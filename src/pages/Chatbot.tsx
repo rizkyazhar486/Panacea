@@ -95,6 +95,7 @@ export function Chatbot() {
         },
         problems: d.problems.map((pr) => ({ id: uid(), ...pr })),
         plan,
+        prognosis: d.prognosis,
         references: d.references,
       }
       saveRecord(record)

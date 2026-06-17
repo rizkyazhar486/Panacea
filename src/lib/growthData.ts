@@ -149,41 +149,123 @@ export const METRIC_LABEL: Record<GrowthMetric, { title: string; unit: string; s
   bmiForAge: { title: 'IMT menurut Umur (IMT/U)', unit: 'kg/m²', short: 'IMT/U' },
 }
 
-// Interpolate the P3/P50/P97 reference at a given age, then classify the value.
-export function classifyGrowth(
-  set: GrowthSet,
-  metric: GrowthMetric,
-  ageYears: number,
-  value: number,
-): { kesan: string; tone: 'low' | 'normal' | 'high' | 'critical' } {
-  const rows = set[metric]
-  const a = Math.max(rows[0][0], Math.min(rows[rows.length - 1][0], ageYears))
-  let lo = rows[0]
-  let hi = rows[rows.length - 1]
-  for (let i = 0; i < rows.length - 1; i++) {
-    if (a >= rows[i][0] && a <= rows[i + 1][0]) {
-      lo = rows[i]
-      hi = rows[i + 1]
+// ---------------------------------------------------------------------------
+// LMS z-score engine (Cole's method, used by WHO/CDC growth standards).
+//   value(z) = M · (1 + L·S·z)^(1/L)   (L≠0)
+//   z(value) = ((value/M)^L − 1) / (L·S)
+// We recover (L, M, S) per reference row from the tabulated P3/P50/P97 points,
+// so z-scores are computed exactly rather than by crude banding.
+// ---------------------------------------------------------------------------
+
+export interface LMS {
+  L: number
+  M: number
+  S: number
+}
+
+const Z3 = 1.8807936 // |z| at the 3rd / 97th percentile
+
+// Fit (L, M, S) so the curve passes through P3, P50 (=M) and P97.
+function fitLMS(p3: number, p50: number, p97: number): LMS {
+  const M = p50
+  const rp = p97 / M
+  const rm = p3 / M
+  const h = (L: number) => Math.pow(rp, L) + Math.pow(rm, L) - 2
+
+  // Direction of the non-zero root is set by the sign of h'(0) = ln(rp·rm).
+  const slope0 = Math.log(rp * rm)
+  let L: number
+  if (Math.abs(slope0) < 1e-6) {
+    L = 1e-4 // near-symmetric → effectively log-normal
+  } else {
+    let lo = slope0 < 0 ? 1e-4 : -6
+    let hi = slope0 < 0 ? 6 : -1e-4
+    // bisection for the crossing (h(lo)·h(hi) < 0 by construction)
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2
+      const hm = h(mid)
+      if (h(lo) * hm <= 0) hi = mid
+      else lo = mid
+    }
+    L = (lo + hi) / 2
+  }
+  const S = Math.abs(L) < 1e-4 ? Math.log(rp) / Z3 : (Math.pow(rp, L) - 1) / (L * Z3)
+  return { L, M, S }
+}
+
+// Pre-fit LMS for every tabulated row, once.
+type LmsTable = { age: number; lms: LMS }[]
+const lmsCache = new Map<string, LmsTable>()
+function lmsTable(set: GrowthSet, metric: GrowthMetric, key: string): LmsTable {
+  const k = `${key}:${metric}`
+  let t = lmsCache.get(k)
+  if (!t) {
+    t = set[metric].map((r) => ({ age: r[0], lms: fitLMS(r[1], r[2], r[3]) }))
+    lmsCache.set(k, t)
+  }
+  return t
+}
+
+export function lmsAt(set: GrowthSet, metric: GrowthMetric, ageYears: number, sexKey: string): LMS {
+  const t = lmsTable(set, metric, sexKey)
+  const a = Math.max(t[0].age, Math.min(t[t.length - 1].age, ageYears))
+  let lo = t[0]
+  let hi = t[t.length - 1]
+  for (let i = 0; i < t.length - 1; i++) {
+    if (a >= t[i].age && a <= t[i + 1].age) {
+      lo = t[i]
+      hi = t[i + 1]
       break
     }
   }
-  const t = hi[0] === lo[0] ? 0 : (a - lo[0]) / (hi[0] - lo[0])
-  const p3 = lo[1] + (hi[1] - lo[1]) * t
-  const p50 = lo[2] + (hi[2] - lo[2]) * t
-  const p97 = lo[3] + (hi[3] - lo[3]) * t
+  const f = hi.age === lo.age ? 0 : (a - lo.age) / (hi.age - lo.age)
+  return {
+    L: lo.lms.L + (hi.lms.L - lo.lms.L) * f,
+    M: lo.lms.M + (hi.lms.M - lo.lms.M) * f,
+    S: lo.lms.S + (hi.lms.S - lo.lms.S) * f,
+  }
+}
 
-  if (value < p3) {
-    const label =
-      metric === 'heightForAge' ? 'Perawakan pendek (Stunted)' : metric === 'bmiForAge' ? 'Gizi kurang (Wasted)' : 'Berat kurang (Underweight)'
-    return { kesan: `< P3 — ${label}`, tone: 'critical' }
+export function zscore(value: number, { L, M, S }: LMS): number {
+  if (Math.abs(L) < 1e-4) return Math.log(value / M) / S
+  return (Math.pow(value / M, L) - 1) / (L * S)
+}
+
+export function valueAtZ(z: number, { L, M, S }: LMS): number {
+  if (Math.abs(L) < 1e-4) return M * Math.exp(S * z)
+  return M * Math.pow(1 + L * S * z, 1 / L)
+}
+
+// Standard normal CDF → percentile.
+export function percentile(z: number): number {
+  const t = 1 / (1 + 0.2316419 * Math.abs(z))
+  const d = 0.3989423 * Math.exp((-z * z) / 2)
+  let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))))
+  p = z > 0 ? 1 - p : p
+  return Math.round(p * 1000) / 10
+}
+
+export function classifyZ(
+  metric: GrowthMetric,
+  z: number,
+): { kesan: string; tone: 'low' | 'normal' | 'high' | 'critical' } {
+  if (metric === 'heightForAge') {
+    if (z < -3) return { kesan: 'Sangat pendek (severely stunted)', tone: 'critical' }
+    if (z < -2) return { kesan: 'Pendek (stunted)', tone: 'high' }
+    if (z > 3) return { kesan: 'Tinggi (tall)', tone: 'normal' }
+    return { kesan: 'Normal', tone: 'normal' }
   }
-  if (value > p97) {
-    const label =
-      metric === 'heightForAge' ? 'Perawakan tinggi (Tall)' : metric === 'bmiForAge' ? 'Obesitas' : 'Berat lebih'
-    return { kesan: `> P97 — ${label}`, tone: 'high' }
+  if (metric === 'bmiForAge') {
+    if (z < -3) return { kesan: 'Gizi buruk (severely wasted)', tone: 'critical' }
+    if (z < -2) return { kesan: 'Gizi kurang (wasted)', tone: 'high' }
+    if (z <= 1) return { kesan: 'Gizi baik (normal)', tone: 'normal' }
+    if (z <= 2) return { kesan: 'Berisiko gizi lebih', tone: 'low' }
+    if (z <= 3) return { kesan: 'Gizi lebih (overweight)', tone: 'high' }
+    return { kesan: 'Obesitas', tone: 'critical' }
   }
-  // crude band
-  if (value < (p3 + p50) / 2) return { kesan: 'P3–P50 (batas bawah normal)', tone: 'low' }
-  if (value > (p50 + p97) / 2) return { kesan: 'P50–P97 (batas atas normal)', tone: 'high' }
-  return { kesan: 'Sekitar P50 (normal)', tone: 'normal' }
+  // weightForAge
+  if (z < -3) return { kesan: 'Berat badan sangat kurang', tone: 'critical' }
+  if (z < -2) return { kesan: 'Berat badan kurang (underweight)', tone: 'high' }
+  if (z > 1) return { kesan: 'Risiko berat lebih', tone: 'low' }
+  return { kesan: 'Normal', tone: 'normal' }
 }

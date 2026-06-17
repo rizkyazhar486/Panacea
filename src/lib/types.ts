@@ -87,6 +87,8 @@ export interface ProblemEntry {
   title: string
   basis: string // basis from anamnesis/exam/supporting
   assessment: string // "Dipikirkan ..." comparative reasoning
+  probability?: number // 0-100 Bayesian estimate
+  differentials?: string[] // diagnosis banding with distinguishing features
 }
 
 export interface EMRRecord {
@@ -98,6 +100,7 @@ export interface EMRRecord {
   physicalExam: PhysicalExam
   problems: ProblemEntry[]
   plan: PlanItem[]
+  prognosis?: string
   references: string[]
   signedBy?: string
   signedAt?: string

@@ -1,4 +1,4 @@
-import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION } from './systemPrompt'
+import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION, EMR_FRAMEWORK } from './systemPrompt'
 import type {
   ChatMessage,
   Patient,
@@ -115,8 +115,9 @@ export interface EMRDraft {
   riwayatNutrisi: string
   riwayatSosialEkonomi: string
   suggestedExams: string[]
-  problems: { title: string; basis: string; assessment: string }[]
+  problems: { title: string; basis: string; assessment: string; probability?: number; differentials?: string[] }[]
   draftPlan: { category: string; text: string }[]
+  prognosis?: string
   references: string[]
 }
 
@@ -137,7 +138,7 @@ export async function draftEMR(
       content: `${contextBlock(ctx)}\n\nTRANSKRIP ANAMNESIS:\n${transcript}\n\n${EMR_DRAFT_INSTRUCTION}`,
     },
   ]
-  const raw = await callClaude(settings, msgs)
+  const raw = await callClaude(settings, msgs, EMR_FRAMEWORK)
   const json = extractJson(raw)
   return json as EMRDraft
 }
@@ -264,12 +265,19 @@ function demoDraft(ctx: PatientContext): EMRDraft {
     problems: [
       {
         title: 'Hipertensi tidak terkontrol',
+        probability: 80,
         basis:
           'Anamnesis nyeri kepala oksipital + tengkuk kaku; riwayat hipertensi dengan kepatuhan rendah; vital TD meningkat.',
         assessment:
-          'Dipikirkan hipertensi esensial tidak terkontrol sebagai penyebab utama, mengingat pola nyeri kepala oksipital pagi hari, riwayat keluarga, dan kepatuhan obat yang rendah, lebih daripada nyeri kepala tipe tegang primer — meski keduanya dapat tumpang tindih. Patofisiologi: peningkatan resistensi vaskular perifer dan remodeling arteriolar meningkatkan afterload; perlu disingkirkan penyebab sekunder (renoparenkimal, renovaskular, endokrin) melalui penunjang.',
+          'Dipikirkan hipertensi esensial tidak terkontrol sebagai penyebab utama, mengingat pola nyeri kepala oksipital pagi hari, riwayat keluarga, dan kepatuhan obat yang rendah, lebih daripada nyeri kepala tipe tegang primer — meski keduanya dapat tumpang tindih. Patofisiologi: peningkatan resistensi vaskular perifer dan remodeling arteriolar meningkatkan afterload; perlu disingkirkan penyebab sekunder (renoparenkimal, renovaskular, endokrin) melalui penunjang. (Evidence level B)',
+        differentials: [
+          'Nyeri kepala tipe tegang — bilateral, tidak berdenyut, tanpa lonjakan TD bermakna.',
+          'Hipertensi sekunder (renovaskular/endokrin) — onset muda/resisten, bruit abdomen, hipokalemia.',
+        ],
       },
     ],
+    prognosis:
+      'Fair — baik bila kepatuhan & target TD tercapai; risiko komplikasi kardio-serebro-vaskular meningkat bila tidak terkontrol.',
     draftPlan: [
       { category: 'Suportif', text: 'Diet DASH, restriksi garam <5 g/hari, target keseimbangan cairan euvolemia.' },
       {

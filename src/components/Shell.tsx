@@ -11,6 +11,8 @@ import {
   IconWallet,
   IconShield,
   IconToken,
+  IconBook,
+  IconArchitecture,
 } from './icons'
 import { useStore } from '../lib/store'
 import { ageFromDob } from '../lib/anthro'
@@ -22,8 +24,10 @@ const nav = [
   { to: '/emr', label: 'AI-EMR', icon: IconEMR },
   { to: '/planning', label: 'Planning', icon: IconPlan },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore },
+  { to: '/my-materials', label: 'Materi Saya', icon: IconBook },
   { to: '/verification', label: 'Verifikasi', icon: IconShield },
   { to: '/billing', label: 'Billing & Token', icon: IconWallet },
+  { to: '/architecture', label: 'Arsitektur CDSS', icon: IconArchitecture },
   { to: '/settings', label: 'Pengaturan', icon: IconSettings },
 ]
 

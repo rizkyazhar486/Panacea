@@ -125,3 +125,12 @@ export const IconBook = ({ size = 18, className = '' }: P) => (
     <path d="M4 19a2 2 0 0 1 2-2h12" />
   </svg>
 )
+
+export const IconArchitecture = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="9" y="3" width="6" height="5" rx="1" />
+    <rect x="3" y="16" width="6" height="5" rx="1" />
+    <rect x="15" y="16" width="6" height="5" rx="1" />
+    <path d="M12 8v4M12 12H6v4M12 12h6v4" />
+  </svg>
+)

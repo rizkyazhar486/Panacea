@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconPlan, IconCheck, IconPlus, IconSparkle } from '../components/icons'
-import type { PlanItem } from '../lib/types'
+import { IconPlan, IconCheck, IconPlus, IconSparkle, IconShield } from '../components/icons'
+import { scorePlanItem, WEIGHTS, S_THRESHOLD } from '../lib/cdss'
+import type { PlanItem, Patient } from '../lib/types'
 
 const CATEGORIES: PlanItem['category'][] = [
   'Suportif',
@@ -57,6 +58,8 @@ export function Planning() {
 
   return (
     <div className="space-y-6">
+      <CdssPanel plan={record.plan} patient={activePatient} />
+
       <Card>
         <SectionTitle
           icon={<IconPlan size={20} />}
@@ -159,5 +162,146 @@ export function Planning() {
         </p>
       </Card>
     </div>
+  )
+}
+
+// ---- CDSS hybrid safety engine -------------------------------------------
+function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-8 text-[10px] font-bold text-neutral-400">{label}</span>
+      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-100">
+        <div className="h-full rounded-full" style={{ width: `${value * 100}%`, background: color }} />
+      </div>
+      <span className="w-8 text-right text-[10px] font-bold tabular-nums">{value.toFixed(2)}</span>
+    </div>
+  )
+}
+
+function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
+  const [open, setOpen] = useState(true)
+  const [overrides, setOverrides] = useState<Record<string, string>>({})
+  const [drafting, setDrafting] = useState<string>('')
+  const [note, setNote] = useState('')
+
+  const scored = plan.map((p) => ({ item: p, s: scorePlanItem(p, patient) }))
+  const blocked = scored.filter((x) => x.s.blocked && !overrides[x.item.id])
+
+  return (
+    <Card className="border-2 border-brand/20">
+      <SectionTitle
+        icon={<IconShield size={20} />}
+        title="CDSS Safety Engine — Hybrid Lateral + Vertical"
+        subtitle={`Ensemble  α·V + β·L + γ·S  (α=${WEIGHTS.alpha}, β=${WEIGHTS.beta}, γ=${WEIGHTS.gamma}) · gerbang keamanan S ≥ ${S_THRESHOLD}`}
+        right={
+          <div className="flex items-center gap-2">
+            {blocked.length > 0 ? (
+              <Badge tone="critical">{blocked.length} diblokir</Badge>
+            ) : (
+              <Badge tone="brand">Aman</Badge>
+            )}
+            <Button variant="ghost" onClick={() => setOpen((o) => !o)}>
+              {open ? 'Sembunyikan' : 'Tampilkan'}
+            </Button>
+          </div>
+        }
+      />
+      {open && (
+        <div className="space-y-2.5">
+          {scored.length === 0 && <p className="text-sm text-neutral-400">Belum ada item untuk dinilai.</p>}
+          {scored.map(({ item, s }) => {
+            const isBlocked = s.blocked && !overrides[item.id]
+            return (
+              <div
+                key={item.id}
+                className={`rounded-xl border p-3 ${
+                  isBlocked ? 'border-accent/40 bg-red-50/50' : 'border-neutral-100'
+                }`}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <Badge tone="neutral">{item.category}</Badge>
+                      {s.highAlert && <Badge tone="critical">High-alert</Badge>}
+                      {overrides[item.id] && <Badge tone="high">Override klinisi</Badge>}
+                    </div>
+                    <p className="text-sm">{item.text}</p>
+                  </div>
+                  <div className="w-44 shrink-0 space-y-1">
+                    <ScoreBar label="V" value={s.V} color="#0b7a4b" />
+                    <ScoreBar label="L" value={s.L} color="#3b82f6" />
+                    <ScoreBar label="S" value={s.S} color={s.blocked ? '#FF3131' : '#00BF63'} />
+                    <div className="flex justify-between border-t border-neutral-100 pt-1 text-[11px] font-bold">
+                      <span className="text-neutral-400">Final</span>
+                      <span className={isBlocked ? 'text-accent' : 'text-brand-dark'}>
+                        {isBlocked ? 'BLOCKED' : s.final.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {s.reasons.length > 0 && (
+                  <ul className="mt-2 space-y-0.5 text-xs text-accent">
+                    {s.reasons.map((r, i) => (
+                      <li key={i}>⚠ {r}</li>
+                    ))}
+                  </ul>
+                )}
+
+                {isBlocked && (
+                  <div className="mt-2 border-t border-red-100 pt-2">
+                    {drafting === item.id ? (
+                      <div className="flex flex-wrap items-end gap-2">
+                        <div className="min-w-[220px] flex-1">
+                          <input
+                            className={inputClass}
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Justifikasi klinis wajib untuk override…"
+                          />
+                        </div>
+                        <Button
+                          variant="danger"
+                          disabled={!note.trim()}
+                          onClick={() => {
+                            setOverrides((o) => ({ ...o, [item.id]: note.trim() }))
+                            setDrafting('')
+                            setNote('')
+                          }}
+                        >
+                          Catat & Override
+                        </Button>
+                        <Button variant="ghost" onClick={() => setDrafting('')}>
+                          Batal
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-accent">
+                          🚫 Diblokir gerbang keamanan — perlu override klinisi dengan justifikasi.
+                        </span>
+                        <Button variant="outline" onClick={() => setDrafting(item.id)}>
+                          Override (justifikasi)
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {overrides[item.id] && (
+                  <p className="mt-2 rounded-lg bg-amber-50 px-2 py-1 text-[11px] text-amber-700">
+                    📝 Audit: override oleh klinisi — “{overrides[item.id]}”
+                  </p>
+                )}
+              </div>
+            )
+          })}
+          <p className="text-[11px] leading-relaxed text-neutral-400">
+            V = vertical (konkordansi pedoman/dosis) · L = lateral (usulan LLM/kesesuaian pasien) · S =
+            keamanan (DDI/alergi/kontraindikasi). Item dengan S &lt; {S_THRESHOLD} diblokir dan menuntut
+            justifikasi klinisi yang tercatat (doctor-in-the-loop).
+          </p>
+        </div>
+      )}
+    </Card>
   )
 }

@@ -3,8 +3,35 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
+import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { generateEducation } from '../lib/ai'
 import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
+
+const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: string[] }[] = [
+  { key: 'mata', label: 'Mata', x: 60, y: 9, kw: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos'] },
+  { key: 'tht', label: 'THT', x: 38, y: 10, kw: ['telinga', 'hidung', 'tenggorok', 'faring', 'tonsil', 'mukosa', 'nasofaring'] },
+  { key: 'kepala', label: 'Kepala', x: 50, y: 5, kw: ['kepala', 'normosefali', 'wajah', 'facies'] },
+  { key: 'leher', label: 'Leher', x: 50, y: 17, kw: ['leher', 'kgb', 'trakea', 'tiroid', 'jvp'] },
+  { key: 'paru', label: 'Paru', x: 37, y: 32, kw: ['paru', 'vesikuler', 'ronki', 'rhonki', 'wheezing', 'fremitus', 'sonor'] },
+  { key: 'jantung', label: 'Jantung', x: 61, y: 34, kw: ['jantung', 'cardio', 'iktus', 'ictus', 's1s2', 'murmur', 'gallop'] },
+  { key: 'abdomen', label: 'Abdomen', x: 50, y: 47, kw: ['abdomen', 'bising usus', 'hepatomegali', 'splenomegali', 'nyeri tekan', 'supel'] },
+  { key: 'kulit', label: 'Kulit', x: 28, y: 58, kw: ['kulit', 'spider nevi', 'eritema', 'pucat', 'sianosis'] },
+  { key: 'ekstremitas', label: 'Ekstremitas', x: 72, y: 82, kw: ['ekstremitas', 'akral', 'crt', 'edema'] },
+]
+
+const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
+
+function buildFindings(perSystem: string): SystemFinding[] {
+  const lines = perSystem.split('\n').filter(Boolean)
+  return BODY_SYSTEMS.map((sys) => {
+    const matched = lines.filter((l) => sys.kw.some((k) => l.toLowerCase().includes(k)))
+    if (matched.length === 0) return { ...sys, status: 'unchecked' as const }
+    const note = matched.join(' ')
+    const low = note.toLowerCase()
+    const abnormal = ABNORMAL_HINTS.some((h) => low.includes(h))
+    return { ...sys, status: abnormal ? ('abnormal' as const) : ('normal' as const), note }
+  })
+}
 
 const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
   { key: 'keluhanUtama', label: 'Keluhan Utama' },
@@ -135,6 +162,13 @@ export function EMR() {
             </label>
           }
         />
+        <div className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            Peta Sistem — ringkasan visual temuan
+          </div>
+          <BodyDiagram findings={buildFindings(draft.physicalExam.perSystem)} />
+        </div>
+
         <div className="grid gap-4">
           <ExamField
             label="Keadaan Umum & Kesadaran"
@@ -167,11 +201,23 @@ export function EMR() {
           {draft.problems.length === 0 && <p className="text-sm text-neutral-400">Belum ada masalah.</p>}
           {draft.problems.map((pr, i) => (
             <div key={pr.id} className="rounded-xl border border-neutral-100 p-4">
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span className="grid h-6 w-6 place-items-center rounded-lg bg-brand text-xs font-bold text-white">
                   {i + 1}
                 </span>
                 <h4 className="font-bold">{pr.title}</h4>
+                {typeof pr.probability === 'number' && (
+                  <span className="ml-auto flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-neutral-400">Probabilitas</span>
+                    <span className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
+                      <span
+                        className="block h-full rounded-full bg-brand"
+                        style={{ width: `${Math.max(0, Math.min(100, pr.probability))}%` }}
+                      />
+                    </span>
+                    <span className="text-xs font-bold text-brand-dark">{pr.probability}%</span>
+                  </span>
+                )}
               </div>
               <p className="mb-2 text-sm">
                 <span className="font-semibold text-neutral-500">Basis: </span>
@@ -180,8 +226,29 @@ export function EMR() {
               <p className="rounded-lg bg-neutral-50 p-3 text-sm leading-relaxed text-neutral-700">
                 {pr.assessment}
               </p>
+              {pr.differentials && pr.differentials.length > 0 && (
+                <div className="mt-2">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+                    Diagnosis Banding
+                  </div>
+                  <ul className="mt-1 space-y-1 text-sm">
+                    {pr.differentials.map((d, j) => (
+                      <li key={j} className="flex gap-2 text-neutral-600">
+                        <span className="text-brand">↔</span>
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
+          {draft.prognosis && (
+            <div className="rounded-xl border-2 border-brand/15 bg-brand-50/40 p-4">
+              <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">Prognosis</div>
+              <p className="text-sm leading-relaxed text-neutral-700">{draft.prognosis}</p>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -319,44 +386,67 @@ function EducationCard({ diagnosis }: { diagnosis: string }) {
           <b>{diagnosis || 'diagnosis'}</b>.
         </p>
       ) : (
-        <div className="space-y-3">
-          <div className="rounded-xl bg-brand-50/60 p-3">
-            <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">Ringkas</div>
-            <p className="text-sm leading-relaxed">{sheet.ringkas}</p>
-          </div>
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Penjelasan Mendalam</div>
-            <p className="text-sm leading-relaxed text-neutral-700">{sheet.mendalam}</p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-neutral-100 p-3">
-              <div className="mb-1 text-xs font-bold uppercase tracking-wide text-brand-dark">
-                Cara Menjaga Kesehatan
-              </div>
-              <ul className="space-y-1 text-sm">
-                {sheet.caraMenjaga.map((c, i) => (
-                  <li key={i} className="flex gap-2">
-                    <IconCheck size={14} className="mt-0.5 shrink-0 text-brand" />
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-xl border border-red-100 bg-red-50/40 p-3">
-              <div className="mb-1 text-xs font-bold uppercase tracking-wide text-accent">Tanda Bahaya</div>
-              <ul className="space-y-1 text-sm">
-                {sheet.tandaBahaya.map((c, i) => (
-                  <li key={i} className="flex gap-2 text-neutral-700">
-                    <span className="text-accent">•</span>
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+        <EducationDeck sheet={sheet} />
       )}
     </Card>
+  )
+}
+
+// Presentation-style education deck — few words, high impact (international slide feel).
+function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet }) {
+  return (
+    <div className="space-y-4">
+      {/* Hero slide */}
+      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Edukasi Pasien</div>
+        <h3 className="mt-1 text-2xl font-extrabold leading-tight">{sheet.diagnosis}</h3>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/90">{sheet.ringkas}</p>
+      </div>
+
+      {/* Key actions — 1·2·3 cards */}
+      <div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
+          Langkah Menjaga Kesehatan
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {sheet.caraMenjaga.slice(0, 6).map((c, i) => (
+            <div key={i} className="rounded-2xl border border-neutral-100 p-4">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-brand-50 text-base font-extrabold text-brand-dark">
+                {i + 1}
+              </div>
+              <p className="mt-2 text-sm font-medium leading-snug">{c}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Red flags strip */}
+      <div className="rounded-2xl border-2 border-accent/20 bg-red-50/40 p-4">
+        <div className="mb-2 flex items-center gap-2 text-sm font-bold text-accent">
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">!</span>
+          Tanda Bahaya — Segera ke Faskes
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {sheet.tandaBahaya.map((c, i) => (
+            <span key={i} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 ring-1 ring-accent/20">
+              {c}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Deep-dive, collapsed by default */}
+      <details className="rounded-2xl border border-neutral-100 p-4">
+        <summary className="cursor-pointer text-sm font-bold text-neutral-700">
+          Penjelasan mendalam (opsional)
+        </summary>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-600">{sheet.mendalam}</p>
+      </details>
+
+      <p className="text-[11px] text-neutral-400">
+        Dibuat {new Date(sheet.generatedAt).toLocaleString('id-ID')} · AI mendukung, verifikasi klinisi.
+      </p>
+    </div>
   )
 }
 

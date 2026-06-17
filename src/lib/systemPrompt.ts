@@ -35,18 +35,42 @@ Literature synthesis & appraisal (GRADE); study/trial design (PICO); data-analys
 
 When working inside the Panaceamed.id app, the chatbot's job in CLINICAL mode is to perform the ANAMNESIS with the patient through empathetic, targeted, open-ended questions (one focused question at a time when interviewing), and to recommend the supporting examinations (targeted physical exam, labs, radiology, ECG) needed to refine the differential. The physical examination findings and final plan are entered and VERIFIED by the human examining doctor — never finalize them yourself.`
 
+// Comprehensive Patient-Based Medicine framework that governs EMR generation.
+// Condensed from the full operational spec; applied as additional system context
+// whenever the app drafts a structured record.
+export const EMR_FRAMEWORK = `EMR GENERATION FRAMEWORK (Patient-Based Medicine, multi-subspecialist):
+1. IDENTITAS — validate completeness (nama, usia, sex, pekerjaan); flag missing critical data.
+2. ANAMNESIS — SOCRATES with algorithmic expansion (chest pain→cardiac risk stratification; abdominal→GI systematic review; neuro→stroke-scale elements). Conditional history: obstetri-ginekologi (GTPAL) if female; tumbuh-kembang (Denver milestones, growth velocity) if pediatric; medication reconciliation + adherence (Morisky); allergy hypersensitivity type (I–IV); social determinants of health.
+3. PEMERIKSAAN FISIK — vitals + general + per-system; adaptive focus by chief complaint; murmur grading, adventitious sounds, GCS/cranial nerves where relevant.
+4. ANTROPOMETRI — pediatric WHO/CDC z-score & percentile with clinical interpretation; adult BMI (WHO/Asia-Pacific) + waist-hip ratio.
+5. PENUNJANG — interpret every Lab/ECG/imaging with clinical correlation; pattern recognition (anemia workup by MCV/ferritin/B12; liver Child-Pugh; kidney eGFR staging; lipid CV risk).
+6. ASSESSMENT — differential diagnosis ranked by probability (Bayesian); apply clinical decision rules (Wells, CURB-65, Ottawa, etc.) when applicable.
+7. CLINICAL REASONING — per diagnosis a "Dipikirkan ..." narrative integrating anamnesis (sensitivity/specificity), exam (likelihood ratios), penunjang (diagnostic accuracy), etiologi, patofisiologi, epidemiologi, faktor risiko, diagnosis banding (distinguishing features), and gold-standard criteria with evidence level.
+8. TATALAKSANA — supportive (ABC, fluid balance, caloric needs via Harris-Benedict, urine output >0.5 mL/kg/jam) + definitive (drug/dose/route/frequency/duration, adjusted for weight/age/renal function), with guideline reference & recommendation class; high-alert drugs → ranges + clinician verification only.
+9. EDUKASI & FOLLOW-UP — lifestyle (diet/exercise/sleep), warning signs, self-monitoring; follow-up timing keyed to severity.
+10. PROGNOSIS — good/fair/poor with prognostic factors & evidence base.
+11. REFERENSI — Vancouver; prioritize meta-analyses & RCTs ≤5y, society guidelines, Harrison's 21st ed; Indonesian sources (Buku Ajar IPD FKUI, PAPDI/PNPK) on request. Tag evidence level (A–C) for key claims.
+SAFETY: clinician-in-the-loop; never fabricate real-patient findings; flag drug allergy & interactions; verify all doses against formulary.`
+
 // A compact instruction used when the app asks the model to emit a structured
 // draft EMR (anamnesis + suggested exams + draft assessment) as strict JSON.
-export const EMR_DRAFT_INSTRUCTION = `Based on the conversation so far, produce a DRAFT clinical record for the examining doctor to verify and complete. Output ONLY valid minified JSON (no markdown fences, no commentary) matching this TypeScript shape:
+export const EMR_DRAFT_INSTRUCTION = `Based on the conversation so far AND the EMR GENERATION FRAMEWORK, produce a DRAFT clinical record for the examining doctor to verify and complete. Output ONLY valid minified JSON (no markdown fences, no commentary) matching this TypeScript shape:
 {
  "keluhanUtama": string,
- "rps": string,                 // SOCRATES narrative
+ "rps": string,                 // SOCRATES narrative with algorithmic expansion
  "rpd": string, "rpk": string,
  "riwayatPengobatan": string, "riwayatAlergi": string, "riwayatNutrisi": string,
  "riwayatSosialEkonomi": string,
- "suggestedExams": string[],    // recommended supporting examinations (targeted PE, labs, radiology, ECG)
- "problems": [{"title": string, "basis": string, "assessment": string}],
+ "suggestedExams": string[],    // recommended supporting examinations (targeted PE, labs, radiology, ECG) with brief rationale
+ "problems": [{
+    "title": string,
+    "probability": number,      // 0-100, Bayesian estimate; problems sorted descending
+    "basis": string,            // basis from anamnesis + exam + penunjang
+    "assessment": string,       // "Dipikirkan ..." comparative narrative (etiologi/patofisiologi/epidemiologi/faktor risiko/gold standard + evidence level)
+    "differentials": string[]   // diagnosis banding with distinguishing features
+ }],
  "draftPlan": [{"category": "Suportif"|"Definitif"|"Edukasi"|"Follow-up"|"Monitoring", "text": string}],
- "references": string[]
+ "prognosis": string,           // good/fair/poor + prognostic factors
+ "references": string[]         // Vancouver, key claims only, with evidence level tag where possible
 }
-The "assessment" field must contain a "Dipikirkan ..." comparative narrative. Keep doses as ranges for high-alert drugs and append a verify-disclaimer. Use bilingual (Indonesian + English) terms.`
+Keep doses as ranges for high-alert drugs and append a verify-disclaimer. Use bilingual (Indonesian + English) terms.`

@@ -22,9 +22,27 @@ patients with chronic disease, the elderly, and the immunocompromised.
 | **AI-EMR** | SOAP record. AI drafts the anamnesis (S) and assessment (A) with a *"Dipikirkan …"* comparative narrative; the **doctor fills & verifies the physical exam (O)** and signs. Includes an AI **patient-education** sheet (brief + deep) so patients understand their disease and how to stay healthy. |
 | **Planning** | AI recommends management (Suportif · Definitif · Edukasi · Follow-up · Monitoring); the **doctor verifies, rejects, or adds** items. High-alert drugs return ranges + references only. |
 | **Marketplace** | Buy & sell **medical notes / materials / journals** (USMLE, UKMPPD) and **AI-EMR templates** with **PanaceaToken (PNC)**. Upload as **Word / PDF / PowerPoint**. Every upload is gated by **Claude AI verification → specialist verifier**. |
+| **Materi Saya** | Contributor dashboard — uploaded materials, verification pipeline (Upload → AI Claude → Verifikator → Terbit), downloads, and **royalty earnings**. |
 | **Verifikasi** | Two-layer gatekeeping: Claude AI (accuracy/safety) then a **Spesialis/Subspesialis verifier**. Contributors must be verified before their materials are listed. "Act as" switcher to demo each role. |
 | **Billing & Token** | Runnable token wallet — deposit (simulated gateway), purchase, **author royalty payout**, and **subscriptions** (Individu / Rumah Sakit) that unlock full AI-EMR + automatic patient education. |
+| **Arsitektur CDSS** | Reference for the hybrid lateral+vertical CDSS: 12 microservices, data flow, the ensemble formula, the safety-filter pseudocode, roadmap, evaluation metrics & regulatory checklist. |
 | **Settings** | Anthropic API key, model selection, examining-doctor identity. |
+
+## Clinical engines
+
+- **LMS z-scores (Cole's method)** power the pediatric growth charts — exact z-score &
+  percentile with WHO/CDC classification (stunted/wasted/overweight), fitted from the
+  tabulated P3/P50/P97 reference points. Adults get a WHO Asia-Pacific BMI band chart.
+- **CDSS hybrid safety engine** (`src/lib/cdss.ts`) scores every plan item as
+  `CombinedScore = α·V + β·L + γ·S` and **blocks** any item with safety `S < 0.8`
+  (allergy/high-alert/contraindication), requiring a **logged clinician override
+  justification** (doctor-in-the-loop). Visualized on the Planning page.
+- **Comprehensive EMR framework** — the AI drafts records per a Patient-Based Medicine
+  spec (SOCRATES algorithmic expansion, conditional pediatric/obstetric history,
+  **probability-ranked differentials**, "Dipikirkan …" reasoning, prognosis, and
+  evidence-graded Vancouver citations).
+- **Modern visual layer** — an anatomical **body map** summarizes physical-exam findings
+  per system; patient education renders as a brief, high-impact **presentation deck**.
 
 ## Business model
 

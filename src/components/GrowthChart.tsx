@@ -1,12 +1,28 @@
 import { useState } from 'react'
-import { growthSet, classifyGrowth, METRIC_LABEL, type GrowthMetric } from '../lib/growthData'
+import {
+  growthSet,
+  lmsAt,
+  zscore,
+  valueAtZ,
+  percentile,
+  classifyZ,
+  METRIC_LABEL,
+  type GrowthMetric,
+} from '../lib/growthData'
 import { computeBmi } from '../lib/anthro'
 import { Badge } from './ui'
 import type { Patient } from '../lib/types'
 
 const METRICS: GrowthMetric[] = ['weightForAge', 'heightForAge', 'bmiForAge']
+const SD_LINES = [-3, -2, 0, 2, 3]
+const SD_STYLE: Record<number, { color: string; dash: string; label: string }> = {
+  [-3]: { color: '#FF3131', dash: '2 3', label: '-3 SD' },
+  [-2]: { color: '#f59e0b', dash: '4 3', label: '-2 SD' },
+  [0]: { color: '#00BF63', dash: '', label: 'Median' },
+  [2]: { color: '#f59e0b', dash: '4 3', label: '+2 SD' },
+  [3]: { color: '#FF3131', dash: '2 3', label: '+3 SD' },
+}
 
-// ---- Pediatric percentile chart (age 2–19) --------------------------------
 function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: number }) {
   const [metric, setMetric] = useState<GrowthMetric>('bmiForAge')
   const set = growthSet(patient.sex)
@@ -18,23 +34,27 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
   const padL = 44
   const padB = 34
   const padT = 14
-  const padR = 14
+  const padR = 40
 
   const xMin = 2
   const xMax = 19
-  const yMin = Math.min(...rows.map((r) => r[1])) * 0.9
-  const yMax = Math.max(...rows.map((r) => r[3])) * 1.05
+
+  // Build each SD curve from the per-age LMS fit.
+  const curves = SD_LINES.map((z) => ({
+    z,
+    pts: rows.map((r) => {
+      const lms = lmsAt(set, metric, r[0], patient.sex)
+      return { age: r[0], v: valueAtZ(z, lms) }
+    }),
+  }))
+  const allV = curves.flatMap((c) => c.pts.map((p) => p.v))
+  const yMin = Math.min(...allV) * 0.96
+  const yMax = Math.max(...allV) * 1.04
 
   const px = (age: number) => padL + ((age - xMin) / (xMax - xMin)) * (W - padL - padR)
   const py = (v: number) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB)
-
-  const line = (idx: 1 | 2 | 3) =>
-    rows.map((r) => `${px(r[0]).toFixed(1)},${py(r[idx]).toFixed(1)}`).join(' ')
-
-  const band =
-    rows.map((r) => `${px(r[0]).toFixed(1)},${py(r[3]).toFixed(1)}`).join(' ') +
-    ' ' +
-    [...rows].reverse().map((r) => `${px(r[0]).toFixed(1)},${py(r[1]).toFixed(1)}`).join(' ')
+  const poly = (pts: { age: number; v: number }[]) =>
+    pts.map((p) => `${px(p.age).toFixed(1)},${py(p.v).toFixed(1)}`).join(' ')
 
   const patientValue =
     metric === 'weightForAge'
@@ -44,7 +64,10 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
         : computeBmi(patient.weightKg, patient.heightCm).bmi
 
   const inRange = ageYears >= xMin && ageYears <= xMax
-  const cls = classifyGrowth(set, metric, ageYears, patientValue)
+  const lms = lmsAt(set, metric, ageYears, patient.sex)
+  const z = zscore(patientValue, lms)
+  const pct = percentile(z)
+  const cls = classifyZ(metric, z)
 
   const yTicks = 5
   const xTicks = [2, 5, 8, 11, 14, 17, 19]
@@ -67,7 +90,6 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
 
       <div className="overflow-x-auto">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[480px]">
-          {/* grid + axes */}
           {Array.from({ length: yTicks + 1 }).map((_, i) => {
             const v = yMin + ((yMax - yMin) / yTicks) * i
             const y = py(v)
@@ -85,53 +107,77 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
               {t}
             </text>
           ))}
-          <text x={(W) / 2} y={H - 2} textAnchor="middle" fontSize="9" fill="#9aa5a0">
+          <text x={W / 2} y={H - 2} textAnchor="middle" fontSize="9" fill="#9aa5a0">
             Umur (tahun)
           </text>
 
-          {/* P3–P97 band */}
-          <polygon points={band} fill="#00BF63" opacity="0.08" />
-          <polyline points={line(1)} fill="none" stroke="#cdd8d2" strokeWidth="1" strokeDasharray="4 3" />
-          <polyline points={line(2)} fill="none" stroke="#00BF63" strokeWidth="2" />
-          <polyline points={line(3)} fill="none" stroke="#cdd8d2" strokeWidth="1" strokeDasharray="4 3" />
+          {/* normal band ±2 SD shaded */}
+          <polygon
+            points={`${poly(curves.find((c) => c.z === 2)!.pts)} ${poly([...curves.find((c) => c.z === -2)!.pts].reverse())}`}
+            fill="#00BF63"
+            opacity="0.07"
+          />
 
-          {/* labels for percentile lines */}
-          <text x={W - padR} y={py(rows[rows.length - 1][3]) - 3} textAnchor="end" fontSize="8" fill="#9aa5a0">P97</text>
-          <text x={W - padR} y={py(rows[rows.length - 1][2]) - 3} textAnchor="end" fontSize="8" fill="#0b7a4b">P50</text>
-          <text x={W - padR} y={py(rows[rows.length - 1][1]) - 3} textAnchor="end" fontSize="8" fill="#9aa5a0">P3</text>
+          {curves.map((c) => {
+            const st = SD_STYLE[c.z]
+            return (
+              <g key={c.z}>
+                <polyline
+                  points={poly(c.pts)}
+                  fill="none"
+                  stroke={st.color}
+                  strokeWidth={c.z === 0 ? 2.2 : 1.2}
+                  strokeDasharray={st.dash}
+                />
+                <text x={W - padR + 2} y={py(c.pts[c.pts.length - 1].v) + 3} fontSize="8" fill={st.color}>
+                  {st.label}
+                </text>
+              </g>
+            )
+          })}
 
-          {/* patient marker */}
           {inRange && (
             <g>
-              <line x1={px(ageYears)} y1={padT} x2={px(ageYears)} y2={H - padB} stroke="#FF3131" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
-              <circle cx={px(ageYears)} cy={py(patientValue)} r="5" fill="#FF3131" stroke="#fff" strokeWidth="2" />
+              <line x1={px(ageYears)} y1={padT} x2={px(ageYears)} y2={H - padB} stroke="#0c1410" strokeWidth="1" strokeDasharray="3 3" opacity="0.35" />
+              <circle cx={px(ageYears)} cy={py(patientValue)} r="5.5" fill="#0c1410" stroke="#fff" strokeWidth="2" />
             </g>
           )}
         </svg>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm">
-          <span className="text-neutral-500">{label.title}: </span>
-          <span className="font-bold">
-            {patientValue} {label.unit}
-          </span>
-          <span className="text-neutral-400"> @ {ageYears} th</span>
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{label.short}</div>
+          <div className="text-xl font-extrabold">
+            {patientValue} <span className="text-xs font-medium text-neutral-400">{label.unit}</span>
+          </div>
         </div>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Z-score (SD)</div>
+          <div className={`text-xl font-extrabold ${Math.abs(z) > 2 ? 'text-accent' : 'text-brand-dark'}`}>
+            {z >= 0 ? '+' : ''}
+            {z.toFixed(2)}
+          </div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Persentil</div>
+          <div className="text-xl font-extrabold">P{pct}</div>
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between">
+        <span className="text-sm text-neutral-500">Kesan ({label.short})</span>
         <Badge tone={cls.tone}>{cls.kesan}</Badge>
       </div>
       <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
-        Kurva referensi WHO/CDC (perkiraan, P3–P50–P97). Z-score presisi (LMS) dihitung AI pada workup
-        AI-EMR.
+        Z-score dihitung dengan metode LMS (Cole) — konsisten standar WHO/CDC. Kurva referensi
+        diturunkan dari titik persentil tabulasi.
       </p>
     </div>
   )
 }
 
-// ---- Adult BMI band chart -------------------------------------------------
 function AdultBmiChart({ patient }: { patient: Patient }) {
   const { bmi, kesan, tone } = computeBmi(patient.weightKg, patient.heightCm)
-  // Asia-Pacific bands
   const bands = [
     { from: 12, to: 18.5, label: 'Kurang', color: '#fbbf24' },
     { from: 18.5, to: 23, label: 'Normal', color: '#00BF63' },
@@ -148,29 +194,21 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
       <div className="mb-2 flex items-end justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">IMT (BMI) Dewasa</div>
-          <div className="text-3xl font-extrabold">{bmi} <span className="text-base font-medium text-neutral-400">kg/m²</span></div>
+          <div className="text-3xl font-extrabold">
+            {bmi} <span className="text-base font-medium text-neutral-400">kg/m²</span>
+          </div>
         </div>
         <Badge tone={tone}>{kesan}</Badge>
       </div>
       <div className="relative mt-4 h-8 w-full overflow-hidden rounded-full">
         <div className="flex h-full w-full">
           {bands.map((b) => (
-            <div
-              key={b.label}
-              style={{ width: `${((b.to - b.from) / (max - min)) * 100}%`, background: b.color }}
-              className="h-full"
-            />
+            <div key={b.label} style={{ width: `${((b.to - b.from) / (max - min)) * 100}%`, background: b.color }} className="h-full" />
           ))}
         </div>
-        {/* marker */}
-        <div
-          className="absolute top-0 h-8"
-          style={{ left: `calc(${pct(bmi)}% - 1px)` }}
-        >
+        <div className="absolute top-0 h-8" style={{ left: `calc(${pct(bmi)}% - 1px)` }}>
           <div className="h-8 w-0.5 bg-ink" />
-          <div className="absolute -top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-1 text-[10px] font-bold">
-            ▲
-          </div>
+          <div className="absolute -top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-1 text-[10px] font-bold">▲</div>
         </div>
       </div>
       <div className="mt-1 flex justify-between text-[10px] text-neutral-400">
@@ -192,7 +230,6 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
 }
 
 export function GrowthChart({ patient, ageYears }: { patient: Patient; ageYears: number }) {
-  // Children/adolescents (2–19y) get growth curves; adults get the BMI band.
   if (ageYears >= 2 && ageYears <= 19) return <PediatricChart patient={patient} ageYears={ageYears} />
   return <AdultBmiChart patient={patient} />
 }
