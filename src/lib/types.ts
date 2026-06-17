@@ -103,6 +103,91 @@ export interface EMRRecord {
   signedAt?: string
 }
 
+// AI-generated patient-facing disease education (brief + deep).
+export interface EducationSheet {
+  diagnosis: string
+  ringkas: string // brief plain-language summary
+  mendalam: string // deeper explanation
+  caraMenjaga: string[] // how to maintain health
+  tandaBahaya: string[] // red flags / when to seek care
+  generatedAt: string
+}
+
+// -- Marketplace / tokenized medical notes & materials -----------------------
+
+export type MaterialCategory = 'Catatan' | 'Materi' | 'Jurnal' | 'AI-EMR Template'
+export type ExamTrack = 'USMLE' | 'UKMPPD' | 'Umum'
+export type FileType = 'Word' | 'PDF' | 'PowerPoint'
+export type MaterialStatus =
+  | 'pending-ai' // awaiting Claude AI verification
+  | 'pending-verifier' // awaiting specialist verifier
+  | 'verified' // approved & listed
+  | 'rejected'
+
+export interface AIReview {
+  verdict: 'approved' | 'revise'
+  score: number // 0-100 quality/accuracy
+  notes: string
+  at: string
+}
+
+export interface VerifierReview {
+  verifierName: string
+  verifierRole: 'Spesialis' | 'Subspesialis'
+  approved: boolean
+  notes: string
+  at: string
+}
+
+export interface Material {
+  id: string
+  title: string
+  description: string
+  category: MaterialCategory
+  exam: ExamTrack
+  specialty: string
+  authorId: string
+  authorName: string
+  fileType: FileType
+  fileName: string
+  priceTokens: number
+  status: MaterialStatus
+  aiReview?: AIReview
+  verifierReview?: VerifierReview
+  createdAt: string
+  downloads: number
+  rating: number
+}
+
+export interface Contributor {
+  id: string
+  name: string
+  role: 'Dokter' | 'Spesialis' | 'Subspesialis'
+  specialty: string
+  verified: boolean // verified as a contributor by a verifier
+  canVerify: boolean // is a verifier (specialist/subspecialist)
+}
+
+export type TxType = 'deposit' | 'purchase' | 'payout' | 'subscription'
+export interface WalletTx {
+  id: string
+  type: TxType
+  amount: number // tokens (+in / -out)
+  note: string
+  at: string
+}
+export interface Wallet {
+  balance: number // PanaceaToken (PNC)
+  transactions: WalletTx[]
+}
+
+export type SubscriptionPlan = 'none' | 'individu' | 'rumah-sakit'
+export interface Subscription {
+  plan: SubscriptionPlan
+  since?: string
+  seats?: number // for hospital plan
+}
+
 export interface AppState {
   patients: Patient[]
   activePatientId: string
@@ -110,6 +195,13 @@ export interface AppState {
   supportive: Record<string, SupportiveResult[]>
   chats: Record<string, ChatMessage[]>
   records: Record<string, EMRRecord>
+  education: Record<string, EducationSheet> // by patientId
+  materials: Material[]
+  ownedMaterialIds: string[]
+  contributors: Contributor[]
+  wallet: Wallet
+  subscription: Subscription
+  currentUserId: string // the logged-in contributor (demo "act as")
   settings: {
     apiKey: string
     model: string

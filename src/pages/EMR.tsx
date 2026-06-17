@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
-import { IconEMR, IconCheck, IconSparkle, IconShield } from '../components/icons'
+import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
+import { generateEducation } from '../lib/ai'
 import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
 
 const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
@@ -219,6 +220,9 @@ export function EMR() {
         )}
       </Card>
 
+      {/* Patient education */}
+      <EducationCard diagnosis={draft.problems[0]?.title ?? draft.anamnesis.keluhanUtama} />
+
       {/* Sign-off */}
       <Card className="border-2 border-brand/20">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -267,6 +271,92 @@ function ExamField({
         className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
       />
     </div>
+  )
+}
+
+function EducationCard({ diagnosis }: { diagnosis: string }) {
+  const { state, activePatient, saveEducation } = useStore()
+  const sheet = state.education[activePatient.id]
+  const [busy, setBusy] = useState(false)
+  const subscribed = state.subscription.plan !== 'none'
+
+  async function gen() {
+    setBusy(true)
+    const vitals = state.vitals[activePatient.id] ?? []
+    const s = await generateEducation(
+      state.settings,
+      {
+        patient: activePatient,
+        latestVitals: vitals[vitals.length - 1],
+        supportive: state.supportive[activePatient.id] ?? [],
+      },
+      diagnosis,
+    )
+    saveEducation(activePatient.id, s)
+    setBusy(false)
+  }
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconBook size={18} />}
+        title="Edukasi Pasien — Singkat & Mendalam"
+        subtitle="Agar pasien memahami penyakitnya dan cara menjaga kesehatannya"
+        right={
+          <Button onClick={gen} disabled={busy}>
+            <IconSparkle size={16} /> {busy ? 'Menyusun…' : sheet ? 'Buat Ulang' : 'Buat Edukasi Pasien'}
+          </Button>
+        }
+      />
+      {!subscribed && (
+        <div className="mb-3 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          Fitur edukasi otomatis termasuk dalam langganan. Anda tetap dapat mencobanya di sini.
+        </div>
+      )}
+      {!sheet ? (
+        <p className="text-sm text-neutral-400">
+          Belum ada lembar edukasi. Tekan tombol di atas untuk membuat edukasi pasien tentang{' '}
+          <b>{diagnosis || 'diagnosis'}</b>.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          <div className="rounded-xl bg-brand-50/60 p-3">
+            <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">Ringkas</div>
+            <p className="text-sm leading-relaxed">{sheet.ringkas}</p>
+          </div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Penjelasan Mendalam</div>
+            <p className="text-sm leading-relaxed text-neutral-700">{sheet.mendalam}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-neutral-100 p-3">
+              <div className="mb-1 text-xs font-bold uppercase tracking-wide text-brand-dark">
+                Cara Menjaga Kesehatan
+              </div>
+              <ul className="space-y-1 text-sm">
+                {sheet.caraMenjaga.map((c, i) => (
+                  <li key={i} className="flex gap-2">
+                    <IconCheck size={14} className="mt-0.5 shrink-0 text-brand" />
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-red-100 bg-red-50/40 p-3">
+              <div className="mb-1 text-xs font-bold uppercase tracking-wide text-accent">Tanda Bahaya</div>
+              <ul className="space-y-1 text-sm">
+                {sheet.tandaBahaya.map((c, i) => (
+                  <li key={i} className="flex gap-2 text-neutral-700">
+                    <span className="text-accent">•</span>
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
   )
 }
 

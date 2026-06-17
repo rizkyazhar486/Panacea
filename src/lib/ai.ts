@@ -1,5 +1,13 @@
 import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION } from './systemPrompt'
-import type { ChatMessage, Patient, VitalSign, SupportiveResult } from './types'
+import type {
+  ChatMessage,
+  Patient,
+  VitalSign,
+  SupportiveResult,
+  Material,
+  AIReview,
+  EducationSheet,
+} from './types'
 
 const API_URL = 'https://api.anthropic.com/v1/messages'
 const ANTHROPIC_VERSION = '2023-06-01'
@@ -132,6 +140,82 @@ export async function draftEMR(
   const raw = await callClaude(settings, msgs)
   const json = extractJson(raw)
   return json as EMRDraft
+}
+
+// AI verification of an uploaded material / AI-EMR template (Claude gatekeeper).
+export async function verifyMaterial(settings: AISettings, m: Material): Promise<AIReview> {
+  if (!hasKey(settings)) {
+    await wait(1100)
+    return demoVerify(m)
+  }
+  const msgs = [
+    {
+      role: 'user' as const,
+      content: `Tinjau kelayakan materi medis untuk dijual di platform edukasi kedokteran. Nilai akurasi, kemutakhiran, keamanan klinis, dan kelengkapan. Judul: "${m.title}". Kategori: ${m.category}. Jalur: ${m.exam}. Spesialti: ${m.specialty}. Deskripsi: ${m.description}.\n\nKeluarkan HANYA JSON minified: {"verdict":"approved"|"revise","score":0-100,"notes":"alasan singkat bilingual"}`,
+    },
+  ]
+  const raw = await callClaude(settings, msgs)
+  const j = extractJson(raw) as { verdict: 'approved' | 'revise'; score: number; notes: string }
+  return { ...j, at: new Date().toISOString() }
+}
+
+// Patient-facing disease education (brief + deep), for subscribers' patients.
+export async function generateEducation(
+  settings: AISettings,
+  ctx: PatientContext,
+  diagnosis: string,
+): Promise<EducationSheet> {
+  if (!hasKey(settings)) {
+    await wait(1000)
+    return demoEducation(diagnosis)
+  }
+  const msgs = [
+    {
+      role: 'user' as const,
+      content: `${contextBlock(ctx)}\n\nBuat EDUKASI PASIEN (bahasa awam, empatik, bilingual ID+EN) untuk diagnosis: "${diagnosis}". Singkat namun mendalam, agar pasien memahami penyakitnya dan cara menjaga kesehatan.\n\nKeluarkan HANYA JSON minified: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
+    },
+  ]
+  const raw = await callClaude(settings, msgs)
+  const j = extractJson(raw) as Omit<EducationSheet, 'generatedAt'>
+  return { ...j, generatedAt: new Date().toISOString() }
+}
+
+function wait(ms: number) {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+function demoVerify(m: Material): AIReview {
+  const score = 78 + (m.title.length % 18)
+  return {
+    verdict: score >= 80 ? 'approved' : 'approved',
+    score: Math.min(96, score),
+    notes:
+      '⚠️ Mode Demo. Konten dinilai konsisten dengan pedoman terkini; sitasi & dosis perlu konfirmasi verifikator spesialis. / Content appears consistent with current guidelines; citations & doses to be confirmed by a specialist verifier.',
+    at: new Date().toISOString(),
+  }
+}
+
+function demoEducation(diagnosis: string): EducationSheet {
+  return {
+    diagnosis,
+    ringkas: `⚠️ Mode Demo. ${diagnosis} adalah kondisi yang perlu dipahami dan dikontrol bersama tim medis. Dengan pengobatan teratur dan gaya hidup sehat, kualitas hidup Anda dapat terjaga.`,
+    mendalam:
+      'Penyakit ini berkembang dari interaksi faktor risiko (genetik, gaya hidup, lingkungan) yang memengaruhi fungsi organ secara bertahap. Memahami pemicu, mengenali gejala dini, dan patuh pada terapi membantu mencegah komplikasi serta memperpanjang masa sehat (healthspan).',
+    caraMenjaga: [
+      'Minum obat sesuai jadwal; jangan berhenti tanpa anjuran dokter.',
+      'Pola makan seimbang — kurangi garam, gula, dan lemak jenuh.',
+      'Aktivitas fisik teratur (mis. jalan cepat 30 menit, 5×/minggu).',
+      'Tidur cukup 7–8 jam dan kelola stres.',
+      'Pantau tanda vital di rumah dan catat keluhan.',
+    ],
+    tandaBahaya: [
+      'Sesak napas berat atau nyeri dada.',
+      'Penurunan kesadaran atau kebingungan mendadak.',
+      'Demam tinggi yang tidak membaik.',
+      'Gejala memburuk cepat — segera ke fasilitas kesehatan.',
+    ],
+    generatedAt: new Date().toISOString(),
+  }
 }
 
 function extractJson(raw: string): unknown {

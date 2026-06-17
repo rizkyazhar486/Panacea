@@ -7,6 +7,10 @@ import {
   IconEMR,
   IconPlan,
   IconSettings,
+  IconStore,
+  IconWallet,
+  IconShield,
+  IconToken,
 } from './icons'
 import { useStore } from '../lib/store'
 import { ageFromDob } from '../lib/anthro'
@@ -17,8 +21,14 @@ const nav = [
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR },
   { to: '/planning', label: 'Planning', icon: IconPlan },
+  { to: '/marketplace', label: 'Marketplace', icon: IconStore },
+  { to: '/verification', label: 'Verifikasi', icon: IconShield },
+  { to: '/billing', label: 'Billing & Token', icon: IconWallet },
   { to: '/settings', label: 'Pengaturan', icon: IconSettings },
 ]
+
+// Pages that revolve around the active patient (vs. platform-wide pages).
+const PATIENT_PAGES = ['/', '/chatbot', '/emr', '/planning']
 
 const riskLabel: Record<string, string> = {
   chronic: 'Penyakit Kronis',
@@ -30,6 +40,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { state, activePatient, setActivePatient } = useStore()
   const loc = useLocation()
   const title = nav.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))
+  const showPatient = PATIENT_PAGES.includes(loc.pathname)
 
   return (
     <div className="flex min-h-screen">
@@ -86,35 +97,48 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 sm:flex">
-              {activePatient.riskFlags.map((r) => (
-                <Badge key={r} tone="high">
-                  {riskLabel[r]}
-                </Badge>
-              ))}
-            </div>
-            <div
-              className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
-              title="Identitas pasien aktif — terintegrasi di seluruh modul"
+            <NavLink
+              to="/billing"
+              className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
+              title="Saldo PanaceaToken"
             >
-              <span
-                className="grid h-8 w-8 place-items-center rounded-lg text-xs font-bold text-white"
-                style={{ background: activePatient.avatarColor }}
-              >
-                {activePatient.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
-              </span>
-              <select
-                value={state.activePatientId}
-                onChange={(e) => setActivePatient(e.target.value)}
-                className="max-w-[180px] cursor-pointer bg-transparent text-sm font-semibold outline-none"
-              >
-                {state.patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} · {ageFromDob(p.dob)}th
-                  </option>
-                ))}
-              </select>
-            </div>
+              <IconToken size={16} className="text-brand" />
+              {state.wallet.balance}
+              <span className="text-[10px] font-semibold text-white/60">PNC</span>
+            </NavLink>
+            {showPatient && (
+              <>
+                <div className="hidden items-center gap-1.5 sm:flex">
+                  {activePatient.riskFlags.map((r) => (
+                    <Badge key={r} tone="high">
+                      {riskLabel[r]}
+                    </Badge>
+                  ))}
+                </div>
+                <div
+                  className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
+                  title="Identitas pasien aktif — terintegrasi di seluruh modul"
+                >
+                  <span
+                    className="grid h-8 w-8 place-items-center rounded-lg text-xs font-bold text-white"
+                    style={{ background: activePatient.avatarColor }}
+                  >
+                    {activePatient.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
+                  </span>
+                  <select
+                    value={state.activePatientId}
+                    onChange={(e) => setActivePatient(e.target.value)}
+                    className="max-w-[180px] cursor-pointer bg-transparent text-sm font-semibold outline-none"
+                  >
+                    {state.patients.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} · {ageFromDob(p.dob)}th
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         </header>
 

@@ -8,6 +8,9 @@ import { Dashboard } from './pages/Dashboard'
 import { Chatbot } from './pages/Chatbot'
 import { EMR } from './pages/EMR'
 import { Planning } from './pages/Planning'
+import { Marketplace } from './pages/Marketplace'
+import { Verification } from './pages/Verification'
+import { Billing } from './pages/Billing'
 import { Settings } from './pages/Settings'
 
 createRoot(document.getElementById('root')!).render(
@@ -20,6 +23,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/emr" element={<EMR />} />
             <Route path="/planning" element={<Planning />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/verification" element={<Verification />} />
+            <Route path="/billing" element={<Billing />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Shell>

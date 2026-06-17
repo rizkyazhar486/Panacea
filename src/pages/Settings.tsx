@@ -90,6 +90,13 @@ export function Settings() {
           Ditujukan untuk pemantauan berkelanjutan pasien penyakit kronis, lansia, dan
           immunocompromised.
         </p>
+        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+          Selain AI-EMR, platform menjual <b>catatan & materi kedokteran</b> (USMLE, UKMPPD, jurnal)
+          melalui sistem <b>tokenized (PanaceaToken)</b> yang perlu dideposit pembeli. Penulis/kontributor
+          wajib diverifikasi oleh <b>verifikator spesialis/subspesialis</b>, dan setiap unggahan —
+          termasuk template AI-EMR — divalidasi oleh <b>AI Claude</b> terlebih dahulu. Rumah sakit atau
+          individu yang berlangganan memperoleh edukasi pasien otomatis.
+        </p>
         <p className="mt-3 text-xs text-neutral-400">
           AI mendukung, bukan menggantikan, klinisi berlisensi. Verifikasi seluruh dosis terhadap
           formularium terkini sebelum digunakan.

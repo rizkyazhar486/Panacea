@@ -6,9 +6,20 @@ import type {
   SupportiveResult,
   ChatMessage,
   EMRRecord,
+  EducationSheet,
+  Material,
+  Contributor,
+  WalletTx,
+  Subscription,
+  SubscriptionPlan,
+  AIReview,
+  VerifierReview,
 } from './types'
 
-const STORAGE_KEY = 'panaceamed.state.v1'
+const STORAGE_KEY = 'panaceamed.state.v2'
+
+export const TOKEN_TO_IDR = 1000 // 1 PNC = Rp1.000 (simulasi)
+export const PLATFORM_FEE = 0.2 // 20% platform fee on author payout
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
@@ -61,6 +72,20 @@ function seed(): AppState {
       riskFlags: ['chronic'],
       avatarColor: '#0B7A4B',
     },
+    {
+      id: 'p4',
+      name: 'An. Bilal Ramadhan',
+      sex: 'L',
+      dob: '2018-05-20',
+      mrn: 'PMD-000451',
+      heightCm: 96,
+      weightKg: 12.4,
+      bloodType: 'O+',
+      allergies: ['Susu sapi'],
+      chronicConditions: ['Gizi kurang', 'Asma'],
+      riskFlags: ['chronic'],
+      avatarColor: '#FF8A3D',
+    },
   ]
 
   const vitals: Record<string, VitalSign[]> = {
@@ -76,6 +101,7 @@ function seed(): AppState {
       v(ago(2), 120, 76, 90, 21, 36.9, 95, 99),
     ],
     p3: [v(ago(20), 134, 86, 76, 16, 36.6, 99, 142), v(ago(1), 132, 84, 74, 16, 36.5, 99, 138)],
+    p4: [v(ago(30), 95, 60, 104, 24, 36.8, 98), v(ago(4), 96, 62, 100, 22, 36.7, 99)],
   }
 
   const supportive: Record<string, SupportiveResult[]> = {
@@ -94,6 +120,31 @@ function seed(): AppState {
       s(ago(20), 'Lab', 'Trigliserida', '288', 'mg/dL', '<150', 'high'),
       s(ago(20), 'Lab', 'GDP', '108', 'mg/dL', '70–100', 'high'),
     ],
+    p4: [
+      s(ago(30), 'Lab', 'Hb', '10.8', 'g/dL', '11.5–15.5', 'low'),
+      s(ago(30), 'Lab', 'Albumin', '3.2', 'g/dL', '3.8–5.4', 'low'),
+    ],
+  }
+
+  const contributors: Contributor[] = [
+    { id: 'c0', name: 'dr. Pemeriksa', role: 'Dokter', specialty: 'Umum', verified: true, canVerify: false },
+    { id: 'c1', name: 'dr. Rina Kusuma, Sp.PD-KGEH', role: 'Subspesialis', specialty: 'Gastroenterohepatologi', verified: true, canVerify: true },
+    { id: 'c2', name: 'dr. Bagus Santoso, Sp.A', role: 'Spesialis', specialty: 'Anak', verified: true, canVerify: true },
+    { id: 'c3', name: 'dr. Maya Lestari', role: 'Dokter', specialty: 'Umum', verified: false, canVerify: false },
+  ]
+
+  const materials: Material[] = [
+    mat('m1', 'Pendekatan Diagnosis Nyeri Dada Akut', 'Algoritma triase IGD: ACS vs non-kardiak, interpretasi EKG & troponin.', 'Catatan', 'UKMPPD', 'Kardiologi', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PDF', 'nyeri-dada-akut.pdf', 8, 'verified', 156, 4.8, true),
+    mat('m2', 'High-Yield Antibiotics for USMLE Step 1', 'Mekanisme, spektrum, efek samping antibiotik beserta mnemonic.', 'Materi', 'USMLE', 'Farmakologi', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PowerPoint', 'abx-step1.pptx', 12, 'verified', 203, 4.9, true),
+    mat('m3', 'Tata Laksana Gizi Buruk pada Anak (WHO 10 Langkah)', 'Fase stabilisasi–rehabilitasi, F-75/F-100, ReSoMal.', 'Catatan', 'UKMPPD', 'Anak', 'c2', 'dr. Bagus Santoso, Sp.A', 'Word', 'gizi-buruk-anak.docx', 6, 'verified', 98, 4.7, true),
+    mat('m4', 'Update Manajemen Sepsis 2024 (Surviving Sepsis)', 'Ringkasan bundle 1-jam, target resusitasi, vasopresor.', 'Jurnal', 'Umum', 'Penyakit Dalam', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PDF', 'sepsis-2024.pdf', 15, 'pending-verifier', 0, 0, true),
+  ]
+
+  const wallet = {
+    balance: 25,
+    transactions: [
+      { id: uid(), type: 'deposit' as const, amount: 25, note: 'Top-up awal (bonus pendaftaran)', at: ago(100) },
+    ] as WalletTx[],
   }
 
   return {
@@ -101,9 +152,60 @@ function seed(): AppState {
     activePatientId: 'p1',
     vitals,
     supportive,
-    chats: { p1: [], p2: [], p3: [] },
+    chats: { p1: [], p2: [], p3: [], p4: [] },
     records: {},
+    education: {},
+    materials,
+    ownedMaterialIds: ['m1'],
+    contributors,
+    wallet,
+    subscription: { plan: 'none' } as Subscription,
+    currentUserId: 'c0',
     settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: 'dr. Pemeriksa' },
+  }
+}
+
+function mat(
+  id: string,
+  title: string,
+  description: string,
+  category: Material['category'],
+  exam: Material['exam'],
+  specialty: string,
+  authorId: string,
+  authorName: string,
+  fileType: Material['fileType'],
+  fileName: string,
+  priceTokens: number,
+  status: Material['status'],
+  downloads: number,
+  rating: number,
+  aiApproved: boolean,
+): Material {
+  const now = new Date().toISOString()
+  return {
+    id,
+    title,
+    description,
+    category,
+    exam,
+    specialty,
+    authorId,
+    authorName,
+    fileType,
+    fileName,
+    priceTokens,
+    status,
+    downloads,
+    rating,
+    createdAt: now,
+    aiReview: aiApproved
+      ? { verdict: 'approved', score: 88, notes: 'Konten akurat & sesuai pedoman terkini.', at: now }
+      : undefined,
+    verifierReview:
+      status === 'verified'
+        ? { verifierName: authorName, verifierRole: 'Subspesialis', approved: true, notes: 'Disetujui.', at: now }
+        : undefined,
   }
 }
 
@@ -145,14 +247,24 @@ function load(): AppState {
 interface Store {
   state: AppState
   activePatient: Patient
+  currentUser: Contributor
   setActivePatient: (id: string) => void
   addPatient: (p: Patient) => void
   addVital: (patientId: string, vital: VitalSign) => void
   addSupportive: (patientId: string, r: SupportiveResult) => void
   setChat: (patientId: string, messages: ChatMessage[]) => void
   saveRecord: (record: EMRRecord) => void
+  saveEducation: (patientId: string, sheet: EducationSheet) => void
   updateSettings: (partial: Partial<AppState['settings']>) => void
   resetDemo: () => void
+  // marketplace + billing
+  setCurrentUser: (id: string) => void
+  depositTokens: (amount: number, note: string) => void
+  buyMaterial: (materialId: string) => { ok: boolean; reason?: string }
+  uploadMaterial: (m: Material) => void
+  setMaterialAIReview: (id: string, review: AIReview) => void
+  setMaterialVerifierReview: (id: string, review: VerifierReview) => void
+  subscribe: (plan: SubscriptionPlan, seats?: number) => void
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -167,9 +279,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const store = useMemo<Store>(() => {
     const activePatient =
       state.patients.find((p) => p.id === state.activePatientId) ?? state.patients[0]
+    const currentUser =
+      state.contributors.find((c) => c.id === state.currentUserId) ?? state.contributors[0]
     return {
       state,
       activePatient,
+      currentUser,
       setActivePatient: (id) => setState((st) => ({ ...st, activePatientId: id })),
       addPatient: (p) =>
         setState((st) => ({
@@ -197,12 +312,106 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => ({ ...st, chats: { ...st.chats, [patientId]: messages } })),
       saveRecord: (record) =>
         setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } })),
+      saveEducation: (patientId, sheet) =>
+        setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } })),
       updateSettings: (partial) =>
         setState((st) => ({ ...st, settings: { ...st.settings, ...partial } })),
       resetDemo: () => {
         localStorage.removeItem(STORAGE_KEY)
         setState(seed())
       },
+      setCurrentUser: (id) => setState((st) => ({ ...st, currentUserId: id })),
+      depositTokens: (amount, note) =>
+        setState((st) => ({
+          ...st,
+          wallet: {
+            balance: st.wallet.balance + amount,
+            transactions: [
+              { id: uid(), type: 'deposit', amount, note, at: new Date().toISOString() },
+              ...st.wallet.transactions,
+            ],
+          },
+        })),
+      buyMaterial: (materialId) => {
+        const m = state.materials.find((x) => x.id === materialId)
+        if (!m) return { ok: false, reason: 'Materi tidak ditemukan.' }
+        if (state.ownedMaterialIds.includes(materialId)) return { ok: false, reason: 'Sudah dimiliki.' }
+        if (state.wallet.balance < m.priceTokens)
+          return { ok: false, reason: 'Saldo token tidak cukup. Silakan deposit.' }
+        setState((st) => {
+          const now = new Date().toISOString()
+          const payout = Math.round(m.priceTokens * (1 - PLATFORM_FEE))
+          return {
+            ...st,
+            ownedMaterialIds: [...st.ownedMaterialIds, materialId],
+            materials: st.materials.map((x) =>
+              x.id === materialId ? { ...x, downloads: x.downloads + 1 } : x,
+            ),
+            wallet: {
+              balance: st.wallet.balance - m.priceTokens,
+              transactions: [
+                { id: uid(), type: 'purchase', amount: -m.priceTokens, note: `Beli: ${m.title}`, at: now },
+                {
+                  id: uid(),
+                  type: 'payout',
+                  amount: payout,
+                  note: `Royalti penulis ${m.authorName} (${m.title})`,
+                  at: now,
+                },
+                ...st.wallet.transactions,
+              ],
+            },
+          }
+        })
+        return { ok: true }
+      },
+      uploadMaterial: (m) => setState((st) => ({ ...st, materials: [m, ...st.materials] })),
+      setMaterialAIReview: (id, review) =>
+        setState((st) => ({
+          ...st,
+          materials: st.materials.map((x) =>
+            x.id === id
+              ? {
+                  ...x,
+                  aiReview: review,
+                  status: review.verdict === 'approved' ? 'pending-verifier' : 'rejected',
+                }
+              : x,
+          ),
+        })),
+      setMaterialVerifierReview: (id, review) =>
+        setState((st) => ({
+          ...st,
+          materials: st.materials.map((x) =>
+            x.id === id
+              ? { ...x, verifierReview: review, status: review.approved ? 'verified' : 'rejected' }
+              : x,
+          ),
+        })),
+      subscribe: (plan, seats) =>
+        setState((st) => {
+          const price = plan === 'individu' ? 20 : plan === 'rumah-sakit' ? 200 : 0
+          const txs: WalletTx[] =
+            price > 0
+              ? [
+                  {
+                    id: uid(),
+                    type: 'subscription',
+                    amount: -price,
+                    note: `Langganan ${plan === 'individu' ? 'Individu' : 'Rumah Sakit'} / bulan`,
+                    at: new Date().toISOString(),
+                  },
+                ]
+              : []
+          return {
+            ...st,
+            subscription: { plan, since: new Date().toISOString(), seats },
+            wallet:
+              price > 0 && st.wallet.balance >= price
+                ? { balance: st.wallet.balance - price, transactions: [...txs, ...st.wallet.transactions] }
+                : st.wallet,
+          }
+        }),
     }
   }, [state])
 

@@ -3,6 +3,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconHeart, IconShield, IconPlus, IconSparkle } from '../components/icons'
 import { computeBmi, ageFromDob } from '../lib/anthro'
+import { GrowthChart } from '../components/GrowthChart'
 import type { VitalSign } from '../lib/types'
 
 function fmt(iso: string): string {
@@ -179,6 +180,20 @@ export function Dashboard() {
           </p>
         </Card>
       </div>
+
+      {/* Growth & BMI charts */}
+      <Card>
+        <SectionTitle
+          icon={<IconSparkle size={18} />}
+          title="Grafik Tumbuh Kembang & BMI"
+          subtitle={
+            ageFromDob(p.dob) <= 19
+              ? 'Kurva pertumbuhan anak/remaja (WHO/CDC) — BB/U · TB/U · IMT/U'
+              : 'Klasifikasi IMT dewasa (Asia-Pasifik)'
+          }
+        />
+        <GrowthChart patient={p} ageYears={ageFromDob(p.dob)} />
+      </Card>
 
       {/* Supportive results */}
       <Card>

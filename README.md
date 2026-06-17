@@ -17,11 +17,23 @@ patients with chronic disease, the elderly, and the immunocompromised.
 
 | Module | What it does |
 | --- | --- |
-| **Dashboard** | Continuous patient identity — vital-sign trends, anthropometry (BMI/Kesan), supporting results (Lab/EKG/Radiology), and a Longevity Score. |
+| **Dashboard** | Continuous patient identity — vital-sign trends, anthropometry, **growth & BMI charts** (pediatric WHO/CDC curves for BB/U·TB/U·IMT/U and an adult BMI band chart), supporting results (Lab/EKG/Radiology), and a Longevity Score. |
 | **AI Chatbot** | Anamnesis Co-Physician. Interviews the patient with SOCRATES-based, open-ended questions and recommends supporting examinations. One click drafts a structured AI-EMR. |
-| **AI-EMR** | SOAP record. AI drafts the anamnesis (S) and assessment (A) with a *"Dipikirkan …"* comparative narrative; the **doctor fills & verifies the physical exam (O)** and signs the record. |
+| **AI-EMR** | SOAP record. AI drafts the anamnesis (S) and assessment (A) with a *"Dipikirkan …"* comparative narrative; the **doctor fills & verifies the physical exam (O)** and signs. Includes an AI **patient-education** sheet (brief + deep) so patients understand their disease and how to stay healthy. |
 | **Planning** | AI recommends management (Suportif · Definitif · Edukasi · Follow-up · Monitoring); the **doctor verifies, rejects, or adds** items. High-alert drugs return ranges + references only. |
+| **Marketplace** | Buy & sell **medical notes / materials / journals** (USMLE, UKMPPD) and **AI-EMR templates** with **PanaceaToken (PNC)**. Upload as **Word / PDF / PowerPoint**. Every upload is gated by **Claude AI verification → specialist verifier**. |
+| **Verifikasi** | Two-layer gatekeeping: Claude AI (accuracy/safety) then a **Spesialis/Subspesialis verifier**. Contributors must be verified before their materials are listed. "Act as" switcher to demo each role. |
+| **Billing & Token** | Runnable token wallet — deposit (simulated gateway), purchase, **author royalty payout**, and **subscriptions** (Individu / Rumah Sakit) that unlock full AI-EMR + automatic patient education. |
 | **Settings** | Anthropic API key, model selection, examining-doctor identity. |
+
+## Business model
+
+Panaceamed.id is both an **AI-EMR system** and a **tokenized marketplace** for medical
+knowledge. Buyers deposit PanaceaToken to purchase notes/materials; authors earn
+royalties (platform takes a fee). Contributors are verified by specialist/subspecialist
+verifiers, and Claude AI validates every uploaded item — including AI-EMR templates.
+Hospitals and individuals subscribe so their **patients receive concise-yet-deep
+education** about their disease and how to maintain their health.
 
 ## The Co-Physician brain
 

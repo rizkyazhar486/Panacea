@@ -1,0 +1,275 @@
+import { useRef, useState } from 'react'
+import { useStore, uid } from '../lib/store'
+import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
+import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } from '../components/icons'
+import { verifyMaterial } from '../lib/ai'
+import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
+
+const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
+const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'AI-EMR Template']
+
+function fileTypeFromName(name: string): FileType {
+  const n = name.toLowerCase()
+  if (n.endsWith('.pdf')) return 'PDF'
+  if (n.endsWith('.ppt') || n.endsWith('.pptx')) return 'PowerPoint'
+  return 'Word'
+}
+
+function downloadStub(m: Material) {
+  const body = `PANACEAMED.ID — ${m.title}\n\nKategori: ${m.category} · ${m.exam} · ${m.specialty}\nPenulis: ${m.authorName}\nFormat asli: ${m.fileType} (${m.fileName})\n\n${m.description}\n\n[Demo] File asli akan diunduh dalam format ${m.fileType}. Materi telah diverifikasi AI Claude & verifikator spesialis.`
+  const blob = new Blob([body], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = m.fileName.replace(/\.[^.]+$/, '') + '.txt'
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function Marketplace() {
+  const { state, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview } = useStore()
+  const [exam, setExam] = useState<(typeof EXAMS)[number]>('Semua')
+  const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
+  const [toast, setToast] = useState('')
+
+  const listed = state.materials.filter(
+    (m) =>
+      m.status === 'verified' &&
+      (exam === 'Semua' || m.exam === exam) &&
+      (cat === 'Semua' || m.category === cat),
+  )
+
+  function notify(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(''), 2600)
+  }
+
+  function buy(m: Material) {
+    const res = buyMaterial(m.id)
+    notify(res.ok ? `Berhasil membeli “${m.title}”.` : res.reason ?? 'Gagal.')
+  }
+
+  return (
+    <div className="space-y-6">
+      {toast && (
+        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-xl bg-ink px-4 py-2 text-sm text-white shadow-lg">
+          {toast}
+        </div>
+      )}
+
+      <Card>
+        <SectionTitle
+          icon={<IconStore size={20} />}
+          title="Marketplace Catatan & Materi Kedokteran"
+          subtitle="USMLE · UKMPPD · Jurnal · Template AI-EMR — dibeli dengan PanaceaToken (PNC)"
+          right={
+            <span className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white">
+              <IconToken size={16} className="text-brand" /> {state.wallet.balance} PNC
+            </span>
+          }
+        />
+        <div className="flex flex-wrap gap-2">
+          {EXAMS.map((e) => (
+            <button
+              key={e}
+              onClick={() => setExam(e)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                exam === e ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
+              }`}
+            >
+              {e}
+            </button>
+          ))}
+          <span className="mx-1 w-px bg-neutral-200" />
+          {CATS.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                cat === c ? 'bg-brand-dark text-white' : 'bg-neutral-100 text-neutral-500'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {listed.map((m) => {
+          const owned = state.ownedMaterialIds.includes(m.id)
+          return (
+            <Card key={m.id} className="flex flex-col">
+              <div className="mb-2 flex items-center gap-2">
+                <Badge tone="brand">{m.exam}</Badge>
+                <Badge tone="neutral">{m.category}</Badge>
+                <span className="ml-auto rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-bold text-neutral-500">
+                  {m.fileType}
+                </span>
+              </div>
+              <h3 className="font-bold leading-tight">{m.title}</h3>
+              <p className="mt-1 line-clamp-3 text-sm text-neutral-500">{m.description}</p>
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-400">
+                <IconShield size={13} className="text-brand" />
+                Terverifikasi AI + {m.verifierReview?.verifierRole ?? 'Spesialis'} · {m.specialty}
+              </div>
+              <div className="mt-1 text-xs text-neutral-400">
+                oleh {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× diunduh
+              </div>
+              <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
+                <span className="flex items-center gap-1 text-lg font-extrabold">
+                  <IconToken size={16} className="text-brand" />
+                  {m.priceTokens}
+                  <span className="text-xs font-medium text-neutral-400">PNC</span>
+                </span>
+                {owned ? (
+                  <Button variant="outline" onClick={() => downloadStub(m)}>
+                    <IconCheck size={14} /> Unduh
+                  </Button>
+                ) : (
+                  <Button onClick={() => buy(m)}>Beli</Button>
+                )}
+              </div>
+            </Card>
+          )
+        })}
+        {listed.length === 0 && (
+          <Card className="md:col-span-2 lg:col-span-3 text-center text-sm text-neutral-400">
+            Tidak ada materi pada filter ini.
+          </Card>
+        )}
+      </div>
+
+      <UploadPanel
+        onUpload={async (m) => {
+          uploadMaterial(m)
+          notify('Materi diunggah — menjalankan verifikasi AI Claude…')
+          const review = await verifyMaterial(state.settings, m)
+          setMaterialAIReview(m.id, review)
+          notify(
+            review.verdict === 'approved'
+              ? 'Lolos verifikasi AI ✓ — menunggu verifikator spesialis.'
+              : 'AI meminta revisi. Lihat tab Verifikasi.',
+          )
+        }}
+        authorId={currentUser.id}
+        authorName={currentUser.name}
+      />
+    </div>
+  )
+}
+
+function UploadPanel({
+  onUpload,
+  authorId,
+  authorName,
+}: {
+  onUpload: (m: Material) => void
+  authorId: string
+  authorName: string
+}) {
+  const [f, setF] = useState({
+    title: '',
+    description: '',
+    category: 'Catatan' as MaterialCategory,
+    exam: 'UKMPPD' as ExamTrack,
+    specialty: '',
+    price: 5,
+    fileName: '',
+    fileType: 'PDF' as FileType,
+  })
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function submit() {
+    if (!f.title.trim() || !f.fileName) return
+    setBusy(true)
+    const m: Material = {
+      id: uid(),
+      title: f.title.trim(),
+      description: f.description.trim() || 'Tanpa deskripsi.',
+      category: f.category,
+      exam: f.exam,
+      specialty: f.specialty.trim() || 'Umum',
+      authorId,
+      authorName,
+      fileType: f.fileType,
+      fileName: f.fileName,
+      priceTokens: Number(f.price) || 0,
+      status: 'pending-ai',
+      createdAt: new Date().toISOString(),
+      downloads: 0,
+      rating: 0,
+    }
+    await onUpload(m)
+    setF({ ...f, title: '', description: '', specialty: '', fileName: '' })
+    setBusy(false)
+  }
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconUpload size={18} />}
+        title="Unggah Catatan / Materi / Template AI-EMR"
+        subtitle="Format Word, PDF, atau PowerPoint — wajib lolos verifikasi AI Claude lalu verifikator spesialis"
+      />
+      <div className="grid gap-3 md:grid-cols-2">
+        <Field label="Judul">
+          <input className={inputClass} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="mis. Ringkasan Tatalaksana DKA" />
+        </Field>
+        <Field label="Spesialti / Topik">
+          <input className={inputClass} value={f.specialty} onChange={(e) => setF({ ...f, specialty: e.target.value })} placeholder="mis. Endokrinologi" />
+        </Field>
+        <div className="md:col-span-2">
+          <Field label="Deskripsi">
+            <textarea className={inputClass} rows={2} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} />
+          </Field>
+        </div>
+        <Field label="Kategori">
+          <select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as MaterialCategory })}>
+            {(['Catatan', 'Materi', 'Jurnal', 'AI-EMR Template'] as MaterialCategory[]).map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Jalur Ujian">
+          <select className={inputClass} value={f.exam} onChange={(e) => setF({ ...f, exam: e.target.value as ExamTrack })}>
+            {(['USMLE', 'UKMPPD', 'Umum'] as ExamTrack[]).map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Harga (PNC)">
+          <input className={inputClass} type="number" min={0} value={f.price} onChange={(e) => setF({ ...f, price: Number(e.target.value) })} />
+        </Field>
+        <Field label="Berkas (.docx / .pdf / .pptx)">
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".doc,.docx,.pdf,.ppt,.pptx"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) setF((s) => ({ ...s, fileName: file.name, fileType: fileTypeFromName(file.name) }))
+              }}
+            />
+            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+              <IconUpload size={14} /> Pilih Berkas
+            </Button>
+            <span className="truncate text-sm text-neutral-500">{f.fileName || 'Belum ada berkas'}</span>
+          </div>
+        </Field>
+      </div>
+      <div className="mt-4 flex items-center gap-3">
+        <Button onClick={submit} disabled={busy || !f.title.trim() || !f.fileName}>
+          <IconBook size={16} /> {busy ? 'Mengunggah & verifikasi AI…' : 'Unggah & Verifikasi'}
+        </Button>
+        <p className="text-xs text-neutral-400">
+          Mengunggah sebagai <b>{authorName}</b>. Pendapatan royalti masuk ke saldo PNC Anda setelah
+          terjual.
+        </p>
+      </div>
+    </Card>
+  )
+}
