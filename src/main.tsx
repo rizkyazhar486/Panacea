@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
@@ -18,7 +18,7 @@ import { Settings } from './pages/Settings'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <StoreProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Shell>
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -33,7 +33,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Shell>
-      </BrowserRouter>
+      </HashRouter>
     </StoreProvider>
   </StrictMode>,
 )
