@@ -326,8 +326,11 @@ const Ctx = createContext<Store | null>(null)
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(load)
 
+  // Persist everything EXCEPT the session account, so each visit starts at the
+  // public landing and the role can be chosen freely (fixes role being "stuck").
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    const { account: _account, ...persist } = state
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
   }, [state])
 
   // When a backend is configured, hydrate clinical data from the server on login.

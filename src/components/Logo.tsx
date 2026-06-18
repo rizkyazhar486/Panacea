@@ -14,19 +14,19 @@ export function LogoMark({ size = 40, className = '' }: { size?: number; classNa
     >
       <g
         stroke="#00BF63"
-        strokeWidth="80"
+        strokeWidth="84"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       >
-        {/* stem + U descender */}
-        <path d="M182 150 V322 Q182 398 250 398 Q318 398 318 322 V300" />
+        {/* stem + rounded U descender (heart bottom) */}
+        <path d="M180 150 V322 Q180 402 252 402 Q324 402 324 322 V286" />
         {/* P bowl */}
-        <path d="M182 150 H298 Q374 150 374 218 Q374 286 298 286 H214" />
+        <path d="M180 150 H300 Q380 150 380 218 Q380 286 300 286 H216" />
       </g>
       {/* red cross */}
-      <rect x="70" y="30" width="66" height="156" rx="10" fill="#FF3131" />
-      <rect x="8" y="76" width="190" height="66" rx="10" fill="#FF3131" />
+      <rect x="66" y="24" width="70" height="162" rx="14" fill="#FF3131" />
+      <rect x="2" y="72" width="200" height="70" rx="14" fill="#FF3131" />
     </svg>
   )
 }

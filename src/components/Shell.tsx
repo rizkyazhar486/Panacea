@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
   IconDashboard,
@@ -24,9 +24,16 @@ import { useStore } from '../lib/store'
 import { ageFromDob } from '../lib/anthro'
 import { Badge } from './ui'
 import { Login } from '../pages/Login'
+import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { api, backendEnabled } from '../lib/api'
 import type { Role } from '../lib/types'
+
+// Public entry: marketing landing first, then the login screen on demand.
+function PublicEntry() {
+  const [showLogin, setShowLogin] = useState(false)
+  return showLogin ? <Login onBack={() => setShowLogin(false)} /> : <Landing onMasuk={() => setShowLogin(true)} />
+}
 
 type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[]; end?: boolean }
 
@@ -77,7 +84,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const loc = useLocation()
   const account = state.account
 
-  if (!account) return <Login />
+  if (!account) return <PublicEntry />
 
   const items = nav.filter((n) => n.roles.includes(account.role))
   const title = items.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))

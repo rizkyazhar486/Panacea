@@ -24,7 +24,7 @@ const DEFAULT_NAME: Record<Role, string> = {
   owner: 'Owner Panaceamed',
 }
 
-export function Login() {
+export function Login({ onBack }: { onBack?: () => void }) {
   const { login, sendEmail } = useStore()
   const [role, setRole] = useState<Role>('pasien')
   const [email, setEmail] = useState('rizkyazhar486@gmail.com')
@@ -38,9 +38,7 @@ export function Login() {
   useEffect(() => {
     if (!backendEnabled) return
     api.health().then(setHealth).catch(() => setError('Backend tidak terjangkau — memakai mode lokal.'))
-    // already logged in on the server?
-    api.me().then(login).catch(() => {})
-  }, [login])
+  }, [])
 
   useEffect(() => {
     roleRef.current = role
@@ -114,6 +112,11 @@ export function Login() {
           <div className="mb-6 lg:hidden">
             <Wordmark size={34} />
           </div>
+          {onBack && (
+            <button onClick={onBack} className="mb-3 text-sm font-semibold text-neutral-500 hover:text-brand-dark">
+              ← Kembali ke beranda
+            </button>
+          )}
           <h2 className="text-2xl font-extrabold">Masuk</h2>
           <p className="mt-1 text-sm text-neutral-500">Pilih peran lalu masuk dengan akun Google Anda.</p>
 
