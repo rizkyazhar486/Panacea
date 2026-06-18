@@ -84,6 +84,10 @@ export function Dashboard() {
                   </Badge>
                 ))}
               </div>
+              <p className="mt-2 flex items-center gap-1 text-[11px] text-neutral-400">
+                <IconShield size={12} className="text-brand" /> Data kesehatan bersifat rahasia —
+                hanya dibagikan atas izin pasien.
+              </p>
             </div>
           </div>
           <div className="rounded-xl bg-brand-50 px-4 py-3 text-right">

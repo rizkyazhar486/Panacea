@@ -33,7 +33,7 @@ type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[
 const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 
 const nav: Nav[] = [
-  { to: '/', label: 'Dashboard', icon: IconDashboard, roles: ['dokter', 'owner'], end: true },
+  { to: '/', label: 'Dashboard', icon: IconDashboard, roles: ['pasien', 'dokter'], end: true },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'] },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'] },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'] },
@@ -49,10 +49,12 @@ const nav: Nav[] = [
   { to: '/admin', label: 'Layanan & Admin', icon: IconStethoscope, roles: ['admin'] },
   { to: '/owner', label: 'Owner — Keuntungan', icon: IconChartUp, roles: ['owner'] },
   { to: '/billing', label: 'Billing & Token', icon: IconWallet, roles: ALL },
-  { to: '/architecture', label: 'Arsitektur CDSS', icon: IconArchitecture, roles: ['dokter', 'owner', 'admin'] },
+  { to: '/architecture', label: 'Arsitektur CDSS', icon: IconArchitecture, roles: ['admin'] },
   { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL },
 ]
 
+// Pages that show the active-patient context. Patients see only their own data
+// (no selector); doctors manage patients via the selector.
 const PATIENT_PAGES = ['/', '/chatbot', '/emr', '/planning']
 
 const roleLabel: Record<Role, string> = {
@@ -79,7 +81,8 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const items = nav.filter((n) => n.roles.includes(account.role))
   const title = items.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))
-  const showPatient = PATIENT_PAGES.includes(loc.pathname) && (account.role === 'dokter' || account.role === 'owner')
+  // Only doctors switch between patients; patients see their own data only.
+  const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
 
   return (
     <div className="flex min-h-screen">

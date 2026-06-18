@@ -476,7 +476,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : x,
           ),
         })),
-      login: (account) => setState((st) => ({ ...st, account })),
+      login: (account) =>
+        setState((st) => ({
+          ...st,
+          account,
+          // Patients are pinned to their own record (confidential, no switching).
+          activePatientId:
+            account.role === 'pasien' && account.patientId ? account.patientId : st.activePatientId,
+        })),
       logout: () => setState((st) => ({ ...st, account: null })),
       addPost: (p) => setState((st) => ({ ...st, posts: [p, ...st.posts] })),
       toggleLike: (id) =>

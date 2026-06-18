@@ -4,7 +4,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
-import { Dashboard } from './pages/Dashboard'
+import { Home } from './pages/Home'
 import { Chatbot } from './pages/Chatbot'
 import { EMR } from './pages/EMR'
 import { Planning } from './pages/Planning'
@@ -29,7 +29,7 @@ createRoot(document.getElementById('root')!).render(
       <HashRouter>
         <Shell>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Home />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/emr" element={<EMR />} />
             <Route path="/planning" element={<Planning />} />
