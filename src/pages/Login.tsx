@@ -84,7 +84,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
       name: name.trim() || 'Pengguna Panaceamed',
       role,
       isSubscriber: role === 'owner',
-      patientId: role === 'pasien' || role === 'dokter' ? 'p1' : undefined,
       loggedAt: new Date().toISOString(),
       sex,
       age: age.trim() ? Number(age) : undefined,

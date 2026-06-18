@@ -24,7 +24,7 @@ import type {
   TxType,
 } from './types'
 
-const STORAGE_KEY = 'panaceamed.state.v2'
+const STORAGE_KEY = 'panaceamed.state.v3'
 
 // The platform owner. Only this account may switch modes (owner/pasien/dokter)
 // and manage which emails are allowed to sign in as Admin.
@@ -37,263 +37,59 @@ export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
 }
 
-function seed(): AppState {
-  const now = Date.now()
-  const ago = (h: number) => new Date(now - h * 3600 * 1000).toISOString()
+// Placeholder identities used only as safe fallbacks when no real data exists
+// yet (e.g. a doctor before adding any patient). These are NOT seeded content.
+const PLACEHOLDER_PATIENT: Patient = {
+  id: 'none', name: 'Belum ada pasien', sex: 'L', dob: '1990-01-01', mrn: '—',
+  heightCm: 165, weightKg: 60, allergies: [], chronicConditions: [], riskFlags: [], avatarColor: '#94a3b8',
+}
+const PLACEHOLDER_CONTRIBUTOR: Contributor = {
+  id: 'me', name: 'Saya', role: 'Dokter', specialty: '', verified: false, canVerify: false,
+}
 
-  const patients: Patient[] = [
-    {
-      id: 'p1',
-      name: 'Bpk. Hartono Wijaya',
-      sex: 'L',
-      dob: '1952-04-12',
-      mrn: 'PMD-000124',
-      heightCm: 168,
-      weightKg: 78,
-      bloodType: 'O+',
-      allergies: ['Penisilin'],
-      chronicConditions: ['Hipertensi', 'Diabetes Melitus tipe 2'],
-      riskFlags: ['chronic', 'elderly'],
-      avatarColor: '#00BF63',
-    },
-    {
-      id: 'p2',
-      name: 'Ibu Siti Rahayu',
-      sex: 'P',
-      dob: '1968-09-30',
-      mrn: 'PMD-000219',
-      heightCm: 156,
-      weightKg: 49,
-      bloodType: 'B+',
-      allergies: [],
-      chronicConditions: ['PPOK', 'Riwayat TB paru'],
-      riskFlags: ['chronic', 'immunocompromised'],
-      avatarColor: '#FF3131',
-    },
-    {
-      id: 'p3',
-      name: 'Sdr. Andi Pratama',
-      sex: 'L',
-      dob: '1995-02-18',
-      mrn: 'PMD-000388',
-      heightCm: 174,
-      weightKg: 92,
-      bloodType: 'A+',
-      allergies: [],
-      chronicConditions: ['Obesitas', 'Dislipidemia'],
-      riskFlags: ['chronic'],
-      avatarColor: '#0B7A4B',
-    },
-    {
-      id: 'p4',
-      name: 'An. Bilal Ramadhan',
-      sex: 'L',
-      dob: '2018-05-20',
-      mrn: 'PMD-000451',
-      heightCm: 96,
-      weightKg: 12.4,
-      bloodType: 'O+',
-      allergies: ['Susu sapi'],
-      chronicConditions: ['Gizi kurang', 'Asma'],
-      riskFlags: ['chronic'],
-      avatarColor: '#FF8A3D',
-    },
-  ]
-
-  const vitals: Record<string, VitalSign[]> = {
-    p1: [
-      v(ago(72), 158, 96, 88, 18, 36.6, 98, 184),
-      v(ago(48), 152, 92, 84, 18, 36.5, 98, 176),
-      v(ago(24), 149, 90, 80, 17, 36.7, 99, 168),
-      v(ago(3), 145, 88, 78, 16, 36.6, 99, 162),
-    ],
-    p2: [
-      v(ago(50), 118, 74, 96, 24, 37.1, 93, 110),
-      v(ago(26), 116, 72, 92, 22, 37.0, 94, 104),
-      v(ago(2), 120, 76, 90, 21, 36.9, 95, 99),
-    ],
-    p3: [v(ago(20), 134, 86, 76, 16, 36.6, 99, 142), v(ago(1), 132, 84, 74, 16, 36.5, 99, 138)],
-    p4: [v(ago(30), 95, 60, 104, 24, 36.8, 98), v(ago(4), 96, 62, 100, 22, 36.7, 99)],
-  }
-
-  const supportive: Record<string, SupportiveResult[]> = {
-    p1: [
-      s(ago(24), 'Lab', 'HbA1c', '8.2', '%', '<7.0', 'high'),
-      s(ago(24), 'Lab', 'Kreatinin', '1.3', 'mg/dL', '0.7–1.2', 'high'),
-      s(ago(24), 'Lab', 'LDL', '156', 'mg/dL', '<100', 'high'),
-      s(ago(24), 'EKG', 'EKG 12 lead', 'LVH, sinus rhythm', '', 'Normal', 'high'),
-    ],
-    p2: [
-      s(ago(26), 'Lab', 'Leukosit', '12.4', '10³/µL', '4–11', 'high'),
-      s(ago(26), 'Radiologi', 'Rontgen Toraks', 'Hiperinflasi, old fibrosis', '', '', 'high'),
-      s(ago(26), 'Lab', 'SpO2 (ruangan)', '94', '%', '>95', 'low'),
-    ],
-    p3: [
-      s(ago(20), 'Lab', 'Trigliserida', '288', 'mg/dL', '<150', 'high'),
-      s(ago(20), 'Lab', 'GDP', '108', 'mg/dL', '70–100', 'high'),
-    ],
-    p4: [
-      s(ago(30), 'Lab', 'Hb', '10.8', 'g/dL', '11.5–15.5', 'low'),
-      s(ago(30), 'Lab', 'Albumin', '3.2', 'g/dL', '3.8–5.4', 'low'),
-    ],
-  }
-
-  const contributors: Contributor[] = [
-    { id: 'c0', name: 'dr. Pemeriksa', role: 'Dokter', specialty: 'Umum', verified: true, canVerify: false },
-    { id: 'c1', name: 'dr. Rina Kusuma, Sp.PD-KGEH', role: 'Subspesialis', specialty: 'Gastroenterohepatologi', verified: true, canVerify: true },
-    { id: 'c2', name: 'dr. Bagus Santoso, Sp.A', role: 'Spesialis', specialty: 'Anak', verified: true, canVerify: true },
-    { id: 'c3', name: 'dr. Maya Lestari', role: 'Dokter', specialty: 'Umum', verified: false, canVerify: false },
-  ]
-
-  const materials: Material[] = [
-    mat('m1', 'Pendekatan Diagnosis Nyeri Dada Akut', 'Algoritma triase IGD: ACS vs non-kardiak, interpretasi EKG & troponin.', 'Catatan', 'UKMPPD', 'Kardiologi', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PDF', 'nyeri-dada-akut.pdf', 8, 'verified', 156, 4.8, true),
-    mat('m2', 'High-Yield Antibiotics for USMLE Step 1', 'Mekanisme, spektrum, efek samping antibiotik beserta mnemonic.', 'Materi', 'USMLE', 'Farmakologi', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PowerPoint', 'abx-step1.pptx', 12, 'verified', 203, 4.9, true),
-    mat('m3', 'Tata Laksana Gizi Buruk pada Anak (WHO 10 Langkah)', 'Fase stabilisasi–rehabilitasi, F-75/F-100, ReSoMal.', 'Catatan', 'UKMPPD', 'Anak', 'c2', 'dr. Bagus Santoso, Sp.A', 'Word', 'gizi-buruk-anak.docx', 6, 'verified', 98, 4.7, true),
-    mat('m4', 'Update Manajemen Sepsis 2024 (Surviving Sepsis)', 'Ringkasan bundle 1-jam, target resusitasi, vasopresor.', 'Jurnal', 'Umum', 'Penyakit Dalam', 'c1', 'dr. Rina Kusuma, Sp.PD-KGEH', 'PDF', 'sepsis-2024.pdf', 15, 'pending-verifier', 0, 0, true),
-  ]
-
-  const wallet = {
-    balance: 25,
-    transactions: [
-      { id: uid(), type: 'deposit' as const, amount: 25, note: 'Top-up awal (bonus pendaftaran)', at: ago(100) },
-    ] as WalletTx[],
-  }
-
+// Build a patient record from a patient account's registration details.
+function patientFromAccount(account: Account): Patient {
+  const year = new Date().getFullYear() - (account.age ?? 30)
   return {
-    patients,
-    activePatientId: 'p1',
-    vitals,
-    supportive,
-    chats: { p1: [], p2: [], p3: [], p4: [] },
+    id: 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
+    name: account.name,
+    sex: account.sex ?? 'L',
+    dob: `${year}-01-01`,
+    mrn: 'PMD-' + account.email.replace(/[^0-9]/g, '').slice(0, 6).padStart(6, '0'),
+    heightCm: 165,
+    weightKg: 60,
+    allergies: [],
+    chronicConditions: [],
+    riskFlags: [],
+    avatarColor: '#00BF63',
+  }
+}
+
+// A clean, empty application state — no dummy/demo content.
+function seed(): AppState {
+  return {
+    patients: [],
+    activePatientId: 'none',
+    vitals: {},
+    supportive: {},
+    chats: {},
     records: {},
     education: {},
-    materials,
-    ownedMaterialIds: ['m1'],
-    contributors,
-    wallet,
+    materials: [],
+    ownedMaterialIds: [],
+    contributors: [],
+    wallet: { balance: 0, transactions: [] },
     subscription: { plan: 'none' } as Subscription,
-    currentUserId: 'c0',
+    currentUserId: 'me',
     account: null,
     adminEmails: [OWNER_EMAIL],
-    posts: [
-      post('Ibu Siti Rahayu', 'pasien', 'video', 'Jalan pagi', 'Rutin jalan 30 menit tiap pagi 🌅 langkah makin enteng!', '#00BF63', 12, {
-        postType: 'aktivitas', distanceKm: 2.4, durationMin: 30, steps: 3200, calories: 145, comments: 4,
-      }),
-      post('Sdr. Andi Pratama', 'pasien', 'image', 'Makan sehat', 'Salmon + brokoli, tinggi protein 🥗 plus 8 gelas air hari ini.', '#0B7A4B', 8, {
-        postType: 'kebiasaan', waterMl: 2000, veggieServ: 3, sugaryDrinks: 0, comments: 2,
-      }),
-      post('Rizky Azhar', 'owner', 'image', 'Lari sore', 'Tutup hari dengan 5K santai. Konsistensi > kecepatan 🏃', '#00BF63', 31, {
-        postType: 'aktivitas', distanceKm: 5.0, durationMin: 32, steps: 6400, calories: 310, comments: 7,
-      }),
-      post('dr. Bagus Santoso, Sp.A', 'dokter', 'image', 'Longevity', 'Mengapa tidur 7–8 jam memperpanjang healthspan', '#3b82f6', 21, {
-        postType: 'artikel', articleTitle: 'Tidur cukup & umur panjang: bukti dari studi kohort', articleSource: 'Panaceamed Longevity', comments: 5,
-      }),
-      post('dr. Rina Kusuma, Sp.PD-KGEH', 'dokter', 'image', 'Longevity', 'Serat & mikrobioma usus: kunci metabolik', '#8b5cf6', 18, {
-        postType: 'artikel', articleTitle: '30 gram serat/hari menurunkan risiko kardiometabolik', articleSource: 'Panaceamed Longevity', comments: 3,
-      }),
-    ],
+    posts: [],
     follows: [],
     foods: [],
     consults: [],
     emails: [],
-    settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: 'dr. Pemeriksa' },
+    settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: '' },
   }
-}
-
-function post(
-  authorName: string,
-  role: Role,
-  kind: SocialPost['kind'],
-  activity: string,
-  caption: string,
-  mediaColor: string,
-  likes: number,
-  extra: Partial<SocialPost> = {},
-): SocialPost {
-  return {
-    id: uid(),
-    authorEmail: authorName.toLowerCase().replace(/[^a-z]/g, '') + '@panaceamed.id',
-    authorName,
-    role,
-    kind,
-    postType: 'aktivitas',
-    activity,
-    caption,
-    mediaColor,
-    durationSec: kind === 'video' ? 15 : undefined,
-    likes,
-    at: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
-    ...extra,
-  }
-}
-
-function mat(
-  id: string,
-  title: string,
-  description: string,
-  category: Material['category'],
-  exam: Material['exam'],
-  specialty: string,
-  authorId: string,
-  authorName: string,
-  fileType: Material['fileType'],
-  fileName: string,
-  priceTokens: number,
-  status: Material['status'],
-  downloads: number,
-  rating: number,
-  aiApproved: boolean,
-): Material {
-  const now = new Date().toISOString()
-  return {
-    id,
-    title,
-    description,
-    category,
-    exam,
-    specialty,
-    authorId,
-    authorName,
-    fileType,
-    fileName,
-    priceTokens,
-    status,
-    downloads,
-    rating,
-    createdAt: now,
-    aiReview: aiApproved
-      ? { verdict: 'approved', score: 88, notes: 'Konten akurat & sesuai pedoman terkini.', at: now }
-      : undefined,
-    verifierReview:
-      status === 'verified'
-        ? { verifierName: authorName, verifierRole: 'Subspesialis', approved: true, notes: 'Disetujui.', at: now }
-        : undefined,
-  }
-}
-
-function v(
-  takenAt: string,
-  systolic: number,
-  diastolic: number,
-  heartRate: number,
-  respRate: number,
-  tempC: number,
-  spo2: number,
-  glucose?: number,
-): VitalSign {
-  return { id: uid(), takenAt, systolic, diastolic, heartRate, respRate, tempC, spo2, glucose }
-}
-
-function s(
-  takenAt: string,
-  category: SupportiveResult['category'],
-  name: string,
-  value: string,
-  unit: string,
-  reference: string,
-  flag: SupportiveResult['flag'],
-): SupportiveResult {
-  return { id: uid(), takenAt, category, name, value, unit, reference, flag }
 }
 
 function load(): AppState {
@@ -381,9 +177,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const store = useMemo<Store>(() => {
     const activePatient =
-      state.patients.find((p) => p.id === state.activePatientId) ?? state.patients[0]
+      state.patients.find((p) => p.id === state.activePatientId) ?? state.patients[0] ?? PLACEHOLDER_PATIENT
     const currentUser =
-      state.contributors.find((c) => c.id === state.currentUserId) ?? state.contributors[0]
+      state.contributors.find((c) => c.id === state.currentUserId) ?? state.contributors[0] ?? PLACEHOLDER_CONTRIBUTOR
     return {
       state,
       activePatient,
@@ -503,13 +299,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ),
         })),
       login: (account) =>
-        setState((st) => ({
-          ...st,
-          account,
-          // Patients are pinned to their own record (confidential, no switching).
-          activePatientId:
-            account.role === 'pasien' && account.patientId ? account.patientId : st.activePatientId,
-        })),
+        setState((st) => {
+          // A patient gets their OWN record, built from registration details
+          // (no dummy data). Doctors start with an empty patient list.
+          if (account.role === 'pasien') {
+            const self = patientFromAccount(account)
+            const exists = st.patients.some((p) => p.id === self.id)
+            return {
+              ...st,
+              account: { ...account, patientId: self.id },
+              patients: exists ? st.patients : [...st.patients, self],
+              activePatientId: self.id,
+            }
+          }
+          return { ...st, account }
+        }),
       logout: () => setState((st) => ({ ...st, account: null })),
       setMode: (role) =>
         setState((st) => {

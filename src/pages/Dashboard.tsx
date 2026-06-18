@@ -44,18 +44,49 @@ function Spark({ values, color }: { values: number[]; color: string }) {
 }
 
 export function Dashboard() {
-  const { state, activePatient, addVital } = useStore()
+  const { state, activePatient, addVital, addPatient } = useStore()
   const p = activePatient
   const vitals = state.vitals[p.id] ?? []
   const supportive = state.supportive[p.id] ?? []
   const latest = vitals[vitals.length - 1]
   const anthro = computeBmi(p.weightKg, p.heightCm)
   const [showAdd, setShowAdd] = useState(false)
+  const [showAddPatient, setShowAddPatient] = useState(false)
 
   const longevity = computeLongevity(p, latest, supportive)
+  const hasPatient = p.id !== 'none'
+
+  if (!hasPatient) {
+    return (
+      <div className="space-y-6">
+        <Card className="text-center">
+          <IconHeart size={32} className="mx-auto text-brand" />
+          <h2 className="mt-2 text-xl font-bold">Belum ada pasien</h2>
+          <p className="mx-auto mt-1 max-w-md text-sm text-neutral-500">
+            Tambahkan pasien pertama Anda untuk mulai mencatat tanda vital, antropometri & data klinis.
+          </p>
+        </Card>
+        <Card>
+          <SectionTitle icon={<IconPlus size={18} />} title="Tambah Pasien" />
+          <AddPatientForm onAdd={(np) => addPatient(np)} />
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={() => setShowAddPatient((s) => !s)}>
+          <IconPlus size={16} /> Tambah Pasien
+        </Button>
+      </div>
+      {showAddPatient && (
+        <Card>
+          <SectionTitle icon={<IconPlus size={18} />} title="Tambah Pasien" />
+          <AddPatientForm onAdd={(np) => { addPatient(np); setShowAddPatient(false) }} />
+        </Card>
+      )}
       {/* Patient identity — continuous */}
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -296,6 +327,50 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between">
       <span className="text-sm text-neutral-500">{label}</span>
       <span className="font-semibold">{value}</span>
+    </div>
+  )
+}
+
+function AddPatientForm({ onAdd }: { onAdd: (p: import('../lib/types').Patient) => void }) {
+  const [f, setF] = useState({ name: '', sex: 'L', age: '40', heightCm: '165', weightKg: '60', bloodType: '', conditions: '', allergies: '' })
+  const colors = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#FF3131', '#f59e0b']
+  function submit() {
+    if (!f.name.trim()) return
+    const year = new Date().getFullYear() - (Number(f.age) || 30)
+    onAdd({
+      id: uid(),
+      name: f.name.trim(),
+      sex: f.sex as 'L' | 'P',
+      dob: `${year}-01-01`,
+      mrn: 'PMD-' + uid().slice(0, 6).toUpperCase(),
+      heightCm: Number(f.heightCm) || 165,
+      weightKg: Number(f.weightKg) || 60,
+      bloodType: f.bloodType.trim() || undefined,
+      allergies: f.allergies.split(',').map((a) => a.trim()).filter(Boolean),
+      chronicConditions: f.conditions.split(',').map((c) => c.trim()).filter(Boolean),
+      riskFlags: [],
+      avatarColor: colors[Math.floor(Math.random() * colors.length)],
+    })
+    setF({ name: '', sex: 'L', age: '40', heightCm: '165', weightKg: '60', bloodType: '', conditions: '', allergies: '' })
+  }
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Field label="Nama"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Nama pasien" /></Field>
+      <Field label="Jenis Kelamin">
+        <select className={inputClass} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
+          <option value="L">Laki-laki</option>
+          <option value="P">Perempuan</option>
+        </select>
+      </Field>
+      <Field label="Umur"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
+      <Field label="Gol. Darah"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
+      <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
+      <Field label="Berat (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
+      <Field label="Penyakit Kronis"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="pisah koma" /></Field>
+      <Field label="Alergi"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="pisah koma" /></Field>
+      <div className="flex items-end sm:col-span-2 lg:col-span-4">
+        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Simpan Pasien</Button>
+      </div>
     </div>
   )
 }

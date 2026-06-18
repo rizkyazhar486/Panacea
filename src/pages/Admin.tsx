@@ -1,13 +1,7 @@
 import type { ReactNode } from 'react'
 import { useStore } from '../lib/store'
-import { Card, SectionTitle, Badge } from '../components/ui'
+import { Card, SectionTitle } from '../components/ui'
 import { IconStethoscope, IconPhone, IconSparkle, IconCheck } from '../components/icons'
-
-const TICKETS = [
-  { id: '#4821', user: 'Bpk. Hartono', topic: 'Penjadwalan operasi katarak', status: 'Diproses AI', tone: 'high' as const },
-  { id: '#4815', user: 'Ibu Siti', topic: 'Tidak bisa unduh materi', status: 'Selesai', tone: 'brand' as const },
-  { id: '#4809', user: 'dr. Maya', topic: 'Status verifikasi tertunda', status: 'Eskalasi manusia', tone: 'high' as const },
-]
 
 export function Admin() {
   const { state } = useStore()
@@ -20,25 +14,15 @@ export function Admin() {
           subtitle="Admin manusia + AI Chatbot otomatis (lambang telfon di tiap halaman)"
         />
         <div className="grid gap-3 sm:grid-cols-3">
-          <Mini icon={<IconPhone size={18} />} label="Tiket aktif" value="2" />
-          <Mini icon={<IconSparkle size={18} />} label="Ditangani AI" value="83%" />
-          <Mini icon={<IconCheck size={18} />} label="Selesai hari ini" value="14" />
+          <Mini icon={<IconPhone size={18} />} label="Tiket aktif" value="0" />
+          <Mini icon={<IconSparkle size={18} />} label="Ditangani AI" value="—" />
+          <Mini icon={<IconCheck size={18} />} label="Selesai hari ini" value="0" />
         </div>
       </Card>
 
       <Card>
         <SectionTitle title="Tiket Keluhan & Kendala" subtitle="Untuk memperbaiki sistem & membantu pelayanan" />
-        <div className="space-y-2">
-          {TICKETS.map((t) => (
-            <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-neutral-100 px-3 py-2">
-              <div>
-                <span className="font-bold">{t.id}</span> <span className="text-sm text-neutral-500">— {t.topic}</span>
-                <div className="text-xs text-neutral-400">{t.user}</div>
-              </div>
-              <Badge tone={t.tone}>{t.status}</Badge>
-            </div>
-          ))}
-        </div>
+        <p className="text-sm text-neutral-400">Belum ada tiket masuk.</p>
       </Card>
 
       <Card>

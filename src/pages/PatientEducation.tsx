@@ -5,9 +5,9 @@ import { IconBook, IconSparkle, IconCheck, IconScissors } from '../components/ic
 import { generateEducation } from '../lib/ai'
 
 export function PatientEducation() {
-  const { state, account, saveEducation, sendEmail } = useStore()
-  const pid = account?.patientId ?? 'p1'
-  const patient = state.patients.find((p) => p.id === pid) ?? state.patients[0]
+  const { state, account, activePatient, saveEducation, sendEmail } = useStore()
+  const pid = account?.patientId ?? activePatient.id
+  const patient = state.patients.find((p) => p.id === pid) ?? activePatient
   const record = state.records[pid]
   const sheet = state.education[pid]
   const [busy, setBusy] = useState(false)
