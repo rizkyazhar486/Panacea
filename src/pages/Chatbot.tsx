@@ -17,6 +17,28 @@ function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
   }
 }
 
+// Auto-Objective: pull measurable facts from the conversation + latest vitals.
+// Subjective is captured by the AI draft (anamnesis); these objective lines
+// (numbers with units) are routed into the Objective automatically.
+function autoObjective(messages: ChatMessage[], latest?: PatientContext['latestVitals']): string {
+  const lines: string[] = []
+  if (latest) {
+    lines.push(
+      `[Auto-vital] TD ${latest.systolic}/${latest.diastolic} mmHg · Nadi ${latest.heartRate}x/mnt · RR ${latest.respRate}x/mnt · Suhu ${latest.tempC}°C · SpO₂ ${latest.spo2}%` +
+        (latest.glucose ? ` · GDS ${latest.glucose} mg/dL` : ''),
+    )
+  }
+  const re = /[^.!?\n]*\b(\d{2,3}\/\d{2,3}|\d+(?:[.,]\d+)?\s?(?:mmhg|mg\/dl|°c|celsius|kg|cm|%|x\/menit|bpm|mmol))\b[^.!?\n]*/gi
+  const seen = new Set<string>()
+  for (const m of messages) {
+    if (m.role !== 'user') continue
+    const found = m.content.match(re)
+    if (found) found.forEach((f) => seen.add(f.trim()))
+  }
+  seen.forEach((l) => lines.push(`[Auto-Objektif] ${l}`))
+  return lines.join('\n')
+}
+
 export function Chatbot() {
   const store = useStore()
   const { state, activePatient, setChat, saveRecord } = store
@@ -89,7 +111,7 @@ export function Chatbot() {
         },
         physicalExam: existing?.physicalExam ?? {
           general: '',
-          vitalsNote: '',
+          vitalsNote: autoObjective(messages, ctxOf(store).latestVitals),
           perSystem: d.suggestedExams.map((s) => `• [USULAN AI] ${s}`).join('\n'),
           doctorVerified: false,
         },
@@ -124,10 +146,14 @@ export function Chatbot() {
           </div>
           <div className="flex items-center gap-2">
             <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Live' : 'Mode Demo'}</Badge>
-            <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
-              <IconSparkle size={16} />
-              {drafting ? 'Menyusun…' : 'Susun Draft AI-EMR'}
-            </Button>
+            {store.account?.role === 'dokter' ? (
+              <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
+                <IconSparkle size={16} />
+                {drafting ? 'Menyusun…' : 'Susun Draft AI-EMR (SOAP)'}
+              </Button>
+            ) : (
+              <Badge tone="neutral">Anamnesis diteruskan ke dokter (AI-EMR)</Badge>
+            )}
           </div>
         </div>
 
