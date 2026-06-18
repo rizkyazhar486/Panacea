@@ -145,6 +145,7 @@ export interface Account {
   patientId?: string // for pasien/dokter linkage
   loggedAt: string
   // Registration background (collected at sign-up)
+  sex?: Sex // jenis kelamin (L/P)
   age?: number
   occupation?: string
   background?: string // latar belakang singkat

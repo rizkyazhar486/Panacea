@@ -15,20 +15,12 @@ const ROLES: { id: Role; title: string; desc: string }[] = [
   { id: 'owner', title: 'Owner', desc: 'Lihat keuntungan moneter perusahaan' },
 ]
 
-const DEFAULT_NAME: Record<Role, string> = {
-  pasien: 'Bpk. Hartono Wijaya',
-  dokter: 'dr. Pemeriksa, Sp.PD',
-  kontributor: 'dr. Maya Lestari',
-  verifikator: 'Prof. dr. Rina Kusuma, Sp.PD-KGEH',
-  admin: 'Admin Panaceamed',
-  owner: 'Owner Panaceamed',
-}
-
 export function Login({ onBack }: { onBack?: () => void }) {
   const { login, sendEmail, state } = useStore()
   const [role, setRole] = useState<Role>('pasien')
-  const [email, setEmail] = useState('rizkyazhar486@gmail.com')
-  const [name, setName] = useState(DEFAULT_NAME['pasien'])
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [sex, setSex] = useState<'L' | 'P'>('L')
   const [age, setAge] = useState('')
   const [occupation, setOccupation] = useState('')
   const [background, setBackground] = useState('')
@@ -61,7 +53,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   function pick(r: Role) {
     setRole(r)
-    setName(DEFAULT_NAME[r])
   }
 
   function finish(account: Account) {
@@ -90,11 +81,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }
     const account: Account = {
       email: cleanEmail,
-      name: name.trim() || DEFAULT_NAME[role],
+      name: name.trim() || 'Pengguna Panaceamed',
       role,
       isSubscriber: role === 'owner',
       patientId: role === 'pasien' || role === 'dokter' ? 'p1' : undefined,
       loggedAt: new Date().toISOString(),
+      sex,
       age: age.trim() ? Number(age) : undefined,
       occupation: occupation.trim() || undefined,
       background: background.trim() || undefined,
@@ -169,10 +161,17 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <input className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} type="email" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Nama</label>
-              <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Nama Lengkap</label>
+              <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap Anda" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Jenis Kelamin</label>
+                <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'L' | 'P')}>
+                  <option value="L">Laki-laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Umur</label>
                 <input className={inputClass} value={age} onChange={(e) => setAge(e.target.value)} type="number" placeholder="mis. 34" />

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" fill="none">
   <!-- Green letterform: stem + U descender + P bowl (white interior is negative space) -->
-  <g stroke="#00BF63" stroke-width="74" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M178 152 V340 Q178 404 242 404 Q306 404 306 340 V268" />
-    <path d="M178 152 H300 Q366 152 366 214 Q366 276 300 276 H244" />
+  <g stroke="#00BF63" stroke-width="80" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M172 150 V330 Q172 402 242 402 Q312 402 312 330 V300" />
+    <path d="M172 150 H300 Q374 150 374 216 Q374 282 300 282 H224" />
   </g>
   <!-- Red cross -->
-  <rect x="74" y="34" width="64" height="150" rx="8" fill="#FF3131" />
-  <rect x="14" y="78" width="184" height="64" rx="8" fill="#FF3131" />
+  <rect x="62" y="24" width="78" height="168" rx="12" fill="#FF3131" />
+  <rect x="4" y="72" width="198" height="70" rx="12" fill="#FF3131" />
 </svg>

@@ -21,15 +21,15 @@ export function LogoMark({
       aria-label="Panaceamed.id"
       role="img"
     >
-      <g stroke={stroke} strokeWidth="74" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <g stroke={stroke} strokeWidth="80" strokeLinecap="round" strokeLinejoin="round" fill="none">
         {/* stem + rounded U tail (heart bottom) */}
-        <path d="M186 150 V326 Q186 404 256 404 Q322 404 322 330 V298" />
+        <path d="M172 150 V330 Q172 402 242 402 Q312 402 312 330 V300" />
         {/* P bowl */}
-        <path d="M186 150 H300 Q374 150 374 214 Q374 278 300 278 H214" />
+        <path d="M172 150 H300 Q374 150 374 216 Q374 282 300 282 H224" />
       </g>
-      {/* red cross */}
-      <rect x="70" y="28" width="66" height="158" rx="13" fill="#FF3131" />
-      <rect x="8" y="74" width="190" height="66" rx="13" fill="#FF3131" />
+      {/* red cross (bold plus, top-left) */}
+      <rect x="62" y="24" width="78" height="168" rx="12" fill="#FF3131" />
+      <rect x="4" y="72" width="198" height="70" rx="12" fill="#FF3131" />
     </svg>
   )
 }
