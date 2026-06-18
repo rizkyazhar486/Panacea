@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
-import { IconWallet, IconToken, IconCheck, IconShield } from '../components/icons'
+import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import type { SubscriptionPlan, TxType, PaymentMethod } from '../lib/types'
 
@@ -54,6 +54,7 @@ export function Billing() {
   const [withdraw, setWithdraw] = useState(10)
   const [bank, setBank] = useState('BCA')
   const [msg, setMsg] = useState('')
+  const [buyPlan, setBuyPlan] = useState<SubscriptionPlan | null>(null)
 
   return (
     <div className="space-y-6">
@@ -235,7 +236,7 @@ export function Billing() {
                   className="mt-4 w-full"
                   variant={active ? 'outline' : 'primary'}
                   disabled={active || wallet.balance < pl.price}
-                  onClick={() => subscribe(pl.id, pl.id === 'rumah-sakit' ? 25 : 1)}
+                  onClick={() => setBuyPlan(pl.id)}
                 >
                   {active
                     ? 'Sedang aktif'
@@ -248,6 +249,20 @@ export function Billing() {
           })}
         </div>
       </Card>
+
+      {buyPlan && (
+        <EmrPurchaseModal
+          plan={buyPlan}
+          price={PLANS.find((p) => p.id === buyPlan)?.price ?? 0}
+          onClose={() => setBuyPlan(null)}
+          onConfirm={(seats) => {
+            subscribe(buyPlan, seats)
+            setBuyPlan(null)
+            setMsg('Pembelian AI-EMR berhasil — kredensial diterima & sedang diverifikasi.')
+            setTimeout(() => setMsg(''), 3000)
+          }}
+        />
+      )}
 
       {/* Transactions */}
       <Card>
@@ -284,6 +299,125 @@ export function Billing() {
           </table>
         </div>
       </Card>
+    </div>
+  )
+}
+
+// AI-EMR is sold to certified buyers only. Individuals submit their STR;
+// companies (hospital/institution) submit an NPWP plus each doctor's STR (JPGs).
+function EmrPurchaseModal({
+  plan, price, onClose, onConfirm,
+}: {
+  plan: SubscriptionPlan
+  price: number
+  onClose: () => void
+  onConfirm: (seats: number) => void
+}) {
+  const isCompany = plan === 'rumah-sakit'
+  const [buyer, setBuyer] = useState<'perusahaan' | 'individu'>(isCompany ? 'perusahaan' : 'individu')
+  const [orgType, setOrgType] = useState<'Rumah Sakit' | 'Instansi'>('Rumah Sakit')
+  const [orgName, setOrgName] = useState('')
+  const [npwp, setNpwp] = useState('')
+  const [str, setStr] = useState('')
+  const [strFiles, setStrFiles] = useState<string[]>([])
+  const [seats, setSeats] = useState(isCompany ? 25 : 1)
+  const [err, setErr] = useState('')
+
+  function submit() {
+    if (buyer === 'individu') {
+      if (!str.trim()) return setErr('Nomor STR wajib diisi untuk pembelian individu.')
+    } else {
+      if (!orgName.trim()) return setErr('Nama perusahaan/instansi wajib diisi.')
+      if (!npwp.trim()) return setErr('NPWP perusahaan wajib diisi.')
+      if (strFiles.length === 0) return setErr('Unggah minimal satu STR dokter (JPG).')
+    }
+    onConfirm(seats)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2 text-brand-dark">
+          <IconShield size={20} />
+          <h3 className="text-lg font-bold">Pembelian AI-EMR — Verifikasi Kredensial</h3>
+        </div>
+        <p className="mt-1 text-sm text-neutral-500">
+          AI-EMR hanya dijual ke pembeli bersertifikat. Paket <b>{isCompany ? 'Rumah Sakit' : 'Individu'}</b> · {price} PNC/bulan.
+        </p>
+
+        <div className="mt-4 flex gap-2">
+          {(['individu', 'perusahaan'] as const).map((b) => (
+            <button
+              key={b}
+              onClick={() => setBuyer(b)}
+              className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${buyer === b ? 'bg-brand-50 text-brand-dark ring-1 ring-brand' : 'bg-neutral-100 text-neutral-500'}`}
+            >
+              {b === 'individu' ? 'Individu (Dokter)' : 'Perusahaan / Instansi'}
+            </button>
+          ))}
+        </div>
+
+        {buyer === 'individu' ? (
+          <div className="mt-4 space-y-3">
+            <Field label="Nomor STR / Sertifikat Praktik">
+              <input className={inputClass} value={str} onChange={(e) => setStr(e.target.value)} placeholder="Wajib — STR aktif" />
+            </Field>
+            <UploadBox label="Unggah scan STR (JPG/PDF) — opsional" onFiles={(f) => setStrFiles(f)} files={strFiles} />
+          </div>
+        ) : (
+          <div className="mt-4 space-y-3">
+            <Field label="Jenis Pembeli">
+              <select className={inputClass} value={orgType} onChange={(e) => setOrgType(e.target.value as 'Rumah Sakit' | 'Instansi')}>
+                <option>Rumah Sakit</option>
+                <option>Instansi</option>
+              </select>
+            </Field>
+            <Field label={`Nama ${orgType}`}>
+              <input className={inputClass} value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder={`mis. ${orgType === 'Rumah Sakit' ? 'RS Sehat Sentosa' : 'Dinas Kesehatan Kota'}`} />
+            </Field>
+            <Field label="NPWP Perusahaan">
+              <input className={inputClass} value={npwp} onChange={(e) => setNpwp(e.target.value)} placeholder="00.000.000.0-000.000" />
+            </Field>
+            <Field label="Jumlah seat dokter">
+              <input className={inputClass} type="number" min={1} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
+            </Field>
+            <UploadBox label="STR setiap dokter (beberapa JPG)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
+          </div>
+        )}
+
+        {err && <p className="mt-3 text-xs font-semibold text-accent">{err}</p>}
+        <div className="mt-5 flex gap-2">
+          <Button variant="ghost" className="flex-1" onClick={onClose}>Batal</Button>
+          <Button className="flex-1" onClick={submit}>Bayar {price} PNC & Kirim</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function UploadBox({ label, multiple, onFiles, files }: { label: string; multiple?: boolean; onFiles: (names: string[]) => void; files: string[] }) {
+  return (
+    <div>
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-5 text-neutral-500 hover:border-brand">
+        <IconUpload size={22} />
+        <span className="text-xs font-semibold">{label}</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,application/pdf"
+          multiple={multiple}
+          className="hidden"
+          onChange={(e) => onFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
+        />
+      </label>
+      {files.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {files.map((f) => (
+            <span key={f} className="flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-dark">
+              <IconCheck size={12} /> {f}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
