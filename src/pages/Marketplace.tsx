@@ -27,7 +27,7 @@ function downloadStub(m: Material) {
 }
 
 export function Marketplace() {
-  const { state, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview } = useStore()
+  const { state, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview, buyLongevitySub } = useStore()
   const [exam, setExam] = useState<(typeof EXAMS)[number]>('Semua')
   const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
   const [toast, setToast] = useState('')
@@ -56,6 +56,34 @@ export function Marketplace() {
           {toast}
         </div>
       )}
+
+      {/* AI Longevity subscription */}
+      {(() => {
+        const active = !!state.longevitySubExpires && new Date(state.longevitySubExpires) > new Date()
+        const daysLeft = state.longevitySubExpires ? Math.max(0, Math.ceil((new Date(state.longevitySubExpires).getTime() - Date.now()) / 86400000)) : 0
+        return (
+          <Card className="!p-0 overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-br from-brand to-brand-dark p-5 text-white">
+              <div>
+                <div className="flex items-center gap-2">
+                  <IconShield size={20} />
+                  <h3 className="text-lg font-extrabold">Langganan AI Longevity</h3>
+                  {active && <Badge tone="neutral">Aktif · {daysLeft} hari</Badge>}
+                </div>
+                <p className="mt-1 max-w-lg text-sm text-white/85">
+                  Buka Nilai Longevity bertenaga AI di menu Nutrisi & Kalori. Berlaku 30 hari, perpanjang tiap bulan.
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-extrabold">Rp125.000<span className="text-sm font-medium text-white/70">/30 hari</span></div>
+                <Button variant="outline" className="mt-1 border-white !text-white hover:!bg-white/15" onClick={() => { buyLongevitySub(); notify(active ? 'Langganan AI Longevity diperpanjang 30 hari.' : 'Langganan AI Longevity aktif 30 hari.') }}>
+                  {active ? 'Perpanjang' : 'Langganan Sekarang'}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )
+      })()}
 
       <Card>
         <SectionTitle

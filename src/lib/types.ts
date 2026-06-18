@@ -184,9 +184,16 @@ export interface SocialPost {
   // Longevity article snippet (optional)
   articleTitle?: string
   articleSource?: string
+  // TikTok-style media & social state
+  photos?: string[] // multiple photo placeholders (gradient colors)
+  videoSec?: number // short video length (<=30s)
+  locked?: boolean // private/locked post (only owner sees in "Terkunci")
   likes: number
   comments?: number
+  reposts?: number
   likedByMe?: boolean
+  repostedByMe?: boolean
+  bookmarkedByMe?: boolean
   at: string
 }
 
@@ -324,6 +331,7 @@ export interface AppState {
   currentUserId: string // the logged-in contributor (demo "act as")
   account: Account | null // logged-in account (role-based)
   adminEmails: string[] // emails allowed to sign in as Admin (managed by owner)
+  longevitySubExpires?: string // ISO date — AI Longevity score subscription expiry
   posts: SocialPost[]
   follows: string[] // emails the current account follows
   foods: FoodEntry[]

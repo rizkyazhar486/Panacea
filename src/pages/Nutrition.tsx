@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
-import { IconFood, IconPlus, IconRun, IconDrop, IconFlame } from '../components/icons'
+import { IconFood, IconPlus, IconSparkle } from '../components/icons'
 import { FOODS } from '../lib/foods'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
 export function Nutrition() {
-  const { state, activePatient, addFood } = useStore()
+  const { state, addFood } = useStore()
   const [foodName, setFoodName] = useState(FOODS[0].name)
   const [grams, setGrams] = useState(100)
 
@@ -86,7 +87,7 @@ export function Nutrition() {
         </div>
       </Card>
 
-      <ActivityLifestyle intakeKcal={total.kcal} defaultWeight={activePatient?.weightKg ?? 65} />
+      <LongevityCalculator />
 
       <Card>
         <SectionTitle title="Anjuran Harian" subtitle="Disesuaikan nutrisi & kondisi pasien" />
@@ -135,168 +136,170 @@ function Tip({ title, text }: { title: string; text: string }) {
   )
 }
 
-// -- Detailed activity & lifestyle calorie calculator -----------------------
-// MET (Metabolic Equivalent) values; kcal = MET × weightKg × hours.
-type Intensity = 'Ringan' | 'Sedang' | 'Berat'
-const ACTIVITY_MET: { name: string; met: number; intensity: Intensity }[] = [
-  { name: 'Menyapu / pekerjaan rumah', met: 3.3, intensity: 'Ringan' },
-  { name: 'Jalan kaki santai', met: 3.0, intensity: 'Ringan' },
-  { name: 'Yoga / peregangan', met: 2.5, intensity: 'Ringan' },
-  { name: 'Jalan cepat', met: 4.3, intensity: 'Sedang' },
-  { name: 'Bersepeda santai', met: 6.0, intensity: 'Sedang' },
-  { name: 'Berkebun', met: 4.0, intensity: 'Sedang' },
-  { name: 'Angkat beban (gym)', met: 5.0, intensity: 'Sedang' },
-  { name: 'Berenang', met: 8.0, intensity: 'Berat' },
-  { name: 'Lari', met: 9.8, intensity: 'Berat' },
-  { name: 'Futsal / sepak bola', met: 9.0, intensity: 'Berat' },
-  { name: 'HIIT / olahraga khusus', met: 10.0, intensity: 'Berat' },
-]
-const SUGARY_KCAL = 90 // avg kcal per sugary drink serving
+// -- AI Longevity calculator (subscription-gated) ---------------------------
+// All inputs are entered manually; the AI computes a calculative longevity score.
+function clamp(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
 
-interface ActLog { id: string; name: string; minutes: number; kcal: number; intensity: Intensity }
-const intensityTone: Record<Intensity, 'normal' | 'low' | 'high'> = { Ringan: 'normal', Sedang: 'low', Berat: 'high' }
+function computeLongevity(i: {
+  mainMeals: number; snacks: number; exerciseFreq: number; exerciseMin: number
+  hydrationL: number; sleepHr: number; sunDone: boolean; sunHr: number
+}) {
+  // Each pillar scored 0–100 vs ideal ranges.
+  const meals = clamp(100 - Math.abs(i.mainMeals - 3) * 18 - Math.max(0, i.snacks - 2) * 12)
+  const exercise = clamp((i.exerciseFreq >= 1 ? 60 : i.exerciseFreq * 60) + Math.min(40, (i.exerciseMin / 30) * 40))
+  const hydration = clamp(i.hydrationL >= 2 && i.hydrationL <= 3.5 ? 100 : 100 - Math.abs(i.hydrationL - 2.5) * 28)
+  const sleep = clamp(i.sleepHr >= 7 && i.sleepHr <= 9 ? 100 : 100 - Math.abs(i.sleepHr - 8) * 16)
+  const sun = clamp(!i.sunDone ? 40 : i.sunHr >= 0.17 && i.sunHr <= 0.6 ? 100 : 100 - Math.abs(i.sunHr - 0.33) * 80)
+  const score = clamp(meals * 0.2 + exercise * 0.25 + hydration * 0.15 + sleep * 0.25 + sun * 0.15)
+  return { score, meals, exercise, hydration, sleep, sun }
+}
 
-function ActivityLifestyle({ intakeKcal, defaultWeight }: { intakeKcal: number; defaultWeight: number }) {
-  const [weight, setWeight] = useState(defaultWeight)
-  const [actName, setActName] = useState(ACTIVITY_MET[0].name)
-  const [minutes, setMinutes] = useState(30)
-  const [logs, setLogs] = useState<ActLog[]>([])
-  const [waterMl, setWaterMl] = useState(0)
-  const [sugary, setSugary] = useState(0)
-  const [screenHr, setScreenHr] = useState(0)
+const PRICE_LONGEVITY = 125000
 
-  const burned = useMemo(() => logs.reduce((a, l) => a + l.kcal, 0), [logs])
-  const sugaryKcal = sugary * SUGARY_KCAL
-  const net = intakeKcal + sugaryKcal - burned
-  const waterTarget = 2000
-  const waterPct = Math.min(100, Math.round((waterMl / waterTarget) * 100))
+function LongevityCalculator() {
+  const { state, buyLongevitySub } = useStore()
+  const [mainMeals, setMainMeals] = useState(3)
+  const [snacks, setSnacks] = useState(2)
+  const [exerciseFreq, setExerciseFreq] = useState(1)
+  const [exerciseMin, setExerciseMin] = useState(30)
+  const [hydrationL, setHydrationL] = useState(2)
+  const [sleepHr, setSleepHr] = useState(7)
+  const [sunDone, setSunDone] = useState(false)
+  const [sunHr, setSunHr] = useState(0.25)
+  const [result, setResult] = useState<ReturnType<typeof computeLongevity> | null>(null)
 
-  function addActivity() {
-    const a = ACTIVITY_MET.find((x) => x.name === actName)!
-    const kcal = Math.round(a.met * weight * (minutes / 60))
-    setLogs((l) => [{ id: uid(), name: a.name, minutes, kcal, intensity: a.intensity }, ...l])
+  const subActive = !!state.longevitySubExpires && new Date(state.longevitySubExpires) > new Date()
+  const daysLeft = state.longevitySubExpires
+    ? Math.max(0, Math.ceil((new Date(state.longevitySubExpires).getTime() - Date.now()) / 86400000))
+    : 0
+
+  function compute() {
+    setResult(computeLongevity({ mainMeals, snacks, exerciseFreq, exerciseMin, hydrationL, sleepHr, sunDone, sunHr }))
   }
 
   return (
     <Card>
       <SectionTitle
-        icon={<IconRun size={20} />}
-        title="Kalkulator Aktivitas & Gaya Hidup"
-        subtitle="Hitung kalori terbakar dari aktivitas (ringan–berat) serta pantau air minum, minuman manis & screen time"
+        icon={<IconSparkle size={20} />}
+        title="Kalkulator Longevity (AI)"
+        subtitle="Isi gaya hidup harian Anda secara manual — AI menghitung nilai longevity Anda"
+        right={subActive ? <Badge tone="brand">Langganan aktif · {daysLeft} hari</Badge> : <Badge tone="high">Perlu langganan</Badge>}
       />
 
-      {/* summary */}
-      <div className="grid gap-3 sm:grid-cols-4">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Asupan</div>
-          <div className="text-2xl font-extrabold text-amber-600">{intakeKcal + sugaryKcal}</div>
-          <div className="text-[10px] text-neutral-400">kkal masuk</div>
-        </div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Terbakar</div>
-          <div className="text-2xl font-extrabold text-brand">{burned}</div>
-          <div className="text-[10px] text-neutral-400">kkal aktivitas</div>
-        </div>
-        <div className="rounded-xl bg-brand-50 p-3 text-center">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-brand-dark">Saldo Net</div>
-          <div className={`text-2xl font-extrabold ${net > 0 ? 'text-accent' : 'text-brand-dark'}`}>{net > 0 ? '+' : ''}{net}</div>
-          <div className="text-[10px] text-neutral-500">{net > 0 ? 'surplus' : 'defisit'} kkal</div>
-        </div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Air Putih</div>
-          <div className="text-2xl font-extrabold text-blue-500">{(waterMl / 1000).toFixed(1)}L</div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white">
-            <div className="h-full rounded-full bg-blue-500" style={{ width: `${waterPct}%` }} />
+      <div className="grid gap-5 lg:grid-cols-2">
+        {/* Manual inputs */}
+        <div className="space-y-4">
+          <div className="rounded-xl border border-neutral-100 p-3">
+            <div className="mb-2 text-sm font-bold">🍽️ Penjadwalan Makan</div>
+            <Stepper label="Makan utama / hari" value={mainMeals} min={1} max={5} onChange={setMainMeals} />
+            <Stepper label="Selingan / hari" value={snacks} min={0} max={4} onChange={setSnacks} />
+          </div>
+          <div className="rounded-xl border border-neutral-100 p-3">
+            <div className="mb-2 text-sm font-bold">🏃 Pola Olahraga</div>
+            <Stepper label="Frekuensi (kali/hari)" value={exerciseFreq} min={0} max={4} onChange={setExerciseFreq} />
+            <Stepper label="Durasi per sesi (menit)" value={exerciseMin} min={0} max={180} step={5} onChange={setExerciseMin} />
+          </div>
+          <div className="rounded-xl border border-neutral-100 p-3">
+            <div className="mb-2 text-sm font-bold">💧 Hidrasi & 😴 Tidur</div>
+            <Stepper label="Air putih (liter)" value={hydrationL} min={0} max={6} step={0.25} onChange={setHydrationL} unit="L" />
+            <Stepper label="Jam tidur" value={sleepHr} min={0} max={12} step={0.5} onChange={setSleepHr} unit="jam" />
+          </div>
+          <div className="rounded-xl border border-neutral-100 p-3">
+            <div className="mb-2 text-sm font-bold">☀️ Berjemur (paparan sinar matahari)</div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={sunDone} onChange={(e) => setSunDone(e.target.checked)} className="h-4 w-4 accent-[#00BF63]" />
+              Sudah berjemur hari ini?
+            </label>
+            {sunDone && <div className="mt-2"><Stepper label="Berapa jam?" value={sunHr} min={0} max={3} step={0.25} onChange={setSunHr} unit="jam" /></div>}
           </div>
         </div>
-      </div>
 
-      {/* activity input */}
-      <div className="mt-4 flex flex-wrap items-end gap-3">
-        <div className="w-24">
-          <Field label="Berat (kg)">
-            <input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(Number(e.target.value))} />
-          </Field>
+        {/* Result / gating */}
+        <div>
+          {!subActive ? (
+            <div className="flex h-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50/40 p-6 text-center">
+              <IconSparkle size={34} className="text-brand" />
+              <h3 className="mt-2 text-lg font-bold">Nilai Longevity bertenaga AI</h3>
+              <p className="mt-1 max-w-xs text-sm text-neutral-600">
+                Fitur ini berlangganan <b>30 hari</b>. Perpanjang tiap bulan <b>Rp{PRICE_LONGEVITY.toLocaleString('id-ID')}</b> melalui Marketplace.
+              </p>
+              <Button className="mt-4" onClick={() => buyLongevitySub()}>
+                <IconSparkle size={16} /> Langganan 30 Hari — Rp{PRICE_LONGEVITY.toLocaleString('id-ID')}
+              </Button>
+              <Link to="/marketplace" className="mt-2 text-xs font-semibold text-brand-dark hover:underline">Buka di Marketplace →</Link>
+            </div>
+          ) : result ? (
+            <div className="rounded-2xl bg-gradient-to-br from-brand to-brand-dark p-5 text-white">
+              <div className="flex items-center gap-4">
+                <Gauge value={result.score} />
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Nilai Longevity AI</div>
+                  <div className="text-4xl font-extrabold">{result.score}<span className="text-lg">/100</span></div>
+                  <div className="text-sm text-white/85">{result.score >= 80 ? 'Sangat baik 🌟' : result.score >= 60 ? 'Cukup baik 👍' : 'Perlu perbaikan'}</div>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                <PillarBar label="Pola makan" v={result.meals} />
+                <PillarBar label="Olahraga" v={result.exercise} />
+                <PillarBar label="Hidrasi" v={result.hydration} />
+                <PillarBar label="Tidur" v={result.sleep} />
+                <PillarBar label="Sinar matahari" v={result.sun} />
+              </div>
+              <p className="mt-3 text-[11px] text-white/70">Dihitung oleh AI Panaceamed dari data gaya hidup Anda hari ini.</p>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center rounded-2xl bg-neutral-50 p-6 text-center">
+              <p className="text-sm text-neutral-500">Isi data di kiri lalu tekan tombol di bawah untuk menghitung nilai longevity Anda.</p>
+            </div>
+          )}
+          {subActive && (
+            <Button className="mt-4 w-full" onClick={compute}>
+              <IconSparkle size={16} /> Hitung Nilai Longevity (AI)
+            </Button>
+          )}
         </div>
-        <div className="w-56">
-          <Field label="Aktivitas">
-            <select className={inputClass} value={actName} onChange={(e) => setActName(e.target.value)}>
-              {ACTIVITY_MET.map((a) => (
-                <option key={a.name}>{a.name}</option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        <div className="w-28">
-          <Field label="Durasi (menit)">
-            <input className={inputClass} type="number" value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} />
-          </Field>
-        </div>
-        <Button onClick={addActivity}><IconFlame size={16} /> Hitung & Catat</Button>
-      </div>
-      <div className="mt-3 space-y-2">
-        {logs.length === 0 && <p className="text-sm text-neutral-400">Belum ada aktivitas tercatat hari ini.</p>}
-        {logs.map((l) => (
-          <div key={l.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-sm">
-            <span className="flex items-center gap-2 font-medium">
-              {l.name} <Badge tone={intensityTone[l.intensity]}>{l.intensity}</Badge>
-              <span className="text-neutral-400">· {l.minutes} mnt</span>
-            </span>
-            <span className="font-bold text-brand">−{l.kcal} kkal</span>
-          </div>
-        ))}
-      </div>
-
-      {/* lifestyle trackers */}
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <Tracker
-          icon={<IconDrop size={18} className="text-blue-500" />}
-          label="Air Minum"
-          value={`${waterMl} ml`}
-          hint={waterMl >= waterTarget ? 'Target tercapai 👍' : `Sisa ${waterTarget - waterMl} ml`}
-          onMinus={() => setWaterMl((w) => Math.max(0, w - 250))}
-          onPlus={() => setWaterMl((w) => w + 250)}
-          step="+250ml"
-        />
-        <Tracker
-          icon={<IconFlame size={18} className="text-accent" />}
-          label="Minuman Manis"
-          value={`${sugary} gelas`}
-          hint={sugary === 0 ? 'Bagus, tanpa gula tambahan' : `≈ ${sugaryKcal} kkal gula`}
-          onMinus={() => setSugary((s) => Math.max(0, s - 1))}
-          onPlus={() => setSugary((s) => s + 1)}
-          step="+1"
-        />
-        <Tracker
-          icon={<IconRun size={18} className="text-neutral-500" />}
-          label="Screen Time"
-          value={`${screenHr} jam`}
-          hint={screenHr > 6 ? 'Tinggi — selingi gerak & istirahat mata' : 'Dalam batas wajar'}
-          onMinus={() => setScreenHr((s) => Math.max(0, s - 1))}
-          onPlus={() => setScreenHr((s) => s + 1)}
-          step="+1 jam"
-        />
       </div>
     </Card>
   )
 }
 
-function Tracker({
-  icon, label, value, hint, onMinus, onPlus, step,
-}: {
-  icon: React.ReactNode; label: string; value: string; hint: string; onMinus: () => void; onPlus: () => void; step: string
+function Stepper({ label, value, min, max, step = 1, unit, onChange }: {
+  label: string; value: number; min: number; max: number; step?: number; unit?: string; onChange: (v: number) => void
 }) {
+  const dec = () => onChange(Math.max(min, +(value - step).toFixed(2)))
+  const inc = () => onChange(Math.min(max, +(value + step).toFixed(2)))
   return (
-    <div className="rounded-xl border border-neutral-100 p-3">
-      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-neutral-400">{icon} {label}</div>
-      <div className="mt-1 flex items-center justify-between">
-        <span className="text-xl font-extrabold">{value}</span>
-        <div className="flex items-center gap-1.5">
-          <button onClick={onMinus} className="grid h-7 w-7 place-items-center rounded-lg bg-neutral-100 font-bold">−</button>
-          <button onClick={onPlus} className="grid h-7 w-7 place-items-center rounded-lg bg-brand-50 text-xs font-bold text-brand-dark">{step}</button>
-        </div>
+    <div className="flex items-center justify-between py-1">
+      <span className="text-sm text-neutral-600">{label}</span>
+      <div className="flex items-center gap-2">
+        <button onClick={dec} className="grid h-7 w-7 place-items-center rounded-lg bg-neutral-100 font-bold">−</button>
+        <span className="w-16 text-center text-sm font-extrabold">{value}{unit ? ` ${unit}` : ''}</span>
+        <button onClick={inc} className="grid h-7 w-7 place-items-center rounded-lg bg-brand-50 font-bold text-brand-dark">+</button>
       </div>
-      <p className="mt-1 text-[11px] text-neutral-500">{hint}</p>
     </div>
+  )
+}
+
+function PillarBar({ label, v }: { label: string; v: number }) {
+  return (
+    <div>
+      <div className="mb-0.5 flex justify-between text-xs"><span>{label}</span><span className="font-bold">{v}</span></div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-white/25">
+        <div className="h-full rounded-full bg-white" style={{ width: `${v}%` }} />
+      </div>
+    </div>
+  )
+}
+
+function Gauge({ value }: { value: number }) {
+  const r = 30
+  const c = 2 * Math.PI * r
+  return (
+    <svg width="76" height="76" viewBox="0 0 76 76">
+      <circle cx="38" cy="38" r={r} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="8" />
+      <circle cx="38" cy="38" r={r} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round"
+        strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} transform="rotate(-90 38 38)" />
+      <text x="38" y="43" textAnchor="middle" fontSize="18" fontWeight="800" fill="#fff">{value}</text>
+    </svg>
   )
 }

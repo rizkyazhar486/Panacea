@@ -133,7 +133,10 @@ interface Store {
   // social + nutrition + consult + email + withdraw
   addPost: (p: SocialPost) => void
   toggleLike: (id: string) => void
+  toggleRepost: (id: string) => void
+  toggleBookmark: (id: string) => void
   toggleFollow: (email: string) => void
+  buyLongevitySub: () => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
   bookConsult: (c: ConsultSession) => void
   sendEmail: (e: EmailMsg) => void
@@ -345,6 +348,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : p,
           ),
         })),
+      toggleRepost: (id) =>
+        setState((st) => ({
+          ...st,
+          posts: st.posts.map((p) =>
+            p.id === id
+              ? { ...p, repostedByMe: !p.repostedByMe, reposts: (p.reposts ?? 0) + (p.repostedByMe ? -1 : 1) }
+              : p,
+          ),
+        })),
+      toggleBookmark: (id) =>
+        setState((st) => ({
+          ...st,
+          posts: st.posts.map((p) => (p.id === id ? { ...p, bookmarkedByMe: !p.bookmarkedByMe } : p)),
+        })),
+      buyLongevitySub: () => {
+        const now = new Date()
+        const expires = new Date(now.getTime() + 30 * 86400000).toISOString()
+        setState((st) => ({
+          ...st,
+          longevitySubExpires: expires,
+          wallet: {
+            balance: st.wallet.balance,
+            transactions: [
+              {
+                id: uid(),
+                type: 'subscription' as TxType,
+                amount: 0,
+                note: 'Langganan AI Longevity 30 hari — Rp125.000 (dibayar)',
+                at: now.toISOString(),
+              },
+              ...st.wallet.transactions,
+            ],
+          },
+        }))
+        return { ok: true }
+      },
       toggleFollow: (email) =>
         setState((st) => ({
           ...st,
