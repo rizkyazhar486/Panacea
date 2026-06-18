@@ -54,7 +54,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] px-6 py-16 text-white sm:px-10 sm:py-24">
         <div className="mx-auto max-w-4xl text-center">
-          <LogoMark size={84} className="mx-auto drop-shadow" />
+          <LogoMark size={84} dark className="mx-auto drop-shadow" />
           <h1 className="mt-5 text-3xl font-extrabold leading-tight sm:text-5xl">
             Longevity Medical-AI Co-Physician
           </h1>
