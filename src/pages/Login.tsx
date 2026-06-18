@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Wordmark } from '../components/Logo'
 import { Button, inputClass } from '../components/ui'
 import { IconUser } from '../components/icons'
+import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api'
 import type { Account, Role } from '../lib/types'
 
 const ROLES: { id: Role; title: string; desc: string }[] = [
@@ -28,23 +29,41 @@ export function Login() {
   const [role, setRole] = useState<Role>('pasien')
   const [email, setEmail] = useState('rizkyazhar486@gmail.com')
   const [name, setName] = useState(DEFAULT_NAME['pasien'])
+  const [health, setHealth] = useState<Health | null>(null)
+  const [error, setError] = useState('')
+  const roleRef = useRef<Role>('pasien')
+  const gbtn = useRef<HTMLDivElement>(null)
+
+  // Detect a configured backend; render the real Google button when available.
+  useEffect(() => {
+    if (!backendEnabled) return
+    api.health().then(setHealth).catch(() => setError('Backend tidak terjangkau — memakai mode lokal.'))
+    // already logged in on the server?
+    api.me().then(login).catch(() => {})
+  }, [login])
+
+  useEffect(() => {
+    roleRef.current = role
+  }, [role])
+
+  useEffect(() => {
+    if (health?.googleClientId && gbtn.current) {
+      renderGoogleButton(gbtn.current, health.googleClientId, (credential) => {
+        api
+          .googleLogin(credential, roleRef.current)
+          .then((acc) => login({ ...acc, isSubscriber: acc.role === 'owner' }))
+          .catch(() => setError('Verifikasi Google gagal.'))
+      }).catch(() => setError('Gagal memuat Google Sign-In.'))
+    }
+  }, [health, login])
 
   function pick(r: Role) {
     setRole(r)
     setName(DEFAULT_NAME[r])
   }
 
-  function doLogin() {
-    const account: Account = {
-      email: email.trim() || 'user@gmail.com',
-      name: name.trim() || DEFAULT_NAME[role],
-      role,
-      isSubscriber: role === 'owner', // owner must subscribe too — prompt later
-      patientId: role === 'pasien' || role === 'dokter' ? 'p1' : undefined,
-      loggedAt: new Date().toISOString(),
-    }
+  function finish(account: Account) {
     login(account)
-    // Simulate emailing registration + onboarding info to the account email.
     sendEmail({
       id: uid(),
       to: account.email,
@@ -52,6 +71,26 @@ export function Login() {
       body: `Halo ${account.name}, akun Anda (${account.role}) telah aktif. Informasi edukasi, diagnosis, dan penjadwalan akan dikirim ke email ini.`,
       at: new Date().toISOString(),
     })
+  }
+
+  function doLogin() {
+    const account: Account = {
+      email: email.trim() || 'user@gmail.com',
+      name: name.trim() || DEFAULT_NAME[role],
+      role,
+      isSubscriber: role === 'owner',
+      patientId: role === 'pasien' || role === 'dokter' ? 'p1' : undefined,
+      loggedAt: new Date().toISOString(),
+    }
+    // Backend present → create a real server session (dev-login) for the wallet/API.
+    if (backendEnabled) {
+      api
+        .devLogin(account.email, account.name, role)
+        .then((acc) => finish({ ...acc, isSubscriber: account.isSubscriber }))
+        .catch(() => finish(account)) // graceful fallback to local
+      return
+    }
+    finish(account)
   }
 
   return (
@@ -78,12 +117,23 @@ export function Login() {
           <h2 className="text-2xl font-extrabold">Masuk</h2>
           <p className="mt-1 text-sm text-neutral-500">Pilih peran lalu masuk dengan akun Google Anda.</p>
 
-          <button
-            onClick={doLogin}
-            className="mt-5 flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50"
-          >
-            <GoogleG /> Masuk dengan Google
-          </button>
+          {health?.googleClientId ? (
+            <div ref={gbtn} className="mt-5 flex justify-center" />
+          ) : (
+            <button
+              onClick={doLogin}
+              className="mt-5 flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50"
+            >
+              <GoogleG /> Masuk dengan Google
+            </button>
+          )}
+          {error && <p className="mt-2 text-xs text-accent">{error}</p>}
+          {backendEnabled && (
+            <p className="mt-2 text-[11px] font-semibold text-brand-dark">
+              ● Backend aktif{health?.features.payments ? ' · pembayaran Midtrans LIVE' : ' · pembayaran mock'}
+              {health?.features.google ? ' · Google LIVE' : ''}
+            </p>
+          )}
 
           <div className="my-4 flex items-center gap-3 text-xs text-neutral-400">
             <span className="h-px flex-1 bg-neutral-200" /> atau isi manual <span className="h-px flex-1 bg-neutral-200" />

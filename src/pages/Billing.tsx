@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield } from '../components/icons'
+import { api, backendEnabled } from '../lib/api'
 import type { SubscriptionPlan, TxType, PaymentMethod } from '../lib/types'
 
 const PACKS = [10, 25, 50, 100]
@@ -56,6 +57,7 @@ export function Billing() {
 
   return (
     <div className="space-y-6">
+      {backendEnabled && <BackendWallet />}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Balance + deposit */}
         <Card className="lg:col-span-2">
@@ -295,5 +297,78 @@ function QrPlaceholder() {
         <span key={i} className={on ? 'bg-ink' : 'bg-transparent'} />
       ))}
     </div>
+  )
+}
+
+// Real backend wallet (Midtrans payments + server-side balance).
+function BackendWallet() {
+  const [balance, setBalance] = useState(0)
+  const [live, setLive] = useState(false)
+  const [amount, setAmount] = useState(25)
+  const [method, setMethod] = useState<PaymentMethod>('QRIS')
+  const [bank, setBank] = useState('BCA')
+  const [msg, setMsg] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  function refresh() {
+    api.wallet().then((w) => setBalance(w.balance)).catch(() => {})
+    api.health().then((h) => setLive(h.features.payments)).catch(() => {})
+  }
+  useEffect(refresh, [])
+
+  async function pay() {
+    setBusy(true)
+    setMsg('')
+    try {
+      const r = await api.createPayment(amount, method)
+      if (r.live && r.redirectUrl) {
+        window.open(r.redirectUrl, '_blank')
+        setMsg('Selesaikan pembayaran di tab Midtrans, lalu tekan Perbarui.')
+      } else {
+        await api.confirmPayment(r.orderId)
+        setMsg(`Pembayaran ${method} berhasil (mock) — ${amount} PNC ditambahkan.`)
+        refresh()
+      }
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : 'Gagal.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function withdraw() {
+    try {
+      const r = await api.withdraw(amount, bank)
+      setBalance(r.balance)
+      setMsg(`Penarikan ke ${bank} diproses.`)
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : 'Gagal.')
+    }
+  }
+
+  return (
+    <Card className="border-2 border-brand">
+      <SectionTitle
+        icon={<IconShield size={20} />}
+        title="Dompet Real (Backend)"
+        subtitle="Saldo & pembayaran diproses server"
+        right={<Badge tone={live ? 'brand' : 'high'}>{live ? 'Midtrans LIVE' : 'Mock backend'}</Badge>}
+      />
+      <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-brand p-5 text-white">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Saldo server</div>
+          <div className="text-3xl font-extrabold">{balance} <span className="text-base font-medium text-white/70">PNC</span></div>
+        </div>
+        <Button variant="ghost" className="bg-white/15 text-white hover:bg-white/25" onClick={refresh}>Perbarui</Button>
+      </div>
+      <div className="mt-4 flex flex-wrap items-end gap-3">
+        <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+        <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
+        <Button onClick={pay} disabled={busy}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
+        <div className="w-28"><Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['BCA', 'Mandiri', 'BNI', 'BRI'].map((b) => <option key={b}>{b}</option>)}</select></Field></div>
+        <Button variant="outline" onClick={withdraw}>Tarik ke Bank</Button>
+      </div>
+      {msg && <p className="mt-2 text-xs font-semibold text-brand-dark">{msg}</p>}
+    </Card>
   )
 }

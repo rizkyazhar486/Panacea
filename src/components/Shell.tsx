@@ -25,6 +25,7 @@ import { ageFromDob } from '../lib/anthro'
 import { Badge } from './ui'
 import { Login } from '../pages/Login'
 import { ContactService } from './ContactService'
+import { api, backendEnabled } from '../lib/api'
 import type { Role } from '../lib/types'
 
 type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[]; end?: boolean }
@@ -121,7 +122,10 @@ export function Shell({ children }: { children: ReactNode }) {
         </nav>
 
         <button
-          onClick={logout}
+          onClick={() => {
+            if (backendEnabled) api.logout().catch(() => {})
+            logout()
+          }}
           className="mt-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
         >
           <IconLogout size={18} /> Keluar
