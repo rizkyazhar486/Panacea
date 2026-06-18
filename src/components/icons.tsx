@@ -220,6 +220,35 @@ export const IconComment = ({ size = 20, className = '' }: P) => (
     <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.5A8 8 0 1 1 21 12Z" />
   </svg>
 )
+export const IconHome = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M3 11l9-8 9 8" />
+    <path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10" />
+    <path d="M9 21v-6h6v6" />
+  </svg>
+)
+export const IconSearch = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M21 21l-4.3-4.3" />
+  </svg>
+)
+export const IconBookmark = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+  </svg>
+)
+export const IconRepost = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M4 9V7a2 2 0 0 1 2-2h11M20 7l-3-3M20 15v2a2 2 0 0 1-2 2H7M4 17l3 3" />
+  </svg>
+)
+export const IconLock = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="4.5" y="11" width="15" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </svg>
+)
 export const IconPill = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}>
     <rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)" />
