@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "Panaceamed.id backend — Google OAuth login + Midtrans payments (real, with mock fallback)",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
