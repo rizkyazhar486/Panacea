@@ -59,6 +59,7 @@ export function Planning() {
   return (
     <div className="space-y-6">
       <CdssPanel plan={record.plan} patient={activePatient} />
+      <SurgeryCard />
 
       <Card>
         <SectionTitle
@@ -162,6 +163,78 @@ export function Planning() {
         </p>
       </Card>
     </div>
+  )
+}
+
+// ---- Surgery recommendation + multi-stage informed consent ----------------
+function SurgeryCard() {
+  const { state, activePatient, saveRecord } = useStore()
+  const record = state.records[activePatient.id]
+  if (!record) return null
+  const s = record.surgery
+
+  function recommend() {
+    const dx = record!.problems[0]?.title ?? 'tindakan'
+    saveRecord({
+      ...record!,
+      surgery: {
+        recommended: true,
+        procedure: 'Tindakan operatif sesuai indikasi',
+        indication: dx,
+        pre: 'Puasa 6–8 jam, evaluasi pra-bedah (lab, EKG, konsul anestesi), informed consent, optimasi komorbid, profilaksis antibiotik bila perlu.',
+        intra: 'Anestesi sesuai status ASA, monitoring tanda vital kontinu, teknik aseptik, time-out keselamatan (sign-in/time-out/sign-out WHO).',
+        post: 'Pemantauan di ruang pemulihan, kontrol nyeri, mobilisasi dini, perawatan luka, edukasi tanda komplikasi, jadwal kontrol.',
+        risks: 'Perdarahan, infeksi, reaksi anestesi, risiko spesifik prosedur — didiskusikan saat informed consent.',
+        consent: (['Chatbot-AI', 'Rekomendasi Operasi', 'Pemberian Obat', 'Tindakan/Operasi'] as const).map((stage) => ({ stage, agreed: false })),
+      },
+      updatedAt: new Date().toISOString(),
+    })
+  }
+
+  function patch(field: string, value: string) {
+    saveRecord({ ...record!, surgery: { ...record!.surgery!, [field]: value }, updatedAt: new Date().toISOString() })
+  }
+
+  if (!s?.recommended) {
+    return (
+      <Card>
+        <SectionTitle icon={<IconShield size={18} />} title="Rekomendasi Tindakan / Operasi" subtitle="Bila diperlukan, edukasi pra/intra/pasca-operasi & informed consent multi-tahap aktif" />
+        <Button onClick={recommend}>Rekomendasikan Operasi</Button>
+      </Card>
+    )
+  }
+
+  const agreed = s.consent.filter((c) => c.agreed).length
+  return (
+    <Card className="border-2 border-brand/20">
+      <SectionTitle
+        icon={<IconShield size={18} />}
+        title="Operasi Direkomendasikan"
+        subtitle="Edukasi & consent tampil di akun pasien"
+        right={<Badge tone={agreed === s.consent.length ? 'brand' : 'high'}>{agreed}/{s.consent.length} consent</Badge>}
+      />
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Prosedur</label>
+          <input className={inputClass} value={s.procedure} onChange={(e) => patch('procedure', e.target.value)} />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Indikasi</label>
+          <input className={inputClass} value={s.indication} onChange={(e) => patch('indication', e.target.value)} />
+        </div>
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        {(['pre', 'intra', 'post'] as const).map((k) => (
+          <div key={k}>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              {k === 'pre' ? 'Pra-Operasi' : k === 'intra' ? 'Intra-Operasi' : 'Pasca-Operasi'}
+            </label>
+            <textarea className={inputClass} rows={4} value={s[k]} onChange={(e) => patch(k, e.target.value)} />
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-neutral-400">Informed consent multi-tahap (Chatbot-AI → Rekomendasi → Obat → Tindakan) disetujui pasien di halaman Edukasi.</p>
+    </Card>
   )
 }
 

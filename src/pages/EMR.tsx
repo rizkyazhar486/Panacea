@@ -21,6 +21,17 @@ const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: stri
 
 const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
 
+function supportiveDefaults(weightKg: number) {
+  const w = weightKg || 60
+  const maint = w > 20 ? 1500 + 20 * (w - 20) : w > 10 ? 1000 + 50 * (w - 10) : 100 * w
+  return {
+    resusitasi: 'Nilai ABC; kristaloid (RL/NaCl 0.9%) sesuai status; target MAP ≥65 mmHg.',
+    balansCairan: `Rumatan ±${Math.round(maint)} mL/24 jam (${Math.round(maint / 24)} mL/jam, Holliday-Segar); sesuaikan defisit/loss.`,
+    kebutuhanKalori: `${Math.round(w * 25)}–${Math.round(w * 30)} kkal/hari (25–30 kkal/kg).`,
+    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/jam (0,5 mL/kg/jam).`,
+  }
+}
+
 function buildFindings(perSystem: string): SystemFinding[] {
   const lines = perSystem.split('\n').filter(Boolean)
   return BODY_SYSTEMS.map((sys) => {
@@ -189,6 +200,57 @@ export function EMR() {
             rows={6}
           />
         </div>
+      </Card>
+
+      {/* Penunjang & Suportif */}
+      <Card>
+        <SectionTitle
+          title="Penunjang & Terapi Suportif"
+          subtitle="Interpretasi Lab/EKG · resusitasi, balans cairan, kebutuhan kalori, urine output"
+        />
+        <div className="mb-4">
+          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Interpretasi Temuan Lab & Hasil EKG
+          </label>
+          <textarea
+            value={draft.labEkgInterpretation ?? ''}
+            onChange={(e) =>
+              patch((r) => ({ ...r, labEkgInterpretation: e.target.value, updatedAt: new Date().toISOString() }))
+            }
+            rows={4}
+            placeholder="mis. HbA1c 8.2% (DM tak terkontrol); EKG: LVH, sinus rhythm…"
+            className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {(
+            [
+              ['resusitasi', 'Resusitasi'],
+              ['balansCairan', 'Balans Cairan'],
+              ['kebutuhanKalori', 'Kebutuhan Kalori'],
+              ['urineOutput', 'Target Urine Output'],
+            ] as const
+          ).map(([k, label]) => (
+            <div key={k}>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{label}</label>
+              <input
+                value={(draft.supportive ?? supportiveDefaults(activePatient.weightKg))[k]}
+                onChange={(e) =>
+                  patch((r) => ({
+                    ...r,
+                    supportive: { ...(r.supportive ?? supportiveDefaults(activePatient.weightKg)), [k]: e.target.value },
+                    updatedAt: new Date().toISOString(),
+                  }))
+                }
+                className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              />
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[11px] text-neutral-400">
+          Default dihitung dari berat badan (kalori 25–30 kkal/kg; urine 0.5 mL/kg/jam; cairan rumatan
+          Holliday-Segar) — dokter dapat menyesuaikan.
+        </p>
       </Card>
 
       {/* A — Assessment */}

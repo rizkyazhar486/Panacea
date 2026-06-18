@@ -101,9 +101,97 @@ export interface EMRRecord {
   problems: ProblemEntry[]
   plan: PlanItem[]
   prognosis?: string
+  // Penunjang & supportive (Mode-1 clinical workup)
+  labEkgInterpretation?: string // interpretasi temuan Lab & hasil EKG
+  supportive?: SupportivePlan
+  surgery?: SurgeryPlan
   references: string[]
   signedBy?: string
   signedAt?: string
+}
+
+// Supportive therapy numbers: resuscitation, fluid balance, calories, urine output.
+export interface SupportivePlan {
+  resusitasi: string
+  balansCairan: string
+  kebutuhanKalori: string
+  urineOutput: string
+}
+
+// Surgery recommendation with multi-stage informed consent.
+export interface SurgeryPlan {
+  recommended: boolean
+  procedure: string
+  indication: string
+  pre: string
+  intra: string
+  post: string
+  risks: string
+  consent: ConsentStage[]
+}
+export interface ConsentStage {
+  stage: 'Chatbot-AI' | 'Rekomendasi Operasi' | 'Pemberian Obat' | 'Tindakan/Operasi'
+  agreed: boolean
+  at?: string
+}
+
+// -------- Accounts & roles -------------------------------------------------
+export type Role = 'pasien' | 'dokter' | 'kontributor' | 'verifikator' | 'admin' | 'owner'
+export interface Account {
+  email: string
+  name: string
+  role: Role
+  isSubscriber: boolean
+  patientId?: string // for pasien/dokter linkage
+  loggedAt: string
+}
+
+// -------- Social feed (TikTok-style health progress) -----------------------
+export interface SocialPost {
+  id: string
+  authorEmail: string
+  authorName: string
+  role: Role
+  kind: 'image' | 'video'
+  activity: string // lari, berenang, padel, makan sehat ...
+  caption: string
+  mediaColor: string
+  durationSec?: number // for video (<=15)
+  likes: number
+  likedByMe?: boolean
+  at: string
+}
+
+// -------- Nutrition / calorie diary ----------------------------------------
+export interface FoodEntry {
+  id: string
+  date: string // yyyy-mm-dd
+  name: string
+  grams: number
+  kcal: number
+  carbs: number
+  protein: number
+  fat: number
+}
+
+// -------- Doctor consultations --------------------------------------------
+export interface ConsultSession {
+  id: string
+  doctorName: string
+  specialty: string
+  patientEmail: string
+  at: string
+  feeIdr: number
+  status: 'terjadwal' | 'selesai'
+}
+
+// -------- Simulated email outbox ------------------------------------------
+export interface EmailMsg {
+  id: string
+  to: string
+  subject: string
+  body: string
+  at: string
 }
 
 // AI-generated patient-facing disease education (brief + deep).
@@ -171,7 +259,8 @@ export interface Contributor {
   canVerify: boolean // is a verifier (specialist/subspecialist)
 }
 
-export type TxType = 'deposit' | 'purchase' | 'payout' | 'subscription'
+export type TxType = 'deposit' | 'purchase' | 'payout' | 'subscription' | 'withdraw' | 'consult'
+export type PaymentMethod = 'Visa' | 'QRIS' | 'Virtual Account'
 export interface WalletTx {
   id: string
   type: TxType
@@ -205,6 +294,12 @@ export interface AppState {
   wallet: Wallet
   subscription: Subscription
   currentUserId: string // the logged-in contributor (demo "act as")
+  account: Account | null // logged-in account (role-based)
+  posts: SocialPost[]
+  follows: string[] // emails the current account follows
+  foods: FoodEntry[]
+  consults: ConsultSession[]
+  emails: EmailMsg[]
   settings: {
     apiKey: string
     model: string

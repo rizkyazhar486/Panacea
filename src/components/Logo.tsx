@@ -1,4 +1,5 @@
-// Panaceamed.id brand mark — red cross + green "tP" letterform with U descender.
+// Panaceamed.id brand mark — red cross + green "P" letterform whose stem
+// curves into a U descender (white negative space forms the bowl).
 
 export function LogoMark({ size = 40, className = '' }: { size?: number; className?: string }) {
   return (
@@ -13,16 +14,19 @@ export function LogoMark({ size = 40, className = '' }: { size?: number; classNa
     >
       <g
         stroke="#00BF63"
-        strokeWidth="74"
+        strokeWidth="80"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       >
-        <path d="M178 152 V340 Q178 404 242 404 Q306 404 306 340 V268" />
-        <path d="M178 152 H300 Q366 152 366 214 Q366 276 300 276 H244" />
+        {/* stem + U descender */}
+        <path d="M182 150 V322 Q182 398 250 398 Q318 398 318 322 V300" />
+        {/* P bowl */}
+        <path d="M182 150 H298 Q374 150 374 218 Q374 286 298 286 H214" />
       </g>
-      <rect x="74" y="34" width="64" height="150" rx="8" fill="#FF3131" />
-      <rect x="14" y="78" width="184" height="64" rx="8" fill="#FF3131" />
+      {/* red cross */}
+      <rect x="70" y="30" width="66" height="156" rx="10" fill="#FF3131" />
+      <rect x="8" y="76" width="190" height="66" rx="10" fill="#FF3131" />
     </svg>
   )
 }

@@ -14,6 +14,13 @@ import type {
   SubscriptionPlan,
   AIReview,
   VerifierReview,
+  Account,
+  Role,
+  SocialPost,
+  FoodEntry,
+  ConsultSession,
+  EmailMsg,
+  TxType,
 } from './types'
 
 const STORAGE_KEY = 'panaceamed.state.v2'
@@ -161,7 +168,41 @@ function seed(): AppState {
     wallet,
     subscription: { plan: 'none' } as Subscription,
     currentUserId: 'c0',
+    account: null,
+    posts: [
+      post('Ibu Siti Rahayu', 'pasien', 'video', 'Jalan pagi', 'Rutin jalan 30 menit tiap pagi 🌅', '#00BF63', 12),
+      post('Sdr. Andi Pratama', 'pasien', 'image', 'Makan sehat', 'Salmon + brokoli, tinggi protein 🥗', '#0B7A4B', 8),
+      post('dr. Bagus Santoso, Sp.A', 'dokter', 'image', 'Edukasi', 'Tips tidur cukup untuk imunitas anak 💤', '#3b82f6', 21),
+    ],
+    follows: [],
+    foods: [],
+    consults: [],
+    emails: [],
     settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: 'dr. Pemeriksa' },
+  }
+}
+
+function post(
+  authorName: string,
+  role: Role,
+  kind: SocialPost['kind'],
+  activity: string,
+  caption: string,
+  mediaColor: string,
+  likes: number,
+): SocialPost {
+  return {
+    id: uid(),
+    authorEmail: authorName.toLowerCase().replace(/[^a-z]/g, '') + '@panaceamed.id',
+    authorName,
+    role,
+    kind,
+    activity,
+    caption,
+    mediaColor,
+    durationSec: kind === 'video' ? 15 : undefined,
+    likes,
+    at: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
   }
 }
 
@@ -248,6 +289,7 @@ interface Store {
   state: AppState
   activePatient: Patient
   currentUser: Contributor
+  account: Account | null
   setActivePatient: (id: string) => void
   addPatient: (p: Patient) => void
   addVital: (patientId: string, vital: VitalSign) => void
@@ -265,6 +307,17 @@ interface Store {
   setMaterialAIReview: (id: string, review: AIReview) => void
   setMaterialVerifierReview: (id: string, review: VerifierReview) => void
   subscribe: (plan: SubscriptionPlan, seats?: number) => void
+  // auth
+  login: (account: Account) => void
+  logout: () => void
+  // social + nutrition + consult + email + withdraw
+  addPost: (p: SocialPost) => void
+  toggleLike: (id: string) => void
+  toggleFollow: (email: string) => void
+  addFood: (f: FoodEntry) => void
+  bookConsult: (c: ConsultSession) => void
+  sendEmail: (e: EmailMsg) => void
+  withdrawTokens: (amount: number, bank: string) => { ok: boolean; reason?: string }
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -285,6 +338,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       state,
       activePatient,
       currentUser,
+      account: state.account,
       setActivePatient: (id) => setState((st) => ({ ...st, activePatientId: id })),
       addPatient: (p) =>
         setState((st) => ({
@@ -388,6 +442,66 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : x,
           ),
         })),
+      login: (account) => setState((st) => ({ ...st, account })),
+      logout: () => setState((st) => ({ ...st, account: null })),
+      addPost: (p) => setState((st) => ({ ...st, posts: [p, ...st.posts] })),
+      toggleLike: (id) =>
+        setState((st) => ({
+          ...st,
+          posts: st.posts.map((p) =>
+            p.id === id
+              ? { ...p, likedByMe: !p.likedByMe, likes: p.likes + (p.likedByMe ? -1 : 1) }
+              : p,
+          ),
+        })),
+      toggleFollow: (email) =>
+        setState((st) => ({
+          ...st,
+          follows: st.follows.includes(email)
+            ? st.follows.filter((e) => e !== email)
+            : [...st.follows, email],
+        })),
+      addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
+      bookConsult: (c) =>
+        setState((st) => ({
+          ...st,
+          consults: [c, ...st.consults],
+          wallet: {
+            balance: st.wallet.balance,
+            transactions: [
+              {
+                id: uid(),
+                type: 'consult' as TxType,
+                amount: 0,
+                note: `Konsultasi ${c.doctorName} — Rp${c.feeIdr.toLocaleString('id-ID')} (dibayar)`,
+                at: c.at,
+              },
+              ...st.wallet.transactions,
+            ],
+          },
+        })),
+      sendEmail: (e) => setState((st) => ({ ...st, emails: [e, ...st.emails] })),
+      withdrawTokens: (amount, bank) => {
+        if (amount <= 0) return { ok: false, reason: 'Jumlah tidak valid.' }
+        if (state.wallet.balance < amount) return { ok: false, reason: 'Saldo tidak cukup.' }
+        setState((st) => ({
+          ...st,
+          wallet: {
+            balance: st.wallet.balance - amount,
+            transactions: [
+              {
+                id: uid(),
+                type: 'withdraw' as TxType,
+                amount: -amount,
+                note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')})`,
+                at: new Date().toISOString(),
+              },
+              ...st.wallet.transactions,
+            ],
+          },
+        }))
+        return { ok: true }
+      },
       subscribe: (plan, seats) =>
         setState((st) => {
           const price = plan === 'individu' ? 20 : plan === 'rumah-sakit' ? 200 : 0

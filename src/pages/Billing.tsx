@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield } from '../components/icons'
-import type { SubscriptionPlan, TxType } from '../lib/types'
+import type { SubscriptionPlan, TxType, PaymentMethod } from '../lib/types'
 
 const PACKS = [10, 25, 50, 100]
+const METHODS: PaymentMethod[] = ['QRIS', 'Visa', 'Virtual Account']
 
 const txMeta: Record<TxType, { label: string; tone: 'brand' | 'critical' | 'neutral' | 'high' }> = {
   deposit: { label: 'Deposit', tone: 'brand' },
   purchase: { label: 'Pembelian', tone: 'critical' },
   payout: { label: 'Royalti', tone: 'brand' },
   subscription: { label: 'Langganan', tone: 'high' },
+  withdraw: { label: 'Tarik Dana', tone: 'high' },
+  consult: { label: 'Konsultasi', tone: 'neutral' },
 }
 
 const PLANS: {
@@ -43,9 +46,13 @@ const PLANS: {
 ]
 
 export function Billing() {
-  const { state, depositTokens, subscribe } = useStore()
+  const { state, depositTokens, subscribe, withdrawTokens } = useStore()
   const { wallet, subscription } = state
   const [amount, setAmount] = useState(25)
+  const [method, setMethod] = useState<PaymentMethod>('QRIS')
+  const [withdraw, setWithdraw] = useState(10)
+  const [bank, setBank] = useState('BCA')
+  const [msg, setMsg] = useState('')
 
   return (
     <div className="space-y-6">
@@ -87,7 +94,32 @@ export function Billing() {
                 </button>
               ))}
             </div>
-            <div className="mt-3 flex flex-wrap items-end gap-3">
+            <div className="mt-3 mb-2 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-neutral-600">Metode pembayaran:</span>
+              {METHODS.map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMethod(m)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                    method === m ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
+                  }`}
+                >
+                  {m === 'QRIS' ? '▦' : m === 'Visa' ? '💳' : '#'} {m}
+                </button>
+              ))}
+            </div>
+            {method === 'QRIS' && (
+              <div className="mb-2 inline-flex items-center gap-3 rounded-xl border border-neutral-200 p-3">
+                <QrPlaceholder />
+                <div className="text-xs text-neutral-500">Pindai QRIS untuk membayar<br />Rp{((amount || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')}</div>
+              </div>
+            )}
+            {method === 'Virtual Account' && (
+              <div className="mb-2 rounded-xl border border-neutral-200 p-3 text-sm">
+                No. Virtual Account <b>{bank}</b>: <span className="font-mono font-bold">8810 7700 {String(1000 + ((amount || 0) % 9000)).slice(0, 4)}</span>
+              </div>
+            )}
+            <div className="flex flex-wrap items-end gap-3">
               <div className="w-40">
                 <Field label="Jumlah (PNC)">
                   <input
@@ -100,15 +132,49 @@ export function Billing() {
                 </Field>
               </div>
               <Button
-                onClick={() => depositTokens(Number(amount) || 0, `Top-up ${amount} PNC (simulasi pembayaran)`)}
+                onClick={() => {
+                  depositTokens(Number(amount) || 0, `Top-up ${amount} PNC via ${method}`)
+                  setMsg(`Pembayaran ${method} berhasil — ${amount} PNC ditambahkan.`)
+                  setTimeout(() => setMsg(''), 2500)
+                }}
                 disabled={!amount || amount <= 0}
               >
-                <IconToken size={16} /> Deposit Rp{((amount || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')}
+                <IconToken size={16} /> Bayar Rp{((amount || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')}
               </Button>
             </div>
+            {msg && <p className="mt-2 text-xs font-semibold text-brand-dark">{msg}</p>}
             <p className="mt-2 text-xs text-neutral-400">
-              Simulasi gateway pembayaran — saldo bertambah seketika untuk demo billing.
+              Harga token mengikuti perhitungan biaya API + margin operasional (simulasi gateway). 1 PNC = Rp{TOKEN_TO_IDR.toLocaleString('id-ID')}.
             </p>
+
+            {/* Withdraw to bank */}
+            <div className="mt-5 rounded-xl border border-neutral-200 p-4">
+              <div className="mb-2 text-sm font-bold">Tarik Sisa Deposit ke Bank</div>
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="w-32">
+                  <Field label="Jumlah (PNC)">
+                    <input className={inputClass} type="number" min={1} value={withdraw} onChange={(e) => setWithdraw(Number(e.target.value))} />
+                  </Field>
+                </div>
+                <div className="w-32">
+                  <Field label="Bank">
+                    <select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>
+                      {['BCA', 'Mandiri', 'BNI', 'BRI'].map((b) => <option key={b}>{b}</option>)}
+                    </select>
+                  </Field>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const r = withdrawTokens(Number(withdraw) || 0, bank)
+                    setMsg(r.ok ? `Penarikan Rp${((withdraw || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')} ke ${bank} diproses.` : r.reason ?? 'Gagal.')
+                    setTimeout(() => setMsg(''), 2800)
+                  }}
+                >
+                  Tarik ke {bank}
+                </Button>
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -216,6 +282,18 @@ export function Billing() {
           </table>
         </div>
       </Card>
+    </div>
+  )
+}
+
+function QrPlaceholder() {
+  // Decorative QR-like grid (payment simulation).
+  const cells = Array.from({ length: 49 }, (_, i) => (i * 7 + 3) % 5 < 2)
+  return (
+    <div className="grid h-20 w-20 grid-cols-7 gap-0.5 rounded-md bg-white p-1 ring-1 ring-neutral-200">
+      {cells.map((on, i) => (
+        <span key={i} className={on ? 'bg-ink' : 'bg-transparent'} />
+      ))}
     </div>
   )
 }

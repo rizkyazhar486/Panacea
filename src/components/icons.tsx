@@ -126,6 +126,67 @@ export const IconBook = ({ size = 18, className = '' }: P) => (
   </svg>
 )
 
+export const IconPhone = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z" />
+  </svg>
+)
+export const IconUser = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </svg>
+)
+export const IconUsers = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+    <path d="M16 5a3.5 3.5 0 0 1 0 7M22 20a6.5 6.5 0 0 0-5-6.3" />
+  </svg>
+)
+export const IconLogout = ({ size = 18, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <path d="M16 17l5-5-5-5M21 12H9" />
+  </svg>
+)
+export const IconHospital = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M4 21V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14" />
+    <path d="M2 21h20M12 7v6M9 10h6" />
+  </svg>
+)
+export const IconStethoscope = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M4 3v6a4 4 0 0 0 8 0V3" />
+    <path d="M8 13v2a5 5 0 0 0 10 0v-2" />
+    <circle cx="18" cy="9" r="2" />
+  </svg>
+)
+export const IconFood = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M4 3v7a2 2 0 0 0 4 0V3M6 10v11M16 3c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5ZM16 12v9" />
+  </svg>
+)
+export const IconVideo = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="2" y="6" width="14" height="12" rx="2" />
+    <path d="M22 8l-6 4 6 4V8Z" />
+  </svg>
+)
+export const IconChartUp = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M3 3v18h18" />
+    <path d="M7 14l4-4 3 3 5-6" />
+  </svg>
+)
+export const IconScissors = ({ size = 18, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="6" cy="18" r="3" />
+    <path d="M20 4 8.1 15.9M14.5 12.5 20 20M8.1 8.1 12 12" />
+  </svg>
+)
 export const IconArchitecture = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}>
     <rect x="9" y="3" width="6" height="5" rx="1" />
