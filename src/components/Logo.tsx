@@ -1,5 +1,6 @@
-// Panaceamed.id brand mark — red cross + "tP" letterform (P bowl + heart U tail).
-// `dark` renders the letterform white for use on green/dark backgrounds.
+// Panaceamed.id brand mark — red cross + green "tP" monogram (P bowl + U/heart
+// tail). Faithful vector reproduction of the brand artwork; `dark` renders the
+// monogram white for use on green/dark backgrounds.
 
 export function LogoMark({
   size = 40,
@@ -10,7 +11,7 @@ export function LogoMark({
   className?: string
   dark?: boolean
 }) {
-  const stroke = dark ? '#FFFFFF' : '#00BF63'
+  const green = dark ? '#FFFFFF' : '#00BF63'
   return (
     <svg
       width={size}
@@ -21,15 +22,16 @@ export function LogoMark({
       aria-label="Panaceamed.id"
       role="img"
     >
-      <g stroke={stroke} strokeWidth="80" strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* stem + rounded U tail (heart bottom) */}
-        <path d="M172 150 V330 Q172 402 242 402 Q312 402 312 330 V300" />
+      {/* Green "tP" monogram — thick rounded strokes */}
+      <g stroke={green} strokeWidth="82" strokeLinecap="round" strokeLinejoin="round" fill="none">
+        {/* stem + rounded U tail */}
+        <path d="M168 150 V322 Q168 398 244 398 Q318 398 318 322 V300" />
         {/* P bowl */}
-        <path d="M172 150 H300 Q374 150 374 216 Q374 282 300 282 H224" />
+        <path d="M168 150 H298 Q392 150 392 226 Q392 300 298 300 H224" />
       </g>
-      {/* red cross (bold plus, top-left) */}
-      <rect x="62" y="24" width="78" height="168" rx="12" fill="#FF3131" />
-      <rect x="4" y="72" width="198" height="70" rx="12" fill="#FF3131" />
+      {/* Red cross (bold plus, top-left) */}
+      <rect x="62" y="28" width="72" height="158" rx="6" fill="#FF3131" />
+      <rect x="6" y="74" width="192" height="66" rx="6" fill="#FF3131" />
     </svg>
   )
 }
