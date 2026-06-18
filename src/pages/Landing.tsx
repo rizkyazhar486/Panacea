@@ -84,7 +84,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             Kecerdasan buatan melakukan anamnesis & analisis penunjang melalui chatbot, lalu hasilnya
             mengalir ke rekam medis yang <b>diverifikasi dan ditandatangani dokter manusia</b>. Identitas
             pasien terintegrasi kontinu — selalu menyertakan tanda vital & penunjang sebagai dukungan
-            <b> longevity</b>, khususnya bagi pasien penyakit kronis, lansia, dan immunocompromised.
+            <b> longevity</b>. Visi kami: <b>AI-Klinik Praktis untuk Akses Kesehatan — untuk masa depan kesehatan Anda.</b>
           </p>
         </div>
 
