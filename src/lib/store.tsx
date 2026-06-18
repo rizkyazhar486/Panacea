@@ -21,6 +21,7 @@ import type {
   FoodEntry,
   ConsultSession,
   EmailMsg,
+  Order,
   TxType,
 } from './types'
 
@@ -87,6 +88,7 @@ function seed(): AppState {
     follows: [],
     foods: [],
     consults: [],
+    orders: [],
     emails: [],
     settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: '' },
   }
@@ -138,6 +140,7 @@ interface Store {
   toggleFollow: (email: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
+  addOrder: (o: Order) => void
   bookConsult: (c: ConsultSession) => void
   sendEmail: (e: EmailMsg) => void
   withdrawTokens: (amount: number, bank: string) => { ok: boolean; reason?: string }
@@ -152,7 +155,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // public landing and the role can be chosen freely (fixes role being "stuck").
   useEffect(() => {
     const { account: _account, ...persist } = state
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persist))
+    } catch {
+      // Storage quota exceeded (e.g. many uploaded photos) — drop heavy media
+      // from the persisted copy so the app keeps working.
+      try {
+        const slim = { ...persist, posts: persist.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(slim))
+      } catch {
+        /* give up persisting this update */
+      }
+    }
   }, [state])
 
   // When a backend is configured, hydrate clinical data from the server on login.
@@ -368,6 +382,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => ({
           ...st,
           longevitySubExpires: expires,
+          orders: [
+            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 125000, status: 'Selesai' as const, at: now.toISOString() },
+            ...st.orders,
+          ],
           wallet: {
             balance: st.wallet.balance,
             transactions: [
@@ -392,6 +410,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             : [...st.follows, email],
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
+      addOrder: (o) => setState((st) => ({ ...st, orders: [o, ...st.orders] })),
       bookConsult: (c) =>
         setState((st) => ({
           ...st,

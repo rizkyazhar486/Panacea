@@ -205,13 +205,17 @@ function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: stri
 
       <div className="text-xs font-bold uppercase tracking-wide text-neutral-400">{query ? 'Hasil' : 'For You'}</div>
       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-        {shown.map((p) => (
-          <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-            <span className="absolute left-1.5 top-1.5 text-white/90">{p.kind === 'video' ? <IconVideo size={16} /> : p.postType === 'kebiasaan' ? <IconLeaf size={16} /> : <IconRun size={16} />}</span>
-            <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white">{p.activity}</span>
-            <span className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 text-[10px] font-bold text-white"><IconHeart size={11} />{p.likes}</span>
-          </button>
-        ))}
+        {shown.map((p) => {
+          const cover = p.photos?.find(isImg)
+          return (
+            <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
+              {cover && <img src={cover} className="absolute inset-0 h-full w-full object-cover" alt="" />}
+              <span className="absolute left-1.5 top-1.5 text-white/90 drop-shadow">{p.videoUrl || p.kind === 'video' ? <IconVideo size={16} /> : p.postType === 'kebiasaan' ? <IconLeaf size={16} /> : <IconRun size={16} />}</span>
+              <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span>
+              <span className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 text-[10px] font-bold text-white drop-shadow"><IconHeart size={11} />{p.likes}</span>
+            </button>
+          )
+        })}
       </div>
       {shown.length === 0 && <Card className="text-center text-sm text-neutral-400">Belum ada unggahan untuk ditampilkan.</Card>}
     </div>
@@ -318,12 +322,16 @@ function PostGrid({ posts, onOpen, empty }: { posts: SocialPost[]; onOpen: (id: 
   if (posts.length === 0) return <Card className="text-center text-sm text-neutral-400">{empty}</Card>
   return (
     <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-      {posts.map((p) => (
-        <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-          <span className="absolute left-1.5 top-1.5 text-white/90">{p.locked ? <IconLock size={14} /> : p.kind === 'video' ? <IconVideo size={14} /> : <IconRun size={14} />}</span>
-          <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white">{p.activity}</span>
-        </button>
-      ))}
+      {posts.map((p) => {
+        const cover = p.photos?.find(isImg)
+        return (
+          <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
+            {cover && <img src={cover} className="absolute inset-0 h-full w-full object-cover" alt="" />}
+            <span className="absolute left-1.5 top-1.5 text-white/90 drop-shadow">{p.locked ? <IconLock size={14} /> : p.videoUrl || p.kind === 'video' ? <IconVideo size={14} /> : <IconRun size={14} />}</span>
+            <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -392,7 +400,23 @@ function PostCard({ post: p, me, store, onProfile }: {
   )
 }
 
+function isImg(s: string): boolean {
+  return s.startsWith('data:') || s.startsWith('blob:') || s.startsWith('http')
+}
+
 function MediaBlock({ post: p }: { post: SocialPost }) {
+  if (p.videoUrl) {
+    return <video src={p.videoUrl} className="max-h-[70vh] w-full bg-black" controls muted loop playsInline />
+  }
+  const realPhotos = p.photos?.filter(isImg) ?? []
+  if (realPhotos.length > 0) {
+    if (realPhotos.length === 1) return <img src={realPhotos[0]} className="max-h-[70vh] w-full object-cover" alt={p.activity} />
+    return (
+      <div className={`grid gap-1 ${realPhotos.length === 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
+        {realPhotos.slice(0, 4).map((src, i) => <img key={i} src={src} className="aspect-square w-full object-cover" alt="" />)}
+      </div>
+    )
+  }
   const photos = p.photos && p.photos.length > 1 ? p.photos : null
   if (photos) {
     return (
@@ -465,8 +489,9 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
   onClose: () => void; onPost: (p: SocialPost) => void; authorEmail: string; authorName: string; role: Role
 }) {
   const [postType, setPostType] = useState<PostType>('aktivitas')
-  const [media, setMedia] = useState<'video' | 'foto'>('video')
-  const [photoCount, setPhotoCount] = useState(2)
+  const [media, setMedia] = useState<'video' | 'foto'>('foto')
+  const [photoData, setPhotoData] = useState<string[]>([])
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [activity, setActivity] = useState(ACTIVITIES[0])
   const [caption, setCaption] = useState('')
   const [color, setColor] = useState(COLORS[0])
@@ -478,15 +503,26 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
   const [articleTitle, setArticleTitle] = useState('')
   const num = (s: string) => (s.trim() === '' ? undefined : Number(s))
 
+  function onPickPhotos(files: FileList | null) {
+    if (!files) return
+    const imgs = Array.from(files).slice(0, 4)
+    Promise.all(imgs.map((f) => new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.readAsDataURL(f) }))).then(setPhotoData)
+  }
+  function onPickVideo(files: FileList | null) {
+    const f = files?.[0]
+    if (f) setVideoUrl(URL.createObjectURL(f))
+  }
+
   function submit() {
-    const isVideo = media === 'video' && postType !== 'artikel'
+    const isVideo = media === 'video' && postType !== 'artikel' && !!videoUrl
     const base: SocialPost = {
       id: uid(), authorEmail, authorName, role, postType,
       kind: isVideo ? 'video' : 'image',
       activity: postType === 'kebiasaan' ? 'Kebiasaan sehat' : postType === 'artikel' ? 'Longevity' : activity,
       caption: caption.trim(), mediaColor: color,
       videoSec: isVideo ? 30 : undefined,
-      photos: !isVideo && postType !== 'artikel' && photoCount > 1 ? Array.from({ length: photoCount }, (_, i) => COLORS[(COLORS.indexOf(color) + i) % COLORS.length]) : undefined,
+      videoUrl: isVideo ? videoUrl! : undefined,
+      photos: !isVideo && postType !== 'artikel' && photoData.length > 0 ? photoData : undefined,
       locked, likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
     }
     if (postType === 'aktivitas') { base.distanceKm = num(distanceKm); base.durationMin = num(durationMin) }
@@ -509,14 +545,34 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
 
         {postType !== 'artikel' && (
           <div className="mt-3 flex gap-2">
-            {([['video', 'Video 30 dtk', <IconVideo size={15} key="v" />], ['foto', 'Foto', <IconLeaf size={15} key="f" />]] as const).map(([m, label, icon]) => (
+            {([['foto', 'Foto', <IconLeaf size={15} key="f" />], ['video', 'Video 30 dtk', <IconVideo size={15} key="v" />]] as const).map(([m, label, icon]) => (
               <button key={m} onClick={() => setMedia(m)} className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold ${media === m ? 'bg-ink text-white' : 'bg-neutral-100 text-neutral-500'}`}>{icon} {label}</button>
             ))}
           </div>
         )}
 
         {postType !== 'artikel' && media === 'foto' && (
-          <div className="mt-3"><Field label={`Jumlah foto: ${photoCount}`}><input type="range" min={1} max={4} value={photoCount} onChange={(e) => setPhotoCount(Number(e.target.value))} className="w-full accent-[#00BF63]" /></Field></div>
+          <div className="mt-3">
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-5 text-neutral-500 hover:border-brand">
+              <IconPlus size={22} /><span className="text-xs font-semibold">Unggah foto (maks 4)</span>
+              <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onPickPhotos(e.target.files)} />
+            </label>
+            {photoData.length > 0 && (
+              <div className="mt-2 grid grid-cols-4 gap-1.5">
+                {photoData.map((src, i) => <img key={i} src={src} className="aspect-square w-full rounded-lg object-cover" alt="" />)}
+              </div>
+            )}
+          </div>
+        )}
+
+        {postType !== 'artikel' && media === 'video' && (
+          <div className="mt-3">
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-5 text-neutral-500 hover:border-brand">
+              <IconVideo size={22} /><span className="text-xs font-semibold">Unggah video singkat (maks 30 detik)</span>
+              <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onPickVideo(e.target.files)} />
+            </label>
+            {videoUrl && <video src={videoUrl} className="mt-2 max-h-48 w-full rounded-lg" controls muted playsInline />}
+          </div>
         )}
 
         <div className="mt-3 space-y-3">

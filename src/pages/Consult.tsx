@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
-import { IconStethoscope, IconCheck, IconChat, IconHospital, IconShield } from '../components/icons'
+import { IconStethoscope, IconCheck, IconChat, IconHospital, IconShield, IconSearch } from '../components/icons'
 import { ConsultChat } from '../components/ConsultChat'
 import { backendEnabled } from '../lib/api'
 import type { PaymentMethod } from '../lib/types'
@@ -33,12 +33,13 @@ function triage(complaint: string): { tag: string; reason: string; surgery: bool
 }
 
 export function Consult() {
-  const { account, bookConsult, sendEmail } = useStore()
+  const { account, bookConsult, sendEmail, addOrder } = useStore()
   const [pay, setPay] = useState<PaymentMethod>('QRIS')
   const [complaint, setComplaint] = useState('')
   const [result, setResult] = useState<ReturnType<typeof triage> | null>(null)
   const [done, setDone] = useState<string>('')
   const [chatRoom, setChatRoom] = useState<string>('')
+  const [docQuery, setDocQuery] = useState('')
 
   const recommended = useMemo(() => {
     if (!result) return DOCTORS
@@ -51,6 +52,7 @@ export function Consult() {
     const at = new Date().toISOString()
     // The mandatory AI consultation fee (revenue + unlocks human consult).
     bookConsult({ id: uid(), doctorName: 'AI Chatbot (Triase)', specialty: 'AI Triage', patientEmail: account?.email ?? '', at, feeIdr: AI_FEE, status: 'selesai' })
+    addOrder({ id: uid(), category: 'Konsultasi', title: 'Konsultasi AI (Triase)', detail: r.reason, amountIdr: AI_FEE, status: 'Selesai', at })
     sendEmail({
       id: uid(),
       to: account?.email ?? '',
@@ -64,6 +66,7 @@ export function Consult() {
   function book(name: string, specialty: string) {
     const at = new Date().toISOString()
     bookConsult({ id: uid(), doctorName: name, specialty, patientEmail: account?.email ?? '', at, feeIdr: FEE, status: 'terjadwal' })
+    addOrder({ id: uid(), category: 'Konsultasi', title: `Konsultasi ${name}`, detail: specialty, amountIdr: FEE, status: 'Selesai', at })
     sendEmail({
       id: uid(),
       to: account?.email ?? '',
@@ -154,8 +157,14 @@ export function Consult() {
 
       {/* Step 2 — doctor list (only after AI triage) */}
       {result && (
+        <div className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm ring-1 ring-black/5">
+          <IconSearch size={18} className="text-neutral-400" />
+          <input value={docQuery} onChange={(e) => setDocQuery(e.target.value)} placeholder="Cari dokter atau spesialisasi…" className="w-full bg-transparent text-sm outline-none" />
+        </div>
+      )}
+      {result && (
         <div className="grid gap-4 md:grid-cols-2">
-          {recommended.map((d) => {
+          {recommended.filter((d) => { const x = docQuery.trim().toLowerCase(); return !x || d.name.toLowerCase().includes(x) || d.specialty.toLowerCase().includes(x) }).map((d) => {
             const isRec = d.tag === result.tag
             return (
               <Card key={d.name} className={`flex flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>

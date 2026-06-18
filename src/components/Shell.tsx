@@ -49,6 +49,7 @@ const nav: Nav[] = [
   { to: '/nutrition', label: 'Nutrisi & Kalori', icon: IconFood, roles: ['pasien'] },
   { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'] },
   { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'] },
+  { to: '/orders', label: 'Riwayat Transaksi', icon: IconWallet, roles: ['pasien'] },
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'] },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'] },
   { to: '/my-materials', label: 'Materi Saya', icon: IconBook, roles: ['kontributor'] },

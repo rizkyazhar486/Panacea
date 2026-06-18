@@ -20,6 +20,7 @@ import { Nutrition } from './pages/Nutrition'
 import { Consult } from './pages/Consult'
 import { Hospitals } from './pages/Hospitals'
 import { Pharmacy } from './pages/Pharmacy'
+import { Orders } from './pages/Orders'
 import { Editor } from './pages/Editor'
 import { PatientEducation } from './pages/PatientEducation'
 import { Admin } from './pages/Admin'
@@ -46,6 +47,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/consult" element={<Consult />} />
             <Route path="/hospitals" element={<Hospitals />} />
             <Route path="/pharmacy" element={<Pharmacy />} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/education" element={<PatientEducation />} />
             <Route path="/admin" element={<Admin />} />

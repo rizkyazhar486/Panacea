@@ -157,7 +157,8 @@ function computeLongevity(i: {
 const PRICE_LONGEVITY = 125000
 
 function LongevityCalculator() {
-  const { state, buyLongevitySub } = useStore()
+  const { state, account, buyLongevitySub, addPost } = useStore()
+  const [shared, setShared] = useState(false)
   const [mainMeals, setMainMeals] = useState(3)
   const [snacks, setSnacks] = useState(2)
   const [exerciseFreq, setExerciseFreq] = useState(1)
@@ -175,6 +176,29 @@ function LongevityCalculator() {
 
   function compute() {
     setResult(computeLongevity({ mainMeals, snacks, exerciseFreq, exerciseMin, hydrationL, sleepHr, sunDone, sunHr }))
+  }
+
+  function shareToFeed() {
+    if (!result) return
+    addPost({
+      id: uid(),
+      authorEmail: account?.email ?? 'me@panaceamed.id',
+      authorName: account?.name ?? 'Saya',
+      role: account?.role ?? 'pasien',
+      postType: 'kebiasaan',
+      kind: 'image',
+      activity: 'Longevity harian',
+      caption: `Nilai Longevity AI saya hari ini: ${result.score}/100 🌱 Terus konsisten! #PerjalananSehat`,
+      mediaColor: '#00BF63',
+      waterMl: Math.round(hydrationL * 1000),
+      veggieServ: mainMeals,
+      sleepHr,
+      sugaryDrinks: 0,
+      likes: 0, comments: 0, reposts: 0,
+      at: new Date().toISOString(),
+    })
+    setShared(true)
+    setTimeout(() => setShared(false), 3000)
   }
 
   return (
@@ -246,6 +270,9 @@ function LongevityCalculator() {
                 <PillarBar label="Sinar matahari" v={result.sun} />
               </div>
               <p className="mt-3 text-[11px] text-white/70">Dihitung oleh AI Panaceamed dari data gaya hidup Anda hari ini.</p>
+              <button onClick={shareToFeed} className="mt-3 w-full rounded-xl bg-white py-2 text-sm font-bold text-brand-dark hover:bg-white/90">
+                {shared ? '✓ Dibagikan ke Feed!' : '📣 Bagikan ke Feed'}
+              </button>
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center rounded-2xl bg-neutral-50 p-6 text-center">

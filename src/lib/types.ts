@@ -185,7 +185,8 @@ export interface SocialPost {
   articleTitle?: string
   articleSource?: string
   // TikTok-style media & social state
-  photos?: string[] // multiple photo placeholders (gradient colors)
+  photos?: string[] // real uploaded images (data URLs) or gradient color placeholders
+  videoUrl?: string // uploaded short video (object URL)
   videoSec?: number // short video length (<=30s)
   locked?: boolean // private/locked post (only owner sees in "Terkunci")
   likes: number
@@ -218,6 +219,18 @@ export interface ConsultSession {
   at: string
   feeIdr: number
   status: 'terjadwal' | 'selesai'
+}
+
+// -------- Unified transactions / order history ----------------------------
+export type OrderCategory = 'Obat' | 'Konsultasi' | 'Langganan' | 'Lab' | 'Lainnya'
+export interface Order {
+  id: string
+  category: OrderCategory
+  title: string
+  detail?: string
+  amountIdr: number
+  status: 'Diproses' | 'Diterima' | 'Selesai'
+  at: string
 }
 
 // -------- Simulated email outbox ------------------------------------------
@@ -336,6 +349,7 @@ export interface AppState {
   follows: string[] // emails the current account follows
   foods: FoodEntry[]
   consults: ConsultSession[]
+  orders: Order[]
   emails: EmailMsg[]
   settings: {
     apiKey: string
