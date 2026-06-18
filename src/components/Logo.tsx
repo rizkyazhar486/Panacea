@@ -1,6 +1,7 @@
-// Panaceamed.id brand mark — red cross + green "tP" monogram (P bowl + U/heart
-// tail). Faithful vector reproduction of the brand artwork; `dark` renders the
-// monogram white for use on green/dark backgrounds.
+// Panaceamed.id brand mark — uses the official logo artwork (public/logo-mark.png).
+// On dark/green backgrounds we place the mark on a white rounded chip so the red
+// cross and green monogram stay legible.
+const logoUrl = import.meta.env.BASE_URL + 'logo-mark.png'
 
 export function LogoMark({
   size = 40,
@@ -11,29 +12,17 @@ export function LogoMark({
   className?: string
   dark?: boolean
 }) {
-  const green = dark ? '#FFFFFF' : '#00BF63'
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 440 440"
-      fill="none"
-      className={className}
-      aria-label="Panaceamed.id"
-      role="img"
-    >
-      {/* Green "tP" monogram — thick rounded strokes */}
-      <g stroke={green} strokeWidth="82" strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {/* stem + rounded U tail */}
-        <path d="M168 150 V322 Q168 398 244 398 Q318 398 318 322 V300" />
-        {/* P bowl */}
-        <path d="M168 150 H298 Q392 150 392 226 Q392 300 298 300 H224" />
-      </g>
-      {/* Red cross (bold plus, top-left) */}
-      <rect x="62" y="28" width="72" height="158" rx="6" fill="#FF3131" />
-      <rect x="6" y="74" width="192" height="66" rx="6" fill="#FF3131" />
-    </svg>
-  )
+  if (dark) {
+    return (
+      <span
+        className={`inline-grid place-items-center rounded-xl bg-white ${className}`}
+        style={{ width: size, height: size }}
+      >
+        <img src={logoUrl} alt="Panaceamed.id" style={{ width: size * 0.82, height: size * 0.82 }} />
+      </span>
+    )
+  }
+  return <img src={logoUrl} alt="Panaceamed.id" width={size} height={size} className={className} style={{ objectFit: 'contain' }} />
 }
 
 export function Wordmark({
