@@ -3,7 +3,23 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { config, features } from './config.js'
-import { balance, txsFor, credit, listPosts, addPost, likePost, uid, type User, type Post } from './store.js'
+import {
+  balance,
+  txsFor,
+  credit,
+  listPosts,
+  addPost,
+  likePost,
+  uid,
+  getClinical,
+  saveRecord,
+  saveEducation,
+  addVital,
+  addSupportive,
+  addPatient,
+  type User,
+  type Post,
+} from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
@@ -91,6 +107,39 @@ app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
   res.json({ post: p })
+})
+
+// --- clinical (patients + EMR + vitals/supportive + education) ---
+app.get('/api/clinical', requireAuth, (_req, res) => res.json(getClinical()))
+app.post('/api/clinical/record', requireAuth, (req, res) => {
+  const { patientId, record } = req.body as { patientId?: string; record?: unknown }
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  saveRecord(patientId, record)
+  res.json({ ok: true })
+})
+app.post('/api/clinical/education', requireAuth, (req, res) => {
+  const { patientId, sheet } = req.body as { patientId?: string; sheet?: unknown }
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  saveEducation(patientId, sheet)
+  res.json({ ok: true })
+})
+app.post('/api/clinical/vital', requireAuth, (req, res) => {
+  const { patientId, vital } = req.body as { patientId?: string; vital?: unknown }
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  addVital(patientId, vital)
+  res.json({ ok: true })
+})
+app.post('/api/clinical/supportive', requireAuth, (req, res) => {
+  const { patientId, result } = req.body as { patientId?: string; result?: unknown }
+  if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  addSupportive(patientId, result)
+  res.json({ ok: true })
+})
+app.post('/api/clinical/patient', requireAuth, (req, res) => {
+  const { patient } = req.body as { patient?: unknown }
+  if (!patient) return res.status(400).json({ error: 'missing_patient' })
+  addPatient(patient)
+  res.json({ ok: true })
 })
 
 const server = createServer(app)

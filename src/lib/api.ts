@@ -2,7 +2,7 @@
 // payments). When VITE_API_URL is unset (e.g. the GitHub Pages demo), the app
 // falls back to its in-browser simulation and none of this is used.
 
-import type { Role, Account } from './types'
+import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet } from './types'
 
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
 export const backendEnabled = Boolean(API)
@@ -81,6 +81,26 @@ export const api = {
   createPost: (p: Partial<BackendPost>) =>
     req<{ post: BackendPost }>('/api/posts', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.post),
   likePost: (id: string) => req<{ post: BackendPost }>(`/api/posts/${id}/like`, { method: 'POST' }).then((r) => r.post),
+  // clinical persistence
+  clinical: () => req<ClinicalData>('/api/clinical'),
+  saveRecordRemote: (patientId: string, record: EMRRecord) =>
+    req<{ ok: boolean }>('/api/clinical/record', { method: 'POST', body: JSON.stringify({ patientId, record }) }),
+  saveEducationRemote: (patientId: string, sheet: EducationSheet) =>
+    req<{ ok: boolean }>('/api/clinical/education', { method: 'POST', body: JSON.stringify({ patientId, sheet }) }),
+  addVitalRemote: (patientId: string, vital: VitalSign) =>
+    req<{ ok: boolean }>('/api/clinical/vital', { method: 'POST', body: JSON.stringify({ patientId, vital }) }),
+  addSupportiveRemote: (patientId: string, result: SupportiveResult) =>
+    req<{ ok: boolean }>('/api/clinical/supportive', { method: 'POST', body: JSON.stringify({ patientId, result }) }),
+  addPatientRemote: (patient: Patient) =>
+    req<{ ok: boolean }>('/api/clinical/patient', { method: 'POST', body: JSON.stringify({ patient }) }),
+}
+
+export interface ClinicalData {
+  patients: Patient[]
+  vitals: Record<string, VitalSign[]>
+  supportive: Record<string, SupportiveResult[]>
+  records: Record<string, EMRRecord>
+  education: Record<string, EducationSheet>
 }
 
 export interface BackendPost {

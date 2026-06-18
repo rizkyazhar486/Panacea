@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { api, backendEnabled } from './api'
 import type {
   AppState,
   Patient,
@@ -329,6 +330,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state])
 
+  // When a backend is configured, hydrate clinical data from the server on login.
+  const hydratedFor = useRef<string>('')
+  useEffect(() => {
+    const email = state.account?.email
+    if (!backendEnabled || !email || hydratedFor.current === email) return
+    hydratedFor.current = email
+    api
+      .clinical()
+      .then((data) =>
+        setState((st) => ({
+          ...st,
+          patients: data.patients?.length ? data.patients : st.patients,
+          vitals: { ...st.vitals, ...(data.vitals ?? {}) },
+          supportive: { ...st.supportive, ...(data.supportive ?? {}) },
+          records: { ...st.records, ...(data.records ?? {}) },
+          education: { ...st.education, ...(data.education ?? {}) },
+        })),
+      )
+      .catch(() => {
+        hydratedFor.current = '' // allow retry on next change
+      })
+  }, [state.account?.email])
+
   const store = useMemo<Store>(() => {
     const activePatient =
       state.patients.find((p) => p.id === state.activePatientId) ?? state.patients[0]
@@ -340,7 +364,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       currentUser,
       account: state.account,
       setActivePatient: (id) => setState((st) => ({ ...st, activePatientId: id })),
-      addPatient: (p) =>
+      addPatient: (p) => {
+        if (backendEnabled) api.addPatientRemote(p).catch(() => {})
         setState((st) => ({
           ...st,
           patients: [...st.patients, p],
@@ -348,26 +373,35 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           supportive: { ...st.supportive, [p.id]: [] },
           chats: { ...st.chats, [p.id]: [] },
           activePatientId: p.id,
-        })),
-      addVital: (patientId, vital) =>
+        }))
+      },
+      addVital: (patientId, vital) => {
+        if (backendEnabled) api.addVitalRemote(patientId, vital).catch(() => {})
         setState((st) => ({
           ...st,
           vitals: { ...st.vitals, [patientId]: [...(st.vitals[patientId] ?? []), vital] },
-        })),
-      addSupportive: (patientId, r) =>
+        }))
+      },
+      addSupportive: (patientId, r) => {
+        if (backendEnabled) api.addSupportiveRemote(patientId, r).catch(() => {})
         setState((st) => ({
           ...st,
           supportive: {
             ...st.supportive,
             [patientId]: [...(st.supportive[patientId] ?? []), r],
           },
-        })),
+        }))
+      },
       setChat: (patientId, messages) =>
         setState((st) => ({ ...st, chats: { ...st.chats, [patientId]: messages } })),
-      saveRecord: (record) =>
-        setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } })),
-      saveEducation: (patientId, sheet) =>
-        setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } })),
+      saveRecord: (record) => {
+        if (backendEnabled) api.saveRecordRemote(record.patientId, record).catch(() => {})
+        setState((st) => ({ ...st, records: { ...st.records, [record.patientId]: record } }))
+      },
+      saveEducation: (patientId, sheet) => {
+        if (backendEnabled) api.saveEducationRemote(patientId, sheet).catch(() => {})
+        setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } }))
+      },
       updateSettings: (partial) =>
         setState((st) => ({ ...st, settings: { ...st.settings, ...partial } })),
       resetDemo: () => {

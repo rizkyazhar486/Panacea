@@ -53,15 +53,41 @@ export interface Post {
   at: string
 }
 
+// Clinical data is stored as opaque JSON (shape owned by the frontend types).
+export interface Clinical {
+  patients: any[]
+  vitals: Record<string, any[]>
+  supportive: Record<string, any[]>
+  records: Record<string, any>
+  education: Record<string, any>
+}
+
+function seedPatients(): any[] {
+  return [
+    { id: 'p1', name: 'Bpk. Hartono Wijaya', sex: 'L', dob: '1952-04-12', mrn: 'PMD-000124', heightCm: 168, weightKg: 78, bloodType: 'O+', allergies: ['Penisilin'], chronicConditions: ['Hipertensi', 'Diabetes Melitus tipe 2'], riskFlags: ['chronic', 'elderly'], avatarColor: '#00BF63' },
+    { id: 'p2', name: 'Ibu Siti Rahayu', sex: 'P', dob: '1968-09-30', mrn: 'PMD-000219', heightCm: 156, weightKg: 49, bloodType: 'B+', allergies: [], chronicConditions: ['PPOK', 'Riwayat TB paru'], riskFlags: ['chronic', 'immunocompromised'], avatarColor: '#FF3131' },
+    { id: 'p3', name: 'Sdr. Andi Pratama', sex: 'L', dob: '1995-02-18', mrn: 'PMD-000388', heightCm: 174, weightKg: 92, bloodType: 'A+', allergies: [], chronicConditions: ['Obesitas', 'Dislipidemia'], riskFlags: ['chronic'], avatarColor: '#0B7A4B' },
+    { id: 'p4', name: 'An. Bilal Ramadhan', sex: 'L', dob: '2018-05-20', mrn: 'PMD-000451', heightCm: 96, weightKg: 12.4, bloodType: 'O+', allergies: ['Susu sapi'], chronicConditions: ['Gizi kurang', 'Asma'], riskFlags: ['chronic'], avatarColor: '#FF8A3D' },
+  ]
+}
+
 interface DB {
   users: User[]
   wallets: Record<string, number> // userId -> PNC balance
   txs: Tx[]
   orders: Order[]
   posts: Post[]
+  clinical: Clinical
 }
 
-let db: DB = { users: [], wallets: {}, txs: [], orders: [], posts: [] }
+let db: DB = {
+  users: [],
+  wallets: {},
+  txs: [],
+  orders: [],
+  posts: [],
+  clinical: { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} },
+}
 
 function load() {
   if (existsSync(DB_PATH)) {
@@ -135,6 +161,36 @@ export function likePost(id: string): Post | undefined {
     save()
   }
   return p
+}
+
+function ensureClinical() {
+  if (!db.clinical) db.clinical = { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} }
+  return db.clinical
+}
+export function getClinical(): Clinical {
+  return ensureClinical()
+}
+export function saveRecord(patientId: string, record: any) {
+  ensureClinical().records[patientId] = record
+  save()
+}
+export function saveEducation(patientId: string, sheet: any) {
+  ensureClinical().education[patientId] = sheet
+  save()
+}
+export function addVital(patientId: string, vital: any) {
+  const c = ensureClinical()
+  c.vitals[patientId] = [...(c.vitals[patientId] ?? []), vital]
+  save()
+}
+export function addSupportive(patientId: string, r: any) {
+  const c = ensureClinical()
+  c.supportive[patientId] = [...(c.supportive[patientId] ?? []), r]
+  save()
+}
+export function addPatient(p: any) {
+  ensureClinical().patients.push(p)
+  save()
 }
 
 export function createOrder(o: Order) {
