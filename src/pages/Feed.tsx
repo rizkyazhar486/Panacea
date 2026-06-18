@@ -21,10 +21,11 @@ import {
   IconLock,
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
-import type { SocialPost, PostType, Role } from '../lib/types'
+import type { SocialPost, PostType, Role, ProfileEdit } from '../lib/types'
 
 const ACTIVITIES = ['Lari', 'Jalan kaki', 'Berenang', 'Bersepeda', 'Padel', 'Futsal', 'Yoga', 'Gym', 'Menyapu']
 const COLORS = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#f59e0b', '#FF3131']
+const SONGS = ['Tanpa musik', 'Life is Art', 'Moments In Time', 'Morning Light', 'Calm Vibes', 'Sehat Selalu (Lo-fi)']
 
 const roleLabel: Record<Role, string> = {
   pasien: 'Pelanggan', dokter: 'Dokter', kontributor: 'Kontributor', verifikator: 'Verifikator', admin: 'Admin', owner: 'Owner',
@@ -137,6 +138,7 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
   const { state } = store
   const [filter, setFilter] = useState<'foryou' | 'following'>('foryou')
   const posts = state.posts.filter((p) => {
+    if (p.archived) return false
     if (p.locked && p.authorEmail !== me) return false
     if (filter === 'following') return state.follows.includes(p.authorEmail) || p.authorEmail === me
     return true
@@ -184,7 +186,7 @@ function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: stri
   const query = q.trim().toLowerCase()
   const matchProfiles = query ? profiles.filter((p) => p.name.toLowerCase().includes(query) || p.email.toLowerCase().includes(query)) : []
   // For You Page: public posts with visual media, scrollable grid
-  const fyp = state.posts.filter((p) => !p.locked && (p.postType !== 'artikel'))
+  const fyp = state.posts.filter((p) => !p.locked && !p.archived && (p.postType !== 'artikel'))
   const shown = query
     ? fyp.filter((p) => p.caption.toLowerCase().includes(query) || p.activity.toLowerCase().includes(query) || p.authorName.toLowerCase().includes(query))
     : fyp
@@ -225,12 +227,15 @@ function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: stri
 // ---- PROFILE (own) -------------------------------------------------------
 type ProfileTab = 'posts' | 'locked' | 'liked' | 'saved'
 function ProfileView({ me, name, role, onOpen }: { me: string; name: string; role: Role; onOpen: (id: string) => void }) {
-  const { state } = useStore()
+  const { state, updateProfile } = useStore()
   const [pt, setPt] = useState<ProfileTab>('posts')
+  const [edit, setEdit] = useState(false)
+  const prof = state.profiles[me]
+  const displayName = prof?.name || name
   const mine = state.posts.filter((p) => p.authorEmail === me)
   const sets: Record<ProfileTab, SocialPost[]> = {
-    posts: mine.filter((p) => !p.locked),
-    locked: mine.filter((p) => p.locked),
+    posts: mine.filter((p) => !p.locked && !p.archived),
+    locked: mine.filter((p) => p.locked || p.archived),
     liked: state.posts.filter((p) => p.likedByMe || p.repostedByMe),
     saved: state.posts.filter((p) => p.bookmarkedByMe),
   }
@@ -238,15 +243,20 @@ function ProfileView({ me, name, role, onOpen }: { me: string; name: string; rol
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <Card className="text-center">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-full text-2xl font-extrabold text-white" style={{ background: color }}>{initials(name)}</span>
-        <h2 className="mt-2 text-xl font-extrabold">{name}</h2>
+        <span className="mx-auto grid h-20 w-20 place-items-center overflow-hidden rounded-full text-2xl font-extrabold text-white" style={{ background: color }}>
+          {prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(displayName)}
+        </span>
+        <h2 className="mt-2 text-xl font-extrabold">{displayName}</h2>
         <p className="text-sm text-neutral-500">{roleLabel[role]} · {me}</p>
+        {prof?.bio && <p className="mx-auto mt-1 max-w-sm text-sm text-neutral-600">{prof.bio}</p>}
         <div className="mt-3 flex justify-center gap-6 text-sm">
           <span><b>{mine.length}</b> <span className="text-neutral-400">Postingan</span></span>
           <span><b>{state.follows.length}</b> <span className="text-neutral-400">Mengikuti</span></span>
           <span><b>{sets.saved.length}</b> <span className="text-neutral-400">Disimpan</span></span>
         </div>
+        <Button variant="outline" className="mt-3" onClick={() => setEdit(true)}>Edit Profil</Button>
       </Card>
+      {edit && <EditProfileModal current={{ name: displayName, bio: prof?.bio ?? '', avatar: prof?.avatar }} onClose={() => setEdit(false)} onSave={(d) => { updateProfile(me, d); setEdit(false) }} />}
 
       <div className="flex justify-center gap-1 rounded-2xl bg-white p-1 shadow-sm ring-1 ring-black/5">
         <ProfTab icon={<IconHome size={16} />} label="Postingan" active={pt === 'posts'} onClick={() => setPt('posts')} />
@@ -273,9 +283,10 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
   const store = useStore()
   const { state } = store
   const me = state.account?.email ?? ''
-  const posts = state.posts.filter((p) => p.authorEmail === email && (!p.locked || p.authorEmail === me))
+  const posts = state.posts.filter((p) => p.authorEmail === email && !p.archived && (!p.locked || p.authorEmail === me))
   const first = state.posts.find((p) => p.authorEmail === email)
-  const name = first?.authorName ?? email
+  const prof = state.profiles[email]
+  const name = prof?.name ?? first?.authorName ?? email
   const role = first?.role ?? 'pasien'
   const color = first?.mediaColor ?? COLORS[Math.abs(hash(email)) % COLORS.length]
   const following = state.follows.includes(email)
@@ -283,7 +294,10 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
     <div className="mx-auto max-w-2xl space-y-4">
       <button onClick={onBack} className="text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Kembali</button>
       <Card className="text-center">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-full text-2xl font-extrabold text-white" style={{ background: color }}>{initials(name)}</span>
+        <span className="mx-auto grid h-20 w-20 place-items-center overflow-hidden rounded-full text-2xl font-extrabold text-white" style={{ background: color }}>
+          {prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(name)}
+        </span>
+        {prof?.bio && <p className="mx-auto mt-2 max-w-sm text-sm text-neutral-600">{prof.bio}</p>}
         <h2 className="mt-2 text-xl font-extrabold">{name}</h2>
         <p className="text-sm text-neutral-500">{roleLabel[role]}</p>
         {email !== me && (
@@ -293,6 +307,40 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
         )}
       </Card>
       <PostGrid posts={posts} onOpen={onOpen} empty="Belum ada postingan publik." />
+    </div>
+  )
+}
+
+function EditProfileModal({ current, onClose, onSave }: { current: { name: string; bio: string; avatar?: string }; onClose: () => void; onSave: (d: ProfileEdit) => void }) {
+  const [name, setName] = useState(current.name)
+  const [bio, setBio] = useState(current.bio)
+  const [avatar, setAvatar] = useState<string | undefined>(current.avatar)
+  function pick(file?: File) {
+    if (!file) return
+    const r = new FileReader(); r.onload = () => setAvatar(String(r.result)); r.readAsDataURL(file)
+  }
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold">Edit Profil</h3>
+        <div className="mt-4 flex flex-col items-center">
+          <span className="grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-brand text-2xl font-extrabold text-white">
+            {avatar ? <img src={avatar} className="h-full w-full object-cover" alt="" /> : initials(name)}
+          </span>
+          <label className="mt-2 cursor-pointer text-sm font-semibold text-brand-dark hover:underline">
+            Ubah foto profil
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
+          </label>
+        </div>
+        <div className="mt-4 space-y-3">
+          <Field label="Nama"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} /></Field>
+          <Field label="Status / Bio"><textarea className={`${inputClass} min-h-[70px]`} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tulis status atau bio singkat…" /></Field>
+        </div>
+        <div className="mt-5 flex gap-2">
+          <Button variant="ghost" className="flex-1" onClick={onClose}>Batal</Button>
+          <Button className="flex-1" onClick={() => onSave({ name: name.trim() || current.name, bio: bio.trim(), avatar })}>Simpan</Button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -362,19 +410,34 @@ function PostCard({ post: p, me, store, onProfile }: {
   const type = p.postType ?? 'aktivitas'
   const mine = p.authorEmail === me
   const following = store.state.follows.includes(p.authorEmail)
+  const prof = store.state.profiles[p.authorEmail]
+  const [menu, setMenu] = useState(false)
   return (
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-3">
-        <button onClick={() => onProfile(p.authorEmail)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold text-white" style={{ background: p.mediaColor }}>{initials(p.authorName)}</button>
+        <button onClick={() => onProfile(p.authorEmail)} className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ background: p.mediaColor }}>
+          {prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(prof?.name ?? p.authorName)}
+        </button>
         <button onClick={() => onProfile(p.authorEmail)} className="min-w-0 flex-1 text-left">
           <div className="flex items-center gap-1.5">
-            <span className="truncate text-sm font-bold">{p.authorName}</span>
+            <span className="truncate text-sm font-bold">{prof?.name ?? p.authorName}</span>
             {p.locked && <IconLock size={13} className="text-neutral-400" />}
             <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{roleLabel[p.role]}</span>
           </div>
           <span className="text-[11px] text-neutral-400">{timeAgo(p.at)} lalu · {p.activity}</span>
         </button>
-        {!mine && (
+        {mine ? (
+          <div className="relative">
+            <button onClick={() => setMenu((m) => !m)} className="px-2 text-lg font-bold text-neutral-400">⋯</button>
+            {menu && (
+              <div className="absolute right-0 top-7 z-10 w-44 overflow-hidden rounded-xl bg-white py-1 text-sm shadow-lg ring-1 ring-black/10">
+                <button onClick={() => { store.updatePost(p.id, { locked: !p.locked }); setMenu(false) }} className="block w-full px-3 py-2 text-left hover:bg-neutral-50">{p.locked ? '🔓 Buka kunci' : '🔒 Kunci (privat)'}</button>
+                <button onClick={() => { store.updatePost(p.id, { archived: !p.archived }); setMenu(false) }} className="block w-full px-3 py-2 text-left hover:bg-neutral-50">{p.archived ? '👁️ Tampilkan' : '🗄️ Arsipkan / sembunyikan'}</button>
+                <button onClick={() => { if (confirm('Hapus postingan ini?')) store.deletePost(p.id) }} className="block w-full px-3 py-2 text-left text-accent hover:bg-red-50">🗑️ Hapus</button>
+              </div>
+            )}
+          </div>
+        ) : (
           <button onClick={() => store.toggleFollow(p.authorEmail)} className={`rounded-full px-3 py-1 text-xs font-bold ${following ? 'bg-neutral-100 text-neutral-500' : 'bg-brand text-white'}`}>{following ? 'Mengikuti' : 'Ikuti'}</button>
         )}
       </div>
@@ -382,6 +445,12 @@ function PostCard({ post: p, me, store, onProfile }: {
       {type === 'artikel' ? <ArticleBlock post={p} /> : <MediaBlock post={p} />}
       {type === 'aktivitas' && <ActivityMetrics post={p} />}
       {type === 'kebiasaan' && <HabitMetrics post={p} />}
+      {(p.audio || p.location) && (
+        <div className="flex flex-wrap gap-3 px-4 pt-2 text-[11px] font-semibold text-neutral-500">
+          {p.audio && <span>🎵 {p.audio}</span>}
+          {p.location && <span>📍 {p.location}</span>}
+        </div>
+      )}
       {p.caption && <p className="px-4 pt-3 text-sm text-ink">{p.caption}</p>}
 
       <div className="flex items-center gap-5 px-4 py-3 text-neutral-500">
@@ -496,6 +565,8 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
   const [caption, setCaption] = useState('')
   const [color, setColor] = useState(COLORS[0])
   const [locked, setLocked] = useState(false)
+  const [audio, setAudio] = useState(SONGS[0])
+  const [location, setLocation] = useState('')
   const [distanceKm, setDistanceKm] = useState('')
   const [durationMin, setDurationMin] = useState('')
   const [waterMl, setWaterMl] = useState('')
@@ -523,6 +594,8 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
       videoSec: isVideo ? 30 : undefined,
       videoUrl: isVideo ? videoUrl! : undefined,
       photos: !isVideo && postType !== 'artikel' && photoData.length > 0 ? photoData : undefined,
+      audio: audio !== SONGS[0] ? audio : undefined,
+      location: location.trim() || undefined,
       locked, likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
     }
     if (postType === 'aktivitas') { base.distanceKm = num(distanceKm); base.durationMin = num(durationMin) }
@@ -595,6 +668,10 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
             <Field label="Judul artikel"><input className={inputClass} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} placeholder="Kilasan artikel longevity" /></Field>
           )}
           <Field label="Caption"><input className={inputClass} value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Ceritakan kemajuan sehat Anda…" /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="🎵 Pilih lagu"><select className={inputClass} value={audio} onChange={(e) => setAudio(e.target.value)}>{SONGS.map((s) => <option key={s}>{s}</option>)}</select></Field>
+            <Field label="📍 Lokasi"><input className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="mis. GBK, Jakarta" /></Field>
+          </div>
         </div>
 
         <div className="mt-3 flex items-center gap-2">

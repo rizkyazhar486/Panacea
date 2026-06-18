@@ -1,41 +1,33 @@
 import { useMemo, useState } from 'react'
 import { useStore, uid } from '../lib/store'
-import { Card, SectionTitle, Button, Badge } from '../components/ui'
-import { IconPill, IconUpload, IconCheck, IconShield, IconSearch } from '../components/icons'
+import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
+import { IconPill, IconUpload, IconCheck, IconShield, IconSearch, IconPlus } from '../components/icons'
+import type { PharmacyProduct, PharmacyCategory } from '../lib/types'
 
-type Cat = 'Demam & Nyeri' | 'Batuk & Pilek' | 'Lambung' | 'Vitamin' | 'Topikal'
-interface Product { id: string; name: string; desc: string; category: Cat; priceIdr: number; rx: boolean; emoji: string; color: string }
-
-const PRODUCTS: Product[] = [
-  { id: 'm1', name: 'Paracetamol 500 mg', desc: 'Pereda demam & nyeri ringan (strip 10)', category: 'Demam & Nyeri', priceIdr: 8000, rx: false, emoji: '💊', color: '#ef4444' },
-  { id: 'm2', name: 'Ibuprofen 200 mg', desc: 'Anti-nyeri & anti-radang ringan (strip 10)', category: 'Demam & Nyeri', priceIdr: 12000, rx: false, emoji: '💊', color: '#f97316' },
-  { id: 'm3', name: 'OBH Sirup', desc: 'Pereda batuk berdahak (100 ml)', category: 'Batuk & Pilek', priceIdr: 18500, rx: false, emoji: '🧴', color: '#a16207' },
-  { id: 'm4', name: 'Cetirizine 10 mg', desc: 'Antihistamin alergi/pilek (strip 10)', category: 'Batuk & Pilek', priceIdr: 15000, rx: false, emoji: '💊', color: '#0ea5e9' },
-  { id: 'm5', name: 'Antasida Doen', desc: 'Penetral asam lambung (strip 10)', category: 'Lambung', priceIdr: 9000, rx: false, emoji: '💊', color: '#10b981' },
-  { id: 'm6', name: 'Omeprazole 20 mg', desc: 'Penurun asam lambung — perlu resep', category: 'Lambung', priceIdr: 26000, rx: true, emoji: '💊', color: '#8b5cf6' },
-  { id: 'm7', name: 'Vitamin C 500 mg', desc: 'Suplemen harian (tabung 30)', category: 'Vitamin', priceIdr: 22000, rx: false, emoji: '🍊', color: '#f59e0b' },
-  { id: 'm8', name: 'Vitamin D3 1000 IU', desc: 'Dukungan imun & tulang (botol 60)', category: 'Vitamin', priceIdr: 45000, rx: false, emoji: '☀️', color: '#eab308' },
-  { id: 'm9', name: 'Salep Hidrokortison 1%', desc: 'Anti-gatal & radang kulit ringan', category: 'Topikal', priceIdr: 17500, rx: false, emoji: '🧴', color: '#14b8a6' },
-  { id: 'm10', name: 'Amoxicillin 500 mg', desc: 'Antibiotik — wajib resep dokter', category: 'Topikal', priceIdr: 32000, rx: true, emoji: '💊', color: '#ec4899' },
-]
-const CATS: (Cat | 'Semua')[] = ['Semua', 'Demam & Nyeri', 'Batuk & Pilek', 'Lambung', 'Vitamin', 'Topikal']
+type Cat = PharmacyCategory
+type Product = PharmacyProduct
+const CAT_LIST: Cat[] = ['Demam & Nyeri', 'Batuk & Pilek', 'Lambung', 'Vitamin', 'Topikal']
+const CATS: (Cat | 'Semua')[] = ['Semua', ...CAT_LIST]
 const rupiah = (n: number) => `Rp${n.toLocaleString('id-ID')}`
 
 export function Pharmacy() {
-  const { addOrder } = useStore()
+  const { state, account, addOrder, addProduct, removeProduct } = useStore()
+  const PRODUCTS = state.products
+  const canManage = account?.role === 'admin' || account?.role === 'owner'
   const [cart, setCart] = useState<Record<string, number>>({})
   const [showRx, setShowRx] = useState(false)
   const [rxFile, setRxFile] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [q, setQ] = useState('')
   const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
+  const [manage, setManage] = useState(false)
 
   const products = useMemo(() => {
     const query = q.trim().toLowerCase()
     return PRODUCTS.filter((p) => (cat === 'Semua' || p.category === cat) && (!query || p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query)))
-  }, [q, cat])
+  }, [PRODUCTS, q, cat])
 
-  const total = useMemo(() => Object.entries(cart).reduce((s, [id, qty]) => s + (PRODUCTS.find((p) => p.id === id)?.priceIdr ?? 0) * qty, 0), [cart])
+  const total = useMemo(() => Object.entries(cart).reduce((s, [id, qty]) => s + (PRODUCTS.find((p) => p.id === id)?.priceIdr ?? 0) * qty, 0), [PRODUCTS, cart])
   const count = Object.values(cart).reduce((a, b) => a + b, 0)
 
   function add(p: Product) {
@@ -57,7 +49,12 @@ export function Pharmacy() {
     <div className="space-y-5">
       <Card>
         <SectionTitle icon={<IconPill size={20} />} title="Apotek Panaceamed" subtitle="Beli obat bebas (OTC) atau tebus resep dari konsultasi dokter"
-          right={<Button variant="outline" onClick={() => setShowRx(true)}><IconUpload size={16} /> Tebus / Scan Resep</Button>} />
+          right={
+            <div className="flex gap-2">
+              {canManage && <Button variant="outline" onClick={() => setManage((m) => !m)}><IconPlus size={16} /> Kelola Obat</Button>}
+              <Button variant="outline" onClick={() => setShowRx(true)}><IconUpload size={16} /> Tebus / Scan Resep</Button>
+            </div>
+          } />
         <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
           <IconSearch size={16} className="text-neutral-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari obat… (mis. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
@@ -73,15 +70,31 @@ export function Pharmacy() {
 
       {done && <Card className="flex items-center gap-2 bg-brand-50 text-sm font-semibold text-brand-dark"><IconCheck size={18} /> Pesanan diterima — tercatat di Riwayat Transaksi. Bukti dikirim ke email.</Card>}
 
+      {canManage && manage && (
+        <Card>
+          <SectionTitle icon={<IconPlus size={18} />} title="Kelola Daftar Obat" subtitle="Admin / apotek terdaftar dapat menambah & menghapus produk" />
+          <AddProductForm onAdd={addProduct} />
+          <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto">
+            {PRODUCTS.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-sm">
+                <span>{p.emoji} {p.name} · <span className="text-neutral-400">{rupiah(p.priceIdr)}</span></span>
+                <button onClick={() => removeProduct(p.id)} className="text-xs font-semibold text-accent hover:underline">Hapus</button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {products.map((p) => (
               <Card key={p.id} pad={false} className="overflow-hidden">
                 {/* photo tile */}
-                <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
-                  <span>{p.emoji}</span>
+                <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.image ? undefined : `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
+                  {p.image ? <img src={p.image} className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}
                   <span className="absolute left-2 top-2">{p.rx ? <Badge tone="high">Resep</Badge> : <Badge tone="normal">Bebas</Badge>}</span>
+                  {canManage && <button onClick={() => removeProduct(p.id)} className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-xs text-white">✕</button>}
                 </div>
                 <div className="p-3">
                   <div className="text-sm font-bold leading-tight">{p.name}</div>
@@ -126,6 +139,30 @@ export function Pharmacy() {
       </div>
 
       {showRx && <RxModal onClose={() => setShowRx(false)} onUpload={(name) => { setRxFile(name); setShowRx(false) }} />}
+    </div>
+  )
+}
+
+function AddProductForm({ onAdd }: { onAdd: (p: Product) => void }) {
+  const [f, setF] = useState({ name: '', category: CAT_LIST[0] as Cat, priceIdr: '', rx: false, emoji: '💊', desc: '', image: '' })
+  function pickImg(file?: File) {
+    if (!file) return
+    const r = new FileReader(); r.onload = () => setF((s) => ({ ...s, image: String(r.result) })); r.readAsDataURL(file)
+  }
+  function submit() {
+    if (!f.name.trim() || !f.priceIdr) return
+    onAdd({ id: uid(), name: f.name.trim(), desc: f.desc.trim() || '—', category: f.category, priceIdr: Number(f.priceIdr), rx: f.rx, emoji: f.emoji || '💊', color: '#10b981', image: f.image || undefined })
+    setF({ name: '', category: CAT_LIST[0], priceIdr: '', rx: false, emoji: '💊', desc: '', image: '' })
+  }
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <Field label="Nama obat"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="mis. Paracetamol" /></Field>
+      <Field label="Kategori"><select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Cat })}>{CAT_LIST.map((c) => <option key={c}>{c}</option>)}</select></Field>
+      <Field label="Harga (Rp)"><input className={inputClass} type="number" value={f.priceIdr} onChange={(e) => setF({ ...f, priceIdr: e.target.value })} /></Field>
+      <Field label="Foto produk"><input className={inputClass} type="file" accept="image/*" onChange={(e) => pickImg(e.target.files?.[0])} /></Field>
+      <Field label="Deskripsi"><input className={inputClass} value={f.desc} onChange={(e) => setF({ ...f, desc: e.target.value })} placeholder="kemasan / kegunaan" /></Field>
+      <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" checked={f.rx} onChange={(e) => setF({ ...f, rx: e.target.checked })} className="h-4 w-4 accent-[#00BF63]" /> Wajib resep</label>
+      <div className="flex items-end lg:col-span-2"><Button onClick={submit} disabled={!f.name.trim() || !f.priceIdr}><IconPlus size={16} /> Tambah Obat</Button></div>
     </div>
   )
 }

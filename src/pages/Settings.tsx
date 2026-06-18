@@ -79,29 +79,9 @@ export function Settings() {
           </div>
         </div>
       </Card>
-
-      <Card>
-        <SectionTitle title="Tentang Panaceamed.id" />
-        <p className="text-sm leading-relaxed text-neutral-600">
-          Platform <b>Longevity Medical-AI Co-Physician</b>: AI melakukan anamnesis & merekomendasikan
-          pemeriksaan penunjang melalui chatbot, hasilnya mengalir ke <b>AI-EMR</b> yang terintegrasi
-          dengan identitas pasien secara kontinu — selalu menyertakan tanda vital & penunjang sebagai
-          dukungan longevity. Pemeriksaan fisik dan rencana <b>diisi serta diverifikasi oleh dokter</b>.
-          Ditujukan untuk pemantauan berkelanjutan pasien penyakit kronis, lansia, dan
-          immunocompromised.
-        </p>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
-          Selain AI-EMR, platform menjual <b>catatan & materi kedokteran</b> (USMLE, UKMPPD, jurnal)
-          melalui sistem <b>tokenized (PanaceaToken)</b> yang perlu dideposit pembeli. Penulis/kontributor
-          wajib diverifikasi oleh <b>verifikator spesialis/subspesialis</b>, dan setiap unggahan —
-          termasuk template AI-EMR — divalidasi oleh <b>AI Claude</b> terlebih dahulu. Rumah sakit atau
-          individu yang berlangganan memperoleh edukasi pasien otomatis.
-        </p>
-        <p className="mt-3 text-xs text-neutral-400">
-          AI mendukung, bukan menggantikan, klinisi berlisensi. Verifikasi seluruh dosis terhadap
-          formularium terkini sebelum digunakan.
-        </p>
-      </Card>
+      <p className="px-1 text-center text-xs text-neutral-400">
+        Info selengkapnya tentang Panaceamed.id ada di halaman <b>Beranda → Tentang Kami</b>.
+      </p>
     </div>
   )
 }

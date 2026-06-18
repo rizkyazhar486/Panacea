@@ -188,6 +188,9 @@ export interface SocialPost {
   photos?: string[] // real uploaded images (data URLs) or gradient color placeholders
   videoUrl?: string // uploaded short video (object URL)
   videoSec?: number // short video length (<=30s)
+  audio?: string // selected background song title
+  location?: string // tagged location
+  archived?: boolean // hidden/archived by the owner
   locked?: boolean // private/locked post (only owner sees in "Terkunci")
   likes: number
   comments?: number
@@ -219,6 +222,27 @@ export interface ConsultSession {
   at: string
   feeIdr: number
   status: 'terjadwal' | 'selesai'
+}
+
+// -------- Pharmacy products (editable by admin / registered pharmacy) -------
+export type PharmacyCategory = 'Demam & Nyeri' | 'Batuk & Pilek' | 'Lambung' | 'Vitamin' | 'Topikal'
+export interface PharmacyProduct {
+  id: string
+  name: string
+  desc: string
+  category: PharmacyCategory
+  priceIdr: number
+  rx: boolean // requires prescription
+  emoji: string
+  color: string
+  image?: string // optional uploaded product photo (data URL)
+}
+
+// -------- Editable user profile (name, status/bio, avatar) -----------------
+export interface ProfileEdit {
+  name?: string
+  bio?: string
+  avatar?: string // data URL
 }
 
 // -------- Unified transactions / order history ----------------------------
@@ -350,6 +374,8 @@ export interface AppState {
   foods: FoodEntry[]
   consults: ConsultSession[]
   orders: Order[]
+  products: PharmacyProduct[]
+  profiles: Record<string, ProfileEdit> // by email
   emails: EmailMsg[]
   settings: {
     apiKey: string

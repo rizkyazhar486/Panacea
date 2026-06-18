@@ -22,8 +22,11 @@ import type {
   ConsultSession,
   EmailMsg,
   Order,
+  PharmacyProduct,
+  ProfileEdit,
   TxType,
 } from './types'
+import { DEFAULT_PRODUCTS } from './pharmacy'
 
 const STORAGE_KEY = 'panaceamed.state.v3'
 
@@ -89,6 +92,8 @@ function seed(): AppState {
     foods: [],
     consults: [],
     orders: [],
+    products: DEFAULT_PRODUCTS,
+    profiles: {},
     emails: [],
     settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: '' },
   }
@@ -134,6 +139,8 @@ interface Store {
   removeAdminEmail: (email: string) => void
   // social + nutrition + consult + email + withdraw
   addPost: (p: SocialPost) => void
+  updatePost: (id: string, partial: Partial<SocialPost>) => void
+  deletePost: (id: string) => void
   toggleLike: (id: string) => void
   toggleRepost: (id: string) => void
   toggleBookmark: (id: string) => void
@@ -141,6 +148,10 @@ interface Store {
   buyLongevitySub: () => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
   addOrder: (o: Order) => void
+  addProduct: (p: PharmacyProduct) => void
+  updateProduct: (id: string, partial: Partial<PharmacyProduct>) => void
+  removeProduct: (id: string) => void
+  updateProfile: (email: string, partial: ProfileEdit) => void
   bookConsult: (c: ConsultSession) => void
   sendEmail: (e: EmailMsg) => void
   withdrawTokens: (amount: number, bank: string) => { ok: boolean; reason?: string }
@@ -353,6 +364,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           adminEmails: st.adminEmails.filter((e) => e !== email || e === OWNER_EMAIL),
         })),
       addPost: (p) => setState((st) => ({ ...st, posts: [p, ...st.posts] })),
+      updatePost: (id, partial) =>
+        setState((st) => ({ ...st, posts: st.posts.map((p) => (p.id === id ? { ...p, ...partial } : p)) })),
+      deletePost: (id) => setState((st) => ({ ...st, posts: st.posts.filter((p) => p.id !== id) })),
       toggleLike: (id) =>
         setState((st) => ({
           ...st,
@@ -411,6 +425,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       addOrder: (o) => setState((st) => ({ ...st, orders: [o, ...st.orders] })),
+      addProduct: (p) => setState((st) => ({ ...st, products: [p, ...st.products] })),
+      updateProduct: (id, partial) =>
+        setState((st) => ({ ...st, products: st.products.map((p) => (p.id === id ? { ...p, ...partial } : p)) })),
+      removeProduct: (id) => setState((st) => ({ ...st, products: st.products.filter((p) => p.id !== id) })),
+      updateProfile: (email, partial) =>
+        setState((st) => ({ ...st, profiles: { ...st.profiles, [email]: { ...st.profiles[email], ...partial } } })),
       bookConsult: (c) =>
         setState((st) => ({
           ...st,

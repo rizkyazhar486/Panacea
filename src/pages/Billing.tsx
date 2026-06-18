@@ -113,7 +113,7 @@ export function Billing() {
             </div>
             {method === 'QRIS' && (
               <div className="mb-2 inline-flex items-center gap-3 rounded-xl border border-neutral-200 p-3">
-                <QrPlaceholder />
+                <QrCode amount={(amount || 0) * TOKEN_TO_IDR} />
                 <div className="text-xs text-neutral-500">Pindai QRIS untuk membayar<br />Rp{((amount || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')}</div>
               </div>
             )}
@@ -422,16 +422,20 @@ function UploadBox({ label, multiple, onFiles, files }: { label: string; multipl
   )
 }
 
-function QrPlaceholder() {
-  // Decorative QR-like grid (payment simulation).
-  const cells = Array.from({ length: 49 }, (_, i) => (i * 7 + 3) % 5 < 2)
-  return (
-    <div className="grid h-20 w-20 grid-cols-7 gap-0.5 rounded-md bg-white p-1 ring-1 ring-neutral-200">
-      {cells.map((on, i) => (
-        <span key={i} className={on ? 'bg-ink' : 'bg-transparent'} />
-      ))}
-    </div>
-  )
+function QrCode({ amount }: { amount: number }) {
+  // Real, scannable QR encoding a demo QRIS payment payload.
+  const [failed, setFailed] = useState(false)
+  const payload = `PANACEAMED-QRIS|merchant=Panaceamed.id|amount=${amount}|ref=${Math.random().toString(36).slice(2, 10).toUpperCase()}`
+  const src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(payload)}`
+  if (failed) {
+    const cells = Array.from({ length: 49 }, (_, i) => (i * 7 + (amount % 5) + 3) % 5 < 2)
+    return (
+      <div className="grid h-24 w-24 grid-cols-7 gap-0.5 rounded-md bg-white p-1 ring-1 ring-neutral-200">
+        {cells.map((on, i) => <span key={i} className={on ? 'bg-ink' : 'bg-transparent'} />)}
+      </div>
+    )
+  }
+  return <img src={src} onError={() => setFailed(true)} width={96} height={96} alt="QRIS" className="h-24 w-24 rounded-md ring-1 ring-neutral-200" />
 }
 
 // Real backend wallet (Midtrans payments + server-side balance).
