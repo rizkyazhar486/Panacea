@@ -77,6 +77,29 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ amountPnc, bank }),
     }),
+  posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
+  createPost: (p: Partial<BackendPost>) =>
+    req<{ post: BackendPost }>('/api/posts', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.post),
+  likePost: (id: string) => req<{ post: BackendPost }>(`/api/posts/${id}/like`, { method: 'POST' }).then((r) => r.post),
+}
+
+export interface BackendPost {
+  id: string
+  authorEmail: string
+  authorName: string
+  role: Role
+  kind: 'image' | 'video'
+  activity: string
+  caption: string
+  mediaColor: string
+  durationSec?: number
+  likes: number
+  at: string
+}
+
+// WebSocket URL for real-time consultations.
+export function wsUrl(): string {
+  return API.replace(/^http/, 'ws') + '/ws'
 }
 
 // Load Google Identity Services and render a real Sign-In button.

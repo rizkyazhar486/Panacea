@@ -21,6 +21,35 @@ const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: stri
 
 const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
 
+function LabPanel({ results }: { results: import('../lib/types').SupportiveResult[] }) {
+  const labs = results.filter((r) => r.category === 'Lab')
+  if (labs.length === 0) return null
+  const pos: Record<string, number> = { low: 18, normal: 50, high: 80, critical: 94 }
+  const col: Record<string, string> = { low: '#f59e0b', normal: '#00BF63', high: '#FF3131', critical: '#FF3131' }
+  return (
+    <div className="mb-4">
+      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">Panel Lab — nilai vs rentang rujukan</div>
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        {labs.map((r) => {
+          const f = r.flag ?? 'normal'
+          return (
+            <div key={r.id} className="rounded-xl border border-neutral-100 p-2.5">
+              <div className="mb-1 flex items-baseline justify-between text-sm">
+                <span className="font-semibold">{r.name}</span>
+                <span className="font-bold" style={{ color: col[f] }}>{r.value} {r.unit}</span>
+              </div>
+              <div className="relative h-2 rounded-full bg-gradient-to-r from-amber-200 via-brand-100 to-red-200">
+                <div className="absolute top-1/2 h-3.5 w-1 -translate-y-1/2 rounded-full" style={{ left: `${pos[f]}%`, background: col[f] }} />
+              </div>
+              <div className="mt-1 text-[10px] text-neutral-400">Rujukan: {r.reference || '—'}</div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function supportiveDefaults(weightKg: number) {
   const w = weightKg || 60
   const maint = w > 20 ? 1500 + 20 * (w - 20) : w > 10 ? 1000 + 50 * (w - 10) : 100 * w
@@ -114,7 +143,7 @@ export function EMR() {
             title="AI-EMR · Rekam Medis Elektronik"
             subtitle={`Pasien: ${activePatient.name} · diperbarui ${new Date(draft.updatedAt).toLocaleString('id-ID')}`}
           />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 print:hidden">
             {draft.signedBy ? (
               <Badge tone="brand">
                 <IconCheck size={13} /> Ditandatangani {draft.signedBy}
@@ -124,6 +153,9 @@ export function EMR() {
             )}
             <Button variant="outline" onClick={save} disabled={!dirty}>
               {dirty ? 'Simpan Perubahan' : 'Tersimpan'}
+            </Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <IconBook size={14} /> Cetak / PDF
             </Button>
           </div>
         </div>
@@ -208,6 +240,7 @@ export function EMR() {
           title="Penunjang & Terapi Suportif"
           subtitle="Interpretasi Lab/EKG · resusitasi, balans cairan, kebutuhan kalori, urine output"
         />
+        <LabPanel results={state.supportive[activePatient.id] ?? []} />
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
             Interpretasi Temuan Lab & Hasil EKG

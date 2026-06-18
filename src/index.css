@@ -67,3 +67,27 @@ body {
 .rise {
   animation: rise 0.25s ease-out both;
 }
+
+/* Print / PDF export — show only the document content. */
+@media print {
+  aside,
+  header,
+  nav {
+    display: none !important;
+  }
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  textarea {
+    border: none !important;
+    resize: none !important;
+    padding: 0 !important;
+  }
+}

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
 import { IconUsers, IconVideo, IconPlus } from '../components/icons'
+import { api, backendEnabled } from '../lib/api'
 import type { SocialPost } from '../lib/types'
 
 const ACTIVITIES = ['Lari', 'Berenang', 'Padel', 'Futsal', 'Main bola', 'Makan sehat', 'Yoga', 'Bersepeda']
@@ -18,10 +19,31 @@ export function Social() {
   const { state, account, addPost, toggleLike, toggleFollow } = useStore()
   const [filter, setFilter] = useState<'semua' | 'following'>('semua')
   const [open, setOpen] = useState(false)
+  const [serverPosts, setServerPosts] = useState<SocialPost[]>([])
 
-  const posts = state.posts.filter((p) =>
+  function reload() {
+    if (!backendEnabled) return
+    api.posts().then((ps) => setServerPosts(ps.map((p) => ({ ...p, likedByMe: false } as SocialPost)))).catch(() => {})
+  }
+  useEffect(reload, [])
+
+  const source = backendEnabled ? serverPosts : state.posts
+  const posts = source.filter((p) =>
     filter === 'following' ? state.follows.includes(p.authorEmail) || p.authorEmail === account?.email : true,
   )
+
+  function onCreate(p: SocialPost) {
+    if (backendEnabled) {
+      api.createPost({ activity: p.activity, caption: p.caption, kind: p.kind, mediaColor: p.mediaColor }).then(reload).catch(() => addPost(p))
+    } else {
+      addPost(p)
+    }
+    setOpen(false)
+  }
+  function onLike(p: SocialPost) {
+    if (backendEnabled) api.likePost(p.id).then(reload).catch(() => {})
+    else toggleLike(p.id)
+  }
 
   return (
     <div className="space-y-5">
@@ -49,7 +71,7 @@ export function Social() {
             </button>
           ))}
         </div>
-        {open && <Composer onPost={(p) => { addPost(p); setOpen(false) }} authorEmail={account?.email ?? 'me@panaceamed.id'} authorName={account?.name ?? 'Saya'} role={account?.role ?? 'pasien'} />}
+        {open && <Composer onPost={onCreate} authorEmail={account?.email ?? 'me@panaceamed.id'} authorName={account?.name ?? 'Saya'} role={account?.role ?? 'pasien'} />}
       </Card>
 
       {/* Vertical TikTok-like feed */}
@@ -73,7 +95,7 @@ export function Social() {
                 </div>
                 {/* like rail */}
                 <div className="absolute bottom-4 right-3 flex flex-col items-center gap-3 text-white">
-                  <button onClick={() => toggleLike(p.id)} className="flex flex-col items-center">
+                  <button onClick={() => onLike(p)} className="flex flex-col items-center">
                     <span className={`text-2xl ${p.likedByMe ? 'scale-110' : ''}`}>{p.likedByMe ? '❤️' : '🤍'}</span>
                     <span className="text-xs font-semibold">{p.likes}</span>
                   </button>

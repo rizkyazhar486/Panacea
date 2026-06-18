@@ -39,14 +39,29 @@ export interface Order {
   createdAt: string
 }
 
+export interface Post {
+  id: string
+  authorEmail: string
+  authorName: string
+  role: Role
+  kind: 'image' | 'video'
+  activity: string
+  caption: string
+  mediaColor: string
+  durationSec?: number
+  likes: number
+  at: string
+}
+
 interface DB {
   users: User[]
   wallets: Record<string, number> // userId -> PNC balance
   txs: Tx[]
   orders: Order[]
+  posts: Post[]
 }
 
-let db: DB = { users: [], wallets: {}, txs: [], orders: [] }
+let db: DB = { users: [], wallets: {}, txs: [], orders: [], posts: [] }
 
 function load() {
   if (existsSync(DB_PATH)) {
@@ -102,6 +117,24 @@ export function credit(userId: string, amountPnc: number, type: TxType, note: st
   db.wallets[userId] = (db.wallets[userId] ?? 0) + amountPnc
   db.txs.unshift({ id: uid(), userId, type, amountPnc, note, at: new Date().toISOString(), ref })
   save()
+}
+
+export function listPosts(): Post[] {
+  if (!db.posts) db.posts = []
+  return db.posts.slice(0, 100)
+}
+export function addPost(p: Post) {
+  if (!db.posts) db.posts = []
+  db.posts.unshift(p)
+  save()
+}
+export function likePost(id: string): Post | undefined {
+  const p = db.posts?.find((x) => x.id === id)
+  if (p) {
+    p.likes += 1
+    save()
+  }
+  return p
 }
 
 export function createOrder(o: Order) {

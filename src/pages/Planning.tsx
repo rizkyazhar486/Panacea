@@ -4,6 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconPlan, IconCheck, IconPlus, IconSparkle, IconShield } from '../components/icons'
 import { scorePlanItem, WEIGHTS, S_THRESHOLD } from '../lib/cdss'
+import { checkInteractions } from '../lib/ddi'
 import type { PlanItem, Patient } from '../lib/types'
 
 const CATEGORIES: PlanItem['category'][] = [
@@ -59,6 +60,7 @@ export function Planning() {
   return (
     <div className="space-y-6">
       <CdssPanel plan={record.plan} patient={activePatient} />
+      <DDICheck texts={[...record.plan.map((p) => p.text), record.anamnesis.riwayatPengobatan, ...activePatient.allergies]} />
       <SurgeryCard />
 
       <Card>
@@ -163,6 +165,38 @@ export function Planning() {
         </p>
       </Card>
     </div>
+  )
+}
+
+// ---- Drug–drug interaction (DDI) checker ----------------------------------
+function DDICheck({ texts }: { texts: string[] }) {
+  const hits = checkInteractions(texts)
+  const toneFor = (s: string): 'critical' | 'high' | 'normal' =>
+    s === 'mayor' ? 'critical' : s === 'moderat' ? 'high' : 'normal'
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconShield size={18} />}
+        title="Pemeriksa Interaksi Obat (DDI)"
+        subtitle="Skrining otomatis terhadap rencana + riwayat obat & alergi"
+        right={hits.length === 0 ? <Badge tone="brand">Tidak ada interaksi</Badge> : <Badge tone="critical">{hits.length} interaksi</Badge>}
+      />
+      {hits.length === 0 ? (
+        <p className="text-sm text-neutral-400">Belum ada interaksi bermakna terdeteksi pada daftar saat ini.</p>
+      ) : (
+        <div className="space-y-2">
+          {hits.map((h, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-xl border border-neutral-100 p-3">
+              <Badge tone={toneFor(h.severity)}>{h.severity}</Badge>
+              <div className="text-sm">
+                <span className="font-bold capitalize">{h.drugs[0]} × {h.drugs[1]}</span>
+                <p className="text-neutral-600">{h.effect}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   )
 }
 

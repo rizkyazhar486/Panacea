@@ -25,7 +25,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Set repo variable VITE_API_URL (Settings → Secrets and variables →
+      # Actions → Variables) to your deployed backend URL to enable live mode.
       - run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

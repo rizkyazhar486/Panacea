@@ -2,7 +2,13 @@ import { useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { IconStethoscope, IconCheck } from '../components/icons'
+import { ConsultChat } from '../components/ConsultChat'
+import { backendEnabled } from '../lib/api'
 import type { PaymentMethod } from '../lib/types'
+
+function slug(s: string): string {
+  return s.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '').slice(0, 24)
+}
 
 const FEE = 35000
 
@@ -17,6 +23,7 @@ export function Consult() {
   const { account, bookConsult, sendEmail } = useStore()
   const [pay, setPay] = useState<PaymentMethod>('QRIS')
   const [done, setDone] = useState<string>('')
+  const [chatRoom, setChatRoom] = useState<string>('')
 
   function book(name: string, specialty: string) {
     const at = new Date().toISOString()
@@ -77,13 +84,31 @@ export function Consult() {
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
               <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('id-ID')}<span className="text-xs font-medium text-neutral-400">/sesi</span></span>
-              <Button onClick={() => book(d.name, d.specialty)} disabled={!d.online}>
-                <IconCheck size={14} /> Booking & Bayar
-              </Button>
+              <div className="flex gap-2">
+                {backendEnabled && (
+                  <Button variant="outline" onClick={() => setChatRoom('consult-' + slug(d.name))} disabled={!d.online}>
+                    Chat
+                  </Button>
+                )}
+                <Button onClick={() => book(d.name, d.specialty)} disabled={!d.online}>
+                  <IconCheck size={14} /> Booking & Bayar
+                </Button>
+              </div>
             </div>
           </Card>
         ))}
       </div>
+
+      {backendEnabled && chatRoom && (
+        <Card>
+          <SectionTitle
+            icon={<IconStethoscope size={20} />}
+            title="Konsultasi Real-time"
+            subtitle="Dokter & pasien yang membuka ruang yang sama akan terhubung langsung"
+          />
+          <ConsultChat room={chatRoom} name={account?.name ?? 'Pasien'} />
+        </Card>
+      )}
 
       <Card>
         <SectionTitle title="Sesi Saya" />

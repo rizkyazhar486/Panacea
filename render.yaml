@@ -1,0 +1,33 @@
+# Render Blueprint — one-click deploy of the Panaceamed backend.
+# 1. Push this repo to GitHub.
+# 2. On https://render.com → New → Blueprint → pick this repo.
+# 3. After deploy, copy the service URL and set it as a GitHub Actions repo
+#    variable VITE_API_URL so the Pages frontend talks to it (see deploy.yml).
+services:
+  - type: web
+    name: panaceamed-backend
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: '20'
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: CORS_ORIGINS
+        value: https://rizkyazhar486.github.io
+      - key: JWT_SECRET
+        generateValue: true
+      # Fill these in the Render dashboard to go fully live (left blank = mock):
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: MIDTRANS_SERVER_KEY
+        sync: false
+      - key: MIDTRANS_CLIENT_KEY
+        sync: false
+      - key: MIDTRANS_IS_PRODUCTION
+        value: 'false'

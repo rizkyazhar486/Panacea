@@ -1,10 +1,12 @@
+import { createServer } from 'node:http'
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { config, features } from './config.js'
-import { balance, txsFor, credit, type User } from './store.js'
+import { balance, txsFor, credit, listPosts, addPost, likePost, uid, type User, type Post } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
+import { attachRealtime } from './realtime.js'
 
 const app = express()
 app.use(express.json())
@@ -64,7 +66,36 @@ app.post('/api/payments/confirm', requireAuth, confirmPayment)
 app.post('/api/payments/webhook', paymentWebhook)
 app.get('/api/payments/status/:orderId', orderStatus)
 
-app.listen(config.port, () => {
+// --- social posts (persisted) ---
+app.get('/api/posts', (_req, res) => res.json({ posts: listPosts() }))
+app.post('/api/posts', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Partial<Post>
+  const p: Post = {
+    id: uid(),
+    authorEmail: u.email,
+    authorName: u.name,
+    role: u.role,
+    kind: b.kind === 'video' ? 'video' : 'image',
+    activity: String(b.activity || 'Aktivitas'),
+    caption: String(b.caption || ''),
+    mediaColor: String(b.mediaColor || '#00BF63'),
+    durationSec: b.kind === 'video' ? 15 : undefined,
+    likes: 0,
+    at: new Date().toISOString(),
+  }
+  addPost(p)
+  res.json({ post: p })
+})
+app.post('/api/posts/:id/like', (req, res) => {
+  const p = likePost(req.params.id)
+  if (!p) return res.status(404).json({ error: 'not_found' })
+  res.json({ post: p })
+})
+
+const server = createServer(app)
+attachRealtime(server)
+server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
