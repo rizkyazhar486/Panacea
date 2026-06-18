@@ -144,6 +144,12 @@ export interface Account {
   isSubscriber: boolean
   patientId?: string // for pasien/dokter linkage
   loggedAt: string
+  // Registration background (collected at sign-up)
+  age?: number
+  occupation?: string
+  background?: string // latar belakang singkat
+  str?: string // doctor's Surat Tanda Registrasi / practice certificate no.
+  isOwner?: boolean // true for the platform owner account (mode-switch enabled)
 }
 
 // -------- Social feed — "Panacea Hidup Sehat" (Strava + IG + RedNote) -------
@@ -316,6 +322,7 @@ export interface AppState {
   subscription: Subscription
   currentUserId: string // the logged-in contributor (demo "act as")
   account: Account | null // logged-in account (role-based)
+  adminEmails: string[] // emails allowed to sign in as Admin (managed by owner)
   posts: SocialPost[]
   follows: string[] // emails the current account follows
   foods: FoodEntry[]

@@ -26,6 +26,10 @@ import type {
 
 const STORAGE_KEY = 'panaceamed.state.v2'
 
+// The platform owner. Only this account may switch modes (owner/pasien/dokter)
+// and manage which emails are allowed to sign in as Admin.
+export const OWNER_EMAIL = 'rizkyazhar486@gmail.com'
+
 export const TOKEN_TO_IDR = 1000 // 1 PNC = Rp1.000 (simulasi)
 export const PLATFORM_FEE = 0.2 // 20% platform fee on author payout
 
@@ -170,6 +174,7 @@ function seed(): AppState {
     subscription: { plan: 'none' } as Subscription,
     currentUserId: 'c0',
     account: null,
+    adminEmails: [OWNER_EMAIL],
     posts: [
       post('Ibu Siti Rahayu', 'pasien', 'video', 'Jalan pagi', 'Rutin jalan 30 menit tiap pagi 🌅 langkah makin enteng!', '#00BF63', 12, {
         postType: 'aktivitas', distanceKm: 2.4, durationMin: 30, steps: 3200, calories: 145, comments: 4,
@@ -326,6 +331,9 @@ interface Store {
   // auth
   login: (account: Account) => void
   logout: () => void
+  setMode: (role: Role) => void // owner-only: switch acting role
+  addAdminEmail: (email: string) => void
+  removeAdminEmail: (email: string) => void
   // social + nutrition + consult + email + withdraw
   addPost: (p: SocialPost) => void
   toggleLike: (id: string) => void
@@ -503,6 +511,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             account.role === 'pasien' && account.patientId ? account.patientId : st.activePatientId,
         })),
       logout: () => setState((st) => ({ ...st, account: null })),
+      setMode: (role) =>
+        setState((st) => {
+          if (!st.account?.isOwner) return st // only the owner can switch modes
+          return {
+            ...st,
+            account: { ...st.account, role },
+            activePatientId: role === 'pasien' ? st.patients[0]?.id ?? st.activePatientId : st.activePatientId,
+          }
+        }),
+      addAdminEmail: (email) =>
+        setState((st) => {
+          const e = email.trim().toLowerCase()
+          if (!e || st.adminEmails.includes(e)) return st
+          return { ...st, adminEmails: [...st.adminEmails, e] }
+        }),
+      removeAdminEmail: (email) =>
+        setState((st) => ({
+          ...st,
+          adminEmails: st.adminEmails.filter((e) => e !== email || e === OWNER_EMAIL),
+        })),
       addPost: (p) => setState((st) => ({ ...st, posts: [p, ...st.posts] })),
       toggleLike: (id) =>
         setState((st) => ({

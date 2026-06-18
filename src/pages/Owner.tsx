@@ -1,11 +1,13 @@
-import type { ReactNode } from 'react'
-import { useStore, PLATFORM_FEE, TOKEN_TO_IDR } from '../lib/store'
-import { Card, SectionTitle, Badge } from '../components/ui'
-import { IconChartUp, IconToken, IconUsers, IconStore } from '../components/icons'
+import { useState, type ReactNode } from 'react'
+import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
+import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
+import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus } from '../components/icons'
 
 export function Owner() {
-  const { state } = useStore()
+  const { state, account, addAdminEmail, removeAdminEmail } = useStore()
   const tx = state.wallet.transactions
+  const [newAdmin, setNewAdmin] = useState('')
+  const isOwner = account?.isOwner
 
   // Revenue streams (in PNC), reconstructed from ledger + catalogue.
   const subsRevenue = tx.filter((t) => t.type === 'subscription').reduce((a, t) => a + Math.abs(t.amount), 0)
@@ -53,6 +55,42 @@ export function Owner() {
           <Bar label="Konsultasi dokter" value={consultRevenue} total={grossIdr} color="#f59e0b" />
         </div>
       </Card>
+
+      {isOwner && (
+        <Card>
+          <SectionTitle
+            icon={<IconShield size={20} />}
+            title="Kelola Akses Admin"
+            subtitle="Hanya email yang Anda izinkan di sini yang dapat masuk sebagai Admin."
+          />
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              value={newAdmin}
+              onChange={(e) => setNewAdmin(e.target.value)}
+              placeholder="email-admin@contoh.com"
+              type="email"
+            />
+            <Button onClick={() => { addAdminEmail(newAdmin); setNewAdmin('') }}>
+              <IconPlus size={16} /> Tambah
+            </Button>
+          </div>
+          <div className="mt-3 space-y-2">
+            {state.adminEmails.map((e) => (
+              <div key={e} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-sm">
+                <span className="font-medium">{e}</span>
+                {e === OWNER_EMAIL ? (
+                  <Badge tone="brand">Owner</Badge>
+                ) : (
+                  <button onClick={() => removeAdminEmail(e)} className="text-xs font-semibold text-accent hover:underline">
+                    Hapus
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div className="flex items-center gap-2 text-sm text-neutral-500">

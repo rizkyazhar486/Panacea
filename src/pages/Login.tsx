@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useStore, uid } from '../lib/store'
+import { useStore, uid, OWNER_EMAIL } from '../lib/store'
 import { Wordmark } from '../components/Logo'
 import { Button, inputClass } from '../components/ui'
 import { IconUser } from '../components/icons'
@@ -25,10 +25,14 @@ const DEFAULT_NAME: Record<Role, string> = {
 }
 
 export function Login({ onBack }: { onBack?: () => void }) {
-  const { login, sendEmail } = useStore()
+  const { login, sendEmail, state } = useStore()
   const [role, setRole] = useState<Role>('pasien')
   const [email, setEmail] = useState('rizkyazhar486@gmail.com')
   const [name, setName] = useState(DEFAULT_NAME['pasien'])
+  const [age, setAge] = useState('')
+  const [occupation, setOccupation] = useState('')
+  const [background, setBackground] = useState('')
+  const [str, setStr] = useState('')
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState('')
   const roleRef = useRef<Role>('pasien')
@@ -72,13 +76,30 @@ export function Login({ onBack }: { onBack?: () => void }) {
   }
 
   function doLogin() {
+    const cleanEmail = (email.trim() || 'user@gmail.com').toLowerCase()
+    const isOwner = cleanEmail === OWNER_EMAIL
+    // Admin is restricted to owner-approved emails only.
+    if (role === 'admin' && !isOwner && !state.adminEmails.includes(cleanEmail)) {
+      setError('Email ini belum diizinkan sebagai Admin. Hubungi Owner untuk menambahkan email Anda.')
+      return
+    }
+    // Doctors must provide an STR / practice-licence number.
+    if (role === 'dokter' && !str.trim()) {
+      setError('Nomor STR / sertifikat praktik wajib diisi untuk mendaftar sebagai Dokter.')
+      return
+    }
     const account: Account = {
-      email: email.trim() || 'user@gmail.com',
+      email: cleanEmail,
       name: name.trim() || DEFAULT_NAME[role],
       role,
       isSubscriber: role === 'owner',
       patientId: role === 'pasien' || role === 'dokter' ? 'p1' : undefined,
       loggedAt: new Date().toISOString(),
+      age: age.trim() ? Number(age) : undefined,
+      occupation: occupation.trim() || undefined,
+      background: background.trim() || undefined,
+      str: role === 'dokter' ? str.trim() : undefined,
+      isOwner,
     }
     // Backend present → create a real server session (dev-login) for the wallet/API.
     if (backendEnabled) {
@@ -151,6 +172,29 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Nama</label>
               <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Umur</label>
+                <input className={inputClass} value={age} onChange={(e) => setAge(e.target.value)} type="number" placeholder="mis. 34" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Pekerjaan</label>
+                <input className={inputClass} value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="mis. Karyawan" />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Latar belakang (singkat)</label>
+              <input className={inputClass} value={background} onChange={(e) => setBackground(e.target.value)} placeholder="mis. Riwayat hipertensi keluarga, ingin hidup lebih sehat" />
+            </div>
+            {role === 'dokter' && (
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  No. STR / Sertifikat Praktik <span className="text-accent">*</span>
+                </label>
+                <input className={inputClass} value={str} onChange={(e) => setStr(e.target.value)} placeholder="Wajib — nasional atau internasional" />
+                <p className="mt-1 text-[11px] text-neutral-400">AI-EMR hanya untuk klinisi bersertifikat. STR diverifikasi sebelum akses penuh.</p>
+              </div>
+            )}
           </div>
 
           <div className="mt-4">

@@ -80,7 +80,7 @@ const riskLabel: Record<string, string> = {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  const { state, activePatient, setActivePatient, logout } = useStore()
+  const { state, activePatient, setActivePatient, logout, setMode } = useStore()
   const loc = useLocation()
   const account = state.account
 
@@ -150,6 +150,20 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
+            {account.isOwner && (
+              <label className="flex items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — pindah mode akses">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">Mode</span>
+                <select
+                  value={account.role}
+                  onChange={(e) => setMode(e.target.value as Role)}
+                  className="cursor-pointer bg-transparent text-sm font-bold text-brand-dark outline-none"
+                >
+                  {ALL.map((r) => (
+                    <option key={r} value={r}>{roleLabel[r]}</option>
+                  ))}
+                </select>
+              </label>
+            )}
             <NavLink
               to="/billing"
               className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
