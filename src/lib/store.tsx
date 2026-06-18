@@ -171,9 +171,21 @@ function seed(): AppState {
     currentUserId: 'c0',
     account: null,
     posts: [
-      post('Ibu Siti Rahayu', 'pasien', 'video', 'Jalan pagi', 'Rutin jalan 30 menit tiap pagi 🌅', '#00BF63', 12),
-      post('Sdr. Andi Pratama', 'pasien', 'image', 'Makan sehat', 'Salmon + brokoli, tinggi protein 🥗', '#0B7A4B', 8),
-      post('dr. Bagus Santoso, Sp.A', 'dokter', 'image', 'Edukasi', 'Tips tidur cukup untuk imunitas anak 💤', '#3b82f6', 21),
+      post('Ibu Siti Rahayu', 'pasien', 'video', 'Jalan pagi', 'Rutin jalan 30 menit tiap pagi 🌅 langkah makin enteng!', '#00BF63', 12, {
+        postType: 'aktivitas', distanceKm: 2.4, durationMin: 30, steps: 3200, calories: 145, comments: 4,
+      }),
+      post('Sdr. Andi Pratama', 'pasien', 'image', 'Makan sehat', 'Salmon + brokoli, tinggi protein 🥗 plus 8 gelas air hari ini.', '#0B7A4B', 8, {
+        postType: 'kebiasaan', waterMl: 2000, veggieServ: 3, sugaryDrinks: 0, comments: 2,
+      }),
+      post('Rizky Azhar', 'owner', 'image', 'Lari sore', 'Tutup hari dengan 5K santai. Konsistensi > kecepatan 🏃', '#00BF63', 31, {
+        postType: 'aktivitas', distanceKm: 5.0, durationMin: 32, steps: 6400, calories: 310, comments: 7,
+      }),
+      post('dr. Bagus Santoso, Sp.A', 'dokter', 'image', 'Longevity', 'Mengapa tidur 7–8 jam memperpanjang healthspan', '#3b82f6', 21, {
+        postType: 'artikel', articleTitle: 'Tidur cukup & umur panjang: bukti dari studi kohort', articleSource: 'Panaceamed Longevity', comments: 5,
+      }),
+      post('dr. Rina Kusuma, Sp.PD-KGEH', 'dokter', 'image', 'Longevity', 'Serat & mikrobioma usus: kunci metabolik', '#8b5cf6', 18, {
+        postType: 'artikel', articleTitle: '30 gram serat/hari menurunkan risiko kardiometabolik', articleSource: 'Panaceamed Longevity', comments: 3,
+      }),
     ],
     follows: [],
     foods: [],
@@ -191,6 +203,7 @@ function post(
   caption: string,
   mediaColor: string,
   likes: number,
+  extra: Partial<SocialPost> = {},
 ): SocialPost {
   return {
     id: uid(),
@@ -198,12 +211,14 @@ function post(
     authorName,
     role,
     kind,
+    postType: 'aktivitas',
     activity,
     caption,
     mediaColor,
     durationSec: kind === 'video' ? 15 : undefined,
     likes,
     at: new Date(Date.now() - Math.random() * 86400000 * 3).toISOString(),
+    ...extra,
   }
 }
 

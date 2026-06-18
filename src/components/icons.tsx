@@ -187,6 +187,50 @@ export const IconScissors = ({ size = 18, className = '' }: P) => (
     <path d="M20 4 8.1 15.9M14.5 12.5 20 20M8.1 8.1 12 12" />
   </svg>
 )
+export const IconRun = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="14" cy="4" r="2" />
+    <path d="M11 7l-3 3 3 2 1 5M12 12l4 1 2 4M9 21l1.5-4M8 10l-3 1-1 3" />
+  </svg>
+)
+export const IconDrop = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" />
+  </svg>
+)
+export const IconFlame = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M12 3c1 3-2 4-2 7a2 2 0 0 0 4 0c2 1.5 3 3.5 3 5.5a5 5 0 0 1-10 0C7 16 12 13 12 3Z" />
+  </svg>
+)
+export const IconLeaf = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M4 20C3 11 9 4 20 4c0 11-7 17-16 16Z" />
+    <path d="M9 15c2-3 5-5 8-6" />
+  </svg>
+)
+export const IconArticle = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="4" y="3" width="16" height="18" rx="2" />
+    <path d="M8 8h8M8 12h8M8 16h5" />
+  </svg>
+)
+export const IconComment = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.5A8 8 0 1 1 21 12Z" />
+  </svg>
+)
+export const IconPill = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)" />
+    <path d="M8.5 8.5l7 7" />
+  </svg>
+)
+export const IconMoon = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <path d="M21 12.8A8 8 0 1 1 11.2 3 6.2 6.2 0 0 0 21 12.8Z" />
+  </svg>
+)
 export const IconArchitecture = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}>
     <rect x="9" y="3" width="6" height="5" rx="1" />

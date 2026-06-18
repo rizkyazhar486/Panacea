@@ -15,10 +15,11 @@ import { Billing } from './pages/Billing'
 import { Architecture } from './pages/Architecture'
 import { Settings } from './pages/Settings'
 import { Owner } from './pages/Owner'
-import { Social } from './pages/Social'
+import { Dashboard } from './pages/Dashboard'
 import { Nutrition } from './pages/Nutrition'
 import { Consult } from './pages/Consult'
 import { Hospitals } from './pages/Hospitals'
+import { Pharmacy } from './pages/Pharmacy'
 import { Editor } from './pages/Editor'
 import { PatientEducation } from './pages/PatientEducation'
 import { Admin } from './pages/Admin'
@@ -39,10 +40,12 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/billing" element={<Billing />} />
             <Route path="/architecture" element={<Architecture />} />
             <Route path="/owner" element={<Owner />} />
-            <Route path="/social" element={<Social />} />
+            <Route path="/clinical" element={<Dashboard />} />
+            <Route path="/social" element={<Home />} />
             <Route path="/nutrition" element={<Nutrition />} />
             <Route path="/consult" element={<Consult />} />
             <Route path="/hospitals" element={<Hospitals />} />
+            <Route path="/pharmacy" element={<Pharmacy />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/education" element={<PatientEducation />} />
             <Route path="/admin" element={<Admin />} />

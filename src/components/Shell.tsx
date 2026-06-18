@@ -13,12 +13,12 @@ import {
   IconToken,
   IconBook,
   IconArchitecture,
-  IconUsers,
   IconFood,
   IconStethoscope,
-  IconHospital,
   IconChartUp,
   IconLogout,
+  IconHeart,
+  IconPill,
 } from './icons'
 import { useStore } from '../lib/store'
 import { ageFromDob } from '../lib/anthro'
@@ -40,15 +40,15 @@ type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[
 const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 
 const nav: Nav[] = [
-  { to: '/', label: 'Dashboard', icon: IconDashboard, roles: ['pasien', 'dokter'], end: true },
+  { to: '/', label: 'Dashboard', icon: IconDashboard, roles: ['pasien', 'dokter', 'owner'], end: true },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'] },
+  { to: '/clinical', label: 'Data Klinis Pasien', icon: IconHeart, roles: ['dokter'] },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'] },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'] },
   { to: '/education', label: 'Edukasi Saya', icon: IconBook, roles: ['pasien'] },
   { to: '/nutrition', label: 'Nutrisi & Kalori', icon: IconFood, roles: ['pasien'] },
   { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'] },
-  { to: '/hospitals', label: 'Cari Rumah Sakit', icon: IconHospital, roles: ['pasien', 'dokter'] },
-  { to: '/social', label: 'Sosial', icon: IconUsers, roles: ALL },
+  { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'] },
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'] },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'] },
   { to: '/my-materials', label: 'Materi Saya', icon: IconBook, roles: ['kontributor'] },
@@ -62,7 +62,7 @@ const nav: Nav[] = [
 
 // Pages that show the active-patient context. Patients see only their own data
 // (no selector); doctors manage patients via the selector.
-const PATIENT_PAGES = ['/', '/chatbot', '/emr', '/planning']
+const PATIENT_PAGES = ['/clinical', '/chatbot', '/emr', '/planning']
 
 const roleLabel: Record<Role, string> = {
   pasien: 'Pelanggan/Pasien',

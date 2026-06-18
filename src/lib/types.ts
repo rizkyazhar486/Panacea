@@ -146,18 +146,39 @@ export interface Account {
   loggedAt: string
 }
 
-// -------- Social feed (TikTok-style health progress) -----------------------
+// -------- Social feed — "Panacea Hidup Sehat" (Strava + IG + RedNote) -------
+// A social network for healthy living. A post is one of three kinds:
+//  • aktivitas  — physical activity with Strava-style metrics
+//  • kebiasaan  — daily healthy-habit log (water, vegetables, sleep, dll.)
+//  • artikel    — a longevity / healthy-lifestyle article snippet
+export type PostType = 'aktivitas' | 'kebiasaan' | 'artikel'
+
 export interface SocialPost {
   id: string
   authorEmail: string
   authorName: string
   role: Role
   kind: 'image' | 'video'
+  postType?: PostType // defaults to 'aktivitas' for legacy posts
   activity: string // lari, berenang, padel, makan sehat ...
   caption: string
   mediaColor: string
   durationSec?: number // for video (<=15)
+  // Strava-style activity metrics (optional)
+  distanceKm?: number
+  durationMin?: number
+  steps?: number
+  calories?: number
+  // Healthy-habit metrics (optional)
+  waterMl?: number
+  veggieServ?: number
+  sleepHr?: number
+  sugaryDrinks?: number
+  // Longevity article snippet (optional)
+  articleTitle?: string
+  articleSource?: string
   likes: number
+  comments?: number
   likedByMe?: boolean
   at: string
 }
