@@ -134,12 +134,20 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
+        {(account.role === 'pasien' || account.role === 'dokter') && (
+          <NavLink
+            to="/hospitals"
+            className="mt-3 flex items-center justify-center gap-2 rounded-full bg-accent/10 px-3 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
+          >
+            <IconHospital size={18} /> Darurat (SOS)
+          </NavLink>
+        )}
         <button
           onClick={() => {
             if (backendEnabled) api.logout().catch(() => {})
             logout()
           }}
-          className="mt-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
+          className="mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
         >
           <IconLogout size={18} /> Keluar
         </button>

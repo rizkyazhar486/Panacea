@@ -137,7 +137,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           ) : (
             <button
               onClick={doLogin}
-              className="mt-5 flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50"
+              className="mt-5 flex w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50 active:scale-[0.99]"
             >
               <GoogleG /> Masuk dengan Google
             </button>
