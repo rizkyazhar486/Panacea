@@ -264,6 +264,30 @@ export function saveSettings(userId: string, prefs: Record<string, any>) {
   save()
 }
 
+// Doctors awaiting / holding STR verification — joins the user record with the
+// STR number & status kept in their settings blob.
+export interface DoctorRow {
+  id: string
+  email: string
+  name: string
+  str: string | null
+  strStatus: 'pending' | 'verified'
+  createdAt: string
+}
+export function listDoctors(): DoctorRow[] {
+  const s = db.settings || {}
+  return db.users
+    .filter((u) => u.role === 'dokter')
+    .map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      str: (s[u.id]?.str as string) ?? null,
+      strStatus: (s[u.id]?.strStatus as 'pending' | 'verified') ?? 'pending',
+      createdAt: u.createdAt,
+    }))
+}
+
 export function createOrder(o: Order) {
   db.orders.unshift(o)
   save()

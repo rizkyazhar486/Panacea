@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck } from '../components/icons'
-import { api, backendEnabled, type AuditEntry } from '../lib/api'
+import { api, backendEnabled, type AuditEntry, type DoctorRow } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -124,6 +124,8 @@ function CompliancePanel() {
 
   return (
     <>
+      <DoctorVerifyPanel />
+
       <Card>
         <SectionTitle
           icon={<IconShield size={20} />}
@@ -165,6 +167,83 @@ function CompliancePanel() {
         )}
       </Card>
     </>
+  )
+}
+
+// Owner-only: review & verify doctor STR/SIP before AI-EMR access.
+function DoctorVerifyPanel() {
+  const [docs, setDocs] = useState<DoctorRow[] | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [err, setErr] = useState('')
+
+  function load() {
+    if (!backendEnabled) return
+    api.doctors().then(setDocs).catch(() => setErr('Gagal memuat daftar dokter (butuh server aktif).'))
+  }
+  useEffect(load, [])
+
+  async function setStatus(id: string, status: 'verified' | 'pending') {
+    setBusy(id)
+    try {
+      await api.verifyDoctor(id, status)
+      setDocs((prev) => prev?.map((d) => (d.id === id ? { ...d, strStatus: status } : d)) ?? null)
+    } catch {
+      setErr('Gagal memperbarui status.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const pending = docs?.filter((d) => d.strStatus !== 'verified') ?? []
+  const verified = docs?.filter((d) => d.strStatus === 'verified') ?? []
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconShield size={20} />}
+        title="Verifikasi STR Dokter"
+        subtitle="Tinjau STR/SIP sebelum membuka akses AI-EMR (UU Kesehatan)"
+        right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge> : undefined}
+      />
+      {err && <p className="text-sm text-accent">{err}</p>}
+      {!backendEnabled && <p className="text-sm text-neutral-400">Memerlukan server aktif.</p>}
+      {docs && docs.length === 0 && <p className="text-sm text-neutral-400">Belum ada dokter terdaftar.</p>}
+
+      {pending.length > 0 && (
+        <div className="space-y-2">
+          {pending.map((d) => (
+            <div key={d.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-bold">{d.name}</div>
+                <div className="text-[11px] text-neutral-500">{d.email} · STR: <b>{d.str || '—'}</b></div>
+              </div>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-amber-700">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Menunggu
+              </span>
+              <Button onClick={() => setStatus(d.id, 'verified')} disabled={busy === d.id}>
+                <IconCheck size={15} /> {busy === d.id ? '…' : 'Verifikasi'}
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {verified.length > 0 && (
+        <div className="mt-3 space-y-1.5">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Terverifikasi</div>
+          {verified.map((d) => (
+            <div key={d.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
+              <IconCheck size={15} className="shrink-0 text-brand" />
+              <span className="truncate font-semibold">{d.name}</span>
+              <span className="truncate text-[11px] text-neutral-400">STR {d.str || '—'}</span>
+              <button onClick={() => setStatus(d.id, 'pending')} className="ml-auto shrink-0 text-[11px] font-semibold text-neutral-400 hover:text-accent">
+                Cabut
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   )
 }
 

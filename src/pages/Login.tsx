@@ -69,6 +69,11 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   function finish(account: Account) {
     login(account)
+    // Register the doctor's STR number on the server so the Owner can verify it.
+    // We never write strStatus here (would overwrite an existing 'verified').
+    if (backendEnabled && account.role === 'dokter' && account.str) {
+      api.saveSettings({ str: account.str }).catch(() => {})
+    }
     sendEmail({
       id: uid(),
       to: account.email,

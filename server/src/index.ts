@@ -19,6 +19,7 @@ import {
   addPatient,
   getSettings,
   saveSettings,
+  listDoctors,
   addAudit,
   getAudit,
   initStore,
@@ -169,11 +170,32 @@ app.put('/api/settings', requireAuth, (req, res) => {
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 
+// Owner gate — by configured owner email OR an explicit owner role.
+function isOwner(u: User): boolean {
+  return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
+}
+
 // --- audit log (Permenkes 24/2022) — owner-only access ---
 app.get('/api/audit', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  if (u.role !== 'owner') return res.status(403).json({ error: 'forbidden' })
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   res.json({ entries: getAudit(300) })
+})
+
+// --- doctor STR verification (owner-only) ---
+app.get('/api/doctors', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ doctors: listDoctors() })
+})
+app.post('/api/doctors/:id/verify', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const id = req.params.id
+  const status = (req.body as { status?: string }).status === 'pending' ? 'pending' : 'verified'
+  saveSettings(id, { strStatus: status })
+  addAudit(u, 'str.verify', id)
+  res.json({ ok: true })
 })
 
 // --- SATUSEHAT interoperability (Kemenkes) — integration skeleton ---

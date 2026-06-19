@@ -7,6 +7,7 @@ export const config = {
     .map((s) => s.trim())
     .filter(Boolean),
   jwtSecret: process.env.JWT_SECRET || 'dev-insecure-secret',
+  ownerEmail: (process.env.OWNER_EMAIL || 'rizkyazhar486@gmail.com').toLowerCase(),
   cookieSecure: process.env.COOKIE_SECURE === 'true',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   midtrans: {

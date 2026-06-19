@@ -79,6 +79,9 @@ export const api = {
     }),
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
+  doctors: () => req<{ doctors: DoctorRow[] }>('/api/doctors').then((r) => r.doctors),
+  verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
+    req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),
   satusehatStatus: () => req<{ configured: boolean; env: string; note: string }>('/api/satusehat/status'),
   // server-side Claude proxy — AI works without the user supplying a key
   aiMessages: (payload: {
@@ -115,6 +118,15 @@ export interface ClinicalData {
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
   education: Record<string, EducationSheet>
+}
+
+export interface DoctorRow {
+  id: string
+  email: string
+  name: string
+  str: string | null
+  strStatus: 'pending' | 'verified'
+  createdAt: string
 }
 
 export interface AuditEntry {

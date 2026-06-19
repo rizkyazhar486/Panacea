@@ -87,7 +87,7 @@ const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
   { key: 'riwayatSosialEkonomi', label: 'Riwayat Sosial-Ekonomi & Lingkungan' },
 ]
 
-function StrGate({ onVerify, str }: { onVerify: () => void; str?: string }) {
+function StrGate({ str }: { str?: string }) {
   return (
     <div className="mx-auto max-w-lg">
       <Card className="text-center">
@@ -101,11 +101,8 @@ function StrGate({ onVerify, str }: { onVerify: () => void; str?: string }) {
           <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Status: Menunggu verifikasi
         </div>
         <div className="mt-5 rounded-xl bg-neutral-50 p-3 text-left text-[12px] text-neutral-500">
-          Verifikasi dilakukan oleh tim Panaceamed terhadap data KKI/STR. Setelah disetujui, AI-EMR terbuka otomatis.
+          Verifikasi dilakukan oleh tim Panaceamed (Owner/Admin) terhadap data KKI/STR. Setelah disetujui, AI-EMR terbuka otomatis saat Anda membuka kembali halaman ini.
         </div>
-        <Button variant="outline" className="mt-4" onClick={onVerify}>
-          <IconCheck size={16} /> Verifikasi STR (Admin/Owner)
-        </Button>
       </Card>
     </div>
   )
@@ -117,7 +114,7 @@ export function EMR() {
   const acc = state.account
   // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
   if (acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner) {
-    return <StrGate onVerify={store.verifyStr} str={acc.str} />
+    return <StrGate str={acc.str} />
   }
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
