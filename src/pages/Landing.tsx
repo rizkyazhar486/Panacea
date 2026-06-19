@@ -111,12 +111,10 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f, i) => (
+          {FEATURES.map((f) => (
             <div
               key={f.title}
-              className={`group rounded-2xl border border-black/5 bg-white p-5 shadow-[0_4px_12px_rgba(12,20,16,0.05)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md ${
-                ''
-              }`}
+              className="group rounded-2xl border border-black/5 bg-white p-5 shadow-[0_4px_12px_rgba(12,20,16,0.05)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md"
             >
               <div className="flex items-start justify-between">
                 <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-dark">

@@ -129,6 +129,16 @@ body {
   animation: rise 0.25s ease-out both;
 }
 
+/* Reduced-motion preference — kill transitions & animations app-wide. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 /* Print / PDF export — show only the document content. */
 @media print {
   aside,
