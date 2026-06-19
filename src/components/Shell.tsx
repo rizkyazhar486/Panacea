@@ -99,8 +99,14 @@ export function Shell({ children }: { children: ReactNode }) {
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-black/5 bg-white px-4 py-6 lg:flex">
+    <div className="relative flex min-h-screen">
+      {/* Ambient animated backdrop — sits behind every page */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/10 blur-3xl" />
+        <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" style={{ animationDelay: '-8s' }} />
+        <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" style={{ animationDelay: '-14s' }} />
+      </div>
+      <aside className="sticky top-0 z-10 hidden h-screen w-64 shrink-0 flex-col border-r border-black/5 bg-white/80 px-4 py-6 backdrop-blur-xl lg:flex">
         <div className="mb-6 flex items-center gap-2.5 px-2">
           <LogoMark size={38} />
           <div className="leading-tight">
@@ -157,8 +163,8 @@ export function Shell({ children }: { children: ReactNode }) {
         </button>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-white/90 px-5 py-3 backdrop-blur">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-white/80 px-5 py-3 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <span className="lg:hidden"><LogoMark size={30} /></span>
             <h1 className="text-lg font-bold">{title?.label ?? 'Panaceamed.id'}</h1>
@@ -248,7 +254,11 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+          <div key={loc.pathname} className="page-enter">
+            {children}
+          </div>
+        </main>
       </div>
 
       <ContactService />

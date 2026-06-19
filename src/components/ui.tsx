@@ -4,14 +4,18 @@ export function Card({
   children,
   className = '',
   pad = true,
+  hover = false,
 }: {
   children: ReactNode
   className?: string
   pad?: boolean
+  hover?: boolean
 }) {
   return (
     <div
-      className={`rounded-2xl bg-white shadow-[0_4px_12px_rgba(12,20,16,0.05)] ring-1 ring-black/[0.04] ${pad ? 'p-5' : ''} ${className}`}
+      className={`rounded-2xl border border-white/50 bg-white/80 shadow-[0_8px_30px_rgba(12,20,16,0.05)] ring-1 ring-black/[0.03] backdrop-blur-xl ${
+        hover ? 'transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,191,99,0.14)]' : ''
+      } ${pad ? 'p-5' : ''} ${className}`}
     >
       {children}
     </div>

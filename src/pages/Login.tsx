@@ -107,17 +107,31 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Brand panel */}
-      <div className="hidden flex-col justify-between bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-10 text-white lg:flex">
-        <Wordmark size={40} onDark />
-        <div>
-          <h1 className="text-4xl font-extrabold leading-tight">Longevity Medical-AI Co-Physician</h1>
+      {/* Brand panel — animated */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-10 text-white lg:flex">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="orb absolute -left-16 top-10 h-72 w-72 rounded-full bg-white/15 blur-3xl" />
+          <div className="orb absolute bottom-0 right-0 h-80 w-80 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
+          <div className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:40px_40px]" />
+        </div>
+        <div className="relative">
+          <Wordmark size={40} onDark />
+        </div>
+        <div className="relative">
+          <h1 className="text-4xl font-extrabold leading-tight">
+            Longevity Medical-AI <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
+          </h1>
           <p className="mt-3 max-w-md text-white/85">
             AI melakukan anamnesis & edukasi; dokter memverifikasi. Catatan kedokteran ter-tokenisasi,
             pemantauan kontinu untuk healthspan.
           </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {['AI-EMR Bersertifikat', 'Longevity AI', 'Faskes Darurat', 'Apotek Digital'].map((t) => (
+              <span key={t} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
+            ))}
+          </div>
         </div>
-        <p className="text-xs text-white/70">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+        <p className="relative text-xs text-white/70">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
       </div>
 
       {/* Form panel */}
