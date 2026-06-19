@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useStore, uid, OWNER_EMAIL } from '../lib/store'
 import { Wordmark } from '../components/Logo'
 import { Button, inputClass } from '../components/ui'
-import { IconUser } from '../components/icons'
+import { IconUser, IconSun, IconMoon } from '../components/icons'
 import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api'
+import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import type { Account, Role } from '../lib/types'
 
 const ROLES: { id: Role; title: string; desc: string }[] = [
@@ -27,6 +28,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [str, setStr] = useState('')
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState('')
+  const [theme, setTheme] = useState<Theme>(getTheme)
   const roleRef = useRef<Role>('pasien')
   const gbtn = useRef<HTMLDivElement>(null)
 
@@ -119,7 +121,15 @@ export function Login({ onBack }: { onBack?: () => void }) {
       </div>
 
       {/* Form panel */}
-      <div className="flex items-center justify-center p-6">
+      <div className="relative flex items-center justify-center p-6">
+        <button
+          onClick={() => setTheme(toggleTheme())}
+          className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 shadow-sm transition hover:text-brand-dark"
+          title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+          aria-label="Ganti tema"
+        >
+          {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+        </button>
         <div className="w-full max-w-md">
           <div className="mb-6 lg:hidden">
             <Wordmark size={34} />

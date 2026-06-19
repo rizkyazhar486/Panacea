@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Wordmark } from '../components/Logo'
 import {
   IconChat,
@@ -8,7 +9,10 @@ import {
   IconSparkle,
   IconUsers,
   IconCheck,
+  IconSun,
+  IconMoon,
 } from '../components/icons'
+import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 
 const FEATURES = [
   { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
@@ -37,17 +41,28 @@ const WHATS_NEW = [
 ]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
+  const [theme, setTheme] = useState<Theme>(getTheme)
   return (
     <div className="min-h-screen bg-white">
       {/* Top bar — logo kiri atas */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-black/5 bg-white/90 px-5 py-3 backdrop-blur sm:px-8">
         <Wordmark size={36} />
-        <button
-          onClick={onMasuk}
-          className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-6 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-95"
-        >
-          Masuk
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setTheme(toggleTheme())}
+            className="grid h-10 w-10 place-items-center rounded-full border border-black/5 text-neutral-500 transition hover:text-brand-dark"
+            title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+            aria-label="Ganti tema"
+          >
+            {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+          </button>
+          <button
+            onClick={onMasuk}
+            className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-6 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-95"
+          >
+            Masuk
+          </button>
+        </div>
       </header>
 
       {/* Hero — light bento */}
