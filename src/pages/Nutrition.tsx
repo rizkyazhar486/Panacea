@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
@@ -308,11 +308,19 @@ function Stepper({ label, value, min, max, step = 1, unit, onChange }: {
 }
 
 function PillarBar({ label, v }: { label: string; v: number }) {
+  const [shown, setShown] = useState(document.documentElement.classList.contains('reduce-motion'))
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setShown(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
   return (
     <div>
       <div className="mb-0.5 flex justify-between text-xs"><span>{label}</span><span className="font-bold">{v}</span></div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/25">
-        <div className="h-full rounded-full bg-white" style={{ width: `${v}%` }} />
+        <div
+          className="h-full rounded-full bg-white"
+          style={{ width: `${shown ? v : 0}%`, transition: 'width 0.9s cubic-bezier(0.2,0.7,0.2,1)' }}
+        />
       </div>
     </div>
   )
@@ -321,11 +329,21 @@ function PillarBar({ label, v }: { label: string; v: number }) {
 function Gauge({ value }: { value: number }) {
   const r = 30
   const c = 2 * Math.PI * r
+  // Sweep the arc from 0 → value once mounted (skipped under reduced-motion).
+  const [shown, setShown] = useState(document.documentElement.classList.contains('reduce-motion'))
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setShown(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+  const off = c * (1 - (shown ? value : 0) / 100)
   return (
-    <svg width="76" height="76" viewBox="0 0 76 76">
-      <circle cx="38" cy="38" r={r} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="8" />
-      <circle cx="38" cy="38" r={r} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} transform="rotate(-90 38 38)" />
+    <svg width="84" height="84" viewBox="0 0 76 76" className="drop-shadow">
+      <circle cx="38" cy="38" r={r} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="8" />
+      <circle
+        cx="38" cy="38" r={r} fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round"
+        strokeDasharray={c} strokeDashoffset={off} transform="rotate(-90 38 38)"
+        style={{ transition: 'stroke-dashoffset 1.1s cubic-bezier(0.2,0.7,0.2,1)' }}
+      />
       <text x="38" y="43" textAnchor="middle" fontSize="18" fontWeight="800" fill="#fff">{value}</text>
     </svg>
   )
