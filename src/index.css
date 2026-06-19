@@ -161,12 +161,14 @@ body {
   100% { background-position: 200% 0; }
 }
 
-/* Per-route entrance — replays on navigation via a keyed wrapper */
+/* Per-route entrance — replays on navigation via a keyed wrapper.
+   Opacity-only: a transform here would become the containing block for any
+   position:fixed descendants (FAB, modals), so we deliberately avoid it. */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(10px) scale(0.995); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.page-enter { animation: page-enter 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.page-enter { animation: page-enter 0.35s ease both; }
 .reduce-motion .page-enter { animation: none !important; }
 
 /* Scroll-reveal — toggled by the Reveal component via IntersectionObserver */

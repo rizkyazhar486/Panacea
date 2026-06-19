@@ -146,15 +146,35 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
   })
   return (
     <div className="mx-auto max-w-xl space-y-5">
+      <div className="rise text-center">
+        <h2 className="text-2xl font-extrabold tracking-tight">
+          Panacea{' '}
+          <span className="animate-gradient-text bg-gradient-to-r from-brand via-emerald-500 to-brand-dark bg-clip-text text-transparent">Hidup Sehat</span>
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">Bagikan aktivitas, kebiasaan & artikel longevity Anda.</p>
+      </div>
       <div className="flex justify-center gap-2">
         {([['foryou', 'Untuk Anda'], ['following', 'Mengikuti']] as const).map(([f, l]) => (
-          <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-4 py-1.5 text-sm font-bold ${filter === f ? 'bg-brand text-white' : 'bg-white text-neutral-500 ring-1 ring-black/5'}`}>{l}</button>
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`rounded-full px-5 py-1.5 text-sm font-bold transition active:scale-95 ${
+              filter === f ? 'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white shadow-sm shadow-brand/30' : 'bg-white text-neutral-500 ring-1 ring-black/5 hover:ring-brand/30'
+            }`}
+          >
+            {l}
+          </button>
         ))}
       </div>
       {posts.map((p) => <PostCard key={p.id} post={p} me={me} store={store} onProfile={onProfile} />)}
       {posts.length === 0 && (
-        <Card className="text-center text-sm text-neutral-400">
-          Belum ada unggahan. Ketuk tombol <b className="text-brand-dark">+</b> di kiri bawah untuk membagikan video singkat atau foto.
+        <Card className="flex flex-col items-center gap-3 py-12 text-center">
+          <span className="orb grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-brand to-brand-dark text-white shadow-lg shadow-brand/30">
+            <IconPlus size={30} />
+          </span>
+          <p className="max-w-xs text-sm text-neutral-500">
+            Belum ada unggahan. Ketuk tombol <b className="text-brand-dark">+</b> di kiri bawah untuk membagikan video singkat atau foto.
+          </p>
         </Card>
       )}
     </div>
