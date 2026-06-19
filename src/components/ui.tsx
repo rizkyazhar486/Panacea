@@ -11,7 +11,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl bg-white shadow-sm ring-1 ring-black/5 ${pad ? 'p-5' : ''} ${className}`}
+      className={`rounded-2xl bg-white shadow-[0_4px_12px_rgba(12,20,16,0.05)] ring-1 ring-black/[0.04] ${pad ? 'p-5' : ''} ${className}`}
     >
       {children}
     </div>

@@ -1,4 +1,4 @@
-import { LogoMark, Wordmark } from '../components/Logo'
+import { Wordmark } from '../components/Logo'
 import {
   IconChat,
   IconStore,
@@ -44,32 +44,40 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <Wordmark size={36} />
         <button
           onClick={onMasuk}
-          className="rounded-xl bg-brand px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-dark"
+          className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-6 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-95"
         >
           Masuk
         </button>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] px-6 py-16 text-white sm:px-10 sm:py-24">
-        <div className="mx-auto max-w-4xl text-center">
-          <LogoMark size={84} dark className="mx-auto drop-shadow" />
-          <h1 className="mt-5 text-3xl font-extrabold leading-tight sm:text-5xl">
-            Longevity Medical-AI Co-Physician
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-white/90 sm:text-lg">
-            AI melakukan anamnesis & edukasi; dokter memverifikasi. Memperpanjang <b>healthspan</b> —
-            bukan sekadar usia — lewat penalaran klinis presisi, pencegahan dini, dan optimasi gaya hidup.
-          </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <button onClick={onMasuk} className="rounded-xl bg-white px-7 py-3 font-bold text-brand-dark shadow-lg transition hover:bg-neutral-100">
-              Mulai Sekarang
-            </button>
-            <a href="#about" className="rounded-xl border border-white/40 px-7 py-3 font-bold text-white transition hover:bg-white/10">
-              Pelajari Lebih Lanjut
-            </a>
+      {/* Hero — light bento */}
+      <section className="px-4 py-10 sm:px-8 sm:py-16">
+        <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-black/5 bg-gradient-to-br from-brand-50 via-white to-[#e1eae3] px-6 py-16 text-center shadow-[0_8px_30px_rgba(12,20,16,0.06)] sm:px-10 sm:py-20">
+          {/* grid texture */}
+          <div className="pointer-events-none absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(0,109,54,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(0,109,54,0.04)_1px,transparent_1px)] [background-size:40px_40px]" />
+          <div className="relative">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-1.5 backdrop-blur">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
+              <span className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Longevity Medical-AI · Siap Pakai</span>
+            </div>
+            <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-[56px] sm:leading-[60px]">
+              AI-Klinik Praktis untuk<br />
+              <span className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent">Akses Kesehatan</span>
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-neutral-600 sm:text-lg">
+              AI melakukan anamnesis & edukasi; dokter memverifikasi. Memperpanjang <b>healthspan</b> — bukan
+              sekadar usia — lewat penalaran klinis presisi, pencegahan dini, dan optimasi gaya hidup.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <button onClick={onMasuk} className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-8 py-3.5 font-bold text-white shadow-md transition hover:brightness-105 active:scale-[0.98]">
+                Mulai Sekarang
+              </button>
+              <a href="#about" className="rounded-full bg-brand-50 px-8 py-3.5 font-bold text-brand-dark transition hover:bg-brand-100">
+                Pelajari Lebih Lanjut
+              </a>
+            </div>
+            <p className="mt-4 text-xs text-neutral-400">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
           </div>
-          <p className="mt-4 text-xs text-white/70">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
         </div>
       </section>
 
@@ -87,13 +95,23 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-2xl border border-neutral-100 p-5 shadow-sm transition hover:shadow-md">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-dark">
-                <f.icon size={22} />
-              </span>
-              <h3 className="mt-3 font-bold">{f.title}</h3>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.title}
+              className={`group rounded-2xl border border-black/5 bg-white p-5 shadow-[0_4px_12px_rgba(12,20,16,0.05)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md ${
+                i === 0 ? 'sm:col-span-2 lg:col-span-2' : ''
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-dark">
+                  <f.icon size={22} />
+                </span>
+                <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-sm font-bold text-neutral-400 transition group-hover:bg-brand group-hover:text-white">
+                  →
+                </span>
+              </div>
+              <h3 className="mt-4 font-bold">{f.title}</h3>
               <p className="mt-1 text-sm text-neutral-500">{f.text}</p>
             </div>
           ))}
@@ -142,7 +160,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           ))}
         </ul>
         <div className="mt-8 text-center">
-          <button onClick={onMasuk} className="rounded-xl bg-brand px-8 py-3 font-bold text-white shadow-sm transition hover:bg-brand-dark">
+          <button onClick={onMasuk} className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-8 py-3.5 font-bold text-white shadow-md transition hover:brightness-105 active:scale-[0.98]">
             Masuk & Coba Sekarang
           </button>
         </div>
