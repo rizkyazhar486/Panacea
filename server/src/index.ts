@@ -17,6 +17,7 @@ import {
   addVital,
   addSupportive,
   addPatient,
+  initStore,
   type User,
   type Post,
 } from './store.js'
@@ -144,6 +145,7 @@ app.post('/api/clinical/patient', requireAuth, (req, res) => {
 
 const server = createServer(app)
 attachRealtime(server)
+await initStore()
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)

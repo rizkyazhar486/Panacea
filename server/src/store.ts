@@ -62,13 +62,9 @@ export interface Clinical {
   education: Record<string, any>
 }
 
+// No dummy/demo content — a clean clinical store.
 function seedPatients(): any[] {
-  return [
-    { id: 'p1', name: 'Bpk. Hartono Wijaya', sex: 'L', dob: '1952-04-12', mrn: 'PMD-000124', heightCm: 168, weightKg: 78, bloodType: 'O+', allergies: ['Penisilin'], chronicConditions: ['Hipertensi', 'Diabetes Melitus tipe 2'], riskFlags: ['chronic', 'elderly'], avatarColor: '#00BF63' },
-    { id: 'p2', name: 'Ibu Siti Rahayu', sex: 'P', dob: '1968-09-30', mrn: 'PMD-000219', heightCm: 156, weightKg: 49, bloodType: 'B+', allergies: [], chronicConditions: ['PPOK', 'Riwayat TB paru'], riskFlags: ['chronic', 'immunocompromised'], avatarColor: '#FF3131' },
-    { id: 'p3', name: 'Sdr. Andi Pratama', sex: 'L', dob: '1995-02-18', mrn: 'PMD-000388', heightCm: 174, weightKg: 92, bloodType: 'A+', allergies: [], chronicConditions: ['Obesitas', 'Dislipidemia'], riskFlags: ['chronic'], avatarColor: '#0B7A4B' },
-    { id: 'p4', name: 'An. Bilal Ramadhan', sex: 'L', dob: '2018-05-20', mrn: 'PMD-000451', heightCm: 96, weightKg: 12.4, bloodType: 'O+', allergies: ['Susu sapi'], chronicConditions: ['Gizi kurang', 'Asma'], riskFlags: ['chronic'], avatarColor: '#FF8A3D' },
-  ]
+  return []
 }
 
 interface DB {
@@ -89,7 +85,13 @@ let db: DB = {
   clinical: { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} },
 }
 
-function load() {
+// MongoDB persistence (optional). When MONGODB_URI is set the whole state is
+// stored as a single document and survives restarts/redeploys (permanent,
+// cross-device). Otherwise it falls back to the ephemeral data.json file.
+let mongoCol: any = null
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+
+function loadFile() {
   if (existsSync(DB_PATH)) {
     try {
       db = JSON.parse(readFileSync(DB_PATH, 'utf-8'))
@@ -98,14 +100,48 @@ function load() {
     }
   }
 }
+
 function save() {
+  // Local file (harmless; ephemeral on hosts like Render).
   try {
     writeFileSync(DB_PATH, JSON.stringify(db, null, 2))
   } catch {
     /* ignore in read-only envs */
   }
+  // Mongo (permanent), debounced to coalesce rapid writes.
+  if (mongoCol) {
+    if (saveTimer) clearTimeout(saveTimer)
+    saveTimer = setTimeout(() => {
+      mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true }).catch(() => {})
+    }, 400)
+  }
 }
-load()
+
+// Call once at boot before serving requests.
+export async function initStore() {
+  const uri = process.env.MONGODB_URI
+  if (!uri) {
+    loadFile()
+    console.log('[store] file mode (set MONGODB_URI for permanent storage)')
+    return
+  }
+  try {
+    // Indirect specifier keeps tsc happy even before `npm install` adds the dep.
+    const mongo: any = await import('mongodb' as string)
+    const client = new mongo.MongoClient(uri)
+    await client.connect()
+    const dbName = process.env.MONGODB_DB || 'panaceamed'
+    mongoCol = client.db(dbName).collection('app')
+    const doc = await mongoCol.findOne({ _id: 'state' })
+    if (doc?.data) db = doc.data as DB
+    else await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
+    console.log('[store] MongoDB connected — permanent mode')
+  } catch (e) {
+    mongoCol = null
+    loadFile()
+    console.error('[store] MongoDB failed, using file mode:', (e as Error).message)
+  }
+}
 
 export function uid(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
