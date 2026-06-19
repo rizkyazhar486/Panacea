@@ -35,6 +35,13 @@ const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal
 applyAppearance()
 applyLang(getLang())
 
+// Register the PWA service worker (installable + offline shell).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {})
+  })
+}
+
 function PageLoader() {
   return (
     <div className="flex items-center justify-center py-24 text-sm text-neutral-400">

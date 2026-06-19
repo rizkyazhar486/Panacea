@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
-import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
+import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck } from '../components/icons'
 import { api, backendEnabled, type AuditEntry, type DoctorRow } from '../lib/api'
 
@@ -151,6 +151,7 @@ function CompliancePanel() {
         />
         {err && <p className="text-sm text-accent">{err}</p>}
         {!backendEnabled && <p className="text-sm text-neutral-400">Audit log memerlukan server aktif.</p>}
+        {backendEnabled && !audit && !err && <SkeletonRows rows={4} />}
         {audit && audit.length === 0 && <p className="text-sm text-neutral-400">Belum ada akses tercatat.</p>}
         {audit && audit.length > 0 && (
           <div className="max-h-80 space-y-1.5 overflow-y-auto">
@@ -207,6 +208,7 @@ function DoctorVerifyPanel() {
       />
       {err && <p className="text-sm text-accent">{err}</p>}
       {!backendEnabled && <p className="text-sm text-neutral-400">Memerlukan server aktif.</p>}
+      {backendEnabled && !docs && !err && <SkeletonRows rows={3} />}
       {docs && docs.length === 0 && <p className="text-sm text-neutral-400">Belum ada dokter terdaftar.</p>}
 
       {pending.length > 0 && (
