@@ -251,12 +251,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         hydratedFor.current = '' // allow retry on next change
       })
     // Pull synced preferences (notifications, security toggles, model, doctor
-    // name). The server never stores the API key, so the local key is kept.
+    // name, STR verification). The server never stores the API key, so the
+    // local key is kept. STR status is restored onto the account so a verified
+    // doctor stays verified across devices/reloads (autologin-safe).
     api
       .getSettings()
       .then((remote) => {
         if (remote && Object.keys(remote).length) {
-          setState((st) => ({ ...st, settings: { ...st.settings, ...remote } }))
+          setState((st) => {
+            const next = { ...st, settings: { ...st.settings, ...remote } }
+            if (remote.strStatus && st.account?.role === 'dokter') {
+              next.account = { ...st.account, strStatus: remote.strStatus as Account['strStatus'] }
+            }
+            return next
+          })
         }
       })
       .catch(() => {})
@@ -408,8 +416,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return { ...st, account }
         }),
       logout: () => setState((st) => ({ ...st, account: null })),
-      verifyStr: () =>
-        setState((st) => (st.account ? { ...st, account: { ...st.account, strStatus: 'verified' } } : st)),
+      verifyStr: () => {
+        if (backendEnabled) api.saveSettings({ strStatus: 'verified' }).catch(() => {})
+        setState((st) => (st.account ? { ...st, account: { ...st.account, strStatus: 'verified' } } : st))
+      },
       setMode: (role) =>
         setState((st) => {
           if (!st.account?.isOwner) return st // only the owner can switch modes

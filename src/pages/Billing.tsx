@@ -464,7 +464,7 @@ function BackendWallet() {
         setMsg('Selesaikan pembayaran di tab Midtrans, lalu tekan Perbarui.')
       } else {
         await api.confirmPayment(r.orderId)
-        setMsg(`Pembayaran ${method} berhasil (mock) — ${amount} PNC ditambahkan.`)
+        setMsg(`Pembayaran ${method} berhasil — ${amount} PNC ditambahkan.`)
         refresh()
       }
     } catch (e) {
