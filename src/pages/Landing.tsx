@@ -19,7 +19,7 @@ const FEATURES = [
   { icon: IconHeart, title: 'Kalkulator Longevity AI', text: 'Isi pola makan, olahraga, hidrasi, tidur & berjemur — AI menghitung nilai longevity Anda (langganan 30 hari).' },
   { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI mewawancara pasien (SOCRATES); hasilnya mengalir otomatis ke Subjective/Objective di AI-EMR yang hanya diakses dokter.' },
   { icon: IconStethoscope, title: 'Konsultasi, Apotek & Faskes', text: 'Konsultasi via AI (Rp13.000) → rujukan dokter spesialis; apotek + tebus resep; faskes terdekat via GPS untuk darurat.' },
-  { icon: IconStore, title: 'Marketplace Materi & Artikel', text: 'Jual–beli catatan/jurnal/artikel kedokteran dengan PanaceaToken; harga ditentukan penulis; PDF ber-watermark ID pembeli.' },
+  { icon: IconStore, title: 'Pusat Materi Kedokteran', text: 'Temukan & bagikan catatan, jurnal, dan artikel kedokteran pilihan. Harga ditentukan penulis; PDF ber-watermark untuk keamanan kontributor.' },
   { icon: IconShield, title: 'AI-EMR Bersertifikat', text: 'Untuk klinisi & institusi bersertifikat (STR/NPWP). CDSS doctor-in-the-loop memblokir interaksi obat, alergi & kontraindikasi.' },
 ]
 
@@ -37,7 +37,7 @@ const WHATS_NEW = [
   'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp125.000/bulan).',
   'Apotek dengan tebus/scan resep + Riwayat Transaksi terpadu (bisa disaring per jenis).',
   'Faskes terdekat via GPS (rumah sakit, klinik & apotek) untuk situasi darurat.',
-  'Marketplace materi/artikel — harga ditentukan penulis, PDF ber-watermark ID pembeli.',
+  'Pusat Materi Kedokteran — temukan & bagikan catatan, jurnal, dan artikel pilihan dengan PanaceaToken.',
 ]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
@@ -115,7 +115,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div
               key={f.title}
               className={`group rounded-2xl border border-black/5 bg-white p-5 shadow-[0_4px_12px_rgba(12,20,16,0.05)] transition hover:-translate-y-1 hover:border-brand/40 hover:shadow-md ${
-                i === 0 ? 'sm:col-span-2 lg:col-span-2' : ''
+                ''
               }`}
             >
               <div className="flex items-start justify-between">
