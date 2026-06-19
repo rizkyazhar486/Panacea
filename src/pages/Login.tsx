@@ -169,8 +169,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {error && <p className="mt-2 text-xs text-accent">{error}</p>}
           {backendEnabled && (
             <p className="mt-2 text-[11px] font-semibold text-brand-dark">
-              ● Backend aktif{health?.features.payments ? ' · pembayaran Midtrans LIVE' : ' · pembayaran mock'}
+              ● Server aktif
+              {health?.features.ai ? ' · AI LIVE' : ''}
               {health?.features.google ? ' · Google LIVE' : ''}
+              {health?.features.payments ? ' · Pembayaran LIVE' : ''}
             </p>
           )}
 
@@ -243,7 +245,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             Masuk sebagai {ROLES.find((r) => r.id === role)?.title}
           </Button>
           <p className="mt-3 text-center text-[11px] text-neutral-400">
-            Demo — login & Google disimulasikan. Semua peran termasuk Owner wajib menjadi pelanggan.
+            Dengan masuk, Anda menyetujui Syarat &amp; Ketentuan dan Kebijakan Privasi Panaceamed.id.
           </p>
         </div>
       </div>

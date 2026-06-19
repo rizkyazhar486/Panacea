@@ -1,4 +1,5 @@
 import { SYSTEM_PROMPT, EMR_DRAFT_INSTRUCTION, EMR_FRAMEWORK } from './systemPrompt'
+import { api, backendEnabled } from './api'
 import type {
   ChatMessage,
   Patient,
@@ -62,33 +63,43 @@ export function hasKey(settings: AISettings): boolean {
   return Boolean(settings.apiKey && settings.apiKey.trim().length > 10)
 }
 
+// AI is "real" when either the user supplied a personal key OR a backend
+// (with a server-side Anthropic key) is configured.
+export function aiAvailable(settings: AISettings): boolean {
+  return hasKey(settings) || backendEnabled
+}
+
 async function callClaude(
   settings: AISettings,
   messages: { role: 'user' | 'assistant'; content: string }[],
   systemExtra = '',
 ): Promise<string> {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': settings.apiKey,
-      'anthropic-version': ANTHROPIC_VERSION,
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: settings.model,
-      max_tokens: 2048,
-      system: SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : ''),
-      messages,
-    }),
-  })
-  if (!res.ok) {
-    const txt = await res.text()
-    throw new Error(`Claude API ${res.status}: ${txt.slice(0, 300)}`)
+  const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
+
+  // Preferred path: the user's own key → direct browser call.
+  if (hasKey(settings)) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': settings.apiKey,
+        'anthropic-version': ANTHROPIC_VERSION,
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({ model: settings.model, max_tokens: 2048, system, messages }),
+    })
+    if (!res.ok) {
+      const txt = await res.text()
+      throw new Error(`Claude API ${res.status}: ${txt.slice(0, 300)}`)
+    }
+    const data = await res.json()
+    const block = (data.content || []).find((b: { type: string }) => b.type === 'text')
+    return block?.text ?? '(tidak ada respons)'
   }
-  const data = await res.json()
-  const block = (data.content || []).find((b: { type: string }) => b.type === 'text')
-  return block?.text ?? '(tidak ada respons)'
+
+  // Public path: route through the backend's shared server-side key.
+  const { text } = await api.aiMessages({ model: settings.model, system, messages, max_tokens: 2048 })
+  return text || '(tidak ada respons)'
 }
 
 export async function sendChat(
@@ -99,10 +110,12 @@ export async function sendChat(
   const msgs = history.map((m) => ({ role: m.role, content: m.content }))
   // Front-load the continuous patient context on the first user turn.
   const sysExtra = contextBlock(ctx)
-  if (!hasKey(settings)) {
+  if (!aiAvailable(settings)) return demoChatReply(history, ctx)
+  try {
+    return await callClaude(settings, msgs, sysExtra)
+  } catch {
     return demoChatReply(history, ctx)
   }
-  return callClaude(settings, msgs, sysExtra)
 }
 
 export interface EMRDraft {
@@ -126,9 +139,7 @@ export async function draftEMR(
   history: ChatMessage[],
   ctx: PatientContext,
 ): Promise<EMRDraft> {
-  if (!hasKey(settings)) {
-    return demoDraft(ctx)
-  }
+  if (!aiAvailable(settings)) return demoDraft(ctx)
   const transcript = history
     .map((m) => `${m.role === 'user' ? 'Pasien' : 'AI'}: ${m.content}`)
     .join('\n')
@@ -138,14 +149,17 @@ export async function draftEMR(
       content: `${contextBlock(ctx)}\n\nTRANSKRIP ANAMNESIS:\n${transcript}\n\n${EMR_DRAFT_INSTRUCTION}`,
     },
   ]
-  const raw = await callClaude(settings, msgs, EMR_FRAMEWORK)
-  const json = extractJson(raw)
-  return json as EMRDraft
+  try {
+    const raw = await callClaude(settings, msgs, EMR_FRAMEWORK)
+    return extractJson(raw) as EMRDraft
+  } catch {
+    return demoDraft(ctx)
+  }
 }
 
 // AI verification of an uploaded material / AI-EMR template (Claude gatekeeper).
 export async function verifyMaterial(settings: AISettings, m: Material): Promise<AIReview> {
-  if (!hasKey(settings)) {
+  if (!aiAvailable(settings)) {
     await wait(1100)
     return demoVerify(m)
   }
@@ -155,9 +169,13 @@ export async function verifyMaterial(settings: AISettings, m: Material): Promise
       content: `Tinjau kelayakan materi medis untuk dijual di platform edukasi kedokteran. Nilai akurasi, kemutakhiran, keamanan klinis, dan kelengkapan. Judul: "${m.title}". Kategori: ${m.category}. Jalur: ${m.exam}. Spesialti: ${m.specialty}. Deskripsi: ${m.description}.\n\nKeluarkan HANYA JSON minified: {"verdict":"approved"|"revise","score":0-100,"notes":"alasan singkat bilingual"}`,
     },
   ]
-  const raw = await callClaude(settings, msgs)
-  const j = extractJson(raw) as { verdict: 'approved' | 'revise'; score: number; notes: string }
-  return { ...j, at: new Date().toISOString() }
+  try {
+    const raw = await callClaude(settings, msgs)
+    const j = extractJson(raw) as { verdict: 'approved' | 'revise'; score: number; notes: string }
+    return { ...j, at: new Date().toISOString() }
+  } catch {
+    return demoVerify(m)
+  }
 }
 
 // Patient-facing disease education (brief + deep), for subscribers' patients.
@@ -166,7 +184,7 @@ export async function generateEducation(
   ctx: PatientContext,
   diagnosis: string,
 ): Promise<EducationSheet> {
-  if (!hasKey(settings)) {
+  if (!aiAvailable(settings)) {
     await wait(1000)
     return demoEducation(diagnosis)
   }
@@ -176,9 +194,13 @@ export async function generateEducation(
       content: `${contextBlock(ctx)}\n\nBuat EDUKASI PASIEN (bahasa awam, empatik, bilingual ID+EN) untuk diagnosis: "${diagnosis}". Singkat namun mendalam, agar pasien memahami penyakitnya dan cara menjaga kesehatan.\n\nKeluarkan HANYA JSON minified: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
     },
   ]
-  const raw = await callClaude(settings, msgs)
-  const j = extractJson(raw) as Omit<EducationSheet, 'generatedAt'>
-  return { ...j, generatedAt: new Date().toISOString() }
+  try {
+    const raw = await callClaude(settings, msgs)
+    const j = extractJson(raw) as Omit<EducationSheet, 'generatedAt'>
+    return { ...j, generatedAt: new Date().toISOString() }
+  } catch {
+    return demoEducation(diagnosis)
+  }
 }
 
 function wait(ms: number) {

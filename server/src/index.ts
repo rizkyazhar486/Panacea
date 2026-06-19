@@ -24,6 +24,7 @@ import {
   type Post,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
+import { aiMessages } from './ai.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
 
@@ -44,7 +45,7 @@ app.use(
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive },
     tokenToIdr: config.tokenToIdr,
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
     googleClientId: features.googleLive ? config.googleClientId : null,
@@ -159,11 +160,15 @@ app.put('/api/settings', requireAuth, (req, res) => {
   res.json({ ok: true, settings: getSettings(u.id) })
 })
 
+// --- AI (server-side Claude proxy) ---
+app.post('/api/ai/messages', requireAuth, aiMessages)
+
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
+  console.log(`  AI (Claude):  ${features.aiLive ? 'LIVE (server key)' : 'off (clients use own key / demo)'}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
 })

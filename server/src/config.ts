@@ -21,4 +21,5 @@ export const config = {
 export const features = {
   googleLive: Boolean(config.googleClientId),
   paymentsLive: Boolean(config.midtrans.serverKey),
+  aiLive: Boolean(process.env.ANTHROPIC_API_KEY),
 }

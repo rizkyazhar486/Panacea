@@ -15,7 +15,7 @@ import {
   IconCheck,
   IconChevronRight,
 } from '../components/icons'
-import { hasKey } from '../lib/ai'
+import { hasKey, aiAvailable } from '../lib/ai'
 import {
   getThemePref,
   setThemePref,
@@ -194,7 +194,7 @@ export function Settings() {
           icon={<IconSettings size={20} />}
           title={t('aiSettings', lang)}
           subtitle="Konfigurasi model & identitas dokter pemeriksa"
-          right={<Badge tone={hasKey(state.settings) ? 'brand' : 'high'}>{hasKey(state.settings) ? 'AI Live' : 'Mode Demo'}</Badge>}
+          right={<Badge tone={aiAvailable(state.settings) ? 'brand' : 'high'}>{hasKey(state.settings) ? 'AI · Kunci Pribadi' : aiAvailable(state.settings) ? 'AI · Server' : 'AI Terbatas'}</Badge>}
         />
         <div className="space-y-4">
           <Field label="Anthropic API Key">
@@ -203,7 +203,7 @@ export function Settings() {
           <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-xs text-neutral-500">
             <IconShield size={16} className="mt-0.5 shrink-0 text-brand" />
             Kunci disimpan <b className="mx-1">hanya di browser Anda</b> (localStorage) dan dipakai untuk memanggil
-            Claude API langsung. Tanpa kunci, aplikasi berjalan dalam Mode Demo tersimulasi.
+            Claude API langsung. Tanpa kunci pribadi, AI tetap berjalan melalui server Panaceamed.
           </div>
           <Field label="Model">
             <select className={inputClass} value={state.settings.model} onChange={(e) => updateSettings({ model: e.target.value })}>
@@ -217,7 +217,7 @@ export function Settings() {
           </Field>
           <div className="flex items-center gap-3">
             <Button onClick={save}>{saved ? t('saved', lang) : t('save', lang)}</Button>
-            <Button variant="ghost" onClick={resetDemo}>Reset Data Demo</Button>
+            <Button variant="ghost" onClick={resetDemo}>Reset Data Lokal</Button>
           </div>
         </div>
       </Card>
