@@ -2,7 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
+import { applyTheme, getTheme } from './lib/theme'
 import { StoreProvider } from './lib/store'
+
+// Apply the saved (or OS-preferred) theme before first paint.
+applyTheme(getTheme())
 import { Shell } from './components/Shell'
 import { Home } from './pages/Home'
 import { Chatbot } from './pages/Chatbot'

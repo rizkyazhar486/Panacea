@@ -260,6 +260,12 @@ export const IconMoon = ({ size = 20, className = '' }: P) => (
     <path d="M21 12.8A8 8 0 1 1 11.2 3 6.2 6.2 0 0 0 21 12.8Z" />
   </svg>
 )
+export const IconSun = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+  </svg>
+)
 export const IconArchitecture = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}>
     <rect x="9" y="3" width="6" height="5" rx="1" />
