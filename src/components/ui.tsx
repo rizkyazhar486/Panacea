@@ -84,7 +84,7 @@ export function Button({
   className?: string
 }) {
   const styles: Record<string, string> = {
-    primary: 'bg-brand text-white hover:bg-brand-dark shadow-sm',
+    primary: 'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white hover:brightness-105 shadow-sm',
     danger: 'bg-accent text-white hover:opacity-90 shadow-sm',
     outline: 'border border-brand text-brand-dark hover:bg-brand-50',
     ghost: 'text-neutral-600 hover:bg-neutral-100',
@@ -94,7 +94,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
     >
       {children}
     </button>

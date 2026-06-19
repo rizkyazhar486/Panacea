@@ -123,8 +123,8 @@ export function Shell({ children }: { children: ReactNode }) {
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-                  isActive ? 'bg-brand-50 text-brand-dark' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'
+                `flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                  isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'
                 }`
               }
             >
@@ -217,7 +217,7 @@ export function Shell({ children }: { children: ReactNode }) {
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                `flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold ${
                   isActive ? 'bg-brand-50 text-brand-dark' : 'text-neutral-500'
                 }`
               }
