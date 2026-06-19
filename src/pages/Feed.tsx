@@ -90,10 +90,11 @@ export function Feed() {
         </>
       )}
 
-      {/* Floating + (bottom-left) — upload */}
+      {/* Floating + upload — offset past the sidebar on desktop so it never
+          overlaps the sidebar's SOS/Keluar buttons. */}
       <button
         onClick={() => setCompose(true)}
-        className="fixed bottom-6 left-6 z-30 grid h-14 w-14 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark"
+        className="fixed bottom-6 left-6 z-30 grid h-14 w-14 place-items-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark hover:scale-105 lg:left-[17rem]"
         title="Unggah video singkat / foto"
       >
         <IconPlus size={26} />
@@ -110,7 +111,7 @@ export function Feed() {
       )}
 
       {activePost && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4" onClick={() => setViewPost(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setViewPost(null)}>
           <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <PostCard post={activePost} me={me} store={store} onProfile={(e) => { setViewPost(null); setViewProfile(e) }} />
           </div>
