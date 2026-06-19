@@ -6,7 +6,9 @@ import { applyAppearance } from './lib/theme'
 import { applyLang, getLang } from './lib/i18n'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { Home } from './pages/Home'
+import { NotFound } from './pages/NotFound'
 import { Chatbot } from './pages/Chatbot'
 import { Dashboard } from './pages/Dashboard'
 import { Nutrition } from './pages/Nutrition'
@@ -52,6 +54,7 @@ function PageLoader() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <ErrorBoundary>
     <StoreProvider>
       <HashRouter>
         <Shell>
@@ -79,10 +82,12 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin" element={<Admin />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/legal" element={<Legal />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </Shell>
       </HashRouter>
     </StoreProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
