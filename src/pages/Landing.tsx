@@ -1,7 +1,6 @@
 import { LogoMark, Wordmark } from '../components/Logo'
 import {
   IconChat,
-  IconEMR,
   IconStore,
   IconShield,
   IconHeart,
@@ -12,29 +11,29 @@ import {
 } from '../components/icons'
 
 const FEATURES = [
-  { icon: IconChat, title: 'AI Chatbot Anamnesis', text: 'AI mewawancara pasien (SOCRATES) & merekomendasikan pemeriksaan penunjang — diverifikasi dokter.' },
-  { icon: IconEMR, title: 'AI-EMR (SOAP)', text: 'Rekam medis elektronik: AI menyusun draf, dokter mengisi & menandatangani. Lab/EKG, balans cairan, kalori, urine output.' },
-  { icon: IconHeart, title: 'Pemantauan Longevity', text: 'Tanda vital & penunjang terpantau kontinu untuk pasien kronis, lansia, immunocompromised.' },
-  { icon: IconStore, title: 'Marketplace Materi', text: 'Jual–beli catatan & jurnal kedokteran (USMLE/UKMPPD) dengan PanaceaToken, diverifikasi AI + spesialis.' },
-  { icon: IconStethoscope, title: 'Konsultasi & Rujukan', text: 'Konsultasi dokter real-time (Rp35.000/sesi) & cari rumah sakit terdekat untuk tindakan/operasi.' },
-  { icon: IconShield, title: 'CDSS Aman', text: 'Mesin keamanan resep (doctor-in-the-loop): memblokir interaksi obat, alergi, kontraindikasi.' },
+  { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
+  { icon: IconHeart, title: 'Kalkulator Longevity AI', text: 'Isi pola makan, olahraga, hidrasi, tidur & berjemur — AI menghitung nilai longevity Anda (langganan 30 hari).' },
+  { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI mewawancara pasien (SOCRATES); hasilnya mengalir otomatis ke Subjective/Objective di AI-EMR yang hanya diakses dokter.' },
+  { icon: IconStethoscope, title: 'Konsultasi, Apotek & Faskes', text: 'Konsultasi via AI (Rp13.000) → rujukan dokter spesialis; apotek + tebus resep; faskes terdekat via GPS untuk darurat.' },
+  { icon: IconStore, title: 'Marketplace Materi & Artikel', text: 'Jual–beli catatan/jurnal/artikel kedokteran dengan PanaceaToken; harga ditentukan penulis; PDF ber-watermark ID pembeli.' },
+  { icon: IconShield, title: 'AI-EMR Bersertifikat', text: 'Untuk klinisi & institusi bersertifikat (STR/NPWP). CDSS doctor-in-the-loop memblokir interaksi obat, alergi & kontraindikasi.' },
 ]
 
 const ROLES = [
-  ['Pelanggan / Pasien', 'Edukasi penyakit, nutrisi & kalori, sosial kesehatan, konsultasi dokter.'],
-  ['Dokter', 'AI-EMR penuh, planning, konsultasi pasien.'],
-  ['Kontributor', 'Menulis & menjual materi kedokteran.'],
+  ['Pelanggan / Pasien', 'Dashboard hidup sehat, edukasi penyakit, nutrisi & Longevity AI, konsultasi, apotek & faskes terdekat.'],
+  ['Dokter', 'AI-EMR penuh (SOAP), data klinis per pasien, planning & konsultasi.'],
+  ['Kontributor', 'Menulis, menjual & minta verifikasi materi kedokteran.'],
   ['Verifikator', 'Spesialis/Profesor + AI memverifikasi materi.'],
-  ['Admin', 'Layanan & dukungan otomatis.'],
-  ['Owner', 'Memantau keuntungan perusahaan.'],
+  ['Admin', 'Layanan, dukungan otomatis & kelola katalog apotek.'],
+  ['Owner', 'Pindah mode akses & memantau keuntungan perusahaan.'],
 ]
 
 const WHATS_NEW = [
-  'Login Google asli & pembayaran QRIS / Virtual Account / Kartu (Midtrans).',
-  'Konsultasi dokter–pasien real-time (chat langsung).',
-  'Grafik tumbuh kembang anak (z-score LMS WHO/CDC) & BMI dewasa.',
-  'Data AI-EMR tersimpan di server — sinkron lintas perangkat.',
-  'Edukasi pasien gaya presentasi: ringkas, mendalam, & cara menjaga kesehatan.',
+  'Dashboard sosial "Panacea Hidup Sehat" — foto & video 30 detik, profil, repost, bookmark privat.',
+  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp125.000/bulan).',
+  'Apotek dengan tebus/scan resep + Riwayat Transaksi terpadu (bisa disaring per jenis).',
+  'Faskes terdekat via GPS (rumah sakit, klinik & apotek) untuk situasi darurat.',
+  'Marketplace materi/artikel — harga ditentukan penulis, PDF ber-watermark ID pembeli.',
 ]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {

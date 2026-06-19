@@ -145,10 +145,10 @@ export function Consult() {
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
               <div className="flex items-start gap-2 text-sm text-amber-800">
                 <IconHospital size={18} className="mt-0.5 shrink-0" />
-                <span>Keluhan Anda <b>terindikasi kemungkinan tindakan bedah</b>. Cari rumah sakit terdekat untuk rujukan operasi.</span>
+                <span>Keluhan Anda <b>terindikasi kemungkinan tindakan bedah</b>. Cari faskes terdekat untuk rujukan operasi.</span>
               </div>
               <Link to="/hospitals">
-                <Button variant="outline"><IconHospital size={16} /> Cari Rumah Sakit</Button>
+                <Button variant="outline"><IconHospital size={16} /> Faskes Terdekat</Button>
               </Link>
             </div>
           )}

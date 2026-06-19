@@ -7,7 +7,7 @@ import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api
 import type { Account, Role } from '../lib/types'
 
 const ROLES: { id: Role; title: string; desc: string }[] = [
-  { id: 'pasien', title: 'Pelanggan / Pasien', desc: 'AI Chatbot, edukasi, nutrisi, sosial, konsultasi & cari RS' },
+  { id: 'pasien', title: 'Pelanggan / Pasien', desc: 'Dashboard hidup sehat, AI Chatbot, edukasi, nutrisi & Longevity, konsultasi, apotek & faskes' },
   { id: 'dokter', title: 'Dokter', desc: 'Khusus AI-EMR, Planning, konsultasi pasien' },
   { id: 'kontributor', title: 'Kontributor / Penulis', desc: 'Tulis, edit & unggah materi ke verifikator' },
   { id: 'verifikator', title: 'Verifikator', desc: 'AI + Subspesialis/Profesor mereview jurnal' },
