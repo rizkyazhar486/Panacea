@@ -28,8 +28,12 @@ function downloadOwned(m: Material, buyerId: string) {
 }
 
 export function Marketplace() {
-  const { state, account, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview, buyLongevitySub } = useStore()
+  const { state, account, buyMaterial, uploadMaterial, setMaterialAIReview, buyLongevitySub, setAuthorSubPrice, subscribeAuthor } = useStore()
   const buyerId = account?.email ?? 'guest@panaceamed.id'
+  const subActive = (authorEmail: string) => {
+    const exp = state.authorSubs[authorEmail]
+    return !!exp && new Date(exp) > new Date()
+  }
   const [exam, setExam] = useState<(typeof EXAMS)[number]>('Semua')
   const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
   const [toast, setToast] = useState('')
@@ -127,7 +131,9 @@ export function Marketplace() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {listed.map((m) => {
-          const owned = state.ownedMaterialIds.includes(m.id)
+          const subbed = subActive(m.authorId)
+          const owned = state.ownedMaterialIds.includes(m.id) || subbed
+          const subPrice = state.authorSubPrices[m.authorId] ?? 0
           return (
             <Card key={m.id} className="flex flex-col">
               <div className="mb-2 flex items-center gap-2">
@@ -145,6 +151,7 @@ export function Marketplace() {
               </div>
               <div className="mt-1 text-xs text-neutral-400">
                 oleh {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× diunduh
+                {subbed && <span className="ml-1 font-semibold text-brand-dark">· langganan aktif</span>}
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
                 <span className="flex items-center gap-1 text-lg font-extrabold">
@@ -160,6 +167,14 @@ export function Marketplace() {
                   <Button onClick={() => buy(m)}>Beli {m.priceTokens} PNC</Button>
                 )}
               </div>
+              {!owned && subPrice > 0 && m.authorId !== buyerId && (
+                <button
+                  onClick={() => { const r = subscribeAuthor(m.authorId); notify(r.ok ? `Berlangganan ${m.authorName} — akses semua materinya 30 hari.` : r.reason ?? 'Gagal.') }}
+                  className="mt-2 w-full rounded-xl border border-brand bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-100"
+                >
+                  Langganan penulis · {subPrice} PNC/bln
+                </button>
+              )}
             </Card>
           )
         })}
@@ -182,8 +197,10 @@ export function Marketplace() {
               : 'AI meminta revisi. Lihat tab Verifikasi.',
           )
         }}
-        authorId={currentUser.id}
-        authorName={currentUser.name}
+        authorId={buyerId}
+        authorName={account?.name ?? 'Saya'}
+        subPrice={state.authorSubPrices[buyerId] ?? 0}
+        onSubPrice={(p) => setAuthorSubPrice(buyerId, p)}
       />
     </div>
   )
@@ -193,10 +210,14 @@ function UploadPanel({
   onUpload,
   authorId,
   authorName,
+  subPrice,
+  onSubPrice,
 }: {
   onUpload: (m: Material) => void
   authorId: string
   authorName: string
+  subPrice: number
+  onSubPrice: (price: number) => void
 }) {
   const [f, setF] = useState({
     title: '',
@@ -269,8 +290,11 @@ function UploadPanel({
             ))}
           </select>
         </Field>
-        <Field label="Harga (PNC)">
+        <Field label="Harga beli satuan (PNC)">
           <input className={inputClass} type="number" min={0} value={f.price} onChange={(e) => setF({ ...f, price: Number(e.target.value) })} />
+        </Field>
+        <Field label="Harga langganan penulis (PNC/bln · 0 = nonaktif)">
+          <input className={inputClass} type="number" min={0} value={subPrice} onChange={(e) => onSubPrice(Number(e.target.value))} />
         </Field>
         <Field label="Berkas (.docx / .pdf / .pptx)">
           <div className="flex items-center gap-2">

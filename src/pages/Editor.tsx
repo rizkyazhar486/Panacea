@@ -34,7 +34,7 @@ export function Editor() {
       category,
       exam,
       specialty: specialty.trim() || 'Umum',
-      authorId: state.currentUserId,
+      authorId: account?.email ?? state.currentUserId,
       authorName: account?.name ?? 'Penulis',
       fileType: 'Word',
       fileName: title.trim().toLowerCase().replace(/\s+/g, '-').slice(0, 30) + '.docx',

@@ -87,6 +87,8 @@ function seed(): AppState {
     currentUserId: 'me',
     account: null,
     adminEmails: [OWNER_EMAIL],
+    authorSubPrices: {},
+    authorSubs: {},
     posts: [],
     follows: [],
     foods: [],
@@ -131,6 +133,8 @@ interface Store {
   setMaterialAIReview: (id: string, review: AIReview) => void
   setMaterialVerifierReview: (id: string, review: VerifierReview) => void
   subscribe: (plan: SubscriptionPlan, seats?: number) => void
+  setAuthorSubPrice: (authorEmail: string, priceTokens: number) => void
+  subscribeAuthor: (authorEmail: string) => { ok: boolean; reason?: string }
   // auth
   login: (account: Account) => void
   logout: () => void
@@ -495,6 +499,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 : st.wallet,
           }
         }),
+      setAuthorSubPrice: (authorEmail, priceTokens) =>
+        setState((st) => ({ ...st, authorSubPrices: { ...st.authorSubPrices, [authorEmail]: Math.max(0, Math.round(priceTokens)) } })),
+      subscribeAuthor: (authorEmail) => {
+        const price = state.authorSubPrices[authorEmail] ?? 0
+        if (state.wallet.balance < price) return { ok: false, reason: 'Saldo PNC tidak cukup. Silakan deposit di Billing.' }
+        const now = new Date()
+        const expires = new Date(now.getTime() + 30 * 86400000).toISOString()
+        setState((st) => ({
+          ...st,
+          authorSubs: { ...st.authorSubs, [authorEmail]: expires },
+          orders: [
+            { id: uid(), category: 'Langganan' as const, title: `Langganan penulis ${authorEmail}`, detail: 'Akses semua materi penulis 30 hari', amountIdr: price * TOKEN_TO_IDR, status: 'Selesai' as const, at: now.toISOString() },
+            ...st.orders,
+          ],
+          wallet: {
+            balance: st.wallet.balance - price,
+            transactions: [
+              { id: uid(), type: 'subscription' as TxType, amount: -price, note: `Langganan penulis ${authorEmail} (30 hari)`, at: now.toISOString() },
+              ...st.wallet.transactions,
+            ],
+          },
+        }))
+        return { ok: true }
+      },
     }
   }, [state])
 

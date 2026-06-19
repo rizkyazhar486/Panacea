@@ -369,6 +369,8 @@ export interface AppState {
   account: Account | null // logged-in account (role-based)
   adminEmails: string[] // emails allowed to sign in as Admin (managed by owner)
   longevitySubExpires?: string // ISO date — AI Longevity score subscription expiry
+  authorSubPrices: Record<string, number> // authorEmail -> monthly PNC price
+  authorSubs: Record<string, string> // authorEmail -> subscription expiry ISO
   posts: SocialPost[]
   follows: string[] // emails the current account follows
   foods: FoodEntry[]
