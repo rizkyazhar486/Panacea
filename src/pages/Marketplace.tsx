@@ -135,7 +135,7 @@ export function Marketplace() {
           const owned = state.ownedMaterialIds.includes(m.id) || subbed
           const subPrice = state.authorSubPrices[m.authorId] ?? 0
           return (
-            <Card key={m.id} className="flex flex-col">
+            <Card key={m.id} hover className="flex flex-col">
               <div className="mb-2 flex items-center gap-2">
                 <Badge tone="brand">{m.exam}</Badge>
                 <Badge tone="neutral">{m.category}</Badge>

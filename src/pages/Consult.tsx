@@ -167,7 +167,7 @@ export function Consult() {
           {recommended.filter((d) => { const x = docQuery.trim().toLowerCase(); return !x || d.name.toLowerCase().includes(x) || d.specialty.toLowerCase().includes(x) }).map((d) => {
             const isRec = d.tag === result.tag
             return (
-              <Card key={d.name} className={`flex flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
+              <Card key={d.name} hover className={`flex flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
                 <div className="flex items-start gap-3">
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">
                     <IconStethoscope size={22} />

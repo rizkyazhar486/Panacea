@@ -89,7 +89,7 @@ export function Pharmacy() {
         <div className="lg:col-span-2">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {products.map((p) => (
-              <Card key={p.id} pad={false} className="overflow-hidden">
+              <Card key={p.id} pad={false} hover className="overflow-hidden">
                 {/* photo tile */}
                 <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.image ? undefined : `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
                   {p.image ? <img src={p.image} className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}

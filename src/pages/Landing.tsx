@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Wordmark } from '../components/Logo'
 import { Reveal, CountUp } from '../components/Reveal'
+import { InteractiveAura } from '../components/InteractiveAura'
 import {
   IconChat,
   IconStore,
@@ -90,6 +91,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       <section className="relative px-4 py-12 sm:px-8 sm:py-20">
         {/* Animated atmosphere */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <InteractiveAura />
           <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
           <div className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" style={{ animationDelay: '-6s' }} />
           <div className="orb absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-teal-300/20 blur-3xl" style={{ animationDelay: '-12s' }} />

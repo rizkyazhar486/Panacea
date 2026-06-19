@@ -75,7 +75,7 @@ export function Hospitals() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {list.map((h) => (
-          <Card key={h.id} className="flex flex-col">
+          <Card key={h.id} hover className="flex flex-col">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <div className="flex items-center gap-2">
