@@ -72,7 +72,7 @@ export function Feed() {
   return (
     <div className="relative pb-24">
       {/* Top tab bar (TikTok-style) */}
-      <div className="sticky top-0 z-20 -mx-4 mb-4 flex items-center justify-center gap-1 border-b border-neutral-100 bg-[#f4f7f5]/90 px-4 py-2 backdrop-blur sm:gap-2">
+      <div className="sticky top-0 z-20 -mx-4 mb-4 flex items-center justify-center gap-1 border-b border-neutral-100 bg-white/85 px-4 py-2 backdrop-blur sm:gap-2">
         <TabBtn icon={<IconHome size={18} />} label="Home" active={tab === 'home'} onClick={() => { setTab('home'); setViewProfile(null) }} />
         <TabBtn icon={<IconUsers size={18} />} label="Friends" active={tab === 'friends'} onClick={() => { setTab('friends'); setViewProfile(null) }} />
         <TabBtn icon={<IconSearch size={18} />} label="Search" active={tab === 'search'} onClick={() => { setTab('search'); setViewProfile(null) }} />
