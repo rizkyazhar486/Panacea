@@ -94,8 +94,8 @@ export function Marketplace() {
       <Card>
         <SectionTitle
           icon={<IconStore size={20} />}
-          title="Marketplace Catatan, Materi & Artikel"
-          subtitle="Jual-beli tulisan kedokteran — harga ditentukan penulis, dibeli dengan PNC. Hanya pembeli yang dapat mengakses; tiap halaman PDF diberi watermark ID pembeli."
+          title="Pusat Referensi Medis"
+          subtitle="Temukan, pelajari, dan bagikan referensi medis pilihan dari para kontributor terverifikasi. Setiap dokumen dilindungi watermark untuk keamanan dan keaslian."
           right={
             <span className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white">
               <IconToken size={16} className="text-brand" /> {state.wallet.balance} PNC
@@ -261,8 +261,8 @@ function UploadPanel({
     <Card>
       <SectionTitle
         icon={<IconUpload size={18} />}
-        title="Unggah & Minta Verifikasi Catatan / Materi / Artikel"
-        subtitle="Siapa pun boleh menjual tulisan: tentukan harga PNC sendiri. Wajib lolos verifikasi AI Claude lalu verifikator spesialis sebelum tampil."
+        title="Bagikan & Verifikasi Referensi Medis"
+        subtitle="Kontributor dapat membagikan materi medis untuk ditinjau oleh AI dan verifikator spesialis sebelum dipublikasikan."
       />
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Judul">
