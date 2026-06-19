@@ -383,5 +383,14 @@ export interface AppState {
     apiKey: string
     model: string
     doctorName: string
+    // Notification preferences
+    notifVitals?: boolean
+    notifEmail?: boolean
+    notifSms?: boolean
+    notifAiInsights?: boolean
+    notifBroadcasts?: boolean
+    // Security
+    twoFactor?: boolean
+    biometricLock?: boolean
   }
 }

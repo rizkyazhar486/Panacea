@@ -1,7 +1,20 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
-import { IconSettings, IconShield, IconSun, IconMoon } from '../components/icons'
+import {
+  IconSettings,
+  IconShield,
+  IconSun,
+  IconMoon,
+  IconGlobe,
+  IconBell,
+  IconDownload,
+  IconKey,
+  IconUser,
+  IconCheck,
+  IconChevronRight,
+} from '../components/icons'
 import { hasKey } from '../lib/ai'
 import {
   getThemePref,
@@ -22,16 +35,21 @@ const MODELS = [
 ]
 
 export function Settings() {
-  const { state, updateSettings, resetDemo } = useStore()
+  const store = useStore()
+  const { state, updateSettings, resetDemo } = store
+  const nav = useNavigate()
   const [key, setKey] = useState(state.settings.apiKey)
   const [doctor, setDoctor] = useState(state.settings.doctorName)
   const [saved, setSaved] = useState(false)
 
-  // Appearance prefs (live — applied immediately on change).
+  // Appearance prefs (applied immediately).
   const [themePref, setThemePrefState] = useState<ThemePref>(getThemePref)
   const [lang, setLangState] = useState<Lang>(getLang)
   const [scale, setScaleState] = useState<TextScale>(getTextScale)
   const [motion, setMotionState] = useState<boolean>(getReducedMotion)
+  const [showPwd, setShowPwd] = useState(false)
+
+  const s = state.settings
 
   function save() {
     updateSettings({ apiKey: key.trim(), doctorName: doctor.trim() || 'dr. Pemeriksa' })
@@ -47,60 +65,33 @@ export function Settings() {
     setLang(l)
     setLangState(l)
   }
-  function chooseScale(s: TextScale) {
-    setTextScale(s)
-    setScaleState(s)
-  }
-  function toggleMotion(on: boolean) {
-    setReducedMotion(on)
-    setMotionState(on)
+
+  function exportData() {
+    // Strip heavy media so the export stays small & shareable.
+    const { account: _a, ...rest } = state
+    const slim = { ...rest, posts: rest.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
+    const blob = new Blob([JSON.stringify(slim, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `panaceamed-data-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      {/* Appearance / display settings */}
+    <div className="mx-auto max-w-3xl space-y-6">
+      {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>
-        <SectionTitle
-          icon={<IconSun size={20} />}
-          title={t('appearance', lang)}
-          subtitle={t('appearanceSub', lang)}
-        />
+        <SectionTitle icon={<IconSun size={20} />} title={t('appearance', lang)} subtitle={t('appearanceSub', lang)} />
         <div className="space-y-5">
-          {/* Theme */}
+          {/* Theme preview cards */}
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{t('theme', lang)}</label>
-            <div className="grid grid-cols-3 gap-2">
-              <SegBtn active={themePref === 'light'} onClick={() => chooseTheme('light')}>
-                <IconSun size={16} /> {t('light', lang)}
-              </SegBtn>
-              <SegBtn active={themePref === 'dark'} onClick={() => chooseTheme('dark')}>
-                <IconMoon size={16} /> {t('dark', lang)}
-              </SegBtn>
-              <SegBtn active={themePref === 'system'} onClick={() => chooseTheme('system')}>
-                <IconSettings size={16} /> {t('system', lang)}
-              </SegBtn>
-            </div>
-          </div>
-
-          {/* Language */}
-          <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{t('language', lang)}</label>
-            <div className="grid grid-cols-2 gap-2">
-              {LANGS.map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => chooseLang(l.id)}
-                  className={`flex items-center gap-2.5 rounded-xl border p-3 text-left transition ${
-                    lang === l.id ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:bg-neutral-50'
-                  }`}
-                >
-                  <span className="text-xl">{l.flag}</span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold">{l.native}</span>
-                    <span className="block text-[11px] text-neutral-400">{l.en}</span>
-                  </span>
-                </button>
-              ))}
+            <div className="grid grid-cols-3 gap-3">
+              <ThemeCard active={themePref === 'light'} onClick={() => chooseTheme('light')} label={t('light', lang)} preview="light" icon={<IconSun size={15} />} />
+              <ThemeCard active={themePref === 'dark'} onClick={() => chooseTheme('dark')} label={t('dark', lang)} preview="dark" icon={<IconMoon size={15} />} />
+              <ThemeCard active={themePref === 'system'} onClick={() => chooseTheme('system')} label={t('system', lang)} preview="system" icon={<IconSettings size={15} />} />
             </div>
           </div>
 
@@ -108,29 +99,96 @@ export function Settings() {
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{t('textSize', lang)}</label>
             <div className="grid grid-cols-3 gap-2">
-              <SegBtn active={scale === 'sm'} onClick={() => chooseScale('sm')}><span className="text-xs">A</span> {t('small', lang)}</SegBtn>
-              <SegBtn active={scale === 'md'} onClick={() => chooseScale('md')}><span className="text-sm">A</span> {t('normal', lang)}</SegBtn>
-              <SegBtn active={scale === 'lg'} onClick={() => chooseScale('lg')}><span className="text-base">A</span> {t('large', lang)}</SegBtn>
+              <SegBtn active={scale === 'sm'} onClick={() => { setTextScale('sm'); setScaleState('sm') }}><span className="text-xs">A</span> {t('small', lang)}</SegBtn>
+              <SegBtn active={scale === 'md'} onClick={() => { setTextScale('md'); setScaleState('md') }}><span className="text-sm">A</span> {t('normal', lang)}</SegBtn>
+              <SegBtn active={scale === 'lg'} onClick={() => { setTextScale('lg'); setScaleState('lg') }}><span className="text-base">A</span> {t('large', lang)}</SegBtn>
             </div>
           </div>
 
           {/* Reduced motion */}
-          <button
-            onClick={() => toggleMotion(!motion)}
-            className="flex w-full items-center justify-between rounded-xl bg-neutral-50 p-3 text-left"
-          >
-            <span>
-              <span className="block text-sm font-bold">{t('reduceMotion', lang)}</span>
-              <span className="block text-[11px] text-neutral-400">{t('reduceMotionSub', lang)}</span>
-            </span>
-            <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${motion ? 'bg-brand' : 'bg-neutral-300'}`}>
-              <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${motion ? 'left-[22px]' : 'left-0.5'}`} />
-            </span>
-          </button>
+          <ToggleRow
+            title={t('reduceMotion', lang)}
+            sub={t('reduceMotionSub', lang)}
+            on={motion}
+            onToggle={(v) => { setReducedMotion(v); setMotionState(v) }}
+          />
         </div>
       </Card>
 
-      {/* AI settings */}
+      {/* ── Language ───────────────────────────────────────────── */}
+      <Card>
+        <SectionTitle icon={<IconGlobe size={20} />} title={t('language', lang)} subtitle="Bahasa · Language · 语言 · اللغة" />
+        <div className="grid grid-cols-2 gap-2">
+          {LANGS.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => chooseLang(l.id)}
+              className={`flex items-center gap-2.5 rounded-xl border p-3 text-left transition ${
+                lang === l.id ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:bg-neutral-50'
+              }`}
+            >
+              <span className="text-xl">{l.flag}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-bold">{l.native}</span>
+                <span className="block text-[11px] text-neutral-400">{l.en}</span>
+              </span>
+              {lang === l.id && <IconCheck size={16} className="text-brand" />}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── Notifications ──────────────────────────────────────── */}
+      <Card>
+        <SectionTitle icon={<IconBell size={20} />} title={t('notifications', lang)} subtitle={t('notifSub', lang)} />
+        <div className="space-y-3">
+          <ToggleRow title={t('notifVitals', lang)} sub={t('notifVitalsSub', lang)} on={s.notifVitals ?? true} onToggle={(v) => updateSettings({ notifVitals: v })} />
+          <ToggleRow title={t('notifEmail', lang)} sub={t('notifEmailSub', lang)} on={s.notifEmail ?? true} onToggle={(v) => updateSettings({ notifEmail: v })} />
+          <ToggleRow title={t('notifSms', lang)} sub={t('notifSmsSub', lang)} on={s.notifSms ?? false} onToggle={(v) => updateSettings({ notifSms: v })} />
+          <ToggleRow title={t('notifAi', lang)} sub={t('notifAiSub', lang)} on={s.notifAiInsights ?? true} onToggle={(v) => updateSettings({ notifAiInsights: v })} />
+          <ToggleRow title={t('notifBroadcast', lang)} sub={t('notifBroadcastSub', lang)} on={s.notifBroadcasts ?? false} onToggle={(v) => updateSettings({ notifBroadcasts: v })} />
+        </div>
+      </Card>
+
+      {/* ── Account & Security ─────────────────────────────────── */}
+      <Card>
+        <SectionTitle icon={<IconShield size={20} />} title={t('security', lang)} subtitle={t('securitySub', lang)} />
+        <div className="space-y-3">
+          <LinkRow icon={<IconUser size={18} />} title={t('editProfile', lang)} sub={t('editProfileSub', lang)} onClick={() => nav('/')} />
+          <button
+            onClick={() => setShowPwd((v) => !v)}
+            className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-3 text-left transition hover:bg-neutral-50"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconKey size={18} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold">{t('password', lang)}</span>
+              <span className="block text-[11px] text-neutral-400">{t('passwordSub', lang)}</span>
+            </span>
+            <IconChevronRight size={18} className={`text-neutral-400 transition ${showPwd ? 'rotate-90' : ''}`} />
+          </button>
+          {showPwd && <PasswordForm lang={lang} onDone={() => setShowPwd(false)} />}
+          <ToggleRow title={t('twoFactor', lang)} sub={t('twoFactorSub', lang)} on={s.twoFactor ?? false} onToggle={(v) => updateSettings({ twoFactor: v })} />
+          <ToggleRow title={t('biometric', lang)} sub={t('biometricSub', lang)} on={s.biometricLock ?? false} onToggle={(v) => updateSettings({ biometricLock: v })} />
+        </div>
+      </Card>
+
+      {/* ── Privacy & Data ─────────────────────────────────────── */}
+      <Card>
+        <SectionTitle icon={<IconDownload size={20} />} title={t('privacy', lang)} subtitle={t('privacySub', lang)} />
+        <button
+          onClick={exportData}
+          className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-4 text-left transition hover:bg-neutral-50"
+        >
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconDownload size={20} /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-bold">{t('exportData', lang)}</span>
+            <span className="block text-[11px] text-neutral-400">{t('exportSub', lang)}</span>
+          </span>
+          <IconChevronRight size={18} className="text-neutral-400" />
+        </button>
+      </Card>
+
+      {/* ── AI Co-Physician ────────────────────────────────────── */}
       <Card>
         <SectionTitle
           icon={<IconSettings size={20} />}
@@ -140,56 +198,65 @@ export function Settings() {
         />
         <div className="space-y-4">
           <Field label="Anthropic API Key">
-            <input
-              className={inputClass}
-              type="password"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="sk-ant-..."
-            />
+            <input className={inputClass} type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="sk-ant-..." />
           </Field>
           <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-xs text-neutral-500">
             <IconShield size={16} className="mt-0.5 shrink-0 text-brand" />
-            Kunci disimpan <b className="mx-1">hanya di browser Anda</b> (localStorage) dan dipakai
-            untuk memanggil Claude API langsung. Tanpa kunci, aplikasi berjalan dalam Mode Demo
-            tersimulasi.
+            Kunci disimpan <b className="mx-1">hanya di browser Anda</b> (localStorage) dan dipakai untuk memanggil
+            Claude API langsung. Tanpa kunci, aplikasi berjalan dalam Mode Demo tersimulasi.
           </div>
-
           <Field label="Model">
-            <select
-              className={inputClass}
-              value={state.settings.model}
-              onChange={(e) => updateSettings({ model: e.target.value })}
-            >
+            <select className={inputClass} value={state.settings.model} onChange={(e) => updateSettings({ model: e.target.value })}>
               {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
-                </option>
+                <option key={m.id} value={m.id}>{m.label}</option>
               ))}
             </select>
           </Field>
-
           <Field label="Nama Dokter Pemeriksa">
-            <input
-              className={inputClass}
-              value={doctor}
-              onChange={(e) => setDoctor(e.target.value)}
-              placeholder="dr. Nama, Sp.PD"
-            />
+            <input className={inputClass} value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="dr. Nama, Sp.PD" />
           </Field>
-
           <div className="flex items-center gap-3">
-            <Button onClick={save}>{saved ? t('saved', lang) : 'Simpan'}</Button>
-            <Button variant="ghost" onClick={resetDemo}>
-              Reset Data Demo
-            </Button>
+            <Button onClick={save}>{saved ? t('saved', lang) : t('save', lang)}</Button>
+            <Button variant="ghost" onClick={resetDemo}>Reset Data Demo</Button>
           </div>
         </div>
       </Card>
-      <p className="px-1 text-center text-xs text-neutral-400">
-        Info selengkapnya tentang Panaceamed.id ada di halaman <b>Beranda → Tentang Kami</b>.
-      </p>
+
+      {/* App info */}
+      <div className="pb-2 pt-2 text-center">
+        <p className="text-sm font-bold text-neutral-500">Panaceamed.id · v2.4.0</p>
+        <p className="text-[11px] uppercase tracking-widest text-neutral-400">{t('appInfo', lang)}</p>
+      </div>
     </div>
+  )
+}
+
+// ── Sub-components ──────────────────────────────────────────────
+function ThemeCard({ active, onClick, label, preview, icon }: { active: boolean; onClick: () => void; label: string; preview: 'light' | 'dark' | 'system'; icon: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col gap-2 rounded-xl border-2 p-3 transition ${
+        active ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:border-neutral-300'
+      }`}
+    >
+      <span className="flex h-16 w-full overflow-hidden rounded-lg border border-black/5">
+        {preview === 'system' ? (
+          <>
+            <span className="flex-1 bg-white" />
+            <span className="flex-1 bg-[#0c0f0f]" />
+          </>
+        ) : (
+          <span className={`flex-1 ${preview === 'light' ? 'bg-white' : 'bg-[#0c0f0f]'}`}>
+            <span className="m-1.5 block h-1.5 w-3/4 rounded-full bg-brand/60" />
+            <span className="mx-1.5 block h-5 w-1/2 rounded-md bg-brand/20" />
+          </span>
+        )}
+      </span>
+      <span className={`flex items-center justify-center gap-1.5 text-sm font-bold ${active ? 'text-brand-dark' : 'text-neutral-500'}`}>
+        {icon} {label}
+      </span>
+    </button>
   )
 }
 
@@ -203,5 +270,52 @@ function SegBtn({ active, onClick, children }: { active: boolean; onClick: () =>
     >
       {children}
     </button>
+  )
+}
+
+function ToggleRow({ title, sub, on, onToggle }: { title: string; sub: string; on: boolean; onToggle: (v: boolean) => void }) {
+  return (
+    <button onClick={() => onToggle(!on)} className="flex w-full items-center justify-between gap-3 rounded-xl bg-neutral-50 p-3 text-left">
+      <span className="min-w-0">
+        <span className="block text-sm font-bold">{title}</span>
+        <span className="block text-[11px] text-neutral-400">{sub}</span>
+      </span>
+      <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${on ? 'bg-brand' : 'bg-neutral-300'}`}>
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
+      </span>
+    </button>
+  )
+}
+
+function LinkRow({ icon, title, sub, onClick }: { icon: React.ReactNode; title: string; sub: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-3 text-left transition hover:bg-neutral-50">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark">{icon}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold">{title}</span>
+        <span className="block text-[11px] text-neutral-400">{sub}</span>
+      </span>
+      <IconChevronRight size={18} className="text-neutral-400" />
+    </button>
+  )
+}
+
+function PasswordForm({ lang, onDone }: { lang: Lang; onDone: () => void }) {
+  const [pw, setPw] = useState('')
+  const [pw2, setPw2] = useState('')
+  const [msg, setMsg] = useState('')
+  function submit() {
+    if (pw.length < 8) return setMsg(lang === 'en' ? 'Minimum 8 characters.' : 'Minimal 8 karakter.')
+    if (pw !== pw2) return setMsg(lang === 'en' ? 'Passwords do not match.' : 'Kata sandi tidak cocok.')
+    setMsg('')
+    onDone()
+  }
+  return (
+    <div className="space-y-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+      <input className={inputClass} type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder={lang === 'en' ? 'New password' : 'Kata sandi baru'} />
+      <input className={inputClass} type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder={lang === 'en' ? 'Confirm password' : 'Konfirmasi kata sandi'} />
+      {msg && <p className="text-xs text-accent">{msg}</p>}
+      <Button onClick={submit} className="w-full">{t('save', lang)}</Button>
+    </div>
   )
 }

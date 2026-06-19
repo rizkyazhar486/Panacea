@@ -97,7 +97,18 @@ function seed(): AppState {
     products: DEFAULT_PRODUCTS,
     profiles: {},
     emails: [],
-    settings: { apiKey: '', model: 'claude-sonnet-4-6', doctorName: '' },
+    settings: {
+      apiKey: '',
+      model: 'claude-sonnet-4-6',
+      doctorName: '',
+      notifVitals: true,
+      notifEmail: true,
+      notifSms: false,
+      notifAiInsights: true,
+      notifBroadcasts: false,
+      twoFactor: false,
+      biometricLock: false,
+    },
   }
 }
 
