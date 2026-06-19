@@ -18,8 +18,10 @@ services:
         value: '20'
       - key: COOKIE_SECURE
         value: 'true'
+      # Must list EVERY frontend origin that calls the API (comma-separated, no
+      # trailing slash). Cross-site cookies require the exact origin here.
       - key: CORS_ORIGINS
-        value: https://rizkyazhar486.github.io
+        value: https://panaceamed.vercel.app,https://rizkyazhar486.github.io,http://localhost:5173
       - key: JWT_SECRET
         generateValue: true
       # Fill these in the Render dashboard to go fully live (left blank = mock):
