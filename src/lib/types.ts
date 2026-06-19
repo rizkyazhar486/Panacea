@@ -278,7 +278,7 @@ export interface EducationSheet {
 
 // -- Marketplace / tokenized medical notes & materials -----------------------
 
-export type MaterialCategory = 'Catatan' | 'Materi' | 'Jurnal' | 'AI-EMR Template'
+export type MaterialCategory = 'Catatan' | 'Materi' | 'Jurnal' | 'Artikel'
 export type ExamTrack = 'USMLE' | 'UKMPPD' | 'Umum'
 export type FileType = 'Word' | 'PDF' | 'PowerPoint'
 export type MaterialStatus =

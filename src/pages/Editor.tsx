@@ -68,7 +68,7 @@ export function Editor() {
           <Field label="Spesialti / Topik"><input className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value)} /></Field>
           <Field label="Kategori">
             <select className={inputClass} value={category} onChange={(e) => setCategory(e.target.value as MaterialCategory)}>
-              {(['Catatan', 'Materi', 'Jurnal', 'AI-EMR Template'] as MaterialCategory[]).map((c) => <option key={c}>{c}</option>)}
+              {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => <option key={c}>{c}</option>)}
             </select>
           </Field>
           <Field label="Jalur Ujian">

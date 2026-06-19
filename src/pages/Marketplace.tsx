@@ -3,10 +3,11 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } from '../components/icons'
 import { verifyMaterial } from '../lib/ai'
+import { downloadWatermarkedPdf } from '../lib/pdf'
 import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
 
 const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
-const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'AI-EMR Template']
+const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'Artikel']
 
 function fileTypeFromName(name: string): FileType {
   const n = name.toLowerCase()
@@ -15,19 +16,20 @@ function fileTypeFromName(name: string): FileType {
   return 'Word'
 }
 
-function downloadStub(m: Material) {
-  const body = `PANACEAMED.ID — ${m.title}\n\nKategori: ${m.category} · ${m.exam} · ${m.specialty}\nPenulis: ${m.authorName}\nFormat asli: ${m.fileType} (${m.fileName})\n\n${m.description}\n\n[Demo] File asli akan diunduh dalam format ${m.fileType}. Materi telah diverifikasi AI Claude & verifikator spesialis.`
-  const blob = new Blob([body], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = m.fileName.replace(/\.[^.]+$/, '') + '.txt'
-  a.click()
-  URL.revokeObjectURL(url)
+function downloadOwned(m: Material, buyerId: string) {
+  const meta = `Kategori: ${m.category} · ${m.exam} · ${m.specialty} · Penulis: ${m.authorName}`
+  const body =
+    `${m.description}\n\n` +
+    `Materi ini telah diverifikasi AI Claude & verifikator spesialis (${m.verifierReview?.verifierRole ?? 'Spesialis'}).\n` +
+    `Berkas asli: ${m.fileName} (${m.fileType}).\n\n` +
+    `Dokumen berlisensi untuk pembeli dengan ID di bawah ini. Setiap halaman diberi watermark ID pembeli; ` +
+    `penyalinan atau penyebaran ulang tanpa izin dapat ditindak.`
+  downloadWatermarkedPdf({ title: m.title, meta, body, buyerId })
 }
 
 export function Marketplace() {
-  const { state, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview, buyLongevitySub } = useStore()
+  const { state, account, currentUser, buyMaterial, uploadMaterial, setMaterialAIReview, buyLongevitySub } = useStore()
+  const buyerId = account?.email ?? 'guest@panaceamed.id'
   const [exam, setExam] = useState<(typeof EXAMS)[number]>('Semua')
   const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
   const [toast, setToast] = useState('')
@@ -88,8 +90,8 @@ export function Marketplace() {
       <Card>
         <SectionTitle
           icon={<IconStore size={20} />}
-          title="Marketplace Catatan & Materi Kedokteran"
-          subtitle="USMLE · UKMPPD · Jurnal · Template AI-EMR — dibeli dengan PanaceaToken (PNC)"
+          title="Marketplace Catatan, Materi & Artikel"
+          subtitle="Jual-beli tulisan kedokteran — harga ditentukan penulis, dibeli dengan PNC. Hanya pembeli yang dapat mengakses; tiap halaman PDF diberi watermark ID pembeli."
           right={
             <span className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white">
               <IconToken size={16} className="text-brand" /> {state.wallet.balance} PNC
@@ -151,11 +153,11 @@ export function Marketplace() {
                   <span className="text-xs font-medium text-neutral-400">PNC</span>
                 </span>
                 {owned ? (
-                  <Button variant="outline" onClick={() => downloadStub(m)}>
-                    <IconCheck size={14} /> Unduh
+                  <Button variant="outline" onClick={() => downloadOwned(m, buyerId)}>
+                    <IconCheck size={14} /> Unduh PDF
                   </Button>
                 ) : (
-                  <Button onClick={() => buy(m)}>Beli</Button>
+                  <Button onClick={() => buy(m)}>Beli {m.priceTokens} PNC</Button>
                 )}
               </div>
             </Card>
@@ -238,8 +240,8 @@ function UploadPanel({
     <Card>
       <SectionTitle
         icon={<IconUpload size={18} />}
-        title="Unggah Catatan / Materi / Template AI-EMR"
-        subtitle="Format Word, PDF, atau PowerPoint — wajib lolos verifikasi AI Claude lalu verifikator spesialis"
+        title="Unggah & Minta Verifikasi Catatan / Materi / Artikel"
+        subtitle="Siapa pun boleh menjual tulisan: tentukan harga PNC sendiri. Wajib lolos verifikasi AI Claude lalu verifikator spesialis sebelum tampil."
       />
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Judul">
@@ -255,7 +257,7 @@ function UploadPanel({
         </div>
         <Field label="Kategori">
           <select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as MaterialCategory })}>
-            {(['Catatan', 'Materi', 'Jurnal', 'AI-EMR Template'] as MaterialCategory[]).map((c) => (
+            {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>

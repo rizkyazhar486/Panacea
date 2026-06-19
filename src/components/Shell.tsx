@@ -19,6 +19,7 @@ import {
   IconLogout,
   IconHeart,
   IconPill,
+  IconHospital,
 } from './icons'
 import { useStore } from '../lib/store'
 import { ageFromDob } from '../lib/anthro'
@@ -48,6 +49,7 @@ const nav: Nav[] = [
   { to: '/education', label: 'Edukasi Saya', icon: IconBook, roles: ['pasien'] },
   { to: '/nutrition', label: 'Nutrisi & Kalori', icon: IconFood, roles: ['pasien'] },
   { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'] },
+  { to: '/hospitals', label: 'Faskes Terdekat', icon: IconHospital, roles: ['pasien', 'dokter'] },
   { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'] },
   { to: '/orders', label: 'Riwayat Transaksi', icon: IconWallet, roles: ['pasien'] },
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'] },
