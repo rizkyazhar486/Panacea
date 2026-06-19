@@ -17,6 +17,8 @@ import {
   addVital,
   addSupportive,
   addPatient,
+  getSettings,
+  saveSettings,
   initStore,
   type User,
   type Post,
@@ -141,6 +143,20 @@ app.post('/api/clinical/patient', requireAuth, (req, res) => {
   if (!patient) return res.status(400).json({ error: 'missing_patient' })
   addPatient(patient)
   res.json({ ok: true })
+})
+
+// --- user settings / preferences (cross-device sync; no secrets) ---
+app.get('/api/settings', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ settings: getSettings(u.id) })
+})
+app.put('/api/settings', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
+  // Defensive: never persist the Anthropic API key server-side.
+  const { apiKey: _drop, ...safe } = prefs as Record<string, unknown>
+  saveSettings(u.id, safe)
+  res.json({ ok: true, settings: getSettings(u.id) })
 })
 
 const server = createServer(app)

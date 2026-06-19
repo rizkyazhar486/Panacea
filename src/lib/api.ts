@@ -77,6 +77,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ amountPnc, bank }),
     }),
+  // user preferences (cross-device sync; never carries the API key)
+  getSettings: () => req<{ settings: Record<string, unknown> }>('/api/settings').then((r) => r.settings),
+  saveSettings: (settings: Record<string, unknown>) =>
+    req<{ ok: boolean }>('/api/settings', { method: 'PUT', body: JSON.stringify({ settings }) }),
   posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
   createPost: (p: Partial<BackendPost>) =>
     req<{ post: BackendPost }>('/api/posts', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.post),

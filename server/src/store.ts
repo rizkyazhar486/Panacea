@@ -74,6 +74,7 @@ interface DB {
   orders: Order[]
   posts: Post[]
   clinical: Clinical
+  settings: Record<string, any> // userId -> preference blob (no secrets)
 }
 
 let db: DB = {
@@ -83,6 +84,7 @@ let db: DB = {
   orders: [],
   posts: [],
   clinical: { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} },
+  settings: {},
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -226,6 +228,18 @@ export function addSupportive(patientId: string, r: any) {
 }
 export function addPatient(p: any) {
   ensureClinical().patients.push(p)
+  save()
+}
+
+// Per-user preference sync (notifications, security toggles, model, doctor
+// name). Never holds secrets — the Anthropic API key stays in the browser.
+export function getSettings(userId: string): Record<string, any> {
+  if (!db.settings) db.settings = {}
+  return db.settings[userId] ?? {}
+}
+export function saveSettings(userId: string, prefs: Record<string, any>) {
+  if (!db.settings) db.settings = {}
+  db.settings[userId] = { ...db.settings[userId], ...prefs }
   save()
 }
 

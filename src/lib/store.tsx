@@ -249,6 +249,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .catch(() => {
         hydratedFor.current = '' // allow retry on next change
       })
+    // Pull synced preferences (notifications, security toggles, model, doctor
+    // name). The server never stores the API key, so the local key is kept.
+    api
+      .getSettings()
+      .then((remote) => {
+        if (remote && Object.keys(remote).length) {
+          setState((st) => ({ ...st, settings: { ...st.settings, ...remote } }))
+        }
+      })
+      .catch(() => {})
   }, [state.account?.email])
 
   const store = useMemo<Store>(() => {
@@ -300,8 +310,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (backendEnabled) api.saveEducationRemote(patientId, sheet).catch(() => {})
         setState((st) => ({ ...st, education: { ...st.education, [patientId]: sheet } }))
       },
-      updateSettings: (partial) =>
-        setState((st) => ({ ...st, settings: { ...st.settings, ...partial } })),
+      updateSettings: (partial) => {
+        // Sync prefs to the backend (cross-device), but never the API key.
+        if (backendEnabled) {
+          const { apiKey: _k, ...sync } = partial
+          if (Object.keys(sync).length) api.saveSettings(sync).catch(() => {})
+        }
+        setState((st) => ({ ...st, settings: { ...st.settings, ...partial } }))
+      },
       resetDemo: () => {
         localStorage.removeItem(STORAGE_KEY)
         setState(seed())
