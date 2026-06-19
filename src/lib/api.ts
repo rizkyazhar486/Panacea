@@ -77,6 +77,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ amountPnc, bank }),
     }),
+  // compliance — audit log (owner-only) & SATUSEHAT integration status
+  audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
+  satusehatStatus: () => req<{ configured: boolean; env: string; note: string }>('/api/satusehat/status'),
   // server-side Claude proxy — AI works without the user supplying a key
   aiMessages: (payload: {
     model: string
@@ -112,6 +115,15 @@ export interface ClinicalData {
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
   education: Record<string, EducationSheet>
+}
+
+export interface AuditEntry {
+  id: string
+  at: string
+  userId: string
+  userEmail: string
+  action: string
+  target?: string
 }
 
 export interface BackendPost {

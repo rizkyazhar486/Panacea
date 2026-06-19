@@ -1,7 +1,8 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
-import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus } from '../components/icons'
+import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck } from '../components/icons'
+import { api, backendEnabled, type AuditEntry } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -92,6 +93,8 @@ export function Owner() {
         </Card>
       )}
 
+      {isOwner && <CompliancePanel />}
+
       <Card>
         <div className="flex items-center gap-2 text-sm text-neutral-500">
           <Badge tone="high">Catatan</Badge>
@@ -99,6 +102,69 @@ export function Owner() {
         </div>
       </Card>
     </div>
+  )
+}
+
+// Compliance dashboard — audit log (Permenkes 24/2022) + SATUSEHAT status.
+function CompliancePanel() {
+  const [audit, setAudit] = useState<AuditEntry[] | null>(null)
+  const [sehat, setSehat] = useState<{ configured: boolean; env: string; note: string } | null>(null)
+  const [err, setErr] = useState('')
+
+  useEffect(() => {
+    if (!backendEnabled) return
+    api.audit().then(setAudit).catch(() => setErr('Gagal memuat audit log (butuh server aktif).'))
+    api.satusehatStatus().then(setSehat).catch(() => {})
+  }, [])
+
+  const actionLabel: Record<string, string> = {
+    'clinical.read': 'Akses rekam medis',
+    'emr.save': 'Simpan AI-EMR',
+  }
+
+  return (
+    <>
+      <Card>
+        <SectionTitle
+          icon={<IconShield size={20} />}
+          title="SATUSEHAT — Interoperabilitas Kemenkes"
+          subtitle="Permenkes 24/2022 · pertukaran data FHIR R4"
+          right={<Badge tone={sehat?.configured ? 'brand' : 'high'}>{sehat?.configured ? 'Terhubung' : 'Belum dikonfigurasi'}</Badge>}
+        />
+        <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-sm text-neutral-600">
+          <span className={`mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full ${sehat?.configured ? 'bg-brand' : 'bg-amber-400'}`} />
+          <div>
+            <div>{sehat?.note ?? (backendEnabled ? 'Memuat status…' : 'Server tidak aktif.')}</div>
+            <div className="mt-0.5 text-[11px] text-neutral-400">Lingkungan: {sehat?.env ?? 'sandbox'} · set SATUSEHAT_CLIENT_ID/SECRET di server untuk mengaktifkan.</div>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          icon={<IconLock size={20} />}
+          title="Audit Log Akses Rekam Medis"
+          subtitle="Jejak akses & perubahan data klinis (UU PDP & Permenkes 24/2022)"
+          right={audit ? <Badge tone="neutral">{audit.length} entri</Badge> : undefined}
+        />
+        {err && <p className="text-sm text-accent">{err}</p>}
+        {!backendEnabled && <p className="text-sm text-neutral-400">Audit log memerlukan server aktif.</p>}
+        {audit && audit.length === 0 && <p className="text-sm text-neutral-400">Belum ada akses tercatat.</p>}
+        {audit && audit.length > 0 && (
+          <div className="max-h-80 space-y-1.5 overflow-y-auto">
+            {audit.map((e) => (
+              <div key={e.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
+                <IconCheck size={15} className="shrink-0 text-brand" />
+                <span className="font-semibold">{actionLabel[e.action] ?? e.action}</span>
+                {e.target && <span className="text-[11px] text-neutral-400">#{e.target}</span>}
+                <span className="ml-auto truncate text-[11px] text-neutral-400">{e.userEmail}</span>
+                <span className="shrink-0 text-[11px] text-neutral-400">{new Date(e.at).toLocaleString('id-ID')}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </>
   )
 }
 
