@@ -19,6 +19,8 @@ import {
   addPatient,
   getSettings,
   saveSettings,
+  addAudit,
+  getAudit,
   initStore,
   type User,
   type Post,
@@ -114,11 +116,15 @@ app.post('/api/posts/:id/like', (req, res) => {
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
-app.get('/api/clinical', requireAuth, (_req, res) => res.json(getClinical()))
+app.get('/api/clinical', requireAuth, (req, res) => {
+  addAudit((req as express.Request & { user: User }).user, 'clinical.read')
+  res.json(getClinical())
+})
 app.post('/api/clinical/record', requireAuth, (req, res) => {
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
   saveRecord(patientId, record)
+  addAudit((req as express.Request & { user: User }).user, 'emr.save', patientId)
   res.json({ ok: true })
 })
 app.post('/api/clinical/education', requireAuth, (req, res) => {
@@ -162,6 +168,19 @@ app.put('/api/settings', requireAuth, (req, res) => {
 
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
+
+// --- audit log (Permenkes 24/2022) — owner-only access ---
+app.get('/api/audit', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'owner') return res.status(403).json({ error: 'forbidden' })
+  res.json({ entries: getAudit(300) })
+})
+
+// --- SATUSEHAT interoperability (Kemenkes) — integration skeleton ---
+app.get('/api/satusehat/status', requireAuth, (_req, res) => {
+  const configured = Boolean(process.env.SATUSEHAT_CLIENT_ID && process.env.SATUSEHAT_CLIENT_SECRET)
+  res.json({ configured, env: process.env.SATUSEHAT_ENV || 'sandbox', note: configured ? 'Kredensial terdeteksi — siap integrasi.' : 'Belum dikonfigurasi (set SATUSEHAT_CLIENT_ID/SECRET).' })
+})
 
 const server = createServer(app)
 attachRealtime(server)

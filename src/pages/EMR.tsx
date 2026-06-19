@@ -87,8 +87,38 @@ const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
   { key: 'riwayatSosialEkonomi', label: 'Riwayat Sosial-Ekonomi & Lingkungan' },
 ]
 
+function StrGate({ onVerify, str }: { onVerify: () => void; str?: string }) {
+  return (
+    <div className="mx-auto max-w-lg">
+      <Card className="text-center">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-amber-100 text-amber-700"><IconShield size={30} /></span>
+        <h2 className="mt-4 text-xl font-extrabold">STR sedang diverifikasi</h2>
+        <p className="mt-2 text-sm text-neutral-600">
+          Akses <b>AI-EMR</b> hanya untuk klinisi dengan <b>STR/SIP terverifikasi</b> (sesuai UU Kesehatan &amp; Permenkes Telemedicine).
+          Nomor STR Anda{str ? <> (<b>{str}</b>)</> : ''} telah kami terima dan sedang ditinjau tim verifikasi.
+        </p>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Status: Menunggu verifikasi
+        </div>
+        <div className="mt-5 rounded-xl bg-neutral-50 p-3 text-left text-[12px] text-neutral-500">
+          Verifikasi dilakukan oleh tim Panaceamed terhadap data KKI/STR. Setelah disetujui, AI-EMR terbuka otomatis.
+        </div>
+        <Button variant="outline" className="mt-4" onClick={onVerify}>
+          <IconCheck size={16} /> Verifikasi STR (Admin/Owner)
+        </Button>
+      </Card>
+    </div>
+  )
+}
+
 export function EMR() {
-  const { state, activePatient, saveRecord } = useStore()
+  const store = useStore()
+  const { state, activePatient, saveRecord } = store
+  const acc = state.account
+  // STR gate — AI-EMR is restricted to clinicians with a verified STR/SIP.
+  if (acc?.role === 'dokter' && acc.strStatus !== 'verified' && !acc.isOwner) {
+    return <StrGate onVerify={store.verifyStr} str={acc.str} />
+  }
   const record = state.records[activePatient.id]
   const [draft, setDraft] = useState<EMRRecord | null>(record ?? null)
   const [dirty, setDirty] = useState(false)

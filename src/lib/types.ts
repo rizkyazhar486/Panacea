@@ -150,6 +150,8 @@ export interface Account {
   occupation?: string
   background?: string // latar belakang singkat
   str?: string // doctor's Surat Tanda Registrasi / practice certificate no.
+  strStatus?: 'none' | 'pending' | 'verified' // STR verification gate for AI-EMR
+  consentAt?: string // ISO timestamp of T&C + privacy + informed consent
   isOwner?: boolean // true for the platform owner account (mode-switch enabled)
 }
 

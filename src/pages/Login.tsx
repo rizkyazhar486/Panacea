@@ -28,8 +28,11 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [str, setStr] = useState('')
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [showLegal, setShowLegal] = useState(false)
   const [theme, setTheme] = useState<Theme>(getTheme)
   const roleRef = useRef<Role>('pasien')
+  const consentRef = useRef(false)
   const gbtn = useRef<HTMLDivElement>(null)
 
   // Detect a configured backend; render the real Google button when available.
@@ -41,13 +44,20 @@ export function Login({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     roleRef.current = role
   }, [role])
+  useEffect(() => {
+    consentRef.current = consent
+  }, [consent])
 
   useEffect(() => {
     if (health?.googleClientId && gbtn.current) {
       renderGoogleButton(gbtn.current, health.googleClientId, (credential) => {
+        if (!consentRef.current) {
+          setError('Harap menyetujui Syarat, Kebijakan Privasi & Persetujuan Tindakan terlebih dahulu.')
+          return
+        }
         api
           .googleLogin(credential, roleRef.current)
-          .then((acc) => login({ ...acc, isSubscriber: acc.role === 'owner' }))
+          .then((acc) => login({ ...acc, isSubscriber: acc.role === 'owner', consentAt: new Date().toISOString(), strStatus: acc.role === 'dokter' ? 'pending' : 'none' }))
           .catch(() => setError('Verifikasi Google gagal.'))
       }).catch(() => setError('Gagal memuat Google Sign-In.'))
     }
@@ -69,6 +79,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
   }
 
   function doLogin() {
+    if (!consent) {
+      setError('Harap menyetujui Syarat, Kebijakan Privasi & Persetujuan Tindakan terlebih dahulu.')
+      return
+    }
     const cleanEmail = (email.trim() || 'user@gmail.com').toLowerCase()
     const isOwner = cleanEmail === OWNER_EMAIL
     // Admin is restricted to owner-approved emails only.
@@ -92,6 +106,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
       occupation: occupation.trim() || undefined,
       background: background.trim() || undefined,
       str: role === 'dokter' ? str.trim() : undefined,
+      strStatus: role === 'dokter' ? 'pending' : 'none',
+      consentAt: new Date().toISOString(),
       isOwner,
     }
     // Backend present → create a real server session (dev-login) for the wallet/API.
@@ -241,13 +257,39 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </div>
           </div>
 
-          <Button onClick={doLogin} className="mt-5 w-full">
+          <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
+            <span>
+              Saya telah membaca &amp; menyetujui <button type="button" onClick={() => setShowLegal(true)} className="font-bold text-brand-dark underline">Syarat &amp; Ketentuan, Kebijakan Privasi, dan Persetujuan Tindakan (Informed Consent)</button>. Saya memahami AI bersifat pendukung, bukan pengganti dokter.
+            </span>
+          </label>
+
+          <Button onClick={doLogin} className="mt-4 w-full">
             Masuk sebagai {ROLES.find((r) => r.id === role)?.title}
           </Button>
           <p className="mt-3 text-center text-[11px] text-neutral-400">
-            Dengan masuk, Anda menyetujui Syarat &amp; Ketentuan dan Kebijakan Privasi Panaceamed.id.
+            ⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi. Data Anda dilindungi sesuai UU PDP.
           </p>
+
+          {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function LegalModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold">Persetujuan, Privasi & Ketentuan</h3>
+        <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
+          <p><b>Persetujuan Tindakan (Informed Consent).</b> Interaksi AI bersifat edukatif &amp; pendukung — bukan diagnosis final. Diagnosis &amp; terapi tetap memerlukan verifikasi dokter berlisensi.</p>
+          <p><b>Privasi (UU PDP No. 27/2022).</b> Data kesehatan Anda adalah data pribadi spesifik, disimpan terenkripsi di Indonesia, dengan audit log akses. Anda berhak mengakses, memperbaiki, dan menghapus data kapan saja.</p>
+          <p><b>Ketentuan.</b> AI-EMR hanya untuk klinisi dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin &amp; BPOM. Dalam keadaan darurat, gunakan fitur Darurat SOS dan hubungi faskes terdekat.</p>
+          <p className="text-xs text-neutral-400">Versi lengkap tersedia di menu “Privasi &amp; Legal” setelah masuk.</p>
+        </div>
+        <button onClick={onClose} className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2.5 text-sm font-bold text-white">Mengerti</button>
       </div>
     </div>
   )

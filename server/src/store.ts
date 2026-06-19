@@ -231,6 +231,27 @@ export function addPatient(p: any) {
   save()
 }
 
+// ── Audit log (Permenkes 24/2022) — record every access/change to clinical
+// data: who, what action, which patient, and when. Append-only, capped.
+export interface AuditEntry {
+  id: string
+  at: string
+  userId: string
+  userEmail: string
+  action: string
+  target?: string
+}
+export function addAudit(user: User, action: string, target?: string) {
+  if (!(db as any).audit) (db as any).audit = []
+  const audit: AuditEntry[] = (db as any).audit
+  audit.unshift({ id: uid(), at: new Date().toISOString(), userId: user.id, userEmail: user.email, action, target })
+  if (audit.length > 5000) audit.length = 5000
+  save()
+}
+export function getAudit(limit = 200): AuditEntry[] {
+  return ((db as any).audit ?? []).slice(0, limit)
+}
+
 // Per-user preference sync (notifications, security toggles, model, doctor
 // name). Never holds secrets — the Anthropic API key stays in the browser.
 export function getSettings(userId: string): Record<string, any> {

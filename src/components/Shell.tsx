@@ -64,6 +64,7 @@ const nav: Nav[] = [
   { to: '/billing', label: 'Billing & Token', icon: IconWallet, roles: ALL },
   { to: '/architecture', label: 'Arsitektur CDSS', icon: IconArchitecture, roles: ['admin'] },
   { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL },
+  { to: '/legal', label: 'Privasi & Legal', icon: IconShield, roles: ALL },
 ]
 
 // Pages that show the active-patient context. Patients see only their own data

@@ -30,6 +30,7 @@ import { Orders } from './pages/Orders'
 import { Editor } from './pages/Editor'
 import { PatientEducation } from './pages/PatientEducation'
 import { Admin } from './pages/Admin'
+import { Legal } from './pages/Legal'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -58,6 +59,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/education" element={<PatientEducation />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/legal" element={<Legal />} />
           </Routes>
         </Shell>
       </HashRouter>

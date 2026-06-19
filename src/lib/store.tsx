@@ -149,6 +149,7 @@ interface Store {
   // auth
   login: (account: Account) => void
   logout: () => void
+  verifyStr: () => void // mark the current doctor's STR as verified
   setMode: (role: Role) => void // owner-only: switch acting role
   addAdminEmail: (email: string) => void
   removeAdminEmail: (email: string) => void
@@ -407,6 +408,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return { ...st, account }
         }),
       logout: () => setState((st) => ({ ...st, account: null })),
+      verifyStr: () =>
+        setState((st) => (st.account ? { ...st, account: { ...st.account, strStatus: 'verified' } } : st)),
       setMode: (role) =>
         setState((st) => {
           if (!st.account?.isOwner) return st // only the owner can switch modes

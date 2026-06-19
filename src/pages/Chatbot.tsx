@@ -4,7 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, Button, Badge } from '../components/ui'
 import { IconSend, IconSparkle, IconChat } from '../components/icons'
 import { LogoMark } from '../components/Logo'
-import { sendChat, draftEMR, hasKey, type PatientContext } from '../lib/ai'
+import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
@@ -129,10 +129,17 @@ export function Chatbot() {
     }
   }
 
-  const keyed = hasKey(state.settings)
+  const keyed = aiAvailable(state.settings)
 
   return (
     <div className="space-y-4">
+      <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] leading-snug text-amber-800">
+        <span className="mt-0.5 shrink-0">⚕️</span>
+        <span>
+          <b>Penting:</b> AI ini bersifat <b>edukatif &amp; pendukung</b>, bukan pengganti dokter. Tidak memberikan diagnosis final.
+          Untuk keadaan darurat (nyeri dada hebat, sesak berat, penurunan kesadaran), segera gunakan <b>Darurat SOS</b> atau hubungi faskes terdekat.
+        </span>
+      </div>
       <Card pad={false} className="overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
           <div className="flex items-center gap-2.5">
@@ -145,7 +152,7 @@ export function Chatbot() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Live' : 'Mode Demo'}</Badge>
+            <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Aktif' : 'AI Terbatas'}</Badge>
             {store.account?.role === 'dokter' ? (
               <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
                 <IconSparkle size={16} />
@@ -218,7 +225,7 @@ function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
       </p>
       {!keyed && (
         <p className="mt-2 text-xs text-accent">
-          Mode Demo aktif — tambahkan API key Anthropic di Pengaturan untuk respons AI penuh.
+          AI terbatas — sambungkan server (atau tambah API key pribadi di Pengaturan) untuk respons AI penuh.
         </p>
       )}
       <div className="mt-4 flex flex-wrap justify-center gap-2">
