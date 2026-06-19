@@ -21,6 +21,7 @@ import {
   IconLock,
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { uploadOrLocal } from '../lib/upload'
 import type { SocialPost, PostType, Role, ProfileEdit } from '../lib/types'
 
 const ACTIVITIES = ['Lari', 'Jalan kaki', 'Berenang', 'Bersepeda', 'Padel', 'Futsal', 'Yoga', 'Gym', 'Menyapu']
@@ -315,9 +316,12 @@ function EditProfileModal({ current, onClose, onSave }: { current: { name: strin
   const [name, setName] = useState(current.name)
   const [bio, setBio] = useState(current.bio)
   const [avatar, setAvatar] = useState<string | undefined>(current.avatar)
-  function pick(file?: File) {
+  const [busy, setBusy] = useState(false)
+  async function pick(file?: File) {
     if (!file) return
-    const r = new FileReader(); r.onload = () => setAvatar(String(r.result)); r.readAsDataURL(file)
+    setBusy(true)
+    setAvatar(await uploadOrLocal(file))
+    setBusy(false)
   }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
@@ -328,7 +332,7 @@ function EditProfileModal({ current, onClose, onSave }: { current: { name: strin
             {avatar ? <img src={avatar} className="h-full w-full object-cover" alt="" /> : initials(name)}
           </span>
           <label className="mt-2 cursor-pointer text-sm font-semibold text-brand-dark hover:underline">
-            Ubah foto profil
+            {busy ? 'Mengunggah…' : 'Ubah foto profil'}
             <input type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
           </label>
         </div>
@@ -572,16 +576,23 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
   const [waterMl, setWaterMl] = useState('')
   const [veggieServ, setVeggieServ] = useState('')
   const [articleTitle, setArticleTitle] = useState('')
+  const [uploading, setUploading] = useState(false)
   const num = (s: string) => (s.trim() === '' ? undefined : Number(s))
 
-  function onPickPhotos(files: FileList | null) {
+  async function onPickPhotos(files: FileList | null) {
     if (!files) return
     const imgs = Array.from(files).slice(0, 4)
-    Promise.all(imgs.map((f) => new Promise<string>((res) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.readAsDataURL(f) }))).then(setPhotoData)
+    setUploading(true)
+    const urls = await Promise.all(imgs.map((f) => uploadOrLocal(f)))
+    setPhotoData(urls)
+    setUploading(false)
   }
-  function onPickVideo(files: FileList | null) {
+  async function onPickVideo(files: FileList | null) {
     const f = files?.[0]
-    if (f) setVideoUrl(URL.createObjectURL(f))
+    if (!f) return
+    setUploading(true)
+    setVideoUrl(await uploadOrLocal(f))
+    setUploading(false)
   }
 
   function submit() {
@@ -684,9 +695,10 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           <IconLock size={14} className="text-neutral-400" /> Kunci postingan (privat — hanya Anda)
         </label>
 
+        {uploading && <p className="mt-3 text-xs font-semibold text-brand-dark">Mengunggah media…</p>}
         <div className="mt-5 flex gap-2">
           <Button variant="ghost" className="flex-1" onClick={onClose}>Batal</Button>
-          <Button className="flex-1" onClick={submit}><IconPlus size={16} /> Posting</Button>
+          <Button className="flex-1" onClick={submit} disabled={uploading}><IconPlus size={16} /> Posting</Button>
         </div>
       </div>
     </div>

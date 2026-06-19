@@ -25,8 +25,9 @@ services:
       - key: JWT_SECRET
         generateValue: true
       # Fill these in the Render dashboard to go fully live (left blank = mock):
+      # Google OAuth Client ID is public (shipped to the browser) — safe to commit.
       - key: GOOGLE_CLIENT_ID
-        sync: false
+        value: 271592823595-bsseftegtunc8hh4cn8dm0ljqga7t5oc.apps.googleusercontent.com
       - key: MIDTRANS_SERVER_KEY
         sync: false
       - key: MIDTRANS_CLIENT_KEY
