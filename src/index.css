@@ -42,6 +42,8 @@ body {
 /* Surfaces */
 .dark .bg-white { background-color: #15181a !important; }
 .dark .bg-white\/90 { background-color: rgba(21, 24, 26, 0.9) !important; }
+.dark .bg-white\/85 { background-color: rgba(21, 24, 26, 0.85) !important; }
+.dark .bg-white\/80 { background-color: rgba(21, 24, 26, 0.8) !important; }
 .dark .bg-white\/70 { background-color: rgba(21, 24, 26, 0.7) !important; }
 .dark .bg-neutral-50 { background-color: #1b1f20 !important; }
 .dark .bg-neutral-100 { background-color: #23282a !important; }
