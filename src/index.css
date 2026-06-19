@@ -45,6 +45,9 @@ body {
 .dark .bg-white\/85 { background-color: rgba(21, 24, 26, 0.85) !important; }
 .dark .bg-white\/80 { background-color: rgba(21, 24, 26, 0.8) !important; }
 .dark .bg-white\/70 { background-color: rgba(21, 24, 26, 0.7) !important; }
+.dark .bg-white\/60 { background-color: rgba(24, 28, 30, 0.6) !important; }
+.dark .bg-white\/50 { background-color: rgba(24, 28, 30, 0.5) !important; }
+.dark .bg-white\/40 { background-color: rgba(24, 28, 30, 0.45) !important; }
 .dark .bg-neutral-50 { background-color: #1b1f20 !important; }
 .dark .bg-neutral-100 { background-color: #23282a !important; }
 .dark .bg-neutral-200 { background-color: #2c3133 !important; }
@@ -127,6 +130,58 @@ body {
 }
 .rise {
   animation: rise 0.25s ease-out both;
+}
+
+/* ── Marketing / showcase animations ─────────────────────────── */
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(28px, -36px) scale(1.08); }
+  66% { transform: translate(-22px, 22px) scale(0.94); }
+}
+.orb { animation: float-orb 20s ease-in-out infinite; will-change: transform; }
+
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-text {
+  background-size: 220% auto;
+  animation: gradient-pan 6s ease infinite;
+}
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee-x 30s linear infinite; }
+.marquee-pause:hover .animate-marquee { animation-play-state: paused; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Scroll-reveal — toggled by the Reveal component via IntersectionObserver */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Honor the reduced-motion preference for every decorative effect */
+.reduce-motion .orb,
+.reduce-motion .animate-gradient-text,
+.reduce-motion .animate-marquee {
+  animation: none !important;
+}
+.reduce-motion .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 /* Reduced-motion preference — kill transitions & animations app-wide. */
