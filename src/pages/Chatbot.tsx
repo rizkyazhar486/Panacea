@@ -5,6 +5,7 @@ import { Card, Button, Badge } from '../components/ui'
 import { IconSend, IconSparkle, IconChat } from '../components/icons'
 import { LogoMark } from '../components/Logo'
 import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
+import { api, backendEnabled } from '../lib/api'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
@@ -48,11 +49,38 @@ export function Chatbot() {
   const [busy, setBusy] = useState(false)
   const [drafting, setDrafting] = useState(false)
   const [error, setError] = useState('')
+  const [consulting, setConsulting] = useState(false)
+  const [price, setPrice] = useState(5)
+  const [topup, setTopup] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, busy])
+  }, [messages, busy, consulting])
+
+  useEffect(() => {
+    if (backendEnabled) api.health().then((h) => h.aiConsultPnc && setPrice(h.aiConsultPnc)).catch(() => {})
+  }, [])
+
+  // Premium deep consultation — charges PNC server-side, appends a structured report.
+  async function deepConsult() {
+    if (messages.length === 0) return
+    setConsulting(true)
+    setError('')
+    setTopup(false)
+    try {
+      const r = await api.aiConsult(messages.map((m) => ({ role: m.role, content: m.content })))
+      setChat(activePatient.id, [
+        ...messages,
+        { id: uid(), role: 'assistant', content: `🩺 **Konsultasi AI Mendalam** _(−${r.charged} PNC · sisa ${r.balance})_\n\n${r.text}`, at: new Date().toISOString() },
+      ])
+    } catch (e) {
+      if (String(e instanceof Error ? e.message : e).includes('insufficient_balance')) setTopup(true)
+      else setError('Gagal menjalankan konsultasi mendalam.')
+    } finally {
+      setConsulting(false)
+    }
+  }
 
   async function send() {
     const text = input.trim()
@@ -140,6 +168,12 @@ export function Chatbot() {
           Untuk keadaan darurat (nyeri dada hebat, sesak berat, penurunan kesadaran), segera gunakan <b>Darurat SOS</b> atau hubungi faskes terdekat.
         </span>
       </div>
+      {topup && (
+        <div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm">
+          <span className="text-accent">Saldo PNC tidak cukup untuk Konsultasi Mendalam ({price} PNC).</span>
+          <Button onClick={() => nav('/billing')} className="!px-4 !py-1.5 text-xs">Top up PNC</Button>
+        </div>
+      )}
       <Card pad={false} className="overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
           <div className="flex items-center gap-2.5">
@@ -153,6 +187,12 @@ export function Chatbot() {
           </div>
           <div className="flex items-center gap-2">
             <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Aktif' : 'AI Terbatas'}</Badge>
+            {backendEnabled && (
+              <Button variant="outline" onClick={deepConsult} disabled={consulting || messages.length === 0}>
+                <IconSparkle size={16} />
+                {consulting ? 'Menganalisis…' : `Konsultasi Mendalam · ${price} PNC`}
+              </Button>
+            )}
             {store.account?.role === 'dokter' ? (
               <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
                 <IconSparkle size={16} />

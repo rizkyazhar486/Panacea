@@ -9,7 +9,8 @@ export const backendEnabled = Boolean(API)
 
 export interface Health {
   ok: boolean
-  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean }
+  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean }
+  aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null
   googleClientId: string | null
@@ -138,6 +139,8 @@ export const api = {
       body: JSON.stringify({ title, body }),
     }),
   // server-side Claude proxy — AI works without the user supplying a key
+  aiConsult: (messages: { role: 'user' | 'assistant'; content: string }[]) =>
+    req<{ text: string; charged: number; balance: number }>('/api/ai/consult', { method: 'POST', body: JSON.stringify({ messages }) }),
   aiMessages: (payload: {
     model: string
     system: string

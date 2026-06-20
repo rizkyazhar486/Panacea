@@ -16,6 +16,7 @@ export const config = {
     isProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
   },
   tokenToIdr: Number(process.env.TOKEN_TO_IDR) || 1000,
+  aiConsultPnc: Number(process.env.AI_CONSULT_PNC) || 5,
   vapid: {
     publicKey: process.env.VAPID_PUBLIC_KEY || '',
     privateKey: process.env.VAPID_PRIVATE_KEY || '',

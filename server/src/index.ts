@@ -35,7 +35,7 @@ import {
   type Post,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { aiMessages } from './ai.js'
+import { aiMessages, aiConsult } from './ai.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
@@ -61,6 +61,7 @@ app.get('/api/health', (_req, res) => {
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
+    aiConsultPnc: config.aiConsultPnc,
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
     googleClientId: features.googleLive ? config.googleClientId : null,
   })
@@ -190,6 +191,7 @@ app.put('/api/settings', requireAuth, (req, res) => {
 
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
+app.post('/api/ai/consult', requireAuth, aiConsult)
 
 // --- targeted notification (verifier/admin/owner → a specific user) ---
 app.post('/api/notify/user', requireAuth, async (req, res) => {
