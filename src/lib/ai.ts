@@ -113,7 +113,12 @@ export async function sendChat(
   if (!aiAvailable(settings)) return demoChatReply(history, ctx)
   try {
     return await callClaude(settings, msgs, sysExtra)
-  } catch {
+  } catch (e) {
+    // Surface a clear message when the server-side rate limit is hit, rather
+    // than silently dropping to scripted text.
+    if (String((e as Error)?.message).includes('rate_limited')) {
+      return '⏳ Terlalu banyak permintaan dalam waktu singkat. Mohon tunggu sebentar lalu coba lagi.'
+    }
     return demoChatReply(history, ctx)
   }
 }

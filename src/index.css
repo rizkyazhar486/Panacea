@@ -92,6 +92,16 @@ body {
 .dark textarea::placeholder { color: #7c867f !important; }
 .dark option { background-color: #1b1f20; color: #e6ece8; }
 
+/* Keyboard accessibility — visible focus ring for non-pointer users only. */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Thin, branded scrollbar */
 *::-webkit-scrollbar {
   width: 9px;
