@@ -5,7 +5,39 @@ import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { generateEducation } from '../lib/ai'
+import { api, backendEnabled } from '../lib/api'
 import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
+
+// Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
+function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  if (!backendEnabled) return null
+  async function send() {
+    setBusy(true)
+    setMsg('')
+    try {
+      const r = await api.satusehatSubmit(patient, { ...record, vitals })
+      setMsg(
+        r.configured
+          ? `✅ Terkirim ke SATUSEHAT (${r.summary.resources} sumber daya FHIR).`
+          : `📋 Pratinjau FHIR siap (${r.summary.resources} sumber daya) — aktifkan kredensial SATUSEHAT di server untuk mengirim.`,
+      )
+    } catch {
+      setMsg('Gagal menyiapkan bundel SATUSEHAT.')
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Button variant="outline" onClick={send} disabled={busy}>
+        <IconShield size={14} /> {busy ? 'Mengirim…' : 'Kirim ke SATUSEHAT'}
+      </Button>
+      {msg && <span className="text-[11px] font-semibold text-brand-dark">{msg}</span>}
+    </span>
+  )
+}
 
 const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: string[] }[] = [
   { key: 'mata', label: 'Mata', x: 60, y: 9, kw: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos'] },
@@ -184,6 +216,7 @@ export function EMR() {
             <Button variant="outline" onClick={() => window.print()}>
               <IconBook size={14} /> Cetak / PDF
             </Button>
+            <SatusehatButton patient={activePatient} record={draft} vitals={state.vitals[activePatient.id] ?? []} />
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">

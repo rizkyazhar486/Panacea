@@ -37,6 +37,7 @@ import {
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { aiMessages } from './ai.js'
 import { sendPush, notify } from './push.js'
+import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
 
@@ -283,6 +284,21 @@ app.post('/api/doctors/:id/verify', requireAuth, (req, res) => {
   saveSettings(id, { strStatus: status })
   addAudit(u, 'str.verify', id)
   res.json({ ok: true })
+})
+
+// --- SATUSEHAT: submit an EMR as a FHIR R4 Bundle (dokter/owner) ---
+app.post('/api/satusehat/encounter', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter' && !isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { patient, record } = req.body as { patient?: unknown; record?: unknown }
+  if (!patient || !record) return res.status(400).json({ error: 'missing_data' })
+  try {
+    const out = await submitEmr(patient, record, u.name)
+    addAudit(u, 'satusehat.submit', (patient as { id?: string })?.id)
+    res.json({ ok: true, ...out })
+  } catch (e) {
+    res.status(502).json({ error: 'satusehat_failed', detail: String(e) })
+  }
 })
 
 // --- SATUSEHAT interoperability (Kemenkes) — integration skeleton ---

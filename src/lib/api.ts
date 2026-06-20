@@ -80,6 +80,11 @@ export const api = {
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
   stats: () => req<Stats>('/api/stats'),
+  satusehatSubmit: (patient: unknown, record: unknown) =>
+    req<{ ok: boolean; configured: boolean; summary: { resources: number; conditions: number; observations: number } }>(
+      '/api/satusehat/encounter',
+      { method: 'POST', body: JSON.stringify({ patient, record }) },
+    ),
   doctors: () => req<{ doctors: DoctorRow[] }>('/api/doctors').then((r) => r.doctors),
   verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
     req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),

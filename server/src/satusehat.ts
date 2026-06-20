@@ -47,6 +47,90 @@ export async function postResource(resourceType: string, resource: unknown): Pro
   return r.json()
 }
 
-// TODO (certification phase): map Panaceamed EMR → FHIR R4 Bundle
-// (Patient, Encounter, Observation[vitals/labs], Condition, MedicationRequest)
-// and reconcile patient identity with NIK/IHS number.
+// Build a FHIR R4 transaction Bundle from a Panaceamed EMR record.
+// Minimal but valid: Patient + Encounter + Condition[] (from problems) +
+// Observation[] (from vitals). Identity reconciliation (NIK/IHS) is added at
+// certification; here we send local references.
+export function buildEmrBundle(patient: any, record: any, practitionerName: string): any {
+  const pRef = `urn:uuid:patient-${patient?.id || 'unknown'}`
+  const eRef = `urn:uuid:encounter-${Date.now()}`
+  const entry: any[] = []
+
+  entry.push({
+    fullUrl: pRef,
+    resource: {
+      resourceType: 'Patient',
+      name: [{ text: patient?.name || 'Pasien' }],
+      gender: patient?.sex === 'P' ? 'female' : 'male',
+      birthDate: patient?.dob || undefined,
+      identifier: patient?.mrn ? [{ system: 'http://panaceamed.id/mrn', value: patient.mrn }] : undefined,
+    },
+    request: { method: 'POST', url: 'Patient' },
+  })
+
+  entry.push({
+    fullUrl: eRef,
+    resource: {
+      resourceType: 'Encounter',
+      status: 'finished',
+      class: { system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB', display: 'ambulatory' },
+      subject: { reference: pRef, display: patient?.name },
+      participant: [{ individual: { display: practitionerName } }],
+      period: { start: new Date().toISOString() },
+    },
+    request: { method: 'POST', url: 'Encounter' },
+  })
+
+  for (const p of record?.problems ?? []) {
+    entry.push({
+      resource: {
+        resourceType: 'Condition',
+        subject: { reference: pRef },
+        encounter: { reference: eRef },
+        code: { text: p.title },
+        note: p.assessment ? [{ text: p.assessment }] : undefined,
+      },
+      request: { method: 'POST', url: 'Condition' },
+    })
+  }
+
+  for (const v of record?.vitals ?? []) {
+    if (v?.value == null) continue
+    entry.push({
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs' }] }],
+        code: { text: v.label || v.name || 'Vital' },
+        subject: { reference: pRef },
+        encounter: { reference: eRef },
+        valueQuantity: { value: Number(v.value), unit: v.unit || '' },
+        effectiveDateTime: v.at || new Date().toISOString(),
+      },
+      request: { method: 'POST', url: 'Observation' },
+    })
+  }
+
+  return { resourceType: 'Bundle', type: 'transaction', entry }
+}
+
+// Submit an EMR as a FHIR Bundle. Returns a preview (no network) until
+// credentials are configured, then POSTs the transaction to SATUSEHAT.
+export async function submitEmr(patient: any, record: any, practitionerName: string) {
+  const bundle = buildEmrBundle(patient, record, practitionerName)
+  const summary = {
+    patient: patient?.name,
+    resources: bundle.entry.length,
+    conditions: (record?.problems ?? []).length,
+    observations: bundle.entry.filter((e: any) => e.resource.resourceType === 'Observation').length,
+  }
+  if (!isConfigured()) return { configured: false, summary, preview: bundle }
+  const t = await getAccessToken()
+  const r = await fetch(FHIR_BASE, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${t}`, 'content-type': 'application/json' },
+    body: JSON.stringify(bundle),
+  })
+  if (!r.ok) throw new Error(`satusehat_${r.status}`)
+  return { configured: true, summary, result: await r.json() }
+}
