@@ -438,8 +438,16 @@ function QrCode({ amount }: { amount: number }) {
   return <img src={src} onError={() => setFailed(true)} width={96} height={96} alt="QRIS" className="h-24 w-24 rounded-md ring-1 ring-neutral-200" />
 }
 
+const TOPUP_PACKAGES = [
+  { pnc: 25, label: 'Mulai' },
+  { pnc: 50, label: 'Populer', popular: true },
+  { pnc: 100, label: 'Hemat' },
+  { pnc: 250, label: 'Pro' },
+]
+
 // Real backend wallet (Midtrans payments + server-side balance).
 function BackendWallet() {
+  const { syncWalletBalance } = useStore()
   const [balance, setBalance] = useState(0)
   const [live, setLive] = useState(false)
   const [amount, setAmount] = useState(25)
@@ -449,7 +457,7 @@ function BackendWallet() {
   const [busy, setBusy] = useState(false)
 
   function refresh() {
-    api.wallet().then((w) => setBalance(w.balance)).catch(() => {})
+    api.wallet().then((w) => { setBalance(w.balance); syncWalletBalance(w.balance) }).catch(() => {})
     api.health().then((h) => setLive(h.features.payments)).catch(() => {})
   }
   useEffect(refresh, [])
@@ -478,6 +486,7 @@ function BackendWallet() {
     try {
       const r = await api.withdraw(amount, bank)
       setBalance(r.balance)
+      syncWalletBalance(r.balance)
       setMsg(`Penarikan ke ${bank} diproses.`)
     } catch (e) {
       setMsg(e instanceof Error ? e.message : 'Gagal.')
@@ -499,12 +508,31 @@ function BackendWallet() {
         </div>
         <Button variant="ghost" className="bg-white/15 text-white hover:bg-white/25" onClick={refresh}>Perbarui</Button>
       </div>
-      <div className="mt-4 flex flex-wrap items-end gap-3">
-        <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
-        <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
-        <Button onClick={pay} disabled={busy}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
-        <div className="w-28"><Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['BCA', 'Mandiri', 'BNI', 'BRI'].map((b) => <option key={b}>{b}</option>)}</select></Field></div>
-        <Button variant="outline" onClick={withdraw}>Tarik ke Bank</Button>
+      <div className="mt-4">
+        <div className="mb-2 text-sm font-semibold text-neutral-600">Pilih paket top-up</div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {TOPUP_PACKAGES.map((p) => (
+            <button
+              key={p.pnc}
+              onClick={() => setAmount(p.pnc)}
+              className={`relative rounded-2xl border-2 p-3 text-left transition ${amount === p.pnc ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:border-brand/40'}`}
+            >
+              {p.popular && <span className="absolute -top-2 right-2 rounded-full bg-brand px-2 py-0.5 text-[9px] font-bold text-white">Populer</span>}
+              <div className="text-lg font-extrabold leading-none">{p.pnc}<span className="ml-1 text-[11px] font-medium text-neutral-400">PNC</span></div>
+              <div className="mt-1 text-[11px] text-neutral-500">Rp{(p.pnc * TOKEN_TO_IDR).toLocaleString('id-ID')}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">{p.label}</div>
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <div className="w-24"><Field label="Jumlah lain"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+          <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
+          <Button onClick={pay} disabled={busy || amount <= 0}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
+        </div>
+        <div className="mt-2 flex flex-wrap items-end gap-3">
+          <div className="w-28"><Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['BCA', 'Mandiri', 'BNI', 'BRI'].map((b) => <option key={b}>{b}</option>)}</select></Field></div>
+          <Button variant="outline" onClick={withdraw}>Tarik ke Bank</Button>
+        </div>
       </div>
       {msg && <p className="mt-2 text-xs font-semibold text-brand-dark">{msg}</p>}
     </Card>

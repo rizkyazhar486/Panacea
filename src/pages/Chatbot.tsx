@@ -70,6 +70,7 @@ export function Chatbot() {
     setTopup(false)
     try {
       const r = await api.aiConsult(messages.map((m) => ({ role: m.role, content: m.content })))
+      store.syncWalletBalance(r.balance)
       setChat(activePatient.id, [
         ...messages,
         { id: uid(), role: 'assistant', content: `🩺 **Konsultasi AI Mendalam** _(−${r.charged} PNC · sisa ${r.balance})_\n\n${r.text}`, at: new Date().toISOString() },

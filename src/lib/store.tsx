@@ -150,6 +150,7 @@ interface Store {
   // auth
   login: (account: Account) => void
   logout: () => void
+  syncWalletBalance: (balance: number) => void // mirror the server PNC balance
   verifyStr: () => void // mark the current doctor's STR as verified
   setMode: (role: Role) => void // owner-only: switch acting role
   addAdminEmail: (email: string) => void
@@ -268,6 +269,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           })
         }
       })
+      .catch(() => {})
+    // The server wallet is the source of truth for PNC — mirror it locally so
+    // the header balance stays accurate (e.g. after server-side AI charges).
+    api
+      .wallet()
+      .then((w) => setState((st) => ({ ...st, wallet: { ...st.wallet, balance: w.balance } })))
       .catch(() => {})
   }, [state.account?.email])
 
@@ -417,6 +424,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return { ...st, account }
         }),
       logout: () => setState((st) => ({ ...st, account: null })),
+      syncWalletBalance: (balance) =>
+        setState((st) => (st.wallet.balance === balance ? st : { ...st, wallet: { ...st.wallet, balance } })),
       verifyStr: () => {
         if (backendEnabled) api.saveSettings({ strStatus: 'verified' }).catch(() => {})
         setState((st) => (st.account ? { ...st, account: { ...st.account, strStatus: 'verified' } } : st))
