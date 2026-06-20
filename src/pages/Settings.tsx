@@ -201,8 +201,8 @@ export function Settings() {
           right={<Badge tone={aiAvailable(state.settings) ? 'brand' : 'high'}>{hasKey(state.settings) ? 'AI · Kunci Pribadi' : aiAvailable(state.settings) ? 'AI · Server' : 'AI Terbatas'}</Badge>}
         />
         <div className="space-y-4">
-          <Field label="Anthropic API Key">
-            <input className={inputClass} type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="sk-ant-..." />
+          <Field label="Anthropic API Key (opsional — pengguna lanjutan)">
+            <input className={inputClass} type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="Kosongkan — AI sudah jalan via server" />
           </Field>
           <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-xs text-neutral-500">
             <IconShield size={16} className="mt-0.5 shrink-0 text-brand" />
