@@ -37,10 +37,15 @@ export function Pharmacy() {
   function remove(id: string) {
     setCart((c) => { const n = { ...c }; if (n[id] > 1) n[id] -= 1; else delete n[id]; return n })
   }
+  // Halodoc-style fees: a platform service fee + flat delivery (ongkir).
+  const SERVICE_FEE = 3000
+  const DELIVERY_FEE = count > 0 ? 10000 : 0
+  const grandTotal = total + (count > 0 ? SERVICE_FEE : 0) + DELIVERY_FEE
+
   function checkout() {
     if (count === 0) return
     const names = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find((p) => p.id === id)?.name} ×${qty}`)
-    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} lainnya` : ''}`, detail: names.join(', '), amountIdr: total, status: 'Diproses', at: new Date().toISOString() })
+    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} lainnya` : ''}`, detail: `${names.join(', ')} · layanan Rp${SERVICE_FEE.toLocaleString('id-ID')} · ongkir Rp${DELIVERY_FEE.toLocaleString('id-ID')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
     setDone(true); setCart({})
     setTimeout(() => setDone(false), 3500)
   }
@@ -131,7 +136,14 @@ export function Pharmacy() {
                 })}
               </div>
             )}
-            <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3"><span className="text-sm text-neutral-500">Total</span><span className="text-lg font-extrabold">{rupiah(total)}</span></div>
+            {count > 0 && (
+              <div className="mt-3 space-y-1 border-t border-neutral-100 pt-3 text-sm">
+                <div className="flex justify-between text-neutral-500"><span>Subtotal obat</span><span>{rupiah(total)}</span></div>
+                <div className="flex justify-between text-neutral-500"><span>Biaya layanan</span><span>{rupiah(SERVICE_FEE)}</span></div>
+                <div className="flex justify-between text-neutral-500"><span>Ongkir</span><span>{rupiah(DELIVERY_FEE)}</span></div>
+              </div>
+            )}
+            <div className="mt-2 flex items-center justify-between border-t border-neutral-100 pt-2"><span className="text-sm font-semibold">Total bayar</span><span className="text-lg font-extrabold">{rupiah(count > 0 ? grandTotal : 0)}</span></div>
             <Button className="mt-3 w-full" disabled={count === 0} onClick={checkout}>Bayar Sekarang</Button>
             {rxFile && <p className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-brand-dark"><IconCheck size={13} /> Resep terlampir: {rxFile}</p>}
           </Card>
