@@ -3,7 +3,7 @@
 // with an offline fallback to the cached shell); same-origin static assets are
 // cache-first (they're content-hashed, so safe). API & cross-origin requests
 // (backend, Cloudinary, Google, fonts) are never cached.
-const CACHE = 'panaceamed-v1'
+const CACHE = 'panaceamed-v2'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-mark.png']
 
 self.addEventListener('install', (event) => {
@@ -16,6 +16,38 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))),
   )
   self.clients.claim()
+})
+
+// ── Web Push ────────────────────────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  let data = { title: 'Panaceamed.id', body: 'Anda punya pembaruan baru.', url: './' }
+  try {
+    if (event.data) data = { ...data, ...event.data.json() }
+  } catch {
+    /* keep defaults */
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: './logo-mark.png',
+      badge: './logo-mark.png',
+      tag: data.tag || 'panaceamed',
+      data: { url: data.url || './' },
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = (event.notification.data && event.notification.data.url) || './'
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      for (const c of clients) {
+        if ('focus' in c) return c.focus()
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url)
+    }),
+  )
 })
 
 self.addEventListener('fetch', (event) => {

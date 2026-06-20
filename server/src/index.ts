@@ -20,6 +20,8 @@ import {
   getSettings,
   saveSettings,
   listDoctors,
+  addPushSub,
+  removePushSub,
   addAudit,
   getAudit,
   initStore,
@@ -28,6 +30,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { aiMessages } from './ai.js'
+import { sendPush } from './push.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
 
@@ -48,7 +51,8 @@ app.use(
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive },
+    vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
     googleClientId: features.googleLive ? config.googleClientId : null,
@@ -170,6 +174,27 @@ app.put('/api/settings', requireAuth, (req, res) => {
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 
+// --- Web Push notifications ---
+app.get('/api/push/key', (_req, res) => res.json({ key: features.pushLive ? config.vapid.publicKey : null }))
+app.post('/api/push/subscribe', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const sub = (req.body as { subscription?: unknown }).subscription
+  if (!sub || typeof sub !== 'object') return res.status(400).json({ error: 'bad_subscription' })
+  addPushSub(u.id, sub)
+  res.json({ ok: true })
+})
+app.post('/api/push/unsubscribe', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const endpoint = (req.body as { endpoint?: string }).endpoint
+  if (endpoint) removePushSub(u.id, endpoint)
+  res.json({ ok: true })
+})
+app.post('/api/push/test', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const sent = await sendPush(u.id, { title: 'Panaceamed.id', body: 'Notifikasi berhasil diaktifkan ✅', url: './' })
+  res.json({ ok: true, sent })
+})
+
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
@@ -210,6 +235,7 @@ await initStore()
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  AI (Claude):  ${features.aiLive ? 'LIVE (server key)' : 'off (clients use own key / demo)'}`)
+  console.log(`  Web Push:     ${features.pushLive ? 'LIVE (VAPID set)' : 'off (set VAPID_PUBLIC_KEY/PRIVATE_KEY)'}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
 })

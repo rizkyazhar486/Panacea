@@ -16,6 +16,11 @@ export const config = {
     isProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
   },
   tokenToIdr: Number(process.env.TOKEN_TO_IDR) || 1000,
+  vapid: {
+    publicKey: process.env.VAPID_PUBLIC_KEY || '',
+    privateKey: process.env.VAPID_PRIVATE_KEY || '',
+    subject: process.env.VAPID_SUBJECT || 'mailto:admin@panaceamed.id',
+  },
 }
 
 // Feature is "live" only when its credentials are present; otherwise mock mode.
@@ -23,4 +28,5 @@ export const features = {
   googleLive: Boolean(config.googleClientId),
   paymentsLive: Boolean(config.midtrans.serverKey),
   aiLive: Boolean(process.env.ANTHROPIC_API_KEY),
+  pushLive: Boolean(config.vapid.publicKey && config.vapid.privateKey),
 }

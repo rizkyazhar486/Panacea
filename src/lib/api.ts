@@ -9,7 +9,7 @@ export const backendEnabled = Boolean(API)
 
 export interface Health {
   ok: boolean
-  features: { google: boolean; payments: boolean; ai?: boolean }
+  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean }
   tokenToIdr: number
   midtransClientKey: string | null
   googleClientId: string | null
@@ -83,6 +83,13 @@ export const api = {
   verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
     req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),
   satusehatStatus: () => req<{ configured: boolean; env: string; note: string }>('/api/satusehat/status'),
+  // web push
+  pushKey: () => req<{ key: string | null }>('/api/push/key').then((r) => r.key),
+  pushSubscribe: (subscription: unknown) =>
+    req<{ ok: boolean }>('/api/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription }) }),
+  pushUnsubscribe: (endpoint: string) =>
+    req<{ ok: boolean }>('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint }) }),
+  pushTest: () => req<{ ok: boolean; sent: number }>('/api/push/test', { method: 'POST' }),
   // server-side Claude proxy — AI works without the user supplying a key
   aiMessages: (payload: {
     model: string

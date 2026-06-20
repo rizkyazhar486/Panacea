@@ -75,6 +75,7 @@ interface DB {
   posts: Post[]
   clinical: Clinical
   settings: Record<string, any> // userId -> preference blob (no secrets)
+  pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
 }
 
 let db: DB = {
@@ -85,6 +86,7 @@ let db: DB = {
   posts: [],
   clinical: { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} },
   settings: {},
+  pushSubs: {},
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -286,6 +288,23 @@ export function listDoctors(): DoctorRow[] {
       strStatus: (s[u.id]?.strStatus as 'pending' | 'verified') ?? 'pending',
       createdAt: u.createdAt,
     }))
+}
+
+// Web Push subscriptions per user (dedup by endpoint).
+export function addPushSub(userId: string, sub: any) {
+  if (!db.pushSubs) db.pushSubs = {}
+  const list = db.pushSubs[userId] ?? []
+  if (!list.some((s) => s.endpoint === sub.endpoint)) list.push(sub)
+  db.pushSubs[userId] = list
+  save()
+}
+export function listPushSubs(userId: string): any[] {
+  return (db.pushSubs?.[userId] ?? [])
+}
+export function removePushSub(userId: string, endpoint: string) {
+  if (!db.pushSubs?.[userId]) return
+  db.pushSubs[userId] = db.pushSubs[userId].filter((s) => s.endpoint !== endpoint)
+  save()
 }
 
 export function createOrder(o: Order) {
