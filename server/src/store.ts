@@ -170,6 +170,18 @@ export function upsertUser(email: string, name: string, role: Role, picture?: st
 export function getUser(id: string): User | undefined {
   return db.users.find((u) => u.id === id)
 }
+export function userExistsByEmail(email: string): boolean {
+  return db.users.some((u) => u.email === email)
+}
+
+// Resolve a registered patient-user from a self-patient id ("self-<sanitized
+// email>"), mirroring the frontend's id derivation. Returns undefined for
+// doctor-created patients (no linked account).
+export function findUserBySelfPatientId(patientId: string): User | undefined {
+  if (!patientId?.startsWith('self-')) return undefined
+  const suffix = patientId.slice(5).toLowerCase()
+  return db.users.find((u) => u.email.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) === suffix)
+}
 
 export function balance(userId: string): number {
   return db.wallets[userId] ?? 0
@@ -308,6 +320,43 @@ export function removePushSub(userId: string, endpoint: string) {
   if (!db.pushSubs?.[userId]) return
   db.pushSubs[userId] = db.pushSubs[userId].filter((s) => s.endpoint !== endpoint)
   save()
+}
+
+// Aggregate platform stats for the Owner dashboard (computed live from the DB).
+export function getStats() {
+  const users = db.users
+  const orders = db.orders ?? []
+  const paid = orders.filter((o) => o.status === 'paid')
+  const revenueIdr = paid.reduce((a, o) => a + o.amountIdr, 0)
+
+  // Last-7-days series for signups & revenue.
+  const days: string[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    days.push(d.toISOString().slice(0, 10))
+  }
+  const signups7d = days.map((day) => ({
+    day,
+    count: users.filter((u) => u.createdAt.slice(0, 10) === day).length,
+  }))
+  const revenue7d = days.map((day) => ({
+    day,
+    idr: paid.filter((o) => o.createdAt.slice(0, 10) === day).reduce((a, o) => a + o.amountIdr, 0),
+  }))
+
+  return {
+    totalUsers: users.length,
+    doctors: users.filter((u) => u.role === 'dokter').length,
+    patients: users.filter((u) => u.role === 'pasien').length,
+    posts: (db.posts ?? []).length,
+    orders: orders.length,
+    paidOrders: paid.length,
+    revenueIdr,
+    pushSubscribers: Object.keys(db.pushSubs ?? {}).length,
+    signups7d,
+    revenue7d,
+  }
 }
 
 export function createOrder(o: Order) {

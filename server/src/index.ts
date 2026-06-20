@@ -23,6 +23,8 @@ import {
   addPushSub,
   removePushSub,
   allPushUserIds,
+  findUserBySelfPatientId,
+  getStats,
   addAudit,
   getAudit,
   initStore,
@@ -52,7 +54,7 @@ app.use(
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
@@ -129,8 +131,18 @@ app.get('/api/clinical', requireAuth, (req, res) => {
 app.post('/api/clinical/record', requireAuth, (req, res) => {
   const { patientId, record } = req.body as { patientId?: string; record?: unknown }
   if (!patientId) return res.status(400).json({ error: 'missing_patientId' })
+  const actor = (req as express.Request & { user: User }).user
   saveRecord(patientId, record)
-  addAudit((req as express.Request & { user: User }).user, 'emr.save', patientId)
+  addAudit(actor, 'emr.save', patientId)
+  // Notify the patient (if they have a linked account) that their EMR is ready.
+  const patientUser = findUserBySelfPatientId(patientId)
+  if (patientUser && patientUser.id !== actor.id) {
+    sendPush(patientUser.id, {
+      title: 'Rekam medis Anda diperbarui 🩺',
+      body: 'Dokter telah menyelesaikan catatan AI-EMR Anda. Buka untuk melihat edukasi & rencana.',
+      url: './#/education',
+    }).catch(() => {})
+  }
   res.json({ ok: true })
 })
 app.post('/api/clinical/education', requireAuth, (req, res) => {
@@ -223,6 +235,13 @@ app.get('/api/audit', requireAuth, (req, res) => {
   res.json({ entries: getAudit(300) })
 })
 
+// --- owner stats dashboard ---
+app.get('/api/stats', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json(getStats())
+})
+
 // --- doctor STR verification (owner-only) ---
 app.get('/api/doctors', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -252,6 +271,7 @@ server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  AI (Claude):  ${features.aiLive ? 'LIVE (server key)' : 'off (clients use own key / demo)'}`)
   console.log(`  Web Push:     ${features.pushLive ? 'LIVE (VAPID set)' : 'off (set VAPID_PUBLIC_KEY/PRIVATE_KEY)'}`)
+  console.log(`  Email:        ${features.emailLive ? 'LIVE (Resend)' : 'off (set RESEND_API_KEY)'}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
 })

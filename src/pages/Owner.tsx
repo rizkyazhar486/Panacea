@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend } from '../components/icons'
-import { api, backendEnabled, type AuditEntry, type DoctorRow } from '../lib/api'
+import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -40,6 +40,8 @@ export function Owner() {
           <div className="mt-1 text-[11px] text-white/70">Target bulanan Rp{monthlyTarget.toLocaleString('id-ID')}</div>
         </div>
       </Card>
+
+      <RealtimeStats />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={<IconWalletDot />} label="Langganan" value={`${subsRevenue} PNC`} sub="recurring" />
@@ -169,6 +171,75 @@ function CompliancePanel() {
         )}
       </Card>
     </>
+  )
+}
+
+// Live platform metrics from the backend, refreshed on mount + every 30s.
+function RealtimeStats() {
+  const [s, setS] = useState<Stats | null>(null)
+  useEffect(() => {
+    if (!backendEnabled) return
+    const load = () => api.stats().then(setS).catch(() => {})
+    load()
+    const id = setInterval(load, 30_000)
+    return () => clearInterval(id)
+  }, [])
+  if (!backendEnabled) return null
+
+  const tiles = s
+    ? [
+        { label: 'Total Pengguna', value: s.totalUsers },
+        { label: 'Dokter', value: s.doctors },
+        { label: 'Pasien', value: s.patients },
+        { label: 'Top-up Lunas', value: s.paidOrders },
+        { label: 'Pelanggan Push', value: s.pushSubscribers },
+        { label: 'Pendapatan', value: `Rp${s.revenueIdr.toLocaleString('id-ID')}` },
+      ]
+    : []
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconChartUp size={20} />} title="Statistik Real-time" subtitle="Diperbarui otomatis tiap 30 detik" right={<span className="flex items-center gap-1 text-[11px] font-bold text-brand-dark"><span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> live</span>} />
+      {!s ? (
+        <SkeletonRows rows={2} />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {tiles.map((t) => (
+              <div key={t.label} className="rounded-xl bg-neutral-50 p-3">
+                <div className="text-lg font-extrabold leading-tight">{t.value}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <MiniChart title="Pendaftaran (7 hari)" data={s.signups7d.map((d) => d.count)} labels={s.signups7d.map((d) => d.day.slice(5))} color="#00BF63" />
+            <MiniChart title="Pendapatan (7 hari)" data={s.revenue7d.map((d) => d.idr)} labels={s.revenue7d.map((d) => d.day.slice(5))} color="#3b82f6" money />
+          </div>
+        </>
+      )}
+    </Card>
+  )
+}
+
+function MiniChart({ title, data, labels, color, money }: { title: string; data: number[]; labels: string[]; color: string; money?: boolean }) {
+  const max = Math.max(1, ...data)
+  const total = data.reduce((a, b) => a + b, 0)
+  return (
+    <div className="rounded-xl border border-neutral-100 p-3">
+      <div className="flex items-baseline justify-between">
+        <span className="text-xs font-semibold text-neutral-500">{title}</span>
+        <span className="text-xs font-bold">{money ? `Rp${total.toLocaleString('id-ID')}` : total}</span>
+      </div>
+      <div className="mt-2 flex h-20 items-end gap-1">
+        {data.map((v, i) => (
+          <div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${labels[i]}: ${money ? 'Rp' + v.toLocaleString('id-ID') : v}`}>
+            <div className="w-full rounded-t transition-all" style={{ height: `${(v / max) * 100}%`, minHeight: 2, background: color }} />
+            <span className="text-[8px] text-neutral-400">{labels[i]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 

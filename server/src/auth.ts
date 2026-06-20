@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { OAuth2Client } from 'google-auth-library'
 import { config, features } from './config.js'
-import { upsertUser, getUser, type Role, type User } from './store.js'
+import { upsertUser, getUser, userExistsByEmail, type Role, type User } from './store.js'
+import { sendWelcome } from './email.js'
 
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
@@ -50,7 +51,9 @@ export async function googleLogin(req: Request, res: Response) {
     const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: config.googleClientId })
     const payload = ticket.getPayload()
     if (!payload?.email) return res.status(401).json({ error: 'invalid_token' })
+    const isNew = !userExistsByEmail(payload.email)
     const user = upsertUser(payload.email, payload.name || payload.email, (role as Role) || 'pasien', payload.picture)
+    if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
     setSession(res, user.id)
     res.json({ user, live: true })
   } catch {
@@ -62,7 +65,9 @@ export async function googleLogin(req: Request, res: Response) {
 export function devLogin(req: Request, res: Response) {
   const { email, name, role } = req.body as { email?: string; name?: string; role?: Role }
   if (!email) return res.status(400).json({ error: 'missing_email' })
+  const isNew = !userExistsByEmail(email)
   const user = upsertUser(email, name || email, (role as Role) || 'pasien')
+  if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
   setSession(res, user.id)
   res.json({ user, live: false })
 }

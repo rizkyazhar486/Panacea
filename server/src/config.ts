@@ -21,6 +21,7 @@ export const config = {
     privateKey: process.env.VAPID_PRIVATE_KEY || '',
     subject: process.env.VAPID_SUBJECT || 'mailto:admin@panaceamed.id',
   },
+  emailFrom: process.env.EMAIL_FROM || 'Panaceamed.id <onboarding@resend.dev>',
 }
 
 // Feature is "live" only when its credentials are present; otherwise mock mode.
@@ -29,4 +30,5 @@ export const features = {
   paymentsLive: Boolean(config.midtrans.serverKey),
   aiLive: Boolean(process.env.ANTHROPIC_API_KEY),
   pushLive: Boolean(config.vapid.publicKey && config.vapid.privateKey),
+  emailLive: Boolean(process.env.RESEND_API_KEY),
 }

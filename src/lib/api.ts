@@ -79,6 +79,7 @@ export const api = {
     }),
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
+  stats: () => req<Stats>('/api/stats'),
   doctors: () => req<{ doctors: DoctorRow[] }>('/api/doctors').then((r) => r.doctors),
   verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
     req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),
@@ -130,6 +131,19 @@ export interface ClinicalData {
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
   education: Record<string, EducationSheet>
+}
+
+export interface Stats {
+  totalUsers: number
+  doctors: number
+  patients: number
+  posts: number
+  orders: number
+  paidOrders: number
+  revenueIdr: number
+  pushSubscribers: number
+  signups7d: { day: string; count: number }[]
+  revenue7d: { day: string; idr: number }[]
 }
 
 export interface DoctorRow {
