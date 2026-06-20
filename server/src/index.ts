@@ -22,6 +22,7 @@ import {
   listDoctors,
   addPushSub,
   removePushSub,
+  allPushUserIds,
   addAudit,
   getAudit,
   initStore,
@@ -193,6 +194,21 @@ app.post('/api/push/test', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const sent = await sendPush(u.id, { title: 'Panaceamed.id', body: 'Notifikasi berhasil diaktifkan ✅', url: './' })
   res.json({ ok: true, sent })
+})
+// Owner broadcast — push an announcement to all opted-in subscribers.
+app.post('/api/push/broadcast', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { title, body, url } = req.body as { title?: string; body?: string; url?: string }
+  if (!body?.trim()) return res.status(400).json({ error: 'empty' })
+  const ids = allPushUserIds()
+  let sent = 0
+  for (const id of ids) {
+    if (getSettings(id).notifBroadcasts === false) continue // honor user preference
+    sent += await sendPush(id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './', tag: 'broadcast' })
+  }
+  addAudit(u, 'push.broadcast', `${sent} terkirim`)
+  res.json({ ok: true, sent, recipients: ids.length })
 })
 
 // Owner gate — by configured owner email OR an explicit owner role.

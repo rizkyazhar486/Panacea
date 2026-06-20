@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
-import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck } from '../components/icons'
+import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend } from '../components/icons'
 import { api, backendEnabled, type AuditEntry, type DoctorRow } from '../lib/api'
 
 export function Owner() {
@@ -124,6 +124,7 @@ function CompliancePanel() {
 
   return (
     <>
+      <BroadcastPanel />
       <DoctorVerifyPanel />
 
       <Card>
@@ -168,6 +169,47 @@ function CompliancePanel() {
         )}
       </Card>
     </>
+  )
+}
+
+// Owner-only: broadcast a push announcement to all opted-in subscribers.
+function BroadcastPanel() {
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  async function send() {
+    if (!body.trim()) return
+    setBusy(true)
+    setMsg('')
+    try {
+      const r = await api.pushBroadcast(title.trim() || 'Panaceamed.id', body.trim())
+      setMsg(`Terkirim ke ${r.sent} perangkat (dari ${r.recipients} pelanggan).`)
+      setBody('')
+      setTitle('')
+    } catch {
+      setMsg('Gagal mengirim — pastikan Web Push aktif di server.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!backendEnabled) return null
+  return (
+    <Card>
+      <SectionTitle icon={<IconBell size={20} />} title="Kirim Pengumuman (Push)" subtitle="Notifikasi ke seluruh pengguna yang berlangganan & mengizinkan siaran" />
+      <div className="space-y-2">
+        <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Judul (mis. Pembaruan Layanan)" maxLength={60} />
+        <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Isi pengumuman…" maxLength={180} />
+        <div className="flex items-center gap-3">
+          <Button onClick={send} disabled={busy || !body.trim()}>
+            <IconSend size={15} /> {busy ? 'Mengirim…' : 'Kirim ke Semua'}
+          </Button>
+          {msg && <span className="text-xs font-semibold text-brand-dark">{msg}</span>}
+        </div>
+      </div>
+    </Card>
   )
 }
 

@@ -90,6 +90,11 @@ export const api = {
   pushUnsubscribe: (endpoint: string) =>
     req<{ ok: boolean }>('/api/push/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint }) }),
   pushTest: () => req<{ ok: boolean; sent: number }>('/api/push/test', { method: 'POST' }),
+  pushBroadcast: (title: string, body: string) =>
+    req<{ ok: boolean; sent: number; recipients: number }>('/api/push/broadcast', {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+    }),
   // server-side Claude proxy — AI works without the user supplying a key
   aiMessages: (payload: {
     model: string

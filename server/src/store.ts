@@ -301,6 +301,9 @@ export function addPushSub(userId: string, sub: any) {
 export function listPushSubs(userId: string): any[] {
   return (db.pushSubs?.[userId] ?? [])
 }
+export function allPushUserIds(): string[] {
+  return Object.keys(db.pushSubs ?? {})
+}
 export function removePushSub(userId: string, endpoint: string) {
   if (!db.pushSubs?.[userId]) return
   db.pushSubs[userId] = db.pushSubs[userId].filter((s) => s.endpoint !== endpoint)

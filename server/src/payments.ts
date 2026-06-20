@@ -4,6 +4,7 @@ import crypto from 'node:crypto'
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
 import { credit, createOrder, getOrder, setOrderStatus, uid, type User } from './store.js'
+import { sendPush } from './push.js'
 
 const snap = features.paymentsLive
   ? new (midtransClient as any).Snap({
@@ -55,6 +56,7 @@ export function confirmPayment(req: Request, res: Response) {
   if (order.status !== 'paid') {
     setOrderStatus(order.id, 'paid')
     credit(user.id, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method} (simulasi)`, order.id)
+    sendPush(user.id, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }).catch(() => {})
   }
   res.json({ ok: true, status: 'paid' })
 }
@@ -77,6 +79,7 @@ export function paymentWebhook(req: Request, res: Response) {
     if (order.status !== 'paid') {
       setOrderStatus(order.id, 'paid')
       credit(order.userId, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method}`, order.id)
+      sendPush(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }).catch(() => {})
     }
   } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
     setOrderStatus(order.id, 'failed')
