@@ -87,11 +87,15 @@ app.get('/api/wallet', requireAuth, (req, res) => {
 })
 app.post('/api/wallet/withdraw', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
-  const amount = Math.floor(Number((req.body as { amountPnc?: number }).amountPnc) || 0)
-  const bank = String((req.body as { bank?: string }).bank || 'BCA')
+  const b = req.body as { amountPnc?: number; bank?: string; accountNumber?: string; accountHolder?: string }
+  const amount = Math.floor(Number(b.amountPnc) || 0)
+  const bank = String(b.bank || '').trim()
+  const accountNumber = String(b.accountNumber || '').replace(/\s/g, '')
+  const accountHolder = String(b.accountHolder || '').trim()
   if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
+  if (!bank || !accountNumber || !accountHolder) return res.status(400).json({ error: 'missing_account' })
   if (balance(u.id) < amount) return res.status(400).json({ error: 'insufficient_funds' })
-  credit(u.id, -amount, 'withdraw', `Tarik dana ke ${bank}`)
+  credit(u.id, -amount, 'withdraw', `Tarik ke ${bank} ${accountNumber} a.n. ${accountHolder}`)
   res.json({ ok: true, balance: balance(u.id) })
 })
 

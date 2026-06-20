@@ -452,7 +452,9 @@ function BackendWallet() {
   const [live, setLive] = useState(false)
   const [amount, setAmount] = useState(25)
   const [method, setMethod] = useState<PaymentMethod>('QRIS')
-  const [bank, setBank] = useState('BCA')
+  const [bank, setBank] = useState('Mandiri')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [accountHolder, setAccountHolder] = useState('')
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -483,13 +485,18 @@ function BackendWallet() {
   }
 
   async function withdraw() {
+    if (!accountNumber.trim() || !accountHolder.trim()) {
+      setMsg('Isi nama pemilik & nomor rekening untuk menarik dana.')
+      return
+    }
     try {
-      const r = await api.withdraw(amount, bank)
+      const r = await api.withdraw(amount, bank, accountNumber.trim(), accountHolder.trim())
       setBalance(r.balance)
       syncWalletBalance(r.balance)
-      setMsg(`Penarikan ke ${bank} diproses.`)
+      setMsg(`Penarikan ${amount} PNC ke ${bank} ${accountNumber} a.n. ${accountHolder} diproses.`)
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : 'Gagal.')
+      const m = e instanceof Error ? e.message : 'Gagal.'
+      setMsg(m === 'insufficient_funds' ? 'Saldo tidak cukup.' : m === 'missing_account' ? 'Lengkapi data rekening.' : 'Gagal memproses penarikan.')
     }
   }
 
@@ -529,10 +536,20 @@ function BackendWallet() {
           <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
           <Button onClick={pay} disabled={busy || amount <= 0}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
         </div>
-        <div className="mt-2 flex flex-wrap items-end gap-3">
-          <div className="w-28"><Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['BCA', 'Mandiri', 'BNI', 'BRI'].map((b) => <option key={b}>{b}</option>)}</select></Field></div>
-          <Button variant="outline" onClick={withdraw}>Tarik ke Bank</Button>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-neutral-200 p-4">
+        <div className="mb-2 text-sm font-semibold text-neutral-600">Tarik dana ke rekening bank</div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['Mandiri', 'BCA', 'BNI', 'BRI', 'BSI', 'CIMB Niaga', 'Permata'].map((b) => <option key={b}>{b}</option>)}</select></Field>
+          <Field label="Nomor Rekening"><input className={inputClass} inputMode="numeric" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="mis. 1260007276065" /></Field>
+          <Field label="Nama Pemilik Rekening"><input className={inputClass} value={accountHolder} onChange={(e) => setAccountHolder(e.target.value.toUpperCase())} placeholder="mis. RIZKY MUHAMMAD AZRIS" /></Field>
         </div>
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+          <Button variant="outline" onClick={withdraw}>Tarik Rp{(amount * TOKEN_TO_IDR).toLocaleString('id-ID')} ke Bank</Button>
+        </div>
+        <p className="mt-2 text-[11px] text-neutral-400">Dana ditarik ke rekening atas nama Anda. Pastikan data benar — kesalahan rekening di luar tanggung jawab platform.</p>
       </div>
       {msg && <p className="mt-2 text-xs font-semibold text-brand-dark">{msg}</p>}
     </Card>

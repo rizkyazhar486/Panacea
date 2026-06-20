@@ -103,10 +103,10 @@ export const api = {
     ),
   confirmPayment: (orderId: string) =>
     req<{ ok: boolean }>('/api/payments/confirm', { method: 'POST', body: JSON.stringify({ orderId }) }),
-  withdraw: (amountPnc: number, bank: string) =>
+  withdraw: (amountPnc: number, bank: string, accountNumber: string, accountHolder: string) =>
     req<{ ok: boolean; balance: number }>('/api/wallet/withdraw', {
       method: 'POST',
-      body: JSON.stringify({ amountPnc, bank }),
+      body: JSON.stringify({ amountPnc, bank, accountNumber, accountHolder }),
     }),
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
