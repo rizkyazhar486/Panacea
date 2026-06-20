@@ -23,10 +23,33 @@ interface BackendUser {
   picture?: string
 }
 
+// Bearer token (set on login) — robust to third-party cookie blocking when the
+// frontend and backend live on different domains. Cookie auth still works too.
+const TOKEN_KEY = 'pmd-token'
+let authToken: string | null = (() => {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch {
+    return null
+  }
+})()
+export function setAuthToken(token: string | null) {
+  authToken = token
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token)
+    else localStorage.removeItem(TOKEN_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(API + path, {
     credentials: 'include',
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+    },
     ...init,
   })
   if (!res.ok) {
@@ -51,16 +74,23 @@ export const api = {
   health: () => req<Health>('/api/health'),
   me: () => req<{ user: BackendUser }>('/api/auth/me').then((r) => toAccount(r.user)),
   devLogin: (email: string, name: string, role: Role) =>
-    req<{ user: BackendUser }>('/api/auth/dev-login', {
+    req<{ user: BackendUser; token?: string }>('/api/auth/dev-login', {
       method: 'POST',
       body: JSON.stringify({ email, name, role }),
-    }).then((r) => toAccount(r.user)),
+    }).then((r) => {
+      if (r.token) setAuthToken(r.token)
+      return toAccount(r.user)
+    }),
   googleLogin: (credential: string, role: Role) =>
-    req<{ user: BackendUser }>('/api/auth/google', {
+    req<{ user: BackendUser; token?: string }>('/api/auth/google', {
       method: 'POST',
       body: JSON.stringify({ credential, role }),
-    }).then((r) => toAccount(r.user)),
-  logout: () => req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }),
+    }).then((r) => {
+      if (r.token) setAuthToken(r.token)
+      return toAccount(r.user)
+    }),
+  logout: () =>
+    req<{ ok: boolean }>('/api/auth/logout', { method: 'POST' }).finally(() => setAuthToken(null)),
   wallet: () =>
     req<{ balance: number; transactions: { id: string; type: string; amountPnc: number; note: string; at: string }[]; tokenToIdr: number }>(
       '/api/wallet',

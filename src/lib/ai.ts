@@ -261,7 +261,7 @@ function demoChatReply(history: ChatMessage[], ctx: PatientContext): string {
   const turn = history.filter((m) => m.role === 'user').length
   const name = ctx.patient.name.split(' ')[0]
   const scripts = [
-    `MODE: Clinical — Education/Simulation\n\n⚠️ MODE DEMO (tanpa API key). Tambahkan API key Anthropic di **Pengaturan** untuk respons AI sungguhan.\n\nHalo ${name}, saya asisten klinis–longevity Anda — mendukung, bukan menggantikan, dokter pemeriksa. Boleh ceritakan **keluhan utama** Anda hari ini? Sejak kapan dirasakan?`,
+    `Halo ${name}, saya asisten klinis–longevity Anda — mendukung, bukan menggantikan, dokter pemeriksa. Boleh ceritakan **keluhan utama** Anda hari ini? Sejak kapan dirasakan?\n\n_(Catatan: respons AI penuh sedang tidak terjangkau saat ini — ini balasan contoh. Coba lagi sesaat lagi.)_`,
     `Terima kasih. Mari perdalam dengan **SOCRATES**:\n- **Site** — di mana persisnya?\n- **Onset** — mendadak atau bertahap?\n- **Character** — seperti apa rasanya (tertekan, terbakar, tertusuk)?\n- **Radiation** — menjalar ke mana?\n\nSilakan jawab satu per satu.`,
     `Baik. Beberapa pertanyaan penyaring:\n- Apakah ada **demam**, penurunan berat badan, atau keringat malam?\n- Bagaimana **pola makan, tidur, dan aktivitas** belakangan ini?\n- Adakah riwayat penyakit serupa di keluarga?`,
     `Cukup lengkap untuk hipotesis awal. Berdasarkan keluhan dan konteks (${ctx.patient.chronicConditions.join(

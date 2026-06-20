@@ -8,22 +8,34 @@ import { sendWelcome } from './email.js'
 const googleClient = new OAuth2Client(config.googleClientId)
 const COOKIE = 'pmd_session'
 
-function setSession(res: Response, userId: string) {
-  const token = jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d' })
+function issueToken(userId: string): string {
+  return jwt.sign({ uid: userId }, config.jwtSecret, { expiresIn: '7d' })
+}
+
+// Set the session cookie AND return the token so it can also be sent in the
+// response body for Bearer auth (robust to third-party cookie blocking when the
+// frontend and backend are on different domains).
+function setSession(res: Response, userId: string): string {
+  const token = issueToken(userId)
   res.cookie(COOKIE, token, {
     httpOnly: true,
     secure: config.cookieSecure,
     sameSite: config.cookieSecure ? 'none' : 'lax',
     maxAge: 7 * 24 * 3600 * 1000,
   })
+  return token
 }
 
 export function clearSession(res: Response) {
   res.clearCookie(COOKIE)
 }
 
+// Accept the session from a Bearer token (preferred, cross-domain safe) or the
+// cookie (same-site).
 export function currentUser(req: Request): User | undefined {
-  const token = req.cookies?.[COOKIE]
+  const auth = req.headers.authorization
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined
+  const token = bearer || req.cookies?.[COOKIE]
   if (!token) return undefined
   try {
     const { uid } = jwt.verify(token, config.jwtSecret) as { uid: string }
@@ -54,8 +66,8 @@ export async function googleLogin(req: Request, res: Response) {
     const isNew = !userExistsByEmail(payload.email)
     const user = upsertUser(payload.email, payload.name || payload.email, (role as Role) || 'pasien', payload.picture)
     if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
-    setSession(res, user.id)
-    res.json({ user, live: true })
+    const token = setSession(res, user.id)
+    res.json({ user, token, live: true })
   } catch {
     res.status(401).json({ error: 'verification_failed' })
   }
@@ -68,6 +80,6 @@ export function devLogin(req: Request, res: Response) {
   const isNew = !userExistsByEmail(email)
   const user = upsertUser(email, name || email, (role as Role) || 'pasien')
   if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
-  setSession(res, user.id)
-  res.json({ user, live: false })
+  const token = setSession(res, user.id)
+  res.json({ user, token, live: false })
 }
