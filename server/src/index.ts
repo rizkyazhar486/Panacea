@@ -35,14 +35,14 @@ import {
   type Post,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { aiMessages, aiConsult } from './ai.js'
+import { aiMessages, aiConsult, aiVision } from './ai.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
-app.use(express.json())
+app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
   cors({
@@ -196,6 +196,7 @@ app.put('/api/settings', requireAuth, (req, res) => {
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 app.post('/api/ai/consult', requireAuth, aiConsult)
+app.post('/api/ai/vision', requireAuth, aiVision)
 
 // --- targeted notification (verifier/admin/owner → a specific user) ---
 app.post('/api/notify/user', requireAuth, async (req, res) => {

@@ -139,6 +139,8 @@ export const api = {
       body: JSON.stringify({ title, body }),
     }),
   // server-side Claude proxy — AI works without the user supplying a key
+  aiVision: (image: string, prompt?: string) =>
+    req<{ text: string }>('/api/ai/vision', { method: 'POST', body: JSON.stringify({ image, prompt }) }),
   aiConsult: (messages: { role: 'user' | 'assistant'; content: string }[]) =>
     req<{ text: string; charged: number; balance: number }>('/api/ai/consult', { method: 'POST', body: JSON.stringify({ messages }) }),
   aiMessages: (payload: {

@@ -28,7 +28,7 @@ function rateLimited(userId: string): boolean {
   return cur.n > MAX_PER_WINDOW
 }
 
-type Msg = { role: 'user' | 'assistant'; content: string }
+type Msg = { role: 'user' | 'assistant'; content: string | any[] }
 
 // Shared call to the Anthropic API. Returns the text or throws.
 async function callAnthropic(model: string, system: string, messages: Msg[], maxTokens: number): Promise<string> {
@@ -49,6 +49,30 @@ async function callAnthropic(model: string, system: string, messages: Msg[], max
   }
   const data = (await r.json()) as { content?: { type: string; text?: string }[] }
   return (data.content || []).find((b) => b.type === 'text')?.text ?? ''
+}
+
+// Vision: analyze a supportive-exam image (EKG, CT, MRI, X-ray, USG, lab photo)
+// and describe objective findings for the AI-EMR Objective → Assessment flow.
+const VISION_SYSTEM = `Anda adalah AI co-physician Panaceamed yang menganalisis CITRA PEMERIKSAAN PENUNJANG (EKG, CT-scan, MRI, X-ray/Rontgen, USG, foto lab, dll). Jawab berbahasa Indonesia, terstruktur dengan judul tebal (markdown):
+**Jenis Pemeriksaan** (identifikasi modalitas), **Temuan Objektif** (deskripsi sistematis untuk bagian OBJECTIVE rekam medis), **Interpretasi/Kemungkinan** (membantu ASSESSMENT — diferensial), **Tanda Bahaya & Saran**. WAJIB: ini alat bantu edukatif, BUKAN diagnosis final — tegaskan verifikasi dokter/radiolog/kardiolog. Jika gambar bukan citra medis, katakan dengan jujur.`
+
+export async function aiVision(req: Request, res: Response) {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  const user = (req as Request & { user: User }).user
+  if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
+  const { image, prompt } = req.body as { image?: string; prompt?: string }
+  const m = typeof image === 'string' && image.match(/^data:(image\/(?:png|jpe?g|webp|gif));base64,(.+)$/)
+  if (!m) return res.status(400).json({ error: 'bad_image' })
+  const content = [
+    { type: 'text', text: prompt?.trim() || 'Analisis citra pemeriksaan penunjang ini untuk rekam medis.' },
+    { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
+  ]
+  try {
+    const text = await callAnthropic('claude-opus-4-8', VISION_SYSTEM, [{ role: 'user', content }], 1500)
+    res.json({ text })
+  } catch (e) {
+    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+  }
 }
 
 export async function aiMessages(req: Request, res: Response) {

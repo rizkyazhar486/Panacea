@@ -6,6 +6,7 @@ import { IconSend, IconSparkle, IconChat } from '../components/icons'
 import { LogoMark } from '../components/Logo'
 import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
+import { compressImage, readAsDataUrl } from '../lib/upload'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
@@ -50,6 +51,7 @@ export function Chatbot() {
   const [drafting, setDrafting] = useState(false)
   const [error, setError] = useState('')
   const [consulting, setConsulting] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
   const [price, setPrice] = useState(5)
   const [topup, setTopup] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -61,6 +63,24 @@ export function Chatbot() {
   useEffect(() => {
     if (backendEnabled) api.health().then((h) => h.aiConsultPnc && setPrice(h.aiConsultPnc)).catch(() => {})
   }, [])
+
+  // Vision: analyze a supportive-exam image (EKG/CT/MRI/X-ray) → into the chat,
+  // which the doctor's "Susun Draft AI-EMR" then folds into Objective/Assessment.
+  async function analyzeImage(file?: File) {
+    if (!file) return
+    setAnalyzing(true)
+    setError('')
+    try {
+      const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🩻 Mengunggah citra pemeriksaan penunjang: ${file.name}`, at: new Date().toISOString() }])
+      const r = await api.aiVision(dataUrl, 'Analisis citra pemeriksaan penunjang ini untuk rekam medis pasien.')
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🩻 **Analisis Penunjang (untuk Objective AI-EMR)**\n\n${r.text}`, at: new Date().toISOString() }))
+    } catch {
+      setError('Gagal menganalisis citra. Pastikan file gambar valid & coba lagi.')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   // Premium deep consultation — charges PNC server-side, appends a structured report.
   async function deepConsult() {
@@ -222,6 +242,15 @@ export function Chatbot() {
           <div className="mx-5 mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>
         )}
 
+        {backendEnabled && (
+          <div className="border-t border-black/5 px-3 pt-3">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark transition hover:bg-brand-100">
+              {analyzing ? '🔬 Menganalisis citra…' : '🩻 Unggah Penunjang (EKG/CT/MRI/X-ray)'}
+              <input type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
+            </label>
+            <span className="ml-2 text-[11px] text-neutral-400">AI membaca citra → masuk Objective AI-EMR.</span>
+          </div>
+        )}
         <div className="flex items-end gap-2 border-t border-black/5 p-3">
           <textarea
             value={input}
