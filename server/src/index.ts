@@ -24,6 +24,8 @@ import {
   removePushSub,
   allPushUserIds,
   findUserBySelfPatientId,
+  listNotifications,
+  markNotificationsRead,
   getStats,
   addAudit,
   getAudit,
@@ -33,7 +35,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { aiMessages } from './ai.js'
-import { sendPush } from './push.js'
+import { sendPush, notify } from './push.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { attachRealtime } from './realtime.js'
 
@@ -137,7 +139,7 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   // Notify the patient (if they have a linked account) that their EMR is ready.
   const patientUser = findUserBySelfPatientId(patientId)
   if (patientUser && patientUser.id !== actor.id) {
-    sendPush(patientUser.id, {
+    notify(patientUser.id, {
       title: 'Rekam medis Anda diperbarui 🩺',
       body: 'Dokter telah menyelesaikan catatan AI-EMR Anda. Buka untuk melihat edukasi & rencana.',
       url: './#/education',
@@ -187,6 +189,17 @@ app.put('/api/settings', requireAuth, (req, res) => {
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 
+// --- in-app notification inbox ---
+app.get('/api/notifications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ notifications: listNotifications(u.id) })
+})
+app.post('/api/notifications/read', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  markNotificationsRead(u.id)
+  res.json({ ok: true })
+})
+
 // --- Web Push notifications ---
 app.get('/api/push/key', (_req, res) => res.json({ key: features.pushLive ? config.vapid.publicKey : null }))
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
@@ -217,7 +230,7 @@ app.post('/api/push/broadcast', requireAuth, async (req, res) => {
   let sent = 0
   for (const id of ids) {
     if (getSettings(id).notifBroadcasts === false) continue // honor user preference
-    sent += await sendPush(id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './', tag: 'broadcast' })
+    sent += await notify(id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './', tag: 'broadcast' })
   }
   addAudit(u, 'push.broadcast', `${sent} terkirim`)
   res.json({ ok: true, sent, recipients: ids.length })

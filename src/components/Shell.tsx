@@ -30,6 +30,7 @@ import { Badge } from './ui'
 import { Login } from '../pages/Login'
 import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
+import { NotificationBell } from './NotificationBell'
 import { api, backendEnabled } from '../lib/api'
 import type { Role } from '../lib/types'
 
@@ -172,6 +173,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
               className="grid h-9 w-9 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition hover:bg-neutral-50 hover:text-brand-dark"

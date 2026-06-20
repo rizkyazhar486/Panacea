@@ -1,5 +1,5 @@
 import { config, features } from './config.js'
-import { listPushSubs, removePushSub } from './store.js'
+import { listPushSubs, removePushSub, addNotification } from './store.js'
 
 // Web Push sender. The `web-push` package is imported indirectly so the project
 // type-checks even before `npm install` adds it; pushes are no-ops unless VAPID
@@ -44,4 +44,10 @@ export async function sendPush(userId: string, payload: PushPayload): Promise<nu
     }),
   )
   return sent
+}
+
+// Deliver a notification both ways: persist to the in-app inbox AND send a push.
+export async function notify(userId: string, payload: PushPayload): Promise<number> {
+  addNotification(userId, { title: payload.title, body: payload.body, url: payload.url })
+  return sendPush(userId, payload)
 }

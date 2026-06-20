@@ -76,6 +76,7 @@ interface DB {
   clinical: Clinical
   settings: Record<string, any> // userId -> preference blob (no secrets)
   pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
+  notifications: Record<string, Notif[]> // userId -> in-app notification inbox
 }
 
 let db: DB = {
@@ -87,6 +88,7 @@ let db: DB = {
   clinical: { patients: seedPatients(), vitals: {}, supportive: {}, records: {}, education: {} },
   settings: {},
   pushSubs: {},
+  notifications: {},
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -315,6 +317,34 @@ export function listPushSubs(userId: string): any[] {
 }
 export function allPushUserIds(): string[] {
   return Object.keys(db.pushSubs ?? {})
+}
+
+// In-app notification inbox (persists alongside push so notifications aren't
+// ephemeral). Capped per user.
+export interface Notif {
+  id: string
+  title: string
+  body: string
+  url?: string
+  at: string
+  read: boolean
+}
+export function addNotification(userId: string, n: { title: string; body: string; url?: string }) {
+  if (!db.notifications) db.notifications = {}
+  const list = db.notifications[userId] ?? []
+  list.unshift({ id: uid(), title: n.title, body: n.body, url: n.url, at: new Date().toISOString(), read: false })
+  if (list.length > 50) list.length = 50
+  db.notifications[userId] = list
+  save()
+}
+export function listNotifications(userId: string): Notif[] {
+  return db.notifications?.[userId] ?? []
+}
+export function markNotificationsRead(userId: string) {
+  const list = db.notifications?.[userId]
+  if (!list) return
+  list.forEach((n) => (n.read = true))
+  save()
 }
 export function removePushSub(userId: string, endpoint: string) {
   if (!db.pushSubs?.[userId]) return

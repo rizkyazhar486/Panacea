@@ -84,6 +84,9 @@ export const api = {
   verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
     req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),
   satusehatStatus: () => req<{ configured: boolean; env: string; note: string }>('/api/satusehat/status'),
+  // in-app notification inbox
+  notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
+  markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),
   // web push
   pushKey: () => req<{ key: string | null }>('/api/push/key').then((r) => r.key),
   pushSubscribe: (subscription: unknown) =>
@@ -131,6 +134,15 @@ export interface ClinicalData {
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
   education: Record<string, EducationSheet>
+}
+
+export interface Notif {
+  id: string
+  title: string
+  body: string
+  url?: string
+  at: string
+  read: boolean
 }
 
 export interface Stats {
