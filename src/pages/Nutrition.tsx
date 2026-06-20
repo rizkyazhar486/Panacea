@@ -3,9 +3,18 @@ import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconFood, IconPlus, IconSparkle } from '../components/icons'
-import { FOODS } from '../lib/foods'
+import { FOODS, EXERCISES } from '../lib/foods'
 
 const today = () => new Date().toISOString().slice(0, 10)
+
+// Goals used to normalize the comparison chart (each metric → % of its goal).
+const GOAL_KCAL = 2000
+const GOAL_SLEEP = 8
+const GOAL_WATER = 2000 // mL
+// Series colors requested: kalori #00BF63, jam tidur hitam, air putih biru.
+const COL_KCAL = '#00BF63'
+const COL_SLEEP = '#111111'
+const COL_WATER = '#2563eb'
 
 export function Nutrition() {
   const { state, addFood } = useStore()
@@ -87,6 +96,10 @@ export function Nutrition() {
         </div>
       </Card>
 
+      <ActivityLog />
+
+      <WellnessTrendChart />
+
       <LongevityCalculator />
 
       <Card>
@@ -101,6 +114,196 @@ export function Nutrition() {
         </div>
       </Card>
     </div>
+  )
+}
+
+// -- Olahraga + Tidur + Air log (feeds the comparison chart) -----------------
+function ActivityLog() {
+  const { state, logWellness } = useStore()
+  const w = state.wellness?.[today()] ?? { date: today() }
+  const [exName, setExName] = useState(EXERCISES[0].name)
+  const [exMin, setExMin] = useState(30)
+
+  const ex = EXERCISES.find((e) => e.name === exName)!
+  const burn = Math.round(ex.kcalPerMin * exMin)
+
+  function addExercise() {
+    logWellness(today(), {
+      exerciseKcal: (w.exerciseKcal ?? 0) + burn,
+      exerciseMin: (w.exerciseMin ?? 0) + exMin,
+    })
+  }
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconPlus size={18} />}
+        title="Olahraga, Tidur & Air Putih"
+        subtitle="Catat aktivitas harian — dihitung kalorinya & dibandingkan di grafik"
+      />
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Exercise */}
+        <div className="rounded-xl border border-neutral-100 p-3">
+          <div className="mb-2 text-sm font-bold">🏃 Olahraga (terbakar {w.exerciseKcal ?? 0} kkal hari ini)</div>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="w-44">
+              <Field label="Jenis olahraga">
+                <select className={inputClass} value={exName} onChange={(e) => setExName(e.target.value)}>
+                  {EXERCISES.map((e) => (
+                    <option key={e.name}>{e.emoji} {e.name}</option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            <div className="w-28">
+              <Field label="Menit">
+                <input className={inputClass} type="number" value={exMin} onChange={(e) => setExMin(Math.max(0, Number(e.target.value)))} />
+              </Field>
+            </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-sm text-neutral-500">Estimasi bakar: <b className="text-accent">{burn} kkal</b> <Badge tone="neutral">{ex.intensity}</Badge></span>
+            <Button onClick={addExercise}><IconPlus size={16} /> Catat</Button>
+          </div>
+        </div>
+
+        {/* Sleep & water */}
+        <div className="rounded-xl border border-neutral-100 p-3">
+          <div className="mb-2 text-sm font-bold">😴 Tidur & 💧 Air putih hari ini</div>
+          <Stepper label="Jam tidur" value={w.sleepHr ?? 0} min={0} max={12} step={0.5} unit="jam" onChange={(v) => logWellness(today(), { sleepHr: v })} />
+          <Stepper label="Air putih" value={w.waterMl ?? 0} min={0} max={5000} step={250} unit="mL" onChange={(v) => logWellness(today(), { waterMl: v })} />
+          <div className="mt-2 grid grid-cols-2 gap-2 text-center text-xs">
+            <div className="rounded-lg bg-neutral-50 py-1.5">Target tidur <b>{GOAL_SLEEP} jam</b></div>
+            <div className="rounded-lg bg-neutral-50 py-1.5">Target air <b>{GOAL_WATER} mL</b></div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+// -- Stacked-area comparison chart: kalori (#00BF63) · tidur (hitam) · air (biru)
+function WellnessTrendChart() {
+  const { state, account, addPost } = useStore()
+  const [shared, setShared] = useState('')
+
+  // Build the last 7 days of normalized metrics.
+  const days: { date: string; kcal: number; sleepHr: number; waterMl: number }[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const date = d.toISOString().slice(0, 10)
+    const kcal = state.foods.filter((f) => f.date === date).reduce((a, f) => a + f.kcal, 0)
+    const wd = state.wellness?.[date]
+    days.push({ date, kcal, sleepHr: wd?.sleepHr ?? 0, waterMl: wd?.waterMl ?? 0 })
+  }
+  const hasData = days.some((d) => d.kcal || d.sleepHr || d.waterMl)
+
+  // Chart geometry.
+  const W = 320, H = 180, base = 160, top = 30, scale = (base - top) / 3 // 3 stacked units
+  const xs = days.map((_, i) => 15 + (i * (W - 30)) / 6)
+  const nKcal = days.map((d) => Math.min(1, d.kcal / GOAL_KCAL))
+  const nSleep = days.map((d) => Math.min(1, d.sleepHr / GOAL_SLEEP))
+  const nWater = days.map((d) => Math.min(1, d.waterMl / GOAL_WATER))
+
+  const yKcal = nKcal.map((v) => base - v * scale)
+  const ySleep = nKcal.map((v, i) => base - (v + nSleep[i]) * scale)
+  const yWater = nKcal.map((v, i) => base - (v + nSleep[i] + nWater[i]) * scale)
+
+  const band = (upper: number[], lower: number[]) => {
+    const up = xs.map((x, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${upper[i].toFixed(1)}`).join(' ')
+    const down = xs.map((_, i) => `L${xs[xs.length - 1 - i].toFixed(1)},${lower[lower.length - 1 - i].toFixed(1)}`).join(' ')
+    return `${up} ${down} Z`
+  }
+  const baseLine = xs.map(() => base)
+
+  // 7-day averages for the share caption.
+  const avg = (arr: number[]) => Math.round(arr.reduce((a, b) => a + b, 0) / arr.length)
+  const avgKcal = avg(days.map((d) => d.kcal))
+  const avgSleep = (days.reduce((a, d) => a + d.sleepHr, 0) / days.length).toFixed(1)
+  const avgWater = avg(days.map((d) => d.waterMl))
+
+  function shareToDashboard() {
+    addPost({
+      id: uid(),
+      authorEmail: account?.email ?? 'me@panaceamed.id',
+      authorName: account?.name ?? 'Saya',
+      role: account?.role ?? 'pasien',
+      postType: 'kebiasaan',
+      kind: 'image',
+      activity: 'Tren kesehatan 7 hari',
+      caption: `Tren 7 hari saya 📊 Kalori rata-rata ${avgKcal} kkal · Tidur ${avgSleep} jam · Air ${avgWater} mL/hari. #PerjalananSehat #Panaceamed`,
+      mediaColor: COL_KCAL,
+      calories: avgKcal,
+      sleepHr: Number(avgSleep),
+      waterMl: avgWater,
+      likes: 0, comments: 0, reposts: 0,
+      at: new Date().toISOString(),
+    })
+    setShared('feed')
+    setTimeout(() => setShared(''), 3000)
+  }
+
+  async function shareExternal() {
+    const text = `Tren kesehatan 7 hari saya di Panaceamed.id 🌱\nKalori: ${avgKcal} kkal/hari\nTidur: ${avgSleep} jam/hari\nAir putih: ${avgWater} mL/hari`
+    try {
+      if (navigator.share) await navigator.share({ title: 'Tren Kesehatan Saya — Panaceamed.id', text })
+      else { await navigator.clipboard.writeText(text); setShared('copy'); setTimeout(() => setShared(''), 3000) }
+    } catch { /* user cancelled */ }
+  }
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconSparkle size={20} />}
+        title="Grafik Perbandingan 7 Hari"
+        subtitle="Bandingkan kalori, jam tidur & air putih harian — dapat dibagikan ke Dashboard/medsos"
+      />
+      {!hasData ? (
+        <div className="rounded-2xl bg-neutral-50 p-6 text-center text-sm text-neutral-500">
+          Catat makanan, olahraga, tidur & air putih untuk melihat grafik perbandingan harian Anda.
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 280 }}>
+              {/* gridlines */}
+              {[0, 1, 2, 3].map((u) => (
+                <line key={u} x1={12} x2={W - 12} y1={base - u * scale} y2={base - u * scale} stroke="rgba(0,0,0,0.06)" strokeWidth={1} />
+              ))}
+              {/* stacked bands (bottom→top): kalori, tidur, air */}
+              <path d={band(yKcal, baseLine)} fill={COL_KCAL} fillOpacity={0.85} />
+              <path d={band(ySleep, yKcal)} fill={COL_SLEEP} fillOpacity={0.8} />
+              <path d={band(yWater, ySleep)} fill={COL_WATER} fillOpacity={0.8} />
+              {/* day labels */}
+              {days.map((d, i) => (
+                <text key={d.date} x={xs[i]} y={H - 6} textAnchor="middle" fontSize="8" fill="#9ca3af">
+                  {new Date(d.date).toLocaleDateString('id-ID', { weekday: 'short' })}
+                </text>
+              ))}
+            </svg>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-4 text-xs">
+            <Legend color={COL_KCAL} label={`Kalori (${avgKcal}/hari)`} />
+            <Legend color={COL_SLEEP} label={`Tidur (${avgSleep} jam)`} />
+            <Legend color={COL_WATER} label={`Air putih (${avgWater} mL)`} />
+          </div>
+          <p className="mt-1 text-center text-[10px] text-neutral-400">Tinggi tiap warna = % terhadap target (kalori {GOAL_KCAL} · tidur {GOAL_SLEEP} jam · air {GOAL_WATER} mL).</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button onClick={shareToDashboard}>📣 {shared === 'feed' ? 'Dibagikan ke Dashboard!' : 'Bagikan ke Dashboard'}</Button>
+            <Button variant="outline" onClick={shareExternal}>🔗 {shared === 'copy' ? 'Disalin!' : 'Bagikan ke Medsos'}</Button>
+          </div>
+        </>
+      )}
+    </Card>
+  )
+}
+
+function Legend({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="flex items-center gap-1.5 font-semibold text-neutral-600">
+      <span className="inline-block h-3 w-3 rounded-sm" style={{ background: color }} /> {label}
+    </span>
   )
 }
 

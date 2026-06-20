@@ -291,18 +291,23 @@ export interface DoctorRow {
   id: string
   email: string
   name: string
+  role: Role
   str: string | null
   strStatus: 'pending' | 'verified'
   createdAt: string
 }
+// STR / practice-certificate holders awaiting verification: doctors plus the
+// licence-gated content roles (contributor & verifier).
+const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
 export function listDoctors(): DoctorRow[] {
   const s = db.settings || {}
   return db.users
-    .filter((u) => u.role === 'dokter')
+    .filter((u) => STR_ROLES.includes(u.role))
     .map((u) => ({
       id: u.id,
       email: u.email,
       name: u.name,
+      role: u.role,
       str: (s[u.id]?.str as string) ?? null,
       strStatus: (s[u.id]?.strStatus as 'pending' | 'verified') ?? 'pending',
       createdAt: u.createdAt,

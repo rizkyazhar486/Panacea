@@ -118,8 +118,12 @@ export function Billing() {
               </div>
             )}
             {method === 'Virtual Account' && (
-              <div className="mb-2 rounded-xl border border-neutral-200 p-3 text-sm">
+              <div className="mb-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                 No. Virtual Account <b>{bank}</b>: <span className="font-mono font-bold">8810 7700 {String(1000 + ((amount || 0) % 9000)).slice(0, 4)}</span>
+                <p className="mt-1 text-[11px] text-amber-700">
+                  ⚠️ Ini nomor VA <b>contoh/simulasi</b> (mode demo), bukan rekening nyata. Nomor VA asli
+                  diterbitkan otomatis oleh Midtrans saat pembayaran LIVE aktif. Gunakan panel <b>“Top-up via Midtrans”</b> di bawah untuk transaksi sungguhan.
+                </p>
               </div>
             )}
             <div className="flex flex-wrap items-end gap-3">
@@ -493,7 +497,14 @@ function BackendWallet() {
       const r = await api.withdraw(amount, bank, accountNumber.trim(), accountHolder.trim())
       setBalance(r.balance)
       syncWalletBalance(r.balance)
-      setMsg(`Penarikan ${amount} PNC ke ${bank} ${accountNumber} a.n. ${accountHolder} diproses.`)
+      const idr = `Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`
+      setMsg(
+        r.payout?.status === 'processed'
+          ? `✅ ${idr} sedang dikirim otomatis (Iris) ke ${bank} a.n. ${accountHolder}. Ref ${r.payout.referenceNo ?? '-'}.`
+          : r.payout?.status === 'queued'
+          ? `⏳ Penarikan ${idr} dibuat & menunggu persetujuan (Iris). Ref ${r.payout.referenceNo ?? '-'}.`
+          : `Penarikan ${idr} ke ${bank} ${accountNumber} a.n. ${accountHolder} diterima — diproses oleh tim.`,
+      )
     } catch (e) {
       const m = e instanceof Error ? e.message : 'Gagal.'
       setMsg(m === 'insufficient_funds' ? 'Saldo tidak cukup.' : m === 'missing_account' ? 'Lengkapi data rekening.' : 'Gagal memproses penarikan.')

@@ -154,10 +154,15 @@ export function Marketplace() {
                 {subbed && <span className="ml-1 font-semibold text-brand-dark">· langganan aktif</span>}
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
-                <span className="flex items-center gap-1 text-lg font-extrabold">
-                  <IconToken size={16} className="text-brand" />
-                  {m.priceTokens}
-                  <span className="text-xs font-medium text-neutral-400">PNC</span>
+                <span>
+                  <span className="flex items-center gap-1 text-lg font-extrabold">
+                    <IconToken size={16} className="text-brand" />
+                    {m.priceTokens}
+                    <span className="text-xs font-medium text-neutral-400">PNC</span>
+                  </span>
+                  <span className="text-[10px] text-neutral-400">
+                    Penulis terima {Math.max(0, m.priceTokens - 5)} · biaya platform 5 PNC
+                  </span>
                 </span>
                 {owned ? (
                   <Button variant="outline" onClick={() => downloadOwned(m, buyerId)}>

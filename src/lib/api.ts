@@ -9,7 +9,7 @@ export const backendEnabled = Boolean(API)
 
 export interface Health {
   ok: boolean
-  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean }
+  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean }
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null
@@ -104,7 +104,7 @@ export const api = {
   confirmPayment: (orderId: string) =>
     req<{ ok: boolean }>('/api/payments/confirm', { method: 'POST', body: JSON.stringify({ orderId }) }),
   withdraw: (amountPnc: number, bank: string, accountNumber: string, accountHolder: string) =>
-    req<{ ok: boolean; balance: number }>('/api/wallet/withdraw', {
+    req<{ ok: boolean; balance: number; payout?: { live: boolean; status: 'queued' | 'processed' | 'manual'; referenceNo?: string; detail?: string } }>('/api/wallet/withdraw', {
       method: 'POST',
       body: JSON.stringify({ amountPnc, bank, accountNumber, accountHolder }),
     }),

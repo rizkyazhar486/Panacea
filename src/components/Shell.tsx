@@ -166,13 +166,13 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-white/80 px-5 py-3 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <span className="lg:hidden"><LogoMark size={30} /></span>
-            <h1 className="text-lg font-bold">{title?.label ?? 'Panaceamed.id'}</h1>
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-5">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="shrink-0 lg:hidden"><LogoMark size={28} /></span>
+            <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
@@ -205,6 +205,18 @@ export function Shell({ children }: { children: ReactNode }) {
               {state.wallet.balance}
               <span className="text-[10px] font-semibold text-white/60">PNC</span>
             </NavLink>
+            {/* Mobile-only exit/logout — the sidebar Keluar is hidden on phones */}
+            <button
+              onClick={() => {
+                if (backendEnabled) api.logout().catch(() => {})
+                logout()
+              }}
+              className="grid h-9 w-9 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
+              title="Keluar"
+              aria-label="Keluar"
+            >
+              <IconLogout size={18} />
+            </button>
             {showPatient && (
               <div
                 className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"

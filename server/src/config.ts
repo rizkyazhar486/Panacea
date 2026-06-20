@@ -34,4 +34,5 @@ export const features = {
   aiLive: Boolean(process.env.ANTHROPIC_API_KEY),
   pushLive: Boolean(config.vapid.publicKey && config.vapid.privateKey),
   emailLive: Boolean(process.env.RESEND_API_KEY),
+  payoutLive: Boolean(process.env.IRIS_API_KEY || process.env.IRIS_CREATOR_KEY),
 }

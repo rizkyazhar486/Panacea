@@ -54,9 +54,13 @@ export interface NearbyFacility {
 // Fetch REAL nearby health facilities from OpenStreetMap (Overpass API — free,
 // no key, CORS-enabled). Returns hospitals, clinics, doctors & pharmacies with
 // real names and phone numbers where mapped.
-export async function fetchNearbyFacilities(lat: number, lng: number, radiusM = 6000): Promise<NearbyFacility[]> {
-  const filter = '["amenity"~"^(hospital|clinic|pharmacy|doctors)$"]'
-  const q = `[out:json][timeout:25];(node${filter}(around:${radiusM},${lat},${lng});way${filter}(around:${radiusM},${lat},${lng}););out center 80;`
+export async function fetchNearbyFacilities(lat: number, lng: number, radiusM = 5000): Promise<NearbyFacility[]> {
+  // Match both `amenity=*` and `healthcare=*` so hospitals tagged either way
+  // (e.g. Siloam Hospital Mampang) are captured within the emergency radius.
+  const a = '["amenity"~"^(hospital|clinic|pharmacy|doctors)$"]'
+  const h = '["healthcare"~"^(hospital|clinic|pharmacy)$"]'
+  const around = `(around:${radiusM},${lat},${lng})`
+  const q = `[out:json][timeout:25];(node${a}${around};way${a}${around};node${h}${around};way${h}${around};);out center 150;`
   const endpoints = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']
   let data: any = null
   for (const url of endpoints) {
@@ -74,19 +78,23 @@ export async function fetchNearbyFacilities(lat: number, lng: number, radiusM = 
   if (!data?.elements) throw new Error('overpass_unavailable')
 
   const out: NearbyFacility[] = []
+  const seen = new Set<string>()
   for (const el of data.elements) {
     const t = el.tags || {}
     if (!t.name) continue
     const elat = el.lat ?? el.center?.lat
     const elng = el.lon ?? el.center?.lon
     if (elat == null || elng == null) continue
-    const amenity = t.amenity as string
-    const kind: FacilityKind = amenity === 'pharmacy' ? 'Apotek' : amenity === 'hospital' ? 'RS' : 'Klinik'
+    const key = `${t.name.toLowerCase()}@${elat.toFixed(4)},${elng.toFixed(4)}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    const cat = (t.amenity || t.healthcare) as string
+    const kind: FacilityKind = cat === 'pharmacy' ? 'Apotek' : cat === 'hospital' ? 'RS' : 'Klinik'
     const type =
-      kind === 'RS' ? 'Rumah Sakit' : kind === 'Apotek' ? 'Apotek' : amenity === 'doctors' ? 'Praktik Dokter' : 'Klinik'
+      kind === 'RS' ? 'Rumah Sakit' : kind === 'Apotek' ? 'Apotek' : cat === 'doctors' ? 'Praktik Dokter' : 'Klinik'
     const services = [
       t['healthcare:speciality']?.replace(/[_;]/g, ' '),
-      t.emergency === 'yes' ? 'IGD' : undefined,
+      t.emergency === 'yes' || cat === 'hospital' ? 'IGD' : undefined,
       t.dispensing === 'yes' ? 'Tebus Resep' : undefined,
       t.opening_hours === '24/7' ? 'Buka 24 jam' : undefined,
     ].filter(Boolean) as string[]
@@ -102,8 +110,8 @@ export async function fetchNearbyFacilities(lat: number, lng: number, radiusM = 
       dist: distanceKm(lat, lng, elat, elng),
       services: services.length ? services : [type],
       rating: 0,
-      emergency: t.emergency === 'yes' || amenity === 'hospital',
+      emergency: t.emergency === 'yes' || cat === 'hospital',
     })
   }
-  return out.sort((a, b) => a.dist - b.dist).slice(0, 40)
+  return out.sort((a, b) => a.dist - b.dist).slice(0, 60)
 }

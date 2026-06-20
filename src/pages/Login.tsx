@@ -7,6 +7,10 @@ import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import type { Account, Role } from '../lib/types'
 
+// Roles that must provide an STR / practice-certificate at sign-up. Clinical &
+// content-authority roles are licence-gated; patients and admins are not.
+const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
+
 const ROLES: { id: Role; title: string; desc: string }[] = [
   { id: 'pasien', title: 'Pelanggan / Pasien', desc: 'Dashboard hidup sehat, AI Chatbot, edukasi, nutrisi & Longevity, konsultasi, apotek & faskes' },
   { id: 'dokter', title: 'Dokter', desc: 'Khusus AI-EMR, Planning, konsultasi pasien' },
@@ -57,7 +61,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
         }
         api
           .googleLogin(credential, roleRef.current)
-          .then((acc) => login({ ...acc, isSubscriber: acc.role === 'owner', consentAt: new Date().toISOString(), strStatus: acc.role === 'dokter' ? 'pending' : 'none' }))
+          .then((acc) => login({ ...acc, isSubscriber: acc.role === 'owner', consentAt: new Date().toISOString(), strStatus: STR_ROLES.includes(acc.role) ? 'pending' : 'none' }))
           .catch(() => setError('Verifikasi Google gagal.'))
       }).catch(() => setError('Gagal memuat Google Sign-In.'))
     }
@@ -71,7 +75,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     login(account)
     // Register the doctor's STR number on the server so the Owner can verify it.
     // We never write strStatus here (would overwrite an existing 'verified').
-    if (backendEnabled && account.role === 'dokter' && account.str) {
+    if (backendEnabled && STR_ROLES.includes(account.role) && account.str) {
       api.saveSettings({ str: account.str }).catch(() => {})
     }
     sendEmail({
@@ -95,9 +99,9 @@ export function Login({ onBack }: { onBack?: () => void }) {
       setError('Email ini belum diizinkan sebagai Admin. Hubungi Owner untuk menambahkan email Anda.')
       return
     }
-    // Doctors must provide an STR / practice-licence number.
-    if (role === 'dokter' && !str.trim()) {
-      setError('Nomor STR / sertifikat praktik wajib diisi untuk mendaftar sebagai Dokter.')
+    // Clinical & content-authority roles must provide an STR / practice-licence.
+    if (STR_ROLES.includes(role) && !str.trim()) {
+      setError('Nomor STR / sertifikat praktik wajib diisi untuk peran Dokter, Kontributor/Penulis, dan Verifikator.')
       return
     }
     const account: Account = {
@@ -110,8 +114,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
       age: age.trim() ? Number(age) : undefined,
       occupation: occupation.trim() || undefined,
       background: background.trim() || undefined,
-      str: role === 'dokter' ? str.trim() : undefined,
-      strStatus: role === 'dokter' ? 'pending' : 'none',
+      str: STR_ROLES.includes(role) ? str.trim() : undefined,
+      strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
       consentAt: new Date().toISOString(),
       isOwner,
     }
@@ -231,13 +235,17 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Latar belakang (singkat)</label>
               <input className={inputClass} value={background} onChange={(e) => setBackground(e.target.value)} placeholder="mis. Riwayat hipertensi keluarga, ingin hidup lebih sehat" />
             </div>
-            {role === 'dokter' && (
+            {STR_ROLES.includes(role) && (
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
                   No. STR / Sertifikat Praktik <span className="text-accent">*</span>
                 </label>
                 <input className={inputClass} value={str} onChange={(e) => setStr(e.target.value)} placeholder="Wajib — nasional atau internasional" />
-                <p className="mt-1 text-[11px] text-neutral-400">AI-EMR hanya untuk klinisi bersertifikat. STR diverifikasi sebelum akses penuh.</p>
+                <p className="mt-1 text-[11px] text-neutral-400">
+                  {role === 'dokter'
+                    ? 'AI-EMR hanya untuk klinisi bersertifikat. STR diverifikasi sebelum akses penuh.'
+                    : 'Kontributor & Verifikator wajib klinisi/akademisi bersertifikat — STR/sertifikat diverifikasi sebelum materi tayang.'}
+                </p>
               </div>
             )}
           </div>

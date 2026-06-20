@@ -19,6 +19,7 @@ import type {
   Role,
   SocialPost,
   FoodEntry,
+  WellnessDay,
   ConsultSession,
   EmailMsg,
   Order,
@@ -35,7 +36,10 @@ const STORAGE_KEY = 'panaceamed.state.v3'
 export const OWNER_EMAIL = 'rizkyazhar486@gmail.com'
 
 export const TOKEN_TO_IDR = 1000 // 1 PNC = Rp1.000 (simulasi)
-export const PLATFORM_FEE = 0.2 // 20% platform fee on author payout
+export const PLATFORM_FEE = 0.2 // (legacy) 20% — retained for compatibility
+// Marketplace: every content/material sale is charged a FLAT 5 PNC platform fee
+// per article (the rest is the author's royalty).
+export const MARKETPLACE_FEE_PNC = 5
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
@@ -92,6 +96,7 @@ function seed(): AppState {
     posts: [],
     follows: [],
     foods: [],
+    wellness: {},
     consults: [],
     orders: [],
     products: DEFAULT_PRODUCTS,
@@ -165,6 +170,7 @@ interface Store {
   toggleFollow: (email: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
+  logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
   addProduct: (p: PharmacyProduct) => void
   updateProduct: (id: string, partial: Partial<PharmacyProduct>) => void
@@ -359,7 +365,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return { ok: false, reason: 'Saldo token tidak cukup. Silakan deposit.' }
         setState((st) => {
           const now = new Date().toISOString()
-          const payout = Math.round(m.priceTokens * (1 - PLATFORM_FEE))
+          // Flat 5 PNC platform fee per article; author keeps the remainder.
+          const fee = Math.min(MARKETPLACE_FEE_PNC, m.priceTokens)
+          const payout = m.priceTokens - fee
           return {
             ...st,
             ownedMaterialIds: [...st.ownedMaterialIds, materialId],
@@ -374,7 +382,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                   id: uid(),
                   type: 'payout',
                   amount: payout,
-                  note: `Royalti penulis ${m.authorName} (${m.title})`,
+                  note: `Royalti penulis ${m.authorName} (${m.title}) — setelah biaya platform ${fee} PNC`,
                   at: now,
                 },
                 ...st.wallet.transactions,
@@ -511,6 +519,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             : [...st.follows, email],
         })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
+      logWellness: (date, patch) =>
+        setState((st) => ({
+          ...st,
+          wellness: {
+            ...st.wellness,
+            [date]: { ...(st.wellness?.[date] ?? {}), ...patch, date },
+          },
+        })),
       addOrder: (o) => setState((st) => ({ ...st, orders: [o, ...st.orders] })),
       addProduct: (p) => setState((st) => ({ ...st, products: [p, ...st.products] })),
       updateProduct: (id, partial) =>

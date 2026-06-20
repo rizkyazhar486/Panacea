@@ -216,6 +216,15 @@ export interface FoodEntry {
   fat: number
 }
 
+// -------- Daily wellness log (sleep / water / exercise) for trend chart -----
+export interface WellnessDay {
+  date: string // yyyy-mm-dd
+  sleepHr?: number // hours of sleep
+  waterMl?: number // water intake in mL
+  exerciseKcal?: number // calories burned via exercise
+  exerciseMin?: number // total exercise minutes
+}
+
 // -------- Doctor consultations --------------------------------------------
 export interface ConsultSession {
   id: string
@@ -377,6 +386,7 @@ export interface AppState {
   posts: SocialPost[]
   follows: string[] // emails the current account follows
   foods: FoodEntry[]
+  wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
   orders: Order[]
   products: PharmacyProduct[]

@@ -14,12 +14,18 @@ function slug(s: string): string {
 const AI_FEE = 13000 // Rp13.000 / ≈ $1 — wajib untuk konsultasi AI (triase)
 const FEE = 35000 // sesi dokter manusia
 
-const DOCTORS = [
-  { name: 'dr. Rina Kusuma, Sp.PD-KGEH', specialty: 'Penyakit Dalam (Gastrohepatologi)', tag: 'lambung', rating: 4.9, online: true },
-  { name: 'dr. Bagus Santoso, Sp.A', specialty: 'Anak', tag: 'anak', rating: 4.8, online: true },
-  { name: 'dr. Hendra Wijaya, Sp.JP', specialty: 'Jantung & Pembuluh Darah', tag: 'jantung', rating: 4.7, online: false },
-  { name: 'dr. Sari Melati, Sp.PD', specialty: 'Penyakit Dalam', tag: 'umum', rating: 4.6, online: true },
-]
+// Real, verified doctors are onboarded here later — no dummy/example entries.
+// The roster is populated from STR-verified physician accounts.
+type Doctor = { name: string; specialty: string; tag: string; rating: number; online: boolean }
+const DOCTORS: Doctor[] = []
+
+// Human-readable specialty per triage tag (used in emails/recommendations).
+const SPECIALTY_LABEL: Record<string, string> = {
+  jantung: 'Spesialis Jantung & Pembuluh Darah (Sp.JP)',
+  anak: 'Spesialis Anak (Sp.A)',
+  lambung: 'Spesialis Penyakit Dalam (Sp.PD)',
+  umum: 'Dokter Umum / Penyakit Dalam',
+}
 
 // Very simple AI triage: map complaint keywords to a specialty + surgery flag.
 function triage(complaint: string): { tag: string; reason: string; surgery: boolean } {
@@ -57,7 +63,7 @@ export function Consult() {
       id: uid(),
       to: account?.email ?? '',
       subject: 'Hasil Triase AI Panaceamed',
-      body: `Berdasarkan keluhan Anda, AI merekomendasikan dokter ${DOCTORS.find((d) => d.tag === r.tag)?.specialty}. ${r.surgery ? 'Terindikasi kemungkinan tindakan bedah — pencarian rumah sakit diaktifkan.' : ''}`,
+      body: `Berdasarkan keluhan Anda, AI merekomendasikan ${SPECIALTY_LABEL[r.tag] ?? 'dokter umum'}. ${r.surgery ? 'Terindikasi kemungkinan tindakan bedah — pencarian rumah sakit diaktifkan.' : ''}`,
       at,
     })
     setResult(r)
@@ -78,7 +84,7 @@ export function Consult() {
     setTimeout(() => setDone(''), 3000)
   }
 
-  const recDoctor = result ? DOCTORS.find((d) => d.tag === result.tag) : null
+  const recSpecialty = result ? (SPECIALTY_LABEL[result.tag] ?? 'Dokter Umum') : ''
 
   return (
     <div className="space-y-6">
@@ -129,7 +135,7 @@ export function Consult() {
           <SectionTitle
             icon={<IconStethoscope size={20} />}
             title="Langkah 2 — Dokter Spesialis Rekomendasi AI"
-            subtitle={`AI: ${result.reason}. Rekomendasi utama: ${recDoctor?.specialty}.`}
+            subtitle={`AI: ${result.reason}. Rekomendasi utama: ${recSpecialty}.`}
             right={<Button variant="ghost" onClick={() => { setResult(null); setComplaint('') }}>Ulangi triase</Button>}
           />
           <div className="flex flex-wrap items-center gap-2">
@@ -156,7 +162,24 @@ export function Consult() {
       )}
 
       {/* Step 2 — doctor list (only after AI triage) */}
-      {result && (
+      {result && recommended.length === 0 && (
+        <Card className="text-center">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-dark">
+            <IconStethoscope size={28} />
+          </span>
+          <h3 className="mt-3 text-lg font-bold">Dokter asli sedang dalam proses onboarding</h3>
+          <p className="mx-auto mt-1 max-w-md text-sm text-neutral-500">
+            AI merekomendasikan <b>{recSpecialty}</b>. Daftar dokter terverifikasi (STR aktif) akan tampil
+            di sini begitu mereka bergabung. Sementara itu, gunakan AI Chatbot untuk anamnesis lengkap atau
+            cari faskes terdekat untuk penanganan langsung.
+          </p>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Link to="/chatbot"><Button variant="outline"><IconChat size={16} /> Lanjut ke AI Chatbot</Button></Link>
+            <Link to="/hospitals"><Button><IconHospital size={16} /> Faskes Terdekat</Button></Link>
+          </div>
+        </Card>
+      )}
+      {result && recommended.length > 0 && (
         <div className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm ring-1 ring-black/5">
           <IconSearch size={18} className="text-neutral-400" />
           <input value={docQuery} onChange={(e) => setDocQuery(e.target.value)} placeholder="Cari dokter atau spesialisasi…" className="w-full bg-transparent text-sm outline-none" />

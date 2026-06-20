@@ -41,6 +41,7 @@ import { aiMessages, aiConsult, aiVision } from './ai.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
+import { disburse, irisLive } from './iris.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -60,7 +61,7 @@ app.use(
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     aiConsultPnc: config.aiConsultPnc,
@@ -87,7 +88,7 @@ app.get('/api/wallet', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json({ balance: balance(u.id), transactions: txsFor(u.id), tokenToIdr: config.tokenToIdr })
 })
-app.post('/api/wallet/withdraw', requireAuth, (req, res) => {
+app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const b = req.body as { amountPnc?: number; bank?: string; accountNumber?: string; accountHolder?: string }
   const amount = Math.floor(Number(b.amountPnc) || 0)
@@ -97,8 +98,27 @@ app.post('/api/wallet/withdraw', requireAuth, (req, res) => {
   if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
   if (!bank || !accountNumber || !accountHolder) return res.status(400).json({ error: 'missing_account' })
   if (balance(u.id) < amount) return res.status(400).json({ error: 'insufficient_funds' })
-  credit(u.id, -amount, 'withdraw', `Tarik ke ${bank} ${accountNumber} a.n. ${accountHolder}`)
-  res.json({ ok: true, balance: balance(u.id) })
+
+  const amountIdr = amount * config.tokenToIdr
+  // Try an automatic Iris bank disbursement; fall back to manual settlement.
+  let payout
+  try {
+    payout = await disburse({ amountIdr, bank, accountNumber, accountHolder, email: u.email })
+  } catch (e) {
+    return res.status(502).json({ error: 'payout_failed', detail: (e as Error).message })
+  }
+  // Deduct only after the payout was accepted (or queued for manual handling).
+  const noteBase = `Tarik Rp${amountIdr.toLocaleString('id-ID')} ke ${bank} ${accountNumber} a.n. ${accountHolder}`
+  const note = payout.status === 'manual' ? `${noteBase} (manual)` : `${noteBase} · Iris ${payout.referenceNo ?? payout.status}`
+  credit(u.id, -amount, 'withdraw', note)
+  addAudit(u, 'wallet.withdraw', note)
+  const body = payout.status === 'processed'
+    ? `Rp${amountIdr.toLocaleString('id-ID')} sedang dikirim ke rekening ${bank} Anda.`
+    : payout.status === 'queued'
+    ? `Penarikan Rp${amountIdr.toLocaleString('id-ID')} dibuat & menunggu persetujuan.`
+    : `Penarikan Rp${amountIdr.toLocaleString('id-ID')} diterima — diproses manual oleh tim.`
+  notify(u.id, { title: 'Penarikan diproses', body, url: '/billing' }, 'notifTransactions').catch(() => {})
+  res.json({ ok: true, balance: balance(u.id), payout })
 })
 
 // --- payments ---
@@ -353,4 +373,5 @@ server.listen(config.port, () => {
   console.log(`  Email:        ${features.emailLive ? 'LIVE (Resend)' : 'off (set RESEND_API_KEY)'}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
+  console.log(`  Payout (Iris):${irisLive ? ' LIVE' : ' off (set IRIS_API_KEY for auto-disbursement)'}`)
 })
