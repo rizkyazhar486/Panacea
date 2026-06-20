@@ -7,6 +7,7 @@ import { applyLang, getLang } from './lib/i18n'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { AppStatus } from './components/AppStatus'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { Chatbot } from './pages/Chatbot'
@@ -56,6 +57,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
     <StoreProvider>
+      <AppStatus />
       <HashRouter>
         <Shell>
           <Suspense fallback={<PageLoader />}>
