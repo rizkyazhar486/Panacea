@@ -35,3 +35,75 @@ export function distanceKm(aLat: number, aLng: number, bLat: number, bLng: numbe
     Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
   return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))
 }
+
+export interface NearbyFacility {
+  id: string
+  name: string
+  kind: FacilityKind
+  type: string
+  city: string
+  phone: string
+  lat: number
+  lng: number
+  dist: number
+  services: string[]
+  rating: number
+  emergency?: boolean
+}
+
+// Fetch REAL nearby health facilities from OpenStreetMap (Overpass API — free,
+// no key, CORS-enabled). Returns hospitals, clinics, doctors & pharmacies with
+// real names and phone numbers where mapped.
+export async function fetchNearbyFacilities(lat: number, lng: number, radiusM = 6000): Promise<NearbyFacility[]> {
+  const filter = '["amenity"~"^(hospital|clinic|pharmacy|doctors)$"]'
+  const q = `[out:json][timeout:25];(node${filter}(around:${radiusM},${lat},${lng});way${filter}(around:${radiusM},${lat},${lng}););out center 80;`
+  const endpoints = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']
+  let data: any = null
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: 'data=' + encodeURIComponent(q),
+      })
+      if (res.ok) { data = await res.json(); break }
+    } catch {
+      /* try next endpoint */
+    }
+  }
+  if (!data?.elements) throw new Error('overpass_unavailable')
+
+  const out: NearbyFacility[] = []
+  for (const el of data.elements) {
+    const t = el.tags || {}
+    if (!t.name) continue
+    const elat = el.lat ?? el.center?.lat
+    const elng = el.lon ?? el.center?.lon
+    if (elat == null || elng == null) continue
+    const amenity = t.amenity as string
+    const kind: FacilityKind = amenity === 'pharmacy' ? 'Apotek' : amenity === 'hospital' ? 'RS' : 'Klinik'
+    const type =
+      kind === 'RS' ? 'Rumah Sakit' : kind === 'Apotek' ? 'Apotek' : amenity === 'doctors' ? 'Praktik Dokter' : 'Klinik'
+    const services = [
+      t['healthcare:speciality']?.replace(/[_;]/g, ' '),
+      t.emergency === 'yes' ? 'IGD' : undefined,
+      t.dispensing === 'yes' ? 'Tebus Resep' : undefined,
+      t.opening_hours === '24/7' ? 'Buka 24 jam' : undefined,
+    ].filter(Boolean) as string[]
+    out.push({
+      id: `osm-${el.type}-${el.id}`,
+      name: t.name,
+      kind,
+      type,
+      city: t['addr:city'] || t['addr:suburb'] || t['addr:street'] || '',
+      phone: t.phone || t['contact:phone'] || '',
+      lat: elat,
+      lng: elng,
+      dist: distanceKm(lat, lng, elat, elng),
+      services: services.length ? services : [type],
+      rating: 0,
+      emergency: t.emergency === 'yes' || amenity === 'hospital',
+    })
+  }
+  return out.sort((a, b) => a.dist - b.dist).slice(0, 40)
+}

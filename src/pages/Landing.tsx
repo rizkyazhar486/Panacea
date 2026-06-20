@@ -159,9 +159,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       </section>
 
       {/* Marquee strip */}
-      <div className="marquee-pause relative overflow-hidden border-y border-black/5 bg-neutral-50/60 py-5 backdrop-blur">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-white to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-white to-transparent" />
+      <div className="marquee-pause relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
+        <div className="marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-16" />
+        <div className="marquee-fade-r pointer-events-none absolute inset-y-0 right-0 z-10 w-16" />
         <div className="flex w-max animate-marquee gap-10 pr-10">
           {[...MARQUEE, ...MARQUEE].map((m, i) => (
             <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-400">

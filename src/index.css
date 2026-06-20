@@ -166,6 +166,12 @@ body {
 .animate-marquee { animation: marquee-x 30s linear infinite; }
 .marquee-pause:hover .animate-marquee { animation-play-state: paused; }
 
+/* Edge fades that blend into the page background (dark-mode aware). */
+.marquee-fade { background: linear-gradient(to right, #f4f7f5, transparent); }
+.marquee-fade-r { background: linear-gradient(to left, #f4f7f5, transparent); }
+.dark .marquee-fade { background: linear-gradient(to right, #0c0f0f, transparent); }
+.dark .marquee-fade-r { background: linear-gradient(to left, #0c0f0f, transparent); }
+
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
