@@ -175,6 +175,9 @@ export function getUser(id: string): User | undefined {
 export function userExistsByEmail(email: string): boolean {
   return db.users.some((u) => u.email === email)
 }
+export function getUserByEmail(email: string): User | undefined {
+  return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase())
+}
 
 // Resolve a registered patient-user from a self-patient id ("self-<sanitized
 // email>"), mirroring the frontend's id derivation. Returns undefined for

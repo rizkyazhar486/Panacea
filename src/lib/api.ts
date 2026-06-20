@@ -84,6 +84,9 @@ export const api = {
   verifyDoctor: (id: string, status: 'verified' | 'pending' = 'verified') =>
     req<{ ok: boolean }>(`/api/doctors/${id}/verify`, { method: 'POST', body: JSON.stringify({ status }) }),
   satusehatStatus: () => req<{ configured: boolean; env: string; note: string }>('/api/satusehat/status'),
+  // verifier/admin/owner → notify a specific user by email
+  notifyUser: (email: string, title: string, body: string, url?: string) =>
+    req<{ ok: boolean; sent: number }>('/api/notify/user', { method: 'POST', body: JSON.stringify({ email, title, body, url }) }),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),

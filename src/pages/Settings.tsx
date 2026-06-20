@@ -149,6 +149,7 @@ export function Settings() {
           <ToggleRow title={t('notifEmail', lang)} sub={t('notifEmailSub', lang)} on={s.notifEmail ?? true} onToggle={(v) => updateSettings({ notifEmail: v })} />
           <ToggleRow title={t('notifSms', lang)} sub={t('notifSmsSub', lang)} on={s.notifSms ?? false} onToggle={(v) => updateSettings({ notifSms: v })} />
           <ToggleRow title={t('notifAi', lang)} sub={t('notifAiSub', lang)} on={s.notifAiInsights ?? true} onToggle={(v) => updateSettings({ notifAiInsights: v })} />
+          <ToggleRow title={t('notifTx', lang)} sub={t('notifTxSub', lang)} on={s.notifTransactions ?? true} onToggle={(v) => updateSettings({ notifTransactions: v })} />
           <ToggleRow title={t('notifBroadcast', lang)} sub={t('notifBroadcastSub', lang)} on={s.notifBroadcasts ?? false} onToggle={(v) => updateSettings({ notifBroadcasts: v })} />
         </div>
       </Card>

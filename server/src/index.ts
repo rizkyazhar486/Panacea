@@ -24,6 +24,7 @@ import {
   removePushSub,
   allPushUserIds,
   findUserBySelfPatientId,
+  getUserByEmail,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -143,7 +144,7 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
       title: 'Rekam medis Anda diperbarui 🩺',
       body: 'Dokter telah menyelesaikan catatan AI-EMR Anda. Buka untuk melihat edukasi & rencana.',
       url: './#/education',
-    }).catch(() => {})
+    }, 'notifVitals').catch(() => {})
   }
   res.json({ ok: true })
 })
@@ -189,6 +190,20 @@ app.put('/api/settings', requireAuth, (req, res) => {
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 
+// --- targeted notification (verifier/admin/owner → a specific user) ---
+app.post('/api/notify/user', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!['verifikator', 'admin', 'owner'].includes(u.role) && !isOwner(u)) {
+    return res.status(403).json({ error: 'forbidden' })
+  }
+  const { email, title, body, url } = req.body as { email?: string; title?: string; body?: string; url?: string }
+  if (!email || !body?.trim()) return res.status(400).json({ error: 'bad_request' })
+  const target = getUserByEmail(email.toLowerCase())
+  if (!target) return res.json({ ok: true, sent: 0, note: 'user_not_registered' })
+  const sent = await notify(target.id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './' })
+  res.json({ ok: true, sent })
+})
+
 // --- in-app notification inbox ---
 app.get('/api/notifications', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -229,8 +244,7 @@ app.post('/api/push/broadcast', requireAuth, async (req, res) => {
   const ids = allPushUserIds()
   let sent = 0
   for (const id of ids) {
-    if (getSettings(id).notifBroadcasts === false) continue // honor user preference
-    sent += await notify(id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './', tag: 'broadcast' })
+    sent += await notify(id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './', tag: 'broadcast' }, 'notifBroadcasts')
   }
   addAudit(u, 'push.broadcast', `${sent} terkirim`)
   res.json({ ok: true, sent, recipients: ids.length })

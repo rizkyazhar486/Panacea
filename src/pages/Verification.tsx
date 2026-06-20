@@ -3,6 +3,7 @@ import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconShield, IconSparkle, IconCheck } from '../components/icons'
 import { verifyMaterial } from '../lib/ai'
+import { api, backendEnabled } from '../lib/api'
 import type { Material } from '../lib/types'
 
 const statusLabel: Record<Material['status'], { label: string; tone: 'high' | 'normal' | 'brand' | 'critical' }> = {
@@ -115,7 +116,7 @@ export function Verification() {
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Button
                     disabled={!canVerify}
-                    onClick={() =>
+                    onClick={() => {
                       setMaterialVerifierReview(m.id, {
                         verifierName: currentUser.name,
                         verifierRole: currentUser.role === 'Subspesialis' ? 'Subspesialis' : 'Spesialis',
@@ -123,14 +124,17 @@ export function Verification() {
                         notes: 'Konten valid & layak edukasi.',
                         at: new Date().toISOString(),
                       })
-                    }
+                      if (backendEnabled) {
+                        api.notifyUser(m.authorId, 'Materi Anda terverifikasi ✅', `"${m.title}" telah disetujui & terbit di Marketplace.`, './#/marketplace').catch(() => {})
+                      }
+                    }}
                   >
                     <IconCheck size={14} /> Setujui & Terbitkan
                   </Button>
                   <Button
                     variant="ghost"
                     disabled={!canVerify}
-                    onClick={() =>
+                    onClick={() => {
                       setMaterialVerifierReview(m.id, {
                         verifierName: currentUser.name,
                         verifierRole: currentUser.role === 'Subspesialis' ? 'Subspesialis' : 'Spesialis',
@@ -138,7 +142,10 @@ export function Verification() {
                         notes: 'Perlu perbaikan sebelum diterbitkan.',
                         at: new Date().toISOString(),
                       })
-                    }
+                      if (backendEnabled) {
+                        api.notifyUser(m.authorId, 'Materi perlu revisi', `"${m.title}" perlu perbaikan sebelum diterbitkan. Cek catatan verifikator.`, './#/my-materials').catch(() => {})
+                      }
+                    }}
                   >
                     Tolak
                   </Button>

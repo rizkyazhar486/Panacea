@@ -391,6 +391,7 @@ export interface AppState {
     notifSms?: boolean
     notifAiInsights?: boolean
     notifBroadcasts?: boolean
+    notifTransactions?: boolean
     // Security
     twoFactor?: boolean
     biometricLock?: boolean

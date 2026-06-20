@@ -86,6 +86,8 @@ const DICT: Dict = {
   notifAiSub: { id: 'Rekomendasi gaya hidup harian dari PanaceaAI', en: 'Daily lifestyle tips from PanaceaAI', zh: '来自 PanaceaAI 的每日建议', ar: 'نصائح يومية من PanaceaAI' },
   notifBroadcast: { id: 'Siaran Jaringan', en: 'Network Broadcasts', zh: '网络广播', ar: 'بث الشبكة' },
   notifBroadcastSub: { id: 'Pembaruan dari penyedia layanan medis Anda', en: 'Updates from your medical providers', zh: '来自您的医疗机构的更新', ar: 'تحديثات من مقدمي الرعاية' },
+  notifTx: { id: 'Transaksi & Pembayaran', en: 'Transactions & Payments', zh: '交易与支付', ar: 'المعاملات والمدفوعات' },
+  notifTxSub: { id: 'Konfirmasi top-up & pembelian', en: 'Top-up & purchase confirmations', zh: '充值与购买确认', ar: 'تأكيدات الدفع والشراء' },
 
   // Account & security
   security: { id: 'Akun & Keamanan', en: 'Account & Security', zh: '账户与安全', ar: 'الحساب والأمان' },

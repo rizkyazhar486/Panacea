@@ -106,6 +106,7 @@ function seed(): AppState {
       notifSms: false,
       notifAiInsights: true,
       notifBroadcasts: false,
+      notifTransactions: true,
       twoFactor: false,
       biometricLock: false,
     },

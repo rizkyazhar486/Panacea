@@ -57,7 +57,7 @@ export function confirmPayment(req: Request, res: Response) {
   if (order.status !== 'paid') {
     setOrderStatus(order.id, 'paid')
     credit(user.id, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method} (simulasi)`, order.id)
-    notify(user.id, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }).catch(() => {})
+    notify(user.id, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
     sendReceipt(user.email, user.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
   }
   res.json({ ok: true, status: 'paid' })
@@ -81,7 +81,7 @@ export function paymentWebhook(req: Request, res: Response) {
     if (order.status !== 'paid') {
       setOrderStatus(order.id, 'paid')
       credit(order.userId, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method}`, order.id)
-      notify(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }).catch(() => {})
+      notify(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
       const payer = getUser(order.userId)
       if (payer) sendReceipt(payer.email, payer.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
     }
