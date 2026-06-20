@@ -25,6 +25,8 @@ import {
   allPushUserIds,
   findUserBySelfPatientId,
   getUserByEmail,
+  addCreatorSub,
+  activeCreatorSubs,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -210,6 +212,33 @@ app.post('/api/notify/user', requireAuth, async (req, res) => {
   if (!target) return res.json({ ok: true, sent: 0, note: 'user_not_registered' })
   const sent = await notify(target.id, { title: title?.trim() || 'Panaceamed.id', body: body.trim(), url: url || './' })
   res.json({ ok: true, sent })
+})
+
+// --- creator subscriptions (exclusive content) with PNC revenue split ---
+app.get('/api/creator/subs', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ authors: activeCreatorSubs(u.id), price: config.creatorSubPnc })
+})
+app.post('/api/creator/subscribe', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const authorEmail = String((req.body as { authorEmail?: string }).authorEmail || '').toLowerCase()
+  if (!authorEmail) return res.status(400).json({ error: 'missing_author' })
+  if (authorEmail === u.email.toLowerCase()) return res.status(400).json({ error: 'self_subscribe' })
+  const price = config.creatorSubPnc
+  const adminCut = Math.min(config.creatorSubAdminPnc, price)
+  const authorCut = price - adminCut
+  if (balance(u.id) < price) return res.status(402).json({ error: 'insufficient_balance', price, balance: balance(u.id) })
+
+  const author = getUserByEmail(authorEmail)
+  // Move PNC: subscriber pays, author gets 75, platform/owner gets 25.
+  credit(u.id, -price, 'purchase', `Langganan kreator @${authorEmail}`)
+  if (author) credit(author.id, authorCut, 'payout', `Royalti langganan dari ${u.email}`)
+  const owner = getUserByEmail(config.ownerEmail)
+  if (owner) credit(owner.id, adminCut, 'deposit', `Komisi platform langganan @${authorEmail}`)
+
+  const expires = addCreatorSub(u.id, authorEmail)
+  if (author) notify(author.id, { title: 'Subscriber baru 🎉', body: `Anda mendapat ${authorCut} PNC dari langganan kreator.`, url: './#/' }).catch(() => {})
+  res.json({ ok: true, balance: balance(u.id), expires, authorCut, adminCut })
 })
 
 // --- in-app notification inbox ---

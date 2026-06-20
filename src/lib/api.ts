@@ -123,6 +123,10 @@ export const api = {
   // verifier/admin/owner → notify a specific user by email
   notifyUser: (email: string, title: string, body: string, url?: string) =>
     req<{ ok: boolean; sent: number }>('/api/notify/user', { method: 'POST', body: JSON.stringify({ email, title, body, url }) }),
+  // creator subscriptions (exclusive content, PNC split)
+  creatorSubs: () => req<{ authors: string[]; price: number }>('/api/creator/subs'),
+  creatorSubscribe: (authorEmail: string) =>
+    req<{ ok: boolean; balance: number; expires: string; authorCut: number; adminCut: number }>('/api/creator/subscribe', { method: 'POST', body: JSON.stringify({ authorEmail }) }),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),

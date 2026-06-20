@@ -194,6 +194,7 @@ export interface SocialPost {
   location?: string // tagged location
   archived?: boolean // hidden/archived by the owner
   locked?: boolean // private/locked post (only owner sees in "Terkunci")
+  exclusive?: boolean // subscriber-only content (monetized via creator subscription)
   likes: number
   comments?: number
   reposts?: number

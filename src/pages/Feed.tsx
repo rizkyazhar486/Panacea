@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Card, Button, Field, inputClass } from '../components/ui'
 import {
@@ -50,6 +50,13 @@ function initials(name: string): string {
 
 interface Profile { email: string; name: string; role: Role; color: string; posts: number }
 
+// Creator-subscription state shared with every PostCard.
+const SubCtx = createContext<{ subscribed: Set<string>; price: number; subscribe: (email: string) => Promise<boolean> }>({
+  subscribed: new Set(),
+  price: 100,
+  subscribe: async () => false,
+})
+
 export function Feed() {
   const store = useStore()
   const { state, account } = store
@@ -57,8 +64,26 @@ export function Feed() {
   const [compose, setCompose] = useState(false)
   const [viewProfile, setViewProfile] = useState<string | null>(null) // email of profile being viewed
   const [viewPost, setViewPost] = useState<string | null>(null)
+  const [subscribed, setSubscribed] = useState<Set<string>>(new Set())
+  const [subPrice, setSubPrice] = useState(100)
 
   const me = account?.email ?? 'me@panaceamed.id'
+
+  useEffect(() => {
+    if (!backendEnabled) return
+    api.creatorSubs().then((r) => { setSubscribed(new Set(r.authors.map((a) => a.toLowerCase()))); setSubPrice(r.price) }).catch(() => {})
+  }, [])
+
+  async function subscribe(email: string): Promise<boolean> {
+    try {
+      const r = await api.creatorSubscribe(email)
+      setSubscribed((s) => new Set(s).add(email.toLowerCase()))
+      store.syncWalletBalance(r.balance)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   function onCreate(p: SocialPost) {
     store.addPost(p)
@@ -70,6 +95,7 @@ export function Feed() {
   const activePost = viewPost ? state.posts.find((p) => p.id === viewPost) : null
 
   return (
+    <SubCtx.Provider value={{ subscribed, price: subPrice, subscribe }}>
     <div className="relative pb-24">
       {/* Top tab bar (TikTok-style) */}
       <div className="sticky top-0 z-20 -mx-4 mb-4 flex items-center justify-center gap-1 border-b border-neutral-100 bg-white/85 px-4 py-2 backdrop-blur sm:gap-2">
@@ -118,6 +144,7 @@ export function Feed() {
         </div>
       )}
     </div>
+    </SubCtx.Provider>
   )
 }
 
@@ -428,12 +455,41 @@ function hash(s: string): number {
   return h
 }
 
+// Paywall overlay for subscriber-only (exclusive) posts.
+function ExclusiveLock({ post: p, onProfile }: { post: SocialPost; onProfile: (e: string) => void }) {
+  const { price, subscribe } = useContext(SubCtx)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  async function go() {
+    setBusy(true); setErr('')
+    const ok = await subscribe(p.authorEmail)
+    if (!ok) setErr('Saldo PNC tidak cukup. Top up di Billing & Token.')
+    setBusy(false)
+  }
+  return (
+    <div className="relative flex aspect-[16/11] flex-col items-center justify-center gap-2 overflow-hidden px-6 text-center" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
+      <div className="absolute inset-0 backdrop-blur-xl" />
+      <div className="relative flex flex-col items-center gap-2 text-white">
+        <span className="text-2xl">⭐🔒</span>
+        <div className="text-sm font-bold">Konten Eksklusif</div>
+        <p className="max-w-xs text-[12px] text-white/80">Langganan kreator <button onClick={() => onProfile(p.authorEmail)} className="font-bold underline">{p.authorName}</button> untuk membuka semua konten eksklusifnya.</p>
+        <button onClick={go} disabled={busy} className="mt-1 rounded-full bg-white px-5 py-2 text-sm font-bold text-brand-dark shadow disabled:opacity-60">
+          {busy ? 'Memproses…' : `Langganan · ${price} PNC / bulan`}
+        </button>
+        {err && <p className="text-[11px] text-amber-200">{err}</p>}
+      </div>
+    </div>
+  )
+}
+
 // ---- Post card -----------------------------------------------------------
 function PostCard({ post: p, me, store, onProfile }: {
   post: SocialPost; me: string; store: ReturnType<typeof useStore>; onProfile: (e: string) => void
 }) {
   const type = p.postType ?? 'aktivitas'
   const mine = p.authorEmail === me
+  const sub = useContext(SubCtx)
+  const exclusiveLocked = !!p.exclusive && !mine && !sub.subscribed.has(p.authorEmail.toLowerCase())
   const following = store.state.follows.includes(p.authorEmail)
   const prof = store.state.profiles[p.authorEmail]
   const [menu, setMenu] = useState(false)
@@ -467,16 +523,22 @@ function PostCard({ post: p, me, store, onProfile }: {
         )}
       </div>
 
-      {type === 'artikel' ? <ArticleBlock post={p} /> : <MediaBlock post={p} />}
-      {type === 'aktivitas' && <ActivityMetrics post={p} />}
-      {type === 'kebiasaan' && <HabitMetrics post={p} />}
-      {(p.audio || p.location) && (
-        <div className="flex flex-wrap gap-3 px-4 pt-2 text-[11px] font-semibold text-neutral-500">
-          {p.audio && <span>🎵 {p.audio}</span>}
-          {p.location && <span>📍 {p.location}</span>}
-        </div>
+      {exclusiveLocked ? (
+        <ExclusiveLock post={p} onProfile={onProfile} />
+      ) : (
+        <>
+          {type === 'artikel' ? <ArticleBlock post={p} /> : <MediaBlock post={p} />}
+          {type === 'aktivitas' && <ActivityMetrics post={p} />}
+          {type === 'kebiasaan' && <HabitMetrics post={p} />}
+          {(p.audio || p.location) && (
+            <div className="flex flex-wrap gap-3 px-4 pt-2 text-[11px] font-semibold text-neutral-500">
+              {p.audio && <span>🎵 {p.audio}</span>}
+              {p.location && <span>📍 {p.location}</span>}
+            </div>
+          )}
+          {p.caption && <p className="px-4 pt-3 text-sm text-ink">{p.caption}</p>}
+        </>
       )}
-      {p.caption && <p className="px-4 pt-3 text-sm text-ink">{p.caption}</p>}
 
       <div className="flex items-center gap-5 px-4 py-3 text-neutral-500">
         <button onClick={() => store.toggleLike(p.id)} className="flex items-center gap-1.5 text-sm font-semibold">
@@ -590,6 +652,7 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
   const [caption, setCaption] = useState('')
   const [color, setColor] = useState(COLORS[0])
   const [locked, setLocked] = useState(false)
+  const [exclusive, setExclusive] = useState(false)
   const [audio, setAudio] = useState(SONGS[0])
   const [location, setLocation] = useState('')
   const [distanceKm, setDistanceKm] = useState('')
@@ -628,7 +691,7 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
       photos: !isVideo && postType !== 'artikel' && photoData.length > 0 ? photoData : undefined,
       audio: audio !== SONGS[0] ? audio : undefined,
       location: location.trim() || undefined,
-      locked, likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
+      locked, exclusive, likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
     }
     if (postType === 'aktivitas') { base.distanceKm = num(distanceKm); base.durationMin = num(durationMin) }
     else if (postType === 'kebiasaan') { base.waterMl = num(waterMl); base.veggieServ = num(veggieServ); if (!base.caption) base.caption = 'Kebiasaan sehat hari ini 💪' }
@@ -714,6 +777,10 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
         <label className="mt-3 flex items-center gap-2 text-sm">
           <input type="checkbox" checked={locked} onChange={(e) => setLocked(e.target.checked)} className="h-4 w-4 accent-[#00BF63]" />
           <IconLock size={14} className="text-neutral-400" /> Kunci postingan (privat — hanya Anda)
+        </label>
+        <label className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50 p-2.5 text-sm text-brand-dark">
+          <input type="checkbox" checked={exclusive} onChange={(e) => setExclusive(e.target.checked)} className="h-4 w-4 accent-[#00BF63]" />
+          <span>⭐ <b>Konten Eksklusif</b> — hanya untuk subscriber (langganan 100 PNC/bln; Anda dapat 75, platform 25).</span>
         </label>
 
         {uploading && <p className="mt-3 text-xs font-semibold text-brand-dark">Mengunggah media…</p>}

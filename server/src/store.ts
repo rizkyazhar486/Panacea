@@ -77,6 +77,7 @@ interface DB {
   settings: Record<string, any> // userId -> preference blob (no secrets)
   pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
   notifications: Record<string, Notif[]> // userId -> in-app notification inbox
+  creatorSubs: { subscriberId: string; authorEmail: string; at: string; expires: string }[]
 }
 
 let db: DB = {
@@ -89,6 +90,7 @@ let db: DB = {
   settings: {},
   pushSubs: {},
   notifications: {},
+  creatorSubs: [],
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -390,6 +392,22 @@ export function getStats() {
     signups7d,
     revenue7d,
   }
+}
+
+// Creator subscriptions — who has an active paid subscription to which author.
+export function addCreatorSub(subscriberId: string, authorEmail: string, days = 30) {
+  if (!db.creatorSubs) db.creatorSubs = []
+  const expires = new Date(Date.now() + days * 86400_000).toISOString()
+  db.creatorSubs = db.creatorSubs.filter((s) => !(s.subscriberId === subscriberId && s.authorEmail === authorEmail))
+  db.creatorSubs.push({ subscriberId, authorEmail: authorEmail.toLowerCase(), at: new Date().toISOString(), expires })
+  save()
+  return expires
+}
+export function activeCreatorSubs(subscriberId: string): string[] {
+  const now = Date.now()
+  return (db.creatorSubs ?? [])
+    .filter((s) => s.subscriberId === subscriberId && new Date(s.expires).getTime() > now)
+    .map((s) => s.authorEmail)
 }
 
 export function createOrder(o: Order) {
