@@ -8,6 +8,7 @@ export type TextScale = 'sm' | 'md' | 'lg'
 const THEME_KEY = 'pmd-theme'
 const SCALE_KEY = 'pmd-text-scale'
 const MOTION_KEY = 'pmd-reduced-motion'
+const SIMPLE_KEY = 'pmd-simple-mode'
 
 function systemTheme(): Theme {
   if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
@@ -96,9 +97,30 @@ export function setReducedMotion(on: boolean) {
   document.documentElement.classList.toggle('reduce-motion', on)
 }
 
+// ── Simple mode (lansia / non-tech) ─────────────────────────────────────────
+// Bigger text & tap targets, calmer layout. Toggling adds `.simple-mode` to
+// <html>; index.css carries the matching overrides.
+export function getSimpleMode(): boolean {
+  try {
+    return localStorage.getItem(SIMPLE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+export function setSimpleMode(on: boolean) {
+  try {
+    localStorage.setItem(SIMPLE_KEY, String(on))
+  } catch {
+    /* ignore */
+  }
+  document.documentElement.classList.toggle('simple-mode', on)
+}
+
 // Apply every saved appearance preference before first paint.
 export function applyAppearance() {
   applyTheme(resolveTheme())
   setTextScale(getTextScale())
   setReducedMotion(getReducedMotion())
+  setSimpleMode(getSimpleMode())
 }

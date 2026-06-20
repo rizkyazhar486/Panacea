@@ -8,6 +8,22 @@
   --color-accent: #ff3131;
   --color-ink: #0c1410;
   --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+
+  /* Panaceamed "pnc" design tokens — calmer, green-tinted neutral system.
+     Light surfaces stay airy; dark mode uses warm green-tinted greys (not
+     harsh black) for a more comfortable reading experience. */
+  --color-pnc-canvas: #f4f7f5;
+  --color-pnc-surface: #ffffff;
+  --color-pnc-elevated: #f8faf9;
+  --color-pnc-ink: #0c1410;
+  --color-pnc-ink-light: #4a6355;
+  --color-pnc-muted: #889e93;
+  --color-pnc-border: #d4e2da;
+  --color-pnc-border-subtle: #e2ebe6;
+  --color-pnc-green-light: #e6f9ef;
+  --color-pnc-red-light: #fff0f0;
+  --color-pnc-yellow-light: #fff9e6;
+  --color-pnc-blue-light: #f0f7ff;
 }
 
 :root {
@@ -34,59 +50,61 @@ body {
    so we remap those surfaces/inks under `.dark` instead of rewiring
    every component. Keeps brand green intact for accents.
    ───────────────────────────────────────────────────────────── */
+/* Dark palette uses the warm, green-tinted "pnc.dark" tones (canvas #0C1410,
+   surface #1A241F, elevated #24302A) — easier on the eyes than pure black. */
 .dark body {
-  background: radial-gradient(circle at 50% 0%, rgba(0, 191, 99, 0.08) 0%, #0c0f0f 55%) fixed;
-  color: #e6ece8;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 191, 99, 0.08) 0%, #0c1410 55%) fixed;
+  color: #f0f5f2;
 }
 
 /* Surfaces */
-.dark .bg-white { background-color: #15181a !important; }
-.dark .bg-white\/90 { background-color: rgba(21, 24, 26, 0.9) !important; }
-.dark .bg-white\/85 { background-color: rgba(21, 24, 26, 0.85) !important; }
-.dark .bg-white\/80 { background-color: rgba(21, 24, 26, 0.8) !important; }
-.dark .bg-white\/70 { background-color: rgba(21, 24, 26, 0.7) !important; }
-.dark .bg-white\/60 { background-color: rgba(24, 28, 30, 0.6) !important; }
-.dark .bg-white\/50 { background-color: rgba(24, 28, 30, 0.5) !important; }
-.dark .bg-white\/40 { background-color: rgba(24, 28, 30, 0.45) !important; }
-.dark .bg-neutral-50 { background-color: #1b1f20 !important; }
-.dark .bg-neutral-100 { background-color: #23282a !important; }
-.dark .bg-neutral-200 { background-color: #2c3133 !important; }
-.dark .bg-ink { background-color: #05201380 !important; }
+.dark .bg-white { background-color: #1a241f !important; }
+.dark .bg-white\/90 { background-color: rgba(26, 36, 31, 0.9) !important; }
+.dark .bg-white\/85 { background-color: rgba(26, 36, 31, 0.85) !important; }
+.dark .bg-white\/80 { background-color: rgba(26, 36, 31, 0.8) !important; }
+.dark .bg-white\/70 { background-color: rgba(26, 36, 31, 0.7) !important; }
+.dark .bg-white\/60 { background-color: rgba(36, 48, 42, 0.6) !important; }
+.dark .bg-white\/50 { background-color: rgba(36, 48, 42, 0.5) !important; }
+.dark .bg-white\/40 { background-color: rgba(36, 48, 42, 0.45) !important; }
+.dark .bg-neutral-50 { background-color: #24302a !important; }
+.dark .bg-neutral-100 { background-color: #2a3a33 !important; }
+.dark .bg-neutral-200 { background-color: #32443b !important; }
+.dark .bg-ink { background-color: #0520133a !important; }
 
 /* Brand tints adapt for contrast on dark */
 .dark .bg-brand-50 { background-color: rgba(0, 191, 99, 0.14) !important; }
 .dark .bg-brand-100 { background-color: rgba(0, 191, 99, 0.2) !important; }
 .dark .text-brand-dark { color: #45e08a !important; }
 
-/* Inks */
-.dark .text-ink { color: #e6ece8 !important; }
+/* Inks — ink #FFF, ink-light #A8C4B5, muted #5A7A6A from the pnc palette */
+.dark .text-ink { color: #f0f5f2 !important; }
 .dark .text-neutral-900,
 .dark .text-neutral-800,
-.dark .text-neutral-700 { color: #e2e8e4 !important; }
-.dark .text-neutral-600 { color: #c2cdc6 !important; }
-.dark .text-neutral-500 { color: #a7b2ab !important; }
-.dark .text-neutral-400 { color: #8a948d !important; }
+.dark .text-neutral-700 { color: #eaf1ec !important; }
+.dark .text-neutral-600 { color: #c4d6cb !important; }
+.dark .text-neutral-500 { color: #a8c4b5 !important; }
+.dark .text-neutral-400 { color: #7d9488 !important; }
 
-/* Borders / rings */
-.dark .border-black\/5 { border-color: rgba(255, 255, 255, 0.08) !important; }
-.dark .border-black\/10 { border-color: rgba(255, 255, 255, 0.12) !important; }
-.dark .border-neutral-100 { border-color: rgba(255, 255, 255, 0.07) !important; }
-.dark .border-neutral-200 { border-color: rgba(255, 255, 255, 0.1) !important; }
+/* Borders / rings — green-tinted #2A3A33 */
+.dark .border-black\/5 { border-color: rgba(168, 196, 181, 0.1) !important; }
+.dark .border-black\/10 { border-color: rgba(168, 196, 181, 0.14) !important; }
+.dark .border-neutral-100 { border-color: rgba(168, 196, 181, 0.09) !important; }
+.dark .border-neutral-200 { border-color: rgba(168, 196, 181, 0.12) !important; }
 .dark .ring-black\/5 { --tw-ring-color: rgba(255, 255, 255, 0.08) !important; }
 .dark .ring-black\/\[0\.04\] { --tw-ring-color: rgba(255, 255, 255, 0.07) !important; }
 
 /* Gradient hero backgrounds → dark wash */
-.dark .from-brand-50 { --tw-gradient-from: #11231b var(--tw-gradient-from-position) !important; }
-.dark .via-white { --tw-gradient-via: #15181a var(--tw-gradient-via-position) !important; }
-.dark .to-\[\#e1eae3\] { --tw-gradient-to: #0e1413 var(--tw-gradient-to-position) !important; }
+.dark .from-brand-50 { --tw-gradient-from: #15281e var(--tw-gradient-from-position) !important; }
+.dark .via-white { --tw-gradient-via: #1a241f var(--tw-gradient-via-position) !important; }
+.dark .to-\[\#e1eae3\] { --tw-gradient-to: #101a15 var(--tw-gradient-to-position) !important; }
 
 /* Form fields */
 .dark input,
 .dark textarea,
 .dark select {
-  background-color: #1b1f20 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: #e6ece8 !important;
+  background-color: #24302a !important;
+  border-color: rgba(168, 196, 181, 0.14) !important;
+  color: #f0f5f2 !important;
 }
 .dark input::placeholder,
 .dark textarea::placeholder { color: #7c867f !important; }
@@ -242,4 +260,37 @@ body {
     resize: none !important;
     padding: 0 !important;
   }
+}
+
+/* ── Simple mode (lansia / non-tech): bigger text & friendlier targets ─────── */
+.simple-mode {
+  font-size: 19px;
+}
+.simple-mode body {
+  letter-spacing: 0.1px;
+}
+/* Larger tap targets for buttons & links */
+.simple-mode button,
+.simple-mode a[href],
+.simple-mode select,
+.simple-mode input,
+.simple-mode textarea {
+  min-height: 48px;
+}
+.simple-mode .text-xs,
+.simple-mode .text-\[11px\],
+.simple-mode .text-\[10px\],
+.simple-mode .text-\[12px\] {
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+.simple-mode .text-sm {
+  font-size: 1.02rem !important;
+}
+/* Calm the ambient animations & reduce visual noise */
+.simple-mode .orb {
+  display: none !important;
+}
+.simple-mode * {
+  animation-duration: 0.001s !important;
 }

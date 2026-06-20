@@ -9,7 +9,7 @@ export const backendEnabled = Boolean(API)
 
 export interface Health {
   ok: boolean
-  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean }
+  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean; otp?: boolean }
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null
@@ -86,6 +86,16 @@ export const api = {
     req<{ user: BackendUser; token?: string }>('/api/auth/google', {
       method: 'POST',
       body: JSON.stringify({ credential, role }),
+    }).then((r) => {
+      if (r.token) setAuthToken(r.token)
+      return toAccount(r.user)
+    }),
+  otpStart: (phone: string) =>
+    req<{ ok: boolean; phone: string }>('/api/auth/otp/start', { method: 'POST', body: JSON.stringify({ phone }) }),
+  otpVerify: (phone: string, code: string, name: string, role: Role) =>
+    req<{ user: BackendUser; token?: string }>('/api/auth/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code, name, role }),
     }).then((r) => {
       if (r.token) setAuthToken(r.token)
       return toAccount(r.user)

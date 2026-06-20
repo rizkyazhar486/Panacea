@@ -15,7 +15,7 @@ function issueToken(userId: string): string {
 // Set the session cookie AND return the token so it can also be sent in the
 // response body for Bearer auth (robust to third-party cookie blocking when the
 // frontend and backend are on different domains).
-function setSession(res: Response, userId: string): string {
+export function setSession(res: Response, userId: string): string {
   const token = issueToken(userId)
   res.cookie(COOKIE, token, {
     httpOnly: true,

@@ -15,6 +15,36 @@ const catIcon: Record<OrderCategory, React.ReactNode> = {
 }
 const statusTone = { Diproses: 'low', Diterima: 'brand', Selesai: 'normal' } as const
 
+// Visual step progress for a transaction: Diproses → Diterima → Selesai.
+const STEPS: Order['status'][] = ['Diproses', 'Diterima', 'Selesai']
+function StatusProgress({ status }: { status: Order['status'] }) {
+  const idx = STEPS.indexOf(status)
+  return (
+    <div className="mt-3 border-t border-neutral-100 pt-3">
+      <div className="flex items-center">
+        {STEPS.map((label, i) => {
+          const done = i <= idx
+          return (
+            <div key={label} className="flex flex-1 items-center last:flex-none">
+              <div className="flex flex-col items-center">
+                <span className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold transition ${done ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-400'}`}>
+                  {done ? '✓' : i + 1}
+                </span>
+                <span className={`mt-1 text-[10px] font-semibold ${done ? 'text-brand-dark' : 'text-neutral-400'}`}>{label}</span>
+              </div>
+              {i < STEPS.length - 1 && (
+                <div className="mx-1 h-1 flex-1 overflow-hidden rounded-full bg-neutral-200">
+                  <div className="h-full rounded-full bg-brand transition-all" style={{ width: i < idx ? '100%' : '0%' }} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function Orders() {
   const { state } = useStore()
   const [cat, setCat] = useState<(typeof CATS)[number]>('Semua')
@@ -54,17 +84,20 @@ export function Orders() {
           <div key={date} className="space-y-2">
             <div className="px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{date}</div>
             {items.map((o) => (
-              <Card key={o.id} className="flex items-center gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">{catIcon[o.category]}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate font-bold">{o.title}</span>
-                    <Badge tone={statusTone[o.status]}>{o.status}</Badge>
+              <Card key={o.id}>
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">{catIcon[o.category]}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate font-bold">{o.title}</span>
+                      <Badge tone={statusTone[o.status]}>{o.status}</Badge>
+                    </div>
+                    {o.detail && <p className="truncate text-xs text-neutral-500">{o.detail}</p>}
+                    <p className="text-[11px] text-neutral-400">{new Date(o.at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {o.category}</p>
                   </div>
-                  {o.detail && <p className="truncate text-xs text-neutral-500">{o.detail}</p>}
-                  <p className="text-[11px] text-neutral-400">{new Date(o.at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {o.category}</p>
+                  <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('id-ID')}</span>
                 </div>
-                <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('id-ID')}</span>
+                <StatusProgress status={o.status} />
               </Card>
             ))}
           </div>

@@ -260,7 +260,7 @@ function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: stri
           const cover = p.photos?.find(isImg)
           return (
             <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-              {cover && <img src={cover} className="absolute inset-0 h-full w-full object-cover" alt="" />}
+              {cover && <img src={cover} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" alt="" />}
               <span className="absolute left-1.5 top-1.5 text-white/90 drop-shadow">{p.videoUrl || p.kind === 'video' ? <IconVideo size={16} /> : p.postType === 'kebiasaan' ? <IconLeaf size={16} /> : <IconRun size={16} />}</span>
               <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span>
               <span className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 text-[10px] font-bold text-white drop-shadow"><IconHeart size={11} />{p.likes}</span>
@@ -426,7 +426,7 @@ function PostGrid({ posts, onOpen, empty }: { posts: SocialPost[]; onOpen: (id: 
         const cover = p.photos?.find(isImg)
         return (
           <button key={p.id} onClick={() => onOpen(p.id)} className="relative aspect-[3/4] overflow-hidden rounded-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-            {cover && <img src={cover} className="absolute inset-0 h-full w-full object-cover" alt="" />}
+            {cover && <img src={cover} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" alt="" />}
             <span className="absolute left-1.5 top-1.5 text-white/90 drop-shadow">{p.locked ? <IconLock size={14} /> : p.videoUrl || p.kind === 'video' ? <IconVideo size={14} /> : <IconRun size={14} />}</span>
             <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span>
           </button>
@@ -566,10 +566,10 @@ function MediaBlock({ post: p }: { post: SocialPost }) {
   }
   const realPhotos = p.photos?.filter(isImg) ?? []
   if (realPhotos.length > 0) {
-    if (realPhotos.length === 1) return <img src={realPhotos[0]} className="max-h-[70vh] w-full object-cover" alt={p.activity} />
+    if (realPhotos.length === 1) return <img src={realPhotos[0]} loading="lazy" decoding="async" className="max-h-[70vh] w-full object-cover" alt={p.activity} />
     return (
       <div className={`grid gap-1 ${realPhotos.length === 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
-        {realPhotos.slice(0, 4).map((src, i) => <img key={i} src={src} className="aspect-square w-full object-cover" alt="" />)}
+        {realPhotos.slice(0, 4).map((src, i) => <img key={i} src={src} loading="lazy" decoding="async" className="aspect-square w-full object-cover" alt="" />)}
       </div>
     )
   }
@@ -727,7 +727,7 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
             </label>
             {photoData.length > 0 && (
               <div className="mt-2 grid grid-cols-4 gap-1.5">
-                {photoData.map((src, i) => <img key={i} src={src} className="aspect-square w-full rounded-lg object-cover" alt="" />)}
+                {photoData.map((src, i) => <img key={i} src={src} loading="lazy" decoding="async" className="aspect-square w-full rounded-lg object-cover" alt="" />)}
               </div>
             )}
           </div>

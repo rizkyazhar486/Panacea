@@ -35,4 +35,5 @@ export const features = {
   pushLive: Boolean(config.vapid.publicKey && config.vapid.privateKey),
   emailLive: Boolean(process.env.RESEND_API_KEY),
   payoutLive: Boolean(process.env.IRIS_API_KEY || process.env.IRIS_CREATOR_KEY),
+  otpLive: Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_VERIFY_SERVICE_SID),
 }

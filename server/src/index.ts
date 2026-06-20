@@ -37,6 +37,7 @@ import {
   type Post,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
+import { otpStart, otpVerify, otpLive } from './otp.js'
 import { aiMessages, aiConsult, aiVision } from './ai.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -61,7 +62,7 @@ app.use(
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otp: otpLive },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     aiConsultPnc: config.aiConsultPnc,
@@ -73,6 +74,8 @@ app.get('/api/health', (_req, res) => {
 // --- auth ---
 app.post('/api/auth/google', googleLogin)
 app.post('/api/auth/dev-login', devLogin)
+app.post('/api/auth/otp/start', otpStart)
+app.post('/api/auth/otp/verify', otpVerify)
 app.get('/api/auth/me', (req, res) => {
   const u = currentUser(req)
   if (!u) return res.status(401).json({ error: 'unauthorized' })
@@ -374,4 +377,5 @@ server.listen(config.port, () => {
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
   console.log(`  Payout (Iris):${irisLive ? ' LIVE' : ' off (set IRIS_API_KEY for auto-disbursement)'}`)
+  console.log(`  OTP SMS:      ${otpLive ? 'LIVE (Twilio Verify)' : 'off (set TWILIO_ACCOUNT_SID/AUTH_TOKEN/VERIFY_SERVICE_SID)'}`)
 })

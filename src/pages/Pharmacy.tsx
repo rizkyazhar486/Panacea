@@ -97,7 +97,7 @@ export function Pharmacy() {
               <Card key={p.id} pad={false} hover className="overflow-hidden">
                 {/* photo tile */}
                 <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.image ? undefined : `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
-                  {p.image ? <img src={p.image} className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}
+                  {p.image ? <img src={p.image} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}
                   <span className="absolute left-2 top-2">{p.rx ? <Badge tone="high">Resep</Badge> : <Badge tone="normal">Bebas</Badge>}</span>
                   {canManage && <button onClick={() => removeProduct(p.id)} className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-xs text-white">✕</button>}
                 </div>

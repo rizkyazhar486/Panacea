@@ -23,6 +23,8 @@ import {
   setTextScale,
   getReducedMotion,
   setReducedMotion,
+  getSimpleMode,
+  setSimpleMode,
   type ThemePref,
   type TextScale,
 } from '../lib/theme'
@@ -49,6 +51,7 @@ export function Settings() {
   const [lang, setLangState] = useState<Lang>(getLang)
   const [scale, setScaleState] = useState<TextScale>(getTextScale)
   const [motion, setMotionState] = useState<boolean>(getReducedMotion)
+  const [simple, setSimpleState] = useState<boolean>(getSimpleMode)
   const [showPwd, setShowPwd] = useState(false)
 
   const s = state.settings
@@ -114,6 +117,24 @@ export function Settings() {
             on={motion}
             onToggle={(v) => { setReducedMotion(v); setMotionState(v) }}
           />
+
+          {/* Simple mode (elderly / non-tech) */}
+          <button
+            onClick={() => { const v = !simple; setSimpleMode(v); setSimpleState(v) }}
+            className={`flex w-full items-center justify-between gap-3 rounded-2xl border-2 p-4 text-left transition ${
+              simple ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <span className="min-w-0">
+              <span className="flex items-center gap-2 text-base font-extrabold">👵 Mode Simpel</span>
+              <span className="mt-0.5 block text-[13px] text-neutral-500">
+                Teks &amp; tombol lebih besar, tampilan ditenangkan — cocok untuk lansia atau yang baru memakai aplikasi.
+              </span>
+            </span>
+            <span className={`relative h-7 w-12 shrink-0 rounded-full transition ${simple ? 'bg-brand' : 'bg-neutral-300'}`}>
+              <span className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all ${simple ? 'left-[22px]' : 'left-0.5'}`} />
+            </span>
+          </button>
         </div>
       </Card>
 

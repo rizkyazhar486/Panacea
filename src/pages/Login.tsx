@@ -191,6 +191,19 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <GoogleG /> Masuk dengan Google
             </button>
           )}
+          {health?.features.otp && (
+            <PhoneLogin
+              role={role}
+              consentOk={() => {
+                if (!consent) { setError('Harap menyetujui Syarat, Kebijakan Privasi & Persetujuan Tindakan terlebih dahulu.'); return false }
+                if (STR_ROLES.includes(role) && !str.trim()) { setError('Nomor STR / sertifikat praktik wajib untuk peran ini.'); return false }
+                return true
+              }}
+              name={name}
+              str={str}
+              onLogin={(acc) => finish(acc)}
+            />
+          )}
           {error && <p className="mt-2 text-xs text-accent">{error}</p>}
           {backendEnabled && (
             <p className="mt-2 text-[11px] font-semibold text-brand-dark">
@@ -287,6 +300,81 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
         </div>
       </div>
+    </div>
+  )
+}
+
+// Phone-number + SMS OTP login (Twilio Verify). Only shown when the server has
+// OTP configured (health.features.otp). Fast path for mobile users.
+function PhoneLogin({ role, name, str, consentOk, onLogin }: {
+  role: Role
+  name: string
+  str: string
+  consentOk: () => boolean
+  onLogin: (acc: Account) => void
+}) {
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  async function start() {
+    if (!consentOk()) return
+    if (!phone.trim()) { setMsg('Masukkan nomor HP.'); return }
+    setBusy(true); setMsg('')
+    try {
+      await api.otpStart(phone.trim())
+      setSent(true)
+      setMsg('Kode OTP dikirim via SMS. Cek pesan masuk Anda.')
+    } catch {
+      setMsg('Gagal mengirim OTP. Periksa nomor & coba lagi.')
+    } finally { setBusy(false) }
+  }
+
+  async function verify() {
+    if (!code.trim()) { setMsg('Masukkan kode OTP.'); return }
+    setBusy(true); setMsg('')
+    try {
+      const acc = await api.otpVerify(phone.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
+      onLogin({
+        ...acc,
+        isSubscriber: role === 'owner',
+        sex: 'L',
+        str: STR_ROLES.includes(role) ? str.trim() : undefined,
+        strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
+        consentAt: new Date().toISOString(),
+      })
+    } catch {
+      setMsg('Kode OTP salah atau kedaluwarsa.')
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="mt-3 rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
+      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">📱 Masuk cepat dengan No. HP (OTP SMS)</div>
+      <div className="flex gap-2">
+        <input
+          className={inputClass}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          inputMode="tel"
+          placeholder="08xxxxxxxxxx"
+          disabled={sent}
+        />
+        {!sent ? (
+          <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Kirim OTP'}</Button>
+        ) : (
+          <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Ubah</button>
+        )}
+      </div>
+      {sent && (
+        <div className="mt-2 flex gap-2">
+          <input className={inputClass} value={code} onChange={(e) => setCode(e.target.value)} inputMode="numeric" placeholder="Kode 6 digit" />
+          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verifikasi'}</Button>
+        </div>
+      )}
+      {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
     </div>
   )
 }
