@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://panaceamed.vercel.app/sitemap.xml
+Sitemap: https://panaceamed.id/sitemap.xml
