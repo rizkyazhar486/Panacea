@@ -181,7 +181,7 @@ body {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.animate-marquee { animation: marquee-x 30s linear infinite; }
+.animate-marquee { animation: marquee-x 55s linear infinite; will-change: transform; }
 .marquee-pause:hover .animate-marquee { animation-play-state: paused; }
 
 /* Edge fades that blend into the page background (dark-mode aware). */
@@ -236,6 +236,15 @@ body {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+
+/* Auto-honor the OS "reduce motion" setting — calmer & smoother for everyone. */
+@media (prefers-reduced-motion: reduce) {
+  .orb,
+  .animate-marquee,
+  .animate-gradient-text {
+    animation: none !important;
+  }
 }
 
 /* Print / PDF export — show only the document content. */
