@@ -206,37 +206,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state])
 
-  // Autologin: the account isn't persisted locally, but a valid backend session
-  // cookie means the user is still signed in. On first load, ask the server who
-  // we are and restore the session (skips the landing for returning users).
-  // Logging out clears the cookie, so the next visit starts at the landing again.
+  // Auto-login DISABLED by request: the app always starts at the landing/login,
+  // even if a backend session cookie exists. Users sign in explicitly each visit.
   const bootedRef = useRef(false)
   useEffect(() => {
-    if (bootedRef.current || !backendEnabled) return
     bootedRef.current = true
-    api
-      .me()
-      .then((acc) => {
-        const isOwner = acc.email.toLowerCase() === OWNER_EMAIL
-        const restored: Account = { ...acc, isOwner, isSubscriber: isOwner || acc.isSubscriber }
-        setState((st) => {
-          if (st.account) return st // a fresh login already happened — don't clobber it
-          if (restored.role === 'pasien') {
-            const self = patientFromAccount(restored)
-            const exists = st.patients.some((p) => p.id === self.id)
-            return {
-              ...st,
-              account: { ...restored, patientId: self.id },
-              patients: exists ? st.patients : [...st.patients, self],
-              activePatientId: self.id,
-            }
-          }
-          return { ...st, account: restored }
-        })
-      })
-      .catch(() => {
-        /* no active session — stay on the public landing */
-      })
+    // Intentionally no api.me() restore — no auto-login.
   }, [])
 
   // When a backend is configured, hydrate clinical data from the server on login.

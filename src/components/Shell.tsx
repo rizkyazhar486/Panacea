@@ -141,17 +141,6 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="orb absolute right-0 top-1/3 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" style={{ animationDelay: '-8s' }} />
         <div className="orb absolute bottom-0 left-1/2 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" style={{ animationDelay: '-14s' }} />
       </div>
-      {/* Floating reopen button when the sidebar is collapsed (desktop) */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="fixed left-3 top-3 z-20 hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-ink shadow-md hover:bg-neutral-50 lg:grid"
-          title="Buka menu"
-          aria-label="Buka menu samping"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" /></svg>
-        </button>
-      )}
       <aside className={`sticky top-0 z-10 hidden h-screen shrink-0 flex-col border-r border-black/5 bg-white/80 py-6 backdrop-blur-xl transition-all duration-300 lg:flex ${sidebarOpen ? 'w-64 px-4' : 'w-0 overflow-hidden border-r-0 px-0 opacity-0'}`}>
         <div className="mb-6 flex items-center justify-between gap-2 px-2">
           <div className="flex items-center gap-2.5">
@@ -233,6 +222,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
+            {/* Mobile: buka drawer */}
             <button
               onClick={() => setMenuOpen(true)}
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
@@ -242,7 +232,18 @@ export function Shell({ children }: { children: ReactNode }) {
                 <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
               </svg>
             </button>
-            <span className="shrink-0 lg:hidden"><LogoMark size={26} /></span>
+            {/* Desktop: buka kembali sidebar saat diciutkan (di dalam header → tidak menimpa judul) */}
+            {!sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="hidden h-9 w-9 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
+                aria-label="Buka menu samping"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              </button>
+            )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
 
@@ -326,8 +327,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
 
         {/* Quick actions — one-tap shortcuts (mobile only) */}
-        <div className="flex gap-2 overflow-x-auto border-b border-black/5 bg-white px-3 py-2 lg:hidden">
-          <span className="flex shrink-0 items-center pr-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Cepat</span>
+        <div className="flex gap-2 overflow-x-auto border-b border-black/5 bg-white px-3 py-2.5 lg:hidden">
           {quick.map((n) => (
             <NavLink
               key={n.to}
