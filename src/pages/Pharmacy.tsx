@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
 import { IconPill, IconUpload, IconCheck, IconShield, IconSearch, IconPlus } from '../components/icons'
+import { Carousel, ButtonGroup } from '../components/Carousel'
 import type { PharmacyProduct, PharmacyCategory } from '../lib/types'
 
 type Cat = PharmacyCategory
@@ -64,8 +65,8 @@ export function Pharmacy() {
           <IconSearch size={16} className="text-neutral-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari obat… (mis. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {CATS.map((c) => <button key={c} onClick={() => setCat(c)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${cat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>{c}</button>)}
+        <div className="mt-3">
+          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: c }))} onChange={setCat} />
         </div>
         <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-50 p-3 text-xs text-brand-dark">
           <IconShield size={15} className="mt-0.5 shrink-0" />
@@ -74,6 +75,27 @@ export function Pharmacy() {
       </Card>
 
       {done && <Card className="flex items-center gap-2 bg-brand-50 text-sm font-semibold text-brand-dark"><IconCheck size={18} /> Pesanan diterima — tercatat di Riwayat Transaksi. Bukti dikirim ke email.</Card>}
+
+      {products.length > 0 && (
+        <Card>
+          <SectionTitle title="Geser untuk Pilih Obat" subtitle={`${products.length} produk · ${cat}`} />
+          <Carousel itemClass="w-44">
+            {products.map((p) => (
+              <div key={p.id} className="flex h-full flex-col rounded-2xl border border-black/5 bg-white p-3">
+                <div className="mb-2 grid h-20 place-items-center rounded-xl text-4xl" style={{ background: `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
+                  {p.image ? <img src={p.image} loading="lazy" className="h-full w-full rounded-xl object-cover" alt={p.name} /> : p.emoji}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate text-sm font-bold">{p.name}</span>
+                  {p.rx && <Badge tone="high">Resep</Badge>}
+                </div>
+                <div className="text-xs text-neutral-500">{rupiah(p.priceIdr)}</div>
+                <Button onClick={() => add(p)} className="mt-2 w-full !py-1.5 text-xs"><IconPlus size={14} /> Tambah</Button>
+              </div>
+            ))}
+          </Carousel>
+        </Card>
+      )}
 
       {canManage && manage && (
         <Card>

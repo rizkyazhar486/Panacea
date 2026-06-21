@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHospital, IconPhone, IconCheck, IconSearch } from '../components/icons'
 import { BottomSheet } from '../components/BottomSheet'
+import { ButtonGroup } from '../components/Carousel'
 import { HOSPITALS, fetchNearbyFacilities, type FacilityKind, type NearbyFacility } from '../lib/hospitals'
 
 const KIND_LABEL: Record<string, string> = { Semua: 'Semua Faskes', RS: 'Rumah Sakit', Klinik: 'Klinik', Apotek: 'Apotek' }
@@ -82,13 +83,13 @@ export function Hospitals() {
           <IconSearch size={16} className="text-neutral-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / layanan / kota…" className="w-full bg-transparent text-sm outline-none" />
         </div>
-        {/* Desktop: chips. Mobile: a button that opens a bottom sheet. */}
-        <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
-          {(['Semua', 'RS', 'Klinik', 'Apotek'] as const).map((k) => (
-            <button key={k} onClick={() => setKind(k)} className={`rounded-full px-3.5 py-1.5 text-xs font-bold ${kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-              {k === 'RS' ? 'Rumah Sakit' : k}
-            </button>
-          ))}
+        {/* Desktop: Button Group. Mobile: a button that opens a bottom sheet. */}
+        <div className="mt-3 hidden sm:block">
+          <ButtonGroup
+            value={kind}
+            options={[{ id: 'Semua', label: 'Semua' }, { id: 'RS', label: 'Rumah Sakit' }, { id: 'Klinik', label: 'Klinik' }, { id: 'Apotek', label: 'Apotek' }] as { id: FacilityKind | 'Semua'; label: string }[]}
+            onChange={setKind}
+          />
         </div>
         <button
           onClick={() => setSheetOpen(true)}
