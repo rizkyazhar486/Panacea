@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
-import { IconFood, IconPlus, IconSparkle } from '../components/icons'
+import { IconFood, IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital } from '../components/icons'
 import { FOODS, EXERCISES } from '../lib/foods'
+import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
+import type { VitalSign } from '../lib/types'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -99,6 +101,8 @@ export function Nutrition() {
       <ActivityLog />
 
       <WellnessTrendChart />
+
+      <ChronicMonitor />
 
       <LongevityCalculator />
 
@@ -335,6 +339,167 @@ function Tip({ title, text }: { title: string; text: string }) {
     <div className="rounded-xl border border-neutral-100 p-3">
       <Badge tone="brand">{title}</Badge>
       <p className="mt-1.5 text-sm text-neutral-600">{text}</p>
+    </div>
+  )
+}
+
+// -- Chronic-care Follow-Up: daily TTV monitoring for chronic patients --------
+// Subscription-gated (Rp50rb/bln atau Rp7,5jt lifetime). Logs daily vitals,
+// evaluates them against target ranges, and routes red flags to consult/SOS.
+const CHRONIC_MONTHLY = 50000
+const CHRONIC_LIFETIME = 7500000
+
+function ChronicMonitor() {
+  const { state, activePatient, addVital, buyChronicSub } = useStore()
+  const p = activePatient
+  const vitals = state.vitals[p.id] ?? []
+  const latest = vitals[vitals.length - 1]
+  const [show, setShow] = useState(false)
+  const [f, setF] = useState({ sys: 120, dia: 80, hr: 78, rr: 16, temp: 36.6, spo2: 98, glu: '' })
+
+  const active = !!state.chronicLifetime || (!!state.chronicSubExpires && new Date(state.chronicSubExpires) > new Date())
+  const daysLeft = state.chronicSubExpires ? Math.max(0, Math.ceil((new Date(state.chronicSubExpires).getTime() - Date.now()) / 86400000)) : 0
+
+  const evals = latest ? evaluateVitals(latest, p.chronicConditions) : []
+  const status = overallStatus(evals)
+
+  function save() {
+    addVital(p.id, {
+      id: uid(), takenAt: new Date().toISOString(),
+      systolic: Number(f.sys), diastolic: Number(f.dia), heartRate: Number(f.hr),
+      respRate: Number(f.rr), tempC: Number(f.temp), spo2: Number(f.spo2),
+      glucose: f.glu ? Number(f.glu) : undefined,
+    })
+    setShow(false)
+  }
+
+  if (!active) {
+    return (
+      <Card className="border-2 border-brand/20">
+        <SectionTitle
+          icon={<IconHeart size={20} />}
+          title="Pemantauan Kronis & Longevity (Follow-Up)"
+          subtitle="Pantau TTV harian pasien kronis seumur hidup — terkontrol & terhubung ke konsultasi"
+          right={<Badge tone="high">Perlu langganan</Badge>}
+        />
+        <div className="rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50/40 p-5">
+          <p className="text-sm text-neutral-600">
+            Untuk pasien <b>hipertensi, diabetes, jantung</b>, dan kondisi kronis lain: catat tekanan darah,
+            gula darah, nadi, SpO₂, & suhu setiap hari. Sistem menilai apakah <b>terkontrol</b> dan
+            memberi peringatan dini bila berbahaya — langsung terhubung ke <b>konsultasi/darurat</b>.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button onClick={() => { buyChronicSub('monthly') }} className="rounded-2xl border-2 border-neutral-200 p-4 text-left transition hover:border-brand">
+              <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Bulanan</div>
+              <div className="text-2xl font-extrabold">Rp{CHRONIC_MONTHLY.toLocaleString('id-ID')}<span className="text-sm font-medium text-neutral-400">/bln</span></div>
+              <div className="mt-1 text-[11px] text-neutral-500">Pemantauan penuh, perpanjang tiap bulan.</div>
+            </button>
+            <button onClick={() => { buyChronicSub('lifetime') }} className="relative rounded-2xl border-2 border-brand bg-brand-50 p-4 text-left">
+              <span className="absolute -top-2 right-3 rounded-full bg-brand px-2 py-0.5 text-[9px] font-bold text-white">Terbaik · Seumur hidup</span>
+              <div className="text-xs font-semibold uppercase tracking-wide text-brand-dark">Lifetime</div>
+              <div className="text-2xl font-extrabold text-brand-dark">Rp{(CHRONIC_LIFETIME / 1000000).toLocaleString('id-ID')}jt</div>
+              <div className="mt-1 text-[11px] text-neutral-500">Sekali bayar, pantau selamanya — sesuai sifat longevity.</div>
+            </button>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-400">⚕️ Pemantauan ini mendukung, bukan menggantikan, kontrol rutin ke dokter.</p>
+        </div>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className="border-2 border-brand/20">
+      <SectionTitle
+        icon={<IconHeart size={20} />}
+        title="Pemantauan Kronis & Longevity (Follow-Up)"
+        subtitle="Catat TTV harian — sistem menilai apakah kondisi Anda terkontrol"
+        right={<Badge tone="brand">{state.chronicLifetime ? 'Lifetime aktif' : `Aktif · ${daysLeft} hari`}</Badge>}
+      />
+
+      {status === 'alert' && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-red-300 bg-red-50 p-4">
+          <div className="flex items-start gap-2 text-sm text-accent">
+            <span className="text-xl">🚨</span>
+            <span><b>Tanda vital berbahaya terdeteksi.</b> Jika ada nyeri dada, sesak berat, atau penurunan kesadaran — ini darurat.</span>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/consult"><Button variant="outline"><IconStethoscope size={16} /> Konsultasi</Button></Link>
+            <Link to="/hospitals"><Button><IconHospital size={16} /> Darurat SOS</Button></Link>
+          </div>
+        </div>
+      )}
+      {status === 'warn' && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <span>⚠️ Sebagian nilai di luar target. Pantau lebih ketat & pertimbangkan konsultasi.</span>
+          <Link to="/consult"><Button variant="outline" className="!py-1.5">Konsultasi</Button></Link>
+        </div>
+      )}
+
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-sm">
+          Status hari ini: <b style={{ color: STATUS_COLOR[status] }}>{latest ? STATUS_LABEL[status] : 'Belum ada data'}</b>
+          {p.chronicConditions.length > 0 && <span className="ml-2 text-[11px] text-neutral-400">· {p.chronicConditions.join(', ')}</span>}
+        </div>
+        <Button variant="outline" onClick={() => setShow((s) => !s)}><IconPlus size={16} /> Catat TTV Hari Ini</Button>
+      </div>
+
+      {show && (
+        <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl bg-neutral-50 p-3 sm:grid-cols-4">
+          {([['sys', 'Sistolik'], ['dia', 'Diastolik'], ['hr', 'Nadi'], ['rr', 'RR'], ['temp', 'Suhu'], ['spo2', 'SpO₂'], ['glu', 'Gula (opsional)']] as const).map(([k, label]) => (
+            <Field key={k} label={label}>
+              <input className={inputClass} type="number" value={(f as Record<string, number | string>)[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} />
+            </Field>
+          ))}
+          <div className="flex items-end"><Button onClick={save}>Simpan</Button></div>
+        </div>
+      )}
+
+      {latest ? (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {evals.map((e) => (
+              <div key={e.label} className="rounded-xl border p-3" style={{ borderColor: STATUS_COLOR[e.status] + '55', background: STATUS_COLOR[e.status] + '0f' }}>
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{e.label}</div>
+                <div className="text-xl font-extrabold" style={{ color: STATUS_COLOR[e.status] }}>{e.value} <span className="text-[11px] font-medium text-neutral-400">{e.unit}</span></div>
+                <div className="text-[10px] text-neutral-400">Target {e.target} · {STATUS_LABEL[e.status]}</div>
+              </div>
+            ))}
+          </div>
+          <TtvTrend vitals={vitals} />
+          <p className="mt-2 text-[11px] text-neutral-400">
+            {vitals.length} pencatatan tersimpan · terakhir {new Date(latest.takenAt).toLocaleString('id-ID')}. Catat tiap hari untuk kontrol optimal.
+          </p>
+        </>
+      ) : (
+        <p className="text-sm text-neutral-400">Belum ada catatan TTV. Tekan “Catat TTV Hari Ini” untuk mulai memantau.</p>
+      )}
+    </Card>
+  )
+}
+
+// 14-day systolic & glucose trend sparkline for chronic monitoring.
+function TtvTrend({ vitals }: { vitals: VitalSign[] }) {
+  const recent = vitals.slice(-14)
+  if (recent.length < 2) return null
+  const line = (vals: number[], color: string) => {
+    const w = 280, h = 40
+    const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1
+    const pts = vals.map((v, i) => `${((i / (vals.length - 1)) * w).toFixed(1)},${(h - ((v - min) / span) * (h - 6) - 3).toFixed(1)}`).join(' ')
+    return <polyline points={pts} fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  }
+  const glu = recent.map((v) => v.glucose).filter((g): g is number => g != null)
+  return (
+    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="rounded-xl border border-neutral-100 p-3">
+        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Tren Sistolik (14 catatan)</div>
+        <svg viewBox="0 0 280 40" className="w-full">{line(recent.map((v) => v.systolic), '#FF3131')}</svg>
+      </div>
+      {glu.length >= 2 && (
+        <div className="rounded-xl border border-neutral-100 p-3">
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Tren Gula Darah</div>
+          <svg viewBox="0 0 280 40" className="w-full">{line(glu, '#f59e0b')}</svg>
+        </div>
+      )}
     </div>
   )
 }

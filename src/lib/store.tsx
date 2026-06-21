@@ -169,6 +169,7 @@ interface Store {
   toggleBookmark: (id: string) => void
   toggleFollow: (email: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
+  buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
   logWellness: (date: string, patch: Partial<Omit<WellnessDay, 'date'>>) => void
   addOrder: (o: Order) => void
@@ -505,6 +506,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 note: 'Langganan AI Longevity 30 hari — Rp125.000 (dibayar)',
                 at: now.toISOString(),
               },
+              ...st.wallet.transactions,
+            ],
+          },
+        }))
+        return { ok: true }
+      },
+      buyChronicSub: (plan) => {
+        const now = new Date()
+        const lifetime = plan === 'lifetime'
+        const priceIdr = lifetime ? 7500000 : 50000
+        const expires = lifetime ? undefined : new Date(now.getTime() + 30 * 86400000).toISOString()
+        setState((st) => ({
+          ...st,
+          chronicLifetime: lifetime ? true : st.chronicLifetime,
+          chronicSubExpires: lifetime ? st.chronicSubExpires : expires,
+          orders: [
+            { id: uid(), category: 'Langganan' as const, title: lifetime ? 'Pemantauan Kronis — Lifetime' : 'Pemantauan Kronis 30 hari', detail: 'Monitoring TTV harian pasien kronis & longevity', amountIdr: priceIdr, status: 'Selesai' as const, at: now.toISOString() },
+            ...st.orders,
+          ],
+          wallet: {
+            balance: st.wallet.balance,
+            transactions: [
+              { id: uid(), type: 'subscription' as TxType, amount: 0, note: `${lifetime ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari'} — Rp${priceIdr.toLocaleString('id-ID')} (dibayar)`, at: now.toISOString() },
               ...st.wallet.transactions,
             ],
           },
