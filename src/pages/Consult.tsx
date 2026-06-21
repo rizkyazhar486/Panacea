@@ -4,6 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope, IconCheck, IconChat, IconHospital, IconShield, IconSearch } from '../components/icons'
 import { ConsultChat } from '../components/ConsultChat'
+import { Carousel, ButtonGroup } from '../components/Carousel'
 import { backendEnabled } from '../lib/api'
 import type { PaymentMethod } from '../lib/types'
 
@@ -112,11 +113,7 @@ export function Consult() {
           </Field>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-sm text-neutral-500">Bayar:</span>
-            {(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => (
-              <button key={m} onClick={() => setPay(m)} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${pay === m ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-                {m}
-              </button>
-            ))}
+            <ButtonGroup value={pay} options={(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => ({ id: m, label: m }))} onChange={setPay} />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
@@ -140,11 +137,7 @@ export function Consult() {
           />
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-neutral-500">Metode bayar sesi:</span>
-            {(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => (
-              <button key={m} onClick={() => setPay(m)} className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${pay === m ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-                {m}
-              </button>
-            ))}
+            <ButtonGroup value={pay} options={(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => ({ id: m, label: m }))} onChange={setPay} />
           </div>
 
           {result.surgery && (
@@ -185,12 +178,12 @@ export function Consult() {
           <input value={docQuery} onChange={(e) => setDocQuery(e.target.value)} placeholder="Cari dokter atau spesialisasi…" className="w-full bg-transparent text-sm outline-none" />
         </div>
       )}
-      {result && (
-        <div className="grid gap-4 md:grid-cols-2">
+      {result && recommended.length > 0 && (
+        <Carousel itemClass="w-72">
           {recommended.filter((d) => { const x = docQuery.trim().toLowerCase(); return !x || d.name.toLowerCase().includes(x) || d.specialty.toLowerCase().includes(x) }).map((d) => {
             const isRec = d.tag === result.tag
             return (
-              <Card key={d.name} hover className={`flex flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
+              <Card key={d.name} hover className={`flex h-full flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
                 <div className="flex items-start gap-3">
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">
                     <IconStethoscope size={22} />
@@ -221,7 +214,7 @@ export function Consult() {
               </Card>
             )
           })}
-        </div>
+        </Carousel>
       )}
 
       {backendEnabled && chatRoom && (

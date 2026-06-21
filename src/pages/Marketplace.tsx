@@ -3,6 +3,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconStore, IconUpload, IconToken, IconBook, IconShield, IconCheck } from '../components/icons'
 import { verifyMaterial } from '../lib/ai'
+import { ButtonGroup } from '../components/Carousel'
 import { downloadWatermarkedPdf } from '../lib/pdf'
 import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/types'
 
@@ -102,30 +103,9 @@ export function Marketplace() {
             </span>
           }
         />
-        <div className="flex flex-wrap gap-2">
-          {EXAMS.map((e) => (
-            <button
-              key={e}
-              onClick={() => setExam(e)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
-                exam === e ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
-              }`}
-            >
-              {e}
-            </button>
-          ))}
-          <span className="mx-1 w-px bg-neutral-200" />
-          {CATS.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
-                cat === c ? 'bg-brand-dark text-white' : 'bg-neutral-100 text-neutral-500'
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3">
+          <ButtonGroup value={exam} options={EXAMS.map((e) => ({ id: e, label: e }))} onChange={setExam} />
+          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: c }))} onChange={setCat} />
         </div>
       </Card>
 
