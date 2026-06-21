@@ -449,6 +449,15 @@ const TOPUP_PACKAGES = [
   { pnc: 250, label: 'Pro' },
 ]
 
+// Manual bank-transfer destination (no Midtrans/NPWP needed). Confirmed by owner.
+const MANUAL_BANK = {
+  bank: 'Bank Mandiri',
+  number: '1260007276065',
+  holder: 'RIZKY MUHAMMAD AZRIS',
+  waNumber: '6282261143040', // E.164 without "+"
+  waLabel: '+62 822-6114-3040',
+}
+
 // Real backend wallet (Midtrans payments + server-side balance).
 function BackendWallet() {
   const { syncWalletBalance } = useStore()
@@ -461,6 +470,8 @@ function BackendWallet() {
   const [accountHolder, setAccountHolder] = useState('')
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
+  const [reqMsg, setReqMsg] = useState('')
+  const [copied, setCopied] = useState(false)
 
   function refresh() {
     api.wallet().then((w) => { setBalance(w.balance); syncWalletBalance(w.balance) }).catch(() => {})
@@ -486,6 +497,24 @@ function BackendWallet() {
     } finally {
       setBusy(false)
     }
+  }
+
+  // Manual top-up: record the request (owner approves later) + open WhatsApp.
+  async function submitManual() {
+    if (amount <= 0) { setReqMsg('Masukkan jumlah PNC.'); return }
+    const idr = (amount * TOKEN_TO_IDR).toLocaleString('id-ID')
+    try {
+      await api.topupRequest(amount).catch(() => {})
+      setReqMsg(`Permintaan top-up ${amount} PNC (Rp${idr}) tercatat. Transfer lalu konfirmasi via WhatsApp — saldo ditambahkan setelah disetujui.`)
+    } catch {
+      setReqMsg('Gagal mencatat permintaan, tapi Anda tetap bisa transfer & konfirmasi via WhatsApp.')
+    }
+    const text = `Halo, saya mau top-up Panaceamed.id%0A%0AJumlah: ${amount} PNC (Rp${idr})%0ASudah transfer ke ${MANUAL_BANK.bank} ${MANUAL_BANK.number} a.n. ${MANUAL_BANK.holder}.%0A%0AMohon dikonfirmasi & saldo ditambahkan. Terima kasih.`
+    window.open(`https://wa.me/${MANUAL_BANK.waNumber}?text=${text}`, '_blank')
+  }
+
+  function copyNumber() {
+    navigator.clipboard?.writeText(MANUAL_BANK.number).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) }).catch(() => {})
   }
 
   async function withdraw() {
@@ -547,6 +576,43 @@ function BackendWallet() {
           <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
           <Button onClick={pay} disabled={busy || amount <= 0}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
         </div>
+      </div>
+
+      {/* Manual bank-transfer top-up — works without Midtrans/NPWP */}
+      <div className="mt-5 rounded-2xl border-2 border-brand/20 bg-brand-50/40 p-4">
+        <div className="flex items-center gap-2 text-sm font-bold text-brand-dark">
+          🏦 Top-up Manual (Transfer Bank)
+          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-neutral-500">tanpa biaya admin</span>
+        </div>
+        <p className="mt-1 text-[12px] text-neutral-500">
+          Transfer sesuai nominal, lalu konfirmasi via WhatsApp. Saldo PNC ditambahkan setelah pembayaran diverifikasi.
+        </p>
+        <div className="mt-3 rounded-xl bg-white p-3 text-sm">
+          <div className="flex items-center justify-between py-1">
+            <span className="text-neutral-400">Bank</span><span className="font-bold">{MANUAL_BANK.bank}</span>
+          </div>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-neutral-400">No. Rekening</span>
+            <span className="flex items-center gap-2">
+              <span className="font-mono text-base font-extrabold">{MANUAL_BANK.number}</span>
+              <button onClick={copyNumber} className="rounded-lg bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-dark">{copied ? 'Tersalin ✓' : 'Salin'}</button>
+            </span>
+          </div>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-neutral-400">Atas Nama</span><span className="font-bold">{MANUAL_BANK.holder}</span>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+          <div className="rounded-xl bg-white px-3 py-2 text-sm">
+            Total transfer: <b>Rp{(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}</b>
+          </div>
+          <Button onClick={submitManual} disabled={amount <= 0} className="!bg-[#25D366] hover:!bg-[#1ebe5a]">
+            💬 Sudah Transfer — Konfirmasi WhatsApp
+          </Button>
+        </div>
+        {reqMsg && <p className="mt-2 text-[12px] font-semibold text-brand-dark">{reqMsg}</p>}
+        <p className="mt-1 text-[11px] text-neutral-400">Admin: {MANUAL_BANK.waLabel} · saldo masuk setelah disetujui.</p>
       </div>
 
       <div className="mt-5 rounded-2xl border border-neutral-200 p-4">

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend } from '../components/icons'
-import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats } from '../lib/api'
+import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -42,6 +42,8 @@ export function Owner() {
       </Card>
 
       <RealtimeStats />
+
+      {backendEnabled && <ManualTopupPanel />}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={<IconWalletDot />} label="Langganan" value={`${subsRevenue} PNC`} sub="recurring" />
@@ -217,6 +219,74 @@ function RealtimeStats() {
             <MiniChart title="Pendapatan (7 hari)" data={s.revenue7d.map((d) => d.idr)} labels={s.revenue7d.map((d) => d.day.slice(5))} color="#3b82f6" money />
           </div>
         </>
+      )}
+    </Card>
+  )
+}
+
+// Owner approves/rejects manual bank-transfer top-ups → credits the user's PNC.
+function ManualTopupPanel() {
+  const [rows, setRows] = useState<ManualTopup[] | null>(null)
+  const [busy, setBusy] = useState('')
+  const [err, setErr] = useState('')
+
+  function load() {
+    api.listTopups().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).'))
+  }
+  useEffect(load, [])
+
+  async function decide(id: string, approve: boolean) {
+    setBusy(id)
+    try {
+      await api.decideTopup(id, approve)
+      load()
+    } catch {
+      setErr('Gagal memproses.')
+    } finally {
+      setBusy('')
+    }
+  }
+
+  const pending = (rows ?? []).filter((r) => r.status === 'pending')
+  const decided = (rows ?? []).filter((r) => r.status !== 'pending').slice(0, 8)
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconToken size={20} />}
+        title="Top-up Manual — Persetujuan"
+        subtitle="Setujui transfer bank untuk menambah saldo PNC pengguna"
+        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge>}
+      />
+      {err && <p className="mb-2 text-xs text-accent">{err}</p>}
+      {!rows && !err && <SkeletonRows rows={2} />}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">Tidak ada permintaan menunggu.</p>}
+      <div className="space-y-2">
+        {pending.map((r) => (
+          <div key={r.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <div className="min-w-0 flex-1">
+              <div className="font-bold">{r.name} <span className="text-xs font-normal text-neutral-500">· {r.email}</span></div>
+              <div className="text-sm text-neutral-600">{r.amountPnc} PNC · <b>Rp{r.amountIdr.toLocaleString('id-ID')}</b> · {new Date(r.at).toLocaleString('id-ID')}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Setujui</Button>
+              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Tolak</Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {decided.length > 0 && (
+        <div className="mt-4">
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">Riwayat</div>
+          <div className="space-y-1">
+            {decided.map((r) => (
+              <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
+                <span>{r.name} · {r.amountPnc} PNC</span>
+                <Badge tone={r.status === 'approved' ? 'brand' : 'critical'}>{r.status === 'approved' ? 'Disetujui' : 'Ditolak'}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </Card>
   )

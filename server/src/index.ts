@@ -27,6 +27,9 @@ import {
   getUserByEmail,
   addCreatorSub,
   activeCreatorSubs,
+  addManualTopup,
+  listManualTopups,
+  setManualTopupStatus,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -124,6 +127,37 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
     : `Penarikan Rp${amountIdr.toLocaleString('id-ID')} diterima — diproses manual oleh tim.`
   notify(u.id, { title: 'Penarikan diproses', body, url: '/billing' }, 'notifTransactions').catch(() => {})
   res.json({ ok: true, balance: balance(u.id), payout })
+})
+
+// --- manual bank-transfer top-up (no Midtrans needed) ---
+// User submits a request after transferring; the owner approves to credit PNC.
+app.post('/api/wallet/topup-request', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const amount = Math.floor(Number((req.body as { amountPnc?: number }).amountPnc) || 0)
+  if (amount <= 0) return res.status(400).json({ error: 'bad_amount' })
+  const row = addManualTopup({ userId: u.id, email: u.email, name: u.name, amountPnc: amount, amountIdr: amount * config.tokenToIdr })
+  addAudit(u, 'wallet.topup_request', `${amount} PNC (Rp${row.amountIdr.toLocaleString('id-ID')})`)
+  res.json({ ok: true, request: row })
+})
+app.get('/api/wallet/topups', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ requests: listManualTopups() })
+})
+app.post('/api/wallet/topups/decide', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { id, approve } = req.body as { id?: string; approve?: boolean }
+  const t = setManualTopupStatus(String(id || ''), approve ? 'approved' : 'rejected')
+  if (!t) return res.status(404).json({ error: 'not_found_or_decided' })
+  if (approve) {
+    credit(t.userId, t.amountPnc, 'deposit', `Top-up manual disetujui (Rp${t.amountIdr.toLocaleString('id-ID')})`)
+    notify(t.userId, { title: 'Top-up disetujui ✅', body: `Saldo Anda bertambah ${t.amountPnc} PNC.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+  } else {
+    notify(t.userId, { title: 'Top-up ditolak', body: `Permintaan top-up ${t.amountPnc} PNC tidak disetujui. Hubungi admin bila ada pertanyaan.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+  }
+  addAudit(u, approve ? 'wallet.topup_approve' : 'wallet.topup_reject', `${t.amountPnc} PNC · ${t.email}`)
+  res.json({ ok: true, request: t, balance: balance(t.userId) })
 })
 
 // --- payments ---

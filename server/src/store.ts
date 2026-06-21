@@ -78,6 +78,20 @@ interface DB {
   pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
   notifications: Record<string, Notif[]> // userId -> in-app notification inbox
   creatorSubs: { subscriberId: string; authorEmail: string; at: string; expires: string }[]
+  manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
+}
+
+// Manual (bank-transfer) top-up request — user transfers, owner approves to credit.
+export interface ManualTopup {
+  id: string
+  userId: string
+  email: string
+  name: string
+  amountPnc: number
+  amountIdr: number
+  status: 'pending' | 'approved' | 'rejected'
+  at: string
+  decidedAt?: string
 }
 
 let db: DB = {
@@ -91,6 +105,7 @@ let db: DB = {
   pushSubs: {},
   notifications: {},
   creatorSubs: [],
+  manualTopups: [],
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -413,6 +428,30 @@ export function activeCreatorSubs(subscriberId: string): string[] {
   return (db.creatorSubs ?? [])
     .filter((s) => s.subscriberId === subscriberId && new Date(s.expires).getTime() > now)
     .map((s) => s.authorEmail)
+}
+
+// ── Manual bank-transfer top-ups ────────────────────────────────────────────
+export function addManualTopup(t: Omit<ManualTopup, 'id' | 'status' | 'at'>): ManualTopup {
+  if (!db.manualTopups) db.manualTopups = []
+  const row: ManualTopup = { id: uid(), status: 'pending', at: new Date().toISOString(), ...t }
+  db.manualTopups.unshift(row)
+  save()
+  return row
+}
+export function listManualTopups(status?: ManualTopup['status']): ManualTopup[] {
+  const all = db.manualTopups ?? []
+  return (status ? all.filter((t) => t.status === status) : all).slice(0, 200)
+}
+export function getManualTopup(id: string): ManualTopup | undefined {
+  return db.manualTopups?.find((t) => t.id === id)
+}
+export function setManualTopupStatus(id: string, status: 'approved' | 'rejected'): ManualTopup | undefined {
+  const t = getManualTopup(id)
+  if (!t || t.status !== 'pending') return undefined
+  t.status = status
+  t.decidedAt = new Date().toISOString()
+  save()
+  return t
 }
 
 export function createOrder(o: Order) {

@@ -123,6 +123,11 @@ export const api = {
     ),
   confirmPayment: (orderId: string) =>
     req<{ ok: boolean }>('/api/payments/confirm', { method: 'POST', body: JSON.stringify({ orderId }) }),
+  topupRequest: (amountPnc: number) =>
+    req<{ ok: boolean; request: ManualTopup }>('/api/wallet/topup-request', { method: 'POST', body: JSON.stringify({ amountPnc }) }),
+  listTopups: () => req<{ requests: ManualTopup[] }>('/api/wallet/topups').then((r) => r.requests),
+  decideTopup: (id: string, approve: boolean) =>
+    req<{ ok: boolean; request: ManualTopup }>('/api/wallet/topups/decide', { method: 'POST', body: JSON.stringify({ id, approve }) }),
   withdraw: (amountPnc: number, bank: string, accountNumber: string, accountHolder: string) =>
     req<{ ok: boolean; balance: number; payout?: { live: boolean; status: 'queued' | 'processed' | 'manual'; referenceNo?: string; detail?: string } }>('/api/wallet/withdraw', {
       method: 'POST',
@@ -241,6 +246,18 @@ export interface AuditEntry {
   userEmail: string
   action: string
   target?: string
+}
+
+export interface ManualTopup {
+  id: string
+  userId: string
+  email: string
+  name: string
+  amountPnc: number
+  amountIdr: number
+  status: 'pending' | 'approved' | 'rejected'
+  at: string
+  decidedAt?: string
 }
 
 export interface BackendPost {
