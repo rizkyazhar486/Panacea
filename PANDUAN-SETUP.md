@@ -90,17 +90,46 @@ Anda hanya perlu mengizinkan alamat `panaceamed.id` pada client itu.
 ## Bagian 3 — Pembayaran Midtrans Produksi (uang asli) 💳
 
 Butuh akun Midtrans bisnis yang **terverifikasi** (KTP/NPWP/rekening).
+**Tidak perlu ubah kode** — cukup ganti kunci di Render.
 
-1. Buka **https://dashboard.midtrans.com** → login/daftar.
-2. Lengkapi **data bisnis + NPWP + rekening bank** → ajukan ke **Production**.
-3. Tunggu **persetujuan** dari Midtrans.
-4. Setelah disetujui: menu **Settings** → **Access Keys** → mode **Production**.
-   Salin **Server Key** dan **Client Key**.
-5. Di **Render** (Bagian 0), tambahkan 3 kunci:
-   - `MIDTRANS_SERVER_KEY` = (Server Key produksi)
-   - `MIDTRANS_CLIENT_KEY` = (Client Key produksi)
-   - `MIDTRANS_IS_PRODUCTION` = `true`
-6. Save. Setelah redeploy, top-up memakai pembayaran **asli**.
+### Langkah A — Ambil kunci Production
+1. Buka **https://dashboard.midtrans.com**.
+2. Di kiri atas, pastikan **Environment = Production** (bukan Sandbox).
+3. Menu **Settings → Access Keys**. Salin:
+   - **Server Key** (diawali `Mid-server-...`)
+   - **Client Key** (diawali `Mid-client-...`)
+   > ⚠️ Kunci Sandbox biasanya diawali `SB-Mid-...`. Pastikan Anda menyalin yang
+   > dari Environment **Production**.
+
+### Langkah B — Pasang di Render
+Di **Render** (Bagian 0), isi/ubah **3 kunci** ini:
+- `MIDTRANS_SERVER_KEY` = (Server Key production)
+- `MIDTRANS_CLIENT_KEY` = (Client Key production)
+- `MIDTRANS_IS_PRODUCTION` = `true`
+
+Save → tunggu redeploy.
+
+### Langkah C — Set URL Notifikasi (Webhook)
+1. Di Midtrans → **Settings → Configuration**.
+2. **Payment Notification URL** =
+   `https://panaceamed-backend.onrender.com/api/payments/webhook`
+   (ganti `panaceamed-backend` bila nama service Render Anda berbeda).
+3. **Finish / Unfinish / Error Redirect URL** = `https://panaceamed.id`
+4. Simpan.
+
+### Langkah D — Verifikasi
+1. Buka `https://panaceamed-backend.onrender.com/api/health`.
+2. Pastikan `"payments":true` dan `midtransClientKey` **bukan** `SB-...`.
+3. Coba top-up nominal kecil (mis. 1 PNC) lalu bayar sungguhan.
+
+> **Catatan penting:**
+> - Setiap metode (QRIS Dinamis, VA, GoPay, dll) harus **disetujui Midtrans**
+>   dulu. Bila statusnya "sedang diproses", metode itu belum aktif walau
+>   production sudah menyala.
+> - **QRIS Dinamis** muncul otomatis lewat Midtrans Snap (channel `qris`/`gopay`)
+>   begitu disetujui — **tidak perlu QRIS statis**.
+> - Tiap transaksi sukses kena biaya Midtrans (mis. QRIS ±0,7%). Top-up Manual
+>   (transfer bank) tetap tersedia sebagai alternatif gratis.
 
 ---
 
