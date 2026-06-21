@@ -4,6 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconFood, IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital } from '../components/icons'
 import { FOODS, EXERCISES } from '../lib/foods'
+import { api, backendEnabled } from '../lib/api'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import type { VitalSign } from '../lib/types'
 
@@ -355,10 +356,42 @@ function ChronicMonitor() {
   const vitals = state.vitals[p.id] ?? []
   const latest = vitals[vitals.length - 1]
   const [show, setShow] = useState(false)
+  const [payMsg, setPayMsg] = useState('')
   const [f, setF] = useState({ sys: 120, dia: 80, hr: 78, rr: 16, temp: 36.6, spo2: 98, glu: '' })
 
   const active = !!state.chronicLifetime || (!!state.chronicSubExpires && new Date(state.chronicSubExpires) > new Date())
   const daysLeft = state.chronicSubExpires ? Math.max(0, Math.ceil((new Date(state.chronicSubExpires).getTime() - Date.now()) / 86400000)) : 0
+  const loggedToday = !!latest && latest.takenAt.slice(0, 10) === new Date().toISOString().slice(0, 10)
+
+  // Buy a chronic subscription — via Midtrans when payments are live, else local.
+  async function buy(plan: 'monthly' | 'lifetime') {
+    setPayMsg('')
+    if (!backendEnabled) { buyChronicSub(plan); return }
+    try {
+      const h = await api.health()
+      if (!h.features.payments) { buyChronicSub(plan); return }
+      const r = await api.createPayment(0, 'QRIS', `chronic_${plan}`)
+      if (r.live && r.redirectUrl) {
+        window.open(r.redirectUrl, '_blank')
+        setPayMsg('Selesaikan pembayaran di tab Midtrans — langganan aktif otomatis setelah lunas.')
+        // Poll until the webhook activates the subscription server-side.
+        let n = 0
+        const iv = setInterval(async () => {
+          n++
+          try {
+            const s = await api.paymentStatus(r.orderId)
+            if (s.status === 'paid') { clearInterval(iv); buyChronicSub(plan); setPayMsg('✅ Pembayaran berhasil — langganan aktif.') }
+            else if (s.status === 'failed') { clearInterval(iv); setPayMsg('Pembayaran gagal/dibatalkan.') }
+          } catch { /* keep trying */ }
+          if (n >= 45) clearInterval(iv)
+        }, 4000)
+      } else {
+        await api.confirmPayment(r.orderId); buyChronicSub(plan)
+      }
+    } catch {
+      setPayMsg('Gagal memproses pembayaran. Coba lagi.')
+    }
+  }
 
   const evals = latest ? evaluateVitals(latest, p.chronicConditions) : []
   const status = overallStatus(evals)
@@ -389,18 +422,19 @@ function ChronicMonitor() {
             memberi peringatan dini bila berbahaya — langsung terhubung ke <b>konsultasi/darurat</b>.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <button onClick={() => { buyChronicSub('monthly') }} className="rounded-2xl border-2 border-neutral-200 p-4 text-left transition hover:border-brand">
+            <button onClick={() => buy('monthly')} className="rounded-2xl border-2 border-neutral-200 p-4 text-left transition hover:border-brand">
               <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Bulanan</div>
               <div className="text-2xl font-extrabold">Rp{CHRONIC_MONTHLY.toLocaleString('id-ID')}<span className="text-sm font-medium text-neutral-400">/bln</span></div>
               <div className="mt-1 text-[11px] text-neutral-500">Pemantauan penuh, perpanjang tiap bulan.</div>
             </button>
-            <button onClick={() => { buyChronicSub('lifetime') }} className="relative rounded-2xl border-2 border-brand bg-brand-50 p-4 text-left">
+            <button onClick={() => buy('lifetime')} className="relative rounded-2xl border-2 border-brand bg-brand-50 p-4 text-left">
               <span className="absolute -top-2 right-3 rounded-full bg-brand px-2 py-0.5 text-[9px] font-bold text-white">Terbaik · Seumur hidup</span>
               <div className="text-xs font-semibold uppercase tracking-wide text-brand-dark">Lifetime</div>
               <div className="text-2xl font-extrabold text-brand-dark">Rp{(CHRONIC_LIFETIME / 1000000).toLocaleString('id-ID')}jt</div>
               <div className="mt-1 text-[11px] text-neutral-500">Sekali bayar, pantau selamanya — sesuai sifat longevity.</div>
             </button>
           </div>
+          {payMsg && <p className="mt-2 text-[12px] font-semibold text-brand-dark">{payMsg}</p>}
           <p className="mt-2 text-[11px] text-neutral-400">⚕️ Pemantauan ini mendukung, bukan menggantikan, kontrol rutin ke dokter.</p>
         </div>
       </Card>
@@ -416,6 +450,12 @@ function ChronicMonitor() {
         right={<Badge tone="brand">{state.chronicLifetime ? 'Lifetime aktif' : `Aktif · ${daysLeft} hari`}</Badge>}
       />
 
+      {!loggedToday && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand/30 bg-brand-50 p-3">
+          <span className="flex items-center gap-2 text-sm font-semibold text-brand-dark">⏰ Anda belum mencatat TTV hari ini. Catat rutin agar kondisi tetap terkontrol.</span>
+          <Button onClick={() => setShow(true)} className="!py-1.5">Catat Sekarang</Button>
+        </div>
+      )}
       {status === 'alert' && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-red-300 bg-red-50 p-4">
           <div className="flex items-start gap-2 text-sm text-accent">

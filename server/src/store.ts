@@ -37,6 +37,7 @@ export interface Order {
   method: string
   status: 'pending' | 'paid' | 'failed'
   createdAt: string
+  purpose?: string // 'topup' (default) | 'chronic_monthly' | 'chronic_lifetime'
 }
 
 export interface Post {

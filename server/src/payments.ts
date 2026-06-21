@@ -3,9 +3,31 @@ import crypto from 'node:crypto'
 // midtrans-client is CommonJS
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
-import { credit, createOrder, getOrder, setOrderStatus, getUser, uid, type User } from './store.js'
+import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, uid, type User } from './store.js'
 import { notify } from './push.js'
 import { sendReceipt } from './email.js'
+
+// Chronic-care subscription prices (IDR) — paid directly, not via PNC.
+const CHRONIC_PRICE: Record<string, number> = { chronic_monthly: 50000, chronic_lifetime: 7500000 }
+
+// Activate a chronic subscription in the user's server-side settings.
+function activateChronic(userId: string, purpose: string) {
+  if (purpose === 'chronic_lifetime') saveSettings(userId, { chronicLifetime: true })
+  else if (purpose === 'chronic_monthly') saveSettings(userId, { chronicSubExpires: new Date(Date.now() + 30 * 86400000).toISOString() })
+}
+
+// Apply a successful order: chronic subscriptions activate access; others credit PNC.
+function fulfillOrder(order: { id: string; userId: string; amountPnc: number; amountIdr: number; method: string; purpose?: string }) {
+  if (order.purpose && order.purpose.startsWith('chronic')) {
+    activateChronic(order.userId, order.purpose)
+    notify(order.userId, { title: 'Langganan aktif ✅', body: 'Pemantauan Kronis & Longevity Anda telah aktif.', url: './#/nutrition' }, 'notifTransactions').catch(() => {})
+  } else {
+    credit(order.userId, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method}`, order.id)
+    notify(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
+    const payer = getUser(order.userId)
+    if (payer) sendReceipt(payer.email, payer.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
+  }
+}
 
 const snap = features.paymentsLive
   ? new (midtransClient as any).Snap({
@@ -24,22 +46,26 @@ function channels(method: string): string[] {
 
 export async function createPayment(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
-  const { amountPnc, method } = req.body as { amountPnc?: number; method?: string }
-  const pnc = Math.max(1, Math.floor(Number(amountPnc) || 0))
-  const amountIdr = pnc * config.tokenToIdr
+  const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
+  const isChronic = !!purpose && purpose in CHRONIC_PRICE
+  const pnc = isChronic ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
+  const amountIdr = isChronic ? CHRONIC_PRICE[purpose!] : pnc * config.tokenToIdr
   const orderId = 'PMD-' + uid().slice(0, 14)
-  createOrder({ id: orderId, userId: user.id, amountPnc: pnc, amountIdr, method: method || 'QRIS', status: 'pending', createdAt: new Date().toISOString() })
+  createOrder({ id: orderId, userId: user.id, amountPnc: pnc, amountIdr, method: method || 'QRIS', status: 'pending', createdAt: new Date().toISOString(), purpose: purpose || 'topup' })
 
   if (!snap) {
     // Mock mode: frontend calls /confirm to simulate a successful gateway callback.
     return res.json({ live: false, orderId, amountPnc: pnc, amountIdr, method, mock: true })
   }
   try {
+    const item = isChronic
+      ? { id: purpose!, price: amountIdr, quantity: 1, name: purpose === 'chronic_lifetime' ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari' }
+      : { id: 'PNC', price: config.tokenToIdr, quantity: pnc, name: 'PanaceaToken' }
     const tx = await snap.createTransaction({
       transaction_details: { order_id: orderId, gross_amount: amountIdr },
       enabled_payments: channels(method || 'QRIS'),
       customer_details: { email: user.email, first_name: user.name },
-      item_details: [{ id: 'PNC', price: config.tokenToIdr, quantity: pnc, name: 'PanaceaToken' }],
+      item_details: [item],
     })
     res.json({ live: true, orderId, token: tx.token, redirectUrl: tx.redirect_url, clientKey: config.midtrans.clientKey })
   } catch (e) {
@@ -56,9 +82,7 @@ export function confirmPayment(req: Request, res: Response) {
   if (snap) return res.status(400).json({ error: 'use_real_gateway' })
   if (order.status !== 'paid') {
     setOrderStatus(order.id, 'paid')
-    credit(user.id, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method} (simulasi)`, order.id)
-    notify(user.id, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
-    sendReceipt(user.email, user.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
+    fulfillOrder(order)
   }
   res.json({ ok: true, status: 'paid' })
 }
@@ -80,10 +104,7 @@ export function paymentWebhook(req: Request, res: Response) {
   if (transaction_status === 'settlement' || transaction_status === 'capture') {
     if (order.status !== 'paid') {
       setOrderStatus(order.id, 'paid')
-      credit(order.userId, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method}`, order.id)
-      notify(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
-      const payer = getUser(order.userId)
-      if (payer) sendReceipt(payer.email, payer.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
+      fulfillOrder(order)
     }
   } else if (['deny', 'cancel', 'expire'].includes(transaction_status)) {
     setOrderStatus(order.id, 'failed')

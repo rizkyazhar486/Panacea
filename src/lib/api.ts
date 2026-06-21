@@ -116,10 +116,10 @@ export const api = {
     req<{ balance: number; transactions: { id: string; type: string; amountPnc: number; note: string; at: string }[]; tokenToIdr: number }>(
       '/api/wallet',
     ),
-  createPayment: (amountPnc: number, method: string) =>
+  createPayment: (amountPnc: number, method: string, purpose?: string) =>
     req<{ live: boolean; orderId: string; amountIdr: number; token?: string; redirectUrl?: string; clientKey?: string }>(
       '/api/payments/create',
-      { method: 'POST', body: JSON.stringify({ amountPnc, method }) },
+      { method: 'POST', body: JSON.stringify({ amountPnc, method, purpose }) },
     ),
   confirmPayment: (orderId: string) =>
     req<{ ok: boolean }>('/api/payments/confirm', { method: 'POST', body: JSON.stringify({ orderId }) }),

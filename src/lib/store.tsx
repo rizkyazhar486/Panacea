@@ -272,6 +272,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             if (remote.strStatus && st.account?.role === 'dokter') {
               next.account = { ...st.account, strStatus: remote.strStatus as Account['strStatus'] }
             }
+            // Chronic-care subscription is activated server-side after payment;
+            // restore it so access persists across devices/reloads.
+            if (remote.chronicLifetime) next.chronicLifetime = true
+            if (remote.chronicSubExpires) next.chronicSubExpires = remote.chronicSubExpires as string
             return next
           })
         }
