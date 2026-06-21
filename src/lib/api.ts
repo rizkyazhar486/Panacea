@@ -123,6 +123,8 @@ export const api = {
     ),
   confirmPayment: (orderId: string) =>
     req<{ ok: boolean }>('/api/payments/confirm', { method: 'POST', body: JSON.stringify({ orderId }) }),
+  paymentStatus: (orderId: string) =>
+    req<{ status: 'pending' | 'paid' | 'failed' }>(`/api/payments/status/${orderId}`),
   topupRequest: (amountPnc: number) =>
     req<{ ok: boolean; request: ManualTopup }>('/api/wallet/topup-request', { method: 'POST', body: JSON.stringify({ amountPnc }) }),
   listTopups: () => req<{ requests: ManualTopup[] }>('/api/wallet/topups').then((r) => r.requests),

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
@@ -472,6 +472,31 @@ function BackendWallet() {
   const [busy, setBusy] = useState(false)
   const [reqMsg, setReqMsg] = useState('')
   const [copied, setCopied] = useState(false)
+  const [payState, setPayState] = useState<'idle' | 'pending' | 'paid' | 'failed'>('idle')
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current) }, [])
+
+  // Poll the order status until the Midtrans webhook marks it paid/failed.
+  function startPolling(orderId: string) {
+    setPayState('pending')
+    let tries = 0
+    if (pollRef.current) clearInterval(pollRef.current)
+    pollRef.current = setInterval(async () => {
+      tries++
+      try {
+        const r = await api.paymentStatus(orderId)
+        if (r.status === 'paid') {
+          if (pollRef.current) clearInterval(pollRef.current)
+          setPayState('paid'); setMsg(''); refresh()
+        } else if (r.status === 'failed') {
+          if (pollRef.current) clearInterval(pollRef.current)
+          setPayState('failed')
+        }
+      } catch { /* keep trying */ }
+      if (tries >= 45 && pollRef.current) clearInterval(pollRef.current) // ~3 menit
+    }, 4000)
+  }
 
   function refresh() {
     api.wallet().then((w) => { setBalance(w.balance); syncWalletBalance(w.balance) }).catch(() => {})
@@ -486,7 +511,8 @@ function BackendWallet() {
       const r = await api.createPayment(amount, method)
       if (r.live && r.redirectUrl) {
         window.open(r.redirectUrl, '_blank')
-        setMsg('Selesaikan pembayaran di tab Midtrans, lalu tekan Perbarui.')
+        setMsg('Selesaikan pembayaran di tab Midtrans. Status diperbarui otomatis di sini.')
+        startPolling(r.orderId)
       } else {
         await api.confirmPayment(r.orderId)
         setMsg(`Pembayaran ${method} berhasil — ${amount} PNC ditambahkan.`)
@@ -576,6 +602,40 @@ function BackendWallet() {
           <div className="w-40"><Field label="Metode"><select className={inputClass} value={method} onChange={(e) => setMethod(e.target.value as PaymentMethod)}>{METHODS.map((m) => <option key={m}>{m}</option>)}</select></Field></div>
           <Button onClick={pay} disabled={busy || amount <= 0}><IconToken size={16} /> {busy ? 'Memproses…' : `Bayar Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`}</Button>
         </div>
+
+        {payState !== 'idle' && (
+          <div className={`mt-3 rounded-2xl border p-3 ${payState === 'paid' ? 'border-brand/30 bg-brand-50' : payState === 'failed' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+            <div className="flex items-center gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-lg">
+                {payState === 'paid' ? '✅' : payState === 'failed' ? '❌' : <span className="vital-dot">⏳</span>}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-bold">
+                  {payState === 'paid' ? 'Pembayaran Berhasil' : payState === 'failed' ? 'Pembayaran Gagal / Dibatalkan' : 'Menunggu Pembayaran…'}
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  {payState === 'paid' ? 'Saldo PNC Anda sudah ditambahkan.' : payState === 'failed' ? 'Transaksi tidak selesai. Silakan coba lagi.' : 'Selesaikan di tab Midtrans — halaman ini mengecek otomatis.'}
+                </div>
+              </div>
+              {payState !== 'pending' && (
+                <button onClick={() => setPayState('idle')} className="shrink-0 text-xs font-semibold text-neutral-500 hover:underline">Tutup</button>
+              )}
+            </div>
+            {/* progress steps */}
+            <div className="mt-3 flex items-center gap-1">
+              {['Dibuat', 'Dibayar', 'Selesai'].map((label, i) => {
+                const done = payState === 'paid' ? true : payState === 'pending' ? i === 0 : i === 0
+                const isFail = payState === 'failed' && i > 0
+                return (
+                  <div key={label} className="flex flex-1 items-center last:flex-none">
+                    <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold ${isFail ? 'bg-red-400 text-white' : done ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-400'}`}>{isFail ? '×' : done ? '✓' : i + 1}</span>
+                    {i < 2 && <span className={`mx-1 h-1 flex-1 rounded-full ${payState === 'paid' ? 'bg-brand' : 'bg-neutral-200'}`} />}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Manual bank-transfer top-up — works without Midtrans/NPWP */}
