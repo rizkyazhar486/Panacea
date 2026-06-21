@@ -165,6 +165,21 @@ Minta bantuan saya jika ingin dipandu.
 
 ---
 
+## Bagian 6 — Briefing Bisnis Harian via Email (GRATIS) 📨
+
+AI Operator bisa mengirim **briefing bisnis tiap pagi** ke email Anda otomatis.
+
+1. Di **Render** (Bagian 0), tambah env: `CRON_SECRET` = (kata sandi acak bebas, mis. `pmd-rahasia-123`).
+2. Di Render → **New +** → **Cron Job** (gratis):
+   - **Schedule**: `0 1 * * *` (tiap 08:00 WIB ≈ 01:00 UTC)
+   - **Command**: `curl -s "https://panaceamed-backend.onrender.com/api/cron/daily-briefing?key=pmd-rahasia-123"`
+   (ganti `pmd-rahasia-123` dengan CRON_SECRET Anda)
+3. Pastikan `RESEND_API_KEY` aktif (Bagian 1) agar email terkirim.
+
+Setiap pagi Anda terima ringkasan: pertumbuhan, pendapatan, antrean persetujuan, & rekomendasi.
+
+---
+
 ## ✅ Ringkasan prioritas
 
 | Prioritas | Apa | Biaya | Hasil |

@@ -140,19 +140,9 @@ Baris pertama = JUDUL menarik (maks 60 karakter, tanpa tanda kutip).
 Lalu 2 paragraf singkat + 3 poin tips praktis (pakai "• ").
 Akhiri dengan 1 kalimat pengingat bahwa ini edukatif & konsultasikan ke dokter bila perlu. Hindari klaim medis berlebihan atau menakut-nakuti.`
 
-export async function aiOperator(req: Request, res: Response) {
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
-  const mode = (req.body as { mode?: string }).mode === 'content' ? 'content' : 'briefing'
-
-  if (mode === 'content') {
-    try {
-      const text = await callAnthropic('claude-sonnet-4-6', CONTENT_SYSTEM, [{ role: 'user', content: 'Buat satu artikel hidup sehat untuk feed hari ini.' }], 800)
-      return res.json({ text, mode })
-    } catch (e) {
-      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
-    }
-  }
-
+// Generate the business briefing from live data (reused by the panel & the
+// daily-email cron). Returns the markdown text + pending counts.
+export async function generateOperatorBriefing(): Promise<{ text: string; pending: { topups: number; topupIdr: number; doctors: number } }> {
   const s = getStats()
   const pendingTopups = listManualTopups('pending')
   const topupIdr = pendingTopups.reduce((a, t) => a + t.amountIdr, 0)
@@ -167,14 +157,25 @@ export async function aiOperator(req: Request, res: Response) {
 - Antrean Top-up manual menunggu: ${pendingTopups.length} permintaan (total Rp${topupIdr.toLocaleString('id-ID')})
 - Dokter/kontributor menunggu verifikasi STR: ${pendingDoctors.length}
 - Aktivitas audit terbaru: ${recentActions || 'belum ada'}`
+  const text = await callAnthropic('claude-sonnet-4-6', OPERATOR_SYSTEM, [{ role: 'user', content: context }], 1600)
+  return { text, pending: { topups: pendingTopups.length, topupIdr, doctors: pendingDoctors.length } }
+}
 
+export async function aiOperator(req: Request, res: Response) {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  const mode = (req.body as { mode?: string }).mode === 'content' ? 'content' : 'briefing'
+
+  if (mode === 'content') {
+    try {
+      const text = await callAnthropic('claude-sonnet-4-6', CONTENT_SYSTEM, [{ role: 'user', content: 'Buat satu artikel hidup sehat untuk feed hari ini.' }], 800)
+      return res.json({ text, mode })
+    } catch (e) {
+      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    }
+  }
   try {
-    const text = await callAnthropic('claude-sonnet-4-6', OPERATOR_SYSTEM, [{ role: 'user', content: context }], 1600)
-    res.json({
-      text,
-      mode,
-      pending: { topups: pendingTopups.length, topupIdr, doctors: pendingDoctors.length },
-    })
+    const r = await generateOperatorBriefing()
+    res.json({ text: r.text, mode, pending: r.pending })
   } catch (e) {
     res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
   }
