@@ -149,6 +149,8 @@ export interface Account {
   // Registration background (collected at sign-up)
   sex?: Sex // jenis kelamin (L/P)
   age?: number
+  dob?: string // ISO date of birth (from datepicker)
+  nik?: string // NIK (optional, sensitive — UU PDP)
   occupation?: string
   background?: string // latar belakang singkat
   str?: string // doctor's Surat Tanda Registrasi / practice certificate no.

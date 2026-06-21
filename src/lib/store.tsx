@@ -62,7 +62,8 @@ function patientFromAccount(account: Account): Patient {
     id: 'self-' + account.email.replace(/[^a-z0-9]/gi, '').slice(0, 16),
     name: account.name,
     sex: account.sex ?? 'L',
-    dob: `${year}-01-01`,
+    // Prefer the real date of birth from the datepicker; fall back to age estimate.
+    dob: account.dob || `${year}-01-01`,
     mrn: 'PMD-' + account.email.replace(/[^0-9]/g, '').slice(0, 6).padStart(6, '0'),
     heightCm: 165,
     weightKg: 60,

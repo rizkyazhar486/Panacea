@@ -31,11 +31,22 @@ function ageFromDob(dob: string): number {
   return Math.floor(diff / (365.25 * 24 * 3600 * 1000))
 }
 
+function ageGroup(age: number): string {
+  if (age < 1) return 'bayi (neonatus/infant)'
+  if (age < 5) return 'balita'
+  if (age < 12) return 'anak'
+  if (age < 18) return 'remaja'
+  if (age < 60) return 'dewasa'
+  return 'lansia (geriatri)'
+}
+
 function contextBlock(ctx: PatientContext): string {
   const { patient: p, latestVitals: v, supportive } = ctx
+  const age = ageFromDob(p.dob)
   const lines = [
     `KONTEKS PASIEN (continuous identity):`,
-    `- Nama: ${p.name} | ${p.sex === 'L' ? 'Laki-laki' : 'Perempuan'} | Usia ${ageFromDob(p.dob)} th | MRN ${p.mrn}`,
+    `- Nama: ${p.name} | ${p.sex === 'L' ? 'Laki-laki' : 'Perempuan'} | Usia ${age} th (${ageGroup(age)}) | MRN ${p.mrn}`,
+    `- WAJIB sesuaikan gaya & isi pertanyaan dengan kelompok usia ini (mis. anamnesis anak ditanyakan ke orang tua/wali, pertimbangan tumbuh-kembang & imunisasi; pada lansia perhatikan polifarmasi, jatuh, fungsi kognitif & kemandirian). Gunakan bahasa yang sesuai usia.`,
     `- TB ${p.heightCm} cm, BB ${p.weightKg} kg`,
     `- Kondisi kronis: ${p.chronicConditions.join(', ') || '-'}`,
     `- Alergi: ${p.allergies.join(', ') || '-'}`,

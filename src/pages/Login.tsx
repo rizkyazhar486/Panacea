@@ -5,6 +5,7 @@ import { Button, inputClass } from '../components/ui'
 import { IconUser, IconSun, IconMoon } from '../components/icons'
 import { api, backendEnabled, renderGoogleButton, type Health } from '../lib/api'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
+import { ageFromDob } from '../lib/anthro'
 import type { Account, Role } from '../lib/types'
 
 // Roles that must provide an STR / practice-certificate at sign-up. Clinical &
@@ -26,7 +27,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [sex, setSex] = useState<'L' | 'P'>('L')
-  const [age, setAge] = useState('')
+  const [dob, setDob] = useState('')
+  const [nik, setNik] = useState('')
   const [occupation, setOccupation] = useState('')
   const [background, setBackground] = useState('')
   const [str, setStr] = useState('')
@@ -111,7 +113,9 @@ export function Login({ onBack }: { onBack?: () => void }) {
       isSubscriber: role === 'owner',
       loggedAt: new Date().toISOString(),
       sex,
-      age: age.trim() ? Number(age) : undefined,
+      dob: dob || undefined,
+      age: dob ? ageFromDob(dob) : undefined,
+      nik: nik.trim() || undefined,
       occupation: occupation.trim() || undefined,
       background: background.trim() || undefined,
       str: STR_ROLES.includes(role) ? str.trim() : undefined,
@@ -219,6 +223,14 @@ export function Login({ onBack }: { onBack?: () => void }) {
               onLogin={(acc) => finish(acc)}
             />
           )}
+
+          {/* Persetujuan — diletakkan tepat di bawah opsi masuk cepat (Google/Email) */}
+          <label className="mt-3 flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
+            <span>
+              Saya telah membaca &amp; menyetujui <button type="button" onClick={() => setShowLegal(true)} className="font-bold text-brand-dark underline">Syarat &amp; Ketentuan, Kebijakan Privasi, dan Persetujuan Tindakan (Informed Consent)</button>. Saya memahami AI bersifat pendukung, bukan pengganti dokter.
+            </span>
+          </label>
           {error && <p className="mt-2 text-xs text-accent">{error}</p>}
           {backendEnabled && (
             <p className="mt-2 text-[11px] font-semibold text-brand-dark">
@@ -242,7 +254,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Nama Lengkap</label>
               <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nama lengkap Anda" />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Jenis Kelamin</label>
                 <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'L' | 'P')}>
@@ -251,12 +263,19 @@ export function Login({ onBack }: { onBack?: () => void }) {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Umur</label>
-                <input className={inputClass} value={age} onChange={(e) => setAge(e.target.value)} type="number" placeholder="mis. 34" />
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Tanggal Lahir</label>
+                <input className={inputClass} value={dob} onChange={(e) => setDob(e.target.value)} type="date" max={new Date().toISOString().slice(0, 10)} />
+                {dob && <p className="mt-0.5 text-[11px] text-brand-dark">Umur: {ageFromDob(dob)} tahun</p>}
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Pekerjaan</label>
                 <input className={inputClass} value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="mis. Karyawan" />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">NIK <span className="font-normal text-neutral-400">(opsional)</span></label>
+                <input className={inputClass} value={nik} onChange={(e) => setNik(e.target.value.replace(/\D/g, '').slice(0, 16))} inputMode="numeric" placeholder="16 digit — boleh dikosongkan" />
               </div>
             </div>
             <div>
@@ -298,12 +317,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </div>
           </div>
 
-          <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
-            <span>
-              Saya telah membaca &amp; menyetujui <button type="button" onClick={() => setShowLegal(true)} className="font-bold text-brand-dark underline">Syarat &amp; Ketentuan, Kebijakan Privasi, dan Persetujuan Tindakan (Informed Consent)</button>. Saya memahami AI bersifat pendukung, bukan pengganti dokter.
-            </span>
-          </label>
 
           <Button onClick={doLogin} className="mt-4 w-full">
             Masuk sebagai {ROLES.find((r) => r.id === role)?.title}
