@@ -239,6 +239,8 @@ body {
 }
 
 /* Print / PDF export — show only the document content. */
+/* Print / PDF letterhead — horizontal Panaceamed.id logo on every printed page. */
+.print-letterhead { display: none; }
 @media print {
   aside,
   header,
@@ -250,6 +252,17 @@ body {
     padding: 0 !important;
   }
   body {
+    background: #fff;
+    padding-top: 64px; /* ruang untuk kop surat tetap */
+  }
+  .print-letterhead {
+    display: flex !important;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 2px solid #00bf63;
     background: #fff;
   }
   .print\:hidden {

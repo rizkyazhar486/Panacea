@@ -118,6 +118,14 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative flex min-h-screen">
+      {/* Kop surat untuk cetak/PDF — tampil hanya saat mencetak, di tiap halaman */}
+      <div className="print-letterhead">
+        <LogoMark size={28} />
+        <div className="leading-tight">
+          <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400">Longevity Medical-AI · Dokumen Resmi</div>
+        </div>
+      </div>
       {/* Ambient animated backdrop — sits behind every page */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="orb absolute -left-32 top-10 h-80 w-80 rounded-full bg-brand/10 blur-3xl" />

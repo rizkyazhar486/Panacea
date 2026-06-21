@@ -52,6 +52,7 @@ export function Chatbot() {
   const [error, setError] = useState('')
   const [consulting, setConsulting] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const [price, setPrice] = useState(5)
   const [topup, setTopup] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -244,11 +245,21 @@ export function Chatbot() {
 
         {backendEnabled && (
           <div className="border-t border-black/5 px-3 pt-3">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark transition hover:bg-brand-100">
-              {analyzing ? '🔬 Menganalisis citra…' : '🩻 Unggah Penunjang (EKG/CT/MRI/X-ray)'}
+            <label
+              onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => { e.preventDefault(); setDragging(false); analyzeImage(e.dataTransfer.files?.[0]) }}
+              className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed px-4 py-4 text-center transition ${
+                dragging ? 'border-brand bg-brand-50' : 'border-brand/30 bg-brand-50/40 hover:bg-brand-50'
+              }`}
+            >
+              <span className="text-xl">{analyzing ? '🔬' : '🩻'}</span>
+              <span className="text-xs font-bold text-brand-dark">
+                {analyzing ? 'Menganalisis citra…' : 'Seret & lepas, atau klik untuk unggah Penunjang'}
+              </span>
+              <span className="text-[11px] text-neutral-400">EKG · CT · MRI · X-ray · USG · foto lab → masuk Objective AI-EMR</span>
               <input type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
             </label>
-            <span className="ml-2 text-[11px] text-neutral-400">AI membaca citra → masuk Objective AI-EMR.</span>
           </div>
         )}
         <div className="flex items-end gap-2 border-t border-black/5 p-3">

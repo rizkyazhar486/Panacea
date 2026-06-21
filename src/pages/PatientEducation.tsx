@@ -39,7 +39,12 @@ export function PatientEducation() {
           icon={<IconBook size={20} />}
           title="Edukasi Kesehatan Saya"
           subtitle="Tanda & gejala singkat · diagnosis · edukasi menyeluruh (makan, minum, tidur, olahraga, sinar matahari)"
-          right={<Button onClick={gen} disabled={busy}><IconSparkle size={16} /> {busy ? 'Menyusun…' : sheet ? 'Perbarui' : 'Buat Edukasi'}</Button>}
+          right={
+            <div className="flex gap-2">
+              {sheet && <Button variant="outline" onClick={() => window.print()}><IconBook size={14} /> Unduh PDF</Button>}
+              <Button onClick={gen} disabled={busy}><IconSparkle size={16} /> {busy ? 'Menyusun…' : sheet ? 'Perbarui' : 'Buat Edukasi'}</Button>
+            </div>
+          }
         />
         {!sheet ? (
           <p className="text-sm text-neutral-400">
