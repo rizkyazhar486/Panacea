@@ -32,6 +32,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [occupation, setOccupation] = useState('')
   const [background, setBackground] = useState('')
   const [str, setStr] = useState('')
+  const [gelar, setGelar] = useState('')
+  const [keahlian, setKeahlian] = useState('')
+  const [universitas, setUniversitas] = useState('')
+  const [tahunLulus, setTahunLulus] = useState('')
+  const [spesialis, setSpesialis] = useState('')
+  const [subspesialis, setSubspesialis] = useState('')
+  const [pdfName, setPdfName] = useState('')
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState('')
   const [consent, setConsent] = useState(false)
@@ -79,6 +86,13 @@ export function Login({ onBack }: { onBack?: () => void }) {
     // We never write strStatus here (would overwrite an existing 'verified').
     if (backendEnabled && STR_ROLES.includes(account.role) && account.str) {
       api.saveSettings({ str: account.str }).catch(() => {})
+      // Submit a professional onboarding application for owner review (AI-checked
+      // + emailed). Credentials come from the registration form state.
+      api.submitApplication({
+        str: account.str ?? '', gelar: gelar.trim(), keahlian: keahlian.trim(),
+        universitas: universitas.trim(), tahunLulus: tahunLulus.trim(),
+        spesialis: spesialis.trim(), subspesialis: subspesialis.trim(), pdfName,
+      }).catch(() => {})
     }
     sendEmail({
       id: uid(),
@@ -119,6 +133,12 @@ export function Login({ onBack }: { onBack?: () => void }) {
       occupation: occupation.trim() || undefined,
       background: background.trim() || undefined,
       str: STR_ROLES.includes(role) ? str.trim() : undefined,
+      keahlian: keahlian.trim() || undefined,
+      universitas: universitas.trim() || undefined,
+      tahunLulus: tahunLulus.trim() || undefined,
+      spesialis: role === 'kontributor' ? spesialis.trim() || undefined : undefined,
+      gelar: role === 'kontributor' ? gelar.trim() || undefined : undefined,
+      subspesialis: role === 'verifikator' ? subspesialis.trim() || undefined : undefined,
       strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
       consentAt: new Date().toISOString(),
       isOwner,
@@ -293,6 +313,49 @@ export function Login({ onBack }: { onBack?: () => void }) {
                     ? 'AI-EMR hanya untuk klinisi bersertifikat. STR diverifikasi sebelum akses penuh.'
                     : 'Kontributor & Verifikator wajib klinisi/akademisi bersertifikat — STR/sertifikat diverifikasi sebelum materi tayang.'}
                 </p>
+
+                {/* Riwayat pendidikan & kredensial (dapat diedit) */}
+                <div className="mt-3 space-y-3 rounded-xl border border-brand/20 bg-brand-50/40 p-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Riwayat Pendidikan & Kredensial</div>
+                  {role === 'kontributor' && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Gelar</label>
+                        <input className={inputClass} value={gelar} onChange={(e) => setGelar(e.target.value)} placeholder="mis. dr., dr. Sp.PD" />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Spesialis</label>
+                        <input className={inputClass} value={spesialis} onChange={(e) => setSpesialis(e.target.value)} placeholder="mis. Penyakit Dalam" />
+                      </div>
+                    </div>
+                  )}
+                  {role === 'verifikator' && (
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Subspesialis</label>
+                      <input className={inputClass} value={subspesialis} onChange={(e) => setSubspesialis(e.target.value)} placeholder="mis. Gastroenterologi-Hepatologi" />
+                    </div>
+                  )}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Keahlian</label>
+                    <input className={inputClass} value={keahlian} onChange={(e) => setKeahlian(e.target.value)} placeholder="mis. Kardiologi preventif, longevity" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Universitas</label>
+                      <input className={inputClass} value={universitas} onChange={(e) => setUniversitas(e.target.value)} placeholder="mis. Universitas Indonesia" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Tahun Lulus</label>
+                      <input className={inputClass} value={tahunLulus} onChange={(e) => setTahunLulus(e.target.value.replace(/\D/g, '').slice(0, 4))} inputMode="numeric" placeholder="mis. 2018" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Unggah Dokumen Kredensial (PDF)</label>
+                    <input type="file" accept="application/pdf" onChange={(e) => setPdfName(e.target.files?.[0]?.name ?? '')} className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
+                    {pdfName && <p className="mt-1 text-[11px] text-brand-dark">✓ {pdfName} — akan ditinjau AI & tim Panaceamed.</p>}
+                  </div>
+                  <p className="text-[11px] text-neutral-400">Data dikirim untuk ditinjau AI-Agent & disetujui Owner sebelum akses penuh diberikan.</p>
+                </div>
               </div>
             )}
           </div>

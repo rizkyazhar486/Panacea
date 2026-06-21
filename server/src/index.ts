@@ -30,6 +30,10 @@ import {
   addManualTopup,
   listManualTopups,
   setManualTopupStatus,
+  addApplication,
+  listApplications,
+  setApplicationStatus,
+  setApplicationVerdict,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -41,7 +45,8 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { aiMessages, aiConsult, aiVision, aiOperator } from './ai.js'
+import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText } from './ai.js'
+import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
@@ -158,6 +163,46 @@ app.post('/api/wallet/topups/decide', requireAuth, (req, res) => {
   }
   addAudit(u, approve ? 'wallet.topup_approve' : 'wallet.topup_reject', `${t.amountPnc} PNC · ${t.email}`)
   res.json({ ok: true, request: t, balance: balance(t.userId) })
+})
+
+// --- professional onboarding applications (doctor/writer/verifier) ---
+app.post('/api/applications', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Record<string, string>
+  const app_ = addApplication({
+    userId: u.id, email: u.email, name: u.name, role: u.role,
+    str: b.str, gelar: b.gelar, keahlian: b.keahlian, universitas: b.universitas,
+    tahunLulus: b.tahunLulus, spesialis: b.spesialis, subspesialis: b.subspesialis, pdfName: b.pdfName,
+  })
+  addAudit(u, 'application.submit', `${u.role} · ${u.email}`)
+  const summary = `Pendaftar: ${u.name} (${u.email})\nPeran: ${u.role}\nSTR: ${b.str || '-'}\nGelar: ${b.gelar || '-'}\nKeahlian: ${b.keahlian || '-'}\nUniversitas: ${b.universitas || '-'} (lulus ${b.tahunLulus || '-'})\nSpesialis: ${b.spesialis || '-'}\nSubspesialis: ${b.subspesialis || '-'}\nDokumen: ${b.pdfName || 'tidak ada'}`
+  // AI-Agent review (async) then store the verdict.
+  reviewApplicationText(summary).then((verdict) => setApplicationVerdict(app_.id, verdict)).catch(() => {})
+  // Email the owner so applications never get missed.
+  sendEmail(
+    config.ownerEmail,
+    `Pendaftar baru (${u.role}): ${u.name}`,
+    `<h2>Pendaftaran ${u.role}</h2><pre style="font-family:inherit;font-size:14px;white-space:pre-wrap">${summary}</pre><p>Tinjau & beri akses di panel Owner → Pendaftar.</p>`,
+  ).catch(() => {})
+  res.json({ ok: true, application: app_ })
+})
+app.get('/api/applications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ applications: listApplications() })
+})
+app.post('/api/applications/decide', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { id, grant } = req.body as { id?: string; grant?: boolean }
+  const a = setApplicationStatus(String(id || ''), grant ? 'granted' : 'rejected')
+  if (!a) return res.status(404).json({ error: 'not_found' })
+  notify(a.userId, grant
+    ? { title: 'Akses disetujui ✅', body: `Pendaftaran ${a.role} Anda disetujui. Akses penuh aktif.`, url: './#/' }
+    : { title: 'Pendaftaran ditinjau', body: `Pendaftaran ${a.role} Anda belum disetujui. Hubungi admin.`, url: './#/' },
+  ).catch(() => {})
+  addAudit(u, grant ? 'application.grant' : 'application.reject', `${a.role} · ${a.email}`)
+  res.json({ ok: true, application: a })
 })
 
 // --- payments ---

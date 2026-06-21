@@ -80,6 +80,29 @@ interface DB {
   notifications: Record<string, Notif[]> // userId -> in-app notification inbox
   creatorSubs: { subscriberId: string; authorEmail: string; at: string; expires: string }[]
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
+  applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
+}
+
+// Professional onboarding application — submitted at sign-up by clinicians,
+// writers & verifiers; reviewed by AI then granted/rejected by the owner.
+export interface Application {
+  id: string
+  userId: string
+  email: string
+  name: string
+  role: Role
+  str?: string
+  gelar?: string // academic title (writers)
+  keahlian?: string // expertise
+  universitas?: string
+  tahunLulus?: string
+  spesialis?: string // writers
+  subspesialis?: string // verifiers
+  pdfName?: string // uploaded credential file name
+  aiVerdict?: string // AI-Agent review note
+  status: 'pending' | 'granted' | 'rejected'
+  at: string
+  decidedAt?: string
 }
 
 // Manual (bank-transfer) top-up request — user transfers, owner approves to credit.
@@ -107,6 +130,7 @@ let db: DB = {
   notifications: {},
   creatorSubs: [],
   manualTopups: [],
+  applications: [],
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -453,6 +477,38 @@ export function setManualTopupStatus(id: string, status: 'approved' | 'rejected'
   t.decidedAt = new Date().toISOString()
   save()
   return t
+}
+
+// ── Professional onboarding applications ────────────────────────────────────
+export function addApplication(a: Omit<Application, 'id' | 'status' | 'at'>): Application {
+  if (!db.applications) db.applications = []
+  // Replace any prior pending application from the same user+role.
+  db.applications = db.applications.filter((x) => !(x.userId === a.userId && x.role === a.role && x.status === 'pending'))
+  const row: Application = { id: uid(), status: 'pending', at: new Date().toISOString(), ...a }
+  db.applications.unshift(row)
+  save()
+  return row
+}
+export function listApplications(status?: Application['status']): Application[] {
+  const all = db.applications ?? []
+  return (status ? all.filter((a) => a.status === status) : all).slice(0, 200)
+}
+export function getApplication(id: string): Application | undefined {
+  return db.applications?.find((a) => a.id === id)
+}
+export function setApplicationVerdict(id: string, aiVerdict: string) {
+  const a = getApplication(id)
+  if (a) { a.aiVerdict = aiVerdict; save() }
+}
+export function setApplicationStatus(id: string, status: 'granted' | 'rejected'): Application | undefined {
+  const a = getApplication(id)
+  if (!a) return undefined
+  a.status = status
+  a.decidedAt = new Date().toISOString()
+  // Granting marks the user's STR verified so role-gated modules unlock.
+  if (status === 'granted') saveSettings(a.userId, { strStatus: 'verified' })
+  save()
+  return a
 }
 
 export function createOrder(o: Order) {

@@ -128,6 +128,11 @@ export const api = {
   topupRequest: (amountPnc: number) =>
     req<{ ok: boolean; request: ManualTopup }>('/api/wallet/topup-request', { method: 'POST', body: JSON.stringify({ amountPnc }) }),
   listTopups: () => req<{ requests: ManualTopup[] }>('/api/wallet/topups').then((r) => r.requests),
+  submitApplication: (info: Record<string, string>) =>
+    req<{ ok: boolean; application: Application }>('/api/applications', { method: 'POST', body: JSON.stringify(info) }),
+  listApplications: () => req<{ applications: Application[] }>('/api/applications').then((r) => r.applications),
+  decideApplication: (id: string, grant: boolean) =>
+    req<{ ok: boolean; application: Application }>('/api/applications/decide', { method: 'POST', body: JSON.stringify({ id, grant }) }),
   decideTopup: (id: string, approve: boolean) =>
     req<{ ok: boolean; request: ManualTopup }>('/api/wallet/topups/decide', { method: 'POST', body: JSON.stringify({ id, approve }) }),
   withdraw: (amountPnc: number, bank: string, accountNumber: string, accountHolder: string) =>
@@ -265,6 +270,25 @@ export interface ManualTopup {
   status: 'pending' | 'approved' | 'rejected'
   at: string
   decidedAt?: string
+}
+
+export interface Application {
+  id: string
+  userId: string
+  email: string
+  name: string
+  role: string
+  str?: string
+  gelar?: string
+  keahlian?: string
+  universitas?: string
+  tahunLulus?: string
+  spesialis?: string
+  subspesialis?: string
+  pdfName?: string
+  aiVerdict?: string
+  status: 'pending' | 'granted' | 'rejected'
+  at: string
 }
 
 export interface BackendPost {

@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, uid, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend, IconSparkle } from '../components/icons'
-import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup } from '../lib/api'
+import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup, type Application } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -44,6 +44,8 @@ export function Owner() {
       {backendEnabled && <AIOperatorPanel />}
 
       <RealtimeStats />
+
+      {backendEnabled && <ApplicationsPanel />}
 
       {backendEnabled && <ManualTopupPanel />}
 
@@ -308,6 +310,68 @@ function AIOperatorPanel() {
         ⚕️ AI memberi analisa & draf. Keputusan keuangan (persetujuan top-up, verifikasi STR) tetap Anda
         konfirmasi manual untuk keamanan.
       </p>
+    </Card>
+  )
+}
+
+// Owner reviews professional onboarding applications & grants access.
+const ROLE_LABEL: Record<string, string> = { dokter: 'Dokter', kontributor: 'Penulis', verifikator: 'Verifikator', admin: 'Admin', pasien: 'Subscriber/Pasien', owner: 'Owner' }
+function ApplicationsPanel() {
+  const [rows, setRows] = useState<Application[] | null>(null)
+  const [busy, setBusy] = useState('')
+  const [err, setErr] = useState('')
+  function load() { api.listApplications().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  useEffect(load, [])
+  async function decide(id: string, grant: boolean) {
+    setBusy(id)
+    try { await api.decideApplication(id, grant); load() } catch { setErr('Gagal memproses.') } finally { setBusy('') }
+  }
+  const pending = (rows ?? []).filter((r) => r.status === 'pending')
+  const decided = (rows ?? []).filter((r) => r.status !== 'pending').slice(0, 8)
+  return (
+    <Card className="border-2 border-brand/30">
+      <SectionTitle
+        icon={<IconShield size={20} />}
+        title="Pendaftar — Beri Akses"
+        subtitle="Dokter, Penulis, Verifikator, Admin, Subscriber yang mendaftar — tinjau & setujui"
+        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge>}
+      />
+      {err && <p className="mb-2 text-xs text-accent">{err}</p>}
+      {!rows && !err && <SkeletonRows rows={2} />}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">Tidak ada pendaftar menunggu.</p>}
+      <div className="space-y-2">
+        {pending.map((r) => (
+          <div key={r.id} className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="brand">{ROLE_LABEL[r.role] ?? r.role}</Badge>
+              <span className="font-bold">{r.name}</span>
+              <span className="text-xs text-neutral-500">{r.email}</span>
+            </div>
+            <div className="mt-1 text-sm text-neutral-600">
+              {[r.gelar && `Gelar: ${r.gelar}`, r.spesialis && `Sp: ${r.spesialis}`, r.subspesialis && `Subsp: ${r.subspesialis}`, r.keahlian && `Keahlian: ${r.keahlian}`, r.universitas && `${r.universitas}${r.tahunLulus ? ` (${r.tahunLulus})` : ''}`, r.str && `STR: ${r.str}`].filter(Boolean).join(' · ')}
+            </div>
+            {r.pdfName && <div className="mt-0.5 text-[11px] text-neutral-500">📄 {r.pdfName}</div>}
+            {r.aiVerdict && <div className="mt-1 rounded-lg bg-white/70 p-2 text-[11px] text-neutral-600"><b>AI-Agent:</b> {r.aiVerdict}</div>}
+            <div className="mt-2 flex gap-2">
+              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Beri Akses</Button>
+              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Tolak</Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {decided.length > 0 && (
+        <div className="mt-4">
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">Riwayat</div>
+          <div className="space-y-1">
+            {decided.map((r) => (
+              <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
+                <span>{r.name} · {ROLE_LABEL[r.role] ?? r.role}</span>
+                <Badge tone={r.status === 'granted' ? 'brand' : 'critical'}>{r.status === 'granted' ? 'Diberi akses' : 'Ditolak'}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </Card>
   )
 }

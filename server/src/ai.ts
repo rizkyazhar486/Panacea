@@ -118,6 +118,17 @@ export async function aiConsult(req: Request, res: Response) {
   }
 }
 
+// AI-Agent review of a professional onboarding application (credentials).
+export async function reviewApplicationText(info: string): Promise<string> {
+  if (!process.env.ANTHROPIC_API_KEY) return 'AI nonaktif — mohon tinjau manual.'
+  const sys = `Anda AI verifikator kredensial Panaceamed. Tinjau data pendaftaran tenaga kesehatan/penulis/verifikator (STR, gelar, keahlian, universitas, tahun lulus, spesialis/subspesialis, dokumen). Beri penilaian SINGKAT (2–3 kalimat) berbahasa Indonesia: kelengkapan & kewajaran data, lalu rekomendasi diakhiri salah satu label: [LAYAK DITINJAU] atau [PERLU DOKUMEN TAMBAHAN]. Ini bukan keputusan final.`
+  try {
+    return await callAnthropic('claude-sonnet-4-6', sys, [{ role: 'user', content: info }], 400)
+  } catch {
+    return 'Gagal meninjau otomatis — mohon tinjau manual.'
+  }
+}
+
 // ── AI Operator (owner) — an "AI COO" that reads live platform data and returns
 // a business briefing, or drafts engaging health content for the feed. Read-only
 // for money; sensitive actions stay behind the owner's explicit approval.

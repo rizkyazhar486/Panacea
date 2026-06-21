@@ -154,6 +154,12 @@ export interface Account {
   occupation?: string
   background?: string // latar belakang singkat
   str?: string // doctor's Surat Tanda Registrasi / practice certificate no.
+  gelar?: string // academic/professional title (penulis)
+  keahlian?: string // area of expertise
+  universitas?: string // alma mater
+  tahunLulus?: string // graduation year
+  spesialis?: string // specialty (penulis)
+  subspesialis?: string // subspecialty (verifikator)
   strStatus?: 'none' | 'pending' | 'verified' // STR verification gate for AI-EMR
   consentAt?: string // ISO timestamp of T&C + privacy + informed consent
   isOwner?: boolean // true for the platform owner account (mode-switch enabled)
