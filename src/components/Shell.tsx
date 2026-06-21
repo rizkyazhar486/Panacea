@@ -32,6 +32,7 @@ import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
 import { api, backendEnabled } from '../lib/api'
+import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
 
 // Public entry: marketing landing first, then the login screen on demand.
@@ -94,8 +95,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const account = state.account
 
-  // Close the mobile drawer whenever the route changes.
-  useEffect(() => { setMenuOpen(false) }, [loc.pathname])
+  // Close the mobile drawer & record the visit (for "most-used services").
+  useEffect(() => { setMenuOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
 
   if (!account) return <PublicEntry />
 
@@ -107,6 +108,12 @@ export function Shell({ children }: { children: ReactNode }) {
   // utility pages — one-tap shortcuts beside the hamburger menu.
   const quick = items.filter((n) => !['/settings', '/legal', '/billing', '/architecture'].includes(n.to)).slice(0, 6)
   const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
+  // Beranda ringkas — the user's most-used services (ranked by visit history),
+  // shown on the home route only.
+  const homeServices = rankByUsage(
+    items.filter((n) => !['/', '/settings', '/legal', '/architecture'].includes(n.to)),
+  ).slice(0, 8)
+  const onHome = loc.pathname === '/'
 
   return (
     <div className="relative flex min-h-screen">
@@ -294,6 +301,27 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+          {onHome && homeServices.length > 0 && (
+            <div className="mb-5">
+              <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
+                Layanan tersering Anda
+              </div>
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+                {homeServices.map((n) => (
+                  <NavLink
+                    key={n.to}
+                    to={n.to}
+                    className="flex flex-col items-center gap-1.5 rounded-2xl border border-black/5 bg-white p-2.5 text-center transition hover:border-brand/30 hover:bg-brand-50"
+                  >
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-dark">
+                      <n.icon size={20} />
+                    </span>
+                    <span className="line-clamp-2 text-[10px] font-semibold leading-tight text-neutral-600">{n.label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+          )}
           <div key={loc.pathname} className="page-enter">
             {children}
           </div>

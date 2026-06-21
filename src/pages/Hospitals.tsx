@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHospital, IconPhone, IconCheck, IconSearch } from '../components/icons'
+import { BottomSheet } from '../components/BottomSheet'
 import { HOSPITALS, fetchNearbyFacilities, type FacilityKind, type NearbyFacility } from '../lib/hospitals'
+
+const KIND_LABEL: Record<string, string> = { Semua: 'Semua Faskes', RS: 'Rumah Sakit', Klinik: 'Klinik', Apotek: 'Apotek' }
+const KIND_EMOJI: Record<string, string> = { Semua: '🏥', RS: '🏥', Klinik: '🩺', Apotek: '💊' }
 
 type Coords = { lat: number; lng: number }
 
@@ -19,6 +23,7 @@ export function Hospitals() {
   const [live, setLive] = useState<NearbyFacility[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [liveErr, setLiveErr] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   function useMyLocation() {
     if (!('geolocation' in navigator)) { setGeoState('denied'); return }
@@ -77,14 +82,37 @@ export function Hospitals() {
           <IconSearch size={16} className="text-neutral-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / layanan / kota…" className="w-full bg-transparent text-sm outline-none" />
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
+        {/* Desktop: chips. Mobile: a button that opens a bottom sheet. */}
+        <div className="mt-3 hidden flex-wrap gap-2 sm:flex">
           {(['Semua', 'RS', 'Klinik', 'Apotek'] as const).map((k) => (
             <button key={k} onClick={() => setKind(k)} className={`rounded-full px-3.5 py-1.5 text-xs font-bold ${kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
               {k === 'RS' ? 'Rumah Sakit' : k}
             </button>
           ))}
         </div>
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="mt-3 flex w-full items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-bold sm:hidden"
+        >
+          <span>{KIND_EMOJI[kind]} {KIND_LABEL[kind]}</span>
+          <span className="text-brand-dark">Pilih ▾</span>
+        </button>
       </Card>
+
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Pilih jenis faskes">
+        <div className="space-y-2">
+          {(['Semua', 'RS', 'Klinik', 'Apotek'] as const).map((k) => (
+            <button
+              key={k}
+              onClick={() => { setKind(k); setSheetOpen(false) }}
+              className={`flex w-full items-center justify-between rounded-2xl border-2 px-4 py-3 text-left text-sm font-bold transition ${kind === k ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200'}`}
+            >
+              <span>{KIND_EMOJI[k]} {KIND_LABEL[k]}</span>
+              {kind === k && <IconCheck size={18} className="text-brand" />}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
 
       {loading && <SkeletonRows rows={4} />}
 

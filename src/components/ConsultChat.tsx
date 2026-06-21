@@ -25,7 +25,14 @@ export function ConsultChat({ room, name }: { room: string; name: string }) {
       try {
         const m = JSON.parse(ev.data) as Line & { count?: number }
         if (m.type === 'presence') setCount(m.count ?? 0)
-        else setLines((l) => [...l, m])
+        else {
+          setLines((l) => [...l, m])
+          // Notify on an incoming message from the other party when the tab is
+          // hidden (free, no server push needed).
+          if (m.type === 'msg' && m.from && m.from !== name && document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+            try { new Notification(`💬 Pesan dari ${m.from}`, { body: m.text, icon: '/icon-192.png', tag: 'consult-' + room }) } catch { /* ignore */ }
+          }
+        }
       } catch {
         /* ignore */
       }

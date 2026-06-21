@@ -302,3 +302,11 @@ body {
 }
 .drawer-in { animation: drawer-in 0.22s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .reduce-motion .drawer-in { animation: none; }
+
+/* Bottom sheet slide-up */
+@keyframes sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-in { animation: sheet-in 0.24s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reduce-motion .sheet-in { animation: none; }
