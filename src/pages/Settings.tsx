@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
+import { Card, SectionTitle, Button, inputClass } from '../components/ui'
 import {
   IconSettings,
   IconShield,
@@ -15,7 +15,6 @@ import {
   IconCheck,
   IconChevronRight,
 } from '../components/icons'
-import { hasKey, aiAvailable } from '../lib/ai'
 import {
   getThemePref,
   setThemePref,
@@ -33,19 +32,10 @@ import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/pus
 import { InstallApp } from '../components/InstallApp'
 import { api } from '../lib/api'
 
-const MODELS = [
-  { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6 (cepat & hemat)' },
-  { id: 'claude-opus-4-8', label: 'Claude Opus 4.8 (penalaran terdalam)' },
-  { id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5 (ringan)' },
-]
-
 export function Settings() {
   const store = useStore()
   const { state, updateSettings, resetDemo } = store
   const nav = useNavigate()
-  const [key, setKey] = useState(state.settings.apiKey)
-  const [doctor, setDoctor] = useState(state.settings.doctorName)
-  const [saved, setSaved] = useState(false)
 
   // Appearance prefs (applied immediately).
   const [themePref, setThemePrefState] = useState<ThemePref>(getThemePref)
@@ -56,12 +46,6 @@ export function Settings() {
   const [showPwd, setShowPwd] = useState(false)
 
   const s = state.settings
-
-  function save() {
-    updateSettings({ apiKey: key.trim(), doctorName: doctor.trim() || 'dr. Pemeriksa' })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 1800)
-  }
 
   function chooseTheme(p: ThemePref) {
     setThemePref(p)
@@ -217,38 +201,10 @@ export function Settings() {
         </button>
       </Card>
 
-      {/* ── AI Co-Physician ────────────────────────────────────── */}
+      {/* ── Data lokal ─────────────────────────────────────────── */}
       <Card>
-        <SectionTitle
-          icon={<IconSettings size={20} />}
-          title={t('aiSettings', lang)}
-          subtitle="Konfigurasi model & identitas dokter pemeriksa"
-          right={<Badge tone={aiAvailable(state.settings) ? 'brand' : 'high'}>{hasKey(state.settings) ? 'AI · Kunci Pribadi' : aiAvailable(state.settings) ? 'AI · Server' : 'AI Terbatas'}</Badge>}
-        />
-        <div className="space-y-4">
-          <Field label="Anthropic API Key (opsional — pengguna lanjutan)">
-            <input className={inputClass} type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="Kosongkan — AI sudah jalan via server" />
-          </Field>
-          <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-xs text-neutral-500">
-            <IconShield size={16} className="mt-0.5 shrink-0 text-brand" />
-            Kunci disimpan <b className="mx-1">hanya di browser Anda</b> (localStorage) dan dipakai untuk memanggil
-            Claude API langsung. Tanpa kunci pribadi, AI tetap berjalan melalui server Panaceamed.
-          </div>
-          <Field label="Model">
-            <select className={inputClass} value={state.settings.model} onChange={(e) => updateSettings({ model: e.target.value })}>
-              {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>{m.label}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Nama Dokter Pemeriksa">
-            <input className={inputClass} value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="dr. Nama, Sp.PD" />
-          </Field>
-          <div className="flex items-center gap-3">
-            <Button onClick={save}>{saved ? t('saved', lang) : t('save', lang)}</Button>
-            <Button variant="ghost" onClick={resetDemo}>Reset Data Lokal</Button>
-          </div>
-        </div>
+        <SectionTitle icon={<IconShield size={20} />} title="Data Lokal" subtitle="Kelola data tersimpan di perangkat ini" />
+        <Button variant="ghost" onClick={resetDemo}>Reset Data Lokal</Button>
       </Card>
 
       {/* App info */}

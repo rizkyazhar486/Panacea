@@ -53,6 +53,36 @@ export function Chatbot() {
   const [consulting, setConsulting] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [dragging, setDragging] = useState(false)
+  const [listening, setListening] = useState(false)
+  const [voiceOut, setVoiceOut] = useState(false)
+  const recogRef = useRef<any>(null)
+
+  // Speak text aloud (Bahasa Indonesia) when voice output is on.
+  function speak(text: string) {
+    if (!voiceOut || typeof window === 'undefined' || !window.speechSynthesis) return
+    const clean = text.replace(/[*_#>`~]/g, '')
+    const u = new SpeechSynthesisUtterance(clean)
+    u.lang = 'id-ID'
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(u)
+  }
+
+  // Toggle voice input (speech-to-text) using the browser's Web Speech API.
+  function toggleMic() {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SR) { setError('Browser ini belum mendukung input suara. Coba Chrome.'); return }
+    if (listening) { recogRef.current?.stop(); return }
+    const r = new SR()
+    r.lang = 'id-ID'
+    r.interimResults = false
+    r.continuous = false
+    r.onresult = (e: any) => setInput((prev) => (prev ? prev + ' ' : '') + e.results[0][0].transcript)
+    r.onend = () => setListening(false)
+    r.onerror = () => setListening(false)
+    recogRef.current = r
+    setListening(true)
+    r.start()
+  }
   const [price, setPrice] = useState(5)
   const [topup, setTopup] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -119,6 +149,7 @@ export function Chatbot() {
         ...next,
         { id: uid(), role: 'assistant', content: reply, at: new Date().toISOString() },
       ])
+      speak(reply)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Gagal menghubungi AI.')
     } finally {
@@ -273,9 +304,25 @@ export function Chatbot() {
               }
             }}
             rows={1}
-            placeholder="Tulis keluhan atau jawaban pasien… (Enter untuk kirim)"
+            placeholder="Tulis atau tekan 🎤 untuk bicara… (Enter untuk kirim)"
             className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-neutral-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
+          <button
+            onClick={toggleMic}
+            title="Bicara (suara ke teks)"
+            aria-label="Input suara"
+            className={`grid h-[44px] w-[44px] shrink-0 place-items-center rounded-xl border transition ${listening ? 'animate-pulse border-accent bg-accent text-white' : 'border-neutral-200 bg-white text-neutral-500 hover:text-brand-dark'}`}
+          >
+            🎤
+          </button>
+          <button
+            onClick={() => { setVoiceOut((v) => { if (v) window.speechSynthesis?.cancel(); return !v }) }}
+            title={voiceOut ? 'Matikan suara jawaban' : 'Aktifkan suara jawaban'}
+            aria-label="Suara jawaban"
+            className={`grid h-[44px] w-[44px] shrink-0 place-items-center rounded-xl border transition ${voiceOut ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 bg-white text-neutral-500 hover:text-brand-dark'}`}
+          >
+            {voiceOut ? '🔊' : '🔈'}
+          </button>
           <Button onClick={send} disabled={busy || !input.trim()} className="h-[44px]">
             <IconSend size={16} /> Kirim
           </Button>

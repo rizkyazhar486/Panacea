@@ -30,8 +30,60 @@ function rateLimited(userId: string): boolean {
 
 type Msg = { role: 'user' | 'assistant'; content: string | any[] }
 
-// Shared call to the Anthropic API. Returns the text or throws.
+// ── OpenRouter (https://openrouter.ai) — one key, many models. When
+// OPENROUTER_API_KEY is set, all AI routes through it: the patient Chatbot uses
+// a fast model (Gemini Flash) and the heavier AI-EMR/Vision uses GLM. Set the
+// model ids via env so you can swap providers without code changes.
+const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || ''
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const CHAT_MODEL = process.env.AI_CHAT_MODEL || 'google/gemini-2.0-flash-001'
+const EMR_MODEL = process.env.AI_EMR_MODEL || 'z-ai/glm-4.6'
+
+export function aiConfigured(): boolean {
+  return Boolean(process.env.ANTHROPIC_API_KEY || OPENROUTER_KEY)
+}
+
+// Convert our message content (string or Anthropic-style image blocks) to the
+// OpenAI/OpenRouter shape (image blocks → image_url data URLs).
+function toOpenAIContent(content: string | any[]): any {
+  if (typeof content === 'string') return content
+  return content.map((b) =>
+    b?.type === 'image' && b.source?.data
+      ? { type: 'image_url', image_url: { url: `data:${b.source.media_type};base64,${b.source.data}` } }
+      : b,
+  )
+}
+
+async function callOpenRouter(model: string, system: string, messages: Msg[], maxTokens: number): Promise<string> {
+  const oaMessages = [
+    { role: 'system', content: system },
+    ...messages.map((m) => ({ role: m.role, content: toOpenAIContent(m.content) })),
+  ]
+  const r = await fetch(OPENROUTER_URL, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${OPENROUTER_KEY}`,
+      'HTTP-Referer': 'https://panaceamed.id',
+      'X-Title': 'Panaceamed.id',
+    },
+    body: JSON.stringify({ model, messages: oaMessages, max_tokens: Math.min(Math.max(maxTokens, 256), 4096) }),
+  })
+  if (!r.ok) {
+    const txt = await r.text()
+    throw new Error(`openrouter_${r.status}:${txt.slice(0, 200)}`)
+  }
+  const data = (await r.json()) as { choices?: { message?: { content?: string } }[] }
+  return data.choices?.[0]?.message?.content ?? ''
+}
+
+// Shared AI call. Routes to OpenRouter when configured (heavier "opus" requests
+// → AI-EMR model/GLM, others → fast chat model/Gemini), else to Anthropic.
 async function callAnthropic(model: string, system: string, messages: Msg[], maxTokens: number): Promise<string> {
+  if (OPENROUTER_KEY) {
+    const orModel = model.includes('opus') ? EMR_MODEL : CHAT_MODEL
+    return callOpenRouter(orModel, system, messages, maxTokens)
+  }
   const key = process.env.ANTHROPIC_API_KEY as string
   const r = await fetch(API_URL, {
     method: 'POST',
@@ -57,7 +109,7 @@ const VISION_SYSTEM = `Anda adalah AI co-physician Panaceamed yang menganalisis 
 **Jenis Pemeriksaan** (identifikasi modalitas), **Temuan Objektif** (deskripsi sistematis untuk bagian OBJECTIVE rekam medis), **Interpretasi/Kemungkinan** (membantu ASSESSMENT — diferensial), **Tanda Bahaya & Saran**. WAJIB: ini alat bantu edukatif, BUKAN diagnosis final — tegaskan verifikasi dokter/radiolog/kardiolog. Jika gambar bukan citra medis, katakan dengan jujur.`
 
 export async function aiVision(req: Request, res: Response) {
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   const user = (req as Request & { user: User }).user
   if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
   const { image, prompt } = req.body as { image?: string; prompt?: string }
@@ -76,7 +128,7 @@ export async function aiVision(req: Request, res: Response) {
 }
 
 export async function aiMessages(req: Request, res: Response) {
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   const user = (req as Request & { user: User }).user
   if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
 
@@ -98,7 +150,7 @@ const CONSULT_SYSTEM = `Anda adalah AI co-physician longevity Panaceamed. Berdas
 **Ringkasan Keluhan**, **Analisis & Kemungkinan (diferensial)**, **Pemeriksaan Penunjang yang Disarankan**, **Rencana Gaya Hidup & Longevity**, **Tanda Bahaya (segera ke dokter/IGD)**. Akurat, ringkas, dan tidak memberi diagnosis final atau resep obat.`
 
 export async function aiConsult(req: Request, res: Response) {
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   const user = (req as Request & { user: User }).user
   const price = config.aiConsultPnc
   if (balance(user.id) < price) {
@@ -120,7 +172,7 @@ export async function aiConsult(req: Request, res: Response) {
 
 // AI-Agent review of a professional onboarding application (credentials).
 export async function reviewApplicationText(info: string): Promise<string> {
-  if (!process.env.ANTHROPIC_API_KEY) return 'AI nonaktif — mohon tinjau manual.'
+  if (!aiConfigured()) return 'AI nonaktif — mohon tinjau manual.'
   const sys = `Anda AI verifikator kredensial Panaceamed. Tinjau data pendaftaran tenaga kesehatan/penulis/verifikator (STR, gelar, keahlian, universitas, tahun lulus, spesialis/subspesialis, dokumen). Beri penilaian SINGKAT (2–3 kalimat) berbahasa Indonesia: kelengkapan & kewajaran data, lalu rekomendasi diakhiri salah satu label: [LAYAK DITINJAU] atau [PERLU DOKUMEN TAMBAHAN]. Ini bukan keputusan final.`
   try {
     return await callAnthropic('claude-sonnet-4-6', sys, [{ role: 'user', content: info }], 400)
@@ -162,7 +214,7 @@ export async function generateOperatorBriefing(): Promise<{ text: string; pendin
 }
 
 export async function aiOperator(req: Request, res: Response) {
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   const mode = (req.body as { mode?: string }).mode === 'content' ? 'content' : 'briefing'
 
   if (mode === 'content') {

@@ -180,6 +180,26 @@ Setiap pagi Anda terima ringkasan: pertumbuhan, pendapatan, antrean persetujuan,
 
 ---
 
+## Bagian 7 — Ganti AI ke OpenRouter (Gemini + GLM) 🤖
+
+AI bisa dipindah dari Anthropic ke **OpenRouter** (1 kunci, banyak model). Chatbot
+pasien pakai model cepat (Gemini Flash); AI-EMR/Vision pakai GLM. **Tanpa ubah kode.**
+
+1. Daftar di **https://openrouter.ai** → menu **Keys** → **Create Key** → salin (diawali `sk-or-...`).
+2. (Isi saldo sedikit di OpenRouter → Credits, mis. $5, untuk membayar pemakaian.)
+3. Di **Render** (Bagian 0), tambah env:
+   - `OPENROUTER_API_KEY` = `sk-or-...`
+   - `AI_CHAT_MODEL` = `google/gemini-2.0-flash-001` (chatbot pasien — cepat & murah)
+   - `AI_EMR_MODEL` = `z-ai/glm-4.6` (AI-EMR/analisa — GLM, open & murah)
+4. Save → redeploy. Begitu `OPENROUTER_API_KEY` ada, **semua AI otomatis lewat OpenRouter**
+   (Anthropic diabaikan). Hapus `ANTHROPIC_API_KEY` bila tak dipakai lagi.
+
+> Nama model bisa Anda ganti sesuai katalog di **openrouter.ai/models** (cari "gemini"
+> atau "glm"). Pakai ID **persis** seperti di OpenRouter. Untuk membaca **gambar**,
+> pilih model yang mendukung *vision* (mis. Gemini Flash).
+
+---
+
 ## ✅ Ringkasan prioritas
 
 | Prioritas | Apa | Biaya | Hasil |

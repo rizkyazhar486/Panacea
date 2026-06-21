@@ -47,7 +47,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, generateOperatorBriefing } from './ai.js'
+import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, generateOperatorBriefing, aiConfigured } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -323,7 +323,7 @@ app.post('/api/ai/operator', requireAuth, (req, res) => {
 app.get('/api/cron/daily-briefing', async (req, res) => {
   const secret = process.env.CRON_SECRET
   if (!secret || req.query.key !== secret) return res.status(403).json({ error: 'forbidden' })
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
   try {
     const { text, pending } = await generateOperatorBriefing()
     const html = `<h2>Briefing Harian Panaceamed.id</h2><p style="color:#869586">${new Date().toLocaleString('id-ID')} · ${pending.topups} top-up & ${pending.doctors} pendaftar menunggu</p><pre style="font-family:inherit;font-size:14px;white-space:pre-wrap;line-height:1.6">${text}</pre>`
