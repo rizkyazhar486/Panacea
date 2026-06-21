@@ -670,6 +670,15 @@ function LongevityCalculator() {
                   <div className="text-sm text-white/85">{result.score >= 80 ? 'Sangat baik 🌟' : result.score >= 60 ? 'Cukup baik 👍' : 'Perlu perbaikan'}</div>
                 </div>
               </div>
+              {/* Progress bar nilai longevity dengan angka */}
+              <div className="mt-4">
+                <div className="mb-1 flex justify-between text-xs font-semibold text-white/85">
+                  <span>Skor Longevity</span><span>{result.score}/100</span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-white/20">
+                  <div className="h-full rounded-full bg-white transition-all" style={{ width: `${result.score}%` }} />
+                </div>
+              </div>
               <div className="mt-4 space-y-2">
                 <PillarBar label="Pola makan" v={result.meals} />
                 <PillarBar label="Olahraga" v={result.exercise} />
