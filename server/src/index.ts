@@ -41,7 +41,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { aiMessages, aiConsult, aiVision } from './ai.js'
+import { aiMessages, aiConsult, aiVision, aiOperator } from './ai.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
@@ -258,6 +258,11 @@ app.put('/api/settings', requireAuth, (req, res) => {
 app.post('/api/ai/messages', requireAuth, aiMessages)
 app.post('/api/ai/consult', requireAuth, aiConsult)
 app.post('/api/ai/vision', requireAuth, aiVision)
+app.post('/api/ai/operator', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  return aiOperator(req, res)
+})
 
 // --- targeted notification (verifier/admin/owner → a specific user) ---
 app.post('/api/notify/user', requireAuth, async (req, res) => {

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { useStore, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
+import { useStore, uid, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
-import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend } from '../components/icons'
+import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend, IconSparkle } from '../components/icons'
 import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup } from '../lib/api'
 
 export function Owner() {
@@ -40,6 +40,8 @@ export function Owner() {
           <div className="mt-1 text-[11px] text-white/70">Target bulanan Rp{monthlyTarget.toLocaleString('id-ID')}</div>
         </div>
       </Card>
+
+      {backendEnabled && <AIOperatorPanel />}
 
       <RealtimeStats />
 
@@ -220,6 +222,92 @@ function RealtimeStats() {
           </div>
         </>
       )}
+    </Card>
+  )
+}
+
+// AI Operator — an "AI COO" that reads live data for a business briefing, and
+// drafts engaging health content for the feed (owner publishes with one tap).
+function AIOperatorPanel() {
+  const { account, addPost } = useStore()
+  const [tab, setTab] = useState<'briefing' | 'content'>('briefing')
+  const [text, setText] = useState('')
+  const [pending, setPending] = useState<{ topups: number; topupIdr: number; doctors: number } | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const [posted, setPosted] = useState(false)
+
+  async function run(mode: 'briefing' | 'content') {
+    setTab(mode); setBusy(true); setErr(''); setText(''); setPosted(false)
+    try {
+      const r = await api.aiOperator(mode)
+      setText(r.text)
+      if (r.pending) setPending(r.pending)
+    } catch {
+      setErr('AI Operator gagal. Pastikan server & kunci AI aktif.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function publish() {
+    const lines = text.trim().split('\n')
+    const title = lines[0].replace(/^#+\s*/, '').slice(0, 80)
+    const body = lines.slice(1).join('\n').trim()
+    addPost({
+      id: uid(),
+      authorEmail: account?.email ?? 'owner@panaceamed.id',
+      authorName: account?.name ?? 'Panaceamed',
+      role: account?.role ?? 'owner',
+      postType: 'artikel',
+      kind: 'image',
+      activity: 'Artikel sehat',
+      caption: body || text,
+      articleTitle: title,
+      mediaColor: '#00BF63',
+      likes: 0, comments: 0, reposts: 0,
+      at: new Date().toISOString(),
+    })
+    setPosted(true)
+    setTimeout(() => setPosted(false), 3000)
+  }
+
+  return (
+    <Card className="border-2 border-brand/30">
+      <SectionTitle
+        icon={<IconSparkle size={20} />}
+        title="AI Operator — Asisten Operasional Otomatis"
+        subtitle="Analisa bisnis real-time & pembuatan konten — ditenagai AI (gratis via server)"
+        right={pending && (pending.topups + pending.doctors > 0)
+          ? <Badge tone="high">{pending.topups + pending.doctors} perlu tindakan</Badge>
+          : <Badge tone="brand">AI siap</Badge>}
+      />
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => run('briefing')} disabled={busy}>
+          <IconChartUp size={16} /> {busy && tab === 'briefing' ? 'Menganalisa…' : 'Briefing Bisnis'}
+        </Button>
+        <Button variant="outline" onClick={() => run('content')} disabled={busy}>
+          <IconSparkle size={16} /> {busy && tab === 'content' ? 'Menulis…' : 'Buat Konten Sehat'}
+        </Button>
+      </div>
+
+      {err && <p className="mt-3 text-sm text-accent">{err}</p>}
+
+      {text && (
+        <div className="mt-4 rounded-2xl border border-neutral-100 bg-neutral-50/60 p-4">
+          <div className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">{text}</div>
+          {tab === 'content' && (
+            <div className="mt-3 flex flex-wrap gap-2 border-t border-neutral-100 pt-3">
+              <Button onClick={publish}><IconSend size={14} /> {posted ? 'Diposting ke Feed ✓' : 'Posting ke Feed'}</Button>
+              <Button variant="ghost" onClick={() => navigator.clipboard?.writeText(text)}>Salin</Button>
+            </div>
+          )}
+        </div>
+      )}
+      <p className="mt-2 text-[11px] text-neutral-400">
+        ⚕️ AI memberi analisa & draf. Keputusan keuangan (persetujuan top-up, verifikasi STR) tetap Anda
+        konfirmasi manual untuk keamanan.
+      </p>
     </Card>
   )
 }

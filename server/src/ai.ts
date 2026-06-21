@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import type { User } from './store.js'
-import { balance, credit } from './store.js'
+import { balance, credit, getStats, listManualTopups, listDoctors, getAudit } from './store.js'
 import { config } from './config.js'
 
 // Server-side Claude proxy — keeps the Anthropic key on the server so AI works
@@ -113,6 +113,57 @@ export async function aiConsult(req: Request, res: Response) {
     // Charge only after a successful generation.
     credit(user.id, -price, 'purchase', 'Konsultasi AI Mendalam')
     res.json({ text, charged: price, balance: balance(user.id) })
+  } catch (e) {
+    res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+  }
+}
+
+// ── AI Operator (owner) — an "AI COO" that reads live platform data and returns
+// a business briefing, or drafts engaging health content for the feed. Read-only
+// for money; sensitive actions stay behind the owner's explicit approval.
+const OPERATOR_SYSTEM = `Anda adalah AI Chief Operating Officer untuk Panaceamed.id — super-app kesehatan & longevity di Indonesia. Berdasarkan DATA OPERASIONAL yang diberikan, susun BRIEFING BISNIS ringkas, tajam, dan praktis berbahasa Indonesia. Gunakan judul tebal markdown:
+**Ringkasan Hari Ini**, **Pertumbuhan & Pendapatan**, **Perlu Tindakan Sekarang** (sebut angka antrean persetujuan & item tertunda), **Rekomendasi Pertumbuhan** (3–5 langkah konkret; dahulukan yang gratis/murah), **Risiko & Kepatuhan**. Pakai angka konkret dari data, jujur bila data masih kecil, dan beri prioritas yang jelas. Hindari janji berlebihan.`
+
+const CONTENT_SYSTEM = `Anda adalah AI editor konten Panaceamed.id. Tulis SATU artikel-mikro hidup sehat/longevity berbahasa Indonesia yang akurat, hangat, dan memikat untuk feed sosial. Format keluaran:
+Baris pertama = JUDUL menarik (maks 60 karakter, tanpa tanda kutip).
+Lalu 2 paragraf singkat + 3 poin tips praktis (pakai "• ").
+Akhiri dengan 1 kalimat pengingat bahwa ini edukatif & konsultasikan ke dokter bila perlu. Hindari klaim medis berlebihan atau menakut-nakuti.`
+
+export async function aiOperator(req: Request, res: Response) {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'ai_not_configured' })
+  const mode = (req.body as { mode?: string }).mode === 'content' ? 'content' : 'briefing'
+
+  if (mode === 'content') {
+    try {
+      const text = await callAnthropic('claude-sonnet-4-6', CONTENT_SYSTEM, [{ role: 'user', content: 'Buat satu artikel hidup sehat untuk feed hari ini.' }], 800)
+      return res.json({ text, mode })
+    } catch (e) {
+      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    }
+  }
+
+  const s = getStats()
+  const pendingTopups = listManualTopups('pending')
+  const topupIdr = pendingTopups.reduce((a, t) => a + t.amountIdr, 0)
+  const pendingDoctors = listDoctors().filter((d) => d.strStatus === 'pending')
+  const recentActions = getAudit(25).map((a) => `${a.at.slice(0, 16)} ${a.action}`).join('; ')
+  const context = `DATA OPERASIONAL PANACEAMED (real-time):
+- Total pengguna: ${s.totalUsers} (dokter ${s.doctors}, pasien ${s.patients})
+- Pendaftaran 7 hari: ${s.signups7d.map((d) => d.count).join(', ')}
+- Pendapatan total (terbayar): Rp${s.revenueIdr.toLocaleString('id-ID')} dari ${s.paidOrders} order
+- Pendapatan 7 hari (Rp): ${s.revenue7d.map((d) => d.idr).join(', ')}
+- Postingan feed: ${s.posts} · Pelanggan push: ${s.pushSubscribers}
+- Antrean Top-up manual menunggu: ${pendingTopups.length} permintaan (total Rp${topupIdr.toLocaleString('id-ID')})
+- Dokter/kontributor menunggu verifikasi STR: ${pendingDoctors.length}
+- Aktivitas audit terbaru: ${recentActions || 'belum ada'}`
+
+  try {
+    const text = await callAnthropic('claude-sonnet-4-6', OPERATOR_SYSTEM, [{ role: 'user', content: context }], 1600)
+    res.json({
+      text,
+      mode,
+      pending: { topups: pendingTopups.length, topupIdr, doctors: pendingDoctors.length },
+    })
   } catch (e) {
     res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
   }

@@ -180,6 +180,11 @@ export const api = {
     messages: { role: 'user' | 'assistant'; content: string }[]
     max_tokens?: number
   }) => req<{ text: string }>('/api/ai/messages', { method: 'POST', body: JSON.stringify(payload) }),
+  aiOperator: (mode: 'briefing' | 'content') =>
+    req<{ text: string; mode: string; pending?: { topups: number; topupIdr: number; doctors: number } }>(
+      '/api/ai/operator',
+      { method: 'POST', body: JSON.stringify({ mode }) },
+    ),
   // user preferences (cross-device sync; never carries the API key)
   getSettings: () => req<{ settings: Record<string, unknown> }>('/api/settings').then((r) => r.settings),
   saveSettings: (settings: Record<string, unknown>) =>
