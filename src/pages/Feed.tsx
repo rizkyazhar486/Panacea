@@ -177,7 +177,7 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
       <div className="rise text-center">
         <h2 className="text-2xl font-extrabold tracking-tight">
           Panacea{' '}
-          <span className="animate-gradient-text bg-gradient-to-r from-brand via-emerald-500 to-brand-dark bg-clip-text text-transparent">Hidup Sehat</span>
+          <span className="bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text text-transparent">Hidup Sehat</span>
         </h2>
         <p className="mt-1 text-sm text-neutral-500">Bagikan aktivitas, kebiasaan & artikel longevity Anda.</p>
       </div>

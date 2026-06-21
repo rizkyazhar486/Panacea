@@ -34,6 +34,8 @@ import {
   listApplications,
   setApplicationStatus,
   setApplicationVerdict,
+  isEarlyAdopter,
+  earlyAdopterInfo,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -76,7 +78,14 @@ app.get('/api/health', (_req, res) => {
     aiConsultPnc: config.aiConsultPnc,
     midtransClientKey: features.paymentsLive ? config.midtrans.clientKey : null,
     googleClientId: features.googleLive ? config.googleClientId : null,
+    promo: earlyAdopterInfo(),
   })
+})
+
+// Per-user promo status (am I one of the first 25? → 75% off everything).
+app.get('/api/promo', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ ...earlyAdopterInfo(), eligible: isEarlyAdopter(u.id) })
 })
 
 // --- auth ---

@@ -3,7 +3,7 @@ import crypto from 'node:crypto'
 // midtrans-client is CommonJS
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
-import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, uid, type User } from './store.js'
+import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, uid, type User } from './store.js'
 import { notify } from './push.js'
 import { sendReceipt } from './email.js'
 
@@ -49,7 +49,10 @@ export async function createPayment(req: Request, res: Response) {
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
   const isChronic = !!purpose && purpose in CHRONIC_PRICE
   const pnc = isChronic ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
-  const amountIdr = isChronic ? CHRONIC_PRICE[purpose!] : pnc * config.tokenToIdr
+  const baseIdr = isChronic ? CHRONIC_PRICE[purpose!] : pnc * config.tokenToIdr
+  // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
+  const early = isEarlyAdopter(user.id)
+  const amountIdr = early ? Math.max(1000, Math.round(baseIdr * (1 - EARLY_ADOPTER_DISCOUNT))) : baseIdr
   const orderId = 'PMD-' + uid().slice(0, 14)
   createOrder({ id: orderId, userId: user.id, amountPnc: pnc, amountIdr, method: method || 'QRIS', status: 'pending', createdAt: new Date().toISOString(), purpose: purpose || 'topup' })
 
@@ -58,9 +61,9 @@ export async function createPayment(req: Request, res: Response) {
     return res.json({ live: false, orderId, amountPnc: pnc, amountIdr, method, mock: true })
   }
   try {
-    const item = isChronic
-      ? { id: purpose!, price: amountIdr, quantity: 1, name: purpose === 'chronic_lifetime' ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari' }
-      : { id: 'PNC', price: config.tokenToIdr, quantity: pnc, name: 'PanaceaToken' }
+    const itemName = (isChronic ? (purpose === 'chronic_lifetime' ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari') : `${pnc} PanaceaToken`) + (early ? ' (Diskon 75% Early Bird)' : '')
+    // Single item priced at the (possibly discounted) total so Midtrans totals match.
+    const item = { id: isChronic ? purpose! : 'PNC', price: amountIdr, quantity: 1, name: itemName }
     const tx = await snap.createTransaction({
       transaction_details: { order_id: orderId, gross_amount: amountIdr },
       enabled_payments: channels(method || 'QRIS'),

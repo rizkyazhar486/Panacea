@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { api, backendEnabled, type Health } from '../lib/api'
 import { Wordmark } from '../components/Logo'
 import { Reveal, CountUp } from '../components/Reveal'
 import { InteractiveAura } from '../components/InteractiveAura'
@@ -64,8 +65,18 @@ const MARQUEE = [
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
+  const [promo, setPromo] = useState<Health['promo'] | null>(null)
+  useEffect(() => {
+    if (backendEnabled) api.health().then((h) => setPromo(h.promo ?? null)).catch(() => {})
+  }, [])
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
+      {/* Promo early-bird — 75% untuk pendaftar pertama */}
+      {promo && promo.slotsLeft > 0 && (
+        <button onClick={onMasuk} className="block w-full bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] px-4 py-2.5 text-center text-sm font-bold text-white hover:brightness-110">
+          🎉 Diskon {promo.discountPct}% SEMUA layanan untuk {promo.limit} pendaftar pertama — sisa {promo.slotsLeft} slot! Daftar sekarang →
+        </button>
+      )}
       {/* Glass header */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-black/5 bg-white/70 px-5 py-3 backdrop-blur-xl sm:px-8">
         <Wordmark size={36} />
@@ -109,7 +120,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
               AI-Klinik Praktis untuk
               <br />
-              <span className="animate-gradient-text bg-gradient-to-r from-brand via-emerald-500 to-brand-dark bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text text-transparent">
                 Akses Kesehatan Anda
               </span>
             </h1>
@@ -293,7 +304,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
       <section className="px-6 py-12 sm:px-10">
         <Reveal>
-          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-2">
+          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-3">
             <div>
               <h2 className="text-2xl font-extrabold">Tentang Kami</h2>
               <p className="mt-3 text-sm leading-relaxed text-neutral-600">
@@ -302,6 +313,14 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 penyakit kronis, dan ilmu longevity terdepan terjangkau untuk semua — didukung kecerdasan buatan
                 yang bertanggung jawab dan kepatuhan UU PDP.
               </p>
+            </div>
+            <div className="rounded-2xl bg-brand-50 p-5">
+              <h3 className="font-bold">Hubungi Kami</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><span className="text-neutral-400">Email:</span> <a href="mailto:index.meds@gmail.com" className="font-semibold text-brand-dark hover:underline">index.meds@gmail.com</a></li>
+                <li><span className="text-neutral-400">Instagram:</span> <a href="https://instagram.com/Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
+                <li><span className="text-neutral-400">TikTok:</span> <a href="https://tiktok.com/@Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
+              </ul>
             </div>
             <div className="rounded-2xl bg-neutral-50 p-5">
               <h3 className="font-bold">Kontak Pendiri</h3>

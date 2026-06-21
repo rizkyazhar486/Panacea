@@ -511,6 +511,20 @@ export function setApplicationStatus(id: string, status: 'granted' | 'rejected')
   return a
 }
 
+// ── Early-adopter promo: first N registered emails get a platform-wide discount.
+export const EARLY_ADOPTER_LIMIT = 25
+export const EARLY_ADOPTER_DISCOUNT = 0.75 // 75% off
+function earlyAdopterIds(): string[] {
+  return [...db.users].sort((a, b) => a.createdAt.localeCompare(b.createdAt)).slice(0, EARLY_ADOPTER_LIMIT).map((u) => u.id)
+}
+export function isEarlyAdopter(userId: string): boolean {
+  return earlyAdopterIds().includes(userId)
+}
+export function earlyAdopterInfo() {
+  const used = Math.min(db.users.length, EARLY_ADOPTER_LIMIT)
+  return { limit: EARLY_ADOPTER_LIMIT, used, slotsLeft: Math.max(0, EARLY_ADOPTER_LIMIT - db.users.length), discountPct: Math.round(EARLY_ADOPTER_DISCOUNT * 100) }
+}
+
 export function createOrder(o: Order) {
   db.orders.unshift(o)
   save()

@@ -14,6 +14,7 @@ export interface Health {
   tokenToIdr: number
   midtransClientKey: string | null
   googleClientId: string | null
+  promo?: { limit: number; used: number; slotsLeft: number; discountPct: number }
 }
 
 interface BackendUser {
@@ -73,6 +74,7 @@ function toAccount(u: BackendUser): Account {
 
 export const api = {
   health: () => req<Health>('/api/health'),
+  promo: () => req<{ limit: number; used: number; slotsLeft: number; discountPct: number; eligible: boolean }>('/api/promo'),
   me: () => req<{ user: BackendUser }>('/api/auth/me').then((r) => toAccount(r.user)),
   devLogin: (email: string, name: string, role: Role) =>
     req<{ user: BackendUser; token?: string }>('/api/auth/dev-login', {
