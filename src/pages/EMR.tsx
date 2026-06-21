@@ -7,7 +7,8 @@ import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { generateEducation } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
-import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
+import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
+import type { Anamnesis, EMRRecord, PhysicalExam, VitalSign } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
 function SatusehatButton({ patient, record, vitals }: { patient: unknown; record: EMRRecord; vitals: unknown[] }) {
@@ -413,6 +414,9 @@ export function EMR() {
         </div>
       </Card>
 
+      {/* Pemantauan Kronis pasien (TTV harian mandiri) */}
+      <ChronicSummary vitals={state.vitals[activePatient.id] ?? []} conditions={activePatient.chronicConditions} />
+
       {/* P — Plan summary */}
       <Card>
         <SectionTitle
@@ -574,6 +578,34 @@ function DiagnosisPicker({ value, aiText, onChange }: {
         Standar ICD-10 (dipakai SATUSEHAT/BPJS) dengan padanan ICD-11 untuk diagnosis umum. Diagnosis utama final tetap ditentukan & ditandatangani dokter.
       </p>
     </div>
+  )
+}
+
+// Doctor-side view of the patient's self-logged daily TTV (chronic follow-up).
+function ChronicSummary({ vitals, conditions }: { vitals: VitalSign[]; conditions: string[] }) {
+  if (vitals.length === 0) return null
+  const latest = vitals[vitals.length - 1]
+  const evals = evaluateVitals(latest, conditions)
+  const status = overallStatus(evals)
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconShield size={18} />}
+        title="Pemantauan Kronis Pasien (Follow-Up TTV)"
+        subtitle="TTV harian mandiri pasien — dievaluasi terhadap target kondisi kronis"
+        right={<Badge tone={status === 'alert' ? 'critical' : status === 'warn' ? 'high' : 'brand'}>{STATUS_LABEL[status]}</Badge>}
+      />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {evals.map((e) => (
+          <div key={e.label} className="rounded-xl border p-3" style={{ borderColor: STATUS_COLOR[e.status] + '55', background: STATUS_COLOR[e.status] + '0f' }}>
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{e.label}</div>
+            <div className="text-xl font-extrabold" style={{ color: STATUS_COLOR[e.status] }}>{e.value} <span className="text-[11px] font-medium text-neutral-400">{e.unit}</span></div>
+            <div className="text-[10px] text-neutral-400">Target {e.target}</div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] text-neutral-400">{vitals.length} pencatatan · terakhir {new Date(latest.takenAt).toLocaleString('id-ID')}</p>
+    </Card>
   )
 }
 
