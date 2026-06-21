@@ -6,7 +6,7 @@ import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../compon
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { generateEducation } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
-import { searchICD, matchICD, type ICDCode } from '../lib/icd'
+import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
 import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -535,7 +535,8 @@ function DiagnosisPicker({ value, aiText, onChange }: {
       {value ? (
         <div className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2">
           <div className="min-w-0">
-            <span className="font-mono text-sm font-extrabold text-brand-dark">{value.code}</span>
+            <span className="font-mono text-sm font-extrabold text-brand-dark">ICD-10 {value.code}</span>
+            {icd11(value.code) && <span className="ml-2 font-mono text-[11px] font-bold text-neutral-500">· ICD-11 {icd11(value.code)}</span>}
             <span className="ml-2 text-sm font-bold">{value.title}</span>
             {value.chapter && <span className="ml-2 text-[11px] text-neutral-400">· {value.chapter}</span>}
             <span className="ml-2 text-[10px] font-semibold text-neutral-400">({value.source === 'AI' ? 'usulan AI' : 'pilihan dokter'})</span>
@@ -563,13 +564,14 @@ function DiagnosisPicker({ value, aiText, onChange }: {
             >
               <span className="w-16 shrink-0 font-mono text-xs font-bold text-brand-dark">{c.code}</span>
               <span className="min-w-0 flex-1 truncate">{c.id}</span>
-              <span className="shrink-0 text-[10px] text-neutral-400">{c.chapter}</span>
+              {icd11(c.code) && <span className="shrink-0 rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[9px] font-bold text-neutral-500">11: {icd11(c.code)}</span>}
+              <span className="hidden shrink-0 text-[10px] text-neutral-400 sm:inline">{c.chapter}</span>
             </button>
           ))}
         </div>
       )}
       <p className="mt-1.5 text-[10px] text-neutral-400">
-        Standar ICD-10 (dipakai SATUSEHAT/BPJS). Diagnosis utama final tetap ditentukan & ditandatangani dokter.
+        Standar ICD-10 (dipakai SATUSEHAT/BPJS) dengan padanan ICD-11 untuk diagnosis umum. Diagnosis utama final tetap ditentukan & ditandatangani dokter.
       </p>
     </div>
   )

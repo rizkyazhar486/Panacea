@@ -30,6 +30,7 @@ import {
 } from '../lib/theme'
 import { LANGS, getLang, setLang, t, type Lang } from '../lib/i18n'
 import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/push'
+import { InstallApp } from '../components/InstallApp'
 import { api } from '../lib/api'
 
 const MODELS = [
@@ -86,6 +87,9 @@ export function Settings() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      {/* ── Install as app (PWA) ───────────────────────────────── */}
+      <InstallApp />
+
       {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>
         <SectionTitle icon={<IconSun size={20} />} title={t('appearance', lang)} subtitle={t('appearanceSub', lang)} />

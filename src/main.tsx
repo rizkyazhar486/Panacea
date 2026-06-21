@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import { applyAppearance } from './lib/theme'
 import { applyLang, getLang } from './lib/i18n'
+import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -37,6 +38,7 @@ const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
 applyLang(getLang())
+initPwaInstall()
 
 // Register the PWA service worker (installable + offline shell).
 if ('serviceWorker' in navigator) {

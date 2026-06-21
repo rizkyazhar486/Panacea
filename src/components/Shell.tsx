@@ -31,6 +31,7 @@ import { Login } from '../pages/Login'
 import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
+import { InstallBanner } from './InstallApp'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
@@ -301,6 +302,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+          {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
             <div className="mb-5">
               <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">

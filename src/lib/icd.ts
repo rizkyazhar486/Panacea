@@ -136,6 +136,38 @@ export const ICD_CODES: ICDCode[] = [
   { code: 'Z00.0', id: 'Pemeriksaan kesehatan umum', en: 'General medical examination', chapter: 'Pemeriksaan' },
 ]
 
+// ICD-11 (the newest WHO revision) stem codes for the most common diagnoses,
+// mapped from their ICD-10 counterpart. Provided for diagnoses where the
+// crosswalk is well-established; the treating doctor verifies the final code.
+export const ICD11_MAP: Record<string, string> = {
+  // Infeksi
+  A15: '1B11', A90: '1D20', 'A01.0': '1A07', B20: '1C62', 'B34.2': 'RA01', 'B35.9': '1F28',
+  // Pernapasan
+  J00: 'CA00', 'J45.9': 'CA23', 'J44.9': 'CA22', 'J18.9': 'CA40', 'J30.4': 'CA08',
+  // Kardiovaskular
+  I10: 'BA00', 'I20.0': 'BA40', 'I21.9': 'BA41', 'I50.9': 'BD10', I48: 'BC81', 'I63.9': '8B11',
+  // Endokrin & metabolik
+  'E11.9': '5A11', 'E10.9': '5A10', 'E78.5': '5C80', 'E03.9': '5A00', 'E05.9': '5A02', 'E66.9': '5B81', 'E55.9': '5B57',
+  // Saluran cerna
+  'K21.9': 'DA22', 'K29.7': 'DA42', 'K35.8': 'DB10', 'K40.9': 'DD50', 'K80.2': 'DC11',
+  // Ginjal & kemih
+  'N18.9': 'GB61', 'N39.0': 'GC08', 'N20.0': 'GB70', N40: 'GA90',
+  // Muskuloskeletal
+  'M10.9': 'FA25', 'M17.9': 'FA01', 'M06.9': 'FA20',
+  // Saraf & jiwa
+  'G43.9': '8A80', 'G40.9': '8A6Z', 'F32.9': '6A70', 'F41.1': '6B00', 'F41.0': '6B01', 'F20.9': '6A20',
+  // Kulit
+  'L20.9': 'EA80', 'L50.9': 'EB05', 'L70.0': 'ED80',
+  // Darah & gizi
+  'D50.9': '3A00',
+  // Gejala umum
+  'R50.9': 'MG26', R05: 'MD12',
+}
+
+export function icd11(code: string): string | undefined {
+  return ICD11_MAP[code]
+}
+
 // Distinct chapters (for grouping / filters).
 export const ICD_CHAPTERS = Array.from(new Set(ICD_CODES.map((c) => c.chapter)))
 
