@@ -252,6 +252,65 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </ul>
       </section>
 
+      {/* ── INOVASI KEDOKTERAN (sorotan 3 tahun terakhir) ─────────── */}
+      <section className="px-6 py-16 sm:px-10">
+        <Reveal>
+          <div className="mx-auto max-w-5xl text-center">
+            <h2 className="text-2xl font-extrabold sm:text-3xl">Sorotan Inovasi Kedokteran Terkini</h2>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">Panaceamed dibangun di atas sains terbaru tentang longevity, sel punca, dan kecerdasan buatan.</p>
+          </div>
+        </Reveal>
+        <div className="mx-auto mt-8 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { tag: 'Nobel Kedokteran 2023', t: 'mRNA termodifikasi', d: 'Katalin Karikó & Drew Weissman — modifikasi basa nukleosida yang memungkinkan vaksin mRNA COVID-19, membuka era terapi mRNA.' },
+            { tag: 'Nobel Kedokteran 2024', t: 'microRNA', d: 'Victor Ambros & Gary Ruvkun — penemuan microRNA & perannya dalam regulasi gen, fondasi diagnostik & terapi presisi.' },
+            { tag: 'Nobel Kimia 2024', t: 'AI & struktur protein', d: 'AlphaFold (Hassabis & Jumper) — AI memprediksi struktur protein, mempercepat penemuan obat secara dramatis.' },
+            { tag: 'Longevity', t: 'Reprogram epigenetik', d: 'Faktor Yamanaka & senolitik diteliti untuk "meremajakan" sel dan memperpanjang healthspan — inti pendekatan longevity.' },
+            { tag: 'Sel Punca', t: 'Terapi regeneratif', d: 'Sel punca (stem cell) untuk regenerasi jaringan & penyakit degeneratif terus berkembang dalam uji klinis global.' },
+            { tag: 'Pandemi → Endemi', t: 'Kesiapsiagaan', d: 'Transisi COVID-19 ke endemi menegaskan pentingnya pemantauan kesehatan berkelanjutan & deteksi dini berbasis data.' },
+          ].map((c) => (
+            <Reveal key={c.t}>
+              <div className="h-full rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
+                <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-dark">{c.tag}</span>
+                <h3 className="mt-3 font-bold">{c.t}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-neutral-600">{c.d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal>
+          <blockquote className="mx-auto mt-8 max-w-3xl rounded-2xl bg-brand-50/60 p-6 text-center text-lg font-semibold italic text-brand-dark">
+            “Tujuan kedokteran bukan sekadar memperpanjang umur, tetapi memperpanjang masa sehat (healthspan).”
+          </blockquote>
+        </Reveal>
+      </section>
+
+      {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
+      <section className="px-6 py-12 sm:px-10">
+        <Reveal>
+          <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-2">
+            <div>
+              <h2 className="text-2xl font-extrabold">Tentang Kami</h2>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+                Panaceamed.id adalah super-app kesehatan & longevity Indonesia: AI melakukan anamnesis & edukasi,
+                dokter berlisensi memverifikasi. Misi kami menjadikan akses kesehatan berkualitas, pemantauan
+                penyakit kronis, dan ilmu longevity terdepan terjangkau untuk semua — didukung kecerdasan buatan
+                yang bertanggung jawab dan kepatuhan UU PDP.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-neutral-50 p-5">
+              <h3 className="font-bold">Kontak Pendiri</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><span className="text-neutral-400">Nama:</span> <b>Rizky Muhammad Azrissal</b></li>
+                <li><span className="text-neutral-400">Email:</span> <a href="mailto:Rizkyazhar486@gmail.com" className="font-semibold text-brand-dark hover:underline">Rizkyazhar486@gmail.com</a></li>
+                <li><span className="text-neutral-400">Telepon:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
+                <li><span className="text-neutral-400">Instagram:</span> <a href="https://instagram.com/Rizkyazr4" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Rizkyazr4</a></li>
+              </ul>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ── FINAL CTA ─────────────────────────────────────────── */}
       <section className="px-6 pb-24 sm:px-10">
         <Reveal>
