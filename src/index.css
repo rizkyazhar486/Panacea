@@ -42,7 +42,23 @@ body {
   background: radial-gradient(circle at 50% 0%, rgba(0, 191, 99, 0.06) 0%, #f4f7f5 55%) fixed;
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
 }
+
+/* Global feel polish — smooth anchor scroll, no ugly mobile tap flash, branded
+   text selection. Pure CSS, no logic. */
+html { scroll-behavior: smooth; }
+* { -webkit-tap-highlight-color: transparent; }
+::selection { background: rgba(0, 191, 99, 0.22); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Images render crisper & avoid layout jank while loading */
+img { -webkit-user-drag: none; }
+
+/* Buttons/links get a consistent, gentle press feedback on touch */
+button, a[href], [role='button'] { transition: transform 0.12s ease, background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease; }
+button:active, a[href]:active, [role='button']:active { transform: scale(0.985); }
 
 /* ─────────────────────────────────────────────────────────────
    Dark mode — class-based override layer.
