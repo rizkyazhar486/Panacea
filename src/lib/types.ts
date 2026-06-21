@@ -99,6 +99,8 @@ export interface EMRRecord {
   anamnesis: Anamnesis
   physicalExam: PhysicalExam
   problems: ProblemEntry[]
+  // Diagnosis utama (ICD-10) — picked by the doctor or accepted from AI.
+  primaryDiagnosis?: { code: string; title: string; chapter?: string; source?: 'AI' | 'Dokter' }
   plan: PlanItem[]
   prognosis?: string
   // Penunjang & supportive (Mode-1 clinical workup)

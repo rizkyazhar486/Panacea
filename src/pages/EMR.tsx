@@ -6,6 +6,7 @@ import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../compon
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
 import { generateEducation } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
+import { searchICD, matchICD, type ICDCode } from '../lib/icd'
 import type { Anamnesis, EMRRecord, PhysicalExam } from '../lib/types'
 
 // Send the current EMR to SATUSEHAT as a FHIR R4 Bundle (dokter/owner only).
@@ -352,6 +353,11 @@ export function EMR() {
           title="A · Assessment — Daftar Masalah & Pengkajian"
           subtitle="Reasoning AI: basis temuan + narasi “Dipikirkan …”"
         />
+        <DiagnosisPicker
+          value={draft.primaryDiagnosis}
+          aiText={draft.problems[0]?.title ?? draft.anamnesis.keluhanUtama}
+          onChange={(d) => patch((r) => ({ ...r, primaryDiagnosis: d, updatedAt: new Date().toISOString() }))}
+        />
         <div className="space-y-4">
           {draft.problems.length === 0 && <p className="text-sm text-neutral-400">Belum ada masalah.</p>}
           {draft.problems.map((pr, i) => (
@@ -492,6 +498,79 @@ function ExamField({
         placeholder="Isi temuan pemeriksaan fisik…"
         className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
       />
+    </div>
+  )
+}
+
+// Diagnosis Utama (ICD-10) — searchable picker with one-tap AI auto-match.
+function DiagnosisPicker({ value, aiText, onChange }: {
+  value?: { code: string; title: string; chapter?: string; source?: 'AI' | 'Dokter' }
+  aiText: string
+  onChange: (d: { code: string; title: string; chapter?: string; source?: 'AI' | 'Dokter' } | undefined) => void
+}) {
+  const [q, setQ] = useState('')
+  const [open, setOpen] = useState(false)
+  const results = searchICD(q, 24)
+
+  function choose(c: ICDCode, source: 'AI' | 'Dokter') {
+    onChange({ code: c.code, title: c.id, chapter: c.chapter, source })
+    setQ('')
+    setOpen(false)
+  }
+  function autoMatch() {
+    const m = matchICD(aiText)
+    if (m) choose(m, 'AI')
+    else { setQ(aiText.slice(0, 24)); setOpen(true) }
+  }
+
+  return (
+    <div className="mb-4 rounded-xl border-2 border-brand/20 bg-brand-50/40 p-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">🩺 Diagnosis Utama (ICD-10)</div>
+        <button onClick={autoMatch} className="rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-white hover:bg-brand-dark">
+          ✨ Cocokkan usulan AI
+        </button>
+      </div>
+
+      {value ? (
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-white px-3 py-2">
+          <div className="min-w-0">
+            <span className="font-mono text-sm font-extrabold text-brand-dark">{value.code}</span>
+            <span className="ml-2 text-sm font-bold">{value.title}</span>
+            {value.chapter && <span className="ml-2 text-[11px] text-neutral-400">· {value.chapter}</span>}
+            <span className="ml-2 text-[10px] font-semibold text-neutral-400">({value.source === 'AI' ? 'usulan AI' : 'pilihan dokter'})</span>
+          </div>
+          <button onClick={() => { onChange(undefined); setOpen(true) }} className="shrink-0 text-xs font-semibold text-accent hover:underline">Ubah</button>
+        </div>
+      ) : (
+        <input
+          value={q}
+          onChange={(e) => { setQ(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
+          placeholder="Cari diagnosis / kode ICD-10… (mis. hipertensi, J18, diabetes)"
+          className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+        />
+      )}
+
+      {open && !value && (
+        <div className="mt-2 max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white">
+          {results.length === 0 && <p className="p-3 text-sm text-neutral-400">Tidak ada kode yang cocok.</p>}
+          {results.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => choose(c, 'Dokter')}
+              className="flex w-full items-center gap-2 border-b border-neutral-50 px-3 py-2 text-left text-sm last:border-0 hover:bg-brand-50"
+            >
+              <span className="w-16 shrink-0 font-mono text-xs font-bold text-brand-dark">{c.code}</span>
+              <span className="min-w-0 flex-1 truncate">{c.id}</span>
+              <span className="shrink-0 text-[10px] text-neutral-400">{c.chapter}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="mt-1.5 text-[10px] text-neutral-400">
+        Standar ICD-10 (dipakai SATUSEHAT/BPJS). Diagnosis utama final tetap ditentukan & ditandatangani dokter.
+      </p>
     </div>
   )
 }

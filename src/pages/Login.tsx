@@ -191,6 +191,21 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <GoogleG /> Masuk dengan Google
             </button>
           )}
+          {health?.features.otpEmail && (
+            <EmailOtpLogin
+              role={role}
+              consentOk={() => {
+                if (!consent) { setError('Harap menyetujui Syarat, Kebijakan Privasi & Persetujuan Tindakan terlebih dahulu.'); return false }
+                if (STR_ROLES.includes(role) && !str.trim()) { setError('Nomor STR / sertifikat praktik wajib untuk peran ini.'); return false }
+                return true
+              }}
+              name={name}
+              str={str}
+              email={email}
+              setEmail={setEmail}
+              onLogin={(acc) => finish(acc)}
+            />
+          )}
           {health?.features.otp && (
             <PhoneLogin
               role={role}
@@ -300,6 +315,75 @@ export function Login({ onBack }: { onBack?: () => void }) {
           {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
         </div>
       </div>
+    </div>
+  )
+}
+
+// Email + OTP login (FREE — code delivered by email). Shown when the server has
+// email configured (health.features.otpEmail).
+function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }: {
+  role: Role
+  name: string
+  str: string
+  email: string
+  setEmail: (v: string) => void
+  consentOk: () => boolean
+  onLogin: (acc: Account) => void
+}) {
+  const [code, setCode] = useState('')
+  const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  async function start() {
+    if (!consentOk()) return
+    if (!email.trim()) { setMsg('Masukkan email Anda.'); return }
+    setBusy(true); setMsg('')
+    try {
+      await api.emailOtpStart(email.trim())
+      setSent(true)
+      setMsg('Kode dikirim ke email Anda. Cek inbox/spam.')
+    } catch {
+      setMsg('Gagal mengirim kode. Periksa email & coba lagi.')
+    } finally { setBusy(false) }
+  }
+
+  async function verify() {
+    if (!code.trim()) { setMsg('Masukkan kode dari email.'); return }
+    setBusy(true); setMsg('')
+    try {
+      const acc = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
+      onLogin({
+        ...acc,
+        isSubscriber: role === 'owner',
+        sex: 'L',
+        str: STR_ROLES.includes(role) ? str.trim() : undefined,
+        strStatus: STR_ROLES.includes(role) ? 'pending' : 'none',
+        consentAt: new Date().toISOString(),
+      })
+    } catch {
+      setMsg('Kode salah atau kedaluwarsa.')
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="mt-3 rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
+      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">✉️ Masuk cepat dengan Email (kode OTP gratis)</div>
+      <div className="flex gap-2">
+        <input className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="email@anda.com" disabled={sent} />
+        {!sent ? (
+          <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Kirim Kode'}</Button>
+        ) : (
+          <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Ubah</button>
+        )}
+      </div>
+      {sent && (
+        <div className="mt-2 flex gap-2">
+          <input className={inputClass} value={code} onChange={(e) => setCode(e.target.value)} inputMode="numeric" placeholder="Kode 6 digit" />
+          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verifikasi'}</Button>
+        </div>
+      )}
+      {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
     </div>
   )
 }

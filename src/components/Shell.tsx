@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
   IconDashboard,
@@ -91,7 +91,11 @@ export function Shell({ children }: { children: ReactNode }) {
   const { state, activePatient, setActivePatient, logout, setMode } = useStore()
   const loc = useLocation()
   const [theme, setTheme] = useState<Theme>(getTheme)
+  const [menuOpen, setMenuOpen] = useState(false)
   const account = state.account
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => { setMenuOpen(false) }, [loc.pathname])
 
   if (!account) return <PublicEntry />
 
@@ -99,6 +103,10 @@ export function Shell({ children }: { children: ReactNode }) {
   const title = items.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
+  // Quick actions (mobile): the role's most useful destinations, minus the
+  // utility pages — one-tap shortcuts beside the hamburger menu.
+  const quick = items.filter((n) => !['/settings', '/legal', '/billing', '/architecture'].includes(n.to)).slice(0, 6)
+  const doLogout = () => { if (backendEnabled) api.logout().catch(() => {}); logout() }
 
   return (
     <div className="relative flex min-h-screen">
@@ -167,8 +175,17 @@ export function Shell({ children }: { children: ReactNode }) {
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-5">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="shrink-0 lg:hidden"><LogoMark size={28} /></span>
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
+              aria-label="Buka menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
+              </svg>
+            </button>
+            <span className="shrink-0 lg:hidden"><LogoMark size={26} /></span>
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
 
@@ -251,23 +268,30 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <nav className="flex gap-1 overflow-x-auto border-b border-black/5 bg-white px-3 py-2 lg:hidden">
-          {items.map((n) => (
+        {/* Quick actions — one-tap shortcuts (mobile only) */}
+        <div className="flex gap-2 overflow-x-auto border-b border-black/5 bg-white px-3 py-2 lg:hidden">
+          <span className="flex shrink-0 items-center pr-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Cepat</span>
+          {quick.map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold ${
-                  isActive ? 'bg-brand-50 text-brand-dark' : 'text-neutral-500'
+                `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  isActive ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'
                 }`
               }
             >
-              <n.icon size={16} />
+              <n.icon size={15} />
               {n.label}
             </NavLink>
           ))}
-        </nav>
+          {(account.role === 'pasien' || account.role === 'dokter') && (
+            <NavLink to="/hospitals" className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent">
+              <IconHospital size={15} /> SOS
+            </NavLink>
+          )}
+        </div>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
           <div key={loc.pathname} className="page-enter">
@@ -275,6 +299,52 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+
+      {/* Mobile drawer — full menu (different & friendlier than the desktop sidebar) */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
+          <aside className="absolute left-0 top-0 flex h-full w-[82%] max-w-xs flex-col bg-white shadow-2xl drawer-in">
+            <div className="flex items-center justify-between border-b border-black/5 px-4 py-4">
+              <div className="flex items-center gap-2.5">
+                <LogoMark size={34} />
+                <div className="leading-tight">
+                  <div className="text-base font-extrabold tracking-tight">Panacea<span className="text-brand">med</span><span className="text-accent">.id</span></div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">{roleLabel[account.role]}</div>
+                </div>
+              </div>
+              <button onClick={() => setMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
+            </div>
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
+              {items.map((n) => (
+                <NavLink
+                  key={n.to}
+                  to={n.to}
+                  end={n.end}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-semibold transition ${
+                      isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-600 hover:bg-neutral-50'
+                    }`
+                  }
+                >
+                  <n.icon size={20} />
+                  {n.label}
+                </NavLink>
+              ))}
+            </nav>
+            <div className="border-t border-black/5 p-3">
+              {(account.role === 'pasien' || account.role === 'dokter') && (
+                <NavLink to="/hospitals" className="mb-2 flex items-center justify-center gap-2 rounded-xl bg-accent/10 px-3 py-3 text-sm font-bold text-accent">
+                  <IconHospital size={18} /> Darurat (SOS)
+                </NavLink>
+              )}
+              <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
+                <IconLogout size={18} /> Keluar
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
 
       <ContactService />
     </div>

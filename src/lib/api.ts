@@ -9,7 +9,7 @@ export const backendEnabled = Boolean(API)
 
 export interface Health {
   ok: boolean
-  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean; otp?: boolean }
+  features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean; otp?: boolean; otpEmail?: boolean }
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null
@@ -92,6 +92,16 @@ export const api = {
     }),
   otpStart: (phone: string) =>
     req<{ ok: boolean; phone: string }>('/api/auth/otp/start', { method: 'POST', body: JSON.stringify({ phone }) }),
+  emailOtpStart: (email: string) =>
+    req<{ ok: boolean; email: string }>('/api/auth/otp/email/start', { method: 'POST', body: JSON.stringify({ email }) }),
+  emailOtpVerify: (email: string, code: string, name: string, role: Role) =>
+    req<{ user: BackendUser; token?: string }>('/api/auth/otp/email/verify', {
+      method: 'POST',
+      body: JSON.stringify({ email, code, name, role }),
+    }).then((r) => {
+      if (r.token) setAuthToken(r.token)
+      return toAccount(r.user)
+    }),
   otpVerify: (phone: string, code: string, name: string, role: Role) =>
     req<{ user: BackendUser; token?: string }>('/api/auth/otp/verify', {
       method: 'POST',

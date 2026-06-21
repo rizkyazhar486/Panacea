@@ -41,6 +41,19 @@ export function sendWelcome(to: string, name: string, role: string) {
   )
 }
 
+export function sendOtpCode(to: string, code: string) {
+  return sendEmail(
+    to,
+    `Kode masuk Panaceamed.id: ${code}`,
+    shell(
+      'Kode verifikasi masuk',
+      `<p style="font-size:14px;line-height:1.6;color:#3c4a3e">Gunakan kode berikut untuk masuk. Berlaku 10 menit dan jangan dibagikan ke siapa pun.</p>
+       <div style="font-size:34px;font-weight:800;letter-spacing:8px;color:#0b7a4b;text-align:center;background:#e6f9ef;border-radius:12px;padding:16px;margin:14px 0">${code}</div>
+       <p style="font-size:12px;color:#869586">Jika Anda tidak meminta kode ini, abaikan email ini.</p>`,
+    ),
+  )
+}
+
 export function sendReceipt(to: string, name: string, pnc: number, idr: number, method: string) {
   return sendEmail(
     to,

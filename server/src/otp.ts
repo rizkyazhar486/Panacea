@@ -7,13 +7,15 @@
 import type { Request, Response } from 'express'
 import { upsertUser, userExistsByEmail, getUserByEmail, type Role } from './store.js'
 import { setSession } from './auth.js'
-import { sendWelcome } from './email.js'
+import { sendWelcome, sendOtpCode } from './email.js'
 
 const SID = process.env.TWILIO_ACCOUNT_SID || ''
 const TOKEN = process.env.TWILIO_AUTH_TOKEN || ''
 const VERIFY_SID = process.env.TWILIO_VERIFY_SERVICE_SID || ''
 
 export const otpLive = Boolean(SID && TOKEN && VERIFY_SID)
+// Email OTP is FREE (delivered via Resend) — available whenever email is set up.
+export const emailOtpLive = Boolean(process.env.RESEND_API_KEY)
 
 function twAuth(): string {
   return 'Basic ' + Buffer.from(`${SID}:${TOKEN}`).toString('base64')
@@ -58,6 +60,46 @@ export async function otpStart(req: Request, res: Response) {
   } catch (e) {
     res.status(502).json({ error: 'otp_send_failed', detail: (e as Error).message })
   }
+}
+
+// ── Email OTP (free) ────────────────────────────────────────────────────────
+// 6-digit code emailed via Resend, held in-memory with a 10-minute expiry.
+const emailCodes = new Map<string, { code: string; expires: number; tries: number }>()
+const emailLastStart = new Map<string, number>()
+const isEmail = (s: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)
+
+export async function emailOtpStart(req: Request, res: Response) {
+  if (!emailOtpLive) return res.status(503).json({ error: 'otp_not_configured' })
+  const email = String((req.body as any)?.email || '').trim().toLowerCase()
+  if (!isEmail(email)) return res.status(400).json({ error: 'bad_email' })
+  const now = Date.now()
+  if (now - (emailLastStart.get(email) ?? 0) < 30_000) return res.status(429).json({ error: 'too_soon' })
+  emailLastStart.set(email, now)
+  const code = String(Math.floor(100000 + Math.random() * 900000))
+  emailCodes.set(email, { code, expires: now + 10 * 60_000, tries: 0 })
+  const ok = await sendOtpCode(email, code)
+  if (!ok) return res.status(502).json({ error: 'otp_send_failed' })
+  res.json({ ok: true, email })
+}
+
+export async function emailOtpVerify(req: Request, res: Response) {
+  if (!emailOtpLive) return res.status(503).json({ error: 'otp_not_configured' })
+  const b = req.body as { email?: string; code?: string; name?: string; role?: Role }
+  const email = String(b.email || '').trim().toLowerCase()
+  const code = String(b.code || '').trim()
+  if (!isEmail(email) || !code) return res.status(400).json({ error: 'bad_input' })
+  const rec = emailCodes.get(email)
+  if (!rec || rec.expires < Date.now()) return res.status(401).json({ error: 'otp_expired' })
+  if (rec.tries >= 5) { emailCodes.delete(email); return res.status(429).json({ error: 'too_many_tries' }) }
+  rec.tries += 1
+  if (rec.code !== code) return res.status(401).json({ error: 'otp_invalid' })
+  emailCodes.delete(email)
+  const existing = getUserByEmail(email)
+  const isNew = !userExistsByEmail(email)
+  const user = upsertUser(email, b.name?.trim() || existing?.name || email, (b.role as Role) || existing?.role || 'pasien')
+  if (isNew) sendWelcome(user.email, user.name, user.role).catch(() => {})
+  const token = setSession(res, user.id)
+  res.json({ user, token, live: true })
 }
 
 export async function otpVerify(req: Request, res: Response) {
