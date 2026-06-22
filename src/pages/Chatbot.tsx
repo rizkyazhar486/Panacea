@@ -413,7 +413,7 @@ const mdComponents: any = {
   h3({ children, ...props }: any) { return <h3 className="my-1.5 text-sm font-bold" {...props}>{children}</h3> },
   a({ href, children, ...props }: any) { return <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand underline hover:no-underline" {...props}>{children}</a> },
   blockquote({ children, ...props }: any) { return <blockquote className="my-2 border-l-[3px] border-brand/30 pl-3 italic text-neutral-600" {...props}>{children}</blockquote> },
-  hr(...props: any) { return <hr className="my-3 border-neutral-200" {...props} /> },
+  hr(props: any) { return <hr className="my-3 border-neutral-200" {...props} /> },
 }
 
 function Bubble({ msg }: { msg: ChatMessage }) {
