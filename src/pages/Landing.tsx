@@ -169,22 +169,15 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
       </section>
 
-      {/* Marquee strip */}
+           {/* Marquee strip */}
+      <style>{`#panacea-track{animation:panaceaGo 80s linear infinite!important}@keyframes panaceaGo{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
       <div className="relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white/80 to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white/80 to-transparent" />
-        <div
-          style={{
-            display: 'flex',
-            width: 'max-content',
-            animation: 'panaceaScroll 80s linear infinite',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.animationPlayState = 'paused')}
-          onMouseLeave={(e) => (e.currentTarget.style.animationPlayState = 'running')}
-        >
-          {[0, 1, 2].map((g) => (
-            <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g !== 0}>
-              {MARQUEE.map((m, i) => (
+        <div id="panacea-track" className="flex w-max" onMouseEnter={e=>e.currentTarget.style.animationPlayState='paused'} onMouseLeave={e=>e.currentTarget.style.animationPlayState='running'}>
+          {[0,1,2].map(g=>(
+            <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g!==0}>
+              {MARQUEE.map((m,i)=>(
                 <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-400">
                   <m.icon size={18} className="text-brand/70" /> {m.label}
                 </span>
@@ -192,7 +185,6 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             </div>
           ))}
         </div>
-        <style>{`@keyframes panaceaScroll { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }`}</style>
       </div>
 
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
