@@ -58,7 +58,7 @@ function TableBlock({ lines }: { lines: string[] }) {
   const headers = rows[sepIdx - 1]
   const body = rows.filter((_: any, i: number) => i !== sepIdx - 1 && i !== sepIdx)
   return (
-    <div className="my-3 overflow-x-auto rounded-xl border border-neutral-200/80">
+    <div className="my-3 overflow-x-auto rounded-xl border border-black/5">
       <table className="w-full text-xs">
         <thead className="bg-brand/10">
           <tr>{headers.map((h: string, i: number) => <th key={i} className="whitespace-nowrap px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-brand-dark"><Inline text={h} /></th>)}</tr>
@@ -329,18 +329,18 @@ export function Chatbot() {
         </div>
 
         <div className="relative">
-          <div ref={scrollRef} onScroll={handleScroll} className="h-[52vh] space-y-4 overflow-y-auto px-5 py-5">
+          <div ref={scrollRef} onScroll={handleScroll} className="h-[52vh] space-y-6 overflow-y-auto px-5 py-6">
             {messages.length === 0 && <Welcome name={activePatient.name} keyed={keyed} />}
             {messages.map((m, idx) => {
               const isLastAi = m.role === 'assistant' && !messages.slice(idx + 1).some(mm => mm.role === 'assistant')
               return (<Bubble key={m.id} msg={m} isLastAi={isLastAi} copiedId={copiedId} feedback={feedbackMap[m.id]} onCopy={copyText} onFeedback={toggleFeedback} onRegenerate={regenerate} />)
             })}
-            {busy && (<div className="flex items-center gap-2 text-sm text-neutral-400"><LogoMark size={22} /><span className="vital-dot">AI sedang menganalisis…</span></div>)}
+            {busy && (<div className="flex items-center gap-2.5 text-sm text-neutral-400"><LogoMark size={22} /><span className="animate-pulse">AI sedang menganalisis…</span></div>)}
           </div>
           {showScrollBtn && (<button onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })} className="absolute bottom-3 right-5 z-10 grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-lg transition hover:bg-brand hover:text-white" title="Ke bawah">↓</button>)}
         </div>
 
-        {lastMsgIsAi && !busy && (<div className="flex flex-wrap gap-2 border-t border-black/5 px-5 pt-3">{QUICK_REPLIES.map(q => (<button key={q} onClick={() => setInput(q)} className="rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>))}</div>)}
+        {lastMsgIsAi && !busy && (<div className="flex flex-wrap gap-2 border-t border-black/5 px-5 pt-3">{QUICK_REPLIES.map(q => (<button key={q} onClick={() => setInput(q)} className="rounded-full border border-black/5 bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>))}</div>)}
         {error && (<div className="mx-5 mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>)}
 
         {backendEnabled && (<div className="border-t border-black/5 px-3 pt-3">
@@ -390,12 +390,18 @@ export function Chatbot() {
 function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   const suggestions = ['Saya merasa nyeri dada sejak 2 hari', 'Akhir-akhir ini sering pusing dan lemas', 'Sesak napas saat aktivitas ringan']
   return (
-    <div className="rise mx-auto max-w-lg rounded-2xl bg-brand-50/60 p-6 text-center">
+    <div className="mx-auto max-w-xl py-8 text-center">
       <LogoMark size={48} className="mx-auto" />
-      <h3 className="mt-3 text-lg font-bold">Selamat datang</h3>
-      <p className="mt-1 text-sm text-neutral-600">Asisten klinis untuk <span className="font-semibold">{name}</span>. Mulai anamnesis dengan menulis keluhan utama.</p>
+      <h3 className="mt-4 text-lg font-bold">Selamat datang{', '}{name}</h3>
+      <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Mulai anamnesis dengan menulis keluhan utama, atau pilih salah satu saran di bawah.</p>
       {!keyed && <p className="mt-2 text-xs text-accent">AI terbatas — sambungkan server atau tambah API key di Pengaturan.</p>}
-      <div className="mt-4 flex flex-wrap justify-center gap-2">{suggestions.map((s) => (<span key={s} className="rounded-full bg-white px-3 py-1 text-xs text-neutral-500 ring-1 ring-black/5">"{s}"</span>))}</div>
+      <div className="mt-6 grid gap-2 sm:grid-cols-2 max-w-lg mx-auto">
+        {suggestions.map((s) => (
+          <button key={s} onClick={() => {}} className="group/s rounded-xl border border-black/5 bg-neutral-50/50 px-4 py-3 text-left text-xs text-neutral-600 transition hover:border-brand/40 hover:bg-brand-50/50 hover:text-brand-dark">
+            <span className="block font-semibold">{s}</span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
@@ -416,28 +422,29 @@ function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegen
 
   if (isUser) {
     return (
-      <div className="rise flex justify-end">
-        <div className="flex flex-col items-end">
-          <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-brand px-4 py-2.5 text-sm leading-relaxed text-white">{msg.content}</div>
-          <span className="mt-1 text-[10px] text-neutral-400">{time}</span>
+      <div className="flex justify-end">
+        <div className="max-w-[75%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-brand px-4 py-2.5 text-sm leading-relaxed text-white shadow-sm">
+          {msg.content}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="rise flex gap-2.5">
-      <span className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50"><LogoMark size={20} /></span>
-      <div className="flex flex-col gap-1 min-w-0">
-        <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-2.5 text-sm leading-relaxed text-ink">
+    <div className="group/b flex gap-3">
+      <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand/10">
+        <LogoMark size={16} />
+      </span>
+      <div className="flex-1 min-w-0 max-w-[85%]">
+        <div className="text-sm leading-relaxed text-ink">
           <RenderContent text={msg.content} />
         </div>
-        <div className="flex items-center gap-1 pl-1">
-          <span className="text-[10px] text-neutral-400">{time}</span>
-          <button onClick={() => onCopy(msg.content, msg.id)} className="ml-1 text-[10px] text-neutral-400 hover:text-brand-dark transition">{copiedId === msg.id ? '✅ Tersalin' : '📋 Salin'}</button>
-          <button onClick={() => onFeedback(msg.id, 'up')} className={`ml-1 text-xs transition ${feedback === 'up' ? 'text-brand' : 'text-neutral-300 hover:text-brand'}`}>👍</button>
-          <button onClick={() => onFeedback(msg.id, 'down')} className={`text-xs transition ${feedback === 'down' ? 'text-accent' : 'text-neutral-300 hover:text-accent'}`}>👎</button>
-          {isLastAi && <button onClick={onRegenerate} className="ml-1 text-[10px] text-neutral-400 hover:text-brand-dark transition">🔄 Ulangi</button>}
+        <div className="mt-1.5 flex items-center gap-0.5 opacity-0 transition-opacity group-hover/b:opacity-100">
+          <span className="mr-1 text-[10px] text-neutral-400">{time}</span>
+          <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-400 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>
+          <button onClick={() => onFeedback(msg.id, 'up')} className={`rounded-md p-1 text-xs transition ${feedback === 'up' ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-100 hover:text-ink'}`}>👍</button>
+          <button onClick={() => onFeedback(msg.id, 'down')} className={`rounded-md p-1 text-xs transition ${feedback === 'down' ? 'text-accent' : 'text-neutral-400 hover:bg-neutral-100 hover:text-ink'}`}>👎</button>
+          {isLastAi && <button onClick={onRegenerate} className="rounded-md p-1 text-[10px] text-neutral-400 transition hover:bg-neutral-100 hover:text-ink">🔄</button>}
         </div>
       </div>
     </div>
