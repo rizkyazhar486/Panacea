@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, Button, Badge } from './ui'
@@ -34,7 +34,7 @@ function groupByDate(sessions: ChatSession[]) {
 
 // Inline: **bold**, *italic*, `code`, [link](url)
 function Inline({ text }: { text: string }) {
-  const parts: any[] = []
+  const parts: React.ReactNode[] = []
   const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g
   let last = 0, m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
@@ -42,7 +42,11 @@ function Inline({ text }: { text: string }) {
     if (m[2]) parts.push(<strong key={m.index} className="font-bold">{m[2]}</strong>)
     else if (m[3]) parts.push(<em key={m.index}>{m[3]}</em>)
     else if (m[4]) parts.push(<code key={m.index} className="rounded bg-black/[.06] px-1.5 py-0.5 text-[13px] font-mono">{m[4]}</code>)
-    else if (m[5]) parts.push(<a key={m.index} href={m[6]} target="_blank" rel="noopener noreferrer" className="text-brand underline">{m[5]}</a>)
+    else if (m[5]) {
+      const url = m[6]
+      const safe = /^https?:\/\//i.test(url)
+      parts.push(<a key={m.index} href={safe ? url : '#'} target="_blank" rel="noopener noreferrer" className="text-brand underline">{m[5]}</a>)
+    }
     last = m.index + m[0].length
   }
   if (last < text.length) parts.push(text.slice(last))
@@ -91,7 +95,7 @@ function isCodeBlock(lines: string[]): { is: boolean; lang?: string } {
 // Render seluruh konten AI (auto-detect tabel, list, heading, code, paragraf)
 function RenderContent({ text }: { text: string }) {
   const blocks = text.split(/\n{2,}/)
-  const elements: JSX.Element[] = []
+  const elements: React.ReactNode[] = []
 
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi]
@@ -100,7 +104,8 @@ function RenderContent({ text }: { text: string }) {
     // 1. Code block
     const cb = isCodeBlock(lines)
     if (cb.is) {
-      const codeLines = lines.slice(1, lines.findIndex((l, i) => i > 0 && l.trim() === '```') || lines.length)
+      const endIdx = lines.findIndex((l, i) => i > 0 && l.trim() === '```')
+      const codeLines = endIdx === -1 ? lines.slice(1) : lines.slice(1, endIdx)
       elements.push(
         <pre key={bi} className="my-2 overflow-x-auto rounded-xl bg-ink p-3 text-xs leading-relaxed text-white">
           <code>{codeLines.join('\n')}</code>
@@ -150,7 +155,7 @@ function RenderContent({ text }: { text: string }) {
       continue
     }
 
-    // 6. Paragraf biasa (support baris baru dengan <br/>)
+    // 6. Paragraf biasa
     elements.push(
       <p key={bi} className="my-1.5 text-sm leading-relaxed">
         {block.split('\n').map((line, li) => (
@@ -211,9 +216,13 @@ export function Chatbot() {
   const [price, setPrice] = useState(5)
   const [topup, setTopup] = useState(false)
 
+  const groupedHistory = useMemo(() => groupByDate(history), [history])
+
   useEffect(() => { setHistory(getHistory(activePatient.id)) }, [activePatient.id])
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }) }, [messages, busy, consulting])
   useEffect(() => { if (backendEnabled) api.health().then((h) => h.aiConsultPnc && setPrice(h.aiConsultPnc)).catch(() => {}) }, [])
+  useEffect(() => { return () => { window.speechSynthesis?.cancel() } }, [])
+
   function handleScroll() { const el = scrollRef.current; if (!el) return; setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 120) }
 
   function speak(text: string) {
@@ -292,13 +301,20 @@ export function Chatbot() {
     setCopiedId(msgId); setTimeout(() => setCopiedId(null), 2000)
   }
 
-  function toggleFeedback(msgId: string, type: 'up' | 'down') { setFeedbackMap(p => p[msgId] === type ? { ...p, [msgId]: undefined as any } : { ...p, [msgId]: type }) }
+  function toggleFeedback(msgId: string, type: 'up' | 'down') {
+    setFeedbackMap(prev => {
+      const next = { ...prev }
+      if (prev[msgId] === type) { delete next[msgId] } else { next[msgId] = type }
+      return next
+    })
+  }
 
   function exportChat() {
     if (messages.length === 0) return
     let text = `Chat Anamnesis — ${activePatient.name}\nTanggal: ${new Date().toLocaleDateString('id-ID')}\n${'═'.repeat(50)}\n\n`
     for (const m of messages) { const t = m.at ? new Date(m.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''; text += `[${t}] ${m.role === 'user' ? '👤 Pasien' : '🤖 AI'}:\n${m.content.replace(/[*_#>`~]/g, '')}\n\n` }
     const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chat-${activePatient.name}-${new Date().toISOString().slice(0, 10)}.txt`; a.click()
+    setTimeout(() => { URL.revokeObjectURL(a.href) }, 1000)
   }
 
   function startNewChat() {
@@ -376,7 +392,7 @@ export function Chatbot() {
             <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3"><h3 className="font-bold text-sm">📜 Riwayat Chat</h3><button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button></div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
               <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Simpan & mulai chat baru</button>
-              {groupByDate(history).map(group => (
+              {groupedHistory.map(group => (
                 <div key={group.label} className="mt-3">
                   <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">{group.label}</div>
                   {group.items.map(session => (
@@ -414,7 +430,7 @@ function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
 }
 
 /* ═══════════════════════════════════════════
-   BUBBLE (dengan RenderContent langsung)
+   BUBBLE
    ═══════════════════════════════════════════ */
 interface BubbleProps {
   msg: ChatMessage
