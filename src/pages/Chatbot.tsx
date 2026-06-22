@@ -1,17 +1,14 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
-import { Card, Button, Badge } from './ui'
-import { IconSend, IconSparkle, IconChat } from './icons'
-import { LogoMark } from './components/Logo'
+import { Card, Button, Badge } from '../components/ui'
+import { IconSend, IconSparkle, IconChat } from '../components/icons'
+import { LogoMark } from '../components/Logo'
 import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
-/* ═══════════════════════════════════════════
-   CHAT HISTORY (localStorage)
-   ═══════════════════════════════════════════ */
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
 function getHistory(pid: string): ChatSession[] { try { const r = localStorage.getItem(`ph_${pid}`); return r ? JSON.parse(r) : [] } catch { return [] } }
 function saveHistory(pid: string, s: ChatSession[]) { localStorage.setItem(`ph_${pid}`, JSON.stringify(s)) }
@@ -28,13 +25,8 @@ function groupByDate(sessions: ChatSession[]) {
   return g
 }
 
-/* ═══════════════════════════════════════════
-   DIRECT CONTENT PARSER (tanpa library markdown)
-   ═══════════════════════════════════════════ */
-
-// Inline: **bold**, *italic*, `code`, [link](url)
 function Inline({ text }: { text: string }) {
-  const parts: React.ReactNode[] = []
+  const parts: any[] = []
   const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g
   let last = 0, m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
@@ -53,30 +45,28 @@ function Inline({ text }: { text: string }) {
   return <>{parts}</>
 }
 
-// Cek apakah blok teks adalah tabel markdown
 function isTableBlock(lines: string[]): boolean {
   if (lines.length < 2) return false
   if (!lines[0].includes('|')) return false
   return lines.some(l => /^\|[\s\-:|]+\|$/.test(l.trim()))
 }
 
-// Parse blok tabel → HTML table
 function TableBlock({ lines }: { lines: string[] }) {
-  const rows = lines.filter(l => l.trim()).map(l => l.split('|').map(c => c.trim()).filter((_, i, arr) => i > 0 && i < arr.length - 1))
+  const rows = lines.filter(l => l.trim()).map(l => l.split('|').map(c => c.trim()).filter((_: any, i: number, arr: any[]) => i > 0 && i < arr.length - 1))
   const sepIdx = lines.findIndex(l => /^\|[\s\-:|]+\|$/.test(l.trim()))
   if (sepIdx < 1) return null
   const headers = rows[sepIdx - 1]
-  const body = rows.filter((_, i) => i !== sepIdx - 1 && i !== sepIdx)
+  const body = rows.filter((_: any, i: number) => i !== sepIdx - 1 && i !== sepIdx)
   return (
     <div className="my-3 overflow-x-auto rounded-xl border border-neutral-200/80">
       <table className="w-full text-xs">
         <thead className="bg-brand/10">
-          <tr>{headers.map((h, i) => <th key={i} className="whitespace-nowrap px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-brand-dark"><Inline text={h} /></th>)}</tr>
+          <tr>{headers.map((h: string, i: number) => <th key={i} className="whitespace-nowrap px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-brand-dark"><Inline text={h} /></th>)}</tr>
         </thead>
         <tbody>
-          {body.map((row, ri) => (
+          {body.map((row: string[], ri: number) => (
             <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-neutral-50/50'}>
-              {row.map((cell, ci) => <td key={ci} className="border-t border-neutral-100 px-3 py-2 text-xs"><Inline text={cell} /></td>)}
+              {row.map((cell: string, ci: number) => <td key={ci} className="border-t border-neutral-100 px-3 py-2 text-xs"><Inline text={cell} /></td>)}
             </tr>
           ))}
         </tbody>
@@ -85,26 +75,23 @@ function TableBlock({ lines }: { lines: string[] }) {
   )
 }
 
-// Cek apakah blok adalah code block (```)
 function isCodeBlock(lines: string[]): { is: boolean; lang?: string } {
   const first = lines[0]?.trim()
   if (first?.startsWith('```')) return { is: true, lang: first.slice(3).trim() || undefined }
   return { is: false }
 }
 
-// Render seluruh konten AI (auto-detect tabel, list, heading, code, paragraf)
 function RenderContent({ text }: { text: string }) {
   const blocks = text.split(/\n{2,}/)
-  const elements: React.ReactNode[] = []
+  const elements: any[] = []
 
   for (let bi = 0; bi < blocks.length; bi++) {
     const block = blocks[bi]
     const lines = block.split('\n')
 
-    // 1. Code block
     const cb = isCodeBlock(lines)
     if (cb.is) {
-      const endIdx = lines.findIndex((l, i) => i > 0 && l.trim() === '```')
+      const endIdx = lines.findIndex((l: string, i: number) => i > 0 && l.trim() === '```')
       const codeLines = endIdx === -1 ? lines.slice(1) : lines.slice(1, endIdx)
       elements.push(
         <pre key={bi} className="my-2 overflow-x-auto rounded-xl bg-ink p-3 text-xs leading-relaxed text-white">
@@ -114,13 +101,11 @@ function RenderContent({ text }: { text: string }) {
       continue
     }
 
-    // 2. Table block
     if (isTableBlock(lines)) {
       elements.push(<TableBlock key={bi} lines={lines} />)
       continue
     }
 
-    // 3. List block
     const listItems: string[] = []
     const listType = lines[0]?.match(/^[\s]*[-*]\s/) ? 'ul' : lines[0]?.match(/^[\s]*\d+\.\s/) ? 'ol' : null
     if (listType) {
@@ -129,14 +114,13 @@ function RenderContent({ text }: { text: string }) {
         if (m) listItems.push(m[1])
       }
       if (listType === 'ul') {
-        elements.push(<ul key={bi} className="my-1.5 ml-4 list-disc space-y-0.5 text-sm">{listItems.map((li, i) => <li key={i}><Inline text={li} /></li>)}</ul>)
+        elements.push(<ul key={bi} className="my-1.5 ml-4 list-disc space-y-0.5 text-sm">{listItems.map((li: string, i: number) => <li key={i}><Inline text={li} /></li>)}</ul>)
       } else {
-        elements.push(<ol key={bi} className="my-1.5 ml-4 list-decimal space-y-0.5 text-sm">{listItems.map((li, i) => <li key={i}><Inline text={li} /></li>)}</ol>)
+        elements.push(<ol key={bi} className="my-1.5 ml-4 list-decimal space-y-0.5 text-sm">{listItems.map((li: string, i: number) => <li key={i}><Inline text={li} /></li>)}</ol>)
       }
       continue
     }
 
-    // 4. Heading
     const hMatch = lines[0]?.match(/^(#{1,3})\s+(.+)/)
     if (hMatch && lines.length <= 2) {
       const lvl = hMatch[1].length
@@ -145,20 +129,18 @@ function RenderContent({ text }: { text: string }) {
       continue
     }
 
-    // 5. Blockquote
     if (lines.every(l => /^>\s?/.test(l))) {
       elements.push(
         <blockquote key={bi} className="my-2 border-l-[3px] border-brand/30 pl-3 italic text-neutral-600">
-          {lines.map((l, i) => <p key={i} className="text-sm"><Inline text={l.replace(/^>\s?/, '')} /></p>)}
+          {lines.map((l: string, i: number) => <p key={i} className="text-sm"><Inline text={l.replace(/^>\s?/, '')} /></p>)}
         </blockquote>
       )
       continue
     }
 
-    // 6. Paragraf biasa
     elements.push(
       <p key={bi} className="my-1.5 text-sm leading-relaxed">
-        {block.split('\n').map((line, li) => (
+        {block.split('\n').map((line: string, li: number) => (
           <span key={li}>{li > 0 && <br />}<Inline text={line} /></span>
         ))}
       </p>
@@ -168,9 +150,6 @@ function RenderContent({ text }: { text: string }) {
   return <>{elements}</>
 }
 
-/* ═══════════════════════════════════════════
-   EXISTING HELPERS
-   ═══════════════════════════════════════════ */
 function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
   const p = store.activePatient
   const vitals = store.state.vitals[p.id] ?? []
@@ -189,9 +168,6 @@ function autoObjective(messages: ChatMessage[], latest?: PatientContext['latestV
 
 const QUICK_REPLIES = ['Jelaskan lebih detail', 'Berikan alternatif tata laksana', 'Pemeriksaan penunjang apa yang disarankan?', 'Apa red flag yang perlu diwaspadai?']
 
-/* ═══════════════════════════════════════════
-   MAIN COMPONENT
-   ═══════════════════════════════════════════ */
 export function Chatbot() {
   const store = useStore()
   const { state, activePatient, setChat, saveRecord } = store
@@ -215,8 +191,6 @@ export function Chatbot() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [price, setPrice] = useState(5)
   const [topup, setTopup] = useState(false)
-
-  const groupedHistory = useMemo(() => groupByDate(history), [history])
 
   useEffect(() => { setHistory(getHistory(activePatient.id)) }, [activePatient.id])
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }) }, [messages, busy, consulting])
@@ -392,7 +366,7 @@ export function Chatbot() {
             <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3"><h3 className="font-bold text-sm">📜 Riwayat Chat</h3><button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button></div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
               <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Simpan & mulai chat baru</button>
-              {groupedHistory.map(group => (
+              {groupByDate(history).map(group => (
                 <div key={group.label} className="mt-3">
                   <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">{group.label}</div>
                   {group.items.map(session => (
@@ -413,9 +387,6 @@ export function Chatbot() {
   )
 }
 
-/* ═══════════════════════════════════════════
-   WELCOME
-   ═══════════════════════════════════════════ */
 function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   const suggestions = ['Saya merasa nyeri dada sejak 2 hari', 'Akhir-akhir ini sering pusing dan lemas', 'Sesak napas saat aktivitas ringan']
   return (
@@ -429,9 +400,6 @@ function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   )
 }
 
-/* ═══════════════════════════════════════════
-   BUBBLE
-   ═══════════════════════════════════════════ */
 interface BubbleProps {
   msg: ChatMessage
   isLastAi: boolean
