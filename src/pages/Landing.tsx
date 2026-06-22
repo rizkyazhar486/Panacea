@@ -179,7 +179,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       to { transform: translateX(-50%); }
     }
     .marquee-slow {
-      animation: marquee-slow 10s linear infinite; /* ⬅️ Ubah 40s sesuai keinginan */
+      animation: marquee-slow 48s linear infinite;
     }
     .marquee-pause:hover .marquee-slow {
       animation-play-state: paused;
