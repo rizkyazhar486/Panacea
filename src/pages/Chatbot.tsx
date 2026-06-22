@@ -185,6 +185,7 @@ export function Chatbot() {
   const recogRef = useRef<any>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const attachRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLInputElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const [showHistory, setShowHistory] = useState(false)
   const [history, setHistory] = useState<ChatSession[]>([])
@@ -226,10 +227,20 @@ export function Chatbot() {
     if (!file) return; setShowAttach(false); setAnalyzing(true); setError('')
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
-      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🩻 Mengunggah citra: ${file.name}`, at: new Date().toISOString() }])
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Mengunggah gambar: ${file.name}`, at: new Date().toISOString() }])
       const r = await api.aiVision(dataUrl, 'Analisis citra pemeriksaan penunjang ini.')
-      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🩻 **Analisis Penunjang**\n\n${r.text}`, at: new Date().toISOString() }))
-    } catch { setError('Gagal menganalisis citra.') } finally { setAnalyzing(false) }
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Analisis Gambar**\n\n${r.text}`, at: new Date().toISOString() }))
+    } catch { setError('Gagal menganalisis gambar.') } finally { setAnalyzing(false) }
+  }
+
+  async function uploadFile(file?: File) {
+    if (!file) return; setShowAttach(false); setAnalyzing(true); setError('')
+    try {
+      const dataUrl = await readAsDataUrl(file)
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `📎 Mengunggah file: ${file.name}`, at: new Date().toISOString() }])
+      const r = await api.aiVision(dataUrl, `Baca dan analisis isi file ${file.name} ini.`)
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `📎 **Analisis File**\n\n${r.text}`, at: new Date().toISOString() }))
+    } catch { setError('Gagal menganalisis file.') } finally { setAnalyzing(false) }
   }
 
   async function deepConsult() {
@@ -395,32 +406,41 @@ export function Chatbot() {
         {/* Input Bar */}
         <div className="shrink-0 border-t border-black/5 bg-white p-3">
           <div className="mx-auto flex max-w-3xl items-end gap-1.5 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 shadow-sm focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10 transition">
+            {/* Tombol + */}
             <div className="relative" ref={attachRef}>
               <button
                 onClick={() => setShowAttach(v => !v)}
                 title="Lampiran"
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-lg font-bold text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
               >
                 +
               </button>
-              {showAttach && backendEnabled && (
-                <div className="absolute bottom-12 left-0 z-20 w-52 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl">
+              {showAttach && (
+                <div className="absolute bottom-12 left-0 z-20 w-56 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl">
+                  <button
+                    onClick={() => { setShowAttach(false); imageRef.current?.click() }}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50"
+                  >
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-50 text-base">🖼️</span>
+                    <div>
+                      <div className="font-medium">Unggah Gambar</div>
+                      <div className="text-[11px] text-neutral-400">JPG, PNG, dll</div>
+                    </div>
+                  </button>
                   <button
                     onClick={() => { setShowAttach(false); fileRef.current?.click() }}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50"
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50"
                   >
-                    🩻 Unggah Penunjang
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-purple-50 text-base">📎</span>
+                    <div>
+                      <div className="font-medium">Unggah File</div>
+                      <div className="text-[11px] text-neutral-400">PDF, DOCX, dll</div>
+                    </div>
                   </button>
                 </div>
               )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={analyzing}
-                onChange={(e) => analyzeImage(e.target.files?.[0])}
-              />
+              <input ref={imageRef} type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
+              <input ref={fileRef} type="file" className="hidden" disabled={analyzing} onChange={(e) => uploadFile(e.target.files?.[0])} />
             </div>
 
             <textarea
