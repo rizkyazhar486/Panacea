@@ -170,7 +170,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       </section>
 
            {/* Marquee strip */}
-      <style>{`#panacea-track{animation:panaceaGo 80s linear infinite!important}@keyframes panaceaGo{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
+      <style>{`#panacea-track{animation:panaceaGo 45s linear infinite!important}@keyframes panaceaGo{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
       <div className="relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white/80 to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white/80 to-transparent" />
