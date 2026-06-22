@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
@@ -367,23 +369,73 @@ function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   )
 }
 
+function MermaidBlock({ code }: { code: string }) {
+  const [svg, setSvg] = useState('')
+  const [err, setErr] = useState('')
+  useEffect(() => {
+    let cancelled = false
+    import('mermaid').then((m) => {
+      m.default.initialize({ startOnLoad: false, theme: 'base', themeVariables: { primaryColor: '#e0f2fe', primaryTextColor: '#1e293b', primaryBorderColor: '#7dd3fc', fontFamily: 'inherit' } })
+      const id = 'mmd-' + Math.random().toString(36).slice(2, 10)
+      m.default.render(id, code.trim()).then(({ svg }) => { if (!cancelled) setSvg(svg) }).catch((e: any) => { if (!cancelled) setErr(e?.message || String(e)) })
+    }).catch(() => { if (!cancelled) setErr('Gagal memuat Mermaid') })
+    return () => { cancelled = true }
+  }, [code])
+  if (err) return <div className="my-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">⚠️ Diagram gagal: {err}</div>
+  if (!svg) return <div className="my-2 rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-400">⏳ Memuat diagram…</div>
+  return <div className="my-2 overflow-x-auto rounded-lg bg-white p-3" dangerouslySetInnerHTML={{ __html: svg }} />
+}
+
+const mdComponents: any = {
+  code({ className, children, ...props }: any) {
+    const match = /language-(\w+)/.exec(className || '')
+    if (match?.[1] === 'mermaid') return <MermaidBlock code={String(children).replace(/\n$/, '')} />
+    if (!className) return <code className="rounded bg-black/[.06] px-1.5 py-0.5 text-[13px] font-mono" {...props}>{children}</code>
+    return <code className={className} {...props}>{children}</code>
+  },
+  pre({ children }: any) {
+    const child = Array.isArray(children) ? children[0] : children
+    if (child?.type === MermaidBlock) return <>{children}</>
+    return <pre className="my-2 overflow-x-auto rounded-xl bg-ink p-3 text-xs leading-relaxed text-white">{children}</pre>
+  },
+  table({ children, ...props }: any) {
+    return <div className="my-3 overflow-x-auto rounded-xl border border-neutral-200/80"><table className="w-full text-xs" {...props}>{children}</table></div>
+  },
+  thead({ children, ...props }: any) { return <thead className="bg-brand/10" {...props}>{children}</thead> },
+  th({ children, ...props }: any) { return <th className="whitespace-nowrap px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-brand-dark" {...props}>{children}</th> },
+  td({ children, ...props }: any) { return <td className="border-t border-neutral-100 px-3 py-2 text-xs" {...props}>{children}</td> },
+  ul({ children, ...props }: any) { return <ul className="my-1.5 ml-4 list-disc space-y-0.5 text-sm" {...props}>{children}</ul> },
+  ol({ children, ...props }: any) { return <ol className="my-1.5 ml-4 list-decimal space-y-0.5 text-sm" {...props}>{children}</ol> },
+  p({ children, ...props }: any) { return <p className="my-1.5 text-sm leading-relaxed" {...props}>{children}</p> },
+  strong({ children, ...props }: any) { return <strong className="font-bold" {...props}>{children}</strong> },
+  h1({ children, ...props }: any) { return <h1 className="my-2 text-base font-bold" {...props}>{children}</h1> },
+  h2({ children, ...props }: any) { return <h2 className="my-2 text-[15px] font-bold" {...props}>{children}</h2> },
+  h3({ children, ...props }: any) { return <h3 className="my-1.5 text-sm font-bold" {...props}>{children}</h3> },
+  a({ href, children, ...props }: any) { return <a href={href} target="_blank" rel="noopener noreferrer" className="text-brand underline hover:no-underline" {...props}>{children}</a> },
+  blockquote({ children, ...props }: any) { return <blockquote className="my-2 border-l-[3px] border-brand/30 pl-3 italic text-neutral-600" {...props}>{children}</blockquote> },
+  hr(...props: any) { return <hr className="my-3 border-neutral-200" {...props} /> },
+}
+
 function Bubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user'
+  if (isUser) {
+    return (
+      <div className="rise flex justify-end">
+        <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-brand px-4 py-2.5 text-sm leading-relaxed text-white">
+          {msg.content}
+        </div>
+      </div>
+    )
+  }
   return (
-    <div className={`rise flex gap-2.5 ${isUser ? 'flex-row-reverse' : ''}`}>
-      {!isUser && (
-        <span className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50">
-          <LogoMark size={20} />
-        </span>
-      )}
-      <div
-        className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-          isUser
-            ? 'rounded-tr-sm bg-brand text-white'
-            : 'rounded-tl-sm bg-neutral-100 text-ink'
-        }`}
-      >
-        {msg.content}
+    <div className="rise flex gap-2.5">
+      <span className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-50">
+        <LogoMark size={20} />
+      </span>
+      <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-2.5 text-sm leading-relaxed text-ink">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+          {msg.content}
+        </ReactMarkdown>
       </div>
     </div>
   )
