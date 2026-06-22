@@ -170,22 +170,34 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       </section>
 
       {/* Marquee strip */}
-      <div className="marquee-pause relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
-        <div className="marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-16" />
-        <div className="marquee-fade-r pointer-events-none absolute inset-y-0 right-0 z-10 w-16" />
-        <div className="flex w-max animate-marquee">
-          {/* Dua grup identik → loop mulus tanpa "lompatan" */}
-          {[0, 1].map((g) => (
-            <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g === 1}>
-              {MARQUEE.map((m, i) => (
-                <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-400">
-                  <m.icon size={18} className="text-brand/70" /> {m.label}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
+<div className="marquee-pause relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
+  <div className="marquee-fade pointer-events-none absolute inset-y-0 left-0 z-10 w-16" />
+  <div className="marquee-fade-r pointer-events-none absolute inset-y-0 right-0 z-10 w-16" />
+  <style>{`
+    @keyframes marquee-slow {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .marquee-slow {
+      animation: marquee-slow 40s linear infinite; /* ⬅️ Ubah 40s sesuai keinginan */
+    }
+    .marquee-pause:hover .marquee-slow {
+      animation-play-state: paused;
+    }
+  `}</style>
+  <div className="marquee-slow flex w-max">
+    {/* Dua grup identik → loop mulus tanpa "lompatan" */}
+    {[0, 1].map((g) => (
+      <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g === 1}>
+        {MARQUEE.map((m, i) => (
+          <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-400">
+            <m.icon size={18} className="text-brand/70" /> {m.label}
+          </span>
+        ))}
       </div>
+    ))}
+  </div>
+</div>
 
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
       <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
