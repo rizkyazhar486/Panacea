@@ -179,11 +179,13 @@ export function Chatbot() {
   const [error, setError] = useState('')
   const [consulting, setConsulting] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
-  const [dragging, setDragging] = useState(false)
   const [listening, setListening] = useState(false)
   const [voiceOut, setVoiceOut] = useState(false)
+  const [showAttach, setShowAttach] = useState(false)
   const recogRef = useRef<any>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const attachRef = useRef<HTMLDivElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [showHistory, setShowHistory] = useState(false)
   const [history, setHistory] = useState<ChatSession[]>([])
   const [showScrollBtn, setShowScrollBtn] = useState(false)
@@ -196,6 +198,11 @@ export function Chatbot() {
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }) }, [messages, busy, consulting])
   useEffect(() => { if (backendEnabled) api.health().then((h) => h.aiConsultPnc && setPrice(h.aiConsultPnc)).catch(() => {}) }, [])
   useEffect(() => { return () => { window.speechSynthesis?.cancel() } }, [])
+  useEffect(() => {
+    function clickOutside(e: MouseEvent) { if (showAttach && attachRef.current && !attachRef.current.contains(e.target as Node)) setShowAttach(false) }
+    document.addEventListener('mousedown', clickOutside)
+    return () => document.removeEventListener('mousedown', clickOutside)
+  }, [showAttach])
 
   function handleScroll() { const el = scrollRef.current; if (!el) return; setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 120) }
 
@@ -216,7 +223,7 @@ export function Chatbot() {
   }
 
   async function analyzeImage(file?: File) {
-    if (!file) return; setAnalyzing(true); setError('')
+    if (!file) return; setShowAttach(false); setAnalyzing(true); setError('')
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
       setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🩻 Mengunggah citra: ${file.name}`, at: new Date().toISOString() }])
@@ -312,8 +319,9 @@ export function Chatbot() {
       </div>
       {topup && (<div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm"><span className="text-accent">Saldo PNC tidak cukup ({price} PNC).</span><Button onClick={() => nav('/billing')} className="!px-4 !py-1.5 text-xs">Top up</Button></div>)}
 
-      <Card pad={false} className="overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
+      <Card pad={false} className="overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
+        {/* Header */}
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
           <div className="flex items-center gap-2.5">
             <button onClick={() => setShowHistory(true)} title="Riwayat chat" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
             <IconChat className="text-brand" size={20} />
@@ -328,8 +336,9 @@ export function Chatbot() {
           </div>
         </div>
 
-        <div className="relative">
-          <div ref={scrollRef} onScroll={handleScroll} className="h-[52vh] space-y-6 overflow-y-auto px-5 py-6">
+        {/* Chat Area - full height */}
+        <div className="relative flex-1 min-h-0">
+          <div ref={scrollRef} onScroll={handleScroll} className="h-full space-y-5 overflow-y-auto px-5 py-6">
             {messages.length === 0 && <Welcome name={activePatient.name} keyed={keyed} />}
             {messages.map((m, idx) => {
               const isLastAi = m.role === 'assistant' && !messages.slice(idx + 1).some(mm => mm.role === 'assistant')
@@ -340,25 +349,76 @@ export function Chatbot() {
           {showScrollBtn && (<button onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })} className="absolute bottom-3 right-5 z-10 grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-lg transition hover:bg-brand hover:text-white" title="Ke bawah">↓</button>)}
         </div>
 
-        {lastMsgIsAi && !busy && (<div className="flex flex-wrap gap-2 border-t border-black/5 px-5 pt-3">{QUICK_REPLIES.map(q => (<button key={q} onClick={() => setInput(q)} className="rounded-full border border-black/5 bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>))}</div>)}
-        {error && (<div className="mx-5 mb-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>)}
+        {/* Quick Replies */}
+        {lastMsgIsAi && !busy && (
+          <div className="shrink-0 flex flex-wrap gap-2 border-t border-black/5 px-5 py-2.5">
+            {QUICK_REPLIES.map(q => (<button key={q} onClick={() => setInput(q)} className="rounded-full border border-black/5 bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>))}
+          </div>
+        )}
+        {error && (<div className="shrink-0 mx-5 mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>)}
 
-        {backendEnabled && (<div className="border-t border-black/5 px-3 pt-3">
-          <label onDragOver={(e) => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)} onDrop={(e) => { e.preventDefault(); setDragging(false); analyzeImage(e.dataTransfer.files?.[0]) }} className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed px-4 py-3 text-center transition ${dragging ? 'border-brand bg-brand-50' : 'border-brand/30 bg-brand-50/40 hover:bg-brand-50'}`}>
-            <span className="text-lg">{analyzing ? '🔬' : '🩻'}</span><span className="text-[11px] font-bold text-brand-dark">{analyzing ? 'Menganalisis…' : 'Seret/ klik untuk unggah Penunjang'}</span>
-            <input type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
-          </label>
-        </div>)}
+        {/* Input Bar - Gemini/ChatGPT style */}
+        <div className="shrink-0 border-t border-black/5 bg-white p-3">
+          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 shadow-sm focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10 transition">
+            {/* Tombol + (Attach) */}
+            <div className="relative" ref={attachRef}>
+              <button
+                onClick={() => setShowAttach(v => !v)}
+                title="Lampiran"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              {showAttach && backendEnabled && (
+                <div className="absolute bottom-12 left-0 z-20 w-52 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl">
+                  <button onClick={() => { setShowAttach(false); fileRef.current?.click() }} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50">
+                    <span>🩻</span> Unggah Penunjang
+                  </button>
+                </div>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
+            </div>
 
-        <div className="flex items-end gap-2 border-t border-black/5 p-3">
-          <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }} rows={1} placeholder="Tulis atau tekan 🎤… (Enter kirim)" className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-neutral-200 px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
-          <button onClick={toggleMic} title="Input suara" className={`grid h-[44px] w-[44px] shrink-0 place-items-center rounded-xl border transition ${listening ? 'animate-pulse border-accent bg-accent text-white' : 'border-neutral-200 bg-white text-neutral-500 hover:text-brand-dark'}`}>🎤</button>
-          <button onClick={() => { setVoiceOut(v => { if (v) window.speechSynthesis?.cancel(); return !v }) }} title={voiceOut ? 'Matikan suara' : 'Aktifkan suara'} className={`grid h-[44px] w-[44px] shrink-0 place-items-center rounded-xl border transition ${voiceOut ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 bg-white text-neutral-500 hover:text-brand-dark'}`}>{voiceOut ? '🔊' : '🔈'}</button>
-          <Button onClick={send} disabled={busy || !input.trim()} className="h-[44px]"><IconSend size={16} /> Kirim</Button>
+            {/* Textarea */}
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+              rows={1}
+              placeholder="Tulis keluhan atau pertanyaan medis…"
+              className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-400"
+            />
+
+            {/* Mic */}
+            <button
+              onClick={toggleMic}
+              title="Input suara"
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+            >
+              🎤
+            </button>
+
+            {/* Voice Out */}
+            <button
+              onClick={() => { setVoiceOut(v => { if (v) window.speechSynthesis?.cancel(); return !v }) }}
+              title={voiceOut ? 'Matikan suara' : 'Aktifkan suara'}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition ${voiceOut ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+            >
+              {voiceOut ? '🔊' : '🔈'}
+            </button>
+
+            {/* Send */}
+            <button
+              onClick={send}
+              disabled={busy || !input.trim()}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white transition hover:brightness-110 disabled:opacity-30 disabled:hover:brightness-100"
+            >
+              <IconSend size={16} />
+            </button>
+          </div>
+          <p className="mt-2 text-center text-[10px] text-neutral-400">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
         </div>
       </Card>
-
-      <p className="px-1 text-xs text-neutral-400">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
 
       {showHistory && (
         <div className="fixed inset-0 z-50 flex">
@@ -390,15 +450,15 @@ export function Chatbot() {
 function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   const suggestions = ['Saya merasa nyeri dada sejak 2 hari', 'Akhir-akhir ini sering pusing dan lemas', 'Sesak napas saat aktivitas ringan']
   return (
-    <div className="mx-auto max-w-xl py-8 text-center">
-      <LogoMark size={48} className="mx-auto" />
-      <h3 className="mt-4 text-lg font-bold">Selamat datang{', '}{name}</h3>
-      <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Mulai anamnesis dengan menulis keluhan utama, atau pilih salah satu saran di bawah.</p>
+    <div className="mx-auto max-w-xl py-12 text-center">
+      <LogoMark size={52} className="mx-auto" />
+      <h3 className="mt-5 text-xl font-bold">Selamat datang{', '}{name}</h3>
+      <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Mulai anamnesis dengan menulis keluhan utama di bawah, atau pilih salah satu saran.</p>
       {!keyed && <p className="mt-2 text-xs text-accent">AI terbatas — sambungkan server atau tambah API key di Pengaturan.</p>}
-      <div className="mt-6 grid gap-2 sm:grid-cols-2 max-w-lg mx-auto">
+      <div className="mt-8 grid gap-2.5 sm:grid-cols-1 max-w-md mx-auto">
         {suggestions.map((s) => (
-          <button key={s} onClick={() => {}} className="group/s rounded-xl border border-black/5 bg-neutral-50/50 px-4 py-3 text-left text-xs text-neutral-600 transition hover:border-brand/40 hover:bg-brand-50/50 hover:text-brand-dark">
-            <span className="block font-semibold">{s}</span>
+          <button key={s} onClick={() => {}} className="rounded-xl border border-black/5 bg-neutral-50/50 px-4 py-3 text-left text-xs text-neutral-600 transition hover:border-brand/30 hover:bg-brand-50/40 hover:text-brand-dark">
+            {s}
           </button>
         ))}
       </div>
@@ -436,10 +496,10 @@ function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegen
         <LogoMark size={16} />
       </span>
       <div className="flex-1 min-w-0 max-w-[85%]">
-        <div className="text-sm leading-relaxed text-ink">
+        <div className="rounded-2xl rounded-tl-sm bg-neutral-50 px-4 py-3 text-sm leading-relaxed text-ink">
           <RenderContent text={msg.content} />
         </div>
-        <div className="mt-1.5 flex items-center gap-0.5 opacity-0 transition-opacity group-hover/b:opacity-100">
+        <div className="mt-1 flex items-center gap-0.5 pl-1 opacity-0 transition-opacity group-hover/b:opacity-100">
           <span className="mr-1 text-[10px] text-neutral-400">{time}</span>
           <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-400 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>
           <button onClick={() => onFeedback(msg.id, 'up')} className={`rounded-md p-1 text-xs transition ${feedback === 'up' ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-100 hover:text-ink'}`}>👍</button>
