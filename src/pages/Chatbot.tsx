@@ -312,74 +312,117 @@ export function Chatbot() {
   const lastMsgIsAi = messages.length > 0 && messages[messages.length - 1].role === 'assistant'
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-[calc(100vh-140px)] min-h-[500px] flex-col">
       <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] leading-snug text-amber-800">
         <span className="mt-0.5 shrink-0">⚕️</span>
         <span><b>Penting:</b> AI ini bersifat <b>edukatif &amp; pendukung</b>, bukan pengganti dokter. Untuk keadaan darurat, segera gunakan <b>Darurat SOS</b>.</span>
       </div>
-      {topup && (<div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm"><span className="text-accent">Saldo PNC tidak cukup ({price} PNC).</span><Button onClick={() => nav('/billing')} className="!px-4 !py-1.5 text-xs">Top up</Button></div>)}
+      {topup && (
+        <div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm">
+          <span className="text-accent">Saldo PNC tidak cukup ({price} PNC).</span>
+          <Button onClick={() => nav('/billing')} className="!px-4 !py-1.5 text-xs">Top up</Button>
+        </div>
+      )}
 
-      <Card pad={false} className="overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
+      <Card pad={false} className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
           <div className="flex items-center gap-2.5">
             <button onClick={() => setShowHistory(true)} title="Riwayat chat" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
             <IconChat className="text-brand" size={20} />
-            <div><div className="font-bold">Anamnesis Co-Physician</div><div className="text-xs text-neutral-500">AI mewawancara pasien & merekomendasikan penunjang</div></div>
+            <div>
+              <div className="font-bold">Anamnesis Co-Physician</div>
+              <div className="text-xs text-neutral-500">AI mewawancara pasien &amp; merekomendasikan penunjang</div>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Aktif' : 'AI Terbatas'}</Badge>
             <Button variant="outline" onClick={startNewChat} disabled={messages.length === 0}>➕ Chat Baru</Button>
             <Button variant="outline" onClick={exportChat} disabled={messages.length === 0}>📥 Export</Button>
-            {backendEnabled && (<Button variant="outline" onClick={deepConsult} disabled={consulting || messages.length === 0}><IconSparkle size={16} />{consulting ? 'Menganalisis…' : `${price} PNC`}</Button>)}
-            {store.account?.role === 'dokter' ? (<Button onClick={makeDraft} disabled={drafting || messages.length === 0}><IconSparkle size={16} />{drafting ? 'Menyusun…' : 'Susun Draft AI-EMR'}</Button>) : (<Badge tone="neutral">Diteruskan ke dokter</Badge>)}
+            {backendEnabled && (
+              <Button variant="outline" onClick={deepConsult} disabled={consulting || messages.length === 0}>
+                <IconSparkle size={16} />{consulting ? 'Menganalisis…' : `${price} PNC`}
+              </Button>
+            )}
+            {store.account?.role === 'dokter' ? (
+              <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
+                <IconSparkle size={16} />{drafting ? 'Menyusun…' : 'Susun Draft AI-EMR'}
+              </Button>
+            ) : (
+              <Badge tone="neutral">Diteruskan ke dokter</Badge>
+            )}
           </div>
         </div>
 
-        {/* Chat Area - full height */}
-        <div className="relative flex-1 min-h-0">
+        {/* Chat Area */}
+        <div className="relative min-h-0 flex-1">
           <div ref={scrollRef} onScroll={handleScroll} className="h-full space-y-5 overflow-y-auto px-5 py-6">
             {messages.length === 0 && <Welcome name={activePatient.name} keyed={keyed} />}
             {messages.map((m, idx) => {
               const isLastAi = m.role === 'assistant' && !messages.slice(idx + 1).some(mm => mm.role === 'assistant')
               return (<Bubble key={m.id} msg={m} isLastAi={isLastAi} copiedId={copiedId} feedback={feedbackMap[m.id]} onCopy={copyText} onFeedback={toggleFeedback} onRegenerate={regenerate} />)
             })}
-            {busy && (<div className="flex items-center gap-2.5 text-sm text-neutral-400"><LogoMark size={22} /><span className="animate-pulse">AI sedang menganalisis…</span></div>)}
+            {busy && (
+              <div className="flex items-center gap-2.5 text-sm text-neutral-400">
+                <LogoMark size={22} />
+                <span className="animate-pulse">AI sedang menganalisis…</span>
+              </div>
+            )}
           </div>
-          {showScrollBtn && (<button onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })} className="absolute bottom-3 right-5 z-10 grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-lg transition hover:bg-brand hover:text-white" title="Ke bawah">↓</button>)}
+          {showScrollBtn && (
+            <button
+              onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })}
+              className="absolute bottom-3 right-5 z-10 grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-lg transition hover:bg-brand hover:text-white"
+              title="Ke bawah"
+            >
+              ↓
+            </button>
+          )}
         </div>
 
         {/* Quick Replies */}
         {lastMsgIsAi && !busy && (
           <div className="shrink-0 flex flex-wrap gap-2 border-t border-black/5 px-5 py-2.5">
-            {QUICK_REPLIES.map(q => (<button key={q} onClick={() => setInput(q)} className="rounded-full border border-black/5 bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>))}
+            {QUICK_REPLIES.map(q => (
+              <button key={q} onClick={() => setInput(q)} className="rounded-full border border-black/5 bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500 transition hover:border-brand hover:text-brand-dark">{q}</button>
+            ))}
           </div>
         )}
-        {error && (<div className="shrink-0 mx-5 mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>)}
+        {error && (
+          <div className="shrink-0 mx-5 mb-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-accent">{error}</div>
+        )}
 
-        {/* Input Bar - Gemini/ChatGPT style */}
+        {/* Input Bar */}
         <div className="shrink-0 border-t border-black/5 bg-white p-3">
-          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 shadow-sm focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10 transition">
-            {/* Tombol + (Attach) */}
+          <div className="mx-auto flex max-w-3xl items-end gap-1.5 rounded-2xl border border-neutral-200 bg-neutral-50 px-3 py-2 shadow-sm focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10 transition">
             <div className="relative" ref={attachRef}>
               <button
                 onClick={() => setShowAttach(v => !v)}
                 title="Lampiran"
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                +
               </button>
               {showAttach && backendEnabled && (
                 <div className="absolute bottom-12 left-0 z-20 w-52 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-xl">
-                  <button onClick={() => { setShowAttach(false); fileRef.current?.click() }} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50">
-                    <span>🩻</span> Unggah Penunjang
+                  <button
+                    onClick={() => { setShowAttach(false); fileRef.current?.click() }}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-700 transition hover:bg-neutral-50"
+                  >
+                    🩻 Unggah Penunjang
                   </button>
                 </div>
               )}
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" disabled={analyzing} onChange={(e) => analyzeImage(e.target.files?.[0])} />
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={analyzing}
+                onChange={(e) => analyzeImage(e.target.files?.[0])}
+              />
             </div>
 
-            {/* Textarea */}
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -389,25 +432,22 @@ export function Chatbot() {
               className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-400"
             />
 
-            {/* Mic */}
             <button
               onClick={toggleMic}
               title="Input suara"
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               🎤
             </button>
 
-            {/* Voice Out */}
             <button
               onClick={() => { setVoiceOut(v => { if (v) window.speechSynthesis?.cancel(); return !v }) }}
               title={voiceOut ? 'Matikan suara' : 'Aktifkan suara'}
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition ${voiceOut ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${voiceOut ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               {voiceOut ? '🔊' : '🔈'}
             </button>
 
-            {/* Send */}
             <button
               onClick={send}
               disabled={busy || !input.trim()}
@@ -423,15 +463,21 @@ export function Chatbot() {
       {showHistory && (
         <div className="fixed inset-0 z-50 flex">
           <div className="w-80 max-w-[85vw] flex flex-col border-r border-neutral-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3"><h3 className="font-bold text-sm">📜 Riwayat Chat</h3><button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button></div>
+            <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
+              <h3 className="font-bold text-sm">📜 Riwayat Chat</h3>
+              <button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button>
+            </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
-              <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Simpan & mulai chat baru</button>
+              <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Simpan &amp; mulai chat baru</button>
               {groupByDate(history).map(group => (
                 <div key={group.label} className="mt-3">
                   <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">{group.label}</div>
                   {group.items.map(session => (
                     <div key={session.id} onClick={() => loadSession(session)} className="group/s flex items-center gap-2 rounded-xl px-3 py-2.5 cursor-pointer transition hover:bg-neutral-50">
-                      <div className="min-w-0 flex-1"><div className="truncate text-sm font-medium text-ink">{session.title}</div><div className="text-[11px] text-neutral-400">{new Date(session.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} pesan</div></div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-medium text-ink">{session.title}</div>
+                        <div className="text-[11px] text-neutral-400">{new Date(session.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} pesan</div>
+                      </div>
                       <button onClick={(e) => deleteSession(session.id, e)} className="shrink-0 text-neutral-300 opacity-0 transition group-hover/s:opacity-100 hover:text-red-500">🗑️</button>
                     </div>
                   ))}
@@ -452,10 +498,10 @@ function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
   return (
     <div className="mx-auto max-w-xl py-12 text-center">
       <LogoMark size={52} className="mx-auto" />
-      <h3 className="mt-5 text-xl font-bold">Selamat datang{', '}{name}</h3>
+      <h3 className="mt-5 text-xl font-bold">Selamat datang, {name}</h3>
       <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Mulai anamnesis dengan menulis keluhan utama di bawah, atau pilih salah satu saran.</p>
       {!keyed && <p className="mt-2 text-xs text-accent">AI terbatas — sambungkan server atau tambah API key di Pengaturan.</p>}
-      <div className="mt-8 grid gap-2.5 sm:grid-cols-1 max-w-md mx-auto">
+      <div className="mt-8 grid gap-2.5 max-w-md mx-auto">
         {suggestions.map((s) => (
           <button key={s} onClick={() => {}} className="rounded-xl border border-black/5 bg-neutral-50/50 px-4 py-3 text-left text-xs text-neutral-600 transition hover:border-brand/30 hover:bg-brand-50/40 hover:text-brand-dark">
             {s}
