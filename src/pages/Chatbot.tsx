@@ -34,7 +34,7 @@ function groupByDate(sessions: ChatSession[]) {
 
 // Inline: **bold**, *italic*, `code`, [link](url)
 function Inline({ text }: { text: string }) {
-  const parts: React.ReactNode[] = []
+  const parts: any[] = []
   const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\))/g
   let last = 0, m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
