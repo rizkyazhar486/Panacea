@@ -445,10 +445,11 @@ export function Dashboard() {
         </div>
       </Card>
 
-      {/* Add Vital Collapsible */}
+      {/* Add Vital Collapsible — FIX: tidak pakai style pada Card */}
       {showAdd && (
-        <Card className="overflow-hidden" style={{ borderColor: 'rgba(0,191,99,0.2)' }}>
-          <div className="border-b px-5 py-3" style={{ borderColor: 'rgba(0,191,99,0.1)', background: 'rgba(0,191,99,0.02)' }}>
+        <Card className="overflow-hidden">
+          <div className="h-[3px]" style={{ background: 'linear-gradient(90deg, #00BF63, #00BF6340, transparent)' }} />
+          <div className="border-b border-neutral-100 px-5 py-3" style={{ background: 'rgba(0,191,99,0.02)' }}>
             <SectionTitle icon={<IconHeart size={18} />} title="Catat Tanda Vital Baru" />
           </div>
           <div className="p-5"><AddVital onAdd={(v) => { addVital(p.id, v); setShowAdd(false) }} /></div>
@@ -508,7 +509,7 @@ export function Dashboard() {
         </div>
       </Card>
 
-      {/* Growth Chart — KEY FIX: patient cast ke any */}
+      {/* Growth Chart */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
