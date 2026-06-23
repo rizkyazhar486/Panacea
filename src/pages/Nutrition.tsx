@@ -1281,15 +1281,22 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
             <Button variant="outline" onClick={() => setShowForm(false)} className="h-9 text-xs rounded-xl">Batal</Button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {labKeys.map(k => (
-              <div key={k}>
-                <label className="text-[10px] font-bold text-neutral-500">{labLabels[k] || k} ({labUnits[k] || ''})</label>
-                <input className={inputClass + ' mt-0.5'} placeholder="-" value={editVals[k] ?? ''} onChange={e => setEditVals({ ...editVals, [k]: e.target.value })} type="number" step="any" />
-              </div>
-            ))}
-          </
-                     </div>
-        </div>
+  {labKeys.map(k => (
+    <div key={k}>
+      <label className="text-[10px] font-bold text-neutral-500">
+        {labLabels[k] || k} ({labUnits[k] || ''})
+      </label>
+      <input
+        className={inputClass + ' mt-0.5'}
+        placeholder="-"
+        value={editVals[k] ?? ''}
+        onChange={e => setEditVals({ ...editVals, [k]: e.target.value })}
+        type="number"
+        step="any"
+      />
+    </div>
+  ))}
+</div>
       )}
 
       {/* Lab Results Table with Weekly Comparison */}
