@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
-import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconActivity, IconFlame, IconDroplet, IconMoon, IconSun, IconShield, IconBrain, IconLungs, IconEye } from '../components/icons'
+import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import type { VitalSign } from '../lib/types'
@@ -956,7 +956,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
       </div>
       <div className="mt-3 flex items-end gap-3">
         <div className="flex-1 rounded-xl bg-neutral-50 px-4 py-3">
-          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'warn' : fd.gi > 55 ? 'neutral' : 'ok'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="ok">Rekomendasi</Badge>}{isAvoided && <Badge tone="warn">Hindari</Badge>}</div>
+          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="ok">Rekomendasi</Badge>}{isAvoided && <Badge tone="high">Hindari</Badge>}</div>
           <div className="mt-1 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
             <span style={{ color: '#0B7A4B' }}>{pv.k} kkal</span>
             <span className="text-amber-500">K{pv.c}</span>
@@ -1105,7 +1105,7 @@ function ManualEx({ body, ex, onComplete }: { body: Body; ex: Exer; onComplete: 
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-bold text-neutral-700">{ex.emoji} Manual - {ex.name}</span>
         <div className="flex items-center gap-2">
-          {ex.hiit && <Badge tone="warn">HIIT</Badge>}
+          {ex.hiit && <Badge tone="high">HIIT</Badge>}
           <span className="rounded-lg bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-600">{k} kkal</span>
         </div>
       </div>
@@ -1488,7 +1488,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">Skor Longevity</span>
             <span className="text-[9px] text-white/20">{'\u00B7'}</span>
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-            {activeProtocol && <Badge tone="warn" className="ml-2">{activeProtocol.emoji} {activeProtocol.name}</Badge>}
+            {activeProtocol && <Badge tone="high" className="ml-2">{activeProtocol.emoji} {activeProtocol.name}</Badge>}
           </div>
 
           <div className="flex items-center gap-6 mt-4">
