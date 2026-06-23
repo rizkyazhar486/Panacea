@@ -37,7 +37,6 @@ export function Settings() {
   const { state, updateSettings, resetDemo } = store
   const nav = useNavigate()
 
-  // Appearance prefs (applied immediately).
   const [themePref, setThemePrefState] = useState<ThemePref>(getThemePref)
   const [lang, setLangState] = useState<Lang>(getLang)
   const [scale, setScaleState] = useState<TextScale>(getTextScale)
@@ -46,18 +45,64 @@ export function Settings() {
   const [showPwd, setShowPwd] = useState(false)
 
   const s = state.settings
+  const S = simple // singkatan
 
-  function chooseTheme(p: ThemePref) {
-    setThemePref(p)
-    setThemePrefState(p)
-  }
-  function chooseLang(l: Lang) {
-    setLang(l)
-    setLangState(l)
-  }
+  /* ═══════════════════════════════════════════════════════════════
+     1) UBAH FONT-SIZE ROOT → semua unit rem di Tailwind ikut
+     ═══════════════════════════════════════════════════════════════ */
+  useEffect(() => {
+    const root = document.documentElement
+    const map: Record<TextScale, string> = { sm: '14px', md: '16px', lg: '18px' }
+    root.style.fontSize = simple ? '18px' : map[scale]
+    root.style.lineHeight = simple ? '1.75' : ''
+    root.style.webkitFontSmoothing = 'antialiased'
+    root.style.mozOsxFontSmoothing = 'grayscale'
+    root.style.textRendering = 'optimizeLegibility'
+    return () => {
+      root.style.fontSize = ''
+      root.style.lineHeight = ''
+      root.style.webkitFontSmoothing = ''
+      root.style.mozOsxFontSmoothing = ''
+      root.style.textRendering = ''
+    }
+  }, [scale, simple])
+
+  /* ═══════════════════════════════════════════════════════════════
+     2) REDUCED MOTION — matikan semua transisi & animasi
+     ═══════════════════════════════════════════════════════════════ */
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('reduce-motion', motion)
+    return () => root.classList.remove('reduce-motion')
+  }, [motion])
+
+  // Inject stylesheet reduced-motion sekali saja
+  useEffect(() => {
+    const id = 'panaceamed-rm'
+    if (document.getElementById(id)) return
+    const el = document.createElement('style')
+    el.id = id
+    el.textContent = `
+      .reduce-motion,
+      .reduce-motion *,
+      .reduce-motion *::before,
+      .reduce-motion *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    `
+    document.head.appendChild(el)
+  }, [])
+
+  /* ═══════════════════════════════════════════════════════════════
+     Actions
+     ═══════════════════════════════════════════════════════════════ */
+  function chooseTheme(p: ThemePref) { setThemePref(p); setThemePrefState(p) }
+  function chooseLang(l: Lang) { setLang(l); setLangState(l) }
 
   function exportData() {
-    // Strip heavy media so the export stays small & shareable.
     const { account: _a, ...rest } = state
     const slim = { ...rest, posts: rest.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
     const blob = new Blob([JSON.stringify(slim, null, 2)], { type: 'application/json' })
@@ -69,163 +114,168 @@ export function Settings() {
     URL.revokeObjectURL(url)
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     Render
+     ═══════════════════════════════════════════════════════════════ */
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      {/* ── Install as app (PWA) ───────────────────────────────── */}
+    <div className={`mx-auto max-w-3xl ${S ? 'space-y-8' : 'space-y-6'}`}>
       <InstallApp />
 
       {/* ── Appearance ─────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconSun size={20} />} title={t('appearance', lang)} subtitle={t('appearanceSub', lang)} />
-        <div className="space-y-5">
-          {/* Theme preview cards */}
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconSun size={S ? 22 : 20} />} title={t('appearance', lang)} subtitle={t('appearanceSub', lang)} />
+        <div className={`${S ? 'space-y-7' : 'space-y-5'}`}>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{t('theme', lang)}</label>
             <div className="grid grid-cols-3 gap-3">
-              <ThemeCard active={themePref === 'light'} onClick={() => chooseTheme('light')} label={t('light', lang)} preview="light" icon={<IconSun size={15} />} />
-              <ThemeCard active={themePref === 'dark'} onClick={() => chooseTheme('dark')} label={t('dark', lang)} preview="dark" icon={<IconMoon size={15} />} />
-              <ThemeCard active={themePref === 'system'} onClick={() => chooseTheme('system')} label={t('system', lang)} preview="system" icon={<IconSettings size={15} />} />
+              <ThemeCard active={themePref === 'light'} onClick={() => chooseTheme('light')} label={t('light', lang)} preview="light" icon={<IconSun size={15} />} simple={S} />
+              <ThemeCard active={themePref === 'dark'} onClick={() => chooseTheme('dark')} label={t('dark', lang)} preview="dark" icon={<IconMoon size={15} />} simple={S} />
+              <ThemeCard active={themePref === 'system'} onClick={() => chooseTheme('system')} label={t('system', lang)} preview="system" icon={<IconSettings size={15} />} simple={S} />
             </div>
           </div>
 
-          {/* Text size */}
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">{t('textSize', lang)}</label>
             <div className="grid grid-cols-3 gap-2">
-              <SegBtn active={scale === 'sm'} onClick={() => { setTextScale('sm'); setScaleState('sm') }}><span className="text-xs">A</span> {t('small', lang)}</SegBtn>
-              <SegBtn active={scale === 'md'} onClick={() => { setTextScale('md'); setScaleState('md') }}><span className="text-sm">A</span> {t('normal', lang)}</SegBtn>
-              <SegBtn active={scale === 'lg'} onClick={() => { setTextScale('lg'); setScaleState('lg') }}><span className="text-base">A</span> {t('large', lang)}</SegBtn>
+              <SegBtn active={scale === 'sm'} onClick={() => { setTextScale('sm'); setScaleState('sm') }} simple={S}><span className="text-xs">A</span> {t('small', lang)}</SegBtn>
+              <SegBtn active={scale === 'md'} onClick={() => { setTextScale('md'); setScaleState('md') }} simple={S}><span className="text-sm">A</span> {t('normal', lang)}</SegBtn>
+              <SegBtn active={scale === 'lg'} onClick={() => { setTextScale('lg'); setScaleState('lg') }} simple={S}><span className="text-base">A</span> {t('large', lang)}</SegBtn>
             </div>
           </div>
 
-          {/* Reduced motion */}
-          <ToggleRow
-            title={t('reduceMotion', lang)}
-            sub={t('reduceMotionSub', lang)}
-            on={motion}
-            onToggle={(v) => { setReducedMotion(v); setMotionState(v) }}
-          />
+          <ToggleRow title={t('reduceMotion', lang)} sub={t('reduceMotionSub', lang)} on={motion} onToggle={(v) => { setReducedMotion(v); setMotionState(v) }} simple={S} />
 
-          {/* Simple mode (elderly / non-tech) */}
+          {/* Simple mode toggle */}
           <button
             onClick={() => { const v = !simple; setSimpleMode(v); setSimpleState(v) }}
-            className={`flex w-full items-center justify-between gap-3 rounded-2xl border-2 p-4 text-left transition ${
+            className={`flex w-full items-center justify-between gap-3 rounded-2xl border-2 p-4 text-left ${
+              S ? 'p-5' : ''
+            } ${
               simple ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:bg-neutral-50'
             }`}
           >
             <span className="min-w-0">
-              <span className="flex items-center gap-2 text-base font-extrabold">👵 Mode Simpel</span>
-              <span className="mt-0.5 block text-[13px] text-neutral-500">
+              <span className={`flex items-center gap-2 font-extrabold ${S ? 'text-lg' : 'text-base'}`}>👵 Mode Simpel</span>
+              <span className={`mt-1 block text-neutral-500 ${S ? 'text-sm' : 'text-[13px]'}`}>
                 Teks &amp; tombol lebih besar, tampilan ditenangkan — cocok untuk lansia atau yang baru memakai aplikasi.
               </span>
             </span>
-            <span className={`relative h-7 w-12 shrink-0 rounded-full transition ${simple ? 'bg-brand' : 'bg-neutral-300'}`}>
-              <span className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all ${simple ? 'left-[22px]' : 'left-0.5'}`} />
+            <span className={`relative shrink-0 rounded-full ${S ? 'h-9 w-16' : 'h-7 w-12'} ${simple ? 'bg-brand' : 'bg-neutral-300'}`}>
+              <span className={`absolute top-0.5 rounded-full bg-white shadow ${S ? 'h-8 w-8' : 'h-6 w-6'} ${simple ? 'right-0.5' : 'left-0.5'}`} />
             </span>
           </button>
         </div>
       </Card>
 
       {/* ── Language ───────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconGlobe size={20} />} title={t('language', lang)} subtitle="Bahasa · Language · 语言 · اللغة" />
-        <div className="grid grid-cols-2 gap-2">
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconGlobe size={S ? 22 : 20} />} title={t('language', lang)} subtitle="Bahasa · Language · 语言 · اللغة" />
+        <div className={`grid grid-cols-2 ${S ? 'gap-3' : 'gap-2'}`}>
           {LANGS.map((l) => (
             <button
               key={l.id}
               onClick={() => chooseLang(l.id)}
-              className={`flex items-center gap-2.5 rounded-xl border p-3 text-left transition ${
+              className={`flex items-center gap-2.5 ${S ? 'rounded-2xl p-4' : 'rounded-xl p-3'} text-left border-2 ${
                 lang === l.id ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:bg-neutral-50'
               }`}
             >
-              <span className="text-xl">{l.flag}</span>
+              <span className={S ? 'text-2xl' : 'text-xl'}>{l.flag}</span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-bold">{l.native}</span>
-                <span className="block text-[11px] text-neutral-400">{l.en}</span>
+                <span className={`block truncate font-bold ${S ? 'text-base' : 'text-sm'}`}>{l.native}</span>
+                <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{l.en}</span>
               </span>
-              {lang === l.id && <IconCheck size={16} className="text-brand" />}
+              {lang === l.id && <IconCheck size={S ? 20 : 16} className="text-brand" />}
             </button>
           ))}
         </div>
       </Card>
 
       {/* ── Notifications ──────────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconBell size={20} />} title={t('notifications', lang)} subtitle={t('notifSub', lang)} />
-        <PushControl />
-        <div className="mt-3 space-y-3">
-          <ToggleRow title={t('notifVitals', lang)} sub={t('notifVitalsSub', lang)} on={s.notifVitals ?? true} onToggle={(v) => updateSettings({ notifVitals: v })} />
-          <ToggleRow title={t('notifEmail', lang)} sub={t('notifEmailSub', lang)} on={s.notifEmail ?? true} onToggle={(v) => updateSettings({ notifEmail: v })} />
-          <ToggleRow title={t('notifSms', lang)} sub={t('notifSmsSub', lang)} on={s.notifSms ?? false} onToggle={(v) => updateSettings({ notifSms: v })} />
-          <ToggleRow title={t('notifAi', lang)} sub={t('notifAiSub', lang)} on={s.notifAiInsights ?? true} onToggle={(v) => updateSettings({ notifAiInsights: v })} />
-          <ToggleRow title={t('notifTx', lang)} sub={t('notifTxSub', lang)} on={s.notifTransactions ?? true} onToggle={(v) => updateSettings({ notifTransactions: v })} />
-          <ToggleRow title={t('notifBroadcast', lang)} sub={t('notifBroadcastSub', lang)} on={s.notifBroadcasts ?? false} onToggle={(v) => updateSettings({ notifBroadcasts: v })} />
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconBell size={S ? 22 : 20} />} title={t('notifications', lang)} subtitle={t('notifSub', lang)} />
+        <PushControl simple={S} lang={lang} />
+        <div className={`mt-3 ${S ? 'space-y-4' : 'space-y-3'}`}>
+          <ToggleRow title={t('notifVitals', lang)} sub={t('notifVitalsSub', lang)} on={s.notifVitals ?? true} onToggle={(v) => updateSettings({ notifVitals: v })} simple={S} />
+          <ToggleRow title={t('notifEmail', lang)} sub={t('notifEmailSub', lang)} on={s.notifEmail ?? true} onToggle={(v) => updateSettings({ notifEmail: v })} simple={S} />
+          <ToggleRow title={t('notifSms', lang)} sub={t('notifSmsSub', lang)} on={s.notifSms ?? false} onToggle={(v) => updateSettings({ notifSms: v })} simple={S} />
+          <ToggleRow title={t('notifAi', lang)} sub={t('notifAiSub', lang)} on={s.notifAiInsights ?? true} onToggle={(v) => updateSettings({ notifAiInsights: v })} simple={S} />
+          <ToggleRow title={t('notifTx', lang)} sub={t('notifTxSub', lang)} on={s.notifTransactions ?? true} onToggle={(v) => updateSettings({ notifTransactions: v })} simple={S} />
+          <ToggleRow title={t('notifBroadcast', lang)} sub={t('notifBroadcastSub', lang)} on={s.notifBroadcasts ?? false} onToggle={(v) => updateSettings({ notifBroadcasts: v })} simple={S} />
         </div>
       </Card>
 
       {/* ── Account & Security ─────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconShield size={20} />} title={t('security', lang)} subtitle={t('securitySub', lang)} />
-        <div className="space-y-3">
-          <LinkRow icon={<IconUser size={18} />} title={t('editProfile', lang)} sub={t('editProfileSub', lang)} onClick={() => nav('/')} />
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconShield size={S ? 22 : 20} />} title={t('security', lang)} subtitle={t('securitySub', lang)} />
+        <div className={`${S ? 'space-y-4' : 'space-y-3'}`}>
+          <LinkRow icon={<IconUser size={18} />} title={t('editProfile', lang)} sub={t('editProfileSub', lang)} onClick={() => nav('/')} simple={S} />
           <button
             onClick={() => setShowPwd((v) => !v)}
-            className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-3 text-left transition hover:bg-neutral-50"
+            className={`flex w-full items-center gap-3 border border-neutral-200 text-left hover:bg-neutral-50 ${S ? 'rounded-2xl p-4' : 'rounded-xl p-3'}`}
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconKey size={18} /></span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold">{t('password', lang)}</span>
-              <span className="block text-[11px] text-neutral-400">{t('passwordSub', lang)}</span>
+            <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-12 w-12' : 'h-10 w-10'}`}>
+              <IconKey size={S ? 20 : 18} />
             </span>
-            <IconChevronRight size={18} className={`text-neutral-400 transition ${showPwd ? 'rotate-90' : ''}`} />
+            <span className="min-w-0 flex-1">
+              <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{t('password', lang)}</span>
+              <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('passwordSub', lang)}</span>
+            </span>
+            <IconChevronRight size={18} className={`text-neutral-400 ${showPwd ? 'rotate-90' : ''}`} />
           </button>
-          {showPwd && <PasswordForm lang={lang} onDone={() => setShowPwd(false)} />}
-          <ToggleRow title={t('twoFactor', lang)} sub={t('twoFactorSub', lang)} on={s.twoFactor ?? false} onToggle={(v) => updateSettings({ twoFactor: v })} />
-          <ToggleRow title={t('biometric', lang)} sub={t('biometricSub', lang)} on={s.biometricLock ?? false} onToggle={(v) => updateSettings({ biometricLock: v })} />
+          {showPwd && <PasswordForm lang={lang} onDone={() => setShowPwd(false)} simple={S} />}
+          <ToggleRow title={t('twoFactor', lang)} sub={t('twoFactorSub', lang)} on={s.twoFactor ?? false} onToggle={(v) => updateSettings({ twoFactor: v })} simple={S} />
+          <ToggleRow title={t('biometric', lang)} sub={t('biometricSub', lang)} on={s.biometricLock ?? false} onToggle={(v) => updateSettings({ biometricLock: v })} simple={S} />
         </div>
       </Card>
 
       {/* ── Privacy & Data ─────────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconDownload size={20} />} title={t('privacy', lang)} subtitle={t('privacySub', lang)} />
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconDownload size={S ? 22 : 20} />} title={t('privacy', lang)} subtitle={t('privacySub', lang)} />
         <button
           onClick={exportData}
-          className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-4 text-left transition hover:bg-neutral-50"
+          className={`flex w-full items-center gap-3 border border-neutral-200 text-left hover:bg-neutral-50 ${S ? 'rounded-2xl p-5' : 'rounded-xl p-4'}`}
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconDownload size={20} /></span>
+          <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-14 w-14' : 'h-11 w-11'}`}>
+            <IconDownload size={S ? 22 : 20} />
+          </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-sm font-bold">{t('exportData', lang)}</span>
-            <span className="block text-[11px] text-neutral-400">{t('exportSub', lang)}</span>
+            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{t('exportData', lang)}</span>
+            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('exportSub', lang)}</span>
           </span>
           <IconChevronRight size={18} className="text-neutral-400" />
         </button>
       </Card>
 
       {/* ── Data lokal ─────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle icon={<IconShield size={20} />} title="Data Lokal" subtitle="Kelola data tersimpan di perangkat ini" />
-        <Button variant="ghost" onClick={resetDemo}>Reset Data Lokal</Button>
+      <Card className={S ? '!p-6' : ''}>
+        <SectionTitle icon={<IconShield size={S ? 22 : 20} />} title="Data Lokal" subtitle="Kelola data tersimpan di perangkat ini" />
+        <Button variant="ghost" onClick={resetDemo} className={S ? '!py-3 !text-base' : ''}>Reset Data Lokal</Button>
       </Card>
 
-      {/* App info */}
       <div className="pb-2 pt-2 text-center">
-        <p className="text-sm font-bold text-neutral-500">Panaceamed.id · v2.4.0</p>
-        <p className="text-[11px] uppercase tracking-widest text-neutral-400">{t('appInfo', lang)}</p>
+        <p className={`font-bold text-neutral-500 ${S ? 'text-base' : 'text-sm'}`}>Panaceamed.id · v2.4.0</p>
+        <p className={`uppercase tracking-widest text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('appInfo', lang)}</p>
       </div>
     </div>
   )
 }
 
-// ── Sub-components ──────────────────────────────────────────────
-function ThemeCard({ active, onClick, label, preview, icon }: { active: boolean; onClick: () => void; label: string; preview: 'light' | 'dark' | 'system'; icon: React.ReactNode }) {
+/* ═══════════════════════════════════════════════════════════════
+   Sub-components — semua menerima prop `simple`
+   ═══════════════════════════════════════════════════════════════ */
+
+function ThemeCard({ active, onClick, label, preview, icon, simple: S }: {
+  active: boolean; onClick: () => void; label: string
+  preview: 'light' | 'dark' | 'system'; icon: React.ReactNode; simple: boolean
+}) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col gap-2 rounded-xl border-2 p-3 transition ${
+      className={`flex flex-col gap-2 border-2 ${S ? 'rounded-2xl p-4' : 'rounded-xl p-3'} ${
         active ? 'border-brand bg-brand-50' : 'border-neutral-200 hover:border-neutral-300'
       }`}
     >
-      <span className="flex h-16 w-full overflow-hidden rounded-lg border border-black/5">
+      <span className={`flex w-full overflow-hidden rounded-lg border border-black/5 ${S ? 'h-20' : 'h-16'}`}>
         {preview === 'system' ? (
           <>
             <span className="flex-1 bg-white" />
@@ -238,31 +288,117 @@ function ThemeCard({ active, onClick, label, preview, icon }: { active: boolean;
           </span>
         )}
       </span>
-      <span className={`flex items-center justify-center gap-1.5 text-sm font-bold ${active ? 'text-brand-dark' : 'text-neutral-500'}`}>
+      <span className={`flex items-center justify-center gap-1.5 font-bold ${S ? 'text-base' : 'text-sm'} ${active ? 'text-brand-dark' : 'text-neutral-500'}`}>
         {icon} {label}
       </span>
     </button>
   )
 }
 
-// Web Push enrollment — request permission, subscribe via SW, send a test.
-function PushControl() {
+function SegBtn({ active, onClick, children, simple: S }: {
+  active: boolean; onClick: () => void; children: React.ReactNode; simple: boolean
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center justify-center gap-1.5 border font-bold ${
+        S ? 'rounded-2xl py-3.5 text-base' : 'rounded-xl py-2.5 text-sm'
+      } ${
+        active ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+function ToggleRow({ title, sub, on, onToggle, simple: S }: {
+  title: string; sub: string; on: boolean; onToggle: (v: boolean) => void; simple: boolean
+}) {
+  return (
+    <button
+      onClick={() => onToggle(!on)}
+      className={`flex w-full items-center justify-between gap-3 bg-neutral-50 text-left ${
+        S ? 'rounded-2xl p-4' : 'rounded-xl p-3'
+      }`}
+    >
+      <span className="min-w-0">
+        <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{title}</span>
+        <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
+      </span>
+      {/* Toggle switch — pakai right-0.5/left-0.5 supaya tidak perlu hitung px */}
+      <span className={`relative shrink-0 rounded-full ${S ? 'h-8 w-14' : 'h-6 w-11'} ${on ? 'bg-brand' : 'bg-neutral-300'}`}>
+        <span className={`absolute top-0.5 rounded-full bg-white shadow ${S ? 'h-7 w-7' : 'h-5 w-5'} ${on ? 'right-0.5' : 'left-0.5'}`} />
+      </span>
+    </button>
+  )
+}
+
+function LinkRow({ icon, title, sub, onClick, simple: S }: {
+  icon: React.ReactNode; title: string; sub: string; onClick: () => void; simple: boolean
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 border border-neutral-200 text-left hover:bg-neutral-50 ${
+        S ? 'rounded-2xl p-4' : 'rounded-xl p-3'
+      }`}
+    >
+      <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-12 w-12' : 'h-10 w-10'}`}>{icon}</span>
+      <span className="min-w-0 flex-1">
+        <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{title}</span>
+        <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
+      </span>
+      <IconChevronRight size={18} className="text-neutral-400" />
+    </button>
+  )
+}
+
+function PasswordForm({ lang, onDone, simple: S }: { lang: Lang; onDone: () => void; simple: boolean }) {
+  const [pw, setPw] = useState('')
+  const [pw2, setPw2] = useState('')
+  const [msg, setMsg] = useState('')
+  function submit() {
+    if (pw.length < 8) return setMsg(lang === 'en' ? 'Minimum 8 characters.' : 'Minimal 8 karakter.')
+    if (pw !== pw2) return setMsg(lang === 'en' ? 'Passwords do not match.' : 'Kata sandi tidak cocok.')
+    setMsg('')
+    onDone()
+  }
+  return (
+    <div className={`space-y-2 border border-neutral-200 bg-neutral-50 ${
+      S ? 'space-y-3 rounded-2xl p-5' : 'rounded-xl p-3'
+    }`}>
+      <input
+        className={`${inputClass} ${S ? '!py-3.5 !text-base' : ''}`}
+        type="password"
+        value={pw}
+        onChange={(e) => setPw(e.target.value)}
+        placeholder={lang === 'en' ? 'New password' : 'Kata sandi baru'}
+      />
+      <input
+        className={`${inputClass} ${S ? '!py-3.5 !text-base' : ''}`}
+        type="password"
+        value={pw2}
+        onChange={(e) => setPw2(e.target.value)}
+        placeholder={lang === 'en' ? 'Confirm password' : 'Konfirmasi kata sandi'}
+      />
+      {msg && <p className={`text-accent ${S ? 'text-sm' : 'text-xs'}`}>{msg}</p>}
+      <Button onClick={submit} className={`w-full ${S ? '!py-3.5 !text-base' : ''}`}>{t('save', lang)}</Button>
+    </div>
+  )
+}
+
+function PushControl({ simple: S, lang }: { simple: boolean; lang: Lang }) {
   const [status, setStatus] = useState<PushStatus | null>(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
 
-  useEffect(() => {
-    pushStatus().then(setStatus)
-  }, [])
+  useEffect(() => { pushStatus().then(setStatus) }, [])
 
   async function toggle() {
-    setBusy(true)
-    setMsg('')
-    try {
-      setStatus(status === 'enabled' ? await disablePush() : await enablePush())
-    } finally {
-      setBusy(false)
-    }
+    setBusy(true); setMsg('')
+    try { setStatus(status === 'enabled' ? await disablePush() : await enablePush()) }
+    finally { setBusy(false) }
   }
   async function test() {
     const r = await api.pushTest().catch(() => ({ sent: 0 }))
@@ -283,87 +419,32 @@ function PushControl() {
     unsupported: 'Coba via Chrome/Edge atau pasang sebagai aplikasi (PWA).',
     unavailable: 'Owner perlu menyetel VAPID di server untuk mengaktifkan.',
   }
+
   if (!status) return null
   const actionable = status === 'enabled' || status === 'disabled'
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-brand/20 bg-brand-50 p-3">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-brand-dark"><IconBell size={18} /></span>
+    <div className={`flex items-start gap-3 border border-brand/20 bg-brand-50 ${
+      S ? 'rounded-2xl p-4' : 'rounded-xl p-3'
+    }`}>
+      <span className={`grid shrink-0 place-items-center rounded-full bg-white text-brand-dark ${S ? 'h-11 w-11' : 'h-9 w-9'}`}>
+        <IconBell size={S ? 20 : 18} />
+      </span>
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-bold">{label[status]}</div>
-        <div className="text-[11px] text-neutral-500">{note[status]}</div>
-        {msg && <div className="mt-1 text-[11px] font-semibold text-brand-dark">{msg}</div>}
+        <div className={`font-bold ${S ? 'text-base' : 'text-sm'}`}>{label[status]}</div>
+        <div className={`text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{note[status]}</div>
+        {msg && <div className={`mt-1 font-semibold text-brand-dark ${S ? 'text-xs' : 'text-[11px]'}`}>{msg}</div>}
       </div>
       {actionable && (
         <div className="flex shrink-0 flex-col gap-1.5">
-          <Button onClick={toggle} disabled={busy} variant={status === 'enabled' ? 'outline' : 'primary'} className="!px-3 !py-1.5 text-xs">
+          <Button onClick={toggle} disabled={busy} variant={status === 'enabled' ? 'outline' : 'primary'} className={`!px-3 ${S ? '!py-2.5 text-sm' : '!py-1.5 text-xs'}`}>
             {busy ? '…' : status === 'enabled' ? 'Matikan' : 'Aktifkan'}
           </Button>
           {status === 'enabled' && (
-            <button onClick={test} className="text-[11px] font-semibold text-brand-dark hover:underline">Kirim uji</button>
+            <button className={`font-semibold text-brand-dark hover:underline ${S ? 'text-xs' : 'text-[11px]'}`}>Kirim uji</button>
           )}
         </div>
       )}
-    </div>
-  )
-}
-
-function SegBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center justify-center gap-1.5 rounded-xl border py-2.5 text-sm font-bold transition ${
-        active ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}
-
-function ToggleRow({ title, sub, on, onToggle }: { title: string; sub: string; on: boolean; onToggle: (v: boolean) => void }) {
-  return (
-    <button onClick={() => onToggle(!on)} className="flex w-full items-center justify-between gap-3 rounded-xl bg-neutral-50 p-3 text-left">
-      <span className="min-w-0">
-        <span className="block text-sm font-bold">{title}</span>
-        <span className="block text-[11px] text-neutral-400">{sub}</span>
-      </span>
-      <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${on ? 'bg-brand' : 'bg-neutral-300'}`}>
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
-      </span>
-    </button>
-  )
-}
-
-function LinkRow({ icon, title, sub, onClick }: { icon: React.ReactNode; title: string; sub: string; onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 p-3 text-left transition hover:bg-neutral-50">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark">{icon}</span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-bold">{title}</span>
-        <span className="block text-[11px] text-neutral-400">{sub}</span>
-      </span>
-      <IconChevronRight size={18} className="text-neutral-400" />
-    </button>
-  )
-}
-
-function PasswordForm({ lang, onDone }: { lang: Lang; onDone: () => void }) {
-  const [pw, setPw] = useState('')
-  const [pw2, setPw2] = useState('')
-  const [msg, setMsg] = useState('')
-  function submit() {
-    if (pw.length < 8) return setMsg(lang === 'en' ? 'Minimum 8 characters.' : 'Minimal 8 karakter.')
-    if (pw !== pw2) return setMsg(lang === 'en' ? 'Passwords do not match.' : 'Kata sandi tidak cocok.')
-    setMsg('')
-    onDone()
-  }
-  return (
-    <div className="space-y-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
-      <input className={inputClass} type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder={lang === 'en' ? 'New password' : 'Kata sandi baru'} />
-      <input className={inputClass} type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} placeholder={lang === 'en' ? 'Confirm password' : 'Konfirmasi kata sandi'} />
-      {msg && <p className="text-xs text-accent">{msg}</p>}
-      <Button onClick={submit} className="w-full">{t('save', lang)}</Button>
     </div>
   )
 }
