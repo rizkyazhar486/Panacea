@@ -377,7 +377,6 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     labRanges: { glucose: [70, 100], hba1c: [0, 6.5], totalCholesterol: [0, 200], ldl: [0, 100], hdl: [40, 100], triglycerides: [0, 150], uricAcid: [2.5, 7.0], alt: [7, 56], ast: [10, 40], crp: [0, 5] },
     exerRestrictions: ['Latihan resistensi wajib 2-3x/minggu', 'Aerobik 200-300 menit/minggu', 'HIIT efektif tapi mulai pelan', 'Kombinasi cardio + strength terbaik', 'Target turunkan 5-10% berat badan'],
   },
-]
   {
     id: 'alzheimer', name: 'Alzheimer / Demensia', emoji: '🧠', color: '#818cf8',
     calAdj: 0, protAdj: 1.0, naMax: 2300, kMax: 0, fluidMax: 2500, fluidMin: 1500,
@@ -391,7 +390,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     exerRestrictions: ['Latihan aerobik ringan-sedang', 'Yoga & tai chi sangat bermanfaat', 'Latihan keseimbangan untuk mencegah jatuh', 'Aktivitas di luar rumah', 'Supervisi selama latihan'],
   },
   {
-    id: 'liver', name: 'Gangguan Liver', emoji: '🫀', color: '#f97316',
+    id: 'liver', name: 'Gangguan Liver', emoji: '🟤', color: '#f97316',
     calAdj: 0.1, protAdj: 1.2, naMax: 2000, kMax: 0, fluidMax: 2000, fluidMin: 1500,
     specialFoods: ['Oatmeal', 'Kacang almond', 'Dada ayam rebus', 'Ikan kod', 'Tahu kukus', 'Bayam', 'Brokoli', 'Jambu biji', 'Pepaya', 'Whey protein'],
     avoidFoods: ['Alkohol', 'Makanan tinggi gula/fruktosa', 'Makanan goreng', 'Daging berlemak', 'Fast food', 'Makanan olahan'],
@@ -406,7 +405,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     id: 'hd', name: 'Pasien Indikasi HD', emoji: '💉', color: '#ef4444',
     calAdj: 0.1, protAdj: 1.2, naMax: 2000, kMax: 2500, fluidMax: 1000, fluidMin: 500,
     specialFoods: ['Nasi putih', 'Telur putuh', 'Ikan kod', 'Tahu kukus', 'Wortel', 'Selada', 'Nanas', 'Semangka'],
-    avoidFoods: ['Kacang merah', 'Kacang kedelai', 'Tempe', 'Keju', 'Susu', 'Pisang', 'Jeruk', 'Alpukado', 'Daging merah'],
+    avoidFoods: ['Kacang merah', 'Kacang kedelai', 'Tempe', 'Keju', 'Susu', 'Pisang', 'Jeruk', 'Alpukat', 'Daging merah'],
     notes: ['Protein 1.2g/kgBB (kebutuhan meningkat karena kehilangan saat HD)', 'Kalori 30-35 kkal/kgBB', 'Kalium terbatas <2500mg/hari', 'Fosfor terbatas 800-1000mg/hari', 'Cairan sangat terbatas: urine output + 500mL', 'Timbang berat badan sebelum & sesudah HD', 'Makan tinggi protein sesudah HD'],
     labKeys: ['creatinine', 'gfr', 'bun', 'potassium', 'phosphorus', 'calcium', 'hemoglobin', 'albumin', 'ferritin', 'uricAcid'],
     labLabels: { creatinine: 'Kreatinin', gfr: 'eGFR', bun: 'BUN', potassium: 'Kalium', phosphorus: 'Fosfor', calcium: 'Kalsium', hemoglobin: 'Hemoglobin', albumin: 'Albumin', ferritin: 'Ferritin', uricAcid: 'Asam Urat' },
@@ -433,7 +432,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     avoidFoods: ['Makanan tinggi natrium', 'Makanan olahan', 'Gula berlebihan', 'Trans fat', 'Alkohol'],
     notes: ['Diet Mediteranean sangat direkomendasikan', 'Natrium <1500mg untuk kontrol tekanan darah', 'Kalium tinggi dari buah & sayur', 'Omega-3 2g+/hari', 'Serat 25-30g/hari', 'Fokus pada rehabilitasi & nutrisi', 'Makanan lunak jika ada dysphagia'],
     labKeys: ['systolic', 'ldl', 'hdl', 'totalCholesterol', 'triglycerides', 'glucose', 'hba1c', 'crp', 'homocysteine'],
-    labLabels: { systolic: 'Sistolik', ldl: 'LDL', hdl: 'HDL', totalCholesterol: 'Kolestrol Total', triglycerides: 'Trigliserida', glucose: 'Gula Darah', hba1c: 'HbA1c', crp: 'CRP', homocysteine: 'Homosistein' },
+    labLabels: { systolic: 'systolic', ldl: 'LDL', hdl: 'HDL', totalCholesterol: 'Kolestrol Total', triglycerides: 'Trigliserida', glucose: 'Gula Darah', hba1c: 'HbA1c', crp: 'CRP', homocysteine: 'Homosistein' },
     labUnits: { systolic: 'mmHg', ldl: 'mg/dL', hdl: 'mg/dL', totalCholesterol: 'mg/dL', triglycerides: 'mg/dL', glucose: 'mg/dL', hba1c: '%', crp: 'mg/L', homocysteine: 'umol/L' },
     labRanges: { systolic: [90, 130], ldl: [0, 100], hdl: [40, 100], totalCholesterol: [0, 200], triglycerides: [0, 150], glucose: [70, 100], hba1c: [0, 6.5], crp: [0, 5], homocysteine: [5, 15] },
     exerRestrictions: ['Fisioterapi terstruktur wajib', 'Latihan sesuai kemampuan', 'Latihan keseimbangan penting', 'Hindari latihan tanpa pengawasan', 'Koordinasi dengan tim rehabilitasi'],
@@ -469,7 +468,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     avoidFoods: ['Nasi goreng', 'Bakso', 'Soto ayam', 'Sate ayam', 'Mie goreng', 'Keju', 'Nasi padang', 'Es teh manis', 'Makanan olahan', 'Fast food'],
     notes: ['Diet DASH sangat direkomendasikan', 'Natrium <1500mg/hari', 'Kalium tinggi 3500-5000mg/hari', 'Kalsium 1000-1300mg/hari', 'Magnesium 300-500mg/hari', 'Serat 25-30g/hari', 'Batasi alkohol', 'Diet Mediteranean juga efektif'],
     labKeys: ['systolic', 'potassium', 'sodium', 'creatinine', 'gfr', 'totalCholesterol', 'ldl', 'hdl', 'glucose', 'uricAcid'],
-    labLabels: { systolic: 'Sistolik', potassium: 'Kalium', sodium: 'Natrium', creatinine: 'Kreatinin', gfr: 'eGFR', totalCholesterol: 'Kolestrol Total', ldl: 'LDL', hdl: 'HDL', glucose: 'Gula Darah', uricAcid: 'Asam Urat' },
+    labLabels: { systolic: 'systolic', potassium: 'Kalium', sodium: 'Natrium', creatinine: 'Kreatinin', gfr: 'eGFR', totalCholesterol: 'Kolestrol Total', ldl: 'LDL', hdl: 'HDL', glucose: 'Gula Darah', uricAcid: 'Asam Urat' },
     labUnits: { systolic: 'mmHg', potassium: 'mEq/L', sodium: 'mEq/L', creatinine: 'mg/dL', gfr: 'mL/min', totalCholesterol: 'mg/dL', ldl: 'mg/dL', hdl: 'mg/dL', glucose: 'mg/dL', uricAcid: 'mg/dL' },
     labRanges: { systolic: [90, 130], potassium: [3.5, 5.0], sodium: [135, 145], creatinine: [0.6, 1.2], gfr: [60, 120], totalCholesterol: [0, 200], ldl: [0, 100], hdl: [40, 100], glucose: [70, 100], uricAcid: [2.5, 7.0] },
     exerRestrictions: ['Aerobik 150 menit/minggu minimal', 'Latihan resistensi moderat 2-3x/minggu', 'Hindari latihan isometrik berat', 'Hindari latihan Valsalva', 'Monitor tekanan darah sebelum latihan'],
@@ -529,7 +528,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     avoidFoods: ['Makanan ultra-olahan', 'Gula berlebihan'],
     notes: ['Antioksidan tinggi untuk melindungi sel rambut pendengaran', 'Omega-3 2g/hari', 'Magnesium penting untuk fungsi saraf', 'Zinc untuk indera pendengaran', 'Vitamin B-complex', 'Kurangi paparan kebisingan', 'Kontrol tekanan darah (HT memperburuk presbiakusis)'],
     labKeys: ['systolic', 'vitD', 'vitB12', 'folate', 'magnesium', 'zinc'],
-    labLabels: { systolic: 'Sistolik', vitD: 'Vitamin D', vitB12: 'Vitamin B12', folate: 'Folat', magnesium: 'Magnesium', zinc: 'Zinc' },
+    labLabels: { systolic: 'systolic', vitD: 'Vitamin D', vitB12: 'Vitamin B12', folate: 'Folat', magnesium: 'Magnesium', zinc: 'Zinc' },
     labUnits: { systolic: 'mmHg', vitD: 'ng/mL', vitB12: 'pg/mL', folate: 'ng/mL', magnesium: 'mg/dL', zinc: 'ug/dL' },
     labRanges: { systolic: [90, 130], vitD: [30, 100], vitB12: [200, 900], folate: [3, 20], magnesium: [1.7, 2.2], zinc: [66, 110] },
     exerRestrictions: ['Latihan aerobik untuk sirkulasi', 'Yoga & meditasi untuk stress reduction', 'Hindari latihan dengan kebisingan berlebihan', 'Gunakan ear protection jika perlu'],
@@ -580,7 +579,7 @@ function makePath(m: { x: number; y: number }[]) {
    ═══════════════════════════════════════════════════════ */
 const KM: Record<string, string> = {
   date: 'date', tanggal: 'date', heartrate: 'heartRate', hr: 'heartRate', nadi: 'heartRate',
-  steps: 'steps', langkah: 'steps', systolic: 'systolic', sistolik: 'systolic',
+  steps: 'steps', langkah: 'steps', systolic: 'systolic', systolic: 'systolic',
   spo2: 'spo2', oxygen: 'spo2', oksigen: 'spo2', hrv: 'hrv', rmssd: 'hrv',
   vo2max: 'vo2Max', vo2: 'vo2Max', glucose: 'glucose', gula: 'glucose',
   hba1c: 'hba1c', creatinine: 'creatinine', kreatinin: 'creatinine', gfr: 'gfr',
