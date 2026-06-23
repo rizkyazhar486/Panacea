@@ -1299,8 +1299,6 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
 </div>
 </div>
 )}
-      )}
-
       {/* Lab Results Table with Weekly Comparison */}
       {labs.length === 0 ? (
         <Empty e={'\u{1F9EA}'} t="Belum ada data lab. Tambah manual atau import CSV/JSON." />
