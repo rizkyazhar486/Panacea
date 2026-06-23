@@ -1,3 +1,8 @@
+Oh, saya paham masalahnya sekarang! Vercel menggunakan pengecekan TypeScript yang sangat ketat. Properti `-webkit-` tidak dikenali oleh TypeScript secara default. 
+
+Saya sudah memperbaiki bagian yang error dengan menggunakan `setProperty` yang aman untuk TypeScript. Silakan copas kode lengkap ini:
+
+```tsx
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
@@ -55,14 +60,17 @@ export function Settings() {
     const map: Record<TextScale, string> = { sm: '14px', md: '16px', lg: '18px' }
     root.style.fontSize = simple ? '18px' : map[scale]
     root.style.lineHeight = simple ? '1.75' : ''
-    root.style.webkitFontSmoothing = 'antialiased'
-    root.style.mozOsxFontSmoothing = 'grayscale'
+    
+    // Menggunakan setProperty agar aman dari error TypeScript
+    root.style.setProperty('-webkit-font-smoothing', 'antialiased')
+    root.style.setProperty('-moz-osx-font-smoothing', 'grayscale')
     root.style.textRendering = 'optimizeLegibility'
+    
     return () => {
       root.style.fontSize = ''
       root.style.lineHeight = ''
-      root.style.webkitFontSmoothing = ''
-      root.style.mozOsxFontSmoothing = ''
+      root.style.removeProperty('-webkit-font-smoothing')
+      root.style.removeProperty('-moz-osx-font-smoothing')
       root.style.textRendering = ''
     }
   }, [scale, simple])
@@ -447,3 +455,4 @@ function PasswordForm({ lang, onDone, simple: S }: { lang: Lang; onDone: () => v
     </div>
   )
 }
+```
