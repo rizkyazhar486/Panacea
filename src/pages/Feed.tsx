@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useStore, uid } from '../lib/store'
-import { Card, Button, Field, inputClass } from '../components/ui'
+import { Card, Field, inputClass } from '../components/ui'
 import {
   IconHome,
   IconUsers,
@@ -57,7 +57,7 @@ const SubCtx = createContext<{ subscribed: Set<string>; price: number; subscribe
 })
 
 /* ═══════════════════════════════════════════
-   MINI LONGEVITY RING (for home hero)
+   MINI LONGEVITY RING
    ═══════════════════════════════════════════ */
 
 function MiniRing({ score, size = 56 }: { score: number; size?: number }) {
@@ -73,6 +73,11 @@ function MiniRing({ score, size = 56 }: { score: number; size?: number }) {
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={col} strokeWidth="5" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1)' }} />
     </svg>
   )
+}
+
+/* helper: wrap icon with color since icon components don't accept style */
+function ColoredIcon({ children, color }: { children: React.ReactNode; color: string }) {
+  return <span style={{ color, display: 'inline-flex' }}>{children}</span>
 }
 
 /* ═══════════════════════════════════════════
@@ -93,14 +98,15 @@ export function Feed() {
 
   useEffect(() => {
     if (!backendEnabled) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.creatorSubs().then((r: any) => { setSubscribed(new Set(r.authors.map((a: string) => a.toLowerCase()))); setSubPrice(r.price) }).catch(() => {})
+    api.creatorSubs().then((r: { authors: string[]; price: number }) => {
+      setSubscribed(new Set(r.authors.map((a) => a.toLowerCase())))
+      setSubPrice(r.price)
+    }).catch(() => {})
   }, [])
 
   async function subscribe(email: string): Promise<boolean> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const r: any = await api.creatorSubscribe(email)
+      const r: { balance: number } = await api.creatorSubscribe(email)
       setSubscribed((s) => new Set(s).add(email.toLowerCase()))
       store.syncWalletBalance(r.balance)
       return true
@@ -122,7 +128,6 @@ export function Feed() {
     <SubCtx.Provider value={{ subscribed, price: subPrice, subscribe }}>
     <div className="relative pb-24">
 
-      {/* ── Glassmorphism Tab Bar ── */}
       <div className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-center gap-1 border-b px-4 py-2.5" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(16px)', borderColor: 'rgba(0,0,0,0.04)' }}>
         <TabBtn icon={<IconHome size={17} />} label="Home" active={tab === 'home'} onClick={() => { setTab('home'); setViewProfile(null) }} />
         <TabBtn icon={<IconUsers size={17} />} label="Friends" active={tab === 'friends'} onClick={() => { setTab('friends'); setViewProfile(null) }} />
@@ -141,7 +146,6 @@ export function Feed() {
         </>
       )}
 
-      {/* ── Floating + Button ── */}
       <button
         onClick={() => setCompose(true)}
         className="fixed bottom-6 left-6 z-30 grid h-14 w-14 place-items-center rounded-2xl text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 lg:left-[17rem]"
@@ -156,7 +160,8 @@ export function Feed() {
           onClose={() => setCompose(false)}
           onPost={onCreate}
           authorEmail={me}
-          authorName={account?.name ?? 'Saya'}
+          authorName={account?.name ?? 'Saya'
+          }
           role={account?.role ?? 'pasien'}
         />
       )}
@@ -189,7 +194,7 @@ function TabBtn({ icon, label, active, onClick }: { icon: React.ReactNode; label
 }
 
 /* ═══════════════════════════════════════════
-   HOME FEED — with longevity hero
+   HOME FEED
    ═══════════════════════════════════════════ */
 
 function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => void }) {
@@ -203,20 +208,18 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
     return true
   })
 
-  // Compute a simple "longevity" from user's own posts
   const myPosts = state.posts.filter((p) => p.authorEmail === me && !p.archived)
   const longevityScore = useMemo(() => {
     let s = 60
     s += Math.min(myPosts.length * 3, 30)
     s += myPosts.filter((p) => p.postType === 'kebiasaan').length * 2
-    s = Math.min(100, s)
-    return s
+    return Math.min(100, s)
   }, [myPosts])
 
   return (
     <div className="mx-auto max-w-xl space-y-5">
 
-      {/* ── Hero: Longevity Score + Quick Actions ── */}
+      {/* Hero */}
       <div className="overflow-hidden rounded-2xl border p-5" style={{ borderColor: 'rgba(0,191,99,0.12)', background: 'linear-gradient(135deg, rgba(0,191,99,0.04), rgba(11,122,75,0.02), transparent)' }}>
         <div className="flex items-center gap-4">
           <div className="relative shrink-0">
@@ -231,7 +234,6 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
             <p className="mt-0.5 text-xs text-neutral-500">Bagikan aktivitas, kebiasaan & artikel longevity Anda.</p>
           </div>
         </div>
-        {/* Story-like quick actions */}
         <div className="mt-4 flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
           {[
             { icon: <IconRun size={14} />, label: 'Aktivitas', color: '#00BF63' },
@@ -242,7 +244,7 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
           ].map((a) => (
             <div key={a.label} className="flex shrink-0 flex-col items-center gap-1.5">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl border transition-transform duration-200 hover:scale-110" style={{ borderColor: `${a.color}20`, background: `${a.color}08` }}>
-                <span style={{ color: a.color }}>{a.icon}</span>
+                <ColoredIcon color={a.color}>{a.icon}</ColoredIcon>
               </div>
               <span className="text-[9px] font-bold text-neutral-400">{a.label}</span>
             </div>
@@ -250,7 +252,7 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
         </div>
       </div>
 
-      {/* ── Filter Pills ── */}
+      {/* Filter */}
       <div className="flex justify-center gap-2">
         {(['foryou', 'following'] as const).map((f) => (
           <button
@@ -267,7 +269,6 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
         ))}
       </div>
 
-      {/* ── Posts ── */}
       {posts.map((p) => <PostCard key={p.id} post={p} me={me} store={store} onProfile={onProfile} />)}
       {posts.length === 0 && (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed py-14 text-center" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
@@ -293,7 +294,9 @@ function FriendsView({ me, onProfile }: { me: string; onProfile: (e: string) => 
   return (
     <div className="mx-auto max-w-xl space-y-4">
       <div className="rounded-2xl border p-5" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-        <h3 className="flex items-center gap-2 font-bold"><IconUsers size={18} style={{ color: '#00BF63' }} /> Teman</h3>
+        <h3 className="flex items-center gap-2 font-bold">
+          <ColoredIcon color="#00BF63"><IconUsers size={18} /></ColoredIcon> Teman
+        </h3>
         <p className="mt-0.5 text-sm text-neutral-500">Akun yang Anda ikuti & berinteraksi dengan Anda.</p>
       </div>
       {profiles.map((p) => <ProfileRow key={p.email} p={p} onClick={() => onProfile(p.email)} />)}
@@ -380,7 +383,6 @@ function ProfileView({ me, name, role, onOpen }: { me: string; name: string; rol
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      {/* ── Profile Hero Banner ── */}
       <div className="overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
         <div className="h-24" style={{ background: `linear-gradient(135deg, ${color}30, ${color}10 60%, transparent)` }} />
         <div className="relative -mt-10 px-5 pb-5">
@@ -414,7 +416,6 @@ function ProfileView({ me, name, role, onOpen }: { me: string; name: string; rol
 
       {edit && <EditProfileModal current={{ name: displayName, bio: prof?.bio ?? '', avatar: prof?.avatar }} onClose={() => setEdit(false)} onSave={(d) => { updateProfile(me, d); setEdit(false) }} />}
 
-      {/* ── Profile Tabs ── */}
       <div className="flex gap-1 rounded-2xl p-1" style={{ background: '#fff', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
         <ProfTab icon={<IconHome size={15} />} label="Postingan" active={pt === 'posts'} onClick={() => setPt('posts')} />
         <ProfTab icon={<IconLock size={15} />} label="Terkunci" active={pt === 'locked'} onClick={() => setPt('locked')} />
@@ -541,7 +542,7 @@ function ProfileRow({ p, onClick }: { p: Profile; onClick: () => void }) {
         <div className="truncate font-bold">{p.name}</div>
         <div className="text-xs text-neutral-400">{roleLabel[p.role]} · {p.posts} postingan</div>
       </div>
-      <IconUser size={16} style={{ color: '#d4d4d4' }} />
+      <ColoredIcon color="#d4d4d4"><IconUser size={16} /></ColoredIcon>
     </button>
   )
 }
@@ -585,7 +586,7 @@ function hash(s: string): number {
 }
 
 /* ═══════════════════════════════════════════
-   EXCLUSIVE LOCK OVERLAY
+   EXCLUSIVE LOCK
    ═══════════════════════════════════════════ */
 
 function ExclusiveLock({ post: p, onProfile }: { post: SocialPost; onProfile: (e: string) => void }) {
@@ -615,7 +616,7 @@ function ExclusiveLock({ post: p, onProfile }: { post: SocialPost; onProfile: (e
 }
 
 /* ═══════════════════════════════════════════
-   POST CARD — redesigned
+   POST CARD
    ═══════════════════════════════════════════ */
 
 function PostCard({ post: p, me, store, onProfile }: {
@@ -629,15 +630,12 @@ function PostCard({ post: p, me, store, onProfile }: {
   const prof = store.state.profiles[p.authorEmail]
   const [menu, setMenu] = useState(false)
 
-  // Accent color based on post type
   const accent = type === 'kebiasaan' ? '#0B7A4B' : type === 'artikel' ? '#3b82f6' : '#00BF63'
 
   return (
     <Card className="!p-0 overflow-hidden">
-      {/* Left accent bar */}
       <div className="absolute left-0 top-0 h-full w-[3px]" style={{ background: `linear-gradient(180deg, ${accent}, ${accent}44)` }} />
 
-      {/* Header */}
       <div className="flex items-center gap-3 px-5 py-3">
         <button onClick={() => onProfile(p.authorEmail)} className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl text-sm font-bold text-white transition-transform duration-200 hover:scale-105" style={{ background: `linear-gradient(145deg, ${p.mediaColor}, ${p.mediaColor}bb)` }}>
           {prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(prof?.name ?? p.authorName)}
@@ -645,7 +643,7 @@ function PostCard({ post: p, me, store, onProfile }: {
         <button onClick={() => onProfile(p.authorEmail)} className="min-w-0 flex-1 text-left">
           <div className="flex items-center gap-1.5">
             <span className="truncate text-sm font-bold">{prof?.name ?? p.authorName}</span>
-            {p.locked && <IconLock size={12} style={{ color: '#a3a3a3' }} />}
+            {p.locked && <IconLock size={12} className="text-neutral-400" />}
             <span className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide" style={{ background: 'rgba(0,0,0,0.04)', color: '#a3a3a3' }}>{roleLabel[p.role]}</span>
           </div>
           <span className="text-[11px] text-neutral-400">{timeAgo(p.at)} lalu · {p.activity}</span>
@@ -673,7 +671,6 @@ function PostCard({ post: p, me, store, onProfile }: {
         )}
       </div>
 
-      {/* Content */}
       {exclusiveLocked ? (
         <ExclusiveLock post={p} onProfile={onProfile} />
       ) : (
@@ -691,19 +688,18 @@ function PostCard({ post: p, me, store, onProfile }: {
         </>
       )}
 
-      {/* Action Bar */}
       <div className="flex items-center gap-5 px-5 py-3" style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}>
         <button onClick={() => store.toggleLike(p.id)} className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:scale-105">
-          <IconHeart size={18} style={{ color: p.likedByMe ? '#FF3131' : '#a3a3a3' }} />
+          <ColoredIcon color={p.likedByMe ? '#FF3131' : '#a3a3a3'}><IconHeart size={18} /></ColoredIcon>
           <span style={{ color: p.likedByMe ? '#FF3131' : '#737373' }}>{p.likes}</span>
         </button>
         <span className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: '#737373' }}><IconComment size={18} /> {p.comments ?? 0}</span>
         <button onClick={() => store.toggleRepost(p.id)} className="flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:scale-105">
-          <IconRepost size={18} style={{ color: p.repostedByMe ? '#00BF63' : '#a3a3a3' }} />
+          <ColoredIcon color={p.repostedByMe ? '#00BF63' : '#a3a3a3'}><IconRepost size={18} /></ColoredIcon>
           <span style={{ color: p.repostedByMe ? '#00BF63' : '#737373' }}>{p.reposts ?? 0}</span>
         </button>
         <button onClick={() => store.toggleBookmark(p.id)} className="ml-auto transition-all duration-200 hover:scale-110" title="Simpan (privat)">
-          <IconBookmark size={18} style={{ color: p.bookmarkedByMe ? '#00BF63' : '#a3a3a3' }} />
+          <ColoredIcon color={p.bookmarkedByMe ? '#00BF63' : '#a3a3a3'}><IconBookmark size={18} /></ColoredIcon>
         </button>
       </div>
     </Card>
@@ -711,7 +707,7 @@ function PostCard({ post: p, me, store, onProfile }: {
 }
 
 /* ═══════════════════════════════════════════
-   MEDIA / ARTICLE / METRICS BLOCKS
+   MEDIA / ARTICLE / METRICS
    ═══════════════════════════════════════════ */
 
 function isImg(s: string): boolean {
@@ -726,7 +722,7 @@ function MediaBlock({ post: p }: { post: SocialPost }) {
   if (realPhotos.length > 0) {
     if (realPhotos.length === 1) return <img src={realPhotos[0]} loading="lazy" decoding="async" className="max-h-[70vh] w-full object-cover" alt={p.activity} />
     return (
-      <div className={`grid gap-0.5 ${realPhotos.length === 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
+      <div className="grid grid-cols-2 gap-0.5">
         {realPhotos.slice(0, 4).map((src, i) => <img key={i} src={src} loading="lazy" decoding="async" className="aspect-square w-full object-cover" alt="" />)}
       </div>
     )
@@ -769,7 +765,7 @@ function Metric({ icon, value, label, color }: { icon: React.ReactNode; value: s
   const c = color ?? '#00BF63'
   return (
     <div className="flex flex-col items-center gap-0.5 rounded-xl px-2 py-2.5" style={{ background: `${c}06` }}>
-      <span style={{ color: c }}>{icon}</span>
+      <ColoredIcon color={c}>{icon}</ColoredIcon>
       <span className="text-sm font-extrabold tabular-nums" style={{ color: '#171717' }}>{value}</span>
       <span className="text-[9px] font-bold uppercase tracking-wide text-neutral-400">{label}</span>
     </div>
@@ -801,7 +797,7 @@ function HabitMetrics({ post: p }: { post: SocialPost }) {
 }
 
 /* ═══════════════════════════════════════════
-   COMPOSE MODAL — redesigned
+   COMPOSE MODAL
    ═══════════════════════════════════════════ */
 
 function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
@@ -867,7 +863,7 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
     ['kebiasaan', 'Kebiasaan', <IconLeaf size={14} key="k" />],
     ['artikel', 'Artikel', <IconArticle size={14} key="r" />],
   ]
-  const mediaOptions: ['foto', 'video'][] = ['foto', 'video']
+  const mediaOptions = ['foto', 'video'] as const
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
@@ -875,7 +871,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
         <h3 className="text-lg font-bold">Unggah</h3>
         <p className="mt-0.5 text-sm text-neutral-500">Video singkat (maks 30 detik) atau beberapa foto.</p>
 
-        {/* Post type selector */}
         <div className="mt-4 flex gap-2">
           {typeOptions.map(([t, label, icon]) => (
             <button key={t} onClick={() => setPostType(t)} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200"
@@ -887,7 +882,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           ))}
         </div>
 
-        {/* Media type selector */}
         {postType !== 'artikel' && (
           <div className="mt-3 flex gap-2">
             {mediaOptions.map((m) => (
@@ -903,7 +897,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           </div>
         )}
 
-        {/* Photo upload */}
         {postType !== 'artikel' && media === 'foto' && (
           <div className="mt-3">
             <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed py-5 text-neutral-500 transition-colors duration-200 hover:border-[#00BF63]" style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}>
@@ -918,7 +911,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           </div>
         )}
 
-        {/* Video upload */}
         {postType !== 'artikel' && media === 'video' && (
           <div className="mt-3">
             <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed py-5 text-neutral-500 transition-colors duration-200 hover:border-[#00BF63]" style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}>
@@ -929,7 +921,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           </div>
         )}
 
-        {/* Fields */}
         <div className="mt-3 space-y-3">
           {postType === 'aktivitas' && (
             <>
@@ -956,7 +947,6 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           </div>
         </div>
 
-        {/* Color picker */}
         <div className="mt-3 flex items-center gap-2">
           <span className="text-xs font-semibold text-neutral-500">Warna:</span>
           {COLORS.map((c) => (
@@ -964,10 +954,9 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
           ))}
         </div>
 
-        {/* Lock & Exclusive */}
         <label className="mt-3 flex items-center gap-2 text-sm">
           <input type="checkbox" checked={locked} onChange={(e) => setLocked(e.target.checked)} className="h-4 w-4" style={{ accentColor: '#00BF63' }} />
-          <IconLock size={14} style={{ color: '#a3a3a3' }} /> Kunci postingan (privat — hanya Anda)
+          <IconLock size={14} className="text-neutral-400" /> Kunci postingan (privat — hanya Anda)
         </label>
         <label className="mt-2 flex items-center gap-2 rounded-xl p-2.5 text-sm" style={{ background: 'rgba(0,191,99,0.05)', color: '#0B7A4B' }}>
           <input type="checkbox" checked={exclusive} onChange={(e) => setExclusive(e.target.checked)} className="h-4 w-4" style={{ accentColor: '#00BF63' }} />
