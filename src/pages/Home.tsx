@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { Feed } from './Feed'
+import Feed from "./Feed"
 
 // Role-based landing. The Dashboard is now the "Panacea Hidup Sehat" social
 // feed — shared by patients, doctors and owner. Clinical patient data is no
