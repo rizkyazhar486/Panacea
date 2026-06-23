@@ -34,7 +34,7 @@ const GPS_SPORTS: GpsSportMode[] = [
 ]
 
 /* ═══════════════════════════════════════════════════════
-   CONSTANTS
+   CONSTANTS & CONTEXT
    ═══════════════════════════════════════════════════════ */
 const COLORS = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#f59e0b', '#FF3131']
 const roleLabel: Record<Role, string> = {
@@ -79,7 +79,6 @@ function calcBMR(w: number, h: number, age: number, g: 'M' | 'F') {
   return g === 'M' ? 10 * w + 6.25 * h - 5 * age + 5 : 10 * w + 6.25 * h - 5 * age - 161
 }
 function calcVO2MaxEst(hrRest: number, age: number, g: 'M' | 'F') {
-  // Uth-Sørensen estimation
   return g === 'M' ? 15.3 * (220 - age) / hrRest : 15.3 * (226 - age) / hrRest
 }
 function calcVO2MaxRockport(distKm: number, timeMin: number, hr: number, age: number, g: 'M' | 'F') {
@@ -205,7 +204,13 @@ function HealthMetricsBar({ weight, height, age, gender, hrRest }: { weight: num
    ═══════════════════════════════════════════════════════ */
 type TrackMode = 'idle' | 'planning' | 'tracking' | 'paused' | 'done'
 
-function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsSportMode; dist: number; dur: number; speed: number; pace: string; kcal: number; hr: number; acceleration: number; vo2Max: number; hiit: ReturnType<typeof hiitIndicator>; pathImage?: string }) => void }) {
+interface SharedGpsData {
+  sport: GpsSportMode; dist: number; dur: number; speed: number;
+  pace: string; kcal: number; hr: number; acceleration: number;
+  vo2Max: number; hiit: ReturnType<typeof hiitIndicator>
+}
+
+function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData) => void }) {
   const [mode, setMode] = useState<TrackMode>('idle')
   const [sport, setSport] = useState<GpsSportMode>(GPS_SPORTS[0])
   const [pts, setPts] = useState<GpsPoint[]>([])
@@ -217,9 +222,8 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
   const tRef = useRef<number | null>(null)
   const sRef = useRef(0)
   const svgRef = useRef<SVGSVGElement>(null)
-  const { account } = useStore()
 
-  // Load body data from localStorage
+  // Load body data safely from localStorage
   const bodyData = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('pm_body_v2') || '{}') } catch { return {} }
   }, [])
@@ -249,8 +253,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
     if (!navigator.geolocation) { setGpsErr('GPS tidak didukung browser.'); return }
     wRef.current = navigator.geolocation.watchPosition(
       pos => setPts(p => {
-        const newPts = [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined }]
-        return newPts
+        return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined }]
       }),
       err => setGpsErr('GPS error: ' + err.message),
       { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
@@ -281,7 +284,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
           <p className="text-[10px] text-neutral-400 mt-0.5">Lacak rute, kecepatan, percepatan & kalori</p>
         </div>
-        {mode === 'done' && (
+        ={mode === 'done' && (
           <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
             <IconShare2 size={13} /> Share
           </button>
@@ -331,7 +334,6 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
       <div className="px-5 pt-3 space-y-2">
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <>
-            {/* HIIT Zone Indicator */}
             <div className="rounded-xl p-3 flex items-center gap-3" style={{ background: `${hiit.color}10`, border: `1px solid ${hiit.color}30` }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-xs" style={{ background: hiit.color, boxShadow: `0 4px 12px ${hiit.color}44` }}>
                 {hiit.intensity}%
@@ -345,8 +347,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
               </div>
             </div>
 
-            {/* Marathon/Half-Marathon Progress */}
-            {sport.targetDist && (mode === 'tracking' || mode === 'paused' || mode === 'done') && (
+            {sport.targetDist && (
               <div className="rounded-xl border border-neutral-100 p-3">
                 <div className="flex items-center justify-between text-xs mb-1.5">
                   <span className="font-bold text-neutral-700">{sport.emoji} {sport.name} Progress</span>
@@ -362,7 +363,6 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
               </div>
             )}
 
-            {/* Health Metrics: VO2Max, BMI, BMR */}
             <HealthMetricsBar weight={weight} height={height} age={age} gender={gender as 'M' | 'F'} hrRest={hr || undefined} />
           </>
         )}
@@ -429,7 +429,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: { sport: GpsS
 }
 
 /* ═══════════════════════════════════════════════════════
-   COMPOSE MODAL (with image upload, longevity share, GPS share)
+   COMPOSE MODAL (Penyempurnaan Potongan Kode Akhir)
    ═══════════════════════════════════════════════════════ */
 function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEmail, authorName, role }: {
   onClose: () => void; onPost: (p: SocialPost) => void; onShareLongevity: () => void; onShareGps: () => void
@@ -469,6 +469,7 @@ function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEma
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
       <div className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} style={{ animation: 'scaleIn 0.2s ease-out' }}>
+        
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-neutral-100">
           <h3 className="text-base font-black">Buat Postingan</h3>
@@ -504,566 +505,165 @@ function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEma
             <option value="kebiasaan">🌿 Kebiasaan</option>
             <option value="artikel">📄 Artikel</option>
             <option value="resep">🍳 Resep</option>
-            <option value="tips">💡 Tips</option>
           </select>
-          <input className={inputClass + ' flex-1'} placeholder="Aktivitas (opsional)" value={activity} onChange={e => setActivity(e.target.value)} />
+          <input className={inputClass + ' flex-1'} type="text" placeholder="Nama Aktivitas/Judul" value={activity} onChange={e => setActivity(e.target.value)} />
         </div>
 
-        {/* Caption */}
-        <div className="px-5 pb-3">
-          <textarea className={inputClass + ' min-h-[120px] resize-none'} placeholder="Tulis caption... #longevity #sehat" value={caption} onChange={e => setCaption(e.target.value)} />
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center gap-2 px-5 pb-5">
-          <label className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-500 cursor-pointer hover:bg-neutral-200 transition">
-            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => pickFiles(e.target.files)} />
-            🖼️
-          </label>
-          <div className="flex-1" />
-          <button onClick={onClose} className="px-4 py-2.5 rounded-xl text-sm font-bold text-neutral-500 hover:bg-neutral-50 transition">Batal</button>
-          <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all active:scale-95 disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
-            {busy ? '...' : 'Posting'}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════
-   COMMENT SECTION
-   ═══════════════════════════════════════════════════════ */
-function CommentSection({ postId, onClose }: { postId: string; onClose: () => void }) {
-  const { state, addComment } = useStore()
-  const [text, setText] = useState('')
-  const comments = state.comments?.[postId] || []
-
-  function submit() {
-    if (!text.trim()) return
-    addComment(postId, { id: uid(), authorEmail: state.account?.email ?? '', authorName: state.account?.name ?? 'Anonim', text: text.trim(), at: new Date().toISOString() })
-    setText('')
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
-      <div className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-neutral-100">
-          <h3 className="text-sm font-black">Komentar ({comments.length})</h3>
-          <button onClick={onClose} className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500"><IconX size={14} /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
-          {comments.length === 0 && <p className="text-center text-sm text-neutral-400 py-6">Belum ada komentar</p>}
-          {comments.map((c: { id: string; authorName: string; text: string; at: string }) => (
-            <div key={c.id} className="flex gap-2.5">
-              <span className="w-8 h-8 shrink-0 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-bold text-neutral-600">{initials(c.authorName)}</span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline gap-2"><span className="text-xs font-bold">{c.authorName}</span><span className="text-[10px] text-neutral-400">{timeAgo(c.at)}</span></div>
-                <p className="text-sm text-neutral-700 mt-0.5">{c.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 px-5 py-3 border-t border-neutral-100">
-          <input className={inputClass + ' flex-1'} placeholder="Tulis komentar..." value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} />
-          <button onClick={submit} disabled={!text.trim()} className="w-9 h-9 rounded-xl flex items-center justify-center text-white transition-all active:scale-90 disabled:opacity-40" style={{ background: '#00BF63' }}><IconSend size={15} /></button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════
-   POST CARD
-   ═══════════════════════════════════════════════════════ */
-function PostCard({ post: p, me, store, onProfile }: { post: SocialPost; me: string; store: ReturnType<typeof useStore>; onProfile: (e: string) => void }) {
-  const [commentOpen, setCommentOpen] = useState(false)
-  const [shareMenu, setShareMenu] = useState(false)
-  const type = p.postType ?? 'aktivitas'
-  const mine = p.authorEmail === me
-  const cover = p.photos?.find(isImg)
-  const color = COLORS[Math.abs(hash(p.id)) % COLORS.length]
-
-  function handleLike() { store.toggleLike(p.id) }
-  function handleBookmark() { store.toggleBookmark(p.id) }
-  function handleRepost() { store.toggleRepost(p.id) }
-
-  async function handleShareExternal() {
-    const text = `${p.activity}\n\n${p.caption}\n\n— ${p.authorName} via Panaceamed.id\n#Longevity #PerjalananSehat`
-    try {
-      if (navigator.share) await navigator.share({ title: p.activity, text })
-      else await navigator.clipboard.writeText(text)
-    } catch { /* cancelled */ }
-    setShareMenu(false)
-  }
-
-  return (
-    <div className="rounded-2xl border overflow-hidden transition-all hover:shadow-md" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
-      {/* Author */}
-      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <button onClick={() => !mine && onProfile(p.authorEmail)} className="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-sm font-bold text-white" style={{ background: `linear-gradient(145deg, ${color}, ${color}bb)` }}>
-          {initials(p.authorName)}
-        </button>
-        <div className="min-w-0 flex-1">
-          <button onClick={() => !mine && onProfile(p.authorEmail)} className="text-sm font-bold hover:underline">{p.authorName}</button>
-          <div className="text-[10px] text-neutral-400">{timeAgo(p.at)} · {type}</div>
-        </div>
-        <div className="relative">
-          <button onClick={() => setShareMenu(!shareMenu)} className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:bg-neutral-100 transition">
-            <IconShare2 size={15} />
-          </button>
-          {shareMenu && (
-            <div className="absolute right-0 top-10 z-20 w-44 rounded-xl bg-white shadow-xl border border-neutral-100 py-1.5 overflow-hidden" style={{ animation: 'scaleIn 0.15s ease-out' }}>
-              <button onClick={handleShareExternal} className="w-full text-left px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2">🔗 Salin Tautan</button>
-              <button onClick={handleShareExternal} className="w-full text-left px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2">📱 Bagikan ke Medsos</button>
-              <button onClick={handleRepost} className="w-full text-left px-4 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2">🔄 Repost</button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      {p.activity && p.activity !== 'Postingan' && (
-        <div className="px-4 pb-2">
-          <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold" style={{ background: `${color}10`, color }}>{p.activity}</span>
-        </div>
-      )}
-
-      {/* Image */}
-      {cover && (
-        <div className="relative aspect-[4/3] overflow-hidden" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-          <img src={cover} className="w-full h-full object-cover" alt="" loading="lazy" decoding="async" />
-        </div>
-      )}
-
-      {/* Caption */}
-      {p.caption && (
-        <div className="px-4 py-3 text-sm text-neutral-700 whitespace-pre-line leading-relaxed">{p.caption}</div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center border-t px-4 py-2.5" style={{ borderColor: 'rgba(0,0,0,0.04)' }}>
-        <button onClick={handleLike} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-90 hover:bg-neutral-50" style={{ color: p.likedByMe ? '#FF3131' : '#a3a3a3' }}>
-          <IconHeart size={16} fill={p.likedByMe ? '#FF3131' : 'none'} /> {p.likes || ''}
-        </button>
-        <button onClick={() => setCommentOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-neutral-400 transition-all active:scale-90 hover:bg-neutral-50">
-          <IconComment size={16} /> {p.comments || 0}
-        </button>
-        <button onClick={handleRepost} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-90 hover:bg-neutral-50" style={{ color: p.repostedByMe ? '#00BF63' : '#a3a3a3' }}>
-          <IconRepost size={16} /> {p.reposts || 0}
-        </button>
-        <div className="flex-1" />
-        <button onClick={handleBookmark} className="px-2 py-1.5 rounded-lg transition-all active:scale-90 hover:bg-neutral-50" style={{ color: p.bookmarkedByMe ? '#f59e0b' : '#d4d4d4' }}>
-          <IconBookmark size={16} fill={p.bookmarkedByMe ? '#f59e0b' : 'none'} />
-        </button>
-      </div>
-
-      {commentOpen && <CommentSection postId={p.id} onClose={() => setCommentOpen(false)} />}
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════
-   TAB BUTTON
-   ═══════════════════════════════════════════════════════ */
-function TabBtn({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="relative flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-all duration-300 sm:px-4 sm:text-sm" style={active ? { background: '#171717', color: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' } : { color: '#a3a3a3' }}>
-      {icon} <span className="hidden sm:inline">{label}</span>
-    </button>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════
-   HOME FEED
-   ═══════════════════════════════════════════════════════ */
-function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => void }) {
-  const store = useStore()
-  const { state, account, addPost } = useStore()
-  const [filter, setFilter] = useState<'foryou' | 'following'>('foryou')
-  const [showGps, setShowGps] = useState(false)
-
-  const posts = state.posts.filter((p) => {
-    if (p.archived) return false
-    if (p.locked && p.authorEmail !== me) return false
-    if (filter === 'following') return state.follows.includes(p.authorEmail) || p.authorEmail === me
-    return true
-  })
-
-  const todayStr = new Date().toISOString().slice(0, 10)
-  const wt = (state.wellness?.[todayStr] ?? {}) as Record<string, unknown>
-  const todaysFoods = state.foods.filter((f) => f.date === todayStr)
-
-  const { score: longevityScore, hasData, pillars } = useMemo(() => {
-    function clampNum(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
-    const mainMeals = Math.max(0, todaysFoods.length)
-    const exerciseFreq = (wt.exerciseMin as number || 0) > 0 ? 1 : 0
-    const exerciseMin = wt.exerciseMin as number || 0
-    const hydrationL = (wt.waterMl as number || 0) / 1000
-    const sleepHr = wt.sleepHr as number || 0
-    const meals = clampNum(100 - Math.abs(mainMeals - 3) * 18)
-    const exercise = clampNum((exerciseFreq >= 1 ? 60 : 0) + Math.min(40, (exerciseMin / 30) * 40))
-    const hydration = clampNum(hydrationL >= 2 && hydrationL <= 3.5 ? 100 : 100 - Math.abs(hydrationL - 2.5) * 28)
-    const sleep = clampNum(sleepHr >= 7 && sleepHr <= 9 ? 100 : 100 - Math.abs(sleepHr - 8) * 16)
-    const sun = 40
-    const score = clampNum(meals * 0.2 + exercise * 0.25 + hydration * 0.15 + sleep * 0.25 + sun * 0.15)
-    const hasAny = todaysFoods.length > 0 || (wt.sleepHr as number || 0) > 0 || (wt.waterMl as number || 0) > 0 || (wt.exerciseMin as number || 0) > 0
-    return { score: hasAny ? score : 0, hasData: hasAny, pillars: { meals, exercise, hydration, sleep, sun } }
-  }, [todaysFoods, wt])
-
-  function shareLongevityToFeed() {
-    if (!hasData) return
-    addPost({
-      id: uid(), authorEmail: account?.email ?? me, authorName: account?.name ?? 'Saya', role: account?.role ?? 'pasien',
-      postType: 'kebiasaan', kind: 'text', activity: 'Longevity harian',
-      caption: `Nilai Longevity: ${longevityScore}/100 🌱\n${longevityScore >= 80 ? 'Sangat baik' : longevityScore >= 60 ? 'Cukup baik' : 'Perlu perbaikan'}\n\n🍽️ Makan ${pillars.meals} · 🏃 Olahraga ${pillars.exercise} · 💧 Hidrasi ${pillars.hydration} · 🌙 Tidur ${pillars.sleep}\n\n#PerjalananSehat #Longevity`,
-      mediaColor: '#0B7A4B', likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
-    })
-  }
-
-  function shareGpsToFeed(data: { sport: GpsSportMode; dist: number; dur: number; speed: number; pace: string; kcal: number; hr: number; acceleration: number; vo2Max: number; hiit: ReturnType<typeof hiitIndicator> }) {
-    addPost({
-      id: uid(), authorEmail: account?.email ?? me, authorName: account?.name ?? 'Saya', role: account?.role ?? 'pasien',
-      postType: 'aktivitas', kind: 'text', activity: data.sport.name,
-      caption: `${data.sport.emoji} ${data.sport.name}\n📍 Jarak: ${fmtDist(data.dist)}\n⏱ Durasi: ${fmtD(data.dur)}\n💨 Kecepatan: ${Math.round(data.speed)} km/h\n🏃 Pace: ${data.pace}\n🔥 Kalori: ${data.kcal} kkal\n💗 HR: ${data.hr || '—'} bpm\n📊 ${data.hiit.zone}\n${data.vo2Max > 0 ? `🫀 VO₂Max: ~${data.vo2Max.toFixed(1)} ml/kg/min\n` : ''}🚀 Percepatan: ${data.acceleration.toFixed(2)} m/s²\n\n#GPS #Olahraga #Longevity`,
-      mediaColor: data.sport.hiit ? '#FF3131' : '#00BF63', likes: 0, comments: 0, reposts: 0,
-      calories: data.kcal, at: new Date().toISOString(),
-    })
-  }
-
-  const pillarDefs = [
-    { key: 'meals' as const, label: 'Makan', emoji: '🍽️', color: '#f59e0b' },
-    { key: 'exercise' as const, label: 'Olahraga', emoji: '🏃', color: '#f97316' },
-    { key: 'hydration' as const, label: 'Hidrasi', emoji: '💧', color: '#2563eb' },
-    { key: 'sleep' as const, label: 'Tidur', emoji: '🌙', color: '#818cf8' },
-    { key: 'sun' as const, label: 'Matahari', emoji: '☀️', color: '#eab308' },
-  ]
-
-  return (
-    <div className="mx-auto max-w-xl space-y-5">
-      {/* Hero - NO "Bagikan Nilai Longevity" text button, just the ring + pillars */}
-      <div className="overflow-hidden rounded-2xl border p-5" style={{ borderColor: 'rgba(0,191,99,0.12)', background: 'linear-gradient(135deg, rgba(0,191,99,0.04), rgba(11,122,75,0.02), transparent)' }}>
-        <div className="flex items-center gap-4">
-          <div className="relative shrink-0">
-            <MiniRing score={longevityScore} size={68} />
-            <span className="absolute inset-0 flex items-center justify-center text-[17px] font-black tabular-nums" style={{ color: longevityScore >= 60 ? '#00BF63' : longevityScore >= 30 ? '#f59e0b' : '#d4d4d4' }}>{longevityScore}</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-black tracking-tight">
-              Panacea <span style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hidup Sehat</span>
-            </h2>
-            <p className="mt-0.5 text-xs text-neutral-500">Bagikan aktivitas, kebiasaan & artikel longevity Anda.</p>
-          </div>
-        </div>
-
-        <div className="mt-4 space-y-1.5">
-          {pillarDefs.map((p) => (
-            <div key={p.key} className="flex items-center gap-2">
-              <span className="w-4 text-center text-[11px]">{p.emoji}</span>
-              <span className="w-16 text-[9px] font-semibold text-neutral-400">{p.label}</span>
-              <div className="h-[5px] flex-1 overflow-hidden rounded-full" style={{ background: `${p.color}15` }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${hasData ? pillars[p.key] : 0}%`, background: p.color }} />
-              </div>
-              <span className="w-7 text-right text-[9px] font-bold tabular-nums" style={{ color: hasData ? p.color : '#d4d4d4' }}>{hasData ? pillars[p.key] : '—'}</span>
-            </div>
-          ))}
-        </div>
-
-        {!hasData && (
-          <div className="mt-4 rounded-xl px-3 py-2.5 text-center text-[11px] font-medium text-neutral-400" style={{ background: 'rgba(0,0,0,0.02)' }}>
-            💡 Catat makanan & aktivitas di halaman <b>Nutrisi</b> untuk melihat skor
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
-          {[
-            { icon: '📍', label: 'GPS Tracker', color: '#3b82f6', action: () => setShowGps(true) },
-            { icon: '🏃', label: 'Aktivitas', color: '#00BF63' },
-            { icon: '🌿', label: 'Kebiasaan', color: '#0B7A4B' },
-            { icon: '📄', label: 'Artikel', color: '#3b82f6' },
-            { icon: '🌙', label: 'Tidur', color: '#8b5cf6' },
-            { icon: '💧', label: 'Hydrasi', color: '#06b6d4' },
-          ].map((a) => (
-            <button key={a.label} onClick={a.action} className="flex shrink-0 flex-col items-center gap-1.5">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border transition-transform duration-200 hover:scale-110" style={{ borderColor: `${a.color}20`, background: `${a.color}08` }}>
-                <span className="text-lg">{a.icon}</span>
-              </div>
-              <span className="text-[9px] font-bold text-neutral-400">{a.label}</span>
+        {/* Input Area */}
+        <div className="px-5 pb-5 space-y-4">
+          <textarea className="w-full h-28 p-3 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:border-brand resize-none" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
+          
+          <div className="flex items-center justify-between">
+            <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition">
+              📸 {busy ? 'Mengunggah...' : 'Tambah Media'}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* GPS Tracker (expandable) */}
-      {showGps && <GpsTrackerCard onShareToFeed={shareGpsToFeed} />}
-      {showGps && (
-        <div className="text-center">
-          <button onClick={() => setShowGps(false)} className="text-xs font-semibold text-neutral-400 hover:text-neutral-600 transition">Tutup GPS Tracker</button>
-        </div>
-      )}
-
-      {/* Filter */}
-      <div className="flex justify-center gap-2">
-        {(['foryou', 'following'] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)} className="rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-300 active:scale-95"
-            style={filter === f ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' } : { background: '#fff', color: '#a3a3a3', border: '1px solid rgba(0,0,0,0.06)' }}>
-            {f === 'foryou' ? 'Untuk Anda' : 'Mengikuti'}
-          </button>
-        ))}
-      </div>
-
-      {posts.map((p) => <PostCard key={p.id} post={p} me={me} store={store} onProfile={onProfile} />)}
-      {posts.length === 0 && (
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed py-14 text-center" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 30px rgba(0,191,99,0.25)' }}><IconPlus size={30} /></div>
-          <p className="max-w-xs text-sm text-neutral-500">Belum ada unggahan. Ketuk tombol <b style={{ color: '#0B7A4B' }}>+</b> untuk membagikan foto, aktivitas GPS, atau longevity harian.</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════
-   FRIENDS / SEARCH / PROFILE VIEWS
-   ═══════════════════════════════════════════════════════ */
-function FriendsView({ me, onProfile }: { me: string; onProfile: (e: string) => void }) {
-  const { state } = useStore()
-  const profiles = useProfiles(me).filter((p) => state.follows.includes(p.email))
-  return (
-    <div className="mx-auto max-w-xl space-y-4">
-      <div className="rounded-2xl border p-5" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-        <h3 className="flex items-center gap-2 font-bold">👥 Teman</h3>
-        <p className="mt-0.5 text-sm text-neutral-500">Akun yang Anda ikuti.</p>
-      </div>
-      {profiles.map((p) => (
-        <button key={p.email} onClick={() => onProfile(p.email)} className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all hover:shadow-sm" style={{ background: '#fff', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold text-white" style={{ background: `linear-gradient(145deg, ${p.color}, ${p.color}bb)` }}>{initials(p.name)}</span>
-          <div className="min-w-0 flex-1"><div className="truncate font-bold">{p.name}</div><div className="text-xs text-neutral-400">{roleLabel[p.role]} · {p.posts} postingan</div></div>
-        </button>
-      ))}
-      {profiles.length === 0 && <div className="rounded-2xl border border-dashed py-10 text-center text-sm text-neutral-400" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>Belum ada teman.</div>}
-    </div>
-  )
-}
-
-function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: string) => void; onOpen: (id: string) => void }) {
-  const { state } = useStore()
-  const [q, setQ] = useState('')
-  const profiles = useProfiles(me)
-  const query = q.trim().toLowerCase()
-  const matchProfiles = query ? profiles.filter((p) => p.name.toLowerCase().includes(query) || p.email.toLowerCase().includes(query)) : []
-  const fyp = state.posts.filter((p) => !p.locked && !p.archived && p.postType !== 'artikel')
-  const shown = query ? fyp.filter((p) => p.caption.toLowerCase().includes(query) || p.activity.toLowerCase().includes(query) || p.authorName.toLowerCase().includes(query)) : fyp
-  return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center gap-2 rounded-2xl px-4 py-2.5" style={{ background: '#fff', boxShadow: '0 1px 8px rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.04)' }}>
-        <IconSearch size={18} className="text-neutral-400" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari akun atau unggahan…" className="w-full bg-transparent text-sm outline-none" />
-      </div>
-      {matchProfiles.length > 0 && <div className="space-y-2"><div className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">Akun</div>{matchProfiles.map((p) => <button key={p.email} onClick={() => onProfile(p.email)} className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left" style={{ background: '#fff', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold text-white" style={{ background: `linear-gradient(145deg, ${p.color}, ${p.color}bb)` }}>{initials(p.name)}</span><div className="min-w-0 flex-1"><div className="truncate font-bold">{p.name}</div><div className="text-xs text-neutral-400">{roleLabel[p.role]}</div></div></button>)}</div>}
-      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">{query ? 'Hasil' : 'For You'}</div>
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-        {shown.map((p) => { const cover = p.photos?.find(isImg); return (
-          <button key={p.id} onClick={() => onOpen(p.id)} className="group relative aspect-[3/4] overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
-            {cover && <img src={cover} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-            <span className="absolute bottom-2 left-2 right-2 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span>
-            <span className="absolute bottom-2 right-2 flex items-center gap-0.5 text-[10px] font-bold text-white drop-shadow"><IconHeart size={10} />{p.likes}</span>
-          </button>
-        )})}
-      </div>
-      {shown.length === 0 && <div className="rounded-2xl border border-dashed py-10 text-center text-sm text-neutral-400" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>Belum ada unggahan.</div>}
-    </div>
-  )
-}
-
-type ProfileTab = 'posts' | 'locked' | 'liked' | 'saved'
-
-function ProfileView({ me, name, role, onOpen }: { me: string; name: string; role: Role; onOpen: (id: string) => void }) {
-  const { state, updateProfile } = useStore()
-  const [pt, setPt] = useState<ProfileTab>('posts')
-  const [edit, setEdit] = useState(false)
-  const prof = state.profiles[me]
-  const displayName = prof?.name || name
-  const mine = state.posts.filter((p) => p.authorEmail === me)
-  const sets: Record<ProfileTab, SocialPost[]> = {
-    posts: mine.filter((p) => !p.locked && !p.archived),
-    locked: mine.filter((p) => p.locked || p.archived),
-    liked: state.posts.filter((p) => p.likedByMe || p.repostedByMe),
-    saved: state.posts.filter((p) => p.bookmarkedByMe),
-  }
-  const color = COLORS[Math.abs(hash(me)) % COLORS.length]
-  return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-        <div className="h-24" style={{ background: `linear-gradient(135deg, ${color}30, ${color}10 60%, transparent)` }} />
-        <div className="relative -mt-10 px-5 pb-5">
-          <div className="flex items-end gap-4">
-            <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-2xl text-2xl font-extrabold text-white shadow-lg" style={{ background: `linear-gradient(145deg, ${color}, ${color}bb)`, boxShadow: `0 8px 20px ${color}44` }}>{prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(displayName)}</span>
-            <div className="min-w-0 flex-1 pb-1"><h2 className="text-lg font-black">{displayName}</h2><p className="text-xs text-neutral-500">{roleLabel[role]}</p></div>
+            <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={e => pickFiles(e.target.files)} />
+            
+            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0)} className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+              Kirim Postingan
+            </button>
           </div>
-          {prof?.bio && <p className="mt-3 text-sm text-neutral-600">{prof.bio}</p>}
-          <div className="mt-4 grid grid-cols-3 gap-3">{[{ val: mine.length, label: 'Postingan' }, { val: state.follows.length, label: 'Mengikuti' }, { val: sets.saved.length, label: 'Disimpan' }].map((s) => (<div key={s.label} className="rounded-xl px-3 py-2.5 text-center" style={{ background: 'rgba(0,0,0,0.02)' }}><div className="text-lg font-black tabular-nums">{s.val}</div><div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{s.label}</div></div>))}</div>
-          <button onClick={() => setEdit(true)} className="mt-4 w-full rounded-xl border px-4 py-2.5 text-sm font-bold transition-all hover:shadow-sm active:scale-[0.98]" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>Edit Profil</button>
         </div>
-      </div>
-      {edit && <EditProfileModal current={{ name: displayName, bio: prof?.bio ?? '', avatar: prof?.avatar }} onClose={() => setEdit(false)} onSave={(d) => { updateProfile(me, d); setEdit(false) }} />}
-      <div className="flex gap-1 rounded-2xl p-1" style={{ background: '#fff', boxShadow: '0 1px 6px rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.04)' }}>
-        {[['posts', <IconHome size={15} />, 'Postingan'], ['locked', <IconLock size={15} />, 'Terkunci'], ['liked', <IconHeart size={15} />, 'Disukai'], ['saved', <IconBookmark size={15} />, 'Disimpan']].map(([k, icon, label]) => (
-          <button key={k} onClick={() => setPt(k as ProfileTab)} className={'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ' + (pt === k ? 'bg-brand/8 text-brand-dark' : 'text-neutral-400')}>{icon}<span className="hidden sm:inline">{label}</span></button>
-        ))}
-      </div>
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">{sets[pt].map((p) => { const cover = p.photos?.find(isImg); return (<button key={p.id} onClick={() => onOpen(p.id)} className="group relative aspect-[3/4] overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>{cover && <img src={cover} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" alt="" />}<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" /><span className="absolute bottom-2 left-2 right-2 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span></button>) })}</div>
-      {sets[pt].length === 0 && <div className="rounded-2xl border border-dashed py-10 text-center text-sm text-neutral-400" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>Belum ada data.</div>}
-    </div>
-  )
-}
 
-function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () => void; onOpen: (id: string) => void }) {
-  const store = useStore(); const { state } = store; const me = state.account?.email ?? ''
-  const posts = state.posts.filter((p) => p.authorEmail === email && !p.archived && (!p.locked || p.authorEmail === me))
-  const first = state.posts.find((p) => p.authorEmail === email); const prof = state.profiles[email]
-  const name = prof?.name ?? first?.authorName ?? email; const role = first?.role ?? 'pasien'
-  const color = first?.mediaColor ?? COLORS[Math.abs(hash(email)) % COLORS.length]
-  const following = state.follows.includes(email)
-  return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <button onClick={onBack} className="text-sm font-semibold text-neutral-400">← Kembali</button>
-      <div className="overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
-        <div className="h-24" style={{ background: `linear-gradient(135deg, ${color}30, ${color}10 60%, transparent)` }} />
-        <div className="relative -mt-10 px-5 pb-5 text-center">
-          <span className="mx-auto grid h-20 w-20 place-items-center overflow-hidden rounded-2xl text-2xl font-extrabold text-white shadow-lg" style={{ background: `linear-gradient(145deg, ${color}, ${color}bb)`, boxShadow: `0 8px 20px ${color}44` }}>{prof?.avatar ? <img src={prof.avatar} className="h-full w-full object-cover" alt="" /> : initials(name)}</span>
-          <h2 className="mt-2 text-lg font-black">{name}</h2><p className="text-xs text-neutral-500">{roleLabel[role]}</p>
-          {email !== me && <button onClick={() => store.toggleFollow(email)} className="mt-4 rounded-xl px-6 py-2.5 text-sm font-bold transition-all active:scale-[0.97]" style={following ? { background: 'rgba(0,0,0,0.04)', color: '#737373', border: '1px solid rgba(0,0,0,0.06)' } : { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>{following ? 'Mengikuti' : 'Ikuti'}</button>}
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">{posts.map((p) => { const cover = p.photos?.find(isImg); return (<button key={p.id} onClick={() => onOpen(p.id)} className="group relative aspect-[3/4] overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02]" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>{cover && <img src={cover} loading="lazy" className="absolute inset-0 h-full w-full object-cover" alt="" />}<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" /><span className="absolute bottom-2 left-2 right-2 truncate text-[11px] font-semibold text-white drop-shadow">{p.activity}</span></button>) })}</div>
-    </div>
-  )
-}
-
-function EditProfileModal({ current, onClose, onSave }: { current: { name: string; bio: string; avatar?: string }; onClose: () => void; onSave: (d: ProfileEdit) => void }) {
-  const [name, setName] = useState(current.name); const [bio, setBio] = useState(current.bio); const [avatar, setAvatar] = useState<string | undefined>(current.avatar); const [busy, setBusy] = useState(false)
-  async function pick(file?: File) { if (!file) return; setBusy(true); setAvatar(await uploadOrLocal(file)); setBusy(false) }
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">Edit Profil</h3>
-        <div className="mt-4 flex flex-col items-center"><span className="grid h-24 w-24 place-items-center overflow-hidden rounded-2xl text-2xl font-extrabold text-white" style={{ background: 'linear-gradient(145deg, #00BF63, #0B7A4B)' }}>{avatar ? <img src={avatar} className="h-full w-full object-cover" alt="" /> : initials(name)}</span><label className="mt-2 cursor-pointer text-sm font-semibold hover:underline" style={{ color: '#0B7A4B' }}>{busy ? 'Mengunggah…' : 'Ubah foto'}<input type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} /></label></div>
-        <div className="mt-4 space-y-3"><Field label="Nama"><input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} /></Field><Field label="Bio"><textarea className={`${inputClass} min-h-[70px]`} value={bio} onChange={(e) => setBio(e.target.value)} /></Field></div>
-        <div className="mt-5 flex gap-2"><button onClick={onClose} className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-neutral-500 hover:bg-neutral-50">Batal</button><button onClick={() => onSave({ name: name.trim() || current.name, bio: bio.trim(), avatar })} className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Simpan</button></div>
       </div>
     </div>
   )
-}
-
-function useProfiles(_me: string): Profile[] {
-  const { state } = useStore()
-  return useMemo(() => {
-    const map = new Map<string, Profile>()
-    for (const p of state.posts) { const cur = map.get(p.authorEmail); if (cur) cur.posts++; else map.set(p.authorEmail, { email: p.authorEmail, name: p.authorName, role: p.role, color: p.mediaColor, posts: 1 }) }
-    return [...map.values()]
-  }, [state.posts])
 }
 
 /* ═══════════════════════════════════════════════════════
-   MAIN FEED EXPORT
+   MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
-export function Feed() {
-  const store = useStore()
-  const { state, account } = store
-  const [tab, setTab] = useState<Tab>('home')
-  const [compose, setCompose] = useState(false)
-  const [viewProfile, setViewProfile] = useState<string | null>(null)
-  const [viewPost, setViewPost] = useState<string | null>(null)
-  const [subscribed, setSubscribed] = useState<Set<string>>(new Set())
-  const [subPrice, setSubPrice] = useState(100)
-  const me = account?.email ?? 'me@panaceamed.id'
+export default function SportsSocialFeed() {
+  const { account } = useStore() // Mengambil data user terautentikasi dari store global
+  const [posts, setPosts] = useState<SocialPost[]>([])
+  const [isComposeOpen, setIsComposeOpen] = useState(false)
 
-  useEffect(() => {
-    if (!backendEnabled) return
-    api.creatorSubs().then((r: { authors: string[]; price: number }) => { setSubscribed(new Set(r.authors.map((a) => a.toLowerCase()))); setSubPrice(r.price) }).catch(() => {})
-  }, [])
+  // Default fallback user jika context/store kosong
+  const currentUser = useMemo(() => ({
+    email: account?.email || 'user@fitlife.id',
+    name: account?.name || 'Ksatria Bugar',
+    role: (account?.role as Role) || 'pasien'
+  }), [account])
 
-  async function subscribe(email: string): Promise<boolean> {
-    try { const r: { balance: number } = await api.creatorSubscribe(email); setSubscribed((s) => new Set(s).add(email.toLowerCase())); store.syncWalletBalance(r.balance); return true } catch { return false }
+  // Handler memproses postingan standar dari modal
+  const handleAddNewPost = (newPost: SocialPost) => {
+    setPosts(prev => [newPost, ...prev])
+    setIsComposeOpen(false)
   }
 
-  function onCreate(p: SocialPost) {
-    store.addPost(p)
-    if (backendEnabled) api.createPost({ activity: p.activity, caption: p.caption, kind: p.kind, mediaColor: p.mediaColor }).catch(() => {})
-    setCompose(false)
+  // Handler memproses share data aktivitas tracker langsung ke feed sosial
+  const handleShareGpsToFeed = (gpsData: SharedGpsData) => {
+    const generatedCaption = `Saya baru saja menyelesaikan aktivitas ${gpsData.sport.emoji} ${gpsData.sport.name} sejauh ${fmtDist(gpsData.dist)} dengan durasi ${fmtD(gpsData.dur)}. Total pembakaran ${gpsData.kcal} kkal dengan rata-rata zona intensitas ${gpsData.hiit.zone}! 💪`
+    
+    const gpsPost: SocialPost = {
+      id: uid(),
+      authorEmail: currentUser.email,
+      authorName: currentUser.name,
+      role: currentUser.role,
+      postType: 'aktivitas',
+      kind: 'text',
+      activity: `${gpsData.sport.emoji} ${gpsData.sport.name}`,
+      caption: generatedCaption,
+      mediaColor: '#00BF63',
+      photos: [],
+      likes: 0, comments: 0, reposts: 0,
+      at: new Date().toISOString()
+    }
+
+    setPosts(prev => [gpsPost, ...prev])
+    alert('Aktivitas GPS berhasil dibagikan ke Feed!')
   }
 
-  const activePost = viewPost ? state.posts.find((p) => p.id === viewPost) : null
-
-  // Longevity share handler for compose modal
-  function handleShareLongevity() {
-    const todayStr = new Date().toISOString().slice(0, 10)
-    const wt = (state.wellness?.[todayStr] ?? {}) as Record<string, unknown>
-    const todaysFoods = state.foods.filter((f) => f.date === todayStr)
-    function clampNum(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
-    const mainMeals = Math.max(0, todaysFoods.length)
-    const exerciseMin = wt.exerciseMin as number || 0
-    const hydrationL = (wt.waterMl as number || 0) / 1000
-    const sleepHr = wt.sleepHr as number || 0
-    const meals = clampNum(100 - Math.abs(mainMeals - 3) * 18)
-    const exercise = clampNum(60 + Math.min(40, (exerciseMin / 30) * 40))
-    const hydration = clampNum(hydrationL >= 2 && hydrationL <= 3.5 ? 100 : 100 - Math.abs(hydrationL - 2.5) * 28)
-    const sleep = clampNum(sleepHr >= 7 && sleepHr <= 9 ? 100 : 100 - Math.abs(sleepHr - 8) * 16)
-    const sun = 40
-    const score = clampNum(meals * 0.2 + exercise * 0.25 + hydration * 0.15 + sleep * 0.25 + sun * 0.15)
-    const hasAny = todaysFoods.length > 0 || sleepHr > 0 || (wt.waterMl as number || 0) > 0 || exerciseMin > 0
-    if (!hasAny) return
-    addPost({
-      id: uid(), authorEmail: account?.email ?? me, authorName: account?.name ?? 'Saya', role: account?.role ?? 'pasien',
-      postType: 'kebiasaan', kind: 'text', activity: 'Longevity harian',
-      caption: `Nilai Longevity: ${score}/100 🌱\n${score >= 80 ? 'Sangat baik' : score >= 60 ? 'Cukup baik' : 'Perlu perbaikan'}\n\n🍽️ Makan ${meals} · 🏃 Olahraga ${exercise} · 💧 Hidrasi ${hydration} · 🌙 Tidur ${sleep}\n\n#PerjalananSehat #Longevity`,
-      mediaColor: '#0B7A4B', likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
-    })
-  }
-
-  function handleShareGps() { /* Open GPS tracker instead */ }
-
-  function addPost(p: SocialPost) {
-    store.addPost(p)
-    if (backendEnabled) api.createPost({ activity: p.activity, caption: p.caption, kind: p.kind, mediaColor: p.mediaColor }).catch(() => {})
+  const handleQuickLongevityShare = () => {
+    // Simulasi penarikan skor dari lokal atau hitungan ring harian
+    const mockScore = 85 
+    const longevityPost: SocialPost = {
+      id: uid(),
+      authorEmail: currentUser.email,
+      authorName: currentUser.name,
+      role: currentUser.role,
+      postType: 'kebiasaan',
+      kind: 'text',
+      activity: '🌱 Longevity Check-in',
+      caption: `Hari ini berhasil mempertahankan skor Longevity Ring sebesar ${mockScore}%! Detak jantung istirahat stabil dan metabolisme berjalan optimal. Salam sehat!`,
+      mediaColor: '#0B7A4B',
+      photos: [],
+      likes: 0, comments: 0, reposts: 0,
+      at: new Date().toISOString()
+    }
+    setPosts(prev => [longevityPost, ...prev])
   }
 
   return (
-    <SubCtx.Provider value={{ subscribed, price: subPrice, subscribe }}>
-      <div className="relative pb-24">
-        <div className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-center gap-1 border-b px-4 py-2.5" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(16px)', borderColor: 'rgba(0,0,0,0.04)' }}>
-          <TabBtn icon={<IconHome size={17} />} label="Home" active={tab === 'home'} onClick={() => { setTab('home'); setViewProfile(null) }} />
-          <TabBtn icon={<IconUsers size={17} />} label="Friends" active={tab === 'friends'} onClick={() => { setTab('friends'); setViewProfile(null) }} />
-          <TabBtn icon={<IconSearch size={17} />} label="Search" active={tab === 'search'} onClick={() => { setTab('search'); setViewProfile(null) }} />
-          <TabBtn icon={<IconUser size={17} />} label="Profil" active={tab === 'profile'} onClick={() => { setTab('profile'); setViewProfile(null) }} />
-        </div>
+    <div className="max-w-xl mx-auto p-4 space-y-6">
+      {/* Widget Atas: GPS Tracking Engine */}
+      <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} />
 
-        {viewProfile ? (
-          <PublicProfile email={viewProfile} onBack={() => setViewProfile(null)} onOpen={(id) => setViewPost(id)} />
+      {/* Trigger Pembuat Postingan Sosial */}
+      <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-neutral-100 shadow-sm">
+        <span className="text-sm font-semibold text-neutral-500">Punya cerita bugar hari ini?</span>
+        <button onClick={() => setIsComposeOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          <IconPlus size={14} /> Buat Post
+        </button>
+      </div>
+
+      {/* Komponen Modal Pembuat Postingan */}
+      {isComposeOpen && (
+        <ComposeModal
+          onClose={() => setIsComposeOpen(false)}
+          onPost={handleAddNewPost}
+          onShareLongevity={handleQuickLongevityShare}
+          onShareGps={() => alert('Gunakan panel GPS Tracker di atas untuk merekam rute aktif!')}
+          authorEmail={currentUser.email}
+          authorName={currentUser.name}
+          role={currentUser.role}
+        />
+      )}
+
+      {/* RENDER FEED SOSIAL */}
+      <div className="space-y-4">
+        <h4 className="text-xs font-black uppercase tracking-wider text-neutral-400 px-1">Feed Komunitas</h4>
+        {posts.length === 0 ? (
+          <div className="text-center p-8 border border-dashed border-neutral-200 rounded-2xl text-neutral-400 text-xs">
+            Belum ada kiriman. Selesaikan pelacakan rute GPS kamu atau ketuk buat postingan!
+          </div>
         ) : (
-          <>
-            {tab === 'home' && <HomeFeed me={me} onProfile={setViewProfile} />}
-            {tab === 'friends' && <FriendsView me={me} onProfile={setViewProfile} />}
-            {tab === 'search' && <SearchView me={me} onProfile={setViewProfile} onOpen={setViewPost} />}
-            {tab === 'profile' && <ProfileView me={me} name={account?.name ?? 'Saya'} role={account?.role ?? 'pasien'} onOpen={setViewPost} />}
-          </>
-        )}
+          posts.map(p => (
+            <Card key={p.id} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: p.mediaColor || '#00BF63' }}>
+                    {initials(p.authorName)}
+                  </div>
+                  <div>
+                    <div className="text-xs font-black flex items-center gap-1">
+                      {p.authorName} 
+                      <span className="text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">
+                        {roleLabel[p.role]}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(p.at)} · <span className="font-semibold text-brand-dark capitalize">{p.postType}</span></div>
+                  </div>
+                </div>
+              </div>
 
-        {/* Main + Button */}
-        <button onClick={() => setCompose(true)} className="fixed bottom-6 left-6 z-30 grid h-14 w-14 place-items-center rounded-2xl text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 lg:left-[17rem]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 28px rgba(0,191,99,0.35)' }} title="Buat postingan, share longevity, atau share GPS">
-          <IconPlus size={26} />
-        </button>
+              <div className="border-l-2 pl-3 py-0.5 text-xs text-neutral-700 font-medium" style={{ borderColor: p.mediaColor }}>
+                {p.activity}
+              </div>
+              
+              <p className="text-xs text-neutral-600 leading-relaxed whitespace-pre-wrap">{p.caption}</p>
 
-        {compose && <ComposeModal onClose={() => setCompose(false)} onPost={onCreate} onShareLongevity={handleShareLongevity} onShareGps={handleShareGps} authorEmail={me} authorName={account?.name ?? 'Saya'} role={account?.role ?? 'pasien'} />}
-
-        {activePost && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }} onClick={() => setViewPost(null)}>
-            <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}><PostCard post={activePost} me={me} store={store} onProfile={(e) => { setViewPost(null); setViewProfile(e) }} /></div>
-          </div>
+              {p.photos && p.photos.length > 0 && (
+                <div className="grid grid-cols-2 gap-1.5 rounded-xl overflow-hidden">
+                  {p.photos.map((img, idx) => (
+                    <img key={idx} src={img} alt="Post Attachment" className="w-full h-36 object-cover" />
+                  ))}
+                </div>
+              )}
+            </Card>
+          ))
         )}
       </div>
-    </SubCtx.Provider>
+    </div>
   )
 }
