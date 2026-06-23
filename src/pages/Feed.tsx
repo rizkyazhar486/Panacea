@@ -2,23 +2,8 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { Card, Field, inputClass } from '../components/ui'
 import {
-  IconHome,
-  IconUsers,
-  IconSearch,
-  IconUser,
-  IconPlus,
-  IconRun,
-  IconDrop,
-  IconFlame,
-  IconLeaf,
-  IconArticle,
-  IconComment,
-  IconMoon,
-  IconVideo,
-  IconHeart,
-  IconRepost,
-  IconBookmark,
-  IconLock,
+  IconHome, IconUsers, IconSearch, IconUser, IconPlus, IconRun, IconDrop, IconFlame, IconLeaf,
+  IconArticle, IconComment, IconMoon, IconVideo, IconHeart, IconRepost, IconBookmark, IconLock,
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { uploadOrLocal } from '../lib/upload'
@@ -75,8 +60,165 @@ function hash(s: string): number {
 }
 
 /* ═══════════════════════════════════════════
-   MINI LONGEVITY RING
+   CANVAS LONGEVITY IMAGE GENERATOR
    ═══════════════════════════════════════════ */
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x, y + r, y)
+  ctx.closePath()
+}
+
+function generateLongevityImage(
+  score: number,
+  p: { meals: number; exercise: number; hydration: number; sleep: number; sun: number },
+): string {
+  const W = 400
+  const H = 520
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')!
+
+  /* Background */
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, '#0B7A4B')
+  bg.addColorStop(0.5, '#064e36')
+  bg.addColorStop(1, '#0a2f1f')
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, W, H)
+
+  /* Decorative circles */
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)'
+  ctx.lineWidth = 1.5
+  ctx.beginPath(); ctx.arc(W - 20, 30, 55, 0, Math.PI * 2); ctx.stroke()
+  ctx.beginPath(); ctx.arc(15, H - 20, 40, 0, Math.PI * 2); ctx.stroke()
+
+  /* Header */
+  ctx.fillStyle = 'rgba(255,255,255,0.2)'
+  ctx.font = 'bold 9px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.letterSpacing = '4px'
+  ctx.fillText('LONGEVITY SCORE', W / 2, 40)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.12)'
+  ctx.font = '9px sans-serif'
+  ctx.letterSpacing = '0px'
+  ctx.fillText(
+    new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+    W / 2, 58,
+  )
+
+  /* Ring background */
+  const cx = W / 2
+  const cy = 118
+  const r = 50
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)'
+  ctx.lineWidth = 8
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke()
+
+  /* Ring fill */
+  const ringColor = score >= 60 ? '#00BF63' : score >= 30 ? '#f59e0b' : '#FF3131'
+  ctx.strokeStyle = ringColor
+  ctx.lineCap = 'round'
+  ctx.lineWidth = 8
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (score / 100) * Math.PI * 2)
+  ctx.stroke()
+
+  /* Score number */
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 44px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(String(score), cx, cy - 2)
+
+  /* /100 */
+  ctx.fillStyle = 'rgba(255,255,255,0.25)'
+  ctx.font = '15px sans-serif'
+  ctx.fillText('/100', cx, cy + 26)
+
+  /* Band label */
+  const band =
+    score >= 80 ? 'Sangat Baik' : score >= 60 ? 'Cukup Baik' : score >= 40 ? 'Perlu Perbaikan' : 'Mulai dari Langkah Kecil'
+  const bandEmoji = score >= 80 ? ' 🌟' : score >= 60 ? ' 👍' : score >= 40 ? ' 💪' : ''
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'
+  ctx.font = '13px sans-serif'
+  ctx.fillText(band + bandEmoji, cx, cy + 50)
+
+  /* Divider */
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(35, 210); ctx.lineTo(W - 35, 210); ctx.stroke()
+
+  /* Pillar bars */
+  const defs = [
+    { label: 'Makan', emoji: '🍽', value: p.meals, color: '#f59e0b' },
+    { label: 'Olahraga', emoji: '🏃', value: p.exercise, color: '#f97316' },
+    { label: 'Hidrasi', emoji: '💧', value: p.hydration, color: '#2563eb' },
+    { label: 'Tidur', emoji: '🌙', value: p.sleep, color: '#818cf8' },
+    { label: 'Matahari', emoji: '☀️', value: p.sun, color: '#eab308' },
+  ]
+
+  const barX = 62
+  const barW = W - 110
+  const barH = 10
+  const gap = 22
+  const startY = 238
+
+  defs.forEach((d, i) => {
+    const y = startY + i * gap
+    ctx.font = '16px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(d.emoji, 28, y + barH / 2 + 1)
+
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.font = '10px sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText(d.label, 48, y + barH / 2 + 3)
+
+    ctx.fillStyle = 'rgba(255,255,255,0.05)'
+    roundRect(ctx, barX, y, barW, barH, 5)
+    ctx.fill()
+
+    ctx.fillStyle = d.color
+    roundRect(ctx, barX, y, Math.max(4, (d.value / 100) * barW), barH, 5)
+    ctx.fill()
+
+    ctx.fillStyle = d.color
+    ctx.font = 'bold 12px sans-serif'
+    ctx.textAlign = 'right'
+    ctx.fillText(String(d.value), W - 16, y + barH / 2 + 3)
+  })
+
+  /* Footer */
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+  ctx.lineWidth = 1
+  ctx.beginPath(); ctx.moveTo(25, H - 32); ctx.lineTo(W - 25, H - 32); ctx.stroke()
+
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'
+  ctx.font = 'bold 10px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.letterSpacing = '3px'
+  ctx.fillText('PANACEA', W / 2 - 16, H - 12)
+  ctx.fillStyle = 'rgba(0,191,99,0.35)'
+  ctx.fillText('MED', W / 2 + 16, H - 12)
+
+  return canvas.toDataURL('image/png', 0.92)
+}
+
+/* ═══════════════════════════════════════════
+   MINI LONGEVITY RING
+   ═════════════════════════════════════════════ */
 
 function MiniRing({ score, size = 56 }: { score: number; size?: number }) {
   const [v, setV] = useState(0)
@@ -280,7 +422,7 @@ export function Feed() {
 
 function TabBtn({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="relative flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-all duration-300 sm:px-4 sm:text-sm" style={active ? { background: '#171717', color: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' } : { color: '#a3a3a3' }}>
+    <button onClick={onClick} className="relative flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-all duration-300 sm:px-4 sm:text-sm" style={active ? { background: '#171717', color: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' } : { color: '#a3a3a3a3' }}>
       {icon} <span className="hidden sm:inline">{label}</span>
     </button>
   )
@@ -288,7 +430,9 @@ function TabBtn({ icon, label, active, onClick }: { icon: React.ReactNode; label
 
 /* ═══════════════════════════════════════════
    HOME FEED
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════
+   - Share button dipindah ke pojok kanan atas hero, di sebelah label skor
+   ═══════════════════════════════════════════════ */
 
 function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => void }) {
   const store = useStore()
@@ -328,12 +472,24 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
 
   function shareToFeed() {
     if (!hasData) return
+    const imageData = generateLongevityImage(longevityScore, pillars)
     addPost({
-      id: uid(), authorEmail: account?.email ?? me, authorName: account?.name ?? 'Saya',
-      role: account?.role ?? 'pasien', postType: 'kebiasaan', kind: 'image', activity: 'Longevity harian',
+      id: uid(),
+      authorEmail: account?.email ?? me,
+      authorName: account?.name ?? 'Saya',
+      role: account?.role ?? 'pasien',
+      postType: 'kebiasaan',
+      kind: 'image',
+      activity: 'Longevity harian',
       caption: `Nilai Longevity: ${longevityScore}/100 🌱\n${longevityScore >= 80 ? 'Sangat baik' : longevityScore >= 60 ? 'Cukup baik' : 'Perlu perbaikan'}\n\n🍽️ Makan ${pillars.meals} · 🏃 Olahraga ${pillars.exercise} · 💧 Hidrasi ${pillars.hydration} · 🌙 Tidur ${pillars.sleep}\n\n#PerjalananSehat #Longevity`,
-      mediaColor: '#0B7A4B', waterMl: wt.waterMl || 0, sleepHr: wt.sleepHr || 0,
-      likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
+      mediaColor: '#0B7A4B',
+      photos: [imageData],
+      waterMl: wt.waterMl || 0,
+      sleepHr: wt.sleepHr || 0,
+      likes: 0,
+      comments: 0,
+      reposts: 0,
+      at: new Date().toISOString(),
     })
   }
 
@@ -379,9 +535,22 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
             <span className="absolute inset-0 flex items-center justify-center text-[17px] font-black tabular-nums" style={{ color: longevityScore >= 60 ? '#00BF63' : longevityScore >= 30 ? '#f59e0b' : '#d4d4d4' }}>{longevityScore}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl font-black tracking-tight">Panacea <span style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hidup Sehat</span></h2>
+            <h2 className="text-xl font-black tracking-tight">
+              Panacea <span style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Hidup Sehat</span>
+            </h2>
             <p className="mt-0.5 text-xs text-neutral-500">Bagikan aktivitas, kebiasaan & artikel longevity Anda.</p>
-            <p className="mt-1.5 text-[11px] font-semibold" style={{ color: hasData ? (longevityScore >= 60 ? '#0B7A4B' : '#b45309') : '#a3a3a3' }}>{scoreLabel}</p>
+
+            {/* ── SHARE BUTTON DI POJOK KANAN ATAS ── */}
+            <button
+              onClick={() => setShowShare(true)}
+              className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[11px] font-bold text-white transition-all duration-300 hover:shadow-lg active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(135deg, #0B7A4B, #064e36)',
+                boxShadow: '0 3px 12px rgba(11,122,75,0.25)',
+              }}
+            >
+              <span className="text-xs">📤</span> Bagikan Nilai Longevity
+            </button>
           </div>
         </div>
 
@@ -399,13 +568,11 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
           ))}
         </div>
 
-        {/* Share Button */}
-        {hasData ? (
-          <button onClick={() => setShowShare(true)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-[12px] font-bold text-white transition-all duration-300 hover:shadow-lg active:scale-[0.98]" style={{ background: 'linear-gradient(135deg, #0B7A4B, #064e36)', boxShadow: '0 4px 16px rgba(11,122,75,0.3)' }}>
-            <span className="text-sm">📤</span> Bagikan Nilai Longevity
-          </button>
-        ) : (
-          <div className="mt-4 rounded-xl px-3 py-2.5 text-center text-[11px] font-medium text-neutral-400" style={{ background: 'rgba(0,0,0,0.02)' }}>💡 Catat makanan & aktivitas di halaman <b>Nutrisi</b> untuk melihat skor</div>
+        {/* Hint jika belum ada data */}
+        {!hasData && (
+          <div className="mt-4 rounded-xl px-3 py-2.5 text-center text-[11px] font-medium text-neutral-400" style={{ background: 'rgba(0,0,0,0.02)' }}>
+            💡 Catat makanan & aktivitas di halaman <b>Nutrisi</b> untuk melihat skor
+          </div>
         )}
 
         {/* Quick Actions */}
@@ -430,7 +597,15 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
       {/* Filter */}
       <div className="flex justify-center gap-2">
         {(['foryou', 'following'] as const).map((f) => (
-          <button key={f} onClick={() => setFilter(f)} className="rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-300 active:scale-95" style={filter === f ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' } : { background: '#fff', color: '#a3a3a3', border: '1px solid rgba(0,0,0,0.06)' }}>
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className="rounded-full px-5 py-1.5 text-sm font-bold transition-all duration-300 active:scale-95"
+            style={filter === f
+              ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }
+              : { background: '#fff', color: '#a3a3a3a3', border: '1px solid rgba(0,0,0,0.06)' }
+            }
+          >
             {f === 'foryou' ? 'Untuk Anda' : 'Mengikuti'}
           </button>
         ))}
@@ -444,14 +619,17 @@ function HomeFeed({ me, onProfile }: { me: string; onProfile: (e: string) => voi
         </div>
       )}
 
-      {showShare && hasData && <ShareModal score={longevityScore} pillars={pillars} onClose={() => setShowShare(false)} onShareFeed={shareToFeed} onShareExternal={shareExternal} />}
+      {/* Share Modal */}
+      {showShare && hasData && (
+        <ShareModal score={longevityScore} pillars={pillars} onClose={() => setShowShare(false)} onShareFeed={shareToFeed} onShareExternal={shareExternal} />
+      )}
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ═════════════════════════════════════════════
    FRIENDS VIEW
-   ═══════════════════════════════════════════ */
+   ═════════════════════════════════════════════════ */
 
 function FriendsView({ me, onProfile }: { me: string; onProfile: (e: string) => void }) {
   const { state } = useStore()
@@ -468,9 +646,9 @@ function FriendsView({ me, onProfile }: { me: string; onProfile: (e: string) => 
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
    SEARCH VIEW
-   ═══════════════════════════════════════════ */
+   ═════════════════════════════════════════════════════════════
 
 function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: string) => void; onOpen: (id: string) => void }) {
   const { state } = useStore()
@@ -513,9 +691,9 @@ function SearchView({ me, onProfile, onOpen }: { me: string; onProfile: (e: stri
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ═════════════════════════════════════════════════════════════════════
    PROFILE VIEW (own)
-   ═══════════════════════════════════════════ */
+   ═════════════════════════════════════════════════════════════════
 
 type ProfileTab = 'posts' | 'locked' | 'liked' | 'saved'
 
@@ -572,14 +750,12 @@ function ProfileView({ me, name, role, onOpen }: { me: string; name: string; rol
         <ProfTab icon={<IconBookmark size={15} />} label="Disimpan" active={pt === 'saved'} onClick={() => setPt('saved')} />
       </div>
       {pt === 'saved' && <p className="text-center text-[11px] text-neutral-400">🔒 Kolom "Disimpan" hanya terlihat oleh Anda.</p>}
-      <PostGrid posts={sets[pt]} onOpen={onOpen} empty={pt === 'posts' ? 'Belum ada postingan.' : pt === 'locked' ? 'Belum ada postingan terkunci.' : pt === 'liked' ? 'Belum ada yang disukai.' : 'Belum ada yang disimpan.'} />
+      <PostGrid posts={sets[pt]} onOpen={onOpen} empty={pt === 'posts' ? 'Belum ada postingan.' : pt === 'locked' ? 'Belum ada postingan terkunci.' : pt === 'liked' ? 'Belum ada yang disukai.' : 'Belum ada yang disimpan.'} />}
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════
-   PUBLIC PROFILE
-   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
 
 function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () => void; onOpen: (id: string) => void }) {
   const store = useStore()
@@ -595,7 +771,7 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <button onClick={onBack} className="text-sm font-semibold" style={{ color: '#a3a3a3' }}>← Kembali</button>
+      <button onClick={onBack} className="text-sm font-semibold" style={{ color: '#a3a3a3a3a3' }}>← Kembali</button>
       <div className="overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(0,0,0,0.05)' }}>
         <div className="h-24" style={{ background: `linear-gradient(135deg, ${color}30, ${color}10 60%, transparent)` }} />
         <div className="relative -mt-10 px-5 pb-5 text-center">
@@ -606,7 +782,13 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
           <h2 className="mt-2 text-lg font-black">{name}</h2>
           <p className="text-xs text-neutral-500">{roleLabel[role]}</p>
           {email !== me && (
-            <button onClick={() => store.toggleFollow(email)} className="mt-4 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.97]" style={following ? { background: 'rgba(0,0,0,0.04)', color: '#737373', border: '1px solid rgba(0,0,0,0.06)' } : { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
+            <button
+              onClick={() => store.toggleFollow(email)}
+              className="mt-4 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.97]"
+              style={following
+                ? { background: 'rgba(0,0,0,0.04)', color: '#737373', border: '1px solid rgba(0,0,0,0.06)' }
+                : { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }
+            >
               {following ? 'Mengikuti' : 'Ikuti'}
             </button>
           )}
@@ -617,9 +799,7 @@ function PublicProfile({ email, onBack, onOpen }: { email: string; onBack: () =>
   )
 }
 
-/* ═══════════════════════════════════════════
-   EDIT PROFILE MODAL
-   ═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
 
 function EditProfileModal({ current, onClose, onSave }: { current: { name: string; bio: string; avatar?: string }; onClose: () => void; onSave: (d: ProfileEdit) => void }) {
   const [name, setName] = useState(current.name)
@@ -660,7 +840,7 @@ function EditProfileModal({ current, onClose, onSave }: { current: { name: strin
 
 function ProfTab({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all duration-200" style={active ? { background: 'rgba(0,191,99,0.08)', color: '#0B7A4B' } : { color: '#a3a3a3' }}>
+    <button onClick={onClick} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all duration-200" style={active ? { background: 'rgba(0,191,99,0.08)', color: '#0B7A4B' } : { color: '#a3a3a3a3a3' }}>
       {icon}<span className="hidden sm:inline">{label}</span>
     </button>
   )
@@ -674,7 +854,7 @@ function ProfileRow({ p, onClick }: { p: Profile; onClick: () => void }) {
         <div className="truncate font-bold">{p.name}</div>
         <div className="text-xs text-neutral-400">{roleLabel[p.role]} · {p.posts} postingan</div>
       </div>
-      <ColoredIcon color="#d4d4d4"><IconUser size={16} /></ColoredIcon>
+      <ColoredIcon color="#d4d4d4d4"><IconUser size={16} /></ColoredIcon>
     </button>
   )
 }
@@ -711,9 +891,9 @@ function useProfiles(_me: string): Profile[] {
   }, [state.posts])
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════════════
    EXCLUSIVE LOCK
-   ═══════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════════ */
 
 function ExclusiveLock({ post: p, onProfile }: { post: SocialPost; onProfile: (e: string) => void }) {
   const { price, subscribe } = useContext(SubCtx)
@@ -741,9 +921,9 @@ function ExclusiveLock({ post: p, onProfile }: { post: SocialPost; onProfile: (e
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
    POST CARD
-   ═══════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════════════════ */
 
 function PostCard({ post: p, me, store, onProfile }: { post: SocialPost; me: string; store: ReturnType<typeof useStore>; onProfile: (e: string) => void }) {
   const type = p.postType ?? 'aktivitas'
@@ -766,7 +946,7 @@ function PostCard({ post: p, me, store, onProfile }: { post: SocialPost; me: str
           <div className="flex items-center gap-1.5">
             <span className="truncate text-sm font-bold">{prof?.name ?? p.authorName}</span>
             {p.locked && <IconLock size={12} className="text-neutral-400" />}
-            <span className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide" style={{ background: 'rgba(0,0,0,0.04)', color: '#a3a3a3' }}>{roleLabel[p.role]}</span>
+            <span className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide" style={{ background: 'rgba(0,0,0,0.04)', color: '#a3a3a3a3a3' }}>{roleLabel[p.role]}</span>
           </div>
           <span className="text-[11px] text-neutral-400">{timeAgo(p.at)} lalu · {p.activity}</span>
         </button>
@@ -782,7 +962,7 @@ function PostCard({ post: p, me, store, onProfile }: { post: SocialPost; me: str
             )}
           </div>
         ) : (
-          <button onClick={() => store.toggleFollow(p.authorEmail)} className="rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-all duration-200 active:scale-95" style={following ? { background: 'rgba(0,0,0,0.04)', color: '#737373' } : { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 2px 10px rgba(0,191,99,0.25)' }}>
+          <button onClick={() => store.toggleFollow(p.authorEmail)} className="rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-all duration-200 active:scale-95" style={following ? { background: 'rgba(0,0,0,0.04)', color: '#7373737' } : { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', color: '#fff', boxShadow: '0 2px 10px rgba(0,191,99,0.25)' }}>
             {following ? 'Mengikuti' : 'Ikuti'}
           </button>
         )}
@@ -795,32 +975,34 @@ function PostCard({ post: p, me, store, onProfile }: { post: SocialPost; me: str
           {type === 'artikel' ? <ArticleBlock post={p} /> : <MediaBlock post={p} />}
           {type === 'aktivitas' && <ActivityMetrics post={p} />}
           {type === 'kebiasaan' && <HabitMetrics post={p} />}
-          {(p.audio || p.location) && <div className="flex flex-wrap gap-3 px-5 pt-2 text-[11px] font-semibold text-neutral-500">{p.audio && <span>🎵 {p.audio}</span>}{p.location && <span>📍 {p.location}</span>}</div>}
+          {(p.audio || p.location) && (
+            <div className="flex flex-wrap gap-3 px-5 pt-2 text-[11px] font-semibold text-neutral-500">{p.audio && <span>🎵 {p.audio}</span>}{p.location && <span>📍 {p.location}</span>}</div>
+          )}
           {p.caption && <p className="px-5 pt-3 text-sm" style={{ color: '#171717' }}>{p.caption}</p>}
         </>
       )}
 
       <div className="flex items-center gap-5 px-5 py-3" style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}>
         <button onClick={() => store.toggleLike(p.id)} className="flex items-center gap-1.5 text-sm font-semibold hover:scale-105 transition-transform">
-          <ColoredIcon color={p.likedByMe ? '#FF3131' : '#a3a3a3'}><IconHeart size={18} /></ColoredIcon>
-          <span style={{ color: p.likedByMe ? '#FF3131' : '#737373' }}>{p.likes}</span>
+          <ColoredIcon color={p.likedByMe ? '#FF3131' : '#a3a3a3a3a3'}><IconHeart size={18} /></ColoredIcon>
+          <span style={{ color: p.likedByMe ? '#FF3131' : '#737373737' }}>{p.likes}</span>
         </button>
-        <span className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: '#737373' }}><IconComment size={18} /> {p.comments ?? 0}</span>
+        <span className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: '#737373737' }}><IconComment size={18} /> {p.comments ?? 0}</span>
         <button onClick={() => store.toggleRepost(p.id)} className="flex items-center gap-1.5 text-sm font-semibold hover:scale-105 transition-transform">
-          <ColoredIcon color={p.repostedByMe ? '#00BF63' : '#a3a3a3'}><IconRepost size={18} /></ColoredIcon>
-          <span style={{ color: p.repostedByMe ? '#00BF63' : '#737373' }}>{p.reposts ?? 0}</span>
+          <ColoredIcon color={p.repostedByMe ? '#00BF63' : '#a3a3a3a3a3'}><IconRepost size={18} /></ColoredIcon>
+          <span style={{ color: p.repostedByMe ? '#00BF63' : '#737373737' }}>{p.reposts ?? 0}</span>
         </button>
         <button onClick={() => store.toggleBookmark(p.id)} className="ml-auto hover:scale-110 transition-transform" title="Simpan">
-          <ColoredIcon color={p.bookmarkedByMe ? '#00BF63' : '#a3a3a3'}><IconBookmark size={18} /></ColoredIcon>
+          <ColoredIcon color={p.bookmarkedByMe ? '#00BF63' : '#a3a3a3a3a3'}><IconBookmark size={18} /></ColoredIcon>
         </button>
       </div>
     </Card>
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════════
    MEDIA / ARTICLE / METRICS
-   ═══════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════════════ */
 
 function MediaBlock({ post: p }: { post: SocialPost }) {
   if (p.videoUrl) return <video src={p.videoUrl} className="max-h-[70vh] w-full bg-black" controls muted loop playsInline />
@@ -835,7 +1017,7 @@ function MediaBlock({ post: p }: { post: SocialPost }) {
     <div className="relative flex aspect-[16/11] items-center justify-center" style={{ background: `linear-gradient(150deg, ${p.mediaColor}, #0c1410)` }}>
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
       <div className="relative text-center text-white/95">
-        {(p.postType ?? 'aktivitas') === 'kebiasaan' ? <IconLeaf size={44} className="mx-auto" /> : p.kind === 'video' ? <IconVideo size={44} className="mx-auto" /> : <IconRun size={44} className="mx-auto" />}
+        {(p.postType ?? 'aktivitas' ? <IconLeaf size={44} className="mx-auto" /> : p.kind === 'video' ? <IconVideo size={44} className="mx-auto" /> : <IconRun size={44} className="mx-auto" />}
         <div className="mt-2 text-2xl font-extrabold">{p.activity}</div>
         {p.kind === 'video' && <span className="mt-1 inline-block rounded-full px-2 py-0.5 text-[11px]" style={{ background: 'rgba(0,0,0,0.3)' }}>▶ {p.videoSec ?? p.durationSec ?? 30}s</span>}
       </div>
@@ -867,11 +1049,11 @@ function Metric({ icon, value, label, color }: { icon: React.ReactNode; value: s
 function ActivityMetrics({ post: p }: { post: SocialPost }) {
   if (!p.distanceKm && !p.durationMin && !p.calories && !p.steps) return null
   return (
-    <div className="mt-3 grid grid-cols-4 gap-2 px-5">
-      <Metric icon={<IconRun size={17} />} value={p.distanceKm ? `${p.distanceKm}` : '—'} label="km" />
-      <Metric icon={<IconComment size={17} />} value={p.durationMin ? `${p.durationMin}` : '—'} label="menit" color="#3b82f6" />
-      <Metric icon={<IconFlame size={17} />} value={p.calories ? `${p.calories}` : '—'} label="kkal" color="#f59e0b" />
-      <Metric icon={<IconLeaf size={17} />} value={p.steps ? `${p.steps.toLocaleString('id-ID')}` : '—'} label="langkah" />
+    <div className="mt-3 grid grid grid-cols-4 gap-2 px-5">
+      <Metric icon={<IconRun size={17} />} value={p.distanceKm ? `${p.distanceKm}` : '—'} unit="km" color="#00BF63" />
+      <Metric icon={<IconComment size={17} />} value={p.durationMin ? `${p.durationMin}` : '—'} unit="menit" color="#3b82f6" />
+      <Metric icon={<IconFlame size={17} />} value={p.calories ? `${p.calories}` : '—'} unit="kkal" color="#f59e0b" />
+      <Metric icon={<IconLeaf size={17} />} value={p.steps ? `${p.steps.toLocaleString('id-ID')}` : '—'} unit="langkah" />
     </div>
   )
 }
@@ -880,19 +1062,20 @@ function HabitMetrics({ post: p }: { post: SocialPost }) {
   if (p.waterMl == null && p.veggieServ == null && p.sleepHr == null && p.sugaryDrinks == null) return null
   return (
     <div className="mt-3 grid grid-cols-4 gap-2 px-5">
-      <Metric icon={<IconDrop size={17} />} value={p.waterMl != null ? `${(p.waterMl / 1000).toFixed(1)}` : '—'} label="liter air" color="#06b6d4" />
-      <Metric icon={<IconLeaf size={17} />} value={p.veggieServ != null ? `${p.veggieServ}` : '—'} label="porsi sayur" />
-      <Metric icon={<IconMoon size={17} />} value={p.sleepHr != null ? `${p.sleepHr}` : '—'} label="jam tidur" color="#8b5cf6" />
-      <Metric icon={<IconFlame size={17} />} value={p.sugaryDrinks != null ? `${p.sugaryDrinks}` : '—'} label="min. manis" color="#f59e0b" />
+      <Metric icon={<IconDrop size={17} />} value={p.waterMl != null ? `${(p.waterMl / 1000).toFixed(1)}` : '—'} unit="liter air" color="#06b6d4" />
+      <Metric icon={<IconLeaf size={17} />} value={p.veggieServ != null ? `${p.veggieServ}` : '—'} unit="porsi sayur" />
+      <Metric icon={<IconMoon size={17} />} value={p.sleepHr != null ? `${p.sleepHr}` : '—'} unit="jam tidur" color="#818cf8" />
+      <Metric icon={<IconFlame size={17} />} value={p.sugaryDrinks != null ? `${p.sugaryDrinks}` : '—'} unit="min. manis" color="#f59e0b" />
     </div>
   )
 }
 
-/* ═══════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════════════
    COMPOSE MODAL
-   ═══════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════════ */
 
-function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: { onClose: () => void; onPost: (p: SocialPost) => void; authorEmail: string; authorName: string; role: Role }) {
+function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: {
+  onClose: () => void; onPost: (p: SocialPost) => void; authorEmail: string; authorName: string; role: Role }) {
   const [postType, setPostType] = useState<PostType>('aktivitas')
   const [media, setMedia] = useState<'video' | 'foto'>('foto')
   const [photoData, setPhotoData] = useState<string[]>([])
@@ -915,7 +1098,7 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: { onCl
   async function onPickPhotos(files: FileList | null) {
     if (!files) return
     setUploading(true)
-    setPhotoData(await Promise.all(Array.from(files).slice(0, 4).map((f) => uploadOrLocal(f))))
+    setPhotoData(await Promise.all(Array.from(files).slice(0, 4).map((f) => uploadOrLocal(f)))
     setUploading(false)
   }
   async function onPickVideo(files: FileList | null) {
@@ -931,16 +1114,17 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: { onCl
     const base: SocialPost = {
       id: uid(), authorEmail, authorName, role, postType,
       kind: isVideo ? 'video' : 'image',
-      activity: postType === 'kebiasaan' ? 'Kebiasaan sehat' : postType === 'artikel' ? 'Longevity' : activity,
-      caption: caption.trim(), mediaColor: color,
-      videoSec: isVideo ? 30 : undefined, videoUrl: isVideo ? videoUrl! : undefined,
+      activity: postType === 'kebiasaan' ? 'Kebiasaan sehat' : postType === 'artikel' ? 'Longevity',
+      caption: caption.trim(), mediaColor: '#0B7A4B',
+      videoSec: isVideo ? 30 : undefined,
+      videoUrl: isVideo ? videoUrl! : undefined,
       photos: !isVideo && postType !== 'artikel' && photoData.length > 0 ? photoData : undefined,
       audio: audio !== SONGS[0] ? audio : undefined,
       location: location.trim() || undefined,
       locked, exclusive, likes: 0, comments: 0, reposts: 0, at: new Date().toISOString(),
     }
     if (postType === 'aktivitas') { base.distanceKm = num(distanceKm); base.durationMin = num(durationMin) }
-    else if (postType === 'kebiasaan') { base.waterMl = num(waterMl); base.veggieServ = num(veggieServ); if (!base.caption) base.caption = 'Kebiasaan sehat hari ini 💪' }
+    else if (postType === 'kebiasaan') { base.waterMl = num(waterMl); base.veggieServ = num(veggieServ) }
     else { base.articleTitle = articleTitle.trim() || caption.trim(); base.articleSource = 'Panaceamed Longevity' }
     onPost(base)
   }
@@ -954,82 +1138,176 @@ function ComposeModal({ onClose, onPost, authorEmail, authorName, role }: { onCl
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} onClick={onClose}>
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">Unggah</h3>
-        <p className="mt-0.5 text-sm text-neutral-500">Video singkat (maks 30 detik) atau beberapa foto.</p>
-        <div className="mt-4 flex gap-2">
-          {typeOptions.map(([t, label, icon]) => (
-            <button key={t} onClick={() => setPostType(t)} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200" style={postType === t ? { background: 'rgba(0,191,99,0.08)', color: '#0B7A4B', border: '1px solid rgba(0,191,99,0.2)' } : { background: 'rgba(0,0,0,0.03)', color: '#a3a3a3' }}>{icon} {label}</button>
-          ))}
-        </div>
-        {postType !== 'artikel' && (
-          <div className="mt-3 flex gap-2">
-            {mediaOptions.map((m) => (
-              <button key={m} onClick={() => setMedia(m)} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200" style={media === m ? { background: '#171717', color: '#fff' } : { background: 'rgba(0,0,0,0.03)', color: '#a3a3a3' }}>
-                {m === 'foto' ? <IconLeaf size={14} /> : <IconVideo size={14} />} {m === 'foto' ? 'Foto' : 'Video 30 dtk'}
-              </button>
-            ))}
+      <div className="w-full max-w-md max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="max-h-[85vh] overflow-y-auto">
+          <h3 className="text-lg font-bold">Unggah</h3>
+          <p className="mt-0.5 text-sm text-neutral-500">Video singkat (maks 30 detik) atau beberapa foto.</p>
+          <div className="mt-4 flex flex flex-wrap gap-2">
+            {typeOptions.map(([t, label, icon]) => (
+              <button key={t} onClick={() => setPostType(t)} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200" style={postType === t ? { background: 'rgba(0,191,99,0.08)', color: '#0B7A4B', border: '1px solid rgba(0,191,99,0.2)' } : { background: 'rgba(0,0,0,0.03)', color: '#a3a3a3a3a3a3' }}>{icon} {label}</button>
+            )}
           </div>
         )}
-        {postType !== 'artikel' && media === 'foto' && (
+        {postType !== 'artikel' && (
           <div className="mt-3">
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed py-5 text-neutral-500 hover:border-[#00BF63]" style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}>
-              <IconPlus size={22} /><span className="text-xs font-semibold">Unggah foto (maks 4)</span>
+            <Field label="Judul artikel"><input className={inputClass} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} placeholder="Kilasan artikel longevity" /></Field>
+          </div>
+        )}
+        <div className="mt-3 flex flex flex-wrap items-end gap-2">
+          {postType !== 'artikel' && media === 'foto' && (
+            <div className="mt-3">
+              <label className="flex cursor-pointer flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-neutral-200 py-5 text-neutral-500 hover:border-[#00BF63]"
+                style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}
+              <IconPlus size={22} className="text-neutral-400" />
               <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => onPickPhotos(e.target.files)} />
             </label>
-            {photoData.length > 0 && <div className="mt-2 grid grid-cols-4 gap-1.5">{photoData.map((src, i) => <img key={i} src={src} loading="lazy" decoding="async" className="aspect-square w-full rounded-lg object-cover" alt="" />)}</div>}
           </div>
         )}
-        {postType !== 'artikel' && media === 'video' && (
-          <div className="mt-3">
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed py-5 text-neutral-500 hover:border-[#00BF63]" style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}>
-              <IconVideo size={22} /><span className="text-xs font-semibold">Unggah video singkat (maks 30 detik)</span>
-              <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onPickVideo(e.target.files)} />
-            </label>
-            {videoUrl && <video src={videoUrl} className="mt-2 max-h-48 w-full rounded-lg" controls muted playsInline />}
-          </div>
-        )}
+        <div className="mt-3 flex flex flex-wrap items-end gap-2">
+          {postType !== 'artikel' && media === 'video' && (
+            <div className="mt-3">
+              <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-neutral-200 py-5 text-neutral-500 hover:border-[#00BF63]"
+                style={{ borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(0,0,0,0.01)' }}
+                <IconVideo size={22} className="text-neutral-400" />
+                <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onPickVideo(e.target.files)} />
+              </label>
+            </div>
+          )}
+        </div>
         <div className="mt-3 space-y-3">
-          {postType === 'aktivitas' && (<>
+          {postType === 'aktivitas' && (
             <Field label="Aktivitas"><select className={inputClass} value={activity} onChange={(e) => setActivity(e.target.value)}>{ACTIVITIES.map((a) => <option key={a}>{a}</option>)}</select></Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Jarak (km)"><input className={inputClass} type="number" value={distanceKm} onChange={(e) => setDistanceKm(e.target.value)} /></Field>
               <Field label="Durasi (menit)"><input className={inputClass} type="number" value={durationMin} onChange={(e) => setDurationMin(e.target.value)} /></Field>
             </div>
-          </>)}
+          )}
           {postType === 'kebiasaan' && (
             <div className="grid grid-cols-2 gap-3">
               <Field label="Air putih (ml)"><input className={inputClass} type="number" value={waterMl} onChange={(e) => setWaterMl(e.target.value)} /></Field>
               <Field label="Porsi sayur/buah"><input className={inputClass} type="number" value={veggieServ} onChange={(e) => setVeggieServ(e.target.value)} /></Field>
             </div>
           )}
-          {postType === 'artikel' && <Field label="Judul artikel"><input className={inputClass} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} placeholder="Kilasan artikel longevity" /></Field>}
-          <Field label="Caption"><input className={inputClass} value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Ceritakan kemajuan sehat Anda…" /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="🎵 Pilih lagu"><select className={inputClass} value={audio} onChange={(e) => setAudio(e.target.value)}>{SONGS.map((s) => <option key={s}>{s}</option>)}</select></Field>
-            <Field label="📍 Lokasi"><input className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="mis. GBK, Jakarta" /></Field>
-          </div>
+          {postType === 'artikel' && (
+            <Field label="Judul artikel"><input className={inputClass} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} placeholder="Kilasan artikel longevity" /></Field>
+        )}
+        <div className="mt-3 flex flex flex-wrap items-end gap-2">
+          <Field label="🎵 Pilih lagu"><select className={inputClass} value={audio} onChange={(e) => setAudio(e.target.value)}>{SONGS.map((s) => <option key={s}>{s}</option>)}</select></Field>
+          <Field label="📍 Lokasi"><input className={inputClass} value={location} onChange={(e) => setLocation(e.target.value)} placeholder="mis. GBK Jakarta" /></Field>
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <span className="text-xs font-semibold text-neutral-500">Warna:</span>
-          {COLORS.map((c) => <button key={c} onClick={() => setColor(c)} className="h-6 w-6 rounded-full transition-transform duration-200 hover:scale-110" style={{ background: c, boxShadow: color === c ? `0 0 0 2px #fff, 0 0 0 4px ${c}` : 'none' }} />)}
+          <Field label="Warna"><select className={inputClass} value={locked} onChange={(e) => setLocked(e.target.checked)} className="h-4 w-4 accent-[#00BF63]" /></Field>
+            <IconLock size={14} className="text-neutral-400" /> Kunci postingan (privat)
+          </label>
+          <label className="mt-2 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm" style={{ background: 'rgba(0,191,99,0.05)', color: '#0B7A4B' }}>
+            <input type="checkbox" checked={exclusive} onChange={(e) => setExclusive(e.target.checked)} className="h-4 w-4 accent-[#00BF63]" />
+            <span>⭐ <b>Konten Eksklusif</b> — hanya untuk subscriber (langganan 100 PNC/bln)</span>
+          </label>
         </div>
-        <label className="mt-3 flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={locked} onChange={(e) => setLocked(e.target.checked)} className="h-4 w-4" style={{ accentColor: '#00BF63' }} />
-          <IconLock size={14} className="text-neutral-400" /> Kunci postingan (privat)
-        </label>
-        <label className="mt-2 flex items-center gap-2 rounded-xl p-2.5 text-sm" style={{ background: 'rgba(0,191,99,0.05)', color: '#0B7A4B' }}>
-          <input type="checkbox" checked={exclusive} onChange={(e) => setExclusive(e.target.checked)} className="h-4 w-4" style={{ accentColor: '#00BF63' }} />
-          <span>⭐ <b>Konten Eksklusif</b> — hanya untuk subscriber (langganan 100 PNC/bln)</span>
-        </label>
-        {uploading && <p className="mt-3 text-xs font-semibold" style={{ color: '#0B7A4B' }}>Mengunggah media…</p>}
         <div className="mt-5 flex gap-2">
-          <button onClick={onClose} className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-neutral-500 hover:bg-neutral-50">Batal</button>
-          <button onClick={submit} disabled={uploading} className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white active:scale-[0.97] disabled:opacity-60" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          <button onClick={submit} className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white active:scale-[0.97] disabled={uploading}>
             <span className="flex items-center justify-center gap-1.5"><IconPlus size={15} /> Posting</span>
           </button>
         </div>
       </div>
     </div>
+  )
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MAIN FEED
+   ════════════════════════════════════════════════════════════════════════════════════════════════════════════ */}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+function useProfiles(_me: string): Profile[] {
+  const { state } = useStore()
+  return useMemo(() => {
+    const map = new Map<string, Profile>()
+    for (const p of state.posts) {
+      const cur = map.get(p.authorEmail)
+      if (cur) cur.posts++
+      else map.set(p.authorEmail, { email: p.authorEmail, name: p.authorName, role: p.role, color: p.mediaColor, posts: 1 })
+    }
+    return [...map.values()]
+  }, [state.posts])
+}
+
+export function Feed() {
+  const store = useStore()
+  const { state, account } = store
+  const [tab, setTab] = useState<Tab>('home')
+  const [compose, setCompose] = useState(false)
+  const [viewProfile, setViewProfile] = useState<string | null>(null)
+  const [viewPost, setViewPost] = useState<string | null>(null)
+  const [subscribed, setSubscribed] = useState<Set<string>>(new Set())
+  const [subPrice, setSubPrice] = useState(100)
+  const me = account?.email ?? 'me@panaceamed.id'
+
+  useEffect(() => {
+    if (!backendEnabled) return
+    api.creatorSubs().then((r: { authors: string[]; price: number }) => {
+      setSubscribed(new Set(r.authors.map((a) => a.toLowerCase()))
+      setSubPrice(r.price)
+    }).catch(() => {})
+  }, [])
+
+  async function subscribe(email: string): Promise<boolean> {
+    try {
+      const r: { balance: number } = await api.creatorSubscribe(email)
+      setSubscribed((s) => new Set(s).add(email.toLowerCase()))
+      store.syncWalletBalance(r.balance)
+      return true
+    } catch { return false }
+  }
+
+  function onCreate(p: SocialPost) {
+    store.addPost(p)
+    if (backendEnabled) api.createPost({ activity: p.activity, caption: p.caption, kind: p.kind, mediaColor: p.mediaColor }).catch(() => {})
+    setCompose(false)
+    setTab('profile')
+  }
+
+  const activePost = viewPost ? state.posts.find((p) => p.id === viewPost) : null
+
+  return (
+    <SubCtx.Provider value={{ subscribed, price: subPrice, subscribe }}>
+    <div className="relative pb-24">
+      <div className="sticky top-0 z-20 -mx-4 mb-5 flex items-center justify-center gap-1 border-b px-4 py-2.5"
+        style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(16px)', borderColor: 'rgba(0,0,0,0.04)' }}
+      >
+        <TabBtn icon={<IconHome size={17} />} label="Home" active={tab === 'home'} onClick={() => { setTab('home'); setViewProfile(null) }} />
+        <TabBtn icon={<IconUsers size={17} />} label="Friends" active={tab === 'friends' } onClick={() => { setTab('friends'); setViewProfile(null) }} />
+        <TabBtn icon={<IconSearch size={17} />} label="Search" active={tab === 'search' } onClick={() => { setTab('search'); setViewProfile(null) }} />
+        <TabBtn icon={<IconUser size={17} />} label="Profil" active={tab === 'profile' } onClick={() => { setTab('profile'); setViewProfile(null) }} />
+      </div>
+
+      {viewProfile ? (
+        <PublicProfile email={viewProfile} onBack={() => setViewProfile(null)} onOpen={(id) => setViewPost(id)} />
+      ) : (
+        <>
+          {tab === 'home' && <HomeFeed me={me} onProfile={setViewProfile} />}
+          {tab === 'friends' && <FriendsView me={me} onProfile={setViewProfile} />}
+          {tab === 'search' && <SearchView me={me} onProfile={setViewProfile} onOpen={setViewPost} />}
+          {tab === 'profile' && <ProfileView me={me} name={account?.name ?? 'Saya'} role={account?.role ?? 'pasien'} onOpen={setViewPost} />}
+        </>
+      )}
+
+      <button onClick={() => setCompose(true)} className="fixed bottom-6 left-6 left-6 z-30 grid h-14 w-14 place-items-center rounded-2xl text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 lg:left-[17rem]"
+        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 28px rgba(0,191,99,0.35)' }}
+        title="Unggah video singkat / foto"
+      >
+
+      {compose && <ComposeModal onClose={() => setCompose(false)} onPost={onCreate} authorEmail={me} authorName={account?.name ?? 'Saya'} role={account?.role ?? 'pasien' } />}
+
+      {activePost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }} onClick={() => setViewPost(null)}>
+          <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <PostCard post={activePost} me={me} store={store} onProfile={(e) => { setViewPost(null); setViewProfile(e) }} />
+          </div>
+        </div>
+      )}
+    </div>
+    </div>
+    </SubCtx.Provider>
   )
 }
