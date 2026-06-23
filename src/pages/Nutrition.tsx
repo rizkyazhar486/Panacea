@@ -370,7 +370,7 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     calAdj: -0.2, protAdj: 1.3, naMax: 1500, kMax: 0, fluidMax: 2500, fluidMin: 1500,
     specialFoods: ['Salmon', 'Dada ayam rebus', 'Oatmeal', 'Quinoa', 'Kacang almond', 'Bayam', 'Brokoli', 'Jambu biji', 'Alpukado', 'Yogurt Greek', 'Minyak zaitun', 'Dark chocolate 85%'],
     avoidFoods: ['Nasi putih', 'Roti tawar', 'Mie goreng', 'Es teh manis', 'Gula merah', 'Minuman energi', 'Fast food', 'Makanan olahan', 'Nasi uduk'],
-    notes: ['Target: turunkan lingkar perut', 'Karbo <45% dari kalori total', 'Lemak sehat 30-35% (MUFAn PUFA)', 'Natrium <1500mg untuk tekanan darah', 'Serat 30g+/hari', 'Omega-3 2-3g/hari', 'Cuka apel sebelum makan bisa bantu sensitivitas insulin'],
+    ['Target: turunkan lingkar perut', 'Karbo <45% dari kalori total', 'Lemak sehat 35-40% dari kalori total', 'Omega-3 dari ikan & kacang', 'Hindari fruktosa berlebihan', 'Cek profil lipid setiap 3 bulan'], 'Natrium <1500mg untuk tekanan darah', 'Serat 30g+/hari', 'Omega-3 2-3g/hari', 'Cuka apel sebelum makan bisa bantu sensitivitas insulin'],
     labKeys: ['glucose', 'hba1c', 'totalCholesterol', 'ldl', 'hdl', 'triglycerides', 'uricAcid', 'crp', 'alt', 'systolic'],
     labLabels: { glucose: 'Gula Darah', hba1c: 'HbA1c', totalCholesterol: 'Kolestrol Total', ldl: 'LDL', hdl: 'HDL', triglycerides: 'Trigliserida', uricAcid: 'Asam Urat', crp: 'CRP', alt: 'ALT', systolic: 'Sistolik' },
     labUnits: { glucose: 'mg/dL', hba1c: '%', totalCholesterol: 'mg/dL', ldl: 'mg/dL', hdl: 'mg/dL', triglycerides: 'mg/dL', uricAcid: 'mg/dL', crp: 'mg/L', alt: 'U/L', systolic: 'mmHg' },
