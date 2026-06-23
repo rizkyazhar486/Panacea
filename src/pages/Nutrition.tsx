@@ -1295,8 +1295,10 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
         step="any"
       />
     </div>
-  ))}
+ ))}
 </div>
+</div>
+)}
       )}
 
       {/* Lab Results Table with Weekly Comparison */}
