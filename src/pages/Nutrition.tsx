@@ -1201,8 +1201,6 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
    ═══════════════════════════════════════════════════════ */
 function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   const [labs, setLabs] = useState<LabEntry[]>(loadLabs)
-  const [showForm, setShowForm] = useState(false)
-  const [editDate, setEditDate] = useState(today())
   const [editVals, setEditVals] = useState<Record<string, string>>({})
 
   const labKeys = activeProtocol?.labKeys ?? ['glucose', 'hba1c', 'totalCholesterol', 'ldl', 'hdl', 'triglycerides', 'creatinine', 'gfr', 'alt', 'ast', 'hemoglobin', 'crp', 'potassium', 'sodium', 'albumin', 'vitD']
