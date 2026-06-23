@@ -7,7 +7,7 @@ import { GrowthChart } from '../components/GrowthChart'
 import type { VitalSign } from '../lib/types'
 
 /* ═══════════════════════════════════════════
-   LOCAL TYPES — agar tidak depend pada type yang mungkin belum diekspos
+   LOCAL TYPES
    ═══════════════════════════════════════════ */
 
 interface SupportiveResult {
@@ -69,11 +69,12 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
   const c = 2 * Math.PI * r
   const offset = c - (animated / 100) * c
   const color = score >= 80 ? '#00BF63' : score >= 60 ? '#f59e0b' : '#FF3131'
-  const glow = score >= 80
-    ? '0 0 24px rgba(0,191,99,0.3)'
-    : score >= 60
-      ? '0 0 24px rgba(245,158,11,0.3)'
-      : '0 0 24px rgba(255,49,49,0.3)'
+  const glow =
+    score >= 80
+      ? '0 0 24px rgba(0,191,99,0.3)'
+      : score >= 60
+        ? '0 0 24px rgba(245,158,11,0.3)'
+        : '0 0 24px rgba(255,49,49,0.3)'
 
   return (
     <div
@@ -84,8 +85,20 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
       aria-valuemax={100}
       aria-label={`Longevity Score: ${score} — ${band}`}
     >
-      <svg width="112" height="112" className="-rotate-90" style={{ filter: `drop-shadow(${glow})` }}>
-        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth="9" />
+      <svg
+        width="112"
+        height="112"
+        className="-rotate-90"
+        style={{ filter: `drop-shadow(${glow})` }}
+      >
+        <circle
+          cx="56"
+          cy="56"
+          r={r}
+          fill="none"
+          stroke="rgba(0,0,0,0.04)"
+          strokeWidth="9"
+        />
         <circle
           cx="56"
           cy="56"
@@ -96,7 +109,9 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          style={{ transition: 'stroke-dashoffset 1.6s cubic-bezier(0.22, 1, 0.36, 1)' }}
+          style={{
+            transition: 'stroke-dashoffset 1.6s cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
         />
       </svg>
       <div className="absolute flex flex-col items-center">
@@ -132,16 +147,26 @@ function Spark({ values, color }: { values: number[]; color: string }) {
       return `${x.toFixed(1)},${y.toFixed(1)}`
     })
     .join(' ')
+  const lastY =
+    h - ((values[values.length - 1] - min) / span) * (h - 4) - 2
   const gradId = `spk-${color.replace('#', '')}`
   return (
-    <svg width={w} height={h} className="overflow-visible" aria-hidden="true">
+    <svg
+      width={w}
+      height={h}
+      className="overflow-visible"
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.18" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polygon points={`0,${h} ${pts} ${w},${h}`} fill={`url(#${gradId})`} />
+      <polygon
+        points={`0,${h} ${pts} ${w},${h}`}
+        fill={`url(#${gradId})`}
+      />
       <polyline
         points={pts}
         fill="none"
@@ -150,7 +175,7 @@ function Spark({ values, color }: { values: number[]; color: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx={w} cy={h - ((values[values.length - 1] - min) / span) * (h - 4) - 2} r="2.5" fill={color} />
+      <circle cx={w} cy={lastY} r="2.5" fill={color} />
     </svg>
   )
 }
@@ -159,10 +184,22 @@ function Spark({ values, color }: { values: number[]; color: string }) {
    BMI VISUAL GAUGE
    ═══════════════════════════════════════════ */
 
-function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: string }) {
+function BmiGauge({
+  bmi,
+  kesan,
+  tone,
+}: {
+  bmi: number
+  kesan: string
+  tone: string
+}) {
   const pct = Math.max(0, Math.min(100, ((bmi - 15) / 25) * 100))
   const color =
-    tone === 'high' || tone === 'critical' ? '#FF3131' : tone === 'low' ? '#f59e0b' : '#00BF63'
+    tone === 'high' || tone === 'critical'
+      ? '#FF3131'
+      : tone === 'low'
+        ? '#f59e0b'
+        : '#00BF63'
 
   return (
     <div className="w-full space-y-3">
@@ -188,13 +225,18 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
         <span>Obese</span>
       </div>
       <div className="text-center">
-        <span className="text-3xl font-black tabular-nums" style={{ color }}>
+        <span
+          className="text-3xl font-black tabular-nums"
+          style={{ color }}
+        >
           {bmi}
         </span>
         <span className="ml-1 text-xs text-neutral-400">kg/m²</span>
       </div>
       <div className="text-center">
-        <Badge tone={tone as 'normal' | 'high' | 'low' | 'critical'}>{kesan}</Badge>
+        <Badge tone={tone as 'normal' | 'high' | 'low' | 'critical'}>
+          {kesan}
+        </Badge>
       </div>
     </div>
   )
@@ -219,7 +261,8 @@ function VitalCard({
 }) {
   const accent = tone === 'high' ? '#FF3131' : '#00BF63'
   const bg = tone === 'high' ? 'rgba(255,49,49,0.03)' : 'rgba(0,191,99,0.03)'
-  const border = tone === 'high' ? 'rgba(255,49,49,0.1)' : 'rgba(0,191,99,0.08)'
+  const border =
+    tone === 'high' ? 'rgba(255,49,49,0.1)' : 'rgba(0,191,99,0.08)'
 
   return (
     <div
@@ -230,14 +273,19 @@ function VitalCard({
     >
       <div
         className="absolute left-0 top-0 h-full w-[3px] transition-all duration-300 group-hover:w-[5px]"
-        style={{ background: `linear-gradient(180deg, ${accent}, ${accent}66)` }}
+        style={{
+          background: `linear-gradient(180deg, ${accent}, ${accent}66)`,
+        }}
       />
       <div className="flex items-start justify-between pl-2">
         <div>
           <div className="flex items-center gap-1.5">
             <span
               className="inline-block h-[5px] w-[5px] rounded-full"
-              style={{ background: accent, boxShadow: `0 0 6px ${accent}66` }}
+              style={{
+                background: accent,
+                boxShadow: `0 0 6px ${accent}66`,
+              }}
             />
             <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">
               {label}
@@ -246,11 +294,15 @@ function VitalCard({
           <div className="mt-2.5 flex items-baseline gap-1">
             <span
               className="text-[26px] font-black leading-none tabular-nums"
-              style={{ color: tone === 'high' ? '#FF3131' : '#171717' }}
+              style={{
+                color: tone === 'high' ? '#FF3131' : '#171717',
+              }}
             >
               {value}
             </span>
-            <span className="text-[10px] font-medium text-neutral-400">{unit}</span>
+            <span className="text-[10px] font-medium text-neutral-400">
+              {unit}
+            </span>
           </div>
         </div>
         <div className="mt-1 opacity-70 transition-opacity group-hover:opacity-100">
@@ -317,7 +369,11 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
    ADD PATIENT FORM
    ═══════════════════════════════════════════ */
 
-function AddPatientForm({ onAdd }: { onAdd: (p: import('../lib/types').Patient) => void }) {
+function AddPatientForm({
+  onAdd,
+}: {
+  onAdd: (p: import('../lib/types').Patient) => void
+}) {
   const [f, setF] = useState({
     name: '',
     sex: 'L',
@@ -444,17 +500,17 @@ function AddPatientForm({ onAdd }: { onAdd: (p: import('../lib/types').Patient) 
 }
 
 /* ═══════════════════════════════════════════
-   ADD VITAL FORM
+   ADD VITAL FORM  ← FIX: semua string, Record<string,string>
    ═══════════════════════════════════════════ */
 
 function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
-  const [f, setF] = useState({
-    sys: 120,
-    dia: 80,
-    hr: 78,
-    rr: 16,
-    temp: 36.6,
-    spo2: 98,
+  const [f, setF] = useState<Record<string, string>>({
+    sys: '120',
+    dia: '80',
+    hr: '78',
+    rr: '16',
+    temp: '36.6',
+    spo2: '98',
     glu: '',
   })
 
@@ -475,7 +531,7 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
           <input
             className={inputClass}
             type="number"
-            value={f[k as keyof typeof f]}
+            value={f[k] ?? ''}
             onChange={(e) => setF({ ...f, [k]: e.target.value })}
           />
         </Field>
@@ -510,8 +566,9 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
 export function Dashboard() {
   const { state, activePatient, addVital, addPatient } = useStore()
   const p = activePatient
-  const vitals: VitalSign[] = state.vitals[p.id] ?? []
-  const supportive: SupportiveResult[] = (state.supportive[p.id] ?? []) as SupportiveResult[]
+  const vitals: VitalSign[] = (state.vitals[p.id] ?? []) as VitalSign[]
+  const supportive: SupportiveResult[] = (state.supportive[p.id] ??
+    []) as SupportiveResult[]
   const latest = vitals[vitals.length - 1]
   const anthro = computeBmi(p.weightKg, p.heightCm)
   const [showAdd, setShowAdd] = useState(false)
@@ -538,13 +595,17 @@ export function Dashboard() {
             Mulai Perjalanan Longevity
           </h2>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
-            Tambahkan pasien pertama untuk memantau tanda vital, antropometri, dan data klinis
-            — semua terintegrasi mendukung umur panjang berkualitas.
+            Tambahkan pasien pertama untuk memantau tanda vital, antropometri,
+            dan data klinis — semua terintegrasi mendukung umur panjang
+            berkualitas.
           </p>
         </div>
         <Card className="overflow-hidden">
           <div className="border-b border-neutral-100 px-5 py-3">
-            <SectionTitle icon={<IconPlus size={18} />} title="Pasien Baru" />
+            <SectionTitle
+              icon={<IconPlus size={18} />}
+              title="Pasien Baru"
+            />
           </div>
           <div className="p-5">
             <AddPatientForm onAdd={(np) => addPatient(np)} />
@@ -557,7 +618,7 @@ export function Dashboard() {
   /* ── Main Layout ── */
   return (
     <div className="space-y-5">
-      {/* ── Story-like Quick Actions ── */}
+      {/* Story-like Quick Actions */}
       <div
         className="flex items-center gap-2.5 overflow-x-auto pb-1"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -585,11 +646,14 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* ── Add Patient Drawer ── */}
+      {/* Add Patient Drawer */}
       {showAddPatient && (
         <Card className="overflow-hidden">
           <div className="border-b border-neutral-100 px-5 py-3">
-            <SectionTitle icon={<IconPlus size={18} />} title="Tambah Pasien" />
+            <SectionTitle
+              icon={<IconPlus size={18} />}
+              title="Tambah Pasien"
+            />
           </div>
           <div className="p-5">
             <AddPatientForm
@@ -602,7 +666,7 @@ export function Dashboard() {
         </Card>
       )}
 
-      {/* ── Patient Profile Hero ── */}
+      {/* Patient Profile Hero */}
       <Card className="overflow-hidden">
         <div className="relative">
           <div
@@ -631,7 +695,9 @@ export function Dashboard() {
                     {p.name}
                   </h2>
                   <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
-                    <span>{p.sex === 'L' ? 'Laki-laki' : 'Perempuan'}</span>
+                    <span>
+                      {p.sex === 'L' ? 'Laki-laki' : 'Perempuan'}
+                    </span>
                     <span className="text-neutral-200">·</span>
                     <span>{ageFromDob(p.dob)} tahun</span>
                     {p.bloodType && (
@@ -643,24 +709,33 @@ export function Dashboard() {
                       </>
                     )}
                     <span className="text-neutral-200">·</span>
-                    <span className="font-mono text-xs text-neutral-400">{p.mrn}</span>
+                    <span className="font-mono text-xs text-neutral-400">
+                      {p.mrn}
+                    </span>
                   </p>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-1 sm:pb-1">
-                <LongevityRing score={longevity.score} band={longevity.band} />
+                <LongevityRing
+                  score={longevity.score}
+                  band={longevity.band}
+                />
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-400">
                   Longevity Score
                 </span>
               </div>
             </div>
 
-            {/* Condition / Allergy Tags */}
+            {/* Tags */}
             <div className="mt-5 flex flex-wrap gap-1.5">
-              {p.chronicConditions.length === 0 && p.allergies.length === 0 ? (
+              {p.chronicConditions.length === 0 &&
+              p.allergies.length === 0 ? (
                 <span
                   className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold"
-                  style={{ background: 'rgba(0,191,99,0.06)', color: '#0B7A4B' }}
+                  style={{
+                    background: 'rgba(0,191,99,0.06)',
+                    color: '#0B7A4B',
+                  }}
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />
                   Tidak ada kondisi kronis / alergi tercatat
@@ -671,7 +746,10 @@ export function Dashboard() {
                     <span
                       key={c}
                       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold"
-                      style={{ background: 'rgba(255,49,49,0.05)', color: '#FF3131' }}
+                      style={{
+                        background: 'rgba(255,49,49,0.05)',
+                        color: '#FF3131',
+                      }}
                     >
                       <span
                         className="h-1.5 w-1.5 rounded-full"
@@ -684,7 +762,10 @@ export function Dashboard() {
                     <span
                       key={a}
                       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold"
-                      style={{ background: 'rgba(245,158,11,0.06)', color: '#b45309' }}
+                      style={{
+                        background: 'rgba(245,158,11,0.06)',
+                        color: '#b45309',
+                      }}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                       Alergi: {a}
@@ -695,21 +776,30 @@ export function Dashboard() {
             </div>
 
             <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-400">
-              <IconShield size={11} className="text-[#00BF63]" /> Data kesehatan bersifat
-              rahasia — hanya dibagikan atas izin pasien.
+              <IconShield size={11} className="text-[#00BF63]" /> Data
+              kesehatan bersifat rahasia — hanya dibagikan atas izin pasien.
             </p>
           </div>
         </div>
       </Card>
 
-      {/* ── Add Vital Collapsible ── */}
+      {/* Add Vital Collapsible */}
       {showAdd && (
-        <Card className="overflow-hidden" style={{ borderColor: 'rgba(0,191,99,0.2)' }}>
+        <Card
+          className="overflow-hidden"
+          style={{ borderColor: 'rgba(0,191,99,0.2)' }}
+        >
           <div
             className="border-b px-5 py-3"
-            style={{ borderColor: 'rgba(0,191,99,0.1)', background: 'rgba(0,191,99,0.02)' }}
+            style={{
+              borderColor: 'rgba(0,191,99,0.1)',
+              background: 'rgba(0,191,99,0.02)',
+            }}
           >
-            <SectionTitle icon={<IconHeart size={18} />} title="Catat Tanda Vital Baru" />
+            <SectionTitle
+              icon={<IconHeart size={18} />}
+              title="Catat Tanda Vital Baru"
+            />
           </div>
           <div className="p-5">
             <AddVital
@@ -722,7 +812,7 @@ export function Dashboard() {
         </Card>
       )}
 
-      {/* ── Vitals Feed Grid ── */}
+      {/* Vitals Feed Grid */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
@@ -734,10 +824,16 @@ export function Dashboard() {
         <div className="grid grid-cols-2 gap-3 p-5 lg:grid-cols-3">
           <VitalCard
             label="Tekanan Darah"
-            value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'}
+            value={
+              latest
+                ? `${latest.systolic}/${latest.diastolic}`
+                : '—'
+            }
             unit="mmHg"
             series={vitals.map((v) => v.systolic)}
-            tone={latest && latest.systolic >= 140 ? 'high' : 'normal'}
+            tone={
+              latest && latest.systolic >= 140 ? 'high' : 'normal'
+            }
           />
           <VitalCard
             label="Nadi"
@@ -745,7 +841,10 @@ export function Dashboard() {
             unit="x/min"
             series={vitals.map((v) => v.heartRate)}
             tone={
-              latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'
+              latest &&
+              (latest.heartRate > 100 || latest.heartRate < 60)
+                ? 'high'
+                : 'normal'
             }
           />
           <VitalCard
@@ -753,28 +852,40 @@ export function Dashboard() {
             value={latest ? `${latest.respRate}` : '—'}
             unit="x/min"
             series={vitals.map((v) => v.respRate)}
-            tone={latest && latest.respRate > 20 ? 'high' : 'normal'}
+            tone={
+              latest && latest.respRate > 20 ? 'high' : 'normal'
+            }
           />
           <VitalCard
             label="Suhu"
             value={latest ? `${latest.tempC}` : '—'}
             unit="°C"
             series={vitals.map((v) => v.tempC)}
-            tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'}
+            tone={
+              latest && latest.tempC >= 37.5 ? 'high' : 'normal'
+            }
           />
           <VitalCard
             label="SpO₂"
             value={latest ? `${latest.spo2}` : '—'}
             unit="%"
             series={vitals.map((v) => v.spo2)}
-            tone={latest && latest.spo2 < 95 ? 'high' : 'normal'}
+            tone={
+              latest && latest.spo2 < 95 ? 'high' : 'normal'
+            }
           />
           <VitalCard
             label="Gula Darah"
             value={latest?.glucose ? `${latest.glucose}` : '—'}
             unit="mg/dL"
-            series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)}
-            tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'}
+            series={vitals
+              .map((v) => v.glucose ?? 0)
+              .filter(Boolean)}
+            tone={
+              latest?.glucose && latest.glucose >= 200
+                ? 'high'
+                : 'normal'
+            }
           />
         </div>
         {latest && (
@@ -787,7 +898,7 @@ export function Dashboard() {
         )}
       </Card>
 
-      {/* ── Anthropometry + BMI Gauge ── */}
+      {/* Anthropometry + BMI Gauge */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
@@ -802,20 +913,28 @@ export function Dashboard() {
               className="flex items-center justify-between rounded-xl px-4 py-3.5"
               style={{ background: 'rgba(0,0,0,0.02)' }}
             >
-              <span className="text-sm text-neutral-500">Tinggi Badan</span>
+              <span className="text-sm text-neutral-500">
+                Tinggi Badan
+              </span>
               <span className="text-lg font-bold tabular-nums">
                 {p.heightCm}{' '}
-                <span className="text-xs font-normal text-neutral-400">cm</span>
+                <span className="text-xs font-normal text-neutral-400">
+                  cm
+                </span>
               </span>
             </div>
             <div
               className="flex items-center justify-between rounded-xl px-4 py-3.5"
               style={{ background: 'rgba(0,0,0,0.02)' }}
             >
-              <span className="text-sm text-neutral-500">Berat Badan</span>
+              <span className="text-sm text-neutral-500">
+                Berat Badan
+              </span>
               <span className="text-lg font-bold tabular-nums">
                 {p.weightKg}{' '}
-                <span className="text-xs font-normal text-neutral-400">kg</span>
+                <span className="text-xs font-normal text-neutral-400">
+                  kg
+                </span>
               </span>
             </div>
             <div
@@ -826,20 +945,28 @@ export function Dashboard() {
               }}
             >
               <p className="text-[11px] leading-relaxed text-neutral-500">
-                <IconSparkle size={11} className="mr-1 inline text-[#00BF63]" />
-                Z-score WHO/CDC penuh (BB/U, TB/U, BB/TB) dihitung AI saat workup di AI-EMR.
+                <IconSparkle
+                  size={11}
+                  className="mr-1 inline text-[#00BF63]"
+                />
+                Z-score WHO/CDC penuh (BB/U, TB/U, BB/TB) dihitung AI
+                saat workup di AI-EMR.
               </p>
             </div>
           </div>
           <div className="flex items-center">
             <div className="w-full">
-              <BmiGauge bmi={anthro.bmi} kesan={anthro.kesan} tone={anthro.tone} />
+              <BmiGauge
+                bmi={anthro.bmi}
+                kesan={anthro.kesan}
+                tone={anthro.tone}
+              />
             </div>
           </div>
         </div>
       </Card>
 
-      {/* ── Growth Chart ── */}
+      {/* Growth Chart */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
@@ -853,11 +980,14 @@ export function Dashboard() {
           />
         </div>
         <div className="p-5">
-          <GrowthChart patient={p} ageYears={ageFromDob(p.dob)} />
+          <GrowthChart
+            patient={p}
+            ageYears={ageFromDob(p.dob)}
+          />
         </div>
       </Card>
 
-      {/* ── Supportive Results — Card Stream ── */}
+      {/* Supportive Results — Card Stream */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
@@ -873,14 +1003,19 @@ export function Dashboard() {
                 className="flex h-12 w-12 items-center justify-center rounded-2xl"
                 style={{ background: 'rgba(0,0,0,0.03)' }}
               >
-                <IconShield size={22} className="text-neutral-300" />
+                <IconShield
+                  size={22}
+                  className="text-neutral-300"
+                />
               </div>
               <p className="text-sm text-neutral-400">
                 Belum ada hasil pemeriksaan penunjang.
               </p>
             </div>
           ) : (
-            supportive.map((r) => <SupportiveCard key={r.id} r={r} />)
+            supportive.map((r) => (
+              <SupportiveCard key={r.id} r={r} />
+            ))
           )}
         </div>
       </Card>
