@@ -16,6 +16,18 @@ const COL_KCAL = '#00BF63'
 const COL_SLEEP = '#111111'
 const COL_WATER = '#2563eb'
 
+/* helper: safely read wellness fields without index signature errors */
+function getW(state: ReturnType<typeof useStore>['state'], date: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = (state.wellness?.[date] ?? {}) as any
+  return {
+    sleepHr: (w.sleepHr as number) ?? 0,
+    waterMl: (w.waterMl as number) ?? 0,
+    exerciseKcal: (w.exerciseKcal as number) ?? 0,
+    exerciseMin: (w.exerciseMin as number) ?? 0,
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    MAIN
    ══════════════════════════════════════════════════════════════════════════ */
@@ -29,10 +41,7 @@ export function Nutrition() {
     (a, f) => ({ kcal: a.kcal + f.kcal, carbs: a.carbs + f.carbs, protein: a.protein + f.protein, fat: a.fat + f.fat }),
     { kcal: 0, carbs: 0, protein: 0, fat: 0 },
   )
-  const w = state.wellness?.[today()] ?? { date: today() }
-  const sleepHr = (w as Record<string, unknown>).sleepHr as number ?? 0
-  const waterMl = (w as Record<string, unknown>).waterMl as number ?? 0
-  const exerciseKcal = (w as Record<string, unknown>).exerciseKcal as number ?? 0
+  const wt = getW(state, today())
 
   const previewBase = FOODS.find((f) => f.name === foodName)!
   const k = grams / 100
@@ -44,7 +53,8 @@ export function Nutrition() {
   }
 
   const weekDots = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - (6 - i))
+    const d = new Date()
+    d.setDate(d.getDate() - (6 - i))
     const date = d.toISOString().slice(0, 10)
     return !!(state.foods.some((f) => f.date === date) || state.wellness?.[date])
   })
@@ -64,13 +74,13 @@ export function Nutrition() {
               {weekDots.map((filled, i) => (
                 <div key={i} className={`h-2 w-2 rounded-full transition-all duration-500 ${filled ? 'bg-brand scale-100' : 'bg-neutral-200 scale-75'}`} />
               ))}
-              <span className="ml-1.5 text-[10px] text-neutral-400">{weekDots.filter(Boolean).length}/7 hari</span>
+              <span className="ml-1.5 text-[10px] text-neutral-400">{weekDots.filter(Boolean).length}/7</span>
             </div>
           </div>
           <div className="mt-5 grid grid-cols-3 gap-3">
-            <MiniStat icon="😴" label="Tidur" value={sleepHr} max={GOAL_SLEEP} unit="jam" color="#818cf8" />
-            <MiniStat icon="💧" label="Air" value={waterMl} max={GOAL_WATER} unit="mL" color={COL_WATER} />
-            <MiniStat icon="🔥" label="Olahraga" value={exerciseKcal} max={500} unit="kkal" color="#f97316" />
+            <MiniStat icon="😴" label="Tidur" value={wt.sleepHr} max={GOAL_SLEEP} unit="jam" color="#818cf8" />
+            <MiniStat icon="💧" label="Air" value={wt.waterMl} max={GOAL_WATER} unit="mL" color={COL_WATER} />
+            <MiniStat icon="🔥" label="Olahraga" value={wt.exerciseKcal} max={500} unit="kkal" color="#f97316" />
           </div>
         </div>
         <div className="grid grid-cols-3 gap-px bg-neutral-100">
@@ -80,7 +90,7 @@ export function Nutrition() {
         </div>
       </Card>
 
-      {/* ─── Tambah Makanan ─── */}
+      {/* ─── TAMBAH MAKANAN ─── */}
       <Card className="!p-5">
         <SectionTitle icon={<IconFood size={18} />} title="Tambah Makanan" />
         <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -146,7 +156,7 @@ export function Nutrition() {
       <ChronicMonitor />
       <LongevityCalculator />
 
-      {/* ─── Tips ─── */}
+      {/* ─── TIPS ─── */}
       <Card className="!p-5">
         <SectionTitle title="Anjuran Harian" subtitle="Disesuaikan nutrisi & kondisi pasien" />
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -167,8 +177,7 @@ export function Nutrition() {
    ══════════════════════════════════════════════════════════════════════════ */
 function ActivityLog() {
   const { state, logWellness } = useStore()
-  const w = state.wellness?.[today()] ?? { date: today() }
-  const wSafe = w as Record<string, unknown>
+  const wt = getW(state, today())
   const [exName, setExName] = useState(EXERCISES[0].name)
   const [exMin, setExMin] = useState(30)
   const ex = EXERCISES.find((e) => e.name === exName)!
@@ -176,8 +185,8 @@ function ActivityLog() {
 
   function addExercise() {
     logWellness(today(), {
-      exerciseKcal: ((wSafe.exerciseKcal as number) ?? 0) + burn,
-      exerciseMin: ((wSafe.exerciseMin as number) ?? 0) + exMin,
+      exerciseKcal: wt.exerciseKcal + burn,
+      exerciseMin: wt.exerciseMin + exMin,
     })
   }
 
@@ -195,7 +204,7 @@ function ActivityLog() {
               </div>
             </div>
             <span className="rounded-xl bg-orange-50 px-3 py-1.5 text-sm font-extrabold text-orange-600 tabular-nums">
-              <AnimatedNum value={(wSafe.exerciseKcal as number) ?? 0} /> kkal
+              <AnimatedNum value={wt.exerciseKcal} /> kkal
             </span>
           </div>
           <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -230,13 +239,11 @@ function ActivityLog() {
                   <div className="text-[10px] text-neutral-400">Target {GOAL_SLEEP} jam</div>
                 </div>
               </div>
-              <span className="text-sm font-extrabold text-indigo-500 tabular-nums">
-                <AnimatedNum value={(wSafe.sleepHr as number) ?? 0} decimals={1} /> jam
-              </span>
+              <span className="text-sm font-extrabold text-indigo-500 tabular-nums"><AnimatedNum value={wt.sleepHr} decimals={1} /> jam</span>
             </div>
             <div className="mt-2">
-              <Stepper label="" value={(wSafe.sleepHr as number) ?? 0} min={0} max={12} step={0.5} unit="jam" onChange={(v) => logWellness(today(), { sleepHr: v })} />
-              <RangeTrack value={(wSafe.sleepHr as number) ?? 0} min={0} max={GOAL_SLEEP} color="#818cf8" />
+              <Stepper label="" value={wt.sleepHr} min={0} max={12} step={0.5} unit="jam" onChange={(v) => logWellness(today(), { sleepHr: v })} />
+              <RangeTrack value={wt.sleepHr} min={0} max={GOAL_SLEEP} color="#818cf8" />
             </div>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4 transition hover:shadow-sm">
@@ -248,13 +255,11 @@ function ActivityLog() {
                   <div className="text-[10px] text-neutral-400">Target {GOAL_WATER} mL</div>
                 </div>
               </div>
-              <span className="text-sm font-extrabold text-blue-600 tabular-nums">
-                <AnimatedNum value={(wSafe.waterMl as number) ?? 0} /> mL
-              </span>
+              <span className="text-sm font-extrabold text-blue-600 tabular-nums"><AnimatedNum value={wt.waterMl} /> mL</span>
             </div>
             <div className="mt-2">
-              <Stepper label="" value={(wSafe.waterMl as number) ?? 0} min={0} max={5000} step={250} unit="mL" onChange={(v) => logWellness(today(), { waterMl: v })} />
-              <RangeTrack value={(wSafe.waterMl as number) ?? 0} min={0} max={GOAL_WATER} color={COL_WATER} />
+              <Stepper label="" value={wt.waterMl} min={0} max={5000} step={250} unit="mL" onChange={(v) => logWellness(today(), { waterMl: v })} />
+              <RangeTrack value={wt.waterMl} min={0} max={GOAL_WATER} color={COL_WATER} />
             </div>
           </div>
         </div>
@@ -274,15 +279,20 @@ function WellnessTrendChart() {
 
   const days: { date: string; kcal: number; sleepHr: number; waterMl: number }[] = []
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i)
+    const d = new Date()
+    d.setDate(d.getDate() - i)
     const date = d.toISOString().slice(0, 10)
     const kcal = state.foods.filter((f) => f.date === date).reduce((a, f) => a + f.kcal, 0)
-    const wd = state.wellness?.[date] as Record<string, unknown> | undefined
-    days.push({ date, kcal, sleepHr: (wd?.sleepHr as number) ?? 0, waterMl: (wd?.waterMl as number) ?? 0 })
+    const wd = getW(state, date)
+    days.push({ date, kcal, sleepHr: wd.sleepHr, waterMl: wd.waterMl })
   }
   const hasData = days.some((d) => d.kcal || d.sleepHr || d.waterMl)
 
-  const W = 380, H = 200, base = 176, topY = 24, pad = 20
+  const W = 380
+  const H = 200
+  const base = 176
+  const topY = 24
+  const pad = 20
   const scale = (base - topY) / 3
   const xs = days.map((_, i) => pad + (i * (W - pad * 2)) / 6)
   const nK = days.map((d) => Math.min(1, d.kcal / GOAL_KCAL))
@@ -433,33 +443,42 @@ function ChronicMonitor() {
     setShow(false)
   }
 
-  if (!active) return (
-    <Card className="!p-5 border-2 border-brand/15">
-      <SectionTitle icon={<IconHeart size={20} />} title="Pemantauan Kronis" subtitle="TTV harian pasien kronis" right={<Badge tone="high">Langganan</Badge>} />
-      <div className="mt-4 rounded-2xl border-2 border-dashed border-brand/25 bg-gradient-to-br from-brand/[0.03] to-transparent p-6">
-        <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-xl">🫀</span>
-          <p className="text-sm leading-relaxed text-neutral-600">Untuk pasien <b>hipertensi, diabetes, jantung</b>: catat tekanan darah, gula, nadi, SpO₂ & suhu setiap hari.</p>
+  /* ── Paywall ── */
+  if (!active) {
+    return (
+      <Card className="!p-5 border-2 border-brand/15">
+        <SectionTitle icon={<IconHeart size={20} />} title="Pemantauan Kronis" subtitle="TTV harian pasien kronis" right={<Badge tone="high">Langganan</Badge>} />
+        <div className="mt-4 rounded-2xl border-2 border-dashed border-brand/25 bg-gradient-to-br from-brand/[0.03] to-transparent p-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-xl">🫀</span>
+            <p className="text-sm leading-relaxed text-neutral-600">Untuk pasien <b>hipertensi, diabetes, jantung</b>: catat tekanan darah, gula, nadi, SpO₂ & suhu setiap hari. Sistem menilai apakah <b>terkontrol</b> dan memberi peringatan dini.</p>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <button onClick={() => buy('monthly')} className="group rounded-2xl border-2 border-neutral-200 p-4 text-left transition-all hover:border-brand/40 hover:shadow-md">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Bulanan</div>
+              <div className="mt-1 text-2xl font-extrabold text-neutral-800">Rp{CHRONIC_MONTHLY.toLocaleString('id-ID')}<span className="text-sm font-medium text-neutral-400">/bln</span></div>
+              <div className="mt-1.5 text-[11px] text-neutral-500">Pemantauan penuh, perpanjang tiap bulan.</div>
+            </button>
+            <button onClick={() => buy('lifetime')} className="relative rounded-2xl border-2 border-brand bg-brand/[0.04] p-4 text-left transition-all hover:shadow-md">
+              <span className="absolute -top-2.5 right-3 rounded-full bg-brand px-2.5 py-0.5 text-[9px] font-bold text-white shadow-sm">Terbaik</span>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">Lifetime</div>
+              <div className="mt-1 text-2xl font-extrabold text-brand-dark">Rp{(CHRONIC_LIFETIME / 1e6).toLocaleString('id-ID')}jt</div>
+              <div className="mt-1.5 text-[11px] text-neutral-500">Sekali bayar, pantau selamanya.</div>
+            </button>
+          </div>
+          {payMsg && <p className="mt-3 text-xs font-semibold text-brand-dark">{payMsg}</p>}
+          <p className="mt-3 text-[10px] text-neutral-400">⚕️ Mendukung, bukan menggantikan, kontrol rutin ke dokter.</p>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <button onClick={() => buy('monthly')} className="rounded-2xl border-2 border-neutral-200 p-4 text-left transition-all hover:border-brand/40 hover:shadow-md">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Bulanan</div>
-            <div className="mt-1 text-2xl font-extrabold text-neutral-800">Rp{CHRONIC_MONTHLY.toLocaleString('id-ID')}<span className="text-sm font-medium text-neutral-400">/bln</span></div>
-          </button>
-          <button onClick={() => buy('lifetime')} className="relative rounded-2xl border-2 border-brand bg-brand/[0.04] p-4 text-left transition-all hover:shadow-md">
-            <span className="absolute -top-2.5 right-3 rounded-full bg-brand px-2.5 py-0.5 text-[9px] font-bold text-white shadow-sm">Terbaik</span>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-brand-dark">Lifetime</div>
-            <div className="mt-1 text-2xl font-extrabold text-brand-dark">Rp{(CHRONIC_LIFETIME / 1e6).toLocaleString('id-ID')}jt</div>
-          </button>
-        </div>
-        {payMsg && <p className="mt-3 text-xs font-semibold text-brand-dark">{payMsg}</p>}
-      </div>
-    </Card>
-  )
+      </Card>
+    )
+  }
 
-  const vitalFields: [string, string, string | number][] = [
-    ['sys', 'Sistolik', f.sys], ['dia', 'Diastolik', f.dia], ['hr', 'Nadi', f.hr],
-    ['rr', 'RR', f.rr], ['temp', 'Suhu', f.temp], ['spo2', 'SpO₂', f.spo2], ['glu', 'Gula (ops.)', f.glu],
+  /* ── Active ── */
+  const vitalFields: { key: string; label: string }[] = [
+    { key: 'sys', label: 'Sistolik' }, { key: 'dia', label: 'Diastolik' },
+    { key: 'hr', label: 'Nadi' }, { key: 'rr', label: 'RR' },
+    { key: 'temp', label: 'Suhu' }, { key: 'spo2', label: 'SpO₂' },
+    { key: 'glu', label: 'Gula (ops.)' },
   ]
 
   return (
@@ -498,8 +517,7 @@ function ChronicMonitor() {
       )}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm text-neutral-500">
-          Status: <b style={{ color: STATUS_COLOR[status] }}>{latest ? STATUS_LABEL[status] : 'Belum ada data'}</b>
+        <span className="text-sm text-neutral-500">Status: <b style={{ color: STATUS_COLOR[status] }}>{latest ? STATUS_LABEL[status] : 'Belum ada data'}</b>
           {p.chronicConditions.length > 0 && <span className="ml-1.5 text-[11px] text-neutral-400">· {p.chronicConditions.join(', ')}</span>}
         </span>
         <Button variant="outline" onClick={() => setShow((s) => !s)} className="h-8 text-xs rounded-xl"><IconPlus size={14} /> Catat TTV</Button>
@@ -507,9 +525,10 @@ function ChronicMonitor() {
 
       {show && (
         <div className="mt-3 grid grid-cols-2 gap-2.5 rounded-2xl bg-neutral-50 p-4 sm:grid-cols-4">
-          {vitalFields.map(([k, label, val]) => (
-            <Field key={k} label={label}>
-              <input className={inputClass} type="number" value={String(val)} onChange={(e) => setF({ ...f, [k]: e.target.value })} />
+          {vitalFields.map(({ key, label }) => (
+            <Field key={key} label={label}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <input className={inputClass} type="number" value={(f as any)[key]} onChange={(e) => setF({ ...f, [key]: e.target.value } as typeof f)} />
             </Field>
           ))}
           <div className="flex items-end"><Button onClick={save} className="h-[38px] rounded-xl">Simpan</Button></div>
@@ -524,9 +543,7 @@ function ChronicMonitor() {
                 <div className="absolute left-0 top-0 h-full w-1 rounded-l-2xl" style={{ background: STATUS_COLOR[e.status] }} />
                 <div className="pl-2">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">{e.label}</div>
-                  <div className="mt-1 text-2xl font-extrabold leading-tight tabular-nums" style={{ color: STATUS_COLOR[e.status] }}>
-                    {e.value} <span className="text-[11px] font-medium text-neutral-400">{e.unit}</span>
-                  </div>
+                  <div className="mt-1 text-2xl font-extrabold leading-tight tabular-nums" style={{ color: STATUS_COLOR[e.status] }}>{e.value} <span className="text-[11px] font-medium text-neutral-400">{e.unit}</span></div>
                   <div className="mt-1 flex items-center gap-1.5">
                     <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: STATUS_COLOR[e.status] }} />
                     <span className="text-[10px] text-neutral-400">{e.target} · {STATUS_LABEL[e.status]}</span>
@@ -549,23 +566,33 @@ function ChronicMonitor() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   TTV TREND
+   TTV TREND SPARKLINES
    ══════════════════════════════════════════════════════════════════════════ */
 function TtvTrend({ vitals }: { vitals: VitalSign[] }) {
   const recent = vitals.slice(-14)
   if (recent.length < 2) return null
 
   const makeLine = (vals: number[], color: string) => {
-    const w = 280, h = 44
-    const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1
-    const pts: number[][] = vals.map((v, i) => [(i / (vals.length - 1)) * w, h - 4 - ((v - min) / span) * (h - 10)])
+    const w = 280
+    const h = 44
+    const mn = Math.min(...vals)
+    const mx = Math.max(...vals)
+    const span = mx - mn || 1
+    const pts: number[][] = vals.map((v, i) => [
+      (i / (vals.length - 1)) * w,
+      h - 4 - ((v - mn) / span) * (h - 10),
+    ])
     let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`
     for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = pts[Math.max(0, i - 1)]
-      const p1 = pts[i]
-      const p2 = pts[i + 1]
-      const p3 = pts[Math.min(pts.length - 1, i + 2)]
-      d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`
+      const x0 = pts[Math.max(0, i - 1)][0]
+      const y0 = pts[Math.max(0, i - 1)][1]
+      const x1 = pts[i][0]
+      const y1 = pts[i][1]
+      const x2 = pts[i + 1][0]
+      const y2 = pts[i + 1][1]
+      const x3 = pts[Math.min(pts.length - 1, i + 2)][0]
+      const y3 = pts[Math.min(pts.length - 1, i + 2)][1]
+      d += ` C${(x1 + (x2 - x0) / 6).toFixed(1)},${(y1 + (y2 - y0) / 6).toFixed(1)} ${(x2 - (x3 - x1) / 6).toFixed(1)},${(y2 - (y3 - y1) / 6).toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`
     }
     const fillD = `${d} L${pts[pts.length - 1][0].toFixed(1)},${h} L0,${h} Z`
     return (
@@ -604,15 +631,15 @@ function TtvTrend({ vitals }: { vitals: VitalSign[] }) {
 /* ══════════════════════════════════════════════════════════════════════════
    LONGEVITY CALCULATOR
    ══════════════════════════════════════════════════════════════════════════ */
-function clamp(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
+function clampNum(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
 
 function computeLongevity(i: { mainMeals: number; snacks: number; exerciseFreq: number; exerciseMin: number; hydrationL: number; sleepHr: number; sunDone: boolean; sunHr: number }) {
-  const meals = clamp(100 - Math.abs(i.mainMeals - 3) * 18 - Math.max(0, i.snacks - 2) * 12)
-  const exercise = clamp((i.exerciseFreq >= 1 ? 60 : i.exerciseFreq * 60) + Math.min(40, (i.exerciseMin / 30) * 40))
-  const hydration = clamp(i.hydrationL >= 2 && i.hydrationL <= 3.5 ? 100 : 100 - Math.abs(i.hydrationL - 2.5) * 28)
-  const sleep = clamp(i.sleepHr >= 7 && i.sleepHr <= 9 ? 100 : 100 - Math.abs(i.sleepHr - 8) * 16)
-  const sun = clamp(!i.sunDone ? 40 : i.sunHr >= 0.17 && i.sunHr <= 0.6 ? 100 : 100 - Math.abs(i.sunHr - 0.33) * 80)
-  const score = clamp(meals * 0.2 + exercise * 0.25 + hydration * 0.15 + sleep * 0.25 + sun * 0.15)
+  const meals = clampNum(100 - Math.abs(i.mainMeals - 3) * 18 - Math.max(0, i.snacks - 2) * 12)
+  const exercise = clampNum((i.exerciseFreq >= 1 ? 60 : i.exerciseFreq * 60) + Math.min(40, (i.exerciseMin / 30) * 40))
+  const hydration = clampNum(i.hydrationL >= 2 && i.hydrationL <= 3.5 ? 100 : 100 - Math.abs(i.hydrationL - 2.5) * 28)
+  const sleep = clampNum(i.sleepHr >= 7 && i.sleepHr <= 9 ? 100 : 100 - Math.abs(i.sleepHr - 8) * 16)
+  const sun = clampNum(!i.sunDone ? 40 : i.sunHr >= 0.17 && i.sunHr <= 0.6 ? 100 : 100 - Math.abs(i.sunHr - 0.33) * 80)
+  const score = clampNum(meals * 0.2 + exercise * 0.25 + hydration * 0.15 + sleep * 0.25 + sun * 0.15)
   return { score, meals, exercise, hydration, sleep, sun }
 }
 
@@ -634,7 +661,9 @@ function LongevityCalculator() {
   const subActive = !!state.longevitySubExpires && new Date(state.longevitySubExpires) > new Date()
   const daysLeft = state.longevitySubExpires ? Math.max(0, Math.ceil((new Date(state.longevitySubExpires).getTime() - Date.now()) / 86400000)) : 0
 
-  function compute() { setResult(computeLongevity({ mainMeals, snacks, exerciseFreq, exerciseMin, hydrationL, sleepHr, sunDone, sunHr })) }
+  function compute() {
+    setResult(computeLongevity({ mainMeals, snacks, exerciseFreq, exerciseMin, hydrationL, sleepHr, sunDone, sunHr }))
+  }
 
   function shareToFeed() {
     if (!result) return
@@ -719,7 +748,7 @@ function LongevityCalculator() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   SHARED COMPONENTS
+   SHARED VISUAL COMPONENTS
    ══════════════════════════════════════════════════════════════════════════ */
 
 function InputBlock({ title, children }: { title: string; children: React.ReactNode }) {
@@ -744,9 +773,7 @@ function CircleRing({ label, value, max, unit, color, size = 120, sw = 10 }: {
     <div className="flex flex-col items-center">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={0.1} strokeWidth={sw} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={off} transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,0.61,0.36,1)' }} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,0.61,0.36,1)' }} />
         <text x={size / 2} y={size / 2 - 8} textAnchor="middle" fontSize="30" fontWeight="800" fill="#111">{value}</text>
         <text x={size / 2} y={size / 2 + 14} textAnchor="middle" fontSize="10" fontWeight="600" fill="#aaa">/ {max} {unit}</text>
       </svg>
@@ -794,18 +821,18 @@ function AnimatedNum({ value, decimals = 0 }: { value: number; decimals?: number
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const startVal = parseFloat(el.textContent || '0')
-    if (startVal === value) return
+    const span = el
+    let current = Number(span.textContent) || 0
+    if (Math.abs(current - value) < 0.01) return
+    const startVal = current
     const dur = 600
     const t0 = performance.now()
     let raf = 0
-    function tick() {
-      const now = performance.now()
+    function tick(now: number) {
       const p = Math.min(1, (now - t0) / dur)
       const ease = 1 - Math.pow(1 - p, 3)
-      const cur = startVal + (value - startVal) * ease
-      const target = ref.current
-      if (target) target.textContent = cur.toFixed(decimals)
+      current = startVal + (value - startVal) * ease
+      span.textContent = current.toFixed(decimals)
       if (p < 1) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -865,10 +892,7 @@ function PillarBar({ label, v }: { label: string; v: number }) {
   useEffect(() => { const id = requestAnimationFrame(() => setShown(true)); return () => cancelAnimationFrame(id) }, [])
   return (
     <div>
-      <div className="mb-0.5 flex justify-between text-[11px] font-medium">
-        <span className="text-white/70">{label}</span>
-        <span className="font-bold">{v}</span>
-      </div>
+      <div className="mb-0.5 flex justify-between text-[11px] font-medium"><span className="text-white/70">{label}</span><span className="font-bold">{v}</span></div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/20">
         <div className="h-full rounded-full bg-white" style={{ width: `${shown ? v : 0}%`, transition: 'width 0.8s cubic-bezier(0.22,0.61,0.36,1)' }} />
       </div>
@@ -877,16 +901,15 @@ function PillarBar({ label, v }: { label: string; v: number }) {
 }
 
 function Gauge({ value }: { value: number }) {
-  const r = 30, c = 2 * Math.PI * r
+  const r = 30
+  const c = 2 * Math.PI * r
   const [shown, setShown] = useState(false)
   useEffect(() => { const id = requestAnimationFrame(() => setShown(true)); return () => cancelAnimationFrame(id) }, [])
   const off = c * (1 - (shown ? value : 0) / 100)
   return (
     <svg width="84" height="84" viewBox="0 0 76 76" className="drop-shadow-lg">
       <circle cx="38" cy="38" r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="7" />
-      <circle cx="38" cy="38" r={r} fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={off} transform="rotate(-90 38 38)"
-        style={{ transition: 'stroke-dashoffset 1.1s cubic-bezier(0.22,0.61,0.36,1)' }} />
+      <circle cx="38" cy="38" r={r} fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} transform="rotate(-90 38 38)" style={{ transition: 'stroke-dashoffset 1.1s cubic-bezier(0.22,0.61,0.36,1)' }} />
       <text x="38" y="42" textAnchor="middle" fontSize="18" fontWeight="800" fill="#fff">{value}</text>
     </svg>
   )
