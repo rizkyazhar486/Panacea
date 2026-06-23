@@ -1,8 +1,3 @@
-Oh, saya paham masalahnya sekarang! Vercel menggunakan pengecekan TypeScript yang sangat ketat. Properti `-webkit-` tidak dikenali oleh TypeScript secara default. 
-
-Saya sudah memperbaiki bagian yang error dengan menggunakan `setProperty` yang aman untuk TypeScript. Silakan copas kode lengkap ini:
-
-```tsx
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
@@ -455,4 +450,3 @@ function PasswordForm({ lang, onDone, simple: S }: { lang: Lang; onDone: () => v
     </div>
   )
 }
-```
