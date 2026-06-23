@@ -1547,7 +1547,7 @@ function RecommendationsCard({ recs }: { recs: Rec[] }) {
   if (!recs.length) return null
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconSparkle size={18} />} title="Rekomendasi Real-time" subtitle={recs.length + ' saran berdasarkan data Anda"} />
+      <SectionTitle icon={<IconSparkle size={18} />} title="Rekomendasi Real-time" subtitle={`${recs.length} saran berdasarkan data Anda`} />
       <div className="mt-3 space-y-2 max-h-80 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {recs.map((r, i) => (
           <div key={i} className="flex gap-3 rounded-xl px-3 py-2.5 transition hover:bg-neutral-50" style={{ borderLeft: '3px solid ' + r.c }}>
