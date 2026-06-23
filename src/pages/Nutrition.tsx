@@ -992,7 +992,7 @@ type GMode = 'idle' | 'planning' | 'tracking' | 'paused' | 'done'
 function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: number, min: number, metH: number) => void }) {
   const [mode, setMode] = useState<GMode>('idle')
   const [exType, setExType] = useState(EX[0]); const [exCat, setExCat] = useState('Kardio')
-  const [pts, setPts] = useState<GP[]>([]); const [plan, setPlan] = useState<WP[]>([])
+  const [pts, setPts] = useState<GP[]>([]); const [plan, setPlan] = useState<{x: number; y: number}[]>([])
   const [dur, setDur] = useState(0); const [hr, setHr] = useState(0)
   const [gpsErr, setGpsErr] = useState('')
   const wRef = useRef<number | null>(null); const tRef = useRef<number | null>(null)
