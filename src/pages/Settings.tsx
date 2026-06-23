@@ -28,9 +28,13 @@ import {
   type TextScale,
 } from '../lib/theme'
 import { LANGS, getLang, setLang, t, type Lang } from '../lib/i18n'
-import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/push'
+import {
+  enablePush,
+  disablePush,
+  pushStatus,
+  type PushStatus,
+} from '../lib/push'
 import { InstallApp } from '../components/InstallApp'
-import { api } from '../lib/api'
 
 export function Settings() {
   const store = useStore()
@@ -733,7 +737,6 @@ function PasswordForm({
 function PushControl({ simple: S }: { simple: boolean }) {
   const [status, setStatus] = useState<PushStatus | null>(null)
   const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState('')
 
   useEffect(() => {
     pushStatus().then(setStatus)
@@ -741,7 +744,6 @@ function PushControl({ simple: S }: { simple: boolean }) {
 
   async function toggle() {
     setBusy(true)
-    setMsg('')
     try {
       setStatus(
         status === 'enabled' ? await disablePush() : await enablePush()
@@ -751,23 +753,14 @@ function PushControl({ simple: S }: { simple: boolean }) {
     }
   }
 
-  async function test() {
-    const r = await api.pushTest().catch(() => ({ sent: 0 }))
-    setMsg(
-      r.sent > 0
-        ? 'Notifikasi uji dikirim ✅'
-        : 'Tidak ada perangkat terdaftar.'
-    )
-  }
-
-  const label: Record<PushStatus, string> = {
+  const label: Record<string, string> = {
     enabled: 'Notifikasi push aktif',
     disabled: 'Aktifkan notifikasi push',
     denied: 'Izin diblokir di browser',
     unsupported: 'Browser tidak mendukung',
     unavailable: 'Belum dikonfigurasi server',
   }
-  const note: Record<PushStatus, string> = {
+  const note: Record<string, string> = {
     enabled:
       'Anda akan menerima pemberitahuan penting meski aplikasi tertutup.',
     disabled:
@@ -798,20 +791,11 @@ function PushControl({ simple: S }: { simple: boolean }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className={`font-bold ${S ? 'text-base' : 'text-sm'}`}>
-          {label[status]}
+          {label[status] || status}
         </div>
         <div className={`text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>
-          {note[status]}
+          {note[status] || ''}
         </div>
-        {msg && (
-          <div
-            className={`mt-1 font-semibold text-brand-dark ${
-              S ? 'text-xs' : 'text-[11px]'
-            }`}
-          >
-            {msg}
-          </div>
-        )}
       </div>
       {actionable && (
         <div className="flex shrink-0 flex-col gap-1.5">
@@ -823,16 +807,6 @@ function PushControl({ simple: S }: { simple: boolean }) {
           >
             {busy ? '…' : status === 'enabled' ? 'Matikan' : 'Aktifkan'}
           </Button>
-          {status === 'enabled' && (
-            <button
-              onClick={test}
-              className={`font-semibold text-brand-dark hover:underline ${
-                S ? 'text-xs' : 'text-[11px]'
-              }`}
-            >
-              Kirim uji
-            </button>
-          )}
         </div>
       )}
     </div>
