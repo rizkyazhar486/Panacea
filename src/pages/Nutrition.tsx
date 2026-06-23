@@ -376,7 +376,8 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
     labUnits: { glucose: 'mg/dL', hba1c: '%', totalCholesterol: 'mg/dL', ldl: 'mg/dL', hdl: 'mg/dL', triglycerides: 'mg/dL', uricAcid: 'mg/dL', alt: 'U/L', ast: 'U/L', crp: 'mg/L' },
     labRanges: { glucose: [70, 100], hba1c: [0, 6.5], totalCholesterol: [0, 200], ldl: [0, 100], hdl: [40, 100], triglycerides: [0, 150], uricAcid: [2.5, 7.0], alt: [7, 56], ast: [10, 40], crp: [0, 5] },
     exerRestrictions: ['Latihan resistensi wajib 2-3x/minggu', 'Aerobik 200-300 menit/minggu', 'HIIT efektif tapi mulai pelan', 'Kombinasi cardio + strength terbaik', 'Target turunkan 5-10% berat badan'],
-},
+  },
+]
   {
     id: 'alzheimer', name: 'Alzheimer / Demensia', emoji: '🧠', color: '#818cf8',
     calAdj: 0, protAdj: 1.0, naMax: 2300, kMax: 0, fluidMax: 2500, fluidMin: 1500,
