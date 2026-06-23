@@ -689,7 +689,7 @@ function genRecs(b: Body, intake: number, prot: number, fiber: number, na: numbe
   if (!sun) add('\u2600\uFE0F', 'Tanpa matahari', '10-20 menit pagi untuk vitamin D.', 3, '#eab308')
 
   // Vitals
-  if (hr != null && hr > 80) add('\u{1F493}', 'HR istirahat tinggi', `${hr} bpm - optimal <75.`, 1, C.bad)
+  if (hr != null && hr > 80) add('💓', 'HR istirahat tinggi', `${hr} bpm - optimal <75.`, 1, C.bad)
   if (sys != null && sys > 130) add('\u{1FEA7}', 'Tekanan darah tinggi', `${sys} mmHg.`, 0, C.bad)
   if (spo2 != null && spo2 < 96) add('\u{1F9E1}', 'SpO2 rendah', `${spo2}% - normal >=97%.`, 0, C.bad)
 
