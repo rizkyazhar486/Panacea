@@ -1,0 +1,18 @@
+{
+  "name": "Panaceamed.id — Longevity Medical-AI",
+  "short_name": "Panaceamed",
+  "description": "AI-Klinik Praktis untuk Akses Kesehatan. AI anamnesis, AI-EMR, longevity & faskes darurat — diverifikasi klinisi berlisensi.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7f5",
+  "theme_color": "#00BF63",
+  "lang": "id",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    { "src": "./logo-mark.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./logo-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./logo-mark.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
