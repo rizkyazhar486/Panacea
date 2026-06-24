@@ -4,6 +4,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { Activity as IconActivity } from 'lucide-react'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 import type { VitalSign } from '../lib/types'
 
@@ -580,6 +581,7 @@ function makePath(m: { x: number; y: number }[]) {
 const KM: Record<string, string> = {
   date: 'date', tanggal: 'date', heartrate: 'heartRate', hr: 'heartRate', nadi: 'heartRate',
   steps: 'steps', langkah: 'steps', systolic: 'systolic', systolic: 'systolic',
+  steps: 'steps', langkah: 'steps', systolic: 'systolic',
   spo2: 'spo2', oxygen: 'spo2', oksigen: 'spo2', hrv: 'hrv', rmssd: 'hrv',
   vo2max: 'vo2Max', vo2: 'vo2Max', glucose: 'glucose', gula: 'glucose',
   hba1c: 'hba1c', creatinine: 'creatinine', kreatinin: 'creatinine', gfr: 'gfr',
@@ -957,6 +959,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
       <div className="mt-3 flex items-end gap-3">
         <div className="flex-1 rounded-xl bg-neutral-50 px-4 py-3">
           <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="ok">Rekomendasi</Badge>}{isAvoided && <Badge tone="high">Hindari</Badge>}</div>
+          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="normal">Rekomendasi</Badge>}{isAvoided && <Badge tone="high">Hindari</Badge>}</div>
           <div className="mt-1 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
             <span style={{ color: '#0B7A4B' }}>{pv.k} kkal</span>
             <span className="text-amber-500">K{pv.c}</span>
@@ -1202,6 +1205,8 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
 function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   const [labs, setLabs] = useState<LabEntry[]>(loadLabs)
   const [editVals, setEditVals] = useState<Record<string, string>>({})
+  const [editDate, setEditDate] = useState(today())
+  const [showForm, setShowForm] = useState(false)
 
   const labKeys = activeProtocol?.labKeys ?? ['glucose', 'hba1c', 'totalCholesterol', 'ldl', 'hdl', 'triglycerides', 'creatinine', 'gfr', 'alt', 'ast', 'hemoglobin', 'crp', 'potassium', 'sodium', 'albumin', 'vitD']
   const labLabels = activeProtocol?.labLabels ?? { glucose: 'Gula Darah', hba1c: 'HbA1c', totalCholesterol: 'Kolestrol Total', ldl: 'LDL', hdl: 'HDL', triglycerides: 'Trigliserida', creatinine: 'Kreatinin', gfr: 'eGFR', alt: 'ALT', ast: 'AST', hemoglobin: 'Hemoglobin', crp: 'CRP', potassium: 'Kalium', sodium: 'Natrium', albumin: 'Albumin', vitD: 'Vitamin D' }
@@ -1248,6 +1253,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
       const parsed = parseF(text, file.name)
       if (!parsed.length) return
       const newLabs = parsed.map(p => ({ date: p.date, values: Object.fromEntries(Object.entries(p).filter(([k]) => k !== 'date').map(([k, v]) => [k, v as number])) as LabEntry }))
+      const newLabs = parsed.map(p => ({ date: p.date, values: Object.fromEntries(Object.entries(p).filter(([k]) => k !== 'date').map(([k, v]) => [k, v as number])) }))
       const merged = [...labs]
       newLabs.forEach(nl => {
         const idx = merged.findIndex(l => l.date === nl.date)
@@ -1489,6 +1495,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
             <span className="text-[9px] text-white/20">{'\u00B7'}</span>
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <Badge tone="high" className="ml-2">{activeProtocol.emoji} {activeProtocol.name}</Badge>}
+            {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
           <div className="flex items-center gap-6 mt-4">

@@ -178,6 +178,7 @@ export interface SocialPost {
   authorName: string
   role: Role
   kind: 'image' | 'video'
+  kind: 'image' | 'video' | 'text'
   postType?: PostType // defaults to 'aktivitas' for legacy posts
   activity: string // lari, berenang, padel, makan sehat ...
   caption: string
@@ -233,6 +234,10 @@ export interface WellnessDay {
   waterMl?: number // water intake in mL
   exerciseKcal?: number // calories burned via exercise
   exerciseMin?: number // total exercise minutes
+  sunDone?: boolean
+  sunHr?: number
+  metHours?: number
+
 }
 
 // -------- Doctor consultations --------------------------------------------
