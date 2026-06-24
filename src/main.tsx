@@ -13,7 +13,7 @@ import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { Chatbot } from './pages/Chatbot'
 import { Dashboard } from './pages/Dashboard'
-import { Nutrition } from './pages/Nutrition'
+import Nutrition from './pages/Nutrition' // Perbaikan: Menghapus tanda kurung kurawal {}
 import { Consult } from './pages/Consult'
 import { Hospitals } from './pages/Hospitals'
 import { Pharmacy } from './pages/Pharmacy'
