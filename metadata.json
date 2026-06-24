@@ -1,0 +1,6 @@
+{
+  "name": "Panaceamed.id",
+  "description": "Longevity Medical-AI Co-Physician platform (AI Chatbot + AI-EMR) with standard health trackers and community bugar feed.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -299,6 +299,7 @@ export interface BackendPost {
   authorName: string
   role: Role
   kind: 'image' | 'video'
+  kind: 'image' | 'video' | 'text'
   activity: string
   caption: string
   mediaColor: string

@@ -6,6 +6,17 @@ import {
   IconArticle, IconComment, IconMoon, IconVideo, IconHeart, IconRepost, IconBookmark, IconLock,
   IconShare2, IconSend, IconX, IconMapPin, IconNavigation, IconTimer, IconGauge, IconActivity,
 } from '../components/icons'
+  IconSend,
+} from '../components/icons'
+import {
+  Share2 as IconShare2,
+  X as IconX,
+  MapPin as IconMapPin,
+  Navigation as IconNavigation,
+  Timer as IconTimer,
+  Gauge as IconGauge,
+  Activity as IconActivity,
+} from 'lucide-react'
 import { api, backendEnabled } from '../lib/api'
 import { uploadOrLocal } from '../lib/upload'
 import type { SocialPost, PostType, Role, ProfileEdit } from '../lib/types'
@@ -534,6 +545,7 @@ function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEma
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
+export function Feed() {
   const { account } = useStore() // Mengambil data user terautentikasi dari store global
   const [posts, setPosts] = useState<SocialPost[]>([])
   const [isComposeOpen, setIsComposeOpen] = useState(false)

@@ -14,6 +14,7 @@ import { NotFound } from './pages/NotFound'
 import { Chatbot } from './pages/Chatbot'
 import { Dashboard } from './pages/Dashboard'
 import { Nutrition } from './pages/Nutrition'
+import { Nutrition } from './pages/Nutrition' // Fixed: Changed to named import to match Nutrition.tsx from main
 import { Consult } from './pages/Consult'
 import { Hospitals } from './pages/Hospitals'
 import { Pharmacy } from './pages/Pharmacy'
