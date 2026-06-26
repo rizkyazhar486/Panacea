@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/blissful-ride-30vcu5
+      - main
   workflow_dispatch:
 
 permissions:
