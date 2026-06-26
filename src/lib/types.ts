@@ -307,6 +307,32 @@ export interface SportCommunity {
   createdAt: string
 }
 
+// -------- Pusat Kesehatan Realtime: edukasi, news, kalkulasi, monitoring ---
+// Self-tracked manual vitals log (separate from the clinical multi-patient `vitals` map).
+export interface SelfVital {
+  id: string
+  at: string // ISO datetime
+  systolic: number
+  diastolic: number
+  heartRate: number
+  spo2: number
+  tempC: number
+}
+
+export interface SleepLog {
+  id: string
+  date: string // yyyy-mm-dd
+  hours: number
+  bedtimeConsistent: boolean // went to bed within ~1h of usual time
+}
+
+export interface MedReminder {
+  id: string
+  name: string
+  time: string // "HH:MM"
+  takenDates: string[] // yyyy-mm-dd dates marked taken
+}
+
 // -------- Nutrition / calorie diary ----------------------------------------
 export interface FoodEntry {
   id: string
@@ -503,6 +529,11 @@ export interface AppState {
   circles: Circle[] // Circle of Care groups (item 9)
   gratitudes: GratitudeNote[] // gratitude wall (item 10)
   communities: SportCommunity[] // sport-interest communities (item 10b / affinity basis for item 1)
+  selfVitals: SelfVital[] // manual vitals monitoring log (Pusat Kesehatan Realtime)
+  sleepLogs: SleepLog[] // sleep quality monitoring
+  medReminders: MedReminder[] // medication/vitamin reminders
+  eduBookmarks: string[] // bookmarked education article ids
+  quizScore: { correct: number; total: number } // myth-vs-fact quiz running score
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]

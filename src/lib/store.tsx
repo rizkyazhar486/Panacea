@@ -26,6 +26,9 @@ import type {
   Circle,
   GratitudeNote,
   SportCommunity,
+  SelfVital,
+  SleepLog,
+  MedReminder,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -113,6 +116,11 @@ function seed(): AppState {
     circles: [],
     gratitudes: [],
     communities: [],
+    selfVitals: [],
+    sleepLogs: [],
+    medReminders: [],
+    eduBookmarks: [],
+    quizScore: { correct: 0, total: 0 },
     foods: [],
     wellness: {},
     consults: [],
@@ -203,6 +211,13 @@ interface Store {
   addGratitude: (toName: string, text: string) => void // item 10
   createCommunity: (name: string, sportTag: string) => void // item 10: discover/start sport-interest groups
   joinCommunity: (id: string, memberName: string) => void // item 10
+  // Pusat Kesehatan Realtime — edukasi, news, fungsionalitas, kalkulasi, monitoring
+  addSelfVital: (v: Omit<SelfVital, 'id' | 'at'>) => void
+  addSleepLog: (hours: number, bedtimeConsistent: boolean) => void
+  addMedReminder: (name: string, time: string) => void
+  markMedTaken: (id: string) => void
+  toggleEduBookmark: (articleId: string) => void
+  answerQuiz: (correct: boolean) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -679,6 +694,35 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : c
           ),
         })),
+      addSelfVital: (v) =>
+        setState((st) => ({ ...st, selfVitals: [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50) })),
+      addSleepLog: (hours, bedtimeConsistent) =>
+        setState((st) => {
+          const date = new Date().toISOString().slice(0, 10)
+          const without = st.sleepLogs.filter((s) => s.date !== date)
+          return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
+        }),
+      addMedReminder: (name, time) =>
+        setState((st) => (name.trim() && time ? { ...st, medReminders: [{ id: uid(), name: name.trim(), time, takenDates: [] }, ...st.medReminders] } : st)),
+      markMedTaken: (id) =>
+        setState((st) => {
+          const today = new Date().toISOString().slice(0, 10)
+          return {
+            ...st,
+            medReminders: st.medReminders.map((m) =>
+              m.id === id && !m.takenDates.includes(today) ? { ...m, takenDates: [...m.takenDates, today] } : m
+            ),
+          }
+        }),
+      toggleEduBookmark: (articleId) =>
+        setState((st) => ({
+          ...st,
+          eduBookmarks: st.eduBookmarks.includes(articleId)
+            ? st.eduBookmarks.filter((id) => id !== articleId)
+            : [...st.eduBookmarks, articleId],
+        })),
+      answerQuiz: (correct) =>
+        setState((st) => ({ ...st, quizScore: { correct: st.quizScore.correct + (correct ? 1 : 0), total: st.quizScore.total + 1 } })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

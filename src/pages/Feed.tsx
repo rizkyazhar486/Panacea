@@ -1203,6 +1203,245 @@ function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; view
 }
 
 /* ═══════════════════════════════════════════════════════
+   PUSAT KESEHATAN REALTIME — edukasi, news, fungsionalitas,
+   kalkulasi, monitoring (10 fitur)
+   ═══════════════════════════════════════════════════════ */
+const HEALTH_NEWS = [
+  { id: 'n1', title: 'WHO: 30 menit jalan cepat/hari turunkan risiko penyakit jantung', tag: 'Kardiologi' },
+  { id: 'n2', title: 'Studi terbaru: tidur < 6 jam tingkatkan risiko diabetes tipe 2', tag: 'Endokrin' },
+  { id: 'n3', title: 'Kemenkes imbau vaksinasi influenza musim hujan', tag: 'Imunisasi' },
+  { id: 'n4', title: 'Konsumsi gula berlebih dikaitkan dengan penuaan kulit lebih cepat', tag: 'Nutrisi' },
+  { id: 'n5', title: 'Latihan kekuatan 2x/minggu terbukti perpanjang usia harapan hidup', tag: 'Olahraga' },
+]
+const EDU_ARTICLES = [
+  { id: 'e1', title: 'Mengenal Tekanan Darah: Kapan Harus Waspada?', minutes: 4 },
+  { id: 'e2', title: '5 Kebiasaan Tidur Sehat untuk Pemulihan Otot', minutes: 3 },
+  { id: 'e3', title: 'Hidrasi: Berapa Air yang Sebenarnya Tubuh Anda Butuhkan?', minutes: 2 },
+  { id: 'e4', title: 'Mitos vs Fakta Seputar Diet Karbo', minutes: 5 },
+]
+const MYTH_QUIZ = [
+  { q: 'Minum air dingin setelah olahraga berat berbahaya bagi jantung.', answer: false },
+  { q: 'Tekanan darah normal dewasa sekitar 120/80 mmHg.', answer: true },
+  { q: 'Tidur kurang dari 6 jam tiap malam dapat memengaruhi metabolisme.', answer: true },
+  { q: 'Detoks jus selama 3 hari dapat "membersihkan" racun dari hati.', answer: false },
+]
+
+function bpCategory(sys: number, dia: number) {
+  if (sys < 90 || dia < 60) return { label: 'Rendah', color: '#3B82F6' }
+  if (sys < 120 && dia < 80) return { label: 'Normal', color: '#00BF63' }
+  if (sys < 130 && dia < 80) return { label: 'Tinggi-Normal', color: '#84CC16' }
+  if (sys < 140 || dia < 90) return { label: 'Hipertensi Tahap 1', color: '#F59E0B' }
+  return { label: 'Hipertensi Tahap 2', color: '#EF4444' }
+}
+
+function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
+  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, answerQuiz } = useStore()
+
+  // 1. Kalkulator BMI & Kalori Harian (TDEE)
+  const [weight, setWeight] = useState(70)
+  const [height, setHeight] = useState(170)
+  const [age, setAge] = useState(30)
+  const [activity, setActivity] = useState(1.4)
+  const bmi = weight / Math.pow(height / 100, 2)
+  const bmiCat = bmiCategory(bmi)
+  const tdee = Math.round((10 * weight + 6.25 * height - 5 * age + 5) * activity)
+
+  // 2. Kalkulator Tekanan Darah
+  const [sys, setSys] = useState(120)
+  const [dia, setDia] = useState(80)
+  const bpCat = bpCategory(sys, dia)
+
+  // 3. Kalkulator Kebutuhan Cairan Harian
+  const waterMl = Math.round(weight * 33 * (activity > 1.3 ? 1.15 : 1))
+
+  // 4. Monitor Vital Realtime
+  const [hr, setHr] = useState(72)
+  const [spo2, setSpo2] = useState(98)
+  const [tempC, setTempC] = useState(36.5)
+  const lastVital = state.selfVitals[0]
+
+  // 5. Skor Kualitas Tidur
+  const [sleepHours, setSleepHours] = useState(7)
+  const [bedtimeConsistent, setBedtimeConsistent] = useState(true)
+  const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(sleepHours, 9) / 9) * 70 + (bedtimeConsistent ? 30 : 0))))
+  const todaySleep = state.sleepLogs.find((s) => s.date === new Date().toISOString().slice(0, 10))
+
+  // 6. Pengingat Obat/Vitamin
+  const [medName, setMedName] = useState('')
+  const [medTime, setMedTime] = useState('08:00')
+  const today = new Date().toISOString().slice(0, 10)
+  const now = new Date()
+  const nowHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+
+  // 7. Live Health News Ticker
+  const [newsIdx, setNewsIdx] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setNewsIdx((i) => (i + 1) % HEALTH_NEWS.length), 6000)
+    return () => clearInterval(t)
+  }, [])
+
+  // 9. Kuis Fakta vs Mitos
+  const [quizIdx, setQuizIdx] = useState(0)
+  const [quizFeedback, setQuizFeedback] = useState<'right' | 'wrong' | null>(null)
+  const quiz = MYTH_QUIZ[quizIdx % MYTH_QUIZ.length]
+
+  return (
+    <div className="space-y-4">
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Pusat Kesehatan Realtime</h4>
+
+      {/* 7. Live Health News Ticker */}
+      <Card className="space-y-1.5 overflow-hidden">
+        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Berita Kesehatan Live <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
+        <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">
+          <span className="font-bold text-brand-dark">[{HEALTH_NEWS[newsIdx].tag}]</span> {HEALTH_NEWS[newsIdx].title}
+        </div>
+      </Card>
+
+      {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🧮 Kalkulator BMI, Kalori & Cairan</div>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <Field label="Berat (kg)"><input type="number" value={weight} onChange={(e) => setWeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Tinggi (cm)"><input type="number" value={height} onChange={(e) => setHeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Usia"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+        </div>
+        <select value={activity} onChange={(e) => setActivity(+e.target.value)} className={inputClass + ' text-xs'}>
+          <option value={1.2}>Jarang olahraga</option>
+          <option value={1.4}>Olahraga ringan</option>
+          <option value={1.6}>Olahraga sedang</option>
+          <option value={1.9}>Olahraga berat</option>
+        </select>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="rounded-xl p-2 text-center text-white" style={{ background: bmiCat.c }}>
+            <div className="text-[10px] opacity-90">BMI</div>
+            <div className="text-sm font-black">{bmi.toFixed(1)}</div>
+            <div className="text-[10px] font-bold">{bmiCat.l}</div>
+          </div>
+          <div className="rounded-xl bg-brand-50 p-2 text-center text-brand-dark">
+            <div className="text-[10px]">Kalori/hari</div>
+            <div className="text-sm font-black">{tdee}</div>
+            <div className="text-[10px] font-bold">kkal</div>
+          </div>
+          <div className="rounded-xl bg-sky-50 p-2 text-center text-sky-700">
+            <div className="text-[10px]">Cairan/hari</div>
+            <div className="text-sm font-black">{(waterMl / 1000).toFixed(1)}</div>
+            <div className="text-[10px] font-bold">liter</div>
+          </div>
+        </div>
+      </Card>
+
+      {/* 2. Kalkulator Tekanan Darah + 4. Monitor Vital Realtime */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🩺 Tekanan Darah & Monitor Vital</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <Field label="Sistolik"><input type="number" value={sys} onChange={(e) => setSys(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Diastolik"><input type="number" value={dia} onChange={(e) => setDia(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+        </div>
+        <div className="rounded-xl p-2 text-center text-white" style={{ background: bpCat.color }}>
+          <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-2 text-xs">
+          <Field label="HR (bpm)"><input type="number" value={hr} onChange={(e) => setHr(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="SpO2 (%)"><input type="number" value={spo2} onChange={(e) => setSpo2(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Suhu (°C)"><input type="number" step={0.1} value={tempC} onChange={(e) => setTempC(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+        </div>
+        <button onClick={() => addSelfVital({ systolic: sys, diastolic: dia, heartRate: hr, spo2, tempC })}
+          className="w-full rounded-xl px-4 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          Catat Vital Sekarang
+        </button>
+        {lastVital && (
+          <p className="text-[11px] text-neutral-500">Terakhir dicatat: {timeAgo(lastVital.at)} — {lastVital.systolic}/{lastVital.diastolic} mmHg, HR {lastVital.heartRate}, SpO2 {lastVital.spo2}%, {lastVital.tempC}°C</p>
+        )}
+      </Card>
+
+      {/* 5. Skor Kualitas Tidur */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">😴 Skor Kualitas Tidur</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <Field label="Jam tidur"><input type="number" value={sleepHours} onChange={(e) => setSleepHours(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <label className="flex items-center gap-2 pt-5 text-xs text-neutral-600">
+            <input type="checkbox" checked={bedtimeConsistent} onChange={(e) => setBedtimeConsistent(e.target.checked)} /> Jam tidur konsisten
+          </label>
+        </div>
+        <button onClick={() => addSleepLog(sleepHours, bedtimeConsistent)} className="w-full rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Simpan Tidur Hari Ini</button>
+        <div className="rounded-xl bg-indigo-50 p-2 text-center text-indigo-700">
+          <span className="text-sm font-black">{todaySleep ? sleepScore : '—'}</span> <span className="text-xs font-bold">/100 {todaySleep ? '(tersimpan hari ini)' : '(belum disimpan)'}</span>
+        </div>
+      </Card>
+
+      {/* 6. Pengingat Obat/Vitamin Realtime */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">💊 Pengingat Obat & Vitamin</div>
+        <div className="flex items-center gap-2">
+          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' flex-1 text-xs'} />
+          <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' w-24 text-xs'} />
+          <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
+        </div>
+        {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">Belum ada pengingat. Tambahkan satu di atas.</p>}
+        {state.medReminders.map((m) => {
+          const taken = m.takenDates.includes(today)
+          const due = nowHM >= m.time && !taken
+          return (
+            <div key={m.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-xs">
+              <span className={due ? 'font-bold text-red-500' : 'text-neutral-600'}>{m.name} · {m.time} {due ? '⏰ Saatnya!' : ''}</span>
+              <button onClick={() => markMedTaken(m.id)} disabled={taken}
+                className="rounded-full px-2.5 py-1 text-[11px] font-bold disabled:opacity-50" style={{ background: taken ? '#E5F8EE' : '#00BF63', color: taken ? '#0B7A4B' : '#fff' }}>
+                {taken ? '✓ Diminum' : 'Tandai'}
+              </button>
+            </div>
+          )
+        })}
+      </Card>
+
+      {/* 8. Pusat Edukasi Cepat */}
+      <Card className="space-y-2">
+        <div className="text-xs font-black text-ink">📚 Edukasi Cepat</div>
+        {EDU_ARTICLES.map((a) => {
+          const bookmarked = state.eduBookmarks.includes(a.id)
+          return (
+            <div key={a.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
+              <span className="flex-1 pr-2 text-neutral-700">{a.title} <span className="text-neutral-400">· {a.minutes} mnt baca</span></span>
+              <button onClick={() => toggleEduBookmark(a.id)} className="shrink-0 text-base">{bookmarked ? '🔖' : '📑'}</button>
+            </div>
+          )
+        })}
+      </Card>
+
+      {/* 9. Kuis Fakta vs Mitos */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🧠 Kuis Fakta vs Mitos</div>
+        <p className="text-xs text-neutral-600">{quiz.q}</p>
+        <div className="flex gap-2">
+          <button onClick={() => { const ok = quiz.answer === true; setQuizFeedback(ok ? 'right' : 'wrong'); answerQuiz(ok) }}
+            className="flex-1 rounded-xl bg-brand/10 py-2 text-xs font-bold text-brand-dark">Fakta</button>
+          <button onClick={() => { const ok = quiz.answer === false; setQuizFeedback(ok ? 'right' : 'wrong'); answerQuiz(ok) }}
+            className="flex-1 rounded-xl bg-neutral-100 py-2 text-xs font-bold text-neutral-600">Mitos</button>
+        </div>
+        {quizFeedback && (
+          <div className="flex items-center justify-between text-xs">
+            <span className={quizFeedback === 'right' ? 'font-bold text-brand-dark' : 'font-bold text-red-500'}>{quizFeedback === 'right' ? '✓ Benar!' : '✕ Kurang tepat.'}</span>
+            <button onClick={() => { setQuizIdx((i) => i + 1); setQuizFeedback(null) }} className="rounded-full bg-neutral-100 px-3 py-1 font-bold text-neutral-600">Lanjut →</button>
+          </div>
+        )}
+        <p className="text-[11px] text-neutral-400">Skor: {state.quizScore.correct}/{state.quizScore.total}</p>
+      </Card>
+
+      {/* 10. Dashboard Ringkasan Realtime — agregasi semua metrik di atas */}
+      <Card className="space-y-2">
+        <div className="text-xs font-black text-ink">📊 Ringkasan Realtime</div>
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tensi</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tidur hari ini</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Belum dicatat'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Vital terakhir</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'Belum ada'}</div></div>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
@@ -1286,6 +1525,9 @@ export default function SportsSocialFeed() {
 
       {/* Komunitas Sehat — Health Buddy, mood & dukungan, tantangan, Circle of Care, gratitude wall */}
       <KomunitasSehat viewerEmail={currentUser.email} viewerName={currentUser.name} />
+
+      {/* Pusat Kesehatan Realtime — edukasi, news, fungsionalitas, kalkulasi, monitoring */}
+      <PusatKesehatanRealtime viewerEmail={currentUser.email} />
 
       {/* RENDER FEED SOSIAL */}
       <div className="space-y-4">
