@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { api, backendEnabled } from './api'
+import { api, backendEnabled, type BackendPost } from './api'
 import type {
   AppState,
   Patient,
@@ -56,6 +56,34 @@ export const MARKETPLACE_FEE_PNC = 5
 
 export function uid(): string {
   return Math.random().toString(36).slice(2, 10)
+}
+
+// #9: convert a backend post into the richer local SocialPost shape.
+function backendPostToSocial(p: BackendPost): SocialPost {
+  return {
+    id: p.id,
+    authorEmail: p.authorEmail,
+    authorName: p.authorName,
+    role: p.role,
+    kind: p.kind,
+    activity: p.activity,
+    caption: p.caption,
+    mediaColor: p.mediaColor,
+    durationSec: p.durationSec,
+    photos: [],
+    likes: p.likes,
+    comments: 0,
+    commentList: [],
+    reposts: 0,
+    at: p.at,
+  }
+}
+
+// #9: merge server posts with any local-only (offline) posts, newest first.
+function mergePosts(server: SocialPost[], local: SocialPost[]): SocialPost[] {
+  const serverIds = new Set(server.map((p) => p.id))
+  const localOnly = local.filter((p) => !serverIds.has(p.id))
+  return [...localOnly, ...server].sort((a, b) => (a.at < b.at ? 1 : -1))
 }
 
 // Placeholder identities used only as safe fallbacks when no real data exists
@@ -321,6 +349,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .catch(() => {})
   }, [state.account?.email])
 
+  // #9: multi-user social feed — pull posts from the server on login and poll so
+  // posts/likes from other users appear near-realtime. Local-only (offline) posts
+  // are preserved via mergePosts. No-op when no backend is configured.
+  useEffect(() => {
+    if (!backendEnabled || !state.account?.email) return
+    let alive = true
+    const pull = () =>
+      api
+        .posts()
+        .then((server) => {
+          if (!alive) return
+          const mapped = server.map(backendPostToSocial)
+          setState((st) => ({ ...st, posts: mergePosts(mapped, st.posts) }))
+        })
+        .catch(() => {})
+    pull()
+    const t = setInterval(pull, 15_000)
+    return () => {
+      alive = false
+      clearInterval(t)
+    }
+  }, [state.account?.email])
+
   const store = useMemo<Store>(() => {
     const activePatient =
       state.patients.find((p) => p.id === state.activePatientId) ?? state.patients[0] ?? PLACEHOLDER_PATIENT
@@ -495,11 +546,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           adminEmails: st.adminEmails.filter((e) => e !== email || e === OWNER_EMAIL),
         })),
-      addPost: (p) => setState((st) => ({ ...st, posts: [p, ...st.posts] })),
+      addPost: (p) => {
+        setState((st) => ({ ...st, posts: [p, ...st.posts] }))
+        // #9: best-effort push to the server so other users see the post.
+        if (backendEnabled) {
+          api
+            .createPost({
+              authorEmail: p.authorEmail,
+              authorName: p.authorName,
+              role: p.role,
+              kind: p.kind === 'text' ? 'image' : p.kind,
+              activity: p.activity,
+              caption: p.caption,
+              mediaColor: p.mediaColor,
+              durationSec: p.durationSec,
+            })
+            .then((server) =>
+              // Swap the local temp id for the server id so likes target the right row.
+              setState((st) => ({ ...st, posts: st.posts.map((x) => (x.id === p.id ? { ...x, id: server.id } : x)) })),
+            )
+            .catch(() => {})
+        }
+      },
       updatePost: (id, partial) =>
         setState((st) => ({ ...st, posts: st.posts.map((p) => (p.id === id ? { ...p, ...partial } : p)) })),
       deletePost: (id) => setState((st) => ({ ...st, posts: st.posts.filter((p) => p.id !== id) })),
-      toggleLike: (id) =>
+      toggleLike: (id) => {
         setState((st) => ({
           ...st,
           posts: st.posts.map((p) =>
@@ -507,7 +579,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               ? { ...p, likedByMe: !p.likedByMe, likes: p.likes + (p.likedByMe ? -1 : 1) }
               : p,
           ),
-        })),
+        }))
+        if (backendEnabled) api.likePost(id).catch(() => {}) // #9: sync like to server
+      },
       toggleRepost: (id) =>
         setState((st) => ({
           ...st,
