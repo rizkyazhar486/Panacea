@@ -2,7 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
 
 interface ChatMsg {
-  type: 'join' | 'msg' | 'system' | 'presence'
+  // 'rtc-*' = WebRTC signaling for video/audio calls (relayed to the other peer).
+  type: 'join' | 'msg' | 'system' | 'presence' | 'rtc-offer' | 'rtc-answer' | 'rtc-ice' | 'rtc-end'
   room?: string
   text?: string
   from?: string
@@ -17,6 +18,14 @@ function broadcast(room: string, msg: ChatMsg) {
   if (!set) return
   const data = JSON.stringify({ ...msg, at: msg.at ?? new Date().toISOString() })
   for (const ws of set) if (ws.readyState === WebSocket.OPEN) ws.send(data)
+}
+
+// Relay a raw payload to every peer in the room EXCEPT the sender (used for
+// WebRTC signaling, where echoing back to the sender breaks the handshake).
+function relayToOthers(room: string, sender: WebSocket, raw: string) {
+  const set = rooms.get(room)
+  if (!set) return
+  for (const ws of set) if (ws !== sender && ws.readyState === WebSocket.OPEN) ws.send(raw)
 }
 
 // Real-time consultation rooms over WebSocket (doctor ↔ patient).
@@ -41,6 +50,9 @@ export function attachRealtime(server: Server) {
         broadcast(room, { type: 'presence', room, count: rooms.get(room)!.size })
       } else if (m.type === 'msg' && room) {
         broadcast(room, { type: 'msg', text: m.text, from: m.from || name, room })
+      } else if (m.type?.startsWith('rtc-') && room) {
+        // Video/audio call signaling — forward untouched to the other peer only.
+        relayToOthers(room, ws, raw.toString())
       }
     })
     ws.on('close', () => {

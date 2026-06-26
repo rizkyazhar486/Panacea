@@ -200,6 +200,54 @@ pasien pakai model cepat (Gemini Flash); AI-EMR/Vision pakai GLM. **Tanpa ubah k
 
 ---
 
+## Bagian 6 — Aktifkan Fitur Realtime (Feed multi-user & Konsultasi Video) 🎥
+
+Fitur ini membuat **postingan/like saling terlihat antar pengguna** (#9) dan
+**konsultasi dokter–pasien secara langsung, termasuk panggilan video** (#10).
+
+> 💚 **Kabar baik:** kode-nya **sudah selesai semua**. Anda hanya perlu memastikan
+> backend hidup dan alamatnya terpasang. Tidak ada yang perlu Anda program.
+
+### Langkah A — Pastikan backend sudah hidup (sekali saja)
+Jika Anda **sudah** pernah deploy backend di Render (lihat Bagian 0, service
+bertipe *Web Service*), lewati langkah ini. Jika **belum**:
+1. Buka **https://dashboard.render.com** → **New** → **Blueprint**.
+2. Pilih repository **Panacea** Anda → **Apply**. Render membaca berkas
+   `render.yaml` dan membuat backend otomatis (1–3 menit).
+3. Setelah jadi, **salin alamat** service-nya (mis. `https://panaceamed-backend.onrender.com`).
+
+### Langkah B — Sambungkan aplikasi ke backend (sekali saja)
+1. Buka repo **Panacea** di GitHub → **Settings** → **Secrets and variables**
+   → **Actions** → tab **Variables** → **New repository variable**.
+2. **Name** = `VITE_API_URL`
+   **Value** = alamat backend dari Langkah A (tanpa garis miring di akhir).
+3. **Add variable**. Selesai — saat aplikasi otomatis ter-update, **#9 dan
+   konsultasi teks #10 langsung aktif.**
+
+✅ Sampai sini: feed antar-pengguna jalan, dan tombol Chat di halaman Konsultasi muncul.
+
+### Langkah C (opsional) — Agar Panggilan VIDEO lancar di paket data/HP 📹
+Panggilan video butuh "server perantara" bernama **TURN**. Tanpa ini, video
+sering hanya berhasil di Wi-Fi yang sama. Cara termudah (terkelola, bayar pakai):
+1. Daftar penyedia TURN, mis. **https://www.metered.ca/tools/openrelay** (ada paket gratis)
+   atau **Twilio**. Anda akan mendapat 3 informasi: **alamat (URL)**, **username**, **password**.
+2. Di GitHub (cara sama seperti Langkah B), tambah **3 variable**:
+   - `VITE_TURN_URL` = alamat TURN (mis. `turn:standard.relay.metered.ca:80`)
+   - `VITE_TURN_USER` = username dari penyedia
+   - `VITE_TURN_CRED` = password dari penyedia
+3. Simpan. Setelah aplikasi ter-update, **panggilan video tembus jaringan seluler.**
+
+> Tanpa Langkah C, video **tetap berfungsi** untuk uji coba di jaringan yang sama —
+> hanya kurang andal di jaringan seluler.
+
+### Cara menguji
+1. Buka aplikasi di **dua HP/akun berbeda**. Buat postingan di akun A →
+   muncul di akun B dalam ±15 detik. ✅ (#9)
+2. Dua akun buka **ruang konsultasi yang sama** → terlihat "2 online", chat dua arah,
+   dan tombol 📹 untuk mulai video. ✅ (#10)
+
+---
+
 ## ✅ Ringkasan prioritas
 
 | Prioritas | Apa | Biaya | Hasil |
@@ -209,3 +257,6 @@ pasien pakai model cepat (Gemini Flash); AI-EMR/Vision pakai GLM. **Tanpa ubah k
 | 3 | Pasang PWA (Bagian 5) | Gratis | Jadi "aplikasi" |
 | 4 | Midtrans (Bagian 3) | Perlu NPWP | Pembayaran asli |
 | 5 | Iris (Bagian 4) | Perlu Midtrans | Pencairan otomatis |
+| 6 | Realtime (Bagian 6) | Gratis* | Feed multi-user + konsultasi video |
+
+\* TURN untuk video (Langkah C) ada paket gratis; untuk skala besar berbayar sesuai pakai.
