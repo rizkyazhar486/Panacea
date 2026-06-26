@@ -260,7 +260,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
-              className="grid h-9 w-9 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
+              className="hidden h-9 w-9 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
               title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
               aria-label="Ganti tema"
             >
@@ -287,7 +287,7 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               <IconToken size={16} className="text-brand" />
               {state.wallet.balance}
-              <span className="text-[10px] font-semibold text-white/60">PNC</span>
+              <span className="hidden text-[10px] font-semibold text-white/60 sm:inline">PNC</span>
             </NavLink>
             {/* Mobile-only exit/logout — the sidebar Keluar is hidden on phones */}
             <button
@@ -366,7 +366,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
                 Layanan tersering Anda
               </div>
-              <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-8">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
                 {homeServices.map((n) => (
                   <NavLink
                     key={n.to}
