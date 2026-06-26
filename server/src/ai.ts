@@ -36,11 +36,21 @@ type Msg = { role: 'user' | 'assistant'; content: string | any[] }
 // model ids via env so you can swap providers without code changes.
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || ''
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const CHAT_MODEL = process.env.AI_CHAT_MODEL || 'google/gemini-2.0-flash-001'
-const EMR_MODEL = process.env.AI_EMR_MODEL || 'z-ai/glm-4.6'
+// Defaults match the intended setup so only OPENROUTER_API_KEY is required:
+// patient Chatbot → Gemini 3.5 Flash, AI-EMR/education/vision → GLM 5.2.
+// Override per-deployment via AI_CHAT_MODEL / AI_EMR_MODEL if a slug changes.
+const CHAT_MODEL = process.env.AI_CHAT_MODEL || 'google/gemini-3.5-flash'
+const EMR_MODEL = process.env.AI_EMR_MODEL || 'z-ai/glm-5.2'
 
 export function aiConfigured(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY || OPENROUTER_KEY)
+}
+
+// Human-readable summary of the active AI provider/models (for startup logging).
+export function aiStatus(): string {
+  if (OPENROUTER_KEY) return `LIVE via OpenRouter — chat: ${CHAT_MODEL}, EMR/edu: ${EMR_MODEL}`
+  if (process.env.ANTHROPIC_API_KEY) return 'LIVE via Anthropic (server key)'
+  return 'off (clients use own key / demo)'
 }
 
 // Convert our message content (string or Anthropic-style image blocks) to the

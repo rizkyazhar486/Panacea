@@ -47,7 +47,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, generateOperatorBriefing, aiConfigured } from './ai.js'
+import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -482,7 +482,7 @@ attachRealtime(server)
 await initStore()
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
-  console.log(`  AI (Claude):  ${features.aiLive ? 'LIVE (server key)' : 'off (clients use own key / demo)'}`)
+  console.log(`  AI:           ${aiStatus()}`)
   console.log(`  Web Push:     ${features.pushLive ? 'LIVE (VAPID set)' : 'off (set VAPID_PUBLIC_KEY/PRIVATE_KEY)'}`)
   console.log(`  Email:        ${features.emailLive ? 'LIVE (Resend)' : 'off (set RESEND_API_KEY)'}`)
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
