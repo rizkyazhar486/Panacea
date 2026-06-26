@@ -274,6 +274,23 @@ const EX: Exer[] = [
   { name: 'Mencuci', emoji: '🧼', met: 2.0, int: 'Rendah', gps: false, cat: 'Aktivitas', hiit: false },
   { name: 'Berkebun', emoji: '🌱', met: 3.8, int: 'Rendah', gps: false, cat: 'Aktivitas', hiit: false },
   { name: 'Bersepeda ke kantor', emoji: '🚲', met: 5.0, int: 'Sedang', gps: true, cat: 'Aktivitas', hiit: false },
+  // HIGH-INTENSITY / FUNCTIONAL (Hyrox, CrossFit, dll.)
+  { name: 'Hyrox (race)', emoji: '🟥', met: 13.0, int: 'Sangat Tinggi', gps: true, cat: 'HIIT', hiit: true },
+  { name: 'CrossFit WOD', emoji: '🏋️‍♀️', met: 12.0, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Functional bootcamp', emoji: '🥾', met: 10.0, int: 'Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Sled push/pull', emoji: '🛷', met: 11.0, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Wall balls', emoji: '🧱', met: 9.0, int: 'Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Rowing erg (sprint)', emoji: '🚣', met: 12.0, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'SkiErg', emoji: '⛷️', met: 11.0, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Assault bike', emoji: '🚴‍♂️', met: 12.5, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Farmer carry', emoji: '🧳', met: 8.0, int: 'Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  { name: 'Box jumps', emoji: '📦', met: 10.0, int: 'Sangat Tinggi', gps: false, cat: 'HIIT', hiit: true },
+  // TEAM SPORTS (moderate–high)
+  { name: 'American football', emoji: '🏈', met: 8.0, int: 'Tinggi', gps: true, cat: 'Olahraga', hiit: true },
+  { name: 'Bola basket (kompetitif)', emoji: '🏀', met: 8.0, int: 'Tinggi', gps: true, cat: 'Olahraga', hiit: true },
+  { name: 'Sepak bola (kompetitif)', emoji: '⚽', met: 10.3, int: 'Sangat Tinggi', gps: true, cat: 'Olahraga', hiit: true },
+  { name: 'Hoki es', emoji: '🏒', met: 8.0, int: 'Tinggi', gps: true, cat: 'Olahraga', hiit: true },
+  { name: 'Handball', emoji: '🤾', met: 8.0, int: 'Tinggi', gps: true, cat: 'Olahraga', hiit: true },
 ]
 const EXCATS = [...new Set(EX.map(e => e.cat))]
 
