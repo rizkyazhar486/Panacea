@@ -1,10 +1,12 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
+// Lazy so recharts is split into its own chunk (keeps the main bundle lean).
+const HealthTrends = lazy(() => import('../components/HealthTrends'))
 import type { VitalSign } from '../lib/types'
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -1647,6 +1649,11 @@ export function Nutrition() {
 
       {/* Body Profile */}
       <BodyCard intakeKcal={totalKcal} />
+
+      {/* 7-day BMI / BMR / VO₂Max trends (recharts) */}
+      <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-400 shadow-sm">Memuat tren kesehatan…</div>}>
+        <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
+      </Suspense>
 
       {/* Food Tracker */}
       <FoodTracker body={body} activeProtocol={activeProtocol} />
