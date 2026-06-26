@@ -1266,6 +1266,12 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(sleepHours, 9) / 9) * 70 + (bedtimeConsistent ? 30 : 0))))
   const todaySleep = state.sleepLogs.find((s) => s.date === new Date().toISOString().slice(0, 10))
 
+  // VO2Max — estimasi non-exercise dari HR istirahat & HR maksimal (Uth-Sørensen formula)
+  const [hrRest, setHrRest] = useState(65)
+  const [hrMaxInput, setHrMaxInput] = useState(220 - age)
+  const vo2max = Math.round((15.3 * (hrMaxInput / Math.max(hrRest, 1))) * 10) / 10
+  const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Cukup', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
+
   // 6. Pengingat Obat/Vitamin
   const [medName, setMedName] = useState('')
   const [medTime, setMedTime] = useState('08:00')
@@ -1288,14 +1294,6 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   return (
     <div className="space-y-4">
       <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Pusat Kesehatan Realtime</h4>
-
-      {/* 7. Live Health News Ticker */}
-      <Card className="space-y-1.5 overflow-hidden">
-        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Berita Kesehatan Live <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
-        <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">
-          <span className="font-bold text-brand-dark">[{HEALTH_NEWS[newsIdx].tag}]</span> {HEALTH_NEWS[newsIdx].title}
-        </div>
-      </Card>
 
       {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
       <Card className="space-y-3">
@@ -1369,6 +1367,28 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
         </div>
       </Card>
 
+      {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🫁 Kalkulator VO2Max</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <Field label="HR Istirahat (bpm)"><input type="number" value={hrRest} onChange={(e) => setHrRest(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="HR Maksimal (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+        </div>
+        <p className="text-[10px] text-neutral-400">HR Maks default = 220 − usia. Ganti jika Anda tahu nilai aktual dari tes.</p>
+        <div className="rounded-xl p-2 text-center text-white" style={{ background: vo2Cat.c }}>
+          <span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span>
+        </div>
+        <p className="text-[10px] text-neutral-400">Estimasi non-exercise (Uth-Sørensen). Untuk akurasi lebih tinggi gunakan tes lari 12 menit (Cooper) via GPS Tracker.</p>
+      </Card>
+
+      {/* 7. Live Health News Ticker */}
+      <Card className="space-y-1.5 overflow-hidden">
+        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Berita Kesehatan Live <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
+        <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">
+          <span className="font-bold text-brand-dark">[{HEALTH_NEWS[newsIdx].tag}]</span> {HEALTH_NEWS[newsIdx].title}
+        </div>
+      </Card>
+
       {/* 6. Pengingat Obat/Vitamin Realtime */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">💊 Pengingat Obat & Vitamin</div>
@@ -1435,6 +1455,7 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tensi</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tidur hari ini</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Belum dicatat'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Vital terakhir</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'Belum ada'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{vo2max} · {vo2Cat.l}</div></div>
         </div>
       </Card>
     </div>
