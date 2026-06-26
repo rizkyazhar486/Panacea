@@ -58,6 +58,7 @@ export function Billing() {
 
   return (
     <div className="space-y-6">
+      {(state.account?.role === 'owner' || state.account?.isOwner) && <ProofVerification />}
       {backendEnabled && <BackendWallet />}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Balance + deposit */}
@@ -458,6 +459,74 @@ const MANUAL_BANK = {
   waLabel: '+62 822-6114-3040',
 }
 
+// Owner-only: verify queued transfer-proof photos and auto-credit PNC on approval.
+interface ProofReq { id: string; amount: number; idr: string; proof: string; at: string; status: 'pending' | 'verified' | 'rejected' }
+function ProofVerification() {
+  const { depositTokens } = useStore()
+  const [reqs, setReqs] = useState<ProofReq[]>([])
+  const [view, setView] = useState<string>('')
+
+  function reload() {
+    try { setReqs(JSON.parse(localStorage.getItem('pm_topup_proofs') || '[]')) } catch { setReqs([]) }
+  }
+  useEffect(reload, [])
+
+  function save(next: ProofReq[]) {
+    setReqs(next)
+    try { localStorage.setItem('pm_topup_proofs', JSON.stringify(next)) } catch { /* ignore */ }
+  }
+  function verify(r: ProofReq) {
+    depositTokens(r.amount, `Top-up manual terverifikasi (bukti transfer) — ${r.amount} PNC`)
+    save(reqs.map((x) => (x.id === r.id ? { ...x, status: 'verified' } : x)))
+  }
+  function reject(r: ProofReq) {
+    save(reqs.map((x) => (x.id === r.id ? { ...x, status: 'rejected' } : x)))
+  }
+
+  const pending = reqs.filter((r) => r.status === 'pending')
+
+  return (
+    <Card className="border-2 border-amber-300">
+      <SectionTitle
+        icon={<IconShield size={20} />}
+        title="Verifikasi Bukti Transfer (Owner)"
+        subtitle="Setujui bukti → PNC otomatis ditambahkan"
+        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge>}
+      />
+      {reqs.length === 0 ? (
+        <p className="text-sm text-neutral-400">Belum ada bukti transfer yang masuk.</p>
+      ) : (
+        <div className="space-y-2">
+          {reqs.map((r) => (
+            <div key={r.id} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3">
+              <button onClick={() => setView(view === r.id ? '' : r.proof)} className="shrink-0">
+                <img src={r.proof} alt="bukti" className="h-12 w-12 rounded-lg object-cover ring-1 ring-neutral-200" />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-bold">{r.amount} PNC <span className="font-normal text-neutral-400">· Rp{r.idr}</span></div>
+                <div className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('id-ID')}</div>
+              </div>
+              {r.status === 'pending' ? (
+                <div className="flex shrink-0 gap-2">
+                  <button onClick={() => verify(r)} className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark">Verifikasi</button>
+                  <button onClick={() => reject(r)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-50">Tolak</button>
+                </div>
+              ) : (
+                <Badge tone={r.status === 'verified' ? 'brand' : 'high'}>{r.status === 'verified' ? 'Terverifikasi ✓' : 'Ditolak'}</Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {view && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-6" onClick={() => setView('')}>
+          <img src={view} alt="bukti transfer" className="max-h-[80vh] max-w-full rounded-xl" />
+        </div>
+      )}
+    </Card>
+  )
+}
+
 // Real backend wallet (Midtrans payments + server-side balance).
 function BackendWallet() {
   const { syncWalletBalance } = useStore()
@@ -472,6 +541,8 @@ function BackendWallet() {
   const [busy, setBusy] = useState(false)
   const [reqMsg, setReqMsg] = useState('')
   const [copied, setCopied] = useState(false)
+  const [proof, setProof] = useState<string>('') // receipt photo (data URL)
+  const proofRef = useRef<HTMLInputElement>(null)
   const [payState, setPayState] = useState<'idle' | 'pending' | 'paid' | 'failed'>('idle')
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -525,17 +596,35 @@ function BackendWallet() {
     }
   }
 
-  // Manual top-up: record the request (owner approves later) + open WhatsApp.
+  async function pickProof(file: File | null) {
+    if (!file) return
+    if (file.size > 8 * 1024 * 1024) { setReqMsg('Foto bukti terlalu besar (maks 8MB).'); return }
+    const reader = new FileReader()
+    reader.onload = () => setProof(String(reader.result || ''))
+    reader.readAsDataURL(file)
+  }
+
+  // Manual top-up: requires a photo proof of transfer. The proof is queued for
+  // verification (owner / AI) and PNC is credited only after it is verified —
+  // never auto-credited from an unverified upload.
   async function submitManual() {
     if (amount <= 0) { setReqMsg('Masukkan jumlah PNC.'); return }
+    if (!proof) { setReqMsg('Unggah foto bukti transfer terlebih dahulu.'); return }
     const idr = (amount * TOKEN_TO_IDR).toLocaleString('id-ID')
+    // Queue a pending proof so the owner can verify & credit (persisted locally).
+    try {
+      const key = 'pm_topup_proofs'
+      const list = JSON.parse(localStorage.getItem(key) || '[]')
+      list.unshift({ id: `tp_${Date.now()}`, amount, idr, proof, at: new Date().toISOString(), status: 'pending' })
+      localStorage.setItem(key, JSON.stringify(list.slice(0, 30)))
+    } catch { /* storage full — proof still sent via WhatsApp */ }
     try {
       await api.topupRequest(amount).catch(() => {})
-      setReqMsg(`Permintaan top-up ${amount} PNC (Rp${idr}) tercatat. Transfer lalu konfirmasi via WhatsApp — saldo ditambahkan setelah disetujui.`)
+      setReqMsg(`Bukti transfer ${amount} PNC (Rp${idr}) terkirim & menunggu verifikasi. Saldo otomatis ditambahkan setelah bukti diverifikasi.`)
     } catch {
-      setReqMsg('Gagal mencatat permintaan, tapi Anda tetap bisa transfer & konfirmasi via WhatsApp.')
+      setReqMsg('Bukti tersimpan. Anda juga bisa konfirmasi via WhatsApp.')
     }
-    const text = `Halo, saya mau top-up Panaceamed.id%0A%0AJumlah: ${amount} PNC (Rp${idr})%0ASudah transfer ke ${MANUAL_BANK.bank} ${MANUAL_BANK.number} a.n. ${MANUAL_BANK.holder}.%0A%0AMohon dikonfirmasi & saldo ditambahkan. Terima kasih.`
+    const text = `Halo, saya mau top-up Panaceamed.id%0A%0AJumlah: ${amount} PNC (Rp${idr})%0ASudah transfer ke ${MANUAL_BANK.bank} ${MANUAL_BANK.number} a.n. ${MANUAL_BANK.holder}.%0ABukti transfer (foto) saya lampirkan di chat ini.%0A%0AMohon diverifikasi & saldo ditambahkan. Terima kasih.`
     window.open(`https://wa.me/${MANUAL_BANK.waNumber}?text=${text}`, '_blank')
   }
 
@@ -667,12 +756,31 @@ function BackendWallet() {
           <div className="rounded-xl bg-white px-3 py-2 text-sm">
             Total transfer: <b>Rp{(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}</b>
           </div>
-          <Button onClick={submitManual} disabled={amount <= 0} className="!bg-[#25D366] hover:!bg-[#1ebe5a]">
-            💬 Sudah Transfer — Konfirmasi WhatsApp
+        </div>
+
+        {/* Photo proof of payment — credit is released after verification */}
+        <div className="mt-3 rounded-xl border border-dashed border-brand/40 bg-white p-3">
+          <div className="flex items-center justify-between">
+            <div className="text-[12px] font-bold text-brand-dark">📸 Bukti Transfer (wajib)</div>
+            {proof && <button onClick={() => setProof('')} className="text-[11px] font-semibold text-red-500 hover:underline">Hapus</button>}
+          </div>
+          <input ref={proofRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => pickProof(e.target.files?.[0] ?? null)} />
+          {proof ? (
+            <img src={proof} alt="Bukti transfer" className="mt-2 max-h-44 w-full rounded-lg object-contain ring-1 ring-neutral-200" />
+          ) : (
+            <button onClick={() => proofRef.current?.click()} className="mt-2 grid w-full place-items-center rounded-lg border border-neutral-200 bg-neutral-50 py-6 text-xs font-semibold text-neutral-500 hover:bg-neutral-100">
+              Ketuk untuk unggah / foto struk transfer
+            </button>
+          )}
+        </div>
+
+        <div className="mt-3">
+          <Button onClick={submitManual} disabled={amount <= 0 || !proof} className="!bg-[#25D366] hover:!bg-[#1ebe5a]">
+            ✅ Kirim Bukti & Konfirmasi
           </Button>
         </div>
         {reqMsg && <p className="mt-2 text-[12px] font-semibold text-brand-dark">{reqMsg}</p>}
-        <p className="mt-1 text-[11px] text-neutral-400">Admin: {MANUAL_BANK.waLabel} · saldo masuk setelah disetujui.</p>
+        <p className="mt-1 text-[11px] text-neutral-400">Admin: {MANUAL_BANK.waLabel} · saldo otomatis masuk setelah bukti diverifikasi.</p>
       </div>
 
       <div className="mt-5 rounded-2xl border border-neutral-200 p-4">
