@@ -19,6 +19,7 @@ import {
   IconChartUp,
 } from '../components/icons'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
+import { MedicalNews } from '../components/MedicalNews'
 
 const FEATURES = [
   { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
@@ -300,6 +301,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </blockquote>
         </Reveal>
       </section>
+
+      {/* ── BERITA & INOVASI (rotating) ───────────────────────────── */}
+      <MedicalNews />
 
       {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
       <section className="px-6 py-12 sm:px-10">
