@@ -84,8 +84,10 @@ async function callClaude(
   settings: AISettings,
   messages: { role: 'user' | 'assistant'; content: string }[],
   systemExtra = '',
+  modelOverride = '',
 ): Promise<string> {
   const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
+  const model = modelOverride || settings.model
 
   // Preferred path: the user's own key → direct browser call.
   if (hasKey(settings)) {
@@ -97,7 +99,7 @@ async function callClaude(
         'anthropic-version': ANTHROPIC_VERSION,
         'anthropic-dangerous-direct-browser-access': 'true',
       },
-      body: JSON.stringify({ model: settings.model, max_tokens: 2048, system, messages }),
+      body: JSON.stringify({ model, max_tokens: 2048, system, messages }),
     })
     if (!res.ok) {
       const txt = await res.text()
@@ -109,7 +111,7 @@ async function callClaude(
   }
 
   // Public path: route through the backend's shared server-side key.
-  const { text } = await api.aiMessages({ model: settings.model, system, messages, max_tokens: 2048 })
+  const { text } = await api.aiMessages({ model, system, messages, max_tokens: 2048 })
   return text || '(tidak ada respons)'
 }
 
@@ -211,7 +213,8 @@ export async function generateEducation(
     },
   ]
   try {
-    const raw = await callClaude(settings, msgs)
+    // Education uses the EMR/GLM model. Backend routes "opus" → GLM (EMR_MODEL).
+    const raw = await callClaude(settings, msgs, '', 'claude-opus-4-8')
     const j = extractJson(raw) as Omit<EducationSheet, 'generatedAt'>
     return { ...j, generatedAt: new Date().toISOString() }
   } catch {
