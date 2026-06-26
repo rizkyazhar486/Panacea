@@ -303,3 +303,26 @@ export const IconChevronRight = ({ size = 20, className = '' }: P) => (
     <path d="M9 6l6 6-6 6" />
   </svg>
 )
+
+// --- Added for AI-Studio Feed/activity features ---
+export const IconShare2 = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.6" y1="13.5" x2="15.4" y2="17.5" /><line x1="15.4" y1="6.5" x2="8.6" y2="10.5" /></svg>
+)
+export const IconX = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+)
+export const IconMapPin = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+)
+export const IconNavigation = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
+)
+export const IconTimer = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><circle cx="12" cy="13" r="8" /><line x1="12" y1="13" x2="12" y2="9" /><line x1="9" y1="2" x2="15" y2="2" /></svg>
+)
+export const IconGauge = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><path d="M12 14 17 9" /><path d="M3.5 16a9 9 0 1 1 17 0" /></svg>
+)
+export const IconActivity = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+)
