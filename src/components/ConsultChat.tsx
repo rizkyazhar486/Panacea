@@ -10,10 +10,13 @@ interface Line { from?: string; text?: string; type: string; at?: string }
 // VITE_TURN_CRED (see DOCS/REALTIME-SETUP.md).
 function iceServers(): RTCIceServer[] {
   const list: RTCIceServer[] = [{ urls: 'stun:stun.l.google.com:19302' }]
-  const turn = import.meta.env.VITE_TURN_URL as string | undefined
+  const turn = (import.meta.env.VITE_TURN_URL as string | undefined)?.trim()
   if (turn) {
+    // VITE_TURN_URL may hold several comma-separated URLs (e.g. Metered gives
+    // turn:...:80, turn:...:443, turns:...:443) sharing one username/credential.
+    const urls = turn.split(',').map((u) => u.trim()).filter(Boolean)
     list.push({
-      urls: turn,
+      urls,
       username: (import.meta.env.VITE_TURN_USER as string) || undefined,
       credential: (import.meta.env.VITE_TURN_CRED as string) || undefined,
     })
