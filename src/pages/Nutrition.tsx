@@ -1616,6 +1616,57 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
 }
 
 /* ═══════════════════════════════════════════════════════
+   OBESITY — WEEKLY NUTRITION + EXERCISE SCHEDULER
+   ═══════════════════════════════════════════════════════ */
+const WEEK_DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+
+function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
+  const meals = protocol.specialFoods
+  const restrictions = protocol.exerRestrictions
+  // Deterministic rotation so each day gets a distinct meal trio + exercise focus.
+  const plan = WEEK_DAYS.map((day, i) => {
+    const breakfast = meals[i % meals.length]
+    const lunch = meals[(i + 3) % meals.length]
+    const dinner = meals[(i + 6) % meals.length]
+    const isRestDay = i === 6
+    const exerciseFocus = isRestDay
+      ? 'Istirahat aktif / jalan santai 15-20 menit'
+      : i % 3 === 2
+        ? 'Latihan resistensi (full body, 30-40 menit)'
+        : 'Aerobik intensitas sedang (jalan cepat/bersepeda, 40-60 menit)'
+    return { day, breakfast, lunch, dinner, exerciseFocus, isRestDay }
+  })
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconFlame size={18} />} title="Penjadwalan Mingguan — Obesitas" subtitle="Jadwal makan & olahraga 7 hari berbasis protokol obesitas" />
+      <div className="mt-3 space-y-2">
+        {plan.map((d) => (
+          <div key={d.day} className="rounded-2xl border border-neutral-100 p-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-extrabold text-ink">{d.day}</div>
+              {d.isRestDay && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Pemulihan</span>}
+            </div>
+            <div className="mt-1.5 grid grid-cols-1 gap-1 text-xs text-neutral-600 sm:grid-cols-3">
+              <div><b className="text-neutral-400">Sarapan:</b> {d.breakfast}</div>
+              <div><b className="text-neutral-400">Makan Siang:</b> {d.lunch}</div>
+              <div><b className="text-neutral-400">Makan Malam:</b> {d.dinner}</div>
+            </div>
+            <div className="mt-1.5 text-xs font-semibold text-brand-dark">🏃 {d.exerciseFocus}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 rounded-xl bg-amber-50/60 p-3">
+        <div className="mb-1 text-xs font-bold text-amber-800">Catatan Pembatasan Olahraga</div>
+        <ul className="space-y-1 text-xs text-amber-800">
+          {restrictions.map((r, i) => <li key={i}>• {r}</li>)}
+        </ul>
+      </div>
+    </Card>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
    MAIN NUTRITION EXPORT
    ═══════════════════════════════════════════════════════ */
 export function Nutrition() {
@@ -1645,15 +1696,17 @@ export function Nutrition() {
       <LongevityCard body={body} wt={wt} todaysFoods={todaysFoods} vitals={vitals} activeProtocol={activeProtocol} />
 
       {/* Chronic Protocol Selector */}
-      <ChronicProtocolCard onSelect={setActiveProtocol} active={activeProtocol} />
+      <div id="calc-protokol"><ChronicProtocolCard onSelect={setActiveProtocol} active={activeProtocol} /></div>
 
       {/* Body Profile */}
-      <BodyCard intakeKcal={totalKcal} />
+      <div id="calc-bmi"><BodyCard intakeKcal={totalKcal} /></div>
 
       {/* 7-day BMI / BMR / VO₂Max trends (recharts) */}
-      <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-400 shadow-sm">Memuat tren kesehatan…</div>}>
-        <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
-      </Suspense>
+      <div id="calc-vo2max">
+        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-400 shadow-sm">Memuat tren kesehatan…</div>}>
+          <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
+        </Suspense>
+      </div>
 
       {/* Food Tracker */}
       <FoodTracker body={body} activeProtocol={activeProtocol} />
@@ -1671,7 +1724,10 @@ export function Nutrition() {
       <VitalImporter onImported={avg => setVitals(avg)} />
 
       {/* Lab Tracker */}
-      <LabTracker activeProtocol={activeProtocol} />
+      <div id="calc-lab"><LabTracker activeProtocol={activeProtocol} /></div>
+
+      {/* Obesity weekly nutrition + exercise scheduler */}
+      {activeProtocol?.id === 'obesity' && <ObesityWeeklyPlan protocol={activeProtocol} />}
 
       {/* Recommendations */}
       <RecommendationsCard recs={recs} />
@@ -1681,16 +1737,21 @@ export function Nutrition() {
         <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Longevity Terbaik" subtitle="Dibangun untuk membantu umat manusia hidup lebih panjang dan lebih sehat" />
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { icon: '🫀', label: 'VO₂max Est.', desc: 'Kapasitas aerobik' },
-            { icon: '⚖️', label: 'BMI & BMR', desc: 'Metabolisme basal & indeks massa' },
-            { icon: '🧬', label: 'Lab Tracker', desc: 'Pantau lab penunjang mingguan' },
-            { icon: '🏥', label: 'Protokol Kronis', desc: '19 kondisi klinis' },
+            { icon: '🫀', label: 'VO₂max Est.', desc: 'Kapasitas aerobik', anchor: 'calc-vo2max' },
+            { icon: '⚖️', label: 'BMI & BMR', desc: 'Metabolisme basal & indeks massa', anchor: 'calc-bmi' },
+            { icon: '🧬', label: 'Lab Tracker', desc: 'Pantau lab penunjang mingguan', anchor: 'calc-lab' },
+            { icon: '🏥', label: 'Protokol Kronis', desc: '19 kondisi klinis', anchor: 'calc-protokol' },
           ].map(item => (
-            <div key={item.label} className="flex flex-col items-center rounded-2xl border border-brand/15 bg-brand-50/40 p-3 text-center transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm">
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="flex flex-col items-center rounded-2xl border border-brand/15 bg-brand-50/40 p-3 text-center transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm active:scale-95"
+            >
               <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-2xl shadow-sm">{item.icon}</span>
               <div className="mt-2 text-xs font-extrabold text-ink">{item.label}</div>
               <div className="mt-0.5 text-[11px] leading-tight text-neutral-500">{item.desc}</div>
-            </div>
+            </button>
           ))}
         </div>
         <div className="mt-4 rounded-2xl border border-brand/10 bg-gradient-to-br from-brand-50/70 to-transparent p-5 text-center">

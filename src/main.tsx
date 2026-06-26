@@ -23,6 +23,8 @@ import { Settings } from './pages/Settings'
 
 // Lazy-load role-specific / heavier secondary pages so the initial bundle stays
 // small; they're fetched on demand when first navigated to.
+const Athlete = lazy(() => import('./pages/Athlete').then((m) => ({ default: m.Athlete })))
+const Recovery = lazy(() => import('./pages/Recovery').then((m) => ({ default: m.Recovery })))
 const EMR = lazy(() => import('./pages/EMR').then((m) => ({ default: m.EMR })))
 const Planning = lazy(() => import('./pages/Planning').then((m) => ({ default: m.Planning })))
 const Marketplace = lazy(() => import('./pages/Marketplace').then((m) => ({ default: m.Marketplace })))
@@ -77,6 +79,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/clinical" element={<Dashboard />} />
               <Route path="/social" element={<Home />} />
               <Route path="/nutrition" element={<Nutrition />} />
+              <Route path="/athlete" element={<Athlete />} />
+              <Route path="/recovery" element={<Recovery />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/pharmacy" element={<Pharmacy />} />
