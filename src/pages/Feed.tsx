@@ -284,7 +284,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
           <p className="text-[10px] text-neutral-400 mt-0.5">Lacak rute, kecepatan, percepatan & kalori</p>
         </div>
-        ={mode === 'done' && (
+        {mode === 'done' && (
           <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
             <IconShare2 size={13} /> Share
           </button>
@@ -431,8 +431,8 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
 /* ═══════════════════════════════════════════════════════
    COMPOSE MODAL (Penyempurnaan Potongan Kode Akhir)
    ═══════════════════════════════════════════════════════ */
-function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEmail, authorName, role }: {
-  onClose: () => void; onPost: (p: SocialPost) => void; onShareLongevity: () => void; onShareGps: () => void
+function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, role }: {
+  onClose: () => void; onPost: (p: SocialPost) => void; onShareGps: () => void
   authorEmail: string; authorName: string; role: Role
 }) {
   const [caption, setCaption] = useState('')
@@ -478,9 +478,6 @@ function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEma
 
         {/* Quick Share Actions */}
         <div className="px-5 py-3 flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          <button onClick={() => { onShareLongevity(); onClose() }} className="shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #0B7A4B, #064e36)' }}>
-            <span>🌱</span> Longevity Harian
-          </button>
           <button onClick={() => { onShareGps(); onClose() }} className="shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
             <span>📍</span> Aktivitas GPS
           </button>
@@ -531,11 +528,118 @@ function ComposeModal({ onClose, onPost, onShareLongevity, onShareGps, authorEma
 }
 
 /* ═══════════════════════════════════════════════════════
+   POST CARD — like / comment / share-as-logo (Feed "new face")
+   ═══════════════════════════════════════════════════════ */
+function PostCard({ post, viewerName }: { post: SocialPost; viewerName: string }) {
+  const { toggleLike, updatePost } = useStore()
+  const [showComments, setShowComments] = useState(false)
+  const [draft, setDraft] = useState('')
+  const comments = post.commentList ?? []
+
+  function addComment() {
+    const text = draft.trim()
+    if (!text) return
+    const next = [...comments, { id: uid(), authorName: viewerName, text, at: new Date().toISOString() }]
+    updatePost(post.id, { commentList: next, comments: next.length })
+    setDraft('')
+  }
+
+  // Share-as-logo: native Web Share (social media) with clipboard fallback.
+  async function share() {
+    const text = `${post.activity} — ${post.caption}`
+    const url = typeof window !== 'undefined' ? window.location.origin : 'https://panaceamed.id'
+    const payload = { title: 'Panaceamed.id', text, url }
+    try {
+      if (navigator.share) { await navigator.share(payload); return }
+      await navigator.clipboard.writeText(`${text}\n${url}`)
+      alert('Tautan postingan disalin — siap dibagikan ke media sosial!')
+    } catch { /* user cancelled share sheet */ }
+  }
+
+  const photos = post.photos ?? []
+
+  return (
+    <Card className="space-y-3 overflow-hidden">
+      {/* Header + share logo (top-right) */}
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
+            {initials(post.authorName)}
+          </div>
+          <div>
+            <div className="text-xs font-black flex items-center gap-1">
+              {post.authorName}
+              <span className="text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
+            </div>
+            <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span></div>
+          </div>
+        </div>
+        {/* Share button rendered as a logo only (no text) */}
+        <button onClick={share} aria-label="Bagikan ke media sosial" title="Bagikan"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90"
+          style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
+          <IconShare2 size={15} />
+        </button>
+      </div>
+
+      <div className="border-l-2 pl-3 py-0.5 text-xs text-neutral-700 font-medium" style={{ borderColor: post.mediaColor }}>{post.activity}</div>
+      <p className="text-xs text-neutral-600 leading-relaxed whitespace-pre-wrap">{post.caption}</p>
+
+      {photos.length > 0 && (
+        <div className={'grid gap-1.5 rounded-xl overflow-hidden ' + (photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2')}>
+          {photos.map((img, idx) => (
+            isImg(img)
+              ? <img key={idx} src={img} alt="" className="w-full h-40 object-cover" />
+              : <div key={idx} className="w-full h-40" style={{ background: img }} />
+          ))}
+        </div>
+      )}
+
+      {/* Action bar: like · comment · share */}
+      <div className="flex items-center gap-1 border-t border-neutral-100 pt-2 -mb-1">
+        <button onClick={() => toggleLike(post.id)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={16} /></ColoredIcon>
+          {post.likes > 0 ? post.likes : 'Suka'}
+        </button>
+        <button onClick={() => setShowComments(v => !v)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <IconComment size={16} /> {comments.length > 0 ? comments.length : 'Komentar'}
+        </button>
+        <button onClick={share} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-neutral-500 hover:bg-neutral-50 transition active:scale-95 ml-auto">
+          <IconShare2 size={15} /> Bagikan
+        </button>
+      </div>
+
+      {/* Comment thread */}
+      {showComments && (
+        <div className="space-y-2.5 border-t border-neutral-100 pt-3">
+          {comments.map(c => (
+            <div key={c.id} className="flex items-start gap-2">
+              <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-brand-dark">{initials(c.authorName)}</div>
+              <div className="flex-1 rounded-2xl bg-neutral-50 px-3 py-2">
+                <div className="text-[11px] font-bold text-ink">{c.authorName} <span className="ml-1 font-normal text-neutral-400">{timeAgo(c.at)}</span></div>
+                <div className="text-xs text-neutral-600">{c.text}</div>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addComment() }}
+              placeholder="Tulis komentar..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
+            <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+              <IconSend size={15} />
+            </button>
+          </div>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
-  const { account } = useStore() // Mengambil data user terautentikasi dari store global
-  const [posts, setPosts] = useState<SocialPost[]>([])
+  const { state, account, addPost } = useStore()
+  const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
   // Default fallback user jika context/store kosong
@@ -545,17 +649,16 @@ export default function SportsSocialFeed() {
     role: (account?.role as Role) || 'pasien'
   }), [account])
 
-  // Handler memproses postingan standar dari modal
+  // Handler memproses postingan standar dari modal → store global (persisten & terbagi)
   const handleAddNewPost = (newPost: SocialPost) => {
-    setPosts(prev => [newPost, ...prev])
+    addPost(newPost)
     setIsComposeOpen(false)
   }
 
   // Handler memproses share data aktivitas tracker langsung ke feed sosial
   const handleShareGpsToFeed = (gpsData: SharedGpsData) => {
     const generatedCaption = `Saya baru saja menyelesaikan aktivitas ${gpsData.sport.emoji} ${gpsData.sport.name} sejauh ${fmtDist(gpsData.dist)} dengan durasi ${fmtD(gpsData.dur)}. Total pembakaran ${gpsData.kcal} kkal dengan rata-rata zona intensitas ${gpsData.hiit.zone}! 💪`
-    
-    const gpsPost: SocialPost = {
+    addPost({
       id: uid(),
       authorEmail: currentUser.email,
       authorName: currentUser.name,
@@ -566,32 +669,9 @@ export default function SportsSocialFeed() {
       caption: generatedCaption,
       mediaColor: '#00BF63',
       photos: [],
-      likes: 0, comments: 0, reposts: 0,
-      at: new Date().toISOString()
-    }
-
-    setPosts(prev => [gpsPost, ...prev])
-    alert('Aktivitas GPS berhasil dibagikan ke Feed!')
-  }
-
-  const handleQuickLongevityShare = () => {
-    // Simulasi penarikan skor dari lokal atau hitungan ring harian
-    const mockScore = 85 
-    const longevityPost: SocialPost = {
-      id: uid(),
-      authorEmail: currentUser.email,
-      authorName: currentUser.name,
-      role: currentUser.role,
-      postType: 'kebiasaan',
-      kind: 'text',
-      activity: '🌱 Longevity Check-in',
-      caption: `Hari ini berhasil mempertahankan skor Longevity Ring sebesar ${mockScore}%! Detak jantung istirahat stabil dan metabolisme berjalan optimal. Salam sehat!`,
-      mediaColor: '#0B7A4B',
-      photos: [],
-      likes: 0, comments: 0, reposts: 0,
-      at: new Date().toISOString()
-    }
-    setPosts(prev => [longevityPost, ...prev])
+      likes: 0, comments: 0, commentList: [], reposts: 0,
+      at: new Date().toISOString(),
+    })
   }
 
   return (
@@ -612,7 +692,6 @@ export default function SportsSocialFeed() {
         <ComposeModal
           onClose={() => setIsComposeOpen(false)}
           onPost={handleAddNewPost}
-          onShareLongevity={handleQuickLongevityShare}
           onShareGps={() => alert('Gunakan panel GPS Tracker di atas untuk merekam rute aktif!')}
           authorEmail={currentUser.email}
           authorName={currentUser.name}
@@ -628,39 +707,8 @@ export default function SportsSocialFeed() {
             Belum ada kiriman. Selesaikan pelacakan rute GPS kamu atau ketuk buat postingan!
           </div>
         ) : (
-          posts.map(p => (
-            <Card key={p.id} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: p.mediaColor || '#00BF63' }}>
-                    {initials(p.authorName)}
-                  </div>
-                  <div>
-                    <div className="text-xs font-black flex items-center gap-1">
-                      {p.authorName} 
-                      <span className="text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">
-                        {roleLabel[p.role]}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(p.at)} · <span className="font-semibold text-brand-dark capitalize">{p.postType}</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-l-2 pl-3 py-0.5 text-xs text-neutral-700 font-medium" style={{ borderColor: p.mediaColor }}>
-                {p.activity}
-              </div>
-              
-              <p className="text-xs text-neutral-600 leading-relaxed whitespace-pre-wrap">{p.caption}</p>
-
-              {p.photos && p.photos.length > 0 && (
-                <div className="grid grid-cols-2 gap-1.5 rounded-xl overflow-hidden">
-                  {p.photos.map((img, idx) => (
-                    <img key={idx} src={img} alt="Post Attachment" className="w-full h-36 object-cover" />
-                  ))}
-                </div>
-              )}
-            </Card>
+          posts.filter(p => !p.archived).map(p => (
+            <PostCard key={p.id} post={p} viewerName={currentUser.name} />
           ))
         )}
       </div>

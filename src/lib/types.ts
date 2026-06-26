@@ -172,6 +172,13 @@ export interface Account {
 //  • artikel    — a longevity / healthy-lifestyle article snippet
 export type PostType = 'aktivitas' | 'kebiasaan' | 'artikel'
 
+export interface PostComment {
+  id: string
+  authorName: string
+  text: string
+  at: string
+}
+
 export interface SocialPost {
   id: string
   authorEmail: string
@@ -207,6 +214,7 @@ export interface SocialPost {
   exclusive?: boolean // subscriber-only content (monetized via creator subscription)
   likes: number
   comments?: number
+  commentList?: PostComment[] // inline comment thread
   reposts?: number
   likedByMe?: boolean
   repostedByMe?: boolean
