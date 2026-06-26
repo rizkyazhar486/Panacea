@@ -8,7 +8,7 @@ import {
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { uploadOrLocal } from '../lib/upload'
-import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry } from '../lib/types'
+import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
    GPS SPORTS MODES
@@ -1234,8 +1234,25 @@ function bpCategory(sys: number, dia: number) {
   return { label: 'Hipertensi Tahap 2', color: '#EF4444' }
 }
 
+// #1: lightweight inline SVG sparkline for trend visualization (no chart lib).
+function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; color?: string; height?: number }) {
+  if (data.length === 0) return <div className="text-[10px] text-neutral-400">Belum ada data</div>
+  const w = 100, h = height
+  const min = Math.min(...data), max = Math.max(...data)
+  const range = max - min || 1
+  const step = data.length > 1 ? w / (data.length - 1) : 0
+  const pts = data.map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - min) / range) * (h - 6) - 3).toFixed(1)}`)
+  const last = data[data.length - 1]
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="h-8 w-full">
+      {data.length > 1 && <polyline points={pts.join(' ')} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />}
+      <circle cx={data.length > 1 ? (data.length - 1) * step : w / 2} cy={h - ((last - min) / range) * (h - 6) - 3} r={2.5} fill={color} />
+    </svg>
+  )
+}
+
 function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
-  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, answerQuiz } = useStore()
+  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, answerQuiz, logVo2Max, addGoal, removeGoal } = useStore()
 
   // 1. Kalkulator BMI & Kalori Harian (TDEE)
   const [weight, setWeight] = useState(70)
@@ -1259,6 +1276,10 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   const [spo2, setSpo2] = useState(98)
   const [tempC, setTempC] = useState(36.5)
   const lastVital = state.selfVitals[0]
+  // #1: trend series (oldest -> newest) for sparklines.
+  const sysSeries = [...state.selfVitals].reverse().slice(-10).map((v) => v.systolic)
+  const hrSeries = [...state.selfVitals].reverse().slice(-10).map((v) => v.heartRate)
+  const sleepSeries = [...state.sleepLogs].reverse().slice(-10).map((s) => s.hours)
 
   // 5. Skor Kualitas Tidur
   const [sleepHours, setSleepHours] = useState(7)
@@ -1271,6 +1292,10 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   const [hrMaxInput, setHrMaxInput] = useState(220 - age)
   const vo2max = Math.round((15.3 * (hrMaxInput / Math.max(hrRest, 1))) * 10) / 10
   const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Cukup', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
+  // #5: Tes Cooper — jarak (meter) yang ditempuh dalam lari 12 menit.
+  const [cooperMeters, setCooperMeters] = useState(2400)
+  const cooperVo2 = Math.round(((cooperMeters - 504.9) / 44.73) * 10) / 10
+  const lastVo2 = state.vo2maxLog[0]
 
   // 6. Pengingat Obat/Vitamin
   const [medName, setMedName] = useState('')
@@ -1286,10 +1311,84 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
     return () => clearInterval(t)
   }, [])
 
+  // #2: real browser notifications for due medication reminders.
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission>(typeof Notification !== 'undefined' ? Notification.permission : 'denied')
+  const notifiedRef = useRef<Set<string>>(new Set())
+  const requestNotif = async () => {
+    if (typeof Notification === 'undefined') return
+    const p = await Notification.requestPermission()
+    setNotifPerm(p)
+  }
+  useEffect(() => {
+    if (notifPerm !== 'granted') return
+    const check = () => {
+      const d = new Date()
+      const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+      const day = d.toISOString().slice(0, 10)
+      for (const m of state.medReminders) {
+        const key = `${m.id}-${day}`
+        if (hm >= m.time && !m.takenDates.includes(day) && !notifiedRef.current.has(key)) {
+          notifiedRef.current.add(key)
+          try { new Notification('💊 Waktunya minum obat', { body: `${m.name} — jadwal ${m.time}`, tag: key }) } catch { /* ignore */ }
+        }
+      }
+    }
+    check()
+    const t = setInterval(check, 60_000)
+    return () => clearInterval(t)
+  }, [notifPerm, state.medReminders])
+
   // 9. Kuis Fakta vs Mitos
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizFeedback, setQuizFeedback] = useState<'right' | 'wrong' | null>(null)
   const quiz = MYTH_QUIZ[quizIdx % MYTH_QUIZ.length]
+
+  // #4: targets & progress badges. Current values pulled from real tracked data.
+  const myCheckInDates = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
+  const checkInStreak = useMemo(() => {
+    let s = 0, d = new Date()
+    if (!myCheckInDates.includes(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1)
+    while (myCheckInDates.includes(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+    return s
+  }, [myCheckInDates])
+  const goalCurrent = (metric: HealthGoal['metric']): number => {
+    if (metric === 'sleep') return todaySleep?.hours ?? 0
+    if (metric === 'checkin') return checkInStreak
+    if (metric === 'steps') return 0 // butuh integrasi wearable (rekomendasi #8)
+    return 0
+  }
+  const [goalLabel, setGoalLabel] = useState('')
+  const [goalMetric, setGoalMetric] = useState<HealthGoal['metric']>('sleep')
+  const [goalTarget, setGoalTarget] = useState(7)
+  const metricUnit: Record<HealthGoal['metric'], string> = { sleep: 'jam', checkin: 'hari', water: 'liter', steps: 'langkah', custom: '' }
+
+  // #3: export a printable health report (user can Save as PDF / share).
+  const exportReport = () => {
+    const esc = (s: string) => s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c] || c))
+    const rows = [
+      ['BMI', `${bmi.toFixed(1)} (${bmiCat.l})`],
+      ['Kalori harian (TDEE)', `${tdee} kkal`],
+      ['Kebutuhan cairan', `${(waterMl / 1000).toFixed(1)} liter/hari`],
+      ['Tekanan darah', `${sys}/${dia} mmHg (${bpCat.label})`],
+      ['VO2Max', lastVo2 ? `${lastVo2.value} mL/kg/min (${lastVo2.method})` : `${vo2max} mL/kg/min (estimasi HR)`],
+      ['Skor tidur hari ini', todaySleep ? `${sleepScore}/100` : 'Belum dicatat'],
+      ['Vital terakhir', lastVital ? `${lastVital.systolic}/${lastVital.diastolic} mmHg, HR ${lastVital.heartRate}, SpO2 ${lastVital.spo2}%, ${lastVital.tempC}°C` : 'Belum ada'],
+    ]
+    const win = window.open('', '_blank')
+    if (!win) { alert('Izinkan pop-up untuk mengekspor laporan.'); return }
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Laporan Kesehatan</title>
+      <style>body{font-family:system-ui,sans-serif;padding:32px;color:#111}h1{color:#0B7A4B;font-size:20px}
+      .sub{color:#888;font-size:12px;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:14px}
+      td{padding:10px 8px;border-bottom:1px solid #eee}td:first-child{color:#666;width:45%}td:last-child{font-weight:600}
+      .foot{margin-top:24px;font-size:11px;color:#aaa}</style></head><body>
+      <h1>🩺 Laporan Kesehatan — Panaceamed.id</h1>
+      <div class="sub">Dibuat: ${esc(new Date().toLocaleString('id-ID'))}</div>
+      <table>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>
+      <div class="foot">Data bersifat pencatatan mandiri dan tidak menggantikan diagnosis tenaga medis profesional.</div>
+      </body></html>`)
+    win.document.close()
+    setTimeout(() => win.print(), 400)
+  }
 
   return (
     <div className="space-y-4">
@@ -1367,6 +1466,26 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
         </div>
       </Card>
 
+      {/* #1: Tren grafik vital & tidur */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">📈 Tren 10 Pencatatan Terakhir</div>
+        <div className="space-y-2">
+          <div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Sistolik (mmHg)</span><b className="text-ink">{sysSeries.length ? sysSeries[sysSeries.length - 1] : '—'}</b></div>
+            <Sparkline data={sysSeries} color="#EF4444" />
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Detak Jantung (bpm)</span><b className="text-ink">{hrSeries.length ? hrSeries[hrSeries.length - 1] : '—'}</b></div>
+            <Sparkline data={hrSeries} color="#00BF63" />
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Jam Tidur</span><b className="text-ink">{sleepSeries.length ? sleepSeries[sleepSeries.length - 1] : '—'}</b></div>
+            <Sparkline data={sleepSeries} color="#6366F1" />
+          </div>
+        </div>
+        <p className="text-[10px] text-neutral-400">Catat vital & tidur secara rutin untuk melihat tren naik/turun di sini.</p>
+      </Card>
+
       {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🫁 Kalkulator VO2Max</div>
@@ -1375,10 +1494,31 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
           <Field label="HR Maksimal (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <p className="text-[10px] text-neutral-400">HR Maks default = 220 − usia. Ganti jika Anda tahu nilai aktual dari tes.</p>
-        <div className="rounded-xl p-2 text-center text-white" style={{ background: vo2Cat.c }}>
-          <span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span>
+        <div className="flex items-center justify-between rounded-xl p-2 text-white" style={{ background: vo2Cat.c }}>
+          <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
+          <button onClick={() => logVo2Max(vo2max, 'Estimasi HR')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Catat</button>
         </div>
-        <p className="text-[10px] text-neutral-400">Estimasi non-exercise (Uth-Sørensen). Untuk akurasi lebih tinggi gunakan tes lari 12 menit (Cooper) via GPS Tracker.</p>
+        <p className="text-[10px] text-neutral-400">Estimasi non-exercise (Uth-Sørensen).</p>
+
+        {/* #5: Tes Cooper — lari 12 menit, paling akurat */}
+        <div className="space-y-2 border-t border-neutral-100 pt-2">
+          <div className="text-[11px] font-bold text-ink">🏃 Tes Cooper (lari 12 menit)</div>
+          <div className="flex items-center gap-2">
+            <Field label="Jarak 12 mnt (m)"><input type="number" value={cooperMeters} onChange={(e) => setCooperMeters(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+            <div className="flex-1 rounded-xl bg-brand-50 p-2 text-center text-brand-dark">
+              <span className="text-sm font-black">{cooperVo2 > 0 ? cooperVo2 : '—'}</span> <span className="text-[10px] font-bold">mL/kg/min</span>
+            </div>
+            <button onClick={() => logVo2Max(cooperVo2, 'Tes Cooper')} disabled={cooperVo2 <= 0}
+              className="rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Catat</button>
+          </div>
+          <p className="text-[10px] text-neutral-400">Lari sejauh mungkin dalam 12 menit (pakai GPS Tracker untuk ukur jarak), lalu masukkan jaraknya. Rumus Cooper paling akurat.</p>
+        </div>
+
+        {lastVo2 && (
+          <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
+            VO2Max terukur terakhir: <b className="text-ink">{lastVo2.value}</b> mL/kg/min · {lastVo2.method} · {timeAgo(lastVo2.at)}
+          </div>
+        )}
       </Card>
 
       {/* 7. Live Health News Ticker */}
@@ -1391,7 +1531,12 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
 
       {/* 6. Pengingat Obat/Vitamin Realtime */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">💊 Pengingat Obat & Vitamin</div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-black text-ink">💊 Pengingat Obat & Vitamin</div>
+          {notifPerm === 'granted'
+            ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifikasi aktif</span>
+            : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Aktifkan Notifikasi</button>}
+        </div>
         <div className="flex items-center gap-2">
           <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' flex-1 text-xs'} />
           <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' w-24 text-xs'} />
@@ -1447,15 +1592,65 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
         <p className="text-[11px] text-neutral-400">Skor: {state.quizScore.correct}/{state.quizScore.total}</p>
       </Card>
 
+      {/* #4: Target & Badge Progres */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🎯 Target Kesehatan</div>
+        <div className="flex items-center gap-2">
+          <select value={goalMetric} onChange={(e) => setGoalMetric(e.target.value as HealthGoal['metric'])} className={inputClass + ' w-28 text-xs'}>
+            <option value="sleep">Tidur</option>
+            <option value="checkin">Check-in beruntun</option>
+            <option value="water">Minum air</option>
+            <option value="steps">Langkah</option>
+            <option value="custom">Lainnya</option>
+          </select>
+          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Nama target" className={inputClass + ' flex-1 text-xs'} />}
+          <input type="number" value={goalTarget} onChange={(e) => setGoalTarget(+e.target.value || 0)} className={inputClass + ' w-16 text-xs'} />
+          <button onClick={() => {
+            const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Tidur', checkin: 'Check-in beruntun', water: 'Minum air', steps: 'Langkah harian', custom: '' }[goalMetric]
+            addGoal({ metric: goalMetric, label, target: goalTarget, unit: metricUnit[goalMetric] })
+            setGoalLabel('')
+          }} disabled={goalTarget <= 0 || (goalMetric === 'custom' && !goalLabel.trim())}
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
+        </div>
+        {state.goals.length === 0 && <p className="text-xs text-neutral-400">Belum ada target. Tetapkan satu untuk mulai melacak progres.</p>}
+        {state.goals.map((g) => {
+          const cur = goalCurrent(g.metric)
+          const pct = Math.min(100, Math.round((cur / g.target) * 100))
+          const done = pct >= 100
+          const trackable = g.metric === 'sleep' || g.metric === 'checkin'
+          return (
+            <div key={g.id} className="space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-semibold text-neutral-600">{done ? '🏅 ' : ''}{g.label} <span className="text-neutral-400">· target {g.target} {g.unit}</span></span>
+                <button onClick={() => removeGoal(g.id)} className="text-neutral-300 hover:text-red-400">✕</button>
+              </div>
+              {trackable ? (
+                <>
+                  <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? '#00BF63' : 'linear-gradient(90deg,#84CC16,#00BF63)' }} />
+                  </div>
+                  <div className="text-[10px] text-neutral-400">{cur} / {g.target} {g.unit} ({pct}%){done ? ' — tercapai! 🎉' : ''}</div>
+                </>
+              ) : (
+                <div className="text-[10px] text-neutral-400">Pelacakan otomatis butuh integrasi wearable (rekomendasi mendatang).</div>
+              )}
+            </div>
+          )
+        })}
+      </Card>
+
       {/* 10. Dashboard Ringkasan Realtime — agregasi semua metrik di atas */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">📊 Ringkasan Realtime</div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-black text-ink">📊 Ringkasan Realtime</div>
+          <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Ekspor Laporan</button>
+        </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tensi</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tidur hari ini</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Belum dicatat'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Vital terakhir</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'Belum ada'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{vo2max} · {vo2Cat.l}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
         </div>
       </Card>
     </div>
@@ -1466,7 +1661,7 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
-  const { state, account, addPost, addStory, heartbeat } = useStore()
+  const { state, account, addPost, addStory, heartbeat, logVo2Max } = useStore()
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
@@ -1509,6 +1704,8 @@ export default function SportsSocialFeed() {
       likes: 0, comments: 0, commentList: [], reposts: 0,
       at: new Date().toISOString(),
     })
+    // #5: persist activity-based VO2Max so the calculator can show a real measurement.
+    if (gpsData.vo2Max > 0) logVo2Max(gpsData.vo2Max, `GPS ${gpsData.sport.name}`)
   }
 
   return (

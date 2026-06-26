@@ -29,6 +29,8 @@ import type {
   SelfVital,
   SleepLog,
   MedReminder,
+  Vo2MaxEntry,
+  HealthGoal,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -121,6 +123,8 @@ function seed(): AppState {
     medReminders: [],
     eduBookmarks: [],
     quizScore: { correct: 0, total: 0 },
+    vo2maxLog: [],
+    goals: [],
     foods: [],
     wellness: {},
     consults: [],
@@ -218,6 +222,9 @@ interface Store {
   markMedTaken: (id: string) => void
   toggleEduBookmark: (articleId: string) => void
   answerQuiz: (correct: boolean) => void
+  logVo2Max: (value: number, method: string) => void
+  addGoal: (g: Omit<HealthGoal, 'id'>) => void
+  removeGoal: (id: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -723,6 +730,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         })),
       answerQuiz: (correct) =>
         setState((st) => ({ ...st, quizScore: { correct: st.quizScore.correct + (correct ? 1 : 0), total: st.quizScore.total + 1 } })),
+      logVo2Max: (value, method) =>
+        setState((st) => (value > 0 ? { ...st, vo2maxLog: [{ id: uid(), at: new Date().toISOString(), value: Math.round(value * 10) / 10, method }, ...st.vo2maxLog].slice(0, 50) } : st)),
+      addGoal: (g) =>
+        setState((st) => (g.label.trim() && g.target > 0 ? { ...st, goals: [{ id: uid(), ...g }, ...st.goals] } : st)),
+      removeGoal: (id) => setState((st) => ({ ...st, goals: st.goals.filter((g) => g.id !== id) })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

@@ -333,6 +333,21 @@ export interface MedReminder {
   takenDates: string[] // yyyy-mm-dd dates marked taken
 }
 
+export interface Vo2MaxEntry {
+  id: string
+  at: string // ISO datetime
+  value: number // mL/kg/min
+  method: string // "Tes Cooper", "GPS Aktivitas", "Estimasi HR"
+}
+
+export interface HealthGoal {
+  id: string
+  metric: 'water' | 'sleep' | 'steps' | 'checkin' | 'custom'
+  label: string
+  target: number
+  unit: string
+}
+
 // -------- Nutrition / calorie diary ----------------------------------------
 export interface FoodEntry {
   id: string
@@ -534,6 +549,8 @@ export interface AppState {
   medReminders: MedReminder[] // medication/vitamin reminders
   eduBookmarks: string[] // bookmarked education article ids
   quizScore: { correct: number; total: number } // myth-vs-fact quiz running score
+  vo2maxLog: Vo2MaxEntry[] // VO2Max measurements over time (Cooper test, GPS, HR estimate)
+  goals: HealthGoal[] // personal health targets (item 4)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
