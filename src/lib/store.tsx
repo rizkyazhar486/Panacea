@@ -25,6 +25,7 @@ import type {
   Challenge,
   Circle,
   GratitudeNote,
+  SportCommunity,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -111,6 +112,7 @@ function seed(): AppState {
     challenges: [],
     circles: [],
     gratitudes: [],
+    communities: [],
     foods: [],
     wellness: {},
     consults: [],
@@ -199,6 +201,8 @@ interface Store {
   bumpChallenge: (challengeId: string, amount: number) => void // item 5
   createCircle: (name: string, memberNames: string[]) => void // item 9
   addGratitude: (toName: string, text: string) => void // item 10
+  createCommunity: (name: string, sportTag: string) => void // item 10: discover/start sport-interest groups
+  joinCommunity: (id: string, memberName: string) => void // item 10
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -652,6 +656,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const note: GratitudeNote = { id: uid(), fromName: acc.name, toName: toName.trim(), text: text.trim(), at: new Date().toISOString() }
           return { ...st, gratitudes: [note, ...st.gratitudes] }
         }),
+      createCommunity: (name, sportTag) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc || !name.trim() || !sportTag.trim()) return st
+          const community: SportCommunity = {
+            id: uid(),
+            name: name.trim(),
+            sportTag: sportTag.trim(),
+            memberNames: [acc.name],
+            createdBy: acc.email,
+            createdAt: new Date().toISOString(),
+          }
+          return { ...st, communities: [community, ...st.communities] }
+        }),
+      joinCommunity: (id, memberName) =>
+        setState((st) => ({
+          ...st,
+          communities: st.communities.map((c) =>
+            c.id === id && memberName.trim() && !c.memberNames.includes(memberName.trim())
+              ? { ...c, memberNames: [...c.memberNames, memberName.trim()] }
+              : c
+          ),
+        })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

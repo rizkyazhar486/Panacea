@@ -964,8 +964,25 @@ const MOOD_OPTIONS: { id: MoodEntry['mood']; emoji: string; label: string }[] = 
    (Health Buddy & check-in, mood + dukungan, tantangan kelompok,
    Circle of Care, dan dinding rasa terima kasih)
    ═══════════════════════════════════════════════════════ */
+// Achievement tiers — derived, no extra state. Colors deepen as counts grow.
+const LOVE_TIERS = [
+  { min: 0, color: '#FFB3C1', label: 'Pemula' },
+  { min: 5, color: '#FF6B8B', label: 'Hangat' },
+  { min: 20, color: '#E0245E', label: 'Penuh Kasih' },
+  { min: 50, color: '#8B0036', label: 'Legenda Peduli' },
+]
+const FIRE_TIERS = [
+  { min: 0, color: '#FFD27A', label: 'Mulai' },
+  { min: 3, color: '#FF9F43', label: 'Konsisten' },
+  { min: 7, color: '#FF5E1A', label: 'Membara' },
+  { min: 30, color: '#B8330A', label: 'Tak Tergoyahkan' },
+]
+function tierFor(tiers: typeof LOVE_TIERS, n: number) {
+  return [...tiers].reverse().find((t) => n >= t.min) ?? tiers[0]
+}
+
 function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; viewerName: string }) {
-  const { state, setBuddy, checkInToday, addMood, sendSupport, startChallenge, bumpChallenge, createCircle, addGratitude } = useStore()
+  const { state, setBuddy, checkInToday, addMood, sendSupport, startChallenge, bumpChallenge, createCircle, addGratitude, createCommunity, joinCommunity } = useStore()
   const [buddyDraft, setBuddyDraft] = useState(state.buddyName ?? '')
   const [moodNote, setMoodNote] = useState('')
   const [supportTo, setSupportTo] = useState('')
@@ -975,6 +992,10 @@ function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; view
   const [circleMembers, setCircleMembers] = useState('')
   const [gratTo, setGratTo] = useState('')
   const [gratText, setGratText] = useState('')
+  const [communityName, setCommunityName] = useState('')
+  const [sportTag, setSportTag] = useState('')
+  const [sportFilter, setSportFilter] = useState('')
+  const [joinNameDraft, setJoinNameDraft] = useState(viewerName)
 
   const myCheckIns = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
   const today = new Date().toISOString().slice(0, 10)
@@ -991,6 +1012,19 @@ function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; view
   const recentMoods = state.moods.slice(0, 6)
   const recentSupport = state.supportMessages.slice(0, 5)
   const recentGratitude = state.gratitudes.slice(0, 5)
+
+  // Item 2: achievement tiers, derived from existing activity — no extra state.
+  const loveCount = state.gratitudes.filter((g) => g.toName === viewerName).length
+    + state.posts.filter((p) => p.authorEmail === viewerEmail).reduce((sum, p) => sum + (p.reactions?.['❤️']?.length ?? 0), 0)
+  const loveTier = tierFor(LOVE_TIERS, loveCount)
+  const fireTier = tierFor(FIRE_TIERS, streak)
+
+  // Item 1: an illustrative "affinity score" toward the Health Buddy — built from
+  // shared accountability signals (streak + shared sport-community membership).
+  const sharedCommunities = state.communities.filter((c) => c.memberNames.includes(viewerName) && state.buddyName && c.memberNames.includes(state.buddyName))
+  const affinityScore = state.buddyName ? Math.min(100, streak * 8 + sharedCommunities.length * 15) : 0
+
+  const filteredCommunities = state.communities.filter((c) => !sportFilter.trim() || c.sportTag.toLowerCase().includes(sportFilter.trim().toLowerCase()))
 
   return (
     <div className="space-y-4">
@@ -1016,6 +1050,43 @@ function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; view
             className="rounded-xl px-4 py-2 text-xs font-bold text-white transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             {checkedInToday ? '✓ Check-in' : 'Check-in Sekarang'}
           </button>
+        </div>
+        {/* Item 2: achievement badges with color tiers */}
+        <div className="flex items-center gap-2 border-t border-neutral-100 pt-2 text-[11px] font-bold">
+          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-white" style={{ background: fireTier.color }}>🔥 {fireTier.label}</span>
+          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-white" style={{ background: loveTier.color }}>❤️ {loveTier.label}</span>
+        </div>
+        {state.buddyName && (
+          <div className="rounded-xl bg-pink-50 p-2.5 text-[11px] text-pink-700">
+            💞 Skor Afinitas dengan {state.buddyName}: <b>{affinityScore}/100</b> — naik tiap check-in & komunitas olahraga yang sama (ilustratif, berdasarkan aktivitas Anda berdua di akun ini).
+          </div>
+        )}
+      </Card>
+
+      {/* 10. Komunitas olahraga — temukan/buat grup berdasarkan ketertarikan yang sama */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🏃 Komunitas Olahraga</div>
+        <input value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} placeholder="Cari komunitas (mis. Lari, Yoga)"
+          className={inputClass + ' text-xs'} />
+        <div className="space-y-1.5">
+          {filteredCommunities.length === 0 && <p className="text-xs text-neutral-400">Belum ada komunitas. Buat yang pertama!</p>}
+          {filteredCommunities.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
+              <div>
+                <b className="text-ink">{c.name}</b> · <span className="text-brand-dark">{c.sportTag}</span>
+                <div className="text-neutral-400">{c.memberNames.length} anggota: {c.memberNames.join(', ')}</div>
+              </div>
+              {!c.memberNames.includes(viewerName) && (
+                <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Gabung</button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 border-t border-neutral-100 pt-2">
+          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Nama komunitas" className={inputClass + ' flex-1 text-xs'} />
+          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Olahraga" className={inputClass + ' w-24 text-xs'} />
+          <button onClick={() => { createCommunity(communityName, sportTag); setCommunityName(''); setSportTag('') }} disabled={!communityName.trim() || !sportTag.trim()}
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
         </div>
       </Card>
 

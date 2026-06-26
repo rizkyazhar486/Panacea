@@ -296,6 +296,17 @@ export interface GratitudeNote {
   at: string
 }
 
+// 11. Sport communities — small groups discoverable by shared sport interest;
+// also the basis for an "affinity score" between members (item 1).
+export interface SportCommunity {
+  id: string
+  name: string
+  sportTag: string // e.g. "Lari", "Yoga", "Gym", "Sepeda"
+  memberNames: string[]
+  createdBy: string // account email
+  createdAt: string
+}
+
 // -------- Nutrition / calorie diary ----------------------------------------
 export interface FoodEntry {
   id: string
@@ -491,6 +502,7 @@ export interface AppState {
   challenges: Challenge[] // group health challenges (item 5)
   circles: Circle[] // Circle of Care groups (item 9)
   gratitudes: GratitudeNote[] // gratitude wall (item 10)
+  communities: SportCommunity[] // sport-interest communities (item 10b / affinity basis for item 1)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
