@@ -25,6 +25,7 @@ import {
   IconRun,
   IconUsers,
   IconFlame,
+  IconSparkle,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -64,6 +65,7 @@ const nav: Nav[] = [
   { to: '/recovery', label: 'Recovery Tracker', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/workout', label: 'AI Program Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/sexual-health', label: 'Kesehatan Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
+  { to: '/shape-forming', label: 'Shape Forming dari Foto', icon: IconSparkle, roles: ['pasien'], group: 'Klinis & AI' },
   { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Layanan' },
   { to: '/hospitals', label: 'Faskes Terdekat', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Layanan' },
   { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Layanan' },
