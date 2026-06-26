@@ -8,7 +8,7 @@ import {
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { uploadOrLocal } from '../lib/upload'
-import type { SocialPost, PostType, Role, ProfileEdit, Story } from '../lib/types'
+import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
    GPS SPORTS MODES
@@ -451,13 +451,23 @@ const STORY_TTL_MS = 24 * 60 * 60 * 1000
 
 interface StoryGroup { authorEmail: string; authorName: string; mediaColor: string; stories: Story[] }
 
-function StoryViewer({ group, onClose, onComment }: {
-  group: StoryGroup; onClose: () => void; onComment: (storyId: string, text: string) => void
+const STORY_REACTIONS = ['❤️', '💪', '🙏', '👏']
+
+function StoryViewer({ group, onClose, onComment, onReact }: {
+  group: StoryGroup; onClose: () => void; onComment: (storyId: string, text: string) => void; onReact: (storyId: string, emoji: string) => void
 }) {
   const [idx, setIdx] = useState(0)
   const [draft, setDraft] = useState('')
+  const [floaters, setFloaters] = useState<{ id: string; emoji: string }[]>([])
   const story = group.stories[idx]
   const DURATION = story.video ? 15000 : 5000
+
+  function react(emoji: string) {
+    onReact(story.id, emoji)
+    const id = uid()
+    setFloaters((f) => [...f, { id, emoji }])
+    setTimeout(() => setFloaters((f) => f.filter((x) => x.id !== id)), 1200)
+  }
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -523,8 +533,21 @@ function StoryViewer({ group, onClose, onComment }: {
           </div>
         )}
 
-        {/* Direct reply input */}
+        {/* Floating live reactions (item 8) */}
+        <div className="pointer-events-none absolute bottom-24 right-4 z-10 flex h-40 w-10 flex-col items-center justify-end">
+          {floaters.map((f) => (
+            <span key={f.id} className="story-float absolute text-2xl">{f.emoji}</span>
+          ))}
+        </div>
+
+        {/* Quick reactions + direct reply input */}
         <div className="z-10 flex items-center gap-2 p-3" onClick={(e) => e.stopPropagation()}>
+          {STORY_REACTIONS.map((emo) => (
+            <button key={emo} onClick={() => react(emo)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/15 text-base transition active:scale-90">
+              {emo}
+              {story.reactions?.[emo] ? <span className="sr-only">{story.reactions[emo]}</span> : null}
+            </button>
+          ))}
           <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
             placeholder="Balas langsung..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
           <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
@@ -532,6 +555,10 @@ function StoryViewer({ group, onClose, onComment }: {
           </button>
         </div>
       </div>
+      <style>{`
+        @keyframes storyFloat { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-140px) scale(1.2); opacity: 0; } }
+        .story-float { animation: storyFloat 1.2s ease-out forwards; }
+      `}</style>
     </div>
   )
 }
@@ -539,10 +566,10 @@ function StoryViewer({ group, onClose, onComment }: {
 function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
   stories: Story[]; viewerEmail: string; viewerName: string; onAddStory: (s: Story) => void
 }) {
-  const [openGroup, setOpenGroup] = useState<StoryGroup | null>(null)
+  const [openEmail, setOpenEmail] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
-  const { addStoryComment } = useStore()
+  const { addStoryComment, addStoryReaction } = useStore()
 
   const active = useMemo(() => stories.filter((s) => Date.now() - new Date(s.at).getTime() < STORY_TTL_MS), [stories])
   const groups = useMemo(() => {
@@ -584,7 +611,7 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
       </button>
       <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => pickStory(e.target.files?.[0])} />
       {groups.map((g) => (
-        <button key={g.authorEmail} onClick={() => setOpenGroup(g)} className="flex shrink-0 flex-col items-center gap-1">
+        <button key={g.authorEmail} onClick={() => setOpenEmail(g.authorEmail)} className="flex shrink-0 flex-col items-center gap-1">
           <span className="grid h-14 w-14 place-items-center rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, #00BF63, #f59e0b, #FF3131)' }}>
             <span className="grid h-full w-full place-items-center rounded-full border-2 border-white text-sm font-bold text-white" style={{ backgroundColor: g.mediaColor }}>
               {initials(g.authorName)}
@@ -593,11 +620,12 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
           <span className="max-w-[60px] truncate text-[10px] font-semibold text-neutral-500">{g.authorName.split(' ')[0]}</span>
         </button>
       ))}
-      {openGroup && (
+      {openEmail && groups.find((g) => g.authorEmail === openEmail) && (
         <StoryViewer
-          group={openGroup}
-          onClose={() => setOpenGroup(null)}
+          group={groups.find((g) => g.authorEmail === openEmail)!}
+          onClose={() => setOpenEmail(null)}
           onComment={(storyId, text) => addStoryComment(storyId, text, viewerName)}
+          onReact={(storyId, emoji) => addStoryReaction(storyId, emoji)}
         />
       )}
     </div>
@@ -747,16 +775,25 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 /* ═══════════════════════════════════════════════════════
    POST CARD — like / comment / share-as-logo (Feed "new face")
    ═══════════════════════════════════════════════════════ */
+const POST_REACTIONS: { emoji: string; label: string }[] = [
+  { emoji: '❤️', label: 'Peduli' }, { emoji: '💪', label: 'Semangat' }, { emoji: '🙏', label: 'Doa' }, { emoji: '👏', label: 'Bangga' },
+]
+
 function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
-  const { state, toggleLike, updatePost, toggleFollow, subscribeAuthor } = useStore()
+  const { state, toggleLike, updatePost, toggleFollow, subscribeAuthor, toggleReaction } = useStore()
   const [showComments, setShowComments] = useState(false)
+  const [showReactions, setShowReactions] = useState(false)
   const [draft, setDraft] = useState('')
   const comments = post.commentList ?? []
   const isOwnPost = post.authorEmail === viewerEmail
   const following = state.follows.includes(post.authorEmail)
+  // Mutual engagement badge (item 7): you follow them and they've engaged back on this post.
+  const mutual = following && (post.likedByMe || (post.commentList?.some((c) => c.authorName === viewerName)))
   const subPrice = state.authorSubPrices[post.authorEmail] ?? 0
   const subExpires = state.authorSubs[post.authorEmail]
   const subscribed = !!subExpires && new Date(subExpires) > new Date()
+  const lastSeen = state.presence[post.authorEmail]
+  const online = !!lastSeen && Date.now() - new Date(lastSeen).getTime() < 2 * 60 * 1000
 
   function subscribeNow() {
     const r = subscribeAuthor(post.authorEmail)
@@ -790,13 +827,15 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
       {/* Header + share logo (top-right) */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
+          <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
             {initials(post.authorName)}
+            {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Sedang aktif" />}
           </div>
           <div>
             <div className="text-xs font-black flex items-center gap-1">
               {post.authorName}
               <span className="text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
+              {mutual && <span className="text-[9px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md">🤝 Saling mendukung</span>}
             </div>
             <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span></div>
           </div>
@@ -851,12 +890,34 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
         </div>
       )}
 
-      {/* Action bar: like · comment · share */}
-      <div className="flex items-center gap-1 border-t border-neutral-100 pt-2 -mb-1">
+      {/* Reaction tally (item 2: peduli/semangat/doa/bangga beyond plain Like) */}
+      {post.reactions && Object.values(post.reactions).some((list) => list.length > 0) && (
+        <div className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+          {POST_REACTIONS.filter((r) => (post.reactions?.[r.emoji]?.length ?? 0) > 0).map((r) => (
+            <span key={r.emoji} className="rounded-full bg-neutral-100 px-2 py-0.5">{r.emoji} {post.reactions![r.emoji].length}</span>
+          ))}
+        </div>
+      )}
+
+      {/* Action bar: like · react · comment · share */}
+      <div className="relative flex items-center gap-1 border-t border-neutral-100 pt-2 -mb-1">
         <button onClick={() => toggleLike(post.id)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
           <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={16} /></ColoredIcon>
           {post.likes > 0 ? post.likes : 'Suka'}
         </button>
+        <button onClick={() => setShowReactions((v) => !v)} className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-neutral-500 hover:bg-neutral-50 transition active:scale-95">
+          😊
+        </button>
+        {showReactions && (
+          <div className="absolute bottom-11 left-12 z-10 flex gap-1 rounded-full border border-neutral-100 bg-white p-1.5 shadow-lg">
+            {POST_REACTIONS.map((r) => (
+              <button key={r.emoji} title={r.label} onClick={() => { toggleReaction(post.id, r.emoji); setShowReactions(false) }}
+                className={'grid h-8 w-8 place-items-center rounded-full text-base transition hover:scale-125 ' + (post.reactions?.[r.emoji]?.includes(viewerEmail) ? 'bg-brand/10' : '')}>
+                {r.emoji}
+              </button>
+            ))}
+          </div>
+        )}
         <button onClick={() => setShowComments(v => !v)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
           <IconComment size={16} /> {comments.length > 0 ? comments.length : 'Komentar'}
         </button>
@@ -890,11 +951,191 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
   )
 }
 
+const MOOD_OPTIONS: { id: MoodEntry['mood']; emoji: string; label: string }[] = [
+  { id: 'senang', emoji: '😄', label: 'Senang' },
+  { id: 'biasa', emoji: '🙂', label: 'Biasa' },
+  { id: 'lelah', emoji: '😴', label: 'Lelah' },
+  { id: 'sedih', emoji: '😢', label: 'Sedih' },
+  { id: 'stres', emoji: '😣', label: 'Stres' },
+]
+
+/* ═══════════════════════════════════════════════════════
+   KOMUNITAS SEHAT — interpersonal-relationship health features
+   (Health Buddy & check-in, mood + dukungan, tantangan kelompok,
+   Circle of Care, dan dinding rasa terima kasih)
+   ═══════════════════════════════════════════════════════ */
+function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; viewerName: string }) {
+  const { state, setBuddy, checkInToday, addMood, sendSupport, startChallenge, bumpChallenge, createCircle, addGratitude } = useStore()
+  const [buddyDraft, setBuddyDraft] = useState(state.buddyName ?? '')
+  const [moodNote, setMoodNote] = useState('')
+  const [supportTo, setSupportTo] = useState('')
+  const [supportText, setSupportText] = useState('')
+  const [newChallengeTitle, setNewChallengeTitle] = useState('')
+  const [circleName, setCircleName] = useState('')
+  const [circleMembers, setCircleMembers] = useState('')
+  const [gratTo, setGratTo] = useState('')
+  const [gratText, setGratText] = useState('')
+
+  const myCheckIns = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
+  const today = new Date().toISOString().slice(0, 10)
+  const checkedInToday = myCheckIns.includes(today)
+  // Consecutive-day streak ending today/yesterday.
+  const streak = useMemo(() => {
+    let s = 0
+    let d = new Date()
+    if (!checkedInToday) d.setDate(d.getDate() - 1)
+    while (myCheckIns.includes(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+    return s
+  }, [myCheckIns, checkedInToday])
+
+  const recentMoods = state.moods.slice(0, 6)
+  const recentSupport = state.supportMessages.slice(0, 5)
+  const recentGratitude = state.gratitudes.slice(0, 5)
+
+  return (
+    <div className="space-y-4">
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Komunitas Sehat</h4>
+
+      {/* 1. Health Buddy — akuntabilitas */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🤝 Health Buddy</div>
+        <div className="flex items-center gap-2">
+          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Nama teman akuntabilitas Anda"
+            className={inputClass + ' flex-1 text-xs'} />
+          <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Simpan</button>
+        </div>
+        {state.buddyName && (
+          <p className="text-xs text-neutral-500">Buddy Anda: <b className="text-ink">{state.buddyName}</b> — saling mengingatkan check-in harian ya!</p>
+        )}
+        <div className="flex items-center justify-between rounded-xl bg-brand-50 p-3">
+          <div className="text-xs">
+            <div className="font-bold text-brand-dark">🔥 Streak {streak} hari</div>
+            <div className="text-neutral-500">{checkedInToday ? 'Sudah check-in hari ini.' : 'Belum check-in hari ini.'}</div>
+          </div>
+          <button onClick={checkInToday} disabled={checkedInToday}
+            className="rounded-xl px-4 py-2 text-xs font-bold text-white transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            {checkedInToday ? '✓ Check-in' : 'Check-in Sekarang'}
+          </button>
+        </div>
+      </Card>
+
+      {/* 4 & 6. Mood check-in + dukungan langsung */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">💬 Mood & Dukungan</div>
+        <div className="flex flex-wrap gap-2">
+          {MOOD_OPTIONS.map((m) => (
+            <button key={m.id} onClick={() => { addMood(m.id, moodNote); setMoodNote('') }}
+              className="flex items-center gap-1 rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-50">
+              {m.emoji} {m.label}
+            </button>
+          ))}
+        </div>
+        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Catatan singkat (opsional), lalu pilih mood di atas"
+          className={inputClass + ' text-xs'} />
+        {recentMoods.length > 0 && (
+          <div className="space-y-1.5 border-t border-neutral-100 pt-2">
+            {recentMoods.map((m) => (
+              <div key={m.id} className="text-[11px] text-neutral-500">
+                {MOOD_OPTIONS.find((o) => o.id === m.mood)?.emoji} <b className="text-ink">{m.name}</b> merasa {m.mood}{m.note ? ` — "${m.note}"` : ''} <span className="text-neutral-400">· {timeAgo(m.at)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex items-center gap-2 border-t border-neutral-100 pt-2">
+          <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 text-xs'} />
+          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Kirim semangat singkat..." className={inputClass + ' flex-1 text-xs'} />
+          <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <IconSend size={15} />
+          </button>
+        </div>
+        {recentSupport.length > 0 && (
+          <div className="space-y-1.5">
+            {recentSupport.map((s) => (
+              <div key={s.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
+                <b className="text-ink">{s.fromName}</b> → {s.toName}: {s.text}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {/* 5. Tantangan kelompok realtime */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🏆 Tantangan Kelompok</div>
+        <div className="flex items-center gap-2">
+          <input value={newChallengeTitle} onChange={(e) => setNewChallengeTitle(e.target.value)} placeholder="Mis. 10.000 langkah/minggu"
+            className={inputClass + ' flex-1 text-xs'} />
+          <button onClick={() => { startChallenge(newChallengeTitle, 'poin', 100, 7); setNewChallengeTitle('') }} disabled={!newChallengeTitle.trim()}
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Mulai</button>
+        </div>
+        {state.challenges.length === 0 && <p className="text-xs text-neutral-400">Belum ada tantangan aktif. Mulai satu dan undang teman!</p>}
+        {state.challenges.map((c) => {
+          const leaders = [...c.participants].sort((a, b) => b.progress - a.progress)
+          const me = c.participants.find((p) => p.email === viewerEmail)
+          return (
+            <div key={c.id} className="rounded-xl border border-neutral-100 p-3">
+              <div className="mb-1.5 flex items-center justify-between text-xs font-bold text-ink">
+                <span>{c.title}</span>
+                <button onClick={() => bumpChallenge(c.id, 10)} className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">+10 {c.unit}</button>
+              </div>
+              <div className="space-y-1">
+                {leaders.map((p, i) => (
+                  <div key={p.email} className="flex items-center gap-2 text-[11px] text-neutral-500">
+                    <span className="w-4 font-bold">{i + 1}.</span>
+                    <span className="flex-1 truncate font-semibold text-neutral-600">{p.email === viewerEmail ? `${p.name} (Anda)` : p.name}</span>
+                    <span>{p.progress} {c.unit}</span>
+                  </div>
+                ))}
+              </div>
+              {!me && <p className="mt-1 text-[10px] text-neutral-400">Tekan "+10" untuk ikut serta.</p>}
+            </div>
+          )
+        })}
+      </Card>
+
+      {/* 9. Circle of Care */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🫂 Circle of Care</div>
+        <div className="flex items-center gap-2">
+          <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Nama circle (mis. Keluarga)" className={inputClass + ' w-32 text-xs'} />
+          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Nama anggota, pisahkan koma" className={inputClass + ' flex-1 text-xs'} />
+          <button onClick={() => { createCircle(circleName, circleMembers.split(',')); setCircleName(''); setCircleMembers('') }} disabled={!circleName.trim()}
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
+        </div>
+        {state.circles.map((c) => (
+          <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
+            <b className="text-ink">{c.name}</b> — {c.memberNames.length > 0 ? c.memberNames.join(', ') : 'belum ada anggota'}
+          </div>
+        ))}
+      </Card>
+
+      {/* 10. Gratitude wall */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🙏 Dinding Terima Kasih</div>
+        <div className="flex items-center gap-2">
+          <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 text-xs'} />
+          <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="Ucapan terima kasih..." className={inputClass + ' flex-1 text-xs'} />
+          <button onClick={() => { addGratitude(gratTo, gratText); setGratTo(''); setGratText('') }} disabled={!gratText.trim() || !gratTo.trim()}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <IconSend size={15} />
+          </button>
+        </div>
+        {recentGratitude.map((g) => (
+          <div key={g.id} className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-neutral-700">
+            <b>{g.fromName}</b> berterima kasih kepada <b>{g.toName}</b>: "{g.text}"
+          </div>
+        ))}
+      </Card>
+    </div>
+  )
+}
+
 /* ═══════════════════════════════════════════════════════
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
-  const { state, account, addPost, addStory } = useStore()
+  const { state, account, addPost, addStory, heartbeat } = useStore()
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
@@ -904,6 +1145,15 @@ export default function SportsSocialFeed() {
     name: account?.name || 'Ksatria Bugar',
     role: (account?.role as Role) || 'pasien'
   }), [account])
+
+  // 3. Live "sedang aktif" presence — heartbeat while the feed is open.
+  useEffect(() => {
+    if (!account) return
+    heartbeat()
+    const t = setInterval(heartbeat, 60_000)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account?.email])
 
   // Handler memproses postingan standar dari modal → store global (persisten & terbagi)
   const handleAddNewPost = (newPost: SocialPost) => {
@@ -962,6 +1212,9 @@ export default function SportsSocialFeed() {
           role={currentUser.role}
         />
       )}
+
+      {/* Komunitas Sehat — Health Buddy, mood & dukungan, tantangan, Circle of Care, gratitude wall */}
+      <KomunitasSehat viewerEmail={currentUser.email} viewerName={currentUser.name} />
 
       {/* RENDER FEED SOSIAL */}
       <div className="space-y-4">

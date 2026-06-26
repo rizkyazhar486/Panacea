@@ -19,6 +19,12 @@ import type {
   Role,
   SocialPost,
   Story,
+  CheckIn,
+  MoodEntry,
+  SupportMessage,
+  Challenge,
+  Circle,
+  GratitudeNote,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -98,6 +104,13 @@ function seed(): AppState {
     posts: [],
     stories: [],
     follows: [],
+    presence: {},
+    checkIns: [],
+    moods: [],
+    supportMessages: [],
+    challenges: [],
+    circles: [],
+    gratitudes: [],
     foods: [],
     wellness: {},
     consults: [],
@@ -173,7 +186,19 @@ interface Store {
   toggleFollow: (email: string) => void
   addStory: (s: Story) => void
   addStoryComment: (storyId: string, text: string, authorName: string) => void
+  addStoryReaction: (storyId: string, emoji: string) => void
   deleteStory: (id: string) => void
+  toggleReaction: (postId: string, emoji: string) => void
+  // Komunitas Sehat — interpersonal-relationship health features
+  heartbeat: () => void // updates own presence timestamp (online indicator)
+  setBuddy: (name: string) => void // item 1: pair a Health Buddy
+  checkInToday: () => void // item 1: daily accountability check-in
+  addMood: (mood: MoodEntry['mood'], note?: string) => void // item 4
+  sendSupport: (toName: string, text: string) => void // items 4 & 6
+  startChallenge: (title: string, unit: string, goal: number, days: number) => void // item 5
+  bumpChallenge: (challengeId: string, amount: number) => void // item 5
+  createCircle: (name: string, memberNames: string[]) => void // item 9
+  addGratitude: (toName: string, text: string) => void // item 10
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -537,7 +562,96 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               : s,
           ),
         })),
+      addStoryReaction: (storyId, emoji) =>
+        setState((st) => ({
+          ...st,
+          stories: st.stories.map((s) =>
+            s.id === storyId
+              ? { ...s, reactions: { ...(s.reactions ?? {}), [emoji]: (s.reactions?.[emoji] ?? 0) + 1 } }
+              : s,
+          ),
+        })),
       deleteStory: (id) => setState((st) => ({ ...st, stories: st.stories.filter((s) => s.id !== id) })),
+      toggleReaction: (postId, emoji) =>
+        setState((st) => {
+          const email = st.account?.email ?? ''
+          return {
+            ...st,
+            posts: st.posts.map((p) => {
+              if (p.id !== postId) return p
+              const had = p.reactions?.[emoji] ?? []
+              const mine = had.includes(email)
+              const nextList = mine ? had.filter((e) => e !== email) : [...had, email]
+              return { ...p, reactions: { ...(p.reactions ?? {}), [emoji]: nextList } }
+            }),
+          }
+        }),
+      // ── Komunitas Sehat — interpersonal-relationship health features ──────
+      heartbeat: () =>
+        setState((st) => {
+          const email = st.account?.email
+          if (!email) return st
+          return { ...st, presence: { ...st.presence, [email]: new Date().toISOString() } }
+        }),
+      setBuddy: (name) => setState((st) => (st.account ? { ...st, buddyName: name.trim() || undefined } : st)),
+      checkInToday: () =>
+        setState((st) => {
+          const email = st.account?.email
+          if (!email) return st
+          const today = new Date().toISOString().slice(0, 10)
+          if (st.checkIns.some((c) => c.email === email && c.date === today)) return st
+          return { ...st, checkIns: [...st.checkIns, { email, date: today }] }
+        }),
+      addMood: (mood, note) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc) return st
+          const entry: MoodEntry = { id: uid(), email: acc.email, name: acc.name, mood, note: note?.trim() || undefined, at: new Date().toISOString() }
+          return { ...st, moods: [entry, ...st.moods] }
+        }),
+      sendSupport: (toName, text) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc || !text.trim()) return st
+          const msg: SupportMessage = { id: uid(), fromEmail: acc.email, fromName: acc.name, toName: toName.trim() || 'Teman', text: text.trim(), at: new Date().toISOString() }
+          return { ...st, supportMessages: [msg, ...st.supportMessages] }
+        }),
+      startChallenge: (title, unit, goal, days) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc || !title.trim()) return st
+          const c: Challenge = {
+            id: uid(), title: title.trim(), unit: unit.trim() || 'poin', goal: Math.max(1, goal),
+            endsAt: new Date(Date.now() + days * 86400000).toISOString(),
+            participants: [{ email: acc.email, name: acc.name, progress: 0 }],
+          }
+          return { ...st, challenges: [c, ...st.challenges] }
+        }),
+      bumpChallenge: (challengeId, amount) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc) return st
+          return {
+            ...st,
+            challenges: st.challenges.map((c) => {
+              if (c.id !== challengeId) return c
+              const has = c.participants.some((p) => p.email === acc.email)
+              const participants = has
+                ? c.participants.map((p) => (p.email === acc.email ? { ...p, progress: p.progress + amount } : p))
+                : [...c.participants, { email: acc.email, name: acc.name, progress: amount }]
+              return { ...c, participants }
+            }),
+          }
+        }),
+      createCircle: (name, memberNames) =>
+        setState((st) => (name.trim() ? { ...st, circles: [{ id: uid(), name: name.trim(), memberNames: memberNames.filter((m) => m.trim()) }, ...st.circles] } : st)),
+      addGratitude: (toName, text) =>
+        setState((st) => {
+          const acc = st.account
+          if (!acc || !text.trim() || !toName.trim()) return st
+          const note: GratitudeNote = { id: uid(), fromName: acc.name, toName: toName.trim(), text: text.trim(), at: new Date().toISOString() }
+          return { ...st, gratitudes: [note, ...st.gratitudes] }
+        }),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

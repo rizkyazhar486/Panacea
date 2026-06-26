@@ -216,6 +216,7 @@ export interface SocialPost {
   comments?: number
   commentList?: PostComment[] // inline comment thread
   reposts?: number
+  reactions?: Record<string, string[]> // emoji -> emails who reacted (peduli/semangat/doa/bangga)
   likedByMe?: boolean
   repostedByMe?: boolean
   bookmarkedByMe?: boolean
@@ -233,6 +234,66 @@ export interface Story {
   caption?: string
   at: string
   comments?: PostComment[] // live/direct replies shown over the story
+  reactions?: Record<string, number> // emoji -> live tally (story reaction, item 8)
+}
+
+// -------- Komunitas Sehat — interpersonal-relationship health features -----
+// All features below run on the locally-shared store (no backend mocking of
+// other people) so they work for real accounts/data as soon as they exist.
+
+// 1. Health Buddy — paired accountability partner with a daily check-in streak.
+export interface CheckIn {
+  email: string
+  date: string // yyyy-mm-dd, one per day
+}
+
+// 4. Daily mood log + 6. private "send support" one-tap messages.
+export interface MoodEntry {
+  id: string
+  email: string
+  name: string
+  mood: 'senang' | 'biasa' | 'lelah' | 'sedih' | 'stres'
+  note?: string
+  at: string
+}
+export interface SupportMessage {
+  id: string
+  fromEmail: string
+  fromName: string
+  toName: string // free-text recipient (buddy/teman/keluarga) — no fake accounts
+  text: string
+  at: string
+}
+
+// 5. Group health challenge with a live leaderboard.
+export interface ChallengeParticipant {
+  email: string
+  name: string
+  progress: number
+}
+export interface Challenge {
+  id: string
+  title: string
+  unit: string
+  goal: number
+  endsAt: string
+  participants: ChallengeParticipant[]
+}
+
+// 9. Circle of Care — small trusted group sharing a mood/activity snapshot.
+export interface Circle {
+  id: string
+  name: string
+  memberNames: string[] // free-text member names (family/friends), opt-in
+}
+
+// 10. Gratitude wall — short public thank-you notes between users.
+export interface GratitudeNote {
+  id: string
+  fromName: string
+  toName: string
+  text: string
+  at: string
 }
 
 // -------- Nutrition / calorie diary ----------------------------------------
@@ -422,6 +483,14 @@ export interface AppState {
   posts: SocialPost[]
   stories: Story[]
   follows: string[] // emails the current account follows
+  presence: Record<string, string> // email -> ISO last-active timestamp (online indicator)
+  buddyName?: string // accountability Health Buddy (free-text name, item 1)
+  checkIns: CheckIn[] // daily accountability check-ins (item 1)
+  moods: MoodEntry[] // mood log (item 4)
+  supportMessages: SupportMessage[] // private one-tap support notes (items 4 & 6)
+  challenges: Challenge[] // group health challenges (item 5)
+  circles: Circle[] // Circle of Care groups (item 9)
+  gratitudes: GratitudeNote[] // gratitude wall (item 10)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]
