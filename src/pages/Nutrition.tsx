@@ -1669,28 +1669,31 @@ export function Nutrition() {
       {/* Recommendations */}
       <RecommendationsCard recs={recs} />
 
-      {/* Quick Links */}
+      {/* Quick Links — kapabilitas kalkulator longevity */}
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Longevity Terbaik" subtitle="Dibangun untuk membantu umat manusia hidup lebih panjang dan lebih sehat" />
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { icon: '🫀', label: 'VO2Max Est.', desc: 'Estimasi kapasitas aerobik', link: '/nutrition' },
-            { icon: '⚖️', label: 'BMI & BMR', desc: 'Metabolisme basal & indeks massa', link: '/nutrition' },
-            { icon: '🧬', label: 'Lab Tracker', desc: 'Pantau lab penunjang mingguan', link: '/nutrition' },
-            { icon: '🏥', label: 'Protokol Kronis', desc: '19 kondisi klinis', link: '/nutrition' },
+            { icon: '🫀', label: 'VO₂max Est.', desc: 'Kapasitas aerobik' },
+            { icon: '⚖️', label: 'BMI & BMR', desc: 'Metabolisme basal & indeks massa' },
+            { icon: '🧬', label: 'Lab Tracker', desc: 'Pantau lab penunjang mingguan' },
+            { icon: '🏥', label: 'Protokol Kronis', desc: '19 kondisi klinis' },
           ].map(item => (
-            <Link key={item.label} to={item.link} className="rounded-xl border border-neutral-100 p-3 text-center transition hover:shadow-sm hover:border-brand/30 active:scale-95">
-              <span className="text-2xl">{item.icon}</span>
-              <div className="mt-1 text-[11px] font-bold text-neutral-700">{item.label}</div>
-              <div className="text-[9px] text-neutral-400">{item.desc}</div>
-            </Link>
+            <div key={item.label} className="flex flex-col items-center rounded-2xl border border-brand/15 bg-brand-50/40 p-3 text-center transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-2xl shadow-sm">{item.icon}</span>
+              <div className="mt-2 text-xs font-extrabold text-ink">{item.label}</div>
+              <div className="mt-0.5 text-[11px] leading-tight text-neutral-500">{item.desc}</div>
+            </div>
           ))}
         </div>
-        <div className="mt-4 rounded-xl p-4 text-center" style={{ background: 'linear-gradient(135deg, rgba(0,191,99,0.05), rgba(11,122,75,0.02))' }}>
-          <p className="text-xs text-neutral-500 leading-relaxed">
-            <b>Panacea Med</b> dirancang dengan standar klinis untuk membantu atlet dunia seperti Cristiano Ronaldo, Messi, Mbappe, Kipchoge, Phelps — hingga pasien dalam fase kritis dengan CHF, COPD, Diabetes, Gagal Ginjal, Kanker, dan 15+ kondisi kronis lainnya. Setiap rekomendasi dihitung secara real-time berdasarkan data Anda.
+        <div className="mt-4 rounded-2xl border border-brand/10 bg-gradient-to-br from-brand-50/70 to-transparent p-5 text-center">
+          <p className="text-[13px] leading-relaxed text-neutral-600">
+            <b className="text-brand-dark">Panaceamed</b> dirancang dengan standar klinis — dari mendukung atlet elite
+            (<i>Ronaldo, Messi, Mbappé, Kipchoge, Phelps</i>) hingga merawat pasien fase kritis
+            (<b>CHF, COPD, Diabetes, Gagal Ginjal, Kanker</b>, dan 15+ kondisi kronis). Setiap rekomendasi
+            dihitung <b>real-time</b> dari data Anda.
           </p>
-          <p className="mt-2 text-[10px] text-neutral-400 italic">{'\u{1F33F}'} Semoga bermanfaat untuk umat manusia.</p>
+          <p className="mt-2 text-xs font-semibold italic text-brand-dark">🌿 Semoga bermanfaat untuk umat manusia.</p>
         </div>
       </Card>
     </div>
