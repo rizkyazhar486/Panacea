@@ -39,6 +39,8 @@ const Owner = lazy(() => import('./pages/Owner').then((m) => ({ default: m.Owner
 const Editor = lazy(() => import('./pages/Editor').then((m) => ({ default: m.Editor })))
 const Admin = lazy(() => import('./pages/Admin').then((m) => ({ default: m.Admin })))
 const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal })))
+const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
+const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -81,6 +83,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/owner" element={<Owner />} />
               <Route path="/clinical" element={<Dashboard />} />
               <Route path="/social" element={<Home />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />

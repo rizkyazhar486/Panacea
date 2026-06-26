@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun, IconActivity, IconHeart } from '../components/icons'
+import { ShareToFeed } from '../components/ShareToFeed'
 
 interface AthleteProfile { age: number; g: 'M' | 'F'; weight: number; hrRest: number; hrMax: number }
 
@@ -45,6 +46,9 @@ export function Athlete() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <div className="flex justify-end">
+        <ShareToFeed activity="🏃 Performa Atlet" defaultCaption="Update latihan & performa saya hari ini 💪" />
+      </div>
       <Card className="!p-5">
         <SectionTitle icon={<IconRun size={20} />} title="Performa Atlet" subtitle="VO₂max, zona latihan & target beban mingguan" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
@@ -26,6 +26,9 @@ import {
   IconUsers,
   IconFlame,
   IconSparkle,
+  IconHome,
+  IconActivity,
+  IconPlus,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -36,6 +39,7 @@ import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
 import { InstallBanner } from './InstallApp'
+import { OnboardingTour } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
@@ -54,7 +58,9 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 const GROUP_ORDER = ['Beranda', 'Klinis & AI', 'Layanan', 'Konten', 'Kelola', 'Akun']
 
 const nav: Nav[] = [
-  { to: '/', label: 'Dashboard', icon: IconDashboard, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Beranda' },
+  { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Beranda' },
+  { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/clinical', label: 'Data Klinis Pasien', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
@@ -104,6 +110,7 @@ const riskLabel: Record<string, string> = {
 export function Shell({ children }: { children: ReactNode }) {
   const { state, activePatient, setActivePatient, logout, setMode } = useStore()
   const loc = useLocation()
+  const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -359,10 +366,10 @@ export function Shell({ children }: { children: ReactNode }) {
           )}
         </div>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
           {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
-            <div className="mb-5">
+            <div className="mb-5 hidden lg:block">
               <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
                 Layanan tersering Anda
               </div>
@@ -433,6 +440,46 @@ export function Shell({ children }: { children: ReactNode }) {
           </aside>
         </div>
       )}
+
+      {/* Bottom tab bar (mobile) — ikon besar & universal untuk navigasi sosial.
+          Ditujukan agar bisa dipakai siapa pun, termasuk yang kesulitan membaca:
+          ikon jelas + aria-label untuk pembaca layar + target sentuh besar. */}
+      {['pasien', 'dokter', 'owner'].includes(account.role) && (
+        <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden" aria-label="Navigasi utama">
+          {[
+            { to: '/', label: 'Beranda', icon: IconHome, end: true },
+            { to: '/community', label: 'Community', icon: IconUsers },
+          ].map((t) => (
+            <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
+              className={({ isActive }) => `flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${isActive ? 'text-brand-dark' : 'text-neutral-400'}`}>
+              <t.icon size={26} />
+              <span className="text-[9px] font-bold">{t.label}</span>
+            </NavLink>
+          ))}
+          {/* Tombol tengah "+" — buat post/story */}
+          <button
+            onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
+            aria-label="Buat postingan atau story baru"
+            className="-mt-5 flex flex-col items-center justify-center"
+          >
+            <span className="grid h-14 w-14 place-items-center rounded-full text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 6px 18px rgba(0,191,99,0.45)' }}>
+              <IconPlus size={28} />
+            </span>
+          </button>
+          {[
+            { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
+            { to: '/consult', label: 'Konsultasi', icon: IconStethoscope },
+          ].map((t) => (
+            <NavLink key={t.to} to={t.to} aria-label={t.label}
+              className={({ isActive }) => `flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${isActive ? 'text-brand-dark' : 'text-neutral-400'}`}>
+              <t.icon size={26} />
+              <span className="text-[9px] font-bold">{t.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      )}
+
+      {['pasien', 'dokter', 'owner'].includes(account.role) && <OnboardingTour />}
 
       <ContactService />
     </div>

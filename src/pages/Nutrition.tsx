@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
+import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 // Lazy so recharts is split into its own chunk (keeps the main bundle lean).
@@ -1692,6 +1693,9 @@ export function Nutrition() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <div className="flex justify-end">
+        <ShareToFeed activity="🥗 Nutrisi & Kalori" defaultCaption="Progres nutrisi & gaya hidup sehat saya hari ini 🥗" />
+      </div>
       {/* Longevity Score */}
       <LongevityCard body={body} wt={wt} todaysFoods={todaysFoods} vitals={vitals} activeProtocol={activeProtocol} />
 

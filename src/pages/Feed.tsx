@@ -233,6 +233,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   const [dur, setDur] = useState(0)
   const [hr, setHr] = useState(0)
   const [gpsErr, setGpsErr] = useState('')
+  const [open, setOpen] = useState(false) // collapsed by default — logo only, expand on tap
   const wRef = useRef<number | null>(null)
   const tRef = useRef<number | null>(null)
   const sRef = useRef(0)
@@ -292,6 +293,22 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
 
   const progressPct = sport.targetDist ? Math.min(100, (dist / 1000 / sport.targetDist) * 100) : 0
 
+  // Collapsed state — show only a compact logo pill so the dashboard stays short.
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Buka GPS Tracker untuk melacak olahraga"
+        className="flex w-full items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
+      >
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-xl">📍</span>
+        <span className="flex-1 text-left text-sm font-bold text-ink">GPS Tracker</span>
+        {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Sedang merekam" />}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400"><polyline points="6 9 12 15 18 9" /></svg>
+      </button>
+    )
+  }
+
   return (
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
@@ -299,11 +316,16 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
           <p className="text-[10px] text-neutral-400 mt-0.5">Lacak rute, kecepatan, percepatan & kalori</p>
         </div>
-        {mode === 'done' && (
-          <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
-            <IconShare2 size={13} /> Share
+        <div className="flex items-center gap-2">
+          {mode === 'done' && (
+            <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
+              <IconShare2 size={13} /> Share
+            </button>
+          )}
+          <button onClick={() => setOpen(false)} aria-label="Tutup GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
           </button>
-        )}
+        </div>
       </div>
 
       {/* Sport Selection */}
@@ -981,7 +1003,7 @@ function tierFor(tiers: typeof LOVE_TIERS, n: number) {
   return [...tiers].reverse().find((t) => n >= t.min) ?? tiers[0]
 }
 
-function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; viewerName: string }) {
+export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: string; viewerName: string }) {
   const { state, setBuddy, checkInToday, addMood, sendSupport, startChallenge, bumpChallenge, createCircle, addGratitude, createCommunity, joinCommunity } = useStore()
   const [buddyDraft, setBuddyDraft] = useState(state.buddyName ?? '')
   const [moodNote, setMoodNote] = useState('')
@@ -1251,7 +1273,7 @@ function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; c
   )
 }
 
-function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
+export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, answerQuiz, logVo2Max, addGoal, removeGoal } = useStore()
 
   // 1. Kalkulator BMI & Kalori Harian (TDEE)
@@ -1747,6 +1769,13 @@ export default function SportsSocialFeed() {
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
+  // Open the composer when the mobile bottom-bar "+" is tapped (decoupled event).
+  useEffect(() => {
+    const open = () => setIsComposeOpen(true)
+    window.addEventListener('panacea:compose', open)
+    return () => window.removeEventListener('panacea:compose', open)
+  }, [])
+
   // Default fallback user jika context/store kosong
   const currentUser = useMemo(() => ({
     email: account?.email || 'user@fitlife.id',
@@ -1800,16 +1829,8 @@ export default function SportsSocialFeed() {
         onAddStory={addStory}
       />
 
-      {/* Widget Atas: GPS Tracking Engine */}
+      {/* Widget Atas: GPS Tracking Engine (collapsed → logo only) */}
       <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} />
-
-      {/* Trigger Pembuat Postingan Sosial */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-neutral-100 shadow-sm">
-        <span className="text-sm font-semibold text-neutral-500">Punya cerita bugar hari ini?</span>
-        <button onClick={() => setIsComposeOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-          <IconPlus size={14} /> Buat Post
-        </button>
-      </div>
 
       {/* Komponen Modal Pembuat Postingan */}
       {isComposeOpen && (
@@ -1823,18 +1844,11 @@ export default function SportsSocialFeed() {
         />
       )}
 
-      {/* Komunitas Sehat — Health Buddy, mood & dukungan, tantangan, Circle of Care, gratitude wall */}
-      <KomunitasSehat viewerEmail={currentUser.email} viewerName={currentUser.name} />
-
-      {/* Pusat Kesehatan Realtime — edukasi, news, fungsionalitas, kalkulasi, monitoring */}
-      <PusatKesehatanRealtime viewerEmail={currentUser.email} />
-
-      {/* RENDER FEED SOSIAL */}
+      {/* RENDER FEED SOSIAL — beranda social media murni (Instagram-style) */}
       <div className="space-y-4">
-        <h4 className="text-xs font-black uppercase tracking-wider text-neutral-400 px-1">Feed Komunitas</h4>
         {posts.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-neutral-200 rounded-2xl text-neutral-400 text-xs">
-            Belum ada kiriman. Selesaikan pelacakan rute GPS kamu atau ketuk buat postingan!
+          <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
+            Belum ada kiriman. Ketuk tombol <span className="font-bold text-brand-dark">＋</span> di bawah untuk membuat postingan atau story.
           </div>
         ) : (
           posts.filter(p => !p.archived).map(p => (
@@ -1842,6 +1856,17 @@ export default function SportsSocialFeed() {
           ))
         )}
       </div>
+
+      {/* Tombol mengambang "+" — buat post/story (ikon, universal, target besar) */}
+      <button
+        onClick={() => setIsComposeOpen(true)}
+        aria-label="Buat postingan atau story baru"
+        data-tour="compose"
+        className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-white shadow-lg transition active:scale-95 lg:grid"
+        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
+      >
+        <IconPlus size={26} />
+      </button>
     </div>
   )
 }
