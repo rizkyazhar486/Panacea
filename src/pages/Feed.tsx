@@ -1276,6 +1276,33 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
   const [spo2, setSpo2] = useState(98)
   const [tempC, setTempC] = useState(36.5)
   const lastVital = state.selfVitals[0]
+
+  // #8: Web Bluetooth — baca detak jantung langsung dari strap BLE (Heart Rate Service 0x180D).
+  const [bleStatus, setBleStatus] = useState<'idle' | 'connecting' | 'connected' | 'unsupported' | 'error'>(
+    typeof navigator !== 'undefined' && (navigator as any).bluetooth ? 'idle' : 'unsupported'
+  )
+  const connectWearable = async () => {
+    const bt = (navigator as any).bluetooth
+    if (!bt) { setBleStatus('unsupported'); return }
+    try {
+      setBleStatus('connecting')
+      const device = await bt.requestDevice({ filters: [{ services: ['heart_rate'] }] })
+      const server = await device.gatt.connect()
+      const service = await server.getPrimaryService('heart_rate')
+      const char = await service.getCharacteristic('heart_rate_measurement')
+      await char.startNotifications()
+      char.addEventListener('characteristicvaluechanged', (e: any) => {
+        const dv: DataView = e.target.value
+        const flags = dv.getUint8(0)
+        const bpm = flags & 0x1 ? dv.getUint16(1, true) : dv.getUint8(1)
+        if (bpm > 0) setHr(bpm)
+      })
+      device.addEventListener('gattserverdisconnected', () => setBleStatus('idle'))
+      setBleStatus('connected')
+    } catch {
+      setBleStatus('error')
+    }
+  }
   // #1: trend series (oldest -> newest) for sparklines.
   const sysSeries = [...state.selfVitals].reverse().slice(-10).map((v) => v.systolic)
   const hrSeries = [...state.selfVitals].reverse().slice(-10).map((v) => v.heartRate)
@@ -1390,9 +1417,57 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
     setTimeout(() => win.print(), 400)
   }
 
+  // #7: anomaly detection — flag vitals outside safe ranges (uses current monitor inputs).
+  const anomalies: { level: 'warn' | 'crit'; text: string }[] = []
+  if (spo2 > 0 && spo2 < 90) anomalies.push({ level: 'crit', text: `SpO2 ${spo2}% sangat rendah — segera cari pertolongan medis.` })
+  else if (spo2 > 0 && spo2 < 95) anomalies.push({ level: 'warn', text: `SpO2 ${spo2}% di bawah normal (≥95%). Pantau & istirahat.` })
+  if (hr > 120) anomalies.push({ level: 'crit', text: `Detak jantung ${hr} bpm sangat tinggi saat istirahat.` })
+  else if (hr > 100) anomalies.push({ level: 'warn', text: `Detak jantung ${hr} bpm (takikardia ringan). Tenangkan diri.` })
+  else if (hr > 0 && hr < 50) anomalies.push({ level: 'warn', text: `Detak jantung ${hr} bpm rendah (bradikardia). Pantau jika disertai pusing.` })
+  if (tempC >= 39) anomalies.push({ level: 'crit', text: `Suhu ${tempC}°C demam tinggi.` })
+  else if (tempC >= 37.8) anomalies.push({ level: 'warn', text: `Suhu ${tempC}°C menandakan demam.` })
+  if (sys >= 180 || dia >= 120) anomalies.push({ level: 'crit', text: `Tekanan darah ${sys}/${dia} krisis hipertensi — butuh penanganan segera.` })
+  else if (sys >= 140 || dia >= 90) anomalies.push({ level: 'warn', text: `Tekanan darah ${sys}/${dia} tinggi (hipertensi). Kurangi garam & kelola stres.` })
+  else if (sys > 0 && sys < 90) anomalies.push({ level: 'warn', text: `Tekanan darah ${sys}/${dia} rendah. Cukupi cairan.` })
+
+  // #6: AI Health Assistant — rekomendasi kontekstual dari data pengguna (rule-based, offline).
+  const insights: string[] = []
+  if (bmi >= 25) insights.push(`BMI Anda ${bmi.toFixed(1)} (${bmiCat.l}). Defisit ~300-500 kkal/hari dari TDEE (${tdee} kkal) + kardio 3x/minggu membantu menurunkan berat secara sehat.`)
+  else if (bmi < 18.5) insights.push(`BMI Anda ${bmi.toFixed(1)} tergolong kurus. Tambah asupan bergizi dan latihan kekuatan untuk massa otot.`)
+  else insights.push(`BMI Anda ${bmi.toFixed(1)} ideal — pertahankan dengan ${tdee} kkal/hari dan aktivitas rutin.`)
+  if (todaySleep && sleepScore < 70) insights.push(`Skor tidur ${sleepScore}/100. Coba tidur 7-9 jam dengan jadwal konsisten untuk pemulihan optimal.`)
+  if (!todaySleep) insights.push('Anda belum mencatat tidur hari ini — pantau durasi & konsistensi untuk insight lebih akurat.')
+  const vForAdvice = lastVo2?.value ?? vo2max
+  if (vForAdvice < 40) insights.push(`VO2Max ${vForAdvice} masih bisa ditingkatkan. Latihan interval (HIIT) 1-2x/minggu efektif menaikkan kebugaran kardio.`)
+  else insights.push(`VO2Max ${vForAdvice} tergolong baik — pertahankan latihan aerobik rutin.`)
+  if (checkInStreak >= 3) insights.push(`Hebat! Streak check-in ${checkInStreak} hari. Konsistensi adalah kunci kesehatan jangka panjang. 🔥`)
+  insights.push(`Target cairan hari ini ~${(waterMl / 1000).toFixed(1)} liter. Sebarkan minum sepanjang hari, jangan sekaligus.`)
+
   return (
     <div className="space-y-4">
       <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Pusat Kesehatan Realtime</h4>
+
+      {/* #6 + #7: Asisten Kesehatan AI dengan deteksi anomali */}
+      <Card className="space-y-3">
+        <div className="text-xs font-black text-ink">🤖 Asisten Kesehatan AI</div>
+        {anomalies.length > 0 && (
+          <div className="space-y-1.5">
+            {anomalies.map((a, i) => (
+              <div key={i} className={`flex items-start gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold ${a.level === 'crit' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}>
+                <span>{a.level === 'crit' ? '🚨' : '⚠️'}</span><span>{a.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="space-y-1.5">
+          {insights.map((t, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
+              <span className="text-brand-dark">💡</span><span>{t}</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-neutral-400">Analisis otomatis berdasarkan data yang Anda catat. Bukan pengganti konsultasi tenaga medis profesional.</p>
+      </Card>
 
       {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
       <Card className="space-y-3">
@@ -1442,6 +1517,13 @@ function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
           <Field label="SpO2 (%)"><input type="number" value={spo2} onChange={(e) => setSpo2(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
           <Field label="Suhu (°C)"><input type="number" step={0.1} value={tempC} onChange={(e) => setTempC(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
+        {/* #8: koneksi wearable BLE untuk HR live */}
+        {bleStatus !== 'unsupported' && (
+          <button onClick={connectWearable} disabled={bleStatus === 'connecting' || bleStatus === 'connected'}
+            className="w-full rounded-xl border border-brand/30 bg-brand-50 px-3 py-2 text-xs font-bold text-brand-dark disabled:opacity-60">
+            {bleStatus === 'connected' ? '⌚ Wearable terhubung — HR live' : bleStatus === 'connecting' ? 'Menghubungkan…' : bleStatus === 'error' ? '⚠ Gagal — coba lagi' : '⌚ Hubungkan Wearable (Bluetooth)'}
+          </button>
+        )}
         <button onClick={() => addSelfVital({ systolic: sys, diastolic: dia, heartRate: hr, spo2, tempC })}
           className="w-full rounded-xl px-4 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           Catat Vital Sekarang
