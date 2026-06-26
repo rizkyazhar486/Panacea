@@ -206,7 +206,7 @@ export interface SocialPost {
   // TikTok-style media & social state
   photos?: string[] // real uploaded images (data URLs) or gradient color placeholders
   videoUrl?: string // uploaded short video (object URL)
-  videoSec?: number // short video length (<=30s)
+  videoSec?: number // video length in seconds (<=180s / 3 min)
   audio?: string // selected background song title
   location?: string // tagged location
   archived?: boolean // hidden/archived by the owner
@@ -220,6 +220,19 @@ export interface SocialPost {
   repostedByMe?: boolean
   bookmarkedByMe?: boolean
   at: string
+}
+
+// -------- Stories (Instagram-style, 24h ephemeral) -------------------------
+export interface Story {
+  id: string
+  authorEmail: string
+  authorName: string
+  mediaColor: string
+  image?: string // data URL / object URL photo
+  video?: string // data URL / object URL short video
+  caption?: string
+  at: string
+  comments?: PostComment[] // live/direct replies shown over the story
 }
 
 // -------- Nutrition / calorie diary ----------------------------------------
@@ -407,6 +420,7 @@ export interface AppState {
   authorSubPrices: Record<string, number> // authorEmail -> monthly PNC price
   authorSubs: Record<string, string> // authorEmail -> subscription expiry ISO
   posts: SocialPost[]
+  stories: Story[]
   follows: string[] // emails the current account follows
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date

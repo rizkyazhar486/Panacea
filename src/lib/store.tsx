@@ -18,6 +18,7 @@ import type {
   Account,
   Role,
   SocialPost,
+  Story,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -95,6 +96,7 @@ function seed(): AppState {
     authorSubPrices: {},
     authorSubs: {},
     posts: [],
+    stories: [],
     follows: [],
     foods: [],
     wellness: {},
@@ -169,6 +171,9 @@ interface Store {
   toggleRepost: (id: string) => void
   toggleBookmark: (id: string) => void
   toggleFollow: (email: string) => void
+  addStory: (s: Story) => void
+  addStoryComment: (storyId: string, text: string, authorName: string) => void
+  deleteStory: (id: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -522,6 +527,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ? st.follows.filter((e) => e !== email)
             : [...st.follows, email],
         })),
+      addStory: (s) => setState((st) => ({ ...st, stories: [s, ...st.stories] })),
+      addStoryComment: (storyId, text, authorName) =>
+        setState((st) => ({
+          ...st,
+          stories: st.stories.map((s) =>
+            s.id === storyId
+              ? { ...s, comments: [...(s.comments ?? []), { id: uid(), authorName, text, at: new Date().toISOString() }] }
+              : s,
+          ),
+        })),
+      deleteStory: (id) => setState((st) => ({ ...st, stories: st.stories.filter((s) => s.id !== id) })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

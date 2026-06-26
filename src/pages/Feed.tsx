@@ -8,7 +8,7 @@ import {
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { uploadOrLocal } from '../lib/upload'
-import type { SocialPost, PostType, Role, ProfileEdit } from '../lib/types'
+import type { SocialPost, PostType, Role, ProfileEdit, Story } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
    GPS SPORTS MODES
@@ -70,6 +70,21 @@ function ColoredIcon({ children, color }: { children: React.ReactNode; color: st
 }
 function isImg(s: string): boolean { return s.startsWith('data:') || s.startsWith('blob:') || s.startsWith('http') }
 function hash(s: string): number { let h = 0; for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i); return h }
+
+/** Probe a local video file's duration (seconds) before upload, so we can enforce the 3-minute cap. */
+function getVideoDuration(file: File): Promise<number> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file)
+    const v = document.createElement('video')
+    v.preload = 'metadata'
+    v.onloadedmetadata = () => { const d = v.duration; URL.revokeObjectURL(url); resolve(Number.isFinite(d) ? d : 0) }
+    v.onerror = () => { URL.revokeObjectURL(url); resolve(0) }
+    v.src = url
+  })
+}
+
+const SONGS = ['Tanpa Musik', '🎵 Morning Vibes', '🎵 Upbeat Workout', '🎵 Chill Lo-fi', '🎵 Acoustic Calm', '🎵 Energetic Pop']
+const MAX_VIDEO_SEC = 180 // 3 minutes
 
 /* ═══════════════════════════════════════════════════════
    CALCULATIONS: BMI, BMR, VO2Max, HIIT Indicator
@@ -429,6 +444,167 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
 }
 
 /* ═══════════════════════════════════════════════════════
+   STORIES — Instagram-style 24h ephemeral stories with a
+   full-screen viewer and live/direct comment replies.
+   ═══════════════════════════════════════════════════════ */
+const STORY_TTL_MS = 24 * 60 * 60 * 1000
+
+interface StoryGroup { authorEmail: string; authorName: string; mediaColor: string; stories: Story[] }
+
+function StoryViewer({ group, onClose, onComment }: {
+  group: StoryGroup; onClose: () => void; onComment: (storyId: string, text: string) => void
+}) {
+  const [idx, setIdx] = useState(0)
+  const [draft, setDraft] = useState('')
+  const story = group.stories[idx]
+  const DURATION = story.video ? 15000 : 5000
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (idx < group.stories.length - 1) setIdx((i) => i + 1)
+      else onClose()
+    }, DURATION)
+    return () => clearTimeout(t)
+  }, [idx, DURATION, group.stories.length, onClose])
+
+  function send() {
+    const text = draft.trim()
+    if (!text) return
+    onComment(story.id, text)
+    setDraft('')
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="relative flex h-full w-full max-w-md flex-col">
+        {/* Progress segments */}
+        <div className="absolute left-0 right-0 top-0 z-10 flex gap-1 p-2">
+          {group.stories.map((s, i) => (
+            <div key={s.id} className="h-1 flex-1 overflow-hidden rounded-full bg-white/30">
+              <div className="h-full bg-white" style={{ width: i < idx ? '100%' : i === idx ? '100%' : '0%', transition: i === idx ? `width ${DURATION}ms linear` : undefined }} />
+            </div>
+          ))}
+        </div>
+
+        {/* Header */}
+        <div className="absolute left-0 right-0 top-5 z-10 flex items-center justify-between px-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: group.mediaColor }}>{initials(group.authorName)}</div>
+            <div className="text-xs font-bold text-white drop-shadow">{group.authorName}</div>
+            <div className="text-[10px] text-white/70">{timeAgo(story.at)}</div>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full bg-black/30 text-white"><IconX size={16} /></button>
+        </div>
+
+        {/* Tap zones to navigate */}
+        <button aria-label="Sebelumnya" className="absolute left-0 top-0 z-[5] h-full w-1/3" onClick={() => setIdx((i) => Math.max(0, i - 1))} />
+        <button aria-label="Selanjutnya" className="absolute right-0 top-0 z-[5] h-full w-1/3" onClick={() => (idx < group.stories.length - 1 ? setIdx((i) => i + 1) : onClose())} />
+
+        {/* Media */}
+        <div className="flex flex-1 items-center justify-center overflow-hidden" style={{ background: story.image || story.video ? '#000' : group.mediaColor }}>
+          {story.video
+            ? <video src={story.video} className="h-full w-full object-contain" autoPlay muted playsInline />
+            : story.image
+              ? <img src={story.image} className="h-full w-full object-contain" alt="" />
+              : <div className="px-8 text-center text-lg font-bold text-white">{story.caption}</div>}
+        </div>
+        {story.caption && (story.image || story.video) && (
+          <div className="absolute bottom-20 left-0 right-0 px-4 text-center text-sm font-semibold text-white drop-shadow">{story.caption}</div>
+        )}
+
+        {/* Live comment feed (most recent on top, IG-style direct reply) */}
+        {(story.comments?.length ?? 0) > 0 && (
+          <div className="absolute bottom-16 left-0 right-0 z-10 max-h-32 space-y-1.5 overflow-y-auto px-4">
+            {story.comments!.slice(-4).map((c) => (
+              <div key={c.id} className="inline-block w-full rounded-2xl bg-black/35 px-3 py-1.5 text-[11px] text-white">
+                <b>{c.authorName}</b> {c.text}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Direct reply input */}
+        <div className="z-10 flex items-center gap-2 p-3" onClick={(e) => e.stopPropagation()}>
+          <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
+            placeholder="Balas langsung..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
+          <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <IconSend size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
+  stories: Story[]; viewerEmail: string; viewerName: string; onAddStory: (s: Story) => void
+}) {
+  const [openGroup, setOpenGroup] = useState<StoryGroup | null>(null)
+  const [busy, setBusy] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const { addStoryComment } = useStore()
+
+  const active = useMemo(() => stories.filter((s) => Date.now() - new Date(s.at).getTime() < STORY_TTL_MS), [stories])
+  const groups = useMemo(() => {
+    const byAuthor = new Map<string, StoryGroup>()
+    for (const s of active) {
+      const g = byAuthor.get(s.authorEmail)
+      if (g) g.stories.push(s)
+      else byAuthor.set(s.authorEmail, { authorEmail: s.authorEmail, authorName: s.authorName, mediaColor: s.mediaColor, stories: [s] })
+    }
+    for (const g of byAuthor.values()) g.stories.reverse() // oldest-first within a group
+    return Array.from(byAuthor.values())
+  }, [active])
+
+  async function pickStory(file?: File) {
+    if (!file) return
+    setBusy(true)
+    try {
+      if (file.type.startsWith('video/')) {
+        const dur = await getVideoDuration(file)
+        if (dur > MAX_VIDEO_SEC) { alert(`Video story maksimal ${MAX_VIDEO_SEC / 60} menit.`); return }
+        const url = await uploadOrLocal(file)
+        onAddStory({ id: uid(), authorEmail: viewerEmail, authorName: viewerName, mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)], video: url, at: new Date().toISOString(), comments: [] })
+      } else {
+        const url = await uploadOrLocal(file)
+        onAddStory({ id: uid(), authorEmail: viewerEmail, authorName: viewerName, mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)], image: url, at: new Date().toISOString(), comments: [] })
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+      <button onClick={() => fileRef.current?.click()} disabled={busy} className="flex shrink-0 flex-col items-center gap-1">
+        <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-dashed border-brand/40 bg-brand-50 text-brand-dark">
+          <IconPlus size={20} />
+        </span>
+        <span className="text-[10px] font-semibold text-neutral-500">{busy ? 'Mengunggah…' : 'Story Anda'}</span>
+      </button>
+      <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => pickStory(e.target.files?.[0])} />
+      {groups.map((g) => (
+        <button key={g.authorEmail} onClick={() => setOpenGroup(g)} className="flex shrink-0 flex-col items-center gap-1">
+          <span className="grid h-14 w-14 place-items-center rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, #00BF63, #f59e0b, #FF3131)' }}>
+            <span className="grid h-full w-full place-items-center rounded-full border-2 border-white text-sm font-bold text-white" style={{ backgroundColor: g.mediaColor }}>
+              {initials(g.authorName)}
+            </span>
+          </span>
+          <span className="max-w-[60px] truncate text-[10px] font-semibold text-neutral-500">{g.authorName.split(' ')[0]}</span>
+        </button>
+      ))}
+      {openGroup && (
+        <StoryViewer
+          group={openGroup}
+          onClose={() => setOpenGroup(null)}
+          onComment={(storyId, text) => addStoryComment(storyId, text, viewerName)}
+        />
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
    COMPOSE MODAL (Penyempurnaan Potongan Kode Akhir)
    ═══════════════════════════════════════════════════════ */
 function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, role }: {
@@ -439,8 +615,13 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
   const [activity, setActivity] = useState('')
   const [postType, setPostType] = useState<PostType>('aktivitas')
   const [photos, setPhotos] = useState<string[]>([])
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  const [videoSec, setVideoSec] = useState(0)
+  const [song, setSong] = useState(SONGS[0])
   const [busy, setBusy] = useState(false)
+  const [videoErr, setVideoErr] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLInputElement>(null)
 
   async function pickFiles(files: FileList | null) {
     if (!files) return
@@ -454,14 +635,27 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
     setBusy(false)
   }
 
+  async function pickVideo(file?: File) {
+    if (!file) return
+    setVideoErr('')
+    const dur = await getVideoDuration(file)
+    if (dur > MAX_VIDEO_SEC) { setVideoErr(`Video maksimal ${MAX_VIDEO_SEC / 60} menit (durasi terdeteksi ${Math.round(dur)} detik).`); return }
+    setBusy(true)
+    const url = await uploadOrLocal(file)
+    setVideoUrl(url); setVideoSec(Math.round(dur))
+    setBusy(false)
+  }
+
   function submit() {
-    if (!caption.trim() && photos.length === 0) return
+    if (!caption.trim() && photos.length === 0 && !videoUrl) return
     onPost({
       id: uid(), authorEmail, authorName, role,
-      postType, kind: photos.length > 0 ? 'image' : 'text',
+      postType, kind: videoUrl ? 'video' : photos.length > 0 ? 'image' : 'text',
       activity: activity || 'Postingan', caption: caption.trim(),
       mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)],
-      photos, likes: 0, comments: 0, reposts: 0,
+      photos, videoUrl: videoUrl ?? undefined, videoSec: videoUrl ? videoSec : undefined,
+      audio: song !== SONGS[0] ? song : undefined,
+      likes: 0, comments: 0, reposts: 0,
       at: new Date().toISOString(),
     })
   }
@@ -495,6 +689,18 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
           </div>
         )}
 
+        {/* Video preview */}
+        {videoUrl && (
+          <div className="px-5 pb-3">
+            <div className="relative w-full overflow-hidden rounded-xl bg-black">
+              <video src={videoUrl} className="max-h-56 w-full object-contain" controls />
+              <button onClick={() => { setVideoUrl(null); setVideoSec(0) }} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-xs"><IconX size={12} /></button>
+            </div>
+            <p className="mt-1 text-[10px] text-neutral-400">Durasi: {videoSec}s / {MAX_VIDEO_SEC}s maks.</p>
+          </div>
+        )}
+        {videoErr && <p className="px-5 pb-2 text-[11px] font-medium text-accent">{videoErr}</p>}
+
         {/* Type & Activity */}
         <div className="px-5 pb-3 flex gap-2">
           <select className={inputClass + ' flex-1'} value={postType} onChange={e => setPostType(e.target.value as PostType)}>
@@ -510,13 +716,24 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
         <div className="px-5 pb-5 space-y-4">
           <textarea className="w-full h-28 p-3 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:border-brand resize-none" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
           
-          <div className="flex items-center justify-between">
-            <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition">
-              📸 {busy ? 'Mengunggah...' : 'Tambah Media'}
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => fileRef.current?.click()} disabled={!!videoUrl} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition disabled:opacity-40">
+              📸 {busy ? 'Mengunggah...' : 'Foto'}
             </button>
             <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={e => pickFiles(e.target.files)} />
-            
-            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0)} className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+
+            <button onClick={() => videoRef.current?.click()} disabled={photos.length > 0} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition disabled:opacity-40">
+              <IconVideo size={14} /> {busy ? 'Mengunggah...' : 'Video (maks 3 mnt)'}
+            </button>
+            <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => pickVideo(e.target.files?.[0])} />
+
+            <select className="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-600 focus:outline-none" value={song} onChange={e => setSong(e.target.value)}>
+              {SONGS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div className="flex justify-end">
+            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               Kirim Postingan
             </button>
           </div>
@@ -530,11 +747,21 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 /* ═══════════════════════════════════════════════════════
    POST CARD — like / comment / share-as-logo (Feed "new face")
    ═══════════════════════════════════════════════════════ */
-function PostCard({ post, viewerName }: { post: SocialPost; viewerName: string }) {
-  const { toggleLike, updatePost } = useStore()
+function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
+  const { state, toggleLike, updatePost, toggleFollow, subscribeAuthor } = useStore()
   const [showComments, setShowComments] = useState(false)
   const [draft, setDraft] = useState('')
   const comments = post.commentList ?? []
+  const isOwnPost = post.authorEmail === viewerEmail
+  const following = state.follows.includes(post.authorEmail)
+  const subPrice = state.authorSubPrices[post.authorEmail] ?? 0
+  const subExpires = state.authorSubs[post.authorEmail]
+  const subscribed = !!subExpires && new Date(subExpires) > new Date()
+
+  function subscribeNow() {
+    const r = subscribeAuthor(post.authorEmail)
+    if (!r.ok) alert(r.reason ?? 'Gagal berlangganan.')
+  }
 
   function addComment() {
     const text = draft.trim()
@@ -574,24 +801,53 @@ function PostCard({ post, viewerName }: { post: SocialPost; viewerName: string }
             <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span></div>
           </div>
         </div>
-        {/* Share button rendered as a logo only (no text) */}
-        <button onClick={share} aria-label="Bagikan ke media sosial" title="Bagikan"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90"
-          style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
-          <IconShare2 size={15} />
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {!isOwnPost && (
+            <button onClick={() => toggleFollow(post.authorEmail)}
+              className={'rounded-full px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (following ? 'bg-neutral-100 text-neutral-500' : 'bg-brand/10 text-brand-dark')}>
+              {following ? 'Mengikuti' : '+ Ikuti'}
+            </button>
+          )}
+          {!isOwnPost && subPrice > 0 && (
+            <button onClick={subscribeNow} disabled={subscribed}
+              className={'rounded-full px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (subscribed ? 'bg-amber-50 text-amber-600' : 'bg-ink text-white')}>
+              {subscribed ? '✓ Berlangganan' : `Subscribe`}
+            </button>
+          )}
+          {/* Share button rendered as a logo only (no text) */}
+          <button onClick={share} aria-label="Bagikan ke media sosial" title="Bagikan"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90"
+            style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
+            <IconShare2 size={15} />
+          </button>
+        </div>
       </div>
 
       <div className="border-l-2 pl-3 py-0.5 text-xs text-neutral-700 font-medium" style={{ borderColor: post.mediaColor }}>{post.activity}</div>
       <p className="text-xs text-neutral-600 leading-relaxed whitespace-pre-wrap">{post.caption}</p>
 
-      {photos.length > 0 && (
+      {post.videoUrl ? (
+        <div className="relative overflow-hidden rounded-xl bg-black">
+          <video src={post.videoUrl} controls className="max-h-80 w-full object-contain" />
+          {post.videoSec ? (
+            <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+              {Math.floor(post.videoSec / 60)}:{String(post.videoSec % 60).padStart(2, '0')}
+            </span>
+          ) : null}
+        </div>
+      ) : photos.length > 0 && (
         <div className={'grid gap-1.5 rounded-xl overflow-hidden ' + (photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2')}>
           {photos.map((img, idx) => (
             isImg(img)
               ? <img key={idx} src={img} alt="" className="w-full h-40 object-cover" />
               : <div key={idx} className="w-full h-40" style={{ background: img }} />
           ))}
+        </div>
+      )}
+
+      {post.audio && (
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-semibold text-neutral-500">
+          🎵 {post.audio}
         </div>
       )}
 
@@ -638,7 +894,7 @@ function PostCard({ post, viewerName }: { post: SocialPost; viewerName: string }
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
-  const { state, account, addPost } = useStore()
+  const { state, account, addPost, addStory } = useStore()
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
@@ -676,6 +932,14 @@ export default function SportsSocialFeed() {
 
   return (
     <div className="max-w-xl mx-auto p-4 space-y-6">
+      {/* Stories (Instagram-style, 24h) */}
+      <StoriesBar
+        stories={state.stories}
+        viewerEmail={currentUser.email}
+        viewerName={currentUser.name}
+        onAddStory={addStory}
+      />
+
       {/* Widget Atas: GPS Tracking Engine */}
       <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} />
 
@@ -708,7 +972,7 @@ export default function SportsSocialFeed() {
           </div>
         ) : (
           posts.filter(p => !p.archived).map(p => (
-            <PostCard key={p.id} post={p} viewerName={currentUser.name} />
+            <PostCard key={p.id} post={p} viewerEmail={currentUser.email} viewerName={currentUser.name} />
           ))
         )}
       </div>
