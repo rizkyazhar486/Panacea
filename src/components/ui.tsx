@@ -14,7 +14,7 @@ export function Card({
   return (
     <div
       className={`rounded-2xl border border-white/50 bg-white/80 shadow-[0_8px_30px_rgba(12,20,16,0.05)] ring-1 ring-black/[0.03] backdrop-blur-xl ${
-        hover ? 'transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,191,99,0.14)]' : ''
+        hover ? 'transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]' : ''
       } ${pad ? 'p-5' : ''} ${className}`}
     >
       {children}
@@ -88,9 +88,10 @@ export function Button({
   className?: string
 }) {
   const styles: Record<string, string> = {
-    primary: 'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white hover:brightness-105 shadow-sm',
-    danger: 'bg-accent text-white hover:opacity-90 shadow-sm',
-    outline: 'border border-brand text-brand-dark hover:bg-brand-50',
+    primary:
+      'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white shadow-[0_6px_16px_rgba(0,191,99,0.28)] hover:shadow-[0_8px_22px_rgba(0,191,99,0.36)] hover:brightness-105',
+    danger: 'bg-accent text-white shadow-[0_6px_16px_rgba(255,49,49,0.25)] hover:opacity-90',
+    outline: 'border border-brand/40 text-brand-dark hover:border-brand hover:bg-brand-50',
     ghost: 'text-neutral-600 hover:bg-neutral-100',
   }
   return (
@@ -98,7 +99,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${styles[variant]} ${className}`}
     >
       {children}
     </button>
