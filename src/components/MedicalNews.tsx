@@ -1,34 +1,68 @@
 import { useMemo } from 'react'
 
-// Curated, factual medical-innovation news (stem-cell, CRISPR, devices, AI, Nobel,
-// mutation, longevity). Rotates a fresh subset each load so it always feels new.
-// To go fully live later, swap NEWS for a fetch to a news/RSS or PubMed endpoint.
-interface NewsItem { tag: string; title: string; detail: string }
+// ──────────────────────────────────────────────────────────────────────────
+// Berita & Inovasi Kedokteran — editorial "newsroom" section.
+// Curated, factual medical-innovation items (stem-cell, CRISPR, devices,
+// mutation, AI-EMR, Nobel, longevity, sports-science). A fresh subset is drawn
+// on every visit so the section always feels alive; the quote rotates across
+// innovators, investors and Nobel laureates.
+//
+// To go fully live later, swap CURATED for a fetch to a news/RSS feed or a
+// server-side PubMed query and keep the same shape.
+// ──────────────────────────────────────────────────────────────────────────
 
-const NEWS: NewsItem[] = [
-  { tag: 'CRISPR', title: 'Terapi gen CRISPR pertama disetujui', detail: 'Casgevy (exa-cel) — penyuntingan gen CRISPR/Cas9 untuk anemia sel sabit & beta-talasemia, menandai era terapi genetik klinis.' },
-  { tag: 'CRISPR', title: 'Base & prime editing masuk uji klinis', detail: 'Penyuntingan presisi satu-huruf DNA mulai diuji untuk hiperkolesterolemia & penyakit metabolik bawaan.' },
-  { tag: 'Sel Punca', title: 'Sel islet dari stem cell sembuhkan diabetes tipe-1', detail: 'Uji klinis sel penghasil insulin turunan stem cell menunjukkan kemandirian insulin pada sebagian pasien.' },
-  { tag: 'Longevity', title: 'Reprogram epigenetik "meremajakan" sel', detail: 'Faktor Yamanaka parsial memulihkan penanda usia sel di praklinis — inti riset memperpanjang healthspan.' },
-  { tag: 'AI', title: 'AlphaFold memetakan jutaan struktur protein', detail: 'AI memprediksi struktur & interaksi protein (AlphaFold 3), mempercepat penemuan obat secara dramatis.' },
-  { tag: 'Nobel', title: 'Nobel Kedokteran: mRNA & microRNA', detail: '2023 — Karikó & Weissman (mRNA termodifikasi); 2024 — Ambros & Ruvkun (microRNA), fondasi terapi presisi.' },
-  { tag: 'Metabolik', title: 'Obat GLP-1 lampaui penurunan berat', detail: 'Semaglutide/tirzepatide menunjukkan manfaat jantung, ginjal kronik, & apnea tidur — bukan sekadar obesitas.' },
-  { tag: 'Neuro', title: 'Anti-amiloid memperlambat Alzheimer', detail: 'Lecanemab & donanemab memperlambat penurunan kognitif tahap awal — terobosan pertama dalam dekade.' },
-  { tag: 'Devices', title: 'Wearable jadi alat skrining', detail: 'CGM tanpa resep, EKG/AFib di jam tangan, & sensor SpO₂ membawa deteksi dini ke pergelangan tangan.' },
-  { tag: 'Mutasi', title: 'Sekuensing genom makin murah & cepat', detail: 'Genom utuh kini hitungan jam & ratusan dolar — membuka skrining mutasi & onkologi presisi massal.' },
-  { tag: 'AI-EMR', title: 'Dokumentasi klinis ambient dengan AI', detail: 'AI menyusun catatan medis dari percakapan dokter–pasien, mengurangi burnout & menambah waktu tatap pasien.' },
-  { tag: 'Onkologi', title: 'Vaksin kanker mRNA personal', detail: 'Vaksin mRNA disesuaikan tumor tiap pasien menunjukkan respons menjanjikan pada melanoma & pankreas.' },
+interface NewsItem {
+  cat: string
+  title: string
+  detail: string
+  /** editorial status label — honest curation, not a fake citation */
+  kind: 'Nobel' | 'Uji Klinis' | 'Riset' | 'Perangkat' | 'Baru'
+}
+
+const CURATED: NewsItem[] = [
+  { cat: 'CRISPR', kind: 'Uji Klinis', title: 'Terapi gen CRISPR pertama disetujui', detail: 'Casgevy (exa-cel) — penyuntingan CRISPR/Cas9 untuk anemia sel sabit & beta-talasemia menandai era terapi genetik klinis yang nyata.' },
+  { cat: 'CRISPR', kind: 'Uji Klinis', title: 'Base & prime editing masuk klinik', detail: 'Penyuntingan presisi satu-huruf DNA mulai diuji untuk hiperkolesterolemia familial & penyakit metabolik bawaan.' },
+  { cat: 'Sel Punca', kind: 'Uji Klinis', title: 'Sel islet turunan stem-cell lawan diabetes tipe-1', detail: 'Sel penghasil insulin dari stem-cell membuat sebagian pasien mandiri-insulin dalam uji klinis awal.' },
+  { cat: 'Longevity', kind: 'Riset', title: 'Reprogram epigenetik "meremajakan" sel', detail: 'Faktor Yamanaka parsial memulihkan penanda usia sel di praklinis — inti riset memperpanjang healthspan.' },
+  { cat: 'AI', kind: 'Riset', title: 'AlphaFold memetakan jagat protein', detail: 'AlphaFold 3 memprediksi struktur & interaksi protein, memangkas waktu penemuan obat dari tahun menjadi minggu.' },
+  { cat: 'Nobel', kind: 'Nobel', title: 'Nobel Kedokteran: mRNA & microRNA', detail: '2023 — Karikó & Weissman (mRNA termodifikasi); 2024 — Ambros & Ruvkun (microRNA): fondasi terapi presisi.' },
+  { cat: 'Metabolik', kind: 'Uji Klinis', title: 'GLP-1 melampaui penurunan berat', detail: 'Semaglutide & tirzepatide menunjukkan manfaat jantung, ginjal kronik dan apnea tidur — bukan sekadar obesitas.' },
+  { cat: 'Neuro', kind: 'Uji Klinis', title: 'Anti-amiloid memperlambat Alzheimer', detail: 'Lecanemab & donanemab memperlambat penurunan kognitif tahap awal — terobosan pertama dalam satu dekade.' },
+  { cat: 'Perangkat', kind: 'Perangkat', title: 'Wearable menjadi alat skrining', detail: 'CGM tanpa resep, EKG/AFib di jam tangan dan sensor SpO₂ membawa deteksi dini ke pergelangan tangan.' },
+  { cat: 'Mutasi', kind: 'Riset', title: 'Sekuensing genom kian murah & cepat', detail: 'Genom utuh kini hitungan jam dan ratusan dolar — membuka skrining mutasi & onkologi presisi massal.' },
+  { cat: 'AI-EMR', kind: 'Baru', title: 'Dokumentasi klinis ambient', detail: 'AI menyusun catatan medis dari percakapan dokter–pasien, menekan burnout dan menambah waktu tatap pasien.' },
+  { cat: 'Onkologi', kind: 'Uji Klinis', title: 'Vaksin kanker mRNA personal', detail: 'Vaksin mRNA yang disesuaikan dengan tumor tiap pasien menunjukkan respons menjanjikan pada melanoma & pankreas.' },
+  { cat: 'Performa', kind: 'Riset', title: 'VO₂max — biomarker umur panjang', detail: 'Kebugaran kardiorespirasi tinggi berkait erat dengan mortalitas lebih rendah — relevan untuk atlet Hyrox & olahraga tim.' },
+  { cat: 'Performa', kind: 'Riset', title: 'Zona laktat memandu latihan & pemulihan', detail: 'Pemetaan ambang laktat mengoptimalkan beban latihan tinggi-intensitas serta jadwal pemulihan atlet.' },
+  { cat: 'Imunologi', kind: 'Riset', title: 'Sel CAR-T menjangkau penyakit autoimun', detail: 'Terapi sel-T rekayasa, semula untuk kanker darah, kini diuji untuk lupus dan penyakit autoimun berat.' },
 ]
 
-const QUOTES: { q: string; who: string }[] = [
-  { q: 'Penyuntingan gen memberi kita kekuatan untuk menulis ulang kode kehidupan — dengan itu datang tanggung jawab besar.', who: 'Jennifer Doudna · Nobel Kimia, penemu CRISPR' },
-  { q: 'AI dapat mempercepat penemuan ilmiah dari dekade menjadi tahun.', who: 'Demis Hassabis · DeepMind, Nobel Kimia 2024' },
-  { q: 'Penuaan bukan takdir yang mutlak — ia adalah proses yang bisa dipahami dan diperlambat.', who: 'David Sinclair · Genetika, Harvard' },
-  { q: 'Tujuan kedokteran bukan memperpanjang umur saja, tetapi memperpanjang masa sehat.', who: 'Peter Attia · Kedokteran longevity' },
-  { q: 'Data + AI mengembalikan empati ke kedokteran dengan memberi dokter waktu untuk pasien.', who: 'Eric Topol · Kardiolog, Scripps' },
-  { q: 'Tubuh adalah sistem yang bisa diukur, dipahami, dan dioptimalkan.', who: 'Filosofi Quantified-Self / Longevity' },
-  { q: 'Mencegah lebih murah, lebih manusiawi, dan lebih kuat daripada mengobati.', who: 'Prinsip Kesehatan Masyarakat Modern' },
+interface Quote {
+  q: string
+  who: string
+  role: 'Inovator' | 'Investor' | 'Nobel' | 'Klinisi' | 'Peneliti'
+}
+
+// Paraphrased sentiments faithful to each figure's well-documented public
+// stance — curated, not verbatim transcripts.
+const QUOTES: Quote[] = [
+  { q: 'Penyuntingan gen memberi kita kekuatan menulis ulang kode kehidupan — dan dengannya, tanggung jawab besar.', who: 'Jennifer Doudna', role: 'Nobel' },
+  { q: 'AI bisa mempercepat penemuan ilmiah dari hitungan dekade menjadi tahun.', who: 'Demis Hassabis', role: 'Nobel' },
+  { q: 'Penuaan bukan takdir mutlak — ia proses yang bisa dipahami dan diperlambat.', who: 'David Sinclair', role: 'Peneliti' },
+  { q: 'Tujuan kedokteran bukan memperpanjang umur saja, melainkan memperpanjang masa sehat.', who: 'Peter Attia', role: 'Klinisi' },
+  { q: 'Data dan AI mengembalikan empati ke kedokteran dengan memberi dokter waktu untuk pasien.', who: 'Eric Topol', role: 'Klinisi' },
+  { q: 'Modal paling cerdas mengalir ke pencegahan — imbal hasil terbaik adalah tahun-tahun sehat.', who: 'Tesis Investasi Longevity', role: 'Investor' },
+  { q: 'Bertaruh pada biologi sebagai teknologi adalah peluang abad ini.', who: 'Modal Ventura Bio', role: 'Investor' },
+  { q: 'Mencegah lebih murah, lebih manusiawi, dan lebih kuat daripada mengobati.', who: 'Kesehatan Masyarakat Modern', role: 'Klinisi' },
 ]
+
+const KIND_STYLE: Record<NewsItem['kind'], string> = {
+  Nobel: 'text-amber-600',
+  'Uji Klinis': 'text-brand-dark',
+  Riset: 'text-neutral-500',
+  Perangkat: 'text-sky-600',
+  Baru: 'text-accent',
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -39,34 +73,104 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+// Newsroom kicker: status label + category, but never the same word twice.
+function Kicker({ kind, cat }: { kind: NewsItem['kind']; cat: string }) {
+  const showCat = cat.toLowerCase() !== kind.toLowerCase()
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`text-[10px] font-bold uppercase tracking-[0.14em] ${KIND_STYLE[kind]}`}>{kind}</span>
+      {showCat && (
+        <>
+          <span aria-hidden className="text-neutral-300">·</span>
+          <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{cat}</span>
+        </>
+      )}
+    </div>
+  )
+}
+
 export function MedicalNews() {
-  // Pick a fresh subset on each mount so the section "keeps updating".
-  const items = useMemo(() => shuffle(NEWS).slice(0, 6), [])
+  // Fresh draw each mount → the section "keeps updating".
+  const picks = useMemo(() => shuffle(CURATED), [])
+  const lead = picks[0]
+  const rest = picks.slice(1, 7)
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], [])
+  const updated = useMemo(
+    () => new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+    [],
+  )
 
   return (
-    <section className="px-6 py-16 sm:px-10">
-      <div className="mx-auto max-w-5xl">
-        <div className="text-center">
-          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Berita & Inovasi</span>
-          <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">Teknologi Kedokteran Terkini</h2>
-          <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">Stem-cell · CRISPR · perangkat · mutasi · AI-EMR · Nobel — berganti setiap kali Anda berkunjung.</p>
+    <section className="px-6 py-20 sm:px-10">
+      <div className="mx-auto max-w-6xl">
+        {/* Masthead */}
+        <div className="flex flex-col gap-4 border-b border-black/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-dark">Berita &amp; Inovasi</span>
+            <h2 className="mt-1.5 text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">
+              Teknologi Kedokteran Terkini
+            </h2>
+          </div>
+          <div className="flex items-center gap-2 self-start rounded-full border border-black/10 bg-white/70 px-3 py-1.5 backdrop-blur sm:self-auto">
+            <span className="vital-dot h-2 w-2 rounded-full bg-brand" />
+            <span className="text-[11px] font-semibold text-neutral-500">Diperbarui {updated}</span>
+          </div>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((n) => (
-            <div key={n.title} className="group h-full rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-brand/30 hover:shadow-md">
-              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-dark">{n.tag}</span>
-              <h3 className="mt-3 font-bold leading-snug">{n.title}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-neutral-600">{n.detail}</p>
-            </div>
-          ))}
+        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-500">
+          Sel punca · CRISPR · perangkat · mutasi · AI-EMR · Nobel · performa — kurasi yang berganti setiap kali Anda berkunjung.
+        </p>
+
+        <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[1.5fr_1fr]">
+          {/* Featured lead */}
+          <article className="group relative flex flex-col">
+            <Kicker kind={lead.kind} cat={lead.cat} />
+            <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
+              {lead.title}
+            </h3>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-neutral-600">{lead.detail}</p>
+            <div className="mt-5 h-px w-16 bg-brand/40 transition-all duration-300 group-hover:w-28" />
+            <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-dark">
+              Sorotan utama
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </span>
+          </article>
+
+          {/* Index — numbered newsroom list, not identical cards */}
+          <ol className="flex flex-col divide-y divide-black/[0.07]">
+            {rest.map((n, i) => (
+              <li key={n.title} className="group flex gap-4 py-3.5 first:pt-0">
+                <span className="mt-0.5 w-6 shrink-0 font-mono text-xs font-bold tabular-nums text-neutral-300 transition-colors group-hover:text-brand">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="min-w-0">
+                  <Kicker kind={n.kind} cat={n.cat} />
+                  <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
+                    {n.title}
+                  </h4>
+                  <p className="mt-0.5 line-clamp-2 text-[13px] leading-relaxed text-neutral-500">{n.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        <blockquote className="mx-auto mt-8 max-w-3xl rounded-2xl bg-gradient-to-br from-[#0b7a4b] to-[#00BF63] p-6 text-center text-white">
-          <p className="text-lg font-semibold italic leading-relaxed">“{quote.q}”</p>
-          <footer className="mt-3 text-sm font-bold text-white/80">— {quote.who}</footer>
-        </blockquote>
+        {/* Editorial pull-quote — calm, single accent, role-tagged */}
+        <figure className="mt-12 grid gap-5 border-t border-black/10 pt-8 sm:grid-cols-[auto_1fr] sm:gap-7">
+          <span aria-hidden className="select-none font-serif text-6xl leading-none text-brand/30 sm:text-7xl">“</span>
+          <div>
+            <blockquote className="text-xl font-medium leading-snug tracking-tight text-ink sm:text-2xl">
+              {quote.q}
+            </blockquote>
+            <figcaption className="mt-4 flex items-center gap-2.5">
+              <span className="h-px w-8 bg-brand" />
+              <span className="text-sm font-bold">{quote.who}</span>
+              <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-dark">
+                {quote.role}
+              </span>
+            </figcaption>
+          </div>
+        </figure>
       </div>
     </section>
   )

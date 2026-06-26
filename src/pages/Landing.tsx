@@ -269,40 +269,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </ul>
       </section>
 
-      {/* ── INOVASI KEDOKTERAN (sorotan 3 tahun terakhir) ─────────── */}
-      <section className="px-6 py-16 sm:px-10">
-        <Reveal>
-          <div className="mx-auto max-w-5xl text-center">
-            <h2 className="text-2xl font-extrabold sm:text-3xl">Sorotan Inovasi Kedokteran Terkini</h2>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">Panaceamed dibangun di atas sains terbaru tentang longevity, sel punca, dan kecerdasan buatan.</p>
-          </div>
-        </Reveal>
-        <div className="mx-auto mt-8 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { tag: 'Nobel Kedokteran 2023', t: 'mRNA termodifikasi', d: 'Katalin Karikó & Drew Weissman — modifikasi basa nukleosida yang memungkinkan vaksin mRNA COVID-19, membuka era terapi mRNA.' },
-            { tag: 'Nobel Kedokteran 2024', t: 'microRNA', d: 'Victor Ambros & Gary Ruvkun — penemuan microRNA & perannya dalam regulasi gen, fondasi diagnostik & terapi presisi.' },
-            { tag: 'Nobel Kimia 2024', t: 'AI & struktur protein', d: 'AlphaFold (Hassabis & Jumper) — AI memprediksi struktur protein, mempercepat penemuan obat secara dramatis.' },
-            { tag: 'Longevity', t: 'Reprogram epigenetik', d: 'Faktor Yamanaka & senolitik diteliti untuk "meremajakan" sel dan memperpanjang healthspan — inti pendekatan longevity.' },
-            { tag: 'Sel Punca', t: 'Terapi regeneratif', d: 'Sel punca (stem cell) untuk regenerasi jaringan & penyakit degeneratif terus berkembang dalam uji klinis global.' },
-            { tag: 'Pandemi → Endemi', t: 'Kesiapsiagaan', d: 'Transisi COVID-19 ke endemi menegaskan pentingnya pemantauan kesehatan berkelanjutan & deteksi dini berbasis data.' },
-          ].map((c) => (
-            <Reveal key={c.t}>
-              <div className="h-full rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
-                <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-dark">{c.tag}</span>
-                <h3 className="mt-3 font-bold">{c.t}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-neutral-600">{c.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal>
-          <blockquote className="mx-auto mt-8 max-w-3xl rounded-2xl bg-brand-50/60 p-6 text-center text-lg font-semibold italic text-brand-dark">
-            "Tujuan kedokteran bukan sekadar memperpanjang umur, tetapi memperpanjang masa sehat (healthspan)."
-          </blockquote>
-        </Reveal>
-      </section>
-
-      {/* ── BERITA & INOVASI (rotating) ───────────────────────────── */}
+      {/* ── BERITA & INOVASI KEDOKTERAN (editorial, rotating) ─────── */}
       <MedicalNews />
 
       {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
