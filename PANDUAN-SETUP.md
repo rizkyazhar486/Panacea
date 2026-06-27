@@ -248,6 +248,43 @@ sering hanya berhasil di Wi-Fi yang sama. Cara termudah (terkelola, bayar pakai)
 
 ---
 
+## Bagian 7 — Nyalakan Notifikasi di HP (Owner, Penarikan, Verifikator) 🔔
+
+Agar Anda (owner) menerima pemberitahuan **setiap ada permintaan penarikan PNC**
+(lengkap dengan nomor rekening, untuk transfer manual maks 1×24 jam), serta
+notifikasi untuk verifikator & pengaju, lakukan ini:
+
+### A. Di HP Anda (sekali saja)
+1. **iPhone (Safari):** buka website → tombol **Bagikan** (kotak panah ke atas)
+   → **Tambahkan ke Layar Utama**. Buka aplikasi dari ikon yang baru muncul.
+   *(iOS hanya mengizinkan notifikasi untuk aplikasi yang sudah di Layar Utama.)*
+   **Android (Chrome):** buka website → menu ⋮ → **Instal aplikasi**.
+2. Masuk ke akun **owner** (`rizkyazhar486@gmail.com`).
+3. Buka **menu ⚙️ Pengaturan** di aplikasi → bagian **Notifikasi** →
+   ketuk **"Aktifkan notifikasi push"** → saat browser bertanya, pilih **Izinkan**.
+4. Ketuk **"Kirim notifikasi uji"** — bila muncul pemberitahuan, berarti berhasil. ✅
+
+### B. Agar notifikasi terkirim dari server (sekali saja, oleh Anda)
+Notifikasi push butuh sepasang "kunci VAPID" di server. Cara termudah:
+1. Buka **https://vapidkeys.com** → klik **Generate** → akan muncul **Public Key**
+   dan **Private Key**.
+2. Di **Render** (lihat Bagian 0), tambah 3 environment variable:
+   - `VAPID_PUBLIC_KEY` = (public key)
+   - `VAPID_PRIVATE_KEY` = (private key)
+   - `VAPID_SUBJECT` = `mailto:rizkyazhar486@gmail.com`
+3. Save → server redeploy otomatis. Sejak ini, notifikasi terkirim ke HP.
+
+### Siapa menerima apa
+- **Owner** (`rizkyazhar486@gmail.com`): notifikasi **setiap penarikan PNC** berisi
+  nama pengaju, nominal, bank & nomor rekening → Anda transfer manual ≤1×24 jam.
+- **Pengaju penarikan & verifikator**: cukup lakukan **Langkah A** di akun
+  masing-masing untuk menerima pembaruan status (disetujui/ditolak/diproses).
+
+> Tanpa Langkah B, notifikasi tetap muncul **di dalam aplikasi** (ikon 🔔 di atas),
+> hanya saja tidak "menyembul" ke layar HP saat aplikasi tertutup.
+
+---
+
 ## ✅ Ringkasan prioritas
 
 | Prioritas | Apa | Biaya | Hasil |
@@ -258,5 +295,6 @@ sering hanya berhasil di Wi-Fi yang sama. Cara termudah (terkelola, bayar pakai)
 | 4 | Midtrans (Bagian 3) | Perlu NPWP | Pembayaran asli |
 | 5 | Iris (Bagian 4) | Perlu Midtrans | Pencairan otomatis |
 | 6 | Realtime (Bagian 6) | Gratis* | Feed multi-user + konsultasi video |
+| 7 | Notifikasi HP (Bagian 7) | Gratis | Owner dapat alert penarikan PNC + nomor rekening |
 
 \* TURN untuk video (Langkah C) ada paket gratis; untuk skala besar berbayar sesuai pakai.

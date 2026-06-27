@@ -16,7 +16,7 @@ export const config = {
     isProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
   },
   tokenToIdr: Number(process.env.TOKEN_TO_IDR) || 1000,
-  aiConsultPnc: Number(process.env.AI_CONSULT_PNC) || 5,
+  aiConsultPnc: Number(process.env.AI_CONSULT_PNC) || 25,
   creatorSubPnc: Number(process.env.CREATOR_SUB_PNC) || 100, // monthly creator subscription
   creatorSubAdminPnc: Number(process.env.CREATOR_SUB_ADMIN_PNC) || 25, // platform cut
   vapid: {

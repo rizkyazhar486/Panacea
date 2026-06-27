@@ -1,7 +1,42 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
-import { IconRun, IconActivity, IconHeart } from '../components/icons'
+import { IconRun, IconActivity, IconHeart, IconX } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
+
+// Motivational quotes from legendary athletes (Olympic/medal/award winners &
+// globally followed icons) — shown as a welcome popup on the Athlete page.
+const ATHLETE_QUOTES: { quote: string; author: string; feat: string }[] = [
+  { quote: 'Kamu kalah 100% dari tembakan yang tidak kamu coba.', author: 'Michael Jordan', feat: '6× Juara NBA · Emas Olimpiade' },
+  { quote: 'Saya tidak menghitung sit-up. Saya baru mulai menghitung saat mulai sakit.', author: 'Muhammad Ali', feat: 'Legenda Tinju · Emas Olimpiade 1960' },
+  { quote: 'Bakat memenangkan pertandingan, tapi kerja sama & otak memenangkan kejuaraan.', author: 'Michael Jordan', feat: '14× NBA All-Star' },
+  { quote: 'Tubuh saya bisa menahan apa pun. Yang harus saya yakinkan adalah pikiran saya.', author: 'Usain Bolt', feat: '8× Emas Olimpiade · Rekor Dunia 100m' },
+  { quote: 'Keras kepala terhadap mimpi, fleksibel terhadap cara mencapainya.', author: 'Cristiano Ronaldo', feat: '5× Ballon d’Or · 600jt+ pengikut IG' },
+  { quote: 'Saya selalu percaya: jika kamu menempatkan kerja keras, hasil akan datang.', author: 'Lionel Messi', feat: '8× Ballon d’Or · Juara Dunia 2022' },
+  { quote: 'Juara terus bermain sampai mereka melakukannya dengan benar.', author: 'Serena Williams', feat: '23× Grand Slam · 4× Emas Olimpiade' },
+  { quote: 'Tekanan adalah hak istimewa — ia datang pada mereka yang berhasil.', author: 'Billie Jean King', feat: '39× Grand Slam · Presidential Medal of Freedom' },
+  { quote: 'Setiap orang punya batas. Yang membedakan adalah siapa yang berani melewatinya.', author: 'Eliud Kipchoge', feat: 'Maraton <2 jam · 2× Emas Olimpiade' },
+  { quote: 'Emas bukan tentang medali — tapi tentang menjadi versi terbaik dirimu.', author: 'Michael Phelps', feat: '23× Emas Olimpiade (terbanyak sepanjang masa)' },
+]
+
+function AthleteQuotePopup() {
+  const [q] = useState(() => ATHLETE_QUOTES[Math.floor(Math.random() * ATHLETE_QUOTES.length)])
+  const [open, setOpen] = useState(true)
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setOpen(false)}>
+      <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <button onClick={() => setOpen(false)} aria-label="Tutup" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+        <div className="mb-3 text-4xl">🏅</div>
+        <p className="text-lg font-bold leading-snug text-ink">“{q.quote}”</p>
+        <div className="mt-4 text-sm font-black text-brand-dark">{q.author}</div>
+        <div className="text-xs text-neutral-400">{q.feat}</div>
+        <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-white transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          Ayo Latihan! 💪
+        </button>
+      </div>
+    </div>
+  )
+}
 
 interface AthleteProfile { age: number; g: 'M' | 'F'; weight: number; hrRest: number; hrMax: number }
 
@@ -46,6 +81,7 @@ export function Athlete() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <AthleteQuotePopup />
       <div className="flex justify-end">
         <ShareToFeed activity="🏃 Performa Atlet" defaultCaption="Update latihan & performa saya hari ini 💪" />
       </div>

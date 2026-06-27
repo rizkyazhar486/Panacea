@@ -31,7 +31,7 @@ export function ContactService() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-lg transition hover:bg-brand-dark"
+        className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-brand text-white shadow-lg transition hover:bg-brand-dark lg:bottom-5 lg:right-5 lg:h-14 lg:w-14"
         title="Layanan / Contact Service"
         aria-label="Contact Service"
       >
@@ -39,7 +39,7 @@ export function ContactService() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+        <div className="fixed bottom-36 right-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 lg:bottom-24 lg:right-5">
           <div className="flex items-center gap-2 bg-ink px-4 py-3 text-white">
             <IconPhone size={18} className="text-brand" />
             <div className="text-sm font-bold">Layanan Panaceamed</div>

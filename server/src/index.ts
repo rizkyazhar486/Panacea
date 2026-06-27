@@ -140,6 +140,20 @@ app.post('/api/wallet/withdraw', requireAuth, async (req, res) => {
     ? `Penarikan Rp${amountIdr.toLocaleString('id-ID')} dibuat & menunggu persetujuan.`
     : `Penarikan Rp${amountIdr.toLocaleString('id-ID')} diterima — diproses manual oleh tim.`
   notify(u.id, { title: 'Penarikan diproses', body, url: '/billing' }, 'notifTransactions').catch(() => {})
+  // Notify the owner of every withdrawal so manual transfers (1×24 jam) can be
+  // actioned — includes the requester's bank account details.
+  const owner = getUserByEmail(config.ownerEmail)
+  if (owner && owner.id !== u.id) {
+    notify(
+      owner.id,
+      {
+        title: '💸 Permintaan Penarikan PNC',
+        body: `${u.name} menarik Rp${amountIdr.toLocaleString('id-ID')} → ${bank} ${accountNumber} a.n. ${accountHolder}. Proses manual maks 1×24 jam.`,
+        url: '/billing',
+      },
+      'notifTransactions',
+    ).catch(() => {})
+  }
   res.json({ ok: true, balance: balance(u.id), payout })
 })
 

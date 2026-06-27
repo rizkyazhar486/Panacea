@@ -1250,8 +1250,8 @@ const MYTH_QUIZ = [
 
 function bpCategory(sys: number, dia: number) {
   if (sys < 90 || dia < 60) return { label: 'Rendah', color: '#3B82F6' }
-  if (sys < 120 && dia < 80) return { label: 'Normal', color: '#00BF63' }
-  if (sys < 130 && dia < 80) return { label: 'Tinggi-Normal', color: '#84CC16' }
+  if (sys <= 120 && dia <= 80) return { label: 'Normal', color: '#00BF63' }
+  if (sys < 130 && dia < 85) return { label: 'Tinggi-Normal', color: '#84CC16' }
   if (sys < 140 || dia < 90) return { label: 'Hipertensi Tahap 1', color: '#F59E0B' }
   return { label: 'Hipertensi Tahap 2', color: '#EF4444' }
 }

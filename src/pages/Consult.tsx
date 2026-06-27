@@ -12,8 +12,8 @@ function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '').slice(0, 24)
 }
 
-const AI_FEE = 13000 // Rp13.000 / ≈ $1 — wajib untuk konsultasi AI (triase)
-const FEE = 35000 // sesi dokter manusia
+const AI_FEE = 35000 // Rp35.000 — konsultasi AI (triase + rujukan spesialis)
+const FEE = 90000 // Rp90.000 — sesi dokter manusia (telemedicine)
 
 // Real, verified doctors are onboarded here later — no dummy/example entries.
 // The roster is populated from STR-verified physician accounts.
@@ -117,7 +117,7 @@ export function Consult() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
-              <b>Rp{AI_FEE.toLocaleString('id-ID')}</b> (≈ $1) untuk konsultasi AI — termasuk rujukan ke dokter spesialis terdaftar.
+              <b>Rp{AI_FEE.toLocaleString('id-ID')}</b> untuk konsultasi AI — termasuk rujukan ke dokter spesialis terdaftar.
             </div>
             <Button onClick={payAITriage} disabled={!complaint.trim()}>
               <IconCheck size={16} /> Bayar & Mulai Triase AI

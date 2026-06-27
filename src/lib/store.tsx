@@ -176,10 +176,34 @@ function seed(): AppState {
   }
 }
 
+// --- Remembered session: keep the user logged in for 7 days, then auto-logout.
+const SESSION_KEY = 'panaceamed.session.v1'
+const SESSION_TTL = 7 * 86400000 // 7 hari
+
+function saveSession(account: Account) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify({ account, loginAt: Date.now() })) } catch { /* ignore */ }
+}
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY) } catch { /* ignore */ }
+}
+// Returns the remembered account if the session is still within 7 days, else
+// clears it (auto-logout) and returns null.
+function loadSession(): Account | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const { account, loginAt } = JSON.parse(raw) as { account: Account; loginAt: number }
+    if (!account || typeof loginAt !== 'number' || Date.now() - loginAt > SESSION_TTL) { clearSession(); return null }
+    return account
+  } catch { return null }
+}
+
 function load(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return { ...seed(), ...JSON.parse(raw) }
+    const base = raw ? { ...seed(), ...JSON.parse(raw) } : seed()
+    // Restore a remembered login (≤7 days) so frequent users stay signed in.
+    return { ...base, account: loadSession() }
   } catch {
     /* ignore */
   }
@@ -510,16 +534,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (account.role === 'pasien') {
             const self = patientFromAccount(account)
             const exists = st.patients.some((p) => p.id === self.id)
+            const acc = { ...account, patientId: self.id }
+            saveSession(acc) // remember login for 7 days
             return {
               ...st,
-              account: { ...account, patientId: self.id },
+              account: acc,
               patients: exists ? st.patients : [...st.patients, self],
               activePatientId: self.id,
             }
           }
+          saveSession(account) // remember login for 7 days
           return { ...st, account }
         }),
-      logout: () => setState((st) => ({ ...st, account: null })),
+      logout: () => { clearSession(); return setState((st) => ({ ...st, account: null })) },
       syncWalletBalance: (balance) =>
         setState((st) => (st.wallet.balance === balance ? st : { ...st, wallet: { ...st.wallet, balance } })),
       verifyStr: () => {
@@ -625,7 +652,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       buyChronicSub: (plan) => {
         const now = new Date()
         const lifetime = plan === 'lifetime'
-        const priceIdr = lifetime ? 7500000 : 50000
+        const priceIdr = lifetime ? 9900000 : 99000
         const expires = lifetime ? undefined : new Date(now.getTime() + 30 * 86400000).toISOString()
         setState((st) => ({
           ...st,

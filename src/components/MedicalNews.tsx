@@ -17,6 +17,8 @@ interface NewsItem {
   detail: string
   /** editorial status label — honest curation, not a fake citation */
   kind: 'Nobel' | 'Uji Klinis' | 'Riset' | 'Perangkat' | 'Baru'
+  /** liputan internasional vs dalam negeri (Indonesia) — default internasional */
+  region?: 'Internasional' | 'Dalam Negeri'
 }
 
 const CURATED: NewsItem[] = [
@@ -35,6 +37,13 @@ const CURATED: NewsItem[] = [
   { cat: 'Performa', kind: 'Riset', title: 'VO₂max — biomarker umur panjang', detail: 'Kebugaran kardiorespirasi tinggi berkait erat dengan mortalitas lebih rendah — relevan untuk atlet Hyrox & olahraga tim.' },
   { cat: 'Performa', kind: 'Riset', title: 'Zona laktat memandu latihan & pemulihan', detail: 'Pemetaan ambang laktat mengoptimalkan beban latihan tinggi-intensitas serta jadwal pemulihan atlet.' },
   { cat: 'Imunologi', kind: 'Riset', title: 'Sel CAR-T menjangkau penyakit autoimun', detail: 'Terapi sel-T rekayasa, semula untuk kanker darah, kini diuji untuk lupus dan penyakit autoimun berat.' },
+  // --- Dalam Negeri (Indonesia) ---
+  { cat: 'SATUSEHAT', kind: 'Baru', title: 'SATUSEHAT jadi tulang punggung rekam medis nasional', detail: 'Kemenkes mendorong interoperabilitas data kesehatan antar-faskes lewat platform SATUSEHAT — fondasi rekam medis elektronik terpadu se-Indonesia.', region: 'Dalam Negeri' },
+  { cat: 'Telemedicine', kind: 'Baru', title: 'Telemedicine kian diadopsi pasca-pandemi', detail: 'Konsultasi jarak jauh & resep digital makin lazim di kota besar Indonesia, memperluas akses layanan dokter ke daerah.', region: 'Dalam Negeri' },
+  { cat: 'JKN', kind: 'Baru', title: 'KRIS — standar kelas rawat inap BPJS', detail: 'Kelas Rawat Inap Standar (KRIS) mulai diterapkan bertahap untuk menyetarakan mutu layanan peserta JKN/BPJS Kesehatan.', region: 'Dalam Negeri' },
+  { cat: 'Penyakit Tropis', kind: 'Uji Klinis', title: 'Nyamuk ber-Wolbachia tekan kasus DBD', detail: 'Teknologi Wolbachia di sejumlah kota Indonesia terbukti menurunkan kasus demam berdarah secara signifikan.', region: 'Dalam Negeri' },
+  { cat: 'Stunting', kind: 'Riset', title: 'Penurunan stunting jadi prioritas nasional', detail: 'Intervensi gizi 1.000 hari pertama kehidupan & pemantauan tumbuh-kembang digenjot untuk menekan prevalensi stunting balita.', region: 'Dalam Negeri' },
+  { cat: 'Imunisasi', kind: 'Baru', title: 'Vaksin HPV masuk imunisasi nasional', detail: 'Perluasan vaksinasi HPV untuk pelajar perempuan menargetkan penurunan kanker serviks — salah satu kanker tersering pada wanita Indonesia.', region: 'Dalam Negeri' },
 ]
 
 interface Quote {
@@ -73,6 +82,16 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+// Region pill — distinguishes domestic (Indonesia) from international coverage.
+function RegionTag({ region }: { region?: NewsItem['region'] }) {
+  const dom = region === 'Dalam Negeri'
+  return (
+    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${dom ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-600'}`}>
+      {dom ? '🇮🇩 Dalam Negeri' : '🌍 Internasional'}
+    </span>
+  )
+}
+
 // Newsroom kicker: status label + category, but never the same word twice.
 function Kicker({ kind, cat }: { kind: NewsItem['kind']; cat: string }) {
   const showCat = cat.toLowerCase() !== kind.toLowerCase()
@@ -90,10 +109,14 @@ function Kicker({ kind, cat }: { kind: NewsItem['kind']; cat: string }) {
 }
 
 export function MedicalNews() {
-  // Fresh draw each mount → the section "keeps updating".
-  const picks = useMemo(() => shuffle(CURATED), [])
-  const lead = picks[0]
-  const rest = picks.slice(1, 7)
+  // Fresh draw each mount → the section "keeps updating". Guarantee a mix of
+  // international and domestic (Indonesia) coverage every time.
+  const { lead, rest } = useMemo(() => {
+    const intl = shuffle(CURATED.filter((n) => (n.region ?? 'Internasional') === 'Internasional'))
+    const dom = shuffle(CURATED.filter((n) => n.region === 'Dalam Negeri'))
+    const mixed = shuffle([...intl.slice(1, 5), ...dom.slice(0, 3)]).slice(0, 6)
+    return { lead: intl[0], rest: mixed }
+  }, [])
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], [])
   const updated = useMemo(
     () => new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -118,13 +141,16 @@ export function MedicalNews() {
         </div>
 
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-500">
-          Sel punca · CRISPR · perangkat · mutasi · AI-EMR · Nobel · performa — kurasi yang berganti setiap kali Anda berkunjung.
+          Liputan internasional 🌍 &amp; dalam negeri 🇮🇩 — sel punca, CRISPR, AI-EMR, SATUSEHAT, JKN/BPJS, DBD, stunting — kurasi yang berganti setiap kali Anda berkunjung.
         </p>
 
         <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[1.5fr_1fr]">
           {/* Featured lead */}
           <article className="group relative flex flex-col">
-            <Kicker kind={lead.kind} cat={lead.cat} />
+            <div className="flex items-center gap-2">
+              <Kicker kind={lead.kind} cat={lead.cat} />
+              <RegionTag region={lead.region} />
+            </div>
             <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
               {lead.title}
             </h3>
@@ -144,7 +170,10 @@ export function MedicalNews() {
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <div className="min-w-0">
-                  <Kicker kind={n.kind} cat={n.cat} />
+                  <div className="flex items-center gap-2">
+                    <Kicker kind={n.kind} cat={n.cat} />
+                    <RegionTag region={n.region} />
+                  </div>
                   <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
                     {n.title}
                   </h4>

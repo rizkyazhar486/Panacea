@@ -23,7 +23,7 @@ const PLANS: {
   {
     id: 'individu',
     name: 'Individu',
-    price: 20,
+    price: 99,
     features: [
       'AI-EMR penuh untuk 1 klinisi',
       'Edukasi pasien tanpa batas',
@@ -33,7 +33,7 @@ const PLANS: {
   {
     id: 'rumah-sakit',
     name: 'Rumah Sakit',
-    price: 200,
+    price: 1500,
     features: [
       'AI-EMR multi-seat + integrasi identitas pasien',
       'Edukasi pasien otomatis untuk seluruh pasien',
