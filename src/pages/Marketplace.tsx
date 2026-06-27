@@ -82,7 +82,7 @@ export function Marketplace() {
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-extrabold">Rp125.000<span className="text-sm font-medium text-white/70">/30 hari</span></div>
+                <div className="text-2xl font-extrabold">Rp299.000<span className="text-sm font-medium text-white/70">/30 hari</span></div>
                 <Button variant="outline" className="mt-1 border-white !text-white hover:!bg-white/15" onClick={() => { buyLongevitySub(); notify(active ? 'Langganan AI Longevity diperpanjang 30 hari.' : 'Langganan AI Longevity aktif 30 hari.') }}>
                   {active ? 'Perpanjang' : 'Langganan Sekarang'}
                 </Button>

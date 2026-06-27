@@ -8,7 +8,7 @@ import { notify } from './push.js'
 import { sendReceipt } from './email.js'
 
 // Chronic-care subscription prices (IDR) — paid directly, not via PNC.
-const CHRONIC_PRICE: Record<string, number> = { chronic_monthly: 99000, chronic_lifetime: 9900000 }
+const CHRONIC_PRICE: Record<string, number> = { chronic_monthly: 199000, chronic_lifetime: 19900000 }
 
 // Activate a chronic subscription in the user's server-side settings.
 function activateChronic(userId: string, purpose: string) {

@@ -682,7 +682,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           longevitySubExpires: expires,
           orders: [
-            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 125000, status: 'Selesai' as const, at: now.toISOString() },
+            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 299000, status: 'Selesai' as const, at: now.toISOString() },
             ...st.orders,
           ],
           wallet: {
@@ -692,7 +692,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'subscription' as TxType,
                 amount: 0,
-                note: 'Langganan AI Longevity 30 hari — Rp125.000 (dibayar)',
+                note: 'Langganan AI Longevity 30 hari — Rp299.000 (dibayar)',
                 at: now.toISOString(),
               },
               ...st.wallet.transactions,
@@ -704,7 +704,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       buyChronicSub: (plan) => {
         const now = new Date()
         const lifetime = plan === 'lifetime'
-        const priceIdr = lifetime ? 9900000 : 99000
+        const priceIdr = lifetime ? 19900000 : 199000
         const expires = lifetime ? undefined : new Date(now.getTime() + 30 * 86400000).toISOString()
         setState((st) => ({
           ...st,
