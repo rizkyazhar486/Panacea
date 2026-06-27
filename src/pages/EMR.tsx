@@ -4,6 +4,8 @@ import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconEMR, IconCheck, IconSparkle, IconShield, IconBook } from '../components/icons'
 import { BodyDiagram, type SystemFinding } from '../components/BodyDiagram'
+import { GrowthChart } from '../components/GrowthChart'
+import { ageFromDob } from '../lib/anthro'
 import { generateEducation } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { searchICD, matchICD, icd11, type ICDCode } from '../lib/icd'
@@ -267,6 +269,16 @@ export function EMR() {
             </label>
           }
         />
+        {/* Kurva pertumbuhan CDC/WHO — wajib untuk kasus pediatri (≤19 thn) */}
+        {ageFromDob(activePatient.dob) <= 19 && (
+          <div className="mb-4 rounded-2xl border border-brand/20 bg-brand-50/40 p-4">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-dark">
+              🧒 Kurva Pertumbuhan Pediatri (WHO/CDC) — BB/U · TB/U · IMT/U
+            </div>
+            <GrowthChart patient={activePatient} ageYears={ageFromDob(activePatient.dob)} />
+          </div>
+        )}
+
         <div className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
             Peta Sistem — ringkasan visual temuan
