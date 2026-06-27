@@ -61,6 +61,7 @@ const nav: Nav[] = [
   { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Beranda' },
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/clinical', label: 'Data Klinis Pasien', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
@@ -264,6 +265,12 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {['pasien', 'dokter', 'owner'].includes(account.role) && (
+              <NavLink to="/messages" aria-label="Pesan" title="Pesan"
+                className={({ isActive }) => `grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+                <IconChat size={20} />
+              </NavLink>
+            )}
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}

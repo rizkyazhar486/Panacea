@@ -27,7 +27,7 @@ function iceServers(): RTCIceServer[] {
 // Real-time consultation room over WebSocket (doctor ↔ patient join the same room).
 // Text chat + optional WebRTC audio/video call. The WebSocket relays both chat
 // messages and WebRTC signaling (offer/answer/ICE) to the other peer in the room.
-export function ConsultChat({ room, name }: { room: string; name: string }) {
+export function ConsultChat({ room, name, title }: { room: string; name: string; title?: string }) {
   const [lines, setLines] = useState<Line[]>([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
@@ -169,7 +169,7 @@ export function ConsultChat({ room, name }: { room: string; name: string }) {
     <div className="overflow-hidden rounded-2xl border border-neutral-200">
       <div className="flex items-center gap-2 bg-ink px-4 py-2.5 text-white">
         <IconStethoscope size={18} className="text-brand" />
-        <span className="text-sm font-bold">Ruang: {room}</span>
+        <span className="text-sm font-bold">{title ?? `Ruang: ${room}`}</span>
         <span className="ml-auto flex items-center gap-1 text-[11px] text-white/70">
           <span className={`h-2 w-2 rounded-full ${connected ? 'bg-brand vital-dot' : 'bg-neutral-500'}`} />
           {connected ? `${count} online` : 'menyambung…'}
