@@ -36,6 +36,13 @@ body,
   height: 100%;
 }
 
+/* Stop iOS Safari from auto-inflating text (root cause of oversized fonts on
+   iPhone). Keeps the app's proportions consistent with the design on phones. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);

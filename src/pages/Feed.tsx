@@ -849,32 +849,34 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
   return (
     <Card className="space-y-3 overflow-hidden">
       {/* Header + share logo (top-right) */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
             {initials(post.authorName)}
             {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Sedang aktif" />}
           </div>
-          <div>
-            <div className="text-xs font-black flex items-center gap-1">
-              {post.authorName}
-              <span className="text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
-              {mutual && <span className="text-[9px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md">🤝 Saling mendukung</span>}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1">
+              <span className="truncate text-xs font-black">{post.authorName}</span>
+              <span className="shrink-0 text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
             </div>
-            <div className="text-[10px] text-neutral-400 mt-0.5">{timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span></div>
+            <div className="text-[10px] text-neutral-400 mt-0.5 truncate">
+              {timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span>
+              {mutual && <span className="ml-1 text-amber-600">· 🤝</span>}
+            </div>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           {!isOwnPost && (
-            <button onClick={() => toggleFollow(post.authorEmail)}
+            <button onClick={() => toggleFollow(post.authorEmail)} aria-label={following ? 'Berhenti mengikuti' : 'Ikuti'}
               className={'rounded-full px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (following ? 'bg-neutral-100 text-neutral-500' : 'bg-brand/10 text-brand-dark')}>
-              {following ? 'Mengikuti' : '+ Ikuti'}
+              {following ? '✓' : '+ Ikuti'}
             </button>
           )}
           {!isOwnPost && subPrice > 0 && (
-            <button onClick={subscribeNow} disabled={subscribed}
-              className={'rounded-full px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (subscribed ? 'bg-amber-50 text-amber-600' : 'bg-ink text-white')}>
-              {subscribed ? '✓ Berlangganan' : `Subscribe`}
+            <button onClick={subscribeNow} disabled={subscribed} aria-label="Berlangganan"
+              className={'grid h-9 w-9 place-items-center rounded-full text-[13px] font-bold transition active:scale-95 ' + (subscribed ? 'bg-amber-50 text-amber-600' : 'bg-ink text-white')}>
+              {subscribed ? '✓' : '★'}
             </button>
           )}
           {/* Share button rendered as a logo only (no text) */}
@@ -923,17 +925,17 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
         </div>
       )}
 
-      {/* Action bar: like · react · comment · share */}
-      <div className="relative flex items-center gap-1 border-t border-neutral-100 pt-2 -mb-1">
-        <button onClick={() => toggleLike(post.id)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
-          <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={16} /></ColoredIcon>
-          {post.likes > 0 ? post.likes : 'Suka'}
+      {/* Action bar: like · react · comment · share (icon-first, evenly spread) */}
+      <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-2 -mb-1">
+        <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={18} /></ColoredIcon>
+          {post.likes > 0 && <span>{post.likes}</span>}
         </button>
-        <button onClick={() => setShowReactions((v) => !v)} className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-neutral-500 hover:bg-neutral-50 transition active:scale-95">
+        <button onClick={() => setShowReactions((v) => !v)} aria-label="Reaksi" className="flex items-center rounded-lg px-3 py-1.5 text-lg transition active:scale-95 hover:bg-neutral-50">
           😊
         </button>
         {showReactions && (
-          <div className="absolute bottom-11 left-12 z-10 flex gap-1 rounded-full border border-neutral-100 bg-white p-1.5 shadow-lg">
+          <div className="absolute bottom-11 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-full border border-neutral-100 bg-white p-1.5 shadow-lg">
             {POST_REACTIONS.map((r) => (
               <button key={r.emoji} title={r.label} onClick={() => { toggleReaction(post.id, r.emoji); setShowReactions(false) }}
                 className={'grid h-8 w-8 place-items-center rounded-full text-base transition hover:scale-125 ' + (post.reactions?.[r.emoji]?.includes(viewerEmail) ? 'bg-brand/10' : '')}>
@@ -942,11 +944,11 @@ function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerE
             ))}
           </div>
         )}
-        <button onClick={() => setShowComments(v => !v)} className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
-          <IconComment size={16} /> {comments.length > 0 ? comments.length : 'Komentar'}
+        <button onClick={() => setShowComments(v => !v)} aria-label="Komentar" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <IconComment size={18} /> {comments.length > 0 && <span>{comments.length}</span>}
         </button>
-        <button onClick={share} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-neutral-500 hover:bg-neutral-50 transition active:scale-95 ml-auto">
-          <IconShare2 size={15} /> Bagikan
+        <button onClick={share} aria-label="Bagikan" className="flex items-center rounded-lg px-3 py-1.5 text-neutral-500 transition active:scale-95 hover:bg-neutral-50">
+          <IconShare2 size={17} />
         </button>
       </div>
 
