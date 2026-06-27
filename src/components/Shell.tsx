@@ -73,6 +73,7 @@ const nav: Nav[] = [
   { to: '/athlete', label: 'Atlet & Performa', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/recovery', label: 'Recovery Tracker', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/workout', label: 'AI Program Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
+  { to: '/fitness-test', label: 'Tes Fisik & Form (SIPSS/Hyrox)', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/sexual-health', label: 'Kesehatan Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/shape-forming', label: 'Shape Forming dari Foto', icon: IconSparkle, roles: ['pasien'], group: 'Klinis & AI' },
   { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Layanan' },
