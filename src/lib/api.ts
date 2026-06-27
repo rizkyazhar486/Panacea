@@ -200,6 +200,8 @@ export const api = {
   createPost: (p: Partial<BackendPost>) =>
     req<{ post: BackendPost }>('/api/posts', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.post),
   likePost: (id: string) => req<{ post: BackendPost }>(`/api/posts/${id}/like`, { method: 'POST' }).then((r) => r.post),
+  reactPost: (id: string, emoji: string) =>
+    req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
@@ -304,6 +306,7 @@ export interface BackendPost {
   mediaColor: string
   durationSec?: number
   likes: number
+  reactions?: Record<string, string[]>
   at: string
 }
 

@@ -73,11 +73,23 @@ function backendPostToSocial(p: BackendPost): SocialPost {
     durationSec: p.durationSec,
     photos: [],
     likes: p.likes,
+    reactions: p.reactions,
     comments: 0,
     commentList: [],
     reposts: 0,
     at: p.at,
   }
+}
+
+// Union two reaction maps (emoji -> emails), de-duplicating emails per emoji.
+function unionReactions(a?: Record<string, string[]>, b?: Record<string, string[]>): Record<string, string[]> | undefined {
+  if (!a) return b
+  if (!b) return a
+  const out: Record<string, string[]> = {}
+  for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    out[key] = [...new Set([...(a[key] ?? []), ...(b[key] ?? [])])]
+  }
+  return out
 }
 
 // #9: merge server posts with any local-only (offline) posts, newest first.
@@ -92,7 +104,9 @@ function mergePosts(server: SocialPost[], local: SocialPost[]): SocialPost[] {
     if (!lp) return sp
     return {
       ...sp,
-      reactions: lp.reactions ?? sp.reactions,
+      // Union server (cross-user) reactions with the viewer's optimistic local
+      // reactions so an emote shows instantly AND others' emotes appear.
+      reactions: unionReactions(sp.reactions, lp.reactions),
       likedByMe: lp.likedByMe ?? sp.likedByMe,
       repostedByMe: lp.repostedByMe ?? sp.repostedByMe,
       bookmarkedByMe: lp.bookmarkedByMe ?? sp.bookmarkedByMe,
@@ -727,7 +741,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ),
         })),
       deleteStory: (id) => setState((st) => ({ ...st, stories: st.stories.filter((s) => s.id !== id) })),
-      toggleReaction: (postId, emoji) =>
+      toggleReaction: (postId, emoji) => {
         setState((st) => {
           const email = st.account?.email ?? ''
           return {
@@ -740,7 +754,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
               return { ...p, reactions: { ...(p.reactions ?? {}), [emoji]: nextList } }
             }),
           }
-        }),
+        })
+        // Sync to server so the emote is visible to other users (cross-user).
+        if (backendEnabled) api.reactPost(postId, emoji).catch(() => {})
+      },
       // ── Komunitas Sehat — interpersonal-relationship health features ──────
       heartbeat: () =>
         setState((st) => {

@@ -475,7 +475,7 @@ const STORY_TTL_MS = 24 * 60 * 60 * 1000
 
 interface StoryGroup { authorEmail: string; authorName: string; mediaColor: string; stories: Story[] }
 
-const STORY_REACTIONS = ['❤️', '💪', '🙏', '👏']
+const STORY_REACTIONS = ['❤️', '💪', '🙏', '👏', '🔥', '😍', '😂', '😮', '💯', '🎉']
 
 function StoryViewer({ group, onClose, onComment, onReact }: {
   group: StoryGroup; onClose: () => void; onComment: (storyId: string, text: string) => void; onReact: (storyId: string, emoji: string) => void
@@ -808,6 +808,8 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
    ═══════════════════════════════════════════════════════ */
 const POST_REACTIONS: { emoji: string; label: string }[] = [
   { emoji: '❤️', label: 'Peduli' }, { emoji: '💪', label: 'Semangat' }, { emoji: '🙏', label: 'Doa' }, { emoji: '👏', label: 'Bangga' },
+  { emoji: '🔥', label: 'Keren' }, { emoji: '😍', label: 'Suka banget' }, { emoji: '😂', label: 'Lucu' }, { emoji: '😮', label: 'Wow' },
+  { emoji: '😢', label: 'Sedih' }, { emoji: '💯', label: 'Mantap' }, { emoji: '🎉', label: 'Selamat' }, { emoji: '🏆', label: 'Juara' },
 ]
 
 export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
@@ -942,10 +944,10 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           😊
         </button>
         {showReactions && (
-          <div className="absolute bottom-11 left-1/2 z-10 flex -translate-x-1/2 gap-1 rounded-full border border-neutral-100 bg-white p-1.5 shadow-lg">
+          <div className="absolute bottom-11 left-1/2 z-10 grid w-60 max-w-[80vw] -translate-x-1/2 grid-cols-6 gap-1 rounded-2xl border border-neutral-100 bg-white p-2 shadow-lg">
             {POST_REACTIONS.map((r) => (
-              <button key={r.emoji} title={r.label} onClick={() => { toggleReaction(post.id, r.emoji); setShowReactions(false) }}
-                className={'grid h-8 w-8 place-items-center rounded-full text-base transition hover:scale-125 ' + (post.reactions?.[r.emoji]?.includes(viewerEmail) ? 'bg-brand/10' : '')}>
+              <button key={r.emoji} title={r.label} aria-label={r.label} onClick={() => { toggleReaction(post.id, r.emoji); setShowReactions(false) }}
+                className={'grid h-8 w-8 place-items-center rounded-full text-lg transition hover:scale-125 ' + (post.reactions?.[r.emoji]?.includes(viewerEmail) ? 'bg-brand/10' : '')}>
                 {r.emoji}
               </button>
             ))}

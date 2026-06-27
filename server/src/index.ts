@@ -10,6 +10,7 @@ import {
   listPosts,
   addPost,
   likePost,
+  reactPost,
   uid,
   getClinical,
   saveRecord,
@@ -257,6 +258,15 @@ app.post('/api/posts', requireAuth, (req, res) => {
 })
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
+  if (!p) return res.status(404).json({ error: 'not_found' })
+  res.json({ post: p })
+})
+// Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.
+app.post('/api/posts/:id/react', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const emoji = String((req.body as { emoji?: string }).emoji || '').slice(0, 8)
+  if (!emoji) return res.status(400).json({ error: 'missing_emoji' })
+  const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
   res.json({ post: p })
 })

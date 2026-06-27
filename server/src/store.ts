@@ -51,6 +51,7 @@ export interface Post {
   mediaColor: string
   durationSec?: number
   likes: number
+  reactions?: Record<string, string[]> // emoji -> emails who reacted (cross-user)
   at: string
 }
 
@@ -259,6 +260,17 @@ export function likePost(id: string): Post | undefined {
     p.likes += 1
     save()
   }
+  return p
+}
+// Toggle a viewer's reaction emoji on a post (cross-user, visible to everyone).
+export function reactPost(id: string, emoji: string, email: string): Post | undefined {
+  const p = db.posts?.find((x) => x.id === id)
+  if (!p) return undefined
+  if (!p.reactions) p.reactions = {}
+  const list = p.reactions[emoji] ?? []
+  p.reactions[emoji] = list.includes(email) ? list.filter((e) => e !== email) : [...list, email]
+  if (p.reactions[emoji].length === 0) delete p.reactions[emoji]
+  save()
   return p
 }
 
