@@ -665,6 +665,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 }) {
   const [caption, setCaption] = useState('')
   const [activity, setActivity] = useState('')
+  const [tags, setTags] = useState('') // tag teman (@nama), dipisah koma
   const [postType, setPostType] = useState<PostType>('aktivitas')
   const [photos, setPhotos] = useState<string[]>([])
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
@@ -700,10 +701,13 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
   function submit() {
     if (!caption.trim() && photos.length === 0 && !videoUrl) return
+    // Tag teman → mention "@nama" yang ditambahkan ke caption.
+    const mentions = tags.split(',').map((s) => s.trim().replace(/^@/, '')).filter(Boolean).map((n) => `@${n}`)
+    const fullCaption = [caption.trim(), mentions.length ? `\n${mentions.join(' ')}` : ''].join('')
     onPost({
       id: uid(), authorEmail, authorName, role,
       postType, kind: videoUrl ? 'video' : photos.length > 0 ? 'image' : 'text',
-      activity: activity || 'Postingan', caption: caption.trim(),
+      activity: activity || 'Postingan', caption: fullCaption,
       mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)],
       photos, videoUrl: videoUrl ?? undefined, videoSec: videoUrl ? videoSec : undefined,
       audio: song !== SONGS[0] ? song : undefined,
@@ -767,7 +771,10 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
         {/* Input Area */}
         <div className="px-5 pb-5 space-y-4">
           <textarea className="w-full h-28 p-3 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:border-brand resize-none" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
-          
+
+          {/* Tag teman */}
+          <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag teman (mis. Budi, Sinta) — pisahkan koma" value={tags} onChange={e => setTags(e.target.value)} />
+
           <div className="flex flex-wrap items-center gap-2">
             <button onClick={() => fileRef.current?.click()} disabled={!!videoUrl} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition disabled:opacity-40">
               📸 {busy ? 'Mengunggah...' : 'Foto'}
@@ -1077,6 +1084,19 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             {checkedInToday ? '✓ Check-in' : 'Check-in Sekarang'}
           </button>
         </div>
+        {/* Riwayat check-in (log) */}
+        {myCheckIns.length > 0 && (
+          <div className="border-t border-neutral-100 pt-2">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Riwayat Check-in ({myCheckIns.length})</div>
+            <div className="flex flex-wrap gap-1.5">
+              {[...myCheckIns].reverse().slice(0, 14).map((d) => (
+                <span key={d} className="rounded-md bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-dark">
+                  {new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Item 2: achievement badges with color tiers */}
         <div className="flex items-center gap-2 border-t border-neutral-100 pt-2 text-[11px] font-bold">
           <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-white" style={{ background: fireTier.color }}>🔥 {fireTier.label}</span>
