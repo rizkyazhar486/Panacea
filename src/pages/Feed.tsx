@@ -1792,6 +1792,7 @@ export default function SportsSocialFeed() {
   const { state, account, addPost, addStory, heartbeat, logVo2Max, addGpsActivity } = useStore()
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
+  const [feedTab, setFeedTab] = useState<'foryou' | 'following'>('foryou')
 
   // Open the composer when the mobile bottom-bar "+" is tapped (decoupled event).
   useEffect(() => {
@@ -1882,17 +1883,37 @@ export default function SportsSocialFeed() {
         />
       )}
 
-      {/* RENDER FEED SOSIAL — beranda social media murni (Instagram-style) */}
+      {/* Feed tabs — For You / Mengikuti + search (gaya TikTok/Instagram) */}
+      <div className="sticky top-0 z-20 -mx-4 flex items-center justify-center gap-6 border-b border-neutral-100 bg-white/85 px-4 py-2 backdrop-blur">
+        <button onClick={() => setFeedTab('following')} className={`text-sm font-bold transition ${feedTab === 'following' ? 'text-ink' : 'text-neutral-400'}`}>
+          Mengikuti{feedTab === 'following' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
+        </button>
+        <button onClick={() => setFeedTab('foryou')} className={`text-sm font-bold transition ${feedTab === 'foryou' ? 'text-ink' : 'text-neutral-400'}`}>
+          Untuk Anda{feedTab === 'foryou' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
+        </button>
+        <button onClick={() => { window.location.hash = '#/search' }} aria-label="Cari" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
+          <IconSearch size={18} />
+        </button>
+      </div>
+
+      {/* RENDER FEED SOSIAL — beranda social media (Instagram/TikTok-style) */}
       <div className="space-y-4">
-        {posts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
-            Belum ada kiriman. Ketuk tombol <span className="font-bold text-brand-dark">＋</span> di bawah untuk membuat postingan atau story.
-          </div>
-        ) : (
-          posts.filter(p => !p.archived).map(p => (
-            <PostCard key={p.id} post={p} viewerEmail={currentUser.email} viewerName={currentUser.name} />
-          ))
-        )}
+        {(() => {
+          const visible = posts.filter((p) => !p.archived && !p.locked)
+          const feed = feedTab === 'following'
+            ? visible.filter((p) => p.authorEmail === currentUser.email || state.follows.includes(p.authorEmail))
+            : visible
+          if (feed.length === 0) {
+            return (
+              <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
+                {feedTab === 'following'
+                  ? <>Belum ada kiriman dari yang Anda ikuti. Buka <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">Untuk Anda</button> atau <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">cari orang</button>.</>
+                  : <>Belum ada kiriman. Ketuk tombol <span className="font-bold text-brand-dark">＋</span> di bawah untuk membuat postingan atau story.</>}
+              </div>
+            )
+          }
+          return feed.map((p) => <PostCard key={p.id} post={p} viewerEmail={currentUser.email} viewerName={currentUser.name} />)
+        })()}
       </div>
 
       {/* Tombol mengambang "+" — buat post/story (ikon, universal, target besar) */}

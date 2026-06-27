@@ -4,6 +4,49 @@ import { IconSparkle, IconUpload, IconActivity, IconLeaf, IconHeart } from '../c
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { api } from '../lib/api'
 
+// Level-based workout plans (Beginner → Pro) for shaping the body.
+type Level = 'beginner' | 'intermediate' | 'advanced' | 'pro'
+const LEVELS: { id: Level; name: string; emoji: string; sub: string; days: number; plan: { day: string; focus: string }[] }[] = [
+  {
+    id: 'beginner', name: 'Beginner', emoji: '🌱', sub: '3 hari/mgg · fondasi gerak & kebiasaan', days: 3,
+    plan: [
+      { day: 'Hari 1', focus: 'Full-body dasar: squat 3×10, push-up lutut 3×8, plank 3×20 dtk' },
+      { day: 'Hari 2', focus: 'Kardio ringan 20–30 mnt (jalan cepat) + mobilitas' },
+      { day: 'Hari 3', focus: 'Full-body: glute bridge 3×12, row band 3×12, dead bug 3×8' },
+    ],
+  },
+  {
+    id: 'intermediate', name: 'Intermediate', emoji: '💪', sub: '4 hari/mgg · upper/lower split', days: 4,
+    plan: [
+      { day: 'Hari 1', focus: 'Upper: bench/push-up 4×8, row 4×10, shoulder press 3×10' },
+      { day: 'Hari 2', focus: 'Lower: goblet squat 4×10, RDL 3×10, calf raise 3×15' },
+      { day: 'Hari 3', focus: 'Kardio interval 25 mnt + core' },
+      { day: 'Hari 4', focus: 'Full-body hipertrofi + lengan (curl/triceps 3×12)' },
+    ],
+  },
+  {
+    id: 'advanced', name: 'Advanced', emoji: '🔥', sub: '5 hari/mgg · push/pull/legs', days: 5,
+    plan: [
+      { day: 'Hari 1', focus: 'Push: bench 5×5, OHP 4×6, dips 3×AMRAP' },
+      { day: 'Hari 2', focus: 'Pull: pull-up 5×5, barbell row 4×8, face pull 3×15' },
+      { day: 'Hari 3', focus: 'Legs: squat 5×5, lunge 4×10, leg curl 3×12' },
+      { day: 'Hari 4', focus: 'Hipertrofi upper + HIIT 15 mnt' },
+      { day: 'Hari 5', focus: 'Hipertrofi lower + core berbeban' },
+    ],
+  },
+  {
+    id: 'pro', name: 'Pro / Atlet', emoji: '🏆', sub: '6 hari/mgg · periodisasi + performa', days: 6,
+    plan: [
+      { day: 'Hari 1', focus: 'Strength: squat berat 6×3 @85% + accessory' },
+      { day: 'Hari 2', focus: 'Power: clean/jump + bench 6×3' },
+      { day: 'Hari 3', focus: 'Hipertrofi pull + grip' },
+      { day: 'Hari 4', focus: 'Deadlift 5×3 + posterior chain' },
+      { day: 'Hari 5', focus: 'Conditioning/Hyrox: sled, erg, wall ball' },
+      { day: 'Hari 6', focus: 'Hipertrofi/weak-point + mobilitas mendalam' },
+    ],
+  },
+]
+
 interface ShapeAnalysis {
   bodyAssessment: string
   bodyType: string
@@ -56,7 +99,9 @@ export function ShapeForming() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<ShapeAnalysis | null>(null)
+  const [level, setLevel] = useState<Level>('beginner')
   const fileRef = useRef<HTMLInputElement>(null)
+  const lvl = LEVELS.find((l) => l.id === level)!
 
   async function onUpload(file?: File) {
     if (!file) return
@@ -93,6 +138,29 @@ export function ShapeForming() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => onUpload(e.target.files?.[0])} />
           {error && <p className="text-xs text-accent">{error}</p>}
         </div>
+      </Card>
+
+      {/* Program latihan berdasarkan level */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={18} />} title="Program Latihan per Level" subtitle="Pilih level Anda — pemula hingga atlet pro" />
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {LEVELS.map((l) => (
+            <button key={l.id} onClick={() => setLevel(l.id)}
+              className={`flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-bold transition ${level === l.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+              <span className="text-lg">{l.emoji}</span>{l.name}
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-xs font-semibold text-brand-dark">{lvl.emoji} {lvl.name} — {lvl.sub}</p>
+        <div className="mt-2 space-y-1.5">
+          {lvl.plan.map((d) => (
+            <div key={d.day} className="flex gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
+              <span className="w-12 shrink-0 font-bold text-neutral-500">{d.day}</span>
+              <span className="text-neutral-600">{d.focus}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] text-neutral-400">Tingkatkan beban/volume bertahap (progressive overload). Cek form gerakan di menu Tes Fisik & Form.</p>
       </Card>
 
       {result && (
