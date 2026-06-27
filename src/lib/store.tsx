@@ -81,10 +81,35 @@ function backendPostToSocial(p: BackendPost): SocialPost {
 }
 
 // #9: merge server posts with any local-only (offline) posts, newest first.
+// For posts that exist on the server, keep the server's authoritative content
+// (likes count, caption) BUT preserve the viewer's local-only interaction state
+// (reactions, like/repost/bookmark flags, comment thread) and any local media —
+// otherwise a poll refresh would wipe an emote/comment the user just added.
 function mergePosts(server: SocialPost[], local: SocialPost[]): SocialPost[] {
+  const localById = new Map(local.map((p) => [p.id, p]))
+  const merged = server.map((sp) => {
+    const lp = localById.get(sp.id)
+    if (!lp) return sp
+    return {
+      ...sp,
+      reactions: lp.reactions ?? sp.reactions,
+      likedByMe: lp.likedByMe ?? sp.likedByMe,
+      repostedByMe: lp.repostedByMe ?? sp.repostedByMe,
+      bookmarkedByMe: lp.bookmarkedByMe ?? sp.bookmarkedByMe,
+      commentList: lp.commentList?.length ? lp.commentList : sp.commentList,
+      comments: Math.max(sp.comments ?? 0, lp.comments ?? 0),
+      likes: Math.max(sp.likes ?? 0, lp.likes ?? 0),
+      // server's simple post model doesn't echo media back — keep local media.
+      photos: lp.photos?.length ? lp.photos : sp.photos,
+      videoUrl: lp.videoUrl ?? sp.videoUrl,
+      videoSec: lp.videoSec ?? sp.videoSec,
+      audio: lp.audio ?? sp.audio,
+      caption: sp.caption || lp.caption,
+    }
+  })
   const serverIds = new Set(server.map((p) => p.id))
   const localOnly = local.filter((p) => !serverIds.has(p.id))
-  return [...localOnly, ...server].sort((a, b) => (a.at < b.at ? 1 : -1))
+  return [...localOnly, ...merged].sort((a, b) => (a.at < b.at ? 1 : -1))
 }
 
 // Placeholder identities used only as safe fallbacks when no real data exists
