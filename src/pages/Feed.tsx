@@ -853,7 +853,54 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
     } catch { /* user cancelled share sheet */ }
   }
 
+  // Copy a deep link to this specific post (shareable URL with ?post=id).
+  const [copied, setCopied] = useState(false)
+  async function copyUrl() {
+    const base = typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}#/?post=${post.id}`
+      : `https://panaceamed.id/#/?post=${post.id}`
+    try {
+      await navigator.clipboard.writeText(base)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1600)
+    } catch { alert('Tautan: ' + base) }
+  }
+
+  // Premium gating: an exclusive post is blurred for viewers who aren't the
+  // author and haven't subscribed to the author.
+  const premium = !!post.exclusive
+  const gated = premium && !isOwnPost && !subscribed
+
   const photos = post.photos ?? []
+
+  // Overlay shown on top of the post media (video/photos): Premium toggle for
+  // the owner, Copy-URL for everyone.
+  const mediaOverlay = (
+    <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-2">
+      <div className="flex items-start justify-between">
+        {premium ? (
+          <span className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-white shadow backdrop-blur-sm">
+            🔒 Premium
+          </span>
+        ) : <span />}
+        {isOwnPost && (
+          <button
+            onClick={() => updatePost(post.id, { exclusive: !premium })}
+            aria-label={premium ? 'Jadikan publik' : 'Jadikan premium'}
+            title={premium ? 'Jadikan publik' : 'Jadikan premium (khusus pelanggan)'}
+            className={'pointer-events-auto inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold shadow backdrop-blur-sm transition active:scale-95 ' + (premium ? 'bg-white/90 text-amber-600' : 'bg-black/55 text-white')}>
+            {premium ? '🔓 Publik' : '🔒 Premium'}
+          </button>
+        )}
+      </div>
+      <div className="flex justify-end">
+        <button onClick={copyUrl} aria-label="Salin URL" title="Salin tautan postingan"
+          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold text-white shadow backdrop-blur-sm transition active:scale-95">
+          {copied ? '✓ Tersalin' : '📋 Copy URL'}
+        </button>
+      </div>
+    </div>
+  )
 
   return (
     <Card className="space-y-3 overflow-hidden">
@@ -902,20 +949,36 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
 
       {post.videoUrl ? (
         <div className="relative overflow-hidden rounded-xl bg-black">
-          <video src={post.videoUrl} controls className="max-h-80 w-full object-contain" />
+          <div className={gated ? 'blur-xl' : ''}>
+            <video src={post.videoUrl} controls={!gated} className="max-h-80 w-full object-contain" />
+          </div>
           {post.videoSec ? (
-            <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="absolute right-2 bottom-2 z-20 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
               {Math.floor(post.videoSec / 60)}:{String(post.videoSec % 60).padStart(2, '0')}
             </span>
           ) : null}
+          {mediaOverlay}
+          {gated && (
+            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Konten premium<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
+            </button>
+          )}
         </div>
       ) : photos.length > 0 && (
-        <div className={'grid gap-1.5 rounded-xl overflow-hidden ' + (photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2')}>
-          {photos.map((img, idx) => (
-            isImg(img)
-              ? <img key={idx} src={img} alt="" className="w-full h-40 object-cover" />
-              : <div key={idx} className="w-full h-40" style={{ background: img }} />
-          ))}
+        <div className="relative overflow-hidden rounded-xl">
+          <div className={'grid gap-1.5 ' + (photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2') + (gated ? ' blur-xl' : '')}>
+            {photos.map((img, idx) => (
+              isImg(img)
+                ? <img key={idx} src={img} alt="" className="w-full h-40 object-cover" />
+                : <div key={idx} className="w-full h-40" style={{ background: img }} />
+            ))}
+          </div>
+          {mediaOverlay}
+          {gated && (
+            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Konten premium<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
+            </button>
+          )}
         </div>
       )}
 
