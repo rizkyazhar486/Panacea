@@ -417,7 +417,11 @@ export interface PharmacyProduct {
 export interface ProfileEdit {
   name?: string
   bio?: string
-  avatar?: string // data URL
+  avatar?: string // data URL / uploaded photo
+  sex?: 'L' | 'P' | '-' // jenis kelamin (L=laki-laki, P=perempuan, -=tidak disebut)
+  location?: string // kota/domisili
+  profession?: string // pekerjaan/keahlian
+  link?: string // tautan/sitasi URL (mis. profil profesional, publikasi)
 }
 
 // -------- Unified transactions / order history ----------------------------
