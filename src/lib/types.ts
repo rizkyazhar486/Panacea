@@ -348,6 +348,22 @@ export interface HealthGoal {
   unit: string
 }
 
+// Auto-recorded GPS sport activity (route-based) — values are COMPUTED from GPS
+// tracking, never entered manually. Powers competitive charts & leaderboards.
+export interface GpsActivity {
+  id: string
+  email: string
+  name: string
+  sport: string // display name, e.g. "Lari", "Renang", "Triathlon"
+  sportType: string // 'run' | 'cycle' | 'swim' | 'marathon' | 'half_marathon' | 'triathlon' | 'walk'
+  emoji: string
+  distKm: number
+  durSec: number
+  avgSpeedKmh: number
+  kcal: number
+  at: string // ISO datetime
+}
+
 // -------- Nutrition / calorie diary ----------------------------------------
 export interface FoodEntry {
   id: string
@@ -551,6 +567,7 @@ export interface AppState {
   quizScore: { correct: number; total: number } // myth-vs-fact quiz running score
   vo2maxLog: Vo2MaxEntry[] // VO2Max measurements over time (Cooper test, GPS, HR estimate)
   goals: HealthGoal[] // personal health targets (item 4)
+  gpsActivities: GpsActivity[] // auto-recorded GPS sport activities (competitive charts)
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]

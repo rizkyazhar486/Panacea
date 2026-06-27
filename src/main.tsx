@@ -9,6 +9,7 @@ import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { AppStatus } from './components/AppStatus'
+import { OfflineBanner } from './components/OfflineBanner'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { Chatbot } from './pages/Chatbot'
@@ -67,6 +68,7 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
     <StoreProvider>
       <AppStatus />
+      <OfflineBanner />
       <HashRouter>
         <Shell>
           <Suspense fallback={<PageLoader />}>

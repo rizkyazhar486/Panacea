@@ -14,7 +14,7 @@ import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthG
    GPS SPORTS MODES
    ═══════════════════════════════════════════════════════ */
 interface GpsSportMode {
-  id: string; name: string; emoji: string; met: number; type: 'walk' | 'run' | 'cycle' | 'marathon' | 'half_marathon'
+  id: string; name: string; emoji: string; met: number; type: 'walk' | 'run' | 'cycle' | 'marathon' | 'half_marathon' | 'swim' | 'triathlon'
   targetDist?: number; // km
   hiit: boolean
 }
@@ -31,6 +31,8 @@ const GPS_SPORTS: GpsSportMode[] = [
   { id: 'fartlek', name: 'Fartlek', emoji: '🌀', met: 11.5, type: 'run', hiit: true },
   { id: 'interval', name: 'Interval Training', emoji: '🔥', met: 13.0, type: 'run', hiit: true },
   { id: 'tempo', name: 'Tempo Run', emoji: '💨', met: 10.8, type: 'run', hiit: false },
+  { id: 'swim', name: 'Renang', emoji: '🏊', met: 8.3, type: 'swim', hiit: false },
+  { id: 'triathlon', name: 'Triathlon', emoji: '🥇', met: 10.0, type: 'triathlon', hiit: false },
 ]
 
 /* ═══════════════════════════════════════════════════════
@@ -1765,7 +1767,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
    MAIN INTEGRATION WRAPPER COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function SportsSocialFeed() {
-  const { state, account, addPost, addStory, heartbeat, logVo2Max } = useStore()
+  const { state, account, addPost, addStory, heartbeat, logVo2Max, addGpsActivity } = useStore()
   const posts = state.posts
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
@@ -1817,6 +1819,20 @@ export default function SportsSocialFeed() {
     })
     // #5: persist activity-based VO2Max so the calculator can show a real measurement.
     if (gpsData.vo2Max > 0) logVo2Max(gpsData.vo2Max, `GPS ${gpsData.sport.name}`)
+    // Auto-record the GPS activity (values computed from tracking, never manual)
+    // → powers the competitive charts & leaderboard in Community.
+    addGpsActivity({
+      email: currentUser.email,
+      name: currentUser.name,
+      sport: gpsData.sport.name,
+      sportType: gpsData.sport.type,
+      emoji: gpsData.sport.emoji,
+      distKm: Math.round((gpsData.dist / 1000) * 100) / 100,
+      durSec: Math.round(gpsData.dur),
+      avgSpeedKmh: Math.round(gpsData.speed * 10) / 10,
+      kcal: gpsData.kcal,
+      at: new Date().toISOString(),
+    })
   }
 
   return (
