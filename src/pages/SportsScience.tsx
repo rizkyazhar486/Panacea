@@ -76,6 +76,29 @@ const REFERENCES = [
   'Jones AM. The physiology of the world-record marathon (running economy).',
 ]
 
+// ── Tujuh cabang ilmu keolahragaan (exercise science) ────────────────────────
+// Tiap cabang dijelaskan + bagaimana ia membentuk rencana latihan pengguna.
+const SCIENCE_BRANCHES: { name: string; emoji: string; what: string; apply: string }[] = [
+  { name: 'Biomekanika', emoji: '📐', what: 'Analisis gaya, gerak, tuas & teknik tubuh.', apply: 'Perbaiki teknik (postur lari, sudut squat) untuk efisiensi & cegah cedera overuse.' },
+  { name: 'Anatomi', emoji: '🦴', what: 'Struktur otot, sendi, tulang & jaringan.', apply: 'Pilih latihan yang menargetkan rantai otot benar & lindungi sendi rentan.' },
+  { name: 'Fisiologi', emoji: '🫀', what: 'Respons sistem energi, kardiovaskular & otot terhadap beban.', apply: 'Atur zona HR, VO₂max & ambang laktat agar adaptasi tepat sasaran.' },
+  { name: 'Perilaku Psikomotor', emoji: '🎯', what: 'Hubungan kognisi–gerak: akurasi, waktu reaksi, koordinasi.', apply: 'Latih keterampilan spesifik (drill presisi) dalam kondisi mirip kompetisi.' },
+  { name: 'Neurosains', emoji: '🧠', what: 'Peran otak & saraf dalam adaptasi dan kelelahan.', apply: 'Kelola beban neural (HRV) & jadwalkan recovery agar sistem saraf pulih.' },
+  { name: 'Kontrol Motorik', emoji: '🕹️', what: 'Bagaimana gerakan dipelajari & diotomatisasi.', apply: 'Progresi dari sadar → otomatis lewat repetisi terstruktur & variasi.' },
+  { name: 'Psikologi Olahraga', emoji: '💭', what: 'Motivasi, fokus, regulasi emosi & mentalitas juara.', apply: 'Tetapkan tujuan, rutin pra-kompetisi & mindfulness untuk performa puncak.' },
+]
+
+// ── Prinsip latihan (7 prinsip ilmu olahraga) ────────────────────────────────
+const TRAINING_PRINCIPLES: { name: string; emoji: string; rule: string; apply: string }[] = [
+  { name: 'Overload', emoji: '⬆️', rule: 'Beri beban di atas kebiasaan agar tubuh beradaptasi.', apply: 'Naikkan volume/intensitas terukur — tapi jaga ACWR ≤1.3.' },
+  { name: 'Progression', emoji: '📈', rule: 'Tingkatkan beban bertahap & sistematis.', apply: 'Aturan +10%/minggu; tambah satu variabel (jarak ATAU intensitas), bukan semua.' },
+  { name: 'Periodization', emoji: '🗓️', rule: 'Susun siklus beban–pemulihan menuju puncak.', apply: 'Blok meso 3–4 minggu + deload; taper jelang kompetisi.' },
+  { name: 'Specificity', emoji: '🎯', rule: 'Adaptasi spesifik pada jenis beban yang dilatih.', apply: 'Latih sesuai tuntutan cabang (energi, gerak, kecepatan) Anda.' },
+  { name: 'Individualization', emoji: '🧬', rule: 'Sesuaikan dengan usia, level, genetik & respons.', apply: 'Pakai data pribadi (VO₂max, HRV, RPE) bukan rata-rata umum.' },
+  { name: 'Reversibility', emoji: '⬇️', rule: '"Use it or lose it" — kebugaran menurun bila berhenti.', apply: 'Jaga beban minimum saat sibuk/cedera agar tak detraining.' },
+  { name: 'Recovery / Adaptation', emoji: '😴', rule: 'Adaptasi terjadi saat pulih, bukan saat latihan.', apply: 'Tidur 7–9 jam, sisipkan hari ringan; pantau HRV & Recovery Time.' },
+]
+
 const SPORT_FILTERS = ['Semua', 'Lari', 'Sepeda', 'Renang', 'Gym', 'HIIT', 'Bola', 'Lainnya'] as const
 
 const ID_MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
@@ -200,6 +223,41 @@ export function SportsScience() {
                     <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{k.why}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Seven branches of exercise science */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconHeart size={20} />} title="Tujuh Cabang Ilmu Olahraga" subtitle="Dasar ilmiah yang membentuk rencana latihan Anda" />
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
+          Perencanaan latihan berbasis ilmu menerapkan metode ilmiah dari tujuh cabang untuk memahami &
+          meningkatkan performa, olahraga, dan aktivitas fisik.
+        </p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {SCIENCE_BRANCHES.map((b) => (
+            <div key={b.name} className="rounded-xl border border-neutral-100 p-3">
+              <div className="text-sm font-extrabold">{b.emoji} {b.name}</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{b.what}</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-brand-dark"><b>Penerapan:</b> {b.apply}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Training principles */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconChartUp size={20} />} title="Prinsip Latihan (7 Prinsip)" subtitle="Panduan utama merancang program yang efektif" />
+        <div className="mt-3 space-y-2">
+          {TRAINING_PRINCIPLES.map((pr, i) => (
+            <div key={pr.name} className="flex gap-3 rounded-xl border border-neutral-100 p-3">
+              <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-50 text-xs font-extrabold text-brand-dark">{i + 1}</div>
+              <div>
+                <div className="text-sm font-extrabold">{pr.emoji} {pr.name}</div>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">{pr.rule}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-brand-dark"><b>Terapkan:</b> {pr.apply}</p>
               </div>
             </div>
           ))}
