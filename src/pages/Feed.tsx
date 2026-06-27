@@ -803,7 +803,7 @@ const POST_REACTIONS: { emoji: string; label: string }[] = [
   { emoji: '❤️', label: 'Peduli' }, { emoji: '💪', label: 'Semangat' }, { emoji: '🙏', label: 'Doa' }, { emoji: '👏', label: 'Bangga' },
 ]
 
-function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
+export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
   const { state, toggleLike, updatePost, toggleFollow, subscribeAuthor, toggleReaction } = useStore()
   const [showComments, setShowComments] = useState(false)
   const [showReactions, setShowReactions] = useState(false)

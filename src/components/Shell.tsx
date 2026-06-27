@@ -29,6 +29,7 @@ import {
   IconHome,
   IconActivity,
   IconPlus,
+  IconUser,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -62,6 +63,7 @@ const nav: Nav[] = [
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/profile', label: 'Profil Saya', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/clinical', label: 'Data Klinis Pasien', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
@@ -475,7 +477,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </button>
           {[
             { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
-            { to: '/consult', label: 'Konsultasi', icon: IconStethoscope },
+            { to: '/profile', label: 'Profil', icon: IconUser },
           ].map((t) => (
             <NavLink key={t.to} to={t.to} aria-label={t.label}
               className={({ isActive }) => `flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${isActive ? 'text-brand-dark' : 'text-neutral-400'}`}>

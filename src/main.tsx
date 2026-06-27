@@ -43,6 +43,7 @@ const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
 const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
+const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -89,6 +90,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/community" element={<Community />} />
               <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/messages" element={<Messages />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
