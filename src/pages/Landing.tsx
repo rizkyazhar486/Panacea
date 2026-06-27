@@ -112,7 +112,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
         <div className="relative mx-auto max-w-5xl text-center">
           <Reveal>
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/60 px-4 py-1.5 shadow-sm backdrop-blur-md">
+            <div className="liquid-glass mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
               <span className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Longevity Medical-AI · Siap Pakai</span>
             </div>
@@ -121,7 +121,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
               AI-Klinik Praktis untuk
               <br />
-              <span className="bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text text-transparent">
+              <span className="font-serif-display bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text italic text-transparent">
                 Akses Kesehatan Anda
               </span>
             </h1>
@@ -156,7 +156,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               {STATS.map((s, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-white/40 bg-white/60 p-4 shadow-[0_8px_30px_rgba(12,20,16,0.06)] backdrop-blur-xl"
+                  className="liquid-glass rounded-2xl p-4"
                 >
                   <div className="bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
                     {s.node}

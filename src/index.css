@@ -191,6 +191,28 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 }
 .orb { animation: float-orb 20s ease-in-out infinite; will-change: transform; }
 
+/* Editorial display serif for hero headlines (premium, anti-slop feel). */
+.font-serif-display {
+  font-family: 'Instrument Serif', ui-serif, Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Liquid-glass surface — layered translucency, soft inner highlight + saturated
+   backdrop blur for a tactile, premium card. */
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.72), rgba(255,255,255,0.42));
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 8px 32px rgba(12,20,16,0.10), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.dark .liquid-glass {
+  background: linear-gradient(135deg, rgba(28,34,30,0.62), rgba(18,22,20,0.42));
+  border-color: rgba(255,255,255,0.10);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
 @keyframes gradient-pan {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
