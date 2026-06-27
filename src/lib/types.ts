@@ -348,6 +348,15 @@ export interface HealthGoal {
   unit: string
 }
 
+// Training Intensity journal — Rate of Perceived Exertion (RPE 1-10) per session.
+export interface TrainingLog {
+  id: string
+  date: string // yyyy-mm-dd
+  rpe: number // 1 (sangat ringan) – 10 (maksimal)
+  type: string // mis. Lari, Gym, HIIT, Renang
+  note?: string
+}
+
 // Auto-recorded GPS sport activity (route-based) — values are COMPUTED from GPS
 // tracking, never entered manually. Powers competitive charts & leaderboards.
 export interface GpsActivity {
@@ -572,6 +581,8 @@ export interface AppState {
   vo2maxLog: Vo2MaxEntry[] // VO2Max measurements over time (Cooper test, GPS, HR estimate)
   goals: HealthGoal[] // personal health targets (item 4)
   gpsActivities: GpsActivity[] // auto-recorded GPS sport activities (competitive charts)
+  trainingLogs: TrainingLog[] // Training Intensity (RPE) journal
+  activeProgram?: string // training program the user is currently following
   foods: FoodEntry[]
   wellness: Record<string, WellnessDay> // daily sleep/water/exercise by date
   consults: ConsultSession[]

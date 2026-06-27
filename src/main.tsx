@@ -46,6 +46,7 @@ const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
 const Search = lazy(() => import('./pages/Search').then((m) => ({ default: m.Search })))
+const Logs = lazy(() => import('./pages/Logs').then((m) => ({ default: m.Logs })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -95,6 +96,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/profile" element={<Profile />} />
               <Route path="/fitness-test" element={<FitnessTest />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/logs" element={<Logs />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />

@@ -32,6 +32,7 @@ import type {
   Vo2MaxEntry,
   HealthGoal,
   GpsActivity,
+  TrainingLog,
   FoodEntry,
   WellnessDay,
   ConsultSession,
@@ -194,6 +195,7 @@ function seed(): AppState {
     vo2maxLog: [],
     goals: [],
     gpsActivities: [],
+    trainingLogs: [],
     foods: [],
     wellness: {},
     consults: [],
@@ -319,6 +321,8 @@ interface Store {
   addGoal: (g: Omit<HealthGoal, 'id'>) => void
   removeGoal: (id: string) => void
   addGpsActivity: (a: Omit<GpsActivity, 'id'>) => void // auto from GPS, never manual
+  addTrainingLog: (rpe: number, type: string, note?: string) => void // RPE journal
+  setActiveProgram: (program: string) => void
   buyLongevitySub: () => { ok: boolean; reason?: string }
   buyChronicSub: (plan: 'monthly' | 'lifetime') => { ok: boolean; reason?: string }
   addFood: (f: FoodEntry) => void
@@ -883,6 +887,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       removeGoal: (id) => setState((st) => ({ ...st, goals: st.goals.filter((g) => g.id !== id) })),
       addGpsActivity: (a) =>
         setState((st) => ({ ...st, gpsActivities: [{ id: uid(), ...a }, ...st.gpsActivities].slice(0, 200) })),
+      addTrainingLog: (rpe, type, note) =>
+        setState((st) => ({
+          ...st,
+          trainingLogs: [{ id: uid(), date: new Date().toISOString().slice(0, 10), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
+        })),
+      setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),
       logWellness: (date, patch) =>
         setState((st) => ({

@@ -55,41 +55,51 @@ type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[
 
 const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 
-// Sidebar groups (accordion sections) — order defines display order.
-const GROUP_ORDER = ['Beranda', 'Klinis & AI', 'Layanan', 'Konten', 'Kelola', 'Akun']
+// Sidebar groups (accordion sections) — order defines display order. Grouped by
+// intent with short labels so the menu stays scannable and icon-led.
+const GROUP_ORDER = ['Beranda', 'Kesehatan', 'Kebugaran', 'Klinis & AI', 'Layanan', 'Konten', 'Kelola', 'Akun']
 
 const nav: Nav[] = [
+  // Beranda (rendered as plain links — the most-used, social-first destinations)
   { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Beranda' },
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
-  { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
-  { to: '/profile', label: 'Profil Saya', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/logs', label: 'Log & Statistik', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/profile', label: 'Profil', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  // Kesehatan
+  { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
+  { to: '/nutrition', label: 'Nutrisi', icon: IconFood, roles: ['pasien'], group: 'Kesehatan' },
+  { to: '/education', label: 'Edukasi', icon: IconBook, roles: ['pasien'], group: 'Kesehatan' },
+  { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Kesehatan' },
+  // Kebugaran
+  { to: '/athlete', label: 'Atlet', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/fitness-test', label: 'Tes Fisik', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Kebugaran' },
+  // Klinis & AI
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/clinical', label: 'Data Klinis Pasien', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
+  { to: '/clinical', label: 'Data Klinis', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Klinis & AI' },
-  { to: '/education', label: 'Edukasi Saya', icon: IconBook, roles: ['pasien'], group: 'Klinis & AI' },
-  { to: '/nutrition', label: 'Nutrisi & Kalori', icon: IconFood, roles: ['pasien'], group: 'Klinis & AI' },
-  { to: '/athlete', label: 'Atlet & Performa', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/recovery', label: 'Recovery Tracker', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/workout', label: 'AI Program Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/fitness-test', label: 'Tes Fisik & Form (SIPSS/Hyrox)', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/sexual-health', label: 'Kesehatan Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/shape-forming', label: 'Shape Forming dari Foto', icon: IconSparkle, roles: ['pasien'], group: 'Klinis & AI' },
-  { to: '/consult', label: 'Konsultasi Dokter', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Layanan' },
-  { to: '/hospitals', label: 'Faskes Terdekat', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Layanan' },
+  { to: '/sexual-health', label: 'Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
+  // Layanan
+  { to: '/consult', label: 'Konsultasi', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Layanan' },
+  { to: '/hospitals', label: 'Faskes', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Layanan' },
   { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Layanan' },
-  { to: '/orders', label: 'Riwayat Transaksi', icon: IconWallet, roles: ['pasien'], group: 'Layanan' },
+  { to: '/orders', label: 'Transaksi', icon: IconWallet, roles: ['pasien'], group: 'Layanan' },
+  // Konten
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Konten' },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'], group: 'Konten' },
   { to: '/my-materials', label: 'Materi Saya', icon: IconBook, roles: ['kontributor'], group: 'Konten' },
   { to: '/verification', label: 'Verifikasi', icon: IconShield, roles: ['verifikator'], group: 'Konten' },
-  { to: '/admin', label: 'Layanan & Admin', icon: IconStethoscope, roles: ['admin'], group: 'Kelola' },
-  { to: '/owner', label: 'Owner — Keuntungan', icon: IconChartUp, roles: ['owner'], group: 'Kelola' },
-  { to: '/architecture', label: 'Arsitektur CDSS', icon: IconArchitecture, roles: ['admin'], group: 'Kelola' },
-  { to: '/billing', label: 'Billing & Token', icon: IconWallet, roles: ALL, group: 'Akun' },
+  // Kelola
+  { to: '/admin', label: 'Admin', icon: IconStethoscope, roles: ['admin'], group: 'Kelola' },
+  { to: '/owner', label: 'Owner', icon: IconChartUp, roles: ['owner'], group: 'Kelola' },
+  { to: '/architecture', label: 'Arsitektur', icon: IconArchitecture, roles: ['admin'], group: 'Kelola' },
+  // Akun
+  { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Akun' },
   { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL, group: 'Akun' },
-  { to: '/legal', label: 'Privasi & Legal', icon: IconShield, roles: ALL, group: 'Akun' },
+  { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Akun' },
 ]
 
 // Pages that show the active-patient context. Patients see only their own data
