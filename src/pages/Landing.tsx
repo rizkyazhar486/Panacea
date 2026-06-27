@@ -192,7 +192,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
         <Reveal className="text-center">
           <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Tentang Kami</span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Apa itu Panaceamed.id?</h2>
+          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Apa itu <span className="font-serif-display italic text-brand-dark">Panaceamed.id</span>?</h2>
           <p className="mx-auto mt-3 max-w-3xl text-neutral-600">
             Platform <b>AI-EMR</b> sekaligus <b>pusat pengetahuan kedokteran</b>. AI melakukan anamnesis &
             analisis penunjang via chatbot, lalu mengalir ke rekam medis yang <b>diverifikasi dan ditandatangani
@@ -203,7 +203,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={(i % 3) * 90}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-6 shadow-[0_8px_30px_rgba(12,20,16,0.05)] backdrop-blur-xl transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
+              <div className="liquid-glass group relative h-full overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition group-hover:bg-brand/20" />
                 <div className="relative flex items-start justify-between">
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-dark shadow-inner">
@@ -227,7 +227,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
             <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark backdrop-blur">Model Bisnis</span>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Satu platform, banyak peran</h2>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Satu platform, <span className="font-serif-display italic text-brand-dark">banyak peran</span></h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
               Langganan (individu & rumah sakit) + ekonomi token: pembeli deposit <b>PanaceaToken</b>,
               penulis menerima royalti, semua materi diverifikasi spesialis & AI.
@@ -236,7 +236,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {ROLES.map(([t, d], i) => (
               <Reveal key={t} delay={(i % 3) * 90}>
-                <div className="flex h-full items-start gap-3 rounded-2xl border border-white/50 bg-white/70 p-5 shadow-sm backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-md">
+                <div className="liquid-glass flex h-full items-start gap-3 rounded-2xl p-5 transition hover:-translate-y-1 hover:shadow-md">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand"><IconUsers size={18} /></span>
                   <div>
                     <h3 className="font-bold">{t}</h3>
@@ -255,12 +255,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent">
             <IconSparkle size={13} /> What's New
           </span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Pembaruan Terbaru</h2>
+          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Pembaruan <span className="font-serif-display italic text-brand-dark">Terbaru</span></h2>
         </Reveal>
         <ul className="mt-8 space-y-3">
           {WHATS_NEW.map((w, i) => (
             <Reveal key={w} as="li" delay={i * 70}>
-              <div className="flex items-start gap-3 rounded-2xl border border-white/50 bg-white/70 p-4 shadow-sm backdrop-blur-xl transition hover:translate-x-1 hover:border-brand/30">
+              <div className="liquid-glass flex items-start gap-3 rounded-2xl p-4 transition hover:translate-x-1 hover:border-brand/30">
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-white"><IconCheck size={16} /></span>
                 <span className="text-sm text-neutral-700">{w}</span>
               </div>
@@ -313,7 +313,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div className="orb pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/15 blur-3xl" />
             <div className="orb pointer-events-none absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
             <div className="relative">
-              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Mulai perjalanan healthspan Anda</h2>
+              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Mulai perjalanan <span className="font-serif-display italic">healthspan</span> Anda</h2>
               <p className="mx-auto mt-3 max-w-xl text-white/85">
                 Gratis untuk dicoba — pilih peran Anda dan rasakan AI co-physician yang diverifikasi dokter.
               </p>
