@@ -202,6 +202,9 @@ export const api = {
   likePost: (id: string) => req<{ post: BackendPost }>(`/api/posts/${id}/like`, { method: 'POST' }).then((r) => r.post),
   reactPost: (id: string, emoji: string) =>
     req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
+  deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
+  patchPost: (id: string, patch: Record<string, unknown>) =>
+    req<{ post: BackendPost }>(`/api/posts/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.post),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>

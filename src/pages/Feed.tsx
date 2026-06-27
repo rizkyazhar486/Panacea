@@ -812,10 +812,63 @@ const POST_REACTIONS: { emoji: string; label: string }[] = [
   { emoji: '😢', label: 'Sedih' }, { emoji: '💯', label: 'Mantap' }, { emoji: '🎉', label: 'Selamat' }, { emoji: '🏆', label: 'Juara' },
 ]
 
+// Instagram-style options bottom sheet for a post. Owner-only actions are
+// hidden for other viewers. Light/efficient: pure flags + existing store calls.
+function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmark, onUpdate, onDelete }: {
+  post: SocialPost
+  isOwnPost: boolean
+  onClose: () => void
+  onCopyUrl: () => void
+  onToggleBookmark: () => void
+  onUpdate: (patch: Partial<SocialPost>) => void
+  onDelete: () => void
+}) {
+  type Row = { icon: string; label: string; onClick: () => void; danger?: boolean; active?: boolean }
+  const close = (fn: () => void) => () => { fn(); onClose() }
+  const general: Row[] = [
+    { icon: '🔖', label: post.bookmarkedByMe ? 'Hapus dari simpanan' : 'Simpan', onClick: close(onToggleBookmark), active: post.bookmarkedByMe },
+    { icon: '📋', label: 'Salin URL', onClick: close(onCopyUrl) },
+  ]
+  const owner: Row[] = isOwnPost ? [
+    { icon: post.exclusive ? '🔓' : '🔒', label: post.exclusive ? 'Jadikan publik' : 'Jadikan premium', onClick: close(() => onUpdate({ exclusive: !post.exclusive })), active: post.exclusive },
+    { icon: '🗂️', label: post.archived ? 'Keluarkan dari arsip' : 'Arsipkan', onClick: close(() => onUpdate({ archived: !post.archived })), active: post.archived },
+    { icon: '📌', label: post.pinned ? 'Lepas sematan' : 'Sematkan di profil', onClick: close(() => onUpdate({ pinned: !post.pinned })), active: post.pinned },
+    { icon: '❤️', label: post.hideLikes ? 'Tampilkan jumlah suka' : 'Sembunyikan jumlah suka', onClick: close(() => onUpdate({ hideLikes: !post.hideLikes })), active: post.hideLikes },
+    { icon: '💬', label: post.commentsOff ? 'Aktifkan komentar' : 'Matikan komentar', onClick: close(() => onUpdate({ commentsOff: !post.commentsOff })), active: post.commentsOff },
+  ] : []
+  const danger: Row[] = isOwnPost ? [
+    { icon: '🗑️', label: 'Hapus', danger: true, onClick: () => { if (confirm('Hapus postingan ini secara permanen?')) { onDelete(); onClose() } } },
+  ] : []
+  const Group = ({ rows }: { rows: Row[] }) => (
+    <div className="overflow-hidden rounded-2xl bg-neutral-50">
+      {rows.map((r, i) => (
+        <button key={r.label} onClick={r.onClick}
+          className={'flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm font-semibold transition active:bg-neutral-100 ' + (i > 0 ? 'border-t border-neutral-100 ' : '') + (r.danger ? 'text-rose-500' : 'text-ink')}>
+          <span className="w-5 text-center text-base">{r.icon}</span>
+          <span className="flex-1">{r.label}</span>
+          {r.active && <span className="text-brand-dark">✓</span>}
+        </button>
+      ))}
+    </div>
+  )
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="w-full max-w-md space-y-2.5 rounded-t-3xl bg-white p-3 pb-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="mx-auto h-1 w-10 rounded-full bg-neutral-200" />
+        <Group rows={general} />
+        {owner.length > 0 && <Group rows={owner} />}
+        {danger.length > 0 && <Group rows={danger} />}
+        <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Batal</button>
+      </div>
+    </div>
+  )
+}
+
 export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; viewerEmail: string; viewerName: string }) {
-  const { state, toggleLike, updatePost, toggleFollow, subscribeAuthor, toggleReaction } = useStore()
+  const { state, toggleLike, updatePost, deletePost, toggleBookmark, toggleFollow, subscribeAuthor, toggleReaction } = useStore()
   const [showComments, setShowComments] = useState(false)
   const [showReactions, setShowReactions] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
   const [draft, setDraft] = useState('')
   const comments = post.commentList ?? []
   const isOwnPost = post.authorEmail === viewerEmail
@@ -941,8 +994,25 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
             <IconShare2 size={15} />
           </button>
+          {/* Options menu (Instagram-style: Save / QR / Insights / Archive / Edit / Delete …) */}
+          <button onClick={() => setShowMenu(true)} aria-label="Opsi lainnya" title="Opsi"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-400 transition active:scale-90 hover:bg-neutral-100">
+            <span className="text-lg leading-none">⋯</span>
+          </button>
         </div>
       </div>
+
+      {showMenu && (
+        <PostOptionsSheet
+          post={post}
+          isOwnPost={isOwnPost}
+          onClose={() => setShowMenu(false)}
+          onCopyUrl={copyUrl}
+          onToggleBookmark={() => toggleBookmark(post.id)}
+          onUpdate={(patch) => updatePost(post.id, patch)}
+          onDelete={() => deletePost(post.id)}
+        />
+      )}
 
       <div className="border-l-2 pl-3 py-0.5 text-xs text-neutral-700 font-medium" style={{ borderColor: post.mediaColor }}>{post.activity}</div>
       <p className="text-xs text-neutral-600 leading-relaxed whitespace-pre-wrap">{post.caption}</p>
@@ -1001,7 +1071,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
       <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-2 -mb-1">
         <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
           <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={18} /></ColoredIcon>
-          {post.likes > 0 && <span>{post.likes}</span>}
+          {post.likes > 0 && !post.hideLikes && <span>{post.likes}</span>}
         </button>
         <button onClick={() => setShowReactions((v) => !v)} aria-label="Reaksi" className="flex items-center rounded-lg px-3 py-1.5 text-lg transition active:scale-95 hover:bg-neutral-50">
           😊
@@ -1016,8 +1086,8 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             ))}
           </div>
         )}
-        <button onClick={() => setShowComments(v => !v)} aria-label="Komentar" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
-          <IconComment size={18} /> {comments.length > 0 && <span>{comments.length}</span>}
+        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Komentar" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <IconComment size={18} /> {!post.commentsOff && comments.length > 0 && <span>{comments.length}</span>}
         </button>
         <button onClick={share} aria-label="Bagikan" className="flex items-center rounded-lg px-3 py-1.5 text-neutral-500 transition active:scale-95 hover:bg-neutral-50">
           <IconShare2 size={17} />

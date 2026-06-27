@@ -52,6 +52,13 @@ export interface Post {
   durationSec?: number
   likes: number
   reactions?: Record<string, string[]> // emoji -> emails who reacted (cross-user)
+  exclusive?: boolean
+  locked?: boolean
+  archived?: boolean
+  pinned?: boolean
+  hideLikes?: boolean
+  commentsOff?: boolean
+  reuseOff?: boolean
   at: string
 }
 
@@ -260,6 +267,28 @@ export function likePost(id: string): Post | undefined {
     p.likes += 1
     save()
   }
+  return p
+}
+// Remove a post (owner-only — caller enforces ownership). Returns true if removed.
+export function deletePost(id: string, email: string): boolean {
+  const p = db.posts?.find((x) => x.id === id)
+  if (!p || p.authorEmail !== email) return false
+  db.posts = (db.posts ?? []).filter((x) => x.id !== id)
+  save()
+  return true
+}
+// Patch owner-editable fields on a post (caption, activity, flags). Owner-only.
+export function updatePost(id: string, email: string, patch: Partial<Post>): Post | undefined {
+  const p = db.posts?.find((x) => x.id === id)
+  if (!p || p.authorEmail !== email) return undefined
+  if (typeof patch.caption === 'string') p.caption = patch.caption
+  if (typeof patch.activity === 'string') p.activity = patch.activity
+  const flags = patch as Record<string, unknown>
+  const target = p as unknown as Record<string, unknown>
+  for (const k of ['exclusive', 'locked', 'archived', 'pinned', 'hideLikes', 'commentsOff', 'reuseOff']) {
+    if (typeof flags[k] === 'boolean') target[k] = flags[k]
+  }
+  save()
   return p
 }
 // Toggle a viewer's reaction emoji on a post (cross-user, visible to everyone).

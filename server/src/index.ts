@@ -11,6 +11,8 @@ import {
   addPost,
   likePost,
   reactPost,
+  deletePost,
+  updatePost,
   uid,
   getClinical,
   saveRecord,
@@ -259,6 +261,20 @@ app.post('/api/posts', requireAuth, (req, res) => {
 app.post('/api/posts/:id/like', (req, res) => {
   const p = likePost(req.params.id)
   if (!p) return res.status(404).json({ error: 'not_found' })
+  res.json({ post: p })
+})
+// Delete a post (owner-only).
+app.delete('/api/posts/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const ok = deletePost(req.params.id, u.email)
+  if (!ok) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ok: true })
+})
+// Patch a post's caption/activity/flags (owner-only).
+app.patch('/api/posts/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const p = updatePost(req.params.id, u.email, req.body as Partial<Post>)
+  if (!p) return res.status(403).json({ error: 'forbidden' })
   res.json({ post: p })
 })
 // Toggle an emoji reaction (cross-user). Requires auth so we know who reacted.

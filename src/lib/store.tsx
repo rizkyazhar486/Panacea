@@ -641,9 +641,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             .catch(() => {})
         }
       },
-      updatePost: (id, partial) =>
-        setState((st) => ({ ...st, posts: st.posts.map((p) => (p.id === id ? { ...p, ...partial } : p)) })),
-      deletePost: (id) => setState((st) => ({ ...st, posts: st.posts.filter((p) => p.id !== id) })),
+      updatePost: (id, partial) => {
+        setState((st) => ({ ...st, posts: st.posts.map((p) => (p.id === id ? { ...p, ...partial } : p)) }))
+        // Sync owner-editable fields (caption/activity/flags) to the server.
+        if (backendEnabled) api.patchPost(id, partial as Record<string, unknown>).catch(() => {})
+      },
+      deletePost: (id) => {
+        setState((st) => ({ ...st, posts: st.posts.filter((p) => p.id !== id) }))
+        if (backendEnabled) api.deletePost(id).catch(() => {})
+      },
       toggleLike: (id) => {
         setState((st) => ({
           ...st,

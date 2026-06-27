@@ -212,6 +212,10 @@ export interface SocialPost {
   archived?: boolean // hidden/archived by the owner
   locked?: boolean // private/locked post (only owner sees in "Terkunci")
   exclusive?: boolean // subscriber-only content (monetized via creator subscription)
+  pinned?: boolean // pinned to the top of the owner's grid
+  hideLikes?: boolean // hide the like count from viewers
+  commentsOff?: boolean // commenting disabled by the owner
+  reuseOff?: boolean // remix/reuse disabled by the owner
   likes: number
   comments?: number
   commentList?: PostComment[] // inline comment thread
