@@ -905,6 +905,46 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
   )
 }
 
+/* ── AI Food Photo Detector ─────────────────────────────
+   Foto makanan → AI vision (server) menaksir nama, porsi &
+   makro, lalu langsung masuk ke jurnal harian.            */
+interface DetectedFood { name: string; grams: number; kcal: number; carbs: number; protein: number; fat: number }
+function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }) {
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!backendEnabled) { setMsg('Fitur AI foto butuh server aktif (VITE_API_URL).'); return }
+    setBusy(true); setMsg('')
+    try {
+      const dataUrl: string = await new Promise((res, rej) => {
+        const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file)
+      })
+      const prompt = 'Identifikasi makanan pada foto ini. Balas HANYA JSON array: [{"name":"...","grams":n,"kcal":n,"carbs":n,"protein":n,"fat":n}] dengan estimasi porsi realistis. Tanpa teks lain.'
+      const out = (await api.aiVision(dataUrl, prompt)).text
+      const jsonStr = out.slice(out.indexOf('['), out.lastIndexOf(']') + 1)
+      const items = JSON.parse(jsonStr) as DetectedFood[]
+      if (!Array.isArray(items) || items.length === 0) throw new Error('empty')
+      onDetect(items.map((i) => ({ name: String(i.name), grams: Math.round(+i.grams || 100), kcal: Math.round(+i.kcal || 0), carbs: Math.round(+i.carbs || 0), protein: Math.round(+i.protein || 0), fat: Math.round(+i.fat || 0) })))
+      setMsg(`✓ ${items.length} makanan terdeteksi & masuk jurnal: ${items.map((i) => i.name).join(', ')}`)
+    } catch {
+      setMsg('AI tidak yakin dengan foto ini — coba foto lebih jelas atau input manual.')
+    } finally { setBusy(false) }
+  }
+  return (
+    <div className="mt-4 rounded-2xl border border-dashed border-brand/40 bg-brand-50/50 p-3">
+      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
+        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+        {busy ? '⏳ AI menganalisis foto…' : '📸 Foto Makanan → AI isi jurnal otomatis'}
+        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={pick} disabled={busy} />
+      </label>
+      {msg && <p className="mt-2 text-center text-[11px] text-neutral-500">{msg}</p>}
+    </div>
+  )
+}
+
 /* ═══════════════════════════════════════════════════════
    2. FOOD TRACKER
    ═══════════════════════════════════════════════════════ */
@@ -956,6 +996,8 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           <div className="mt-1 h-1.5 rounded-full bg-neutral-200 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (omega3 / 3) * 100) + '%', background: omega3 >= 2 ? C.ok : omega3 >= 1 ? C.warn : C.blue }} /></div>
         </div>
       </div>
+
+      <FoodPhotoAI onDetect={(items) => items.forEach((it) => addFood({ id: uid(), date: today(), name: it.name, grams: it.grams, kcal: it.kcal, carbs: it.carbs, protein: it.protein, fat: it.fat }))} />
 
       <div className="mt-4 flex gap-2">
         <div className="flex-1"><input className={inputClass} placeholder="Cari makanan..." value={q} onChange={e => setQ(e.target.value)} /></div>

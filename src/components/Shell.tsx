@@ -18,6 +18,7 @@ import {
   IconChartUp,
   IconLogout,
   IconHeart,
+  IconTimer,
   IconPill,
   IconHospital,
   IconMoon,
@@ -75,6 +76,8 @@ const nav: Nav[] = [
   { to: '/athlete', label: 'Atlet', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/fitness-test', label: 'Tes Fisik', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/training-plan', label: 'Program AI', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/body', label: 'Komposisi Tubuh', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/sports-science', label: 'Sains & KPI', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Kebugaran' },
   // Klinis & AI

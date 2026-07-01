@@ -1,4 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+
+// Real map (Leaflet + OpenStreetMap, free) — lazy so the heavy lib loads only
+// when the GPS tracker is opened.
+const RouteMap = lazy(() => import('../components/RouteMap'))
 import { useStore, uid } from '../lib/store'
 import { Card, Field, inputClass } from '../components/ui'
 import {
@@ -343,6 +347,15 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
           ))}
         </div>
       </div>
+
+      {/* Peta nyata (OpenStreetMap) — tampil saat merekam/selesai, gaya Strava */}
+      {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
+        <div className="mx-5 mb-3 overflow-hidden rounded-2xl border border-neutral-100">
+          <Suspense fallback={<div className="grid h-[220px] place-items-center text-xs text-neutral-400">Memuat peta…</div>}>
+            <RouteMap points={pts} />
+          </Suspense>
+        </div>
+      )}
 
       {/* Map SVG */}
       <div className="mx-5 rounded-2xl overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>

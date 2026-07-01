@@ -92,9 +92,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </button>
           <button
             onClick={onMasuk}
-            className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-6 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-95"
+            className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-7 py-3 text-base font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95"
           >
-            Masuk
+            Masuk / Daftar
           </button>
         </div>
       </header>
@@ -138,7 +138,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 onClick={onMasuk}
                 className="group relative overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-8 py-3.5 font-bold text-white shadow-lg shadow-brand/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand/30 active:scale-[0.98]"
               >
-                <span className="relative z-10">Mulai Sekarang →</span>
+                <span className="relative z-10 text-lg">Daftar Gratis Sekarang →</span>
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
               </button>
               <a
@@ -203,7 +203,8 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={(i % 3) * 90}>
-              <div className="liquid-glass group relative h-full overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
+              <div role="button" tabIndex={0} onClick={onMasuk} onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
+                className="liquid-glass group relative h-full cursor-pointer overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition group-hover:bg-brand/20" />
                 <div className="relative flex items-start justify-between">
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-dark shadow-inner">

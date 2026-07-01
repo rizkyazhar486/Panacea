@@ -275,10 +275,106 @@ export function Athlete() {
         </ul>
       </Card>
 
+      <FitnessFatigueCard acute={p.acuteLoad} chronic={p.chronicLoad} />
+      <RacePlannerCard />
+
+      {/* Musik latihan */}
+      <Card className="!p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="text-sm font-extrabold">🎧 Musik latihan</div>
+          <div className="flex gap-2">
+            <a href="https://open.spotify.com/genre/workout" target="_blank" rel="noreferrer" className="rounded-full bg-[#1DB954] px-4 py-2 text-xs font-bold text-white active:scale-95">Spotify</a>
+            <a href="https://music.apple.com/us/room/6451822724" target="_blank" rel="noreferrer" className="rounded-full bg-neutral-900 px-4 py-2 text-xs font-bold text-white active:scale-95"> Apple Music</a>
+          </div>
+        </div>
+      </Card>
+
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
-        📚 Pelajari indikator ini lebih dalam di <a href="#/sports-science" className="font-bold underline">Sains Olahraga & KPI</a> — referensi jurnal, metode tim juara & kalender aktivitas per cabang.
+        📚 Pelajari indikator ini lebih dalam di <a href="#/sports-science" className="font-bold underline">Sains Olahraga & KPI</a> ·
+        program terjadwal di <a href="#/training-plan" className="font-bold underline">AI Training Planner</a> ·
+        komposisi tubuh di <a href="#/body" className="font-bold underline">Komposisi Tubuh</a>.
+        Halaman ini tersimpan lokal & bisa diakses offline setelah kunjungan pertama.
       </div>
     </div>
+  )
+}
+
+// ── Fitness & Fatigue (Banister/TSB model, gaya TrainingPeaks) ───────────────
+// CTL ≈ chronic (fitness), ATL ≈ acute (fatigue), TSB = CTL − ATL (form).
+function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number }) {
+  const ctl = chronic / 7 // beban harian rata-rata kronis
+  const atl = acute / 7
+  const tsb = ctl - atl
+  const has = acute > 0 && chronic > 0
+  const zone = !has ? { l: 'Isi Training Load di atas', tone: 'neutral' as const, d: 'CTL/ATL dihitung dari beban akut & kronis.' }
+    : tsb > 15 ? { l: 'Sangat Segar (risiko detraining)', tone: 'low' as const, d: 'Form tinggi tapi fitness bisa turun — cocok hanya untuk race week.' }
+    : tsb >= 5 ? { l: 'Fresh — siap performa', tone: 'brand' as const, d: 'Zona lomba/tes: kebugaran terjaga, kelelahan rendah.' }
+    : tsb >= -10 ? { l: 'Netral — zona latihan ideal', tone: 'brand' as const, d: 'Beban produktif. Pertahankan progresi bertahap.' }
+    : tsb >= -25 ? { l: 'Lelah — beban tinggi', tone: 'low' as const, d: 'Overreaching fungsional. Pastikan tidur & nutrisi; jadwalkan deload.' }
+    : { l: 'Sangat Lelah — bahaya', tone: 'critical' as const, d: 'TSB sangat negatif. Kurangi beban sekarang untuk hindari overtraining/cedera.' }
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="Model CTL/ATL/TSB — dihitung dari Training Load yang sama di atas" />
+      <div className="mt-3 grid grid-cols-3 gap-3">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Fitness (CTL)</div>
+          <div className="text-xl font-extrabold text-brand-dark">{has ? ctl.toFixed(0) : '—'}</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Fatigue (ATL)</div>
+          <div className="text-xl font-extrabold text-amber-600">{has ? atl.toFixed(0) : '—'}</div>
+        </div>
+        <div className="rounded-xl bg-ink p-3 text-center text-white">
+          <div className="text-[9px] font-bold uppercase text-white/50">Form (TSB)</div>
+          <div className={'text-xl font-extrabold ' + (tsb >= 0 ? 'text-brand' : 'text-amber-300')}>{has ? (tsb > 0 ? '+' : '') + tsb.toFixed(0) : '—'}</div>
+        </div>
+      </div>
+      <div className="mt-2"><Badge tone={zone.tone}>{zone.l}</Badge></div>
+      <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">{zone.d}</p>
+    </Card>
+  )
+}
+
+// ── Race Planner — countdown, taper & prediksi waktu (rumus Riegel) ──────────
+function RacePlannerCard() {
+  const RKEY = 'pm_race_plan'
+  const [race, setRace] = useState(() => {
+    try { return { date: '', dist: 10, recentDist: 5, recentMin: 30, ...JSON.parse(localStorage.getItem(RKEY) || '{}') } } catch { return { date: '', dist: 10, recentDist: 5, recentMin: 30 } }
+  })
+  const upd = (p: Partial<typeof race>) => setRace((r: typeof race) => { const n = { ...r, ...p }; try { localStorage.setItem(RKEY, JSON.stringify(n)) } catch { /* ignore */ } return n })
+  const daysOut = race.date ? Math.ceil((new Date(race.date).getTime() - Date.now()) / 86400000) : 0
+  // Riegel: T2 = T1 × (D2/D1)^1.06
+  const pred = race.recentMin > 0 && race.recentDist > 0 ? race.recentMin * Math.pow(race.dist / race.recentDist, 1.06) : 0
+  const predPace = pred > 0 ? pred / race.dist : 0
+  const phase = daysOut <= 0 ? '' : daysOut <= 7 ? 'RACE WEEK: volume −60%, intensitas pendek segar, karbo-loading 2 hari terakhir, tidur prioritas.' :
+    daysOut <= 14 ? 'TAPER: volume −40%, pertahankan 1 sesi intensitas pendek. Jangan latihan baru.' :
+    daysOut <= 42 ? 'PEAK: sesi kunci spesifik pace lomba 2×/minggu + long run. Latihan minum/gel di long run.' :
+    'BASE/BUILD: bangun volume Zone 2 + 1-2 sesi kualitas. Naik maks +10%/minggu.'
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconRun size={20} />} title="Race Planning" subtitle="Target lomba → fase latihan otomatis + prediksi waktu (Riegel)" />
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Field label="Tanggal lomba"><input className={inputClass} type="date" value={race.date} onChange={(e) => upd({ date: e.target.value })} /></Field>
+        <Field label="Jarak lomba (km)"><input className={inputClass} type="number" value={race.dist} onChange={(e) => upd({ dist: +e.target.value })} /></Field>
+        <Field label="Hasil terakhir: jarak (km)"><input className={inputClass} type="number" value={race.recentDist} onChange={(e) => upd({ recentDist: +e.target.value })} /></Field>
+        <Field label="Hasil terakhir: waktu (mnt)"><input className={inputClass} type="number" value={race.recentMin} onChange={(e) => upd({ recentMin: +e.target.value })} /></Field>
+      </div>
+      {race.date && daysOut > 0 && (
+        <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
+          <div className="flex items-baseline justify-between">
+            <div><span className="text-3xl font-extrabold text-brand">{daysOut}</span><span className="ml-1 text-xs text-white/60">hari lagi</span></div>
+            {pred > 0 && (
+              <div className="text-right">
+                <div className="text-[10px] uppercase text-white/50">Prediksi finis</div>
+                <div className="text-xl font-extrabold">{Math.floor(pred / 60) > 0 ? `${Math.floor(pred / 60)}j ` : ''}{Math.round(pred % 60)}m</div>
+                <div className="text-[10px] text-white/60">pace {Math.floor(predPace)}:{String(Math.round((predPace % 1) * 60)).padStart(2, '0')} /km</div>
+              </div>
+            )}
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-white/80">📋 {phase}</p>
+        </div>
+      )}
+    </Card>
   )
 }
 
