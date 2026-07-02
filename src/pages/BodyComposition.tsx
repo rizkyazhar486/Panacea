@@ -17,11 +17,13 @@ interface Body {
   stress: number; anxiety: number; mood: number // 0-10 self report
   mets: number; caffeineCutoff: string; noiseDb: number
   vo2: number
+  bmd: number // bone mineral density T-score (from DEXA scan, if available)
 }
 const DEF: Body = {
   w: 65, h: 168, age: 26, g: 'M', waist: 80, hip: 95, neck: 37,
   smm: 0, bfm: 0, rhr: 60, hrv: 0, sleepH: 7, remH: 1.5, deepH: 1.2,
   stress: 4, anxiety: 3, mood: 7, mets: 6, caffeineCutoff: '14:00', noiseDb: 45, vo2: 41,
+  bmd: 0,
 }
 const KEY = 'pm_bodycomp_v1'
 const load = (): Body => { try { return { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEF } }
@@ -178,6 +180,29 @@ export function BodyComposition() {
           <b className="text-ink">BMR: {d.basal} kkal</b> (Mifflin-St Jeor) — kebutuhan dasar sebelum aktivitas.
           Lemak dihitung metode US Navy dari lingkar tubuh bila data InBody kosong.
         </div>
+      </Card>
+
+      {/* Lab & Pemeriksaan Lanjutan */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Pemeriksaan Lanjutan" subtitle="Bone Mass Density (DEXA) — isi bila Anda punya hasil pemeriksaan" />
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {num('T-score BMD (DEXA)', 'bmd', 0.1)}
+        </div>
+        {b.bmd !== 0 && (
+          <div className="mt-3 rounded-xl bg-neutral-50 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-neutral-500">Klasifikasi WHO</span>
+              <Badge tone={b.bmd >= -1 ? 'brand' : b.bmd >= -2.5 ? 'low' : 'critical'}>
+                {b.bmd >= -1 ? 'Normal' : b.bmd >= -2.5 ? 'Osteopenia' : 'Osteoporosis'}
+              </Badge>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
+              T-score ≥ −1: normal · −1 s/d −2.5: osteopenia (massa tulang rendah) · ≤ −2.5: osteoporosis (kriteria WHO).
+              Kepadatan tulang menurun secara alami seiring usia — resistance training & asupan kalsium/vitamin D & protein cukup membantu menjaga BMD.
+            </p>
+          </div>
+        )}
+        {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-400">Belum ada data. BMD diukur via DEXA scan di fasilitas kesehatan/lab radiologi.</p>}
       </Card>
 
       {/* Longevity indicator bento */}

@@ -31,6 +31,7 @@ import {
   IconActivity,
   IconPlus,
   IconUser,
+  IconGauge,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -41,7 +42,7 @@ import { Landing } from '../pages/Landing'
 import { ContactService } from './ContactService'
 import { NotificationBell } from './NotificationBell'
 import { InstallBanner } from './InstallApp'
-import { OnboardingTour } from './OnboardingTour'
+import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
@@ -76,8 +77,10 @@ const nav: Nav[] = [
   { to: '/athlete', label: 'Atlet', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/fitness-test', label: 'Tes Fisik', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/assessment', label: 'Penilaian Awal', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/training-plan', label: 'Program AI', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/body', label: 'Komposisi Tubuh', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/lab', label: 'Lab Performa', icon: IconGauge, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/sports-science', label: 'Sains & KPI', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Kebugaran' },
   // Klinis & AI
@@ -503,7 +506,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </nav>
       )}
 
-      {['pasien', 'dokter', 'owner'].includes(account.role) && <OnboardingTour />}
+      {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
       <ContactService />
     </div>

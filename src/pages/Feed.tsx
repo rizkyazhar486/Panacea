@@ -128,7 +128,7 @@ function bmiCategory(v: number) {
 /* ═══════════════════════════════════════════════════════
    GPS HELPERS
    ═══════════════════════════════════════════════════════ */
-interface GpsPoint { lat: number; lng: number; t: number; hr?: number; spd?: number }
+interface GpsPoint { lat: number; lng: number; t: number; hr?: number; spd?: number; alt?: number }
 interface Waypoint { x: number; y: number }
 
 function hav(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -141,6 +141,27 @@ function totalDist(pts: GpsPoint[]) { let d = 0; for (let i = 1; i < pts.length;
 function fmtD(s: number) { const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sc = Math.floor(s % 60); return h > 0 ? h + ':' + String(m).padStart(2, '0') + ':' + String(sc).padStart(2, '0') : m + ':' + String(sc).padStart(2, '0') }
 function fmtDist(m: number) { return m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m' }
 function fmtPace(s: number, m: number) { if (m < 10) return '--:--/km'; const pk = s / 60 / (m / 1000); const pm = Math.floor(pk); const ps = Math.round((pk - pm) * 60); return pm + ':' + String(ps).padStart(2, '0') + '/km' }
+// Elevation gain from GPS altitude fixes — filters <1m noise typical of phone GPS.
+function elevGain(pts: GpsPoint[]): number {
+  let gain = 0
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1].alt, b = pts[i].alt
+    if (a == null || b == null) continue
+    const d = b - a
+    if (d > 1) gain += d
+  }
+  return gain
+}
+// Rough terrain classification from elevation gain per km — used since a free
+// GPS route doesn't carry a terrain database.
+function terrainLabel(gainM: number, distKm: number): string {
+  if (distKm < 0.15) return '—'
+  const perKm = gainM / distKm
+  if (perKm < 8) return 'Datar'
+  if (perKm < 20) return 'Bergelombang'
+  if (perKm < 45) return 'Berbukit'
+  return 'Pegunungan'
+}
 function calcAcceleration(pts: GpsPoint[]): number {
   if (pts.length < 3) return 0
   const recent = pts.slice(-5)
@@ -229,6 +250,7 @@ interface SharedGpsData {
   sport: GpsSportMode; dist: number; dur: number; speed: number;
   pace: string; kcal: number; hr: number; acceleration: number;
   vo2Max: number; hiit: ReturnType<typeof hiitIndicator>
+  elevGainM: number; terrain: string
 }
 
 function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData) => void }) {
@@ -263,6 +285,8 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   const pathD = makeSVGPath(mapped)
   const hiit = hiitIndicator(sport.met, hrMax, hr || 60, hr)
   const vo2Est = hr > 0 ? calcVO2MaxRockport(dist / 1000, dur / 60, hr, age, gender as 'M' | 'F') : 0
+  const elevGainM = elevGain(pts)
+  const terrain = terrainLabel(elevGainM, dist / 1000)
 
   function onSvgClick(e: React.MouseEvent<SVGSVGElement>) {
     if (mode !== 'planning' || !svgRef.current) return
@@ -275,7 +299,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
     if (!navigator.geolocation) { setGpsErr('GPS tidak didukung browser.'); return }
     wRef.current = navigator.geolocation.watchPosition(
       pos => setPts(p => {
-        return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined }]
+        return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]
       }),
       err => setGpsErr('GPS error: ' + err.message),
       { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
@@ -286,14 +310,14 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
     setMode('tracking'); const off = dur * 1000; sRef.current = Date.now() - off
     tRef.current = window.setInterval(() => setDur((Date.now() - sRef.current) / 1000), 1000)
     wRef.current = navigator.geolocation.watchPosition(
-      pos => setPts(p => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined }]),
+      pos => setPts(p => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]),
       () => {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
     )
   }
   function stop() { setMode('done'); if (wRef.current) navigator.geolocation.clearWatch(wRef.current); if (tRef.current) clearInterval(tRef.current) }
   function reset() { setMode('idle'); setPts([]); setPlan([]); setDur(0); setHr(0); setGpsErr('') }
   function shareToFeed() {
-    onShareToFeed({ sport, dist, dur, speed, pace: fmtPace(dur, dist), kcal, hr, acceleration, vo2Max: vo2Est, hiit })
+    onShareToFeed({ sport, dist, dur, speed, pace: fmtPace(dur, dist), kcal, hr, acceleration, vo2Max: vo2Est, hiit, elevGainM, terrain })
   }
   function planPathD() { if (plan.length < 2) return ''; return 'M' + plan[0].x.toFixed(1) + ',' + plan[0].y.toFixed(1) + plan.slice(1).map(p => ' L' + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('') }
 
@@ -371,8 +395,8 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
 
         {/* Stats Overlay */}
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
-          <div className="grid grid-cols-5 gap-px bg-black/30">
-            {[[fmtD(dur), 'WAKTU'], [fmtDist(dist), 'JARAK'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²']].map(([v, l]) => (
+          <div className="grid grid-cols-3 gap-px bg-black/30">
+            {[[fmtD(dur), 'WAKTU'], [fmtDist(dist), 'JARAK'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVASI']].map(([v, l]) => (
               <div key={l} className="bg-black/40 px-1.5 py-2 text-center">
                 <div className="text-xs font-extrabold text-white tabular-nums">{v}</div>
                 <div className="text-[7px] font-bold uppercase tracking-widest text-white/40">{l}</div>
@@ -1973,7 +1997,8 @@ export default function SportsSocialFeed() {
 
   // Handler memproses share data aktivitas tracker langsung ke feed sosial
   const handleShareGpsToFeed = (gpsData: SharedGpsData) => {
-    const generatedCaption = `Saya baru saja menyelesaikan aktivitas ${gpsData.sport.emoji} ${gpsData.sport.name} sejauh ${fmtDist(gpsData.dist)} dengan durasi ${fmtD(gpsData.dur)}. Total pembakaran ${gpsData.kcal} kkal dengan rata-rata zona intensitas ${gpsData.hiit.zone}! 💪`
+    const elevNote = gpsData.elevGainM > 5 ? ` Elevasi +${Math.round(gpsData.elevGainM)}m (${gpsData.terrain}).` : ''
+    const generatedCaption = `Saya baru saja menyelesaikan aktivitas ${gpsData.sport.emoji} ${gpsData.sport.name} sejauh ${fmtDist(gpsData.dist)} dengan durasi ${fmtD(gpsData.dur)}. Total pembakaran ${gpsData.kcal} kkal dengan rata-rata zona intensitas ${gpsData.hiit.zone}!${elevNote} 💪`
     addPost({
       id: uid(),
       authorEmail: currentUser.email,

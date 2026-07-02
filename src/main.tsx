@@ -50,6 +50,8 @@ const Logs = lazy(() => import('./pages/Logs').then((m) => ({ default: m.Logs })
 const SportsScience = lazy(() => import('./pages/SportsScience').then((m) => ({ default: m.SportsScience })))
 const TrainingPlan = lazy(() => import('./pages/TrainingPlan').then((m) => ({ default: m.TrainingPlan })))
 const BodyComposition = lazy(() => import('./pages/BodyComposition').then((m) => ({ default: m.BodyComposition })))
+const PerformanceLab = lazy(() => import('./pages/PerformanceLab').then((m) => ({ default: m.PerformanceLab })))
+const InitialAssessment = lazy(() => import('./pages/InitialAssessment').then((m) => ({ default: m.InitialAssessment })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -103,6 +105,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sports-science" element={<SportsScience />} />
               <Route path="/training-plan" element={<TrainingPlan />} />
               <Route path="/body" element={<BodyComposition />} />
+              <Route path="/lab" element={<PerformanceLab />} />
+              <Route path="/assessment" element={<InitialAssessment />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
