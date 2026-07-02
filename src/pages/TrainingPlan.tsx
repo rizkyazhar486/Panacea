@@ -48,6 +48,11 @@ const TECHNIQUE_VIDEOS: { label: string; cue: string; url: string }[] = [
   { label: 'Squat', cue: 'Dada tegak · lutut searah jari kaki · paha sejajar lantai', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023249_bb1e8e4f-d292-4726-a8b3-f62731dcb892.mp4' },
   { label: 'Push-up', cue: 'Garis lurus kepala–tumit · siku 45° · turun terkontrol', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023318_072af872-419c-4a8e-ad89-cc8668ffdfae.mp4' },
   { label: 'Form Lari', cue: 'Midfoot strike · condong ringan ke depan · lengan rileks 90°', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023308_424ad8f6-42e7-497a-9976-7182c1b0d367.mp4' },
+  { label: 'Deadlift', cue: 'Punggung netral · bar menempel tulang kering · dorong lantai', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030244_5bb8852a-7225-47bc-800a-8565d1c145ea.mp4' },
+  { label: 'Pull-up', cue: 'Full hang di bawah · tarik dagu lewat bar · tanpa ayunan', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030300_85444d19-b286-40e6-8f47-203d6957134a.mp4' },
+  { label: 'Hip Thrust', cue: 'Punggung atas di bench · dorong dari tumit · squeeze 1 dtk di atas', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030311_c9fa30bd-3f0f-4581-a9a5-a32b7f1de3dc.mp4' },
+  { label: 'Renang (Freestyle)', cue: 'High elbow catch · rotasi tubuh · kepala diam, napas ke samping', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030336_6140502e-4fbf-4895-8e40-9f9cff3abca3.mp4' },
+  { label: 'Sepeda', cue: 'Punggung datar · siku rileks · kayuhan bulat kadens ±90 rpm', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030348_8f39a332-9b8b-4bb3-82b0-2f47a811b0ae.mp4' },
 ]
 
 const GOALS = [

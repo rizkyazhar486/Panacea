@@ -198,6 +198,16 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   letter-spacing: -0.01em;
 }
 
+/* Scrim over the landing hero's background video: strong enough that the
+   template text stays comfortably readable in BOTH themes. Tailwind gradient
+   utilities aren't remapped by the .dark overrides, hence a dedicated class. */
+.hero-video-scrim {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.8) 55%, #ffffff 100%);
+}
+.dark .hero-video-scrim {
+  background: linear-gradient(to bottom, rgba(12, 20, 16, 0.88) 0%, rgba(12, 20, 16, 0.82) 55%, #0c1410 100%);
+}
+
 /* Liquid-glass surface — layered translucency, soft inner highlight + saturated
    backdrop blur for a tactile, premium card. */
 .liquid-glass {

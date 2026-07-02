@@ -109,7 +109,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             autoPlay muted loop playsInline
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/62 to-white" />
+          <div className="hero-video-scrim absolute inset-0" />
           <InteractiveAura />
           <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/20 blur-3xl" />
           <div className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl" style={{ animationDelay: '-6s' }} />
