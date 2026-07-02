@@ -36,10 +36,19 @@ const TECHNIQUE_IMAGES: { match: RegExp; url: string }[] = [
   { match: /hip thrust/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012828_c764c942-79a0-4a12-b77f-7993ba7389a4.png' },
   { match: /overhead press/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012843_1ad9fcbb-a3d8-4b52-a0b4-5e81be2626d0.png' },
   { match: /easy run|tempo|long run|interval|4×4|8×300|ladder/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012852_10ed0602-40b4-40b1-8155-585b5fae2cb1.png' },
+  { match: /plank/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023548_f3908098-532a-4057-a74c-0c1ff0c6ecec.png' },
 ]
 function techniqueImage(name: string): string | null {
   return TECHNIQUE_IMAGES.find((t) => t.match.test(name))?.url ?? null
 }
+
+// Looping demonstration videos (Higgsfield kling3_0_turbo) — how to actually
+// perform the key movements with correct form.
+const TECHNIQUE_VIDEOS: { label: string; cue: string; url: string }[] = [
+  { label: 'Squat', cue: 'Dada tegak · lutut searah jari kaki · paha sejajar lantai', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023249_bb1e8e4f-d292-4726-a8b3-f62731dcb892.mp4' },
+  { label: 'Push-up', cue: 'Garis lurus kepala–tumit · siku 45° · turun terkontrol', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023318_072af872-419c-4a8e-ad89-cc8668ffdfae.mp4' },
+  { label: 'Form Lari', cue: 'Midfoot strike · condong ringan ke depan · lengan rileks 90°', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023308_424ad8f6-42e7-497a-9976-7182c1b0d367.mp4' },
+]
 
 const GOALS = [
   'Longevity (VO₂max + Strength)', 'Hybrid Training', 'Cardio', 'Muscle Gain', 'Full Body Workout',
@@ -285,6 +294,22 @@ export function TrainingPlan() {
               className={'flex-1 rounded-xl py-2 text-xs font-bold capitalize transition ' + (view === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
               {v === 'minggu' ? '📅 Minggu' : v === 'bulan' ? '🗓️ Bulan' : '📆 Tahun'}
             </button>
+          ))}
+        </div>
+      </Card>
+
+      {/* Video teknik gerakan (Higgsfield) */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconRun size={20} />} title="Video Teknik Gerakan" subtitle="Contoh cara melakukan gerakan dengan form yang benar" />
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {TECHNIQUE_VIDEOS.map((v) => (
+            <div key={v.label} className="overflow-hidden rounded-2xl border border-neutral-100">
+              <video src={v.url} autoPlay muted loop playsInline preload="metadata" className="aspect-square w-full object-cover" />
+              <div className="p-2.5">
+                <div className="text-xs font-extrabold">{v.label}</div>
+                <div className="mt-0.5 text-[10px] leading-relaxed text-neutral-500">{v.cue}</div>
+              </div>
+            </div>
           ))}
         </div>
       </Card>

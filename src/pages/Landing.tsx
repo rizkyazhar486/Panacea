@@ -100,14 +100,19 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       </header>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative px-4 py-12 sm:px-8 sm:py-20">
-        {/* Animated atmosphere */}
+      <section className="relative overflow-hidden px-4 py-12 sm:px-8 sm:py-20">
+        {/* Cinematic brand film (Higgsfield) behind the hero, softened by a
+            white gradient so the original template text stays readable. */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <video
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
+            autoPlay muted loop playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/62 to-white" />
           <InteractiveAura />
-          <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/25 blur-3xl" />
-          <div className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" style={{ animationDelay: '-6s' }} />
-          <div className="orb absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-teal-300/20 blur-3xl" style={{ animationDelay: '-12s' }} />
-          <div className="absolute inset-0 [background-image:linear-gradient(rgba(0,109,54,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(0,109,54,0.035)_1px,transparent_1px)] [background-size:44px_44px]" />
+          <div className="orb absolute -left-20 top-10 h-72 w-72 rounded-full bg-brand/20 blur-3xl" />
+          <div className="orb absolute right-0 top-40 h-80 w-80 rounded-full bg-emerald-400/15 blur-3xl" style={{ animationDelay: '-6s' }} />
         </div>
 
         <div className="relative mx-auto max-w-5xl text-center">
@@ -187,6 +192,29 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           ))}
         </div>
       </div>
+
+      {/* ── FEATURED BRAND FILM ──────────────────────────────── */}
+      <section className="px-6 py-16 sm:px-10">
+        <Reveal>
+          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
+            <video
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
+              autoPlay muted loop playsInline
+              className="aspect-video w-full object-cover"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-10">
+              <div className="text-[11px] font-bold uppercase tracking-widest text-white/60">Panaceamed.id</div>
+              <h2 className="mt-1 text-2xl font-extrabold sm:text-4xl">
+                Alam. Manusia. <span className="font-serif-display italic text-emerald-300">Kebugaran.</span>
+              </h2>
+              <p className="mt-2 max-w-xl text-sm text-white/80">
+                Memperpanjang healthspan lewat sains — bukan sekadar menambah usia, tapi menambah hidup pada usia Anda.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </section>
 
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
       <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">

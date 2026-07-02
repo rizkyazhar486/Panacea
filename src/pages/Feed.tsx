@@ -129,7 +129,8 @@ function bmiCategory(v: number) {
    GPS HELPERS
    ═══════════════════════════════════════════════════════ */
 interface GpsPoint { lat: number; lng: number; t: number; hr?: number; spd?: number; alt?: number }
-interface Waypoint { x: number; y: number }
+// Planned-route waypoint — real map coordinates (clicked on the Leaflet map).
+interface Waypoint { lat: number; lng: number }
 
 function hav(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371000; const dr = Math.PI / 180
@@ -137,7 +138,7 @@ function hav(lat1: number, lon1: number, lat2: number, lon2: number) {
   const a = Math.sin(dLa / 2) ** 2 + Math.cos(lat1 * dr) * Math.cos(lat2 * dr) * Math.sin(dLo / 2) ** 2
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
-function totalDist(pts: GpsPoint[]) { let d = 0; for (let i = 1; i < pts.length; i++) d += hav(pts[i - 1].lat, pts[i - 1].lng, pts[i].lat, pts[i].lng); return d }
+function totalDist(pts: { lat: number; lng: number }[]) { let d = 0; for (let i = 1; i < pts.length; i++) d += hav(pts[i - 1].lat, pts[i - 1].lng, pts[i].lat, pts[i].lng); return d }
 function fmtD(s: number) { const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const sc = Math.floor(s % 60); return h > 0 ? h + ':' + String(m).padStart(2, '0') + ':' + String(sc).padStart(2, '0') : m + ':' + String(sc).padStart(2, '0') }
 function fmtDist(m: number) { return m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m' }
 function fmtPace(s: number, m: number) { if (m < 10) return '--:--/km'; const pk = s / 60 / (m / 1000); const pm = Math.floor(pk); const ps = Math.round((pk - pm) * 60); return pm + ':' + String(ps).padStart(2, '0') + '/km' }
@@ -176,22 +177,6 @@ function calcAcceleration(pts: GpsPoint[]): number {
     totalAcc += (v2 - v1) / dt; count++
   }
   return count > 0 ? totalAcc / count : 0
-}
-function mapGPSToSVG(pts: GpsPoint[], w: number, h: number, pad: number) {
-  if (!pts.length) return [{ x: w / 2, y: h / 2 }]
-  const las = pts.map(p => p.lat); const lns = pts.map(p => p.lng)
-  const minLa = Math.min(...las); const maxLa = Math.max(...las)
-  const minLo = Math.min(...lns); const maxLo = Math.max(...lns)
-  const rLa = (maxLa - minLa) || 0.002; const rLo = (maxLo - minLo) || 0.002
-  const s = Math.min((w - pad * 2) / rLo, (h - pad * 2) / rLa)
-  return pts.map(p => ({
-    x: pad + (p.lng - minLo) * s + ((w - pad * 2) - rLo * s) / 2,
-    y: pad + (maxLa - p.lat) * s + ((h - pad * 2) - rLa * s) / 2,
-  }))
-}
-function makeSVGPath(m: { x: number; y: number }[]) {
-  if (m.length < 2) return ''
-  return 'M' + m[0].x.toFixed(1) + ',' + m[0].y.toFixed(1) + m.slice(1).map(p => ' L' + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('')
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -265,7 +250,6 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   const wRef = useRef<number | null>(null)
   const tRef = useRef<number | null>(null)
   const sRef = useRef(0)
-  const svgRef = useRef<SVGSVGElement>(null)
 
   // Load body data safely from localStorage
   const bodyData = useMemo(() => {
@@ -281,18 +265,11 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   const speed = dur > 0 ? (dist / dur) * 3.6 : 0
   const acceleration = calcAcceleration(pts)
   const kcal = Math.round(sport.met * weight * (dur / 3600))
-  const mapped = mapGPSToSVG(pts, 360, 220, 20)
-  const pathD = makeSVGPath(mapped)
   const hiit = hiitIndicator(sport.met, hrMax, hr || 60, hr)
   const vo2Est = hr > 0 ? calcVO2MaxRockport(dist / 1000, dur / 60, hr, age, gender as 'M' | 'F') : 0
   const elevGainM = elevGain(pts)
   const terrain = terrainLabel(elevGainM, dist / 1000)
-
-  function onSvgClick(e: React.MouseEvent<SVGSVGElement>) {
-    if (mode !== 'planning' || !svgRef.current) return
-    const r = svgRef.current.getBoundingClientRect()
-    setPlan(p => [...p, { x: ((e.clientX - r.left) / r.width) * 360, y: ((e.clientY - r.top) / r.height) * 220 }])
-  }
+  const planDist = totalDist(plan)
   function startTrack() {
     setGpsErr(''); setMode('tracking'); setPts([]); setDur(0); sRef.current = Date.now()
     tRef.current = window.setInterval(() => setDur((Date.now() - sRef.current) / 1000), 1000)
@@ -319,7 +296,6 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   function shareToFeed() {
     onShareToFeed({ sport, dist, dur, speed, pace: fmtPace(dur, dist), kcal, hr, acceleration, vo2Max: vo2Est, hiit, elevGainM, terrain })
   }
-  function planPathD() { if (plan.length < 2) return ''; return 'M' + plan[0].x.toFixed(1) + ',' + plan[0].y.toFixed(1) + plan.slice(1).map(p => ' L' + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('') }
 
   const progressPct = sport.targetDist ? Math.min(100, (dist / 1000 / sport.targetDist) * 100) : 0
 
@@ -372,32 +348,28 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
         </div>
       </div>
 
-      {/* Peta nyata (OpenStreetMap) — tampil saat merekam/selesai, gaya Strava */}
-      {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
-        <div className="mx-5 mb-3 overflow-hidden rounded-2xl border border-neutral-100">
-          <Suspense fallback={<div className="grid h-[220px] place-items-center text-xs text-neutral-400">Memuat peta…</div>}>
-            <RouteMap points={pts} />
-          </Suspense>
-        </div>
-      )}
+      {/* Satu peta nyata (OpenStreetMap) untuk semua mode: lihat posisi,
+          rencanakan jalur (klik peta = tambah waypoint), dan rekam rute. */}
+      <div className="mx-5 overflow-hidden rounded-2xl border border-neutral-100 relative">
+        {mode === 'planning' && (
+          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
+            📍 Ketuk peta untuk menambah titik jalur {plan.length > 0 && `· ${plan.length} titik · ${fmtDist(planDist)}`}
+          </div>
+        )}
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Memuat peta…</div>}>
+          <RouteMap
+            points={pts}
+            planned={plan}
+            height={240}
+            onMapClick={mode === 'planning' ? (p) => setPlan((pl) => [...pl, p]) : undefined}
+          />
+        </Suspense>
 
-      {/* Map SVG */}
-      <div className="mx-5 rounded-2xl overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        <svg ref={svgRef} viewBox="0 0 360 220" className="w-full cursor-crosshair" onClick={onSvgClick} style={{ minHeight: 180 }}>
-          {Array.from({ length: 9 }, (_, i) => <line key={'h' + i} x1="0" x2="360" y1={i * 27.5} y2={i * 27.5} stroke="rgba(255,255,255,0.03)" />)}
-          {Array.from({ length: 13 }, (_, i) => <line key={'v' + i} x1={i * 30} x2={i * 30} y1="0" y2="220" stroke="rgba(255,255,255,0.03)" />)}
-          {plan.length >= 2 && <><path d={planPathD()} fill="none" stroke="rgba(139,92,246,0.5)" strokeWidth="3" strokeDasharray="8 4" strokeLinecap="round" />{plan.map((p, i) => <circle key={'wp' + i} cx={p.x} cy={p.y} r="5" fill="rgba(139,92,246,0.3)" stroke="#8b5cf6" strokeWidth="1.5" />)}</>}
-          {pathD && <><defs><linearGradient id="rG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#00BF63" /><stop offset="50%" stopColor="#f59e0b" /><stop offset="100%" stopColor="#ef4444" /></linearGradient></defs><path d={pathD} fill="none" stroke="url(#rG)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" /></>}
-          {mapped.length > 0 && <>{mapped.map((p, i) => i === 0 ? <circle key={'s' + i} cx={p.x} cy={p.y} r="6" fill="#00BF63" stroke="white" strokeWidth="2" /> : i === mapped.length - 1 && mode !== 'tracking' ? <circle key={'e' + i} cx={p.x} cy={p.y} r="6" fill="#ef4444" stroke="white" strokeWidth="2" /> : null)}{(mode === 'tracking' || mode === 'paused') && mapped.length > 0 && <g><circle cx={mapped[mapped.length - 1].x} cy={mapped[mapped.length - 1].y} r="8" fill="rgba(0,191,99,0.3)"><animate attributeName="r" values="6;12;6" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.5s" repeatCount="indefinite" /></circle><circle cx={mapped[mapped.length - 1].x} cy={mapped[mapped.length - 1].y} r="4" fill="#00BF63" stroke="white" strokeWidth="1.5" /></g>}</>}
-          {mode === 'idle' && pts.length === 0 && plan.length === 0 && <text x="180" y="105" textAnchor="middle" fontSize="12" fill="rgba(255,255,255,0.3)" fontWeight="600">Pilih olahraga & tekan Mulai</text>}
-          {mode === 'planning' && <text x="180" y="15" textAnchor="middle" fontSize="9" fill="rgba(139,92,246,0.8)" fontWeight="600">📍 Klik untuk menambah waypoint</text>}
-        </svg>
-
-        {/* Stats Overlay */}
+        {/* Stats bar */}
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
-          <div className="grid grid-cols-3 gap-px bg-black/30">
+          <div className="grid grid-cols-3 gap-px bg-neutral-900">
             {[[fmtD(dur), 'WAKTU'], [fmtDist(dist), 'JARAK'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVASI']].map(([v, l]) => (
-              <div key={l} className="bg-black/40 px-1.5 py-2 text-center">
+              <div key={l} className="bg-neutral-900 px-1.5 py-2 text-center">
                 <div className="text-xs font-extrabold text-white tabular-nums">{v}</div>
                 <div className="text-[7px] font-bold uppercase tracking-widest text-white/40">{l}</div>
               </div>
@@ -438,6 +410,34 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
                 </div>
               </div>
             )}
+
+            {/* %HRmax + Talk Test + MAF (Maffetone) — panduan intensitas lari */}
+            <div className="rounded-xl border border-neutral-100 p-3">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Panduan Intensitas Lari</div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="rounded-lg bg-neutral-50 p-2">
+                  <div className="text-sm font-extrabold tabular-nums" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
+                    {hr > 0 ? Math.round((hr / hrMax) * 100) + '%' : '—'}
+                  </div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">% HR Max</div>
+                </div>
+                <div className="rounded-lg bg-neutral-50 p-2">
+                  <div className="text-[11px] font-extrabold leading-tight" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
+                    {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Bisa bicara kalimat penuh' : hr / hrMax < 0.9 ? 'Hanya 3-4 kata' : 'Tak bisa bicara'}
+                  </div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Talk Test</div>
+                </div>
+                <div className="rounded-lg bg-neutral-50 p-2">
+                  <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[9px] text-neutral-400"> bpm</span></div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">MAF Target</div>
+                </div>
+              </div>
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-400">
+                <b>Talk test:</b> validasi zona termudah — Zone 2 bila masih bisa bicara kalimat penuh.
+                <b> MAF</b> (Maximum Aerobic Function, metode Maffetone 180−usia): latihan di ≤{180 - age} bpm membangun mesin aerobik & pembakaran lemak maksimal.
+                {hr > 0 && hr > 180 - age && <span className="font-bold text-amber-600"> HR Anda {hr} bpm di atas MAF — pelankan untuk basis aerobik.</span>}
+              </p>
+            </div>
 
             <HealthMetricsBar weight={weight} height={height} age={age} gender={gender as 'M' | 'F'} hrRest={hr || undefined} />
           </>
