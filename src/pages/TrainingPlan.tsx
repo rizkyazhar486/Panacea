@@ -24,6 +24,23 @@ interface Exercise {
 }
 interface DayPlan { title: string; emoji: string; focus: string; items: Exercise[] }
 
+// Technique illustrations (Higgsfield-generated, minimalist instructional
+// style) — matched by keyword against the exercise name so every block that
+// reuses a movement (e.g. Push-up appears in Full Body & Upper Body) gets its
+// thumbnail automatically, no per-entry wiring needed.
+const TECHNIQUE_IMAGES: { match: RegExp; url: string }[] = [
+  { match: /squat/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012752_fc31ed96-35bf-40ce-aad2-27310e0d6ee8.png' },
+  { match: /push-up|bench/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012802_01eb1d11-a6ab-4b55-8eb8-b086cb5d1220.png' },
+  { match: /deadlift/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012812_09d7e171-15bd-4bb1-83fe-7086d40f324d.png' },
+  { match: /pull-up/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012821_16047742-2bfc-42cb-a111-f80e13026240.png' },
+  { match: /hip thrust/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012828_c764c942-79a0-4a12-b77f-7993ba7389a4.png' },
+  { match: /overhead press/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012843_1ad9fcbb-a3d8-4b52-a0b4-5e81be2626d0.png' },
+  { match: /easy run|tempo|long run|interval|4×4|8×300|ladder/i, url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_012852_10ed0602-40b4-40b1-8155-585b5fae2cb1.png' },
+]
+function techniqueImage(name: string): string | null {
+  return TECHNIQUE_IMAGES.find((t) => t.match.test(name))?.url ?? null
+}
+
 const GOALS = [
   'Longevity (VO₂max + Strength)', 'Hybrid Training', 'Cardio', 'Muscle Gain', 'Full Body Workout',
   'Fat Loss / Burn Fat', 'Strength Boost', 'Glutes', 'Back', 'Bicep', 'Tricep', 'Upper Body',
@@ -287,21 +304,30 @@ export function TrainingPlan() {
                   <>
                     <div className="mt-1 text-[11px] font-semibold text-brand-dark">{p.focus}</div>
                     <div className="mt-2 space-y-2">
-                      {p.items.map((ex) => (
-                        <div key={ex.name} className="rounded-xl bg-neutral-50 p-2.5">
-                          <div className="flex flex-wrap items-center justify-between gap-1">
-                            <span className="text-xs font-bold">{ex.name}</span>
-                            <span className="text-[11px] font-extrabold text-brand-dark">
-                              {[ex.sets, ex.dur, ex.dist].filter(Boolean).join(' · ')}
-                            </span>
+                      {p.items.map((ex) => {
+                        const img = techniqueImage(ex.name)
+                        return (
+                          <div key={ex.name} className="flex gap-2.5 rounded-xl bg-neutral-50 p-2.5">
+                            {img && (
+                              <img src={img} alt={`Teknik ${ex.name}`} loading="lazy"
+                                className="h-14 w-14 shrink-0 rounded-lg border border-neutral-200 bg-white object-cover" />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center justify-between gap-1">
+                                <span className="text-xs font-bold">{ex.name}</span>
+                                <span className="text-[11px] font-extrabold text-brand-dark">
+                                  {[ex.sets, ex.dur, ex.dist].filter(Boolean).join(' · ')}
+                                </span>
+                              </div>
+                              <div className="mt-0.5 flex flex-wrap gap-x-3 text-[10px] text-neutral-500">
+                                {ex.rest && <span>⏸ Istirahat: {ex.rest}</span>}
+                                {ex.pace && <span>🎯 {ex.pace}</span>}
+                              </div>
+                              <div className="mt-0.5 text-[10px] italic text-neutral-400">💡 {ex.cue}</div>
+                            </div>
                           </div>
-                          <div className="mt-0.5 flex flex-wrap gap-x-3 text-[10px] text-neutral-500">
-                            {ex.rest && <span>⏸ Istirahat: {ex.rest}</span>}
-                            {ex.pace && <span>🎯 {ex.pace}</span>}
-                          </div>
-                          <div className="mt-0.5 text-[10px] italic text-neutral-400">💡 {ex.cue}</div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </>
                 )}
@@ -420,7 +446,7 @@ export function TrainingPlan() {
       </Card>
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
-        🖼️ Ilustrasi teknik gerakan (gambar/animasi Higgsfield) akan diisi setelah credit tersedia — slot sudah disiapkan di tiap latihan.
+        🖼️ Ilustrasi teknik gerakan kini tampil otomatis pada Squat, Push-up/Bench Press, Deadlift, Pull-up, Hip Thrust, Overhead Press & sesi lari — akan terus ditambah untuk gerakan lainnya.
         Log beban gym cepat ada di <a href="#/fitness-test" className="font-bold underline">Tes Fisik</a>, jurnal RPE di <a href="#/logs" className="font-bold underline">Log & Statistik</a>.
       </div>
     </div>
