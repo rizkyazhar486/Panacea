@@ -5,6 +5,9 @@ import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../compone
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
+
+// Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
+const RouteMap = lazy(() => import('../components/RouteMap'))
 import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../lib/chronic'
 // Lazy so recharts is split into its own chunk (keeps the main bundle lean).
 const HealthTrends = lazy(() => import('../components/HealthTrends'))
@@ -576,23 +579,7 @@ function hav(lat1: number, lon1: number, lat2: number, lon2: number) {
   const a = Math.sin(dLa / 2) ** 2 + Math.cos(lat1 * dr) * Math.cos(lat2 * dr) * Math.sin(dLo / 2) ** 2
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
-function totalDist(pts: GP[]) { let d = 0; for (let i = 1; i < pts.length; i++) d += hav(pts[i - 1].lat, pts[i - 1].lng, pts[i].lat, pts[i].lng); return d }
-function mapSVG(pts: GP[], w: number, h: number, pad: number) {
-  if (!pts.length) return [{ x: w / 2, y: h / 2 }]
-  const las = pts.map(p => p.lat); const lns = pts.map(p => p.lng)
-  const minLa = Math.min(...las); const maxLa = Math.max(...las)
-  const minLo = Math.min(...lns); const maxLo = Math.max(...lns)
-  const rLa = (maxLa - minLa) || 0.002; const rLo = (maxLo - minLo) || 0.002
-  const s = Math.min((w - pad * 2) / rLo, (h - pad * 2) / rLa)
-  return pts.map(p => ({
-    x: pad + (p.lng - minLo) * s + ((w - pad * 2) - rLo * s) / 2,
-    y: pad + (maxLa - p.lat) * s + ((h - pad * 2) - rLa * s) / 2,
-  }))
-}
-function makePath(m: { x: number; y: number }[]) {
-  if (m.length < 2) return ''
-  return 'M' + m[0].x.toFixed(1) + ',' + m[0].y.toFixed(1) + m.slice(1).map(p => ' L' + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('')
-}
+function totalDist(pts: { lat: number; lng: number }[]) { let d = 0; for (let i = 1; i < pts.length; i++) d += hav(pts[i - 1].lat, pts[i - 1].lng, pts[i].lat, pts[i].lng); return d }
 
 /* ═══════════════════════════════════════════════════════
    VITAL IMPORT PARSER
@@ -1054,20 +1041,15 @@ type GMode = 'idle' | 'planning' | 'tracking' | 'paused' | 'done'
 function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: number, min: number, metH: number) => void }) {
   const [mode, setMode] = useState<GMode>('idle')
   const [exType, setExType] = useState(EX[0]); const [exCat, setExCat] = useState('Kardio')
-  const [pts, setPts] = useState<GP[]>([]); const [plan, setPlan] = useState<{x: number; y: number}[]>([])
+  const [pts, setPts] = useState<GP[]>([]); const [plan, setPlan] = useState<{ lat: number; lng: number }[]>([])
   const [dur, setDur] = useState(0); const [hr, setHr] = useState(0)
   const [gpsErr, setGpsErr] = useState('')
   const wRef = useRef<number | null>(null); const tRef = useRef<number | null>(null)
-  const sRef = useRef(0); const svgRef = useRef<SVGSVGElement>(null)
-  const dist = totalDist(pts); const mapped = mapSVG(pts, 360, 240, 20); const pathD = makePath(mapped)
+  const sRef = useRef(0)
+  const dist = totalDist(pts)
+  const planDist = totalDist(plan)
   const kcal = getMetBurn(exType.met, body.w, dur / 60); const metH = exType.met * (dur / 3600)
   const filtered = EX.filter(e => e.cat === exCat)
-
-  function onSvgClick(e: React.MouseEvent<SVGSVGElement>) {
-    if (mode !== 'planning' || !svgRef.current) return
-    const r = svgRef.current.getBoundingClientRect()
-    setPlan(p => [...p, { x: ((e.clientX - r.left) / r.width) * 360, y: ((e.clientY - r.top) / r.height) * 240 }])
-  }
   function startTrack() {
     if (!exType.gps) { setGpsErr('GPS tidak tersedia. Gunakan mode manual.'); return }
     setGpsErr(''); setMode('tracking'); setPts([]); setDur(0); sRef.current = Date.now()
@@ -1090,7 +1072,6 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
   }
   function stop() { setMode('done'); if (wRef.current) navigator.geolocation.clearWatch(wRef.current); if (tRef.current) clearInterval(tRef.current); onComplete(kcal, dur / 60, metH) }
   function reset() { setMode('idle'); setPts([]); setPlan([]); setDur(0); setHr(0); setGpsErr('') }
-  function planPathD() { if (plan.length < 2) return ''; return 'M' + plan[0].x.toFixed(1) + ',' + plan[0].y.toFixed(1) + plan.slice(1).map(p => ' L' + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('') }
 
   return (
     <Card className="!p-0 overflow-hidden">
@@ -1101,20 +1082,26 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExType(f[0]) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-400">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
-      <div className="mx-5 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
-        <svg ref={svgRef} viewBox="0 0 360 240" className="w-full cursor-crosshair" onClick={onSvgClick} style={{ minHeight: 200 }}>
-          {Array.from({ length: 9 }, (_, i) => <line key={'h' + i} x1="0" x2="360" y1={i * 30} y2={i * 30} stroke="rgba(255,255,255,0.04)" />)}
-          {Array.from({ length: 13 }, (_, i) => <line key={'v' + i} x1={i * 30} x2={i * 30} y1="0" y2="240" stroke="rgba(255,255,255,0.04)" />)}
-          {plan.length >= 2 && <><path d={planPathD()} fill="none" stroke="rgba(139,92,246,0.5)" strokeWidth="3" strokeDasharray="8 4" strokeLinecap="round" />{plan.map((p, i) => <circle key={'wp' + i} cx={p.x} cy={p.y} r="5" fill="rgba(139,92,246,0.3)" stroke="#8b5cf6" strokeWidth="1.5" />)}</>}
-          {pathD && <><defs><linearGradient id="rG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#00BF63" /><stop offset="50%" stopColor="#f59e0b" /><stop offset="100%" stopColor="#ef4444" /></linearGradient></defs><path d={pathD} fill="none" stroke="url(#rG)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" /></>}
-          {mapped.length > 0 && <>{mapped.map((p, i) => i === 0 ? <circle key={'s' + i} cx={p.x} cy={p.y} r="6" fill="#00BF63" stroke="white" strokeWidth="2" /> : i === mapped.length - 1 && mode !== 'tracking' ? <circle key={'e' + i} cx={p.x} cy={p.y} r="6" fill="#ef4444" stroke="white" strokeWidth="2" /> : null)}{(mode === 'tracking' || mode === 'paused') && mapped.length > 0 && <g><circle cx={mapped[mapped.length - 1].x} cy={mapped[mapped.length - 1].y} r="8" fill="rgba(0,191,99,0.3)"><animate attributeName="r" values="6;12;6" dur="1.5s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.5s" repeatCount="indefinite" /></circle><circle cx={mapped[mapped.length - 1].x} cy={mapped[mapped.length - 1].y} r="4" fill="#00BF63" stroke="white" strokeWidth="1.5" /></g>}</>}
-          {mode === 'idle' && pts.length === 0 && plan.length === 0 && <text x="180" y="115" textAnchor="middle" fontSize="12" fill="rgba(255,255,255,0.3)" fontWeight="600">Pilih olahraga & tekan Mulai</text>}
-          {mode === 'planning' && <text x="180" y="15" textAnchor="middle" fontSize="9" fill="rgba(139,92,246,0.8)" fontWeight="600">Klik untuk menambah waypoint</text>}
-        </svg>
+      {/* Peta nyata (OpenStreetMap) — posisi live, rekam rute & rencanakan
+          jalur dengan mengetuk peta. */}
+      <div className="relative mx-5 overflow-hidden rounded-2xl border border-neutral-100">
+        {mode === 'planning' && (
+          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
+            {'\u{1F4CD}'} Ketuk peta untuk menambah titik jalur {plan.length > 0 && `· ${plan.length} titik · ${fmtDist(planDist)}`}
+          </div>
+        )}
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Memuat peta…</div>}>
+          <RouteMap
+            points={pts}
+            planned={plan}
+            height={240}
+            onMapClick={mode === 'planning' ? (p) => setPlan((pl) => [...pl, p]) : undefined}
+          />
+        </Suspense>
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
-          <div className="grid grid-cols-4 gap-px bg-black/30">
+          <div className="grid grid-cols-4 gap-px bg-neutral-900">
             {[[fmtD(dur), 'WAKTU'], [fmtDist(dist), 'JARAK'], [Math.round(dur > 0 ? (dist / dur) * 3.6 : 0) + ' km/h', 'KECEPATAN'], [fmtPace(dur, dist), 'PACE']].map(([v, l]) => (
-              <div key={l} className="bg-black/40 px-2 py-2 text-center">
+              <div key={l} className="bg-neutral-900 px-2 py-2 text-center">
                 <div className="text-sm font-extrabold text-white tabular-nums">{v}</div>
                 <div className="text-[8px] font-bold uppercase tracking-widest text-white/40">{l}</div>
               </div>
