@@ -262,7 +262,10 @@ export function Settings() {
         </div>
       </Card>
 
-      {/* ── Privacy & Data ─────────────────────────────────────── */}
+      {/* ── Pesan & Saran (feedback) ───────────────────────────── */}
+      <FeedbackCard simple={S} />
+
+      {/* ── Privacy & Data (export + local reset, merged) ─────────── */}
       <Card>
         <SectionTitle
           icon={<IconDownload size={S ? 22 : 20} />}
@@ -282,16 +285,13 @@ export function Settings() {
           </span>
           <IconChevronRight size={18} className="text-neutral-400" />
         </button>
-      </Card>
-
-      {/* ── Data lokal ─────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle
-          icon={<IconShield size={S ? 22 : 20} />}
-          title="Data Lokal"
-          subtitle="Kelola data tersimpan di perangkat ini"
-        />
-        <Button variant="ghost" onClick={resetDemo} className={S ? '!py-3 !text-base' : ''}>Reset Data Lokal</Button>
+        <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 ${S ? 'p-4' : 'p-3'}`}>
+          <span className="min-w-0">
+            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Data Lokal</span>
+            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>Hapus data tersimpan di perangkat ini</span>
+          </span>
+          <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
+        </div>
       </Card>
 
       {/* App info */}
@@ -304,6 +304,89 @@ export function Settings() {
 }
 
 // ── Sub-components ──────────────────────────────────────────────
+
+// Pesan & Saran — user feedback straight to the founder via WhatsApp or email
+// (the same contact channels published on the landing page). Message history
+// is kept locally so users can see what they've sent.
+const FEEDBACK_WA = '6282261143040'
+const FEEDBACK_EMAIL = 'index.meds@gmail.com'
+const FB_KEY = 'pmd_feedback_history'
+
+function FeedbackCard({ simple: S }: { simple: boolean }) {
+  const [kind, setKind] = useState<'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian'>('Saran')
+  const [text, setText] = useState('')
+  const [sent, setSent] = useState<{ kind: string; text: string; at: string }[]>(() => {
+    try { return JSON.parse(localStorage.getItem(FB_KEY) || '[]') } catch { return [] }
+  })
+
+  function record() {
+    const entry = { kind, text: text.trim(), at: new Date().toISOString() }
+    const next = [entry, ...sent].slice(0, 10)
+    setSent(next)
+    try { localStorage.setItem(FB_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+    setText('')
+  }
+  const body = `[${kind}] Panaceamed.id\n\n${text.trim()}`
+  const canSend = text.trim().length >= 5
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<span className={S ? 'text-2xl' : 'text-xl'}>💬</span>}
+        title="Pesan & Saran"
+        subtitle="Kirim masukan langsung ke pengembang — semua dibaca"
+      />
+      <div className={`flex flex-wrap ${S ? 'gap-2.5' : 'gap-1.5'}`}>
+        {(['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian'] as const).map((k) => (
+          <button key={k} onClick={() => setKind(k)}
+            className={`rounded-full font-bold ${S ? 'px-4 py-2 text-sm' : 'px-3 py-1.5 text-[11px]'} ${
+              kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
+            }`}>
+            {k}
+          </button>
+        ))}
+      </div>
+      <textarea
+        className={`mt-3 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 ${S ? 'text-base' : 'text-sm'}`}
+        rows={4}
+        placeholder="Tulis pesan, saran, atau kendala yang Anda alami…"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <div className="mt-2 flex gap-2">
+        <a
+          href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
+          target="_blank" rel="noreferrer"
+          onClick={(e) => { if (!canSend) { e.preventDefault(); return } record() }}
+          className={`flex-1 rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend ? 'bg-[#25D366]' : 'cursor-not-allowed bg-neutral-300'}`}
+        >
+          Kirim via WhatsApp
+        </a>
+        <a
+          href={canSend ? `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(`[${kind}] Feedback Panaceamed.id`)}&body=${encodeURIComponent(text.trim())}` : undefined}
+          onClick={(e) => { if (!canSend) { e.preventDefault(); return } record() }}
+          className={`flex-1 rounded-xl border-2 py-3 text-center font-bold ${S ? 'text-base' : 'text-sm'} ${canSend ? 'border-brand text-brand-dark' : 'cursor-not-allowed border-neutral-200 text-neutral-300'}`}
+        >
+          ✉️ Email
+        </a>
+      </div>
+      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-400">Tulis minimal 5 karakter.</p>}
+      {sent.length > 0 && (
+        <details className="mt-3">
+          <summary className={`cursor-pointer font-semibold text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>Riwayat kiriman ({sent.length})</summary>
+          <div className="mt-2 space-y-1.5">
+            {sent.map((f, i) => (
+              <div key={i} className="rounded-lg bg-neutral-50 px-3 py-2">
+                <div className="text-[10px] font-bold text-brand-dark">{f.kind} · {new Date(f.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                <div className={`text-neutral-600 ${S ? 'text-sm' : 'text-xs'}`}>{f.text}</div>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+    </Card>
+  )
+}
 
 function ThemeCard({ active, onClick, label, preview, icon, simple: S }: { active: boolean; onClick: () => void; label: string; preview: 'light' | 'dark' | 'system'; icon: React.ReactNode; simple: boolean }) {
   return (
