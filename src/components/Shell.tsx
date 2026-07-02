@@ -128,6 +128,55 @@ const riskLabel: Record<string, string> = {
   immunocompromised: 'Immunocompromised',
 }
 
+// Mobile drawer navigation with accordion groups — the flat list grew too long
+// to scroll. 'Beranda' items stay as always-visible plain links; every other
+// group collapses, with the group containing the current route open by default.
+function DrawerNav({ items }: { items: Nav[] }) {
+  const loc = useLocation()
+  const groups = GROUP_ORDER
+    .map((g) => ({ name: g, items: items.filter((n) => n.group === g) }))
+    .filter((g) => g.items.length > 0)
+  const activeGroup = groups.find((g) => g.items.some((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to))))?.name
+  const [open, setOpen] = useState<Record<string, boolean>>(() => (activeGroup ? { [activeGroup]: true } : {}))
+
+  const link = (n: Nav, indent = false) => (
+    <NavLink key={n.to} to={n.to} end={n.end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-semibold transition ${indent ? 'ml-2' : ''} ${
+          isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-600 hover:bg-neutral-50'
+        }`
+      }>
+      <n.icon size={20} />
+      {n.label}
+    </NavLink>
+  )
+
+  return (
+    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
+      {groups.map((g) =>
+        g.name === 'Beranda' ? (
+          g.items.map((n) => link(n))
+        ) : (
+          <div key={g.name}>
+            <button
+              onClick={() => setOpen((o) => ({ ...o, [g.name]: !o[g.name] }))}
+              aria-expanded={!!open[g.name]}
+              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-wide text-neutral-400 hover:bg-neutral-50"
+            >
+              {g.name}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+                className={`transition-transform ${open[g.name] ? 'rotate-180' : ''}`}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {open[g.name] && <div className="flex flex-col gap-1">{g.items.map((n) => link(n, true))}</div>}
+          </div>
+        ),
+      )}
+    </nav>
+  )
+}
+
 export function Shell({ children }: { children: ReactNode }) {
   const { state, activePatient, setActivePatient, logout, setMode } = useStore()
   const loc = useLocation()
@@ -437,23 +486,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
               <button onClick={() => setMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
             </div>
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
-              {items.map((n) => (
-                <NavLink
-                  key={n.to}
-                  to={n.to}
-                  end={n.end}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-semibold transition ${
-                      isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-600 hover:bg-neutral-50'
-                    }`
-                  }
-                >
-                  <n.icon size={20} />
-                  {n.label}
-                </NavLink>
-              ))}
-            </nav>
+            <DrawerNav items={items} />
             <div className="border-t border-black/5 p-3">
               {(account.role === 'pasien' || account.role === 'dokter') && (
                 <NavLink to="/hospitals" className="mb-2 flex items-center justify-center gap-2 rounded-xl bg-accent/10 px-3 py-3 text-sm font-bold text-accent">
