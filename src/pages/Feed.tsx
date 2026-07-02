@@ -90,6 +90,115 @@ function getVideoDuration(file: File): Promise<number> {
 }
 
 const SONGS = ['Tanpa Musik', '🎵 Morning Vibes', '🎵 Upbeat Workout', '🎵 Chill Lo-fi', '🎵 Acoustic Calm', '🎵 Energetic Pop']
+
+/* ── Music picker: real song search via the public iTunes Search API (free, no
+   key, CORS-enabled) with a 30s preview, plus Spotify / Apple Music deep
+   links. The chosen "Song — Artist" string is stored in post.audio. */
+interface FoundSong { id: number; title: string; artist: string; artwork: string; preview: string }
+function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const [results, setResults] = useState<FoundSong[]>([])
+  const [busy, setBusy] = useState(false)
+  const [playing, setPlaying] = useState<number | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  async function search() {
+    const term = q.trim()
+    if (!term) return
+    setBusy(true)
+    try {
+      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&limit=8`)
+      const d = await r.json()
+      setResults((d.results ?? []).map((x: Record<string, unknown>) => ({
+        id: x.trackId as number,
+        title: x.trackName as string,
+        artist: x.artistName as string,
+        artwork: x.artworkUrl60 as string,
+        preview: x.previewUrl as string,
+      })))
+    } catch { setResults([]) }
+    setBusy(false)
+  }
+  function preview(s: FoundSong) {
+    if (playing === s.id) { audioRef.current?.pause(); setPlaying(null); return }
+    if (!audioRef.current) audioRef.current = new Audio()
+    audioRef.current.src = s.preview
+    audioRef.current.play().catch(() => {})
+    audioRef.current.onended = () => setPlaying(null)
+    setPlaying(s.id)
+  }
+  function choose(s: FoundSong) {
+    setSong(`${s.title} — ${s.artist}`)
+    audioRef.current?.pause(); setPlaying(null)
+    setOpen(false)
+  }
+  useEffect(() => () => { audioRef.current?.pause() }, [])
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)} className="max-w-[180px] truncate rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-100">
+        {song === SONGS[0] ? '🎵 Pilih Musik' : `🎵 ${song}`}
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50" onClick={() => setOpen(false)}>
+          <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-6" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-neutral-200" />
+            <div className="text-sm font-black">Pilih Musik</div>
+
+            {/* Real song search */}
+            <div className="mt-3 flex gap-2">
+              <input className={inputClass} placeholder="Cari lagu / artis…" value={q}
+                onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} />
+              <button onClick={search} disabled={busy} className="shrink-0 rounded-xl bg-brand px-4 text-xs font-bold text-white disabled:opacity-50">
+                {busy ? '…' : 'Cari'}
+              </button>
+            </div>
+            {q.trim() && (
+              <div className="mt-2 flex gap-2">
+                <a href={`https://open.spotify.com/search/${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
+                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-white">Buka di Spotify</a>
+                <a href={`https://music.apple.com/search?term=${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
+                  className="rounded-full bg-neutral-900 px-3 py-1.5 text-[10px] font-bold text-white"> Apple Music</a>
+              </div>
+            )}
+            <div className="mt-2 space-y-1.5">
+              {results.map((s) => (
+                <div key={s.id} className="flex items-center gap-2.5 rounded-xl border border-neutral-100 p-2">
+                  <img src={s.artwork} alt="" className="h-10 w-10 rounded-lg" />
+                  <button onClick={() => choose(s)} className="min-w-0 flex-1 text-left">
+                    <div className="truncate text-xs font-bold">{s.title}</div>
+                    <div className="truncate text-[10px] text-neutral-400">{s.artist}</div>
+                  </button>
+                  {s.preview && (
+                    <button onClick={() => preview(s)} aria-label="Pratinjau 30 detik"
+                      className={'grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs ' + (playing === s.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
+                      {playing === s.id ? '⏸' : '▶'}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Quick moods + none */}
+            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Suasana cepat</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {SONGS.map((s) => (
+                <button key={s} onClick={() => { setSong(s); setOpen(false) }}
+                  className={'rounded-full px-3 py-1.5 text-[11px] font-bold ' + (song === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
+                  {s}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">
+              Pencarian & pratinjau 30 dtk via katalog iTunes (gratis). Pemutaran penuh membuka aplikasi Spotify / Apple Music Anda.
+            </p>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
 const MAX_VIDEO_SEC = 180 // 3 minutes
 
 /* ═══════════════════════════════════════════════════════
@@ -823,9 +932,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
             </button>
             <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => pickVideo(e.target.files?.[0])} />
 
-            <select className="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-600 focus:outline-none" value={song} onChange={e => setSong(e.target.value)}>
-              {SONGS.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <MusicPicker song={song} setSong={setSong} />
           </div>
 
           <div className="flex justify-end">

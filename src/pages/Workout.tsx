@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
+import { VideoGallery } from '../components/VideoGallery'
 
 type Muscle = 'Dada' | 'Punggung' | 'Bahu' | 'Lengan' | 'Kaki' | 'Glute' | 'Core' | 'Full Body'
 type Modality =
@@ -150,6 +151,17 @@ export function Workout() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <VideoGallery
+        icon={<IconFlame size={20} />}
+        title="Video Contoh Gerakan"
+        subtitle="Demonstrasi form yang benar — pemanasan, HIIT & kaki"
+        videos={[
+          { label: 'Pemanasan Dinamis', cue: 'Leg swing · arm circle · high knees — wajib sebelum sesi', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073037_fc3668ff-bc44-4938-8e63-69f2ba59c7f9.mp4' },
+          { label: 'Burpee', cue: 'Squat → plank → push-up → lompat eksplosif, jaga form saat lelah', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072933_8c31ec59-1c8a-46a2-8e05-03b56cd36e5f.mp4' },
+          { label: 'Lunge', cue: 'Torso tegak · lutut depan 90° searah jari kaki', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072947_e56eb38e-4fea-4d36-aed8-0baf8e10b1f5.mp4' },
+        ]}
+      />
+
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Statis & dinamis, alat maupun calisthenic, per kelompok otot — dasar sport science & orthopedic" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">

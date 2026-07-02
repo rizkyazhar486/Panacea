@@ -79,22 +79,22 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </button>
       )}
       {/* Glass header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-black/5 bg-white/70 px-5 py-3 backdrop-blur-xl sm:px-8">
-        <Wordmark size={36} />
-        <div className="flex items-center gap-2.5">
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-8">
+        <div className="min-w-0 shrink"><Wordmark size={32} /></div>
+        <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
-            className="grid h-10 w-10 place-items-center rounded-full border border-black/5 text-neutral-500 transition hover:text-brand-dark"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-500 transition hover:text-brand-dark"
             title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
             aria-label="Ganti tema"
           >
-            {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+            {theme === 'dark' ? <IconSun size={17} /> : <IconMoon size={17} />}
           </button>
           <button
             onClick={onMasuk}
-            className="rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-7 py-3 text-base font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95"
+            className="whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-4 py-2 text-sm font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95 sm:px-6 sm:py-2.5 sm:text-base"
           >
-            Masuk / Daftar
+            Masuk<span className="hidden sm:inline"> / Daftar</span>
           </button>
         </div>
       </header>

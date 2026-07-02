@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
+import { VideoGallery } from '../components/VideoGallery'
 
 type RecoveryType = 'surgery' | 'injury' | 'illness' | 'overtraining'
 
@@ -69,6 +70,16 @@ export function Recovery() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <VideoGallery
+        icon={<IconLeaf size={20} />}
+        title="Video Pemulihan"
+        subtitle="Peregangan lembut & latihan napas untuk mempercepat recovery"
+        videos={[
+          { label: 'Peregangan Hamstring & Twist', cue: 'Tahan 20-30 dtk per sisi · napas dalam · tanpa nyeri', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072959_151332b7-0e3e-4388-b7f3-4775a65c9b9c.mp4' },
+          { label: 'Napas & Meditasi', cue: 'Duduk tegak · napas 4-7-8 · 10 menit menurunkan stres & memperbaiki HRV', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073011_31df726a-68e4-43bf-a5c6-7cbbb41c748e.mp4' },
+        ]}
+      />
+
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Recovery Tracker" subtitle="Pelacak fase pemulihan & panduan bertahap" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
