@@ -33,7 +33,7 @@ export function OfflineBanner() {
       {online ? (
         <>✓ Kembali online</>
       ) : (
-        <>📴 Mode Offline — data tetap tersimpan di perangkat, akan tersinkron saat online</>
+        <>📴 Mode Offline — Atlet, Lab Performa & Program AI tetap bisa dipakai; data tersinkron saat online kembali</>
       )}
     </div>
   )

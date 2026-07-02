@@ -30,6 +30,7 @@ import {
 import { LANGS, getLang, setLang, t, type Lang } from '../lib/i18n'
 import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/push'
 import { InstallApp } from '../components/InstallApp'
+import { OfflineReady } from '../components/OfflineReady'
 import { api } from '../lib/api'
 
 export function Settings() {
@@ -123,6 +124,9 @@ export function Settings() {
     <div className={`mx-auto max-w-3xl ${S ? 'space-y-8' : 'space-y-6'}`}>
       {/* ── Install as app (PWA) ───────────────────────────────── */}
       <InstallApp />
+
+      {/* ── Offline mode ───────────────────────────────────────── */}
+      <OfflineReady />
 
       {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>

@@ -3,7 +3,7 @@
 // with an offline fallback to the cached shell); same-origin static assets are
 // cache-first (they're content-hashed, so safe). API & cross-origin requests
 // (backend, Cloudinary, Google, fonts) are never cached.
-const CACHE = 'panaceamed-v5'
+const CACHE = 'panaceamed-v6'
 const SHELL = ['./', './index.html', './manifest.webmanifest', './logo-mark.png']
 
 self.addEventListener('install', (event) => {
