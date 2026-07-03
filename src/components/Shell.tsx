@@ -70,6 +70,7 @@ const nav: Nav[] = [
   { to: '/profile', label: 'Profil', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
   // Kesehatan
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
+  { to: '/longevity', label: 'Pusat Longevity', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
   { to: '/nutrition', label: 'Nutrisi', icon: IconFood, roles: ['pasien'], group: 'Kesehatan' },
   { to: '/education', label: 'Edukasi', icon: IconBook, roles: ['pasien'], group: 'Kesehatan' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Kesehatan' },
