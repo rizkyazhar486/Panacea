@@ -52,6 +52,7 @@ const TrainingPlan = lazy(() => import('./pages/TrainingPlan').then((m) => ({ de
 const BodyComposition = lazy(() => import('./pages/BodyComposition').then((m) => ({ default: m.BodyComposition })))
 const PerformanceLab = lazy(() => import('./pages/PerformanceLab').then((m) => ({ default: m.PerformanceLab })))
 const InitialAssessment = lazy(() => import('./pages/InitialAssessment').then((m) => ({ default: m.InitialAssessment })))
+const Readiness = lazy(() => import('./pages/Readiness').then((m) => ({ default: m.Readiness })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -107,6 +108,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/body" element={<BodyComposition />} />
               <Route path="/lab" element={<PerformanceLab />} />
               <Route path="/assessment" element={<InitialAssessment />} />
+              <Route path="/readiness" element={<Readiness />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
