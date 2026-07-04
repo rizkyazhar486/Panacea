@@ -294,7 +294,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
       <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
         <Reveal className="text-center">
-          <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Tentang Kami</span>
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Tentang Kami</span>
           <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Apa itu <span className="font-serif-display italic text-brand-dark">Panaceamed.id</span>?</h2>
           <p className="mx-auto mt-3 max-w-3xl text-neutral-600">
             Platform <b>AI-EMR</b> sekaligus <b>pusat pengetahuan kedokteran</b>. AI melakukan anamnesis &
@@ -313,12 +313,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-dark shadow-inner">
                     <f.icon size={22} />
                   </span>
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-sm font-bold text-neutral-300 transition group-hover:border-brand group-hover:bg-brand group-hover:text-white">
-                    →
+                  <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-neutral-400 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" /></svg>
                   </span>
                 </div>
-                <h3 className="relative mt-4 font-bold">{f.title}</h3>
-                <p className="relative mt-1 text-sm text-neutral-500">{f.text}</p>
+                <h3 className="relative mt-4 font-bold text-ink">{f.title}</h3>
+                <p className="relative mt-1 text-sm leading-relaxed text-neutral-600">{f.text}</p>
               </div>
             </Reveal>
           ))}
@@ -330,7 +330,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="orb pointer-events-none absolute right-10 top-10 h-60 w-60 rounded-full bg-brand/15 blur-3xl" />
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark backdrop-blur">Model Bisnis</span>
+            <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark backdrop-blur">Model Bisnis</span>
             <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Satu platform, <span className="font-serif-display italic text-brand-dark">banyak peran</span></h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
               Langganan (individu & rumah sakit) + ekonomi token: pembeli deposit <b>PanaceaToken</b>,
@@ -356,7 +356,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* ── WHAT'S NEW ────────────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
         <Reveal className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-accent">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
             <IconSparkle size={13} /> What's New
           </span>
           <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Pembaruan <span className="font-serif-display italic text-brand-dark">Terbaru</span></h2>
@@ -384,7 +384,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
         <div className="relative mx-auto max-w-4xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Warisan Ribuan Tahun</span>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Warisan Ribuan Tahun</span>
             <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Sejarah <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Kesehatan</h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
               Dari firaun, para nabi, Yunani-Romawi, dinasti Tiongkok, hingga kekaisaran Mongol —
@@ -441,7 +441,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           {/* FHIR explainer */}
           <Reveal delay={80}>
             <div className="mt-8 rounded-2xl border border-brand/20 bg-brand-50 p-6">
-              <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">Apa itu FHIR?</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Apa itu FHIR?</div>
               <p className="mt-1.5 text-sm leading-relaxed text-neutral-700">
                 <b>FHIR</b> (Fast Healthcare Interoperability Resources) adalah standar global agar data kesehatan —
                 rekam medis, lab, obat, tanda vital — bisa dibaca antar rumah sakit, aplikasi, &amp; AI dalam satu "bahasa".
@@ -452,7 +452,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
           {/* Stem cells — the frontier of regenerative longevity */}
           <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Perbatasan Regeneratif</span>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Perbatasan Regeneratif</span>
             <h3 className="mt-3 text-2xl font-extrabold">Sel Punca (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
               Harapan besar anti-aging: mengganti sel rusak &amp; meremajakan jaringan. Tiga jenis utama, dari yang paling mapan hingga paling mutakhir.
@@ -485,7 +485,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
           {/* Robotics in medicine */}
           <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Presisi Mesin</span>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Presisi Mesin</span>
             <h3 className="mt-3 text-2xl font-extrabold">Robotika dalam <span className="font-serif-display italic text-brand-dark">Kedokteran</span></h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
               Dari lengan bedah berpresisi hingga nanorobot di aliran darah — mesin memperluas tangan &amp; jangkauan dokter, membuat perawatan lebih aman, minim-invasif, &amp; terjangkau.
