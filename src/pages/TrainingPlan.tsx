@@ -254,6 +254,167 @@ const DOW = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
 // Cooper test → VO₂max (Cooper 1968): (jarak_m − 504.9) / 44.73
 function cooperVo2(m: number) { return (m - 504.9) / 44.73 }
 
+// ── Personalized Runner Coach ────────────────────────────────────────────────
+// Fixes the core mistake: a Cooper test is an ALL-OUT 12-minute effort, NOT an
+// easy run. We estimate VO₂max fairly from a submaximal run using the ACSM
+// running equation, adjusted for perceived effort — so an easy 4km/35min no
+// longer produces a demoralizing (and wrong) number. Then it builds personal
+// pace zones (Daniels-style) and a realistic progressive plan.
+function fmtPace(secPerKm: number): string {
+  if (!isFinite(secPerKm) || secPerKm <= 0) return '—'
+  const m = Math.floor(secPerKm / 60), s = Math.round(secPerKm % 60)
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+// ACSM: VO₂ (ml/kg/min) at running speed = speed(m/min)×0.2 + 3.5.
+function vo2AtPace(speedMperMin: number) { return speedMperMin * 0.2 + 3.5 }
+// Effort fraction of VO₂max for the entered run.
+const EFFORT_FRAC: Record<string, number> = { easy: 0.68, moderate: 0.78, hard: 0.9 }
+function vo2Category(v: number, age: number, g: 'M' | 'F'): { label: string; tone: 'brand' | 'low' | 'critical' | 'neutral' } {
+  // Cooper/ACSM norms, age & sex adjusted (approx).
+  const base = g === 'M' ? [32, 38, 44, 51] : [27, 33, 39, 45]
+  const adj = base.map((b) => b - Math.max(0, age - 30) * 0.3)
+  if (v >= adj[3]) return { label: 'Superior', tone: 'brand' }
+  if (v >= adj[2]) return { label: 'Sangat Baik', tone: 'brand' }
+  if (v >= adj[1]) return { label: 'Baik', tone: 'low' }
+  if (v >= adj[0]) return { label: 'Cukup', tone: 'low' }
+  return { label: 'Membangun Fondasi', tone: 'neutral' }
+}
+
+function RunnerCoach() {
+  const [km, setKm] = useState(4)
+  const [min, setMin] = useState(35)
+  const [effort, setEffort] = useState<'easy' | 'moderate' | 'hard'>('easy')
+  const [age, setAge] = useState(26)
+  const [g, setG] = useState<'M' | 'F'>('M')
+
+  const speedMperMin = km > 0 && min > 0 ? (km * 1000) / min : 0
+  const runPaceSec = km > 0 ? (min * 60) / km : 0
+  const vo2atRun = vo2AtPace(speedMperMin)
+  const vo2max = effort ? vo2atRun / EFFORT_FRAC[effort] : 0
+  const cat = vo2max > 0 ? vo2Category(vo2max, age, g) : null
+
+  // Velocity at VO₂max → 5K-equivalent pace → Daniels-style zones.
+  const vVo2 = (vo2max - 3.5) / 0.2 // m/min
+  const pace5kSec = vVo2 > 0 ? (1000 / vVo2) * 60 * 1.04 : 0
+  const zone = (deltaSec: number) => fmtPace(pace5kSec + deltaSec)
+
+  // Level for the progression.
+  const canRunCont = km >= 3 && effort !== 'hard'
+  const level: 0 | 1 | 2 = km < 2 ? 0 : km < 3 ? 1 : 2
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconRun size={20} />} title="Pelatih Lari Personal" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang benar, zona pace personal & rencana realistis" />
+
+      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km} onChange={(e) => setKm(+e.target.value)} /></Field>
+        <Field label="Waktu (menit)"><input className={inputClass} type="number" value={min} onChange={(e) => setMin(+e.target.value)} /></Field>
+        <Field label="Seberapa berat?">
+          <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
+            <option value="easy">Santai (bisa ngobrol)</option>
+            <option value="moderate">Sedang (agak berat)</option>
+            <option value="hard">All-out (maksimal)</option>
+          </select>
+        </Field>
+        <Field label="Usia / Kelamin">
+          <div className="flex gap-1">
+            <input className={inputClass + ' w-14'} type="number" value={age} onChange={(e) => setAge(+e.target.value)} />
+            <select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">L</option><option value="F">P</option></select>
+          </div>
+        </Field>
+      </div>
+
+      {/* Honest VO2max */}
+      <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Estimasi VO₂max Anda</div>
+            <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-white/50">ml/kg/mnt</span></div>
+            <div className="text-[10px] text-white/50">pace lari ini: {fmtPace(runPaceSec)}/km · O₂ saat itu {vo2atRun.toFixed(0)}</div>
+          </div>
+          {cat && <Badge tone={cat.tone}>{cat.label}</Badge>}
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-white/80">
+          {effort === 'easy'
+            ? '⚠️ Karena ini lari SANTAI, VO₂max sebenarnya JAUH lebih tinggi dari sekadar mengubah pace ini ke Cooper Test. Lari santai memang HARUS terasa lambat — itu prinsip yang benar (80% latihan harus mudah).'
+            : effort === 'moderate'
+            ? 'Dihitung dari usaha sedang, disesuaikan ke perkiraan VO₂max. Untuk angka pasti, lakukan tes all-out 12 menit.'
+            : 'Bagus — ini usaha maksimal, jadi estimasi paling akurat. Ini setara Cooper Test yang benar.'}
+        </p>
+      </div>
+
+      {/* Encouraging reframe */}
+      <div className="mt-3 rounded-xl bg-brand-50 p-3 text-[12px] leading-relaxed text-brand-dark">
+        💚 <b>Perspektif jujur:</b> mampu lari {km} km terus-menerus sudah menempatkan Anda di atas mayoritas orang yang tak sanggup lari 1 km.
+        VO₂max adalah kapasitas yang <b>paling bisa dilatih</b> — pemula lazim naik <b>15-30% dalam 8-12 minggu</b> latihan terstruktur.
+        Jangan bandingkan lari <i>santai</i> Anda dengan pace <i>lomba</i> orang lain; itu apel vs jeruk.
+      </div>
+
+      {/* Personal pace zones */}
+      {pace5kSec > 0 && (
+        <div className="mt-3">
+          <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Zona Pace Personal Anda (menit/km)</div>
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {[
+              ['Pemulihan', zone(105), 'sangat santai'],
+              ['Easy / Zona 2', zone(85), '80% latihan di sini'],
+              ['Long run', zone(70), 'daya tahan'],
+              ['Tempo / Ambang', zone(22), '"nyaman-berat"'],
+              ['Interval / VO₂max', zone(0), 'naikkan plafon'],
+              ['Cepat / Strides', zone(-12), '15-20 dtk eksplosif'],
+            ].map(([l, p, d]) => (
+              <div key={l} className="rounded-xl border border-neutral-100 p-2.5">
+                <div className="text-[10px] font-bold text-neutral-400">{l}</div>
+                <div className="text-base font-extrabold text-brand-dark">{p}</div>
+                <div className="text-[9px] text-neutral-400">{d}</div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[10px] text-neutral-400">Diturunkan dari VO₂max Anda (metode Jack Daniels). Jalankan easy run di zona Easy — kalau lebih cepat, Anda merusak basis aerobik.</p>
+        </div>
+      )}
+
+      {/* Progressive plan for their level */}
+      <div className="mt-3">
+        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Rencana 8 Minggu — Disesuaikan Level Anda</div>
+        <div className="mt-2 space-y-2">
+          {(level === 0
+            ? [
+                { w: 'Minggu 1-2', d: 'Run-walk: lari 1 mnt / jalan 2 mnt × 8. 3×/minggu. Tujuan: terbiasa bergerak tanpa cedera.' },
+                { w: 'Minggu 3-4', d: 'Lari 2 mnt / jalan 1 mnt × 8. Tambah 1 sesi jalan cepat 30 mnt.' },
+                { w: 'Minggu 5-6', d: 'Lari 5 mnt / jalan 1 mnt × 5. Mulai bisa lari 10-15 mnt kontinu.' },
+                { w: 'Minggu 7-8', d: 'Lari kontinu 20-25 mnt easy. Anda resmi jadi pelari!' },
+              ]
+            : level === 1
+            ? [
+                { w: 'Minggu 1-2', d: `3× lari easy 20-30 mnt di pace ${zone(85)}. Fokus konsistensi, bukan kecepatan.` },
+                { w: 'Minggu 3-4', d: 'Naikkan 1 easy run ke 35-40 mnt. Tambah 4×20 dtk strides di akhir 1 sesi.' },
+                { w: 'Minggu 5-6', d: `Tambah 1 sesi tempo pendek: 2×6 mnt di pace ${zone(22)} (jeda jalan 2 mnt).` },
+                { w: 'Minggu 7-8', d: 'Tes ulang: lari all-out 12 menit (Cooper benar) — lihat lompatan angka Anda.' },
+              ]
+            : [
+                { w: 'Minggu 1-2', d: `Basis: 3× easy ${zone(85)} (30-40 mnt) + 1 long run ${zone(70)} (45 mnt). Semua HARUS terasa mudah.` },
+                { w: 'Minggu 3-4', d: `Tambah kualitas: 1× tempo 3×8 mnt @ ${zone(22)}. Pertahankan easy tetap easy.` },
+                { w: 'Minggu 5-6', d: `Naikkan VO₂max: 1× Norwegian 4×4 (4 mnt keras @ ${zone(0)} + 3 mnt jog) + 1 tempo. Long run 60 mnt.` },
+                { w: 'Minggu 7-8', d: 'Deload minggu 7 (−40%), lalu Minggu 8 tes 12 menit all-out. Target naik 1-3 ml/kg/mnt.' },
+              ])
+            .map((p) => (
+              <div key={p.w} className="flex gap-3 rounded-xl border border-neutral-100 p-3">
+                <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-[10px] font-extrabold text-brand-dark">{p.w}</span>
+                <p className="text-[12px] leading-relaxed text-neutral-600">{p.d}</p>
+              </div>
+            ))}
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
+          {canRunCont
+            ? '🎯 Resep emas untuk menaikkan VO₂max Anda: 80% lari mudah + 20% keras (Norwegian 4×4 & tempo), kekuatan 2×/minggu, tidur 7-9 jam. Kesabaran mengalahkan intensitas.'
+            : 'Mulai dari run-walk — ini cara TERBUKTI & teraman untuk pemula. Jangan buru-buru; konsistensi 3×/minggu jauh lebih penting dari kecepatan.'}
+        </p>
+      </div>
+    </Card>
+  )
+}
+
 export function TrainingPlan() {
   const [goal, setGoal] = useState<Goal>('Longevity (VO₂max + Strength)')
   const [level, setLevel] = useState<Level>('pemula')
@@ -302,6 +463,9 @@ export function TrainingPlan() {
           ))}
         </div>
       </Card>
+
+      {/* Pelatih Lari Personal — VO₂max yang benar + zona pace + rencana */}
+      <RunnerCoach />
 
       {/* Video teknik gerakan (Higgsfield) */}
       <Card className="!p-5">
@@ -415,20 +579,23 @@ export function TrainingPlan() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Panel Longevity Anda" subtitle="VO₂max, kekuatan, massa otot, glukosa — kompetensi inti Panaceamed" />
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field label="VO₂max (ml/kg/mnt)"><input className={inputClass} type="number" value={vo2Now} onChange={(e) => setVo2Now(+e.target.value)} /></Field>
-          <Field label="Cooper 12 mnt (m)"><input className={inputClass} type="number" value={cooper} onChange={(e) => setCooper(+e.target.value)} /></Field>
+          <Field label="VO₂max (dari jam/tes)"><input className={inputClass} type="number" value={vo2Now} onChange={(e) => setVo2Now(+e.target.value)} /></Field>
+          <Field label="Cooper 12 mnt ALL-OUT (m)"><input className={inputClass} type="number" value={cooper} onChange={(e) => setCooper(+e.target.value)} /></Field>
           <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg} onChange={(e) => setWeightKg(+e.target.value)} /></Field>
+        </div>
+        <div className="mt-2 rounded-xl bg-amber-50 p-2.5 text-[10px] leading-relaxed text-amber-800">
+          ⚠️ Cooper Test = lari <b>sekuat mungkin selama 12 menit</b> (bukan pace lari santai). Jangan isi kolom Cooper dengan pace easy run — hasilnya akan salah-rendah. Untuk analisis dari lari biasa, pakai <b>Pelatih Lari Personal</b> di atas.
         </div>
 
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">VO₂max dari Cooper</div>
-              <div className="text-2xl font-extrabold text-brand">{vo2FromCooper.toFixed(1)}</div>
-              <div className="text-[10px] text-white/50">(jarak − 504.9) ÷ 44.73</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">VO₂max Cooper (all-out)</div>
+              <div className="text-2xl font-extrabold text-brand">{cooper > 600 ? vo2FromCooper.toFixed(1) : '—'}</div>
+              <div className="text-[10px] text-white/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ jauh di bawah VO₂max jam Anda — kemungkinan tes tidak all-out' : '(jarak − 504.9) ÷ 44.73'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Target</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Target realistis</div>
               <div className="text-2xl font-extrabold text-amber-300">{vo2Target}</div>
               <div className="text-[10px] text-white/50">±{monthsToTarget} bulan dgn 4×4 rutin (≈+0.5/bln)</div>
             </div>
@@ -437,7 +604,7 @@ export function TrainingPlan() {
             <div className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (vo2Now / vo2Target) * 100)}%` }} />
           </div>
           <p className="mt-2 text-[11px] leading-relaxed text-white/80">
-            VO₂max {vo2Now} di usia 26 = kategori "cukup" — kabar baiknya ini sangat bisa dilatih.
+            VO₂max sangat bisa dilatih — pemula naik 15-30% dalam 8-12 minggu.
             Resep: <b>2× Norwegian 4×4</b> + <b>3× Zone 2</b> (45-60 mnt) + <b>2× strength</b> per minggu.
             Naik 1 MET (±3.5 ml/kg/mnt) menurunkan risiko kematian ~12-17%.
           </p>
