@@ -244,25 +244,31 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
       {/* ── FEATURED BRAND FILM ──────────────────────────────── */}
       <section className="px-6 py-16 sm:px-10">
-        <Reveal>
-          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
-            <video
-              src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
-              autoPlay muted loop playsInline
-              className="aspect-video w-full object-cover"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 text-white sm:p-10">
-              <div className="text-[11px] font-bold uppercase tracking-widest text-white/60">Panaceamed.id</div>
-              <h2 className="mt-1 text-2xl font-extrabold sm:text-4xl">
-                Alam. Manusia. <span className="font-serif-display italic text-emerald-300">Kebugaran.</span>
-              </h2>
-              <p className="mt-2 max-w-xl text-sm text-white/80">
-                Memperpanjang healthspan lewat sains — bukan sekadar menambah usia, tapi menambah hidup pada usia Anda.
-              </p>
+        <div className="mx-auto grid max-w-5xl gap-5 lg:grid-cols-2">
+          {/* Self-hosted Remotion logo animation (code-based, free) */}
+          <Reveal>
+            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
+              <video src={`${import.meta.env.BASE_URL}media/brand-intro.mp4`} autoPlay muted loop playsInline className="aspect-video w-full bg-[#06120c] object-cover" />
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+          {/* Cinematic nature film */}
+          <Reveal delay={80}>
+            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
+              <video
+                src="https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023227_88b54135-7489-48de-9476-ca0657fc0d29.mp4"
+                autoPlay muted loop playsInline
+                className="aspect-video w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                <h2 className="text-xl font-extrabold sm:text-2xl">
+                  Alam. Manusia. <span className="font-serif-display italic text-emerald-300">Kebugaran.</span>
+                </h2>
+                <p className="mt-1 max-w-xl text-[13px] text-white/80">Memperpanjang healthspan lewat sains — menambah hidup pada usia Anda.</p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
@@ -364,6 +370,13 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               Dari firaun, para nabi, Yunani-Romawi, dinasti Tiongkok, hingga kekaisaran Mongol —
               pencarian hidup panjang &amp; sehat setua peradaban. Panaceamed.id meneruskannya dengan sains &amp; AI.
             </p>
+          </Reveal>
+
+          {/* Self-hosted Remotion animated timeline (code-based, free) */}
+          <Reveal delay={80}>
+            <div className="mt-8 overflow-hidden rounded-[2rem] shadow-2xl shadow-brand/20">
+              <video src={`${import.meta.env.BASE_URL}media/history.mp4`} autoPlay muted loop playsInline className="aspect-video w-full bg-[#06120c] object-cover" />
+            </div>
           </Reveal>
 
           {/* Ancient eras timeline */}
