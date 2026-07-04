@@ -133,15 +133,15 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-500 transition hover:text-brand-dark"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-600 transition hover:text-brand-dark"
             title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-            aria-label="Ganti tema"
+            aria-label={theme === 'dark' ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
           >
-            {theme === 'dark' ? <IconSun size={17} /> : <IconMoon size={17} />}
+            {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
           </button>
           <button
             onClick={onMasuk}
-            className="whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-4 py-2 text-sm font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95 sm:px-6 sm:py-2.5 sm:text-base"
+            className="min-h-[44px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-5 py-2.5 text-sm font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95 sm:px-6 sm:text-base"
           >
             Masuk<span className="hidden sm:inline"> / Daftar</span>
           </button>
@@ -220,7 +220,23 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               ))}
             </div>
           </Reveal>
-          <p className="mt-5 text-xs text-neutral-400">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+          <p className="mt-5 text-xs text-neutral-500">AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+
+          {/* Trust & Authority strip — the #1 pattern for health products */}
+          <Reveal delay={360}>
+            <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
+              {[
+                { icon: IconStethoscope, label: 'Diverifikasi dokter berlisensi' },
+                { icon: IconShield, label: 'Kepatuhan UU PDP' },
+                { icon: IconCheck, label: 'Standar data FHIR' },
+                { icon: IconHeart, label: 'Longevity terukur' },
+              ].map((t) => (
+                <span key={t.label} className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600">
+                  <t.icon size={16} className="text-brand-dark" /> {t.label}
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -233,8 +249,8 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           {[0,1,2].map(g=>(
             <div key={g} className="flex shrink-0 gap-10 pr-10" aria-hidden={g!==0}>
               {MARQUEE.map((m,i)=>(
-                <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-400">
-                  <m.icon size={18} className="text-brand/70" /> {m.label}
+                <span key={i} className="flex shrink-0 items-center gap-2 text-sm font-bold text-neutral-500">
+                  <m.icon size={18} className="text-brand-dark" /> {m.label}
                 </span>
               ))}
             </div>
