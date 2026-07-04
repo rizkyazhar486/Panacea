@@ -12,3 +12,7 @@ yarn-error.log*
 
 # backend
 server/data.json
+
+# Locally-added agent skills (tooling, not app code)
+.agents/
+skills-lock.json
