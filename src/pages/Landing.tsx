@@ -87,6 +87,17 @@ const HISTORY_MODERN: { decade: string; title: string; body: string }[] = [
   { decade: '2010–2020', title: 'Wearable & Longevity Science', body: 'Apple Watch, WHOOP, CGM. Riset senolytics, NAD+, rapamycin, puasa. Longevity naik dari pinggiran ke sains arus utama (Sinclair, Attia).' },
   { decade: '2020–kini', title: 'AI dalam Kedokteran + FHIR', body: 'AI untuk diagnosis, anamnesis, & interpretasi citra; LLM medis. FHIR menyatukan data agar AI & pasien berbicara satu bahasa. Panaceamed.id lahir di sini: AI + verifikasi dokter + longevity terukur.' },
 ]
+const STEM_CELLS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
+  { type: 'Somatic (Dewasa)', emoji: '🩹', short: 'Multipoten',
+    body: 'Sel punca yang sudah ada di tubuh dewasa — sumsum tulang, lemak, darah tali pusat. Bersifat multipoten (terbatas jadi beberapa jenis sel dari jaringannya). Paling aman & sudah rutin dipakai klinis (mis. transplantasi sumsum tulang untuk leukemia).',
+    use: 'Terapi sel darah, ortopedi, penyembuhan luka' },
+  { type: 'Embryonic (Embrionik)', emoji: '🌱', short: 'Pluripoten',
+    body: 'Berasal dari blastosis embrio dini; bersifat pluripoten — bisa menjadi HAMPIR semua jenis sel tubuh. Sangat kuat untuk riset & regenerasi, namun menimbulkan pertimbangan etika & risiko penolakan imun/tumor.',
+    use: 'Riset perkembangan, model penyakit, regenerasi organ' },
+  { type: 'iPSC (Induced Pluripotent)', emoji: '🔄', short: 'Pluripoten (rekayasa)',
+    body: 'Sel dewasa (mis. kulit/darah) "diprogram ulang" kembali ke keadaan pluripoten (Yamanaka, Nobel 2012). Menggabungkan kekuatan embrionik TANPA masalah etika embrio, dan bisa cocok-personal (dari sel pasien sendiri → minim penolakan).',
+    use: 'Pengobatan personal, uji obat, riset anti-aging & reprogramming' },
+]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
@@ -390,6 +401,39 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 Inilah fondasi yang membuat AI-EMR &amp; longevity terukur di Panaceamed.id bisa aman, portabel, &amp; kolaboratif.
               </p>
             </div>
+          </Reveal>
+
+          {/* Stem cells — the frontier of regenerative longevity */}
+          <Reveal className="mt-12 text-center">
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Perbatasan Regeneratif</span>
+            <h3 className="mt-3 text-2xl font-extrabold">Sel Punca (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
+              Harapan besar anti-aging: mengganti sel rusak &amp; meremajakan jaringan. Tiga jenis utama, dari yang paling mapan hingga paling mutakhir.
+            </p>
+          </Reveal>
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {STEM_CELLS.map((s, i) => (
+              <Reveal key={s.type} delay={(i % 3) * 80}>
+                <div className="liquid-glass flex h-full flex-col rounded-2xl p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{s.emoji}</span>
+                    <div>
+                      <div className="font-extrabold text-ink">{s.type}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">{s.short}</div>
+                    </div>
+                  </div>
+                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
+                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Aplikasi:</b> {s.use}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal delay={80}>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-400">
+              Potensi vs kematangan: <b>potensi</b> tertinggi pada embrionik &amp; iPSC (pluripoten), <b>kematangan klinis</b> tertinggi pada somatik.
+              Riset reprogramming parsial (faktor Yamanaka) kini mengeksplorasi <i>membalik jam biologis sel</i> — perbatasan sains longevity.
+              <br /><span className="opacity-70">Bersifat edukatif; terapi sel punca harus di fasilitas berlisensi &amp; sesuai regulasi.</span>
+            </p>
           </Reveal>
         </div>
       </section>
