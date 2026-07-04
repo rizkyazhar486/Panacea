@@ -280,12 +280,26 @@ function vo2Category(v: number, age: number, g: 'M' | 'F'): { label: string; ton
   return { label: 'Membangun Fondasi', tone: 'neutral' }
 }
 
+const RED_FLAGS = [
+  { id: 'faint', label: '😵 Pusing / hampir pingsan saat olahraga' },
+  { id: 'chest', label: '💢 Nyeri/tekanan dada saat aktivitas' },
+  { id: 'palpitation', label: '💓 Jantung berdebar tak wajar' },
+  { id: 'breathless_rest', label: '🫁 Sesak napas saat istirahat' },
+  { id: 'heart_history', label: '🩺 Riwayat jantung / tekanan darah tinggi' },
+]
+
 function RunnerCoach() {
   const [km, setKm] = useState(4)
   const [min, setMin] = useState(35)
   const [effort, setEffort] = useState<'easy' | 'moderate' | 'hard'>('easy')
   const [age, setAge] = useState(26)
   const [g, setG] = useState<'M' | 'F'>('M')
+  // Honest current ability drives the plan far better than one run's distance.
+  const [cont, setCont] = useState<'u1' | 'm1_5' | 'm5_15' | 'm15_30' | 'm30p'>('m30p')
+  const [flags, setFlags] = useState<string[]>([])
+  // Cooper goal countdown.
+  const [targetM, setTargetM] = useState(2500)
+  const [months, setMonths] = useState(6)
 
   const speedMperMin = km > 0 && min > 0 ? (km * 1000) / min : 0
   const runPaceSec = km > 0 ? (min * 60) / km : 0
@@ -298,13 +312,55 @@ function RunnerCoach() {
   const pace5kSec = vVo2 > 0 ? (1000 / vVo2) * 60 * 1.04 : 0
   const zone = (deltaSec: number) => fmtPace(pace5kSec + deltaSec)
 
-  // Level for the progression.
-  const canRunCont = km >= 3 && effort !== 'hard'
-  const level: 0 | 1 | 2 = km < 2 ? 0 : km < 3 ? 1 : 2
+  // Level from honest continuous-run ability.
+  const level: 0 | 1 | 2 = cont === 'u1' || cont === 'm1_5' ? 0 : cont === 'm5_15' ? 1 : 2
+  const canRunCont = level >= 1
+
+  // Cooper goal realism.
+  const targetVo2 = cooperVo2(targetM)
+  const gainNeeded = targetVo2 - vo2max
+  const monthsNeeded = gainNeeded > 0 ? gainNeeded / 1.2 : 0 // ~1.2 ml/kg/mo aggressive-beginner
+  const verdict = gainNeeded <= 0
+    ? { l: 'Sudah tercapai 🎉', tone: 'brand' as const, d: 'Estimasi Anda sudah di atas target — fokus pertahankan & pertajam pacing tes.' }
+    : monthsNeeded <= months
+    ? { l: 'Realistis', tone: 'brand' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan; Anda punya ${months}. Konsisten = sangat bisa.` }
+    : monthsNeeded <= months * 1.4
+    ? { l: 'Menantang (stretch)', tone: 'low' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan vs ${months} tersedia. Bisa, tapi tanpa kompromi konsistensi & pemulihan.` }
+    : { l: 'Sangat agresif', tone: 'critical' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan. Mengejar ${targetM}m dalam ${months} bulan berisiko cedera. Target ~${Math.round((vo2max + months * 1.2) * 44.73 + 504.9)}m lebih aman.` }
 
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconRun size={20} />} title="Pelatih Lari Personal" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang benar, zona pace personal & rencana realistis" />
+
+      {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
+      <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">
+        <div className="text-xs font-extrabold text-rose-700">🛡️ Skrining Keamanan (isi jujur sebelum lari intens)</div>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {RED_FLAGS.map((f) => (
+            <button key={f.id} onClick={() => setFlags((x) => x.includes(f.id) ? x.filter((y) => y !== f.id) : [...x, f.id])}
+              className={'rounded-full px-3 py-1.5 text-[11px] font-bold ' + (flags.includes(f.id) ? 'bg-rose-500 text-white' : 'bg-white text-neutral-500 border border-neutral-200')}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+        {flags.length > 0 && (
+          <div className="mt-2 rounded-xl bg-white p-3 text-[11px] leading-relaxed text-rose-700">
+            <b>Berhenti dulu — periksa ke dokter sebelum latihan intensitas tinggi atau Cooper Test.</b> Gejala yang Anda tandai (khususnya pusing/hampir pingsan atau nyeri dada saat olahraga) harus dievaluasi (EKG + pemeriksaan jantung) untuk memastikan aman. Sementara itu, batasi ke jalan cepat & jangan pernah berlatih sampai hampir pingsan.
+            <div className="mt-2"><a href="#/consult" className="font-bold underline">Konsultasi dokter</a> · <a href="#/hospitals" className="font-bold underline">Faskes terdekat</a></div>
+          </div>
+        )}
+      </div>
+
+      {/* Honest current ability */}
+      <div className="mt-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Berapa lama bisa lari TERUS tanpa berhenti?</div>
+        <div className="mt-1.5 grid grid-cols-2 gap-1.5 sm:grid-cols-5">
+          {([['u1', '<1 mnt'], ['m1_5', '1-5 mnt'], ['m5_15', '5-15 mnt'], ['m15_30', '15-30 mnt'], ['m30p', '30+ mnt']] as const).map(([k, l]) => (
+            <button key={k} onClick={() => setCont(k)} className={'rounded-xl py-2 text-xs font-bold ' + (cont === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
+          ))}
+        </div>
+        <p className="mt-1 text-[10px] text-neutral-400">Jawab jujur dari lari pelan-nyaman, bukan sprint. Ini yang menentukan rencana Anda.</p>
+      </div>
 
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km} onChange={(e) => setKm(+e.target.value)} /></Field>
@@ -409,6 +465,56 @@ function RunnerCoach() {
           {canRunCont
             ? '🎯 Resep emas untuk menaikkan VO₂max Anda: 80% lari mudah + 20% keras (Norwegian 4×4 & tempo), kekuatan 2×/minggu, tidur 7-9 jam. Kesabaran mengalahkan intensitas.'
             : 'Mulai dari run-walk — ini cara TERBUKTI & teraman untuk pemula. Jangan buru-buru; konsistensi 3×/minggu jauh lebih penting dari kecepatan.'}
+        </p>
+      </div>
+
+      {/* Symptom troubleshooting — the exact things that go wrong for beginners */}
+      <div className="mt-4">
+        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Atasi Keluhan Umum Saat Lari</div>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {[
+            { s: '🦵 Betis pegal/kaku sejak awal', d: 'Anda mendarat di ujung kaki / lari terlalu cepat. Perbaikan: pemanasan 5 mnt jalan + ankle circles; mendarat MIDFOOT tepat di bawah pinggul; perlambat. Kuatkan betis: calf raise 3×15, 3×/minggu. Naikkan jarak maks +10%/minggu.' },
+            { s: '🫁 Napas ngos-ngosan cepat (300m)', d: 'Anda start terlalu ngebut → langsung anaerobik. Perbaikan: mulai SANGAT pelan — tes bicara: jika tak bisa bicara satu kalimat, PELANKAN atau jalan. Napas ritmis (tarik 2-3 langkah, buang 2-3 langkah).' },
+            { s: '😵 Pusing/limbung (500m)', d: '⚠️ Jangan pernah dorong sampai titik ini. Bisa dari napas berlebih, gula darah rendah, dehidrasi — TAPI wajib diperiksa dokter dulu (bisa terkait jantung). Sementara: hanya jalan cepat, minum cukup, makan 1-2 jam sebelum.' },
+            { s: '🎽 Cepat lelah walau jarak pendek', d: 'Basis aerobik belum terbangun — itu WAJAR & cepat membaik. Run-walk 3×/minggu selama 3-4 minggu akan mengubah drastis daya tahan Anda.' },
+          ].map((x) => (
+            <div key={x.s} className="rounded-xl border border-neutral-100 p-3">
+              <div className="text-xs font-extrabold">{x.s}</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{x.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Cooper goal countdown */}
+      <div className="mt-4 rounded-2xl border border-brand/20 bg-brand-50 p-4">
+        <div className="text-xs font-extrabold text-brand-dark">🎯 Target Cooper Test Anda</div>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <Field label="Target jarak (m)"><input className={inputClass} type="number" value={targetM} onChange={(e) => setTargetM(+e.target.value)} /></Field>
+          <Field label="Waktu tersedia (bulan)"><input className={inputClass} type="number" value={months} onChange={(e) => setMonths(+e.target.value)} /></Field>
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          <Badge tone={verdict.tone}>{verdict.l}</Badge>
+          <span className="text-[11px] text-neutral-500">Target ≈ VO₂max {targetVo2.toFixed(0)} · Anda sekarang ≈ {vo2max.toFixed(0)}</span>
+        </div>
+        <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-600">{verdict.d}</p>
+        <div className="mt-3 space-y-1.5">
+          {[
+            { m: 'Bulan 1', d: canRunCont ? 'Basis aerobik: run-walk → lari kontinu easy 30 mnt. Tanpa sesi keras. Kuatkan betis & core.' : 'Run-walk (lari 1-2 mnt/jalan 1-2 mnt). Tujuan: lari 10 mnt kontinu. Skrining dokter bila ada gejala.' },
+            { m: 'Bulan 2', d: 'Bangun volume: 3-4× easy run, 1 long run naik bertahap. Tambah 4×20 dtk strides. Easy HARUS terasa mudah.' },
+            { m: 'Bulan 3', d: 'Mulai ambang: 1× tempo/minggu. Tes 12 menit percobaan #1 — ukur kemajuan tanpa tekanan.' },
+            { m: 'Bulan 4', d: 'Naikkan VO₂max: 1× Norwegian 4×4/minggu + 1 tempo + 2 easy + 1 long. Kekuatan 2×.' },
+            { m: 'Bulan 5', d: 'Puncak spesifik tes: interval mirip pace Cooper (mis. 6×3 mnt). Latih pacing merata — jangan start ngebut.' },
+            { m: 'Bulan 6 (Januari)', d: 'Minggu 1-2 taper (−40% volume, jaga intensitas). Cooper Test resmi. Strategi: 4 lap merata, sisakan tenaga 2 menit terakhir.' },
+          ].map((x) => (
+            <div key={x.m} className="flex gap-2 rounded-lg bg-white/70 p-2.5">
+              <span className="shrink-0 text-[10px] font-extrabold text-brand-dark">{x.m}</span>
+              <span className="text-[11px] leading-relaxed text-neutral-600">{x.d}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+          Strategi hari-H Cooper: <b>jangan start sprint</b> (kesalahan fatal). Bagi rata 4 putaran; kalau masih kuat di 2 menit terakhir, baru habiskan. Pacing merata mengalahkan start ngebut sejauh 100-200m.
         </p>
       </div>
     </Card>
