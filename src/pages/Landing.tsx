@@ -340,11 +340,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {ROLES.map(([t, d], i) => (
               <Reveal key={t} delay={(i % 3) * 90}>
-                <div className="liquid-glass flex h-full items-start gap-3 rounded-2xl p-5 transition hover:-translate-y-1 hover:shadow-md">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand"><IconUsers size={18} /></span>
+                <div className="liquid-glass flex h-full items-start gap-3 rounded-2xl p-5 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_-12px_rgba(0,191,99,0.22)]">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark"><IconUsers size={18} /></span>
                   <div>
-                    <h3 className="font-bold">{t}</h3>
-                    <p className="text-sm text-neutral-500">{d}</p>
+                    <h3 className="font-bold text-ink">{t}</h3>
+                    <p className="mt-0.5 text-sm leading-relaxed text-neutral-600">{d}</p>
                   </div>
                 </div>
               </Reveal>
@@ -424,7 +424,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           {/* Modern per-decade */}
           <Reveal className="mt-12 text-center">
             <h3 className="text-2xl font-extrabold">Era Modern — <span className="font-serif-display italic text-brand-dark">Per Dekade</span></h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">Dari antibiotik & rekam medis, ke wearable, standar data FHIR, dan AI dalam kedokteran.</p>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">Dari antibiotik & rekam medis, ke wearable, standar data FHIR, dan AI dalam kedokteran.</p>
           </Reveal>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {HISTORY_MODERN.map((m, i) => (
@@ -454,7 +454,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal className="mt-12 text-center">
             <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Perbatasan Regeneratif</span>
             <h3 className="mt-3 text-2xl font-extrabold">Sel Punca (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
               Harapan besar anti-aging: mengganti sel rusak &amp; meremajakan jaringan. Tiga jenis utama, dari yang paling mapan hingga paling mutakhir.
             </p>
           </Reveal>
@@ -466,7 +466,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{s.emoji}</span>
                     <div>
                       <div className="font-extrabold text-ink">{s.type}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">{s.short}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-dark">{s.short}</div>
                     </div>
                   </div>
                   <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
@@ -476,7 +476,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             ))}
           </div>
           <Reveal delay={80}>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-400">
+            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
               Potensi vs kematangan: <b>potensi</b> tertinggi pada embrionik &amp; iPSC (pluripoten), <b>kematangan klinis</b> tertinggi pada somatik.
               Riset reprogramming parsial (faktor Yamanaka) kini mengeksplorasi <i>membalik jam biologis sel</i> — perbatasan sains longevity.
               <br /><span className="opacity-70">Bersifat edukatif; terapi sel punca harus di fasilitas berlisensi &amp; sesuai regulasi.</span>
@@ -487,7 +487,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal className="mt-12 text-center">
             <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Presisi Mesin</span>
             <h3 className="mt-3 text-2xl font-extrabold">Robotika dalam <span className="font-serif-display italic text-brand-dark">Kedokteran</span></h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
               Dari lengan bedah berpresisi hingga nanorobot di aliran darah — mesin memperluas tangan &amp; jangkauan dokter, membuat perawatan lebih aman, minim-invasif, &amp; terjangkau.
             </p>
           </Reveal>
@@ -499,7 +499,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{r.emoji}</span>
                     <div>
                       <div className="font-extrabold text-ink">{r.type}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">{r.short}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-dark">{r.short}</div>
                     </div>
                   </div>
                   <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{r.body}</p>
@@ -509,7 +509,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             ))}
           </div>
           <Reveal delay={80}>
-            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-400">
+            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
               Robotika berpadu dengan <b>AI</b> (navigasi bedah, analisis citra real-time) &amp; <b>FHIR</b> (data terhubung) —
               perpaduan yang menjadi arah Panaceamed.id: teknologi memperkuat, bukan menggantikan, klinisi.
               <br /><span className="opacity-70">Sebagian teknologi (nanorobot) masih tahap riset/uji klinis.</span>
@@ -534,18 +534,18 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div className="rounded-2xl bg-brand-50 p-5">
               <h3 className="font-bold">Hubungi Kami</h3>
               <ul className="mt-3 space-y-2 text-sm">
-                <li><span className="text-neutral-400">Email:</span> <a href="mailto:index.meds@gmail.com" className="font-semibold text-brand-dark hover:underline">index.meds@gmail.com</a></li>
-                <li><span className="text-neutral-400">Instagram:</span> <a href="https://instagram.com/Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
-                <li><span className="text-neutral-400">TikTok:</span> <a href="https://tiktok.com/@Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
+                <li><span className="text-neutral-500">Email:</span> <a href="mailto:index.meds@gmail.com" className="font-semibold text-brand-dark hover:underline">index.meds@gmail.com</a></li>
+                <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
+                <li><span className="text-neutral-500">TikTok:</span> <a href="https://tiktok.com/@Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
               </ul>
             </div>
             <div className="rounded-2xl bg-neutral-50 p-5">
               <h3 className="font-bold">Kontak Pendiri</h3>
               <ul className="mt-3 space-y-2 text-sm">
-                <li><span className="text-neutral-400">Nama:</span> <b>Rizky Muhammad Azrissal</b></li>
-                <li><span className="text-neutral-400">Email:</span> <a href="mailto:Rizkyazhar486@gmail.com" className="font-semibold text-brand-dark hover:underline">Rizkyazhar486@gmail.com</a></li>
-                <li><span className="text-neutral-400">Telepon:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
-                <li><span className="text-neutral-400">Instagram:</span> <a href="https://instagram.com/Rizkyazr4" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Rizkyazr4</a></li>
+                <li><span className="text-neutral-500">Nama:</span> <b>Rizky Muhammad Azrissal</b></li>
+                <li><span className="text-neutral-500">Email:</span> <a href="mailto:Rizkyazhar486@gmail.com" className="font-semibold text-brand-dark hover:underline">Rizkyazhar486@gmail.com</a></li>
+                <li><span className="text-neutral-500">Telepon:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
+                <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Rizkyazr4" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Rizkyazr4</a></li>
               </ul>
             </div>
           </div>
@@ -565,9 +565,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               </p>
               <button
                 onClick={onMasuk}
-                className="mt-7 rounded-full bg-white px-9 py-3.5 font-bold text-brand-dark shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.98]"
+                className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-8 pr-2 font-bold text-brand-dark shadow-[0_12px_30px_-8px_rgba(0,0,0,0.35)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                Masuk & Coba Sekarang
+                <span>Masuk &amp; Coba Sekarang</span>
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-white transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                </span>
               </button>
             </div>
           </div>
@@ -578,7 +581,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       <footer className="border-t border-black/5 bg-white px-6 py-8 sm:px-10">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
           <Wordmark size={28} />
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-neutral-500">
             © {new Date().getFullYear()} Panaceamed.id · Longevity Medical-AI · AI mendukung, bukan
             menggantikan, klinisi berlisensi.
           </p>
