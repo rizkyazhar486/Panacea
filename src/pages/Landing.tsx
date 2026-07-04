@@ -149,7 +149,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       </header>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden px-4 py-12 sm:px-8 sm:py-20">
+      <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-28">
         {/* Cinematic brand film (Higgsfield) behind the hero, softened by a
             white gradient so the original template text stays readable. */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -168,7 +168,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal>
             <div className="liquid-glass mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
-              <span className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Longevity Medical-AI · Siap Pakai</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-600">Longevity Medical-AI · Siap Pakai</span>
             </div>
           </Reveal>
           <Reveal delay={80}>
@@ -188,16 +188,20 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </Reveal>
           <Reveal delay={240}>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {/* Nested 'button-in-button' CTA with magnetic icon physics */}
               <button
                 onClick={onMasuk}
-                className="group relative overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-8 py-3.5 font-bold text-white shadow-lg shadow-brand/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand/30 active:scale-[0.98]"
+                className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2 pl-7 pr-2 font-bold text-white shadow-[0_10px_30px_-8px_rgba(0,191,99,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                <span className="relative z-10 text-lg">Daftar Gratis Sekarang →</span>
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <span className="relative z-10 text-base">Daftar Gratis Sekarang</span>
+                <span className="relative z-10 grid h-9 w-9 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
               </button>
               <a
                 href="#about"
-                className="rounded-full border border-black/10 bg-white/60 px-8 py-3.5 font-bold text-brand-dark shadow-sm backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white"
+                className="flex items-center rounded-full border border-black/10 bg-white/60 px-8 py-3.5 font-bold text-brand-dark shadow-sm backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-white"
               >
                 Pelajari Lebih Lanjut
               </a>

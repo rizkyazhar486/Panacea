@@ -20,6 +20,10 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // Reveal immediately if already in view on mount (above-the-fold content
+    // must never wait on a scroll event).
+    const r = el.getBoundingClientRect()
+    if (r.top < (window.innerHeight || 800) && r.bottom > 0) { setShown(true); return }
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -30,7 +34,10 @@ export function Reveal({
       { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
     )
     io.observe(el)
-    return () => io.disconnect()
+    // Safety net: never leave content permanently hidden if the observer
+    // never fires (some headless/embedded browsers, tab restores, etc.).
+    const fallback = window.setTimeout(() => setShown(true), 1500)
+    return () => { io.disconnect(); clearTimeout(fallback) }
   }, [])
 
   return (
