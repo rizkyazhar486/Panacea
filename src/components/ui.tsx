@@ -99,7 +99,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${styles[variant]} ${className}`}
+      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${styles[variant]} ${className}`}
     >
       {children}
     </button>
@@ -115,7 +115,7 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">
         {label}
       </span>
       {children}
@@ -146,4 +146,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
+  'w-full min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20'
