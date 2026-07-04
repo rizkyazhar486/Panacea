@@ -98,6 +98,20 @@ const STEM_CELLS: { type: string; emoji: string; short: string; body: string; us
     body: 'Sel dewasa (mis. kulit/darah) "diprogram ulang" kembali ke keadaan pluripoten (Yamanaka, Nobel 2012). Menggabungkan kekuatan embrionik TANPA masalah etika embrio, dan bisa cocok-personal (dari sel pasien sendiri → minim penolakan).',
     use: 'Pengobatan personal, uji obat, riset anti-aging & reprogramming' },
 ]
+const ROBOTICS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
+  { type: 'Bedah Robotik', emoji: '🤖', short: 'Presisi mikro',
+    body: 'Sistem seperti da Vinci (sejak ~2000) memungkinkan dokter mengoperasi lewat sayatan sangat kecil dengan lengan robot berpresisi, tremor-filter, & penglihatan 3D. Hasilnya: luka lebih kecil, nyeri berkurang, & pemulihan lebih cepat.',
+    use: 'Urologi, ginekologi, bedah jantung & digestif' },
+  { type: 'Prostetik & Eksoskeleton', emoji: '🦾', short: 'Bionik',
+    body: 'Tangan/kaki bionik yang dikendalikan sinyal saraf/otot (myoelectric), serta eksoskeleton robotik yang membantu pasien stroke/cedera tulang belakang berjalan kembali — mengembalikan mobilitas & kemandirian.',
+    use: 'Rehabilitasi, amputasi, cedera saraf tulang belakang' },
+  { type: 'Nanorobot & Mikrorobot', emoji: '🧫', short: 'Skala sel',
+    body: 'Robot berukuran mikro/nano (masih tahap riset & uji awal) dirancang mengantar obat langsung ke sel target — mis. tumor — atau membersihkan pembuluh, meminimalkan efek samping ke jaringan sehat. Perbatasan pengobatan presisi.',
+    use: 'Pengantaran obat bertarget, diagnostik intra-tubuh' },
+  { type: 'Robot Rehabilitasi & Perawatan', emoji: '💗', short: 'Pendamping',
+    body: 'Robot terapi gerak berulang untuk pemulihan pasca-stroke, robot pendamping lansia (memantau jatuh, mengingatkan obat), & telepresence untuk kunjungan dokter jarak jauh — memperluas akses perawatan.',
+    use: 'Fisioterapi, perawatan lansia, telemedicine' },
+]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
@@ -433,6 +447,39 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               Potensi vs kematangan: <b>potensi</b> tertinggi pada embrionik &amp; iPSC (pluripoten), <b>kematangan klinis</b> tertinggi pada somatik.
               Riset reprogramming parsial (faktor Yamanaka) kini mengeksplorasi <i>membalik jam biologis sel</i> — perbatasan sains longevity.
               <br /><span className="opacity-70">Bersifat edukatif; terapi sel punca harus di fasilitas berlisensi &amp; sesuai regulasi.</span>
+            </p>
+          </Reveal>
+
+          {/* Robotics in medicine */}
+          <Reveal className="mt-12 text-center">
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Presisi Mesin</span>
+            <h3 className="mt-3 text-2xl font-extrabold">Robotika dalam <span className="font-serif-display italic text-brand-dark">Kedokteran</span></h3>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">
+              Dari lengan bedah berpresisi hingga nanorobot di aliran darah — mesin memperluas tangan &amp; jangkauan dokter, membuat perawatan lebih aman, minim-invasif, &amp; terjangkau.
+            </p>
+          </Reveal>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {ROBOTICS.map((r, i) => (
+              <Reveal key={r.type} delay={(i % 2) * 80}>
+                <div className="liquid-glass flex h-full flex-col rounded-2xl p-5">
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-xl">{r.emoji}</span>
+                    <div>
+                      <div className="font-extrabold text-ink">{r.type}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">{r.short}</div>
+                    </div>
+                  </div>
+                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{r.body}</p>
+                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Aplikasi:</b> {r.use}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal delay={80}>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-400">
+              Robotika berpadu dengan <b>AI</b> (navigasi bedah, analisis citra real-time) &amp; <b>FHIR</b> (data terhubung) —
+              perpaduan yang menjadi arah Panaceamed.id: teknologi memperkuat, bukan menggantikan, klinisi.
+              <br /><span className="opacity-70">Sebagian teknologi (nanorobot) masih tahap riset/uji klinis.</span>
             </p>
           </Reveal>
         </div>
