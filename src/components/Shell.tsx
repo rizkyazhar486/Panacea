@@ -32,6 +32,7 @@ import {
   IconPlus,
   IconUser,
   IconGauge,
+  IconLeaf,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -79,6 +80,7 @@ const nav: Nav[] = [
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/fitness-test', label: 'Tes Fisik', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
+  { to: '/organ-vitality', label: 'Anti-Aging & Organ', icon: IconLeaf, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/assessment', label: 'Penilaian Awal', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/training-plan', label: 'Program AI', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/body', label: 'Komposisi Tubuh', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
