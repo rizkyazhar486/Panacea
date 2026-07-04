@@ -64,6 +64,30 @@ const MARQUEE = [
   { icon: IconChartUp, label: 'Healthspan Tracking' },
 ]
 
+// ── Sejarah longevity, anti-aging, wellness & sistem kesehatan ──────────────
+const HISTORY_ERAS: { era: string; when: string; emoji: string; title: string; body: string }[] = [
+  { era: 'Mesir Kuno', when: '≈3000–300 SM', emoji: '𓂀', title: 'Firaun & Papirus Kedokteran',
+    body: 'Papirus Edwin Smith & Ebers mencatat resep, bedah, dan higiene. Firaun memburu keabadian lewat mumifikasi; imhotep dihormati sebagai tabib. Kosmetik & minyak (moringa, madu) jadi anti-aging pertama.' },
+  { era: 'Zaman Para Nabi', when: '≈2000 SM–632 M', emoji: '☾', title: 'Tradisi Kenabian & Higiene',
+    body: 'Ajaran kenabian menekankan wudu/kebersihan, puasa berkala, madu & habbatussauda, makan secukupnya ("sepertiga makanan, sepertiga minum, sepertiga napas"). Prinsip pencegahan & moderasi ini sejalan dengan sains longevity modern.' },
+  { era: 'Yunani–Romawi', when: '≈500 SM–500 M', emoji: '🏛️', title: 'Hippokrates & Galen',
+    body: 'Hippokrates: "biarkan makanan jadi obatmu" & Sumpah Hippokrates (etika medis). Galen sistematisasi fisiologi. Romawi membangun aqueduct, pemandian, & sanitasi publik — sistem kesehatan masyarakat pertama.' },
+  { era: 'Dinasti Tiongkok', when: '≈200 SM–1912 M', emoji: '🐉', title: 'Qi, Herbal & Elixir Panjang Umur',
+    body: 'Huangdi Neijing meletakkan dasar TCM. Kaisar mencari "elixir keabadian" (ironisnya sebagian mengandung merkuri). Qigong, akupunktur, ginseng, & keseimbangan yin-yang: pendekatan holistik healthspan.' },
+  { era: 'Kekaisaran Mongol', when: '≈1206–1368 M', emoji: '🏹', title: 'Kedokteran Lintas Budaya',
+    body: 'Pax Mongolica menghubungkan tabib Persia, Tiongkok, & Arab di Jalur Sutra — pertukaran ilmu bedah, farmasi, & karantina. Rumah sakit keliling & standar kebugaran prajurit jadi bentuk awal "performance medicine".' },
+  { era: 'Keemasan Islam', when: '≈800–1300 M', emoji: '⚕️', title: 'Ibnu Sina & Rumah Sakit (Bimaristan)',
+    body: 'Al-Qanun (Canon of Medicine) Ibnu Sina jadi rujukan dunia 600 tahun. Al-Razi memelopori catatan klinis. Bimaristan: rumah sakit dengan rekam medis, apotek, & spesialisasi — cikal bakal sistem layanan kesehatan modern.' },
+]
+const HISTORY_MODERN: { decade: string; title: string; body: string }[] = [
+  { decade: '1900–1950', title: 'Antibiotik & Vaksin', body: 'Penisilin (Fleming, 1928), vaksinasi massal, & sanitasi melipatgandakan harapan hidup. Fokus: penyakit menular.' },
+  { decade: '1960–1980', title: 'Rekam Medis & Kedokteran Bukti', body: 'Rekam medis elektronik pertama (Problem-Oriented Medical Record). Randomized trial jadi standar emas. Awal gerontologi.' },
+  { decade: '1990–2000', title: 'Genom & Telomer', body: 'Human Genome Project. Penemuan telomerase (anti-aging molekuler). Internet mulai mengubah akses informasi kesehatan.' },
+  { decade: '2000–2010', title: 'EHR & Standar Interoperabilitas', body: 'Adopsi Electronic Health Records meluas. HL7 v2/v3 & lahirnya FHIR (2011) — standar tukar data kesehatan antar-sistem yang kini jadi tulang punggung digital health.' },
+  { decade: '2010–2020', title: 'Wearable & Longevity Science', body: 'Apple Watch, WHOOP, CGM. Riset senolytics, NAD+, rapamycin, puasa. Longevity naik dari pinggiran ke sains arus utama (Sinclair, Attia).' },
+  { decade: '2020–kini', title: 'AI dalam Kedokteran + FHIR', body: 'AI untuk diagnosis, anamnesis, & interpretasi citra; LLM medis. FHIR menyatukan data agar AI & pasien berbicara satu bahasa. Panaceamed.id lahir di sini: AI + verifikasi dokter + longevity terukur.' },
+]
+
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [promo, setPromo] = useState<Health['promo'] | null>(null)
@@ -300,6 +324,75 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
       {/* ── BERITA & INOVASI KEDOKTERAN (editorial, rotating) ─────── */}
       <MedicalNews />
+
+      {/* ── SEJARAH LONGEVITY & SISTEM KESEHATAN ──────────────────── */}
+      <section className="relative overflow-hidden px-6 py-20 sm:px-10">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl" />
+          <div className="orb absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl" style={{ animationDelay: '-8s' }} />
+        </div>
+        <div className="relative mx-auto max-w-4xl">
+          <Reveal className="text-center">
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-dark">Warisan Ribuan Tahun</span>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Sejarah <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Kesehatan</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
+              Dari firaun, para nabi, Yunani-Romawi, dinasti Tiongkok, hingga kekaisaran Mongol —
+              pencarian hidup panjang &amp; sehat setua peradaban. Panaceamed.id meneruskannya dengan sains &amp; AI.
+            </p>
+          </Reveal>
+
+          {/* Ancient eras timeline */}
+          <div className="mt-10 space-y-4">
+            {HISTORY_ERAS.map((e, i) => (
+              <Reveal key={e.era} delay={(i % 3) * 80}>
+                <div className="liquid-glass flex gap-4 rounded-2xl p-5">
+                  <div className="flex shrink-0 flex-col items-center">
+                    <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl">{e.emoji}</span>
+                    {i < HISTORY_ERAS.length - 1 && <span className="mt-2 w-px flex-1 bg-brand/20" />}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <h3 className="text-base font-extrabold text-ink">{e.title}</h3>
+                      <span className="text-[11px] font-bold text-brand-dark">{e.era}</span>
+                      <span className="text-[10px] text-neutral-400">· {e.when}</span>
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Modern per-decade */}
+          <Reveal className="mt-12 text-center">
+            <h3 className="text-2xl font-extrabold">Era Modern — <span className="font-serif-display italic text-brand-dark">Per Dekade</span></h3>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-500">Dari antibiotik & rekam medis, ke wearable, standar data FHIR, dan AI dalam kedokteran.</p>
+          </Reveal>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {HISTORY_MODERN.map((m, i) => (
+              <Reveal key={m.decade} delay={(i % 3) * 80}>
+                <div className="liquid-glass h-full rounded-2xl p-5">
+                  <div className="text-xs font-black text-brand-dark">{m.decade}</div>
+                  <div className="mt-1 font-bold text-ink">{m.title}</div>
+                  <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">{m.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* FHIR explainer */}
+          <Reveal delay={80}>
+            <div className="mt-8 rounded-2xl border border-brand/20 bg-brand-50 p-6">
+              <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">Apa itu FHIR?</div>
+              <p className="mt-1.5 text-sm leading-relaxed text-neutral-700">
+                <b>FHIR</b> (Fast Healthcare Interoperability Resources) adalah standar global agar data kesehatan —
+                rekam medis, lab, obat, tanda vital — bisa dibaca antar rumah sakit, aplikasi, &amp; AI dalam satu "bahasa".
+                Inilah fondasi yang membuat AI-EMR &amp; longevity terukur di Panaceamed.id bisa aman, portabel, &amp; kolaboratif.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
       <section className="px-6 py-12 sm:px-10">
