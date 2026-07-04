@@ -26,7 +26,7 @@ interface LongevityData {
   tests: Record<string, string> // test id -> last done ISO date
 }
 const DEF: LongevityData = {
-  age: 26, g: 'M', vo2: 0, grip: 0, chair30: 0, balance: 0,
+  age: 30, g: 'M', vo2: 0, grip: 0, chair30: 0, balance: 0,
   whr: 0, rhr: 0, sleepH: 7, smoke: 'never', alcohol: 0,
   protein: false, social: false, purpose: false,
   hba1c: 0, ldl: 0, crp: 0, sbp: 0, tests: {},

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../components/icons'
+import { getDemo, setDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Training Planner — rule-based sports-science generator (runs offline).
@@ -289,17 +290,20 @@ const RED_FLAGS = [
 ]
 
 function RunnerCoach() {
-  const [km, setKm] = useState(4)
-  const [min, setMin] = useState(35)
+  const demo = getDemo()
+  const [km, setKm] = useState(0)
+  const [min, setMin] = useState(0)
   const [effort, setEffort] = useState<'easy' | 'moderate' | 'hard'>('easy')
-  const [age, setAge] = useState(26)
-  const [g, setG] = useState<'M' | 'F'>('M')
+  const [age, setAge] = useState(demo.age)
+  const [g, setG] = useState<'M' | 'F'>(demo.sex)
   // Honest current ability drives the plan far better than one run's distance.
-  const [cont, setCont] = useState<'u1' | 'm1_5' | 'm5_15' | 'm15_30' | 'm30p'>('m30p')
+  const [cont, setCont] = useState<'u1' | 'm1_5' | 'm5_15' | 'm15_30' | 'm30p'>('m5_15')
   const [flags, setFlags] = useState<string[]>([])
-  // Cooper goal countdown.
-  const [targetM, setTargetM] = useState(2500)
+  // Cooper goal countdown (generic default — the standard "good" adult mark).
+  const [targetM, setTargetM] = useState(2400)
   const [months, setMonths] = useState(6)
+  function updAge(v: number) { setAge(v); setDemo({ age: v }) }
+  function updSex(v: 'M' | 'F') { setG(v); setDemo({ sex: v }) }
 
   const speedMperMin = km > 0 && min > 0 ? (km * 1000) / min : 0
   const runPaceSec = km > 0 ? (min * 60) / km : 0
@@ -363,8 +367,8 @@ function RunnerCoach() {
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km} onChange={(e) => setKm(+e.target.value)} /></Field>
-        <Field label="Waktu (menit)"><input className={inputClass} type="number" value={min} onChange={(e) => setMin(+e.target.value)} /></Field>
+        <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="mis. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
+        <Field label="Waktu (menit)"><input className={inputClass} type="number" value={min || ''} placeholder="mis. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
         <Field label="Seberapa berat?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
             <option value="easy">Santai (bisa ngobrol)</option>
@@ -374,8 +378,8 @@ function RunnerCoach() {
         </Field>
         <Field label="Usia / Kelamin">
           <div className="flex gap-1">
-            <input className={inputClass + ' w-14'} type="number" value={age} onChange={(e) => setAge(+e.target.value)} />
-            <select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">L</option><option value="F">P</option></select>
+            <input className={inputClass + ' w-14'} type="number" value={age} onChange={(e) => updAge(+e.target.value)} />
+            <select className={inputClass} value={g} onChange={(e) => updSex(e.target.value as 'M' | 'F')}><option value="M">L</option><option value="F">P</option></select>
           </div>
         </Field>
       </div>
@@ -400,11 +404,13 @@ function RunnerCoach() {
       </div>
 
       {/* Encouraging reframe */}
-      <div className="mt-3 rounded-xl bg-brand-50 p-3 text-[12px] leading-relaxed text-brand-dark">
-        💚 <b>Perspektif jujur:</b> mampu lari {km} km terus-menerus sudah menempatkan Anda di atas mayoritas orang yang tak sanggup lari 1 km.
-        VO₂max adalah kapasitas yang <b>paling bisa dilatih</b> — pemula lazim naik <b>15-30% dalam 8-12 minggu</b> latihan terstruktur.
-        Jangan bandingkan lari <i>santai</i> Anda dengan pace <i>lomba</i> orang lain; itu apel vs jeruk.
-      </div>
+      {vo2max > 0 && (
+        <div className="mt-3 rounded-xl bg-brand-50 p-3 text-[12px] leading-relaxed text-brand-dark">
+          💚 <b>Perspektif jujur:</b> {km >= 1 ? `mampu lari ${km} km terus-menerus sudah menempatkan Anda di atas mayoritas orang yang tak sanggup lari 1 km. ` : ''}
+          VO₂max adalah kapasitas yang <b>paling bisa dilatih</b> — pemula lazim naik <b>15-30% dalam 8-12 minggu</b> latihan terstruktur.
+          Jangan bandingkan lari <i>santai</i> Anda dengan pace <i>lomba</i> orang lain; itu apel vs jeruk.
+        </div>
+      )}
 
       {/* Personal pace zones */}
       {pace5kSec > 0 && (
@@ -526,9 +532,9 @@ export function TrainingPlan() {
   const [level, setLevel] = useState<Level>('pemula')
   const [days, setDays] = useState(4)
   const [view, setView] = useState<'minggu' | 'bulan' | 'tahun'>('minggu')
-  const [vo2Now, setVo2Now] = useState(41)
-  const [cooper, setCooper] = useState(1090)
-  const [weightKg, setWeightKg] = useState(65)
+  const [vo2Now, setVo2Now] = useState(0)
+  const [cooper, setCooper] = useState(0)
+  const [weightKg, setWeightKg] = useState(getDemo().weightKg)
 
   const week = useMemo(() => buildWeek(goal, level, days), [goal, level, days])
   const vo2FromCooper = cooperVo2(cooper)
@@ -685,9 +691,9 @@ export function TrainingPlan() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Panel Longevity Anda" subtitle="VO₂max, kekuatan, massa otot, glukosa — kompetensi inti Panaceamed" />
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field label="VO₂max (dari jam/tes)"><input className={inputClass} type="number" value={vo2Now} onChange={(e) => setVo2Now(+e.target.value)} /></Field>
-          <Field label="Cooper 12 mnt ALL-OUT (m)"><input className={inputClass} type="number" value={cooper} onChange={(e) => setCooper(+e.target.value)} /></Field>
-          <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg} onChange={(e) => setWeightKg(+e.target.value)} /></Field>
+          <Field label="VO₂max (dari jam/tes)"><input className={inputClass} type="number" value={vo2Now || ''} placeholder="mis. 40" onChange={(e) => setVo2Now(+e.target.value)} /></Field>
+          <Field label="Cooper 12 mnt ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="mis. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
+          <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="mis. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
         </div>
         <div className="mt-2 rounded-xl bg-amber-50 p-2.5 text-[10px] leading-relaxed text-amber-800">
           ⚠️ Cooper Test = lari <b>sekuat mungkin selama 12 menit</b> (bukan pace lari santai). Jangan isi kolom Cooper dengan pace easy run — hasilnya akan salah-rendah. Untuk analisis dari lari biasa, pakai <b>Pelatih Lari Personal</b> di atas.
@@ -702,8 +708,8 @@ export function TrainingPlan() {
             </div>
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Target realistis</div>
-              <div className="text-2xl font-extrabold text-amber-300">{vo2Target}</div>
-              <div className="text-[10px] text-white/50">±{monthsToTarget} bulan dgn 4×4 rutin (≈+0.5/bln)</div>
+              <div className="text-2xl font-extrabold text-amber-300">{vo2Now > 0 ? vo2Target : '—'}</div>
+              <div className="text-[10px] text-white/50">{vo2Now > 0 ? `±${monthsToTarget} bulan dgn 4×4 rutin (≈+0.5/bln)` : 'isi VO₂max Anda'}</div>
             </div>
           </div>
           <div className="relative mt-3 h-2.5 overflow-hidden rounded-full bg-white/15">

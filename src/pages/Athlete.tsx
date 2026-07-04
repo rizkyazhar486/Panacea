@@ -56,7 +56,7 @@ interface AthleteProfile {
 
 const KEY = 'pm_athlete_profile'
 const def: AthleteProfile = {
-  age: 24, g: 'M', weight: 70, hrRest: 55, hrMax: 0,
+  age: 30, g: 'M', weight: 70, hrRest: 60, hrMax: 0,
   acuteLoad: 0, chronicLoad: 0, vo2Trend: 'flat', hrv: 0, hrvBaseline: 0,
   recoveryHrs: 0, ltHr: 0, ltPace: '', teAerobic: 0, teAnaerobic: 0, sleepScore: 0,
 }

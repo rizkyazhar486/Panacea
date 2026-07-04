@@ -20,13 +20,27 @@ interface Body {
   bmd: number // bone mineral density T-score (from DEXA scan, if available)
 }
 const DEF: Body = {
-  w: 65, h: 168, age: 26, g: 'M', waist: 80, hip: 95, neck: 37,
-  smm: 0, bfm: 0, rhr: 60, hrv: 0, sleepH: 7, remH: 1.5, deepH: 1.2,
-  stress: 4, anxiety: 3, mood: 7, mets: 6, caffeineCutoff: '14:00', noiseDb: 45, vo2: 41,
+  w: 70, h: 170, age: 30, g: 'M', waist: 85, hip: 98, neck: 38,
+  smm: 0, bfm: 0, rhr: 65, hrv: 0, sleepH: 7, remH: 1.5, deepH: 1.2,
+  stress: 4, anxiety: 3, mood: 7, mets: 6, caffeineCutoff: '14:00', noiseDb: 45, vo2: 0,
   bmd: 0,
 }
 const KEY = 'pm_bodycomp_v1'
-const load = (): Body => { try { return { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEF } }
+const load = (): Body => {
+  let d = DEF
+  try { d = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { /* ignore */ }
+  // Seed demographics from the shared profile if the user hasn't set them here yet.
+  try {
+    const p = JSON.parse(localStorage.getItem('pmd_profile') || '{}')
+    if (!localStorage.getItem(KEY)) {
+      if (p.age) d.age = p.age
+      if (p.sex) d.g = p.sex
+      if (p.weightKg) d.w = p.weightKg
+      if (p.heightCm) d.h = p.heightCm
+    }
+  } catch { /* ignore */ }
+  return d
+}
 
 // US Navy body-fat % (needs waist/neck/hip in cm, height in cm).
 function navyBf(b: Body): number {
