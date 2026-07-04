@@ -515,18 +515,21 @@ export function Shell({ children }: { children: ReactNode }) {
             { to: '/community', label: 'Community', icon: IconUsers },
           ].map((t) => (
             <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
-              className={({ isActive }) => `flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${isActive ? 'text-brand-dark' : 'text-neutral-400'}`}>
-              <t.icon size={26} />
-              <span className="text-[9px] font-bold">{t.label}</span>
+              className={({ isActive }) => `group relative flex min-h-[54px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+              {({ isActive }) => (<>
+                <span className={`absolute top-0 h-0.5 w-8 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                <t.icon size={25} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
+                <span className="text-[9px] font-bold">{t.label}</span>
+              </>)}
             </NavLink>
           ))}
           {/* Tombol tengah "+" — buat post/story */}
           <button
             onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
             aria-label="Buat postingan atau story baru"
-            className="-mt-5 flex flex-col items-center justify-center"
+            className="group -mt-5 flex flex-col items-center justify-center"
           >
-            <span className="grid h-14 w-14 place-items-center rounded-full text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 6px 18px rgba(0,191,99,0.45)' }}>
+            <span className="grid h-14 w-14 place-items-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 22px rgba(0,191,99,0.45)' }}>
               <IconPlus size={28} />
             </span>
           </button>
@@ -535,9 +538,12 @@ export function Shell({ children }: { children: ReactNode }) {
             { to: '/profile', label: 'Profil', icon: IconUser },
           ].map((t) => (
             <NavLink key={t.to} to={t.to} aria-label={t.label}
-              className={({ isActive }) => `flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${isActive ? 'text-brand-dark' : 'text-neutral-400'}`}>
-              <t.icon size={26} />
-              <span className="text-[9px] font-bold">{t.label}</span>
+              className={({ isActive }) => `group relative flex min-h-[54px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+              {({ isActive }) => (<>
+                <span className={`absolute top-0 h-0.5 w-8 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                <t.icon size={25} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
+                <span className="text-[9px] font-bold">{t.label}</span>
+              </>)}
             </NavLink>
           ))}
         </nav>
