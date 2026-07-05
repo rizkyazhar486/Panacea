@@ -36,10 +36,10 @@ export function SectionTitle({
   return (
     <div className="mb-4 flex items-start justify-between gap-3">
       <div className="flex items-center gap-2.5">
-        {icon && <span className="text-brand">{icon}</span>}
-        <div>
-          <h2 className="text-lg font-bold leading-tight">{title}</h2>
-          {subtitle && <p className="text-sm text-neutral-500">{subtitle}</p>}
+        {icon && <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">{icon}</span>}
+        <div className="min-w-0">
+          <h2 className="text-lg font-extrabold leading-tight tracking-tight text-ink">{title}</h2>
+          {subtitle && <p className="mt-0.5 text-[13px] leading-snug text-neutral-500">{subtitle}</p>}
         </div>
       </div>
       {right}

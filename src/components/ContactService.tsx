@@ -31,11 +31,13 @@ export function ContactService() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-brand text-white shadow-lg transition hover:bg-brand-dark lg:bottom-5 lg:right-5 lg:h-14 lg:w-14"
+        className="group fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:bottom-5 lg:right-5 lg:h-14 lg:w-14"
+        style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 26px -6px rgba(0,191,99,0.55)' }}
         title="Layanan / Contact Service"
         aria-label="Contact Service"
       >
-        <IconPhone size={24} />
+        <span className="absolute inset-0 rounded-full bg-brand/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:animate-ping" />
+        <IconPhone size={24} className="relative" />
       </button>
 
       {open && (
