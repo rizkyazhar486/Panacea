@@ -89,6 +89,7 @@ interface DB {
   creatorSubs: { subscriberId: string; authorEmail: string; at: string; expires: string }[]
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
+  healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
 }
 
 // Professional onboarding application — submitted at sign-up by clinicians,
@@ -364,6 +365,20 @@ export function saveSettings(userId: string, prefs: Record<string, any>) {
   if (!db.settings) db.settings = {}
   db.settings[userId] = { ...db.settings[userId], ...prefs }
   save()
+}
+
+// Per-user health profile — an opaque JSON blob owned by the frontend
+// (demographics + wearable snapshot from manual/WHOOP/Apple Watch/etc.).
+// Keyed by user email so it follows the account across devices.
+export function getHealthProfile(email: string): Record<string, any> {
+  if (!db.healthProfiles) db.healthProfiles = {}
+  return db.healthProfiles[email] ?? {}
+}
+export function saveHealthProfile(email: string, data: Record<string, any>): Record<string, any> {
+  if (!db.healthProfiles) db.healthProfiles = {}
+  db.healthProfiles[email] = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
+  save()
+  return db.healthProfiles[email]
 }
 
 // Doctors awaiting / holding STR verification — joins the user record with the
