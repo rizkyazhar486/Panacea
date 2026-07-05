@@ -315,7 +315,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {/* Mobile: buka drawer */}
             <button
               onClick={() => setMenuOpen(true)}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
               aria-label="Buka menu"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -326,7 +326,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="hidden h-9 w-9 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
+                className="hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
                 aria-label="Buka menu samping"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -340,14 +340,14 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {['pasien', 'dokter', 'owner'].includes(account.role) && (
               <NavLink to="/messages" aria-label="Pesan" title="Pesan"
-                className={({ isActive }) => `grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+                className={({ isActive }) => `grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
                 <IconChat size={20} />
               </NavLink>
             )}
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
-              className="hidden h-9 w-9 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
+              className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
               title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
               aria-label="Ganti tema"
             >
@@ -382,7 +382,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 if (backendEnabled) api.logout().catch(() => {})
                 logout()
               }}
-              className="grid h-9 w-9 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
               title="Keluar"
               aria-label="Keluar"
             >
@@ -488,7 +488,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">{roleLabel[account.role]}</div>
                 </div>
               </div>
-              <button onClick={() => setMenuOpen(false)} className="grid h-9 w-9 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
+              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
             </div>
             <DrawerNav items={items} />
             <div className="border-t border-black/5 p-3">
