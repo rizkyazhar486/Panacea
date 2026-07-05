@@ -916,18 +916,18 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Input Area */}
         <div className="px-5 pb-5 space-y-4">
-          <textarea className="w-full h-28 p-3 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:border-brand resize-none" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
+          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
 
           {/* Tag teman */}
           <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag teman (mis. Budi, Sinta) — pisahkan koma" value={tags} onChange={e => setTags(e.target.value)} />
 
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={() => fileRef.current?.click()} disabled={!!videoUrl} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition disabled:opacity-40">
+            <button onClick={() => fileRef.current?.click()} disabled={!!videoUrl} className="flex min-h-[40px] items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-bold text-neutral-600 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-neutral-100 active:scale-95 disabled:opacity-40">
               📸 {busy ? 'Mengunggah...' : 'Foto'}
             </button>
             <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={e => pickFiles(e.target.files)} />
 
-            <button onClick={() => videoRef.current?.click()} disabled={photos.length > 0} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-xs font-bold text-neutral-600 transition disabled:opacity-40">
+            <button onClick={() => videoRef.current?.click()} disabled={photos.length > 0} className="flex min-h-[40px] items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-bold text-neutral-600 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-neutral-100 active:scale-95 disabled:opacity-40">
               <IconVideo size={14} /> {busy ? 'Mengunggah...' : 'Video (maks 3 mnt)'}
             </button>
             <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => pickVideo(e.target.files?.[0])} />
@@ -936,8 +936,11 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
           </div>
 
           <div className="flex justify-end">
-            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-white shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               Kirim Postingan
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
+                <IconSend size={15} />
+              </span>
             </button>
           </div>
         </div>
