@@ -2,7 +2,11 @@
 // height used across the fitness calculators so users enter it ONCE and pages
 // stop shipping any one person's numbers as defaults. Stored locally per device.
 
-export interface Demo { age: number; sex: 'M' | 'F'; weightKg: number; heightCm: number }
+export interface Demo {
+  age: number; sex: 'M' | 'F'; weightKg: number; heightCm: number
+  // Optional biometrics mirrored from the Health Profile so calculators prefill.
+  vo2max?: number; restingHr?: number; hrvMs?: number
+}
 
 // Neutral, generic defaults — NOT any specific user's numbers.
 export const DEMO_DEFAULT: Demo = { age: 30, sex: 'M', weightKg: 70, heightCm: 170 }

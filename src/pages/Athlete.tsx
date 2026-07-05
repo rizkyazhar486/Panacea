@@ -61,7 +61,18 @@ const def: AthleteProfile = {
   recoveryHrs: 0, ltHr: 0, ltPace: '', teAerobic: 0, teAnaerobic: 0, sleepScore: 0,
 }
 function load(): AthleteProfile {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || ''); return d.age ? { ...def, ...d } : def } catch { return def }
+  let p = def
+  try { const d = JSON.parse(localStorage.getItem(KEY) || ''); p = d.age ? { ...def, ...d } : def } catch { /* ignore */ }
+  // Prefill resting HR / HRV / age from the central Health Profile when unset.
+  try {
+    const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
+    if (p.hrRest === def.hrRest && hp.restingHr) p.hrRest = hp.restingHr
+    if (!p.hrv && hp.hrvMs) p.hrv = hp.hrvMs
+    if (p.age === def.age && hp.age) p.age = hp.age
+    if (hp.sex) p.g = hp.sex
+    if (p.weight === def.weight && hp.weightKg) p.weight = hp.weightKg
+  } catch { /* ignore */ }
+  return p
 }
 function save(p: AthleteProfile) { try { localStorage.setItem(KEY, JSON.stringify(p)) } catch { /* ignore */ } }
 

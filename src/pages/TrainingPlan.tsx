@@ -532,7 +532,7 @@ export function TrainingPlan() {
   const [level, setLevel] = useState<Level>('pemula')
   const [days, setDays] = useState(4)
   const [view, setView] = useState<'minggu' | 'bulan' | 'tahun'>('minggu')
-  const [vo2Now, setVo2Now] = useState(0)
+  const [vo2Now, setVo2Now] = useState(getDemo().vo2max ?? 0)
   const [cooper, setCooper] = useState(0)
   const [weightKg, setWeightKg] = useState(getDemo().weightKg)
 

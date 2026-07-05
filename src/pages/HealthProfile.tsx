@@ -94,7 +94,8 @@ export function HealthProfile() {
     setP(payload)
     try { localStorage.setItem(LKEY, JSON.stringify(payload)) } catch { /* ignore */ }
     // Keep the shared local demographics in sync for every calculator.
-    setDemo({ age: p.age || undefined, sex: p.sex, weightKg: p.weightKg || undefined, heightCm: p.heightCm || undefined } as never)
+    setDemo({ age: p.age || undefined, sex: p.sex, weightKg: p.weightKg || undefined, heightCm: p.heightCm || undefined,
+      vo2max: p.vo2max || undefined, restingHr: p.restingHr || undefined, hrvMs: p.hrvMs || undefined } as never)
     if (backendEnabled) {
       try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
       catch { setErr('Tersimpan di perangkat, tapi gagal sinkron ke server (offline). Akan otomatis tersimpan lokal.') }
@@ -123,6 +124,23 @@ export function HealthProfile() {
     } finally {
       if (fileRef.current) fileRef.current.value = ''
     }
+  }
+
+  function download(name: string, text: string, type: string) {
+    const url = URL.createObjectURL(new Blob([text], { type }))
+    const a = document.createElement('a')
+    a.href = url; a.download = name; a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 2000)
+  }
+  function exportJson() {
+    download(`data-kesehatan-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(p, null, 2), 'application/json')
+  }
+  function exportCsv() {
+    const rows = p.history ?? []
+    if (!rows.length) { setErr('Belum ada riwayat untuk diekspor — simpan data dulu.'); return }
+    const cols: (keyof Snapshot)[] = ['date', 'vo2max', 'restingHr', 'hrvMs', 'recoveryPct', 'sleepH']
+    const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => r[c] ?? '').join(','))].join('\n')
+    download(`riwayat-kesehatan-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv')
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
@@ -156,16 +174,18 @@ export function HealthProfile() {
         {account && <div className="mt-2 text-[10px] text-neutral-400">Akun: {account.email}</div>}
       </Card>
 
-      {/* Import from a health-app export file */}
+      {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Impor Otomatis" subtitle="Apple Health export.xml · WHOOP .csv" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Impor & Ekspor" subtitle="Apple Health export.xml · WHOOP .csv" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Ekspor dari aplikasi kesehatan Anda lalu unggah di sini — kolom akan terisi otomatis. File diproses di perangkat, tidak diunggah saat dibaca.
+          Ekspor dari aplikasi kesehatan Anda lalu unggah di sini — kolom akan terisi otomatis. File diproses di perangkat, tidak diunggah saat dibaca. Anda juga bisa mengunduh data Anda kapan saja.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,text/xml,text/csv" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
           <Button onClick={() => fileRef.current?.click()} className="!px-4">Pilih file export…</Button>
-          {note && <span className="text-[11px] font-semibold text-brand-dark">{note}</span>}
+          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh JSON</button>
+          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh riwayat CSV</button>
+          {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
       </Card>
 

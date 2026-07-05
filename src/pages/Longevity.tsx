@@ -46,6 +46,15 @@ function load(): LongevityData {
     if (bc.g) d.g = bc.g
     if (!d.sleepH && bc.sleepH) d.sleepH = bc.sleepH
   } catch { /* ignore */ }
+  // Then from the central Health Profile (manual/wearable) — highest priority source.
+  try {
+    const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
+    if (!d.vo2 && hp.vo2max) d.vo2 = hp.vo2max
+    if (!d.rhr && hp.restingHr) d.rhr = hp.restingHr
+    if (!d.sleepH && hp.sleepH) d.sleepH = hp.sleepH
+    if (d.age === DEF.age && hp.age) d.age = hp.age
+    if (hp.sex) d.g = hp.sex
+  } catch { /* ignore */ }
   return d
 }
 
