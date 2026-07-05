@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { PostCard } from './Feed'
 import { compressImage, readAsDataUrl } from '../lib/upload'
@@ -96,6 +97,8 @@ export function Profile() {
         )}
       </div>
 
+      <HealthDataCard />
+
       {/* Edit profile button */}
       <button onClick={openEdit} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-700">
         ✎ Edit Profil
@@ -182,5 +185,42 @@ export function Profile() {
         )}
       </div>
     </div>
+  )
+}
+
+// Compact snapshot of the user's saved health data (from /health-data), shown on
+// the profile with a shortcut to edit. Reads the same local cache the health
+// page writes; empty state nudges the user to fill it in.
+function HealthDataCard() {
+  let h: Record<string, unknown> = {}
+  try { h = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}') } catch { /* ignore */ }
+  const n = (v: unknown) => (typeof v === 'number' && v > 0 ? v : null)
+  const stats = [
+    { label: 'VO₂max', value: n(h.vo2max), unit: '' },
+    { label: 'HR Istirahat', value: n(h.restingHr), unit: 'bpm' },
+    { label: 'HRV', value: n(h.hrvMs), unit: 'ms' },
+    { label: 'Tidur', value: n(h.sleepH), unit: 'j' },
+  ].filter((s) => s.value != null)
+  const src = typeof h.source === 'string' ? h.source : 'Manual'
+
+  return (
+    <Link to="/health-data" className="mt-3 block rounded-2xl border border-brand/15 bg-brand-50/60 p-3 transition hover:border-brand/30 hover:bg-brand-50">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-brand-dark">❤️ Data Kesehatan</span>
+        <span className="text-[10px] font-semibold text-neutral-400">Sumber: {src} · Ubah →</span>
+      </div>
+      {stats.length ? (
+        <div className="mt-2 grid grid-cols-4 gap-2">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center">
+              <div className="text-sm font-black text-ink">{s.value}<span className="text-[9px] font-semibold text-neutral-400">{s.unit}</span></div>
+              <div className="text-[9px] text-neutral-400">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-1 text-[11px] text-neutral-500">Belum ada data — isi manual atau salin dari WHOOP / Apple Watch / Garmin.</p>
+      )}
+    </Link>
   )
 }
