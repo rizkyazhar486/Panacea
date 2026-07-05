@@ -37,4 +37,14 @@ export function HealthSnapshot({ className = '' }: { className?: string }) {
   )
 }
 
+// Tiny inline badge marking a calculator input as prefilled from /health-data.
+export function PrefillBadge({ show }: { show: boolean }) {
+  if (!show) return null
+  return (
+    <span className="ml-1 inline-flex items-center rounded-full bg-brand-50 px-1.5 py-0.5 text-[9px] font-bold text-brand-dark align-middle" title="Terisi otomatis dari Data Kesehatan">
+      ❤ auto
+    </span>
+  )
+}
+
 export default HealthSnapshot

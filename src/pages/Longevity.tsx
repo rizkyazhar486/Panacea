@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
+import { PrefillBadge } from '../components/HealthSnapshot'
+import { hasHealth, pushBiometrics } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -139,6 +141,8 @@ const PROTOCOL = [
 export function Longevity() {
   const [d, setD] = useState<LongevityData>(load)
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
+  // Sync edited biometrics back to the central Health Profile so the whole app agrees.
+  useEffect(() => { pushBiometrics({ vo2max: d.vo2, restingHr: d.rhr, sleepH: d.sleepH }) }, [d.vo2, d.rhr, d.sleepH])
   const u = (p: Partial<LongevityData>) => setD((x) => ({ ...x, ...p }))
 
   const pillars = useMemo(() => pillarsOf(d), [d])
@@ -155,12 +159,16 @@ export function Longevity() {
 
   const scoreColor = score == null ? '#a3a3a3' : score >= 75 ? '#00BF63' : score >= 55 ? '#f59e0b' : '#ef4444'
 
-  const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => (
-    <Field label={label}>
-      <input className={inputClass} type="number" step={step} placeholder={ph}
-        value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)} />
-    </Field>
-  )
+  const HEALTH_FIELD: Partial<Record<keyof LongevityData, 'vo2max' | 'restingHr' | 'sleepH'>> = { vo2: 'vo2max', rhr: 'restingHr', sleepH: 'sleepH' }
+  const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => {
+    const hf = HEALTH_FIELD[key]
+    return (
+      <Field label={<>{label}<PrefillBadge show={!!hf && hasHealth(hf)} /></>}>
+        <input className={inputClass} type="number" step={step} placeholder={ph}
+          value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)} />
+      </Field>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
