@@ -1212,12 +1212,12 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
       )}
 
       {/* Action bar: like · react · comment · share (icon-first, evenly spread) */}
-      <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-2 -mb-1">
-        <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
-          <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><IconHeart size={18} /></ColoredIcon>
+      <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-1.5 -mb-1">
+        <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-90 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
+          <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><span className={post.likedByMe ? 'inline-block animate-[likepop_0.35s_ease]' : 'inline-block'}><IconHeart size={18} /></span></ColoredIcon>
           {post.likes > 0 && !post.hideLikes && <span>{post.likes}</span>}
         </button>
-        <button onClick={() => setShowReactions((v) => !v)} aria-label="Reaksi" className="flex items-center rounded-lg px-3 py-1.5 text-lg transition active:scale-95 hover:bg-neutral-50">
+        <button onClick={() => setShowReactions((v) => !v)} aria-label="Reaksi" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-lg transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           😊
         </button>
         {showReactions && (
@@ -1230,10 +1230,10 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             ))}
           </div>
         )}
-        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Komentar" className={'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition active:scale-95 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Komentar" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 active:scale-90 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
           <IconComment size={18} /> {!post.commentsOff && comments.length > 0 && <span>{comments.length}</span>}
         </button>
-        <button onClick={share} aria-label="Bagikan" className="flex items-center rounded-lg px-3 py-1.5 text-neutral-500 transition active:scale-95 hover:bg-neutral-50">
+        <button onClick={share} aria-label="Bagikan" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-neutral-500 transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           <IconShare2 size={17} />
         </button>
       </div>

@@ -261,6 +261,14 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .reduce-motion .page-enter { animation: none !important; }
 
 /* Scroll-reveal — toggled by the Reveal component via IntersectionObserver */
+/* Heart "pop" when a post is liked. */
+@keyframes likepop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(26px);
