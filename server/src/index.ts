@@ -22,6 +22,8 @@ import {
   addPatient,
   getSettings,
   saveSettings,
+  getHealthProfile,
+  saveHealthProfile,
   listDoctors,
   addPushSub,
   removePushSub,
@@ -346,6 +348,26 @@ app.put('/api/settings', requireAuth, (req, res) => {
   const { apiKey: _drop, ...safe } = prefs as Record<string, unknown>
   saveSettings(u.id, safe)
   res.json({ ok: true, settings: getSettings(u.id) })
+})
+
+// Per-user health profile (manual / WHOOP / Apple Watch / other). Stored by
+// email so it follows the user across devices.
+app.get('/api/health-profile', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ profile: getHealthProfile(u.email) })
+})
+app.put('/api/health-profile', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const data = (req.body as { profile?: Record<string, unknown> }).profile ?? {}
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    res.status(400).json({ error: 'invalid health profile payload' })
+    return
+  }
+  try {
+    res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
 })
 
 // --- AI (server-side Claude proxy) ---

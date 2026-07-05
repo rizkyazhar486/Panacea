@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
+import { PrefillBadge } from '../components/HealthSnapshot'
+import { hasHealth, pushBiometrics } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -34,7 +36,7 @@ const DEF: LongevityData = {
 const KEY = 'pmd_longevity_v1'
 
 function load(): LongevityData {
-  let d = DEF
+  let d: LongevityData = { ...DEF }
   try { d = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { /* ignore */ }
   // Prefill once from sibling pages if empty — the "aggregator" behavior.
   try {
@@ -45,6 +47,15 @@ function load(): LongevityData {
     if (d.age === DEF.age && bc.age) d.age = bc.age
     if (bc.g) d.g = bc.g
     if (!d.sleepH && bc.sleepH) d.sleepH = bc.sleepH
+  } catch { /* ignore */ }
+  // Then from the central Health Profile (manual/wearable) — highest priority source.
+  try {
+    const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
+    if (!d.vo2 && hp.vo2max) d.vo2 = hp.vo2max
+    if (!d.rhr && hp.restingHr) d.rhr = hp.restingHr
+    if (!d.sleepH && hp.sleepH) d.sleepH = hp.sleepH
+    if (d.age === DEF.age && hp.age) d.age = hp.age
+    if (hp.sex) d.g = hp.sex
   } catch { /* ignore */ }
   return d
 }
@@ -130,6 +141,8 @@ const PROTOCOL = [
 export function Longevity() {
   const [d, setD] = useState<LongevityData>(load)
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
+  // Sync edited biometrics back to the central Health Profile so the whole app agrees.
+  useEffect(() => { pushBiometrics({ vo2max: d.vo2, restingHr: d.rhr, sleepH: d.sleepH }) }, [d.vo2, d.rhr, d.sleepH])
   const u = (p: Partial<LongevityData>) => setD((x) => ({ ...x, ...p }))
 
   const pillars = useMemo(() => pillarsOf(d), [d])
@@ -146,12 +159,16 @@ export function Longevity() {
 
   const scoreColor = score == null ? '#a3a3a3' : score >= 75 ? '#00BF63' : score >= 55 ? '#f59e0b' : '#ef4444'
 
-  const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => (
-    <Field label={label}>
-      <input className={inputClass} type="number" step={step} placeholder={ph}
-        value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)} />
-    </Field>
-  )
+  const HEALTH_FIELD: Partial<Record<keyof LongevityData, 'vo2max' | 'restingHr' | 'sleepH'>> = { vo2: 'vo2max', rhr: 'restingHr', sleepH: 'sleepH' }
+  const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => {
+    const hf = HEALTH_FIELD[key]
+    return (
+      <Field label={<>{label}<PrefillBadge show={!!hf && hasHealth(hf)} /></>}>
+        <input className={inputClass} type="number" step={step} placeholder={ph}
+          value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)} />
+      </Field>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">

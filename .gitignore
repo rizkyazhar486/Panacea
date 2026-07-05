@@ -16,3 +16,7 @@ server/data.json
 # Locally-added agent skills (tooling, not app code)
 .agents/
 skills-lock.json
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun, IconActivity, IconHeart, IconX } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
+import { PrefillBadge } from '../components/HealthSnapshot'
+import { hasHealth, pushBiometrics } from '../lib/profile'
 
 // Motivational quotes from legendary athletes (Olympic/medal/award winners &
 // globally followed icons) — shown as a welcome popup on the Athlete page.
@@ -61,7 +63,18 @@ const def: AthleteProfile = {
   recoveryHrs: 0, ltHr: 0, ltPace: '', teAerobic: 0, teAnaerobic: 0, sleepScore: 0,
 }
 function load(): AthleteProfile {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || ''); return d.age ? { ...def, ...d } : def } catch { return def }
+  let p: AthleteProfile = { ...def }
+  try { const d = JSON.parse(localStorage.getItem(KEY) || ''); if (d.age) p = { ...def, ...d } } catch { /* ignore */ }
+  // Prefill resting HR / HRV / age from the central Health Profile when unset.
+  try {
+    const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
+    if (p.hrRest === def.hrRest && hp.restingHr) p.hrRest = hp.restingHr
+    if (!p.hrv && hp.hrvMs) p.hrv = hp.hrvMs
+    if (p.age === def.age && hp.age) p.age = hp.age
+    if (hp.sex) p.g = hp.sex
+    if (p.weight === def.weight && hp.weightKg) p.weight = hp.weightKg
+  } catch { /* ignore */ }
+  return p
 }
 function save(p: AthleteProfile) { try { localStorage.setItem(KEY, JSON.stringify(p)) } catch { /* ignore */ } }
 
@@ -130,6 +143,9 @@ export function Athlete() {
     const merged = { ...p, ...next }
     setP(merged)
     save(merged)
+    // Sync shared biometrics back to the central Health Profile.
+    if ('hrRest' in next || 'hrv' in next || 'weight' in next)
+      pushBiometrics({ restingHr: merged.hrRest, hrvMs: merged.hrv, weightKg: merged.weight })
   }
 
   return (
@@ -148,7 +164,7 @@ export function Athlete() {
             </select>
           </Field>
           <Field label="Berat (kg)"><input className={inputClass} type="number" value={p.weight} onChange={(e) => upd({ weight: +e.target.value })} /></Field>
-          <Field label="Nadi Istirahat"><input className={inputClass} type="number" value={p.hrRest} onChange={(e) => upd({ hrRest: +e.target.value })} /></Field>
+          <Field label={<>Nadi Istirahat<PrefillBadge show={hasHealth('restingHr')} /></>}><input className={inputClass} type="number" value={p.hrRest} onChange={(e) => upd({ hrRest: +e.target.value })} /></Field>
         </div>
         <div className="mt-2">
           <Field label="Nadi Maks Terukur (opsional, kosongkan untuk estimasi 220-usia)">
@@ -237,7 +253,7 @@ export function Athlete() {
               <option value="up">Naik ↑</option><option value="flat">Stabil →</option><option value="down">Turun ↓</option>
             </select>
           </Field>
-          <Field label="HRV malam (ms)"><input className={inputClass} type="number" value={p.hrv || ''} placeholder="mis. 65" onChange={(e) => upd({ hrv: +e.target.value })} /></Field>
+          <Field label={<>HRV malam (ms)<PrefillBadge show={hasHealth('hrvMs')} /></>}><input className={inputClass} type="number" value={p.hrv || ''} placeholder="mis. 65" onChange={(e) => upd({ hrv: +e.target.value })} /></Field>
           <Field label="Baseline HRV (ms)"><input className={inputClass} type="number" value={p.hrvBaseline || ''} placeholder="mis. 68" onChange={(e) => upd({ hrvBaseline: +e.target.value })} /></Field>
           <Field label="Recovery Time (jam)"><input className={inputClass} type="number" value={p.recoveryHrs || ''} placeholder="mis. 18" onChange={(e) => upd({ recoveryHrs: +e.target.value })} /></Field>
           <Field label="Skor Tidur (0–100)"><input className={inputClass} type="number" value={p.sleepScore || ''} placeholder="mis. 82" onChange={(e) => upd({ sleepScore: +e.target.value })} /></Field>

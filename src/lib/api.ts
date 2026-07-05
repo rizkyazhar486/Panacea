@@ -203,6 +203,10 @@ export const api = {
   reactPost: (id: string, emoji: string) =>
     req<{ post: BackendPost }>(`/api/posts/${id}/react`, { method: 'POST', body: JSON.stringify({ emoji }) }).then((r) => r.post),
   deletePost: (id: string) => req<{ ok: boolean }>(`/api/posts/${id}`, { method: 'DELETE' }),
+  // Per-user health profile (manual / WHOOP / Apple Watch / other)
+  getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
+  saveHealthProfile: (profile: Record<string, unknown>) =>
+    req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),
   patchPost: (id: string, patch: Record<string, unknown>) =>
     req<{ post: BackendPost }>(`/api/posts/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.post),
   // clinical persistence

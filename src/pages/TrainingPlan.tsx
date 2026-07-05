@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../components/icons'
-import { getDemo, setDemo } from '../lib/profile'
+import { getDemo, setDemo, hasHealth, pushBiometrics } from '../lib/profile'
+import { PrefillBadge } from '../components/HealthSnapshot'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AI Training Planner — rule-based sports-science generator (runs offline).
@@ -532,7 +533,7 @@ export function TrainingPlan() {
   const [level, setLevel] = useState<Level>('pemula')
   const [days, setDays] = useState(4)
   const [view, setView] = useState<'minggu' | 'bulan' | 'tahun'>('minggu')
-  const [vo2Now, setVo2Now] = useState(0)
+  const [vo2Now, setVo2Now] = useState(getDemo().vo2max ?? 0)
   const [cooper, setCooper] = useState(0)
   const [weightKg, setWeightKg] = useState(getDemo().weightKg)
 
@@ -691,7 +692,7 @@ export function TrainingPlan() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Panel Longevity Anda" subtitle="VO₂max, kekuatan, massa otot, glukosa — kompetensi inti Panaceamed" />
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field label="VO₂max (dari jam/tes)"><input className={inputClass} type="number" value={vo2Now || ''} placeholder="mis. 40" onChange={(e) => setVo2Now(+e.target.value)} /></Field>
+          <Field label={<>VO₂max (dari jam/tes)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="mis. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
           <Field label="Cooper 12 mnt ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="mis. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
           <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="mis. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
         </div>

@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { useStore } from '../lib/store'
+import { HealthSnapshot } from '../components/HealthSnapshot'
 import { PostCard } from './Feed'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { IconX } from '../components/icons'
@@ -95,6 +96,8 @@ export function Profile() {
           <a href={normalizeUrl(profile.link)} target="_blank" rel="noopener noreferrer" className="inline-block text-xs font-semibold text-brand-dark">🔗 {profile.link}</a>
         )}
       </div>
+
+      <HealthSnapshot className="mt-3" />
 
       {/* Edit profile button */}
       <button onClick={openEdit} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-700">
