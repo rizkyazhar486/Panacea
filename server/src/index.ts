@@ -359,7 +359,15 @@ app.get('/api/health-profile', requireAuth, (req, res) => {
 app.put('/api/health-profile', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const data = (req.body as { profile?: Record<string, unknown> }).profile ?? {}
-  res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    res.status(400).json({ error: 'invalid health profile payload' })
+    return
+  }
+  try {
+    res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
 })
 
 // --- AI (server-side Claude proxy) ---

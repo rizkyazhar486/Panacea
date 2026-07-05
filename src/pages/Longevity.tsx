@@ -36,7 +36,7 @@ const DEF: LongevityData = {
 const KEY = 'pmd_longevity_v1'
 
 function load(): LongevityData {
-  let d = DEF
+  let d: LongevityData = { ...DEF }
   try { d = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { /* ignore */ }
   // Prefill once from sibling pages if empty — the "aggregator" behavior.
   try {

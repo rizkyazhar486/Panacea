@@ -375,6 +375,10 @@ export function getHealthProfile(email: string): Record<string, any> {
   return db.healthProfiles[email] ?? {}
 }
 export function saveHealthProfile(email: string, data: Record<string, any>): Record<string, any> {
+  // Reject anything that isn't a plain object so a bad payload can't corrupt the
+  // stored shape via the spread; cap size so repeated saves can't grow unbounded.
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('invalid health profile payload')
+  if (JSON.stringify(data).length > 64 * 1024) throw new Error('health profile payload too large')
   if (!db.healthProfiles) db.healthProfiles = {}
   db.healthProfiles[email] = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
   save()

@@ -95,7 +95,7 @@ export function HealthProfile() {
     try { localStorage.setItem(LKEY, JSON.stringify(payload)) } catch { /* ignore */ }
     // Keep the shared local demographics in sync for every calculator.
     setDemo({ age: p.age || undefined, sex: p.sex, weightKg: p.weightKg || undefined, heightCm: p.heightCm || undefined,
-      vo2max: p.vo2max || undefined, restingHr: p.restingHr || undefined, hrvMs: p.hrvMs || undefined } as never)
+      vo2max: p.vo2max || undefined, restingHr: p.restingHr || undefined, hrvMs: p.hrvMs || undefined })
     if (backendEnabled) {
       try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
       catch { setErr('Tersimpan di perangkat, tapi gagal sinkron ke server (offline). Akan otomatis tersimpan lokal.') }
@@ -103,8 +103,14 @@ export function HealthProfile() {
     setSavedAt(now); setSaving(false)
   }
 
+  const MAX_IMPORT_BYTES = 60 * 1024 * 1024 // 60 MB — big Apple Health exports can freeze the tab if loaded whole
   async function onImport(file?: File) {
     if (!file) return
+    if (file.size > MAX_IMPORT_BYTES) {
+      setNote(''); setErr(`File terlalu besar (${(file.size / 1048576).toFixed(0)} MB, maks 60 MB). Untuk export Apple Health yang besar, isi nilai kunci secara manual.`)
+      if (fileRef.current) fileRef.current.value = ''
+      return
+    }
     setNote('Membaca file…'); setErr('')
     try {
       const text = await file.text()
@@ -145,7 +151,7 @@ export function HealthProfile() {
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
     <Field label={label}>
-      <input className={inputClass} type="number" step={step} placeholder={ph}
+      <input className={inputClass} type="number" step={step} min={0} placeholder={ph}
         value={(p[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<HealthProfile>)} />
     </Field>
   )

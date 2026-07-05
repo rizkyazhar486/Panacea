@@ -18,11 +18,19 @@ export interface ImportResult {
 // match of each type is the most recent value. We regex instead of DOM-parsing
 // so multi-MB exports don't blow up memory.
 export function parseAppleHealth(xml: string): ImportResult {
+  // Pick the record with the greatest startDate rather than trusting file order —
+  // Apple exports interleave sources and aren't reliably chronological. Falls back
+  // to the last match when a record has no parseable date.
   const latest = (type: string): number | undefined => {
-    const re = new RegExp(`type="${type}"[^>]*?value="([\\d.]+)"`, 'g')
+    const re = new RegExp(`type="${type}"[^>]*?(?:startDate="([^"]*)"[^>]*?)?value="([\\d.]+)"`, 'g')
     let m: RegExpExecArray | null
     let v: number | undefined
-    while ((m = re.exec(xml))) v = parseFloat(m[1])
+    let best = -Infinity
+    while ((m = re.exec(xml))) {
+      const t = m[1] ? Date.parse(m[1]) : NaN
+      const key = Number.isNaN(t) ? best : t // undated records: keep last-seen ordering
+      if (key >= best) { best = key; v = parseFloat(m[2]) }
+    }
     return Number.isFinite(v) ? v : undefined
   }
   const out: ImportResult = { source: 'Apple Watch' }

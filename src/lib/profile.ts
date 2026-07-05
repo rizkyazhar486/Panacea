@@ -5,7 +5,7 @@
 export interface Demo {
   age: number; sex: 'M' | 'F'; weightKg: number; heightCm: number
   // Optional biometrics mirrored from the Health Profile so calculators prefill.
-  vo2max?: number; restingHr?: number; hrvMs?: number
+  vo2max?: number; restingHr?: number; hrvMs?: number; sleepH?: number
 }
 
 // Neutral, generic defaults — NOT any specific user's numbers.
