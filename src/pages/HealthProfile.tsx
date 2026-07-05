@@ -1,21 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconCheck } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
+import { parseHealthFile, type ImportResult } from '../lib/healthImport'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
-// so it follows the user across devices), filled manually or copied from
-// WHOOP / Apple Watch / Garmin / other health apps. Falls back to localStorage
-// when the backend is offline. Also mirrors demographics into the shared local
-// profile so every calculator prefills.
+// so it follows the user across devices), filled manually, imported from an
+// Apple Health / WHOOP export file, or copied from any wearable. Falls back to
+// localStorage when the backend is offline. Keeps a dated history so the user
+// can see trends, and mirrors demographics into the shared local profile so
+// every calculator prefills.
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Src = 'Manual' | 'WHOOP' | 'Apple Watch' | 'Garmin' | 'Samsung Health' | 'Fitbit' | 'Oura' | 'Lainnya'
 const SOURCES: Src[] = ['Manual', 'WHOOP', 'Apple Watch', 'Garmin', 'Samsung Health', 'Fitbit', 'Oura', 'Lainnya']
 
+interface Snapshot {
+  date: string
+  vo2max?: number; restingHr?: number; hrvMs?: number; recoveryPct?: number; sleepH?: number
+}
 interface HealthProfile {
   source: Src
   // Demographics
@@ -29,12 +36,14 @@ interface HealthProfile {
   sleepH: number; remH: number; deepH: number
   steps: number; activeKcal: number
   bloodPressure: string // "120/80"
+  history?: Snapshot[]
   updatedAt?: string
 }
 const DEF: HealthProfile = {
   source: 'Manual', age: 0, sex: 'M', heightCm: 0, weightKg: 0,
   bodyFatPct: 0, muscleMassKg: 0, vo2max: 0, restingHr: 0, hrvMs: 0,
   recoveryPct: 0, strain: 0, sleepH: 0, remH: 0, deepH: 0, steps: 0, activeKcal: 0, bloodPressure: '',
+  history: [],
 }
 const LKEY = 'pmd_health_profile'
 
@@ -45,6 +54,8 @@ export function HealthProfile() {
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const [err, setErr] = useState('')
+  const [note, setNote] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
   // Load: server first (per-user), else local.
   useEffect(() => {
@@ -63,10 +74,24 @@ export function HealthProfile() {
 
   const u = (patch: Partial<HealthProfile>) => setP((x) => ({ ...x, ...patch }))
 
+  // Append/replace today's snapshot for the trend chart.
+  function withSnapshot(cur: HealthProfile): Snapshot[] {
+    const today = new Date().toISOString().slice(0, 10)
+    const snap: Snapshot = {
+      date: today,
+      vo2max: cur.vo2max || undefined, restingHr: cur.restingHr || undefined,
+      hrvMs: cur.hrvMs || undefined, recoveryPct: cur.recoveryPct || undefined, sleepH: cur.sleepH || undefined,
+    }
+    const prev = (cur.history ?? []).filter((s) => s.date !== today)
+    return [...prev, snap].slice(-90)
+  }
+
   async function save() {
     setSaving(true); setErr('')
     const now = new Date().toISOString()
-    const payload = { ...p, updatedAt: now }
+    const history = withSnapshot(p)
+    const payload = { ...p, history, updatedAt: now }
+    setP(payload)
     try { localStorage.setItem(LKEY, JSON.stringify(payload)) } catch { /* ignore */ }
     // Keep the shared local demographics in sync for every calculator.
     setDemo({ age: p.age || undefined, sex: p.sex, weightKg: p.weightKg || undefined, heightCm: p.heightCm || undefined } as never)
@@ -75,6 +100,29 @@ export function HealthProfile() {
       catch { setErr('Tersimpan di perangkat, tapi gagal sinkron ke server (offline). Akan otomatis tersimpan lokal.') }
     }
     setSavedAt(now); setSaving(false)
+  }
+
+  async function onImport(file?: File) {
+    if (!file) return
+    setNote('Membaca file…'); setErr('')
+    try {
+      const text = await file.text()
+      const r: ImportResult = parseHealthFile(file.name, text)
+      const keys = Object.keys(r).filter((k) => k !== 'source')
+      if (!keys.length) { setNote(''); setErr('Tidak menemukan data yang dikenali di file itu. Coba export.xml (Apple Health) atau physiological_cycles.csv (WHOOP).'); return }
+      setP((x) => ({
+        ...x,
+        source: (r.source as Src) ?? x.source,
+        vo2max: r.vo2max ?? x.vo2max, restingHr: r.restingHr ?? x.restingHr, hrvMs: r.hrvMs ?? x.hrvMs,
+        recoveryPct: r.recoveryPct ?? x.recoveryPct, strain: r.strain ?? x.strain, sleepH: r.sleepH ?? x.sleepH,
+        weightKg: r.weightKg ?? x.weightKg, bodyFatPct: r.bodyFatPct ?? x.bodyFatPct,
+      }))
+      setNote(`Terisi dari ${r.source}: ${keys.length} nilai. Periksa lalu tekan Simpan.`)
+    } catch {
+      setNote(''); setErr('Gagal membaca file.')
+    } finally {
+      if (fileRef.current) fileRef.current.value = ''
+    }
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
@@ -92,7 +140,7 @@ export function HealthProfile() {
         <SectionTitle icon={<IconHeart size={20} />} title="Data Kesehatan Saya"
           subtitle={backendEnabled ? 'Tersimpan di server per akun — ikut di semua perangkat' : 'Tersimpan di perangkat ini (server tidak aktif)'} />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Isi manual, atau salin dari <b>WHOOP · Apple Watch · Garmin · Samsung Health · Fitbit · Oura</b>. Data ini mengisi otomatis semua kalkulator kebugaran & longevity Anda.
+          Isi manual, impor file export, atau salin dari <b>WHOOP · Apple Watch · Garmin · Samsung Health · Fitbit · Oura</b>. Data ini mengisi otomatis semua kalkulator kebugaran & longevity Anda.
         </p>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sumber Data</div>
@@ -106,6 +154,19 @@ export function HealthProfile() {
           </div>
         </div>
         {account && <div className="mt-2 text-[10px] text-neutral-400">Akun: {account.email}</div>}
+      </Card>
+
+      {/* Import from a health-app export file */}
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="Impor Otomatis" subtitle="Apple Health export.xml · WHOOP .csv" />
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+          Ekspor dari aplikasi kesehatan Anda lalu unggah di sini — kolom akan terisi otomatis. File diproses di perangkat, tidak diunggah saat dibaca.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <input ref={fileRef} type="file" accept=".xml,.csv,text/xml,text/csv" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
+          <Button onClick={() => fileRef.current?.click()} className="!px-4">Pilih file export…</Button>
+          {note && <span className="text-[11px] font-semibold text-brand-dark">{note}</span>}
+        </div>
       </Card>
 
       <Card className="!p-5">
@@ -153,6 +214,8 @@ export function HealthProfile() {
         </div>
       </Card>
 
+      <TrendChart history={p.history ?? []} />
+
       <div className="sticky bottom-4 z-10">
         <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg">
           <div className="min-w-0 text-[11px] text-neutral-500">
@@ -172,6 +235,50 @@ export function HealthProfile() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Trend of the key longevity/fitness metrics across saved snapshots.
+function TrendChart({ history }: { history: Snapshot[] }) {
+  if (history.length < 2) {
+    return (
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle="Grafik muncul setelah ≥2 kali simpan" />
+        <p className="mt-1 text-[11px] text-neutral-500">Simpan data secara berkala (mis. tiap pagi) untuk melihat perkembangan VO₂max, HRV, dan HR istirahat dari waktu ke waktu.</p>
+      </Card>
+    )
+  }
+  const data = history.map((s) => ({ ...s, label: new Date(s.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }))
+  const series = [
+    { key: 'vo2max', name: 'VO₂max', color: '#00BF63' },
+    { key: 'hrvMs', name: 'HRV (ms)', color: '#6366f1' },
+    { key: 'restingHr', name: 'HR Istirahat', color: '#f59e0b' },
+  ] as const
+  const active = series.filter((s) => data.some((d) => (d as unknown as Record<string, number>)[s.key]))
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle={`${history.length} catatan tersimpan`} />
+      <div className="mt-3 h-56">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9ca3af' }} />
+            <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} />
+            <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #eee' }} />
+            {active.map((s) => (
+              <Line key={s.key} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} strokeWidth={2} dot={{ r: 2 }} connectNulls />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-2 flex flex-wrap justify-center gap-3">
+        {active.map((s) => (
+          <span key={s.key} className="flex items-center gap-1 text-[10px] font-semibold text-neutral-500">
+            <span className="h-2 w-2 rounded-full" style={{ background: s.color }} />{s.name}
+          </span>
+        ))}
+      </div>
+    </Card>
   )
 }
 

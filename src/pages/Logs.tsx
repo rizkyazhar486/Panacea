@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useStore } from '../lib/store'
 import { Card } from '../components/ui'
+import { HealthSnapshot } from '../components/HealthSnapshot'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 
 const PROGRAM_OPTIONS = ['—', 'SIPSS / Kedinasan', 'HYROX', 'Marathon (42K)', 'Half Marathon (21K)', 'Shape: Beginner', 'Shape: Intermediate', 'Shape: Advanced', 'Shape: Pro', 'Custom']
@@ -68,6 +69,8 @@ export function Logs() {
           <p className="text-xs text-neutral-400">Intensitas latihan, komunitas, relasi & tantangan Anda</p>
         </div>
       </div>
+
+      <HealthSnapshot />
 
       {/* RPE trend (recharts) */}
       <Card className="space-y-3">
