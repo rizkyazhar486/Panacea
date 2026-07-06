@@ -394,9 +394,19 @@ app.post('/api/health-webhook/:token', (req, res) => {
     res.status(404).json({ error: 'unknown_token' })
     return
   }
+  // Names only (never values) — safe to log for diagnosing "0 imported" reports,
+  // since a wrong Date Range in Health Auto Export can send metric groups with
+  // no samples, which looks identical to a naming-mismatch bug from the outside.
+  const rawMetrics = (req.body as { data?: { metrics?: { name?: string; data?: unknown[] }[] } })?.data?.metrics
+  const metricNames = Array.isArray(rawMetrics) ? rawMetrics.map((m) => `${m?.name ?? '?'}(${m?.data?.length ?? 0})`) : []
   const mapped = parseHealthWebhookPayload(req.body)
+  console.log(`[health-webhook] ${email}: groups=${metricNames.join(', ') || 'none'} matched=${Object.keys(mapped).join(',') || 'none'}`)
   if (!Object.keys(mapped).length) {
-    res.status(200).json({ ok: true, imported: 0, hint: 'no recognized metrics in payload' })
+    res.status(200).json({
+      ok: true, imported: 0,
+      hint: 'Tidak ada metrik yang cocok — kemungkinan belum ada data untuk rentang tanggal yang dipilih (mis. VO2max/berat badan tidak tercatat setiap hari). Coba perluas Date Range ke "Last 7 Days".',
+      metricsReceived: metricNames,
+    })
     return
   }
   try {
