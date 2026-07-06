@@ -7,6 +7,8 @@ import { api, backendEnabled, apiBaseUrl } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
+import { generateInsights } from '../lib/healthInsights'
+import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -243,6 +245,8 @@ export function HealthProfile() {
         </div>
       </Card>
 
+      <InsightCard history={p.history ?? []} />
+      <BenchmarkCard profile={p} />
       <TrendChart history={p.history ?? []} />
 
       <div className="sticky bottom-4 z-10">
@@ -264,6 +268,76 @@ export function HealthProfile() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Rule-based coaching nudges from the user's own history — no AI/LLM call, so
+// it's free and instant. See lib/healthInsights.ts for the rules.
+function InsightCard({ history }: { history: Snapshot[] }) {
+  const insights = generateInsights(history)
+  const toneClass: Record<string, string> = {
+    brand: 'border-brand/20 bg-brand-50/60 text-brand-dark',
+    critical: 'border-rose-200 bg-rose-50 text-rose-700',
+    low: 'border-amber-200 bg-amber-50 text-amber-700',
+    neutral: 'border-neutral-200 bg-neutral-50 text-neutral-600',
+  }
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconActivity size={20} />} title="Insight Otomatis" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
+      <div className="mt-3 space-y-2">
+        {insights.map((ins) => (
+          <div key={ins.id} className={`rounded-xl border p-3 ${toneClass[ins.tone]}`}>
+            <div className="flex items-start gap-2">
+              <span className="text-base leading-none">{ins.icon}</span>
+              <div className="min-w-0">
+                <div className="text-sm font-bold">{ins.title}</div>
+                <p className="mt-0.5 text-[12px] leading-relaxed opacity-90">{ins.body}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+// "See how you compare" — percentile/category estimate against published
+// population norms (ACSM/Cooper), same evidence basis already used elsewhere
+// in the app. Only renders for metrics the user has actually filled in.
+function BenchmarkCard({ profile }: { profile: HealthProfile }) {
+  if (!profile.age || !profile.sex) return null
+  const items: BenchmarkItem[] = []
+  if (profile.vo2max > 0) items.push(benchmarkVo2max(profile.vo2max, profile.age, profile.sex))
+  if (profile.restingHr > 0) items.push(benchmarkRestingHr(profile.restingHr))
+  if (profile.sleepH > 0) items.push(benchmarkSleep(profile.sleepH))
+  if (!items.length) return null
+
+  const barPct: Record<string, number> = {}
+  items.forEach((it) => {
+    const m = it.percentileLabel.match(/P(\d+)/)
+    barPct[it.key] = m ? +m[1] : it.tone === 'brand' ? 85 : it.tone === 'low' ? 60 : it.tone === 'critical' ? 15 : 40
+  })
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimasi berbasis norma usia & jenis kelamin" />
+      <div className="mt-3 space-y-4">
+        {items.map((it) => (
+          <div key={it.key}>
+            <div className="flex items-baseline justify-between text-xs">
+              <span className="font-bold text-ink">{it.label}: {it.value}{it.unit === 'jam' ? ' jam' : ` ${it.unit}`}</span>
+              <span className="font-semibold text-neutral-500">{it.categoryLabel}</span>
+            </div>
+            <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+              <div className={`h-full rounded-full ${it.tone === 'brand' ? 'bg-brand' : it.tone === 'critical' ? 'bg-rose-400' : it.tone === 'low' ? 'bg-amber-400' : 'bg-neutral-400'}`}
+                style={{ width: `${Math.max(4, Math.min(100, barPct[it.key]))}%` }} />
+            </div>
+            <p className="mt-1 text-[11px] text-neutral-500">{it.percentileLabel} · {it.note}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">{BENCHMARK_DISCLAIMER}</p>
+    </Card>
   )
 }
 
