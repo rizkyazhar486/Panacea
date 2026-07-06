@@ -12,6 +12,7 @@ import {
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { HealthQuiz } from '../components/HealthQuiz'
+import { ExamQuiz } from '../components/ExamQuiz'
 import { uploadOrLocal } from '../lib/upload'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
@@ -1975,6 +1976,11 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       {/* 9. Kuis Fakta vs Mitos — graded layperson to frontier science */}
       <Card>
         <HealthQuiz />
+      </Card>
+
+      {/* 10. Latihan ujian dokter internasional */}
+      <Card>
+        <ExamQuiz />
       </Card>
 
       {/* #4: Target & Badge Progres */}
