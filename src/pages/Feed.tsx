@@ -11,6 +11,7 @@ import {
   IconShare2, IconSend, IconX, IconMapPin, IconNavigation, IconTimer, IconGauge, IconActivity,
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { HealthQuiz } from '../components/HealthQuiz'
 import { uploadOrLocal } from '../lib/upload'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
@@ -1547,13 +1548,6 @@ const EDU_ARTICLES = [
   { id: 'e3', title: 'Hidrasi: Berapa Air yang Sebenarnya Tubuh Anda Butuhkan?', minutes: 2 },
   { id: 'e4', title: 'Mitos vs Fakta Seputar Diet Karbo', minutes: 5 },
 ]
-const MYTH_QUIZ = [
-  { q: 'Minum air dingin setelah olahraga berat berbahaya bagi jantung.', answer: false },
-  { q: 'Tekanan darah normal dewasa sekitar 120/80 mmHg.', answer: true },
-  { q: 'Tidur kurang dari 6 jam tiap malam dapat memengaruhi metabolisme.', answer: true },
-  { q: 'Detoks jus selama 3 hari dapat "membersihkan" racun dari hati.', answer: false },
-]
-
 function bpCategory(sys: number, dia: number) {
   if (sys < 90 || dia < 60) return { label: 'Rendah', color: '#3B82F6' }
   if (sys <= 120 && dia <= 80) return { label: 'Normal', color: '#00BF63' }
@@ -1580,7 +1574,7 @@ function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; c
 }
 
 export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
-  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, answerQuiz, logVo2Max, addGoal, removeGoal } = useStore()
+  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, logVo2Max, addGoal, removeGoal } = useStore()
 
   // 1. Kalkulator BMI & Kalori Harian (TDEE)
   const [weight, setWeight] = useState(70)
@@ -1692,11 +1686,6 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
     const t = setInterval(check, 60_000)
     return () => clearInterval(t)
   }, [notifPerm, state.medReminders])
-
-  // 9. Kuis Fakta vs Mitos
-  const [quizIdx, setQuizIdx] = useState(0)
-  const [quizFeedback, setQuizFeedback] = useState<'right' | 'wrong' | null>(null)
-  const quiz = MYTH_QUIZ[quizIdx % MYTH_QUIZ.length]
 
   // #4: targets & progress badges. Current values pulled from real tracked data.
   const myCheckInDates = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
@@ -1983,23 +1972,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         })}
       </Card>
 
-      {/* 9. Kuis Fakta vs Mitos */}
-      <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🧠 Kuis Fakta vs Mitos</div>
-        <p className="text-xs text-neutral-600">{quiz.q}</p>
-        <div className="flex gap-2">
-          <button onClick={() => { const ok = quiz.answer === true; setQuizFeedback(ok ? 'right' : 'wrong'); answerQuiz(ok) }}
-            className="flex-1 rounded-xl bg-brand/10 py-2 text-xs font-bold text-brand-dark">Fakta</button>
-          <button onClick={() => { const ok = quiz.answer === false; setQuizFeedback(ok ? 'right' : 'wrong'); answerQuiz(ok) }}
-            className="flex-1 rounded-xl bg-neutral-100 py-2 text-xs font-bold text-neutral-600">Mitos</button>
-        </div>
-        {quizFeedback && (
-          <div className="flex items-center justify-between text-xs">
-            <span className={quizFeedback === 'right' ? 'font-bold text-brand-dark' : 'font-bold text-red-500'}>{quizFeedback === 'right' ? '✓ Benar!' : '✕ Kurang tepat.'}</span>
-            <button onClick={() => { setQuizIdx((i) => i + 1); setQuizFeedback(null) }} className="rounded-full bg-neutral-100 px-3 py-1 font-bold text-neutral-600">Lanjut →</button>
-          </div>
-        )}
-        <p className="text-[11px] text-neutral-400">Skor: {state.quizScore.correct}/{state.quizScore.total}</p>
+      {/* 9. Kuis Fakta vs Mitos — graded layperson to frontier science */}
+      <Card>
+        <HealthQuiz />
       </Card>
 
       {/* #4: Target & Badge Progres */}
