@@ -15,7 +15,10 @@ export interface HealthWebhookResult {
   activeKcal?: number
 }
 
-interface MetricSample { date?: string; qty?: number; asleep?: number; Avg?: number }
+// When the user turns on Health Auto Export's "Summarize Data" option, samples
+// can arrive as { Min, Avg, Max } instead of a single { qty }, for ANY metric
+// (not just heart rate) — so every matcher below must tolerate both shapes.
+interface MetricSample { date?: string; qty?: number; asleep?: number; Min?: number; Avg?: number; Max?: number }
 interface Metric { name?: string; units?: string; data?: MetricSample[] }
 interface Payload { data?: { metrics?: Metric[] } }
 
@@ -48,14 +51,20 @@ function latestSample(samples: MetricSample[] | undefined): MetricSample | undef
   return best ?? samples[samples.length - 1]
 }
 
+// Prefer the exact reading (qty), then the average of the summarized window,
+// then whatever bound is available — always something over nothing.
+function anyValue(s: MetricSample): number | undefined {
+  return s.qty ?? s.Avg ?? s.Max ?? s.Min
+}
+
 const MATCHERS: { key: keyof HealthWebhookResult; test: (n: string) => boolean; pick: (s: MetricSample) => number | undefined }[] = [
-  { key: 'vo2max', test: (n) => n.includes('vo2'), pick: (s) => s.qty ?? s.Avg },
-  { key: 'restingHr', test: (n) => n.includes('restingheartrate'), pick: (s) => s.qty ?? s.Avg },
-  { key: 'hrvMs', test: (n) => n.includes('heartratevariability') || n.includes('hrv'), pick: (s) => s.qty ?? s.Avg },
-  { key: 'weightKg', test: (n) => n.includes('weightbodymass') || n === 'bodyweight' || n === 'weight', pick: (s) => s.qty },
-  { key: 'bodyFatPct', test: (n) => n.includes('bodyfatpercentage'), pick: (s) => (s.qty != null ? (s.qty <= 1 ? s.qty * 100 : s.qty) : undefined) },
-  { key: 'steps', test: (n) => n.includes('stepcount'), pick: (s) => s.qty },
-  { key: 'activeKcal', test: (n) => n.includes('activeenergy'), pick: (s) => s.qty },
+  { key: 'vo2max', test: (n) => n.includes('vo2'), pick: anyValue },
+  { key: 'restingHr', test: (n) => n.includes('restingheartrate'), pick: anyValue },
+  { key: 'hrvMs', test: (n) => n.includes('heartratevariability') || n.includes('hrv'), pick: anyValue },
+  { key: 'weightKg', test: (n) => n.includes('weightbodymass') || n === 'bodyweight' || n === 'weight', pick: anyValue },
+  { key: 'bodyFatPct', test: (n) => n.includes('bodyfatpercentage'), pick: (s) => { const v = anyValue(s); return v != null ? (v <= 1 ? v * 100 : v) : undefined } },
+  { key: 'steps', test: (n) => n.includes('stepcount'), pick: anyValue },
+  { key: 'activeKcal', test: (n) => n.includes('activeenergy'), pick: anyValue },
 ]
 
 export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
