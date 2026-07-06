@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
-import { IconHeart, IconActivity, IconCheck } from '../components/icons'
+import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../components/icons'
 import { api, backendEnabled, apiBaseUrl } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
@@ -349,16 +350,11 @@ function AutoSyncCard() {
         <p className="mt-1 text-[10px] text-neutral-400">Jaga tautan ini rahasia — siapa pun yang memilikinya bisa mengirim data ke akun Anda.</p>
       </div>
 
-      <details className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-600">
-        <summary className="cursor-pointer font-bold text-neutral-700">Cara setup (sekali saja)</summary>
-        <ol className="mt-2 list-decimal space-y-1 pl-4">
-          <li>Unduh aplikasi <b>Health Auto Export</b> dari App Store di iPhone yang terpasang dengan Apple Watch Anda.</li>
-          <li>Buka aplikasi → buat automation baru → pilih tipe <b>REST API</b>.</li>
-          <li>Tempel <b>Tautan Sinkron Pribadi</b> di atas sebagai URL tujuan, format <b>JSON</b>.</li>
-          <li>Pilih metrik: VO₂ Max, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Body Mass, Body Fat Percentage.</li>
-          <li>Aktifkan jadwal otomatis (mis. tiap pagi). Selesai — data akan muncul di sini & di seluruh Panaceamed setelah sinkron pertama.</li>
-        </ol>
-      </details>
+      <Link to="/health-data/tutorial"
+        className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-50/80">
+        📖 Lihat Tutorial Setup Lengkap (7 langkah, ±5 menit)
+        <IconChevronRight size={16} className="shrink-0" />
+      </Link>
 
       <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
         {busy ? 'Memproses…' : 'Buat ulang tautan (jika bocor)'}

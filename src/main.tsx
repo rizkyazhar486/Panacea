@@ -56,6 +56,7 @@ const Readiness = lazy(() => import('./pages/Readiness').then((m) => ({ default:
 const Longevity = lazy(() => import('./pages/Longevity').then((m) => ({ default: m.Longevity })))
 const OrganVitality = lazy(() => import('./pages/OrganVitality').then((m) => ({ default: m.OrganVitality })))
 const HealthProfile = lazy(() => import('./pages/HealthProfile').then((m) => ({ default: m.HealthProfile })))
+const HealthSyncTutorial = lazy(() => import('./pages/HealthSyncTutorial').then((m) => ({ default: m.HealthSyncTutorial })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -115,6 +116,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/longevity" element={<Longevity />} />
               <Route path="/organ-vitality" element={<OrganVitality />} />
               <Route path="/health-data" element={<HealthProfile />} />
+              <Route path="/health-data/tutorial" element={<HealthSyncTutorial />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
