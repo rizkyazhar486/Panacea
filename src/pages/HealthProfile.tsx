@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
-import { IconHeart, IconActivity, IconCheck } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../components/icons'
+import { api, backendEnabled, apiBaseUrl } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
+import { generateInsights } from '../lib/healthInsights'
+import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Health Profile — per-user health data saved on the SERVER (keyed by account,
@@ -195,6 +198,8 @@ export function HealthProfile() {
         </div>
       </Card>
 
+      {backendEnabled && <AutoSyncCard />}
+
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Demografi" subtitle="Dasar untuk semua perhitungan" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -240,6 +245,8 @@ export function HealthProfile() {
         </div>
       </Card>
 
+      <InsightCard history={p.history ?? []} />
+      <BenchmarkCard profile={p} />
       <TrendChart history={p.history ?? []} />
 
       <div className="sticky bottom-4 z-10">
@@ -261,6 +268,76 @@ export function HealthProfile() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Rule-based coaching nudges from the user's own history — no AI/LLM call, so
+// it's free and instant. See lib/healthInsights.ts for the rules.
+function InsightCard({ history }: { history: Snapshot[] }) {
+  const insights = generateInsights(history)
+  const toneClass: Record<string, string> = {
+    brand: 'border-brand/20 bg-brand-50/60 text-brand-dark',
+    critical: 'border-rose-200 bg-rose-50 text-rose-700',
+    low: 'border-amber-200 bg-amber-50 text-amber-700',
+    neutral: 'border-neutral-200 bg-neutral-50 text-neutral-600',
+  }
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconActivity size={20} />} title="Insight Otomatis" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
+      <div className="mt-3 space-y-2">
+        {insights.map((ins) => (
+          <div key={ins.id} className={`rounded-xl border p-3 ${toneClass[ins.tone]}`}>
+            <div className="flex items-start gap-2">
+              <span className="text-base leading-none">{ins.icon}</span>
+              <div className="min-w-0">
+                <div className="text-sm font-bold">{ins.title}</div>
+                <p className="mt-0.5 text-[12px] leading-relaxed opacity-90">{ins.body}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+// "See how you compare" — percentile/category estimate against published
+// population norms (ACSM/Cooper), same evidence basis already used elsewhere
+// in the app. Only renders for metrics the user has actually filled in.
+function BenchmarkCard({ profile }: { profile: HealthProfile }) {
+  if (!profile.age || !profile.sex) return null
+  const items: BenchmarkItem[] = []
+  if (profile.vo2max > 0) items.push(benchmarkVo2max(profile.vo2max, profile.age, profile.sex))
+  if (profile.restingHr > 0) items.push(benchmarkRestingHr(profile.restingHr))
+  if (profile.sleepH > 0) items.push(benchmarkSleep(profile.sleepH))
+  if (!items.length) return null
+
+  const barPct: Record<string, number> = {}
+  items.forEach((it) => {
+    const m = it.percentileLabel.match(/P(\d+)/)
+    barPct[it.key] = m ? +m[1] : it.tone === 'brand' ? 85 : it.tone === 'low' ? 60 : it.tone === 'critical' ? 15 : 40
+  })
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimasi berbasis norma usia & jenis kelamin" />
+      <div className="mt-3 space-y-4">
+        {items.map((it) => (
+          <div key={it.key}>
+            <div className="flex items-baseline justify-between text-xs">
+              <span className="font-bold text-ink">{it.label}: {it.value}{it.unit === 'jam' ? ' jam' : ` ${it.unit}`}</span>
+              <span className="font-semibold text-neutral-500">{it.categoryLabel}</span>
+            </div>
+            <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+              <div className={`h-full rounded-full ${it.tone === 'brand' ? 'bg-brand' : it.tone === 'critical' ? 'bg-rose-400' : it.tone === 'low' ? 'bg-amber-400' : 'bg-neutral-400'}`}
+                style={{ width: `${Math.max(4, Math.min(100, barPct[it.key]))}%` }} />
+            </div>
+            <p className="mt-1 text-[11px] text-neutral-500">{it.percentileLabel} · {it.note}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">{BENCHMARK_DISCLAIMER}</p>
+    </Card>
   )
 }
 
@@ -304,6 +381,58 @@ function TrendChart({ history }: { history: Snapshot[] }) {
           </span>
         ))}
       </div>
+    </Card>
+  )
+}
+
+// Sync Apple Watch/iPhone health data automatically via the "Health Auto
+// Export" app (HealthyApps) — a third-party app that reads HealthKit and POSTs
+// a JSON export to a URL on a schedule. A website can't read HealthKit
+// directly (Apple restricts it to native apps), so this webhook is the closest
+// thing to "auto-sync" without building a companion iOS app.
+function AutoSyncCard() {
+  const [token, setToken] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => { api.getHealthWebhookToken().then(setToken).catch(() => {}) }, [])
+
+  const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
+
+  async function rotate() {
+    if (!confirm('Buat ulang tautan sinkron? Tautan lama akan berhenti bekerja — Anda perlu memperbarui URL di aplikasi Health Auto Export.')) return
+    setBusy(true)
+    try { setToken(await api.rotateHealthWebhookToken()) } finally { setBusy(false) }
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { /* ignore */ }
+  }
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
+      <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+        Website tidak bisa membaca Apple Health langsung — itu batasan dari Apple, khusus aplikasi native. Cara paling dekat dengan "otomatis": pasang aplikasi <b>Health Auto Export</b> (App Store, sekali beli) di iPhone Anda, lalu arahkan ke tautan pribadi di bawah ini.
+      </p>
+
+      <div className="mt-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Tautan Sinkron Pribadi</div>
+        <div className="mt-1.5 flex items-center gap-2">
+          <input readOnly value={url || 'Memuat…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
+          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Tersalin ✓' : 'Salin'}</button>
+        </div>
+        <p className="mt-1 text-[10px] text-neutral-400">Jaga tautan ini rahasia — siapa pun yang memilikinya bisa mengirim data ke akun Anda.</p>
+      </div>
+
+      <Link to="/health-data/tutorial"
+        className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-50/80">
+        📖 Lihat Tutorial Setup Lengkap (7 langkah, ±5 menit)
+        <IconChevronRight size={16} className="shrink-0" />
+      </Link>
+
+      <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
+        {busy ? 'Memproses…' : 'Buat ulang tautan (jika bocor)'}
+      </button>
     </Card>
   )
 }

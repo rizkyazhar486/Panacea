@@ -24,6 +24,9 @@ import {
   saveSettings,
   getHealthProfile,
   saveHealthProfile,
+  getHealthWebhookToken,
+  rotateHealthWebhookToken,
+  emailForWebhookToken,
   listDoctors,
   addPushSub,
   removePushSub,
@@ -58,6 +61,7 @@ import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
+import { parseHealthWebhookPayload } from './healthWebhook.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -365,6 +369,39 @@ app.put('/api/health-profile', requireAuth, (req, res) => {
   }
   try {
     res.json({ ok: true, profile: saveHealthProfile(u.email, data as Record<string, unknown>) })
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+  }
+})
+
+// Per-user webhook token + endpoint for automatic Apple Health sync via the
+// "Health Auto Export" app (HealthyApps). The app POSTs its own JSON export to
+// the URL below on a schedule; the opaque token in the path IS the auth (no
+// login/cookie possible from a background phone automation).
+app.get('/api/health-profile/webhook-token', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ token: getHealthWebhookToken(u.email) })
+})
+app.post('/api/health-profile/webhook-token/rotate', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ token: rotateHealthWebhookToken(u.email) })
+})
+// Reuses the global express.json() limit (12mb, set at app.use above) — plenty
+// for an incremental daily export of a handful of metrics.
+app.post('/api/health-webhook/:token', (req, res) => {
+  const email = emailForWebhookToken(req.params.token)
+  if (!email) {
+    res.status(404).json({ error: 'unknown_token' })
+    return
+  }
+  const mapped = parseHealthWebhookPayload(req.body)
+  if (!Object.keys(mapped).length) {
+    res.status(200).json({ ok: true, imported: 0, hint: 'no recognized metrics in payload' })
+    return
+  }
+  try {
+    const profile = saveHealthProfile(email, { ...mapped, source: 'Apple Watch' })
+    res.json({ ok: true, imported: Object.keys(mapped).length, profile })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
