@@ -6,6 +6,7 @@ import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, Ed
 
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
 export const backendEnabled = Boolean(API)
+export const apiBaseUrl = API
 
 export interface Health {
   ok: boolean
@@ -207,6 +208,9 @@ export const api = {
   getHealthProfile: () => req<{ profile: Record<string, unknown> }>('/api/health-profile').then((r) => r.profile),
   saveHealthProfile: (profile: Record<string, unknown>) =>
     req<{ ok: boolean; profile: Record<string, unknown> }>('/api/health-profile', { method: 'PUT', body: JSON.stringify({ profile }) }).then((r) => r.profile),
+  // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
+  getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
+  rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),
   patchPost: (id: string, patch: Record<string, unknown>) =>
     req<{ post: BackendPost }>(`/api/posts/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.post),
   // clinical persistence

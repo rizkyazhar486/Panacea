@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconCheck } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { api, backendEnabled, apiBaseUrl } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
@@ -195,6 +195,8 @@ export function HealthProfile() {
         </div>
       </Card>
 
+      {backendEnabled && <AutoSyncCard />}
+
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Demografi" subtitle="Dasar untuk semua perhitungan" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -304,6 +306,63 @@ function TrendChart({ history }: { history: Snapshot[] }) {
           </span>
         ))}
       </div>
+    </Card>
+  )
+}
+
+// Sync Apple Watch/iPhone health data automatically via the "Health Auto
+// Export" app (HealthyApps) — a third-party app that reads HealthKit and POSTs
+// a JSON export to a URL on a schedule. A website can't read HealthKit
+// directly (Apple restricts it to native apps), so this webhook is the closest
+// thing to "auto-sync" without building a companion iOS app.
+function AutoSyncCard() {
+  const [token, setToken] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => { api.getHealthWebhookToken().then(setToken).catch(() => {}) }, [])
+
+  const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
+
+  async function rotate() {
+    if (!confirm('Buat ulang tautan sinkron? Tautan lama akan berhenti bekerja — Anda perlu memperbarui URL di aplikasi Health Auto Export.')) return
+    setBusy(true)
+    try { setToken(await api.rotateHealthWebhookToken()) } finally { setBusy(false) }
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { /* ignore */ }
+  }
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
+      <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+        Website tidak bisa membaca Apple Health langsung — itu batasan dari Apple, khusus aplikasi native. Cara paling dekat dengan "otomatis": pasang aplikasi <b>Health Auto Export</b> (App Store, sekali beli) di iPhone Anda, lalu arahkan ke tautan pribadi di bawah ini.
+      </p>
+
+      <div className="mt-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Tautan Sinkron Pribadi</div>
+        <div className="mt-1.5 flex items-center gap-2">
+          <input readOnly value={url || 'Memuat…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
+          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Tersalin ✓' : 'Salin'}</button>
+        </div>
+        <p className="mt-1 text-[10px] text-neutral-400">Jaga tautan ini rahasia — siapa pun yang memilikinya bisa mengirim data ke akun Anda.</p>
+      </div>
+
+      <details className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-600">
+        <summary className="cursor-pointer font-bold text-neutral-700">Cara setup (sekali saja)</summary>
+        <ol className="mt-2 list-decimal space-y-1 pl-4">
+          <li>Unduh aplikasi <b>Health Auto Export</b> dari App Store di iPhone yang terpasang dengan Apple Watch Anda.</li>
+          <li>Buka aplikasi → buat automation baru → pilih tipe <b>REST API</b>.</li>
+          <li>Tempel <b>Tautan Sinkron Pribadi</b> di atas sebagai URL tujuan, format <b>JSON</b>.</li>
+          <li>Pilih metrik: VO₂ Max, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Body Mass, Body Fat Percentage.</li>
+          <li>Aktifkan jadwal otomatis (mis. tiap pagi). Selesai — data akan muncul di sini & di seluruh Panaceamed setelah sinkron pertama.</li>
+        </ol>
+      </details>
+
+      <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
+        {busy ? 'Memproses…' : 'Buat ulang tautan (jika bocor)'}
+      </button>
     </Card>
   )
 }

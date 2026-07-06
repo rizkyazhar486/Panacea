@@ -3,6 +3,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { randomBytes } from 'node:crypto'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DB_PATH = join(__dirname, '..', 'data.json')
@@ -90,6 +91,7 @@ interface DB {
   manualTopups?: ManualTopup[] // bank-transfer top-up requests awaiting owner approval
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
+  healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
 }
 
 // Professional onboarding application — submitted at sign-up by clinicians,
@@ -383,6 +385,28 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
   db.healthProfiles[email] = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
   save()
   return db.healthProfiles[email]
+}
+
+// Opaque per-user webhook token — lets an automation on the user's phone (e.g.
+// the "Health Auto Export" app reading Apple HealthKit) push data to
+// POST /api/health-webhook/:token without a session login. The token itself is
+// the credential, so it's random, revocable, and never guessable from the email.
+export function getHealthWebhookToken(email: string): string {
+  if (!db.healthWebhookTokens) db.healthWebhookTokens = {}
+  const existing = Object.entries(db.healthWebhookTokens).find(([, e]) => e === email)
+  if (existing) return existing[0]
+  return rotateHealthWebhookToken(email)
+}
+export function rotateHealthWebhookToken(email: string): string {
+  if (!db.healthWebhookTokens) db.healthWebhookTokens = {}
+  for (const [t, e] of Object.entries(db.healthWebhookTokens)) if (e === email) delete db.healthWebhookTokens[t]
+  const token = randomBytes(24).toString('hex')
+  db.healthWebhookTokens[token] = email
+  save()
+  return token
+}
+export function emailForWebhookToken(token: string): string | undefined {
+  return db.healthWebhookTokens?.[token]
 }
 
 // Doctors awaiting / holding STR verification — joins the user record with the
