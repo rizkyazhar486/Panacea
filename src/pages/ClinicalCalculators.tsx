@@ -693,7 +693,327 @@ const TABS = [
   { id: 'naegele', label: 'Naegele' },
   { id: 'map', label: 'MAP' },
   { id: 'alvarado', label: 'Alvarado' },
+  { id: 'centor', label: 'Centor/McIsaac' },
+  { id: 'nacorr', label: 'Koreksi Na⁺' },
+  { id: 'broca', label: 'Broca IBW' },
+  { id: 'midparental', label: 'Mid-Parental' },
+  { id: 'fletcher', label: 'Fletcher Index' },
+  { id: 'nose', label: 'NOSE' },
+  { id: 'rsi', label: 'RSI' },
+  { id: 'abcd2', label: 'ABCD²' },
+  { id: 'four', label: 'FOUR Score' },
+  { id: 'mcdonald', label: 'McDonald' },
 ] as const
+
+/* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
+function CentorCalc() {
+  const [fever, setFever] = useState(false)
+  const [noCough, setNoCough] = useState(false)
+  const [tenderNodes, setTenderNodes] = useState(false)
+  const [exudate, setExudate] = useState(false)
+  const [age, setAge] = useState(30)
+  const ageAdj = age < 15 ? 1 : age >= 45 ? -1 : 0
+  const total = [fever, noCough, tenderNodes, exudate].filter(Boolean).length + ageAdj
+  const interp = total <= 0
+    ? { l: 'Risiko sangat rendah (1-2.5%)', tone: 'normal' as const, note: 'Tidak perlu swab/antibiotik empiris.' }
+    : total === 1
+    ? { l: 'Risiko rendah (5-10%)', tone: 'normal' as const, note: 'Umumnya tidak perlu antibiotik.' }
+    : total === 2
+    ? { l: 'Risiko sedang (11-17%)', tone: 'low' as const, note: 'Pertimbangkan rapid strep test/kultur sebelum antibiotik.' }
+    : total === 3
+    ? { l: 'Risiko tinggi (28-35%)', tone: 'low' as const, note: 'Uji strep dianjurkan; terapi bila positif.' }
+    : { l: 'Risiko sangat tinggi (51-53%)', tone: 'critical' as const, note: 'Pertimbangkan antibiotik empiris (mis. penisilin) atau uji cepat dulu sesuai kebijakan lokal.' }
+  const Row = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
+    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
+      <div className="text-sm font-bold text-ink">{label}</div>
+    </label>
+  )
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Centor / McIsaac Score" subtitle="Kemungkinan faringitis streptokokus (Centor 1981, modifikasi McIsaac 1998)" />
+      <div className="space-y-2">
+        <Row label="Demam >38°C" checked={fever} onChange={setFever} />
+        <Row label="Tanpa batuk" checked={noCough} onChange={setNoCough} />
+        <Row label="Limfadenopati servikal anterior nyeri tekan" checked={tenderNodes} onChange={setTenderNodes} />
+        <Row label="Eksudat/pembengkakan tonsil" checked={exudate} onChange={setExudate} />
+        <Field label="Usia (tahun)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}</div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+      </div>
+      <p className="mt-3 text-[10px] text-neutral-400">Modifikasi McIsaac: usia &lt;15th (+1), 15-44th (+0), ≥45th (-1).</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ KOREKSI NATRIUM (HIPERGLIKEMIA) ══════════════════ */
+function NaCorrectionCalc() {
+  const [measuredNa, setMeasuredNa] = useState(130)
+  const [glucose, setGlucose] = useState(400)
+  // Katz correction: +1.6 mEq/L Na per 100 mg/dL glucose above 100 mg/dL
+  const correctedNa = measuredNa + 1.6 * Math.max(0, (glucose - 100) / 100)
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Koreksi Natrium (Hiperglikemia)" subtitle="Formula Katz (1973) — natrium sejati saat glukosa tinggi" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Natrium Terukur (mEq/L)"><input className={inputClass} type="number" value={measuredNa} onChange={(e) => setMeasuredNa(+e.target.value)} /></Field>
+        <Field label="Glukosa Darah (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">mEq/L</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Natrium Terkoreksi</div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Na Terkoreksi = Na Terukur + 1.6 × [(Glukosa − 100) / 100]. Hiperglikemia menarik air keluar sel, mengencerkan natrium serum secara faktisial — koreksi ini mengungkap status natrium sebenarnya, penting sebelum menyimpulkan hiponatremia pada DKA/HHS.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ BROCA'S FORMULA (IDEAL BODY WEIGHT) ══════════════════ */
+function BrocaCalc() {
+  const [height, setHeight] = useState(165)
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const base = height - 100
+  const ibw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Berat Badan Ideal)" subtitle="Broca Index, dimodifikasi untuk jenis kelamin" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Tinggi Badan (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Pria' }, { v: 'F', l: 'Wanita' }]} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">kg</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Berat Badan Ideal (Broca)</div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Pria: (TB − 100) − 10%. Wanita: (TB − 100) − 15%. Perkiraan sederhana — untuk kebutuhan klinis presisi lebih tinggi (mis. dosis obat), pertimbangkan rumus Devine/Robinson.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ MID-PARENTAL HEIGHT ══════════════════ */
+function MidParentalCalc() {
+  const [fatherCm, setFatherCm] = useState(170)
+  const [motherCm, setMotherCm] = useState(158)
+  const [childSex, setChildSex] = useState<'M' | 'F'>('M')
+  const mph = childSex === 'M' ? (fatherCm + motherCm + 13) / 2 : (fatherCm + motherCm - 13) / 2
+  const rangeLo = mph - 8.5
+  const rangeHi = mph + 8.5
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Prediksi target tinggi dewasa anak dari tinggi orang tua" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Tinggi Ayah (cm)"><input className={inputClass} type="number" value={fatherCm} onChange={(e) => setFatherCm(+e.target.value)} /></Field>
+        <Field label="Tinggi Ibu (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
+        <Field label="Jenis Kelamin Anak"><SegButtons value={childSex} onChange={setChildSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Target Tinggi (rentang ±8.5cm: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Laki-laki: (TB Ayah + TB Ibu + 13) / 2. Perempuan: (TB Ayah + TB Ibu − 13) / 2. Rentang ±8.5cm mencakup ~90% target genetik — penyimpangan jauh dari rentang ini pada anak layak dievaluasi endokrin/gizi.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ FLETCHER INDEX (HEARING LOSS) ══════════════════ */
+function FletcherCalc() {
+  const [t500, setT500] = useState(20)
+  const [t1000, setT1000] = useState(20)
+  const [t2000, setT2000] = useState(20)
+  const index = (t500 + t1000 + t2000) / 3
+  const cls = index < 26
+    ? { l: 'Normal', tone: 'normal' as const }
+    : index < 41
+    ? { l: 'Tuli ringan', tone: 'low' as const }
+    : index < 56
+    ? { l: 'Tuli sedang', tone: 'low' as const }
+    : index < 71
+    ? { l: 'Tuli sedang-berat', tone: 'critical' as const }
+    : index < 91
+    ? { l: 'Tuli berat', tone: 'critical' as const }
+    : { l: 'Tuli sangat berat (total)', tone: 'critical' as const }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Rata-rata ambang nada murni 500/1000/2000 Hz — klasifikasi derajat tuli" />
+      <div className="grid grid-cols-3 gap-2">
+        <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
+        <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(+e.target.value)} /></Field>
+        <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{index.toFixed(1)} dB</div>
+          <Badge tone={cls.tone}>{cls.l}</Badge>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] text-neutral-400">Fletcher Index = rata-rata ambang 500+1000+2000 Hz. &lt;26dB normal · 26-40 ringan · 41-55 sedang · 56-70 sedang-berat · 71-90 berat · &gt;90 sangat berat.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ NOSE SCORE ══════════════════ */
+function NoseCalc() {
+  const items = [
+    'Kongesti/tersumbat hidung',
+    'Obstruksi/sumbatan hidung',
+    'Kesulitan bernapas lewat hidung',
+    'Kesulitan tidur',
+    'Tidak cukup udara lewat hidung saat aktivitas',
+  ]
+  const opts = [{ v: 0, l: 'Tidak ada' }, { v: 1, l: 'Ringan' }, { v: 2, l: 'Sedang' }, { v: 3, l: 'Berat' }, { v: 4, l: 'Sangat berat' }]
+  const [vals, setVals] = useState<number[]>([0, 0, 0, 0, 0])
+  const total = vals.reduce((a, b) => a + b, 0) * 5 // 0-100 scale
+  const cls = total <= 25 ? { l: 'Ringan', tone: 'normal' as const } : total <= 50 ? { l: 'Sedang', tone: 'low' as const } : total <= 75 ? { l: 'Berat', tone: 'critical' as const } : { l: 'Sangat berat', tone: 'critical' as const }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="NOSE Score" subtitle="Nasal Obstruction Symptom Evaluation — kualitas hidup obstruksi hidung" />
+      <div className="space-y-3">
+        {items.map((label, i) => (
+          <Field key={label} label={label}>
+            <SegButtons value={vals[i]} onChange={(v) => setVals((s) => s.map((x, j) => (j === i ? v : x)))} options={opts} />
+          </Field>
+        ))}
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/100</span></div>
+          <Badge tone={cls.tone}>{cls.l}</Badge>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] text-neutral-400">Total = jumlah 5 item (0-4 masing-masing) × 5, skala 0-100.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ REFLUX SYMPTOM INDEX (RSI) ══════════════════ */
+function RsiCalc() {
+  const items = [
+    'Suara serak/gangguan suara',
+    'Sering berdehem',
+    'Lendir berlebih di tenggorokan/tetesan pascanasal',
+    'Kesulitan menelan makanan/cairan/pil',
+    'Batuk setelah makan/berbaring',
+    'Kesulitan bernapas/tersedak',
+    'Batuk yang mengganggu',
+    'Sensasi ganjalan di tenggorokan',
+    'Nyeri ulu hati, dada, atau rasa asam naik',
+  ]
+  const [vals, setVals] = useState<number[]>(Array(9).fill(0))
+  const total = vals.reduce((a, b) => a + b, 0)
+  const abnormal = total > 13
+  const opts = [0, 1, 2, 3, 4, 5].map((v) => ({ v, l: String(v) }))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Reflux Symptom Index (RSI)" subtitle="Belafsky et al., 2002 — skrining refluks laringofaringeal" />
+      <div className="space-y-3">
+        {items.map((label, i) => (
+          <Field key={label} label={label}>
+            <SegButtons value={vals[i]} onChange={(v) => setVals((s) => s.map((x, j) => (j === i ? v : x)))} options={opts} />
+          </Field>
+        ))}
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/45</span></div>
+          <Badge tone={abnormal ? 'critical' : 'normal'}>{abnormal ? 'Abnormal' : 'Normal'}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] text-neutral-500">Skala 0 (tidak ada masalah) - 5 (bermasalah berat) per item. Skor &gt;13 dianggap abnormal, sugestif refluks laringofaringeal.</p>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ ABCD² SCORE (TIA STROKE RISK) ══════════════════ */
+function Abcd2Calc() {
+  const [age60, setAge60] = useState(false)
+  const [bp140, setBp140] = useState(false)
+  const [clinical, setClinical] = useState<'none' | 'speech' | 'weakness'>('none')
+  const [duration, setDuration] = useState<'lt10' | '10to59' | 'ge60'>('lt10')
+  const [diabetes, setDiabetes] = useState(false)
+  const clinicalPts = clinical === 'weakness' ? 2 : clinical === 'speech' ? 1 : 0
+  const durationPts = duration === 'ge60' ? 2 : duration === '10to59' ? 1 : 0
+  const total = (age60 ? 1 : 0) + (bp140 ? 1 : 0) + clinicalPts + durationPts + (diabetes ? 1 : 0)
+  const interp = total <= 3
+    ? { l: 'Risiko rendah', tone: 'normal' as const, note: 'Risiko stroke 2 hari ~1%. Evaluasi rawat jalan mungkin sesuai bila fasilitas follow-up cepat tersedia.' }
+    : total <= 5
+    ? { l: 'Risiko sedang', tone: 'low' as const, note: 'Risiko stroke 2 hari ~4.1%. Pertimbangkan observasi/rawat inap.' }
+    : { l: 'Risiko tinggi', tone: 'critical' as const, note: 'Risiko stroke 2 hari ~8.1%. Rawat inap & evaluasi mendesak dianjurkan.' }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ABCD² Score" subtitle="Prediksi risiko stroke pasca-TIA (Johnston et al., 2007)" />
+      <div className="space-y-3">
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={age60} onChange={(e) => setAge60(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">Usia ≥60 tahun (+1)</div>
+        </label>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={bp140} onChange={(e) => setBp140(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">TD ≥140/90 mmHg saat penilaian (+1)</div>
+        </label>
+        <Field label="Gambaran Klinis"><SegButtons value={clinical} onChange={setClinical} options={[{ v: 'none', l: 'Lainnya (0)' }, { v: 'speech', l: 'Gangguan bicara tanpa kelemahan (+1)' }, { v: 'weakness', l: 'Kelemahan unilateral (+2)' }]} /></Field>
+        <Field label="Durasi Gejala"><SegButtons value={duration} onChange={setDuration} options={[{ v: 'lt10', l: '<10 menit (0)' }, { v: '10to59', l: '10-59 menit (+1)' }, { v: 'ge60', l: '≥60 menit (+2)' }]} /></Field>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={diabetes} onChange={(e) => setDiabetes(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">Diabetes (+1)</div>
+        </label>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/7</span></div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ FOUR SCORE (COMA SCALE) ══════════════════ */
+function FourScoreCalc() {
+  const eye = [{ v: 0, l: 'Tak buka mata' }, { v: 1, l: 'Buka bila nyeri' }, { v: 2, l: 'Buka bila suara keras' }, { v: 3, l: 'Buka spontan, tak mengikuti' }, { v: 4, l: 'Buka spontan, mengikuti/berkedip diperintah' }]
+  const motor = [{ v: 0, l: 'Tak respons/status mioklonik' }, { v: 1, l: 'Postur ekstensi' }, { v: 2, l: 'Postur fleksi' }, { v: 3, l: 'Lokalisasi nyeri' }, { v: 4, l: 'Ikuti perintah (jempol/kepal/salam)' }]
+  const brainstem = [{ v: 0, l: 'Tak ada refleks pupil/kornea/batuk' }, { v: 1, l: 'Pupil & kornea tak ada' }, { v: 2, l: 'Salah satu pupil lebar & tetap' }, { v: 3, l: 'Satu refleks pupil/kornea tak ada' }, { v: 4, l: 'Refleks pupil & kornea ada' }]
+  const respiration = [{ v: 0, l: 'Apnea / sinkron ventilator' }, { v: 1, l: 'Napas di atas laju ventilator' }, { v: 2, l: 'Tak teratur' }, { v: 3, l: 'Pola Cheyne-Stokes' }, { v: 4, l: 'Teratur, tak terintubasi' }]
+  const [e, setE] = useState(4); const [m, setM] = useState(4); const [b, setB] = useState(4); const [r, setR] = useState(4)
+  const total = e + m + b + r
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks et al., 2005) — alternatif GCS, menilai batang otak & pola napas" />
+      <div className="space-y-3">
+        <Field label="Eye Response (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
+        <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
+        <Field label="Brainstem Reflexes (B)"><SegButtons value={b} onChange={setB} options={brainstem} /></Field>
+        <Field label="Respiration (R)"><SegButtons value={r} onChange={setR} options={respiration} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">E{e}M{m}B{b}R{r} = {total}<span className="text-sm font-semibold text-neutral-400">/16</span></div>
+        <p className="mt-2 text-[11px] text-neutral-500">Skor lebih rendah → kesadaran lebih terganggu. Unggul dari GCS untuk menilai pasien terintubasi (menilai napas, bukan verbal) dan mendeteksi tanda batang otak/locked-in.</p>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ MCDONALD'S RULE (FUNDAL HEIGHT) ══════════════════ */
+function McDonaldCalc() {
+  const [fundalCm, setFundalCm] = useState(28)
+  const gaWeeksEst = fundalCm // McDonald's rule: fundal height (cm) ≈ GA (weeks), valid ~20-36 weeks
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimasi usia gestasi dari tinggi fundus uteri (20-36 minggu)" />
+      <Field label="Tinggi Fundus Uteri (cm, simfisis-fundus)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-400">minggu</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Estimasi Usia Gestasi</div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">McDonald's Rule: TFU (cm) ≈ usia gestasi (minggu) antara 20-36 minggu kehamilan tunggal dengan pertumbuhan janin normal. Deviasi &gt;3cm dari usia gestasi sebenarnya (dari HPHT/USG) perlu evaluasi lanjut (oligo/polihidramnion, IUGR, makrosomia, kehamilan ganda).</p>
+    </Card>
+  )
+}
 
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
@@ -724,6 +1044,16 @@ export function ClinicalCalculators() {
       {tab === 'naegele' && <NaegeleCalc />}
       {tab === 'map' && <MapCalc />}
       {tab === 'alvarado' && <AlvaradoCalc />}
+      {tab === 'centor' && <CentorCalc />}
+      {tab === 'nacorr' && <NaCorrectionCalc />}
+      {tab === 'broca' && <BrocaCalc />}
+      {tab === 'midparental' && <MidParentalCalc />}
+      {tab === 'fletcher' && <FletcherCalc />}
+      {tab === 'nose' && <NoseCalc />}
+      {tab === 'rsi' && <RsiCalc />}
+      {tab === 'abcd2' && <Abcd2Calc />}
+      {tab === 'four' && <FourScoreCalc />}
+      {tab === 'mcdonald' && <McDonaldCalc />}
     </div>
   )
 }
