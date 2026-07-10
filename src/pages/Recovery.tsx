@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
@@ -53,6 +53,188 @@ const PHASES: Record<RecoveryType, Phase[]> = {
 function daysSince(dateStr: string) {
   const d = new Date(dateStr); const now = new Date()
   return Math.max(0, Math.floor((now.getTime() - d.getTime()) / 86400000))
+}
+
+/* ══════════════════ SLEEP QUALITY SCORING ══════════════════ */
+function clamp100(n: number) { return Math.max(0, Math.min(100, Math.round(n))) }
+
+function sleepScore(hours: number, latencyMin: number, awakenings: number, bedtimeVarianceMin: number) {
+  const duration = clamp100(hours >= 7 && hours <= 9 ? 100 : 100 - Math.abs(hours - 8) * 20)
+  const latency = clamp100(latencyMin <= 15 ? 100 : 100 - (latencyMin - 15) * 2)
+  const awakening = clamp100(100 - awakenings * 15)
+  const consistency = clamp100(bedtimeVarianceMin <= 30 ? 100 : 100 - (bedtimeVarianceMin - 30) * 1.5)
+  const total = clamp100(duration * 0.4 + latency * 0.2 + awakening * 0.2 + consistency * 0.2)
+  return { total, duration, latency, awakening, consistency }
+}
+
+function SleepScoreCard() {
+  const [hours, setHours] = useState(7)
+  const [latency, setLatency] = useState(15)
+  const [awakenings, setAwakenings] = useState(0)
+  const [variance, setVariance] = useState(20)
+
+  const s = sleepScore(hours, latency, awakenings, variance)
+  const grade = s.total >= 85 ? { l: 'Sangat Baik', tone: 'normal' as const } : s.total >= 70 ? { l: 'Baik', tone: 'normal' as const } : s.total >= 50 ? { l: 'Cukup', tone: 'low' as const } : { l: 'Buruk', tone: 'critical' as const }
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconMoon size={20} />} title="Skor Kualitas Tidur" subtitle="Skoring fisiologis berbasis durasi, latensi, terbangun & konsistensi jam tidur" />
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <Field label="Total Tidur (jam)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label="Waktu Sampai Tertidur (menit)"><input className={inputClass} type="number" value={latency} onChange={(e) => setLatency(+e.target.value)} /></Field>
+        <Field label="Jumlah Terbangun Malam"><input className={inputClass} type="number" value={awakenings} onChange={(e) => setAwakenings(+e.target.value)} /></Field>
+        <Field label="Variasi Jam Tidur (menit)"><input className={inputClass} type="number" value={variance} onChange={(e) => setVariance(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{s.total}<span className="text-sm font-semibold text-neutral-400">/100</span></div>
+        <Badge tone={grade.tone}>{grade.l}</Badge>
+      </div>
+      <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Durasi</div></div>
+        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Latensi</div></div>
+        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Terbangun</div></div>
+        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Konsistensi</div></div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Bobot: Durasi 40% (optimal 7-9 jam) · Latensi 20% (idealnya ≤15 menit tertidur) · Terbangun 20% (idealnya 0x) · Konsistensi jam tidur 20% (idealnya varian ≤30 menit dari biasanya) — pola ini merefleksikan komponen inti Pittsburgh Sleep Quality Index (PSQI), disederhanakan untuk pemantauan harian mandiri.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ MEDITATION: GUIDED SCRIPTS + AMBIENT SOUND ══════════════════ */
+interface MeditationScript { key: string; label: string; emoji: string; durationMin: number; steps: string[] }
+const MEDITATION_SCRIPTS: MeditationScript[] = [
+  { key: 'breathing478', label: 'Napas 4-7-8', emoji: '🌬️', durationMin: 5, steps: [
+    'Duduk atau berbaring nyaman, punggung tegak namun rileks.',
+    'Buang napas penuh lewat mulut hingga paru-paru kosong.',
+    'Tarik napas lewat hidung, hitung diam-diam 1-2-3-4.',
+    'Tahan napas, hitung 1-2-3-4-5-6-7.',
+    'Buang napas penuh lewat mulut sambil berdesis, hitung 1-2-3-4-5-6-7-8.',
+    'Ulangi siklus ini 4-8 kali. Bila pusing, kembali ke napas normal sejenak.',
+  ] },
+  { key: 'bodyscan', label: 'Body Scan', emoji: '🧘', durationMin: 10, steps: [
+    'Berbaring telentang, tangan di samping tubuh, mata tertutup.',
+    'Arahkan perhatian ke ujung jari kaki — rasakan sensasi apa pun tanpa menghakimi.',
+    'Perlahan geser perhatian ke atas: telapak kaki, betis, lutut, paha.',
+    'Lanjutkan ke panggul, perut, dada — perhatikan naik-turun napas.',
+    'Geser ke tangan, lengan, bahu, leher, lalu wajah dan kepala.',
+    'Rasakan seluruh tubuh sebagai satu kesatuan selama beberapa napas terakhir.',
+  ] },
+  { key: 'metta', label: 'Loving-Kindness (Metta)', emoji: '💚', durationMin: 8, steps: [
+    'Duduk nyaman, mata tertutup, napas natural.',
+    'Ucapkan dalam hati untuk diri sendiri: "Semoga aku bahagia, semoga aku sehat, semoga aku tenang."',
+    'Bayangkan orang yang Anda kasihi — ulangi harapan yang sama untuknya.',
+    'Bayangkan seseorang yang netral (kenalan biasa) — ulangi harapan yang sama.',
+    'Bila mampu, bayangkan seseorang yang sulit bagi Anda — coba ulangi harapan yang sama.',
+    'Perluas harapan ini ke semua makhluk: "Semoga semua makhluk bahagia & bebas dari penderitaan."',
+  ] },
+]
+
+// Self-contained ambient sound generator (Web Audio API) — no external
+// service/API key needed, so it works fully offline and isn't dependent on
+// a third-party music API that can't be verified reachable from every
+// deployment environment.
+type AmbientKind = 'rain' | 'ocean' | 'tone'
+function useAmbientSound() {
+  const ctxRef = useRef<AudioContext | null>(null)
+  const nodesRef = useRef<{ src?: AudioBufferSourceNode; gain?: GainNode; osc?: OscillatorNode; lfo?: OscillatorNode }>({})
+  const [playing, setPlaying] = useState<AmbientKind | null>(null)
+
+  function stop() {
+    const n = nodesRef.current
+    try { n.src?.stop(); n.osc?.stop(); n.lfo?.stop() } catch { /* already stopped */ }
+    n.src?.disconnect(); n.gain?.disconnect(); n.osc?.disconnect(); n.lfo?.disconnect()
+    nodesRef.current = {}
+    setPlaying(null)
+  }
+
+  function play(kind: AmbientKind, volume: number) {
+    stop()
+    const ctx = ctxRef.current ?? new AudioContext()
+    ctxRef.current = ctx
+    const gain = ctx.createGain()
+    gain.gain.value = volume
+    gain.connect(ctx.destination)
+
+    if (kind === 'tone') {
+      const osc = ctx.createOscillator()
+      osc.type = 'sine'; osc.frequency.value = 136.1 // "Om" frequency, common calming reference tone
+      const lfo = ctx.createOscillator()
+      const lfoGain = ctx.createGain()
+      lfo.frequency.value = 0.15; lfoGain.gain.value = 8
+      lfo.connect(lfoGain); lfoGain.connect(osc.frequency)
+      osc.connect(gain); osc.start(); lfo.start()
+      nodesRef.current = { osc, lfo, gain }
+    } else {
+      const bufferSize = ctx.sampleRate * 4
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+      const data = buffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1
+      const src = ctx.createBufferSource()
+      src.buffer = buffer; src.loop = true
+      const filter = ctx.createBiquadFilter()
+      filter.type = 'lowpass'
+      filter.frequency.value = kind === 'rain' ? 1200 : 500
+      src.connect(filter); filter.connect(gain)
+      src.start()
+      nodesRef.current = { src, gain }
+    }
+    setPlaying(kind)
+  }
+
+  function setVolume(v: number) { if (nodesRef.current.gain) nodesRef.current.gain.gain.value = v }
+
+  return { playing, play, stop, setVolume }
+}
+
+function MeditationCard() {
+  const [scriptKey, setScriptKey] = useState(MEDITATION_SCRIPTS[0].key)
+  const [stepIdx, setStepIdx] = useState(0)
+  const [volume, setVolume] = useState(0.15)
+  const { playing, play, stop, setVolume: setAmbientVolume } = useAmbientSound()
+  const script = MEDITATION_SCRIPTS.find((s) => s.key === scriptKey)!
+
+  function changeVolume(v: number) { setVolume(v); setAmbientVolume(v) }
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconLeaf size={20} />} title="Meditasi Terpandu" subtitle="Skrip panduan + suara ambient untuk menenangkan pikiran sebelum tidur" />
+
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {MEDITATION_SCRIPTS.map((s) => (
+          <button key={s.key} onClick={() => { setScriptKey(s.key); setStepIdx(0) }}
+            className={`shrink-0 rounded-full px-3 py-2 text-xs font-bold transition ${scriptKey === s.key ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+            {s.emoji} {s.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 rounded-xl border border-neutral-100 p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase text-neutral-400">Langkah {stepIdx + 1}/{script.steps.length} · ~{script.durationMin} menit total</span>
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-ink">{script.steps[stepIdx]}</p>
+        <div className="mt-3 flex gap-2">
+          <button onClick={() => setStepIdx((i) => Math.max(0, i - 1))} disabled={stepIdx === 0} className="flex-1 rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">← Sebelumnya</button>
+          <button onClick={() => setStepIdx((i) => Math.min(script.steps.length - 1, i + 1))} disabled={stepIdx === script.steps.length - 1} className="flex-1 rounded-xl bg-brand py-2 text-xs font-bold text-white disabled:opacity-40">Berikutnya →</button>
+        </div>
+      </div>
+
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Suara Ambient</h4>
+      <div className="mt-2 flex gap-2">
+        {([['rain', '🌧️ Hujan'], ['ocean', '🌊 Ombak'], ['tone', '🎵 Nada Tenang']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => (playing === k ? stop() : play(k, volume))}
+            className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${playing === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+            {playing === k ? '⏸ ' : ''}{l}
+          </button>
+        ))}
+      </div>
+      <div className="mt-2 flex items-center gap-2">
+        <span className="text-[10px] font-bold uppercase text-neutral-400">Volume</span>
+        <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Suara ambient dihasilkan langsung di perangkat (Web Audio API) — berfungsi sepenuhnya offline, tanpa bergantung pada layanan musik pihak ketiga yang mungkin tidak selalu dapat diakses.</p>
+    </Card>
+  )
 }
 
 export function Recovery() {
@@ -120,6 +302,9 @@ export function Recovery() {
           ))}
         </div>
       </Card>
+
+      <SleepScoreCard />
+      <MeditationCard />
     </div>
   )
 }
