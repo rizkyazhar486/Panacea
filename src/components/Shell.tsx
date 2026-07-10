@@ -94,6 +94,7 @@ const nav: Nav[] = [
   { to: '/clinical', label: 'Data Klinis', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconStethoscope, roles: ['dokter'], group: 'Klinis & AI' },
+  { to: '/longevity-curriculum', label: 'Kurikulum Longevity', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/sexual-health', label: 'Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   // Layanan
