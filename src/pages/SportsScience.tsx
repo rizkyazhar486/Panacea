@@ -74,6 +74,9 @@ const REFERENCES = [
   'Plews & Laursen. Heart Rate Variability in elite endurance athletes.',
   'Buchheit M. The 30-15 Intermittent Fitness Test & HR monitoring.',
   'Jones AM. The physiology of the world-record marathon (running economy).',
+  "Gallwey WT. The Inner Game of Tennis: Self 1/Self 2 & Performance = Potential − Interference (dasar psikologi olahraga di atas).",
+  'Mujika I, Padilla S. Scientific bases for precompetition tapering strategies. Med Sci Sports Exerc 2003.',
+  'Fullagar HHK, et al. Sleep and athletic performance: effects of sleep loss on performance & recovery. Sports Med 2015.',
 ]
 
 // ── Tujuh cabang ilmu keolahragaan (exercise science) ────────────────────────
@@ -85,7 +88,7 @@ const SCIENCE_BRANCHES: { name: string; emoji: string; what: string; apply: stri
   { name: 'Perilaku Psikomotor', emoji: '🎯', what: 'Hubungan kognisi–gerak: akurasi, waktu reaksi, koordinasi.', apply: 'Latih keterampilan spesifik (drill presisi) dalam kondisi mirip kompetisi.' },
   { name: 'Neurosains', emoji: '🧠', what: 'Peran otak & saraf dalam adaptasi dan kelelahan.', apply: 'Kelola beban neural (HRV) & jadwalkan recovery agar sistem saraf pulih.' },
   { name: 'Kontrol Motorik', emoji: '🕹️', what: 'Bagaimana gerakan dipelajari & diotomatisasi.', apply: 'Progresi dari sadar → otomatis lewat repetisi terstruktur & variasi.' },
-  { name: 'Psikologi Olahraga', emoji: '💭', what: 'Motivasi, fokus, regulasi emosi & mentalitas juara.', apply: 'Tetapkan tujuan, rutin pra-kompetisi & mindfulness untuk performa puncak.' },
+  { name: 'Psikologi Olahraga', emoji: '💭', what: 'Motivasi, fokus, regulasi emosi & mentalitas juara — termasuk kerangka "Inner Game" Timothy Gallwey: Self 1 (pikiran sadar yang menghakimi/overthinking) vs Self 2 (kemampuan alami tubuh); Performa = Potensi − Interferensi.', apply: 'Kurangi "interferensi" (keraguan diri, overthinking teknik) lewat fokus non-menghakimi pada proses (bukan hasil), rutin pra-kompetisi & mindfulness, agar Self 2 bekerja tanpa hambatan Self 1.' },
 ]
 
 // ── Prinsip latihan (7 prinsip ilmu olahraga) ────────────────────────────────
@@ -307,7 +310,7 @@ export function SportsScience() {
           <ul className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-neutral-500">
             {REFERENCES.map((r) => <li key={r}>• {r}</li>)}
           </ul>
-          <p className="mt-2 text-[10px] text-neutral-400">Sumber indikator perangkat: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (manual resmi Garmin).</p>
+          <p className="mt-2 text-[10px] text-neutral-400">Sumber indikator perangkat: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (manual resmi Garmin). Sitasi di atas adalah rujukan landmark yang mendasari konsep di halaman ini — verifikasi detail (volume, tahun edisi, DOI) langsung di PubMed/penerbit untuk keperluan akademik formal.</p>
         </div>
       </Card>
     </div>
