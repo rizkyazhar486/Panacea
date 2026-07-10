@@ -102,6 +102,7 @@ const nav: Nav[] = [
   { to: '/hospitals', label: 'Faskes', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Layanan' },
   { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Layanan' },
   { to: '/orders', label: 'Transaksi', icon: IconWallet, roles: ['pasien'], group: 'Layanan' },
+  { to: '/pricing', label: 'Harga & Paket', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Layanan' },
   // Konten
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Konten' },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'], group: 'Konten' },

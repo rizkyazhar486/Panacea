@@ -35,6 +35,7 @@ const Marketplace = lazy(() => import('./pages/Marketplace').then((m) => ({ defa
 const MyMaterials = lazy(() => import('./pages/MyMaterials').then((m) => ({ default: m.MyMaterials })))
 const Verification = lazy(() => import('./pages/Verification').then((m) => ({ default: m.Verification })))
 const Billing = lazy(() => import('./pages/Billing').then((m) => ({ default: m.Billing })))
+const Pricing = lazy(() => import('./pages/Pricing').then((m) => ({ default: m.Pricing })))
 const Architecture = lazy(() => import('./pages/Architecture').then((m) => ({ default: m.Architecture })))
 const Owner = lazy(() => import('./pages/Owner').then((m) => ({ default: m.Owner })))
 const Editor = lazy(() => import('./pages/Editor').then((m) => ({ default: m.Editor })))
@@ -99,6 +100,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/my-materials" element={<MyMaterials />} />
               <Route path="/verification" element={<Verification />} />
               <Route path="/billing" element={<Billing />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/architecture" element={<Architecture />} />
               <Route path="/owner" element={<Owner />} />
               <Route path="/clinical" element={<Dashboard />} />
