@@ -93,7 +93,7 @@ const nav: Nav[] = [
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/clinical', label: 'Data Klinis', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
-  { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconStethoscope, roles: ['dokter', 'owner'], group: 'Klinis & AI' },
+  { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Layanan' },
   { to: '/longevity-curriculum', label: 'Kurikulum Longevity', icon: IconHeart, roles: ['dokter', 'owner'], group: 'Klinis & AI' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Klinis & AI' },
   { to: '/sexual-health', label: 'Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
