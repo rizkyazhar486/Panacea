@@ -708,6 +708,7 @@ const TABS = [
   { id: 'fluidbalance', label: 'Balans Cairan' },
   { id: 'pedsdose', label: 'Dosis Anak' },
   { id: 'vbac', label: 'VBAC Flamm-Geiger' },
+  { id: 'denver', label: 'Denver II (Simplified)' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1216,6 +1217,116 @@ function VbacCalc() {
   )
 }
 
+/* ══════════════════ DENVER II — SIMPLIFIED DEVELOPMENTAL SCREEN ══════════════════ */
+// The full Denver II uses ~125 items with age-bar percentile plotting and
+// standardized test materials. This is a SIMPLIFIED screening aid: a curated
+// set of representative milestones per domain at standard checkpoint ages,
+// not the full standardized instrument — for a definitive assessment, use
+// the official Denver II kit/form administered per its manual.
+interface Milestone { ageMo: number; label: string }
+const DENVER_DOMAINS: { key: string; label: string; milestones: Milestone[] }[] = [
+  { key: 'personal', label: 'Personal-Sosial', milestones: [
+    { ageMo: 2, label: 'Senyum sosial (merespons wajah)' },
+    { ageMo: 6, label: 'Makan sendiri (finger food)' },
+    { ageMo: 9, label: 'Bermain ciluk-ba' },
+    { ageMo: 12, label: 'Melambai dadah-dadah' },
+    { ageMo: 18, label: 'Makan pakai sendok sendiri' },
+    { ageMo: 24, label: 'Bermain paralel (berdampingan)' },
+    { ageMo: 36, label: 'Bermain bergiliran dengan anak lain' },
+    { ageMo: 48, label: 'Berpakaian sendiri sebagian' },
+    { ageMo: 60, label: 'Memiliki teman bermain pilihan' },
+  ] },
+  { key: 'fineMotor', label: 'Motorik Halus-Adaptif', milestones: [
+    { ageMo: 2, label: 'Tangan terbuka, refleks menggenggam menghilang' },
+    { ageMo: 4, label: 'Meraih objek dengan sengaja' },
+    { ageMo: 6, label: 'Memindahkan objek antar tangan' },
+    { ageMo: 9, label: 'Jepitan jari-jempol (pincer grasp)' },
+    { ageMo: 12, label: 'Mencoret dengan krayon' },
+    { ageMo: 18, label: 'Menyusun 2-4 balok' },
+    { ageMo: 24, label: 'Menyusun 6 balok / meniru garis' },
+    { ageMo: 36, label: 'Meniru bentuk lingkaran' },
+    { ageMo: 48, label: 'Menggambar orang 3 bagian' },
+    { ageMo: 60, label: 'Menggambar orang 6 bagian / menulis nama' },
+  ] },
+  { key: 'language', label: 'Bahasa', milestones: [
+    { ageMo: 2, label: 'Bersuara (cooing)' },
+    { ageMo: 6, label: 'Mengoceh (babbling) tanpa makna spesifik' },
+    { ageMo: 9, label: 'Memahami kata "tidak"' },
+    { ageMo: 12, label: 'Mengucap 1 kata bermakna' },
+    { ageMo: 18, label: 'Mengucap 3-6 kata' },
+    { ageMo: 24, label: 'Menggabung 2 kata' },
+    { ageMo: 36, label: 'Kalimat 3 kata, dipahami ~75% oleh orang asing' },
+    { ageMo: 48, label: 'Bertanya "mengapa", mulai bercerita' },
+    { ageMo: 60, label: 'Mengenal ≥4 warna, menghitung hingga 10' },
+  ] },
+  { key: 'grossMotor', label: 'Motorik Kasar', milestones: [
+    { ageMo: 2, label: 'Mengangkat kepala saat tengkurap' },
+    { ageMo: 4, label: 'Berguling' },
+    { ageMo: 6, label: 'Duduk tanpa topangan' },
+    { ageMo: 9, label: 'Merangkak / berdiri berpegangan' },
+    { ageMo: 12, label: 'Berjalan dituntun / berdiri sendiri' },
+    { ageMo: 18, label: 'Berjalan mundur' },
+    { ageMo: 24, label: 'Berlari / naik tangga berpegangan' },
+    { ageMo: 36, label: 'Mengayuh sepeda roda tiga' },
+    { ageMo: 48, label: 'Melompat dengan satu kaki' },
+    { ageMo: 60, label: 'Melompat bergantian kaki' },
+  ] },
+]
+
+function DenverCalc() {
+  const [ageMo, setAgeMo] = useState(12)
+  const [results, setResults] = useState<Record<string, 'pass' | 'fail' | 'na'>>({})
+
+  const domainFlags = DENVER_DOMAINS.map((d) => {
+    const applicable = d.milestones.filter((m) => m.ageMo <= ageMo)
+    // "Caution/delay" — a milestone expected well below the child's current
+    // age (>=6 months behind) marked as failed.
+    const delayed = applicable.filter((m) => {
+      const key = `${d.key}-${m.ageMo}`
+      return results[key] === 'fail' && ageMo - m.ageMo >= 6
+    })
+    return { domain: d, applicable, delayed }
+  })
+  const anyDelay = domainFlags.some((f) => f.delayed.length > 0)
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Skrining perkembangan disederhanakan — milestone representatif per domain, bukan instrumen Denver II lengkap" />
+      <Field label="Usia Anak (bulan)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+
+      {domainFlags.map(({ domain, applicable }) => (
+        <div key={domain.key} className="mt-4">
+          <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>
+          <div className="mt-2 space-y-1.5">
+            {applicable.length === 0 && <p className="text-[11px] text-neutral-400">Belum ada milestone acuan pada usia ini.</p>}
+            {applicable.map((m) => {
+              const key = `${domain.key}-${m.ageMo}`
+              const v = results[key] ?? 'na'
+              return (
+                <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-bold text-ink">{m.label}</div>
+                    <div className="text-[9px] font-bold uppercase text-neutral-400">Biasanya tercapai ~{m.ageMo} bulan</div>
+                  </div>
+                  <SegButtons value={v} onChange={(nv) => setResults((s) => ({ ...s, [key]: nv }))} options={[{ v: 'pass', l: 'Bisa' }, { v: 'fail', l: 'Belum' }, { v: 'na', l: '—' }]} />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+
+      {anyDelay && (
+        <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
+          <p className="text-xs font-black text-amber-800">⚠️ Pertimbangkan evaluasi tumbuh kembang lanjutan</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">Ada milestone yang biasanya tercapai jauh di bawah usia anak saat ini (≥6 bulan lebih awal) namun belum tercapai. Ini pola skrining sederhana — rujuk ke dokter anak/tumbuh kembang untuk evaluasi Denver II lengkap atau instrumen skrining terstandardisasi lain (mis. KPSP, M-CHAT bila relevan).</p>
+        </div>
+      )}
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ini BUKAN instrumen Denver II resmi (yang memakai ~125 item dengan bar persentil usia & materi tes terstandardisasi) — alat ini adalah skrining awal sederhana berbasis milestone representatif untuk kewaspadaan, bukan diagnosis keterlambatan perkembangan.</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1260,6 +1371,7 @@ export function ClinicalCalculators() {
       {tab === 'fluidbalance' && <FluidBalanceCalc />}
       {tab === 'pedsdose' && <PedsDoseCalc />}
       {tab === 'vbac' && <VbacCalc />}
+      {tab === 'denver' && <DenverCalc />}
     </div>
   )
 }
