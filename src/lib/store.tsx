@@ -678,6 +678,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       buyLongevitySub: () => {
         const now = new Date()
         const expires = new Date(now.getTime() + 30 * 86400000).toISOString()
+        if (backendEnabled) api.saveSettings({ longevitySubExpires: expires }).catch(() => {})
         setState((st) => ({
           ...st,
           longevitySubExpires: expires,

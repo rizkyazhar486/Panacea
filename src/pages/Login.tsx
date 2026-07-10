@@ -96,7 +96,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     renderGoogleButton(gbtn.current, health.googleClientId, cred => {
       if (!consentRef.current) { setError('Harap menyetujui Syarat & Kebijakan Privasi.'); return }
       api.googleLogin(cred, roleRef.current)
-        .then(a => login({ ...a, isSubscriber: a.role === 'owner', consentAt: new Date().toISOString(), strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none' }))
+        .then(a => login({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: a.role === 'owner', consentAt: new Date().toISOString(), strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none' }))
         .catch(() => setError('Verifikasi Google gagal.'))
     }).catch(() => setError('Gagal memuat Google Sign-In.'))
   }, [health, login])
@@ -151,7 +151,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }
     if (backendEnabled) {
       api.devLogin(acc.email, acc.name, role)
-        .then(a => finish({ ...a, isSubscriber: acc.isSubscriber }))
+        .then(a => finish({ ...a, isOwner, isSubscriber: acc.isSubscriber }))
         .catch(() => finish(acc))
       return
     }
@@ -372,7 +372,7 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
     setBusy(true); setMsg('')
     try {
       const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
-      onLogin({ ...a, isSubscriber: role === 'owner', sex: 'L',
+      onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
         strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
     } catch { setMsg('Kode salah atau kedaluwarsa.') } finally { setBusy(false) }
@@ -424,7 +424,7 @@ function PhoneLogin({ role, name, str, consentOk, onLogin }: {
     setBusy(true); setMsg('')
     try {
       const a = await api.otpVerify(phone.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
-      onLogin({ ...a, isSubscriber: role === 'owner', sex: 'L',
+      onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
         strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
     } catch { setMsg('Kode OTP salah atau kedaluwarsa.') } finally { setBusy(false) }

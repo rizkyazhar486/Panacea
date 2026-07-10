@@ -41,6 +41,17 @@ export interface Order {
   purpose?: string // 'topup' (default) | 'chronic_monthly' | 'chronic_lifetime'
 }
 
+export interface Feedback {
+  id: string
+  userId: string
+  userEmail: string
+  userName: string
+  kind: 'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'
+  text: string
+  at: string
+  read: boolean
+}
+
 export interface Post {
   id: string
   authorEmail: string
@@ -93,6 +104,7 @@ interface DB {
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
+  feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
 }
 
 // Professional onboarding application — submitted at sign-up by clinicians,
@@ -504,6 +516,23 @@ export function removePushSub(userId: string, endpoint: string) {
 }
 
 // Aggregate platform stats for the Owner dashboard (computed live from the DB).
+// In-app "Pesan & Saran" — delivered to the owner's website inbox only (no
+// WhatsApp/email side-channel on the server side; the frontend still offers
+// those as user-initiated alternatives).
+export function addFeedback(f: Feedback) {
+  if (!db.feedback) db.feedback = []
+  db.feedback.unshift(f)
+  db.feedback = db.feedback.slice(0, 500)
+  save()
+}
+export function listFeedback(): Feedback[] {
+  return db.feedback ?? []
+}
+export function markFeedbackRead(id: string) {
+  const f = (db.feedback ?? []).find((x) => x.id === id)
+  if (f) { f.read = true; save() }
+}
+
 export function getStats() {
   const users = db.users
   const orders = db.orders ?? []
@@ -538,6 +567,44 @@ export function getStats() {
     signups7d,
     revenue7d,
   }
+}
+
+// Owner-only directory: every registered account with its transaction and
+// subscription status, for "who signed up / paid / subscribed" visibility.
+// Sourced from real server-side state only (db.users/db.orders/db.settings)
+// — client-local-only demo data (e.g. Marketplace's simulated order list)
+// is intentionally not represented here, since the owner can't see it either.
+export function userDirectory() {
+  const orders = db.orders ?? []
+  const now = Date.now()
+  return [...db.users]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map((u) => {
+      const userOrders = orders.filter((o) => o.userId === u.id)
+      const paidOrders = userOrders.filter((o) => o.status === 'paid')
+      const settings = getSettings(u.id)
+      const chronicActive = !!settings.chronicLifetime || (!!settings.chronicSubExpires && new Date(settings.chronicSubExpires).getTime() > now)
+      const longevityActive = !!settings.longevitySubExpires && new Date(settings.longevitySubExpires).getTime() > now
+      return {
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        role: u.role,
+        createdAt: u.createdAt,
+        walletBalance: balance(u.id),
+        ordersCount: userOrders.length,
+        paidOrdersCount: paidOrders.length,
+        totalPaidIdr: paidOrders.reduce((a, o) => a + o.amountIdr, 0),
+        subscriptions: {
+          clinicalCalcUnlocked: !!settings.clinicalCalcUnlocked,
+          longevityActive,
+          longevityExpires: settings.longevitySubExpires ?? null,
+          chronicActive,
+          chronicLifetime: !!settings.chronicLifetime,
+          chronicExpires: settings.chronicSubExpires ?? null,
+        },
+      }
+    })
 }
 
 // Creator subscriptions — who has an active paid subscription to which author.

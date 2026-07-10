@@ -50,6 +50,11 @@ import {
   isClinicalCalcFree,
   clinicalCalcInfo,
   CLINICAL_CALC_PRICE_PNC,
+  userDirectory,
+  addFeedback,
+  listFeedback,
+  markFeedbackRead,
+  type Feedback,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -605,6 +610,41 @@ app.get('/api/stats', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
   res.json(getStats())
+})
+
+// --- owner user directory: who signed up / paid / subscribed ---
+app.get('/api/owner/users', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ users: userDirectory() })
+})
+
+// --- "Pesan & Saran" — in-app feedback delivered to the owner only ---
+app.post('/api/feedback', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const { kind, text } = req.body as { kind?: Feedback['kind']; text?: string }
+  const trimmed = (text ?? '').trim()
+  if (trimmed.length < 5) return res.status(400).json({ error: 'text_too_short' })
+  const validKinds: Feedback['kind'][] = ['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian', 'Permintaan Fitur']
+  const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Saran'
+  const entry: Feedback = { id: uid(), userId: u.id, userEmail: u.email, userName: u.name, kind: safeKind, text: trimmed, at: new Date().toISOString(), read: false }
+  addFeedback(entry)
+  const owner = getUserByEmail(config.ownerEmail)
+  if (owner) {
+    notify(owner.id, { title: `💬 ${safeKind} baru dari ${u.name}`, body: trimmed.slice(0, 120), url: '/owner' }, 'notifTransactions').catch(() => {})
+  }
+  res.json({ ok: true, entry })
+})
+app.get('/api/feedback', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ feedback: listFeedback() })
+})
+app.post('/api/feedback/:id/read', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  markFeedbackRead(req.params.id)
+  res.json({ ok: true })
 })
 
 // --- doctor STR verification (owner-only) ---
