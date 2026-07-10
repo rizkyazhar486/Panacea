@@ -709,6 +709,7 @@ const TABS = [
   { id: 'pedsdose', label: 'Dosis Anak' },
   { id: 'vbac', label: 'VBAC Flamm-Geiger' },
   { id: 'denver', label: 'Denver II (Simplified)' },
+  { id: 'atls', label: 'ATLS Primary Survey' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1327,6 +1328,83 @@ function DenverCalc() {
   )
 }
 
+/* ══════════════════ ATLS PRIMARY SURVEY (ABCDE) ══════════════════ */
+// A guided trauma primary-survey checklist per ATLS (Advanced Trauma Life
+// Support) sequence — every item marked "abnormal" surfaces as a critical
+// finding needing immediate action, in the order ATLS prioritizes them
+// (airway before breathing before circulation, etc.) regardless of entry
+// order, since that ordering is the entire point of the primary survey.
+interface AtlsItem { key: string; label: string; critIfAbnormal: string }
+const ATLS_SECTIONS: { key: string; letter: string; label: string; items: AtlsItem[] }[] = [
+  { key: 'airway', letter: 'A', label: 'Airway & Kontrol Servikal', items: [
+    { key: 'airwayPatent', label: 'Jalan napas paten (bicara jelas, tanpa stridor/gurgling)', critIfAbnormal: 'Jalan napas tidak paten — bebaskan jalan napas segera (jaw thrust/chin lift, suction, airway definitif bila perlu) SEBELUM lanjut ke langkah berikutnya.' },
+    { key: 'cSpine', label: 'Tulang servikal terimobilisasi (collar/manual inline stabilization)', critIfAbnormal: 'C-spine belum terproteksi — asumsikan cedera servikal pada semua trauma tumpul mekanisme signifikan hingga terbukti sebaliknya.' },
+  ] },
+  { key: 'breathing', letter: 'B', label: 'Breathing & Ventilasi', items: [
+    { key: 'rrNormal', label: 'Laju napas normal (12-20x/menit) & simetris', critIfAbnormal: 'Laju napas abnormal — curigai tension pneumotoraks, hematotoraks, flail chest, atau cedera paru.' },
+    { key: 'breathSounds', label: 'Suara napas terdengar bilateral & simetris', critIfAbnormal: 'Suara napas asimetris/hilang sebelah — pertimbangkan needle/finger thoracostomy segera bila curiga tension pneumotoraks.' },
+    { key: 'spo2', label: 'SpO2 ≥94% udara ruangan/dengan oksigen suplemen sesuai', critIfAbnormal: 'Hipoksemia — berikan oksigen aliran tinggi, cari & atasi penyebab (pneumotoraks, aspirasi, dll).' },
+  ] },
+  { key: 'circulation', letter: 'C', label: 'Circulation & Kontrol Perdarahan', items: [
+    { key: 'pulse', label: 'Nadi teraba kuat, laju & irama normal', critIfAbnormal: 'Nadi lemah/cepat/tak teraba — curigai syok hemoragik, mulai resusitasi cairan/darah & cari sumber perdarahan.' },
+    { key: 'hemorrhage', label: 'Tidak ada perdarahan eksternal aktif tak terkontrol', critIfAbnormal: 'Perdarahan eksternal aktif — kontrol segera (tekanan langsung, tourniquet bila ekstremitas) sebelum lanjut survei.' },
+    { key: 'ivAccess', label: 'Akses IV besar (≥2 jalur) terpasang', critIfAbnormal: 'Akses IV belum adekuat — pasang 2 jalur IV besar (atau IO bila sulit) untuk resusitasi cairan/produk darah.' },
+  ] },
+  { key: 'disability', letter: 'D', label: 'Disability (Status Neurologis)', items: [
+    { key: 'gcsNormal', label: 'GCS ≥13 atau sesuai baseline pasien', critIfAbnormal: 'GCS menurun — evaluasi penyebab (cedera kepala, hipoksia, syok, intoksikasi), pertimbangkan proteksi jalan napas bila GCS ≤8.' },
+    { key: 'pupilsNormal', label: 'Pupil isokor & reaktif terhadap cahaya', critIfAbnormal: 'Pupil anisokor/tidak reaktif — curigai lesi massa intrakranial/herniasi, perlu pencitraan & konsultasi bedah saraf segera.' },
+  ] },
+  { key: 'exposure', letter: 'E', label: 'Exposure & Kontrol Lingkungan', items: [
+    { key: 'exposed', label: 'Pasien terpapar penuh (buka baju) untuk pemeriksaan menyeluruh termasuk log-roll punggung' },
+    { key: 'normothermic', label: 'Suhu tubuh terjaga normal (selimut hangat, cairan hangat) — cegah hipotermia' },
+  ].map((i) => ({ ...i, critIfAbnormal: i.key === 'exposed' ? 'Pemeriksaan belum menyeluruh — cedera tersembunyi (punggung, lipatan kulit, perineum) mudah terlewat bila tidak log-roll & inspeksi penuh.' : 'Risiko hipotermia — bagian dari "lethal triad" (hipotermia, asidosis, koagulopati) yang memperburuk prognosis trauma berat.' })) },
+]
+
+function AtlsCalc() {
+  const [status, setStatus] = useState<Record<string, 'ok' | 'abnormal' | 'unassessed'>>({})
+  const criticalFindings = ATLS_SECTIONS.flatMap((s) =>
+    s.items.filter((i) => status[i.key] === 'abnormal').map((i) => ({ letter: s.letter, ...i }))
+  )
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ATLS Primary Survey (ABCDE)" subtitle="Survei primer trauma sistematis — urutan prioritas menentukan tindakan, bukan sekadar checklist" />
+
+      {criticalFindings.length > 0 && (
+        <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
+          <p className="text-xs font-black text-red-800">🚨 Temuan Kritis — tangani sesuai urutan A→E</p>
+          <div className="mt-2 space-y-2">
+            {criticalFindings.map((f) => (
+              <div key={f.key} className="text-[11px] leading-relaxed text-red-700"><b>{f.letter}:</b> {f.critIfAbnormal}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {ATLS_SECTIONS.map((section) => (
+        <div key={section.key} className="mt-4 first:mt-0">
+          <h4 className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-neutral-500">
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-50 text-[11px] font-black text-brand-dark">{section.letter}</span>
+            {section.label}
+          </h4>
+          <div className="mt-2 space-y-2">
+            {section.items.map((item) => {
+              const v = status[item.key] ?? 'unassessed'
+              return (
+                <div key={item.key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
+                  <div className="min-w-0 flex-1 text-[12px] font-bold text-ink">{item.label}</div>
+                  <SegButtons value={v} onChange={(nv) => setStatus((s) => ({ ...s, [item.key]: nv }))} options={[{ v: 'ok', l: 'Normal' }, { v: 'abnormal', l: 'Abnormal' }, { v: 'unassessed', l: '—' }]} />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+
+      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">Prinsip ATLS: tangani setiap masalah SAAT ditemukan, dalam urutan A→B→C→D→E, sebelum lanjut ke langkah berikutnya — jangan menunda tindakan Airway demi menyelesaikan penilaian Circulation. Alat ini adalah bantuan checklist, bukan pengganti pelatihan ATLS resmi & penilaian klinis langsung di lapangan.</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1372,6 +1450,7 @@ export function ClinicalCalculators() {
       {tab === 'pedsdose' && <PedsDoseCalc />}
       {tab === 'vbac' && <VbacCalc />}
       {tab === 'denver' && <DenverCalc />}
+      {tab === 'atls' && <AtlsCalc />}
     </div>
   )
 }
