@@ -202,9 +202,31 @@ Baris pertama = JUDUL menarik (maks 60 karakter, tanpa tanda kutip).
 Lalu 2 paragraf singkat + 3 poin tips praktis (pakai "• ").
 Akhiri dengan 1 kalimat pengingat bahwa ini edukatif & konsultasikan ke dokter bila perlu. Hindari klaim medis berlebihan atau menakut-nakuti.`
 
-// Generate the business briefing from live data (reused by the panel & the
-// daily-email cron). Returns the markdown text + pending counts.
-export async function generateOperatorBriefing(): Promise<{ text: string; pending: { topups: number; topupIdr: number; doctors: number } }> {
+// ── 5-department AI marketing team ──────────────────────────────────────
+// CMO = the existing business-briefing mode above (oversees all departments).
+// Each department below is a distinct system prompt/output shape reusing the
+// same shared AI call — a lightweight "team" rather than separate services.
+const SOCIAL_SYSTEM = `Anda adalah Social Media Manager AI untuk Panaceamed.id (super-app kesehatan & longevity Indonesia). Berdasarkan DATA OPERASIONAL yang diberikan, susun KALENDER KONTEN 7 HARI untuk Instagram/TikTok/X berbahasa Indonesia. Untuk tiap hari, format:
+**Hari N — [tema]**: [ide konten singkat 1 kalimat] · Format: [Reels/Carousel/Story/Live] · Hook: "[kalimat pembuka yang menarik perhatian 3 detik pertama]"
+Variasikan tema (edukasi, testimoni, di balik layar, tips cepat, tanya-jawab, longevity myth-busting, ajakan unduh app). Akhiri dengan 2 ide kolaborasi (nano-influencer kesehatan lokal, dokter mitra) yang murah/gratis.`
+
+const SEO_SYSTEM = `Anda adalah Local SEO Specialist AI untuk Panaceamed.id, super-app kesehatan berbasis Indonesia. Berdasarkan DATA OPERASIONAL, susun REKOMENDASI SEO LOKAL berbahasa Indonesia dengan judul markdown:
+**Google Business Profile** (langkah optimasi listing, kategori, foto, jam), **Kata Kunci Prioritas** (5-8 keyword lokal "kesehatan [kota]"/"konsultasi dokter online" dengan estimasi intent), **Konten Landing Page Lokal** (2-3 ide halaman kota/klinik mitra), **Backlink & Sitasi Lokal** (direktori kesehatan Indonesia relevan, gratis/murah), **Quick Wins Minggu Ini** (3 tindakan tercepat). Prioritaskan taktik gratis/berbiaya rendah untuk tahap awal.`
+
+const ADS_SYSTEM = `Anda adalah Performance Ads Specialist AI untuk Panaceamed.id. Berdasarkan DATA OPERASIONAL, buat 3 VARIAN COPY IKLAN berbahasa Indonesia untuk Meta/Google Ads, format tiap varian:
+**Varian N — [angle/sudut pandang]**
+Headline: [maks 40 karakter]
+Body: [maks 125 karakter, jelas & jujur, tanpa klaim medis berlebihan]
+CTA: [tombol ajakan bertindak]
+Target audiens: [demografi/minat singkat]
+Akhiri dengan estimasi budget harian awal yang wajar (Rp) untuk uji A/B murah, dan 1 peringatan kepatuhan iklan kesehatan (hindari klaim menyembuhkan/testimoni medis tanpa bukti).`
+
+const OPS_SYSTEM = `Anda adalah Marketing Operations AI untuk Panaceamed.id. Berdasarkan DATA OPERASIONAL (termasuk antrean tertunda), susun DRAF TINDAK LANJUT (follow-up) berbahasa Indonesia untuk tim operasional, format:
+**Follow-up Top-up Tertunda** (draf pesan singkat & ramah untuk pengguna dengan top-up manual menunggu, ingatkan tanpa mendesak), **Follow-up Verifikasi Dokter/Kontributor** (draf pesan status untuk yang menunggu verifikasi STR), **Reaktivasi Pengguna Tidak Aktif** (1 ide kampanye email/push singkat untuk mendorong pengguna kembali). Setiap draf harus siap-kirim (copy-paste), sopan, dan singkat (maks 3 kalimat per draf).`
+
+// Shared operational-data context string, reused by every department so each
+// AI "role" reasons from the same live numbers instead of duplicating queries.
+function buildOperatorContext(): { context: string; pending: { topups: number; topupIdr: number; doctors: number } } {
   const s = getStats()
   const pendingTopups = listManualTopups('pending')
   const topupIdr = pendingTopups.reduce((a, t) => a + t.amountIdr, 0)
@@ -219,13 +241,27 @@ export async function generateOperatorBriefing(): Promise<{ text: string; pendin
 - Antrean Top-up manual menunggu: ${pendingTopups.length} permintaan (total Rp${topupIdr.toLocaleString('id-ID')})
 - Dokter/kontributor menunggu verifikasi STR: ${pendingDoctors.length}
 - Aktivitas audit terbaru: ${recentActions || 'belum ada'}`
+  return { context, pending: { topups: pendingTopups.length, topupIdr, doctors: pendingDoctors.length } }
+}
+
+// Generate the business briefing from live data (reused by the panel & the
+// daily-email cron). Returns the markdown text + pending counts.
+export async function generateOperatorBriefing(): Promise<{ text: string; pending: { topups: number; topupIdr: number; doctors: number } }> {
+  const { context, pending } = buildOperatorContext()
   const text = await callAnthropic('claude-sonnet-4-6', OPERATOR_SYSTEM, [{ role: 'user', content: context }], 1600)
-  return { text, pending: { topups: pendingTopups.length, topupIdr, doctors: pendingDoctors.length } }
+  return { text, pending }
+}
+
+const DEPARTMENT_SYSTEM: Record<string, string> = {
+  social: SOCIAL_SYSTEM,
+  seo: SEO_SYSTEM,
+  ads: ADS_SYSTEM,
+  ops: OPS_SYSTEM,
 }
 
 export async function aiOperator(req: Request, res: Response) {
   if (!aiConfigured()) return res.status(503).json({ error: 'ai_not_configured' })
-  const mode = (req.body as { mode?: string }).mode === 'content' ? 'content' : 'briefing'
+  const mode = (req.body as { mode?: string }).mode || 'briefing'
 
   if (mode === 'content') {
     try {
@@ -235,9 +271,18 @@ export async function aiOperator(req: Request, res: Response) {
       return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
     }
   }
+  if (mode in DEPARTMENT_SYSTEM) {
+    try {
+      const { context } = buildOperatorContext()
+      const text = await callAnthropic('claude-sonnet-4-6', DEPARTMENT_SYSTEM[mode], [{ role: 'user', content: context }], 1600)
+      return res.json({ text, mode })
+    } catch (e) {
+      return res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
+    }
+  }
   try {
     const r = await generateOperatorBriefing()
-    res.json({ text: r.text, mode, pending: r.pending })
+    res.json({ text: r.text, mode: 'briefing', pending: r.pending })
   } catch (e) {
     res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })
   }

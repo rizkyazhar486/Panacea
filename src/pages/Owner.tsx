@@ -230,16 +230,25 @@ function RealtimeStats() {
 
 // AI Operator — an "AI COO" that reads live data for a business briefing, and
 // drafts engaging health content for the feed (owner publishes with one tap).
+const AI_DEPARTMENTS = [
+  { mode: 'briefing' as const, label: 'CMO — Briefing Bisnis', icon: IconChartUp },
+  { mode: 'social' as const, label: 'Social Media', icon: IconSparkle },
+  { mode: 'seo' as const, label: 'Local SEO', icon: IconSparkle },
+  { mode: 'content' as const, label: 'Konten', icon: IconSparkle },
+  { mode: 'ads' as const, label: 'Ads', icon: IconSparkle },
+  { mode: 'ops' as const, label: 'Operasional', icon: IconSparkle },
+]
+
 function AIOperatorPanel() {
   const { account, addPost } = useStore()
-  const [tab, setTab] = useState<'briefing' | 'content'>('briefing')
+  const [tab, setTab] = useState<'briefing' | 'content' | 'social' | 'seo' | 'ads' | 'ops'>('briefing')
   const [text, setText] = useState('')
   const [pending, setPending] = useState<{ topups: number; topupIdr: number; doctors: number } | null>(null)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const [posted, setPosted] = useState(false)
 
-  async function run(mode: 'briefing' | 'content') {
+  async function run(mode: 'briefing' | 'content' | 'social' | 'seo' | 'ads' | 'ops') {
     setTab(mode); setBusy(true); setErr(''); setText(''); setPosted(false)
     try {
       const r = await api.aiOperator(mode)
@@ -278,19 +287,18 @@ function AIOperatorPanel() {
     <Card className="border-2 border-brand/30">
       <SectionTitle
         icon={<IconSparkle size={20} />}
-        title="AI Operator — Asisten Operasional Otomatis"
-        subtitle="Analisa bisnis real-time & pembuatan konten — ditenagai AI (gratis via server)"
+        title="Tim Marketing AI — CMO, Social, SEO, Konten, Ads, Operasional"
+        subtitle="5 departemen AI di bawah satu CMO — analisa & draf real-time, ditenagai AI (gratis via server)"
         right={pending && (pending.topups + pending.doctors > 0)
           ? <Badge tone="high">{pending.topups + pending.doctors} perlu tindakan</Badge>
           : <Badge tone="brand">AI siap</Badge>}
       />
       <div className="flex flex-wrap gap-2">
-        <Button onClick={() => run('briefing')} disabled={busy}>
-          <IconChartUp size={16} /> {busy && tab === 'briefing' ? 'Menganalisa…' : 'Briefing Bisnis'}
-        </Button>
-        <Button variant="outline" onClick={() => run('content')} disabled={busy}>
-          <IconSparkle size={16} /> {busy && tab === 'content' ? 'Menulis…' : 'Buat Konten Sehat'}
-        </Button>
+        {AI_DEPARTMENTS.map((d) => (
+          <Button key={d.mode} variant={tab === d.mode ? 'primary' : 'outline'} onClick={() => run(d.mode)} disabled={busy}>
+            <d.icon size={16} /> {busy && tab === d.mode ? 'Memproses…' : d.label}
+          </Button>
+        ))}
       </div>
 
       {err && <p className="mt-3 text-sm text-accent">{err}</p>}
