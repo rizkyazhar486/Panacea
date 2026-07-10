@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
-import { IconActivity, IconHeart, IconTimer } from '../components/icons'
+import { IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,7 +29,6 @@ const STATE_BADGE: Record<NormalizedEvent['state'], { label: string; tone: 'bran
 
 export function SportsScores() {
   const [leagues, setLeagues] = useState<{ id: string; label: string }[]>([])
-  const [unavailable, setUnavailable] = useState<{ leagueId: string; label: string; reason: string }[]>([])
   const [league, setLeague] = useState<string>('epl')
   const [events, setEvents] = useState<NormalizedEvent[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +38,7 @@ export function SportsScores() {
 
   useEffect(() => {
     if (!backendEnabled) { setLoading(false); return }
-    api.getSportsLeagues().then((r) => { setLeagues(r.leagues); setUnavailable(r.unavailable) }).catch(() => {})
+    api.getSportsLeagues().then((r) => setLeagues(r.leagues)).catch(() => {})
     api.getSportsFavorites().then(setFavorites).catch(() => {})
   }, [])
 
@@ -143,17 +142,6 @@ export function SportsScores() {
           })}
         </div>
       )}
-
-      <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Belum Tersedia" subtitle="Jujur soal keterbatasan sumber data gratis" />
-        <div className="mt-2 space-y-1.5">
-          {unavailable.map((u) => (
-            <div key={u.leagueId} className="rounded-xl bg-neutral-50 p-3 text-[11px] text-neutral-500">
-              <span className="font-bold text-neutral-700">{u.label}</span> — {u.reason}
-            </div>
-          ))}
-        </div>
-      </Card>
 
       <p className="text-center text-[10px] text-neutral-400">
         Tandai ★ tim favorit untuk mendapat notifikasi gol/hasil akhir (dicek server tiap ~90 detik).

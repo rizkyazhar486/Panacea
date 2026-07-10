@@ -20,6 +20,8 @@ import {
 } from '../components/icons'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { MedicalNews } from '../components/MedicalNews'
+import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCinematic'
+import { PricingSection } from '../components/PricingSection'
 
 const FEATURES = [
   { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
@@ -41,7 +43,7 @@ const ROLES = [
 
 const WHATS_NEW = [
   'Dashboard sosial "Panacea Hidup Sehat" — foto & video 30 detik, profil, repost, bookmark privat.',
-  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp299.000/bulan).',
+  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp49.000/bulan).',
   'Apotek dengan tebus/scan resep + Riwayat Transaksi terpadu (bisa disaring per jenis).',
   'Faskes terdekat via GPS (rumah sakit, klinik & apotek) untuk situasi darurat.',
   'Pusat Materi Kedokteran — temukan & bagikan catatan, jurnal, dan artikel pilihan dengan PanaceaToken.',
@@ -120,7 +122,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
     if (backendEnabled) api.health().then((h) => setPromo(h.promo ?? null)).catch(() => {})
   }, [])
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white">
+    <div className="min-h-screen bg-white">
       {/* Promo early-bird — 75% untuk pendaftar pertama */}
       {promo && promo.slotsLeft > 0 && (
         <button onClick={onMasuk} className="block w-full bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] px-4 py-2.5 text-center text-sm font-bold text-white hover:brightness-110">
@@ -130,6 +132,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* Glass header */}
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-8">
         <div className="min-w-0 shrink"><Wordmark size={32} /></div>
+        <a href="#pricing" className="hidden shrink-0 text-sm font-bold text-neutral-600 transition hover:text-brand-dark sm:inline">Harga</a>
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
@@ -147,6 +150,14 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </button>
         </div>
       </header>
+
+      {/* ── SCROLL-CINEMATIC OVERTURE ───────────────────────────
+          Scroll-driven sequence (sunrise → vitalitas → sains → longevity)
+          — the live implementation of the earlier Remotion concept video.
+          Pinned via `sticky` over a 400vh track so each act gets its own
+          scroll "chapter" instead of racing past in a few frames. */}
+      <ScrollCinematicStyles />
+      <ScrollCinematic />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-28">
@@ -352,6 +363,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </div>
         </div>
       </section>
+
+      {/* ── HARGA & LAYANAN (dark bento-grid pricing) ─────────────── */}
+      <PricingSection onMasuk={onMasuk} promo={promo} />
 
       {/* ── WHAT'S NEW ────────────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-6 py-20 sm:px-10">

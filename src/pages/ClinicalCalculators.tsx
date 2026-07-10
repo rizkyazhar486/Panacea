@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
-import { IconStethoscope } from '../components/icons'
+import { IconStethoscope, IconShield, IconCheck, IconToken } from '../components/icons'
+import { api, backendEnabled } from '../lib/api'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -709,7 +710,7 @@ const TABS = [
   { id: 'pedsdose', label: 'Dosis Anak' },
   { id: 'vbac', label: 'VBAC Flamm-Geiger' },
   { id: 'denver', label: 'Denver II (Simplified)' },
-  { id: 'atls', label: 'ATLS Primary Survey' },
+  { id: 'atls', label: 'XABCDE Trauma Survey' },
   { id: 'abg', label: 'Analisis Gas Darah' },
   { id: 'burn', label: 'Kalkulator Luka Bakar' },
   { id: 'cranial', label: 'Saraf Kranial + Meningeal' },
@@ -1340,6 +1341,9 @@ function DenverCalc() {
 // order, since that ordering is the entire point of the primary survey.
 interface AtlsItem { key: string; label: string; critIfAbnormal: string }
 const ATLS_SECTIONS: { key: string; letter: string; label: string; items: AtlsItem[] }[] = [
+  { key: 'exsanguination', letter: 'X', label: 'eXsanguinating Hemorrhage Control', items: [
+    { key: 'massiveHemorrhage', label: 'Tidak ada perdarahan eksternal masif yang mengancam nyawa', critIfAbnormal: 'Perdarahan masif eksternal — kontrol SEGERA sebelum Airway (tourniquet ekstremitas, wound packing + tekanan langsung pada junctional/truncal) sesuai prinsip <C>ABCDE / MARCH modern.' },
+  ] },
   { key: 'airway', letter: 'A', label: 'Airway & Kontrol Servikal', items: [
     { key: 'airwayPatent', label: 'Jalan napas paten (bicara jelas, tanpa stridor/gurgling)', critIfAbnormal: 'Jalan napas tidak paten — bebaskan jalan napas segera (jaw thrust/chin lift, suction, airway definitif bila perlu) SEBELUM lanjut ke langkah berikutnya.' },
     { key: 'cSpine', label: 'Tulang servikal terimobilisasi (collar/manual inline stabilization)', critIfAbnormal: 'C-spine belum terproteksi — asumsikan cedera servikal pada semua trauma tumpul mekanisme signifikan hingga terbukti sebaliknya.' },
@@ -1366,16 +1370,41 @@ const ATLS_SECTIONS: { key: string; letter: string; label: string; items: AtlsIt
 
 function AtlsCalc() {
   const [status, setStatus] = useState<Record<string, 'ok' | 'abnormal' | 'unassessed'>>({})
+  const [copied, setCopied] = useState(false)
   const criticalFindings = ATLS_SECTIONS.flatMap((s) =>
     s.items.filter((i) => status[i.key] === 'abnormal').map((i) => ({ letter: s.letter, ...i }))
   )
+  const assessedCount = ATLS_SECTIONS.flatMap((s) => s.items).filter((i) => status[i.key] && status[i.key] !== 'unassessed').length
+  const totalCount = ATLS_SECTIONS.flatMap((s) => s.items).length
+
+  const noteLines = ATLS_SECTIONS.map((section) => {
+    const lines = section.items.map((item) => {
+      const v = status[item.key] ?? 'unassessed'
+      const label = v === 'ok' ? 'Normal' : v === 'abnormal' ? 'ABNORMAL' : 'Belum dinilai'
+      return `  - ${item.label}: ${label}`
+    })
+    return `${section.letter} — ${section.label}\n${lines.join('\n')}`
+  })
+  const formattedNote = `SURVEI PRIMER TRAUMA (XABCDE)\n${noteLines.join('\n\n')}${
+    criticalFindings.length > 0
+      ? `\n\n🚨 TEMUAN KRITIS (tangani sesuai urutan X→E):\n${criticalFindings.map((f) => `- ${f.letter}: ${f.critIfAbnormal}`).join('\n')}`
+      : '\n\nTidak ada temuan kritis tercatat pada survei primer ini.'
+  }`
+
+  function copyNote() {
+    navigator.clipboard?.writeText(formattedNote).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    })
+  }
+
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ATLS Primary Survey (ABCDE)" subtitle="Survei primer trauma sistematis — urutan prioritas menentukan tindakan, bukan sekadar checklist" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Survei Primer Trauma (XABCDE)" subtitle="X = kontrol perdarahan eksotik/masif mendahului Airway — urutan prioritas menentukan tindakan, bukan sekadar checklist" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
-          <p className="text-xs font-black text-red-800">🚨 Temuan Kritis — tangani sesuai urutan A→E</p>
+          <p className="text-xs font-black text-red-800">🚨 Temuan Kritis — tangani sesuai urutan X→E</p>
           <div className="mt-2 space-y-2">
             {criticalFindings.map((f) => (
               <div key={f.key} className="text-[11px] leading-relaxed text-red-700"><b>{f.letter}:</b> {f.critIfAbnormal}</div>
@@ -1404,7 +1433,16 @@ function AtlsCalc() {
         </div>
       ))}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">Prinsip ATLS: tangani setiap masalah SAAT ditemukan, dalam urutan A→B→C→D→E, sebelum lanjut ke langkah berikutnya — jangan menunda tindakan Airway demi menyelesaikan penilaian Circulation. Alat ini adalah bantuan checklist, bukan pengganti pelatihan ATLS resmi & penilaian klinis langsung di lapangan.</p>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Catatan Survei Primer — siap tempel ke rekam medis</div>
+          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-white">{copied ? '✓ Disalin' : 'Salin Catatan'}</button>
+        </div>
+        <pre className="mt-2 whitespace-pre-wrap font-sans text-[11px] leading-relaxed text-neutral-600">{formattedNote}</pre>
+        <p className="mt-2 text-[10px] text-neutral-400">{assessedCount}/{totalCount} item telah dinilai.</p>
+      </div>
+
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Prinsip trauma modern (&lt;C&gt;ABCDE / MARCH): kontrol perdarahan eksternal masif MENDAHULUI Airway bila mengancam nyawa segera, lalu tangani setiap masalah SAAT ditemukan dalam urutan X→A→B→C→D→E sebelum lanjut ke langkah berikutnya. Alat ini adalah bantuan checklist, bukan pengganti pelatihan ATLS/TCCC resmi & penilaian klinis langsung di lapangan.</p>
     </Card>
   )
 }
@@ -1529,55 +1567,124 @@ const BURN_BACK: BurnRegion[] = [
   { key: 'legRB', label: 'Tungkai Kanan (belakang)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
 ]
 
+// Pediatric Lund & Browder (1944) age-banded regions — combined groupings
+// (head+neck, trunk-back+buttocks, whole-limb front/back split) chosen to
+// match this calculator's existing region layout while every band's total
+// still sums to exactly 100% (verified by hand for each band below).
+function lundBrowderBand(ageYears: number) {
+  if (ageYears < 1) return { head: 21, leg: 14 }
+  if (ageYears < 5) return { head: 19, leg: 15 }
+  if (ageYears < 10) return { head: 15, leg: 17 }
+  if (ageYears < 15) return { head: 13, leg: 18 }
+  if (ageYears < 18) return { head: 11, leg: 19 }
+  return { head: 9, leg: 20 }
+}
+function pediatricRegions(ageYears: number): { front: BurnRegion[]; back: BurnRegion[] } {
+  const { head, leg } = lundBrowderBand(ageYears)
+  const headHalf = head / 2
+  const legHalf = leg / 2
+  return {
+    front: [
+      { key: 'headF', label: 'Kepala+Leher (depan)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+      { key: 'armLF', label: 'Lengan Kiri (depan)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'armRF', label: 'Lengan Kanan (depan)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'trunkF', label: 'Batang Tubuh (depan)', pct: 13, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+      { key: 'perineum', label: 'Perineum/Genitalia', pct: 1, x: 92, y: 158, w: 16, h: 12 },
+      { key: 'legLF', label: 'Tungkai Kiri (depan)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'legRF', label: 'Tungkai Kanan (depan)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+    ],
+    back: [
+      { key: 'headB', label: 'Kepala+Leher (belakang)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+      { key: 'armLB', label: 'Lengan Kiri (belakang)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'armRB', label: 'Lengan Kanan (belakang)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'trunkB', label: 'Batang Tubuh (belakang+bokong)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+      { key: 'legLB', label: 'Tungkai Kiri (belakang)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'legRB', label: 'Tungkai Kanan (belakang)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+    ],
+  }
+}
+
 function BurnCalc() {
+  const [method, setMethod] = useState<'draw' | 'manual' | 'pediatric'>('draw')
   const [view, setView] = useState<'front' | 'back'>('front')
   const [selected, setSelected] = useState<Record<string, boolean>>({})
   const [weight, setWeight] = useState(70)
+  const [manualTbsa, setManualTbsa] = useState(20)
+  const [ageYears, setAgeYears] = useState(5)
 
-  const allRegions = [...BURN_FRONT, ...BURN_BACK]
-  const tbsa = allRegions.filter((r) => selected[r.key]).reduce((sum, r) => sum + r.pct, 0)
+  const pedRegions = pediatricRegions(ageYears)
+  const drawFront = method === 'pediatric' ? pedRegions.front : BURN_FRONT
+  const drawBack = method === 'pediatric' ? pedRegions.back : BURN_BACK
+  const allRegions = [...drawFront, ...drawBack]
+  const drawTbsa = allRegions.filter((r) => selected[r.key]).reduce((sum, r) => sum + r.pct, 0)
+  const tbsa = method === 'manual' ? manualTbsa : drawTbsa
   const total24h = 4 * weight * tbsa
   const first8hRate = total24h / 2 / 8
   const next16hRate = (total24h - total24h / 2) / 16
 
-  const regions = view === 'front' ? BURN_FRONT : BURN_BACK
+  const regions = view === 'front' ? drawFront : drawBack
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Luka Bakar Lanjutan" subtitle="Rule of Nines (draw-mode) + Parkland Formula, dapat dicetak/disimpan PDF" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Luka Bakar Lanjutan" subtitle="Tiga metode input %TBSA + Parkland Formula, dapat dicetak/disimpan PDF" />
 
-      <div className="flex gap-2">
-        <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Depan</button>
-        <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Belakang</button>
-      </div>
+      <SegButtons
+        value={method}
+        onChange={(v) => { setMethod(v); setSelected({}) }}
+        options={[{ v: 'draw', l: 'Dewasa (Rule of Nines)' }, { v: 'pediatric', l: 'Anak (Lund-Browder)' }, { v: 'manual', l: 'Input Manual' }]}
+      />
 
-      <div className="mt-3 flex justify-center">
-        <svg viewBox="0 0 200 340" width="200" height="340">
-          {regions.map((r) => (
-            <rect
-              key={r.key}
-              x={r.x} y={r.y} width={r.w} height={r.h} rx={r.rx ?? 4}
-              className="cursor-pointer transition-colors"
-              fill={selected[r.key] ? '#ef4444' : '#e5e7eb'}
-              stroke="#fff" strokeWidth={2}
-              onClick={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))}
-            />
-          ))}
-        </svg>
-      </div>
-      <p className="text-center text-[10px] text-neutral-400">Ketuk area tubuh untuk menandai luka bakar (merah = terpilih)</p>
+      {method === 'manual' ? (
+        <div className="mt-3">
+          <Field label="Total %TBSA (estimasi klinis)">
+            <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
+          </Field>
+          <p className="mt-1.5 text-[10px] text-neutral-400">Untuk kasus dengan estimasi %TBSA sudah tersedia (mis. rujukan RS lain) — masukkan langsung tanpa perlu menandai diagram tubuh.</p>
+        </div>
+      ) : (
+        <>
+          {method === 'pediatric' && (
+            <div className="mt-3">
+              <Field label="Usia (tahun)">
+                <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
+              </Field>
+              <p className="mt-1.5 text-[10px] text-neutral-400">Lund &amp; Browder (1944) mengoreksi proporsi tubuh anak — kepala lebih besar, tungkai lebih kecil secara proporsional dibanding dewasa. Band usia: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 tahun.</p>
+            </div>
+          )}
+          <div className="mt-3 flex gap-2">
+            <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Depan</button>
+            <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Belakang</button>
+          </div>
 
-      <div className="mt-3 space-y-1">
-        {regions.map((r) => (
-          <label key={r.key} className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 hover:bg-neutral-50">
-            <span className="flex items-center gap-2 text-[12px] font-semibold text-ink">
-              <input type="checkbox" checked={!!selected[r.key]} onChange={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))} className="h-4 w-4 accent-red-500" />
-              {r.label}
-            </span>
-            <span className="text-[11px] font-black text-neutral-400">{r.pct}%</span>
-          </label>
-        ))}
-      </div>
+          <div className="mt-3 flex justify-center">
+            <svg viewBox="0 0 200 340" width="200" height="340">
+              {regions.map((r) => (
+                <rect
+                  key={r.key}
+                  x={r.x} y={r.y} width={r.w} height={r.h} rx={r.rx ?? 4}
+                  className="cursor-pointer transition-colors"
+                  fill={selected[r.key] ? '#ef4444' : '#e5e7eb'}
+                  stroke="#fff" strokeWidth={2}
+                  onClick={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))}
+                />
+              ))}
+            </svg>
+          </div>
+          <p className="text-center text-[10px] text-neutral-400">Ketuk area tubuh untuk menandai luka bakar (merah = terpilih)</p>
+
+          <div className="mt-3 space-y-1">
+            {regions.map((r) => (
+              <label key={r.key} className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 hover:bg-neutral-50">
+                <span className="flex items-center gap-2 text-[12px] font-semibold text-ink">
+                  <input type="checkbox" checked={!!selected[r.key]} onChange={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))} className="h-4 w-4 accent-red-500" />
+                  {r.label}
+                </span>
+                <span className="text-[11px] font-black text-neutral-400">{r.pct}%</span>
+              </label>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{tbsa.toFixed(1)}% <span className="text-sm font-semibold text-neutral-400">TBSA</span></div>
@@ -1609,7 +1716,7 @@ function BurnCalc() {
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines adalah estimasi dewasa standar (persentase berbeda pada anak — kepala proporsional lebih besar). Total = 4 mL × berat(kg) × %TBSA (kristaloid RL), separuh dalam 8 jam pertama SEJAK WAKTU CEDERA, sisanya 16 jam berikutnya, disesuaikan output urin.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines (Wallace) adalah estimasi dewasa standar. Lund-Browder mengoreksi proporsi tubuh anak per kelompok usia. Parkland: Total = 4 mL × berat(kg) × %TBSA (kristaloid RL), separuh dalam 8 jam pertama SEJAK WAKTU CEDERA, sisanya 16 jam berikutnya, disesuaikan output urin.</p>
     </Card>
   )
 }
@@ -1818,10 +1925,100 @@ function CompetencyTracker() {
   )
 }
 
+// ── Paywall: free for the first 50 registered accounts, then a one-time
+// unlock via 500 PNC from wallet balance or a direct Rp500.000 charge. ──
+type CalcAccess = { unlocked: boolean; free: boolean; limit: number; slotsLeft: number; pricePnc: number; priceIdr: number }
+
+function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnlocked: () => void }) {
+  const [busy, setBusy] = useState<'pnc' | 'idr' | null>(null)
+  const [err, setErr] = useState('')
+
+  async function payWithPnc() {
+    setBusy('pnc'); setErr('')
+    try {
+      const r = await api.unlockClinicalCalcPnc()
+      if (r.unlocked) onUnlocked()
+    } catch (e) {
+      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Saldo PNC Anda tidak cukup (butuh ${access.pricePnc} PNC). Isi saldo dulu di Billing.` : 'Gagal membuka akses. Coba lagi.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function payWithIdr() {
+    setBusy('idr'); setErr('')
+    try {
+      const r = await api.createPayment(0, 'QRIS', 'clinical_calc_unlock')
+      if (!r.live) {
+        // Sandbox/dev mode — no live payment gateway configured, simulate settlement.
+        await api.confirmPayment(r.orderId)
+        onUnlocked()
+      } else if (r.redirectUrl) {
+        window.location.href = r.redirectUrl
+      }
+    } catch {
+      setErr('Gagal memulai pembayaran. Coba lagi.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 skor & alat bantu keputusan klinis standar internasional" />
+      <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
+        🎉 Kalkulator Klinis <b>gratis</b> untuk {access.limit} pendaftar akun Panaceamed.id pertama — kuota itu sudah penuh. Buka akses seumur akun dengan salah satu metode di bawah.
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <button
+          onClick={payWithPnc}
+          disabled={busy !== null}
+          className="flex flex-col items-start gap-1 rounded-2xl border border-brand/30 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Bayar dari saldo</span>
+          <span className="text-xl font-black text-ink">{access.pricePnc} PNC</span>
+          <span className="text-[11px] text-neutral-500">{busy === 'pnc' ? 'Memproses…' : 'Langsung terpotong dari saldo PanaceaToken Anda'}</span>
+        </button>
+        <button
+          onClick={payWithIdr}
+          disabled={busy !== null}
+          className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+        >
+          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">QRIS / VA / Kartu</span>
+          <span className="text-xl font-black text-ink">Rp{access.priceIdr.toLocaleString('id-ID')}</span>
+          <span className="text-[11px] text-neutral-500">{busy === 'idr' ? 'Memproses…' : 'Pembayaran satu kali, akses seumur akun'}</span>
+        </button>
+      </div>
+      {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
+  const [access, setAccess] = useState<CalcAccess | null>(null)
+
+  useEffect(() => {
+    if (!backendEnabled) { setAccess({ unlocked: true, free: true, limit: 50, slotsLeft: 0, pricePnc: 500, priceIdr: 500000 }); return }
+    api.getClinicalCalcAccess().then(setAccess).catch(() => setAccess({ unlocked: true, free: true, limit: 50, slotsLeft: 0, pricePnc: 500, priceIdr: 500000 }))
+  }, [])
+
+  if (access && !access.unlocked) {
+    return (
+      <div className="mx-auto max-w-xl space-y-4 p-4">
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
+        <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-xl space-y-4 p-4">
+      {access?.free && (
+        <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
+          <IconCheck size={14} /> Anda termasuk {access.limit} pendaftar pertama — akses gratis selamanya.
+        </div>
+      )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {TABS.map((t) => (

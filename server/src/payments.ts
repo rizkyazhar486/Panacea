@@ -3,12 +3,16 @@ import crypto from 'node:crypto'
 // midtrans-client is CommonJS
 import midtransClient from 'midtrans-client'
 import { config, features } from './config.js'
-import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, uid, type User } from './store.js'
+import { credit, createOrder, getOrder, setOrderStatus, getUser, saveSettings, isEarlyAdopter, EARLY_ADOPTER_DISCOUNT, CLINICAL_CALC_PRICE_IDR, uid, type User } from './store.js'
 import { notify } from './push.js'
 import { sendReceipt } from './email.js'
 
-// Chronic-care subscription prices (IDR) — paid directly, not via PNC.
-const CHRONIC_PRICE: Record<string, number> = { chronic_monthly: 199000, chronic_lifetime: 19900000 }
+// Fixed-price purposes (IDR) — paid directly, not priced per-PNC.
+const FIXED_PRICE: Record<string, number> = {
+  chronic_monthly: 199000,
+  chronic_lifetime: 19900000,
+  clinical_calc_unlock: CLINICAL_CALC_PRICE_IDR,
+}
 
 // Activate a chronic subscription in the user's server-side settings.
 function activateChronic(userId: string, purpose: string) {
@@ -16,9 +20,13 @@ function activateChronic(userId: string, purpose: string) {
   else if (purpose === 'chronic_monthly') saveSettings(userId, { chronicSubExpires: new Date(Date.now() + 30 * 86400000).toISOString() })
 }
 
-// Apply a successful order: chronic subscriptions activate access; others credit PNC.
+// Apply a successful order: chronic subscriptions/feature unlocks activate
+// access directly; everything else credits PNC to the wallet.
 function fulfillOrder(order: { id: string; userId: string; amountPnc: number; amountIdr: number; method: string; purpose?: string }) {
-  if (order.purpose && order.purpose.startsWith('chronic')) {
+  if (order.purpose === 'clinical_calc_unlock') {
+    saveSettings(order.userId, { clinicalCalcUnlocked: true })
+    notify(order.userId, { title: 'Kalkulator Klinis terbuka ✅', body: 'Akses penuh ke 34 kalkulator klinis telah aktif.', url: './#/clinical-calculators' }, 'notifTransactions').catch(() => {})
+  } else if (order.purpose && order.purpose.startsWith('chronic')) {
     activateChronic(order.userId, order.purpose)
     notify(order.userId, { title: 'Langganan aktif ✅', body: 'Pemantauan Kronis & Longevity Anda telah aktif.', url: './#/nutrition' }, 'notifTransactions').catch(() => {})
   } else {
@@ -47,9 +55,9 @@ function channels(method: string): string[] {
 export async function createPayment(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   const { amountPnc, method, purpose } = req.body as { amountPnc?: number; method?: string; purpose?: string }
-  const isChronic = !!purpose && purpose in CHRONIC_PRICE
-  const pnc = isChronic ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
-  const baseIdr = isChronic ? CHRONIC_PRICE[purpose!] : pnc * config.tokenToIdr
+  const isFixed = !!purpose && purpose in FIXED_PRICE
+  const pnc = isFixed ? 0 : Math.max(1, Math.floor(Number(amountPnc) || 0))
+  const baseIdr = isFixed ? FIXED_PRICE[purpose!] : pnc * config.tokenToIdr
   // Early-adopter promo: first 25 emails get 75% off everything (PNC still full).
   const early = isEarlyAdopter(user.id)
   const amountIdr = early ? Math.max(1000, Math.round(baseIdr * (1 - EARLY_ADOPTER_DISCOUNT))) : baseIdr
@@ -61,9 +69,14 @@ export async function createPayment(req: Request, res: Response) {
     return res.json({ live: false, orderId, amountPnc: pnc, amountIdr, method, mock: true })
   }
   try {
-    const itemName = (isChronic ? (purpose === 'chronic_lifetime' ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari') : `${pnc} PanaceaToken`) + (early ? ' (Diskon 75% Early Bird)' : '')
+    const fixedLabel: Record<string, string> = {
+      chronic_lifetime: 'Pemantauan Kronis Lifetime',
+      chronic_monthly: 'Pemantauan Kronis 30 hari',
+      clinical_calc_unlock: 'Buka Kalkulator Klinis',
+    }
+    const itemName = (isFixed ? fixedLabel[purpose!] : `${pnc} PanaceaToken`) + (early ? ' (Diskon 75% Early Bird)' : '')
     // Single item priced at the (possibly discounted) total so Midtrans totals match.
-    const item = { id: isChronic ? purpose! : 'PNC', price: amountIdr, quantity: 1, name: itemName }
+    const item = { id: isFixed ? purpose! : 'PNC', price: amountIdr, quantity: 1, name: itemName }
     const tx = await snap.createTransaction({
       transaction_details: { order_id: orderId, gross_amount: amountIdr },
       enabled_payments: channels(method || 'QRIS'),

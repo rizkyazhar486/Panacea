@@ -682,7 +682,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ...st,
           longevitySubExpires: expires,
           orders: [
-            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 299000, status: 'Selesai' as const, at: now.toISOString() },
+            { id: uid(), category: 'Langganan' as const, title: 'Langganan AI Longevity 30 hari', detail: 'Nilai Longevity bertenaga AI', amountIdr: 49000, status: 'Selesai' as const, at: now.toISOString() },
             ...st.orders,
           ],
           wallet: {
@@ -692,7 +692,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'subscription' as TxType,
                 amount: 0,
-                note: 'Langganan AI Longevity 30 hari — Rp299.000 (dibayar)',
+                note: 'Langganan AI Longevity 30 hari — Rp49.000 (dibayar)',
                 at: now.toISOString(),
               },
               ...st.wallet.transactions,
