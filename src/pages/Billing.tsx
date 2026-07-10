@@ -3,6 +3,7 @@ import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { MANUAL_BANK } from '../lib/payment'
 import { Portal } from '../components/Portal'
 import type { SubscriptionPlan, TxType } from '../lib/types'
 
@@ -358,13 +359,7 @@ function UploadBox({ label, multiple, onFiles, files }: { label: string; multipl
 }
 
 // Manual bank-transfer destination (no Midtrans/NPWP needed). Confirmed by owner.
-const MANUAL_BANK = {
-  bank: 'Bank Mandiri',
-  number: '1260007276065',
-  holder: 'RIZKY MUHAMMAD AZRIS',
-  waNumber: '6282261143040', // E.164 without "+"
-  waLabel: '+62 822-6114-3040',
-}
+// Shared via lib/payment so every page quotes the same account.
 
 // Sole valid payment path: manual transfer to the owner's own Mandiri account,
 // confirmed with a photo proof. PNC is credited only after owner verification

@@ -524,7 +524,8 @@ export interface Contributor {
 }
 
 export type TxType = 'deposit' | 'purchase' | 'payout' | 'subscription' | 'withdraw' | 'consult'
-export type PaymentMethod = 'Visa' | 'QRIS' | 'Virtual Account'
+// Sole payment path: manual transfer to the owner's Mandiri account (see lib/payment).
+export type PaymentMethod = 'Transfer Bank'
 export interface WalletTx {
   id: string
   type: TxType
