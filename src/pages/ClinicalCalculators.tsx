@@ -322,6 +322,155 @@ function WhoGrowthCalc() {
   )
 }
 
+/* ══════════════════ NEW BALLARD SCORE + LUBCHENCO SOAP BUILDER ══════════════════ */
+// New Ballard Score (Ballard et al., 1991) — 6 neuromuscular + 6 physical
+// maturity criteria, summed to a total mapped to gestational age (weeks) via
+// the standard published score-to-GA table. Combined here with a simplified
+// Lubchenco-style birth-weight-for-gestational-age classification (SGA/AGA/
+// LGA using approximate 10th/90th percentile bands) into an auto-drafted
+// neonatal SOAP note — both are decision-support estimates, not a substitute
+// for the official charts for edge-case/borderline values.
+const BALLARD_SCORE_TO_GA: [number, number][] = [
+  [-10, 20], [-5, 22], [0, 24], [5, 26], [10, 28], [15, 30], [20, 32],
+  [25, 34], [30, 36], [35, 38], [40, 40], [45, 42], [50, 44],
+]
+function ballardScoreToGA(score: number): number {
+  const pts = BALLARD_SCORE_TO_GA
+  const s = Math.max(pts[0][0], Math.min(pts[pts.length - 1][0], score))
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (s >= pts[i][0] && s <= pts[i + 1][0]) {
+      const t = (s - pts[i][0]) / (pts[i + 1][0] - pts[i][0])
+      return pts[i][1] + t * (pts[i + 1][1] - pts[i][1])
+    }
+  }
+  return pts[pts.length - 1][1]
+}
+
+// Approximate 10th/90th percentile birth weight (grams) by gestational week —
+// simplified Lubchenco/Fenton-style bands for SGA/AGA/LGA screening.
+const LUBCHENCO_WEEKS = [24, 28, 32, 36, 40, 42]
+const LUBCHENCO_P10 = [500, 750, 1300, 2100, 2800, 2900]
+const LUBCHENCO_P90 = [850, 1450, 2400, 3400, 4000, 4200]
+function lubchencoClass(gaWeeks: number, weightG: number): { l: string; tone: 'normal' | 'low' | 'critical' } {
+  const p10 = interp(gaWeeks, LUBCHENCO_WEEKS, LUBCHENCO_P10)
+  const p90 = interp(gaWeeks, LUBCHENCO_WEEKS, LUBCHENCO_P90)
+  if (weightG < p10) return { l: 'SGA (Small for Gestational Age)', tone: 'critical' }
+  if (weightG > p90) return { l: 'LGA (Large for Gestational Age)', tone: 'low' }
+  return { l: 'AGA (Appropriate for Gestational Age)', tone: 'normal' }
+}
+
+const NEURO_CRITERIA: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
+  { key: 'posture', label: 'Posture', opts: [{ v: 0, l: 'Ekstensi penuh' }, { v: 1, l: 'Fleksi awal panggul/lutut' }, { v: 2, l: 'Fleksi sedang' }, { v: 3, l: 'Kaki fleksi-abduksi' }, { v: 4, l: 'Fleksi penuh (fetal)' }] },
+  { key: 'squareWindow', label: 'Square Window (pergelangan tangan)', opts: [{ v: -1, l: '>90°' }, { v: 0, l: '90°' }, { v: 1, l: '60°' }, { v: 2, l: '45°' }, { v: 3, l: '30°' }, { v: 4, l: '0°' }] },
+  { key: 'armRecoil', label: 'Arm Recoil', opts: [{ v: -1, l: '180° (tanpa recoil)' }, { v: 0, l: '140-180°' }, { v: 1, l: '110-140°' }, { v: 2, l: '90-110°' }, { v: 3, l: '<90°' }] },
+  { key: 'poplitealAngle', label: 'Popliteal Angle', opts: [{ v: -1, l: '180°' }, { v: 0, l: '160°' }, { v: 1, l: '140°' }, { v: 2, l: '120°' }, { v: 3, l: '100°' }, { v: 4, l: '90°' }, { v: 5, l: '<90°' }] },
+  { key: 'scarfSign', label: 'Scarf Sign', opts: [{ v: -1, l: 'Siku capai garis aksila lawan' }, { v: 0, l: 'Siku lewat garis tengah' }, { v: 1, l: 'Siku di garis tengah' }, { v: 2, l: 'Siku tak capai garis tengah' }, { v: 3, l: 'Siku di puting kontralateral' }, { v: 4, l: 'Siku tak capai puting' }] },
+  { key: 'heelToEar', label: 'Heel to Ear', opts: [{ v: -1, l: 'Tumit capai telinga mudah' }, { v: 0, l: 'Tumit dekat telinga' }, { v: 1, l: 'Jarak sedang' }, { v: 2, l: 'Jarak menjauh' }, { v: 3, l: 'Jarak jauh' }, { v: 4, l: 'Tumit tak capai telinga' }] },
+]
+const PHYSICAL_CRITERIA: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
+  { key: 'skin', label: 'Kulit', opts: [{ v: -1, l: 'Lengket, transparan' }, { v: 0, l: 'Gelatinosa, merah, tembus pandang' }, { v: 1, l: 'Halus, pink, vena terlihat' }, { v: 2, l: 'Deskuamasi superfisial' }, { v: 3, l: 'Retak, area pucat' }, { v: 4, l: 'Retak dalam, tak ada vena' }, { v: 5, l: 'Kasar, keriput' }] },
+  { key: 'lanugo', label: 'Lanugo', opts: [{ v: -1, l: 'Tidak ada' }, { v: 0, l: 'Jarang' }, { v: 1, l: 'Menipis' }, { v: 2, l: 'Area botak' }, { v: 3, l: 'Sebagian besar botak' }] },
+  { key: 'plantar', label: 'Permukaan Plantar', opts: [{ v: -1, l: '<40mm, tanpa garis' }, { v: 0, l: '40-50mm' }, { v: 1, l: 'Garis merah samar' }, { v: 2, l: 'Garis transversal anterior' }, { v: 3, l: 'Garis 2/3 anterior' }, { v: 4, l: 'Garis di seluruh telapak' }] },
+  { key: 'breast', label: 'Payudara', opts: [{ v: -1, l: 'Tak terpalpasi' }, { v: 0, l: 'Nyaris tak terpalpasi' }, { v: 1, l: 'Areola datar, tanpa bud' }, { v: 2, l: 'Areola berbintik, bud 1-2mm' }, { v: 3, l: 'Areola menonjol, bud 3-4mm' }, { v: 4, l: 'Areola penuh, bud 5-10mm' }] },
+  { key: 'eyeEar', label: 'Mata/Telinga', opts: [{ v: -1, l: 'Kelopak menyatu longgar' }, { v: 0, l: 'Kelopak menyatu erat' }, { v: 1, l: 'Kelopak terbuka, pinna datar' }, { v: 2, l: 'Pinna sedikit melengkung' }, { v: 3, l: 'Pinna melengkung, lunak' }, { v: 4, l: 'Kartilago tebal, kaku' }] },
+  { key: 'genitals', label: 'Genitalia', opts: [{ v: -1, l: 'Skrotum datar/labia rata' }, { v: 0, l: 'Skrotum kosong/labia menonjol' }, { v: 1, l: 'Testis turun sebagian' }, { v: 2, l: 'Testis di kanal atas/labia mayor besar' }, { v: 3, l: 'Testis turun, rugae sedang' }, { v: 4, l: 'Testis turun penuh, rugae dalam' }] },
+]
+
+function BallardSoapCalc() {
+  const [neuro, setNeuro] = useState<Record<string, number>>({ posture: 2, squareWindow: 2, armRecoil: 1, poplitealAngle: 2, scarfSign: 1, heelToEar: 1 })
+  const [phys, setPhys] = useState<Record<string, number>>({ skin: 2, lanugo: 1, plantar: 2, breast: 2, eyeEar: 2, genitals: 2 })
+  const [apgar1, setApgar1] = useState(8)
+  const [apgar5, setApgar5] = useState(9)
+  const [birthWeightG, setBirthWeightG] = useState(3000)
+  const [babyName, setBabyName] = useState('')
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+
+  const total = Object.values(neuro).reduce((a, b) => a + b, 0) + Object.values(phys).reduce((a, b) => a + b, 0)
+  const gaWeeks = ballardScoreToGA(total)
+  const lub = lubchencoClass(gaWeeks, birthWeightG)
+
+  const soapNote = `SOAP — Penilaian Neonatus${babyName ? ` (${babyName})` : ''}
+Jenis Kelamin: ${sex === 'M' ? 'Laki-laki' : 'Perempuan'} · Berat Lahir: ${birthWeightG} g
+
+S (Subjective): Bayi baru lahir, dilakukan penilaian maturitas & adaptasi segera pascalahir.
+
+O (Objective):
+- APGAR menit ke-1: ${apgar1}/10, menit ke-5: ${apgar5}/10
+- New Ballard Score total: ${total} → estimasi usia gestasi ${gaWeeks.toFixed(1)} minggu
+- Klasifikasi berat lahir terhadap usia gestasi (Lubchenco): ${lub.l}
+
+A (Assessment):
+- ${gaWeeks < 37 ? 'Prematur' : gaWeeks > 42 ? 'Post-term' : 'Aterm'} (estimasi Ballard ${gaWeeks.toFixed(1)} minggu)
+- ${lub.l}
+- APGAR 5 menit ${apgar5 >= 7 ? 'baik, adaptasi neonatal memadai' : apgar5 >= 4 ? 'perlu observasi ketat' : 'depresi berat, perlu resusitasi lanjutan & rujukan NICU'}
+
+P (Plan):
+- Rawat sesuai usia gestasi & klasifikasi berat lahir (rawat gabung bila stabil; observasi NICU bila prematur/SGA/APGAR rendah)
+- Pemantauan suhu, glukosa darah, dan tanda vital berkala
+- Inisiasi menyusu dini bila kondisi stabil
+- Profilaksis vitamin K1 & salep mata sesuai protokol
+- Skrining rutin (hipotiroid kongenital, dll.) sesuai jadwal`
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, dirangkum otomatis ke SOAP" />
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Nama Bayi (opsional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
+        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
+        <Field label="Berat Lahir (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="APGAR 1' / 5'">
+          <div className="flex gap-1.5">
+            <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(+e.target.value)} />
+            <input className={inputClass} type="number" min={0} max={10} value={apgar5} onChange={(e) => setApgar5(+e.target.value)} />
+          </div>
+        </Field>
+      </div>
+
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Maturitas Neuromuskular</h4>
+      <div className="mt-2 space-y-2.5">
+        {NEURO_CRITERIA.map((c) => (
+          <Field key={c.key} label={c.label}>
+            <SegButtons value={neuro[c.key]} onChange={(v) => setNeuro((s) => ({ ...s, [c.key]: v }))} options={c.opts} />
+          </Field>
+        ))}
+      </div>
+
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Maturitas Fisik</h4>
+      <div className="mt-2 space-y-2.5">
+        {PHYSICAL_CRITERIA.map((c) => (
+          <Field key={c.key} label={c.label}>
+            <SegButtons value={phys[c.key]} onChange={(v) => setPhys((s) => ({ ...s, [c.key]: v }))} options={c.opts} />
+          </Field>
+        ))}
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{total}</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Skor Ballard</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{gaWeeks.toFixed(1)} mgu</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Usia Gestasi</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
+          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">Lubchenco</div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Draf SOAP (otomatis)</h4>
+        <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
+      </div>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        Estimasi usia gestasi & klasifikasi Lubchenco disederhanakan dari titik acuan standar — verifikasi terhadap tabel/chart resmi untuk kasus borderline. Draf SOAP wajib ditinjau & dilengkapi dokter sebelum masuk rekam medis resmi.
+      </p>
+    </Card>
+  )
+}
+
 const TABS = [
   { id: 'apgar', label: 'APGAR' },
   { id: 'gcs', label: 'GCS' },
@@ -329,6 +478,7 @@ const TABS = [
   { id: 'bishop', label: 'Bishop' },
   { id: 'ckdepi', label: 'CKD-EPI' },
   { id: 'whogrowth', label: 'WHO Growth' },
+  { id: 'ballard', label: 'Ballard+SOAP' },
 ] as const
 
 export function ClinicalCalculators() {
@@ -353,6 +503,7 @@ export function ClinicalCalculators() {
       {tab === 'bishop' && <BishopCalc />}
       {tab === 'ckdepi' && <CkdEpiCalc />}
       {tab === 'whogrowth' && <WhoGrowthCalc />}
+      {tab === 'ballard' && <BallardSoapCalc />}
     </div>
   )
 }
