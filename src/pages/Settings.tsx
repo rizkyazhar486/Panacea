@@ -31,7 +31,7 @@ import { LANGS, getLang, setLang, t, type Lang } from '../lib/i18n'
 import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/push'
 import { InstallApp } from '../components/InstallApp'
 import { OfflineReady } from '../components/OfflineReady'
-import { api } from '../lib/api'
+import { api, backendEnabled } from '../lib/api'
 
 export function Settings() {
   const store = useStore()
@@ -313,8 +313,10 @@ const FEEDBACK_EMAIL = 'index.meds@gmail.com'
 const FB_KEY = 'pmd_feedback_history'
 
 function FeedbackCard({ simple: S }: { simple: boolean }) {
-  const [kind, setKind] = useState<'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian'>('Saran')
+  const [kind, setKind] = useState<'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'>('Saran')
   const [text, setText] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [appSent, setAppSent] = useState(false)
   const [sent, setSent] = useState<{ kind: string; text: string; at: string }[]>(() => {
     try { return JSON.parse(localStorage.getItem(FB_KEY) || '[]') } catch { return [] }
   })
@@ -329,6 +331,18 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
   const body = `[${kind}] Panaceamed.id\n\n${text.trim()}`
   const canSend = text.trim().length >= 5
 
+  async function sendToApp() {
+    if (!canSend || !backendEnabled) return
+    setBusy(true)
+    try {
+      await api.submitFeedback(kind, text.trim())
+      record()
+      setAppSent(true)
+      setTimeout(() => setAppSent(false), 3000)
+    } catch { /* best-effort — WhatsApp/Email below still work as fallback */ }
+    finally { setBusy(false) }
+  }
+
   return (
     <Card>
       <SectionTitle
@@ -337,7 +351,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
         subtitle="Kirim masukan langsung ke pengembang — semua dibaca"
       />
       <div className={`flex flex-wrap ${S ? 'gap-2.5' : 'gap-1.5'}`}>
-        {(['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian'] as const).map((k) => (
+        {(['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian', 'Permintaan Fitur'] as const).map((k) => (
           <button key={k} onClick={() => setKind(k)}
             className={`rounded-full font-bold ${S ? 'px-4 py-2 text-sm' : 'px-3 py-1.5 text-[11px]'} ${
               kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
@@ -353,7 +367,17 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
-      <div className="mt-2 flex gap-2">
+      {backendEnabled && (
+        <button
+          onClick={sendToApp}
+          disabled={!canSend || busy}
+          className={`mt-2 w-full rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend && !busy ? 'bg-brand' : 'cursor-not-allowed bg-neutral-300'}`}
+        >
+          {busy ? 'Mengirim…' : appSent ? '✓ Terkirim ke Owner' : '📩 Kirim ke Owner (Aplikasi)'}
+        </button>
+      )}
+      <p className="mt-2 text-[11px] text-neutral-400">Atau kirim lewat kanal lain:</p>
+      <div className="mt-1 flex gap-2">
         <a
           href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
           target="_blank" rel="noreferrer"

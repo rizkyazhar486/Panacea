@@ -146,6 +146,11 @@ export const api = {
   // compliance — audit log (owner-only) & SATUSEHAT integration status
   audit: () => req<{ entries: AuditEntry[] }>('/api/audit').then((r) => r.entries),
   stats: () => req<Stats>('/api/stats'),
+  ownerUsers: () => req<{ users: UserDirectoryRow[] }>('/api/owner/users').then((r) => r.users),
+  submitFeedback: (kind: FeedbackKind, text: string) =>
+    req<{ ok: boolean; entry: FeedbackEntry }>('/api/feedback', { method: 'POST', body: JSON.stringify({ kind, text }) }),
+  listFeedback: () => req<{ feedback: FeedbackEntry[] }>('/api/feedback').then((r) => r.feedback),
+  markFeedbackRead: (id: string) => req<{ ok: boolean }>(`/api/feedback/${id}/read`, { method: 'POST' }),
   satusehatSubmit: (patient: unknown, record: unknown) =>
     req<{ ok: boolean; configured: boolean; summary: { resources: number; conditions: number; observations: number } }>(
       '/api/satusehat/encounter',
@@ -265,6 +270,38 @@ export interface Stats {
   pushSubscribers: number
   signups7d: { day: string; count: number }[]
   revenue7d: { day: string; idr: number }[]
+}
+
+export interface UserDirectoryRow {
+  id: string
+  email: string
+  name: string
+  role: string
+  createdAt: string
+  walletBalance: number
+  ordersCount: number
+  paidOrdersCount: number
+  totalPaidIdr: number
+  subscriptions: {
+    clinicalCalcUnlocked: boolean
+    longevityActive: boolean
+    longevityExpires: string | null
+    chronicActive: boolean
+    chronicLifetime: boolean
+    chronicExpires: string | null
+  }
+}
+
+export type FeedbackKind = 'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'
+export interface FeedbackEntry {
+  id: string
+  userId: string
+  userEmail: string
+  userName: string
+  kind: FeedbackKind
+  text: string
+  at: string
+  read: boolean
 }
 
 export interface DoctorRow {

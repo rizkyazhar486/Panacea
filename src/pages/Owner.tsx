@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useStore, uid, PLATFORM_FEE, TOKEN_TO_IDR, OWNER_EMAIL } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, inputClass, SkeletonRows } from '../components/ui'
 import { IconChartUp, IconToken, IconUsers, IconStore, IconShield, IconPlus, IconLock, IconCheck, IconBell, IconSend, IconSparkle } from '../components/icons'
-import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup, type Application } from '../lib/api'
+import { api, backendEnabled, type AuditEntry, type DoctorRow, type Stats, type ManualTopup, type Application, type UserDirectoryRow, type FeedbackEntry } from '../lib/api'
 
 export function Owner() {
   const { state, account, addAdminEmail, removeAdminEmail } = useStore()
@@ -44,6 +44,10 @@ export function Owner() {
       {backendEnabled && <AIOperatorPanel />}
 
       <RealtimeStats />
+
+      {backendEnabled && isOwner && <UserDirectoryPanel />}
+
+      {backendEnabled && isOwner && <FeedbackInboxPanel />}
 
       {backendEnabled && <ApplicationsPanel />}
 
@@ -318,6 +322,125 @@ function AIOperatorPanel() {
         ⚕️ AI memberi analisa & draf. Keputusan keuangan (persetujuan top-up, verifikasi STR) tetap Anda
         konfirmasi manual untuk keamanan.
       </p>
+    </Card>
+  )
+}
+
+// Owner-only directory: every registered account (email, role, signup date),
+// with real transaction/subscription status pulled from the server (never
+// client-local-only demo data the owner couldn't otherwise see).
+function UserDirectoryPanel() {
+  const [rows, setRows] = useState<UserDirectoryRow[] | null>(null)
+  const [err, setErr] = useState('')
+  const [filter, setFilter] = useState<'semua' | 'transaksi' | 'berlangganan'>('semua')
+  const [q, setQ] = useState('')
+
+  function load() { api.ownerUsers().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  useEffect(load, [])
+
+  const filtered = (rows ?? []).filter((r) => {
+    if (q.trim() && !`${r.email} ${r.name}`.toLowerCase().includes(q.trim().toLowerCase())) return false
+    if (filter === 'transaksi') return r.paidOrdersCount > 0
+    if (filter === 'berlangganan') return r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked
+    return true
+  })
+
+  return (
+    <Card className="border-2 border-brand/30">
+      <SectionTitle
+        icon={<IconUsers size={20} />}
+        title="Direktori Pengguna"
+        subtitle="Semua akun yang mendaftar, bertransaksi, & berlangganan"
+        right={<Badge tone="brand">{rows?.length ?? 0} akun</Badge>}
+      />
+      {err && <p className="mb-2 text-xs text-accent">{err}</p>}
+      {!rows && !err && <SkeletonRows rows={3} />}
+      {rows && (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            <input className={inputClass} placeholder="Cari email/nama…" value={q} onChange={(e) => setQ(e.target.value)} />
+            <div className="flex gap-1.5">
+              {(['semua', 'transaksi', 'berlangganan'] as const).map((f) => (
+                <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filter === f ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
+                  {f === 'semua' ? 'Semua' : f === 'transaksi' ? 'Sudah bertransaksi' : 'Berlangganan aktif'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-3 space-y-2">
+            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-400">Tidak ada akun sesuai filter.</p>}
+            {filtered.map((r) => (
+              <div key={r.id} className="rounded-xl border border-neutral-100 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate font-bold text-ink">{r.name}</div>
+                    <div className="truncate text-xs text-neutral-500">{r.email}</div>
+                  </div>
+                  <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
+                  <span>Daftar {new Date(r.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span>Saldo {r.walletBalance} PNC</span>
+                  <span>{r.paidOrdersCount} transaksi lunas{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('id-ID')})` : ''}</span>
+                </div>
+                {(r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked) && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {r.subscriptions.longevityActive && <Badge tone="brand">Longevity aktif</Badge>}
+                    {r.subscriptions.chronicLifetime && <Badge tone="brand">Kronis Lifetime</Badge>}
+                    {r.subscriptions.chronicActive && !r.subscriptions.chronicLifetime && <Badge tone="brand">Kronis aktif</Badge>}
+                    {r.subscriptions.clinicalCalcUnlocked && <Badge tone="brand">Kalkulator Klinis terbuka</Badge>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </Card>
+  )
+}
+
+// Owner-only inbox for "Pesan & Saran" submitted from Settings — delivered
+// straight to the website, not just WhatsApp/email side-channels.
+function FeedbackInboxPanel() {
+  const [rows, setRows] = useState<FeedbackEntry[] | null>(null)
+  const [err, setErr] = useState('')
+  function load() { api.listFeedback().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  useEffect(load, [])
+  async function markRead(id: string) {
+    setRows((rs) => rs && rs.map((r) => (r.id === id ? { ...r, read: true } : r)))
+    try { await api.markFeedbackRead(id) } catch { /* ignore */ }
+  }
+  const unread = (rows ?? []).filter((r) => !r.read)
+  return (
+    <Card className="border-2 border-brand/30">
+      <SectionTitle
+        icon={<span className="text-xl">💬</span>}
+        title="Pesan & Saran Pengguna"
+        subtitle="Masukan yang dikirim langsung dari aplikasi"
+        right={<Badge tone={unread.length ? 'high' : 'brand'}>{unread.length} belum dibaca</Badge>}
+      />
+      {err && <p className="mb-2 text-xs text-accent">{err}</p>}
+      {!rows && !err && <SkeletonRows rows={2} />}
+      {rows && rows.length === 0 && <p className="text-sm text-neutral-400">Belum ada pesan masuk.</p>}
+      <div className="space-y-2">
+        {(rows ?? []).slice(0, 30).map((r) => (
+          <div key={r.id} className={`rounded-xl border p-3 ${r.read ? 'border-neutral-100' : 'border-amber-200 bg-amber-50'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Badge tone={r.read ? 'neutral' : 'high'}>{r.kind}</Badge>
+                <span className="text-xs font-bold text-ink">{r.userName}</span>
+                <span className="text-[11px] text-neutral-400">{r.userEmail}</span>
+              </div>
+              <span className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <p className="mt-1.5 text-sm text-neutral-700">{r.text}</p>
+            {!r.read && (
+              <button onClick={() => markRead(r.id)} className="mt-2 text-xs font-semibold text-brand-dark hover:underline">Tandai dibaca</button>
+            )}
+          </div>
+        ))}
+      </div>
     </Card>
   )
 }
