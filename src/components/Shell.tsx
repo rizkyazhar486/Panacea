@@ -427,27 +427,31 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
 
         {/* Quick actions — one-tap shortcuts (mobile only) */}
-        <div className="flex gap-2 overflow-x-auto border-b border-black/5 bg-white px-3 py-2.5 lg:hidden">
-          {quick.map((n) => (
-            <NavLink
-              key={n.to}
-              to={n.to}
-              end={n.end}
-              className={({ isActive }) =>
-                `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
-                  isActive ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'
-                }`
-              }
-            >
-              <n.icon size={15} />
-              {n.label}
-            </NavLink>
-          ))}
-          {(account.role === 'pasien' || account.role === 'dokter') && (
-            <NavLink to="/hospitals" className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent">
-              <IconHospital size={15} /> SOS
-            </NavLink>
-          )}
+        <div className="relative border-b border-black/5 bg-white lg:hidden">
+          <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
+            {quick.map((n) => (
+              <NavLink
+                key={n.to}
+                to={n.to}
+                end={n.end}
+                className={({ isActive }) =>
+                  `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                    isActive ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'
+                  }`
+                }
+              >
+                <n.icon size={15} />
+                {n.label}
+              </NavLink>
+            ))}
+            {(account.role === 'pasien' || account.role === 'dokter') && (
+              <NavLink to="/hospitals" className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent">
+                <IconHospital size={15} /> SOS
+              </NavLink>
+            )}
+          </div>
+          {/* Fade hint that the strip scrolls further right */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent" />
         </div>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
@@ -517,6 +521,7 @@ export function Shell({ children }: { children: ReactNode }) {
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
         <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] lg:hidden" aria-label="Navigasi utama">
           <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
+            <div className="pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full bg-gradient-to-l from-white/70 to-transparent" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
               {[
                 { to: '/', label: 'Beranda', icon: IconHome, end: true },
