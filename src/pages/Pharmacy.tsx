@@ -3,6 +3,7 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
 import { IconPill, IconUpload, IconCheck, IconShield, IconSearch, IconPlus } from '../components/icons'
 import { Carousel, ButtonGroup } from '../components/Carousel'
+import { Portal } from '../components/Portal'
 import type { PharmacyProduct, PharmacyCategory } from '../lib/types'
 
 type Cat = PharmacyCategory
@@ -204,6 +205,7 @@ function AddProductForm({ onAdd }: { onAdd: (p: Product) => void }) {
 function RxModal({ onClose, onUpload }: { onClose: () => void; onUpload: (name: string) => void }) {
   const [name, setName] = useState('')
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 text-brand-dark"><IconUpload size={20} /><h3 className="text-lg font-bold">Scan / Unggah Resep Dokter</h3></div>
@@ -219,5 +221,6 @@ function RxModal({ onClose, onUpload }: { onClose: () => void; onUpload: (name: 
         </div>
       </div>
     </div>
+    </Portal>
   )
 }
