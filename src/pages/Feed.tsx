@@ -16,6 +16,7 @@ import { ExamQuiz } from '../components/ExamQuiz'
 import { uploadOrLocal } from '../lib/upload'
 import { ActivityShareCard } from '../components/ActivityShareCard'
 import { WeatherWidget } from '../components/WeatherWidget'
+import { getDemo } from '../lib/profile'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
@@ -372,14 +373,14 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
   const tRef = useRef<number | null>(null)
   const sRef = useRef(0)
 
-  // Load body data safely from localStorage
-  const bodyData = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('pm_body_v2') || '{}') } catch { return {} }
-  }, [])
-  const weight = bodyData.w || 65
-  const height = bodyData.h || 165
-  const age = bodyData.age || 30
-  const gender = bodyData.g || 'M'
+  // Demographics come from the shared profile bridge (single source of truth,
+  // fed by Data Kesehatan) instead of a private local silo — so a real weight/
+  // height/age entered there feeds every calculator, including this one.
+  const demo = useMemo(() => getDemo(), [])
+  const weight = demo.weightKg
+  const height = demo.heightCm
+  const age = demo.age
+  const gender = demo.sex
   const hrMax = gender === 'M' ? 220 - age : 226 - age
 
   const dist = totalDist(pts)

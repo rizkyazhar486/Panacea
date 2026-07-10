@@ -5,6 +5,7 @@ import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../compone
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
+import { getDemo, setDemo } from '../lib/profile'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -30,11 +31,23 @@ interface Rec { e: string; t: string; d: string; pr: number; c: string }
 interface ChronicProtocol { id: string; name: string; emoji: string; color: string; calAdj: number; protAdj: number; naMax: number; kMax: number; fluidMax: number; fluidMin: number; specialFoods: string[]; avoidFoods: string[]; notes: string[]; labKeys: string[]; labLabels: Record<string, string>; labUnits: Record<string, string>; labRanges: Record<string, [number, number]>; exerRestrictions: string[] }
 interface LabEntry { date: string; values: Record<string, number> }
 
+// Weight/height/age/gender come from the shared Demo profile (single source
+// of truth, fed by Data Kesehatan) instead of a private local silo — this key
+// now only holds Nutrition-specific settings (activity level, diet goal) that
+// Data Kesehatan has no concept of.
 const BK = 'pm_body_v2'
 const LAB_K = 'pm_lab_weekly'
 const defBody: Body = { w: 65, h: 165, age: 30, g: 'M', act: 1, goal: 'maintain' }
-const loadBody = (): Body => { try { const d = JSON.parse(localStorage.getItem(BK) || ''); return d.w ? d : defBody } catch { return defBody } }
-const saveB = (b: Body) => localStorage.setItem(BK, JSON.stringify(b))
+const loadBody = (): Body => {
+  const demo = getDemo()
+  let local: { act?: number; goal?: Body['goal'] } = {}
+  try { local = JSON.parse(localStorage.getItem(BK) || '{}') } catch { /* ignore */ }
+  return { w: demo.weightKg || defBody.w, h: demo.heightCm || defBody.h, age: demo.age || defBody.age, g: demo.sex || defBody.g, act: local.act ?? defBody.act, goal: local.goal ?? defBody.goal }
+}
+const saveB = (b: Body) => {
+  localStorage.setItem(BK, JSON.stringify({ act: b.act, goal: b.goal }))
+  setDemo({ weightKg: b.w, heightCm: b.h, age: b.age, sex: b.g })
+}
 let _br = 0
 const emitB = () => { _br++; window.dispatchEvent(new Event('bc')) }
 const useBR = () => { const [, s] = useState(0); useEffect(() => { const h = () => s(v => v + 1); window.addEventListener('bc', h); return () => window.removeEventListener('bc', h) }, []); return _br }
