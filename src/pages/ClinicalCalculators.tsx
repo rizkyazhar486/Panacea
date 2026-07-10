@@ -712,6 +712,7 @@ const TABS = [
   { id: 'atls', label: 'ATLS Primary Survey' },
   { id: 'abg', label: 'Analisis Gas Darah' },
   { id: 'burn', label: 'Kalkulator Luka Bakar' },
+  { id: 'cranial', label: 'Saraf Kranial + Meningeal' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1612,6 +1613,95 @@ function BurnCalc() {
   )
 }
 
+/* ══════════════════ CRANIAL NERVE + MENINGEAL EXAM AUTOFORMAT ══════════════════ */
+// Last of the "bigger build" items: a structured 12-cranial-nerve + meningeal
+// sign exam that auto-formats into a ready-to-paste neuro exam note — each
+// nerve carries an icon glyph as a lightweight visual cue (this is a coded
+// checklist, not an illustrated anatomy atlas) and a curated set of common
+// normal/abnormal findings rather than free text, for speed and consistency.
+interface CnOption { v: string; l: string }
+const CRANIAL_NERVES: { key: string; numeral: string; name: string; icon: string; opts: CnOption[] }[] = [
+  { key: 'cn1', numeral: 'I', name: 'Olfaktorius', icon: '👃', opts: [{ v: 'normal', l: 'Normosmia' }, { v: 'abn', l: 'Anosmia/hiposmia' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn2', numeral: 'II', name: 'Optikus', icon: '👁️', opts: [{ v: 'normal', l: 'Visus & lapang pandang normal' }, { v: 'abn', l: 'Penurunan visus/defek lapang pandang' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn34_6', numeral: 'III/IV/VI', name: 'Okulomotor, Troklear, Abdusen', icon: '👀', opts: [{ v: 'normal', l: 'Gerak bola mata penuh, pupil isokor reaktif' }, { v: 'abn', l: 'Ptosis/diplopia/paresis gerak mata/pupil anisokor' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn5', numeral: 'V', name: 'Trigeminus', icon: '😐', opts: [{ v: 'normal', l: 'Sensasi wajah & refleks kornea normal, otot mengunyah kuat' }, { v: 'abn', l: 'Baal wajah/refleks kornea menurun/kelemahan mengunyah' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn7', numeral: 'VII', name: 'Fasialis', icon: '😊', opts: [{ v: 'normal', l: 'Simetris, dapat mengerutkan dahi & menutup mata kuat' }, { v: 'abnCentral', l: 'Paresis sentral (dahi terhindar)' }, { v: 'abnPeripheral', l: 'Paresis perifer (dahi ikut terkena)' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn8', numeral: 'VIII', name: 'Vestibulokoklearis', icon: '👂', opts: [{ v: 'normal', l: 'Pendengaran normal, tanpa vertigo/nistagmus' }, { v: 'abn', l: 'Penurunan pendengaran/vertigo/nistagmus' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn9_10', numeral: 'IX/X', name: 'Glosofaringeus, Vagus', icon: '👄', opts: [{ v: 'normal', l: 'Refleks muntah baik, palatum simetris terangkat, suara jernih' }, { v: 'abn', l: 'Disfagia/suara serak/deviasi palatum/refleks muntah menurun' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn11', numeral: 'XI', name: 'Aksesorius', icon: '💪', opts: [{ v: 'normal', l: 'Kekuatan m. trapezius & sternokleidomastoid normal' }, { v: 'abn', l: 'Kelemahan angkat bahu/menoleh melawan tahanan' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn12', numeral: 'XII', name: 'Hipoglosus', icon: '👅', opts: [{ v: 'normal', l: 'Lidah simetris di garis tengah, tanpa atrofi/fasikulasi' }, { v: 'abn', l: 'Deviasi lidah/atrofi/fasikulasi' }, { v: 'na', l: 'Tak dinilai' }] },
+]
+const MENINGEAL_SIGNS: { key: string; label: string }[] = [
+  { key: 'nuchal', label: 'Kaku kuduk (nuchal rigidity)' },
+  { key: 'kernig', label: 'Kernig sign' },
+  { key: 'brudzinski', label: 'Brudzinski sign' },
+]
+
+function CranialNerveCalc() {
+  const [cn, setCn] = useState<Record<string, string>>(Object.fromEntries(CRANIAL_NERVES.map((n) => [n.key, 'normal'])))
+  const [meningeal, setMeningeal] = useState<Record<string, boolean>>({})
+
+  const meningealPositive = MENINGEAL_SIGNS.filter((m) => meningeal[m.key])
+  const anyCnAbnormal = CRANIAL_NERVES.some((n) => cn[n.key]?.startsWith('abn'))
+
+  const noteLines = CRANIAL_NERVES.map((n) => {
+    const opt = n.opts.find((o) => o.v === cn[n.key])
+    return `- N. ${n.numeral} (${n.name}): ${opt?.l ?? '—'}`
+  })
+  const meningealLine = MENINGEAL_SIGNS.map((m) => `${m.label}: ${meningeal[m.key] ? 'Positif' : 'Negatif'}`).join(' · ')
+
+  const formattedNote = `PEMERIKSAAN SARAF KRANIAL & TANDA MENINGEAL
+${noteLines.join('\n')}
+
+Tanda Rangsang Meningeal: ${meningealLine}
+${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangkan meningitis/perdarahan subarakhnoid, evaluasi lanjut (pungsi lumbal bila tak ada kontraindikasi, pencitraan bila indikasi).' : ''}`
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Saraf Kranial + Tanda Meningeal" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, dirangkum otomatis ke format catatan" />
+
+      <div className="space-y-2.5">
+        {CRANIAL_NERVES.map((n) => (
+          <div key={n.key} className="rounded-xl border border-neutral-100 p-3">
+            <div className="mb-1.5 flex items-center gap-2">
+              <span className="text-lg">{n.icon}</span>
+              <span className="text-[12px] font-black text-ink">N. {n.numeral}</span>
+              <span className="text-[11px] text-neutral-400">{n.name}</span>
+            </div>
+            <SegButtons value={cn[n.key]} onChange={(v) => setCn((s) => ({ ...s, [n.key]: v }))} options={n.opts} />
+          </div>
+        ))}
+      </div>
+
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Tanda Rangsang Meningeal</h4>
+      <div className="mt-2 space-y-2">
+        {MENINGEAL_SIGNS.map((m) => (
+          <label key={m.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+            <input type="checkbox" checked={!!meningeal[m.key]} onChange={(e) => setMeningeal((s) => ({ ...s, [m.key]: e.target.checked }))} className="h-5 w-5 accent-red-500" />
+            <div className="text-sm font-bold text-ink">{m.label}</div>
+          </label>
+        ))}
+      </div>
+
+      {(meningealPositive.length > 0 || anyCnAbnormal) && (
+        <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
+          <p className="text-xs font-black text-amber-800">⚠️ Temuan abnormal terdeteksi</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
+            {meningealPositive.length > 0 && 'Tanda meningeal positif — pertimbangkan meningitis/perdarahan subarakhnoid. '}
+            {anyCnAbnormal && 'Ada defisit saraf kranial — korelasikan dengan lokalisasi lesi (batang otak, basis kranii, atau perifer) dan pertimbangkan pencitraan.'}
+          </p>
+        </div>
+      )}
+
+      <div className="mt-4">
+        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Catatan Otomatis</h4>
+        <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
+      </div>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Draf catatan otomatis wajib ditinjau & dilengkapi dokter sebelum masuk rekam medis resmi. Paresis fasialis sentral vs perifer dibedakan dari keterlibatan dahi (dahi terhindar = sentral, karena persarafan dahi bilateral dari korteks; dahi ikut lumpuh = perifer/Bell's palsy).</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1660,6 +1750,7 @@ export function ClinicalCalculators() {
       {tab === 'atls' && <AtlsCalc />}
       {tab === 'abg' && <AbgCalc />}
       {tab === 'burn' && <BurnCalc />}
+      {tab === 'cranial' && <CranialNerveCalc />}
     </div>
   )
 }
