@@ -713,6 +713,7 @@ const TABS = [
   { id: 'abg', label: 'Analisis Gas Darah' },
   { id: 'burn', label: 'Kalkulator Luka Bakar' },
   { id: 'cranial', label: 'Saraf Kranial + Meningeal' },
+  { id: 'competencies', label: 'Tracker Kompetensi' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1702,6 +1703,121 @@ ${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangk
   )
 }
 
+/* ══════════════════ COMPETENCY TRACKER (SKDI) ══════════════════ */
+// Sixth and last of the "bigger build" items. Indonesian medical education
+// is set NATIONALLY under SKDI (Standar Kompetensi Dokter Indonesia, KKI/
+// AIPKI) — individual universities (UI, Unair, UGM, UNS, Unpad, Unhas, etc.)
+// implement the same core national competency areas rather than each having
+// a wholly distinct competency list, so this tracks against the real SKDI
+// 7-area framework with a university/specialty tag for personalization,
+// rather than fabricating school-specific curriculum content that can't be
+// verified.
+const UNIVERSITIES = ['UI', 'Unair', 'UGM', 'UNS', 'Unpad', 'Unhas'] as const
+const SPECIALTIES = ['Kedokteran Umum', 'Penyakit Dalam', 'Bedah', 'Anak', 'Obstetri & Ginekologi', 'Saraf', 'Jantung', 'Anestesi', 'Radiologi', 'Patologi Klinik'] as const
+
+interface SkdiArea { key: string; area: string; title: string; items: string[] }
+const SKDI_AREAS: SkdiArea[] = [
+  { key: 'area1', area: 'Area 1', title: 'Profesionalitas yang Luhur', items: [
+    'Menunjukkan perilaku profesional & etika kedokteran', 'Bermoral & beretika dalam praktik', 'Sadar & taat hukum kedokteran',
+  ] },
+  { key: 'area2', area: 'Area 2', title: 'Mawas Diri & Pengembangan Diri', items: [
+    'Menerapkan mawas diri (refleksi praktik)', 'Mempraktikkan belajar sepanjang hayat', 'Mengembangkan pengetahuan baru',
+  ] },
+  { key: 'area3', area: 'Area 3', title: 'Komunikasi Efektif', items: [
+    'Berkomunikasi dengan pasien & keluarga', 'Berkomunikasi dengan sejawat & profesi lain', 'Berkomunikasi dengan masyarakat',
+  ] },
+  { key: 'area4', area: 'Area 4', title: 'Pengelolaan Informasi', items: [
+    'Mengakses & menilai informasi/data kesehatan secara kritis', 'Memanfaatkan teknologi informasi kesehatan', 'Menyampaikan informasi ilmiah',
+  ] },
+  { key: 'area5', area: 'Area 5', title: 'Landasan Ilmiah Ilmu Kedokteran', items: [
+    'Menerapkan ilmu biomedik', 'Menerapkan ilmu klinik', 'Menerapkan prinsip evidence-based medicine',
+  ] },
+  { key: 'area6', area: 'Area 6', title: 'Keterampilan Klinis', items: [
+    'Anamnesis & pemeriksaan fisik lengkap', 'Melakukan prosedur klinis & kegawatdaruratan', 'Interpretasi pemeriksaan penunjang', 'Menyusun & melaksanakan rencana tatalaksana',
+  ] },
+  { key: 'area7', area: 'Area 7', title: 'Pengelolaan Masalah Kesehatan', items: [
+    'Mengelola masalah kesehatan individu & keluarga', 'Mengelola masalah kesehatan masyarakat/komunitas', 'Menerapkan prinsip keselamatan pasien',
+  ] },
+]
+
+type CompStatus = 'belum' | 'proses' | 'tercapai'
+const COMP_KEY = 'pmd_competency_tracker_v1'
+
+function loadCompProgress(): Record<string, CompStatus> {
+  try { return JSON.parse(localStorage.getItem(COMP_KEY) || '{}') } catch { return {} }
+}
+
+function CompetencyTracker() {
+  const [university, setUniversity] = useState<(typeof UNIVERSITIES)[number]>('UI')
+  const [specialty, setSpecialty] = useState<(typeof SPECIALTIES)[number]>('Kedokteran Umum')
+  const [progress, setProgress] = useState<Record<string, CompStatus>>(loadCompProgress)
+
+  function setStatus(itemKey: string, v: CompStatus) {
+    setProgress((s) => {
+      const next = { ...s, [itemKey]: v }
+      try { localStorage.setItem(COMP_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }
+
+  const allItems = SKDI_AREAS.flatMap((a) => a.items.map((_, i) => `${university}-${specialty}-${a.key}-${i}`))
+  const tercapaiCount = allItems.filter((k) => progress[k] === 'tercapai').length
+  const overallPct = Math.round((tercapaiCount / allItems.length) * 100)
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Tracker Kompetensi (SKDI)" subtitle="7 Area Kompetensi Dokter Indonesia (KKI/AIPKI) — standar nasional, berlaku di seluruh institusi pendidikan kedokteran" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Institusi">
+          <select className={inputClass} value={university} onChange={(e) => setUniversity(e.target.value as (typeof UNIVERSITIES)[number])}>
+            {UNIVERSITIES.map((u) => <option key={u} value={u}>{u}</option>)}
+          </select>
+        </Field>
+        <Field label="Program/Spesialisasi">
+          <select className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value as (typeof SPECIALTIES)[number])}>
+            {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </Field>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{overallPct}%</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Progres Keseluruhan — {tercapaiCount}/{allItems.length} kompetensi tercapai</div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-200">
+          <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${overallPct}%` }} />
+        </div>
+      </div>
+
+      {SKDI_AREAS.map((area) => {
+        const keys = area.items.map((_, i) => `${university}-${specialty}-${area.key}-${i}`)
+        const done = keys.filter((k) => progress[k] === 'tercapai').length
+        return (
+          <div key={area.key} className="mt-4">
+            <h4 className="flex items-center justify-between text-xs font-black uppercase tracking-wide text-neutral-500">
+              <span>{area.area} — {area.title}</span>
+              <span className="text-neutral-400">{done}/{area.items.length}</span>
+            </h4>
+            <div className="mt-2 space-y-1.5">
+              {area.items.map((item, i) => {
+                const key = `${university}-${specialty}-${area.key}-${i}`
+                const v = progress[key] ?? 'belum'
+                return (
+                  <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
+                    <div className="min-w-0 flex-1 text-[12px] font-semibold text-ink">{item}</div>
+                    <SegButtons value={v} onChange={(nv) => setStatus(key, nv)} options={[{ v: 'belum', l: 'Belum' }, { v: 'proses', l: 'Proses' }, { v: 'tercapai', l: 'Tercapai' }]} />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })}
+
+      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">Kerangka 7 Area Kompetensi mengikuti SKDI (Standar Kompetensi Dokter Indonesia, ditetapkan KKI berbasis AIPKI) — berlaku sebagai standar nasional yang diimplementasikan seluruh institusi pendidikan kedokteran, bukan daftar unik per kampus. Sub-kompetensi di atas adalah ringkasan representatif; rujuk dokumen SKDI resmi & buku log institusi untuk daftar lengkap & terverifikasi. Progres tersimpan di perangkat ini.</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1751,6 +1867,7 @@ export function ClinicalCalculators() {
       {tab === 'abg' && <AbgCalc />}
       {tab === 'burn' && <BurnCalc />}
       {tab === 'cranial' && <CranialNerveCalc />}
+      {tab === 'competencies' && <CompetencyTracker />}
     </div>
   )
 }
