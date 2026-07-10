@@ -710,6 +710,7 @@ const TABS = [
   { id: 'vbac', label: 'VBAC Flamm-Geiger' },
   { id: 'denver', label: 'Denver II (Simplified)' },
   { id: 'atls', label: 'ATLS Primary Survey' },
+  { id: 'abg', label: 'Analisis Gas Darah' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1405,6 +1406,101 @@ function AtlsCalc() {
   )
 }
 
+/* ══════════════════ BLOOD GAS DECISION TREE (ANALISIS GAS DARAH) ══════════════════ */
+// Systematic ABG interpretation: primary disorder -> compensation adequacy
+// (Winter's formula & expected-compensation rules) -> anion gap -> delta
+// ratio for mixed disorders — the standard stepwise approach taught for
+// blood gas interpretation, not a simplification of a single named score.
+function AbgCalc() {
+  const [ph, setPh] = useState(7.32)
+  const [paco2, setPaco2] = useState(30)
+  const [hco3, setHco3] = useState(15)
+  const [na, setNa] = useState(140)
+  const [cl, setCl] = useState(104)
+  const [albumin, setAlbumin] = useState(4.0)
+
+  const acidemia = ph < 7.35
+  const alkalemia = ph > 7.45
+  const phNormal = !acidemia && !alkalemia
+
+  let primary = 'Tidak dapat ditentukan'
+  if (acidemia) primary = hco3 < 22 ? 'Asidosis Metabolik' : paco2 > 45 ? 'Asidosis Respiratorik' : 'Asidemia campuran/tak jelas'
+  else if (alkalemia) primary = hco3 > 26 ? 'Alkalosis Metabolik' : paco2 < 35 ? 'Alkalosis Respiratorik' : 'Alkalemia campuran/tak jelas'
+  else primary = (paco2 > 45 || paco2 < 35 || hco3 > 26 || hco3 < 22) ? 'pH normal namun PaCO2/HCO3 abnormal — kemungkinan gangguan campuran (kompensasi penuh)' : 'Normal'
+
+  // Winter's formula for expected PaCO2 in metabolic acidosis
+  const winterExpected = 1.5 * hco3 + 8
+  const winterLo = winterExpected - 2
+  const winterHi = winterExpected + 2
+
+  let compensationNote = ''
+  if (primary === 'Asidosis Metabolik') {
+    if (paco2 < winterLo) compensationNote = `PaCO2 (${paco2}) lebih rendah dari perkiraan Winter (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — curigai alkalosis respiratorik konkomitan.`
+    else if (paco2 > winterHi) compensationNote = `PaCO2 (${paco2}) lebih tinggi dari perkiraan Winter (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — curigai asidosis respiratorik konkomitan.`
+    else compensationNote = `Kompensasi respiratorik sesuai (perkiraan Winter ${winterLo.toFixed(1)}-${winterHi.toFixed(1)}).`
+  }
+
+  const anionGap = na - (cl + hco3)
+  const correctedAG = anionGap + 2.5 * (4 - albumin) // correct for hypoalbuminemia
+  const agHigh = correctedAG > 12
+
+  let deltaRatioNote = ''
+  if (primary === 'Asidosis Metabolik' && agHigh) {
+    const deltaRatio = (correctedAG - 12) / (24 - hco3)
+    deltaRatioNote = deltaRatio < 0.4
+      ? `Delta rasio ${deltaRatio.toFixed(2)} (<0.4) — curigai asidosis non-gap konkomitan (hiperkloremik).`
+      : deltaRatio <= 2
+      ? `Delta rasio ${deltaRatio.toFixed(2)} (0.4-2) — konsisten asidosis gap tinggi murni.`
+      : `Delta rasio ${deltaRatio.toFixed(2)} (>2) — curigai alkalosis metabolik atau asidosis respiratorik kronis konkomitan.`
+  }
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Analisis Gas Darah (ABG)" subtitle="Pendekatan sistematis: gangguan primer → kompensasi → anion gap → delta rasio" />
+      <div className="grid grid-cols-3 gap-2">
+        <Field label="pH"><input className={inputClass} type="number" step="0.01" value={ph} onChange={(e) => setPh(+e.target.value)} /></Field>
+        <Field label="PaCO2 (mmHg)"><input className={inputClass} type="number" value={paco2} onChange={(e) => setPaco2(+e.target.value)} /></Field>
+        <Field label="HCO3 (mEq/L)"><input className={inputClass} type="number" value={hco3} onChange={(e) => setHco3(+e.target.value)} /></Field>
+        <Field label="Na (mEq/L)"><input className={inputClass} type="number" value={na} onChange={(e) => setNa(+e.target.value)} /></Field>
+        <Field label="Cl (mEq/L)"><input className={inputClass} type="number" value={cl} onChange={(e) => setCl(+e.target.value)} /></Field>
+        <Field label="Albumin (g/dL)"><input className={inputClass} type="number" step="0.1" value={albumin} onChange={(e) => setAlbumin(+e.target.value)} /></Field>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 1 — Status pH</div>
+        <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Asidemia' : alkalemia ? 'Alkalemia' : 'pH Normal'}</Badge>
+      </div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-3">
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 2 — Gangguan Primer</div>
+        <div className="mt-1 text-sm font-black text-ink">{primary}</div>
+      </div>
+      {compensationNote && (
+        <div className="mt-2 rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 3 — Kecukupan Kompensasi (Formula Winter)</div>
+          <p className="mt-1 text-[12px] font-semibold text-ink">{compensationNote}</p>
+        </div>
+      )}
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Anion Gap (terkoreksi albumin)</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'Gap Tinggi' : 'Gap Normal'}</Badge>
+          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">Klasifikasi AG</div>
+        </div>
+      </div>
+      {deltaRatioNote && (
+        <div className="mt-2 rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 4 — Delta Rasio (deteksi gangguan campuran)</div>
+          <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
+        </div>
+      )}
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">AG tinggi (MUDPILES: metanol, uremia, DKA, propilen glikol/paraldehid, isoniazid/iron, laktat, etilen glikol, salisilat). AG normal/hiperkloremik: diare, RTA, asetazolamid, dilusi salin. Anion gap terkoreksi = AG + 2.5×(4 − albumin g/dL). Alat bantu interpretasi — selalu integrasikan dengan konteks klinis penuh.</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1451,6 +1547,7 @@ export function ClinicalCalculators() {
       {tab === 'vbac' && <VbacCalc />}
       {tab === 'denver' && <DenverCalc />}
       {tab === 'atls' && <AtlsCalc />}
+      {tab === 'abg' && <AbgCalc />}
     </div>
   )
 }
