@@ -215,8 +215,15 @@ function calcBMR(w: number, h: number, age: number, g: 'M' | 'F') {
 function calcVO2MaxEst(hrRest: number, age: number, g: 'M' | 'F') {
   return g === 'M' ? 15.3 * (220 - age) / hrRest : 15.3 * (226 - age) / hrRest
 }
-function calcVO2MaxRockport(distKm: number, timeMin: number, hr: number, age: number, g: 'M' | 'F') {
-  const vo2 = 132.853 - (0.0769 * (g === 'M' ? 1 : 0)) - (0.3877 * age) - (0.1692 * (hr)) + (6.315 * (g === 'M' ? 1 : 0)) - (3.2649 * timeMin) + (0.1565 * (distKm * 1000))
+// Standard Rockport 1-mile walk test formula (Kline et al. 1987):
+//   VO2max = 132.853 − 0.0769·Weight[lb] − 0.3877·Age + 6.315·Sex[1=M,0=F] − 3.2649·Time[min] − 0.1565·HR[bpm]
+// The protocol assumes exactly one mile; GPS activities rarely are, so time is
+// normalized to a per-mile-equivalent pace before being plugged into the formula.
+function calcVO2MaxRockport(distKm: number, timeMin: number, hr: number, age: number, g: 'M' | 'F', weightKg: number) {
+  if (distKm <= 0) return 0
+  const weightLb = weightKg * 2.20462
+  const timePerMile = timeMin * (1.60934 / distKm)
+  const vo2 = 132.853 - (0.0769 * weightLb) - (0.3877 * age) + (6.315 * (g === 'M' ? 1 : 0)) - (3.2649 * timePerMile) - (0.1565 * hr)
   return Math.max(10, vo2)
 }
 function hiitIndicator(met: number, hrMax: number, hrRest: number, currentHr: number) {
@@ -380,7 +387,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
   const acceleration = calcAcceleration(pts)
   const kcal = Math.round(sport.met * weight * (dur / 3600))
   const hiit = hiitIndicator(sport.met, hrMax, hr || 60, hr)
-  const vo2Est = hr > 0 ? calcVO2MaxRockport(dist / 1000, dur / 60, hr, age, gender as 'M' | 'F') : 0
+  const vo2Est = hr > 0 ? calcVO2MaxRockport(dist / 1000, dur / 60, hr, age, gender as 'M' | 'F', weight) : 0
   const elevGainM = elevGain(pts)
   const terrain = terrainLabel(elevGainM, dist / 1000)
   const planDist = totalDist(plan)
