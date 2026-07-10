@@ -8,12 +8,14 @@ import { Card, Field, inputClass } from '../components/ui'
 import {
   IconHome, IconUsers, IconSearch, IconUser, IconPlus, IconRun, IconDrop, IconFlame, IconLeaf,
   IconArticle, IconComment, IconMoon, IconVideo, IconHeart, IconRepost, IconBookmark, IconLock,
-  IconShare2, IconSend, IconX, IconMapPin, IconNavigation, IconTimer, IconGauge, IconActivity,
+  IconShare2, IconSend, IconX, IconMapPin, IconNavigation, IconTimer, IconGauge, IconActivity, IconDownload,
 } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 import { HealthQuiz } from '../components/HealthQuiz'
 import { ExamQuiz } from '../components/ExamQuiz'
 import { uploadOrLocal } from '../lib/upload'
+import { ActivityShareCard } from '../components/ActivityShareCard'
+import { WeatherWidget } from '../components/WeatherWidget'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
@@ -349,8 +351,9 @@ interface SharedGpsData {
   elevGainM: number; terrain: string
 }
 
-function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData) => void }) {
+function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: SharedGpsData) => void; authorName: string }) {
   const [mode, setMode] = useState<TrackMode>('idle')
+  const [shareImageOpen, setShareImageOpen] = useState(false)
   const [sport, setSport] = useState<GpsSportMode>(GPS_SPORTS[0])
   const [pts, setPts] = useState<GpsPoint[]>([])
   const [plan, setPlan] = useState<Waypoint[]>([])
@@ -427,6 +430,7 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
   }
 
   return (
+    <>
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
@@ -437,6 +441,11 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
           {mode === 'done' && (
             <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
               <IconShare2 size={13} /> Share
+            </button>
+          )}
+          {mode === 'done' && (
+            <button onClick={() => setShareImageOpen(true)} aria-label="Bagikan sebagai gambar ke sosmed" className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all active:scale-95 hover:bg-neutral-50">
+              <IconDownload size={13} /> Gambar
             </button>
           )}
           <button onClick={() => setOpen(false)} aria-label="Tutup GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100">
@@ -612,6 +621,14 @@ function GpsTrackerCard({ onShareToFeed }: { onShareToFeed: (data: SharedGpsData
         </div>
       </div>
     </Card>
+
+    {shareImageOpen && (
+      <ActivityShareCard
+        data={{ points: pts, distKm: dist / 1000, durSec: dur, sportEmoji: sport.emoji, sportName: sport.name, authorName }}
+        onClose={() => setShareImageOpen(false)}
+      />
+    )}
+    </>
   )
 }
 
@@ -2124,6 +2141,11 @@ export default function SportsSocialFeed() {
 
   return (
     <div className="max-w-xl mx-auto p-4 space-y-6">
+      {/* Cuaca berbasis GPS — ikon saja, ketuk untuk lihat minggu/bulan ini */}
+      <div className="flex justify-end">
+        <WeatherWidget />
+      </div>
+
       {/* Stories (Instagram-style, 24h) */}
       <StoriesBar
         stories={state.stories}
@@ -2133,7 +2155,7 @@ export default function SportsSocialFeed() {
       />
 
       {/* Widget Atas: GPS Tracking Engine (collapsed → logo only) */}
-      <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} />
+      <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} authorName={currentUser.name} />
 
       {/* Komponen Modal Pembuat Postingan */}
       {isComposeOpen && (
