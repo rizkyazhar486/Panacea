@@ -7,6 +7,7 @@ import { LogoMark } from '../components/Logo'
 import { sendChat, draftEMR, aiAvailable, type PatientContext } from '../lib/ai'
 import { api, backendEnabled } from '../lib/api'
 import { compressImage, readAsDataUrl } from '../lib/upload'
+import { Portal } from '../components/Portal'
 import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
@@ -481,6 +482,7 @@ export function Chatbot() {
       </Card>
 
       {showHistory && (
+        <Portal>
         <div className="fixed inset-0 z-50 flex">
           <div className="w-80 max-w-[85vw] flex flex-col border-r border-neutral-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
@@ -508,6 +510,7 @@ export function Chatbot() {
           </div>
           <div className="flex-1 bg-black/25 backdrop-blur-[2px]" onClick={() => setShowHistory(false)} />
         </div>
+        </Portal>
       )}
     </div>
   )

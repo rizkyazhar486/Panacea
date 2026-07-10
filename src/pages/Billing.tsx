@@ -3,6 +3,7 @@ import { useStore, TOKEN_TO_IDR } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
 import { IconWallet, IconToken, IconCheck, IconShield, IconUpload } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { Portal } from '../components/Portal'
 import type { SubscriptionPlan, TxType } from '../lib/types'
 
 const txMeta: Record<TxType, { label: string; tone: 'brand' | 'critical' | 'neutral' | 'high' }> = {
@@ -267,6 +268,7 @@ function EmrPurchaseModal({
   }
 
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 text-brand-dark">
@@ -324,6 +326,7 @@ function EmrPurchaseModal({
         </div>
       </div>
     </div>
+    </Portal>
   )
 }
 
@@ -520,9 +523,11 @@ function ProofVerification() {
         </div>
       )}
       {view && (
+        <Portal>
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-6" onClick={() => setView('')}>
           <img src={view} alt="bukti transfer" className="max-h-[80vh] max-w-full rounded-xl" />
         </div>
+        </Portal>
       )}
     </Card>
   )

@@ -4,6 +4,7 @@ import { HealthSnapshot } from '../components/HealthSnapshot'
 import { PostCard } from './Feed'
 import { compressImage, readAsDataUrl } from '../lib/upload'
 import { IconX } from '../components/icons'
+import { Portal } from '../components/Portal'
 import type { ProfileEdit } from '../lib/types'
 
 type Tab = 'posts' | 'locked' | 'reposts' | 'saved' | 'liked' | 'archive'
@@ -104,8 +105,10 @@ export function Profile() {
         ✎ Edit Profil
       </button>
 
-      {/* Edit modal */}
+      {/* Edit modal — portaled to <body> so it can't get trapped behind the
+          mobile bottom nav's stacking context (see components/Portal.tsx) */}
       {editing && (
+        <Portal>
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setEditing(false) }}>
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
@@ -156,6 +159,7 @@ export function Profile() {
             <button onClick={saveProfile} className="mt-5 w-full rounded-2xl py-3 text-base font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Simpan Profil</button>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* Tabs (icon-first) */}

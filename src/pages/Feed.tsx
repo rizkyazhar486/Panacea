@@ -17,6 +17,7 @@ import { uploadOrLocal } from '../lib/upload'
 import { ActivityShareCard } from '../components/ActivityShareCard'
 import { WeatherWidget } from '../components/WeatherWidget'
 import { getDemo } from '../lib/profile'
+import { Portal } from '../components/Portal'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
@@ -146,6 +147,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
         {song === SONGS[0] ? '🎵 Pilih Musik' : `🎵 ${song}`}
       </button>
       {open && (
+        <Portal>
         <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50" onClick={() => setOpen(false)}>
           <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-6" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-neutral-200" />
@@ -200,6 +202,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
             </p>
           </div>
         </div>
+        </Portal>
       )}
     </>
   )
@@ -682,6 +685,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
   }
 
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="relative flex h-full w-full max-w-md flex-col">
         {/* Progress segments */}
@@ -757,6 +761,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
         .story-float { animation: storyFloat 1.2s ease-out forwards; }
       `}</style>
     </div>
+    </Portal>
   )
 }
 
@@ -890,9 +895,10 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
   }
 
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
       <div className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} style={{ animation: 'scaleIn 0.2s ease-out' }}>
-        
+
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-neutral-100">
           <h3 className="text-base font-black">Buat Postingan</h3>
@@ -974,6 +980,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
       </div>
     </div>
+    </Portal>
   )
 }
 
@@ -1026,6 +1033,7 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
     </div>
   )
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div className="w-full max-w-md space-y-2.5 rounded-t-3xl bg-white p-3 pb-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto h-1 w-10 rounded-full bg-neutral-200" />
@@ -1035,6 +1043,7 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
         <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Batal</button>
       </div>
     </div>
+    </Portal>
   )
 }
 

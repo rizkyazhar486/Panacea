@@ -4,6 +4,7 @@ import { IconRun, IconActivity, IconHeart, IconX } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
 import { PrefillBadge } from '../components/HealthSnapshot'
 import { hasHealth, pushBiometrics } from '../lib/profile'
+import { Portal } from '../components/Portal'
 
 // Motivational quotes from legendary athletes (Olympic/medal/award winners &
 // globally followed icons) — shown as a welcome popup on the Athlete page.
@@ -25,6 +26,7 @@ function AthleteQuotePopup() {
   const [open, setOpen] = useState(true)
   if (!open) return null
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setOpen(false)}>
       <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <button onClick={() => setOpen(false)} aria-label="Tutup" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
@@ -37,6 +39,7 @@ function AthleteQuotePopup() {
         </button>
       </div>
     </div>
+    </Portal>
   )
 }
 
