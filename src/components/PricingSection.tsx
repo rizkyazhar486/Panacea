@@ -7,6 +7,13 @@ import { Reveal } from './Reveal'
 // one continuous scroll and unauthenticated visitors never leave it).
 // Interactivity: cards tilt toward the pointer (subtle 3D perspective) and
 // fade/rise into place via the existing scroll-reveal system.
+//
+// Tier pricing is benchmarked against direct competitors: Halodoc/Alodokter
+// charge ~Rp25.000-51.000 per single consult session (promo-driven), while
+// international longevity memberships (Superpower $199/yr, Function Health
+// $365/yr, Fountain Life from $595/yr) bundle diagnostics/coaching into one
+// flat annual fee rather than selling features à la carte. Plus/Pro below
+// mirror that bundled-value model instead of pricing each tool separately.
 
 function TiltCard({ children, className = '' }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement | null>(null)
@@ -29,7 +36,7 @@ function TiltCard({ children, className = '' }: { children: ReactNode; className
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className={`group relative rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_25px_60px_-15px_rgba(0,191,99,0.35)] ${className}`}
+      className={`group relative flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_25px_60px_-15px_rgba(0,191,99,0.35)] ${className}`}
       style={{
         transform: `perspective(900px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
         transition: 'transform 300ms cubic-bezier(0.32,0.72,0,1)',
@@ -52,6 +59,62 @@ function PriceLine({ label, price, note }: { label: string; price: string; note?
   )
 }
 
+function Check({ children }: { children: ReactNode }) {
+  return (
+    <li className="flex items-start gap-2 text-sm text-white/75">
+      <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-400/20 text-[10px] text-emerald-300">✓</span>
+      {children}
+    </li>
+  )
+}
+
+type Tier = {
+  name: string
+  tagline: string
+  price: string
+  note?: string
+  features: ReactNode[]
+  highlight?: boolean
+}
+
+const TIERS: Tier[] = [
+  {
+    name: 'Gratis',
+    tagline: 'Untuk semua orang, selamanya',
+    price: 'Rp0',
+    features: [
+      <>AI Chatbot — anamnesis &amp; edukasi kesehatan</>,
+      <>Community, GPS Faskes &amp; SOS darurat</>,
+      <>Kalkulator Klinis — gratis untuk 50 pendaftar pertama</>,
+    ],
+  },
+  {
+    name: 'Plus',
+    tagline: 'Nilai longevity personal, bertenaga AI',
+    price: 'Rp49.000',
+    note: '/bulan',
+    highlight: true,
+    features: [
+      <>Semua di paket Gratis</>,
+      <>Kalkulator Longevity AI — pola makan, olahraga, tidur &amp; berjemur</>,
+      <>2× Konsultasi AI Mendalam per bulan (senilai Rp98.000)</>,
+      <>Akses penuh Kalkulator Klinis (di luar kuota gratis)</>,
+    ],
+  },
+  {
+    name: 'Pro',
+    tagline: 'Untuk kondisi kronis & pemantauan berkelanjutan',
+    price: 'Rp199.000',
+    note: '/bulan',
+    features: [
+      <>Semua di paket Plus</>,
+      <>Pemantauan Kronis — tren biomarker &amp; rekomendasi berkelanjutan</>,
+      <>Konsultasi AI Mendalam tanpa batas</>,
+      <>Dukungan prioritas</>,
+    ],
+  },
+]
+
 export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?: { slotsLeft: number; discountPct: number } | null }) {
   return (
     <section id="pricing" className="relative overflow-hidden px-6 py-24 sm:px-10" style={{ background: 'linear-gradient(180deg, #052E1C 0%, #0B4A2E 45%, #052E1C 100%)' }}>
@@ -72,103 +135,80 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
             <span className="font-serif-display italic text-emerald-300">&amp; Harga</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-white/60">
-            Setiap layanan berdiri sendiri — bayar hanya untuk yang Anda pakai. Tidak ada biaya tersembunyi.
+            Tiga paket sederhana — pilih sesuai kebutuhan, naik atau turun kapan saja.
           </p>
         </Reveal>
 
         {promo && promo.slotsLeft > 0 && (
           <Reveal delay={60}>
             <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-center text-sm font-semibold text-emerald-200">
-              🎉 Diskon {promo.discountPct}% SEMUA layanan untuk {promo.slotsLeft} pendaftar berikutnya — early-bird terbatas.
+              🎉 Diskon {promo.discountPct}% SEMUA paket untuk {promo.slotsLeft} pendaftar berikutnya — early-bird terbatas.
             </div>
           </Reveal>
         )}
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-2">
-          <Reveal delay={40}>
-            <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Konsultasi &amp; AI Klinis</div>
-              <h3 className="mt-1 text-xl font-extrabold text-white">Chatbot, Konsultasi &amp; AI-EMR</h3>
-              <div className="mt-4">
-                <PriceLine label="AI Chatbot — anamnesis &amp; edukasi kesehatan" price="Gratis" />
-                <PriceLine label="Konsultasi AI Mendalam — laporan klinis terstruktur" price="Rp49.000" note="/sesi" />
-                <PriceLine label="AI-EMR + CDSS bersertifikat (klinisi/institusi)" price="Langganan" note="hubungi kami" />
-              </div>
-            </TiltCard>
-          </Reveal>
+        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          {TIERS.map((t, i) => (
+            <Reveal key={t.name} delay={40 + i * 50}>
+              <TiltCard className={t.highlight ? 'ring-1 ring-emerald-400/30' : ''}>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                  {t.highlight && <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Paling populer</span>}
+                  {t.name}
+                </div>
+                <h3 className="mt-1 text-xl font-extrabold text-white">{t.tagline}</h3>
+                <div className="mt-3">
+                  <span className="text-3xl font-black text-white">{t.price}</span>
+                  {t.note && <span className="ml-1 text-sm text-white/40">{t.note}</span>}
+                </div>
+                <ul className="mt-5 flex-1 space-y-2.5">
+                  {t.features.map((f, fi) => <Check key={fi}>{f}</Check>)}
+                </ul>
+                <button
+                  onClick={onMasuk}
+                  className={`mt-6 w-full rounded-full py-3 text-sm font-bold transition ${
+                    t.highlight ? 'bg-emerald-400 text-brand-dark hover:brightness-105' : 'bg-white/10 text-white hover:bg-white/15'
+                  }`}
+                >
+                  {t.name === 'Gratis' ? 'Mulai Gratis' : `Pilih ${t.name}`}
+                </button>
+              </TiltCard>
+            </Reveal>
+          ))}
+        </div>
 
-          <Reveal delay={90}>
-            <TiltCard className="ring-1 ring-emerald-400/30">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">
-                <span className="rounded-full bg-emerald-400/20 px-2 py-0.5">Baru</span> Kalkulator Klinis
+        <Reveal delay={60}>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            <TiltCard>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Baru</span> Kalkulator Klinis — akses sekali bayar
               </div>
-              <h3 className="mt-1 text-xl font-extrabold text-white">34 Skor &amp; Alat Bantu Keputusan Klinis</h3>
               <p className="mt-2 text-sm text-white/60">
-                APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, dan lainnya — standar internasional, siap pakai.
+                34 skor &amp; alat bantu keputusan klinis standar internasional (APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, dan lainnya) — untuk yang tidak ingin berlangganan bulanan.
               </p>
               <div className="mt-4">
-                <PriceLine label="50 pendaftar akun Panaceamed.id pertama" price="Gratis" note="selamanya" />
-                <PriceLine label="Setelah kuota — bayar dari saldo PanaceaToken" price="500 PNC" />
-                <PriceLine label="Setelah kuota — QRIS / VA / Kartu" price="Rp500.000" note="sekali bayar" />
+                <PriceLine label="Bayar dari saldo PanaceaToken" price="500 PNC" />
+                <PriceLine label="QRIS / VA / Kartu" price="Rp500.000" note="sekali bayar, seumur akun" />
               </div>
             </TiltCard>
-          </Reveal>
-        </div>
-
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <Reveal delay={40}>
             <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Longevity</div>
-              <h3 className="mt-1 font-extrabold text-white">Kalkulator Longevity AI</h3>
-              <p className="mt-2 text-xs text-white/50">Pola makan, olahraga, hidrasi, tidur &amp; berjemur → nilai longevity personal.</p>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Kronis — opsi seumur akun</div>
+              <p className="mt-2 text-sm text-white/60">
+                Untuk pasien yang ingin melunasi sekali dibanding berlangganan Pro bertahun-tahun.
+              </p>
               <div className="mt-4">
-                <PriceLine label="Langganan aktif" price="Rp299.000" note="/30 hari" />
+                <PriceLine label="Pemantauan Kronis Lifetime" price="Rp19.900.000" note="sekali bayar" />
+                <PriceLine label="1 PanaceaToken (PNC)" price="Rp1.000" note="top-up fleksibel" />
               </div>
             </TiltCard>
-          </Reveal>
-
-          <Reveal delay={90}>
-            <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Kronis</div>
-              <h3 className="mt-1 font-extrabold text-white">Pemantauan Kronis</h3>
-              <p className="mt-2 text-xs text-white/50">Pelacakan tren biomarker &amp; rekomendasi berkelanjutan untuk kondisi kronis.</p>
-              <div className="mt-4">
-                <PriceLine label="Bulanan" price="Rp199.000" note="/bulan" />
-                <PriceLine label="Lifetime" price="Rp19.900.000" note="sekali bayar" />
-              </div>
-            </TiltCard>
-          </Reveal>
-
-          <Reveal delay={140}>
-            <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Ekonomi Token</div>
-              <h3 className="mt-1 font-extrabold text-white">PanaceaToken (PNC)</h3>
-              <p className="mt-2 text-xs text-white/50">Satu saldo untuk konsultasi, materi kedokteran, &amp; fitur premium di seluruh platform.</p>
-              <div className="mt-4">
-                <PriceLine label="1 PanaceaToken" price="Rp1.000" />
-                <PriceLine label="Top-up" price="Fleksibel" note="QRIS/VA/Kartu" />
-              </div>
-            </TiltCard>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
 
         <Reveal delay={80}>
           <p className="mx-auto mt-6 max-w-2xl text-center text-[11px] leading-relaxed text-white/40">
+            AI-EMR + CDSS bersertifikat untuk klinisi/institusi: hubungi kami untuk harga langganan.
             Pusat Materi Kedokteran: harga ditentukan penulis, royalti otomatis untuk kontributor.
             Semua harga dalam Rupiah, sudah termasuk PPN yang berlaku.
           </p>
-        </Reveal>
-
-        <Reveal delay={100} className="mt-10 text-center">
-          <button
-            onClick={onMasuk}
-            className="group inline-flex items-center gap-3 rounded-full bg-white py-2 pl-8 pr-2 font-bold text-brand-dark shadow-[0_12px_30px_-8px_rgba(0,0,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
-          >
-            <span>Mulai &amp; Pilih Layanan Anda</span>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-white transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-            </span>
-          </button>
         </Reveal>
       </div>
     </section>

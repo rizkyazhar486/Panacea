@@ -43,7 +43,7 @@ const ROLES = [
 
 const WHATS_NEW = [
   'Dashboard sosial "Panacea Hidup Sehat" — foto & video 30 detik, profil, repost, bookmark privat.',
-  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp299.000/bulan).',
+  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp49.000/bulan).',
   'Apotek dengan tebus/scan resep + Riwayat Transaksi terpadu (bisa disaring per jenis).',
   'Faskes terdekat via GPS (rumah sakit, klinik & apotek) untuk situasi darurat.',
   'Pusat Materi Kedokteran — temukan & bagikan catatan, jurnal, dan artikel pilihan dengan PanaceaToken.',
