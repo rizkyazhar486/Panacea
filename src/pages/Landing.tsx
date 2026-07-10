@@ -20,6 +20,7 @@ import {
 } from '../components/icons'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { MedicalNews } from '../components/MedicalNews'
+import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCinematic'
 
 const FEATURES = [
   { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
@@ -120,7 +121,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
     if (backendEnabled) api.health().then((h) => setPromo(h.promo ?? null)).catch(() => {})
   }, [])
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white">
+    <div className="min-h-screen bg-white">
       {/* Promo early-bird — 75% untuk pendaftar pertama */}
       {promo && promo.slotsLeft > 0 && (
         <button onClick={onMasuk} className="block w-full bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] px-4 py-2.5 text-center text-sm font-bold text-white hover:brightness-110">
@@ -147,6 +148,14 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </button>
         </div>
       </header>
+
+      {/* ── SCROLL-CINEMATIC OVERTURE ───────────────────────────
+          Scroll-driven sequence (sunrise → vitalitas → sains → longevity)
+          — the live implementation of the earlier Remotion concept video.
+          Pinned via `sticky` over a 400vh track so each act gets its own
+          scroll "chapter" instead of racing past in a few frames. */}
+      <ScrollCinematicStyles />
+      <ScrollCinematic />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-28">
