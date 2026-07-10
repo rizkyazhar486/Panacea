@@ -15,6 +15,7 @@ import { HealthQuiz } from '../components/HealthQuiz'
 import { ExamQuiz } from '../components/ExamQuiz'
 import { uploadOrLocal } from '../lib/upload'
 import { ActivityShareCard } from '../components/ActivityShareCard'
+import { WeatherWidget } from '../components/WeatherWidget'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 
 /* ═══════════════════════════════════════════════════════
@@ -2140,6 +2141,11 @@ export default function SportsSocialFeed() {
 
   return (
     <div className="max-w-xl mx-auto p-4 space-y-6">
+      {/* Cuaca berbasis GPS — ikon saja, ketuk untuk lihat minggu/bulan ini */}
+      <div className="flex justify-end">
+        <WeatherWidget />
+      </div>
+
       {/* Stories (Instagram-style, 24h) */}
       <StoriesBar
         stories={state.stories}
