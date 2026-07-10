@@ -37,6 +37,185 @@ const SEX_ED_TOPICS = [
   { title: 'Kesehatan Seksual Pasca-Persalinan', text: 'Aktivitas seksual umumnya dapat dilanjutkan setelah 4-6 minggu pasca-persalinan (setelah involusi uterus & penyembuhan luka perineum/insisi), dengan perhatian pada lubrikasi (efek hormonal laktasi) dan kesiapan psikologis.' },
 ]
 
+/* ══════════════════ PERIOD & CYCLE TRACKER ══════════════════ */
+const CYCLE_KEY = 'pmd_cycle_tracker_v1'
+const LUTEAL_DAYS = 14 // standard assumption: ovulation ≈ 14 days before next period
+
+interface CycleData { periodStarts: string[]; avgCycleLen: number; avgPeriodLen: number; pregnant: boolean; lmp: string }
+const DEF_CYCLE: CycleData = { periodStarts: [], avgCycleLen: 28, avgPeriodLen: 5, pregnant: false, lmp: '' }
+
+function loadCycle(): CycleData {
+  try { return { ...DEF_CYCLE, ...JSON.parse(localStorage.getItem(CYCLE_KEY) || '{}') } } catch { return DEF_CYCLE }
+}
+function saveCycle(d: CycleData) {
+  try { localStorage.setItem(CYCLE_KEY, JSON.stringify(d)) } catch { /* ignore */ }
+}
+
+function addDays(iso: string, days: number): string {
+  const d = new Date(iso); d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+function fmtIdDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+const HORMONAL_PHASES = [
+  { phase: 'Menstruasi', hari: 'Hari 1-5', hormon: 'Estrogen & progesteron rendah', tanda: 'Kram perut, kelelahan, mood rendah — lapisan rahim luruh.' },
+  { phase: 'Folikuler', hari: 'Hari 1-13', hormon: 'FSH merangsang folikel; estrogen naik bertahap', tanda: 'Energi meningkat, kulit lebih cerah, mood membaik menjelang ovulasi.' },
+  { phase: 'Ovulasi', hari: '~Hari 14 (siklus 28 hari)', hormon: 'Lonjakan LH memicu pelepasan sel telur', tanda: 'Lendir serviks bening & elastis (mirip putih telur), sedikit nyeri perut sebelah (mittelschmerz), libido meningkat.' },
+  { phase: 'Luteal', hari: 'Hari 15-28', hormon: 'Progesteron dominan dari korpus luteum', tanda: 'PMS (payudara nyeri, kembung, mood swing) menjelang menstruasi berikutnya bila tidak terjadi pembuahan.' },
+]
+
+// Simplified fetal size-comparison table by gestational week (educational).
+const FETAL_GROWTH: { week: number; size: string; length: string }[] = [
+  { week: 6, size: 'sebiji kacang polong', length: '~0.5 cm' },
+  { week: 8, size: 'sebutir raspberry', length: '~1.6 cm' },
+  { week: 10, size: 'sebuah stroberi', length: '~3.1 cm' },
+  { week: 12, size: 'sebuah jeruk limau', length: '~5.4 cm' },
+  { week: 16, size: 'sebuah alpukat', length: '~11.6 cm' },
+  { week: 20, size: 'sebuah pisang', length: '~25.6 cm' },
+  { week: 24, size: 'sebuah jagung', length: '~30 cm' },
+  { week: 28, size: 'sebuah terong', length: '~37.6 cm' },
+  { week: 32, size: 'sebuah kelapa muda', length: '~42.4 cm' },
+  { week: 36, size: 'semangka kecil', length: '~47.4 cm' },
+  { week: 40, size: 'semangka besar (siap lahir)', length: '~51 cm' },
+]
+
+function PeriodTracker() {
+  const [data, setData] = useState<CycleData>(loadCycle)
+  const [newDate, setNewDate] = useState('')
+
+  function update(patch: Partial<CycleData>) {
+    setData((d) => { const next = { ...d, ...patch }; saveCycle(next); return next })
+  }
+  function addPeriodStart() {
+    if (!newDate) return
+    const dates = [...data.periodStarts, newDate].sort()
+    update({ periodStarts: dates })
+    setNewDate('')
+  }
+  function removeDate(iso: string) {
+    update({ periodStarts: data.periodStarts.filter((d) => d !== iso) })
+  }
+
+  const sorted = [...data.periodStarts].sort()
+  const computedAvgCycle = sorted.length >= 2
+    ? Math.round(sorted.slice(1).reduce((sum, d, i) => sum + (new Date(d).getTime() - new Date(sorted[i]).getTime()) / 86400000, 0) / (sorted.length - 1))
+    : data.avgCycleLen
+  const cycleLen = sorted.length >= 2 ? computedAvgCycle : data.avgCycleLen
+  const lastStart = sorted[sorted.length - 1]
+
+  const nextPeriod = lastStart ? addDays(lastStart, cycleLen) : null
+  const ovulationDay = nextPeriod ? addDays(nextPeriod, -LUTEAL_DAYS) : null
+  const fertileStart = ovulationDay ? addDays(ovulationDay, -5) : null
+  const fertileEnd = ovulationDay ? addDays(ovulationDay, 1) : null
+
+  // Pregnancy mode
+  let edd: string | null = null, gaWeeks = 0, gaDays = 0
+  if (data.pregnant && data.lmp) {
+    edd = addDays(data.lmp, 280)
+    const diffDays = Math.floor((Date.now() - new Date(data.lmp).getTime()) / 86400000)
+    gaWeeks = Math.floor(diffDays / 7); gaDays = diffDays % 7
+  }
+  const currentFetal = data.pregnant ? [...FETAL_GROWTH].reverse().find((f) => f.week <= gaWeeks) : null
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconHeart size={20} />} title="Pelacak Siklus & Menstruasi" subtitle="Prediksi ovulasi, kalender kesuburan & pertumbuhan janin" />
+
+      <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+        <input type="checkbox" checked={data.pregnant} onChange={(e) => update({ pregnant: e.target.checked })} className="h-5 w-5 accent-brand" />
+        <div className="text-sm font-bold text-ink">Sedang hamil</div>
+      </label>
+
+      {!data.pregnant && (
+        <>
+          <div className="mt-3 flex gap-2">
+            <input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className="flex-1 min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
+            <Button onClick={addPeriodStart} className="h-11 rounded-xl px-4 text-xs">+ Catat Haid</Button>
+          </div>
+
+          {sorted.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {sorted.slice(-6).map((d) => (
+                <span key={d} className="flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600">
+                  {fmtIdDate(d)}
+                  <button onClick={() => removeDate(d)} className="ml-1 text-neutral-400 hover:text-red-500">✕</button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {nextPeriod && (
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-xl bg-red-50 p-3 text-center">
+                <div className="text-sm font-black text-red-700">{fmtIdDate(nextPeriod)}</div>
+                <div className="mt-0.5 text-[10px] font-bold uppercase text-red-400">Perkiraan Haid Berikutnya</div>
+              </div>
+              <div className="rounded-xl bg-brand-50 p-3 text-center">
+                <div className="text-sm font-black text-brand-dark">{ovulationDay ? fmtIdDate(ovulationDay) : '—'}</div>
+                <div className="mt-0.5 text-[10px] font-bold uppercase text-brand-dark/60">Perkiraan Ovulasi</div>
+              </div>
+              {fertileStart && fertileEnd && (
+                <div className="col-span-2 rounded-xl bg-amber-50 p-3 text-center">
+                  <div className="text-sm font-black text-amber-700">{fmtIdDate(fertileStart)} — {fmtIdDate(fertileEnd)}</div>
+                  <div className="mt-0.5 text-[10px] font-bold uppercase text-amber-600">Masa Subur (Fertile Window)</div>
+                </div>
+              )}
+            </div>
+          )}
+          <p className="mt-2 text-[10px] text-neutral-400">Rata-rata siklus: {cycleLen} hari ({sorted.length >= 2 ? 'dihitung dari riwayat Anda' : 'default, catat ≥2 siklus untuk perhitungan personal'}). Prediksi berasumsi fase luteal standar 14 hari — variasi individual nyata terjadi, terutama pada siklus tidak teratur (PCOS, dll).</p>
+        </>
+      )}
+
+      {data.pregnant && (
+        <div className="mt-3">
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-500">HPHT (Hari Pertama Haid Terakhir)</span>
+            <input type="date" value={data.lmp} onChange={(e) => update({ lmp: e.target.value })} className="w-full min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
+          </label>
+          {edd && (
+            <>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-xl bg-brand-50 p-3 text-center">
+                  <div className="text-sm font-black text-brand-dark">{gaWeeks}mgu {gaDays}hr</div>
+                  <div className="mt-0.5 text-[10px] font-bold uppercase text-brand-dark/60">Usia Gestasi Saat Ini</div>
+                </div>
+                <div className="rounded-xl bg-neutral-50 p-3 text-center">
+                  <div className="text-sm font-black text-ink">{fmtIdDate(edd)}</div>
+                  <div className="mt-0.5 text-[10px] font-bold uppercase text-neutral-400">Taksiran Persalinan (EDD)</div>
+                </div>
+              </div>
+              {currentFetal && (
+                <div className="mt-2 rounded-xl bg-amber-50 p-3 text-center">
+                  <div className="text-sm font-black text-amber-800">Kira-kira sebesar {currentFetal.size}</div>
+                  <div className="mt-0.5 text-[10px] font-bold uppercase text-amber-600">Panjang janin ≈ {currentFetal.length} (usia {currentFetal.week} minggu)</div>
+                </div>
+              )}
+            </>
+          )}
+          <p className="mt-2 text-[10px] text-neutral-400">Naegele's Rule: EDD = HPHT + 280 hari. Perbandingan ukuran janin bersifat edukatif/ilustratif — pertumbuhan aktual dipantau lewat USG & pemeriksaan ANC rutin, bukan estimasi kalender semata.</p>
+        </div>
+      )}
+
+      <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Tanda Hormonal per Fase Siklus</h4>
+      <div className="mt-2 space-y-2">
+        {HORMONAL_PHASES.map((p) => (
+          <div key={p.phase} className="rounded-xl border border-neutral-100 p-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-bold text-ink">{p.phase}</div>
+              <span className="text-[11px] font-semibold text-neutral-400">{p.hari}</span>
+            </div>
+            <p className="mt-1 text-[12px] leading-relaxed text-brand-dark">{p.hormon}</p>
+            <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-600">{p.tanda}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Data siklus tersimpan di perangkat ini. Alat bantu edukasi & perencanaan — bukan metode kontrasepsi diandalkan tunggal (lihat "Metode Kalender" di atas) maupun pengganti evaluasi medis pada siklus tidak teratur/nyeri berat/kecurigaan PCOS-endometriosis.</p>
+    </Card>
+  )
+}
+
 export function SexualHealth() {
   const [coords, setCoords] = useState<Coords | null>(null)
   const [geoState, setGeoState] = useState<'idle' | 'asking' | 'granted' | 'denied'>('idle')
@@ -64,6 +243,8 @@ export function SexualHealth() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <PeriodTracker />
+
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Edukasi Kesehatan Seksual & Reproduksi" subtitle="Kesuburan, KB, ANC, dan kesehatan seksual — berbasis ilmu obstetri & ginekologi" />
         <div className="mt-3 space-y-2.5">
