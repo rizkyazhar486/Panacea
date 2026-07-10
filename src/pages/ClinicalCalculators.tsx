@@ -703,6 +703,11 @@ const TABS = [
   { id: 'abcd2', label: 'ABCD²' },
   { id: 'four', label: 'FOUR Score' },
   { id: 'mcdonald', label: 'McDonald' },
+  { id: 'paradise', label: 'Paradise' },
+  { id: 'nihss', label: 'NIHSS' },
+  { id: 'fluidbalance', label: 'Balans Cairan' },
+  { id: 'pedsdose', label: 'Dosis Anak' },
+  { id: 'vbac', label: 'VBAC Flamm-Geiger' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1015,6 +1020,202 @@ function McDonaldCalc() {
   )
 }
 
+/* ══════════════════ PARADISE CRITERIA (TONSILEKTOMI) ══════════════════ */
+function ParadiseCalc() {
+  const [y1, setY1] = useState(0)
+  const [y2, setY2] = useState(0)
+  const [y3, setY3] = useState(0)
+  const [documented, setDocumented] = useState(false)
+  const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise et al., 1984)" />
+      <div className="grid grid-cols-3 gap-2">
+        <Field label="Episode Tahun Ini"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
+        <Field label="Episode Tahun Lalu"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
+        <Field label="Episode 2 Tahun Lalu"><input className={inputClass} type="number" value={y3} onChange={(e) => setY3(+e.target.value)} /></Field>
+      </div>
+      <label className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+        <input type="checkbox" checked={documented} onChange={(e) => setDocumented(e.target.checked)} className="h-5 w-5 accent-brand" />
+        <div className="text-sm font-bold text-ink">Setiap episode terdokumentasi baik (demam &gt;38.3°C, eksudat tonsil, limfadenopati servikal nyeri, atau kultur streptokokus positif)</div>
+      </label>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Memenuhi kriteria Paradise' : 'Belum memenuhi kriteria'}</Badge>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">Kriteria: ≥7 episode dalam 1 tahun, ATAU ≥5/tahun selama 2 tahun berturut, ATAU ≥3/tahun selama 3 tahun berturut — dengan setiap episode terdokumentasi baik. Ini adalah salah satu indikasi, keputusan tonsilektomi tetap individual bersama dokter THT.</p>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ NIHSS (NIH STROKE SCALE) ══════════════════ */
+function NihssCalc() {
+  const items: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
+    { key: 'loc', label: '1a. Tingkat Kesadaran', opts: [{ v: 0, l: 'Sadar penuh' }, { v: 1, l: 'Somnolen' }, { v: 2, l: 'Stupor' }, { v: 3, l: 'Koma' }] },
+    { key: 'locQ', label: '1b. Pertanyaan LOC (bulan, usia)', opts: [{ v: 0, l: 'Keduanya benar' }, { v: 1, l: 'Satu benar' }, { v: 2, l: 'Tak satupun benar' }] },
+    { key: 'locC', label: '1c. Perintah LOC (buka/tutup mata, kepal)', opts: [{ v: 0, l: 'Keduanya benar' }, { v: 1, l: 'Satu benar' }, { v: 2, l: 'Tak satupun benar' }] },
+    { key: 'gaze', label: '2. Gaze (Pandangan)', opts: [{ v: 0, l: 'Normal' }, { v: 1, l: 'Paresis parsial' }, { v: 2, l: 'Deviasi paksa' }] },
+    { key: 'visual', label: '3. Lapang Pandang', opts: [{ v: 0, l: 'Tak ada gangguan' }, { v: 1, l: 'Hemianopia parsial' }, { v: 2, l: 'Hemianopia komplet' }, { v: 3, l: 'Hemianopia bilateral/buta' }] },
+    { key: 'facial', label: '4. Paresis Wajah', opts: [{ v: 0, l: 'Normal' }, { v: 1, l: 'Paresis ringan' }, { v: 2, l: 'Paresis parsial' }, { v: 3, l: 'Paralisis komplet' }] },
+    { key: 'motorArmL', label: '5a. Motorik Lengan Kiri', opts: [{ v: 0, l: 'Tak ada drift' }, { v: 1, l: 'Drift' }, { v: 2, l: 'Ada upaya melawan gravitasi' }, { v: 3, l: 'Tak ada upaya melawan gravitasi' }, { v: 4, l: 'Tak ada gerakan' }] },
+    { key: 'motorArmR', label: '5b. Motorik Lengan Kanan', opts: [{ v: 0, l: 'Tak ada drift' }, { v: 1, l: 'Drift' }, { v: 2, l: 'Ada upaya melawan gravitasi' }, { v: 3, l: 'Tak ada upaya melawan gravitasi' }, { v: 4, l: 'Tak ada gerakan' }] },
+    { key: 'motorLegL', label: '6a. Motorik Tungkai Kiri', opts: [{ v: 0, l: 'Tak ada drift' }, { v: 1, l: 'Drift' }, { v: 2, l: 'Ada upaya melawan gravitasi' }, { v: 3, l: 'Tak ada upaya melawan gravitasi' }, { v: 4, l: 'Tak ada gerakan' }] },
+    { key: 'motorLegR', label: '6b. Motorik Tungkai Kanan', opts: [{ v: 0, l: 'Tak ada drift' }, { v: 1, l: 'Drift' }, { v: 2, l: 'Ada upaya melawan gravitasi' }, { v: 3, l: 'Tak ada upaya melawan gravitasi' }, { v: 4, l: 'Tak ada gerakan' }] },
+    { key: 'ataxia', label: '7. Ataksia Anggota Gerak', opts: [{ v: 0, l: 'Tak ada' }, { v: 1, l: 'Satu anggota gerak' }, { v: 2, l: 'Dua anggota gerak' }] },
+    { key: 'sensory', label: '8. Sensorik', opts: [{ v: 0, l: 'Normal' }, { v: 1, l: 'Defisit ringan-sedang' }, { v: 2, l: 'Defisit berat/hilang total' }] },
+    { key: 'language', label: '9. Bahasa Terbaik', opts: [{ v: 0, l: 'Tak ada afasia' }, { v: 1, l: 'Afasia ringan-sedang' }, { v: 2, l: 'Afasia berat' }, { v: 3, l: 'Bisu/afasia global' }] },
+    { key: 'dysarthria', label: '10. Disartria', opts: [{ v: 0, l: 'Normal' }, { v: 1, l: 'Ringan-sedang' }, { v: 2, l: 'Berat/anartria' }] },
+    { key: 'extinction', label: '11. Ekstingsi/Inatensi (Neglect)', opts: [{ v: 0, l: 'Tak ada' }, { v: 1, l: 'Inatensi parsial' }, { v: 2, l: 'Inatensi berat/hemi-inatensi' }] },
+  ]
+  const [vals, setVals] = useState<Record<string, number>>(Object.fromEntries(items.map((i) => [i.key, 0])))
+  const total = Object.values(vals).reduce((a, b) => a + b, 0)
+  const interp = total === 0
+    ? { l: 'Tanpa gejala stroke', tone: 'normal' as const }
+    : total <= 4
+    ? { l: 'Stroke ringan', tone: 'normal' as const }
+    : total <= 15
+    ? { l: 'Stroke sedang', tone: 'low' as const }
+    : total <= 20
+    ? { l: 'Stroke sedang-berat', tone: 'critical' as const }
+    : { l: 'Stroke berat', tone: 'critical' as const }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="NIH Stroke Scale (NIHSS)" subtitle="Penilaian keparahan stroke iskemik akut, 15 item, 0-42" />
+      <div className="space-y-3">
+        {items.map((it) => (
+          <Field key={it.key} label={it.label}>
+            <SegButtons value={vals[it.key]} onChange={(v) => setVals((s) => ({ ...s, [it.key]: v }))} options={it.opts} />
+          </Field>
+        ))}
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/42</span></div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ BALANS CAIRAN (FLUID BALANCE) ══════════════════ */
+function FluidBalanceCalc() {
+  const [oralIn, setOralIn] = useState(0)
+  const [ivIn, setIvIn] = useState(0)
+  const [otherIn, setOtherIn] = useState(0)
+  const [urineOut, setUrineOut] = useState(0)
+  const [drainOut, setDrainOut] = useState(0)
+  const [insensible, setInsensible] = useState(500)
+  const [otherOut, setOtherOut] = useState(0)
+  const totalIn = oralIn + ivIn + otherIn
+  const totalOut = urineOut + drainOut + insensible + otherOut
+  const balance = totalIn - totalOut
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Balans Cairan (24 jam)" subtitle="Total intake vs output — pemantauan status cairan" />
+      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Intake (mL)</h4>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <Field label="Oral/Enteral"><input className={inputClass} type="number" value={oralIn} onChange={(e) => setOralIn(+e.target.value)} /></Field>
+        <Field label="IV/Infus"><input className={inputClass} type="number" value={ivIn} onChange={(e) => setIvIn(+e.target.value)} /></Field>
+        <Field label="Lainnya"><input className={inputClass} type="number" value={otherIn} onChange={(e) => setOtherIn(+e.target.value)} /></Field>
+      </div>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Output (mL)</h4>
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Urin"><input className={inputClass} type="number" value={urineOut} onChange={(e) => setUrineOut(+e.target.value)} /></Field>
+        <Field label="Drain/NGT"><input className={inputClass} type="number" value={drainOut} onChange={(e) => setDrainOut(+e.target.value)} /></Field>
+        <Field label="Insensible Loss"><input className={inputClass} type="number" value={insensible} onChange={(e) => setInsensible(+e.target.value)} /></Field>
+        <Field label="Lainnya"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Total Intake</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Total Output</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Balans (mL)</div></div>
+      </div>
+      <p className="mt-3 text-[10px] text-neutral-400">Insensible loss dewasa perkiraan ~500-800 mL/hari (naik bila demam/takipnea). Balans positif besar berkepanjangan → risiko overload; balans negatif → risiko dehidrasi/hipoperfusi.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ DOSIS OBAT ANAK (LIQUID/PUYER) ══════════════════ */
+function PedsDoseCalc() {
+  const [weight, setWeight] = useState(15)
+  const [doseMgKg, setDoseMgKg] = useState(10)
+  const [freqPerDay, setFreqPerDay] = useState(3)
+  const [concMgMl, setConcMgMl] = useState(125 / 5) // e.g. amoxicillin syrup 125mg/5mL
+
+  const totalDailyMg = weight * doseMgKg
+  const perDoseMg = totalDailyMg / freqPerDay
+  const perDoseMl = perDoseMg / concMgMl
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Dosis Obat Anak" subtitle="Dosis cair (sirup) & puyer berdasarkan berat badan" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Dosis (mg/kg/hari)"><input className={inputClass} type="number" value={doseMgKg} onChange={(e) => setDoseMgKg(+e.target.value)} /></Field>
+        <Field label="Frekuensi (kali/hari)"><input className={inputClass} type="number" value={freqPerDay} onChange={(e) => setFreqPerDay(+e.target.value)} /></Field>
+        <Field label="Konsentrasi Sirup (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">mg/hari Total</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">mg/dosis</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">mL/dosis (sirup)</div></div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Total mg/hari = BB × dosis(mg/kg/hari). mg/dosis = total ÷ frekuensi. mL/dosis = mg/dosis ÷ konsentrasi sirup. Untuk puyer: bagi mg/dosis ke jumlah bungkus sesuai frekuensi peresepan. SELALU verifikasi terhadap dosis maksimal dewasa & formularium — kalkulator ini tidak menggantikan penilaian klinis & pustaka obat resmi.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ VBAC — FLAMM-GEIGER SCORE ══════════════════ */
+function VbacCalc() {
+  const [ageU40, setAgeU40] = useState(true)
+  const [vagHx, setVagHx] = useState<'none' | 'before' | 'vbac'>('none')
+  const [nonDystociaIndication, setNonDystociaIndication] = useState(false)
+  const [effacement, setEffacement] = useState<'lt25' | '25to75' | 'ge75'>('25to75')
+  const [dilation4, setDilation4] = useState(false)
+
+  const agePts = ageU40 ? 2 : 0
+  const vagHxPts = vagHx === 'vbac' ? 4 : vagHx === 'before' ? 2 : 0
+  const indicationPts = nonDystociaIndication ? 1 : 0
+  const effacementPts = effacement === 'ge75' ? 2 : effacement === '25to75' ? 1 : 0
+  const dilationPts = dilation4 ? 1 : 0
+  const total = agePts + vagHxPts + indicationPts + effacementPts + dilationPts
+
+  const successPct = total <= 2 ? '~49%' : total <= 4 ? '~60%' : total <= 6 ? '~75%' : total <= 8 ? '~85%' : '~95%'
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Prediksi keberhasilan persalinan pervaginam pasca-SC (Flamm & Geiger, 1997)" />
+      <div className="space-y-3">
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={ageU40} onChange={(e) => setAgeU40(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">Usia &lt;40 tahun (+2)</div>
+        </label>
+        <Field label="Riwayat Persalinan Pervaginam">
+          <SegButtons value={vagHx} onChange={setVagHx} options={[{ v: 'none', l: 'Tidak ada (0)' }, { v: 'before', l: 'Sebelum SC saja (+2)' }, { v: 'vbac', l: 'Pasca-SC/VBAC sebelumnya (+4)' }]} />
+        </Field>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={nonDystociaIndication} onChange={(e) => setNonDystociaIndication(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">Indikasi SC sebelumnya BUKAN distosia/kegagalan kemajuan persalinan (+1)</div>
+        </label>
+        <Field label="Effacement Serviks Saat Masuk">
+          <SegButtons value={effacement} onChange={setEffacement} options={[{ v: 'lt25', l: '<25% (0)' }, { v: '25to75', l: '25-75% (+1)' }, { v: 'ge75', l: '≥75% (+2)' }]} />
+        </Field>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+          <input type="checkbox" checked={dilation4} onChange={(e) => setDilation4(e.target.checked)} className="h-5 w-5 accent-brand" />
+          <div className="text-sm font-bold text-ink">Dilatasi serviks ≥4cm saat masuk (+1)</div>
+        </label>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
+          <Badge tone={total >= 7 ? 'normal' : total >= 4 ? 'low' : 'critical'}>Estimasi keberhasilan {successPct}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">Skor lebih tinggi → prediksi keberhasilan VBAC lebih tinggi. Model prediksi ini adalah salah satu alat bantu keputusan — keputusan trial of labor after cesarean (TOLAC) tetap individual bersama obgyn, mempertimbangkan fasilitas emergensi SC tersedia.</p>
+      </div>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1054,6 +1255,11 @@ export function ClinicalCalculators() {
       {tab === 'abcd2' && <Abcd2Calc />}
       {tab === 'four' && <FourScoreCalc />}
       {tab === 'mcdonald' && <McDonaldCalc />}
+      {tab === 'paradise' && <ParadiseCalc />}
+      {tab === 'nihss' && <NihssCalc />}
+      {tab === 'fluidbalance' && <FluidBalanceCalc />}
+      {tab === 'pedsdose' && <PedsDoseCalc />}
+      {tab === 'vbac' && <VbacCalc />}
     </div>
   )
 }
