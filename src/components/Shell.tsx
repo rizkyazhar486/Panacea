@@ -88,6 +88,7 @@ const nav: Nav[] = [
   { to: '/lab', label: 'Lab Performa', icon: IconGauge, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/sports-science', label: 'Sains & KPI', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
   { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Kebugaran' },
+  { to: '/sports-scores', label: 'Skor Langsung', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Kebugaran' },
   // Klinis & AI
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
   { to: '/clinical', label: 'Data Klinis', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },

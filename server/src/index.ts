@@ -27,6 +27,9 @@ import {
   getHealthWebhookToken,
   rotateHealthWebhookToken,
   emailForWebhookToken,
+  getSportsFavorites,
+  setSportsFavorites,
+  allSportsFavorites,
   listDoctors,
   addPushSub,
   removePushSub,
@@ -62,6 +65,7 @@ import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload } from './healthWebhook.js'
+import { fetchLeagueScoreboard, fetchF1Info, LEAGUES, UNAVAILABLE } from './sports.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -417,6 +421,36 @@ app.post('/api/health-webhook/:token', (req, res) => {
   }
 })
 
+// --- Sports scores (free, no-key sources: ESPN site API + Jolpica-F1) ---
+// Public routes — scores aren't user data, no auth needed.
+app.get('/api/sports/leagues', (_req, res) => {
+  res.json({ leagues: LEAGUES.map((l) => ({ id: l.id, label: l.label })), unavailable: UNAVAILABLE })
+})
+app.get('/api/sports/scores', async (req, res) => {
+  const league = String(req.query.league ?? '')
+  if (!LEAGUES.some((l) => l.id === league)) {
+    res.status(400).json({ error: 'unknown_league' })
+    return
+  }
+  res.json(await fetchLeagueScoreboard(league))
+})
+app.get('/api/sports/f1', async (_req, res) => {
+  res.json(await fetchF1Info())
+})
+app.get('/api/sports/favorites', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ teams: getSportsFavorites(u.id) })
+})
+app.put('/api/sports/favorites', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const teams = (req.body as { teams?: unknown }).teams
+  if (!Array.isArray(teams) || !teams.every((t) => typeof t === 'string')) {
+    res.status(400).json({ error: 'invalid_teams_payload' })
+    return
+  }
+  res.json({ teams: setSportsFavorites(u.id, teams as string[]) })
+})
+
 // --- AI (server-side Claude proxy) ---
 app.post('/api/ai/messages', requireAuth, aiMessages)
 app.post('/api/ai/consult', requireAuth, aiConsult)
@@ -586,9 +620,44 @@ app.get('/api/satusehat/status', requireAuth, (_req, res) => {
   res.json({ configured, env: process.env.SATUSEHAT_ENV || 'sandbox', note: configured ? 'Kredensial terdeteksi — siap integrasi.' : 'Belum dikonfigurasi (set SATUSEHAT_CLIENT_ID/SECRET).' })
 })
 
+// Poll leagues that at least one user follows a team in, diff scores/state
+// against the last poll, and notify affected users on goals or full-time —
+// reuses the existing push/notification inbox infra (notify()).
+const lastSportsState = new Map<string, { state: string; homeScore?: string; awayScore?: string }>()
+async function pollSportsFavorites() {
+  const favs = allSportsFavorites()
+  const followedLeagues = new Set<string>()
+  for (const teams of Object.values(favs)) for (const t of teams) followedLeagues.add(t.split(':')[0])
+  if (!followedLeagues.size) return
+
+  for (const leagueId of followedLeagues) {
+    const result = await fetchLeagueScoreboard(leagueId)
+    if (result.error) continue
+    for (const ev of result.events) {
+      const key = `${leagueId}:${ev.id}`
+      const prev = lastSportsState.get(key)
+      const cur = { state: ev.state, homeScore: ev.home.score, awayScore: ev.away.score }
+      lastSportsState.set(key, cur)
+      if (!prev) continue // first sight of this match — establish baseline, don't notify retroactively
+
+      const scoreChanged = prev.homeScore !== cur.homeScore || prev.awayScore !== cur.awayScore
+      const justFinished = prev.state !== 'post' && cur.state === 'post'
+      if (!scoreChanged && !justFinished) continue
+
+      for (const [userId, teams] of Object.entries(favs)) {
+        const follows = teams.some((t) => t === `${leagueId}:${ev.home.name}` || t === `${leagueId}:${ev.away.name}`)
+        if (!follows) continue
+        const title = justFinished ? `Selesai: ${ev.home.name} ${ev.home.score}-${ev.away.score} ${ev.away.name}` : `Gol! ${ev.home.name} ${ev.home.score}-${ev.away.score} ${ev.away.name}`
+        notify(userId, { title, body: `${result.label} · ${ev.statusDetail}`, tag: key }, 'sportsNotif').catch(() => {})
+      }
+    }
+  }
+}
+
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
+setInterval(() => { pollSportsFavorites().catch((e) => console.log('[sports] poll error:', (e as Error).message)) }, 90_000)
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  AI:           ${aiStatus()}`)

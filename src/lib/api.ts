@@ -211,6 +211,12 @@ export const api = {
   // Apple Health auto-sync via the "Health Auto Export" app's REST API automation.
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
   rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),
+  // Live sports scores (free sources — see server/src/sports.ts for coverage & gaps)
+  getSportsLeagues: () => req<{ leagues: { id: string; label: string }[]; unavailable: { leagueId: string; label: string; unavailable: true; reason: string }[] }>('/api/sports/leagues'),
+  getSportsScores: (league: string) => req<{ leagueId: string; label: string; events: unknown[]; error?: string }>(`/api/sports/scores?league=${encodeURIComponent(league)}`),
+  getF1Info: () => req<{ next?: { raceName: string; circuit: string; location: string; date: string; time?: string }; lastRaceName?: string; lastPodium?: { position: string; driver: string; constructor: string }[]; error?: string }>('/api/sports/f1'),
+  getSportsFavorites: () => req<{ teams: string[] }>('/api/sports/favorites').then((r) => r.teams),
+  saveSportsFavorites: (teams: string[]) => req<{ teams: string[] }>('/api/sports/favorites', { method: 'PUT', body: JSON.stringify({ teams }) }).then((r) => r.teams),
   patchPost: (id: string, patch: Record<string, unknown>) =>
     req<{ post: BackendPost }>(`/api/posts/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.post),
   // clinical persistence
