@@ -92,6 +92,7 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
+  sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
 }
 
 // Professional onboarding application — submitted at sign-up by clinicians,
@@ -407,6 +408,22 @@ export function rotateHealthWebhookToken(email: string): string {
 }
 export function emailForWebhookToken(token: string): string | undefined {
   return db.healthWebhookTokens?.[token]
+}
+
+// Favorite sports teams a user follows, for score-change push notifications.
+// Team key format: "<leagueId>:<team display name>", e.g. "epl:Arsenal".
+export function getSportsFavorites(userId: string): string[] {
+  return db.sportsFavorites?.[userId] ?? []
+}
+export function setSportsFavorites(userId: string, teams: string[]): string[] {
+  if (!db.sportsFavorites) db.sportsFavorites = {}
+  const clean = Array.from(new Set(teams.filter((t) => typeof t === 'string' && t.length < 100))).slice(0, 50)
+  db.sportsFavorites[userId] = clean
+  save()
+  return clean
+}
+export function allSportsFavorites(): Record<string, string[]> {
+  return db.sportsFavorites ?? {}
 }
 
 // Doctors awaiting / holding STR verification — joins the user record with the
