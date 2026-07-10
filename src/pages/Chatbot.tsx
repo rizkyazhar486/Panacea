@@ -319,7 +319,7 @@ export function Chatbot() {
   function loadSession(session: ChatSession) { setChat(activePatient.id, session.messages); setShowHistory(false) }
   function deleteSession(sid: string, e: React.MouseEvent) { e.stopPropagation(); const updated = getHistory(activePatient.id).filter(s => s.id !== sid); saveHistory(activePatient.id, updated); setHistory(updated) }
 
-  const keyed = aiAvailable(state.settings)
+  const keyed = aiAvailable()
   const lastMsgIsAi = messages.length > 0 && messages[messages.length - 1].role === 'assistant'
 
   return (
