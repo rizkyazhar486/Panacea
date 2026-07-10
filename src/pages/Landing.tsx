@@ -21,6 +21,7 @@ import {
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { MedicalNews } from '../components/MedicalNews'
 import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCinematic'
+import { PricingSection } from '../components/PricingSection'
 
 const FEATURES = [
   { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
@@ -131,6 +132,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* Glass header */}
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-8">
         <div className="min-w-0 shrink"><Wordmark size={32} /></div>
+        <a href="#pricing" className="hidden shrink-0 text-sm font-bold text-neutral-600 transition hover:text-brand-dark sm:inline">Harga</a>
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
@@ -361,6 +363,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </div>
         </div>
       </section>
+
+      {/* ── HARGA & LAYANAN (dark bento-grid pricing) ─────────────── */}
+      <PricingSection onMasuk={onMasuk} promo={promo} />
 
       {/* ── WHAT'S NEW ────────────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
