@@ -626,6 +626,27 @@ export function earlyAdopterInfo() {
   return { limit: EARLY_ADOPTER_LIMIT, used, slotsLeft: Math.max(0, EARLY_ADOPTER_LIMIT - db.users.length), discountPct: Math.round(EARLY_ADOPTER_DISCOUNT * 100) }
 }
 
+// ── Clinical Calculators paywall: the first N registered accounts (by
+// signup order, platform-wide) get free access forever; everyone after
+// pays a one-time unlock via PNC balance or a direct IDR charge.
+export const CLINICAL_CALC_FREE_LIMIT = 50
+export const CLINICAL_CALC_PRICE_PNC = 500
+export const CLINICAL_CALC_PRICE_IDR = 500000
+function clinicalCalcFreeIds(): string[] {
+  return [...db.users].sort((a, b) => a.createdAt.localeCompare(b.createdAt)).slice(0, CLINICAL_CALC_FREE_LIMIT).map((u) => u.id)
+}
+export function isClinicalCalcFree(userId: string): boolean {
+  return clinicalCalcFreeIds().includes(userId)
+}
+export function clinicalCalcInfo() {
+  return {
+    limit: CLINICAL_CALC_FREE_LIMIT,
+    slotsLeft: Math.max(0, CLINICAL_CALC_FREE_LIMIT - db.users.length),
+    pricePnc: CLINICAL_CALC_PRICE_PNC,
+    priceIdr: CLINICAL_CALC_PRICE_IDR,
+  }
+}
+
 export function createOrder(o: Order) {
   db.orders.unshift(o)
   save()

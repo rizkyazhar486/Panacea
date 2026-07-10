@@ -47,6 +47,9 @@ import {
   setApplicationVerdict,
   isEarlyAdopter,
   earlyAdopterInfo,
+  isClinicalCalcFree,
+  clinicalCalcInfo,
+  CLINICAL_CALC_PRICE_PNC,
   listNotifications,
   markNotificationsRead,
   getStats,
@@ -99,6 +102,27 @@ app.get('/api/health', (_req, res) => {
 app.get('/api/promo', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json({ ...earlyAdopterInfo(), eligible: isEarlyAdopter(u.id) })
+})
+
+// Clinical Calculators paywall: free for the first 50 registered accounts,
+// then a one-time unlock via PNC balance or a direct Rp500.000 charge.
+app.get('/api/clinical-calculators/access', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const free = isClinicalCalcFree(u.id)
+  const unlocked = free || !!getSettings(u.id).clinicalCalcUnlocked
+  res.json({ unlocked, free, ...clinicalCalcInfo() })
+})
+app.post('/api/clinical-calculators/unlock-pnc', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (isClinicalCalcFree(u.id) || getSettings(u.id).clinicalCalcUnlocked) {
+    return res.json({ ok: true, unlocked: true, balance: balance(u.id) })
+  }
+  if (balance(u.id) < CLINICAL_CALC_PRICE_PNC) {
+    return res.status(402).json({ error: 'insufficient_balance', price: CLINICAL_CALC_PRICE_PNC, balance: balance(u.id) })
+  }
+  credit(u.id, -CLINICAL_CALC_PRICE_PNC, 'purchase', 'Buka akses Kalkulator Klinis (500 PNC)')
+  saveSettings(u.id, { clinicalCalcUnlocked: true })
+  res.json({ ok: true, unlocked: true, balance: balance(u.id) })
 })
 
 // --- auth ---

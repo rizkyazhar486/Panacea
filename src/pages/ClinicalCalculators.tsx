@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
-import { IconStethoscope } from '../components/icons'
+import { IconStethoscope, IconShield, IconCheck, IconToken } from '../components/icons'
+import { api, backendEnabled } from '../lib/api'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -1818,10 +1819,100 @@ function CompetencyTracker() {
   )
 }
 
+// ── Paywall: free for the first 50 registered accounts, then a one-time
+// unlock via 500 PNC from wallet balance or a direct Rp500.000 charge. ──
+type CalcAccess = { unlocked: boolean; free: boolean; limit: number; slotsLeft: number; pricePnc: number; priceIdr: number }
+
+function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnlocked: () => void }) {
+  const [busy, setBusy] = useState<'pnc' | 'idr' | null>(null)
+  const [err, setErr] = useState('')
+
+  async function payWithPnc() {
+    setBusy('pnc'); setErr('')
+    try {
+      const r = await api.unlockClinicalCalcPnc()
+      if (r.unlocked) onUnlocked()
+    } catch (e) {
+      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Saldo PNC Anda tidak cukup (butuh ${access.pricePnc} PNC). Isi saldo dulu di Billing.` : 'Gagal membuka akses. Coba lagi.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function payWithIdr() {
+    setBusy('idr'); setErr('')
+    try {
+      const r = await api.createPayment(0, 'QRIS', 'clinical_calc_unlock')
+      if (!r.live) {
+        // Sandbox/dev mode — no live payment gateway configured, simulate settlement.
+        await api.confirmPayment(r.orderId)
+        onUnlocked()
+      } else if (r.redirectUrl) {
+        window.location.href = r.redirectUrl
+      }
+    } catch {
+      setErr('Gagal memulai pembayaran. Coba lagi.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 skor & alat bantu keputusan klinis standar internasional" />
+      <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
+        🎉 Kalkulator Klinis <b>gratis</b> untuk {access.limit} pendaftar akun Panaceamed.id pertama — kuota itu sudah penuh. Buka akses seumur akun dengan salah satu metode di bawah.
+      </div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <button
+          onClick={payWithPnc}
+          disabled={busy !== null}
+          className="flex flex-col items-start gap-1 rounded-2xl border border-brand/30 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+        >
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Bayar dari saldo</span>
+          <span className="text-xl font-black text-ink">{access.pricePnc} PNC</span>
+          <span className="text-[11px] text-neutral-500">{busy === 'pnc' ? 'Memproses…' : 'Langsung terpotong dari saldo PanaceaToken Anda'}</span>
+        </button>
+        <button
+          onClick={payWithIdr}
+          disabled={busy !== null}
+          className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+        >
+          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">QRIS / VA / Kartu</span>
+          <span className="text-xl font-black text-ink">Rp{access.priceIdr.toLocaleString('id-ID')}</span>
+          <span className="text-[11px] text-neutral-500">{busy === 'idr' ? 'Memproses…' : 'Pembayaran satu kali, akses seumur akun'}</span>
+        </button>
+      </div>
+      {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
+  const [access, setAccess] = useState<CalcAccess | null>(null)
+
+  useEffect(() => {
+    if (!backendEnabled) { setAccess({ unlocked: true, free: true, limit: 50, slotsLeft: 0, pricePnc: 500, priceIdr: 500000 }); return }
+    api.getClinicalCalcAccess().then(setAccess).catch(() => setAccess({ unlocked: true, free: true, limit: 50, slotsLeft: 0, pricePnc: 500, priceIdr: 500000 }))
+  }, [])
+
+  if (access && !access.unlocked) {
+    return (
+      <div className="mx-auto max-w-xl space-y-4 p-4">
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
+        <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-xl space-y-4 p-4">
+      {access?.free && (
+        <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
+          <IconCheck size={14} /> Anda termasuk {access.limit} pendaftar pertama — akses gratis selamanya.
+        </div>
+      )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {TABS.map((t) => (
