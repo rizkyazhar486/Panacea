@@ -10,11 +10,7 @@ import type {
   EducationSheet,
 } from './types'
 
-const API_URL = 'https://api.anthropic.com/v1/messages'
-const ANTHROPIC_VERSION = '2023-06-01'
-
 export interface AISettings {
-  apiKey: string
   model: string
   doctorName: string
 }
@@ -70,14 +66,11 @@ function contextBlock(ctx: PatientContext): string {
   return lines.join('\n')
 }
 
-export function hasKey(settings: AISettings): boolean {
-  return Boolean(settings.apiKey && settings.apiKey.trim().length > 10)
-}
-
-// AI is "real" when either the user supplied a personal key OR a backend
-// (with a server-side Anthropic key) is configured.
-export function aiAvailable(settings: AISettings): boolean {
-  return hasKey(settings) || backendEnabled
+// AI is "real" when the backend (with its server-side OpenRouter/Anthropic
+// key) is configured — every request routes through it, never a key typed
+// into the browser, so the provider (OpenRouter → Gemini/GLM) stays uniform.
+export function aiAvailable(): boolean {
+  return backendEnabled
 }
 
 async function callClaude(
@@ -88,29 +81,6 @@ async function callClaude(
 ): Promise<string> {
   const system = SYSTEM_PROMPT + (systemExtra ? `\n\n${systemExtra}` : '')
   const model = modelOverride || settings.model
-
-  // Preferred path: the user's own key → direct browser call.
-  if (hasKey(settings)) {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': settings.apiKey,
-        'anthropic-version': ANTHROPIC_VERSION,
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({ model, max_tokens: 2048, system, messages }),
-    })
-    if (!res.ok) {
-      const txt = await res.text()
-      throw new Error(`Claude API ${res.status}: ${txt.slice(0, 300)}`)
-    }
-    const data = await res.json()
-    const block = (data.content || []).find((b: { type: string }) => b.type === 'text')
-    return block?.text ?? '(tidak ada respons)'
-  }
-
-  // Public path: route through the backend's shared server-side key.
   const { text } = await api.aiMessages({ model, system, messages, max_tokens: 2048 })
   return text || '(tidak ada respons)'
 }
@@ -123,7 +93,7 @@ export async function sendChat(
   const msgs = history.map((m) => ({ role: m.role, content: m.content }))
   // Front-load the continuous patient context on the first user turn.
   const sysExtra = contextBlock(ctx)
-  if (!aiAvailable(settings)) return demoChatReply(history, ctx)
+  if (!aiAvailable()) return demoChatReply(history, ctx)
   try {
     return await callClaude(settings, msgs, sysExtra)
   } catch (e) {
@@ -157,7 +127,7 @@ export async function draftEMR(
   history: ChatMessage[],
   ctx: PatientContext,
 ): Promise<EMRDraft> {
-  if (!aiAvailable(settings)) return demoDraft(ctx)
+  if (!aiAvailable()) return demoDraft(ctx)
   const transcript = history
     .map((m) => `${m.role === 'user' ? 'Pasien' : 'AI'}: ${m.content}`)
     .join('\n')
@@ -177,7 +147,7 @@ export async function draftEMR(
 
 // AI verification of an uploaded material / AI-EMR template (Claude gatekeeper).
 export async function verifyMaterial(settings: AISettings, m: Material): Promise<AIReview> {
-  if (!aiAvailable(settings)) {
+  if (!aiAvailable()) {
     await wait(1100)
     return demoVerify(m)
   }
@@ -202,7 +172,7 @@ export async function generateEducation(
   ctx: PatientContext,
   diagnosis: string,
 ): Promise<EducationSheet> {
-  if (!aiAvailable(settings)) {
+  if (!aiAvailable()) {
     await wait(1000)
     return demoEducation(diagnosis)
   }
