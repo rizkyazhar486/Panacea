@@ -711,6 +711,7 @@ const TABS = [
   { id: 'denver', label: 'Denver II (Simplified)' },
   { id: 'atls', label: 'ATLS Primary Survey' },
   { id: 'abg', label: 'Analisis Gas Darah' },
+  { id: 'burn', label: 'Kalkulator Luka Bakar' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -1501,6 +1502,116 @@ function AbgCalc() {
   )
 }
 
+/* ══════════════════ ADVANCED BURN CALCULATOR (DRAW-MODE + PARKLAND) ══════════════════ */
+// Last of the "bigger build" items: an interactive body-diagram (front/back,
+// click-to-toggle regions) applying the Rule of Nines (adult), summing %TBSA
+// live, feeding directly into the Parkland formula, with a print/PDF export
+// via the browser's native print dialog (no extra dependency needed for a
+// clean printable summary).
+interface BurnRegion { key: string; label: string; pct: number; x: number; y: number; w: number; h: number; rx?: number }
+const BURN_FRONT: BurnRegion[] = [
+  { key: 'headF', label: 'Kepala (depan)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+  { key: 'armLF', label: 'Lengan Kiri (depan)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'armRF', label: 'Lengan Kanan (depan)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'trunkF', label: 'Batang Tubuh (depan)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+  { key: 'perineum', label: 'Perineum', pct: 1, x: 92, y: 158, w: 16, h: 12 },
+  { key: 'legLF', label: 'Tungkai Kiri (depan)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'legRF', label: 'Tungkai Kanan (depan)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+]
+const BURN_BACK: BurnRegion[] = [
+  { key: 'headB', label: 'Kepala (belakang)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+  { key: 'armLB', label: 'Lengan Kiri (belakang)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'armRB', label: 'Lengan Kanan (belakang)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'trunkB', label: 'Batang Tubuh (belakang)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+  { key: 'legLB', label: 'Tungkai Kiri (belakang)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'legRB', label: 'Tungkai Kanan (belakang)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+]
+
+function BurnCalc() {
+  const [view, setView] = useState<'front' | 'back'>('front')
+  const [selected, setSelected] = useState<Record<string, boolean>>({})
+  const [weight, setWeight] = useState(70)
+
+  const allRegions = [...BURN_FRONT, ...BURN_BACK]
+  const tbsa = allRegions.filter((r) => selected[r.key]).reduce((sum, r) => sum + r.pct, 0)
+  const total24h = 4 * weight * tbsa
+  const first8hRate = total24h / 2 / 8
+  const next16hRate = (total24h - total24h / 2) / 16
+
+  const regions = view === 'front' ? BURN_FRONT : BURN_BACK
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Luka Bakar Lanjutan" subtitle="Rule of Nines (draw-mode) + Parkland Formula, dapat dicetak/disimpan PDF" />
+
+      <div className="flex gap-2">
+        <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Depan</button>
+        <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Belakang</button>
+      </div>
+
+      <div className="mt-3 flex justify-center">
+        <svg viewBox="0 0 200 340" width="200" height="340">
+          {regions.map((r) => (
+            <rect
+              key={r.key}
+              x={r.x} y={r.y} width={r.w} height={r.h} rx={r.rx ?? 4}
+              className="cursor-pointer transition-colors"
+              fill={selected[r.key] ? '#ef4444' : '#e5e7eb'}
+              stroke="#fff" strokeWidth={2}
+              onClick={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))}
+            />
+          ))}
+        </svg>
+      </div>
+      <p className="text-center text-[10px] text-neutral-400">Ketuk area tubuh untuk menandai luka bakar (merah = terpilih)</p>
+
+      <div className="mt-3 space-y-1">
+        {regions.map((r) => (
+          <label key={r.key} className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 hover:bg-neutral-50">
+            <span className="flex items-center gap-2 text-[12px] font-semibold text-ink">
+              <input type="checkbox" checked={!!selected[r.key]} onChange={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))} className="h-4 w-4 accent-red-500" />
+              {r.label}
+            </span>
+            <span className="text-[11px] font-black text-neutral-400">{r.pct}%</span>
+          </label>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+        <div className="text-2xl font-black text-ink">{tbsa.toFixed(1)}% <span className="text-sm font-semibold text-neutral-400">TBSA</span></div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+      </div>
+
+      {tbsa >= 20 && (
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="rounded-xl bg-neutral-50 p-3 text-center">
+            <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">mL Total 24 jam (Parkland)</div>
+          </div>
+          <div className="rounded-xl bg-neutral-50 p-3 text-center">
+            <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (8 jam pertama)</div>
+          </div>
+          <div className="rounded-xl bg-neutral-50 p-3 text-center">
+            <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (16 jam berikut)</div>
+          </div>
+        </div>
+      )}
+      {tbsa > 0 && tbsa < 20 && (
+        <p className="mt-3 text-[11px] text-neutral-500">Parkland formula umumnya diterapkan pada luka bakar ≥20% TBSA. Untuk luas lebih kecil, tatalaksana cairan disesuaikan kebutuhan klinis individual.</p>
+      )}
+
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
+
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines adalah estimasi dewasa standar (persentase berbeda pada anak — kepala proporsional lebih besar). Total = 4 mL × berat(kg) × %TBSA (kristaloid RL), separuh dalam 8 jam pertama SEJAK WAKTU CEDERA, sisanya 16 jam berikutnya, disesuaikan output urin.</p>
+    </Card>
+  )
+}
+
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   return (
@@ -1548,6 +1659,7 @@ export function ClinicalCalculators() {
       {tab === 'denver' && <DenverCalc />}
       {tab === 'atls' && <AtlsCalc />}
       {tab === 'abg' && <AbgCalc />}
+      {tab === 'burn' && <BurnCalc />}
     </div>
   )
 }
