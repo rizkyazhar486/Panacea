@@ -188,7 +188,7 @@ export const api = {
     messages: { role: 'user' | 'assistant'; content: string }[]
     max_tokens?: number
   }) => req<{ text: string }>('/api/ai/messages', { method: 'POST', body: JSON.stringify(payload) }),
-  aiOperator: (mode: 'briefing' | 'content') =>
+  aiOperator: (mode: 'briefing' | 'content' | 'social' | 'seo' | 'ads' | 'ops') =>
     req<{ text: string; mode: string; pending?: { topups: number; topupIdr: number; doctors: number } }>(
       '/api/ai/operator',
       { method: 'POST', body: JSON.stringify({ mode }) },
