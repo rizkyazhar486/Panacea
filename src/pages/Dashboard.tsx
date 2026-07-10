@@ -4,6 +4,7 @@ import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../compone
 import { IconHeart, IconShield, IconPlus, IconSparkle } from '../components/icons'
 import { computeBmi, ageFromDob } from '../lib/anthro'
 import { GrowthChart } from '../components/GrowthChart'
+import { api, backendEnabled } from '../lib/api'
 import type { VitalSign, Patient } from '../lib/types'
 
 /* ═══════════════════════════════════════════
@@ -326,6 +327,66 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
 }
 
 /* ═══════════════════════════════════════════
+   AI CLINICAL INSIGHT
+   ═══════════════════════════════════════════ */
+const INSIGHT_SYSTEM = `Anda adalah AI co-physician Panaceamed yang membantu dokter membaca data klinis pasien dengan cepat. Berdasarkan data tanda vital & pemeriksaan penunjang yang diberikan, tulis SATU paragraf singkat (maks 3 kalimat) analisis klinis ringkas berbahasa Indonesia, lalu 3 poin rekomendasi tindakan konkret (pakai "• "). Jujur bila data belum cukup untuk kesimpulan kuat. Ini alat bantu, bukan diagnosis final — dokter tetap memutuskan.`
+
+function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; vitals: VitalSign[]; supportive: SupportiveResult[] }) {
+  const [text, setText] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const latest = vitals[vitals.length - 1]
+
+  async function requestInsight() {
+    setBusy(true); setErr(''); setText('')
+    const vitalsLine = latest
+      ? `TD ${latest.systolic}/${latest.diastolic} mmHg, nadi ${latest.heartRate}/min, RR ${latest.respRate}/min, suhu ${latest.tempC}°C, SpO2 ${latest.spo2}%${latest.glucose ? `, GDS ${latest.glucose} mg/dL` : ''}`
+      : 'belum ada data tanda vital tercatat'
+    const labsLine = supportive.length
+      ? supportive.slice(0, 8).map((s) => `${s.name} ${s.value}${s.unit ?? ''}${s.flag && s.flag !== 'normal' ? ` (${s.flag})` : ''}`).join('; ')
+      : 'belum ada hasil penunjang tercatat'
+    const context = `Pasien: ${patient.name}, ${patient.sex === 'L' ? 'laki-laki' : 'perempuan'}, ${ageFromDob(patient.dob)} tahun. Kondisi kronis: ${patient.chronicConditions.join(', ') || '-'}. Alergi: ${patient.allergies.join(', ') || '-'}.\nTanda vital terbaru: ${vitalsLine}.\nPemeriksaan penunjang terbaru: ${labsLine}.`
+    try {
+      const r = await api.aiMessages({ model: 'claude-sonnet-4-6', system: INSIGHT_SYSTEM, messages: [{ role: 'user', content: context }], max_tokens: 500 })
+      setText(r.text)
+    } catch {
+      setErr('AI Clinical Insight gagal dimuat. Pastikan server & kunci AI aktif.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
+      <div className="flex items-center gap-2">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
+        <div>
+          <div className="text-sm font-black">AI Clinical Insight</div>
+          <div className="text-[10px] font-semibold text-white/60">Ditenagai AI Panaceamed · Beta</div>
+        </div>
+      </div>
+
+      {text ? (
+        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-white/90">{text}</div>
+      ) : (
+        <p className="mt-3 text-[13px] leading-relaxed text-white/70">
+          Minta AI merangkum tanda vital & hasil penunjang terbaru pasien ini menjadi analisis klinis singkat dan rekomendasi tindakan.
+        </p>
+      )}
+      {err && <p className="mt-2 text-[11px] text-white/80">{err}</p>}
+
+      <button
+        onClick={requestInsight}
+        disabled={busy}
+        className="mt-4 w-full rounded-xl bg-white/15 py-2.5 text-xs font-bold text-white transition hover:bg-white/25 disabled:opacity-50"
+      >
+        {busy ? 'Menganalisis…' : text ? '🔄 Analisis Ulang' : 'Minta Analisis AI →'}
+      </button>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════
    MAIN DASHBOARD
    ═══════════════════════════════════════════ */
 
@@ -444,6 +505,9 @@ export function Dashboard() {
           </div>
         </div>
       </Card>
+
+      {/* AI Clinical Insight */}
+      {backendEnabled && <AiClinicalInsight patient={p} vitals={vitals} supportive={supportive} />}
 
       {/* Add Vital Collapsible — FIX: tidak pakai style pada Card */}
       {showAdd && (
