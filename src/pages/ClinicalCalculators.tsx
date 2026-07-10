@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 
@@ -198,12 +199,136 @@ function CkdEpiCalc() {
   )
 }
 
+/* ══════════════════ WHO GROWTH STANDARDS (z-score) ══════════════════ */
+// WHO Child Growth Standards (2006), 0–60 months. Reference medians below are
+// taken at standard checkpoint ages (0/6/12/24/36/48/60mo) with linear
+// interpolation between them, and SD estimated from the WHO-published
+// coefficient of variation at each checkpoint. This is a SIMPLIFIED estimator
+// for screening/decision-support — for definitive clinical use, cross-check
+// against the official WHO growth chart (percentile curves), which uses the
+// full monthly-resolution LMS table this tool approximates.
+const WHO_CHECKPOINTS_MO = [0, 6, 12, 24, 36, 48, 60]
+const WHO_WEIGHT_M: Record<'M' | 'F', number[]> = {
+  M: [3.3, 7.9, 9.6, 12.2, 14.3, 16.3, 18.3],
+  F: [3.2, 7.3, 8.9, 11.5, 13.9, 16.1, 18.2],
+}
+const WHO_WEIGHT_SD: Record<'M' | 'F', number[]> = {
+  M: [0.4, 0.9, 1.1, 1.5, 1.8, 2.1, 2.4],
+  F: [0.4, 0.9, 1.1, 1.5, 1.9, 2.2, 2.6],
+}
+const WHO_HEIGHT_M: Record<'M' | 'F', number[]> = {
+  M: [49.9, 67.6, 75.7, 87.1, 96.1, 103.3, 110.0],
+  F: [49.1, 65.7, 74.0, 85.7, 95.1, 102.7, 109.4],
+}
+const WHO_HEIGHT_SD: Record<'M' | 'F', number[]> = {
+  M: [1.9, 2.3, 2.6, 3.2, 3.6, 3.9, 4.2],
+  F: [1.9, 2.3, 2.6, 3.2, 3.6, 4.0, 4.3],
+}
+
+function interp(ageMo: number, xs: number[], ys: number[]): number {
+  const a = Math.max(xs[0], Math.min(xs[xs.length - 1], ageMo))
+  for (let i = 0; i < xs.length - 1; i++) {
+    if (a >= xs[i] && a <= xs[i + 1]) {
+      const t = (a - xs[i]) / (xs[i + 1] - xs[i])
+      return ys[i] + t * (ys[i + 1] - ys[i])
+    }
+  }
+  return ys[ys.length - 1]
+}
+
+function zClass(z: number): { l: string; tone: 'normal' | 'low' | 'critical' } {
+  if (z < -3) return { l: 'Sangat rendah (severely)', tone: 'critical' }
+  if (z < -2) return { l: 'Rendah', tone: 'low' }
+  if (z <= 2) return { l: 'Normal', tone: 'normal' }
+  return { l: 'Tinggi', tone: 'low' }
+}
+
+function WhoGrowthCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const [ageMo, setAgeMo] = useState(12)
+  const [weight, setWeight] = useState(9.6)
+  const [height, setHeight] = useState(75.7)
+
+  const wM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_M[sex])
+  const wSD = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_WEIGHT_SD[sex])
+  const hM = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_HEIGHT_M[sex])
+  const hSD = interp(ageMo, WHO_CHECKPOINTS_MO, WHO_HEIGHT_SD[sex])
+  const waz = (weight - wM) / wSD
+  const haz = (height - hM) / hSD
+  const wazC = zClass(waz)
+  const hazC = zClass(haz)
+
+  // Masked malnutrition: height-for-age flags stunting (haz ≤ -2), but
+  // weight-for-age still reads "normal" — because weight is being judged
+  // against chronological age, not against the child's actual (shorter)
+  // growth trajectory. A clinician glancing at weight-for-age alone would
+  // miss the stunting entirely.
+  const masked = haz <= -2 && waz > -2
+
+  const chartData = WHO_CHECKPOINTS_MO.map((mo, i) => ({
+    mo,
+    beratMedian: WHO_WEIGHT_M[sex][i],
+    tinggiMedian: WHO_HEIGHT_M[sex][i],
+  }))
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Growth Standards (Z-score)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — estimasi dari titik acuan bulan ke-0/6/12/24/36/48/60" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
+        <Field label="Usia (bulan)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+        <Field label="Berat (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Panjang/Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Berat/Usia (WAZ)</div>
+          <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
+          <Badge tone={wazC.tone}>{wazC.l}</Badge>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Tinggi/Usia (HAZ)</div>
+          <div className="mt-1 text-xl font-black text-ink">{haz >= 0 ? '+' : ''}{haz.toFixed(2)} SD</div>
+          <Badge tone={hazC.tone}>{hazC.l}</Badge>
+        </div>
+      </div>
+
+      {masked && (
+        <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
+          <p className="text-xs font-black text-amber-800">⚠️ Kemungkinan stunting tersamar (masked malnutrition)</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
+            Tinggi/usia menunjukkan stunting (HAZ ≤ -2 SD), namun berat/usia tampak normal — ini menyesatkan bila hanya berat/usia yang dilihat, karena berat dinilai relatif terhadap usia kronologis, bukan terhadap lintasan tumbuh anak yang sebenarnya sudah tertekan. Pertimbangkan evaluasi gizi lebih lanjut meski berat/usia terlihat baik.
+          </p>
+        </div>
+      )}
+
+      <div className="mt-4 h-48 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis dataKey="mo" tick={{ fontSize: 10 }} label={{ value: 'Usia (bulan)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} />
+            <Tooltip />
+            <Line type="monotone" dataKey="beratMedian" name="Median Berat (kg)" stroke="#00BF63" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="tinggiMedian" name="Median Tinggi (cm)" stroke="#0B7A4B" strokeWidth={2} dot={false} strokeDasharray="4 3" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        Kurva menunjukkan median rujukan WHO (bukan data anak ini). Estimasi disederhanakan dari titik acuan standar — untuk keputusan klinis definitif, bandingkan dengan grafik pertumbuhan resmi WHO/KMS.
+      </p>
+    </Card>
+  )
+}
+
 const TABS = [
   { id: 'apgar', label: 'APGAR' },
   { id: 'gcs', label: 'GCS' },
   { id: 'curb65', label: 'CURB-65' },
   { id: 'bishop', label: 'Bishop' },
   { id: 'ckdepi', label: 'CKD-EPI' },
+  { id: 'whogrowth', label: 'WHO Growth' },
 ] as const
 
 export function ClinicalCalculators() {
@@ -227,6 +352,7 @@ export function ClinicalCalculators() {
       {tab === 'curb65' && <Curb65Calc />}
       {tab === 'bishop' && <BishopCalc />}
       {tab === 'ckdepi' && <CkdEpiCalc />}
+      {tab === 'whogrowth' && <WhoGrowthCalc />}
     </div>
   )
 }
