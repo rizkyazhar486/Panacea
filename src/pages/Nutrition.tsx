@@ -1810,6 +1810,17 @@ export function Nutrition() {
           <p className="mt-2 text-xs font-semibold italic text-brand-dark">🌿 Semoga bermanfaat untuk umat manusia.</p>
         </div>
       </Card>
+
+      {/* Sumber Data Nutrisi */}
+      <Card className="!p-5">
+        <SectionTitle icon={<span className="text-lg">📚</span>} title="Sumber Data Nutrisi" subtitle="Rujukan komposisi pangan yang mendasari database nutrisi Panaceamed" />
+        <ul className="mt-2 space-y-2 text-[12px] leading-relaxed text-neutral-600">
+          <li>• <b>TKPI</b> (Tabel Komposisi Pangan Indonesia), Kementerian Kesehatan RI — rujukan utama untuk kandungan gizi makanan khas/lokal Indonesia.</li>
+          <li>• <b>USDA FoodData Central</b> (U.S. Department of Agriculture) — rujukan pelengkap untuk item internasional atau data mikronutrien yang lebih rinci.</li>
+          <li>• <b>AKG 2019</b> (Angka Kecukupan Gizi, Permenkes RI) — dasar acuan kebutuhan harian (protein, serat, mikronutrien) yang dipakai target/skor di halaman ini.</li>
+        </ul>
+        <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Nilai gizi per 100g pada database ini adalah estimasi representatif per kategori makanan (mis. "Ayam bakar" mewakili variasi resep umum), bukan hasil uji laboratorium item spesifik — variasi resep, ukuran porsi, dan merek produk memengaruhi nilai aktual. Untuk kebutuhan medis presisi tinggi (mis. penyakit ginjal kronis, alergi berat), verifikasi label produk & konsultasikan ahli gizi klinis.</p>
+      </Card>
     </div>
   )
 }
