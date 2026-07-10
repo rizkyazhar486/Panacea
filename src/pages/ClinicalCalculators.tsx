@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope, IconShield, IconCheck, IconToken } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
+import { MANUAL_BANK } from '../lib/payment'
 
 // Standard published clinical scoring tools — each formula/table matches the
 // cited source exactly (see inline notes). These are decision-support aids,
@@ -64,24 +66,36 @@ function GcsCalc() {
   const eye = [{ v: 1, l: 'Tidak buka' }, { v: 2, l: 'Nyeri' }, { v: 3, l: 'Suara' }, { v: 4, l: 'Spontan' }]
   const verbal = [{ v: 1, l: 'Tidak ada' }, { v: 2, l: 'Suara tak jelas' }, { v: 3, l: 'Kata tak sesuai' }, { v: 4, l: 'Bingung' }, { v: 5, l: 'Orientasi baik' }]
   const motor = [{ v: 1, l: 'Tidak ada' }, { v: 2, l: 'Ekstensi (deserebrasi)' }, { v: 3, l: 'Fleksi (dekortikasi)' }, { v: 4, l: 'Menghindar nyeri' }, { v: 5, l: 'Lokalisasi nyeri' }, { v: 6, l: 'Mengikuti perintah' }]
+  const pupilOpts = [{ v: 0, l: 'Kedua reaktif' }, { v: 1, l: 'Satu tak reaktif' }, { v: 2, l: 'Keduanya tak reaktif' }]
   const [e, setE] = useState(4); const [v, setV] = useState(5); const [m, setM] = useState(6)
+  const [pupil, setPupil] = useState(0)
   const total = e + v + m
+  // GCS-P ("Improved GCS" / GCS-Pupils score, Brennan et al. 2018, Lancet
+  // Neurology) — subtracts a pupil reactivity penalty from GCS-motor+verbal
+  // total, giving better mortality/outcome discrimination in TBI than GCS
+  // alone, especially at the severe end of the scale.
+  const gcsP = Math.max(1, total - pupil)
   const interp = total >= 13 ? { l: 'Cedera ringan', tone: 'normal' as const } : total >= 9 ? { l: 'Cedera sedang', tone: 'low' as const } : { l: 'Cedera berat — proteksi jalan napas', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Glasgow Coma Scale (GCS)" subtitle="Teasdale & Jennett, 1974" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (Improved GCS)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan et al., Lancet Neurol 2018" />
       <div className="space-y-3">
         <Field label="Eye Opening (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
         <Field label="Verbal Response (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
         <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
+        <Field label="Reaktivitas Pupil"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
       </div>
-      <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
-        <div>
-          <div className="text-2xl font-black text-ink">E{e}V{v}M{m} = {total}<span className="text-sm font-semibold text-neutral-400">/15</span></div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-xl font-black text-ink">E{e}V{v}M{m} = {total}<span className="text-sm font-semibold text-neutral-400">/15</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
-        <p className="max-w-[45%] text-right text-[10px] text-neutral-400">13-15 ringan · 9-12 sedang · ≤8 berat (indikasi intubasi proteksi jalan napas).</p>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-xl font-black text-ink">{gcsP}<span className="text-sm font-semibold text-neutral-400">/15 (GCS-P)</span></div>
+          <p className="mt-1 text-[10px] text-neutral-400">GCS-P = GCS total − skor pupil (0/1/2)</p>
+        </div>
       </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">13-15 ringan · 9-12 sedang · ≤8 berat (indikasi intubasi proteksi jalan napas). GCS-Pupil (GCS-P) menggabungkan reaktivitas pupil untuk stratifikasi mortalitas/prognosis cedera otak traumatik yang lebih tajam dibanding GCS saja, terutama pada skor rendah.</p>
     </Card>
   )
 }
@@ -244,6 +258,23 @@ function zClass(z: number): { l: string; tone: 'normal' | 'low' | 'critical' } {
   return { l: 'Tinggi', tone: 'low' }
 }
 
+// Weight-for-height (WHZ) reference — WHO uses height bands rather than age
+// bands for this index, but as a simplified screening estimator we derive
+// the expected weight-for-height from the same age-checkpoint medians (the
+// height at that checkpoint maps to the weight at that checkpoint), which
+// is the same approximation approach already used for WAZ/HAZ above.
+function whzFromHeight(heightCm: number, sex: 'M' | 'F'): { m: number; sd: number } {
+  const hs = WHO_HEIGHT_M[sex]
+  let lo = 0
+  for (let i = 0; i < hs.length - 1; i++) { if (heightCm >= hs[i]) lo = i }
+  const hi = Math.min(lo + 1, hs.length - 1)
+  const span = hs[hi] - hs[lo] || 1
+  const t = Math.max(0, Math.min(1, (heightCm - hs[lo]) / span))
+  const m = WHO_WEIGHT_M[sex][lo] + t * (WHO_WEIGHT_M[sex][hi] - WHO_WEIGHT_M[sex][lo])
+  const sd = WHO_WEIGHT_SD[sex][lo] + t * (WHO_WEIGHT_SD[sex][hi] - WHO_WEIGHT_SD[sex][lo])
+  return { m, sd }
+}
+
 function WhoGrowthCalc() {
   const [sex, setSex] = useState<'M' | 'F'>('M')
   const [ageMo, setAgeMo] = useState(12)
@@ -258,6 +289,10 @@ function WhoGrowthCalc() {
   const haz = (height - hM) / hSD
   const wazC = zClass(waz)
   const hazC = zClass(haz)
+  const whzRef = whzFromHeight(height, sex)
+  const whz = (weight - whzRef.m) / whzRef.sd
+  const whzC = zClass(whz)
+  const bmi = weight / (height / 100) ** 2
 
   // Masked malnutrition: height-for-age flags stunting (haz ≤ -2), but
   // weight-for-age still reads "normal" — because weight is being judged
@@ -274,7 +309,7 @@ function WhoGrowthCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Growth Standards (Z-score)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — estimasi dari titik acuan bulan ke-0/6/12/24/36/48/60" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — mengacu Standar Antropometri Anak Permenkes RI No. 2/2020" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
         <Field label="Usia (bulan)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
@@ -282,7 +317,7 @@ function WhoGrowthCalc() {
         <Field label="Panjang/Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Berat/Usia (WAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
@@ -292,6 +327,16 @@ function WhoGrowthCalc() {
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Tinggi/Usia (HAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{haz >= 0 ? '+' : ''}{haz.toFixed(2)} SD</div>
           <Badge tone={hazC.tone}>{hazC.l}</Badge>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Berat/Tinggi (WHZ)</div>
+          <div className="mt-1 text-xl font-black text-ink">{whz >= 0 ? '+' : ''}{whz.toFixed(2)} SD</div>
+          <Badge tone={whzC.tone}>{whzC.l}</Badge>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3">
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">IMT (BMI)</div>
+          <div className="mt-1 text-xl font-black text-ink">{bmi.toFixed(1)}</div>
+          <div className="text-[10px] text-neutral-400">kg/m²</div>
         </div>
       </div>
 
@@ -316,9 +361,164 @@ function WhoGrowthCalc() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
-        Kurva menunjukkan median rujukan WHO (bukan data anak ini). Estimasi disederhanakan dari titik acuan standar — untuk keputusan klinis definitif, bandingkan dengan grafik pertumbuhan resmi WHO/KMS.
+        Kurva menunjukkan median rujukan WHO (bukan data anak ini). Estimasi disederhanakan dari titik acuan standar — untuk keputusan klinis definitif, bandingkan dengan grafik pertumbuhan resmi WHO/KMS/Buku KIA sesuai Standar Antropometri Anak (Permenkes RI No. 2 Tahun 2020).
       </p>
+    </Card>
+  )
+}
+
+/* ══════════════════ WHO NEONATE GROWTH (0–30 hari) ══════════════════ */
+// WHO/Fenton-style neonatal weight-for-age reference for the first 30 days
+// — a much finer time scale than the 0-60mo standard above, since weight
+// loss/regain in the first 2 weeks follows its own well-known pattern
+// (physiologic weight loss up to ~7-10% by day 3-5, regain to birth weight
+// by day 10-14) rather than the monthly-resolution WHO growth curve.
+const NEONATE_DAYS = [0, 3, 5, 7, 10, 14, 21, 30]
+// Expressed as % of birth weight (median expected trajectory).
+const NEONATE_PCT_OF_BW = [100, 93, 91, 95, 100, 105, 112, 120]
+const NEONATE_PCT_SD = [0, 3, 3.5, 3, 2.5, 3, 4, 5]
+
+function WhoNeonateCalc() {
+  const [birthWeightG, setBirthWeightG] = useState(3200)
+  const [days, setDays] = useState(5)
+  const [currentWeightG, setCurrentWeightG] = useState(2950)
+
+  const expectedPct = interp(days, NEONATE_DAYS, NEONATE_PCT_OF_BW)
+  const sdPct = interp(days, NEONATE_DAYS, NEONATE_PCT_SD)
+  const expectedG = (birthWeightG * expectedPct) / 100
+  const currentPct = (currentWeightG / birthWeightG) * 100
+  const z = (currentPct - expectedPct) / sdPct
+  const lossFromBirth = ((birthWeightG - currentWeightG) / birthWeightG) * 100
+
+  const excessLoss = days <= 10 && lossFromBirth > 10
+  const notRegained = days >= 14 && currentWeightG < birthWeightG
+
+  const chartData = NEONATE_DAYS.map((d, i) => ({ d, pctMedian: NEONATE_PCT_OF_BW[i] }))
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Hari)" subtitle="Lintasan berat badan neonatus dini — penurunan fisiologis & pemulihan ke berat lahir" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Berat Lahir (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="Usia (hari)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
+        <Field label="Berat Saat Ini (g)"><input className={inputClass} type="number" value={currentWeightG} onChange={(e) => setCurrentWeightG(+e.target.value)} /></Field>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{lossFromBirth >= 0 ? lossFromBirth.toFixed(1) : '0'}%</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">{lossFromBirth >= 0 ? 'Turun dari lahir' : 'Sudah naik dari lahir'}</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{z >= 0 ? '+' : ''}{z.toFixed(2)} SD</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">vs. lintasan median (harapan {expectedG.toFixed(0)}g)</div>
+        </div>
+      </div>
+
+      {excessLoss && (
+        <div className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3">
+          <p className="text-xs font-black text-red-800">🚨 Penurunan berat &gt;10% dari lahir</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-red-700">Evaluasi kecukupan menyusui/pemberian minum, hidrasi, dan pertimbangkan rujukan laktasi/pediatri bila belum ada perbaikan.</p>
+        </div>
+      )}
+      {notRegained && !excessLoss && (
+        <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
+          <p className="text-xs font-black text-amber-800">⚠️ Belum kembali ke berat lahir pada usia ≥14 hari</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">Normalnya berat lahir tercapai kembali sekitar hari ke-10-14 — evaluasi asupan bila belum tercapai.</p>
+        </div>
+      )}
+
+      <div className="mt-4 h-40 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis dataKey="d" tick={{ fontSize: 10 }} label={{ value: 'Usia (hari)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} domain={[85, 125]} />
+            <Tooltip />
+            <Line type="monotone" dataKey="pctMedian" name="% Berat Lahir (median)" stroke="#00BF63" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Penurunan fisiologis hingga ~7-10% berat lahir dalam 3-5 hari pertama adalah normal (kehilangan cairan ekstravaskular), dengan pemulihan ke berat lahir sekitar hari ke-10-14. Estimasi disederhanakan dari titik acuan standar — bandingkan dengan grafik neonatal resmi (WHO/Fenton) untuk kasus borderline.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ CDC ANTHROPOMETRY (2–20 TAHUN) ══════════════════ */
+// CDC 2000 growth reference (used for ages beyond WHO's 0-5yr scope, per
+// CDC/AAP convention of switching references at 24 months in US practice,
+// though Indonesia's Permenkes 2/2020 uses WHO throughout — this tab covers
+// the CDC-specific 2-20yr BMI-for-age percentile bands clinicians may still
+// need for international/CDC-referenced records).
+const CDC_BMI_AGE_YR = [2, 5, 10, 15, 20]
+const CDC_BMI_P5: Record<'M' | 'F', number[]> = { M: [14.7, 13.5, 14.2, 16.5, 18.5], F: [14.4, 13.3, 14.0, 16.0, 17.8] }
+const CDC_BMI_P85: Record<'M' | 'F', number[]> = { M: [18.2, 16.8, 19.0, 23.5, 26.0], F: [17.9, 16.9, 19.5, 23.8, 25.8] }
+const CDC_BMI_P95: Record<'M' | 'F', number[]> = { M: [19.3, 17.9, 21.0, 26.5, 29.5], F: [19.1, 18.0, 21.8, 27.0, 29.8] }
+
+function cdcBmiClass(bmi: number, ageYr: number, sex: 'M' | 'F'): { l: string; tone: 'normal' | 'low' | 'critical' } {
+  const p5 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P5[sex])
+  const p85 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P85[sex])
+  const p95 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P95[sex])
+  if (bmi < p5) return { l: 'Berat badan kurang (<P5)', tone: 'low' }
+  if (bmi < p85) return { l: 'Normal (P5-P85)', tone: 'normal' }
+  if (bmi < p95) return { l: 'Berisiko overweight (P85-P95)', tone: 'low' }
+  return { l: 'Obesitas (≥P95)', tone: 'critical' }
+}
+
+function CdcAnthropometryCalc() {
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const [ageYr, setAgeYr] = useState(10)
+  const [weight, setWeight] = useState(32)
+  const [height, setHeight] = useState(138)
+
+  const bmi = weight / (height / 100) ** 2
+  const cls = cdcBmiClass(bmi, ageYr, sex)
+  const p85 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P85[sex])
+  const p95 = interp(ageYr, CDC_BMI_AGE_YR, CDC_BMI_P95[sex])
+
+  const chartData = CDC_BMI_AGE_YR.map((a, i) => ({
+    age: a,
+    p5: CDC_BMI_P5[sex][i],
+    p85: CDC_BMI_P85[sex][i],
+    p95: CDC_BMI_P95[sex][i],
+  }))
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Tahun)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentile untuk anak & remaja" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
+        <Field label="Usia (tahun)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
+        <Field label="Berat (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{bmi.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">kg/m²</span></div>
+          <Badge tone={cls.tone}>{cls.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] text-neutral-500">Ambang usia ini: P85 ≈ {p85.toFixed(1)} · P95 ≈ {p95.toFixed(1)} kg/m²</p>
+      </div>
+
+      <div className="mt-4 h-44 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+            <XAxis dataKey="age" tick={{ fontSize: 10 }} label={{ value: 'Usia (tahun)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} />
+            <Tooltip />
+            <Line type="monotone" dataKey="p5" name="P5" stroke="#9ca3af" strokeWidth={1.5} dot={false} strokeDasharray="3 3" />
+            <Line type="monotone" dataKey="p85" name="P85" stroke="#f59e0b" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="p95" name="P95" stroke="#ef4444" strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">CDC 2000 Growth Reference (2-20 tahun), digunakan secara internasional untuk BMI-for-age. Indonesia (Permenkes 2/2020) menggunakan standar WHO di seluruh rentang usia anak — gunakan tab WHO Anthropometry untuk rujukan nasional. Persentil di atas adalah estimasi dari titik acuan standar, bukan tabel LMS penuh.</p>
     </Card>
   )
 }
@@ -686,7 +886,9 @@ const TABS = [
   { id: 'curb65', label: 'CURB-65' },
   { id: 'bishop', label: 'Bishop' },
   { id: 'ckdepi', label: 'CKD-EPI' },
-  { id: 'whogrowth', label: 'WHO Growth' },
+  { id: 'whogrowth', label: 'WHO Anthropometry' },
+  { id: 'whoneonate', label: 'WHO Neonate' },
+  { id: 'cdcanthro', label: 'CDC Anthropometry' },
   { id: 'ballard', label: 'Ballard+SOAP' },
   { id: 'qsofa', label: 'qSOFA' },
   { id: 'hollidaysegar', label: 'Cairan Rumatan' },
@@ -695,12 +897,15 @@ const TABS = [
   { id: 'map', label: 'MAP' },
   { id: 'alvarado', label: 'Alvarado' },
   { id: 'centor', label: 'Centor/McIsaac' },
-  { id: 'nacorr', label: 'Koreksi Na⁺' },
+  { id: 'nacorr', label: 'Koreksi Elektrolit' },
   { id: 'broca', label: 'Broca IBW' },
+  { id: 'brocalorentz', label: 'Broca-Lorentz Kalori' },
+  { id: 'ivdrip', label: 'Tetes Infus' },
   { id: 'midparental', label: 'Mid-Parental' },
   { id: 'fletcher', label: 'Fletcher Index' },
   { id: 'nose', label: 'NOSE' },
   { id: 'rsi', label: 'RSI' },
+  { id: 'aria', label: 'ARIA Criteria' },
   { id: 'abcd2', label: 'ABCD²' },
   { id: 'four', label: 'FOUR Score' },
   { id: 'mcdonald', label: 'McDonald' },
@@ -711,6 +916,7 @@ const TABS = [
   { id: 'vbac', label: 'VBAC Flamm-Geiger' },
   { id: 'denver', label: 'Denver II (Simplified)' },
   { id: 'atls', label: 'XABCDE Trauma Survey' },
+  { id: 'acls', label: 'Panduan ACLS' },
   { id: 'abg', label: 'Analisis Gas Darah' },
   { id: 'burn', label: 'Kalkulator Luka Bakar' },
   { id: 'cranial', label: 'Saraf Kranial + Meningeal' },
@@ -769,18 +975,51 @@ function NaCorrectionCalc() {
   const [glucose, setGlucose] = useState(400)
   // Katz correction: +1.6 mEq/L Na per 100 mg/dL glucose above 100 mg/dL
   const correctedNa = measuredNa + 1.6 * Math.max(0, (glucose - 100) / 100)
+
+  // Potassium deficit estimate (Sterns' rule-of-thumb, widely taught):
+  // each 1 mEq/L drop in serum K+ below 4.0 corresponds to roughly a 200-400
+  // mEq total-body deficit — presented as a range, not a single number, since
+  // the true relationship is nonlinear and affected by acid-base status.
+  const [measuredK, setMeasuredK] = useState(3.2)
+  const kDeficitLow = Math.max(0, (4.0 - measuredK) * 200)
+  const kDeficitHigh = Math.max(0, (4.0 - measuredK) * 400)
+  const kSeverity = measuredK < 2.5 || measuredK > 6.5
+    ? { l: 'Berat — pantau EKG ketat', tone: 'critical' as const }
+    : measuredK < 3.0 || measuredK > 6.0
+    ? { l: 'Sedang', tone: 'low' as const }
+    : measuredK < 3.5 || measuredK > 5.5
+    ? { l: 'Ringan', tone: 'low' as const }
+    : { l: 'Normal', tone: 'normal' as const }
+
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Koreksi Natrium (Hiperglikemia)" subtitle="Formula Katz (1973) — natrium sejati saat glukosa tinggi" />
-      <div className="grid grid-cols-2 gap-2">
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Koreksi Elektrolit (Na & K)" subtitle="Natrium: Formula Katz (1973) · Kalium: estimasi defisit (Sterns' rule-of-thumb)" />
+
+      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Natrium (Hiperglikemia)</h4>
+      <div className="mt-2 grid grid-cols-2 gap-2">
         <Field label="Natrium Terukur (mEq/L)"><input className={inputClass} type="number" value={measuredNa} onChange={(e) => setMeasuredNa(+e.target.value)} /></Field>
         <Field label="Glukosa Darah (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
       </div>
-      <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
+      <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">mEq/L</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Natrium Terkoreksi</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Na Terkoreksi = Na Terukur + 1.6 × [(Glukosa − 100) / 100]. Hiperglikemia menarik air keluar sel, mengencerkan natrium serum secara faktisial — koreksi ini mengungkap status natrium sebenarnya, penting sebelum menyimpulkan hiponatremia pada DKA/HHS.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Na Terkoreksi = Na Terukur + 1.6 × [(Glukosa − 100) / 100]. Hiperglikemia menarik air keluar sel, mengencerkan natrium serum secara faktisial.</p>
+
+      <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Kalium</h4>
+      <div className="mt-2">
+        <Field label="Kalium Terukur (mEq/L)"><input className={inputClass} type="number" step="0.1" value={measuredK} onChange={(e) => setMeasuredK(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-3 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-lg font-black text-ink">{measuredK < 4.0 ? `${kDeficitLow.toFixed(0)}–${kDeficitHigh.toFixed(0)} mEq` : '—'}</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-400">Estimasi Defisit Total-Body K⁺</div>
+          </div>
+          <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
+        </div>
+      </div>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Estimasi kasar: setiap penurunan 1 mEq/L K⁺ serum di bawah 4.0 ≈ defisit total tubuh 200-400 mEq (hubungan non-linear, dipengaruhi status asam-basa). Koreksi IV kalium umumnya dibatasi ≤10-20 mEq/jam perifer (lebih tinggi via akses sentral dengan pemantauan EKG kontinu) — jangan mengoreksi seluruh defisit sekaligus.</p>
     </Card>
   )
 }
@@ -834,10 +1073,15 @@ function MidParentalCalc() {
 
 /* ══════════════════ FLETCHER INDEX (HEARING LOSS) ══════════════════ */
 function FletcherCalc() {
+  const [mode, setMode] = useState<'basic' | 'complete'>('basic')
   const [t500, setT500] = useState(20)
   const [t1000, setT1000] = useState(20)
   const [t2000, setT2000] = useState(20)
-  const index = (t500 + t1000 + t2000) / 3
+  const [t3000, setT3000] = useState(20)
+  // Complete (AAO-HNS 4-frequency) average adds 3000Hz — captures noise-
+  // induced/occupational hearing-loss notches that the classic 3-frequency
+  // Fletcher index (500/1000/2000Hz) alone can miss.
+  const index = mode === 'basic' ? (t500 + t1000 + t2000) / 3 : (t500 + t1000 + t2000 + t3000) / 4
   const cls = index < 26
     ? { l: 'Normal', tone: 'normal' as const }
     : index < 41
@@ -851,11 +1095,13 @@ function FletcherCalc() {
     : { l: 'Tuli sangat berat (total)', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Rata-rata ambang nada murni 500/1000/2000 Hz — klasifikasi derajat tuli" />
-      <div className="grid grid-cols-3 gap-2">
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Rata-rata ambang nada murni — klasifikasi derajat tuli" />
+      <SegButtons value={mode} onChange={setMode} options={[{ v: 'basic', l: 'Basic (3-frekuensi)' }, { v: 'complete', l: 'Complete (4-frekuensi, AAO-HNS)' }]} />
+      <div className={`mt-3 grid gap-2 ${mode === 'basic' ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
         <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
         <Field label="1000 Hz (dB)"><input className={inputClass} type="number" value={t1000} onChange={(e) => setT1000(+e.target.value)} /></Field>
         <Field label="2000 Hz (dB)"><input className={inputClass} type="number" value={t2000} onChange={(e) => setT2000(+e.target.value)} /></Field>
+        {mode === 'complete' && <Field label="3000 Hz (dB)"><input className={inputClass} type="number" value={t3000} onChange={(e) => setT3000(+e.target.value)} /></Field>}
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -863,7 +1109,9 @@ function FletcherCalc() {
           <Badge tone={cls.tone}>{cls.l}</Badge>
         </div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">Fletcher Index = rata-rata ambang 500+1000+2000 Hz. &lt;26dB normal · 26-40 ringan · 41-55 sedang · 56-70 sedang-berat · 71-90 berat · &gt;90 sangat berat.</p>
+      <p className="mt-3 text-[10px] text-neutral-400">
+        {mode === 'basic' ? 'Fletcher Index = rata-rata ambang 500+1000+2000 Hz.' : 'Complete (AAO-HNS 4-frekuensi) = rata-rata ambang 500+1000+2000+3000 Hz — lebih peka menangkap notch akibat bising/occupational.'} &lt;26dB normal · 26-40 ringan · 41-55 sedang · 56-70 sedang-berat · 71-90 berat · &gt;90 sangat berat.
+      </p>
     </Card>
   )
 }
@@ -1926,40 +2174,26 @@ function CompetencyTracker() {
 }
 
 // ── Paywall: free for the first 50 registered accounts, then a one-time
-// unlock via 500 PNC from wallet balance or a direct Rp500.000 charge. ──
+// 500-PNC unlock. Rupiah settles ONLY via manual transfer to the owner's
+// Mandiri account (topped up as PNC in Billing, verified by photo proof) —
+// no QRIS/VA/card gateway exists, so this deliberately offers no direct
+// IDR charge button. ──
 type CalcAccess = { unlocked: boolean; free: boolean; limit: number; slotsLeft: number; pricePnc: number; priceIdr: number }
 
 function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnlocked: () => void }) {
-  const [busy, setBusy] = useState<'pnc' | 'idr' | null>(null)
+  const navigate = useNavigate()
+  const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
   async function payWithPnc() {
-    setBusy('pnc'); setErr('')
+    setBusy(true); setErr('')
     try {
       const r = await api.unlockClinicalCalcPnc()
       if (r.unlocked) onUnlocked()
     } catch (e) {
-      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Saldo PNC Anda tidak cukup (butuh ${access.pricePnc} PNC). Isi saldo dulu di Billing.` : 'Gagal membuka akses. Coba lagi.')
+      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Saldo PNC Anda tidak cukup (butuh ${access.pricePnc} PNC). Isi saldo dulu lewat transfer bank di Billing.` : 'Gagal membuka akses. Coba lagi.')
     } finally {
-      setBusy(null)
-    }
-  }
-
-  async function payWithIdr() {
-    setBusy('idr'); setErr('')
-    try {
-      const r = await api.createPayment(0, 'QRIS', 'clinical_calc_unlock')
-      if (!r.live) {
-        // Sandbox/dev mode — no live payment gateway configured, simulate settlement.
-        await api.confirmPayment(r.orderId)
-        onUnlocked()
-      } else if (r.redirectUrl) {
-        window.location.href = r.redirectUrl
-      }
-    } catch {
-      setErr('Gagal memulai pembayaran. Coba lagi.')
-    } finally {
-      setBusy(null)
+      setBusy(false)
     }
   }
 
@@ -1967,29 +2201,229 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
     <Card>
       <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 skor & alat bantu keputusan klinis standar internasional" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
-        🎉 Kalkulator Klinis <b>gratis</b> untuk {access.limit} pendaftar akun Panaceamed.id pertama — kuota itu sudah penuh. Buka akses seumur akun dengan salah satu metode di bawah.
+        🎉 Kalkulator Klinis <b>gratis</b> untuk {access.limit} pendaftar akun Panaceamed.id pertama — kuota itu sudah penuh. Buka akses seumur akun sekali bayar: <b>{access.pricePnc} PNC</b> (setara Rp{access.priceIdr.toLocaleString('id-ID')}).
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <button
           onClick={payWithPnc}
-          disabled={busy !== null}
+          disabled={busy}
           className="flex flex-col items-start gap-1 rounded-2xl border border-brand/30 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
         >
           <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Bayar dari saldo</span>
           <span className="text-xl font-black text-ink">{access.pricePnc} PNC</span>
-          <span className="text-[11px] text-neutral-500">{busy === 'pnc' ? 'Memproses…' : 'Langsung terpotong dari saldo PanaceaToken Anda'}</span>
+          <span className="text-[11px] text-neutral-500">{busy ? 'Memproses…' : 'Langsung terpotong dari saldo PanaceaToken Anda'}</span>
         </button>
         <button
-          onClick={payWithIdr}
-          disabled={busy !== null}
-          className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
+          onClick={() => navigate('/billing')}
+          className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
         >
-          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">QRIS / VA / Kartu</span>
-          <span className="text-xl font-black text-ink">Rp{access.priceIdr.toLocaleString('id-ID')}</span>
-          <span className="text-[11px] text-neutral-500">{busy === 'idr' ? 'Memproses…' : 'Pembayaran satu kali, akses seumur akun'}</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">Saldo belum cukup?</span>
+          <span className="text-base font-black text-ink">Transfer {MANUAL_BANK.bank}</span>
+          <span className="text-[11px] text-neutral-500">{MANUAL_BANK.number} a.n. {MANUAL_BANK.holder}</span>
+          <span className="text-[11px] font-semibold text-brand-dark">Isi saldo di Billing →</span>
         </button>
       </div>
       {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Semua pembayaran melalui transfer ke rekening di atas — unggah bukti transfer di Billing, saldo PNC ditambahkan setelah diverifikasi.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ BROCA-LORENTZ CALORIE CALCULATOR ══════════════════ */
+// Ideal body weight via Broca vs. Lorentz formula, feeding a basal/total
+// energy estimate — a common Indonesian nutrition-clinic pairing distinct
+// from the standalone Broca IBW tab (which doesn't compute calories) and
+// from BMR/Harris-Benedict-style calculators elsewhere in the app.
+function BrocaLorentzCalorieCalc() {
+  const [height, setHeight] = useState(165)
+  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const [activity, setActivity] = useState<'ringan' | 'sedang' | 'berat'>('sedang')
+  const [formula, setFormula] = useState<'broca' | 'lorentz'>('lorentz')
+
+  const base = height - 100
+  const brocaIbw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
+  // Lorentz formula — adjusts Broca for height, more accurate for taller/shorter builds
+  const lorentzIbw = sex === 'M'
+    ? height - 100 - (height - 150) / 4
+    : height - 100 - (height - 150) / 2.5
+  const ibw = formula === 'broca' ? brocaIbw : lorentzIbw
+
+  // 25 kcal/kg basal, scaled by activity factor — a simple, widely-taught
+  // Indonesian clinical-nutrition shortcut (RS/Puskesmas gizi klinik) rather
+  // than the more granular Harris-Benedict/Mifflin equations.
+  const activityFactor = { ringan: 30, sedang: 35, berat: 40 }[activity]
+  const totalKcal = ibw * activityFactor
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca–Lorentz Calorie Calculator" subtitle="Berat badan ideal (Broca/Lorentz) → estimasi kebutuhan kalori harian" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Tinggi Badan (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Pria' }, { v: 'F', l: 'Wanita' }]} /></Field>
+        <Field label="Formula BBI"><SegButtons value={formula} onChange={setFormula} options={[{ v: 'broca', l: 'Broca' }, { v: 'lorentz', l: 'Lorentz' }]} /></Field>
+      </div>
+      <Field label="Tingkat Aktivitas">
+        <SegButtons value={activity} onChange={setActivity} options={[{ v: 'ringan', l: 'Ringan (30 kkal/kg)' }, { v: 'sedang', l: 'Sedang (35 kkal/kg)' }, { v: 'berat', l: 'Berat (40 kkal/kg)' }]} />
+      </Field>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{ibw.toFixed(1)} kg</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">BB Ideal ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kkal/hari</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Kebutuhan Kalori Total</div>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Broca: (TB−100)±10-15%. Lorentz: (TB−100) − (TB−150)/4 (pria) atau /2.5 (wanita) — mengoreksi untuk tinggi ekstrem, umumnya dianggap lebih akurat dibanding Broca murni. Kalori = BBI × faktor aktivitas (25 kkal/kg basal + koreksi aktivitas). Sesuaikan lebih lanjut untuk stres metabolik, luka, atau kondisi katabolik.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ IV FLUID DRIP RATE (TETES/MENIT) ══════════════════ */
+function IvDripCalc() {
+  const [volumeMl, setVolumeMl] = useState(500)
+  const [hours, setHours] = useState(8)
+  const [dropFactor, setDropFactor] = useState<15 | 20 | 60>(20)
+
+  const mlPerHour = volumeMl / hours
+  const dropsPerMin = (volumeMl * dropFactor) / (hours * 60)
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Tetes Infus (Drip Rate)" subtitle="Konversi volume & durasi infus ke tetes/menit sesuai faktor tetes set" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Field label="Volume Total (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
+        <Field label="Durasi (jam)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label="Faktor Tetes (set infus)">
+          <SegButtons value={dropFactor} onChange={setDropFactor} options={[{ v: 15, l: '15 (makro)' }, { v: 20, l: '20 (makro)' }, { v: 60, l: '60 (mikro)' }]} />
+        </Field>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/jam</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Kecepatan (pompa infus)</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} tetes/menit</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Tetes/menit (tanpa pompa)</div>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Tetes/menit = (Volume mL × Faktor Tetes) / (Durasi jam × 60). Set makro standar biasanya 15 atau 20 tetes/mL (dewasa/umum), set mikro 60 tetes/mL (anak/neonatus, titrasi presisi). Selalu konfirmasi faktor tetes tercetak pada kemasan set infus yang dipakai.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ ARIA CRITERIA (RINITIS ALERGI) ══════════════════ */
+// Allergic Rhinitis and its Impact on Asthma (ARIA, WHO-endorsed, Bousquet
+// et al. 2008 update) — classifies by duration (intermittent/persistent)
+// and severity (mild/moderate-severe via 4-item quality-of-life impact).
+function AriaCalc() {
+  const [duration, setDuration] = useState<'intermiten' | 'persisten'>('intermiten')
+  const [sleepImpaired, setSleepImpaired] = useState(false)
+  const [dailyImpaired, setDailyImpaired] = useState(false)
+  const [workSchoolImpaired, setWorkSchoolImpaired] = useState(false)
+  const [troublesomeSymptoms, setTroublesomeSymptoms] = useState(false)
+
+  const impactCount = [sleepImpaired, dailyImpaired, workSchoolImpaired, troublesomeSymptoms].filter(Boolean).length
+  const severity = impactCount === 0 ? 'ringan' : 'sedang-berat'
+  const classification = `${duration === 'intermiten' ? 'Intermiten' : 'Persisten'} ${severity === 'ringan' ? 'Ringan' : 'Sedang-Berat'}`
+
+  const treatmentNote: Record<string, string> = {
+    'Intermiten Ringan': 'Antihistamin oral non-sedatif / intranasal sesuai kebutuhan.',
+    'Intermiten Sedang-Berat': 'Antihistamin oral + kortikosteroid intranasal; evaluasi ulang 2-4 minggu.',
+    'Persisten Ringan': 'Kortikosteroid intranasal reguler ± antihistamin; evaluasi ulang.',
+    'Persisten Sedang-Berat': 'Kortikosteroid intranasal reguler + antihistamin; pertimbangkan rujukan alergi/imunoterapi bila menetap.',
+  }
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet et al., WHO 2008)" />
+      <Field label="Durasi Gejala">
+        <SegButtons value={duration} onChange={setDuration} options={[
+          { v: 'intermiten', l: 'Intermiten (<4 hari/mgu atau <4 mgu)' },
+          { v: 'persisten', l: 'Persisten (≥4 hari/mgu dan ≥4 mgu)' },
+        ]} />
+      </Field>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Dampak Kualitas Hidup (skor keparahan)</h4>
+      <div className="mt-2 space-y-2">
+        {[
+          { label: 'Gangguan tidur', checked: sleepImpaired, set: setSleepImpaired },
+          { label: 'Gangguan aktivitas harian/olahraga/rekreasi', checked: dailyImpaired, set: setDailyImpaired },
+          { label: 'Gangguan sekolah/pekerjaan', checked: workSchoolImpaired, set: setWorkSchoolImpaired },
+          { label: 'Gejala mengganggu (troublesome)', checked: troublesomeSymptoms, set: setTroublesomeSymptoms },
+        ].map((item) => (
+          <label key={item.label} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+            <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} className="h-5 w-5 accent-brand" />
+            <div className="text-sm font-bold text-ink">{item.label}</div>
+          </label>
+        ))}
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-black text-ink">{classification}</div>
+          <Badge tone={severity === 'ringan' ? 'normal' : 'low'}>{impactCount}/4 dampak</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Klasifikasi ARIA: durasi (intermiten vs persisten) × keparahan (ringan bila 0/4 item dampak QoL terganggu; sedang-berat bila ≥1/4). Menggantikan istilah lama "seasonal/perennial" karena tak selalu sesuai pola gejala di klinis nyata.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ ACLS QUICK REFERENCE (ALGORITMA) ══════════════════ */
+// Not a calculator with numeric output — a structured, tap-through
+// decision-tree reference for the 3 core ACLS algorithms (AHA 2020
+// Guidelines), complementing the XABCDE/ATLS primary-survey tab with the
+// cardiac-arrest / peri-arrest management side of resuscitation.
+type AclsAlgo = 'arrest' | 'brady' | 'tachy'
+const ACLS_ARREST_STEPS: string[] = [
+  'Mulai RJP berkualitas tinggi: kompresi 100-120x/menit, kedalaman 5-6cm, minimalkan interupsi, izinkan recoil penuh.',
+  'Pasang monitor/defibrilator secepatnya — identifikasi ritme: Shockable (VF/VT tanpa nadi) atau Non-Shockable (PEA/Asistol).',
+  'Shockable: defibrilasi segera (energi sesuai alat) → lanjutkan RJP 2 menit → epinefrin 1mg IV/IO tiap 3-5 menit (mulai setelah syok ke-2) → pertimbangkan amiodaron 300mg (atau lidokain) setelah syok ke-3.',
+  'Non-Shockable: epinefrin 1mg IV/IO sesegera mungkin, ulangi tiap 3-5 menit → RJP 2 menit → cek ritme ulang.',
+  'Cari & atasi penyebab reversibel — 5H (Hipovolemia, Hipoksia, Hidrogen ion/asidosis, Hipo/Hiperkalemia, Hipotermia) & 5T (Tension pneumotoraks, Tamponade jantung, Toksin, Trombosis paru, Trombosis koroner).',
+  'ROSC (Return of Spontaneous Circulation): mulai perawatan pasca-henti jantung — oksigenasi/ventilasi titrasi, target hemodinamik, EKG 12-lead, pertimbangkan target temperature management.',
+]
+const ACLS_BRADY_STEPS: string[] = [
+  'Identifikasi bradikardia (nadi <50x/menit) — nilai apakah menyebabkan gejala/tanda tidak stabil (hipotensi, perubahan status mental, syok, nyeri dada iskemik, gagal jantung akut).',
+  'Bila STABIL: pantau & observasi, identifikasi & atasi penyebab.',
+  'Bila TIDAK STABIL: Atropin 1mg IV bolus (ulangi tiap 3-5 menit, maks 3mg total).',
+  'Bila atropin tidak efektif: transcutaneous pacing, ATAU infus dopamin (5-20 mcg/kg/menit), ATAU infus epinefrin (2-10 mcg/menit).',
+  'Pertimbangkan konsul ahli & pacing transvena bila penyebab reversibel tak segera teratasi.',
+]
+const ACLS_TACHY_STEPS: string[] = [
+  'Identifikasi takikardia (nadi >100x/menit) — nilai apakah menyebabkan gejala/tanda tidak stabil (hipotensi, perubahan status mental, syok, nyeri dada iskemik, gagal jantung akut).',
+  'Bila TIDAK STABIL: kardioversi tersinkronisasi segera (pertimbangkan sedasi singkat bila sadar & waktu memungkinkan).',
+  'Bila STABIL & kompleks SEMPIT (QRS <0.12dtk) reguler: manuver vagal → adenosin 6mg IV cepat (lalu 12mg bila perlu).',
+  'Bila STABIL & kompleks LEBAR (QRS ≥0.12dtk): pertimbangkan adenosin bila reguler & monomorfik, atau infus antiaritmia (prokainamid/amiodaron/sotalol) — konsul ahli dianjurkan.',
+  'Sepanjang proses: pertahankan jalan napas, berikan oksigen bila hipoksemia, pasang akses IV & monitor EKG 12-lead bila memungkinkan tanpa menunda tatalaksana.',
+]
+const ACLS_ALGOS: { id: AclsAlgo; label: string; title: string; steps: string[] }[] = [
+  { id: 'arrest', label: 'Henti Jantung', title: 'Algoritma Henti Jantung Dewasa (Cardiac Arrest)', steps: ACLS_ARREST_STEPS },
+  { id: 'brady', label: 'Bradikardia', title: 'Algoritma Bradikardia (Bergejala)', steps: ACLS_BRADY_STEPS },
+  { id: 'tachy', label: 'Takikardia', title: 'Algoritma Takikardia (Bergejala)', steps: ACLS_TACHY_STEPS },
+]
+
+function AclsCalc() {
+  const [algo, setAlgo] = useState<AclsAlgo>('arrest')
+  const active = ACLS_ALGOS.find((a) => a.id === algo)!
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Panduan ACLS" subtitle="Advanced Cardiovascular Life Support — algoritma ringkas (AHA Guidelines 2020)" />
+      <SegButtons value={algo} onChange={setAlgo} options={ACLS_ALGOS.map((a) => ({ v: a.id, l: a.label }))} />
+      <div className="mt-4 rounded-xl bg-neutral-50 p-4">
+        <h4 className="text-sm font-black text-ink">{active.title}</h4>
+        <ol className="mt-3 space-y-3">
+          {active.steps.map((step, i) => (
+            <li key={i} className="flex gap-3">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-black text-white">{i + 1}</span>
+              <p className="text-[12px] leading-relaxed text-neutral-700">{step}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ringkasan algoritma AHA ACLS 2020 — pelengkap survei primer trauma XABCDE untuk skenario henti jantung/peri-arrest. Bukan pengganti pelatihan ACLS bersertifikat & tidak mencakup seluruh nuansa/dosis pediatrik (lihat PALS terpisah).</p>
     </Card>
   )
 }
@@ -2037,6 +2471,8 @@ export function ClinicalCalculators() {
       {tab === 'bishop' && <BishopCalc />}
       {tab === 'ckdepi' && <CkdEpiCalc />}
       {tab === 'whogrowth' && <WhoGrowthCalc />}
+      {tab === 'whoneonate' && <WhoNeonateCalc />}
+      {tab === 'cdcanthro' && <CdcAnthropometryCalc />}
       {tab === 'ballard' && <BallardSoapCalc />}
       {tab === 'qsofa' && <QsofaCalc />}
       {tab === 'hollidaysegar' && <HollidaySegarCalc />}
@@ -2047,10 +2483,13 @@ export function ClinicalCalculators() {
       {tab === 'centor' && <CentorCalc />}
       {tab === 'nacorr' && <NaCorrectionCalc />}
       {tab === 'broca' && <BrocaCalc />}
+      {tab === 'brocalorentz' && <BrocaLorentzCalorieCalc />}
+      {tab === 'ivdrip' && <IvDripCalc />}
       {tab === 'midparental' && <MidParentalCalc />}
       {tab === 'fletcher' && <FletcherCalc />}
       {tab === 'nose' && <NoseCalc />}
       {tab === 'rsi' && <RsiCalc />}
+      {tab === 'aria' && <AriaCalc />}
       {tab === 'abcd2' && <Abcd2Calc />}
       {tab === 'four' && <FourScoreCalc />}
       {tab === 'mcdonald' && <McDonaldCalc />}
@@ -2061,6 +2500,7 @@ export function ClinicalCalculators() {
       {tab === 'vbac' && <VbacCalc />}
       {tab === 'denver' && <DenverCalc />}
       {tab === 'atls' && <AtlsCalc />}
+      {tab === 'acls' && <AclsCalc />}
       {tab === 'abg' && <AbgCalc />}
       {tab === 'burn' && <BurnCalc />}
       {tab === 'cranial' && <CranialNerveCalc />}
