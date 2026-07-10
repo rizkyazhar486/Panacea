@@ -471,6 +471,214 @@ P (Plan):
   )
 }
 
+/* ══════════════════ qSOFA ══════════════════ */
+function QsofaCalc() {
+  const [rr22, setRr22] = useState(false)
+  const [alteredMental, setAlteredMental] = useState(false)
+  const [sbp100, setSbp100] = useState(false)
+  const total = [rr22, alteredMental, sbp100].filter(Boolean).length
+  const interp = total >= 2
+    ? { l: 'Risiko tinggi', tone: 'critical' as const, note: 'Curiga sepsis — evaluasi SOFA lengkap, kultur & tatalaksana sepsis segera.' }
+    : { l: 'Risiko rendah', tone: 'normal' as const, note: 'qSOFA tidak dirancang untuk skrining awal di luar ICU secara tunggal — tetap gunakan penilaian klinis.' }
+  const Row = ({ label, sub, checked, onChange }: { label: string; sub: string; checked: boolean; onChange: (v: boolean) => void }) => (
+    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
+      <div><div className="text-sm font-bold text-ink">{label}</div><div className="text-[11px] text-neutral-400">{sub}</div></div>
+    </label>
+  )
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — skrining cepat disfungsi organ terkait infeksi (Sepsis-3, 2016)" />
+      <div className="space-y-2">
+        <Row label="Laju napas ≥22x/menit" sub="Takipnea" checked={rr22} onChange={setRr22} />
+        <Row label="Perubahan status mental" sub="GCS <15 / kebingungan akut" checked={alteredMental} onChange={setAlteredMental} />
+        <Row label="Tekanan darah sistolik ≤100 mmHg" sub="Hipotensi" checked={sbp100} onChange={setSbp100} />
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/3</span></div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+      </div>
+    </Card>
+  )
+}
+
+/* ══════════════════ HOLLIDAY-SEGAR MAINTENANCE FLUID ══════════════════ */
+function HollidaySegarCalc() {
+  const [weight, setWeight] = useState(20)
+  function mlPerDay(w: number): number {
+    if (w <= 10) return w * 100
+    if (w <= 20) return 1000 + (w - 10) * 50
+    return 1500 + (w - 20) * 20
+  }
+  const daily = mlPerDay(weight)
+  const hourly = daily / 24
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Holliday-Segar (Cairan Rumatan)" subtitle="Formula 4-2-1 klasik (Holliday & Segar, 1957)" />
+      <Field label="Berat Badan (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{daily.toFixed(0)}</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">mL / 24 jam</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-xl font-black text-ink">{hourly.toFixed(1)}</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">mL / jam (tetesan rumatan)</div>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">10kg pertama: 100 mL/kg · 10kg kedua: +50 mL/kg · setiap kg di atas 20: +20 mL/kg. Sesuaikan dengan status hidrasi, demam, dan kondisi klinis.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ PARKLAND FORMULA (BURN RESUSCITATION) ══════════════════ */
+function ParklandCalc() {
+  const [weight, setWeight] = useState(70)
+  const [tbsa, setTbsa] = useState(20)
+  const total24h = 4 * weight * tbsa
+  const first8h = total24h / 2
+  const first8hRate = first8h / 8
+  const next16hRate = (total24h - first8h) / 16
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Resusitasi cairan luka bakar ≥20% TBSA (Baxter, 1968)" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="% TBSA (luas luka bakar)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">mL Total 24 jam</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (8 jam pertama)</div>
+        </div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center">
+          <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (16 jam berikut)</div>
+        </div>
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Total = 4 mL × berat(kg) × %TBSA, cairan kristaloid (RL). Separuh diberikan dalam 8 jam pertama SEJAK WAKTU CEDERA (bukan sejak tiba di RS), separuh sisanya dalam 16 jam berikutnya. Sesuaikan dengan output urin (target ~0.5 mL/kg/jam dewasa).</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ NAEGELE'S RULE + USIA GESTASI ══════════════════ */
+function NaegeleCalc() {
+  const [lmp, setLmp] = useState('')
+  const [cycleLen, setCycleLen] = useState(28)
+  let edd: Date | null = null
+  let gaWeeks = 0
+  let gaDays = 0
+  if (lmp) {
+    const lmpDate = new Date(lmp)
+    const cycleAdj = cycleLen - 28
+    edd = new Date(lmpDate)
+    edd.setDate(edd.getDate() + 280 + cycleAdj)
+    const diffDays = Math.floor((Date.now() - lmpDate.getTime()) / 86400000) + cycleAdj
+    gaWeeks = Math.floor(diffDays / 7)
+    gaDays = diffDays % 7
+  }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Taksiran hari lahir (EDD) & usia gestasi dari HPHT" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="HPHT (hari pertama haid terakhir)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
+        <Field label="Panjang Siklus Haid (hari)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
+      </div>
+      {edd && (
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="rounded-xl bg-neutral-50 p-3 text-center">
+            <div className="text-base font-black text-ink">{edd.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-400">Taksiran Persalinan (EDD)</div>
+          </div>
+          <div className="rounded-xl bg-neutral-50 p-3 text-center">
+            <div className="text-base font-black text-ink">{gaWeeks}mgu {gaDays}hr</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-400">Usia Gestasi Saat Ini</div>
+          </div>
+        </div>
+      )}
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Naegele's Rule: EDD = HPHT + 280 hari (disesuaikan bila siklus haid bukan 28 hari). Konfirmasi dengan USG trimester pertama bila memungkinkan — lebih akurat dari HPHT saja, terutama pada siklus tidak teratur.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ MAP (MEAN ARTERIAL PRESSURE) ══════════════════ */
+function MapCalc() {
+  const [sys, setSys] = useState(120)
+  const [dia, setDia] = useState(80)
+  const map = (sys + 2 * dia) / 3
+  const interp = map < 60
+    ? { l: 'Sangat rendah', tone: 'critical' as const, note: 'Perfusi organ berisiko terganggu — evaluasi syok/hipoperfusi.' }
+    : map <= 100
+    ? { l: 'Normal', tone: 'normal' as const, note: 'Umumnya cukup untuk perfusi organ (target MAP ≥65 pada syok septik).' }
+    : { l: 'Tinggi', tone: 'low' as const, note: 'Evaluasi hipertensi / krisis hipertensi bila sangat tinggi.' }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mean Arterial Pressure (MAP)" subtitle="Tekanan perfusi rata-rata organ" />
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Sistolik (mmHg)"><input className={inputClass} type="number" value={sys} onChange={(e) => setSys(+e.target.value)} /></Field>
+        <Field label="Diastolik (mmHg)"><input className={inputClass} type="number" value={dia} onChange={(e) => setDia(+e.target.value)} /></Field>
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{map.toFixed(0)}<span className="text-sm font-semibold text-neutral-400"> mmHg</span></div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+      </div>
+      <p className="mt-3 text-[10px] text-neutral-400">MAP = (Sistolik + 2×Diastolik) / 3.</p>
+    </Card>
+  )
+}
+
+/* ══════════════════ ALVARADO SCORE (APENDISITIS) ══════════════════ */
+function AlvaradoCalc() {
+  const criteria = [
+    { key: 'migratoryPain', label: 'Nyeri berpindah ke kanan bawah', pts: 1 },
+    { key: 'anorexia', label: 'Anoreksia', pts: 1 },
+    { key: 'nauseaVomit', label: 'Mual/muntah', pts: 1 },
+    { key: 'rlqTender', label: 'Nyeri tekan kuadran kanan bawah', pts: 2 },
+    { key: 'rebound', label: 'Nyeri lepas (rebound tenderness)', pts: 1 },
+    { key: 'fever', label: 'Demam ≥37.3°C', pts: 1 },
+    { key: 'leukocytosis', label: 'Leukositosis >10.000', pts: 2 },
+    { key: 'shiftLeft', label: 'Neutrofil shift kiri (>75%)', pts: 1 },
+  ]
+  const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const total = criteria.reduce((sum, c) => sum + (checked[c.key] ? c.pts : 0), 0)
+  const interp = total <= 4
+    ? { l: 'Kemungkinan rendah', tone: 'normal' as const, note: 'Apendisitis kurang mungkin — pertimbangkan observasi/diagnosis banding lain.' }
+    : total <= 6
+    ? { l: 'Kemungkinan sedang', tone: 'low' as const, note: 'Pertimbangkan pencitraan lanjut (USG/CT) untuk konfirmasi.' }
+    : { l: 'Kemungkinan tinggi', tone: 'critical' as const, note: 'Pertimbangkan konsultasi bedah untuk apendektomi.' }
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Skor klinis kecurigaan apendisitis akut (Alvarado, 1986)" />
+      <div className="space-y-2">
+        {criteria.map((c) => (
+          <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
+            <input type="checkbox" checked={!!checked[c.key]} onChange={(e) => setChecked((s) => ({ ...s, [c.key]: e.target.checked }))} className="h-5 w-5 accent-brand" />
+            <div className="flex-1 text-sm font-bold text-ink">{c.label}</div>
+            <span className="text-xs font-black text-neutral-400">+{c.pts}</span>
+          </label>
+        ))}
+      </div>
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
+          <Badge tone={interp.tone}>{interp.l}</Badge>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
+      </div>
+    </Card>
+  )
+}
+
 const TABS = [
   { id: 'apgar', label: 'APGAR' },
   { id: 'gcs', label: 'GCS' },
@@ -479,6 +687,12 @@ const TABS = [
   { id: 'ckdepi', label: 'CKD-EPI' },
   { id: 'whogrowth', label: 'WHO Growth' },
   { id: 'ballard', label: 'Ballard+SOAP' },
+  { id: 'qsofa', label: 'qSOFA' },
+  { id: 'hollidaysegar', label: 'Cairan Rumatan' },
+  { id: 'parkland', label: 'Parkland' },
+  { id: 'naegele', label: 'Naegele' },
+  { id: 'map', label: 'MAP' },
+  { id: 'alvarado', label: 'Alvarado' },
 ] as const
 
 export function ClinicalCalculators() {
@@ -504,6 +718,12 @@ export function ClinicalCalculators() {
       {tab === 'ckdepi' && <CkdEpiCalc />}
       {tab === 'whogrowth' && <WhoGrowthCalc />}
       {tab === 'ballard' && <BallardSoapCalc />}
+      {tab === 'qsofa' && <QsofaCalc />}
+      {tab === 'hollidaysegar' && <HollidaySegarCalc />}
+      {tab === 'parkland' && <ParklandCalc />}
+      {tab === 'naegele' && <NaegeleCalc />}
+      {tab === 'map' && <MapCalc />}
+      {tab === 'alvarado' && <AlvaradoCalc />}
     </div>
   )
 }
