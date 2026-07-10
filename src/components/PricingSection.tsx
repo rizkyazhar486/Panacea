@@ -1,5 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { Reveal } from './Reveal'
+import { MANUAL_BANK } from '../lib/payment'
 
 // Dark "Services & Prices" bento-grid section — a professional, scroll-
 // reactive pricing page baked directly into the Landing page's long-scroll
@@ -187,7 +188,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
               </p>
               <div className="mt-4">
                 <PriceLine label="Bayar dari saldo PanaceaToken" price="500 PNC" />
-                <PriceLine label="QRIS / VA / Kartu" price="Rp500.000" note="sekali bayar, seumur akun" />
+                <PriceLine label="Setara transfer bank" price="Rp500.000" note="sekali bayar, seumur akun" />
               </div>
             </TiltCard>
             <TiltCard>
@@ -200,6 +201,18 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                 <PriceLine label="1 PanaceaToken (PNC)" price="Rp1.000" note="top-up fleksibel" />
               </div>
             </TiltCard>
+          </div>
+        </Reveal>
+
+        <Reveal delay={70}>
+          <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-white/15 bg-white/[0.06] px-6 py-4 text-center backdrop-blur-sm">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Cara Pembayaran</div>
+            <p className="mt-1.5 text-sm text-white/70">
+              Semua pembayaran via <b className="text-white">transfer bank</b> ke rekening resmi:
+            </p>
+            <div className="mt-2 text-base font-black text-white">{MANUAL_BANK.bank} · {MANUAL_BANK.number}</div>
+            <div className="text-xs text-white/60">a.n. {MANUAL_BANK.holder}</div>
+            <p className="mt-1.5 text-[11px] text-white/45">Unggah bukti transfer di aplikasi — saldo diverifikasi &amp; ditambahkan oleh tim kami.</p>
           </div>
         </Reveal>
 

@@ -4,9 +4,9 @@ import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope, IconCheck, IconChat, IconHospital, IconShield, IconSearch } from '../components/icons'
 import { ConsultChat } from '../components/ConsultChat'
-import { Carousel, ButtonGroup } from '../components/Carousel'
+import { Carousel } from '../components/Carousel'
 import { backendEnabled } from '../lib/api'
-import type { PaymentMethod } from '../lib/types'
+import { MANUAL_BANK } from '../lib/payment'
 
 function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '').slice(0, 24)
@@ -41,7 +41,7 @@ function triage(complaint: string): { tag: string; reason: string; surgery: bool
 
 export function Consult() {
   const { account, bookConsult, sendEmail, addOrder } = useStore()
-  const [pay, setPay] = useState<PaymentMethod>('QRIS')
+  const pay = 'Transfer Bank' as const
   const [complaint, setComplaint] = useState('')
   const [result, setResult] = useState<ReturnType<typeof triage> | null>(null)
   const [done, setDone] = useState<string>('')
@@ -111,9 +111,11 @@ export function Consult() {
               placeholder="mis. Nyeri ulu hati & mual sejak 3 hari, terutama setelah makan…"
             />
           </Field>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-sm text-neutral-500">Bayar:</span>
-            <ButtonGroup value={pay} options={(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => ({ id: m, label: m }))} onChange={setPay} />
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-neutral-500">Bayar via:</span>
+            <span className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">
+              Transfer {MANUAL_BANK.bank} · {MANUAL_BANK.number} a.n. {MANUAL_BANK.holder}
+            </span>
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
@@ -135,9 +137,11 @@ export function Consult() {
             subtitle={`AI: ${result.reason}. Rekomendasi utama: ${recSpecialty}.`}
             right={<Button variant="ghost" onClick={() => { setResult(null); setComplaint('') }}>Ulangi triase</Button>}
           />
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-neutral-500">Metode bayar sesi:</span>
-            <ButtonGroup value={pay} options={(['QRIS', 'Visa', 'Virtual Account'] as PaymentMethod[]).map((m) => ({ id: m, label: m }))} onChange={setPay} />
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-neutral-500">Metode bayar sesi:</span>
+            <span className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">
+              Transfer {MANUAL_BANK.bank} · {MANUAL_BANK.number} a.n. {MANUAL_BANK.holder}
+            </span>
           </div>
 
           {result.surgery && (

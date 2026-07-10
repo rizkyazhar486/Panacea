@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconWallet, IconStethoscope, IconHeart } from '../components/icons'
+import { MANUAL_BANK } from '../lib/payment'
 
 // In-app pricing page (mirrors the public landing page's "Layanan & Harga"
 // section, but for already-logged-in users browsing under Layanan). Each
@@ -113,7 +114,7 @@ export function Pricing() {
           <span className="font-extrabold text-brand-dark">500 PNC</span>
         </div>
         <div className="flex items-center justify-between py-2 text-sm">
-          <span className="text-neutral-500">QRIS / VA / Kartu</span>
+          <span className="text-neutral-500">Setara transfer bank</span>
           <span className="font-extrabold text-brand-dark">Rp500.000</span>
         </div>
         <Button className="mt-3 w-full" variant="outline" onClick={() => navigate('/clinical-calculators')}>Buka Kalkulator Klinis</Button>
@@ -131,6 +132,24 @@ export function Pricing() {
           <span className="text-neutral-500">1 PanaceaToken (PNC)</span>
           <span className="font-extrabold text-ink">Rp1.000</span>
         </div>
+      </Card>
+
+      <Card className="!border-brand/20 bg-brand-50/50">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-brand-dark">
+          <IconWallet size={14} /> Cara Pembayaran
+        </div>
+        <p className="mt-2 text-sm text-neutral-600">
+          Semua pembayaran melalui <b>transfer bank</b> ke rekening resmi Panaceamed.id:
+        </p>
+        <div className="mt-3 rounded-xl bg-white p-4">
+          <div className="text-sm font-black text-ink">{MANUAL_BANK.bank}</div>
+          <div className="mt-0.5 text-lg font-black tracking-wide text-brand-dark">{MANUAL_BANK.number}</div>
+          <div className="text-xs text-neutral-500">a.n. {MANUAL_BANK.holder}</div>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
+          Setelah transfer, unggah bukti di halaman Billing — saldo PNC ditambahkan setelah bukti diverifikasi (1 PNC = Rp1.000).
+        </p>
+        <Button className="mt-3 w-full" variant="outline" onClick={() => navigate('/billing')}>Isi Saldo di Billing</Button>
       </Card>
 
       <p className="text-center text-[11px] leading-relaxed text-neutral-400">
