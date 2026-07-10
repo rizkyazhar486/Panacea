@@ -143,3 +143,17 @@ createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </StrictMode>,
 )
+
+// Dismiss the inline splash screen once the app has painted — floored at
+// 500ms so it never flashes imperceptibly on a fast connection.
+const SPLASH_MIN_MS = 500
+const splashShownAt = performance.now()
+requestAnimationFrame(() => {
+  const splash = document.getElementById('pmd-splash')
+  if (!splash) return
+  const wait = Math.max(0, SPLASH_MIN_MS - (performance.now() - splashShownAt))
+  setTimeout(() => {
+    splash.style.opacity = '0'
+    setTimeout(() => splash.remove(), 450)
+  }, wait)
+})

@@ -507,47 +507,44 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {/* Bottom tab bar (mobile) — ikon besar & universal untuk navigasi sosial.
-          Ditujukan agar bisa dipakai siapa pun, termasuk yang kesulitan membaca:
-          ikon jelas + aria-label untuk pembaca layar + target sentuh besar. */}
+      {/* Bottom tab bar (mobile) — floating liquid-glass pill, horizontally
+          scrollable so it grows with the app's feature set without ever
+          feeling cramped. Icon-first: label is a small caption underneath,
+          never the primary cue. The "+" compose button floats above the pill,
+          fixed in place (not part of the scroll strip). */}
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
-        <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden" aria-label="Navigasi utama">
-          {[
-            { to: '/', label: 'Beranda', icon: IconHome, end: true },
-            { to: '/community', label: 'Community', icon: IconUsers },
-          ].map((t) => (
-            <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
-              className={({ isActive }) => `group relative flex min-h-[54px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
-              {({ isActive }) => (<>
-                <span className={`absolute top-0 h-0.5 w-8 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                <t.icon size={25} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
-                <span className="text-[9px] font-bold">{t.label}</span>
-              </>)}
-            </NavLink>
-          ))}
-          {/* Tombol tengah "+" — buat post/story */}
-          <button
-            onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
-            aria-label="Buat postingan atau story baru"
-            className="group -mt-5 flex flex-col items-center justify-center"
-          >
-            <span className="grid h-14 w-14 place-items-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 22px rgba(0,191,99,0.45)' }}>
-              <IconPlus size={28} />
-            </span>
-          </button>
-          {[
-            { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
-            { to: '/profile', label: 'Profil', icon: IconUser },
-          ].map((t) => (
-            <NavLink key={t.to} to={t.to} aria-label={t.label}
-              className={({ isActive }) => `group relative flex min-h-[54px] flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
-              {({ isActive }) => (<>
-                <span className={`absolute top-0 h-0.5 w-8 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                <t.icon size={25} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
-                <span className="text-[9px] font-bold">{t.label}</span>
-              </>)}
-            </NavLink>
-          ))}
+        <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] lg:hidden" aria-label="Navigasi utama">
+          <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
+            <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
+              {[
+                { to: '/', label: 'Beranda', icon: IconHome, end: true },
+                { to: '/community', label: 'Community', icon: IconUsers },
+                { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
+                { to: '/health-data', label: 'Kesehatan', icon: IconHeart },
+                { to: '/sports-scores', label: 'Skor', icon: IconRun },
+                { to: '/profile', label: 'Profil', icon: IconUser },
+              ].map((t) => (
+                <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
+                  className={({ isActive }) => `group relative flex min-h-[52px] w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+                  {({ isActive }) => (<>
+                    <span className={`absolute top-0.5 h-0.5 w-6 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+                    <t.icon size={23} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
+                    <span className="text-[9px] font-bold">{t.label}</span>
+                  </>)}
+                </NavLink>
+              ))}
+            </div>
+            {/* Tombol tengah "+" — buat post/story, mengambang di luar area scroll */}
+            <button
+              onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
+              aria-label="Buat postingan atau story baru"
+              className="group absolute right-1 top-1/2 flex -translate-y-1/2 flex-col items-center justify-center"
+            >
+              <span className="grid place-items-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-active:scale-95" style={{ height: 52, width: 52, background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 22px rgba(0,191,99,0.45)' }}>
+                <IconPlus size={26} />
+              </span>
+            </button>
+          </div>
         </nav>
       )}
 

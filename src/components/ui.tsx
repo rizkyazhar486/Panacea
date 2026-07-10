@@ -87,19 +87,21 @@ export function Button({
   disabled?: boolean
   className?: string
 }) {
-  const styles: Record<string, string> = {
-    primary:
-      'bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] text-white shadow-[0_6px_16px_rgba(0,191,99,0.28)] hover:shadow-[0_8px_22px_rgba(0,191,99,0.36)] hover:brightness-105',
-    danger: 'bg-accent text-white shadow-[0_6px_16px_rgba(255,49,49,0.25)] hover:opacity-90',
-    outline: 'border border-brand/40 text-brand-dark hover:border-brand hover:bg-brand-50',
-    ghost: 'text-neutral-600 hover:bg-neutral-100',
+  // Every variant renders as liquid glass (blur + translucency) so buttons
+  // share one tactile language across the app — see .liquid-glass-btn* in
+  // index.css. Text color still varies per variant for contrast.
+  const textColor: Record<string, string> = {
+    primary: 'text-white',
+    danger: 'text-white',
+    outline: 'text-brand-dark',
+    ghost: 'text-neutral-600',
   }
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${styles[variant]} ${className}`}
+      className={`liquid-glass-btn liquid-glass-btn--${variant} inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 ${textColor[variant]} ${className}`}
     >
       {children}
     </button>
