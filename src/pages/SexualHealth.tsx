@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Card, SectionTitle, Button, Badge } from '../components/ui'
+import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHeart, IconUsers, IconHospital, IconShield } from '../components/icons'
 import { HOSPITALS, fetchNearbyFacilities, type NearbyFacility } from '../lib/hospitals'
 
@@ -288,17 +288,21 @@ export function SexualHealth() {
             : geoState === 'denied' ? 'Izin lokasi ditolak / tidak tersedia — menampilkan contoh faskes.'
             : 'Aktifkan GPS untuk menemukan klinik KB/Obgyn nyata terdekat dengan nomor telepon.'}
         </div>
-        <div className="mt-3 space-y-2">
-          {source.slice(0, 6).map((f) => (
-            <div key={f.id} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <div>
-                <div className="text-sm font-bold">{f.name}</div>
-                <div className="text-[11px] text-neutral-400">{f.type} · {f.city} · {f.dist.toFixed(1)} km</div>
+        {loading ? (
+          <div className="mt-3"><SkeletonRows rows={3} /></div>
+        ) : (
+          <div className="mt-3 space-y-2">
+            {source.slice(0, 6).map((f) => (
+              <div key={f.id} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
+                <div>
+                  <div className="text-sm font-bold">{f.name}</div>
+                  <div className="text-[11px] text-neutral-400">{f.type} · {f.city} · {f.dist.toFixed(1)} km</div>
+                </div>
+                <a href={`tel:${f.phone}`} className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">📞 {f.phone}</a>
               </div>
-              <a href={`tel:${f.phone}`} className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">📞 {f.phone}</a>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
 
       <Card className="!p-5">
