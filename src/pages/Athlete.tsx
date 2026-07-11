@@ -81,9 +81,11 @@ function load(): AthleteProfile {
 }
 function save(p: AthleteProfile) { try { localStorage.setItem(KEY, JSON.stringify(p)) } catch { /* ignore */ } }
 
-// Jackson non-exercise VO2max (uses resting HR) — same formula used in HealthTrends.
-function vo2max(age: number, g: 'M' | 'F', hrRest: number) {
-  return g === 'M' ? (15.3 * (220 - age)) / hrRest : (15.3 * (226 - age)) / hrRest
+// Uth-Sørensen-Overgaard-Pedersen non-exercise VO2max estimate: 15.3 × HRmax/HRrest.
+// Uses the user's measured max HR when provided, falling back to the
+// 220−usia (226−usia for women) estimate only when no measurement exists.
+function vo2max(hrMax: number, hrRest: number) {
+  return (15.3 * hrMax) / hrRest
 }
 
 const ZONES = [
@@ -134,8 +136,8 @@ function hrvStatus(hrv: number, base: number): { label: string; tone: 'brand' | 
 
 export function Athlete() {
   const [p, setP] = useState<AthleteProfile>(load)
-  const hrMax = p.hrMax > 0 ? p.hrMax : 220 - p.age
-  const v = vo2max(p.age, p.g, p.hrRest)
+  const hrMax = p.hrMax > 0 ? p.hrMax : (p.g === 'M' ? 220 - p.age : 226 - p.age)
+  const v = vo2max(hrMax, p.hrRest)
   const tier = vo2Tier(v, p.g)
   const acwr = p.chronicLoad > 0 ? p.acuteLoad / p.chronicLoad : 0
   const acwrZ = acwrZone(acwr)
@@ -170,8 +172,8 @@ export function Athlete() {
           <Field label={<>Nadi Istirahat<PrefillBadge show={hasHealth('restingHr')} /></>}><input className={inputClass} type="number" value={p.hrRest} onChange={(e) => upd({ hrRest: +e.target.value })} /></Field>
         </div>
         <div className="mt-2">
-          <Field label="Nadi Maks Terukur (opsional, kosongkan untuk estimasi 220-usia)">
-            <input className={inputClass} type="number" value={p.hrMax || ''} placeholder={String(220 - p.age)} onChange={(e) => upd({ hrMax: +e.target.value })} />
+          <Field label={`Nadi Maks Terukur (opsional, kosongkan untuk estimasi ${p.g === 'M' ? '220' : '226'}-usia)`}>
+            <input className={inputClass} type="number" value={p.hrMax || ''} placeholder={String(p.g === 'M' ? 220 - p.age : 226 - p.age)} onChange={(e) => upd({ hrMax: +e.target.value })} />
           </Field>
         </div>
 
