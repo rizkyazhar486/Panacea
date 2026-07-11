@@ -625,8 +625,8 @@ app.post('/api/feedback', requireAuth, (req, res) => {
   const { kind, text } = req.body as { kind?: Feedback['kind']; text?: string }
   const trimmed = (text ?? '').trim()
   if (trimmed.length < 5) return res.status(400).json({ error: 'text_too_short' })
-  const validKinds: Feedback['kind'][] = ['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian', 'Permintaan Fitur']
-  const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Saran'
+  const validKinds: Feedback['kind'][] = ['Suggestion', 'Problem/Bug', 'Question', 'Compliment', 'Feature Request']
+  const safeKind = validKinds.includes(kind as Feedback['kind']) ? (kind as Feedback['kind']) : 'Suggestion'
   const entry: Feedback = { id: uid(), userId: u.id, userEmail: u.email, userName: u.name, kind: safeKind, text: trimmed, at: new Date().toISOString(), read: false }
   addFeedback(entry)
   const owner = getUserByEmail(config.ownerEmail)

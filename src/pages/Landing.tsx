@@ -24,95 +24,95 @@ import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCine
 import { PricingSection } from '../components/PricingSection'
 
 const FEATURES = [
-  { icon: IconUsers, title: 'Dashboard Hidup Sehat', text: 'Jejaring sosial gaya Strava/TikTok: bagikan aktivitas, kebiasaan sehat & artikel longevity. Foto, video singkat, profil, bookmark.' },
-  { icon: IconHeart, title: 'Kalkulator Longevity AI', text: 'Isi pola makan, olahraga, hidrasi, tidur & berjemur — AI menghitung nilai longevity Anda (langganan 30 hari).' },
-  { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI mewawancara pasien (SOCRATES); hasilnya mengalir otomatis ke Subjective/Objective di AI-EMR yang hanya diakses dokter.' },
-  { icon: IconStethoscope, title: 'Konsultasi, Apotek & Faskes', text: 'Konsultasi via AI (Rp49.000) → rujukan dokter spesialis; apotek + tebus resep; faskes terdekat via GPS untuk darurat.' },
-  { icon: IconStore, title: 'Pusat Materi Kedokteran', text: 'Temukan & bagikan catatan, jurnal, dan artikel kedokteran pilihan. Harga ditentukan penulis; PDF ber-watermark untuk keamanan kontributor.' },
-  { icon: IconShield, title: 'AI-EMR Bersertifikat', text: 'Untuk klinisi & institusi bersertifikat (STR/NPWP). CDSS doctor-in-the-loop memblokir interaksi obat, alergi & kontraindikasi.' },
+  { icon: IconUsers, title: 'Healthy Living Dashboard', text: 'A Strava/TikTok-style social network: share activities, healthy habits & longevity articles. Photos, short videos, profiles, bookmarks.' },
+  { icon: IconHeart, title: 'AI Longevity Calculator', text: 'Log your diet, exercise, hydration, sleep & sun exposure — AI calculates your longevity score (30-day subscription).' },
+  { icon: IconChat, title: 'AI Chatbot → AI-EMR', text: 'AI interviews the patient (SOCRATES method); results flow automatically into the Subjective/Objective fields of the AI-EMR, accessible only to doctors.' },
+  { icon: IconStethoscope, title: 'Consultations, Pharmacy & Facilities', text: 'AI consultation (Rp49,000) → referral to specialist doctors; pharmacy with prescription fulfillment; nearest healthcare facilities via GPS for emergencies.' },
+  { icon: IconStore, title: 'Medical Knowledge Hub', text: 'Discover & share curated medical notes, journals, and articles. Pricing set by the authors; watermarked PDFs protect contributors.' },
+  { icon: IconShield, title: 'Certified AI-EMR', text: 'For certified clinicians & institutions (STR/NPWP). Doctor-in-the-loop CDSS flags drug interactions, allergies & contraindications.' },
 ]
 
 const ROLES = [
-  ['Pelanggan / Pasien', 'Dashboard hidup sehat, edukasi penyakit, nutrisi & Longevity AI, konsultasi, apotek & faskes terdekat.'],
-  ['Dokter', 'AI-EMR penuh (SOAP), data klinis per pasien, planning & konsultasi.'],
-  ['Kontributor', 'Menulis, menjual & minta verifikasi materi kedokteran.'],
-  ['Verifikator', 'Spesialis/Profesor + AI memverifikasi materi.'],
-  ['Admin', 'Layanan, dukungan otomatis & kelola katalog apotek.'],
-  ['Owner', 'Pindah mode akses & memantau keuntungan perusahaan.'],
+  ['Customer / Patient', 'Healthy living dashboard, disease education, nutrition & AI Longevity, consultations, pharmacy & nearest facilities.'],
+  ['Doctor', 'Full AI-EMR (SOAP), per-patient clinical data, planning & consultations.'],
+  ['Contributor', 'Write, sell & request verification for medical content.'],
+  ['Verifier', 'Specialists/professors + AI verify content.'],
+  ['Admin', 'Services, automated support & pharmacy catalog management.'],
+  ['Owner', 'Switch access modes & monitor company profitability.'],
 ]
 
 const WHATS_NEW = [
-  'Dashboard sosial "Panacea Hidup Sehat" — foto & video 30 detik, profil, repost, bookmark privat.',
-  'Kalkulator Longevity bertenaga AI (langganan 30 hari, Rp49.000/bulan).',
-  'Apotek dengan tebus/scan resep + Riwayat Transaksi terpadu (bisa disaring per jenis).',
-  'Faskes terdekat via GPS (rumah sakit, klinik & apotek) untuk situasi darurat.',
-  'Pusat Materi Kedokteran — temukan & bagikan catatan, jurnal, dan artikel pilihan dengan PanaceaToken.',
+  '"Panacea Healthy Living" social dashboard — photos & 30-second videos, profiles, reposts, private bookmarks.',
+  'AI-powered Longevity Calculator (30-day subscription, Rp49,000/month).',
+  'Pharmacy with prescription fulfillment/scanning + unified Transaction History (filterable by type).',
+  'Nearest healthcare facilities via GPS (hospitals, clinics & pharmacies) for emergencies.',
+  'Medical Knowledge Hub — discover & share curated notes, journals, and articles with PanaceaToken.',
 ]
 
 const STATS: { node: React.ReactNode; label: string }[] = [
-  { node: <CountUp to={6} suffix=" Peran" />, label: 'Ekosistem pengguna terpadu' },
-  { node: <CountUp to={100} suffix="%" />, label: 'Diverifikasi dokter (AI-in-the-loop)' },
-  { node: <CountUp to={30} suffix=" Hari" />, label: 'Siklus Longevity AI' },
-  { node: <span>24/7</span>, label: 'Akses & Darurat SOS' },
+  { node: <CountUp to={6} suffix=" Roles" />, label: 'Unified user ecosystem' },
+  { node: <CountUp to={100} suffix="%" />, label: 'Doctor-verified (AI-in-the-loop)' },
+  { node: <CountUp to={30} suffix=" Days" />, label: 'AI Longevity cycle' },
+  { node: <span>24/7</span>, label: 'Access & Emergency SOS' },
 ]
 
 const MARQUEE = [
-  { icon: IconHospital, label: 'Faskes Terdekat' },
-  { icon: IconPill, label: 'Apotek Digital' },
-  { icon: IconStethoscope, label: 'Konsultasi Dokter' },
-  { icon: IconHeart, label: 'Longevity AI' },
-  { icon: IconStore, label: 'Materi Kedokteran' },
-  { icon: IconShield, label: 'AI-EMR Bersertifikat' },
+  { icon: IconHospital, label: 'Nearest Facilities' },
+  { icon: IconPill, label: 'Digital Pharmacy' },
+  { icon: IconStethoscope, label: 'Doctor Consultations' },
+  { icon: IconHeart, label: 'AI Longevity' },
+  { icon: IconStore, label: 'Medical Content' },
+  { icon: IconShield, label: 'Certified AI-EMR' },
   { icon: IconChartUp, label: 'Healthspan Tracking' },
 ]
 
-// ── Sejarah longevity, anti-aging, wellness & sistem kesehatan ──────────────
+// ── History of longevity, anti-aging, wellness & healthcare systems ──────────────
 const HISTORY_ERAS: { era: string; when: string; emoji: string; title: string; body: string }[] = [
-  { era: 'Mesir Kuno', when: '≈3000–300 SM', emoji: '𓂀', title: 'Firaun & Papirus Kedokteran',
-    body: 'Papirus Edwin Smith & Ebers mencatat resep, bedah, dan higiene. Firaun memburu keabadian lewat mumifikasi; imhotep dihormati sebagai tabib. Kosmetik & minyak (moringa, madu) jadi anti-aging pertama.' },
-  { era: 'Zaman Para Nabi', when: '≈2000 SM–632 M', emoji: '☾', title: 'Tradisi Kenabian & Higiene',
-    body: 'Ajaran kenabian menekankan wudu/kebersihan, puasa berkala, madu & habbatussauda, makan secukupnya ("sepertiga makanan, sepertiga minum, sepertiga napas"). Prinsip pencegahan & moderasi ini sejalan dengan sains longevity modern.' },
-  { era: 'Yunani–Romawi', when: '≈500 SM–500 M', emoji: '🏛️', title: 'Hippokrates & Galen',
-    body: 'Hippokrates: "biarkan makanan jadi obatmu" & Sumpah Hippokrates (etika medis). Galen sistematisasi fisiologi. Romawi membangun aqueduct, pemandian, & sanitasi publik — sistem kesehatan masyarakat pertama.' },
-  { era: 'Dinasti Tiongkok', when: '≈200 SM–1912 M', emoji: '🐉', title: 'Qi, Herbal & Elixir Panjang Umur',
-    body: 'Huangdi Neijing meletakkan dasar TCM. Kaisar mencari "elixir keabadian" (ironisnya sebagian mengandung merkuri). Qigong, akupunktur, ginseng, & keseimbangan yin-yang: pendekatan holistik healthspan.' },
-  { era: 'Kekaisaran Mongol', when: '≈1206–1368 M', emoji: '🏹', title: 'Kedokteran Lintas Budaya',
-    body: 'Pax Mongolica menghubungkan tabib Persia, Tiongkok, & Arab di Jalur Sutra — pertukaran ilmu bedah, farmasi, & karantina. Rumah sakit keliling & standar kebugaran prajurit jadi bentuk awal "performance medicine".' },
-  { era: 'Keemasan Islam', when: '≈800–1300 M', emoji: '⚕️', title: 'Ibnu Sina & Rumah Sakit (Bimaristan)',
-    body: 'Al-Qanun (Canon of Medicine) Ibnu Sina jadi rujukan dunia 600 tahun. Al-Razi memelopori catatan klinis. Bimaristan: rumah sakit dengan rekam medis, apotek, & spesialisasi — cikal bakal sistem layanan kesehatan modern.' },
+  { era: 'Ancient Egypt', when: '≈3000–300 BCE', emoji: '𓂀', title: 'Pharaohs & Medical Papyri',
+    body: 'The Edwin Smith and Ebers papyri recorded prescriptions, surgery, and hygiene. Pharaohs pursued eternal life through mummification; Imhotep was revered as a physician. Cosmetics & oils (moringa, honey) became the earliest anti-aging remedies.' },
+  { era: 'Age of the Prophets', when: '≈2000 BCE–632 CE', emoji: '☾', title: 'Prophetic Tradition & Hygiene',
+    body: 'Prophetic teachings emphasized ablution/cleanliness, periodic fasting, honey & black seed, and moderate eating ("a third for food, a third for drink, a third for breath"). These principles of prevention and moderation align closely with modern longevity science.' },
+  { era: 'Greco-Roman', when: '≈500 BCE–500 CE', emoji: '🏛️', title: 'Hippocrates & Galen',
+    body: 'Hippocrates: "let food be thy medicine" and the Hippocratic Oath (medical ethics). Galen systematized physiology. The Romans built aqueducts, bathhouses, and public sanitation — the first public health system.' },
+  { era: 'Chinese Dynasties', when: '≈200 BCE–1912 CE', emoji: '🐉', title: 'Qi, Herbs & Elixirs of Longevity',
+    body: 'The Huangdi Neijing laid the foundations of TCM. Emperors sought an "elixir of immortality" (some, ironically, containing mercury). Qigong, acupuncture, ginseng, and yin-yang balance formed a holistic approach to healthspan.' },
+  { era: 'Mongol Empire', when: '≈1206–1368 CE', emoji: '🏹', title: 'Cross-Cultural Medicine',
+    body: 'The Pax Mongolica connected Persian, Chinese, and Arab physicians along the Silk Road — exchanging surgical, pharmaceutical, and quarantine knowledge. Mobile hospitals and soldier fitness standards were early forms of "performance medicine".' },
+  { era: 'Islamic Golden Age', when: '≈800–1300 CE', emoji: '⚕️', title: 'Ibn Sina & Hospitals (Bimaristan)',
+    body: "Ibn Sina's Al-Qanun (Canon of Medicine) remained the world's reference for 600 years. Al-Razi pioneered clinical record-keeping. The Bimaristan — hospitals with medical records, pharmacies, and specializations — was the forerunner of modern healthcare systems." },
 ]
 const HISTORY_MODERN: { decade: string; title: string; body: string }[] = [
-  { decade: '1900–1950', title: 'Antibiotik & Vaksin', body: 'Penisilin (Fleming, 1928), vaksinasi massal, & sanitasi melipatgandakan harapan hidup. Fokus: penyakit menular.' },
-  { decade: '1960–1980', title: 'Rekam Medis & Kedokteran Bukti', body: 'Rekam medis elektronik pertama (Problem-Oriented Medical Record). Randomized trial jadi standar emas. Awal gerontologi.' },
-  { decade: '1990–2000', title: 'Genom & Telomer', body: 'Human Genome Project. Penemuan telomerase (anti-aging molekuler). Internet mulai mengubah akses informasi kesehatan.' },
-  { decade: '2000–2010', title: 'EHR & Standar Interoperabilitas', body: 'Adopsi Electronic Health Records meluas. HL7 v2/v3 & lahirnya FHIR (2011) — standar tukar data kesehatan antar-sistem yang kini jadi tulang punggung digital health.' },
-  { decade: '2010–2020', title: 'Wearable & Longevity Science', body: 'Apple Watch, WHOOP, CGM. Riset senolytics, NAD+, rapamycin, puasa. Longevity naik dari pinggiran ke sains arus utama (Sinclair, Attia).' },
-  { decade: '2020–kini', title: 'AI dalam Kedokteran + FHIR', body: 'AI untuk diagnosis, anamnesis, & interpretasi citra; LLM medis. FHIR menyatukan data agar AI & pasien berbicara satu bahasa. Panaceamed.id lahir di sini: AI + verifikasi dokter + longevity terukur.' },
+  { decade: '1900–1950', title: 'Antibiotics & Vaccines', body: 'Penicillin (Fleming, 1928), mass vaccination, and sanitation dramatically extended life expectancy. Focus: infectious disease.' },
+  { decade: '1960–1980', title: 'Medical Records & Evidence-Based Medicine', body: 'The first electronic medical record (the Problem-Oriented Medical Record). Randomized trials became the gold standard. The birth of gerontology.' },
+  { decade: '1990–2000', title: 'Genomics & Telomeres', body: 'The Human Genome Project. Discovery of telomerase (molecular anti-aging). The internet began transforming access to health information.' },
+  { decade: '2000–2010', title: 'EHR & Interoperability Standards', body: 'Widespread adoption of Electronic Health Records. HL7 v2/v3 and the birth of FHIR (2011) — the data-exchange standard now underpinning digital health.' },
+  { decade: '2010–2020', title: 'Wearables & Longevity Science', body: 'Apple Watch, WHOOP, CGMs. Research into senolytics, NAD+, rapamycin, fasting. Longevity moved from the fringe into mainstream science (Sinclair, Attia).' },
+  { decade: '2020–present', title: 'AI in Medicine + FHIR', body: 'AI for diagnosis, patient interviews, and image interpretation; medical LLMs. FHIR unifies data so AI and patients speak the same language. Panaceamed.id was born here: AI + doctor verification + measurable longevity.' },
 ]
 const STEM_CELLS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
-  { type: 'Somatic (Dewasa)', emoji: '🩹', short: 'Multipoten',
-    body: 'Sel punca yang sudah ada di tubuh dewasa — sumsum tulang, lemak, darah tali pusat. Bersifat multipoten (terbatas jadi beberapa jenis sel dari jaringannya). Paling aman & sudah rutin dipakai klinis (mis. transplantasi sumsum tulang untuk leukemia).',
-    use: 'Terapi sel darah, ortopedi, penyembuhan luka' },
-  { type: 'Embryonic (Embrionik)', emoji: '🌱', short: 'Pluripoten',
-    body: 'Berasal dari blastosis embrio dini; bersifat pluripoten — bisa menjadi HAMPIR semua jenis sel tubuh. Sangat kuat untuk riset & regenerasi, namun menimbulkan pertimbangan etika & risiko penolakan imun/tumor.',
-    use: 'Riset perkembangan, model penyakit, regenerasi organ' },
-  { type: 'iPSC (Induced Pluripotent)', emoji: '🔄', short: 'Pluripoten (rekayasa)',
-    body: 'Sel dewasa (mis. kulit/darah) "diprogram ulang" kembali ke keadaan pluripoten (Yamanaka, Nobel 2012). Menggabungkan kekuatan embrionik TANPA masalah etika embrio, dan bisa cocok-personal (dari sel pasien sendiri → minim penolakan).',
-    use: 'Pengobatan personal, uji obat, riset anti-aging & reprogramming' },
+  { type: 'Somatic (Adult)', emoji: '🩹', short: 'Multipotent',
+    body: 'Stem cells already present in the adult body — bone marrow, fat, umbilical cord blood. Multipotent (limited to a few cell types from their tissue of origin). The safest, and already routinely used clinically (e.g. bone marrow transplants for leukemia).',
+    use: 'Blood cell therapy, orthopedics, wound healing' },
+  { type: 'Embryonic', emoji: '🌱', short: 'Pluripotent',
+    body: 'Derived from early embryonic blastocysts; pluripotent — able to become ALMOST any cell type in the body. Extremely powerful for research & regeneration, but raises ethical considerations and immune/tumor rejection risks.',
+    use: 'Developmental research, disease modeling, organ regeneration' },
+  { type: 'iPSC (Induced Pluripotent)', emoji: '🔄', short: 'Pluripotent (engineered)',
+    body: "Adult cells (e.g. skin/blood) are \"reprogrammed\" back into a pluripotent state (Yamanaka, Nobel Prize 2012). Combines the power of embryonic cells WITHOUT the embryo ethics issue, and can be personalized (from the patient's own cells → minimal rejection).",
+    use: 'Personalized medicine, drug testing, anti-aging & reprogramming research' },
 ]
 const ROBOTICS: { type: string; emoji: string; short: string; body: string; use: string }[] = [
-  { type: 'Bedah Robotik', emoji: '🤖', short: 'Presisi mikro',
-    body: 'Sistem seperti da Vinci (sejak ~2000) memungkinkan dokter mengoperasi lewat sayatan sangat kecil dengan lengan robot berpresisi, tremor-filter, & penglihatan 3D. Hasilnya: luka lebih kecil, nyeri berkurang, & pemulihan lebih cepat.',
-    use: 'Urologi, ginekologi, bedah jantung & digestif' },
-  { type: 'Prostetik & Eksoskeleton', emoji: '🦾', short: 'Bionik',
-    body: 'Tangan/kaki bionik yang dikendalikan sinyal saraf/otot (myoelectric), serta eksoskeleton robotik yang membantu pasien stroke/cedera tulang belakang berjalan kembali — mengembalikan mobilitas & kemandirian.',
-    use: 'Rehabilitasi, amputasi, cedera saraf tulang belakang' },
-  { type: 'Nanorobot & Mikrorobot', emoji: '🧫', short: 'Skala sel',
-    body: 'Robot berukuran mikro/nano (masih tahap riset & uji awal) dirancang mengantar obat langsung ke sel target — mis. tumor — atau membersihkan pembuluh, meminimalkan efek samping ke jaringan sehat. Perbatasan pengobatan presisi.',
-    use: 'Pengantaran obat bertarget, diagnostik intra-tubuh' },
-  { type: 'Robot Rehabilitasi & Perawatan', emoji: '💗', short: 'Pendamping',
-    body: 'Robot terapi gerak berulang untuk pemulihan pasca-stroke, robot pendamping lansia (memantau jatuh, mengingatkan obat), & telepresence untuk kunjungan dokter jarak jauh — memperluas akses perawatan.',
-    use: 'Fisioterapi, perawatan lansia, telemedicine' },
+  { type: 'Robotic Surgery', emoji: '🤖', short: 'Micro-precision',
+    body: 'Systems like da Vinci (since ~2000) let surgeons operate through tiny incisions using precision robotic arms, tremor filtering, and 3D vision. The result: smaller wounds, less pain, and faster recovery.',
+    use: 'Urology, gynecology, cardiac & digestive surgery' },
+  { type: 'Prosthetics & Exoskeletons', emoji: '🦾', short: 'Bionic',
+    body: "Bionic hands and legs controlled by nerve/muscle signals (myoelectric), plus robotic exoskeletons that help stroke and spinal-injury patients walk again — restoring mobility and independence.",
+    use: 'Rehabilitation, amputation, spinal nerve injury' },
+  { type: 'Nanorobots & Microrobots', emoji: '🧫', short: 'Cellular scale',
+    body: 'Micro/nano-scale robots (still in early research and trial stages) designed to deliver drugs directly to target cells — such as tumors — or clear blood vessels, minimizing side effects to healthy tissue. The frontier of precision medicine.',
+    use: 'Targeted drug delivery, intra-body diagnostics' },
+  { type: 'Rehabilitation & Care Robots', emoji: '💗', short: 'Companion',
+    body: 'Repetitive-motion therapy robots for post-stroke recovery, elderly-companion robots (monitoring falls, reminding about medication), and telepresence for remote doctor visits — expanding access to care.',
+    use: 'Physiotherapy, elderly care, telemedicine' },
 ]
 
 export function Landing({ onMasuk }: { onMasuk: () => void }) {
@@ -123,22 +123,22 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
   }, [])
   return (
     <div className="min-h-screen bg-white">
-      {/* Promo early-bird — 75% untuk pendaftar pertama */}
+      {/* Early-bird promo — 75% off for the first registrants */}
       {promo && promo.slotsLeft > 0 && (
         <button onClick={onMasuk} className="block w-full bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] px-4 py-2.5 text-center text-sm font-bold text-white hover:brightness-110">
-          🎉 Diskon {promo.discountPct}% SEMUA layanan untuk {promo.limit} pendaftar pertama — sisa {promo.slotsLeft} slot! Daftar sekarang →
+          🎉 {promo.discountPct}% off ALL services for the first {promo.limit} sign-ups — only {promo.slotsLeft} spots left! Sign up now →
         </button>
       )}
       {/* Glass header */}
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-white/70 px-4 py-3 backdrop-blur-xl sm:px-8">
         <div className="min-w-0 shrink"><Wordmark size={32} /></div>
-        <a href="#pricing" className="hidden shrink-0 text-sm font-bold text-neutral-600 transition hover:text-brand-dark sm:inline">Harga</a>
+        <a href="#pricing" className="hidden shrink-0 text-sm font-bold text-neutral-600 transition hover:text-brand-dark sm:inline">Pricing</a>
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setTheme(toggleTheme())}
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-black/5 text-neutral-600 transition hover:text-brand-dark"
-            title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-            aria-label={theme === 'dark' ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
           </button>
@@ -146,7 +146,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             onClick={onMasuk}
             className="min-h-[44px] whitespace-nowrap rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] px-5 py-2.5 text-sm font-extrabold text-white shadow-md transition hover:brightness-105 active:scale-95 sm:px-6 sm:text-base"
           >
-            Masuk<span className="hidden sm:inline"> / Daftar</span>
+            Sign In<span className="hidden sm:inline"> / Sign Up</span>
           </button>
         </div>
       </header>
@@ -179,22 +179,22 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal>
             <div className="liquid-glass mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-600">Longevity Medical-AI · Siap Pakai</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-600">Longevity Medical-AI · Ready to Use</span>
             </div>
           </Reveal>
           <Reveal delay={80}>
             <h1 className="mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              AI-Klinik Praktis untuk
+              The Practical AI Clinic for
               <br />
               <span className="font-serif-display bg-gradient-to-r from-[#0b7a4b] to-[#00BF63] bg-clip-text italic text-transparent">
-                Akses Kesehatan Anda
+                Your Access to Healthcare
               </span>
             </h1>
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-5 max-w-2xl text-neutral-600 sm:text-lg">
-              AI melakukan anamnesis & edukasi; dokter memverifikasi. Memperpanjang <b>healthspan</b> — bukan
-              sekadar usia — lewat penalaran klinis presisi, pencegahan dini, dan optimasi gaya hidup.
+              AI handles the intake & education; doctors verify. We extend <b>healthspan</b> — not just
+              lifespan — through precise clinical reasoning, early prevention, and lifestyle optimization.
             </p>
           </Reveal>
           <Reveal delay={240}>
@@ -204,7 +204,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 onClick={onMasuk}
                 className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2 pl-7 pr-2 font-bold text-white shadow-[0_10px_30px_-8px_rgba(0,191,99,0.5)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                <span className="relative z-10 text-base">Daftar Gratis Sekarang</span>
+                <span className="relative z-10 text-base">Sign Up Free Now</span>
                 <span className="relative z-10 grid h-9 w-9 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </span>
@@ -214,7 +214,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 href="#about"
                 className="flex items-center rounded-full border border-black/10 bg-white/60 px-8 py-3.5 font-bold text-brand-dark shadow-sm backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:bg-white"
               >
-                Pelajari Lebih Lanjut
+                Learn More
               </a>
             </div>
           </Reveal>
@@ -235,16 +235,16 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               ))}
             </div>
           </Reveal>
-          <p className="mt-5 text-xs text-neutral-500">AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+          <p className="mt-5 text-xs text-neutral-500">AI supports, but never replaces, licensed clinicians.</p>
 
           {/* Trust & Authority strip — the #1 pattern for health products */}
           <Reveal delay={360}>
             <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
               {[
-                { icon: IconStethoscope, label: 'Diverifikasi dokter berlisensi' },
-                { icon: IconShield, label: 'Kepatuhan UU PDP' },
-                { icon: IconCheck, label: 'Standar data FHIR' },
-                { icon: IconHeart, label: 'Longevity terukur' },
+                { icon: IconStethoscope, label: 'Verified by licensed doctors' },
+                { icon: IconShield, label: 'PDP Law compliant' },
+                { icon: IconCheck, label: 'FHIR data standard' },
+                { icon: IconHeart, label: 'Measurable longevity' },
               ].map((t) => (
                 <span key={t.label} className="flex items-center gap-2 text-[13px] font-semibold text-neutral-600">
                   <t.icon size={16} className="text-brand-dark" /> {t.label}
@@ -293,9 +293,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                 <h2 className="text-xl font-extrabold sm:text-2xl">
-                  Alam. Manusia. <span className="font-serif-display italic text-emerald-300">Kebugaran.</span>
+                  Nature. Humanity. <span className="font-serif-display italic text-emerald-300">Vitality.</span>
                 </h2>
-                <p className="mt-1 max-w-xl text-[13px] text-white/80">Memperpanjang healthspan lewat sains — menambah hidup pada usia Anda.</p>
+                <p className="mt-1 max-w-xl text-[13px] text-white/80">Extending healthspan through science — adding life to your years.</p>
               </div>
             </div>
           </Reveal>
@@ -305,12 +305,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       {/* ── ABOUT / FEATURES ─────────────────────────────────── */}
       <section id="about" className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
         <Reveal className="text-center">
-          <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Tentang Kami</span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Apa itu <span className="font-serif-display italic text-brand-dark">Panaceamed.id</span>?</h2>
+          <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">About Us</span>
+          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">What is <span className="font-serif-display italic text-brand-dark">Panaceamed.id</span>?</h2>
           <p className="mx-auto mt-3 max-w-3xl text-neutral-600">
-            Platform <b>AI-EMR</b> sekaligus <b>pusat pengetahuan kedokteran</b>. AI melakukan anamnesis &
-            analisis penunjang via chatbot, lalu mengalir ke rekam medis yang <b>diverifikasi dan ditandatangani
-            dokter manusia</b>. Visi kami: <b>AI-Klinik Praktis untuk masa depan kesehatan Anda.</b>
+            An <b>AI-EMR</b> platform and <b>medical knowledge hub</b> in one. AI conducts the patient intake &
+            supporting analysis through a chatbot, which then flows into a medical record <b>verified and signed
+            by a human doctor</b>. Our vision: <b>a practical AI clinic for the future of your healthcare.</b>
           </p>
         </Reveal>
 
@@ -341,11 +341,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="orb pointer-events-none absolute right-10 top-10 h-60 w-60 rounded-full bg-brand/15 blur-3xl" />
         <div className="relative mx-auto max-w-5xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark backdrop-blur">Model Bisnis</span>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Satu platform, <span className="font-serif-display italic text-brand-dark">banyak peran</span></h2>
+            <span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark backdrop-blur">Business Model</span>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">One platform, <span className="font-serif-display italic text-brand-dark">many roles</span></h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
-              Langganan (individu & rumah sakit) + ekonomi token: pembeli deposit <b>PanaceaToken</b>,
-              penulis menerima royalti, semua materi diverifikasi spesialis & AI.
+              Subscriptions (individuals & hospitals) plus a token economy: buyers deposit <b>PanaceaToken</b>,
+              authors earn royalties, and all content is verified by specialists & AI.
             </p>
           </Reveal>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -373,7 +373,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
             <IconSparkle size={13} /> What's New
           </span>
-          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Pembaruan <span className="font-serif-display italic text-brand-dark">Terbaru</span></h2>
+          <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Latest <span className="font-serif-display italic text-brand-dark">Updates</span></h2>
         </Reveal>
         <ul className="mt-8 space-y-3">
           {WHATS_NEW.map((w, i) => (
@@ -387,10 +387,10 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </ul>
       </section>
 
-      {/* ── BERITA & INOVASI KEDOKTERAN (editorial, rotating) ─────── */}
+      {/* ── MEDICAL NEWS & INNOVATION (editorial, rotating) ─────── */}
       <MedicalNews />
 
-      {/* ── SEJARAH LONGEVITY & SISTEM KESEHATAN ──────────────────── */}
+      {/* ── LONGEVITY & HEALTHCARE HISTORY ──────────────────── */}
       <section className="relative overflow-hidden px-6 py-20 sm:px-10">
         <div className="pointer-events-none absolute inset-0">
           <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl" />
@@ -398,11 +398,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
         <div className="relative mx-auto max-w-4xl">
           <Reveal className="text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Warisan Ribuan Tahun</span>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">Sejarah <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Kesehatan</h2>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">A Legacy Thousands of Years Old</span>
+            <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">A History of <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Health</h2>
             <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
-              Dari firaun, para nabi, Yunani-Romawi, dinasti Tiongkok, hingga kekaisaran Mongol —
-              pencarian hidup panjang &amp; sehat setua peradaban. Panaceamed.id meneruskannya dengan sains &amp; AI.
+              From pharaohs, prophets, the Greco-Roman world, and Chinese dynasties, to the Mongol empire —
+              the pursuit of a long, healthy life is as old as civilization itself. Panaceamed.id carries it forward with science &amp; AI.
             </p>
           </Reveal>
 
@@ -437,8 +437,8 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
 
           {/* Modern per-decade */}
           <Reveal className="mt-12 text-center">
-            <h3 className="text-2xl font-extrabold">Era Modern — <span className="font-serif-display italic text-brand-dark">Per Dekade</span></h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">Dari antibiotik & rekam medis, ke wearable, standar data FHIR, dan AI dalam kedokteran.</p>
+            <h3 className="text-2xl font-extrabold">The Modern Era — <span className="font-serif-display italic text-brand-dark">Decade by Decade</span></h3>
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">From antibiotics & medical records, to wearables, the FHIR data standard, and AI in medicine.</p>
           </Reveal>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {HISTORY_MODERN.map((m, i) => (
@@ -455,21 +455,21 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           {/* FHIR explainer */}
           <Reveal delay={80}>
             <div className="mt-8 rounded-2xl border border-brand/20 bg-brand-50 p-6">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Apa itu FHIR?</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">What is FHIR?</div>
               <p className="mt-1.5 text-sm leading-relaxed text-neutral-700">
-                <b>FHIR</b> (Fast Healthcare Interoperability Resources) adalah standar global agar data kesehatan —
-                rekam medis, lab, obat, tanda vital — bisa dibaca antar rumah sakit, aplikasi, &amp; AI dalam satu "bahasa".
-                Inilah fondasi yang membuat AI-EMR &amp; longevity terukur di Panaceamed.id bisa aman, portabel, &amp; kolaboratif.
+                <b>FHIR</b> (Fast Healthcare Interoperability Resources) is the global standard that lets health data —
+                medical records, labs, medications, vital signs — be read across hospitals, apps, &amp; AI in one shared "language".
+                It's the foundation that makes AI-EMR &amp; measurable longevity at Panaceamed.id safe, portable, &amp; collaborative.
               </p>
             </div>
           </Reveal>
 
           {/* Stem cells — the frontier of regenerative longevity */}
           <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Perbatasan Regeneratif</span>
-            <h3 className="mt-3 text-2xl font-extrabold">Sel Punca (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">The Regenerative Frontier</span>
+            <h3 className="mt-3 text-2xl font-extrabold">Stem Cells (<span className="font-serif-display italic text-brand-dark">Stem Cell</span>)</h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
-              Harapan besar anti-aging: mengganti sel rusak &amp; meremajakan jaringan. Tiga jenis utama, dari yang paling mapan hingga paling mutakhir.
+              Anti-aging's biggest promise: replacing damaged cells &amp; rejuvenating tissue. Three main types, from the most established to the most cutting-edge.
             </p>
           </Reveal>
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
@@ -484,25 +484,25 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                     </div>
                   </div>
                   <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
-                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Aplikasi:</b> {s.use}</div>
+                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Applications:</b> {s.use}</div>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal delay={80}>
             <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
-              Potensi vs kematangan: <b>potensi</b> tertinggi pada embrionik &amp; iPSC (pluripoten), <b>kematangan klinis</b> tertinggi pada somatik.
-              Riset reprogramming parsial (faktor Yamanaka) kini mengeksplorasi <i>membalik jam biologis sel</i> — perbatasan sains longevity.
-              <br /><span className="opacity-70">Bersifat edukatif; terapi sel punca harus di fasilitas berlisensi &amp; sesuai regulasi.</span>
+              Potential vs. clinical maturity: <b>potential</b> is highest for embryonic &amp; iPSC (pluripotent) cells, while <b>clinical maturity</b> is highest for somatic cells.
+              Partial reprogramming research (Yamanaka factors) is now exploring <i>reversing the cell's biological clock</i> — the frontier of longevity science.
+              <br /><span className="opacity-70">For educational purposes only; stem cell therapy must be performed at licensed facilities &amp; in accordance with regulations.</span>
             </p>
           </Reveal>
 
           {/* Robotics in medicine */}
           <Reveal className="mt-12 text-center">
-            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Presisi Mesin</span>
-            <h3 className="mt-3 text-2xl font-extrabold">Robotika dalam <span className="font-serif-display italic text-brand-dark">Kedokteran</span></h3>
+            <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Machine Precision</span>
+            <h3 className="mt-3 text-2xl font-extrabold">Robotics in <span className="font-serif-display italic text-brand-dark">Medicine</span></h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
-              Dari lengan bedah berpresisi hingga nanorobot di aliran darah — mesin memperluas tangan &amp; jangkauan dokter, membuat perawatan lebih aman, minim-invasif, &amp; terjangkau.
+              From precision surgical arms to nanorobots in the bloodstream — machines extend the reach of doctors, making care safer, less invasive, &amp; more affordable.
             </p>
           </Reveal>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -517,36 +517,36 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                     </div>
                   </div>
                   <p className="mt-2 flex-1 text-[13px] leading-relaxed text-neutral-600">{r.body}</p>
-                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Aplikasi:</b> {r.use}</div>
+                  <div className="mt-2 rounded-lg bg-neutral-50 px-3 py-1.5 text-[11px] text-neutral-500"><b className="text-neutral-600">Applications:</b> {r.use}</div>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal delay={80}>
             <p className="mx-auto mt-4 max-w-2xl text-center text-[11px] leading-relaxed text-neutral-500">
-              Robotika berpadu dengan <b>AI</b> (navigasi bedah, analisis citra real-time) &amp; <b>FHIR</b> (data terhubung) —
-              perpaduan yang menjadi arah Panaceamed.id: teknologi memperkuat, bukan menggantikan, klinisi.
-              <br /><span className="opacity-70">Sebagian teknologi (nanorobot) masih tahap riset/uji klinis.</span>
+              Robotics combined with <b>AI</b> (surgical navigation, real-time image analysis) &amp; <b>FHIR</b> (connected data) —
+              a pairing that defines Panaceamed.id's direction: technology that strengthens, rather than replaces, clinicians.
+              <br /><span className="opacity-70">Some technologies (nanorobots) are still in the research/clinical-trial stage.</span>
             </p>
           </Reveal>
         </div>
       </section>
 
-      {/* ── ABOUT US & KONTAK ─────────────────────────────────────── */}
+      {/* ── ABOUT US & CONTACT ─────────────────────────────────────── */}
       <section className="px-6 py-12 sm:px-10">
         <Reveal>
           <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-3">
             <div>
-              <h2 className="text-2xl font-extrabold">Tentang Kami</h2>
+              <h2 className="text-2xl font-extrabold">About Us</h2>
               <p className="mt-3 text-sm leading-relaxed text-neutral-600">
-                Panaceamed.id adalah super-app kesehatan & longevity Indonesia: AI melakukan anamnesis & edukasi,
-                dokter berlisensi memverifikasi. Misi kami menjadikan akses kesehatan berkualitas, pemantauan
-                penyakit kronis, dan ilmu longevity terdepan terjangkau untuk semua — didukung kecerdasan buatan
-                yang bertanggung jawab dan kepatuhan UU PDP.
+                Panaceamed.id is Indonesia's health & longevity super-app: AI handles the intake & education,
+                licensed doctors verify. Our mission is to make quality healthcare access, chronic disease
+                monitoring, and leading-edge longevity science affordable for everyone — backed by responsible
+                artificial intelligence and PDP Law compliance.
               </p>
             </div>
             <div className="rounded-2xl bg-brand-50 p-5">
-              <h3 className="font-bold">Hubungi Kami</h3>
+              <h3 className="font-bold">Contact Us</h3>
               <ul className="mt-3 space-y-2 text-sm">
                 <li><span className="text-neutral-500">Email:</span> <a href="mailto:index.meds@gmail.com" className="font-semibold text-brand-dark hover:underline">index.meds@gmail.com</a></li>
                 <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Panaceamed.id" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Panaceamed.id</a></li>
@@ -554,11 +554,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
               </ul>
             </div>
             <div className="rounded-2xl bg-neutral-50 p-5">
-              <h3 className="font-bold">Kontak Pendiri</h3>
+              <h3 className="font-bold">Founder Contact</h3>
               <ul className="mt-3 space-y-2 text-sm">
-                <li><span className="text-neutral-500">Nama:</span> <b>Rizky Muhammad Azrissal</b></li>
+                <li><span className="text-neutral-500">Name:</span> <b>Rizky Muhammad Azrissal</b></li>
                 <li><span className="text-neutral-500">Email:</span> <a href="mailto:Rizkyazhar486@gmail.com" className="font-semibold text-brand-dark hover:underline">Rizkyazhar486@gmail.com</a></li>
-                <li><span className="text-neutral-500">Telepon:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
+                <li><span className="text-neutral-500">Phone:</span> <a href="tel:+6282261143040" className="font-semibold text-brand-dark hover:underline">0822-6114-3040</a></li>
                 <li><span className="text-neutral-500">Instagram:</span> <a href="https://instagram.com/Rizkyazr4" target="_blank" rel="noreferrer" className="font-semibold text-brand-dark hover:underline">@Rizkyazr4</a></li>
               </ul>
             </div>
@@ -573,15 +573,15 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div className="orb pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/15 blur-3xl" />
             <div className="orb pointer-events-none absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
             <div className="relative">
-              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Mulai perjalanan <span className="font-serif-display italic">healthspan</span> Anda</h2>
+              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Start your <span className="font-serif-display italic">healthspan</span> journey</h2>
               <p className="mx-auto mt-3 max-w-xl text-white/85">
-                Gratis untuk dicoba — pilih peran Anda dan rasakan AI co-physician yang diverifikasi dokter.
+                Free to try — choose your role and experience an AI co-physician verified by doctors.
               </p>
               <button
                 onClick={onMasuk}
                 className="group mt-7 inline-flex items-center gap-3 rounded-full bg-white py-2 pl-8 pr-2 font-bold text-brand-dark shadow-[0_12px_30px_-8px_rgba(0,0,0,0.35)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                <span>Masuk &amp; Coba Sekarang</span>
+                <span>Sign In &amp; Try Now</span>
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-brand text-white transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:scale-105">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </span>
@@ -596,8 +596,8 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
           <Wordmark size={28} />
           <p className="text-xs text-neutral-500">
-            © {new Date().getFullYear()} Panaceamed.id · Longevity Medical-AI · AI mendukung, bukan
-            menggantikan, klinisi berlisensi.
+            © {new Date().getFullYear()} Panaceamed.id · Longevity Medical-AI · AI supports, but never
+            replaces, licensed clinicians.
           </p>
         </div>
       </footer>

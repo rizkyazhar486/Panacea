@@ -292,7 +292,7 @@ export interface UserDirectoryRow {
   }
 }
 
-export type FeedbackKind = 'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'
+export type FeedbackKind = 'Suggestion' | 'Problem/Bug' | 'Question' | 'Compliment' | 'Feature Request'
 export interface FeedbackEntry {
   id: string
   userId: string
