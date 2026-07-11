@@ -1,6 +1,7 @@
 // Free, no-API-key sports score proxy. Sources:
-//  - Football (all leagues) + NBA + NFL: ESPN's public "site API" — undocumented
-//    but extremely widely used by the community, stable for years. No key.
+//  - Football (all leagues) + NBA + NFL + UFC/MMA: ESPN's public "site API" —
+//    undocumented but extremely widely used by the community, stable for
+//    years. No key. UFC uses the same host under sport=mma, slug=ufc.
 //  - F1: Jolpica-F1 (api.jolpi.ca), the actively-maintained Ergast-compatible
 //    successor after Ergast's own API shut down in 2024. No key.
 //
@@ -38,7 +39,7 @@ export interface UnavailableResult {
   reason: string
 }
 
-export type LeagueSport = 'soccer' | 'basketball' | 'football'
+export type LeagueSport = 'soccer' | 'basketball' | 'football' | 'mma'
 
 export interface LeagueConfig {
   id: string
@@ -58,6 +59,7 @@ export const LEAGUES: LeagueConfig[] = [
   { id: 'worldcup', label: 'Piala Dunia', sport: 'soccer', slug: 'fifa.world' },
   { id: 'nba', label: 'NBA', sport: 'basketball', slug: 'nba' },
   { id: 'nfl', label: 'NFL', sport: 'football', slug: 'nfl' },
+  { id: 'ufc', label: 'UFC', sport: 'mma', slug: 'ufc' },
 ]
 
 // Leagues explicitly NOT covered — shown honestly in the UI instead of faked.
@@ -97,6 +99,33 @@ function normalizeEspnEvent(ev: EspnEvent): NormalizedEvent | null {
   }
 }
 
+// MMA/UFC events have no home/away teams — each "competitor" is a fighter
+// (order 1 or 2) with an `athlete`, not a `team`. Normalized into the same
+// NormalizedEvent shape (fighter 1 -> home slot, fighter 2 -> away slot) so
+// the existing frontend card (name vs name, score always "-") works as-is.
+interface EspnFighterCompetitor { order?: number; winner?: boolean; athlete?: { displayName?: string; shortName?: string; headshot?: { href?: string } } }
+interface EspnMmaCompetition { competitors?: EspnFighterCompetitor[]; status?: { type?: { state?: string; detail?: string; shortDetail?: string } } }
+interface EspnMmaEvent { id?: string; date?: string; name?: string; status?: { type?: { state?: string; detail?: string; shortDetail?: string } }; competitions?: EspnMmaCompetition[] }
+interface EspnMmaResponse { events?: EspnMmaEvent[] }
+
+function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent | null {
+  const comp = ev.competitions?.[0]
+  const f1 = comp?.competitors?.find((c) => c.order === 1) ?? comp?.competitors?.[0]
+  const f2 = comp?.competitors?.find((c) => c.order === 2) ?? comp?.competitors?.[1]
+  if (!f1?.athlete || !f2?.athlete || !ev.id) return null
+  const status = comp?.status?.type ?? ev.status?.type
+  const state = (status?.state as NormalizedEvent['state']) ?? 'pre'
+  const resultFor = (c: EspnFighterCompetitor) => (state === 'post' ? (c.winner ? 'W' : 'L') : undefined)
+  return {
+    id: ev.id,
+    startTime: ev.date ?? '',
+    state: state === 'in' || state === 'post' ? state : 'pre',
+    statusDetail: status?.shortDetail ?? status?.detail ?? ev.name ?? '',
+    home: { name: f1.athlete.displayName ?? f1.athlete.shortName ?? '?', abbrev: '', logo: f1.athlete.headshot?.href, score: resultFor(f1) },
+    away: { name: f2.athlete.displayName ?? f2.athlete.shortName ?? '?', abbrev: '', logo: f2.athlete.headshot?.href, score: resultFor(f2) },
+  }
+}
+
 export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueResult> {
   const league = LEAGUES.find((l) => l.id === leagueId)
   if (!league) return { leagueId, label: leagueId, events: [], error: 'unknown_league' }
@@ -111,8 +140,14 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
       console.log(`[sports] ${leagueId} fetch failed: HTTP ${res.status}`)
       return { leagueId, label: league.label, events: [], error: `upstream_${res.status}` }
     }
-    const json = (await res.json()) as EspnResponse
-    const events = (json.events ?? []).map(normalizeEspnEvent).filter((e): e is NormalizedEvent => e !== null)
+    let events: NormalizedEvent[]
+    if (league.sport === 'mma') {
+      const json = (await res.json()) as EspnMmaResponse
+      events = (json.events ?? []).map(normalizeMmaEvent).filter((e): e is NormalizedEvent => e !== null)
+    } else {
+      const json = (await res.json()) as EspnResponse
+      events = (json.events ?? []).map(normalizeEspnEvent).filter((e): e is NormalizedEvent => e !== null)
+    }
     const result: LeagueResult = { leagueId, label: league.label, events }
     cache.set(leagueId, { at: Date.now(), data: result })
     return result
