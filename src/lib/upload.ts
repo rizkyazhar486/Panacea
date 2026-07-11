@@ -45,8 +45,10 @@ export async function compressImage(file: File, maxEdge = 1600, quality = 0.82):
 }
 
 /** Upload a file to Cloudinary; returns a permanent https URL, or null on failure. */
-export async function uploadMedia(file: File): Promise<string | null> {
+export async function uploadMedia(file: File, timeoutMs = 20_000): Promise<string | null> {
   if (!cloudinaryConfigured) return null
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
     const form = new FormData()
     form.append('file', file)
@@ -54,12 +56,17 @@ export async function uploadMedia(file: File): Promise<string | null> {
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/auto/upload`, {
       method: 'POST',
       body: form,
+      signal: controller.signal,
     })
     if (!res.ok) return null
     const data = (await res.json()) as { secure_url?: string }
     return data.secure_url ?? null
   } catch {
+    // Includes the abort from a slow/flaky connection — caller falls back
+    // to a local data URL instead of hanging the UI forever.
     return null
+  } finally {
+    clearTimeout(timer)
   }
 }
 
