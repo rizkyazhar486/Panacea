@@ -7,9 +7,9 @@ import { useEffect, useRef, useState } from 'react'
 // each act's opacity/parallax via direct style writes (no re-render per
 // scroll frame, so it stays smooth on mobile).
 const ACTS = [
-  { key: 'hero', label: 'Awal' },
-  { key: 'vitality', label: 'Vitalitas' },
-  { key: 'science', label: 'Sains' },
+  { key: 'hero', label: 'Start' },
+  { key: 'vitality', label: 'Vitality' },
+  { key: 'science', label: 'Science' },
   { key: 'longevity', label: 'Longevity' },
 ] as const
 
@@ -119,7 +119,7 @@ export function ScrollCinematic() {
 
         {/* Scroll hint */}
         <div className="pointer-events-none absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1 text-white/70">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.25em]">Gulir</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.25em]">Scroll</span>
           <span className="scroll-chevron text-lg">↓</span>
         </div>
       </div>
@@ -254,7 +254,7 @@ function ActHero() {
       <SunriseGlow />
       <Particles seed={3} />
       <h2 className="relative text-3xl font-black tracking-tight text-white sm:text-5xl">PANACEAMED.ID</h2>
-      <p className="relative max-w-md px-6 text-sm font-semibold text-white/75 sm:text-base">Menuju Hidup Lebih Panjang, Lebih Sehat</p>
+      <p className="relative max-w-md px-6 text-sm font-semibold text-white/75 sm:text-base">Toward a Longer, Healthier Life</p>
     </div>
   )
 }
@@ -263,8 +263,8 @@ function ActVitality() {
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-start gap-6 pt-20 text-center" style={{ background: 'linear-gradient(180deg, #0B4A2E 0%, #0B7A4B 55%, #00BF63 100%)' }}>
       <Particles seed={11} color="#EFFFF6" />
-      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">VITALITAS</h2>
-      <p className="relative max-w-md px-6 text-sm font-semibold text-white/80">Gerak setiap hari, umur lebih panjang</p>
+      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">VITALITY</h2>
+      <p className="relative max-w-md px-6 text-sm font-semibold text-white/80">Move every day, live longer</p>
       <StretchSilhouette />
       <div className="absolute bottom-10 left-0 right-0 px-6"><Heartbeat /></div>
     </div>
@@ -277,7 +277,7 @@ function ActScience() {
     <div className="relative flex h-full w-full flex-col items-center justify-start gap-4 pt-20 text-center" style={{ background: 'linear-gradient(180deg, #00BF63 0%, #0B7A4B 55%, #0B4A2E 100%)' }}>
       <Particles seed={19} color="#DFFFF0" />
       <DnaHelix />
-      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">SAINS LONGEVITY</h2>
+      <h2 className="relative text-2xl font-black tracking-tight text-white sm:text-4xl">LONGEVITY SCIENCE</h2>
       <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center gap-3 px-6">
         {chips.map((c) => (
           <span key={c} className="rounded-full border border-white/35 bg-white/15 px-6 py-2 text-sm font-bold text-white backdrop-blur">
@@ -295,8 +295,8 @@ function ActLongevity() {
       <Rays />
       <SunriseGlow opacity={0.7} />
       <Particles seed={29} />
-      <h2 className="relative max-w-lg px-6 text-2xl font-black tracking-tight text-white sm:text-4xl">LONGEVITY DIMULAI HARI INI</h2>
-      <p className="relative text-base font-bold" style={{ color: '#7CF5B8' }}>Mulai Perjalanan Longevity Anda →</p>
+      <h2 className="relative max-w-lg px-6 text-2xl font-black tracking-tight text-white sm:text-4xl">LONGEVITY STARTS TODAY</h2>
+      <p className="relative text-base font-bold" style={{ color: '#7CF5B8' }}>Start Your Longevity Journey →</p>
     </div>
   )
 }

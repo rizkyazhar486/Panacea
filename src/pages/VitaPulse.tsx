@@ -14,16 +14,16 @@ export function VitaPulse() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">💓</span>
         <div>
           <h1 className="text-lg font-black text-ink">VitaPulse</h1>
-          <p className="text-xs text-neutral-400">Pantau & hitung kesehatan Anda secara realtime</p>
+          <p className="text-xs text-neutral-400">Monitor & calculate your health in real time</p>
         </div>
       </div>
       <div className="mb-4">
         <VideoGallery
           icon={<span className="text-lg">🩺</span>}
-          title="Video Edukasi"
-          subtitle="Cara mengukur tanda vital dengan benar"
+          title="Educational Videos"
+          subtitle="How to measure vital signs correctly"
           videos={[
-            { label: 'Mengukur Tekanan Darah', cue: 'Duduk tenang 5 mnt · lengan di atas meja setinggi jantung · kaki menapak · jangan bicara', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073025_ac2d37c3-a20e-45c4-ae71-ce92a0be4bc8.mp4' },
+            { label: 'Measuring Blood Pressure', cue: 'Sit calmly for 5 min · arm resting on table at heart height · feet flat on floor · don\'t talk', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073025_ac2d37c3-a20e-45c4-ae71-ce92a0be4bc8.mp4' },
           ]}
         />
       </div>

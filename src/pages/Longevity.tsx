@@ -13,10 +13,10 @@ import { ShareStatCard } from '../components/ShareStatCard'
 //     lifestyle) with evidence-based weights.
 //   • Biological-age estimate (heuristic, optionally sharpened by lab values).
 //   • Decade projection: where each capacity lands at 60 & 80 on the current
-//     path vs the trained path — "latih dirimu yang berusia 80".
+//     path vs the trained path — "train the you at 80".
 //   • Testing protocol: quarterly field tests + yearly labs with due dates.
-// Auto-prefills from data already entered elsewhere in the app (Komposisi
-// Tubuh, Atlet). Manual, offline, device-agnostic — a complement to any watch.
+// Auto-prefills from data already entered elsewhere in the app (Body
+// Composition, Athlete). Manual, offline, device-agnostic — a complement to any watch.
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface LongevityData {
@@ -95,14 +95,14 @@ function pillarsOf(d: LongevityData): Pillar[] {
   if (d.purpose) life += 6
   const lifeScore = Math.max(0, Math.min(100, life))
   return [
-    { id: 'vo2', emoji: '🫀', name: 'VO₂max', why: 'Prediktor mortalitas #1 — elit vs rendah ≈ 5x beda risiko', value: d.vo2, unit: 'ml/kg/mnt', score: vo2Score, target: `≥${vo2Good.toFixed(0)} utk usia Anda`, weight: 0.22 },
-    { id: 'grip', emoji: '✊', name: 'Grip Strength', why: 'Tiap −5kg ≈ +16% risiko kematian (PURE)', value: d.grip, unit: 'kg', score: gripScore, target: `≥${gripNorm.toFixed(0)} kg`, weight: 0.13 },
-    { id: 'chair', emoji: '🦵', name: 'Kekuatan Kaki (Chair Stand 30s)', why: 'Prediktor mobilitas & kemandirian usia tua', value: d.chair30, unit: 'x', score: chairScore, target: `≥${chairNorm.toFixed(0)}x`, weight: 0.13 },
-    { id: 'bal', emoji: '🦩', name: 'Keseimbangan Satu Kaki', why: '<10 dtk usia 50+ ≈ 2x risiko kematian 7 thn (BMJ)', value: d.balance, unit: 'dtk', score: balScore, target: '≥30 dtk', weight: 0.1 },
-    { id: 'whr', emoji: '📏', name: 'Waist-Hip Ratio', why: 'Lemak visceral > BMI utk risiko kardiometabolik', value: d.whr, unit: '', score: whrScore, target: M ? '≤0.90' : '≤0.85', weight: 0.1 },
-    { id: 'rhr', emoji: '❤️', name: 'Resting HR', why: 'Efisiensi jantung; turun dgn latihan Zone 2', value: d.rhr, unit: 'bpm', score: rhrScore, target: '50-60 bpm', weight: 0.1 },
-    { id: 'sleep', emoji: '😴', name: 'Tidur', why: 'Fondasi perbaikan sel & hormon', value: d.sleepH, unit: 'jam', score: sleepScore, target: '7-8.5 jam', weight: 0.11 },
-    { id: 'life', emoji: '🌱', name: 'Gaya Hidup & Sosial', why: 'Rokok, alkohol, protein, koneksi sosial, tujuan hidup', value: lifeScore, unit: '/100', score: lifeScore, target: 'tanpa rokok + sosial aktif', weight: 0.11 },
+    { id: 'vo2', emoji: '🫀', name: 'VO₂max', why: '#1 mortality predictor — elite vs low ≈ 5x risk difference', value: d.vo2, unit: 'ml/kg/min', score: vo2Score, target: `≥${vo2Good.toFixed(0)} for your age`, weight: 0.22 },
+    { id: 'grip', emoji: '✊', name: 'Grip Strength', why: 'Every −5kg ≈ +16% mortality risk (PURE)', value: d.grip, unit: 'kg', score: gripScore, target: `≥${gripNorm.toFixed(0)} kg`, weight: 0.13 },
+    { id: 'chair', emoji: '🦵', name: 'Leg Strength (Chair Stand 30s)', why: 'Predictor of mobility & independence in old age', value: d.chair30, unit: 'x', score: chairScore, target: `≥${chairNorm.toFixed(0)}x`, weight: 0.13 },
+    { id: 'bal', emoji: '🦩', name: 'One-Leg Balance', why: '<10s at age 50+ ≈ 2x 7-yr mortality risk (BMJ)', value: d.balance, unit: 'sec', score: balScore, target: '≥30 sec', weight: 0.1 },
+    { id: 'whr', emoji: '📏', name: 'Waist-Hip Ratio', why: 'Visceral fat > BMI for cardiometabolic risk', value: d.whr, unit: '', score: whrScore, target: M ? '≤0.90' : '≤0.85', weight: 0.1 },
+    { id: 'rhr', emoji: '❤️', name: 'Resting HR', why: 'Heart efficiency; lowers with Zone 2 training', value: d.rhr, unit: 'bpm', score: rhrScore, target: '50-60 bpm', weight: 0.1 },
+    { id: 'sleep', emoji: '😴', name: 'Sleep', why: 'Foundation of cellular & hormonal repair', value: d.sleepH, unit: 'hrs', score: sleepScore, target: '7-8.5 hrs', weight: 0.11 },
+    { id: 'life', emoji: '🌱', name: 'Lifestyle & Social', why: 'Smoking, alcohol, protein, social connection, sense of purpose', value: lifeScore, unit: '/100', score: lifeScore, target: 'smoke-free + socially active', weight: 0.11 },
   ]
 }
 
@@ -128,15 +128,15 @@ function project(current: number, age: number, targetAge: number, declineUntrain
 
 // Testing protocol (quarterly field tests + yearly checks).
 const PROTOCOL = [
-  { id: 'cooper', label: '🏃 Cooper Test 12 mnt (VO₂max)', freqM: 3, where: 'Lapangan / treadmill — hasil ke Tes Fisik' },
-  { id: 'grip', label: '✊ Handgrip dynamometer', freqM: 3, where: 'Gym / Lab Performa' },
-  { id: 'chair', label: '🦵 Chair-stand 30 detik', freqM: 3, where: 'Rumah — kursi tanpa lengan' },
-  { id: 'balance', label: '🦩 One-leg stand (buka & tutup mata)', freqM: 3, where: 'Rumah' },
-  { id: 'body', label: '📏 Lingkar pinggang-pinggul + berat', freqM: 1, where: 'Rumah — ke Komposisi Tubuh' },
-  { id: 'bp', label: '🩺 Tekanan darah', freqM: 1, where: 'Rumah / apotek — ke VitaPulse' },
-  { id: 'lab', label: '🧪 Lab tahunan: HbA1c, lipid, hsCRP, ginjal', freqM: 12, where: 'Laboratorium klinik' },
-  { id: 'dental', label: '🦷 Kontrol gigi', freqM: 6, where: 'Dokter gigi — inflamasi gusi ↔ jantung' },
-  { id: 'skin', label: '🔎 Skrining kulit & sesuai usia (kanker)', freqM: 12, where: 'Dokter — jadwal skrining nasional' },
+  { id: 'cooper', label: '🏃 Cooper Test 12 min (VO₂max)', freqM: 3, where: 'Field / treadmill — results to Physical Test' },
+  { id: 'grip', label: '✊ Handgrip dynamometer', freqM: 3, where: 'Gym / Performance Lab' },
+  { id: 'chair', label: '🦵 Chair-stand 30 seconds', freqM: 3, where: 'Home — armless chair' },
+  { id: 'balance', label: '🦩 One-leg stand (eyes open & closed)', freqM: 3, where: 'Home' },
+  { id: 'body', label: '📏 Waist-hip circumference + weight', freqM: 1, where: 'Home — to Body Composition' },
+  { id: 'bp', label: '🩺 Blood pressure', freqM: 1, where: 'Home / pharmacy — to VitaPulse' },
+  { id: 'lab', label: '🧪 Annual labs: HbA1c, lipids, hsCRP, kidney', freqM: 12, where: 'Clinical laboratory' },
+  { id: 'dental', label: '🦷 Dental checkup', freqM: 6, where: 'Dentist — gum inflammation ↔ heart' },
+  { id: 'skin', label: '🔎 Age-appropriate skin (cancer) screening', freqM: 12, where: 'Doctor — per national screening schedule' },
 ]
 
 export function Longevity() {
@@ -177,16 +177,16 @@ export function Longevity() {
       {score != null && bAge != null && (
         <div className="flex justify-end">
           <ShareStatCard
-            activity="❤️ Pusat Longevity"
+            activity="❤️ Longevity Center"
             metricLabel="Longevity Score"
             metricValue={String(score)}
-            badge={delta != null ? (delta <= 0 ? `${Math.abs(delta).toFixed(1)} thn lebih muda` : `${delta.toFixed(1)} thn lebih tua`) : undefined}
-            secondary={`Usia Biologis (est.) ${bAge} thn vs usia kronologis ${d.age}`}
+            badge={delta != null ? (delta <= 0 ? `${Math.abs(delta).toFixed(1)} yrs younger` : `${delta.toFixed(1)} yrs older`) : undefined}
+            secondary={`Biological Age (est.) ${bAge} yrs vs chronological age ${d.age}`}
           />
         </div>
       )}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Pusat Longevity" subtitle="Jam tangan menilai harimu — halaman ini menilai dekademu" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Longevity Center" subtitle="Your watch scores your day — this page scores your decade" />
         <div className="mt-2 flex items-center justify-around">
           <div className="text-center">
             <div className="relative mx-auto" style={{ width: 130, height: 130 }}>
@@ -205,22 +205,22 @@ export function Longevity() {
             </div>
           </div>
           <div className="text-center">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Usia Biologis (est.)</div>
-            <div className="text-4xl font-extrabold text-ink">{bAge ?? '—'}<span className="text-sm text-neutral-400"> thn</span></div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Biological Age (est.)</div>
+            <div className="text-4xl font-extrabold text-ink">{bAge ?? '—'}<span className="text-sm text-neutral-400"> yrs</span></div>
             {delta != null && (
               <Badge tone={delta <= 0 ? 'brand' : 'critical'}>
-                {delta <= 0 ? `${Math.abs(delta).toFixed(1)} thn lebih muda 🎉` : `${delta.toFixed(1)} thn lebih tua`}
+                {delta <= 0 ? `${Math.abs(delta).toFixed(1)} yrs younger 🎉` : `${delta.toFixed(1)} yrs older`}
               </Badge>
             )}
-            <div className="mt-1 text-[9px] text-neutral-400">vs usia kronologis {d.age}</div>
+            <div className="mt-1 text-[9px] text-neutral-400">vs chronological age {d.age}</div>
           </div>
         </div>
-        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-400">Isi minimal 4 pilar di bawah untuk mengaktifkan skor & usia biologis.</p>}
+        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-400">Fill in at least 4 pillars below to activate your score & biological age.</p>}
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <Field label="Usia"><input className={inputClass} type="number" value={d.age} onChange={(e) => u({ age: +e.target.value })} /></Field>
-          <Field label="Jenis Kelamin">
+          <Field label="Age"><input className={inputClass} type="number" value={d.age} onChange={(e) => u({ age: +e.target.value })} /></Field>
+          <Field label="Sex">
             <select className={inputClass} value={d.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
         </div>
@@ -228,28 +228,28 @@ export function Longevity() {
 
       {/* Pillars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="8 Pilar Longevity" subtitle="Prediktor jangka panjang tervalidasi — bobot sesuai kekuatan bukti" />
+        <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Validated long-term predictors — weighted by strength of evidence" />
         <div className="mt-2 grid grid-cols-2 gap-3">
-          {num('VO₂max (ml/kg/mnt)', 'vo2', 0.1)}
-          {num('Grip terbaik (kg)', 'grip', 0.5)}
-          {num('Chair-stand 30 dtk (x)', 'chair30')}
-          {num('Keseimbangan 1 kaki (dtk)', 'balance')}
-          {num('Waist-Hip Ratio', 'whr', 0.01, 'mis. 0.85')}
+          {num('VO₂max (ml/kg/min)', 'vo2', 0.1)}
+          {num('Best grip (kg)', 'grip', 0.5)}
+          {num('Chair-stand 30 sec (x)', 'chair30')}
+          {num('One-leg balance (sec)', 'balance')}
+          {num('Waist-Hip Ratio', 'whr', 0.01, 'e.g. 0.85')}
           {num('Resting HR (bpm)', 'rhr')}
-          {num('Rata-rata tidur (jam)', 'sleepH', 0.1)}
-          <Field label="Merokok">
+          {num('Average sleep (hrs)', 'sleepH', 0.1)}
+          <Field label="Smoking">
             <select className={inputClass} value={d.smoke} onChange={(e) => u({ smoke: e.target.value as LongevityData['smoke'] })}>
-              <option value="never">Tidak pernah</option><option value="former">Berhenti</option><option value="current">Masih</option>
+              <option value="never">Never</option><option value="former">Quit</option><option value="current">Still smoking</option>
             </select>
           </Field>
-          <Field label="Alkohol">
+          <Field label="Alcohol">
             <select className={inputClass} value={d.alcohol} onChange={(e) => u({ alcohol: +e.target.value as LongevityData['alcohol'] })}>
-              <option value={0}>Tidak</option><option value={1}>Sesekali</option><option value={2}>Sering</option>
+              <option value={0}>None</option><option value={1}>Occasional</option><option value={2}>Frequent</option>
             </select>
           </Field>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {([['protein', '🥩 Protein ≥1.6 g/kg/hari'], ['social', '🫂 Koneksi sosial rutin'], ['purpose', '🎯 Punya tujuan hidup (ikigai)']] as const).map(([k, l]) => (
+          {([['protein', '🥩 Protein ≥1.6 g/kg/day'], ['social', '🫂 Regular social connection'], ['purpose', '🎯 Has a sense of purpose (ikigai)']] as const).map(([k, l]) => (
             <button key={k} onClick={() => u({ [k]: !d[k] } as Partial<LongevityData>)}
               className={'rounded-full px-3 py-1.5 text-[11px] font-bold ' + (d[k] ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
               {l}
@@ -280,71 +280,71 @@ export function Longevity() {
 
       {/* Decade projection */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Proyeksi Dekade — Latih Dirimu yang 80 Tahun" subtitle="Tanpa latihan: VO₂max −10%/dekade, otot −8%/dekade setelah 30. Terlatih: separuhnya." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Decade Projection — Train the You at 80" subtitle="Untrained: VO₂max −10%/decade, muscle −8%/decade after 30. Trained: half that." />
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">
-              <div className="text-xs font-bold text-white/60">VO₂max Anda {d.vo2} sekarang →</div>
+              <div className="text-xs font-bold text-white/60">Your VO₂max is {d.vo2} now →</div>
               <div className="mt-2 grid grid-cols-2 gap-3 text-center">
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Usia 60</div>
+                  <div className="text-[10px] uppercase text-white/50">Age 60</div>
                   <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj60.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj60.trained.toFixed(0)}</span></div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Usia 80</div>
+                  <div className="text-[10px] uppercase text-white/50">Age 80</div>
                   <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj80.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj80.trained.toFixed(0)}</span></div>
                 </div>
               </div>
               <p className="mt-2 text-[10px] leading-relaxed text-white/70">
-                Ambang kemandirian ≈18 (naik tangga, belanja sendiri). {vo2Proj80.untrained < 18 ? '⚠️ Tanpa latihan, Anda diproyeksikan di BAWAH ambang mandiri di usia 80 — jalur terlatih menjaga Anda tetap di atasnya.' : 'Kedua jalur masih di atas ambang — pertahankan.'}
-                {' '}Merah = tanpa latihan · Hijau = terlatih rutin.
+                Independence threshold ≈18 (climbing stairs, carrying groceries). {vo2Proj80.untrained < 18 ? '⚠️ Without training, you are projected to fall BELOW the independence threshold by age 80 — the trained path keeps you above it.' : 'Both paths stay above the threshold — keep it up.'}
+                {' '}Red = untrained · Green = trained regularly.
               </p>
             </div>
             {gripProj80 && (
               <div className="rounded-xl border border-neutral-100 p-3 text-[11px] text-neutral-600">
-                ✊ Grip {d.grip}kg → usia 80: <b className="text-rose-500">{gripProj80.untrained.toFixed(0)}kg</b> tanpa latihan vs <b className="text-brand-dark">{gripProj80.trained.toFixed(0)}kg</b> terlatih.
-                Ambang buka toples/pegangan aman ≈16-20kg.
+                ✊ Grip {d.grip}kg → age 80: <b className="text-rose-500">{gripProj80.untrained.toFixed(0)}kg</b> untrained vs <b className="text-brand-dark">{gripProj80.trained.toFixed(0)}kg</b> trained.
+                Safe jar-opening/grip threshold ≈16-20kg.
               </div>
             )}
           </div>
-        ) : <p className="mt-2 text-[11px] text-neutral-400">Isi VO₂max (dan grip) untuk melihat proyeksi Anda di usia 60 & 80.</p>}
+        ) : <p className="mt-2 text-[11px] text-neutral-400">Fill in VO₂max (and grip) to see your projection at ages 60 & 80.</p>}
       </Card>
 
       {/* Lab sharpening */}
       <Card className="!p-5">
-        <SectionTitle icon={<span className="text-lg">🧪</span>} title="Penajaman Lab (opsional)" subtitle="Isi dari hasil lab tahunan — usia biologis makin akurat" />
+        <SectionTitle icon={<span className="text-lg">🧪</span>} title="Lab Sharpening (optional)" subtitle="Fill in from your annual lab results — for a more accurate biological age" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {num('HbA1c (%)', 'hba1c', 0.1, '<5.4')}
           {num('LDL (mg/dL)', 'ldl', 1, '<115')}
           {num('hsCRP (mg/L)', 'crp', 0.1, '<1')}
-          {num('Sistolik (mmHg)', 'sbp', 1, '<118')}
+          {num('Systolic (mmHg)', 'sbp', 1, '<118')}
         </div>
         <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
-          Marker di atas target menambah usia biologis (heuristik terinspirasi PhenoAge — bukan pengganti penilaian dokter).
-          Diskusikan hasil lab dengan dokter Anda; fitur <a href="#/chatbot" className="font-bold text-brand-dark underline">Konsultasi AI</a> bisa membantu menyiapkan pertanyaan.
+          Markers above target add to your biological age (a heuristic inspired by PhenoAge — not a substitute for medical judgment).
+          Discuss your lab results with your doctor; the <a href="#/chatbot" className="font-bold text-brand-dark underline">AI Consultation</a> feature can help you prepare questions.
         </p>
       </Card>
 
       {/* Testing protocol */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Protokol Tes Berkala" subtitle="Yang diukur akan membaik — tandai tiap kali selesai" />
+        <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="What gets measured gets improved — mark each one as done" />
         <div className="mt-2 space-y-2">
           {PROTOCOL.map((p) => {
             const last = d.tests[p.id]
             const dueMs = last ? new Date(last).getTime() + p.freqM * 30.4 * 86400000 : 0
             const overdue = !last || Date.now() > dueMs
             const dueTxt = last
-              ? overdue ? 'JATUH TEMPO' : `berikutnya ${new Date(dueMs).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}`
-              : 'belum pernah'
+              ? overdue ? 'OVERDUE' : `next ${new Date(dueMs).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}`
+              : 'never done'
             return (
               <div key={p.id} className="flex items-center gap-2 rounded-xl border border-neutral-100 p-3">
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold">{p.label}</div>
-                  <div className="text-[10px] text-neutral-400">tiap {p.freqM} bln · {p.where}</div>
+                  <div className="text-[10px] text-neutral-400">every {p.freqM} mo · {p.where}</div>
                 </div>
                 <Badge tone={overdue ? 'critical' : 'brand'}>{dueTxt}</Badge>
                 <button onClick={() => u({ tests: { ...d.tests, [p.id]: new Date().toISOString() } })}
-                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-white active:scale-95">✓ Selesai</button>
+                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-white active:scale-95">✓ Done</button>
               </div>
             )
           })}
@@ -352,12 +352,12 @@ export function Longevity() {
       </Card>
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs leading-relaxed text-brand-dark">
-        Halaman ini adalah <b>pelengkap</b> jam Anda: Apple Watch/WHOOP menjawab "bagaimana hari ini?" —
-        Pusat Longevity menjawab "bagaimana 30 tahun lagi?". Eksekusi hariannya:
+        This page is a <b>complement</b> to your watch: Apple Watch/WHOOP answers "how was today?" —
+        the Longevity Center answers "how will 30 years from now be?". Daily execution:
         {' '}<a href="#/readiness" className="font-bold underline">Recovery & Strain</a> ·
-        {' '}<a href="#/training-plan" className="font-bold underline">Program AI</a> ·
-        {' '}<a href="#/body" className="font-bold underline">Komposisi Tubuh</a>.
-        <br /><span className="text-[10px] opacity-70">Referensi: Mandsager 2018 (JAMA), PURE study (grip), BMJ 2022 (flamingo balance), Rikli & Jones, Attia — Outlive. Estimasi edukatif, bukan diagnosis.</span>
+        {' '}<a href="#/training-plan" className="font-bold underline">AI Program</a> ·
+        {' '}<a href="#/body" className="font-bold underline">Body Composition</a>.
+        <br /><span className="text-[10px] opacity-70">References: Mandsager 2018 (JAMA), PURE study (grip), BMJ 2022 (flamingo balance), Rikli & Jones, Attia — Outlive. Educational estimate, not a diagnosis.</span>
       </div>
     </div>
   )

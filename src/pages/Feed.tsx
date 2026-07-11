@@ -29,19 +29,19 @@ interface GpsSportMode {
   hiit: boolean
 }
 const GPS_SPORTS: GpsSportMode[] = [
-  { id: 'walk', name: 'Jalan', emoji: '🚶', met: 3.5, type: 'walk', hiit: false },
+  { id: 'walk', name: 'Walk', emoji: '🚶', met: 3.5, type: 'walk', hiit: false },
   { id: 'jog', name: 'Jogging', emoji: '🏃', met: 7.0, type: 'run', hiit: false },
-  { id: 'run', name: 'Lari', emoji: '🏃‍♂️', met: 9.8, type: 'run', hiit: false },
+  { id: 'run', name: 'Run', emoji: '🏃‍♂️', met: 9.8, type: 'run', hiit: false },
   { id: 'sprint', name: 'Sprint/HIIT', emoji: '⚡', met: 14.0, type: 'run', hiit: true },
-  { id: 'cycle_easy', name: 'Sepeda Santai', emoji: '🚴', met: 6.0, type: 'cycle', hiit: false },
-  { id: 'cycle_intense', name: 'Sepeda Intens', emoji: '🚴‍♂️', met: 12.0, type: 'cycle', hiit: true },
+  { id: 'cycle_easy', name: 'Easy Cycling', emoji: '🚴', met: 6.0, type: 'cycle', hiit: false },
+  { id: 'cycle_intense', name: 'Intense Cycling', emoji: '🚴‍♂️', met: 12.0, type: 'cycle', hiit: true },
   { id: 'half_marathon', name: 'Half Marathon', emoji: '🏅', met: 10.5, type: 'half_marathon', targetDist: 21.0975, hiit: false },
   { id: 'marathon', name: 'Marathon', emoji: '🏆', met: 10.0, type: 'marathon', targetDist: 42.195, hiit: false },
   { id: 'trail', name: 'Trail Running', emoji: '🏔️', met: 11.0, type: 'run', hiit: false },
   { id: 'fartlek', name: 'Fartlek', emoji: '🌀', met: 11.5, type: 'run', hiit: true },
   { id: 'interval', name: 'Interval Training', emoji: '🔥', met: 13.0, type: 'run', hiit: true },
   { id: 'tempo', name: 'Tempo Run', emoji: '💨', met: 10.8, type: 'run', hiit: false },
-  { id: 'swim', name: 'Renang', emoji: '🏊', met: 8.3, type: 'swim', hiit: false },
+  { id: 'swim', name: 'Swimming', emoji: '🏊', met: 8.3, type: 'swim', hiit: false },
   { id: 'triathlon', name: 'Triathlon', emoji: '🥇', met: 10.0, type: 'triathlon', hiit: false },
 ]
 
@@ -50,17 +50,17 @@ const GPS_SPORTS: GpsSportMode[] = [
    ═══════════════════════════════════════════════════════ */
 const COLORS = ['#00BF63', '#0B7A4B', '#3b82f6', '#8b5cf6', '#f59e0b', '#FF3131']
 const roleLabel: Record<Role, string> = {
-  pasien: 'Pelanggan', dokter: 'Dokter', kontributor: 'Kontributor', verifikator: 'Verifikator', admin: 'Admin', owner: 'Owner',
+  pasien: 'Customer', dokter: 'Doctor', kontributor: 'Contributor', verifikator: 'Verifier', admin: 'Admin', owner: 'Owner',
 }
 type Tab = 'home' | 'friends' | 'search' | 'profile'
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
-  if (m < 1) return 'baru saja'
-  if (m < 60) return `${m} mnt`
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} jam`
-  return `${Math.floor(h / 24)} hari`
+  if (h < 24) return `${h}h`
+  return `${Math.floor(h / 24)}d`
 }
 
 function initials(name: string): string {
@@ -95,7 +95,7 @@ function getVideoDuration(file: File): Promise<number> {
   })
 }
 
-const SONGS = ['Tanpa Musik', '🎵 Morning Vibes', '🎵 Upbeat Workout', '🎵 Chill Lo-fi', '🎵 Acoustic Calm', '🎵 Energetic Pop']
+const SONGS = ['No Music', '🎵 Morning Vibes', '🎵 Upbeat Workout', '🎵 Chill Lo-fi', '🎵 Acoustic Calm', '🎵 Energetic Pop']
 
 /* ── Music picker: real song search via the public iTunes Search API (free, no
    key, CORS-enabled) with a 30s preview, plus Spotify / Apple Music deep
@@ -144,27 +144,27 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
   return (
     <>
       <button onClick={() => setOpen(true)} className="max-w-[180px] truncate rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-100">
-        {song === SONGS[0] ? '🎵 Pilih Musik' : `🎵 ${song}`}
+        {song === SONGS[0] ? '🎵 Choose Music' : `🎵 ${song}`}
       </button>
       {open && (
         <Portal>
         <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50" onClick={() => setOpen(false)}>
           <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-6" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-neutral-200" />
-            <div className="text-sm font-black">Pilih Musik</div>
+            <div className="text-sm font-black">Choose Music</div>
 
             {/* Real song search */}
             <div className="mt-3 flex gap-2">
-              <input className={inputClass} placeholder="Cari lagu / artis…" value={q}
+              <input className={inputClass} placeholder="Search for a song / artist…" value={q}
                 onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} />
               <button onClick={search} disabled={busy} className="shrink-0 rounded-xl bg-brand px-4 text-xs font-bold text-white disabled:opacity-50">
-                {busy ? '…' : 'Cari'}
+                {busy ? '…' : 'Search'}
               </button>
             </div>
             {q.trim() && (
               <div className="mt-2 flex gap-2">
                 <a href={`https://open.spotify.com/search/${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
-                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-white">Buka di Spotify</a>
+                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-white">Open in Spotify</a>
                 <a href={`https://music.apple.com/search?term=${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
                   className="rounded-full bg-neutral-900 px-3 py-1.5 text-[10px] font-bold text-white"> Apple Music</a>
               </div>
@@ -178,7 +178,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
                     <div className="truncate text-[10px] text-neutral-400">{s.artist}</div>
                   </button>
                   {s.preview && (
-                    <button onClick={() => preview(s)} aria-label="Pratinjau 30 detik"
+                    <button onClick={() => preview(s)} aria-label="30-second preview"
                       className={'grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs ' + (playing === s.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
                       {playing === s.id ? '⏸' : '▶'}
                     </button>
@@ -188,7 +188,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
             </div>
 
             {/* Quick moods + none */}
-            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Suasana cepat</div>
+            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Quick moods</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {SONGS.map((s) => (
                 <button key={s} onClick={() => { setSong(s); setOpen(false) }}
@@ -198,7 +198,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
               ))}
             </div>
             <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">
-              Pencarian & pratinjau 30 dtk via katalog iTunes (gratis). Pemutaran penuh membuka aplikasi Spotify / Apple Music Anda.
+              Search & 30-sec preview via the iTunes catalog (free). Full playback opens your Spotify / Apple Music app.
             </p>
           </div>
         </div>
@@ -234,19 +234,19 @@ function hiitIndicator(met: number, hrMax: number, hrRest: number, currentHr: nu
   if (!currentHr) return { zone: '—', color: '#a3a3a3', intensity: 0, label: 'No HR data' }
   const hrReserve = hrMax - hrRest
   const pct = hrReserve > 0 ? ((currentHr - hrRest) / hrReserve) * 100 : 0
-  if (pct >= 90) return { zone: 'Z5 ANAEROBIC', color: '#FF3131', intensity: 100, label: 'HIIT MAX — Maksimal 30-60 detik interval' }
-  if (pct >= 80) return { zone: 'Z4 THRESHOLD', color: '#f97316', intensity: 85, label: 'HIIT High — 2-4 menit interval' }
-  if (pct >= 70) return { zone: 'Z3 TEMPO', color: '#f59e0b', intensity: 70, label: 'Moderate-High — 5-10 menit' }
-  if (pct >= 60) return { zone: 'Z2 AEROBIC', color: '#00BF63', intensity: 50, label: 'Fat Burn — Lari santai / LSD' }
+  if (pct >= 90) return { zone: 'Z5 ANAEROBIC', color: '#FF3131', intensity: 100, label: 'HIIT MAX — Max 30-60 sec intervals' }
+  if (pct >= 80) return { zone: 'Z4 THRESHOLD', color: '#f97316', intensity: 85, label: 'HIIT High — 2-4 min intervals' }
+  if (pct >= 70) return { zone: 'Z3 TEMPO', color: '#f59e0b', intensity: 70, label: 'Moderate-High — 5-10 min' }
+  if (pct >= 60) return { zone: 'Z2 AEROBIC', color: '#00BF63', intensity: 50, label: 'Fat Burn — Easy run / LSD' }
   return { zone: 'Z1 RECOVERY', color: '#3b82f6', intensity: 25, label: 'Recovery — Warm up / Cool down' }
 }
 
 function bmiCategory(v: number) {
-  if (v < 18.5) return { l: 'Kurus', c: '#3b82f6' }
+  if (v < 18.5) return { l: 'Underweight', c: '#3b82f6' }
   if (v < 23) return { l: 'Normal', c: '#00BF63' }
-  if (v < 25) return { l: 'Berlebih', c: '#f59e0b' }
-  if (v < 30) return { l: 'Obesitas I', c: '#f97316' }
-  return { l: 'Obesitas II', c: '#FF3131' }
+  if (v < 25) return { l: 'Overweight', c: '#f59e0b' }
+  if (v < 30) return { l: 'Obese I', c: '#f97316' }
+  return { l: 'Obese II', c: '#FF3131' }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -282,10 +282,10 @@ function elevGain(pts: GpsPoint[]): number {
 function terrainLabel(gainM: number, distKm: number): string {
   if (distKm < 0.15) return '—'
   const perKm = gainM / distKm
-  if (perKm < 8) return 'Datar'
-  if (perKm < 20) return 'Bergelombang'
-  if (perKm < 45) return 'Berbukit'
-  return 'Pegunungan'
+  if (perKm < 8) return 'Flat'
+  if (perKm < 20) return 'Rolling'
+  if (perKm < 45) return 'Hilly'
+  return 'Mountainous'
 }
 function calcAcceleration(pts: GpsPoint[]): number {
   if (pts.length < 3) return 0
@@ -337,7 +337,7 @@ function HealthMetricsBar({ weight, height, age, gender, hrRest }: { weight: num
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold text-indigo-500">{Math.round(bmr)}</div>
         <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">BMR</div>
-        <div className="text-[9px] text-neutral-400">kkal/hari</div>
+        <div className="text-[9px] text-neutral-400">kcal/day</div>
       </div>
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold" style={{ color: vo2 ? (vo2 >= 45 ? '#00BF63' : vo2 >= 35 ? '#f59e0b' : '#FF3131') : '#d4d4d4' }}>
@@ -398,7 +398,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
   function startTrack() {
     setGpsErr(''); setMode('tracking'); setPts([]); setDur(0); sRef.current = Date.now()
     tRef.current = window.setInterval(() => setDur((Date.now() - sRef.current) / 1000), 1000)
-    if (!navigator.geolocation) { setGpsErr('GPS tidak didukung browser.'); return }
+    if (!navigator.geolocation) { setGpsErr('GPS is not supported by this browser.'); return }
     wRef.current = navigator.geolocation.watchPosition(
       pos => setPts(p => {
         return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]
@@ -429,12 +429,12 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
     return (
       <button
         onClick={() => setOpen(true)}
-        aria-label="Buka GPS Tracker untuk melacak olahraga"
+        aria-label="Open GPS Tracker to track your workout"
         className="flex w-full items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
       >
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-xl">📍</span>
         <span className="flex-1 text-left text-sm font-bold text-ink">GPS Tracker</span>
-        {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Sedang merekam" />}
+        {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Recording" />}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
     )
@@ -446,7 +446,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
-          <p className="text-[10px] text-neutral-400 mt-0.5">Lacak rute, kecepatan, percepatan & kalori</p>
+          <p className="text-[10px] text-neutral-400 mt-0.5">Track route, speed, acceleration & calories</p>
         </div>
         <div className="flex items-center gap-2">
           {mode === 'done' && (
@@ -455,11 +455,11 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             </button>
           )}
           {mode === 'done' && (
-            <button onClick={() => setShareImageOpen(true)} aria-label="Bagikan sebagai gambar ke sosmed" className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all active:scale-95 hover:bg-neutral-50">
-              <IconDownload size={13} /> Gambar
+            <button onClick={() => setShareImageOpen(true)} aria-label="Share as an image to social media" className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all active:scale-95 hover:bg-neutral-50">
+              <IconDownload size={13} /> Image
             </button>
           )}
-          <button onClick={() => setOpen(false)} aria-label="Tutup GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100">
+          <button onClick={() => setOpen(false)} aria-label="Close GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
           </button>
         </div>
@@ -484,10 +484,10 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
       <div className="mx-5 overflow-hidden rounded-2xl border border-neutral-100 relative">
         {mode === 'planning' && (
           <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
-            📍 Ketuk peta untuk menambah titik jalur {plan.length > 0 && `· ${plan.length} titik · ${fmtDist(planDist)}`}
+            📍 Tap the map to add a route point {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
-        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Memuat peta…</div>}>
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Loading map…</div>}>
           <RouteMap
             points={pts}
             planned={plan}
@@ -499,7 +499,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         {/* Stats bar */}
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <div className="grid grid-cols-3 gap-px bg-neutral-900">
-            {[[fmtD(dur), 'WAKTU'], [fmtDist(dist), 'JARAK'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVASI']].map(([v, l]) => (
+            {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVATION']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-1.5 py-2 text-center">
                 <div className="text-xs font-extrabold text-white tabular-nums">{v}</div>
                 <div className="text-[7px] font-bold uppercase tracking-widest text-white/40">{l}</div>
@@ -542,9 +542,9 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               </div>
             )}
 
-            {/* %HRmax + Talk Test + MAF (Maffetone) — panduan intensitas lari */}
+            {/* %HRmax + Talk Test + MAF (Maffetone) — running intensity guide */}
             <div className="rounded-xl border border-neutral-100 p-3">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Panduan Intensitas Lari</div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Running Intensity Guide</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-sm font-extrabold tabular-nums" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
@@ -554,7 +554,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-[11px] font-extrabold leading-tight" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
-                    {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Bisa bicara kalimat penuh' : hr / hrMax < 0.9 ? 'Hanya 3-4 kata' : 'Tak bisa bicara'}
+                    {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Can speak full sentences' : hr / hrMax < 0.9 ? 'Only 3-4 words' : 'Cannot speak'}
                   </div>
                   <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Talk Test</div>
                 </div>
@@ -564,9 +564,9 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                 </div>
               </div>
               <p className="mt-2 text-[9px] leading-relaxed text-neutral-400">
-                <b>Talk test:</b> validasi zona termudah — Zone 2 bila masih bisa bicara kalimat penuh.
-                <b> MAF</b> (Maximum Aerobic Function, metode Maffetone 180−usia): latihan di ≤{180 - age} bpm membangun mesin aerobik & pembakaran lemak maksimal.
-                {hr > 0 && hr > 180 - age && <span className="font-bold text-amber-600"> HR Anda {hr} bpm di atas MAF — pelankan untuk basis aerobik.</span>}
+                <b>Talk test:</b> the easiest zone check — Zone 2 if you can still speak in full sentences.
+                <b> MAF</b> (Maximum Aerobic Function, Maffetone's 180−age method): training at ≤{180 - age} bpm builds your aerobic engine & maximizes fat burning.
+                {hr > 0 && hr > 180 - age && <span className="font-bold text-amber-600"> Your HR of {hr} bpm is above MAF — slow down to stay in the aerobic base.</span>}
               </p>
             </div>
 
@@ -590,17 +590,17 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
           <div className="rounded-xl p-4 text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #064e36)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Ringkasan</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Summary</div>
                 <div className="text-xl font-extrabold">{sport.emoji} {sport.name}</div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-extrabold">{kcal}<span className="text-sm font-medium text-white/60"> kkal</span></div>
+                <div className="text-2xl font-extrabold">{kcal}<span className="text-sm font-medium text-white/60"> kcal</span></div>
                 <div className="text-[10px] text-white/70">MET {sport.met} · {vo2Est > 0 ? `VO₂Max ~${vo2Est.toFixed(1)}` : '—'}</div>
               </div>
             </div>
             <div className="mt-2 grid grid-cols-5 gap-2 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-white/50">Jarak</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-white/50">Durasi</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-white/50">Distance</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-white/50">Duration</div></div>
               <div><div className="font-bold">{Math.round(speed)}</div><div className="text-white/50">km/h</div></div>
               <div><div className="font-bold">{hr || '—'}</div><div className="text-white/50">HR</div></div>
               <div><div className="font-bold">{acceleration.toFixed(1)}</div><div className="text-white/50">m/s²</div></div>
@@ -612,23 +612,23 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
         <div className="flex gap-2">
           {mode === 'idle' && <>
-            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Mulai GPS</button>
-            <button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all active:scale-95">📍 Rencanakan Jalur</button>
+            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Start GPS</button>
+            <button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all active:scale-95">📍 Plan Route</button>
           </>}
           {mode === 'planning' && <>
-            <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Hapus</button>
-            <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Batal</button>
-            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Mulai</button>
+            <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Clear</button>
+            <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Cancel</button>
+            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Start</button>
           </>}
           {mode === 'tracking' && <>
-            <button onClick={pause} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all active:scale-95">⏸ Jeda</button>
-            <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Selesai</button>
+            <button onClick={pause} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all active:scale-95">⏸ Pause</button>
+            <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
           {mode === 'paused' && <>
-            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Lanjut</button>
-            <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Selesai</button>
+            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Resume</button>
+            <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
-          {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Selesai & Reset</button>}
+          {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Done & Reset</button>}
         </div>
       </div>
     </Card>
@@ -708,8 +708,8 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
         </div>
 
         {/* Tap zones to navigate */}
-        <button aria-label="Sebelumnya" className="absolute left-0 top-0 z-[5] h-full w-1/3" onClick={() => setIdx((i) => Math.max(0, i - 1))} />
-        <button aria-label="Selanjutnya" className="absolute right-0 top-0 z-[5] h-full w-1/3" onClick={() => (idx < group.stories.length - 1 ? setIdx((i) => i + 1) : onClose())} />
+        <button aria-label="Previous" className="absolute left-0 top-0 z-[5] h-full w-1/3" onClick={() => setIdx((i) => Math.max(0, i - 1))} />
+        <button aria-label="Next" className="absolute right-0 top-0 z-[5] h-full w-1/3" onClick={() => (idx < group.stories.length - 1 ? setIdx((i) => i + 1) : onClose())} />
 
         {/* Media */}
         <div className="flex flex-1 items-center justify-center overflow-hidden" style={{ background: story.image || story.video ? '#000' : group.mediaColor }}>
@@ -750,7 +750,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
             </button>
           ))}
           <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
-            placeholder="Balas langsung..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
+            placeholder="Reply directly..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
           <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={16} />
           </button>
@@ -791,7 +791,7 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
     try {
       if (file.type.startsWith('video/')) {
         const dur = await getVideoDuration(file)
-        if (dur > MAX_VIDEO_SEC) { alert(`Video story maksimal ${MAX_VIDEO_SEC / 60} menit.`); return }
+        if (dur > MAX_VIDEO_SEC) { alert(`Story videos can be at most ${MAX_VIDEO_SEC / 60} minutes.`); return }
         const url = await uploadOrLocal(file)
         onAddStory({ id: uid(), authorEmail: viewerEmail, authorName: viewerName, mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)], video: url, at: new Date().toISOString(), comments: [] })
       } else {
@@ -809,7 +809,7 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
         <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-dashed border-brand/40 bg-brand-50 text-brand-dark">
           <IconPlus size={20} />
         </span>
-        <span className="text-[10px] font-semibold text-neutral-500">{busy ? 'Mengunggah…' : 'Story Anda'}</span>
+        <span className="text-[10px] font-semibold text-neutral-500">{busy ? 'Uploading…' : 'Your Story'}</span>
       </button>
       <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => pickStory(e.target.files?.[0])} />
       {groups.map((g) => (
@@ -870,7 +870,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
     if (!file) return
     setVideoErr('')
     const dur = await getVideoDuration(file)
-    if (dur > MAX_VIDEO_SEC) { setVideoErr(`Video maksimal ${MAX_VIDEO_SEC / 60} menit (durasi terdeteksi ${Math.round(dur)} detik).`); return }
+    if (dur > MAX_VIDEO_SEC) { setVideoErr(`Video can be at most ${MAX_VIDEO_SEC / 60} minutes (detected duration ${Math.round(dur)} seconds).`); return }
     setBusy(true)
     const url = await uploadOrLocal(file)
     setVideoUrl(url); setVideoSec(Math.round(dur))
@@ -885,7 +885,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
     onPost({
       id: uid(), authorEmail, authorName, role,
       postType, kind: videoUrl ? 'video' : photos.length > 0 ? 'image' : 'text',
-      activity: activity || 'Postingan', caption: fullCaption,
+      activity: activity || 'Post', caption: fullCaption,
       mediaColor: COLORS[Math.floor(Math.random() * COLORS.length)],
       photos, videoUrl: videoUrl ?? undefined, videoSec: videoUrl ? videoSec : undefined,
       audio: song !== SONGS[0] ? song : undefined,
@@ -901,14 +901,14 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-neutral-100">
-          <h3 className="text-base font-black">Buat Postingan</h3>
+          <h3 className="text-base font-black">Create Post</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200 transition"><IconX size={16} /></button>
         </div>
 
         {/* Quick Share Actions */}
         <div className="px-5 py-3 flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
           <button onClick={() => { onShareGps(); onClose() }} className="shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
-            <span>📍</span> Aktivitas GPS
+            <span>📍</span> GPS Activity
           </button>
         </div>
 
@@ -931,7 +931,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
               <video src={videoUrl} className="max-h-56 w-full object-contain" controls />
               <button onClick={() => { setVideoUrl(null); setVideoSec(0) }} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-xs"><IconX size={12} /></button>
             </div>
-            <p className="mt-1 text-[10px] text-neutral-400">Durasi: {videoSec}s / {MAX_VIDEO_SEC}s maks.</p>
+            <p className="mt-1 text-[10px] text-neutral-400">Duration: {videoSec}s / {MAX_VIDEO_SEC}s max.</p>
           </div>
         )}
         {videoErr && <p className="px-5 pb-2 text-[11px] font-medium text-accent">{videoErr}</p>}
@@ -939,29 +939,29 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
         {/* Type & Activity */}
         <div className="px-5 pb-3 flex gap-2">
           <select className={inputClass + ' flex-1'} value={postType} onChange={e => setPostType(e.target.value as PostType)}>
-            <option value="aktivitas">🏃 Aktivitas</option>
-            <option value="kebiasaan">🌿 Kebiasaan</option>
-            <option value="artikel">📄 Artikel</option>
-            <option value="resep">🍳 Resep</option>
+            <option value="aktivitas">🏃 Activity</option>
+            <option value="kebiasaan">🌿 Habit</option>
+            <option value="artikel">📄 Article</option>
+            <option value="resep">🍳 Recipe</option>
           </select>
-          <input className={inputClass + ' flex-1'} type="text" placeholder="Nama Aktivitas/Judul" value={activity} onChange={e => setActivity(e.target.value)} />
+          <input className={inputClass + ' flex-1'} type="text" placeholder="Activity Name/Title" value={activity} onChange={e => setActivity(e.target.value)} />
         </div>
 
         {/* Input Area */}
         <div className="px-5 pb-5 space-y-4">
-          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Tulis deskripsi atau insight kesehatanmu di sini..." value={caption} onChange={e => setCaption(e.target.value)} />
+          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Write a description or health insight here..." value={caption} onChange={e => setCaption(e.target.value)} />
 
           {/* Tag teman */}
-          <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag teman (mis. Budi, Sinta) — pisahkan koma" value={tags} onChange={e => setTags(e.target.value)} />
+          <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag friends (e.g. Budi, Sinta) — separate with commas" value={tags} onChange={e => setTags(e.target.value)} />
 
           <div className="flex flex-wrap items-center gap-2">
             <button onClick={() => fileRef.current?.click()} disabled={!!videoUrl} className="flex min-h-[40px] items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-bold text-neutral-600 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-neutral-100 active:scale-95 disabled:opacity-40">
-              📸 {busy ? 'Mengunggah...' : 'Foto'}
+              📸 {busy ? 'Uploading...' : 'Photo'}
             </button>
             <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={e => pickFiles(e.target.files)} />
 
             <button onClick={() => videoRef.current?.click()} disabled={photos.length > 0} className="flex min-h-[40px] items-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-bold text-neutral-600 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-neutral-100 active:scale-95 disabled:opacity-40">
-              <IconVideo size={14} /> {busy ? 'Mengunggah...' : 'Video (maks 3 mnt)'}
+              <IconVideo size={14} /> {busy ? 'Uploading...' : 'Video (max 3 min)'}
             </button>
             <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => pickVideo(e.target.files?.[0])} />
 
@@ -970,7 +970,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
           <div className="flex justify-end">
             <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-white shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-              Kirim Postingan
+              Post
               <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
                 <IconSend size={15} />
               </span>
@@ -988,9 +988,9 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
    POST CARD — like / comment / share-as-logo (Feed "new face")
    ═══════════════════════════════════════════════════════ */
 const POST_REACTIONS: { emoji: string; label: string }[] = [
-  { emoji: '❤️', label: 'Peduli' }, { emoji: '💪', label: 'Semangat' }, { emoji: '🙏', label: 'Doa' }, { emoji: '👏', label: 'Bangga' },
-  { emoji: '🔥', label: 'Keren' }, { emoji: '😍', label: 'Suka banget' }, { emoji: '😂', label: 'Lucu' }, { emoji: '😮', label: 'Wow' },
-  { emoji: '😢', label: 'Sedih' }, { emoji: '💯', label: 'Mantap' }, { emoji: '🎉', label: 'Selamat' }, { emoji: '🏆', label: 'Juara' },
+  { emoji: '❤️', label: 'Caring' }, { emoji: '💪', label: 'Cheering' }, { emoji: '🙏', label: 'Praying' }, { emoji: '👏', label: 'Proud' },
+  { emoji: '🔥', label: 'Awesome' }, { emoji: '😍', label: 'Love it' }, { emoji: '😂', label: 'Funny' }, { emoji: '😮', label: 'Wow' },
+  { emoji: '😢', label: 'Sad' }, { emoji: '💯', label: 'Nailed it' }, { emoji: '🎉', label: 'Congrats' }, { emoji: '🏆', label: 'Champion' },
 ]
 
 // Instagram-style options bottom sheet for a post. Owner-only actions are
@@ -1007,18 +1007,18 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
   type Row = { icon: string; label: string; onClick: () => void; danger?: boolean; active?: boolean }
   const close = (fn: () => void) => () => { fn(); onClose() }
   const general: Row[] = [
-    { icon: '🔖', label: post.bookmarkedByMe ? 'Hapus dari simpanan' : 'Simpan', onClick: close(onToggleBookmark), active: post.bookmarkedByMe },
-    { icon: '📋', label: 'Salin URL', onClick: close(onCopyUrl) },
+    { icon: '🔖', label: post.bookmarkedByMe ? 'Remove from saved' : 'Save', onClick: close(onToggleBookmark), active: post.bookmarkedByMe },
+    { icon: '📋', label: 'Copy URL', onClick: close(onCopyUrl) },
   ]
   const owner: Row[] = isOwnPost ? [
-    { icon: post.exclusive ? '🔓' : '🔒', label: post.exclusive ? 'Jadikan publik' : 'Jadikan premium', onClick: close(() => onUpdate({ exclusive: !post.exclusive })), active: post.exclusive },
-    { icon: '🗂️', label: post.archived ? 'Keluarkan dari arsip' : 'Arsipkan', onClick: close(() => onUpdate({ archived: !post.archived })), active: post.archived },
-    { icon: '📌', label: post.pinned ? 'Lepas sematan' : 'Sematkan di profil', onClick: close(() => onUpdate({ pinned: !post.pinned })), active: post.pinned },
-    { icon: '❤️', label: post.hideLikes ? 'Tampilkan jumlah suka' : 'Sembunyikan jumlah suka', onClick: close(() => onUpdate({ hideLikes: !post.hideLikes })), active: post.hideLikes },
-    { icon: '💬', label: post.commentsOff ? 'Aktifkan komentar' : 'Matikan komentar', onClick: close(() => onUpdate({ commentsOff: !post.commentsOff })), active: post.commentsOff },
+    { icon: post.exclusive ? '🔓' : '🔒', label: post.exclusive ? 'Make public' : 'Make premium', onClick: close(() => onUpdate({ exclusive: !post.exclusive })), active: post.exclusive },
+    { icon: '🗂️', label: post.archived ? 'Remove from archive' : 'Archive', onClick: close(() => onUpdate({ archived: !post.archived })), active: post.archived },
+    { icon: '📌', label: post.pinned ? 'Unpin' : 'Pin to profile', onClick: close(() => onUpdate({ pinned: !post.pinned })), active: post.pinned },
+    { icon: '❤️', label: post.hideLikes ? 'Show like count' : 'Hide like count', onClick: close(() => onUpdate({ hideLikes: !post.hideLikes })), active: post.hideLikes },
+    { icon: '💬', label: post.commentsOff ? 'Turn on comments' : 'Turn off comments', onClick: close(() => onUpdate({ commentsOff: !post.commentsOff })), active: post.commentsOff },
   ] : []
   const danger: Row[] = isOwnPost ? [
-    { icon: '🗑️', label: 'Hapus', danger: true, onClick: () => { if (confirm('Hapus postingan ini secara permanen?')) { onDelete(); onClose() } } },
+    { icon: '🗑️', label: 'Delete', danger: true, onClick: () => { if (confirm('Permanently delete this post?')) { onDelete(); onClose() } } },
   ] : []
   const Group = ({ rows }: { rows: Row[] }) => (
     <div className="overflow-hidden rounded-2xl bg-neutral-50">
@@ -1040,7 +1040,7 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
         <Group rows={general} />
         {owner.length > 0 && <Group rows={owner} />}
         {danger.length > 0 && <Group rows={danger} />}
-        <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Batal</button>
+        <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Cancel</button>
       </div>
     </div>
     </Portal>
@@ -1066,7 +1066,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
 
   function subscribeNow() {
     const r = subscribeAuthor(post.authorEmail)
-    if (!r.ok) alert(r.reason ?? 'Gagal berlangganan.')
+    if (!r.ok) alert(r.reason ?? 'Subscription failed.')
   }
 
   function addComment() {
@@ -1085,7 +1085,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
     try {
       if (navigator.share) { await navigator.share(payload); return }
       await navigator.clipboard.writeText(`${text}\n${url}`)
-      alert('Tautan postingan disalin — siap dibagikan ke media sosial!')
+      alert('Post link copied — ready to share on social media!')
     } catch { /* user cancelled share sheet */ }
   }
 
@@ -1099,7 +1099,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
       await navigator.clipboard.writeText(base)
       setCopied(true)
       setTimeout(() => setCopied(false), 1600)
-    } catch { alert('Tautan: ' + base) }
+    } catch { alert('Link: ' + base) }
   }
 
   // Premium gating: an exclusive post is blurred for viewers who aren't the
@@ -1122,17 +1122,17 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
         {isOwnPost && (
           <button
             onClick={() => updatePost(post.id, { exclusive: !premium })}
-            aria-label={premium ? 'Jadikan publik' : 'Jadikan premium'}
-            title={premium ? 'Jadikan publik' : 'Jadikan premium (khusus pelanggan)'}
+            aria-label={premium ? 'Make public' : 'Make premium'}
+            title={premium ? 'Make public' : 'Make premium (subscribers only)'}
             className={'pointer-events-auto inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold shadow backdrop-blur-sm transition active:scale-95 ' + (premium ? 'bg-white/90 text-amber-600' : 'bg-black/55 text-white')}>
-            {premium ? '🔓 Publik' : '🔒 Premium'}
+            {premium ? '🔓 Public' : '🔒 Premium'}
           </button>
         )}
       </div>
       <div className="flex justify-end">
-        <button onClick={copyUrl} aria-label="Salin URL" title="Salin tautan postingan"
+        <button onClick={copyUrl} aria-label="Copy URL" title="Copy post link"
           className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold text-white shadow backdrop-blur-sm transition active:scale-95">
-          {copied ? '✓ Tersalin' : '📋 Copy URL'}
+          {copied ? '✓ Copied' : '📋 Copy URL'}
         </button>
       </div>
     </div>
@@ -1145,7 +1145,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <div className="relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
             {initials(post.authorName)}
-            {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Sedang aktif" />}
+            {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Currently active" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1">
@@ -1160,25 +1160,25 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           {!isOwnPost && (
-            <button onClick={() => toggleFollow(post.authorEmail)} aria-label={following ? 'Berhenti mengikuti' : 'Ikuti'}
+            <button onClick={() => toggleFollow(post.authorEmail)} aria-label={following ? 'Unfollow' : 'Follow'}
               className={'rounded-full px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (following ? 'bg-neutral-100 text-neutral-500' : 'bg-brand/10 text-brand-dark')}>
-              {following ? '✓' : '+ Ikuti'}
+              {following ? '✓' : '+ Follow'}
             </button>
           )}
           {!isOwnPost && subPrice > 0 && (
-            <button onClick={subscribeNow} disabled={subscribed} aria-label="Berlangganan"
+            <button onClick={subscribeNow} disabled={subscribed} aria-label="Subscribe"
               className={'grid h-9 w-9 place-items-center rounded-full text-[13px] font-bold transition active:scale-95 ' + (subscribed ? 'bg-amber-50 text-amber-600' : 'bg-ink text-white')}>
               {subscribed ? '✓' : '★'}
             </button>
           )}
           {/* Share button rendered as a logo only (no text) */}
-          <button onClick={share} aria-label="Bagikan ke media sosial" title="Bagikan"
+          <button onClick={share} aria-label="Share to social media" title="Share"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90"
             style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
             <IconShare2 size={15} />
           </button>
           {/* Options menu (Instagram-style: Save / QR / Insights / Archive / Edit / Delete …) */}
-          <button onClick={() => setShowMenu(true)} aria-label="Opsi lainnya" title="Opsi"
+          <button onClick={() => setShowMenu(true)} aria-label="More options" title="Options"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-400 transition active:scale-90 hover:bg-neutral-100">
             <span className="text-lg leading-none">⋯</span>
           </button>
@@ -1213,7 +1213,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           {mediaOverlay}
           {gated && (
             <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
-              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Konten premium<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
             </button>
           )}
         </div>
@@ -1229,7 +1229,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           {mediaOverlay}
           {gated && (
             <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
-              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Konten premium<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
             </button>
           )}
         </div>
@@ -1252,11 +1252,11 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
 
       {/* Action bar: like · react · comment · share (icon-first, evenly spread) */}
       <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-1.5 -mb-1">
-        <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-90 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
+        <button onClick={() => toggleLike(post.id)} aria-label="Like" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-90 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
           <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><span className={post.likedByMe ? 'inline-block animate-[likepop_0.35s_ease]' : 'inline-block'}><IconHeart size={18} /></span></ColoredIcon>
           {post.likes > 0 && !post.hideLikes && <span>{post.likes}</span>}
         </button>
-        <button onClick={() => setShowReactions((v) => !v)} aria-label="Reaksi" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-lg transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
+        <button onClick={() => setShowReactions((v) => !v)} aria-label="React" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-lg transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           😊
         </button>
         {showReactions && (
@@ -1269,10 +1269,10 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             ))}
           </div>
         )}
-        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Komentar" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 active:scale-90 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Comments" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 active:scale-90 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
           <IconComment size={18} /> {!post.commentsOff && comments.length > 0 && <span>{comments.length}</span>}
         </button>
-        <button onClick={share} aria-label="Bagikan" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-neutral-500 transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
+        <button onClick={share} aria-label="Share" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-neutral-500 transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           <IconShare2 size={17} />
         </button>
       </div>
@@ -1291,7 +1291,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           ))}
           <div className="flex items-center gap-2">
             <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addComment() }}
-              placeholder="Tulis komentar..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
+              placeholder="Write a comment..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
             <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               <IconSend size={15} />
             </button>
@@ -1303,11 +1303,11 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
 }
 
 const MOOD_OPTIONS: { id: MoodEntry['mood']; emoji: string; label: string }[] = [
-  { id: 'senang', emoji: '😄', label: 'Senang' },
-  { id: 'biasa', emoji: '🙂', label: 'Biasa' },
-  { id: 'lelah', emoji: '😴', label: 'Lelah' },
-  { id: 'sedih', emoji: '😢', label: 'Sedih' },
-  { id: 'stres', emoji: '😣', label: 'Stres' },
+  { id: 'senang', emoji: '😄', label: 'Happy' },
+  { id: 'biasa', emoji: '🙂', label: 'Okay' },
+  { id: 'lelah', emoji: '😴', label: 'Tired' },
+  { id: 'sedih', emoji: '😢', label: 'Sad' },
+  { id: 'stres', emoji: '😣', label: 'Stressed' },
 ]
 
 /* ═══════════════════════════════════════════════════════
@@ -1317,16 +1317,16 @@ const MOOD_OPTIONS: { id: MoodEntry['mood']; emoji: string; label: string }[] = 
    ═══════════════════════════════════════════════════════ */
 // Achievement tiers — derived, no extra state. Colors deepen as counts grow.
 const LOVE_TIERS = [
-  { min: 0, color: '#FFB3C1', label: 'Pemula' },
-  { min: 5, color: '#FF6B8B', label: 'Hangat' },
-  { min: 20, color: '#E0245E', label: 'Penuh Kasih' },
-  { min: 50, color: '#8B0036', label: 'Legenda Peduli' },
+  { min: 0, color: '#FFB3C1', label: 'Beginner' },
+  { min: 5, color: '#FF6B8B', label: 'Warm' },
+  { min: 20, color: '#E0245E', label: 'Full of Care' },
+  { min: 50, color: '#8B0036', label: 'Caring Legend' },
 ]
 const FIRE_TIERS = [
-  { min: 0, color: '#FFD27A', label: 'Mulai' },
-  { min: 3, color: '#FF9F43', label: 'Konsisten' },
-  { min: 7, color: '#FF5E1A', label: 'Membara' },
-  { min: 30, color: '#B8330A', label: 'Tak Tergoyahkan' },
+  { min: 0, color: '#FFD27A', label: 'Starting' },
+  { min: 3, color: '#FF9F43', label: 'Consistent' },
+  { min: 7, color: '#FF5E1A', label: 'Blazing' },
+  { min: 30, color: '#B8330A', label: 'Unshakeable' },
 ]
 function tierFor(tiers: typeof LOVE_TIERS, n: number) {
   return [...tiers].reverse().find((t) => n >= t.min) ?? tiers[0]
@@ -1379,37 +1379,37 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
 
   return (
     <div className="space-y-4">
-      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Komunitas Sehat</h4>
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Community Wellness</h4>
 
       {/* 1. Health Buddy — akuntabilitas */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🤝 Health Buddy</div>
         <div className="flex items-center gap-2">
-          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Nama teman akuntabilitas Anda"
+          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Your accountability partner's name"
             className={inputClass + ' flex-1 text-xs'} />
-          <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Simpan</button>
+          <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Save</button>
         </div>
         {state.buddyName && (
-          <p className="text-xs text-neutral-500">Buddy Anda: <b className="text-ink">{state.buddyName}</b> — saling mengingatkan check-in harian ya!</p>
+          <p className="text-xs text-neutral-500">Your buddy: <b className="text-ink">{state.buddyName}</b> — remind each other to check in daily!</p>
         )}
         <div className="flex items-center justify-between rounded-xl bg-brand-50 p-3">
           <div className="text-xs">
-            <div className="font-bold text-brand-dark">🔥 Streak {streak} hari</div>
-            <div className="text-neutral-500">{checkedInToday ? 'Sudah check-in hari ini.' : 'Belum check-in hari ini.'}</div>
+            <div className="font-bold text-brand-dark">🔥 {streak}-day streak</div>
+            <div className="text-neutral-500">{checkedInToday ? 'You\'ve checked in today.' : 'Not checked in yet today.'}</div>
           </div>
           <button onClick={checkInToday} disabled={checkedInToday}
             className="rounded-xl px-4 py-2 text-xs font-bold text-white transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-            {checkedInToday ? '✓ Check-in' : 'Check-in Sekarang'}
+            {checkedInToday ? '✓ Checked in' : 'Check In Now'}
           </button>
         </div>
         {/* Riwayat check-in (log) */}
         {myCheckIns.length > 0 && (
           <div className="border-t border-neutral-100 pt-2">
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Riwayat Check-in ({myCheckIns.length})</div>
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Check-in History ({myCheckIns.length})</div>
             <div className="flex flex-wrap gap-1.5">
               {[...myCheckIns].reverse().slice(0, 14).map((d) => (
                 <span key={d} className="rounded-md bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-dark">
-                  {new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                  {new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
                 </span>
               ))}
             </div>
@@ -1422,41 +1422,41 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         </div>
         {state.buddyName && (
           <div className="rounded-xl bg-pink-50 p-2.5 text-[11px] text-pink-700">
-            💞 Skor Afinitas dengan {state.buddyName}: <b>{affinityScore}/100</b> — naik tiap check-in & komunitas olahraga yang sama (ilustratif, berdasarkan aktivitas Anda berdua di akun ini).
+            💞 Affinity Score with {state.buddyName}: <b>{affinityScore}/100</b> — rises with every check-in & shared sport community (illustrative, based on both your activity on this account).
           </div>
         )}
       </Card>
 
       {/* 10. Komunitas olahraga — temukan/buat grup berdasarkan ketertarikan yang sama */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🏃 Komunitas Olahraga</div>
-        <input value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} placeholder="Cari komunitas (mis. Lari, Yoga)"
+        <div className="text-xs font-black text-ink">🏃 Sports Community</div>
+        <input value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} placeholder="Search communities (e.g. Running, Yoga)"
           className={inputClass + ' text-xs'} />
         <div className="space-y-1.5">
-          {filteredCommunities.length === 0 && <p className="text-xs text-neutral-400">Belum ada komunitas. Buat yang pertama!</p>}
+          {filteredCommunities.length === 0 && <p className="text-xs text-neutral-400">No communities yet. Create the first one!</p>}
           {filteredCommunities.map((c) => (
             <div key={c.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
               <div>
                 <b className="text-ink">{c.name}</b> · <span className="text-brand-dark">{c.sportTag}</span>
-                <div className="text-neutral-400">{c.memberNames.length} anggota: {c.memberNames.join(', ')}</div>
+                <div className="text-neutral-400">{c.memberNames.length} members: {c.memberNames.join(', ')}</div>
               </div>
               {!c.memberNames.includes(viewerName) && (
-                <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Gabung</button>
+                <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Join</button>
               )}
             </div>
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
-          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Nama komunitas" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
-          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Olahraga" className={inputClass + ' w-24 shrink-0 text-xs'} />
+          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Community name" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Sport" className={inputClass + ' w-24 shrink-0 text-xs'} />
           <button onClick={() => { createCommunity(communityName, sportTag); setCommunityName(''); setSportTag('') }} disabled={!communityName.trim() || !sportTag.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Create</button>
         </div>
       </Card>
 
       {/* 4 & 6. Mood check-in + dukungan langsung */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">💬 Mood & Dukungan</div>
+        <div className="text-xs font-black text-ink">💬 Mood & Support</div>
         <div className="flex flex-wrap gap-2">
           {MOOD_OPTIONS.map((m) => (
             <button key={m.id} onClick={() => { addMood(m.id, moodNote); setMoodNote('') }}
@@ -1465,20 +1465,20 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             </button>
           ))}
         </div>
-        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Catatan singkat (opsional), lalu pilih mood di atas"
+        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Short note (optional), then pick a mood above"
           className={inputClass + ' text-xs'} />
         {recentMoods.length > 0 && (
           <div className="space-y-1.5 border-t border-neutral-100 pt-2">
             {recentMoods.map((m) => (
               <div key={m.id} className="text-[11px] text-neutral-500">
-                {MOOD_OPTIONS.find((o) => o.id === m.mood)?.emoji} <b className="text-ink">{m.name}</b> merasa {m.mood}{m.note ? ` — "${m.note}"` : ''} <span className="text-neutral-400">· {timeAgo(m.at)}</span>
+                {MOOD_OPTIONS.find((o) => o.id === m.mood)?.emoji} <b className="text-ink">{m.name}</b> feeling {m.mood}{m.note ? ` — "${m.note}"` : ''} <span className="text-neutral-400">· {timeAgo(m.at)}</span>
               </div>
             ))}
           </div>
         )}
         <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
-          <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 shrink-0 text-xs'} />
-          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Kirim semangat singkat..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
+          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Send a quick word of encouragement..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
@@ -1497,14 +1497,14 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
 
       {/* 5. Tantangan kelompok realtime */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🏆 Tantangan Kelompok</div>
+        <div className="text-xs font-black text-ink">🏆 Group Challenge</div>
         <div className="flex items-center gap-2">
-          <input value={newChallengeTitle} onChange={(e) => setNewChallengeTitle(e.target.value)} placeholder="Mis. 10.000 langkah/minggu"
+          <input value={newChallengeTitle} onChange={(e) => setNewChallengeTitle(e.target.value)} placeholder="E.g. 10,000 steps/week"
             className={inputClass + ' flex-1 text-xs'} />
           <button onClick={() => { startChallenge(newChallengeTitle, 'poin', 100, 7); setNewChallengeTitle('') }} disabled={!newChallengeTitle.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Mulai</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Start</button>
         </div>
-        {state.challenges.length === 0 && <p className="text-xs text-neutral-400">Belum ada tantangan aktif. Mulai satu dan undang teman!</p>}
+        {state.challenges.length === 0 && <p className="text-xs text-neutral-400">No active challenges yet. Start one and invite friends!</p>}
         {state.challenges.map((c) => {
           const leaders = [...c.participants].sort((a, b) => b.progress - a.progress)
           const me = c.participants.find((p) => p.email === viewerEmail)
@@ -1518,12 +1518,12 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
                 {leaders.map((p, i) => (
                   <div key={p.email} className="flex items-center gap-2 text-[11px] text-neutral-500">
                     <span className="w-4 font-bold">{i + 1}.</span>
-                    <span className="flex-1 truncate font-semibold text-neutral-600">{p.email === viewerEmail ? `${p.name} (Anda)` : p.name}</span>
+                    <span className="flex-1 truncate font-semibold text-neutral-600">{p.email === viewerEmail ? `${p.name} (You)` : p.name}</span>
                     <span>{p.progress} {c.unit}</span>
                   </div>
                 ))}
               </div>
-              {!me && <p className="mt-1 text-[10px] text-neutral-400">Tekan "+10" untuk ikut serta.</p>}
+              {!me && <p className="mt-1 text-[10px] text-neutral-400">Tap "+10" to join in.</p>}
             </div>
           )
         })}
@@ -1533,24 +1533,24 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🫂 Circle of Care</div>
         <div className="flex flex-wrap items-center gap-2">
-          <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Nama circle (mis. Keluarga)" className={inputClass + ' w-32 shrink-0 text-xs'} />
-          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Nama anggota, pisahkan koma" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Circle name (e.g. Family)" className={inputClass + ' w-32 shrink-0 text-xs'} />
+          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Member names, comma separated" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { createCircle(circleName, circleMembers.split(',')); setCircleName(''); setCircleMembers('') }} disabled={!circleName.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Create</button>
         </div>
         {state.circles.map((c) => (
           <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
-            <b className="text-ink">{c.name}</b> — {c.memberNames.length > 0 ? c.memberNames.join(', ') : 'belum ada anggota'}
+            <b className="text-ink">{c.name}</b> — {c.memberNames.length > 0 ? c.memberNames.join(', ') : 'no members yet'}
           </div>
         ))}
       </Card>
 
       {/* 10. Gratitude wall */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🙏 Dinding Terima Kasih</div>
+        <div className="text-xs font-black text-ink">🙏 Gratitude Wall</div>
         <div className="flex flex-wrap items-center gap-2">
-          <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 shrink-0 text-xs'} />
-          <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="Ucapan terima kasih..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
+          <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="A note of thanks..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { addGratitude(gratTo, gratText); setGratTo(''); setGratText('') }} disabled={!gratText.trim() || !gratTo.trim()}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
@@ -1558,7 +1558,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         </div>
         {recentGratitude.map((g) => (
           <div key={g.id} className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-neutral-700">
-            <b>{g.fromName}</b> berterima kasih kepada <b>{g.toName}</b>: "{g.text}"
+            <b>{g.fromName}</b> thanks <b>{g.toName}</b>: "{g.text}"
           </div>
         ))}
       </Card>
@@ -1571,29 +1571,29 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
    kalkulasi, monitoring (10 fitur)
    ═══════════════════════════════════════════════════════ */
 const HEALTH_NEWS = [
-  { id: 'n1', title: 'WHO: 30 menit jalan cepat/hari turunkan risiko penyakit jantung', tag: 'Kardiologi' },
-  { id: 'n2', title: 'Studi terbaru: tidur < 6 jam tingkatkan risiko diabetes tipe 2', tag: 'Endokrin' },
-  { id: 'n3', title: 'Kemenkes imbau vaksinasi influenza musim hujan', tag: 'Imunisasi' },
-  { id: 'n4', title: 'Konsumsi gula berlebih dikaitkan dengan penuaan kulit lebih cepat', tag: 'Nutrisi' },
-  { id: 'n5', title: 'Latihan kekuatan 2x/minggu terbukti perpanjang usia harapan hidup', tag: 'Olahraga' },
+  { id: 'n1', title: 'WHO: 30 minutes of brisk walking a day lowers heart disease risk', tag: 'Cardiology' },
+  { id: 'n2', title: 'New study: sleeping < 6 hours raises type 2 diabetes risk', tag: 'Endocrine' },
+  { id: 'n3', title: 'Health Ministry urges flu vaccination during rainy season', tag: 'Immunization' },
+  { id: 'n4', title: 'Excess sugar intake linked to faster skin aging', tag: 'Nutrition' },
+  { id: 'n5', title: 'Strength training 2x/week shown to extend life expectancy', tag: 'Fitness' },
 ]
 const EDU_ARTICLES = [
-  { id: 'e1', title: 'Mengenal Tekanan Darah: Kapan Harus Waspada?', minutes: 4 },
-  { id: 'e2', title: '5 Kebiasaan Tidur Sehat untuk Pemulihan Otot', minutes: 3 },
-  { id: 'e3', title: 'Hidrasi: Berapa Air yang Sebenarnya Tubuh Anda Butuhkan?', minutes: 2 },
-  { id: 'e4', title: 'Mitos vs Fakta Seputar Diet Karbo', minutes: 5 },
+  { id: 'e1', title: 'Understanding Blood Pressure: When to Be Concerned', minutes: 4 },
+  { id: 'e2', title: '5 Healthy Sleep Habits for Muscle Recovery', minutes: 3 },
+  { id: 'e3', title: 'Hydration: How Much Water Does Your Body Really Need?', minutes: 2 },
+  { id: 'e4', title: 'Myths vs Facts About Carb Diets', minutes: 5 },
 ]
 function bpCategory(sys: number, dia: number) {
-  if (sys < 90 || dia < 60) return { label: 'Rendah', color: '#3B82F6' }
+  if (sys < 90 || dia < 60) return { label: 'Low', color: '#3B82F6' }
   if (sys <= 120 && dia <= 80) return { label: 'Normal', color: '#00BF63' }
-  if (sys < 130 && dia < 85) return { label: 'Tinggi-Normal', color: '#84CC16' }
-  if (sys < 140 || dia < 90) return { label: 'Hipertensi Tahap 1', color: '#F59E0B' }
-  return { label: 'Hipertensi Tahap 2', color: '#EF4444' }
+  if (sys < 130 && dia < 85) return { label: 'High-Normal', color: '#84CC16' }
+  if (sys < 140 || dia < 90) return { label: 'Hypertension Stage 1', color: '#F59E0B' }
+  return { label: 'Hypertension Stage 2', color: '#EF4444' }
 }
 
 // #1: lightweight inline SVG sparkline for trend visualization (no chart lib).
 function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; color?: string; height?: number }) {
-  if (data.length === 0) return <div className="text-[10px] text-neutral-400">Belum ada data</div>
+  if (data.length === 0) return <div className="text-[10px] text-neutral-400">No data yet</div>
   const w = 100, h = height
   const min = Math.min(...data), max = Math.max(...data)
   const range = max - min || 1
@@ -1713,7 +1713,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         const key = `${m.id}-${day}`
         if (hm >= m.time && !m.takenDates.includes(day) && !notifiedRef.current.has(key)) {
           notifiedRef.current.add(key)
-          try { new Notification('💊 Waktunya minum obat', { body: `${m.name} — jadwal ${m.time}`, tag: key }) } catch { /* ignore */ }
+          try { new Notification('💊 Time to take your medicine', { body: `${m.name} — scheduled ${m.time}`, tag: key }) } catch { /* ignore */ }
         }
       }
     }
@@ -1739,31 +1739,31 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const [goalLabel, setGoalLabel] = useState('')
   const [goalMetric, setGoalMetric] = useState<HealthGoal['metric']>('sleep')
   const [goalTarget, setGoalTarget] = useState(7)
-  const metricUnit: Record<HealthGoal['metric'], string> = { sleep: 'jam', checkin: 'hari', water: 'liter', steps: 'langkah', custom: '' }
+  const metricUnit: Record<HealthGoal['metric'], string> = { sleep: 'hr', checkin: 'days', water: 'liters', steps: 'steps', custom: '' }
 
   // #3: export a printable health report (user can Save as PDF / share).
   const exportReport = () => {
     const esc = (s: string) => s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c] || c))
     const rows = [
       ['BMI', `${bmi.toFixed(1)} (${bmiCat.l})`],
-      ['Kalori harian (TDEE)', `${tdee} kkal`],
-      ['Kebutuhan cairan', `${(waterMl / 1000).toFixed(1)} liter/hari`],
-      ['Tekanan darah', `${sys}/${dia} mmHg (${bpCat.label})`],
-      ['VO2Max', lastVo2 ? `${lastVo2.value} mL/kg/min (${lastVo2.method})` : `${vo2max} mL/kg/min (estimasi HR)`],
-      ['Skor tidur hari ini', todaySleep ? `${sleepScore}/100` : 'Belum dicatat'],
-      ['Vital terakhir', lastVital ? `${lastVital.systolic}/${lastVital.diastolic} mmHg, HR ${lastVital.heartRate}, SpO2 ${lastVital.spo2}%, ${lastVital.tempC}°C` : 'Belum ada'],
+      ['Daily calories (TDEE)', `${tdee} kcal`],
+      ['Fluid needs', `${(waterMl / 1000).toFixed(1)} liters/day`],
+      ['Blood pressure', `${sys}/${dia} mmHg (${bpCat.label})`],
+      ['VO2Max', lastVo2 ? `${lastVo2.value} mL/kg/min (${lastVo2.method})` : `${vo2max} mL/kg/min (HR estimate)`],
+      ['Sleep score today', todaySleep ? `${sleepScore}/100` : 'Not recorded'],
+      ['Latest vitals', lastVital ? `${lastVital.systolic}/${lastVital.diastolic} mmHg, HR ${lastVital.heartRate}, SpO2 ${lastVital.spo2}%, ${lastVital.tempC}°C` : 'None yet'],
     ]
     const win = window.open('', '_blank')
-    if (!win) { alert('Izinkan pop-up untuk mengekspor laporan.'); return }
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Laporan Kesehatan</title>
+    if (!win) { alert('Allow pop-ups to export the report.'); return }
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Health Report</title>
       <style>body{font-family:system-ui,sans-serif;padding:32px;color:#111}h1{color:#0B7A4B;font-size:20px}
       .sub{color:#888;font-size:12px;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:14px}
       td{padding:10px 8px;border-bottom:1px solid #eee}td:first-child{color:#666;width:45%}td:last-child{font-weight:600}
       .foot{margin-top:24px;font-size:11px;color:#aaa}</style></head><body>
-      <h1>🩺 Laporan Kesehatan — Panaceamed.id</h1>
-      <div class="sub">Dibuat: ${esc(new Date().toLocaleString('id-ID'))}</div>
+      <h1>🩺 Health Report — Panaceamed.id</h1>
+      <div class="sub">Generated: ${esc(new Date().toLocaleString('en-US'))}</div>
       <table>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>
-      <div class="foot">Data bersifat pencatatan mandiri dan tidak menggantikan diagnosis tenaga medis profesional.</div>
+      <div class="foot">This data is self-reported and does not replace a diagnosis from a healthcare professional.</div>
       </body></html>`)
     win.document.close()
     setTimeout(() => win.print(), 400)
@@ -1771,37 +1771,37 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
   // #7: anomaly detection — flag vitals outside safe ranges (uses current monitor inputs).
   const anomalies: { level: 'warn' | 'crit'; text: string }[] = []
-  if (spo2 > 0 && spo2 < 90) anomalies.push({ level: 'crit', text: `SpO2 ${spo2}% sangat rendah — segera cari pertolongan medis.` })
-  else if (spo2 > 0 && spo2 < 95) anomalies.push({ level: 'warn', text: `SpO2 ${spo2}% di bawah normal (≥95%). Pantau & istirahat.` })
-  if (hr > 120) anomalies.push({ level: 'crit', text: `Detak jantung ${hr} bpm sangat tinggi saat istirahat.` })
-  else if (hr > 100) anomalies.push({ level: 'warn', text: `Detak jantung ${hr} bpm (takikardia ringan). Tenangkan diri.` })
-  else if (hr > 0 && hr < 50) anomalies.push({ level: 'warn', text: `Detak jantung ${hr} bpm rendah (bradikardia). Pantau jika disertai pusing.` })
-  if (tempC >= 39) anomalies.push({ level: 'crit', text: `Suhu ${tempC}°C demam tinggi.` })
-  else if (tempC >= 37.8) anomalies.push({ level: 'warn', text: `Suhu ${tempC}°C menandakan demam.` })
-  if (sys >= 180 || dia >= 120) anomalies.push({ level: 'crit', text: `Tekanan darah ${sys}/${dia} krisis hipertensi — butuh penanganan segera.` })
-  else if (sys >= 140 || dia >= 90) anomalies.push({ level: 'warn', text: `Tekanan darah ${sys}/${dia} tinggi (hipertensi). Kurangi garam & kelola stres.` })
-  else if (sys > 0 && sys < 90) anomalies.push({ level: 'warn', text: `Tekanan darah ${sys}/${dia} rendah. Cukupi cairan.` })
+  if (spo2 > 0 && spo2 < 90) anomalies.push({ level: 'crit', text: `SpO2 ${spo2}% is very low — seek medical help immediately.` })
+  else if (spo2 > 0 && spo2 < 95) anomalies.push({ level: 'warn', text: `SpO2 ${spo2}% is below normal (≥95%). Monitor & rest.` })
+  if (hr > 120) anomalies.push({ level: 'crit', text: `Heart rate ${hr} bpm is very high at rest.` })
+  else if (hr > 100) anomalies.push({ level: 'warn', text: `Heart rate ${hr} bpm (mild tachycardia). Try to relax.` })
+  else if (hr > 0 && hr < 50) anomalies.push({ level: 'warn', text: `Heart rate ${hr} bpm is low (bradycardia). Monitor if accompanied by dizziness.` })
+  if (tempC >= 39) anomalies.push({ level: 'crit', text: `Temperature ${tempC}°C is a high fever.` })
+  else if (tempC >= 37.8) anomalies.push({ level: 'warn', text: `Temperature ${tempC}°C indicates a fever.` })
+  if (sys >= 180 || dia >= 120) anomalies.push({ level: 'crit', text: `Blood pressure ${sys}/${dia} is a hypertensive crisis — needs immediate care.` })
+  else if (sys >= 140 || dia >= 90) anomalies.push({ level: 'warn', text: `Blood pressure ${sys}/${dia} is high (hypertension). Reduce salt & manage stress.` })
+  else if (sys > 0 && sys < 90) anomalies.push({ level: 'warn', text: `Blood pressure ${sys}/${dia} is low. Stay hydrated.` })
 
   // #6: AI Health Assistant — rekomendasi kontekstual dari data pengguna (rule-based, offline).
   const insights: string[] = []
-  if (bmi >= 25) insights.push(`BMI Anda ${bmi.toFixed(1)} (${bmiCat.l}). Defisit ~300-500 kkal/hari dari TDEE (${tdee} kkal) + kardio 3x/minggu membantu menurunkan berat secara sehat.`)
-  else if (bmi < 18.5) insights.push(`BMI Anda ${bmi.toFixed(1)} tergolong kurus. Tambah asupan bergizi dan latihan kekuatan untuk massa otot.`)
-  else insights.push(`BMI Anda ${bmi.toFixed(1)} ideal — pertahankan dengan ${tdee} kkal/hari dan aktivitas rutin.`)
-  if (todaySleep && sleepScore < 70) insights.push(`Skor tidur ${sleepScore}/100. Coba tidur 7-9 jam dengan jadwal konsisten untuk pemulihan optimal.`)
-  if (!todaySleep) insights.push('Anda belum mencatat tidur hari ini — pantau durasi & konsistensi untuk insight lebih akurat.')
+  if (bmi >= 25) insights.push(`Your BMI is ${bmi.toFixed(1)} (${bmiCat.l}). A ~300-500 kcal/day deficit from your TDEE (${tdee} kcal) + cardio 3x/week helps you lose weight safely.`)
+  else if (bmi < 18.5) insights.push(`Your BMI is ${bmi.toFixed(1)}, which is underweight. Add nutrient-rich intake and strength training to build muscle mass.`)
+  else insights.push(`Your BMI of ${bmi.toFixed(1)} is ideal — maintain it with ${tdee} kcal/day and regular activity.`)
+  if (todaySleep && sleepScore < 70) insights.push(`Sleep score ${sleepScore}/100. Try sleeping 7-9 hours on a consistent schedule for optimal recovery.`)
+  if (!todaySleep) insights.push("You haven't logged sleep today — track duration & consistency for more accurate insights.")
   const vForAdvice = lastVo2?.value ?? vo2max
-  if (vForAdvice < 40) insights.push(`VO2Max ${vForAdvice} masih bisa ditingkatkan. Latihan interval (HIIT) 1-2x/minggu efektif menaikkan kebugaran kardio.`)
-  else insights.push(`VO2Max ${vForAdvice} tergolong baik — pertahankan latihan aerobik rutin.`)
-  if (checkInStreak >= 3) insights.push(`Hebat! Streak check-in ${checkInStreak} hari. Konsistensi adalah kunci kesehatan jangka panjang. 🔥`)
-  insights.push(`Target cairan hari ini ~${(waterMl / 1000).toFixed(1)} liter. Sebarkan minum sepanjang hari, jangan sekaligus.`)
+  if (vForAdvice < 40) insights.push(`VO2Max ${vForAdvice} still has room to improve. Interval training (HIIT) 1-2x/week is effective at boosting cardio fitness.`)
+  else insights.push(`VO2Max ${vForAdvice} is good — keep up regular aerobic training.`)
+  if (checkInStreak >= 3) insights.push(`Great job! ${checkInStreak}-day check-in streak. Consistency is the key to long-term health. 🔥`)
+  insights.push(`Today's fluid target is ~${(waterMl / 1000).toFixed(1)} liters. Spread it throughout the day rather than all at once.`)
 
   return (
     <div className="space-y-4">
-      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Pusat Kesehatan Realtime</h4>
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Real-Time Health Center</h4>
 
       {/* #6 + #7: Asisten Kesehatan AI dengan deteksi anomali */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🤖 Asisten Kesehatan AI</div>
+        <div className="text-xs font-black text-ink">🤖 AI Health Assistant</div>
         {anomalies.length > 0 && (
           <div className="space-y-1.5">
             {anomalies.map((a, i) => (
@@ -1818,22 +1818,22 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-neutral-400">Analisis otomatis berdasarkan data yang Anda catat. Bukan pengganti konsultasi tenaga medis profesional.</p>
+        <p className="text-[10px] text-neutral-400">Automated analysis based on the data you've logged. Not a substitute for professional medical consultation.</p>
       </Card>
 
       {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🧮 Kalkulator BMI, Kalori & Cairan</div>
+        <div className="text-xs font-black text-ink">🧮 BMI, Calorie & Fluid Calculator</div>
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <Field label="Berat (kg)"><input type="number" value={weight} onChange={(e) => setWeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Tinggi (cm)"><input type="number" value={height} onChange={(e) => setHeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Usia"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Weight (kg)"><input type="number" value={weight} onChange={(e) => setWeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Height (cm)"><input type="number" value={height} onChange={(e) => setHeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Age"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <select value={activity} onChange={(e) => setActivity(+e.target.value)} className={inputClass + ' text-xs'}>
-          <option value={1.2}>Jarang olahraga</option>
-          <option value={1.4}>Olahraga ringan</option>
-          <option value={1.6}>Olahraga sedang</option>
-          <option value={1.9}>Olahraga berat</option>
+          <option value={1.2}>Rarely exercise</option>
+          <option value={1.4}>Light exercise</option>
+          <option value={1.6}>Moderate exercise</option>
+          <option value={1.9}>Heavy exercise</option>
         </select>
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-xl p-2 text-center text-white" style={{ background: bmiCat.c }}>
@@ -1842,12 +1842,12 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <div className="text-[10px] font-bold">{bmiCat.l}</div>
           </div>
           <div className="rounded-xl bg-brand-50 p-2 text-center text-brand-dark">
-            <div className="text-[10px]">Kalori/hari</div>
+            <div className="text-[10px]">Calories/day</div>
             <div className="text-sm font-black">{tdee}</div>
-            <div className="text-[10px] font-bold">kkal</div>
+            <div className="text-[10px] font-bold">kcal</div>
           </div>
           <div className="rounded-xl bg-sky-50 p-2 text-center text-sky-700">
-            <div className="text-[10px]">Cairan/hari</div>
+            <div className="text-[10px]">Fluid/day</div>
             <div className="text-sm font-black">{(waterMl / 1000).toFixed(1)}</div>
             <div className="text-[10px] font-bold">liter</div>
           </div>
@@ -1856,10 +1856,10 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
       {/* 2. Kalkulator Tekanan Darah + 4. Monitor Vital Realtime */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🩺 Tekanan Darah & Monitor Vital</div>
+        <div className="text-xs font-black text-ink">🩺 Blood Pressure & Vital Monitor</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Field label="Sistolik"><input type="number" value={sys} onChange={(e) => setSys(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Diastolik"><input type="number" value={dia} onChange={(e) => setDia(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Systolic"><input type="number" value={sys} onChange={(e) => setSys(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Diastolic"><input type="number" value={dia} onChange={(e) => setDia(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <div className="rounded-xl p-2 text-center text-white" style={{ background: bpCat.color }}>
           <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
@@ -1867,97 +1867,97 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         <div className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-2 text-xs">
           <Field label="HR (bpm)"><input type="number" value={hr} onChange={(e) => setHr(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
           <Field label="SpO2 (%)"><input type="number" value={spo2} onChange={(e) => setSpo2(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Suhu (°C)"><input type="number" step={0.1} value={tempC} onChange={(e) => setTempC(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Temperature (°C)"><input type="number" step={0.1} value={tempC} onChange={(e) => setTempC(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         {/* #8: koneksi wearable BLE untuk HR live */}
         {bleStatus !== 'unsupported' && (
           <button onClick={connectWearable} disabled={bleStatus === 'connecting' || bleStatus === 'connected'}
             className="w-full rounded-xl border border-brand/30 bg-brand-50 px-3 py-2 text-xs font-bold text-brand-dark disabled:opacity-60">
-            {bleStatus === 'connected' ? '⌚ Wearable terhubung — HR live' : bleStatus === 'connecting' ? 'Menghubungkan…' : bleStatus === 'error' ? '⚠ Gagal — coba lagi' : '⌚ Hubungkan Wearable (Bluetooth)'}
+            {bleStatus === 'connected' ? '⌚ Wearable connected — live HR' : bleStatus === 'connecting' ? 'Connecting…' : bleStatus === 'error' ? '⚠ Failed — try again' : '⌚ Connect Wearable (Bluetooth)'}
           </button>
         )}
         <button onClick={() => addSelfVital({ systolic: sys, diastolic: dia, heartRate: hr, spo2, tempC })}
           className="w-full rounded-xl px-4 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-          Catat Vital Sekarang
+          Record Vitals Now
         </button>
         {lastVital && (
-          <p className="text-[11px] text-neutral-500">Terakhir dicatat: {timeAgo(lastVital.at)} — {lastVital.systolic}/{lastVital.diastolic} mmHg, HR {lastVital.heartRate}, SpO2 {lastVital.spo2}%, {lastVital.tempC}°C</p>
+          <p className="text-[11px] text-neutral-500">Last recorded: {timeAgo(lastVital.at)} — {lastVital.systolic}/{lastVital.diastolic} mmHg, HR {lastVital.heartRate}, SpO2 {lastVital.spo2}%, {lastVital.tempC}°C</p>
         )}
       </Card>
 
       {/* 5. Skor Kualitas Tidur */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">😴 Skor Kualitas Tidur</div>
+        <div className="text-xs font-black text-ink">😴 Sleep Quality Score</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Field label="Jam tidur"><input type="number" value={sleepHours} onChange={(e) => setSleepHours(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Sleep hours"><input type="number" value={sleepHours} onChange={(e) => setSleepHours(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
           <label className="flex items-center gap-2 pt-5 text-xs text-neutral-600">
-            <input type="checkbox" checked={bedtimeConsistent} onChange={(e) => setBedtimeConsistent(e.target.checked)} /> Jam tidur konsisten
+            <input type="checkbox" checked={bedtimeConsistent} onChange={(e) => setBedtimeConsistent(e.target.checked)} /> Consistent bedtime
           </label>
         </div>
-        <button onClick={() => addSleepLog(sleepHours, bedtimeConsistent)} className="w-full rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Simpan Tidur Hari Ini</button>
+        <button onClick={() => addSleepLog(sleepHours, bedtimeConsistent)} className="w-full rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Save Today's Sleep</button>
         <div className="rounded-xl bg-indigo-50 p-2 text-center text-indigo-700">
-          <span className="text-sm font-black">{todaySleep ? sleepScore : '—'}</span> <span className="text-xs font-bold">/100 {todaySleep ? '(tersimpan hari ini)' : '(belum disimpan)'}</span>
+          <span className="text-sm font-black">{todaySleep ? sleepScore : '—'}</span> <span className="text-xs font-bold">/100 {todaySleep ? '(saved today)' : '(not saved yet)'}</span>
         </div>
       </Card>
 
       {/* #1: Tren grafik vital & tidur */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">📈 Tren 10 Pencatatan Terakhir</div>
+        <div className="text-xs font-black text-ink">📈 Last 10 Readings Trend</div>
         <div className="space-y-2">
           <div>
-            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Sistolik (mmHg)</span><b className="text-ink">{sysSeries.length ? sysSeries[sysSeries.length - 1] : '—'}</b></div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Systolic (mmHg)</span><b className="text-ink">{sysSeries.length ? sysSeries[sysSeries.length - 1] : '—'}</b></div>
             <Sparkline data={sysSeries} color="#EF4444" />
           </div>
           <div>
-            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Detak Jantung (bpm)</span><b className="text-ink">{hrSeries.length ? hrSeries[hrSeries.length - 1] : '—'}</b></div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Heart Rate (bpm)</span><b className="text-ink">{hrSeries.length ? hrSeries[hrSeries.length - 1] : '—'}</b></div>
             <Sparkline data={hrSeries} color="#00BF63" />
           </div>
           <div>
-            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Jam Tidur</span><b className="text-ink">{sleepSeries.length ? sleepSeries[sleepSeries.length - 1] : '—'}</b></div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Sleep Hours</span><b className="text-ink">{sleepSeries.length ? sleepSeries[sleepSeries.length - 1] : '—'}</b></div>
             <Sparkline data={sleepSeries} color="#6366F1" />
           </div>
         </div>
-        <p className="text-[10px] text-neutral-400">Catat vital & tidur secara rutin untuk melihat tren naik/turun di sini.</p>
+        <p className="text-[10px] text-neutral-400">Log vitals & sleep regularly to see trends here.</p>
       </Card>
 
       {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🫁 Kalkulator VO2Max</div>
+        <div className="text-xs font-black text-ink">🫁 VO2Max Calculator</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Field label="HR Istirahat (bpm)"><input type="number" value={hrRest} onChange={(e) => setHrRest(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="HR Maksimal (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Resting HR (bpm)"><input type="number" value={hrRest} onChange={(e) => setHrRest(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Max HR (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
-        <p className="text-[10px] text-neutral-400">HR Maks default = 220 − usia. Ganti jika Anda tahu nilai aktual dari tes.</p>
+        <p className="text-[10px] text-neutral-400">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
         <div className="flex items-center justify-between rounded-xl p-2 text-white" style={{ background: vo2Cat.c }}>
           <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
-          <button onClick={() => logVo2Max(vo2max, 'Estimasi HR')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Catat</button>
+          <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Record</button>
         </div>
-        <p className="text-[10px] text-neutral-400">Estimasi non-exercise (Uth-Sørensen).</p>
+        <p className="text-[10px] text-neutral-400">Non-exercise estimate (Uth-Sørensen).</p>
 
         {/* #5: Tes Cooper — lari 12 menit, paling akurat */}
         <div className="space-y-2 border-t border-neutral-100 pt-2">
-          <div className="text-[11px] font-bold text-ink">🏃 Tes Cooper (lari 12 menit)</div>
+          <div className="text-[11px] font-bold text-ink">🏃 Cooper Test (12-minute run)</div>
           <div className="flex items-center gap-2">
-            <Field label="Jarak 12 mnt (m)"><input type="number" value={cooperMeters} onChange={(e) => setCooperMeters(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+            <Field label="12-min distance (m)"><input type="number" value={cooperMeters} onChange={(e) => setCooperMeters(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
             <div className="flex-1 rounded-xl bg-brand-50 p-2 text-center text-brand-dark">
               <span className="text-sm font-black">{cooperVo2 > 0 ? cooperVo2 : '—'}</span> <span className="text-[10px] font-bold">mL/kg/min</span>
             </div>
-            <button onClick={() => logVo2Max(cooperVo2, 'Tes Cooper')} disabled={cooperVo2 <= 0}
-              className="rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Catat</button>
+            <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
+              className="rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
           </div>
-          <p className="text-[10px] text-neutral-400">Lari sejauh mungkin dalam 12 menit (pakai GPS Tracker untuk ukur jarak), lalu masukkan jaraknya. Rumus Cooper paling akurat.</p>
+          <p className="text-[10px] text-neutral-400">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</p>
         </div>
 
         {lastVo2 && (
           <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
-            VO2Max terukur terakhir: <b className="text-ink">{lastVo2.value}</b> mL/kg/min · {lastVo2.method} · {timeAgo(lastVo2.at)}
+            Last measured VO2Max: <b className="text-ink">{lastVo2.value}</b> mL/kg/min · {lastVo2.method} · {timeAgo(lastVo2.at)}
           </div>
         )}
       </Card>
 
       {/* 7. Live Health News Ticker */}
       <Card className="space-y-1.5 overflow-hidden">
-        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Berita Kesehatan Live <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
+        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Live Health News <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
         <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">
           <span className="font-bold text-brand-dark">[{HEALTH_NEWS[newsIdx].tag}]</span> {HEALTH_NEWS[newsIdx].title}
         </div>
@@ -1966,27 +1966,27 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       {/* 6. Pengingat Obat/Vitamin Realtime */}
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-black text-ink">💊 Pengingat Obat & Vitamin</div>
+          <div className="text-xs font-black text-ink">💊 Medicine & Vitamin Reminder</div>
           {notifPerm === 'granted'
-            ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifikasi aktif</span>
-            : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Aktifkan Notifikasi</button>}
+            ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifications on</span>
+            : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Enable Notifications</button>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Medicine/vitamin name" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' min-w-[110px] max-w-[150px] flex-1 text-xs'} />
           <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
             className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
         </div>
-        {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">Belum ada pengingat. Tambahkan satu di atas.</p>}
+        {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">No reminders yet. Add one above.</p>}
         {state.medReminders.map((m) => {
           const taken = m.takenDates.includes(today)
           const due = nowHM >= m.time && !taken
           return (
             <div key={m.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-xs">
-              <span className={due ? 'font-bold text-red-500' : 'text-neutral-600'}>{m.name} · {m.time} {due ? '⏰ Saatnya!' : ''}</span>
+              <span className={due ? 'font-bold text-red-500' : 'text-neutral-600'}>{m.name} · {m.time} {due ? '⏰ Time!' : ''}</span>
               <button onClick={() => markMedTaken(m.id)} disabled={taken}
                 className="rounded-full px-2.5 py-1 text-[11px] font-bold disabled:opacity-50" style={{ background: taken ? '#E5F8EE' : '#00BF63', color: taken ? '#0B7A4B' : '#fff' }}>
-                {taken ? '✓ Diminum' : 'Tandai'}
+                {taken ? '✓ Taken' : 'Mark'}
               </button>
             </div>
           )
@@ -1995,12 +1995,12 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
       {/* 8. Pusat Edukasi Cepat */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">📚 Edukasi Cepat</div>
+        <div className="text-xs font-black text-ink">📚 Quick Education</div>
         {EDU_ARTICLES.map((a) => {
           const bookmarked = state.eduBookmarks.includes(a.id)
           return (
             <div key={a.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
-              <span className="flex-1 pr-2 text-neutral-700">{a.title} <span className="text-neutral-400">· {a.minutes} mnt baca</span></span>
+              <span className="flex-1 pr-2 text-neutral-700">{a.title} <span className="text-neutral-400">· {a.minutes} min read</span></span>
               <button onClick={() => toggleEduBookmark(a.id)} className="shrink-0 text-base">{bookmarked ? '🔖' : '📑'}</button>
             </div>
           )
@@ -2019,25 +2019,25 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
       {/* #4: Target & Badge Progres */}
       <Card className="space-y-3">
-        <div className="text-xs font-black text-ink">🎯 Target Kesehatan</div>
+        <div className="text-xs font-black text-ink">🎯 Health Goals</div>
         <div className="flex flex-wrap items-center gap-2">
           <select value={goalMetric} onChange={(e) => setGoalMetric(e.target.value as HealthGoal['metric'])} className={inputClass + ' w-28 shrink-0 text-xs'}>
-            <option value="sleep">Tidur</option>
-            <option value="checkin">Check-in beruntun</option>
-            <option value="water">Minum air</option>
-            <option value="steps">Langkah</option>
-            <option value="custom">Lainnya</option>
+            <option value="sleep">Sleep</option>
+            <option value="checkin">Check-in streak</option>
+            <option value="water">Water intake</option>
+            <option value="steps">Steps</option>
+            <option value="custom">Other</option>
           </select>
-          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Nama target" className={inputClass + ' min-w-[140px] flex-1 text-xs'} />}
+          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Goal name" className={inputClass + ' min-w-[140px] flex-1 text-xs'} />}
           <input type="number" value={goalTarget} onChange={(e) => setGoalTarget(+e.target.value || 0)} className={inputClass + ' w-16 shrink-0 text-xs'} />
           <button onClick={() => {
-            const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Tidur', checkin: 'Check-in beruntun', water: 'Minum air', steps: 'Langkah harian', custom: '' }[goalMetric]
+            const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Sleep', checkin: 'Check-in streak', water: 'Water intake', steps: 'Daily steps', custom: '' }[goalMetric]
             addGoal({ metric: goalMetric, label, target: goalTarget, unit: metricUnit[goalMetric] })
             setGoalLabel('')
           }} disabled={goalTarget <= 0 || (goalMetric === 'custom' && !goalLabel.trim())}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
         </div>
-        {state.goals.length === 0 && <p className="text-xs text-neutral-400">Belum ada target. Tetapkan satu untuk mulai melacak progres.</p>}
+        {state.goals.length === 0 && <p className="text-xs text-neutral-400">No goals yet. Set one to start tracking progress.</p>}
         {state.goals.map((g) => {
           const cur = goalCurrent(g.metric)
           const pct = Math.min(100, Math.round((cur / g.target) * 100))
@@ -2054,10 +2054,10 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
                   <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
                     <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? '#00BF63' : 'linear-gradient(90deg,#84CC16,#00BF63)' }} />
                   </div>
-                  <div className="text-[10px] text-neutral-400">{cur} / {g.target} {g.unit} ({pct}%){done ? ' — tercapai! 🎉' : ''}</div>
+                  <div className="text-[10px] text-neutral-400">{cur} / {g.target} {g.unit} ({pct}%){done ? ' — achieved! 🎉' : ''}</div>
                 </>
               ) : (
-                <div className="text-[10px] text-neutral-400">Pelacakan otomatis butuh integrasi wearable (rekomendasi mendatang).</div>
+                <div className="text-[10px] text-neutral-400">Automatic tracking requires wearable integration (upcoming feature).</div>
               )}
             </div>
           )
@@ -2067,14 +2067,14 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       {/* 10. Dashboard Ringkasan Realtime — agregasi semua metrik di atas */}
       <Card className="space-y-2">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-black text-ink">📊 Ringkasan Realtime</div>
-          <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Ekspor Laporan</button>
+          <div className="text-xs font-black text-ink">📊 Real-Time Summary</div>
+          <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Export Report</button>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tensi</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Tidur hari ini</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Belum dicatat'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Vital terakhir</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'Belum ada'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Blood Pressure</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
         </div>
       </Card>
@@ -2101,7 +2101,7 @@ export default function SportsSocialFeed() {
   // Default fallback user jika context/store kosong
   const currentUser = useMemo(() => ({
     email: account?.email || 'user@fitlife.id',
-    name: account?.name || 'Ksatria Bugar',
+    name: account?.name || 'Fitness Champion',
     role: (account?.role as Role) || 'pasien'
   }), [account])
 
@@ -2123,7 +2123,7 @@ export default function SportsSocialFeed() {
   // Handler memproses share data aktivitas tracker langsung ke feed sosial
   const handleShareGpsToFeed = (gpsData: SharedGpsData) => {
     const elevNote = gpsData.elevGainM > 5 ? ` Elevasi +${Math.round(gpsData.elevGainM)}m (${gpsData.terrain}).` : ''
-    const generatedCaption = `Saya baru saja menyelesaikan aktivitas ${gpsData.sport.emoji} ${gpsData.sport.name} sejauh ${fmtDist(gpsData.dist)} dengan durasi ${fmtD(gpsData.dur)}. Total pembakaran ${gpsData.kcal} kkal dengan rata-rata zona intensitas ${gpsData.hiit.zone}!${elevNote} 💪`
+    const generatedCaption = `I just finished a ${gpsData.sport.emoji} ${gpsData.sport.name} activity covering ${fmtDist(gpsData.dist)} in ${fmtD(gpsData.dur)}. Burned a total of ${gpsData.kcal} kcal with an average intensity zone of ${gpsData.hiit.zone}!${elevNote} 💪`
     addPost({
       id: uid(),
       authorEmail: currentUser.email,
@@ -2179,7 +2179,7 @@ export default function SportsSocialFeed() {
         <ComposeModal
           onClose={() => setIsComposeOpen(false)}
           onPost={handleAddNewPost}
-          onShareGps={() => alert('Gunakan panel GPS Tracker di atas untuk merekam rute aktif!')}
+          onShareGps={() => alert('Use the GPS Tracker panel above to record an active route!')}
           authorEmail={currentUser.email}
           authorName={currentUser.name}
           role={currentUser.role}
@@ -2189,12 +2189,12 @@ export default function SportsSocialFeed() {
       {/* Feed tabs — For You / Mengikuti + search (gaya TikTok/Instagram) */}
       <div className="sticky top-0 z-20 -mx-4 flex items-center justify-center gap-6 border-b border-neutral-100 bg-white/85 px-4 py-2 backdrop-blur">
         <button onClick={() => setFeedTab('following')} className={`text-sm font-bold transition ${feedTab === 'following' ? 'text-ink' : 'text-neutral-400'}`}>
-          Mengikuti{feedTab === 'following' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
+          Following{feedTab === 'following' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
         </button>
         <button onClick={() => setFeedTab('foryou')} className={`text-sm font-bold transition ${feedTab === 'foryou' ? 'text-ink' : 'text-neutral-400'}`}>
-          Untuk Anda{feedTab === 'foryou' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
+          For You{feedTab === 'foryou' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
         </button>
-        <button onClick={() => { window.location.hash = '#/search' }} aria-label="Cari" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
+        <button onClick={() => { window.location.hash = '#/search' }} aria-label="Search" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
           <IconSearch size={18} />
         </button>
       </div>
@@ -2210,8 +2210,8 @@ export default function SportsSocialFeed() {
             return (
               <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
                 {feedTab === 'following'
-                  ? <>Belum ada kiriman dari yang Anda ikuti. Buka <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">Untuk Anda</button> atau <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">cari orang</button>.</>
-                  : <>Belum ada kiriman. Ketuk tombol <span className="font-bold text-brand-dark">＋</span> di bawah untuk membuat postingan atau story.</>}
+                  ? <>No posts yet from people you follow. Go to <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">For You</button> or <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">find people</button>.</>
+                  : <>No posts yet. Tap the <span className="font-bold text-brand-dark">＋</span> button below to create a post or story.</>}
               </div>
             )
           }
@@ -2222,7 +2222,7 @@ export default function SportsSocialFeed() {
       {/* Tombol mengambang "+" — buat post/story (ikon, universal, target besar) */}
       <button
         onClick={() => setIsComposeOpen(true)}
-        aria-label="Buat postingan atau story baru"
+        aria-label="Create a new post or story"
         data-tour="compose"
         className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-white shadow-lg transition active:scale-95 lg:grid"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
