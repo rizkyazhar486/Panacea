@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun, IconActivity, IconHeart, IconX } from '../components/icons'
-import { ShareToFeed } from '../components/ShareToFeed'
+import { ShareStatCard } from '../components/ShareStatCard'
 import { PrefillBadge } from '../components/HealthSnapshot'
 import { hasHealth, pushBiometrics } from '../lib/profile'
 import { Portal } from '../components/Portal'
@@ -157,7 +157,14 @@ export function Athlete() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <AthleteQuotePopup />
       <div className="flex justify-end">
-        <ShareToFeed activity="🏃 Performa Atlet" defaultCaption="Update latihan & performa saya hari ini 💪" />
+        <ShareStatCard
+          activity="🏃 Performa Atlet"
+          metricLabel="VO₂max Estimasi"
+          metricValue={v.toFixed(1)}
+          metricUnit="ml/kg/min"
+          badge={tier}
+          secondary={`Nadi Maks ${hrMax} bpm`}
+        />
       </div>
       <Card className="!p-5">
         <SectionTitle icon={<IconRun size={20} />} title="Performa Atlet" subtitle="VO₂max, zona latihan & target beban mingguan" />
