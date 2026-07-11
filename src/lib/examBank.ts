@@ -11,7 +11,7 @@
 // that reflects genuine regional disease burden, not stereotype.
 
 export type ExamTrack =
-  | 'usmle' | 'plab' | 'saudi_smle' | 'uae' | 'singapore' | 'japan'
+  | 'ukmppd' | 'usmle' | 'plab' | 'saudi_smle' | 'uae' | 'singapore' | 'japan'
   | 'taiwan' | 'china' | 'europe_de' | 'south_africa' | 'israel'
 
 export interface ExamInfo {
@@ -32,6 +32,7 @@ export interface ExamQuestion {
 }
 
 export const EXAM_INFO: Record<ExamTrack, ExamInfo> = {
+  ukmppd: { id: 'ukmppd', flag: '🇮🇩', country: 'Indonesia', examName: 'UKMPPD (CBT)', body: 'Panitia Nasional UKMPPD / KKI', format: 'Clinical-vignette MCQ, single best answer' },
   usmle: { id: 'usmle', flag: '🇺🇸', country: 'Amerika Serikat', examName: 'USMLE (Step 1/2 CK)', body: 'NBME/FSMB', format: 'MCQ vignette klinis, single best answer' },
   plab: { id: 'plab', flag: '🇬🇧', country: 'Inggris (UK)', examName: 'PLAB 1 & 2', body: 'General Medical Council (GMC)', format: 'MCQ + OSCE, penekanan etika & NHS guideline' },
   saudi_smle: { id: 'saudi_smle', flag: '🇸🇦', country: 'Arab Saudi', examName: 'SMLE', body: 'Saudi Commission for Health Specialties (SCFHS)', format: 'MCQ vignette klinis' },
@@ -45,9 +46,91 @@ export const EXAM_INFO: Record<ExamTrack, ExamInfo> = {
   israel: { id: 'israel', flag: '🇮🇱', country: 'Israel', examName: 'Rishuy (Israeli Medical Licensing Exam)', body: 'Kementerian Kesehatan Israel', format: 'MCQ, tersedia versi bahasa Inggris' },
 }
 
-export const EXAM_ORDER: ExamTrack[] = ['usmle', 'plab', 'saudi_smle', 'uae', 'singapore', 'japan', 'taiwan', 'china', 'europe_de', 'south_africa', 'israel']
+export const EXAM_ORDER: ExamTrack[] = ['ukmppd', 'usmle', 'plab', 'saudi_smle', 'uae', 'singapore', 'japan', 'taiwan', 'china', 'europe_de', 'south_africa', 'israel']
 
 export const EXAM_BANK: Record<ExamTrack, ExamQuestion[]> = {
+  ukmppd: [
+    { id: 'ukmppd-1',
+      vignette: 'A 24-year-old man presents on day 4 of high fever with headache, retro-orbital pain, and myalgia. On examination there is a positive tourniquet test and petechiae. Platelets 90,000/µL, hematocrit rising, WBC low. He is alert with warm extremities and good urine output.',
+      options: ['Dengue fever without warning signs', 'Dengue with warning signs', 'Dengue shock syndrome', 'Chikungunya'],
+      answer: 1,
+      explanation: 'Rising hematocrit (plasma leakage) plus thrombocytopenia in a dengue-endemic patient signals dengue WITH warning signs, mandating closer monitoring and IV fluids — but the absence of hypotension, narrow pulse pressure, or poor perfusion rules out dengue shock syndrome. Chikungunya causes prominent arthralgia and is less associated with plasma leakage.' },
+    { id: 'ukmppd-2',
+      vignette: 'A 30-year-old man has had a productive cough for 4 weeks with hemoptysis, night sweats, and weight loss. Sputum acid-fast bacilli smear is positive. He has never been treated for TB before.',
+      options: ['2RHZE / 4RH (Category 1 regimen)', 'Rifampicin only', 'Amoxicillin 7 days', '2RHZES / 1RHZE / 5RHE (retreatment)'],
+      answer: 0,
+      explanation: 'A new, smear-positive pulmonary TB case receives the standard first-line regimen: 2 months of rifampicin, isoniazid, pyrazinamide, and ethambutol (intensive phase) followed by 4 months of rifampicin + isoniazid (continuation) — the WHO/Indonesian national TB program Category 1 regimen. The streptomycin-containing retreatment regimen is for previously treated cases.' },
+    { id: 'ukmppd-3',
+      vignette: 'A 28-year-old woman at 34 weeks gestation presents with a blood pressure of 170/110 mmHg, 3+ proteinuria, headache, and epigastric pain. She then has a generalized tonic-clonic seizure.',
+      options: ['IV diazepam alone', 'Magnesium sulfate', 'Immediate cesarean under general anesthesia before stabilization', 'Oral labetalol and discharge'],
+      answer: 1,
+      explanation: 'This is eclampsia. Magnesium sulfate is the drug of choice both to abort the seizure and to prevent recurrence (it is superior to diazepam/phenytoin per the Magpie/Collaborative Eclampsia trials). Blood pressure is controlled in parallel, the patient is stabilized, and delivery is planned — not rushed to theatre before controlling seizures and pressure.' },
+    { id: 'ukmppd-4',
+      vignette: 'A 5-year-old child presents with a high fever for 7 days, a coated tongue, relative bradycardia, and abdominal discomfort with mild hepatosplenomegaly. Widal and a blood culture are pending.',
+      options: ['Chloramphenicol or ceftriaxone for typhoid fever', 'Oseltamivir', 'Artesunate', 'Metronidazole'],
+      answer: 0,
+      explanation: 'Prolonged stepwise fever with relative bradycardia (Faget sign), a coated tongue, and hepatosplenomegaly is the classic picture of typhoid fever (Salmonella typhi). First-line therapy in Indonesia is chloramphenicol or a third-generation cephalosporin (ceftriaxone/cefixime); blood culture is the diagnostic gold standard, as Widal has limited specificity.' },
+    { id: 'ukmppd-5',
+      vignette: 'A febrile traveler returning from Papua has a fever with a 48-hour periodicity, chills, and sweats. A blood smear shows ring forms and banana-shaped (crescent) gametocytes.',
+      options: ['Plasmodium vivax', 'Plasmodium falciparum', 'Plasmodium malariae', 'Plasmodium ovale'],
+      answer: 1,
+      explanation: 'Banana/crescent-shaped gametocytes are pathognomonic for Plasmodium falciparum — the species responsible for severe, potentially fatal malaria (cerebral malaria, hyperparasitemia). Papua is a falciparum-endemic region of Indonesia. Vivax/ovale form round gametocytes and cause relapse via hypnozoites (needing primaquine), while falciparum does not.' },
+    { id: 'ukmppd-6',
+      vignette: 'A newborn at 1 minute of life has a heart rate of 90/min, slow irregular breathing, some flexion of the limbs, a grimace to suction, and a pink body with blue extremities.',
+      options: ['APGAR 4', 'APGAR 6', 'APGAR 8', 'APGAR 10'],
+      answer: 1,
+      explanation: 'Scoring: heart rate <100 = 1, slow/irregular respiration = 1, some flexion = 1, grimace = 1, acrocyanosis (blue extremities) = 1. Total = 6. An APGAR of 4–6 indicates moderate distress requiring stimulation and support, distinguishing it from severe depression (0–3).' },
+    { id: 'ukmppd-7',
+      vignette: 'A 45-year-old man with a crushing central chest pain for 45 minutes has ST elevation in leads II, III, and aVF on ECG. He arrives at a primary health center 90 minutes from the nearest PCI-capable hospital.',
+      options: ['Aspirin only and observe', 'Fibrinolytic therapy if no contraindication, plus aspirin and referral', 'Immediate coronary artery bypass grafting', 'Discharge with antacids'],
+      answer: 1,
+      explanation: 'This is an inferior STEMI. When primary PCI cannot be delivered within the recommended window (target <120 min from diagnosis), fibrinolysis is indicated for eligible patients presenting within 12 hours — give aspirin, load antiplatelet/anticoagulant, administer the fibrinolytic if no contraindication, and refer for rescue/routine PCI. Reperfusion time is muscle saved.' },
+    { id: 'ukmppd-8',
+      vignette: 'A 2-year-old presents with a barking cough, inspiratory stridor at rest, and a low-grade fever that worsened over 2 days. There is no drooling and the child can swallow.',
+      options: ['Epiglottitis', 'Croup (laryngotracheobronchitis) — nebulized epinephrine and dexamethasone', 'Foreign body aspiration', 'Bacterial tracheitis requiring immediate intubation'],
+      answer: 1,
+      explanation: 'A barking (seal-like) cough with stridor and a viral prodrome is croup, usually parainfluenza. Management is corticosteroids (dexamethasone) for all, plus nebulized epinephrine for stridor at rest. The absence of drooling, toxic appearance, and dysphagia argues against epiglottitis, where the child classically drools, is toxic, and sits in the tripod position.' },
+    { id: 'ukmppd-9',
+      vignette: 'A 60-year-old man with type 2 diabetes presents with a foot ulcer, fever, and a blood glucose of 480 mg/dL. Blood gas shows pH 7.28, bicarbonate 14 mEq/L, and ketones are positive. He is drowsy.',
+      options: ['Start long-acting insulin subcutaneously and discharge', 'IV fluids, IV insulin, and potassium monitoring for diabetic ketoacidosis', 'Oral metformin only', 'IV dextrose'],
+      answer: 1,
+      explanation: 'Hyperglycemia + high anion-gap metabolic acidosis + ketosis defines DKA. The cornerstones are aggressive isotonic fluid resuscitation, a continuous IV insulin infusion, and close potassium monitoring/replacement (insulin drives K⁺ intracellularly and can precipitate dangerous hypokalemia) — while treating the precipitant, here the infected foot ulcer.' },
+    { id: 'ukmppd-10',
+      vignette: 'A 22-year-old woman presents with a 3-day history of dysuria, frequency, and suprapubic discomfort. She is afebrile with no flank pain and no vaginal discharge. Urine dipstick is positive for leukocyte esterase and nitrites.',
+      options: ['Uncomplicated cystitis — short-course antibiotics', 'Acute pyelonephritis requiring admission', 'Pelvic inflammatory disease', 'Nephrolithiasis'],
+      answer: 0,
+      explanation: 'Dysuria, frequency, and suprapubic pain without fever or costovertebral angle tenderness is uncomplicated lower UTI (cystitis). Positive nitrites suggest Enterobacteriaceae. A short course of an appropriate first-line agent (e.g. nitrofurantoin, or trimethoprim-sulfamethoxazole where resistance is low) is sufficient; the absence of systemic features argues against pyelonephritis.' },
+    { id: 'ukmppd-11',
+      vignette: 'A 35-year-old man is brought after a motorcycle crash. He opens his eyes to pain, makes incomprehensible sounds, and withdraws from a painful stimulus.',
+      options: ['GCS 6', 'GCS 8', 'GCS 9', 'GCS 12'],
+      answer: 1,
+      explanation: 'Eye opening to pain = 2, incomprehensible sounds = 2, flexion withdrawal to pain = 4. Total GCS = 8. A GCS of 8 or below is the classic threshold at which the airway is considered unprotected and definitive airway management (intubation) should be strongly considered.' },
+    { id: 'ukmppd-12',
+      vignette: 'A 4-month-old, exclusively breastfed infant is brought for routine immunization. According to the Indonesian national schedule, which vaccines are due at this visit?',
+      options: ['BCG and OPV-0 only', 'DPT-HB-Hib 3, OPV 4, and PCV/IPV per schedule', 'MR only', 'No vaccines until 9 months'],
+      answer: 1,
+      explanation: 'On the Indonesian immunization schedule, the third dose of the pentavalent DPT-HB-Hib together with the corresponding polio dose falls at around 4 months (following doses at 2 and 3 months), with IPV/PCV given per the current national schedule. BCG and OPV-0 are given at birth/first month, and MR is given at 9 months.' },
+    { id: 'ukmppd-13',
+      vignette: 'A 50-year-old woman presents with acute severe right upper quadrant pain radiating to the shoulder after a fatty meal, fever, and a positive Murphy sign. Ultrasound shows gallstones with a thickened gallbladder wall and pericholecystic fluid.',
+      options: ['Acute cholecystitis', 'Biliary colic', 'Acute pancreatitis', 'Hepatitis A'],
+      answer: 0,
+      explanation: 'A positive Murphy sign with fever and ultrasound showing wall thickening plus pericholecystic fluid indicates acute cholecystitis (inflammation), not simple biliary colic (transient pain without inflammation or fever). Management is admission, analgesia, antibiotics, and early laparoscopic cholecystectomy where feasible.' },
+    { id: 'ukmppd-14',
+      vignette: 'A 3-year-old presents with edema (periorbital and pedal), frothy urine, and 3+ proteinuria. Serum albumin is low and cholesterol is high. Blood pressure and renal function are normal, and there is no hematuria.',
+      options: ['Acute post-streptococcal glomerulonephritis', 'Minimal change nephrotic syndrome', 'Henoch-Schönlein purpura nephritis', 'Acute tubular necrosis'],
+      answer: 1,
+      explanation: 'Heavy proteinuria, hypoalbuminemia, edema, and hyperlipidemia with a bland urine sediment (no hematuria) and preserved renal function in a young child is classic minimal change disease — the commonest childhood nephrotic syndrome, typically steroid-responsive. Post-streptococcal GN presents as a nephritic picture with hematuria, hypertension, and low complement.' },
+    { id: 'ukmppd-15',
+      vignette: 'A 68-year-old man presents with sudden painless monocular vision loss. Fundoscopy shows a pale retina with a cherry-red spot at the macula.',
+      options: ['Central retinal vein occlusion', 'Central retinal artery occlusion — an ocular emergency', 'Acute angle-closure glaucoma', 'Vitreous hemorrhage'],
+      answer: 1,
+      explanation: 'Sudden painless monocular vision loss with a pale retina and a cherry-red spot (the intact choroidal circulation showing through the fovea) is central retinal artery occlusion — an ocular stroke. It is an emergency; immediate measures (ocular massage, lowering intraocular pressure) may help, and the patient needs urgent stroke/vascular work-up. CRVO instead shows a "blood-and-thunder" fundus.' },
+    { id: 'ukmppd-16',
+      vignette: 'A 40-year-old man presents 5 days after a puncture wound while gardening with jaw stiffness (trismus), difficulty swallowing, and painful muscle spasms. He has no vaccination record.',
+      options: ['Tetanus — needs wound care, human tetanus immunoglobulin, metronidazole, and spasm control', 'Rabies', 'Botulism', 'Meningitis'],
+      answer: 0,
+      explanation: 'Trismus, dysphagia, and painful spasms after a contaminated wound in an unvaccinated person is tetanus (Clostridium tetani toxin blocking inhibitory neurotransmission). Management is wound debridement, human tetanus immunoglobulin to neutralize unbound toxin, metronidazole (preferred over penicillin), spasm control (benzodiazepines), supportive care in a quiet environment, and active immunization — since natural infection does not confer immunity.' },
+  ],
   usmle: [
     { id: 'usmle-1',
       vignette: 'Wanita 32 tahun datang dengan palpitasi, tremor halus, penurunan berat badan meski nafsu makan meningkat, dan goiter difus disertai eksoftalmus. TSH rendah, free T4 tinggi.',
