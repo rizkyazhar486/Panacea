@@ -116,8 +116,13 @@ export function Settings() {
     const a = document.createElement('a')
     a.href = url
     a.download = `panaceamed-data-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
+    a.remove()
+    // Revoking right after click() can abort the download mid-flight on some
+    // browsers (notably Safari/iOS) since the actual file write is async —
+    // give it headroom before freeing the object URL.
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
   }
 
   return (

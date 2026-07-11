@@ -186,8 +186,14 @@ export function ShareStatCard(props: StatCardProps) {
     const a = document.createElement('a')
     a.href = url
     a.download = 'panaceamed-stat.png'
+    document.body.appendChild(a)
     a.click()
-    URL.revokeObjectURL(url)
+    a.remove()
+    // Revoking immediately can kill the download mid-flight (the actual
+    // file write happens async after click()) — Safari/iOS in particular
+    // then shows the download stuck forever instead of completing. Give it
+    // a few seconds of headroom before freeing the object URL.
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
   }
 
   async function publishInApp(as: 'post' | 'story') {

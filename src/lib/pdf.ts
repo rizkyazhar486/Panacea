@@ -79,6 +79,11 @@ export function downloadWatermarkedPdf(opts: { title: string; meta: string; body
   const a = document.createElement('a')
   a.href = url
   a.download = opts.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.pdf'
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(url)
+  a.remove()
+  // Revoking right after click() can abort the download mid-flight on some
+  // browsers (notably Safari/iOS) since the actual file write is async —
+  // give it headroom before freeing the object URL.
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
