@@ -31,7 +31,7 @@ export function ContactService() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="group fixed bottom-32 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:bottom-5 lg:right-5 lg:h-14 lg:w-14"
+        className="group fixed bottom-28 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:bottom-5 lg:left-auto lg:right-5 lg:h-14 lg:w-14"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 26px -6px rgba(0,191,99,0.55)' }}
         title="Layanan / Contact Service"
         aria-label="Contact Service"
@@ -41,7 +41,7 @@ export function ContactService() {
       </button>
 
       {open && (
-        <div className="fixed bottom-48 right-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 lg:bottom-24 lg:right-5">
+        <div className="fixed bottom-44 left-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 lg:bottom-24 lg:left-auto lg:right-5">
           <div className="flex items-center gap-2 bg-ink px-4 py-3 text-white">
             <IconPhone size={18} className="text-brand" />
             <div className="text-sm font-bold">Layanan Panaceamed</div>
