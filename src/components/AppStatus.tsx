@@ -43,19 +43,19 @@ export function AppStatus() {
     <>
       {offline && (
         <div className="fixed inset-x-0 top-0 z-[60] flex items-center justify-center gap-2 bg-ink px-4 py-1.5 text-center text-xs font-semibold text-white">
-          <span className="h-2 w-2 rounded-full bg-amber-400" /> Anda sedang offline — sebagian fitur mungkin tidak tersedia.
+          <span className="h-2 w-2 rounded-full bg-amber-400" /> You are offline — some features may be unavailable.
         </div>
       )}
       {update && (
         <div className="fixed bottom-5 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-3 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-white shadow-xl">
-          <span>✨ Versi baru tersedia</span>
+          <span>✨ A new version is available</span>
           <button
             onClick={() => window.location.reload()}
             className="rounded-full bg-brand px-3 py-1 text-xs font-bold text-white transition hover:brightness-110"
           >
-            Muat ulang
+            Reload
           </button>
-          <button onClick={() => setUpdate(false)} className="text-white/60 hover:text-white" aria-label="Tutup">✕</button>
+          <button onClick={() => setUpdate(false)} className="text-white/60 hover:text-white" aria-label="Close">✕</button>
         </div>
       )}
     </>

@@ -108,7 +108,7 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
             </text>
           ))}
           <text x={W / 2} y={H - 2} textAnchor="middle" fontSize="9" fill="#9aa5a0">
-            Umur (tahun)
+            Age (years)
           </text>
 
           {/* normal band ±2 SD shaded */}
@@ -160,17 +160,17 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
           </div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Persentil</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Percentile</div>
           <div className="text-xl font-extrabold">P{pct}</div>
         </div>
       </div>
       <div className="mt-2 flex items-center justify-between">
-        <span className="text-sm text-neutral-500">Kesan ({label.short})</span>
+        <span className="text-sm text-neutral-500">Assessment ({label.short})</span>
         <Badge tone={cls.tone}>{cls.kesan}</Badge>
       </div>
       <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
-        Z-score dihitung dengan metode LMS (Cole) — konsisten standar WHO/CDC. Kurva referensi
-        diturunkan dari titik persentil tabulasi.
+        Z-scores are computed using the LMS method (Cole) — consistent with WHO/CDC standards. Reference
+        curves are derived from tabulated percentile points.
       </p>
     </div>
   )

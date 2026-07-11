@@ -8,11 +8,11 @@ export function NotFound() {
       <div className="animate-gradient-text bg-gradient-to-r from-brand via-emerald-500 to-brand-dark bg-clip-text text-7xl font-extrabold text-transparent">
         404
       </div>
-      <h1 className="text-xl font-extrabold">Halaman tidak ditemukan</h1>
+      <h1 className="text-xl font-extrabold">Page not found</h1>
       <p className="max-w-sm text-sm text-neutral-500">
-        Tautan yang Anda buka tidak ada atau telah dipindahkan.
+        The link you followed doesn't exist or has been moved.
       </p>
-      <Button onClick={() => nav('/')}>← Kembali ke Dashboard</Button>
+      <Button onClick={() => nav('/')}>← Back to Dashboard</Button>
     </div>
   )
 }

@@ -10,6 +10,14 @@ type Cat = PharmacyCategory
 type Product = PharmacyProduct
 const CAT_LIST: Cat[] = ['Demam & Nyeri', 'Batuk & Pilek', 'Lambung', 'Vitamin', 'Topikal']
 const CATS: (Cat | 'Semua')[] = ['Semua', ...CAT_LIST]
+const CAT_LABELS: Record<string, string> = {
+  Semua: 'All',
+  'Demam & Nyeri': 'Fever & Pain',
+  'Batuk & Pilek': 'Cough & Cold',
+  Lambung: 'Digestive',
+  Vitamin: 'Vitamins',
+  Topikal: 'Topical',
+}
 const rupiah = (n: number) => `Rp${n.toLocaleString('id-ID')}`
 
 export function Pharmacy() {
@@ -47,7 +55,7 @@ export function Pharmacy() {
   function checkout() {
     if (count === 0) return
     const names = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find((p) => p.id === id)?.name} ×${qty}`)
-    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} lainnya` : ''}`, detail: `${names.join(', ')} · layanan Rp${SERVICE_FEE.toLocaleString('id-ID')} · ongkir Rp${DELIVERY_FEE.toLocaleString('id-ID')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
+    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} more` : ''}`, detail: `${names.join(', ')} · service Rp${SERVICE_FEE.toLocaleString('id-ID')} · delivery Rp${DELIVERY_FEE.toLocaleString('id-ID')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
     setDone(true); setCart({})
     setTimeout(() => setDone(false), 3500)
   }
@@ -55,31 +63,31 @@ export function Pharmacy() {
   return (
     <div className="space-y-5">
       <Card>
-        <SectionTitle icon={<IconPill size={20} />} title="Apotek Panaceamed" subtitle="Beli obat bebas (OTC) atau tebus resep dari konsultasi dokter"
+        <SectionTitle icon={<IconPill size={20} />} title="Panaceamed Pharmacy" subtitle="Buy over-the-counter (OTC) medicine or fill a prescription from a doctor consultation"
           right={
             <div className="flex gap-2">
-              {canManage && <Button variant="outline" onClick={() => setManage((m) => !m)}><IconPlus size={16} /> Kelola Obat</Button>}
-              <Button variant="outline" onClick={() => setShowRx(true)}><IconUpload size={16} /> Tebus / Scan Resep</Button>
+              {canManage && <Button variant="outline" onClick={() => setManage((m) => !m)}><IconPlus size={16} /> Manage Medicines</Button>}
+              <Button variant="outline" onClick={() => setShowRx(true)}><IconUpload size={16} /> Fill / Scan Prescription</Button>
             </div>
           } />
         <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
           <IconSearch size={16} className="text-neutral-400" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari obat… (mis. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search medicine… (e.g. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
         </div>
         <div className="mt-3">
-          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: c }))} onChange={setCat} />
+          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: CAT_LABELS[c] ?? c }))} onChange={setCat} />
         </div>
         <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-50 p-3 text-xs text-brand-dark">
           <IconShield size={15} className="mt-0.5 shrink-0" />
-          <span>Obat berlabel <b>Resep</b> hanya bisa dibeli setelah mengunggah resep dokter yang sah. Obat bebas dosis ringan bisa langsung dibeli.</span>
+          <span>Items labeled <b>Prescription</b> can only be purchased after uploading a valid doctor's prescription. Low-dose OTC medicines can be purchased directly.</span>
         </div>
       </Card>
 
-      {done && <Card className="flex items-center gap-2 bg-brand-50 text-sm font-semibold text-brand-dark"><IconCheck size={18} /> Pesanan diterima — tercatat di Riwayat Transaksi. Bukti dikirim ke email.</Card>}
+      {done && <Card className="flex items-center gap-2 bg-brand-50 text-sm font-semibold text-brand-dark"><IconCheck size={18} /> Order received — recorded in Transaction History. A receipt has been sent to your email.</Card>}
 
       {products.length > 0 && (
         <Card>
-          <SectionTitle title="Geser untuk Pilih Obat" subtitle={`${products.length} produk · ${cat}`} />
+          <SectionTitle title="Swipe to Pick Medicine" subtitle={`${products.length} products · ${CAT_LABELS[cat] ?? cat}`} />
           <Carousel itemClass="w-44">
             {products.map((p) => (
               <div key={p.id} className="flex h-full flex-col rounded-2xl border border-black/5 bg-white p-3">
@@ -88,10 +96,10 @@ export function Pharmacy() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="truncate text-sm font-bold">{p.name}</span>
-                  {p.rx && <Badge tone="high">Resep</Badge>}
+                  {p.rx && <Badge tone="high">Prescription</Badge>}
                 </div>
                 <div className="text-xs text-neutral-500">{rupiah(p.priceIdr)}</div>
-                <Button onClick={() => add(p)} className="mt-2 w-full !py-1.5 text-xs"><IconPlus size={14} /> Tambah</Button>
+                <Button onClick={() => add(p)} className="mt-2 w-full !py-1.5 text-xs"><IconPlus size={14} /> Add</Button>
               </div>
             ))}
           </Carousel>
@@ -100,13 +108,13 @@ export function Pharmacy() {
 
       {canManage && manage && (
         <Card>
-          <SectionTitle icon={<IconPlus size={18} />} title="Kelola Daftar Obat" subtitle="Admin / apotek terdaftar dapat menambah & menghapus produk" />
+          <SectionTitle icon={<IconPlus size={18} />} title="Manage Medicine List" subtitle="Admins / registered pharmacies can add & remove products" />
           <AddProductForm onAdd={addProduct} />
           <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto">
             {PRODUCTS.map((p) => (
               <div key={p.id} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-sm">
                 <span>{p.emoji} {p.name} · <span className="text-neutral-400">{rupiah(p.priceIdr)}</span></span>
-                <button onClick={() => removeProduct(p.id)} className="text-xs font-semibold text-accent hover:underline">Hapus</button>
+                <button onClick={() => removeProduct(p.id)} className="text-xs font-semibold text-accent hover:underline">Remove</button>
               </div>
             ))}
           </div>
@@ -121,7 +129,7 @@ export function Pharmacy() {
                 {/* photo tile */}
                 <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.image ? undefined : `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
                   {p.image ? <img src={p.image} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}
-                  <span className="absolute left-2 top-2">{p.rx ? <Badge tone="high">Resep</Badge> : <Badge tone="normal">Bebas</Badge>}</span>
+                  <span className="absolute left-2 top-2">{p.rx ? <Badge tone="high">Prescription</Badge> : <Badge tone="normal">OTC</Badge>}</span>
                   {canManage && <button onClick={() => removeProduct(p.id)} className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-xs text-white">✕</button>}
                 </div>
                 <div className="p-3">
@@ -137,21 +145,21 @@ export function Pharmacy() {
                       </div>
                     ) : (
                       <button onClick={() => add(p)} className="rounded-lg border border-brand px-2.5 py-1 text-xs font-bold text-brand-dark hover:bg-brand-50">
-                        {p.rx ? 'Resep' : '+ Tambah'}
+                        {p.rx ? 'Prescription' : '+ Add'}
                       </button>
                     )}
                   </div>
                 </div>
               </Card>
             ))}
-            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-400">Obat tidak ditemukan.</Card>}
+            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-400">No medicine found.</Card>}
           </div>
         </div>
 
         <div>
           <Card className="sticky top-20">
-            <SectionTitle title="Keranjang" subtitle={`${count} item`} />
-            {count === 0 ? <p className="text-sm text-neutral-400">Keranjang masih kosong.</p> : (
+            <SectionTitle title="Cart" subtitle={`${count} items`} />
+            {count === 0 ? <p className="text-sm text-neutral-400">Your cart is still empty.</p> : (
               <div className="space-y-2">
                 {Object.entries(cart).map(([id, qty]) => {
                   const p = PRODUCTS.find((x) => x.id === id)!
@@ -161,14 +169,14 @@ export function Pharmacy() {
             )}
             {count > 0 && (
               <div className="mt-3 space-y-1 border-t border-neutral-100 pt-3 text-sm">
-                <div className="flex justify-between text-neutral-500"><span>Subtotal obat</span><span>{rupiah(total)}</span></div>
-                <div className="flex justify-between text-neutral-500"><span>Biaya layanan</span><span>{rupiah(SERVICE_FEE)}</span></div>
-                <div className="flex justify-between text-neutral-500"><span>Ongkir</span><span>{rupiah(DELIVERY_FEE)}</span></div>
+                <div className="flex justify-between text-neutral-500"><span>Medicine subtotal</span><span>{rupiah(total)}</span></div>
+                <div className="flex justify-between text-neutral-500"><span>Service fee</span><span>{rupiah(SERVICE_FEE)}</span></div>
+                <div className="flex justify-between text-neutral-500"><span>Delivery</span><span>{rupiah(DELIVERY_FEE)}</span></div>
               </div>
             )}
-            <div className="mt-2 flex items-center justify-between border-t border-neutral-100 pt-2"><span className="text-sm font-semibold">Total bayar</span><span className="text-lg font-extrabold">{rupiah(count > 0 ? grandTotal : 0)}</span></div>
-            <Button className="mt-3 w-full" disabled={count === 0} onClick={checkout}>Bayar Sekarang</Button>
-            {rxFile && <p className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-brand-dark"><IconCheck size={13} /> Resep terlampir: {rxFile}</p>}
+            <div className="mt-2 flex items-center justify-between border-t border-neutral-100 pt-2"><span className="text-sm font-semibold">Total due</span><span className="text-lg font-extrabold">{rupiah(count > 0 ? grandTotal : 0)}</span></div>
+            <Button className="mt-3 w-full" disabled={count === 0} onClick={checkout}>Pay Now</Button>
+            {rxFile && <p className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-brand-dark"><IconCheck size={13} /> Prescription attached: {rxFile}</p>}
           </Card>
         </div>
       </div>

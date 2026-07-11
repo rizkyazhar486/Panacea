@@ -405,7 +405,7 @@ function UserDirectoryPanel() {
 function FeedbackInboxPanel() {
   const [rows, setRows] = useState<FeedbackEntry[] | null>(null)
   const [err, setErr] = useState('')
-  function load() { api.listFeedback().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  function load() { api.listFeedback().then(setRows).catch(() => setErr('Failed to load (requires an Owner account).')) }
   useEffect(load, [])
   async function markRead(id: string) {
     setRows((rs) => rs && rs.map((r) => (r.id === id ? { ...r, read: true } : r)))
@@ -416,13 +416,13 @@ function FeedbackInboxPanel() {
     <Card className="border-2 border-brand/30">
       <SectionTitle
         icon={<span className="text-xl">💬</span>}
-        title="Pesan & Saran Pengguna"
-        subtitle="Masukan yang dikirim langsung dari aplikasi"
-        right={<Badge tone={unread.length ? 'high' : 'brand'}>{unread.length} belum dibaca</Badge>}
+        title="User Messages & Suggestions"
+        subtitle="Feedback sent directly from the app"
+        right={<Badge tone={unread.length ? 'high' : 'brand'}>{unread.length} unread</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && rows.length === 0 && <p className="text-sm text-neutral-400">Belum ada pesan masuk.</p>}
+      {rows && rows.length === 0 && <p className="text-sm text-neutral-400">No messages yet.</p>}
       <div className="space-y-2">
         {(rows ?? []).slice(0, 30).map((r) => (
           <div key={r.id} className={`rounded-xl border p-3 ${r.read ? 'border-neutral-100' : 'border-amber-200 bg-amber-50'}`}>
@@ -436,7 +436,7 @@ function FeedbackInboxPanel() {
             </div>
             <p className="mt-1.5 text-sm text-neutral-700">{r.text}</p>
             {!r.read && (
-              <button onClick={() => markRead(r.id)} className="mt-2 text-xs font-semibold text-brand-dark hover:underline">Tandai dibaca</button>
+              <button onClick={() => markRead(r.id)} className="mt-2 text-xs font-semibold text-brand-dark hover:underline">Mark as read</button>
             )}
           </div>
         ))}
@@ -446,16 +446,16 @@ function FeedbackInboxPanel() {
 }
 
 // Owner reviews professional onboarding applications & grants access.
-const ROLE_LABEL: Record<string, string> = { dokter: 'Dokter', kontributor: 'Penulis', verifikator: 'Verifikator', admin: 'Admin', pasien: 'Subscriber/Pasien', owner: 'Owner' }
+const ROLE_LABEL: Record<string, string> = { dokter: 'Doctor', kontributor: 'Author', verifikator: 'Verifier', admin: 'Admin', pasien: 'Subscriber/Patient', owner: 'Owner' }
 function ApplicationsPanel() {
   const [rows, setRows] = useState<Application[] | null>(null)
   const [busy, setBusy] = useState('')
   const [err, setErr] = useState('')
-  function load() { api.listApplications().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  function load() { api.listApplications().then(setRows).catch(() => setErr('Failed to load (requires an Owner account).')) }
   useEffect(load, [])
   async function decide(id: string, grant: boolean) {
     setBusy(id)
-    try { await api.decideApplication(id, grant); load() } catch { setErr('Gagal memproses.') } finally { setBusy('') }
+    try { await api.decideApplication(id, grant); load() } catch { setErr('Failed to process.') } finally { setBusy('') }
   }
   const pending = (rows ?? []).filter((r) => r.status === 'pending')
   const decided = (rows ?? []).filter((r) => r.status !== 'pending').slice(0, 8)
@@ -463,13 +463,13 @@ function ApplicationsPanel() {
     <Card className="border-2 border-brand/30">
       <SectionTitle
         icon={<IconShield size={20} />}
-        title="Pendaftar — Beri Akses"
-        subtitle="Dokter, Penulis, Verifikator, Admin, Subscriber yang mendaftar — tinjau & setujui"
-        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge>}
+        title="Applicants — Grant Access"
+        subtitle="Doctors, Authors, Verifiers, Admins, Subscribers who applied — review & approve"
+        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">Tidak ada pendaftar menunggu.</p>}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">No applicants pending.</p>}
       <div className="space-y-2">
         {pending.map((r) => (
           <div key={r.id} className="rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -479,25 +479,25 @@ function ApplicationsPanel() {
               <span className="text-xs text-neutral-500">{r.email}</span>
             </div>
             <div className="mt-1 text-sm text-neutral-600">
-              {[r.gelar && `Gelar: ${r.gelar}`, r.spesialis && `Sp: ${r.spesialis}`, r.subspesialis && `Subsp: ${r.subspesialis}`, r.keahlian && `Keahlian: ${r.keahlian}`, r.universitas && `${r.universitas}${r.tahunLulus ? ` (${r.tahunLulus})` : ''}`, r.str && `STR: ${r.str}`].filter(Boolean).join(' · ')}
+              {[r.gelar && `Title: ${r.gelar}`, r.spesialis && `Sp: ${r.spesialis}`, r.subspesialis && `Subsp: ${r.subspesialis}`, r.keahlian && `Expertise: ${r.keahlian}`, r.universitas && `${r.universitas}${r.tahunLulus ? ` (${r.tahunLulus})` : ''}`, r.str && `STR: ${r.str}`].filter(Boolean).join(' · ')}
             </div>
             {r.pdfName && <div className="mt-0.5 text-[11px] text-neutral-500">📄 {r.pdfName}</div>}
             {r.aiVerdict && <div className="mt-1 rounded-lg bg-white/70 p-2 text-[11px] text-neutral-600"><b>AI-Agent:</b> {r.aiVerdict}</div>}
             <div className="mt-2 flex gap-2">
-              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Beri Akses</Button>
-              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Tolak</Button>
+              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Grant Access</Button>
+              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Reject</Button>
             </div>
           </div>
         ))}
       </div>
       {decided.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">Riwayat</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">History</div>
           <div className="space-y-1">
             {decided.map((r) => (
               <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
                 <span>{r.name} · {ROLE_LABEL[r.role] ?? r.role}</span>
-                <Badge tone={r.status === 'granted' ? 'brand' : 'critical'}>{r.status === 'granted' ? 'Diberi akses' : 'Ditolak'}</Badge>
+                <Badge tone={r.status === 'granted' ? 'brand' : 'critical'}>{r.status === 'granted' ? 'Access granted' : 'Rejected'}</Badge>
               </div>
             ))}
           </div>
@@ -514,7 +514,7 @@ function ManualTopupPanel() {
   const [err, setErr] = useState('')
 
   function load() {
-    api.listTopups().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).'))
+    api.listTopups().then(setRows).catch(() => setErr('Failed to load (requires an Owner account).'))
   }
   useEffect(load, [])
 
@@ -524,7 +524,7 @@ function ManualTopupPanel() {
       await api.decideTopup(id, approve)
       load()
     } catch {
-      setErr('Gagal memproses.')
+      setErr('Failed to process.')
     } finally {
       setBusy('')
     }
@@ -537,13 +537,13 @@ function ManualTopupPanel() {
     <Card>
       <SectionTitle
         icon={<IconToken size={20} />}
-        title="Top-up Manual — Persetujuan"
-        subtitle="Setujui transfer bank untuk menambah saldo PNC pengguna"
-        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge>}
+        title="Manual Top-up — Approval"
+        subtitle="Approve bank transfers to add to users' PNC balance"
+        right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">Tidak ada permintaan menunggu.</p>}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">No pending requests.</p>}
       <div className="space-y-2">
         {pending.map((r) => (
           <div key={r.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -552,20 +552,20 @@ function ManualTopupPanel() {
               <div className="text-sm text-neutral-600">{r.amountPnc} PNC · <b>Rp{r.amountIdr.toLocaleString('id-ID')}</b> · {new Date(r.at).toLocaleString('id-ID')}</div>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Setujui</Button>
-              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Tolak</Button>
+              <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Approve</Button>
+              <Button variant="outline" onClick={() => decide(r.id, false)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs">Reject</Button>
             </div>
           </div>
         ))}
       </div>
       {decided.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">Riwayat</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">History</div>
           <div className="space-y-1">
             {decided.map((r) => (
               <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
                 <span>{r.name} · {r.amountPnc} PNC</span>
-                <Badge tone={r.status === 'approved' ? 'brand' : 'critical'}>{r.status === 'approved' ? 'Disetujui' : 'Ditolak'}</Badge>
+                <Badge tone={r.status === 'approved' ? 'brand' : 'critical'}>{r.status === 'approved' ? 'Approved' : 'Rejected'}</Badge>
               </div>
             ))}
           </div>
@@ -609,11 +609,11 @@ function BroadcastPanel() {
     setMsg('')
     try {
       const r = await api.pushBroadcast(title.trim() || 'Panaceamed.id', body.trim())
-      setMsg(`Terkirim ke ${r.sent} perangkat (dari ${r.recipients} pelanggan).`)
+      setMsg(`Sent to ${r.sent} devices (of ${r.recipients} subscribers).`)
       setBody('')
       setTitle('')
     } catch {
-      setMsg('Gagal mengirim — pastikan Web Push aktif di server.')
+      setMsg('Failed to send — make sure Web Push is active on the server.')
     } finally {
       setBusy(false)
     }
@@ -622,13 +622,13 @@ function BroadcastPanel() {
   if (!backendEnabled) return null
   return (
     <Card>
-      <SectionTitle icon={<IconBell size={20} />} title="Kirim Pengumuman (Push)" subtitle="Notifikasi ke seluruh pengguna yang berlangganan & mengizinkan siaran" />
+      <SectionTitle icon={<IconBell size={20} />} title="Send Announcement (Push)" subtitle="Notification to all users who are subscribed & allow broadcasts" />
       <div className="space-y-2">
-        <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Judul (mis. Pembaruan Layanan)" maxLength={60} />
-        <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Isi pengumuman…" maxLength={180} />
+        <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g. Service Update)" maxLength={60} />
+        <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Announcement content…" maxLength={180} />
         <div className="flex items-center gap-3">
           <Button onClick={send} disabled={busy || !body.trim()}>
-            <IconSend size={15} /> {busy ? 'Mengirim…' : 'Kirim ke Semua'}
+            <IconSend size={15} /> {busy ? 'Sending…' : 'Send to All'}
           </Button>
           {msg && <span className="text-xs font-semibold text-brand-dark">{msg}</span>}
         </div>
@@ -645,7 +645,7 @@ function DoctorVerifyPanel() {
 
   function load() {
     if (!backendEnabled) return
-    api.doctors().then(setDocs).catch(() => setErr('Gagal memuat daftar dokter (butuh server aktif).'))
+    api.doctors().then(setDocs).catch(() => setErr('Failed to load doctor list (requires an active server).'))
   }
   useEffect(load, [])
 
@@ -655,7 +655,7 @@ function DoctorVerifyPanel() {
       await api.verifyDoctor(id, status)
       setDocs((prev) => prev?.map((d) => (d.id === id ? { ...d, strStatus: status } : d)) ?? null)
     } catch {
-      setErr('Gagal memperbarui status.')
+      setErr('Failed to update status.')
     } finally {
       setBusy(null)
     }
@@ -668,14 +668,14 @@ function DoctorVerifyPanel() {
     <Card>
       <SectionTitle
         icon={<IconShield size={20} />}
-        title="Verifikasi STR Dokter"
-        subtitle="Tinjau STR/SIP sebelum membuka akses AI-EMR (UU Kesehatan)"
-        right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} menunggu</Badge> : undefined}
+        title="Doctor STR Verification"
+        subtitle="Review STR/SIP before granting AI-EMR access (Health Law)"
+        right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge> : undefined}
       />
       {err && <p className="text-sm text-accent">{err}</p>}
-      {!backendEnabled && <p className="text-sm text-neutral-400">Memerlukan server aktif.</p>}
+      {!backendEnabled && <p className="text-sm text-neutral-400">Requires an active server.</p>}
       {backendEnabled && !docs && !err && <SkeletonRows rows={3} />}
-      {docs && docs.length === 0 && <p className="text-sm text-neutral-400">Belum ada dokter terdaftar.</p>}
+      {docs && docs.length === 0 && <p className="text-sm text-neutral-400">No doctors registered yet.</p>}
 
       {pending.length > 0 && (
         <div className="space-y-2">
