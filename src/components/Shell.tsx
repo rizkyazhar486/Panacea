@@ -342,10 +342,10 @@ export function Shell({ children }: { children: ReactNode }) {
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
             {['pasien', 'dokter', 'owner'].includes(account.role) && (
               <NavLink to="/messages" aria-label="Pesan" title="Pesan"
-                className={({ isActive }) => `grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
+                className={({ isActive }) => `grid h-10 w-10 shrink-0 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
                 <IconChat size={20} />
               </NavLink>
             )}
@@ -359,12 +359,12 @@ export function Shell({ children }: { children: ReactNode }) {
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
             </button>
             {account.isOwner && (
-              <label className="flex items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — pindah mode akses">
-                <span className="text-[10px] font-bold uppercase tracking-wide text-brand-dark">Mode</span>
+              <label className="flex shrink-0 items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — pindah mode akses">
+                <span className="hidden text-[10px] font-bold uppercase tracking-wide text-brand-dark sm:inline">Mode</span>
                 <select
                   value={account.role}
                   onChange={(e) => setMode(e.target.value as Role)}
-                  className="cursor-pointer bg-transparent text-sm font-bold text-brand-dark outline-none"
+                  className="max-w-[92px] cursor-pointer bg-transparent text-sm font-bold text-brand-dark outline-none sm:max-w-none"
                 >
                   {ALL.map((r) => (
                     <option key={r} value={r}>{roleLabel[r]}</option>
@@ -374,7 +374,7 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             <NavLink
               to="/billing"
-              className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
+              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
               title="Saldo PanaceaToken"
             >
               <IconToken size={16} className="text-brand" />
@@ -387,7 +387,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 if (backendEnabled) api.logout().catch(() => {})
                 logout()
               }}
-              className="grid h-10 w-10 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
               title="Keluar"
               aria-label="Keluar"
             >
