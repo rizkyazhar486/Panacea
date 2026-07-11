@@ -194,10 +194,34 @@ export function Shell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
+  const [navHidden, setNavHidden] = useState(false)
   const account = state.account
 
   // Close the mobile drawer & record the visit (for "most-used services").
   useEffect(() => { setMenuOpen(false); trackVisit(loc.pathname) }, [loc.pathname])
+
+  // Auto-hide the floating bottom nav while scrolling down through a feed
+  // (it otherwise sits on top of post action buttons); bring it back on any
+  // upward scroll or once near the top, so it's never more than a flick away.
+  useEffect(() => {
+    let lastY = window.scrollY
+    let ticking = false
+    function onScroll() {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const y = window.scrollY
+        const delta = y - lastY
+        if (y < 80) setNavHidden(false)
+        else if (delta > 8) setNavHidden(true)
+        else if (delta < -8) setNavHidden(false)
+        lastY = y
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   if (!account) return <PublicEntry />
 
@@ -520,7 +544,10 @@ export function Shell({ children }: { children: ReactNode }) {
           never the primary cue. The "+" compose button floats above the pill,
           fixed in place (not part of the scroll strip). */}
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
-        <nav className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] lg:hidden" aria-label="Navigasi utama">
+        <nav
+          className={`fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden ${navHidden ? 'translate-y-[calc(100%+env(safe-area-inset-bottom)+16px)]' : 'translate-y-0'}`}
+          aria-label="Navigasi utama"
+        >
           <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
             <div className="pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full bg-gradient-to-l from-white/70 to-transparent" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
