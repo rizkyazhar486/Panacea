@@ -87,10 +87,12 @@ export const LEAGUES: LeagueConfig[] = [
   { id: 'atp', label: 'ATP Tour', sport: 'tennis', slug: 'atp' },
   { id: 'wta', label: 'WTA Tour', sport: 'tennis', slug: 'wta' },
   // TheSportsDB (free, no per-user key) for leagues ESPN doesn't serve well.
-  { id: 'liga1', label: 'Liga 1 Indonesia', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indonesian Liga 1', tsdbCountry: 'Indonesia', tsdbSport: 'Soccer' },
+  // IPL cricket has no free key-less option other than TheSportsDB (API-Football
+  // is soccer-only), so it stays on TSDB.
   { id: 'ipl', label: 'IPL (Cricket)', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indian Premier League', tsdbCountry: 'India', tsdbSport: 'Cricket' },
-  // API-Football (free tier, needs APISPORTS_KEY) for lower divisions ESPN/TSDB
-  // don't cover reliably.
+  // Indonesian divisions via API-Football (free tier, needs APISPORTS_KEY) —
+  // more reliable than TheSportsDB, which failed to serve Liga 1.
+  { id: 'liga1', label: 'Liga 1 Indonesia', sport: 'soccer', slug: '', source: 'apisports', apisportsName: 'Liga 1', apisportsCountry: 'Indonesia' },
   { id: 'liga2', label: 'Liga 2 Indonesia', sport: 'soccer', slug: '', source: 'apisports', apisportsName: 'Liga 2', apisportsCountry: 'Indonesia' },
 ]
 
