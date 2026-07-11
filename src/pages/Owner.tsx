@@ -27,17 +27,17 @@ export function Owner() {
       <Card>
         <SectionTitle
           icon={<IconChartUp size={20} />}
-          title="Owner — Keuntungan Perusahaan"
-          subtitle="Ringkasan moneter Panaceamed (semua aliran pendapatan)"
+          title="Owner — Company Profit"
+          subtitle="Panaceamed monetary summary (all revenue streams)"
         />
         <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Estimasi Pendapatan Kotor</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Estimated Gross Revenue</div>
           <div className="text-4xl font-extrabold">Rp{grossIdr.toLocaleString('id-ID')}</div>
-          <div className="mt-1 text-sm text-white/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('id-ID')} konsultasi</div>
+          <div className="mt-1 text-sm text-white/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('id-ID')} consultations</div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
             <div className="h-full rounded-full bg-white" style={{ width: `${Math.min(100, (grossIdr / monthlyTarget) * 100)}%` }} />
           </div>
-          <div className="mt-1 text-[11px] text-white/70">Target bulanan Rp{monthlyTarget.toLocaleString('id-ID')}</div>
+          <div className="mt-1 text-[11px] text-white/70">Monthly target Rp{monthlyTarget.toLocaleString('id-ID')}</div>
         </div>
       </Card>
 
@@ -54,18 +54,18 @@ export function Owner() {
       {backendEnabled && <ManualTopupPanel />}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat icon={<IconWalletDot />} label="Langganan" value={`${subsRevenue} PNC`} sub="recurring" />
-        <Stat icon={<IconStore size={18} />} label="Fee Marketplace" value={`${platformFeeRevenue} PNC`} sub={`${PLATFORM_FEE * 100}% royalti`} />
-        <Stat icon={<IconUsers size={18} />} label="Konsultasi" value={`Rp${consultRevenue.toLocaleString('id-ID')}`} sub={`${state.consults.length} sesi`} />
-        <Stat icon={<IconToken size={18} />} label="Token Terjual" value={`${tokenSalesPNC} PNC`} sub={`Rp${(tokenSalesPNC * TOKEN_TO_IDR).toLocaleString('id-ID')}`} />
+        <Stat icon={<IconWalletDot />} label="Subscriptions" value={`${subsRevenue} PNC`} sub="recurring" />
+        <Stat icon={<IconStore size={18} />} label="Marketplace Fee" value={`${platformFeeRevenue} PNC`} sub={`${PLATFORM_FEE * 100}% royalty`} />
+        <Stat icon={<IconUsers size={18} />} label="Consultations" value={`Rp${consultRevenue.toLocaleString('id-ID')}`} sub={`${state.consults.length} sessions`} />
+        <Stat icon={<IconToken size={18} />} label="Tokens Sold" value={`${tokenSalesPNC} PNC`} sub={`Rp${(tokenSalesPNC * TOKEN_TO_IDR).toLocaleString('id-ID')}`} />
       </div>
 
       <Card>
-        <SectionTitle title="Komposisi Pendapatan" />
+        <SectionTitle title="Revenue Composition" />
         <div className="space-y-3">
-          <Bar label="Langganan (Individu/RS)" value={subsRevenue * TOKEN_TO_IDR} total={grossIdr} color="#00BF63" />
-          <Bar label="Fee Marketplace materi" value={platformFeeRevenue * TOKEN_TO_IDR} total={grossIdr} color="#3b82f6" />
-          <Bar label="Konsultasi dokter" value={consultRevenue} total={grossIdr} color="#f59e0b" />
+          <Bar label="Subscriptions (Individual/Hospital)" value={subsRevenue * TOKEN_TO_IDR} total={grossIdr} color="#00BF63" />
+          <Bar label="Materials marketplace fee" value={platformFeeRevenue * TOKEN_TO_IDR} total={grossIdr} color="#3b82f6" />
+          <Bar label="Doctor consultations" value={consultRevenue} total={grossIdr} color="#f59e0b" />
         </div>
       </Card>
 
@@ -73,19 +73,19 @@ export function Owner() {
         <Card>
           <SectionTitle
             icon={<IconShield size={20} />}
-            title="Kelola Akses Admin"
-            subtitle="Hanya email yang Anda izinkan di sini yang dapat masuk sebagai Admin."
+            title="Manage Admin Access"
+            subtitle="Only emails you allow here can sign in as Admin."
           />
           <div className="flex gap-2">
             <input
               className={inputClass}
               value={newAdmin}
               onChange={(e) => setNewAdmin(e.target.value)}
-              placeholder="email-admin@contoh.com"
+              placeholder="admin-email@example.com"
               type="email"
             />
             <Button onClick={() => { addAdminEmail(newAdmin); setNewAdmin('') }}>
-              <IconPlus size={16} /> Tambah
+              <IconPlus size={16} /> Add
             </Button>
           </div>
           <div className="mt-3 space-y-2">
@@ -96,7 +96,7 @@ export function Owner() {
                   <Badge tone="brand">Owner</Badge>
                 ) : (
                   <button onClick={() => removeAdminEmail(e)} className="text-xs font-semibold text-accent hover:underline">
-                    Hapus
+                    Remove
                   </button>
                 )}
               </div>
@@ -109,8 +109,8 @@ export function Owner() {
 
       <Card>
         <div className="flex items-center gap-2 text-sm text-neutral-500">
-          <Badge tone="high">Catatan</Badge>
-          Owner pun wajib menjadi pelanggan (subscriber) — kelola langganan di menu Billing & Token.
+          <Badge tone="high">Note</Badge>
+          The owner is also required to be a subscriber — manage the subscription in the Billing & Tokens menu.
         </div>
       </Card>
     </div>
@@ -125,13 +125,13 @@ function CompliancePanel() {
 
   useEffect(() => {
     if (!backendEnabled) return
-    api.audit().then(setAudit).catch(() => setErr('Gagal memuat audit log (butuh server aktif).'))
+    api.audit().then(setAudit).catch(() => setErr('Failed to load audit log (requires an active server).'))
     api.satusehatStatus().then(setSehat).catch(() => {})
   }, [])
 
   const actionLabel: Record<string, string> = {
-    'clinical.read': 'Akses rekam medis',
-    'emr.save': 'Simpan AI-EMR',
+    'clinical.read': 'Medical record access',
+    'emr.save': 'Save AI-EMR',
   }
 
   return (
@@ -142,15 +142,15 @@ function CompliancePanel() {
       <Card>
         <SectionTitle
           icon={<IconShield size={20} />}
-          title="SATUSEHAT — Interoperabilitas Kemenkes"
-          subtitle="Permenkes 24/2022 · pertukaran data FHIR R4"
-          right={<Badge tone={sehat?.configured ? 'brand' : 'high'}>{sehat?.configured ? 'Terhubung' : 'Belum dikonfigurasi'}</Badge>}
+          title="SATUSEHAT — Ministry of Health Interoperability"
+          subtitle="Permenkes 24/2022 · FHIR R4 data exchange"
+          right={<Badge tone={sehat?.configured ? 'brand' : 'high'}>{sehat?.configured ? 'Connected' : 'Not configured'}</Badge>}
         />
         <div className="flex items-start gap-2 rounded-xl bg-neutral-50 p-3 text-sm text-neutral-600">
           <span className={`mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full ${sehat?.configured ? 'bg-brand' : 'bg-amber-400'}`} />
           <div>
-            <div>{sehat?.note ?? (backendEnabled ? 'Memuat status…' : 'Server tidak aktif.')}</div>
-            <div className="mt-0.5 text-[11px] text-neutral-400">Lingkungan: {sehat?.env ?? 'sandbox'} · set SATUSEHAT_CLIENT_ID/SECRET di server untuk mengaktifkan.</div>
+            <div>{sehat?.note ?? (backendEnabled ? 'Loading status…' : 'Server not active.')}</div>
+            <div className="mt-0.5 text-[11px] text-neutral-400">Environment: {sehat?.env ?? 'sandbox'} · set SATUSEHAT_CLIENT_ID/SECRET on the server to enable.</div>
           </div>
         </div>
       </Card>
@@ -158,14 +158,14 @@ function CompliancePanel() {
       <Card>
         <SectionTitle
           icon={<IconLock size={20} />}
-          title="Audit Log Akses Rekam Medis"
-          subtitle="Jejak akses & perubahan data klinis (UU PDP & Permenkes 24/2022)"
-          right={audit ? <Badge tone="neutral">{audit.length} entri</Badge> : undefined}
+          title="Medical Record Access Audit Log"
+          subtitle="Trail of access & changes to clinical data (Data Protection Law & Permenkes 24/2022)"
+          right={audit ? <Badge tone="neutral">{audit.length} entries</Badge> : undefined}
         />
         {err && <p className="text-sm text-accent">{err}</p>}
-        {!backendEnabled && <p className="text-sm text-neutral-400">Audit log memerlukan server aktif.</p>}
+        {!backendEnabled && <p className="text-sm text-neutral-400">Audit log requires an active server.</p>}
         {backendEnabled && !audit && !err && <SkeletonRows rows={4} />}
-        {audit && audit.length === 0 && <p className="text-sm text-neutral-400">Belum ada akses tercatat.</p>}
+        {audit && audit.length === 0 && <p className="text-sm text-neutral-400">No access recorded yet.</p>}
         {audit && audit.length > 0 && (
           <div className="max-h-80 space-y-1.5 overflow-y-auto">
             {audit.map((e) => (
@@ -198,18 +198,18 @@ function RealtimeStats() {
 
   const tiles = s
     ? [
-        { label: 'Total Pengguna', value: s.totalUsers },
-        { label: 'Dokter', value: s.doctors },
-        { label: 'Pasien', value: s.patients },
-        { label: 'Top-up Lunas', value: s.paidOrders },
-        { label: 'Pelanggan Push', value: s.pushSubscribers },
-        { label: 'Pendapatan', value: `Rp${s.revenueIdr.toLocaleString('id-ID')}` },
+        { label: 'Total Users', value: s.totalUsers },
+        { label: 'Doctors', value: s.doctors },
+        { label: 'Patients', value: s.patients },
+        { label: 'Paid Top-ups', value: s.paidOrders },
+        { label: 'Push Subscribers', value: s.pushSubscribers },
+        { label: 'Revenue', value: `Rp${s.revenueIdr.toLocaleString('id-ID')}` },
       ]
     : []
 
   return (
     <Card>
-      <SectionTitle icon={<IconChartUp size={20} />} title="Statistik Real-time" subtitle="Diperbarui otomatis tiap 30 detik" right={<span className="flex items-center gap-1 text-[11px] font-bold text-brand-dark"><span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> live</span>} />
+      <SectionTitle icon={<IconChartUp size={20} />} title="Real-time Statistics" subtitle="Automatically refreshed every 30 seconds" right={<span className="flex items-center gap-1 text-[11px] font-bold text-brand-dark"><span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> live</span>} />
       {!s ? (
         <SkeletonRows rows={2} />
       ) : (
@@ -223,8 +223,8 @@ function RealtimeStats() {
             ))}
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <MiniChart title="Pendaftaran (7 hari)" data={s.signups7d.map((d) => d.count)} labels={s.signups7d.map((d) => d.day.slice(5))} color="#00BF63" />
-            <MiniChart title="Pendapatan (7 hari)" data={s.revenue7d.map((d) => d.idr)} labels={s.revenue7d.map((d) => d.day.slice(5))} color="#3b82f6" money />
+            <MiniChart title="Sign-ups (7 days)" data={s.signups7d.map((d) => d.count)} labels={s.signups7d.map((d) => d.day.slice(5))} color="#00BF63" />
+            <MiniChart title="Revenue (7 days)" data={s.revenue7d.map((d) => d.idr)} labels={s.revenue7d.map((d) => d.day.slice(5))} color="#3b82f6" money />
           </div>
         </>
       )}
@@ -235,12 +235,12 @@ function RealtimeStats() {
 // AI Operator — an "AI COO" that reads live data for a business briefing, and
 // drafts engaging health content for the feed (owner publishes with one tap).
 const AI_DEPARTMENTS = [
-  { mode: 'briefing' as const, label: 'CMO — Briefing Bisnis', icon: IconChartUp },
+  { mode: 'briefing' as const, label: 'CMO — Business Briefing', icon: IconChartUp },
   { mode: 'social' as const, label: 'Social Media', icon: IconSparkle },
   { mode: 'seo' as const, label: 'Local SEO', icon: IconSparkle },
-  { mode: 'content' as const, label: 'Konten', icon: IconSparkle },
+  { mode: 'content' as const, label: 'Content', icon: IconSparkle },
   { mode: 'ads' as const, label: 'Ads', icon: IconSparkle },
-  { mode: 'ops' as const, label: 'Operasional', icon: IconSparkle },
+  { mode: 'ops' as const, label: 'Operations', icon: IconSparkle },
 ]
 
 function AIOperatorPanel() {
@@ -259,7 +259,7 @@ function AIOperatorPanel() {
       setText(r.text)
       if (r.pending) setPending(r.pending)
     } catch {
-      setErr('AI Operator gagal. Pastikan server & kunci AI aktif.')
+      setErr('AI Operator failed. Make sure the server & AI key are active.')
     } finally {
       setBusy(false)
     }
@@ -291,16 +291,16 @@ function AIOperatorPanel() {
     <Card className="border-2 border-brand/30">
       <SectionTitle
         icon={<IconSparkle size={20} />}
-        title="Tim Marketing AI — CMO, Social, SEO, Konten, Ads, Operasional"
-        subtitle="5 departemen AI di bawah satu CMO — analisa & draf real-time, ditenagai AI (gratis via server)"
+        title="AI Marketing Team — CMO, Social, SEO, Content, Ads, Operations"
+        subtitle="5 AI departments under one CMO — real-time analysis & drafting, AI-powered (free via server)"
         right={pending && (pending.topups + pending.doctors > 0)
-          ? <Badge tone="high">{pending.topups + pending.doctors} perlu tindakan</Badge>
-          : <Badge tone="brand">AI siap</Badge>}
+          ? <Badge tone="high">{pending.topups + pending.doctors} need action</Badge>
+          : <Badge tone="brand">AI ready</Badge>}
       />
       <div className="flex flex-wrap gap-2">
         {AI_DEPARTMENTS.map((d) => (
           <Button key={d.mode} variant={tab === d.mode ? 'primary' : 'outline'} onClick={() => run(d.mode)} disabled={busy}>
-            <d.icon size={16} /> {busy && tab === d.mode ? 'Memproses…' : d.label}
+            <d.icon size={16} /> {busy && tab === d.mode ? 'Processing…' : d.label}
           </Button>
         ))}
       </div>
@@ -312,15 +312,15 @@ function AIOperatorPanel() {
           <div className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">{text}</div>
           {tab === 'content' && (
             <div className="mt-3 flex flex-wrap gap-2 border-t border-neutral-100 pt-3">
-              <Button onClick={publish}><IconSend size={14} /> {posted ? 'Diposting ke Feed ✓' : 'Posting ke Feed'}</Button>
-              <Button variant="ghost" onClick={() => navigator.clipboard?.writeText(text)}>Salin</Button>
+              <Button onClick={publish}><IconSend size={14} /> {posted ? 'Posted to Feed ✓' : 'Post to Feed'}</Button>
+              <Button variant="ghost" onClick={() => navigator.clipboard?.writeText(text)}>Copy</Button>
             </div>
           )}
         </div>
       )}
       <p className="mt-2 text-[11px] text-neutral-400">
-        ⚕️ AI memberi analisa & draf. Keputusan keuangan (persetujuan top-up, verifikasi STR) tetap Anda
-        konfirmasi manual untuk keamanan.
+        ⚕️ AI provides analysis & drafts. Financial decisions (top-up approvals, STR verification) still require
+        your manual confirmation for safety.
       </p>
     </Card>
   )
@@ -335,7 +335,7 @@ function UserDirectoryPanel() {
   const [filter, setFilter] = useState<'semua' | 'transaksi' | 'berlangganan'>('semua')
   const [q, setQ] = useState('')
 
-  function load() { api.ownerUsers().then(setRows).catch(() => setErr('Gagal memuat (butuh akun Owner).')) }
+  function load() { api.ownerUsers().then(setRows).catch(() => setErr('Failed to load (requires an Owner account).')) }
   useEffect(load, [])
 
   const filtered = (rows ?? []).filter((r) => {
@@ -349,26 +349,26 @@ function UserDirectoryPanel() {
     <Card className="border-2 border-brand/30">
       <SectionTitle
         icon={<IconUsers size={20} />}
-        title="Direktori Pengguna"
-        subtitle="Semua akun yang mendaftar, bertransaksi, & berlangganan"
-        right={<Badge tone="brand">{rows?.length ?? 0} akun</Badge>}
+        title="User Directory"
+        subtitle="All accounts that signed up, transacted, & subscribed"
+        right={<Badge tone="brand">{rows?.length ?? 0} accounts</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={3} />}
       {rows && (
         <>
           <div className="flex flex-wrap items-center gap-2">
-            <input className={inputClass} placeholder="Cari email/nama…" value={q} onChange={(e) => setQ(e.target.value)} />
+            <input className={inputClass} placeholder="Search email/name…" value={q} onChange={(e) => setQ(e.target.value)} />
             <div className="flex gap-1.5">
               {(['semua', 'transaksi', 'berlangganan'] as const).map((f) => (
                 <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${filter === f ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-                  {f === 'semua' ? 'Semua' : f === 'transaksi' ? 'Sudah bertransaksi' : 'Berlangganan aktif'}
+                  {f === 'semua' ? 'All' : f === 'transaksi' ? 'Has transacted' : 'Active subscription'}
                 </button>
               ))}
             </div>
           </div>
           <div className="mt-3 space-y-2">
-            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-400">Tidak ada akun sesuai filter.</p>}
+            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-400">No accounts match the filter.</p>}
             {filtered.map((r) => (
               <div key={r.id} className="rounded-xl border border-neutral-100 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -379,16 +379,16 @@ function UserDirectoryPanel() {
                   <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
-                  <span>Daftar {new Date(r.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  <span>Saldo {r.walletBalance} PNC</span>
-                  <span>{r.paidOrdersCount} transaksi lunas{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('id-ID')})` : ''}</span>
+                  <span>Joined {new Date(r.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span>Balance {r.walletBalance} PNC</span>
+                  <span>{r.paidOrdersCount} paid transactions{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('id-ID')})` : ''}</span>
                 </div>
                 {(r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked) && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {r.subscriptions.longevityActive && <Badge tone="brand">Longevity aktif</Badge>}
-                    {r.subscriptions.chronicLifetime && <Badge tone="brand">Kronis Lifetime</Badge>}
-                    {r.subscriptions.chronicActive && !r.subscriptions.chronicLifetime && <Badge tone="brand">Kronis aktif</Badge>}
-                    {r.subscriptions.clinicalCalcUnlocked && <Badge tone="brand">Kalkulator Klinis terbuka</Badge>}
+                    {r.subscriptions.longevityActive && <Badge tone="brand">Longevity active</Badge>}
+                    {r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic Lifetime</Badge>}
+                    {r.subscriptions.chronicActive && !r.subscriptions.chronicLifetime && <Badge tone="brand">Chronic active</Badge>}
+                    {r.subscriptions.clinicalCalcUnlocked && <Badge tone="brand">Clinical Calculator unlocked</Badge>}
                   </div>
                 )}
               </div>

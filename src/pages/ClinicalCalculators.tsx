@@ -31,18 +31,18 @@ function SegButtons<T extends string | number>({ value, onChange, options }: { v
 /* ══════════════════ APGAR ══════════════════ */
 function ApgarCalc() {
   const criteria: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
-    { key: 'appearance', label: 'Appearance (warna kulit)', opts: [{ v: 0, l: 'Biru/pucat seluruh tubuh' }, { v: 1, l: 'Tubuh merah, ekstremitas biru' }, { v: 2, l: 'Merah muda seluruhnya' }] },
-    { key: 'pulse', label: 'Pulse (denyut jantung)', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: '<100x/menit' }, { v: 2, l: '≥100x/menit' }] },
-    { key: 'grimace', label: 'Grimace (respons refleks)', opts: [{ v: 0, l: 'Tidak ada respons' }, { v: 1, l: 'Meringis/grimace' }, { v: 2, l: 'Menangis/batuk/bersin kuat' }] },
-    { key: 'activity', label: 'Activity (tonus otot)', opts: [{ v: 0, l: 'Lemas' }, { v: 1, l: 'Sedikit fleksi ekstremitas' }, { v: 2, l: 'Gerak aktif' }] },
-    { key: 'respiration', label: 'Respiration (napas)', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: 'Lambat/tidak teratur' }, { v: 2, l: 'Menangis kuat' }] },
+    { key: 'appearance', label: 'Appearance (skin color)', opts: [{ v: 0, l: 'Blue/pale all over' }, { v: 1, l: 'Body pink, extremities blue' }, { v: 2, l: 'Pink all over' }] },
+    { key: 'pulse', label: 'Pulse (heart rate)', opts: [{ v: 0, l: 'Absent' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
+    { key: 'grimace', label: 'Grimace (reflex irritability)', opts: [{ v: 0, l: 'No response' }, { v: 1, l: 'Grimace' }, { v: 2, l: 'Strong cry/cough/sneeze' }] },
+    { key: 'activity', label: 'Activity (muscle tone)', opts: [{ v: 0, l: 'Limp' }, { v: 1, l: 'Some flexion of extremities' }, { v: 2, l: 'Active movement' }] },
+    { key: 'respiration', label: 'Respiration (breathing)', opts: [{ v: 0, l: 'Absent' }, { v: 1, l: 'Slow/irregular' }, { v: 2, l: 'Strong cry' }] },
   ]
   const [v, setV] = useState<Record<string, number>>({ appearance: 2, pulse: 2, grimace: 2, activity: 2, respiration: 2 })
   const total = Object.values(v).reduce((a, b) => a + b, 0)
-  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Perlu bantuan', tone: 'low' as const } : { l: 'Depresi berat', tone: 'critical' as const }
+  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Needs assistance', tone: 'low' as const } : { l: 'Severe depression', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Nilai pada menit ke-1 dan ke-5 setelah lahir (Apgar, 1953)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Scored at 1 and 5 minutes after birth (Apgar, 1953)" />
       <div className="space-y-3">
         {criteria.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -55,7 +55,7 @@ function ApgarCalc() {
           <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
-        <p className="max-w-[55%] text-right text-[10px] text-neutral-400">7-10 normal · 4-6 perlu bantuan · 0-3 resusitasi segera. Ulangi tiap 5 menit bila &lt;7.</p>
+        <p className="max-w-[55%] text-right text-[10px] text-neutral-400">7-10 normal · 4-6 needs assistance · 0-3 immediate resuscitation. Repeat every 5 minutes if &lt;7.</p>
       </div>
     </Card>
   )
@@ -63,10 +63,10 @@ function ApgarCalc() {
 
 /* ══════════════════ GCS ══════════════════ */
 function GcsCalc() {
-  const eye = [{ v: 1, l: 'Tidak buka' }, { v: 2, l: 'Nyeri' }, { v: 3, l: 'Suara' }, { v: 4, l: 'Spontan' }]
-  const verbal = [{ v: 1, l: 'Tidak ada' }, { v: 2, l: 'Suara tak jelas' }, { v: 3, l: 'Kata tak sesuai' }, { v: 4, l: 'Bingung' }, { v: 5, l: 'Orientasi baik' }]
-  const motor = [{ v: 1, l: 'Tidak ada' }, { v: 2, l: 'Ekstensi (deserebrasi)' }, { v: 3, l: 'Fleksi (dekortikasi)' }, { v: 4, l: 'Menghindar nyeri' }, { v: 5, l: 'Lokalisasi nyeri' }, { v: 6, l: 'Mengikuti perintah' }]
-  const pupilOpts = [{ v: 0, l: 'Kedua reaktif' }, { v: 1, l: 'Satu tak reaktif' }, { v: 2, l: 'Keduanya tak reaktif' }]
+  const eye = [{ v: 1, l: 'No opening' }, { v: 2, l: 'To pain' }, { v: 3, l: 'To sound' }, { v: 4, l: 'Spontaneous' }]
+  const verbal = [{ v: 1, l: 'None' }, { v: 2, l: 'Incomprehensible sounds' }, { v: 3, l: 'Inappropriate words' }, { v: 4, l: 'Confused' }, { v: 5, l: 'Oriented' }]
+  const motor = [{ v: 1, l: 'None' }, { v: 2, l: 'Extension (decerebrate)' }, { v: 3, l: 'Flexion (decorticate)' }, { v: 4, l: 'Withdraws from pain' }, { v: 5, l: 'Localizes pain' }, { v: 6, l: 'Obeys commands' }]
+  const pupilOpts = [{ v: 0, l: 'Both reactive' }, { v: 1, l: 'One unreactive' }, { v: 2, l: 'Both unreactive' }]
   const [e, setE] = useState(4); const [v, setV] = useState(5); const [m, setM] = useState(6)
   const [pupil, setPupil] = useState(0)
   const total = e + v + m
@@ -75,7 +75,7 @@ function GcsCalc() {
   // total, giving better mortality/outcome discrimination in TBI than GCS
   // alone, especially at the severe end of the scale.
   const gcsP = Math.max(1, total - pupil)
-  const interp = total >= 13 ? { l: 'Cedera ringan', tone: 'normal' as const } : total >= 9 ? { l: 'Cedera sedang', tone: 'low' as const } : { l: 'Cedera berat — proteksi jalan napas', tone: 'critical' as const }
+  const interp = total >= 13 ? { l: 'Mild injury', tone: 'normal' as const } : total >= 9 ? { l: 'Moderate injury', tone: 'low' as const } : { l: 'Severe injury — airway protection indicated', tone: 'critical' as const }
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (Improved GCS)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan et al., Lancet Neurol 2018" />
@@ -83,7 +83,7 @@ function GcsCalc() {
         <Field label="Eye Opening (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
         <Field label="Verbal Response (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
         <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
-        <Field label="Reaktivitas Pupil"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
+        <Field label="Pupil Reactivity"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3">
@@ -92,10 +92,10 @@ function GcsCalc() {
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
           <div className="text-xl font-black text-ink">{gcsP}<span className="text-sm font-semibold text-neutral-400">/15 (GCS-P)</span></div>
-          <p className="mt-1 text-[10px] text-neutral-400">GCS-P = GCS total − skor pupil (0/1/2)</p>
+          <p className="mt-1 text-[10px] text-neutral-400">GCS-P = GCS total − pupil score (0/1/2)</p>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">13-15 ringan · 9-12 sedang · ≤8 berat (indikasi intubasi proteksi jalan napas). GCS-Pupil (GCS-P) menggabungkan reaktivitas pupil untuk stratifikasi mortalitas/prognosis cedera otak traumatik yang lebih tajam dibanding GCS saja, terutama pada skor rendah.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</p>
     </Card>
   )
 }
@@ -109,10 +109,10 @@ function Curb65Calc() {
   const [age65, setAge65] = useState(false)
   const total = [confusion, urea, rr, bp, age65].filter(Boolean).length
   const interp = total <= 1
-    ? { l: 'Risiko rendah', tone: 'normal' as const, note: 'Umumnya aman untuk rawat jalan.' }
+    ? { l: 'Low risk', tone: 'normal' as const, note: 'Generally safe for outpatient treatment.' }
     : total === 2
-    ? { l: 'Risiko sedang', tone: 'low' as const, note: 'Pertimbangkan rawat inap singkat/pengawasan ketat.' }
-    : { l: 'Risiko tinggi', tone: 'critical' as const, note: 'Rawat inap, pertimbangkan ICU bila skor 4-5.' }
+    ? { l: 'Moderate risk', tone: 'low' as const, note: 'Consider short admission/close monitoring.' }
+    : { l: 'High risk', tone: 'critical' as const, note: 'Admit; consider ICU if score is 4-5.' }
   const Row = ({ label, sub, checked, onChange }: { label: string; sub: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -121,13 +121,13 @@ function Curb65Calc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Stratifikasi keparahan pneumonia komunitas (Lim et al. 2003, British Thoracic Society)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Severity stratification for community-acquired pneumonia (Lim et al. 2003, British Thoracic Society)" />
       <div className="space-y-2">
-        <Row label="Confusion" sub="Kebingungan akut/disorientasi baru" checked={confusion} onChange={setConfusion} />
+        <Row label="Confusion" sub="Acute confusion/new disorientation" checked={confusion} onChange={setConfusion} />
         <Row label="Urea" sub="BUN >19 mg/dL (urea >7 mmol/L)" checked={urea} onChange={setUrea} />
-        <Row label="Respiratory rate" sub="Laju napas ≥30x/menit" checked={rr} onChange={setRr} />
-        <Row label="Blood pressure" sub="Sistolik <90 atau diastolik ≤60 mmHg" checked={bp} onChange={setBp} />
-        <Row label="Age ≥65" sub="Usia 65 tahun atau lebih" checked={age65} onChange={setAge65} />
+        <Row label="Respiratory rate" sub="Respiratory rate ≥30 breaths/min" checked={rr} onChange={setRr} />
+        <Row label="Blood pressure" sub="Systolic <90 or diastolic ≤60 mmHg" checked={bp} onChange={setBp} />
+        <Row label="Age ≥65" sub="Age 65 years or older" checked={age65} onChange={setAge65} />
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -145,8 +145,8 @@ function BishopCalc() {
   const dilationOpts = [{ v: 0, l: '0 cm' }, { v: 1, l: '1-2 cm' }, { v: 2, l: '3-4 cm' }, { v: 3, l: '≥5 cm' }]
   const effacementOpts = [{ v: 0, l: '0-30%' }, { v: 1, l: '40-50%' }, { v: 2, l: '60-70%' }, { v: 3, l: '≥80%' }]
   const stationOpts = [{ v: 0, l: '-3' }, { v: 1, l: '-2' }, { v: 2, l: '-1/0' }, { v: 3, l: '+1/+2' }]
-  const consistencyOpts = [{ v: 0, l: 'Keras' }, { v: 1, l: 'Sedang' }, { v: 2, l: 'Lunak' }]
-  const positionOpts = [{ v: 0, l: 'Posterior' }, { v: 1, l: 'Mid-posisi' }, { v: 2, l: 'Anterior' }]
+  const consistencyOpts = [{ v: 0, l: 'Firm' }, { v: 1, l: 'Medium' }, { v: 2, l: 'Soft' }]
+  const positionOpts = [{ v: 0, l: 'Posterior' }, { v: 1, l: 'Mid-position' }, { v: 2, l: 'Anterior' }]
   const [dilation, setDilation] = useState(0)
   const [effacement, setEffacement] = useState(0)
   const [station, setStation] = useState(0)
@@ -154,19 +154,19 @@ function BishopCalc() {
   const [position, setPosition] = useState(0)
   const total = dilation + effacement + station + consistency + position
   const interp = total >= 8
-    ? { l: 'Matang', tone: 'normal' as const, note: 'Peluang induksi berhasil tinggi, mirip persalinan spontan.' }
+    ? { l: 'Favorable', tone: 'normal' as const, note: 'High likelihood of successful induction, similar to spontaneous labor.' }
     : total >= 6
-    ? { l: 'Cukup matang', tone: 'low' as const, note: 'Induksi umumnya berhasil.' }
-    : { l: 'Belum matang', tone: 'critical' as const, note: 'Pertimbangkan agen pematangan serviks (mis. prostaglandin) sebelum induksi.' }
+    ? { l: 'Moderately favorable', tone: 'low' as const, note: 'Induction generally successful.' }
+    : { l: 'Unfavorable', tone: 'critical' as const, note: 'Consider cervical ripening agents (e.g. prostaglandins) before induction.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Cervical readiness for labor induction (Bishop, 1964)" />
       <div className="space-y-3">
-        <Field label="Dilatasi serviks"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
-        <Field label="Effacement (penipisan)"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
-        <Field label="Station (penurunan kepala)"><SegButtons value={station} onChange={setStation} options={stationOpts} /></Field>
-        <Field label="Konsistensi serviks"><SegButtons value={consistency} onChange={setConsistency} options={consistencyOpts} /></Field>
-        <Field label="Posisi serviks"><SegButtons value={position} onChange={setPosition} options={positionOpts} /></Field>
+        <Field label="Cervical dilation"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
+        <Field label="Effacement"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
+        <Field label="Station (fetal descent)"><SegButtons value={station} onChange={setStation} options={stationOpts} /></Field>
+        <Field label="Cervical consistency"><SegButtons value={consistency} onChange={setConsistency} options={consistencyOpts} /></Field>
+        <Field label="Cervical position"><SegButtons value={position} onChange={setPosition} options={positionOpts} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -193,22 +193,22 @@ function CkdEpiCalc() {
     return 142 * minTerm * maxTerm * (0.9938 ** age) * sexMult
   }
   const result = egfr()
-  const stage = result >= 90 ? 'G1 — Normal/tinggi' : result >= 60 ? 'G2 — Penurunan ringan' : result >= 45 ? 'G3a — Penurunan ringan-sedang' : result >= 30 ? 'G3b — Penurunan sedang-berat' : result >= 15 ? 'G4 — Penurunan berat' : 'G5 — Gagal ginjal'
+  const stage = result >= 90 ? 'G1 — Normal/high' : result >= 60 ? 'G2 — Mildly decreased' : result >= 45 ? 'G3a — Mild-moderate decrease' : result >= 30 ? 'G3b — Moderate-severe decrease' : result >= 15 ? 'G4 — Severely decreased' : 'G5 — Kidney failure'
   const tone = result >= 60 ? 'normal' as const : result >= 30 ? 'low' as const : 'critical' as const
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CKD-EPI 2021 (eGFR)" subtitle="Persamaan bebas-ras terbaru (Inker et al., NEJM 2021)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CKD-EPI 2021 (eGFR)" subtitle="Latest race-free equation (Inker et al., NEJM 2021)" />
       <div className="grid grid-cols-3 gap-2">
-        <Field label="Kreatinin (mg/dL)"><input className={inputClass} type="number" step="0.01" value={scr} onChange={(e) => setScr(+e.target.value)} /></Field>
-        <Field label="Usia (tahun)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
-        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Pria' }, { v: 'F', l: 'Wanita' }]} /></Field>
+        <Field label="Creatinine (mg/dL)"><input className={inputClass} type="number" step="0.01" value={scr} onChange={(e) => setScr(+e.target.value)} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
         <div>
           <div className="text-2xl font-black text-ink">{result.toFixed(0)}<span className="text-sm font-semibold text-neutral-400"> mL/min/1.73m²</span></div>
           <Badge tone={tone}>{stage}</Badge>
         </div>
-        <p className="max-w-[40%] text-right text-[10px] text-neutral-400">Persamaan 2021 menghapus koefisien ras yang dipakai versi sebelumnya (CKD-EPI 2009/2012).</p>
+        <p className="max-w-[40%] text-right text-[10px] text-neutral-400">The 2021 equation removes the race coefficient used in earlier versions (CKD-EPI 2009/2012).</p>
       </div>
     </Card>
   )
