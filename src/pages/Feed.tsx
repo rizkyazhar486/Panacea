@@ -1971,11 +1971,13 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifikasi aktif</span>
             : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Aktifkan Notifikasi</button>}
         </div>
-        <div className="flex items-center gap-2">
-          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' flex-1 text-xs'} />
-          <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' w-24 text-xs'} />
-          <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' min-w-0 text-xs sm:flex-1'} />
+          <div className="flex items-center gap-2">
+            <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' w-24 shrink-0 text-xs'} />
+            <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
+              className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
+          </div>
         </div>
         {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">Belum ada pengingat. Tambahkan satu di atas.</p>}
         {state.medReminders.map((m) => {
