@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
 import { PrefillBadge } from '../components/HealthSnapshot'
 import { hasHealth, pushBiometrics } from '../lib/profile'
+import { ShareStatCard } from '../components/ShareStatCard'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -173,6 +174,17 @@ export function Longevity() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       {/* Hero */}
+      {score != null && bAge != null && (
+        <div className="flex justify-end">
+          <ShareStatCard
+            activity="❤️ Pusat Longevity"
+            metricLabel="Longevity Score"
+            metricValue={String(score)}
+            badge={delta != null ? (delta <= 0 ? `${Math.abs(delta).toFixed(1)} thn lebih muda` : `${delta.toFixed(1)} thn lebih tua`) : undefined}
+            secondary={`Usia Biologis (est.) ${bAge} thn vs usia kronologis ${d.age}`}
+          />
+        </div>
+      )}
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Pusat Longevity" subtitle="Jam tangan menilai harimu — halaman ini menilai dekademu" />
         <div className="mt-2 flex items-center justify-around">
