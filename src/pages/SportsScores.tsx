@@ -27,6 +27,22 @@ const STATE_BADGE: Record<NormalizedEvent['state'], { label: string; tone: 'bran
   pre: { label: 'Akan Datang', tone: 'brand' },
 }
 
+// Real team crest from the source API (ESPN) when available; falls back to a
+// monogram badge (initials) if there's no logo URL or it fails to load, so a
+// broken/missing image never leaves a blank gap.
+function TeamLogo({ src, alt }: { src?: string; alt: string }) {
+  const [broken, setBroken] = useState(false)
+  const initials = alt.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+  if (!src || broken) {
+    return (
+      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-100 text-[9px] font-black text-neutral-500">
+        {initials}
+      </span>
+    )
+  }
+  return <img src={src} alt="" className="h-6 w-6 shrink-0 rounded-full object-contain" onError={() => setBroken(true)} />
+}
+
 export function SportsScores() {
   const [leagues, setLeagues] = useState<{ id: string; label: string }[]>([])
   const [league, setLeague] = useState<string>('epl')
@@ -129,11 +145,13 @@ export function SportsScores() {
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <button onClick={() => toggleFav(ev.home.name)} className="flex flex-1 items-center gap-2 text-left">
                     <span className={`text-sm ${isFav(ev.home.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <TeamLogo src={ev.home.logo} alt={ev.home.name} />
                     <span className="truncate text-sm font-semibold text-ink">{ev.home.name}</span>
                   </button>
                   <span className="shrink-0 text-lg font-black text-ink">{ev.home.score ?? '-'} : {ev.away.score ?? '-'}</span>
                   <button onClick={() => toggleFav(ev.away.name)} className="flex flex-1 items-center justify-end gap-2 text-right">
                     <span className="truncate text-sm font-semibold text-ink">{ev.away.name}</span>
+                    <TeamLogo src={ev.away.logo} alt={ev.away.name} />
                     <span className={`text-sm ${isFav(ev.away.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
                   </button>
                 </div>
