@@ -57,7 +57,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
     pc.onicecandidate = (e) => { if (e.candidate) wsSend({ type: 'rtc-ice', candidate: e.candidate }) }
     pc.ontrack = (e) => { if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0] }
     pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') setCallError('Koneksi panggilan terputus.')
+      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') setCallError('The call connection was lost.')
     }
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     localStreamRef.current = stream
@@ -75,7 +75,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
       await pc.setLocalDescription(offer)
       wsSend({ type: 'rtc-offer', sdp: offer })
     } catch {
-      setCallError('Tidak bisa mengakses kamera/mikrofon. Periksa izin browser.')
+      setCallError('Unable to access camera/microphone. Check your browser permissions.')
       endCall()
     }
   }
@@ -117,7 +117,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
         endCall()
       }
     } catch {
-      setCallError('Gagal memproses sinyal panggilan.')
+      setCallError('Failed to process the call signal.')
     }
   }
 
@@ -137,7 +137,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
         else {
           setLines((l) => [...l, m])
           if (m.type === 'msg' && m.from && document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-            try { new Notification(`💬 Pesan dari ${m.from}`, { body: m.text, icon: '/icon-192.png', tag: 'consult-' + room }) } catch { /* ignore */ }
+            try { new Notification(`💬 Message from ${m.from}`, { body: m.text, icon: '/icon-192.png', tag: 'consult-' + room }) } catch { /* ignore */ }
           }
         }
       } catch {
@@ -169,10 +169,10 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
     <div className="overflow-hidden rounded-2xl border border-neutral-200">
       <div className="flex items-center gap-2 bg-ink px-4 py-2.5 text-white">
         <IconStethoscope size={18} className="text-brand" />
-        <span className="text-sm font-bold">{title ?? `Ruang: ${room}`}</span>
+        <span className="text-sm font-bold">{title ?? `Room: ${room}`}</span>
         <span className="ml-auto flex items-center gap-1 text-[11px] text-white/70">
           <span className={`h-2 w-2 rounded-full ${connected ? 'bg-brand vital-dot' : 'bg-neutral-500'}`} />
-          {connected ? `${count} online` : 'menyambung…'}
+          {connected ? `${count} online` : 'connecting…'}
         </span>
       </div>
 
@@ -192,7 +192,7 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
       {callError && <div className="bg-red-50 px-3 py-2 text-[11px] text-red-600">{callError}</div>}
 
       <div ref={scrollRef} className="h-56 space-y-2 overflow-y-auto bg-neutral-50 p-3">
-        {lines.length === 0 && <p className="text-center text-xs text-neutral-400">Mulai percakapan…</p>}
+        {lines.length === 0 && <p className="text-center text-xs text-neutral-400">Start the conversation…</p>}
         {lines.map((l, i) =>
           l.type === 'system' ? (
             <div key={i} className="text-center text-[11px] text-neutral-400">{l.text}</div>
@@ -214,10 +214,10 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
-          placeholder="Ketik pesan…"
+          placeholder="Type a message…"
           className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand"
         />
-        <Button onClick={send} disabled={!connected}>Kirim</Button>
+        <Button onClick={send} disabled={!connected}>Send</Button>
       </div>
     </div>
   )

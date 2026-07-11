@@ -7,20 +7,20 @@ import { IconDownload, IconCheck } from './icons'
 // JS for the fully local (localStorage-only) Kebugaran pages so they open
 // instantly with zero network the next time, even in airplane mode.
 const OFFLINE_PAGES: { label: string; imp: () => Promise<unknown> }[] = [
-  { label: 'Atlet', imp: () => import('../pages/Athlete') },
-  { label: 'Lab Performa', imp: () => import('../pages/PerformanceLab') },
-  { label: 'Program AI', imp: () => import('../pages/TrainingPlan') },
-  { label: 'Komposisi Tubuh', imp: () => import('../pages/BodyComposition') },
-  { label: 'Penilaian Awal', imp: () => import('../pages/InitialAssessment') },
-  { label: 'Sains & KPI', imp: () => import('../pages/SportsScience') },
-  { label: 'Tes Fisik', imp: () => import('../pages/FitnessTest') },
-  { label: 'Log & Statistik', imp: () => import('../pages/Logs') },
+  { label: 'Athlete', imp: () => import('../pages/Athlete') },
+  { label: 'Performance Lab', imp: () => import('../pages/PerformanceLab') },
+  { label: 'AI Program', imp: () => import('../pages/TrainingPlan') },
+  { label: 'Body Composition', imp: () => import('../pages/BodyComposition') },
+  { label: 'Initial Assessment', imp: () => import('../pages/InitialAssessment') },
+  { label: 'Science & KPIs', imp: () => import('../pages/SportsScience') },
+  { label: 'Fitness Test', imp: () => import('../pages/FitnessTest') },
+  { label: 'Logs & Stats', imp: () => import('../pages/Logs') },
 ]
 const KEY = 'pmd_offline_ready_v1'
 
 function fmtWhen(iso: string) {
   const d = new Date(iso)
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
 
 export function OfflineReady() {
@@ -42,23 +42,23 @@ export function OfflineReady() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconDownload size={20} />} title="Mode Offline" subtitle="Simpan fitur Kebugaran di HP — tetap jalan tanpa internet" />
+      <SectionTitle icon={<IconDownload size={20} />} title="Offline Mode" subtitle="Save the Fitness features to your phone — they keep working without internet" />
 
       {busy ? (
         <div className="mt-1">
           <div className="h-2.5 w-full overflow-hidden rounded-full bg-neutral-100">
             <div className="h-full rounded-full bg-brand transition-all duration-300" style={{ width: `${(done / OFFLINE_PAGES.length) * 100}%` }} />
           </div>
-          <p className="mt-2 text-xs text-neutral-500">Menyiapkan… {done}/{OFFLINE_PAGES.length}</p>
+          <p className="mt-2 text-xs text-neutral-500">Preparing… {done}/{OFFLINE_PAGES.length}</p>
         </div>
       ) : (
         <>
           <Button onClick={prepare} className="w-full">
-            <IconDownload size={16} /> {readyAt ? 'Perbarui Data Offline' : 'Siapkan Mode Offline'}
+            <IconDownload size={16} /> {readyAt ? 'Update Offline Data' : 'Set Up Offline Mode'}
           </Button>
           {readyAt && (
             <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-brand-dark">
-              <IconCheck size={14} /> Siap dipakai offline — terakhir disiapkan {fmtWhen(readyAt)}
+              <IconCheck size={14} /> Ready to use offline — last prepared {fmtWhen(readyAt)}
             </p>
           )}
         </>
@@ -66,16 +66,16 @@ export function OfflineReady() {
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl bg-brand-50 p-3">
-          <div className="text-xs font-bold text-brand-dark">✓ Jalan tanpa internet</div>
+          <div className="text-xs font-bold text-brand-dark">✓ Works without internet</div>
           <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
-            Atlet, Lab Performa, Program AI, Komposisi Tubuh, Penilaian Awal, Sains & KPI, Tes Fisik, Log & Statistik —
-            semua data tersimpan langsung di HP Anda.
+            Athlete, Performance Lab, AI Program, Body Composition, Initial Assessment, Science & KPIs, Fitness Test, Logs & Stats —
+            all data is stored directly on your phone.
           </p>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-xs font-bold text-neutral-500">○ Perlu internet</div>
+          <div className="text-xs font-bold text-neutral-500">○ Needs internet</div>
           <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-            Beranda (postingan), Community, Pesan, Konsultasi AI, Marketplace & fitur foto AI — karena perlu terhubung ke server.
+            Home (posts), Community, Messages, AI Consultation, Marketplace & AI photo features — because they need a server connection.
           </p>
         </div>
       </div>

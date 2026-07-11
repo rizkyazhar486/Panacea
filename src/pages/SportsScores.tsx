@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Card, SectionTitle, Badge, Button } from '../components/ui'
+import { Card, SectionTitle, Badge, Button, inputClass } from '../components/ui'
 import { IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled } from '../lib/api'
 
@@ -101,15 +101,19 @@ export function SportsScores() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Live Scores" subtitle="Football, NBA, NFL, MLB, NHL, UFC, tennis, F1, MotoGP — free sources" />
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {[...leagues, { id: 'f1', label: 'F1' }, { id: 'motogp', label: 'MotoGP' }].map((l) => (
-            <button key={l.id} onClick={() => setLeague(l.id)}
-              className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition ${league === l.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
-              {l.label}
-            </button>
-          ))}
-        </div>
+        <SectionTitle icon={<IconActivity size={20} />} title="Live Scores" subtitle="Football, NBA, NFL, MLB, NHL, UFC, tennis, cricket, F1, MotoGP — free sources" />
+        <label className="mt-3 block">
+          <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-neutral-400">Choose league / sport</span>
+          <select
+            value={league}
+            onChange={(e) => setLeague(e.target.value)}
+            className={inputClass + ' cursor-pointer font-semibold'}
+          >
+            {[...leagues, { id: 'f1', label: 'F1' }, { id: 'motogp', label: 'MotoGP' }].map((l) => (
+              <option key={l.id} value={l.id}>{l.label}</option>
+            ))}
+          </select>
+        </label>
       </Card>
 
       {loading && <div className="py-8 text-center text-sm text-neutral-400">Loading…</div>}
@@ -174,16 +178,16 @@ export function SportsScores() {
                   <Badge tone={badge.tone}>{ev.state === 'in' ? `🔴 ${ev.statusDetail || badge.label}` : badge.label}</Badge>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <button onClick={() => toggleFav(ev.home.name)} className="flex flex-1 items-center gap-2 text-left">
-                    <span className={`text-sm ${isFav(ev.home.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                  <button onClick={() => toggleFav(ev.home.name)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                    <span className={`shrink-0 text-sm ${isFav(ev.home.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
                     <TeamLogo src={ev.home.logo} alt={ev.home.name} />
                     <span className="truncate text-sm font-semibold text-ink">{ev.home.name}</span>
                   </button>
-                  <span className="shrink-0 text-lg font-black text-ink">{ev.home.score ?? '-'} : {ev.away.score ?? '-'}</span>
-                  <button onClick={() => toggleFav(ev.away.name)} className="flex flex-1 items-center justify-end gap-2 text-right">
+                  <span className="shrink-0 whitespace-nowrap px-1 text-lg font-black text-ink">{ev.home.score ?? '-'} : {ev.away.score ?? '-'}</span>
+                  <button onClick={() => toggleFav(ev.away.name)} className="flex min-w-0 flex-1 items-center justify-end gap-2 text-right">
                     <span className="truncate text-sm font-semibold text-ink">{ev.away.name}</span>
                     <TeamLogo src={ev.away.logo} alt={ev.away.name} />
-                    <span className={`text-sm ${isFav(ev.away.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <span className={`shrink-0 text-sm ${isFav(ev.away.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
                   </button>
                 </div>
               </Card>

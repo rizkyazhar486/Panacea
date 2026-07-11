@@ -41,7 +41,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
 
   const data = useMemo(() => history.slice(-7).map((s) => ({
     ...s,
-    label: new Date(s.date).toLocaleDateString('id-ID', { weekday: 'short' }),
+    label: new Date(s.date).toLocaleDateString('en-US', { weekday: 'short' }),
   })), [history])
 
   const latest = data[data.length - 1]
@@ -56,8 +56,8 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
     <div className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-extrabold text-ink">📈 Tren Kesehatan 7 Hari</h3>
-          <p className="text-[11px] text-neutral-500">BMI · BMR · VO₂Max — tercatat otomatis tiap kunjungan</p>
+          <h3 className="text-sm font-extrabold text-ink">📈 7-Day Health Trends</h3>
+          <p className="text-[11px] text-neutral-500">BMI · BMR · VO₂Max — recorded automatically on each visit</p>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
 
       {data.length < 2 ? (
         <p className="mt-4 rounded-xl bg-neutral-50 px-3 py-4 text-center text-[12px] text-neutral-400">
-          Grafik tren akan terisi setiap hari Anda berkunjung. Data hari ini sudah tercatat ✓
+          The trend chart fills in each day you visit. Today's data has already been recorded ✓
         </p>
       ) : (
         <div className="mt-4 space-y-4">
@@ -81,7 +81,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
             <div key={m.key}>
               <div className="mb-1 flex items-center justify-between text-[11px]">
                 <span className="font-bold" style={{ color: m.color }}>{m.name}</span>
-                <span className="text-neutral-400">Terbaru: <b style={{ color: m.color }}>{m.val}{m.unit}</b></span>
+                <span className="text-neutral-400">Latest: <b style={{ color: m.color }}>{m.val}{m.unit}</b></span>
               </div>
               <ResponsiveContainer width="100%" height={90}>
                 <LineChart data={data} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>

@@ -103,20 +103,20 @@ export function BodyDiagram({
                   className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
                   style={{ background: STATUS[sel.status].fill }}
                 >
-                  {sel.status === 'normal' ? 'Normal' : sel.status === 'abnormal' ? 'Temuan (+)' : 'Belum diperiksa'}
+                  {sel.status === 'normal' ? 'Normal' : sel.status === 'abnormal' ? 'Finding (+)' : 'Not examined'}
                 </span>
               </div>
-              <p className="text-neutral-600">{sel.note || 'Belum ada catatan untuk sistem ini.'}</p>
+              <p className="text-neutral-600">{sel.note || 'No notes recorded for this system yet.'}</p>
             </>
           ) : (
-            <p className="text-neutral-400">Pilih sistem pada gambar untuk melihat temuan.</p>
+            <p className="text-neutral-400">Select a system on the diagram to view findings.</p>
           )}
         </div>
 
         <div className="mt-2 flex gap-3 text-[11px] text-neutral-400">
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-brand" /> Normal</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accent" /> Abnormal</span>
-          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-neutral-300" /> Belum diperiksa</span>
+          <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-neutral-300" /> Not examined</span>
         </div>
       </div>
     </div>

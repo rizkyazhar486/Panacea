@@ -11,7 +11,7 @@ export function ContactService() {
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       from: 'admin',
-      text: 'Halo, ini Layanan Panaceamed (AI + tim manusia). Sampaikan keluhan atau kendala Anda — laporan ini membantu kami memperbaiki sistem & pelayanan.',
+      text: 'Hello, this is Panaceamed Support (AI + human team). Tell us about your complaint or issue — your report helps us improve our system and service.',
     },
   ])
 
@@ -20,9 +20,9 @@ export function ContactService() {
     if (!t) return
     const next: Msg[] = [...msgs, { from: 'user', text: t }]
     const reply =
-      'Terima kasih, keluhan Anda tercatat (tiket #' +
+      'Thank you, your complaint has been recorded (ticket #' +
       Math.floor(1000 + Math.random() * 9000) +
-      '). Untuk penjadwalan operasi/tindakan, tim admin akan menghubungi Anda. Ada lagi yang bisa kami bantu?'
+      '). For scheduling surgery or procedures, our admin team will contact you. Is there anything else we can help with?'
     setMsgs([...next, { from: 'admin', text: reply }])
     setInput('')
   }
@@ -33,7 +33,7 @@ export function ContactService() {
         onClick={() => setOpen((o) => !o)}
         className="group fixed bottom-28 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:bottom-5 lg:left-auto lg:right-5 lg:h-14 lg:w-14"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 26px -6px rgba(0,191,99,0.55)' }}
-        title="Layanan / Contact Service"
+        title="Support / Contact Service"
         aria-label="Contact Service"
       >
         <span className="absolute inset-0 rounded-full bg-brand/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:animate-ping" />
@@ -44,7 +44,7 @@ export function ContactService() {
         <div className="fixed bottom-44 left-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 lg:bottom-24 lg:left-auto lg:right-5">
           <div className="flex items-center gap-2 bg-ink px-4 py-3 text-white">
             <IconPhone size={18} className="text-brand" />
-            <div className="text-sm font-bold">Layanan Panaceamed</div>
+            <div className="text-sm font-bold">Panaceamed Support</div>
             <span className="ml-auto flex items-center gap-1 text-[10px] text-white/60">
               <span className="h-2 w-2 rounded-full bg-brand vital-dot" /> online
             </span>
@@ -68,11 +68,11 @@ export function ContactService() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="Tulis keluhan / pertanyaan…"
+              placeholder="Write your complaint / question…"
               className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand"
             />
             <button onClick={send} className="rounded-xl bg-brand px-3 text-sm font-semibold text-white">
-              Kirim
+              Send
             </button>
           </div>
         </div>

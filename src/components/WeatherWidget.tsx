@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { IconX } from './icons'
+import { Portal } from './Portal'
 
 // GPS-based weather — collapsed to a single icon pill on Beranda; tapping
 // expands a simplified week/month view. Uses Open-Meteo (free, no API key)
@@ -115,6 +116,7 @@ export function WeatherWidget() {
       </button>
 
       {open && (
+        <Portal>
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-t-3xl bg-white p-5 sm:rounded-3xl dark:bg-[#17191c]">
             <div className="mb-3 flex items-center justify-between">
@@ -169,6 +171,7 @@ export function WeatherWidget() {
             )}
           </div>
         </div>
+        </Portal>
       )}
     </>
   )

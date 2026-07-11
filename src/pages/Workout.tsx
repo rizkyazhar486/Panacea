@@ -3,7 +3,7 @@ import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
 
-type Muscle = 'Dada' | 'Punggung' | 'Bahu' | 'Lengan' | 'Kaki' | 'Glute' | 'Core' | 'Full Body'
+type Muscle = 'Chest' | 'Back' | 'Shoulders' | 'Arms' | 'Legs' | 'Glutes' | 'Core' | 'Full Body'
 type Modality =
   | 'Strength' | 'Muscle Gain' | 'Tone & Shape' | 'Cardio' | 'Endurance' | 'HIIT' | 'Fat Loss'
   | 'Mobility' | 'Agility' | 'Balance & Coordination' | 'Core' | 'Kettlebell' | 'Muay Thai / Martial Arts'
@@ -13,8 +13,8 @@ interface Exercise {
   id: string
   name: string
   muscle: Muscle
-  type: 'Calisthenic' | 'Alat'
-  mode: 'Statis' | 'Dinamis'
+  type: 'Calisthenic' | 'Equipment'
+  mode: 'Static' | 'Dynamic'
   modalities: Modality[]
   description: string
   cue: string // clinical/orthopedic cue — load, joint position, common compensation
@@ -22,101 +22,101 @@ interface Exercise {
 }
 
 const EX: Exercise[] = [
-  { id: 'pushup', name: 'Push-Up', muscle: 'Dada', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape', 'Core'],
-    description: 'Posisi plank, tangan selebar bahu sedikit lebih lebar. Turunkan badan dengan siku membentuk sudut ~45° terhadap badan (bukan melebar 90°) hingga dada mendekati lantai, lalu dorong kembali ke atas hingga siku hampir lurus tanpa hyperextend.',
-    cue: 'Pertahankan korset bahu (scapular retraction-protraction terkontrol) untuk mencegah impingement subakromial; aktifkan core agar lumbar tidak hiperekstensi (hindari "sagging hips"). Beban relatif = massa tubuh × % yang ditopang lengan (~64% saat plank standar).',
-    nutrition: 'Protein 1.6-2.2g/kgBB/hari untuk sintesis protein otot (MPS); leusin dari telur/dada ayam/whey membantu memicu mTOR pathway.' },
-  { id: 'benchpress', name: 'Bench Press (Barbel)', muscle: 'Dada', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain'],
-    description: 'Berbaring di bench, grip sedikit lebih lebar dari bahu. Turunkan barbel terkontrol ke garis puting/sternum bawah, siku ~45-75° dari badan, lalu dorong vertikal hingga lengan lurus.',
-    cue: 'Hindari elbow flare 90° (risiko impingement & strain labrum anterior); jaga scapula tertarik & turun (retracted-depressed) sepanjang gerakan untuk stabilitas glenohumeral. Progressive overload 2.5-5%/minggu jika RPE <8.',
-    nutrition: 'Surplus kalori ringan (+250-500 kkal) bila tujuan hipertrofi; karbohidrat kompleks pre-workout untuk performa angkat maksimal.' },
-  { id: 'pullup', name: 'Pull-Up', muscle: 'Punggung', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
-    description: 'Gantung pada bar, grip overhand selebar bahu. Tarik badan hingga dagu melewati bar dengan menarik siku ke bawah-belakang (lat-driven), lalu turun terkontrol hingga lengan lurus penuh (full dead hang).',
-    cue: 'Mulai dari scapular depression sebelum fleksi siku ("scap pull-up" pattern) untuk melatih lower trapezius & mencegah dominasi bisep/leher. Hindari kipping berlebihan pada pemula (risiko cedera bahu).',
-    nutrition: 'Kreatin monohidrat 3-5g/hari dapat membantu output kekuatan repetisi tinggi; cukupi hidrasi 35ml/kgBB.' },
-  { id: 'row', name: 'Bent-Over Row (Dumbbell/Barbel)', muscle: 'Punggung', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
-    description: 'Hip hinge dengan punggung netral, badan ~45° condong ke depan. Tarik beban ke arah perut bawah/pinggang dengan menjepit skapula, turun terkontrol.',
-    cue: 'Pertahankan netral spine (hindari fleksi lumbal di bawah beban — risiko disc shear force tinggi); core brace sebelum menarik.',
-    nutrition: 'Magnesium & kalium cukup (sayur hijau, pisang) untuk fungsi kontraksi otot optimal dan mencegah kram.' },
-  { id: 'ohp', name: 'Overhead Press', muscle: 'Bahu', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Core'],
-    description: 'Berdiri, beban di depan bahu. Dorong vertikal lurus ke atas hingga lengan lurus di atas kepala, kepala sedikit maju saat beban melewati wajah, turun terkontrol.',
-    cue: 'Butuh mobilitas thoracic extension & scapular upward rotation adekuat; hindari lumbar hyperextension kompensatori (brace core, jangan "bankir" pinggang).',
-    nutrition: 'Vitamin D & kalsium untuk kesehatan tulang sendi bahu (sun exposure 10-15 menit/hari atau suplemen sesuai anjuran dokter).' },
-  { id: 'lateralraise', name: 'Lateral Raise', muscle: 'Bahu', type: 'Alat', mode: 'Dinamis', modalities: ['Tone & Shape', 'Muscle Gain'],
-    description: 'Berdiri, dumbbell di samping badan. Angkat lengan ke samping hingga setinggi bahu (bukan lebih), siku sedikit ditekuk, turun terkontrol.',
-    cue: 'Batasi elevasi >90° untuk hindari impingement subakromial; gunakan beban moderat-ringan repetisi tinggi karena lever arm panjang meningkatkan torsi sendi.',
-    nutrition: 'Omega-3 (ikan berlemak) membantu kontrol inflamasi tendon rotator cuff pasca-latihan repetitif.' },
-  { id: 'dip', name: 'Dips', muscle: 'Lengan', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
-    description: 'Tangan di parallel bar, badan tegak (untuk trisep) atau condong (untuk dada). Turun hingga siku ~90°, dorong kembali ke atas.',
-    cue: 'Batasi kedalaman jika ada riwayat instabilitas bahu (depth >90° meningkatkan stress anterior capsule); jaga bahu tetap depressed.',
-    nutrition: 'Protein cepat cerna (whey/telur) pasca-latihan dalam window 1-2 jam untuk memaksimalkan recovery.' },
-  { id: 'curl', name: 'Bicep Curl', muscle: 'Lengan', type: 'Alat', mode: 'Dinamis', modalities: ['Muscle Gain', 'Tone & Shape'],
-    description: 'Berdiri, dumbbell di tangan, siku menempel di sisi badan. Tekuk siku mengangkat beban ke bahu, kontraksi penuh, turun terkontrol (eccentric 2-3 detik).',
-    cue: 'Hindari momentum/swing (mengurangi tension otot target & membebani lumbar); fokus tempo lambat fase eksentrik untuk hipertrofi optimal (time under tension).',
-    nutrition: 'Karbohidrat sedang + protein pasca-latihan untuk replenish glikogen & MPS.' },
-  { id: 'squat', name: 'Squat (Bodyweight/Barbel)', muscle: 'Kaki', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Fat Loss', 'Mobility'],
-    description: 'Kaki selebar bahu, turunkan pinggul ke belakang-bawah seperti duduk hingga paha sejajar lantai (atau lebih dalam jika mobilitas memadai), dada tetap tegak, dorong melalui tumit untuk berdiri.',
-    cue: 'Lutut sejajar arah jari kaki (hindari valgus collapse — faktor risiko ACL/PFPS); jaga lumbar netral, hindari "butt wink" berlebihan di titik terdalam.',
-    nutrition: 'Karbohidrat kompleks pre-workout (oatmeal/nasi merah) untuk energi gerakan compound besar; cukupi kalium untuk fungsi otot kaki.' },
-  { id: 'lunge', name: 'Lunge', muscle: 'Kaki', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Balance & Coordination', 'Tone & Shape', 'Mobility'],
-    description: 'Langkah satu kaki ke depan, turunkan pinggul hingga kedua lutut ~90°, lutut belakang hampir menyentuh lantai, dorong kembali ke posisi awal.',
-    cue: 'Lutut depan tidak melewati ujung jari kaki secara berlebihan jika ada riwayat patellofemoral pain; latih unilateral untuk koreksi asimetri kekuatan kanan-kiri.',
-    nutrition: 'Hidrasi optimal mendukung kontrol neuromuskular & keseimbangan selama gerakan unilateral.' },
-  { id: 'deadlift', name: 'Deadlift', muscle: 'Glute', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Muscle Gain', 'Core'],
-    description: 'Kaki selebar pinggul, barbel dekat tulang kering. Hip hinge, punggung netral, angkat dengan mendorong lantai melalui kaki & meluruskan pinggul bersamaan dengan lutut.',
-    cue: 'Spine netral wajib sepanjang gerakan (flexed-spine lifting = risiko herniasi diskus tertinggi pada compound lift); bar path vertikal dekat tubuh.',
-    nutrition: 'Protein tinggi & natrium-elektrolit cukup; ini gerakan paling demanding secara sistemik — recovery tidur 7-9 jam penting.' },
-  { id: 'hipthrust', name: 'Hip Thrust', muscle: 'Glute', type: 'Alat', mode: 'Dinamis', modalities: ['Strength', 'Tone & Shape', 'Post Natal Shaping'],
-    description: 'Punggung atas di bench, kaki menapak lantai. Dorong pinggul ke atas melalui tumit hingga badan lurus (full hip extension), kontraksi glute di puncak, turun terkontrol.',
-    cue: 'Hindari lumbar hyperextension di puncak — fokus posterior pelvic tilt + kontraksi glute, bukan ekstensi lumbal. Aman & direkomendasikan untuk rehabilitasi diastasis recti pasca-natal dengan beban progresif rendah.',
-    nutrition: 'Protein cukup untuk regenerasi jaringan ikat panggul, khususnya pada program post-natal shaping.' },
-  { id: 'plank', name: 'Plank', muscle: 'Core', type: 'Calisthenic', mode: 'Statis', modalities: ['Core', 'Strength', 'Post Natal Shaping'],
-    description: 'Tumpu pada lengan bawah & ujung kaki, badan membentuk garis lurus dari kepala hingga tumit. Tahan posisi dengan core, glute, dan paha aktif berkontraksi isometrik.',
-    cue: 'Hindari pinggul turun (lumbar sagging) atau naik berlebihan (hip hiking); ini latihan isometrik aman pasca-natal untuk memulihkan tekanan intra-abdominal & diastasis recti sebelum progresif ke gerakan dinamis.',
-    nutrition: 'Tidak ada kebutuhan kalori spesifik tinggi; fokus stabilitas glikemik agar fokus & kontrol motorik optimal selama tahanan statis.' },
-  { id: 'hollow', name: 'Hollow Body Hold', muscle: 'Core', type: 'Calisthenic', mode: 'Statis', modalities: ['Core', 'Focus & Movement', 'Muscle Memory'],
-    description: 'Berbaring telentang, angkat bahu & kaki sedikit dari lantai, punggung bawah menempel lantai (posterior pelvic tilt), tahan posisi dengan napas terkontrol.',
-    cue: 'Indikator teknik benar = lumbar tetap menempel lantai (tidak ada gap); jika lumbar terangkat berarti beban berlebih bagi kapasitas core saat ini — regresi dengan menekuk lutut.',
-    nutrition: 'Latihan kontrol motorik & memori otot diuntungkan oleh tidur cukup (konsolidasi motor learning terjadi saat tidur dalam/REM).' },
-  { id: 'burpee', name: 'Burpee', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dinamis', modalities: ['HIIT', 'Cardio', 'Fat Loss', 'Endurance'],
-    description: 'Dari berdiri, jongkok-tangan ke lantai, lompat kaki ke posisi plank, push-up (opsional), lompat kaki kembali ke jongkok, lalu melompat vertikal dengan tangan ke atas.',
-    cue: 'Latihan compound intensitas tinggi — pantau teknik landing (lutut lentur, bukan kaku) untuk mengurangi gaya impact pada sendi lutut/ankle; hindari pada kondisi sendi akut.',
-    nutrition: 'Defisit kalori moderat (300-500 kkal) efektif dikombinasi HIIT untuk fat loss; cukupi karbohidrat agar intensitas terjaga selama interval.' },
-  { id: 'kettlebellswing', name: 'Kettlebell Swing', muscle: 'Full Body', type: 'Alat', mode: 'Dinamis', modalities: ['Kettlebell', 'Cardio', 'Endurance', 'Fat Loss', 'Strength'],
-    description: 'Kaki selebar bahu, kettlebell di depan. Hip hinge mengayun kettlebell ke belakang di antara paha, lalu dorong pinggul ke depan eksplosif (hip drive) hingga kettlebell terangkat ke ketinggian dada — bukan diangkat dengan bahu/lengan.',
-    cue: 'Power dihasilkan dari ballistic hip extension, bukan fleksi lumbal berulang; pastikan spine netral sepanjang gerakan untuk hindari cedera lumbal akibat repetisi tinggi.',
-    nutrition: 'Latihan metabolic conditioning tinggi — pastikan glikogen otot cukup (karbohidrat pre-workout) & elektrolit untuk sesi >15 menit.' },
-  { id: 'kettlebellgoblet', name: 'Kettlebell Goblet Squat', muscle: 'Kaki', type: 'Alat', mode: 'Dinamis', modalities: ['Kettlebell', 'Mobility', 'Strength'],
-    description: 'Pegang kettlebell di depan dada (goblet position), squat dalam dengan siku di antara lutut, dorong kembali berdiri.',
-    cue: 'Posisi goblet membantu menjaga torso tegak & memperbaiki kedalaman squat secara aman — baik untuk melatih mobilitas pinggul/ankle sebelum progres ke barbel squat.',
-    nutrition: 'Sama seperti squat — karbohidrat kompleks pre-workout.' },
-  { id: 'battlerope', name: 'Battling Ropes (Alternating Waves)', muscle: 'Full Body', type: 'Alat', mode: 'Dinamis', modalities: ['Battling Ropes', 'HIIT', 'Cardio', 'Fat Loss', 'Endurance'],
-    description: 'Berdiri posisi athletic stance (lutut sedikit ditekuk, core aktif), pegang ujung rope tiap tangan, hentakkan rope bergantian naik-turun secara cepat & ritmis selama interval waktu (mis. 20-30 detik kerja).',
-    cue: 'Stabilitas core & posisi lutut penting untuk transfer gaya dari lengan ke tanah tanpa membebani lumbar; gerakan ini high-intensity metabolic & low-impact pada sendi (cocok untuk obesitas/cedera lutut ringan).',
-    nutrition: 'HIIT metabolic conditioning — efektif untuk EPOC (excess post-exercise oxygen consumption) tinggi, mendukung fat loss; cukupi protein pasca-sesi.' },
-  { id: 'muaythaikick', name: 'Teknik Tendangan (Muay Thai — Roundhouse Kick)', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Muay Thai / Martial Arts', 'Balance & Coordination', 'Agility', 'Cardio'],
-    description: 'Pivot kaki tumpu 90° searah tendangan, putar pinggul penuh sambil mengangkat lutut kaki tendang ke samping, luruskan tungkai bawah melalui kontak menggunakan tulang kering (shin), lengan menjaga guard di wajah.',
-    cue: 'Power berasal dari rotasi pinggul (hip rotation), bukan hanya otot tungkai — kurangi risiko strain hip flexor/adductor dengan pemanasan dinamis rotasi pinggul sebelum sesi.',
-    nutrition: 'Latihan teknik & koordinasi tinggi — gula darah stabil penting untuk fokus & reaksi (hindari makan berat <1 jam sebelum sparring).' },
-  { id: 'shadowbox', name: 'Shadow Boxing / Pad Work', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dinamis', modalities: ['Muay Thai / Martial Arts', 'Cardio', 'Endurance', 'Balance & Coordination', 'Agility', 'Focus & Movement'],
-    description: 'Footwork ringan menjaga jarak, lempar kombinasi pukulan (jab-cross-hook) dengan rotasi pinggul & bahu, kembali ke guard setelah tiap pukulan.',
-    cue: 'Latih neuromuscular coordination & reaction time; rotasi trunk yang baik mengurangi beban berlebih pada bahu dominan saat repetisi tinggi.',
-    nutrition: 'Cardio-dominan — karbohidrat cukup untuk sesi >20 menit; hidrasi aktif tiap interval.' },
-  { id: 'jumprope', name: 'Lompat Tali (Jump Rope)', muscle: 'Full Body', type: 'Alat', mode: 'Dinamis', modalities: ['Cardio', 'Agility', 'Balance & Coordination', 'Endurance', 'Fat Loss'],
-    description: 'Lompat ringan dengan pergelangan kaki (bukan lutut tinggi), tali diputar dari pergelangan tangan, irama konsisten.',
-    cue: 'Latihan low-amplitude jump mengurangi impact lutut dibanding lompat tinggi; baik untuk plyometric ringan & agility kaki.',
-    nutrition: 'Cardio kontinyu — pastikan tidak dalam kondisi puasa berkepanjangan untuk menjaga performa & menghindari hipoglikemia ringan.' },
-  { id: 'mobilitydrill', name: 'Hip & Thoracic Mobility Flow', muscle: 'Full Body', type: 'Calisthenic', mode: 'Statis', modalities: ['Mobility', 'Focus & Movement', 'Balance & Coordination'],
-    description: 'Rangkaian gerakan: cat-cow, hip circles 90/90, thoracic rotation, world\'s greatest stretch — tiap posisi ditahan/diulang perlahan dengan napas dalam.',
-    cue: 'Mobilitas adekuat di hip & thoracic spine mengurangi kompensasi berlebih di lumbar saat squat/deadlift/overhead press — lakukan sebagai warm-up dinamis sebelum sesi beban.',
-    nutrition: 'Tidak terkait kalori langsung; cukupi cairan agar jaringan fascia/otot lebih elastis.' },
-  { id: 'postnatalbreath', name: 'Diaphragmatic Breathing + Pelvic Floor Activation', muscle: 'Core', type: 'Calisthenic', mode: 'Statis', modalities: ['Post Natal Shaping', 'Core', 'Mobility'],
-    description: 'Berbaring, tangan di perut, tarik napas dalam mengembangkan perut & rusuk bawah (bukan dada), saat menghembuskan napas kontraksikan dasar panggul (seperti menahan kencing) bersamaan transversus abdominis.',
-    cue: 'Fase wajib sebelum progres ke plank/hip thrust pasca-melahirkan — terutama bila ada diastasis recti atau disfungsi dasar panggul; konsultasi fisioterapi obstetri bila ada coning/bulging di garis tengah perut saat latihan.',
-    nutrition: 'Protein & zat besi cukup untuk recovery jaringan pasca-persalinan; hindari defisit kalori agresif selama menyusui.' },
+  { id: 'pushup', name: 'Push-Up', muscle: 'Chest', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape', 'Core'],
+    description: 'Plank position, hands slightly wider than shoulder-width. Lower your body with elbows at roughly a ~45° angle to the torso (not flared to 90°) until the chest nears the floor, then press back up until the elbows are almost straight without hyperextending.',
+    cue: 'Maintain scapular control (controlled retraction-protraction) to prevent subacromial impingement; engage the core so the lumbar spine does not hyperextend (avoid "sagging hips"). Relative load = body mass × % supported by the arms (~64% in a standard plank).',
+    nutrition: 'Protein 1.6-2.2 g/kg body weight/day for muscle protein synthesis (MPS); leucine from eggs/chicken breast/whey helps trigger the mTOR pathway.' },
+  { id: 'benchpress', name: 'Bench Press (Barbell)', muscle: 'Chest', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain'],
+    description: 'Lie on the bench, grip slightly wider than shoulder-width. Lower the barbell under control to the nipple line/lower sternum, elbows ~45-75° from the torso, then press vertically until the arms are straight.',
+    cue: 'Avoid 90° elbow flare (risk of impingement and anterior labral strain); keep the scapula retracted and depressed throughout the movement for glenohumeral stability. Progressive overload 2.5-5%/week if RPE <8.',
+    nutrition: 'A slight caloric surplus (+250-500 kcal) if the goal is hypertrophy; complex carbohydrates pre-workout for maximal lifting performance.' },
+  { id: 'pullup', name: 'Pull-Up', muscle: 'Back', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
+    description: 'Hang from the bar, overhand grip at shoulder-width. Pull your body up until the chin clears the bar by driving the elbows down and back (lat-driven), then lower under control to a full dead hang.',
+    cue: 'Begin with scapular depression before elbow flexion (a "scap pull-up" pattern) to train the lower trapezius and prevent biceps/neck dominance. Avoid excessive kipping for beginners (shoulder injury risk).',
+    nutrition: 'Creatine monohydrate 3-5 g/day can support strength output on higher-rep sets; keep hydration at 35 ml/kg body weight.' },
+  { id: 'row', name: 'Bent-Over Row (Dumbbell/Barbell)', muscle: 'Back', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
+    description: 'Hip hinge with a neutral back, torso leaning ~45° forward. Pull the weight toward the lower abdomen/waist by squeezing the scapulae together, then lower under control.',
+    cue: 'Maintain a neutral spine (avoid lumbar flexion under load — high risk of disc shear force); brace the core before pulling.',
+    nutrition: 'Adequate magnesium and potassium (leafy greens, bananas) for optimal muscle contraction and cramp prevention.' },
+  { id: 'ohp', name: 'Overhead Press', muscle: 'Shoulders', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Core'],
+    description: 'Stand with the weight at the front of the shoulders. Press straight up until the arms are locked out overhead, tucking the head slightly forward as the weight passes the face, then lower under control.',
+    cue: 'Requires adequate thoracic extension mobility and scapular upward rotation; avoid compensatory lumbar hyperextension (brace the core, don\'t arch the lower back).',
+    nutrition: 'Vitamin D and calcium for the bone and joint health of the shoulder (10-15 min sun exposure/day or supplementation as advised by a physician).' },
+  { id: 'lateralraise', name: 'Lateral Raise', muscle: 'Shoulders', type: 'Equipment', mode: 'Dynamic', modalities: ['Tone & Shape', 'Muscle Gain'],
+    description: 'Stand with a dumbbell at each side. Raise the arms out to the side up to shoulder height (no higher), elbows slightly bent, then lower under control.',
+    cue: 'Limit elevation above 90° to avoid subacromial impingement; use moderate-to-light loads with higher reps since the long lever arm increases joint torque.',
+    nutrition: 'Omega-3 (oily fish) helps control rotator cuff tendon inflammation after repetitive training.' },
+  { id: 'dip', name: 'Dips', muscle: 'Arms', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Tone & Shape'],
+    description: 'Hands on parallel bars, torso upright (for triceps) or leaning forward (for chest). Lower until the elbows reach ~90°, then press back up.',
+    cue: 'Limit depth if there is a history of shoulder instability (depth beyond 90° increases stress on the anterior capsule); keep the shoulders depressed.',
+    nutrition: 'Fast-digesting protein (whey/eggs) post-workout within a 1-2 hour window to maximize recovery.' },
+  { id: 'curl', name: 'Bicep Curl', muscle: 'Arms', type: 'Equipment', mode: 'Dynamic', modalities: ['Muscle Gain', 'Tone & Shape'],
+    description: 'Stand with a dumbbell in each hand, elbows tucked to the sides. Flex the elbows to raise the weight toward the shoulders, full contraction, then lower under control (2-3 second eccentric).',
+    cue: 'Avoid momentum/swing (it reduces tension on the target muscle and loads the lumbar spine); focus on a slow eccentric tempo for optimal hypertrophy (time under tension).',
+    nutrition: 'Moderate carbohydrate plus protein post-workout to replenish glycogen and support MPS.' },
+  { id: 'squat', name: 'Squat (Bodyweight/Barbell)', muscle: 'Legs', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Fat Loss', 'Mobility'],
+    description: 'Feet shoulder-width apart, lower the hips down and back as if sitting until the thighs are parallel to the floor (or deeper if mobility allows), chest upright, then drive through the heels to stand.',
+    cue: 'Knees tracking over the toes (avoid valgus collapse — an ACL/PFPS risk factor); keep the lumbar spine neutral and avoid excessive "butt wink" at the bottom.',
+    nutrition: 'Complex carbohydrates pre-workout (oatmeal/brown rice) for energy on large compound movements; adequate potassium for leg-muscle function.' },
+  { id: 'lunge', name: 'Lunge', muscle: 'Legs', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Balance & Coordination', 'Tone & Shape', 'Mobility'],
+    description: 'Step one foot forward, lower the hips until both knees reach ~90°, the back knee nearly touching the floor, then push back to the starting position.',
+    cue: 'The front knee should not travel excessively past the toes if there is a history of patellofemoral pain; train unilaterally to correct left-right strength asymmetry.',
+    nutrition: 'Optimal hydration supports neuromuscular control and balance during unilateral movements.' },
+  { id: 'deadlift', name: 'Deadlift', muscle: 'Glutes', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Muscle Gain', 'Core'],
+    description: 'Feet hip-width apart, barbell close to the shins. Hip hinge, neutral back, lift by driving the feet into the floor and extending the hips and knees together.',
+    cue: 'A neutral spine is mandatory throughout the movement (flexed-spine lifting = the highest disc-herniation risk among compound lifts); keep a vertical bar path close to the body.',
+    nutrition: 'High protein and adequate sodium/electrolytes; this is the most systemically demanding movement — 7-9 hours of recovery sleep is important.' },
+  { id: 'hipthrust', name: 'Hip Thrust', muscle: 'Glutes', type: 'Equipment', mode: 'Dynamic', modalities: ['Strength', 'Tone & Shape', 'Post Natal Shaping'],
+    description: 'Upper back on the bench, feet planted on the floor. Drive the hips up through the heels until the body is straight (full hip extension), squeeze the glutes at the top, then lower under control.',
+    cue: 'Avoid lumbar hyperextension at the top — focus on a posterior pelvic tilt plus glute contraction, not lumbar extension. Safe and recommended for post-natal diastasis recti rehabilitation with low progressive loading.',
+    nutrition: 'Adequate protein for regeneration of the pelvic connective tissue, especially in post-natal shaping programs.' },
+  { id: 'plank', name: 'Plank', muscle: 'Core', type: 'Calisthenic', mode: 'Static', modalities: ['Core', 'Strength', 'Post Natal Shaping'],
+    description: 'Support on the forearms and toes, body forming a straight line from head to heels. Hold the position with the core, glutes, and thighs actively contracting isometrically.',
+    cue: 'Avoid the hips dropping (lumbar sagging) or rising too high (hip hiking); this is a safe post-natal isometric exercise to restore intra-abdominal pressure and address diastasis recti before progressing to dynamic movements.',
+    nutrition: 'No specific high-calorie requirement; focus on glycemic stability for optimal focus and motor control during static holds.' },
+  { id: 'hollow', name: 'Hollow Body Hold', muscle: 'Core', type: 'Calisthenic', mode: 'Static', modalities: ['Core', 'Focus & Movement', 'Muscle Memory'],
+    description: 'Lie supine, lift the shoulders and legs slightly off the floor, lower back pressed to the floor (posterior pelvic tilt), and hold the position with controlled breathing.',
+    cue: 'An indicator of correct technique = the lumbar spine stays pressed to the floor (no gap); if the lower back lifts, the load exceeds your current core capacity — regress by bending the knees.',
+    nutrition: 'Motor-control and muscle-memory training benefits from adequate sleep (motor-learning consolidation occurs during deep/REM sleep).' },
+  { id: 'burpee', name: 'Burpee', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dynamic', modalities: ['HIIT', 'Cardio', 'Fat Loss', 'Endurance'],
+    description: 'From standing, squat and place the hands on the floor, jump the feet back to a plank, push-up (optional), jump the feet back to the squat, then jump vertically with the hands overhead.',
+    cue: 'A high-intensity compound exercise — watch the landing technique (bend the knees, don\'t land stiff) to reduce impact force on the knee/ankle joints; avoid with acute joint conditions.',
+    nutrition: 'A moderate caloric deficit (300-500 kcal) is effective combined with HIIT for fat loss; ensure adequate carbohydrates to sustain intensity across intervals.' },
+  { id: 'kettlebellswing', name: 'Kettlebell Swing', muscle: 'Full Body', type: 'Equipment', mode: 'Dynamic', modalities: ['Kettlebell', 'Cardio', 'Endurance', 'Fat Loss', 'Strength'],
+    description: 'Feet shoulder-width apart, kettlebell in front. Hip hinge to swing the kettlebell back between the thighs, then explosively drive the hips forward (hip drive) until the kettlebell rises to chest height — not lifted with the shoulders/arms.',
+    cue: 'Power comes from ballistic hip extension, not repeated lumbar flexion; keep the spine neutral throughout to avoid lumbar injury from high repetitions.',
+    nutrition: 'A high metabolic-conditioning workout — ensure adequate muscle glycogen (pre-workout carbohydrates) and electrolytes for sessions over 15 minutes.' },
+  { id: 'kettlebellgoblet', name: 'Kettlebell Goblet Squat', muscle: 'Legs', type: 'Equipment', mode: 'Dynamic', modalities: ['Kettlebell', 'Mobility', 'Strength'],
+    description: 'Hold the kettlebell in front of the chest (goblet position), squat deep with the elbows between the knees, then drive back up to standing.',
+    cue: 'The goblet position helps keep the torso upright and improves squat depth safely — good for training hip/ankle mobility before progressing to the barbell squat.',
+    nutrition: 'Same as the squat — complex carbohydrates pre-workout.' },
+  { id: 'battlerope', name: 'Battling Ropes (Alternating Waves)', muscle: 'Full Body', type: 'Equipment', mode: 'Dynamic', modalities: ['Battling Ropes', 'HIIT', 'Cardio', 'Fat Loss', 'Endurance'],
+    description: 'Stand in an athletic stance (knees slightly bent, core engaged), hold an end of the rope in each hand, and whip the ropes alternately up and down quickly and rhythmically for a timed interval (e.g. 20-30 seconds of work).',
+    cue: 'Core stability and knee position are important to transfer force from the arms to the ground without loading the lumbar spine; this movement is high-intensity metabolic and low-impact on the joints (suitable for obesity/mild knee injury).',
+    nutrition: 'HIIT metabolic conditioning — effective for a high EPOC (excess post-exercise oxygen consumption), supporting fat loss; ensure adequate protein after the session.' },
+  { id: 'muaythaikick', name: 'Kicking Technique (Muay Thai — Roundhouse Kick)', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Muay Thai / Martial Arts', 'Balance & Coordination', 'Agility', 'Cardio'],
+    description: 'Pivot the support foot 90° toward the kick, rotate the hips fully while lifting the kicking-leg knee to the side, extend the lower leg through contact using the shin, keeping the arms in guard at the face.',
+    cue: 'Power comes from hip rotation, not just the leg muscles — reduce the risk of hip flexor/adductor strain with a dynamic hip-rotation warm-up before the session.',
+    nutrition: 'A high technique-and-coordination workout — stable blood sugar is important for focus and reaction (avoid a heavy meal within 1 hour before sparring).' },
+  { id: 'shadowbox', name: 'Shadow Boxing / Pad Work', muscle: 'Full Body', type: 'Calisthenic', mode: 'Dynamic', modalities: ['Muay Thai / Martial Arts', 'Cardio', 'Endurance', 'Balance & Coordination', 'Agility', 'Focus & Movement'],
+    description: 'Light footwork to keep distance, throw punch combinations (jab-cross-hook) with hip and shoulder rotation, returning to guard after each punch.',
+    cue: 'Trains neuromuscular coordination and reaction time; good trunk rotation reduces excessive load on the dominant shoulder during high repetitions.',
+    nutrition: 'Cardio-dominant — adequate carbohydrates for sessions over 20 minutes; active hydration each interval.' },
+  { id: 'jumprope', name: 'Jump Rope', muscle: 'Full Body', type: 'Equipment', mode: 'Dynamic', modalities: ['Cardio', 'Agility', 'Balance & Coordination', 'Endurance', 'Fat Loss'],
+    description: 'Light jumps from the ankles (not high knees), the rope turned from the wrists, at a consistent rhythm.',
+    cue: 'Low-amplitude jumping reduces knee impact compared to high jumps; good for light plyometrics and foot agility.',
+    nutrition: 'Continuous cardio — make sure you are not in a prolonged fasted state to maintain performance and avoid mild hypoglycemia.' },
+  { id: 'mobilitydrill', name: 'Hip & Thoracic Mobility Flow', muscle: 'Full Body', type: 'Calisthenic', mode: 'Static', modalities: ['Mobility', 'Focus & Movement', 'Balance & Coordination'],
+    description: 'A sequence of movements: cat-cow, 90/90 hip circles, thoracic rotation, world\'s greatest stretch — each position held/repeated slowly with deep breathing.',
+    cue: 'Adequate mobility in the hips and thoracic spine reduces excessive compensation at the lumbar spine during squats/deadlifts/overhead presses — perform as a dynamic warm-up before a lifting session.',
+    nutrition: 'Not directly calorie-related; stay hydrated so fascia/muscle tissue is more elastic.' },
+  { id: 'postnatalbreath', name: 'Diaphragmatic Breathing + Pelvic Floor Activation', muscle: 'Core', type: 'Calisthenic', mode: 'Static', modalities: ['Post Natal Shaping', 'Core', 'Mobility'],
+    description: 'Lie down, hands on the abdomen, inhale deeply to expand the belly and lower ribs (not the chest), and as you exhale contract the pelvic floor (as if holding urine) together with the transversus abdominis.',
+    cue: 'A mandatory phase before progressing to planks/hip thrusts post-partum — especially if there is diastasis recti or pelvic floor dysfunction; consult an obstetric physiotherapist if there is coning/bulging along the midline of the abdomen during exercise.',
+    nutrition: 'Adequate protein and iron for post-partum tissue recovery; avoid aggressive caloric deficits while breastfeeding.' },
 ]
 
-const MUSCLES: Muscle[] = ['Dada', 'Punggung', 'Bahu', 'Lengan', 'Kaki', 'Glute', 'Core', 'Full Body']
+const MUSCLES: Muscle[] = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Glutes', 'Core', 'Full Body']
 const MODALITIES: Modality[] = ['Strength', 'Muscle Gain', 'Tone & Shape', 'Cardio', 'Endurance', 'HIIT', 'Fat Loss', 'Mobility', 'Agility', 'Balance & Coordination', 'Core', 'Kettlebell', 'Muay Thai / Martial Arts', 'Battling Ropes', 'Post Natal Shaping', 'Focus & Movement', 'Muscle Memory']
 
 interface LogEntry { id: string; exId: string; date: string; sets: number; reps: number; weight: number }
@@ -125,17 +125,17 @@ function loadLog(): LogEntry[] { try { return JSON.parse(localStorage.getItem(LO
 function saveLog(l: LogEntry[]) { try { localStorage.setItem(LOG_KEY, JSON.stringify(l)) } catch { /* ignore */ } }
 
 export function Workout() {
-  const [muscle, setMuscle] = useState<Muscle | 'Semua'>('Semua')
-  const [modality, setModality] = useState<Modality | 'Semua'>('Semua')
-  const [type, setType] = useState<'Semua' | 'Calisthenic' | 'Alat'>('Semua')
+  const [muscle, setMuscle] = useState<Muscle | 'All'>('All')
+  const [modality, setModality] = useState<Modality | 'All'>('All')
+  const [type, setType] = useState<'All' | 'Calisthenic' | 'Equipment'>('All')
   const [open, setOpen] = useState<string | null>(null)
   const [log, setLog] = useState<LogEntry[]>(loadLog)
   const [sets, setSets] = useState(3); const [reps, setReps] = useState(12); const [weight, setWeight] = useState(0)
 
   const filtered = useMemo(() => EX.filter((e) =>
-    (muscle === 'Semua' || e.muscle === muscle) &&
-    (modality === 'Semua' || e.modalities.includes(modality)) &&
-    (type === 'Semua' || e.type === type),
+    (muscle === 'All' || e.muscle === muscle) &&
+    (modality === 'All' || e.modalities.includes(modality)) &&
+    (type === 'All' || e.type === type),
   ), [muscle, modality, type])
 
   function logExercise(exId: string) {
@@ -153,45 +153,45 @@ export function Workout() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <VideoGallery
         icon={<IconFlame size={20} />}
-        title="Video Contoh Gerakan"
-        subtitle="Demonstrasi form yang benar — pemanasan, HIIT & kaki"
+        title="Movement Demo Videos"
+        subtitle="Correct-form demonstrations — warm-up, HIIT & legs"
         videos={[
-          { label: 'Pemanasan Dinamis', cue: 'Leg swing · arm circle · high knees — wajib sebelum sesi', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073037_fc3668ff-bc44-4938-8e63-69f2ba59c7f9.mp4' },
-          { label: 'Burpee', cue: 'Squat → plank → push-up → lompat eksplosif, jaga form saat lelah', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072933_8c31ec59-1c8a-46a2-8e05-03b56cd36e5f.mp4' },
-          { label: 'Lunge', cue: 'Torso tegak · lutut depan 90° searah jari kaki', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072947_e56eb38e-4fea-4d36-aed8-0baf8e10b1f5.mp4' },
+          { label: 'Dynamic Warm-Up', cue: 'Leg swings · arm circles · high knees — mandatory before a session', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073037_fc3668ff-bc44-4938-8e63-69f2ba59c7f9.mp4' },
+          { label: 'Burpee', cue: 'Squat → plank → push-up → explosive jump, keep form as you fatigue', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072933_8c31ec59-1c8a-46a2-8e05-03b56cd36e5f.mp4' },
+          { label: 'Lunge', cue: 'Torso upright · front knee 90° tracking over the toes', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072947_e56eb38e-4fea-4d36-aed8-0baf8e10b1f5.mp4' },
         ]}
       />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Statis & dinamis, alat maupun calisthenic, per kelompok otot — dasar sport science & orthopedic" />
+        <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Static and dynamic, equipment or calisthenics, by muscle group — grounded in sports science and orthopedics" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <select className={inputClass} value={muscle} onChange={(e) => setMuscle(e.target.value as Muscle | 'Semua')}>
-            <option value="Semua">Semua Otot</option>
+          <select className={inputClass} value={muscle} onChange={(e) => setMuscle(e.target.value as Muscle | 'All')}>
+            <option value="All">All Muscles</option>
             {MUSCLES.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
-          <select className={inputClass} value={modality} onChange={(e) => setModality(e.target.value as Modality | 'Semua')}>
-            <option value="Semua">Semua Tujuan</option>
+          <select className={inputClass} value={modality} onChange={(e) => setModality(e.target.value as Modality | 'All')}>
+            <option value="All">All Goals</option>
             {MODALITIES.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
           <select className={inputClass} value={type} onChange={(e) => setType(e.target.value as typeof type)}>
-            <option value="Semua">Calisthenic & Alat</option>
-            <option value="Calisthenic">Calisthenic</option>
-            <option value="Alat">Dengan Alat</option>
+            <option value="All">Calisthenics & Equipment</option>
+            <option value="Calisthenic">Calisthenics</option>
+            <option value="Equipment">With Equipment</option>
           </select>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{todayLog.length}</div>
-            <div className="text-[10px] text-neutral-400">Set hari ini</div>
+            <div className="text-[10px] text-neutral-400">Sets today</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{weekLog.length}</div>
-            <div className="text-[10px] text-neutral-400">Sesi minggu ini</div>
+            <div className="text-[10px] text-neutral-400">Sessions this week</div>
           </div>
           <div className="rounded-xl bg-brand-50 p-3 text-center">
-            <div className="text-lg font-extrabold text-brand-dark">{weeklyVolume.toLocaleString('id-ID')}</div>
-            <div className="text-[10px] text-neutral-400">Volume mingguan</div>
+            <div className="text-lg font-extrabold text-brand-dark">{weeklyVolume.toLocaleString('en-US')}</div>
+            <div className="text-[10px] text-neutral-400">Weekly volume</div>
           </div>
         </div>
       </Card>
@@ -217,23 +217,23 @@ export function Workout() {
             {open === e.id && (
               <div className="mt-3 space-y-3 border-t border-neutral-100 pt-3">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Cara Melakukan</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">How To Perform</div>
                   <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.description}</p>
                 </div>
                 <div className="rounded-xl bg-amber-50/60 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-amber-700">Catatan Klinis & Orthopedic</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-amber-700">Clinical & Orthopedic Notes</div>
                   <p className="mt-1 text-sm leading-relaxed text-amber-800">{e.cue}</p>
                 </div>
                 <div className="rounded-xl bg-brand-50/60 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Penyesuaian Nutrisi</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Nutrition Adjustments</div>
                   <p className="mt-1 text-sm leading-relaxed text-neutral-700">{e.nutrition}</p>
                 </div>
 
                 <div className="flex flex-wrap items-end gap-2 rounded-xl border border-neutral-100 p-3">
-                  <label className="text-xs">Set<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
+                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
                   <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
-                  <label className="text-xs">Beban (kg)<input className={inputClass + ' mt-1 w-20'} type="number" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
-                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Catat</Button>
+                  <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
+                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
                 </div>
               </div>
             )}
@@ -243,7 +243,7 @@ export function Workout() {
 
       {todayLog.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconFlame size={18} />} title="Log Hari Ini" subtitle="Riwayat set yang sudah dicatat" />
+          <SectionTitle icon={<IconFlame size={18} />} title="Today's Log" subtitle="Sets you have already recorded" />
           <div className="mt-2 space-y-1.5">
             {todayLog.map((l) => {
               const ex = EX.find((x) => x.id === l.exId)
@@ -260,14 +260,14 @@ export function Workout() {
       )}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={18} />} title="Prinsip Pemrograman" subtitle="Dasar sport science untuk menyusun progresi" />
+        <SectionTitle icon={<IconRun size={18} />} title="Programming Principles" subtitle="Sports-science fundamentals for building progression" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
-          <li>• <b>Progressive overload</b>: naikkan beban/reps/volume 2.5-10%/minggu selama RPE &lt;8-9.</li>
-          <li>• <b>Periodisasi</b>: selingi fase volume tinggi-intensitas rendah dengan fase intensitas tinggi-volume rendah; deload tiap 4-6 minggu.</li>
-          <li>• <b>Spesifisitas</b>: gerakan statis (plank, isometric hold) membangun stabilitas sendi & kontrol motorik; gerakan dinamis membangun kekuatan & power eksplosif.</li>
-          <li>• <b>Pemulihan sendi/jaringan ikat</b>: beri 48-72 jam antar sesi kelompok otot yang sama untuk resintesis kolagen tendon & remodeling otot.</li>
-          <li>• <b>HIIT/Battling Ropes/Muay Thai</b> sangat efektif untuk EPOC & fat loss namun bebani sistem saraf — batasi 2-3x/minggu, kombinasikan dengan hari mobility/recovery.</li>
-          <li>• <b>Post natal</b>: mulai dari diaphragmatic breathing & pelvic floor activation, baru progres ke isometrik (plank ringan), lalu dinamis ringan setelah skrining diastasis recti oleh tenaga kesehatan.</li>
+          <li>• <b>Progressive overload</b>: increase load/reps/volume 2.5-10%/week while RPE &lt;8-9.</li>
+          <li>• <b>Periodization</b>: alternate high-volume/low-intensity phases with high-intensity/low-volume phases; deload every 4-6 weeks.</li>
+          <li>• <b>Specificity</b>: static movements (planks, isometric holds) build joint stability and motor control; dynamic movements build strength and explosive power.</li>
+          <li>• <b>Joint/connective-tissue recovery</b>: allow 48-72 hours between sessions for the same muscle group for tendon collagen resynthesis and muscle remodeling.</li>
+          <li>• <b>HIIT/Battling Ropes/Muay Thai</b> are highly effective for EPOC and fat loss but tax the nervous system — limit to 2-3×/week and combine with mobility/recovery days.</li>
+          <li>• <b>Post-natal</b>: start with diaphragmatic breathing and pelvic floor activation, then progress to isometrics (light planks), then to light dynamic work after a diastasis recti screening by a healthcare professional.</li>
         </ul>
       </Card>
     </div>

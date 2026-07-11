@@ -24,11 +24,11 @@ function SatusehatButton({ patient, record, vitals }: { patient: unknown; record
       const r = await api.satusehatSubmit(patient, { ...record, vitals })
       setMsg(
         r.configured
-          ? `✅ Terkirim ke SATUSEHAT (${r.summary.resources} sumber daya FHIR).`
-          : `📋 Pratinjau FHIR siap (${r.summary.resources} sumber daya) — aktifkan kredensial SATUSEHAT di server untuk mengirim.`,
+          ? `✅ Sent to SATUSEHAT (${r.summary.resources} FHIR resources).`
+          : `📋 FHIR preview ready (${r.summary.resources} resources) — enable SATUSEHAT credentials on the server to send.`,
       )
     } catch {
-      setMsg('Gagal menyiapkan bundel SATUSEHAT.')
+      setMsg('Failed to prepare the SATUSEHAT bundle.')
     } finally {
       setBusy(false)
     }
@@ -36,7 +36,7 @@ function SatusehatButton({ patient, record, vitals }: { patient: unknown; record
   return (
     <span className="inline-flex items-center gap-2">
       <Button variant="outline" onClick={send} disabled={busy}>
-        <IconShield size={14} /> {busy ? 'Mengirim…' : 'Kirim ke SATUSEHAT'}
+        <IconShield size={14} /> {busy ? 'Sending…' : 'Send to SATUSEHAT'}
       </Button>
       {msg && <span className="text-[11px] font-semibold text-brand-dark">{msg}</span>}
     </span>
@@ -44,15 +44,15 @@ function SatusehatButton({ patient, record, vitals }: { patient: unknown; record
 }
 
 const BODY_SYSTEMS: { key: string; label: string; x: number; y: number; kw: string[] }[] = [
-  { key: 'mata', label: 'Mata', x: 60, y: 9, kw: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos'] },
-  { key: 'tht', label: 'THT', x: 38, y: 10, kw: ['telinga', 'hidung', 'tenggorok', 'faring', 'tonsil', 'mukosa', 'nasofaring'] },
-  { key: 'kepala', label: 'Kepala', x: 50, y: 5, kw: ['kepala', 'normosefali', 'wajah', 'facies'] },
-  { key: 'leher', label: 'Leher', x: 50, y: 17, kw: ['leher', 'kgb', 'trakea', 'tiroid', 'jvp'] },
-  { key: 'paru', label: 'Paru', x: 37, y: 32, kw: ['paru', 'vesikuler', 'ronki', 'rhonki', 'wheezing', 'fremitus', 'sonor'] },
-  { key: 'jantung', label: 'Jantung', x: 61, y: 34, kw: ['jantung', 'cardio', 'iktus', 'ictus', 's1s2', 'murmur', 'gallop'] },
+  { key: 'mata', label: 'Eyes', x: 60, y: 9, kw: ['mata', 'pupil', 'konjungtiva', 'sklera', 'visus', 'vod', 'vos'] },
+  { key: 'tht', label: 'ENT', x: 38, y: 10, kw: ['telinga', 'hidung', 'tenggorok', 'faring', 'tonsil', 'mukosa', 'nasofaring'] },
+  { key: 'kepala', label: 'Head', x: 50, y: 5, kw: ['kepala', 'normosefali', 'wajah', 'facies'] },
+  { key: 'leher', label: 'Neck', x: 50, y: 17, kw: ['leher', 'kgb', 'trakea', 'tiroid', 'jvp'] },
+  { key: 'paru', label: 'Lungs', x: 37, y: 32, kw: ['paru', 'vesikuler', 'ronki', 'rhonki', 'wheezing', 'fremitus', 'sonor'] },
+  { key: 'jantung', label: 'Heart', x: 61, y: 34, kw: ['jantung', 'cardio', 'iktus', 'ictus', 's1s2', 'murmur', 'gallop'] },
   { key: 'abdomen', label: 'Abdomen', x: 50, y: 47, kw: ['abdomen', 'bising usus', 'hepatomegali', 'splenomegali', 'nyeri tekan', 'supel'] },
-  { key: 'kulit', label: 'Kulit', x: 28, y: 58, kw: ['kulit', 'spider nevi', 'eritema', 'pucat', 'sianosis'] },
-  { key: 'ekstremitas', label: 'Ekstremitas', x: 72, y: 82, kw: ['ekstremitas', 'akral', 'crt', 'edema'] },
+  { key: 'kulit', label: 'Skin', x: 28, y: 58, kw: ['kulit', 'spider nevi', 'eritema', 'pucat', 'sianosis'] },
+  { key: 'ekstremitas', label: 'Extremities', x: 72, y: 82, kw: ['ekstremitas', 'akral', 'crt', 'edema'] },
 ]
 
 const ABNORMAL_HINTS = ['(+)', 'menurun', 'prolaps', 'massa', 'pembesaran', 'deviasi', 'ikterik', 'edema (+)', 'anemis (+)', 'ronki (+', 'wheezing (+', 'murmur (+', 'asites']
@@ -64,7 +64,7 @@ function LabPanel({ results }: { results: import('../lib/types').SupportiveResul
   const col: Record<string, string> = { low: '#f59e0b', normal: '#00BF63', high: '#FF3131', critical: '#FF3131' }
   return (
     <div className="mb-4">
-      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">Panel Lab — nilai vs rentang rujukan</div>
+      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">Lab Panel — value vs reference range</div>
       <div className="grid gap-2.5 sm:grid-cols-2">
         {labs.map((r) => {
           const f = r.flag ?? 'normal'
@@ -77,7 +77,7 @@ function LabPanel({ results }: { results: import('../lib/types').SupportiveResul
               <div className="relative h-2 rounded-full bg-gradient-to-r from-amber-200 via-brand-100 to-red-200">
                 <div className="absolute top-1/2 h-3.5 w-1 -translate-y-1/2 rounded-full" style={{ left: `${pos[f]}%`, background: col[f] }} />
               </div>
-              <div className="mt-1 text-[10px] text-neutral-400">Rujukan: {r.reference || '—'}</div>
+              <div className="mt-1 text-[10px] text-neutral-400">Reference: {r.reference || '—'}</div>
             </div>
           )
         })}
@@ -90,10 +90,10 @@ function supportiveDefaults(weightKg: number) {
   const w = weightKg || 60
   const maint = w > 20 ? 1500 + 20 * (w - 20) : w > 10 ? 1000 + 50 * (w - 10) : 100 * w
   return {
-    resusitasi: 'Nilai ABC; kristaloid (RL/NaCl 0.9%) sesuai status; target MAP ≥65 mmHg.',
-    balansCairan: `Rumatan ±${Math.round(maint)} mL/24 jam (${Math.round(maint / 24)} mL/jam, Holliday-Segar); sesuaikan defisit/loss.`,
-    kebutuhanKalori: `${Math.round(w * 25)}–${Math.round(w * 30)} kkal/hari (25–30 kkal/kg).`,
-    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/jam (0,5 mL/kg/jam).`,
+    resusitasi: 'Assess ABC; crystalloids (RL/NaCl 0.9%) per status; target MAP ≥65 mmHg.',
+    balansCairan: `Maintenance ±${Math.round(maint)} mL/24 h (${Math.round(maint / 24)} mL/h, Holliday-Segar); adjust for deficit/loss.`,
+    kebutuhanKalori: `${Math.round(w * 25)}–${Math.round(w * 30)} kcal/day (25–30 kcal/kg).`,
+    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/h (0.5 mL/kg/h).`,
   }
 }
 
@@ -110,17 +110,17 @@ function buildFindings(perSystem: string): SystemFinding[] {
 }
 
 const ANAMNESIS_FIELDS: { key: keyof Anamnesis; label: string }[] = [
-  { key: 'keluhanUtama', label: 'Keluhan Utama' },
-  { key: 'rps', label: 'Riwayat Penyakit Sekarang (SOCRATES)' },
-  { key: 'rpd', label: 'Riwayat Penyakit Dahulu' },
-  { key: 'rpk', label: 'Riwayat Penyakit Keluarga' },
-  { key: 'riwayatKehamilan', label: 'Riwayat Kehamilan & Persalinan' },
-  { key: 'riwayatPengobatan', label: 'Riwayat Pengobatan' },
-  { key: 'riwayatAlergi', label: 'Riwayat Alergi' },
-  { key: 'riwayatTumbuhKembang', label: 'Riwayat Tumbuh Kembang' },
-  { key: 'riwayatNutrisi', label: 'Riwayat Nutrisi' },
-  { key: 'riwayatImunisasi', label: 'Riwayat Imunisasi' },
-  { key: 'riwayatSosialEkonomi', label: 'Riwayat Sosial-Ekonomi & Lingkungan' },
+  { key: 'keluhanUtama', label: 'Chief Complaint' },
+  { key: 'rps', label: 'History of Present Illness (SOCRATES)' },
+  { key: 'rpd', label: 'Past Medical History' },
+  { key: 'rpk', label: 'Family History' },
+  { key: 'riwayatKehamilan', label: 'Pregnancy & Delivery History' },
+  { key: 'riwayatPengobatan', label: 'Medication History' },
+  { key: 'riwayatAlergi', label: 'Allergy History' },
+  { key: 'riwayatTumbuhKembang', label: 'Growth & Development History' },
+  { key: 'riwayatNutrisi', label: 'Nutrition History' },
+  { key: 'riwayatImunisasi', label: 'Immunization History' },
+  { key: 'riwayatSosialEkonomi', label: 'Socioeconomic & Environmental History' },
 ]
 
 function StrGate({ str }: { str?: string }) {
@@ -128,16 +128,16 @@ function StrGate({ str }: { str?: string }) {
     <div className="mx-auto max-w-lg">
       <Card className="text-center">
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-amber-100 text-amber-700"><IconShield size={30} /></span>
-        <h2 className="mt-4 text-xl font-extrabold">STR sedang diverifikasi</h2>
+        <h2 className="mt-4 text-xl font-extrabold">STR is being verified</h2>
         <p className="mt-2 text-sm text-neutral-600">
-          Akses <b>AI-EMR</b> hanya untuk klinisi dengan <b>STR/SIP terverifikasi</b> (sesuai UU Kesehatan &amp; Permenkes Telemedicine).
-          Nomor STR Anda{str ? <> (<b>{str}</b>)</> : ''} telah kami terima dan sedang ditinjau tim verifikasi.
+          Access to the <b>AI-EMR</b> is limited to clinicians with a <b>verified STR/SIP</b> (in accordance with the Health Law &amp; Telemedicine Regulations).
+          Your STR number{str ? <> (<b>{str}</b>)</> : ''} has been received and is under review by our verification team.
         </p>
         <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Status: Menunggu verifikasi
+          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Status: Awaiting verification
         </div>
         <div className="mt-5 rounded-xl bg-neutral-50 p-3 text-left text-[12px] text-neutral-500">
-          Verifikasi dilakukan oleh tim Panaceamed (Owner/Admin) terhadap data KKI/STR. Setelah disetujui, AI-EMR terbuka otomatis saat Anda membuka kembali halaman ini.
+          Verification is carried out by the Panaceamed team (Owner/Admin) against KKI/STR records. Once approved, the AI-EMR opens automatically the next time you visit this page.
         </div>
       </Card>
     </div>
@@ -203,36 +203,36 @@ export function EMR() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionTitle
             icon={<IconEMR size={20} />}
-            title="AI-EMR · Rekam Medis Elektronik"
-            subtitle={`Pasien: ${activePatient.name} · diperbarui ${new Date(draft.updatedAt).toLocaleString('id-ID')}`}
+            title="AI-EMR · Electronic Medical Record"
+            subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('id-ID')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
             {draft.signedBy ? (
               <Badge tone="brand">
-                <IconCheck size={13} /> Ditandatangani {draft.signedBy}
+                <IconCheck size={13} /> Signed by {draft.signedBy}
               </Badge>
             ) : (
-              <Badge tone="high">Menunggu verifikasi dokter</Badge>
+              <Badge tone="high">Awaiting doctor verification</Badge>
             )}
             <Button variant="outline" onClick={save} disabled={!dirty}>
-              {dirty ? 'Simpan Perubahan' : 'Tersimpan'}
+              {dirty ? 'Save Changes' : 'Saved'}
             </Button>
             <Button variant="outline" onClick={() => window.print()}>
-              <IconBook size={14} /> Cetak / PDF
+              <IconBook size={14} /> Print / PDF
             </Button>
             <SatusehatButton patient={activePatient} record={draft} vitals={state.vitals[activePatient.id] ?? []} />
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">
           <IconSparkle size={14} />
-          Bagian bertanda <b>USULAN AI</b> wajib diverifikasi & dilengkapi dokter sebelum
-          ditandatangani.
+          Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
+          signing.
         </div>
       </Card>
 
       {/* S — Subjective */}
       <Card>
-        <SectionTitle title="S · Subjective — Anamnesis" subtitle="Disusun AI, dapat diedit dokter" />
+        <SectionTitle title="S · Subjective — History" subtitle="Drafted by AI, editable by the doctor" />
         <div className="grid gap-4 md:grid-cols-2">
           {ANAMNESIS_FIELDS.map((f) => (
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>
@@ -254,8 +254,8 @@ export function EMR() {
       {/* O — Objective */}
       <Card>
         <SectionTitle
-          title="O · Objective — Pemeriksaan Fisik"
-          subtitle="Diisi & diverifikasi oleh dokter pemeriksa"
+          title="O · Objective — Physical Examination"
+          subtitle="Completed & verified by the examining doctor"
           right={
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
               <input
@@ -265,7 +265,7 @@ export function EMR() {
                 className="h-4 w-4 accent-[#00BF63]"
               />
               <IconShield size={16} className="text-brand" />
-              Pemeriksaan fisik diverifikasi
+              Physical examination verified
             </label>
           }
         />
@@ -273,7 +273,7 @@ export function EMR() {
         {ageFromDob(activePatient.dob) <= 19 && (
           <div className="mb-4 rounded-2xl border border-brand/20 bg-brand-50/40 p-4">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-dark">
-              🧒 Kurva Pertumbuhan Pediatri (WHO/CDC) — BB/U · TB/U · IMT/U
+              🧒 Pediatric Growth Charts (WHO/CDC) — Weight-for-age · Height-for-age · BMI-for-age
             </div>
             <GrowthChart patient={activePatient} ageYears={ageFromDob(activePatient.dob)} />
           </div>
@@ -281,26 +281,26 @@ export function EMR() {
 
         <div className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Peta Sistem — ringkasan visual temuan
+            System Map — visual summary of findings
           </div>
           <BodyDiagram findings={buildFindings(draft.physicalExam.perSystem)} />
         </div>
 
         <div className="grid gap-4">
           <ExamField
-            label="Keadaan Umum & Kesadaran"
+            label="General Condition & Level of Consciousness"
             value={draft.physicalExam.general}
             onChange={(v) => setExam('general', v)}
             rows={2}
           />
           <ExamField
-            label="Tanda Vital (catatan klinis)"
+            label="Vital Signs (clinical notes)"
             value={draft.physicalExam.vitalsNote}
             onChange={(v) => setExam('vitalsNote', v)}
             rows={2}
           />
           <ExamField
-            label="Pemeriksaan Per-Sistem (usulan penunjang dari AI di bawah — lengkapi temuan)"
+            label="Per-System Examination (AI-suggested workup below — complete the findings)"
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
@@ -311,13 +311,13 @@ export function EMR() {
       {/* Penunjang & Suportif */}
       <Card>
         <SectionTitle
-          title="Penunjang & Terapi Suportif"
-          subtitle="Interpretasi Lab/EKG · resusitasi, balans cairan, kebutuhan kalori, urine output"
+          title="Workup & Supportive Therapy"
+          subtitle="Lab/ECG interpretation · resuscitation, fluid balance, caloric needs, urine output"
         />
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Interpretasi Temuan Lab & Hasil EKG
+            Interpretation of Lab Findings & ECG Results
           </label>
           <textarea
             value={draft.labEkgInterpretation ?? ''}
@@ -325,16 +325,16 @@ export function EMR() {
               patch((r) => ({ ...r, labEkgInterpretation: e.target.value, updatedAt: new Date().toISOString() }))
             }
             rows={4}
-            placeholder="mis. HbA1c 8.2% (DM tak terkontrol); EKG: LVH, sinus rhythm…"
+            placeholder="e.g. HbA1c 8.2% (uncontrolled DM); ECG: LVH, sinus rhythm…"
             className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {(
             [
-              ['resusitasi', 'Resusitasi'],
-              ['balansCairan', 'Balans Cairan'],
-              ['kebutuhanKalori', 'Kebutuhan Kalori'],
+              ['resusitasi', 'Resuscitation'],
+              ['balansCairan', 'Fluid Balance'],
+              ['kebutuhanKalori', 'Caloric Needs'],
               ['urineOutput', 'Target Urine Output'],
             ] as const
           ).map(([k, label]) => (
@@ -355,16 +355,16 @@ export function EMR() {
           ))}
         </div>
         <p className="mt-2 text-[11px] text-neutral-400">
-          Default dihitung dari berat badan (kalori 25–30 kkal/kg; urine 0.5 mL/kg/jam; cairan rumatan
-          Holliday-Segar) — dokter dapat menyesuaikan.
+          Defaults are calculated from body weight (calories 25–30 kcal/kg; urine 0.5 mL/kg/h; maintenance
+          fluids per Holliday-Segar) — the doctor may adjust them.
         </p>
       </Card>
 
       {/* A — Assessment */}
       <Card>
         <SectionTitle
-          title="A · Assessment — Daftar Masalah & Pengkajian"
-          subtitle="Reasoning AI: basis temuan + narasi “Dipikirkan …”"
+          title="A · Assessment — Problem List & Evaluation"
+          subtitle="AI reasoning: basis of findings + “Considered …” narrative"
         />
         <DiagnosisPicker
           value={draft.primaryDiagnosis}
@@ -372,7 +372,7 @@ export function EMR() {
           onChange={(d) => patch((r) => ({ ...r, primaryDiagnosis: d, updatedAt: new Date().toISOString() }))}
         />
         <div className="space-y-4">
-          {draft.problems.length === 0 && <p className="text-sm text-neutral-400">Belum ada masalah.</p>}
+          {draft.problems.length === 0 && <p className="text-sm text-neutral-400">No problems yet.</p>}
           {draft.problems.map((pr, i) => (
             <div key={pr.id} className="rounded-xl border border-neutral-100 p-4">
               <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -382,7 +382,7 @@ export function EMR() {
                 <h4 className="font-bold">{pr.title}</h4>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-neutral-400">Probabilitas</span>
+                    <span className="text-[11px] font-semibold text-neutral-400">Probability</span>
                     <span className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
                       <span
                         className="block h-full rounded-full bg-brand"
@@ -403,7 +403,7 @@ export function EMR() {
               {pr.differentials && pr.differentials.length > 0 && (
                 <div className="mt-2">
                   <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                    Diagnosis Banding
+                    Differential Diagnoses
                   </div>
                   <ul className="mt-1 space-y-1 text-sm">
                     {pr.differentials.map((d, j) => (
@@ -432,11 +432,11 @@ export function EMR() {
       {/* P — Plan summary */}
       <Card>
         <SectionTitle
-          title="P · Plan — Ringkasan"
-          subtitle="Detail verifikasi rencana pada modul Planning"
+          title="P · Plan — Summary"
+          subtitle="Plan verification details in the Planning module"
           right={
             <Link to="/planning">
-              <Button variant="outline">Buka Planning →</Button>
+              <Button variant="outline">Open Planning →</Button>
             </Link>
           }
         />
@@ -453,7 +453,7 @@ export function EMR() {
         {draft.references.length > 0 && (
           <div className="mt-4 border-t border-neutral-100 pt-3">
             <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-              Referensi (Vancouver)
+              References (Vancouver)
             </div>
             <ol className="list-decimal space-y-1 pl-5 text-xs text-neutral-500">
               {draft.references.map((r, i) => (
@@ -471,19 +471,19 @@ export function EMR() {
       <Card className="border-2 border-brand/20">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-bold">Tanda Tangan Dokter Pemeriksa</h3>
+            <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
-              Dengan menandatangani, dokter memverifikasi seluruh isi rekam medis ini.
+              By signing, the doctor verifies the entire contents of this medical record.
             </p>
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
             <IconCheck size={16} />
-            {draft.signedBy ? 'Tandatangani Ulang' : `Tandatangani sebagai ${state.settings.doctorName}`}
+            {draft.signedBy ? 'Re-sign' : `Sign as ${state.settings.doctorName}`}
           </Button>
         </div>
         {draft.signedAt && (
           <p className="mt-2 text-xs text-brand-dark">
-            ✓ Disahkan {state.settings.doctorName} pada {new Date(draft.signedAt).toLocaleString('id-ID')}
+            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('id-ID')}
           </p>
         )}
       </Card>
@@ -511,7 +511,7 @@ function ExamField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        placeholder="Isi temuan pemeriksaan fisik…"
+        placeholder="Enter physical examination findings…"
         className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
       />
     </div>

@@ -18,61 +18,61 @@ import { api, backendEnabled } from '../lib/api'
 const STEPS: { title: string; body: string; icon: React.ReactNode }[] = [
   {
     icon: <IconDownload size={22} />,
-    title: '1. Unduh aplikasi "Health Auto Export"',
-    body: 'Buka App Store di iPhone yang terpasang dengan Apple Watch Anda, cari "Health Auto Export - JSON+CSV" (oleh HealthyApps), lalu unduh. Aplikasi berbayar sekali beli — tidak ada langganan.',
+    title: '1. Download the "Health Auto Export" app',
+    body: 'Open the App Store on the iPhone paired with your Apple Watch, search for "Health Auto Export - JSON+CSV" (by HealthyApps), and download it. It\'s a one-time purchase — no subscription.',
   },
   {
     icon: <IconKey size={22} />,
-    title: '2. Salin Tautan Sinkron Pribadi Anda',
-    body: 'Kembali ke Panaceamed, buka Data Kesehatan → kartu "Sinkron Otomatis dari Apple Watch" → tekan Salin pada Tautan Sinkron Pribadi. Tautan ini unik untuk akun Anda — jangan dibagikan ke orang lain.',
+    title: '2. Copy your Private Sync Link',
+    body: 'Back in Panaceamed, open Health Data → the "Auto-Sync from Apple Watch" card → press Copy on the Private Sync Link. This link is unique to your account — don\'t share it with anyone.',
   },
   {
     icon: <IconActivity size={22} />,
-    title: '3. Buat automation REST API',
-    body: 'Di aplikasi Health Auto Export: buka tab Automations → tekan "+" → pilih jenis REST API. Beri nama bebas, misalnya "Panaceamed".',
+    title: '3. Create a REST API automation',
+    body: 'In the Health Auto Export app: open the Automations tab → press "+" → choose the REST API type. Give it any name, for example "Panaceamed".',
   },
   {
     icon: <IconGauge size={22} />,
-    title: '4. Tempel tautan & pilih format JSON',
-    body: 'Tempel Tautan Sinkron Pribadi dari langkah 2 ke kolom URL. Pastikan format ekspor diset ke JSON (bukan CSV) — server Panaceamed hanya membaca format ini.',
+    title: '4. Paste the link & choose JSON format',
+    body: 'Paste the Private Sync Link from step 2 into the URL field. Make sure the export format is set to JSON (not CSV) — the Panaceamed server only reads this format.',
   },
   {
     icon: <IconHeart size={22} />,
-    title: '5. Pilih metrik yang disinkron',
-    body: 'Centang: VO2 Max, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Weight Body Mass, Body Fat Percentage. Metrik lain boleh dicentang juga, tapi hanya enam ini yang dibaca Panaceamed saat ini.',
+    title: '5. Select the metrics to sync',
+    body: 'Check: VO2 Max, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Weight Body Mass, Body Fat Percentage. You may check other metrics too, but only these six are read by Panaceamed for now.',
   },
   {
     icon: <IconTimer size={22} />,
-    title: '6. Aktifkan jadwal otomatis',
-    body: 'Nyalakan "Automatically Export" dan atur jadwal (disarankan: setiap pagi). Health Auto Export akan mengirim data terbaru ke Panaceamed tanpa Anda buka aplikasi apa pun.',
+    title: '6. Turn on the automatic schedule',
+    body: 'Turn on "Automatically Export" and set a schedule (recommended: every morning). Health Auto Export will send your latest data to Panaceamed without you opening any app.',
   },
   {
     icon: <IconCheck size={22} />,
-    title: '7. Uji coba sekali secara manual',
-    body: 'Tekan tombol "Export" di aplikasi untuk mengirim data pertama kali. Buka kembali Data Kesehatan di Panaceamed — VO2max, HRV, dan HR istirahat Anda akan terisi otomatis dalam beberapa detik.',
+    title: '7. Run one manual test',
+    body: 'Press the "Export" button in the app to send data for the first time. Reopen Health Data in Panaceamed — your VO2max, HRV, and resting HR will fill in automatically within a few seconds.',
   },
 ]
 
 const FAQ: { q: string; a: string }[] = [
   {
-    q: 'Kenapa tidak bisa langsung tanpa aplikasi tambahan?',
-    a: 'Apple sengaja membatasi HealthKit (data Apple Health) hanya bisa dibaca oleh aplikasi native di perangkat itu sendiri — bukan oleh website/browser mana pun, termasuk Panaceamed. Health Auto Export bertindak sebagai jembatan resmi yang sudah banyak dipakai untuk kasus seperti ini.',
+    q: 'Why can\'t it work directly without an extra app?',
+    a: 'Apple deliberately restricts HealthKit (Apple Health data) so it can only be read by native apps on the device itself — not by any website/browser, including Panaceamed. Health Auto Export acts as an official bridge that is widely used for cases like this.',
   },
   {
-    q: 'Apakah aman membagikan Tautan Sinkron Pribadi ke aplikasi itu?',
-    a: 'Ya — tautan hanya dipakai satu arah (Health Auto Export → server Panaceamed) dan hanya bisa menulis data ke akun Anda sendiri, tidak bisa membaca data lain. Tetap jangan sebarkan tautan itu ke orang lain; jika bocor, buat ulang lewat tombol "Buat ulang tautan" di halaman Data Kesehatan.',
+    q: 'Is it safe to share the Private Sync Link with that app?',
+    a: 'Yes — the link is used one-way only (Health Auto Export → Panaceamed server) and can only write data to your own account, not read anyone else\'s data. Still, don\'t spread the link to others; if it leaks, regenerate it via the "Regenerate link" button on the Health Data page.',
   },
   {
-    q: 'Datanya lewat mana? Apakah Panaceamed menyimpan file mentah saya?',
-    a: 'Tidak. Server hanya mengekstrak enam angka (VO2max, HR istirahat, HRV, tidur, berat, lemak tubuh) dari kiriman aplikasi, lalu membuang sisanya. Tidak ada file HealthKit mentah yang disimpan.',
+    q: 'Where does the data go? Does Panaceamed store my raw file?',
+    a: 'No. The server only extracts six numbers (VO2max, resting HR, HRV, sleep, weight, body fat) from what the app sends, then discards the rest. No raw HealthKit file is stored.',
   },
   {
-    q: 'Bisa pakai Android / Garmin / Samsung Health?',
-    a: 'Untuk saat ini jalur otomatis ini khusus Apple Health (iPhone + Apple Watch). Untuk perangkat lain, gunakan impor manual file export atau isi datanya langsung di formulir — keduanya ada di halaman Data Kesehatan.',
+    q: 'Can I use Android / Garmin / Samsung Health?',
+    a: 'For now this automatic path is Apple Health only (iPhone + Apple Watch). For other devices, use the manual export-file import or enter your data directly in the form — both are on the Health Data page.',
   },
   {
-    q: 'Kenapa data saya tidak muncul setelah setup?',
-    a: 'Periksa: (1) format ekspor di aplikasi harus JSON bukan CSV, (2) tautan tertempel lengkap tanpa terpotong, (3) minimal satu metrik yang didukung sudah dicentang, (4) coba tekan Export manual sekali untuk memicu pengiriman pertama.',
+    q: 'Why isn\'t my data showing up after setup?',
+    a: 'Check: (1) the export format in the app must be JSON, not CSV, (2) the link is pasted in full without being truncated, (3) at least one supported metric is checked, (4) try pressing Export manually once to trigger the first send.',
   },
 ]
 
@@ -89,15 +89,15 @@ export function HealthSyncTutorial() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Sambungkan Apple Watch ke Panaceamed"
-          subtitle="Panduan lengkap — bisa diikuti siapa saja" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Connect Apple Watch to Panaceamed"
+          subtitle="Full guide — anyone can follow it" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">
-          Website tidak bisa membaca Apple Health secara langsung — ini batasan resmi dari Apple, bukan keterbatasan Panaceamed. Solusinya: aplikasi jembatan gratis-fitur-utama bernama <b>Health Auto Export</b> yang mengirim data HealthKit Anda ke server Panaceamed secara terjadwal. Ikuti 7 langkah di bawah — sekali setup, selanjutnya berjalan otomatis.
+          A website can't read Apple Health directly — this is an official Apple restriction, not a Panaceamed limitation. The solution: a bridge app called <b>Health Auto Export</b> that sends your HealthKit data to the Panaceamed server on a schedule. Follow the 7 steps below — set it up once, and it runs automatically from then on.
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          <Badge tone="brand">Sekali setup</Badge>
-          <Badge tone="normal">±5 menit</Badge>
-          <Badge tone="neutral">Butuh iPhone + Apple Watch</Badge>
+          <Badge tone="brand">One-time setup</Badge>
+          <Badge tone="normal">~5 minutes</Badge>
+          <Badge tone="neutral">Requires iPhone + Apple Watch</Badge>
         </div>
       </Card>
 
@@ -121,12 +121,12 @@ export function HealthSyncTutorial() {
       {/* Live link preview, if logged in with backend enabled */}
       {backendEnabled && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconKey size={20} />} title="Tautan Sinkron Pribadi Anda" subtitle="Untuk langkah 2 — salin ke aplikasi" />
+          <SectionTitle icon={<IconKey size={20} />} title="Your Private Sync Link" subtitle="For step 2 — copy it into the app" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
-            {url ?? 'Memuat…'}
+            {url ?? 'Loading…'}
           </div>
           <Link to="/health-data">
-            <Button className="mt-3 w-full">Buka Halaman Data Kesehatan <IconChevronRight size={16} /></Button>
+            <Button className="mt-3 w-full">Open the Health Data Page <IconChevronRight size={16} /></Button>
           </Link>
         </Card>
       )}
@@ -138,14 +138,14 @@ export function HealthSyncTutorial() {
             <IconShield size={18} />
           </div>
           <p className="text-[12px] leading-relaxed text-brand-dark">
-            <b>Privasi:</b> tautan sinkron Anda unik dan hanya bisa <i>menulis</i> data ke akun Anda sendiri — tidak bisa dipakai membaca data siapa pun. Server hanya menyimpan enam angka ringkasan, bukan riwayat HealthKit mentah. Bocor tautan? Buat ulang kapan saja di halaman Data Kesehatan.
+            <b>Privacy:</b> your sync link is unique and can only <i>write</i> data to your own account — it can't be used to read anyone's data. The server only stores six summary numbers, not your raw HealthKit history. Link leaked? Regenerate it anytime on the Health Data page.
           </p>
         </div>
       </Card>
 
       {/* FAQ */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Pertanyaan Umum" subtitle="Troubleshooting cepat" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Frequently Asked Questions" subtitle="Quick troubleshooting" />
         <div className="mt-2 divide-y divide-neutral-100">
           {FAQ.map((f, i) => (
             <details key={i} className="group py-3">
@@ -163,7 +163,7 @@ export function HealthSyncTutorial() {
 
       <div className="text-center">
         <Link to="/health-data" className="text-xs font-semibold text-brand-dark hover:underline">
-          ← Kembali ke Data Kesehatan
+          ← Back to Health Data
         </Link>
       </div>
     </div>

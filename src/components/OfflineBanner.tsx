@@ -31,9 +31,9 @@ export function OfflineBanner() {
       style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
     >
       {online ? (
-        <>✓ Kembali online</>
+        <>✓ Back online</>
       ) : (
-        <>📴 Mode Offline — Atlet, Lab Performa & Program AI tetap bisa dipakai; data tersinkron saat online kembali</>
+        <>📴 Offline Mode — Athlete, Performance Lab & AI Program still work; your data syncs when you're back online</>
       )}
     </div>
   )

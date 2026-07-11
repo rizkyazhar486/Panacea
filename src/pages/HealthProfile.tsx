@@ -19,8 +19,8 @@ import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIM
 // every calculator prefills.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Src = 'Manual' | 'WHOOP' | 'Apple Watch' | 'Garmin' | 'Samsung Health' | 'Fitbit' | 'Oura' | 'Lainnya'
-const SOURCES: Src[] = ['Manual', 'WHOOP', 'Apple Watch', 'Garmin', 'Samsung Health', 'Fitbit', 'Oura', 'Lainnya']
+type Src = 'Manual' | 'WHOOP' | 'Apple Watch' | 'Garmin' | 'Samsung Health' | 'Fitbit' | 'Oura' | 'Other'
+const SOURCES: Src[] = ['Manual', 'WHOOP', 'Apple Watch', 'Garmin', 'Samsung Health', 'Fitbit', 'Oura', 'Other']
 
 interface Snapshot {
   date: string
@@ -113,7 +113,7 @@ export function HealthProfile() {
       vo2max: p.vo2max || undefined, restingHr: p.restingHr || undefined, hrvMs: p.hrvMs || undefined })
     if (backendEnabled) {
       try { await api.saveHealthProfile(payload as unknown as Record<string, unknown>) }
-      catch { setErr('Tersimpan di perangkat, tapi gagal sinkron ke server (offline). Akan otomatis tersimpan lokal.') }
+      catch { setErr('Saved on this device, but syncing to the server failed (offline). It will be kept locally automatically.') }
     }
     setSavedAt(now); setSaving(false)
   }
@@ -122,16 +122,16 @@ export function HealthProfile() {
   async function onImport(file?: File) {
     if (!file) return
     if (file.size > MAX_IMPORT_BYTES) {
-      setNote(''); setErr(`File terlalu besar (${(file.size / 1048576).toFixed(0)} MB, maks 60 MB). Untuk export Apple Health yang besar, isi nilai kunci secara manual.`)
+      setNote(''); setErr(`File too large (${(file.size / 1048576).toFixed(0)} MB, max 60 MB). For large Apple Health exports, enter the key values manually.`)
       if (fileRef.current) fileRef.current.value = ''
       return
     }
-    setNote('Membaca file…'); setErr('')
+    setNote('Reading file…'); setErr('')
     try {
       const text = await file.text()
       const r: ImportResult = parseHealthFile(file.name, text)
       const keys = Object.keys(r).filter((k) => k !== 'source')
-      if (!keys.length) { setNote(''); setErr('Tidak menemukan data yang dikenali di file itu. Coba export.xml (Apple Health) atau physiological_cycles.csv (WHOOP).'); return }
+      if (!keys.length) { setNote(''); setErr('No recognizable data found in that file. Try export.xml (Apple Health) or physiological_cycles.csv (WHOOP).'); return }
       setP((x) => ({
         ...x,
         source: (r.source as Src) ?? x.source,
@@ -139,9 +139,9 @@ export function HealthProfile() {
         recoveryPct: r.recoveryPct ?? x.recoveryPct, strain: r.strain ?? x.strain, sleepH: r.sleepH ?? x.sleepH,
         weightKg: r.weightKg ?? x.weightKg, bodyFatPct: r.bodyFatPct ?? x.bodyFatPct,
       }))
-      setNote(`Terisi dari ${r.source}: ${keys.length} nilai. Periksa lalu tekan Simpan.`)
+      setNote(`Filled from ${r.source}: ${keys.length} values. Review, then press Save.`)
     } catch {
-      setNote(''); setErr('Gagal membaca file.')
+      setNote(''); setErr('Failed to read the file.')
     } finally {
       if (fileRef.current) fileRef.current.value = ''
     }
@@ -154,14 +154,14 @@ export function HealthProfile() {
     setTimeout(() => URL.revokeObjectURL(url), 2000)
   }
   function exportJson() {
-    download(`data-kesehatan-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(p, null, 2), 'application/json')
+    download(`health-data-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(p, null, 2), 'application/json')
   }
   function exportCsv() {
     const rows = p.history ?? []
-    if (!rows.length) { setErr('Belum ada riwayat untuk diekspor — simpan data dulu.'); return }
+    if (!rows.length) { setErr('No history to export yet — save your data first.'); return }
     const cols: (keyof Snapshot)[] = ['date', 'vo2max', 'restingHr', 'hrvMs', 'recoveryPct', 'sleepH']
     const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => r[c] ?? '').join(','))].join('\n')
-    download(`riwayat-kesehatan-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv')
+    download(`health-history-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv')
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
@@ -171,18 +171,18 @@ export function HealthProfile() {
     </Field>
   )
 
-  if (loading) return <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-400">Memuat data kesehatan…</div>
+  if (loading) return <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-400">Loading health data…</div>
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Data Kesehatan Saya"
-          subtitle={backendEnabled ? 'Tersimpan di server per akun — ikut di semua perangkat' : 'Tersimpan di perangkat ini (server tidak aktif)'} />
+        <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
+          subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Isi manual, impor file export, atau salin dari <b>WHOOP · Apple Watch · Garmin · Samsung Health · Fitbit · Oura</b>. Data ini mengisi otomatis semua kalkulator kebugaran & longevity Anda.
+          Enter manually, import an export file, or copy from <b>WHOOP · Apple Watch · Garmin · Samsung Health · Fitbit · Oura</b>. This data automatically fills all your fitness & longevity calculators.
         </p>
         <div className="mt-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sumber Data</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {SOURCES.map((s) => (
               <button key={s} onClick={() => u({ source: s })}
@@ -192,20 +192,20 @@ export function HealthProfile() {
             ))}
           </div>
         </div>
-        {account && <div className="mt-2 text-[10px] text-neutral-400">Akun: {account.email}</div>}
+        {account && <div className="mt-2 text-[10px] text-neutral-400">Account: {account.email}</div>}
       </Card>
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Impor & Ekspor" subtitle="Apple Health export.xml · WHOOP .csv" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health export.xml · WHOOP .csv" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Ekspor dari aplikasi kesehatan Anda lalu unggah di sini — kolom akan terisi otomatis. File diproses di perangkat, tidak diunggah saat dibaca. Anda juga bisa mengunduh data Anda kapan saja.
+          Export from your health app, then upload it here — the fields fill in automatically. Files are processed on your device, not uploaded when read. You can also download your data anytime.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,text/xml,text/csv" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
-          <Button onClick={() => fileRef.current?.click()} className="!px-4">Pilih file export…</Button>
-          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh JSON</button>
-          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh riwayat CSV</button>
+          <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
+          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
+          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
       </Card>
@@ -215,47 +215,47 @@ export function HealthProfile() {
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Demografi" subtitle="Dasar untuk semua perhitungan" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Demographics" subtitle="The basis for all calculations" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {num('Usia', 'age', 1, 'mis. 26')}
-          <Field label="Jenis Kelamin">
+          {num('Age', 'age', 1, 'e.g. 26')}
+          <Field label="Sex">
             <select className={inputClass} value={p.sex} onChange={(e) => u({ sex: e.target.value as 'M' | 'F' })}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
-          {num('Tinggi (cm)', 'heightCm', 1, 'mis. 170')}
-          {num('Berat (kg)', 'weightKg', 0.1, 'mis. 68')}
+          {num('Height (cm)', 'heightCm', 1, 'e.g. 170')}
+          {num('Weight (kg)', 'weightKg', 0.1, 'e.g. 68')}
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Kardio, Recovery & HRV" subtitle="Dari jam/cincin atau tes" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="From a watch/ring or a test" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {num('VO₂max (ml/kg/mnt)', 'vo2max', 0.1, 'mis. 42')}
-          {num('Resting HR (bpm)', 'restingHr', 1, 'mis. 58')}
-          {num('HRV (ms)', 'hrvMs', 1, 'mis. 65')}
+          {num('VO₂max (ml/kg/min)', 'vo2max', 0.1, 'e.g. 42')}
+          {num('Resting HR (bpm)', 'restingHr', 1, 'e.g. 58')}
+          {num('HRV (ms)', 'hrvMs', 1, 'e.g. 65')}
           {num('Recovery (%) — WHOOP', 'recoveryPct', 1, '0-100')}
           {num('Strain (0-21) — WHOOP', 'strain', 0.1, '0-21')}
-          <Field label="Tekanan Darah"><input className={inputClass} placeholder="120/80" value={p.bloodPressure} onChange={(e) => u({ bloodPressure: e.target.value })} /></Field>
+          <Field label="Blood Pressure"><input className={inputClass} placeholder="120/80" value={p.bloodPressure} onChange={(e) => u({ bloodPressure: e.target.value })} /></Field>
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Tidur & Aktivitas" subtitle="Snapshot harian" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Sleep & Activity" subtitle="Daily snapshot" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {num('Tidur total (jam)', 'sleepH', 0.1, 'mis. 7.5')}
-          {num('REM (jam)', 'remH', 0.1)}
-          {num('Deep/N3 (jam)', 'deepH', 0.1)}
-          {num('Langkah', 'steps', 1, 'mis. 8000')}
-          {num('Kalori aktif', 'activeKcal', 1)}
+          {num('Total sleep (hours)', 'sleepH', 0.1, 'e.g. 7.5')}
+          {num('REM (hours)', 'remH', 0.1)}
+          {num('Deep/N3 (hours)', 'deepH', 0.1)}
+          {num('Steps', 'steps', 1, 'e.g. 8000')}
+          {num('Active calories', 'activeKcal', 1)}
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Komposisi Tubuh" subtitle="Dari timbangan pintar / InBody" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="From a smart scale / InBody" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {num('Lemak tubuh (%)', 'bodyFatPct', 0.1, 'mis. 18')}
-          {num('Massa otot (kg)', 'muscleMassKg', 0.1)}
+          {num('Body fat (%)', 'bodyFatPct', 0.1, 'e.g. 18')}
+          {num('Muscle mass (kg)', 'muscleMassKg', 0.1)}
         </div>
       </Card>
 
@@ -266,19 +266,19 @@ export function HealthProfile() {
       <div className="sticky bottom-4 z-10">
         <Card className="!p-3 flex items-center justify-between gap-3 shadow-lg">
           <div className="min-w-0 text-[11px] text-neutral-500">
-            {savedAt ? <span className="flex items-center gap-1 font-semibold text-brand-dark"><IconCheck size={13} /> Tersimpan {new Date(savedAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> : 'Belum disimpan'}
+            {savedAt ? <span className="flex items-center gap-1 font-semibold text-brand-dark"><IconCheck size={13} /> Saved {new Date(savedAt).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span> : 'Not saved yet'}
             {err && <span className="mt-0.5 block text-amber-600">{err}</span>}
           </div>
-          <Button onClick={save} disabled={saving} className="shrink-0">{saving ? 'Menyimpan…' : 'Simpan'}</Button>
+          <Button onClick={save} disabled={saving} className="shrink-0">{saving ? 'Saving…' : 'Save'}</Button>
         </Card>
       </div>
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-3 text-center text-[11px] leading-relaxed text-brand-dark">
         {backendEnabled
-          ? 'Data tersimpan aman di server per akun Anda — login di perangkat lain, data ikut. Bukan data medis diagnostik; untuk edukasi & pelacakan pribadi.'
-          : 'Server belum aktif — data tersimpan lokal di perangkat ini. Aktifkan backend (VITE_API_URL) agar tersinkron antar-perangkat.'}
+          ? 'Your data is stored securely on the server per account — log in on another device and it follows you. Not diagnostic medical data; for education & personal tracking.'
+          : 'Server not active — data is stored locally on this device. Enable the backend (VITE_API_URL) to sync across devices.'}
         <div className="mt-1">
-          <Badge tone="brand">Sumber: {p.source}</Badge>
+          <Badge tone="brand">Source: {p.source}</Badge>
         </div>
       </div>
     </div>
@@ -297,7 +297,7 @@ function InsightCard({ history }: { history: Snapshot[] }) {
   }
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Insight Otomatis" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Automatic Insights" subtitle="From your own data trends — free, no AI" />
       <div className="mt-3 space-y-2">
         {insights.map((ins) => (
           <div key={ins.id} className={`rounded-xl border p-3 ${toneClass[ins.tone]}`}>
@@ -334,12 +334,12 @@ function BenchmarkCard({ profile }: { profile: HealthProfile }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimasi berbasis norma usia & jenis kelamin" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Compare with the General Population" subtitle="Estimate based on age & sex norms" />
       <div className="mt-3 space-y-4">
         {items.map((it) => (
           <div key={it.key}>
             <div className="flex items-baseline justify-between text-xs">
-              <span className="font-bold text-ink">{it.label}: {it.value}{it.unit === 'jam' ? ' jam' : ` ${it.unit}`}</span>
+              <span className="font-bold text-ink">{it.label}: {it.value}{it.unit === 'jam' ? ' hours' : ` ${it.unit}`}</span>
               <span className="font-semibold text-neutral-500">{it.categoryLabel}</span>
             </div>
             <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
@@ -360,21 +360,21 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   if (history.length < 2) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle="Grafik muncul setelah ≥2 kali simpan" />
-        <p className="mt-1 text-[11px] text-neutral-500">Simpan data secara berkala (mis. tiap pagi) untuk melihat perkembangan VO₂max, HRV, dan HR istirahat dari waktu ke waktu.</p>
+        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="Chart appears after ≥2 saves" />
+        <p className="mt-1 text-[11px] text-neutral-500">Save your data regularly (e.g. every morning) to track your VO₂max, HRV, and resting HR over time.</p>
       </Card>
     )
   }
-  const data = history.map((s) => ({ ...s, label: new Date(s.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }))
+  const data = history.map((s) => ({ ...s, label: new Date(s.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) }))
   const series = [
     { key: 'vo2max', name: 'VO₂max', color: '#00BF63' },
     { key: 'hrvMs', name: 'HRV (ms)', color: '#6366f1' },
-    { key: 'restingHr', name: 'HR Istirahat', color: '#f59e0b' },
+    { key: 'restingHr', name: 'Resting HR', color: '#f59e0b' },
   ] as const
   const active = series.filter((s) => data.some((d) => (d as unknown as Record<string, number>)[s.key]))
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle={`${history.length} catatan tersimpan`} />
+      <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle={`${history.length} records saved`} />
       <div className="mt-3 h-56">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
@@ -469,7 +469,7 @@ function AutoSyncCard() {
   const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
 
   async function rotate() {
-    if (!confirm('Buat ulang tautan sinkron? Tautan lama akan berhenti bekerja — Anda perlu memperbarui URL di aplikasi Health Auto Export.')) return
+    if (!confirm('Regenerate the sync link? The old link will stop working — you will need to update the URL in the Health Auto Export app.')) return
     setBusy(true)
     try { setToken(await api.rotateHealthWebhookToken()) } finally { setBusy(false) }
   }
@@ -479,28 +479,28 @@ function AutoSyncCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Auto-Sync from Apple Watch" subtitle="Via the third-party “Health Auto Export” app" />
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-        Website tidak bisa membaca Apple Health langsung — itu batasan dari Apple, khusus aplikasi native. Cara paling dekat dengan "otomatis": pasang aplikasi <b>Health Auto Export</b> (App Store, sekali beli) di iPhone Anda, lalu arahkan ke tautan pribadi di bawah ini.
+        A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>
 
       <div className="mt-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Tautan Sinkron Pribadi</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Private Sync Link</div>
         <div className="mt-1.5 flex items-center gap-2">
-          <input readOnly value={url || 'Memuat…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
-          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Tersalin ✓' : 'Salin'}</button>
+          <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
+          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
-        <p className="mt-1 text-[10px] text-neutral-400">Jaga tautan ini rahasia — siapa pun yang memilikinya bisa mengirim data ke akun Anda.</p>
+        <p className="mt-1 text-[10px] text-neutral-400">Keep this link secret — anyone who has it can send data to your account.</p>
       </div>
 
       <Link to="/health-data/tutorial"
         className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-50/80">
-        📖 Lihat Tutorial Setup Lengkap (7 langkah, ±5 menit)
+        📖 View the Full Setup Tutorial (7 steps, ~5 min)
         <IconChevronRight size={16} className="shrink-0" />
       </Link>
 
       <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
-        {busy ? 'Memproses…' : 'Buat ulang tautan (jika bocor)'}
+        {busy ? 'Processing…' : 'Regenerate link (if leaked)'}
       </button>
     </Card>
   )
