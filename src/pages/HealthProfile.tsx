@@ -41,6 +41,8 @@ interface HealthProfile {
   bloodPressure: string // "120/80"
   history?: Snapshot[]
   updatedAt?: string
+  lastDeviceSyncAt?: string
+  deviceSyncSource?: string
 }
 const DEF: HealthProfile = {
   source: 'Manual', age: 0, sex: 'M', heightCm: 0, weightKg: 0,
@@ -60,19 +62,29 @@ export function HealthProfile() {
   const [note, setNote] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Load: server first (per-user), else local.
+  // Load: server first (per-user), else local. Re-pull from the server on mount
+  // AND whenever the tab regains focus, so data pushed from the phone (via the
+  // health webhook) shows up automatically without a manual refresh.
   useEffect(() => {
     let alive = true
-    async function load() {
+    async function load(initial: boolean) {
       let data: Partial<HealthProfile> = {}
-      try { data = JSON.parse(localStorage.getItem(LKEY) || '{}') } catch { /* ignore */ }
+      if (initial) { try { data = JSON.parse(localStorage.getItem(LKEY) || '{}') } catch { /* ignore */ } }
       if (backendEnabled) {
         try { const remote = await api.getHealthProfile(); if (remote && Object.keys(remote).length) data = { ...data, ...(remote as Partial<HealthProfile>) } } catch { /* offline */ }
       }
-      if (alive) { setP({ ...DEF, ...data }); setSavedAt((data as HealthProfile).updatedAt ?? null); setLoading(false) }
+      if (!alive) return
+      if (initial) { setP({ ...DEF, ...data }); setSavedAt((data as HealthProfile).updatedAt ?? null); setLoading(false) }
+      else if (Object.keys(data).length) {
+        // Merge server-authoritative device fields over the current form without
+        // clobbering unsaved edits to unrelated fields.
+        setP((cur) => ({ ...cur, ...data }))
+      }
     }
-    load()
-    return () => { alive = false }
+    load(true)
+    const onFocus = () => load(false)
+    window.addEventListener('focus', onFocus)
+    return () => { alive = false; window.removeEventListener('focus', onFocus) }
   }, [])
 
   const u = (patch: Partial<HealthProfile>) => setP((x) => ({ ...x, ...patch }))
@@ -199,6 +211,8 @@ export function HealthProfile() {
       </Card>
 
       {backendEnabled && <AutoSyncCard />}
+
+      {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
 
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Demografi" subtitle="Dasar untuk semua perhitungan" />
@@ -390,6 +404,61 @@ function TrendChart({ history }: { history: Snapshot[] }) {
 // a JSON export to a URL on a schedule. A website can't read HealthKit
 // directly (Apple restricts it to native apps), so this webhook is the closest
 // thing to "auto-sync" without building a companion iOS app.
+// Shows the data that arrived automatically from the user's device (via the
+// health webhook) — a confirmation that the sync worked and a live readout of
+// every processed metric, so device data is visibly "displayed & processed
+// automatically" the moment it's pushed, no manual entry.
+function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
+  const metrics: { label: string; value: string }[] = []
+  const add = (label: string, v: number | undefined, unit = '', dp = 0) => {
+    if (typeof v === 'number' && v > 0) metrics.push({ label, value: `${v.toFixed(dp)}${unit}` })
+  }
+  add('VO₂max', profile.vo2max, ' ml/kg/min', 1)
+  add('Resting HR', profile.restingHr, ' bpm')
+  add('HRV', profile.hrvMs, ' ms')
+  add('Sleep', profile.sleepH, ' h', 1)
+  add('Weight', profile.weightKg, ' kg', 1)
+  add('Body fat', profile.bodyFatPct, ' %', 1)
+  add('Steps', profile.steps, '')
+  add('Active energy', profile.activeKcal, ' kcal')
+
+  const when = profile.lastDeviceSyncAt ? new Date(profile.lastDeviceSyncAt) : null
+  const ago = when ? timeAgoShort(when) : ''
+
+  return (
+    <Card className="!p-5">
+      <div className="flex items-center justify-between">
+        <SectionTitle icon={<IconActivity size={20} />} title="Synced from Your Device" subtitle={`${profile.deviceSyncSource ?? 'Device'} · processed automatically`} />
+        <span className="flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold text-brand-dark">
+          <span className="h-2 w-2 rounded-full bg-brand vital-dot" /> {ago}
+        </span>
+      </div>
+      {metrics.length > 0 ? (
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {metrics.map((m) => (
+            <div key={m.label} className="rounded-xl border border-neutral-100 bg-neutral-50 p-2.5 text-center">
+              <div className="text-sm font-extrabold text-ink">{m.value}</div>
+              <div className="text-[10px] font-semibold text-neutral-400">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-neutral-400">Your device connected, but this sync carried no matching metrics — widen the Date Range in Health Auto Export and it will fill in here.</p>
+      )}
+      <p className="mt-3 text-[10px] text-neutral-400">These values flow straight into your calculators and the trend chart below — no manual entry needed. Reopen this page (or refocus the tab) to pull the latest sync.</p>
+    </Card>
+  )
+}
+
+// Compact "Xm ago" / "Xh ago" / "Xd ago" for the last sync stamp.
+function timeAgoShort(d: Date): string {
+  const s = Math.floor((Date.now() - d.getTime()) / 1000)
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
+  return `${Math.floor(s / 86400)}d ago`
+}
+
 function AutoSyncCard() {
   const [token, setToken] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)

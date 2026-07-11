@@ -24,6 +24,7 @@ import {
   saveSettings,
   getHealthProfile,
   saveHealthProfile,
+  recordDeviceHealthSync,
   getHealthWebhookToken,
   rotateHealthWebhookToken,
   emailForWebhookToken,
@@ -443,8 +444,11 @@ app.post('/api/health-webhook/:token', (req, res) => {
     return
   }
   try {
-    const profile = saveHealthProfile(email, { ...mapped, source: 'Apple Watch' })
-    res.json({ ok: true, imported: Object.keys(mapped).length, profile })
+    // Store the latest values AND auto-append a dated snapshot to the trend
+    // history + stamp the sync time, so device data is processed and shown on
+    // the website automatically with no manual save.
+    const profile = recordDeviceHealthSync(email, mapped, 'Apple Watch')
+    res.json({ ok: true, imported: Object.keys(mapped).length, syncedAt: profile.lastDeviceSyncAt, profile })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }

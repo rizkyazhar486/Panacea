@@ -400,6 +400,35 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
   return db.healthProfiles[email]
 }
 
+// Called after a device webhook import so the data isn't just "latest values" —
+// it's automatically folded into the same per-day trend history the manual form
+// keeps, and stamped with a device-sync time. This makes device-pushed metrics
+// appear and accumulate on the website with no manual "Save" step.
+const TRACKED_TREND_KEYS = ['vo2max', 'restingHr', 'hrvMs', 'sleepH', 'weightKg', 'bodyFatPct', 'steps', 'activeKcal'] as const
+export function recordDeviceHealthSync(email: string, mapped: Record<string, any>, source: string): Record<string, any> {
+  if (!db.healthProfiles) db.healthProfiles = {}
+  const prev = db.healthProfiles[email] ?? {}
+  const now = new Date().toISOString()
+  const today = now.slice(0, 10)
+
+  // Merge today's snapshot into the trend history (one row per day; later syncs
+  // in the same day refresh that day's values rather than duplicating).
+  const snap: Record<string, any> = { date: today }
+  for (const k of TRACKED_TREND_KEYS) if (typeof mapped[k] === 'number') snap[k] = mapped[k]
+  const history: Record<string, any>[] = Array.isArray(prev.history) ? prev.history : []
+  const merged = [...history.filter((s) => s?.date !== today), { ...history.find((s) => s?.date === today), ...snap }].slice(-90)
+
+  db.healthProfiles[email] = {
+    ...prev, ...mapped,
+    history: merged,
+    lastDeviceSyncAt: now,
+    deviceSyncSource: source,
+    updatedAt: now,
+  }
+  save()
+  return db.healthProfiles[email]
+}
+
 // Opaque per-user webhook token — lets an automation on the user's phone (e.g.
 // the "Health Auto Export" app reading Apple HealthKit) push data to
 // POST /api/health-webhook/:token without a session login. The token itself is
