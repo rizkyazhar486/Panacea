@@ -1446,9 +1446,9 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2 border-t border-neutral-100 pt-2">
-          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Nama komunitas" className={inputClass + ' flex-1 text-xs'} />
-          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Olahraga" className={inputClass + ' w-24 text-xs'} />
+        <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
+          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Nama komunitas" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Olahraga" className={inputClass + ' w-24 shrink-0 text-xs'} />
           <button onClick={() => { createCommunity(communityName, sportTag); setCommunityName(''); setSportTag('') }} disabled={!communityName.trim() || !sportTag.trim()}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
         </div>
@@ -1476,9 +1476,9 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             ))}
           </div>
         )}
-        <div className="flex items-center gap-2 border-t border-neutral-100 pt-2">
-          <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 text-xs'} />
-          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Kirim semangat singkat..." className={inputClass + ' flex-1 text-xs'} />
+        <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
+          <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 shrink-0 text-xs'} />
+          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Kirim semangat singkat..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
@@ -1532,9 +1532,9 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
       {/* 9. Circle of Care */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🫂 Circle of Care</div>
-        <div className="flex items-center gap-2">
-          <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Nama circle (mis. Keluarga)" className={inputClass + ' w-32 text-xs'} />
-          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Nama anggota, pisahkan koma" className={inputClass + ' flex-1 text-xs'} />
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Nama circle (mis. Keluarga)" className={inputClass + ' w-32 shrink-0 text-xs'} />
+          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Nama anggota, pisahkan koma" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { createCircle(circleName, circleMembers.split(',')); setCircleName(''); setCircleMembers('') }} disabled={!circleName.trim()}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
         </div>
@@ -1548,9 +1548,9 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
       {/* 10. Gratitude wall */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🙏 Dinding Terima Kasih</div>
-        <div className="flex items-center gap-2">
-          <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 text-xs'} />
-          <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="Ucapan terima kasih..." className={inputClass + ' flex-1 text-xs'} />
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="Untuk siapa?" className={inputClass + ' w-28 shrink-0 text-xs'} />
+          <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="Ucapan terima kasih..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { addGratitude(gratTo, gratText); setGratTo(''); setGratText('') }} disabled={!gratText.trim() || !gratTo.trim()}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
@@ -1971,13 +1971,11 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifikasi aktif</span>
             : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Aktifkan Notifikasi</button>}
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' min-w-0 text-xs sm:flex-1'} />
-          <div className="flex items-center gap-2">
-            <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' w-24 shrink-0 text-xs'} />
-            <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
-              className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Nama obat/vitamin" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' min-w-[110px] max-w-[150px] flex-1 text-xs'} />
+          <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
+            className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
         </div>
         {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">Belum ada pengingat. Tambahkan satu di atas.</p>}
         {state.medReminders.map((m) => {
@@ -2022,16 +2020,16 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       {/* #4: Target & Badge Progres */}
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🎯 Target Kesehatan</div>
-        <div className="flex items-center gap-2">
-          <select value={goalMetric} onChange={(e) => setGoalMetric(e.target.value as HealthGoal['metric'])} className={inputClass + ' w-28 text-xs'}>
+        <div className="flex flex-wrap items-center gap-2">
+          <select value={goalMetric} onChange={(e) => setGoalMetric(e.target.value as HealthGoal['metric'])} className={inputClass + ' w-28 shrink-0 text-xs'}>
             <option value="sleep">Tidur</option>
             <option value="checkin">Check-in beruntun</option>
             <option value="water">Minum air</option>
             <option value="steps">Langkah</option>
             <option value="custom">Lainnya</option>
           </select>
-          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Nama target" className={inputClass + ' flex-1 text-xs'} />}
-          <input type="number" value={goalTarget} onChange={(e) => setGoalTarget(+e.target.value || 0)} className={inputClass + ' w-16 text-xs'} />
+          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Nama target" className={inputClass + ' min-w-[140px] flex-1 text-xs'} />}
+          <input type="number" value={goalTarget} onChange={(e) => setGoalTarget(+e.target.value || 0)} className={inputClass + ' w-16 shrink-0 text-xs'} />
           <button onClick={() => {
             const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Tidur', checkin: 'Check-in beruntun', water: 'Minum air', steps: 'Langkah harian', custom: '' }[goalMetric]
             addGoal({ metric: goalMetric, label, target: goalTarget, unit: metricUnit[goalMetric] })
