@@ -11,12 +11,12 @@ import type { Account, Role } from '../lib/types'
 const STR_ROLES: Role[] = ['dokter', 'kontributor', 'verifikator']
 
 const ROLES: { id: Role; title: string; desc: string }[] = [
-  { id: 'pasien', title: 'Pelanggan / Pasien', desc: 'Dashboard hidup sehat, AI Chatbot, edukasi, nutrisi & Longevity, konsultasi, apotek & faskes' },
-  { id: 'dokter', title: 'Dokter', desc: 'AI-EMR, Planning, konsultasi pasien' },
-  { id: 'kontributor', title: 'Kontributor / Penulis', desc: 'Tulis, edit & unggah materi ke verifikator' },
-  { id: 'verifikator', title: 'Verifikator', desc: 'AI + Subspesialis/Profesor mereview jurnal' },
-  { id: 'admin', title: 'Admin (Layanan)', desc: 'Tangani keluhan via AI + manusia' },
-  { id: 'owner', title: 'Owner', desc: 'Lihat keuntungan moneter perusahaan' },
+  { id: 'pasien', title: 'Customer / Patient', desc: 'Healthy living dashboard, AI Chatbot, education, nutrition & Longevity, consultations, pharmacy & healthcare facilities' },
+  { id: 'dokter', title: 'Doctor', desc: 'AI-EMR, Planning, patient consultations' },
+  { id: 'kontributor', title: 'Contributor / Writer', desc: 'Write, edit & upload material to verifiers' },
+  { id: 'verifikator', title: 'Verifier', desc: 'AI + Subspecialist/Professor reviews journals' },
+  { id: 'admin', title: 'Admin (Support)', desc: 'Handle complaints via AI + humans' },
+  { id: 'owner', title: 'Owner', desc: 'View company monetary profit' },
 ]
 
 /* ── Tiny helpers ────────────────────────────────────────── */
@@ -88,23 +88,23 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
   useEffect(() => {
     if (!backendEnabled) return
-    api.health().then(setHealth).catch(() => setError('Backend tidak terjangkau — mode lokal.'))
+    api.health().then(setHealth).catch(() => setError('Backend unreachable — local mode.'))
   }, [])
 
   useEffect(() => {
     if (!health?.googleClientId || !gbtn.current) return
     renderGoogleButton(gbtn.current, health.googleClientId, cred => {
-      if (!consentRef.current) { setError('Harap menyetujui Syarat & Kebijakan Privasi.'); return }
+      if (!consentRef.current) { setError('Please agree to the Terms & Privacy Policy.'); return }
       api.googleLogin(cred, roleRef.current)
         .then(a => login({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: a.role === 'owner', consentAt: new Date().toISOString(), strStatus: STR_ROLES.includes(a.role) ? 'pending' : 'none' }))
-        .catch(() => setError('Verifikasi Google gagal.'))
-    }).catch(() => setError('Gagal memuat Google Sign-In.'))
+        .catch(() => setError('Google verification failed.'))
+    }).catch(() => setError('Failed to load Google Sign-In.'))
   }, [health, login])
 
   /* shared consent guard for OTP sub-components */
   function consentOk() {
-    if (!consent) { setError('Harap menyetujui Syarat & Kebijakan Privasi.'); return false }
-    if (clinical && !f.str.trim()) { setError('Nomor STR wajib untuk peran ini.'); return false }
+    if (!consent) { setError('Please agree to the Terms & Privacy Policy.'); return false }
+    if (clinical && !f.str.trim()) { setError('An STR number is required for this role.'); return false }
     return true
   }
 
@@ -120,8 +120,8 @@ export function Login({ onBack }: { onBack?: () => void }) {
     }
     sendEmail({
       id: uid(), to: acc.email,
-      subject: 'Selamat datang di Panaceamed.id',
-      body: `Halo ${acc.name}, akun Anda (${acc.role}) telah aktif.`,
+      subject: 'Welcome to Panaceamed.id',
+      body: `Hello ${acc.name}, your account (${acc.role}) is now active.`,
       at: new Date().toISOString(),
     })
   }
@@ -131,10 +131,10 @@ export function Login({ onBack }: { onBack?: () => void }) {
     const email = (f.email.trim() || 'user@gmail.com').toLowerCase()
     const isOwner = email === OWNER_EMAIL
     if (role === 'admin' && !isOwner && !state.adminEmails.includes(email)) {
-      setError('Email belum diizinkan sebagai Admin.'); return
+      setError('This email is not yet authorized as Admin.'); return
     }
     const acc: Account = {
-      email, name: f.name.trim() || 'Pengguna Panaceamed', role,
+      email, name: f.name.trim() || 'Panaceamed User', role,
       isSubscriber: role === 'owner', loggedAt: new Date().toISOString(),
       sex: simple ? undefined : f.sex,
       dob: simple || !f.dob ? undefined : f.dob,
@@ -174,33 +174,33 @@ export function Login({ onBack }: { onBack?: () => void }) {
             <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
           </h1>
           <p className="mt-3 max-w-md text-white/85">
-            AI melakukan anamnesis & edukasi; dokter memverifikasi. Catatan kedokteran ter-tokenisasi,
-            pemantauan kontinu untuk healthspan.
+            AI handles history-taking & education; doctors verify. Tokenized medical records,
+            continuous monitoring for healthspan.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
-            {['AI-EMR Bersertifikat', 'Longevity AI', 'Faskes Darurat', 'Apotek Digital'].map(t => (
+            {['Certified AI-EMR', 'Longevity AI', 'Emergency Care', 'Digital Pharmacy'].map(t => (
               <span key={t} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-md">{t}</span>
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-white/70">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+        <p className="relative text-xs text-white/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
       </div>
 
       {/* ── Form panel ────────────────────────────── */}
       <div className="relative flex items-center justify-center p-6">
         <button onClick={() => setTheme(toggleTheme())}
           className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 shadow-sm transition hover:text-brand-dark"
-          aria-label="Ganti tema">
+          aria-label="Toggle theme">
           {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
         </button>
 
         <div className="w-full max-w-md space-y-5">
           <div className="lg:hidden"><Wordmark size={34} /></div>
-          {onBack && <button onClick={onBack} className="text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Kembali</button>}
+          {onBack && <button onClick={onBack} className="text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Back</button>}
 
           <div>
-            <h2 className="text-2xl font-extrabold">Masuk</h2>
-            <p className="mt-1 text-sm text-neutral-500">Pilih peran Anda, lalu masuk.</p>
+            <h2 className="text-2xl font-extrabold">Sign In</h2>
+            <p className="mt-1 text-sm text-neutral-500">Choose your role, then sign in.</p>
           </div>
 
           {/* ── Role pills ─────────────────────── */}
@@ -220,7 +220,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             ? <div ref={gbtn} className="flex justify-center" />
             : <button onClick={doLogin}
                 className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-4 py-3 font-semibold shadow-sm transition hover:bg-neutral-50 active:scale-[0.99]">
-                <GoogleG /> Masuk dengan Google
+                <GoogleG /> Sign in with Google
               </button>
           }
           {health?.features.otpEmail && (
@@ -235,21 +235,21 @@ export function Login({ onBack }: { onBack?: () => void }) {
           <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
-            <span>Saya menyetujui{' '}
+            <span>I agree to the{' '}
               <button type="button" onClick={() => setShowLegal(true)}
-                className="font-bold text-brand-dark underline">Syarat & Kebijakan Privasi</button>.
-              AI bersifat pendukung, bukan pengganti dokter.</span>
+                className="font-bold text-brand-dark underline">Terms & Privacy Policy</button>.
+              AI is supportive in nature, not a replacement for a doctor.</span>
           </label>
 
           {error && <p className="text-xs text-accent">{error}</p>}
           {backendEnabled && (
             <p className="text-[11px] font-semibold text-brand-dark">
-              ● Server aktif{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}{health?.features.payments ? ' · Bayar' : ''}
+              ● Server active{health?.features.ai ? ' · AI' : ''}{health?.features.google ? ' · Google' : ''}{health?.features.payments ? ' · Payments' : ''}
             </p>
           )}
 
           <div className="flex items-center gap-3 text-xs text-neutral-400">
-            <span className="h-px flex-1 bg-neutral-200" /> atau isi manual <span className="h-px flex-1 bg-neutral-200" />
+            <span className="h-px flex-1 bg-neutral-200" /> or fill in manually <span className="h-px flex-1 bg-neutral-200" />
           </div>
 
           {/* ── Adaptive form fields ───────────── */}
@@ -258,28 +258,28 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <input className={inputClass} value={f.email}
                 onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" />
             </Field>
-            <Field label="Nama Lengkap">
+            <Field label="Full Name">
               <input className={inputClass} value={f.name}
-                onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Nama lengkap Anda" />
+                onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Your full name" />
             </Field>
 
             {/* Demographics — only for pasien & clinical */}
             {!simple && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Jenis Kelamin</label>
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Sex</label>
                   <select className={inputClass} value={f.sex}
                     onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
-                    <option value="L">Laki-laki</option>
-                    <option value="P">Perempuan</option>
+                    <option value="L">Male</option>
+                    <option value="P">Female</option>
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Tanggal Lahir</label>
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Date of Birth</label>
                   <input className={inputClass} value={f.dob}
                     onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
                     max={new Date().toISOString().slice(0, 10)} />
-                  {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Umur: {ageFromDob(f.dob)} tahun</p>}
+                  {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Age: {ageFromDob(f.dob)} years</p>}
                 </div>
               </div>
             )}
@@ -289,57 +289,57 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <>
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                    No. STR <span className="text-accent">*</span>
+                    STR No. <span className="text-accent">*</span>
                   </label>
                   <input className={inputClass} value={f.str}
                     onChange={e => setF(p => ({ ...p, str: e.target.value }))}
-                    placeholder="Wajib — STR / sertifikat praktik" />
+                    placeholder="Required — STR / practice certificate" />
                   <p className="mt-1 text-[11px] text-neutral-400">
-                    {role === 'dokter' ? 'AI-EMR hanya untuk klinisi bersertifikat.' : 'Wajib klinisi / akademisi bersertifikat.'}
+                    {role === 'dokter' ? 'AI-EMR is only for certified clinicians.' : 'Required for certified clinicians / academics.'}
                   </p>
                 </div>
 
-                <Collapse title="Riwayat Pendidikan & Kredensial">
+                <Collapse title="Education & Credentials History">
                   {role === 'kontributor' && (
                     <div className="grid grid-cols-2 gap-2">
-                      <Mini label="Gelar" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="dr., dr. Sp.PD" />
-                      <Mini label="Spesialis" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Penyakit Dalam" />
+                      <Mini label="Title" value={f.gelar} onChange={v => setF(p => ({ ...p, gelar: v }))} placeholder="Dr., Dr. Sp.PD" />
+                      <Mini label="Specialty" value={f.spesialis} onChange={v => setF(p => ({ ...p, spesialis: v }))} placeholder="Internal Medicine" />
                     </div>
                   )}
                   {role === 'verifikator' && (
-                    <Mini label="Subspesialis" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterologi-Hepatologi" />
+                    <Mini label="Subspecialty" value={f.subspesialis} onChange={v => setF(p => ({ ...p, subspesialis: v }))} placeholder="Gastroenterology-Hepatology" />
                   )}
-                  <Mini label="Keahlian" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Kardiologi preventif, longevity" />
+                  <Mini label="Expertise" value={f.keahlian} onChange={v => setF(p => ({ ...p, keahlian: v }))} placeholder="Preventive cardiology, longevity" />
                   <div className="grid grid-cols-2 gap-2">
-                    <Mini label="Universitas" value={f.universitas} onChange={v => setF(p => ({ ...p, universitas: v }))} placeholder="Universitas Indonesia" />
-                    <Mini label="Tahun Lulus" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
+                    <Mini label="University" value={f.universitas} onChange={v => setF(p => ({ ...p, universitas: v }))} placeholder="Universitas Indonesia" />
+                    <Mini label="Graduation Year" value={f.tahunLulus} onChange={v => setF(p => ({ ...p, tahunLulus: v.replace(/\D/g, '').slice(0, 4) }))} placeholder="2018" numeric />
                   </div>
                   <div>
-                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Unggah Kredensial (PDF)</label>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Upload Credentials (PDF)</label>
                     <input type="file" accept="application/pdf"
                       onChange={e => setF(p => ({ ...p, pdfName: e.target.files?.[0]?.name ?? '' }))}
                       className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
                     {f.pdfName && <p className="mt-1 text-[11px] text-brand-dark">✓ {f.pdfName}</p>}
                   </div>
-                  <p className="text-[11px] text-neutral-400">Ditinjau AI-Agent & disetujui Owner sebelum akses penuh.</p>
+                  <p className="text-[11px] text-neutral-400">Reviewed by AI-Agent & approved by Owner before full access.</p>
                 </Collapse>
               </>
             )}
 
             {/* Optional pasien details — collapsed by default */}
             {role === 'pasien' && (
-              <Collapse title="Detail tambahan (opsional)">
+              <Collapse title="Additional details (optional)">
                 <div className="grid grid-cols-2 gap-2">
-                  <Mini label="Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan" />
-                  <Mini label="NIK" value={f.nik} onChange={v => setF(p => ({ ...p, nik: v.replace(/\D/g, '').slice(0, 16) }))} placeholder="16 digit" numeric />
+                  <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Employee" />
+                  <Mini label="National ID (NIK)" value={f.nik} onChange={v => setF(p => ({ ...p, nik: v.replace(/\D/g, '').slice(0, 16) }))} placeholder="16 digits" numeric />
                 </div>
-                <Mini label="Latar belakang kesehatan" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Riwayat hipertensi keluarga, dsb." />
+                <Mini label="Health background" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Family history of hypertension, etc." />
               </Collapse>
             )}
           </div>
 
-          <Button onClick={doLogin} className="w-full">Masuk sebagai {cur.title}</Button>
-          <p className="text-center text-[11px] text-neutral-400">⚕️ Data dilindungi sesuai UU PDP.</p>
+          <Button onClick={doLogin} className="w-full">Sign in as {cur.title}</Button>
+          <p className="text-center text-[11px] text-neutral-400">⚕️ Data protected in accordance with Indonesia's PDP Law.</p>
         </div>
 
         {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
@@ -361,38 +361,38 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
 
   async function start() {
     if (!consentOk()) return
-    if (!email.trim()) { setMsg('Masukkan email Anda.'); return }
+    if (!email.trim()) { setMsg('Enter your email.'); return }
     setBusy(true); setMsg('')
-    try { await api.emailOtpStart(email.trim()); setSent(true); setMsg('Kode dikirim ke email Anda.') }
-    catch { setMsg('Gagal mengirim kode.') } finally { setBusy(false) }
+    try { await api.emailOtpStart(email.trim()); setSent(true); setMsg('Code sent to your email.') }
+    catch { setMsg('Failed to send code.') } finally { setBusy(false) }
   }
 
   async function verify() {
-    if (!code.trim()) { setMsg('Masukkan kode dari email.'); return }
+    if (!code.trim()) { setMsg('Enter the code from your email.'); return }
     setBusy(true); setMsg('')
     try {
-      const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
+      const a = await api.emailOtpVerify(email.trim(), code.trim(), name.trim() || 'Panaceamed User', role)
       onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
         strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
-    } catch { setMsg('Kode salah atau kedaluwarsa.') } finally { setBusy(false) }
+    } catch { setMsg('Incorrect or expired code.') } finally { setBusy(false) }
   }
 
   return (
     <div className="rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
-      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">✉️ Masuk cepat dengan Email (OTP gratis)</div>
+      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">✉️ Quick sign-in with Email (Free OTP)</div>
       <div className="flex gap-2">
         <input className={inputClass} value={email} onChange={e => setEmail(e.target.value)}
-          type="email" placeholder="email@anda.com" disabled={sent} />
+          type="email" placeholder="email@you.com" disabled={sent} />
         {!sent
-          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Kirim Kode'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Ubah</button>}
+          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send Code'}</Button>
+          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
       </div>
       {sent && (
         <div className="mt-2 flex gap-2">
           <input className={inputClass} value={code} onChange={e => setCode(e.target.value)}
-            inputMode="numeric" placeholder="Kode 6 digit" />
-          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verifikasi'}</Button>
+            inputMode="numeric" placeholder="6-digit code" />
+          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verify'}</Button>
         </div>
       )}
       {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
@@ -413,38 +413,38 @@ function PhoneLogin({ role, name, str, consentOk, onLogin }: {
 
   async function start() {
     if (!consentOk()) return
-    if (!phone.trim()) { setMsg('Masukkan nomor HP.'); return }
+    if (!phone.trim()) { setMsg('Enter your phone number.'); return }
     setBusy(true); setMsg('')
-    try { await api.otpStart(phone.trim()); setSent(true); setMsg('Kode OTP dikirim via SMS.') }
-    catch { setMsg('Gagal mengirim OTP.') } finally { setBusy(false) }
+    try { await api.otpStart(phone.trim()); setSent(true); setMsg('OTP code sent via SMS.') }
+    catch { setMsg('Failed to send OTP.') } finally { setBusy(false) }
   }
 
   async function verify() {
-    if (!code.trim()) { setMsg('Masukkan kode OTP.'); return }
+    if (!code.trim()) { setMsg('Enter the OTP code.'); return }
     setBusy(true); setMsg('')
     try {
-      const a = await api.otpVerify(phone.trim(), code.trim(), name.trim() || 'Pengguna Panaceamed', role)
+      const a = await api.otpVerify(phone.trim(), code.trim(), name.trim() || 'Panaceamed User', role)
       onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
         str: STR_ROLES.includes(role) ? str.trim() : undefined,
         strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
-    } catch { setMsg('Kode OTP salah atau kedaluwarsa.') } finally { setBusy(false) }
+    } catch { setMsg('Incorrect or expired OTP code.') } finally { setBusy(false) }
   }
 
   return (
     <div className="rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
-      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">📱 Masuk cepat dengan No. HP (OTP SMS)</div>
+      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">📱 Quick sign-in with Phone No. (SMS OTP)</div>
       <div className="flex gap-2">
         <input className={inputClass} value={phone} onChange={e => setPhone(e.target.value)}
           inputMode="tel" placeholder="08xxxxxxxxxx" disabled={sent} />
         {!sent
-          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Kirim OTP'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Ubah</button>}
+          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send OTP'}</Button>
+          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
       </div>
       {sent && (
         <div className="mt-2 flex gap-2">
           <input className={inputClass} value={code} onChange={e => setCode(e.target.value)}
-            inputMode="numeric" placeholder="Kode 6 digit" />
-          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verifikasi'}</Button>
+            inputMode="numeric" placeholder="6-digit code" />
+          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verify'}</Button>
         </div>
       )}
       {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
@@ -459,16 +459,16 @@ function LegalModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
         onClick={e => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">Persetujuan, Privasi & Ketentuan</h3>
+        <h3 className="text-lg font-bold">Consent, Privacy & Terms</h3>
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
-          <p><b>Persetujuan Tindakan (Informed Consent).</b> Interaksi AI bersifat edukatif & pendukung — bukan diagnosis final. Diagnosis & terapi tetap memerlukan verifikasi dokter berlisensi.</p>
-          <p><b>Privasi (UU PDP No. 27/2022).</b> Data kesehatan Anda adalah data pribadi spesifik, disimpan terenkripsi di Indonesia, dengan audit log akses. Anda berhak mengakses, memperbaiki, dan menghapus data kapan saja.</p>
-          <p><b>Ketentuan.</b> AI-EMR hanya untuk klinisi dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin & BPOM. Dalam keadaan darurat, gunakan fitur Darurat SOS dan hubungi faskes terdekat.</p>
-          <p className="text-xs text-neutral-400">Versi lengkap tersedia di menu "Privasi & Legal" setelah masuk.</p>
+          <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
+          <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
+          <p><b>Terms.</b> AI-EMR is only for clinicians with a verified STR/SIP. Pharmacy services are subject to licensed pharmacists & BPOM regulation. In an emergency, use the SOS Emergency feature and contact the nearest healthcare facility.</p>
+          <p className="text-xs text-neutral-400">The full version is available in the "Privacy & Legal" menu after signing in.</p>
         </div>
         <button onClick={onClose}
           className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2.5 text-sm font-bold text-white">
-          Mengerti
+          I Understand
         </button>
       </div>
     </div>

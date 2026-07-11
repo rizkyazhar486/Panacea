@@ -46,7 +46,7 @@ export interface Feedback {
   userId: string
   userEmail: string
   userName: string
-  kind: 'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'
+  kind: 'Suggestion' | 'Problem/Bug' | 'Question' | 'Compliment' | 'Feature Request'
   text: string
   at: string
   read: boolean

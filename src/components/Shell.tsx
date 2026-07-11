@@ -60,62 +60,62 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 
 // Sidebar groups (accordion sections) — order defines display order. Grouped by
 // intent with short labels so the menu stays scannable and icon-led.
-const GROUP_ORDER = ['Beranda', 'Kesehatan', 'Kebugaran', 'Klinis & AI', 'Layanan', 'Konten', 'Kelola', 'Akun']
+const GROUP_ORDER = ['Home', 'Health', 'Fitness', 'Clinical & AI', 'Services', 'Content', 'Manage', 'Account']
 
 const nav: Nav[] = [
   // Beranda (rendered as plain links — the most-used, social-first destinations)
-  { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Beranda' },
-  { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
-  { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
-  { to: '/logs', label: 'Log & Statistik', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
-  { to: '/profile', label: 'Profil', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Beranda' },
+  { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  { to: '/messages', label: 'Messages', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  { to: '/logs', label: 'Log & Stats', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   // Kesehatan
-  { to: '/health-data', label: 'Data Kesehatan', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
-  { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
-  { to: '/longevity', label: 'Pusat Longevity', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Kesehatan' },
-  { to: '/nutrition', label: 'Nutrisi', icon: IconFood, roles: ['pasien'], group: 'Kesehatan' },
-  { to: '/education', label: 'Edukasi', icon: IconBook, roles: ['pasien'], group: 'Kesehatan' },
-  { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Kesehatan' },
+  { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
+  { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
+  { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
   // Kebugaran
-  { to: '/athlete', label: 'Atlet', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/fitness-test', label: 'Tes Fisik', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/organ-vitality', label: 'Anti-Aging & Organ', icon: IconLeaf, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/assessment', label: 'Penilaian Awal', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/training-plan', label: 'Program AI', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/body', label: 'Komposisi Tubuh', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/lab', label: 'Lab Performa', icon: IconGauge, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/sports-science', label: 'Sains & KPI', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Kebugaran' },
-  { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Kebugaran' },
-  { to: '/sports-scores', label: 'Skor Langsung', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Kebugaran' },
+  { to: '/athlete', label: 'Athlete', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/fitness-test', label: 'Fitness Test', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/organ-vitality', label: 'Anti-Aging & Organs', icon: IconLeaf, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/assessment', label: 'Initial Assessment', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/training-plan', label: 'AI Program', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/body', label: 'Body Composition', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/lab', label: 'Performance Lab', icon: IconGauge, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/sports-science', label: 'Science & KPIs', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Fitness' },
+  { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Fitness' },
+  { to: '/sports-scores', label: 'Live Scores', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Fitness' },
   // Klinis & AI
-  { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
-  { to: '/clinical', label: 'Data Klinis', icon: IconHeart, roles: ['dokter'], group: 'Klinis & AI' },
-  { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Klinis & AI' },
-  { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Layanan' },
-  { to: '/longevity-curriculum', label: 'Kurikulum Longevity', icon: IconHeart, roles: ['dokter', 'owner'], group: 'Klinis & AI' },
-  { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Klinis & AI' },
-  { to: '/sexual-health', label: 'Seksual & Obgyn', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Klinis & AI' },
+  { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
+  { to: '/clinical', label: 'Clinical Data', icon: IconHeart, roles: ['dokter'], group: 'Clinical & AI' },
+  { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Clinical & AI' },
+  { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
+  { to: '/longevity-curriculum', label: 'Longevity Curriculum', icon: IconHeart, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Clinical & AI' },
+  { to: '/sexual-health', label: 'Sexual Health & OB-GYN', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
   // Layanan
-  { to: '/consult', label: 'Konsultasi', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Layanan' },
-  { to: '/hospitals', label: 'Faskes', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Layanan' },
-  { to: '/pharmacy', label: 'Apotek', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Layanan' },
-  { to: '/orders', label: 'Transaksi', icon: IconWallet, roles: ['pasien'], group: 'Layanan' },
-  { to: '/pricing', label: 'Harga & Paket', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Layanan' },
+  { to: '/consult', label: 'Consultation', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Services' },
+  { to: '/hospitals', label: 'Health Facilities', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Services' },
+  { to: '/pharmacy', label: 'Pharmacy', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Services' },
+  { to: '/orders', label: 'Transactions', icon: IconWallet, roles: ['pasien'], group: 'Services' },
+  { to: '/pricing', label: 'Pricing & Plans', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   // Konten
-  { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Konten' },
-  { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'], group: 'Konten' },
-  { to: '/my-materials', label: 'Materi Saya', icon: IconBook, roles: ['kontributor'], group: 'Konten' },
-  { to: '/verification', label: 'Verifikasi', icon: IconShield, roles: ['verifikator'], group: 'Konten' },
+  { to: '/editor', label: 'Write Material', icon: IconBook, roles: ['kontributor'], group: 'Content' },
+  { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'], group: 'Content' },
+  { to: '/my-materials', label: 'My Materials', icon: IconBook, roles: ['kontributor'], group: 'Content' },
+  { to: '/verification', label: 'Verification', icon: IconShield, roles: ['verifikator'], group: 'Content' },
   // Kelola
-  { to: '/admin', label: 'Admin', icon: IconStethoscope, roles: ['admin'], group: 'Kelola' },
-  { to: '/owner', label: 'Owner', icon: IconChartUp, roles: ['owner'], group: 'Kelola' },
-  { to: '/architecture', label: 'Arsitektur', icon: IconArchitecture, roles: ['admin'], group: 'Kelola' },
+  { to: '/admin', label: 'Admin', icon: IconStethoscope, roles: ['admin'], group: 'Manage' },
+  { to: '/owner', label: 'Owner', icon: IconChartUp, roles: ['owner'], group: 'Manage' },
+  { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
   // Akun
-  { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Akun' },
-  { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL, group: 'Akun' },
-  { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Akun' },
+  { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
+  { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
+  { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
 ]
 
 // Pages that show the active-patient context. Patients see only their own data
@@ -123,22 +123,22 @@ const nav: Nav[] = [
 const PATIENT_PAGES = ['/clinical', '/chatbot', '/emr', '/planning']
 
 const roleLabel: Record<Role, string> = {
-  pasien: 'Pelanggan/Pasien',
-  dokter: 'Dokter',
-  kontributor: 'Kontributor',
-  verifikator: 'Verifikator',
+  pasien: 'Customer/Patient',
+  dokter: 'Doctor',
+  kontributor: 'Contributor',
+  verifikator: 'Verifier',
   admin: 'Admin',
   owner: 'Owner',
 }
 
 const riskLabel: Record<string, string> = {
-  chronic: 'Penyakit Kronis',
-  elderly: 'Lansia',
+  chronic: 'Chronic Illness',
+  elderly: 'Elderly',
   immunocompromised: 'Immunocompromised',
 }
 
 // Mobile drawer navigation with accordion groups — the flat list grew too long
-// to scroll. 'Beranda' items stay as always-visible plain links; every other
+// to scroll. 'Home' items stay as always-visible plain links; every other
 // group collapses, with the group containing the current route open by default.
 function DrawerNav({ items }: { items: Nav[] }) {
   const loc = useLocation()
@@ -163,7 +163,7 @@ function DrawerNav({ items }: { items: Nav[] }) {
   return (
     <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-3">
       {groups.map((g) =>
-        g.name === 'Beranda' ? (
+        g.name === 'Home' ? (
           g.items.map((n) => link(n))
         ) : (
           <div key={g.name}>
@@ -241,7 +241,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const onHome = loc.pathname === '/'
   // Sidebar accordion groups (only groups with visible items for this role).
   const groups = GROUP_ORDER
-    .map((name) => ({ name, items: items.filter((n) => (n.group ?? 'Akun') === name) }))
+    .map((name) => ({ name, items: items.filter((n) => (n.group ?? 'Account') === name) }))
     .filter((g) => g.items.length > 0)
 
   return (
@@ -251,7 +251,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <LogoMark size={28} />
         <div className="leading-tight">
           <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400">Longevity Medical-AI · Dokumen Resmi</div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
       {/* Ambient animated backdrop — sits behind every page */}
@@ -274,13 +274,13 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Sembunyikan menu" aria-label="Sembunyikan menu">
+          <button onClick={() => setSidebarOpen(false)} className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Hide menu" aria-label="Hide menu">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           </button>
         </div>
 
         <div className="mb-4 rounded-xl bg-brand-50 px-3 py-2">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">Masuk sebagai</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">Logged in as</div>
           <div className="truncate text-sm font-bold">{account.name}</div>
           <div className="text-[11px] text-neutral-500">{roleLabel[account.role]}</div>
         </div>
@@ -289,7 +289,7 @@ export function Shell({ children }: { children: ReactNode }) {
           {groups.map((g) => {
             const open = !closedGroups[g.name]
             // A single-item "Beranda" group renders as a plain link (no accordion).
-            if (g.name === 'Beranda') {
+            if (g.name === 'Home') {
               return g.items.map((n) => (
                 <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${isActive ? 'bg-brand-50 text-brand-dark font-bold' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'}`}>
                   <n.icon size={20} /> {n.label}
@@ -324,7 +324,7 @@ export function Shell({ children }: { children: ReactNode }) {
             to="/hospitals"
             className="mt-3 flex items-center justify-center gap-2 rounded-full bg-accent/10 px-3 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
           >
-            <IconHospital size={18} /> Darurat (SOS)
+            <IconHospital size={18} /> Emergency (SOS)
           </NavLink>
         )}
         <button
@@ -334,7 +334,7 @@ export function Shell({ children }: { children: ReactNode }) {
           }}
           className="mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
         >
-          <IconLogout size={18} /> Keluar
+          <IconLogout size={18} /> Log Out
         </button>
       </aside>
 
@@ -345,7 +345,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               onClick={() => setMenuOpen(true)}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
-              aria-label="Buka menu"
+              aria-label="Open menu"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
@@ -356,7 +356,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
-                aria-label="Buka menu samping"
+                aria-label="Open sidebar menu"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                   <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
@@ -368,7 +368,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
           <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
             {['pasien', 'dokter', 'owner'].includes(account.role) && (
-              <NavLink to="/messages" aria-label="Pesan" title="Pesan"
+              <NavLink to="/messages" aria-label="Messages" title="Messages"
                 className={({ isActive }) => `grid h-10 w-10 shrink-0 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
                 <IconChat size={20} />
               </NavLink>
@@ -377,13 +377,13 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               onClick={() => setTheme(toggleTheme())}
               className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
-              title={theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
-              aria-label="Ganti tema"
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              aria-label="Toggle theme"
             >
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
             </button>
             {account.isOwner && (
-              <label className="flex shrink-0 items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — pindah mode akses">
+              <label className="flex shrink-0 items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — switch access mode">
                 <span className="hidden text-[10px] font-bold uppercase tracking-wide text-brand-dark sm:inline">Mode</span>
                 <select
                   value={account.role}
@@ -399,28 +399,28 @@ export function Shell({ children }: { children: ReactNode }) {
             <NavLink
               to="/billing"
               className="flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
-              title="Saldo PanaceaToken"
+              title="PanaceaToken Balance"
             >
               <IconToken size={16} className="text-brand" />
               {state.wallet.balance}
               <span className="hidden text-[10px] font-semibold text-white/60 sm:inline">PNC</span>
             </NavLink>
-            {/* Mobile-only exit/logout — the sidebar Keluar is hidden on phones */}
+            {/* Mobile-only exit/logout — the sidebar Log Out is hidden on phones */}
             <button
               onClick={() => {
                 if (backendEnabled) api.logout().catch(() => {})
                 logout()
               }}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
-              title="Keluar"
-              aria-label="Keluar"
+              title="Log Out"
+              aria-label="Log Out"
             >
               <IconLogout size={18} />
             </button>
             {showPatient && (
               <div
                 className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
-                title="Identitas pasien aktif"
+                title="Active patient"
               >
                 <span
                   className="grid h-8 w-8 place-items-center rounded-lg text-xs font-bold text-white"
@@ -435,7 +435,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 >
                   {state.patients.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} · {ageFromDob(p.dob)}th
+                      {p.name} · {ageFromDob(p.dob)}y
                     </option>
                   ))}
                 </select>
@@ -484,7 +484,7 @@ export function Shell({ children }: { children: ReactNode }) {
           {onHome && homeServices.length > 0 && (
             <div className="mb-5 hidden lg:block">
               <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
-                Layanan tersering Anda
+                Your most-used services
               </div>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
                 {homeServices.map((n) => (
@@ -521,17 +521,17 @@ export function Shell({ children }: { children: ReactNode }) {
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">{roleLabel[account.role]}</div>
                 </div>
               </div>
-              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
+              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Close menu">×</button>
             </div>
             <DrawerNav items={items} />
             <div className="border-t border-black/5 p-3">
               {(account.role === 'pasien' || account.role === 'dokter') && (
                 <NavLink to="/hospitals" className="mb-2 flex items-center justify-center gap-2 rounded-xl bg-accent/10 px-3 py-3 text-sm font-bold text-accent">
-                  <IconHospital size={18} /> Darurat (SOS)
+                  <IconHospital size={18} /> Emergency (SOS)
                 </NavLink>
               )}
               <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
-                <IconLogout size={18} /> Keluar
+                <IconLogout size={18} /> Log Out
               </button>
             </div>
           </aside>
@@ -546,18 +546,18 @@ export function Shell({ children }: { children: ReactNode }) {
       {['pasien', 'dokter', 'owner'].includes(account.role) && (
         <nav
           className={`fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden ${navHidden ? 'translate-y-[calc(100%+env(safe-area-inset-bottom)+16px)]' : 'translate-y-0'}`}
-          aria-label="Navigasi utama"
+          aria-label="Main navigation"
         >
           <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
             <div className="fade-edge-glass pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
               {[
-                { to: '/', label: 'Beranda', icon: IconHome, end: true },
+                { to: '/', label: 'Home', icon: IconHome, end: true },
                 { to: '/community', label: 'Community', icon: IconUsers },
                 { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
-                { to: '/health-data', label: 'Kesehatan', icon: IconHeart },
-                { to: '/sports-scores', label: 'Skor', icon: IconRun },
-                { to: '/profile', label: 'Profil', icon: IconUser },
+                { to: '/health-data', label: 'Health', icon: IconHeart },
+                { to: '/sports-scores', label: 'Scores', icon: IconRun },
+                { to: '/profile', label: 'Profile', icon: IconUser },
               ].map((t) => (
                 <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
                   className={({ isActive }) => `group relative flex min-h-[52px] w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
@@ -572,7 +572,7 @@ export function Shell({ children }: { children: ReactNode }) {
             {/* Tombol tengah "+" — buat post/story, mengambang di luar area scroll */}
             <button
               onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
-              aria-label="Buat postingan atau story baru"
+              aria-label="Create a new post or story"
               className="group absolute right-1 top-1/2 flex -translate-y-1/2 flex-col items-center justify-center"
             >
               <span className="grid place-items-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-active:scale-95" style={{ height: 52, width: 52, background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 22px rgba(0,191,99,0.45)' }}>

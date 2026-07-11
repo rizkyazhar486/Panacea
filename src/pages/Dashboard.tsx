@@ -51,7 +51,7 @@ function computeLongevity(
   }
   score -= supportive.filter((s) => s.flag === 'high' || s.flag === 'critical').length * 3
   score = Math.max(20, Math.min(100, score))
-  const band = score >= 80 ? 'Optimal' : score >= 60 ? 'Perlu perhatian' : 'Prioritas tinggi'
+  const band = score >= 80 ? 'Optimal' : score >= 60 ? 'Needs attention' : 'High priority'
   return { score, band }
 }
 
@@ -220,7 +220,7 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
     critical: { bg: 'rgba(255,49,49,0.08)', dot: '#FF3131' },
   }
   const s = palette[r.flag ?? 'normal']
-  const flagLabel = r.flag === 'high' ? 'Tinggi' : r.flag === 'low' ? 'Rendah' : r.flag === 'critical' ? 'Kritis' : 'Normal'
+  const flagLabel = r.flag === 'high' ? 'High' : r.flag === 'low' ? 'Low' : r.flag === 'critical' ? 'Critical' : 'Normal'
 
   return (
     <div className="group flex items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-200 hover:shadow-sm" style={{ background: s.bg, borderColor: `${s.dot}12` }}>
@@ -234,7 +234,7 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400">
           <span className="font-bold" style={{ color: s.dot }}>{r.value} {r.unit}</span>
-          <span>Rujukan: {r.reference || '—'}</span>
+          <span>Reference: {r.reference || '—'}</span>
         </div>
       </div>
       <span className="shrink-0 text-[10px] tabular-nums text-neutral-300">{fmt(r.takenAt)}</span>
@@ -275,20 +275,20 @@ function AddPatientForm({ onAdd }: { onAdd: (p: Patient) => void }) {
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Field label="Nama"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Nama pasien" autoFocus /></Field>
-      <Field label="Jenis Kelamin">
+      <Field label="Name"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Patient name" autoFocus /></Field>
+      <Field label="Sex">
         <select className={inputClass} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
-          <option value="L">Laki-laki</option><option value="P">Perempuan</option>
+          <option value="L">Male</option><option value="P">Female</option>
         </select>
       </Field>
-      <Field label="Umur"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
-      <Field label="Gol. Darah"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
-      <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
-      <Field label="Berat (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
-      <Field label="Penyakit Kronis"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="pisah koma" /></Field>
-      <Field label="Alergi"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="pisah koma" /></Field>
+      <Field label="Age"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
+      <Field label="Blood Type"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
+      <Field label="Height (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
+      <Field label="Weight (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
+      <Field label="Chronic Conditions"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="comma separated" /></Field>
+      <Field label="Allergies"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="comma separated" /></Field>
       <div className="flex items-end sm:col-span-2 lg:col-span-4">
-        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Simpan Pasien</Button>
+        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Save Patient</Button>
       </div>
     </div>
   )
@@ -303,8 +303,8 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
     sys: '120', dia: '80', hr: '78', rr: '16', temp: '36.6', spo2: '98', glu: '',
   })
   const fields: [string, string][] = [
-    ['sys', 'Sistolik'], ['dia', 'Diastolik'], ['hr', 'Nadi'],
-    ['rr', 'RR'], ['temp', 'Suhu'], ['spo2', 'SpO₂'], ['glu', 'GDS'],
+    ['sys', 'Systolic'], ['dia', 'Diastolic'], ['hr', 'Pulse'],
+    ['rr', 'RR'], ['temp', 'Temp'], ['spo2', 'SpO₂'], ['glu', 'Blood Glucose'],
   ]
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
@@ -320,7 +320,7 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
           heartRate: Number(f.hr), respRate: Number(f.rr),
           tempC: Number(f.temp), spo2: Number(f.spo2),
           glucose: f.glu ? Number(f.glu) : undefined,
-        })}>Simpan</Button>
+        })}>Save</Button>
       </div>
     </div>
   )
@@ -329,7 +329,7 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
 /* ═══════════════════════════════════════════
    AI CLINICAL INSIGHT
    ═══════════════════════════════════════════ */
-const INSIGHT_SYSTEM = `Anda adalah AI co-physician Panaceamed yang membantu dokter membaca data klinis pasien dengan cepat. Berdasarkan data tanda vital & pemeriksaan penunjang yang diberikan, tulis SATU paragraf singkat (maks 3 kalimat) analisis klinis ringkas berbahasa Indonesia, lalu 3 poin rekomendasi tindakan konkret (pakai "• "). Jujur bila data belum cukup untuk kesimpulan kuat. Ini alat bantu, bukan diagnosis final — dokter tetap memutuskan.`
+const INSIGHT_SYSTEM = `You are Panaceamed's AI co-physician, helping doctors quickly read a patient's clinical data. Based on the vital signs & supportive test data provided, write ONE short paragraph (max 3 sentences) with a concise clinical analysis in English, then 3 concrete action recommendations (using "• "). Be honest if the data isn't sufficient for a strong conclusion. This is a support tool, not a final diagnosis — the doctor still decides.`
 
 function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; vitals: VitalSign[]; supportive: SupportiveResult[] }) {
   const [text, setText] = useState('')
@@ -340,17 +340,17 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
   async function requestInsight() {
     setBusy(true); setErr(''); setText('')
     const vitalsLine = latest
-      ? `TD ${latest.systolic}/${latest.diastolic} mmHg, nadi ${latest.heartRate}/min, RR ${latest.respRate}/min, suhu ${latest.tempC}°C, SpO2 ${latest.spo2}%${latest.glucose ? `, GDS ${latest.glucose} mg/dL` : ''}`
-      : 'belum ada data tanda vital tercatat'
+      ? `BP ${latest.systolic}/${latest.diastolic} mmHg, pulse ${latest.heartRate}/min, RR ${latest.respRate}/min, temp ${latest.tempC}°C, SpO2 ${latest.spo2}%${latest.glucose ? `, blood glucose ${latest.glucose} mg/dL` : ''}`
+      : 'no vital signs recorded yet'
     const labsLine = supportive.length
       ? supportive.slice(0, 8).map((s) => `${s.name} ${s.value}${s.unit ?? ''}${s.flag && s.flag !== 'normal' ? ` (${s.flag})` : ''}`).join('; ')
-      : 'belum ada hasil penunjang tercatat'
-    const context = `Pasien: ${patient.name}, ${patient.sex === 'L' ? 'laki-laki' : 'perempuan'}, ${ageFromDob(patient.dob)} tahun. Kondisi kronis: ${patient.chronicConditions.join(', ') || '-'}. Alergi: ${patient.allergies.join(', ') || '-'}.\nTanda vital terbaru: ${vitalsLine}.\nPemeriksaan penunjang terbaru: ${labsLine}.`
+      : 'no supportive results recorded yet'
+    const context = `Patient: ${patient.name}, ${patient.sex === 'L' ? 'male' : 'female'}, ${ageFromDob(patient.dob)} years old. Chronic conditions: ${patient.chronicConditions.join(', ') || '-'}. Allergies: ${patient.allergies.join(', ') || '-'}.\nLatest vital signs: ${vitalsLine}.\nLatest supportive results: ${labsLine}.`
     try {
       const r = await api.aiMessages({ model: 'claude-sonnet-4-6', system: INSIGHT_SYSTEM, messages: [{ role: 'user', content: context }], max_tokens: 500 })
       setText(r.text)
     } catch {
-      setErr('AI Clinical Insight gagal dimuat. Pastikan server & kunci AI aktif.')
+      setErr('AI Clinical Insight failed to load. Make sure the server & AI key are active.')
     } finally {
       setBusy(false)
     }
@@ -362,7 +362,7 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
         <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
         <div>
           <div className="text-sm font-black">AI Clinical Insight</div>
-          <div className="text-[10px] font-semibold text-white/60">Ditenagai AI Panaceamed · Beta</div>
+          <div className="text-[10px] font-semibold text-white/60">Powered by Panaceamed AI · Beta</div>
         </div>
       </div>
 
@@ -370,7 +370,7 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
         <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-white/90">{text}</div>
       ) : (
         <p className="mt-3 text-[13px] leading-relaxed text-white/70">
-          Minta AI merangkum tanda vital & hasil penunjang terbaru pasien ini menjadi analisis klinis singkat dan rekomendasi tindakan.
+          Ask AI to summarize this patient's latest vital signs & supportive results into a brief clinical analysis and action recommendations.
         </p>
       )}
       {err && <p className="mt-2 text-[11px] text-white/80">{err}</p>}
@@ -380,7 +380,7 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
         disabled={busy}
         className="mt-4 w-full rounded-xl bg-white/15 py-2.5 text-xs font-bold text-white transition hover:bg-white/25 disabled:opacity-50"
       >
-        {busy ? 'Menganalisis…' : text ? '🔄 Analisis Ulang' : 'Minta Analisis AI →'}
+        {busy ? 'Analyzing…' : text ? '🔄 Re-analyze' : 'Request AI Analysis →'}
       </button>
     </div>
   )
@@ -414,13 +414,13 @@ export function Dashboard() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
             <IconHeart size={34} className="text-white" />
           </div>
-          <h2 className="mt-7 text-2xl font-black tracking-tight">Mulai Perjalanan Longevity</h2>
+          <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
-            Tambahkan pasien pertama untuk memantau tanda vital, antropometri, dan data klinis — semua terintegrasi mendukung umur panjang berkualitas.
+            Add your first patient to monitor vital signs, anthropometry, and clinical data — all integrated to support quality longevity.
           </p>
         </div>
         <Card className="overflow-hidden">
-          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Pasien Baru" /></div>
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="New Patient" /></div>
           <div className="p-5"><AddPatientForm onAdd={(np) => addPatient(np)} /></div>
         </Card>
       </div>
@@ -434,18 +434,18 @@ export function Dashboard() {
       {/* Story-like Quick Actions */}
       <div className="flex items-center gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <button onClick={() => setShowAddPatient((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-neutral-200 px-4 py-2 text-[11px] font-semibold text-neutral-500 transition-all duration-200 hover:border-[#00BF63] hover:text-[#00BF63] hover:bg-[rgba(0,191,99,0.05)] active:scale-[0.97]">
-          <IconPlus size={13} /> Pasien Baru
+          <IconPlus size={13} /> New Patient
         </button>
         <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-white transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
-          <IconHeart size={13} /> Catat Vital
+          <IconHeart size={13} /> Record Vitals
         </button>
-        {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} pencatatan</span>}
+        {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
       </div>
 
       {/* Add Patient Drawer */}
       {showAddPatient && (
         <Card className="overflow-hidden">
-          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Tambah Pasien" /></div>
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Add Patient" /></div>
           <div className="p-5"><AddPatientForm onAdd={(np) => { addPatient(np); setShowAddPatient(false) }} /></div>
         </Card>
       )}
@@ -463,10 +463,10 @@ export function Dashboard() {
                 <div className="pb-1">
                   <h2 className="text-[22px] font-black leading-tight tracking-tight">{p.name}</h2>
                   <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
-                    <span>{p.sex === 'L' ? 'Laki-laki' : 'Perempuan'}</span>
+                    <span>{p.sex === 'L' ? 'Male' : 'Female'}</span>
                     <span className="text-neutral-200">·</span>
-                    <span>{ageFromDob(p.dob)} tahun</span>
-                    {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Gol. {p.bloodType}</span></>)}
+                    <span>{ageFromDob(p.dob)} years old</span>
+                    {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Type {p.bloodType}</span></>)}
                     <span className="text-neutral-200">·</span>
                     <span className="font-mono text-xs text-neutral-400">{p.mrn}</span>
                   </p>
@@ -481,7 +481,7 @@ export function Dashboard() {
             <div className="mt-5 flex flex-wrap gap-1.5">
               {p.chronicConditions.length === 0 && p.allergies.length === 0 ? (
                 <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(0,191,99,0.06)', color: '#0B7A4B' }}>
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />Tidak ada kondisi kronis / alergi tercatat
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#00BF63]" />No chronic conditions / allergies recorded
                 </span>
               ) : (
                 <>
@@ -492,7 +492,7 @@ export function Dashboard() {
                   ))}
                   {p.allergies.map((a) => (
                     <span key={a} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold" style={{ background: 'rgba(245,158,11,0.06)', color: '#b45309' }}>
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Alergi: {a}
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />Allergy: {a}
                     </span>
                   ))}
                 </>
@@ -500,7 +500,7 @@ export function Dashboard() {
             </div>
 
             <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-400">
-              <IconShield size={11} className="text-[#00BF63]" /> Data kesehatan bersifat rahasia — hanya dibagikan atas izin pasien.
+              <IconShield size={11} className="text-[#00BF63]" /> Health data is confidential — only shared with the patient's consent.
             </p>
           </div>
         </div>
@@ -514,7 +514,7 @@ export function Dashboard() {
         <Card className="overflow-hidden">
           <div className="h-[3px]" style={{ background: 'linear-gradient(90deg, #00BF63, #00BF6340, transparent)' }} />
           <div className="border-b border-neutral-100 px-5 py-3" style={{ background: 'rgba(0,191,99,0.02)' }}>
-            <SectionTitle icon={<IconHeart size={18} />} title="Catat Tanda Vital Baru" />
+            <SectionTitle icon={<IconHeart size={18} />} title="Record New Vital Signs" />
           </div>
           <div className="p-5"><AddVital onAdd={(v) => { addVital(p.id, v); setShowAdd(false) }} /></div>
         </Card>
@@ -523,21 +523,21 @@ export function Dashboard() {
       {/* Vitals Feed Grid */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconHeart size={20} />} title="Tanda Vital" subtitle="Pemantauan kontinu — dukungan longevity" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Vital Signs" subtitle="Continuous monitoring — longevity support" />
         </div>
         <div className="grid grid-cols-2 gap-3 p-5 lg:grid-cols-3">
-          <VitalCard label="Tekanan Darah" value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'} unit="mmHg" series={vitals.map((v) => v.systolic)} tone={latest && latest.systolic >= 140 ? 'high' : 'normal'} />
-          <VitalCard label="Nadi" value={latest ? `${latest.heartRate}` : '—'} unit="x/min" series={vitals.map((v) => v.heartRate)} tone={latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'} />
-          <VitalCard label="Laju Napas" value={latest ? `${latest.respRate}` : '—'} unit="x/min" series={vitals.map((v) => v.respRate)} tone={latest && latest.respRate > 20 ? 'high' : 'normal'} />
-          <VitalCard label="Suhu" value={latest ? `${latest.tempC}` : '—'} unit="°C" series={vitals.map((v) => v.tempC)} tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'} />
+          <VitalCard label="Blood Pressure" value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'} unit="mmHg" series={vitals.map((v) => v.systolic)} tone={latest && latest.systolic >= 140 ? 'high' : 'normal'} />
+          <VitalCard label="Pulse" value={latest ? `${latest.heartRate}` : '—'} unit="x/min" series={vitals.map((v) => v.heartRate)} tone={latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'} />
+          <VitalCard label="Resp. Rate" value={latest ? `${latest.respRate}` : '—'} unit="x/min" series={vitals.map((v) => v.respRate)} tone={latest && latest.respRate > 20 ? 'high' : 'normal'} />
+          <VitalCard label="Temperature" value={latest ? `${latest.tempC}` : '—'} unit="°C" series={vitals.map((v) => v.tempC)} tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'} />
           <VitalCard label="SpO₂" value={latest ? `${latest.spo2}` : '—'} unit="%" series={vitals.map((v) => v.spo2)} tone={latest && latest.spo2 < 95 ? 'high' : 'normal'} />
-          <VitalCard label="Gula Darah" value={latest?.glucose ? `${latest.glucose}` : '—'} unit="mg/dL" series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)} tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'} />
+          <VitalCard label="Blood Glucose" value={latest?.glucose ? `${latest.glucose}` : '—'} unit="mg/dL" series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)} tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'} />
         </div>
         {latest && (
           <div className="border-t border-neutral-50 px-5 py-2.5">
             <p className="flex items-center gap-1.5 text-[11px] text-neutral-400">
               <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00BF63] animate-pulse" />
-              Terakhir diperbarui {fmt(latest.takenAt)}
+              Last updated {fmt(latest.takenAt)}
             </p>
           </div>
         )}
@@ -546,22 +546,22 @@ export function Dashboard() {
       {/* Anthropometry + BMI Gauge */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconSparkle size={18} />} title="Antropometri" subtitle="Asia-Pacific cut-off" />
+          <SectionTitle icon={<IconSparkle size={18} />} title="Anthropometry" subtitle="Asia-Pacific cut-off" />
         </div>
         <div className="grid gap-8 p-5 lg:grid-cols-2">
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
-              <span className="text-sm text-neutral-500">Tinggi Badan</span>
+              <span className="text-sm text-neutral-500">Height</span>
               <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-400">cm</span></span>
             </div>
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
-              <span className="text-sm text-neutral-500">Berat Badan</span>
+              <span className="text-sm text-neutral-500">Weight</span>
               <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-400">kg</span></span>
             </div>
             <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
               <p className="text-[11px] leading-relaxed text-neutral-500">
                 <IconSparkle size={11} className="mr-1 inline text-[#00BF63]" />
-                Z-score WHO/CDC penuh (BB/U, TB/U, BB/TB) dihitung AI saat workup di AI-EMR.
+                Full WHO/CDC Z-scores (weight-for-age, height-for-age, weight-for-height) are computed by AI during workup in AI-EMR.
               </p>
             </div>
           </div>
@@ -578,8 +578,8 @@ export function Dashboard() {
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
             icon={<IconSparkle size={18} />}
-            title="Grafik Tumbuh Kembang & BMI"
-            subtitle={ageFromDob(p.dob) <= 19 ? 'Kurva pertumbuhan anak/remaja (WHO/CDC) — BB/U · TB/U · IMT/U' : 'Klasifikasi IMT dewasa (Asia-Pasifik)'}
+            title="Growth & BMI Chart"
+            subtitle={ageFromDob(p.dob) <= 19 ? 'Child/adolescent growth curve (WHO/CDC) — weight-for-age · height-for-age · BMI-for-age' : 'Adult BMI classification (Asia-Pacific)'}
           />
         </div>
         <div className="p-5">
@@ -591,7 +591,7 @@ export function Dashboard() {
       {/* Supportive Results — Card Stream */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconShield size={20} />} title="Pemeriksaan Penunjang" subtitle="Lab · EKG · Radiologi — suportif longevity" />
+          <SectionTitle icon={<IconShield size={20} />} title="Supportive Results" subtitle="Lab · ECG · Radiology — longevity support" />
         </div>
         <div className="space-y-2 p-5">
           {supportive.length === 0 ? (
@@ -599,7 +599,7 @@ export function Dashboard() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.03)' }}>
                 <IconShield size={22} className="text-neutral-300" />
               </div>
-              <p className="text-sm text-neutral-400">Belum ada hasil pemeriksaan penunjang.</p>
+              <p className="text-sm text-neutral-400">No supportive results yet.</p>
             </div>
           ) : (
             supportive.map((r) => <SupportiveCard key={r.id} r={r} />)

@@ -184,9 +184,9 @@ export function Settings() {
             }`}
           >
             <span className="min-w-0">
-              <span className={`flex items-center gap-2 font-extrabold ${S ? 'text-lg' : 'text-base'}`}>👵 Mode Simpel</span>
+              <span className={`flex items-center gap-2 font-extrabold ${S ? 'text-lg' : 'text-base'}`}>👵 Simple Mode</span>
               <span className={`mt-0.5 block text-neutral-500 ${S ? 'text-sm' : 'text-[13px]'}`}>
-                Teks &amp; tombol lebih besar, tampilan ditenangkan — cocok untuk lansia atau yang baru memakai aplikasi.
+                Bigger text &amp; buttons, a calmer look — ideal for seniors or anyone new to the app.
               </span>
             </span>
             <span className={`relative shrink-0 rounded-full ${S ? 'h-9 w-16' : 'h-7 w-12'} ${simple ? 'bg-brand' : 'bg-neutral-300'}`}>
@@ -296,8 +296,8 @@ export function Settings() {
         </button>
         <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 ${S ? 'p-4' : 'p-3'}`}>
           <span className="min-w-0">
-            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Data Lokal</span>
-            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>Hapus data tersimpan di perangkat ini</span>
+            <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Local Data</span>
+            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>Delete data stored on this device</span>
           </span>
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
@@ -322,7 +322,7 @@ export function TutorialVideoCard({ simple: S }: { simple: boolean }) {
       <SectionTitle
         icon={<IconVideo size={S ? 22 : 20} />}
         title="Video Tutorial"
-        subtitle="Panduan singkat cara memakai semua fitur utama"
+        subtitle="A quick guide to using all the main features"
       />
       <div className="overflow-hidden rounded-2xl bg-black">
         <video
@@ -334,7 +334,7 @@ export function TutorialVideoCard({ simple: S }: { simple: boolean }) {
         />
       </div>
       <p className={`mt-3 text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>
-        Bingung pakai aplikasi? Tonton video ini, atau bagikan ke teman yang baru mulai.
+        Not sure how to use the app? Watch this video, or share it with a friend who's just getting started.
       </p>
     </Card>
   )
@@ -348,7 +348,7 @@ const FEEDBACK_EMAIL = 'index.meds@gmail.com'
 const FB_KEY = 'pmd_feedback_history'
 
 function FeedbackCard({ simple: S }: { simple: boolean }) {
-  const [kind, setKind] = useState<'Saran' | 'Masalah/Bug' | 'Pertanyaan' | 'Pujian' | 'Permintaan Fitur'>('Saran')
+  const [kind, setKind] = useState<'Suggestion' | 'Problem/Bug' | 'Question' | 'Compliment' | 'Feature Request'>('Suggestion')
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [appSent, setAppSent] = useState(false)
@@ -382,11 +382,11 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
     <Card>
       <SectionTitle
         icon={<span className={S ? 'text-2xl' : 'text-xl'}>💬</span>}
-        title="Pesan & Saran"
-        subtitle="Kirim masukan langsung ke pengembang — semua dibaca"
+        title="Feedback & Suggestions"
+        subtitle="Send feedback straight to the developer — all of it gets read"
       />
       <div className={`flex flex-wrap ${S ? 'gap-2.5' : 'gap-1.5'}`}>
-        {(['Saran', 'Masalah/Bug', 'Pertanyaan', 'Pujian', 'Permintaan Fitur'] as const).map((k) => (
+        {(['Suggestion', 'Problem/Bug', 'Question', 'Compliment', 'Feature Request'] as const).map((k) => (
           <button key={k} onClick={() => setKind(k)}
             className={`rounded-full font-bold ${S ? 'px-4 py-2 text-sm' : 'px-3 py-1.5 text-[11px]'} ${
               kind === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'
@@ -398,7 +398,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
       <textarea
         className={`mt-3 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 ${S ? 'text-base' : 'text-sm'}`}
         rows={4}
-        placeholder="Tulis pesan, saran, atau kendala yang Anda alami…"
+        placeholder="Write your message, suggestion, or issue…"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
@@ -408,10 +408,10 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           disabled={!canSend || busy}
           className={`mt-2 w-full rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend && !busy ? 'bg-brand' : 'cursor-not-allowed bg-neutral-300'}`}
         >
-          {busy ? 'Mengirim…' : appSent ? '✓ Terkirim ke Owner' : '📩 Kirim ke Owner (Aplikasi)'}
+          {busy ? 'Sending…' : appSent ? '✓ Sent to Owner' : '📩 Send to Owner (App)'}
         </button>
       )}
-      <p className="mt-2 text-[11px] text-neutral-400">Atau kirim lewat kanal lain:</p>
+      <p className="mt-2 text-[11px] text-neutral-400">Or send through another channel:</p>
       <div className="mt-1 flex gap-2">
         <a
           href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
@@ -419,7 +419,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           onClick={(e) => { if (!canSend) { e.preventDefault(); return } record() }}
           className={`flex-1 rounded-xl py-3 text-center font-bold text-white ${S ? 'text-base' : 'text-sm'} ${canSend ? 'bg-[#25D366]' : 'cursor-not-allowed bg-neutral-300'}`}
         >
-          Kirim via WhatsApp
+          Send via WhatsApp
         </a>
         <a
           href={canSend ? `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(`[${kind}] Feedback Panaceamed.id`)}&body=${encodeURIComponent(text.trim())}` : undefined}
@@ -429,14 +429,14 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           ✉️ Email
         </a>
       </div>
-      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-400">Tulis minimal 5 karakter.</p>}
+      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-400">Write at least 5 characters.</p>}
       {sent.length > 0 && (
         <details className="mt-3">
-          <summary className={`cursor-pointer font-semibold text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>Riwayat kiriman ({sent.length})</summary>
+          <summary className={`cursor-pointer font-semibold text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>Sent history ({sent.length})</summary>
           <div className="mt-2 space-y-1.5">
             {sent.map((f, i) => (
               <div key={i} className="rounded-lg bg-neutral-50 px-3 py-2">
-                <div className="text-[10px] font-bold text-brand-dark">{f.kind} · {new Date(f.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                <div className="text-[10px] font-bold text-brand-dark">{f.kind} · {new Date(f.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
                 <div className={`text-neutral-600 ${S ? 'text-sm' : 'text-xs'}`}>{f.text}</div>
               </div>
             ))}
@@ -495,22 +495,22 @@ function PushControl({ simple: S }: { simple: boolean }) {
   }
   async function test() {
     const r = await api.pushTest().catch(() => ({ sent: 0 }))
-    setMsg(r.sent > 0 ? 'Notifikasi uji dikirim ✅' : 'Tidak ada perangkat terdaftar.')
+    setMsg(r.sent > 0 ? 'Test notification sent ✅' : 'No registered devices.')
   }
 
   const label: Record<PushStatus, string> = {
-    enabled: 'Notifikasi push aktif',
-    disabled: 'Aktifkan notifikasi push',
-    denied: 'Izin diblokir di browser',
-    unsupported: 'Browser tidak mendukung',
-    unavailable: 'Belum dikonfigurasi server',
+    enabled: 'Push notifications active',
+    disabled: 'Enable push notifications',
+    denied: 'Permission blocked in browser',
+    unsupported: 'Browser not supported',
+    unavailable: 'Not yet configured on server',
   }
   const note: Record<PushStatus, string> = {
-    enabled: 'Anda akan menerima pemberitahuan penting meski aplikasi tertutup.',
-    disabled: 'Dapatkan pemberitahuan vital, SOS & wawasan AI langsung ke perangkat.',
-    denied: 'Buka pengaturan situs browser → izinkan Notifikasi, lalu coba lagi.',
-    unsupported: 'Coba via Chrome/Edge atau pasang sebagai aplikasi (PWA).',
-    unavailable: 'Owner perlu menyetel VAPID di server untuk mengaktifkan.',
+    enabled: 'You will receive important alerts even when the app is closed.',
+    disabled: 'Get vital alerts, SOS & AI insights sent straight to your device.',
+    denied: 'Open your browser site settings → allow Notifications, then try again.',
+    unsupported: 'Try Chrome/Edge or install the app (PWA).',
+    unavailable: 'The owner needs to set up VAPID on the server to enable this.',
   }
   if (!status) return null
   const actionable = status === 'enabled' || status === 'disabled'
@@ -526,10 +526,10 @@ function PushControl({ simple: S }: { simple: boolean }) {
       {actionable && (
         <div className="flex shrink-0 flex-col gap-1.5">
           <Button onClick={toggle} disabled={busy} variant={status === 'enabled' ? 'outline' : 'primary'} className={`!px-3 ${S ? '!py-2.5 text-sm' : '!py-1.5 text-xs'}`}>
-            {busy ? '…' : status === 'enabled' ? 'Matikan' : 'Aktifkan'}
+            {busy ? '…' : status === 'enabled' ? 'Turn off' : 'Turn on'}
           </Button>
           {status === 'enabled' && (
-            <button onClick={test} className={`font-semibold text-brand-dark hover:underline ${S ? 'text-xs' : 'text-[11px]'}`}>Kirim uji</button>
+            <button onClick={test} className={`font-semibold text-brand-dark hover:underline ${S ? 'text-xs' : 'text-[11px]'}`}>Send test</button>
           )}
         </div>
       )}
