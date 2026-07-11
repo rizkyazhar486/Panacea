@@ -71,7 +71,12 @@ export function SportsScores() {
       return
     }
     api.getSportsScores(league)
-      .then((r) => { setEvents(r.events as NormalizedEvent[]); if (r.error) setErr('The data source is having issues, please try again later.') })
+      .then((r) => {
+        setEvents(r.events as NormalizedEvent[])
+        if (r.error === 'not_configured') setErr('This league needs the data provider to be set up on the server (APISPORTS_KEY). It will work once that key is configured.')
+        else if (r.error === 'league_not_found') setErr('Couldn\'t find this league on the data provider right now — please try again later.')
+        else if (r.error) setErr('The data source is having issues, please try again later.')
+      })
       .catch(() => setErr('Failed to load scores.'))
       .finally(() => setLoading(false))
   }, [league])
