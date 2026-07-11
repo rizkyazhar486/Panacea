@@ -45,7 +45,13 @@ export interface LeagueConfig {
   id: string
   label: string
   sport: LeagueSport
-  slug: string // ESPN league slug
+  slug: string // ESPN league slug (source 'espn'); ignored for other sources
+  source?: 'espn' | 'tsdb' // default 'espn'
+  // For source 'tsdb' (TheSportsDB) — the league is resolved by name+country
+  // via the free API, since hardcoding a numeric idLeague is fragile.
+  tsdbName?: string
+  tsdbCountry?: string
+  tsdbSport?: string // TheSportsDB sport name, e.g. 'Soccer', 'Cricket'
 }
 
 export const LEAGUES: LeagueConfig[] = [
@@ -65,13 +71,14 @@ export const LEAGUES: LeagueConfig[] = [
   { id: 'urc', label: 'URC (Rugby)', sport: 'rugby', slug: '270557' },
   { id: 'atp', label: 'ATP Tour', sport: 'tennis', slug: 'atp' },
   { id: 'wta', label: 'WTA Tour', sport: 'tennis', slug: 'wta' },
+  // TheSportsDB (free, no per-user key) for leagues ESPN doesn't serve well.
+  { id: 'liga1', label: 'Liga 1 Indonesia', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indonesian Liga 1', tsdbCountry: 'Indonesia', tsdbSport: 'Soccer' },
+  { id: 'ipl', label: 'IPL (Cricket)', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indian Premier League', tsdbCountry: 'India', tsdbSport: 'Cricket' },
 ]
 
 // Leagues explicitly NOT covered — shown honestly in the UI instead of faked.
 export const UNAVAILABLE: UnavailableResult[] = [
-  { leagueId: 'liga1_id', label: 'Liga 1 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
-  { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
-  { leagueId: 'ipl', label: 'IPL (Cricket)', unavailable: true, reason: 'Cricket scoreboards on the free ESPN API are inconsistent and don\'t map cleanly to live scores, so IPL is left out rather than shown incorrectly.' },
+  { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 2 at the moment.' },
   { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'No free padel score API is available yet.' },
 ]
 
@@ -154,6 +161,8 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
   const hit = cache.get(leagueId)
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.data
 
+  if (league.source === 'tsdb') return fetchTsdbScoreboard(league)
+
   try {
     const url = `${ESPN_BASE}/${league.sport}/${league.slug}/scoreboard`
     const res = await fetch(url, { headers: { Accept: 'application/json' } })
@@ -175,6 +184,87 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
   } catch (e) {
     console.log(`[sports] ${leagueId} fetch error:`, (e as Error).message)
     return { leagueId, label: league.label, events: [], error: 'fetch_failed' }
+  }
+}
+
+// --- TheSportsDB (free community sports DB; public test key "3", no signup) ---
+// Used for leagues ESPN doesn't serve well (Liga 1 Indonesia soccer, IPL
+// cricket). The free tier gives recent results + upcoming fixtures rather than
+// live ball-by-ball, so scores here are final/scheduled, not second-by-second.
+// League id is resolved by name once and cached, since numeric idLeague values
+// are undocumented and fragile to hardcode. Not testable from the sandbox —
+// verify the JSON shape on first deploy; every step logs on failure.
+const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/3'
+const tsdbLeagueIdCache = new Map<string, string | null>()
+
+interface TsdbLeague { idLeague?: string; strLeague?: string }
+interface TsdbEvent { idEvent?: string; strHomeTeam?: string; strAwayTeam?: string; intHomeScore?: string | null; intAwayScore?: string | null; dateEvent?: string; strTime?: string; strStatus?: string }
+
+async function resolveTsdbLeagueId(cfg: LeagueConfig): Promise<string | null> {
+  const key = `${cfg.tsdbCountry}|${cfg.tsdbSport}|${cfg.tsdbName}`
+  if (tsdbLeagueIdCache.has(key)) return tsdbLeagueIdCache.get(key) ?? null
+  try {
+    const url = `${TSDB_BASE}/search_all_leagues.php?c=${encodeURIComponent(cfg.tsdbCountry ?? '')}&s=${encodeURIComponent(cfg.tsdbSport ?? '')}`
+    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    if (!res.ok) { console.log(`[sports] tsdb league search failed: HTTP ${res.status}`); return null }
+    const json = (await res.json()) as { countries?: TsdbLeague[]; leagues?: TsdbLeague[] }
+    const list = json.countries ?? json.leagues ?? []
+    const want = (cfg.tsdbName ?? '').toLowerCase()
+    const match = list.find((l) => (l.strLeague ?? '').toLowerCase() === want)
+      ?? list.find((l) => (l.strLeague ?? '').toLowerCase().includes(want))
+    const id = match?.idLeague ?? null
+    tsdbLeagueIdCache.set(key, id)
+    if (!id) console.log(`[sports] tsdb: league "${cfg.tsdbName}" not found in ${cfg.tsdbCountry}/${cfg.tsdbSport}`)
+    return id
+  } catch (e) {
+    console.log('[sports] tsdb league resolve error:', (e as Error).message)
+    return null
+  }
+}
+
+function normalizeTsdbEvent(ev: TsdbEvent, state: NormalizedEvent['state']): NormalizedEvent | null {
+  if (!ev.idEvent || !ev.strHomeTeam || !ev.strAwayTeam) return null
+  const startTime = ev.dateEvent ? `${ev.dateEvent}T${ev.strTime && /^\d{2}:\d{2}/.test(ev.strTime) ? ev.strTime.slice(0, 8).padEnd(8, ':00') : '00:00:00'}Z` : ''
+  const homeScore = ev.intHomeScore != null && ev.intHomeScore !== '' ? String(ev.intHomeScore) : undefined
+  const awayScore = ev.intAwayScore != null && ev.intAwayScore !== '' ? String(ev.intAwayScore) : undefined
+  return {
+    id: ev.idEvent,
+    startTime,
+    state,
+    statusDetail: ev.strStatus ?? (state === 'post' ? 'FT' : ''),
+    home: { name: ev.strHomeTeam, abbrev: '', score: homeScore },
+    away: { name: ev.strAwayTeam, abbrev: '', score: awayScore },
+  }
+}
+
+async function fetchTsdbScoreboard(league: LeagueConfig): Promise<LeagueResult> {
+  const id = await resolveTsdbLeagueId(league)
+  if (!id) return { leagueId: league.id, label: league.label, events: [], error: 'league_not_found' }
+  try {
+    const [nextRes, pastRes] = await Promise.all([
+      fetch(`${TSDB_BASE}/eventsnextleague.php?id=${id}`, { headers: { Accept: 'application/json' } }),
+      fetch(`${TSDB_BASE}/eventspastleague.php?id=${id}`, { headers: { Accept: 'application/json' } }),
+    ])
+    const events: NormalizedEvent[] = []
+    if (nextRes.ok) {
+      const j = (await nextRes.json()) as { events?: TsdbEvent[] | null }
+      for (const ev of j.events ?? []) { const n = normalizeTsdbEvent(ev, 'pre'); if (n) events.push(n) }
+    } else { console.log(`[sports] tsdb ${league.id} next failed: HTTP ${nextRes.status}`) }
+    if (pastRes.ok) {
+      const j = (await pastRes.json()) as { events?: TsdbEvent[] | null }
+      for (const ev of j.events ?? []) { const n = normalizeTsdbEvent(ev, 'post'); if (n) events.push(n) }
+    } else { console.log(`[sports] tsdb ${league.id} past failed: HTTP ${pastRes.status}`) }
+    // Upcoming first (soonest), then recent results (newest first).
+    events.sort((a, b) => {
+      if (a.state !== b.state) return a.state === 'pre' ? -1 : 1
+      return a.state === 'pre' ? a.startTime.localeCompare(b.startTime) : b.startTime.localeCompare(a.startTime)
+    })
+    const result: LeagueResult = { leagueId: league.id, label: league.label, events }
+    cache.set(league.id, { at: Date.now(), data: result })
+    return result
+  } catch (e) {
+    console.log(`[sports] tsdb ${league.id} fetch error:`, (e as Error).message)
+    return { leagueId: league.id, label: league.label, events: [], error: 'fetch_failed' }
   }
 }
 
