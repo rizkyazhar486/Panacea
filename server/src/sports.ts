@@ -39,7 +39,7 @@ export interface UnavailableResult {
   reason: string
 }
 
-export type LeagueSport = 'soccer' | 'basketball' | 'football' | 'mma'
+export type LeagueSport = 'soccer' | 'basketball' | 'football' | 'mma' | 'baseball' | 'hockey' | 'rugby' | 'tennis'
 
 export interface LeagueConfig {
   id: string
@@ -59,15 +59,21 @@ export const LEAGUES: LeagueConfig[] = [
   { id: 'worldcup', label: 'Piala Dunia', sport: 'soccer', slug: 'fifa.world' },
   { id: 'nba', label: 'NBA', sport: 'basketball', slug: 'nba' },
   { id: 'nfl', label: 'NFL', sport: 'football', slug: 'nfl' },
+  { id: 'mlb', label: 'MLB', sport: 'baseball', slug: 'mlb' },
+  { id: 'nhl', label: 'NHL', sport: 'hockey', slug: 'nhl' },
   { id: 'ufc', label: 'UFC', sport: 'mma', slug: 'ufc' },
+  { id: 'urc', label: 'URC (Rugby)', sport: 'rugby', slug: '270557' },
+  { id: 'atp', label: 'ATP Tour', sport: 'tennis', slug: 'atp' },
+  { id: 'wta', label: 'WTA Tour', sport: 'tennis', slug: 'wta' },
 ]
 
 // Leagues explicitly NOT covered — shown honestly in the UI instead of faked.
 export const UNAVAILABLE: UnavailableResult[] = [
-  { leagueId: 'liga1_id', label: 'Liga 1 Indonesia', unavailable: true, reason: 'Tidak ada sumber data gratis yang layak untuk Liga 1/2 Indonesia saat ini.' },
-  { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'Tidak ada sumber data gratis yang layak untuk Liga 1/2 Indonesia saat ini.' },
-  { leagueId: 'tennis', label: 'Tenis (ATP/WTA)', unavailable: true, reason: 'Belum ada sumber skor tenis gratis yang cukup andal untuk diintegrasikan.' },
-  { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'Belum ada API skor padel gratis yang tersedia.' },
+  { leagueId: 'liga1_id', label: 'Liga 1 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
+  { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
+  { leagueId: 'motogp', label: 'MotoGP', unavailable: true, reason: 'No free, no-key MotoGP scoreboard endpoint exists — ESPN\'s public API does not expose MotoGP results the way it does F1.' },
+  { leagueId: 'ipl', label: 'IPL (Cricket)', unavailable: true, reason: 'Cricket scoreboards on the free ESPN API are inconsistent and don\'t map cleanly to live scores, so IPL is left out rather than shown incorrectly.' },
+  { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'No free padel score API is available yet.' },
 ]
 
 const ESPN_BASE = 'https://site.api.espn.com/apis/site/v2/sports'
@@ -99,11 +105,12 @@ function normalizeEspnEvent(ev: EspnEvent): NormalizedEvent | null {
   }
 }
 
-// MMA/UFC events have no home/away teams — each "competitor" is a fighter
-// (order 1 or 2) with an `athlete`, not a `team`. Normalized into the same
-// NormalizedEvent shape (fighter 1 -> home slot, fighter 2 -> away slot) so
-// the existing frontend card (name vs name, score always "-") works as-is.
-interface EspnFighterCompetitor { order?: number; winner?: boolean; athlete?: { displayName?: string; shortName?: string; headshot?: { href?: string } } }
+// Player-vs-player events (MMA/UFC bouts and tennis singles) have no home/away
+// teams — each "competitor" is an athlete (order 1/2 or array index 0/1), not a
+// `team`. Normalized into the same NormalizedEvent shape (player 1 -> home slot,
+// player 2 -> away slot). Score: the live set/games score when the source
+// provides one (tennis), else W/L once decided (MMA), else "-".
+interface EspnFighterCompetitor { order?: number; winner?: boolean; score?: string; athlete?: { displayName?: string; shortName?: string; headshot?: { href?: string } } }
 interface EspnMmaCompetition { competitors?: EspnFighterCompetitor[]; status?: { type?: { state?: string; detail?: string; shortDetail?: string } } }
 interface EspnMmaEvent { id?: string; date?: string; name?: string; status?: { type?: { state?: string; detail?: string; shortDetail?: string } }; competitions?: EspnMmaCompetition[] }
 interface EspnMmaResponse { events?: EspnMmaEvent[] }
@@ -115,7 +122,7 @@ function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent | null {
   if (!f1?.athlete || !f2?.athlete || !ev.id) return null
   const status = comp?.status?.type ?? ev.status?.type
   const state = (status?.state as NormalizedEvent['state']) ?? 'pre'
-  const resultFor = (c: EspnFighterCompetitor) => (state === 'post' ? (c.winner ? 'W' : 'L') : undefined)
+  const resultFor = (c: EspnFighterCompetitor) => (c.score != null && c.score !== '' ? String(c.score) : state === 'post' ? (c.winner ? 'W' : 'L') : undefined)
   return {
     id: ev.id,
     startTime: ev.date ?? '',
@@ -141,7 +148,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
       return { leagueId, label: league.label, events: [], error: `upstream_${res.status}` }
     }
     let events: NormalizedEvent[]
-    if (league.sport === 'mma') {
+    if (league.sport === 'mma' || league.sport === 'tennis') {
       const json = (await res.json()) as EspnMmaResponse
       events = (json.events ?? []).map(normalizeMmaEvent).filter((e): e is NormalizedEvent => e !== null)
     } else {
