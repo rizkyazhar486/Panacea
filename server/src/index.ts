@@ -74,7 +74,7 @@ import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload } from './healthWebhook.js'
-import { fetchLeagueScoreboard, fetchF1Info, LEAGUES, UNAVAILABLE } from './sports.js'
+import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -469,6 +469,9 @@ app.get('/api/sports/scores', async (req, res) => {
 })
 app.get('/api/sports/f1', async (_req, res) => {
   res.json(await fetchF1Info())
+})
+app.get('/api/sports/motogp', async (_req, res) => {
+  res.json(await fetchMotoGpInfo())
 })
 app.get('/api/sports/favorites', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user

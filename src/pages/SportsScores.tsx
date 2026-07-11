@@ -23,8 +23,8 @@ interface NormalizedEvent {
 
 const STATE_BADGE: Record<NormalizedEvent['state'], { label: string; tone: 'brand' | 'critical' | 'neutral' }> = {
   in: { label: 'LIVE', tone: 'critical' },
-  post: { label: 'Selesai', tone: 'neutral' },
-  pre: { label: 'Akan Datang', tone: 'brand' },
+  post: { label: 'Finished', tone: 'neutral' },
+  pre: { label: 'Upcoming', tone: 'brand' },
 }
 
 // Real team crest from the source API (ESPN) when available; falls back to a
@@ -51,6 +51,7 @@ export function SportsScores() {
   const [err, setErr] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
   const [f1, setF1] = useState<{ next?: { raceName: string; circuit: string; location: string; date: string }; lastRaceName?: string; lastPodium?: { position: string; driver: string; constructor: string }[] } | null>(null)
+  const [motogp, setMotogp] = useState<{ next?: { name: string; circuit: string; country: string; date: string }; lastRaceName?: string; lastRaceDate?: string } | null>(null)
 
   useEffect(() => {
     if (!backendEnabled) { setLoading(false); return }
@@ -62,12 +63,16 @@ export function SportsScores() {
     if (!backendEnabled) return
     setLoading(true); setErr('')
     if (league === 'f1') {
-      api.getF1Info().then((r) => { setF1(r); setEvents([]) }).catch(() => setErr('Gagal memuat data F1.')).finally(() => setLoading(false))
+      api.getF1Info().then((r) => { setF1(r); setEvents([]) }).catch(() => setErr('Failed to load F1 data.')).finally(() => setLoading(false))
+      return
+    }
+    if (league === 'motogp') {
+      api.getMotoGpInfo().then((r) => { setMotogp(r); setEvents([]) }).catch(() => setErr('Failed to load MotoGP data.')).finally(() => setLoading(false))
       return
     }
     api.getSportsScores(league)
-      .then((r) => { setEvents(r.events as NormalizedEvent[]); if (r.error) setErr('Sumber data sedang bermasalah, coba lagi nanti.') })
-      .catch(() => setErr('Gagal memuat skor.'))
+      .then((r) => { setEvents(r.events as NormalizedEvent[]); if (r.error) setErr('The data source is having issues, please try again later.') })
+      .catch(() => setErr('Failed to load scores.'))
       .finally(() => setLoading(false))
   }, [league])
 
@@ -83,7 +88,7 @@ export function SportsScores() {
   if (!backendEnabled) {
     return (
       <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-400">
-        Skor langsung butuh server aktif — belum tersedia di mode demo lokal.
+        Live scores require an active server — not available in local demo mode.
       </div>
     )
   }
@@ -91,9 +96,9 @@ export function SportsScores() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Skor Langsung" subtitle="Sepak bola, NBA, NFL, F1 — sumber gratis" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Live Scores" subtitle="Football, NBA, NFL, MLB, NHL, UFC, tennis, F1, MotoGP — free sources" />
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {[...leagues, { id: 'f1', label: 'F1' }].map((l) => (
+          {[...leagues, { id: 'f1', label: 'F1' }, { id: 'motogp', label: 'MotoGP' }].map((l) => (
             <button key={l.id} onClick={() => setLeague(l.id)}
               className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition ${league === l.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500'}`}>
               {l.label}
@@ -102,21 +107,42 @@ export function SportsScores() {
         </div>
       </Card>
 
-      {loading && <div className="py-8 text-center text-sm text-neutral-400">Memuat…</div>}
+      {loading && <div className="py-8 text-center text-sm text-neutral-400">Loading…</div>}
       {err && <div className="rounded-xl bg-rose-50 p-3 text-center text-xs text-rose-600">{err}</div>}
+
+      {league === 'motogp' && motogp && !loading && (
+        <Card className="!p-5 space-y-4">
+          {motogp.next ? (
+            <div>
+              <SectionTitle icon={<IconTimer size={20} />} title="Next Race" subtitle={motogp.next.name} />
+              <p className="mt-1 text-xs text-neutral-500">{motogp.next.circuit}{motogp.next.country ? ` · ${motogp.next.country}` : ''}</p>
+              {motogp.next.date && <p className="mt-0.5 text-xs font-semibold text-brand-dark">{new Date(motogp.next.date).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</p>}
+            </div>
+          ) : (
+            <p className="text-xs text-neutral-400">No upcoming MotoGP race found right now.</p>
+          )}
+          {motogp.lastRaceName && (
+            <div className="border-t border-neutral-100 pt-3">
+              <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Last Race</div>
+              <p className="mt-1 text-sm font-semibold text-ink">{motogp.lastRaceName}</p>
+              {motogp.lastRaceDate && <p className="text-[11px] text-neutral-400">{new Date(motogp.lastRaceDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>}
+            </div>
+          )}
+        </Card>
+      )}
 
       {league === 'f1' && f1 && !loading && (
         <Card className="!p-5 space-y-4">
           {f1.next && (
             <div>
-              <SectionTitle icon={<IconTimer size={20} />} title="Balapan Berikutnya" subtitle={f1.next.raceName} />
+              <SectionTitle icon={<IconTimer size={20} />} title="Next Race" subtitle={f1.next.raceName} />
               <p className="mt-1 text-xs text-neutral-500">{f1.next.circuit} · {f1.next.location}</p>
-              <p className="mt-0.5 text-xs font-semibold text-brand-dark">{new Date(f1.next.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+              <p className="mt-0.5 text-xs font-semibold text-brand-dark">{new Date(f1.next.date).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             </div>
           )}
           {f1.lastPodium && f1.lastPodium.length > 0 && (
             <div>
-              <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Podium Terakhir — {f1.lastRaceName}</div>
+              <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Last Podium — {f1.lastRaceName}</div>
               <div className="mt-2 space-y-1.5">
                 {f1.lastPodium.map((p) => (
                   <div key={p.position} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-xs">
@@ -127,19 +153,19 @@ export function SportsScores() {
               </div>
             </div>
           )}
-          {!f1.next && !f1.lastPodium && <p className="text-xs text-neutral-400">Data F1 tidak tersedia saat ini.</p>}
+          {!f1.next && !f1.lastPodium && <p className="text-xs text-neutral-400">F1 data is unavailable right now.</p>}
         </Card>
       )}
 
-      {league !== 'f1' && !loading && !err && (
+      {league !== 'f1' && league !== 'motogp' && !loading && !err && (
         <div className="space-y-2">
-          {events.length === 0 && <div className="py-8 text-center text-xs text-neutral-400">Tidak ada pertandingan untuk liga ini saat ini.</div>}
+          {events.length === 0 && <div className="py-8 text-center text-xs text-neutral-400">No matches for this league right now.</div>}
           {events.map((ev) => {
             const badge = STATE_BADGE[ev.state]
             return (
               <Card key={ev.id} className="!p-4">
                 <div className="flex items-center justify-between text-[10px] text-neutral-400">
-                  <span>{new Date(ev.startTime).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>{new Date(ev.startTime).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                   <Badge tone={badge.tone}>{ev.state === 'in' ? `🔴 ${ev.statusDetail || badge.label}` : badge.label}</Badge>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
@@ -162,7 +188,7 @@ export function SportsScores() {
       )}
 
       <p className="text-center text-[10px] text-neutral-400">
-        Tandai ★ tim favorit untuk mendapat notifikasi gol/hasil akhir (dicek server tiap ~90 detik).
+        Star ★ your favorite teams to get goal / final-result notifications (checked server-side every ~90 seconds).
       </p>
     </div>
   )

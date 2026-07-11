@@ -224,6 +224,7 @@ export const api = {
     req<{ ok: boolean; unlocked: boolean; balance: number }>('/api/clinical-calculators/unlock-pnc', { method: 'POST' }),
   getSportsScores: (league: string) => req<{ leagueId: string; label: string; events: unknown[]; error?: string }>(`/api/sports/scores?league=${encodeURIComponent(league)}`),
   getF1Info: () => req<{ next?: { raceName: string; circuit: string; location: string; date: string; time?: string }; lastRaceName?: string; lastPodium?: { position: string; driver: string; constructor: string }[]; error?: string }>('/api/sports/f1'),
+  getMotoGpInfo: () => req<{ next?: { name: string; circuit: string; country: string; date: string }; lastRaceName?: string; lastRaceDate?: string; error?: string }>('/api/sports/motogp'),
   getSportsFavorites: () => req<{ teams: string[] }>('/api/sports/favorites').then((r) => r.teams),
   saveSportsFavorites: (teams: string[]) => req<{ teams: string[] }>('/api/sports/favorites', { method: 'PUT', body: JSON.stringify({ teams }) }).then((r) => r.teams),
   patchPost: (id: string, patch: Record<string, unknown>) =>
