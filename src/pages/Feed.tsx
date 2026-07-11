@@ -360,6 +360,21 @@ interface SharedGpsData {
   pace: string; kcal: number; hr: number; acceleration: number;
   vo2Max: number; hiit: ReturnType<typeof hiitIndicator>
   elevGainM: number; terrain: string
+  avgHr: number; maxHr: number; hrSamples: { s: number; bpm: number }[]
+}
+
+// Compress the per-point HR trace into ≤120 evenly-spaced samples so it can be
+// persisted with the activity (powers the HR-zone analysis on the Athlete page)
+// without bloating localStorage.
+function extractHrSamples(pts: GpsPoint[]): { samples: { s: number; bpm: number }[]; avg: number; max: number } {
+  const withHr = pts.filter((p) => (p.hr ?? 0) > 30)
+  if (withHr.length === 0) return { samples: [], avg: 0, max: 0 }
+  const t0 = pts[0]?.t ?? withHr[0].t
+  const step = Math.max(1, Math.ceil(withHr.length / 120))
+  const samples = withHr.filter((_, i) => i % step === 0).map((p) => ({ s: Math.round((p.t - t0) / 1000), bpm: p.hr as number }))
+  const avg = Math.round(withHr.reduce((a, p) => a + (p.hr as number), 0) / withHr.length)
+  const max = Math.max(...withHr.map((p) => p.hr as number))
+  return { samples, avg, max }
 }
 
 function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: SharedGpsData) => void; authorName: string }) {
@@ -419,7 +434,8 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
   function stop() { setMode('done'); if (wRef.current) navigator.geolocation.clearWatch(wRef.current); if (tRef.current) clearInterval(tRef.current) }
   function reset() { setMode('idle'); setPts([]); setPlan([]); setDur(0); setHr(0); setGpsErr('') }
   function shareToFeed() {
-    onShareToFeed({ sport, dist, dur, speed, pace: fmtPace(dur, dist), kcal, hr, acceleration, vo2Max: vo2Est, hiit, elevGainM, terrain })
+    const hrInfo = extractHrSamples(pts)
+    onShareToFeed({ sport, dist, dur, speed, pace: fmtPace(dur, dist), kcal, hr, acceleration, vo2Max: vo2Est, hiit, elevGainM, terrain, avgHr: hrInfo.avg, maxHr: hrInfo.max, hrSamples: hrInfo.samples })
   }
 
   const progressPct = sport.targetDist ? Math.min(100, (dist / 1000 / sport.targetDist) * 100) : 0
@@ -635,7 +651,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
     {shareImageOpen && (
       <ActivityShareCard
-        data={{ points: pts, distKm: dist / 1000, durSec: dur, sportEmoji: sport.emoji, sportName: sport.name, authorName }}
+        data={{ points: pts, distKm: dist / 1000, durSec: dur, sportEmoji: sport.emoji, sportName: sport.name, authorName, avgHr: extractHrSamples(pts).avg || undefined, kcal }}
         onClose={() => setShareImageOpen(false)}
       />
     )}
@@ -2153,6 +2169,9 @@ export default function SportsSocialFeed() {
       avgSpeedKmh: Math.round(gpsData.speed * 10) / 10,
       kcal: gpsData.kcal,
       at: new Date().toISOString(),
+      avgHr: gpsData.avgHr || undefined,
+      maxHr: gpsData.maxHr || undefined,
+      hrSamples: gpsData.hrSamples.length > 0 ? gpsData.hrSamples : undefined,
     })
   }
 

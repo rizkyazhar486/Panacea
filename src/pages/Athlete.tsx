@@ -5,6 +5,7 @@ import { ShareStatCard } from '../components/ShareStatCard'
 import { PrefillBadge } from '../components/HealthSnapshot'
 import { hasHealth, pushBiometrics } from '../lib/profile'
 import { Portal } from '../components/Portal'
+import { useStore } from '../lib/store'
 
 // Motivational quotes from legendary athletes (Olympic/medal/award winners &
 // globally followed icons) — shown as a welcome popup on the Athlete page.
@@ -95,6 +96,117 @@ const ZONES = [
   { z: 'Z4', label: 'Lactate Threshold', pct: [0.8, 0.9], desc: 'Hard, 4-8 minute intervals' },
   { z: 'Z5', label: 'VO₂max / Anaerobic', pct: [0.9, 1.0], desc: 'Maximal effort, short 30s-3 minute intervals' },
 ] as const
+
+// Zone color scale used by the session HR chart & time-in-zone bars —
+// blue (warm-up) → green (easy) → yellow (aerobic) → orange (threshold) → red (max).
+const ZONE_COLORS = ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#ef4444']
+function zoneIndex(bpm: number, hrMax: number): number {
+  const pct = bpm / hrMax
+  if (pct < 0.6) return 0
+  if (pct < 0.7) return 1
+  if (pct < 0.8) return 2
+  if (pct < 0.9) return 3
+  return 4
+}
+function fmtZoneDur(sec: number): string {
+  const m = Math.floor(sec / 60), s = Math.round(sec % 60)
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+// Post-session heart-rate analysis — the layer the watch screenshots show:
+// BPM trace colored by zone + time-in-zone distribution. Reads the viewer's
+// most recent GPS activity that captured HR (entered live in the tracker or
+// synced from a device).
+function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
+  const { state, account } = useStore()
+  const act = [...state.gpsActivities]
+    .filter((a) => a.email === account?.email && (a.hrSamples?.length ?? 0) >= 2)
+    .sort((a, b) => b.at.localeCompare(a.at))[0]
+
+  if (!act || !act.hrSamples) {
+    return (
+      <Card className="!p-5">
+        <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="BPM trace & time in each zone" />
+        <p className="mt-2 text-xs text-neutral-400">
+          No session with heart-rate data yet. Track a workout with the <b>GPS Tracker</b> on Home and enter your HR (bpm) while training — or sync a watch — and your BPM chart and time-in-zone breakdown will appear here automatically.
+        </p>
+      </Card>
+    )
+  }
+
+  const samples = act.hrSamples
+  const bpms = samples.map((x) => x.bpm)
+  const avg = act.avgHr ?? Math.round(bpms.reduce((a, b) => a + b, 0) / bpms.length)
+  const max = act.maxHr ?? Math.max(...bpms)
+  const maxS = Math.max(samples[samples.length - 1].s, 1)
+  const yLo = Math.min(...bpms) - 8
+  const yHi = Math.max(...bpms) + 8
+  const X = (s: number) => (s / maxS) * 320
+  const Y = (bpm: number) => 110 - ((bpm - yLo) / Math.max(yHi - yLo, 1)) * 100
+
+  // Time in zone: attribute the gap after each sample to that sample's zone.
+  const zoneSec = [0, 0, 0, 0, 0]
+  for (let i = 0; i < samples.length - 1; i++) {
+    const dt = Math.min(Math.max(samples[i + 1].s - samples[i].s, 0), 120)
+    zoneSec[zoneIndex(samples[i].bpm, hrMax)] += dt
+  }
+  const totalSec = zoneSec.reduce((a, b) => a + b, 0) || 1
+  const zoneMeta = [
+    { label: 'Zone 1 · Warm-up', range: `≤ ${Math.round(hrMax * 0.6)} bpm` },
+    { label: 'Zone 2 · Easy', range: `${Math.round(hrMax * 0.6)}–${Math.round(hrMax * 0.7)} bpm` },
+    { label: 'Zone 3 · Aerobic', range: `${Math.round(hrMax * 0.7)}–${Math.round(hrMax * 0.8)} bpm` },
+    { label: 'Zone 4 · Threshold', range: `${Math.round(hrMax * 0.8)}–${Math.round(hrMax * 0.9)} bpm` },
+    { label: 'Zone 5 · Maximum', range: `> ${Math.round(hrMax * 0.9)} bpm` },
+  ]
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle
+        icon={<IconHeart size={20} />}
+        title="Session Heart Rate"
+        subtitle={`${act.emoji} ${act.sport} · ${new Date(act.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} · ${fmtZoneDur(act.durSec)}`}
+      />
+      <div className="mt-3 flex items-baseline justify-around text-center">
+        <div>
+          <div className="text-3xl font-extrabold text-ink">{avg}</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Avg BPM</div>
+        </div>
+        <div>
+          <div className="text-3xl font-extrabold text-ink">{max}</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Max BPM</div>
+        </div>
+      </div>
+
+      <svg viewBox="0 0 320 120" className="mt-3 w-full" role="img" aria-label="Heart rate over the session, colored by training zone">
+        <line x1="0" x2="320" y1={Y(avg)} y2={Y(avg)} stroke="#ef4444" strokeWidth="1" strokeDasharray="4 4" opacity="0.55" />
+        {samples.slice(0, -1).map((pt, i) => {
+          const nxt = samples[i + 1]
+          return (
+            <line key={i} x1={X(pt.s)} y1={Y(pt.bpm)} x2={X(nxt.s)} y2={Y(nxt.bpm)}
+              stroke={ZONE_COLORS[zoneIndex((pt.bpm + nxt.bpm) / 2, hrMax)]} strokeWidth="2.5" strokeLinecap="round" />
+          )
+        })}
+      </svg>
+
+      <div className="mt-4 space-y-2.5">
+        {zoneMeta.map((z, i) => {
+          const pct = Math.round((zoneSec[i] / totalSec) * 100)
+          return (
+            <div key={z.label}>
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-bold text-neutral-600">{z.label} <span className="font-medium text-neutral-400">· {z.range}</span></span>
+                <span className="font-bold tabular-nums text-neutral-600">{fmtZoneDur(zoneSec[i])} <span className="text-neutral-400">({pct}%)</span></span>
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-neutral-100">
+                <div className="h-full rounded-full" style={{ width: `${Math.max(pct, zoneSec[i] > 0 ? 3 : 0)}%`, background: ZONE_COLORS[i] }} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
 
 function vo2Tier(v: number, g: 'M' | 'F') {
   const t = g === 'M'
@@ -215,6 +327,8 @@ export function Athlete() {
           })}
         </div>
       </Card>
+
+      <HrZoneAnalysis hrMax={hrMax} />
 
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Weekly Load Target" subtitle="General recommendations based on VO₂max tier" />
