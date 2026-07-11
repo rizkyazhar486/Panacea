@@ -199,13 +199,13 @@ function AddProductForm({ onAdd }: { onAdd: (p: Product) => void }) {
   }
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Field label="Nama obat"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="mis. Paracetamol" /></Field>
-      <Field label="Kategori"><select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Cat })}>{CAT_LIST.map((c) => <option key={c}>{c}</option>)}</select></Field>
-      <Field label="Harga (Rp)"><input className={inputClass} type="number" value={f.priceIdr} onChange={(e) => setF({ ...f, priceIdr: e.target.value })} /></Field>
-      <Field label="Foto produk"><input className={inputClass} type="file" accept="image/*" onChange={(e) => pickImg(e.target.files?.[0])} /></Field>
-      <Field label="Deskripsi"><input className={inputClass} value={f.desc} onChange={(e) => setF({ ...f, desc: e.target.value })} placeholder="kemasan / kegunaan" /></Field>
-      <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" checked={f.rx} onChange={(e) => setF({ ...f, rx: e.target.checked })} className="h-4 w-4 accent-[#00BF63]" /> Wajib resep</label>
-      <div className="flex items-end lg:col-span-2"><Button onClick={submit} disabled={!f.name.trim() || !f.priceIdr}><IconPlus size={16} /> Tambah Obat</Button></div>
+      <Field label="Medicine name"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="e.g. Paracetamol" /></Field>
+      <Field label="Category"><select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Cat })}>{CAT_LIST.map((c) => <option key={c} value={c}>{CAT_LABELS[c] ?? c}</option>)}</select></Field>
+      <Field label="Price (Rp)"><input className={inputClass} type="number" value={f.priceIdr} onChange={(e) => setF({ ...f, priceIdr: e.target.value })} /></Field>
+      <Field label="Product photo"><input className={inputClass} type="file" accept="image/*" onChange={(e) => pickImg(e.target.files?.[0])} /></Field>
+      <Field label="Description"><input className={inputClass} value={f.desc} onChange={(e) => setF({ ...f, desc: e.target.value })} placeholder="packaging / usage" /></Field>
+      <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" checked={f.rx} onChange={(e) => setF({ ...f, rx: e.target.checked })} className="h-4 w-4 accent-[#00BF63]" /> Prescription required</label>
+      <div className="flex items-end lg:col-span-2"><Button onClick={submit} disabled={!f.name.trim() || !f.priceIdr}><IconPlus size={16} /> Add Medicine</Button></div>
     </div>
   )
 }
@@ -216,16 +216,16 @@ function RxModal({ onClose, onUpload }: { onClose: () => void; onUpload: (name: 
     <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-2 text-brand-dark"><IconUpload size={20} /><h3 className="text-lg font-bold">Scan / Unggah Resep Dokter</h3></div>
-        <p className="mt-1 text-sm text-neutral-500">Foto atau pindai resep dokter (JPG/PNG/PDF). Apoteker memverifikasi sebelum obat keras disiapkan.</p>
+        <div className="flex items-center gap-2 text-brand-dark"><IconUpload size={20} /><h3 className="text-lg font-bold">Scan / Upload Doctor's Prescription</h3></div>
+        <p className="mt-1 text-sm text-neutral-500">Photograph or scan the doctor's prescription (JPG/PNG/PDF). A pharmacist verifies it before controlled medicines are prepared.</p>
         <label className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50 py-8 text-neutral-500 hover:border-brand">
-          <IconUpload size={28} /><span className="text-sm font-semibold">Ketuk untuk pilih berkas resep</span><span className="text-[11px]">atau ambil foto dari kamera</span>
-          <input type="file" accept="image/*,application/pdf" capture="environment" className="hidden" onChange={(e) => setName(e.target.files?.[0]?.name ?? 'resep.jpg')} />
+          <IconUpload size={28} /><span className="text-sm font-semibold">Tap to select a prescription file</span><span className="text-[11px]">or take a photo with the camera</span>
+          <input type="file" accept="image/*,application/pdf" capture="environment" className="hidden" onChange={(e) => setName(e.target.files?.[0]?.name ?? 'prescription.jpg')} />
         </label>
         {name && <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-brand-dark"><IconCheck size={14} /> {name}</p>}
         <div className="mt-5 flex gap-2">
-          <Button variant="ghost" className="flex-1" onClick={onClose}>Batal</Button>
-          <Button className="flex-1" disabled={!name} onClick={() => onUpload(name || 'resep.jpg')}>Lampirkan Resep</Button>
+          <Button variant="ghost" className="flex-1" onClick={onClose}>Cancel</Button>
+          <Button className="flex-1" disabled={!name} onClick={() => onUpload(name || 'prescription.jpg')}>Attach Prescription</Button>
         </div>
       </div>
     </div>

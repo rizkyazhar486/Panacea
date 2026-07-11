@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { IconX } from './icons'
+import { Portal } from './Portal'
 import { useStore, uid } from '../lib/store'
 import { uploadOrLocal } from '../lib/upload'
 import type { Role } from '../lib/types'
@@ -190,6 +191,7 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
   }
 
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-3xl bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
@@ -208,6 +210,7 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
         <button onClick={handleDownload} disabled={busy} className="mt-2 w-full rounded-full py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600 disabled:opacity-50">Download image</button>
       </div>
     </div>
+    </Portal>
   )
 }
 

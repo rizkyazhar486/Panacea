@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useStore, uid } from '../lib/store'
 import { uploadOrLocal } from '../lib/upload'
 import { IconShare2, IconX, IconDownload } from './icons'
+import { Portal } from './Portal'
 import type { Role } from '../lib/types'
 
 const CARD_W = 1080
@@ -228,6 +229,7 @@ export function ShareStatCard(props: StatCardProps) {
       </button>
 
       {open && (
+        <Portal>
         <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
@@ -269,6 +271,7 @@ export function ShareStatCard(props: StatCardProps) {
             </a>
           </div>
         </div>
+        </Portal>
       )}
     </>
   )

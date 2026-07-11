@@ -360,21 +360,21 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   if (history.length < 2) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle="Grafik muncul setelah ≥2 kali simpan" />
-        <p className="mt-1 text-[11px] text-neutral-500">Simpan data secara berkala (mis. tiap pagi) untuk melihat perkembangan VO₂max, HRV, dan HR istirahat dari waktu ke waktu.</p>
+        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="Chart appears after ≥2 saves" />
+        <p className="mt-1 text-[11px] text-neutral-500">Save your data regularly (e.g. every morning) to track your VO₂max, HRV, and resting HR over time.</p>
       </Card>
     )
   }
-  const data = history.map((s) => ({ ...s, label: new Date(s.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }))
+  const data = history.map((s) => ({ ...s, label: new Date(s.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) }))
   const series = [
     { key: 'vo2max', name: 'VO₂max', color: '#00BF63' },
     { key: 'hrvMs', name: 'HRV (ms)', color: '#6366f1' },
-    { key: 'restingHr', name: 'HR Istirahat', color: '#f59e0b' },
+    { key: 'restingHr', name: 'Resting HR', color: '#f59e0b' },
   ] as const
   const active = series.filter((s) => data.some((d) => (d as unknown as Record<string, number>)[s.key]))
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Tren" subtitle={`${history.length} catatan tersimpan`} />
+      <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle={`${history.length} records saved`} />
       <div className="mt-3 h-56">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
@@ -469,7 +469,7 @@ function AutoSyncCard() {
   const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
 
   async function rotate() {
-    if (!confirm('Buat ulang tautan sinkron? Tautan lama akan berhenti bekerja — Anda perlu memperbarui URL di aplikasi Health Auto Export.')) return
+    if (!confirm('Regenerate the sync link? The old link will stop working — you will need to update the URL in the Health Auto Export app.')) return
     setBusy(true)
     try { setToken(await api.rotateHealthWebhookToken()) } finally { setBusy(false) }
   }
@@ -479,28 +479,28 @@ function AutoSyncCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Auto-Sync from Apple Watch" subtitle="Via the third-party “Health Auto Export” app" />
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-        Website tidak bisa membaca Apple Health langsung — itu batasan dari Apple, khusus aplikasi native. Cara paling dekat dengan "otomatis": pasang aplikasi <b>Health Auto Export</b> (App Store, sekali beli) di iPhone Anda, lalu arahkan ke tautan pribadi di bawah ini.
+        A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>
 
       <div className="mt-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Tautan Sinkron Pribadi</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Private Sync Link</div>
         <div className="mt-1.5 flex items-center gap-2">
-          <input readOnly value={url || 'Memuat…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
-          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Tersalin ✓' : 'Salin'}</button>
+          <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
+          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
-        <p className="mt-1 text-[10px] text-neutral-400">Jaga tautan ini rahasia — siapa pun yang memilikinya bisa mengirim data ke akun Anda.</p>
+        <p className="mt-1 text-[10px] text-neutral-400">Keep this link secret — anyone who has it can send data to your account.</p>
       </div>
 
       <Link to="/health-data/tutorial"
         className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-50/80">
-        📖 Lihat Tutorial Setup Lengkap (7 langkah, ±5 menit)
+        📖 View the Full Setup Tutorial (7 steps, ~5 min)
         <IconChevronRight size={16} className="shrink-0" />
       </Link>
 
       <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
-        {busy ? 'Memproses…' : 'Buat ulang tautan (jika bocor)'}
+        {busy ? 'Processing…' : 'Regenerate link (if leaked)'}
       </button>
     </Card>
   )

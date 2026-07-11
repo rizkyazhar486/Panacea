@@ -179,11 +179,11 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
 function AdultBmiChart({ patient }: { patient: Patient }) {
   const { bmi, kesan, tone } = computeBmi(patient.weightKg, patient.heightCm)
   const bands = [
-    { from: 12, to: 18.5, label: 'Kurang', color: '#fbbf24' },
+    { from: 12, to: 18.5, label: 'Underweight', color: '#fbbf24' },
     { from: 18.5, to: 23, label: 'Normal', color: '#00BF63' },
-    { from: 23, to: 25, label: 'Berisiko', color: '#f59e0b' },
-    { from: 25, to: 30, label: 'Obesitas I', color: '#fb7185' },
-    { from: 30, to: 40, label: 'Obesitas II', color: '#FF3131' },
+    { from: 23, to: 25, label: 'At risk', color: '#f59e0b' },
+    { from: 25, to: 30, label: 'Obese I', color: '#fb7185' },
+    { from: 30, to: 40, label: 'Obese II', color: '#FF3131' },
   ]
   const min = 12
   const max = 40
@@ -193,7 +193,7 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
     <div>
       <div className="mb-2 flex items-end justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">IMT (BMI) Dewasa</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Adult BMI</div>
           <div className="text-3xl font-extrabold">
             {bmi} <span className="text-base font-medium text-neutral-400">kg/m²</span>
           </div>
@@ -224,7 +224,7 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
           </span>
         ))}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-400">Klasifikasi IMT dewasa Asia-Pasifik (WHO).</p>
+      <p className="mt-2 text-[11px] text-neutral-400">Asia-Pacific adult BMI classification (WHO).</p>
     </div>
   )
 }

@@ -15,38 +15,38 @@ function load(): RecoveryProfile {
 function save(p: RecoveryProfile) { try { localStorage.setItem(KEY, JSON.stringify(p)) } catch { /* ignore */ } }
 
 const TYPE_LABEL: Record<RecoveryType, string> = {
-  surgery: 'Pasca Operasi',
-  injury: 'Cedera (Otot/Sendi/Tulang)',
-  illness: 'Pasca Sakit (Infeksi/Demam)',
-  overtraining: 'Overtraining / Kelelahan Berlebih',
+  surgery: 'Post-Surgery',
+  injury: 'Injury (Muscle/Joint/Bone)',
+  illness: 'Post-Illness (Infection/Fever)',
+  overtraining: 'Overtraining / Excessive Fatigue',
 }
 
 interface Phase { label: string; days: [number, number]; guidance: string[] }
 
 const PHASES: Record<RecoveryType, Phase[]> = {
   surgery: [
-    { label: 'Akut (0-3 hari)', days: [0, 3], guidance: ['Istirahat total, elevasi area operasi', 'Ikuti instruksi analgesik dari dokter', 'Hindari aktivitas fisik & angkat beban', 'Cukupi protein 1.2-1.5g/kgBB untuk penyembuhan jaringan'] },
-    { label: 'Subakut (4-14 hari)', days: [4, 14], guidance: ['Mobilisasi ringan bertahap sesuai anjuran', 'Perawatan luka rutin, pantau tanda infeksi', 'Mulai latihan pernapasan & ROM pasif', 'Tidur 8-9 jam/malam untuk regenerasi'] },
-    { label: 'Pemulihan (15-42 hari)', days: [15, 42], guidance: ['Fisioterapi terstruktur', 'Latihan kekuatan ringan, hindari beban berat', 'Evaluasi ulang dengan dokter bedah', 'Tingkatkan aktivitas harian secara gradual'] },
-    { label: 'Lanjutan (>42 hari)', days: [43, 9999], guidance: ['Kembali ke aktivitas normal bertahap', 'Latihan kekuatan & daya tahan penuh sesuai toleransi', 'Pantau gejala residual', 'Konsultasi rutin bila ada keluhan'] },
+    { label: 'Acute (0-3 days)', days: [0, 3], guidance: ['Complete rest, elevate the surgical area', 'Follow the physician\'s analgesic instructions', 'Avoid physical activity and lifting', 'Ensure protein 1.2-1.5 g/kg body weight for tissue healing'] },
+    { label: 'Subacute (4-14 days)', days: [4, 14], guidance: ['Gradual light mobilization as advised', 'Routine wound care, watch for signs of infection', 'Begin breathing exercises and passive ROM', 'Sleep 8-9 hours/night for regeneration'] },
+    { label: 'Recovery (15-42 days)', days: [15, 42], guidance: ['Structured physiotherapy', 'Light strength training, avoid heavy loads', 'Re-evaluation with the surgeon', 'Gradually increase daily activity'] },
+    { label: 'Advanced (>42 days)', days: [43, 9999], guidance: ['Gradual return to normal activity', 'Full strength and endurance training as tolerated', 'Monitor residual symptoms', 'Routine follow-up if any complaints arise'] },
   ],
   injury: [
-    { label: 'Inflamasi (0-3 hari)', days: [0, 3], guidance: ['RICE: Rest, Ice, Compression, Elevation', 'Hindari panas & pijatan pada area cedera', 'Hindari aktivitas yang memperparah nyeri', 'Anti-inflamasi sesuai anjuran dokter'] },
-    { label: 'Proliferasi (4-21 hari)', days: [4, 21], guidance: ['Mobilisasi lembut & stretching ringan', 'Mulai latihan isometrik tanpa nyeri', 'Kompres hangat dapat dimulai', 'Protein cukup untuk perbaikan jaringan'] },
-    { label: 'Remodeling (22-90 hari)', days: [22, 90], guidance: ['Latihan penguatan progresif', 'Latihan proprioseptif & keseimbangan', 'Kembali ke olahraga bertahap (return-to-play protocol)', 'Pantau nyeri saat eskalasi intensitas'] },
-    { label: 'Maintenance (>90 hari)', days: [91, 9999], guidance: ['Latihan pencegahan cedera berulang', 'Pertahankan fleksibilitas & kekuatan otot penyokong', 'Evaluasi biomekanik/teknik olahraga', 'Lanjutkan program penguatan rutin'] },
+    { label: 'Inflammation (0-3 days)', days: [0, 3], guidance: ['RICE: Rest, Ice, Compression, Elevation', 'Avoid heat and massage on the injured area', 'Avoid activities that worsen the pain', 'Anti-inflammatories as advised by a physician'] },
+    { label: 'Proliferation (4-21 days)', days: [4, 21], guidance: ['Gentle mobilization and light stretching', 'Begin pain-free isometric exercises', 'Warm compresses may be started', 'Adequate protein for tissue repair'] },
+    { label: 'Remodeling (22-90 days)', days: [22, 90], guidance: ['Progressive strengthening exercises', 'Proprioceptive and balance training', 'Gradual return to sport (return-to-play protocol)', 'Monitor pain as intensity escalates'] },
+    { label: 'Maintenance (>90 days)', days: [91, 9999], guidance: ['Exercises to prevent re-injury', 'Maintain flexibility and strength of supporting muscles', 'Evaluate biomechanics/sport technique', 'Continue the routine strengthening program'] },
   ],
   illness: [
-    { label: 'Akut (0-3 hari)', days: [0, 3], guidance: ['Istirahat total, hidrasi 2.5-3L/hari', 'Hindari olahraga sama sekali (kondisi demam/akut)', 'Tidur cukup 8+ jam', 'Makanan mudah cerna & bergizi'] },
-    { label: 'Pemulihan Awal (4-7 hari)', days: [4, 7], guidance: ['Aktivitas ringan jika sudah tanpa demam 24 jam', 'Jalan kaki santai 10-15 menit', 'Pantau detak jantung saat istirahat', 'Hindari intensitas tinggi'] },
-    { label: 'Graded Return (8-14 hari)', days: [8, 14], guidance: ['Tingkatkan durasi & intensitas 10% per hari', 'Perhatikan gejala kambuh (myocarditis risk pasca virus)', 'Aerobik ringan-moderat', 'Konsultasi dokter bila ada sesak/nyeri dada'] },
-    { label: 'Normal (>14 hari)', days: [15, 9999], guidance: ['Kembali ke rutinitas olahraga penuh', 'Pantau daya tahan & energi harian', 'Jaga imunitas dengan tidur & nutrisi seimbang'] },
+    { label: 'Acute (0-3 days)', days: [0, 3], guidance: ['Complete rest, hydration 2.5-3 L/day', 'Avoid exercise entirely (fever/acute condition)', 'Get plenty of sleep, 8+ hours', 'Easily digestible, nutritious foods'] },
+    { label: 'Early Recovery (4-7 days)', days: [4, 7], guidance: ['Light activity once fever-free for 24 hours', 'Easy walking 10-15 minutes', 'Monitor resting heart rate', 'Avoid high intensity'] },
+    { label: 'Graded Return (8-14 days)', days: [8, 14], guidance: ['Increase duration and intensity 10% per day', 'Watch for recurring symptoms (post-viral myocarditis risk)', 'Light-to-moderate aerobics', 'Consult a physician if there is shortness of breath or chest pain'] },
+    { label: 'Normal (>14 days)', days: [15, 9999], guidance: ['Return to full exercise routine', 'Monitor endurance and daily energy', 'Maintain immunity with balanced sleep and nutrition'] },
   ],
   overtraining: [
-    { label: 'Deload (0-7 hari)', days: [0, 7], guidance: ['Stop latihan intensitas tinggi total', 'Tidur 9+ jam/malam', 'Pijat/relaksasi otot, hindari stres tambahan', 'Asupan kalori & protein cukup, jangan defisit'] },
-    { label: 'Aktif Ringan (8-14 hari)', days: [8, 14], guidance: ['Aktivitas Z1 (recovery) saja', 'Mobility & stretching harian', 'Pantau HRV/nadi istirahat pagi', 'Evaluasi pemicu overtraining (volume/stres/tidur)'] },
-    { label: 'Re-build (15-28 hari)', days: [15, 28], guidance: ['Latihan bertahap 50-70% volume sebelumnya', 'Prioritaskan kualitas tidur & pemulihan', 'Tambah volume maksimal 10%/minggu', 'Hindari kembali ke volume penuh terlalu cepat'] },
-    { label: 'Normal (>28 hari)', days: [29, 9999], guidance: ['Kembali ke program latihan penuh', 'Terapkan deload rutin tiap 4-6 minggu', 'Pantau tanda dini overtraining berikutnya'] },
+    { label: 'Deload (0-7 days)', days: [0, 7], guidance: ['Stop all high-intensity training', 'Sleep 9+ hours/night', 'Massage/muscle relaxation, avoid added stress', 'Adequate calorie and protein intake, no deficit'] },
+    { label: 'Light Activity (8-14 days)', days: [8, 14], guidance: ['Zone 1 (recovery) activity only', 'Daily mobility and stretching', 'Monitor morning HRV/resting heart rate', 'Evaluate overtraining triggers (volume/stress/sleep)'] },
+    { label: 'Re-build (15-28 days)', days: [15, 28], guidance: ['Gradual training at 50-70% of previous volume', 'Prioritize sleep quality and recovery', 'Add a maximum of 10% volume/week', 'Avoid returning to full volume too quickly'] },
+    { label: 'Normal (>28 days)', days: [29, 9999], guidance: ['Return to the full training program', 'Apply a routine deload every 4-6 weeks', 'Watch for early signs of the next overtraining'] },
   ],
 }
 
@@ -74,28 +74,28 @@ function SleepScoreCard() {
   const [variance, setVariance] = useState(20)
 
   const s = sleepScore(hours, latency, awakenings, variance)
-  const grade = s.total >= 85 ? { l: 'Sangat Baik', tone: 'normal' as const } : s.total >= 70 ? { l: 'Baik', tone: 'normal' as const } : s.total >= 50 ? { l: 'Cukup', tone: 'low' as const } : { l: 'Buruk', tone: 'critical' as const }
+  const grade = s.total >= 85 ? { l: 'Excellent', tone: 'normal' as const } : s.total >= 70 ? { l: 'Good', tone: 'normal' as const } : s.total >= 50 ? { l: 'Fair', tone: 'low' as const } : { l: 'Poor', tone: 'critical' as const }
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconMoon size={20} />} title="Skor Kualitas Tidur" subtitle="Skoring fisiologis berbasis durasi, latensi, terbangun & konsistensi jam tidur" />
+      <SectionTitle icon={<IconMoon size={20} />} title="Sleep Quality Score" subtitle="Physiological scoring based on duration, latency, awakenings & bedtime consistency" />
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <Field label="Total Tidur (jam)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
-        <Field label="Waktu Sampai Tertidur (menit)"><input className={inputClass} type="number" value={latency} onChange={(e) => setLatency(+e.target.value)} /></Field>
-        <Field label="Jumlah Terbangun Malam"><input className={inputClass} type="number" value={awakenings} onChange={(e) => setAwakenings(+e.target.value)} /></Field>
-        <Field label="Variasi Jam Tidur (menit)"><input className={inputClass} type="number" value={variance} onChange={(e) => setVariance(+e.target.value)} /></Field>
+        <Field label="Total Sleep (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label="Time to Fall Asleep (minutes)"><input className={inputClass} type="number" value={latency} onChange={(e) => setLatency(+e.target.value)} /></Field>
+        <Field label="Number of Night Awakenings"><input className={inputClass} type="number" value={awakenings} onChange={(e) => setAwakenings(+e.target.value)} /></Field>
+        <Field label="Bedtime Variability (minutes)"><input className={inputClass} type="number" value={variance} onChange={(e) => setVariance(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{s.total}<span className="text-sm font-semibold text-neutral-400">/100</span></div>
         <Badge tone={grade.tone}>{grade.l}</Badge>
       </div>
       <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Durasi</div></div>
-        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Latensi</div></div>
-        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Terbangun</div></div>
-        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Konsistensi</div></div>
+        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Duration</div></div>
+        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Latency</div></div>
+        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Awakenings</div></div>
+        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Consistency</div></div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Bobot: Durasi 40% (optimal 7-9 jam) · Latensi 20% (idealnya ≤15 menit tertidur) · Terbangun 20% (idealnya 0x) · Konsistensi jam tidur 20% (idealnya varian ≤30 menit dari biasanya) — pola ini merefleksikan komponen inti Pittsburgh Sleep Quality Index (PSQI), disederhanakan untuk pemantauan harian mandiri.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</p>
     </Card>
   )
 }
@@ -103,29 +103,29 @@ function SleepScoreCard() {
 /* ══════════════════ MEDITATION: GUIDED SCRIPTS + AMBIENT SOUND ══════════════════ */
 interface MeditationScript { key: string; label: string; emoji: string; durationMin: number; steps: string[] }
 const MEDITATION_SCRIPTS: MeditationScript[] = [
-  { key: 'breathing478', label: 'Napas 4-7-8', emoji: '🌬️', durationMin: 5, steps: [
-    'Duduk atau berbaring nyaman, punggung tegak namun rileks.',
-    'Buang napas penuh lewat mulut hingga paru-paru kosong.',
-    'Tarik napas lewat hidung, hitung diam-diam 1-2-3-4.',
-    'Tahan napas, hitung 1-2-3-4-5-6-7.',
-    'Buang napas penuh lewat mulut sambil berdesis, hitung 1-2-3-4-5-6-7-8.',
-    'Ulangi siklus ini 4-8 kali. Bila pusing, kembali ke napas normal sejenak.',
+  { key: 'breathing478', label: '4-7-8 Breathing', emoji: '🌬️', durationMin: 5, steps: [
+    'Sit or lie down comfortably, back upright but relaxed.',
+    'Exhale fully through the mouth until the lungs are empty.',
+    'Inhale through the nose, silently counting 1-2-3-4.',
+    'Hold your breath, counting 1-2-3-4-5-6-7.',
+    'Exhale fully through the mouth with a whoosh, counting 1-2-3-4-5-6-7-8.',
+    'Repeat this cycle 4-8 times. If you feel dizzy, return to normal breathing briefly.',
   ] },
   { key: 'bodyscan', label: 'Body Scan', emoji: '🧘', durationMin: 10, steps: [
-    'Berbaring telentang, tangan di samping tubuh, mata tertutup.',
-    'Arahkan perhatian ke ujung jari kaki — rasakan sensasi apa pun tanpa menghakimi.',
-    'Perlahan geser perhatian ke atas: telapak kaki, betis, lutut, paha.',
-    'Lanjutkan ke panggul, perut, dada — perhatikan naik-turun napas.',
-    'Geser ke tangan, lengan, bahu, leher, lalu wajah dan kepala.',
-    'Rasakan seluruh tubuh sebagai satu kesatuan selama beberapa napas terakhir.',
+    'Lie supine, arms at your sides, eyes closed.',
+    'Direct your attention to the tips of your toes — notice any sensation without judgment.',
+    'Slowly move your attention upward: the soles of the feet, calves, knees, thighs.',
+    'Continue to the pelvis, abdomen, chest — notice the rise and fall of the breath.',
+    'Move to the hands, arms, shoulders, neck, then the face and head.',
+    'Feel the whole body as one for the last few breaths.',
   ] },
   { key: 'metta', label: 'Loving-Kindness (Metta)', emoji: '💚', durationMin: 8, steps: [
-    'Duduk nyaman, mata tertutup, napas natural.',
-    'Ucapkan dalam hati untuk diri sendiri: "Semoga aku bahagia, semoga aku sehat, semoga aku tenang."',
-    'Bayangkan orang yang Anda kasihi — ulangi harapan yang sama untuknya.',
-    'Bayangkan seseorang yang netral (kenalan biasa) — ulangi harapan yang sama.',
-    'Bila mampu, bayangkan seseorang yang sulit bagi Anda — coba ulangi harapan yang sama.',
-    'Perluas harapan ini ke semua makhluk: "Semoga semua makhluk bahagia & bebas dari penderitaan."',
+    'Sit comfortably, eyes closed, breathing naturally.',
+    'Silently say to yourself: "May I be happy, may I be healthy, may I be at peace."',
+    'Picture someone you love — repeat the same wishes for them.',
+    'Picture someone neutral (a casual acquaintance) — repeat the same wishes.',
+    'If you are able, picture someone difficult for you — try to repeat the same wishes.',
+    'Extend these wishes to all beings: "May all beings be happy and free from suffering."',
   ] },
 ]
 
@@ -197,7 +197,7 @@ function MeditationCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconLeaf size={20} />} title="Meditasi Terpandu" subtitle="Skrip panduan + suara ambient untuk menenangkan pikiran sebelum tidur" />
+      <SectionTitle icon={<IconLeaf size={20} />} title="Guided Meditation" subtitle="Guided scripts + ambient sound to calm the mind before sleep" />
 
       <div className="flex gap-2 overflow-x-auto pb-1">
         {MEDITATION_SCRIPTS.map((s) => (
@@ -210,18 +210,18 @@ function MeditationCard() {
 
       <div className="mt-3 rounded-xl border border-neutral-100 p-4">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase text-neutral-400">Langkah {stepIdx + 1}/{script.steps.length} · ~{script.durationMin} menit total</span>
+          <span className="text-[10px] font-bold uppercase text-neutral-400">Step {stepIdx + 1}/{script.steps.length} · ~{script.durationMin} minutes total</span>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink">{script.steps[stepIdx]}</p>
         <div className="mt-3 flex gap-2">
-          <button onClick={() => setStepIdx((i) => Math.max(0, i - 1))} disabled={stepIdx === 0} className="flex-1 rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">← Sebelumnya</button>
-          <button onClick={() => setStepIdx((i) => Math.min(script.steps.length - 1, i + 1))} disabled={stepIdx === script.steps.length - 1} className="flex-1 rounded-xl bg-brand py-2 text-xs font-bold text-white disabled:opacity-40">Berikutnya →</button>
+          <button onClick={() => setStepIdx((i) => Math.max(0, i - 1))} disabled={stepIdx === 0} className="flex-1 rounded-xl border border-neutral-200 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">← Previous</button>
+          <button onClick={() => setStepIdx((i) => Math.min(script.steps.length - 1, i + 1))} disabled={stepIdx === script.steps.length - 1} className="flex-1 rounded-xl bg-brand py-2 text-xs font-bold text-white disabled:opacity-40">Next →</button>
         </div>
       </div>
 
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Suara Ambient</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Ambient Sound</h4>
       <div className="mt-2 flex gap-2">
-        {([['rain', '🌧️ Hujan'], ['ocean', '🌊 Ombak'], ['tone', '🎵 Nada Tenang']] as const).map(([k, l]) => (
+        {([['rain', '🌧️ Rain'], ['ocean', '🌊 Ocean'], ['tone', '🎵 Calming Tone']] as const).map(([k, l]) => (
           <button key={k} onClick={() => (playing === k ? stop() : play(k, volume))}
             className={`flex-1 rounded-xl py-2.5 text-xs font-bold transition ${playing === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
             {playing === k ? '⏸ ' : ''}{l}
@@ -232,7 +232,7 @@ function MeditationCard() {
         <span className="text-[10px] font-bold uppercase text-neutral-400">Volume</span>
         <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Suara ambient dihasilkan langsung di perangkat (Web Audio API) — berfungsi sepenuhnya offline, tanpa bergantung pada layanan musik pihak ketiga yang mungkin tidak selalu dapat diakses.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</p>
     </Card>
   )
 }
@@ -254,49 +254,49 @@ export function Recovery() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <VideoGallery
         icon={<IconLeaf size={20} />}
-        title="Video Pemulihan"
-        subtitle="Peregangan lembut & latihan napas untuk mempercepat recovery"
+        title="Recovery Videos"
+        subtitle="Gentle stretching & breathing exercises to speed up recovery"
         videos={[
-          { label: 'Peregangan Hamstring & Twist', cue: 'Tahan 20-30 dtk per sisi · napas dalam · tanpa nyeri', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072959_151332b7-0e3e-4388-b7f3-4775a65c9b9c.mp4' },
-          { label: 'Napas & Meditasi', cue: 'Duduk tegak · napas 4-7-8 · 10 menit menurunkan stres & memperbaiki HRV', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073011_31df726a-68e4-43bf-a5c6-7cbbb41c748e.mp4' },
+          { label: 'Hamstring Stretch & Twist', cue: 'Hold 20-30 sec per side · deep breathing · no pain', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_072959_151332b7-0e3e-4388-b7f3-4775a65c9b9c.mp4' },
+          { label: 'Breathing & Meditation', cue: 'Sit upright · 4-7-8 breathing · 10 minutes lowers stress and improves HRV', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073011_31df726a-68e4-43bf-a5c6-7cbbb41c748e.mp4' },
         ]}
       />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Recovery Tracker" subtitle="Pelacak fase pemulihan & panduan bertahap" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Recovery Tracker" subtitle="Recovery-phase tracker & step-by-step guidance" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field label="Jenis Pemulihan">
+          <Field label="Recovery Type">
             <select className={inputClass} value={p.type} onChange={(e) => upd({ type: e.target.value as RecoveryType })}>
               {Object.entries(TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </Field>
-          <Field label="Tanggal Mulai">
+          <Field label="Start Date">
             <input className={inputClass} type="date" value={p.startDate} onChange={(e) => upd({ startDate: e.target.value })} />
           </Field>
         </div>
 
         <div className="mt-4 rounded-2xl bg-ink p-4 text-white">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Hari ke-{elapsed} &middot; Fase Saat Ini</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Day {elapsed} &middot; Current Phase</div>
           <div className="mt-1 text-2xl font-extrabold text-brand">{current.label}</div>
           <Badge tone="brand">{TYPE_LABEL[p.type]}</Badge>
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconLeaf size={20} />} title="Panduan Fase Ini" subtitle="Rekomendasi berdasarkan hari sejak mulai" />
+        <SectionTitle icon={<IconLeaf size={20} />} title="Guidance for This Phase" subtitle="Recommendations based on days since you started" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           {current.guidance.map((g, i) => <li key={i}>• {g}</li>)}
         </ul>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Garis Waktu Pemulihan" subtitle="Seluruh fase untuk jenis ini" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Recovery Timeline" subtitle="All phases for this type" />
         <div className="mt-3 space-y-2">
           {phases.map((ph, i) => (
             <div key={ph.label} className={'flex items-center justify-between rounded-xl border p-3 ' + (i === (idx === -1 ? phases.length - 1 : idx) ? 'border-brand/40 bg-brand-50/40' : 'border-neutral-100')}>
               <div className="text-sm font-bold">{ph.label}</div>
               <div className="text-right text-xs font-semibold text-neutral-400">
-                {ph.days[1] >= 9999 ? `>${ph.days[0]} hari` : `${ph.days[0]}-${ph.days[1]} hari`}
+                {ph.days[1] >= 9999 ? `>${ph.days[0]} days` : `${ph.days[0]}-${ph.days[1]} days`}
               </div>
             </div>
           ))}

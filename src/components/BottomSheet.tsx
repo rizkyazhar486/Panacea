@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { Portal } from './Portal'
 
 // Mobile-first bottom sheet — slides up from the bottom with a backdrop. Used
 // instead of native dropdowns on phones (e.g. choosing a facility type).
@@ -17,6 +18,7 @@ export function BottomSheet({ open, onClose, title, children }: {
 
   if (!open) return null
   return (
+    <Portal>
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="sheet-in relative w-full max-w-md rounded-t-3xl bg-white p-4 pb-6 shadow-2xl sm:rounded-3xl">
@@ -25,5 +27,6 @@ export function BottomSheet({ open, onClose, title, children }: {
         {children}
       </div>
     </div>
+    </Portal>
   )
 }

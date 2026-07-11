@@ -232,7 +232,7 @@ export function EMR() {
 
       {/* S — Subjective */}
       <Card>
-        <SectionTitle title="S · Subjective — Anamnesis" subtitle="Disusun AI, dapat diedit dokter" />
+        <SectionTitle title="S · Subjective — History" subtitle="Drafted by AI, editable by the doctor" />
         <div className="grid gap-4 md:grid-cols-2">
           {ANAMNESIS_FIELDS.map((f) => (
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>
@@ -254,8 +254,8 @@ export function EMR() {
       {/* O — Objective */}
       <Card>
         <SectionTitle
-          title="O · Objective — Pemeriksaan Fisik"
-          subtitle="Diisi & diverifikasi oleh dokter pemeriksa"
+          title="O · Objective — Physical Examination"
+          subtitle="Completed & verified by the examining doctor"
           right={
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
               <input
@@ -265,7 +265,7 @@ export function EMR() {
                 className="h-4 w-4 accent-[#00BF63]"
               />
               <IconShield size={16} className="text-brand" />
-              Pemeriksaan fisik diverifikasi
+              Physical examination verified
             </label>
           }
         />
@@ -273,7 +273,7 @@ export function EMR() {
         {ageFromDob(activePatient.dob) <= 19 && (
           <div className="mb-4 rounded-2xl border border-brand/20 bg-brand-50/40 p-4">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-dark">
-              🧒 Kurva Pertumbuhan Pediatri (WHO/CDC) — BB/U · TB/U · IMT/U
+              🧒 Pediatric Growth Charts (WHO/CDC) — Weight-for-age · Height-for-age · BMI-for-age
             </div>
             <GrowthChart patient={activePatient} ageYears={ageFromDob(activePatient.dob)} />
           </div>
@@ -281,26 +281,26 @@ export function EMR() {
 
         <div className="mb-4 rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Peta Sistem — ringkasan visual temuan
+            System Map — visual summary of findings
           </div>
           <BodyDiagram findings={buildFindings(draft.physicalExam.perSystem)} />
         </div>
 
         <div className="grid gap-4">
           <ExamField
-            label="Keadaan Umum & Kesadaran"
+            label="General Condition & Level of Consciousness"
             value={draft.physicalExam.general}
             onChange={(v) => setExam('general', v)}
             rows={2}
           />
           <ExamField
-            label="Tanda Vital (catatan klinis)"
+            label="Vital Signs (clinical notes)"
             value={draft.physicalExam.vitalsNote}
             onChange={(v) => setExam('vitalsNote', v)}
             rows={2}
           />
           <ExamField
-            label="Pemeriksaan Per-Sistem (usulan penunjang dari AI di bawah — lengkapi temuan)"
+            label="Per-System Examination (AI-suggested workup below — complete the findings)"
             value={draft.physicalExam.perSystem}
             onChange={(v) => setExam('perSystem', v)}
             rows={6}
@@ -311,13 +311,13 @@ export function EMR() {
       {/* Penunjang & Suportif */}
       <Card>
         <SectionTitle
-          title="Penunjang & Terapi Suportif"
-          subtitle="Interpretasi Lab/EKG · resusitasi, balans cairan, kebutuhan kalori, urine output"
+          title="Workup & Supportive Therapy"
+          subtitle="Lab/ECG interpretation · resuscitation, fluid balance, caloric needs, urine output"
         />
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Interpretasi Temuan Lab & Hasil EKG
+            Interpretation of Lab Findings & ECG Results
           </label>
           <textarea
             value={draft.labEkgInterpretation ?? ''}
@@ -325,16 +325,16 @@ export function EMR() {
               patch((r) => ({ ...r, labEkgInterpretation: e.target.value, updatedAt: new Date().toISOString() }))
             }
             rows={4}
-            placeholder="mis. HbA1c 8.2% (DM tak terkontrol); EKG: LVH, sinus rhythm…"
+            placeholder="e.g. HbA1c 8.2% (uncontrolled DM); ECG: LVH, sinus rhythm…"
             className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {(
             [
-              ['resusitasi', 'Resusitasi'],
-              ['balansCairan', 'Balans Cairan'],
-              ['kebutuhanKalori', 'Kebutuhan Kalori'],
+              ['resusitasi', 'Resuscitation'],
+              ['balansCairan', 'Fluid Balance'],
+              ['kebutuhanKalori', 'Caloric Needs'],
               ['urineOutput', 'Target Urine Output'],
             ] as const
           ).map(([k, label]) => (
@@ -355,16 +355,16 @@ export function EMR() {
           ))}
         </div>
         <p className="mt-2 text-[11px] text-neutral-400">
-          Default dihitung dari berat badan (kalori 25–30 kkal/kg; urine 0.5 mL/kg/jam; cairan rumatan
-          Holliday-Segar) — dokter dapat menyesuaikan.
+          Defaults are calculated from body weight (calories 25–30 kcal/kg; urine 0.5 mL/kg/h; maintenance
+          fluids per Holliday-Segar) — the doctor may adjust them.
         </p>
       </Card>
 
       {/* A — Assessment */}
       <Card>
         <SectionTitle
-          title="A · Assessment — Daftar Masalah & Pengkajian"
-          subtitle="Reasoning AI: basis temuan + narasi “Dipikirkan …”"
+          title="A · Assessment — Problem List & Evaluation"
+          subtitle="AI reasoning: basis of findings + “Considered …” narrative"
         />
         <DiagnosisPicker
           value={draft.primaryDiagnosis}
@@ -372,7 +372,7 @@ export function EMR() {
           onChange={(d) => patch((r) => ({ ...r, primaryDiagnosis: d, updatedAt: new Date().toISOString() }))}
         />
         <div className="space-y-4">
-          {draft.problems.length === 0 && <p className="text-sm text-neutral-400">Belum ada masalah.</p>}
+          {draft.problems.length === 0 && <p className="text-sm text-neutral-400">No problems yet.</p>}
           {draft.problems.map((pr, i) => (
             <div key={pr.id} className="rounded-xl border border-neutral-100 p-4">
               <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -382,7 +382,7 @@ export function EMR() {
                 <h4 className="font-bold">{pr.title}</h4>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-neutral-400">Probabilitas</span>
+                    <span className="text-[11px] font-semibold text-neutral-400">Probability</span>
                     <span className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
                       <span
                         className="block h-full rounded-full bg-brand"
@@ -403,7 +403,7 @@ export function EMR() {
               {pr.differentials && pr.differentials.length > 0 && (
                 <div className="mt-2">
                   <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                    Diagnosis Banding
+                    Differential Diagnoses
                   </div>
                   <ul className="mt-1 space-y-1 text-sm">
                     {pr.differentials.map((d, j) => (
@@ -432,11 +432,11 @@ export function EMR() {
       {/* P — Plan summary */}
       <Card>
         <SectionTitle
-          title="P · Plan — Ringkasan"
-          subtitle="Detail verifikasi rencana pada modul Planning"
+          title="P · Plan — Summary"
+          subtitle="Plan verification details in the Planning module"
           right={
             <Link to="/planning">
-              <Button variant="outline">Buka Planning →</Button>
+              <Button variant="outline">Open Planning →</Button>
             </Link>
           }
         />
@@ -453,7 +453,7 @@ export function EMR() {
         {draft.references.length > 0 && (
           <div className="mt-4 border-t border-neutral-100 pt-3">
             <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
-              Referensi (Vancouver)
+              References (Vancouver)
             </div>
             <ol className="list-decimal space-y-1 pl-5 text-xs text-neutral-500">
               {draft.references.map((r, i) => (
@@ -471,19 +471,19 @@ export function EMR() {
       <Card className="border-2 border-brand/20">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-bold">Tanda Tangan Dokter Pemeriksa</h3>
+            <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
-              Dengan menandatangani, dokter memverifikasi seluruh isi rekam medis ini.
+              By signing, the doctor verifies the entire contents of this medical record.
             </p>
           </div>
           <Button onClick={sign} disabled={Boolean(draft.signedBy) && !dirty}>
             <IconCheck size={16} />
-            {draft.signedBy ? 'Tandatangani Ulang' : `Tandatangani sebagai ${state.settings.doctorName}`}
+            {draft.signedBy ? 'Re-sign' : `Sign as ${state.settings.doctorName}`}
           </Button>
         </div>
         {draft.signedAt && (
           <p className="mt-2 text-xs text-brand-dark">
-            ✓ Disahkan {state.settings.doctorName} pada {new Date(draft.signedAt).toLocaleString('id-ID')}
+            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('id-ID')}
           </p>
         )}
       </Card>
@@ -511,7 +511,7 @@ function ExamField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        placeholder="Isi temuan pemeriksaan fisik…"
+        placeholder="Enter physical examination findings…"
         className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
       />
     </div>

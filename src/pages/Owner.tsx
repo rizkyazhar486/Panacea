@@ -276,7 +276,7 @@ function AIOperatorPanel() {
       role: account?.role ?? 'owner',
       postType: 'artikel',
       kind: 'image',
-      activity: 'Artikel sehat',
+      activity: 'Health article',
       caption: body || text,
       articleTitle: title,
       mediaColor: '#00BF63',
@@ -686,10 +686,10 @@ function DoctorVerifyPanel() {
                 <div className="text-[11px] text-neutral-500">{d.email} · STR: <b>{d.str || '—'}</b></div>
               </div>
               <span className="flex items-center gap-1 text-[11px] font-bold text-amber-700">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Menunggu
+                <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Pending
               </span>
               <Button onClick={() => setStatus(d.id, 'verified')} disabled={busy === d.id}>
-                <IconCheck size={15} /> {busy === d.id ? '…' : 'Verifikasi'}
+                <IconCheck size={15} /> {busy === d.id ? '…' : 'Verify'}
               </Button>
             </div>
           ))}
@@ -698,14 +698,14 @@ function DoctorVerifyPanel() {
 
       {verified.length > 0 && (
         <div className="mt-3 space-y-1.5">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Terverifikasi</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Verified</div>
           {verified.map((d) => (
             <div key={d.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
               <IconCheck size={15} className="shrink-0 text-brand" />
               <span className="truncate font-semibold">{d.name}</span>
               <span className="truncate text-[11px] text-neutral-400">STR {d.str || '—'}</span>
               <button onClick={() => setStatus(d.id, 'pending')} className="ml-auto shrink-0 text-[11px] font-semibold text-neutral-400 hover:text-accent">
-                Cabut
+                Revoke
               </button>
             </div>
           ))}

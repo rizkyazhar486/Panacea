@@ -9,6 +9,8 @@ import type { Material, MaterialCategory, ExamTrack, FileType } from '../lib/typ
 
 const EXAMS: (ExamTrack | 'Semua')[] = ['Semua', 'USMLE', 'UKMPPD', 'Umum']
 const CATS: (MaterialCategory | 'Semua')[] = ['Semua', 'Catatan', 'Materi', 'Jurnal', 'Artikel']
+const EXAM_LABELS: Record<string, string> = { Semua: 'All', USMLE: 'USMLE', UKMPPD: 'UKMPPD', Umum: 'General' }
+const CAT_LABELS: Record<string, string> = { Semua: 'All', Catatan: 'Notes', Materi: 'Study Material', Jurnal: 'Journal', Artikel: 'Article' }
 
 function fileTypeFromName(name: string): FileType {
   const n = name.toLowerCase()
@@ -18,13 +20,13 @@ function fileTypeFromName(name: string): FileType {
 }
 
 function downloadOwned(m: Material, buyerId: string) {
-  const meta = `Kategori: ${m.category} · ${m.exam} · ${m.specialty} · Penulis: ${m.authorName}`
+  const meta = `Category: ${CAT_LABELS[m.category] ?? m.category} · ${m.exam} · ${m.specialty} · Author: ${m.authorName}`
   const body =
     `${m.description}\n\n` +
-    `Materi ini telah diverifikasi AI Claude & verifikator spesialis (${m.verifierReview?.verifierRole ?? 'Spesialis'}).\n` +
-    `Berkas asli: ${m.fileName} (${m.fileType}).\n\n` +
-    `Dokumen berlisensi untuk pembeli dengan ID di bawah ini. Setiap halaman diberi watermark ID pembeli; ` +
-    `penyalinan atau penyebaran ulang tanpa izin dapat ditindak.`
+    `This material has been verified by Claude AI & a specialist verifier (${m.verifierReview?.verifierRole ?? 'Specialist'}).\n` +
+    `Original file: ${m.fileName} (${m.fileType}).\n\n` +
+    `This document is licensed to the buyer with the ID below. Each page is watermarked with the buyer's ID; ` +
+    `unauthorized copying or redistribution may be subject to legal action.`
   downloadWatermarkedPdf({ title: m.title, meta, body, buyerId })
 }
 
@@ -53,7 +55,7 @@ export function Marketplace() {
 
   function buy(m: Material) {
     const res = buyMaterial(m.id)
-    notify(res.ok ? `Berhasil membeli “${m.title}”.` : res.reason ?? 'Gagal.')
+    notify(res.ok ? `Successfully purchased “${m.title}”.` : res.reason ?? 'Failed.')
   }
 
   return (
@@ -74,17 +76,17 @@ export function Marketplace() {
               <div>
                 <div className="flex items-center gap-2">
                   <IconShield size={20} />
-                  <h3 className="text-lg font-extrabold">Langganan AI Longevity</h3>
-                  {active && <Badge tone="neutral">Aktif · {daysLeft} hari</Badge>}
+                  <h3 className="text-lg font-extrabold">AI Longevity Subscription</h3>
+                  {active && <Badge tone="neutral">Active · {daysLeft} days</Badge>}
                 </div>
                 <p className="mt-1 max-w-lg text-sm text-white/85">
-                  Buka Nilai Longevity bertenaga AI di menu Nutrisi & Kalori. Berlaku 30 hari, perpanjang tiap bulan.
+                  Unlock AI-powered Longevity Scores in the Nutrition & Calories menu. Valid for 30 days, renew monthly.
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-extrabold">Rp49.000<span className="text-sm font-medium text-white/70">/30 hari</span></div>
-                <Button variant="outline" className="mt-1 border-white !text-white hover:!bg-white/15" onClick={() => { buyLongevitySub(); notify(active ? 'Langganan AI Longevity diperpanjang 30 hari.' : 'Langganan AI Longevity aktif 30 hari.') }}>
-                  {active ? 'Perpanjang' : 'Langganan Sekarang'}
+                <div className="text-2xl font-extrabold">Rp49.000<span className="text-sm font-medium text-white/70">/30 days</span></div>
+                <Button variant="outline" className="mt-1 border-white !text-white hover:!bg-white/15" onClick={() => { buyLongevitySub(); notify(active ? 'AI Longevity subscription extended by 30 days.' : 'AI Longevity subscription active for 30 days.') }}>
+                  {active ? 'Renew' : 'Subscribe Now'}
                 </Button>
               </div>
             </div>
@@ -95,8 +97,8 @@ export function Marketplace() {
       <Card>
         <SectionTitle
           icon={<IconStore size={20} />}
-          title="Pusat Referensi Medis"
-          subtitle="Temukan, pelajari, dan bagikan referensi medis pilihan dari para kontributor terverifikasi. Setiap dokumen dilindungi watermark untuk keamanan dan keaslian."
+          title="Medical Reference Hub"
+          subtitle="Discover, study, and share curated medical references from verified contributors. Every document is watermark-protected for security and authenticity."
           right={
             <span className="flex items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white">
               <IconToken size={16} className="text-brand" /> {state.wallet.balance} PNC
