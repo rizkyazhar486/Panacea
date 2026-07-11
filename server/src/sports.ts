@@ -46,12 +46,16 @@ export interface LeagueConfig {
   label: string
   sport: LeagueSport
   slug: string // ESPN league slug (source 'espn'); ignored for other sources
-  source?: 'espn' | 'tsdb' // default 'espn'
+  source?: 'espn' | 'tsdb' | 'apisports' // default 'espn'
   // For source 'tsdb' (TheSportsDB) — the league is resolved by name+country
   // via the free API, since hardcoding a numeric idLeague is fragile.
   tsdbName?: string
   tsdbCountry?: string
   tsdbSport?: string // TheSportsDB sport name, e.g. 'Soccer', 'Cricket'
+  // For source 'apisports' (API-Football, free tier, needs APISPORTS_KEY env) —
+  // resolved by name+country at runtime, same reasoning as tsdb.
+  apisportsName?: string
+  apisportsCountry?: string
 }
 
 export const LEAGUES: LeagueConfig[] = [
@@ -85,12 +89,14 @@ export const LEAGUES: LeagueConfig[] = [
   // TheSportsDB (free, no per-user key) for leagues ESPN doesn't serve well.
   { id: 'liga1', label: 'Liga 1 Indonesia', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indonesian Liga 1', tsdbCountry: 'Indonesia', tsdbSport: 'Soccer' },
   { id: 'ipl', label: 'IPL (Cricket)', sport: 'soccer', slug: '', source: 'tsdb', tsdbName: 'Indian Premier League', tsdbCountry: 'India', tsdbSport: 'Cricket' },
+  // API-Football (free tier, needs APISPORTS_KEY) for lower divisions ESPN/TSDB
+  // don't cover reliably.
+  { id: 'liga2', label: 'Liga 2 Indonesia', sport: 'soccer', slug: '', source: 'apisports', apisportsName: 'Liga 2', apisportsCountry: 'Indonesia' },
 ]
 
 // Leagues explicitly NOT covered — shown honestly in the UI instead of faked.
 export const UNAVAILABLE: UnavailableResult[] = [
-  { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 2 at the moment.' },
-  { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'No free padel score API is available yet.' },
+  { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'No free padel score API exists — API-Sports has no padel product, and every padel source needs a paid/trial key.' },
 ]
 
 const ESPN_BASE = 'https://site.api.espn.com/apis/site/v2/sports'
@@ -173,6 +179,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.data
 
   if (league.source === 'tsdb') return fetchTsdbScoreboard(league)
+  if (league.source === 'apisports') return fetchApiSportsScoreboard(league)
 
   try {
     const url = `${ESPN_BASE}/${league.sport}/${league.slug}/scoreboard`
@@ -275,6 +282,104 @@ async function fetchTsdbScoreboard(league: LeagueConfig): Promise<LeagueResult> 
     return result
   } catch (e) {
     console.log(`[sports] tsdb ${league.id} fetch error:`, (e as Error).message)
+    return { leagueId: league.id, label: league.label, events: [], error: 'fetch_failed' }
+  }
+}
+
+// --- API-Football (api-sports.io free tier — 100 req/day, needs a key) ---
+// The key lives ONLY in the APISPORTS_KEY env var, never in code. Free tier is
+// generous enough for us because every league response is cached server-side
+// (CACHE_MS), so all clients share one upstream fetch. League id is resolved by
+// name+country once and cached. Not testable from the sandbox (outbound
+// blocked) — verify JSON shape on first deploy; every step logs on failure.
+const APISPORTS_BASE = 'https://v3.football.api-sports.io'
+const apiSportsLeagueIdCache = new Map<string, number | null>()
+
+interface ApiSportsLeagueEntry { league?: { id?: number; name?: string }; country?: { name?: string } }
+interface ApiSportsFixture {
+  fixture?: { id?: number; date?: string; status?: { short?: string } }
+  teams?: { home?: { name?: string; logo?: string }; away?: { name?: string; logo?: string } }
+  goals?: { home?: number | null; away?: number | null }
+}
+
+// API-Football status codes → our three states.
+function apiSportsState(short?: string): NormalizedEvent['state'] {
+  const live = ['1H', '2H', 'HT', 'ET', 'BT', 'P', 'LIVE', 'INT']
+  const done = ['FT', 'AET', 'PEN', 'WO', 'AWD']
+  if (short && live.includes(short)) return 'in'
+  if (short && done.includes(short)) return 'post'
+  return 'pre'
+}
+
+async function resolveApiSportsLeagueId(cfg: LeagueConfig, key: string): Promise<number | null> {
+  const cacheKey = `${cfg.apisportsCountry}|${cfg.apisportsName}`
+  if (apiSportsLeagueIdCache.has(cacheKey)) return apiSportsLeagueIdCache.get(cacheKey) ?? null
+  try {
+    const res = await fetch(`${APISPORTS_BASE}/leagues?country=${encodeURIComponent(cfg.apisportsCountry ?? '')}`, { headers: { 'x-apisports-key': key } })
+    if (!res.ok) { console.log(`[sports] apisports league search failed: HTTP ${res.status}`); return null }
+    const json = (await res.json()) as { response?: ApiSportsLeagueEntry[] }
+    const want = (cfg.apisportsName ?? '').toLowerCase()
+    const list = json.response ?? []
+    const match = list.find((l) => (l.league?.name ?? '').toLowerCase() === want)
+      ?? list.find((l) => (l.league?.name ?? '').toLowerCase().includes(want))
+    const id = match?.league?.id ?? null
+    apiSportsLeagueIdCache.set(cacheKey, id)
+    if (!id) console.log(`[sports] apisports: league "${cfg.apisportsName}" not found in ${cfg.apisportsCountry}`)
+    return id
+  } catch (e) {
+    console.log('[sports] apisports league resolve error:', (e as Error).message)
+    return null
+  }
+}
+
+function normalizeApiSportsFixture(fx: ApiSportsFixture): NormalizedEvent | null {
+  const id = fx.fixture?.id
+  const home = fx.teams?.home, away = fx.teams?.away
+  if (!id || !home?.name || !away?.name) return null
+  const state = apiSportsState(fx.fixture?.status?.short)
+  const homeScore = fx.goals?.home != null ? String(fx.goals.home) : undefined
+  const awayScore = fx.goals?.away != null ? String(fx.goals.away) : undefined
+  return {
+    id: String(id),
+    startTime: fx.fixture?.date ?? '',
+    state,
+    statusDetail: fx.fixture?.status?.short ?? '',
+    home: { name: home.name, abbrev: '', logo: home.logo, score: homeScore },
+    away: { name: away.name, abbrev: '', logo: away.logo, score: awayScore },
+  }
+}
+
+async function fetchApiSportsScoreboard(league: LeagueConfig): Promise<LeagueResult> {
+  const key = process.env.APISPORTS_KEY
+  if (!key) {
+    console.log('[sports] apisports: APISPORTS_KEY env var not set')
+    return { leagueId: league.id, label: league.label, events: [], error: 'not_configured' }
+  }
+  const id = await resolveApiSportsLeagueId(league, key)
+  if (!id) return { leagueId: league.id, label: league.label, events: [], error: 'league_not_found' }
+  try {
+    const [nextRes, lastRes] = await Promise.all([
+      fetch(`${APISPORTS_BASE}/fixtures?league=${id}&next=15`, { headers: { 'x-apisports-key': key } }),
+      fetch(`${APISPORTS_BASE}/fixtures?league=${id}&last=15`, { headers: { 'x-apisports-key': key } }),
+    ])
+    const events: NormalizedEvent[] = []
+    if (nextRes.ok) {
+      const j = (await nextRes.json()) as { response?: ApiSportsFixture[] }
+      for (const fx of j.response ?? []) { const n = normalizeApiSportsFixture(fx); if (n) events.push(n) }
+    } else { console.log(`[sports] apisports ${league.id} next failed: HTTP ${nextRes.status}`) }
+    if (lastRes.ok) {
+      const j = (await lastRes.json()) as { response?: ApiSportsFixture[] }
+      for (const fx of j.response ?? []) { const n = normalizeApiSportsFixture(fx); if (n) events.push(n) }
+    } else { console.log(`[sports] apisports ${league.id} last failed: HTTP ${lastRes.status}`) }
+    events.sort((a, b) => {
+      if (a.state !== b.state) return a.state === 'pre' ? -1 : 1
+      return a.state === 'pre' ? a.startTime.localeCompare(b.startTime) : b.startTime.localeCompare(a.startTime)
+    })
+    const result: LeagueResult = { leagueId: league.id, label: league.label, events }
+    cache.set(league.id, { at: Date.now(), data: result })
+    return result
+  } catch (e) {
+    console.log(`[sports] apisports ${league.id} fetch error:`, (e as Error).message)
     return { leagueId: league.id, label: league.label, events: [], error: 'fetch_failed' }
   }
 }
