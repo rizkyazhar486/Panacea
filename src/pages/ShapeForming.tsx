@@ -8,41 +8,41 @@ import { api } from '../lib/api'
 type Level = 'beginner' | 'intermediate' | 'advanced' | 'pro'
 const LEVELS: { id: Level; name: string; emoji: string; sub: string; days: number; plan: { day: string; focus: string }[] }[] = [
   {
-    id: 'beginner', name: 'Beginner', emoji: '🌱', sub: '3 hari/mgg · fondasi gerak & kebiasaan', days: 3,
+    id: 'beginner', name: 'Beginner', emoji: '🌱', sub: '3 days/week · movement foundation & habits', days: 3,
     plan: [
-      { day: 'Hari 1', focus: 'Full-body dasar: squat 3×10, push-up lutut 3×8, plank 3×20 dtk' },
-      { day: 'Hari 2', focus: 'Kardio ringan 20–30 mnt (jalan cepat) + mobilitas' },
-      { day: 'Hari 3', focus: 'Full-body: glute bridge 3×12, row band 3×12, dead bug 3×8' },
+      { day: 'Day 1', focus: 'Basic full-body: squat 3×10, knee push-up 3×8, plank 3×20 sec' },
+      { day: 'Day 2', focus: 'Light cardio 20–30 min (brisk walk) + mobility' },
+      { day: 'Day 3', focus: 'Full-body: glute bridge 3×12, band row 3×12, dead bug 3×8' },
     ],
   },
   {
-    id: 'intermediate', name: 'Intermediate', emoji: '💪', sub: '4 hari/mgg · upper/lower split', days: 4,
+    id: 'intermediate', name: 'Intermediate', emoji: '💪', sub: '4 days/week · upper/lower split', days: 4,
     plan: [
-      { day: 'Hari 1', focus: 'Upper: bench/push-up 4×8, row 4×10, shoulder press 3×10' },
-      { day: 'Hari 2', focus: 'Lower: goblet squat 4×10, RDL 3×10, calf raise 3×15' },
-      { day: 'Hari 3', focus: 'Kardio interval 25 mnt + core' },
-      { day: 'Hari 4', focus: 'Full-body hipertrofi + lengan (curl/triceps 3×12)' },
+      { day: 'Day 1', focus: 'Upper: bench/push-up 4×8, row 4×10, shoulder press 3×10' },
+      { day: 'Day 2', focus: 'Lower: goblet squat 4×10, RDL 3×10, calf raise 3×15' },
+      { day: 'Day 3', focus: 'Interval cardio 25 min + core' },
+      { day: 'Day 4', focus: 'Full-body hypertrophy + arms (curl/triceps 3×12)' },
     ],
   },
   {
-    id: 'advanced', name: 'Advanced', emoji: '🔥', sub: '5 hari/mgg · push/pull/legs', days: 5,
+    id: 'advanced', name: 'Advanced', emoji: '🔥', sub: '5 days/week · push/pull/legs', days: 5,
     plan: [
-      { day: 'Hari 1', focus: 'Push: bench 5×5, OHP 4×6, dips 3×AMRAP' },
-      { day: 'Hari 2', focus: 'Pull: pull-up 5×5, barbell row 4×8, face pull 3×15' },
-      { day: 'Hari 3', focus: 'Legs: squat 5×5, lunge 4×10, leg curl 3×12' },
-      { day: 'Hari 4', focus: 'Hipertrofi upper + HIIT 15 mnt' },
-      { day: 'Hari 5', focus: 'Hipertrofi lower + core berbeban' },
+      { day: 'Day 1', focus: 'Push: bench 5×5, OHP 4×6, dips 3×AMRAP' },
+      { day: 'Day 2', focus: 'Pull: pull-up 5×5, barbell row 4×8, face pull 3×15' },
+      { day: 'Day 3', focus: 'Legs: squat 5×5, lunge 4×10, leg curl 3×12' },
+      { day: 'Day 4', focus: 'Upper hypertrophy + 15-min HIIT' },
+      { day: 'Day 5', focus: 'Lower hypertrophy + weighted core' },
     ],
   },
   {
-    id: 'pro', name: 'Pro / Atlet', emoji: '🏆', sub: '6 hari/mgg · periodisasi + performa', days: 6,
+    id: 'pro', name: 'Pro / Athlete', emoji: '🏆', sub: '6 days/week · periodization + performance', days: 6,
     plan: [
-      { day: 'Hari 1', focus: 'Strength: squat berat 6×3 @85% + accessory' },
-      { day: 'Hari 2', focus: 'Power: clean/jump + bench 6×3' },
-      { day: 'Hari 3', focus: 'Hipertrofi pull + grip' },
-      { day: 'Hari 4', focus: 'Deadlift 5×3 + posterior chain' },
-      { day: 'Hari 5', focus: 'Conditioning/Hyrox: sled, erg, wall ball' },
-      { day: 'Hari 6', focus: 'Hipertrofi/weak-point + mobilitas mendalam' },
+      { day: 'Day 1', focus: 'Strength: heavy squat 6×3 @85% + accessory' },
+      { day: 'Day 2', focus: 'Power: clean/jump + bench 6×3' },
+      { day: 'Day 3', focus: 'Pull hypertrophy + grip' },
+      { day: 'Day 4', focus: 'Deadlift 5×3 + posterior chain' },
+      { day: 'Day 5', focus: 'Conditioning/Hyrox: sled, erg, wall ball' },
+      { day: 'Day 6', focus: 'Hypertrophy/weak-point + deep mobility' },
     ],
   },
 ]
@@ -67,29 +67,29 @@ function extractJson(raw: string): ShapeAnalysis | null {
 
 function demoAnalysis(): ShapeAnalysis {
   return {
-    bodyAssessment: '⚠️ Mode Demo. Postur tampak proporsional dengan distribusi otot rata; ada potensi pembentukan lebih definitif pada area core dan bahu untuk simetri visual yang lebih baik.',
-    bodyType: 'Mesomorf-Ektomorf (campuran)',
-    workoutFocus: ['Core & Postur', 'Bahu & Punggung Atas', 'Kondisi Kardiovaskular', 'Mobilitas Pinggul'],
+    bodyAssessment: '⚠️ Demo Mode. Posture appears proportional with even muscle distribution; there is potential for more definitive shaping in the core and shoulder areas for better visual symmetry.',
+    bodyType: 'Mesomorph-Ectomorph (mixed)',
+    workoutFocus: ['Core & Posture', 'Shoulders & Upper Back', 'Cardiovascular Conditioning', 'Hip Mobility'],
     weeklyPlan: [
-      { day: 'Senin', focus: 'Strength — Push (dada, bahu, trisep)' },
-      { day: 'Selasa', focus: 'Cardio sedang 30-40 menit + mobility flow' },
-      { day: 'Rabu', focus: 'Strength — Pull (punggung, bisep) + core' },
-      { day: 'Kamis', focus: 'HIIT/battling ropes 20 menit (low impact)' },
-      { day: 'Jumat', focus: 'Strength — Kaki & glute' },
-      { day: 'Sabtu', focus: 'Aktif ringan — jalan/yoga/peregangan' },
-      { day: 'Minggu', focus: 'Istirahat penuh / pemulihan' },
+      { day: 'Monday', focus: 'Strength — Push (chest, shoulders, triceps)' },
+      { day: 'Tuesday', focus: 'Moderate cardio 30-40 minutes + mobility flow' },
+      { day: 'Wednesday', focus: 'Strength — Pull (back, biceps) + core' },
+      { day: 'Thursday', focus: 'HIIT/battling ropes 20 minutes (low impact)' },
+      { day: 'Friday', focus: 'Strength — Legs & glutes' },
+      { day: 'Saturday', focus: 'Light activity — walk/yoga/stretching' },
+      { day: 'Sunday', focus: 'Full rest / recovery' },
     ],
-    nutritionSummary: 'Fokus pada defisit kalori ringan-moderat dengan protein tinggi untuk shape forming, serta antioksidan & omega-3 untuk longevity dan kualitas kulit.',
-    foodsRecommended: ['Dada ayam/ikan', 'Telur', 'Sayur hijau gelap', 'Buah beri (antioksidan)', 'Alpukat', 'Kacang almond/walnut', 'Yogurt Greek', 'Minyak zaitun', 'Air putih 2.5-3L/hari'],
-    foodsAvoid: ['Gula tambahan berlebih', 'Gorengan/minyak trans', 'Minuman beralkohol', 'Makanan ultra-proses tinggi natrium'],
-    skinAssessment: '⚠️ Mode Demo. Tekstur kulit tampak cukup baik namun perlu perhatian pada hidrasi dan perlindungan dari paparan sinar UV untuk mencegah penuaan dini (photoaging).',
+    nutritionSummary: 'Focus on a light-to-moderate calorie deficit with high protein for shape forming, plus antioxidants & omega-3s for longevity and skin quality.',
+    foodsRecommended: ['Chicken breast/fish', 'Eggs', 'Dark leafy greens', 'Berries (antioxidants)', 'Avocado', 'Almonds/walnuts', 'Greek yogurt', 'Olive oil', 'Water 2.5-3L/day'],
+    foodsAvoid: ['Excess added sugar', 'Fried food/trans fats', 'Alcoholic beverages', 'Ultra-processed foods high in sodium'],
+    skinAssessment: '⚠️ Demo Mode. Skin texture appears fairly good but needs attention to hydration and UV protection to prevent premature aging (photoaging).',
     skinAdvice: [
-      'Gunakan sunscreen SPF 30+ setiap hari, reapply tiap 2-3 jam bila terpapar matahari langsung',
-      'Hidrasi cukup (air putih + pelembap ber-hyaluronic acid) untuk elastisitas kulit',
-      'Asupan vitamin C & E dari buah-sayur membantu produksi kolagen & melawan radikal bebas',
-      'Tidur 7-8 jam mendukung regenerasi sel kulit (proses repair terjadi optimal saat tidur dalam)',
-      'Hindari merokok — mempercepat degradasi kolagen & elastin',
-      'Olahraga teratur meningkatkan sirkulasi darah ke kulit, mendukung warna kulit lebih sehat',
+      'Use SPF 30+ sunscreen daily, reapply every 2-3 hours during direct sun exposure',
+      'Adequate hydration (water + hyaluronic acid moisturizer) for skin elasticity',
+      'Vitamin C & E intake from fruits and vegetables supports collagen production & fights free radicals',
+      'Sleep 7-8 hours to support skin cell regeneration (repair processes are optimal during deep sleep)',
+      'Avoid smoking — it accelerates collagen & elastin degradation',
+      'Regular exercise improves blood circulation to the skin, supporting a healthier skin tone',
     ],
   }
 }
@@ -109,12 +109,12 @@ export function ShapeForming() {
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
       setPreview(dataUrl)
-      const prompt = `Analisis foto tubuh/postur ini untuk tujuan SHAPE FORMING & LONGEVITY (bukan diagnosis medis formal, edukasi gaya hidup). Nilai proporsi tubuh, postur, dan kualitas kulit yang terlihat (tekstur, tanda penuaan, hidrasi). Berikan rekomendasi program olahraga mingguan (7 hari) dan rekomendasi nutrisi yang sesuai untuk pembentukan tubuh & kesehatan jangka panjang, serta edukasi kualitas kulit & saran perawatannya.\n\nKeluarkan HANYA JSON minified dengan struktur:\n{"bodyAssessment":string,"bodyType":string,"workoutFocus":string[4],"weeklyPlan":[{"day":string,"focus":string}×7],"nutritionSummary":string,"foodsRecommended":string[],"foodsAvoid":string[],"skinAssessment":string,"skinAdvice":string[]}`
+      const prompt = `Analyze this body/posture photo for SHAPE FORMING & LONGEVITY purposes (not a formal medical diagnosis, lifestyle education only). Assess body proportions, posture, and visible skin quality (texture, signs of aging, hydration). Provide a weekly (7-day) workout program and nutrition recommendations suited to shape forming & long-term health, plus skin quality education & care advice.\n\nOutput ONLY minified JSON with the structure:\n{"bodyAssessment":string,"bodyType":string,"workoutFocus":string[4],"weeklyPlan":[{"day":string,"focus":string}×7],"nutritionSummary":string,"foodsRecommended":string[],"foodsAvoid":string[],"skinAssessment":string,"skinAdvice":string[]}`
       const r = await api.aiVision(dataUrl, prompt)
       const parsed = extractJson(r.text)
       setResult(parsed ?? demoAnalysis())
     } catch {
-      setError('Gagal menganalisis foto. Menampilkan contoh rekomendasi.')
+      setError('Failed to analyze photo. Showing sample recommendations.')
       setResult(demoAnalysis())
     } finally {
       setBusy(false)
@@ -124,16 +124,16 @@ export function ShapeForming() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Shape Forming & Longevity dari Foto" subtitle="Unggah foto untuk rekomendasi olahraga, nutrisi & kualitas kulit yang dipersonalisasi" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Shape Forming & Longevity from Photo" subtitle="Upload a photo for personalized workout, nutrition & skin quality recommendations" />
         <div className="mt-3 flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-brand/30 bg-brand-50/30 p-6 text-center">
           {preview ? (
             <img src={preview} alt="Preview" className="h-40 w-40 rounded-2xl object-cover shadow-sm" />
           ) : (
             <span className="grid h-16 w-16 place-items-center rounded-full bg-white text-2xl shadow-sm"><IconUpload size={24} /></span>
           )}
-          <p className="text-xs text-neutral-500">Foto tubuh (depan/samping, pencahayaan baik) — diproses sekali untuk analisis, tidak disimpan permanen di server kami.</p>
+          <p className="text-xs text-neutral-500">Body photo (front/side, good lighting) — processed once for analysis, not stored permanently on our servers.</p>
           <Button onClick={() => fileRef.current?.click()} disabled={busy}>
-            <IconUpload size={14} /> {busy ? 'Menganalisis…' : preview ? 'Ganti Foto' : 'Unggah Foto'}
+            <IconUpload size={14} /> {busy ? 'Analyzing…' : preview ? 'Change Photo' : 'Upload Photo'}
           </Button>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => onUpload(e.target.files?.[0])} />
           {error && <p className="text-xs text-accent">{error}</p>}
@@ -142,7 +142,7 @@ export function ShapeForming() {
 
       {/* Program latihan berdasarkan level */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={18} />} title="Program Latihan per Level" subtitle="Pilih level Anda — pemula hingga atlet pro" />
+        <SectionTitle icon={<IconActivity size={18} />} title="Workout Program by Level" subtitle="Choose your level — beginner to pro athlete" />
         <div className="mt-3 grid grid-cols-4 gap-2">
           {LEVELS.map((l) => (
             <button key={l.id} onClick={() => setLevel(l.id)}
@@ -160,13 +160,13 @@ export function ShapeForming() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[10px] text-neutral-400">Tingkatkan beban/volume bertahap (progressive overload). Cek form gerakan di menu Tes Fisik & Form.</p>
+        <p className="mt-2 text-[10px] text-neutral-400">Gradually increase load/volume (progressive overload). Check movement form in the Physical Test & Form menu.</p>
       </Card>
 
       {result && (
         <>
           <Card className="!p-5">
-            <SectionTitle icon={<IconActivity size={18} />} title="Penilaian Tubuh" subtitle={result.bodyType} />
+            <SectionTitle icon={<IconActivity size={18} />} title="Body Assessment" subtitle={result.bodyType} />
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">{result.bodyAssessment}</p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {result.workoutFocus.map((f) => <Badge key={f} tone="brand">{f}</Badge>)}
@@ -174,7 +174,7 @@ export function ShapeForming() {
           </Card>
 
           <Card className="!p-5">
-            <SectionTitle icon={<IconActivity size={18} />} title="Program Olahraga Mingguan" subtitle="Disesuaikan untuk shape forming & longevity" />
+            <SectionTitle icon={<IconActivity size={18} />} title="Weekly Workout Program" subtitle="Tailored for shape forming & longevity" />
             <div className="mt-2 space-y-1.5">
               {result.weeklyPlan.map((d) => (
                 <div key={d.day} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-sm">
@@ -183,26 +183,26 @@ export function ShapeForming() {
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-[11px] text-neutral-400">Lihat detail gerakan & cara melakukan di halaman <b>AI Program Workout</b>.</p>
+            <p className="mt-2 text-[11px] text-neutral-400">See movement details & how-to instructions on the <b>AI Workout Program</b> page.</p>
           </Card>
 
           <Card className="!p-5">
-            <SectionTitle icon={<IconLeaf size={18} />} title="Rekomendasi Nutrisi" subtitle="Untuk pembentukan tubuh & kesehatan jangka panjang" />
+            <SectionTitle icon={<IconLeaf size={18} />} title="Nutrition Recommendations" subtitle="For body shaping & long-term health" />
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">{result.nutritionSummary}</p>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-xl bg-brand-50/60 p-3">
-                <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Disarankan</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Recommended</div>
                 <ul className="mt-1 space-y-1 text-sm text-neutral-700">{result.foodsRecommended.map((f, i) => <li key={i}>• {f}</li>)}</ul>
               </div>
               <div className="rounded-xl bg-red-50/60 p-3">
-                <div className="text-[11px] font-bold uppercase tracking-wide text-accent">Dihindari</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-accent">Avoid</div>
                 <ul className="mt-1 space-y-1 text-sm text-neutral-700">{result.foodsAvoid.map((f, i) => <li key={i}>• {f}</li>)}</ul>
               </div>
             </div>
           </Card>
 
           <Card className="!p-5">
-            <SectionTitle icon={<IconHeart size={18} />} title="Edukasi Kualitas Kulit" subtitle="Penilaian & saran perawatan kulit" />
+            <SectionTitle icon={<IconHeart size={18} />} title="Skin Quality Education" subtitle="Assessment & skin care advice" />
             <p className="mt-1 text-sm leading-relaxed text-neutral-600">{result.skinAssessment}</p>
             <ul className="mt-3 space-y-1.5 text-sm text-neutral-600">
               {result.skinAdvice.map((s, i) => <li key={i}>• {s}</li>)}

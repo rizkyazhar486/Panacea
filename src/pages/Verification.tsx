@@ -7,10 +7,10 @@ import { api, backendEnabled } from '../lib/api'
 import type { Material } from '../lib/types'
 
 const statusLabel: Record<Material['status'], { label: string; tone: 'high' | 'normal' | 'brand' | 'critical' }> = {
-  'pending-ai': { label: 'Menunggu AI Claude', tone: 'high' },
-  'pending-verifier': { label: 'Menunggu Verifikator', tone: 'high' },
-  verified: { label: 'Terverifikasi', tone: 'brand' },
-  rejected: { label: 'Ditolak', tone: 'critical' },
+  'pending-ai': { label: 'Awaiting Claude AI', tone: 'high' },
+  'pending-verifier': { label: 'Awaiting Verifier', tone: 'high' },
+  verified: { label: 'Verified', tone: 'brand' },
+  rejected: { label: 'Rejected', tone: 'critical' },
 }
 
 export function Verification() {
@@ -39,11 +39,11 @@ export function Verification() {
       <Card>
         <SectionTitle
           icon={<IconShield size={20} />}
-          title="Pusat Verifikasi"
-          subtitle="Dua lapis: AI Claude (akurasi & keamanan) lalu verifikator Spesialis/Subspesialis"
+          title="Verification Center"
+          subtitle="Two layers: Claude AI (accuracy & safety) then a Specialist/Subspecialist verifier"
           right={
             <label className="flex items-center gap-2 text-sm">
-              <span className="text-neutral-500">Bertindak sebagai:</span>
+              <span className="text-neutral-500">Acting as:</span>
               <select
                 value={currentUser.id}
                 onChange={(e) => setCurrentUser(e.target.value)}
@@ -51,7 +51,7 @@ export function Verification() {
               >
                 {state.contributors.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} {c.canVerify ? '(Verifikator)' : ''}
+                    {c.name} {c.canVerify ? '(Verifier)' : ''}
                   </option>
                 ))}
               </select>
@@ -64,16 +64,16 @@ export function Verification() {
           }`}
         >
           {canVerify
-            ? `Anda ${currentUser.role} ${currentUser.specialty} — berwenang memverifikasi kontributor & materi.`
-            : 'Akun Dokter umum tidak dapat menyetujui final. Beralih ke akun Spesialis/Subspesialis untuk memverifikasi.'}
+            ? `You are a ${currentUser.role} ${currentUser.specialty} — authorized to verify contributors & materials.`
+            : 'General Practitioner accounts cannot give final approval. Switch to a Specialist/Subspecialist account to verify.'}
         </div>
       </Card>
 
       {/* Material verification queue */}
       <Card>
-        <SectionTitle title="Antrean Verifikasi Materi" subtitle={`${queue.length} item menunggu`} />
+        <SectionTitle title="Material Verification Queue" subtitle={`${queue.length} item(s) pending`} />
         <div className="space-y-4">
-          {queue.length === 0 && <p className="text-sm text-neutral-400">Tidak ada antrean. 🎉</p>}
+          {queue.length === 0 && <p className="text-sm text-neutral-400">No pending items. 🎉</p>}
           {queue.map((m) => (
             <div key={m.id} className="rounded-xl border border-neutral-100 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -85,7 +85,7 @@ export function Verification() {
                   </div>
                   <h4 className="font-bold">{m.title}</h4>
                   <p className="text-sm text-neutral-500">
-                    {m.description} · oleh {m.authorName}
+                    {m.description} · by {m.authorName}
                   </p>
                 </div>
                 <Badge tone={statusLabel[m.status].tone}>{statusLabel[m.status].label}</Badge>
@@ -94,19 +94,19 @@ export function Verification() {
               {/* AI review */}
               <div className="mt-3 rounded-lg bg-neutral-50 p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-neutral-500">
-                  <IconSparkle size={13} /> Verifikasi AI Claude
+                  <IconSparkle size={13} /> Claude AI Verification
                 </div>
                 {m.aiReview ? (
                   <div className="text-sm">
                     <span className="font-bold">
-                      {m.aiReview.verdict === 'approved' ? '✓ Disetujui AI' : '⚠ Perlu revisi'} · Skor{' '}
+                      {m.aiReview.verdict === 'approved' ? '✓ Approved by AI' : '⚠ Revision needed'} · Score{' '}
                       {m.aiReview.score}/100
                     </span>
                     <p className="mt-1 text-neutral-600">{m.aiReview.notes}</p>
                   </div>
                 ) : (
                   <Button variant="outline" onClick={() => runAI(m)} disabled={busyId === m.id}>
-                    <IconSparkle size={14} /> {busyId === m.id ? 'Memeriksa…' : 'Jalankan Verifikasi AI'}
+                    <IconSparkle size={14} /> {busyId === m.id ? 'Checking…' : 'Run AI Verification'}
                   </Button>
                 )}
               </div>
@@ -121,15 +121,15 @@ export function Verification() {
                         verifierName: currentUser.name,
                         verifierRole: currentUser.role === 'Subspesialis' ? 'Subspesialis' : 'Spesialis',
                         approved: true,
-                        notes: 'Konten valid & layak edukasi.',
+                        notes: 'Content is valid & suitable for education.',
                         at: new Date().toISOString(),
                       })
                       if (backendEnabled) {
-                        api.notifyUser(m.authorId, 'Materi Anda terverifikasi ✅', `"${m.title}" telah disetujui & terbit di Marketplace.`, './#/marketplace').catch(() => {})
+                        api.notifyUser(m.authorId, 'Your material has been verified ✅', `"${m.title}" has been approved & published on the Marketplace.`, './#/marketplace').catch(() => {})
                       }
                     }}
                   >
-                    <IconCheck size={14} /> Setujui & Terbitkan
+                    <IconCheck size={14} /> Approve & Publish
                   </Button>
                   <Button
                     variant="ghost"
@@ -139,19 +139,19 @@ export function Verification() {
                         verifierName: currentUser.name,
                         verifierRole: currentUser.role === 'Subspesialis' ? 'Subspesialis' : 'Spesialis',
                         approved: false,
-                        notes: 'Perlu perbaikan sebelum diterbitkan.',
+                        notes: 'Needs improvement before publishing.',
                         at: new Date().toISOString(),
                       })
                       if (backendEnabled) {
-                        api.notifyUser(m.authorId, 'Materi perlu revisi', `"${m.title}" perlu perbaikan sebelum diterbitkan. Cek catatan verifikator.`, './#/my-materials').catch(() => {})
+                        api.notifyUser(m.authorId, 'Material needs revision', `"${m.title}" needs improvement before publishing. Check the verifier's notes.`, './#/my-materials').catch(() => {})
                       }
                     }}
                   >
-                    Tolak
+                    Reject
                   </Button>
                   {!canVerify && (
                     <span className="text-xs text-amber-600">
-                      Hanya verifikator Spesialis/Subspesialis yang dapat menyetujui.
+                      Only Specialist/Subspecialist verifiers can approve.
                     </span>
                   )}
                 </div>

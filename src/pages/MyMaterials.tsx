@@ -5,10 +5,10 @@ import { IconBook, IconToken, IconUpload, IconShield, IconSparkle } from '../com
 import type { Material, MaterialStatus } from '../lib/types'
 
 const statusMeta: Record<MaterialStatus, { label: string; tone: 'high' | 'brand' | 'critical' }> = {
-  'pending-ai': { label: 'Menunggu AI Claude', tone: 'high' },
-  'pending-verifier': { label: 'Menunggu Verifikator', tone: 'high' },
-  verified: { label: 'Terbit', tone: 'brand' },
-  rejected: { label: 'Ditolak', tone: 'critical' },
+  'pending-ai': { label: 'Awaiting Claude AI', tone: 'high' },
+  'pending-verifier': { label: 'Awaiting Verifier', tone: 'high' },
+  verified: { label: 'Published', tone: 'brand' },
+  rejected: { label: 'Rejected', tone: 'critical' },
 }
 
 function royalty(m: Material): number {
@@ -27,11 +27,11 @@ export function MyMaterials() {
       <Card>
         <SectionTitle
           icon={<IconBook size={20} />}
-          title="Materi Saya — Dasbor Kontributor"
+          title="My Materials — Contributor Dashboard"
           subtitle={`${currentUser.name} · ${currentUser.role} ${currentUser.specialty}`}
           right={
             <label className="flex items-center gap-2 text-sm">
-              <span className="text-neutral-500">Akun:</span>
+              <span className="text-neutral-500">Account:</span>
               <select
                 value={currentUser.id}
                 onChange={(e) => setCurrentUser(e.target.value)}
@@ -47,31 +47,31 @@ export function MyMaterials() {
           }
         />
         <div className="grid gap-3 sm:grid-cols-4">
-          <Stat label="Total Materi" value={`${mine.length}`} />
-          <Stat label="Terbit" value={`${live}`} />
-          <Stat label="Total Unduhan" value={`${totalDl}`} />
+          <Stat label="Total Materials" value={`${mine.length}`} />
+          <Stat label="Published" value={`${live}`} />
+          <Stat label="Total Downloads" value={`${totalDl}`} />
           <Stat
-            label="Royalti Diperoleh"
+            label="Royalties Earned"
             value={`${totalEarn} PNC`}
             accent
-            sub={`setelah fee platform ${PLATFORM_FEE * 100}%`}
+            sub={`after ${PLATFORM_FEE * 100}% platform fee`}
           />
         </div>
         {!currentUser.verified && (
           <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
-            ⚠ Akun kontributor Anda belum diverifikasi verifikator. Materi baru tetap melalui pipeline,
-            namun penerbitan menunggu verifikasi kontributor.
+            ⚠ Your contributor account has not yet been verified. New materials still go through the
+            pipeline, but publishing awaits contributor verification.
           </div>
         )}
       </Card>
 
       <Card>
         <SectionTitle
-          title="Daftar Materi & Pipeline Verifikasi"
+          title="Materials & Verification Pipeline"
           right={
             <Link to="/marketplace">
               <Button variant="outline">
-                <IconUpload size={14} /> Unggah Materi
+                <IconUpload size={14} /> Upload Material
               </Button>
             </Link>
           }
@@ -79,7 +79,7 @@ export function MyMaterials() {
         <div className="space-y-3">
           {mine.length === 0 && (
             <p className="text-sm text-neutral-400">
-              Belum ada materi. Unggah catatan/materi Anda dari halaman Marketplace.
+              No materials yet. Upload your notes/materials from the Marketplace page.
             </p>
           )}
           {mine.map((m) => (
@@ -104,23 +104,23 @@ export function MyMaterials() {
 
               {/* Pipeline */}
               <div className="mt-3 flex items-center gap-1 text-[11px]">
-                <Step ok label="Unggah" />
+                <Step ok label="Upload" />
                 <Bar ok={Boolean(m.aiReview)} />
-                <Step ok={Boolean(m.aiReview)} icon="ai" label="AI Claude" sub={m.aiReview ? `${m.aiReview.score}/100` : undefined} />
+                <Step ok={Boolean(m.aiReview)} icon="ai" label="Claude AI" sub={m.aiReview ? `${m.aiReview.score}/100` : undefined} />
                 <Bar ok={Boolean(m.verifierReview)} />
                 <Step
                   ok={Boolean(m.verifierReview?.approved)}
                   icon="verify"
-                  label="Verifikator"
+                  label="Verifier"
                   sub={m.verifierReview?.verifierRole}
                 />
                 <Bar ok={m.status === 'verified'} />
-                <Step ok={m.status === 'verified'} label="Terbit" />
+                <Step ok={m.status === 'verified'} label="Published" />
               </div>
 
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-neutral-100 pt-2 text-xs text-neutral-500">
-                <span>{m.downloads}× diunduh · ★ {m.rating || '—'}</span>
-                <span className="font-bold text-brand-dark">Royalti: {royalty(m)} PNC</span>
+                <span>{m.downloads}× downloaded · ★ {m.rating || '—'}</span>
+                <span className="font-bold text-brand-dark">Royalty: {royalty(m)} PNC</span>
               </div>
             </div>
           ))}

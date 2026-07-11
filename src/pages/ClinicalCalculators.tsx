@@ -252,10 +252,10 @@ function interp(ageMo: number, xs: number[], ys: number[]): number {
 }
 
 function zClass(z: number): { l: string; tone: 'normal' | 'low' | 'critical' } {
-  if (z < -3) return { l: 'Sangat rendah (severely)', tone: 'critical' }
-  if (z < -2) return { l: 'Rendah', tone: 'low' }
+  if (z < -3) return { l: 'Severely low', tone: 'critical' }
+  if (z < -2) return { l: 'Low', tone: 'low' }
   if (z <= 2) return { l: 'Normal', tone: 'normal' }
-  return { l: 'Tinggi', tone: 'low' }
+  return { l: 'High', tone: 'low' }
 }
 
 // Weight-for-height (WHZ) reference — WHO uses height bands rather than age
@@ -303,38 +303,38 @@ function WhoGrowthCalc() {
 
   const chartData = WHO_CHECKPOINTS_MO.map((mo, i) => ({
     mo,
-    beratMedian: WHO_WEIGHT_M[sex][i],
-    tinggiMedian: WHO_HEIGHT_M[sex][i],
+    weightMedian: WHO_WEIGHT_M[sex][i],
+    heightMedian: WHO_HEIGHT_M[sex][i],
   }))
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — mengacu Standar Antropometri Anak Permenkes RI No. 2/2020" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesian MoH Child Anthropometry Standard (Permenkes 2/2020)" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Laki-laki' }, { v: 'F', l: 'Perempuan' }]} /></Field>
-        <Field label="Usia (bulan)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
-        <Field label="Berat (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Panjang/Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Berat/Usia (WAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Weight/Age (WAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
           <Badge tone={wazC.tone}>{wazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Tinggi/Usia (HAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Height/Age (HAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{haz >= 0 ? '+' : ''}{haz.toFixed(2)} SD</div>
           <Badge tone={hazC.tone}>{hazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Berat/Tinggi (WHZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Weight/Height (WHZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{whz >= 0 ? '+' : ''}{whz.toFixed(2)} SD</div>
           <Badge tone={whzC.tone}>{whzC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">IMT (BMI)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">BMI</div>
           <div className="mt-1 text-xl font-black text-ink">{bmi.toFixed(1)}</div>
           <div className="text-[10px] text-neutral-400">kg/m²</div>
         </div>
@@ -342,9 +342,9 @@ function WhoGrowthCalc() {
 
       {masked && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
-          <p className="text-xs font-black text-amber-800">⚠️ Kemungkinan stunting tersamar (masked malnutrition)</p>
+          <p className="text-xs font-black text-amber-800">⚠️ Possible masked stunting (masked malnutrition)</p>
           <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
-            Tinggi/usia menunjukkan stunting (HAZ ≤ -2 SD), namun berat/usia tampak normal — ini menyesatkan bila hanya berat/usia yang dilihat, karena berat dinilai relatif terhadap usia kronologis, bukan terhadap lintasan tumbuh anak yang sebenarnya sudah tertekan. Pertimbangkan evaluasi gizi lebih lanjut meski berat/usia terlihat baik.
+            Height/age shows stunting (HAZ ≤ -2 SD), yet weight/age looks normal — this is misleading if weight/age is viewed alone, because weight is judged relative to chronological age, not against the child's growth trajectory, which is already compromised. Consider further nutritional evaluation even when weight/age looks fine.
           </p>
         </div>
       )}
@@ -353,17 +353,17 @@ function WhoGrowthCalc() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="mo" tick={{ fontSize: 10 }} label={{ value: 'Usia (bulan)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <XAxis dataKey="mo" tick={{ fontSize: 10 }} label={{ value: 'Age (months)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
-            <Line type="monotone" dataKey="beratMedian" name="Median Berat (kg)" stroke="#00BF63" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="tinggiMedian" name="Median Tinggi (cm)" stroke="#0B7A4B" strokeWidth={2} dot={false} strokeDasharray="4 3" />
+            <Line type="monotone" dataKey="weightMedian" name="Median Weight (kg)" stroke="#00BF63" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="heightMedian" name="Median Height (cm)" stroke="#0B7A4B" strokeWidth={2} dot={false} strokeDasharray="4 3" />
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
-        Kurva menunjukkan median rujukan WHO (bukan data anak ini). Estimasi disederhanakan dari titik acuan standar — untuk keputusan klinis definitif, bandingkan dengan grafik pertumbuhan resmi WHO/KMS/Buku KIA sesuai Standar Antropometri Anak (Permenkes RI No. 2 Tahun 2020).
+        The curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for definitive clinical decisions, compare against the official WHO/KMS growth chart or Buku KIA per the Child Anthropometry Standard (Permenkes RI No. 2/2020).
       </p>
     </Card>
   )
