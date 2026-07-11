@@ -375,6 +375,12 @@ export interface GpsActivity {
   avgSpeedKmh: number
   kcal: number
   at: string // ISO datetime
+  // Heart-rate capture (optional — present when the user entered/synced HR
+  // during the session). Samples are downsampled to ≤120 points to keep
+  // localStorage small; `s` is seconds from session start.
+  avgHr?: number
+  maxHr?: number
+  hrSamples?: { s: number; bpm: number }[]
 }
 
 // -------- Nutrition / calorie diary ----------------------------------------
