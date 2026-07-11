@@ -26,9 +26,19 @@ export function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="Panduan pengguna baru">
-      <div className="w-full max-w-md rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl">
         <div className="mb-1 text-center text-2xl font-black text-ink">Selamat datang 👋</div>
-        <p className="mb-5 text-center text-sm text-neutral-500">Kenali tombol-tombol utama:</p>
+        <p className="mb-4 text-center text-sm text-neutral-500">Tonton video singkat ini dulu, atau langsung kenali tombol-tombol utama di bawah:</p>
+
+        <div className="mb-5 overflow-hidden rounded-2xl bg-black">
+          <video
+            src={`${import.meta.env.BASE_URL}tutorial-video.mp4`}
+            controls
+            playsInline
+            preload="metadata"
+            className="mx-auto block max-h-72 w-full"
+          />
+        </div>
 
         <div className="space-y-3">
           {steps.map((s) => (
