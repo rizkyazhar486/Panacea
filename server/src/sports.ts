@@ -71,7 +71,6 @@ export const LEAGUES: LeagueConfig[] = [
 export const UNAVAILABLE: UnavailableResult[] = [
   { leagueId: 'liga1_id', label: 'Liga 1 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
   { leagueId: 'liga2_id', label: 'Liga 2 Indonesia', unavailable: true, reason: 'No reliable free data source for Indonesia\'s Liga 1/2 at the moment.' },
-  { leagueId: 'motogp', label: 'MotoGP', unavailable: true, reason: 'No free, no-key MotoGP scoreboard endpoint exists — ESPN\'s public API does not expose MotoGP results the way it does F1.' },
   { leagueId: 'ipl', label: 'IPL (Cricket)', unavailable: true, reason: 'Cricket scoreboards on the free ESPN API are inconsistent and don\'t map cleanly to live scores, so IPL is left out rather than shown incorrectly.' },
   { leagueId: 'padel', label: 'Padel', unavailable: true, reason: 'No free padel score API is available yet.' },
 ]
@@ -115,22 +114,37 @@ interface EspnMmaCompetition { competitors?: EspnFighterCompetitor[]; status?: {
 interface EspnMmaEvent { id?: string; date?: string; name?: string; status?: { type?: { state?: string; detail?: string; shortDetail?: string } }; competitions?: EspnMmaCompetition[] }
 interface EspnMmaResponse { events?: EspnMmaEvent[] }
 
-function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent | null {
-  const comp = ev.competitions?.[0]
-  const f1 = comp?.competitors?.find((c) => c.order === 1) ?? comp?.competitors?.[0]
-  const f2 = comp?.competitors?.find((c) => c.order === 2) ?? comp?.competitors?.[1]
-  if (!f1?.athlete || !f2?.athlete || !ev.id) return null
-  const status = comp?.status?.type ?? ev.status?.type
-  const state = (status?.state as NormalizedEvent['state']) ?? 'pre'
-  const resultFor = (c: EspnFighterCompetitor) => (c.score != null && c.score !== '' ? String(c.score) : state === 'post' ? (c.winner ? 'W' : 'L') : undefined)
-  return {
-    id: ev.id,
-    startTime: ev.date ?? '',
-    state: state === 'in' || state === 'post' ? state : 'pre',
-    statusDetail: status?.shortDetail ?? status?.detail ?? ev.name ?? '',
-    home: { name: f1.athlete.displayName ?? f1.athlete.shortName ?? '?', abbrev: '', logo: f1.athlete.headshot?.href, score: resultFor(f1) },
-    away: { name: f2.athlete.displayName ?? f2.athlete.shortName ?? '?', abbrev: '', logo: f2.athlete.headshot?.href, score: resultFor(f2) },
-  }
+// A single ESPN MMA/tennis "event" can be a whole card (e.g. UFC 329) whose
+// individual bouts live in competitions[] — so expand EVERY competition into
+// its own NormalizedEvent instead of only reading the first, otherwise a UFC
+// fight night shows just one fight (or none). Also tolerant of competitors
+// carrying an `athlete`, a bare display name, or a team-shaped object.
+function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent[] {
+  if (!ev.competitions || !ev.id) return []
+  const out: NormalizedEvent[] = []
+  ev.competitions.forEach((comp, idx) => {
+    const f1 = comp?.competitors?.find((c) => c.order === 1) ?? comp?.competitors?.[0]
+    const f2 = comp?.competitors?.find((c) => c.order === 2) ?? comp?.competitors?.[1]
+    const name1 = fighterName(f1)
+    const name2 = fighterName(f2)
+    if (!name1 || !name2) return
+    const status = comp?.status?.type ?? ev.status?.type
+    const state = (status?.state as NormalizedEvent['state']) ?? 'pre'
+    const resultFor = (c?: EspnFighterCompetitor) => (c?.score != null && c.score !== '' ? String(c.score) : state === 'post' ? (c?.winner ? 'W' : 'L') : undefined)
+    out.push({
+      id: `${ev.id}-${idx}`,
+      startTime: ev.date ?? '',
+      state: state === 'in' || state === 'post' ? state : 'pre',
+      statusDetail: status?.shortDetail ?? status?.detail ?? ev.name ?? '',
+      home: { name: name1, abbrev: '', logo: f1?.athlete?.headshot?.href, score: resultFor(f1) },
+      away: { name: name2, abbrev: '', logo: f2?.athlete?.headshot?.href, score: resultFor(f2) },
+    })
+  })
+  return out
+}
+
+function fighterName(c?: EspnFighterCompetitor): string | undefined {
+  return c?.athlete?.displayName ?? c?.athlete?.shortName
 }
 
 export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueResult> {
@@ -150,7 +164,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
     let events: NormalizedEvent[]
     if (league.sport === 'mma' || league.sport === 'tennis') {
       const json = (await res.json()) as EspnMmaResponse
-      events = (json.events ?? []).map(normalizeMmaEvent).filter((e): e is NormalizedEvent => e !== null)
+      events = (json.events ?? []).flatMap(normalizeMmaEvent)
     } else {
       const json = (await res.json()) as EspnResponse
       events = (json.events ?? []).map(normalizeEspnEvent).filter((e): e is NormalizedEvent => e !== null)
@@ -214,6 +228,60 @@ export async function fetchF1Info(): Promise<F1Info> {
     return info
   } catch (e) {
     console.log('[sports] f1 fetch error:', (e as Error).message)
+    return { error: 'fetch_failed' }
+  }
+}
+
+// --- MotoGP (Dorna's own public pulselive API — free, no key) ---
+// Base: https://api.motogp.pulselive.com/motogp/v1 — the same backend the
+// official site/app use. There is no official documentation (community-mapped),
+// so parsing is defensive and every step logs on failure. Like F1, this could
+// not be live-tested from the sandbox; the first real deploy should confirm the
+// JSON shapes against actual responses.
+const MGP_BASE = 'https://api.motogp.pulselive.com/motogp/v1'
+
+interface MgpSeason { id?: string; year?: number; current?: boolean }
+interface MgpEvent { id?: string; name?: string; sponsored_name?: string; circuit?: { name?: string }; country?: { name?: string }; date_start?: string; date_end?: string; test?: boolean }
+
+export interface MotoGpInfo {
+  next?: { name: string; circuit: string; country: string; date: string }
+  lastRaceName?: string
+  lastRaceDate?: string
+  error?: string
+}
+
+let mgpCache: { at: number; data: MotoGpInfo } | null = null
+
+export async function fetchMotoGpInfo(): Promise<MotoGpInfo> {
+  if (mgpCache && Date.now() - mgpCache.at < CACHE_MS * 4) return mgpCache.data
+  try {
+    const seasonsRes = await fetch(`${MGP_BASE}/results/seasons`, { headers: { Accept: 'application/json' } })
+    if (!seasonsRes.ok) { console.log(`[sports] motogp seasons fetch failed: HTTP ${seasonsRes.status}`); return { error: `upstream_${seasonsRes.status}` } }
+    const seasons = (await seasonsRes.json()) as MgpSeason[]
+    // Prefer the season flagged current; else the newest year.
+    const season = (Array.isArray(seasons) ? seasons : []).slice().sort((a, b) => (b.year ?? 0) - (a.year ?? 0)).find((s) => s.current) ?? (Array.isArray(seasons) ? seasons : []).slice().sort((a, b) => (b.year ?? 0) - (a.year ?? 0))[0]
+    if (!season?.id) { console.log('[sports] motogp: no season id'); return { error: 'no_season' } }
+
+    const [upRes, doneRes] = await Promise.all([
+      fetch(`${MGP_BASE}/results/events?seasonUuid=${season.id}&isFinished=false`, { headers: { Accept: 'application/json' } }),
+      fetch(`${MGP_BASE}/results/events?seasonUuid=${season.id}&isFinished=true`, { headers: { Accept: 'application/json' } }),
+    ])
+    const info: MotoGpInfo = {}
+    if (upRes.ok) {
+      const evs = (await upRes.json()) as MgpEvent[]
+      // First non-test upcoming event, sorted by start date.
+      const next = (Array.isArray(evs) ? evs : []).filter((e) => !e.test && e.date_start).sort((a, b) => (a.date_start ?? '').localeCompare(b.date_start ?? ''))[0]
+      if (next) info.next = { name: next.sponsored_name || next.name || 'MotoGP', circuit: next.circuit?.name ?? '', country: next.country?.name ?? '', date: next.date_start ?? '' }
+    } else { console.log(`[sports] motogp upcoming fetch failed: HTTP ${upRes.status}`) }
+    if (doneRes.ok) {
+      const evs = (await doneRes.json()) as MgpEvent[]
+      const last = (Array.isArray(evs) ? evs : []).filter((e) => !e.test && e.date_end).sort((a, b) => (b.date_end ?? '').localeCompare(a.date_end ?? ''))[0]
+      if (last) { info.lastRaceName = last.sponsored_name || last.name; info.lastRaceDate = last.date_end }
+    } else { console.log(`[sports] motogp finished fetch failed: HTTP ${doneRes.status}`) }
+    mgpCache = { at: Date.now(), data: info }
+    return info
+  } catch (e) {
+    console.log('[sports] motogp fetch error:', (e as Error).message)
     return { error: 'fetch_failed' }
   }
 }
