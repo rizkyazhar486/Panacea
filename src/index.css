@@ -230,6 +230,14 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
+/* Horizontal-scroll edge fades — match each container's own surface color so
+   the "scrolls further" hint blends in, instead of the fixed white gradient
+   showing as a pale smudge over a dark background/glass pill. */
+.fade-edge-surface { background: linear-gradient(to left, #ffffff, rgba(255,255,255,0)); }
+.dark .fade-edge-surface { background: linear-gradient(to left, #17191c, rgba(23,25,28,0)); }
+.fade-edge-glass { background: linear-gradient(to left, rgba(255,255,255,0.7), rgba(255,255,255,0)); }
+.dark .fade-edge-glass { background: linear-gradient(to left, rgba(28,34,30,0.68), rgba(28,34,30,0)); }
+
 /* Liquid-glass button — every Button variant routes through this so icons/CTAs
    across the whole app share one tactile, translucent language instead of
    flat fills. Brand green shows through as a tinted glow, not a solid block. */

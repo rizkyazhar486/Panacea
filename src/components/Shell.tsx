@@ -476,7 +476,7 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
           </div>
           {/* Fade hint that the strip scrolls further right */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent" />
+          <div className="fade-edge-surface pointer-events-none absolute inset-y-0 right-0 w-8" />
         </div>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
@@ -549,7 +549,7 @@ export function Shell({ children }: { children: ReactNode }) {
           aria-label="Navigasi utama"
         >
           <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
-            <div className="pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full bg-gradient-to-l from-white/70 to-transparent" />
+            <div className="fade-edge-glass pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
               {[
                 { to: '/', label: 'Beranda', icon: IconHome, end: true },
