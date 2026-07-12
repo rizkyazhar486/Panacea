@@ -47,14 +47,14 @@ function techniqueImage(name: string): string | null {
 // Looping demonstration videos (Higgsfield kling3_0_turbo) — how to actually
 // perform the key movements with correct form.
 const TECHNIQUE_VIDEOS: { label: string; cue: string; url: string }[] = [
-  { label: 'Squat', cue: 'Dada tegak · lutut searah jari kaki · paha sejajar lantai', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023249_bb1e8e4f-d292-4726-a8b3-f62731dcb892.mp4' },
-  { label: 'Push-up', cue: 'Garis lurus kepala–tumit · siku 45° · turun terkontrol', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023318_072af872-419c-4a8e-ad89-cc8668ffdfae.mp4' },
-  { label: 'Form Lari', cue: 'Midfoot strike · condong ringan ke depan · lengan rileks 90°', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023308_424ad8f6-42e7-497a-9976-7182c1b0d367.mp4' },
-  { label: 'Deadlift', cue: 'Punggung netral · bar menempel tulang kering · dorong lantai', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030244_5bb8852a-7225-47bc-800a-8565d1c145ea.mp4' },
-  { label: 'Pull-up', cue: 'Full hang di bawah · tarik dagu lewat bar · tanpa ayunan', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030300_85444d19-b286-40e6-8f47-203d6957134a.mp4' },
-  { label: 'Hip Thrust', cue: 'Punggung atas di bench · dorong dari tumit · squeeze 1 dtk di atas', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030311_c9fa30bd-3f0f-4581-a9a5-a32b7f1de3dc.mp4' },
-  { label: 'Renang (Freestyle)', cue: 'High elbow catch · rotasi tubuh · kepala diam, napas ke samping', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030336_6140502e-4fbf-4895-8e40-9f9cff3abca3.mp4' },
-  { label: 'Sepeda', cue: 'Punggung datar · siku rileks · kayuhan bulat kadens ±90 rpm', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030348_8f39a332-9b8b-4bb3-82b0-2f47a811b0ae.mp4' },
+  { label: 'Squat', cue: 'Chest up · knees track toes · thighs parallel to floor', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023249_bb1e8e4f-d292-4726-a8b3-f62731dcb892.mp4' },
+  { label: 'Push-up', cue: 'Straight line head-to-heel · elbows 45° · controlled descent', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023318_072af872-419c-4a8e-ad89-cc8668ffdfae.mp4' },
+  { label: 'Running Form', cue: 'Midfoot strike · slight forward lean · relaxed arms at 90°', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_023308_424ad8f6-42e7-497a-9976-7182c1b0d367.mp4' },
+  { label: 'Deadlift', cue: 'Neutral spine · bar close to shins · drive through the floor', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030244_5bb8852a-7225-47bc-800a-8565d1c145ea.mp4' },
+  { label: 'Pull-up', cue: 'Full hang at the bottom · chin over the bar · no swinging', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030300_85444d19-b286-40e6-8f47-203d6957134a.mp4' },
+  { label: 'Hip Thrust', cue: 'Upper back on bench · drive through heels · squeeze 1 sec at the top', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030311_c9fa30bd-3f0f-4581-a9a5-a32b7f1de3dc.mp4' },
+  { label: 'Swimming (Freestyle)', cue: 'High elbow catch · body rotation · head still, breathe to the side', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030336_6140502e-4fbf-4895-8e40-9f9cff3abca3.mp4' },
+  { label: 'Cycling', cue: 'Flat back · relaxed elbows · smooth pedal stroke at ~90 rpm cadence', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_030348_8f39a332-9b8b-4bb3-82b0-2f47a811b0ae.mp4' },
 ]
 
 const GOALS = [
@@ -76,48 +76,48 @@ function vol(level: Level, base: string, mid: string, adv: string) {
 function strengthDay(level: Level, focus: 'full' | 'upper' | 'lower' | 'glutes' | 'back' | 'arms' | 'core'): DayPlan {
   const s = (b: string, m: string, a: string) => vol(level, b, m, a)
   const lib: Record<typeof focus, DayPlan> = {
-    full: { title: 'Full Body Strength', emoji: '🏋️', focus: 'Kekuatan seluruh tubuh + grip', items: [
-      { name: 'Squat / Goblet Squat', sets: s('3×8', '4×6-8', '5×5'), rest: '120 dtk', cue: 'Dada tegak, lutut searah jari kaki, paha sejajar lantai.' },
-      { name: 'Push-up / Bench Press', sets: s('3×8-10', '4×8', '5×5'), rest: '90 dtk', cue: 'Skapula ditarik, turunkan 2 dtk, siku 45°.' },
-      { name: 'Deadlift / Hip Hinge', sets: s('3×6', '4×5', '5×3-5'), rest: '150 dtk', cue: 'Punggung netral, dorong lantai, bar menempel tulang kering.' },
-      { name: 'Dead Hang (grip!)', dur: s('3×20 dtk', '3×40 dtk', '3×60 dtk'), rest: '60 dtk', cue: 'Gantung pasif — genggaman kuat memprediksi umur panjang.' },
-      { name: 'Farmer Carry', dist: s('3×20 m', '3×30 m', '4×40 m'), rest: '90 dtk', cue: 'Bahu turun, core kencang, langkah pendek stabil.' },
+    full: { title: 'Full Body Strength', emoji: '🏋️', focus: 'Full-body strength + grip', items: [
+      { name: 'Squat / Goblet Squat', sets: s('3×8', '4×6-8', '5×5'), rest: '120 sec', cue: 'Chest up, knees track toes, thighs parallel to floor.' },
+      { name: 'Push-up / Bench Press', sets: s('3×8-10', '4×8', '5×5'), rest: '90 sec', cue: 'Scapula retracted, lower for 2 sec, elbows at 45°.' },
+      { name: 'Deadlift / Hip Hinge', sets: s('3×6', '4×5', '5×3-5'), rest: '150 sec', cue: 'Neutral spine, drive the floor, bar close to shins.' },
+      { name: 'Dead Hang (grip!)', dur: s('3×20 sec', '3×40 sec', '3×60 sec'), rest: '60 sec', cue: 'Passive hang — strong grip predicts longevity.' },
+      { name: 'Farmer Carry', dist: s('3×20 m', '3×30 m', '4×40 m'), rest: '90 sec', cue: 'Shoulders down, core braced, short stable steps.' },
     ]},
-    upper: { title: 'Upper Body', emoji: '💪', focus: 'Dada, bahu, punggung, lengan', items: [
-      { name: 'Bench / Push-up', sets: s('3×8', '4×8', '5×5'), rest: '120 dtk', cue: 'Kaki menapak kuat, dorong eksplosif.' },
-      { name: 'Pull-up / Lat Pulldown', sets: s('3×5-8', '4×6-8', '5×5'), rest: '120 dtk', cue: 'Tarik siku ke pinggang, dada ke bar.' },
-      { name: 'Overhead Press', sets: s('3×8', '4×6', '5×5'), rest: '120 dtk', cue: 'Glutes kencang, kepala maju setelah bar lewat.' },
-      { name: 'Row', sets: s('3×10', '4×8', '4×6'), rest: '90 dtk', cue: 'Tarik dengan punggung, bukan lengan.' },
+    upper: { title: 'Upper Body', emoji: '💪', focus: 'Chest, shoulders, back, arms', items: [
+      { name: 'Bench / Push-up', sets: s('3×8', '4×8', '5×5'), rest: '120 sec', cue: 'Feet planted firmly, drive explosively.' },
+      { name: 'Pull-up / Lat Pulldown', sets: s('3×5-8', '4×6-8', '5×5'), rest: '120 sec', cue: 'Pull elbows to hips, chest to bar.' },
+      { name: 'Overhead Press', sets: s('3×8', '4×6', '5×5'), rest: '120 sec', cue: 'Glutes braced, head forward once the bar passes.' },
+      { name: 'Row', sets: s('3×10', '4×8', '4×6'), rest: '90 sec', cue: 'Pull with the back, not the arms.' },
     ]},
-    lower: { title: 'Lower Body', emoji: '🦵', focus: 'Kaki — prediktor mobilitas & anti-jatuh', items: [
-      { name: 'Back Squat / Leg Press', sets: s('3×8', '4×6-8', '5×5'), rest: '150 dtk', cue: 'Turun terkontrol 2-3 dtk, dorong sekuatnya.' },
-      { name: 'Romanian Deadlift', sets: s('3×8', '4×8', '4×6'), rest: '120 dtk', cue: 'Rasakan hamstring memanjang, punggung lurus.' },
-      { name: 'Bulgarian Split Squat', sets: s('3×8/kaki', '3×10/kaki', '4×8/kaki'), rest: '90 dtk', cue: 'Torso sedikit condong, lutut stabil.' },
-      { name: 'Calf Raise + Sit-to-Stand cepat', sets: s('3×12', '4×12', '4×15'), rest: '60 dtk', cue: 'Sit-to-stand eksplosif melatih power kaki lansia-muda.' },
+    lower: { title: 'Lower Body', emoji: '🦵', focus: 'Legs — predictor of mobility & fall prevention', items: [
+      { name: 'Back Squat / Leg Press', sets: s('3×8', '4×6-8', '5×5'), rest: '150 sec', cue: 'Controlled 2-3 sec descent, drive up with full force.' },
+      { name: 'Romanian Deadlift', sets: s('3×8', '4×8', '4×6'), rest: '120 sec', cue: 'Feel the hamstring lengthen, keep the back straight.' },
+      { name: 'Bulgarian Split Squat', sets: s('3×8/leg', '3×10/leg', '4×8/leg'), rest: '90 sec', cue: 'Torso slightly leaning, knee stable.' },
+      { name: 'Calf Raise + Fast Sit-to-Stand', sets: s('3×12', '4×12', '4×15'), rest: '60 sec', cue: 'Explosive sit-to-stand trains leg power for healthy aging.' },
     ]},
-    glutes: { title: 'Glutes Focus', emoji: '🍑', focus: 'Gluteus max/med untuk postur & power', items: [
-      { name: 'Hip Thrust', sets: s('3×10', '4×8-10', '5×8'), rest: '120 dtk', cue: 'Dagu ditekuk, dorong dari tumit, tahan 1 dtk di atas.' },
-      { name: 'Sumo Deadlift', sets: s('3×8', '4×6', '4×5'), rest: '150 dtk', cue: 'Lutut keluar, dada tegak.' },
-      { name: 'Cable Kickback / Glute Bridge', sets: s('3×12', '3×15', '4×12'), rest: '60 dtk', cue: 'Squeeze penuh di puncak gerakan.' },
-      { name: 'Side-Lying Abduction', sets: s('3×15', '3×20', '4×15'), rest: '45 dtk', cue: 'Gerakan kecil terkontrol — gluteus medius.' },
+    glutes: { title: 'Glutes Focus', emoji: '🍑', focus: 'Gluteus max/med for posture & power', items: [
+      { name: 'Hip Thrust', sets: s('3×10', '4×8-10', '5×8'), rest: '120 sec', cue: 'Chin tucked, drive through the heels, hold 1 sec at the top.' },
+      { name: 'Sumo Deadlift', sets: s('3×8', '4×6', '4×5'), rest: '150 sec', cue: 'Knees out, chest up.' },
+      { name: 'Cable Kickback / Glute Bridge', sets: s('3×12', '3×15', '4×12'), rest: '60 sec', cue: 'Full squeeze at the top of the movement.' },
+      { name: 'Side-Lying Abduction', sets: s('3×15', '3×20', '4×15'), rest: '45 sec', cue: 'Small controlled movement — gluteus medius.' },
     ]},
-    back: { title: 'Back Focus', emoji: '🔙', focus: 'Punggung tebal & postur sehat', items: [
-      { name: 'Pull-up / Assisted', sets: s('3×5', '4×6-8', '5×5+'), rest: '120 dtk', cue: 'Full hang di bawah, dada ke bar.' },
-      { name: 'Barbell / DB Row', sets: s('3×10', '4×8', '4×6'), rest: '120 dtk', cue: 'Tarik ke pusar, jeda 1 dtk.' },
-      { name: 'Lat Pulldown', sets: s('3×10', '3×12', '4×10'), rest: '90 dtk', cue: 'Turunkan ke dada atas, siku ke bawah-belakang.' },
-      { name: 'Face Pull', sets: s('3×15', '3×15', '4×12'), rest: '60 dtk', cue: 'Tarik ke dahi, rotasi eksternal — sehat untuk bahu.' },
+    back: { title: 'Back Focus', emoji: '🔙', focus: 'Thick back & healthy posture', items: [
+      { name: 'Pull-up / Assisted', sets: s('3×5', '4×6-8', '5×5+'), rest: '120 sec', cue: 'Full hang at the bottom, chest to bar.' },
+      { name: 'Barbell / DB Row', sets: s('3×10', '4×8', '4×6'), rest: '120 sec', cue: 'Pull to the navel, pause 1 sec.' },
+      { name: 'Lat Pulldown', sets: s('3×10', '3×12', '4×10'), rest: '90 sec', cue: 'Lower to the upper chest, elbows down and back.' },
+      { name: 'Face Pull', sets: s('3×15', '3×15', '4×12'), rest: '60 sec', cue: 'Pull to the forehead, external rotation — healthy for the shoulders.' },
     ]},
-    arms: { title: 'Arms (Bicep + Tricep)', emoji: '💪', focus: 'Lengan', items: [
-      { name: 'Barbell / DB Curl', sets: s('3×10', '4×8-10', '4×8'), rest: '75 dtk', cue: 'Siku menempel badan, turunkan 3 dtk.' },
-      { name: 'Hammer Curl', sets: s('3×10', '3×12', '4×10'), rest: '60 dtk', cue: 'Genggaman netral — brachialis & grip.' },
-      { name: 'Close-Grip Bench / Dips', sets: s('3×8', '4×8', '4×6-8'), rest: '90 dtk', cue: 'Siku dekat badan.' },
-      { name: 'Overhead Tricep Ext.', sets: s('3×12', '3×12', '4×10'), rest: '60 dtk', cue: 'Siku mengarah ke depan, regangan penuh.' },
+    arms: { title: 'Arms (Bicep + Tricep)', emoji: '💪', focus: 'Arms', items: [
+      { name: 'Barbell / DB Curl', sets: s('3×10', '4×8-10', '4×8'), rest: '75 sec', cue: 'Elbows pinned to the sides, lower for 3 sec.' },
+      { name: 'Hammer Curl', sets: s('3×10', '3×12', '4×10'), rest: '60 sec', cue: 'Neutral grip — brachialis & grip strength.' },
+      { name: 'Close-Grip Bench / Dips', sets: s('3×8', '4×8', '4×6-8'), rest: '90 sec', cue: 'Elbows close to the body.' },
+      { name: 'Overhead Tricep Ext.', sets: s('3×12', '3×12', '4×10'), rest: '60 sec', cue: 'Elbows pointing forward, full stretch.' },
     ]},
-    core: { title: 'Core & Waist', emoji: '🎯', focus: 'Pinggang, perut & stabilitas', items: [
-      { name: 'Plank', dur: s('3×30 dtk', '3×45 dtk', '3×75 dtk'), rest: '45 dtk', cue: 'Garis lurus kepala-tumit, glutes aktif.' },
-      { name: 'Side Plank', dur: s('3×20 dtk/sisi', '3×30 dtk/sisi', '3×45 dtk/sisi'), rest: '45 dtk', cue: 'Pinggul tinggi — obliques untuk lingkar pinggang.' },
-      { name: 'Dead Bug', sets: s('3×8/sisi', '3×10/sisi', '3×12/sisi'), rest: '45 dtk', cue: 'Punggung bawah menempel lantai.' },
-      { name: 'Pallof Press', sets: s('3×10/sisi', '3×12/sisi', '3×12/sisi'), rest: '45 dtk', cue: 'Anti-rotasi, napas teratur.' },
+    core: { title: 'Core & Waist', emoji: '🎯', focus: 'Waist, abs & stability', items: [
+      { name: 'Plank', dur: s('3×30 sec', '3×45 sec', '3×75 sec'), rest: '45 sec', cue: 'Straight line head-to-heel, glutes engaged.' },
+      { name: 'Side Plank', dur: s('3×20 sec/side', '3×30 sec/side', '3×45 sec/side'), rest: '45 sec', cue: 'Hips high — obliques for waist definition.' },
+      { name: 'Dead Bug', sets: s('3×8/side', '3×10/side', '3×12/side'), rest: '45 sec', cue: 'Lower back pressed to the floor.' },
+      { name: 'Pallof Press', sets: s('3×10/side', '3×12/side', '3×12/side'), rest: '45 sec', cue: 'Anti-rotation, steady breathing.' },
     ]},
   }
   return lib[focus]
@@ -127,70 +127,70 @@ function strengthDay(level: Level, focus: 'full' | 'upper' | 'lower' | 'glutes' 
 function cardioDay(kind: string, level: Level): DayPlan {
   const s = (b: string, m: string, a: string) => vol(level, b, m, a)
   switch (kind) {
-    case 'easy': return { title: 'Easy Run (Zone 2)', emoji: '🏃', focus: 'Basis aerobik — mesin longevity', items: [
-      { name: 'Easy run percakapan', dur: s('25-30 mnt', '40-50 mnt', '60-75 mnt'), pace: 'Zone 2 (60-70% HRmax) — masih bisa bicara kalimat penuh', cue: 'Kalau ngos-ngosan, PELANKAN. 80% volume mingguan di sini.' },
+    case 'easy': return { title: 'Easy Run (Zone 2)', emoji: '🏃', focus: 'Aerobic base — the longevity engine', items: [
+      { name: 'Conversational easy run', dur: s('25-30 min', '40-50 min', '60-75 min'), pace: 'Zone 2 (60-70% HRmax) — still able to speak in full sentences', cue: 'If you\'re out of breath, SLOW DOWN. 80% of weekly volume should be here.' },
     ]}
-    case 'tempo': return { title: 'Tempo Run', emoji: '⏱️', focus: 'Ambang laktat naik', items: [
-      { name: 'Pemanasan', dur: '10 mnt', pace: 'Zone 1-2', cue: 'Progresif, akhiri dengan 4×20 dtk strides.' },
-      { name: 'Tempo', dur: s('2×8 mnt (jeda 3 mnt)', '20 mnt kontinu', '2×15 mnt (jeda 3 mnt)'), pace: '"Comfortably hard" — Zone 3-4, bisa bicara 3-4 kata', cue: 'Ritme stabil, jangan mulai terlalu cepat.' },
-      { name: 'Pendinginan', dur: '10 mnt', pace: 'Zone 1', cue: 'Jalan/jog santai.' },
+    case 'tempo': return { title: 'Tempo Run', emoji: '⏱️', focus: 'Raising the lactate threshold', items: [
+      { name: 'Warm-up', dur: '10 min', pace: 'Zone 1-2', cue: 'Progressive, finish with 4×20 sec strides.' },
+      { name: 'Tempo', dur: s('2×8 min (3 min rest)', '20 min continuous', '2×15 min (3 min rest)'), pace: '"Comfortably hard" — Zone 3-4, able to speak 3-4 words', cue: 'Keep a steady rhythm, don\'t start too fast.' },
+      { name: 'Cool-down', dur: '10 min', pace: 'Zone 1', cue: 'Easy walk/jog.' },
     ]}
-    case 'interval': return { title: 'Interval', emoji: '⚡', focus: 'VO₂max & kecepatan', items: [
-      { name: 'Pemanasan', dur: '12 mnt + 4 strides', pace: 'Zone 1-2', cue: 'Wajib — cegah cedera.' },
-      { name: 'Interval', sets: s('5×2 mnt keras (jeda jog 2 mnt)', '6×3 mnt (jeda 2 mnt)', '5×4 mnt (jeda 3 mnt)'), pace: 'Zone 4-5 (90-95% HRmax)', cue: 'Repetisi terakhir harus sama cepat dengan pertama.' },
-      { name: 'Pendinginan', dur: '10 mnt', pace: 'Zone 1', cue: 'Jog ringan.' },
+    case 'interval': return { title: 'Interval', emoji: '⚡', focus: 'VO₂max & speed', items: [
+      { name: 'Warm-up', dur: '12 min + 4 strides', pace: 'Zone 1-2', cue: 'Mandatory — prevents injury.' },
+      { name: 'Interval', sets: s('5×2 min hard (2 min jog recovery)', '6×3 min (2 min rest)', '5×4 min (3 min rest)'), pace: 'Zone 4-5 (90-95% HRmax)', cue: 'The last rep should be as fast as the first.' },
+      { name: 'Cool-down', dur: '10 min', pace: 'Zone 1', cue: 'Easy jog.' },
     ]}
-    case 'long': return { title: 'Long Run', emoji: '🛣️', focus: 'Daya tahan & efisiensi lemak', items: [
-      { name: 'Long run', dur: s('50-60 mnt', '75-90 mnt', '100-150 mnt'), dist: s('7-9 km', '12-16 km', '18-28 km'), pace: 'Zone 2, 60-75 dtk/km lebih lambat dari pace 10K', cue: 'Bawa minum; gel/karbo tiap 40 mnt bila >75 mnt.' },
+    case 'long': return { title: 'Long Run', emoji: '🛣️', focus: 'Endurance & fat efficiency', items: [
+      { name: 'Long run', dur: s('50-60 min', '75-90 min', '100-150 min'), dist: s('7-9 km', '12-16 km', '18-28 km'), pace: 'Zone 2, 60-75 sec/km slower than 10K pace', cue: 'Bring water; gel/carbs every 40 min if >75 min.' },
     ]}
-    case '4x4': return { title: 'Norwegian 4×4', emoji: '🇳🇴', focus: 'Protokol VO₂max terbukti (naik ~0.5/bln)', items: [
-      { name: 'Pemanasan', dur: '10 mnt', pace: 'Zone 2', cue: 'Naikkan HR bertahap.' },
-      { name: '4× (4 mnt keras + 3 mnt recovery)', sets: '4 repetisi', pace: 'Interval: 85-95% HRmax · Recovery: jog 60-70%', cue: 'Target napas berat tapi terkontrol; jangan sprint mati di menit 1.' },
-      { name: 'Pendinginan', dur: '5-10 mnt', pace: 'Zone 1', cue: 'Total sesi ±40 mnt. 1-2×/minggu cukup.' },
+    case '4x4': return { title: 'Norwegian 4×4', emoji: '🇳🇴', focus: 'Proven VO₂max protocol (~+0.5/month)', items: [
+      { name: 'Warm-up', dur: '10 min', pace: 'Zone 2', cue: 'Gradually raise HR.' },
+      { name: '4× (4 min hard + 3 min recovery)', sets: '4 reps', pace: 'Interval: 85-95% HRmax · Recovery: jog 60-70%', cue: 'Aim for heavy but controlled breathing; don\'t sprint yourself out in minute 1.' },
+      { name: 'Cool-down', dur: '5-10 min', pace: 'Zone 1', cue: 'Total session ±40 min. 1-2×/week is enough.' },
     ]}
-    case '8x300': return { title: '8×300m', emoji: '🎯', focus: 'Kecepatan & ekonomi lari', items: [
-      { name: 'Pemanasan', dur: '15 mnt + drills (A-skip, high knees)', pace: 'Zone 1-2', cue: 'Drills memperbaiki teknik.' },
-      { name: '8×300m', sets: '8 repetisi', rest: s('jalan 3 mnt', 'jog 200m (90 dtk)', 'jog 100m (60 dtk)'), pace: 'Pace 3K-5K (cepat tapi rata)', cue: 'Lengan rileks, kaki mendarat di bawah pinggul.' },
-      { name: 'Pendinginan', dur: '10 mnt', pace: 'Zone 1', cue: 'Regangkan betis & hamstring.' },
+    case '8x300': return { title: '8×300m', emoji: '🎯', focus: 'Speed & running economy', items: [
+      { name: 'Warm-up', dur: '15 min + drills (A-skip, high knees)', pace: 'Zone 1-2', cue: 'Drills improve technique.' },
+      { name: '8×300m', sets: '8 reps', rest: s('walk 3 min', 'jog 200m (90 sec)', 'jog 100m (60 sec)'), pace: '3K-5K pace (fast but even)', cue: 'Relaxed arms, feet landing under the hips.' },
+      { name: 'Cool-down', dur: '10 min', pace: 'Zone 1', cue: 'Stretch calves & hamstrings.' },
     ]}
-    case 'ladder': return { title: 'VO₂max Ladder', emoji: '🪜', focus: 'Variasi interval piramida', items: [
-      { name: 'Pemanasan', dur: '12 mnt', pace: 'Zone 2', cue: '4 strides di akhir.' },
-      { name: 'Ladder: 1-2-3-4-3-2-1 mnt', sets: '1 rangkaian', rest: 'jog separuh durasi repetisi', pace: 'Zone 4-5, makin pendek makin cepat', cue: 'Atur tenaga — puncak tangga tetap kuat.' },
-      { name: 'Pendinginan', dur: '10 mnt', pace: 'Zone 1', cue: 'Jog ringan.' },
+    case 'ladder': return { title: 'VO₂max Ladder', emoji: '🪜', focus: 'Pyramid interval variation', items: [
+      { name: 'Warm-up', dur: '12 min', pace: 'Zone 2', cue: '4 strides at the end.' },
+      { name: 'Ladder: 1-2-3-4-3-2-1 min', sets: '1 set', rest: 'jog half the rep duration', pace: 'Zone 4-5, shorter reps get faster', cue: 'Manage your effort — stay strong at the top of the ladder.' },
+      { name: 'Cool-down', dur: '10 min', pace: 'Zone 1', cue: 'Easy jog.' },
     ]}
-    case 'cycle': return { title: 'Cycling (GPS)', emoji: '🚴', focus: 'Kecepatan & pace via GPS tracker', items: [
-      { name: 'Endurance ride', dur: s('45 mnt', '75 mnt', '2-3 jam'), pace: 'Zone 2 — kecepatan stabil (pantau di GPS Tracker)', cue: 'Kadens 85-95 rpm, posisi rileks.' },
-      { name: 'Interval (opsional)', sets: s('4×2 mnt', '5×3 mnt', '6×4 mnt'), rest: 'spin ringan 3 mnt', pace: 'Zone 4', cue: 'Gunakan speed/pace GPS untuk konsistensi tiap repetisi.' },
+    case 'cycle': return { title: 'Cycling (GPS)', emoji: '🚴', focus: 'Speed & pace via GPS tracker', items: [
+      { name: 'Endurance ride', dur: s('45 min', '75 min', '2-3 hours'), pace: 'Zone 2 — steady speed (monitor on GPS Tracker)', cue: 'Cadence 85-95 rpm, relaxed position.' },
+      { name: 'Interval (optional)', sets: s('4×2 min', '5×3 min', '6×4 min'), rest: 'easy spin 3 min', pace: 'Zone 4', cue: 'Use GPS speed/pace for consistency across reps.' },
     ]}
-    case 'swim': return { title: 'Swimming (GPS)', emoji: '🏊', focus: 'Teknik + speed/pace (open water via GPS)', items: [
-      { name: 'Pemanasan', dist: '200-400 m', pace: 'Santai', cue: 'Campuran gaya, fokus napas.' },
-      { name: 'Drill teknik', sets: s('4×50 m', '6×50 m', '8×50 m'), rest: '20 dtk', cue: 'Catch-up drill, rotasi pinggul, kepala diam.' },
-      { name: 'Main set', sets: s('6×100 m', '8×100 m', '10×150 m'), rest: '20-30 dtk', pace: 'Pace terkontrol per 100m (GPS: speed/pace; depth & pressure hanya dari dive watch)', cue: 'Pace rata — repetisi terakhir = pertama.' },
-      { name: 'Pendinginan', dist: '200 m', pace: 'Santai', cue: 'Gaya punggung rileks.' },
+    case 'swim': return { title: 'Swimming (GPS)', emoji: '🏊', focus: 'Technique + speed/pace (open water via GPS)', items: [
+      { name: 'Warm-up', dist: '200-400 m', pace: 'Easy', cue: 'Mixed strokes, focus on breathing.' },
+      { name: 'Technique drill', sets: s('4×50 m', '6×50 m', '8×50 m'), rest: '20 sec', cue: 'Catch-up drill, hip rotation, head still.' },
+      { name: 'Main set', sets: s('6×100 m', '8×100 m', '10×150 m'), rest: '20-30 sec', pace: 'Controlled pace per 100m (GPS: speed/pace; depth & pressure from dive watch only)', cue: 'Even pace — last rep matches the first.' },
+      { name: 'Cool-down', dist: '200 m', pace: 'Easy', cue: 'Relaxed backstroke.' },
     ]}
-    case 'hiit': return { title: 'HIIT Full Body', emoji: '🔥', focus: 'Bakar lemak & kapasitas anaerobik', items: [
-      { name: 'Sirkuit: burpee, mountain climber, squat jump, push-up', sets: s('4 ronde × 30 dtk kerja/30 dtk istirahat', '5 ronde × 40/20', '6 ronde × 45/15'), rest: '2 mnt antar-ronde', cue: 'Kualitas gerakan > kecepatan; jaga form saat lelah.' },
-      { name: 'Finisher plank', dur: '2×45 dtk', rest: '30 dtk', cue: 'Napas stabil.' },
+    case 'hiit': return { title: 'HIIT Full Body', emoji: '🔥', focus: 'Fat burn & anaerobic capacity', items: [
+      { name: 'Circuit: burpee, mountain climber, squat jump, push-up', sets: s('4 rounds × 30 sec work/30 sec rest', '5 rounds × 40/20', '6 rounds × 45/15'), rest: '2 min between rounds', cue: 'Movement quality > speed; maintain form when tired.' },
+      { name: 'Finisher plank', dur: '2×45 sec', rest: '30 sec', cue: 'Steady breathing.' },
     ]}
     default: return cardioDay('easy', level)
   }
 }
 
 function recoveryDay(): DayPlan {
-  return { title: 'Recovery Aktif', emoji: '🧘', focus: 'Adaptasi terjadi saat pulih', items: [
-    { name: 'Jalan santai / sepeda ringan', dur: '20-30 mnt', pace: 'Zone 1', cue: 'Gerak ringan melancarkan pemulihan.' },
-    { name: 'Mobilitas & stretching', dur: '10-15 mnt', cue: 'Hip flexor, hamstring, thoracic spine.' },
-    { name: 'One-leg stand (tes keseimbangan)', dur: '3×30 dtk/kaki', cue: 'Mata terbuka lalu coba tertutup — prediktor longevity.' },
-    { name: 'Breathwork / meditasi', dur: '10 mnt', cue: 'Napas 4-7-8 menurunkan stres & memperbaiki HRV.' },
+  return { title: 'Active Recovery', emoji: '🧘', focus: 'Adaptation happens during recovery', items: [
+    { name: 'Easy walk / light cycling', dur: '20-30 min', pace: 'Zone 1', cue: 'Light movement promotes recovery.' },
+    { name: 'Mobility & stretching', dur: '10-15 min', cue: 'Hip flexor, hamstring, thoracic spine.' },
+    { name: 'One-leg stand (balance test)', dur: '3×30 sec/leg', cue: 'Eyes open then try closed — a longevity predictor.' },
+    { name: 'Breathwork / meditation', dur: '10 min', cue: '4-7-8 breathing lowers stress & improves HRV.' },
   ]}
 }
 
 function mentalDay(): DayPlan {
-  return { title: 'Mental Strength', emoji: '🧠', focus: 'Mentalitas juara (Seahawks-style mindfulness)', items: [
-    { name: 'Meditasi terpandu', dur: '10-15 mnt', cue: 'Fokus napas; saat pikiran lari, kembalikan tanpa menghakimi.' },
-    { name: 'Visualisasi performa', dur: '5 mnt', cue: 'Bayangkan sesi/lomba sukses dengan detail sensorik.' },
-    { name: 'Jurnal: 3 syukur + 1 tantangan', dur: '5 mnt', cue: 'Tulis tangan — regulasi emosi & motivasi.' },
-    { name: 'Latihan di ketidaknyamanan', dur: 'akhir sesi kardio', cue: 'Tahan 2 mnt ekstra saat ingin berhenti — otot mental.' },
+  return { title: 'Mental Strength', emoji: '🧠', focus: 'Champion mentality (Seahawks-style mindfulness)', items: [
+    { name: 'Guided meditation', dur: '10-15 min', cue: 'Focus on breath; when the mind wanders, bring it back without judgment.' },
+    { name: 'Performance visualization', dur: '5 min', cue: 'Imagine a successful session/race with sensory detail.' },
+    { name: 'Journal: 3 gratitudes + 1 challenge', dur: '5 min', cue: 'Write by hand — emotional regulation & motivation.' },
+    { name: 'Training in discomfort', dur: 'end of cardio session', cue: 'Hold 2 extra minutes when you want to stop — the mental muscle.' },
   ]}
 }
 
@@ -251,7 +251,7 @@ function buildWeek(goal: Goal, level: Level, days: number): (DayPlan | null)[] {
   return week
 }
 
-const DOW = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+const DOW = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 // Cooper test → VO₂max (Cooper 1968): (jarak_m − 504.9) / 44.73
 function cooperVo2(m: number) { return (m - 504.9) / 44.73 }
@@ -276,18 +276,18 @@ function vo2Category(v: number, age: number, g: 'M' | 'F'): { label: string; ton
   const base = g === 'M' ? [32, 38, 44, 51] : [27, 33, 39, 45]
   const adj = base.map((b) => b - Math.max(0, age - 30) * 0.3)
   if (v >= adj[3]) return { label: 'Superior', tone: 'brand' }
-  if (v >= adj[2]) return { label: 'Sangat Baik', tone: 'brand' }
-  if (v >= adj[1]) return { label: 'Baik', tone: 'low' }
-  if (v >= adj[0]) return { label: 'Cukup', tone: 'low' }
-  return { label: 'Membangun Fondasi', tone: 'neutral' }
+  if (v >= adj[2]) return { label: 'Very Good', tone: 'brand' }
+  if (v >= adj[1]) return { label: 'Good', tone: 'low' }
+  if (v >= adj[0]) return { label: 'Fair', tone: 'low' }
+  return { label: 'Building Foundation', tone: 'neutral' }
 }
 
 const RED_FLAGS = [
-  { id: 'faint', label: '😵 Pusing / hampir pingsan saat olahraga' },
-  { id: 'chest', label: '💢 Nyeri/tekanan dada saat aktivitas' },
-  { id: 'palpitation', label: '💓 Jantung berdebar tak wajar' },
-  { id: 'breathless_rest', label: '🫁 Sesak napas saat istirahat' },
-  { id: 'heart_history', label: '🩺 Riwayat jantung / tekanan darah tinggi' },
+  { id: 'faint', label: '😵 Dizziness / near-fainting during exercise' },
+  { id: 'chest', label: '💢 Chest pain/pressure during activity' },
+  { id: 'palpitation', label: '💓 Abnormal heart palpitations' },
+  { id: 'breathless_rest', label: '🫁 Shortness of breath at rest' },
+  { id: 'heart_history', label: '🩺 History of heart disease / high blood pressure' },
 ]
 
 function RunnerCoach() {
@@ -326,20 +326,20 @@ function RunnerCoach() {
   const gainNeeded = targetVo2 - vo2max
   const monthsNeeded = gainNeeded > 0 ? gainNeeded / 1.2 : 0 // ~1.2 ml/kg/mo aggressive-beginner
   const verdict = gainNeeded <= 0
-    ? { l: 'Sudah tercapai 🎉', tone: 'brand' as const, d: 'Estimasi Anda sudah di atas target — fokus pertahankan & pertajam pacing tes.' }
+    ? { l: 'Already achieved 🎉', tone: 'brand' as const, d: 'Your estimate is already above the target — focus on maintaining it & sharpening your test pacing.' }
     : monthsNeeded <= months
-    ? { l: 'Realistis', tone: 'brand' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan; Anda punya ${months}. Konsisten = sangat bisa.` }
+    ? { l: 'Realistic', tone: 'brand' as const, d: `Needs ~${monthsNeeded.toFixed(1)} months; you have ${months}. Consistency = very doable.` }
     : monthsNeeded <= months * 1.4
-    ? { l: 'Menantang (stretch)', tone: 'low' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan vs ${months} tersedia. Bisa, tapi tanpa kompromi konsistensi & pemulihan.` }
-    : { l: 'Sangat agresif', tone: 'critical' as const, d: `Butuh ~${monthsNeeded.toFixed(1)} bulan. Mengejar ${targetM}m dalam ${months} bulan berisiko cedera. Target ~${Math.round((vo2max + months * 1.2) * 44.73 + 504.9)}m lebih aman.` }
+    ? { l: 'Challenging (stretch)', tone: 'low' as const, d: `Needs ~${monthsNeeded.toFixed(1)} months vs ${months} available. Doable, but without compromising consistency & recovery.` }
+    : { l: 'Very aggressive', tone: 'critical' as const, d: `Needs ~${monthsNeeded.toFixed(1)} months. Chasing ${targetM}m in ${months} months risks injury. A target of ~${Math.round((vo2max + months * 1.2) * 44.73 + 504.9)}m is safer.` }
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Pelatih Lari Personal" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang benar, zona pace personal & rencana realistis" />
+      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Enter your last run — get a true VO₂max, personal pace zones & a realistic plan" />
 
       {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
       <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">
-        <div className="text-xs font-extrabold text-rose-700">🛡️ Skrining Keamanan (isi jujur sebelum lari intens)</div>
+        <div className="text-xs font-extrabold text-rose-700">🛡️ Safety Screening (answer honestly before intense running)</div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {RED_FLAGS.map((f) => (
             <button key={f.id} onClick={() => setFlags((x) => x.includes(f.id) ? x.filter((y) => y !== f.id) : [...x, f.id])}
@@ -350,37 +350,37 @@ function RunnerCoach() {
         </div>
         {flags.length > 0 && (
           <div className="mt-2 rounded-xl bg-white p-3 text-[11px] leading-relaxed text-rose-700">
-            <b>Berhenti dulu — periksa ke dokter sebelum latihan intensitas tinggi atau Cooper Test.</b> Gejala yang Anda tandai (khususnya pusing/hampir pingsan atau nyeri dada saat olahraga) harus dievaluasi (EKG + pemeriksaan jantung) untuk memastikan aman. Sementara itu, batasi ke jalan cepat & jangan pernah berlatih sampai hampir pingsan.
-            <div className="mt-2"><a href="#/consult" className="font-bold underline">Konsultasi dokter</a> · <a href="#/hospitals" className="font-bold underline">Faskes terdekat</a></div>
+            <b>Stop for now — see a doctor before high-intensity training or the Cooper Test.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
+            <div className="mt-2"><a href="#/consult" className="font-bold underline">Consult a doctor</a> · <a href="#/hospitals" className="font-bold underline">Nearest facility</a></div>
           </div>
         )}
       </div>
 
       {/* Honest current ability */}
       <div className="mt-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Berapa lama bisa lari TERUS tanpa berhenti?</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">How long can you run CONTINUOUSLY without stopping?</div>
         <div className="mt-1.5 grid grid-cols-2 gap-1.5 sm:grid-cols-5">
-          {([['u1', '<1 mnt'], ['m1_5', '1-5 mnt'], ['m5_15', '5-15 mnt'], ['m15_30', '15-30 mnt'], ['m30p', '30+ mnt']] as const).map(([k, l]) => (
+          {([['u1', '<1 min'], ['m1_5', '1-5 min'], ['m5_15', '5-15 min'], ['m15_30', '15-30 min'], ['m30p', '30+ min']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setCont(k)} className={'rounded-xl py-2 text-xs font-bold ' + (cont === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
           ))}
         </div>
-        <p className="mt-1 text-[10px] text-neutral-400">Jawab jujur dari lari pelan-nyaman, bukan sprint. Ini yang menentukan rencana Anda.</p>
+        <p className="mt-1 text-[10px] text-neutral-400">Answer honestly based on a comfortable easy run, not a sprint. This is what shapes your plan.</p>
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="mis. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
-        <Field label="Waktu (menit)"><input className={inputClass} type="number" value={min || ''} placeholder="mis. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
-        <Field label="Seberapa berat?">
+        <Field label="Distance (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="e.g. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
+        <Field label="Time (minutes)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
+        <Field label="How hard was it?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
-            <option value="easy">Santai (bisa ngobrol)</option>
-            <option value="moderate">Sedang (agak berat)</option>
-            <option value="hard">All-out (maksimal)</option>
+            <option value="easy">Easy (could chat)</option>
+            <option value="moderate">Moderate (fairly hard)</option>
+            <option value="hard">All-out (maximal)</option>
           </select>
         </Field>
-        <Field label="Usia / Kelamin">
+        <Field label="Age / Sex">
           <div className="flex gap-1">
             <input className={inputClass + ' w-14'} type="number" value={age} onChange={(e) => updAge(+e.target.value)} />
-            <select className={inputClass} value={g} onChange={(e) => updSex(e.target.value as 'M' | 'F')}><option value="M">L</option><option value="F">P</option></select>
+            <select className={inputClass} value={g} onChange={(e) => updSex(e.target.value as 'M' | 'F')}><option value="M">M</option><option value="F">F</option></select>
           </div>
         </Field>
       </div>
@@ -389,42 +389,42 @@ function RunnerCoach() {
       <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Estimasi VO₂max Anda</div>
-            <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-white/50">ml/kg/mnt</span></div>
-            <div className="text-[10px] text-white/50">pace lari ini: {fmtPace(runPaceSec)}/km · O₂ saat itu {vo2atRun.toFixed(0)}</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Your Estimated VO₂max</div>
+            <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-white/50">ml/kg/min</span></div>
+            <div className="text-[10px] text-white/50">this run's pace: {fmtPace(runPaceSec)}/km · O₂ at that pace {vo2atRun.toFixed(0)}</div>
           </div>
           {cat && <Badge tone={cat.tone}>{cat.label}</Badge>}
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-white/80">
           {effort === 'easy'
-            ? '⚠️ Karena ini lari SANTAI, VO₂max sebenarnya JAUH lebih tinggi dari sekadar mengubah pace ini ke Cooper Test. Lari santai memang HARUS terasa lambat — itu prinsip yang benar (80% latihan harus mudah).'
+            ? '⚠️ Because this was an EASY run, your actual VO₂max is FAR higher than simply converting this pace to a Cooper Test. Easy runs are SUPPOSED to feel slow — that\'s the correct principle (80% of training should be easy).'
             : effort === 'moderate'
-            ? 'Dihitung dari usaha sedang, disesuaikan ke perkiraan VO₂max. Untuk angka pasti, lakukan tes all-out 12 menit.'
-            : 'Bagus — ini usaha maksimal, jadi estimasi paling akurat. Ini setara Cooper Test yang benar.'}
+            ? 'Calculated from moderate effort, adjusted to an estimated VO₂max. For an exact number, do an all-out 12-minute test.'
+            : 'Great — this was maximal effort, so the estimate is most accurate. This is equivalent to a true Cooper Test.'}
         </p>
       </div>
 
       {/* Encouraging reframe */}
       {vo2max > 0 && (
         <div className="mt-3 rounded-xl bg-brand-50 p-3 text-[12px] leading-relaxed text-brand-dark">
-          💚 <b>Perspektif jujur:</b> {km >= 1 ? `mampu lari ${km} km terus-menerus sudah menempatkan Anda di atas mayoritas orang yang tak sanggup lari 1 km. ` : ''}
-          VO₂max adalah kapasitas yang <b>paling bisa dilatih</b> — pemula lazim naik <b>15-30% dalam 8-12 minggu</b> latihan terstruktur.
-          Jangan bandingkan lari <i>santai</i> Anda dengan pace <i>lomba</i> orang lain; itu apel vs jeruk.
+          💚 <b>An honest perspective:</b> {km >= 1 ? `being able to run ${km} km continuously already puts you ahead of the majority of people who can't run 1 km. ` : ''}
+          VO₂max is the <b>most trainable</b> capacity — beginners commonly gain <b>15-30% in 8-12 weeks</b> of structured training.
+          Don't compare your <i>easy</i> run to someone else's <i>race</i> pace; that's apples to oranges.
         </div>
       )}
 
       {/* Personal pace zones */}
       {pace5kSec > 0 && (
         <div className="mt-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Zona Pace Personal Anda (menit/km)</div>
+          <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Your Personal Pace Zones (min/km)</div>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {[
-              ['Pemulihan', zone(105), 'sangat santai'],
-              ['Easy / Zona 2', zone(85), '80% latihan di sini'],
-              ['Long run', zone(70), 'daya tahan'],
-              ['Tempo / Ambang', zone(22), '"nyaman-berat"'],
-              ['Interval / VO₂max', zone(0), 'naikkan plafon'],
-              ['Cepat / Strides', zone(-12), '15-20 dtk eksplosif'],
+              ['Recovery', zone(105), 'very easy'],
+              ['Easy / Zone 2', zone(85), '80% of training here'],
+              ['Long run', zone(70), 'endurance'],
+              ['Tempo / Threshold', zone(22), '"comfortably hard"'],
+              ['Interval / VO₂max', zone(0), 'raises the ceiling'],
+              ['Fast / Strides', zone(-12), '15-20 sec explosive'],
             ].map(([l, p, d]) => (
               <div key={l} className="rounded-xl border border-neutral-100 p-2.5">
                 <div className="text-[10px] font-bold text-neutral-400">{l}</div>
@@ -433,33 +433,33 @@ function RunnerCoach() {
               </div>
             ))}
           </div>
-          <p className="mt-1.5 text-[10px] text-neutral-400">Diturunkan dari VO₂max Anda (metode Jack Daniels). Jalankan easy run di zona Easy — kalau lebih cepat, Anda merusak basis aerobik.</p>
+          <p className="mt-1.5 text-[10px] text-neutral-400">Derived from your VO₂max (Jack Daniels method). Run easy runs in the Easy zone — going faster damages your aerobic base.</p>
         </div>
       )}
 
       {/* Progressive plan for their level */}
       <div className="mt-3">
-        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Rencana 8 Minggu — Disesuaikan Level Anda</div>
+        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">8-Week Plan — Tailored to Your Level</div>
         <div className="mt-2 space-y-2">
           {(level === 0
             ? [
-                { w: 'Minggu 1-2', d: 'Run-walk: lari 1 mnt / jalan 2 mnt × 8. 3×/minggu. Tujuan: terbiasa bergerak tanpa cedera.' },
-                { w: 'Minggu 3-4', d: 'Lari 2 mnt / jalan 1 mnt × 8. Tambah 1 sesi jalan cepat 30 mnt.' },
-                { w: 'Minggu 5-6', d: 'Lari 5 mnt / jalan 1 mnt × 5. Mulai bisa lari 10-15 mnt kontinu.' },
-                { w: 'Minggu 7-8', d: 'Lari kontinu 20-25 mnt easy. Anda resmi jadi pelari!' },
+                { w: 'Week 1-2', d: 'Run-walk: run 1 min / walk 2 min × 8. 3×/week. Goal: get used to moving without injury.' },
+                { w: 'Week 3-4', d: 'Run 2 min / walk 1 min × 8. Add 1 brisk 30-min walking session.' },
+                { w: 'Week 5-6', d: 'Run 5 min / walk 1 min × 5. Start being able to run 10-15 min continuously.' },
+                { w: 'Week 7-8', d: 'Run continuously for 20-25 min easy. You are officially a runner!' },
               ]
             : level === 1
             ? [
-                { w: 'Minggu 1-2', d: `3× lari easy 20-30 mnt di pace ${zone(85)}. Fokus konsistensi, bukan kecepatan.` },
-                { w: 'Minggu 3-4', d: 'Naikkan 1 easy run ke 35-40 mnt. Tambah 4×20 dtk strides di akhir 1 sesi.' },
-                { w: 'Minggu 5-6', d: `Tambah 1 sesi tempo pendek: 2×6 mnt di pace ${zone(22)} (jeda jalan 2 mnt).` },
-                { w: 'Minggu 7-8', d: 'Tes ulang: lari all-out 12 menit (Cooper benar) — lihat lompatan angka Anda.' },
+                { w: 'Week 1-2', d: `3× easy runs of 20-30 min at ${zone(85)} pace. Focus on consistency, not speed.` },
+                { w: 'Week 3-4', d: 'Extend 1 easy run to 35-40 min. Add 4×20 sec strides at the end of 1 session.' },
+                { w: 'Week 5-6', d: `Add 1 short tempo session: 2×6 min at ${zone(22)} pace (2 min walk rest).` },
+                { w: 'Week 7-8', d: 'Retest: an all-out 12-minute run (true Cooper) — see how much your number jumps.' },
               ]
             : [
-                { w: 'Minggu 1-2', d: `Basis: 3× easy ${zone(85)} (30-40 mnt) + 1 long run ${zone(70)} (45 mnt). Semua HARUS terasa mudah.` },
-                { w: 'Minggu 3-4', d: `Tambah kualitas: 1× tempo 3×8 mnt @ ${zone(22)}. Pertahankan easy tetap easy.` },
-                { w: 'Minggu 5-6', d: `Naikkan VO₂max: 1× Norwegian 4×4 (4 mnt keras @ ${zone(0)} + 3 mnt jog) + 1 tempo. Long run 60 mnt.` },
-                { w: 'Minggu 7-8', d: 'Deload minggu 7 (−40%), lalu Minggu 8 tes 12 menit all-out. Target naik 1-3 ml/kg/mnt.' },
+                { w: 'Week 1-2', d: `Base: 3× easy ${zone(85)} (30-40 min) + 1 long run ${zone(70)} (45 min). All of it MUST feel easy.` },
+                { w: 'Week 3-4', d: `Add quality: 1× tempo 3×8 min @ ${zone(22)}. Keep easy runs easy.` },
+                { w: 'Week 5-6', d: `Raise VO₂max: 1× Norwegian 4×4 (4 min hard @ ${zone(0)} + 3 min jog) + 1 tempo. Long run 60 min.` },
+                { w: 'Week 7-8', d: 'Deload week 7 (−40%), then Week 8 all-out 12-minute test. Target gain of 1-3 ml/kg/min.' },
               ])
             .map((p) => (
               <div key={p.w} className="flex gap-3 rounded-xl border border-neutral-100 p-3">
@@ -470,20 +470,20 @@ function RunnerCoach() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           {canRunCont
-            ? '🎯 Resep emas untuk menaikkan VO₂max Anda: 80% lari mudah + 20% keras (Norwegian 4×4 & tempo), kekuatan 2×/minggu, tidur 7-9 jam. Kesabaran mengalahkan intensitas.'
-            : 'Mulai dari run-walk — ini cara TERBUKTI & teraman untuk pemula. Jangan buru-buru; konsistensi 3×/minggu jauh lebih penting dari kecepatan.'}
+            ? '🎯 The golden recipe for raising your VO₂max: 80% easy running + 20% hard (Norwegian 4×4 & tempo), strength 2×/week, sleep 7-9 hours. Patience beats intensity.'
+            : 'Start with run-walk — this is the PROVEN & safest approach for beginners. Don\'t rush; consistency 3×/week matters far more than speed.'}
         </p>
       </div>
 
       {/* Symptom troubleshooting — the exact things that go wrong for beginners */}
       <div className="mt-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Atasi Keluhan Umum Saat Lari</div>
+        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Fixing Common Complaints While Running</div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {[
-            { s: '🦵 Betis pegal/kaku sejak awal', d: 'Anda mendarat di ujung kaki / lari terlalu cepat. Perbaikan: pemanasan 5 mnt jalan + ankle circles; mendarat MIDFOOT tepat di bawah pinggul; perlambat. Kuatkan betis: calf raise 3×15, 3×/minggu. Naikkan jarak maks +10%/minggu.' },
-            { s: '🫁 Napas ngos-ngosan cepat (300m)', d: 'Anda start terlalu ngebut → langsung anaerobik. Perbaikan: mulai SANGAT pelan — tes bicara: jika tak bisa bicara satu kalimat, PELANKAN atau jalan. Napas ritmis (tarik 2-3 langkah, buang 2-3 langkah).' },
-            { s: '😵 Pusing/limbung (500m)', d: '⚠️ Jangan pernah dorong sampai titik ini. Bisa dari napas berlebih, gula darah rendah, dehidrasi — TAPI wajib diperiksa dokter dulu (bisa terkait jantung). Sementara: hanya jalan cepat, minum cukup, makan 1-2 jam sebelum.' },
-            { s: '🎽 Cepat lelah walau jarak pendek', d: 'Basis aerobik belum terbangun — itu WAJAR & cepat membaik. Run-walk 3×/minggu selama 3-4 minggu akan mengubah drastis daya tahan Anda.' },
+            { s: '🦵 Calves sore/tight from the start', d: 'You\'re landing on your toes / running too fast. Fix: 5-min walking warm-up + ankle circles; land MIDFOOT right under the hips; slow down. Strengthen calves: calf raise 3×15, 3×/week. Increase distance by at most +10%/week.' },
+            { s: '🫁 Quickly out of breath (300m)', d: 'You started too fast → straight into anaerobic. Fix: start VERY slow — talk test: if you can\'t say a full sentence, SLOW DOWN or walk. Rhythmic breathing (inhale 2-3 steps, exhale 2-3 steps).' },
+            { s: '😵 Dizzy/unsteady (500m)', d: '⚠️ Never push to this point. It can come from overbreathing, low blood sugar, dehydration — BUT must be checked by a doctor first (could be heart-related). Meanwhile: only brisk walking, stay hydrated, eat 1-2 hours before.' },
+            { s: '🎽 Get tired fast even at short distances', d: 'The aerobic base hasn\'t been built yet — that\'s NORMAL & improves quickly. Run-walk 3×/week for 3-4 weeks will dramatically change your endurance.' },
           ].map((x) => (
             <div key={x.s} className="rounded-xl border border-neutral-100 p-3">
               <div className="text-xs font-extrabold">{x.s}</div>
@@ -495,24 +495,24 @@ function RunnerCoach() {
 
       {/* Cooper goal countdown */}
       <div className="mt-4 rounded-2xl border border-brand/20 bg-brand-50 p-4">
-        <div className="text-xs font-extrabold text-brand-dark">🎯 Target Cooper Test Anda</div>
+        <div className="text-xs font-extrabold text-brand-dark">🎯 Your Cooper Test Target</div>
         <div className="mt-2 grid grid-cols-2 gap-3">
-          <Field label="Target jarak (m)"><input className={inputClass} type="number" value={targetM} onChange={(e) => setTargetM(+e.target.value)} /></Field>
-          <Field label="Waktu tersedia (bulan)"><input className={inputClass} type="number" value={months} onChange={(e) => setMonths(+e.target.value)} /></Field>
+          <Field label="Target distance (m)"><input className={inputClass} type="number" value={targetM} onChange={(e) => setTargetM(+e.target.value)} /></Field>
+          <Field label="Time available (months)"><input className={inputClass} type="number" value={months} onChange={(e) => setMonths(+e.target.value)} /></Field>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <Badge tone={verdict.tone}>{verdict.l}</Badge>
-          <span className="text-[11px] text-neutral-500">Target ≈ VO₂max {targetVo2.toFixed(0)} · Anda sekarang ≈ {vo2max.toFixed(0)}</span>
+          <span className="text-[11px] text-neutral-500">Target ≈ VO₂max {targetVo2.toFixed(0)} · You currently ≈ {vo2max.toFixed(0)}</span>
         </div>
         <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-600">{verdict.d}</p>
         <div className="mt-3 space-y-1.5">
           {[
-            { m: 'Bulan 1', d: canRunCont ? 'Basis aerobik: run-walk → lari kontinu easy 30 mnt. Tanpa sesi keras. Kuatkan betis & core.' : 'Run-walk (lari 1-2 mnt/jalan 1-2 mnt). Tujuan: lari 10 mnt kontinu. Skrining dokter bila ada gejala.' },
-            { m: 'Bulan 2', d: 'Bangun volume: 3-4× easy run, 1 long run naik bertahap. Tambah 4×20 dtk strides. Easy HARUS terasa mudah.' },
-            { m: 'Bulan 3', d: 'Mulai ambang: 1× tempo/minggu. Tes 12 menit percobaan #1 — ukur kemajuan tanpa tekanan.' },
-            { m: 'Bulan 4', d: 'Naikkan VO₂max: 1× Norwegian 4×4/minggu + 1 tempo + 2 easy + 1 long. Kekuatan 2×.' },
-            { m: 'Bulan 5', d: 'Puncak spesifik tes: interval mirip pace Cooper (mis. 6×3 mnt). Latih pacing merata — jangan start ngebut.' },
-            { m: 'Bulan 6 (Januari)', d: 'Minggu 1-2 taper (−40% volume, jaga intensitas). Cooper Test resmi. Strategi: 4 lap merata, sisakan tenaga 2 menit terakhir.' },
+            { m: 'Month 1', d: canRunCont ? 'Aerobic base: run-walk → continuous easy runs of 30 min. No hard sessions. Strengthen calves & core.' : 'Run-walk (run 1-2 min/walk 1-2 min). Goal: run 10 min continuously. See a doctor if there are symptoms.' },
+            { m: 'Month 2', d: 'Build volume: 3-4× easy runs, 1 long run gradually increasing. Add 4×20 sec strides. Easy MUST feel easy.' },
+            { m: 'Month 3', d: 'Start threshold work: 1× tempo/week. Trial 12-minute test #1 — measure progress without pressure.' },
+            { m: 'Month 4', d: 'Raise VO₂max: 1× Norwegian 4×4/week + 1 tempo + 2 easy + 1 long. Strength 2×.' },
+            { m: 'Month 5', d: 'Test-specific peak: intervals resembling Cooper pace (e.g. 6×3 min). Practice even pacing — don\'t sprint the start.' },
+            { m: 'Month 6 (January)', d: 'Weeks 1-2 taper (−40% volume, maintain intensity). Official Cooper Test. Strategy: 4 even laps, save energy for the final 2 minutes.' },
           ].map((x) => (
             <div key={x.m} className="flex gap-2 rounded-lg bg-white/70 p-2.5">
               <span className="shrink-0 text-[10px] font-extrabold text-brand-dark">{x.m}</span>
@@ -521,7 +521,7 @@ function RunnerCoach() {
           ))}
         </div>
         <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-          Strategi hari-H Cooper: <b>jangan start sprint</b> (kesalahan fatal). Bagi rata 4 putaran; kalau masih kuat di 2 menit terakhir, baru habiskan. Pacing merata mengalahkan start ngebut sejauh 100-200m.
+          Cooper Test-day strategy: <b>don't sprint the start</b> (a fatal mistake). Split 4 even laps; if you still feel strong in the last 2 minutes, then empty the tank. Even pacing beats a fast start by 100-200m.
         </p>
       </div>
     </Card>
@@ -547,10 +547,10 @@ export function TrainingPlan() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Generator */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="AI Training Planner" subtitle="Program tersusun rapi: jadwal, repetisi, durasi, istirahat, pace & teknik" />
+        <SectionTitle icon={<IconActivity size={20} />} title="AI Training Planner" subtitle="A neatly structured program: schedule, reps, duration, rest, pace & technique" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="col-span-2 sm:col-span-1">
-            <Field label="Tujuan / Goal">
+            <Field label="Goal">
               <select className={inputClass} value={goal} onChange={(e) => setGoal(e.target.value as Goal)}>
                 {GOALS.map((g) => <option key={g} value={g}>{g}</option>)}
               </select>
@@ -558,12 +558,12 @@ export function TrainingPlan() {
           </div>
           <Field label="Level">
             <select className={inputClass} value={level} onChange={(e) => setLevel(e.target.value as Level)}>
-              <option value="pemula">Pemula</option><option value="menengah">Menengah</option><option value="lanjut">Lanjut</option>
+              <option value="pemula">Beginner</option><option value="menengah">Intermediate</option><option value="lanjut">Advanced</option>
             </select>
           </Field>
-          <Field label="Hari latihan/minggu">
+          <Field label="Training days/week">
             <select className={inputClass} value={days} onChange={(e) => setDays(+e.target.value)}>
-              {[2, 3, 4, 5, 6].map((d) => <option key={d} value={d}>{d} hari</option>)}
+              {[2, 3, 4, 5, 6].map((d) => <option key={d} value={d}>{d} days</option>)}
             </select>
           </Field>
         </div>
@@ -571,7 +571,7 @@ export function TrainingPlan() {
           {(['minggu', 'bulan', 'tahun'] as const).map((v) => (
             <button key={v} onClick={() => setView(v)}
               className={'flex-1 rounded-xl py-2 text-xs font-bold capitalize transition ' + (view === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>
-              {v === 'minggu' ? '📅 Minggu' : v === 'bulan' ? '🗓️ Bulan' : '📆 Tahun'}
+              {v === 'minggu' ? '📅 Week' : v === 'bulan' ? '🗓️ Month' : '📆 Year'}
             </button>
           ))}
         </div>
@@ -582,7 +582,7 @@ export function TrainingPlan() {
 
       {/* Video teknik gerakan (Higgsfield) */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Video Teknik Gerakan" subtitle="Contoh cara melakukan gerakan dengan form yang benar" />
+        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Examples of how to perform movements with correct form" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TECHNIQUE_VIDEOS.map((v) => (
             <div key={v.label} className="overflow-hidden rounded-2xl border border-neutral-100">

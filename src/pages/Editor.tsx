@@ -33,9 +33,9 @@ export function Editor() {
       description: body.trim().slice(0, 160) + (body.length > 160 ? '…' : ''),
       category,
       exam,
-      specialty: specialty.trim() || 'Umum',
+      specialty: specialty.trim() || 'General',
       authorId: account?.email ?? state.currentUserId,
-      authorName: account?.name ?? 'Penulis',
+      authorName: account?.name ?? 'Author',
       fileType: 'Word',
       fileName: title.trim().toLowerCase().replace(/\s+/g, '-').slice(0, 30) + '.docx',
       priceTokens: Number(price) || 0,
@@ -45,10 +45,10 @@ export function Editor() {
       rating: 0,
     }
     uploadMaterial(m)
-    setStatus('Terkirim ke verifikasi AI Claude…')
+    setStatus('Sent to Claude AI verification…')
     const review = await verifyMaterial(state.settings, m)
     setMaterialAIReview(m.id, review)
-    setStatus(review.verdict === 'approved' ? 'Lolos AI ✓ — menunggu verifikator Subspesialis/Profesor.' : 'AI meminta revisi.')
+    setStatus(review.verdict === 'approved' ? 'Passed AI ✓ — awaiting Subspecialist/Professor verifier.' : 'AI requested revisions.')
     setTitle(''); setBody(''); setSpecialty('')
   }
 
@@ -57,21 +57,21 @@ export function Editor() {
       <Card>
         <SectionTitle
           icon={<IconBook size={20} />}
-          title="Tulis Materi / Catatan Kedokteran"
-          subtitle="Tulis, edit, potong, lalu unggah — diteruskan ke verifikator"
+          title="Write Medical Material / Notes"
+          subtitle="Write, edit, trim, then upload — passed on to a verifier"
           right={
-            <Link to="/my-materials"><Button variant="outline">Materi Saya →</Button></Link>
+            <Link to="/my-materials"><Button variant="outline">My Materials →</Button></Link>
           }
         />
         <div className="grid gap-3 md:grid-cols-2">
-          <Field label="Judul"><input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
-          <Field label="Spesialti / Topik"><input className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value)} /></Field>
-          <Field label="Kategori">
+          <Field label="Title"><input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} /></Field>
+          <Field label="Specialty / Topic"><input className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value)} /></Field>
+          <Field label="Category">
             <select className={inputClass} value={category} onChange={(e) => setCategory(e.target.value as MaterialCategory)}>
               {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => <option key={c}>{c}</option>)}
             </select>
           </Field>
-          <Field label="Jalur Ujian">
+          <Field label="Exam Track">
             <select className={inputClass} value={exam} onChange={(e) => setExam(e.target.value as ExamTrack)}>
               {(['USMLE', 'UKMPPD', 'Umum'] as ExamTrack[]).map((c) => <option key={c}>{c}</option>)}
             </select>
@@ -81,10 +81,10 @@ export function Editor() {
 
       <Card>
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Isi materi (editor)</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Material content (editor)</span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={cutSelection}><IconScissors size={14} /> Potong seleksi</Button>
-            <span className="text-xs text-neutral-400">{body.length} karakter</span>
+            <Button variant="ghost" onClick={cutSelection}><IconScissors size={14} /> Cut selection</Button>
+            <span className="text-xs text-neutral-400">{body.length} characters</span>
           </div>
         </div>
         <textarea
@@ -92,18 +92,18 @@ export function Editor() {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={12}
-          placeholder="Tulis catatan/jurnal Anda di sini… pilih teks lalu 'Potong seleksi' untuk memangkas."
+          placeholder="Write your notes/journal here… select text then 'Cut selection' to trim."
           className="w-full resize-y rounded-xl border border-neutral-200 p-3 font-mono text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div className="w-32">
-            <Field label="Harga (PNC)"><input className={inputClass} type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} /></Field>
+            <Field label="Price (PNC)"><input className={inputClass} type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} /></Field>
           </div>
-          <Button onClick={submit} disabled={!title.trim() || !body.trim()}><IconUpload size={16} /> Unggah ke Verifikator</Button>
+          <Button onClick={submit} disabled={!title.trim() || !body.trim()}><IconUpload size={16} /> Upload to Verifier</Button>
           {status && <Badge tone="brand"><IconSparkle size={12} /> {status}</Badge>}
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-xs text-neutral-400">
-          <IconCheck size={12} className="text-brand" /> Pipeline: Tulis → AI Claude → Verifikator (Subspesialis/Profesor) → Terbit di Marketplace.
+          <IconCheck size={12} className="text-brand" /> Pipeline: Write → Claude AI → Verifier (Subspecialist/Professor) → Published on Marketplace.
         </p>
       </Card>
     </div>

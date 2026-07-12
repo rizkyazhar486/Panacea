@@ -16,19 +16,19 @@ export function OnboardingTour() {
   }
 
   const steps = [
-    { icon: '🏠', title: 'Beranda', desc: 'Lihat & bagikan postingan, foto, video.' },
-    { icon: '🫂', title: 'Community', desc: 'Saling dukung, tantangan & teman sehat.' },
-    { icon: '➕', title: 'Tombol Tambah', desc: 'Buat postingan atau story baru.' },
-    { icon: '💓', title: 'VitaPulse', desc: 'Cek kesehatan: tensi, kalori, tidur, dll.' },
-    { icon: '🩺', title: 'Konsultasi', desc: 'Chat & panggilan video dengan dokter.' },
-    { icon: '🧪', title: 'Lab Performa & Penilaian Awal', desc: 'Kekuatan, daya tahan, kecepatan & skrining risiko cedera — di menu Kebugaran.' },
+    { icon: '🏠', title: 'Home', desc: 'View & share posts, photos, videos.' },
+    { icon: '🫂', title: 'Community', desc: 'Support each other with challenges & health buddies.' },
+    { icon: '➕', title: 'Add Button', desc: 'Create a new post or story.' },
+    { icon: '💓', title: 'VitaPulse', desc: 'Check your health: blood pressure, calories, sleep, and more.' },
+    { icon: '🩺', title: 'Consultation', desc: 'Chat & video calls with a doctor.' },
+    { icon: '🧪', title: 'Performance Lab & Initial Assessment', desc: 'Strength, endurance, speed & injury-risk screening — in the Fitness menu.' },
   ]
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="Panduan pengguna baru">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="New user guide">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl">
-        <div className="mb-1 text-center text-2xl font-black text-ink">Selamat datang 👋</div>
-        <p className="mb-4 text-center text-sm text-neutral-500">Tonton video singkat ini dulu, atau langsung kenali tombol-tombol utama di bawah:</p>
+        <div className="mb-1 text-center text-2xl font-black text-ink">Welcome 👋</div>
+        <p className="mb-4 text-center text-sm text-neutral-500">Watch this short video first, or go straight to getting familiar with the main buttons below:</p>
 
         <div className="mb-5 overflow-hidden rounded-2xl bg-black">
           <video
@@ -54,7 +54,7 @@ export function OnboardingTour() {
 
         <button onClick={close} className="mt-6 w-full rounded-2xl py-3.5 text-base font-bold text-white transition active:scale-95"
           style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-          Mulai ✓
+          Get Started ✓
         </button>
       </div>
     </div>
@@ -86,19 +86,19 @@ export function AssessmentPrompt() {
   if (!show) return null
   function dismiss() { try { localStorage.setItem(PROMPT_KEY, '1') } catch { /* ignore */ }; setShow(false) }
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="Ajakan penilaian awal">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="Initial assessment prompt">
       <div className="w-full max-w-md rounded-t-3xl bg-white p-6 text-center shadow-2xl sm:rounded-3xl">
         <div className="text-4xl">🧪</div>
-        <div className="mt-2 text-xl font-black text-ink">Sebelum mulai berlatih…</div>
+        <div className="mt-2 text-xl font-black text-ink">Before you start training…</div>
         <p className="mt-2 text-sm text-neutral-500">
-          Isi <b>Penilaian Awal</b> (2-3 menit): pola gerak, nyeri, kekuatan dasar & asimetri kanan-kiri.
-          Ini membantu program latihan Anda lebih aman dan efektif sejak hari pertama.
+          Complete the <b>Initial Assessment</b> (2-3 minutes): movement patterns, pain, baseline strength & left-right asymmetry.
+          This helps make your training program safer and more effective from day one.
         </p>
         <a href="#/assessment" onClick={dismiss} className="mt-5 block w-full rounded-2xl py-3.5 text-center text-base font-bold text-white transition active:scale-95"
           style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-          Isi Sekarang →
+          Complete Now →
         </a>
-        <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-400">Nanti saja</button>
+        <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-400">Maybe later</button>
       </div>
     </div>
   )

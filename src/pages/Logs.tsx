@@ -4,7 +4,7 @@ import { Card } from '../components/ui'
 import { HealthSnapshot } from '../components/HealthSnapshot'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 
-const PROGRAM_OPTIONS = ['—', 'SIPSS / Kedinasan', 'HYROX', 'Marathon (42K)', 'Half Marathon (21K)', 'Shape: Beginner', 'Shape: Intermediate', 'Shape: Advanced', 'Shape: Pro', 'Custom']
+const PROGRAM_OPTIONS = ['—', 'SIPSS / Civil Service Exam', 'HYROX', 'Marathon (42K)', 'Half Marathon (21K)', 'Shape: Beginner', 'Shape: Intermediate', 'Shape: Advanced', 'Shape: Pro', 'Custom']
 const RPE_COLOR = (v: number) => (v >= 8 ? '#EF4444' : v >= 5 ? '#F59E0B' : '#00BF63')
 
 // Log — consolidated data-visualization dashboard: Training Intensity (RPE) trend
@@ -13,7 +13,7 @@ const RPE_COLOR = (v: number) => (v >= 8 ? '#EF4444' : v >= 5 ? '#F59E0B' : '#00
 export function Logs() {
   const { state, account, addTrainingLog, setActiveProgram } = useStore()
   const [rpe, setRpe] = useState(6)
-  const [type, setType] = useState('Lari')
+  const [type, setType] = useState('Run')
   const [note, setNote] = useState('')
 
   if (!account) return null
@@ -65,8 +65,8 @@ export function Logs() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
-          <h1 className="text-lg font-black text-ink">Log & Statistik</h1>
-          <p className="text-xs text-neutral-400">Intensitas latihan, komunitas, relasi & tantangan Anda</p>
+          <h1 className="text-lg font-black text-ink">Logs & Stats</h1>
+          <p className="text-xs text-neutral-400">Your training intensity, communities, relationships & challenges</p>
         </div>
       </div>
 
@@ -75,8 +75,8 @@ export function Logs() {
       {/* RPE trend (recharts) */}
       <Card className="space-y-3">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-black text-ink">📈 Intensitas Latihan (RPE) — 30 hari</div>
-          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">rata² {avgRpe}</span>
+          <div className="text-xs font-black text-ink">📈 Training Intensity (RPE) — 30 days</div>
+          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">avg {avgRpe}</span>
         </div>
         <div style={{ width: '100%', height: 180 }}>
           <ResponsiveContainer>
@@ -84,31 +84,31 @@ export function Logs() {
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2ef" vertical={false} />
               <XAxis dataKey="day" tick={{ fontSize: 9, fill: '#9aa5a0' }} interval={5} />
               <YAxis domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} tick={{ fontSize: 9, fill: '#9aa5a0' }} />
-              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #eee' }} formatter={(v) => [`RPE ${v}`, 'Intensitas']} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #eee' }} formatter={(v) => [`RPE ${v}`, 'Intensity']} />
               <ReferenceLine y={8} stroke="#EF4444" strokeDasharray="4 4" strokeOpacity={0.5} />
               <Line type="monotone" dataKey="rpe" stroke="#00BF63" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
             </LineChart>
           </ResponsiveContainer>
         </div>
-        {logged.length === 0 && <p className="text-center text-[11px] text-neutral-400">Belum ada catatan. Catat intensitas di bawah.</p>}
+        {logged.length === 0 && <p className="text-center text-[11px] text-neutral-400">No entries yet. Log your intensity below.</p>}
         {/* RPE logger */}
         <div className="space-y-2 border-t border-neutral-100 pt-3">
           <div className="flex items-center gap-2">
-            <input value={type} onChange={(e) => setType(e.target.value)} placeholder="Jenis (Lari, Gym, HIIT…)" className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
+            <input value={type} onChange={(e) => setType(e.target.value)} placeholder="Type (Run, Gym, HIIT…)" className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
             <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-white" style={{ background: RPE_COLOR(rpe) }}>RPE {rpe}</span>
           </div>
           <input type="range" min={1} max={10} value={rpe} onChange={(e) => setRpe(+e.target.value)} className="w-full accent-[#00BF63]" />
-          <div className="flex justify-between text-[9px] text-neutral-400"><span>1 Ringan</span><span>5 Sedang</span><span>10 Maksimal</span></div>
-          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Catatan (opsional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
-          <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Catat Intensitas Hari Ini</button>
+          <div className="flex justify-between text-[9px] text-neutral-400"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
+          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notes (optional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
+          <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Log Today's Intensity</button>
         </div>
       </Card>
 
       {/* Calendar */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">📅 Kalender Latihan — {today.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</div>
+        <div className="text-xs font-black text-ink">📅 Training Calendar — {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
         <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-neutral-400">
-          {['M', 'S', 'S', 'R', 'K', 'J', 'S'].map((d, i) => <div key={i}>{d}</div>)}
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={i}>{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: firstDow }).map((_, i) => <div key={`e${i}`} />)}
@@ -122,27 +122,27 @@ export function Logs() {
             )
           })}
         </div>
-        <p className="text-[10px] text-neutral-400">Hijau = ada latihan / check-in / aktivitas GPS hari itu.</p>
+        <p className="text-[10px] text-neutral-400">Green = training / check-in / GPS activity that day.</p>
       </Card>
 
       {/* Current program */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">🎯 Program Latihan Saat Ini</div>
+        <div className="text-xs font-black text-ink">🎯 Current Training Program</div>
         <select value={state.activeProgram ?? '—'} onChange={(e) => setActiveProgram(e.target.value)} className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand">
           {PROGRAM_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
-        {state.activeProgram && state.activeProgram !== '—' && <p className="text-[11px] text-brand-dark">Sedang menjalani: <b>{state.activeProgram}</b></p>}
+        {state.activeProgram && state.activeProgram !== '—' && <p className="text-[11px] text-brand-dark">Currently following: <b>{state.activeProgram}</b></p>}
       </Card>
 
       {/* Communities */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">🏃 Komunitas yang Diikuti ({myCommunities.length})</div>
-        {myCommunities.length === 0 ? <p className="text-[11px] text-neutral-400">Belum bergabung komunitas. Buka Community untuk gabung.</p> : (
+        <div className="text-xs font-black text-ink">🏃 Communities Joined ({myCommunities.length})</div>
+        {myCommunities.length === 0 ? <p className="text-[11px] text-neutral-400">No communities joined yet. Open Community to join one.</p> : (
           <div className="space-y-1.5">
             {myCommunities.map((c) => (
               <div key={c.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
                 <span><b className="text-ink">{c.name}</b> · <span className="text-brand-dark">{c.sportTag}</span></span>
-                <span className="text-neutral-400">{c.memberNames.length} anggota</span>
+                <span className="text-neutral-400">{c.memberNames.length} member(s)</span>
               </div>
             ))}
           </div>
@@ -151,34 +151,34 @@ export function Logs() {
 
       {/* Special person (affinity) */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">💞 Relasi Terdekat</div>
+        <div className="text-xs font-black text-ink">💞 Closest Relationship</div>
         {state.buddyName ? (
           <div className="rounded-xl bg-pink-50 p-3 text-pink-700">
             <div className="text-sm font-bold">🤝 {state.buddyName}</div>
-            <div className="mt-1 text-[11px]">Skor afinitas <b>{affinity}/100</b> · streak {streak} hari · {sharedCommunities.length} komunitas bersama</div>
+            <div className="mt-1 text-[11px]">Affinity score <b>{affinity}/100</b> · {streak}-day streak · {sharedCommunities.length} shared communities</div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/60"><div className="h-full rounded-full bg-pink-500" style={{ width: `${affinity}%` }} /></div>
           </div>
-        ) : <p className="text-[11px] text-neutral-400">Belum ada Health Buddy. Tetapkan di Community untuk melacak afinitas.</p>}
+        ) : <p className="text-[11px] text-neutral-400">No Health Buddy yet. Set one in Community to track affinity.</p>}
       </Card>
 
       {/* Circles */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">🫂 Circle of Care ({state.circles.length})</div>
-        {state.circles.length === 0 ? <p className="text-[11px] text-neutral-400">Belum ada circle.</p> : state.circles.map((c) => (
-          <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600"><b className="text-ink">{c.name}</b> — {c.memberNames.join(', ') || 'belum ada anggota'}</div>
+        {state.circles.length === 0 ? <p className="text-[11px] text-neutral-400">No circles yet.</p> : state.circles.map((c) => (
+          <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600"><b className="text-ink">{c.name}</b> — {c.memberNames.join(', ') || 'no members yet'}</div>
         ))}
       </Card>
 
       {/* Challenges */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">🏆 Tantangan Saya ({state.challenges.length})</div>
-        {state.challenges.length === 0 ? <p className="text-[11px] text-neutral-400">Belum ada tantangan aktif.</p> : state.challenges.map((c) => {
+        <div className="text-xs font-black text-ink">🏆 My Challenges ({state.challenges.length})</div>
+        {state.challenges.length === 0 ? <p className="text-[11px] text-neutral-400">No active challenges yet.</p> : state.challenges.map((c) => {
           const me2 = c.participants.find((p) => p.email === account.email)
           const top = [...c.participants].sort((a, b) => b.progress - a.progress)[0]
           return (
             <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
               <b className="text-ink">{c.title}</b>
-              <div className="text-neutral-500">Progres Anda: {me2?.progress ?? 0} {c.unit} · pemuncak: {top?.name ?? '—'} ({top?.progress ?? 0})</div>
+              <div className="text-neutral-500">Your progress: {me2?.progress ?? 0} {c.unit} · leader: {top?.name ?? '—'} ({top?.progress ?? 0})</div>
             </div>
           )
         })}
@@ -186,8 +186,8 @@ export function Logs() {
 
       {/* Wall of gratitude */}
       <Card className="space-y-2">
-        <div className="text-xs font-black text-ink">🙏 Dinding Terima Kasih ({state.gratitudes.length})</div>
-        {state.gratitudes.length === 0 ? <p className="text-[11px] text-neutral-400">Belum ada ucapan.</p> : state.gratitudes.slice(0, 8).map((g) => (
+        <div className="text-xs font-black text-ink">🙏 Wall of Gratitude ({state.gratitudes.length})</div>
+        {state.gratitudes.length === 0 ? <p className="text-[11px] text-neutral-400">No messages yet.</p> : state.gratitudes.slice(0, 8).map((g) => (
           <div key={g.id} className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-neutral-700"><b>{g.fromName}</b> → <b>{g.toName}</b>: "{g.text}"</div>
         ))}
       </Card>
