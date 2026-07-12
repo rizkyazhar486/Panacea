@@ -77,14 +77,14 @@ export function Architecture() {
             α={WEIGHTS.alpha} · β={WEIGHTS.beta} · γ={WEIGHTS.gamma}
           </div>
           <div className="mt-4 text-base">
-            FinalScore<sub>i</sub> = CombinedScore<sub>i</sub> &nbsp;jika&nbsp; S<sub>i</sub> ≥ {S_THRESHOLD};
-            &nbsp; selain itu <span className="text-accent">BLOCKED</span>
+            FinalScore<sub>i</sub> = CombinedScore<sub>i</sub> &nbsp;if&nbsp; S<sub>i</sub> ≥ {S_THRESHOLD};
+            &nbsp; otherwise <span className="text-accent">BLOCKED</span>
           </div>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Legend tag="V" title="Vertical" desc="Konkordansi pedoman, kebenaran dosis; kontraindikasi keras ⇒ V=0." color="#0b7a4b" />
-          <Legend tag="L" title="Lateral" desc="Confidence LLM terkalibrasi, relevansi konteks, manfaat alternatif." color="#3b82f6" />
-          <Legend tag="S" title="Safety" desc="DDI severity, alergi, margin renal/hepatik; kontraindikasi absolut ⇒ S=0." color="#00BF63" />
+          <Legend tag="V" title="Vertical" desc="Guideline concordance, dosing correctness; hard contraindication ⇒ V=0." color="#0b7a4b" />
+          <Legend tag="L" title="Lateral" desc="Calibrated LLM confidence, context relevance, benefit of alternatives." color="#3b82f6" />
+          <Legend tag="S" title="Safety" desc="DDI severity, allergies, renal/hepatic margin; absolute contraindication ⇒ S=0." color="#00BF63" />
         </div>
         <pre className="mt-4 overflow-x-auto rounded-xl bg-neutral-900 p-4 text-xs leading-relaxed text-neutral-100">
 {`function evaluate_candidate(plan, patient):
@@ -96,16 +96,16 @@ export function Architecture() {
         reject_with_reason("Safety gate: DDI/allergy/contraindication")
     else:
         return {score: combined, V, L, S, evidence: collate_evidence(plan)}
-# Override rencana yang ditolak ⇒ wajib justifikasi klinisi (tersimpan di audit log).`}
+# Overriding a rejected plan ⇒ requires clinician justification (recorded in the audit log).`}
         </pre>
         <p className="mt-2 text-xs text-neutral-400">
-          → Diimplementasikan langsung pada modul <b>Planning</b> (CDSS Safety Engine).
+          → Implemented directly in the <b>Planning</b> module (CDSS Safety Engine).
         </p>
       </Card>
 
       {/* Modules */}
       <Card>
-        <SectionTitle icon={<IconEMR size={18} />} title="Modul (Microservices)" subtitle="12 layanan inti" />
+        <SectionTitle icon={<IconEMR size={18} />} title="Modules (Microservices)" subtitle="12 core services" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {MODULES.map(([t, d], i) => (
             <div key={t} className="rounded-xl border border-neutral-100 p-3">
@@ -123,7 +123,7 @@ export function Architecture() {
 
       {/* Data flow */}
       <Card>
-        <SectionTitle title="Alur Data" subtitle="EHR → reasoning → DDI → LLM lateral → ensemble → safety gate → klinisi" />
+        <SectionTitle title="Data Flow" subtitle="EHR → reasoning → DDI → lateral LLM → ensemble → safety gate → clinician" />
         <ol className="space-y-2">
           {FLOW.map((f, i) => (
             <li key={i} className="flex gap-3 text-sm">
@@ -139,7 +139,7 @@ export function Architecture() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Roadmap */}
         <Card>
-          <SectionTitle title="Roadmap MVP → Skala" />
+          <SectionTitle title="Roadmap MVP → Scale" />
           <div className="space-y-3">
             {ROADMAP.map(([phase, desc, tone]) => (
               <div key={phase} className="rounded-xl border border-neutral-100 p-3">
@@ -152,7 +152,7 @@ export function Architecture() {
 
         {/* Eval metrics */}
         <Card>
-          <SectionTitle icon={<IconBook size={18} />} title="Metrik Evaluasi" />
+          <SectionTitle icon={<IconBook size={18} />} title="Evaluation Metrics" />
           <div className="space-y-2.5">
             {METRICS.map(([t, d]) => (
               <div key={t}>
@@ -166,7 +166,7 @@ export function Architecture() {
 
       {/* Regulatory */}
       <Card>
-        <SectionTitle icon={<IconShield size={18} />} title="Checklist Regulatori & Deployment" />
+        <SectionTitle icon={<IconShield size={18} />} title="Regulatory & Deployment Checklist" />
         <ul className="space-y-2">
           {REG.map((r) => (
             <li key={r} className="flex gap-2 text-sm text-neutral-600">
@@ -176,9 +176,9 @@ export function Architecture() {
           ))}
         </ul>
         <p className="mt-3 text-xs text-neutral-400">
-          Privasi & training: federated learning untuk update adapter LLM & prediktor DDI; data tetap
-          lokal, dikombinasikan dengan Differential Privacy & secure aggregation. Evaluasi pada test-set
-          berfokus keamanan sebelum rollout, dengan versioning & jalur rollback.
+          Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays
+          local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused
+          test set before rollout, with versioning & rollback paths.
         </p>
       </Card>
     </div>

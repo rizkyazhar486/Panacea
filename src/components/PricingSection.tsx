@@ -80,38 +80,38 @@ type Tier = {
 
 const TIERS: Tier[] = [
   {
-    name: 'Gratis',
-    tagline: 'Untuk semua orang, selamanya',
+    name: 'Free',
+    tagline: 'For everyone, forever',
     price: 'Rp0',
     features: [
-      <>AI Chatbot — anamnesis &amp; edukasi kesehatan</>,
-      <>Community, GPS Faskes &amp; SOS darurat</>,
-      <>Kalkulator Klinis — gratis untuk 50 pendaftar pertama</>,
+      <>AI Chatbot — history-taking &amp; health education</>,
+      <>Community, Facility GPS &amp; Emergency SOS</>,
+      <>Clinical Calculators — free for the first 50 sign-ups</>,
     ],
   },
   {
     name: 'Plus',
-    tagline: 'Nilai longevity personal, bertenaga AI',
-    price: 'Rp49.000',
-    note: '/bulan',
+    tagline: 'Personal longevity insight, powered by AI',
+    price: 'Rp49,000',
+    note: '/month',
     highlight: true,
     features: [
-      <>Semua di paket Gratis</>,
-      <>Kalkulator Longevity AI — pola makan, olahraga, tidur &amp; berjemur</>,
-      <>2× Konsultasi AI Mendalam per bulan (senilai Rp98.000)</>,
-      <>Akses penuh Kalkulator Klinis (di luar kuota gratis)</>,
+      <>Everything in the Free plan</>,
+      <>AI Longevity Calculator — diet, exercise, sleep &amp; sun exposure</>,
+      <>2× In-depth AI Consultations per month (worth Rp98,000)</>,
+      <>Full access to Clinical Calculators (beyond the free quota)</>,
     ],
   },
   {
     name: 'Pro',
-    tagline: 'Untuk kondisi kronis & pemantauan berkelanjutan',
-    price: 'Rp199.000',
-    note: '/bulan',
+    tagline: 'For chronic conditions & ongoing monitoring',
+    price: 'Rp199,000',
+    note: '/month',
     features: [
-      <>Semua di paket Plus</>,
-      <>Pemantauan Kronis — tren biomarker &amp; rekomendasi berkelanjutan</>,
-      <>Konsultasi AI Mendalam tanpa batas</>,
-      <>Dukungan prioritas</>,
+      <>Everything in the Plus plan</>,
+      <>Chronic Monitoring — biomarker trends &amp; ongoing recommendations</>,
+      <>Unlimited in-depth AI Consultations</>,
+      <>Priority support</>,
     ],
   },
 ]
@@ -126,24 +126,24 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
 
       <div className="relative mx-auto max-w-5xl">
         <Reveal className="text-center">
-          <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300">Transparan & Adil</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300">Transparent & Fair</span>
           <h2 className="mt-4 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl">
             <span className="inline-flex items-center gap-3">
-              Layanan
+              Services
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-base sm:h-10 sm:w-10 sm:text-lg">↓</span>
             </span>
             <br />
-            <span className="font-serif-display italic text-emerald-300">&amp; Harga</span>
+            <span className="font-serif-display italic text-emerald-300">&amp; Pricing</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-white/60">
-            Tiga paket sederhana — pilih sesuai kebutuhan, naik atau turun kapan saja.
+            Three simple plans — pick what fits your needs, upgrade or downgrade anytime.
           </p>
         </Reveal>
 
         {promo && promo.slotsLeft > 0 && (
           <Reveal delay={60}>
             <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-center text-sm font-semibold text-emerald-200">
-              🎉 Diskon {promo.discountPct}% SEMUA paket untuk {promo.slotsLeft} pendaftar berikutnya — early-bird terbatas.
+              🎉 {promo.discountPct}% off ALL plans for the next {promo.slotsLeft} sign-ups — limited early-bird offer.
             </div>
           </Reveal>
         )}
@@ -153,7 +153,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
             <Reveal key={t.name} delay={40 + i * 50}>
               <TiltCard className={t.highlight ? 'ring-1 ring-emerald-400/30' : ''}>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                  {t.highlight && <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Paling populer</span>}
+                  {t.highlight && <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Most popular</span>}
                   {t.name}
                 </div>
                 <h3 className="mt-1 text-xl font-extrabold text-white">{t.tagline}</h3>
@@ -170,7 +170,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                     t.highlight ? 'bg-emerald-400 text-brand-dark hover:brightness-105' : 'bg-white/10 text-white hover:bg-white/15'
                   }`}
                 >
-                  {t.name === 'Gratis' ? 'Mulai Gratis' : `Pilih ${t.name}`}
+                  {t.name === 'Free' ? 'Start Free' : `Choose ${t.name}`}
                 </button>
               </TiltCard>
             </Reveal>
@@ -181,24 +181,24 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <TiltCard>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">Baru</span> Kalkulator Klinis — akses sekali bayar
+                <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-emerald-300">New</span> Clinical Calculators — one-time payment access
               </div>
               <p className="mt-2 text-sm text-white/60">
-                34 skor &amp; alat bantu keputusan klinis standar internasional (APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, dan lainnya) — untuk yang tidak ingin berlangganan bulanan.
+                34 internationally standard clinical scores &amp; decision-support tools (APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, and more) — for those who'd rather not subscribe monthly.
               </p>
               <div className="mt-4">
-                <PriceLine label="Bayar dari saldo PanaceaToken" price="500 PNC" />
-                <PriceLine label="Setara transfer bank" price="Rp500.000" note="sekali bayar, seumur akun" />
+                <PriceLine label="Pay from your PanaceaToken balance" price="500 PNC" />
+                <PriceLine label="Equivalent bank transfer" price="Rp500,000" note="one-time payment, lifetime access" />
               </div>
             </TiltCard>
             <TiltCard>
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Kronis — opsi seumur akun</div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Chronic — lifetime account option</div>
               <p className="mt-2 text-sm text-white/60">
-                Untuk pasien yang ingin melunasi sekali dibanding berlangganan Pro bertahun-tahun.
+                For patients who'd rather pay once than subscribe to Pro for years on end.
               </p>
               <div className="mt-4">
-                <PriceLine label="Pemantauan Kronis Lifetime" price="Rp19.900.000" note="sekali bayar" />
-                <PriceLine label="1 PanaceaToken (PNC)" price="Rp1.000" note="top-up fleksibel" />
+                <PriceLine label="Chronic Monitoring Lifetime" price="Rp19,900,000" note="one-time payment" />
+                <PriceLine label="1 PanaceaToken (PNC)" price="Rp1,000" note="flexible top-up" />
               </div>
             </TiltCard>
           </div>
@@ -206,21 +206,21 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
 
         <Reveal delay={70}>
           <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-white/15 bg-white/[0.06] px-6 py-4 text-center backdrop-blur-sm">
-            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Cara Pembayaran</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">How to Pay</div>
             <p className="mt-1.5 text-sm text-white/70">
-              Semua pembayaran via <b className="text-white">transfer bank</b> ke rekening resmi:
+              All payments are made via <b className="text-white">bank transfer</b> to our official account:
             </p>
             <div className="mt-2 text-base font-black text-white">{MANUAL_BANK.bank} · {MANUAL_BANK.number}</div>
-            <div className="text-xs text-white/60">a.n. {MANUAL_BANK.holder}</div>
-            <p className="mt-1.5 text-[11px] text-white/45">Unggah bukti transfer di aplikasi — saldo diverifikasi &amp; ditambahkan oleh tim kami.</p>
+            <div className="text-xs text-white/60">Account holder: {MANUAL_BANK.holder}</div>
+            <p className="mt-1.5 text-[11px] text-white/45">Upload your proof of transfer in the app — your balance is verified &amp; added by our team.</p>
           </div>
         </Reveal>
 
         <Reveal delay={80}>
           <p className="mx-auto mt-6 max-w-2xl text-center text-[11px] leading-relaxed text-white/40">
-            AI-EMR + CDSS bersertifikat untuk klinisi/institusi: hubungi kami untuk harga langganan.
-            Pusat Materi Kedokteran: harga ditentukan penulis, royalti otomatis untuk kontributor.
-            Semua harga dalam Rupiah, sudah termasuk PPN yang berlaku.
+            Certified AI-EMR + CDSS for clinicians/institutions: contact us for subscription pricing.
+            Medical Materials Hub: pricing set by authors, royalties paid automatically to contributors.
+            All prices are in Indonesian Rupiah, inclusive of applicable VAT.
           </p>
         </Reveal>
       </div>

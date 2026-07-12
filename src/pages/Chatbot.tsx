@@ -13,16 +13,16 @@ import type { ChatMessage, EMRRecord, PlanItem } from '../lib/types'
 interface ChatSession { id: string; title: string; messages: ChatMessage[]; createdAt: string }
 function getHistory(pid: string): ChatSession[] { try { const r = localStorage.getItem(`ph_${pid}`); return r ? JSON.parse(r) : [] } catch { return [] } }
 function saveHistory(pid: string, s: ChatSession[]) { localStorage.setItem(`ph_${pid}`, JSON.stringify(s)) }
-function makeTitle(msgs: ChatMessage[]): string { const f = msgs.find(m => m.role === 'user'); return f ? (f.content.length > 50 ? f.content.slice(0, 50) + '…' : f.content) : 'Percakapan baru' }
+function makeTitle(msgs: ChatMessage[]): string { const f = msgs.find(m => m.role === 'user'); return f ? (f.content.length > 50 ? f.content.slice(0, 50) + '…' : f.content) : 'New conversation' }
 function groupByDate(sessions: ChatSession[]) {
   const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(), yesterday = today - 864e5
   const g: { label: string; items: ChatSession[] }[] = []
   const t = sessions.filter(s => new Date(s.createdAt).getTime() >= today)
   const y = sessions.filter(s => { const d = new Date(s.createdAt).getTime(); return d >= yesterday && d < today })
   const o = sessions.filter(s => new Date(s.createdAt).getTime() < yesterday)
-  if (t.length) g.push({ label: 'Hari ini', items: t })
-  if (y.length) g.push({ label: 'Kemarin', items: y })
-  if (o.length) g.push({ label: 'Lebih lama', items: o })
+  if (t.length) g.push({ label: 'Today', items: t })
+  if (y.length) g.push({ label: 'Yesterday', items: y })
+  if (o.length) g.push({ label: 'Older', items: o })
   return g
 }
 
@@ -159,15 +159,15 @@ function ctxOf(store: ReturnType<typeof useStore>): PatientContext {
 
 function autoObjective(messages: ChatMessage[], latest?: PatientContext['latestVitals']): string {
   const lines: string[] = []
-  if (latest) { lines.push(`[Auto-vital] TD ${latest.systolic}/${latest.diastolic} mmHg · Nadi ${latest.heartRate}x/mnt · RR ${latest.respRate}x/mnt · Suhu ${latest.tempC}°C · SpO₂ ${latest.spo2}%` + (latest.glucose ? ` · GDS ${latest.glucose} mg/dL` : '')) }
+  if (latest) { lines.push(`[Auto-vital] BP ${latest.systolic}/${latest.diastolic} mmHg · Pulse ${latest.heartRate}/min · RR ${latest.respRate}/min · Temp ${latest.tempC}°C · SpO₂ ${latest.spo2}%` + (latest.glucose ? ` · Blood glucose ${latest.glucose} mg/dL` : '')) }
   const re = /[^.!?\n]*\b(\d{2,3}\/\d{2,3}|\d+(?:[.,]\d+)?\s?(?:mmhg|mg\/dl|°c|celsius|kg|cm|%|x\/menit|bpm|mmol))\b[^.!?\n]*/gi
   const seen = new Set<string>()
   for (const m of messages) { if (m.role !== 'user') continue; const found = m.content.match(re); if (found) found.forEach((f) => seen.add(f.trim())) }
-  seen.forEach((l) => lines.push(`[Auto-Objektif] ${l}`))
+  seen.forEach((l) => lines.push(`[Auto-Objective] ${l}`))
   return lines.join('\n')
 }
 
-const QUICK_REPLIES = ['Jelaskan lebih detail', 'Berikan alternatif tata laksana', 'Pemeriksaan penunjang apa yang disarankan?', 'Apa red flag yang perlu diwaspadai?']
+const QUICK_REPLIES = ['Explain in more detail', 'Provide alternative management options', 'What supporting tests are recommended?', 'What red flags should I watch for?']
 
 export function Chatbot() {
   const store = useStore()
@@ -211,14 +211,14 @@ export function Chatbot() {
   function speak(text: string) {
     if (!voiceOut || typeof window === 'undefined' || !window.speechSynthesis) return
     const clean = text.replace(/[*_#>`~]/g, '')
-    const u = new SpeechSynthesisUtterance(clean); u.lang = 'id-ID'; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u)
+    const u = new SpeechSynthesisUtterance(clean); u.lang = 'en-US'; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u)
   }
 
   function toggleMic() {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SR) { setError('Browser belum mendukung input suara.'); return }
+    if (!SR) { setError('Your browser does not support voice input.'); return }
     if (listening) { recogRef.current?.stop(); return }
-    const r = new SR(); r.lang = 'id-ID'; r.interimResults = false; r.continuous = false
+    const r = new SR(); r.lang = 'en-US'; r.interimResults = false; r.continuous = false
     r.onresult = (e: any) => setInput((p) => (p ? p + ' ' : '') + e.results[0][0].transcript)
     r.onend = () => setListening(false); r.onerror = () => setListening(false)
     recogRef.current = r; setListening(true); r.start()
@@ -228,20 +228,20 @@ export function Chatbot() {
     if (!file) return; setShowAttach(false); setAnalyzing(true); setError('')
     try {
       const dataUrl = await readAsDataUrl(await compressImage(file, 1280, 0.85))
-      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Mengunggah gambar: ${file.name}`, at: new Date().toISOString() }])
-      const r = await api.aiVision(dataUrl, 'Analisis citra pemeriksaan penunjang ini.')
-      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Analisis Gambar**\n\n${r.text}`, at: new Date().toISOString() }))
-    } catch { setError('Gagal menganalisis gambar.') } finally { setAnalyzing(false) }
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `🖼️ Uploading image: ${file.name}`, at: new Date().toISOString() }])
+      const r = await api.aiVision(dataUrl, 'Analyze this diagnostic imaging.')
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `🖼️ **Image Analysis**\n\n${r.text}`, at: new Date().toISOString() }))
+    } catch { setError('Failed to analyze the image.') } finally { setAnalyzing(false) }
   }
 
   async function uploadFile(file?: File) {
     if (!file) return; setShowAttach(false); setAnalyzing(true); setError('')
     try {
       const dataUrl = await readAsDataUrl(file)
-      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `📎 Mengunggah file: ${file.name}`, at: new Date().toISOString() }])
-      const r = await api.aiVision(dataUrl, `Baca dan analisis isi file ${file.name} ini.`)
-      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `📎 **Analisis File**\n\n${r.text}`, at: new Date().toISOString() }))
-    } catch { setError('Gagal menganalisis file.') } finally { setAnalyzing(false) }
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'user', content: `📎 Uploading file: ${file.name}`, at: new Date().toISOString() }])
+      const r = await api.aiVision(dataUrl, `Read and analyze the contents of this file ${file.name}.`)
+      setChat(activePatient.id, (state.chats[activePatient.id] ?? messages).concat({ id: uid(), role: 'assistant', content: `📎 **File Analysis**\n\n${r.text}`, at: new Date().toISOString() }))
+    } catch { setError('Failed to analyze the file.') } finally { setAnalyzing(false) }
   }
 
   async function deepConsult() {
@@ -249,8 +249,8 @@ export function Chatbot() {
     try {
       const r = await api.aiConsult(messages.map((m) => ({ role: m.role, content: m.content })))
       store.syncWalletBalance(r.balance)
-      setChat(activePatient.id, [...messages, { id: uid(), role: 'assistant', content: `🩺 **Konsultasi Mendalam** _(−${r.charged} PNC · sisa ${r.balance})_\n\n${r.text}`, at: new Date().toISOString() }])
-    } catch (e) { if (String(e instanceof Error ? e.message : e).includes('insufficient_balance')) setTopup(true); else setError('Gagal konsultasi mendalam.') } finally { setConsulting(false) }
+      setChat(activePatient.id, [...messages, { id: uid(), role: 'assistant', content: `🩺 **In-Depth Consultation** _(−${r.charged} PNC · ${r.balance} remaining)_\n\n${r.text}`, at: new Date().toISOString() }])
+    } catch (e) { if (String(e instanceof Error ? e.message : e).includes('insufficient_balance')) setTopup(true); else setError('Failed to run the in-depth consultation.') } finally { setConsulting(false) }
   }
 
   async function send() {
@@ -258,7 +258,7 @@ export function Chatbot() {
     const userMsg: ChatMessage = { id: uid(), role: 'user', content: text, at: new Date().toISOString() }
     const next = [...messages, userMsg]; setChat(activePatient.id, next); setInput(''); setBusy(true)
     try { const reply = await sendChat(state.settings, next, ctxOf(store)); setChat(activePatient.id, [...next, { id: uid(), role: 'assistant', content: reply, at: new Date().toISOString() }]); speak(reply) }
-    catch (e) { setError(e instanceof Error ? e.message : 'Gagal menghubungi AI.') } finally { setBusy(false) }
+    catch (e) { setError(e instanceof Error ? e.message : 'Failed to reach the AI.') } finally { setBusy(false) }
   }
 
   async function regenerate() {
@@ -268,7 +268,7 @@ export function Chatbot() {
     const cutAt = messages.length - 1 - lastAiIdx; const context = messages.slice(0, cutAt)
     setChat(activePatient.id, context); setBusy(true); setError('')
     try { const reply = await sendChat(state.settings, context, ctxOf(store)); setChat(activePatient.id, [...context, { id: uid(), role: 'assistant', content: reply, at: new Date().toISOString() }]); speak(reply) }
-    catch (e) { setError(e instanceof Error ? e.message : 'Gagal menghubungi AI.') } finally { setBusy(false) }
+    catch (e) { setError(e instanceof Error ? e.message : 'Failed to reach the AI.') } finally { setBusy(false) }
   }
 
   async function makeDraft() {
@@ -280,11 +280,11 @@ export function Chatbot() {
       const record: EMRRecord = {
         id: existing?.id ?? uid(), patientId: activePatient.id, createdAt: existing?.createdAt ?? now, updatedAt: now,
         anamnesis: { keluhanUtama: d.keluhanUtama, rps: d.rps, rpd: d.rpd, rpk: d.rpk, riwayatKehamilan: '', riwayatPengobatan: d.riwayatPengobatan, riwayatAlergi: d.riwayatAlergi, riwayatTumbuhKembang: '', riwayatNutrisi: d.riwayatNutrisi, riwayatImunisasi: '', riwayatSosialEkonomi: d.riwayatSosialEkonomi },
-        physicalExam: existing?.physicalExam ?? { general: '', vitalsNote: autoObjective(messages, ctxOf(store).latestVitals), perSystem: d.suggestedExams.map((s) => `• [USULAN AI] ${s}`).join('\n'), doctorVerified: false },
+        physicalExam: existing?.physicalExam ?? { general: '', vitalsNote: autoObjective(messages, ctxOf(store).latestVitals), perSystem: d.suggestedExams.map((s) => `• [AI SUGGESTION] ${s}`).join('\n'), doctorVerified: false },
         problems: d.problems.map((pr) => ({ id: uid(), ...pr })), plan, prognosis: d.prognosis, references: d.references,
       }
       saveRecord(record); nav('/emr')
-    } catch (e) { setError(e instanceof Error ? e.message : 'Gagal menyusun draft.') } finally { setDrafting(false) }
+    } catch (e) { setError(e instanceof Error ? e.message : 'Failed to compose the draft.') } finally { setDrafting(false) }
   }
 
   function copyText(text: string, msgId: string) {
@@ -304,8 +304,8 @@ export function Chatbot() {
 
   function exportChat() {
     if (messages.length === 0) return
-    let text = `Chat Anamnesis — ${activePatient.name}\nTanggal: ${new Date().toLocaleDateString('id-ID')}\n${'═'.repeat(50)}\n\n`
-    for (const m of messages) { const t = m.at ? new Date(m.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''; text += `[${t}] ${m.role === 'user' ? '👤 Pasien' : '🤖 AI'}:\n${m.content.replace(/[*_#>`~]/g, '')}\n\n` }
+    let text = `Anamnesis Chat — ${activePatient.name}\nDate: ${new Date().toLocaleDateString('en-US')}\n${'═'.repeat(50)}\n\n`
+    for (const m of messages) { const t = m.at ? new Date(m.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''; text += `[${t}] ${m.role === 'user' ? '👤 Patient' : '🤖 AI'}:\n${m.content.replace(/[*_#>`~]/g, '')}\n\n` }
     const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chat-${activePatient.name}-${new Date().toISOString().slice(0, 10)}.txt`; a.click()
     setTimeout(() => { URL.revokeObjectURL(a.href) }, 1000)
   }
@@ -327,11 +327,11 @@ export function Chatbot() {
     <div className="flex h-[calc(100vh-140px)] min-h-[500px] flex-col">
       <div className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] leading-snug text-amber-800">
         <span className="mt-0.5 shrink-0">⚕️</span>
-        <span><b>Penting:</b> AI ini bersifat <b>edukatif &amp; pendukung</b>, bukan pengganti dokter. Untuk keadaan darurat, segera gunakan <b>Darurat SOS</b>.</span>
+        <span><b>Important:</b> This AI is <b>educational &amp; supportive</b>, not a replacement for a doctor. In an emergency, use <b>Emergency SOS</b> immediately.</span>
       </div>
       {topup && (
         <div className="flex items-center justify-between gap-2 rounded-2xl border border-accent/30 bg-accent/5 px-4 py-3 text-sm">
-          <span className="text-accent">Saldo PNC tidak cukup ({price} PNC).</span>
+          <span className="text-accent">Insufficient PNC balance ({price} PNC).</span>
           <Button onClick={() => nav('/billing')} className="!px-4 !py-1.5 text-xs">Top up</Button>
         </div>
       )}
@@ -340,28 +340,28 @@ export function Chatbot() {
         {/* Header */}
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-black/5 px-5 py-3">
           <div className="flex items-center gap-2.5">
-            <button onClick={() => setShowHistory(true)} title="Riwayat chat" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
+            <button onClick={() => setShowHistory(true)} title="Chat history" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neutral-200 text-neutral-500 transition hover:border-brand hover:text-brand-dark">📜</button>
             <IconChat className="text-brand" size={20} />
             <div>
               <div className="font-bold">Anamnesis Co-Physician</div>
-              <div className="text-xs text-neutral-500">AI mewawancara pasien &amp; merekomendasikan penunjang</div>
+              <div className="text-xs text-neutral-500">AI interviews the patient &amp; recommends supporting tests</div>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Aktif' : 'AI Terbatas'}</Badge>
-            <Button variant="outline" onClick={startNewChat} disabled={messages.length === 0}>➕ Chat Baru</Button>
+            <Badge tone={keyed ? 'brand' : 'high'}>{keyed ? 'AI Active' : 'AI Limited'}</Badge>
+            <Button variant="outline" onClick={startNewChat} disabled={messages.length === 0}>➕ New Chat</Button>
             <Button variant="outline" onClick={exportChat} disabled={messages.length === 0}>📥 Export</Button>
             {backendEnabled && (
               <Button variant="outline" onClick={deepConsult} disabled={consulting || messages.length === 0}>
-                <IconSparkle size={16} />{consulting ? 'Menganalisis…' : `${price} PNC`}
+                <IconSparkle size={16} />{consulting ? 'Analyzing…' : `${price} PNC`}
               </Button>
             )}
             {store.account?.role === 'dokter' ? (
               <Button onClick={makeDraft} disabled={drafting || messages.length === 0}>
-                <IconSparkle size={16} />{drafting ? 'Menyusun…' : 'Susun Draft AI-EMR'}
+                <IconSparkle size={16} />{drafting ? 'Composing…' : 'Compose AI-EMR Draft'}
               </Button>
             ) : (
-              <Badge tone="neutral">Diteruskan ke dokter</Badge>
+              <Badge tone="neutral">Forwarded to physician</Badge>
             )}
           </div>
         </div>
@@ -377,7 +377,7 @@ export function Chatbot() {
             {busy && (
               <div className="flex items-center gap-2.5 text-sm text-neutral-400">
                 <LogoMark size={22} />
-                <span className="animate-pulse">AI sedang menganalisis…</span>
+                <span className="animate-pulse">AI is analyzing…</span>
               </div>
             )}
           </div>
@@ -385,7 +385,7 @@ export function Chatbot() {
             <button
               onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })}
               className="absolute bottom-3 right-5 z-10 grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-lg transition hover:bg-brand hover:text-white"
-              title="Ke bawah"
+              title="Scroll down"
             >
               ↓
             </button>
@@ -411,7 +411,7 @@ export function Chatbot() {
             <div className="relative" ref={attachRef}>
               <button
                 onClick={() => setShowAttach(v => !v)}
-                title="Lampiran"
+                title="Attachment"
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-lg font-bold text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
               >
                 +
@@ -424,8 +424,8 @@ export function Chatbot() {
                   >
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-50 text-base">🖼️</span>
                     <div>
-                      <div className="font-medium">Unggah Gambar</div>
-                      <div className="text-[11px] text-neutral-400">JPG, PNG, dll</div>
+                      <div className="font-medium">Upload Image</div>
+                      <div className="text-[11px] text-neutral-400">JPG, PNG, etc.</div>
                     </div>
                   </button>
                   <button
@@ -434,8 +434,8 @@ export function Chatbot() {
                   >
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-purple-50 text-base">📎</span>
                     <div>
-                      <div className="font-medium">Unggah File</div>
-                      <div className="text-[11px] text-neutral-400">PDF, DOCX, dll</div>
+                      <div className="font-medium">Upload File</div>
+                      <div className="text-[11px] text-neutral-400">PDF, DOCX, etc.</div>
                     </div>
                   </button>
                 </div>
@@ -449,13 +449,13 @@ export function Chatbot() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
               rows={1}
-              placeholder="Tulis keluhan atau pertanyaan medis…"
+              placeholder="Type your medical complaint or question…"
               className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-400"
             />
 
             <button
               onClick={toggleMic}
-              title="Input suara"
+              title="Voice input"
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               🎤
@@ -463,7 +463,7 @@ export function Chatbot() {
 
             <button
               onClick={() => { setVoiceOut(v => { if (v) window.speechSynthesis?.cancel(); return !v }) }}
-              title={voiceOut ? 'Matikan suara' : 'Aktifkan suara'}
+              title={voiceOut ? 'Turn off voice' : 'Turn on voice'}
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${voiceOut ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               {voiceOut ? '🔊' : '🔈'}
@@ -477,7 +477,7 @@ export function Chatbot() {
               <IconSend size={16} />
             </button>
           </div>
-          <p className="mt-2 text-center text-[10px] text-neutral-400">⚕️ AI mendukung, bukan menggantikan, klinisi berlisensi.</p>
+          <p className="mt-2 text-center text-[10px] text-neutral-400">⚕️ AI supports, but does not replace, a licensed clinician.</p>
         </div>
       </Card>
 
@@ -486,11 +486,11 @@ export function Chatbot() {
         <div className="fixed inset-0 z-50 flex">
           <div className="w-80 max-w-[85vw] flex flex-col border-r border-neutral-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
-              <h3 className="font-bold text-sm">📜 Riwayat Chat</h3>
+              <h3 className="font-bold text-sm">📜 Chat History</h3>
               <button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
-              <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Simpan &amp; mulai chat baru</button>
+              <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Save &amp; start new chat</button>
               {groupByDate(history).map(group => (
                 <div key={group.label} className="mt-3">
                   <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">{group.label}</div>
@@ -498,14 +498,14 @@ export function Chatbot() {
                     <div key={session.id} onClick={() => loadSession(session)} className="group/s flex items-center gap-2 rounded-xl px-3 py-2.5 cursor-pointer transition hover:bg-neutral-50">
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-medium text-ink">{session.title}</div>
-                        <div className="text-[11px] text-neutral-400">{new Date(session.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} pesan</div>
+                        <div className="text-[11px] text-neutral-400">{new Date(session.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} message(s)</div>
                       </div>
                       <button onClick={(e) => deleteSession(session.id, e)} className="shrink-0 text-neutral-300 opacity-0 transition group-hover/s:opacity-100 hover:text-red-500">🗑️</button>
                     </div>
                   ))}
                 </div>
               ))}
-              {history.length === 0 && <p className="py-10 text-center text-xs text-neutral-400">Belum ada riwayat.</p>}
+              {history.length === 0 && <p className="py-10 text-center text-xs text-neutral-400">No history yet.</p>}
             </div>
           </div>
           <div className="flex-1 bg-black/25 backdrop-blur-[2px]" onClick={() => setShowHistory(false)} />
@@ -517,13 +517,13 @@ export function Chatbot() {
 }
 
 function Welcome({ name, keyed }: { name: string; keyed: boolean }) {
-  const suggestions = ['Saya merasa nyeri dada sejak 2 hari', 'Akhir-akhir ini sering pusing dan lemas', 'Sesak napas saat aktivitas ringan']
+  const suggestions = ['I have had chest pain for 2 days', 'I have been feeling dizzy and weak lately', 'Shortness of breath during light activity']
   return (
     <div className="mx-auto max-w-xl py-12 text-center">
       <LogoMark size={52} className="mx-auto" />
-      <h3 className="mt-5 text-xl font-bold">Selamat datang, {name}</h3>
-      <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Mulai anamnesis dengan menulis keluhan utama di bawah, atau pilih salah satu saran.</p>
-      {!keyed && <p className="mt-2 text-xs text-accent">AI terbatas — sambungkan server atau tambah API key di Pengaturan.</p>}
+      <h3 className="mt-5 text-xl font-bold">Welcome, {name}</h3>
+      <p className="mt-2 text-sm text-neutral-500 max-w-md mx-auto">Start the anamnesis by writing the chief complaint below, or pick one of the suggestions.</p>
+      {!keyed && <p className="mt-2 text-xs text-accent">AI limited — connect a server or add an API key in Settings.</p>}
       <div className="mt-8 grid gap-2.5 max-w-md mx-auto">
         {suggestions.map((s) => (
           <button key={s} onClick={() => {}} className="rounded-xl border border-black/5 bg-neutral-50/50 px-4 py-3 text-left text-xs text-neutral-600 transition hover:border-brand/30 hover:bg-brand-50/40 hover:text-brand-dark">
@@ -547,7 +547,7 @@ interface BubbleProps {
 
 function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegenerate }: BubbleProps) {
   const isUser = msg.role === 'user'
-  const time = msg.at ? new Date(msg.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : ''
+  const time = msg.at ? new Date(msg.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''
 
   if (isUser) {
     return (

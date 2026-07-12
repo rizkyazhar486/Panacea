@@ -163,14 +163,14 @@ export function Verification() {
 
       {/* Contributor roster */}
       <Card>
-        <SectionTitle title="Kontributor & Verifikator" subtitle="Penulis harus terverifikasi sebelum materinya tampil" />
+        <SectionTitle title="Contributors & Verifiers" subtitle="Authors must be verified before their materials appear" />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-neutral-400">
-                <th className="pb-2 pr-4 font-semibold">Nama</th>
-                <th className="pb-2 pr-4 font-semibold">Peran</th>
-                <th className="pb-2 pr-4 font-semibold">Spesialti</th>
+                <th className="pb-2 pr-4 font-semibold">Name</th>
+                <th className="pb-2 pr-4 font-semibold">Role</th>
+                <th className="pb-2 pr-4 font-semibold">Specialty</th>
                 <th className="pb-2 font-semibold">Status</th>
               </tr>
             </thead>
@@ -185,10 +185,10 @@ export function Verification() {
                   <td className="py-2.5">
                     {c.verified ? (
                       <span className="flex items-center gap-1 text-brand-dark">
-                        <IconCheck size={14} /> Terverifikasi
+                        <IconCheck size={14} /> Verified
                       </span>
                     ) : (
-                      <span className="text-amber-600">Menunggu verifikasi</span>
+                      <span className="text-amber-600">Awaiting verification</span>
                     )}
                   </td>
                 </tr>

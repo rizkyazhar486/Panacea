@@ -144,7 +144,7 @@ export function Pricing() {
         <div className="mt-3 rounded-xl bg-white p-4">
           <div className="text-sm font-black text-ink">{MANUAL_BANK.bank}</div>
           <div className="mt-0.5 text-lg font-black tracking-wide text-brand-dark">{MANUAL_BANK.number}</div>
-          <div className="text-xs text-neutral-500">a.n. {MANUAL_BANK.holder}</div>
+          <div className="text-xs text-neutral-500">Account holder: {MANUAL_BANK.holder}</div>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           After transferring, upload your proof on the Billing page — PNC balance is added once the proof is verified (1 PNC = Rp1,000).

@@ -10,18 +10,18 @@ import type { ProfileEdit } from '../lib/types'
 type Tab = 'posts' | 'locked' | 'reposts' | 'saved' | 'liked' | 'archive'
 
 const TABS: { id: Tab; icon: string; label: string }[] = [
-  { id: 'posts', icon: '▦', label: 'Postingan' },
-  { id: 'locked', icon: '🔒', label: 'Terkunci' },
-  { id: 'reposts', icon: '🔁', label: 'Repost' },
-  { id: 'saved', icon: '🔖', label: 'Tersimpan' },
-  { id: 'liked', icon: '❤️', label: 'Disukai' },
-  { id: 'archive', icon: '📦', label: 'Arsip' },
+  { id: 'posts', icon: '▦', label: 'Posts' },
+  { id: 'locked', icon: '🔒', label: 'Locked' },
+  { id: 'reposts', icon: '🔁', label: 'Reposts' },
+  { id: 'saved', icon: '🔖', label: 'Saved' },
+  { id: 'liked', icon: '❤️', label: 'Liked' },
+  { id: 'archive', icon: '📦', label: 'Archive' },
 ]
 
 // User profile — TikTok/Instagram-style: counts, bio, and tabbed collections
 // (posts, locked, reposts, bookmarks, liked, archive). Locked/archived/saved are
 // private to the owner; others never see them.
-const SEX_LABEL: Record<string, string> = { L: '♂ Laki-laki', P: '♀ Perempuan', '-': 'Tidak disebut' }
+const SEX_LABEL: Record<string, string> = { L: '♂ Male', P: '♀ Female', '-': 'Not specified' }
 
 export function Profile() {
   const { state, account, updateProfile } = useStore()
@@ -66,7 +66,7 @@ export function Profile() {
     <div className="mx-auto w-full max-w-xl">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={openEdit} className="relative h-20 w-20 shrink-0" aria-label="Ubah foto profil">
+        <button onClick={openEdit} className="relative h-20 w-20 shrink-0" aria-label="Change profile photo">
           {profile.avatar
             ? <img src={profile.avatar} alt="" className="h-20 w-20 rounded-full object-cover" />
             : <span className="grid h-20 w-20 place-items-center rounded-full text-2xl font-black text-white" style={{ backgroundColor: '#00BF63' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
@@ -76,9 +76,9 @@ export function Profile() {
           <h1 className="truncate text-lg font-black text-ink">{account.name}</h1>
           <div className="truncate text-xs text-neutral-400">{handle}</div>
           <div className="mt-2 flex gap-5 text-center">
-            <div><div className="text-sm font-black text-ink">{state.follows.length}</div><div className="text-[10px] text-neutral-400">Mengikuti</div></div>
-            <div><div className="text-sm font-black text-ink">{collections.posts.length}</div><div className="text-[10px] text-neutral-400">Postingan</div></div>
-            <div><div className="text-sm font-black text-ink">{totalLikes}</div><div className="text-[10px] text-neutral-400">Suka</div></div>
+            <div><div className="text-sm font-black text-ink">{state.follows.length}</div><div className="text-[10px] text-neutral-400">Following</div></div>
+            <div><div className="text-sm font-black text-ink">{collections.posts.length}</div><div className="text-[10px] text-neutral-400">Posts</div></div>
+            <div><div className="text-sm font-black text-ink">{totalLikes}</div><div className="text-[10px] text-neutral-400">Likes</div></div>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ export function Profile() {
 
       {/* Edit profile button */}
       <button onClick={openEdit} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-700">
-        ✎ Edit Profil
+        ✎ Edit Profile
       </button>
 
       {/* Edit modal — portaled to <body> so it can't get trapped behind the
@@ -112,25 +112,25 @@ export function Profile() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setEditing(false) }}>
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-black text-ink">Edit Profil</h3>
-              <button onClick={() => setEditing(false)} aria-label="Tutup" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <h3 className="text-base font-black text-ink">Edit Profile</h3>
+              <button onClick={() => setEditing(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
-            {/* Foto */}
+            {/* Photo */}
             <div className="mb-4 flex flex-col items-center gap-2">
-              <button onClick={() => fileRef.current?.click()} disabled={busy} className="relative h-24 w-24" aria-label="Unggah foto">
+              <button onClick={() => fileRef.current?.click()} disabled={busy} className="relative h-24 w-24" aria-label="Upload photo">
                 {draft.avatar
                   ? <img src={draft.avatar} alt="" className="h-24 w-24 rounded-full object-cover" />
                   : <span className="grid h-24 w-24 place-items-center rounded-full text-2xl font-black text-white" style={{ backgroundColor: '#00BF63' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
                 <span className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-brand text-xs text-white">📷</span>
               </button>
-              <span className="text-[11px] text-neutral-400">{busy ? 'Mengunggah…' : 'Ketuk untuk ganti foto'}</span>
+              <span className="text-[11px] text-neutral-400">{busy ? 'Uploading…' : 'Tap to change photo'}</span>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => pickAvatar(e.target.files?.[0])} />
             </div>
 
             <div className="space-y-3">
               <label className="block">
-                <span className="text-xs font-bold text-neutral-500">Jenis Kelamin</span>
+                <span className="text-xs font-bold text-neutral-500">Sex</span>
                 <div className="mt-1 flex gap-2">
                   {(['L', 'P', '-'] as const).map((s) => (
                     <button key={s} onClick={() => setDraft((d) => ({ ...d, sex: s }))}
@@ -139,24 +139,24 @@ export function Profile() {
                 </div>
               </label>
               <label className="block">
-                <span className="text-xs font-bold text-neutral-500">Pekerjaan / Keahlian</span>
-                <input value={draft.profession ?? ''} onChange={(e) => setDraft((d) => ({ ...d, profession: e.target.value }))} placeholder="mis. Dokter Umum, Atlet, Pelatih" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <span className="text-xs font-bold text-neutral-500">Profession / Expertise</span>
+                <input value={draft.profession ?? ''} onChange={(e) => setDraft((d) => ({ ...d, profession: e.target.value }))} placeholder="e.g. General Practitioner, Athlete, Coach" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
               </label>
               <label className="block">
-                <span className="text-xs font-bold text-neutral-500">Domisili</span>
-                <input value={draft.location ?? ''} onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))} placeholder="mis. Jakarta" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <span className="text-xs font-bold text-neutral-500">Location</span>
+                <input value={draft.location ?? ''} onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))} placeholder="e.g. Jakarta" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
               </label>
               <label className="block">
                 <span className="text-xs font-bold text-neutral-500">Bio</span>
-                <textarea value={draft.bio ?? ''} onChange={(e) => setDraft((d) => ({ ...d, bio: e.target.value }))} placeholder="Ceritakan tentang Anda…" className="mt-1 min-h-[64px] w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <textarea value={draft.bio ?? ''} onChange={(e) => setDraft((d) => ({ ...d, bio: e.target.value }))} placeholder="Tell us about yourself…" className="mt-1 min-h-[64px] w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
               </label>
               <label className="block">
-                <span className="text-xs font-bold text-neutral-500">Tautan / Sitasi (URL)</span>
-                <input value={draft.link ?? ''} onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))} placeholder="mis. linkedin.com/in/nama atau doi.org/…" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
+                <span className="text-xs font-bold text-neutral-500">Link / Citation (URL)</span>
+                <input value={draft.link ?? ''} onChange={(e) => setDraft((d) => ({ ...d, link: e.target.value }))} placeholder="e.g. linkedin.com/in/name or doi.org/…" className="mt-1 w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand" />
               </label>
             </div>
 
-            <button onClick={saveProfile} className="mt-5 w-full rounded-2xl py-3 text-base font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Simpan Profil</button>
+            <button onClick={saveProfile} className="mt-5 w-full rounded-2xl py-3 text-base font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Save Profile</button>
           </div>
         </div>
         </Portal>
@@ -177,12 +177,12 @@ export function Profile() {
       <div className="mt-4 space-y-4">
         {list.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
-            {tab === 'posts' && 'Belum ada postingan. Buat lewat tombol ＋.'}
-            {tab === 'locked' && '🔒 Belum ada postingan terkunci. Postingan terkunci hanya terlihat oleh Anda.'}
-            {tab === 'reposts' && '🔁 Belum ada repost.'}
-            {tab === 'saved' && '🔖 Belum ada yang disimpan. Bookmark postingan untuk melihatnya di sini (privat).'}
-            {tab === 'liked' && '❤️ Belum ada yang disukai.'}
-            {tab === 'archive' && '📦 Arsip kosong. Postingan yang diarsipkan disembunyikan dari publik.'}
+            {tab === 'posts' && 'No posts yet. Create one using the ＋ button.'}
+            {tab === 'locked' && '🔒 No locked posts yet. Locked posts are only visible to you.'}
+            {tab === 'reposts' && '🔁 No reposts yet.'}
+            {tab === 'saved' && '🔖 Nothing saved yet. Bookmark posts to see them here (private).'}
+            {tab === 'liked' && '❤️ Nothing liked yet.'}
+            {tab === 'archive' && '📦 Archive is empty. Archived posts are hidden from the public.'}
           </div>
         ) : (
           list.map((p) => <PostCard key={p.id} post={p} viewerEmail={email} viewerName={account.name} />)

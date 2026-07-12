@@ -35,21 +35,21 @@ function weatherEmoji(code: number): string {
 }
 
 function weatherLabel(code: number): string {
-  if (code === 0) return 'Cerah'
-  if (code === 1 || code === 2) return 'Cerah Berawan'
-  if (code === 3) return 'Berawan'
-  if (code === 45 || code === 48) return 'Berkabut'
-  if ([51, 53, 55, 56, 57].includes(code)) return 'Gerimis'
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Hujan'
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Salju'
-  if ([95, 96, 99].includes(code)) return 'Badai Petir'
-  return 'Tidak diketahui'
+  if (code === 0) return 'Clear'
+  if (code === 1 || code === 2) return 'Partly Cloudy'
+  if (code === 3) return 'Cloudy'
+  if (code === 45 || code === 48) return 'Foggy'
+  if ([51, 53, 55, 56, 57].includes(code)) return 'Drizzle'
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Rain'
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow'
+  if ([95, 96, 99].includes(code)) return 'Thunderstorm'
+  return 'Unknown'
 }
 
 function dayLabel(iso: string, i: number): string {
-  if (i === 0) return 'Hari ini'
+  if (i === 0) return 'Today'
   const d = new Date(iso)
-  return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })
+  return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
 export function WeatherWidget() {

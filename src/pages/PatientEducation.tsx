@@ -11,7 +11,7 @@ export function PatientEducation() {
   const record = state.records[pid]
   const sheet = state.education[pid]
   const [busy, setBusy] = useState(false)
-  const diagnosis = record?.problems[0]?.title ?? patient.chronicConditions[0] ?? 'Kondisi kesehatan'
+  const diagnosis = record?.problems[0]?.title ?? patient.chronicConditions[0] ?? 'Health condition'
 
   async function gen() {
     setBusy(true)
@@ -25,8 +25,8 @@ export function PatientEducation() {
     sendEmail({
       id: uid(),
       to: account?.email ?? '',
-      subject: `Edukasi penyakit: ${diagnosis}`,
-      body: `Ringkasan edukasi & cara menjaga kesehatan untuk ${diagnosis} telah tersedia di akun Anda dan dikirim ke email ini.`,
+      subject: `Health education: ${diagnosis}`,
+      body: `An education summary & health-maintenance guide for ${diagnosis} is now available in your account and has been sent to this email.`,
       at: new Date().toISOString(),
     })
     setBusy(false)
@@ -37,18 +37,18 @@ export function PatientEducation() {
       <Card>
         <SectionTitle
           icon={<IconBook size={20} />}
-          title="Edukasi Kesehatan Saya"
-          subtitle="Tanda & gejala singkat · diagnosis · edukasi menyeluruh (makan, minum, tidur, olahraga, sinar matahari)"
+          title="My Health Education"
+          subtitle="Brief signs & symptoms · diagnosis · comprehensive education (diet, hydration, sleep, exercise, sunlight)"
           right={
             <div className="flex gap-2">
-              {sheet && <Button variant="outline" onClick={() => window.print()}><IconBook size={14} /> Unduh PDF</Button>}
-              <Button onClick={gen} disabled={busy}><IconSparkle size={16} /> {busy ? 'Menyusun…' : sheet ? 'Perbarui' : 'Buat Edukasi'}</Button>
+              {sheet && <Button variant="outline" onClick={() => window.print()}><IconBook size={14} /> Download PDF</Button>}
+              <Button onClick={gen} disabled={busy}><IconSparkle size={16} /> {busy ? 'Generating…' : sheet ? 'Update' : 'Generate Education'}</Button>
             </div>
           }
         />
         {!sheet ? (
           <p className="text-sm text-neutral-400">
-            Tekan <b>Buat Edukasi</b> untuk menampilkan penjelasan tentang <b>{diagnosis}</b> dan cara menjaga kesehatan Anda.
+            Press <b>Generate Education</b> to display an explanation of <b>{diagnosis}</b> and how to maintain your health.
           </p>
         ) : (
           <div className="space-y-4">
@@ -58,7 +58,7 @@ export function PatientEducation() {
               <p className="mt-2 text-sm text-white/90">{sheet.ringkas}</p>
             </div>
             <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">Cara Menjaga Kesehatan</div>
+              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">How to Maintain Your Health</div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {sheet.caraMenjaga.map((c, i) => (
                   <div key={i} className="rounded-2xl border border-neutral-100 p-4">
@@ -69,7 +69,7 @@ export function PatientEducation() {
               </div>
             </div>
             <div className="rounded-2xl border-2 border-accent/20 bg-red-50/40 p-4">
-              <div className="mb-2 text-sm font-bold text-accent">Tanda Bahaya — segera ke faskes</div>
+              <div className="mb-2 text-sm font-bold text-accent">Warning Signs — seek care immediately</div>
               <div className="flex flex-wrap gap-2">
                 {sheet.tandaBahaya.map((c, i) => (
                   <span key={i} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold ring-1 ring-accent/20">{c}</span>
@@ -77,7 +77,7 @@ export function PatientEducation() {
               </div>
             </div>
             <details className="rounded-2xl border border-neutral-100 p-4">
-              <summary className="cursor-pointer text-sm font-bold text-neutral-700">Penjelasan mendalam</summary>
+              <summary className="cursor-pointer text-sm font-bold text-neutral-700">In-depth explanation</summary>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{sheet.mendalam}</p>
             </details>
           </div>
@@ -102,33 +102,33 @@ function SurgeryEducation({ pid }: { pid: string }) {
       id: uid(),
       to: account?.email ?? '',
       subject: `Informed consent: ${stage}`,
-      body: `Anda menyetujui tahap "${stage}" untuk prosedur ${s.procedure}. Penjadwalan akan dibantu admin.`,
+      body: `You have agreed to the "${stage}" stage for the ${s.procedure} procedure. Scheduling will be assisted by admin.`,
       at: new Date().toISOString(),
     })
   }
 
   return (
     <Card className="border-2 border-brand/20">
-      <SectionTitle icon={<IconScissors size={18} />} title={`Edukasi Operasi — ${s.procedure}`} subtitle={`Indikasi: ${s.indication}`} />
+      <SectionTitle icon={<IconScissors size={18} />} title={`Surgery Education — ${s.procedure}`} subtitle={`Indication: ${s.indication}`} />
       <div className="grid gap-3 sm:grid-cols-3">
-        <Phase title="Pra-Operasi" text={s.pre} />
-        <Phase title="Intra-Operasi" text={s.intra} />
-        <Phase title="Pasca-Operasi" text={s.post} />
+        <Phase title="Pre-Operative" text={s.pre} />
+        <Phase title="Intra-Operative" text={s.intra} />
+        <Phase title="Post-Operative" text={s.post} />
       </div>
       <div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-        <b>Keamanan & Risiko:</b> {s.risks}
+        <b>Safety & Risks:</b> {s.risks}
       </div>
 
       <div className="mt-4">
-        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">Informed Consent — Multi-tahap</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">Informed Consent — Multi-stage</div>
         <div className="space-y-2">
           {s.consent.map((c) => (
             <div key={c.stage} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2">
               <span className="text-sm font-medium">{c.stage}</span>
               {c.agreed ? (
-                <Badge tone="brand"><IconCheck size={12} /> Disetujui</Badge>
+                <Badge tone="brand"><IconCheck size={12} /> Agreed</Badge>
               ) : (
-                <Button variant="outline" onClick={() => agree(c.stage)}>Setujui</Button>
+                <Button variant="outline" onClick={() => agree(c.stage)}>Agree</Button>
               )}
             </div>
           ))}
