@@ -2,6 +2,8 @@ import { createServer } from 'node:http'
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 import { config, features } from './config.js'
 import {
   balance,
@@ -78,6 +80,11 @@ import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILAB
 import { attachRealtime } from './realtime.js'
 
 const app = express()
+// Security headers (CSP disabled here — the SPA is served from GitHub Pages,
+// not this API host, so a strict API-side CSP would only add risk of breaking
+// JSON clients without protecting the frontend).
+app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }))
+app.set('trust proxy', 1) // behind Render's proxy — needed for correct client IPs in rate limiting
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
@@ -89,6 +96,22 @@ app.use(
     credentials: true,
   }),
 )
+
+// --- Rate limiting (prepares the server for many users / abuse resistance) ---
+// A generous global cap on every API route, plus a much tighter cap on the
+// auth & OTP surface to blunt brute-force and OTP-spam. Health check is exempt
+// so uptime monitors don't get throttled.
+const globalLimiter = rateLimit({
+  windowMs: 60_000, max: 300, standardHeaders: true, legacyHeaders: false,
+  skip: (req) => req.path === '/api/health',
+  message: { error: 'rate_limited' },
+})
+const authLimiter = rateLimit({
+  windowMs: 15 * 60_000, max: 30, standardHeaders: true, legacyHeaders: false,
+  message: { error: 'rate_limited' },
+})
+app.use('/api', globalLimiter)
+app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 
 // --- health / capability discovery ---
 app.get('/api/health', (_req, res) => {
