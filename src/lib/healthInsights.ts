@@ -32,8 +32,8 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
   const out: Insight[] = []
   if (history.length < 2) {
     return [{
-      id: 'not-enough-data', tone: 'neutral', icon: '📊', title: 'Data belum cukup',
-      body: 'Simpan Data Kesehatan setidaknya beberapa kali (idealnya tiap pagi) agar Panaceamed bisa mendeteksi tren dan memberi rekomendasi otomatis.',
+      id: 'not-enough-data', tone: 'neutral', icon: '📊', title: 'Not enough data yet',
+      body: 'Save your Health Data at least a few times (ideally every morning) so Panaceamed can detect trends and give automatic recommendations.',
     }]
   }
 
@@ -52,14 +52,14 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     if (delta <= -10) {
       out.push({
         id: 'hrv-down', tone: 'critical', icon: '⚠️',
-        title: `HRV turun ${Math.abs(delta).toFixed(0)}%`,
-        body: 'Tanda tubuh belum pulih penuh. Pertimbangkan sesi ringan (Zone 2 santai) atau istirahat penuh hari ini, dan prioritaskan tidur malam ini.',
+        title: `HRV down ${Math.abs(delta).toFixed(0)}%`,
+        body: 'A sign your body hasn\'t fully recovered. Consider an easy session (relaxed Zone 2) or full rest today, and prioritize sleep tonight.',
       })
     } else if (delta >= 10) {
       out.push({
         id: 'hrv-up', tone: 'brand', icon: '💪',
-        title: `HRV membaik ${delta.toFixed(0)}%`,
-        body: 'Tubuh Anda dalam kondisi siap. Ini waktu yang baik untuk sesi lebih berat — interval VO₂max atau latihan kekuatan intensitas tinggi.',
+        title: `HRV improved ${delta.toFixed(0)}%`,
+        body: 'Your body is ready. This is a good time for a harder session — VO₂max intervals or high-intensity strength training.',
       })
     }
   }
@@ -70,8 +70,8 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     if (deltaBpm >= 4) {
       out.push({
         id: 'rhr-up', tone: 'low', icon: '❤️',
-        title: `HR istirahat naik ${deltaBpm.toFixed(0)} bpm`,
-        body: 'Bisa jadi indikasi kelelahan, stres, atau awal sakit. Pantau 2-3 hari ke depan; jika berlanjut disertai gejala lain, pertimbangkan istirahat ekstra.',
+        title: `Resting HR up ${deltaBpm.toFixed(0)} bpm`,
+        body: 'Could indicate fatigue, stress, or the onset of illness. Monitor for the next 2-3 days; if it persists along with other symptoms, consider extra rest.',
       })
     }
   }
@@ -80,8 +80,8 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
   if (recentSleep != null && recentSleep < 6.5) {
     out.push({
       id: 'sleep-low', tone: 'critical', icon: '😴',
-      title: `Rata-rata tidur ${recentSleep.toFixed(1)} jam`,
-      body: 'Di bawah rekomendasi 7-9 jam/malam. Utang tidur menumpuk memengaruhi pemulihan, HRV, dan performa kognitif — coba majukan waktu tidur 30-60 menit.',
+      title: `Average sleep ${recentSleep.toFixed(1)}h`,
+      body: 'Below the recommended 7-9 hours/night. Accumulating sleep debt affects recovery, HRV, and cognitive performance — try moving bedtime 30-60 minutes earlier.',
     })
   }
 
@@ -91,16 +91,16 @@ export function generateInsights(history: HistorySnapshot[]): Insight[] {
     if (delta >= 1) {
       out.push({
         id: 'vo2-up', tone: 'brand', icon: '📈',
-        title: `VO₂max naik ${delta.toFixed(1)} poin`,
-        body: 'Latihan aerobik Anda berbuah hasil. Pertahankan basis Zone 2 dan sesekali interval untuk terus mendorong batas ini.',
+        title: `VO₂max up ${delta.toFixed(1)} points`,
+        body: 'Your aerobic training is paying off. Keep up the Zone 2 base and occasional intervals to keep pushing this limit.',
       })
     }
   }
 
   if (!out.length) {
     out.push({
-      id: 'stable', tone: 'neutral', icon: '✅', title: 'Semua terlihat stabil',
-      body: 'Tidak ada perubahan signifikan pada tren terbaru Anda. Terus konsisten dengan rutinitas & pencatatan.',
+      id: 'stable', tone: 'neutral', icon: '✅', title: 'Everything looks stable',
+      body: 'No significant changes in your recent trends. Keep being consistent with your routine & tracking.',
     })
   }
   return out

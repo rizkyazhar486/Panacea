@@ -11,24 +11,24 @@ export interface AnthroResult {
 export function computeBmi(weightKg: number, heightCm: number): AnthroResult {
   const h = heightCm / 100
   const bmi = h > 0 ? weightKg / (h * h) : 0
-  let kesan = 'Tidak dapat dihitung'
+  let kesan = 'Cannot be calculated'
   let tone: AnthroResult['tone'] = 'normal'
   if (bmi > 0) {
     // Asia-Pacific cut-offs.
     if (bmi < 18.5) {
-      kesan = 'Underweight / Gizi kurang'
+      kesan = 'Underweight'
       tone = 'low'
     } else if (bmi < 23) {
       kesan = 'Normal'
       tone = 'normal'
     } else if (bmi < 25) {
-      kesan = 'Berisiko (At risk)'
+      kesan = 'At risk'
       tone = 'high'
     } else if (bmi < 30) {
-      kesan = 'Obesitas I'
+      kesan = 'Obesity I'
       tone = 'high'
     } else {
-      kesan = 'Obesitas II'
+      kesan = 'Obesity II'
       tone = 'critical'
     }
   }
