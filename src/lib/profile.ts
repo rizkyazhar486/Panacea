@@ -15,9 +15,17 @@ const KEY = 'pmd_profile'
 export function getDemo(): Demo {
   try { return { ...DEMO_DEFAULT, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEMO_DEFAULT }
 }
+// Broadcast that health/demographic data changed so any mounted page can
+// re-sync immediately (not just on window focus). Pages listen for
+// 'panacea:health-updated' alongside their focus handler.
+export function broadcastHealthUpdate(): void {
+  try { window.dispatchEvent(new Event('panacea:health-updated')) } catch { /* ignore */ }
+}
+
 export function setDemo(patch: Partial<Demo>): Demo {
   const next = { ...getDemo(), ...patch }
   try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  broadcastHealthUpdate()
   return next
 }
 
