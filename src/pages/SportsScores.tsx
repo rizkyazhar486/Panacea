@@ -74,6 +74,7 @@ export function SportsScores() {
       .then((r) => {
         setEvents(r.events as NormalizedEvent[])
         if (r.error === 'not_configured') setErr('This league needs the data provider to be set up on the server (APISPORTS_KEY). It will work once that key is configured.')
+        else if (r.error === 'no_slam_active') setErr('No Grand Slam is being played right now. This card shows live matches during the Australian Open (Jan), French Open (May-Jun), Wimbledon (Jun-Jul), and US Open (Aug-Sep).')
         else if (r.error === 'league_not_found') setErr('Couldn\'t find this league on the data provider right now — please try again later.')
         else if (r.error) setErr('The data source is having issues, please try again later.')
       })

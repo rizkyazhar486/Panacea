@@ -86,6 +86,9 @@ export const LEAGUES: LeagueConfig[] = [
   { id: 'urc', label: 'URC (Rugby)', sport: 'rugby', slug: '270557' },
   { id: 'atp', label: 'ATP Tour', sport: 'tennis', slug: 'atp' },
   { id: 'wta', label: 'WTA Tour', sport: 'tennis', slug: 'wta' },
+  // Virtual league: merges ATP + WTA scoreboards and keeps only the four
+  // majors (Australian Open, French Open/Roland Garros, Wimbledon, US Open).
+  { id: 'grandslam', label: 'Grand Slams', sport: 'tennis', slug: 'atp' },
   // TheSportsDB (free, no per-user key) for leagues ESPN doesn't serve well.
   // IPL cricket has no free key-less option other than TheSportsDB (API-Football
   // is soccer-only), so it stays on TSDB.
@@ -145,7 +148,7 @@ interface EspnMmaResponse { events?: EspnMmaEvent[] }
 // its own NormalizedEvent instead of only reading the first, otherwise a UFC
 // fight night shows just one fight (or none). Also tolerant of competitors
 // carrying an `athlete`, a bare display name, or a team-shaped object.
-function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent[] {
+function normalizeMmaEvent(ev: EspnMmaEvent, opts?: { prefixEventName?: boolean }): NormalizedEvent[] {
   if (!ev.competitions || !ev.id) return []
   const out: NormalizedEvent[] = []
   ev.competitions.forEach((comp, idx) => {
@@ -157,16 +160,55 @@ function normalizeMmaEvent(ev: EspnMmaEvent): NormalizedEvent[] {
     const status = comp?.status?.type ?? ev.status?.type
     const state = (status?.state as NormalizedEvent['state']) ?? 'pre'
     const resultFor = (c?: EspnFighterCompetitor) => (c?.score != null && c.score !== '' ? String(c.score) : state === 'post' ? (c?.winner ? 'W' : 'L') : undefined)
+    let detail = status?.shortDetail ?? status?.detail ?? ev.name ?? ''
+    // For tennis, prefix the tournament name (the ESPN event name) so the UI
+    // shows which tournament a match belongs to (e.g. "Wimbledon · R16").
+    if (opts?.prefixEventName && ev.name && !detail.includes(ev.name)) detail = detail ? `${ev.name} · ${detail}` : ev.name
     out.push({
       id: `${ev.id}-${idx}`,
       startTime: ev.date ?? '',
       state: state === 'in' || state === 'post' ? state : 'pre',
-      statusDetail: status?.shortDetail ?? status?.detail ?? ev.name ?? '',
+      statusDetail: detail,
       home: { name: name1, abbrev: '', logo: f1?.athlete?.headshot?.href, score: resultFor(f1) },
       away: { name: name2, abbrev: '', logo: f2?.athlete?.headshot?.href, score: resultFor(f2) },
     })
   })
   return out
+}
+
+// The four tennis majors, as they appear in ESPN tournament/event names.
+const SLAM_RE = /australian open|french open|roland garros|wimbledon|us open/i
+
+// Fetch one ESPN tennis tour scoreboard, keeping the tournament name on each
+// match. Used by the atp/wta cards and the merged Grand Slams card.
+async function fetchEspnTennisEvents(slug: string): Promise<{ events: EspnMmaEvent[]; error?: string }> {
+  const res = await fetch(`${ESPN_BASE}/tennis/${slug}/scoreboard`, { headers: { Accept: 'application/json' } })
+  if (!res.ok) return { events: [], error: `upstream_${res.status}` }
+  const json = (await res.json()) as EspnMmaResponse
+  return { events: json.events ?? [] }
+}
+
+// Grand Slams virtual league: merge ATP + WTA and keep only the majors, so
+// the card reflects the Australian Open / French Open / Wimbledon / US Open
+// specifically instead of whatever smaller tour stop is running.
+async function fetchGrandSlamScoreboard(league: LeagueConfig): Promise<LeagueResult> {
+  try {
+    const [atp, wta] = await Promise.all([fetchEspnTennisEvents('atp'), fetchEspnTennisEvents('wta')])
+    if (atp.error && wta.error) return { leagueId: league.id, label: league.label, events: [], error: atp.error }
+    const slamEvents = [...atp.events, ...wta.events].filter((ev) => SLAM_RE.test(ev.name ?? ''))
+    const events = slamEvents.flatMap((ev) => normalizeMmaEvent(ev, { prefixEventName: true }))
+    if (!events.length) {
+      // No slam in progress right now — say so honestly instead of showing an
+      // empty card that looks broken. The UI renders this as an info note.
+      return { leagueId: league.id, label: league.label, events: [], error: 'no_slam_active' }
+    }
+    const result: LeagueResult = { leagueId: league.id, label: league.label, events }
+    cache.set(league.id, { at: Date.now(), data: result })
+    return result
+  } catch (e) {
+    console.log(`[sports] grandslam fetch error:`, (e as Error).message)
+    return { leagueId: league.id, label: league.label, events: [], error: 'fetch_failed' }
+  }
 }
 
 function fighterName(c?: EspnFighterCompetitor): string | undefined {
@@ -182,6 +224,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
 
   if (league.source === 'tsdb') return fetchTsdbScoreboard(league)
   if (league.source === 'apisports') return fetchApiSportsScoreboard(league)
+  if (league.id === 'grandslam') return fetchGrandSlamScoreboard(league)
 
   try {
     const url = `${ESPN_BASE}/${league.sport}/${league.slug}/scoreboard`
@@ -193,7 +236,7 @@ export async function fetchLeagueScoreboard(leagueId: string): Promise<LeagueRes
     let events: NormalizedEvent[]
     if (league.sport === 'mma' || league.sport === 'tennis') {
       const json = (await res.json()) as EspnMmaResponse
-      events = (json.events ?? []).flatMap(normalizeMmaEvent)
+      events = (json.events ?? []).flatMap((ev) => normalizeMmaEvent(ev, { prefixEventName: league.sport === 'tennis' }))
     } else {
       const json = (await res.json()) as EspnResponse
       events = (json.events ?? []).map(normalizeEspnEvent).filter((e): e is NormalizedEvent => e !== null)
