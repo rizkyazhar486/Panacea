@@ -1545,14 +1545,14 @@ function DenverCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Skrining perkembangan disederhanakan — milestone representatif per domain, bukan instrumen Denver II lengkap" />
-      <Field label="Usia Anak (bulan)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Simplified developmental screening — representative milestones per domain, not the full Denver II instrument" />
+      <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
 
       {domainFlags.map(({ domain, applicable }) => (
         <div key={domain.key} className="mt-4">
           <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>
           <div className="mt-2 space-y-1.5">
-            {applicable.length === 0 && <p className="text-[11px] text-neutral-400">Belum ada milestone acuan pada usia ini.</p>}
+            {applicable.length === 0 && <p className="text-[11px] text-neutral-400">No reference milestones for this age yet.</p>}
             {applicable.map((m) => {
               const key = `${domain.key}-${m.ageMo}`
               const v = results[key] ?? 'na'
@@ -1560,9 +1560,9 @@ function DenverCalc() {
                 <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-bold text-ink">{m.label}</div>
-                    <div className="text-[9px] font-bold uppercase text-neutral-400">Biasanya tercapai ~{m.ageMo} bulan</div>
+                    <div className="text-[9px] font-bold uppercase text-neutral-400">Typically achieved ~{m.ageMo} months</div>
                   </div>
-                  <SegButtons value={v} onChange={(nv) => setResults((s) => ({ ...s, [key]: nv }))} options={[{ v: 'pass', l: 'Bisa' }, { v: 'fail', l: 'Belum' }, { v: 'na', l: '—' }]} />
+                  <SegButtons value={v} onChange={(nv) => setResults((s) => ({ ...s, [key]: nv }))} options={[{ v: 'pass', l: 'Can' }, { v: 'fail', l: 'Not yet' }, { v: 'na', l: '—' }]} />
                 </div>
               )
             })}
@@ -1572,11 +1572,11 @@ function DenverCalc() {
 
       {anyDelay && (
         <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
-          <p className="text-xs font-black text-amber-800">⚠️ Pertimbangkan evaluasi tumbuh kembang lanjutan</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">Ada milestone yang biasanya tercapai jauh di bawah usia anak saat ini (≥6 bulan lebih awal) namun belum tercapai. Ini pola skrining sederhana — rujuk ke dokter anak/tumbuh kembang untuk evaluasi Denver II lengkap atau instrumen skrining terstandardisasi lain (mis. KPSP, M-CHAT bila relevan).</p>
+          <p className="text-xs font-black text-amber-800">⚠️ Consider further developmental evaluation</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">There are milestones typically achieved well below the child's current age (≥6 months earlier) that have not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II evaluation or another standardized screening instrument (e.g. KPSP, M-CHAT if relevant).</p>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ini BUKAN instrumen Denver II resmi (yang memakai ~125 item dengan bar persentil usia & materi tes terstandardisasi) — alat ini adalah skrining awal sederhana berbasis milestone representatif untuk kewaspadaan, bukan diagnosis keterlambatan perkembangan.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</p>
     </Card>
   )
 }
@@ -1590,30 +1590,30 @@ function DenverCalc() {
 interface AtlsItem { key: string; label: string; critIfAbnormal: string }
 const ATLS_SECTIONS: { key: string; letter: string; label: string; items: AtlsItem[] }[] = [
   { key: 'exsanguination', letter: 'X', label: 'eXsanguinating Hemorrhage Control', items: [
-    { key: 'massiveHemorrhage', label: 'Tidak ada perdarahan eksternal masif yang mengancam nyawa', critIfAbnormal: 'Perdarahan masif eksternal — kontrol SEGERA sebelum Airway (tourniquet ekstremitas, wound packing + tekanan langsung pada junctional/truncal) sesuai prinsip <C>ABCDE / MARCH modern.' },
+    { key: 'massiveHemorrhage', label: 'No massive external hemorrhage that is immediately life-threatening', critIfAbnormal: 'Massive external hemorrhage — control IMMEDIATELY before Airway (extremity tourniquet, wound packing + direct pressure on junctional/truncal sites) per modern <C>ABCDE / MARCH principles.' },
   ] },
-  { key: 'airway', letter: 'A', label: 'Airway & Kontrol Servikal', items: [
-    { key: 'airwayPatent', label: 'Jalan napas paten (bicara jelas, tanpa stridor/gurgling)', critIfAbnormal: 'Jalan napas tidak paten — bebaskan jalan napas segera (jaw thrust/chin lift, suction, airway definitif bila perlu) SEBELUM lanjut ke langkah berikutnya.' },
-    { key: 'cSpine', label: 'Tulang servikal terimobilisasi (collar/manual inline stabilization)', critIfAbnormal: 'C-spine belum terproteksi — asumsikan cedera servikal pada semua trauma tumpul mekanisme signifikan hingga terbukti sebaliknya.' },
+  { key: 'airway', letter: 'A', label: 'Airway & Cervical Spine Control', items: [
+    { key: 'airwayPatent', label: 'Airway patent (speaks clearly, no stridor/gurgling)', critIfAbnormal: 'Airway not patent — open the airway immediately (jaw thrust/chin lift, suction, definitive airway if needed) BEFORE moving to the next step.' },
+    { key: 'cSpine', label: 'Cervical spine immobilized (collar/manual inline stabilization)', critIfAbnormal: 'C-spine not yet protected — assume cervical injury in all significant blunt-trauma mechanisms until proven otherwise.' },
   ] },
-  { key: 'breathing', letter: 'B', label: 'Breathing & Ventilasi', items: [
-    { key: 'rrNormal', label: 'Laju napas normal (12-20x/menit) & simetris', critIfAbnormal: 'Laju napas abnormal — curigai tension pneumotoraks, hematotoraks, flail chest, atau cedera paru.' },
-    { key: 'breathSounds', label: 'Suara napas terdengar bilateral & simetris', critIfAbnormal: 'Suara napas asimetris/hilang sebelah — pertimbangkan needle/finger thoracostomy segera bila curiga tension pneumotoraks.' },
-    { key: 'spo2', label: 'SpO2 ≥94% udara ruangan/dengan oksigen suplemen sesuai', critIfAbnormal: 'Hipoksemia — berikan oksigen aliran tinggi, cari & atasi penyebab (pneumotoraks, aspirasi, dll).' },
+  { key: 'breathing', letter: 'B', label: 'Breathing & Ventilation', items: [
+    { key: 'rrNormal', label: 'Normal respiratory rate (12-20/min) & symmetric', critIfAbnormal: 'Abnormal respiratory rate — suspect tension pneumothorax, hemothorax, flail chest, or pulmonary injury.' },
+    { key: 'breathSounds', label: 'Breath sounds heard bilaterally & symmetric', critIfAbnormal: 'Asymmetric/absent breath sounds on one side — consider immediate needle/finger thoracostomy if tension pneumothorax is suspected.' },
+    { key: 'spo2', label: 'SpO2 ≥94% on room air/with appropriate supplemental oxygen', critIfAbnormal: 'Hypoxemia — give high-flow oxygen, find & treat the cause (pneumothorax, aspiration, etc.).' },
   ] },
-  { key: 'circulation', letter: 'C', label: 'Circulation & Kontrol Perdarahan', items: [
-    { key: 'pulse', label: 'Nadi teraba kuat, laju & irama normal', critIfAbnormal: 'Nadi lemah/cepat/tak teraba — curigai syok hemoragik, mulai resusitasi cairan/darah & cari sumber perdarahan.' },
-    { key: 'hemorrhage', label: 'Tidak ada perdarahan eksternal aktif tak terkontrol', critIfAbnormal: 'Perdarahan eksternal aktif — kontrol segera (tekanan langsung, tourniquet bila ekstremitas) sebelum lanjut survei.' },
-    { key: 'ivAccess', label: 'Akses IV besar (≥2 jalur) terpasang', critIfAbnormal: 'Akses IV belum adekuat — pasang 2 jalur IV besar (atau IO bila sulit) untuk resusitasi cairan/produk darah.' },
+  { key: 'circulation', letter: 'C', label: 'Circulation & Hemorrhage Control', items: [
+    { key: 'pulse', label: 'Pulse strong, normal rate & rhythm', critIfAbnormal: 'Weak/rapid/absent pulse — suspect hemorrhagic shock, start fluid/blood resuscitation & find the bleeding source.' },
+    { key: 'hemorrhage', label: 'No active uncontrolled external hemorrhage', critIfAbnormal: 'Active external hemorrhage — control immediately (direct pressure, tourniquet if extremity) before continuing the survey.' },
+    { key: 'ivAccess', label: 'Large-bore IV access (≥2 lines) established', critIfAbnormal: 'IV access not yet adequate — establish 2 large-bore IV lines (or IO if difficult) for fluid/blood product resuscitation.' },
   ] },
-  { key: 'disability', letter: 'D', label: 'Disability (Status Neurologis)', items: [
-    { key: 'gcsNormal', label: 'GCS ≥13 atau sesuai baseline pasien', critIfAbnormal: 'GCS menurun — evaluasi penyebab (cedera kepala, hipoksia, syok, intoksikasi), pertimbangkan proteksi jalan napas bila GCS ≤8.' },
-    { key: 'pupilsNormal', label: 'Pupil isokor & reaktif terhadap cahaya', critIfAbnormal: 'Pupil anisokor/tidak reaktif — curigai lesi massa intrakranial/herniasi, perlu pencitraan & konsultasi bedah saraf segera.' },
+  { key: 'disability', letter: 'D', label: 'Disability (Neurological Status)', items: [
+    { key: 'gcsNormal', label: 'GCS ≥13 or at patient baseline', critIfAbnormal: 'Decreased GCS — evaluate the cause (head injury, hypoxia, shock, intoxication), consider airway protection if GCS ≤8.' },
+    { key: 'pupilsNormal', label: 'Pupils isocoric & reactive to light', critIfAbnormal: 'Anisocoric/non-reactive pupils — suspect an intracranial mass lesion/herniation; urgent imaging & neurosurgical consultation needed.' },
   ] },
-  { key: 'exposure', letter: 'E', label: 'Exposure & Kontrol Lingkungan', items: [
-    { key: 'exposed', label: 'Pasien terpapar penuh (buka baju) untuk pemeriksaan menyeluruh termasuk log-roll punggung' },
-    { key: 'normothermic', label: 'Suhu tubuh terjaga normal (selimut hangat, cairan hangat) — cegah hipotermia' },
-  ].map((i) => ({ ...i, critIfAbnormal: i.key === 'exposed' ? 'Pemeriksaan belum menyeluruh — cedera tersembunyi (punggung, lipatan kulit, perineum) mudah terlewat bila tidak log-roll & inspeksi penuh.' : 'Risiko hipotermia — bagian dari "lethal triad" (hipotermia, asidosis, koagulopati) yang memperburuk prognosis trauma berat.' })) },
+  { key: 'exposure', letter: 'E', label: 'Exposure & Environmental Control', items: [
+    { key: 'exposed', label: 'Patient fully exposed (clothing removed) for a thorough exam including a back log-roll' },
+    { key: 'normothermic', label: 'Body temperature kept normal (warm blankets, warmed fluids) — prevent hypothermia' },
+  ].map((i) => ({ ...i, critIfAbnormal: i.key === 'exposed' ? 'Exam not yet thorough — hidden injuries (back, skin folds, perineum) are easily missed without a log-roll & full inspection.' : 'Hypothermia risk — part of the "lethal triad" (hypothermia, acidosis, coagulopathy) that worsens outcomes in severe trauma.' })) },
 ]
 
 function AtlsCalc() {
@@ -1628,15 +1628,15 @@ function AtlsCalc() {
   const noteLines = ATLS_SECTIONS.map((section) => {
     const lines = section.items.map((item) => {
       const v = status[item.key] ?? 'unassessed'
-      const label = v === 'ok' ? 'Normal' : v === 'abnormal' ? 'ABNORMAL' : 'Belum dinilai'
+      const label = v === 'ok' ? 'Normal' : v === 'abnormal' ? 'ABNORMAL' : 'Not yet assessed'
       return `  - ${item.label}: ${label}`
     })
     return `${section.letter} — ${section.label}\n${lines.join('\n')}`
   })
-  const formattedNote = `SURVEI PRIMER TRAUMA (XABCDE)\n${noteLines.join('\n\n')}${
+  const formattedNote = `TRAUMA PRIMARY SURVEY (XABCDE)\n${noteLines.join('\n\n')}${
     criticalFindings.length > 0
-      ? `\n\n🚨 TEMUAN KRITIS (tangani sesuai urutan X→E):\n${criticalFindings.map((f) => `- ${f.letter}: ${f.critIfAbnormal}`).join('\n')}`
-      : '\n\nTidak ada temuan kritis tercatat pada survei primer ini.'
+      ? `\n\n🚨 CRITICAL FINDINGS (address in X→E order):\n${criticalFindings.map((f) => `- ${f.letter}: ${f.critIfAbnormal}`).join('\n')}`
+      : '\n\nNo critical findings recorded on this primary survey.'
   }`
 
   function copyNote() {
@@ -1648,11 +1648,11 @@ function AtlsCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Survei Primer Trauma (XABCDE)" subtitle="X = kontrol perdarahan eksotik/masif mendahului Airway — urutan prioritas menentukan tindakan, bukan sekadar checklist" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = massive/exsanguinating hemorrhage control precedes Airway — priority order drives action, not just a checklist" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
-          <p className="text-xs font-black text-red-800">🚨 Temuan Kritis — tangani sesuai urutan X→E</p>
+          <p className="text-xs font-black text-red-800">🚨 Critical Findings — address in X→E order</p>
           <div className="mt-2 space-y-2">
             {criticalFindings.map((f) => (
               <div key={f.key} className="text-[11px] leading-relaxed text-red-700"><b>{f.letter}:</b> {f.critIfAbnormal}</div>
@@ -1683,14 +1683,14 @@ function AtlsCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Catatan Survei Primer — siap tempel ke rekam medis</div>
-          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-white">{copied ? '✓ Disalin' : 'Salin Catatan'}</button>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Primary Survey Note — ready to paste into the medical record</div>
+          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-white">{copied ? '✓ Copied' : 'Copy Note'}</button>
         </div>
         <pre className="mt-2 whitespace-pre-wrap font-sans text-[11px] leading-relaxed text-neutral-600">{formattedNote}</pre>
-        <p className="mt-2 text-[10px] text-neutral-400">{assessedCount}/{totalCount} item telah dinilai.</p>
+        <p className="mt-2 text-[10px] text-neutral-400">{assessedCount}/{totalCount} items assessed.</p>
       </div>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Prinsip trauma modern (&lt;C&gt;ABCDE / MARCH): kontrol perdarahan eksternal masif MENDAHULUI Airway bila mengancam nyawa segera, lalu tangani setiap masalah SAAT ditemukan dalam urutan X→A→B→C→D→E sebelum lanjut ke langkah berikutnya. Alat ini adalah bantuan checklist, bukan pengganti pelatihan ATLS/TCCC resmi & penilaian klinis langsung di lapangan.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</p>
     </Card>
   )
 }
@@ -1712,10 +1712,10 @@ function AbgCalc() {
   const alkalemia = ph > 7.45
   const phNormal = !acidemia && !alkalemia
 
-  let primary = 'Tidak dapat ditentukan'
-  if (acidemia) primary = hco3 < 22 ? 'Asidosis Metabolik' : paco2 > 45 ? 'Asidosis Respiratorik' : 'Asidemia campuran/tak jelas'
-  else if (alkalemia) primary = hco3 > 26 ? 'Alkalosis Metabolik' : paco2 < 35 ? 'Alkalosis Respiratorik' : 'Alkalemia campuran/tak jelas'
-  else primary = (paco2 > 45 || paco2 < 35 || hco3 > 26 || hco3 < 22) ? 'pH normal namun PaCO2/HCO3 abnormal — kemungkinan gangguan campuran (kompensasi penuh)' : 'Normal'
+  let primary = 'Cannot be determined'
+  if (acidemia) primary = hco3 < 22 ? 'Metabolic Acidosis' : paco2 > 45 ? 'Respiratory Acidosis' : 'Mixed/unclear acidemia'
+  else if (alkalemia) primary = hco3 > 26 ? 'Metabolic Alkalosis' : paco2 < 35 ? 'Respiratory Alkalosis' : 'Mixed/unclear alkalemia'
+  else primary = (paco2 > 45 || paco2 < 35 || hco3 > 26 || hco3 < 22) ? 'Normal pH but abnormal PaCO2/HCO3 — possible mixed disorder (full compensation)' : 'Normal'
 
   // Winter's formula for expected PaCO2 in metabolic acidosis
   const winterExpected = 1.5 * hco3 + 8
@@ -1723,10 +1723,10 @@ function AbgCalc() {
   const winterHi = winterExpected + 2
 
   let compensationNote = ''
-  if (primary === 'Asidosis Metabolik') {
-    if (paco2 < winterLo) compensationNote = `PaCO2 (${paco2}) lebih rendah dari perkiraan Winter (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — curigai alkalosis respiratorik konkomitan.`
-    else if (paco2 > winterHi) compensationNote = `PaCO2 (${paco2}) lebih tinggi dari perkiraan Winter (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — curigai asidosis respiratorik konkomitan.`
-    else compensationNote = `Kompensasi respiratorik sesuai (perkiraan Winter ${winterLo.toFixed(1)}-${winterHi.toFixed(1)}).`
+  if (primary === 'Metabolic Acidosis') {
+    if (paco2 < winterLo) compensationNote = `PaCO2 (${paco2}) is lower than the Winter's formula estimate (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — suspect concomitant respiratory alkalosis.`
+    else if (paco2 > winterHi) compensationNote = `PaCO2 (${paco2}) is higher than the Winter's formula estimate (${winterLo.toFixed(1)}-${winterHi.toFixed(1)}) — suspect concomitant respiratory acidosis.`
+    else compensationNote = `Respiratory compensation is appropriate (Winter's estimate ${winterLo.toFixed(1)}-${winterHi.toFixed(1)}).`
   }
 
   const anionGap = na - (cl + hco3)
@@ -1734,18 +1734,18 @@ function AbgCalc() {
   const agHigh = correctedAG > 12
 
   let deltaRatioNote = ''
-  if (primary === 'Asidosis Metabolik' && agHigh) {
+  if (primary === 'Metabolic Acidosis' && agHigh) {
     const deltaRatio = (correctedAG - 12) / (24 - hco3)
     deltaRatioNote = deltaRatio < 0.4
-      ? `Delta rasio ${deltaRatio.toFixed(2)} (<0.4) — curigai asidosis non-gap konkomitan (hiperkloremik).`
+      ? `Delta ratio ${deltaRatio.toFixed(2)} (<0.4) — suspect concomitant non-gap (hyperchloremic) acidosis.`
       : deltaRatio <= 2
-      ? `Delta rasio ${deltaRatio.toFixed(2)} (0.4-2) — konsisten asidosis gap tinggi murni.`
-      : `Delta rasio ${deltaRatio.toFixed(2)} (>2) — curigai alkalosis metabolik atau asidosis respiratorik kronis konkomitan.`
+      ? `Delta ratio ${deltaRatio.toFixed(2)} (0.4-2) — consistent with pure high-gap acidosis.`
+      : `Delta ratio ${deltaRatio.toFixed(2)} (>2) — suspect concomitant metabolic alkalosis or chronic respiratory acidosis.`
   }
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Analisis Gas Darah (ABG)" subtitle="Pendekatan sistematis: gangguan primer → kompensasi → anion gap → delta rasio" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Blood Gas Analysis (ABG)" subtitle="Systematic approach: primary disorder → compensation → anion gap → delta ratio" />
       <div className="grid grid-cols-3 gap-2">
         <Field label="pH"><input className={inputClass} type="number" step="0.01" value={ph} onChange={(e) => setPh(+e.target.value)} /></Field>
         <Field label="PaCO2 (mmHg)"><input className={inputClass} type="number" value={paco2} onChange={(e) => setPaco2(+e.target.value)} /></Field>
@@ -1756,36 +1756,36 @@ function AbgCalc() {
       </div>
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 1 — Status pH</div>
-        <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Asidemia' : alkalemia ? 'Alkalemia' : 'pH Normal'}</Badge>
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Step 1 — pH Status</div>
+        <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Acidemia' : alkalemia ? 'Alkalemia' : 'Normal pH'}</Badge>
       </div>
       <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 2 — Gangguan Primer</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Step 2 — Primary Disorder</div>
         <div className="mt-1 text-sm font-black text-ink">{primary}</div>
       </div>
       {compensationNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 3 — Kecukupan Kompensasi (Formula Winter)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Step 3 — Compensation Adequacy (Winter's Formula)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{compensationNote}</p>
         </div>
       )}
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Anion Gap (terkoreksi albumin)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Anion Gap (albumin-corrected)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'Gap Tinggi' : 'Gap Normal'}</Badge>
-          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">Klasifikasi AG</div>
+          <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
+          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">AG Classification</div>
         </div>
       </div>
       {deltaRatioNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Langkah 4 — Delta Rasio (deteksi gangguan campuran)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-400">Step 4 — Delta Ratio (detects mixed disorders)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">AG tinggi (MUDPILES: metanol, uremia, DKA, propilen glikol/paraldehid, isoniazid/iron, laktat, etilen glikol, salisilat). AG normal/hiperkloremik: diare, RTA, asetazolamid, dilusi salin. Anion gap terkoreksi = AG + 2.5×(4 − albumin g/dL). Alat bantu interpretasi — selalu integrasikan dengan konteks klinis penuh.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</p>
     </Card>
   )
 }
@@ -1798,21 +1798,21 @@ function AbgCalc() {
 // clean printable summary).
 interface BurnRegion { key: string; label: string; pct: number; x: number; y: number; w: number; h: number; rx?: number }
 const BURN_FRONT: BurnRegion[] = [
-  { key: 'headF', label: 'Kepala (depan)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
-  { key: 'armLF', label: 'Lengan Kiri (depan)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
-  { key: 'armRF', label: 'Lengan Kanan (depan)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
-  { key: 'trunkF', label: 'Batang Tubuh (depan)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+  { key: 'headF', label: 'Head (front)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+  { key: 'armLF', label: 'Left Arm (front)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'armRF', label: 'Right Arm (front)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'trunkF', label: 'Trunk (front)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
   { key: 'perineum', label: 'Perineum', pct: 1, x: 92, y: 158, w: 16, h: 12 },
-  { key: 'legLF', label: 'Tungkai Kiri (depan)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
-  { key: 'legRF', label: 'Tungkai Kanan (depan)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'legLF', label: 'Left Leg (front)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'legRF', label: 'Right Leg (front)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
 ]
 const BURN_BACK: BurnRegion[] = [
-  { key: 'headB', label: 'Kepala (belakang)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
-  { key: 'armLB', label: 'Lengan Kiri (belakang)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
-  { key: 'armRB', label: 'Lengan Kanan (belakang)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
-  { key: 'trunkB', label: 'Batang Tubuh (belakang)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
-  { key: 'legLB', label: 'Tungkai Kiri (belakang)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
-  { key: 'legRB', label: 'Tungkai Kanan (belakang)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'headB', label: 'Head (back)', pct: 4.5, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+  { key: 'armLB', label: 'Left Arm (back)', pct: 4.5, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'armRB', label: 'Right Arm (back)', pct: 4.5, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+  { key: 'trunkB', label: 'Trunk (back)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+  { key: 'legLB', label: 'Left Leg (back)', pct: 9, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+  { key: 'legRB', label: 'Right Leg (back)', pct: 9, x: 102, y: 168, w: 34, h: 160, rx: 8 },
 ]
 
 // Pediatric Lund & Browder (1944) age-banded regions — combined groupings
@@ -1833,21 +1833,21 @@ function pediatricRegions(ageYears: number): { front: BurnRegion[]; back: BurnRe
   const legHalf = leg / 2
   return {
     front: [
-      { key: 'headF', label: 'Kepala+Leher (depan)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
-      { key: 'armLF', label: 'Lengan Kiri (depan)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
-      { key: 'armRF', label: 'Lengan Kanan (depan)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
-      { key: 'trunkF', label: 'Batang Tubuh (depan)', pct: 13, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+      { key: 'headF', label: 'Head+Neck (front)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+      { key: 'armLF', label: 'Left Arm (front)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'armRF', label: 'Right Arm (front)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'trunkF', label: 'Trunk (front)', pct: 13, x: 64, y: 54, w: 72, h: 108, rx: 6 },
       { key: 'perineum', label: 'Perineum/Genitalia', pct: 1, x: 92, y: 158, w: 16, h: 12 },
-      { key: 'legLF', label: 'Tungkai Kiri (depan)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
-      { key: 'legRF', label: 'Tungkai Kanan (depan)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'legLF', label: 'Left Leg (front)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'legRF', label: 'Right Leg (front)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
     ],
     back: [
-      { key: 'headB', label: 'Kepala+Leher (belakang)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
-      { key: 'armLB', label: 'Lengan Kiri (belakang)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
-      { key: 'armRB', label: 'Lengan Kanan (belakang)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
-      { key: 'trunkB', label: 'Batang Tubuh (belakang+bokong)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
-      { key: 'legLB', label: 'Tungkai Kiri (belakang)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
-      { key: 'legRB', label: 'Tungkai Kanan (belakang)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'headB', label: 'Head+Neck (back)', pct: headHalf, x: 78, y: 8, w: 44, h: 42, rx: 18 },
+      { key: 'armLB', label: 'Left Arm (back)', pct: 4.75, x: 26, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'armRB', label: 'Right Arm (back)', pct: 4.75, x: 146, y: 54, w: 28, h: 100, rx: 8 },
+      { key: 'trunkB', label: 'Trunk (back+buttocks)', pct: 18, x: 64, y: 54, w: 72, h: 108, rx: 6 },
+      { key: 'legLB', label: 'Left Leg (back)', pct: legHalf, x: 64, y: 168, w: 34, h: 160, rx: 8 },
+      { key: 'legRB', label: 'Right Leg (back)', pct: legHalf, x: 102, y: 168, w: 34, h: 160, rx: 8 },
     ],
   }
 }
@@ -1874,34 +1874,34 @@ function BurnCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Luka Bakar Lanjutan" subtitle="Tiga metode input %TBSA + Parkland Formula, dapat dicetak/disimpan PDF" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Advanced Burn Calculator" subtitle="Three %TBSA input methods + Parkland Formula, printable/exportable to PDF" />
 
       <SegButtons
         value={method}
         onChange={(v) => { setMethod(v); setSelected({}) }}
-        options={[{ v: 'draw', l: 'Dewasa (Rule of Nines)' }, { v: 'pediatric', l: 'Anak (Lund-Browder)' }, { v: 'manual', l: 'Input Manual' }]}
+        options={[{ v: 'draw', l: 'Adult (Rule of Nines)' }, { v: 'pediatric', l: 'Pediatric (Lund-Browder)' }, { v: 'manual', l: 'Manual Input' }]}
       />
 
       {method === 'manual' ? (
         <div className="mt-3">
-          <Field label="Total %TBSA (estimasi klinis)">
+          <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
-          <p className="mt-1.5 text-[10px] text-neutral-400">Untuk kasus dengan estimasi %TBSA sudah tersedia (mis. rujukan RS lain) — masukkan langsung tanpa perlu menandai diagram tubuh.</p>
+          <p className="mt-1.5 text-[10px] text-neutral-400">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</p>
         </div>
       ) : (
         <>
           {method === 'pediatric' && (
             <div className="mt-3">
-              <Field label="Usia (tahun)">
+              <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
-              <p className="mt-1.5 text-[10px] text-neutral-400">Lund &amp; Browder (1944) mengoreksi proporsi tubuh anak — kepala lebih besar, tungkai lebih kecil secara proporsional dibanding dewasa. Band usia: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 tahun.</p>
+              <p className="mt-1.5 text-[10px] text-neutral-400">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</p>
             </div>
           )}
           <div className="mt-3 flex gap-2">
-            <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Depan</button>
-            <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Belakang</button>
+            <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Front View</button>
+            <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Back View</button>
           </div>
 
           <div className="mt-3 flex justify-center">
@@ -1918,7 +1918,7 @@ function BurnCalc() {
               ))}
             </svg>
           </div>
-          <p className="text-center text-[10px] text-neutral-400">Ketuk area tubuh untuk menandai luka bakar (merah = terpilih)</p>
+          <p className="text-center text-[10px] text-neutral-400">Tap a body area to mark a burn (red = selected)</p>
 
           <div className="mt-3 space-y-1">
             {regions.map((r) => (
@@ -1939,32 +1939,32 @@ function BurnCalc() {
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
       </div>
 
       {tbsa >= 20 && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">mL Total 24 jam (Parkland)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">Total mL / 24h (Parkland)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (8 jam pertama)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/h (first 8 hours)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/jam (16 jam berikut)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/h (next 16 hours)</div>
           </div>
         </div>
       )}
       {tbsa > 0 && tbsa < 20 && (
-        <p className="mt-3 text-[11px] text-neutral-500">Parkland formula umumnya diterapkan pada luka bakar ≥20% TBSA. Untuk luas lebih kecil, tatalaksana cairan disesuaikan kebutuhan klinis individual.</p>
+        <p className="mt-3 text-[11px] text-neutral-500">The Parkland formula is generally applied to burns ≥20% TBSA. For smaller areas, fluid management is tailored to individual clinical needs.</p>
       )}
 
-      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Cetak / Simpan sebagai PDF</button>
+      <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines (Wallace) adalah estimasi dewasa standar. Lund-Browder mengoreksi proporsi tubuh anak per kelompok usia. Parkland: Total = 4 mL × berat(kg) × %TBSA (kristaloid RL), separuh dalam 8 jam pertama SEJAK WAKTU CEDERA, sisanya 16 jam berikutnya, disesuaikan output urin.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</p>
     </Card>
   )
 }
@@ -1977,18 +1977,18 @@ function BurnCalc() {
 // normal/abnormal findings rather than free text, for speed and consistency.
 interface CnOption { v: string; l: string }
 const CRANIAL_NERVES: { key: string; numeral: string; name: string; icon: string; opts: CnOption[] }[] = [
-  { key: 'cn1', numeral: 'I', name: 'Olfaktorius', icon: '👃', opts: [{ v: 'normal', l: 'Normosmia' }, { v: 'abn', l: 'Anosmia/hiposmia' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn2', numeral: 'II', name: 'Optikus', icon: '👁️', opts: [{ v: 'normal', l: 'Visus & lapang pandang normal' }, { v: 'abn', l: 'Penurunan visus/defek lapang pandang' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn34_6', numeral: 'III/IV/VI', name: 'Okulomotor, Troklear, Abdusen', icon: '👀', opts: [{ v: 'normal', l: 'Gerak bola mata penuh, pupil isokor reaktif' }, { v: 'abn', l: 'Ptosis/diplopia/paresis gerak mata/pupil anisokor' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn5', numeral: 'V', name: 'Trigeminus', icon: '😐', opts: [{ v: 'normal', l: 'Sensasi wajah & refleks kornea normal, otot mengunyah kuat' }, { v: 'abn', l: 'Baal wajah/refleks kornea menurun/kelemahan mengunyah' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn7', numeral: 'VII', name: 'Fasialis', icon: '😊', opts: [{ v: 'normal', l: 'Simetris, dapat mengerutkan dahi & menutup mata kuat' }, { v: 'abnCentral', l: 'Paresis sentral (dahi terhindar)' }, { v: 'abnPeripheral', l: 'Paresis perifer (dahi ikut terkena)' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn8', numeral: 'VIII', name: 'Vestibulokoklearis', icon: '👂', opts: [{ v: 'normal', l: 'Pendengaran normal, tanpa vertigo/nistagmus' }, { v: 'abn', l: 'Penurunan pendengaran/vertigo/nistagmus' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn9_10', numeral: 'IX/X', name: 'Glosofaringeus, Vagus', icon: '👄', opts: [{ v: 'normal', l: 'Refleks muntah baik, palatum simetris terangkat, suara jernih' }, { v: 'abn', l: 'Disfagia/suara serak/deviasi palatum/refleks muntah menurun' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn11', numeral: 'XI', name: 'Aksesorius', icon: '💪', opts: [{ v: 'normal', l: 'Kekuatan m. trapezius & sternokleidomastoid normal' }, { v: 'abn', l: 'Kelemahan angkat bahu/menoleh melawan tahanan' }, { v: 'na', l: 'Tak dinilai' }] },
-  { key: 'cn12', numeral: 'XII', name: 'Hipoglosus', icon: '👅', opts: [{ v: 'normal', l: 'Lidah simetris di garis tengah, tanpa atrofi/fasikulasi' }, { v: 'abn', l: 'Deviasi lidah/atrofi/fasikulasi' }, { v: 'na', l: 'Tak dinilai' }] },
+  { key: 'cn1', numeral: 'I', name: 'Olfactory', icon: '👃', opts: [{ v: 'normal', l: 'Normosmia' }, { v: 'abn', l: 'Anosmia/hyposmia' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn2', numeral: 'II', name: 'Optic', icon: '👁️', opts: [{ v: 'normal', l: 'Normal visual acuity & visual field' }, { v: 'abn', l: 'Decreased acuity/visual field defect' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn34_6', numeral: 'III/IV/VI', name: 'Oculomotor, Trochlear, Abducens', icon: '👀', opts: [{ v: 'normal', l: 'Full eye movement, pupils isocoric & reactive' }, { v: 'abn', l: 'Ptosis/diplopia/eye movement paresis/anisocoric pupils' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn5', numeral: 'V', name: 'Trigeminal', icon: '😐', opts: [{ v: 'normal', l: 'Normal facial sensation & corneal reflex, strong chewing muscles' }, { v: 'abn', l: 'Facial numbness/decreased corneal reflex/weak chewing' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn7', numeral: 'VII', name: 'Facial', icon: '😊', opts: [{ v: 'normal', l: 'Symmetric, can wrinkle forehead & close eyes tightly' }, { v: 'abnCentral', l: 'Central paresis (forehead spared)' }, { v: 'abnPeripheral', l: 'Peripheral paresis (forehead involved)' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn8', numeral: 'VIII', name: 'Vestibulocochlear', icon: '👂', opts: [{ v: 'normal', l: 'Normal hearing, no vertigo/nystagmus' }, { v: 'abn', l: 'Hearing loss/vertigo/nystagmus' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn9_10', numeral: 'IX/X', name: 'Glossopharyngeal, Vagus', icon: '👄', opts: [{ v: 'normal', l: 'Good gag reflex, symmetric palate elevation, clear voice' }, { v: 'abn', l: 'Dysphagia/hoarseness/palate deviation/decreased gag reflex' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn11', numeral: 'XI', name: 'Accessory', icon: '💪', opts: [{ v: 'normal', l: 'Normal trapezius & sternocleidomastoid strength' }, { v: 'abn', l: 'Weak shoulder shrug/head turn against resistance' }, { v: 'na', l: 'Not assessed' }] },
+  { key: 'cn12', numeral: 'XII', name: 'Hypoglossal', icon: '👅', opts: [{ v: 'normal', l: 'Tongue midline & symmetric, no atrophy/fasciculation' }, { v: 'abn', l: 'Tongue deviation/atrophy/fasciculation' }, { v: 'na', l: 'Not assessed' }] },
 ]
 const MENINGEAL_SIGNS: { key: string; label: string }[] = [
-  { key: 'nuchal', label: 'Kaku kuduk (nuchal rigidity)' },
+  { key: 'nuchal', label: 'Nuchal rigidity' },
   { key: 'kernig', label: 'Kernig sign' },
   { key: 'brudzinski', label: 'Brudzinski sign' },
 ]
@@ -2004,17 +2004,17 @@ function CranialNerveCalc() {
     const opt = n.opts.find((o) => o.v === cn[n.key])
     return `- N. ${n.numeral} (${n.name}): ${opt?.l ?? '—'}`
   })
-  const meningealLine = MENINGEAL_SIGNS.map((m) => `${m.label}: ${meningeal[m.key] ? 'Positif' : 'Negatif'}`).join(' · ')
+  const meningealLine = MENINGEAL_SIGNS.map((m) => `${m.label}: ${meningeal[m.key] ? 'Positive' : 'Negative'}`).join(' · ')
 
-  const formattedNote = `PEMERIKSAAN SARAF KRANIAL & TANDA MENINGEAL
+  const formattedNote = `CRANIAL NERVE & MENINGEAL SIGN EXAM
 ${noteLines.join('\n')}
 
-Tanda Rangsang Meningeal: ${meningealLine}
-${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangkan meningitis/perdarahan subarakhnoid, evaluasi lanjut (pungsi lumbal bila tak ada kontraindikasi, pencitraan bila indikasi).' : ''}`
+Meningeal Signs: ${meningealLine}
+${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider meningitis/subarachnoid hemorrhage, further evaluation (lumbar puncture if no contraindication, imaging if indicated).' : ''}`
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Saraf Kranial + Tanda Meningeal" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, dirangkum otomatis ke format catatan" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="12 cranial nerve exam & meningeal signs, auto-formatted into a note" />
 
       <div className="space-y-2.5">
         {CRANIAL_NERVES.map((n) => (
@@ -2029,7 +2029,7 @@ ${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangk
         ))}
       </div>
 
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Tanda Rangsang Meningeal</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Meningeal Signs</h4>
       <div className="mt-2 space-y-2">
         {MENINGEAL_SIGNS.map((m) => (
           <label key={m.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -2041,19 +2041,19 @@ ${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangk
 
       {(meningealPositive.length > 0 || anyCnAbnormal) && (
         <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
-          <p className="text-xs font-black text-amber-800">⚠️ Temuan abnormal terdeteksi</p>
+          <p className="text-xs font-black text-amber-800">⚠️ Abnormal findings detected</p>
           <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
-            {meningealPositive.length > 0 && 'Tanda meningeal positif — pertimbangkan meningitis/perdarahan subarakhnoid. '}
-            {anyCnAbnormal && 'Ada defisit saraf kranial — korelasikan dengan lokalisasi lesi (batang otak, basis kranii, atau perifer) dan pertimbangkan pencitraan.'}
+            {meningealPositive.length > 0 && 'Meningeal signs positive — consider meningitis/subarachnoid hemorrhage. '}
+            {anyCnAbnormal && 'Cranial nerve deficit present — correlate with lesion localization (brainstem, skull base, or peripheral) and consider imaging.'}
           </p>
         </div>
       )}
 
       <div className="mt-4">
-        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Catatan Otomatis</h4>
+        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Draf catatan otomatis wajib ditinjau & dilengkapi dokter sebelum masuk rekam medis resmi. Paresis fasialis sentral vs perifer dibedakan dari keterlibatan dahi (dahi terhindar = sentral, karena persarafan dahi bilateral dari korteks; dahi ikut lumpuh = perifer/Bell's palsy).</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</p>
     </Card>
   )
 }
@@ -2068,30 +2068,30 @@ ${meningealPositive.length > 0 ? '⚠️ Tanda meningeal POSITIF — pertimbangk
 // rather than fabricating school-specific curriculum content that can't be
 // verified.
 const UNIVERSITIES = ['UI', 'Unair', 'UGM', 'UNS', 'Unpad', 'Unhas'] as const
-const SPECIALTIES = ['Kedokteran Umum', 'Penyakit Dalam', 'Bedah', 'Anak', 'Obstetri & Ginekologi', 'Saraf', 'Jantung', 'Anestesi', 'Radiologi', 'Patologi Klinik'] as const
+const SPECIALTIES = ['General Medicine', 'Internal Medicine', 'Surgery', 'Pediatrics', 'Obstetrics & Gynecology', 'Neurology', 'Cardiology', 'Anesthesiology', 'Radiology', 'Clinical Pathology'] as const
 
 interface SkdiArea { key: string; area: string; title: string; items: string[] }
 const SKDI_AREAS: SkdiArea[] = [
-  { key: 'area1', area: 'Area 1', title: 'Profesionalitas yang Luhur', items: [
-    'Menunjukkan perilaku profesional & etika kedokteran', 'Bermoral & beretika dalam praktik', 'Sadar & taat hukum kedokteran',
+  { key: 'area1', area: 'Area 1', title: 'Noble Professionalism', items: [
+    'Demonstrates professional behavior & medical ethics', 'Moral & ethical conduct in practice', 'Aware of & compliant with medical law',
   ] },
-  { key: 'area2', area: 'Area 2', title: 'Mawas Diri & Pengembangan Diri', items: [
-    'Menerapkan mawas diri (refleksi praktik)', 'Mempraktikkan belajar sepanjang hayat', 'Mengembangkan pengetahuan baru',
+  { key: 'area2', area: 'Area 2', title: 'Self-Awareness & Self-Development', items: [
+    'Applies self-reflection (practice reflection)', 'Practices lifelong learning', 'Develops new knowledge',
   ] },
-  { key: 'area3', area: 'Area 3', title: 'Komunikasi Efektif', items: [
-    'Berkomunikasi dengan pasien & keluarga', 'Berkomunikasi dengan sejawat & profesi lain', 'Berkomunikasi dengan masyarakat',
+  { key: 'area3', area: 'Area 3', title: 'Effective Communication', items: [
+    'Communicates with patients & families', 'Communicates with colleagues & other professions', 'Communicates with the community',
   ] },
-  { key: 'area4', area: 'Area 4', title: 'Pengelolaan Informasi', items: [
-    'Mengakses & menilai informasi/data kesehatan secara kritis', 'Memanfaatkan teknologi informasi kesehatan', 'Menyampaikan informasi ilmiah',
+  { key: 'area4', area: 'Area 4', title: 'Information Management', items: [
+    'Critically accesses & appraises health information/data', 'Utilizes health information technology', 'Communicates scientific information',
   ] },
-  { key: 'area5', area: 'Area 5', title: 'Landasan Ilmiah Ilmu Kedokteran', items: [
-    'Menerapkan ilmu biomedik', 'Menerapkan ilmu klinik', 'Menerapkan prinsip evidence-based medicine',
+  { key: 'area5', area: 'Area 5', title: 'Scientific Foundation of Medicine', items: [
+    'Applies biomedical science', 'Applies clinical science', 'Applies evidence-based medicine principles',
   ] },
-  { key: 'area6', area: 'Area 6', title: 'Keterampilan Klinis', items: [
-    'Anamnesis & pemeriksaan fisik lengkap', 'Melakukan prosedur klinis & kegawatdaruratan', 'Interpretasi pemeriksaan penunjang', 'Menyusun & melaksanakan rencana tatalaksana',
+  { key: 'area6', area: 'Area 6', title: 'Clinical Skills', items: [
+    'Complete history-taking & physical examination', 'Performs clinical & emergency procedures', 'Interprets supporting investigations', 'Develops & implements a management plan',
   ] },
-  { key: 'area7', area: 'Area 7', title: 'Pengelolaan Masalah Kesehatan', items: [
-    'Mengelola masalah kesehatan individu & keluarga', 'Mengelola masalah kesehatan masyarakat/komunitas', 'Menerapkan prinsip keselamatan pasien',
+  { key: 'area7', area: 'Area 7', title: 'Health Problem Management', items: [
+    'Manages individual & family health problems', 'Manages community/population health problems', 'Applies patient safety principles',
   ] },
 ]
 
@@ -2104,7 +2104,7 @@ function loadCompProgress(): Record<string, CompStatus> {
 
 function CompetencyTracker() {
   const [university, setUniversity] = useState<(typeof UNIVERSITIES)[number]>('UI')
-  const [specialty, setSpecialty] = useState<(typeof SPECIALTIES)[number]>('Kedokteran Umum')
+  const [specialty, setSpecialty] = useState<(typeof SPECIALTIES)[number]>('General Medicine')
   const [progress, setProgress] = useState<Record<string, CompStatus>>(loadCompProgress)
 
   function setStatus(itemKey: string, v: CompStatus) {
@@ -2121,14 +2121,14 @@ function CompetencyTracker() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Tracker Kompetensi (SKDI)" subtitle="7 Area Kompetensi Dokter Indonesia (KKI/AIPKI) — standar nasional, berlaku di seluruh institusi pendidikan kedokteran" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Competency Tracker (SKDI)" subtitle="7 Indonesian Doctor Competency Areas (KKI/AIPKI) — a national standard applied across all medical education institutions" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Institusi">
+        <Field label="Institution">
           <select className={inputClass} value={university} onChange={(e) => setUniversity(e.target.value as (typeof UNIVERSITIES)[number])}>
             {UNIVERSITIES.map((u) => <option key={u} value={u}>{u}</option>)}
           </select>
         </Field>
-        <Field label="Program/Spesialisasi">
+        <Field label="Program/Specialty">
           <select className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value as (typeof SPECIALTIES)[number])}>
             {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -2137,7 +2137,7 @@ function CompetencyTracker() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{overallPct}%</div>
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Progres Keseluruhan — {tercapaiCount}/{allItems.length} kompetensi tercapai</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-400">Overall Progress — {tercapaiCount}/{allItems.length} competencies achieved</div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-200">
           <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${overallPct}%` }} />
         </div>
@@ -2159,7 +2159,7 @@ function CompetencyTracker() {
                 return (
                   <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
                     <div className="min-w-0 flex-1 text-[12px] font-semibold text-ink">{item}</div>
-                    <SegButtons value={v} onChange={(nv) => setStatus(key, nv)} options={[{ v: 'belum', l: 'Belum' }, { v: 'proses', l: 'Proses' }, { v: 'tercapai', l: 'Tercapai' }]} />
+                    <SegButtons value={v} onChange={(nv) => setStatus(key, nv)} options={[{ v: 'belum', l: 'Not yet' }, { v: 'proses', l: 'In progress' }, { v: 'tercapai', l: 'Achieved' }]} />
                   </div>
                 )
               })}
@@ -2168,7 +2168,7 @@ function CompetencyTracker() {
         )
       })}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">Kerangka 7 Area Kompetensi mengikuti SKDI (Standar Kompetensi Dokter Indonesia, ditetapkan KKI berbasis AIPKI) — berlaku sebagai standar nasional yang diimplementasikan seluruh institusi pendidikan kedokteran, bukan daftar unik per kampus. Sub-kompetensi di atas adalah ringkasan representatif; rujuk dokumen SKDI resmi & buku log institusi untuk daftar lengkap & terverifikasi. Progres tersimpan di perangkat ini.</p>
+      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</p>
     </Card>
   )
 }
@@ -2191,7 +2191,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
       const r = await api.unlockClinicalCalcPnc()
       if (r.unlocked) onUnlocked()
     } catch (e) {
-      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Saldo PNC Anda tidak cukup (butuh ${access.pricePnc} PNC). Isi saldo dulu lewat transfer bank di Billing.` : 'Gagal membuka akses. Coba lagi.')
+      setErr(/insufficient_balance/i.test(String((e as Error).message)) ? `Your PNC balance is insufficient (needs ${access.pricePnc} PNC). Top up first via bank transfer in Billing.` : 'Failed to unlock access. Please try again.')
     } finally {
       setBusy(false)
     }
@@ -2199,9 +2199,9 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
 
   return (
     <Card>
-      <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 skor & alat bantu keputusan klinis standar internasional" />
+      <SectionTitle icon={<IconShield size={20} />} title="Unlock Clinical Calculators" subtitle="34 internationally standard clinical decision-support scores & tools" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
-        🎉 Kalkulator Klinis <b>gratis</b> untuk {access.limit} pendaftar akun Panaceamed.id pertama — kuota itu sudah penuh. Buka akses seumur akun sekali bayar: <b>{access.pricePnc} PNC</b> (setara Rp{access.priceIdr.toLocaleString('id-ID')}).
+        🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('id-ID')}).
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <button
@@ -2209,22 +2209,22 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
           disabled={busy}
           className="flex flex-col items-start gap-1 rounded-2xl border border-brand/30 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
         >
-          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Bayar dari saldo</span>
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Pay from balance</span>
           <span className="text-xl font-black text-ink">{access.pricePnc} PNC</span>
-          <span className="text-[11px] text-neutral-500">{busy ? 'Memproses…' : 'Langsung terpotong dari saldo PanaceaToken Anda'}</span>
+          <span className="text-[11px] text-neutral-500">{busy ? 'Processing…' : 'Deducted directly from your PanaceaToken balance'}</span>
         </button>
         <button
           onClick={() => navigate('/billing')}
           className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
         >
-          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">Saldo belum cukup?</span>
-          <span className="text-base font-black text-ink">Transfer {MANUAL_BANK.bank}</span>
-          <span className="text-[11px] text-neutral-500">{MANUAL_BANK.number} a.n. {MANUAL_BANK.holder}</span>
-          <span className="text-[11px] font-semibold text-brand-dark">Isi saldo di Billing →</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">Balance not enough?</span>
+          <span className="text-base font-black text-ink">Transfer to {MANUAL_BANK.bank}</span>
+          <span className="text-[11px] text-neutral-500">{MANUAL_BANK.number} in the name of {MANUAL_BANK.holder}</span>
+          <span className="text-[11px] font-semibold text-brand-dark">Top up in Billing →</span>
         </button>
       </div>
       {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Semua pembayaran melalui transfer ke rekening di atas — unggah bukti transfer di Billing, saldo PNC ditambahkan setelah diverifikasi.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">All payments go through transfer to the account above — upload proof of transfer in Billing, PNC balance is added after verification.</p>
     </Card>
   )
 }
@@ -2237,7 +2237,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
 function BrocaLorentzCalorieCalc() {
   const [height, setHeight] = useState(165)
   const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [activity, setActivity] = useState<'ringan' | 'sedang' | 'berat'>('sedang')
+  const [activity, setActivity] = useState<'ringan' | 'sedang' | 'berat'>('sedang') // 'light' | 'moderate' | 'heavy'
   const [formula, setFormula] = useState<'broca' | 'lorentz'>('lorentz')
 
   const base = height - 100
@@ -2256,26 +2256,26 @@ function BrocaLorentzCalorieCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca–Lorentz Calorie Calculator" subtitle="Berat badan ideal (Broca/Lorentz) → estimasi kebutuhan kalori harian" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca–Lorentz Calorie Calculator" subtitle="Ideal body weight (Broca/Lorentz) → estimated daily calorie requirement" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Tinggi Badan (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-        <Field label="Jenis Kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Pria' }, { v: 'F', l: 'Wanita' }]} /></Field>
-        <Field label="Formula BBI"><SegButtons value={formula} onChange={setFormula} options={[{ v: 'broca', l: 'Broca' }, { v: 'lorentz', l: 'Lorentz' }]} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="IBW Formula"><SegButtons value={formula} onChange={setFormula} options={[{ v: 'broca', l: 'Broca' }, { v: 'lorentz', l: 'Lorentz' }]} /></Field>
       </div>
-      <Field label="Tingkat Aktivitas">
-        <SegButtons value={activity} onChange={setActivity} options={[{ v: 'ringan', l: 'Ringan (30 kkal/kg)' }, { v: 'sedang', l: 'Sedang (35 kkal/kg)' }, { v: 'berat', l: 'Berat (40 kkal/kg)' }]} />
+      <Field label="Activity Level">
+        <SegButtons value={activity} onChange={setActivity} options={[{ v: 'ringan', l: 'Light (30 kcal/kg)' }, { v: 'sedang', l: 'Moderate (35 kcal/kg)' }, { v: 'berat', l: 'Heavy (40 kcal/kg)' }]} />
       </Field>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{ibw.toFixed(1)} kg</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">BB Ideal ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kkal/hari</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Kebutuhan Kalori Total</div>
+          <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kcal/day</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Total Calorie Requirement</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Broca: (TB−100)±10-15%. Lorentz: (TB−100) − (TB−150)/4 (pria) atau /2.5 (wanita) — mengoreksi untuk tinggi ekstrem, umumnya dianggap lebih akurat dibanding Broca murni. Kalori = BBI × faktor aktivitas (25 kkal/kg basal + koreksi aktivitas). Sesuaikan lebih lanjut untuk stres metabolik, luka, atau kondisi katabolik.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</p>
     </Card>
   )
 }
@@ -2291,25 +2291,25 @@ function IvDripCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Tetes Infus (Drip Rate)" subtitle="Konversi volume & durasi infus ke tetes/menit sesuai faktor tetes set" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Convert infusion volume & duration into drops/minute per the giving set's drop factor" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Volume Total (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
-        <Field label="Durasi (jam)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
-        <Field label="Faktor Tetes (set infus)">
-          <SegButtons value={dropFactor} onChange={setDropFactor} options={[{ v: 15, l: '15 (makro)' }, { v: 20, l: '20 (makro)' }, { v: 60, l: '60 (mikro)' }]} />
+        <Field label="Total Volume (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
+        <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label="Drop Factor (giving set)">
+          <SegButtons value={dropFactor} onChange={setDropFactor} options={[{ v: 15, l: '15 (macro)' }, { v: 20, l: '20 (macro)' }, { v: 60, l: '60 (micro)' }]} />
         </Field>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/jam</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Kecepatan (pompa infus)</div>
+          <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/h</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Rate (infusion pump)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} tetes/menit</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Tetes/menit (tanpa pompa)</div>
+          <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} drops/min</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-400">Drops/min (no pump)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Tetes/menit = (Volume mL × Faktor Tetes) / (Durasi jam × 60). Set makro standar biasanya 15 atau 20 tetes/mL (dewasa/umum), set mikro 60 tetes/mL (anak/neonatus, titrasi presisi). Selalu konfirmasi faktor tetes tercetak pada kemasan set infus yang dipakai.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</p>
     </Card>
   )
 }
@@ -2327,31 +2327,31 @@ function AriaCalc() {
 
   const impactCount = [sleepImpaired, dailyImpaired, workSchoolImpaired, troublesomeSymptoms].filter(Boolean).length
   const severity = impactCount === 0 ? 'ringan' : 'sedang-berat'
-  const classification = `${duration === 'intermiten' ? 'Intermiten' : 'Persisten'} ${severity === 'ringan' ? 'Ringan' : 'Sedang-Berat'}`
+  const classification = `${duration === 'intermiten' ? 'Intermittent' : 'Persistent'} ${severity === 'ringan' ? 'Mild' : 'Moderate-Severe'}`
 
   const treatmentNote: Record<string, string> = {
-    'Intermiten Ringan': 'Antihistamin oral non-sedatif / intranasal sesuai kebutuhan.',
-    'Intermiten Sedang-Berat': 'Antihistamin oral + kortikosteroid intranasal; evaluasi ulang 2-4 minggu.',
-    'Persisten Ringan': 'Kortikosteroid intranasal reguler ± antihistamin; evaluasi ulang.',
-    'Persisten Sedang-Berat': 'Kortikosteroid intranasal reguler + antihistamin; pertimbangkan rujukan alergi/imunoterapi bila menetap.',
+    'Intermittent Mild': 'Non-sedating oral antihistamine / intranasal as needed.',
+    'Intermittent Moderate-Severe': 'Oral antihistamine + intranasal corticosteroid; re-evaluate in 2-4 weeks.',
+    'Persistent Mild': 'Regular intranasal corticosteroid ± antihistamine; re-evaluate.',
+    'Persistent Moderate-Severe': 'Regular intranasal corticosteroid + antihistamine; consider allergy referral/immunotherapy if persistent.',
   }
 
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet et al., WHO 2008)" />
-      <Field label="Durasi Gejala">
+      <Field label="Symptom Duration">
         <SegButtons value={duration} onChange={setDuration} options={[
-          { v: 'intermiten', l: 'Intermiten (<4 hari/mgu atau <4 mgu)' },
-          { v: 'persisten', l: 'Persisten (≥4 hari/mgu dan ≥4 mgu)' },
+          { v: 'intermiten', l: 'Intermittent (<4 days/week or <4 weeks)' },
+          { v: 'persisten', l: 'Persistent (≥4 days/week and ≥4 weeks)' },
         ]} />
       </Field>
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Dampak Kualitas Hidup (skor keparahan)</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Quality of Life Impact (severity score)</h4>
       <div className="mt-2 space-y-2">
         {[
-          { label: 'Gangguan tidur', checked: sleepImpaired, set: setSleepImpaired },
-          { label: 'Gangguan aktivitas harian/olahraga/rekreasi', checked: dailyImpaired, set: setDailyImpaired },
-          { label: 'Gangguan sekolah/pekerjaan', checked: workSchoolImpaired, set: setWorkSchoolImpaired },
-          { label: 'Gejala mengganggu (troublesome)', checked: troublesomeSymptoms, set: setTroublesomeSymptoms },
+          { label: 'Sleep disturbance', checked: sleepImpaired, set: setSleepImpaired },
+          { label: 'Impairment of daily activities/sport/leisure', checked: dailyImpaired, set: setDailyImpaired },
+          { label: 'Impairment of school/work', checked: workSchoolImpaired, set: setWorkSchoolImpaired },
+          { label: 'Troublesome symptoms', checked: troublesomeSymptoms, set: setTroublesomeSymptoms },
         ].map((item) => (
           <label key={item.label} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
             <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -2362,11 +2362,11 @@ function AriaCalc() {
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div className="text-lg font-black text-ink">{classification}</div>
-          <Badge tone={severity === 'ringan' ? 'normal' : 'low'}>{impactCount}/4 dampak</Badge>
+          <Badge tone={severity === 'ringan' ? 'normal' : 'low'}>{impactCount}/4 impacts</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Klasifikasi ARIA: durasi (intermiten vs persisten) × keparahan (ringan bila 0/4 item dampak QoL terganggu; sedang-berat bila ≥1/4). Menggantikan istilah lama "seasonal/perennial" karena tak selalu sesuai pola gejala di klinis nyata.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</p>
     </Card>
   )
 }
@@ -2378,31 +2378,31 @@ function AriaCalc() {
 // cardiac-arrest / peri-arrest management side of resuscitation.
 type AclsAlgo = 'arrest' | 'brady' | 'tachy'
 const ACLS_ARREST_STEPS: string[] = [
-  'Mulai RJP berkualitas tinggi: kompresi 100-120x/menit, kedalaman 5-6cm, minimalkan interupsi, izinkan recoil penuh.',
-  'Pasang monitor/defibrilator secepatnya — identifikasi ritme: Shockable (VF/VT tanpa nadi) atau Non-Shockable (PEA/Asistol).',
-  'Shockable: defibrilasi segera (energi sesuai alat) → lanjutkan RJP 2 menit → epinefrin 1mg IV/IO tiap 3-5 menit (mulai setelah syok ke-2) → pertimbangkan amiodaron 300mg (atau lidokain) setelah syok ke-3.',
-  'Non-Shockable: epinefrin 1mg IV/IO sesegera mungkin, ulangi tiap 3-5 menit → RJP 2 menit → cek ritme ulang.',
-  'Cari & atasi penyebab reversibel — 5H (Hipovolemia, Hipoksia, Hidrogen ion/asidosis, Hipo/Hiperkalemia, Hipotermia) & 5T (Tension pneumotoraks, Tamponade jantung, Toksin, Trombosis paru, Trombosis koroner).',
-  'ROSC (Return of Spontaneous Circulation): mulai perawatan pasca-henti jantung — oksigenasi/ventilasi titrasi, target hemodinamik, EKG 12-lead, pertimbangkan target temperature management.',
+  'Start high-quality CPR: compressions 100-120/min, depth 5-6cm, minimize interruptions, allow full recoil.',
+  'Attach monitor/defibrillator as soon as possible — identify rhythm: Shockable (pulseless VF/VT) or Non-Shockable (PEA/Asystole).',
+  'Shockable: defibrillate immediately (energy per device) → resume CPR for 2 minutes → epinephrine 1mg IV/IO every 3-5 minutes (start after the 2nd shock) → consider amiodarone 300mg (or lidocaine) after the 3rd shock.',
+  'Non-Shockable: epinephrine 1mg IV/IO as soon as possible, repeat every 3-5 minutes → CPR for 2 minutes → recheck rhythm.',
+  'Find & treat reversible causes — the 5 Hs (Hypovolemia, Hypoxia, Hydrogen ion/acidosis, Hypo/Hyperkalemia, Hypothermia) & 5 Ts (Tension pneumothorax, Cardiac Tamponade, Toxins, pulmonary Thrombosis, coronary Thrombosis).',
+  'ROSC (Return of Spontaneous Circulation): begin post-cardiac-arrest care — titrated oxygenation/ventilation, hemodynamic targets, 12-lead ECG, consider targeted temperature management.',
 ]
 const ACLS_BRADY_STEPS: string[] = [
-  'Identifikasi bradikardia (nadi <50x/menit) — nilai apakah menyebabkan gejala/tanda tidak stabil (hipotensi, perubahan status mental, syok, nyeri dada iskemik, gagal jantung akut).',
-  'Bila STABIL: pantau & observasi, identifikasi & atasi penyebab.',
-  'Bila TIDAK STABIL: Atropin 1mg IV bolus (ulangi tiap 3-5 menit, maks 3mg total).',
-  'Bila atropin tidak efektif: transcutaneous pacing, ATAU infus dopamin (5-20 mcg/kg/menit), ATAU infus epinefrin (2-10 mcg/menit).',
-  'Pertimbangkan konsul ahli & pacing transvena bila penyebab reversibel tak segera teratasi.',
+  'Identify bradycardia (pulse <50/min) — assess whether it is causing unstable symptoms/signs (hypotension, altered mental status, shock, ischemic chest pain, acute heart failure).',
+  'If STABLE: monitor & observe, identify & treat the cause.',
+  'If UNSTABLE: Atropine 1mg IV bolus (repeat every 3-5 minutes, max 3mg total).',
+  'If atropine is ineffective: transcutaneous pacing, OR dopamine infusion (5-20 mcg/kg/min), OR epinephrine infusion (2-10 mcg/min).',
+  'Consider expert consultation & transvenous pacing if the reversible cause cannot be resolved promptly.',
 ]
 const ACLS_TACHY_STEPS: string[] = [
-  'Identifikasi takikardia (nadi >100x/menit) — nilai apakah menyebabkan gejala/tanda tidak stabil (hipotensi, perubahan status mental, syok, nyeri dada iskemik, gagal jantung akut).',
-  'Bila TIDAK STABIL: kardioversi tersinkronisasi segera (pertimbangkan sedasi singkat bila sadar & waktu memungkinkan).',
-  'Bila STABIL & kompleks SEMPIT (QRS <0.12dtk) reguler: manuver vagal → adenosin 6mg IV cepat (lalu 12mg bila perlu).',
-  'Bila STABIL & kompleks LEBAR (QRS ≥0.12dtk): pertimbangkan adenosin bila reguler & monomorfik, atau infus antiaritmia (prokainamid/amiodaron/sotalol) — konsul ahli dianjurkan.',
-  'Sepanjang proses: pertahankan jalan napas, berikan oksigen bila hipoksemia, pasang akses IV & monitor EKG 12-lead bila memungkinkan tanpa menunda tatalaksana.',
+  'Identify tachycardia (pulse >100/min) — assess whether it is causing unstable symptoms/signs (hypotension, altered mental status, shock, ischemic chest pain, acute heart failure).',
+  'If UNSTABLE: immediate synchronized cardioversion (consider brief sedation if conscious & time permits).',
+  'If STABLE & regular NARROW complex (QRS <0.12s): vagal maneuvers → adenosine 6mg rapid IV push (then 12mg if needed).',
+  'If STABLE & WIDE complex (QRS ≥0.12s): consider adenosine if regular & monomorphic, or antiarrhythmic infusion (procainamide/amiodarone/sotalol) — expert consultation recommended.',
+  'Throughout: maintain the airway, give oxygen if hypoxemic, establish IV access & 12-lead ECG monitoring where possible without delaying treatment.',
 ]
 const ACLS_ALGOS: { id: AclsAlgo; label: string; title: string; steps: string[] }[] = [
-  { id: 'arrest', label: 'Henti Jantung', title: 'Algoritma Henti Jantung Dewasa (Cardiac Arrest)', steps: ACLS_ARREST_STEPS },
-  { id: 'brady', label: 'Bradikardia', title: 'Algoritma Bradikardia (Bergejala)', steps: ACLS_BRADY_STEPS },
-  { id: 'tachy', label: 'Takikardia', title: 'Algoritma Takikardia (Bergejala)', steps: ACLS_TACHY_STEPS },
+  { id: 'arrest', label: 'Cardiac Arrest', title: 'Adult Cardiac Arrest Algorithm', steps: ACLS_ARREST_STEPS },
+  { id: 'brady', label: 'Bradycardia', title: 'Bradycardia Algorithm (Symptomatic)', steps: ACLS_BRADY_STEPS },
+  { id: 'tachy', label: 'Tachycardia', title: 'Tachycardia Algorithm (Symptomatic)', steps: ACLS_TACHY_STEPS },
 ]
 
 function AclsCalc() {
@@ -2410,7 +2410,7 @@ function AclsCalc() {
   const active = ACLS_ALGOS.find((a) => a.id === algo)!
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Panduan ACLS" subtitle="Advanced Cardiovascular Life Support — algoritma ringkas (AHA Guidelines 2020)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ACLS Guide" subtitle="Advanced Cardiovascular Life Support — quick reference algorithms (AHA Guidelines 2020)" />
       <SegButtons value={algo} onChange={setAlgo} options={ACLS_ALGOS.map((a) => ({ v: a.id, l: a.label }))} />
       <div className="mt-4 rounded-xl bg-neutral-50 p-4">
         <h4 className="text-sm font-black text-ink">{active.title}</h4>
@@ -2423,7 +2423,7 @@ function AclsCalc() {
           ))}
         </ol>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ringkasan algoritma AHA ACLS 2020 — pelengkap survei primer trauma XABCDE untuk skenario henti jantung/peri-arrest. Bukan pengganti pelatihan ACLS bersertifikat & tidak mencakup seluruh nuansa/dosis pediatrik (lihat PALS terpisah).</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</p>
     </Card>
   )
 }
@@ -2440,7 +2440,7 @@ export function ClinicalCalculators() {
   if (access && !access.unlocked) {
     return (
       <div className="mx-auto max-w-xl space-y-4 p-4">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
         <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
       </div>
     )
@@ -2450,10 +2450,10 @@ export function ClinicalCalculators() {
     <div className="mx-auto max-w-xl space-y-4 p-4">
       {access?.free && (
         <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
-          <IconCheck size={14} /> Anda termasuk {access.limit} pendaftar pertama — akses gratis selamanya.
+          <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
         </div>
       )}
-      <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle="Skor & alat bantu keputusan klinis standar internasional" />
+      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {TABS.map((t) => (
           <button
