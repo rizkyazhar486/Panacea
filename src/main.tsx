@@ -64,6 +64,7 @@ const LongevityCurriculum = lazy(() => import('./pages/LongevityCurriculum').the
 const MedStudyHub = lazy(() => import('./pages/MedStudyHub').then((m) => ({ default: m.MedStudyHub })))
 const DietarySupplements = lazy(() => import('./pages/DietarySupplements').then((m) => ({ default: m.DietarySupplements })))
 const AestheticVitality = lazy(() => import('./pages/AestheticVitality').then((m) => ({ default: m.AestheticVitality })))
+const ClinicalEvidence = lazy(() => import('./pages/ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -131,6 +132,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/med-study" element={<MedStudyHub />} />
               <Route path="/supplements" element={<DietarySupplements />} />
               <Route path="/aesthetic" element={<AestheticVitality />} />
+              <Route path="/evidence" element={<ClinicalEvidence />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
