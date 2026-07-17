@@ -68,6 +68,8 @@ const ClinicalEvidence = lazy(() => import('./pages/ClinicalEvidence').then((m) 
 const BiologicalAge = lazy(() => import('./pages/BiologicalAge').then((m) => ({ default: m.BiologicalAge })))
 const RealityCheck = lazy(() => import('./pages/RealityCheck').then((m) => ({ default: m.RealityCheck })))
 const FamilyHealth = lazy(() => import('./pages/FamilyHealth').then((m) => ({ default: m.FamilyHealth })))
+const FastingTimer = lazy(() => import('./pages/FastingTimer').then((m) => ({ default: m.FastingTimer })))
+const LabDecoder = lazy(() => import('./pages/LabDecoder').then((m) => ({ default: m.LabDecoder })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -139,6 +141,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/biological-age" element={<BiologicalAge />} />
               <Route path="/reality-check" element={<RealityCheck />} />
               <Route path="/family-health" element={<FamilyHealth />} />
+              <Route path="/fasting" element={<FastingTimer />} />
+              <Route path="/lab-decoder" element={<LabDecoder />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
