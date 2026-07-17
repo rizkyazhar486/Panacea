@@ -748,6 +748,32 @@ async function pollSportsFavorites() {
   }
 }
 
+// --- Production incident alerting ---------------------------------------------
+// Push a notification (and email) to the owner when something goes wrong in
+// production: unhandled route errors, uncaught exceptions, and rejected
+// promises. Throttled so one recurring fault can't spam a flood of alerts.
+let lastOwnerAlert = 0
+function alertOwner(kind: string, detail: string) {
+  const now = Date.now()
+  if (now - lastOwnerAlert < 60_000) return // at most one alert/minute
+  lastOwnerAlert = now
+  const owner = getUserByEmail(config.ownerEmail)
+  const body = `${kind}: ${detail}`.slice(0, 300)
+  console.error(`[incident] ${body}`)
+  if (owner) notify(owner.id, { title: '🚨 Panaceamed production incident', body, url: '/owner' }, 'notifTransactions').catch(() => {})
+  sendEmail(config.ownerEmail, '🚨 Panaceamed production incident', `<p><b>${kind}</b></p><pre>${detail.slice(0, 2000)}</pre>`).catch(() => {})
+}
+
+// Express error-handling middleware (must be registered AFTER all routes).
+app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err)
+  alertOwner(`Route error @ ${req.method} ${req.path}`, msg)
+  if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
+})
+
+process.on('uncaughtException', (e) => alertOwner('Uncaught exception', e?.stack || String(e)))
+process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection', e instanceof Error ? (e.stack || e.message) : String(e)))
+
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
