@@ -221,11 +221,11 @@ export function ShareStatCard(props: StatCardProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Bagikan hasil"
+        aria-label="Share results"
         className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}
       >
-        <IconShare2 size={16} /> Bagikan Hasil
+        <IconShare2 size={16} /> Share Results
       </button>
 
       {open && (
@@ -233,8 +233,8 @@ export function ShareStatCard(props: StatCardProps) {
         <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-black text-ink">Bagikan Hasil</h3>
-              <button onClick={() => setOpen(false)} aria-label="Tutup" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <h3 className="text-base font-black text-ink">Share Results</h3>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
             <div className="mb-3 overflow-hidden rounded-2xl bg-neutral-100">
@@ -243,31 +243,31 @@ export function ShareStatCard(props: StatCardProps) {
 
             <button onClick={() => fileRef.current?.click()} disabled={busy}
               className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand/40 bg-brand-50 py-2.5 text-sm font-bold text-brand-dark">
-              📷 {busy ? 'Mengunggah…' : photoUrl ? 'Ganti Foto Latar' : 'Tambah Foto Latar (opsional)'}
+              📷 {busy ? 'Uploading…' : photoUrl ? 'Change Background Photo' : 'Add Background Photo (optional)'}
             </button>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => pickPhoto(e.target.files?.[0])} />
 
-            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Tulis sesuatu…"
+            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write something…"
               className="mb-3 min-h-[60px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand" />
 
             <button onClick={shareExternally} disabled={busy || !dataUrl}
               className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-40"
               style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-              <IconShare2 size={16} /> Bagikan ke Aplikasi Lain (WA, IG, dll.)
+              <IconShare2 size={16} /> Share to Other Apps (WA, IG, etc.)
             </button>
 
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => publishInApp('story')} disabled={busy || !dataUrl}
                 className="flex items-center justify-center gap-2 rounded-xl bg-neutral-100 py-3 text-sm font-bold text-neutral-700 disabled:opacity-40">
-                🟢 Story (24 jam)
+                🟢 Story (24h)
               </button>
               <button onClick={() => publishInApp('post')} disabled={busy || !dataUrl}
                 className="flex items-center justify-center gap-2 rounded-xl bg-ink py-3 text-sm font-bold text-white disabled:opacity-40">
-                📣 Posting di Panaceamed
+                📣 Post to Panaceamed
               </button>
             </div>
             <a href={dataUrl} download="panaceamed-stat.png" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600">
-              <IconDownload size={14} /> Unduh gambar
+              <IconDownload size={14} /> Download image
             </a>
           </div>
         </div>
