@@ -60,7 +60,7 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 
 // Sidebar groups (accordion sections) — order defines display order. Grouped by
 // intent with short labels so the menu stays scannable and icon-led.
-const GROUP_ORDER = ['Home', 'Health', 'Fitness', 'Clinical & AI', 'Services', 'Content', 'Manage', 'Account']
+const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitness', 'Clinical & AI', 'Services', 'Content', 'Manage', 'Account']
 
 const nav: Nav[] = [
   // Beranda (rendered as plain links — the most-used, social-first destinations)
@@ -69,23 +69,25 @@ const nav: Nav[] = [
   { to: '/messages', label: 'Messages', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/logs', label: 'Log & Stats', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
-  // Kesehatan
+  // Kesehatan — core health data & daily care
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/aesthetic', label: 'Aesthetic Vitality', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/fasting', label: 'Fasting Timer', icon: IconTimer, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/air-quality', label: 'Air Quality & Lungs', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/supplements', label: 'Supplements & Ergogenics', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/air-quality', label: 'Air Quality & Lungs', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
+  // Longevity & aging
+  { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/aesthetic', label: 'Aesthetic Vitality', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/fasting', label: 'Fasting Timer', icon: IconTimer, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  // Calculators & labs
+  { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   // Kebugaran
   { to: '/athlete', label: 'Athlete', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Fitness' },
@@ -104,7 +106,7 @@ const nav: Nav[] = [
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
   { to: '/clinical', label: 'Clinical Data', icon: IconHeart, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Clinical & AI' },
-  { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
+  { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/longevity-curriculum', label: 'Longevity Curriculum', icon: IconHeart, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/sexual-health', label: 'Sexual Health & OB-GYN', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
