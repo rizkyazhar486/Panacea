@@ -149,7 +149,8 @@ export function BiologicalAge() {
   useEffect(() => {
     const onFocus = () => syncNow(true)
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    window.addEventListener('panacea:health-updated', onFocus)
+    return () => { window.removeEventListener('focus', onFocus); window.removeEventListener('panacea:health-updated', onFocus) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
