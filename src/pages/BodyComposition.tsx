@@ -101,7 +101,7 @@ function BodyTypeGrid({ bmi, pbf, g }: { bmi: number; pbf: number; g: 'M' | 'F' 
           </div>
         )))}
       </div>
-      <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>PBF rendah</span><span>normal</span><span>tinggi</span></div>
+      <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Low PBF</span><span>Normal</span><span>High</span></div>
     </div>
   )
 }
@@ -121,7 +121,7 @@ export function BodyComposition() {
     const basal = bmr(b)
     const visceral = Math.max(1, Math.round((b.waist - (b.g === 'M' ? 78 : 70)) / 2 + pbf / 8))
     // Cardio fitness ≈ VO2max tier + life-expectancy delta heuristic (Mandsager 2018 direction).
-    const vo2Tier = b.vo2 >= 52 ? 'Elit' : b.vo2 >= 45 ? 'Sangat Baik' : b.vo2 >= 38 ? 'Cukup' : 'Rendah'
+    const vo2Tier = b.vo2 >= 52 ? 'Elite' : b.vo2 >= 45 ? 'Excellent' : b.vo2 >= 38 ? 'Fair' : 'Low'
     const lifeBase = b.g === 'M' ? 72 : 76 // Indonesia approx
     const lifeAdj = (b.vo2 - 38) * 0.25 + (smm / b.w > 0.4 ? 2 : 0) - (whr > (b.g === 'M' ? 0.9 : 0.85) ? 2 : 0) - b.stress * 0.2 + (b.sleepH >= 7 ? 1 : -1)
     const lifeExp = Math.round(lifeBase + lifeAdj)
@@ -146,19 +146,19 @@ export function BodyComposition() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Komposisi Tubuh & Longevity" subtitle="Isi manual dari timbangan pintar / InBody / Apple Watch — semua dihitung & divisualisasikan" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition & Longevity" subtitle="Enter manually from a smart scale / InBody / Apple Watch — everything is calculated & visualized" />
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
-          {num('Berat (kg)', 'w', 0.1)}
-          {num('Tinggi (cm)', 'h')}
-          {num('Usia', 'age')}
-          <Field label="Jenis Kelamin">
+          {num('Weight (kg)', 'w', 0.1)}
+          {num('Height (cm)', 'h')}
+          {num('Age', 'age')}
+          <Field label="Sex">
             <select className={inputClass} value={b.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
-          {num('Pinggang (cm)', 'waist')}
-          {num('Pinggul (cm)', 'hip')}
-          {num('Leher (cm)', 'neck')}
+          {num('Waist (cm)', 'waist')}
+          {num('Hip (cm)', 'hip')}
+          {num('Neck (cm)', 'neck')}
           {num('VO₂max', 'vo2', 0.1)}
           {num('SMM InBody (kg, ops.)', 'smm', 0.1)}
           {num('Fat Mass InBody (kg, ops.)', 'bfm', 0.1)}
@@ -170,18 +170,18 @@ export function BodyComposition() {
       {/* Score + bento header */}
       <div className="grid grid-cols-2 gap-3">
         <Card className="!p-4 liquid-glass">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Skor Komposisi</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Composition Score</div>
           <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-400"> /100</span></div>
-          <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Atletis' : d.score >= 65 ? 'Rata-rata' : 'Perlu perbaikan'}</Badge>
+          <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
         </Card>
         <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
       </div>
 
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Analisis Otot–Lemak" subtitle="Gaya InBody: Under · Normal · Over" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
         <div className="mt-3 space-y-2.5">
-          <RangeBar label="Berat Badan" value={b.w} unit="kg" lo={18.5 * Math.pow(b.h / 100, 2)} hi={24.9 * Math.pow(b.h / 100, 2)} max={35 * Math.pow(b.h / 100, 2)} />
+          <RangeBar label="Body Weight" value={b.w} unit="kg" lo={18.5 * Math.pow(b.h / 100, 2)} hi={24.9 * Math.pow(b.h / 100, 2)} max={35 * Math.pow(b.h / 100, 2)} />
           <RangeBar label="Skeletal Muscle Mass" value={d.smm} unit="kg" lo={b.w * 0.37} hi={b.w * 0.5} max={b.w * 0.6} />
           <RangeBar label="Body Fat Mass" value={d.fatMass} unit="kg" lo={b.w * (b.g === 'M' ? 0.08 : 0.15)} hi={b.w * (b.g === 'M' ? 0.2 : 0.28)} max={b.w * 0.45} danger />
           <RangeBar label="BMI" value={d.bmi} unit="kg/m²" lo={18.5} hi={24.9} max={40} />
@@ -191,46 +191,46 @@ export function BodyComposition() {
           <RangeBar label="Lean Body Mass" value={d.lean} unit="kg" lo={b.w * 0.7} hi={b.w * 0.92} max={b.w} />
         </div>
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-[11px] leading-relaxed text-neutral-500">
-          <b className="text-ink">BMR: {d.basal} kkal</b> (Mifflin-St Jeor) — kebutuhan dasar sebelum aktivitas.
-          Lemak dihitung metode US Navy dari lingkar tubuh bila data InBody kosong.
+          <b className="text-ink">BMR: {d.basal} kcal</b> (Mifflin-St Jeor) — baseline requirement before activity.
+          Body fat is calculated using the US Navy method from body circumference measurements when InBody data is not provided.
         </div>
       </Card>
 
       {/* Lab & Pemeriksaan Lanjutan */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Pemeriksaan Lanjutan" subtitle="Bone Mass Density (DEXA) — isi bila Anda punya hasil pemeriksaan" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Bone Mass Density (DEXA) — enter if you have test results" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('T-score BMD (DEXA)', 'bmd', 0.1)}
         </div>
         {b.bmd !== 0 && (
           <div className="mt-3 rounded-xl bg-neutral-50 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-neutral-500">Klasifikasi WHO</span>
+              <span className="text-xs font-bold text-neutral-500">WHO Classification</span>
               <Badge tone={b.bmd >= -1 ? 'brand' : b.bmd >= -2.5 ? 'low' : 'critical'}>
                 {b.bmd >= -1 ? 'Normal' : b.bmd >= -2.5 ? 'Osteopenia' : 'Osteoporosis'}
               </Badge>
             </div>
             <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
-              T-score ≥ −1: normal · −1 s/d −2.5: osteopenia (massa tulang rendah) · ≤ −2.5: osteoporosis (kriteria WHO).
-              Kepadatan tulang menurun secara alami seiring usia — resistance training & asupan kalsium/vitamin D & protein cukup membantu menjaga BMD.
+              T-score ≥ −1: normal · −1 to −2.5: osteopenia (low bone mass) · ≤ −2.5: osteoporosis (WHO criteria).
+              Bone density naturally declines with age — resistance training and adequate calcium/vitamin D and protein intake help maintain BMD.
             </p>
           </div>
         )}
-        {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-400">Belum ada data. BMD diukur via DEXA scan di fasilitas kesehatan/lab radiologi.</p>}
+        {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-400">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
       </Card>
 
       {/* Longevity indicator bento */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Indikator Longevity Harian" subtitle="Readiness, body battery, aging & mental — isi dari jam/perasaan hari ini" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Daily Longevity Indicators" subtitle="Readiness, body battery, aging & mental — enter from today's hours/feelings" />
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
-          {num('Tidur total (jam)', 'sleepH', 0.1)}
-          {num('REM (jam)', 'remH', 0.1)}
-          {num('Deep/N3 (jam)', 'deepH', 0.1)}
-          {num('Stres (0-10)', 'stress')}
-          {num('Cemas (0-10)', 'anxiety')}
+          {num('Total sleep (hrs)', 'sleepH', 0.1)}
+          {num('REM (hrs)', 'remH', 0.1)}
+          {num('Deep/N3 (hrs)', 'deepH', 0.1)}
+          {num('Stress (0-10)', 'stress')}
+          {num('Anxiety (0-10)', 'anxiety')}
           {num('Mood (0-10)', 'mood')}
-          {num('METs latihan', 'mets', 0.5)}
-          {num('Kebisingan (dB)', 'noiseDb')}
+          {num('Exercise METs', 'mets', 0.5)}
+          {num('Noise (dB)', 'noiseDb')}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {[
