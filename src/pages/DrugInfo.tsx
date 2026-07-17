@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, inputClass, Button } from '../components/ui'
 import { IconPill, IconShield } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { api } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Drug Info — look up a medicine and see, from its official FDA label, what it's
@@ -42,11 +42,6 @@ export function DrugInfo() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconPill size={20} />} title="Drug Info" subtitle="Look up a medicine — purpose, warnings & side effects from official FDA labels" />
-        {!backendEnabled && (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            Live lookup needs the backend.
-          </p>
-        )}
         <div className="mt-3 flex gap-2">
           <input className={inputClass} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') search() }} placeholder="Brand or generic name — e.g. ibuprofen" />
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Search'}</Button>
