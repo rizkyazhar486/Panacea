@@ -81,6 +81,7 @@ import { searchPubmed } from './pubmed.js'
 import { searchTrials } from './trials.js'
 import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
+import { findRelatedDrugs } from './rxnorm.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -544,6 +545,20 @@ app.get('/api/drugs/label', requireAuth, async (req, res) => {
   } catch (e) {
     console.log('[openfda] error:', (e as Error).message)
     res.json({ drug: null, error: 'drug_unavailable' })
+  }
+})
+
+// Related brand/generic drug names — RxNorm (free, no key). NOT an
+// interaction checker (that RxNav sub-API was retired by NLM in Jan 2024).
+app.get('/api/drugs/related', requireAuth, async (req, res) => {
+  const q = String(req.query.q || '').trim()
+  if (!q) return res.status(400).json({ error: 'empty_query' })
+  try {
+    const drugs = await findRelatedDrugs(q)
+    res.json({ drugs })
+  } catch (e) {
+    console.log('[rxnorm] error:', (e as Error).message)
+    res.json({ drugs: [], error: 'rxnorm_unavailable' })
   }
 })
 
