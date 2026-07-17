@@ -216,12 +216,27 @@ export function Chatbot() {
 
   function toggleMic() {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    if (!SR) { setError('Your browser does not support voice input.'); return }
+    if (!SR) { setError('Your browser does not support voice input. Try Chrome or Edge.'); return }
     if (listening) { recogRef.current?.stop(); return }
+    setError('')
     const r = new SR(); r.lang = 'en-US'; r.interimResults = false; r.continuous = false
     r.onresult = (e: any) => setInput((p) => (p ? p + ' ' : '') + e.results[0][0].transcript)
-    r.onend = () => setListening(false); r.onerror = () => setListening(false)
-    recogRef.current = r; setListening(true); r.start()
+    r.onend = () => setListening(false)
+    r.onerror = (e: any) => {
+      setListening(false)
+      const msgs: Record<string, string> = {
+        'not-allowed': 'Microphone access was denied. Allow mic permission in your browser settings and try again.',
+        'permission-denied': 'Microphone access was denied. Allow mic permission in your browser settings and try again.',
+        'no-speech': 'No speech detected. Try again and speak right after tapping the mic.',
+        'audio-capture': 'No microphone was found on this device.',
+        network: 'A network error interrupted voice recognition. Check your connection and try again.',
+        aborted: '',
+      }
+      const text = msgs[e?.error] ?? 'Voice recording failed. Please try again.'
+      if (text) setError(text)
+    }
+    recogRef.current = r; setListening(true)
+    try { r.start() } catch { setListening(false); setError('Voice recording failed to start. Please try again.') }
   }
 
   async function analyzeImage(file?: File) {
