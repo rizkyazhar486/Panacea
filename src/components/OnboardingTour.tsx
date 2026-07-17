@@ -28,17 +28,7 @@ export function OnboardingTour() {
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-label="New user guide">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl">
         <div className="mb-1 text-center text-2xl font-black text-ink">Welcome 👋</div>
-        <p className="mb-4 text-center text-sm text-neutral-500">Watch this short video first, or go straight to getting familiar with the main buttons below:</p>
-
-        <div className="mb-5 overflow-hidden rounded-2xl bg-black">
-          <video
-            src={`${import.meta.env.BASE_URL}tutorial-video.mp4`}
-            controls
-            playsInline
-            preload="metadata"
-            className="mx-auto block max-h-72 w-full"
-          />
-        </div>
+        <p className="mb-5 text-center text-sm text-neutral-500">Here are the main buttons you'll use most — tap through them anytime:</p>
 
         <div className="space-y-3">
           {steps.map((s) => (

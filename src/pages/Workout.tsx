@@ -199,9 +199,9 @@ export function Workout() {
       <div className="space-y-2.5">
         {filtered.map((e) => (
           <Card key={e.id} className="!p-4">
-            <button type="button" className="flex w-full items-center justify-between text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
-              <div>
-                <div className="flex items-center gap-2 text-sm font-bold text-ink">
+            <button type="button" className="flex w-full items-center justify-between gap-2 text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-ink">
                   {e.name}
                   <Badge tone={e.type === 'Calisthenic' ? 'brand' : 'neutral'}>{e.type}</Badge>
                   <Badge tone="neutral">{e.mode}</Badge>
@@ -211,7 +211,7 @@ export function Workout() {
                   {e.modalities.slice(0, 3).map((m) => <span key={m} className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-dark">{m}</span>)}
                 </div>
               </div>
-              <IconActivity size={16} className={open === e.id ? 'text-brand' : 'text-neutral-300'} />
+              <IconActivity size={16} className={`shrink-0 ${open === e.id ? 'text-brand' : 'text-neutral-300'}`} />
             </button>
 
             {open === e.id && (
