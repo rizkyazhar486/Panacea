@@ -3,8 +3,8 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Anti-Aging & Fungsi Organ — quantitative/QC/safety layer for longevity.
-// Distinct from Longevity (composite score/decades) and Komposisi Tubuh
+// Anti-Aging & Organ Function — quantitative/QC/safety layer for longevity.
+// Distinct from Longevity (composite score/decades) and Body Composition
 // (BMI/InBody). Here: per-organ biomarker panels with reference RANGES and a
 // safety band (green in-range / amber borderline / red act-now), quantified
 // SKIN aging metrics, and AESTHETIC body-composition targets with a safety
@@ -23,51 +23,51 @@ interface Panel { id: string; emoji: string; organ: string; blurb: string; marke
 // Reference ranges are general adult guidance for education — NOT diagnosis.
 const PANELS: Panel[] = [
   {
-    id: 'metabolic', emoji: '🩸', organ: 'Metabolik & Pankreas', blurb: 'Kontrol gula & insulin — pendorong penuaan (glikasi) tercepat.',
+    id: 'metabolic', emoji: '🩸', organ: 'Metabolic & Pancreas', blurb: 'Blood sugar & insulin control — the fastest driver of aging (glycation).',
     markers: [
-      { id: 'glucose', label: 'Gula darah puasa', unit: 'mg/dL', lo: 70, hi: 99, warnLo: 60, warnHi: 125, note: '100-125 pradiabetes · ≥126 diabetes' },
-      { id: 'hba1c', label: 'HbA1c', unit: '%', lo: 4.0, hi: 5.6, warnHi: 6.4, note: '5.7-6.4 pradiabetes · ≥6.5 diabetes' },
-      { id: 'trig', label: 'Trigliserida', unit: 'mg/dL', lo: 40, hi: 149, warnHi: 199, note: 'penanda sensitivitas insulin' },
+      { id: 'glucose', label: 'Fasting blood glucose', unit: 'mg/dL', lo: 70, hi: 99, warnLo: 60, warnHi: 125, note: '100-125 prediabetes · ≥126 diabetes' },
+      { id: 'hba1c', label: 'HbA1c', unit: '%', lo: 4.0, hi: 5.6, warnHi: 6.4, note: '5.7-6.4 prediabetes · ≥6.5 diabetes' },
+      { id: 'trig', label: 'Triglycerides', unit: 'mg/dL', lo: 40, hi: 149, warnHi: 199, note: 'marker of insulin sensitivity' },
     ],
   },
   {
-    id: 'cardio', emoji: '❤️', organ: 'Jantung & Pembuluh', blurb: 'Aterosklerosis mulai diam-diam sejak muda.',
+    id: 'cardio', emoji: '❤️', organ: 'Heart & Vessels', blurb: 'Atherosclerosis begins silently from a young age.',
     markers: [
-      { id: 'ldl', label: 'LDL kolesterol', unit: 'mg/dL', lo: 40, hi: 99, warnHi: 159, note: '<100 optimal · ≥160 tinggi' },
-      { id: 'hdl', label: 'HDL kolesterol', unit: 'mg/dL', lo: 50, hi: 90, warnLo: 40, note: 'makin tinggi makin protektif' },
-      { id: 'sbp', label: 'Tekanan darah sistolik', unit: 'mmHg', lo: 90, hi: 119, warnHi: 139, note: '120-129 meningkat · ≥140 hipertensi' },
-      { id: 'crp', label: 'hsCRP (inflamasi)', unit: 'mg/L', lo: 0, hi: 1, warnHi: 3, note: '<1 rendah · >3 risiko kardio tinggi' },
+      { id: 'ldl', label: 'LDL cholesterol', unit: 'mg/dL', lo: 40, hi: 99, warnHi: 159, note: '<100 optimal · ≥160 high' },
+      { id: 'hdl', label: 'HDL cholesterol', unit: 'mg/dL', lo: 50, hi: 90, warnLo: 40, note: 'higher is more protective' },
+      { id: 'sbp', label: 'Systolic blood pressure', unit: 'mmHg', lo: 90, hi: 119, warnHi: 139, note: '120-129 elevated · ≥140 hypertension' },
+      { id: 'crp', label: 'hsCRP (inflammation)', unit: 'mg/L', lo: 0, hi: 1, warnHi: 3, note: '<1 low · >3 high cardiovascular risk' },
     ],
   },
   {
-    id: 'liver', emoji: '🫗', organ: 'Hati (Liver)', blurb: 'Detoksifikasi & metabolisme; perlemakan hati kian umum.',
+    id: 'liver', emoji: '🫗', organ: 'Liver', blurb: 'Detoxification & metabolism; fatty liver is increasingly common.',
     markers: [
-      { id: 'alt', label: 'ALT (SGPT)', unit: 'U/L', lo: 7, hi: 40, warnHi: 55, note: 'naik = stres/lemak hati' },
+      { id: 'alt', label: 'ALT (SGPT)', unit: 'U/L', lo: 7, hi: 40, warnHi: 55, note: 'elevated = stress/fatty liver' },
       { id: 'ast', label: 'AST (SGOT)', unit: 'U/L', lo: 8, hi: 40, warnHi: 55, note: '' },
-      { id: 'ggt', label: 'GGT', unit: 'U/L', lo: 8, hi: 48, warnHi: 70, note: 'sensitif thd alkohol & lemak hati' },
+      { id: 'ggt', label: 'GGT', unit: 'U/L', lo: 8, hi: 48, warnHi: 70, note: 'sensitive to alcohol & fatty liver' },
     ],
   },
   {
-    id: 'kidney', emoji: '🫘', organ: 'Ginjal', blurb: 'Fungsi filtrasi menurun perlahan seiring usia.',
+    id: 'kidney', emoji: '🫘', organ: 'Kidneys', blurb: 'Filtration function declines gradually with age.',
     markers: [
-      { id: 'creat', label: 'Kreatinin', unit: 'mg/dL', lo: 0.6, hi: 1.2, warnHi: 1.4, note: 'naik = filtrasi turun' },
-      { id: 'egfr', label: 'eGFR', unit: 'mL/mnt', lo: 90, hi: 120, warnLo: 60, note: '<60 (3 bln) = penyakit ginjal kronik' },
-      { id: 'uricacid', label: 'Asam urat', unit: 'mg/dL', lo: 3.5, hi: 7.0, warnHi: 8.0, note: 'tinggi → gout & risiko kardio' },
+      { id: 'creat', label: 'Creatinine', unit: 'mg/dL', lo: 0.6, hi: 1.2, warnHi: 1.4, note: 'elevated = reduced filtration' },
+      { id: 'egfr', label: 'eGFR', unit: 'mL/min', lo: 90, hi: 120, warnLo: 60, note: '<60 (3 mo) = chronic kidney disease' },
+      { id: 'uricacid', label: 'Uric acid', unit: 'mg/dL', lo: 3.5, hi: 7.0, warnHi: 8.0, note: 'high → gout & cardiovascular risk' },
     ],
   },
   {
-    id: 'hormone', emoji: '⚗️', organ: 'Hormon & Tiroid', blurb: 'Mengatur metabolisme, otot, mood, libido.',
+    id: 'hormone', emoji: '⚗️', organ: 'Hormones & Thyroid', blurb: 'Regulates metabolism, muscle, mood, libido.',
     markers: [
-      { id: 'tsh', label: 'TSH (tiroid)', unit: 'mIU/L', lo: 0.4, hi: 4.0, warnHi: 6, note: 'tinggi = hipotiroid' },
-      { id: 'vitd', label: 'Vitamin D (25-OH)', unit: 'ng/mL', lo: 30, hi: 60, warnLo: 20, note: '<20 defisiensi (imun, tulang, mood)' },
-      { id: 'ferritin', label: 'Feritin (cadangan besi)', unit: 'ng/mL', lo: 30, hi: 300, warnLo: 15, note: 'rendah = anemia/lelah' },
+      { id: 'tsh', label: 'TSH (thyroid)', unit: 'mIU/L', lo: 0.4, hi: 4.0, warnHi: 6, note: 'high = hypothyroid' },
+      { id: 'vitd', label: 'Vitamin D (25-OH)', unit: 'ng/mL', lo: 30, hi: 60, warnLo: 20, note: '<20 deficiency (immunity, bone, mood)' },
+      { id: 'ferritin', label: 'Ferritin (iron stores)', unit: 'ng/mL', lo: 30, hi: 300, warnLo: 15, note: 'low = anemia/fatigue' },
     ],
   },
   {
-    id: 'blood', emoji: '🔬', organ: 'Darah & Imun', blurb: 'Oksigenasi & pertahanan tubuh.',
+    id: 'blood', emoji: '🔬', organ: 'Blood & Immunity', blurb: 'Oxygenation & the body\'s defenses.',
     markers: [
-      { id: 'hb', label: 'Hemoglobin', unit: 'g/dL', lo: 13, hi: 17, warnLo: 11, note: 'rendah = anemia (♀ 12-15)' },
-      { id: 'wbc', label: 'Leukosit', unit: '10³/µL', lo: 4, hi: 11, warnHi: 13, note: 'tinggi = infeksi/inflamasi' },
+      { id: 'hb', label: 'Hemoglobin', unit: 'g/dL', lo: 13, hi: 17, warnLo: 11, note: 'low = anemia (♀ 12-15)' },
+      { id: 'wbc', label: 'White blood cells', unit: '10³/µL', lo: 4, hi: 11, warnHi: 13, note: 'high = infection/inflammation' },
     ],
   },
 ]
@@ -80,7 +80,7 @@ function bandOf(m: Marker, v: number): Band {
   return 'bad'
 }
 const BAND_COLOR: Record<Band, string> = { ok: '#00BF63', warn: '#f59e0b', bad: '#ef4444', na: '#d4d4d4' }
-const BAND_LABEL: Record<Band, string> = { ok: 'Normal', warn: 'Perbatasan', bad: 'Perlu tindakan', na: '—' }
+const BAND_LABEL: Record<Band, string> = { ok: 'Normal', warn: 'Borderline', bad: 'Needs attention', na: '—' }
 
 // Range bar showing where the value sits across [display min..max].
 function MarkerBar({ m, v }: { m: Marker; v: number }) {
@@ -159,17 +159,17 @@ export function OrganVitality() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Anti-Aging & Fungsi Organ" subtitle="Angka, rentang aman & kendali mutu di balik penuaan sehat — bukan sekadar wellness" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Anti-Aging & Organ Function" subtitle="The numbers, safe ranges & quality control behind healthy aging — not just wellness" />
         <div className="mt-3 flex gap-1.5">
-          {([['organ', '🫀 Panel Organ'], ['kulit', '✨ Kulit'], ['estetika', '💪 Estetika Aman']] as const).map(([k, l]) => (
+          {([['organ', '🫀 Organ Panel'], ['kulit', '✨ Skin'], ['estetika', '💪 Safe Aesthetics']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setTab(k)} className={'flex-1 rounded-xl py-2 text-xs font-bold transition ' + (tab === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
           ))}
         </div>
         {tab === 'organ' && filled.length > 0 && (
           <div className="mt-3 flex items-center justify-around rounded-2xl bg-neutral-50 p-3 text-center">
-            <div><div className="text-xl font-extrabold text-brand-dark">{filled.length}</div><div className="text-[9px] uppercase text-neutral-400">terisi</div></div>
-            <div><div className="text-xl font-extrabold text-amber-600">{warn}</div><div className="text-[9px] uppercase text-neutral-400">perbatasan</div></div>
-            <div><div className="text-xl font-extrabold text-rose-500">{bad}</div><div className="text-[9px] uppercase text-neutral-400">perlu tindakan</div></div>
+            <div><div className="text-xl font-extrabold text-brand-dark">{filled.length}</div><div className="text-[9px] uppercase text-neutral-400">filled</div></div>
+            <div><div className="text-xl font-extrabold text-amber-600">{warn}</div><div className="text-[9px] uppercase text-neutral-400">borderline</div></div>
+            <div><div className="text-xl font-extrabold text-rose-500">{bad}</div><div className="text-[9px] uppercase text-neutral-400">needs attention</div></div>
           </div>
         )}
       </Card>
@@ -194,7 +194,7 @@ export function OrganVitality() {
             </Card>
           ))}
           <div className="rounded-2xl bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-800">
-            ⚠️ <b>Quality control & keamanan:</b> rentang di atas adalah acuan edukatif dewasa umum — laboratorium berbeda punya rentang sendiri, dan nilai harus ditafsirkan bersama gejala & riwayat. Nilai <b>merah</b> berarti diskusikan dengan dokter, jangan mendiagnosis sendiri. Fitur <a href="#/chatbot" className="font-bold underline">Konsultasi AI</a> membantu menyiapkan pertanyaan untuk dokter.
+            ⚠️ <b>Quality control & safety:</b> the ranges above are general adult educational guidance — different labs have their own reference ranges, and values must be interpreted alongside symptoms & history. A <b>red</b> value means discuss it with a doctor, don't self-diagnose. The <a href="#/chatbot" className="font-bold underline">AI Consultation</a> feature helps you prepare questions for your doctor.
           </div>
         </>
       )}
@@ -202,33 +202,33 @@ export function OrganVitality() {
       {/* SKIN */}
       {tab === 'kulit' && (
         <Card className="!p-5">
-          <SectionTitle icon={<span className="text-lg">✨</span>} title="Penuaan Kulit (Kuantitatif)" subtitle="UV ≈ 80% penuaan kulit ekstrinsik — terukur & bisa dicegah" />
+          <SectionTitle icon={<span className="text-lg">✨</span>} title="Skin Aging (Quantified)" subtitle="UV ≈ 80% of extrinsic skin aging — measurable & preventable" />
           <div className="mt-2 flex items-center justify-around rounded-2xl bg-ink p-4 text-white">
             <div className="text-center">
               <div className="text-4xl font-extrabold" style={{ color: sScore >= 75 ? '#00BF63' : sScore >= 50 ? '#f59e0b' : '#ef4444' }}>{sScore}</div>
-              <div className="text-[9px] uppercase tracking-widest text-white/50">Skor Kulit</div>
+              <div className="text-[9px] uppercase tracking-widest text-white/50">Skin Score</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-extrabold text-amber-300">+{skinBioAge}</div>
-              <div className="text-[9px] uppercase tracking-widest text-white/50">Estimasi "usia kulit" ekstra</div>
+              <div className="text-[9px] uppercase tracking-widest text-white/50">Estimated extra "skin age"</div>
             </div>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <Field label="Hari pakai SPF/minggu"><input className={inputClass} type="number" max={7} value={skin.spfDays} onChange={(e) => setSkin((s) => ({ ...s, spfDays: +e.target.value }))} /></Field>
-            <Field label="Gelas air/hari"><input className={inputClass} type="number" value={skin.hydrationGlasses} onChange={(e) => setSkin((s) => ({ ...s, hydrationGlasses: +e.target.value }))} /></Field>
-            <Field label="Tidur (jam)"><input className={inputClass} type="number" step={0.1} value={skin.sleepH} onChange={(e) => setSkin((s) => ({ ...s, sleepH: +e.target.value }))} /></Field>
+            <Field label="SPF days/week"><input className={inputClass} type="number" max={7} value={skin.spfDays} onChange={(e) => setSkin((s) => ({ ...s, spfDays: +e.target.value }))} /></Field>
+            <Field label="Glasses of water/day"><input className={inputClass} type="number" value={skin.hydrationGlasses} onChange={(e) => setSkin((s) => ({ ...s, hydrationGlasses: +e.target.value }))} /></Field>
+            <Field label="Sleep (hours)"><input className={inputClass} type="number" step={0.1} value={skin.sleepH} onChange={(e) => setSkin((s) => ({ ...s, sleepH: +e.target.value }))} /></Field>
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {([['retinoid', '🧴 Retinoid rutin', false], ['antioxidant', '🍊 Antioksidan/Vit C', false], ['smoke', '🚬 Merokok', true], ['sugarHigh', '🍰 Gula tinggi (glikasi)', true]] as const).map(([k, l, bad]) => (
+            {([['retinoid', '🧴 Regular retinoid', false], ['antioxidant', '🍊 Antioxidant/Vit C', false], ['smoke', '🚬 Smoking', true], ['sugarHigh', '🍰 High sugar (glycation)', true]] as const).map(([k, l, bad]) => (
               <button key={k} onClick={() => setSkin((s) => ({ ...s, [k]: !s[k] }))}
                 className={'rounded-full px-3 py-1.5 text-[11px] font-bold ' + (skin[k] ? (bad ? 'bg-rose-500 text-white' : 'bg-brand text-white') : 'bg-neutral-100 text-neutral-500')}>{l}</button>
             ))}
           </div>
           <ul className="mt-3 space-y-1 text-[11px] leading-relaxed text-neutral-500">
-            <li>• <b>SPF harian</b> adalah intervensi anti-aging kulit paling terbukti (mencegah photoaging & kanker kulit).</li>
-            <li>• <b>Glikasi</b>: gula darah tinggi mengikat kolagen (AGEs) → kulit kaku & kusam — jadi kontrol gula = perawatan kulit.</li>
-            <li>• <b>Tidur & hidrasi</b>: perbaikan kolagen terjadi saat tidur dalam; dehidrasi mempertegas garis halus.</li>
-            <li>• <b>Rokok</b>: menyempitkan pembuluh mikro kulit, mempercepat kerutan secara dramatis.</li>
+            <li>• <b>Daily SPF</b> is the most proven skin anti-aging intervention (prevents photoaging & skin cancer).</li>
+            <li>• <b>Glycation</b>: high blood sugar binds to collagen (AGEs) → stiff, dull skin — so blood sugar control is skincare.</li>
+            <li>• <b>Sleep & hydration</b>: collagen repair happens during deep sleep; dehydration accentuates fine lines.</li>
+            <li>• <b>Smoking</b>: constricts skin's microvessels, dramatically accelerating wrinkles.</li>
           </ul>
         </Card>
       )}
@@ -236,41 +236,41 @@ export function OrganVitality() {
       {/* AESTHETIC + SAFETY */}
       {tab === 'estetika' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Estetika Komposisi — dengan Batas Aman" subtitle="Bentuk optimal tanpa mengorbankan hormon, imun & organ" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Body Composition Aesthetics — with a Safety Floor" subtitle="Optimal shape without sacrificing hormones, immunity & organs" />
           <div className="mt-2 grid grid-cols-2 gap-3">
-            <Field label="Jenis kelamin">
-              <select className={inputClass} value={g} disabled><option>{g === 'M' ? 'Laki-laki' : 'Perempuan'}</option></select>
+            <Field label="Sex">
+              <select className={inputClass} value={g} disabled><option>{g === 'M' ? 'Male' : 'Female'}</option></select>
             </Field>
-            <Field label="% Lemak tubuh"><input className={inputClass} type="number" step={0.1} value={pbf} onChange={(e) => setPbf(+e.target.value)} /></Field>
+            <Field label="% Body fat"><input className={inputClass} type="number" step={0.1} value={pbf} onChange={(e) => setPbf(+e.target.value)} /></Field>
           </div>
           <div className="mt-3 rounded-2xl p-3 text-center" style={{ background: `${BAND_COLOR[pbfBand]}14`, border: `1px solid ${BAND_COLOR[pbfBand]}30` }}>
             <div className="text-sm font-extrabold" style={{ color: BAND_COLOR[pbfBand] }}>
-              {pbf < bf.floor ? '⚠️ Di bawah batas aman' : pbf <= bf.fit[1] ? 'Zona atletis/fit' : pbf <= bf.healthy[1] ? 'Sehat' : 'Di atas rentang sehat'}
+              {pbf < bf.floor ? '⚠️ Below safe floor' : pbf <= bf.fit[1] ? 'Athletic/fit zone' : pbf <= bf.healthy[1] ? 'Healthy' : 'Above healthy range'}
             </div>
             <p className="mt-1 text-[11px] text-neutral-500">
               {pbf < bf.floor
-                ? `Di bawah ${bf.floor}% (${g === 'F' ? 'perempuan' : 'laki-laki'}) mengganggu hormon${g === 'F' ? ' & siklus menstruasi' : ' (testosteron turun)'}, imun, & suhu tubuh. Estetika "shredded" ekstrem tidak berkelanjutan.`
-                : 'Target penampilan tetap dalam koridor yang menjaga fungsi hormon & imun.'}
+                ? `Below ${bf.floor}% (${g === 'F' ? 'female' : 'male'}) disrupts hormones${g === 'F' ? ' & the menstrual cycle' : ' (testosterone drops)'}, immunity, & body temperature regulation. Extreme "shredded" aesthetics aren't sustainable.`
+                : 'Appearance targets that stay within a range that protects hormone & immune function.'}
             </p>
           </div>
           <div className="mt-3 space-y-1.5 text-[11px] text-neutral-600">
-            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Essential (batas minimum fisiologis)</span><b>{bf.essential}%</b></div>
-            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Atletis</span><b>{bf.athletic[0]}-{bf.athletic[1]}%</b></div>
-            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Fit / definisi terlihat</span><b>{bf.fit[0]}-{bf.fit[1]}%</b></div>
-            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Sehat</span><b>{bf.healthy[0]}-{bf.healthy[1]}%</b></div>
+            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Essential (minimum physiological floor)</span><b>{bf.essential}%</b></div>
+            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Athletic</span><b>{bf.athletic[0]}-{bf.athletic[1]}%</b></div>
+            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Fit / visible definition</span><b>{bf.fit[0]}-{bf.fit[1]}%</b></div>
+            <div className="flex justify-between rounded-lg bg-neutral-50 px-3 py-1.5"><span>Healthy</span><b>{bf.healthy[0]}-{bf.healthy[1]}%</b></div>
           </div>
           <div className="mt-3 rounded-xl border border-neutral-100 p-3 text-[11px] leading-relaxed text-neutral-500">
-            <b className="text-ink">Laju perubahan aman (quality control):</b> defisit/surplus ≤0.5-1% berat badan per minggu.
-            Cut lebih cepat = kehilangan otot & metabolisme adaptif; bulk lebih cepat = lemak berlebih.
-            Jaga protein ≥1.6 g/kg + latihan beban agar yang turun adalah lemak, bukan otot.
-            Pantau eksekusinya di <a href="#/body" className="font-bold text-brand-dark underline">Komposisi Tubuh</a> & <a href="#/training-plan" className="font-bold text-brand-dark underline">Program AI</a>.
+            <b className="text-ink">Safe rate of change (quality control):</b> a deficit/surplus of ≤0.5-1% of body weight per week.
+            Cutting faster = muscle loss & adaptive metabolism; bulking faster = excess fat gain.
+            Keep protein ≥1.6 g/kg + resistance training so what you lose is fat, not muscle.
+            Track execution in <a href="#/body" className="font-bold text-brand-dark underline">Body Composition</a> & <a href="#/training-plan" className="font-bold text-brand-dark underline">AI Program</a>.
           </div>
         </Card>
       )}
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-[11px] leading-relaxed text-brand-dark">
-        Ini lapisan <b>klinis-kuantitatif</b> longevity: <a href="#/longevity" className="font-bold underline">Pusat Longevity</a> menilai skor & proyeksi dekade,
-        halaman ini mengurai <b>angka organ, kulit & estetika aman</b>. Semua nilai edukatif — bukan diagnosis. Data tersimpan di perangkat Anda.
+        This is the <b>clinical-quantitative</b> layer of longevity: the <a href="#/longevity" className="font-bold underline">Longevity Hub</a> scores & projects decades,
+        this page breaks down the <b>organ numbers, skin & safe aesthetics</b>. All values are educational — not a diagnosis. Data is stored on your device.
       </div>
     </div>
   )
