@@ -12,23 +12,27 @@ import { api, backendEnabled } from '../lib/api'
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface Drug { brand: string; generic: string; purpose: string; usage: string; warnings: string; dosage: string; adverse: string; manufacturer: string }
+interface RelatedDrug { name: string; tty: string }
 const EXAMPLES = ['ibuprofen', 'metformin', 'amoxicillin', 'atorvastatin', 'omeprazole']
+const TTY_LABEL: Record<string, string> = { SCD: 'Generic', SBD: 'Brand' }
 
 export function DrugInfo() {
   const [q, setQ] = useState('')
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
   const [drug, setDrug] = useState<Drug | null | undefined>(undefined)
+  const [related, setRelated] = useState<RelatedDrug[]>([])
 
   async function search(name?: string) {
     const text = (name ?? q).trim()
     if (!text) return
     if (name) setQ(name)
-    setLoading(true); setErr(''); setDrug(undefined)
+    setLoading(true); setErr(''); setDrug(undefined); setRelated([])
     try {
       const r = await api.lookupDrug(text)
       setDrug(r.drug)
       if (r.error) setErr('The drug database is temporarily unavailable — try again shortly.')
+      api.findRelatedDrugs(text).then((rr) => setRelated(rr.drugs)).catch(() => {})
     } catch {
       setErr('Could not reach the drug database. Please try again later.')
     } finally { setLoading(false) }
@@ -72,6 +76,20 @@ export function DrugInfo() {
           <Section title="Dosage & administration" body={drug.dosage} />
           <Section title="⚠️ Warnings" body={drug.warnings} danger />
           <Section title="Possible side effects" body={drug.adverse} />
+          {related.length > 0 && (
+            <Card className="!p-5">
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Related brand/generic products</div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {related.map((d) => (
+                  <span key={d.name} className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
+                    {TTY_LABEL[d.tty] && <span className="text-[9px] font-bold uppercase text-brand-dark">{TTY_LABEL[d.tty]}</span>}
+                    {d.name}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] text-neutral-400">Via RxNorm (NIH) — other formulations/brands of the same active ingredient, not a substitute check.</p>
+            </Card>
+          )}
         </>
       )}
 

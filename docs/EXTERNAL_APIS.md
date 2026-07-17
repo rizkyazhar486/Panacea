@@ -83,9 +83,10 @@ warnings & adverse reactions from the official FDA label). Fully free.
   - Recalls: `https://api.fda.gov/drug/enforcement.json?search=<TERM>`
 - **Docs:** <https://open.fda.gov/apis/>
 
-## 8. RxNorm (NIH) — drug name normalization (AVAILABLE; interaction sub-API is RETIRED)
+## 8. RxNorm (NIH) — drug name normalization (LIVE, in use; interaction sub-API is RETIRED)
 
-Normalize brand↔generic drug names and look up related dose forms.
+Normalize brand↔generic drug names and look up related dose forms. Powers the
+"Related brand/generic products" card on the Drug Info page.
 
 > ⚠️ **Do not build a drug-interaction checker on RxNav's old Interaction API**
 > (`/interaction/interaction.json`). NLM retired it in January 2024 because its
@@ -96,8 +97,9 @@ Normalize brand↔generic drug names and look up related dose forms.
 > Multum) behind the server. Name-normalization below is still live.
 
 - **Key:** none.
-- **Endpoints (still live):** `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=<DRUG>` ·
-  `https://rxnav.nlm.nih.gov/REST/rxcui/<RXCUI>/related.json?tty=SCD`
+- **Server module:** `server/src/rxnorm.ts` · **Endpoint:** `GET /api/drugs/related?q=`
+- **Endpoints (still live):** `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=<DRUG>&search=1` ·
+  `https://rxnav.nlm.nih.gov/REST/rxcui/<RXCUI>/related.json?tty=SCD+SBD`
 - **Docs:** <https://lhncbc.nlm.nih.gov/RxNav/APIs/>
 
 ## 9. MyGene.info — gene lookups (LIVE, in use)
