@@ -80,6 +80,7 @@ import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILAB
 import { searchPubmed } from './pubmed.js'
 import { searchTrials } from './trials.js'
 import { lookupDrug } from './openfda.js'
+import { lookupGene } from './mygene.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -543,6 +544,20 @@ app.get('/api/drugs/label', requireAuth, async (req, res) => {
   } catch (e) {
     console.log('[openfda] error:', (e as Error).message)
     res.json({ drug: null, error: 'drug_unavailable' })
+  }
+})
+
+// Gene information lookup — MyGene.info (free, no key).
+app.get('/api/genes/info', requireAuth, async (req, res) => {
+  const q = String(req.query.q || '').trim()
+  if (!q) return res.status(400).json({ error: 'empty_query' })
+  try {
+    const gene = await lookupGene(q)
+    if (!gene) return res.json({ gene: null })
+    res.json({ gene })
+  } catch (e) {
+    console.log('[mygene] error:', (e as Error).message)
+    res.json({ gene: null, error: 'gene_unavailable' })
   }
 })
 app.get('/api/sports/favorites', requireAuth, (req, res) => {

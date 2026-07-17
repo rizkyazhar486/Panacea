@@ -228,6 +228,7 @@ export const api = {
   searchPubmed: (q: string) => req<{ articles: { pmid: string; title: string; authors: string; journal: string; year: string; url: string }[]; error?: string }>(`/api/evidence/pubmed?q=${encodeURIComponent(q)}`),
   searchTrials: (q: string, recruiting: boolean, country: string) => req<{ trials: { nctId: string; title: string; status: string; conditions: string; phase: string; locations: string; url: string }[]; error?: string }>(`/api/trials?q=${encodeURIComponent(q)}${recruiting ? '&recruiting=1' : ''}${country ? `&country=${encodeURIComponent(country)}` : ''}`),
   lookupDrug: (q: string) => req<{ drug: { brand: string; generic: string; purpose: string; usage: string; warnings: string; dosage: string; adverse: string; manufacturer: string } | null; error?: string }>(`/api/drugs/label?q=${encodeURIComponent(q)}`),
+  lookupGene: (q: string) => req<{ gene: { symbol: string; name: string; summary: string; aliases: string[]; type: string; chromosome: string; location: string; entrezId: string; ensemblId: string } | null; error?: string }>(`/api/genes/info?q=${encodeURIComponent(q)}`),
   getSportsFavorites: () => req<{ teams: string[] }>('/api/sports/favorites').then((r) => r.teams),
   saveSportsFavorites: (teams: string[]) => req<{ teams: string[] }>('/api/sports/favorites', { method: 'PUT', body: JSON.stringify({ teams }) }).then((r) => r.teams),
   patchPost: (id: string, patch: Record<string, unknown>) =>
