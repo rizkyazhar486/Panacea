@@ -75,6 +75,7 @@ const nav: Nav[] = [
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/aesthetic', label: 'Aesthetic Vitality', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/supplements', label: 'Supplements & Ergogenics', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },

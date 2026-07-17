@@ -66,6 +66,7 @@ const DietarySupplements = lazy(() => import('./pages/DietarySupplements').then(
 const AestheticVitality = lazy(() => import('./pages/AestheticVitality').then((m) => ({ default: m.AestheticVitality })))
 const ClinicalEvidence = lazy(() => import('./pages/ClinicalEvidence').then((m) => ({ default: m.ClinicalEvidence })))
 const BiologicalAge = lazy(() => import('./pages/BiologicalAge').then((m) => ({ default: m.BiologicalAge })))
+const RealityCheck = lazy(() => import('./pages/RealityCheck').then((m) => ({ default: m.RealityCheck })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -135,6 +136,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/aesthetic" element={<AestheticVitality />} />
               <Route path="/evidence" element={<ClinicalEvidence />} />
               <Route path="/biological-age" element={<BiologicalAge />} />
+              <Route path="/reality-check" element={<RealityCheck />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
