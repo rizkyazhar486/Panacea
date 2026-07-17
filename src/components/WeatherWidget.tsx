@@ -79,16 +79,16 @@ export function WeatherWidget() {
         })
         setStatus('ok')
       })
-      .catch(() => { setErr('Gagal memuat cuaca. Coba lagi nanti.'); setStatus('denied') })
+      .catch(() => { setErr('Failed to load weather. Try again later.'); setStatus('denied') })
   }
 
   function requestLocation() {
     setErr('')
-    if (!navigator.geolocation) { setErr('GPS tidak didukung browser.'); setStatus('denied'); return }
+    if (!navigator.geolocation) { setErr('GPS is not supported by this browser.'); setStatus('denied'); return }
     setStatus('locating')
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-      () => { setErr('Izin lokasi ditolak. Ketuk untuk coba lagi.'); setStatus('denied') },
+      () => { setErr('Location permission denied. Tap to try again.'); setStatus('denied') },
       { enableHighAccuracy: false, maximumAge: 10 * 60_000, timeout: 10_000 }
     )
   }
@@ -102,7 +102,7 @@ export function WeatherWidget() {
     <>
       <button
         onClick={() => (status === 'denied' ? requestLocation() : setOpen(true))}
-        aria-label="Cuaca berdasarkan lokasi Anda"
+        aria-label="Weather based on your location"
         className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-2 text-xs font-bold text-neutral-600 shadow-sm transition active:scale-95 dark:border-white/10 dark:bg-white/5 dark:text-neutral-200"
       >
         {status === 'locating' && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-neutral-300 border-t-brand" />}
@@ -120,8 +120,8 @@ export function WeatherWidget() {
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-t-3xl bg-white p-5 sm:rounded-3xl dark:bg-[#17191c]">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-black text-ink dark:text-white">Cuaca Lokasi Anda</h3>
-              <button onClick={() => setOpen(false)} aria-label="Tutup" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10">
+              <h3 className="text-sm font-black text-ink dark:text-white">Your Location Weather</h3>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10">
                 <IconX size={18} />
               </button>
             </div>
@@ -143,13 +143,13 @@ export function WeatherWidget() {
                 onClick={() => setTab('week')}
                 className={`flex-1 rounded-full py-2 text-xs font-bold transition ${tab === 'week' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-300'}`}
               >
-                Minggu Ini
+                This Week
               </button>
               <button
                 onClick={() => setTab('month')}
                 className={`flex-1 rounded-full py-2 text-xs font-bold transition ${tab === 'month' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 dark:bg-white/5 dark:text-neutral-300'}`}
               >
-                Bulan Ini
+                This Month
               </button>
             </div>
 
@@ -166,7 +166,7 @@ export function WeatherWidget() {
 
             {tab === 'month' && (
               <p className="mt-3 text-center text-[10px] text-neutral-400">
-                Perkiraan tersedia hingga 16 hari ke depan (batas layanan cuaca gratis).
+                Forecast available up to 16 days ahead (free weather service limit).
               </p>
             )}
           </div>
