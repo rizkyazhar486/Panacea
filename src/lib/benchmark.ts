@@ -23,7 +23,7 @@ export interface BenchmarkItem {
 }
 
 export const BENCHMARK_DISCLAIMER =
-  'Estimasi berdasarkan norma populasi umum (ACSM/Cooper Institute), disesuaikan usia & jenis kelamin — bukan perbandingan langsung dengan pengguna Panaceamed lain (basis pengguna kami belum cukup besar untuk itu). Untuk keputusan medis, konsultasikan ke dokter.'
+  'Estimated from general population norms (ACSM/Cooper Institute), adjusted for age & sex — not a direct comparison with other Panaceamed users (our user base isn\'t yet large enough for that). For medical decisions, consult a doctor.'
 
 // Same anchor table as TrainingPlan's vo2Category: [Cukup, Baik, Sangat Baik, Superior]
 // boundaries in ml/kg/min for a 30-year-old, shifted -0.3/yr past age 30.
@@ -49,22 +49,22 @@ function interpolatePercentile(value: number, anchors: number[], anchorPercentil
 }
 
 function percentileLabel(pct: number): string {
-  if (pct >= 90) return 'Sekitar 10% teratas'
-  if (pct >= 75) return `Sekitar ${100 - pct}% teratas`
-  if (pct >= 50) return `Di atas rata-rata (≈P${pct})`
-  if (pct >= 30) return `Mendekati rata-rata (≈P${pct})`
-  return `Di bawah rata-rata (≈P${pct})`
+  if (pct >= 90) return 'Top ~10%'
+  if (pct >= 75) return `Top ~${100 - pct}%`
+  if (pct >= 50) return `Above average (≈P${pct})`
+  if (pct >= 30) return `Near average (≈P${pct})`
+  return `Below average (≈P${pct})`
 }
 
 export function benchmarkVo2max(value: number, age: number, sex: Sex): BenchmarkItem {
   const anchors = vo2Anchors(age, sex)
   const pct = interpolatePercentile(value, anchors, [40, 60, 85, 95])
-  const cat = value >= anchors[3] ? 'Superior' : value >= anchors[2] ? 'Sangat Baik' : value >= anchors[1] ? 'Baik' : value >= anchors[0] ? 'Cukup' : 'Membangun Fondasi'
+  const cat = value >= anchors[3] ? 'Superior' : value >= anchors[2] ? 'Excellent' : value >= anchors[1] ? 'Good' : value >= anchors[0] ? 'Fair' : 'Building Foundation'
   const tone = pct >= 75 ? 'brand' : pct >= 40 ? 'low' : 'neutral'
   return {
-    key: 'vo2max', label: 'VO₂max', value, unit: 'ml/kg/mnt',
+    key: 'vo2max', label: 'VO₂max', value, unit: 'ml/kg/min',
     percentileLabel: percentileLabel(pct), categoryLabel: cat, tone,
-    note: 'Prediktor mortalitas #1 — naikkan lewat Zone 2 + interval terstruktur.',
+    note: '#1 mortality predictor — raise it through Zone 2 + structured intervals.',
   }
 }
 
@@ -73,16 +73,16 @@ export function benchmarkVo2max(value: number, age: number, sex: Sex): Benchmark
 // than for VO2max), mapped onto an approximate percentile scale.
 export function benchmarkRestingHr(value: number): BenchmarkItem {
   let pct: number; let cat: string
-  if (value < 60) { pct = 90; cat = 'Sangat Baik (atletis)' }
-  else if (value < 70) { pct = 70; cat = 'Baik' }
-  else if (value < 80) { pct = 50; cat = 'Rata-rata' }
-  else if (value < 90) { pct = 25; cat = 'Di Bawah Rata-rata' }
-  else { pct = 10; cat = 'Perlu Perhatian' }
+  if (value < 60) { pct = 90; cat = 'Excellent (athletic)' }
+  else if (value < 70) { pct = 70; cat = 'Good' }
+  else if (value < 80) { pct = 50; cat = 'Average' }
+  else if (value < 90) { pct = 25; cat = 'Below Average' }
+  else { pct = 10; cat = 'Needs Attention' }
   const tone = pct >= 70 ? 'brand' : pct >= 50 ? 'low' : pct >= 25 ? 'neutral' : 'critical'
   return {
-    key: 'restingHr', label: 'HR Istirahat', value, unit: 'bpm',
+    key: 'restingHr', label: 'Resting HR', value, unit: 'bpm',
     percentileLabel: percentileLabel(pct), categoryLabel: cat, tone,
-    note: 'Turun seiring latihan aerobik konsisten (Zone 2) selama beberapa bulan.',
+    note: 'Drops with consistent aerobic training (Zone 2) over a few months.',
   }
 }
 
@@ -91,11 +91,11 @@ export function benchmarkRestingHr(value: number): BenchmarkItem {
 export function benchmarkSleep(value: number): BenchmarkItem {
   const inRange = value >= 7 && value <= 9
   const tone = inRange ? 'brand' : value < 6 ? 'critical' : value < 7 || value > 9.5 ? 'neutral' : 'low'
-  const cat = inRange ? 'Sesuai Rekomendasi' : value < 7 ? 'Kurang dari Rekomendasi' : 'Lebih dari Rekomendasi'
+  const cat = inRange ? 'On Target' : value < 7 ? 'Below Target' : 'Above Target'
   return {
-    key: 'sleepH', label: 'Tidur', value, unit: 'jam',
-    percentileLabel: inRange ? 'Dalam rentang 7–9 jam' : value < 7 ? `${(7 - value).toFixed(1)} jam di bawah minimum` : `${(value - 9).toFixed(1)} jam di atas maksimum umum`,
+    key: 'sleepH', label: 'Sleep', value, unit: 'hrs',
+    percentileLabel: inRange ? 'Within 7–9h range' : value < 7 ? `${(7 - value).toFixed(1)}h below minimum` : `${(value - 9).toFixed(1)}h above typical maximum`,
     categoryLabel: cat, tone,
-    note: 'Rekomendasi dewasa: 7–9 jam/malam (National Sleep Foundation).',
+    note: 'Adult recommendation: 7–9 hours/night (National Sleep Foundation).',
   }
 }
