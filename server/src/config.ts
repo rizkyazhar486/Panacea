@@ -1,5 +1,12 @@
 import 'dotenv/config'
 
+// Refuse to boot in production with the insecure default JWT secret — a real
+// secret MUST be provided via the JWT_SECRET env var, otherwise every session
+// token could be forged. Fail fast & loud rather than run insecurely.
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET must be set in production. Refusing to start with the insecure development default.')
+}
+
 export const config = {
   port: Number(process.env.PORT) || 8787,
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173')
