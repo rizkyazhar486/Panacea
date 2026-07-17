@@ -167,7 +167,7 @@ export function Marketplace() {
         })}
         {listed.length === 0 && (
           <Card className="md:col-span-2 lg:col-span-3 text-center text-sm text-neutral-400">
-            Tidak ada materi pada filter ini.
+            No materials match this filter.
           </Card>
         )}
       </div>
@@ -249,7 +249,7 @@ function UploadPanel({
       <SectionTitle
         icon={<IconUpload size={18} />}
         title="Bagikan & Verifikasi Referensi Medis"
-        subtitle="Kontributor dapat membagikan materi medis untuk ditinjau oleh AI dan verifikator spesialis sebelum dipublikasikan."
+        subtitle="Contributors can submit medical materials for review by AI and specialist verifiers before publishing."
       />
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Judul">
@@ -298,7 +298,7 @@ function UploadPanel({
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
               <IconUpload size={14} /> Pilih Berkas
             </Button>
-            <span className="truncate text-sm text-neutral-500">{f.fileName || 'Belum ada berkas'}</span>
+            <span className="truncate text-sm text-neutral-500">{f.fileName || 'No file yet'}</span>
           </div>
         </Field>
       </div>
