@@ -5,7 +5,7 @@ import { BottomSheet } from '../components/BottomSheet'
 import { ButtonGroup } from '../components/Carousel'
 import { HOSPITALS, fetchNearbyFacilities, type FacilityKind, type NearbyFacility } from '../lib/hospitals'
 
-const KIND_LABEL: Record<string, string> = { Semua: 'Semua Faskes', RS: 'Rumah Sakit', Klinik: 'Klinik', Apotek: 'Apotek' }
+const KIND_LABEL: Record<string, string> = { Semua: 'All Facilities', RS: 'Hospital', Klinik: 'Clinic', Apotek: 'Pharmacy' }
 const KIND_EMOJI: Record<string, string> = { Semua: '🏥', RS: '🏥', Klinik: '🩺', Apotek: '💊' }
 
 type Coords = { lat: number; lng: number }
@@ -65,29 +65,29 @@ export function Hospitals() {
       <Card>
         <SectionTitle
           icon={<IconHospital size={20} />}
-          title="Fasilitas Kesehatan Terdekat"
-          subtitle="Rumah sakit, klinik & apotek terdekat — penting untuk situasi darurat"
-          right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Mencari…' : 'Gunakan Lokasi Saya (GPS)'}</Button>}
+          title="Nearest Health Facilities"
+          subtitle="Nearby hospitals, clinics & pharmacies — important for emergencies"
+          right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Searching…' : 'Use My Location (GPS)'}</Button>}
         />
         <div className={`rounded-xl px-3 py-2 text-xs ${geoState === 'granted' ? 'bg-brand-50 text-brand-dark' : geoState === 'denied' ? 'bg-red-50 text-accent' : 'bg-neutral-50 text-neutral-500'}`}>
           {geoState === 'granted' && coords && live
-            ? `📍 ${live.length} fasilitas nyata di sekitar Anda (data OpenStreetMap).`
+            ? `📍 ${live.length} real facilities near you (OpenStreetMap data).`
             : geoState === 'granted' && coords && liveErr
-            ? '📍 Lokasi terdeteksi, tapi data peta sedang tak terjangkau — menampilkan contoh.'
-            : geoState === 'asking' ? 'Meminta izin lokasi…'
-            : geoState === 'denied' ? 'Izin lokasi ditolak / tidak tersedia — menampilkan daftar contoh.'
-            : 'Aktifkan GPS untuk menampilkan rumah sakit & apotek NYATA di sekitar Anda beserta nomor telepon.'}
+            ? '📍 Location detected, but map data is currently unreachable — showing examples.'
+            : geoState === 'asking' ? 'Requesting location permission…'
+            : geoState === 'denied' ? 'Location permission denied / unavailable — showing a sample list.'
+            : 'Enable GPS to show REAL hospitals & pharmacies near you along with their phone numbers.'}
         </div>
 
         <div className="mt-3 flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
           <IconSearch size={16} className="text-neutral-400" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / layanan / kota…" className="w-full bg-transparent text-sm outline-none" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name / service / city…" className="w-full bg-transparent text-sm outline-none" />
         </div>
         {/* Desktop: Button Group. Mobile: a button that opens a bottom sheet. */}
         <div className="mt-3 hidden sm:block">
           <ButtonGroup
             value={kind}
-            options={[{ id: 'Semua', label: 'Semua' }, { id: 'RS', label: 'Rumah Sakit' }, { id: 'Klinik', label: 'Klinik' }, { id: 'Apotek', label: 'Apotek' }] as { id: FacilityKind | 'Semua'; label: string }[]}
+            options={[{ id: 'Semua', label: 'All' }, { id: 'RS', label: 'Hospital' }, { id: 'Klinik', label: 'Clinic' }, { id: 'Apotek', label: 'Pharmacy' }] as { id: FacilityKind | 'Semua'; label: string }[]}
             onChange={setKind}
           />
         </div>
@@ -96,11 +96,11 @@ export function Hospitals() {
           className="mt-3 flex w-full items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-bold sm:hidden"
         >
           <span>{KIND_EMOJI[kind]} {KIND_LABEL[kind]}</span>
-          <span className="text-brand-dark">Pilih ▾</span>
+          <span className="text-brand-dark">Select ▾</span>
         </button>
       </Card>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Pilih jenis faskes">
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Select facility type">
         <div className="space-y-2">
           {(['Semua', 'RS', 'Klinik', 'Apotek'] as const).map((k) => (
             <button
@@ -119,7 +119,7 @@ export function Hospitals() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {!loading && list.map((h) => <FacilityCard key={h.id} h={h} hasCoords={!!coords} />)}
-        {!loading && list.length === 0 && <Card className="text-center text-sm text-neutral-400">Tidak ada fasilitas yang cocok.</Card>}
+        {!loading && list.length === 0 && <Card className="text-center text-sm text-neutral-400">No matching facilities.</Card>}
       </div>
     </div>
   )
@@ -140,7 +140,7 @@ function FacilityCard({ h, hasCoords }: { h: NearbyFacility; hasCoords: boolean 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold leading-tight">{h.name}</h3>
-            {h.emergency && <Badge tone="high">IGD / 24 jam</Badge>}
+            {h.emergency && <Badge tone="high">ER / 24h</Badge>}
           </div>
           <p className="text-sm text-neutral-500">{[h.city, h.type].filter(Boolean).join(' · ')}</p>
         </div>
@@ -153,18 +153,18 @@ function FacilityCard({ h, hasCoords }: { h: NearbyFacility; hasCoords: boolean 
       )}
       <div className="mt-3 border-t border-neutral-100 pt-3 text-xs text-neutral-500">
         {h.rating > 0 && <span>★ {h.rating} · </span>}
-        {h.phone ? <span>{h.phone}</span> : <span className="text-neutral-400">Nomor telepon belum tersedia di peta</span>}
+        {h.phone ? <span>{h.phone}</span> : <span className="text-neutral-400">Phone number not yet available on the map</span>}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {h.phone ? (
-          <a href={`tel:${phoneClean}`}><Button variant="outline" className="w-full"><IconPhone size={14} /> Hubungi</Button></a>
+          <a href={`tel:${phoneClean}`}><Button variant="outline" className="w-full"><IconPhone size={14} /> Call</Button></a>
         ) : (
-          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name)}`} target="_blank" rel="noreferrer"><Button variant="outline" className="w-full"><IconSearch size={14} /> Cari Info</Button></a>
+          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name)}`} target="_blank" rel="noreferrer"><Button variant="outline" className="w-full"><IconSearch size={14} /> Find Info</Button></a>
         )}
-        <a href={mapsUrl} target="_blank" rel="noreferrer"><Button className="w-full"><IconCheck size={14} /> Rute</Button></a>
+        <a href={mapsUrl} target="_blank" rel="noreferrer"><Button className="w-full"><IconCheck size={14} /> Directions</Button></a>
       </div>
       <a href={gojek} target="_blank" rel="noreferrer" className="mt-2">
-        <Button variant="ghost" className="w-full text-brand-dark">🛵 Pesan ojek/transport ke sini</Button>
+        <Button variant="ghost" className="w-full text-brand-dark">🛵 Book a ride here</Button>
       </a>
     </Card>
   )
