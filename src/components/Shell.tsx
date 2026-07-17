@@ -85,6 +85,7 @@ const nav: Nav[] = [
   { to: '/aesthetic', label: 'Aesthetic Vitality', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/gene-info', label: 'Gene Info', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/ikigai', label: 'Ikigai & Legacy Letter', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/fasting', label: 'Fasting Timer', icon: IconTimer, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   // Calculators & labs
   { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },

@@ -76,6 +76,7 @@ const AirQuality = lazy(() => import('./pages/AirQuality').then((m) => ({ defaul
 const DataLab = lazy(() => import('./pages/DataLab').then((m) => ({ default: m.DataLab })))
 const DrugInfo = lazy(() => import('./pages/DrugInfo').then((m) => ({ default: m.DrugInfo })))
 const GeneInfo = lazy(() => import('./pages/GeneInfo').then((m) => ({ default: m.GeneInfo })))
+const Ikigai = lazy(() => import('./pages/Ikigai').then((m) => ({ default: m.Ikigai })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -156,6 +157,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/data-lab" element={<DataLab />} />
               <Route path="/drug-info" element={<DrugInfo />} />
               <Route path="/gene-info" element={<GeneInfo />} />
+              <Route path="/ikigai" element={<Ikigai />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
