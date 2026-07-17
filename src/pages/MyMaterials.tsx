@@ -4,6 +4,9 @@ import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { IconBook, IconToken, IconUpload, IconShield, IconSparkle } from '../components/icons'
 import type { Material, MaterialStatus } from '../lib/types'
 
+// English display labels for the stored (Indonesian) category enum values.
+const CAT_LABELS: Record<string, string> = { Catatan: 'Notes', Materi: 'Study Material', Jurnal: 'Journal', Artikel: 'Article' }
+
 const statusMeta: Record<MaterialStatus, { label: string; tone: 'high' | 'brand' | 'critical' }> = {
   'pending-ai': { label: 'Awaiting Claude AI', tone: 'high' },
   'pending-verifier': { label: 'Awaiting Verifier', tone: 'high' },
@@ -87,7 +90,7 @@ export function MyMaterials() {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <div className="mb-1 flex items-center gap-2">
-                    <Badge tone="neutral">{m.category}</Badge>
+                    <Badge tone="neutral">{CAT_LABELS[m.category] ?? m.category}</Badge>
                     <Badge tone="brand">{m.exam}</Badge>
                     <span className="text-xs text-neutral-400">{m.fileType}</span>
                   </div>
