@@ -78,6 +78,21 @@ const DISCLAIMER = 'AI-generated evidence synthesis for licensed health professi
 
 export function evidenceAvailable(): boolean { return backendEnabled }
 
+export interface PubmedArticle {
+  pmid: string; title: string; authors: string; journal: string; year: string; url: string
+}
+
+// Live journal retrieval: fetch real, currently-indexed PubMed articles for the
+// question via the backend (NCBI E-utilities). Returns [] on any failure so the
+// UI degrades gracefully to the manual verification links.
+export async function fetchRelatedArticles(question: string): Promise<PubmedArticle[]> {
+  if (!backendEnabled) return []
+  try {
+    const r = await api.searchPubmed(question)
+    return r.articles ?? []
+  } catch { return [] }
+}
+
 // ── Access control ───────────────────────────────────────────────────────────
 // Pricing: the first 10 accounts to ever open the engine are granted unlimited
 // free access forever ("founding users"). Everyone else gets a small free
