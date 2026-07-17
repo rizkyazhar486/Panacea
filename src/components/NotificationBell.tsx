@@ -5,11 +5,11 @@ import { api, backendEnabled, type Notif } from '../lib/api'
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
-  if (m < 1) return 'baru saja'
-  if (m < 60) return `${m} mnt`
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} jam`
-  return `${Math.floor(h / 24)} hari`
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
 }
 
 // Header bell: unread badge + dropdown inbox, backed by /api/notifications.
@@ -60,8 +60,8 @@ export function NotificationBell() {
       <button
         onClick={toggle}
         className="relative grid h-9 w-9 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition hover:text-brand-dark"
-        title="Notifikasi"
-        aria-label="Notifikasi"
+        title="Notifications"
+        aria-label="Notifications"
       >
         <IconBell size={18} />
         {unread > 0 && (
@@ -74,12 +74,12 @@ export function NotificationBell() {
       {open && (
         <div className="absolute right-0 top-11 z-50 max-h-[70vh] w-80 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-xl ring-1 ring-black/5">
           <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-2.5">
-            <span className="text-sm font-bold">Notifikasi</span>
-            <span className="text-[11px] text-neutral-400">{items.length} pesan</span>
+            <span className="text-sm font-bold">Notifications</span>
+            <span className="text-[11px] text-neutral-400">{items.length} messages</span>
           </div>
           <div className="max-h-[60vh] overflow-y-auto">
             {items.length === 0 ? (
-              <div className="px-4 py-10 text-center text-sm text-neutral-400">Belum ada notifikasi.</div>
+              <div className="px-4 py-10 text-center text-sm text-neutral-400">No notifications yet.</div>
             ) : (
               items.map((n) => (
                 <button
@@ -95,7 +95,7 @@ export function NotificationBell() {
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-bold leading-snug">{n.title}</span>
                     <span className="block text-[12px] leading-snug text-neutral-500">{n.body}</span>
-                    <span className="mt-0.5 block text-[10px] text-neutral-400">{timeAgo(n.at)} lalu</span>
+                    <span className="mt-0.5 block text-[10px] text-neutral-400">{timeAgo(n.at)}</span>
                   </span>
                 </button>
               ))
