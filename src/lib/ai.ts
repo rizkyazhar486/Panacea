@@ -100,7 +100,7 @@ export async function sendChat(
     // Surface a clear message when the server-side rate limit is hit, rather
     // than silently dropping to scripted text.
     if (String((e as Error)?.message).includes('rate_limited')) {
-      return '⏳ Terlalu banyak permintaan dalam waktu singkat. Mohon tunggu sebentar lalu coba lagi.'
+      return '⏳ Too many requests in a short time. Please wait a moment and try again.'
     }
     return demoChatReply(history, ctx)
   }
