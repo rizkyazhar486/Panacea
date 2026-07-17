@@ -69,40 +69,50 @@ Liga 1 & Liga 2 Indonesia (`server/src/sports.ts`).
   <https://www.api-football.com/> (or the RapidAPI listing), copy the key.
 - **Env var:** `APISPORTS_KEY` (server only — never hardcode).
 
-## 7. OpenFDA — drug labels & recalls (AVAILABLE, not yet wired)
+## 7. OpenFDA — drug labels & recalls (LIVE, in use)
 
-For a **Pill / Drug Info** feature (identify a medicine, see warnings &
-interactions). Fully free.
+Powers the **Drug Info** page (identify a medicine, see purpose, dosing,
+warnings & adverse reactions from the official FDA label). Fully free.
 
 - **Key:** none required; an optional key raises limits (register at
-  <https://open.fda.gov/apis/authentication/>). Env var suggestion: `OPENFDA_KEY`.
+  <https://open.fda.gov/apis/authentication/>). Env var: `OPENFDA_KEY`.
+- **Server module:** `server/src/openfda.ts` · **Endpoint:** `GET /api/drugs/label?q=`
 - **Endpoints (no key):**
   - Label: `https://api.fda.gov/drug/label.json?search=openfda.brand_name:"<NAME>"&limit=1`
   - Adverse events: `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:"<NAME>"`
   - Recalls: `https://api.fda.gov/drug/enforcement.json?search=<TERM>`
 - **Docs:** <https://open.fda.gov/apis/>
-- **How to add:** create `server/src/openfda.ts` mirroring `pubmed.ts`, expose
-  `GET /api/drugs/label?q=`, and render on a new `src/pages/DrugInfo.tsx`.
 
-## 8. RxNorm (NIH) — drug normalization & interactions (AVAILABLE, not yet wired)
+## 8. RxNorm (NIH) — drug name normalization (AVAILABLE; interaction sub-API is RETIRED)
 
-Normalize brand↔generic names and (historically) check interactions.
+Normalize brand↔generic drug names and look up related dose forms.
+
+> ⚠️ **Do not build a drug-interaction checker on RxNav's old Interaction API**
+> (`/interaction/interaction.json`). NLM retired it in January 2024 because its
+> two source databases (DrugBank and ONCHigh) ended their data-sharing
+> agreements with NLM — the endpoint is gone, not just deprecated. There is
+> currently no free, key-free, licensable interaction dataset to replace it;
+> a real interaction checker would need a paid feed (e.g. First Databank,
+> Multum) behind the server. Name-normalization below is still live.
 
 - **Key:** none.
-- **Endpoints:** `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=<DRUG>` ·
+- **Endpoints (still live):** `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=<DRUG>` ·
   `https://rxnav.nlm.nih.gov/REST/rxcui/<RXCUI>/related.json?tty=SCD`
 - **Docs:** <https://lhncbc.nlm.nih.gov/RxNav/APIs/>
 
-## 9. MyGene.info / Ensembl — gene lookups (AVAILABLE, for the "genomics" tier)
+## 9. MyGene.info — gene lookups (LIVE, in use)
 
-Educational gene information (e.g. explain FOXO3, MTHFR, ACTN3) without handling
-anyone's actual genome — the responsible, free stand-in for the regulated
-"genomic vault" features.
+Powers the **Gene Info** page — educational gene function, aliases & genomic
+location (e.g. explain FOXO3, MTHFR, APOE) without handling anyone's actual
+genome — the responsible, free stand-in for the regulated "genomic vault"
+features.
 
 - **Key:** none.
-- **Endpoints:** `https://mygene.info/v3/query?q=<SYMBOL>&species=human` ·
-  `https://rest.ensembl.org/lookup/symbol/homo_sapiens/<SYMBOL>?content-type=application/json`
-- **Docs:** <https://docs.mygene.info/> · <https://rest.ensembl.org/>
+- **Server module:** `server/src/mygene.ts` · **Endpoint:** `GET /api/genes/info?q=`
+- **Flow:** `query` (symbol/alias/name → gene ID) → `gene/<id>` (ID → annotation).
+  - Search: `https://mygene.info/v3/query?q=symbol:<SYMBOL>%20OR%20alias:<SYMBOL>&species=human&size=1`
+  - Annotation: `https://mygene.info/v3/gene/<ID>?fields=symbol,name,summary,alias,type_of_gene,genomic_pos,entrezgene,ensembl.gene`
+- **Docs:** <https://docs.mygene.info/>
 
 ## 10. OpenStreetMap Nominatim / Overpass — nearby facilities (LIVE, in use)
 
