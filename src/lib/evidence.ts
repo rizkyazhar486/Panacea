@@ -78,6 +78,63 @@ const DISCLAIMER = 'AI-generated evidence synthesis for licensed health professi
 
 export function evidenceAvailable(): boolean { return backendEnabled }
 
+// ── Access control ───────────────────────────────────────────────────────────
+// Pricing: the first 10 accounts to ever open the engine are granted unlimited
+// free access forever ("founding users"). Everyone else gets a small free
+// allowance, then each query costs 150 PNC (= Rp150,000). The global first-10
+// claim is best-effort: it's persisted per device here and mirrored to the
+// backend when available (a server-authoritative counter is the real source of
+// truth once the backend endpoint is deployed).
+export const EVIDENCE_PRICE_PNC = 150
+export const EVIDENCE_FREE_ALLOWANCE = 10   // free lifetime questions for non-founding users
+export const EVIDENCE_FOUNDER_SLOTS = 10    // first N users are free forever
+
+const USED_KEY = 'pmd_evidence_used_v1'
+const FOUNDER_KEY = 'pmd_evidence_founder_v1'   // '1' if this account claimed a founder slot
+const SLOTS_KEY = 'pmd_evidence_slots_v1'       // locally-seen count of claimed founder slots
+
+export function evidenceUsedCount(): number {
+  try { return Math.max(0, parseInt(localStorage.getItem(USED_KEY) || '0', 10)) || 0 } catch { return 0 }
+}
+export function isEvidenceFounder(): boolean {
+  try { return localStorage.getItem(FOUNDER_KEY) === '1' } catch { return false }
+}
+
+// Claim a founder slot on first visit if any of the first 10 remain. Returns
+// whether this user is a founder (unlimited free). Best-effort local counter.
+export function claimFounderIfEligible(): boolean {
+  try {
+    if (localStorage.getItem(FOUNDER_KEY) === '1') return true
+    const claimed = Math.max(0, parseInt(localStorage.getItem(SLOTS_KEY) || '0', 10)) || 0
+    if (claimed < EVIDENCE_FOUNDER_SLOTS) {
+      localStorage.setItem(SLOTS_KEY, String(claimed + 1))
+      localStorage.setItem(FOUNDER_KEY, '1')
+      return true
+    }
+    return false
+  } catch { return false }
+}
+
+export interface EvidenceGate {
+  founder: boolean
+  freeRemaining: number   // free questions left (Infinity for founders)
+  needsPayment: boolean   // true when the next query must be paid
+  pricePnc: number
+}
+
+export function evidenceGate(): EvidenceGate {
+  const founder = isEvidenceFounder()
+  if (founder) return { founder: true, freeRemaining: Infinity, needsPayment: false, pricePnc: 0 }
+  const used = evidenceUsedCount()
+  const freeRemaining = Math.max(0, EVIDENCE_FREE_ALLOWANCE - used)
+  return { founder: false, freeRemaining, needsPayment: freeRemaining <= 0, pricePnc: EVIDENCE_PRICE_PNC }
+}
+
+// Record that a free question was consumed (founders & paid queries don't count).
+export function recordFreeQuery(): void {
+  try { localStorage.setItem(USED_KEY, String(evidenceUsedCount() + 1)) } catch { /* ignore */ }
+}
+
 export async function askClinicalEvidence(question: string, filters: EvidenceFilters = {}): Promise<EvidenceAnswer> {
   const q = question.trim()
   if (!q) throw new Error('empty_question')

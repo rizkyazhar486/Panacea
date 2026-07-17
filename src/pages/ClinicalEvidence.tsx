@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { IconSearch, IconShield, IconChartUp, IconStethoscope } from '../components/icons'
+import { useStore } from '../lib/store'
 import {
   askClinicalEvidence, verificationLinks, evidenceAvailable,
   STRENGTH_META, CERTAINTY_META, type EvidenceAnswer,
+  claimFounderIfEligible, evidenceGate, recordFreeQuery,
+  EVIDENCE_PRICE_PNC, EVIDENCE_FREE_ALLOWANCE, type EvidenceGate,
 } from '../lib/evidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -35,6 +38,8 @@ function CertaintyBar({ c }: { c: EvidenceAnswer['overallCertainty'] }) {
 }
 
 export function ClinicalEvidence() {
+  const { state, spendPnc } = useStore()
+  const wallet = state.wallet
   const [q, setQ] = useState('')
   const [specialty, setSpecialty] = useState('')
   const [population, setPopulation] = useState('')
@@ -42,16 +47,39 @@ export function ClinicalEvidence() {
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
   const [answer, setAnswer] = useState<EvidenceAnswer | null>(null)
+  const [gate, setGate] = useState<EvidenceGate>(() => evidenceGate())
+  const [topupNeeded, setTopupNeeded] = useState(false)
+
+  // Grant one of the first-10 founder slots on first visit, then read the gate.
+  useEffect(() => { claimFounderIfEligible(); setGate(evidenceGate()) }, [])
 
   async function ask(question?: string) {
     const text = (question ?? q).trim()
     if (!text) return
     if (question) setQ(question)
-    setLoading(true); setErr(''); setAnswer(null)
+    setErr(''); setTopupNeeded(false)
+
+    // Access control: founders are free; others use their free allowance, then
+    // pay 150 PNC per query from the wallet.
+    const g = evidenceGate()
+    let paid = false
+    if (!g.founder && g.needsPayment) {
+      if (wallet.balance < EVIDENCE_PRICE_PNC) { setTopupNeeded(true); return }
+      const res = spendPnc(EVIDENCE_PRICE_PNC, `Clinical Evidence query (${EVIDENCE_PRICE_PNC} PNC)`)
+      if (!res.ok) { setTopupNeeded(true); return }
+      paid = true
+    }
+
+    setLoading(true); setAnswer(null)
     try {
       const a = await askClinicalEvidence(text, { specialty, population, region })
       setAnswer(a)
+      // Only consume a free-allowance credit on success and when not a founder/paid.
+      if (!g.founder && !paid) recordFreeQuery()
+      setGate(evidenceGate())
     } catch (e) {
+      // Refund the free-allowance credit is automatic (we only record on success);
+      // a paid query that failed to synthesize is not re-charged again.
       const msg = String(e instanceof Error ? e.message : e)
       if (msg.includes('backend_unavailable')) setErr('The AI service is not configured on this deployment yet. You can still use the verification links below to search the primary literature.')
       else if (msg.includes('parse_failed')) setErr('The evidence engine returned an unexpected format. Please rephrase the question and try again.')
@@ -77,6 +105,26 @@ export function ClinicalEvidence() {
             AI synthesis isn't configured on this deployment — the verification links still work for searching the literature directly.
           </p>
         )}
+
+        {/* Access status */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          {gate.founder ? (
+            <Badge tone="brand">🎉 Founding user — unlimited free forever</Badge>
+          ) : gate.freeRemaining > 0 ? (
+            <Badge tone="low">{gate.freeRemaining} of {EVIDENCE_FREE_ALLOWANCE} free questions left</Badge>
+          ) : (
+            <Badge tone="neutral">{EVIDENCE_PRICE_PNC} PNC (≈ Rp150,000) per question</Badge>
+          )}
+          <span className="text-neutral-400">Balance: {wallet.balance.toLocaleString()} PNC</span>
+        </div>
+
+        {topupNeeded && (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs dark:border-rose-500/30 dark:bg-rose-500/10">
+            <p className="font-bold text-rose-700 dark:text-rose-300">Insufficient PNC balance</p>
+            <p className="mt-1 text-rose-600 dark:text-rose-200">You've used your {EVIDENCE_FREE_ALLOWANCE} free questions. Each further question costs {EVIDENCE_PRICE_PNC} PNC (≈ Rp150,000). Top up your balance to continue.</p>
+            <a href="#/billing" className="mt-2 inline-block rounded-full bg-rose-500 px-4 py-1.5 font-bold text-white active:scale-95">Top up in Billing →</a>
+          </div>
+        )}
         <div className="mt-3">
           <textarea
             value={q}
@@ -101,7 +149,7 @@ export function ClinicalEvidence() {
         </div>
         <div className="mt-3 flex items-center gap-2">
           <Button onClick={() => ask()} disabled={loading || !q.trim()}>
-            {loading ? 'Searching evidence…' : '🔎 Ask'}
+            {loading ? 'Searching evidence…' : gate.needsPayment ? `🔎 Ask (${EVIDENCE_PRICE_PNC} PNC)` : '🔎 Ask'}
           </Button>
           <span className="text-[11px] text-neutral-400">⌘/Ctrl + Enter</span>
         </div>
