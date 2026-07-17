@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
+import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../components/icons'
+import { getHealthCache, pushBiometrics } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Komposisi Tubuh — InBody-style visual page. All values are entered manually
@@ -106,10 +107,57 @@ function BodyTypeGrid({ bmi, pbf, g }: { bmi: number; pbf: number; g: 'M' | 'F' 
   )
 }
 
+// Pull whatever the Health Profile has synced from Apple Health / WHOOP / etc.
+// and map it onto this page's fields, so the two don't silently disagree.
+function syncFromHealthProfile(cur: Body): { next: Body; changed: string[] } {
+  const hc = getHealthCache() as Record<string, unknown>
+  const num = (k: string) => (typeof hc[k] === 'number' && (hc[k] as number) > 0 ? (hc[k] as number) : undefined)
+  const patch: Partial<Body> = {}
+  const changed: string[] = []
+  const wKg = num('weightKg'); if (wKg) { patch.w = wKg; changed.push('Weight') }
+  const bf = num('bodyFatPct')
+  if (bf) { patch.bfm = +(((wKg ?? cur.w) * bf) / 100).toFixed(1); changed.push('Body Fat') }
+  const smm = num('muscleMassKg'); if (smm) { patch.smm = smm; changed.push('Muscle Mass') }
+  const vo2 = num('vo2max'); if (vo2) { patch.vo2 = vo2; changed.push('VO₂max') }
+  const rhr = num('restingHr'); if (rhr) { patch.rhr = rhr; changed.push('Resting HR') }
+  const hrv = num('hrvMs'); if (hrv) { patch.hrv = hrv; changed.push('HRV') }
+  const sleepH = num('sleepH'); if (sleepH) { patch.sleepH = sleepH; changed.push('Sleep') }
+  return { next: { ...cur, ...patch }, changed }
+}
+
 export function BodyComposition() {
-  const [b, setB] = useState<Body>(load)
+  // Sync BEFORE the first render (not in an effect) so the push-back effect
+  // below never has a chance to commit stale default values over real synced
+  // ones — that race is exactly what caused this page to silently disagree
+  // with Apple Health/WHOOP data in the first place.
+  const [b, setB] = useState<Body>(() => {
+    const initial = load()
+    if (localStorage.getItem(KEY) == null) return syncFromHealthProfile(initial).next
+    return initial
+  })
+  const [syncNote, setSyncNote] = useState('')
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(b)) } catch { /* ignore */ } }, [b])
+  // Keep the shared Health Profile cache in sync with manual edits made here too,
+  // so calculators elsewhere in the app don't drift from what's shown on this page.
+  useEffect(() => { pushBiometrics({ vo2max: b.vo2, restingHr: b.rhr, hrvMs: b.hrv, sleepH: b.sleepH, weightKg: b.w }) }, [b.vo2, b.rhr, b.hrv, b.sleepH, b.w])
   const u = (p: Partial<Body>) => setB((x) => ({ ...x, ...p }))
+
+  function syncNow(silent = false) {
+    setB((cur) => {
+      const { next, changed } = syncFromHealthProfile(cur)
+      if (!silent) setSyncNote(changed.length ? `Synced from Health Profile: ${changed.join(', ')}.` : 'No new device data found in Health Profile.')
+      return changed.length ? next : cur
+    })
+  }
+
+  // Re-sync whenever the tab regains focus, mirroring the same focus-resync
+  // pattern Health Profile uses for data pushed in from a phone.
+  useEffect(() => {
+    const onFocus = () => syncNow(true)
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const d = useMemo(() => {
     const bmi = b.w / Math.pow(b.h / 100, 2)
@@ -146,7 +194,13 @@ export function BodyComposition() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition & Longevity" subtitle="Enter manually from a smart scale / InBody / Apple Watch — everything is calculated & visualized" />
+        <SectionTitle
+          icon={<IconActivity size={20} />}
+          title="Body Composition & Longevity"
+          subtitle="Auto-fills from your Health Profile (Apple Health / WHOOP / etc.) — override manually from a smart scale or InBody printout anytime"
+          right={<Button variant="outline" onClick={() => syncNow(false)}>🔄 Sync from Health Profile</Button>}
+        />
+        {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {num('Weight (kg)', 'w', 0.1)}
           {num('Height (cm)', 'h')}
