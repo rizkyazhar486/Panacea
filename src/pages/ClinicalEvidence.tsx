@@ -7,6 +7,7 @@ import {
   STRENGTH_META, CERTAINTY_META, type EvidenceAnswer,
   claimFounderIfEligible, evidenceGate, recordFreeQuery,
   EVIDENCE_PRICE_PNC, EVIDENCE_FREE_ALLOWANCE, type EvidenceGate,
+  fetchRelatedArticles, type PubmedArticle,
 } from '../lib/evidence'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,6 +48,8 @@ export function ClinicalEvidence() {
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState('')
   const [answer, setAnswer] = useState<EvidenceAnswer | null>(null)
+  const [articles, setArticles] = useState<PubmedArticle[]>([])
+  const [articlesLoading, setArticlesLoading] = useState(false)
   const [gate, setGate] = useState<EvidenceGate>(() => evidenceGate())
   const [topupNeeded, setTopupNeeded] = useState(false)
 
@@ -70,7 +73,9 @@ export function ClinicalEvidence() {
       paid = true
     }
 
-    setLoading(true); setAnswer(null)
+    setLoading(true); setAnswer(null); setArticles([]); setArticlesLoading(true)
+    // Fetch real PubMed articles in parallel with the AI synthesis.
+    fetchRelatedArticles(text).then((a) => setArticles(a)).finally(() => setArticlesLoading(false))
     try {
       const a = await askClinicalEvidence(text, { specialty, population, region })
       setAnswer(a)
@@ -240,6 +245,26 @@ export function ClinicalEvidence() {
             </Card>
           )}
         </>
+      )}
+
+      {/* Live journal retrieval — real PubMed articles for this question */}
+      {(articlesLoading || articles.length > 0) && (
+        <Card className="!p-5">
+          <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Live from PubMed (NCBI) for this question — real, currently-indexed papers" />
+          {articlesLoading && articles.length === 0 ? (
+            <p className="mt-3 text-sm text-neutral-400">Fetching articles from PubMed…</p>
+          ) : (
+            <div className="mt-3 space-y-2">
+              {articles.map((a) => (
+                <a key={a.pmid} href={a.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-neutral-200 bg-white p-3 transition hover:border-brand dark:border-white/10 dark:bg-white/5">
+                  <div className="text-sm font-bold leading-snug text-ink dark:text-white">{a.title}</div>
+                  <div className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">{a.authors}</div>
+                  <div className="mt-0.5 text-[11px] text-neutral-400">{[a.journal, a.year].filter(Boolean).join(' · ')} · PMID {a.pmid}</div>
+                </a>
+              ))}
+            </div>
+          )}
+        </Card>
       )}
 
       {/* Verification links — always available once a question is typed */}

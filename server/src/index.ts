@@ -77,6 +77,7 @@ import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './pa
 import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload } from './healthWebhook.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
+import { searchPubmed } from './pubmed.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -495,6 +496,21 @@ app.get('/api/sports/f1', async (_req, res) => {
 })
 app.get('/api/sports/motogp', async (_req, res) => {
   res.json(await fetchMotoGpInfo())
+})
+
+// Live journal retrieval for the Clinical Evidence page — real PubMed articles
+// via NCBI E-utilities (free, no key). Auth-gated so it isn't abused as an open
+// proxy, and covered by the global rate limiter.
+app.get('/api/evidence/pubmed', requireAuth, async (req, res) => {
+  const q = String(req.query.q || '').trim()
+  if (!q) return res.status(400).json({ error: 'empty_query' })
+  try {
+    const articles = await searchPubmed(q, 6)
+    res.json({ articles })
+  } catch (e) {
+    console.log('[pubmed] error:', (e as Error).message)
+    res.json({ articles: [], error: 'pubmed_unavailable' })
+  }
 })
 app.get('/api/sports/favorites', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
