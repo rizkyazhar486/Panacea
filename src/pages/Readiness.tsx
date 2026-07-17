@@ -30,15 +30,15 @@ const todayKey = () => new Date().toISOString().slice(0, 10)
 const dayKey = (offset: number) => { const d = new Date(); d.setDate(d.getDate() - offset); return d.toISOString().slice(0, 10) }
 
 const BEHAVIORS = [
-  { id: 'caffeine_late', label: '☕ Kafein sore/malam', bad: true },
-  { id: 'alcohol', label: '🍺 Alkohol', bad: true },
-  { id: 'late_meal', label: '🍽️ Makan larut (<2 jam sblm tidur)', bad: true },
-  { id: 'screen_bed', label: '📱 Layar di tempat tidur', bad: true },
-  { id: 'stress_high', label: '😰 Stres tinggi', bad: true },
-  { id: 'sick', label: '🤒 Sakit / tidak enak badan', bad: true },
-  { id: 'travel', label: '✈️ Perjalanan jauh', bad: true },
-  { id: 'meditation', label: '🧘 Meditasi', bad: false },
-  { id: 'reading', label: '📖 Baca buku sblm tidur', bad: false },
+  { id: 'caffeine_late', label: '☕ Afternoon/evening caffeine', bad: true },
+  { id: 'alcohol', label: '🍺 Alcohol', bad: true },
+  { id: 'late_meal', label: '🍽️ Late meal (<2 hrs before bed)', bad: true },
+  { id: 'screen_bed', label: '📱 Screen time in bed', bad: true },
+  { id: 'stress_high', label: '😰 High stress', bad: true },
+  { id: 'sick', label: '🤒 Sick / feeling unwell', bad: true },
+  { id: 'travel', label: '✈️ Long-distance travel', bad: true },
+  { id: 'meditation', label: '🧘 Meditation', bad: false },
+  { id: 'reading', label: '📖 Read before bed', bad: false },
   { id: 'sauna_cold', label: '🧊 Sauna / cold plunge', bad: false },
 ]
 
@@ -92,9 +92,9 @@ function strainTarget(rec: number): [number, number] {
 }
 
 function recTone(r: number): { color: string; label: string } {
-  if (r >= 67) return { color: '#00BF63', label: 'HIJAU — siap performa' }
-  if (r >= 34) return { color: '#f59e0b', label: 'KUNING — latihan sedang' }
-  return { color: '#ef4444', label: 'MERAH — prioritaskan pemulihan' }
+  if (r >= 67) return { color: '#00BF63', label: 'GREEN — ready to perform' }
+  if (r >= 34) return { color: '#f59e0b', label: 'YELLOW — moderate training' }
+  return { color: '#ef4444', label: 'RED — prioritize recovery' }
 }
 
 // Big score ring.
@@ -143,7 +143,7 @@ export function Readiness() {
   const rec = recoveryScore(today, hrvBase, rhrBase, sleepNeed)
   const strain = strainOf(today.workouts)
   const [lo, hi] = rec != null ? strainTarget(rec) : [8, 13]
-  const tone = rec != null ? recTone(rec) : { color: '#a3a3a3', label: 'Isi check-in pagi dulu' }
+  const tone = rec != null ? recTone(rec) : { color: '#a3a3a3', label: 'Fill in your morning check-in first' }
 
   // Week bars.
   const week = useMemo(() => Array.from({ length: 7 }, (_, i) => {
@@ -186,7 +186,7 @@ export function Readiness() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       {/* Hero: today's scores */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Recovery & Strain" subtitle="Satu keputusan tiap pagi: seberapa keras hari ini?" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Recovery & Strain" subtitle="One decision every morning: how hard should today be?" />
         <div className="mt-2 flex items-center justify-around">
           <div className="flex flex-col items-center gap-1">
             <Ring value={rec ?? 0} max={100} color={tone.color}>
@@ -209,10 +209,10 @@ export function Readiness() {
           <div className="text-sm font-extrabold" style={{ color: tone.color }}>{tone.label}</div>
           {rec != null && (
             <p className="mt-1 text-[11px] text-neutral-500">
-              Target strain optimal hari ini: <b>{lo}–{hi}</b>.
-              {strain < lo && ` Masih ada ruang ${(lo - strain).toFixed(1)} strain — silakan berlatih.`}
-              {strain >= lo && strain <= hi && ' Anda berada di zona optimal — pertahankan.'}
-              {strain > hi && ' Sudah melewati target — tambahan beban hari ini berisiko menggerus recovery besok.'}
+              Optimal strain target today: <b>{lo}–{hi}</b>.
+              {strain < lo && ` Still ${(lo - strain).toFixed(1)} strain of room left — go ahead and train.`}
+              {strain >= lo && strain <= hi && ' You are in the optimal zone — keep it up.'}
+              {strain > hi && ' You have already exceeded the target — extra load today risks cutting into tomorrow\'s recovery.'}
             </p>
           )}
         </div>
@@ -220,14 +220,14 @@ export function Readiness() {
 
       {/* Morning check-in */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Check-in Pagi" subtitle="Isi dari jam/cincin Anda atau perasaan subjektif — 30 detik" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Morning Check-in" subtitle="Fill in from your watch/ring or subjective feel — 30 seconds" />
         <div className="mt-2 grid grid-cols-3 gap-3">
-          {num('HRV malam (ms)', 'hrv', 1, hrvBase ? `baseline ${hrvBase.toFixed(0)}` : 'mis. 65')}
-          {num('Resting HR (bpm)', 'rhr', 1, rhrBase ? `baseline ${rhrBase.toFixed(0)}` : 'mis. 58')}
-          {num('Tidur (jam)', 'sleepH', 0.1, `butuh ${sleepNeed.toFixed(1)}j`)}
+          {num('Overnight HRV (ms)', 'hrv', 1, hrvBase ? `baseline ${hrvBase.toFixed(0)}` : 'e.g. 65')}
+          {num('Resting HR (bpm)', 'rhr', 1, rhrBase ? `baseline ${rhrBase.toFixed(0)}` : 'e.g. 58')}
+          {num('Sleep (hours)', 'sleepH', 0.1, `need ${sleepNeed.toFixed(1)}h`)}
         </div>
         <div className="mt-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Kualitas tidur (subjektif)</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sleep quality (subjective)</div>
           <div className="mt-1.5 flex gap-1.5">
             {[1, 2, 3, 4, 5].map((q) => (
               <button key={q} onClick={() => upd({ sleepQ: q })}
@@ -238,7 +238,7 @@ export function Readiness() {
           </div>
         </div>
         <div className="mt-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Jurnal perilaku kemarin</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Yesterday's behavior journal</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {BEHAVIORS.map((b) => (
               <button key={b.id}
@@ -251,37 +251,37 @@ export function Readiness() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-neutral-50 p-3 text-center">
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Need Malam Ini</div>
-            <div className="text-lg font-extrabold text-brand-dark">{sleepNeed.toFixed(1)} jam</div>
-            <div className="text-[9px] text-neutral-400">basis {baseNeed}j + strain + utang tidur</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Need Tonight</div>
+            <div className="text-lg font-extrabold text-brand-dark">{sleepNeed.toFixed(1)} hours</div>
+            <div className="text-[9px] text-neutral-400">base {baseNeed}h + strain + sleep debt</div>
           </div>
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Debt (7 hari)</div>
-            <div className={'text-lg font-extrabold ' + (debt > 2 ? 'text-rose-500' : debt > 0.5 ? 'text-amber-600' : 'text-brand-dark')}>{debt.toFixed(1)} jam</div>
-            <div className="text-[9px] text-neutral-400">{debt > 2 ? 'tidur lebih awal malam ini' : 'terkendali'}</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Debt (7 days)</div>
+            <div className={'text-lg font-extrabold ' + (debt > 2 ? 'text-rose-500' : debt > 0.5 ? 'text-amber-600' : 'text-brand-dark')}>{debt.toFixed(1)} hours</div>
+            <div className="text-[9px] text-neutral-400">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
           </div>
         </div>
       </Card>
 
       {/* Log workout -> strain */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Catat Latihan Hari Ini" subtitle="Durasi × RPE → strain (skala 0-21, semakin tinggi semakin sulit naik)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Log Today's Workout" subtitle="Duration × RPE → strain (0-21 scale, harder to climb the higher it gets)" />
         <div className="mt-2 flex items-end gap-2">
-          <div className="w-24"><Field label="Menit"><input className={inputClass} type="number" value={wMin} onChange={(e) => setWMin(+e.target.value)} /></Field></div>
+          <div className="w-24"><Field label="Minutes"><input className={inputClass} type="number" value={wMin} onChange={(e) => setWMin(+e.target.value)} /></Field></div>
           <div className="flex-1">
-            <Field label={`RPE ${wRpe} — ${['', 'sangat ringan', 'ringan', 'ringan+', 'sedang', 'sedang+', 'agak berat', 'berat', 'sangat berat', 'hampir maks', 'maksimal'][wRpe]}`}>
+            <Field label={`RPE ${wRpe} — ${['', 'very light', 'light', 'light+', 'moderate', 'moderate+', 'somewhat hard', 'hard', 'very hard', 'near max', 'maximal'][wRpe]}`}>
               <input type="range" min={1} max={10} value={wRpe} onChange={(e) => setWRpe(+e.target.value)} className="w-full" />
             </Field>
           </div>
           <button
             onClick={() => { if (wMin > 0) upd({ workouts: [...today.workouts, { rpe: wRpe, min: wMin }] }) }}
-            className="h-[42px] shrink-0 rounded-xl bg-brand px-4 text-sm font-bold text-white active:scale-95">+ Tambah</button>
+            className="h-[42px] shrink-0 rounded-xl bg-brand px-4 text-sm font-bold text-white active:scale-95">+ Add</button>
         </div>
         {today.workouts.length > 0 && (
           <div className="mt-2 space-y-1">
             {today.workouts.map((w, i) => (
               <div key={i} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-xs">
-                <span>🏋️ {w.min} mnt · RPE {w.rpe} <span className="text-neutral-400">(+{(w.rpe * w.min)} load)</span></span>
+                <span>🏋️ {w.min} min · RPE {w.rpe} <span className="text-neutral-400">(+{(w.rpe * w.min)} load)</span></span>
                 <button onClick={() => upd({ workouts: today.workouts.filter((_, j) => j !== i) })} className="font-bold text-rose-400">✕</button>
               </div>
             ))}
@@ -291,7 +291,7 @@ export function Readiness() {
 
       {/* Week view */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="7 Hari Terakhir" subtitle="Recovery (warna) vs Strain (biru)" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Last 7 Days" subtitle="Recovery (color) vs Strain (blue)" />
         <div className="mt-2 flex items-end justify-between gap-1.5" style={{ height: 110 }}>
           {week.map((d) => {
             const c = d.rec != null ? recTone(d.rec).color : '#e5e5e5'
@@ -301,18 +301,18 @@ export function Readiness() {
                   <div className="w-2.5 rounded-t" style={{ height: `${d.rec ?? 4}%`, background: c, minHeight: 4 }} title={`Recovery ${d.rec ?? '—'}%`} />
                   <div className="w-2.5 rounded-t bg-blue-400" style={{ height: `${(d.strain / 21) * 100}%`, minHeight: 2 }} title={`Strain ${d.strain.toFixed(1)}`} />
                 </div>
-                <div className="text-[8px] font-bold text-neutral-400">{new Date(d.k).toLocaleDateString('id-ID', { weekday: 'short' })}</div>
+                <div className="text-[8px] font-bold text-neutral-400">{new Date(d.k).toLocaleDateString('en-US', { weekday: 'short' })}</div>
               </div>
             )
           })}
         </div>
-        {hrvBase == null && <p className="mt-2 text-center text-[11px] text-neutral-400">Isi check-in ≥3 hari agar baseline HRV/RHR personal terbentuk — skor akan makin akurat.</p>}
+        {hrvBase == null && <p className="mt-2 text-center text-[11px] text-neutral-400">Fill in the check-in for ≥3 days to build your personal HRV/RHR baseline — the score will get more accurate.</p>}
       </Card>
 
       {/* Behavior impact */}
       {impacts.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<span className="text-lg">🔬</span>} title="Dampak Perilaku Anda" subtitle="Rata-rata recovery pada hari DENGAN vs TANPA perilaku (30 hari)" />
+          <SectionTitle icon={<span className="text-lg">🔬</span>} title="Your Behavior Impact" subtitle="Average recovery on days WITH vs WITHOUT the behavior (30 days)" />
           <div className="mt-2 space-y-2">
             {impacts.map((r) => {
               const diff = r.withB - r.without
@@ -320,7 +320,7 @@ export function Readiness() {
                 <div key={r.label} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
                   <div>
                     <div className="text-xs font-bold">{r.label}</div>
-                    <div className="text-[10px] text-neutral-400">{r.n} hari tercatat</div>
+                    <div className="text-[10px] text-neutral-400">{r.n} days logged</div>
                   </div>
                   <div className={'text-sm font-extrabold ' + (diff < -2 ? 'text-rose-500' : diff > 2 ? 'text-brand-dark' : 'text-neutral-400')}>
                     {diff > 0 ? '+' : ''}{diff.toFixed(0)}% recovery
@@ -329,13 +329,13 @@ export function Readiness() {
               )
             })}
           </div>
-          <p className="mt-2 text-[10px] text-neutral-400">Ini korelasi personal sederhana, bukan kausalitas — tapi pola konsisten layak ditindaklanjuti.</p>
+          <p className="mt-2 text-[10px] text-neutral-400">This is a simple personal correlation, not causation — but a consistent pattern is worth acting on.</p>
         </Card>
       )}
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
-        Skor ini memberi keputusan harian; untuk tren beban mingguan lihat <a href="#/athlete" className="font-bold underline">ACWR & TSB di Atlet</a>,
-        program latihan di <a href="#/training-plan" className="font-bold underline">Program AI</a>. Semua data tersimpan di perangkat Anda (offline).
+        This score drives daily decisions; for weekly load trends see <a href="#/athlete" className="font-bold underline">ACWR & TSB in Athlete</a>,
+        or your training program in <a href="#/training-plan" className="font-bold underline">AI Program</a>. All data stays on your device (offline).
       </div>
     </div>
   )

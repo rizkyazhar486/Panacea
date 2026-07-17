@@ -577,10 +577,10 @@ export function TrainingPlan() {
         </div>
       </Card>
 
-      {/* Pelatih Lari Personal — VO₂max yang benar + zona pace + rencana */}
+      {/* Personal Running Coach — accurate VO₂max + pace zones + plan */}
       <RunnerCoach />
 
-      {/* Video teknik gerakan (Higgsfield) */}
+      {/* Movement technique videos (Higgsfield) */}
       <Card className="!p-5">
         <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Examples of how to perform movements with correct form" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -605,7 +605,7 @@ export function TrainingPlan() {
               <Card key={d} className={'!p-4 ' + (p ? '' : 'opacity-60')}>
                 <div className="flex items-center justify-between">
                   <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{d}</div>
-                  {p ? <Badge tone="brand">{p.emoji} {p.title}</Badge> : <Badge tone="neutral">Istirahat</Badge>}
+                  {p ? <Badge tone="brand">{p.emoji} {p.title}</Badge> : <Badge tone="neutral">Rest</Badge>}
                 </div>
                 {p && (
                   <>
@@ -616,7 +616,7 @@ export function TrainingPlan() {
                         return (
                           <div key={ex.name} className="flex gap-2.5 rounded-xl bg-neutral-50 p-2.5">
                             {img && (
-                              <img src={img} alt={`Teknik ${ex.name}`} loading="lazy"
+                              <img src={img} alt={`Technique: ${ex.name}`} loading="lazy"
                                 className="h-14 w-14 shrink-0 rounded-lg border border-neutral-200 bg-white object-cover" />
                             )}
                             <div className="min-w-0 flex-1">
@@ -627,7 +627,7 @@ export function TrainingPlan() {
                                 </span>
                               </div>
                               <div className="mt-0.5 flex flex-wrap gap-x-3 text-[10px] text-neutral-500">
-                                {ex.rest && <span>⏸ Istirahat: {ex.rest}</span>}
+                                {ex.rest && <span>⏸ Rest: {ex.rest}</span>}
                                 {ex.pace && <span>🎯 {ex.pace}</span>}
                               </div>
                               <div className="mt-0.5 text-[10px] italic text-neutral-400">💡 {ex.cue}</div>
@@ -647,13 +647,13 @@ export function TrainingPlan() {
       {/* Month mesocycle */}
       {view === 'bulan' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconTimer size={20} />} title="Mesosiklus 4 Minggu" subtitle="Progressive overload + deload — konsistensi mengalahkan intensitas" />
+          <SectionTitle icon={<IconTimer size={20} />} title="4-Week Mesocycle" subtitle="Progressive overload + deload — consistency beats intensity" />
           <div className="mt-3 space-y-2">
             {[
-              { w: 'Minggu 1', pct: '100%', desc: 'Volume dasar sesuai jadwal mingguan. Catat semua beban/pace (baseline).', tone: 'brand' as const },
-              { w: 'Minggu 2', pct: '+5-10%', desc: 'Progression: tambah SATU variabel — beban, repetisi, ATAU durasi. Bukan semuanya.', tone: 'brand' as const },
-              { w: 'Minggu 3', pct: '+10-15%', desc: 'Minggu terberat (overload puncak). Tidur 7-9 jam wajib; protein terjaga.', tone: 'low' as const },
-              { w: 'Minggu 4', pct: '-40%', desc: 'DELOAD: volume dipotong, intensitas ringan. Adaptasi & superkompensasi terjadi di sini.', tone: 'neutral' as const },
+              { w: 'Week 1', pct: '100%', desc: 'Base volume per the weekly schedule. Log all loads/pace (baseline).', tone: 'brand' as const },
+              { w: 'Week 2', pct: '+5-10%', desc: 'Progression: add ONE variable — load, reps, OR duration. Not everything at once.', tone: 'brand' as const },
+              { w: 'Week 3', pct: '+10-15%', desc: 'The hardest week (peak overload). 7-9 hours of sleep is mandatory; keep protein up.', tone: 'low' as const },
+              { w: 'Week 4', pct: '-40%', desc: 'DELOAD: volume cut, low intensity. Adaptation & supercompensation happen here.', tone: 'neutral' as const },
             ].map((m) => (
               <div key={m.w} className="flex items-start gap-3 rounded-xl border border-neutral-100 p-3">
                 <Badge tone={m.tone}>{m.w}</Badge>
@@ -670,14 +670,14 @@ export function TrainingPlan() {
       {/* Year macrocycle */}
       {view === 'tahun' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="Makrosiklus 12 Bulan" subtitle="Periodisasi tahunan menuju puncak — pola tim juara" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="12-Month Macrocycle" subtitle="Annual periodization toward a peak — the champion team's pattern" />
           <div className="mt-3 space-y-2">
             {[
-              { p: 'Bulan 1-3 · Base', desc: 'Fondasi aerobik (Zone 2 dominan) + teknik & kekuatan dasar. ACWR stabil 0.9-1.1.' },
-              { p: 'Bulan 4-6 · Build', desc: 'Tambah intensitas: Norwegian 4×4, tempo, progressive overload gym. VO₂max mulai naik.' },
-              { p: 'Bulan 7-9 · Peak', desc: 'Sesi kunci spesifik target (lomba/tes). Volume tinggi → taper 2 minggu sebelum momen penting.' },
-              { p: 'Bulan 10 · Race / Test', desc: 'Puncak performa: ulangi Cooper Test / lomba. Bandingkan dengan baseline.' },
-              { p: 'Bulan 11-12 · Transisi', desc: 'Recovery aktif, olahraga lain yang menyenangkan, evaluasi & rencana tahun berikutnya.' },
+              { p: 'Month 1-3 · Base', desc: 'Aerobic foundation (Zone 2 dominant) + basic technique & strength. ACWR stable at 0.9-1.1.' },
+              { p: 'Month 4-6 · Build', desc: 'Add intensity: Norwegian 4×4, tempo, progressive gym overload. VO₂max starts rising.' },
+              { p: 'Month 7-9 · Peak', desc: 'Key sessions specific to the target (race/test). High volume → taper 2 weeks before the key moment.' },
+              { p: 'Month 10 · Race / Test', desc: 'Peak performance: repeat the Cooper Test / race. Compare against baseline.' },
+              { p: 'Month 11-12 · Transition', desc: 'Active recovery, other enjoyable sports, evaluation & next year\'s plan.' },
             ].map((m) => (
               <div key={m.p} className="rounded-xl border border-neutral-100 p-3">
                 <div className="text-sm font-extrabold text-brand-dark">{m.p}</div>
@@ -690,14 +690,14 @@ export function TrainingPlan() {
 
       {/* Longevity panel — user's own numbers */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Panel Longevity Anda" subtitle="VO₂max, kekuatan, massa otot, glukosa — kompetensi inti Panaceamed" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Your Longevity Panel" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field label={<>VO₂max (dari jam/tes)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="mis. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
-          <Field label="Cooper 12 mnt ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="mis. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
-          <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="mis. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
+          <Field label={<>VO₂max (from watch/test)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="e.g. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
+          <Field label="Cooper 12-min ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="e.g. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
+          <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="e.g. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
         </div>
         <div className="mt-2 rounded-xl bg-amber-50 p-2.5 text-[10px] leading-relaxed text-amber-800">
-          ⚠️ Cooper Test = lari <b>sekuat mungkin selama 12 menit</b> (bukan pace lari santai). Jangan isi kolom Cooper dengan pace easy run — hasilnya akan salah-rendah. Untuk analisis dari lari biasa, pakai <b>Pelatih Lari Personal</b> di atas.
+          ⚠️ Cooper Test = run <b>as hard as possible for 12 minutes</b> (not an easy-run pace). Don't fill the Cooper field with an easy-run pace — the result will be falsely low. For analysis from a regular run, use the <b>Personal Running Coach</b> above.
         </div>
 
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
@@ -705,32 +705,32 @@ export function TrainingPlan() {
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">VO₂max Cooper (all-out)</div>
               <div className="text-2xl font-extrabold text-brand">{cooper > 600 ? vo2FromCooper.toFixed(1) : '—'}</div>
-              <div className="text-[10px] text-white/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ jauh di bawah VO₂max jam Anda — kemungkinan tes tidak all-out' : '(jarak − 504.9) ÷ 44.73'}</div>
+              <div className="text-[10px] text-white/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ far below your watch VO₂max — the test was likely not all-out' : '(distance − 504.9) ÷ 44.73'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Target realistis</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Realistic target</div>
               <div className="text-2xl font-extrabold text-amber-300">{vo2Now > 0 ? vo2Target : '—'}</div>
-              <div className="text-[10px] text-white/50">{vo2Now > 0 ? `±${monthsToTarget} bulan dgn 4×4 rutin (≈+0.5/bln)` : 'isi VO₂max Anda'}</div>
+              <div className="text-[10px] text-white/50">{vo2Now > 0 ? `±${monthsToTarget} months with regular 4×4 (≈+0.5/month)` : 'fill in your VO₂max'}</div>
             </div>
           </div>
           <div className="relative mt-3 h-2.5 overflow-hidden rounded-full bg-white/15">
             <div className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (vo2Now / vo2Target) * 100)}%` }} />
           </div>
           <p className="mt-2 text-[11px] leading-relaxed text-white/80">
-            VO₂max sangat bisa dilatih — pemula naik 15-30% dalam 8-12 minggu.
-            Resep: <b>2× Norwegian 4×4</b> + <b>3× Zone 2</b> (45-60 mnt) + <b>2× strength</b> per minggu.
-            Naik 1 MET (±3.5 ml/kg/mnt) menurunkan risiko kematian ~12-17%.
+            VO₂max is highly trainable — beginners gain 15-30% in 8-12 weeks.
+            Recipe: <b>2× Norwegian 4×4</b> + <b>3× Zone 2</b> (45-60 min) + <b>2× strength</b> per week.
+            A 1 MET increase (±3.5 ml/kg/min) lowers mortality risk by ~12-17%.
           </p>
         </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {[
-            { t: '💪 Grip Strength (prediksi mortalitas)', d: 'Dead hang 3×maks + farmer carry 2×/mgg. Target hang 60+ dtk. Tiap −5 kg grip ≈ +16% risiko kematian (PURE study).' },
-            { t: '🦵 Leg Strength (mobilitas & anti-jatuh)', d: 'Squat/sit-to-stand: target 30 dtk ≥ 25× (usia 20-an). Kaki kuat = prediktor terbaik kemandirian di usia tua.' },
-            { t: '🥩 Massa Otot (metabolik & imun)', d: `Protein ${protein} g/hari (1.6 g/kg), resistance training 3×/mgg progresif. Otot = organ endokrin anti-inflamasi.`},
-            { t: '🩸 Glukosa & Sensitivitas Insulin', d: 'Jalan 10-15 mnt setelah makan, Zone 2 rutin, tidur cukup. Otot yang terlatih = "spons glukosa".' },
-            { t: '⚖️ Tes Keseimbangan & Fungsi', d: 'One-leg stand target 30+ dtk (10 dtk gagal = red flag); sitting-rising test target skor 8+; gait speed ≥1.0 m/dtk.' },
-            { t: '🧠 Mental & Stres', d: 'Meditasi 10 mnt/hari + jurnal syukur. Stres kronis menaikkan kortisol → menghambat semua adaptasi di atas.' },
+            { t: '💪 Grip Strength (mortality predictor)', d: 'Dead hang 3×max + farmer carry 2×/week. Target 60+ sec hang. Every −5 kg of grip ≈ +16% mortality risk (PURE study).' },
+            { t: '🦵 Leg Strength (mobility & fall prevention)', d: 'Squat/sit-to-stand: target 30 sec ≥ 25× (20s-age level). Strong legs = the best predictor of independence in old age.' },
+            { t: '🥩 Muscle Mass (metabolic & immune)', d: `Protein ${protein} g/day (1.6 g/kg), progressive resistance training 3×/week. Muscle = an anti-inflammatory endocrine organ.`},
+            { t: '🩸 Glucose & Insulin Sensitivity', d: 'Walk 10-15 min after meals, regular Zone 2, adequate sleep. Trained muscle = a "glucose sponge".' },
+            { t: '⚖️ Balance & Function Tests', d: 'One-leg stand target 30+ sec (failing at 10 sec = red flag); sitting-rising test target score of 8+; gait speed ≥1.0 m/sec.' },
+            { t: '🧠 Mental & Stress', d: 'Meditate 10 min/day + gratitude journal. Chronic stress raises cortisol → blunts every adaptation above.' },
           ].map((x) => (
             <div key={x.t} className="rounded-xl border border-neutral-100 p-3">
               <div className="text-xs font-extrabold">{x.t}</div>
@@ -739,15 +739,15 @@ export function TrainingPlan() {
           ))}
         </div>
         <p className="mt-3 text-[10px] text-neutral-400">
-          Referensi: Mandsager 2018 (JAMA — kebugaran & mortalitas), Helgerud 2007 (4×4), PURE study (grip),
-          Rikli & Jones (tes fungsional), Northwestern Mutual Lifespan Calculator & Longevity Illustrator (proyeksi umur).
+          References: Mandsager 2018 (JAMA — fitness & mortality), Helgerud 2007 (4×4), PURE study (grip),
+          Rikli & Jones (functional tests), Northwestern Mutual Lifespan Calculator & Longevity Illustrator (lifespan projection).
         </p>
       </Card>
 
       {/* Music */}
       <Card className="!p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="text-sm font-extrabold">🎧 Musik latihan</div>
+          <div className="text-sm font-extrabold">🎧 Workout Music</div>
           <div className="flex gap-2">
             <a href="https://open.spotify.com/genre/workout" target="_blank" rel="noreferrer" className="rounded-full bg-[#1DB954] px-4 py-2 text-xs font-bold text-white active:scale-95">Spotify</a>
             <a href="https://music.apple.com/us/room/6451822724" target="_blank" rel="noreferrer" className="rounded-full bg-neutral-900 px-4 py-2 text-xs font-bold text-white active:scale-95"> Apple Music</a>
@@ -756,8 +756,8 @@ export function TrainingPlan() {
       </Card>
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
-        🖼️ Ilustrasi teknik gerakan kini tampil otomatis pada Squat, Push-up/Bench Press, Deadlift, Pull-up, Hip Thrust, Overhead Press & sesi lari — akan terus ditambah untuk gerakan lainnya.
-        Log beban gym cepat ada di <a href="#/fitness-test" className="font-bold underline">Tes Fisik</a>, jurnal RPE di <a href="#/logs" className="font-bold underline">Log & Statistik</a>.
+        🖼️ Movement technique illustrations now show automatically for Squat, Push-up/Bench Press, Deadlift, Pull-up, Hip Thrust, Overhead Press & running sessions — more movements will keep being added.
+        Quick gym load logging is in <a href="#/fitness-test" className="font-bold underline">Physical Test</a>, RPE journal in <a href="#/logs" className="font-bold underline">Logs & Stats</a>.
       </div>
     </div>
   )

@@ -4,7 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../compone
 import { IconActivity, IconHeart, IconCheck } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Penilaian Awal — required before starting a demanding program: movement
+// Initial Assessment — required before starting a demanding program: movement
 // pattern screen, pain/injury flags, strength baseline, L/R asymmetry, and a
 // quality-of-life screening. Runs once (or re-run any time), persists locally.
 // The QoL section offers short ADAPTATIONS inspired by the domains of four
@@ -31,37 +31,37 @@ const DEF: Assessment = {
   movement: {}, painRegions: [], painSeverity: 0,
   strength: { pushups: 0, squats60: 0, plankSec: 0 },
   asym: { balanceR: 0, balanceL: 0, hopR: 0, hopL: 0 },
-  qolInstrument: 'Nottingham Health Profile (adaptasi)',
+  qolInstrument: 'Nottingham Health Profile (adapted)',
   qolAnswers: [],
 }
 function load(): Assessment { try { return { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEF } }
 export function isAssessmentDone(): boolean { try { return JSON.parse(localStorage.getItem(KEY) || '{}').done === true } catch { return false } }
 
 const MOVEMENTS = [
-  { id: 'squat', label: 'Overhead Squat', desc: 'Jongkok penuh, tangan lurus di atas kepala, tumit tetap menapak.' },
-  { id: 'balance', label: 'Keseimbangan Satu Kaki', desc: 'Berdiri satu kaki 30 detik tanpa goyah berlebihan.' },
-  { id: 'toetouch', label: 'Toe Touch', desc: 'Membungkuk menyentuh jari kaki, lutut lurus, tanpa nyeri.' },
-  { id: 'shoulder', label: 'Jangkauan Bahu (Scratch Test)', desc: 'Satu tangan dari atas, satu dari bawah punggung, coba bertemu.' },
-  { id: 'hop', label: 'Lompat Satu Kaki (Single-Leg Hop)', desc: 'Melompat & mendarat stabil satu kaki tanpa oleng.' },
+  { id: 'squat', label: 'Overhead Squat', desc: 'Full squat, arms straight overhead, heels stay flat on the floor.' },
+  { id: 'balance', label: 'Single-Leg Balance', desc: 'Stand on one leg for 30 seconds without excessive wobbling.' },
+  { id: 'toetouch', label: 'Toe Touch', desc: 'Bend forward to touch your toes, knees straight, no pain.' },
+  { id: 'shoulder', label: 'Shoulder Reach (Scratch Test)', desc: 'One hand from above, one from below the back, try to meet.' },
+  { id: 'hop', label: 'Single-Leg Hop', desc: 'Jump and land stably on one leg without wobbling.' },
 ]
-const PAIN_REGIONS = ['Leher', 'Bahu', 'Punggung Atas', 'Punggung Bawah', 'Pinggul', 'Lutut', 'Pergelangan Kaki', 'Lainnya']
+const PAIN_REGIONS = ['Neck', 'Shoulder', 'Upper Back', 'Lower Back', 'Hip', 'Knee', 'Ankle', 'Other']
 
 const QOL_INSTRUMENTS: Record<string, { note: string; items: string[] }> = {
-  'Nottingham Health Profile (adaptasi)': {
-    note: 'Adaptasi ringkas dari domain Nottingham Health Profile (energi, nyeri, reaksi emosional, tidur, isolasi sosial, mobilitas fisik) — bukan instrumen resmi berlisensi.',
-    items: ['Energi saya cukup sepanjang hari', 'Saya jarang merasa nyeri mengganggu aktivitas', 'Suasana hati saya stabil belakangan ini', 'Kualitas tidur saya baik', 'Saya cukup terhubung secara sosial (tidak terisolasi)', 'Saya bisa bergerak/beraktivitas fisik dengan bebas'],
+  'Nottingham Health Profile (adapted)': {
+    note: 'A brief adaptation of the Nottingham Health Profile domains (energy, pain, emotional reactions, sleep, social isolation, physical mobility) — not the official licensed instrument.',
+    items: ['My energy is sufficient throughout the day', 'I rarely feel pain that interferes with activities', 'My mood has been stable lately', 'My sleep quality is good', 'I feel socially connected (not isolated)', 'I can move / be physically active freely'],
   },
-  'McGill Pain Questionnaire - Short Form (adaptasi)': {
-    note: 'Adaptasi ringkas dari domain McGill Pain Questionnaire Short-Form (deskriptor sensorik & afektif nyeri) — bukan instrumen resmi berlisensi.',
-    items: ['Nyeri saya tidak berdenyut/menusuk', 'Nyeri saya tidak tajam/seperti disayat', 'Nyeri saya tidak melelahkan secara fisik', 'Nyeri saya tidak mengganggu emosi (tidak menyiksa)', 'Secara umum intensitas nyeri saya rendah'],
+  'McGill Pain Questionnaire - Short Form (adapted)': {
+    note: 'A brief adaptation of the McGill Pain Questionnaire Short-Form domains (sensory & affective pain descriptors) — not the official licensed instrument.',
+    items: ['My pain is not throbbing/stabbing', 'My pain is not sharp/cutting', 'My pain is not physically exhausting', 'My pain does not disturb me emotionally (not agonizing)', 'Overall, my pain intensity is low'],
   },
-  'IQOLA / SF-36 (adaptasi)': {
-    note: 'Adaptasi ringkas dari domain International Quality of Life Assessment (SF-36): fungsi fisik, peran fisik, nyeri tubuh, kesehatan umum, vitalitas, fungsi sosial, peran emosional, kesehatan mental — bukan instrumen resmi berlisensi.',
-    items: ['Saya bisa melakukan aktivitas fisik sedang tanpa hambatan', 'Pekerjaan/aktivitas harian saya tidak terganggu masalah fisik', 'Nyeri tubuh tidak membatasi aktivitas saya', 'Secara umum saya menilai kesehatan saya baik', 'Saya punya cukup energi/vitalitas', 'Aktivitas sosial saya tidak terganggu', 'Masalah emosional tidak mengganggu aktivitas saya', 'Kesehatan mental saya baik (tenang, bahagia)'],
+  'IQOLA / SF-36 (adapted)': {
+    note: 'A brief adaptation of the International Quality of Life Assessment (SF-36) domains: physical functioning, physical role, bodily pain, general health, vitality, social functioning, emotional role, mental health — not the official licensed instrument.',
+    items: ['I can do moderate physical activity without limitation', 'My daily work/activities are not disrupted by physical problems', 'Bodily pain does not limit my activities', 'Overall I rate my health as good', 'I have enough energy/vitality', 'My social activities are not disrupted', 'Emotional problems do not disrupt my activities', 'My mental health is good (calm, happy)'],
   },
-  'Frenchay Activities Index (adaptasi)': {
-    note: 'Adaptasi ringkas dari domain Frenchay Activities Index (aktivitas hidup sehari-hari & partisipasi sosial) — bukan instrumen resmi berlisensi.',
-    items: ['Saya rutin menyiapkan makanan sendiri', 'Saya rutin berbelanja kebutuhan sehari-hari', 'Saya melakukan pekerjaan rumah ringan/berat', 'Saya rutin berjalan kaki di luar rumah', 'Saya aktif menjalani hobi', 'Saya bepergian (mengemudi/transportasi umum) secara mandiri', 'Saya melakukan pekerjaan produktif/bermanfaat'],
+  'Frenchay Activities Index (adapted)': {
+    note: 'A brief adaptation of the Frenchay Activities Index domains (activities of daily living & social participation) — not the official licensed instrument.',
+    items: ['I regularly prepare my own meals', 'I regularly shop for daily necessities', 'I do light/heavy housework', 'I regularly walk outdoors', 'I actively pursue hobbies', 'I travel (driving/public transport) independently', 'I do productive/useful work'],
   },
 }
 
@@ -89,12 +89,12 @@ export function InitialAssessment() {
     nav('/training-plan')
   }
 
-  const STEPS = ['Pola Gerak', 'Nyeri & Cedera', 'Kekuatan Dasar', 'Asimetri', 'Kualitas Hidup', 'Ringkasan']
+  const STEPS = ['Movement Pattern', 'Pain & Injury', 'Baseline Strength', 'Asymmetry', 'Quality of Life', 'Summary']
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Penilaian Awal" subtitle="Pola gerak, risiko cedera, nyeri, kekuatan & asimetri — sebelum memulai program berat" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Initial Assessment" subtitle="Movement pattern, injury risk, pain, strength & asymmetry — before starting a demanding program" />
         <div className="mt-3 flex flex-wrap gap-1.5">
           {STEPS.map((s, i) => (
             <button key={s} onClick={() => setStep(i)} className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition ' + (step === i ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{i + 1}. {s}</button>
@@ -104,7 +104,7 @@ export function InitialAssessment() {
 
       {step === 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Skrining Pola Gerak" subtitle="Nilai diri sendiri (bantu cermin/rekam video) — 0 tidak bisa, 1 dengan kompensasi, 2 sempurna" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Movement Pattern Screen" subtitle="Self-assess (use a mirror/record video) — 0 unable, 1 with compensation, 2 perfect" />
           <div className="mt-3 space-y-3">
             {MOVEMENTS.map((m) => (
               <div key={m.id} className="rounded-xl border border-neutral-100 p-3">
@@ -124,7 +124,7 @@ export function InitialAssessment() {
 
       {step === 1 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Nyeri & Riwayat Cedera" subtitle="Tandai area yang terasa nyeri/pernah cedera" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Pain & Injury History" subtitle="Mark areas that feel painful/have been injured" />
           <div className="mt-3 flex flex-wrap gap-1.5">
             {PAIN_REGIONS.map((r) => (
               <button key={r} onClick={() => setA((x) => ({ ...x, painRegions: x.painRegions.includes(r) ? x.painRegions.filter((p) => p !== r) : [...x.painRegions, r] }))}
@@ -132,46 +132,46 @@ export function InitialAssessment() {
             ))}
           </div>
           <div className="mt-4">
-            <Field label={`Tingkat nyeri keseluruhan (0-10): ${a.painSeverity}`}>
+            <Field label={`Overall pain level (0-10): ${a.painSeverity}`}>
               <input type="range" min={0} max={10} value={a.painSeverity} onChange={(e) => setA((x) => ({ ...x, painSeverity: +e.target.value }))} className="w-full" />
             </Field>
           </div>
-          {painFlag && <div className="mt-3 rounded-xl bg-rose-50 p-3 text-[11px] text-rose-600">⚠️ Nyeri tercatat cukup signifikan. Sebaiknya konsultasikan ke dokter/fisioterapis sebelum memulai program latihan berat.</div>}
+          {painFlag && <div className="mt-3 rounded-xl bg-rose-50 p-3 text-[11px] text-rose-600">⚠️ Significant pain recorded. You should consult a doctor/physiotherapist before starting a demanding training program.</div>}
         </Card>
       )}
 
       {step === 2 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Kekuatan Dasar (Baseline)" subtitle="Tes sederhana — jadi acuan kemajuan Anda" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Baseline Strength" subtitle="Simple tests — a reference point for tracking your progress" />
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <Field label="Push-up maks"><input className={inputClass} type="number" value={a.strength.pushups || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, pushups: +e.target.value } }))} /></Field>
-            <Field label="Squat/60 detik"><input className={inputClass} type="number" value={a.strength.squats60 || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, squats60: +e.target.value } }))} /></Field>
-            <Field label="Plank (detik)"><input className={inputClass} type="number" value={a.strength.plankSec || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, plankSec: +e.target.value } }))} /></Field>
+            <Field label="Max push-ups"><input className={inputClass} type="number" value={a.strength.pushups || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, pushups: +e.target.value } }))} /></Field>
+            <Field label="Squats/60 sec"><input className={inputClass} type="number" value={a.strength.squats60 || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, squats60: +e.target.value } }))} /></Field>
+            <Field label="Plank (sec)"><input className={inputClass} type="number" value={a.strength.plankSec || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, plankSec: +e.target.value } }))} /></Field>
           </div>
         </Card>
       )}
 
       {step === 3 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Asimetri & Ketidakseimbangan" subtitle="Bandingkan sisi kanan vs kiri" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Asymmetry & Imbalance" subtitle="Compare right vs left side" />
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Keseimbangan Kanan (dtk)"><input className={inputClass} type="number" value={a.asym.balanceR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceR: +e.target.value } }))} /></Field>
-            <Field label="Keseimbangan Kiri (dtk)"><input className={inputClass} type="number" value={a.asym.balanceL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceL: +e.target.value } }))} /></Field>
-            <Field label="Lompat Kanan (cm)"><input className={inputClass} type="number" value={a.asym.hopR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopR: +e.target.value } }))} /></Field>
-            <Field label="Lompat Kiri (cm)"><input className={inputClass} type="number" value={a.asym.hopL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopL: +e.target.value } }))} /></Field>
+            <Field label="Right Balance (sec)"><input className={inputClass} type="number" value={a.asym.balanceR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceR: +e.target.value } }))} /></Field>
+            <Field label="Left Balance (sec)"><input className={inputClass} type="number" value={a.asym.balanceL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceL: +e.target.value } }))} /></Field>
+            <Field label="Right Hop (cm)"><input className={inputClass} type="number" value={a.asym.hopR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopR: +e.target.value } }))} /></Field>
+            <Field label="Left Hop (cm)"><input className={inputClass} type="number" value={a.asym.hopL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopL: +e.target.value } }))} /></Field>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Asimetri Keseimbangan</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Asimetri Lompat</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Balance Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Hop Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
           </div>
-          {asymFlag && <div className="mt-3 rounded-xl bg-amber-50 p-3 text-[11px] text-amber-700">⚠️ Asimetri &gt;15% terdeteksi — pertimbangkan latihan unilateral tambahan untuk sisi lebih lemah.</div>}
+          {asymFlag && <div className="mt-3 rounded-xl bg-amber-50 p-3 text-[11px] text-amber-700">⚠️ Asymmetry &gt;15% detected — consider additional unilateral training for the weaker side.</div>}
         </Card>
       )}
 
       {step === 4 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Skrining Kualitas Hidup" subtitle="Pilih instrumen acuan (adaptasi ringkas, bukan versi resmi berlisensi)" />
-          <Field label="Instrumen">
+          <SectionTitle icon={<IconHeart size={20} />} title="Quality of Life Screening" subtitle="Choose a reference instrument (brief adaptation, not the official licensed version)" />
+          <Field label="Instrument">
             <select className={inputClass} value={a.qolInstrument} onChange={(e) => setA((x) => ({ ...x, qolInstrument: e.target.value, qolAnswers: [] }))}>
               {Object.keys(QOL_INSTRUMENTS).map((k) => <option key={k}>{k}</option>)}
             </select>
@@ -187,12 +187,12 @@ export function InitialAssessment() {
                       className={'flex-1 rounded-lg py-1.5 text-[11px] font-bold ' + ((a.qolAnswers[i] ?? -1) === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{v}</button>
                   ))}
                 </div>
-                <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Tidak setuju</span><span>Sangat setuju</span></div>
+                <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Disagree</span><span>Strongly agree</span></div>
               </div>
             ))}
           </div>
           <div className="mt-3 rounded-xl bg-neutral-50 p-3">
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Skor</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-400">Score</div>
             <div className="text-lg font-extrabold text-brand-dark">{qolPct.toFixed(0)}%</div>
           </div>
         </Card>
@@ -200,31 +200,31 @@ export function InitialAssessment() {
 
       {step === 5 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconCheck size={20} />} title="Ringkasan & Simpan" subtitle="Tinjau sebelum menyimpan penilaian" />
+          <SectionTitle icon={<IconCheck size={20} />} title="Summary & Save" subtitle="Review before saving the assessment" />
           <div className="mt-3 space-y-2">
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Pola Gerak</span>
-              <Badge tone={movementFlag ? 'critical' : 'brand'}>{movementScore}/{movementMax} {movementFlag ? '— Perlu perhatian' : '— Baik'}</Badge>
+              <span className="text-xs font-bold">Movement Pattern</span>
+              <Badge tone={movementFlag ? 'critical' : 'brand'}>{movementScore}/{movementMax} {movementFlag ? '— Needs attention' : '— Good'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Nyeri</span>
-              <Badge tone={painFlag ? 'critical' : 'brand'}>{a.painRegions.length > 0 ? a.painRegions.join(', ') : 'Tidak ada'}</Badge>
+              <span className="text-xs font-bold">Pain</span>
+              <Badge tone={painFlag ? 'critical' : 'brand'}>{a.painRegions.length > 0 ? a.painRegions.join(', ') : 'None'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Asimetri</span>
-              <Badge tone={asymFlag ? 'low' : 'brand'}>{asymFlag ? 'Terdeteksi >15%' : 'Seimbang'}</Badge>
+              <span className="text-xs font-bold">Asymmetry</span>
+              <Badge tone={asymFlag ? 'low' : 'brand'}>{asymFlag ? 'Detected >15%' : 'Balanced'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Kualitas Hidup</span>
+              <span className="text-xs font-bold">Quality of Life</span>
               <Badge tone={qolPct >= 70 ? 'brand' : qolPct >= 40 ? 'low' : 'critical'}>{qolPct.toFixed(0)}%</Badge>
             </div>
           </div>
           {(movementFlag || painFlag) && (
             <div className="mt-3 rounded-xl bg-rose-50 p-3 text-[11px] leading-relaxed text-rose-600">
-              Ada tanda risiko cedera. Program Anda akan tetap dibuat, tapi mulai dari intensitas ringan dan pertimbangkan konsultasi profesional dulu.
+              Signs of injury risk detected. Your program will still be created, but start at a light intensity and consider consulting a professional first.
             </div>
           )}
-          <Button onClick={finish} className="mt-4 w-full">Simpan & Mulai Program →</Button>
+          <Button onClick={finish} className="mt-4 w-full">Save & Start Program →</Button>
         </Card>
       )}
     </div>
