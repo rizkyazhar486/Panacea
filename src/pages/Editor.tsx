@@ -6,6 +6,10 @@ import { IconBook, IconUpload, IconScissors, IconCheck, IconSparkle } from '../c
 import { verifyMaterial } from '../lib/ai'
 import type { Material, MaterialCategory, ExamTrack } from '../lib/types'
 
+// English display labels for the stored (Indonesian) category/exam enum values.
+const CAT_LABELS: Record<string, string> = { Catatan: 'Notes', Materi: 'Study Material', Jurnal: 'Journal', Artikel: 'Article' }
+const EXAM_LABELS: Record<string, string> = { USMLE: 'USMLE', UKMPPD: 'UKMPPD', Umum: 'General' }
+
 export function Editor() {
   const { state, account, uploadMaterial, setMaterialAIReview } = useStore()
   const [title, setTitle] = useState('')
@@ -68,12 +72,12 @@ export function Editor() {
           <Field label="Specialty / Topic"><input className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value)} /></Field>
           <Field label="Category">
             <select className={inputClass} value={category} onChange={(e) => setCategory(e.target.value as MaterialCategory)}>
-              {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => <option key={c}>{c}</option>)}
+              {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => <option key={c} value={c}>{CAT_LABELS[c]}</option>)}
             </select>
           </Field>
           <Field label="Exam Track">
             <select className={inputClass} value={exam} onChange={(e) => setExam(e.target.value as ExamTrack)}>
-              {(['USMLE', 'UKMPPD', 'Umum'] as ExamTrack[]).map((c) => <option key={c}>{c}</option>)}
+              {(['USMLE', 'UKMPPD', 'Umum'] as ExamTrack[]).map((c) => <option key={c} value={c}>{EXAM_LABELS[c]}</option>)}
             </select>
           </Field>
         </div>
