@@ -3,11 +3,17 @@ import { IconPhone } from './icons'
 
 interface Msg { from: 'user' | 'admin'; text: string }
 
-const POS_KEY = 'panacea_contact_btn_pos_v1'
+// v2: bumped so any previously-saved position that had drifted up over the
+// header is discarded and everyone resets to the safe lower-corner default.
+const POS_KEY = 'panacea_contact_btn_pos_v2'
 const MIN_KEY = 'panacea_contact_btn_minimized_v1'
 
+// Keep the floating button confined to the LOWER portion of the screen so it
+// can never be dragged up into the header or over the top of page content
+// (the "phone logo blocking the view" complaint). Range: just above the bottom
+// nav (90px) up to ~38% of the viewport height.
 function clampBottom(v: number): number {
-  const maxBottom = window.innerHeight - 80
+  const maxBottom = Math.max(160, Math.round(window.innerHeight * 0.38))
   return Math.min(Math.max(v, 90), maxBottom)
 }
 
@@ -27,7 +33,7 @@ export function ContactService() {
   ])
 
   const [bottom, setBottom] = useState<number>(() => {
-    try { const v = Number(localStorage.getItem(POS_KEY)); return v > 0 ? clampBottom(v) : 112 } catch { return 112 }
+    try { const v = Number(localStorage.getItem(POS_KEY)); return v > 0 ? clampBottom(v) : 96 } catch { return 96 }
   })
   const [minimized, setMinimized] = useState<boolean>(() => {
     try { return localStorage.getItem(MIN_KEY) === '1' } catch { return false }

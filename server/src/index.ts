@@ -79,6 +79,7 @@ import { parseHealthWebhookPayload } from './healthWebhook.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
 import { searchTrials } from './trials.js'
+import { lookupDrug } from './openfda.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -526,7 +527,22 @@ app.get('/api/trials', requireAuth, async (req, res) => {
     res.json({ trials })
   } catch (e) {
     console.log('[trials] error:', (e as Error).message)
+
     res.json({ trials: [], error: 'trials_unavailable' })
+  }
+})
+
+// Drug information lookup — official FDA labels via openFDA (free, no key).
+app.get('/api/drugs/label', requireAuth, async (req, res) => {
+  const q = String(req.query.q || '').trim()
+  if (!q) return res.status(400).json({ error: 'empty_query' })
+  try {
+    const info = await lookupDrug(q)
+    if (!info) return res.json({ drug: null })
+    res.json({ drug: info })
+  } catch (e) {
+    console.log('[openfda] error:', (e as Error).message)
+    res.json({ drug: null, error: 'drug_unavailable' })
   }
 })
 app.get('/api/sports/favorites', requireAuth, (req, res) => {
