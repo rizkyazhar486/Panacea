@@ -29,7 +29,7 @@ import {
   type TextScale,
 } from '../lib/theme'
 import { LANGS, getLang, setLang, t, type Lang } from '../lib/i18n'
-import { enablePush, disablePush, pushStatus, type PushStatus } from '../lib/push'
+import { enablePush, disablePush, pushStatus, resyncPush, type PushStatus } from '../lib/push'
 import { InstallApp } from '../components/InstallApp'
 import { OfflineReady } from '../components/OfflineReady'
 import { api, backendEnabled } from '../lib/api'
@@ -481,7 +481,12 @@ function PushControl({ simple: S }: { simple: boolean }) {
   const [msg, setMsg] = useState('')
 
   useEffect(() => {
-    pushStatus().then(setStatus)
+    pushStatus().then((s) => {
+      setStatus(s)
+      // If the browser is subscribed, make sure the backend has this device —
+      // fixes "active but no registered devices" after a server restart.
+      if (s === 'enabled') resyncPush()
+    })
   }, [])
 
   async function toggle() {
@@ -494,8 +499,14 @@ function PushControl({ simple: S }: { simple: boolean }) {
     }
   }
   async function test() {
-    const r = await api.pushTest().catch(() => ({ sent: 0 }))
-    setMsg(r.sent > 0 ? 'Test notification sent ✅' : 'No registered devices.')
+    setMsg('Sending…')
+    let r = await api.pushTest().catch(() => ({ sent: 0 }))
+    if (r.sent === 0) {
+      // No device on record — re-register this browser and retry once.
+      const ok = await resyncPush()
+      if (ok) r = await api.pushTest().catch(() => ({ sent: 0 }))
+    }
+    setMsg(r.sent > 0 ? 'Test notification sent ✅' : 'Couldn\'t reach a device — tap "Turn off" then "Turn on" to re-register this device.')
   }
 
   const label: Record<PushStatus, string> = {

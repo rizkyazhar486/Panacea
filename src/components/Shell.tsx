@@ -117,6 +117,7 @@ const nav: Nav[] = [
   { to: '/consult', label: 'Consultation', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/hospitals', label: 'Health Facilities', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/pharmacy', label: 'Pharmacy', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Services' },
+  { to: '/drug-info', label: 'Drug Info', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   { to: '/orders', label: 'Transactions', icon: IconWallet, roles: ['pasien'], group: 'Services' },
   { to: '/pricing', label: 'Pricing & Plans', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   // Konten

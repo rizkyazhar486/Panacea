@@ -46,6 +46,21 @@ export async function enablePush(): Promise<PushStatus> {
   return 'enabled'
 }
 
+// Self-heal the "active but no registered devices" mismatch: if the browser
+// already holds a push subscription, re-register it with the backend (the
+// backend can lose it on restart, or the first subscribe call may have failed).
+// Idempotent — safe to call on every mount.
+export async function resyncPush(): Promise<boolean> {
+  if (!pushSupported() || !backendEnabled) return false
+  try {
+    const reg = await navigator.serviceWorker.ready
+    const sub = await reg.pushManager.getSubscription()
+    if (!sub) return false
+    await api.pushSubscribe(sub.toJSON())
+    return true
+  } catch { return false }
+}
+
 export async function disablePush(): Promise<PushStatus> {
   if (!pushSupported()) return 'unsupported'
   const reg = await navigator.serviceWorker.ready.catch(() => null)
