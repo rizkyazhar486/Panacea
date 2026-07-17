@@ -139,12 +139,57 @@ const PROTOCOL = [
   { id: 'skin', label: '🔎 Age-appropriate skin (cancer) screening', freqM: 12, where: 'Doctor — per national screening schedule' },
 ]
 
+// Pull the latest device-synced values (Health Profile ← Apple Health/WHOOP
+// imports, plus Body Composition measurements) OVER the saved local values, so
+// the Longevity Score is always computed from current data, not a stale copy
+// from the first visit. Returns which fields changed for the sync note.
+function syncFromDevices(cur: LongevityData): { next: LongevityData; changed: string[] } {
+  const patch: Partial<LongevityData> = {}
+  const changed: string[] = []
+  try {
+    const hp = JSON.parse(localStorage.getItem('pmd_health_profile') || '{}')
+    if (hp.vo2max > 0 && hp.vo2max !== cur.vo2) { patch.vo2 = hp.vo2max; changed.push('VO₂max') }
+    if (hp.restingHr > 0 && hp.restingHr !== cur.rhr) { patch.rhr = hp.restingHr; changed.push('Resting HR') }
+    if (hp.sleepH > 0 && hp.sleepH !== cur.sleepH) { patch.sleepH = hp.sleepH; changed.push('Sleep') }
+    if (hp.age > 0 && hp.age !== cur.age) { patch.age = hp.age; changed.push('Age') }
+    if ((hp.sex === 'M' || hp.sex === 'F') && hp.sex !== cur.g) { patch.g = hp.sex; changed.push('Sex') }
+  } catch { /* ignore */ }
+  try {
+    const bc = JSON.parse(localStorage.getItem('pm_bodycomp_v1') || '{}')
+    if (bc.waist > 0 && bc.hip > 0) {
+      const whr = +(bc.waist / bc.hip).toFixed(2)
+      if (whr !== cur.whr) { patch.whr = whr; changed.push('Waist-Hip Ratio') }
+    }
+  } catch { /* ignore */ }
+  return { next: { ...cur, ...patch }, changed }
+}
+
 export function Longevity() {
-  const [d, setD] = useState<LongevityData>(load)
+  // Sync device data in the initializer (before first render) so the
+  // push-back effect below can never overwrite fresher cache values with a
+  // stale localStorage copy — same race fixed on the Body Composition page.
+  const [d, setD] = useState<LongevityData>(() => syncFromDevices(load()).next)
+  const [syncNote, setSyncNote] = useState('')
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
   // Sync edited biometrics back to the central Health Profile so the whole app agrees.
   useEffect(() => { pushBiometrics({ vo2max: d.vo2, restingHr: d.rhr, sleepH: d.sleepH }) }, [d.vo2, d.rhr, d.sleepH])
   const u = (p: Partial<LongevityData>) => setD((x) => ({ ...x, ...p }))
+
+  function syncNow(silent = false) {
+    setD((cur) => {
+      const { next, changed } = syncFromDevices(cur)
+      if (!silent) setSyncNote(changed.length ? `Updated from your devices: ${changed.join(', ')}.` : 'Already up to date with your device data.')
+      return changed.length ? next : cur
+    })
+  }
+  // Re-sync when the tab regains focus (data pushed from a phone or edited on
+  // another page shows up without a manual refresh).
+  useEffect(() => {
+    const onFocus = () => syncNow(true)
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const pillars = useMemo(() => pillarsOf(d), [d])
   const filled = pillars.filter((p) => p.score > 0)
@@ -186,7 +231,13 @@ export function Longevity() {
         </div>
       )}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Longevity Center" subtitle="Your watch scores your day — this page scores your decade" />
+        <SectionTitle
+          icon={<IconHeart size={20} />}
+          title="Longevity Center"
+          subtitle="Your watch scores your day — this page scores your decade. VO₂max, resting HR, sleep & WHR auto-update from your Health Profile (Apple Health / WHOOP) and Body Composition."
+          right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
+        />
+        {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
         <div className="mt-2 flex items-center justify-around">
           <div className="text-center">
             <div className="relative mx-auto" style={{ width: 130, height: 130 }}>
