@@ -79,11 +79,11 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Bagikan ke beranda atau story"
+        aria-label="Share to feed or story"
         className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}
       >
-        <IconShare2 size={16} /> Bagikan
+        <IconShare2 size={16} /> Share
       </button>
 
       {open && (
@@ -91,11 +91,11 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-black text-ink">Bagikan</h3>
-              <button onClick={() => setOpen(false)} aria-label="Tutup" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <h3 className="text-base font-black text-ink">Share</h3>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
-            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Tulis sesuatu…"
+            <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write something…"
               className="mb-3 min-h-[70px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand" />
 
             {media ? (
@@ -103,13 +103,13 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
                 {media.kind === 'image'
                   ? <img src={media.url} alt="" className="max-h-56 w-full object-cover" />
                   : <video src={media.url} controls className="max-h-56 w-full" />}
-                <button onClick={() => setMedia(null)} aria-label="Hapus media" className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white"><IconX size={16} /></button>
+                <button onClick={() => setMedia(null)} aria-label="Remove media" className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white"><IconX size={16} /></button>
               </div>
             ) : (
               <button onClick={() => fileRef.current?.click()} disabled={busy}
                 className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand/40 bg-brand-50 py-5 text-brand-dark">
                 <span className="text-2xl">📷</span><span className="text-2xl">🎥</span>
-                <span className="text-sm font-bold">{busy ? 'Mengunggah…' : `Tambah Foto / Video (maks ${MAX_VIDEO_SEC}s)`}</span>
+                <span className="text-sm font-bold">{busy ? 'Uploading…' : `Add Photo / Video (max ${MAX_VIDEO_SEC}s)`}</span>
               </button>
             )}
             <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
@@ -119,12 +119,12 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
             <div className="grid grid-cols-2 gap-2">
               <button onClick={publishStory} disabled={busy || (!media && !caption.trim())}
                 className="flex items-center justify-center gap-2 rounded-xl bg-neutral-100 py-3 text-sm font-bold text-neutral-700 disabled:opacity-40">
-                🟢 Story (24 jam)
+                🟢 Story (24h)
               </button>
               <button onClick={publishPost} disabled={busy || (!media && !caption.trim())}
                 className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-40"
                 style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
-                📣 Posting
+                📣 Post
               </button>
             </div>
           </div>

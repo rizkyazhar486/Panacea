@@ -13,8 +13,8 @@ export function Carousel({ children, itemClass = 'w-64' }: { children: ReactNode
           ? children.map((c, i) => <div key={i} className={`shrink-0 snap-start ${itemClass}`}>{c}</div>)
           : <div className={`shrink-0 snap-start ${itemClass}`}>{children}</div>}
       </div>
-      <button onClick={() => scrollBy(-300)} className="absolute -left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-black/5 bg-white text-ink shadow-md hover:bg-neutral-50 sm:grid" aria-label="Sebelumnya">‹</button>
-      <button onClick={() => scrollBy(300)} className="absolute -right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-black/5 bg-white text-ink shadow-md hover:bg-neutral-50 sm:grid" aria-label="Berikutnya">›</button>
+      <button onClick={() => scrollBy(-300)} className="absolute -left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-black/5 bg-white text-ink shadow-md hover:bg-neutral-50 sm:grid" aria-label="Previous">‹</button>
+      <button onClick={() => scrollBy(300)} className="absolute -right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-black/5 bg-white text-ink shadow-md hover:bg-neutral-50 sm:grid" aria-label="Next">›</button>
     </div>
   )
 }
