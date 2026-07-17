@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, inputClass, Button, Badge } from '../components/ui'
 import { IconStethoscope, IconShield } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { api } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Gene Info — look up a human gene and see what it does, its aliases, and its
@@ -38,11 +38,6 @@ export function GeneInfo() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Gene Info" subtitle="Look up a human gene — function, aliases & genomic location" />
-        {!backendEnabled && (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            Live lookup needs the backend.
-          </p>
-        )}
         <div className="mt-3 flex gap-2">
           <input className={inputClass} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') search() }} placeholder="Gene symbol or name — e.g. APOE" />
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Search'}</Button>
