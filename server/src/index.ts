@@ -78,6 +78,7 @@ import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload } from './healthWebhook.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
+import { searchTrials } from './trials.js'
 import { attachRealtime } from './realtime.js'
 
 const app = express()
@@ -510,6 +511,22 @@ app.get('/api/evidence/pubmed', requireAuth, async (req, res) => {
   } catch (e) {
     console.log('[pubmed] error:', (e as Error).message)
     res.json({ articles: [], error: 'pubmed_unavailable' })
+  }
+})
+
+// Live clinical-trials search — real registered studies from ClinicalTrials.gov
+// (free, no key). Auth-gated & rate-limited.
+app.get('/api/trials', requireAuth, async (req, res) => {
+  const q = String(req.query.q || '').trim()
+  if (!q) return res.status(400).json({ error: 'empty_query' })
+  const recruitingOnly = String(req.query.recruiting || '') === '1'
+  const country = String(req.query.country || '').trim() || undefined
+  try {
+    const trials = await searchTrials(q, { recruitingOnly, country })
+    res.json({ trials })
+  } catch (e) {
+    console.log('[trials] error:', (e as Error).message)
+    res.json({ trials: [], error: 'trials_unavailable' })
   }
 })
 app.get('/api/sports/favorites', requireAuth, (req, res) => {
