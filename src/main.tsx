@@ -73,6 +73,8 @@ const LabDecoder = lazy(() => import('./pages/LabDecoder').then((m) => ({ defaul
 const EmergencyCard = lazy(() => import('./pages/EmergencyCard').then((m) => ({ default: m.EmergencyCard })))
 const RiskCalculators = lazy(() => import('./pages/RiskCalculators').then((m) => ({ default: m.RiskCalculators })))
 const AirQuality = lazy(() => import('./pages/AirQuality').then((m) => ({ default: m.AirQuality })))
+const DataLab = lazy(() => import('./pages/DataLab').then((m) => ({ default: m.DataLab })))
+const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -149,6 +151,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/emergency" element={<EmergencyCard />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
+              <Route path="/data-lab" element={<DataLab />} />
+              <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
               <Route path="/recovery" element={<Recovery />} />
