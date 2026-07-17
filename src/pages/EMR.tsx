@@ -204,7 +204,7 @@ export function EMR() {
           <SectionTitle
             icon={<IconEMR size={20} />}
             title="AI-EMR · Electronic Medical Record"
-            subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('id-ID')}`}
+            subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('en-US')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
             {draft.signedBy ? (
@@ -483,7 +483,7 @@ export function EMR() {
         </div>
         {draft.signedAt && (
           <p className="mt-2 text-xs text-brand-dark">
-            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('id-ID')}
+            ✓ Certified by {state.settings.doctorName} on {new Date(draft.signedAt).toLocaleString('en-US')}
           </p>
         )}
       </Card>
@@ -542,9 +542,9 @@ function DiagnosisPicker({ value, aiText, onChange }: {
   return (
     <div className="mb-4 rounded-xl border-2 border-brand/20 bg-brand-50/40 p-3">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">🩺 Diagnosis Utama (ICD-10)</div>
+        <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">🩺 Primary Diagnosis (ICD-10)</div>
         <button onClick={autoMatch} className="rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-white hover:bg-brand-dark">
-          ✨ Cocokkan usulan AI
+          ✨ Match AI Suggestion
         </button>
       </div>
 
@@ -555,23 +555,23 @@ function DiagnosisPicker({ value, aiText, onChange }: {
             {icd11(value.code) && <span className="ml-2 font-mono text-[11px] font-bold text-neutral-500">· ICD-11 {icd11(value.code)}</span>}
             <span className="ml-2 text-sm font-bold">{value.title}</span>
             {value.chapter && <span className="ml-2 text-[11px] text-neutral-400">· {value.chapter}</span>}
-            <span className="ml-2 text-[10px] font-semibold text-neutral-400">({value.source === 'AI' ? 'usulan AI' : 'pilihan dokter'})</span>
+            <span className="ml-2 text-[10px] font-semibold text-neutral-400">({value.source === 'AI' ? 'AI suggestion' : 'doctor selection'})</span>
           </div>
-          <button onClick={() => { onChange(undefined); setOpen(true) }} className="shrink-0 text-xs font-semibold text-accent hover:underline">Ubah</button>
+          <button onClick={() => { onChange(undefined); setOpen(true) }} className="shrink-0 text-xs font-semibold text-accent hover:underline">Change</button>
         </div>
       ) : (
         <input
           value={q}
           onChange={(e) => { setQ(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
-          placeholder="Cari diagnosis / kode ICD-10… (mis. hipertensi, J18, diabetes)"
+          placeholder="Search diagnosis / ICD-10 code… (e.g. hypertension, J18, diabetes)"
           className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
       )}
 
       {open && !value && (
         <div className="mt-2 max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white">
-          {results.length === 0 && <p className="p-3 text-sm text-neutral-400">Tidak ada kode yang cocok.</p>}
+          {results.length === 0 && <p className="p-3 text-sm text-neutral-400">No matching codes found.</p>}
           {results.map((c) => (
             <button
               key={c.code}
@@ -587,7 +587,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
         </div>
       )}
       <p className="mt-1.5 text-[10px] text-neutral-400">
-        Standar ICD-10 (dipakai SATUSEHAT/BPJS) dengan padanan ICD-11 untuk diagnosis umum. Diagnosis utama final tetap ditentukan & ditandatangani dokter.
+        ICD-10 standard (used by SATUSEHAT/BPJS) with ICD-11 equivalents for common diagnoses. The final primary diagnosis is still determined and signed off by the doctor.
       </p>
     </div>
   )
@@ -603,8 +603,8 @@ function ChronicSummary({ vitals, conditions }: { vitals: VitalSign[]; condition
     <Card>
       <SectionTitle
         icon={<IconShield size={18} />}
-        title="Pemantauan Kronis Pasien (Follow-Up TTV)"
-        subtitle="TTV harian mandiri pasien — dievaluasi terhadap target kondisi kronis"
+        title="Chronic Condition Monitoring (Vitals Follow-Up)"
+        subtitle="Patient's daily self-logged vitals — evaluated against chronic condition targets"
         right={<Badge tone={status === 'alert' ? 'critical' : status === 'warn' ? 'high' : 'brand'}>{STATUS_LABEL[status]}</Badge>}
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -616,7 +616,7 @@ function ChronicSummary({ vitals, conditions }: { vitals: VitalSign[]; condition
           </div>
         ))}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-400">{vitals.length} pencatatan · terakhir {new Date(latest.takenAt).toLocaleString('id-ID')}</p>
+      <p className="mt-2 text-[11px] text-neutral-400">{vitals.length} entries · last logged {new Date(latest.takenAt).toLocaleString('en-US')}</p>
     </Card>
   )
 }
@@ -647,22 +647,22 @@ function EducationCard({ diagnosis }: { diagnosis: string }) {
     <Card>
       <SectionTitle
         icon={<IconBook size={18} />}
-        title="Edukasi Pasien — Singkat & Mendalam"
-        subtitle="Agar pasien memahami penyakitnya dan cara menjaga kesehatannya"
+        title="Patient Education — Brief & In-Depth"
+        subtitle="So the patient understands their condition and how to manage their health"
         right={
           <Button onClick={gen} disabled={busy}>
-            <IconSparkle size={16} /> {busy ? 'Menyusun…' : sheet ? 'Buat Ulang' : 'Buat Edukasi Pasien'}
+            <IconSparkle size={16} /> {busy ? 'Generating…' : sheet ? 'Regenerate' : 'Create Patient Education'}
           </Button>
         }
       />
       {!subscribed && (
         <div className="mb-3 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
-          Fitur edukasi otomatis termasuk dalam langganan. Anda tetap dapat mencobanya di sini.
+          Automatic education generation is included in the subscription. You can still try it here.
         </div>
       )}
       {!sheet ? (
         <p className="text-sm text-neutral-400">
-          Belum ada lembar edukasi. Tekan tombol di atas untuk membuat edukasi pasien tentang{' '}
+          No education sheet yet. Press the button above to generate patient education about{' '}
           <b>{diagnosis || 'diagnosis'}</b>.
         </p>
       ) : (
@@ -678,7 +678,7 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
     <div className="space-y-4">
       {/* Hero slide */}
       <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Edukasi Pasien</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Patient Education</div>
         <h3 className="mt-1 text-2xl font-extrabold leading-tight">{sheet.diagnosis}</h3>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/90">{sheet.ringkas}</p>
       </div>
@@ -686,7 +686,7 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
       {/* Key actions — 1·2·3 cards */}
       <div>
         <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
-          Langkah Menjaga Kesehatan
+          Steps to Stay Healthy
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sheet.caraMenjaga.slice(0, 6).map((c, i) => (
@@ -704,7 +704,7 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
       <div className="rounded-2xl border-2 border-accent/20 bg-red-50/40 p-4">
         <div className="mb-2 flex items-center gap-2 text-sm font-bold text-accent">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-white">!</span>
-          Tanda Bahaya — Segera ke Faskes
+          Warning Signs — Seek Care Immediately
         </div>
         <div className="flex flex-wrap gap-2">
           {sheet.tandaBahaya.map((c, i) => (
@@ -718,13 +718,13 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
       {/* Deep-dive, collapsed by default */}
       <details className="rounded-2xl border border-neutral-100 p-4">
         <summary className="cursor-pointer text-sm font-bold text-neutral-700">
-          Penjelasan mendalam (opsional)
+          In-depth explanation (optional)
         </summary>
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">{sheet.mendalam}</p>
       </details>
 
       <p className="text-[11px] text-neutral-400">
-        Dibuat {new Date(sheet.generatedAt).toLocaleString('id-ID')} · AI mendukung, verifikasi klinisi.
+        Generated {new Date(sheet.generatedAt).toLocaleString('en-US')} · AI-assisted, clinician-verified.
       </p>
     </div>
   )
@@ -734,13 +734,13 @@ function EmptyEMR() {
   return (
     <Card className="mx-auto max-w-md text-center">
       <IconEMR size={40} className="mx-auto text-brand" />
-      <h3 className="mt-3 text-lg font-bold">Belum ada rekam medis</h3>
+      <h3 className="mt-3 text-lg font-bold">No medical record yet</h3>
       <p className="mt-1 text-sm text-neutral-500">
-        Mulai anamnesis di <b>AI Chatbot</b>, lalu tekan <b>“Susun Draft AI-EMR”</b> untuk membuat
-        rekam medis yang dapat diverifikasi dokter.
+        Start an intake in <b>AI Chatbot</b>, then press <b>"Draft AI-EMR"</b> to create a
+        medical record the doctor can verify.
       </p>
       <Link to="/chatbot" className="mt-4 inline-block">
-        <Button>Buka AI Chatbot</Button>
+        <Button>Open AI Chatbot</Button>
       </Link>
     </Card>
   )

@@ -234,15 +234,15 @@ export function BodyComposition() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {[
-            { t: 'Training Readiness', v: `${d.readiness}`, u: '/100', tone: d.readiness >= 70 ? 'text-brand-dark' : d.readiness >= 45 ? 'text-amber-600' : 'text-rose-500', note: d.readiness >= 70 ? 'Siap sesi berat' : d.readiness >= 45 ? 'Sesi ringan-sedang' : 'Prioritaskan pemulihan' },
-            { t: 'Body Battery', v: `${d.battery}`, u: '/100', tone: d.battery >= 60 ? 'text-brand-dark' : 'text-amber-600', note: 'Tidur + HRV − stres' },
+            { t: 'Training Readiness', v: `${d.readiness}`, u: '/100', tone: d.readiness >= 70 ? 'text-brand-dark' : d.readiness >= 45 ? 'text-amber-600' : 'text-rose-500', note: d.readiness >= 70 ? 'Ready for a hard session' : d.readiness >= 45 ? 'Light-moderate session' : 'Prioritize recovery' },
+            { t: 'Body Battery', v: `${d.battery}`, u: '/100', tone: d.battery >= 60 ? 'text-brand-dark' : 'text-amber-600', note: 'Sleep + HRV − stress' },
             { t: 'Cardio Fitness', v: b.vo2.toFixed(0), u: 'VO₂max', tone: 'text-brand-dark', note: d.vo2Tier },
-            { t: 'Resting HR', v: `${b.rhr}`, u: 'bpm', tone: b.rhr <= 60 ? 'text-brand-dark' : b.rhr <= 72 ? 'text-amber-600' : 'text-rose-500', note: b.rhr <= 60 ? 'Sehat' : 'Bisa diturunkan dgn Zone 2' },
-            { t: 'Restorative Sleep', v: d.restorative.toFixed(0), u: '%', tone: d.restorative >= 35 ? 'text-brand-dark' : 'text-amber-600', note: 'REM + Deep dari total' },
-            { t: 'Pace of Aging', v: d.aging.toFixed(2), u: '×', tone: d.aging <= 1 ? 'text-brand-dark' : 'text-amber-600', note: d.aging <= 1 ? 'Menua lebih lambat 🎉' : 'Perbaiki tidur & VO₂max' },
-            { t: 'Estimasi Umur Harapan', v: `${d.lifeExp}`, u: 'thn', tone: 'text-ink', note: 'Heuristik — cek Longevity Illustrator utk aktuaria' },
+            { t: 'Resting HR', v: `${b.rhr}`, u: 'bpm', tone: b.rhr <= 60 ? 'text-brand-dark' : b.rhr <= 72 ? 'text-amber-600' : 'text-rose-500', note: b.rhr <= 60 ? 'Healthy' : 'Can be lowered with Zone 2' },
+            { t: 'Restorative Sleep', v: d.restorative.toFixed(0), u: '%', tone: d.restorative >= 35 ? 'text-brand-dark' : 'text-amber-600', note: 'REM + Deep out of total' },
+            { t: 'Pace of Aging', v: d.aging.toFixed(2), u: '×', tone: d.aging <= 1 ? 'text-brand-dark' : 'text-amber-600', note: d.aging <= 1 ? 'Aging more slowly 🎉' : 'Improve sleep & VO₂max' },
+            { t: 'Estimated Life Expectancy', v: `${d.lifeExp}`, u: 'yrs', tone: 'text-ink', note: 'Heuristic — check Longevity Illustrator for actuarial figures' },
             { t: 'Physical Effort', v: b.mets.toFixed(1), u: 'METs', tone: b.mets >= 6 ? 'text-brand-dark' : 'text-amber-600', note: '≥6 METs = vigorous' },
-            { t: 'Lingkungan Suara', v: `${b.noiseDb}`, u: 'dB', tone: b.noiseDb <= 55 ? 'text-brand-dark' : 'text-rose-500', note: b.noiseDb <= 55 ? 'Aman' : '>55 dB kronis = risiko stres/CVD' },
+            { t: 'Noise Environment', v: `${b.noiseDb}`, u: 'dB', tone: b.noiseDb <= 55 ? 'text-brand-dark' : 'text-rose-500', note: b.noiseDb <= 55 ? 'Safe' : '>55 dB chronic = stress/CVD risk' },
           ].map((x) => (
             <div key={x.t} className="liquid-glass rounded-xl p-3">
               <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-400">{x.t}</div>
@@ -256,27 +256,27 @@ export function BodyComposition() {
         <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-neutral-50 p-3">
           <div className="text-xs font-bold">☕ Caffeine window</div>
           <input type="time" className={inputClass + ' !w-auto'} value={b.caffeineCutoff} onChange={(e) => u({ caffeineCutoff: e.target.value })} />
-          <p className="flex-1 text-[11px] text-neutral-500">Stop kafein ≥8-10 jam sebelum tidur (waktu paruh ±5 jam) agar deep sleep tidak terpotong.</p>
+          <p className="flex-1 text-[11px] text-neutral-500">Stop caffeine ≥8-10 hours before bed (half-life ±5 hours) so deep sleep isn't cut short.</p>
         </div>
 
         {/* Mental quick screen */}
         <div className={'mt-3 rounded-xl p-3 ' + ((b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3) ? 'bg-rose-50 border border-rose-200' : 'bg-brand-50')}>
-          <div className="text-xs font-bold">🧠 Kesehatan Mental</div>
+          <div className="text-xs font-bold">🧠 Mental Health</div>
           <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
             {b.anxiety >= 7 || b.stress >= 8 || b.mood <= 3
-              ? 'Skor cemas/stres tinggi atau mood rendah beberapa hari terakhir. Coba meditasi 10 menit, dan bicarakan dengan AI konselor — bila berlanjut, konsultasikan ke profesional.'
-              : 'Kondisi mental terpantau baik. Pertahankan meditasi, tidur teratur & jurnal syukur.'}
+              ? 'High anxiety/stress score or low mood over the past few days. Try a 10-minute meditation and talk to the AI counselor — if it continues, consult a professional.'
+              : 'Mental condition looks good. Keep up meditation, regular sleep & a gratitude journal.'}
           </p>
           <div className="mt-2 flex gap-2">
-            <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-white active:scale-95">💬 Konsultasi AI</a>
-            <a href="#/recovery" className="rounded-full bg-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-600 active:scale-95">🧘 Meditasi & Recovery</a>
+            <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-white active:scale-95">💬 AI Consultation</a>
+            <a href="#/recovery" className="rounded-full bg-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-600 active:scale-95">🧘 Meditation & Recovery</a>
           </div>
         </div>
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-3 text-center text-[10px] text-neutral-400">
-        <IconMoon size={12} className="mr-1 inline" /> Estimasi berbasis formula tervalidasi (US Navy, Mifflin-St Jeor, Cooper) —
-        bukan pengganti pengukuran klinis. Data tersimpan di perangkat Anda (offline-ready).
+        <IconMoon size={12} className="mr-1 inline" /> Estimates based on validated formulas (US Navy, Mifflin-St Jeor, Cooper) —
+        not a substitute for clinical measurement. Data is stored on your device (offline-ready).
       </div>
     </div>
   )
