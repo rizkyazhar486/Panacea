@@ -106,8 +106,8 @@ export function Marketplace() {
           }
         />
         <div className="flex flex-wrap items-center gap-3">
-          <ButtonGroup value={exam} options={EXAMS.map((e) => ({ id: e, label: e }))} onChange={setExam} />
-          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: c }))} onChange={setCat} />
+          <ButtonGroup value={exam} options={EXAMS.map((e) => ({ id: e, label: EXAM_LABELS[e] ?? e }))} onChange={setExam} />
+          <ButtonGroup value={cat} options={CATS.map((c) => ({ id: c, label: CAT_LABELS[c] ?? c }))} onChange={setCat} />
         </div>
       </Card>
 
@@ -120,7 +120,7 @@ export function Marketplace() {
             <Card key={m.id} hover className="flex flex-col">
               <div className="mb-2 flex items-center gap-2">
                 <Badge tone="brand">{m.exam}</Badge>
-                <Badge tone="neutral">{m.category}</Badge>
+                <Badge tone="neutral">{CAT_LABELS[m.category] ?? m.category}</Badge>
                 <span className="ml-auto rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-bold text-neutral-500">
                   {m.fileType}
                 </span>
@@ -129,11 +129,11 @@ export function Marketplace() {
               <p className="mt-1 line-clamp-3 text-sm text-neutral-500">{m.description}</p>
               <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-400">
                 <IconShield size={13} className="text-brand" />
-                Terverifikasi AI + {m.verifierReview?.verifierRole ?? 'Spesialis'} · {m.specialty}
+                AI-verified + {m.verifierReview?.verifierRole ?? 'Specialist'} · {m.specialty}
               </div>
               <div className="mt-1 text-xs text-neutral-400">
-                oleh {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× diunduh
-                {subbed && <span className="ml-1 font-semibold text-brand-dark">· langganan aktif</span>}
+                by {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× downloaded
+                {subbed && <span className="ml-1 font-semibold text-brand-dark">· subscription active</span>}
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
                 <span>
@@ -143,23 +143,23 @@ export function Marketplace() {
                     <span className="text-xs font-medium text-neutral-400">PNC</span>
                   </span>
                   <span className="text-[10px] text-neutral-400">
-                    Penulis terima {Math.max(0, m.priceTokens - 5)} · biaya platform 5 PNC
+                    Author receives {Math.max(0, m.priceTokens - 5)} · platform fee 5 PNC
                   </span>
                 </span>
                 {owned ? (
                   <Button variant="outline" onClick={() => downloadOwned(m, buyerId)}>
-                    <IconCheck size={14} /> Unduh PDF
+                    <IconCheck size={14} /> Download PDF
                   </Button>
                 ) : (
-                  <Button onClick={() => buy(m)}>Beli {m.priceTokens} PNC</Button>
+                  <Button onClick={() => buy(m)}>Buy {m.priceTokens} PNC</Button>
                 )}
               </div>
               {!owned && subPrice > 0 && m.authorId !== buyerId && (
                 <button
-                  onClick={() => { const r = subscribeAuthor(m.authorId); notify(r.ok ? `Berlangganan ${m.authorName} — akses semua materinya 30 hari.` : r.reason ?? 'Gagal.') }}
+                  onClick={() => { const r = subscribeAuthor(m.authorId); notify(r.ok ? `Subscribed to ${m.authorName} — access all their materials for 30 days.` : r.reason ?? 'Failed.') }}
                   className="mt-2 w-full rounded-xl border border-brand bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-100"
                 >
-                  Langganan penulis · {subPrice} PNC/bln
+                  Author subscription · {subPrice} PNC/mo
                 </button>
               )}
             </Card>
@@ -175,17 +175,17 @@ export function Marketplace() {
       <UploadPanel
         onUpload={async (m) => {
           uploadMaterial(m)
-          notify('Materi diunggah — menjalankan verifikasi AI Claude…')
+          notify('Material uploaded — running Claude AI verification…')
           const review = await verifyMaterial(state.settings, m)
           setMaterialAIReview(m.id, review)
           notify(
             review.verdict === 'approved'
-              ? 'Lolos verifikasi AI ✓ — menunggu verifikator spesialis.'
-              : 'AI meminta revisi. Lihat tab Verifikasi.',
+              ? 'Passed AI verification ✓ — awaiting specialist verifier.'
+              : 'AI requested revisions. See the Verification tab.',
           )
         }}
         authorId={buyerId}
-        authorName={account?.name ?? 'Saya'}
+        authorName={account?.name ?? 'Me'}
         subPrice={state.authorSubPrices[buyerId] ?? 0}
         onSubPrice={(p) => setAuthorSubPrice(buyerId, p)}
       />
@@ -248,42 +248,42 @@ function UploadPanel({
     <Card>
       <SectionTitle
         icon={<IconUpload size={18} />}
-        title="Bagikan & Verifikasi Referensi Medis"
+        title="Share & Verify Medical References"
         subtitle="Contributors can submit medical materials for review by AI and specialist verifiers before publishing."
       />
       <div className="grid gap-3 md:grid-cols-2">
-        <Field label="Judul">
-          <input className={inputClass} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="mis. Ringkasan Tatalaksana DKA" />
+        <Field label="Title">
+          <input className={inputClass} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="e.g. DKA Management Summary" />
         </Field>
-        <Field label="Spesialti / Topik">
-          <input className={inputClass} value={f.specialty} onChange={(e) => setF({ ...f, specialty: e.target.value })} placeholder="mis. Endokrinologi" />
+        <Field label="Specialty / Topic">
+          <input className={inputClass} value={f.specialty} onChange={(e) => setF({ ...f, specialty: e.target.value })} placeholder="e.g. Endocrinology" />
         </Field>
         <div className="md:col-span-2">
-          <Field label="Deskripsi">
+          <Field label="Description">
             <textarea className={inputClass} rows={2} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} />
           </Field>
         </div>
-        <Field label="Kategori">
+        <Field label="Category">
           <select className={inputClass} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as MaterialCategory })}>
             {(['Catatan', 'Materi', 'Jurnal', 'Artikel'] as MaterialCategory[]).map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{CAT_LABELS[c]}</option>
             ))}
           </select>
         </Field>
-        <Field label="Jalur Ujian">
+        <Field label="Exam Track">
           <select className={inputClass} value={f.exam} onChange={(e) => setF({ ...f, exam: e.target.value as ExamTrack })}>
             {(['USMLE', 'UKMPPD', 'Umum'] as ExamTrack[]).map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{EXAM_LABELS[c]}</option>
             ))}
           </select>
         </Field>
-        <Field label="Harga beli satuan (PNC)">
+        <Field label="Unit purchase price (PNC)">
           <input className={inputClass} type="number" min={0} value={f.price} onChange={(e) => setF({ ...f, price: Number(e.target.value) })} />
         </Field>
-        <Field label="Harga langganan penulis (PNC/bln · 0 = nonaktif)">
+        <Field label="Author subscription price (PNC/mo · 0 = disabled)">
           <input className={inputClass} type="number" min={0} value={subPrice} onChange={(e) => onSubPrice(Number(e.target.value))} />
         </Field>
-        <Field label="Berkas (.docx / .pdf / .pptx)">
+        <Field label="File (.docx / .pdf / .pptx)">
           <div className="flex items-center gap-2">
             <input
               ref={fileRef}
@@ -296,7 +296,7 @@ function UploadPanel({
               }}
             />
             <Button variant="outline" onClick={() => fileRef.current?.click()}>
-              <IconUpload size={14} /> Pilih Berkas
+              <IconUpload size={14} /> Choose File
             </Button>
             <span className="truncate text-sm text-neutral-500">{f.fileName || 'No file yet'}</span>
           </div>
@@ -304,11 +304,11 @@ function UploadPanel({
       </div>
       <div className="mt-4 flex items-center gap-3">
         <Button onClick={submit} disabled={busy || !f.title.trim() || !f.fileName}>
-          <IconBook size={16} /> {busy ? 'Mengunggah & verifikasi AI…' : 'Unggah & Verifikasi'}
+          <IconBook size={16} /> {busy ? 'Uploading & AI verification…' : 'Upload & Verify'}
         </Button>
         <p className="text-xs text-neutral-400">
-          Mengunggah sebagai <b>{authorName}</b>. Pendapatan royalti masuk ke saldo PNC Anda setelah
-          terjual.
+          Uploading as <b>{authorName}</b>. Royalty earnings are credited to your PNC balance once
+          sold.
         </p>
       </div>
     </Card>
