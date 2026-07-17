@@ -20,7 +20,9 @@ export function getLang(): Lang {
   } catch {
     /* ignore */
   }
-  return 'id'
+  // English is the app's primary language; Indonesian (and others) remain
+  // selectable in Settings. New users default to English for a consistent UI.
+  return 'en'
 }
 
 export function isRtl(lang: Lang = getLang()): boolean {

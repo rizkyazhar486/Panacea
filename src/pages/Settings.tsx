@@ -14,7 +14,6 @@ import {
   IconUser,
   IconCheck,
   IconChevronRight,
-  IconVideo,
 } from '../components/icons'
 import {
   getThemePref,
@@ -133,9 +132,6 @@ export function Settings() {
 
       {/* ── Offline mode ───────────────────────────────────────── */}
       <OfflineReady />
-
-      {/* ── Video Tutorial ─────────────────────────────────────── */}
-      <TutorialVideoCard simple={S} />
 
       {/* ── Appearance ─────────────────────────────────────────── */}
       <Card>
@@ -313,32 +309,6 @@ export function Settings() {
 }
 
 // ── Sub-components ──────────────────────────────────────────────
-
-// Video Tutorial — the same walkthrough shown once on first login, always
-// available here to re-watch or share with friends who are still confused.
-export function TutorialVideoCard({ simple: S }: { simple: boolean }) {
-  return (
-    <Card>
-      <SectionTitle
-        icon={<IconVideo size={S ? 22 : 20} />}
-        title="Video Tutorial"
-        subtitle="A quick guide to using all the main features"
-      />
-      <div className="overflow-hidden rounded-2xl bg-black">
-        <video
-          src={`${import.meta.env.BASE_URL}tutorial-video.mp4`}
-          controls
-          playsInline
-          preload="metadata"
-          className="mx-auto block max-h-[70vh] w-full"
-        />
-      </div>
-      <p className={`mt-3 text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>
-        Not sure how to use the app? Watch this video, or share it with a friend who's just getting started.
-      </p>
-    </Card>
-  )
-}
 
 // Pesan & Saran — user feedback straight to the founder via WhatsApp or email
 // (the same contact channels published on the landing page). Message history
