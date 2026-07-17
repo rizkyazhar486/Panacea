@@ -335,6 +335,7 @@ interface Store {
   bookConsult: (c: ConsultSession) => void
   sendEmail: (e: EmailMsg) => void
   withdrawTokens: (amount: number, bank: string) => { ok: boolean; reason?: string }
+  spendPnc: (amount: number, note: string) => { ok: boolean; reason?: string }
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -950,6 +951,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')})`,
                 at: new Date().toISOString(),
               },
+              ...st.wallet.transactions,
+            ],
+          },
+        }))
+        return { ok: true }
+      },
+      spendPnc: (amount, note) => {
+        if (amount <= 0) return { ok: true }
+        if (state.wallet.balance < amount) return { ok: false, reason: 'insufficient_balance' }
+        setState((st) => ({
+          ...st,
+          wallet: {
+            balance: st.wallet.balance - amount,
+            transactions: [
+              { id: uid(), type: 'purchase' as TxType, amount: -amount, note, at: new Date().toISOString() },
               ...st.wallet.transactions,
             ],
           },
