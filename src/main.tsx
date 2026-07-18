@@ -106,6 +106,7 @@ const TimiRiskScore = lazy(() => import('./pages/TimiRiskScore').then((m) => ({ 
 const PercRule = lazy(() => import('./pages/PercRule').then((m) => ({ default: m.PercRule })))
 const SofaScore = lazy(() => import('./pages/SofaScore').then((m) => ({ default: m.SofaScore })))
 const LightsCriteria = lazy(() => import('./pages/LightsCriteria').then((m) => ({ default: m.LightsCriteria })))
+const FourTsScore = lazy(() => import('./pages/FourTsScore').then((m) => ({ default: m.FourTsScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -216,6 +217,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/perc-rule" element={<PercRule />} />
               <Route path="/sofa-score" element={<SofaScore />} />
               <Route path="/lights-criteria" element={<LightsCriteria />} />
+              <Route path="/4ts-score" element={<FourTsScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
