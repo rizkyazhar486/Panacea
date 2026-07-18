@@ -34,3 +34,14 @@ services:
         sync: false
       - key: MIDTRANS_IS_PRODUCTION
         value: 'false'
+      # Web Push (owner alerts, withdrawal/verification pings). MUST be a real
+      # VAPID EC keypair — generateValue would produce a random string that
+      # doesn't work for push, so this is fill-in-the-dashboard like Midtrans.
+      # Generate with `npx web-push generate-vapid-keys` and paste both values
+      # in the Render dashboard (see PANDUAN-SETUP.md, Bagian 7).
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:admin@panaceamed.id
