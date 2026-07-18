@@ -265,14 +265,22 @@ notifikasi untuk verifikator & pengaju, lakukan ini:
 4. Ketuk **"Kirim notifikasi uji"** — bila muncul pemberitahuan, berarti berhasil. ✅
 
 ### B. Agar notifikasi terkirim dari server (sekali saja, oleh Anda)
-Notifikasi push butuh sepasang "kunci VAPID" di server. Cara termudah:
+Notifikasi push butuh sepasang "kunci VAPID" di server — ini **beda** dari
+`JWT_SECRET`: tidak boleh sembarang string acak, harus benar-benar sepasang
+kunci kriptografi. Tanpa ini, tombol "Aktifkan notifikasi push" di HP siapa
+pun (termasuk owner) tidak akan pernah berhasil, walau langkah A sudah benar.
+
 1. Buka **https://vapidkeys.com** → klik **Generate** → akan muncul **Public Key**
-   dan **Private Key**.
-2. Di **Render** (lihat Bagian 0), tambah 3 environment variable:
+   dan **Private Key**. (Atau, kalau Anda punya Node.js: `npx web-push generate-vapid-keys`.)
+2. Di **Render** → service backend Anda → tab **Environment**, cari 3 baris
+   yang sudah muncul dari `render.yaml` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
+   `VAPID_SUBJECT`) dan isi 2 yang kosong — lihat cara umum di **Bagian 0**:
    - `VAPID_PUBLIC_KEY` = (public key)
    - `VAPID_PRIVATE_KEY` = (private key)
-   - `VAPID_SUBJECT` = `mailto:rizkyazhar486@gmail.com`
-3. Save → server redeploy otomatis. Sejak ini, notifikasi terkirim ke HP.
+3. Save → server redeploy otomatis (1-3 menit). Sejak ini, notifikasi terkirim ke HP.
+4. **Verifikasi:** buka `https://<alamat-backend-anda>/api/health` di browser — cari
+   `"push": true` di JSON yang muncul. Kalau masih `false`, kunci belum tersimpan
+   dengan benar — cek lagi tidak ada spasi/baris kosong ekstra saat paste.
 
 ### Siapa menerima apa
 - **Owner** (`rizkyazhar486@gmail.com`): notifikasi **setiap penarikan PNC** berisi
