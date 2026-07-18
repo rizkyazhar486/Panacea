@@ -116,6 +116,7 @@ const RockallScore = lazy(() => import('./pages/RockallScore').then((m) => ({ de
 const CharlsonIndex = lazy(() => import('./pages/CharlsonIndex').then((m) => ({ default: m.CharlsonIndex })))
 const CapriniScore = lazy(() => import('./pages/CapriniScore').then((m) => ({ default: m.CapriniScore })))
 const DukeCriteria = lazy(() => import('./pages/DukeCriteria').then((m) => ({ default: m.DukeCriteria })))
+const BradenScale = lazy(() => import('./pages/BradenScale').then((m) => ({ default: m.BradenScale })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -236,6 +237,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/charlson-index" element={<CharlsonIndex />} />
               <Route path="/caprini-score" element={<CapriniScore />} />
               <Route path="/duke-criteria" element={<DukeCriteria />} />
+              <Route path="/braden-scale" element={<BradenScale />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
