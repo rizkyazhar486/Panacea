@@ -99,6 +99,7 @@ const MeldScore = lazy(() => import('./pages/MeldScore').then((m) => ({ default:
 const ChildPughScore = lazy(() => import('./pages/ChildPughScore').then((m) => ({ default: m.ChildPughScore })))
 const FenaCalculator = lazy(() => import('./pages/FenaCalculator').then((m) => ({ default: m.FenaCalculator })))
 const RansonCriteria = lazy(() => import('./pages/RansonCriteria').then((m) => ({ default: m.RansonCriteria })))
+const HasBledScore = lazy(() => import('./pages/HasBledScore').then((m) => ({ default: m.HasBledScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -202,6 +203,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/child-pugh-score" element={<ChildPughScore />} />
               <Route path="/fena-calculator" element={<FenaCalculator />} />
               <Route path="/ranson-criteria" element={<RansonCriteria />} />
+              <Route path="/has-bled-score" element={<HasBledScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
