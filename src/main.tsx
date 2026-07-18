@@ -90,6 +90,7 @@ const SubstanceUseScreen = lazy(() => import('./pages/SubstanceUseScreen').then(
 const EpworthSleepiness = lazy(() => import('./pages/EpworthSleepiness').then((m) => ({ default: m.EpworthSleepiness })))
 const StrokeRiskCalculator = lazy(() => import('./pages/StrokeRiskCalculator').then((m) => ({ default: m.StrokeRiskCalculator })))
 const WellsScore = lazy(() => import('./pages/WellsScore').then((m) => ({ default: m.WellsScore })))
+const OttawaAnkleRules = lazy(() => import('./pages/OttawaAnkleRules').then((m) => ({ default: m.OttawaAnkleRules })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -184,6 +185,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/epworth-sleepiness" element={<EpworthSleepiness />} />
               <Route path="/stroke-risk" element={<StrokeRiskCalculator />} />
               <Route path="/wells-score" element={<WellsScore />} />
+              <Route path="/ottawa-ankle" element={<OttawaAnkleRules />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
