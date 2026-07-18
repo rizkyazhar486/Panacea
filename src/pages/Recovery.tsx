@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
+import { getHealthCache, hasHealth } from '../lib/profile'
 
 type RecoveryType = 'surgery' | 'injury' | 'illness' | 'overtraining'
 
@@ -68,7 +69,11 @@ function sleepScore(hours: number, latencyMin: number, awakenings: number, bedti
 }
 
 function SleepScoreCard() {
-  const [hours, setHours] = useState(7)
+  const [hours, setHours] = useState(() => {
+    const v = getHealthCache().sleepH
+    return typeof v === 'number' && v > 0 ? v : 7
+  })
+  const sleepFromDevice = hasHealth('sleepH')
   const [latency, setLatency] = useState(15)
   const [awakenings, setAwakenings] = useState(0)
   const [variance, setVariance] = useState(20)
@@ -80,7 +85,7 @@ function SleepScoreCard() {
     <Card className="!p-5">
       <SectionTitle icon={<IconMoon size={20} />} title="Sleep Quality Score" subtitle="Physiological scoring based on duration, latency, awakenings & bedtime consistency" />
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <Field label="Total Sleep (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label={sleepFromDevice ? 'Total Sleep (hours) — from your device' : 'Total Sleep (hours)'}><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
         <Field label="Time to Fall Asleep (minutes)"><input className={inputClass} type="number" value={latency} onChange={(e) => setLatency(+e.target.value)} /></Field>
         <Field label="Number of Night Awakenings"><input className={inputClass} type="number" value={awakenings} onChange={(e) => setAwakenings(+e.target.value)} /></Field>
         <Field label="Bedtime Variability (minutes)"><input className={inputClass} type="number" value={variance} onChange={(e) => setVariance(+e.target.value)} /></Field>
