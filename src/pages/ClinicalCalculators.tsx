@@ -880,47 +880,49 @@ function AlvaradoCalc() {
   )
 }
 
+// `kw` = hidden search terms so tools are findable by clinical intent
+// (symptom, organ, situation) — not just by name.
 const TABS = [
-  { id: 'apgar', label: 'APGAR' },
-  { id: 'gcs', label: 'GCS' },
-  { id: 'curb65', label: 'CURB-65' },
-  { id: 'bishop', label: 'Bishop' },
-  { id: 'ckdepi', label: 'CKD-EPI' },
-  { id: 'whogrowth', label: 'WHO Anthropometry' },
-  { id: 'whoneonate', label: 'WHO Neonate' },
-  { id: 'cdcanthro', label: 'CDC Anthropometry' },
-  { id: 'ballard', label: 'Ballard+SOAP' },
-  { id: 'qsofa', label: 'qSOFA' },
-  { id: 'hollidaysegar', label: 'Maintenance Fluid' },
-  { id: 'parkland', label: 'Parkland' },
-  { id: 'naegele', label: 'Naegele' },
-  { id: 'map', label: 'MAP' },
-  { id: 'alvarado', label: 'Alvarado' },
-  { id: 'centor', label: 'Centor/McIsaac' },
-  { id: 'nacorr', label: 'Electrolyte Correction' },
-  { id: 'broca', label: 'Broca IBW' },
-  { id: 'brocalorentz', label: 'Broca-Lorentz Calorie' },
-  { id: 'ivdrip', label: 'IV Drip Rate' },
-  { id: 'midparental', label: 'Mid-Parental' },
-  { id: 'fletcher', label: 'Fletcher Index' },
-  { id: 'nose', label: 'NOSE' },
-  { id: 'rsi', label: 'RSI' },
-  { id: 'aria', label: 'ARIA Criteria' },
-  { id: 'abcd2', label: 'ABCD²' },
-  { id: 'four', label: 'FOUR Score' },
-  { id: 'mcdonald', label: 'McDonald' },
-  { id: 'paradise', label: 'Paradise' },
-  { id: 'nihss', label: 'NIHSS' },
-  { id: 'fluidbalance', label: 'Fluid Balance' },
-  { id: 'pedsdose', label: 'Pediatric Dosing' },
-  { id: 'vbac', label: 'VBAC Flamm-Geiger' },
-  { id: 'denver', label: 'Denver II (Simplified)' },
-  { id: 'atls', label: 'XABCDE Trauma Survey' },
-  { id: 'acls', label: 'ACLS Guide' },
-  { id: 'abg', label: 'Blood Gas Analysis' },
-  { id: 'burn', label: 'Burn Calculator' },
-  { id: 'cranial', label: 'Cranial Nerve + Meningeal' },
-  { id: 'competencies', label: 'Competency Tracker' },
+  { id: 'apgar', label: 'APGAR', kw: 'newborn neonate birth delivery score' },
+  { id: 'gcs', label: 'GCS', kw: 'coma consciousness glasgow head injury neuro' },
+  { id: 'curb65', label: 'CURB-65', kw: 'pneumonia cap severity admission respiratory' },
+  { id: 'bishop', label: 'Bishop', kw: 'cervix induction labor obstetric delivery' },
+  { id: 'ckdepi', label: 'CKD-EPI', kw: 'egfr kidney renal creatinine gfr' },
+  { id: 'whogrowth', label: 'WHO Anthropometry', kw: 'child growth stunting weight height pediatric z-score' },
+  { id: 'whoneonate', label: 'WHO Neonate', kw: 'newborn neonate growth anthropometry' },
+  { id: 'cdcanthro', label: 'CDC Anthropometry', kw: 'child bmi percentile adolescent growth' },
+  { id: 'ballard', label: 'Ballard+SOAP', kw: 'gestational age newborn neonate maturity lubchenco' },
+  { id: 'qsofa', label: 'qSOFA', kw: 'sepsis infection screening organ dysfunction' },
+  { id: 'hollidaysegar', label: 'Maintenance Fluid', kw: 'fluid iv pediatric 4-2-1 hydration' },
+  { id: 'parkland', label: 'Parkland', kw: 'burn fluid resuscitation tbsa' },
+  { id: 'naegele', label: 'Naegele', kw: 'due date pregnancy edd lmp obstetric' },
+  { id: 'map', label: 'MAP', kw: 'blood pressure perfusion arterial shock' },
+  { id: 'alvarado', label: 'Alvarado', kw: 'appendicitis abdominal pain rlq surgery' },
+  { id: 'centor', label: 'Centor/McIsaac', kw: 'strep pharyngitis sore throat antibiotic tonsil' },
+  { id: 'nacorr', label: 'Electrolyte Correction', kw: 'sodium potassium hyponatremia hypokalemia glucose katz' },
+  { id: 'broca', label: 'Broca IBW', kw: 'ideal body weight obesity' },
+  { id: 'brocalorentz', label: 'Broca-Lorentz Calorie', kw: 'calorie nutrition ideal weight diet requirement' },
+  { id: 'ivdrip', label: 'IV Drip Rate', kw: 'infusion drops fluid rate tpm' },
+  { id: 'midparental', label: 'Mid-Parental', kw: 'height prediction child target parental' },
+  { id: 'fletcher', label: 'Fletcher Index', kw: 'hearing loss audiometry deaf ent' },
+  { id: 'nose', label: 'NOSE', kw: 'nasal obstruction breathing ent septum' },
+  { id: 'rsi', label: 'RSI', kw: 'reflux lpr laryngopharyngeal hoarseness ent' },
+  { id: 'aria', label: 'ARIA Criteria', kw: 'allergic rhinitis allergy asthma ent' },
+  { id: 'abcd2', label: 'ABCD²', kw: 'tia stroke risk transient ischemic' },
+  { id: 'four', label: 'FOUR Score', kw: 'coma consciousness icu intubated neuro' },
+  { id: 'mcdonald', label: 'McDonald', kw: 'fundal height pregnancy gestational age obstetric' },
+  { id: 'paradise', label: 'Paradise', kw: 'tonsillectomy tonsillitis recurrent ent' },
+  { id: 'nihss', label: 'NIHSS', kw: 'stroke severity neuro deficit thrombolysis' },
+  { id: 'fluidbalance', label: 'Fluid Balance', kw: 'intake output urine monitoring' },
+  { id: 'pedsdose', label: 'Pediatric Dosing', kw: 'dose child weight syrup medication mg/kg' },
+  { id: 'vbac', label: 'VBAC Flamm-Geiger', kw: 'cesarean vaginal birth trial labor obstetric' },
+  { id: 'denver', label: 'Denver II (Simplified)', kw: 'development milestone child screening delay' },
+  { id: 'atls', label: 'XABCDE Trauma Survey', kw: 'trauma primary survey hemorrhage emergency' },
+  { id: 'acls', label: 'ACLS Guide', kw: 'cardiac arrest cpr resuscitation algorithm emergency' },
+  { id: 'abg', label: 'Blood Gas Analysis', kw: 'abg acidosis alkalosis anion gap ph co2' },
+  { id: 'burn', label: 'Burn Calculator', kw: 'burn tbsa parkland rule of nines' },
+  { id: 'cranial', label: 'Cranial Nerve + Meningeal', kw: 'neuro exam nerves meningitis kernig brudzinski' },
+  { id: 'competencies', label: 'Competency Tracker', kw: 'kki aipki education doctor competency' },
 ] as const
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
@@ -2431,6 +2433,15 @@ function AclsCalc() {
 export function ClinicalCalculators() {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
   const [access, setAccess] = useState<CalcAccess | null>(null)
+  const [query, setQuery] = useState('')
+  const q = query.trim().toLowerCase()
+  const visibleTabs = q ? TABS.filter((t) => (t.label + ' ' + t.kw).toLowerCase().includes(q)) : TABS
+  // Keep the open tool in sync with the filter: if the current tab no longer
+  // matches, jump to the first match so search feels immediate.
+  useEffect(() => {
+    if (visibleTabs.length > 0 && !visibleTabs.some((t) => t.id === tab)) setTab(visibleTabs[0].id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q])
 
   useEffect(() => {
     if (!backendEnabled) { setAccess({ unlocked: true, free: true, limit: 50, slotsLeft: 0, pricePnc: 500, priceIdr: 500000 }); return }
@@ -2454,8 +2465,19 @@ export function ClinicalCalculators() {
         </div>
       )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
+      <input
+        className={inputClass}
+        placeholder="Search 40 tools: sepsis, burn, stroke, newborn, dosing…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      {visibleTabs.length === 0 && (
+        <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-400">
+          No tool matches "{query}" — try an organ, symptom, or situation.
+        </p>
+      )}
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-        {TABS.map((t) => (
+        {visibleTabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}

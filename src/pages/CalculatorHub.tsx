@@ -118,7 +118,7 @@ export function CalculatorHub() {
         <p className="mt-2 text-[12px] text-neutral-500">
           Looking for GCS, APGAR, CURB-65, Parkland, ABG, or pediatric dosing? Those live in{' '}
           <a href="#/clinical-calculators" className="font-bold text-brand-dark">Clinical Calculators</a>{' '}
-          (34 more tools).
+          (40 more tools).
         </p>
       </Card>
 
