@@ -109,6 +109,7 @@ const LightsCriteria = lazy(() => import('./pages/LightsCriteria').then((m) => (
 const FourTsScore = lazy(() => import('./pages/FourTsScore').then((m) => ({ default: m.FourTsScore })))
 const News2Score = lazy(() => import('./pages/News2Score').then((m) => ({ default: m.News2Score })))
 const SerumOsmolality = lazy(() => import('./pages/SerumOsmolality').then((m) => ({ default: m.SerumOsmolality })))
+const LdlCalculator = lazy(() => import('./pages/LdlCalculator').then((m) => ({ default: m.LdlCalculator })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -222,6 +223,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/4ts-score" element={<FourTsScore />} />
               <Route path="/news2-score" element={<News2Score />} />
               <Route path="/serum-osmolality" element={<SerumOsmolality />} />
+              <Route path="/ldl-calculator" element={<LdlCalculator />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
