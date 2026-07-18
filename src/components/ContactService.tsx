@@ -22,6 +22,14 @@ function clampBottom(v: number): number {
 // Draggable vertically and collapsible to a small dot, since on some pages
 // (long lists, the weather forecast, bottom sheets) it can sit over content
 // the user wants to see.
+//
+// Stays bottom-LEFT at every viewport size (desktop included) — deliberately
+// NOT bottom-right, because the Feed page has its own always-on-desktop
+// floating "+" compose button fixed at bottom-8/right-5 (see Feed.tsx). The
+// two used to both sit bottom-right on desktop with only ~8px of vertical
+// clearance between their default resting spots, so a user-dragged position
+// (this button is draggable and persists to localStorage) could land right
+// on top of the "+" and block it entirely.
 export function ContactService() {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
@@ -89,7 +97,7 @@ export function ContactService() {
       <button
         onClick={() => toggleMinimized(false)}
         style={{ bottom }}
-        className="fixed left-2 z-40 flex h-7 w-7 items-center justify-center rounded-full text-white opacity-70 shadow-md transition hover:opacity-100 active:scale-90 lg:left-auto lg:right-2"
+        className="fixed left-2 z-40 flex h-7 w-7 items-center justify-center rounded-full text-white opacity-70 shadow-md transition hover:opacity-100 active:scale-90"
         title="Expand support button"
         aria-label="Expand support button"
       >
@@ -107,7 +115,7 @@ export function ContactService() {
         onPointerUp={() => { if (!onPointerUp()) setOpen((o) => !o) }}
         onDoubleClick={() => toggleMinimized(true)}
         style={{ bottom, background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 26px -6px rgba(0,191,99,0.55)', touchAction: 'none' }}
-        className="group fixed left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:left-auto lg:right-5 lg:h-14 lg:w-14"
+        className="group fixed left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:h-14 lg:w-14"
         title="Support / Contact Service — drag to move, double-tap to minimize"
         aria-label="Contact Service"
       >
@@ -116,7 +124,7 @@ export function ContactService() {
       </button>
 
       {open && (
-        <div style={{ bottom: bottom + 64 }} className="fixed left-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10 lg:left-auto lg:right-5">
+        <div style={{ bottom: bottom + 64 }} className="fixed left-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
           <div className="flex items-center gap-2 bg-ink px-4 py-3 text-white">
             <IconPhone size={18} className="text-brand" />
             <div className="text-sm font-bold">Panaceamed Support</div>
