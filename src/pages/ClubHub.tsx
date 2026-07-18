@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+const MeetMap = lazy(() => import('../components/MeetMap'))
 import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
 
@@ -38,18 +40,19 @@ interface Meet {
   id: string; day: number; time: string; durH: number; title: string; club: string; tag: string
   venue: string; address: string; km: number; cap: number; joined: number; emoji: string
   feeRp: number; hosts: string[]; notes: string[]
+  lat: number; lng: number
 }
 const MEETS: Meet[] = [
-  { id: 'm1', day: 0, time: '06:00', durH: 2, title: 'Weekend Long Run 10K', club: 'Sunrise Run Club', tag: 'Social', venue: 'GBK Senayan Loop', address: 'Gelora Bung Karno, Jakarta Pusat', km: 3.2, cap: 35, joined: 27, emoji: '🏃', feeRp: 0, hosts: ['RA', 'DW'], notes: ['Pace groups: 6:30, 7:30, 8:30 /km', 'Water station at km 5', 'Post-run coffee nearby (self-pay)'] },
-  { id: 'm2', day: 0, time: '07:30', durH: 2, title: 'Americano Mixer', club: 'Padel Pulse', tag: 'Americano', venue: 'Padel Parc Simprug', address: 'Jl. Teuku Nyak Arief, Jakarta Selatan', km: 4.5, cap: 12, joined: 11, emoji: '🎾', feeRp: 85000, hosts: ['FK'], notes: ['Fee includes 2h court + balls', 'Bring your own racket (rental available)'] },
-  { id: 'm3', day: 0, time: '16:00', durH: 3, title: 'Doubles Rotation Night', club: 'Shuttle Squad', tag: 'Social', venue: 'GOR Bulungan', address: 'Jl. Bulungan No.1, Jakarta Selatan', km: 5.8, cap: 16, joined: 9, emoji: '🏸', feeRp: 45000, hosts: ['AB', 'TN'], notes: ['Fee includes 3h court + shuttlecocks', 'Mineral water provided'] },
-  { id: 'm4', day: 1, time: '06:30', durH: 1.5, title: 'Walk & Talk: Heart Health', club: 'Walk With A Doctor', tag: 'Health walk', venue: 'Taman Menteng', address: 'Jl. HOS Cokroaminoto, Jakarta Pusat', km: 2.1, cap: 25, joined: 14, emoji: '🩺', feeRp: 0, hosts: ['dr'], notes: ['Q&A on blood pressure & cholesterol while walking', 'Wear comfortable shoes'] },
-  { id: 'm5', day: 1, time: '07:00', durH: 1, title: 'Sunrise Vinyasa', club: 'Morning Flow Yoga', tag: 'Class', venue: 'Taman Langsat', address: 'Jl. Barito, Kebayoran Baru', km: 3.9, cap: 20, joined: 17, emoji: '🧘', feeRp: 30000, hosts: ['YS'], notes: ['Mats provided for first-timers', 'Arrive 10 min early'] },
-  { id: 'm6', day: 2, time: '19:00', durH: 1.5, title: 'Push-Pull-Legs: Pull Day', club: 'Iron Circle', tag: 'Training', venue: 'Ration Strength Gym', address: 'Jl. Wolter Monginsidi, Jakarta Selatan', km: 6.4, cap: 10, joined: 6, emoji: '🏋️', feeRp: 50000, hosts: ['GH'], notes: ['Day pass included in fee', 'Program sheet shared in advance'] },
-  { id: 'm7', day: 3, time: '19:30', durH: 2, title: 'Beginner Padel Clinic', club: 'Padel Pulse', tag: 'Class', venue: 'Republic Padel', address: 'Simprug, Jakarta Selatan', km: 3.8, cap: 8, joined: 8, emoji: '🎾', feeRp: 120000, hosts: ['FK', 'CO'], notes: ['Coached fundamentals: grip, wall play, positioning', 'All equipment provided'] },
-  { id: 'm8', day: 4, time: '06:00', durH: 1.5, title: 'Interval Tempo Session', club: 'Sunrise Run Club', tag: 'Training', venue: 'Stadion Madya Track', address: 'Senayan, Jakarta Pusat', km: 3.0, cap: 30, joined: 12, emoji: '🏃', feeRp: 0, hosts: ['DW'], notes: ['6×800m @ 5K effort', 'Track etiquette briefing for first-timers'] },
-  { id: 'm9', day: 5, time: '16:30', durH: 3, title: 'Mixed Doubles Ladder', club: 'Shuttle Squad', tag: 'Competitive', venue: 'GOR Pertamina', address: 'Simprug, Jakarta Selatan', km: 7.2, cap: 24, joined: 19, emoji: '🏸', feeRp: 55000, hosts: ['AB'], notes: ['Ladder points count toward monthly ranking'] },
-  { id: 'm10', day: 6, time: '06:00', durH: 1.5, title: 'Recovery 5K + Coffee', club: 'Sunrise Run Club', tag: 'Social', venue: 'FX Sudirman Loop', address: 'Jl. Jend. Sudirman, Jakarta Pusat', km: 2.8, cap: 40, joined: 22, emoji: '🏃', feeRp: 0, hosts: ['RA'], notes: ['Conversational pace only — HR zone 1-2'] },
+  { id: 'm1', day: 0, time: '06:00', durH: 2, title: 'Weekend Long Run 10K', club: 'Sunrise Run Club', tag: 'Social', venue: 'GBK Senayan Loop', address: 'Gelora Bung Karno, Jakarta Pusat', km: 3.2, cap: 35, joined: 27, emoji: '🏃', feeRp: 0, hosts: ['RA', 'DW'], notes: ['Pace groups: 6:30, 7:30, 8:30 /km', 'Water station at km 5', 'Post-run coffee nearby (self-pay)'], lat: -6.2185, lng: 106.8022 },
+  { id: 'm2', day: 0, time: '07:30', durH: 2, title: 'Americano Mixer', club: 'Padel Pulse', tag: 'Americano', venue: 'Padel Parc Simprug', address: 'Jl. Teuku Nyak Arief, Jakarta Selatan', km: 4.5, cap: 12, joined: 11, emoji: '🎾', feeRp: 85000, hosts: ['FK'], notes: ['Fee includes 2h court + balls', 'Bring your own racket (rental available)'], lat: -6.2242, lng: 106.783 },
+  { id: 'm3', day: 0, time: '16:00', durH: 3, title: 'Doubles Rotation Night', club: 'Shuttle Squad', tag: 'Social', venue: 'GOR Bulungan', address: 'Jl. Bulungan No.1, Jakarta Selatan', km: 5.8, cap: 16, joined: 9, emoji: '🏸', feeRp: 45000, hosts: ['AB', 'TN'], notes: ['Fee includes 3h court + shuttlecocks', 'Mineral water provided'], lat: -6.2436, lng: 106.7981 },
+  { id: 'm4', day: 1, time: '06:30', durH: 1.5, title: 'Walk & Talk: Heart Health', club: 'Walk With A Doctor', tag: 'Health walk', venue: 'Taman Menteng', address: 'Jl. HOS Cokroaminoto, Jakarta Pusat', km: 2.1, cap: 25, joined: 14, emoji: '🩺', feeRp: 0, hosts: ['dr'], notes: ['Q&A on blood pressure & cholesterol while walking', 'Wear comfortable shoes'], lat: -6.1963, lng: 106.8296 },
+  { id: 'm5', day: 1, time: '07:00', durH: 1, title: 'Sunrise Vinyasa', club: 'Morning Flow Yoga', tag: 'Class', venue: 'Taman Langsat', address: 'Jl. Barito, Kebayoran Baru', km: 3.9, cap: 20, joined: 17, emoji: '🧘', feeRp: 30000, hosts: ['YS'], notes: ['Mats provided for first-timers', 'Arrive 10 min early'], lat: -6.241, lng: 106.794 },
+  { id: 'm6', day: 2, time: '19:00', durH: 1.5, title: 'Push-Pull-Legs: Pull Day', club: 'Iron Circle', tag: 'Training', venue: 'Ration Strength Gym', address: 'Jl. Wolter Monginsidi, Jakarta Selatan', km: 6.4, cap: 10, joined: 6, emoji: '🏋️', feeRp: 50000, hosts: ['GH'], notes: ['Day pass included in fee', 'Program sheet shared in advance'], lat: -6.2378, lng: 106.8009 },
+  { id: 'm7', day: 3, time: '19:30', durH: 2, title: 'Beginner Padel Clinic', club: 'Padel Pulse', tag: 'Class', venue: 'Republic Padel', address: 'Simprug, Jakarta Selatan', km: 3.8, cap: 8, joined: 8, emoji: '🎾', feeRp: 120000, hosts: ['FK', 'CO'], notes: ['Coached fundamentals: grip, wall play, positioning', 'All equipment provided'], lat: -6.226, lng: 106.781 },
+  { id: 'm8', day: 4, time: '06:00', durH: 1.5, title: 'Interval Tempo Session', club: 'Sunrise Run Club', tag: 'Training', venue: 'Stadion Madya Track', address: 'Senayan, Jakarta Pusat', km: 3.0, cap: 30, joined: 12, emoji: '🏃', feeRp: 0, hosts: ['DW'], notes: ['6×800m @ 5K effort', 'Track etiquette briefing for first-timers'], lat: -6.2166, lng: 106.8033 },
+  { id: 'm9', day: 5, time: '16:30', durH: 3, title: 'Mixed Doubles Ladder', club: 'Shuttle Squad', tag: 'Competitive', venue: 'GOR Pertamina', address: 'Simprug, Jakarta Selatan', km: 7.2, cap: 24, joined: 19, emoji: '🏸', feeRp: 55000, hosts: ['AB'], notes: ['Ladder points count toward monthly ranking'], lat: -6.2265, lng: 106.7828 },
+  { id: 'm10', day: 6, time: '06:00', durH: 1.5, title: 'Recovery 5K + Coffee', club: 'Sunrise Run Club', tag: 'Social', venue: 'FX Sudirman Loop', address: 'Jl. Jend. Sudirman, Jakarta Pusat', km: 2.8, cap: 40, joined: 22, emoji: '🏃', feeRp: 0, hosts: ['RA'], notes: ['Conversational pace only — HR zone 1-2'], lat: -6.2247, lng: 106.8028 },
 ]
 
 interface Evt { id: string; title: string; org: string; date: string; format: string; teams: number; status: 'registration' | 'happening'; emoji: string; venue: string }
@@ -109,6 +112,7 @@ type Rsvp = 'none' | 'maybe' | 'joined'
 export function ClubHub() {
   const [tab, setTab] = useState<Tab>('meets')
   const [day, setDay] = useState(0)
+  const [meetView, setMeetView] = useState<'list' | 'map'>('list')
   const [query, setQuery] = useState('')
   const [detail, setDetail] = useState<Meet | null>(null)
   const [p, setP] = useState<Persisted>(loadPersisted)
@@ -263,13 +267,35 @@ export function ClubHub() {
                 </button>
               )
             })}
+            <button
+              onClick={() => setMeetView((v) => (v === 'list' ? 'map' : 'list'))}
+              className="ml-auto flex min-w-[64px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-center text-neutral-500 transition dark:bg-white/10 dark:text-neutral-300"
+            >
+              <span className="text-lg leading-none">{meetView === 'list' ? '🗺️' : '📋'}</span>
+              <span className="mt-0.5 text-[10px] font-bold tracking-wide">{meetView === 'list' ? 'MAP' : 'LIST'}</span>
+            </button>
           </div>
 
           {meetsToday.length === 0 && (
             <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day.</Card>
           )}
 
-          {meetsToday.map((m) => {
+          {meetView === 'map' && meetsToday.length > 0 && (
+            <Card className="!p-2">
+              <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-400">Loading map…</div>}>
+                <MeetMap
+                  pins={meetsToday.map((m) => ({
+                    id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
+                    count: m.joined + (rsvpOf(m.id) === 'joined' ? 1 : 0), cap: m.cap,
+                  }))}
+                  onSelect={(id) => { const m = MEETS.find((x) => x.id === id); if (m) setDetail(m) }}
+                />
+              </Suspense>
+              <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">Pin number = people joined · red = full · tap a pin for details</p>
+            </Card>
+          )}
+
+          {meetView === 'list' && meetsToday.map((m) => {
             const r = rsvpOf(m.id)
             return (
               <Card key={m.id} className="!p-4">
