@@ -15,7 +15,11 @@ async function ensure(): Promise<boolean> {
     webpush.setVapidDetails(config.vapid.subject, config.vapid.publicKey, config.vapid.privateKey)
     configured = true
     return true
-  } catch {
+  } catch (e) {
+    // Surface the real reason in logs — a malformed VAPID key (stray
+    // whitespace from a copy-paste, wrong length) fails silently here
+    // otherwise, and every push send would return 0 with no clue why.
+    console.error('[push] VAPID setup failed — check VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY for typos or extra whitespace:', (e as Error).message)
     return false
   }
 }
@@ -31,6 +35,7 @@ export interface PushPayload {
 export async function sendPush(userId: string, payload: PushPayload): Promise<number> {
   if (!(await ensure())) return 0
   const subs = listPushSubs(userId)
+  if (subs.length === 0) console.log(`[push] no subscriptions on file for user ${userId} — device needs to (re)enable push`)
   let sent = 0
   await Promise.all(
     subs.map(async (sub) => {
@@ -38,8 +43,13 @@ export async function sendPush(userId: string, payload: PushPayload): Promise<nu
         await webpush.sendNotification(sub, JSON.stringify(payload))
         sent += 1
       } catch (e: any) {
-        // 404/410 = subscription expired/unsubscribed → remove it.
-        if (e?.statusCode === 404 || e?.statusCode === 410) removePushSub(userId, sub.endpoint)
+        // 404/410 = subscription expired/unsubscribed → prune it.
+        // 401/403 = VAPID key mismatch (this subscription was created against
+        // a DIFFERENT server key, e.g. before VAPID was configured, or from a
+        // prior key rotation) — also prune it; the client re-subscribes fresh
+        // against the current key next time it calls enablePush()/resyncPush().
+        if ([401, 403, 404, 410].includes(e?.statusCode)) removePushSub(userId, sub.endpoint)
+        console.error(`[push] send failed (status ${e?.statusCode ?? 'unknown'}):`, e?.body || e?.message || e)
       }
     }),
   )
