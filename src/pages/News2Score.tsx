@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { getHealthCache, hasHealth } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS2 (National Early Warning Score 2) — Royal College of Physicians (2017).
@@ -60,7 +61,11 @@ export function News2Score() {
   const [spo2, setSpo2] = useState(98)
   const [onOxygen, setOnOxygen] = useState(false)
   const [sbp, setSbp] = useState(120)
-  const [hr, setHr] = useState(75)
+  const [hr, setHr] = useState(() => {
+    const v = getHealthCache().restingHr
+    return typeof v === 'number' && v > 0 ? v : 75
+  })
+  const hrFromDevice = hasHealth('restingHr')
   const [alert, setAlert] = useState(true)
   const [temp, setTemp] = useState(37.0)
 
@@ -103,13 +108,19 @@ export function News2Score() {
           <Field label="Systolic BP (mmHg)">
             <input className={inputClass} type="number" min={0} value={sbp || ''} onChange={(e) => setSbp(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Pulse (bpm)">
+          <Field label={hrFromDevice ? 'Pulse (bpm) — prefilled from Health Profile' : 'Pulse (bpm)'}>
             <input className={inputClass} type="number" min={0} value={hr || ''} onChange={(e) => setHr(Number(e.target.value) || 0)} />
           </Field>
           <Field label="Temperature (°C)">
             <input className={inputClass} type="number" step="0.1" value={temp || ''} onChange={(e) => setTemp(Number(e.target.value) || 0)} />
           </Field>
         </div>
+        {hrFromDevice && (
+          <p className="mt-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-[11px] font-semibold text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200">
+            Pulse was prefilled from your synced resting heart rate — for scoring someone else (or an
+            acute assessment), replace it with the current measured pulse.
+          </p>
+        )}
         <label className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
           <input type="checkbox" checked={onOxygen} onChange={(e) => setOnOxygen(e.target.checked)} className="h-4 w-4 rounded" />
           Requires supplemental oxygen
