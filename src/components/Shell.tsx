@@ -85,6 +85,7 @@ const nav: Nav[] = [
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/chronotype', label: 'Chronotype Quiz', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/sleep-apnea-screen', label: 'Sleep Apnea Screening', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/caffeine', label: 'Caffeine & Sleep', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
