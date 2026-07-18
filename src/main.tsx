@@ -101,6 +101,7 @@ const FenaCalculator = lazy(() => import('./pages/FenaCalculator').then((m) => (
 const RansonCriteria = lazy(() => import('./pages/RansonCriteria').then((m) => ({ default: m.RansonCriteria })))
 const HasBledScore = lazy(() => import('./pages/HasBledScore').then((m) => ({ default: m.HasBledScore })))
 const BisapScore = lazy(() => import('./pages/BisapScore').then((m) => ({ default: m.BisapScore })))
+const GlasgowBlatchfordScore = lazy(() => import('./pages/GlasgowBlatchfordScore').then((m) => ({ default: m.GlasgowBlatchfordScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -206,6 +207,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/ranson-criteria" element={<RansonCriteria />} />
               <Route path="/has-bled-score" element={<HasBledScore />} />
               <Route path="/bisap-score" element={<BisapScore />} />
+              <Route path="/glasgow-blatchford-score" element={<GlasgowBlatchfordScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
