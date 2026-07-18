@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
+import { getHealthCache, hasHealth } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sleep Debt Calculator — tracks the rolling gap between how much sleep you
@@ -22,7 +23,11 @@ export function SleepDebt() {
   const [need, setNeed] = useState(8)
   const [nights, setNights] = useState<Night[]>(load)
   const today = new Date().toISOString().slice(0, 10)
-  const [hours, setHours] = useState(7)
+  const [hours, setHours] = useState(() => {
+    const v = getHealthCache().sleepH
+    return typeof v === 'number' && v > 0 ? v : 7
+  })
+  const sleepFromDevice = hasHealth('sleepH')
 
   useEffect(() => {
     try { localStorage.setItem(LS_KEY, JSON.stringify(nights)) } catch { /* ignore */ }
@@ -61,10 +66,13 @@ export function SleepDebt() {
             <input className={`${inputClass} mt-1`} type="number" step="0.5" min={5} max={11} value={need || ''} onChange={(e) => setNeed(Number(e.target.value) || 0)} />
           </label>
           <label className="text-[12px] font-semibold text-neutral-500">
-            Last night I slept (hours)
+            Last night I slept (hours){sleepFromDevice && ' — from your device'}
             <input className={`${inputClass} mt-1`} type="number" step="0.25" min={0} max={16} value={hours || ''} onChange={(e) => setHours(Number(e.target.value) || 0)} />
           </label>
         </div>
+        {sleepFromDevice && (
+          <p className="mt-2 text-[11px] text-neutral-400">Prefilled from your synced sleep data — adjust it if last night was different from what synced.</p>
+        )}
         <button onClick={logNight} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Log last night ({today})</button>
       </Card>
 
