@@ -79,6 +79,7 @@ const nav: Nav[] = [
   { to: '/alcohol', label: 'Alcohol Unit & BAC Estimator', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/supplements', label: 'Supplements & Ergogenics', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/air-quality', label: 'Air Quality & Lungs', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/sun-exposure', label: 'Sun Exposure & Vitamin D', icon: IconSun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },

@@ -81,6 +81,7 @@ const CarbonDiet = lazy(() => import('./pages/CarbonDiet').then((m) => ({ defaul
 const CaffeineCalculator = lazy(() => import('./pages/CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const HydrationCalculator = lazy(() => import('./pages/HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
 const AlcoholCalculator = lazy(() => import('./pages/AlcoholCalculator').then((m) => ({ default: m.AlcoholCalculator })))
+const SunExposure = lazy(() => import('./pages/SunExposure').then((m) => ({ default: m.SunExposure })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -166,6 +167,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/caffeine" element={<CaffeineCalculator />} />
               <Route path="/hydration" element={<HydrationCalculator />} />
               <Route path="/alcohol" element={<AlcoholCalculator />} />
+              <Route path="/sun-exposure" element={<SunExposure />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
