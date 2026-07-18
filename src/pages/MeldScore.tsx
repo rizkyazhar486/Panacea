@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELD-Na Score — end-stage liver disease severity & transplant priority.
@@ -82,6 +83,7 @@ export function MeldScore() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">Estimated {bandInfo.mortality} (population-level estimate, not individual prognosis).</p>
         <p className="mt-2 text-[12px] text-neutral-400">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
+        <CopyNote text={`MELD-Na ${meldNa.toFixed(0)} (bilirubin ${bilirubin} mg/dL, INR ${inr}, creatinine ${dialysis ? '4.0 [on dialysis]' : creatinine + ' mg/dL'}, Na ${sodium} mEq/L) — ${bandInfo.label.toLowerCase()}, est. ${bandInfo.mortality} [Kamath 2001; Kim 2008; OPTN 2016]`} />
       </Card>
 
       <ScoreTrend

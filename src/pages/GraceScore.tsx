@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GRACE Score (in-hospital mortality) — Granger, C.B., et al. (2003),
@@ -130,6 +131,7 @@ export function GraceScore() {
           {result.mortality}. Categories: ≤108 low · 109-140 intermediate · {'>'}140 high. In NSTE-ACS,
           higher GRACE risk supports an earlier invasive strategy per ESC guidance.
         </p>
+        <CopyNote text={`GRACE ${score} (age ${age}, HR ${hr}, SBP ${sbp}, Cr ${creat}, Killip ${['I', 'II', 'III', 'IV'][killip]}${arrest ? ', cardiac arrest at admission' : ''}${stDev ? ', ST deviation' : ''}${markers ? ', elevated biomarkers' : ''}) — ${result.label.toLowerCase()}, ${result.mortality} [Granger 2003]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

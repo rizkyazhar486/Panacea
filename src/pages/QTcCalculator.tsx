@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { getDemo } from '../lib/profile'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // QTc Calculator — corrected QT interval, essential for drug safety (many
@@ -84,6 +85,7 @@ export function QTcCalculator() {
             ? 'QTc ≥500ms is a high-risk threshold for Torsades de Pointes regardless of sex — review QT-prolonging medications urgently and correct electrolytes (K, Mg, Ca).'
             : `Normal reference: <430ms (men) / <450ms (women); borderline 430-450 (men)/450-470 (women); prolonged >450ms (men) />470ms (women).`}
         </p>
+        <CopyNote text={`QTc ${primary.toFixed(0)} ms by Bazett (QT ${qtMs} ms @ HR ${hr}, ${sex === 'M' ? 'male' : 'female'}) — ${primaryBand.label.toLowerCase()}; Fridericia ${fridericia.toFixed(0)}, Framingham ${framingham.toFixed(0)}, Hodges ${hodges.toFixed(0)} ms`} />
       </Card>
 
       <ScoreTrend

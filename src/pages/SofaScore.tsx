@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SOFA Score (Sequential Organ Failure Assessment) — Vincent, J.L., et al.
@@ -149,6 +150,7 @@ export function SofaScore() {
           <Badge tone={band.tone}>{band.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">Estimated mortality: {band.mortality} (population-level estimate).</p>
+        <CopyNote text={`SOFA ${total}/24 (resp ${resp}, coag ${coag}, liver ${liver}, CV ${cv}, CNS ${cns}, renal ${renal}) — ${band.label.toLowerCase()}, est. mortality ${band.mortality} [Vincent 1996]`} />
       </Card>
 
       <ScoreTrend

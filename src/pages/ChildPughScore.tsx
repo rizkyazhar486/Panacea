@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child-Pugh Score — Pugh, R.N.H., et al. (1973), Br J Surg, 60(8):646-649
@@ -99,6 +100,7 @@ export function ChildPughScore() {
           <Badge tone={cls.tone}>{cls.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">Estimated {cls.survival} (population-level estimate, not individual prognosis).</p>
+        <CopyNote text={`Child-Pugh ${pts} points, ${cls.label} (bilirubin ${bilirubin} mg/dL, albumin ${albumin} g/dL, INR ${inr}, ascites ${ascites}pt, encephalopathy ${enceph}pt) — est. ${cls.survival} [Pugh 1973]`} />
       </Card>
 
       <ScoreTrend
