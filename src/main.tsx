@@ -93,6 +93,7 @@ const WellsScore = lazy(() => import('./pages/WellsScore').then((m) => ({ defaul
 const OttawaAnkleRules = lazy(() => import('./pages/OttawaAnkleRules').then((m) => ({ default: m.OttawaAnkleRules })))
 const ChildGrowthTracker = lazy(() => import('./pages/ChildGrowthTracker').then((m) => ({ default: m.ChildGrowthTracker })))
 const QTcCalculator = lazy(() => import('./pages/QTcCalculator').then((m) => ({ default: m.QTcCalculator })))
+const CreatinineClearance = lazy(() => import('./pages/CreatinineClearance').then((m) => ({ default: m.CreatinineClearance })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -190,6 +191,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/ottawa-ankle" element={<OttawaAnkleRules />} />
               <Route path="/child-growth" element={<ChildGrowthTracker />} />
               <Route path="/qtc-calculator" element={<QTcCalculator />} />
+              <Route path="/creatinine-clearance" element={<CreatinineClearance />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
