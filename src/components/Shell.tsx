@@ -130,6 +130,7 @@ const nav: Nav[] = [
   { to: '/caprini-score', label: 'Caprini Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/duke-criteria', label: 'Duke Criteria (IE)', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/braden-scale', label: 'Braden Scale', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/grace-score', label: 'GRACE Score', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/data-lab', label: 'Data Lab (upload CSV)', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   // Kebugaran
