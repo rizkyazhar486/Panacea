@@ -84,6 +84,7 @@ const AlcoholCalculator = lazy(() => import('./pages/AlcoholCalculator').then((m
 const SunExposure = lazy(() => import('./pages/SunExposure').then((m) => ({ default: m.SunExposure })))
 const MedicationReminders = lazy(() => import('./pages/MedicationReminders').then((m) => ({ default: m.MedicationReminders })))
 const Chronotype = lazy(() => import('./pages/Chronotype').then((m) => ({ default: m.Chronotype })))
+const SleepApneaScreen = lazy(() => import('./pages/SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -172,6 +173,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sun-exposure" element={<SunExposure />} />
               <Route path="/med-reminders" element={<MedicationReminders />} />
               <Route path="/chronotype" element={<Chronotype />} />
+              <Route path="/sleep-apnea-screen" element={<SleepApneaScreen />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
