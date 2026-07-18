@@ -10,17 +10,17 @@ import { Shell } from './components/Shell'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { AppStatus } from './components/AppStatus'
 import { OfflineBanner } from './components/OfflineBanner'
-import { Home } from './pages/Home'
-import { NotFound } from './pages/NotFound'
-import { Chatbot } from './pages/Chatbot'
-import { Dashboard } from './pages/Dashboard'
-import { Nutrition } from './pages/Nutrition'
-import { Consult } from './pages/Consult'
-import { Hospitals } from './pages/Hospitals'
-import { Pharmacy } from './pages/Pharmacy'
-import { Orders } from './pages/Orders'
-import { PatientEducation } from './pages/PatientEducation'
-import { Settings } from './pages/Settings'
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })))
+const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })))
+const Chatbot = lazy(() => import('./pages/Chatbot').then((m) => ({ default: m.Chatbot })))
+const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })))
+const Nutrition = lazy(() => import('./pages/Nutrition').then((m) => ({ default: m.Nutrition })))
+const Consult = lazy(() => import('./pages/Consult').then((m) => ({ default: m.Consult })))
+const Hospitals = lazy(() => import('./pages/Hospitals').then((m) => ({ default: m.Hospitals })))
+const Pharmacy = lazy(() => import('./pages/Pharmacy').then((m) => ({ default: m.Pharmacy })))
+const Orders = lazy(() => import('./pages/Orders').then((m) => ({ default: m.Orders })))
+const PatientEducation = lazy(() => import('./pages/PatientEducation').then((m) => ({ default: m.PatientEducation })))
+const Settings = lazy(() => import('./pages/Settings').then((m) => ({ default: m.Settings })))
 
 // Lazy-load role-specific / heavier secondary pages so the initial bundle stays
 // small; they're fetched on demand when first navigated to.
