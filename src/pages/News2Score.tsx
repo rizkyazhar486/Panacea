@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { ScoreTrend } from '../components/ScoreTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS2 (National Early Warning Score 2) — Royal College of Physicians (2017).
@@ -139,6 +140,14 @@ export function News2Score() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.action}</p>
       </Card>
+
+      <ScoreTrend
+        storageKey="pmd_news2_trend_v1"
+        scoreName="NEWS2"
+        total={total}
+        maxScore={20}
+        detail={`RR ${rr}, SpO₂ ${spo2}%${onOxygen ? ' on O₂' : ''}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'not alert'}, T ${temp.toFixed(1)}°C`}
+      />
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Royal College of Physicians (2017). National Early Warning Score (NEWS) 2. Decision-support

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { ScoreTrend } from '../components/ScoreTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SOFA Score (Sequential Organ Failure Assessment) — Vincent, J.L., et al.
@@ -149,6 +150,14 @@ export function SofaScore() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">Estimated mortality: {band.mortality} (population-level estimate).</p>
       </Card>
+
+      <ScoreTrend
+        storageKey="pmd_sofa_trend_v1"
+        scoreName="SOFA"
+        total={total}
+        maxScore={24}
+        detail={`Resp ${resp}, Coag ${coag}, Liver ${liver}, CV ${cv}, CNS ${cns}, Renal ${renal}`}
+      />
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Vincent, J.L., et al. (1996). The SOFA score. <i>Intensive Care Med</i>, 22(7), 707-710.

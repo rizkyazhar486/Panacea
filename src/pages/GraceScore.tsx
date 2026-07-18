@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GRACE Score (in-hospital mortality) — Granger, C.B., et al. (2003),
@@ -59,7 +60,7 @@ function band(score: number): { label: string; tone: 'brand' | 'low' | 'critical
 }
 
 export function GraceScore() {
-  const [age, setAge] = useState(60)
+  const [age, setAge] = useState(() => getDemo().age || 60)
   const [hr, setHr] = useState(75)
   const [sbp, setSbp] = useState(130)
   const [creat, setCreat] = useState(1.0)
