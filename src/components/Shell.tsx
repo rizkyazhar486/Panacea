@@ -100,6 +100,7 @@ const nav: Nav[] = [
   { to: '/ikigai', label: 'Ikigai & Legacy Letter', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/fasting', label: 'Fasting Timer', icon: IconTimer, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   // Calculators & labs
+  { to: '/calculator-hub', label: '🔎 Calculator Hub (search all)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/stroke-risk', label: 'CHA₂DS₂-VASc (AF Stroke Risk)', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
