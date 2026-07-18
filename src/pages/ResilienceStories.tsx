@@ -42,6 +42,23 @@ const STORIES: Story[] = [
   { name: 'Nelson Mandela', field: 'Leadership', category: 'Leaders', hardship: '27 years in prison, much of it in a small cell on Robben Island, separated from his family.', lesson: 'Emerged advocating reconciliation over revenge, becoming South Africa\'s first democratically elected president.' },
   { name: 'Viktor Frankl', field: 'Psychiatry', category: 'Leaders', hardship: 'Survived multiple Nazi concentration camps, including Auschwitz, and lost his wife and parents in the Holocaust.', lesson: 'Wrote Man\'s Search for Meaning, arguing that finding purpose is what allows people to endure almost any suffering — a founding text of logotherapy.' },
   { name: 'Malala Yousafzai', field: 'Education advocacy', category: 'Leaders', hardship: 'Shot in the head by the Taliban at 15 for advocating girls\' education.', lesson: 'Recovered and became the youngest-ever Nobel Peace Prize laureate, continuing global advocacy for girls\' education.' },
+  { name: 'Wangari Maathai', field: 'Environmental activism', category: 'Leaders', hardship: 'Jailed and physically beaten multiple times by the Kenyan government for organizing grassroots tree-planting and pro-democracy protests.', lesson: 'Founded the Green Belt Movement (45+ million trees planted) and became the first African woman to win the Nobel Peace Prize (2004).' },
+  { name: 'Elie Wiesel', field: 'Writing & human rights', category: 'Leaders', hardship: 'Survived Auschwitz and Buchenwald as a teenager; his mother, father, and younger sister were killed in the Holocaust.', lesson: 'Wrote Night and spent the rest of his life testifying against indifference to atrocity, winning the Nobel Peace Prize in 1986.' },
+
+  // Athletes (footballers)
+  { name: 'Lionel Messi', field: 'Football', category: 'Athletes', hardship: 'Diagnosed with a growth hormone deficiency at 11; his family in Argentina could not afford the treatment and his local club withdrew financial support.', lesson: 'Barcelona\'s youth academy agreed to fund his treatment (famously formalized on a napkin) after he relocated across the Atlantic at 13 — he went on to become a record-breaking Ballon d\'Or winner and 2022 World Cup champion.' },
+  { name: 'Cristiano Ronaldo', field: 'Football', category: 'Athletes', hardship: 'Grew up in a poor household in Madeira and left home at 12 to join Sporting CP\'s academy alone; underwent heart surgery at 15 to correct a racing heartbeat that risked ending his career before it started.', lesson: 'Became one of football\'s most decorated goal-scorers, crediting relentless extra training as much as natural talent.' },
+
+  // Faith & spiritual traditions — resilience narratives central to each faith's
+  // own teaching. Presented as each tradition describes them, not as a claim
+  // adjudicating between beliefs; included because billions of people draw on
+  // exactly these stories when facing hardship.
+  { name: 'Jesus of Nazareth', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'The Gospels describe him as betrayed by a close disciple, abandoned by his followers at his arrest, and executed by crucifixion as a condemned criminal.', lesson: 'Christian tradition holds the resurrection that followed as the foundation of hope in suffering — the central resilience narrative for over two billion people.' },
+  { name: 'Siddhartha Gautama (the Buddha)', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'Renounced a life of royal comfort to confront suffering directly, then spent years in extreme ascetic self-denial that brought him close to death without answering his questions.', lesson: 'Rejected both indulgence and self-destruction for a "Middle Way" — a founding teaching on enduring hardship without being consumed by it.' },
+  { name: 'Prophet Muhammad ﷺ', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'Islamic tradition describes him as orphaned in early childhood, then facing years of persecution, boycott, and exile from his home city of Mecca alongside his early followers.', lesson: 'His endurance through the Meccan persecution and the migration (Hijra) to Medina is held up in Islamic teaching as the model of sabr (steadfast patience) under hardship.' },
+  { name: 'Musa (Moses)', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'Accounts shared across Judaism, Christianity, and Islam describe him fleeing Egypt as a fugitive and spending decades in exile as a shepherd before being called to confront Pharaoh.', lesson: 'His path from exile back to leading the Exodus is cited across all three traditions as a model of returning to purpose despite past failure and self-doubt.' },
+  { name: 'Ibrahim (Abraham)', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'Tradition describes him cast into a fire by his own community for rejecting idol worship, and later tested by the command to sacrifice his son.', lesson: 'Revered across Judaism, Christianity, and Islam as the model of unwavering faith held under the most extreme tests.' },
+  { name: 'Yusuf (Joseph)', field: 'Faith', category: 'Faith & Spiritual Traditions', hardship: 'Sold into slavery by his own brothers, then falsely accused and imprisoned in Egypt for years despite his innocence.', lesson: 'Rose to a position saving the region from famine — his story, told in Genesis and Surah Yusuf, is widely cited as a model of patience through betrayal.' },
 ]
 
 const CATEGORIES = ['All', ...Array.from(new Set(STORIES.map((s) => s.category)))]
@@ -60,10 +77,11 @@ export function ResilienceStories() {
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Resilience Stories" subtitle="Real people, real hardship, real comebacks" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          A curated collection of well-documented doctors, scientists, athletes, innovators, and
-          leaders who faced serious adversity — illness, injury, poverty, rejection, loss — and kept
-          going. Curated for accuracy over quantity: each story here is a verifiable public fact
-          pattern, not padding.
+          A curated collection of well-documented doctors, scientists, athletes, innovators, leaders,
+          Nobel laureates, and revered spiritual figures who faced serious adversity — illness, injury,
+          poverty, rejection, loss, persecution — and kept going. Curated for accuracy over quantity:
+          each story is a verifiable public fact pattern (or, for faith figures, each tradition's own
+          well-known account), not padding.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
@@ -87,7 +105,8 @@ export function ResilienceStories() {
       ))}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
-        Facts summarized from widely available public biographical record. This collection will grow
+        Facts summarized from widely available public biographical record. Faith figures are described
+        as their own tradition presents them, not as a claim between beliefs. This collection will grow
         over time — always with verifiable stories, never invented ones.
       </div>
     </div>
