@@ -659,7 +659,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
       {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
-      <ContactService />
+      <ContactService hidden={menuOpen} />
     </div>
   )
 }
