@@ -95,6 +95,7 @@ const ChildGrowthTracker = lazy(() => import('./pages/ChildGrowthTracker').then(
 const QTcCalculator = lazy(() => import('./pages/QTcCalculator').then((m) => ({ default: m.QTcCalculator })))
 const CreatinineClearance = lazy(() => import('./pages/CreatinineClearance').then((m) => ({ default: m.CreatinineClearance })))
 const CorrectedCalcium = lazy(() => import('./pages/CorrectedCalcium').then((m) => ({ default: m.CorrectedCalcium })))
+const MeldScore = lazy(() => import('./pages/MeldScore').then((m) => ({ default: m.MeldScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -194,6 +195,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/qtc-calculator" element={<QTcCalculator />} />
               <Route path="/creatinine-clearance" element={<CreatinineClearance />} />
               <Route path="/corrected-calcium" element={<CorrectedCalcium />} />
+              <Route path="/meld-score" element={<MeldScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
