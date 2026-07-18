@@ -30,7 +30,7 @@ function clampBottom(v: number): number {
 // clearance between their default resting spots, so a user-dragged position
 // (this button is draggable and persists to localStorage) could land right
 // on top of the "+" and block it entirely.
-export function ContactService() {
+export function ContactService({ hidden }: { hidden?: boolean } = {}) {
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [msgs, setMsgs] = useState<Msg[]>([
@@ -91,6 +91,8 @@ export function ContactService() {
     setMsgs([...next, { from: 'admin', text: reply }])
     setInput('')
   }
+
+  if (hidden && !open) return null
 
   if (minimized) {
     return (
