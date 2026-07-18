@@ -110,6 +110,7 @@ const nav: Nav[] = [
   { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/stroke-risk', label: 'CHA₂DS₂-VASc (AF Stroke Risk)', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/findrisc', label: 'Diabetes Risk (FINDRISC)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/wells-score', label: 'Wells Score (DVT/PE)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/ottawa-ankle', label: 'Ottawa Ankle Rules', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/child-growth', label: 'Child Growth Tracker', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },

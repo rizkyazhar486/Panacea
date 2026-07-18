@@ -17,6 +17,7 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     emoji: '🧬',
     feats: [
       { to: '/health-simulator', name: 'What-If Health Simulator', what: "See how today's choices reshape your 10-year risk", kw: 'simulator digital twin future risk what-if prevent timeline', tag: 'New' },
+      { to: '/findrisc', name: 'Diabetes Risk (FINDRISC)', what: 'Your 10-year diabetes risk — and how to lower it', kw: 'diabetes findrisc prediabetes prevention metabolic glucose', tag: 'New' },
       { to: '/biological-age', name: 'Biological Age', what: 'How old your body is really functioning, from your data', kw: 'phenoage biomarker aging longevity', tag: 'Antiaging' },
       { to: '/longevity', name: 'Longevity Blueprint', what: 'Your personalized healthspan levers and risk drivers', kw: 'lifespan healthspan risk', tag: 'Longevity' },
       { to: '/organ-vitality', name: 'Organ Vitality', what: 'System-by-system health snapshot', kw: 'organ heart liver kidney vitality', tag: 'Longevity' },
