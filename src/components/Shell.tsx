@@ -34,6 +34,7 @@ import {
   IconGauge,
   IconLeaf,
   IconSearch,
+  IconBell,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -125,6 +126,7 @@ const nav: Nav[] = [
   { to: '/hospitals', label: 'Health Facilities', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/pharmacy', label: 'Pharmacy', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/drug-info', label: 'Drug Info', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
+  { to: '/med-reminders', label: 'Medication Reminders', icon: IconBell, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   { to: '/orders', label: 'Transactions', icon: IconWallet, roles: ['pasien'], group: 'Services' },
   { to: '/pricing', label: 'Pricing & Plans', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   // Konten

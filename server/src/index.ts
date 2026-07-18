@@ -38,6 +38,11 @@ import {
   removePushSub,
   listPushSubs,
   allPushUserIds,
+  listReminders,
+  addReminder,
+  updateReminder,
+  removeReminder,
+  allReminders,
   findUserBySelfPatientId,
   getUserByEmail,
   addCreatorSub,
@@ -713,6 +718,34 @@ app.post('/api/push/broadcast', requireAuth, async (req, res) => {
   res.json({ ok: true, sent, recipients: ids.length })
 })
 
+// --- Medication reminders ---
+// Client computes `nextFireAt` (a UTC ISO instant) from the user's local
+// wall-clock time-of-day so the server never has to know their timezone; the
+// scheduler loop below just compares Date.now() against it.
+app.get('/api/reminders', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ reminders: listReminders(u.id) })
+})
+app.post('/api/reminders', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const { medName, dose, timeOfDay, nextFireAt } = req.body as { medName?: string; dose?: string; timeOfDay?: string; nextFireAt?: string }
+  if (!medName?.trim() || !timeOfDay || !nextFireAt) return res.status(400).json({ error: 'missing_fields' })
+  const rem = addReminder(u.id, { medName: medName.trim(), dose: (dose ?? '').trim(), timeOfDay, nextFireAt, active: true })
+  res.json({ reminder: rem })
+})
+app.patch('/api/reminders/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const patch = req.body as Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>
+  const rem = updateReminder(u.id, req.params.id, patch)
+  if (!rem) return res.status(404).json({ error: 'not_found' })
+  res.json({ reminder: rem })
+})
+app.delete('/api/reminders/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  removeReminder(u.id, req.params.id)
+  res.json({ ok: true })
+})
+
 // Owner gate — by configured owner email OR an explicit owner role.
 function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
@@ -868,6 +901,24 @@ const server = createServer(app)
 attachRealtime(server)
 await initStore()
 setInterval(() => { pollSportsFavorites().catch((e) => console.log('[sports] poll error:', (e as Error).message)) }, 90_000)
+// Medication reminder scheduler — checked every minute; a reminder is due
+// once Date.now() passes its nextFireAt (a UTC instant the client computed
+// from the user's local time, so no server-side timezone handling needed).
+setInterval(() => {
+  const now = Date.now()
+  for (const { userId, reminder } of allReminders()) {
+    if (!reminder.active || new Date(reminder.nextFireAt).getTime() > now) continue
+    notify(userId, {
+      title: `💊 ${reminder.medName}`,
+      body: reminder.dose ? `Time for your ${reminder.dose} dose.` : 'Time to take your medication.',
+      url: '/med-reminders',
+      tag: `reminder-${reminder.id}`,
+    }, 'notifMedReminders').catch(() => {})
+    // Roll forward by exactly 24h from the scheduled time (not from "now") so
+    // a reminder never drifts later even if the server was briefly down.
+    updateReminder(userId, reminder.id, { nextFireAt: new Date(new Date(reminder.nextFireAt).getTime() + 86_400_000).toISOString() })
+  }
+}, 60_000)
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  AI:           ${aiStatus()}`)

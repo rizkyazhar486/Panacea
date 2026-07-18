@@ -28,7 +28,6 @@ import type {
   SportCommunity,
   SelfVital,
   SleepLog,
-  MedReminder,
   Vo2MaxEntry,
   HealthGoal,
   GpsActivity,
@@ -189,7 +188,6 @@ function seed(): AppState {
     communities: [],
     selfVitals: [],
     sleepLogs: [],
-    medReminders: [],
     eduBookmarks: [],
     quizScore: { correct: 0, total: 0 },
     vo2maxLog: [],
@@ -313,8 +311,6 @@ interface Store {
   // Pusat Kesehatan Realtime — edukasi, news, fungsionalitas, kalkulasi, monitoring
   addSelfVital: (v: Omit<SelfVital, 'id' | 'at'>) => void
   addSleepLog: (hours: number, bedtimeConsistent: boolean) => void
-  addMedReminder: (name: string, time: string) => void
-  markMedTaken: (id: string) => void
   toggleEduBookmark: (articleId: string) => void
   answerQuiz: (correct: boolean) => void
   logVo2Max: (value: number, method: string) => void
@@ -866,18 +862,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const date = new Date().toISOString().slice(0, 10)
           const without = st.sleepLogs.filter((s) => s.date !== date)
           return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
-        }),
-      addMedReminder: (name, time) =>
-        setState((st) => (name.trim() && time ? { ...st, medReminders: [{ id: uid(), name: name.trim(), time, takenDates: [] }, ...st.medReminders] } : st)),
-      markMedTaken: (id) =>
-        setState((st) => {
-          const today = new Date().toISOString().slice(0, 10)
-          return {
-            ...st,
-            medReminders: st.medReminders.map((m) =>
-              m.id === id && !m.takenDates.includes(today) ? { ...m, takenDates: [...m.takenDates, today] } : m
-            ),
-          }
         }),
       toggleEduBookmark: (articleId) =>
         setState((st) => ({

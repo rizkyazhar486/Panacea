@@ -2,7 +2,7 @@
 // payments). When VITE_API_URL is unset (e.g. the GitHub Pages demo), the app
 // falls back to its in-browser simulation and none of this is used.
 
-import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet } from './types'
+import type { Role, Account, Patient, VitalSign, SupportiveResult, EMRRecord, EducationSheet, MedReminder } from './types'
 
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || ''
 export const backendEnabled = Boolean(API)
@@ -182,6 +182,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ title, body }),
     }),
+  listReminders: () => req<{ reminders: MedReminder[] }>('/api/reminders').then((r) => r.reminders),
+  addReminder: (r: { medName: string; dose: string; timeOfDay: string; nextFireAt: string }) =>
+    req<{ reminder: MedReminder }>('/api/reminders', { method: 'POST', body: JSON.stringify(r) }).then((r) => r.reminder),
+  updateReminder: (id: string, patch: Partial<{ medName: string; dose: string; timeOfDay: string; nextFireAt: string; active: boolean }>) =>
+    req<{ reminder: MedReminder }>(`/api/reminders/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.reminder),
+  removeReminder: (id: string) => req<{ ok: boolean }>(`/api/reminders/${id}`, { method: 'DELETE' }),
   // server-side Claude proxy — AI works without the user supplying a key
   aiVision: (image: string, prompt?: string) =>
     req<{ text: string }>('/api/ai/vision', { method: 'POST', body: JSON.stringify({ image, prompt }) }),
