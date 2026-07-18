@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { ScoreTrend } from '../components/ScoreTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // QTc Calculator — corrected QT interval, essential for drug safety (many
@@ -84,6 +85,14 @@ export function QTcCalculator() {
             : `Normal reference: <430ms (men) / <450ms (women); borderline 430-450 (men)/450-470 (women); prolonged >450ms (men) />470ms (women).`}
         </p>
       </Card>
+
+      <ScoreTrend
+        storageKey="pmd_qtc_trend_v1"
+        scoreName="QTc (Bazett, ms)"
+        total={Math.round(primary)}
+        maxScore={700}
+        detail={`QT ${qtMs}ms @ HR ${hr} (${sex}) — Fri ${fridericia.toFixed(0)}, Fra ${framingham.toFixed(0)}, Hod ${hodges.toFixed(0)}`}
+      />
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Compare correction formulas</div>
