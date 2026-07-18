@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Glasgow-Blatchford Score (GBS) — Blatchford, O., et al. (2000), Lancet,
@@ -39,7 +40,7 @@ function sbpPts(v: number): number {
 export function GlasgowBlatchfordScore() {
   const [bun, setBun] = useState(15)
   const [hgb, setHgb] = useState(14)
-  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
   const [sbp, setSbp] = useState(120)
   const [flags, setFlags] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setFlags((c) => ({ ...c, [key]: !c[key] }))

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alveolar-arterial (A-a) Oxygen Gradient — standard pulmonary physiology:
@@ -18,7 +19,7 @@ export function AaGradient() {
   const [fio2, setFio2] = useState(21)
   const [pao2, setPao2] = useState(90)
   const [paco2, setPaco2] = useState(40)
-  const [age, setAge] = useState(40)
+  const [age, setAge] = useState(() => getDemo().age || 40)
   const [patm, setPatm] = useState(760)
 
   const PH2O = 47

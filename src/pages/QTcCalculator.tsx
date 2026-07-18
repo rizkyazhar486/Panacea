@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // QTc Calculator — corrected QT interval, essential for drug safety (many
@@ -26,7 +27,7 @@ function band(qtcMs: number, sex: 'M' | 'F'): { label: string; tone: 'brand' | '
 export function QTcCalculator() {
   const [qtMs, setQtMs] = useState(400)
   const [hr, setHr] = useState(60)
-  const [sex, setSex] = useState<'M' | 'F'>('M')
+  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
 
   const rrSec = 60 / hr
   const qtSec = qtMs / 1000

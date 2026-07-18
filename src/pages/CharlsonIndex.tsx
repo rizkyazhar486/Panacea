@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Charlson Comorbidity Index (CCI) — Charlson, M.E., et al. (1987),
@@ -43,7 +44,7 @@ function agePts(age: number): number {
 }
 
 export function CharlsonIndex() {
-  const [age, setAge] = useState(45)
+  const [age, setAge] = useState(() => getDemo().age || 45)
   const [checked, setChecked] = useState<Record<string, boolean>>({})
   const toggle = (key: string) => setChecked((c) => ({ ...c, [key]: !c[key] }))
 
