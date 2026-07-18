@@ -111,6 +111,7 @@ const News2Score = lazy(() => import('./pages/News2Score').then((m) => ({ defaul
 const SerumOsmolality = lazy(() => import('./pages/SerumOsmolality').then((m) => ({ default: m.SerumOsmolality })))
 const LdlCalculator = lazy(() => import('./pages/LdlCalculator').then((m) => ({ default: m.LdlCalculator })))
 const AaGradient = lazy(() => import('./pages/AaGradient').then((m) => ({ default: m.AaGradient })))
+const PaduaScore = lazy(() => import('./pages/PaduaScore').then((m) => ({ default: m.PaduaScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -226,6 +227,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/serum-osmolality" element={<SerumOsmolality />} />
               <Route path="/ldl-calculator" element={<LdlCalculator />} />
               <Route path="/aa-gradient" element={<AaGradient />} />
+              <Route path="/padua-score" element={<PaduaScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
