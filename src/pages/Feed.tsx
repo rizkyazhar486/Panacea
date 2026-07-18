@@ -1697,12 +1697,29 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const cooperVo2 = Math.round(((cooperMeters - 504.9) / 44.73) * 10) / 10
   const lastVo2 = state.vo2maxLog[0]
 
-  // 7. Live Health News Ticker
+  // 7. Live Health News Ticker — real headlines from the server-proxied
+  // Google News health feeds when available; static curated items otherwise.
+  const [liveNews, setLiveNews] = useState<{ tag: string; title: string; link?: string }[] | null>(null)
+  useEffect(() => {
+    let alive = true
+    api.news()
+      .then((r) => {
+        if (!alive || r.items.length === 0) return
+        setLiveNews(r.items.map((n) => ({
+          tag: n.region === 'domestic' ? '🇮🇩 ' + (n.source || 'News') : '🌍 ' + (n.source || 'News'),
+          title: n.source && n.title.endsWith(` - ${n.source}`) ? n.title.slice(0, -(n.source.length + 3)) : n.title,
+          link: n.link,
+        })))
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
+  const ticker = liveNews ?? HEALTH_NEWS
   const [newsIdx, setNewsIdx] = useState(0)
   useEffect(() => {
-    const t = setInterval(() => setNewsIdx((i) => (i + 1) % HEALTH_NEWS.length), 6000)
+    const t = setInterval(() => setNewsIdx((i) => (i + 1) % ticker.length), 6000)
     return () => clearInterval(t)
-  }, [])
+  }, [ticker.length])
 
   // #4: targets & progress badges. Current values pulled from real tracked data.
   const myCheckInDates = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
@@ -1939,10 +1956,25 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
       {/* 7. Live Health News Ticker */}
       <Card className="space-y-1.5 overflow-hidden">
-        <div className="flex items-center gap-2 text-xs font-black text-ink">📰 Live Health News <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /></div>
-        <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">
-          <span className="font-bold text-brand-dark">[{HEALTH_NEWS[newsIdx].tag}]</span> {HEALTH_NEWS[newsIdx].title}
+        <div className="flex items-center gap-2 text-xs font-black text-ink">
+          📰 Live Health News <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+          {liveNews && <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-red-600">Real-time</span>}
         </div>
+        {(() => {
+          const item = ticker[newsIdx % ticker.length]
+          const inner = (
+            <>
+              <span className="font-bold text-brand-dark">[{item.tag}]</span> {item.title}
+            </>
+          )
+          return 'link' in item && item.link ? (
+            <a href={item.link} target="_blank" rel="noreferrer" className="block rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700 hover:bg-neutral-100">
+              {inner}
+            </a>
+          ) : (
+            <div className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-700">{inner}</div>
+          )
+        })()}
       </Card>
 
       {/* 6. Pengingat Obat/Vitamin — full CRUD + real push notifications live on its own page */}
