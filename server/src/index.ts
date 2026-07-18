@@ -673,6 +673,70 @@ app.post('/api/notifications/read', requireAuth, (req, res) => {
   res.json({ ok: true })
 })
 
+// --- Live medical news (Google News RSS proxy — keyless & free) ---
+// The browser can't fetch news.google.com directly (CORS), so the server
+// proxies two health-topic RSS feeds (Indonesian + international), parses the
+// XML with a minimal regex parser (no new dependencies), and caches for 10
+// minutes so we stay a polite consumer while the client still sees
+// continuously fresh headlines.
+interface LiveNewsItem { title: string; link: string; source: string; pubDate: string; region: 'domestic' | 'international' }
+let newsCache: { items: LiveNewsItem[]; at: number } | null = null
+const NEWS_TTL_MS = 10 * 60 * 1000
+
+function decodeXml(s: string): string {
+  return s
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .trim()
+}
+
+function parseRss(xml: string, region: LiveNewsItem['region']): LiveNewsItem[] {
+  const items: LiveNewsItem[] = []
+  for (const block of xml.match(/<item>[\s\S]*?<\/item>/g) ?? []) {
+    const title = decodeXml(block.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? '')
+    const link = decodeXml(block.match(/<link>([\s\S]*?)<\/link>/)?.[1] ?? '')
+    const pubDate = decodeXml(block.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? '')
+    const source = decodeXml(block.match(/<source[^>]*>([\s\S]*?)<\/source>/)?.[1] ?? '')
+    if (title && link) items.push({ title, link, source, pubDate, region })
+  }
+  return items
+}
+
+async function fetchNewsFeed(url: string, region: LiveNewsItem['region']): Promise<LiveNewsItem[]> {
+  const r = await fetch(url, {
+    headers: { 'user-agent': 'Mozilla/5.0 (compatible; PanaceamedNews/1.0)' },
+    signal: AbortSignal.timeout(8000),
+  })
+  if (!r.ok) throw new Error(`news feed ${r.status}`)
+  return parseRss(await r.text(), region)
+}
+
+app.get('/api/news', async (_req, res) => {
+  if (newsCache && Date.now() - newsCache.at < NEWS_TTL_MS) {
+    return res.json({ items: newsCache.items, fetchedAt: newsCache.at, cached: true })
+  }
+  const [dom, intl] = await Promise.allSettled([
+    fetchNewsFeed('https://news.google.com/rss/headlines/section/topic/HEALTH?hl=id&gl=ID&ceid=ID:id', 'domestic'),
+    fetchNewsFeed('https://news.google.com/rss/headlines/section/topic/HEALTH?hl=en-US&gl=US&ceid=US:en', 'international'),
+  ])
+  const items = [
+    ...(dom.status === 'fulfilled' ? dom.value.slice(0, 12) : []),
+    ...(intl.status === 'fulfilled' ? intl.value.slice(0, 12) : []),
+  ]
+  if (items.length === 0) {
+    // Both feeds failed — serve the stale cache if we have one, else 503 so
+    // the client falls back to its curated content.
+    if (newsCache) return res.json({ items: newsCache.items, fetchedAt: newsCache.at, cached: true, stale: true })
+    return res.status(503).json({ error: 'news_unavailable' })
+  }
+  newsCache = { items, at: Date.now() }
+  res.json({ items, fetchedAt: newsCache.at, cached: false })
+})
+
 // --- Web Push notifications ---
 app.get('/api/push/key', (_req, res) => res.json({ key: features.pushLive ? config.vapid.publicKey : null }))
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
