@@ -123,6 +123,8 @@ const CalculatorHub = lazy(() => import('./pages/CalculatorHub').then((m) => ({ 
 const WellnessHub = lazy(() => import('./pages/WellnessHub').then((m) => ({ default: m.WellnessHub })))
 const HealthSimulator = lazy(() => import('./pages/HealthSimulator').then((m) => ({ default: m.HealthSimulator })))
 const Findrisc = lazy(() => import('./pages/Findrisc').then((m) => ({ default: m.Findrisc })))
+const ResilienceStories = lazy(() => import('./pages/ResilienceStories').then((m) => ({ default: m.ResilienceStories })))
+const LifeCompass = lazy(() => import('./pages/LifeCompass').then((m) => ({ default: m.LifeCompass })))
 const Breathwork = lazy(() => import('./pages/Breathwork').then((m) => ({ default: m.Breathwork })))
 const GratitudeJournal = lazy(() => import('./pages/GratitudeJournal').then((m) => ({ default: m.GratitudeJournal })))
 const SleepDebt = lazy(() => import('./pages/SleepDebt').then((m) => ({ default: m.SleepDebt })))
@@ -254,6 +256,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/wellness-hub" element={<WellnessHub />} />
               <Route path="/health-simulator" element={<HealthSimulator />} />
               <Route path="/findrisc" element={<Findrisc />} />
+              <Route path="/resilience-stories" element={<ResilienceStories />} />
+              <Route path="/life-compass" element={<LifeCompass />} />
               <Route path="/breathwork" element={<Breathwork />} />
               <Route path="/gratitude" element={<GratitudeJournal />} />
               <Route path="/sleep-debt" element={<SleepDebt />} />
