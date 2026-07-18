@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, ReferenceLine } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -71,6 +72,26 @@ export function HealthSimulator() {
 
   const baseRisk = framinghamCVD(b)
   const simRisk = framinghamCVD(simulated)
+
+  // Life Timeline — project the same validated equation across future ages
+  // (Framingham is validated for ages 30-74, so we cap the projection there).
+  // Biomarkers are held constant: this isolates the effect of the interventions
+  // themselves rather than guessing how labs drift, which keeps it honest.
+  const timeline = useMemo(() => {
+    const start = Math.max(30, Math.round(b.age))
+    const pts: { age: number; current: number | null; withChanges: number | null }[] = []
+    for (let a = start; a <= 74; a += Math.max(1, a === start ? 0 : 5)) {
+      const age = a === start ? start : Math.min(a, 74)
+      pts.push({
+        age,
+        current: framinghamCVD({ ...b, age }),
+        withChanges: framinghamCVD({ ...simulated, age }),
+      })
+      if (age >= 74) break
+    }
+    return pts
+  }, [b, simulated])
+  const hasIntervention = Object.entries(active).some(([id, on]) => on && LEVERS.find((l) => l.id === id)?.applies(b))
   const valid = baseRisk != null && simRisk != null
   const delta = valid ? simRisk! - baseRisk! : 0
   const relReduction = valid && baseRisk! > 0 ? (1 - simRisk! / baseRisk!) * 100 : 0
@@ -160,6 +181,36 @@ export function HealthSimulator() {
           <p className="mt-2 text-[12px] text-neutral-400">Enter valid cholesterol, HDL, and blood-pressure values to simulate.</p>
         )}
       </Card>
+
+      {timeline.length >= 2 && (
+        <Card className="!p-5">
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Life Timeline — 10-year risk at each future age</div>
+          <p className="mt-1 text-[12px] text-neutral-500">
+            Your risk projected forward with today's numbers held constant. The gap between the two
+            lines is the future you're buying with today's choices.
+          </p>
+          <div className="mt-3 h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timeline} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.25} />
+                <XAxis dataKey="age" tick={{ fontSize: 10 }} label={{ value: 'age', position: 'insideBottomRight', offset: -2, fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} unit="%" />
+                <Tooltip formatter={(v) => `${typeof v === 'number' ? v.toFixed(1) : v}%`} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <ReferenceLine y={20} stroke="#ef4444" strokeDasharray="4 4" label={{ value: 'high-risk', fontSize: 9, fill: '#ef4444' }} />
+                <ReferenceLine y={7.5} stroke="#f59e0b" strokeDasharray="4 4" />
+                <Line type="monotone" dataKey="current" name="Current path" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 2.5 }} connectNulls />
+                {hasIntervention && <Line type="monotone" dataKey="withChanges" name="With your changes" stroke="#00BF63" strokeWidth={2.5} dot={{ r: 2.5 }} connectNulls />}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-400">
+            Projection uses the Framingham equation at each age with your current biomarkers held
+            constant (the model is validated for ages 30-74). It isolates the interventions' effect —
+            real labs and blood pressure also drift with age, so treat this as direction, not destiny.
+          </p>
+        </Card>
+      )}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         D'Agostino, R.B., et al. (2008). General cardiovascular risk profile for use in primary care:
