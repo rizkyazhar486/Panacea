@@ -415,6 +415,14 @@ export function ClubHub() {
                   <span className="text-lg">🏷️</span>
                   <div className="font-bold text-ink dark:text-white">Per person · {fmtFee(m.feeRp)}</div>
                 </div>
+                {(m.emoji === '🏃' || m.emoji === '🩺') && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">📡</span>
+                    <a href="#/community" className="font-bold text-brand-dark">
+                      Track this {m.emoji === '🏃' ? 'run' : 'walk'} with the GPS tracker →
+                    </a>
+                  </div>
+                )}
               </div>
 
               {m.notes.length > 0 && (
