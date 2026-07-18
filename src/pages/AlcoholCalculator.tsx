@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconDrop } from '../components/icons'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Alcohol Unit & BAC Estimator — pure arithmetic, no external API. Uses the
@@ -31,8 +32,8 @@ function gramsOf(d: Drink): number {
 }
 
 export function AlcoholCalculator() {
-  const [sex, setSex] = useState<'M' | 'F'>('M')
-  const [weightKg, setWeightKg] = useState(70)
+  const [sex, setSex] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
+  const [weightKg, setWeightKg] = useState(() => getDemo().weightKg || 70)
   const [picked, setPicked] = useState<Record<string, number>>({})
   const [hoursElapsed, setHoursElapsed] = useState(1)
 
