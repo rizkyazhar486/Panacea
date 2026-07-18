@@ -101,6 +101,7 @@ const nav: Nav[] = [
   // Calculators & labs
   { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/stroke-risk', label: 'CHA₂DS₂-VASc (AF Stroke Risk)', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/data-lab', label: 'Data Lab (upload CSV)', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   // Kebugaran
