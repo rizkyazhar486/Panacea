@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { ScoreTrend } from '../components/ScoreTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MELD-Na Score — end-stage liver disease severity & transplant priority.
@@ -82,6 +83,14 @@ export function MeldScore() {
         <p className="mt-2 text-[12px] text-neutral-500">Estimated {bandInfo.mortality} (population-level estimate, not individual prognosis).</p>
         <p className="mt-2 text-[12px] text-neutral-400">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
       </Card>
+
+      <ScoreTrend
+        storageKey="pmd_meldna_trend_v1"
+        scoreName="MELD-Na"
+        total={Math.round(meldNa)}
+        maxScore={40}
+        detail={`Bili ${bilirubin}, INR ${inr}, Cr ${dialysis ? '4.0 (dialysis)' : creatinine}, Na ${sodium}`}
+      />
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Kamath, P.S., et al. (2001). <i>Hepatology</i>, 33(2), 464-470. Kim, W.R., et al. (2008). <i>NEJM</i>,

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { ScoreTrend } from '../components/ScoreTrend'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Child-Pugh Score — Pugh, R.N.H., et al. (1973), Br J Surg, 60(8):646-649
@@ -99,6 +100,14 @@ export function ChildPughScore() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">Estimated {cls.survival} (population-level estimate, not individual prognosis).</p>
       </Card>
+
+      <ScoreTrend
+        storageKey="pmd_childpugh_trend_v1"
+        scoreName="Child-Pugh"
+        total={pts}
+        maxScore={15}
+        detail={`Bili ${bilirubin}, Alb ${albumin}, INR ${inr}, ascites ${ascites}pt, enceph ${enceph}pt`}
+      />
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Pugh, R.N.H., et al. (1973). Transection of the oesophagus for bleeding oesophageal varices.
