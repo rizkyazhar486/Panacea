@@ -86,6 +86,7 @@ const MedicationReminders = lazy(() => import('./pages/MedicationReminders').the
 const Chronotype = lazy(() => import('./pages/Chronotype').then((m) => ({ default: m.Chronotype })))
 const SleepApneaScreen = lazy(() => import('./pages/SleepApneaScreen').then((m) => ({ default: m.SleepApneaScreen })))
 const MentalHealthScreen = lazy(() => import('./pages/MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
+const SubstanceUseScreen = lazy(() => import('./pages/SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -176,6 +177,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/chronotype" element={<Chronotype />} />
               <Route path="/sleep-apnea-screen" element={<SleepApneaScreen />} />
               <Route path="/mental-health-screen" element={<MentalHealthScreen />} />
+              <Route path="/substance-use-screen" element={<SubstanceUseScreen />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
