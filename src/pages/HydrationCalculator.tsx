@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
-import { getDemo } from '../lib/profile'
+import { getHealthCache, hasHealth } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Daily Hydration Calculator — pure arithmetic, no external API. Baseline is
@@ -20,14 +20,32 @@ import { getDemo } from '../lib/profile'
 type Intensity = 'none' | 'light' | 'moderate' | 'intense'
 const INTENSITY_ML_PER_HOUR: Record<Intensity, number> = { none: 0, light: 400, moderate: 600, intense: 800 }
 
+function deviceWeight(): number | undefined {
+  const v = getHealthCache().weightKg
+  return typeof v === 'number' && v > 0 ? v : undefined
+}
+
 export function HydrationCalculator() {
-  const demo = getDemo()
-  const [weightKg, setWeightKg] = useState(demo.weightKg || 70)
+  const [weightKg, setWeightKg] = useState(() => deviceWeight() ?? 70)
+  const [weightFromDevice, setWeightFromDevice] = useState(hasHealth('weightKg'))
   const [exerciseMin, setExerciseMin] = useState(0)
   const [intensity, setIntensity] = useState<Intensity>('moderate')
   const [hotClimate, setHotClimate] = useState(false)
   const [pregnant, setPregnant] = useState(false)
   const [breastfeeding, setBreastfeeding] = useState(false)
+
+  // Keep weight in step with the Health Profile (Apple Health / WHOOP / etc.)
+  // so this calculator never silently drifts from what a synced scale reports —
+  // same pattern as Body Composition and Longevity.
+  useEffect(() => {
+    const resync = () => {
+      const w = deviceWeight()
+      if (w) { setWeightKg(w); setWeightFromDevice(true) }
+    }
+    window.addEventListener('focus', resync)
+    window.addEventListener('panacea:health-updated', resync)
+    return () => { window.removeEventListener('focus', resync); window.removeEventListener('panacea:health-updated', resync) }
+  }, [])
 
   const baseMl = weightKg * 33
   const exerciseMl = (exerciseMin / 60) * INTENSITY_ML_PER_HOUR[intensity]
@@ -60,8 +78,8 @@ export function HydrationCalculator() {
 
       <Card className="!p-5">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Body weight (kg)">
-            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
+          <Field label={<>Body weight (kg) {weightFromDevice && <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-dark">From Health Profile</span>}</>}>
+            <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => { setWeightKg(Number(e.target.value) || 0); setWeightFromDevice(false) }} />
           </Field>
           <Field label="Exercise today (minutes)">
             <input className={inputClass} type="number" min={0} max={600} value={exerciseMin} onChange={(e) => setExerciseMin(Number(e.target.value) || 0)} />
