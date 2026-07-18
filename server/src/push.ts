@@ -11,15 +11,28 @@ async function ensure(): Promise<boolean> {
   if (!features.pushLive) return false
   if (configured) return true
   try {
-    webpush = await import('web-push' as string)
+    // web-push is a plain CommonJS package (module.exports = {...}), not ESM.
+    // Depending on the Node/runtime's CJS-ESM interop, a dynamic import() can
+    // land the real exports under `.default` instead of on the namespace
+    // object directly — if we only ever read `webpush.setVapidDetails`
+    // without this fallback, it can silently be `undefined`, throw, and get
+    // swallowed by this try/catch, permanently disabling push with no
+    // visible cause even though the VAPID keys themselves are fine.
+    const mod: any = await import('web-push' as string)
+    webpush = mod?.setVapidDetails ? mod : mod?.default
+    if (!webpush?.setVapidDetails || !webpush?.sendNotification) {
+      throw new Error('web-push module did not expose the expected functions (unexpected export shape)')
+    }
     webpush.setVapidDetails(config.vapid.subject, config.vapid.publicKey, config.vapid.privateKey)
     configured = true
     return true
   } catch (e) {
     // Surface the real reason in logs — a malformed VAPID key (stray
-    // whitespace from a copy-paste, wrong length) fails silently here
-    // otherwise, and every push send would return 0 with no clue why.
-    console.error('[push] VAPID setup failed — check VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY for typos or extra whitespace:', (e as Error).message)
+    // whitespace from a copy-paste, wrong length) or an import/interop issue
+    // fails silently here otherwise, and every push send would return 0 with
+    // no clue why. Check Render's Logs tab for this line if push still
+    // doesn't work after VAPID keys are set correctly.
+    console.error('[push] VAPID setup failed — check VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY for typos/whitespace, or that the web-push package installed correctly:', (e as Error).message)
     return false
   }
 }
