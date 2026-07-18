@@ -131,7 +131,7 @@ export function HealthProfile() {
       const text = await file.text()
       const r: ImportResult = parseHealthFile(file.name, text)
       const keys = Object.keys(r).filter((k) => k !== 'source')
-      if (!keys.length) { setNote(''); setErr('No recognizable data found in that file. Try export.xml (Apple Health) or physiological_cycles.csv (WHOOP).'); return }
+      if (!keys.length) { setNote(''); setErr('No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.'); return }
       setP((x) => ({
         ...x,
         source: (r.source as Src) ?? x.source,
@@ -179,7 +179,9 @@ export function HealthProfile() {
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Enter manually, import an export file, or copy from <b>WHOOP · Apple Watch · Garmin · Samsung Health · Fitbit · Oura</b>. This data automatically fills all your fitness & longevity calculators.
+          Apple Watch auto-syncs live; Garmin and WHOOP import from a file you export and upload;
+          everything else can be entered by hand. Whatever you fill in here flows straight into every
+          fitness &amp; longevity calculator in the app.
         </p>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
@@ -197,12 +199,15 @@ export function HealthProfile() {
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health export.xml · WHOOP .csv" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · WHOOP .csv/.json · Garmin .json" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Export from your health app, then upload it here — the fields fill in automatically. Files are processed on your device, not uploaded when read. You can also download your data anytime.
+          <b>Apple Watch</b> can auto-sync below. <b>Garmin and WHOOP don't offer a live sync link</b>,
+          so export your data from the Garmin Connect or WHOOP app and upload the file here — the
+          fields fill in automatically, and you'll see exactly what was found before saving. Files are
+          processed on your device, never uploaded when read.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <input ref={fileRef} type="file" accept=".xml,.csv,text/xml,text/csv" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
+          <input ref={fileRef} type="file" accept=".xml,.csv,.json,text/xml,text/csv,application/json" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
           <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
           <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
           <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
