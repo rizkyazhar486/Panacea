@@ -115,12 +115,24 @@ export function AirQuality() {
               <Pollutant label="PM10" value={aq.pm10} unit="µg/m³" note="Coarse particles" />
               <Pollutant label="Ozone" value={aq.ozone} unit="µg/m³" note="O₃" />
             </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+              Note: the US AQI headline number and the raw pollutant readings above can look slightly
+              inconsistent if you try to back-calculate one from the other by hand. That's expected — the
+              AQI uses the EPA's <b>NowCast</b> method (a trend-weighted average of the last several hours),
+              while PM2.5/PM10/ozone above are the single current-hour reading. During a rapid pollution
+              spike or drop, the two will diverge; both are correct, they just describe different time
+              windows of the same air.
+            </p>
           </>
         )}
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
-        Live data from the free Open-Meteo Air-Quality API using your device location (used only to fetch the reading). Educational guidance based on US AQI bands — it doesn't replace your personal asthma/COPD action plan or medical advice. Seek care for worsening breathlessness regardless of the number.
+        Live data from the free Open-Meteo Air-Quality API, fetched using your device's actual GPS
+        coordinates via <code>navigator.geolocation</code> (location is used only to fetch the reading,
+        never stored or sent anywhere else). Educational guidance based on US AQI bands — it doesn't
+        replace your personal asthma/COPD action plan or medical advice. Seek care for worsening
+        breathlessness regardless of the number.
       </div>
     </div>
   )
