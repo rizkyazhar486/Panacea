@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Cockcroft-Gault Creatinine Clearance — Cockcroft, D.W. & Gault, M.H. (1976),
@@ -96,6 +97,7 @@ export function CreatinineClearance() {
           <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>
+        <CopyNote text={`CrCl (Cockcroft-Gault) ${crcl.toFixed(0)} mL/min using ${weightBasis} body weight (age ${age}, ${sex === 'M' ? 'male' : 'female'}, ${useWeight.toFixed(0)} kg, SCr ${scr} mg/dL) — ${bandInfo.label.toLowerCase()} [Cockcroft & Gault 1976]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

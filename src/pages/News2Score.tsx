@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
 import { getHealthCache, hasHealth } from '../lib/profile'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWS2 (National Early Warning Score 2) — Royal College of Physicians (2017).
@@ -150,6 +151,7 @@ export function News2Score() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.action}</p>
+        <CopyNote text={`NEWS2 ${total} (RR ${rr}, SpO2 ${spo2}%${onOxygen ? ' on supplemental O2' : ' on air'}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'AVPU<A'}, T ${temp.toFixed(1)}°C) — ${result.label.toLowerCase()}: ${result.action} [RCP 2017]`} />
       </Card>
 
       <ScoreTrend
