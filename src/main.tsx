@@ -78,6 +78,7 @@ const DrugInfo = lazy(() => import('./pages/DrugInfo').then((m) => ({ default: m
 const GeneInfo = lazy(() => import('./pages/GeneInfo').then((m) => ({ default: m.GeneInfo })))
 const Ikigai = lazy(() => import('./pages/Ikigai').then((m) => ({ default: m.Ikigai })))
 const CarbonDiet = lazy(() => import('./pages/CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
+const CaffeineCalculator = lazy(() => import('./pages/CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -160,6 +161,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/gene-info" element={<GeneInfo />} />
               <Route path="/ikigai" element={<Ikigai />} />
               <Route path="/carbon-diet" element={<CarbonDiet />} />
+              <Route path="/caffeine" element={<CaffeineCalculator />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />

@@ -80,6 +80,7 @@ const nav: Nav[] = [
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
+  { to: '/caffeine', label: 'Caffeine & Sleep', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
