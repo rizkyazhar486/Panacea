@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { api, type LiveNewsItem } from '../lib/api'
 
 // ──────────────────────────────────────────────────────────────────────────
 // Berita & Inovasi Kedokteran — editorial "newsroom" section.
@@ -108,7 +109,43 @@ function Kicker({ kind, cat }: { kind: NewsItem['kind']; cat: string }) {
   )
 }
 
+// Google News item titles end in " - Source"; strip it since we show the
+// source separately.
+function cleanTitle(t: string, source: string): string {
+  return source && t.endsWith(` - ${source}`) ? t.slice(0, -(source.length + 3)) : t
+}
+
+function relTime(pubDate: string): string {
+  const t = Date.parse(pubDate)
+  if (Number.isNaN(t)) return ''
+  const mins = Math.max(0, Math.round((Date.now() - t) / 60000))
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.round(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
+}
+
 export function MedicalNews() {
+  // Live headlines from the server-proxied Google News health feeds (free,
+  // keyless, refreshed every ~10 minutes). When the backend or network is
+  // unavailable, the section falls back to the curated evergreen items below
+  // so it never renders empty.
+  const [live, setLive] = useState<LiveNewsItem[] | null>(null)
+  useEffect(() => {
+    let alive = true
+    api.news().then((r) => { if (alive && r.items.length > 0) setLive(r.items) }).catch(() => {})
+    return () => { alive = false }
+  }, [])
+
+  const liveMix = useMemo(() => {
+    if (!live) return null
+    const dom = live.filter((n) => n.region === 'domestic')
+    const intl = live.filter((n) => n.region === 'international')
+    const lead = intl[0] ?? dom[0]
+    const rest = shuffle([...dom.slice(0, 4), ...intl.slice(1, 5)].filter((n) => n !== lead)).slice(0, 6)
+    return { lead, rest }
+  }, [live])
+
   // Fresh draw each mount → the section "keeps updating". Guarantee a mix of
   // international and domestic (Indonesia) coverage every time.
   const { lead, rest } = useMemo(() => {
@@ -136,7 +173,7 @@ export function MedicalNews() {
           </div>
           <div className="flex items-center gap-2 self-start rounded-full border border-black/10 bg-white/70 px-3 py-1.5 backdrop-blur sm:self-auto">
             <span className="vital-dot h-2 w-2 rounded-full bg-brand" />
-            <span className="text-[11px] font-semibold text-neutral-500">Updated {updated}</span>
+            <span className="text-[11px] font-semibold text-neutral-500">{liveMix ? 'Live · Google News health feeds' : `Updated ${updated}`}</span>
           </div>
         </div>
 
@@ -144,6 +181,51 @@ export function MedicalNews() {
           International 🌍 &amp; domestic 🇮🇩 coverage — stem cells, CRISPR, AI-EMR, SATUSEHAT, JKN/BPJS, dengue, stunting — a fresh curation every time you visit.
         </p>
 
+        {liveMix ? (
+          <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[1.5fr_1fr]">
+            {/* Featured live lead */}
+            <a href={liveMix.lead.link} target="_blank" rel="noreferrer" className="group relative flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-dark">Breaking</span>
+                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
+              </div>
+              <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
+                {cleanTitle(liveMix.lead.title, liveMix.lead.source)}
+              </h3>
+              <p className="mt-3 text-[13px] font-semibold text-neutral-500">
+                {liveMix.lead.source}{relTime(liveMix.lead.pubDate) && ` · ${relTime(liveMix.lead.pubDate)}`}
+              </p>
+              <div className="mt-5 h-px w-16 bg-brand/40 transition-all duration-300 group-hover:w-28" />
+              <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-dark">
+                Read the full story
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </a>
+
+            {/* Live index */}
+            <ol className="flex flex-col divide-y divide-black/[0.07]">
+              {liveMix.rest.map((n, i) => (
+                <li key={n.link}>
+                  <a href={n.link} target="_blank" rel="noreferrer" className="group flex gap-4 py-3.5 first:pt-0">
+                    <span className="mt-0.5 w-6 shrink-0 font-mono text-xs font-bold tabular-nums text-neutral-300 transition-colors group-hover:text-brand">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{n.source || 'Health'}</span>
+                        <RegionTag region={n.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
+                      </div>
+                      <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
+                        {cleanTitle(n.title, n.source)}
+                      </h4>
+                      {relTime(n.pubDate) && <p className="mt-0.5 text-[12px] text-neutral-400">{relTime(n.pubDate)}</p>}
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : (
         <div className="mt-8 grid gap-x-10 gap-y-8 lg:grid-cols-[1.5fr_1fr]">
           {/* Featured lead */}
           <article className="group relative flex flex-col">
@@ -183,6 +265,7 @@ export function MedicalNews() {
             ))}
           </ol>
         </div>
+        )}
 
         {/* Editorial pull-quote — calm, single accent, role-tagged */}
         <figure className="mt-12 grid gap-5 border-t border-black/10 pt-8 sm:grid-cols-[auto_1fr] sm:gap-7">

@@ -167,6 +167,8 @@ export const api = {
   creatorSubs: () => req<{ authors: string[]; price: number }>('/api/creator/subs'),
   creatorSubscribe: (authorEmail: string) =>
     req<{ ok: boolean; balance: number; expires: string; authorCut: number; adminCut: number }>('/api/creator/subscribe', { method: 'POST', body: JSON.stringify({ authorEmail }) }),
+  // live medical news (server-proxied Google News RSS; free, keyless)
+  news: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/news'),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),
@@ -260,6 +262,14 @@ export interface ClinicalData {
   supportive: Record<string, SupportiveResult[]>
   records: Record<string, EMRRecord>
   education: Record<string, EducationSheet>
+}
+
+export interface LiveNewsItem {
+  title: string
+  link: string
+  source: string
+  pubDate: string
+  region: 'domestic' | 'international'
 }
 
 export interface Notif {
