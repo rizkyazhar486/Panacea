@@ -68,6 +68,7 @@ const nav: Nav[] = [
   // Beranda (rendered as plain links — the most-used, social-first destinations)
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  { to: '/clubs', label: 'Club Hub', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/messages', label: 'Messages', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/logs', label: 'Log & Stats', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
