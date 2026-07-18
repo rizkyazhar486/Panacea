@@ -32,6 +32,8 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
       { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
       { to: '/ikigai', name: 'Ikigai & Purpose', what: 'Find your reason for being', kw: 'ikigai purpose meaning japanese', tag: 'Wellness' },
+      { to: '/life-compass', name: 'Life Compass', what: 'Plan your vision, mission, and next step', kw: 'vision mission purpose goals future anxiety worry planning', tag: 'New' },
+      { to: '/resilience-stories', name: 'Resilience Stories', what: 'Real people, real hardship, real comebacks', kw: 'motivation inspiration resilience hardship comeback stories', tag: 'New' },
     ],
   },
   {

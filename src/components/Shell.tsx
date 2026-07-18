@@ -104,6 +104,8 @@ const nav: Nav[] = [
   { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/gene-info', label: 'Gene Info', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/ikigai', label: 'Ikigai & Legacy Letter', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/life-compass', label: 'Life Compass (Vision & Purpose)', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/resilience-stories', label: 'Resilience Stories', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/fasting', label: 'Fasting Timer', icon: IconTimer, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   // Calculators & labs
   { to: '/calculator-hub', label: '🔎 Calculator Hub (search all)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
