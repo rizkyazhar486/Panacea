@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Padua Prediction Score — Barbar, S., et al. (2010), J Thromb Haemost,
@@ -66,6 +67,7 @@ export function PaduaScore() {
             ? 'Pharmacologic thromboprophylaxis (e.g. LMWH) is recommended if bleeding risk permits — in the original cohort, ~11% of unprophylaxed high-risk patients developed VTE within 90 days vs 0.3% of low-risk.'
             : 'Routine pharmacologic prophylaxis is not indicated at this score — encourage early mobilization and reassess if the clinical picture changes.'}
         </p>
+        <CopyNote text={`Padua ${score}/20 — ${high ? 'high VTE risk (>=4): pharmacologic prophylaxis recommended if bleeding risk permits' : 'low VTE risk (<4): routine prophylaxis not indicated'} [Barbar 2010]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

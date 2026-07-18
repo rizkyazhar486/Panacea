@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Corrected Calcium — Payne, R.B., et al. (1973), BMJ, 4(5893):643-646.
@@ -72,6 +73,7 @@ export function CorrectedCalcium() {
           When available and in critically ill or borderline cases, a directly measured ionized calcium
           is more reliable than either total or corrected calcium.
         </p>
+        <CopyNote text={`Corrected Ca ${corrected.toFixed(1)} mg/dL (measured ${totalCa.toFixed(1)}, albumin ${albumin} g/dL) — ${correctedBand.label.toLowerCase()} [Payne 1973]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

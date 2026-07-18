@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Modified Duke Criteria — Durack, D.T., et al. (1994), Am J Med, 96:200-209;
@@ -94,6 +95,7 @@ export function DukeCriteria() {
           <Badge tone={verdict.tone}>{verdict.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">{verdict.note}</p>
+        <CopyNote text={`Modified Duke: ${majors} major + ${minors} minor${pathologic ? ' + pathologic criterion' : ''} — ${verdict.label} [Durack 1994; Li 2000]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

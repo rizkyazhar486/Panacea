@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Glasgow-Blatchford Score (GBS) — Blatchford, O., et al. (2000), Lancet,
@@ -118,6 +119,7 @@ export function GlasgowBlatchfordScore() {
             ? 'Score of 0: some guidelines support safe outpatient management without hospital admission.'
             : 'A score ≥1 generally warrants admission and inpatient endoscopy per most guidelines; higher scores correlate with need for transfusion, endoscopic intervention, or surgery.'}
         </p>
+        <CopyNote text={`Glasgow-Blatchford ${score} (BUN ${bun}, Hgb ${hgb} ${sex}, SBP ${sbp}) — ${lowRisk ? 'very low risk: outpatient management may be appropriate' : 'admission and inpatient endoscopy warranted'} [Blatchford 2000]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

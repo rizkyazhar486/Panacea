@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wells Score — two related, extremely widely used clinical decision rules
@@ -91,6 +92,7 @@ export function WellsScore() {
                 ? 'Score ≥2 — proceed to compression ultrasound.'
                 : 'Score ≤1 — a negative D-dimer can reasonably rule out DVT without imaging; if D-dimer is positive, proceed to ultrasound.'}
             </p>
+            <CopyNote text={`Wells DVT score ${dvtScore} — ${dvtLikely ? 'DVT likely (>=2): proceed to ultrasound' : 'DVT unlikely (<=1): D-dimer strategy appropriate'} [Wells 2003]`} />
           </Card>
         </>
       ) : (
@@ -119,6 +121,7 @@ export function WellsScore() {
                 ? 'Score >4 — proceed to CT pulmonary angiogram (or V/Q scan if contraindicated).'
                 : 'Score ≤4 — a negative D-dimer can reasonably rule out PE without imaging; if D-dimer is positive, proceed to CT pulmonary angiogram.'}
             </p>
+            <CopyNote text={`Wells PE score ${peScore} — ${peLikely ? 'PE likely (>4): proceed to CT-PA' : 'PE unlikely (<=4): D-dimer strategy appropriate'} [Wells 2000]`} />
           </Card>
         </>
       )}

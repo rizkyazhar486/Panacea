@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4Ts Score — Lo, G.K., et al. (2006), J Thromb Haemost, 4(4):759-765
@@ -89,6 +90,7 @@ export function FourTsScore() {
             ? 'A low score has a high negative predictive value — further HIT-specific testing is usually unnecessary.'
             : 'Consider stopping all heparin products and sending confirmatory HIT antibody testing while awaiting results.'}
         </p>
+        <CopyNote text={`4Ts ${score}/8 — ${result.label.toLowerCase()} of HIT (${result.prob}) [Lo 2006]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

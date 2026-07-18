@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Braden Scale — Bergstrom, N., Braden, B.J., et al. (1987), Nurs Res,
@@ -111,6 +112,7 @@ export function BradenScale() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.rec}</p>
+        <CopyNote text={`Braden ${total}/23 — ${result.label.toLowerCase()}: ${result.rec} [Bergstrom & Braden 1987]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BISAP Score — Wu, B.U., et al. (2008), Gut, 57(12):1698-1703. Bedside
@@ -60,6 +61,7 @@ export function BisapScore() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.pct}. A score ≥3 is associated with a marked step-up in mortality and risk of organ failure/necrosis.</p>
+        <CopyNote text={`BISAP ${score}/5 — ${result.label.toLowerCase()}, ${result.pct} [Wu 2008]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

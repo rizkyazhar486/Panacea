@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TIMI Risk Score for UA/NSTEMI — Antman, E.M., et al. (2000), JAMA,
@@ -64,6 +65,7 @@ export function TimiRiskScore() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">14-day risk of death, MI, or urgent revascularization: ~{RISK_BY_SCORE[score]}.</p>
+        <CopyNote text={`TIMI (UA/NSTEMI) ${score}/7 — ${result.label.toLowerCase()}, ~${RISK_BY_SCORE[score]} 14-day death/MI/urgent revascularization [Antman 2000]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

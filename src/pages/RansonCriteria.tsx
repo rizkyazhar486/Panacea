@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ranson's Criteria — Ranson, J.H.C., et al. (1974), Surg Gynecol Obstet,
@@ -82,6 +83,7 @@ export function RansonCriteria() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">A score ≥3 has historically been used as a threshold suggesting severe pancreatitis and possible ICU-level monitoring.</p>
+        <CopyNote text={`Ranson ${score}/11 — ${result.label} [Ranson 1974]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

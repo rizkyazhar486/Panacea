@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fractional Excretion of Sodium (FeNa) — Espinel, C.H. (1976), JAMA,
@@ -72,6 +73,7 @@ export function FenaCalculator() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">Reference: FeNa {'<'}1% prerenal · 1-2% indeterminate · {'>'}2% intrinsic renal.</p>
+        <CopyNote text={`FeNa ${fena.toFixed(2)}% (UNa ${urineNa}, PCr ${plasmaCr}, PNa ${plasmaNa}, UCr ${urineCr}${onDiuretics ? '; on diuretics — interpret cautiously' : ''}) — ${result.label} [Espinel 1976]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

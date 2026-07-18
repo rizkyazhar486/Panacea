@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CHA2DS2-VASc Score — Lip, G.Y.H., et al. (2010), Chest, 137(2):263-272.
@@ -72,6 +73,7 @@ export function StrokeRiskCalculator() {
           decision support — the final anticoagulation decision should weigh bleeding risk (e.g. via
           HAS-BLED), patient preference, and drug interactions, in discussion with the treating physician.
         </p>
+        <CopyNote text={`CHA2DS2-VASc ${score}/9 — ${rec.label} [Lip 2010]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
