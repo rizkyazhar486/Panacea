@@ -1625,7 +1625,7 @@ function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; c
 }
 
 export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string }) {
-  const { state, addSelfVital, addSleepLog, addMedReminder, markMedTaken, toggleEduBookmark, logVo2Max, addGoal, removeGoal } = useStore()
+  const { state, addSelfVital, addSleepLog, toggleEduBookmark, logVo2Max, addGoal, removeGoal } = useStore()
 
   // 1. Kalkulator BMI & Kalori Harian (TDEE)
   const [weight, setWeight] = useState(70)
@@ -1697,46 +1697,12 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const cooperVo2 = Math.round(((cooperMeters - 504.9) / 44.73) * 10) / 10
   const lastVo2 = state.vo2maxLog[0]
 
-  // 6. Pengingat Obat/Vitamin
-  const [medName, setMedName] = useState('')
-  const [medTime, setMedTime] = useState('08:00')
-  const today = new Date().toISOString().slice(0, 10)
-  const now = new Date()
-  const nowHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-
   // 7. Live Health News Ticker
   const [newsIdx, setNewsIdx] = useState(0)
   useEffect(() => {
     const t = setInterval(() => setNewsIdx((i) => (i + 1) % HEALTH_NEWS.length), 6000)
     return () => clearInterval(t)
   }, [])
-
-  // #2: real browser notifications for due medication reminders.
-  const [notifPerm, setNotifPerm] = useState<NotificationPermission>(typeof Notification !== 'undefined' ? Notification.permission : 'denied')
-  const notifiedRef = useRef<Set<string>>(new Set())
-  const requestNotif = async () => {
-    if (typeof Notification === 'undefined') return
-    const p = await Notification.requestPermission()
-    setNotifPerm(p)
-  }
-  useEffect(() => {
-    if (notifPerm !== 'granted') return
-    const check = () => {
-      const d = new Date()
-      const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-      const day = d.toISOString().slice(0, 10)
-      for (const m of state.medReminders) {
-        const key = `${m.id}-${day}`
-        if (hm >= m.time && !m.takenDates.includes(day) && !notifiedRef.current.has(key)) {
-          notifiedRef.current.add(key)
-          try { new Notification('💊 Time to take your medicine', { body: `${m.name} — scheduled ${m.time}`, tag: key }) } catch { /* ignore */ }
-        }
-      }
-    }
-    check()
-    const t = setInterval(check, 60_000)
-    return () => clearInterval(t)
-  }, [notifPerm, state.medReminders])
 
   // #4: targets & progress badges. Current values pulled from real tracked data.
   const myCheckInDates = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
@@ -1979,34 +1945,13 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         </div>
       </Card>
 
-      {/* 6. Pengingat Obat/Vitamin Realtime */}
-      <Card className="space-y-3">
-        <div className="flex items-center justify-between">
+      {/* 6. Pengingat Obat/Vitamin — full CRUD + real push notifications live on its own page */}
+      <Card className="flex items-center justify-between gap-3">
+        <div>
           <div className="text-xs font-black text-ink">💊 Medicine & Vitamin Reminder</div>
-          {notifPerm === 'granted'
-            ? <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-dark">🔔 Notifications on</span>
-            : <button onClick={requestNotif} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">Enable Notifications</button>}
+          <p className="mt-0.5 text-[11px] text-neutral-500">Get a push notification daily, even when the app is closed.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <input value={medName} onChange={(e) => setMedName(e.target.value)} placeholder="Medicine/vitamin name" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
-          <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} className={inputClass + ' min-w-[110px] max-w-[150px] flex-1 text-xs'} />
-          <button onClick={() => { addMedReminder(medName, medTime); setMedName('') }} disabled={!medName.trim()}
-            className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
-        </div>
-        {state.medReminders.length === 0 && <p className="text-xs text-neutral-400">No reminders yet. Add one above.</p>}
-        {state.medReminders.map((m) => {
-          const taken = m.takenDates.includes(today)
-          const due = nowHM >= m.time && !taken
-          return (
-            <div key={m.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-xs">
-              <span className={due ? 'font-bold text-red-500' : 'text-neutral-600'}>{m.name} · {m.time} {due ? '⏰ Time!' : ''}</span>
-              <button onClick={() => markMedTaken(m.id)} disabled={taken}
-                className="rounded-full px-2.5 py-1 text-[11px] font-bold disabled:opacity-50" style={{ background: taken ? '#E5F8EE' : '#00BF63', color: taken ? '#0B7A4B' : '#fff' }}>
-                {taken ? '✓ Taken' : 'Mark'}
-              </button>
-            </div>
-          )
-        })}
+        <a href="#/med-reminders" className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white">Manage →</a>
       </Card>
 
       {/* 8. Pusat Edukasi Cepat */}

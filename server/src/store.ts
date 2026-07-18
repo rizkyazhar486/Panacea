@@ -105,6 +105,21 @@ interface DB {
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
+  reminders?: Record<string, MedReminder[]> // userId -> medication reminders
+}
+
+// A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
+// computed client-side from the user's chosen local wall-clock time, so the
+// server never needs to know the user's timezone; it just compares
+// Date.now() against this instant and advances it by 24h after firing.
+export interface MedReminder {
+  id: string
+  medName: string
+  dose: string
+  timeOfDay: string // "HH:MM", for display only — nextFireAt is authoritative
+  nextFireAt: string
+  active: boolean
+  createdAt: string
 }
 
 // Professional onboarding application — submitted at sign-up by clinicians,
@@ -509,6 +524,41 @@ export function listPushSubs(userId: string): any[] {
 }
 export function allPushUserIds(): string[] {
   return Object.keys(db.pushSubs ?? {})
+}
+
+// Medication reminders — a scheduler loop (see index.ts) scans these every
+// minute and pushes a notification when nextFireAt has passed.
+export function listReminders(userId: string): MedReminder[] {
+  return db.reminders?.[userId] ?? []
+}
+export function addReminder(userId: string, r: Omit<MedReminder, 'id' | 'createdAt'>): MedReminder {
+  if (!db.reminders) db.reminders = {}
+  const rem: MedReminder = { ...r, id: uid(), createdAt: new Date().toISOString() }
+  db.reminders[userId] = [...(db.reminders[userId] ?? []), rem]
+  save()
+  return rem
+}
+export function updateReminder(userId: string, id: string, patch: Partial<MedReminder>): MedReminder | null {
+  if (!db.reminders?.[userId]) return null
+  const list = db.reminders[userId]
+  const i = list.findIndex((r) => r.id === id)
+  if (i === -1) return null
+  list[i] = { ...list[i], ...patch }
+  save()
+  return list[i]
+}
+export function removeReminder(userId: string, id: string) {
+  if (!db.reminders?.[userId]) return
+  db.reminders[userId] = db.reminders[userId].filter((r) => r.id !== id)
+  save()
+}
+// All (userId, reminder) pairs across every user — used by the scheduler.
+export function allReminders(): { userId: string; reminder: MedReminder }[] {
+  const out: { userId: string; reminder: MedReminder }[] = []
+  for (const [userId, list] of Object.entries(db.reminders ?? {})) {
+    for (const reminder of list) out.push({ userId, reminder })
+  }
+  return out
 }
 
 // In-app notification inbox (persists alongside push so notifications aren't
