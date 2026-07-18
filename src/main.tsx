@@ -88,6 +88,7 @@ const SleepApneaScreen = lazy(() => import('./pages/SleepApneaScreen').then((m) 
 const MentalHealthScreen = lazy(() => import('./pages/MentalHealthScreen').then((m) => ({ default: m.MentalHealthScreen })))
 const SubstanceUseScreen = lazy(() => import('./pages/SubstanceUseScreen').then((m) => ({ default: m.SubstanceUseScreen })))
 const EpworthSleepiness = lazy(() => import('./pages/EpworthSleepiness').then((m) => ({ default: m.EpworthSleepiness })))
+const StrokeRiskCalculator = lazy(() => import('./pages/StrokeRiskCalculator').then((m) => ({ default: m.StrokeRiskCalculator })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -180,6 +181,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/mental-health-screen" element={<MentalHealthScreen />} />
               <Route path="/substance-use-screen" element={<SubstanceUseScreen />} />
               <Route path="/epworth-sleepiness" element={<EpworthSleepiness />} />
+              <Route path="/stroke-risk" element={<StrokeRiskCalculator />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
