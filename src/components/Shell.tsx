@@ -93,6 +93,7 @@ const nav: Nav[] = [
   { to: '/caffeine', label: 'Caffeine & Sleep', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging
   { to: '/wellness-hub', label: '✨ Wellness Hub (all)', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/health-simulator', label: 'What-If Health Simulator', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/breathwork', label: 'Breathwork Pacer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/gratitude', label: 'Gratitude Journal', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },

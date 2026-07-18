@@ -121,6 +121,7 @@ const GraceScore = lazy(() => import('./pages/GraceScore').then((m) => ({ defaul
 const ClubHub = lazy(() => import('./pages/ClubHub').then((m) => ({ default: m.ClubHub })))
 const CalculatorHub = lazy(() => import('./pages/CalculatorHub').then((m) => ({ default: m.CalculatorHub })))
 const WellnessHub = lazy(() => import('./pages/WellnessHub').then((m) => ({ default: m.WellnessHub })))
+const HealthSimulator = lazy(() => import('./pages/HealthSimulator').then((m) => ({ default: m.HealthSimulator })))
 const Breathwork = lazy(() => import('./pages/Breathwork').then((m) => ({ default: m.Breathwork })))
 const GratitudeJournal = lazy(() => import('./pages/GratitudeJournal').then((m) => ({ default: m.GratitudeJournal })))
 const SleepDebt = lazy(() => import('./pages/SleepDebt').then((m) => ({ default: m.SleepDebt })))
@@ -250,6 +251,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/clubs" element={<ClubHub />} />
               <Route path="/calculator-hub" element={<CalculatorHub />} />
               <Route path="/wellness-hub" element={<WellnessHub />} />
+              <Route path="/health-simulator" element={<HealthSimulator />} />
               <Route path="/breathwork" element={<Breathwork />} />
               <Route path="/gratitude" element={<GratitudeJournal />} />
               <Route path="/sleep-debt" element={<SleepDebt />} />
