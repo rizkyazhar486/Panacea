@@ -54,6 +54,7 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
     title: 'Renal & Electrolytes',
     emoji: '🧪',
     tools: [
+      { to: '/findrisc', name: 'Diabetes Risk (FINDRISC)', what: '10-year type-2 diabetes risk — no blood test needed', keywords: 'diabetes findrisc prediabetes glucose prevention screening metabolic' },
       { to: '/creatinine-clearance', name: 'Creatinine Clearance', what: 'Cockcroft-Gault CrCl for renal drug dosing', keywords: 'renal kidney dosing cockcroft gault crcl' },
       { to: '/fena-calculator', name: 'FeNa', what: 'AKI: prerenal vs intrinsic (ATN)', keywords: 'aki acute kidney injury prerenal atn urine sodium' },
       { to: '/corrected-calcium', name: 'Corrected Calcium', what: 'Adjust total calcium for low albumin', keywords: 'calcium albumin hypocalcemia' },
