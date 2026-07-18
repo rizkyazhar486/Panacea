@@ -1,6 +1,11 @@
 // Parse health-app export files into the fields our Health Profile uses.
-// Supports Apple Health (export.xml) and WHOOP (physiological_cycles.csv).
-// Everything runs client-side — no file ever leaves the device during parsing.
+// Supports Apple Health (export.xml), WHOOP (physiological_cycles.csv or a
+// JSON export), and Garmin Connect (JSON export — "Export Your Data" from
+// Garmin Connect, or any third-party Garmin JSON dump). Garmin and WHOOP
+// don't offer a live auto-sync webhook the way Apple's Health Auto Export
+// app does, so for those two the flow is: export from the app, upload the
+// file here. Everything runs client-side — no file ever leaves the device
+// during parsing.
 
 export interface ImportResult {
   vo2max?: number
@@ -70,10 +75,72 @@ export function parseWhoopCsv(text: string): ImportResult {
   return prune(out)
 }
 
+// Generic JSON export parser — used for both WHOOP and Garmin Connect JSON
+// exports, whose exact schema varies by app version / export tool. Rather
+// than hard-coding one schema, we flatten the whole JSON tree and match keys
+// by a flexible pattern per field, so most real-world exports fill in
+// *something* even if the shape isn't exactly what we tested against. The UI
+// always shows exactly which fields were found ("Review, then press Save"),
+// so a partial or unusual match is never silently wrong.
+// Keys are normalized by stripping separators (_ - space) so "resting_heart_rate",
+// "restingHeartRate", and "resting-heart-rate" all become "restingheartrate" and
+// match one pattern — separator style varies a lot between export tools.
+function normalizeKey(k: string): string {
+  return k.toLowerCase().replace(/[_\-\s]/g, '')
+}
+function flattenJson(v: unknown, out: Record<string, number> = {}): Record<string, number> {
+  if (v == null) return out
+  if (typeof v === 'number' && Number.isFinite(v)) return out // bare numbers have no key context
+  if (Array.isArray(v)) { for (const item of v) flattenJson(item, out); return out }
+  if (typeof v === 'object') {
+    for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        out[normalizeKey(k)] = val // last occurrence wins — exports are usually chronological
+      } else {
+        flattenJson(val, out)
+      }
+    }
+  }
+  return out
+}
+function findKey(flat: Record<string, number>, patterns: RegExp[]): number | undefined {
+  for (const [k, v] of Object.entries(flat)) {
+    if (patterns.some((p) => p.test(k))) return v
+  }
+  return undefined
+}
+export function parseWearableJson(text: string, sourceHint?: 'WHOOP' | 'Garmin'): ImportResult {
+  let data: unknown
+  try { data = JSON.parse(text) } catch { return {} }
+  const flat = flattenJson(data)
+  const source = sourceHint
+    ?? (/whoop/i.test(text) ? 'WHOOP' : /garmin|connectiq|summaryid|bodybattery/i.test(text) ? 'Garmin' : 'Other')
+  const out: ImportResult = { source }
+  out.vo2max = findKey(flat, [/vo2max/])
+  out.restingHr = round(findKey(flat, [/restingheartrate/, /restinghr/]))
+  out.hrvMs = round(findKey(flat, [/hrvrmssd/, /heartratevariability/, /hrvms/, /^hrv$/]))
+  out.recoveryPct = round(findKey(flat, [/recoveryscore/, /bodybattery/]))
+  out.strain = findKey(flat, [/daystrain/, /^strain$/])
+  // Sleep duration units vary a lot by export — check the most specific
+  // (unambiguous unit) patterns first so e.g. seconds and minutes never mix up.
+  const sleepSec = findKey(flat, [/sleepdurationinseconds/, /totalsleepseconds/, /sleeptimeseconds/])
+  const sleepMilli = findKey(flat, [/sleepdurationinmilli/, /sleeptimemilli/, /totalsleepmilli/])
+  const sleepMin = findKey(flat, [/asleepduration/, /inbedduration/, /sleepminutes/, /sleepdurationminutes/])
+  const sleepHrs = findKey(flat, [/^sleephours?$/, /^sleeph$/])
+  if (typeof sleepSec === 'number') out.sleepH = +(sleepSec / 3600).toFixed(1)
+  else if (typeof sleepMilli === 'number') out.sleepH = +(sleepMilli / 3600000).toFixed(1)
+  else if (typeof sleepMin === 'number') out.sleepH = +(sleepMin / 60).toFixed(1)
+  else if (typeof sleepHrs === 'number') out.sleepH = sleepHrs
+  out.weightKg = findKey(flat, [/weightkg/, /weightinkilograms/, /^weight$/])
+  out.bodyFatPct = pct(findKey(flat, [/bodyfatpercentage/, /bodyfat/]))
+  return prune(out)
+}
+
 // Dispatch by file name / content sniffing.
 export function parseHealthFile(name: string, text: string): ImportResult {
   const lower = name.toLowerCase()
   if (lower.endsWith('.xml') || text.includes('<HealthData')) return parseAppleHealth(text)
+  if (lower.endsWith('.json') || /^\s*[[{]/.test(text)) return parseWearableJson(text)
   if (lower.endsWith('.csv') || text.includes(',')) return parseWhoopCsv(text)
   return {}
 }
