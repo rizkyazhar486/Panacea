@@ -115,6 +115,7 @@ const nav: Nav[] = [
   { to: '/has-bled-score', label: 'HAS-BLED Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/bisap-score', label: 'BISAP Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/glasgow-blatchford-score', label: 'Glasgow-Blatchford Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/timi-risk-score', label: 'TIMI Risk Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/data-lab', label: 'Data Lab (upload CSV)', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   // Kebugaran
