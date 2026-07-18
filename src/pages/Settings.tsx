@@ -468,15 +468,20 @@ function PushControl({ simple: S }: { simple: boolean }) {
       setBusy(false)
     }
   }
+  const REASON_LABEL: Record<string, string> = {
+    vapid_not_configured: 'The server isn\'t configured for push yet (ask the owner to check VAPID setup).',
+    no_subscriptions_on_file: 'No device on record — tap "Turn off" then "Turn on" to re-register this device.',
+    send_failed_see_server_logs: 'The server tried to send but it failed — ask the owner to check the server logs for a "[push]" error line.',
+  }
   async function test() {
     setMsg('Sending…')
-    let r = await api.pushTest().catch(() => ({ sent: 0 }))
-    if (r.sent === 0) {
+    let r: { sent: number; reason?: string } = await api.pushTest().catch(() => ({ sent: 0 }))
+    if (r.sent === 0 && r.reason === 'no_subscriptions_on_file') {
       // No device on record — re-register this browser and retry once.
       const ok = await resyncPush()
       if (ok) r = await api.pushTest().catch(() => ({ sent: 0 }))
     }
-    setMsg(r.sent > 0 ? 'Test notification sent ✅' : 'Couldn\'t reach a device — tap "Turn off" then "Turn on" to re-register this device.')
+    setMsg(r.sent > 0 ? 'Test notification sent ✅' : (r.reason && REASON_LABEL[r.reason]) || 'Couldn\'t reach a device — tap "Turn off" then "Turn on" to re-register this device.')
   }
 
   const label: Record<PushStatus, string> = {

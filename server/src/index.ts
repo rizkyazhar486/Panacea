@@ -36,6 +36,7 @@ import {
   listDoctors,
   addPushSub,
   removePushSub,
+  listPushSubs,
   allPushUserIds,
   findUserBySelfPatientId,
   getUserByEmail,
@@ -685,7 +686,17 @@ app.post('/api/push/unsubscribe', requireAuth, (req, res) => {
 app.post('/api/push/test', requireAuth, async (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const sent = await sendPush(u.id, { title: 'Panaceamed.id', body: 'Notifikasi berhasil diaktifkan ✅', url: './' })
-  res.json({ ok: true, sent })
+  // Diagnostic reason for the common "sent: 0" case, so the client (and the
+  // owner reading Render logs) doesn't have to guess why. Not exhaustive —
+  // VAPID init failures still only appear in the server console (see push.ts)
+  // since we don't want to leak internal error strings to the client.
+  let reason: string | undefined
+  if (sent === 0) {
+    if (!features.pushLive) reason = 'vapid_not_configured'
+    else if (listPushSubs(u.id).length === 0) reason = 'no_subscriptions_on_file'
+    else reason = 'send_failed_see_server_logs'
+  }
+  res.json({ ok: true, sent, reason })
 })
 // Owner broadcast — push an announcement to all opted-in subscribers.
 app.post('/api/push/broadcast', requireAuth, async (req, res) => {
