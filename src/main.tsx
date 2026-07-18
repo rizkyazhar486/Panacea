@@ -104,6 +104,7 @@ const BisapScore = lazy(() => import('./pages/BisapScore').then((m) => ({ defaul
 const GlasgowBlatchfordScore = lazy(() => import('./pages/GlasgowBlatchfordScore').then((m) => ({ default: m.GlasgowBlatchfordScore })))
 const TimiRiskScore = lazy(() => import('./pages/TimiRiskScore').then((m) => ({ default: m.TimiRiskScore })))
 const PercRule = lazy(() => import('./pages/PercRule').then((m) => ({ default: m.PercRule })))
+const SofaScore = lazy(() => import('./pages/SofaScore').then((m) => ({ default: m.SofaScore })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -212,6 +213,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/glasgow-blatchford-score" element={<GlasgowBlatchfordScore />} />
               <Route path="/timi-risk-score" element={<TimiRiskScore />} />
               <Route path="/perc-rule" element={<PercRule />} />
+              <Route path="/sofa-score" element={<SofaScore />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
