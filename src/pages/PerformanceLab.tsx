@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
+import { getDemo } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Performa — data-driven calculators for the full strength/endurance/speed
@@ -664,8 +665,8 @@ function KarvonenCard() {
 }
 
 function HrMaxCard() {
-  const [age, setAge] = useState(26)
-  const [g, setG] = useState<'M' | 'F'>('M')
+  const [age, setAge] = useState(() => getDemo().age || 26)
+  const [g, setG] = useState<'M' | 'F'>(() => getDemo().sex || 'M')
   const classic = 220 - age
   const tanaka = 208 - 0.7 * age
   const gulati = 206 - 0.88 * age
