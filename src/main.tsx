@@ -118,6 +118,7 @@ const CapriniScore = lazy(() => import('./pages/CapriniScore').then((m) => ({ de
 const DukeCriteria = lazy(() => import('./pages/DukeCriteria').then((m) => ({ default: m.DukeCriteria })))
 const BradenScale = lazy(() => import('./pages/BradenScale').then((m) => ({ default: m.BradenScale })))
 const GraceScore = lazy(() => import('./pages/GraceScore').then((m) => ({ default: m.GraceScore })))
+const ClubHub = lazy(() => import('./pages/ClubHub').then((m) => ({ default: m.ClubHub })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -240,6 +241,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/duke-criteria" element={<DukeCriteria />} />
               <Route path="/braden-scale" element={<BradenScale />} />
               <Route path="/grace-score" element={<GraceScore />} />
+              <Route path="/clubs" element={<ClubHub />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
