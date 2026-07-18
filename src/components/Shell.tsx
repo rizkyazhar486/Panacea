@@ -88,6 +88,7 @@ const nav: Nav[] = [
   { to: '/sleep-apnea-screen', label: 'Sleep Apnea Screening', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/mental-health-screen', label: 'Mental Health Screening', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/substance-use-screen', label: 'Alcohol & Tobacco Screening', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/epworth-sleepiness', label: 'Daytime Sleepiness (Epworth)', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/caffeine', label: 'Caffeine & Sleep', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
