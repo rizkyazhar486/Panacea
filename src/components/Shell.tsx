@@ -92,7 +92,12 @@ const nav: Nav[] = [
   { to: '/epworth-sleepiness', label: 'Daytime Sleepiness (Epworth)', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/caffeine', label: 'Caffeine & Sleep', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging
+  { to: '/wellness-hub', label: '✨ Wellness Hub (all)', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/breathwork', label: 'Breathwork Pacer', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/gratitude', label: 'Gratitude Journal', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/sleep-debt', label: 'Sleep Debt', icon: IconMoon, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
+  { to: '/thermal-therapy', label: 'Thermal Therapy', icon: IconFlame, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/aesthetic', label: 'Aesthetic Vitality', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
