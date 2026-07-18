@@ -113,6 +113,7 @@ const LdlCalculator = lazy(() => import('./pages/LdlCalculator').then((m) => ({ 
 const AaGradient = lazy(() => import('./pages/AaGradient').then((m) => ({ default: m.AaGradient })))
 const PaduaScore = lazy(() => import('./pages/PaduaScore').then((m) => ({ default: m.PaduaScore })))
 const RockallScore = lazy(() => import('./pages/RockallScore').then((m) => ({ default: m.RockallScore })))
+const CharlsonIndex = lazy(() => import('./pages/CharlsonIndex').then((m) => ({ default: m.CharlsonIndex })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
@@ -230,6 +231,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/aa-gradient" element={<AaGradient />} />
               <Route path="/padua-score" element={<PaduaScore />} />
               <Route path="/rockall-score" element={<RockallScore />} />
+              <Route path="/charlson-index" element={<CharlsonIndex />} />
               <Route path="/trials" element={<ClinicalTrials />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/athlete" element={<Athlete />} />
