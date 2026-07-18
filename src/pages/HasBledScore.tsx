@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HAS-BLED — Pisters, R., et al. (2010), Chest, 138(5):1093-1100. Estimates
@@ -67,6 +68,7 @@ export function HasBledScore() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.bleed}. Score ≥3 warrants caution and correction of modifiable risk factors, with regular clinical review.</p>
+        <CopyNote text={`HAS-BLED ${score}/9 — ${result.label.toLowerCase()}, ${result.bleed} [Pisters 2010]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

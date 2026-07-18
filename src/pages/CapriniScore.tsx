@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Caprini Score (2005 version) — Caprini, J.A. (2005), Dis Mon, 51(2-3):70-78;
@@ -123,6 +124,7 @@ export function CapriniScore() {
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{result.rec}</p>
+        <CopyNote text={`Caprini ${score} — ${result.label.toLowerCase()}: ${result.rec} [Caprini 2005]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

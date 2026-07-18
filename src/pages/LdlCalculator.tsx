@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LDL Cholesterol (calculated) — Friedewald, W.T., et al. (1972), Clin Chem,
@@ -85,6 +86,7 @@ export function LdlCalculator() {
           e.g. {'<'}70 mg/dL (or lower) is commonly targeted after a cardiovascular event. Discuss
           individual goals with the treating clinician.
         </p>
+        <CopyNote text={tgTooHigh ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg} >=400 so Friedewald LDL not valid — direct LDL advised)` : `LDL ${ldl.toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band.label}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

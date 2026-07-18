@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PERC Rule (Pulmonary Embolism Rule-out Criteria) — Kline, J.A., et al.
@@ -79,6 +80,7 @@ export function PercRule() {
             ? 'All 8 criteria negative, but the rule only applies to patients already judged low-risk by gestalt — proceed with D-dimer/imaging per standard workup.'
             : 'One or more criteria positive — PERC cannot rule out PE; proceed with D-dimer and/or imaging per standard workup.'}
         </p>
+        <CopyNote text={`PERC ${positiveCount}/8 positive${lowGestalt ? ', low pretest gestalt' : ', gestalt NOT low-risk'} — ${percNegative && lowGestalt ? 'PERC-negative: PE reasonably excluded without further testing' : 'PERC does not exclude PE: proceed with D-dimer/imaging'} [Kline 2004]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

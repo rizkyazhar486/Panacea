@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rockall Score — Rockall, T.A., et al. (1996), Gut, 38(3):316-321. Mortality
@@ -109,6 +110,7 @@ export function RockallScore() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">{band.note}</p>
         {postEndoscopy && <p className="mt-2 text-[11px] text-neutral-400">Clinical component alone: {preScore} / 7.</p>}
+        <CopyNote text={`Rockall ${postEndoscopy ? 'complete ' + fullScore + '/11' : 'clinical ' + preScore + '/7'} — ${band.label.toLowerCase()}: ${band.note} [Rockall 1996]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">

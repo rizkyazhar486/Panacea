@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
+import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Charlson Comorbidity Index (CCI) — Charlson, M.E., et al. (1987),
@@ -109,6 +110,7 @@ export function CharlsonIndex() {
           <Badge tone={tone}>Estimated 10-year survival</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-400">10-yr survival = 0.983 ^ exp(0.9 × score) — a population-level estimate from the original cohort, not an individual prognosis.</p>
+        <CopyNote text={`Charlson Comorbidity Index ${total} (comorbidity ${comorbidityPts} + age ${agePts(age)}) — est. 10-year survival ${survival10y.toFixed(0)}% [Charlson 1987]`} />
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
