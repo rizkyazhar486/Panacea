@@ -120,6 +120,7 @@ const nav: Nav[] = [
   { to: '/creatinine-clearance', label: 'Creatinine Clearance (Cockcroft-Gault)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/corrected-calcium', label: 'Corrected Calcium', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/meld-score', label: 'MELD-Na Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
+  { to: '/maddrey-score', label: "Maddrey's Discriminant Function", icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/child-pugh-score', label: 'Child-Pugh Score', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/fena-calculator', label: 'FeNa Calculator', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/ranson-criteria', label: "Ranson's Criteria", icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },

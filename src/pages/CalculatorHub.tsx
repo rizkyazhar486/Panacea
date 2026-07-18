@@ -43,6 +43,7 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
     emoji: '🫀',
     tools: [
       { to: '/meld-score', name: 'MELD-Na', what: 'Liver disease severity / transplant priority + serial trend', keywords: 'liver cirrhosis transplant meld' },
+      { to: '/maddrey-score', name: "Maddrey's Discriminant Function", what: 'Severe alcoholic hepatitis — the corticosteroid decision', keywords: 'alcoholic hepatitis steroid prednisolone maddrey liver' },
       { to: '/child-pugh-score', name: 'Child-Pugh', what: 'Cirrhosis class A/B/C, surgical risk + serial trend', keywords: 'liver cirrhosis ascites surgical risk' },
       { to: '/glasgow-blatchford-score', name: 'Glasgow-Blatchford', what: 'Upper GI bleed: who needs admission (pre-endoscopy)', keywords: 'gi bleed bleeding hematemesis melena admission' },
       { to: '/rockall-score', name: 'Rockall Score', what: 'Upper GI bleed: rebleeding/mortality (post-endoscopy)', keywords: 'gi bleed endoscopy rebleeding mortality' },
