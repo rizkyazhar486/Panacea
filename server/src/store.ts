@@ -106,6 +106,7 @@ interface DB {
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
+  meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
 }
 
 // A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
@@ -144,6 +145,31 @@ export interface Application {
   decidedAt?: string
 }
 
+// A real, user-created Club Hub meet — join counts are the actual number of
+// distinct accounts in `participants`, never a preset/fake number.
+export interface Meet {
+  id: string
+  title: string
+  club: string
+  tag: string
+  venue: string
+  address: string
+  day: number // days from now (0 = today)
+  time: string // "HH:MM"
+  durH: number
+  cap: number
+  feeRp: number
+  notes: string[]
+  lat: number
+  lng: number
+  emoji: string
+  hostEmail: string
+  hostName: string
+  participants: string[] // emails who RSVP'd "joined"
+  maybes: string[] // emails who RSVP'd "maybe"
+  createdAt: string
+}
+
 // Manual (bank-transfer) top-up request — user transfers, owner approves to credit.
 export interface ManualTopup {
   id: string
@@ -155,6 +181,22 @@ export interface ManualTopup {
   status: 'pending' | 'approved' | 'rejected'
   at: string
   decidedAt?: string
+}
+
+// A handful of officially-hosted recurring sessions to seed a brand-new
+// deployment so Club Hub isn't empty on day one. Unlike the old client-side
+// mock data, the join count is real and starts at zero — these grow only as
+// actual accounts RSVP, same as any user-created meet.
+function seedMeets(): Meet[] {
+  const host = { hostEmail: 'community@panaceamed.id', hostName: 'Panaceamed Community' }
+  const now = new Date().toISOString()
+  return [
+    { id: 'seed-run', title: 'Weekend Long Run', club: 'Sunrise Run Club', tag: 'Social', venue: 'GBK Senayan Loop', address: 'Gelora Bung Karno, Jakarta Pusat', day: 0, time: '06:00', durH: 2, cap: 40, feeRp: 0, notes: ['Pace groups: 6:30, 7:30, 8:30 /km', 'Conversational pace welcome'], lat: -6.2185, lng: 106.8022, emoji: '🏃', participants: [], maybes: [], createdAt: now, ...host },
+    { id: 'seed-padel', title: 'Americano Mixer', club: 'Padel Pulse', tag: 'Americano', venue: 'Padel Parc Simprug', address: 'Jl. Teuku Nyak Arief, Jakarta Selatan', day: 0, time: '07:30', durH: 2, cap: 12, feeRp: 85000, notes: ['Fee includes 2h court + balls', 'Bring your own racket (rental available)'], lat: -6.2242, lng: 106.783, emoji: '🎾', participants: [], maybes: [], createdAt: now, ...host },
+    { id: 'seed-badminton', title: 'Doubles Rotation Night', club: 'Shuttle Squad', tag: 'Social', venue: 'GOR Bulungan', address: 'Jl. Bulungan No.1, Jakarta Selatan', day: 0, time: '16:00', durH: 3, cap: 16, feeRp: 45000, notes: ['Fee includes 3h court + shuttlecocks'], lat: -6.2436, lng: 106.7981, emoji: '🏸', participants: [], maybes: [], createdAt: now, ...host },
+    { id: 'seed-walk', title: 'Walk & Talk: Heart Health', club: 'Walk With A Doctor', tag: 'Health walk', venue: 'Taman Menteng', address: 'Jl. HOS Cokroaminoto, Jakarta Pusat', day: 1, time: '06:30', durH: 1.5, cap: 25, feeRp: 0, notes: ['Q&A on blood pressure & cholesterol while walking'], lat: -6.1963, lng: 106.8296, emoji: '🩺', participants: [], maybes: [], createdAt: now, ...host },
+    { id: 'seed-yoga', title: 'Sunrise Vinyasa', club: 'Morning Flow Yoga', tag: 'Class', venue: 'Taman Langsat', address: 'Jl. Barito, Kebayoran Baru', day: 1, time: '07:00', durH: 1, cap: 20, feeRp: 30000, notes: ['Mats provided for first-timers'], lat: -6.241, lng: 106.794, emoji: '🧘', participants: [], maybes: [], createdAt: now, ...host },
+  ]
 }
 
 let db: DB = {
@@ -170,6 +212,7 @@ let db: DB = {
   creatorSubs: [],
   manualTopups: [],
   applications: [],
+  meets: seedMeets(),
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -322,6 +365,39 @@ export function updatePost(id: string, email: string, patch: Partial<Post>): Pos
   save()
   return p
 }
+// --- Club Hub meets (real, user-created; join counts are actual RSVPs) ---
+export function listMeets(): Meet[] {
+  if (!db.meets) db.meets = []
+  // Drop meets more than a day in the past so the list doesn't grow forever.
+  db.meets = db.meets.filter((m) => m.day >= -1)
+  return db.meets
+}
+export function addMeet(m: Meet) {
+  if (!db.meets) db.meets = []
+  db.meets.unshift(m)
+  save()
+}
+export function rsvpMeet(id: string, email: string, status: 'joined' | 'maybe' | 'none'): { meet?: Meet; full?: boolean } {
+  const m = db.meets?.find((x) => x.id === id)
+  if (!m) return {}
+  const wasJoined = m.participants.includes(email)
+  if (status === 'joined' && !wasJoined && m.participants.length >= m.cap) return { meet: m, full: true }
+  m.participants = m.participants.filter((e) => e !== email)
+  m.maybes = m.maybes.filter((e) => e !== email)
+  if (status === 'joined') m.participants.push(email)
+  else if (status === 'maybe') m.maybes.push(email)
+  save()
+  return { meet: m }
+}
+// Remove a meet (host-only). Returns true if removed.
+export function deleteMeet(id: string, email: string): boolean {
+  const m = db.meets?.find((x) => x.id === id)
+  if (!m || m.hostEmail !== email) return false
+  db.meets = (db.meets ?? []).filter((x) => x.id !== id)
+  save()
+  return true
+}
+
 // Toggle a viewer's reaction emoji on a post (cross-user, visible to everyone).
 export function reactPost(id: string, emoji: string, email: string): Post | undefined {
   const p = db.posts?.find((x) => x.id === id)
