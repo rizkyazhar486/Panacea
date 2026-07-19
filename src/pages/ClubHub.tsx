@@ -4,56 +4,52 @@ import { createPortal } from 'react-dom'
 const MeetMap = lazy(() => import('../components/MeetMap'))
 import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
+import { api, type BackendMeet } from '../lib/api'
+import { useStore } from '../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Club Hub — community sports & health clubs, scheduled meets with join
 // capacity, meet detail (participants, fee, notes, calendar export, maps
-// link), and a personal "My Hub" schedule of everything joined. Inspired by
-// community-sport apps (clubs / meets / detail pages), adapted to
-// Panaceamed's health focus. Client-side only: seeded catalog + localStorage
-// persistence. Calendar export generates a standards-compliant .ics file
-// locally; the maps link opens the venue in Google Maps — no API keys.
+// link), and a personal "My Hub" schedule of everything joined. Meets are
+// real and server-persisted (see server/src/store.ts `meets`) — anyone can
+// host one, and the "X/Y joined" count is the actual number of accounts that
+// RSVP'd, not a preset number. Calendar export generates a standards-
+// compliant .ics file locally; the maps link opens the venue in Google Maps
+// — no API keys for either.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LS_KEY = 'pmd_clubhub_v1'
 
-interface Persisted { joinedMeets: string[]; maybeMeets: string[]; joinedClubs: string[]; joinedEvents: string[] }
+interface Persisted { joinedClubs: string[]; joinedEvents: string[] }
 function loadPersisted(): Persisted {
   try {
     const raw = localStorage.getItem(LS_KEY)
-    if (raw) return { joinedMeets: [], maybeMeets: [], joinedClubs: [], joinedEvents: [], ...JSON.parse(raw) }
+    if (raw) return { joinedClubs: [], joinedEvents: [], ...JSON.parse(raw) }
   } catch { /* ignore */ }
-  return { joinedMeets: [], maybeMeets: [], joinedClubs: [], joinedEvents: [] }
+  return { joinedClubs: [], joinedEvents: [] }
 }
 
-interface Club { id: string; name: string; emoji: string; members: number; level: string; sport: string; desc: string }
+// No fake member counts: this is a directory of sports/formats you can host or
+// join a real meet under. "Members" isn't shown because Club Hub doesn't yet
+// track club-level membership separately from meet RSVPs — only claim numbers
+// that are real.
+interface Club { id: string; name: string; emoji: string; level: string; sport: string; desc: string }
 const CLUBS: Club[] = [
-  { id: 'sunrise-run', name: 'Sunrise Run Club', emoji: '🏃', members: 486, level: 'All levels', sport: 'Running', desc: 'Easy-pace social runs every weekend morning — zone 2, no one left behind.' },
-  { id: 'padel-pulse', name: 'Padel Pulse', emoji: '🎾', members: 261, level: 'Beginner-Intermediate', sport: 'Padel', desc: 'Social padel mixers and Americano-format sessions.' },
-  { id: 'shuttle-squad', name: 'Shuttle Squad', emoji: '🏸', members: 342, level: 'All levels', sport: 'Badminton', desc: 'Doubles rotation nights, casual and competitive courts.' },
-  { id: 'iron-circle', name: 'Iron Circle', emoji: '🏋️', members: 158, level: 'Intermediate', sport: 'Strength', desc: 'Progressive-overload group lifting with form-check culture.' },
-  { id: 'dokter-jalan', name: 'Walk With A Doctor', emoji: '🩺', members: 97, level: 'All levels', sport: 'Health walk', desc: 'Clinician-led weekend walks — bring your questions, leave with 8,000 steps.' },
-  { id: 'flow-yoga', name: 'Morning Flow Yoga', emoji: '🧘', members: 214, level: 'All levels', sport: 'Yoga', desc: 'Sunrise vinyasa in the park; mats provided for first-timers.' },
+  { id: 'sunrise-run', name: 'Sunrise Run Club', emoji: '🏃', level: 'All levels', sport: 'Running', desc: 'Easy-pace social runs every weekend morning — zone 2, no one left behind.' },
+  { id: 'padel-pulse', name: 'Padel Pulse', emoji: '🎾', level: 'Beginner-Intermediate', sport: 'Padel', desc: 'Social padel mixers and Americano-format sessions.' },
+  { id: 'shuttle-squad', name: 'Shuttle Squad', emoji: '🏸', level: 'All levels', sport: 'Badminton', desc: 'Doubles rotation nights, casual and competitive courts.' },
+  { id: 'iron-circle', name: 'Iron Circle', emoji: '🏋️', level: 'Intermediate', sport: 'Strength', desc: 'Progressive-overload group lifting with form-check culture.' },
+  { id: 'dokter-jalan', name: 'Walk With A Doctor', emoji: '🩺', level: 'All levels', sport: 'Health walk', desc: 'Clinician-led weekend walks — bring your questions, leave with 8,000 steps.' },
+  { id: 'flow-yoga', name: 'Morning Flow Yoga', emoji: '🧘', level: 'All levels', sport: 'Yoga', desc: 'Sunrise vinyasa in the park; mats provided for first-timers.' },
 ]
 
-interface Meet {
-  id: string; day: number; time: string; durH: number; title: string; club: string; tag: string
-  venue: string; address: string; km: number; cap: number; joined: number; emoji: string
-  feeRp: number; hosts: string[]; notes: string[]
-  lat: number; lng: number
-}
-const MEETS: Meet[] = [
-  { id: 'm1', day: 0, time: '06:00', durH: 2, title: 'Weekend Long Run 10K', club: 'Sunrise Run Club', tag: 'Social', venue: 'GBK Senayan Loop', address: 'Gelora Bung Karno, Jakarta Pusat', km: 3.2, cap: 35, joined: 27, emoji: '🏃', feeRp: 0, hosts: ['RA', 'DW'], notes: ['Pace groups: 6:30, 7:30, 8:30 /km', 'Water station at km 5', 'Post-run coffee nearby (self-pay)'], lat: -6.2185, lng: 106.8022 },
-  { id: 'm2', day: 0, time: '07:30', durH: 2, title: 'Americano Mixer', club: 'Padel Pulse', tag: 'Americano', venue: 'Padel Parc Simprug', address: 'Jl. Teuku Nyak Arief, Jakarta Selatan', km: 4.5, cap: 12, joined: 11, emoji: '🎾', feeRp: 85000, hosts: ['FK'], notes: ['Fee includes 2h court + balls', 'Bring your own racket (rental available)'], lat: -6.2242, lng: 106.783 },
-  { id: 'm3', day: 0, time: '16:00', durH: 3, title: 'Doubles Rotation Night', club: 'Shuttle Squad', tag: 'Social', venue: 'GOR Bulungan', address: 'Jl. Bulungan No.1, Jakarta Selatan', km: 5.8, cap: 16, joined: 9, emoji: '🏸', feeRp: 45000, hosts: ['AB', 'TN'], notes: ['Fee includes 3h court + shuttlecocks', 'Mineral water provided'], lat: -6.2436, lng: 106.7981 },
-  { id: 'm4', day: 1, time: '06:30', durH: 1.5, title: 'Walk & Talk: Heart Health', club: 'Walk With A Doctor', tag: 'Health walk', venue: 'Taman Menteng', address: 'Jl. HOS Cokroaminoto, Jakarta Pusat', km: 2.1, cap: 25, joined: 14, emoji: '🩺', feeRp: 0, hosts: ['dr'], notes: ['Q&A on blood pressure & cholesterol while walking', 'Wear comfortable shoes'], lat: -6.1963, lng: 106.8296 },
-  { id: 'm5', day: 1, time: '07:00', durH: 1, title: 'Sunrise Vinyasa', club: 'Morning Flow Yoga', tag: 'Class', venue: 'Taman Langsat', address: 'Jl. Barito, Kebayoran Baru', km: 3.9, cap: 20, joined: 17, emoji: '🧘', feeRp: 30000, hosts: ['YS'], notes: ['Mats provided for first-timers', 'Arrive 10 min early'], lat: -6.241, lng: 106.794 },
-  { id: 'm6', day: 2, time: '19:00', durH: 1.5, title: 'Push-Pull-Legs: Pull Day', club: 'Iron Circle', tag: 'Training', venue: 'Ration Strength Gym', address: 'Jl. Wolter Monginsidi, Jakarta Selatan', km: 6.4, cap: 10, joined: 6, emoji: '🏋️', feeRp: 50000, hosts: ['GH'], notes: ['Day pass included in fee', 'Program sheet shared in advance'], lat: -6.2378, lng: 106.8009 },
-  { id: 'm7', day: 3, time: '19:30', durH: 2, title: 'Beginner Padel Clinic', club: 'Padel Pulse', tag: 'Class', venue: 'Republic Padel', address: 'Simprug, Jakarta Selatan', km: 3.8, cap: 8, joined: 8, emoji: '🎾', feeRp: 120000, hosts: ['FK', 'CO'], notes: ['Coached fundamentals: grip, wall play, positioning', 'All equipment provided'], lat: -6.226, lng: 106.781 },
-  { id: 'm8', day: 4, time: '06:00', durH: 1.5, title: 'Interval Tempo Session', club: 'Sunrise Run Club', tag: 'Training', venue: 'Stadion Madya Track', address: 'Senayan, Jakarta Pusat', km: 3.0, cap: 30, joined: 12, emoji: '🏃', feeRp: 0, hosts: ['DW'], notes: ['6×800m @ 5K effort', 'Track etiquette briefing for first-timers'], lat: -6.2166, lng: 106.8033 },
-  { id: 'm9', day: 5, time: '16:30', durH: 3, title: 'Mixed Doubles Ladder', club: 'Shuttle Squad', tag: 'Competitive', venue: 'GOR Pertamina', address: 'Simprug, Jakarta Selatan', km: 7.2, cap: 24, joined: 19, emoji: '🏸', feeRp: 55000, hosts: ['AB'], notes: ['Ladder points count toward monthly ranking'], lat: -6.2265, lng: 106.7828 },
-  { id: 'm10', day: 6, time: '06:00', durH: 1.5, title: 'Recovery 5K + Coffee', club: 'Sunrise Run Club', tag: 'Social', venue: 'FX Sudirman Loop', address: 'Jl. Jend. Sudirman, Jakarta Pusat', km: 2.8, cap: 40, joined: 22, emoji: '🏃', feeRp: 0, hosts: ['RA'], notes: ['Conversational pace only — HR zone 1-2'], lat: -6.2247, lng: 106.8028 },
-]
+// Meet is the server's BackendMeet — a real, shared record. "Joined" count
+// is always `participants.length`, never a stored number, so it can't drift
+// from reality.
+type Meet = BackendMeet
+
+const TAGS = ['Social', 'Training', 'Class', 'Competitive', 'Health walk', 'Americano'] as const
+const EMOJI_BY_SPORT: Record<string, string> = { Running: '🏃', Padel: '🎾', Badminton: '🏸', Strength: '🏋️', 'Health walk': '🩺', Yoga: '🧘' }
 
 interface Evt { id: string; title: string; org: string; date: string; format: string; teams: number; status: 'registration' | 'happening'; emoji: string; venue: string }
 const EVENTS: Evt[] = [
@@ -110,36 +106,54 @@ type Tab = 'myhub' | 'meets' | 'clubs' | 'events'
 type Rsvp = 'none' | 'maybe' | 'joined'
 
 export function ClubHub() {
+  const { account } = useStore()
+  const email = account?.email || ''
   const [tab, setTab] = useState<Tab>('meets')
   const [day, setDay] = useState(0)
   const [meetView, setMeetView] = useState<'list' | 'map'>('list')
   const [query, setQuery] = useState('')
   const [detail, setDetail] = useState<Meet | null>(null)
   const [p, setP] = useState<Persisted>(loadPersisted)
+  const [meets, setMeets] = useState<Meet[]>([])
+  const [loadingMeets, setLoadingMeets] = useState(true)
+  const [showHost, setShowHost] = useState(false)
+  const [rsvpError, setRsvpError] = useState('')
 
   useEffect(() => {
     try { localStorage.setItem(LS_KEY, JSON.stringify(p)) } catch { /* ignore */ }
   }, [p])
 
-  const rsvpOf = (id: string): Rsvp => (p.joinedMeets.includes(id) ? 'joined' : p.maybeMeets.includes(id) ? 'maybe' : 'none')
-  const setRsvp = (id: string, r: Rsvp) =>
-    setP((s) => ({
-      ...s,
-      joinedMeets: r === 'joined' ? [...new Set([...s.joinedMeets, id])] : s.joinedMeets.filter((x) => x !== id),
-      maybeMeets: r === 'maybe' ? [...new Set([...s.maybeMeets, id])] : s.maybeMeets.filter((x) => x !== id),
-    }))
+  const refreshMeets = () => {
+    api.meets().then(setMeets).catch(() => {}).finally(() => setLoadingMeets(false))
+  }
+  useEffect(() => { refreshMeets() }, [])
+
+  const rsvpOf = (m: Meet): Rsvp => (m.participants.includes(email) ? 'joined' : m.maybes.includes(email) ? 'maybe' : 'none')
+  const setRsvp = async (id: string, r: Rsvp) => {
+    setRsvpError('')
+    try {
+      const updated = await api.rsvpMeet(id, r)
+      setMeets((list) => list.map((m) => (m.id === id ? updated : m)))
+      setDetail((d) => (d && d.id === id ? updated : d))
+    } catch (e) {
+      setRsvpError(e instanceof Error && e.message === 'full' ? 'This meet just filled up — try another one.' : 'Could not update your RSVP — check your connection and try again.')
+    }
+  }
   const toggleIn = (list: 'joinedClubs' | 'joinedEvents', id: string) =>
     setP((s) => ({ ...s, [list]: s[list].includes(id) ? s[list].filter((x) => x !== id) : [...s[list], id] }))
 
   const q = query.trim().toLowerCase()
   const meetsToday = useMemo(
-    () => MEETS.filter((m) => m.day === day && (!q || (m.title + m.club + m.venue + m.tag).toLowerCase().includes(q))).sort((a, b) => a.time.localeCompare(b.time)),
-    [day, q],
+    () => meets.filter((m) => m.day === day && (!q || (m.title + m.club + m.venue + m.tag).toLowerCase().includes(q))).sort((a, b) => a.time.localeCompare(b.time)),
+    [meets, day, q],
   )
   const clubsFiltered = CLUBS.filter((c) => !q || (c.name + c.sport + c.desc).toLowerCase().includes(q))
   const eventsFiltered = EVENTS.filter((e) => !q || (e.title + e.org + e.format).toLowerCase().includes(q))
 
-  const myMeets = MEETS.filter((m) => rsvpOf(m.id) !== 'none').sort((a, b) => a.day - b.day || a.time.localeCompare(b.time))
+  const myMeets = useMemo(
+    () => meets.filter((m) => rsvpOf(m) !== 'none').sort((a, b) => a.day - b.day || a.time.localeCompare(b.time)),
+    [meets, email],
+  )
   const myMeetsByDay = useMemo(() => {
     const groups: { day: number; meets: Meet[] }[] = []
     for (const m of myMeets) {
@@ -148,12 +162,12 @@ export function ClubHub() {
       else groups.push({ day: m.day, meets: [m] })
     }
     return groups
-  }, [p.joinedMeets, p.maybeMeets]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [myMeets])
   const myClubs = CLUBS.filter((c) => p.joinedClubs.includes(c.id))
   const myEvents = EVENTS.filter((e) => p.joinedEvents.includes(e.id))
 
   const capBadge = (m: Meet) => {
-    const count = m.joined + (rsvpOf(m.id) === 'joined' ? 1 : 0)
+    const count = m.participants.length
     return (
       <span className={`rounded-full px-2 py-0.5 text-[11px] font-black ${count >= m.cap ? 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300'}`}>
         {count}/{m.cap}
@@ -227,7 +241,7 @@ export function ClubHub() {
               <div className="border-b border-dashed border-neutral-200 pb-2 text-base font-black text-ink dark:border-white/10 dark:text-white">{dayName(g.day)}</div>
               <div className="mt-2 space-y-3">
                 {g.meets.map((m) => {
-                  const r = rsvpOf(m.id)
+                  const r = rsvpOf(m)
                   return (
                     <button key={m.id} onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
                       <div className="w-14 shrink-0 text-center">
@@ -239,7 +253,7 @@ export function ClubHub() {
                         <span className={`mt-1 inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${r === 'joined' ? 'border-brand text-brand-dark' : 'border-amber-400 text-amber-600 dark:text-amber-300'}`}>
                           {r === 'joined' ? 'Joining' : 'Maybe'}
                         </span>
-                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-400"><IconMapPin size={12} />{m.venue} ({m.km.toFixed(1)} km)</div>
+                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-400"><IconMapPin size={12} />{m.venue}</div>
                       </div>
                       {capBadge(m)}
                     </button>
@@ -269,15 +283,24 @@ export function ClubHub() {
             })}
             <button
               onClick={() => setMeetView((v) => (v === 'list' ? 'map' : 'list'))}
-              className="ml-auto flex min-w-[64px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-center text-neutral-500 transition dark:bg-white/10 dark:text-neutral-300"
+              className="flex min-w-[64px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-center text-neutral-500 transition dark:bg-white/10 dark:text-neutral-300"
             >
               <span className="text-lg leading-none">{meetView === 'list' ? '🗺️' : '📋'}</span>
               <span className="mt-0.5 text-[10px] font-bold tracking-wide">{meetView === 'list' ? 'MAP' : 'LIST'}</span>
             </button>
+            <button
+              onClick={() => setShowHost(true)}
+              className="ml-auto flex min-w-[64px] flex-col items-center justify-center rounded-2xl bg-brand px-3 py-2 text-center text-white transition"
+            >
+              <span className="text-lg leading-none">＋</span>
+              <span className="mt-0.5 text-[10px] font-bold tracking-wide">HOST</span>
+            </button>
           </div>
 
-          {meetsToday.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day.</Card>
+          {loadingMeets && <Card className="!p-5 text-center text-sm text-neutral-400">Loading meets…</Card>}
+
+          {!loadingMeets && meetsToday.length === 0 && (
+            <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
           )}
 
           {meetView === 'map' && meetsToday.length > 0 && (
@@ -286,17 +309,17 @@ export function ClubHub() {
                 <MeetMap
                   pins={meetsToday.map((m) => ({
                     id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
-                    count: m.joined + (rsvpOf(m.id) === 'joined' ? 1 : 0), cap: m.cap,
+                    count: m.participants.length, cap: m.cap,
                   }))}
-                  onSelect={(id) => { const m = MEETS.find((x) => x.id === id); if (m) setDetail(m) }}
+                  onSelect={(id) => { const m = meets.find((x) => x.id === id); if (m) setDetail(m) }}
                 />
               </Suspense>
-              <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">Pin number = people joined · red = full · tap a pin for details</p>
+              <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">Pin number = people actually joined · red = full · tap a pin for details</p>
             </Card>
           )}
 
           {meetView === 'list' && meetsToday.map((m) => {
-            const r = rsvpOf(m.id)
+            const r = rsvpOf(m)
             return (
               <Card key={m.id} className="!p-4">
                 <button onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
@@ -307,7 +330,6 @@ export function ClubHub() {
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
                       <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{m.tag}</span>
                       <span className="flex items-center gap-1"><IconMapPin size={12} />{m.venue}</span>
-                      <span>· {m.km.toFixed(1)} km</span>
                       <span className="font-semibold">{fmtFee(m.feeRp)}</span>
                     </div>
                   </div>
@@ -334,7 +356,6 @@ export function ClubHub() {
               <div className="min-w-0 flex-1">
                 <div className="text-[15px] font-black text-ink dark:text-white">{c.name}</div>
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
-                  <span className="flex items-center gap-1"><IconUsers size={12} />{(c.members + (member ? 1 : 0)).toLocaleString()} members</span>
                   <span className="flex items-center gap-1"><IconActivity size={12} />{c.level}</span>
                   <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{c.sport}</span>
                 </div>
@@ -380,10 +401,12 @@ export function ClubHub() {
 
       {detail && (() => {
         const m = detail
-        const r = rsvpOf(m.id)
-        const count = m.joined + (r === 'joined' ? 1 : 0)
+        const r = rsvpOf(m)
+        const count = m.participants.length
         const full = count >= m.cap && r !== 'joined'
+        const isHost = m.hostEmail === email
         const start = meetDate(m)
+        const initials = (name: string) => name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
         return createPortal(
           <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Meet detail" onClick={() => setDetail(null)}>
             <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 dark:bg-neutral-900 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
@@ -401,22 +424,19 @@ export function ClubHub() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/20 text-xl">{m.emoji}</div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-black text-ink dark:text-white">{m.club}</div>
-                  <div className="text-[12px] text-neutral-500">Hosted meet · {m.tag}</div>
+                  <div className="text-[12px] text-neutral-500">Hosted by {m.hostName} · {m.tag}</div>
                 </div>
                 {capBadge(m)}
               </div>
 
               <div className="mt-3 flex items-center gap-2">
-                {m.hosts.map((h) => (
-                  <span key={h} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[12px] font-black text-white">{h}</span>
+                {m.participants.slice(0, 4).map((pEmail) => (
+                  <span key={pEmail} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[12px] font-black text-white" title={pEmail}>{initials(pEmail)}</span>
                 ))}
-                {Array.from({ length: Math.min(3, Math.max(0, count - m.hosts.length)) }, (_, i) => (
-                  <span key={i} className="h-9 w-9 rounded-full border-2 border-dashed border-neutral-300 dark:border-white/20" />
-                ))}
-                {count > m.hosts.length + 3 && (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-400 dark:border-white/20">+{count - m.hosts.length - 3}</span>
+                {count > 4 && (
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-400 dark:border-white/20">+{count - 4}</span>
                 )}
-                <span className="ml-1 text-[12px] text-neutral-400">{count} going</span>
+                <span className="ml-1 text-[12px] text-neutral-400">{count} really going{m.maybes.length > 0 ? ` · ${m.maybes.length} maybe` : ''}</span>
               </div>
 
               <div className="mt-4 space-y-3 text-sm">
@@ -433,7 +453,6 @@ export function ClubHub() {
                   <div>
                     <div className="font-bold text-ink dark:text-white">{m.venue}</div>
                     <div className="text-[12px] leading-relaxed text-neutral-500">{m.address}</div>
-                    <div className="text-[12px] text-neutral-400">{m.km.toFixed(1)} km from you</div>
                     <a href={mapsUrl(m)} target="_blank" rel="noreferrer" className="mt-0.5 inline-block text-[13px] font-bold text-brand-dark">Show in maps</a>
                   </div>
                 </div>
@@ -460,6 +479,8 @@ export function ClubHub() {
                 </div>
               )}
 
+              {rsvpError && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12px] font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{rsvpError}</p>}
+
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={() => setRsvp(m.id, r === 'maybe' ? 'none' : 'maybe')}
@@ -475,18 +496,110 @@ export function ClubHub() {
                   {r === 'joined' ? '✓ Joining — tap to leave' : full ? 'Full' : 'Join meet'}
                 </button>
               </div>
+
+              {isHost && (
+                <button
+                  onClick={async () => { await api.deleteMeet(m.id).catch(() => {}); setDetail(null); refreshMeets() }}
+                  className="mt-3 w-full rounded-xl bg-red-50 py-2 text-[13px] font-bold text-red-600 dark:bg-red-500/10 dark:text-red-300"
+                >
+                  Cancel this meet (you're hosting it)
+                </button>
+              )}
             </div>
           </div>,
           document.body,
         )
       })()}
 
+      {showHost && <HostMeetSheet email={email} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
+
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
-        Community catalog is illustrative while club onboarding is open — joins are saved on this
-        device. Group exercise adherence evidence: social support is a consistent predictor of
-        long-term physical-activity maintenance (e.g. Smith et al., <i>Int J Behav Nutr Phys Act</i> 2017).
+        Meets are real and shared with every Panaceamed user — anyone can host one, and "joined" is
+        the actual number of accounts who RSVP'd, never a preset number. Group exercise adherence
+        evidence: social support is a consistent predictor of long-term physical-activity maintenance
+        (e.g. Smith et al., <i>Int J Behav Nutr Phys Act</i> 2017).
       </div>
     </div>
+  )
+}
+
+function HostMeetSheet({ email, onClose, onCreated }: { email: string; onClose: () => void; onCreated: () => void }) {
+  const [title, setTitle] = useState('')
+  const [club, setClub] = useState('')
+  const [tag, setTag] = useState<(typeof TAGS)[number]>('Social')
+  const [venue, setVenue] = useState('')
+  const [address, setAddress] = useState('')
+  const [day, setDay] = useState(0)
+  const [time, setTime] = useState('06:00')
+  const [durH, setDurH] = useState(1.5)
+  const [cap, setCap] = useState(20)
+  const [feeRp, setFeeRp] = useState(0)
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const submit = async () => {
+    if (!title.trim() || !venue.trim()) { setError('Give it a title and a venue.'); return }
+    setSaving(true)
+    setError('')
+    try {
+      await api.createMeet({
+        title: title.trim(), club: club.trim() || undefined, tag, venue: venue.trim(), address: address.trim(),
+        day, time, durH, cap, feeRp, emoji: EMOJI_BY_SPORT[tag] || '🏃', notes: [],
+      })
+      onCreated()
+    } catch {
+      setError('Could not create the meet — check your connection and try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Host a meet" onClick={onClose}>
+      <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 dark:bg-neutral-900 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-black text-ink dark:text-white">Host a real meet</h2>
+          <button onClick={onClose} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
+        </div>
+        <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
+          This posts a real, shared meet visible to every Panaceamed user — {email || 'you'} will be
+          listed as the host and first participant.
+        </p>
+        <div className="mt-4 space-y-3">
+          <input className={inputClass} placeholder="Title (e.g. Saturday 5K)" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <input className={inputClass} placeholder="Club / group name (optional)" value={club} onChange={(e) => setClub(e.target.value)} />
+          <select className={inputClass} value={tag} onChange={(e) => setTag(e.target.value as (typeof TAGS)[number])}>
+            {TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <input className={inputClass} placeholder="Venue (e.g. GBK Senayan Loop)" value={venue} onChange={(e) => setVenue(e.target.value)} />
+          <input className={inputClass} placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-[12px] font-bold text-neutral-500">Day
+              <select className={`${inputClass} mt-1`} value={day} onChange={(e) => setDay(Number(e.target.value))}>
+                {Array.from({ length: 7 }, (_, i) => <option key={i} value={i}>{i === 0 ? 'Today' : dayName(i)}</option>)}
+              </select>
+            </label>
+            <label className="text-[12px] font-bold text-neutral-500">Time
+              <input className={`${inputClass} mt-1`} type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            </label>
+            <label className="text-[12px] font-bold text-neutral-500">Duration (hours)
+              <input className={`${inputClass} mt-1`} type="number" min={0.5} max={6} step={0.5} value={durH} onChange={(e) => setDurH(Number(e.target.value) || 1)} />
+            </label>
+            <label className="text-[12px] font-bold text-neutral-500">Capacity
+              <input className={`${inputClass} mt-1`} type="number" min={2} max={200} value={cap} onChange={(e) => setCap(Number(e.target.value) || 2)} />
+            </label>
+            <label className="col-span-2 text-[12px] font-bold text-neutral-500">Fee per person (Rp, 0 = free)
+              <input className={`${inputClass} mt-1`} type="number" min={0} step={5000} value={feeRp} onChange={(e) => setFeeRp(Number(e.target.value) || 0)} />
+            </label>
+          </div>
+        </div>
+        {error && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12px] font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
+        <button onClick={submit} disabled={saving} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white disabled:opacity-60">
+          {saving ? 'Posting…' : 'Post this meet'}
+        </button>
+      </div>
+    </div>,
+    document.body,
   )
 }
 

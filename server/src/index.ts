@@ -15,6 +15,10 @@ import {
   reactPost,
   deletePost,
   updatePost,
+  listMeets,
+  addMeet,
+  rsvpMeet,
+  deleteMeet,
   uid,
   getClinical,
   saveRecord,
@@ -72,6 +76,7 @@ import {
   initStore,
   type User,
   type Post,
+  type Meet,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -359,6 +364,53 @@ app.post('/api/posts/:id/react', requireAuth, (req, res) => {
   const p = reactPost(req.params.id, emoji, u.email)
   if (!p) return res.status(404).json({ error: 'not_found' })
   res.json({ post: p })
+})
+
+// --- Club Hub meets (real, user-created — join counts are actual RSVPs) ---
+app.get('/api/meets', (_req, res) => res.json({ meets: listMeets() }))
+app.post('/api/meets', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Partial<Meet>
+  if (!b.title || !b.venue || !b.time) return res.status(400).json({ error: 'missing_fields' })
+  const m: Meet = {
+    id: uid(),
+    title: String(b.title).slice(0, 120),
+    club: String(b.club || u.name).slice(0, 80),
+    tag: String(b.tag || 'Social').slice(0, 40),
+    venue: String(b.venue).slice(0, 120),
+    address: String(b.address || '').slice(0, 200),
+    day: Math.min(Math.max(Number(b.day) || 0, 0), 6),
+    time: String(b.time).slice(0, 5),
+    durH: Math.min(Math.max(Number(b.durH) || 1, 0.5), 6),
+    cap: Math.min(Math.max(Number(b.cap) || 10, 2), 200),
+    feeRp: Math.max(Number(b.feeRp) || 0, 0),
+    notes: Array.isArray(b.notes) ? b.notes.slice(0, 5).map((n) => String(n).slice(0, 200)) : [],
+    lat: Number(b.lat) || 0,
+    lng: Number(b.lng) || 0,
+    emoji: String(b.emoji || '🏃').slice(0, 4),
+    hostEmail: u.email,
+    hostName: u.name,
+    participants: [u.email],
+    maybes: [],
+    createdAt: new Date().toISOString(),
+  }
+  addMeet(m)
+  res.json({ meet: m })
+})
+app.post('/api/meets/:id/rsvp', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const status = (req.body as { status?: string }).status
+  if (status !== 'joined' && status !== 'maybe' && status !== 'none') return res.status(400).json({ error: 'invalid_status' })
+  const { meet, full } = rsvpMeet(req.params.id, u.email, status)
+  if (!meet) return res.status(404).json({ error: 'not_found' })
+  if (full) return res.status(409).json({ error: 'full', meet })
+  res.json({ meet })
+})
+app.delete('/api/meets/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const ok = deleteMeet(req.params.id, u.email)
+  if (!ok) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ok: true })
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---

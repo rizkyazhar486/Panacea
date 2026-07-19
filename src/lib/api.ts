@@ -242,6 +242,13 @@ export const api = {
   saveSportsFavorites: (teams: string[]) => req<{ teams: string[] }>('/api/sports/favorites', { method: 'PUT', body: JSON.stringify({ teams }) }).then((r) => r.teams),
   patchPost: (id: string, patch: Record<string, unknown>) =>
     req<{ post: BackendPost }>(`/api/posts/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((r) => r.post),
+  // Club Hub meets — real, server-persisted; join counts are actual RSVPs.
+  meets: () => req<{ meets: BackendMeet[] }>('/api/meets').then((r) => r.meets),
+  createMeet: (m: Partial<BackendMeet>) =>
+    req<{ meet: BackendMeet }>('/api/meets', { method: 'POST', body: JSON.stringify(m) }).then((r) => r.meet),
+  rsvpMeet: (id: string, status: 'joined' | 'maybe' | 'none') =>
+    req<{ meet: BackendMeet }>(`/api/meets/${id}/rsvp`, { method: 'POST', body: JSON.stringify({ status }) }).then((r) => r.meet),
+  deleteMeet: (id: string) => req<{ ok: boolean }>(`/api/meets/${id}`, { method: 'DELETE' }),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
@@ -388,6 +395,29 @@ export interface BackendPost {
   likes: number
   reactions?: Record<string, string[]>
   at: string
+}
+
+export interface BackendMeet {
+  id: string
+  title: string
+  club: string
+  tag: string
+  venue: string
+  address: string
+  day: number
+  time: string
+  durH: number
+  cap: number
+  feeRp: number
+  notes: string[]
+  lat: number
+  lng: number
+  emoji: string
+  hostEmail: string
+  hostName: string
+  participants: string[]
+  maybes: string[]
+  createdAt: string
 }
 
 // WebSocket URL for real-time consultations.
