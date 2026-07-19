@@ -19,6 +19,10 @@ import {
   addMeet,
   rsvpMeet,
   deleteMeet,
+  listClubs,
+  addClub,
+  toggleClubMember,
+  deleteClub,
   uid,
   getClinical,
   saveRecord,
@@ -77,6 +81,7 @@ import {
   type User,
   type Post,
   type Meet,
+  type Club,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -409,6 +414,40 @@ app.post('/api/meets/:id/rsvp', requireAuth, (req, res) => {
 app.delete('/api/meets/:id', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const ok = deleteMeet(req.params.id, u.email)
+  if (!ok) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ok: true })
+})
+
+// --- Club Hub clubs (real, user-created — member counts are actual joins) ---
+app.get('/api/clubs', (_req, res) => res.json({ clubs: listClubs() }))
+app.post('/api/clubs', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Partial<Club>
+  if (!b.name || !b.sport) return res.status(400).json({ error: 'missing_fields' })
+  const c: Club = {
+    id: uid(),
+    name: String(b.name).slice(0, 80),
+    emoji: String(b.emoji || '🏃').slice(0, 4),
+    sport: String(b.sport).slice(0, 40),
+    level: String(b.level || 'All levels').slice(0, 40),
+    desc: String(b.desc || '').slice(0, 300),
+    hostEmail: u.email,
+    hostName: u.name,
+    members: [u.email],
+    createdAt: new Date().toISOString(),
+  }
+  addClub(c)
+  res.json({ club: c })
+})
+app.post('/api/clubs/:id/join', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const c = toggleClubMember(req.params.id, u.email)
+  if (!c) return res.status(404).json({ error: 'not_found' })
+  res.json({ club: c })
+})
+app.delete('/api/clubs/:id', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const ok = deleteClub(req.params.id, u.email)
   if (!ok) return res.status(403).json({ error: 'forbidden' })
   res.json({ ok: true })
 })

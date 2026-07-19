@@ -2,62 +2,30 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 const MeetMap = lazy(() => import('../components/MeetMap'))
-import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
+import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
-import { api, type BackendMeet } from '../lib/api'
+import { api, type BackendMeet, type BackendClub } from '../lib/api'
 import { useStore } from '../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Club Hub — community sports & health clubs, scheduled meets with join
-// capacity, meet detail (participants, fee, notes, calendar export, maps
-// link), and a personal "My Hub" schedule of everything joined. Meets are
-// real and server-persisted (see server/src/store.ts `meets`) — anyone can
-// host one, and the "X/Y joined" count is the actual number of accounts that
-// RSVP'd, not a preset number. Calendar export generates a standards-
-// compliant .ics file locally; the maps link opens the venue in Google Maps
-// — no API keys for either.
+// Club Hub — community sports & health clubs and scheduled meets, both fully
+// server-persisted (see server/src/store.ts `meets` / `clubs`) — anyone can
+// host a meet or start a club, and every count shown ("X/Y joined", "N
+// members") is the real number of accounts that joined, never a preset
+// number. Calendar export generates a standards-compliant .ics file
+// locally; the maps link opens the venue in Google Maps — no API keys for
+// either.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const LS_KEY = 'pmd_clubhub_v1'
-
-interface Persisted { joinedClubs: string[]; joinedEvents: string[] }
-function loadPersisted(): Persisted {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (raw) return { joinedClubs: [], joinedEvents: [], ...JSON.parse(raw) }
-  } catch { /* ignore */ }
-  return { joinedClubs: [], joinedEvents: [] }
-}
-
-// No fake member counts: this is a directory of sports/formats you can host or
-// join a real meet under. "Members" isn't shown because Club Hub doesn't yet
-// track club-level membership separately from meet RSVPs — only claim numbers
-// that are real.
-interface Club { id: string; name: string; emoji: string; level: string; sport: string; desc: string }
-const CLUBS: Club[] = [
-  { id: 'sunrise-run', name: 'Sunrise Run Club', emoji: '🏃', level: 'All levels', sport: 'Running', desc: 'Easy-pace social runs every weekend morning — zone 2, no one left behind.' },
-  { id: 'padel-pulse', name: 'Padel Pulse', emoji: '🎾', level: 'Beginner-Intermediate', sport: 'Padel', desc: 'Social padel mixers and Americano-format sessions.' },
-  { id: 'shuttle-squad', name: 'Shuttle Squad', emoji: '🏸', level: 'All levels', sport: 'Badminton', desc: 'Doubles rotation nights, casual and competitive courts.' },
-  { id: 'iron-circle', name: 'Iron Circle', emoji: '🏋️', level: 'Intermediate', sport: 'Strength', desc: 'Progressive-overload group lifting with form-check culture.' },
-  { id: 'dokter-jalan', name: 'Walk With A Doctor', emoji: '🩺', level: 'All levels', sport: 'Health walk', desc: 'Clinician-led weekend walks — bring your questions, leave with 8,000 steps.' },
-  { id: 'flow-yoga', name: 'Morning Flow Yoga', emoji: '🧘', level: 'All levels', sport: 'Yoga', desc: 'Sunrise vinyasa in the park; mats provided for first-timers.' },
-]
-
-// Meet is the server's BackendMeet — a real, shared record. "Joined" count
-// is always `participants.length`, never a stored number, so it can't drift
-// from reality.
+// Meet/Club are the server's BackendMeet/BackendClub — real, shared records.
+// Counts are always `.length` of the participants/members array, never a
+// stored number, so they can't drift from reality.
 type Meet = BackendMeet
+type Club = BackendClub
 
 const TAGS = ['Social', 'Training', 'Class', 'Competitive', 'Health walk', 'Americano'] as const
-const EMOJI_BY_SPORT: Record<string, string> = { Running: '🏃', Padel: '🎾', Badminton: '🏸', Strength: '🏋️', 'Health walk': '🩺', Yoga: '🧘' }
-
-interface Evt { id: string; title: string; org: string; date: string; format: string; teams: number; status: 'registration' | 'happening'; emoji: string; venue: string }
-const EVENTS: Evt[] = [
-  { id: 'e1', title: 'Panacea Community Run 2026', org: 'Sunrise Run Club', date: 'Aug 9', format: '5K / 10K fun run', teams: 214, status: 'registration', emoji: '🏅', venue: 'GBK Senayan' },
-  { id: 'e2', title: 'Padel League Season 2', org: 'Padel Pulse', date: 'Jul 26', format: 'Round robin, 6 weeks', teams: 18, status: 'happening', emoji: '🏆', venue: 'Padel Parc Simprug' },
-  { id: 'e3', title: 'Healthy Heart Charity Walk', org: 'Walk With A Doctor', date: 'Aug 17', format: '3K walk + health screening booths', teams: 130, status: 'registration', emoji: '❤️', venue: 'Taman Menteng' },
-  { id: 'e4', title: 'Smash Cup Badminton Open', org: 'Shuttle Squad', date: 'Jul 20', format: 'Knockout doubles', teams: 32, status: 'happening', emoji: '🏸', venue: 'GOR Bulungan' },
-]
+const SPORTS = ['Running', 'Padel', 'Badminton', 'Strength', 'Health walk', 'Yoga', 'Other'] as const
+const EMOJI_BY_SPORT: Record<string, string> = { Running: '🏃', Padel: '🎾', Badminton: '🏸', Strength: '🏋️', 'Health walk': '🩺', Yoga: '🧘', Other: '🏅' }
 
 const DAY_MS = 86400000
 function meetDate(m: Meet): Date {
@@ -102,7 +70,7 @@ function mapsUrl(m: Meet): string {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${m.venue}, ${m.address}`)
 }
 
-type Tab = 'myhub' | 'meets' | 'clubs' | 'events'
+type Tab = 'myhub' | 'meets' | 'clubs'
 type Rsvp = 'none' | 'maybe' | 'joined'
 
 export function ClubHub() {
@@ -113,20 +81,21 @@ export function ClubHub() {
   const [meetView, setMeetView] = useState<'list' | 'map'>('list')
   const [query, setQuery] = useState('')
   const [detail, setDetail] = useState<Meet | null>(null)
-  const [p, setP] = useState<Persisted>(loadPersisted)
   const [meets, setMeets] = useState<Meet[]>([])
+  const [clubs, setClubs] = useState<Club[]>([])
   const [loadingMeets, setLoadingMeets] = useState(true)
+  const [loadingClubs, setLoadingClubs] = useState(true)
   const [showHost, setShowHost] = useState(false)
+  const [showNewClub, setShowNewClub] = useState(false)
   const [rsvpError, setRsvpError] = useState('')
-
-  useEffect(() => {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(p)) } catch { /* ignore */ }
-  }, [p])
 
   const refreshMeets = () => {
     api.meets().then(setMeets).catch(() => {}).finally(() => setLoadingMeets(false))
   }
-  useEffect(() => { refreshMeets() }, [])
+  const refreshClubs = () => {
+    api.clubs().then(setClubs).catch(() => {}).finally(() => setLoadingClubs(false))
+  }
+  useEffect(() => { refreshMeets(); refreshClubs() }, [])
 
   const rsvpOf = (m: Meet): Rsvp => (m.participants.includes(email) ? 'joined' : m.maybes.includes(email) ? 'maybe' : 'none')
   const setRsvp = async (id: string, r: Rsvp) => {
@@ -139,16 +108,19 @@ export function ClubHub() {
       setRsvpError(e instanceof Error && e.message === 'full' ? 'This meet just filled up — try another one.' : 'Could not update your RSVP — check your connection and try again.')
     }
   }
-  const toggleIn = (list: 'joinedClubs' | 'joinedEvents', id: string) =>
-    setP((s) => ({ ...s, [list]: s[list].includes(id) ? s[list].filter((x) => x !== id) : [...s[list], id] }))
+  const toggleClub = async (id: string) => {
+    try {
+      const updated = await api.joinClub(id)
+      setClubs((list) => list.map((c) => (c.id === id ? updated : c)))
+    } catch { /* ignore transient failure — user can retry the tap */ }
+  }
 
   const q = query.trim().toLowerCase()
   const meetsToday = useMemo(
     () => meets.filter((m) => m.day === day && (!q || (m.title + m.club + m.venue + m.tag).toLowerCase().includes(q))).sort((a, b) => a.time.localeCompare(b.time)),
     [meets, day, q],
   )
-  const clubsFiltered = CLUBS.filter((c) => !q || (c.name + c.sport + c.desc).toLowerCase().includes(q))
-  const eventsFiltered = EVENTS.filter((e) => !q || (e.title + e.org + e.format).toLowerCase().includes(q))
+  const clubsFiltered = clubs.filter((c) => !q || (c.name + c.sport + c.desc).toLowerCase().includes(q))
 
   const myMeets = useMemo(
     () => meets.filter((m) => rsvpOf(m) !== 'none').sort((a, b) => a.day - b.day || a.time.localeCompare(b.time)),
@@ -163,8 +135,7 @@ export function ClubHub() {
     }
     return groups
   }, [myMeets])
-  const myClubs = CLUBS.filter((c) => p.joinedClubs.includes(c.id))
-  const myEvents = EVENTS.filter((e) => p.joinedEvents.includes(e.id))
+  const myClubs = useMemo(() => clubs.filter((c) => c.members.includes(email)), [clubs, email])
 
   const capBadge = (m: Meet) => {
     const count = m.participants.length
@@ -178,13 +149,14 @@ export function ClubHub() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Find your people — clubs, group meets, and community events" />
+        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Find your people — clubs and group meets, all real" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Regular group activity is one of the strongest predictors of sticking with exercise. Join a
-          club, show up to a meet, and your workouts stop depending on willpower alone.
+          club, show up to a meet, and your workouts stop depending on willpower alone. Anyone can
+          start a club or host a meet — there's no gatekeeper.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs'], ['events', 'Events']] as [Tab, string][]).map(([t, label]) => (
+          {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs']] as [Tab, string][]).map(([t, label]) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -207,7 +179,7 @@ export function ClubHub() {
       {tab === 'myhub' && (
         <>
           <Card className="!p-4">
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-2 gap-3 text-center">
               <div className="rounded-2xl bg-brand/10 p-3">
                 <div className="text-2xl font-black text-brand-dark">{myClubs.length}</div>
                 <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">My clubs</div>
@@ -215,10 +187,6 @@ export function ClubHub() {
               <div className="rounded-2xl bg-brand/10 p-3">
                 <div className="text-2xl font-black text-brand-dark">{myMeets.length}</div>
                 <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Upcoming</div>
-              </div>
-              <div className="rounded-2xl bg-brand/10 p-3">
-                <div className="text-2xl font-black text-brand-dark">{myEvents.length}</div>
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Events</div>
               </div>
             </div>
             {myClubs.length > 0 && (
@@ -347,57 +315,45 @@ export function ClubHub() {
         </>
       )}
 
-      {tab === 'clubs' && clubsFiltered.map((c) => {
-        const member = p.joinedClubs.includes(c.id)
-        return (
-          <Card key={c.id} className="!p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/10 text-2xl">{c.emoji}</div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-black text-ink dark:text-white">{c.name}</div>
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
-                  <span className="flex items-center gap-1"><IconActivity size={12} />{c.level}</span>
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{c.sport}</span>
-                </div>
-                <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">{c.desc}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => toggleIn('joinedClubs', c.id)}
-              className={`mt-3 w-full rounded-xl py-2 text-sm font-bold transition ${member ? 'bg-brand/10 text-brand-dark' : 'bg-brand text-white'}`}
-            >
-              {member ? '✓ Member — tap to leave' : 'Join club'}
-            </button>
-          </Card>
-        )
-      })}
+      {tab === 'clubs' && (
+        <>
+          <button onClick={() => setShowNewClub(true)} className="w-full rounded-2xl bg-brand py-3 text-sm font-bold text-white">
+            ＋ Start a new club
+          </button>
 
-      {tab === 'events' && eventsFiltered.map((e) => {
-        const registered = p.joinedEvents.includes(e.id)
-        return (
-          <Card key={e.id} className="!p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-2xl">{e.emoji}</div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{e.org}</div>
-                <div className="text-[15px] font-black text-ink dark:text-white">{e.title}</div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
-                  <span className="font-bold text-ink dark:text-white">{e.date}</span>
-                  <span className="flex items-center gap-1"><IconMapPin size={12} />{e.venue}</span>
+          {loadingClubs && <Card className="!p-5 text-center text-sm text-neutral-400">Loading clubs…</Card>}
+
+          {!loadingClubs && clubsFiltered.length === 0 && (
+            <Card className="!p-5 text-center text-sm text-neutral-400">No clubs match "{query}" — start one instead.</Card>
+          )}
+
+          {clubsFiltered.map((c) => {
+            const member = c.members.includes(email)
+            return (
+              <Card key={c.id} className="!p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/10 text-2xl">{c.emoji}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[15px] font-black text-ink dark:text-white">{c.name}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
+                      <span className="flex items-center gap-1"><IconUsers size={12} />{c.members.length} member{c.members.length === 1 ? '' : 's'}</span>
+                      <span className="flex items-center gap-1"><IconActivity size={12} />{c.level}</span>
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{c.sport}</span>
+                    </div>
+                    {c.desc && <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">{c.desc}</p>}
+                  </div>
                 </div>
-                <div className="mt-1 text-[12px] text-neutral-500">{e.format} · {e.teams + (registered ? 1 : 0)} registered</div>
-              </div>
-              <Badge tone={e.status === 'happening' ? 'brand' : 'low'}>{e.status === 'happening' ? 'Happening now' : 'Registration open'}</Badge>
-            </div>
-            <button
-              onClick={() => toggleIn('joinedEvents', e.id)}
-              className={`mt-3 w-full rounded-xl py-2 text-sm font-bold transition ${registered ? 'bg-brand/10 text-brand-dark' : 'bg-brand text-white'}`}
-            >
-              {registered ? '✓ Registered — tap to cancel' : e.status === 'happening' ? 'Join event' : 'Register'}
-            </button>
-          </Card>
-        )
-      })}
+                <button
+                  onClick={() => toggleClub(c.id)}
+                  className={`mt-3 w-full rounded-xl py-2 text-sm font-bold transition ${member ? 'bg-brand/10 text-brand-dark' : 'bg-brand text-white'}`}
+                >
+                  {member ? '✓ Member — tap to leave' : 'Join club'}
+                </button>
+              </Card>
+            )
+          })}
+        </>
+      )}
 
       {detail && (() => {
         const m = detail
@@ -512,12 +468,14 @@ export function ClubHub() {
       })()}
 
       {showHost && <HostMeetSheet email={email} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
+      {showNewClub && <NewClubSheet onClose={() => setShowNewClub(false)} onCreated={() => { setShowNewClub(false); refreshClubs() }} />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
-        Meets are real and shared with every Panaceamed user — anyone can host one, and "joined" is
-        the actual number of accounts who RSVP'd, never a preset number. Group exercise adherence
-        evidence: social support is a consistent predictor of long-term physical-activity maintenance
-        (e.g. Smith et al., <i>Int J Behav Nutr Phys Act</i> 2017).
+        Clubs and meets are real and shared with every Panaceamed user — anyone can start a club or
+        host a meet, and every "members" or "joined" count is the actual number of accounts that
+        joined, never a preset number. Group exercise adherence evidence: social support is a
+        consistent predictor of long-term physical-activity maintenance (e.g. Smith et al.,
+        <i> Int J Behav Nutr Phys Act</i> 2017).
       </div>
     </div>
   )
@@ -596,6 +554,57 @@ function HostMeetSheet({ email, onClose, onCreated }: { email: string; onClose: 
         {error && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12px] font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
         <button onClick={submit} disabled={saving} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white disabled:opacity-60">
           {saving ? 'Posting…' : 'Post this meet'}
+        </button>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
+function NewClubSheet({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState('')
+  const [sport, setSport] = useState<(typeof SPORTS)[number]>('Running')
+  const [level, setLevel] = useState('All levels')
+  const [desc, setDesc] = useState('')
+  const [error, setError] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const submit = async () => {
+    if (!name.trim()) { setError('Give the club a name.'); return }
+    setSaving(true)
+    setError('')
+    try {
+      await api.createClub({ name: name.trim(), sport, level, desc: desc.trim(), emoji: EMOJI_BY_SPORT[sport] })
+      onCreated()
+    } catch {
+      setError('Could not create the club — check your connection and try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Start a club" onClick={onClose}>
+      <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 dark:bg-neutral-900 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-black text-ink dark:text-white">Start a real club</h2>
+          <button onClick={onClose} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
+        </div>
+        <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
+          This creates a real, shared club visible to every Panaceamed user — you'll be the first
+          member. Once it exists, host meets under it from the Meets tab.
+        </p>
+        <div className="mt-4 space-y-3">
+          <input className={inputClass} placeholder="Club name (e.g. East Jakarta Trail Runners)" value={name} onChange={(e) => setName(e.target.value)} />
+          <select className={inputClass} value={sport} onChange={(e) => setSport(e.target.value as (typeof SPORTS)[number])}>
+            {SPORTS.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <input className={inputClass} placeholder="Level (e.g. All levels, Intermediate)" value={level} onChange={(e) => setLevel(e.target.value)} />
+          <textarea className={`${inputClass} min-h-20`} placeholder="What's this club about? (optional)" value={desc} onChange={(e) => setDesc(e.target.value)} />
+        </div>
+        {error && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-[12px] font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
+        <button onClick={submit} disabled={saving} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white disabled:opacity-60">
+          {saving ? 'Creating…' : 'Create this club'}
         </button>
       </div>
     </div>,
