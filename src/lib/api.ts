@@ -249,6 +249,12 @@ export const api = {
   rsvpMeet: (id: string, status: 'joined' | 'maybe' | 'none') =>
     req<{ meet: BackendMeet }>(`/api/meets/${id}/rsvp`, { method: 'POST', body: JSON.stringify({ status }) }).then((r) => r.meet),
   deleteMeet: (id: string) => req<{ ok: boolean }>(`/api/meets/${id}`, { method: 'DELETE' }),
+  // Club Hub clubs — real, server-persisted; member counts are actual joins.
+  clubs: () => req<{ clubs: BackendClub[] }>('/api/clubs').then((r) => r.clubs),
+  createClub: (c: Partial<BackendClub>) =>
+    req<{ club: BackendClub }>('/api/clubs', { method: 'POST', body: JSON.stringify(c) }).then((r) => r.club),
+  joinClub: (id: string) => req<{ club: BackendClub }>(`/api/clubs/${id}/join`, { method: 'POST' }).then((r) => r.club),
+  deleteClub: (id: string) => req<{ ok: boolean }>(`/api/clubs/${id}`, { method: 'DELETE' }),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
@@ -417,6 +423,19 @@ export interface BackendMeet {
   hostName: string
   participants: string[]
   maybes: string[]
+  createdAt: string
+}
+
+export interface BackendClub {
+  id: string
+  name: string
+  emoji: string
+  sport: string
+  level: string
+  desc: string
+  hostEmail: string
+  hostName: string
+  members: string[]
   createdAt: string
 }
 

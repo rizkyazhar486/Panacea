@@ -107,6 +107,7 @@ interface DB {
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
+  clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
 }
 
 // A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
@@ -170,6 +171,21 @@ export interface Meet {
   createdAt: string
 }
 
+// A real, user-created Club Hub club — member counts are the actual number
+// of distinct accounts in `members`, never a preset/fake number.
+export interface Club {
+  id: string
+  name: string
+  emoji: string
+  sport: string
+  level: string
+  desc: string
+  hostEmail: string
+  hostName: string
+  members: string[]
+  createdAt: string
+}
+
 // Manual (bank-transfer) top-up request — user transfers, owner approves to credit.
 export interface ManualTopup {
   id: string
@@ -199,6 +215,21 @@ function seedMeets(): Meet[] {
   ]
 }
 
+// Same idea for clubs: a handful of official starter clubs whose member
+// count is real and starts at zero, growing only from actual joins.
+function seedClubs(): Club[] {
+  const host = { hostEmail: 'community@panaceamed.id', hostName: 'Panaceamed Community' }
+  const now = new Date().toISOString()
+  return [
+    { id: 'sunrise-run', name: 'Sunrise Run Club', emoji: '🏃', sport: 'Running', level: 'All levels', desc: 'Easy-pace social runs every weekend morning — zone 2, no one left behind.', members: [], createdAt: now, ...host },
+    { id: 'padel-pulse', name: 'Padel Pulse', emoji: '🎾', sport: 'Padel', level: 'Beginner-Intermediate', desc: 'Social padel mixers and Americano-format sessions.', members: [], createdAt: now, ...host },
+    { id: 'shuttle-squad', name: 'Shuttle Squad', emoji: '🏸', sport: 'Badminton', level: 'All levels', desc: 'Doubles rotation nights, casual and competitive courts.', members: [], createdAt: now, ...host },
+    { id: 'iron-circle', name: 'Iron Circle', emoji: '🏋️', sport: 'Strength', level: 'Intermediate', desc: 'Progressive-overload group lifting with form-check culture.', members: [], createdAt: now, ...host },
+    { id: 'dokter-jalan', name: 'Walk With A Doctor', emoji: '🩺', sport: 'Health walk', level: 'All levels', desc: 'Clinician-led weekend walks — bring your questions, leave with 8,000 steps.', members: [], createdAt: now, ...host },
+    { id: 'flow-yoga', name: 'Morning Flow Yoga', emoji: '🧘', sport: 'Yoga', level: 'All levels', desc: 'Sunrise vinyasa in the park; mats provided for first-timers.', members: [], createdAt: now, ...host },
+  ]
+}
+
 let db: DB = {
   users: [],
   wallets: {},
@@ -213,6 +244,7 @@ let db: DB = {
   manualTopups: [],
   applications: [],
   meets: seedMeets(),
+  clubs: seedClubs(),
 }
 
 // MongoDB persistence (optional). When MONGODB_URI is set the whole state is
@@ -394,6 +426,32 @@ export function deleteMeet(id: string, email: string): boolean {
   const m = db.meets?.find((x) => x.id === id)
   if (!m || m.hostEmail !== email) return false
   db.meets = (db.meets ?? []).filter((x) => x.id !== id)
+  save()
+  return true
+}
+
+// --- Club Hub clubs (real, user-created; member counts are actual joins) ---
+export function listClubs(): Club[] {
+  if (!db.clubs) db.clubs = []
+  return db.clubs
+}
+export function addClub(c: Club) {
+  if (!db.clubs) db.clubs = []
+  db.clubs.unshift(c)
+  save()
+}
+export function toggleClubMember(id: string, email: string): Club | undefined {
+  const c = db.clubs?.find((x) => x.id === id)
+  if (!c) return undefined
+  c.members = c.members.includes(email) ? c.members.filter((e) => e !== email) : [...c.members, email]
+  save()
+  return c
+}
+// Remove a club (host-only). Returns true if removed.
+export function deleteClub(id: string, email: string): boolean {
+  const c = db.clubs?.find((x) => x.id === id)
+  if (!c || c.hostEmail !== email) return false
+  db.clubs = (db.clubs ?? []).filter((x) => x.id !== id)
   save()
   return true
 }
