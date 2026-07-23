@@ -467,7 +467,7 @@ export function ClubHub() {
         )
       })()}
 
-      {showHost && <HostMeetSheet email={email} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
+      {showHost && <HostMeetSheet email={email} initialDay={day} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
       {showNewClub && <NewClubSheet onClose={() => setShowNewClub(false)} onCreated={() => { setShowNewClub(false); refreshClubs() }} />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
@@ -481,13 +481,13 @@ export function ClubHub() {
   )
 }
 
-function HostMeetSheet({ email, onClose, onCreated }: { email: string; onClose: () => void; onCreated: () => void }) {
+function HostMeetSheet({ email, initialDay, onClose, onCreated }: { email: string; initialDay: number; onClose: () => void; onCreated: () => void }) {
   const [title, setTitle] = useState('')
   const [club, setClub] = useState('')
   const [tag, setTag] = useState<(typeof TAGS)[number]>('Social')
   const [venue, setVenue] = useState('')
   const [address, setAddress] = useState('')
-  const [day, setDay] = useState(0)
+  const [day, setDay] = useState(initialDay)
   const [time, setTime] = useState('06:00')
   const [durH, setDurH] = useState(1.5)
   const [cap, setCap] = useState(20)
