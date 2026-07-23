@@ -100,6 +100,9 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/nutrition-toolkit', name: 'Nutrition Longevity Toolkit', what: 'Mediterranean checklist, sugar streak, plant diversity & more', kw: 'mediterranean diet sugar streak antioxidant plant diversity coffee electrolyte toolkit', tag: 'New' },
       { to: '/toxin-checklist', name: 'Environment & Toxin Checklist', what: 'Everyday exposure reduction — plastics, cleaning, EMF, air quality', kw: 'toxin environment plastic emf endocrine disruptor cleaning swap air purifier checklist', tag: 'New' },
       { to: '/longevity-science', name: 'Longevity Science Explainers', what: 'Hallmarks of aging, NAD+, sirtuins, rapamycin & more, explained', kw: 'hallmarks aging nad sirtuins spermidine urolithin metformin rapamycin methylene blue science', tag: 'New' },
+      { to: '/self-assessment-toolkit', name: 'Self-Assessment Toolkit', what: 'Telomere quiz, inflammation score, waist-to-height & more', kw: 'telomere quiz inflammation score aging factor waist height ratio toolkit', tag: 'New' },
+      { to: '/body-toolkit', name: 'Body & Skin Toolkit', what: 'Skincare routine builder, symptom map, NEAT tracker', kw: 'skincare routine builder symptom body map neat non-exercise activity toolkit', tag: 'New' },
+      { to: '/longevity-game-center', name: 'Longevity Game Center', what: 'Habit bingo, a shareable report card, and a daily quote', kw: 'habit bingo report card shareable quote game viral', tag: 'New' },
     ],
   },
 ]

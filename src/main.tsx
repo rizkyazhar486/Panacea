@@ -146,6 +146,9 @@ const MindToolkit = lazy(() => import('./pages/MindToolkit').then((m) => ({ defa
 const NutritionToolkit = lazy(() => import('./pages/NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
 const ToxinChecklist = lazy(() => import('./pages/ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
 const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) => ({ default: m.LongevityScience })))
+const SelfAssessmentToolkit = lazy(() => import('./pages/SelfAssessmentToolkit').then((m) => ({ default: m.SelfAssessmentToolkit })))
+const BodyToolkit = lazy(() => import('./pages/BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
+const LongevityGameCenter = lazy(() => import('./pages/LongevityGameCenter').then((m) => ({ default: m.LongevityGameCenter })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -235,6 +238,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/nutrition-toolkit" element={<NutritionToolkit />} />
               <Route path="/toxin-checklist" element={<ToxinChecklist />} />
               <Route path="/longevity-science" element={<LongevityScience />} />
+              <Route path="/self-assessment-toolkit" element={<SelfAssessmentToolkit />} />
+              <Route path="/body-toolkit" element={<BodyToolkit />} />
+              <Route path="/longevity-game-center" element={<LongevityGameCenter />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />
