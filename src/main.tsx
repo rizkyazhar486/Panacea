@@ -140,6 +140,12 @@ const PostureBreaks = lazy(() => import('./pages/PostureBreaks').then((m) => ({ 
 const PainDiary = lazy(() => import('./pages/PainDiary').then((m) => ({ default: m.PainDiary })))
 const OrganDonorCard = lazy(() => import('./pages/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 const FitnessHub = lazy(() => import('./pages/FitnessHub').then((m) => ({ default: m.FitnessHub })))
+const SleepToolkit = lazy(() => import('./pages/SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
+const MovementToolkit = lazy(() => import('./pages/MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
+const MindToolkit = lazy(() => import('./pages/MindToolkit').then((m) => ({ default: m.MindToolkit })))
+const NutritionToolkit = lazy(() => import('./pages/NutritionToolkit').then((m) => ({ default: m.NutritionToolkit })))
+const ToxinChecklist = lazy(() => import('./pages/ToxinChecklist').then((m) => ({ default: m.ToxinChecklist })))
+const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) => ({ default: m.LongevityScience })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -223,6 +229,12 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/pain-diary" element={<PainDiary />} />
               <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/fitness-hub" element={<FitnessHub />} />
+              <Route path="/sleep-toolkit" element={<SleepToolkit />} />
+              <Route path="/movement-toolkit" element={<MovementToolkit />} />
+              <Route path="/mind-toolkit" element={<MindToolkit />} />
+              <Route path="/nutrition-toolkit" element={<NutritionToolkit />} />
+              <Route path="/toxin-checklist" element={<ToxinChecklist />} />
+              <Route path="/longevity-science" element={<LongevityScience />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />

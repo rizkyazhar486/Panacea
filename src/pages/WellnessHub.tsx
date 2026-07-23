@@ -90,6 +90,18 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/second-opinion', name: 'Second Opinion', what: 'AI drafts privately, a real doctor reviews and approves', kw: 'second opinion doctor review diagnosis ai emr', tag: 'New' },
     ],
   },
+  {
+    title: 'Longevity Toolkits',
+    emoji: '🧰',
+    feats: [
+      { to: '/sleep-toolkit', name: 'Sleep Toolkit', what: 'Cycle alarm, nap timer, consistency score, dream journal & more', kw: 'sleep cycle alarm nap timer consistency dream journal bedtime toolkit', tag: 'New' },
+      { to: '/movement-toolkit', name: 'Movement Longevity Toolkit', what: 'Grip strength, balance test, Zone 2, micro-workouts & squat streak', kw: 'grip strength balance zone 2 cardio micro workout squat challenge toolkit', tag: 'New' },
+      { to: '/mind-toolkit', name: 'Cognitive Longevity Toolkit', what: 'Brain puzzle, memory game, reaction time, stress inventory & more', kw: 'brain puzzle memory game reaction time word stress digital detox meditation toolkit', tag: 'New' },
+      { to: '/nutrition-toolkit', name: 'Nutrition Longevity Toolkit', what: 'Mediterranean checklist, sugar streak, plant diversity & more', kw: 'mediterranean diet sugar streak antioxidant plant diversity coffee electrolyte toolkit', tag: 'New' },
+      { to: '/toxin-checklist', name: 'Environment & Toxin Checklist', what: 'Everyday exposure reduction — plastics, cleaning, EMF, air quality', kw: 'toxin environment plastic emf endocrine disruptor cleaning swap air purifier checklist', tag: 'New' },
+      { to: '/longevity-science', name: 'Longevity Science Explainers', what: 'Hallmarks of aging, NAD+, sirtuins, rapamycin & more, explained', kw: 'hallmarks aging nad sirtuins spermidine urolithin metformin rapamycin methylene blue science', tag: 'New' },
+    ],
+  },
 ]
 
 const TAG_STYLE: Record<string, string> = {
