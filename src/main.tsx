@@ -131,6 +131,9 @@ const GratitudeJournal = lazy(() => import('./pages/GratitudeJournal').then((m) 
 const SleepDebt = lazy(() => import('./pages/SleepDebt').then((m) => ({ default: m.SleepDebt })))
 const ThermalTherapy = lazy(() => import('./pages/ThermalTherapy').then((m) => ({ default: m.ThermalTherapy })))
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
+const FirstAidGuide = lazy(() => import('./pages/FirstAidGuide').then((m) => ({ default: m.FirstAidGuide })))
+const VaccineTracker = lazy(() => import('./pages/VaccineTracker').then((m) => ({ default: m.VaccineTracker })))
+const BloodDonation = lazy(() => import('./pages/BloodDonation').then((m) => ({ default: m.BloodDonation })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -205,6 +208,9 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/fasting" element={<FastingTimer />} />
               <Route path="/lab-decoder" element={<LabDecoder />} />
               <Route path="/emergency" element={<EmergencyCard />} />
+              <Route path="/first-aid" element={<FirstAidGuide />} />
+              <Route path="/vaccine-tracker" element={<VaccineTracker />} />
+              <Route path="/blood-donation" element={<BloodDonation />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />
