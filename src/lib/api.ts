@@ -255,6 +255,13 @@ export const api = {
     req<{ club: BackendClub }>('/api/clubs', { method: 'POST', body: JSON.stringify(c) }).then((r) => r.club),
   joinClub: (id: string) => req<{ club: BackendClub }>(`/api/clubs/${id}/join`, { method: 'POST' }).then((r) => r.club),
   deleteClub: (id: string) => req<{ ok: boolean }>(`/api/clubs/${id}`, { method: 'DELETE' }),
+  // Second opinion — AI drafts privately for a doctor to review; patients only
+  // ever receive the doctor's finalized text.
+  submitSecondOpinion: (b: { currentDiagnosis: string; currentTreatment: string; symptoms: string; history: string }) =>
+    req<{ request: BackendSecondOpinion }>('/api/second-opinion', { method: 'POST', body: JSON.stringify(b) }).then((r) => r.request),
+  listSecondOpinions: () => req<{ requests: BackendSecondOpinion[] }>('/api/second-opinion').then((r) => r.requests),
+  completeSecondOpinion: (id: string, finalOpinion: string) =>
+    req<{ request: BackendSecondOpinion }>(`/api/second-opinion/${id}/complete`, { method: 'POST', body: JSON.stringify({ finalOpinion }) }).then((r) => r.request),
   // clinical persistence
   clinical: () => req<ClinicalData>('/api/clinical'),
   saveRecordRemote: (patientId: string, record: EMRRecord) =>
@@ -437,6 +444,23 @@ export interface BackendClub {
   hostName: string
   members: string[]
   createdAt: string
+}
+
+export interface BackendSecondOpinion {
+  id: string
+  patientEmail: string
+  patientName: string
+  currentDiagnosis: string
+  currentTreatment: string
+  symptoms: string
+  history: string
+  status: 'pending_doctor' | 'completed'
+  aiDraft?: string // present only in the doctor's queue view, never sent to the patient
+  doctorEmail?: string
+  doctorName?: string
+  finalOpinion?: string
+  createdAt: string
+  completedAt?: string
 }
 
 // WebSocket URL for real-time consultations.

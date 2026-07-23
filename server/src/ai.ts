@@ -191,6 +191,23 @@ export async function reviewApplicationText(info: string): Promise<string> {
   }
 }
 
+// Second Opinion — drafts a structured analysis from a patient's submitted
+// case (their existing diagnosis, treatment, symptoms, history). This is
+// explicitly a DRAFT for a licensed doctor to review, edit, and approve
+// before the patient ever sees it — the same human-in-the-loop pattern
+// already used for AI-EMR (AI drafts, doctor signs off).
+export async function draftSecondOpinion(caseInfo: string): Promise<string> {
+  if (!aiConfigured()) return 'AI belum aktif — dokter akan meninjau kasus ini secara manual sepenuhnya.'
+  const sys = `Anda AI co-physician yang membantu menyusun DRAF pendapat kedua (second opinion) untuk seorang dokter berlisensi meninjau — pasien TIDAK melihat draf ini secara langsung. Berdasarkan ringkasan kasus dari pasien (diagnosis/pengobatan saat ini, gejala, riwayat), susun draf berbahasa Indonesia dengan judul tebal markdown:
+**Ringkasan Kasus** (parafrase singkat apa yang disampaikan pasien), **Poin yang Sejalan dengan Diagnosis Saat Ini**, **Poin yang Perlu Diklarifikasi atau Dipertimbangkan Ulang** (pertanyaan/red flag yang layak dokter tinjau, bukan tuduhan bahwa diagnosis salah), **Saran Pemeriksaan Tambahan (jika relevan)**, **Catatan untuk Dokter Peninjau** (ringkas, poin-poin yang perlu diverifikasi/diedit).
+WAJIB: ini draf mentah untuk dokter, tegaskan bahwa keputusan akhir sepenuhnya di tangan dokter peninjau, dan jangan menyusun kalimat final yang ditujukan langsung ke pasien.`
+  try {
+    return await callAnthropic('claude-sonnet-4-6', sys, [{ role: 'user', content: caseInfo }], 900)
+  } catch {
+    return 'Draf AI gagal dibuat — dokter akan meninjau kasus ini secara manual sepenuhnya.'
+  }
+}
+
 // ── AI Operator (owner) — an "AI COO" that reads live platform data and returns
 // a business briefing, or drafts engaging health content for the feed. Read-only
 // for money; sensitive actions stay behind the owner's explicit approval.

@@ -108,6 +108,7 @@ interface DB {
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
   clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
+  secondOpinions?: SecondOpinion[] // AI-drafted, doctor-reviewed second opinions
 }
 
 // A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
@@ -184,6 +185,28 @@ export interface Club {
   hostName: string
   members: string[]
   createdAt: string
+}
+
+// A patient-submitted request for a second medical opinion. AI drafts an
+// analysis from the case summary immediately (aiDraft), but the patient
+// never sees that draft directly — a real, licensed doctor must review,
+// edit, and approve it (finalOpinion) before it's released. Human-in-the-
+// loop: AI assists, a doctor decides, same as AI-EMR.
+export interface SecondOpinion {
+  id: string
+  patientEmail: string
+  patientName: string
+  currentDiagnosis: string
+  currentTreatment: string
+  symptoms: string
+  history: string
+  status: 'pending_doctor' | 'completed'
+  aiDraft: string
+  doctorEmail?: string
+  doctorName?: string
+  finalOpinion?: string
+  createdAt: string
+  completedAt?: string
 }
 
 // Manual (bank-transfer) top-up request — user transfers, owner approves to credit.
@@ -454,6 +477,34 @@ export function deleteClub(id: string, email: string): boolean {
   db.clubs = (db.clubs ?? []).filter((x) => x.id !== id)
   save()
   return true
+}
+
+// --- Second opinions (AI drafts, a real doctor reviews & finalizes) ---
+export function addSecondOpinion(s: SecondOpinion) {
+  if (!db.secondOpinions) db.secondOpinions = []
+  db.secondOpinions.unshift(s)
+  save()
+}
+// A patient sees only their own requests.
+export function listSecondOpinionsForPatient(email: string): SecondOpinion[] {
+  return (db.secondOpinions ?? []).filter((s) => s.patientEmail === email)
+}
+// A doctor sees the pending queue (never another doctor's already-completed
+// notes are hidden from other doctors' queues, but a doctor CAN see the case
+// details of anything still pending so any available doctor can pick it up).
+export function listPendingSecondOpinions(): SecondOpinion[] {
+  return (db.secondOpinions ?? []).filter((s) => s.status === 'pending_doctor')
+}
+export function completeSecondOpinion(id: string, doctor: { email: string; name: string }, finalOpinion: string): SecondOpinion | undefined {
+  const s = db.secondOpinions?.find((x) => x.id === id)
+  if (!s || s.status !== 'pending_doctor') return undefined
+  s.status = 'completed'
+  s.doctorEmail = doctor.email
+  s.doctorName = doctor.name
+  s.finalOpinion = finalOpinion
+  s.completedAt = new Date().toISOString()
+  save()
+  return s
 }
 
 // Toggle a viewer's reaction emoji on a post (cross-user, visible to everyone).
