@@ -71,6 +71,17 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/first-aid', name: 'First Aid Quick Guide', what: 'Plain-language steps for choking, CPR, bleeding & more', kw: 'first aid cpr choking bleeding burns seizure fainting stroke anaphylaxis emergency', tag: 'New' },
       { to: '/vaccine-tracker', name: 'Vaccine / Immunization Tracker', what: 'Log your last dose, see when the next is due', kw: 'vaccine immunization booster flu tdap covid schedule', tag: 'New' },
       { to: '/blood-donation', name: 'Blood Donation Eligibility', what: 'A quick pre-screen and your next-eligible date', kw: 'blood donation donor eligibility hemoglobin', tag: 'New' },
+      { to: '/organ-donor', name: 'Organ Donor Pledge', what: 'Clarify your wishes, then talk to your family', kw: 'organ donor pledge donation transplant', tag: 'New' },
+    ],
+  },
+  {
+    title: 'Habits & Prep',
+    emoji: '🗓️',
+    feats: [
+      { to: '/visit-prep', name: 'Doctor-Visit Prep Checklist', what: "What to bring and what to ask, before you walk in", kw: 'doctor visit checklist prepare questions appointment', tag: 'New' },
+      { to: '/posture-breaks', name: 'Posture & Desk-Break Reminder', what: 'A gentle nudge to stand, stretch, or rest your eyes', kw: 'posture desk break timer eye strain 20-20-20 sedentary', tag: 'New' },
+      { to: '/pain-diary', name: 'Pain / Symptom Diary', what: 'Track severity over time — useful for you and your clinician', kw: 'pain symptom diary tracker severity trend', tag: 'New' },
+      { to: '/second-opinion', name: 'Second Opinion', what: 'AI drafts privately, a real doctor reviews and approves', kw: 'second opinion doctor review diagnosis ai emr', tag: 'New' },
     ],
   },
 ]
