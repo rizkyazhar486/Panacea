@@ -6,6 +6,7 @@ import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconUsers, IconActivity, IconMapPin } from '../components/icons'
 import { api, type BackendMeet, type BackendClub } from '../lib/api'
 import { useStore } from '../lib/store'
+import { geocode } from '../lib/geocode'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Club Hub — community sports & health clubs and scheduled meets, both fully
@@ -271,20 +272,33 @@ export function ClubHub() {
             <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
           )}
 
-          {meetView === 'map' && meetsToday.length > 0 && (
-            <Card className="!p-2">
-              <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-400">Loading map…</div>}>
-                <MeetMap
-                  pins={meetsToday.map((m) => ({
-                    id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
-                    count: m.participants.length, cap: m.cap,
-                  }))}
-                  onSelect={(id) => { const m = meets.find((x) => x.id === id); if (m) setDetail(m) }}
-                />
-              </Suspense>
-              <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">Pin number = people actually joined · red = full · tap a pin for details</p>
-            </Card>
-          )}
+          {meetView === 'map' && meetsToday.length > 0 && (() => {
+            // A meet with lat/lng exactly 0,0 means its venue couldn't be geocoded
+            // (or is a legacy record from before geocoding existed) — showing it
+            // would misplace a pin off the coast of Africa, so it's list-only.
+            const mappable = meetsToday.filter((m) => m.lat !== 0 || m.lng !== 0)
+            return (
+              <Card className="!p-2">
+                {mappable.length > 0 ? (
+                  <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-400">Loading map…</div>}>
+                    <MeetMap
+                      pins={mappable.map((m) => ({
+                        id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
+                        count: m.participants.length, cap: m.cap,
+                      }))}
+                      onSelect={(id) => { const m = meets.find((x) => x.id === id); if (m) setDetail(m) }}
+                    />
+                  </Suspense>
+                ) : (
+                  <div className="flex h-[200px] items-center justify-center px-4 text-center text-sm text-neutral-400">None of today's meets have a mappable location yet — check the list view instead.</div>
+                )}
+                <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">
+                  Pin number = people actually joined · red = full · tap a pin for details
+                  {mappable.length < meetsToday.length ? ` · ${meetsToday.length - mappable.length} meet(s) not shown (no location match)` : ''}
+                </p>
+              </Card>
+            )
+          })()}
 
           {meetView === 'list' && meetsToday.map((m) => {
             const r = rsvpOf(m)
@@ -500,9 +514,11 @@ function HostMeetSheet({ email, initialDay, onClose, onCreated }: { email: strin
     setSaving(true)
     setError('')
     try {
+      const geo = await geocode([venue, address].filter(Boolean).join(', '))
       await api.createMeet({
         title: title.trim(), club: club.trim() || undefined, tag, venue: venue.trim(), address: address.trim(),
         day, time, durH, cap, feeRp, emoji: EMOJI_BY_SPORT[tag] || '🏃', notes: [],
+        lat: geo?.lat ?? 0, lng: geo?.lng ?? 0,
       })
       onCreated()
     } catch {
