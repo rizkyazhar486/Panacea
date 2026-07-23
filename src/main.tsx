@@ -139,6 +139,7 @@ const VisitPrepChecklist = lazy(() => import('./pages/VisitPrepChecklist').then(
 const PostureBreaks = lazy(() => import('./pages/PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
 const PainDiary = lazy(() => import('./pages/PainDiary').then((m) => ({ default: m.PainDiary })))
 const OrganDonorCard = lazy(() => import('./pages/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
+const FitnessHub = lazy(() => import('./pages/FitnessHub').then((m) => ({ default: m.FitnessHub })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -221,6 +222,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/posture-breaks" element={<PostureBreaks />} />
               <Route path="/pain-diary" element={<PainDiary />} />
               <Route path="/organ-donor" element={<OrganDonorCard />} />
+              <Route path="/fitness-hub" element={<FitnessHub />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />

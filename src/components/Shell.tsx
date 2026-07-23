@@ -31,7 +31,6 @@ import {
   IconActivity,
   IconPlus,
   IconUser,
-  IconGauge,
   IconLeaf,
   IconSearch,
   IconBell,
@@ -103,18 +102,14 @@ const nav: Nav[] = [
   { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/data-lab', label: 'Data Lab (upload CSV)', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
-  // Kebugaran
+  // Kebugaran — trimmed to daily-use entries; Fitness Test, Anti-Aging &
+  // Organs, Initial Assessment, Body Composition, Performance Lab, Science &
+  // KPIs, and Shape Forming live in Fitness Hub, searchable.
+  { to: '/fitness-hub', label: '🏃 Fitness Hub (all)', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/athlete', label: 'Athlete', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/fitness-test', label: 'Fitness Test', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/organ-vitality', label: 'Anti-Aging & Organs', icon: IconLeaf, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/assessment', label: 'Initial Assessment', icon: IconActivity, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/training-plan', label: 'AI Program', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/body', label: 'Body Composition', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/lab', label: 'Performance Lab', icon: IconGauge, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/sports-science', label: 'Science & KPIs', icon: IconChartUp, roles: ['pasien', 'dokter'], group: 'Fitness' },
-  { to: '/shape-forming', label: 'Shape Forming', icon: IconSparkle, roles: ['pasien'], group: 'Fitness' },
+  { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/sports-scores', label: 'Live Scores', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Fitness' },
   // Klinis & AI
   { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
