@@ -57,6 +57,14 @@ function PublicEntry() {
 
 type Nav = { to: string; label: string; icon: typeof IconDashboard; roles: Role[]; end?: boolean; group?: string }
 
+// Path-boundary match: '/nutrition' should match '/nutrition' and
+// '/nutrition/x', but never '/nutrition-toolkit' — a plain startsWith
+// silently matched these route-prefix collisions.
+function navMatches(n: Nav, pathname: string): boolean {
+  if (n.end) return pathname === n.to
+  return pathname === n.to || pathname.startsWith(n.to + '/')
+}
+
 const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 'owner']
 
 // Sidebar groups (accordion sections) — order defines display order. Grouped by
@@ -173,7 +181,7 @@ function DrawerNav({ items }: { items: Nav[] }) {
   const groups = GROUP_ORDER
     .map((g) => ({ name: g, items: items.filter((n) => n.group === g) }))
     .filter((g) => g.items.length > 0)
-  const activeGroup = groups.find((g) => g.items.some((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to))))?.name
+  const activeGroup = groups.find((g) => g.items.some((n) => navMatches(n, loc.pathname)))?.name
   const [open, setOpen] = useState<Record<string, boolean>>(() => (activeGroup ? { [activeGroup]: true } : {}))
 
   const link = (n: Nav, indent = false) => (
@@ -254,7 +262,7 @@ export function Shell({ children }: { children: ReactNode }) {
   if (!account) return <PublicEntry />
 
   const items = nav.filter((n) => n.roles.includes(account.role))
-  const title = items.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))
+  const title = items.find((n) => navMatches(n, loc.pathname))
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
   // Quick actions (mobile): the role's most useful destinations, minus the
