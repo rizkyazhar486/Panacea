@@ -64,6 +64,15 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/sun-exposure', name: 'Sun & Vitamin D', what: 'Safe sun for vitamin D without skin damage', kw: 'sun uv vitamin d sunscreen skin', tag: 'Aesthetic' },
     ],
   },
+  {
+    title: 'Emergency Preparedness',
+    emoji: '🚑',
+    feats: [
+      { to: '/first-aid', name: 'First Aid Quick Guide', what: 'Plain-language steps for choking, CPR, bleeding & more', kw: 'first aid cpr choking bleeding burns seizure fainting stroke anaphylaxis emergency', tag: 'New' },
+      { to: '/vaccine-tracker', name: 'Vaccine / Immunization Tracker', what: 'Log your last dose, see when the next is due', kw: 'vaccine immunization booster flu tdap covid schedule', tag: 'New' },
+      { to: '/blood-donation', name: 'Blood Donation Eligibility', what: 'A quick pre-screen and your next-eligible date', kw: 'blood donation donor eligibility hemoglobin', tag: 'New' },
+    ],
+  },
 ]
 
 const TAG_STYLE: Record<string, string> = {
