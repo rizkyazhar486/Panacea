@@ -22,6 +22,8 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/longevity', name: 'Longevity Blueprint', what: 'Your personalized healthspan levers and risk drivers', kw: 'lifespan healthspan risk', tag: 'Longevity' },
       { to: '/organ-vitality', name: 'Organ Vitality', what: 'System-by-system health snapshot', kw: 'organ heart liver kidney vitality', tag: 'Longevity' },
       { to: '/supplements', name: 'Supplement Guide', what: 'Evidence-graded longevity supplements', kw: 'supplement vitamin omega creatine stack', tag: 'Antiaging' },
+      { to: '/family-health', name: 'Family Health History', what: 'Early-screening flags from your family history', kw: 'family history genogram legacy tree hereditary risk', tag: 'Longevity' },
+      { to: '/gene-info', name: 'Gene Info', what: 'Look up what a gene does and why it matters', kw: 'gene genetics dna hereditary', tag: 'Longevity' },
     ],
   },
   {
@@ -31,6 +33,7 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/breathwork', name: 'Breathwork Pacer', what: 'Animated paced breathing to calm you in minutes', kw: 'breathing box 478 coherence anxiety stress calm vagus', tag: 'New' },
       { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
       { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
+      { to: '/substance-use-screen', name: 'Alcohol & Tobacco Screening', what: 'Validated substance-use screening', kw: 'audit fagerstrom alcohol tobacco smoking screen substance', tag: 'Mental' },
       { to: '/ikigai', name: 'Ikigai & Purpose', what: 'Find your reason for being', kw: 'ikigai purpose meaning japanese', tag: 'Wellness' },
       { to: '/life-compass', name: 'Life Compass', what: 'Plan your vision, mission, and next step', kw: 'vision mission purpose goals future anxiety worry planning', tag: 'New' },
       { to: '/resilience-stories', name: 'Resilience Stories', what: 'Real people, real hardship, real comebacks', kw: 'motivation inspiration resilience hardship comeback stories', tag: 'New' },
@@ -54,6 +57,9 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/thermal-therapy', name: 'Thermal Therapy', what: 'Sauna & cold-exposure protocols with the evidence', kw: 'sauna cold plunge heat ice thermal recovery', tag: 'New' },
       { to: '/nutrition', name: 'Nutrition & BMR', what: 'Calories, macros, and metabolic rate', kw: 'nutrition calorie macro bmr tdee diet', tag: 'Wellness' },
       { to: '/hydration', name: 'Hydration', what: 'Your daily water target', kw: 'water hydration drink fluid', tag: 'Wellness' },
+      { to: '/alcohol', name: 'Alcohol Unit & BAC Estimator', what: 'Standard drinks and an educational BAC estimate', kw: 'alcohol drink bac widmark unit', tag: 'Wellness' },
+      { to: '/caffeine', name: 'Caffeine & Sleep', what: "See how today's caffeine lingers into tonight's sleep", kw: 'caffeine coffee sleep half-life', tag: 'Sleep' },
+      { to: '/air-quality', name: 'Air Quality & Lungs', what: 'Local air quality and what it means for your lungs', kw: 'air quality aqi pollution lungs pm2.5', tag: 'Wellness' },
     ],
   },
   {
