@@ -135,6 +135,10 @@ const FirstAidGuide = lazy(() => import('./pages/FirstAidGuide').then((m) => ({ 
 const VaccineTracker = lazy(() => import('./pages/VaccineTracker').then((m) => ({ default: m.VaccineTracker })))
 const BloodDonation = lazy(() => import('./pages/BloodDonation').then((m) => ({ default: m.BloodDonation })))
 const SecondOpinion = lazy(() => import('./pages/SecondOpinion').then((m) => ({ default: m.SecondOpinion })))
+const VisitPrepChecklist = lazy(() => import('./pages/VisitPrepChecklist').then((m) => ({ default: m.VisitPrepChecklist })))
+const PostureBreaks = lazy(() => import('./pages/PostureBreaks').then((m) => ({ default: m.PostureBreaks })))
+const PainDiary = lazy(() => import('./pages/PainDiary').then((m) => ({ default: m.PainDiary })))
+const OrganDonorCard = lazy(() => import('./pages/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -213,6 +217,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/vaccine-tracker" element={<VaccineTracker />} />
               <Route path="/blood-donation" element={<BloodDonation />} />
               <Route path="/second-opinion" element={<SecondOpinion />} />
+              <Route path="/visit-prep" element={<VisitPrepChecklist />} />
+              <Route path="/posture-breaks" element={<PostureBreaks />} />
+              <Route path="/pain-diary" element={<PainDiary />} />
+              <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />
