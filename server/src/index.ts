@@ -23,6 +23,10 @@ import {
   addClub,
   toggleClubMember,
   deleteClub,
+  addSecondOpinion,
+  listSecondOpinionsForPatient,
+  listPendingSecondOpinions,
+  completeSecondOpinion,
   uid,
   getClinical,
   saveRecord,
@@ -82,10 +86,11 @@ import {
   type Post,
   type Meet,
   type Club,
+  type SecondOpinion,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
-import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
+import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
@@ -450,6 +455,51 @@ app.delete('/api/clubs/:id', requireAuth, (req, res) => {
   const ok = deleteClub(req.params.id, u.email)
   if (!ok) return res.status(403).json({ error: 'forbidden' })
   res.json({ ok: true })
+})
+
+// --- Second opinion (AI drafts a private analysis for a doctor to review;
+// the patient only ever sees the doctor's finalized opinion) ---
+app.post('/api/second-opinion', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const b = req.body as Partial<SecondOpinion>
+  if (!b.currentDiagnosis && !b.symptoms) return res.status(400).json({ error: 'missing_fields' })
+  const currentDiagnosis = String(b.currentDiagnosis || '').slice(0, 1000)
+  const currentTreatment = String(b.currentTreatment || '').slice(0, 1000)
+  const symptoms = String(b.symptoms || '').slice(0, 1000)
+  const history = String(b.history || '').slice(0, 1000)
+  const caseInfo = `Diagnosis/pengobatan saat ini: ${currentDiagnosis || '(tidak diisi)'}\nPengobatan saat ini: ${currentTreatment || '(tidak diisi)'}\nGejala: ${symptoms || '(tidak diisi)'}\nRiwayat relevan: ${history || '(tidak diisi)'}`
+  const aiDraft = await draftSecondOpinion(caseInfo)
+  const s: SecondOpinion = {
+    id: uid(),
+    patientEmail: u.email,
+    patientName: u.name,
+    currentDiagnosis, currentTreatment, symptoms, history,
+    status: 'pending_doctor',
+    aiDraft,
+    createdAt: new Date().toISOString(),
+  }
+  addSecondOpinion(s)
+  addAudit(u, 'second_opinion.submit')
+  // Patient never receives aiDraft — only the doctor's eventual finalOpinion.
+  res.json({ request: { ...s, aiDraft: undefined } })
+})
+app.get('/api/second-opinion', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role === 'dokter' || u.role === 'owner') {
+    return res.json({ requests: listPendingSecondOpinions() })
+  }
+  const mine = listSecondOpinionsForPatient(u.email).map((s) => ({ ...s, aiDraft: undefined }))
+  res.json({ requests: mine })
+})
+app.post('/api/second-opinion/:id/complete', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (u.role !== 'dokter' && u.role !== 'owner') return res.status(403).json({ error: 'forbidden' })
+  const finalOpinion = String((req.body as { finalOpinion?: string }).finalOpinion || '').slice(0, 4000)
+  if (!finalOpinion.trim()) return res.status(400).json({ error: 'missing_opinion' })
+  const s = completeSecondOpinion(req.params.id, { email: u.email, name: u.name }, finalOpinion)
+  if (!s) return res.status(404).json({ error: 'not_found_or_already_completed' })
+  addAudit(u, 'second_opinion.complete')
+  res.json({ request: s })
 })
 
 // --- clinical (patients + EMR + vitals/supportive + education) ---
