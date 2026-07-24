@@ -9,7 +9,7 @@ import { OSCE_STATION_RUBRICS } from '../lib/osceStationRubrics'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../lib/skdiTherapyReference'
 import { SKDI_SKILLS, SKILL_SYSTEMS, type SkillSystem } from '../lib/skdiSkillsChecklist'
 import { SKDI_DISEASE_LIST, SKDI_DISEASE_SYSTEMS, type SkdiDiseaseSystem } from '../lib/skdiDiseaseList'
-import { SKDI_DISEASE_NOTES } from '../lib/skdiDiseaseNotes'
+import { SKDI_DISEASE_NOTES, REFERENSI_SUMBER } from '../lib/skdiDiseaseNotes'
 
 type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'therapy' | 'diseases' | 'techniques' | 'timeline'
 
@@ -303,6 +303,14 @@ function SkdiDiseaseDirectorySection() {
                           {note.tatalaksana.map((t, j) => <li key={j}>{t}</li>)}
                         </ul>
                       </div>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Referensi</div>
+                        <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                          {note.referensi.map((key) => (
+                            <li key={key}>{REFERENSI_SUMBER[key] ?? key}</li>
+                          ))}
+                        </ol>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -313,9 +321,17 @@ function SkdiDiseaseDirectorySection() {
       ))}
       {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
-        Berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia). Level 4A/4B = harus tuntas mandiri saat
-        lulus dokter, 3A/3B = bisa dengan supervisi, 2 = pernah melihat, 1 = tahu teori.
+      <div className="space-y-2 rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+        <p>
+          Nama penyakit dan level kompetensi berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia).
+          Level 4A/4B = harus tuntas mandiri saat lulus dokter, 3A/3B = bisa dengan supervisi,
+          2 = pernah melihat, 1 = tahu teori.
+        </p>
+        <p>
+          Isi klinis tiap catatan disusun dari ajaran klinis baku dan diselaraskan dengan pedoman
+          terbit yang dicantumkan pada bagian Referensi di tiap entry — bukan kutipan verbatim dari
+          satu dokumen tertentu. Selalu cross-check pedoman terkini sebelum penggunaan klinis.
+        </p>
       </div>
     </div>
   )
