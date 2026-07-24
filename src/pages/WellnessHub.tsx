@@ -94,7 +94,7 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     title: 'Longevity Toolkits',
     emoji: '🧰',
     feats: [
-      { to: '/sleep-toolkit', name: 'Sleep Toolkit', what: 'Cycle alarm, nap timer, consistency score, dream journal & more', kw: 'sleep cycle alarm nap timer consistency dream journal bedtime toolkit', tag: 'New' },
+      { to: '/sleep-toolkit', name: 'Sleep Toolkit', what: 'Cycle alarm, nap timer, consistency score, dream journal, soundscape generator & more', kw: 'sleep cycle alarm nap timer consistency dream journal bedtime toolkit binaural beats white noise pink noise soundscape', tag: 'New' },
       { to: '/movement-toolkit', name: 'Movement Longevity Toolkit', what: 'Grip strength, balance test, Zone 2, micro-workouts & squat streak', kw: 'grip strength balance zone 2 cardio micro workout squat challenge toolkit', tag: 'New' },
       { to: '/mind-toolkit', name: 'Cognitive Longevity Toolkit', what: 'Brain puzzle, memory game, reaction time, stress inventory & more', kw: 'brain puzzle memory game reaction time word stress digital detox meditation toolkit', tag: 'New' },
       { to: '/nutrition-toolkit', name: 'Nutrition Longevity Toolkit', what: 'Mediterranean checklist, sugar streak, plant diversity & more', kw: 'mediterranean diet sugar streak antioxidant plant diversity coffee electrolyte toolkit', tag: 'New' },
