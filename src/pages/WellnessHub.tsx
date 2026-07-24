@@ -76,6 +76,7 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     feats: [
       { to: '/first-aid', name: 'First Aid Quick Guide', what: 'Plain-language steps for choking, CPR, bleeding & more', kw: 'first aid cpr choking bleeding burns seizure fainting stroke anaphylaxis emergency', tag: 'New' },
       { to: '/vaccine-tracker', name: 'Vaccine / Immunization Tracker', what: 'Log your last dose, see when the next is due', kw: 'vaccine immunization booster flu tdap covid schedule', tag: 'New' },
+      { to: '/allergy-tracker', name: 'Allergy Tracker', what: 'Log food, drink, medication & contact (DKA) allergies', kw: 'allergy allergies food drink medication contact dermatitis kontak alergi dka anaphylaxis', tag: 'New' },
       { to: '/blood-donation', name: 'Blood Donation Eligibility', what: 'A quick pre-screen and your next-eligible date', kw: 'blood donation donor eligibility hemoglobin', tag: 'New' },
       { to: '/organ-donor', name: 'Organ Donor Pledge', what: 'Clarify your wishes, then talk to your family', kw: 'organ donor pledge donation transplant', tag: 'New' },
     ],

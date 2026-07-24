@@ -139,6 +139,7 @@ const ThermalTherapy = lazy(() => import('./pages/ThermalTherapy').then((m) => (
 const ClinicalTrials = lazy(() => import('./pages/ClinicalTrials').then((m) => ({ default: m.ClinicalTrials })))
 const FirstAidGuide = lazy(() => import('./pages/FirstAidGuide').then((m) => ({ default: m.FirstAidGuide })))
 const VaccineTracker = lazy(() => import('./pages/VaccineTracker').then((m) => ({ default: m.VaccineTracker })))
+const AllergyTracker = lazy(() => import('./pages/AllergyTracker').then((m) => ({ default: m.AllergyTracker })))
 const BloodDonation = lazy(() => import('./pages/BloodDonation').then((m) => ({ default: m.BloodDonation })))
 const SecondOpinion = lazy(() => import('./pages/SecondOpinion').then((m) => ({ default: m.SecondOpinion })))
 const VisitPrepChecklist = lazy(() => import('./pages/VisitPrepChecklist').then((m) => ({ default: m.VisitPrepChecklist })))
@@ -237,6 +238,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/emergency" element={<EmergencyCard />} />
               <Route path="/first-aid" element={<FirstAidGuide />} />
               <Route path="/vaccine-tracker" element={<VaccineTracker />} />
+              <Route path="/allergy-tracker" element={<AllergyTracker />} />
               <Route path="/blood-donation" element={<BloodDonation />} />
               <Route path="/second-opinion" element={<SecondOpinion />} />
               <Route path="/visit-prep" element={<VisitPrepChecklist />} />
