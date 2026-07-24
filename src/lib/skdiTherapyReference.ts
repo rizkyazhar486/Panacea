@@ -417,6 +417,10 @@ export const SKDI_ENTRIES: SkdiEntry[] = [
   { system: 'Mata', diagnosis: 'Benda Asing Konjungtiva', therapy: 'Anestesi topikal + ekstraksi dengan lidi kapas + antibiotik topikal' },
   { system: 'Mata', diagnosis: 'Hifema (awal)', therapy: 'Bedrest posisi semi-fowler, sikloplegik topikal + turunkan TIO, asam traneksamat' },
   { system: 'Mata', diagnosis: 'Trauma Asam/Basa Mata', therapy: 'Irigasi segera 15-30 menit dengan 2L NaCl 0.9% per mata, sikloplegia + antibiotik; EDTA untuk trauma basa' },
+  { system: 'Mata', diagnosis: 'Endoftalmitis', therapy: 'Infeksi/inflamasi rongga intraokular (vitreous + aqueous), belum mengenai sklera; antibiotik/antifungal intravitreal + sistemik, vitrektomi bila berat' },
+  { system: 'Mata', diagnosis: 'Panoftalmitis', therapy: 'Infeksi meluas ke seluruh bola mata termasuk sklera dan jaringan orbita (lebih berat dari endoftalmitis); antibiotik sistemik agresif, sering berujung eviserasi/enukleasi' },
+  { system: 'Mata', diagnosis: 'Eviserasi', therapy: 'Pengangkatan isi bola mata (kornea, uvea, retina, vitreous) dengan sklera dan otot ekstraokular tetap dipertahankan — pilihan pada panoftalmitis akut untuk mencegah penyebaran infeksi ke orbita/intrakranial' },
+  { system: 'Mata', diagnosis: 'Enukleasi', therapy: 'Pengangkatan seluruh bola mata termasuk sklera, memutus nervus optikus dan otot ekstraokular — indikasi: tumor intraokular (retinoblastoma, melanoma uveal), mata buta nyeri, atau trauma berat non-infeksi' },
 
   // THT
   { system: 'THT', diagnosis: 'Otitis Eksterna Sirkumskripta', therapy: 'Antibiotik topikal (Basitracin, Neomisin, Polymyxin B); definitif: insisi drainase bila furunkel belum pecah; berat: Ampisilin 4x250mg' },
