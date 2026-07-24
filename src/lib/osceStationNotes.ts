@@ -2164,4 +2164,232 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     tips: 'Selalu tunjukkan teknik penyuntikan yang benar (sudut, lokasi, dosis) karena sering menjadi poin penilaian OSCE tersendiri — jangan hanya menyebutkan jenis vaksin.',
   },
+
+  // ─── Hematologi, Imunologi & Infeksi ────────────────────────────────────
+  'Dengue Hemorrhagic Fever (DHF) — semua grade': {
+    anamnesis: [
+      'Demam tinggi mendadak 2-7 hari, bifasik (saddleback fever)',
+      'Nyeri kepala retro-orbital, mialgia, artralgia (breakbone fever)',
+      'Tanda perdarahan: petekie, epistaksis, gusi berdarah, hematemesis/melena',
+      'Nyeri perut hebat, muntah persisten (tanda warning sign)',
+      'Riwayat bepergian/tinggal di daerah endemis dengue',
+    ],
+    pemeriksaanFisik: [
+      'Suhu tubuh, tanda ruam kulit (rash konfluens dengan islands of white)',
+      'Uji tourniquet (Rumple Leede) positif bila ≥10 petekie/inci²',
+      'Tanda syok: akral dingin, capillary refill time memanjang, nadi cepat lemah, tekanan nadi menyempit (<20mmHg)',
+      'Hepatomegali, tanda efusi pleura/asites bila kebocoran plasma berat',
+    ],
+    kriteriaDiagnosis:
+      'Demam akut 2-7 hari + minimal 2 gejala (nyeri kepala, mialgia, ruam, leukopenia, uji tourniquet positif) + trombositopenia (<100.000/µL) + tanda kebocoran plasma (hemokonsentrasi, efusi). Konfirmasi: NS1 antigen (hari 1-3) atau IgM/IgG dengue (setelah hari 5).',
+    tatalaksana: [
+      'Tanpa warning sign: rawat jalan, cairan oral banyak, parasetamol (hindari NSAID/aspirin — risiko perdarahan)',
+      'Dengan warning sign (nyeri perut hebat, muntah persisten, akumulasi cairan, perdarahan mukosa, letargi): rawat inap, cairan kristaloid IV sesuai berat badan',
+      'Dengue shock syndrome: resusitasi cairan kristaloid bolus 10-20 mL/kgBB, evaluasi ketat, pertimbangkan koloid bila tidak respon',
+      'Monitor Hct dan trombosit serial, transfusi trombosit hanya bila perdarahan aktif signifikan (bukan profilaksis rutin)',
+      'Edukasi tanda bahaya untuk kembali segera ke faskes',
+    ],
+    tips: 'Fase kritis DHF justru terjadi saat demam mulai turun (hari 3-7) — edukasi pasien/keluarga bahwa perbaikan suhu bukan berarti sembuh, justru waspada tanda syok.',
+  },
+
+  'Malaria (falciparum/vivax) — apus darah tebal/tipis': {
+    anamnesis: [
+      'Demam periodik (tersiana/kuartana tergantung spesies), menggigil, berkeringat',
+      'Riwayat bepergian/tinggal di daerah endemis malaria',
+      'Nyeri kepala, mialgia, mual muntah',
+      'Pada malaria berat: penurunan kesadaran, kejang, ikterik',
+    ],
+    pemeriksaanFisik: [
+      'Suhu tubuh saat demam, pola demam (intermiten)',
+      'Splenomegali, hepatomegali',
+      'Ikterik (hemolisis), pucat (anemia)',
+      'Tanda malaria berat: penurunan kesadaran, distres napas, syok',
+    ],
+    kriteriaDiagnosis:
+      'Apus darah tebal (untuk deteksi) dan tipis (untuk identifikasi spesies) menunjukkan parasit Plasmodium; RDT (rapid diagnostic test) sebagai alternatif/konfirmasi cepat.',
+    tatalaksana: [
+      'Malaria falciparum tanpa komplikasi: ACT (Artemisinin-based Combination Therapy, misal DHP) 3 hari + primakuin dosis tunggal',
+      'Malaria vivax/ovale: ACT + primakuin 14 hari (radikal, eradikasi hipnozoit) — cek G6PD bila memungkinkan',
+      'Malaria berat (falciparum dengan komplikasi): Artesunat IV, lanjut ACT oral setelah perbaikan',
+      'Tatalaksana suportif: cairan, antipiretik, monitor gula darah (hipoglikemia sering pada malaria berat)',
+      'Edukasi pencegahan: kelambu berinsektisida, repelan, kemoprofilaksis untuk pelancong ke daerah endemis',
+    ],
+    tips: 'Apus darah tebal untuk skrining (lebih sensitif), apus darah tipis untuk identifikasi spesies dan hitung parasitemia — jelaskan perbedaan fungsi keduanya bila ditanya penguji.',
+  },
+
+  'Anemia Defisiensi Besi': {
+    anamnesis: [
+      'Lemas, mudah lelah, pucat, pusing',
+      'Pica (mengunyah es/tanah), disfagia (Plummer-Vinson syndrome)',
+      'Riwayat menstruasi banyak/lama, kehamilan, perdarahan GI kronik',
+      'Riwayat diet rendah zat besi, vegetarian ketat',
+      'Pada anak: riwayat ASI eksklusif lama tanpa MPASI kaya besi',
+    ],
+    pemeriksaanFisik: [
+      'Konjungtiva anemis, atrofi papil lidah (glositis)',
+      'Koilonychia (kuku sendok)',
+      'Angular cheilitis (stomatitis angularis)',
+      'Takikardia bila anemia berat, murmur sistolik fungsional',
+    ],
+    kriteriaDiagnosis:
+      'Hb rendah, MCV/MCH rendah (mikrositik hipokrom), ferritin serum rendah (paling spesifik), TIBC meningkat, saturasi transferin rendah.',
+    tatalaksana: [
+      'Suplementasi besi oral: ferrous sulfate 3x325mg atau setara elemental iron 100-200mg/hari',
+      'Minum saat perut kosong dengan vitamin C untuk absorpsi optimal, hindari bersamaan teh/kopi/kalsium',
+      'Edukasi efek samping (mual, konstipasi, tinja hitam) dan target durasi terapi 3-6 bulan (termasuk mengisi cadangan besi)',
+      'Cari dan tatalaksana penyebab dasar (perdarahan GI, menstruasi berlebih)',
+      'Transfusi PRC bila anemia berat simtomatik (Hb <7 atau gejala hemodinamik)',
+    ],
+    tips: 'Anemia defisiensi besi pada laki-laki dewasa atau wanita pascamenopause wajib dicari sumber perdarahan GI (termasuk skrining keganasan kolon) — jangan langsung diberi suplementasi tanpa mencari penyebab.',
+  },
+
+  'Thalassemia': {
+    anamnesis: [
+      'Riwayat anemia sejak kecil, transfusi berulang',
+      'Riwayat keluarga thalassemia (penyakit genetik autosomal resesif)',
+      'Pertumbuhan terhambat, mudah lelah, pucat kronik',
+      'Riwayat pemberian kelasi besi bila sudah rutin transfusi',
+    ],
+    pemeriksaanFisik: [
+      'Facies Cooley (frontal bossing, hipertelorisme, maksila prominen) pada thalassemia mayor',
+      'Pucat kronik, ikterik ringan (hemolisis kronik)',
+      'Hepatosplenomegali (eritropoiesis ekstramedular)',
+      'Tanda kelebihan besi bila transfusi kronik: perubahan warna kulit keabuan',
+    ],
+    kriteriaDiagnosis:
+      'Anemia mikrositik hipokrom dengan Mentzer index rendah, gambaran darah tepi: sel target, anisopoikilositosis. Konfirmasi: elektroforesis hemoglobin (HbA2/HbF meningkat pada beta-thalassemia).',
+    tatalaksana: [
+      'Thalassemia minor/trait: tidak perlu transfusi, edukasi genetik dan konseling pranikah',
+      'Thalassemia mayor: transfusi PRC rutin (target Hb pre-transfusi >9-10.5 g/dL)',
+      'Terapi kelasi besi (deferoxamine/deferasirox) untuk mencegah hemosiderosis akibat transfusi kronik',
+      'Splenektomi dipertimbangkan bila hipersplenisme berat',
+      'Skrining komplikasi: fungsi jantung (kelebihan besi kardiotoksik), fungsi endokrin',
+    ],
+    tips: 'Konseling genetik penting — tawarkan skrining pembawa sifat (trait) pada keluarga/pasangan untuk pencegahan thalassemia mayor pada keturunan berikutnya.',
+  },
+
+  'Leptospirosis / Weil Disease': {
+    anamnesis: [
+      'Riwayat kontak air banjir/tanah tergenang/tikus (pekerjaan berisiko: petani, pekerja selokan)',
+      'Demam mendadak tinggi, nyeri kepala hebat, mialgia berat (terutama betis)',
+      'Fase kedua (imun): demam berulang, meningismus, ikterik, penurunan produksi urin',
+      'Injeksi konjungtiva tanpa sekret (khas)',
+    ],
+    pemeriksaanFisik: [
+      'Injeksi konjungtiva bilateral tanpa eksudat',
+      'Ikterik (Weil disease — leptospirosis berat dengan gagal hati/ginjal)',
+      'Nyeri tekan otot betis (myalgia gastrocnemius)',
+      'Tanda perdarahan (petekie, epistaksis) pada kasus berat',
+      'Tanda gagal ginjal akut: oliguria, edema',
+    ],
+    kriteriaDiagnosis:
+      'Klinis + faktor risiko epidemiologis + serologi MAT (Microscopic Agglutination Test, gold standard) atau IgM ELISA/rapid test.',
+    tatalaksana: [
+      'Kasus ringan: doksisiklin 2x100mg selama 7 hari (kontraindikasi anak <8 tahun, ibu hamil)',
+      'Kasus berat (Weil disease): Penisilin G IV atau Ceftriaxone IV, rawat inap',
+      'Tatalaksana suportif: cairan, monitor fungsi ginjal, dialisis bila gagal ginjal akut berat',
+      'Waspada reaksi Jarisch-Herxheimer pasca pemberian antibiotik dosis pertama',
+      'Edukasi pencegahan: alas kaki pelindung saat kontak air/tanah berisiko, kontrol tikus',
+    ],
+    tips: 'Kombinasi demam + mialgia betis + injeksi konjungtiva + riwayat kontak air banjir sangat sugestif leptospirosis — pola ini sering menjadi kunci diagnosis OSCE.',
+  },
+
+  'Filariasis': {
+    anamnesis: [
+      'Riwayat tinggal di daerah endemis filariasis, gigitan nyamuk berulang',
+      'Episode demam berulang disertai limfangitis (garis merah menjalar dari pangkal ke ujung tungkai)',
+      'Pembengkakan tungkai/skrotum yang progresif dan kronik',
+      'Riwayat pengobatan massal filariasis sebelumnya',
+    ],
+    pemeriksaanFisik: [
+      'Limfedema tungkai (elephantiasis pada kasus kronik)',
+      'Hidrokel/limfedema skrotum pada laki-laki',
+      'Limfangitis akut: eritema, nyeri sepanjang jalur limfatik',
+      'Pembesaran kelenjar getah bening regional',
+    ],
+    kriteriaDiagnosis:
+      'Identifikasi mikrofilaria pada apus darah tebal (diambil malam hari sesuai periodisitas nokturnal), atau deteksi antigen filaria (ICT card test).',
+    tatalaksana: [
+      'DEC (diethylcarbamazine) 6mg/kgBB/hari selama 12 hari, atau kombinasi DEC + albendazole dosis tunggal (program eliminasi massal)',
+      'Perawatan limfedema kronik: elevasi tungkai, kompresi, higiene kulit untuk cegah infeksi sekunder',
+      'Tatalaksana bedah untuk hidrokel simtomatik',
+      'Edukasi pencegahan gigitan nyamuk (kelambu, repelan) dan partisipasi program pengobatan massal',
+    ],
+    tips: 'Ambil sampel darah malam hari (biasanya 22.00-02.00) karena mikrofilaria memiliki periodisitas nokturnal di sebagian besar wilayah Indonesia — poin penting bila ditanya waktu pengambilan sampel.',
+  },
+
+  'Rheumatoid Arthritis (RA)': {
+    anamnesis: [
+      'Nyeri dan bengkak sendi simetris, terutama sendi kecil tangan (MCP, PIP) dan kaki',
+      'Kaku sendi pagi hari >1 jam (morning stiffness)',
+      'Gejala sistemik: lelah, demam ringan, penurunan BB',
+      'Perjalanan kronik progresif, dapat mengenai sendi besar juga',
+    ],
+    pemeriksaanFisik: [
+      'Sinovitis (bengkak, hangat, nyeri tekan) pada sendi MCP/PIP simetris',
+      'Deformitas lanjut: swan neck, boutonniere, ulnar deviation',
+      'Nodul rheumatoid pada area penekanan (siku)',
+      'Atrofi otot interoseus tangan pada kasus lanjut',
+    ],
+    kriteriaDiagnosis:
+      'Kriteria ACR/EULAR 2010: jumlah dan jenis sendi terlibat, serologi (RF dan/atau anti-CCP positif), reaktan fase akut (CRP/LED meningkat), durasi gejala ≥6 minggu — skor kumulatif ≥6 mendukung diagnosis.',
+    tatalaksana: [
+      'DMARD lini pertama: Methotrexate (dimulai sedini mungkin, prinsip treat-to-target)',
+      'NSAID/kortikosteroid dosis rendah untuk kontrol gejala jangka pendek sambil menunggu efek DMARD',
+      'DMARD biologik (anti-TNF, dll) bila respon tidak adekuat dengan DMARD konvensional',
+      'Monitor efek samping methotrexate: hepatotoksisitas, supresi sumsum tulang — cek darah lengkap dan fungsi hati berkala',
+      'Rehabilitasi medik untuk menjaga fungsi sendi',
+    ],
+    tips: 'Morning stiffness >1 jam adalah pembeda kunci RA dari osteoarthritis (yang biasanya <30 menit) — selalu tanyakan durasi kaku pagi secara spesifik.',
+  },
+
+  'Systemic Lupus Erythematosus (SLE)': {
+    anamnesis: [
+      'Ruam malar (butterfly rash) yang memburuk dengan paparan sinar matahari (fotosensitivitas)',
+      'Nyeri sendi multipel, sariawan berulang, rambut rontok',
+      'Gejala sistemik: demam, lelah, penurunan BB',
+      'Riwayat keguguran berulang (sindrom antifosfolipid terkait), gejala ginjal (edema, urin berbusa)',
+    ],
+    pemeriksaanFisik: [
+      'Ruam malar melintasi pangkal hidung, tidak mengenai lipatan nasolabial',
+      'Ruam diskoid, ulkus oral tidak nyeri',
+      'Artritis non-erosif pada sendi kecil',
+      'Tanda keterlibatan organ: edema (nefritis lupus), efusi pleura/perikardial',
+    ],
+    kriteriaDiagnosis:
+      'Kriteria SLICC/ACR-EULAR: kombinasi kriteria klinis (mukokutan, artritis, serositis, ginjal, neurologis, hematologi) dan imunologis (ANA positif, anti-dsDNA, anti-Sm, komplemen rendah).',
+    tatalaksana: [
+      'Hydroxychloroquine sebagai terapi dasar untuk semua pasien SLE (kecuali kontraindikasi)',
+      'Kortikosteroid dosis disesuaikan derajat keparahan (topikal untuk kulit, sistemik untuk keterlibatan organ mayor)',
+      'Imunosupresan (mycophenolate, azathioprine, cyclophosphamide) untuk nefritis lupus atau keterlibatan organ berat',
+      'Edukasi proteksi sinar matahari (tabir surya, pakaian tertutup) untuk cegah flare',
+      'Monitor rutin: fungsi ginjal, komplemen, anti-dsDNA untuk deteksi flare dini',
+    ],
+    tips: 'ANA positif sensitif tapi tidak spesifik untuk SLE — anti-dsDNA dan anti-Sm lebih spesifik dan berguna untuk memantau aktivitas penyakit (titer anti-dsDNA berkorelasi dengan nefritis lupus).',
+  },
+
+  'Autoimmune Hemolytic Anemia (AIHA)': {
+    anamnesis: [
+      'Lemas, pucat mendadak, ikterik',
+      'Urin berwarna gelap (hemoglobinuria pada hemolisis intravaskular)',
+      'Riwayat penyakit autoimun lain (SLE), keganasan limfoproliferatif, atau infeksi/obat pencetus',
+      'Gejala anemia akut: sesak, palpitasi bila derajat berat',
+    ],
+    pemeriksaanFisik: [
+      'Pucat, ikterik (sklera dan kulit)',
+      'Splenomegali (tempat destruksi eritrosit oleh makrofag)',
+      'Tanda anemia berat: takikardia, hipotensi',
+      'Urin gelap bila hemolisis intravaskular signifikan',
+    ],
+    kriteriaDiagnosis:
+      'Anemia dengan tanda hemolisis (retikulositosis, bilirubin indirek meningkat, LDH meningkat, haptoglobin menurun) + tes Coombs (direct antiglobulin test) positif membedakan dari hemolisis non-autoimun.',
+    tatalaksana: [
+      'Kortikosteroid lini pertama (prednisone 1mg/kgBB/hari), respon dinilai dalam 1-3 minggu',
+      'Splenektomi atau rituximab dipertimbangkan bila refrakter/relaps terhadap steroid',
+      'Transfusi PRC hanya bila anemia berat simtomatik — perlu crossmatch hati-hati karena autoantibodi dapat menyulitkan uji cocok serasi',
+      'Cari dan tatalaksana penyebab dasar (SLE, limfoma, obat pencetus)',
+      'Asam folat suplementasi mendukung eritropoiesis kompensatorik',
+    ],
+    tips: 'Tes Coombs direct positif adalah kunci membedakan AIHA dari penyebab hemolisis lain (misal defisiensi G6PD, thalassemia) — selalu sebutkan pemeriksaan ini saat ditanya alur diagnosis anemia hemolitik.',
+  },
 }
