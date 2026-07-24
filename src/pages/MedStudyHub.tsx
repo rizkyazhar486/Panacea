@@ -4,6 +4,7 @@ import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../compone
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
 import { OSCE_CASES, OSCE_SYSTEMS, type OsceSystem } from '../lib/osceCaseBank'
+import { OSCE_STATION_NOTES } from '../lib/osceStationNotes'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../lib/skdiTherapyReference'
 
 type Section = 'practice' | 'osce' | 'case-bank' | 'therapy' | 'techniques' | 'timeline'
@@ -116,6 +117,7 @@ function SkdiTherapySection() {
 function OsceCaseBankSection() {
   const [query, setQuery] = useState('')
   const [system, setSystem] = useState<OsceSystem | null>(null)
+  const [expanded, setExpanded] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -163,15 +165,57 @@ function OsceCaseBankSection() {
         <Card key={sys} className="!p-4">
           <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys}</div>
           <div className="mt-2 space-y-2">
-            {cases.map((c) => (
-              <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-[13px] font-bold text-ink dark:text-white">{c.name}</span>
-                  <Badge tone={freqTone(c.frequency)}>{c.frequency}</Badge>
+            {cases.map((c) => {
+              const notes = OSCE_STATION_NOTES[c.name]
+              const isOpen = expanded === c.name
+              return (
+                <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+                  <button
+                    className="flex w-full items-start justify-between gap-2 text-left"
+                    onClick={() => notes && setExpanded(isOpen ? null : c.name)}
+                  >
+                    <span className="text-[13px] font-bold text-ink dark:text-white">{c.name}</span>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <Badge tone={freqTone(c.frequency)}>{c.frequency}</Badge>
+                      {notes && <Badge tone="brand">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
+                    </div>
+                  </button>
+                  {c.note && <p className="mt-1 text-[12px] text-neutral-500">{c.note}</p>}
+
+                  {isOpen && notes && (
+                    <div className="mt-3 space-y-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Anamnesis</div>
+                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                          {notes.anamnesis.map((a, i) => <li key={i}>{a}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pemeriksaan Fisik</div>
+                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                          {notes.pemeriksaanFisik.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Kriteria Diagnosis</div>
+                        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.kriteriaDiagnosis}</p>
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Tatalaksana</div>
+                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                          {notes.tatalaksana.map((t, i) => <li key={i}>{t}</li>)}
+                        </ul>
+                      </div>
+                      {notes.tips && (
+                        <div className="rounded-lg bg-amber-50 p-2.5 text-[12px] leading-relaxed text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
+                          💡 {notes.tips}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                {c.note && <p className="mt-1 text-[12px] text-neutral-500">{c.note}</p>}
-              </div>
-            ))}
+              )
+            })}
           </div>
         </Card>
       ))}
