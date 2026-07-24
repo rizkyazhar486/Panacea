@@ -9,6 +9,7 @@ import { OSCE_STATION_RUBRICS } from '../lib/osceStationRubrics'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../lib/skdiTherapyReference'
 import { SKDI_SKILLS, SKILL_SYSTEMS, type SkillSystem } from '../lib/skdiSkillsChecklist'
 import { SKDI_DISEASE_LIST, SKDI_DISEASE_SYSTEMS, type SkdiDiseaseSystem } from '../lib/skdiDiseaseList'
+import { SKDI_DISEASE_NOTES } from '../lib/skdiDiseaseNotes'
 
 type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'therapy' | 'diseases' | 'techniques' | 'timeline'
 
@@ -214,6 +215,7 @@ function SkdiDiseaseDirectorySection() {
   const [query, setQuery] = useState('')
   const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
   const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
+  const [expanded, setExpanded] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -267,18 +269,45 @@ function SkdiDiseaseDirectorySection() {
         <Card key={sys} className="!p-4">
           <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys} · {diseases.length}</div>
           <div className="mt-2 space-y-2">
-            {diseases.map((e, i) => (
-              <div key={i} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                <div>
-                  <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
-                  {e.subsection && <span className="ml-2 text-[11px] text-neutral-400">{e.subsection}</span>}
+            {diseases.map((e, i) => {
+              const note = SKDI_DISEASE_NOTES[e.disease]
+              const isOpen = expanded === e.disease
+              return (
+                <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+                  <button
+                    className="flex w-full items-start justify-between gap-2 text-left"
+                    onClick={() => note && setExpanded(isOpen ? null : e.disease)}
+                  >
+                    <div>
+                      <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
+                      {e.subsection && <span className="ml-2 text-[11px] text-neutral-400">{e.subsection}</span>}
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {hasOsceNote(e.disease) && <Badge tone="brand">Catatan OSCE</Badge>}
+                      <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
+                      {note && <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
+                    </div>
+                  </button>
+                  {isOpen && note && (
+                    <div className="mt-3 space-y-2 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.definisi}</p>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Diagnosis</div>
+                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                          {note.diagnosis.map((d, j) => <li key={j}>{d}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Tatalaksana</div>
+                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                          {note.tatalaksana.map((t, j) => <li key={j}>{t}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {hasOsceNote(e.disease) && <Badge tone="brand">Catatan OSCE</Badge>}
-                  <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </Card>
       ))}
