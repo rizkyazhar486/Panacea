@@ -1551,4 +1551,129 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Hernia strangulata: operasi cito (kegawatdaruratan) — risiko nekrosis usus bila ditunda',
     ],
   },
+
+  // ─── Ginjal & Saluran Kemih ─────────────────────────────────────────────
+  'Sistitis Akut': {
+    anamnesis: [
+      'Disuria, frekuensi, urgensi, nyeri suprapubik, tanpa demam tinggi/nyeri pinggang (beda dari pielonefritis)',
+      'Faktor risiko: aktivitas seksual, kehamilan, riwayat ISK berulang',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tekan suprapubik ringan, tidak ada nyeri ketok CVA (membedakan dari pielonefritis)',
+      'Tanda vital umumnya normal (tanpa demam tinggi)',
+    ],
+    kriteriaDiagnosis: 'Urinalisis: leukosituria, nitrit positif (bakteri penghasil nitrit reduktase); kultur urin >10^5 CFU/mL untuk konfirmasi bila diperlukan.',
+    tatalaksana: [
+      'Antibiotik: kotrimoksazol atau fluorokuinolon (siprofloksasin) 3 hari untuk sistitis tanpa komplikasi, 7-14 hari bila komplikata',
+      'Hidrasi adekuat, hindari menahan BAK',
+      'Edukasi: BAK setelah berhubungan seksual, cebok dari depan ke belakang pada wanita',
+    ],
+  },
+  'Pielonefritis Akut': {
+    anamnesis: [
+      'Nyeri pinggang unilateral, demam tinggi menggigil, mual muntah, disertai gejala ISK bawah (disuria, frekuensi)',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri ketok sudut kostovertebra (CVA tenderness) positif pada sisi terkena, demam tinggi, nyeri tekan suprapubik dapat menyertai',
+    ],
+    kriteriaDiagnosis: 'Urinalisis: leukosituria, silinder leukosit (khas menunjukkan keterlibatan ginjal, bukan hanya kandung kemih); kultur urin untuk identifikasi organisme & sensitivitas.',
+    tatalaksana: [
+      'Antibiotik: fluorokuinolon (siprofloksasin/levofloksasin) atau sefalosporin, 7-14 hari; IV bila rawat inap',
+      'Hidrasi adekuat, analgesik-antipiretik',
+      'Rawat inap bila tanda sepsis, tidak respons terapi oral, atau kehamilan',
+    ],
+  },
+  'Glomerulonefritis Akut Pasca-Streptokokus (GNAPS)': {
+    anamnesis: [
+      'Anak dengan riwayat infeksi tenggorokan/kulit oleh Streptococcus 1-3 minggu sebelumnya, kemudian muncul edema (terutama periorbital pagi hari), urin berwarna gelap seperti teh/cola, penurunan volume urin, kadang hipertensi/sakit kepala',
+    ],
+    pemeriksaanFisik: [
+      'Edema periorbital/tungkai, hipertensi, urinalisis: hematuria makroskopik (urin cola-colored)',
+    ],
+    kriteriaDiagnosis: 'Mnemonic PHARAOH: Proteinuria, Hematuria, Azotemia, Red cell cast, Oliguria, Hipertensi. Titer ASTO meningkat, komplemen C3 menurun (transien).',
+    tatalaksana: [
+      'Suportif: restriksi cairan & garam, diuretik bila edema/hipertensi bermakna',
+      'Antibiotik (amoksisilin) bila masih ada fokus infeksi streptokokus aktif',
+      'Rujuk Sp.A/nefrologi anak bila komplikasi (hipertensi ensefalopati, gagal ginjal akut)',
+      'Prognosis umumnya baik dengan resolusi spontan dalam beberapa minggu',
+    ],
+  },
+  'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis': {
+    anamnesis: [
+      'Nyeri kolik hebat pinggang menjalar ke selangkangan/genitalia (sesuai lokasi batu — proksimal ureter: setinggi umbilikus; ureter tengah: ke inguinal/skrotum; ureter distal: ujung penis/labia), hematuria, mual muntah',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri ketok CVA, pasien gelisah tidak bisa diam mencari posisi nyaman (khas kolik renal, beda dari peritonitis yang diam menghindari gerakan)',
+      'Hematuria pada urinalisis',
+    ],
+    kriteriaDiagnosis: 'BNO-IVP atau CT scan non-kontras (baku emas) menunjukkan batu dan lokasinya; USG untuk skrining awal/kehamilan.',
+    tatalaksana: [
+      'Batu kecil (<5mm): terapi ekspulsif medis (tamsulosin/alpha-blocker) + hidrasi + analgesik (NSAID/opioid), observasi keluar spontan',
+      'Batu besar/tidak keluar spontan/obstruksi berat: ESWL, ureteroskopi, atau PCNL tergantung ukuran/lokasi',
+      'Analgesik NSAID lini pertama untuk kolik akut (efektif mengurangi spasme ureter)',
+    ],
+  },
+  'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter': {
+    anamnesis: [
+      'Tidak bisa BAK sama sekali, nyeri suprapubik hebat, riwayat gejala LUTS sebelumnya (pancaran lemah, nokturia, sering BAK) pada BPH; atau riwayat batu kandung kemih',
+    ],
+    pemeriksaanFisik: [
+      'Distensi kandung kemih teraba/terlihat di suprapubik (buli-buli penuh), nyeri tekan suprapubik',
+      'Colok dubur: pembesaran prostat simetris kenyal pada BPH (beda dari keras/asimetris/nodul pada keganasan prostat)',
+    ],
+    kriteriaDiagnosis: 'Klinis + USG buli-buli (volume residu tinggi).',
+    tatalaksana: [
+      'Kateterisasi uretra segera untuk dekompresi (informed consent, teknik aseptik, ukur volume residu)',
+      'Bila gagal kateter uretra (striktur/obstruksi berat): sistostomi suprapubik',
+      'BPH: alpha-blocker (tamsulosin) + 5-alpha reductase inhibitor jangka panjang, evaluasi bedah (TURP) bila retensi berulang',
+    ],
+    tips: 'Teknik pemasangan kateter uretra pria/wanita adalah skill inti yang sering dinilai langsung — hafal urutan aseptik dan ukuran kateter yang sesuai.',
+  },
+  'Sindrom Nefrotik / Sindrom Nefritik': {
+    anamnesis: [
+      'Nefrotik: edema masif (periorbital, tungkai, dapat asites/efusi pleura), urin berbusa (proteinuria masif)',
+      'Nefritik: hematuria, hipertensi, edema ringan-sedang, oliguria',
+    ],
+    pemeriksaanFisik: [
+      'Nefrotik: edema anasarka, dapat asites',
+      'Nefritik: hipertensi, edema ringan, hematuria makroskopik/mikroskopik',
+    ],
+    kriteriaDiagnosis: 'Nefrotik: proteinuria masif (>3,5g/24jam), hipoalbuminemia, edema, hiperlipidemia (tetrad klasik). Nefritik: hematuria + proteinuria ringan-sedang + hipertensi + penurunan fungsi ginjal, sering dengan komplemen rendah pada penyebab tertentu.',
+    tatalaksana: [
+      'Nefrotik (anak, kemungkinan besar minimal change disease): kortikosteroid (prednison) sebagai terapi awal, diuretik untuk edema, restriksi garam',
+      'Nefritik: tatalaksana penyebab dasar, kontrol tekanan darah, restriksi cairan/garam bila oliguria',
+      'Rujuk nefrologi untuk kasus yang tidak respons/relaps sering/dewasa (perlu biopsi ginjal)',
+    ],
+  },
+  'Fimosis / Parafimosis — tindakan sirkumsisi': {
+    anamnesis: [
+      'Fimosis: kulup tidak dapat ditarik ke belakang, kesulitan BAK (menggembung saat BAK) pada kasus berat',
+      'Parafimosis: kulup tertarik ke belakang tidak bisa dikembalikan, menyebabkan konstriksi/edema glans — kegawatdaruratan',
+    ],
+    pemeriksaanFisik: [
+      'Fimosis: preputium menyempit tidak dapat diretraksi',
+      'Parafimosis: glans edema kebiruan, preputium tertarik di belakang sulkus koronarius membentuk cincin konstriksi — risiko nekrosis glans bila tidak segera direduksi',
+    ],
+    kriteriaDiagnosis: 'Klinis dari inspeksi.',
+    tatalaksana: [
+      'Fimosis: sirkumsisi elektif bila mengganggu BAK/higiene/infeksi berulang; pada anak kecil tanpa gejala, dapat observasi (banyak resolusi spontan usia <5 tahun)',
+      'Parafimosis: reduksi manual segera (kompresi edema + dorong glans kembali) — kegawatdaruratan; bila gagal, insisi dorsal darurat; sirkumsisi definitif setelah edema mereda',
+    ],
+    tips: 'Parafimosis adalah kegawatdaruratan urologi — reduksi manual harus dicoba segera sebelum komplikasi nekrosis glans terjadi.',
+  },
+  'Prostatitis': {
+    anamnesis: [
+      'Nyeri perineum/suprapubik, disuria, kadang demam (akut bakterial) atau gejala kronis berulang (nyeri panggul kronis), gangguan berkemih',
+    ],
+    pemeriksaanFisik: [
+      'Colok dubur: prostat bengkak, nyeri tekan hebat pada prostatitis akut bakterial (hati-hati, masase prostat dikontraindikasikan pada akut karena risiko bakteremia); pada kronis dapat teraba normal/sedikit nyeri',
+    ],
+    kriteriaDiagnosis: 'Klinis + urinalisis/kultur urin (leukosituria, kultur positif pada bakterial akut).',
+    tatalaksana: [
+      'Akut bakterial: antibiotik (fluorokuinolon) 2-4 minggu, dapat rawat inap bila berat/sepsis',
+      'Kronis bakterial: antibiotik jangka lebih panjang (4-6 minggu)',
+      'Kronis non-bakterial (nyeri panggul kronis): alpha-blocker, analgesik, terapi multimodal',
+    ],
+    tips: 'Hindari masase prostat pada prostatitis bakterial akut — dapat memicu bakteremia/sepsis.',
+  },
 }
