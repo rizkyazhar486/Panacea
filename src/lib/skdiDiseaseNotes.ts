@@ -1,13 +1,69 @@
+// ─────────────────────────────────────────────────────────────────────────────
 // Quick-reference clinical notes for the full SKDI 2012 disease directory
 // (src/lib/skdiDiseaseList.ts), covering diseases beyond the 143-case OSCE
 // practical exam bank (which has full station notes in osceStationNotes.ts).
 // Kept intentionally concise (definisi/diagnosis/tatalaksana) given the ~600+
 // entry volume — cross-check current dosing/guidelines before clinical use.
+//
+// PROVENANCE / SITASI — dibaca sebelum menambah entry baru:
+//   • Nama penyakit dan level kompetensi berasal dari dokumen resmi SKDI 2012
+//     (Konsil Kedokteran Indonesia) — dokumen ini HANYA memuat tabel nama +
+//     level, tanpa isi klinis.
+//   • Isi klinis (definisi/diagnosis/tatalaksana) disusun dari ajaran klinis
+//     baku dan diselaraskan dengan pedoman/textbook terbit yang tercantum di
+//     REFERENSI_SUMBER di bawah. Isi ini BUKAN salinan verbatim dari dokumen
+//     mana pun; field `referensi` menunjuk pedoman yang menjadi rujukan
+//     konsep, bukan klaim kutipan halaman.
+//   • Jangan menuliskan sitasi ke dokumen yang isinya tidak benar-benar
+//     menjadi rujukan entry tersebut.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Daftar sumber rujukan, format Vancouver. Key dipakai di field `referensi`. */
+export const REFERENSI_SUMBER: Record<string, string> = {
+  SKDI2012:
+    'Konsil Kedokteran Indonesia. Standar Kompetensi Dokter Indonesia. Jakarta: Konsil Kedokteran Indonesia; 2012.',
+  PPKFKTP2014:
+    'Kementerian Kesehatan Republik Indonesia. Panduan Praktik Klinis bagi Dokter di Fasilitas Pelayanan Kesehatan Tingkat Pertama. Jakarta: Kementerian Kesehatan RI; 2014.',
+  PAPDI2014:
+    'Setiati S, Alwi I, Sudoyo AW, Simadibrata M, Setiyohadi B, Syam AF, editors. Buku Ajar Ilmu Penyakit Dalam. 6th ed. Jakarta: InternaPublishing; 2014.',
+  HARRISON2022:
+    "Loscalzo J, Fauci AS, Kasper DL, Hauser SL, Longo DL, Jameson JL, editors. Harrison's Principles of Internal Medicine. 21st ed. New York: McGraw Hill; 2022.",
+  PERKENI2021:
+    'Perkumpulan Endokrinologi Indonesia. Pedoman Pengelolaan dan Pencegahan Diabetes Melitus Tipe 2 Dewasa di Indonesia. Jakarta: PB PERKENI; 2021.',
+  ADA2024:
+    'American Diabetes Association Professional Practice Committee. Standards of Care in Diabetes—2024. Diabetes Care. 2024;47(Suppl 1):S1-S321.',
+  WHOSAM2013:
+    'World Health Organization. Guideline: Updates on the Management of Severe Acute Malnutrition in Infants and Children. Geneva: World Health Organization; 2013.',
+  FORENSIKFKUI:
+    'Budiyanto A, Widiatmaka W, Sudiono S, Winardi T, Mun’im Idries A, Sidhi, et al. Ilmu Kedokteran Forensik. Jakarta: Bagian Kedokteran Forensik Fakultas Kedokteran Universitas Indonesia; 1997.',
+  KNIGHT2016:
+    "Saukko P, Knight B. Knight's Forensic Pathology. 4th ed. Boca Raton: CRC Press; 2016.",
+  KDIGOCKD2024:
+    'Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314.',
+  KDIGOAKI2012:
+    'Kidney Disease: Improving Global Outcomes (KDIGO) Acute Kidney Injury Work Group. KDIGO Clinical Practice Guideline for Acute Kidney Injury. Kidney Int Suppl. 2012;2(1):1-138.',
+  CAMPBELL2016:
+    'Wein AJ, Kavoussi LR, Partin AW, Peters CA, editors. Campbell-Walsh Urology. 11th ed. Philadelphia: Elsevier; 2016.',
+  HOFFBRAND2019:
+    "Hoffbrand AV, Moss PAH. Hoffbrand's Essential Haematology. 8th ed. Oxford: Wiley-Blackwell; 2019.",
+  SSC2021:
+    'Evans L, Rhodes A, Alhazzani W, Antonelli M, Coopersmith CM, French C, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063-e1143.',
+  WHODENGUE2009:
+    'World Health Organization. Dengue: Guidelines for Diagnosis, Treatment, Prevention and Control. New ed. Geneva: World Health Organization; 2009.',
+  WAO2020:
+    'Cardona V, Ansotegui IJ, Ebisawa M, El-Gamal Y, Fernandez Rivas M, Fineman S, et al. World Allergy Organization Anaphylaxis Guidance 2020. World Allergy Organ J. 2020;13(10):100472.',
+  ACREULAR2010:
+    'Aletaha D, Neogi T, Silman AJ, Funovits J, Felson DT, Bingham CO 3rd, et al. 2010 Rheumatoid Arthritis Classification Criteria: an American College of Rheumatology/European League Against Rheumatism Collaborative Initiative. Arthritis Rheum. 2010;62(9):2569-81.',
+  ATA2016:
+    'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
+}
 
 export interface SkdiDiseaseNote {
   definisi: string
   diagnosis: string[]
   tatalaksana: string[]
+  /** Key ke REFERENSI_SUMBER — pedoman yang menjadi rujukan konsep entry ini. */
+  referensi: string[]
 }
 
 export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
@@ -24,6 +80,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Dokumentasi forensik: foto, pengukuran, deskripsi tertulis rinci sebelum/selama tindakan medis',
       'Pembuatan visum et repertum atas permintaan resmi penyidik',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Kekerasan tajam': {
     definisi: 'Cedera akibat benda bermata tajam/berujung runcing (luka iris, luka tusuk, luka bacok) dengan tepi luka rata.',
@@ -38,6 +95,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Dokumentasi forensik lengkap sebelum debridement/penjahitan bila memungkinkan',
       'Visum et repertum menjelaskan jenis kekerasan dan derajat luka',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Trauma kimia': {
     definisi: 'Cedera jaringan akibat kontak dengan bahan kimia korosif (asam/basa), dapat mengenai kulit, mata, atau saluran cerna.',
@@ -51,6 +109,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Netralisasi tidak direkomendasikan rutin (risiko reaksi eksotermik memperberat cedera)',
       'Rujuk untuk evaluasi lebih lanjut sesuai organ terkena (mata: oftalmologi; esofagus: endoskopi)',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Luka tembak': {
     definisi: 'Cedera akibat proyektil senjata api, dengan karakteristik luka masuk dan keluar yang khas untuk rekonstruksi forensik.',
@@ -64,6 +123,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Dokumentasi forensik sebelum tindakan bedah bila kondisi pasien memungkinkan',
       'Pelaporan wajib ke pihak berwajib (kasus forensik/pidana)',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Luka listrik dan petir': {
     definisi: 'Cedera akibat aliran listrik (arus rumah tangga/industri) atau sambaran petir, dapat menyebabkan luka lokal maupun kerusakan sistemik.',
@@ -78,6 +138,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Resusitasi cairan bila rhabdomiolisis (cegah gagal ginjal akut)',
       'Tatalaksana luka bakar lokal sesuai derajat',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Barotrauma': {
     definisi: 'Cedera jaringan akibat perubahan tekanan lingkungan mendadak (menyelam, penerbangan), sering mengenai telinga tengah, sinus, atau paru.',
@@ -91,6 +152,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Barotrauma paru berat (emboli udara/dekompresi): oksigen 100%, rekompresi hiperbarik segera',
       'Rujuk THT bila ruptur membran timpani menetap',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Trauma suhu': {
     definisi: 'Cedera jaringan akibat paparan suhu ekstrem, meliputi luka bakar (panas) dan frostbite/hipotermia (dingin).',
@@ -104,6 +166,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Frostbite: rewarming cepat air hangat 37-39°C, hindari gosokan/pemanasan langsung api',
       'Hipotermia: rewarming bertahap (pasif eksternal ringan, aktif internal pada berat), hindari pergerakan kasar (risiko aritmia)',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Asfiksia': {
     definisi: 'Kondisi kekurangan oksigen jaringan akibat gangguan jalan napas/pertukaran gas, penyebab kematian penting dalam kasus forensik (pencekikan, penjeratan, pembekapan).',
@@ -116,6 +179,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Bila korban masih hidup: bebaskan jalan napas segera, oksigenasi, resusitasi sesuai kondisi',
       'Kasus forensik (korban meninggal): pemeriksaan luar dan dalam sistematis, dokumentasi jejas untuk rekonstruksi mekanisme kematian',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Tenggelam': {
     definisi: 'Asfiksia akibat terendamnya jalan napas dalam cairan, dapat fatal atau non-fatal (near-drowning) tergantung durasi dan pertolongan.',
@@ -129,6 +193,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Rujuk ICU untuk pemantauan ARDS/edema paru sekunder meski awalnya tampak stabil',
       'Kasus forensik: pemeriksaan lengkap untuk konfirmasi tenggelam vs penyebab kematian lain sebelum masuk air',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Pembunuhan anak sendiri': {
     definisi: 'Istilah forensik (dan pasal KUHP) untuk pembunuhan bayi baru lahir oleh ibu kandungnya sendiri, umumnya dalam kondisi psikologis tertekan pasca melahirkan.',
@@ -141,6 +206,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Bukan kondisi klinis yang ditatalaksana medis — peran dokter adalah pemeriksaan forensik objektif dan pembuatan visum et repertum',
       'Rujuk ibu untuk evaluasi dan dukungan psikiatri (sering terkait gangguan psikologis pascapersalinan)',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Pengguguran kandungan': {
     definisi: 'Aborsi/abortus provokatus — penghentian kehamilan secara sengaja, aspek forensik menilai legalitas (indikasi medis vs kriminal) dan komplikasinya.',
@@ -153,6 +219,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Tatalaksana komplikasi medis (kuretase, antibiotik, resusitasi bila perdarahan/sepsis)',
       'Pelaporan sesuai ketentuan hukum bila dicurigai tindak pidana',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Kematian mendadak': {
     definisi: 'Kematian yang terjadi tiba-tiba dan tidak terduga pada individu yang tampak sehat/tanpa penyakit terminal diketahui sebelumnya, sering memerlukan otopsi untuk penyebab.',
@@ -165,6 +232,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Bukan kondisi yang ditatalaksana — fokus pada penentuan sebab kematian yang akurat untuk kepentingan medikolegal dan keluarga',
       'Visum et repertum jenazah sesuai permintaan penyidik',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
   'Toksikologi forensik': {
     definisi: 'Cabang forensik yang mempelajari identifikasi zat racun/obat dalam tubuh untuk menentukan peran zat tersebut dalam sakit/kematian.',
@@ -177,6 +245,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Bila korban hidup: tatalaksana keracunan sesuai zat (antidot spesifik, dekontaminasi, suportif)',
       'Kasus forensik: koordinasi dengan laboratorium forensik untuk analisis toksikologi lengkap sebagai bagian visum',
     ],
+    referensi: ['SKDI2012', 'FORENSIKFKUI', 'KNIGHT2016'],
   },
 
   // ─── Endokrin & Metabolik ────────────────────────────────────────────────
@@ -191,6 +260,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Edukasi pemantauan gula darah mandiri, pengenalan dan tatalaksana hipoglikemia',
       'Skrining komplikasi kronik rutin (mata, ginjal, kaki) sejak dini',
     ],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Diabetes melitus tipe 2': {
     definisi: 'DM akibat resistensi insulin dengan defisiensi insulin relatif, terkait obesitas dan gaya hidup, onset biasanya usia dewasa.',
@@ -202,6 +272,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Modifikasi gaya hidup + metformin lini pertama, kombinasi OAD/insulin bertahap sesuai target HbA1c',
       'Skrining dan tatalaksana komorbid kardiovaskular (hipertensi, dislipidemia)',
     ],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Ketoasidosis diabetikum nonketotik': {
     definisi: 'Merujuk pada Hyperosmolar Hyperglycemic State (HHS) — dekompensasi hiperglikemik berat tanpa ketosis signifikan, khas pada DM tipe 2 lansia.',
@@ -213,151 +284,181 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Resusitasi cairan agresif sebagai prioritas utama, insulin drip setelah cairan dan kalium adekuat',
       'Cari dan atasi faktor pencetus, monitor status neurologis ketat',
     ],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Hiperglikemi hiperosmolar': {
     definisi: 'Hyperosmolar Hyperglycemic State (HHS) — komplikasi akut DM tipe 2 dengan hiperglikemia ekstrem dan dehidrasi berat tanpa ketoasidosis bermakna.',
     diagnosis: ['GDS >600 mg/dL, osmolaritas serum efektif >320 mOsm/kg, keton negatif/minimal, penurunan kesadaran'],
     tatalaksana: ['Resusitasi cairan kristaloid bertahap (defisit besar, koreksi 24-48 jam), insulin drip setelah resusitasi awal, koreksi kalium'],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Hipoglikemia ringan': {
     definisi: 'Penurunan gula darah <70 mg/dL dengan gejala otonom (berkeringat, gemetar, jantung berdebar) tanpa gangguan kesadaran berat.',
     diagnosis: ['Gejala adrenergik + GDS rendah, membaik setelah asupan glukosa (whipple triad)'],
     tatalaksana: ['Rule of 15: 15g karbohidrat cepat serap oral, ulangi cek GDS 15 menit, edukasi penyesuaian dosis obat DM'],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Hipoglikemia berat': {
     definisi: 'Hipoglikemia dengan gangguan kesadaran/kejang, memerlukan bantuan orang lain untuk penanganan — kegawatdaruratan.',
     diagnosis: ['GDS sangat rendah disertai penurunan kesadaran, kejang, atau perilaku abnormal'],
     tatalaksana: ['Dekstrosa 40% IV bolus (bila akses IV ada) atau glukagon IM bila tidak ada akses IV, lanjut infus dekstrosa maintenance, cari penyebab (overdosis insulin/sulfonilurea)'],
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Diabetes insipidus': {
     definisi: 'Gangguan defisiensi ADH (sentral) atau resistensi ginjal terhadap ADH (nefrogenik) menyebabkan poliuria masif dan polidipsia.',
     diagnosis: ['Poliuria >3L/hari dengan urin sangat encer (osmolaritas rendah), water deprivation test membedakan sentral vs nefrogenik'],
     tatalaksana: ['Sentral: desmopressin (DDAVP); Nefrogenik: atasi penyebab dasar, diuretik tiazid paradoksal, restriksi garam'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Akromegali, gigantisme': {
     definisi: 'Kelebihan hormon pertumbuhan (GH) kronik akibat adenoma hipofisis — gigantisme bila terjadi sebelum lempeng epifisis menutup, akromegali bila sesudahnya.',
     diagnosis: ['Pembesaran tangan/kaki/wajah progresif (akromegali), pertumbuhan tinggi berlebihan (gigantisme); IGF-1 meningkat, GH tidak tersupresi pada OGTT'],
     tatalaksana: ['Reseksi transsfenoidal adenoma hipofisis sebagai lini pertama, analog somatostatin/pegvisomant bila residual/tidak operable'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Defisiensi hormon pertumbuhan': {
     definisi: 'Kekurangan GH menyebabkan perawakan pendek pada anak atau gejala metabolik pada dewasa.',
     diagnosis: ['Perawakan pendek dengan kecepatan tumbuh melambat pada anak; stimulation test GH rendah'],
     tatalaksana: ['Terapi GH rekombinan pada anak dengan defisiensi terbukti, dipantau kecepatan tumbuh dan usia tulang'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Hiperparatiroid': {
     definisi: 'Kelebihan hormon paratiroid (PTH) menyebabkan hiperkalsemia, tersering akibat adenoma paratiroid.',
     diagnosis: ['Gejala hiperkalsemia ("stones, bones, groans, psychiatric overtones"), PTH dan kalsium serum meningkat bersamaan'],
     tatalaksana: ['Paratiroidektomi pada kasus simtomatik/kalsium sangat tinggi, hidrasi dan bifosfonat untuk kontrol hiperkalsemia akut'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Hipoparatiroid': {
     definisi: 'Defisiensi PTH menyebabkan hipokalsemia, sering pasca tiroidektomi/paratiroidektomi.',
     diagnosis: ['Gejala hipokalsemia: parestesia perioral, tetani, Chvostek/Trousseau sign positif; kalsium rendah, PTH rendah/tidak sesuai'],
     tatalaksana: ['Kalsium dan vitamin D oral jangka panjang, kalsium glukonas IV pada tetani akut'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Hipertiroid': {
     definisi: 'Kelebihan hormon tiroid menyebabkan hipermetabolisme sistemik, tersering akibat Grave\'s disease.',
     diagnosis: ['Penurunan BB, palpitasi, tremor, intoleransi panas; TSH rendah, FT4/FT3 tinggi'],
     tatalaksana: ['Obat antitiroid (methimazole/PTU), beta-blocker simptomatik, terapi definitif (iodine radioaktif/tiroidektomi) bila relaps'],
+    referensi: ['SKDI2012', 'ATA2016', 'PAPDI2014'],
   },
   'Tirotoksikosis': {
     definisi: 'Sindrom klinis kelebihan hormon tiroid beredar, dapat akibat hipertiroid primer atau sumber lain (tiroiditis, eksogen).',
     diagnosis: ['Gejala hipermetabolik berat, krisis tiroid (thyroid storm) bila disertai demam tinggi/takikardia berat/penurunan kesadaran'],
     tatalaksana: ['Krisis tiroid: PTU dosis tinggi, iodine (1 jam setelah PTU), beta-blocker, kortikosteroid, tatalaksana suportif ICU'],
+    referensi: ['SKDI2012', 'ATA2016', 'PAPDI2014'],
   },
   'Hipotiroid': {
     definisi: 'Defisiensi hormon tiroid menyebabkan perlambatan metabolisme sistemik, tersering akibat tiroiditis Hashimoto.',
     diagnosis: ['Lemas, penambahan BB, intoleransi dingin, konstipasi; TSH tinggi, FT4 rendah'],
     tatalaksana: ['Levothyroxine substitusi seumur hidup, titrasi berdasarkan TSH tiap 6-8 minggu'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Goiter': {
     definisi: 'Pembesaran kelenjar tiroid, dapat difus atau nodular, dengan fungsi tiroid normal/hiper/hipo.',
     diagnosis: ['Pembesaran leher anterior teraba/terlihat, USG tiroid dan fungsi tiroid (TSH/FT4) untuk klasifikasi'],
     tatalaksana: ['Suplementasi iodium bila endemik, obat antitiroid/levothyroxine sesuai fungsi, operasi bila kompresi/kosmetik/curiga keganasan'],
+    referensi: ['SKDI2012', 'ATA2016', 'PAPDI2014'],
   },
   'Tiroiditis': {
     definisi: 'Inflamasi kelenjar tiroid (autoimun, subakut/de Quervain, atau pasca-partum), dapat menyebabkan fase hipertiroid diikuti hipotiroid.',
     diagnosis: ['Nyeri tiroid (subakut) atau tanpa nyeri (Hashimoto/pascapartum), pola TSH/FT4 berubah sesuai fase'],
     tatalaksana: ['Subakut: NSAID/steroid untuk nyeri, beta-blocker fase hipertiroid; Hashimoto: levothyroxine bila hipotiroid menetap'],
+    referensi: ['SKDI2012', 'ATA2016', 'PAPDI2014'],
   },
   "Cushing's disease": {
     definisi: "Sindrom Cushing akibat kelebihan ACTH dari adenoma hipofisis, menyebabkan hiperkortisolisme kronik.",
     diagnosis: ['Moon face, buffalo hump, striae ungu, obesitas sentral; kortisol bebas urin 24 jam meningkat, tidak tersupresi dexamethasone'],
     tatalaksana: ['Reseksi transsfenoidal adenoma hipofisis sebagai terapi definitif, terapi medikamentosa (ketoconazole) bila tidak operable'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Krisis adrenal': {
     definisi: 'Kegawatdaruratan akibat defisiensi kortisol akut, dapat dipicu stres/infeksi pada pasien insufisiensi adrenal kronik atau penghentian steroid mendadak.',
     diagnosis: ['Hipotensi refrakter, syok, hiponatremia, hiperkalemia, hipoglikemia, nyeri perut/muntah'],
     tatalaksana: ['Hidrokortison IV bolus segera (jangan tunda untuk hasil lab), resusitasi cairan NaCl 0,9% dengan dekstrosa, cari dan atasi pencetus'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   "Addison's disease": {
     definisi: 'Insufisiensi adrenal primer akibat destruksi korteks adrenal (autoimun tersering), menyebabkan defisiensi kortisol dan aldosteron.',
     diagnosis: ['Lemas, hiperpigmentasi kulit, hipotensi, hiponatremia, hiperkalemia; kortisol pagi rendah, ACTH tinggi'],
     tatalaksana: ['Substitusi hidrokortison dan fludrokortison seumur hidup, edukasi dosis stres saat sakit/prosedur'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Pubertas prekoks': {
     definisi: 'Munculnya tanda pubertas sebelum usia 8 tahun (perempuan) atau 9 tahun (laki-laki).',
     diagnosis: ['Tanda seks sekunder dini, usia tulang lebih maju dari usia kronologis, LH/FSH dan hormon seks meningkat sesuai jenis (sentral vs perifer)'],
     tatalaksana: ['Sentral: agonis GnRH untuk menekan pubertas; cari dan tatalaksana penyebab dasar (tumor SSP, dll)'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Hipogonadisme': {
     definisi: 'Penurunan fungsi gonad menyebabkan defisiensi hormon seks, dapat primer (gonad) atau sekunder (hipotalamus-hipofisis).',
     diagnosis: ['Pubertas terlambat/tidak lengkap, infertilitas, penurunan libido; kadar hormon seks rendah dengan LH/FSH tinggi (primer) atau rendah (sekunder)'],
     tatalaksana: ['Terapi sulih hormon seks sesuai jenis kelamin dan usia, evaluasi penyebab sekunder (tumor hipofisis, dll)'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Prolaktinemia': {
     definisi: 'Hiperprolaktinemia — kelebihan hormon prolaktin, tersering akibat prolaktinoma hipofisis atau obat (antipsikotik).',
     diagnosis: ['Galaktorea, gangguan menstruasi/infertilitas pada wanita, disfungsi ereksi pada pria; prolaktin serum meningkat, MRI hipofisis bila curiga tumor'],
     tatalaksana: ['Agonis dopamin (bromocriptine/cabergoline) lini pertama untuk prolaktinoma, hentikan/ganti obat pencetus bila penyebab medikamentosa'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Adenoma tiroid': {
     definisi: 'Tumor jinak kelenjar tiroid, dapat fungsional (toxic adenoma) atau non-fungsional.',
     diagnosis: ['Nodul tiroid teraba, USG untuk karakteristik nodul, sidik tiroid bila fungsional (hot nodule), FNAB bila curiga keganasan'],
     tatalaksana: ['Observasi bila non-fungsional dan jinak, ablasi/operasi bila toxic adenoma atau kecurigaan keganasan'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Karsinoma tiroid': {
     definisi: 'Keganasan kelenjar tiroid, tersering tipe papiler dengan prognosis baik bila ditatalaksana tepat.',
     diagnosis: ['Nodul tiroid dengan tanda curiga (keras, fiksasi, pembesaran KGB), FNAB untuk konfirmasi sitologi'],
     tatalaksana: ['Tiroidektomi total/near-total, ablasi iodine radioaktif pasca-operasi, supresi TSH dengan levothyroxine, surveilans tiroglobulin'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Malnutrisi energi-protein': {
     definisi: 'Kekurangan asupan energi dan protein kronik, meliputi spektrum marasmus, kwashiorkor, dan campuran keduanya.',
     diagnosis: ['BB/TB rendah, LiLA rendah, edema (kwashiorkor), wasting berat (marasmus)'],
     tatalaksana: ['Tatalaksana 10 langkah WHO gizi buruk, pemberian makan bertahap (F-75 lalu F-100), koreksi mikronutrien'],
+    referensi: ['SKDI2012', 'WHOSAM2013', 'PPKFKTP2014'],
   },
   'Defisiensi vitamin': {
     definisi: 'Kekurangan satu atau lebih vitamin esensial, manifestasi bervariasi sesuai jenis vitamin (A: xerophthalmia, B1: beri-beri, C: skorbut, D: rakitis).',
     diagnosis: ['Sesuai jenis vitamin: gangguan penglihatan malam (A), neuropati/gagal jantung (B1), perdarahan gusi (C), deformitas tulang (D)'],
     tatalaksana: ['Suplementasi vitamin spesifik sesuai defisiensi, atasi penyebab dasar (malabsorpsi, diet tidak adekuat)'],
+    referensi: ['SKDI2012', 'WHOSAM2013', 'PPKFKTP2014'],
   },
   'Defisiensi mineral': {
     definisi: 'Kekurangan mineral esensial (besi, zink, iodium, kalsium) dengan manifestasi klinis sesuai jenis.',
     diagnosis: ['Sesuai jenis: anemia (besi), gangguan pertumbuhan/imunitas (zink), goiter (iodium), osteopenia (kalsium)'],
     tatalaksana: ['Suplementasi mineral spesifik, perbaikan diet, atasi penyebab dasar'],
+    referensi: ['SKDI2012', 'WHOSAM2013', 'PPKFKTP2014'],
   },
   'Dislipidemia': {
     definisi: 'Kelainan profil lipid darah (kolesterol total, LDL, HDL, trigliserida) yang meningkatkan risiko kardiovaskular.',
     diagnosis: ['Profil lipid puasa abnormal sesuai kriteria (LDL/TG tinggi, HDL rendah)'],
     tatalaksana: ['Modifikasi gaya hidup, statin lini pertama sesuai kategori risiko kardiovaskular'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014'],
   },
   'Porfiria': {
     definisi: 'Kelompok gangguan metabolik akibat defek enzim sintesis heme, menyebabkan akumulasi porfirin/prekursornya.',
     diagnosis: ['Nyeri perut hebat, gejala neuropsikiatri, urin berwarna gelap (port-wine) saat serangan akut; porfobilinogen urin meningkat saat serangan'],
     tatalaksana: ['Hindari faktor pencetus (obat porfirinogenik, puasa, alkohol), hematin/glukosa IV pada serangan akut'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
   'Hiperurisemia': {
     definisi: 'Peningkatan kadar asam urat serum, dapat asimtomatik atau berujung gout artritis/batu ginjal.',
     diagnosis: ['Asam urat serum tinggi (>7 mg/dL pria, >6 mg/dL wanita), evaluasi gejala gout bila ada'],
     tatalaksana: ['Modifikasi diet (batasi purin, alkohol), obat penurun urat (allopurinol) bila simtomatik/berulang, tidak rutin diobati bila asimtomatik murni'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014'],
   },
   'Obesitas': {
     definisi: 'Akumulasi lemak tubuh berlebih yang meningkatkan risiko berbagai komorbid metabolik dan kardiovaskular.',
     diagnosis: ['BMI ≥25 kg/m² (kriteria Asia Pasifik), evaluasi komorbid terkait (DM, hipertensi, sleep apnea)'],
     tatalaksana: ['Modifikasi gaya hidup (defisit kalori, aktivitas fisik), farmakoterapi/bedah bariatrik pada kasus berat gagal konservatif'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014'],
   },
   'Sindrom metabolik': {
     definisi: 'Kumpulan faktor risiko kardiometabolik (obesitas sentral, dislipidemia, hipertensi, hiperglikemia) yang meningkatkan risiko DM dan penyakit kardiovaskular.',
     diagnosis: ['Minimal 3 dari 5 kriteria NCEP ATP III modifikasi Asia (lingkar pinggang, TG, HDL, TD, GDP)'],
     tatalaksana: ['Modifikasi gaya hidup multifaktorial sebagai dasar, tatalaksana tiap komponen sesuai indikasi'],
+    referensi: ['SKDI2012', 'PAPDI2014', 'HARRISON2022'],
   },
 
   // ─── Hematologi & Imunologi ──────────────────────────────────────────────
@@ -365,155 +466,374 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     definisi: 'Kegagalan sumsum tulang memproduksi sel darah (pansitopenia) akibat destruksi/supresi sel punca hematopoietik.',
     diagnosis: ['Pansitopenia (anemia, leukopenia, trombositopenia) tanpa organomegali, biopsi sumsum tulang menunjukkan hiposelularitas berat'],
     tatalaksana: ['Transplantasi sumsum tulang alogenik pada usia muda dengan donor cocok, terapi imunosupresif (ATG + siklosporin) bila tidak ada donor, transfusi suportif'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Anemia hemolitik': {
     definisi: 'Anemia akibat destruksi eritrosit dipercepat, dapat imun (AIHA) atau non-imun (defek membran, enzim, hemoglobinopati).',
     diagnosis: ['Ikterik, splenomegali, retikulositosis, bilirubin indirek dan LDH meningkat, haptoglobin menurun; Coombs test membedakan imun vs non-imun'],
     tatalaksana: ['Kortikosteroid bila autoimun, transfusi bila anemia berat simtomatik, atasi penyebab dasar'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Anemia makrositik': {
     definisi: 'Anemia dengan MCV meningkat (>100 fL), tersering akibat defisiensi B12/folat atau penyakit hati/hipotiroid.',
     diagnosis: ['MCV tinggi, kadar B12/folat serum, apus darah tepi (megaloblastik vs non-megaloblastik)'],
     tatalaksana: ['Suplementasi B12/folat sesuai defisiensi, atasi penyebab dasar (malabsorpsi, diet, penyakit hati)'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Anemia megaloblastik': {
     definisi: 'Anemia makrositik akibat gangguan sintesis DNA, tersering defisiensi vitamin B12 atau asam folat.',
     diagnosis: ['MCV tinggi, hipersegmentasi neutrofil pada apus darah tepi, B12/folat serum rendah'],
     tatalaksana: ['B12 injeksi (bila defisiensi B12, terutama jika ada gejala neurologis) atau folat oral; jangan beri folat saja bila B12 belum disingkirkan (dapat memperberat neuropati)'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Hemoglobinopati': {
     definisi: 'Kelainan genetik struktur/produksi hemoglobin (thalassemia, sickle cell disease, dll).',
     diagnosis: ['Anemia mikrositik/hemolitik kronik sejak usia dini, riwayat keluarga; elektroforesis hemoglobin untuk konfirmasi jenis'],
     tatalaksana: ['Sesuai jenis: transfusi rutin + kelasi besi (thalassemia mayor), hidroksiurea (sickle cell), konseling genetik'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Polisitemia': {
     definisi: 'Peningkatan jumlah eritrosit/hemoglobin di atas normal, dapat primer (polisitemia vera) atau sekunder (hipoksia kronik, tumor penghasil EPO).',
     diagnosis: ['Hb/hematokrit tinggi, gejala hiperviskositas (nyeri kepala, pruritus pasca mandi air hangat); mutasi JAK2 mendukung polisitemia vera'],
     tatalaksana: ['Flebotomi berkala, aspirin dosis rendah, sitoreduksi (hidroksiurea) pada polisitemia vera risiko tinggi; atasi penyebab dasar bila sekunder'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'DIC (Disseminated Intravascular Coagulation)': {
     definisi: 'Aktivasi sistem koagulasi yang meluas dan tidak terkontrol, menyebabkan trombosis mikrovaskular sekaligus perdarahan akibat konsumsi faktor pembekuan.',
     diagnosis: ['Perdarahan multipel (bekas suntikan, mukosa) bersamaan tanda trombosis; trombositopenia, PT/aPTT memanjang, fibrinogen rendah, D-dimer sangat tinggi'],
     tatalaksana: ['Atasi penyebab dasar (sepsis, obstetri, keganasan) sebagai prioritas utama, transfusi komponen darah (FFP, kriopresipitat, trombosit) sesuai defisit'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Agranulositosis': {
     definisi: 'Penurunan neutrofil berat (<500/µL), sering akibat obat (misal: OAT, propylthiouracil, clozapine), meningkatkan risiko infeksi berat.',
     diagnosis: ['Demam tinggi mendadak pada pasien dengan riwayat obat penyebab, hitung neutrofil absolut sangat rendah'],
     tatalaksana: ['Hentikan segera obat penyebab, isolasi protektif, antibiotik empiris spektrum luas segera bila demam neutropenia, G-CSF dipertimbangkan'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Inkompatibilitas golongan darah': {
     definisi: 'Reaksi imunologis akibat ketidakcocokan golongan darah ABO/Rh antara donor-resipien transfusi atau ibu-janin.',
     diagnosis: ['Reaksi transfusi akut: demam, menggigil, nyeri pinggang, hemoglobinuria; pada neonatus: ikterik dini berat, anemia hemolitik (inkompatibilitas Rh/ABO ibu-janin)'],
     tatalaksana: ['Hentikan transfusi segera bila reaksi, tatalaksana suportif dan cari penyebab; pada neonatus: fototerapi/transfusi tukar sesuai derajat, profilaksis anti-D pada ibu Rh negatif'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Timoma': {
     definisi: 'Tumor kelenjar timus, sering berkaitan dengan myasthenia gravis dan gangguan autoimun lain.',
     diagnosis: ['Massa mediastinum anterior pada pencitraan, sering ditemukan insidental atau saat evaluasi myasthenia gravis'],
     tatalaksana: ['Timektomi sebagai terapi utama, radioterapi adjuvan pada kasus invasif'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   "Limfoma non-Hodgkin's, Hodgkin's": {
     definisi: 'Keganasan sistem limfatik; Hodgkin ditandai sel Reed-Sternberg, non-Hodgkin lebih heterogen dan sering ekstranodal.',
     diagnosis: ['Limfadenopati tanpa nyeri progresif, gejala B (demam, keringat malam, penurunan BB); biopsi kelenjar getah bening untuk konfirmasi histopatologi'],
     tatalaksana: ['Kemoterapi kombinasi (ABVD untuk Hodgkin, R-CHOP untuk non-Hodgkin sel B), radioterapi pada stadium terbatas, rujuk hematologi-onkologi'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Leukemia akut, kronik': {
     definisi: 'Keganasan sel darah putih; akut (AML/ALL) progresif cepat, kronik (CML/CLL) lebih indolen.',
     diagnosis: ['Akut: anemia, perdarahan, infeksi berulang, blast di darah tepi/sumsum tulang; Kronik: sering asimtomatik, leukositosis ditemukan skrining, splenomegali'],
     tatalaksana: ['Akut: kemoterapi induksi segera, rujuk hematologi-onkologi cito; Kronik: CML dengan TKI (imatinib), CLL observasi/kemoterapi sesuai stadium'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Mieloma multipel': {
     definisi: 'Keganasan sel plasma klonal yang memproduksi imunoglobulin monoklonal berlebih, menyerang tulang dan ginjal.',
     diagnosis: ['CRAB criteria: hiperCalcemia, Renal insufficiency, Anemia, Bone lesions (lesi litik); elektroforesis protein serum menunjukkan M-protein/gap paraprotein'],
     tatalaksana: ['Kemoterapi kombinasi/terapi target (bortezomib, lenalidomide), transplantasi sel punca autolog pada kandidat sesuai, bifosfonat untuk lesi tulang'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Limfadenopati': {
     definisi: 'Pembesaran kelenjar getah bening, dapat reaktif (infeksi), atau patologis (keganasan, autoimun).',
     diagnosis: ['Evaluasi lokasi, ukuran, konsistensi, nyeri tekan; curiga keganasan bila keras, fiksasi, tidak nyeri, progresif — biopsi bila persisten/curiga'],
     tatalaksana: ['Atasi penyebab dasar (infeksi/antibiotik), observasi bila reaktif jelas, rujuk untuk biopsi bila kriteria curiga terpenuhi'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Limfadenitis': {
     definisi: 'Inflamasi kelenjar getah bening akibat infeksi, umumnya bakteri (limfadenitis supuratif) atau TB (skrofuloderma).',
     diagnosis: ['Kelenjar bengkak, nyeri, hangat, dapat fluktuatif bila abses; cari fokus infeksi primer'],
     tatalaksana: ['Antibiotik sesuai sumber infeksi, insisi drainase bila abses, OAT bila limfadenitis TB'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Bakteremia': {
     definisi: 'Keberadaan bakteri dalam aliran darah, dapat transien atau menetap, berpotensi berkembang menjadi sepsis.',
     diagnosis: ['Demam, menggigil, kultur darah positif; cari sumber infeksi primer (ISK, pneumonia, infeksi kulit)'],
     tatalaksana: ['Antibiotik empiris IV segera setelah kultur diambil, sesuaikan berdasarkan hasil kultur dan sensitivitas, atasi sumber infeksi'],
+    referensi: ['SKDI2012', 'SSC2021', 'PAPDI2014'],
   },
   'Demam dengue, DHF': {
     definisi: 'Infeksi virus dengue dengan spektrum dari demam dengue ringan hingga DHF dengan kebocoran plasma.',
     diagnosis: ['Demam akut + 2 gejala penyerta (nyeri kepala, mialgia, ruam, uji tourniquet positif) + trombositopenia + tanda kebocoran plasma untuk DHF'],
     tatalaksana: ['Cairan oral/IV sesuai derajat, monitor Hct dan trombosit serial, hindari NSAID/aspirin'],
+    referensi: ['SKDI2012', 'WHODENGUE2009', 'PPKFKTP2014'],
   },
   'Dengue shock syndrome': {
     definisi: 'Bentuk DHF paling berat dengan kegagalan sirkulasi akibat kebocoran plasma masif.',
     diagnosis: ['Tanda syok: akral dingin, nadi cepat lemah, tekanan nadi menyempit <20mmHg, penurunan kesadaran'],
     tatalaksana: ['Resusitasi cairan kristaloid bolus segera 10-20 mL/kgBB, evaluasi ketat, pertimbangkan koloid bila tidak respon, rawat ICU'],
+    referensi: ['SKDI2012', 'WHODENGUE2009', 'PPKFKTP2014'],
   },
   'Leishmaniasis dan tripanosomiasis': {
     definisi: 'Infeksi parasit protozoa ditularkan vektor serangga (lalat pasir untuk Leishmania, lalat tsetse/triatoma untuk Trypanosoma).',
     diagnosis: ['Leishmaniasis: lesi kulit ulseratif kronik atau demam+hepatosplenomegali (visceral); Tripanosomiasis: chancre di gigitan, limfadenopati, gangguan neurologis stadium lanjut'],
     tatalaksana: ['Sesuai spesies dan bentuk klinis: antimonial pentavalen/amphotericin B (leishmaniasis), suramin/melarsoprol (tripanosomiasis) — rujuk pusat tropis'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Toksoplasmosis': {
     definisi: 'Infeksi protozoa Toxoplasma gondii, penting pada kehamilan (risiko kongenital) dan imunokompromais (ensefalitis).',
     diagnosis: ['Umumnya asimtomatik pada imunokompeten; serologi IgM/IgG toxoplasma untuk skrining kehamilan; pada imunokompromais: gejala ensefalitis dengan lesi cincin pada CT/MRI'],
     tatalaksana: ['Pirimetamin + sulfadiazin + asam folinat pada kasus simtomatik/kongenital/imunokompromais; spiramycin pada ibu hamil terinfeksi akut untuk cegah transmisi'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Sepsis': {
     definisi: 'Disfungsi organ mengancam nyawa akibat respons tubuh yang tidak teratur terhadap infeksi.',
     diagnosis: ['Kecurigaan infeksi + perubahan skor SOFA ≥2 poin, atau qSOFA ≥2 (perubahan kesadaran, RR≥22, TD sistolik≤100) sebagai skrining cepat'],
     tatalaksana: ['Bundle sepsis jam pertama: kultur darah sebelum antibiotik, antibiotik empiris broad-spectrum segera, resusitasi cairan kristaloid 30mL/kgBB bila hipotensi/laktat tinggi, vasopresor bila tetap hipotensi'],
+    referensi: ['SKDI2012', 'SSC2021', 'PAPDI2014'],
   },
   'Lupus eritematosus sistemik': {
     definisi: 'Penyakit autoimun sistemik kronik yang dapat menyerang berbagai organ (kulit, sendi, ginjal, SSP).',
     diagnosis: ['Kriteria SLICC/ACR-EULAR: kombinasi klinis (ruam malar, artritis, serositis, nefritis) dan imunologis (ANA, anti-dsDNA positif)'],
     tatalaksana: ['Hydroxychloroquine dasar untuk semua pasien, kortikosteroid/imunosupresan sesuai keterlibatan organ'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Poliarteritis nodosa': {
     definisi: 'Vaskulitis nekrotikans pembuluh darah sedang, dapat mengenai berbagai organ (ginjal, kulit, saraf perifer, GI).',
     diagnosis: ['Gejala sistemik (demam, penurunan BB) + keterlibatan organ multipel; angiografi menunjukkan aneurisma mikro, biopsi menunjukkan vaskulitis nekrotikans'],
     tatalaksana: ['Kortikosteroid dosis tinggi ± siklofosfamid pada kasus berat, skrining dan tatalaksana hepatitis B (asosiasi etiologi pada sebagian kasus)'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Polimialgia reumatik': {
     definisi: 'Sindrom inflamasi pada usia lanjut dengan nyeri dan kaku otot proksimal (bahu, panggul), sering berkaitan dengan giant cell arteritis.',
     diagnosis: ['Nyeri/kaku bahu dan panggul bilateral usia >50 tahun, LED/CRP meningkat signifikan; respons dramatis terhadap kortikosteroid dosis rendah mendukung diagnosis'],
     tatalaksana: ['Prednison dosis rendah (12,5-25mg/hari) dengan tapering bertahap, waspada gejala giant cell arteritis (nyeri kepala, gangguan penglihatan) yang memerlukan dosis lebih tinggi segera'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Reaksi anafilaktik': {
     definisi: 'Reaksi hipersensitivitas sistemik berat dan mendadak, dapat mengancam nyawa melalui gangguan jalan napas dan syok.',
     diagnosis: ['Onset cepat setelah paparan alergen: urtikaria, angioedema, sesak/stridor, hipotensi — klinis, tidak perlu menunggu pemeriksaan penunjang'],
     tatalaksana: ['Epinefrin IM 0,3-0,5mg (1:1000) di paha anterolateral segera sebagai lini pertama, dapat diulang tiap 5-15 menit; oksigen, cairan IV, antihistamin dan kortikosteroid sebagai adjuvan (bukan pengganti epinefrin)'],
+    referensi: ['SKDI2012', 'WAO2020', 'PPKFKTP2014'],
   },
   'Demam reumatik': {
     definisi: 'Reaksi autoimun pasca infeksi Streptococcus grup A yang dapat menyerang jantung, sendi, SSP, dan kulit.',
     diagnosis: ['Kriteria Jones: mayor (karditis, poliartritis migrans, korea, eritema marginatum, nodul subkutan) + bukti infeksi strep sebelumnya (ASTO)'],
     tatalaksana: ['Penisilin untuk eradikasi streptokokus, NSAID/aspirin untuk artritis, kortikosteroid bila karditis berat, profilaksis penisilin jangka panjang untuk cegah rekurensi'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Artritis reumatoid': {
     definisi: 'Penyakit autoimun kronik menyerang sendi secara simetris, dapat menyebabkan deformitas progresif bila tidak diterapi.',
     diagnosis: ['Kriteria ACR/EULAR 2010: sendi terlibat, serologi (RF/anti-CCP), reaktan fase akut, durasi ≥6 minggu'],
     tatalaksana: ['DMARD (methotrexate) sedini mungkin, NSAID/steroid dosis rendah untuk kontrol gejala sementara'],
+    referensi: ['SKDI2012', 'ACREULAR2010', 'PAPDI2014'],
   },
   'Juvenile chronic arthritis': {
     definisi: 'Artritis idiopatik pada anak (<16 tahun) berlangsung >6 minggu, berbagai subtipe (oligoartikular, poliartikular, sistemik).',
     diagnosis: ['Bengkak sendi persisten pada anak tanpa penyebab lain, subtipe sistemik disertai demam tinggi intermiten dan ruam'],
     tatalaksana: ['NSAID lini pertama, DMARD (methotrexate) bila persisten, biologik pada kasus refrakter, fisioterapi untuk cegah kontraktur'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Henoch-schoenlein purpura': {
     definisi: 'Vaskulitis IgA yang mengenai pembuluh darah kecil, tersering pada anak, dengan tetrad klasik purpura-artritis-nyeri perut-nefritis.',
     diagnosis: ['Purpura palpabel di ekstremitas bawah/bokong, artralgia, nyeri perut, hematuria/proteinuria (nefritis)'],
     tatalaksana: ['Suportif pada kasus ringan (self-limiting), kortikosteroid untuk nyeri perut berat/keterlibatan ginjal signifikan, monitor fungsi ginjal jangka panjang'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Eritema multiformis': {
     definisi: 'Reaksi hipersensitivitas kulit akut, tersering dipicu infeksi HSV atau obat, dengan lesi target khas.',
     diagnosis: ['Lesi target/iris (tiga zona warna konsentris) simetris di ekstremitas, dapat disertai lesi mukosa ringan'],
     tatalaksana: ['Hentikan obat pencetus bila ada, atasi infeksi HSV pemicu (asiklovir bila rekuren), simtomatik (antihistamin, kompres)'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Imunodefisiensi': {
     definisi: 'Gangguan sistem imun (primer/kongenital atau sekunder/didapat seperti HIV, obat imunosupresan) yang meningkatkan kerentanan infeksi.',
     diagnosis: ['Infeksi berulang/berat/oportunistik, evaluasi jumlah dan fungsi sel imun (limfosit, imunoglobulin) sesuai kecurigaan jenis'],
     tatalaksana: ['Atasi/cegah infeksi (profilaksis sesuai jenis defisiensi), substitusi imunoglobulin pada defisiensi antibodi berat, atasi penyebab dasar bila sekunder'],
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
+  },
+
+  // ─── Ginjal & Saluran Kemih ──────────────────────────────────────────────
+  'Infeksi saluran kemih': {
+    definisi: 'Infeksi bakteri pada saluran kemih, dapat mengenai kandung kemih (sistitis) atau naik ke ginjal (pielonefritis).',
+    diagnosis: ['Disuria, frekuensi, urgensi (sistitis); demam, nyeri pinggang, nyeri ketok CVA (pielonefritis); urinalisis leukosituria/nitrit positif, kultur urin konfirmasi'],
+    tatalaksana: ['Sistitis tanpa komplikasi: antibiotik oral (nitrofurantoin/kotrimoksazol/fluoroquinolone) 3-7 hari; pielonefritis: antibiotik lebih lama, rawat inap bila berat/tidak toleransi oral'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'CAMPBELL2016'],
+  },
+  'Glomerulonefritis kronik': {
+    definisi: 'Kerusakan glomerulus progresif dan menetap, dapat berujung penyakit ginjal kronik.',
+    diagnosis: ['Proteinuria persisten, hematuria mikroskopik, penurunan fungsi ginjal bertahap; biopsi ginjal untuk klasifikasi histopatologi'],
+    tatalaksana: ['Kontrol tekanan darah ketat (ACE-inhibitor/ARB untuk efek renoprotektif), imunosupresan sesuai etiologi, tatalaksana komplikasi CKD'],
+    referensi: ['SKDI2012', 'KDIGOCKD2024', 'PAPDI2014'],
+  },
+  'Karsinoma sel renal': {
+    definisi: 'Keganasan primer ginjal tersering pada dewasa, berasal dari epitel tubulus ginjal.',
+    diagnosis: ['Trias klasik (jarang lengkap): hematuria, nyeri pinggang, massa teraba; CT scan kontras untuk karakterisasi massa ginjal'],
+    tatalaksana: ['Nefrektomi parsial/radikal sebagai terapi utama, terapi target/imunoterapi pada stadium metastatik'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Tumor Wilms': {
+    definisi: 'Nefroblastoma — tumor ginjal ganas tersering pada anak, umumnya usia <5 tahun.',
+    diagnosis: ['Massa abdomen asimtomatik teraba orang tua, kadang hematuria/hipertensi; USG/CT abdomen menunjukkan massa ginjal'],
+    tatalaksana: ['Nefrektomi + kemoterapi (dan radioterapi pada stadium lanjut), prognosis umumnya baik dengan terapi multimodal'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Acute kidney injury': {
+    definisi: 'Penurunan fungsi ginjal mendadak (jam-hari), diklasifikasikan pre-renal, renal (intrinsik), atau post-renal (obstruktif).',
+    diagnosis: ['Peningkatan kreatinin serum akut dan/atau penurunan produksi urin (kriteria KDIGO); cari penyebab (hipovolemia, nefrotoksin, obstruksi)'],
+    tatalaksana: ['Atasi penyebab dasar, optimalkan volume cairan, hindari nefrotoksin, dialisis bila indikasi (overload cairan, hiperkalemia berat, asidosis berat, uremia simtomatik)'],
+    referensi: ['SKDI2012', 'KDIGOAKI2012', 'PAPDI2014'],
+  },
+  'Penyakit ginjal kronik': {
+    definisi: 'Kerusakan ginjal dan/atau penurunan fungsi ginjal ≥3 bulan, diklasifikasikan berdasarkan eGFR dan albuminuria.',
+    diagnosis: ['eGFR <60 mL/min/1.73m² dan/atau penanda kerusakan ginjal (albuminuria) menetap ≥3 bulan'],
+    tatalaksana: ['Kontrol tekanan darah dan gula darah, ACE-inhibitor/ARB untuk proteinuria, restriksi diet sesuai stadium, terapi pengganti ginjal (dialisis/transplantasi) pada stadium akhir'],
+    referensi: ['SKDI2012', 'KDIGOCKD2024', 'PAPDI2014'],
+  },
+  'Kolik renal': {
+    definisi: 'Nyeri hebat akibat obstruksi akut saluran kemih atas, tersering karena batu ureter.',
+    diagnosis: ['Nyeri pinggang hebat menjalar ke selangkangan, hematuria mikroskopik; USG/CT non-kontras untuk konfirmasi batu dan lokasinya'],
+    tatalaksana: ['Analgesia (NSAID lini pertama), hidrasi, alpha-blocker untuk membantu ekspulsi batu ureter distal kecil, litotripsi/endourologi bila batu besar/tidak keluar spontan'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Ginjal polikistik simtomatik': {
+    definisi: 'Penyakit ginjal genetik dengan kista multipel progresif, tersering tipe autosomal dominan (ADPKD).',
+    diagnosis: ['Riwayat keluarga, nyeri pinggang kronik, hipertensi, hematuria; USG/CT menunjukkan kista multipel bilateral'],
+    tatalaksana: ['Kontrol tekanan darah ketat, tolvaptan dapat memperlambat progresi pada kasus terpilih, tatalaksana komplikasi (infeksi kista, batu, CKD)'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Ginjal tapal kuda': {
+    definisi: 'Horseshoe kidney — anomali kongenital fusi kutub bawah kedua ginjal, umumnya asimtomatik namun predisposisi komplikasi.',
+    diagnosis: ['Sering insidental pada pencitraan; predisposisi infeksi berulang, batu, obstruksi ureteropelvic junction'],
+    tatalaksana: ['Observasi bila asimtomatik, tatalaksana komplikasi spesifik (infeksi, batu, obstruksi) bila muncul'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Pielonefritis tanpa komplikasi': {
+    definisi: 'Infeksi bakteri parenkim ginjal tanpa faktor penyulit anatomis/sistemik.',
+    diagnosis: ['Demam, menggigil, nyeri pinggang, nyeri ketok CVA positif; urinalisis dan kultur urin positif'],
+    tatalaksana: ['Antibiotik empiris (fluoroquinolone/ceftriaxone) 7-14 hari, rawat jalan bila stabil, rawat inap bila muntah/tidak toleransi oral/tanda sepsis'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'CAMPBELL2016'],
+  },
+  'Nekrosis tubular akut': {
+    definisi: 'Penyebab tersering AKI intrinsik, akibat iskemia atau toksin langsung merusak sel tubulus ginjal.',
+    diagnosis: ['Riwayat hipotensi/syok/nefrotoksin, FENa >2%, sedimen urin menunjukkan muddy brown casts'],
+    tatalaksana: ['Suportif: optimalkan hemodinamik, hindari nefrotoksin tambahan, dialisis bila indikasi, umumnya reversibel dalam 1-3 minggu bila penyebab diatasi'],
+    referensi: ['SKDI2012', 'KDIGOAKI2012', 'PAPDI2014'],
+  },
+  'Hipospadia': {
+    definisi: 'Kelainan kongenital muara uretra terletak di sisi ventral penis, bukan di ujung glans.',
+    diagnosis: ['Tampak saat pemeriksaan neonatus: lokasi meatus uretra abnormal, dapat disertai chordee (kelengkungan penis)'],
+    tatalaksana: ['Koreksi bedah elektif (uretroplasti), idealnya sebelum usia sekolah, hindari sirkumsisi sebelum operasi (kulit preputium digunakan untuk rekonstruksi)'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Epispadia': {
+    definisi: 'Kelainan kongenital muara uretra terletak di sisi dorsal penis, sering berkaitan dengan ekstrofi buli.',
+    diagnosis: ['Meatus uretra di dorsum penis, evaluasi keterlibatan buli (ekstrofi vesika) yang sering menyertai'],
+    tatalaksana: ['Koreksi bedah rekonstruksi kompleks, rujuk pusat urologi pediatrik berpengalaman'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Testis tidak turun/ kriptorkidismus': {
+    definisi: 'Kegagalan testis turun ke skrotum selama perkembangan janin, meningkatkan risiko infertilitas dan keganasan testis bila tidak dikoreksi.',
+    diagnosis: ['Skrotum kosong pada palpasi, testis mungkin teraba di kanalis inguinalis atau tidak teraba sama sekali'],
+    tatalaksana: ['Orkidopeksi sebelum usia 1-2 tahun untuk optimalkan fertilitas dan deteksi dini keganasan, observasi hingga usia 6 bulan (kemungkinan turun spontan)'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Rectratile testis': {
+    definisi: 'Testis retraktil — testis yang dapat naik-turun akibat refleks kremaster hiperaktif, bukan kriptorkidismus sejati.',
+    diagnosis: ['Testis dapat dimanipulasi turun ke skrotum secara manual dan menetap sesaat (beda dari kriptorkidismus yang tidak bisa)'],
+    tatalaksana: ['Observasi berkala (umumnya menetap turun sendiri saat pubertas), tidak perlu bedah kecuali berkembang jadi ascending testis'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Varikokel': {
+    definisi: 'Dilatasi vena pleksus pampiniformis di skrotum, tersering sisi kiri, dapat memengaruhi fertilitas.',
+    diagnosis: ['Massa skrotum seperti "bag of worms", lebih jelas saat berdiri/Valsava, mengecil saat berbaring'],
+    tatalaksana: ['Observasi bila asimtomatik, varikokelektomi bila nyeri, atrofi testis, atau infertilitas terkait'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Hidrokel': {
+    definisi: 'Akumulasi cairan di antara lapisan tunika vaginalis testis.',
+    diagnosis: ['Pembengkakan skrotum tidak nyeri, transiluminasi positif (membedakan dari massa solid)'],
+    tatalaksana: ['Observasi pada bayi (sering menutup spontan <1-2 tahun), operasi (hidrokelektomi) bila menetap/besar/simtomatik pada anak besar atau dewasa'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Spermatokel': {
+    definisi: 'Kista berisi cairan mengandung sperma, muncul dari epididimis, umumnya jinak.',
+    diagnosis: ['Massa kistik teraba terpisah dari testis di superior/posterior, transiluminasi positif'],
+    tatalaksana: ['Observasi bila asimtomatik/kecil, eksisi bedah bila besar/simtomatik'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Epididimitis': {
+    definisi: 'Inflamasi epididimis, tersering akibat infeksi (IMS pada usia muda, bakteri enterik pada usia tua).',
+    diagnosis: ['Nyeri dan bengkak skrotum unilateral gradual, Prehn sign positif (nyeri berkurang dengan elevasi testis) — bantu bedakan dari torsio'],
+    tatalaksana: ['Antibiotik sesuai usia dan kemungkinan patogen (ceftriaxone+doksisiklin bila IMS, fluoroquinolone bila enterik), analgesia, elevasi skrotum'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Torsio testis': {
+    definisi: 'Kegawatdaruratan urologi — testis terpuntir pada funikulus spermatikus menyebabkan iskemia, memerlukan tatalaksana segera untuk selamatkan testis.',
+    diagnosis: ['Nyeri skrotum mendadak hebat, testis letak tinggi dan horizontal, refleks kremaster hilang, Prehn sign negatif (nyeri tidak berkurang dengan elevasi)'],
+    tatalaksana: ['Eksplorasi bedah emergensi <6 jam onset untuk detorsi dan orkidopeksi bilateral — jangan tunda pencitraan bila kecurigaan klinis tinggi'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Ruptur uretra': {
+    definisi: 'Cedera traumatik uretra, tersering akibat trauma pelvis (uretra posterior) atau straddle injury (uretra anterior).',
+    diagnosis: ['Darah di meatus uretra, retensi urin, hematoma perineum kupu-kupu (uretra anterior); kontraindikasi kateterisasi buta sebelum evaluasi'],
+    tatalaksana: ['Sistostomi suprapubik bila kecurigaan ruptur (hindari kateterisasi uretra langsung), uretrografi retrograd untuk konfirmasi, rujuk urologi untuk rekonstruksi definitif'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Ruptur kandung kencing': {
+    definisi: 'Cedera traumatik kandung kemih, dapat intraperitoneal atau ekstraperitoneal, sering berkaitan trauma pelvis.',
+    diagnosis: ['Hematuria gross, nyeri suprapubik, riwayat trauma pelvis/abdomen bawah; sistografi CT/konvensional untuk konfirmasi dan lokasi'],
+    tatalaksana: ['Ekstraperitoneal: kateter urin terpasang untuk drainase, sering sembuh konservatif; Intraperitoneal: perbaikan bedah wajib (risiko peritonitis kimia)'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Ruptur ginjal': {
+    definisi: 'Cedera traumatik ginjal, diklasifikasikan derajat I-V berdasarkan luas kerusakan (AAST grading).',
+    diagnosis: ['Riwayat trauma tumpul/tajam pinggang/abdomen, hematuria (dapat tidak sebanding derajat cedera), nyeri pinggang; CT kontras untuk staging'],
+    tatalaksana: ['Sebagian besar (derajat rendah) tatalaksana konservatif dengan observasi ketat, derajat tinggi/tidak stabil hemodinamik memerlukan intervensi/nefrektomi'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Karsinoma uroterial': {
+    definisi: 'Keganasan epitel urotelial, dapat terjadi di kandung kemih, ureter, atau pelvis renal — tersering kandung kemih.',
+    diagnosis: ['Hematuria makroskopik tanpa nyeri (gejala kunci), sistoskopi + biopsi untuk konfirmasi dan staging'],
+    tatalaksana: ['Reseksi transuretral tumor buli (TURBT) untuk superfisial, sistektomi + kemoterapi untuk invasif otot, BCG intravesikal untuk risiko tinggi rekuren'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Seminoma testis': {
+    definisi: 'Tumor sel germinal testis tersering, prognosis baik karena sangat radiosensitif dan kemosensitif.',
+    diagnosis: ['Massa testis tidak nyeri, teraba padat; USG skrotum, penanda tumor (LDH, hCG umumnya normal/ringan naik, AFP normal — beda dari non-seminoma)'],
+    tatalaksana: ['Orkidektomi radikal inguinal sebagai terapi awal, radioterapi/kemoterapi adjuvan sesuai stadium'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Teratoma testis': {
+    definisi: 'Tumor sel germinal non-seminoma testis berisi berbagai jenis jaringan (ketiga lapisan germinal).',
+    diagnosis: ['Massa testis tidak nyeri; penanda tumor AFP dapat meningkat, USG dan CT untuk staging'],
+    tatalaksana: ['Orkidektomi radikal inguinal, kemoterapi berbasis platinum untuk penyakit metastatik/residual'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Hiperplasia prostat jinak': {
+    definisi: 'Pembesaran jinak kelenjar prostat terkait usia, menyebabkan gejala obstruksi saluran kemih bawah (LUTS).',
+    diagnosis: ['Gejala LUTS (pancaran lemah, hesitansi, nokturia, frekuensi), colok dubur: prostat membesar simetris, kenyal; PSA untuk skrining keganasan'],
+    tatalaksana: ['Alpha-blocker (tamsulosin) untuk gejala, 5-alpha reductase inhibitor (finasteride) untuk mengecilkan volume, TURP bila gagal medikamentosa/retensi berulang'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Karsinoma prostat': {
+    definisi: 'Keganasan prostat, tersering pada pria usia lanjut, sering asimtomatik pada stadium dini.',
+    diagnosis: ['Colok dubur: nodul keras/ireguler; PSA meningkat, biopsi transrektal untuk konfirmasi histopatologi dan skor Gleason'],
+    tatalaksana: ['Active surveillance pada risiko rendah, prostatektomi radikal/radioterapi pada risiko sedang-tinggi lokal, terapi deprivasi androgen pada metastatik'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Striktura uretra': {
+    definisi: 'Penyempitan lumen uretra akibat jaringan parut, tersering akibat trauma, instrumentasi, atau infeksi kronik.',
+    diagnosis: ['Pancaran urin lemah/bercabang, retensi urin, riwayat kateterisasi/IMS/trauma; uretrografi untuk lokasi dan panjang striktur'],
+    tatalaksana: ['Dilatasi uretra/uretrotomi interna untuk striktur pendek, uretroplasti untuk striktur panjang/rekuren'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Priapismus': {
+    definisi: 'Ereksi persisten >4 jam tanpa rangsangan seksual, kegawatdaruratan urologi (risiko iskemia korpus kavernosum).',
+    diagnosis: ['Ereksi menetap nyeri (tipe iskemik/low-flow, lebih sering dan lebih darurat) atau tidak nyeri (tipe non-iskemik/high-flow); analisis gas darah korpus kavernosum membedakan tipe'],
+    tatalaksana: ['Tipe iskemik: aspirasi korpus kavernosum + irigasi salin, injeksi fenilefrin intrakavernosa bila tidak respon, shunt bedah bila refrakter — tatalaksana <4-6 jam untuk cegah kerusakan permanen'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+  'Chancroid': {
+    definisi: 'Infeksi menular seksual akibat Haemophilus ducreyi, menyebabkan ulkus genital nyeri.',
+    diagnosis: ['Ulkus genital nyeri dengan dasar kotor, tepi ireguler, disertai limfadenopati inguinal nyeri (bubo) — beda dari sifilis (ulkus tidak nyeri)'],
+    tatalaksana: ['Azithromycin dosis tunggal atau ceftriaxone IM dosis tunggal, skrining IMS lain dan pasangan seksual'],
+    referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
   },
 }
