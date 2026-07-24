@@ -54,6 +54,14 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Cardona V, Ansotegui IJ, Ebisawa M, El-Gamal Y, Fernandez Rivas M, Fineman S, et al. World Allergy Organization Anaphylaxis Guidance 2020. World Allergy Organ J. 2020;13(10):100472.',
   ACREULAR2010:
     'Aletaha D, Neogi T, Silman AJ, Funovits J, Felson DT, Bingham CO 3rd, et al. 2010 Rheumatoid Arthritis Classification Criteria: an American College of Rheumatology/European League Against Rheumatism Collaborative Initiative. Arthritis Rheum. 2010;62(9):2569-81.',
+  PPDGJIII:
+    'Departemen Kesehatan Republik Indonesia, Direktorat Jenderal Pelayanan Medik. Pedoman Penggolongan dan Diagnosis Gangguan Jiwa di Indonesia III (PPDGJ-III). Jakarta: Departemen Kesehatan RI; 1993.',
+  DSM5TR2022:
+    'American Psychiatric Association. Diagnostic and Statistical Manual of Mental Disorders. 5th ed., text revision (DSM-5-TR). Washington, DC: American Psychiatric Association Publishing; 2022.',
+  KAPLAN2015:
+    "Sadock BJ, Sadock VA, Ruiz P. Kaplan & Sadock's Synopsis of Psychiatry: Behavioral Sciences/Clinical Psychiatry. 11th ed. Philadelphia: Wolters Kluwer; 2015.",
+  WHOMHGAP2016:
+    'World Health Organization. mhGAP Intervention Guide for Mental, Neurological and Substance Use Disorders in Non-Specialized Health Settings. Version 2.0. Geneva: World Health Organization; 2016.',
   PERKIHF2020:
     'Perhimpunan Dokter Spesialis Kardiovaskular Indonesia. Pedoman Tatalaksana Gagal Jantung. 2nd ed. Jakarta: PERKI; 2020.',
   PERKIHT2021:
@@ -1537,5 +1545,211 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     diagnosis: ['Edema tungkai yang memberat sore hari, hiperpigmentasi hemosiderin, lipodermatosklerosis, varises, hingga ulkus vena di area maleolus medial; USG Doppler menilai refluks'],
     tatalaksana: ['Kompresi sebagai terapi utama, elevasi tungkai, latihan otot betis, perawatan kulit; intervensi vena pada refluks superfisial signifikan; pastikan ABI normal sebelum memberikan kompresi'],
     referensi: ['SKDI2012', 'BRAUNWALD2022', 'PPKFKTP2014'],
+  },
+
+  // ─── Psikiatri ───────────────────────────────────────────────────────────
+  'Intoksikasi akut zat psikoaktif': {
+    definisi: 'Kondisi akut akibat konsumsi zat psikoaktif dalam dosis yang menimbulkan gangguan kesadaran, kognisi, persepsi, afek, atau perilaku.',
+    diagnosis: ['Riwayat penggunaan zat, gejala sesuai jenis: opioid (pupil pinpoint, depresi napas, kesadaran menurun), stimulan (pupil midriasis, agitasi, hipertensi, takikardia), alkohol (bicara cadel, ataksia); skrining toksikologi urin bila tersedia'],
+    tatalaksana: ['Amankan ABC, monitor tanda vital dan kesadaran; nalokson pada intoksikasi opioid dengan depresi napas, tatalaksana suportif dan lingkungan tenang pada stimulan, tiamin sebelum glukosa pada intoksikasi alkohol; rujuk untuk rehabilitasi setelah fase akut'],
+    referensi: ['SKDI2012', 'WHOMHGAP2016', 'KAPLAN2015'],
+  },
+  'Adiksi/ketergantungan Narkoba': {
+    definisi: 'Pola penggunaan zat berulang yang menimbulkan toleransi, gejala putus zat, dan dorongan kuat (craving) hingga mengabaikan fungsi sosial dan pekerjaan.',
+    diagnosis: ['Kriteria ketergantungan: craving kuat, kesulitan mengendalikan penggunaan, gejala putus zat, toleransi meningkat, mengabaikan aktivitas lain, penggunaan berlanjut meski ada kerugian nyata'],
+    tatalaksana: ['Tatalaksana gejala putus zat (detoksifikasi terkontrol), terapi substitusi pada ketergantungan opioid (metadon/buprenorfin), psikoterapi dan terapi perilaku, dukungan keluarga dan kelompok, rujuk ke pusat rehabilitasi — pendekatan tanpa stigma meningkatkan retensi terapi'],
+    referensi: ['SKDI2012', 'WHOMHGAP2016', 'KAPLAN2015'],
+  },
+  'Gangguan bipolar, episode manik': {
+    definisi: 'Gangguan suasana perasaan dengan episode manik (mood meningkat/iritabel, energi berlebih) yang bergantian dengan episode depresi.',
+    diagnosis: ['Episode manik: mood elasi/iritabel ≥1 minggu disertai peningkatan aktivitas, berkurangnya kebutuhan tidur, bicara cepat, flight of ideas, grandiositas, perilaku berisiko; dapat disertai gejala psikotik'],
+    tatalaksana: ['Mood stabilizer (litium/asam valproat) sebagai terapi utama, antipsikotik untuk agitasi dan gejala psikotik akut, hindari antidepresan tunggal (risiko memicu mania), rawat inap bila risiko bahaya diri/orang lain, pemantauan kadar litium dan fungsi tiroid-ginjal'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan siklotimia': {
+    definisi: 'Instabilitas suasana perasaan menetap dengan periode hipomania ringan dan depresi ringan yang tidak memenuhi kriteria bipolar penuh.',
+    diagnosis: ['Fluktuasi mood kronik ≥2 tahun tanpa periode bebas gejala yang panjang, derajat gejala lebih ringan dari episode manik/depresi mayor'],
+    tatalaksana: ['Psikoedukasi dan pemantauan mood, mood stabilizer bila mengganggu fungsi, psikoterapi; waspadai perkembangan ke gangguan bipolar penuh'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan distimia (depresi neurosis)': {
+    definisi: 'Depresi kronik derajat ringan-sedang yang berlangsung lama (≥2 tahun) tanpa memenuhi kriteria episode depresi mayor.',
+    diagnosis: ['Mood depresi hampir sepanjang hari lebih banyak hari daripada tidak, ≥2 tahun, disertai gangguan nafsu makan/tidur, energi rendah, harga diri rendah, sulit konsentrasi, rasa putus asa'],
+    tatalaksana: ['Psikoterapi (CBT) dan/atau antidepresan (SSRI), aktivasi perilaku dan olahraga teratur, evaluasi berkala risiko bunuh diri'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'WHOMHGAP2016'],
+  },
+  'Agorafobia dengan/tanpa panik': {
+    definisi: 'Ketakutan berada di tempat atau situasi yang sulit meloloskan diri atau sulit mendapat pertolongan bila terjadi serangan panik.',
+    diagnosis: ['Cemas berat pada situasi seperti keramaian, transportasi umum, ruang terbuka/tertutup, hingga menghindari situasi tersebut; dapat disertai serangan panik'],
+    tatalaksana: ['CBT dengan terapi paparan bertahap sebagai terapi utama, SSRI bila berat, latihan relaksasi dan pernapasan; hindari benzodiazepin jangka panjang'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Fobia sosial': {
+    definisi: 'Ketakutan menetap dan berlebihan terhadap situasi sosial atau situasi di mana individu merasa dinilai orang lain.',
+    diagnosis: ['Cemas berat saat berbicara di depan umum, bertemu orang baru, atau makan di depan orang; disertai gejala otonom (wajah memerah, gemetar, berkeringat) dan perilaku menghindar yang mengganggu fungsi'],
+    tatalaksana: ['CBT dengan paparan bertahap dan latihan keterampilan sosial, SSRI bila gejala berat/menetap, beta-blocker situasional untuk gejala otonom pada performance anxiety'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Fobia spesifik': {
+    definisi: 'Ketakutan irasional dan berlebihan terhadap objek atau situasi tertentu (ketinggian, hewan, darah, jarum suntik).',
+    diagnosis: ['Cemas segera muncul saat terpapar stimulus spesifik, dihindari secara aktif, individu menyadari ketakutannya berlebihan, mengganggu aktivitas sehari-hari'],
+    tatalaksana: ['Terapi paparan bertahap (desensitisasi sistematis) sebagai terapi paling efektif; farmakoterapi jarang diperlukan; teknik applied tension khusus untuk fobia darah/jarum yang disertai sinkop vasovagal'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan obsesif-kompulsif': {
+    definisi: 'Gangguan dengan pikiran obsesif berulang yang mengganggu dan/atau perilaku kompulsif berulang yang dilakukan untuk meredakan kecemasan.',
+    diagnosis: ['Obsesi (pikiran/dorongan berulang, tidak diinginkan, menimbulkan cemas) dan/atau kompulsi (perilaku repetitif seperti mencuci, mengecek, menghitung); menyita waktu >1 jam/hari atau mengganggu fungsi'],
+    tatalaksana: ['CBT dengan Exposure and Response Prevention (ERP) sebagai terapi lini pertama, SSRI dosis lebih tinggi dan durasi lebih lama dibanding depresi, kombinasi keduanya pada kasus berat'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Reaksi terhadap stres yg berat, & gangguan penyesuaian': {
+    definisi: 'Respons maladaptif terhadap stresor psikososial yang jelas, mencakup reaksi stres akut dan gangguan penyesuaian.',
+    diagnosis: ['Gejala emosional/perilaku muncul dalam kaitan waktu jelas dengan stresor (umumnya dalam 1-3 bulan), derajat distres melebihi yang diperkirakan, mengganggu fungsi; reaksi stres akut muncul dalam menit-jam dan mereda dalam beberapa hari'],
+    tatalaksana: ['Dukungan psikososial dan konseling sebagai terapi utama, teknik pemecahan masalah dan koping, farmakoterapi jangka pendek hanya bila gejala berat; sebagian besar membaik seiring adaptasi terhadap stresor'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'WHOMHGAP2016'],
+  },
+  'Post traumatic stress disorder': {
+    definisi: 'Gangguan yang berkembang setelah mengalami/menyaksikan peristiwa traumatik berat, ditandai reexperiencing, avoidance, dan hyperarousal.',
+    diagnosis: ['Gejala menetap >1 bulan pasca trauma: mimpi buruk dan kilas balik, menghindari pengingat trauma, perubahan negatif kognisi dan mood, kewaspadaan berlebih dan mudah terkejut'],
+    tatalaksana: ['Psikoterapi berfokus trauma (trauma-focused CBT, EMDR) sebagai lini pertama, SSRI bila psikoterapi tidak tersedia/tidak adekuat, hindari benzodiazepin, dukungan sosial dan keamanan pasien'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'WHOMHGAP2016'],
+  },
+  'Gangguan disosiasi (konversi)': {
+    definisi: 'Hilangnya integrasi normal antara memori, identitas, sensasi, dan kontrol gerakan tubuh, tanpa dasar kelainan organik yang menjelaskan.',
+    diagnosis: ['Gejala neurologis (kelumpuhan, kejang non-epileptik, buta, afonia) atau gangguan memori/identitas yang tidak sesuai pola anatomis/fisiologis; sering didahului stresor psikologis; wajib menyingkirkan penyebab organik lebih dahulu'],
+    tatalaksana: ['Jelaskan diagnosis dengan empatik tanpa menuduh pasien berpura-pura, psikoterapi dan fisioterapi bila ada gejala motorik, atasi stresor pemicu; hindari pemeriksaan berlebihan yang memperkuat gejala'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan somatoform': {
+    definisi: 'Keluhan fisik berulang tanpa dasar kelainan organik yang memadai, disertai kekhawatiran berlebihan terhadap kesehatan.',
+    diagnosis: ['Keluhan fisik multipel dan berulang ≥2 tahun, pemeriksaan berulang negatif, pasien menolak meyakini bahwa tidak ada kelainan fisik, mengganggu fungsi sosial dan pekerjaan'],
+    tatalaksana: ['Bangun hubungan terapeutik dengan satu dokter tetap, jadwalkan kunjungan berkala terjadwal (bukan berdasarkan keluhan), batasi pemeriksaan penunjang yang tidak perlu, CBT, atasi komorbid depresi/cemas'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'PPKFKTP2014'],
+  },
+  'Gangguan kepribadian': {
+    definisi: 'Pola perilaku, kognisi, dan pengalaman batin yang menetap, kaku, menyimpang dari norma budaya, dimulai sejak remaja dan menimbulkan hendaya.',
+    diagnosis: ['Pola menetap dan pervasif lintas situasi, onset masa remaja/dewasa muda, menimbulkan distres atau hendaya; dikelompokkan cluster A (aneh), B (dramatis/emosional), C (cemas/takut)'],
+    tatalaksana: ['Psikoterapi jangka panjang sebagai terapi utama (mis. dialectical behaviour therapy untuk kepribadian ambang), farmakoterapi hanya untuk gejala target/komorbid, konsistensi batasan terapeutik, rujuk psikiatri'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan identitas gender': {
+    definisi: 'Ketidaksesuaian yang menetap antara identitas gender yang dialami seseorang dengan jenis kelamin yang ditetapkan saat lahir, disertai distres bermakna.',
+    diagnosis: ['Ketidaksesuaian menetap ≥6 bulan disertai distres klinis bermakna atau hendaya fungsi; evaluasi oleh tenaga yang kompeten, singkirkan gangguan psikiatri lain sebagai penjelasan'],
+    tatalaksana: ['Pendekatan afirmatif dan tanpa stigma, dukungan psikologis untuk distres dan komorbid (depresi, cemas, risiko bunuh diri lebih tinggi), rujuk ke layanan spesialistik untuk keputusan penanganan lanjutan'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'DSM5TR2022'],
+  },
+  'Gangguan preferensi seksual': {
+    definisi: 'Pola dorongan atau perilaku seksual yang menyimpang dari norma dan menimbulkan distres pada individu atau kerugian pada orang lain.',
+    diagnosis: ['Dorongan/fantasi/perilaku seksual berulang ≥6 bulan terhadap objek atau situasi atipik; menjadi gangguan bila menimbulkan distres pada diri sendiri atau melibatkan orang yang tidak menyetujui/tidak mampu menyetujui'],
+    tatalaksana: ['Psikoterapi (CBT) untuk kontrol dorongan, terapi farmakologis penurun dorongan seksual pada kasus tertentu, rujuk psikiatri; laporan wajib bila melibatkan korban anak/tanpa persetujuan sesuai ketentuan hukum'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan perkembangan pervasif': {
+    definisi: 'Kelompok gangguan neurodevelopmental (termasuk spektrum autisme) dengan hendaya interaksi sosial, komunikasi, dan pola perilaku repetitif.',
+    diagnosis: ['Onset masa kanak awal: hendaya interaksi sosial timbal balik, gangguan komunikasi verbal-nonverbal, minat terbatas dan perilaku repetitif; skrining perkembangan (M-CHAT) dan asesmen komprehensif'],
+    tatalaksana: ['Intervensi perilaku dan edukasi terstruktur sedini mungkin (terapi wicara, okupasi, ABA), dukungan keluarga, farmakoterapi hanya untuk gejala penyerta (agresi, hiperaktivitas), rujuk tim tumbuh kembang'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Retardasi mental': {
+    definisi: 'Disabilitas intelektual — keterbatasan bermakna pada fungsi intelektual dan perilaku adaptif dengan onset masa perkembangan.',
+    diagnosis: ['IQ di bawah rata-rata bermakna (biasanya <70) disertai defisit perilaku adaptif (konseptual, sosial, praktis), onset sebelum usia 18 tahun; klasifikasi ringan, sedang, berat, sangat berat'],
+    tatalaksana: ['Program pendidikan khusus dan pelatihan keterampilan hidup, terapi okupasi dan wicara, dukungan keluarga, cari dan atasi penyebab yang dapat dikoreksi (hipotiroid kongenital, fenilketonuria), pencegahan melalui skrining neonatus'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Gangguan tingkah laku (conduct disorder)': {
+    definisi: 'Pola perilaku berulang yang melanggar hak orang lain atau norma sosial pada anak dan remaja.',
+    diagnosis: ['Agresi terhadap orang/hewan, perusakan properti, berbohong atau mencuri, pelanggaran aturan serius, berlangsung ≥12 bulan; bedakan dari gangguan menentang oposisional yang lebih ringan'],
+    tatalaksana: ['Terapi perilaku dan parent management training sebagai lini pertama, intervensi berbasis sekolah dan keluarga, atasi komorbid (ADHD, depresi, penyalahgunaan zat), farmakoterapi hanya untuk komorbid'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Anoreksia nervosa': {
+    definisi: 'Gangguan makan dengan restriksi asupan yang menyebabkan berat badan sangat rendah, disertai ketakutan intens naik berat badan dan gangguan persepsi tubuh.',
+    diagnosis: ['Berat badan jauh di bawah normal untuk usia dan tinggi, ketakutan gemuk meski kurus, gangguan citra tubuh; komplikasi: amenore, bradikardia, hipotensi, gangguan elektrolit, osteoporosis'],
+    tatalaksana: ['Pemulihan nutrisi bertahap dengan pemantauan ketat refeeding syndrome (fosfat, kalium, magnesium), psikoterapi (family-based therapy pada remaja, CBT), rawat inap bila instabilitas medis; tangani komplikasi medis sebagai prioritas'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Bulimia': {
+    definisi: 'Gangguan makan dengan episode makan berlebihan berulang diikuti perilaku kompensasi (memuntahkan, laksatif, olahraga berlebihan).',
+    diagnosis: ['Episode binge eating dengan rasa kehilangan kendali, diikuti perilaku kompensatorik, ≥1x/minggu selama 3 bulan; tanda fisik: erosi email gigi, tanda Russell di punggung tangan, pembesaran kelenjar parotis, hipokalemia'],
+    tatalaksana: ['CBT untuk gangguan makan sebagai lini pertama, fluoxetine dosis tinggi sebagai farmakoterapi dengan bukti terbaik, koreksi gangguan elektrolit, edukasi pola makan teratur'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Pica': {
+    definisi: 'Konsumsi berulang zat non-nutritif (tanah, kapur, es, rambut) selama minimal 1 bulan dan tidak sesuai tahap perkembangan.',
+    diagnosis: ['Riwayat konsumsi bahan non-makanan menetap; skrining defisiensi besi dan zink, kadar timbal bila konsumsi cat/tanah, evaluasi disabilitas intelektual atau kehamilan sebagai konteks'],
+    tatalaksana: ['Koreksi defisiensi nutrisi (terutama besi), terapi perilaku dan pengawasan lingkungan, atasi komplikasi (obstruksi, keracunan timbal, infeksi parasit)'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Gilles de la tourette syndrome': {
+    definisi: 'Gangguan tic dengan kombinasi tic motorik multipel dan minimal satu tic vokal yang berlangsung lebih dari satu tahun.',
+    diagnosis: ['Tic motorik multipel dan ≥1 tic vokal (tidak harus bersamaan), onset sebelum usia 18 tahun, berlangsung >1 tahun; sering komorbid dengan ADHD dan OCD'],
+    tatalaksana: ['Psikoedukasi (banyak kasus ringan tidak perlu obat), Comprehensive Behavioral Intervention for Tics (CBIT), farmakoterapi (antipsikotik dosis rendah, klonidin) bila tic mengganggu, atasi komorbid'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Chronic motor of vocal tics disorder': {
+    definisi: 'Gangguan tic kronik dengan tic motorik ATAU vokal (tidak keduanya) yang berlangsung lebih dari satu tahun.',
+    diagnosis: ['Tic motorik saja atau tic vokal saja, menetap >1 tahun, onset sebelum usia 18 tahun, tidak pernah memenuhi kriteria Tourette'],
+    tatalaksana: ['Psikoedukasi dan observasi bila ringan, terapi perilaku (CBIT), farmakoterapi hanya bila menimbulkan hendaya bermakna'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Transient tics disorder': {
+    definisi: 'Tic motorik dan/atau vokal yang berlangsung kurang dari satu tahun, umum pada anak usia sekolah dan umumnya sembuh sendiri.',
+    diagnosis: ['Tic tunggal atau multipel berlangsung <12 bulan sejak onset pertama, sering memberat saat stres atau lelah'],
+    tatalaksana: ['Reassurance dan psikoedukasi kepada anak, orang tua, dan guru; kurangi stresor dan hindari menegur tic (memperberat); umumnya tidak perlu farmakoterapi'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Functional encoperasis': {
+    definisi: 'Enkopresis fungsional — pengeluaran feses berulang di tempat tidak semestinya pada anak usia ≥4 tahun tanpa penyebab organik, umumnya akibat konstipasi kronik dengan overflow.',
+    diagnosis: ['Kejadian ≥1x/bulan selama ≥3 bulan pada anak usia perkembangan ≥4 tahun; periksa massa feses (skibala) pada palpasi abdomen dan colok dubur; singkirkan penyebab organik (Hirschsprung, hipotiroid)'],
+    tatalaksana: ['Disimpaksi awal lalu terapi rumatan laksatif (polietilen glikol) jangka panjang, toilet training terjadwal setelah makan, edukasi keluarga bahwa ini bukan kesengajaan anak, dukungan psikologis bila ada distres'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Functional enuresis': {
+    definisi: 'Enuresis fungsional — berkemih berulang di tempat tidur atau pakaian pada anak usia ≥5 tahun tanpa penyebab organik.',
+    diagnosis: ['Kejadian ≥2x/minggu selama ≥3 bulan pada anak usia ≥5 tahun; bedakan primer (belum pernah kering) dan sekunder (kambuh setelah periode kering); singkirkan ISK, DM, diabetes insipidus, konstipasi'],
+    tatalaksana: ['Edukasi dan hindari hukuman, batasi cairan malam hari dan berkemih sebelum tidur, alarm enuresis sebagai terapi paling efektif jangka panjang, desmopressin untuk kebutuhan jangka pendek (mis. menginap)'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Uncoordinated speech': {
+    definisi: 'Gangguan kelancaran bicara (termasuk gagap/stuttering dan cluttering) yang mengganggu komunikasi dan tidak sesuai usia.',
+    diagnosis: ['Pengulangan suara/suku kata, perpanjangan bunyi, blok bicara, atau bicara terlalu cepat dan tidak teratur; nilai dampak pada komunikasi dan kepercayaan diri; singkirkan gangguan neurologis dan pendengaran'],
+    tatalaksana: ['Terapi wicara sebagai terapi utama, edukasi keluarga dan guru untuk memberi waktu bicara tanpa menyela/mengoreksi, dukungan psikologis bila ada kecemasan sosial sekunder'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
+  },
+  'Parafilia': {
+    definisi: 'Dorongan seksual intens dan berulang terhadap objek, situasi, atau individu atipik; menjadi gangguan bila menimbulkan distres atau melibatkan orang tanpa persetujuan.',
+    diagnosis: ['Fantasi, dorongan, atau perilaku seksual berulang ≥6 bulan; bedakan minat parafilik (tidak merugikan) dari gangguan parafilik (menimbulkan distres atau korban)'],
+    tatalaksana: ['CBT untuk kontrol dorongan dan pencegahan relaps, farmakoterapi penurun dorongan seksual pada kasus berisiko, rujuk psikiatri; kewajiban pelaporan bila ada korban sesuai ketentuan hukum'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Gangguan keinginan dan gairah seksual': {
+    definisi: 'Penurunan atau hilangnya hasrat dan/atau gairah seksual yang menimbulkan distres pada individu atau pasangan.',
+    diagnosis: ['Kurang/hilangnya minat seksual dan fantasi menetap ≥6 bulan disertai distres; evaluasi penyebab organik (hipogonadisme, hipotiroid, hiperprolaktinemia), obat (SSRI, antihipertensi), depresi, dan faktor relasi'],
+    tatalaksana: ['Atasi penyebab organik dan tinjau ulang obat yang berkontribusi, konseling seksual dan terapi pasangan, tatalaksana depresi/cemas penyerta, terapi hormonal hanya bila ada defisiensi terbukti'],
+    referensi: ['SKDI2012', 'PPDGJIII', 'KAPLAN2015'],
+  },
+  'Hipersomnia': {
+    definisi: 'Rasa kantuk berlebihan pada siang hari atau durasi tidur berlebihan meski tidur malam cukup.',
+    diagnosis: ['Kantuk berlebih hampir setiap hari ≥3 bulan; singkirkan penyebab sekunder: OSA, kurang tidur kronik, obat sedatif, depresi, hipotiroid; polisomnografi dan multiple sleep latency test bila curiga narkolepsi'],
+    tatalaksana: ['Higiene tidur dan jadwal tidur teratur, atasi penyebab dasar (CPAP bila OSA), stimulan (modafinil) pada hipersomnia primer/narkolepsi setelah diagnosis tegak, hindari mengemudi saat mengantuk'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Sleep-wake cycle disturbance': {
+    definisi: 'Gangguan irama sirkadian tidur-bangun akibat ketidaksesuaian antara jam biologis internal dan jadwal tidur yang dituntut lingkungan.',
+    diagnosis: ['Pola tidur bergeser menetap (delayed/advanced sleep phase, kerja shift, jet lag) menyebabkan insomnia atau kantuk berlebih dan hendaya fungsi; sleep diary atau aktigrafi membantu'],
+    tatalaksana: ['Higiene tidur, terapi cahaya terang pada waktu tepat untuk menggeser fase, melatonin terjadwal, penyesuaian jadwal kerja bila memungkinkan, hindari kafein dan layang menjelang tidur'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Nightmare': {
+    definisi: 'Mimpi buruk berulang yang membangunkan penderita dengan ingatan jelas isi mimpi, umumnya pada fase tidur REM (paruh kedua malam).',
+    diagnosis: ['Mimpi menakutkan berulang dengan bangun penuh kesadaran dan ingatan jelas; bedakan dari night terror (terjadi awal malam, tidak ingat kejadian, sulit dibangunkan); cari kaitan trauma atau obat'],
+    tatalaksana: ['Higiene tidur dan reassurance (umumnya jinak pada anak), imagery rehearsal therapy bila berulang pada dewasa, tatalaksana PTSD bila terkait trauma, tinjau obat pemicu'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
+  },
+  'Sleep walking': {
+    definisi: 'Somnambulisme — parasomnia berupa bangkit dan berjalan saat tidur gelombang lambat, umumnya pada sepertiga awal malam, tanpa ingatan kejadian.',
+    diagnosis: ['Episode berjalan saat tidur dengan tatapan kosong, sulit dibangunkan, amnesia terhadap kejadian; umum pada anak dan biasanya menghilang seiring usia; pemicu: kurang tidur, demam, stres, alkohol'],
+    tatalaksana: ['Utamakan keamanan lingkungan (kunci pintu/jendela, singkirkan benda berbahaya, hindari tempat tidur tingkat), tidur cukup dan teratur, jangan membangunkan paksa saat episode; farmakoterapi hanya bila sering dan berisiko cedera'],
+    referensi: ['SKDI2012', 'DSM5TR2022', 'KAPLAN2015'],
   },
 }
