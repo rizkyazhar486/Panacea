@@ -1380,4 +1380,175 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Rujuk Sp.BTKV untuk torakotomi bila: drainase awal torakostomi >1000mL (trauma tembus) atau >1500mL (trauma tumpul), ATAU drainase >200cc/jam selama 3 jam berturut-turut',
     ],
   },
+
+  // ─── Gastrointestinal & Hepatobilier ───────────────────────────────────
+  'Demam Tifoid': {
+    anamnesis: [
+      'Demam step-ladder (naik bertahap tiap hari, mereda pagi memberat sore/malam) berlangsung >1 minggu, nyeri kepala, nyeri perut, konstipasi atau diare, lidah kotor',
+      'Riwayat konsumsi makanan/minuman kurang higienis',
+    ],
+    pemeriksaanFisik: [
+      'Demam, bradikardia relatif (nadi tidak meningkat proporsional dengan suhu), lidah kotor (kotor di tengah, tepi & ujung merah), hepatosplenomegali ringan',
+    ],
+    kriteriaDiagnosis: 'Klinis + kultur darah (baku emas, terutama minggu pertama) atau uji Widal (titer O≥1/320 atau H≥1/640, kurang spesifik) atau Tubex/tes cepat.',
+    tatalaksana: [
+      'Antibiotik: kloramfenikol 4x500mg hingga 7 hari bebas demam, atau seftriakson/siprofloksasin sebagai alternatif',
+      'Suportif: istirahat, diet lunak rendah serat pada fase akut, hidrasi adekuat',
+      'Edukasi: higiene makanan/minuman, cuci tangan, vaksinasi tifoid untuk pencegahan',
+    ],
+  },
+  'Hepatitis A / B': {
+    anamnesis: [
+      'Hepatitis A: mual muntah, ikterik, urin gelap, riwayat konsumsi makanan/air tidak higienis, onset akut',
+      'Hepatitis B: dapat akut atau kronis (asimtomatik lama), faktor risiko (transfusi, jarum suntik, hubungan seksual berisiko, riwayat ibu HBsAg+)',
+    ],
+    pemeriksaanFisik: [
+      'Ikterus sklera/kulit, hepatomegali nyeri tekan ringan, urin gelap (bilirubinuria)',
+    ],
+    kriteriaDiagnosis: 'Hepatitis A: IgM anti-HAV positif. Hepatitis B akut: HBsAg + IgM anti-HBc positif. Hepatitis B kronis: HBsAg positif >6 bulan.',
+    tatalaksana: [
+      'Hepatitis A: suportif (istirahat, hidrasi, hindari hepatotoksik seperti alkohol/parasetamol dosis tinggi), self-limiting, vaksinasi untuk pencegahan',
+      'Hepatitis B akut: suportif, mayoritas dewasa sembuh spontan; kronis: evaluasi terapi antivirus (tenofovir/entecavir) berdasarkan viral load/ALT/fibrosis',
+      'Edukasi: hindari penularan (pisahkan alat cukur/sikat gigi, vaksinasi kontak serumah untuk Hep B)',
+    ],
+  },
+  'Gastritis / Dispepsia / GERD': {
+    anamnesis: [
+      'Nyeri ulu hati, rasa terbakar/penuh, mual, kembung',
+      'GERD: rasa terbakar naik ke dada/tenggorokan (heartburn), regurgitasi asam, memberat berbaring/setelah makan',
+      'Faktor risiko: NSAID, alkohol, makanan pedas/asam, stres, merokok',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tekan epigastrium ringan, umumnya tanpa tanda alarm (perdarahan, penurunan BB, disfagia, onset baru usia >55 tahun — bila ada, perlu endoskopi)',
+    ],
+    kriteriaDiagnosis: 'Klinis; endoskopi bila ada tanda alarm atau tidak respons terapi empiris.',
+    tatalaksana: [
+      'PPI (omeprazole) sebagai terapi empiris lini pertama',
+      'Hindari pencetus (NSAID, alkohol, makanan pedas/asam, makan sebelum tidur)',
+      'GERD: modifikasi posisi tidur (elevasi kepala), turunkan berat badan bila obesitas',
+      'Eradikasi H. pylori bila terkonfirmasi (triple therapy: PPI + amoksisilin + klaritromisin 7-14 hari)',
+    ],
+  },
+  'Disentri (Amoeba / Basiler)': {
+    anamnesis: [
+      'Diare berdarah/berlendir, tenesmus',
+      'Basiler (Shigella): onset akut, demam tinggi, frekuensi BAB sangat sering; amoeba: onset lebih bertahap, darah lebih dominan, demam kurang menonjol',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tekan abdomen, tanda dehidrasi bila diare berat, pemeriksaan feses langsung dapat menunjukkan eritrosit, leukosit, atau trofozoit amoeba',
+    ],
+    kriteriaDiagnosis: 'Pemeriksaan feses: basiler menunjukkan banyak leukosit PMN; amoeba menunjukkan trofozoit Entamoeba histolytica mengandung eritrosit fagositosis. Kultur feses untuk konfirmasi basiler.',
+    tatalaksana: [
+      'Basiler (Shigella): antibiotik (siprofloksasin atau azitromisin)',
+      'Amoeba: metronidazol 3x750mg 5-10 hari, dilanjutkan luminal agent (paromomisin) untuk eradikasi kista',
+      'Rehidrasi oral/IV sesuai derajat dehidrasi',
+      'Edukasi higiene makanan/air, cuci tangan',
+    ],
+  },
+  'Appendisitis Akut': {
+    anamnesis: [
+      'Nyeri perut awal periumbilikal berpindah ke kuadran kanan bawah (McBurney point) dalam 24 jam, disertai anoreksia, mual muntah, demam ringan',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tekan McBurney point, Blumberg sign (nyeri lepas) positif, Rovsing sign (nyeri kanan bawah saat kiri bawah ditekan), Psoas sign dan Obturator sign positif tergantung lokasi apendiks',
+    ],
+    kriteriaDiagnosis: 'Klinis (skor Alvarado) + USG (target sign/non-compressible tubular structure) atau CT abdomen bila diperlukan konfirmasi.',
+    tatalaksana: [
+      'Apendektomi (terbuka/laparoskopi) adalah terapi definitif',
+      'Antibiotik profilaksis pre-operatif, resusitasi cairan pre-operatif',
+      'Rujuk bedah segera bila dicurigai — jangan tunda karena risiko perforasi',
+    ],
+  },
+  'Kolesistitis / Kolelitiasis': {
+    anamnesis: [
+      'Nyeri kolik kuadran kanan atas, memberat setelah makan berlemak, dapat menjalar ke skapula kanan/bahu',
+      'Kolesistitis: nyeri menetap disertai demam (beda dari kolik bilier sederhana yang sembuh spontan)',
+    ],
+    pemeriksaanFisik: [
+      'Murphy sign positif (nyeri tekan hipokondrium kanan yang menghentikan inspirasi dalam saat palpasi) — khas kolesistitis akut',
+      'Nyeri tekan kuadran kanan atas, dapat teraba kandung empedu membesar',
+    ],
+    kriteriaDiagnosis: 'USG abdomen: batu empedu, penebalan dinding kandung empedu (>3mm), cairan perikolesistik, Murphy sign sonografi positif.',
+    tatalaksana: [
+      'Kolesistitis akut: rawat inap, puasa, cairan IV, analgesik, antibiotik spektrum luas, kolesistektomi (laparoskopi) dalam 24-72 jam onset',
+      'Kolelitiasis asimtomatik: observasi; simtomatik (kolik berulang): kolesistektomi elektif',
+    ],
+  },
+  'Hemoroid Interna (berbagai grade)': {
+    anamnesis: [
+      'Perdarahan BAB warna merah segar tanpa nyeri (khas interna, beda dari eksterna yang nyeri), rasa mengganjal/prolaps saat BAB, riwayat konstipasi kronis/mengejan',
+    ],
+    pemeriksaanFisik: [
+      'Anuskopi untuk visualisasi hemoroid interna: grade 1 (tidak prolaps), grade 2 (prolaps saat mengejan, reduksi spontan), grade 3 (prolaps, perlu reduksi manual), grade 4 (prolaps menetap tidak dapat direduksi)',
+    ],
+    kriteriaDiagnosis: 'Anuskopi/inspeksi visual menentukan grade.',
+    tatalaksana: [
+      'Grade 1-2: modifikasi diet tinggi serat, banyak minum, hindari mengejan, obat topikal (venotonik/kortikosteroid ringan)',
+      'Grade 2-3: ligasi pita karet (rubber band ligation), skleroterapi',
+      'Grade 3-4/gagal konservatif: hemoroidektomi bedah',
+      'Edukasi: hindari duduk lama di toilet, kelola konstipasi',
+    ],
+  },
+  'Ileus Obstruktif — pasang NGT': {
+    anamnesis: [
+      'Nyeri perut kolik, distensi abdomen, muntah (dapat fekulen pada obstruksi lanjut), tidak bisa flatus/BAB (obstipasi), riwayat operasi abdomen sebelumnya (adhesi) atau hernia',
+    ],
+    pemeriksaanFisik: [
+      'Distensi abdomen, bising usus meningkat metalik (dini) atau menghilang (lanjut/strangulasi), nyeri tekan difus, cari tanda hernia inkarserata',
+    ],
+    kriteriaDiagnosis: 'Foto polos abdomen (BNO 3 posisi): dilatasi usus dengan air-fluid level (step-ladder pattern), tanpa udara di rektum pada obstruksi total.',
+    tatalaksana: [
+      'Dekompresi dengan pemasangan NGT untuk dekompresi lambung/usus proksimal',
+      'Puasa, resusitasi cairan IV, koreksi elektrolit',
+      'Rujuk bedah untuk evaluasi kebutuhan laparotomi (terutama bila ada tanda strangulasi: nyeri hebat menetap, demam, takikardia, peritonitis)',
+    ],
+    tips: 'Pemasangan NGT yang benar (pengukuran panjang, konfirmasi posisi) sering jadi station tindakan tersendiri pada kasus ini.',
+  },
+  'Peritonitis': {
+    anamnesis: [
+      'Nyeri perut hebat difus, memberat dengan gerakan/batuk, riwayat perforasi organ (apendisitis, ulkus peptikum perforasi, divertikulitis) atau trauma',
+    ],
+    pemeriksaanFisik: [
+      'Perut papan (rigiditas involunter), nyeri tekan difus, nyeri lepas difus (rebound tenderness), bising usus menghilang, tanda syok sepsis pada kasus lanjut',
+    ],
+    kriteriaDiagnosis: 'Klinis (perut papan + nyeri lepas difus) + foto polos abdomen (udara bebas subdiafragma bila perforasi organ berongga) + leukositosis.',
+    tatalaksana: [
+      'Resusitasi cairan agresif, antibiotik spektrum luas segera (cakupan gram negatif + anaerob)',
+      'Rujuk bedah segera untuk laparotomi eksplorasi — kegawatdaruratan bedah',
+      'Puasa, NGT dekompresi, pasang kateter urin untuk monitor produksi urin',
+    ],
+  },
+  'Ascariasis / Taeniasis / Amoebiasis (parasit)': {
+    anamnesis: [
+      'Ascariasis: nyeri perut, kadang keluar cacing dari mulut/anus, pada infeksi berat dapat obstruksi usus pada anak',
+      'Taeniasis: keluar proglotid (segmen cacing pita) pada feses, riwayat konsumsi daging sapi/babi kurang matang',
+      'Amoebiasis: diare berdarah kronis atau abses hati amoeba (nyeri kuadran kanan atas + demam)',
+    ],
+    pemeriksaanFisik: [
+      'Pemeriksaan feses langsung untuk identifikasi telur/proglotid/trofozoit/kista sesuai spesies',
+    ],
+    kriteriaDiagnosis: 'Identifikasi telur cacing (Ascaris: berdinding tebal bergelombang; Taenia: bulat berdinding tebal radial) atau proglotid pada pemeriksaan feses; amoebiasis: trofozoit/kista Entamoeba histolytica pada feses, atau USG hati untuk abses amoeba.',
+    tatalaksana: [
+      'Ascariasis: albendazol atau mebendazol dosis tunggal/beberapa hari',
+      'Taeniasis: praziquantel dosis tunggal',
+      'Amoebiasis intestinal: metronidazol + luminal agent (paromomisin); abses hati amoeba: metronidazol dosis lebih tinggi/lama, aspirasi bila abses besar/tidak respons',
+      'Edukasi: masak daging hingga matang, cuci tangan, sanitasi lingkungan',
+    ],
+  },
+  'Hernia Inguinalis': {
+    anamnesis: [
+      'Benjolan di lipat paha yang membesar saat mengejan/batuk/berdiri lama, mengecil/hilang saat berbaring (reponibel)',
+      'Nyeri hebat mendadak + benjolan tidak bisa masuk kembali = curiga inkarserata/strangulata (kegawatdaruratan)',
+    ],
+    pemeriksaanFisik: [
+      'Inspeksi & palpasi benjolan inguinal, coba reduksi, uji finger test/thumb test untuk membedakan hernia inguinalis direk vs indirek',
+      'Waspada tanda strangulasi: nyeri hebat, benjolan tegang tidak dapat direduksi, kulit di atasnya kemerahan, tanda obstruksi usus/peritonitis',
+    ],
+    kriteriaDiagnosis: 'Klinis dari inspeksi & palpasi; USG inguinal bila diagnosis meragukan.',
+    tatalaksana: [
+      'Hernia reponibel elektif: rujuk bedah untuk hernioplasti/hernioraphy elektif (tidak darurat)',
+      'Hernia inkarserata: coba reduksi manual hati-hati (bila tidak ada tanda strangulasi) lalu rencanakan operasi elektif dalam waktu dekat',
+      'Hernia strangulata: operasi cito (kegawatdaruratan) — risiko nekrosis usus bila ditunda',
+    ],
+  },
 }
