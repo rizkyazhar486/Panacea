@@ -8,8 +8,9 @@ import { OSCE_STATION_NOTES } from '../lib/osceStationNotes'
 import { OSCE_STATION_RUBRICS } from '../lib/osceStationRubrics'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../lib/skdiTherapyReference'
 import { SKDI_SKILLS, SKILL_SYSTEMS, type SkillSystem } from '../lib/skdiSkillsChecklist'
+import { SKDI_DISEASE_LIST, SKDI_DISEASE_SYSTEMS, type SkdiDiseaseSystem } from '../lib/skdiDiseaseList'
 
-type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'therapy' | 'techniques' | 'timeline'
+type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'therapy' | 'diseases' | 'techniques' | 'timeline'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'practice', label: 'Question Bank', emoji: '❓' },
@@ -18,6 +19,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'station-sim', label: 'Station Simulator', emoji: '🎭' },
   { id: 'skills', label: 'SKDI Skills Checklist', emoji: '✅' },
   { id: 'therapy', label: 'SKDI Therapy Reference', emoji: '💊' },
+  { id: 'diseases', label: 'Daftar Penyakit SKDI', emoji: '📖' },
   { id: 'techniques', label: 'How to Study', emoji: '🧠' },
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
@@ -194,6 +196,97 @@ function SkdiTherapySection() {
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Direkap dari referensi tatalaksana SKDI/UKMPPD, digunakan dengan izin pemilik konten. Bantuan
         belajar untuk ujian — bukan pengganti panduan farmakologi resmi atau penilaian klinis.
+      </div>
+    </div>
+  )
+}
+
+const OSCE_NOTE_KEYS = Object.keys(OSCE_STATION_NOTES)
+function hasOsceNote(diseaseName: string): boolean {
+  const d = diseaseName.toLowerCase()
+  return OSCE_NOTE_KEYS.some((k) => {
+    const kl = k.toLowerCase()
+    return kl.includes(d) || d.includes(kl.split(' (')[0].split(' —')[0])
+  })
+}
+
+function SkdiDiseaseDirectorySection() {
+  const [query, setQuery] = useState('')
+  const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
+  const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase().trim()
+    return SKDI_DISEASE_LIST.filter((e) => {
+      if (system && e.system !== system) return false
+      if (levelFilter !== 'all' && !e.level.startsWith(levelFilter)) return false
+      if (!q) return true
+      return `${e.disease} ${e.subsection ?? ''} ${e.system}`.toLowerCase().includes(q)
+    })
+  }, [query, system, levelFilter])
+
+  const grouped = useMemo(() => {
+    const map = new Map<SkdiDiseaseSystem, typeof SKDI_DISEASE_LIST>()
+    for (const e of filtered) {
+      if (!map.has(e.system)) map.set(e.system, [])
+      map.get(e.system)!.push(e)
+    }
+    return Array.from(map.entries())
+  }, [filtered])
+
+  return (
+    <div className="space-y-4">
+      <Card className="!p-5">
+        <SectionTitle icon={<IconBook size={20} />} title="Daftar Penyakit SKDI" subtitle={`${SKDI_DISEASE_LIST.length} penyakit/kondisi resmi, per Standar Kompetensi Dokter Indonesia (Konsil Kedokteran Indonesia)`} />
+        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
+          Referensi cepat: nama penyakit, sistem, dan level kompetensi. Penyakit yang sudah punya
+          catatan station lengkap (anamnesis/PF/tatalaksana) ditandai badge "Catatan OSCE" — buka di
+          tab OSCE Case Bank.
+        </p>
+        <input
+          className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
+          placeholder="Cari penyakit (mis. malaria, hipertensi, katarak)…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button onClick={() => setLevelFilter('all')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === 'all' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua level</button>
+          {(['4', '3', '2', '1'] as const).map((lv) => (
+            <button key={lv} onClick={() => setLevelFilter(lv)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === lv ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Level {lv}</button>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button onClick={() => setSystem(null)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!system ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua sistem</button>
+          {SKDI_DISEASE_SYSTEMS.map((s) => (
+            <button key={s} onClick={() => setSystem(s)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${system === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{s}</button>
+          ))}
+        </div>
+      </Card>
+
+      {grouped.map(([sys, diseases]) => (
+        <Card key={sys} className="!p-4">
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys} · {diseases.length}</div>
+          <div className="mt-2 space-y-2">
+            {diseases.map((e, i) => (
+              <div key={i} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+                <div>
+                  <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
+                  {e.subsection && <span className="ml-2 text-[11px] text-neutral-400">{e.subsection}</span>}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {hasOsceNote(e.disease) && <Badge tone="brand">Catatan OSCE</Badge>}
+                  <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ))}
+      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
+
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+        Berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia). Level 4A/4B = harus tuntas mandiri saat
+        lulus dokter, 3A/3B = bisa dengan supervisi, 2 = pernah melihat, 1 = tahu teori.
       </div>
     </div>
   )
@@ -481,6 +574,7 @@ export function MedStudyHub() {
       {section === 'station-sim' && <StationSimulatorSection />}
       {section === 'skills' && <SkdiSkillsSection />}
       {section === 'therapy' && <SkdiTherapySection />}
+      {section === 'diseases' && <SkdiDiseaseDirectorySection />}
       {section === 'techniques' && <TechniquesSection />}
       {section === 'timeline' && <TimelineSection />}
     </div>
