@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
 
@@ -10,7 +10,7 @@ import { IconMoon } from '../components/icons'
 // All pure client-side math/state, localStorage-persisted, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'cycles' | 'nap' | 'consistency' | 'dream' | 'bedtime'
+type Tab = 'cycles' | 'nap' | 'consistency' | 'dream' | 'bedtime' | 'soundscape'
 
 function CycleAlarm() {
   const [mode, setMode] = useState<'bedtime' | 'now'>('now')
@@ -172,12 +172,172 @@ function BedtimeChecklist() {
   )
 }
 
+// Real Web Audio synthesis: binaural beats (two pure tones, one per ear,
+// differing by the chosen beat frequency) and colored noise (white/pink/brown
+// generated sample-by-sample). No pre-recorded audio files, no external API —
+// framed as a relaxation aid, not a claim of any specific cognitive effect.
+type NoiseColor = 'white' | 'pink' | 'brown'
+const BEAT_PRESETS = [
+  { label: 'Delta (deep sleep) — 2 Hz', hz: 2 },
+  { label: 'Theta (relaxation) — 6 Hz', hz: 6 },
+  { label: 'Alpha (calm focus) — 10 Hz', hz: 10 },
+]
+
+function SoundscapeGenerator() {
+  const [playing, setPlaying] = useState(false)
+  const [mode, setMode] = useState<'binaural' | 'noise'>('binaural')
+  const [beatHz, setBeatHz] = useState(6)
+  const [baseHz, setBaseHz] = useState(200)
+  const [noiseColor, setNoiseColor] = useState<NoiseColor>('pink')
+  const [volume, setVolume] = useState(0.15)
+  const [minutes, setMinutes] = useState(10)
+  const [remainingSec, setRemainingSec] = useState<number | null>(null)
+
+  const ctxRef = useRef<AudioContext | null>(null)
+  const nodesRef = useRef<{ stop: () => void } | null>(null)
+  const timerRef = useRef<number | null>(null)
+
+  function clearTimer() { if (timerRef.current) { window.clearInterval(timerRef.current); timerRef.current = null } }
+
+  function stop() {
+    nodesRef.current?.stop()
+    nodesRef.current = null
+    clearTimer()
+    setRemainingSec(null)
+    setPlaying(false)
+  }
+
+  function start() {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ctx = ctxRef.current ?? new AC()
+    ctxRef.current = ctx
+    if (ctx.state === 'suspended') ctx.resume()
+
+    const master = ctx.createGain()
+    master.gain.value = volume
+    master.connect(ctx.destination)
+
+    let stopFn: () => void
+
+    if (mode === 'binaural') {
+      const left = ctx.createOscillator()
+      const right = ctx.createOscillator()
+      left.frequency.value = baseHz
+      right.frequency.value = baseHz + beatHz
+      const leftPan = ctx.createStereoPanner(); leftPan.pan.value = -1
+      const rightPan = ctx.createStereoPanner(); rightPan.pan.value = 1
+      left.connect(leftPan).connect(master)
+      right.connect(rightPan).connect(master)
+      left.start(); right.start()
+      stopFn = () => { left.stop(); right.stop() }
+    } else {
+      const bufferSize = 2 * ctx.sampleRate
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+      const data = buffer.getChannelData(0)
+      if (noiseColor === 'white') {
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1
+      } else if (noiseColor === 'pink') {
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1
+          b0 = 0.99886 * b0 + white * 0.0555179
+          b1 = 0.99332 * b1 + white * 0.0750759
+          b2 = 0.96900 * b2 + white * 0.1538520
+          b3 = 0.86650 * b3 + white * 0.3104856
+          b4 = 0.55000 * b4 + white * 0.5329522
+          b5 = -0.7616 * b5 - white * 0.0168980
+          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362
+          b6 = white * 0.115926
+          data[i] = pink * 0.11
+        }
+      } else {
+        let last = 0
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1
+          last = (last + 0.02 * white) / 1.02
+          data[i] = last * 3.5
+        }
+      }
+      const src = ctx.createBufferSource()
+      src.buffer = buffer
+      src.loop = true
+      src.connect(master)
+      src.start()
+      stopFn = () => src.stop()
+    }
+
+    nodesRef.current = { stop: () => { stopFn(); master.disconnect() } }
+    setPlaying(true)
+
+    if (minutes > 0) {
+      let sec = minutes * 60
+      setRemainingSec(sec)
+      clearTimer()
+      timerRef.current = window.setInterval(() => {
+        sec -= 1
+        setRemainingSec(sec)
+        if (sec <= 0) stop()
+      }, 1000)
+    }
+  }
+
+  useEffect(() => () => { nodesRef.current?.stop(); clearTimer() }, [])
+
+  return (
+    <Card className="!p-6">
+      <p className="text-[13px] text-neutral-500">Real generated audio (Web Audio API) — binaural tones or colored noise for winding down. A relaxation aid, not a proven treatment for any sleep disorder. Headphones recommended for binaural beats to work (each ear needs a different tone).</p>
+
+      <div className="mt-4 flex gap-2">
+        <button onClick={() => setMode('binaural')} className={`flex-1 rounded-xl py-2 text-[12px] font-bold ${mode === 'binaural' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Binaural Beats</button>
+        <button onClick={() => setMode('noise')} className={`flex-1 rounded-xl py-2 text-[12px] font-bold ${mode === 'noise' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Colored Noise</button>
+      </div>
+
+      {mode === 'binaural' && (
+        <div className="mt-4 space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {BEAT_PRESETS.map((p) => (
+              <button key={p.hz} onClick={() => setBeatHz(p.hz)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${beatHz === p.hz ? 'bg-brand-dark text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{p.label}</button>
+            ))}
+          </div>
+          <label className="block text-[11px] font-bold text-neutral-500">Base tone: {baseHz} Hz
+            <input className="mt-1 w-full accent-brand" type="range" min={100} max={400} value={baseHz} onChange={(e) => setBaseHz(Number(e.target.value))} disabled={playing} />
+          </label>
+        </div>
+      )}
+
+      {mode === 'noise' && (
+        <div className="mt-4 flex gap-2">
+          {(['white', 'pink', 'brown'] as NoiseColor[]).map((c) => (
+            <button key={c} onClick={() => setNoiseColor(c)} disabled={playing} className={`flex-1 rounded-xl py-2 text-[12px] font-bold capitalize ${noiseColor === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{c}</button>
+          ))}
+        </div>
+      )}
+
+      <label className="mt-4 block text-[11px] font-bold text-neutral-500">Volume: {Math.round(volume * 100)}%
+        <input className="mt-1 w-full accent-brand" type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} />
+      </label>
+      <label className="mt-3 block text-[11px] font-bold text-neutral-500">Auto-stop after: {minutes === 0 ? 'never' : `${minutes} min`}
+        <input className="mt-1 w-full accent-brand" type="range" min={0} max={60} step={5} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} disabled={playing} />
+      </label>
+
+      {!playing ? (
+        <button onClick={start} className="mt-5 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">▶ Play</button>
+      ) : (
+        <button onClick={stop} className="mt-5 w-full rounded-xl bg-neutral-800 py-3 text-sm font-bold text-white dark:bg-white/20">
+          ■ Stop{remainingSec != null ? ` — ${Math.floor(remainingSec / 60)}:${String(remainingSec % 60).padStart(2, '0')} left` : ''}
+        </button>
+      )}
+    </Card>
+  )
+}
+
 const TABS: { id: Tab; label: string }[] = [
   { id: 'cycles', label: 'Cycle Alarm' },
   { id: 'nap', label: 'Nap Timer' },
   { id: 'consistency', label: 'Consistency' },
   { id: 'dream', label: 'Dream Journal' },
   { id: 'bedtime', label: 'Bedtime Checklist' },
+  { id: 'soundscape', label: 'Soundscape' },
 ]
 
 export function SleepToolkit() {
@@ -185,7 +345,7 @@ export function SleepToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Toolkit" subtitle="Five small, real sleep tools in one place" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Toolkit" subtitle="Six small, real sleep tools in one place" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
@@ -198,6 +358,7 @@ export function SleepToolkit() {
       {tab === 'consistency' && <ConsistencyScore />}
       {tab === 'dream' && <DreamJournal />}
       {tab === 'bedtime' && <BedtimeChecklist />}
+      {tab === 'soundscape' && <SoundscapeGenerator />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Educational estimates based on general sleep-science heuristics (90-minute cycle length varies
