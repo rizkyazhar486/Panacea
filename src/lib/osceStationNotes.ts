@@ -430,6 +430,261 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
 
+  // ─── Psikiatri ─────────────────────────────────────────────────────────
+  'Post-Traumatic Stress Disorder (PTSD)': {
+    anamnesis: [
+      'Riwayat peristiwa traumatis (kecelakaan, bencana, kekerasan) — gali detail kejadian dan kapan terjadi',
+      'Gejala re-experiencing: mimpi buruk berulang, flashback, teringat terus peristiwa',
+      'Gejala penghindaran: menghindari tempat/situasi/percakapan yang mengingatkan trauma',
+      'Gejala hiperarousal: mudah terkejut, sulit tidur, mudah marah, waspada berlebihan',
+      'Durasi gejala >1 bulan sejak kejadian traumatis',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: penampilan, raut wajah cemas/tegang, sering waspada/mudah terkejut',
+      'Mood/afek: disforik, appropriate',
+      'Isi pikiran: preokupasi tentang peristiwa traumatis',
+      'Tilikan (insight): biasanya baik (derajat 6) — pasien menyadari gejalanya tidak wajar',
+    ],
+    kriteriaDiagnosis: 'Gejala re-experiencing + avoidance + hyperarousal setelah paparan peristiwa traumatis, berlangsung >1 bulan, menyebabkan gangguan fungsi.',
+    tatalaksana: [
+      'Farmakoterapi: SSRI (sertraline 50mg, atau paroxetine) lini pertama',
+      'Non-farmako: trauma-focused CBT, EMDR bila tersedia',
+      'Edukasi: proses pemulihan butuh waktu, pentingnya dukungan keluarga, hindari alkohol/zat sebagai koping',
+    ],
+    tips: 'Status mental lengkap wajib didokumentasikan tertulis di rekam medis pada station ini — bukan hanya disampaikan lisan.',
+  },
+  'Gangguan Cemas Menyeluruh (GAD)': {
+    anamnesis: [
+      'Cemas berlebihan tentang berbagai hal (pekerjaan, kesehatan, keuangan) hampir setiap hari, sulit dikendalikan, ≥6 bulan',
+      'Gejala somatik penyerta: tegang otot, mudah lelah, sulit konsentrasi, iritabel, gangguan tidur, gelisah',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: tampak gelisah/tegang, mood cemas, afek sesuai',
+      'Singkirkan penyebab organik: fungsi tiroid (hipertiroid dapat menyerupai cemas), riwayat konsumsi kafein/stimulan berlebihan',
+    ],
+    kriteriaDiagnosis: 'Kecemasan dan kekhawatiran berlebihan, sulit dikendalikan, tentang berbagai peristiwa/aktivitas, ≥6 bulan, disertai minimal 3 gejala somatik (gelisah, mudah lelah, sulit konsentrasi, iritabel, tegang otot, gangguan tidur).',
+    tatalaksana: [
+      'Farmakoterapi: SSRI (sertraline, escitalopram) lini pertama untuk terapi jangka panjang; benzodiazepin jangka pendek hanya untuk kontrol gejala akut',
+      'Non-farmako: CBT, relaksasi, psikoedukasi',
+      'Edukasi: kurangi kafein, olahraga teratur, teknik relaksasi',
+    ],
+  },
+  'Skizofrenia Paranoid': {
+    anamnesis: [
+      'Waham kejar/persekutorik (merasa diawasi, dimata-matai, akan dicelakai)',
+      'Halusinasi auditorik (mendengar suara-suara yang mengomentari/memerintah)',
+      'Durasi gejala ≥1 bulan',
+      'Riwayat fungsi sosial/pekerjaan menurun, riwayat keluarga skizofrenia, penggunaan zat psikoaktif',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: penampilan kadang kurang terawat, kontak mata kurang, waham kejar (+), halusinasi auditorik (+), reality testing ability terganggu, tilikan buruk (derajat 1-2)',
+    ],
+    kriteriaDiagnosis: 'Waham dan/atau halusinasi menonjol (predominan waham kejar) berlangsung ≥1 bulan, dengan fungsi kognitif dan afek relatif terjaga dibanding subtipe skizofrenia lain.',
+    tatalaksana: [
+      'Antipsikotik: risperidone 2x2mg, haloperidol, atau antipsikotik atipikal lain',
+      'Non-farmako: psikoedukasi keluarga, rehabilitasi psikososial',
+      'Edukasi keluarga: kepatuhan obat jangka panjang krusial mencegah relaps, kenali tanda kekambuhan dini',
+    ],
+    tips: 'Bedakan dari gangguan waham menetap: skizofrenia paranoid disertai halusinasi menonjol, sedangkan gangguan waham menetap umumnya tanpa halusinasi menonjol dan fungsi kepribadian lebih terjaga.',
+  },
+  'Gangguan Afektif Bipolar (manik/depresi)': {
+    anamnesis: [
+      'Episode manik: mood meningkat/iritabel, energi berlebih, bicara cepat tak terhenti, flight of ideas, kebutuhan tidur berkurang tanpa lelah, perilaku impulsif/boros, grandiositas',
+      'Episode depresi: mood turun, anhedonia, energi menurun, gangguan tidur, nafsu makan berubah, ide bunuh diri',
+      'Riwayat episode sebelumnya (pola siklik manik-depresi-eutimia)',
+    ],
+    pemeriksaanFisik: [
+      'Episode manik: dandanan mencolok, hiperaktif, pembicaraan cepat/produktif, flight of ideas, mood elevated/labil, waham kebesaran mungkin ada, tilikan buruk',
+      'Episode depresi: penampilan lesu, psikomotor lambat, mood depresif, isi pikir pesimis/ide bunuh diri, tilikan bervariasi',
+    ],
+    kriteriaDiagnosis: 'Minimal 1 episode manik/hipomanik pernah terjadi untuk diagnosis bipolar; tentukan "episode kini" (manik atau depresi, dengan/tanpa gejala psikotik) sesuai gejala saat pemeriksaan.',
+    tatalaksana: [
+      'Episode manik: mood stabilizer (asam valproat, litium) dan/atau antipsikotik atipikal (risperidone, quetiapine)',
+      'Episode depresi bipolar: mood stabilizer + hati-hati pemberian antidepresan tunggal (risiko switch ke manik)',
+      'Non-farmako: psikoedukasi pola tidur teratur, hindari zat psikoaktif, family therapy',
+    ],
+    tips: 'Jangan berikan antidepresan tunggal tanpa mood stabilizer pada bipolar — risiko memicu switch ke episode manik.',
+  },
+  'Depresi (ringan/sedang/berat)': {
+    anamnesis: [
+      'Trias utama: mood depresif, anhedonia, mudah lelah/energi menurun — minimal 2 minggu',
+      'Gejala tambahan: gangguan tidur, nafsu makan berubah, konsentrasi menurun, rasa bersalah/tidak berharga, ide bunuh diri (wajib ditanyakan langsung)',
+      'Tentukan derajat: ringan (2 utama + 2 tambahan), sedang (2 utama + 3-4 tambahan), berat (3 utama + ≥4 tambahan, dapat disertai gejala psikotik)',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: psikomotor lambat/retardasi, mood depresif, isi pikir pesimis, ide bunuh diri (+/-), tilikan baik pada depresi non-psikotik',
+    ],
+    kriteriaDiagnosis: 'Kombinasi gejala utama + tambahan sesuai derajat, berlangsung minimal 2 minggu, menyebabkan gangguan fungsi.',
+    tatalaksana: [
+      'Ringan: psikoterapi (CBT) dapat menjadi lini pertama tanpa farmakoterapi',
+      'Sedang-berat: SSRI (sertraline, fluoxetine) lini pertama + psikoterapi',
+      'Berat dengan gejala psikotik: kombinasi antidepresan + antipsikotik, atau ECT bila refrakter/risiko bunuh diri tinggi',
+      'Wajib skrining risiko bunuh diri aktif pada setiap kasus depresi — bila ada rencana konkret, rujuk emergensi psikiatri',
+    ],
+    tips: 'Menanyakan ide bunuh diri secara langsung dan eksplisit adalah poin penilaian krusial yang sering dihindari peserta karena canggung — jangan lewatkan.',
+  },
+  'Insomnia (primer/early/middle/late)': {
+    anamnesis: [
+      'Kesulitan memulai tidur (early/initial insomnia), mempertahankan tidur (middle insomnia, sering terbangun), atau bangun terlalu pagi (late/terminal insomnia)',
+      'Durasi ≥3x/minggu selama ≥1 bulan mengganggu fungsi siang hari',
+      'Singkirkan penyebab sekunder: depresi, cemas, nyeri kronis, kafein/alkohol, sleep apnea',
+    ],
+    pemeriksaanFisik: [
+      'Status mental umumnya normal pada insomnia primer; bila ada gejala depresi/cemas penyerta, dokumentasikan sebagai kemungkinan insomnia sekunder',
+    ],
+    kriteriaDiagnosis: 'Kesulitan tidur (onset/maintenance/early morning awakening) ≥3x/minggu ≥1 bulan dengan dampak fungsi siang hari, setelah menyingkirkan penyebab organik/psikiatri sekunder lain.',
+    tatalaksana: [
+      'Non-farmako lini pertama: sleep hygiene (jadwal tidur teratur, hindari layar sebelum tidur, hindari kafein sore hari), CBT-Insomnia bila tersedia',
+      'Farmako jangka pendek bila perlu: Z-drug (zolpidem) atau benzodiazepin kerja pendek — hindari penggunaan jangka panjang',
+      'Bila insomnia sekunder: obati penyebab dasar (depresi/cemas/nyeri) sebagai prioritas',
+    ],
+  },
+  'Gangguan Waham Menetap': {
+    anamnesis: [
+      'Waham (non-bizarre) menetap ≥3 bulan — mis. waham cemburu, waham dikejar, waham somatik — tanpa gejala skizofrenia lain menonjol',
+      'Fungsi kepribadian dan pekerjaan relatif terjaga di luar area waham',
+      'Tidak ada halusinasi menonjol',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: penampilan rapi (berbeda dari skizofrenia), waham sistematis dan meyakinkan, afek sesuai isi waham, tidak ada halusinasi menonjol, tilikan buruk terhadap wahamnya',
+    ],
+    kriteriaDiagnosis: 'Waham tunggal atau berkaitan (non-bizarre) menetap minimal 3 bulan, tanpa gejala skizofrenia lain (halusinasi menonjol, gejala negatif), fungsi di luar area waham relatif baik.',
+    tatalaksana: [
+      'Antipsikotik dosis rendah (respons sering terbatas dibanding skizofrenia)',
+      'Psikoterapi suportif — hindari konfrontasi langsung terhadap waham, bangun aliansi terapeutik',
+      'Edukasi keluarga: hindari argumentasi langsung menentang waham, fokus pada fungsi sehari-hari',
+    ],
+  },
+  'Gangguan Psikotik Akut': {
+    anamnesis: [
+      'Onset gejala psikotik (waham, halusinasi, perilaku kacau) mendadak dalam hitungan hari-2 minggu',
+      'Sering dipicu stresor psikososial akut',
+      'Durasi gejala <1 bulan (bila >1 bulan, evaluasi ulang ke arah skizofrenia)',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: waham/halusinasi polimorfik dan berubah-ubah, afek labil, perilaku kacau/bingung, tilikan buruk selama episode akut',
+    ],
+    kriteriaDiagnosis: 'Onset psikotik akut (<2 minggu) dengan gambaran polimorfik/berubah-ubah, durasi total <1 bulan dengan pemulihan penuh — dibedakan dari skizofrenia (>1 bulan).',
+    tatalaksana: [
+      'Antipsikotik jangka pendek (haloperidol atau antipsikotik atipikal) untuk kontrol gejala akut',
+      'Rawat inap bila risiko membahayakan diri/orang lain',
+      'Setelah remisi, evaluasi ulang untuk menyingkirkan skizofrenia bila gejala menetap >1 bulan',
+    ],
+  },
+  'Gangguan Panik': {
+    anamnesis: [
+      'Serangan panik berulang: rasa takut/tidak nyaman intens, mendadak, memuncak dalam beberapa menit, disertai gejala fisik (jantung berdebar, sesak, keringat dingin, gemetar, rasa tercekik, nyeri dada, mual, pusing, rasa akan mati/gila)',
+      'Kekhawatiran terus-menerus akan serangan berikutnya, perubahan perilaku menghindari situasi tertentu',
+    ],
+    pemeriksaanFisik: [
+      'Status mental interiktal umumnya normal di luar serangan; selama serangan tampak sangat cemas, takikardia, hiperventilasi',
+      'Penting: singkirkan penyebab kardiak/organik lain sebelum menegakkan diagnosis psikiatri (EKG, fungsi tiroid) terutama pada presentasi pertama',
+    ],
+    kriteriaDiagnosis: 'Serangan panik berulang tak terduga + minimal 1 bulan kekhawatiran akan serangan berikutnya atau perubahan perilaku maladaptif terkait, setelah menyingkirkan penyebab organik/kardiak.',
+    tatalaksana: [
+      'Farmakoterapi: SSRI lini pertama jangka panjang; benzodiazepin jangka pendek untuk kontrol gejala akut',
+      'Non-farmako: CBT (termasuk exposure therapy), teknik pernapasan/relaksasi',
+      'Edukasi: serangan panik tidak mengancam nyawa meski terasa sangat menakutkan',
+    ],
+  },
+  'Gangguan Somatisasi / Hipokondriasis': {
+    anamnesis: [
+      'Somatisasi: keluhan fisik multipel, berpindah-pindah, berulang bertahun-tahun tanpa penjelasan medis adekuat meski sudah diperiksa berulang',
+      'Hipokondriasis: keyakinan menetap menderita penyakit serius tertentu meski hasil pemeriksaan berulang normal, preokupasi berlebihan terhadap sensasi tubuh normal',
+      'Riwayat pemeriksaan/konsultasi dokter berulang tanpa hasil abnormal signifikan',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: preokupasi somatik menonjol, mood cemas terkait keluhan fisik, tidak ada waham (pasien masih bisa menerima kemungkinan bukan penyakit serius meski sulit)',
+    ],
+    kriteriaDiagnosis: 'Keluhan fisik berulang/persisten tanpa dasar organik adekuat (somatisasi) ATAU preokupasi menetap terhadap keyakinan menderita penyakit serius meski pemeriksaan berulang normal (hipokondriasis), menyebabkan gangguan fungsi.',
+    tatalaksana: [
+      'Bangun hubungan dokter-pasien suportif, jadwalkan kontrol rutin (bukan hanya saat gejala) untuk mengurangi doctor shopping',
+      'Hindari pemeriksaan penunjang berulang tanpa indikasi jelas',
+      'Psikoterapi (CBT) sebagai terapi utama; SSRI dapat membantu bila ada gejala cemas/depresi penyerta',
+    ],
+  },
+  'Baby Blues / Depresi Postpartum': {
+    anamnesis: [
+      'Baby blues: mood labil, mudah menangis, cemas ringan, muncul 2-3 hari pasca-persalinan, membaik spontan dalam 2 minggu, tidak mengganggu kemampuan merawat bayi',
+      'Depresi postpartum: gejala depresi menetap >2 minggu, onset dalam 4-6 minggu pasca-persalinan, mengganggu kemampuan merawat bayi, dapat disertai pikiran membahayakan diri/bayi (wajib ditanyakan)',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: mood depresif/labil, afek sesuai; pada depresi postpartum berat dapat ada waham/halusinasi terkait bayi (postpartum psychosis — kegawatdaruratan, berbeda dari depresi postpartum biasa)',
+    ],
+    kriteriaDiagnosis: 'Baby blues: gejala ringan, transien, sembuh spontan <2 minggu. Depresi postpartum: gejala depresi menetap >2 minggu dalam 6 minggu pasca-persalinan yang mengganggu fungsi.',
+    tatalaksana: [
+      'Baby blues: dukungan emosional, edukasi bahwa ini normal dan akan membaik, libatkan keluarga membantu perawatan bayi',
+      'Depresi postpartum: SSRI yang aman untuk menyusui (sertraline pilihan utama) + psikoterapi, evaluasi keamanan bayi',
+      'Waspada postpartum psychosis (waham/halusinasi terkait mencelakai bayi) — kegawatdaruratan psikiatri, rawat inap segera',
+    ],
+    tips: 'Selalu tanyakan langsung risiko membahayakan diri sendiri ATAU bayi pada setiap kasus gangguan mood postpartum — poin penilaian keselamatan krusial.',
+  },
+  'Trikotilomania': {
+    anamnesis: [
+      'Menarik rambut sendiri berulang menyebabkan kerontokan terlihat, biasanya dipicu stres/kecemasan, perilaku sulit dikendalikan meski sudah berusaha berhenti',
+      'Rasa lega/puas setelah menarik rambut',
+      'Dampak psikososial (malu, isolasi sosial)',
+    ],
+    pemeriksaanFisik: [
+      'Status lokalis: area alopesia dengan rambut tumbuh tidak merata, batas tidak tegas, rambut patah dengan panjang bervariasi (beda dari alopesia areata yang berbatas tegas dan licin)',
+    ],
+    kriteriaDiagnosis: 'Menarik rambut berulang menyebabkan kerontokan terlihat, usaha berulang menghentikan kebiasaan gagal, menyebabkan distres/gangguan fungsi, bukan akibat kondisi dermatologis lain.',
+    tatalaksana: [
+      'Non-farmako: habit reversal training (bagian dari CBT) sebagai terapi lini pertama',
+      'Farmako: SSRI dapat dipertimbangkan bila ada gejala cemas/depresi/OCD penyerta',
+      'Edukasi: kondisi ini terkait spektrum obsesif-kompulsif, bukan sekadar kebiasaan buruk',
+    ],
+  },
+  'Skizoafektif': {
+    anamnesis: [
+      'Gejala psikotik (waham/halusinasi) terjadi bersamaan dengan episode gangguan mood (manik atau depresi) yang menonjol',
+      'Kunci pembeda: pada periode tertentu, gejala psikotik muncul TANPA gejala mood menonjol',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: kombinasi gejala psikotik (waham/halusinasi) dan gejala mood (elevated/depresif) muncul bersamaan dalam episode yang sama',
+    ],
+    kriteriaDiagnosis: 'Episode gangguan mood menonjol muncul bersamaan dengan gejala psikotik yang memenuhi kriteria skizofrenia, DAN pernah ada periode ≥2 minggu gejala psikotik tanpa gejala mood menonjol (kriteria pembeda kunci dari gangguan mood dengan psikotik).',
+    tatalaksana: [
+      'Kombinasi antipsikotik + mood stabilizer/antidepresan sesuai tipe episode mood yang dominan',
+      'Psikoedukasi keluarga tentang kompleksitas kondisi ini (gabungan psikotik + mood)',
+    ],
+    tips: 'Salah satu diagnosis banding tersulit di psikiatri OSCE — kuncinya menemukan periode psikotik TANPA gejala mood untuk membedakan dari gangguan mood dengan ciri psikotik semata.',
+  },
+  'Intoksikasi Alkohol / Zat Psikoaktif': {
+    anamnesis: [
+      'Riwayat konsumsi alkohol/zat (jenis, jumlah, waktu terakhir) sebelum onset gejala',
+      'Gejala intoksikasi alkohol: bicara pelo, jalan sempoyongan, disinhibisi perilaku, penurunan kesadaran pada kasus berat',
+      'Riwayat penggunaan kronis untuk menilai risiko withdrawal/delirium tremens bila dihentikan',
+    ],
+    pemeriksaanFisik: [
+      'Status mental: kesadaran berkabut hingga stupor tergantung derajat, bau alkohol dari napas, nistagmus, disartria, ataksia gaya berjalan',
+      'Nilai tanda vital untuk menyingkirkan komplikasi (aspirasi, trauma kepala penyerta)',
+    ],
+    kriteriaDiagnosis: 'Perubahan perilaku/psikologis bermakna secara klinis (disinhibisi, labilitas mood, gangguan penilaian) yang berkembang selama/segera setelah konsumsi zat, dengan tanda fisiologis intoksikasi (disartria, inkoordinasi, gaya berjalan tidak stabil, nistagmus).',
+    tatalaksana: [
+      'Suportif: posisi pemulihan (recovery position) bila kesadaran menurun untuk mencegah aspirasi, pantau jalan napas dan tanda vital',
+      'Bila dicurigai withdrawal/delirium tremens pada pengguna kronis yang berhenti mendadak: benzodiazepin (fenobarbital/diazepam sesuai protokol) untuk mencegah kejang withdrawal',
+      'Edukasi & rujuk program rehabilitasi bila terindikasi ketergantungan',
+    ],
+  },
+  'Disfungsi Ereksi e.c. Psikologis': {
+    anamnesis: [
+      'Kesulitan mencapai/mempertahankan ereksi cukup untuk hubungan seksual; onset mendadak lebih mengarah psikogenik, bertahap lebih mengarah organik',
+      'Kunci pembeda psikogenik: ereksi pagi hari (morning erection) MASIH ADA, ereksi saat masturbasi normal, tapi gagal saat berhubungan dengan pasangan',
+      'Stresor psikososial, masalah hubungan, riwayat kecemasan performa, depresi',
+    ],
+    pemeriksaanFisik: [
+      'Pemeriksaan fisik genital umumnya normal',
+      'Singkirkan penyebab organik: riwayat DM, penyakit kardiovaskular, obat-obatan (antihipertensi, antidepresan), riwayat operasi panggul/prostat, kadar testosteron bila dicurigai hipogonadisme',
+    ],
+    kriteriaDiagnosis: 'Disfungsi ereksi dengan ereksi pagi hari/nokturnal dan saat masturbasi yang masih normal, onset situasional/mendadak terkait stresor psikologis tertentu, tanpa faktor risiko organik signifikan.',
+    tatalaksana: [
+      'Psikoterapi: konseling seksual, terapi pasangan, atasi kecemasan performa',
+      'Farmako simtomatik bila diperlukan: PDE5 inhibitor (sildenafil) dapat membantu memutus siklus kecemasan-kegagalan',
+      'Edukasi: komunikasi terbuka dengan pasangan, kelola stres, hindari alkohol berlebihan',
+    ],
+  },
+
   // ─── Kardiovaskular ────────────────────────────────────────────────────
   'Syok Anafilaktik — tindakan resusitasi': {
     anamnesis: [
