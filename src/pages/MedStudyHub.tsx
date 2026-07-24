@@ -3,15 +3,89 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../components/icons'
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
+import { OSCE_CASES, OSCE_SYSTEMS, type OsceSystem } from '../lib/osceCaseBank'
 
-type Section = 'practice' | 'osce' | 'techniques' | 'timeline'
+type Section = 'practice' | 'osce' | 'case-bank' | 'techniques' | 'timeline'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'practice', label: 'Question Bank', emoji: '❓' },
   { id: 'osce', label: 'OSCE Technique', emoji: '🩺' },
+  { id: 'case-bank', label: 'OSCE Case Bank', emoji: '📋' },
   { id: 'techniques', label: 'How to Study', emoji: '🧠' },
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
+
+function OsceCaseBankSection() {
+  const [query, setQuery] = useState('')
+  const [system, setSystem] = useState<OsceSystem | null>(null)
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase().trim()
+    return OSCE_CASES.filter((c) => {
+      if (system && c.system !== system) return false
+      if (!q) return true
+      return `${c.name} ${c.note ?? ''} ${c.system}`.toLowerCase().includes(q)
+    })
+  }, [query, system])
+
+  const grouped = useMemo(() => {
+    const map = new Map<OsceSystem, typeof OSCE_CASES>()
+    for (const c of filtered) {
+      if (!map.has(c.system)) map.set(c.system, [])
+      map.get(c.system)!.push(c)
+    }
+    return Array.from(map.entries())
+  }, [filtered])
+
+  const freqTone = (f: string) => (f === 'Sangat Sering' ? 'critical' : f === 'Sering' ? 'brand' : 'neutral') as 'critical' | 'brand' | 'neutral'
+
+  return (
+    <div className="space-y-4">
+      <Card className="!p-5">
+        <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Case Bank" subtitle="Curated high-yield case topics by system, from a decade of real OSCE UKMPPD recaps" />
+        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
+          Frequency tags are a rough "how often a variant of this case shows up" signal for prioritizing
+          review — not a guarantee of what's on any specific exam sitting.
+        </p>
+        <input
+          className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
+          placeholder="Cari kasus (mis. BPPV, DM, appendisitis)…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button onClick={() => setSystem(null)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!system ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua</button>
+          {OSCE_SYSTEMS.map((s) => (
+            <button key={s} onClick={() => setSystem(s)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${system === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{s}</button>
+          ))}
+        </div>
+      </Card>
+
+      {grouped.map(([sys, cases]) => (
+        <Card key={sys} className="!p-4">
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys}</div>
+          <div className="mt-2 space-y-2">
+            {cases.map((c) => (
+              <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-[13px] font-bold text-ink dark:text-white">{c.name}</span>
+                  <Badge tone={freqTone(c.frequency)}>{c.frequency}</Badge>
+                </div>
+                {c.note && <p className="mt-1 text-[12px] text-neutral-500">{c.note}</p>}
+              </div>
+            ))}
+          </div>
+        </Card>
+      ))}
+      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
+
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+        Direkap dari rekap kasus OSCE UKMPPD 2016-2026 (studyclubukmppd & kontributor lain). Bantuan
+        belajar, bukan bocoran atau jaminan soal ujian — tetap pelajari materi secara menyeluruh.
+      </div>
+    </div>
+  )
+}
 
 const SCORE_KEY = 'pmd_medstudy_scores'
 interface Scores { [track: string]: { correct: number; total: number } }
@@ -63,6 +137,7 @@ export function MedStudyHub() {
 
       {section === 'practice' && <PracticeBank />}
       {section === 'osce' && <OsceSection />}
+      {section === 'case-bank' && <OsceCaseBankSection />}
       {section === 'techniques' && <TechniquesSection />}
       {section === 'timeline' && <TimelineSection />}
     </div>
