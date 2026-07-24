@@ -2392,4 +2392,318 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     tips: 'Tes Coombs direct positif adalah kunci membedakan AIHA dari penyebab hemolisis lain (misal defisiensi G6PD, thalassemia) — selalu sebutkan pemeriksaan ini saat ditanya alur diagnosis anemia hemolitik.',
   },
+
+  // ─── Muskuloskeletal ─────────────────────────────────────────────────────
+  'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai': {
+    anamnesis: [
+      'Riwayat trauma (jatuh, kecelakaan lalu lintas, olahraga) dengan mekanisme jelas',
+      'Nyeri hebat pada lokasi cedera, tidak dapat menggerakkan/menumpu anggota gerak',
+      'Bengkak dan deformitas segera setelah trauma',
+      'Tanyakan waktu kejadian, riwayat pertolongan pertama, alergi obat/lateks sebelum tindakan',
+    ],
+    pemeriksaanFisik: [
+      'Look: deformitas, bengkak, ekimosis, luka terbuka (pastikan tertutup untuk kategori ini)',
+      'Feel: nyeri tekan titik (point tenderness), krepitasi, periksa status neurovaskular distal (pulsasi, sensasi, CRT)',
+      'Move: keterbatasan gerak aktif/pasif karena nyeri',
+      'Selalu periksa sendi di atas dan di bawah lokasi fraktur',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (deformitas, nyeri tekan titik, krepitasi) dikonfirmasi rontgen: fraktur tanpa disrupsi kulit di atasnya (tertutup).',
+    tatalaksana: [
+      'Analgesia adekuat sebelum reposisi/pembidaian',
+      'Pembidaian: sertakan sendi proksimal dan distal fraktur, bidai dengan padding cukup, jangan terlalu ketat (cegah kompartemen)',
+      'Evaluasi neurovaskular sebelum dan sesudah pembidaian — dokumentasikan',
+      'Rujuk untuk reduksi definitif (tertutup/terbuka) dan fiksasi sesuai jenis fraktur',
+      'Edukasi tanda kompartemen sindrom (nyeri hebat tidak proporsional, pallor, parestesia, pulselessness, paralysis)',
+    ],
+    tips: 'Teknik pembidaian adalah poin penilaian utama station ini — verbalisasikan tiap langkah (imobilisasi sendi atas-bawah, cek neurovaskular sebelum-sesudah) agar terlihat sistematis oleh penguji.',
+  },
+
+  'Ankle Sprain / Knee Sprain': {
+    anamnesis: [
+      'Riwayat trauma inversi/eversi pergelangan kaki atau twisting pada lutut (olahraga, terpeleset)',
+      'Nyeri, bengkak segera atau dalam beberapa jam setelah cedera',
+      'Rasa "pop" atau tidak stabil pada lutut (curiga ruptur ligamen)',
+      'Kemampuan menumpu berat badan setelah cedera (relevan untuk kriteria Ottawa)',
+    ],
+    pemeriksaanFisik: [
+      'Inspeksi bengkak, ekimosis di sekitar ankle/lutut',
+      'Palpasi titik nyeri tekan tulang (maleolus, basis metatarsal 5, navikular untuk Ottawa Ankle Rules)',
+      'Uji stabilitas ligamen: anterior drawer test, talar tilt test (ankle); Lachman test, anterior/posterior drawer, valgus/varus stress test (lutut)',
+      'Range of motion aktif dan pasif',
+    ],
+    kriteriaDiagnosis:
+      'Klinis berdasarkan derajat (grade I-III sesuai keparahan robekan ligamen); Ottawa Ankle/Knee Rules menentukan perlunya rontgen untuk menyingkirkan fraktur.',
+    tatalaksana: [
+      'Prinsip RICE: Rest, Ice, Compression, Elevation pada 48-72 jam pertama',
+      'Analgesia (NSAID/parasetamol)',
+      'Grade I-II: mobilisasi dini bertahap, fisioterapi',
+      'Grade III (ruptur komplit) atau ketidakstabilan berat: rujuk ortopedi untuk evaluasi bedah',
+      'Edukasi pemakaian ankle brace/penyangga saat kembali beraktivitas untuk cegah cedera berulang',
+    ],
+    tips: 'Sebutkan Ottawa Ankle Rules secara eksplisit (nyeri tekan maleolus posterior/basis metatarsal 5/navikular, atau tidak bisa menumpu 4 langkah) sebagai dasar keputusan rontgen — poin penting OSCE.',
+  },
+
+  'Gout Artritis': {
+    anamnesis: [
+      'Nyeri sendi mendadak, sangat hebat, biasanya malam/dini hari, sering di ibu jari kaki (podagra)',
+      'Riwayat serangan berulang sebelumnya, faktor pencetus: alkohol, makanan tinggi purin, dehidrasi, trauma minor',
+      'Riwayat komorbid: hipertensi, sindrom metabolik, penggunaan diuretik',
+      'Riwayat keluarga gout/hiperurisemia',
+    ],
+    pemeriksaanFisik: [
+      'Sendi bengkak, kemerahan, hangat, sangat nyeri tekan (bahkan sentuhan ringan/sprei)',
+      'Lokasi tersering: MTP-1 (podagra), pergelangan kaki, lutut',
+      'Tofus (deposit urat) pada kasus kronik: heliks telinga, sekitar sendi',
+      'Range of motion terbatas karena nyeri',
+    ],
+    kriteriaDiagnosis:
+      'Gold standard: identifikasi kristal monosodium urat (needle-shaped, birefringence negatif) dari aspirasi cairan sendi. Asam urat serum tinggi mendukung tapi tidak diagnostik mutlak (bisa normal saat serangan akut).',
+    tatalaksana: [
+      'Serangan akut: NSAID dosis penuh (kecuali kontraindikasi), atau colchicine dosis rendah, atau kortikosteroid (bila kontraindikasi NSAID/colchicine)',
+      'Jangan mulai/ubah terapi penurun asam urat (allopurinol) saat serangan akut — dapat memperpanjang serangan',
+      'Terapi penurun asam urat jangka panjang (allopurinol, dimulai dosis rendah dititrasi) setelah serangan akut reda, untuk pasien serangan berulang/tofus',
+      'Edukasi diet: batasi purin tinggi (jeroan, seafood, alkohol terutama bir), perbanyak cairan',
+      'Target asam urat serum <6 mg/dL pada terapi jangka panjang',
+    ],
+    tips: 'Jangan memulai allopurinol saat serangan akut — ini kesalahan umum yang sering diuji. Terapi penurun urat baru dimulai 2-4 minggu setelah serangan reda.',
+  },
+
+  'Osteoarthritis (OA)': {
+    anamnesis: [
+      'Nyeri sendi kronik progresif, memberat dengan aktivitas, membaik dengan istirahat',
+      'Kaku sendi pagi hari singkat (<30 menit) — beda dengan RA',
+      'Lokasi tersering: lutut, panggul, sendi tangan (DIP/PIP), vertebra',
+      'Faktor risiko: usia lanjut, obesitas, riwayat trauma sendi, pekerjaan dengan beban sendi repetitif',
+    ],
+    pemeriksaanFisik: [
+      'Krepitasi saat gerakan sendi',
+      'Pembesaran tulang: Heberden node (DIP), Bouchard node (PIP)',
+      'Nyeri tekan garis sendi, efusi ringan mungkin ada',
+      'Keterbatasan range of motion, deformitas varus pada OA lutut lanjut',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (nyeri mekanik, kaku pagi singkat, krepitasi) + rontgen: penyempitan celah sendi, osteofit, sklerosis subkondral, kista subkondral.',
+    tatalaksana: [
+      'Modifikasi gaya hidup: penurunan BB, latihan penguatan otot sekitar sendi (kuadrisep untuk OA lutut)',
+      'Analgesia: parasetamol lini pertama, NSAID topikal/oral bila tidak cukup',
+      'Injeksi intraartikular kortikosteroid untuk eksaserbasi akut, atau asam hialuronat',
+      'Alat bantu: tongkat, penyangga sendi untuk mengurangi beban',
+      'Total joint replacement dipertimbangkan pada OA berat yang mengganggu fungsi dan gagal terapi konservatif',
+    ],
+    tips: 'Bedakan dari RA lewat pola sendi (OA: sendi penopang beban dan DIP/PIP asimetris; RA: MCP/PIP simetris) dan durasi kaku pagi — sering jadi pertanyaan pembeda diagnosis banding OSCE.',
+  },
+
+  'Dislokasi Patela': {
+    anamnesis: [
+      'Riwayat trauma twisting pada lutut atau benturan langsung, sering pada aktivitas olahraga',
+      'Nyeri hebat mendadak, lutut terasa "keluar dari tempatnya"',
+      'Ketidakmampuan meluruskan/menekuk lutut, bengkak cepat',
+      'Riwayat dislokasi patela sebelumnya (rekurensi sering pada laxity ligamen)',
+    ],
+    pemeriksaanFisik: [
+      'Deformitas terlihat jelas: patela bergeser (biasanya lateral)',
+      'Bengkak sendi lutut (hemarthrosis)',
+      'Apprehension test positif (pasien cemas saat patela didorong ke lateral)',
+      'Evaluasi neurovaskular distal',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (deformitas jelas, apprehension test positif) dikonfirmasi rontgen untuk menyingkirkan fraktur osteokondral yang menyertai.',
+    tatalaksana: [
+      'Reduksi tertutup: ekstensi lutut perlahan sambil mendorong patela medial (setelah analgesia adekuat)',
+      'Immobilisasi dengan knee brace/back slab dalam posisi ekstensi',
+      'Evaluasi neurovaskular pasca reduksi',
+      'Rujuk ortopedi untuk evaluasi lanjut (MRI bila curiga cedera osteokondral/ligamen) dan rehabilitasi',
+      'Fisioterapi penguatan kuadrisep untuk cegah rekurensi',
+    ],
+    tips: 'Setelah reduksi berhasil, lutut biasanya dapat diekstensikan penuh tanpa nyeri berlebih — verbalisasikan pemeriksaan ulang range of motion sebagai konfirmasi keberhasilan reduksi.',
+  },
+
+  'Ruptur Tendon Achilles': {
+    anamnesis: [
+      'Riwayat trauma mendadak saat aktivitas fisik (lari, lompat), sering merasa seperti "ditendang" di betis',
+      'Bunyi "pop" terdengar saat cedera',
+      'Nyeri tajam mendadak di belakang pergelangan kaki, kesulitan berjalan/menjinjit',
+      'Faktor risiko: usia paruh baya, riwayat penggunaan fluoroquinolone/steroid, olahraga tidak rutin',
+    ],
+    pemeriksaanFisik: [
+      'Palpasi teraba gap/defek pada tendon Achilles',
+      'Bengkak dan ekimosis di area tendon',
+      'Thompson test (Simmonds test) positif: penekanan betis tidak menghasilkan plantar fleksi kaki (menunjukkan ruptur)',
+      'Ketidakmampuan berdiri dengan tumit/menjinjit pada sisi yang terkena',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (Thompson test positif, gap teraba) dikonfirmasi USG atau MRI bila diperlukan untuk derajat ruptur.',
+    tatalaksana: [
+      'Immobilisasi awal dengan gips/boot posisi plantar fleksi (equinus), non-weight bearing',
+      'Analgesia dan elevasi tungkai',
+      'Tatalaksana definitif: konservatif (casting bertahap) atau bedah (perbaikan tendon) tergantung usia, aktivitas pasien, dan derajat ruptur — rujuk ortopedi',
+      'Rehabilitasi bertahap pasca imobilisasi/bedah untuk kembali ke aktivitas',
+    ],
+    tips: 'Thompson test adalah pemeriksaan kunci yang wajib didemonstrasikan — pasien posisi prone, kaki menggantung di tepi bed, penguji meremas betis dan menilai ada/tidaknya plantar fleksi kaki.',
+  },
+
+  // ─── Integumen ───────────────────────────────────────────────────────────
+  'Tinea Corporis': {
+    anamnesis: [
+      'Lesi kulit gatal, meluas perlahan dengan bagian tengah tampak lebih sembuh (central clearing)',
+      'Riwayat kontak dengan hewan peliharaan, penderita lain, atau lingkungan lembap',
+      'Gatal terutama saat berkeringat',
+      'Riwayat penggunaan kortikosteroid topikal sebelumnya (tinea incognito bila bentuk atypical)',
+    ],
+    pemeriksaanFisik: [
+      'Lesi anular/polisiklik dengan tepi aktif eritematosa meninggi, skuama, central clearing',
+      'Bisa multipel, konfluens membentuk pola polisiklik',
+      'KOH 10% menunjukkan hifa bersepta bercabang',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (lesi anular dengan central clearing dan tepi aktif) dikonfirmasi pemeriksaan KOH 10% menunjukkan hifa panjang bersepta.',
+    tatalaksana: [
+      'Antifungal topikal: golongan azol (ketoconazole/clotrimazole 2x/hari) selama 2-4 minggu',
+      'Antifungal sistemik (itraconazole/terbinafine) bila lesi luas, rekuren, atau gagal terapi topikal',
+      'Edukasi menjaga kulit kering, hindari berbagi handuk/pakaian, tatalaksana hewan peliharaan bila sumber penularan',
+      'Hindari kortikosteroid topikal tunggal (memperburuk dan menyamarkan gambaran klinis)',
+    ],
+    tips: 'Selalu lakukan dan sebutkan pemeriksaan KOH sebagai konfirmasi — ini poin penilaian standar pada semua station dermatomikosis.',
+  },
+
+  'Dermatitis Atopik': {
+    anamnesis: [
+      'Gatal kronik hilang timbul sejak usia dini, riwayat atopi keluarga (asma, rinitis alergi, dermatitis atopik)',
+      'Lokasi khas: lipatan (fleksural) pada anak besar/dewasa, wajah dan ekstensor pada bayi',
+      'Gejala memberat dengan stres, cuaca dingin/kering, kontak iritan/alergen',
+      'Riwayat penggunaan pelembap dan respons terhadap terapi sebelumnya',
+    ],
+    pemeriksaanFisik: [
+      'Kulit kering (xerosis), likenifikasi pada lesi kronik akibat garukan berulang',
+      'Lokasi fleksural (fossa kubiti, fossa poplitea) pada anak besar/dewasa',
+      'Tanda atopi lain: Dennie-Morgan fold, hiperlinearitas palmar',
+      'Tanda infeksi sekunder bila ada: krusta kekuningan, pustula',
+    ],
+    kriteriaDiagnosis:
+      'Klinis berdasarkan kriteria Hanifin-Rajka atau UK Working Party: gatal + morfologi dan distribusi khas + kronisitas/rekurensi + riwayat atopi.',
+    tatalaksana: [
+      'Emolien/pelembap digunakan rutin setiap hari sebagai dasar terapi (bahkan saat tidak flare)',
+      'Kortikosteroid topikal potensi sesuai lokasi dan derajat keparahan untuk flare akut',
+      'Hindari trigger: sabun keras, wol, suhu ekstrem, alergen yang teridentifikasi',
+      'Antihistamin oral untuk mengurangi gatal terutama malam hari',
+      'Kalsineurin inhibitor topikal (tacrolimus) sebagai steroid-sparing pada area sensitif (wajah)',
+    ],
+    tips: 'Tekankan pentingnya emolien sebagai terapi jangka panjang berkelanjutan, bukan hanya saat flare — kepatuhan pelembap rutin adalah kunci mencegah kekambuhan.',
+  },
+
+  'Dermatitis Seboroik': {
+    anamnesis: [
+      'Gatal/tidak gatal dengan skuama berminyak pada area kaya kelenjar sebasea (kulit kepala, wajah, dada)',
+      'Perjalanan kronik hilang timbul, memberat saat stres/cuaca dingin',
+      'Pada bayi: "cradle cap" pada kulit kepala tanpa gatal signifikan',
+      'Riwayat imunosupresi (HIV, Parkinson) berkaitan dengan bentuk lebih berat',
+    ],
+    pemeriksaanFisik: [
+      'Plak eritematosa dengan skuama kuning berminyak pada kulit kepala, alis, lipatan nasolabial, dada',
+      'Pada bayi: skuama kuning berlapis di verteks kulit kepala (cradle cap)',
+      'Tidak ada central clearing (beda dengan tinea)',
+    ],
+    kriteriaDiagnosis:
+      'Klinis berdasarkan distribusi khas (area seboroik) dan morfologi (skuama berminyak kekuningan) — tidak perlu pemeriksaan penunjang rutin.',
+    tatalaksana: [
+      'Sampo antijamur (ketoconazole 2%, selenium sulfide, zinc pyrithione) untuk kulit kepala, 2-3x/minggu',
+      'Kortikosteroid topikal potensi ringan untuk lesi wajah/badan yang inflamasi',
+      'Pada bayi: cradle cap biasanya self-limiting, dapat dibantu minyak bayi dan sikat lembut',
+      'Edukasi kondisi kronik-relaps, perlu perawatan jangka panjang bukan kuratif tunggal',
+    ],
+    tips: 'Bedakan dari psoriasis kulit kepala (skuama seboroik lebih berminyak dan kuning, psoriasis lebih tebal keperakan) — pembeda ini sering ditanyakan sebagai diagnosis banding.',
+  },
+
+  'Dermatitis Venenata / Kontak': {
+    anamnesis: [
+      'Riwayat kontak dengan bahan iritan (deterjen, sabun) atau alergen (nikel, kosmetik, tanaman) sebelum lesi muncul',
+      'Gatal/perih, lokasi lesi sesuai area kontak',
+      'Dermatitis venenata: riwayat kontak serangga (tersentuh/tergencet) dengan pola lesi linear',
+      'Riwayat penggunaan produk baru (perhiasan, sabun, kosmetik)',
+    ],
+    pemeriksaanFisik: [
+      'Lesi eritematosa, vesikel, bahkan bulla pada kasus akut, sesuai pola kontak (misal: bentuk linear pada dermatitis venenata, bentuk sesuai perhiasan pada alergi nikel)',
+      'Batas lesi tegas sesuai area kontak',
+      'Krusta/likenifikasi pada kasus kronik akibat garukan',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (riwayat pajanan + morfologi + distribusi sesuai kontak). Patch test dapat mengonfirmasi alergen spesifik pada dermatitis kontak alergi kronik/rekuren.',
+    tatalaksana: [
+      'Identifikasi dan hindari agen penyebab (edukasi paling penting)',
+      'Kompres dingin/basah untuk lesi akut vesikuler/bulla',
+      'Kortikosteroid topikal potensi sesuai keparahan',
+      'Antihistamin oral untuk gatal',
+      'Kortikosteroid sistemik pada kasus luas/berat',
+    ],
+    tips: 'Selalu gali riwayat pajanan secara rinci (produk baru, pekerjaan, hobi) — identifikasi dan penghindaran agen penyebab adalah kunci tatalaksana dan pencegahan kekambuhan.',
+  },
+
+  'Kandidiasis Intertriginosa': {
+    anamnesis: [
+      'Gatal dan rasa terbakar pada lipatan kulit (inguinal, inframammae, aksila, sela jari)',
+      'Faktor risiko: obesitas, DM, kelembapan berlebih, penggunaan antibiotik/steroid lama',
+      'Perjalanan progresif dengan lesi satelit di sekitar lesi utama',
+    ],
+    pemeriksaanFisik: [
+      'Plak eritematosa merah cerah pada lipatan kulit dengan maserasi',
+      'Lesi satelit (papul/pustul kecil di luar lesi utama) — khas kandidiasis',
+      'Tepi tidak meninggi tegas seperti tinea',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (eritema lipatan dengan lesi satelit) dikonfirmasi KOH menunjukkan pseudohifa dan blastospora (beda dengan hifa sejati pada tinea).',
+    tatalaksana: [
+      'Antifungal topikal golongan azol (clotrimazole/ketoconazole) 2x/hari',
+      'Jaga area lipatan tetap kering, gunakan bedak antifungal bila perlu',
+      'Skrining dan kontrol DM bila menjadi faktor predisposisi',
+      'Kortikosteroid topikal potensi ringan kombinasi dapat digunakan singkat untuk inflamasi berat, hindari penggunaan lama',
+    ],
+    tips: 'Lesi satelit adalah tanda pembeda kunci kandidiasis dari tinea/dermatitis lain — selalu periksa dan sebutkan temuan ini secara eksplisit.',
+  },
+
+  'Insect Bite / Fixed Drug Eruption': {
+    anamnesis: [
+      'Insect bite: papul gatal muncul setelah gigitan serangga, sering multipel, riwayat aktivitas luar ruangan',
+      'Fixed drug eruption: lesi muncul berulang di lokasi yang sama setiap kali terpapar obat pencetus (NSAID, antibiotik, dll)',
+      'Tanyakan riwayat obat yang dikonsumsi sebelum onset lesi (FDE)',
+      'Riwayat gigitan/pajanan serangga terakhir (insect bite)',
+    ],
+    pemeriksaanFisik: [
+      'Insect bite: papul urtika dengan punctum sentral, gatal, dapat berkelompok',
+      'FDE: makula/plak eritematosa hingga keunguan, kadang bulla, soliter/beberapa lesi, sembuh dengan hiperpigmentasi residual',
+      'Lokasi FDE sering: bibir, genital, ekstremitas',
+    ],
+    kriteriaDiagnosis:
+      'Klinis: insect bite (papul gatal dengan punctum, riwayat pajanan); FDE (lesi berulang di lokasi sama setiap terpapar obat sama, konfirmasi dengan riwayat obat dan rechallenge bila diperlukan).',
+    tatalaksana: [
+      'Insect bite: antihistamin oral untuk gatal, kortikosteroid topikal ringan, hindari garukan (cegah infeksi sekunder)',
+      'FDE: hentikan segera obat penyebab (paling penting), kortikosteroid topikal untuk lesi',
+      'Edukasi FDE: catat dan hindari obat penyebab seumur hidup, informasikan ke tenaga medis di kunjungan berikutnya',
+      'Analgesia/antipiretik alternatif yang aman bila FDE dipicu NSAID/parasetamol tertentu',
+    ],
+    tips: 'Pada kecurigaan FDE, tanyakan secara spesifik riwayat konsumsi obat 1-2 hari sebelum lesi muncul dan riwayat episode serupa sebelumnya di lokasi sama — kunci membedakan dari erupsi kulit lain.',
+  },
+
+  'Herpes Simplex / Herpes Zoster': {
+    anamnesis: [
+      'HSV: vesikel berkelompok nyeri/gatal di area oral (HSV-1) atau genital (HSV-2), riwayat rekurensi dengan prodromal (nyeri/gatal sebelum lesi muncul)',
+      'Herpes zoster: nyeri seperti terbakar unilateral mengikuti dermatom sebelum lesi muncul, riwayat cacar air sebelumnya, faktor risiko imunosupresi/usia lanjut/stres',
+      'Tanyakan riwayat kontak seksual (HSV genital) dan status imun pasien',
+    ],
+    pemeriksaanFisik: [
+      'HSV: vesikel berkelompok di atas dasar eritematosa, dapat pecah menjadi erosi/ulkus dangkal',
+      'Herpes zoster: vesikel berkelompok unilateral, tidak menyeberang garis tengah tubuh, mengikuti distribusi dermatom',
+      'Zoster oftalmikus: melibatkan cabang oftalmik trigeminal, waspada tanda keterlibatan mata (perlu rujuk segera)',
+    ],
+    kriteriaDiagnosis:
+      'Klinis (morfologi vesikel berkelompok dan distribusi khas) — Tzanck smear menunjukkan multinucleated giant cells, PCR dapat mengonfirmasi tipe virus bila diperlukan.',
+    tatalaksana: [
+      'Antivirus: acyclovir/valacyclovir oral, idealnya dimulai dalam 72 jam onset (terutama herpes zoster) untuk mengurangi durasi dan risiko neuralgia pasca-herpetik',
+      'Analgesia untuk nyeri (NSAID hingga gabapentin bila nyeri neuropatik berat)',
+      'HSV rekuren sering: pertimbangkan terapi supresif jangka panjang bila frekuensi tinggi',
+      'Zoster oftalmikus: rujuk segera ke oftalmologi untuk cegah komplikasi mata',
+      'Edukasi menghindari kontak langsung lesi aktif (penularan) terutama pada individu rentan (bayi, ibu hamil, imunokompromais)',
+    ],
+    tips: 'Distribusi unilateral mengikuti dermatom tanpa menyeberang garis tengah adalah ciri khas herpes zoster yang membedakannya dari HSV — sebutkan ini eksplisit sebagai dasar diagnosis banding.',
+  },
 }
