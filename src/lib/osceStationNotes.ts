@@ -685,6 +685,276 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
 
+  // ─── Indera (Mata/THT) ─────────────────────────────────────────────────
+  'Konjungtivitis (bakteri/vernal/viral)': {
+    anamnesis: [
+      'Mata merah, gatal/nyeri, sekret — tanyakan karakter sekret: purulen kental (bakteri), gatal hebat + sekret mukoid (vernal/alergi), berair + riwayat ISPA/kontak (viral)',
+      'Unilateral vs bilateral, riwayat kontak dengan penderita serupa (viral sangat menular)',
+      'Riwayat atopi/alergi (vernal), penggunaan lensa kontak',
+    ],
+    pemeriksaanFisik: [
+      'Injeksi konjungtiva, sekret (deskripsikan warna/konsistensi)',
+      'Bakteri: sekret purulen kental, kelopak lengket pagi hari',
+      'Viral: sekret berair, injeksi difus, kadang limfadenopati preaurikular',
+      'Vernal: cobblestone papillae di konjungtiva tarsal superior, Trantas dots di limbus',
+      'Visus tidak terganggu signifikan pada konjungtivitis tanpa komplikasi kornea',
+    ],
+    kriteriaDiagnosis: 'Diagnosis klinis berdasarkan karakter sekret dan tanda penyerta; kultur/swab jarang diperlukan kecuali kasus berat/rekuren/neonatus.',
+    tatalaksana: [
+      'Bakteri: antibiotik topikal (kloramfenikol tetes 4x1 tetes selama 7 hari)',
+      'Viral: suportif (kompres dingin, air mata buatan), sangat menular — edukasi cuci tangan & hindari berbagi handuk',
+      'Vernal/alergi: hindari alergen, mast cell stabilizer (sodium kromoglikat) + antihistamin topikal',
+      'Edukasi umum: jangan menggosok mata, cuci tangan sering',
+    ],
+  },
+  'Hordeolum / Blefaritis': {
+    anamnesis: [
+      'Hordeolum: benjolan nyeri di kelopak mata, onset akut',
+      'Blefaritis: gatal, rasa mengganjal, krusta di dasar bulu mata, kronis/berulang',
+    ],
+    pemeriksaanFisik: [
+      'Hordeolum eksterna: benjolan nyeri di tepi kelopak (kelenjar Zeis/Moll); hordeolum interna: benjolan di konjungtiva tarsal (kelenjar Meibom), lebih dalam',
+      'Blefaritis anterior: krusta di dasar bulu mata, tepi kelopak hiperemis; blefaritis posterior: disfungsi kelenjar Meibom, sekret berminyak',
+    ],
+    kriteriaDiagnosis: 'Diagnosis klinis dari inspeksi lokasi dan karakteristik lesi kelopak mata.',
+    tatalaksana: [
+      'Hordeolum: kompres hangat 10-15 menit 4x/hari, antibiotik topikal; insisi bila tidak membaik — horizontal untuk eksterna, vertikal untuk interna',
+      'Blefaritis: kebersihan kelopak mata (lid hygiene) dengan sampo bayi/pembersih kelopak, kompres hangat, antibiotik topikal bila anterior berat',
+    ],
+  },
+  'Episkleritis / Keratitis': {
+    anamnesis: [
+      'Episkleritis: mata merah sektoral, nyeri ringan/tidak nyeri, tanpa gangguan visus, sering rekuren, kadang terkait penyakit autoimun',
+      'Keratitis: nyeri hebat, fotofobia, mata berair, penurunan visus, riwayat trauma/lensa kontak/infeksi',
+    ],
+    pemeriksaanFisik: [
+      'Episkleritis: injeksi sektoral pembuluh episklera, blanching dengan fenilefrin topikal, kornea jernih',
+      'Keratitis: infiltrat/ulkus kornea, injeksi silier, defek epitel dengan pewarnaan fluoresein positif',
+    ],
+    kriteriaDiagnosis: 'Episkleritis: klinis + tes blanching fenilefrin. Keratitis: pewarnaan fluoresein menunjukkan defek epitel kornea, kultur kerokan kornea bila dicurigai infeksi berat.',
+    tatalaksana: [
+      'Episkleritis: self-limiting, air mata buatan, NSAID topikal/oral bila perlu',
+      'Keratitis bakteri: antibiotik topikal spektrum luas intensif; keratitis herpes: asiklovir topikal — hindari steroid topikal pada keratitis herpes aktif (dapat memperburuk)',
+      'Rujuk Sp.M segera pada keratitis berat/mengancam penglihatan',
+    ],
+  },
+  'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi': {
+    anamnesis: [
+      'Riwayat kemasukan benda asing, rasa mengganjal/nyeri, tanyakan jenis benda (organik/anorganik) dan waktu kejadian',
+    ],
+    pemeriksaanFisik: [
+      'Mata: eversi kelopak untuk mencari benda asing subtarsal, pewarnaan fluoresein untuk defek kornea sekunder',
+      'Hidung: rinoskopi anterior — benda asing organik dapat menyebabkan sekret unilateral berbau busuk bila lama',
+      'Telinga: otoskopi, waspada benda asing serangga hidup atau baterai (kegawatdaruratan)',
+    ],
+    kriteriaDiagnosis: 'Visualisasi langsung benda asing pada pemeriksaan.',
+    tatalaksana: [
+      'Mata: irigasi/ekstraksi dengan cotton bud/jarum di bawah anestesi topikal, cek visus & integritas kornea pasca-ekstraksi',
+      'Hidung: ekstraksi dengan hook/pinset di bawah visualisasi langsung, jangan dorong ke posterior (risiko aspirasi)',
+      'Telinga: bila serangga hidup, matikan dulu dengan minyak/lidokain sebelum ekstraksi; ekstraksi dengan hook/irigasi untuk benda anorganik',
+      'Baterai di hidung/telinga: ekstraksi segera (kegawatdaruratan, risiko nekrosis jaringan cepat)',
+    ],
+    tips: 'Skill ekstraksi benda asing sering jadi station tindakan langsung — latih teknik ekstraksi aman tanpa mendorong benda lebih dalam.',
+  },
+  'Pterygium': {
+    anamnesis: [
+      'Pertumbuhan jaringan fibrovaskular di konjungtiva bulbi meluas ke kornea, biasanya sisi nasal, riwayat paparan sinar matahari/debu/angin kronis',
+      'Gejala: mata merah kronis, rasa mengganjal, gangguan visus bila menutupi aksis visual',
+    ],
+    pemeriksaanFisik: [
+      'Jaringan fibrovaskular segitiga dari konjungtiva bulbi nasal meluas ke kornea, nilai derajat perluasan ke kornea',
+    ],
+    kriteriaDiagnosis: 'Diagnosis klinis dari inspeksi langsung.',
+    tatalaksana: [
+      'Derajat awal: air mata buatan, hindari paparan matahari/debu/angin (kacamata pelindung)',
+      'Derajat lanjut mengganggu visus/kosmetik: ekstirpasi bedah + graft konjungtiva untuk mencegah rekurensi',
+    ],
+  },
+  'Glaukoma Akut Sudut Tertutup': {
+    anamnesis: [
+      'Nyeri mata hebat mendadak, penglihatan kabur/melihat halo di sekitar cahaya, mual muntah hebat (dapat menyerupai kondisi abdomen akut), sakit kepala berat',
+      'Faktor risiko: hipermetropia, usia tua, riwayat keluarga, berada di ruang gelap/midriasis (bioskop, obat midriatik)',
+    ],
+    pemeriksaanFisik: [
+      'Mata merah, kornea edema/keruh, pupil mid-dilatasi dan tidak reaktif terhadap cahaya, bilik mata depan dangkal, palpasi bola mata terasa keras seperti batu',
+      'Tekanan intraokular (TIO) sangat tinggi (>40-50 mmHg)',
+    ],
+    kriteriaDiagnosis: 'Nyeri mata akut + TIO sangat tinggi + bilik mata depan dangkal + pupil mid-dilatasi non-reaktif — kegawatdaruratan mata.',
+    tatalaksana: [
+      'Kegawatdaruratan: turunkan TIO segera — asetazolamid 500mg oral/IV, timolol topikal, pilokarpin topikal 2% (miosis, buka sudut), manitol IV bila TIO sangat tinggi tidak responsif',
+      'Rujuk segera Sp.M untuk iridotomi perifer laser (definitif) setelah TIO terkontrol',
+      'Profilaksis mata sebelahnya (berisiko tinggi mengalami serangan serupa) dengan iridotomi profilaksis',
+    ],
+    tips: 'Kegawatan mata yang sering menyerupai gejala GI (mual muntah hebat) — jangan sampai terlewat sebagai penyebab nyeri kepala/mual pada pasien usia tua.',
+  },
+  'Hifema': {
+    anamnesis: [
+      'Riwayat trauma tumpul mata (bola, tinju, dll), nyeri, penglihatan kabur/gelap',
+    ],
+    pemeriksaanFisik: [
+      'Darah terlihat di bilik mata depan (level darah terlihat dengan pasien duduk), nilai derajat hifema (grade 1-4 berdasarkan persentase pengisian bilik mata depan)',
+      'Periksa TIO (dapat meningkat akibat obstruksi aliran humor akuos oleh darah)',
+    ],
+    kriteriaDiagnosis: 'Visualisasi darah pada bilik mata depan pasca-trauma.',
+    tatalaksana: [
+      'Bed rest posisi kepala elevasi 30-45° (semi-fowler) agar darah mengendap di bawah, hindari aktivitas fisik berat',
+      'Sikloplegik topikal untuk mengurangi nyeri, turunkan TIO bila meningkat',
+      'Asam traneksamat (antifibrinolitik) untuk mengurangi risiko perdarahan ulang (rebleeding)',
+      'Rujuk Sp.M untuk pemantauan, evakuasi bedah bila hifema total/TIO tidak terkontrol',
+    ],
+  },
+  'Dakrioadenitis / Dakriosistitis': {
+    anamnesis: [
+      'Dakrioadenitis: bengkak nyeri kelopak mata atas lateral (lokasi kelenjar lakrimal), sering terkait infeksi virus (mumps, EBV)',
+      'Dakriosistitis: bengkak nyeri di kantus medial (lokasi sakus lakrimal), sering pada bayi (obstruksi duktus nasolakrimalis kongenital) atau dewasa dengan obstruksi duktus',
+    ],
+    pemeriksaanFisik: [
+      'Dakrioadenitis: pembengkakan kelopak atas lateral berbentuk "S" khas, nyeri tekan',
+      'Dakriosistitis: pembengkakan nyeri kantus medial, dapat keluar sekret purulen saat ditekan area sakus lakrimal',
+    ],
+    kriteriaDiagnosis: 'Diagnosis klinis dari lokasi pembengkakan dan nyeri.',
+    tatalaksana: [
+      'Dakrioadenitis: umumnya self-limiting bila viral, antibiotik sistemik bila bakterial, kompres hangat',
+      'Dakriosistitis akut: antibiotik sistemik + kompres hangat + masase sakus lakrimal (pada bayi); insisi drainase bila abses; probing duktus nasolakrimalis pada obstruksi kongenital persisten',
+    ],
+  },
+  'Rhinitis Alergika': {
+    anamnesis: [
+      'Bersin berulang, hidung gatal/tersumbat, rinore encer, mata gatal berair — dipicu alergen (debu, serbuk sari, bulu hewan), riwayat atopi',
+    ],
+    pemeriksaanFisik: [
+      'Rinoskopi anterior: mukosa konka edema, pucat/livid (bukan hiperemis seperti infeksi), sekret encer bening',
+      'Allergic shiners (lingkaran gelap di bawah mata), allergic crease (garis melintang batang hidung akibat kebiasaan menggosok hidung)',
+    ],
+    kriteriaDiagnosis: 'Klinis + riwayat atopi; skin prick test/IgE spesifik untuk konfirmasi alergen bila diperlukan.',
+    tatalaksana: [
+      'Hindari alergen pencetus',
+      'Antihistamin oral non-sedatif (loratadine, cetirizine)',
+      'Kortikosteroid intranasal untuk gejala persisten/sedang-berat',
+      'Dekongestan topikal maksimal 5-7 hari (hindari rhinitis medikamentosa)',
+    ],
+  },
+  'Sinusitis Maksilaris': {
+    anamnesis: [
+      'Nyeri wajah/pipi terutama menunduk, hidung tersumbat, sekret purulen/mukopurulen, kadang gigi atas terasa nyeri, durasi >7-10 hari atau memburuk setelah perbaikan awal',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tekan area sinus maksilaris (pipi), transiluminasi sinus maksilaris berkurang bila terisi cairan/pus',
+      'Rinoskopi anterior: sekret mukopurulen di meatus media',
+    ],
+    kriteriaDiagnosis: 'Klinis; foto Waters (sinus paranasal) menunjukkan perselubungan/air-fluid level pada sinus maksilaris bila diperlukan konfirmasi.',
+    tatalaksana: [
+      'Antibiotik (amoksisilin atau amoksisilin-klavulanat) 10-14 hari bila dicurigai bakterial',
+      'Dekongestan, analgesik, cuci hidung dengan saline',
+      'Rujuk THT bila kronis/rekuren untuk evaluasi endoskopi/CT sinus',
+    ],
+  },
+  'Tonsilitis (akut/kronis eksaserbasi)': {
+    anamnesis: [
+      'Nyeri tenggorokan, sulit menelan, demam; tanyakan frekuensi episode (kronis eksaserbasi akut bila berulang)',
+    ],
+    pemeriksaanFisik: [
+      'Tonsil hiperemis, membesar (T1-T4), detritus/eksudat putih pada kripta, pembesaran KGB submandibula/servikal anterior nyeri tekan',
+    ],
+    kriteriaDiagnosis: 'Klinis; skor Centor (demam, eksudat tonsil, limfadenopati servikal anterior nyeri, tidak ada batuk) untuk memperkirakan probabilitas etiologi streptokokus.',
+    tatalaksana: [
+      'Bakterial (curiga streptokokus grup A, skor Centor tinggi): antibiotik (amoksisilin/penisilin 10 hari — mencegah demam rematik)',
+      'Analgesik-antipiretik, kumur air garam',
+      'Tonsilektomi bila kronis rekuren memenuhi kriteria (≥3-7 episode/tahun, obstruksi jalan napas, abses peritonsil berulang)',
+    ],
+  },
+  'Faringitis Akut': {
+    anamnesis: [
+      'Nyeri tenggorokan, rasa gatal/kering, batuk (lebih mengarah viral bila ada batuk/pilek/suara serak)',
+    ],
+    pemeriksaanFisik: [
+      'Faring hiperemis, dapat disertai eksudat pada faringitis bakterial, nilai skor Centor untuk stratifikasi risiko streptokokus',
+    ],
+    kriteriaDiagnosis: 'Klinis, rapid antigen test/kultur tenggorok untuk konfirmasi streptokokus bila skor Centor sedang-tinggi.',
+    tatalaksana: [
+      'Viral (mayoritas kasus): simtomatik — analgesik, kumur air garam, hidrasi, hindari antibiotik',
+      'Bakterial (streptokokus): penisilin/amoksisilin 10 hari',
+    ],
+  },
+  'Otitis Media Akut (OMA) — semua stadium': {
+    anamnesis: [
+      'Anak dengan nyeri telinga, demam, rewel (bayi/anak kecil menarik-narik telinga), riwayat ISPA sebelumnya',
+      'Tanyakan durasi gejala untuk memperkirakan stadium',
+    ],
+    pemeriksaanFisik: [
+      'Otoskopi per stadium: oklusi tuba (membran timpani retraksi, suram), hiperemis (membran timpani merah difus), supurasi (membran timpani bulging, kuning), perforasi (perforasi + sekret keluar), resolusi (perforasi menutup/sekret berkurang)',
+    ],
+    kriteriaDiagnosis: 'Otoskopi menentukan stadium — panduan tatalaksana berbeda per stadium.',
+    tatalaksana: [
+      'Oklusi tuba: dekongestan tetes hidung',
+      'Hiperemis: antibiotik oral (amoksisilin) + dekongestan + analgesik',
+      'Supurasi: antibiotik oral + miringotomi bila bulging berat',
+      'Perforasi: cuci telinga H2O2 3% 3-5 hari + antibiotik tetes/oral',
+      'Resolusi: observasi; evaluasi ke arah OMSK bila perforasi >3 minggu belum menutup',
+    ],
+  },
+  'Otitis Eksterna': {
+    anamnesis: [
+      'Nyeri telinga hebat terutama saat daun telinga ditarik/tragus ditekan (khas otitis eksterna, beda dari OMA), riwayat kemasukan air (berenang) atau membersihkan telinga berlebihan',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri tarik daun telinga/tekan tragus (+), liang telinga edema/hiperemis, sekret bila difus, membran timpani sulit dinilai akibat edema liang telinga',
+    ],
+    kriteriaDiagnosis: 'Klinis: nyeri tarik daun telinga/tragus + inflamasi liang telinga.',
+    tatalaksana: [
+      'Sirkumskripta (furunkel): antibiotik topikal, insisi bila sudah fluktuasi',
+      'Difusa: tampon antibiotik-kortikosteroid (ofloxacin) di liang telinga, analgesik',
+      'Edukasi: jaga telinga tetap kering, hindari korek telinga berlebihan',
+    ],
+  },
+  'Serumen Prop / Mastoiditis': {
+    anamnesis: [
+      'Serumen prop: rasa penuh telinga, penurunan pendengaran ringan, riwayat jarang membersihkan telinga atau penggunaan cotton bud yang mendorong serumen',
+      'Mastoiditis: nyeri dan bengkak di belakang telinga, demam, riwayat OMA sebelumnya tidak tuntas diobati',
+    ],
+    pemeriksaanFisik: [
+      'Serumen prop: sumbatan serumen terlihat pada otoskopi menutupi membran timpani',
+      'Mastoiditis: pembengkakan, eritema, nyeri tekan area mastoid, daun telinga terdorong ke depan-bawah (khas)',
+    ],
+    kriteriaDiagnosis: 'Serumen prop: visualisasi otoskopi. Mastoiditis: klinis + pencitraan (CT mastoid) menunjukkan opasifikasi sel udara mastoid/erosi tulang.',
+    tatalaksana: [
+      'Serumen prop: karbol gliserin 10% atau H2O2 3% untuk melunakkan bila keras, lalu ekstraksi/irigasi',
+      'Mastoiditis: antibiotik IV dosis tinggi, rujuk THT untuk evaluasi mastoidektomi bila tidak respons/komplikasi',
+    ],
+  },
+  'Epistaksis Anterior — tindakan tampon': {
+    anamnesis: [
+      'Perdarahan dari hidung, tanyakan lokasi (anterior biasanya terlihat jelas dari nares, dapat dihentikan dengan penekanan), riwayat trauma/mengorek hidung/hipertensi/gangguan pembekuan darah',
+    ],
+    pemeriksaanFisik: [
+      'Sumber perdarahan terlihat di pleksus Kiesselbach (septum anterior) pada rinoskopi anterior',
+      'Periksa tekanan darah (hipertensi sebagai faktor pencetus/pemberat)',
+    ],
+    kriteriaDiagnosis: 'Visualisasi sumber perdarahan anterior pada rinoskopi.',
+    tatalaksana: [
+      'Pertolongan pertama: duduk tegak kepala sedikit menunduk ke depan, tekan ala nasi (cuping hidung) selama 10-15 menit',
+      'Bila tidak berhenti: pasang tampon anterior (kasa dengan vaselin/antibiotik) selama 24-48 jam',
+      'Kauterisasi kimia (perak nitrat) atau elektrokauter bila sumber perdarahan teridentifikasi jelas dan berulang',
+      'Atasi faktor pencetus (kontrol tekanan darah, hindari mengorek hidung)',
+    ],
+    tips: 'Teknik pemasangan tampon anterior sering jadi station tindakan tersendiri — latih urutan dan bahan tampon yang benar.',
+  },
+  'Abses Peritonsil': {
+    anamnesis: [
+      'Nyeri tenggorokan unilateral hebat, sulit membuka mulut (trismus), suara teredam ("hot potato voice"), sulit menelan air liur sendiri, riwayat tonsilitis sebelumnya',
+    ],
+    pemeriksaanFisik: [
+      'Trismus, pembengkakan peritonsil unilateral dengan deviasi uvula ke sisi berlawanan, tonsil terdorong ke medial',
+    ],
+    kriteriaDiagnosis: 'Klinis: trismus + bulging peritonsil unilateral + deviasi uvula; aspirasi jarum dapat mengkonfirmasi sekaligus terapeutik (pus keluar).',
+    tatalaksana: [
+      'Aspirasi jarum atau insisi drainase abses',
+      'Antibiotik IV (penisilin/klindamisin)',
+      'Analgesik, hidrasi',
+      'Tonsilektomi elektif (interval) dipertimbangkan setelah peradangan akut mereda, terutama bila riwayat berulang',
+    ],
+  },
+
   // ─── Kardiovaskular ────────────────────────────────────────────────────
   'Syok Anafilaktik — tindakan resusitasi': {
     anamnesis: [
