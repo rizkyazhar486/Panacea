@@ -54,6 +54,24 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Cardona V, Ansotegui IJ, Ebisawa M, El-Gamal Y, Fernandez Rivas M, Fineman S, et al. World Allergy Organization Anaphylaxis Guidance 2020. World Allergy Organ J. 2020;13(10):100472.',
   ACREULAR2010:
     'Aletaha D, Neogi T, Silman AJ, Funovits J, Felson DT, Bingham CO 3rd, et al. 2010 Rheumatoid Arthritis Classification Criteria: an American College of Rheumatology/European League Against Rheumatism Collaborative Initiative. Arthritis Rheum. 2010;62(9):2569-81.',
+  PERKIHF2020:
+    'Perhimpunan Dokter Spesialis Kardiovaskular Indonesia. Pedoman Tatalaksana Gagal Jantung. 2nd ed. Jakarta: PERKI; 2020.',
+  PERKIHT2021:
+    'Perhimpunan Dokter Spesialis Kardiovaskular Indonesia. Pedoman Tatalaksana Hipertensi pada Penyakit Kardiovaskular. 2nd ed. Jakarta: PERKI; 2021.',
+  ESCACS2023:
+    'Byrne RA, Rossello X, Coughlan JJ, Barbato E, Berry C, Chieffo A, et al. 2023 ESC Guidelines for the management of acute coronary syndromes. Eur Heart J. 2023;44(38):3720-826.',
+  BRAUNWALD2022:
+    "Libby P, Bonow RO, Mann DL, Tomaselli GF, Bhatt DL, Solomon SD, editors. Braunwald's Heart Disease: A Textbook of Cardiovascular Medicine. 12th ed. Philadelphia: Elsevier; 2022.",
+  GOLD2024:
+    'Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for the Diagnosis, Management, and Prevention of Chronic Obstructive Pulmonary Disease: 2024 Report. GOLD; 2024.',
+  PNPKTB2020:
+    'Kementerian Kesehatan Republik Indonesia. Pedoman Nasional Pelayanan Kedokteran Tata Laksana Tuberkulosis. Jakarta: Kementerian Kesehatan RI; 2020.',
+  WHOTBDR2022:
+    'World Health Organization. WHO Consolidated Guidelines on Tuberculosis. Module 4: Treatment — Drug-Resistant Tuberculosis Treatment, 2022 Update. Geneva: World Health Organization; 2022.',
+  MURRAY2022:
+    "Broaddus VC, Ernst JD, King TE Jr, Lazarus SC, Sarmiento KF, Schnapp LM, et al., editors. Murray & Nadel's Textbook of Respiratory Medicine. 7th ed. Philadelphia: Elsevier; 2022.",
+  ARDSBERLIN2012:
+    'ARDS Definition Task Force; Ranieri VM, Rubenfeld GD, Thompson BT, Ferguson ND, Caldwell E, et al. Acute respiratory distress syndrome: the Berlin Definition. JAMA. 2012;307(23):2526-33.',
   APLEY2018:
     "Solomon L, Warwick D, Nayagam S. Apley & Solomon's System of Orthopaedics and Trauma. 10th ed. Boca Raton: CRC Press; 2018.",
   CAMPBELLORTHO2021:
@@ -1084,5 +1102,440 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     diagnosis: ['Massa jaringan lunak padat; fibromatosis cenderung infiltratif dan rekuren lokal; MRI dan biopsi untuk membedakan jenis dan grade'],
     tatalaksana: ['Eksisi bedah dengan tepi adekuat, radioterapi adjuvan pada kasus tertentu; fibromatosis desmoid dapat diobservasi atau diberi terapi sistemik karena tingginya rekurensi pasca operasi'],
     referensi: ['SKDI2012', 'CAMPBELLORTHO2021', 'HARRISON2022'],
+  },
+
+  // ─── Respirasi ───────────────────────────────────────────────────────────
+  'Influenza': {
+    definisi: 'Infeksi virus influenza pada saluran napas, umumnya self-limiting namun dapat berat pada kelompok risiko tinggi.',
+    diagnosis: ['Demam mendadak, mialgia, nyeri kepala, batuk kering, nyeri tenggorokan; diagnosis umumnya klinis, rapid antigen/PCR bila perlu konfirmasi'],
+    tatalaksana: ['Suportif (istirahat, cairan, antipiretik); oseltamivir dalam 48 jam onset pada kelompok risiko tinggi atau kasus berat; vaksinasi influenza tahunan sebagai pencegahan'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'MURRAY2022'],
+  },
+  'Acute Respiratory distress syndrome (ARDS)': {
+    definisi: 'Gagal napas hipoksemik akut akibat kerusakan alveolar difus dengan edema paru non-kardiogenik.',
+    diagnosis: ['Definisi Berlin: onset dalam 1 minggu, infiltrat bilateral pada pencitraan, bukan gagal jantung/overload cairan, dengan derajat berdasarkan PaO2/FiO2 (ringan ≤300, sedang ≤200, berat ≤100)'],
+    tatalaksana: ['Ventilasi mekanik protektif paru (tidal volume 4-8 mL/kgBB prediksi, plateau pressure <30 cmH2O), posisi pronasi pada ARDS berat, atasi penyebab dasar, strategi cairan konservatif'],
+    referensi: ['SKDI2012', 'ARDSBERLIN2012', 'MURRAY2022'],
+  },
+  'SARS': {
+    definisi: 'Severe Acute Respiratory Syndrome — pneumonia atipik berat akibat infeksi coronavirus (SARS-CoV), berpotensi wabah.',
+    diagnosis: ['Demam tinggi, batuk, sesak progresif dengan riwayat kontak/perjalanan dari daerah wabah; infiltrat paru pada rontgen, konfirmasi PCR'],
+    tatalaksana: ['Isolasi ketat dengan kewaspadaan airborne dan droplet, terapi suportif dan oksigenasi, ventilasi mekanik bila gagal napas, pelaporan wajib ke otoritas kesehatan'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Flu burung': {
+    definisi: 'Infeksi virus avian influenza (H5N1/H7N9) pada manusia, umumnya dari kontak unggas terinfeksi, dengan mortalitas tinggi.',
+    diagnosis: ['Demam tinggi, gejala pernapasan progresif cepat, dengan riwayat kontak unggas sakit/mati; konfirmasi PCR dari swab'],
+    tatalaksana: ['Oseltamivir segera (jangan menunggu konfirmasi bila kecurigaan kuat), isolasi, terapi suportif intensif, pelaporan wajib sebagai penyakit berpotensi wabah'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Hipertrofi adenoid': {
+    definisi: 'Pembesaran jaringan adenoid di nasofaring, umum pada anak, dapat menyumbat jalan napas atas dan tuba Eustachius.',
+    diagnosis: ['Napas lewat mulut, mendengkur, rinore kronik, suara sengau, fasies adenoid; rontgen lateral nasofaring atau nasoendoskopi menunjukkan pembesaran'],
+    tatalaksana: ['Observasi (sering mengecil seiring usia), kortikosteroid nasal, adenoidektomi bila obstruksi berat, sleep apnea, atau otitis media efusi berulang'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'MURRAY2022'],
+  },
+  'Pseudo-croop acute epiglotitis': {
+    definisi: 'Croup (laringotrakeobronkitis, umumnya viral) dan epiglotitis akut (umumnya bakterial, H. influenzae tipe b) — keduanya menyebabkan obstruksi jalan napas atas pada anak.',
+    diagnosis: [
+      'Croup: batuk menggonggong (barking cough), stridor inspirasi, suara serak, demam ringan; rontgen leher menunjukkan steeple sign',
+      'Epiglotitis: onset sangat cepat, demam tinggi, air hunger, drooling, tripod position, tanpa batuk menggonggong; rontgen lateral menunjukkan thumb sign',
+    ],
+    tatalaksana: [
+      'Croup: deksametason dosis tunggal, nebulisasi epinefrin pada distres sedang-berat, oksigen',
+      'Epiglotitis: JANGAN periksa faring/tekan lidah (risiko spasme laring fatal) — amankan jalan napas di kamar operasi terlebih dahulu, lalu antibiotik IV (ceftriaxone)',
+    ],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'MURRAY2022'],
+  },
+  'Difteria (THT)': {
+    definisi: 'Infeksi Corynebacterium diphtheriae pada saluran napas atas dengan pembentukan pseudomembran dan produksi eksotoksin sistemik.',
+    diagnosis: ['Nyeri tenggorokan dengan pseudomembran abu-abu yang melekat dan mudah berdarah bila diangkat, bull neck (limfadenopati servikal berat), riwayat imunisasi tidak lengkap; kultur swab konfirmatif'],
+    tatalaksana: ['Anti-Difteri Serum (ADS) segera berdasarkan kecurigaan klinis (jangan tunggu kultur), antibiotik (penisilin/eritromisin), isolasi, monitor komplikasi miokarditis dan neuropati, profilaksis dan imunisasi kontak'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'HARRISON2022'],
+  },
+  'Karsinoma laring': {
+    definisi: 'Keganasan laring, tersering karsinoma sel skuamosa, faktor risiko utama merokok dan alkohol.',
+    diagnosis: ['Suara serak progresif >2-3 minggu (gejala kunci pada tumor glotis), disfagia, sesak, benjolan leher; laringoskopi dan biopsi untuk konfirmasi'],
+    tatalaksana: ['Radioterapi atau bedah konservasi laring pada stadium dini, laringektomi total ± kemoradiasi pada stadium lanjut, rehabilitasi suara pasca operasi'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Karsinoma nasofaring': {
+    definisi: 'Keganasan epitel nasofaring, insidens relatif tinggi di Asia Tenggara termasuk Indonesia, berkaitan dengan infeksi virus Epstein-Barr.',
+    diagnosis: ['Trias: benjolan leher (limfadenopati servikal), gejala hidung (epistaksis, sumbatan), gejala telinga (tinitus, tuli konduktif unilateral); nasoendoskopi dan biopsi konfirmatif, titer EBV mendukung'],
+    tatalaksana: ['Radioterapi sebagai modalitas utama (sangat radiosensitif), dikombinasi kemoterapi pada stadium lanjut — rujuk pusat onkologi'],
+    referensi: ['SKDI2012', 'HARRISON2022', 'MURRAY2022'],
+  },
+  'Trakeitis': {
+    definisi: 'Inflamasi trakea, dapat viral atau bakterial (trakeitis bakterial berpotensi mengancam jalan napas pada anak).',
+    diagnosis: ['Batuk, stridor, demam; trakeitis bakterial: demam tinggi, toksik, sekret purulen dan tidak respons terhadap terapi croup standar'],
+    tatalaksana: ['Antibiotik IV bila bakterial, amankan jalan napas bila obstruksi mengancam, terapi suportif dan humidifikasi'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'PPKFKTP2014'],
+  },
+  'Aspirasi': {
+    definisi: 'Masuknya material (cairan lambung, makanan, benda asing) ke saluran napas bawah, dapat menyebabkan pneumonitis kimia atau pneumonia aspirasi.',
+    diagnosis: ['Riwayat penurunan kesadaran/gangguan menelan, batuk dan sesak mendadak saat/setelah makan; infiltrat pada segmen dependen paru (lobus bawah kanan bila posisi tegak)'],
+    tatalaksana: ['Bebaskan jalan napas dan suction, oksigenasi; antibiotik bila terbukti pneumonia aspirasi (bukan profilaksis rutin pada pneumonitis kimia murni), cegah rekurensi (posisi, evaluasi menelan)'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'PPKFKTP2014'],
+  },
+  'Benda asing': {
+    definisi: 'Obstruksi saluran napas oleh benda asing, kegawatdaruratan tersering pada anak kecil.',
+    diagnosis: ['Riwayat tersedak mendadak, batuk paroksismal, stridor/wheezing unilateral; rontgen dapat menunjukkan air trapping unilateral (benda asing radiolusen sering tidak tampak langsung)'],
+    tatalaksana: ['Obstruksi total: back blows dan chest thrusts pada bayi, Heimlich manuver pada anak besar/dewasa; obstruksi parsial dengan pasien masih bisa batuk: jangan intervensi buta, rujuk untuk bronkoskopi ekstraksi'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'ATLS2018'],
+  },
+  'Displasia bronkopulmonar': {
+    definisi: 'Penyakit paru kronik pada bayi prematur akibat cedera paru dari ventilasi mekanik dan oksigen suplemental.',
+    diagnosis: ['Bayi prematur yang masih memerlukan oksigen pada usia koreksi 36 minggu; gambaran rontgen menunjukkan perubahan kistik dan fibrosis'],
+    tatalaksana: ['Dukungan oksigen dan nutrisi optimal, minimalkan barotrauma, diuretik dan bronkodilator selektif, pencegahan infeksi (imunisasi, profilaksis RSV bila tersedia)'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Karsinoma paru': {
+    definisi: 'Keganasan primer paru, dibagi non-small cell (NSCLC, ~85%) dan small cell (SCLC); faktor risiko utama merokok.',
+    diagnosis: ['Batuk kronik yang berubah pola, hemoptisis, penurunan BB, nyeri dada; rontgen/CT toraks menunjukkan massa, konfirmasi biopsi (bronkoskopi/TTNA) dan staging'],
+    tatalaksana: ['NSCLC stadium dini: reseksi bedah; stadium lanjut: kemoterapi/terapi target sesuai mutasi (EGFR, ALK)/imunoterapi; SCLC: kemoterapi ± radioterapi karena umumnya sudah menyebar saat diagnosis'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Tuberkulosis dengan HIV': {
+    definisi: 'Koinfeksi TB pada orang dengan HIV — TB adalah penyebab kematian tersering pada ODHIV, dengan presentasi sering atipik.',
+    diagnosis: ['Gejala TB dapat atipik dan rontgen sering tidak khas (terutama CD4 rendah); TB ekstraparu lebih sering; gunakan TCM (Xpert MTB/RIF) sebagai uji awal, skrining TB pada semua ODHIV'],
+    tatalaksana: ['OAT dimulai lebih dahulu, ARV dimulai dalam 2-8 minggu setelah OAT (lebih cepat bila CD4 sangat rendah), waspada IRIS dan interaksi rifampisin dengan ARV, profilaksis kotrimoksazol'],
+    referensi: ['SKDI2012', 'PNPKTB2020', 'WHOTBDR2022'],
+  },
+  'Multi Drug Resistance (MDR) TB': {
+    definisi: 'TB yang resisten terhadap minimal isoniazid dan rifampisin, memerlukan regimen lini kedua yang lebih panjang dan toksik.',
+    diagnosis: ['Kecurigaan pada gagal terapi, kambuh, putus obat, atau kontak pasien MDR; konfirmasi dengan uji kepekaan obat/TCM yang mendeteksi resistensi rifampisin'],
+    tatalaksana: ['Regimen MDR sesuai pedoman nasional (regimen jangka pendek atau individual dengan bedaquiline dan obat lini kedua), pengawasan menelan obat ketat, pemantauan efek samping (ototoksisitas, QT, hepatotoksisitas)'],
+    referensi: ['SKDI2012', 'WHOTBDR2022', 'PNPKTB2020'],
+  },
+  'Pneumothorax ventil': {
+    definisi: 'Tension pneumothorax — udara masuk rongga pleura secara satu arah, menekan mediastinum dan menurunkan curah jantung; kegawatdaruratan yang mengancam nyawa.',
+    diagnosis: ['Sesak berat, hipotensi, distensi vena leher, deviasi trakea ke sisi kontralateral, suara napas hilang dan hipersonor pada sisi terkena — diagnosis KLINIS, jangan tunggu rontgen'],
+    tatalaksana: ['Dekompresi jarum segera (ICS 2 linea midklavikula atau ICS 4-5 linea aksilaris anterior), dilanjutkan pemasangan WSD (chest tube) definitif'],
+    referensi: ['SKDI2012', 'ATLS2018', 'MURRAY2022'],
+  },
+  'Pneumothorax': {
+    definisi: 'Terkumpulnya udara dalam rongga pleura menyebabkan kolaps paru; dapat spontan primer, sekunder, atau traumatik.',
+    diagnosis: ['Nyeri dada pleuritik mendadak dan sesak, suara napas menurun dan hipersonor pada perkusi; rontgen toraks menunjukkan garis pleura viseral tanpa corakan paru di perifer'],
+    tatalaksana: ['Kecil dan asimtomatik: observasi dengan oksigen; besar atau simtomatik: aspirasi atau pemasangan WSD; pleurodesis dipertimbangkan pada kasus berulang'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'ATLS2018'],
+  },
+  'Efusi pleura masif': {
+    definisi: 'Akumulasi cairan dalam rongga pleura dalam jumlah besar sehingga menekan paru dan menyebabkan gangguan napas berat.',
+    diagnosis: ['Sesak, perkusi redup, suara napas menghilang, fremitus menurun; rontgen menunjukkan perselubungan luas dengan pergeseran mediastinum kontralateral; torasentesis dengan analisis kriteria Light membedakan transudat vs eksudat'],
+    tatalaksana: ['Torasentesis terapeutik (drainase bertahap, hindari >1-1,5 L sekaligus karena risiko re-expansion pulmonary edema), atasi penyebab dasar (TB, keganasan, gagal jantung), pleurodesis pada efusi maligna berulang'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'PAPDI2014'],
+  },
+  'Emfisema paru': {
+    definisi: 'Pembesaran permanen rongga udara distal bronkiolus terminalis dengan destruksi dinding alveolus — komponen utama PPOK.',
+    diagnosis: ['Sesak progresif, barrel chest, hipersonor, suara napas melemah; spirometri menunjukkan obstruksi ireversibel (FEV1/FVC pasca-bronkodilator <0,70)'],
+    tatalaksana: ['Berhenti merokok sebagai intervensi paling penting, bronkodilator kerja panjang, rehabilitasi paru, oksigen jangka panjang bila hipoksemia kronik, vaksinasi influenza dan pneumokokus'],
+    referensi: ['SKDI2012', 'GOLD2024', 'MURRAY2022'],
+  },
+  'Atelektasis': {
+    definisi: 'Kolaps atau pengembangan tidak sempurna jaringan paru, dapat obstruktif (sumbatan bronkus) atau non-obstruktif (kompresi, hipoventilasi).',
+    diagnosis: ['Sesak, penurunan suara napas, perkusi redup; rontgen menunjukkan opasitas dengan tanda kehilangan volume (pergeseran fisura/mediastinum ke sisi lesi)'],
+    tatalaksana: ['Atasi penyebab (bronkoskopi untuk sumbatan, drainase efusi), fisioterapi dada dan latihan napas dalam, mobilisasi dini pasca operasi sebagai pencegahan'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'PAPDI2014'],
+  },
+  'Edema paru': {
+    definisi: 'Akumulasi cairan di alveoli dan interstisium paru, umumnya kardiogenik (gagal jantung kiri) atau non-kardiogenik (ARDS).',
+    diagnosis: ['Sesak berat ortopnea, batuk berbusa kemerahan, ronki basah halus bilateral; rontgen menunjukkan gambaran batwing dan garis Kerley B; BNP tinggi mendukung kardiogenik'],
+    tatalaksana: ['Posisi duduk, oksigen/ventilasi non-invasif, diuretik loop IV (furosemid), nitrat bila tekanan darah memadai, atasi pencetus (iskemia, aritmia, krisis hipertensi)'],
+    referensi: ['SKDI2012', 'PERKIHF2020', 'BRAUNWALD2022'],
+  },
+  'Infark paru': {
+    definisi: 'Nekrosis jaringan paru akibat obstruksi aliran arteri pulmonalis, umumnya komplikasi emboli paru.',
+    diagnosis: ['Nyeri dada pleuritik, hemoptisis, sesak; CT angiografi paru menunjukkan defek pengisian dengan opasitas berbentuk baji perifer (Hampton hump)'],
+    tatalaksana: ['Antikoagulasi seperti pada emboli paru, analgesia, oksigen, atasi faktor risiko tromboemboli'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'BRAUNWALD2022'],
+  },
+  'Emboli paru': {
+    definisi: 'Obstruksi arteri pulmonalis oleh trombus (umumnya dari trombosis vena dalam tungkai), dapat fatal bila masif.',
+    diagnosis: ['Sesak mendadak, nyeri dada pleuritik, takikardia, dapat disertai sinkop/syok bila masif; skor Wells untuk probabilitas, D-dimer untuk menyingkirkan pada risiko rendah, CT angiografi paru sebagai baku emas'],
+    tatalaksana: ['Antikoagulasi segera (heparin/LMWH lalu antikoagulan oral), trombolisis pada emboli masif dengan instabilitas hemodinamik, filter vena kava bila antikoagulasi kontraindikasi'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'BRAUNWALD2022'],
+  },
+  'Kistik fibrosis': {
+    definisi: 'Penyakit genetik autosomal resesif (mutasi gen CFTR) menyebabkan sekret kental di paru, pankreas, dan organ lain.',
+    diagnosis: ['Infeksi paru berulang, bronkiektasis, steatore dan gagal tumbuh (insufisiensi pankreas); uji keringat (sweat chloride) meningkat, konfirmasi analisis genetik'],
+    tatalaksana: ['Fisioterapi dada dan mukolitik, antibiotik agresif untuk eksaserbasi, enzim pankreas dan dukungan nutrisi, modulator CFTR pada mutasi yang sesuai — rujuk pusat rujukan'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Haematothorax': {
+    definisi: 'Terkumpulnya darah dalam rongga pleura, umumnya akibat trauma toraks.',
+    diagnosis: ['Riwayat trauma, sesak, perkusi redup, suara napas menurun, dapat disertai syok hipovolemik; rontgen toraks menunjukkan perselubungan'],
+    tatalaksana: ['Pemasangan WSD untuk evakuasi darah dan pemantauan produksi, resusitasi cairan/darah; torakotomi bila drainase awal >1500 mL atau perdarahan berlanjut >200 mL/jam selama 2-4 jam'],
+    referensi: ['SKDI2012', 'ATLS2018', 'MURRAY2022'],
+  },
+  'Tumor mediastinum': {
+    definisi: 'Massa di rongga mediastinum, jenisnya berkorelasi dengan kompartemen (anterior: timoma, limfoma, teratoma, tiroid; posterior: tumor neurogenik).',
+    diagnosis: ['Sering asimtomatik/insidental; bila besar dapat menyebabkan batuk, sesak, sindrom vena kava superior, disfagia; CT toraks untuk lokasi dan karakterisasi, biopsi untuk histopatologi'],
+    tatalaksana: ['Sesuai jenis: reseksi bedah (timoma, teratoma, tumor neurogenik), kemoterapi/radioterapi (limfoma, tumor sel germinal) — rujuk bedah toraks/onkologi'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Pnemokoniasis': {
+    definisi: 'Penyakit paru akibat inhalasi debu mineral di tempat kerja (silikosis, asbestosis, coal workers pneumoconiosis).',
+    diagnosis: ['Riwayat paparan okupasional bertahun-tahun, sesak progresif, batuk kering; rontgen/HRCT menunjukkan nodul atau fibrosis dengan pola khas sesuai jenis debu'],
+    tatalaksana: ['Tidak ada terapi kuratif — hentikan paparan, terapi suportif dan rehabilitasi paru, skrining TB (silikosis meningkatkan risiko) dan keganasan (asbestosis), pelaporan sebagai penyakit akibat kerja'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Penyakit paru intersisial': {
+    definisi: 'Kelompok penyakit yang menyebabkan inflamasi dan fibrosis interstisium paru, menghasilkan pola restriktif dan gangguan difusi.',
+    diagnosis: ['Sesak progresif, batuk kering, ronki velcro basal, clubbing; spirometri pola restriktif dengan DLCO menurun, HRCT toraks menunjukkan pola fibrosis (mis. UIP)'],
+    tatalaksana: ['Sesuai etiologi: hentikan paparan/obat penyebab, kortikosteroid-imunosupresan pada penyakit inflamasi, antifibrotik (pirfenidone/nintedanib) pada fibrosis paru idiopatik, oksigen dan rehabilitasi paru'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+  'Obstructive Sleep Apnea (OSA)': {
+    definisi: 'Episode berulang obstruksi jalan napas atas saat tidur menyebabkan apnea/hipopnea, hipoksemia intermiten, dan fragmentasi tidur.',
+    diagnosis: ['Mendengkur keras, apnea disaksikan, mengantuk berlebih siang hari; skrining kuesioner STOP-BANG/Epworth, konfirmasi polisomnografi dengan indeks apnea-hipopnea (AHI)'],
+    tatalaksana: ['Penurunan berat badan dan hindari alkohol/sedatif sebelum tidur, CPAP sebagai terapi utama pada OSA sedang-berat, oral appliance atau bedah pada kasus terpilih'],
+    referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
+  },
+
+  // ─── Kardiovaskular ──────────────────────────────────────────────────────
+  'Syok (septik, hipovolemik, kardiogenik, neurogenik)': {
+    definisi: 'Kegagalan sirkulasi yang menyebabkan hipoperfusi jaringan dan hipoksia sel; diklasifikasikan berdasarkan mekanisme utama.',
+    diagnosis: [
+      'Hipotensi, takikardia, akral dingin dan CRT memanjang (kecuali syok distributif fase awal yang hangat), oliguria, penurunan kesadaran, laktat meningkat',
+      'Bedakan mekanisme: hipovolemik (perdarahan/dehidrasi, JVP rendah), kardiogenik (JVP tinggi, ronki, riwayat jantung), septik (sumber infeksi, hangat vasodilatasi), neurogenik (bradikardia paradoks, cedera spinal)',
+    ],
+    tatalaksana: [
+      'Hipovolemik: resusitasi cairan/darah agresif dan kontrol sumber perdarahan',
+      'Septik: bundle sepsis — kultur, antibiotik dini, kristaloid 30 mL/kgBB, vasopresor (norepinefrin) bila tetap hipotensi',
+      'Kardiogenik: hati-hati cairan, inotropik/vasopresor, revaskularisasi segera bila akibat infark miokard',
+      'Neurogenik: cairan dan vasopresor, atropin bila bradikardia bermakna, imobilisasi spinal',
+    ],
+    referensi: ['SKDI2012', 'SSC2021', 'ATLS2018'],
+  },
+  'Infark miokard': {
+    definisi: 'Nekrosis miokardium akibat iskemia berkepanjangan, umumnya oleh trombosis pada plak aterosklerotik koroner.',
+    diagnosis: [
+      'Nyeri dada tipikal >20 menit, menjalar ke lengan kiri/rahang, disertai keringat dingin, mual; dapat atipik pada lansia, wanita, dan pasien DM',
+      'EKG 12 sadapan dalam 10 menit pertama: elevasi ST (STEMI) atau depresi ST/inversi T (NSTEMI); troponin jantung meningkat',
+    ],
+    tatalaksana: [
+      'Terapi awal: oksigen bila saturasi rendah, aspirin kunyah 160-320 mg, nitrat sublingual, morfin bila nyeri persisten, antiplatelet kedua dan antikoagulan',
+      'STEMI: reperfusi segera — IKP primer dalam 120 menit bila tersedia, atau fibrinolitik dalam 30 menit bila IKP tidak terjangkau',
+      'NSTEMI: stratifikasi risiko dan strategi invasif sesuai risiko; lanjutkan terapi antiiskemik dan statin dosis tinggi',
+    ],
+    referensi: ['SKDI2012', 'ESCACS2023', 'BRAUNWALD2022'],
+  },
+  'Gagal jantung akut': {
+    definisi: 'Onset atau perburukan cepat gejala dan tanda gagal jantung yang memerlukan terapi segera.',
+    diagnosis: ['Sesak berat/ortopnea, ronki basah, peningkatan JVP, edema; rontgen menunjukkan kongesti paru, BNP/NT-proBNP meningkat, ekokardiografi menilai fungsi ventrikel'],
+    tatalaksana: ['Posisi duduk dan oksigen/ventilasi non-invasif, diuretik loop IV, vasodilator bila tekanan darah memadai, inotropik/vasopresor bila hipoperfusi; identifikasi dan atasi pencetus (iskemia, aritmia, infeksi, ketidakpatuhan obat)'],
+    referensi: ['SKDI2012', 'PERKIHF2020', 'BRAUNWALD2022'],
+  },
+  'Gagal jantung kronik': {
+    definisi: 'Sindrom klinis akibat kelainan struktur/fungsi jantung yang menurunkan curah jantung atau meningkatkan tekanan pengisian.',
+    diagnosis: ['Sesak saat aktivitas, ortopnea, paroxysmal nocturnal dyspnea, edema tungkai, JVP meningkat; ekokardiografi mengklasifikasikan HFrEF (EF ≤40%) dan HFpEF (EF ≥50%)'],
+    tatalaksana: [
+      'HFrEF — empat pilar terapi: ACE-inhibitor/ARB/ARNI, beta-blocker, antagonis reseptor mineralokortikoid, dan SGLT2 inhibitor; diuretik untuk kontrol gejala kongesti',
+      'Edukasi restriksi garam dan cairan, pemantauan berat badan harian, rehabilitasi jantung, vaksinasi',
+    ],
+    referensi: ['SKDI2012', 'PERKIHF2020', 'BRAUNWALD2022'],
+  },
+  'Takikardi: supraventrikular, ventrikular': {
+    definisi: 'Aritmia dengan laju >100x/menit; supraventrikular berasal dari atas berkas His (QRS umumnya sempit), ventrikular dari ventrikel (QRS lebar).',
+    diagnosis: ['EKG membedakan: SVT (QRS sempit, reguler, laju 150-250), VT (QRS lebar >120 ms, dapat disertai disosiasi AV); nilai stabilitas hemodinamik segera'],
+    tatalaksana: [
+      'Tidak stabil (hipotensi, nyeri dada iskemik, gagal jantung akut, penurunan kesadaran): kardioversi tersinkronisasi segera',
+      'SVT stabil: manuver vagal, lalu adenosin IV bolus cepat; VT stabil: antiaritmia IV (amiodaron) dengan persiapan kardioversi',
+    ],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Fibrilasi atrial': {
+    definisi: 'Aritmia supraventrikular dengan aktivasi atrium tidak terkoordinasi sehingga kontraksi atrium tidak efektif; aritmia menetap tersering.',
+    diagnosis: ['Palpitasi, sesak, lemas; EKG menunjukkan irama ireguler tanpa gelombang P yang jelas; nilai laju ventrikel dan cari penyebab (hipertiroid, penyakit katup, hipertensi)'],
+    tatalaksana: [
+      'Kontrol laju (beta-blocker/calcium channel blocker non-dihidropiridin) atau kontrol irama sesuai kondisi pasien',
+      'Antikoagulasi berdasarkan skor CHA2DS2-VASc dengan mempertimbangkan risiko perdarahan (HAS-BLED) — pencegahan stroke adalah prioritas utama',
+      'Kardioversi segera bila hemodinamik tidak stabil',
+    ],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Fibrilasi ventrikular': {
+    definisi: 'Aktivitas listrik ventrikel yang kacau tanpa kontraksi efektif — menyebabkan henti jantung, fatal bila tidak ditangani dalam menit.',
+    diagnosis: ['Pasien tidak sadar, tidak bernapas normal, nadi tidak teraba; monitor menunjukkan gelombang ireguler kacau tanpa kompleks QRS terorganisasi'],
+    tatalaksana: ['Defibrilasi (unsynchronized shock) SEGERA sebagai prioritas, RJP berkualitas tinggi dengan interupsi minimal, epinefrin tiap 3-5 menit, amiodaron setelah syok ketiga, cari dan atasi penyebab reversibel (5H-5T)'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Atrial flutter': {
+    definisi: 'Takiaritmia atrium akibat sirkuit re-entry, umumnya di atrium kanan, dengan laju atrium sekitar 250-350x/menit.',
+    diagnosis: ['EKG menunjukkan gelombang flutter "gigi gergaji" (sawtooth) terutama di sadapan inferior, dengan konduksi blok tetap (sering 2:1 sehingga laju ventrikel ~150)'],
+    tatalaksana: ['Prinsip serupa fibrilasi atrium: kontrol laju, antikoagulasi berdasarkan risiko tromboemboli, kardioversi bila tidak stabil; ablasi kateter sangat efektif untuk flutter tipikal'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Ekstrasistol supraventrikular, ventrikular': {
+    definisi: 'Denyut prematur yang berasal dari atrium (SVES/PAC) atau ventrikel (VES/PVC), sering ditemukan pada jantung normal.',
+    diagnosis: ['Sensasi denyut "terlewat" atau berdebar; EKG menunjukkan kompleks prematur — QRS sempit (supraventrikular) atau lebar dengan pause kompensasi (ventrikular)'],
+    tatalaksana: ['Umumnya jinak: reassurance, kurangi kafein/alkohol/stres, koreksi gangguan elektrolit; beta-blocker bila sangat simtomatik; evaluasi lebih lanjut bila sangat sering atau ada penyakit jantung struktural'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Bundle Branch Block': {
+    definisi: 'Gangguan konduksi pada berkas cabang kanan (RBBB) atau kiri (LBBB) sehingga aktivasi ventrikel tidak sinkron.',
+    diagnosis: ['EKG: QRS ≥120 ms; RBBB pola rSR\' di V1 dengan S lebar di V6; LBBB QRS lebar bertakik di V5-V6 tanpa gelombang Q septal — LBBB baru dengan nyeri dada dianggap setara STEMI'],
+    tatalaksana: ['Tidak perlu terapi khusus bila asimtomatik dan tanpa penyakit struktural; evaluasi penyakit jantung dasar; pacu jantung bila disertai blok AV derajat tinggi atau gejala bradikardia'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Aritmia lainnya': {
+    definisi: 'Kelainan irama jantung selain yang tersebut spesifik, mencakup bradiaritmia, blok AV, sindrom sick sinus, dan aritmia kanal ion.',
+    diagnosis: ['Palpitasi, pusing, sinkop, atau asimtomatik; EKG 12 sadapan, Holter monitoring untuk aritmia intermiten, studi elektrofisiologi pada kasus tertentu'],
+    tatalaksana: ['Atasi pemicu (elektrolit, obat, iskemia, hipertiroid); pacu jantung permanen pada bradiaritmia simtomatik, antiaritmia atau ablasi sesuai jenis takiaritmia'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Kardiomiopati': {
+    definisi: 'Penyakit otot jantung primer, tipe utama: dilatasi, hipertrofik, dan restriktif.',
+    diagnosis: ['Gejala gagal jantung, aritmia, atau sinkop; ekokardiografi menentukan tipe (dilatasi ruang dengan EF turun, hipertrofi septum asimetris, atau gangguan pengisian restriktif); MRI jantung untuk karakterisasi lanjut'],
+    tatalaksana: ['Dilatasi: terapi gagal jantung standar; Hipertrofik: beta-blocker, hindari dehidrasi dan olahraga kompetitif intens, evaluasi risiko kematian mendadak untuk ICD; Restriktif: atasi penyebab dasar (amiloidosis, hemokromatosis)'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PERKIHF2020'],
+  },
+  'Kor pulmonale akut': {
+    definisi: 'Dilatasi dan gagal ventrikel kanan akut akibat peningkatan mendadak tekanan arteri pulmonalis, tersering karena emboli paru masif.',
+    diagnosis: ['Sesak mendadak, hipotensi, JVP meningkat, EKG dapat menunjukkan pola S1Q3T3 dan RBBB baru; ekokardiografi menunjukkan dilatasi dan disfungsi ventrikel kanan'],
+    tatalaksana: ['Atasi penyebab segera (trombolisis/antikoagulasi pada emboli paru masif), dukungan hemodinamik hati-hati (cairan berlebih dapat memperburuk), oksigen'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'MURRAY2022'],
+  },
+  'Kor pulmonale kronik': {
+    definisi: 'Hipertrofi dan/atau dilatasi ventrikel kanan akibat penyakit paru kronik dengan hipertensi pulmonal, tersering pada PPOK lanjut.',
+    diagnosis: ['Sesak kronik, edema tungkai, JVP meningkat, hepatomegali, P pulmonal pada EKG; ekokardiografi memperkirakan tekanan arteri pulmonalis'],
+    tatalaksana: ['Optimalkan terapi penyakit paru dasar, oksigen jangka panjang bila hipoksemia kronik (memperbaiki survival), diuretik hati-hati untuk kongesti, hindari terapi berlebihan yang menurunkan preload ventrikel kanan'],
+    referensi: ['SKDI2012', 'GOLD2024', 'BRAUNWALD2022'],
+  },
+  'Hipertensi esensial': {
+    definisi: 'Peningkatan tekanan darah persisten tanpa penyebab sekunder yang teridentifikasi (>90% kasus hipertensi).',
+    diagnosis: ['TD ≥140/90 mmHg pada pengukuran berulang dengan teknik benar; konfirmasi dengan pengukuran di rumah/ABPM; evaluasi kerusakan organ target (jantung, ginjal, mata) dan risiko kardiovaskular total'],
+    tatalaksana: [
+      'Modifikasi gaya hidup: restriksi garam <5 g/hari, penurunan BB, aktivitas fisik, batasi alkohol, berhenti merokok',
+      'Farmakoterapi: ACE-inhibitor/ARB, calcium channel blocker, atau diuretik tiazid; kombinasi dosis rendah lebih dianjurkan daripada monoterapi dosis maksimal',
+      'Target umumnya <140/90 mmHg, lebih ketat pada pasien tertentu sesuai toleransi',
+    ],
+    referensi: ['SKDI2012', 'PERKIHT2021', 'BRAUNWALD2022'],
+  },
+  'Hipertensi sekunder': {
+    definisi: 'Hipertensi dengan penyebab spesifik yang dapat diidentifikasi dan berpotensi dikoreksi.',
+    diagnosis: ['Curigai bila onset usia <30 atau >55 tahun, hipertensi resisten, perburukan mendadak, atau ada petunjuk klinis; cari penyebab: penyakit ginjal, stenosis arteri renalis (bruit abdomen), hiperaldosteronisme (hipokalemia), feokromositoma (trias sakit kepala-palpitasi-berkeringat), koarktasio aorta, sleep apnea'],
+    tatalaksana: ['Tatalaksana penyebab dasar (revaskularisasi, adrenalektomi, CPAP), sambil kontrol tekanan darah dengan antihipertensi yang sesuai mekanisme'],
+    referensi: ['SKDI2012', 'PERKIHT2021', 'BRAUNWALD2022'],
+  },
+  'Hipertensi pulmoner': {
+    definisi: 'Peningkatan tekanan arteri pulmonalis rata-rata, dapat idiopatik atau sekunder terhadap penyakit jantung kiri, paru, atau tromboemboli kronik.',
+    diagnosis: ['Sesak progresif tanpa sebab jelas, lelah, sinkop saat aktivitas; ekokardiografi sebagai skrining, kateterisasi jantung kanan sebagai baku emas'],
+    tatalaksana: ['Atasi penyakit dasar; pada hipertensi arteri pulmonalis: terapi spesifik vasodilator pulmonal (antagonis reseptor endotelin, inhibitor PDE-5, analog prostasiklin), antikoagulasi selektif, oksigen — rujuk pusat rujukan'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'MURRAY2022'],
+  },
+  'Penyakit Raynaud': {
+    definisi: 'Vasospasme arteri digital episodik yang dipicu dingin atau stres emosional, menyebabkan perubahan warna jari berurutan.',
+    diagnosis: ['Perubahan warna trifasik: pucat (iskemia) → sianosis → kemerahan (reperfusi), disertai rasa baal dan nyeri; bedakan primer (jinak) dari sekunder (terkait skleroderma/SLE — periksa ANA dan kapilaroskopi)'],
+    tatalaksana: ['Hindari dingin dan gunakan sarung tangan, berhenti merokok, hindari obat vasokonstriktor; calcium channel blocker (nifedipin) bila serangan sering/berat; tatalaksana penyakit autoimun dasar bila sekunder'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Trombosis arteri': {
+    definisi: 'Pembentukan trombus dalam arteri yang menyebabkan iskemia akut pada jaringan distal.',
+    diagnosis: ['Iskemia tungkai akut dengan 6P: Pain, Pallor, Pulselessness, Paresthesia, Paralysis, Poikilothermia; Doppler dan angiografi menentukan lokasi oklusi'],
+    tatalaksana: ['Antikoagulasi (heparin) segera, revaskularisasi darurat (trombektomi/trombolisis kateter/bypass) — iskemia tungkai akut adalah kegawatdaruratan dengan jendela waktu terbatas untuk menyelamatkan ekstremitas'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Koarktasio aorta': {
+    definisi: 'Penyempitan kongenital aorta, umumnya distal terhadap arteri subklavia kiri.',
+    diagnosis: ['Hipertensi pada ekstremitas atas dengan tekanan darah lebih rendah dan nadi femoral melemah/terlambat (radiofemoral delay); rontgen dapat menunjukkan rib notching; ekokardiografi/CT angiografi konfirmatif'],
+    tatalaksana: ['Koreksi bedah atau intervensi kateter (balloon angioplasty/stent), kontrol hipertensi, pemantauan jangka panjang (rekoarktasio, aneurisma, hipertensi menetap)'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  "Penyakit Buerger's (Thromboangiitis Obliterans)": {
+    definisi: 'Vaskulitis oklusif non-aterosklerotik pada arteri dan vena kecil-sedang ekstremitas, sangat erat kaitannya dengan merokok.',
+    diagnosis: ['Laki-laki muda perokok berat dengan klaudikasio distal, nyeri istirahat, ulkus/gangren jari, dapat disertai tromboflebitis migrans dan fenomena Raynaud; angiografi menunjukkan gambaran corkscrew collateral'],
+    tatalaksana: ['BERHENTI MEROKOK TOTAL adalah satu-satunya terapi yang terbukti mengubah perjalanan penyakit, perawatan luka, analgesia, vasodilator/iloprost pada iskemia berat, amputasi bila gangren luas'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Emboli arteri': {
+    definisi: 'Oklusi arteri oleh material embolus yang berasal dari tempat lain, tersering dari jantung (fibrilasi atrium, trombus mural pasca infark).',
+    diagnosis: ['Iskemia akut mendadak pada ekstremitas/organ dengan batas jelas, pada pasien dengan sumber emboli (fibrilasi atrium, penyakit katup); bedakan dari trombosis in situ yang biasanya pada pasien dengan riwayat klaudikasio kronik'],
+    tatalaksana: ['Heparinisasi segera, embolektomi darurat (kateter Fogarty) atau trombolisis, kemudian antikoagulasi jangka panjang untuk mencegah rekurensi dan tatalaksana sumber emboli'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Aterosklerosis': {
+    definisi: 'Penumpukan plak lipid dan fibrosis pada dinding arteri, dasar patologi penyakit jantung koroner, stroke, dan penyakit arteri perifer.',
+    diagnosis: ['Umumnya asimtomatik hingga stenosis bermakna; nilai faktor risiko (merokok, hipertensi, dislipidemia, DM, riwayat keluarga) dan skrining organ target'],
+    tatalaksana: ['Modifikasi faktor risiko agresif: berhenti merokok, statin, kontrol tekanan darah dan gula darah, aktivitas fisik, diet sehat; antiplatelet pada pencegahan sekunder'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PERKIHT2021'],
+  },
+  'Subclavian steal syndrome': {
+    definisi: 'Stenosis arteri subklavia proksimal menyebabkan aliran balik dari arteri vertebralis untuk memasok lengan, sehingga "mencuri" aliran serebral.',
+    diagnosis: ['Gejala vertebrobasilar (pusing, sinkop, gangguan penglihatan) yang dipicu penggunaan lengan, perbedaan tekanan darah antar lengan >15-20 mmHg; Doppler menunjukkan aliran vertebralis terbalik'],
+    tatalaksana: ['Modifikasi faktor risiko aterosklerosis dan antiplatelet; revaskularisasi (stenting/bypass) bila gejala neurologis atau iskemia lengan bermakna'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Aneurisma Aorta': {
+    definisi: 'Dilatasi permanen aorta melebihi 1,5 kali diameter normal, berisiko ruptur yang fatal.',
+    diagnosis: ['Sering asimtomatik dan ditemukan insidental; massa abdomen berdenyut pada aneurisma aorta abdominalis; USG/CT menentukan diameter dan perluasan; ruptur ditandai nyeri hebat mendadak dan syok'],
+    tatalaksana: ['Surveilans pencitraan berkala dan kontrol tekanan darah serta berhenti merokok bila kecil; perbaikan elektif (EVAR atau bedah terbuka) bila diameter mencapai ambang atau tumbuh cepat; ruptur adalah kegawatdaruratan bedah'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Aneurisma diseksi': {
+    definisi: 'Diseksi aorta — robekan tunika intima menyebabkan darah masuk ke dinding aorta dan memisahkan lapisannya; kegawatdaruratan dengan mortalitas tinggi.',
+    diagnosis: ['Nyeri dada/punggung mendadak sangat hebat, sering digambarkan menyayat (tearing), perbedaan tekanan darah/nadi antar ekstremitas; CT angiografi sebagai modalitas konfirmasi utama; klasifikasi Stanford A (aorta asendens) dan B'],
+    tatalaksana: ['Kontrol tekanan darah dan denyut jantung agresif (beta-blocker IV dahulu, baru vasodilator) untuk menurunkan tegangan dinding aorta; Stanford A memerlukan bedah darurat, Stanford B umumnya terapi medis kecuali ada komplikasi'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Klaudikasio': {
+    definisi: 'Nyeri otot tungkai yang timbul saat aktivitas dan mereda dengan istirahat, akibat penyakit arteri perifer.',
+    diagnosis: ['Nyeri betis/paha saat berjalan sejauh jarak tertentu dan hilang dengan istirahat, nadi distal melemah, kulit atrofi dan rambut rontok; ankle-brachial index (ABI) <0,9 menegakkan diagnosis'],
+    tatalaksana: ['Program latihan berjalan terstruktur (terapi paling efektif untuk jarak tempuh), berhenti merokok, statin dan antiplatelet, cilostazol pada kasus terpilih; revaskularisasi bila mengganggu berat atau iskemia kritis'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Penyakit jantung reumatik': {
+    definisi: 'Kerusakan katup jantung permanen sebagai sekuele demam reumatik akut pasca infeksi Streptococcus grup A; katup mitral tersering terkena.',
+    diagnosis: ['Riwayat demam reumatik, murmur jantung (stenosis/regurgitasi mitral), gejala gagal jantung atau fibrilasi atrium; ekokardiografi menilai katup dan derajat keparahan'],
+    tatalaksana: ['Profilaksis penisilin jangka panjang untuk mencegah serangan berulang, terapi gagal jantung dan aritmia, antikoagulasi bila fibrilasi atrium, intervensi katup (valvuloplasti/penggantian) bila berat'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Tromboflebitis': {
+    definisi: 'Inflamasi vena superfisial disertai pembentukan trombus.',
+    diagnosis: ['Vena superfisial teraba keras seperti tali, nyeri, kemerahan dan hangat sepanjang jalurnya; USG Doppler menyingkirkan perluasan ke vena dalam'],
+    tatalaksana: ['Kompres hangat, NSAID, elevasi dan kompresi, mobilisasi tetap dianjurkan; antikoagulasi bila trombus meluas mendekati sistem vena dalam'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'BRAUNWALD2022'],
+  },
+  'Limfangitis': {
+    definisi: 'Inflamasi saluran limfe akibat infeksi, umumnya bakteri Streptococcus dari luka di distal.',
+    diagnosis: ['Garis merah memanjang dari fokus infeksi menuju kelenjar getah bening regional, nyeri, demam, limfadenopati regional'],
+    tatalaksana: ['Antibiotik sistemik yang mencakup Streptococcus (penisilin/sefalosporin), elevasi ekstremitas, perawatan luka sumber infeksi, kompres hangat'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'HARRISON2022'],
+  },
+  'Varises (primer, sekunder)': {
+    definisi: 'Dilatasi dan pemanjangan vena superfisial akibat inkompetensi katup vena; primer bila idiopatik, sekunder bila akibat obstruksi/refluks vena dalam.',
+    diagnosis: ['Vena superfisial berkelok dan menonjol, rasa berat dan pegal pada tungkai yang memberat saat berdiri lama; USG Doppler menilai refluks dan patensi vena dalam'],
+    tatalaksana: ['Stoking kompresi, elevasi tungkai, hindari berdiri lama, penurunan BB; intervensi (ablasi endovena, skleroterapi, stripping) bila simtomatik berat atau ada komplikasi kulit'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PPKFKTP2014'],
+  },
+  'Obstructed venous return': {
+    definisi: 'Hambatan aliran balik vena, dapat akibat trombosis, kompresi eksternal (tumor, kehamilan), atau sindrom vena kava superior.',
+    diagnosis: ['Edema, distensi vena kolateral, perubahan warna kulit pada area drainase terhambat; sindrom vena kava superior: pembengkakan wajah dan lengan, distensi vena leher, dispnea; CT/venografi menentukan lokasi'],
+    tatalaksana: ['Atasi penyebab (antikoagulasi bila trombosis, terapi tumor/radioterapi pada kompresi maligna, stenting vena pada kasus terpilih), elevasi dan kompresi untuk gejala'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'HARRISON2022'],
+  },
+  'Trombosis vena dalam': {
+    definisi: 'Pembentukan trombus pada vena dalam, umumnya tungkai, dengan risiko utama emboli paru.',
+    diagnosis: ['Bengkak unilateral, nyeri, hangat, kemerahan pada tungkai; skor Wells untuk probabilitas, D-dimer untuk menyingkirkan pada risiko rendah, USG Doppler kompresi sebagai konfirmasi'],
+    tatalaksana: ['Antikoagulasi (LMWH/antikoagulan oral langsung) minimal 3 bulan, durasi lebih panjang bila faktor risiko menetap; mobilisasi dan stoking kompresi; filter vena kava hanya bila antikoagulasi kontraindikasi'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
+  },
+  'Emboli vena': {
+    definisi: 'Lepasnya trombus vena yang terbawa aliran darah, umumnya bermanifestasi sebagai emboli paru.',
+    diagnosis: ['Sesak mendadak, nyeri dada pleuritik, takikardia pada pasien dengan faktor risiko/trombosis vena dalam; CT angiografi paru sebagai baku emas'],
+    tatalaksana: ['Antikoagulasi segera, trombolisis bila emboli masif dengan instabilitas hemodinamik, dukungan oksigen dan hemodinamik, pencegahan sekunder jangka panjang'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'MURRAY2022'],
+  },
+  'Limfedema (primer, sekunder)': {
+    definisi: 'Pembengkakan jaringan akibat gangguan drainase limfe; primer bila kelainan perkembangan sistem limfe, sekunder bila akibat obstruksi (filariasis, pasca diseksi kelenjar, radioterapi, keganasan).',
+    diagnosis: ['Edema non-pitting kronik yang progresif, kulit menebal, tanda Stemmer positif (kulit dasar jari kaki tidak dapat dicubit); bedakan dari edema vena/jantung'],
+    tatalaksana: ['Terapi dekongestif kompleks: perawatan kulit ketat (cegah selulitis), drainase limfatik manual, bandaging/stoking kompresi, latihan; tatalaksana penyebab (DEC pada filariasis); diuretik tidak efektif'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PPKFKTP2014'],
+  },
+  'Insufisiensi vena kronik': {
+    definisi: 'Gangguan aliran balik vena kronik akibat inkompetensi katup dan/atau obstruksi, menyebabkan hipertensi vena dan perubahan kulit.',
+    diagnosis: ['Edema tungkai yang memberat sore hari, hiperpigmentasi hemosiderin, lipodermatosklerosis, varises, hingga ulkus vena di area maleolus medial; USG Doppler menilai refluks'],
+    tatalaksana: ['Kompresi sebagai terapi utama, elevasi tungkai, latihan otot betis, perawatan kulit; intervensi vena pada refluks superfisial signifikan; pastikan ABI normal sebelum memberikan kompresi'],
+    referensi: ['SKDI2012', 'BRAUNWALD2022', 'PPKFKTP2014'],
   },
 }
