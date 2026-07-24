@@ -1903,4 +1903,265 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Uterotonik bila subinvolusi/perdarahan menyertai',
     ],
   },
+
+  // ─── Endokrin & Metabolik ───────────────────────────────────────────────
+  'DM Tipe 2 (edukasi & tatalaksana)': {
+    anamnesis: [
+      'Poliuria, polidipsia, polifagia, penurunan berat badan tanpa sebab jelas',
+      'Riwayat keluarga DM, riwayat DM gestasional, riwayat melahirkan bayi besar (>4kg)',
+      'Gejala komplikasi: kesemutan/baal kaki (neuropati), pandangan kabur (retinopati), luka sulit sembuh',
+      'Faktor risiko: obesitas, aktivitas fisik kurang, hipertensi, dislipidemia',
+      'Riwayat pengobatan sebelumnya dan kepatuhan diet',
+    ],
+    pemeriksaanFisik: [
+      'BMI dan lingkar pinggang (obesitas sentral)',
+      'Tekanan darah (komorbid hipertensi)',
+      'Pemeriksaan kaki: sensasi (monofilament 10g), nadi perifer, luka/ulkus',
+      'Tanda acanthosis nigricans (resistensi insulin)',
+      'Funduskopi bila fasilitas tersedia (retinopati diabetik)',
+    ],
+    kriteriaDiagnosis:
+      'GDP ≥126 mg/dL, atau GD 2 jam PP (TTGO) ≥200 mg/dL, atau GDS ≥200 mg/dL disertai gejala klasik, atau HbA1c ≥6,5% — dikonfirmasi dua kali pemeriksaan pada hari berbeda bila tanpa gejala klasik.',
+
+    tatalaksana: [
+      'Edukasi: perencanaan makan (karbohidrat kompleks, batasi gula sederhana), target BB ideal',
+      'Aktivitas fisik aerobik 150 menit/minggu',
+      'Farmakoterapi lini pertama: Metformin 500mg 1-3x/hari (titrasi), kontraindikasi bila eGFR <30',
+      'Kombinasi bila HbA1c belum tercapai: sulfonilurea, DPP-4 inhibitor, SGLT2 inhibitor, atau insulin',
+      'Target terapi: HbA1c <7%, GDP 80-130 mg/dL, GD 2 jam PP <180 mg/dL',
+      'Skrining komplikasi tahunan: funduskopi, urin albumin/kreatinin, profil lipid, EKG',
+    ],
+    tips: 'Selalu edukasi tanda-tanda hipoglikemia terutama bila memulai sulfonilurea/insulin. Jelaskan efek samping metformin (gangguan GI) dan cara mitigasinya (mulai dosis rendah, minum saat makan).',
+  },
+
+  'Ketoasidosis Diabetik (KAD) — resusitasi cairan': {
+    anamnesis: [
+      'Riwayat DM tipe 1 (atau tipe 2 dengan faktor pencetus: infeksi, tidak patuh obat, stres)',
+      'Poliuria, polidipsia berat, mual muntah, nyeri perut',
+      'Napas cepat dan dalam (Kussmaul), bau nafas aseton',
+      'Penurunan kesadaran progresif',
+      'Cari faktor pencetus: demam, infeksi, riwayat berhenti insulin',
+    ],
+    pemeriksaanFisik: [
+      'Tanda dehidrasi berat: turgor menurun, mukosa kering, mata cekung',
+      'Tekanan darah, nadi (takikardia, hipotensi bila syok)',
+      'Pernapasan Kussmaul (cepat dan dalam)',
+      'Bau aseton pada napas',
+      'GCS untuk menilai derajat kesadaran',
+    ],
+    kriteriaDiagnosis:
+      'GDS >250 mg/dL, pH arteri <7,3, bikarbonat serum <15 mEq/L, anion gap meningkat (>12), keton serum/urin positif.',
+    tatalaksana: [
+      'Resusitasi cairan: NaCl 0,9% 15-20 mL/kgBB pada jam pertama, lanjut sesuai status hidrasi dan natrium terkoreksi',
+      'Insulin regular IV kontinu 0,1 unit/kgBB/jam setelah kalium >3,3 mEq/L (jangan mulai insulin bila kalium rendah — risiko aritmia)',
+      'Koreksi kalium: tambahkan KCl pada cairan bila K <5,3 mEq/L dengan produksi urin adekuat',
+      'Koreksi bikarbonat hanya bila pH <6,9',
+      'Monitor GDS tiap jam; target penurunan 50-75 mg/dL/jam, ganti cairan ke dekstrosa saat GDS <200-250 mg/dL',
+      'Cari dan tatalaksana faktor pencetus (antibiotik bila infeksi)',
+    ],
+    tips: 'Urutan resusitasi KAD wajib: cairan dulu → koreksi kalium → baru insulin. Jangan berikan insulin bolus IV pada tatalaksana standar dewasa (beda dengan protokol lama) — insulin drip kontinu lebih aman.',
+  },
+
+  'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan': {
+    anamnesis: [
+      'Biasanya pasien DM tipe 2 usia lanjut, onset gejala lebih lambat (hari) dibanding KAD',
+      'Poliuria, polidipsia, penurunan kesadaran bertahap hingga koma',
+      'Faktor pencetus: infeksi, stroke, infark miokard, dehidrasi berat, obat (steroid, diuretik)',
+      'Tanpa gejala Kussmaul/bau aseton (keton minimal/negatif)',
+    ],
+    pemeriksaanFisik: [
+      'Dehidrasi berat, hipotensi, takikardia',
+      'Penurunan kesadaran (GCS rendah, bisa stupor/koma)',
+      'Tidak ada pernapasan Kussmaul (berbeda dengan KAD)',
+      'Cari tanda infeksi/fokus infeksi sebagai pencetus',
+    ],
+    kriteriaDiagnosis:
+      'GDS sangat tinggi (>600 mg/dL), osmolaritas serum efektif >320 mOsm/kg, pH >7,3, bikarbonat >18 mEq/L, keton minimal/negatif.',
+    tatalaksana: [
+      'Resusitasi cairan agresif: NaCl 0,9% 15-20 mL/kgBB jam pertama, koreksi defisit cairan total (bisa 8-10L) secara bertahap dalam 24-48 jam',
+      'Insulin regular IV kontinu 0,1 unit/kgBB/jam setelah resusitasi cairan awal dan kalium adekuat',
+      'Koreksi kalium seperti pada KAD',
+      'Monitor status neurologis dan osmolaritas serial — koreksi terlalu cepat berisiko edema serebri',
+      'Cari dan atasi faktor pencetus',
+    ],
+    tips: 'Mortalitas HHS lebih tinggi dari KAD karena populasi lanjut usia dan derajat dehidrasi lebih berat — resusitasi cairan adalah kunci utama, bukan insulin.',
+  },
+
+  'Sindrom Metabolik': {
+    anamnesis: [
+      'Riwayat obesitas sentral, kurang aktivitas fisik, riwayat keluarga DM/penyakit jantung',
+      'Gejala mungkin asimtomatik, ditemukan saat skrining rutin',
+      'Riwayat hipertensi, dislipidemia, hiperurisemia',
+    ],
+    pemeriksaanFisik: [
+      'Lingkar pinggang: pria >90cm, wanita >80cm (kriteria Asia)',
+      'Tekanan darah ≥130/85 mmHg',
+      'BMI dan tanda obesitas sentral',
+      'Acanthosis nigricans bila ada resistensi insulin berat',
+    ],
+    kriteriaDiagnosis:
+      'Minimal 3 dari 5 kriteria (NCEP ATP III modifikasi Asia): lingkar pinggang meningkat, trigliserida ≥150 mg/dL, HDL rendah (<40 pria/<50 wanita), TD ≥130/85 mmHg, GDP ≥100 mg/dL.',
+    tatalaksana: [
+      'Modifikasi gaya hidup: penurunan BB 7-10%, diet rendah kalori dan lemak jenuh',
+      'Aktivitas fisik teratur minimal 150 menit/minggu',
+      'Tatalaksana masing-masing komponen: statin bila dislipidemia signifikan, antihipertensi bila TD tidak terkontrol dengan gaya hidup',
+      'Skrining DM dan penyakit kardiovaskular secara berkala',
+    ],
+    tips: 'Sindrom metabolik adalah kumpulan faktor risiko, bukan diagnosis tunggal — jelaskan ke pasien bahwa tatalaksana bersifat multifaktorial dan berfokus pada perubahan gaya hidup jangka panjang.',
+  },
+
+  'Dislipidemia': {
+    anamnesis: [
+      'Biasanya asimtomatik, ditemukan saat skrining atau setelah kejadian kardiovaskular',
+      'Riwayat keluarga dislipidemia familial atau penyakit jantung koroner dini',
+      'Riwayat diet tinggi lemak jenuh, kurang aktivitas fisik, konsumsi alkohol',
+      'Riwayat DM, hipotiroid, penyakit ginjal kronik (penyebab sekunder)',
+    ],
+    pemeriksaanFisik: [
+      'Xanthelasma (kelopak mata), xanthoma tendon (Achilles) — tanda dislipidemia familial',
+      'Arcus cornea pada usia muda',
+      'BMI dan lingkar pinggang',
+      'Tanda aterosklerosis: bruit karotis, nadi perifer melemah',
+    ],
+    kriteriaDiagnosis:
+      'Profil lipid puasa: kolesterol total >200 mg/dL, LDL >130 mg/dL (target bervariasi sesuai risiko kardiovaskular), trigliserida >150 mg/dL, HDL rendah (<40 pria/<50 wanita).',
+    tatalaksana: [
+      'Terapi gaya hidup: diet rendah lemak jenuh, tinggi serat, olahraga teratur, berhenti merokok',
+      'Statin lini pertama bila risiko kardiovaskular tinggi/LDL tetap tinggi setelah modifikasi gaya hidup',
+      'Fibrat bila trigliserida sangat tinggi (>500 mg/dL) — risiko pankreatitis',
+      'Target LDL disesuaikan kategori risiko (risiko sangat tinggi: LDL <70 mg/dL)',
+      'Monitor fungsi hati dan gejala miopati pada terapi statin',
+    ],
+    tips: 'Tanyakan mialgia sebelum dan selama terapi statin sebagai baseline — penting untuk membedakan efek samping obat dari keluhan yang sudah ada sebelumnya.',
+  },
+
+  "Goiter Endemik / Grave's Disease / Hipertiroid": {
+    anamnesis: [
+      'Penurunan BB meski nafsu makan meningkat, palpitasi, tremor, intoleransi panas, berkeringat berlebih',
+      'Gelisah, sulit tidur, diare',
+      'Pada Grave: mata menonjol (eksoftalmus), gangguan penglihatan',
+      'Riwayat tinggal di daerah endemik defisiensi iodium (goiter endemik)',
+      'Siklus menstruasi tidak teratur pada wanita',
+    ],
+    pemeriksaanFisik: [
+      'Struma (pembesaran tiroid) — difus pada Grave, nodular pada goiter multinodular',
+      'Takikardia, tremor halus tangan, kulit hangat dan lembab',
+      'Eksoftalmus, lid lag, lid retraction (khas Grave)',
+      'Refleks tendon meningkat',
+      'Auskultasi bruit pada tiroid (hipervaskularisasi Grave)',
+    ],
+    kriteriaDiagnosis:
+      'TSH menurun (<0,4 mIU/L), FT4/FT3 meningkat. Pada Grave: TRAb/TSI positif. USG tiroid dan sidik tiroid membantu membedakan penyebab.',
+    tatalaksana: [
+      'Obat antitiroid: Methimazole (lini pertama, dosis awal 10-30mg/hari) atau PTU (pada trimester 1 kehamilan/krisis tiroid)',
+      'Beta-blocker (propranolol) untuk kontrol gejala adrenergik (takikardia, tremor)',
+      'Terapi definitif bila relaps/kontraindikasi obat: iodine radioaktif (I-131) atau tiroidektomi',
+      'Goiter endemik: suplementasi iodium (garam beriodium)',
+      'Edukasi tanda krisis tiroid (demam tinggi, takikardia berat, penurunan kesadaran) sebagai kegawatdaruratan',
+    ],
+    tips: 'Selalu periksa mata pada kecurigaan Grave — eksoftalmus adalah temuan spesifik yang membedakannya dari penyebab hipertiroid lain.',
+  },
+
+  'Hipotiroid Primer': {
+    anamnesis: [
+      'Lemas, mudah lelah, penambahan BB meski nafsu makan menurun, intoleransi dingin',
+      'Konstipasi, kulit kering, rambut rontok, suara serak',
+      'Gangguan konsentrasi, depresi, gangguan siklus menstruasi (menorrhagia)',
+      'Riwayat tiroidektomi, terapi iodine radioaktif, atau penyakit autoimun (Hashimoto)',
+    ],
+    pemeriksaanFisik: [
+      'Bradikardia, kulit kering dan dingin, edema non-pitting (myxedema)',
+      'Wajah bengkak (moon face), suara serak',
+      'Refleks tendon melambat (delayed relaxation phase — khas hipotiroid)',
+      'Struma bisa ada (Hashimoto) atau tidak ada tiroid teraba',
+      'Rambut rontok termasuk sepertiga lateral alis (madarosis)',
+    ],
+    kriteriaDiagnosis:
+      'TSH meningkat, FT4 menurun (hipotiroid primer). Anti-TPO positif mendukung tiroiditis Hashimoto sebagai penyebab.',
+    tatalaksana: [
+      'Levothyroxine dosis awal 1,6 mcg/kgBB/hari (dewasa muda sehat), dosis lebih rendah pada lansia/penyakit jantung',
+      'Titrasi berdasarkan TSH tiap 6-8 minggu hingga eutiroid',
+      'Minum levothyroxine pagi hari, saat perut kosong, 30-60 menit sebelum makan',
+      'Hindari konsumsi bersamaan dengan kalsium, zat besi (mengganggu absorpsi)',
+      'Monitor TSH berkala setelah dosis stabil (tiap 6-12 bulan)',
+    ],
+    tips: 'Edukasi kepatuhan minum obat jangka panjang (seumur hidup) — hipotiroid primer akibat Hashimoto/pascatiroidektomi bersifat permanen.',
+  },
+
+  'Obesitas (berbagai grade)': {
+    anamnesis: [
+      'Pola makan, aktivitas fisik, riwayat penambahan BB progresif',
+      'Riwayat keluarga obesitas, DM, penyakit kardiovaskular',
+      'Skrining komorbid: sleep apnea (mendengkur, mengantuk siang hari), nyeri sendi, gangguan menstruasi',
+      'Riwayat diet/program penurunan BB sebelumnya dan hasilnya',
+    ],
+    pemeriksaanFisik: [
+      'BMI: overweight 23-24,9, obesitas I 25-29,9, obesitas II ≥30 (kriteria Asia Pasifik)',
+      'Lingkar pinggang (obesitas sentral)',
+      'Tekanan darah, tanda resistensi insulin (acanthosis nigricans)',
+      'Skrining komorbid: tanda sleep apnea, sendi (osteoarthritis lutut)',
+    ],
+    kriteriaDiagnosis:
+      'BMI ≥25 kg/m² (obesitas, kriteria Asia Pasifik) dengan/tanpa komorbid metabolik terkait obesitas.',
+    tatalaksana: [
+      'Modifikasi gaya hidup: defisit kalori 500-750 kkal/hari, target penurunan BB 5-10% dalam 6 bulan',
+      'Aktivitas fisik bertahap, mulai ringan hingga 150-300 menit/minggu',
+      'Farmakoterapi bila BMI ≥30 atau ≥27 dengan komorbid dan gaya hidup gagal (orlistat, GLP-1 agonis bila tersedia)',
+      'Bedah bariatrik dipertimbangkan pada obesitas berat (BMI ≥35 dengan komorbid, atau ≥40) yang gagal terapi konservatif',
+      'Skrining dan tatalaksana komorbid (DM, hipertensi, dislipidemia, sleep apnea)',
+    ],
+    tips: 'Fokus pada perubahan perilaku bertahap dan realistis daripada target penurunan BB drastis — meningkatkan keberhasilan jangka panjang dan kepatuhan pasien.',
+  },
+
+  'Marasmus / Kwashiorkor (gizi buruk anak)': {
+    anamnesis: [
+      'Riwayat asupan makan tidak adekuat, penyapihan dini, pola makan keluarga',
+      'Marasmus: penurunan BB progresif, tampak sangat kurus (wasting)',
+      'Kwashiorkor: edema, perubahan kulit dan rambut, meski BB tidak terlalu rendah',
+      'Riwayat diare berulang, infeksi berulang, sosioekonomi rendah',
+      'Riwayat imunisasi dan pemantauan tumbuh kembang sebelumnya',
+    ],
+    pemeriksaanFisik: [
+      'Marasmus: wasting berat, "old man face", iga gambang, baggy pants (kulit longgar di bokong)',
+      'Kwashiorkor: edema bilateral (mulai dari kaki), rambut mudah dicabut & berubah warna (flag sign), kulit crazy pavement dermatosis, hepatomegali (perlemakan hati)',
+      'BB/TB atau BB/PB <-3 SD (gizi buruk), LiLA <11,5cm pada balita',
+      'Tanda dehidrasi, tanda syok, tanda infeksi penyerta',
+      'Periksa mata untuk tanda defisiensi vitamin A (xerophthalmia)',
+    ],
+    kriteriaDiagnosis:
+      'Gizi buruk: BB/TB <-3 SD dan/atau edema bilateral pitting, dan/atau LiLA <11,5cm (usia 6-59 bulan), sesuai kurva WHO.',
+    tatalaksana: [
+      'Tatalaksana 10 langkah WHO untuk gizi buruk: (1) atasi/cegah hipoglikemia, (2) atasi/cegah hipotermia, (3) atasi/cegah dehidrasi (ReSoMal, bukan cairan IV rutin), (4) koreksi gangguan elektrolit, (5) atasi infeksi (antibiotik empiris, tanpa demam sekalipun)',
+      '(6) koreksi defisiensi mikronutrien (vitamin A, asam folat, tanpa besi di fase awal), (7) mulai pemberian makan bertahap (F-75 fase stabilisasi)',
+      '(8) fasilitasi tumbuh kejar dengan F-100 (fase rehabilitasi), (9) berikan stimulasi sensorik dan emosional, (10) siapkan tindak lanjut pasca pemulangan',
+      'Pemberian makan harus bertahap — refeeding terlalu cepat berisiko refeeding syndrome',
+      'Edukasi keluarga tentang gizi seimbang dan pemantauan tumbuh kembang rutin',
+    ],
+    tips: 'Jangan berikan zat besi pada fase stabilisasi awal — dapat memperberat infeksi. Zat besi baru ditambahkan pada fase rehabilitasi setelah nafsu makan membaik.',
+  },
+
+  'Imunisasi & Interpretasi KMS/Tumbang (anak)': {
+    anamnesis: [
+      'Riwayat imunisasi dasar lengkap (usia pemberian tiap vaksin) dan booster',
+      'Riwayat KIPI (kejadian ikutan pasca imunisasi) sebelumnya',
+      'Riwayat tumbuh kembang: milestone motorik, bahasa, sosial sesuai usia',
+      'Riwayat penyakit yang mungkin jadi kontraindikasi imunisasi (imunodefisiensi, demam tinggi akut)',
+    ],
+    pemeriksaanFisik: [
+      'Plot BB, TB/PB, dan lingkar kepala pada kurva WHO/KMS — interpretasi status gizi dan pertumbuhan',
+      'Skrining perkembangan sesuai usia (KPSP/Denver bila tersedia)',
+      'Pemeriksaan umum memastikan anak sehat sebelum imunisasi (bebas demam/infeksi akut berat)',
+    ],
+    kriteriaDiagnosis:
+      'Interpretasi KMS: garis pertumbuhan naik mengikuti pita warna = normal; datar/turun = perlu evaluasi lebih lanjut (gizi kurang/buruk, penyakit penyerta).',
+    tatalaksana: [
+      'Jadwal imunisasi dasar (Kemenkes/IDAI): Hepatitis B (0 jam), BCG & Polio 1 (1 bulan), DPT-HB-Hib & Polio 2-3-4 (2,3,4 bulan), IPV, Campak-Rubela (9 bulan), booster DPT & Campak (18-24 bulan)',
+      'Teknik BCG: 0,05mL intrakutan, sudut 10-15°, regio lengan atas kanan',
+      'Teknik DPT-HB-Hib: 0,5mL intramuskular, sudut 90°, regio paha anterolateral (bayi) atau deltoid (anak lebih besar)',
+      'Teknik Polio oral (OPV): 2 tetes per oral; IPV: 0,5mL intramuskular',
+      'Edukasi KIPI ringan yang wajar (demam, bengkak lokal) dan kapan harus kembali (demam tinggi, kejang, syok)',
+      'Bila status gizi kurang/buruk pada plot KMS: rujuk untuk tatalaksana gizi',
+    ],
+    tips: 'Selalu tunjukkan teknik penyuntikan yang benar (sudut, lokasi, dosis) karena sering menjadi poin penilaian OSCE tersendiri — jangan hanya menyebutkan jenis vaksin.',
+  },
 }
