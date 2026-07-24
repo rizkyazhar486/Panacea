@@ -1676,4 +1676,231 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     tips: 'Hindari masase prostat pada prostatitis bakterial akut — dapat memicu bakteremia/sepsis.',
   },
+
+  // ─── Obgyn ─────────────────────────────────────────────────────────────
+  'ANC Normal (Antenatal Care)': {
+    anamnesis: [
+      'HPHT untuk hitung usia kehamilan, riwayat obstetri sebelumnya (paritas), keluhan kehamilan saat ini, riwayat penyakit penyerta',
+    ],
+    pemeriksaanFisik: [
+      'Tinggi fundus uteri sesuai usia kehamilan, Leopold I-IV untuk letak/presentasi janin (trimester akhir), DJJ, tekanan darah, berat badan, edema tungkai',
+    ],
+    kriteriaDiagnosis: 'Bukan diagnosis penyakit — evaluasi kesehatan ibu & janin rutin sesuai jadwal ANC standar (minimal 6x kunjungan menurut standar WHO/Kemenkes terbaru).',
+    tatalaksana: [
+      'Skrining rutin: Hb, golongan darah, HIV, sifilis, hepatitis B, urinalisis, gula darah',
+      'Suplementasi: asam folat, zat besi, kalsium',
+      'Imunisasi TT (tetanus toksoid) sesuai jadwal',
+      'Edukasi: tanda bahaya kehamilan (perdarahan, kejang, nyeri kepala hebat, gerak janin berkurang), nutrisi, aktivitas',
+    ],
+  },
+  'Ketuban Pecah Dini (KPD)': {
+    anamnesis: [
+      'Keluar cairan dari kemaluan mendadak sebelum tanda persalinan (kontraksi teratur), usia kehamilan, warna/bau cairan (hijau = mekonium, berbau busuk = infeksi)',
+    ],
+    pemeriksaanFisik: [
+      'Inspekulo: pooling cairan ketuban di forniks posterior/keluar dari OUE, tes lakmus/nitrazin (kertas berubah biru pada cairan ketuban alkalis) atau tes pakis (fern test) untuk konfirmasi',
+      'Nilai tanda infeksi (demam, takikardia, nyeri tekan uterus, cairan berbau)',
+    ],
+    kriteriaDiagnosis: 'Visualisasi cairan ketuban pada inspekulo + tes konfirmasi (nitrazin/fern test) positif.',
+    tatalaksana: [
+      'Usia kehamilan aterm: induksi persalinan (bila tidak ada kontraindikasi) dalam 24 jam untuk mengurangi risiko infeksi',
+      'Preterm: kortikosteroid untuk maturasi paru janin bila <34 minggu, antibiotik profilaksis, tokolitik dipertimbangkan tergantung usia kehamilan, rujuk Sp.OG',
+      'Hindari pemeriksaan dalam berulang (risiko infeksi asenden)',
+    ],
+  },
+  'Abortus Imminens / Inkomplit': {
+    anamnesis: [
+      'Perdarahan pervaginam pada kehamilan muda (<20 minggu), nyeri perut bawah/kram',
+      'Imminens: OUI tertutup, janin masih hidup; inkomplit: sebagian jaringan sudah keluar, OUI terbuka',
+    ],
+    pemeriksaanFisik: [
+      'Inspekulo & VT: imminens — OUI tertutup, perdarahan minimal-sedang; inkomplit — OUI terbuka, teraba jaringan/sisa konsepsi, perdarahan aktif dapat banyak',
+    ],
+    kriteriaDiagnosis: 'USG: imminens — janin/kantung gestasi masih intak dengan DJJ (+); inkomplit — sisa jaringan hasil konsepsi di kavum uteri tanpa gestational sac utuh.',
+    tatalaksana: [
+      'Imminens: tirah baring, hindari aktivitas berat, progesteron dapat dipertimbangkan pada kasus tertentu, observasi',
+      'Inkomplit: evakuasi sisa jaringan (kuretase atau manual vacuum aspiration), tatalaksana perdarahan (uterotonik bila perlu), antibiotik profilaksis',
+      'Edukasi & dukungan emosional pasien pasca-keguguran',
+    ],
+  },
+  'Mastitis / Cracked Nipple': {
+    anamnesis: [
+      'Ibu menyusui dengan nyeri, kemerahan, bengkak payudara, demam (mastitis)',
+      'Cracked nipple: nyeri puting saat menyusui, luka/lecet pada puting akibat teknik pelekatan (latch) yang salah',
+    ],
+    pemeriksaanFisik: [
+      'Mastitis: eritema, indurasi, nyeri tekan payudara sektoral, demam',
+      'Cracked nipple: fisura/luka pada puting susu',
+    ],
+    kriteriaDiagnosis: 'Klinis dari inspeksi & anamnesis; USG payudara bila dicurigai abses (fluktuasi, tidak respons antibiotik).',
+    tatalaksana: [
+      'Mastitis: lanjutkan menyusui/pompa ASI (penting untuk drainase, tidak perlu dihentikan), antibiotik (dikloksasilin/kloksasilin) bila bakterial, kompres hangat, analgesik',
+      'Cracked nipple: perbaiki teknik pelekatan menyusui, olesi ASI/lanolin pada puting, biarkan kering di udara',
+      'Abses payudara: insisi drainase bila terbentuk abses',
+    ],
+  },
+  'Bakterial Vaginosis (BV)': {
+    anamnesis: [
+      'Keputihan berbau amis/fishy odor (terutama setelah berhubungan), warna abu-abu, tidak disertai gatal hebat/nyeri (beda dari kandidiasis)',
+    ],
+    pemeriksaanFisik: [
+      'Sekret vagina homogen abu-abu tipis melapisi dinding vagina',
+      'Kriteria Amsel: sekret homogen + pH vagina >4,5 + whiff test (bau amis) positif + clue cells pada mikroskopik',
+    ],
+    kriteriaDiagnosis: 'Minimal 3 dari 4 kriteria Amsel terpenuhi.',
+    tatalaksana: [
+      'Metronidazol oral 2x500mg 7 hari, atau metronidazol gel intravaginal',
+      'Tidak perlu terapi pasangan seksual secara rutin (bukan IMS klasik)',
+      'Edukasi: hindari douching vagina',
+    ],
+  },
+  'Kandidiasis Vulvovaginalis': {
+    anamnesis: [
+      'Keputihan kental seperti keju (cottage cheese), gatal hebat, kadang rasa terbakar/dispareunia, faktor risiko: DM, antibiotik/kortikosteroid, kehamilan, imunosupresi',
+    ],
+    pemeriksaanFisik: [
+      'Sekret putih kental bergumpal, eritema/edema vulva-vagina',
+      'Mikroskopik KOH: hifa/pseudohifa Candida',
+    ],
+    kriteriaDiagnosis: 'Klinis + KOH mikroskopik menunjukkan hifa/pseudohifa, pH vagina normal (<4,5, beda dari BV/trikomoniasis).',
+    tatalaksana: [
+      'Antifungal topikal (klotrimazol/mikonazol intravaginal) atau flukonazol oral dosis tunggal 150mg',
+      'Kontrol faktor risiko (gula darah pada DM)',
+      'Terapi pasangan tidak rutin kecuali simtomatik',
+    ],
+  },
+  'Servisitis / Uretritis Gonore': {
+    anamnesis: [
+      'Keputihan purulen, disuria, nyeri panggul ringan; pada pria: duh uretra purulen, disuria; riwayat kontak seksual berisiko',
+    ],
+    pemeriksaanFisik: [
+      'Serviks: sekret mukopurulen, serviks mudah berdarah saat disentuh (friable); nyeri goyang serviks minimal/tidak ada (beda dari PID)',
+    ],
+    kriteriaDiagnosis: 'Pewarnaan Gram: diplokokus gram negatif intraseluler; kultur/NAAT untuk konfirmasi Neisseria gonorrhoeae; skrining ko-infeksi Chlamydia rutin.',
+    tatalaksana: [
+      'Ceftriakson IM dosis tunggal + azitromisin oral dosis tunggal (cakupan ko-infeksi Chlamydia)',
+      'Terapi pasangan seksual wajib',
+      'Edukasi: hindari hubungan seksual sampai terapi tuntas & pasangan diterapi, skrining IMS lain',
+    ],
+  },
+  'Pelvic Inflammatory Disease (PID)': {
+    anamnesis: [
+      'Nyeri perut bawah/panggul, keputihan abnormal, demam, dispareunia, kadang perdarahan intermenstrual; riwayat IMS/servisitis tidak diobati',
+    ],
+    pemeriksaanFisik: [
+      'Nyeri goyang serviks (cervical motion tenderness) positif — tanda khas, nyeri tekan adneksa bilateral, dapat teraba massa adneksa (tubo-ovarian abscess)',
+    ],
+    kriteriaDiagnosis: 'Klinis minimal: nyeri panggul + nyeri goyang serviks ATAU nyeri tekan adneksa/uterus tanpa penyebab lain — cukup untuk memulai terapi empiris karena risiko sekuel infertilitas bila terlambat.',
+    tatalaksana: [
+      'Regimen antibiotik kombinasi (ceftriakson IM + doksisiklin oral ± metronidazol) untuk cakupan gonore, klamidia, dan anaerob',
+      'Rawat inap bila berat/tidak respons rawat jalan/tubo-ovarian abscess/kehamilan',
+      'Terapi pasangan seksual, edukasi risiko infertilitas/kehamilan ektopik di masa depan bila tidak diobati adekuat',
+    ],
+  },
+  'Hiperemesis Gravidarum (HEG)': {
+    anamnesis: [
+      'Mual muntah berat pada kehamilan muda yang mengganggu asupan nutrisi/cairan hingga penurunan berat badan, berbeda dari morning sickness biasa',
+    ],
+    pemeriksaanFisik: [
+      'Tanda dehidrasi (turgor menurun, mukosa kering, takikardia), penurunan berat badan >5% dari sebelum hamil',
+      'Urinalisis: ketonuria',
+    ],
+    kriteriaDiagnosis: 'Klinis: muntah persisten + dehidrasi + ketonuria + penurunan berat badan, setelah menyingkirkan penyebab lain (gastroenteritis, hepatitis, dll).',
+    tatalaksana: [
+      'Rehidrasi IV (dekstrosa + elektrolit), koreksi ketonuria',
+      'Antiemetik aman kehamilan (piridoksin-doksilamin lini pertama, ondansetron/metoklopramid bila perlu)',
+      'Tiamin sebelum pemberian dekstrosa pada kasus berat (cegah ensefalopati Wernicke)',
+      'Diet sedikit tapi sering, hindari makanan berbau/berlemak',
+    ],
+  },
+  'Preeklamsia Berat (PEB) / Impending Eklamsia': {
+    anamnesis: [
+      'Kehamilan >20 minggu dengan sakit kepala hebat, gangguan penglihatan (pandangan kabur/berkunang), nyeri epigastrium/ulu hati (khas), riwayat hipertensi kehamilan',
+    ],
+    pemeriksaanFisik: [
+      'Tekanan darah ≥160/110 mmHg, edema dapat luas, refleks patella hiperrefleks (tanda impending eklamsia), nyeri tekan epigastrium/kuadran kanan atas',
+    ],
+    kriteriaDiagnosis: 'TD ≥160/110 mmHg + proteinuria bermakna ATAU disertai gejala berat (nyeri kepala, gangguan visus, nyeri epigastrium, trombositopenia, peningkatan enzim liver, gangguan fungsi ginjal) pada kehamilan >20 minggu.',
+    tatalaksana: [
+      'MgSO4 sebagai antikonvulsan profilaksis/terapi kejang (loading dose + maintenance, pantau refleks patella/RR/urin output untuk toksisitas magnesium)',
+      'Antihipertensi (nifedipin oral atau nikardipin/labetalol IV) untuk kontrol TD akut',
+      'Terminasi kehamilan adalah terapi definitif — timing tergantung usia kehamilan & keparahan',
+      'Rujuk segera ke fasilitas dengan kemampuan ICU/NICU',
+    ],
+    tips: 'MgSO4 adalah obat kunci pencegahan kejang eklamsia — pantau tanda toksisitas (refleks patella hilang, depresi napas, oliguria) selama pemberian; antidotumnya kalsium glukonat.',
+  },
+  'Asuhan Persalinan Normal (APN 60 langkah)': {
+    anamnesis: [
+      'Bukan station anamnesis — dimulai saat pasien inpartu kala II (pembukaan lengkap, dorongan meneran)',
+    ],
+    pemeriksaanFisik: [
+      'Nilai tanda kala II: dorongan meneran, tekanan pada anus, perineum menonjol, vulva membuka (5 tanda kala II)',
+      'Pantau DJJ, kontraksi, kemajuan persalinan',
+    ],
+    kriteriaDiagnosis: 'Bukan diagnosis — protokol tindakan persalinan normal 60 langkah APN: mengenali tanda kala II, persiapan pertolongan, memastikan pembukaan lengkap, memimpin meneran, persiapan kelahiran bayi, penanganan bayi baru lahir, manajemen aktif kala III (MAK III), menilai perdarahan, asuhan pasca-persalinan.',
+    tatalaksana: [
+      'Ikuti sekuens 60 langkah APN berurutan: pastikan alat & bahan steril siap, pakai APD, pimpin meneran efektif, lindungi perineum saat kepala crowning, sanggah susur badan bayi, potong tali pusat',
+      'Manajemen aktif kala III (MAK III): suntik oksitosin dalam 1 menit pasca-lahir, lahirkan plasenta dengan peregangan tali pusat terkendali, masase fundus uteri',
+      'Periksa kelengkapan plasenta & robekan jalan lahir, jahit bila ada laserasi',
+    ],
+    tips: 'Skill wajib — hafal urutan 60 langkah APN termasuk manajemen aktif kala III (MAK III) yang krusial mencegah perdarahan postpartum.',
+  },
+  'Kista Bartholin / Bartholinitis': {
+    anamnesis: [
+      'Benjolan di labia (posisi jam 4/8 — lokasi kelenjar Bartholin), dapat asimtomatik bila kista kecil',
+      'Bartholinitis (infeksi/abses): nyeri hebat, bengkak, sulit duduk/berjalan',
+    ],
+    pemeriksaanFisik: [
+      'Kista: benjolan kistik tidak nyeri di labia mayora posisi khas',
+      'Abses Bartholin: benjolan nyeri hebat, fluktuatif, eritema, dapat demam',
+    ],
+    kriteriaDiagnosis: 'Klinis dari lokasi dan karakteristik benjolan.',
+    tatalaksana: [
+      'Kista asimtomatik kecil: observasi',
+      'Kista simtomatik/abses: insisi drainase dengan marsupialisasi (kantong permanen mencegah rekurensi) atau pemasangan kateter Word',
+      'Antibiotik bila selulitis/infeksi menyertai',
+    ],
+  },
+  'Suspek Ca Serviks — IVA test / Pap smear': {
+    anamnesis: [
+      'Skrining rutin pada wanita usia reproduktif/pernah berhubungan seksual, atau gejala curiga: perdarahan pascasenggama, keputihan berbau/berdarah, perdarahan di luar siklus haid',
+    ],
+    pemeriksaanFisik: [
+      'Inspekulo: inspeksi serviks langsung — IVA test (aplikasi asam asetat 3-5%, positif bila muncul area aceto-white); Pap smear: pengambilan sampel sel serviks untuk sitologi',
+    ],
+    kriteriaDiagnosis: 'IVA positif (area aceto-white) atau Pap smear abnormal (displasia/ASC-US ke atas) — memerlukan lanjutan kolposkopi + biopsi untuk konfirmasi histopatologi bila dicurigai keganasan.',
+    tatalaksana: [
+      'IVA/Pap smear positif: rujuk untuk kolposkopi & biopsi terarah',
+      'Skrining rutin: IVA/Pap smear tiap 3-5 tahun pada wanita usia 30-50 tahun',
+      'Edukasi vaksinasi HPV sebagai pencegahan primer',
+    ],
+  },
+  'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)': {
+    anamnesis: [
+      'Riwayat obstetri, rencana jumlah anak, kontraindikasi metode tertentu (riwayat tromboemboli untuk hormonal kombinasi, infeksi panggul aktif untuk AKDR), preferensi pasien',
+    ],
+    pemeriksaanFisik: [
+      'Pemeriksaan panggul sebelum pemasangan AKDR (menyingkirkan infeksi/kehamilan), pemeriksaan lengan sebelum pemasangan implan',
+    ],
+    kriteriaDiagnosis: 'Bukan diagnosis — konseling metode kontrasepsi sesuai kondisi & preferensi pasien, menjelaskan cara kerja, efektivitas, efek samping, dan durasi.',
+    tatalaksana: [
+      'Implan: insersi subdermal di lengan atas non-dominan dengan anestesi lokal, teknik aseptik, berlaku 3 tahun (tergantung jenis)',
+      'AKDR: insersi transservikal saat menstruasi/tidak hamil, teknik aseptik, kontrol benang setelah haid pertama',
+      'Edukasi efek samping yang mungkin (perubahan pola haid) dan kapan kembali kontrol/lepas',
+    ],
+  },
+  'Endometritis': {
+    anamnesis: [
+      'Demam pasca-persalinan/keguguran/prosedur ginekologi, nyeri perut bawah, lokia berbau busuk, riwayat persalinan lama/ketuban pecah dini/manipulasi intrauterin',
+    ],
+    pemeriksaanFisik: [
+      'Demam, nyeri tekan uterus (subinvolusi uterus), lokia purulen berbau busuk, nyeri tekan abdomen bawah',
+    ],
+    kriteriaDiagnosis: 'Klinis: demam pasca-persalinan/prosedur + nyeri tekan uterus + lokia abnormal, setelah menyingkirkan penyebab demam lain (ISK, mastitis, dll).',
+    tatalaksana: [
+      'Antibiotik spektrum luas IV (klindamisin + gentamisin, atau kombinasi lain mencakup anaerob)',
+      'Evaluasi sisa jaringan plasenta (USG) — kuretase bila ada retensi',
+      'Uterotonik bila subinvolusi/perdarahan menyertai',
+    ],
+  },
 }
