@@ -99,6 +99,11 @@ const MeldScore = lazy(() => import('./pages/MeldScore').then((m) => ({ default:
 const ChildPughScore = lazy(() => import('./pages/ChildPughScore').then((m) => ({ default: m.ChildPughScore })))
 const FenaCalculator = lazy(() => import('./pages/FenaCalculator').then((m) => ({ default: m.FenaCalculator })))
 const PediatricDkaCalculator = lazy(() => import('./pages/PediatricDkaCalculator').then((m) => ({ default: m.PediatricDkaCalculator })))
+const FluidCalculators = lazy(() => import('./pages/FluidCalculators').then((m) => ({ default: m.FluidCalculators })))
+const NeonatalResuscitationGuide = lazy(() => import('./pages/NeonatalResuscitationGuide').then((m) => ({ default: m.NeonatalResuscitationGuide })))
+const EmpiricTherapyReference = lazy(() => import('./pages/EmpiricTherapyReference').then((m) => ({ default: m.EmpiricTherapyReference })))
+const DermatologyLesionMapper = lazy(() => import('./pages/DermatologyLesionMapper').then((m) => ({ default: m.DermatologyLesionMapper })))
+const PsychiatricStatusExam = lazy(() => import('./pages/PsychiatricStatusExam').then((m) => ({ default: m.PsychiatricStatusExam })))
 const RansonCriteria = lazy(() => import('./pages/RansonCriteria').then((m) => ({ default: m.RansonCriteria })))
 const HasBledScore = lazy(() => import('./pages/HasBledScore').then((m) => ({ default: m.HasBledScore })))
 const BisapScore = lazy(() => import('./pages/BisapScore').then((m) => ({ default: m.BisapScore })))
@@ -282,6 +287,11 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/child-pugh-score" element={<ChildPughScore />} />
               <Route path="/fena-calculator" element={<FenaCalculator />} />
               <Route path="/pediatric-dka-calculator" element={<PediatricDkaCalculator />} />
+              <Route path="/fluid-calculators" element={<FluidCalculators />} />
+              <Route path="/neonatal-resuscitation-guide" element={<NeonatalResuscitationGuide />} />
+              <Route path="/empiric-therapy-reference" element={<EmpiricTherapyReference />} />
+              <Route path="/dermatology-lesion-mapper" element={<DermatologyLesionMapper />} />
+              <Route path="/psychiatric-status-exam" element={<PsychiatricStatusExam />} />
               <Route path="/ranson-criteria" element={<RansonCriteria />} />
               <Route path="/has-bled-score" element={<HasBledScore />} />
               <Route path="/bisap-score" element={<BisapScore />} />

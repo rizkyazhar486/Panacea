@@ -91,6 +91,18 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
       { to: '/data-lab', name: 'Data Lab', what: 'Upload a CSV of your own health data and chart it', keywords: 'csv upload chart data' },
     ],
   },
+  {
+    title: 'Fluids, Resuscitation & Clinical Assessment',
+    emoji: '💧',
+    tools: [
+      { to: '/fluid-calculators', name: 'Fluid & Electrolyte Calculators', what: 'Maintenance, resuscitation (sepsis/PALS/Parkland) & electrolyte correction', keywords: 'cairan maintenance rumatan resusitasi cairan elektrolit holliday segar parkland sepsis pals fluid resuscitation electrolyte' },
+      { to: '/pediatric-dka-calculator', name: 'Pediatric DKA Calculator', what: 'Bolus, deficit, maintenance, potassium & insulin infusion', keywords: 'pediatric dka anak diabetic ketoacidosis' },
+      { to: '/neonatal-resuscitation-guide', name: 'Neonatal Resuscitation (NRP) Guide', what: 'Initial-steps algorithm + Golden Minute timer', keywords: 'resusitasi neonatus neonatal nrp golden minute newborn edukasi' },
+      { to: '/empiric-therapy-reference', name: 'Empiric Therapy Reference', what: 'First-line drug classes by diagnosis — searchable quick reference', keywords: 'pemilihan obat berdasarkan diagnosis empiric therapy antibiotic first line drug class' },
+      { to: '/dermatology-lesion-mapper', name: 'Dermatology Status & Lesion Mapper', what: 'Morphology + predilection site → classic teaching differential', keywords: 'status dermatologis predileksi lesi dermatology skin lesion morphology differential' },
+      { to: '/psychiatric-status-exam', name: 'Psychiatric Status Exam', what: 'Structured Mental Status Exam (MSE) documentation', keywords: 'status psikiatri mental status exam mse psychiatric' },
+    ],
+  },
 ]
 
 export function CalculatorHub() {
