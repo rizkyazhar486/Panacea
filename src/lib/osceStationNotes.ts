@@ -1161,6 +1161,186 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
 
   // ─── Respirasi ─────────────────────────────────────────────────────────
+  'Asma (berbagai derajat & eksaserbasi) — tindakan nebulisasi': {
+    anamnesis: [
+      'Sesak napas episodik, mengi, batuk terutama malam/dini hari, dipicu alergen/aktivitas fisik/udara dingin/infeksi virus',
+      'Riwayat atopi pribadi/keluarga (rinitis alergi, dermatitis atopik)',
+      'Frekuensi serangan dan penggunaan obat pelega untuk menilai derajat kontrol',
+    ],
+    pemeriksaanFisik: [
+      'Penggunaan otot bantu napas, mengi ekspiratoar bilateral pada auskultasi; pada serangan berat: silent chest (tanda bahaya, obstruksi sangat berat)',
+      'Tanda vital: takipnea, takikardia, SpO2',
+      'Arus puncak ekspirasi (APE/peak flow) untuk menilai derajat obstruksi',
+    ],
+    kriteriaDiagnosis: 'Riwayat episode mengi/sesak berulang reversibel + pemeriksaan mendukung obstruksi jalan napas reversibel (spirometri: peningkatan FEV1 ≥12% pasca-bronkodilator).',
+    tatalaksana: [
+      'Serangan akut: oksigen untuk SpO2≥90%, nebulisasi agonis β2 kerja pendek (salbutamol) ± ipratropium bromida, kortikosteroid sistemik bila respons tidak segera/berat',
+      'Kontrol jangka panjang: kortikosteroid inhalasi dosis rendah-sedang sebagai pengontrol, agonis β2 kerja lama bila belum terkontrol',
+      'Edukasi: teknik inhaler yang benar, identifikasi & hindari pemicu, action plan tertulis',
+    ],
+    tips: 'Teknik nebulisasi (dosis obat, durasi, evaluasi respons) sering jadi station tindakan tersendiri — hafal dosis salbutamol nebul dan target evaluasi ulang.',
+  },
+  'PPOK Eksaserbasi Akut': {
+    anamnesis: [
+      'Sesak memberat dari baseline, peningkatan volume/purulensi sputum',
+      'Riwayat merokok lama (pack-years), riwayat PPOK terdiagnosis sebelumnya',
+    ],
+    pemeriksaanFisik: [
+      'Barrel chest, penggunaan otot bantu napas, hipersonor pada perkusi, ekspirasi memanjang, mengi/ronki pada auskultasi',
+      'Tanda gagal napas: sianosis, penggunaan otot bantu napas berat, kesadaran menurun (tanda hiperkapnia berat)',
+    ],
+    kriteriaDiagnosis: 'Perburukan akut gejala respirasi (sesak, sputum) melebihi variasi harian pada pasien dengan riwayat PPOK terkonfirmasi spirometri (FEV1/FVC <0,7 pasca-bronkodilator).',
+    tatalaksana: [
+      'Oksigen terkontrol (target SpO2 88-92% — hindari hiperoksia yang dapat memperburuk retensi CO2)',
+      'Bronkodilator kerja pendek (salbutamol + ipratropium) nebulisasi',
+      'Kortikosteroid sistemik oral/IV',
+      'Antibiotik bila memenuhi kriteria Anthonisen (peningkatan sesak, volume sputum, purulensi sputum — minimal 2 kriteria termasuk purulensi)',
+      'NIV (non-invasive ventilation) pada gagal napas dengan asidosis respiratorik',
+    ],
+  },
+  'Pneumonia (lobaris/aspirasi/CAP)': {
+    anamnesis: [
+      'Demam, batuk berdahak, sesak napas, nyeri dada pleuritik',
+      'Aspirasi: riwayat penurunan kesadaran/gangguan menelan/muntah sebelum onset',
+    ],
+    pemeriksaanFisik: [
+      'Demam, takipnea; auskultasi: ronki basah kasar/halus, suara napas bronkial pada konsolidasi, redup pada perkusi area terkena',
+      'Nilai skor CURB-65 untuk derajat keparahan (Confusion, Urea, Respiratory rate, Blood pressure, usia ≥65)',
+    ],
+    kriteriaDiagnosis: 'Klinis + foto toraks menunjukkan infiltrat/konsolidasi baru sesuai gejala.',
+    tatalaksana: [
+      'Rawat jalan (CURB-65 rendah): antibiotik oral (amoksisilin atau makrolid)',
+      'Rawat inap (CURB-65 sedang-tinggi): antibiotik IV (beta-laktam + makrolid, atau fluorokuinolon respirasi)',
+      'Aspirasi: tambahkan cakupan anaerob (klindamisin/metronidazol)',
+      'Suportif: oksigen, hidrasi, antipiretik',
+    ],
+  },
+  'Bronkitis Akut': {
+    anamnesis: [
+      'Batuk (berdahak/kering) 1-3 minggu, sering pasca-ISPA viral, dapat disertai demam ringan, tanpa tanda konsolidasi paru',
+    ],
+    pemeriksaanFisik: [
+      'Ronki basah kasar dapat terdengar namun tanpa tanda konsolidasi (redup fokal, suara bronkial)',
+      'Tanda vital umumnya normal/demam ringan',
+    ],
+    kriteriaDiagnosis: 'Klinis: batuk akut tanpa bukti pneumonia pada pemeriksaan (foto toraks bila diperlukan untuk menyingkirkan pneumonia).',
+    tatalaksana: [
+      'Simtomatik: ekspektoran, antipiretik, bronkodilator bila ada mengi/sesak',
+      'Antibiotik tidak rutin diberikan (mayoritas kasus viral) kecuali ada tanda infeksi bakteri jelas',
+      'Edukasi: kurangi paparan asap rokok/polusi',
+    ],
+  },
+  'Bronkiolitis (anak)': {
+    anamnesis: [
+      'Bayi/anak <2 tahun dengan riwayat ISPA ringan diikuti sesak progresif, mengi, kesulitan menyusu/makan',
+      'Sering musim tertentu, penyebab tersering RSV (Respiratory Syncytial Virus)',
+    ],
+    pemeriksaanFisik: [
+      'Takipnea, retraksi dinding dada, mengi ekspiratoar, hiperinflasi dada, saturasi oksigen perlu dinilai',
+      'Tanda dehidrasi bila asupan oral menurun akibat sesak',
+    ],
+    kriteriaDiagnosis: 'Klinis pada anak <2 tahun: episode pertama mengi + sesak setelah gejala ISPA prodromal.',
+    tatalaksana: [
+      'Suportif utama: oksigen bila SpO2 rendah, hidrasi adekuat (oral/IV bila tidak bisa minum), suction lendir hidung',
+      'Bronkodilator tidak rutin efektif (respons individual bervariasi, dapat dicoba percobaan terbatas)',
+      'Antibiotik tidak diberikan kecuali ada superinfeksi bakteri',
+      'Edukasi: tanda bahaya untuk kembali (sesak berat, tidak bisa minum, sianosis)',
+    ],
+  },
+  'Pertusis': {
+    anamnesis: [
+      'Batuk paroksismal (whooping cough) berat, diikuti "whoop" (tarikan napas dalam bersuara khas) pasca-batuk, kadang muntah pasca-batuk, durasi berminggu-minggu',
+      'Fase kataral awal menyerupai ISPA biasa sebelum fase paroksismal',
+      'Status imunisasi DPT/pertusis',
+    ],
+    pemeriksaanFisik: [
+      'Episode batuk paroksismal dapat disaksikan langsung, wajah kemerahan/sianosis saat batuk berat, konjungtiva dapat petekie akibat batuk hebat',
+      'Pada bayi kecil, dapat tanpa "whoop" klasik namun dengan apnea',
+    ],
+    kriteriaDiagnosis: 'Klinis (batuk paroksismal + whoop + post-tussive vomiting ≥2 minggu), kultur nasofaring/PCR Bordetella pertussis untuk konfirmasi.',
+    tatalaksana: [
+      'Antibiotik makrolid (azitromisin) — efektif mengurangi penularan meski efek pada durasi gejala terbatas bila diberikan setelah fase kataral',
+      'Suportif: hindari pemicu batuk, pantau distres napas terutama pada bayi (risiko apnea)',
+      'Profilaksis kontak erat dengan makrolid',
+      'Edukasi pentingnya imunisasi DPT lengkap untuk pencegahan',
+    ],
+  },
+  'Tuberkulosis Paru': {
+    anamnesis: [
+      'Batuk kronis >2 minggu (berdahak, kadang berdarah), keringat malam, penurunan berat badan, demam subfebris sore-malam',
+      'Riwayat kontak dengan penderita TB, status imun (HIV)',
+    ],
+    pemeriksaanFisik: [
+      'Dapat normal atau ditemukan ronki di apeks paru, tanda konsolidasi/kavitas pada kasus lanjut, penurunan berat badan/kaheksia',
+    ],
+    kriteriaDiagnosis: 'Sputum BTA (basil tahan asam) positif dan/atau GeneXpert MTB/RIF positif (juga mendeteksi resistensi rifampisin); foto toraks mendukung (infiltrat apeks, kavitas).',
+    tatalaksana: [
+      'Kasus baru: regimen 4 obat (isoniazid, rifampisin, pirazinamid, etambutol) fase intensif 2 bulan, dilanjutkan fase lanjutan isoniazid-rifampisin 4 bulan',
+      'Pemantauan efek samping (hepatotoksisitas, neuropati perifer — beri piridoksin/vitamin B6 profilaksis dengan isoniazid)',
+      'Edukasi kepatuhan obat penuh (DOTS), isolasi respirasi sampai tidak menular, skrining kontak serumah',
+    ],
+  },
+  'Efusi Pleura Massive': {
+    anamnesis: [
+      'Sesak progresif, nyeri dada pleuritik (bila ada inflamasi), telusuri penyebab dasar (gagal jantung, infeksi/TB, keganasan)',
+    ],
+    pemeriksaanFisik: [
+      'Perkusi redup/pekak di area efusi, suara napas menghilang/melemah di area terkena, fremitus taktil menurun, pergeseran mediastinum ke sisi berlawanan bila massive',
+    ],
+    kriteriaDiagnosis: 'Foto toraks menunjukkan perselubungan homogen dengan meniscus sign; torakosentesis diagnostik untuk analisis cairan (kriteria Light membedakan eksudat vs transudat).',
+    tatalaksana: [
+      'Torakosentesis terapeutik untuk mengurangi sesak pada efusi massive (hati-hati re-expansion pulmonary edema bila drainase terlalu cepat/banyak)',
+      'Tatalaksana penyebab dasar (diuretik bila gagal jantung, antibiotik/OAT bila infeksi, evaluasi onkologi bila keganasan)',
+      'WSD bila efusi berulang/empiema',
+    ],
+  },
+  'Bronkiektasis': {
+    anamnesis: [
+      'Batuk kronis produktif dengan sputum banyak (dapat 3 lapis: buih-mukoid-purulen), riwayat infeksi paru berulang/TB sebelumnya, hemoptisis berulang',
+    ],
+    pemeriksaanFisik: [
+      'Ronki basah kasar persisten, clubbing finger pada kasus lama/berat',
+      'Auskultasi: crackles kasar terutama basal paru',
+    ],
+    kriteriaDiagnosis: 'HRCT toraks menunjukkan dilatasi bronkus ireversibel (baku emas) — foto toraks polos dapat menunjukkan honeycomb appearance pada kasus lanjut.',
+    tatalaksana: [
+      'Fisioterapi dada/postural drainase rutin untuk mobilisasi sekret',
+      'Antibiotik saat eksaserbasi (peningkatan volume/purulensi sputum)',
+      'Bronkodilator bila ada komponen obstruktif',
+      'Atasi penyebab dasar bila teridentifikasi (mis. TB harus dituntaskan pengobatannya)',
+    ],
+  },
+  'Abses Paru': {
+    anamnesis: [
+      'Demam tinggi, batuk produktif dengan sputum berbau busuk (foul-smelling, khas anaerob), penurunan berat badan, riwayat aspirasi/gangguan kesadaran/penyakit periodontal',
+    ],
+    pemeriksaanFisik: [
+      'Demam tinggi, ronki di area terkena, dapat ditemukan tanda konsolidasi',
+      'Higiene mulut buruk/penyakit periodontal sering ditemukan (sumber aspirasi anaerob)',
+    ],
+    kriteriaDiagnosis: 'Foto toraks/CT menunjukkan kavitas dengan air-fluid level.',
+    tatalaksana: [
+      'Antibiotik spektrum luas dengan cakupan anaerob (klindamisin, atau beta-laktam/beta-laktamase inhibitor) jangka panjang (3-6 minggu)',
+      'Drainase postural/fisioterapi dada',
+      'Drainase perkutan/bedah bila tidak respons antibiotik atau abses sangat besar',
+    ],
+  },
+  'Laringitis Akut / Sindroma Croup': {
+    anamnesis: [
+      'Croup (anak): batuk menggonggong (barking cough), suara serak, stridor inspiratoar terutama malam hari, didahului gejala ISPA ringan',
+      'Laringitis dewasa: suara serak/afonia, tenggorokan gatal/nyeri, riwayat penggunaan suara berlebihan atau ISPA',
+    ],
+    pemeriksaanFisik: [
+      'Croup: stridor inspiratoar, retraksi dinding dada bila berat, suara serak; nilai derajat keparahan (Westley croup score)',
+      'Laringitis dewasa: laringoskopi menunjukkan edema/eritema pita suara',
+    ],
+    kriteriaDiagnosis: 'Klinis: croup dari trias batuk menggonggong + stridor + suara serak pada anak; foto leher AP dapat menunjukkan "steeple sign" (penyempitan subglotis) bila diperlukan.',
+    tatalaksana: [
+      'Croup ringan: dapat rawat jalan, deksametason oral dosis tunggal, udara lembab',
+      'Croup sedang-berat: nebulisasi epinefrin + kortikosteroid (deksametason), observasi rebound stridor pasca-epinefrin',
+      'Laringitis dewasa: istirahat suara, hidrasi, hindari iritan (rokok), umumnya self-limiting',
+    ],
+  },
   'Pneumotoraks (Tension/Terbuka) — needle decompression': {
     anamnesis: [
       'Sesak napas mendadak, sering dengan riwayat trauma dada (tumpul/tembus)',
