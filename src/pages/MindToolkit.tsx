@@ -10,7 +10,7 @@ import { IconSparkle } from '../components/icons'
 // persisted, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'puzzle' | 'memory' | 'reaction' | 'word' | 'stress' | 'detox' | 'meditation' | 'stroop' | 'nback' | 'pattern'
+type Tab = 'puzzle' | 'memory' | 'reaction' | 'word' | 'stress' | 'detox' | 'meditation' | 'stroop' | 'nback' | 'pattern' | 'tapping' | 'gonogo'
 
 const PUZZLES = [
   { seq: '2, 4, 8, 16, ?', answer: '32', hint: 'Each number doubles' },
@@ -380,6 +380,139 @@ function PatternMatrix() {
   )
 }
 
+function FingerTappingTest() {
+  const [phase, setPhase] = useState<'idle' | 'running' | 'done'>('idle')
+  const [taps, setTaps] = useState<number[]>([])
+  const startRef = useRef(0)
+  const DURATION_MS = 10000
+
+  function start() {
+    startRef.current = performance.now()
+    setTaps([])
+    setPhase('running')
+    window.setTimeout(() => setPhase('done'), DURATION_MS)
+  }
+  function tap() {
+    if (phase !== 'running') return
+    setTaps((t) => [...t, performance.now() - startRef.current])
+  }
+
+  const intervals = useMemo(() => taps.slice(1).map((t, i) => t - taps[i]), [taps])
+  const meanIntervalMs = intervals.length ? intervals.reduce((a, b) => a + b, 0) / intervals.length : 0
+  const sd = intervals.length > 1
+    ? Math.sqrt(intervals.reduce((a, b) => a + (b - meanIntervalMs) ** 2, 0) / (intervals.length - 1))
+    : 0
+  const cv = meanIntervalMs ? (sd / meanIntervalMs) * 100 : 0
+  const tapsPerSecond = taps.length / (DURATION_MS / 1000)
+
+  return (
+    <Card className="!p-6 text-center">
+      <p className="text-[13px] text-neutral-500">Tap as fast and as evenly as you can for 10 seconds. Tapping speed and rhythm consistency are real, widely-used measures of fine motor speed.</p>
+      {phase === 'idle' && (
+        <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start 10s test</button>
+      )}
+      {phase === 'running' && (
+        <button onClick={tap} className="mt-4 h-40 w-full rounded-2xl bg-brand text-2xl font-black text-white active:scale-95">TAP<div className="mt-1 text-sm font-bold opacity-80">{taps.length}</div></button>
+      )}
+      {phase === 'done' && (
+        <div className="mt-4 space-y-2 text-left">
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Total taps</span><b>{taps.length}</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Taps / second</span><b>{tapsPerSecond.toFixed(1)}</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Rhythm variability (CV)</span><b>{cv.toFixed(1)}%</b></div>
+          <p className="text-[11px] text-neutral-400">Lower variability = steadier rhythm. Not a diagnostic motor exam — just a fun, repeatable self-tracker.</p>
+          <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function GoNoGoTest() {
+  const ROUNDS = 20
+  const NOGO_RATIO = 0.25
+  const [phase, setPhase] = useState<'idle' | 'running' | 'done'>('idle')
+  const [round, setRound] = useState(0)
+  const [stimulus, setStimulus] = useState<'go' | 'nogo' | null>(null)
+  const [results, setResults] = useState<{ type: 'go' | 'nogo'; correct: boolean; rtMs: number | null }[]>([])
+  const shownAtRef = useRef(0)
+  const timeoutRef = useRef<number | null>(null)
+  const respondedRef = useRef(false)
+
+  function clearTimer() { if (timeoutRef.current) { window.clearTimeout(timeoutRef.current); timeoutRef.current = null } }
+
+  function nextRound(r: number) {
+    if (r >= ROUNDS) { setPhase('done'); setStimulus(null); return }
+    respondedRef.current = false
+    const isNoGo = Math.random() < NOGO_RATIO
+    const delay = 400 + Math.random() * 800
+    setStimulus(null)
+    timeoutRef.current = window.setTimeout(() => {
+      setStimulus(isNoGo ? 'nogo' : 'go')
+      shownAtRef.current = performance.now()
+      timeoutRef.current = window.setTimeout(() => {
+        if (!respondedRef.current) {
+          setResults((res) => [...res, { type: isNoGo ? 'nogo' : 'go', correct: isNoGo, rtMs: null }])
+          setRound((rr) => { const nr = rr + 1; nextRound(nr); return nr })
+        }
+      }, 900)
+    }, delay)
+  }
+
+  function start() {
+    setResults([])
+    setRound(0)
+    setPhase('running')
+    nextRound(0)
+  }
+
+  function respond() {
+    if (phase !== 'running' || respondedRef.current || !stimulus) return
+    respondedRef.current = true
+    clearTimer()
+    const rt = performance.now() - shownAtRef.current
+    setResults((res) => [...res, { type: stimulus, correct: stimulus === 'go', rtMs: stimulus === 'go' ? rt : rt }])
+    setStimulus(null)
+    setRound((rr) => { const nr = rr + 1; nextRound(nr); return nr })
+  }
+
+  useEffect(() => () => clearTimer(), [])
+
+  const goTrials = results.filter((r) => r.type === 'go')
+  const nogoTrials = results.filter((r) => r.type === 'nogo')
+  const goAccuracy = goTrials.length ? (goTrials.filter((r) => r.correct).length / goTrials.length) * 100 : 0
+  const nogoAccuracy = nogoTrials.length ? (nogoTrials.filter((r) => r.correct).length / nogoTrials.length) * 100 : 0
+  const avgRt = goTrials.filter((r) => r.rtMs != null).length
+    ? goTrials.reduce((a, r) => a + (r.rtMs || 0), 0) / goTrials.filter((r) => r.rtMs != null).length
+    : 0
+
+  return (
+    <Card className="!p-6 text-center">
+      <p className="text-[13px] text-neutral-500">Tap on green "GO" circles. Do <b>not</b> tap on red "STOP" circles. Measures response inhibition — your ability to hold back an automatic response.</p>
+      {phase === 'idle' && <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start test ({ROUNDS} rounds)</button>}
+      {phase === 'running' && (
+        <div className="mt-4">
+          <div className="text-[11px] font-bold text-neutral-400">Round {round + 1} / {ROUNDS}</div>
+          <button
+            onClick={respond}
+            disabled={!stimulus}
+            className={`mx-auto mt-3 h-32 w-32 rounded-full transition ${stimulus === 'go' ? 'bg-emerald-500' : stimulus === 'nogo' ? 'bg-red-500' : 'bg-neutral-200 dark:bg-white/10'}`}
+          />
+          <p className="mt-2 text-[11px] text-neutral-400">{stimulus === 'go' ? 'GO — tap now!' : stimulus === 'nogo' ? 'STOP — do not tap' : 'wait...'}</p>
+        </div>
+      )}
+      {phase === 'done' && (
+        <div className="mt-4 space-y-2 text-left">
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Go accuracy (hit rate)</span><b>{goAccuracy.toFixed(0)}%</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">No-Go accuracy (inhibition)</span><b>{nogoAccuracy.toFixed(0)}%</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Avg. reaction time (Go)</span><b>{avgRt ? `${Math.round(avgRt)} ms` : '—'}</b></div>
+          <p className="text-[11px] text-neutral-400">Lower No-Go accuracy means more impulsive "false alarm" taps. A casual self-tracker, not a clinical inhibition assessment.</p>
+          <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
+        </div>
+      )}
+    </Card>
+  )
+}
+
 const MEDITATION_KEY = 'pmd_meditation_streak_v1'
 function MeditationStreak() {
   const [days, setDays] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(MEDITATION_KEY) || '[]') } catch { return [] } })
@@ -420,6 +553,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'stroop', label: 'Stroop Test' },
   { id: 'nback', label: 'Dual N-Back' },
   { id: 'pattern', label: 'Pattern Matrix' },
+  { id: 'tapping', label: 'Finger Tapping' },
+  { id: 'gonogo', label: 'Go/No-Go' },
 ]
 
 export function MindToolkit() {
@@ -427,7 +562,7 @@ export function MindToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Cognitive Longevity Toolkit" subtitle="Ten small brain & stress tools in one place" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Cognitive Longevity Toolkit" subtitle="Twelve small brain & stress tools in one place" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
@@ -445,6 +580,8 @@ export function MindToolkit() {
       {tab === 'stroop' && <StroopTest />}
       {tab === 'nback' && <DualNBack />}
       {tab === 'pattern' && <PatternMatrix />}
+      {tab === 'tapping' && <FingerTappingTest />}
+      {tab === 'gonogo' && <GoNoGoTest />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Casual brain games and self-tracking — engaging, not a clinical cognitive assessment. If you're
