@@ -105,6 +105,18 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/longevity-game-center', name: 'Longevity Game Center', what: 'Habit bingo, a shareable report card, and a daily quote', kw: 'habit bingo report card shareable quote game viral', tag: 'New' },
     ],
   },
+  {
+    title: 'Computational Biomarkers (experimental)',
+    emoji: '🔬',
+    feats: [
+      { to: '/rppg-heart-rate', name: 'rPPG Heart Rate', what: 'Estimate your pulse from your webcam — no wearable needed', kw: 'rppg heart rate webcam camera photoplethysmography pulse experimental', tag: 'New' },
+      { to: '/vocal-biomarkers', name: 'Vocal Biomarker Analyzer', what: 'Pitch, jitter & shimmer from a 5-second voice sample', kw: 'voice vocal biomarker jitter shimmer pitch acoustic experimental', tag: 'New' },
+      { to: '/snp-profiler', name: 'Local SNP Longevity Profiler', what: 'Upload raw DNA data — parsed entirely in your browser, never uploaded', kw: 'dna snp gene genotype 23andme foxo3 apoe mthfr profiler local', tag: 'New' },
+      { to: '/predictive-models-toolkit', name: 'Predictive Models Toolkit', what: 'Autophagy timing, cortisol curve, glycemic load & more', kw: 'autophagy cortisol sauna nova glycemic load healthspan predictive model toolkit', tag: 'New' },
+      { to: '/data-lab-advanced', name: 'Data Lab Advanced', what: 'Blood trend forecaster, PhenoAge, encrypted vault & more', kw: 'blood panel forecaster phenoage glucose variability omega microbiome supplement vault local data', tag: 'New' },
+      { to: '/bio-simulators', name: 'Bio-Simulators', what: 'Illustrative mTOR/AMPK, circadian, and telomere visualizations', kw: 'mtor ampk circadian telomere attrition simulator illustrative', tag: 'New' },
+    ],
+  },
 ]
 
 const TAG_STYLE: Record<string, string> = {

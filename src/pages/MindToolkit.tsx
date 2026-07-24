@@ -10,7 +10,7 @@ import { IconSparkle } from '../components/icons'
 // persisted, no external API.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'puzzle' | 'memory' | 'reaction' | 'word' | 'stress' | 'detox' | 'meditation'
+type Tab = 'puzzle' | 'memory' | 'reaction' | 'word' | 'stress' | 'detox' | 'meditation' | 'stroop' | 'nback' | 'pattern'
 
 const PUZZLES = [
   { seq: '2, 4, 8, 16, ?', answer: '32', hint: 'Each number doubles' },
@@ -206,6 +206,180 @@ function DigitalDetox() {
   )
 }
 
+const STROOP_COLORS = [
+  { name: 'Red', hex: '#EF4444' }, { name: 'Blue', hex: '#3B82F6' }, { name: 'Green', hex: '#00BF63' }, { name: 'Yellow', hex: '#F59E0B' },
+]
+function StroopTest() {
+  const [round, setRound] = useState(0)
+  const [word, setWord] = useState(STROOP_COLORS[0])
+  const [ink, setInk] = useState(STROOP_COLORS[1])
+  const [score, setScore] = useState({ correct: 0, total: 0 })
+  const [times, setTimes] = useState<number[]>([])
+  const [started, setStarted] = useState(false)
+  const startTs = useRef(0)
+
+  const nextRound = () => {
+    const w = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)]
+    const i = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)]
+    setWord(w); setInk(i); setRound((r) => r + 1)
+    startTs.current = performance.now()
+  }
+  const begin = () => { setStarted(true); setScore({ correct: 0, total: 0 }); setTimes([]); nextRound() }
+  const answer = (c: typeof STROOP_COLORS[number]) => {
+    const rt = performance.now() - startTs.current
+    setTimes((t) => [...t, rt])
+    setScore((s) => ({ correct: s.correct + (c.name === ink.name ? 1 : 0), total: s.total + 1 }))
+    if (round >= 15) { setStarted(false); return }
+    nextRound()
+  }
+  const avgMs = times.length ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0
+
+  return (
+    <Card className="!p-6 text-center">
+      <p className="text-[13px] text-neutral-500">Tap the button matching the <b>ink color</b>, not the word — measures executive function / processing speed.</p>
+      {!started && round === 0 && <button onClick={begin} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start (15 rounds)</button>}
+      {started && (
+        <>
+          <div className="mt-4 text-4xl font-black" style={{ color: ink.hex }}>{word.name}</div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {STROOP_COLORS.map((c) => <button key={c.name} onClick={() => answer(c)} className="rounded-xl py-3 text-sm font-bold text-white" style={{ background: c.hex }}>{c.name}</button>)}
+          </div>
+        </>
+      )}
+      {!started && round > 0 && (
+        <div className="mt-4 rounded-xl bg-brand/10 p-4">
+          <div className="text-2xl font-black text-brand-dark">{score.correct}/{score.total} correct</div>
+          <div className="text-[12px] text-neutral-500">Avg response: {avgMs}ms</div>
+          <button onClick={begin} className="mt-3 w-full rounded-xl bg-brand py-2 text-sm font-bold text-white">Try again</button>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function DualNBack() {
+  const [n] = useState(2)
+  const [seq, setSeq] = useState<{ pos: number; letter: string }[]>([])
+  const [running, setRunning] = useState(false)
+  const [current, setCurrent] = useState<{ pos: number; letter: string } | null>(null)
+  const [matches, setMatches] = useState({ posHits: 0, letterHits: 0, posMiss: 0, letterMiss: 0 })
+  const [answered, setAnswered] = useState({ pos: false, letter: false })
+  const LETTERS = 'CHKLQRSTW'.split('')
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const seqRef = useRef<typeof seq>([])
+
+  const start = () => {
+    setSeq([]); seqRef.current = []
+    setMatches({ posHits: 0, letterHits: 0, posMiss: 0, letterMiss: 0 })
+    setRunning(true)
+    let count = 0
+    timerRef.current = setInterval(() => {
+      const item = { pos: Math.floor(Math.random() * 9), letter: LETTERS[Math.floor(Math.random() * LETTERS.length)] }
+      seqRef.current = [...seqRef.current, item]
+      setSeq((s) => [...s, item])
+      setCurrent(item)
+      setAnswered({ pos: false, letter: false })
+      count++
+      if (count >= 20) { clearInterval(timerRef.current!); setTimeout(() => setRunning(false), 3000) }
+    }, 3000)
+  }
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current) }, [])
+
+  const markPos = () => {
+    if (answered.pos) return
+    setAnswered((a) => ({ ...a, pos: true }))
+    const i = seqRef.current.length - 1
+    const isMatch = i >= n && seqRef.current[i].pos === seqRef.current[i - n].pos
+    setMatches((m) => (isMatch ? { ...m, posHits: m.posHits + 1 } : { ...m, posMiss: m.posMiss + 1 }))
+  }
+  const markLetter = () => {
+    if (answered.letter) return
+    setAnswered((a) => ({ ...a, letter: true }))
+    const i = seqRef.current.length - 1
+    const isMatch = i >= n && seqRef.current[i].letter === seqRef.current[i - n].letter
+    setMatches((m) => (isMatch ? { ...m, letterHits: m.letterHits + 1 } : { ...m, letterMiss: m.letterMiss + 1 }))
+  }
+
+  return (
+    <Card className="!p-6 text-center">
+      <p className="text-[13px] text-neutral-500">The gold-standard working-memory trainer. Tap "Position match" or "Letter match" when the current square/letter matches the one from {n} steps back.</p>
+      {!running && seq.length === 0 && <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start 2-back (20 rounds)</button>}
+      {running && current && (
+        <>
+          <div className="mx-auto mt-4 grid w-40 grid-cols-3 gap-1">
+            {Array.from({ length: 9 }, (_, i) => (
+              <div key={i} className={`flex h-12 items-center justify-center rounded-lg text-lg font-black ${i === current.pos ? 'bg-brand text-white' : 'bg-neutral-100 dark:bg-white/10'}`}>{i === current.pos ? current.letter : ''}</div>
+            ))}
+          </div>
+          <div className="mt-4 flex gap-2">
+            <button onClick={markPos} disabled={answered.pos} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Position match</button>
+            <button onClick={markLetter} disabled={answered.letter} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Letter match</button>
+          </div>
+        </>
+      )}
+      {!running && seq.length > 0 && (
+        <div className="mt-4 rounded-xl bg-brand/10 p-4 text-left text-[13px]">
+          <div><b>Position:</b> {matches.posHits} correct, {matches.posMiss} incorrect</div>
+          <div><b>Letter:</b> {matches.letterHits} correct, {matches.letterMiss} incorrect</div>
+          <button onClick={start} className="mt-3 w-full rounded-xl bg-brand py-2 text-sm font-bold text-white">Try again</button>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+function PatternMatrix() {
+  const [size, setSize] = useState(3)
+  const [pattern, setPattern] = useState<number[]>([])
+  const [showing, setShowing] = useState(false)
+  const [input, setInput] = useState<number[]>([])
+  const [status, setStatus] = useState<'idle' | 'show' | 'input' | 'win' | 'lose'>('idle')
+
+  const start = (n: number) => {
+    setSize(n)
+    const cells = n * n
+    const count = Math.min(cells - 1, n + 1)
+    const chosen = new Set<number>()
+    while (chosen.size < count) chosen.add(Math.floor(Math.random() * cells))
+    setPattern([...chosen])
+    setInput([])
+    setStatus('show')
+    setShowing(true)
+    setTimeout(() => { setShowing(false); setStatus('input') }, 1500)
+  }
+  const click = (i: number) => {
+    if (status !== 'input') return
+    const next = [...input, i]
+    setInput(next)
+    if (!pattern.includes(i)) { setStatus('lose'); return }
+    if (next.length === pattern.length) setStatus('win')
+  }
+
+  return (
+    <Card className="!p-6 text-center">
+      <p className="text-[13px] text-neutral-500">Memorize the highlighted squares, then tap them back in any order.</p>
+      {status === 'idle' && (
+        <div className="mt-4 flex justify-center gap-2">
+          {[3, 4, 5].map((n) => <button key={n} onClick={() => start(n)} className="rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white">{n}×{n}</button>)}
+        </div>
+      )}
+      {status !== 'idle' && (
+        <div className="mx-auto mt-4 grid gap-1" style={{ gridTemplateColumns: `repeat(${size}, minmax(0,1fr))`, maxWidth: 240 }}>
+          {Array.from({ length: size * size }, (_, i) => {
+            const isPattern = pattern.includes(i)
+            const isInput = input.includes(i)
+            const highlight = (showing && isPattern) || (status === 'input' && isInput) || (status !== 'input' && !showing && isPattern)
+            return <button key={i} onClick={() => click(i)} className={`aspect-square rounded-lg transition ${highlight ? 'bg-brand' : 'bg-neutral-100 dark:bg-white/10'}`} />
+          })}
+        </div>
+      )}
+      {status === 'win' && <p className="mt-3 text-sm font-bold text-brand-dark">✓ Solved!</p>}
+      {status === 'lose' && <p className="mt-3 text-sm font-bold text-red-500">Missed one — try again</p>}
+      {(status === 'win' || status === 'lose') && <button onClick={() => setStatus('idle')} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">New pattern</button>}
+    </Card>
+  )
+}
+
 const MEDITATION_KEY = 'pmd_meditation_streak_v1'
 function MeditationStreak() {
   const [days, setDays] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(MEDITATION_KEY) || '[]') } catch { return [] } })
@@ -243,6 +417,9 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'stress', label: 'Stress Inventory' },
   { id: 'detox', label: 'Digital Detox' },
   { id: 'meditation', label: 'Meditation Streak' },
+  { id: 'stroop', label: 'Stroop Test' },
+  { id: 'nback', label: 'Dual N-Back' },
+  { id: 'pattern', label: 'Pattern Matrix' },
 ]
 
 export function MindToolkit() {
@@ -250,7 +427,7 @@ export function MindToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Cognitive Longevity Toolkit" subtitle="Seven small brain & stress tools in one place" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Cognitive Longevity Toolkit" subtitle="Ten small brain & stress tools in one place" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
@@ -265,6 +442,9 @@ export function MindToolkit() {
       {tab === 'stress' && <StressInventory />}
       {tab === 'detox' && <DigitalDetox />}
       {tab === 'meditation' && <MeditationStreak />}
+      {tab === 'stroop' && <StroopTest />}
+      {tab === 'nback' && <DualNBack />}
+      {tab === 'pattern' && <PatternMatrix />}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
         Casual brain games and self-tracking — engaging, not a clinical cognitive assessment. If you're

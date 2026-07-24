@@ -149,6 +149,12 @@ const LongevityScience = lazy(() => import('./pages/LongevityScience').then((m) 
 const SelfAssessmentToolkit = lazy(() => import('./pages/SelfAssessmentToolkit').then((m) => ({ default: m.SelfAssessmentToolkit })))
 const BodyToolkit = lazy(() => import('./pages/BodyToolkit').then((m) => ({ default: m.BodyToolkit })))
 const LongevityGameCenter = lazy(() => import('./pages/LongevityGameCenter').then((m) => ({ default: m.LongevityGameCenter })))
+const RppgHeartRate = lazy(() => import('./pages/RppgHeartRate').then((m) => ({ default: m.RppgHeartRate })))
+const VocalBiomarkers = lazy(() => import('./pages/VocalBiomarkers').then((m) => ({ default: m.VocalBiomarkers })))
+const SnpProfiler = lazy(() => import('./pages/SnpProfiler').then((m) => ({ default: m.SnpProfiler })))
+const PredictiveModelsToolkit = lazy(() => import('./pages/PredictiveModelsToolkit').then((m) => ({ default: m.PredictiveModelsToolkit })))
+const DataLabAdvanced = lazy(() => import('./pages/DataLabAdvanced').then((m) => ({ default: m.DataLabAdvanced })))
+const BioSimulators = lazy(() => import('./pages/BioSimulators').then((m) => ({ default: m.BioSimulators })))
 
 // Apply the saved appearance (theme, text size, motion) and language before first paint.
 applyAppearance()
@@ -241,6 +247,12 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/self-assessment-toolkit" element={<SelfAssessmentToolkit />} />
               <Route path="/body-toolkit" element={<BodyToolkit />} />
               <Route path="/longevity-game-center" element={<LongevityGameCenter />} />
+              <Route path="/rppg-heart-rate" element={<RppgHeartRate />} />
+              <Route path="/vocal-biomarkers" element={<VocalBiomarkers />} />
+              <Route path="/snp-profiler" element={<SnpProfiler />} />
+              <Route path="/predictive-models-toolkit" element={<PredictiveModelsToolkit />} />
+              <Route path="/data-lab-advanced" element={<DataLabAdvanced />} />
+              <Route path="/bio-simulators" element={<BioSimulators />} />
               <Route path="/risk" element={<RiskCalculators />} />
               <Route path="/air-quality" element={<AirQuality />} />
               <Route path="/data-lab" element={<DataLab />} />
