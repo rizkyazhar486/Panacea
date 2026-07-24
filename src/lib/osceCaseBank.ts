@@ -100,6 +100,8 @@ export const OSCE_CASES: OsceCase[] = [
   { system: 'Respirasi', name: 'Bronkiektasis', frequency: 'Kadang' },
   { system: 'Respirasi', name: 'Abses Paru', frequency: 'Kadang' },
   { system: 'Respirasi', name: 'Laringitis Akut / Sindroma Croup', frequency: 'Kadang' },
+  { system: 'Respirasi', name: 'Pneumotoraks (Tension/Terbuka) — needle decompression', frequency: 'Sering', note: 'Kegawatan trauma toraks — lokasi insersi needle decompression sering jadi poin penilaian' },
+  { system: 'Respirasi', name: 'Hematotoraks & Flail Chest', frequency: 'Kadang' },
 
   // Kardiovaskular
   { system: 'Kardiovaskular', name: 'Syok Anafilaktik — tindakan resusitasi', frequency: 'Sangat Sering', note: 'Adrenalin IM dosis & lokasi injeksi sering jadi poin penilaian' },
@@ -111,6 +113,7 @@ export const OSCE_CASES: OsceCase[] = [
   { system: 'Kardiovaskular', name: 'Angina Pektoris Stabil', frequency: 'Sering' },
   { system: 'Kardiovaskular', name: 'CHF / ADHF / Cor Pulmonale', frequency: 'Sering' },
   { system: 'Kardiovaskular', name: 'Cardiac Arrest — RJP/BLS/ACLS', frequency: 'Sangat Sering', note: 'Skill resusitasi jantung paru wajib lancar' },
+  { system: 'Kardiovaskular', name: 'Bradiaritmia / AV Block', frequency: 'Sering', note: 'Bedakan stabil vs tidak stabil — menentukan atropin vs pacemaker' },
 
   // GI & Hepatobilier
   { system: 'Gastrointestinal & Hepatobilier', name: 'Demam Tifoid', frequency: 'Sangat Sering' },

@@ -232,14 +232,18 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Faktor risiko: pekerjaan repetitif tangan, kehamilan, hipotiroid, DM, RA',
     ],
     pemeriksaanFisik: [
-      'Tinel sign: perkusi di atas terowongan karpal memicu parestesia ke distribusi N. medianus',
-      'Phalen test: fleksi pergelangan tangan maksimal 60 detik memicu gejala',
-      'Atrofi thenar pada kasus lanjut',
+      'Phalen test: fleksi pergelangan tangan maksimal, tunggu 60 detik — gejala muncul/memberat',
+      'Tinel sign: perkusi di atas terowongan karpal dengan posisi tangan dorsofleksi — timbul parestesia/nyeri pada distribusi N. medianus',
+      'Flick\'s sign: pasien diminta mengibas-ibaskan tangan — keluhan berkurang (mendukung CTS)',
+      'Froment\'s sign positif mengarah ke cubital tunnel syndrome (diagnosis banding N. ulnaris, bukan CTS)',
+      'Pemeriksaan lokalis thenar/hipotenar (inspeksi, palpasi, gerakan) — atrofi thenar pada kasus lanjut',
+      'DD yang perlu disingkirkan: polineuropati DM, defisiensi vitamin B12',
     ],
-    kriteriaDiagnosis: 'Gejala klinis khas + Tinel/Phalen positif, dikonfirmasi studi konduksi saraf bila tersedia.',
+    kriteriaDiagnosis: 'Gejala klinis khas + Phalen/Tinel/Flick positif; baku emas konfirmasi adalah nerve conduction study (studi konduksi saraf/EMG).',
     tatalaksana: [
-      'Konservatif: splint pergelangan tangan posisi netral terutama malam hari, modifikasi aktivitas, NSAID',
-      'Injeksi kortikosteroid lokal pada kasus sedang',
+      'Non-medikamentosa: rest, ice pack, istirahatkan pergelangan tangan, bidai/wrist splint, edukasi mengurangi aktivitas yang melibatkan kompresi wrist',
+      'Medikamentosa: gabapentin 100mg 3x1, mecobalamin 500mcg 3x1',
+      'Penunjang: darah perifer lengkap, MCV/MCHC, GDS, HbA1c (singkirkan neuropati DM sebagai penyebab); EMG/nerve conduction study sebagai baku emas',
       'Operasi release terowongan karpal bila gagal konservatif atau ada atrofi/defisit motorik',
     ],
   },
@@ -249,14 +253,18 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Faktor risiko: deformitas kaki, trauma pergelangan kaki, edema',
     ],
     pemeriksaanFisik: [
-      'Tinel sign di area maleolus medial (belakang bawah)',
-      'Sensasi telapak kaki, kekuatan otot intrinsik kaki',
+      'Look: edema, eritema, deformitas kaki',
+      'Feel: nyeri tekan di area maleolus medial dan heel bagian plantar (DD: plantar fasciitis)',
+      'Move: minta pasien dorsofleksi sendiri (bila tidak bisa, arahkan curiga peroneal palsy) dan minta berjalan — khas menumpu pada bagian belakang kaki',
+      'Tinel sign di area maleolus medial; special test tambahan: dorsiflexion & eversion test memicu gejala',
+      'Gejala diperberat pembebanan tubuh, memberat malam hari',
     ],
-    kriteriaDiagnosis: 'Gejala klinis + Tinel positif di terowongan tarsal, dikonfirmasi studi konduksi saraf bila tersedia.',
+    kriteriaDiagnosis: 'Gejala klinis (nyeri sensoris plantar akibat kompresi N. tibialis posterior di area maleolus medial) + Tinel/dorsiflexion-eversion test positif, dikonfirmasi EMG bila tersedia.',
     tatalaksana: [
-      'Konservatif: ortotik/sepatu suportif, NSAID, modifikasi aktivitas',
-      'Injeksi kortikosteroid lokal',
-      'Operasi release bila gagal konservatif',
+      'Non-medikamentosa: rest, ice pack, istirahatkan kaki bila nyeri',
+      'Medikamentosa: gabapentin 100mg 1x1 prn nyeri, mecobalamin 100mcg 3x1',
+      'Bila tidak membaik dengan konservatif: rujuk Sp.S untuk injeksi kortikosteroid',
+      'Penunjang: EMG, GDS, HbA1c',
     ],
   },
   'Neuralgia Trigeminal': {
@@ -285,11 +293,13 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Tes monofilament 10g untuk sensasi proteksi kaki (skrining kaki diabetik)',
       'Refleks tendon Achilles sering menurun/hilang',
       'Periksa kaki untuk luka/ulkus (risiko kaki diabetik akibat hilangnya sensasi protektif)',
+      'Gejala klasik gloves and stocking distribution: ekstremitas bawah lebih berat dibanding atas',
     ],
-    kriteriaDiagnosis: 'Gejala/tanda neuropati sensorik distal simetris pada pasien DM, setelah menyingkirkan penyebab neuropati lain (defisiensi B12, hipotiroid, dll).',
+    kriteriaDiagnosis: 'Gejala/tanda neuropati sensorik distal simetris (gloves and stocking) pada pasien DM (gali gejala klasik 3P, faktor pencetus riwayat DM/HT/kolesterol, riwayat konsumsi alkohol), setelah menyingkirkan penyebab neuropati lain (defisiensi B12, neuropati alkoholik, CTS).',
     tatalaksana: [
-      'Optimalisasi kontrol gula darah (mencegah progresi)',
-      'Nyeri neuropatik: gabapentin/pregabalin atau duloksetin',
+      'Non-medikamentosa: edukasi DM menyeluruh (diet, aktivitas fisik, kepatuhan obat)',
+      'Medikamentosa nyeri neuropatik: gabapentin 100mg 3x1, mecobalamin 500mcg 3x1',
+      'Kontrol gula darah: metformin 500mg 3x1 (atau sesuai regimen DM yang sudah berjalan) untuk mencegah progresi',
       'Edukasi perawatan kaki diabetik: inspeksi harian, alas kaki tertutup, hindari berjalan tanpa alas kaki',
     ],
   },
@@ -383,19 +393,24 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Rabies / Tetanus': {
     anamnesis: [
-      'Rabies: riwayat gigitan/cakaran hewan (anjing, kucing, kelelawar) tidak divaksinasi, gejala prodromal (nyeri/parestesia di lokasi gigitan), lalu hidrofobia, aerofobia, hipersalivasi, agitasi',
-      'Tetanus: riwayat luka tusuk/kotor tanpa profilaksis tetanus adekuat, trismus (rahang terkunci), kekakuan otot progresif, kejang otot dipicu rangsang ringan (risus sardonicus)',
+      'Rabies: kontak dengan binatang (anjing, kera, kucing, kelelawar) → agitasi, kejang, sulit minum tapi bisa makan makanan padat, hidrofobia, spasme faring; stadium klinis: prodromal (demam, malaise, mual, nyeri tenggorokan) → sensoris (nyeri/panas/kesemutan sekitar luka, reaksi berlebihan pada rangsang sensoris) → eksitasi (peningkatan tonus otot & aktivitas simpatis) → paralisis (paresis otot progresif)',
+      'Tetanus: riwayat terkena paku/tertusuk benda berkarat, atau (pada neonatus) persalinan tidak higienis oleh dukun tanpa ibu divaksin; gejala trismus, kejang (tonic spasm), kaku seluruh tubuh, opistotonus, hiperrefleksia, keringat berlebih, demam, sulit menelan',
     ],
     pemeriksaanFisik: [
-      'Rabies: pemeriksaan neurologis menunjukkan ensefalitis progresif, hidrofobia khas saat mencoba minum',
-      'Tetanus: trismus, kekakuan otot leher-punggung (opistotonus pada kasus berat), kesadaran tetap baik (berbeda dari ensefalitis)',
+      'Rabies: KU, TTV, GCS, head-to-toe, status lokalis luka, pemeriksaan neurologis lengkap',
+      'Tetanus: trismus (ukur jarak buka mulut), risus sardonicus, spatula test (sentuh dinding posterior faring dengan spatula lidah — bila muncul refleks spasme otot maseter, tes positif mendukung tetanus), kaku kuduk/Brudzinski 1-2-3 untuk menyingkirkan meningitis, thorax-abdomen (perut papan/board-like rigidity), status lokalis luka (vulnus punctum dengan jaringan nekrotik)',
     ],
-    kriteriaDiagnosis: 'Rabies: klinis khas + riwayat pajanan, begitu gejala muncul hampir selalu fatal. Tetanus: klinis (trismus + kekakuan + kejang otot) pada pasien dengan riwayat luka berisiko tanpa imunisasi adekuat.',
+    kriteriaDiagnosis: 'Rabies: klinis khas + riwayat pajanan; konfirmasi lab bila tersedia (antibodi pada saliva/serum/CSF pada manusia, RT-PCR isolasi virus; pada hewan — Negri bodies post-mortem, tes DFA) — begitu gejala muncul, hampir selalu fatal. Tetanus: klinis (trismus + kekakuan + kejang otot + spatula test positif) pada pasien dengan riwayat luka berisiko tanpa imunisasi adekuat; DD tetanus: meningoensefalitis; DD rabies: tetanus, meningoensefalitis.',
     tatalaksana: [
-      'Rabies: pencegahan adalah kunci — cuci luka segera dengan sabun/air mengalir 15 menit, vaksinasi rabies pasca-pajanan + imunoglobulin rabies (kategori luka III), tidak ada terapi kuratif setelah gejala muncul',
-      'Tetanus: Human Tetanus Immunoglobulin (HTIG) + toksoid tetanus + antibiotik (metronidazol) + kontrol kejang otot (diazepam/benzodiazepin) + perawatan suportif ICU pada kasus berat, plus perawatan luka adekuat',
+      'Rabies — pencegahan: cuci luka dengan air sabun 15 menit, lalu debridement dan antiseptik; isolasi pasien untuk menghindari rangsangan pemicu spasme otot',
+      'Rabies — stratifikasi risiko luka: risiko tinggi (jilatan/luka daerah mukosa, luka di atas bahu, jari tangan/kaki, genital, luka multipel) → VAR + SAR. Bila hewan kabur → langsung VAR. Bila hewan tertangkap → tunda VAR, observasi gejala hewan 10-14 hari (hewan mati → VAR; hewan tetap sehat → VAR tidak perlu)',
+      'Rabies — dosis: VAR 0,5mL IM, 4x pemberian (hari ke-0 dua kali sekaligus di lengan kiri-kanan, lalu hari ke-7, hari ke-21); SAR homolog 20 IU/kgBB dibagi 2 dosis (separuh infiltrasi di sekitar luka, separuh IM) — lakukan skin test dahulu',
+      'Tetanus: rawat inap, konsul Sp.N, pendekatan ABCDE — oksigen 2 lpm (target SpO2 >94%), pasang IV line, pasang NGT, isolasi di ruang sunyi dan gelap, debridement luka',
+      'Tetanus — cairan: IVFD D5%:RL = 1:1 per 6 jam',
+      'Tetanus — luka kotor: ATS 50.000 IU IM/IV atau HTIG 3000-6000 IU dosis tunggal IM',
+      'Tetanus — antibiotik: metronidazol 3x500mg selama 10 hari (anak: 30mg/kgBB/hari terbagi 4 dosis), kontrol kejang otot dengan diazepam/benzodiazepin',
     ],
-    tips: 'Edukasi pencegahan (protokol luka gigitan/tusukan, jadwal vaksinasi) sering jadi poin penilaian utama karena begitu gejala klinis muncul, keduanya punya prognosis buruk.',
+    tips: 'Spatula test (tetanus) dan hidrofobia (rabies) adalah tanda klinis kunci yang membedakan keduanya dari meningoensefalitis biasa — edukasi pencegahan luka gigitan/tusukan tetap poin penilaian utama karena begitu gejala klinis muncul, keduanya berprognosis buruk.',
   },
   'Ensefalopati Hipertensi': {
     anamnesis: [
@@ -497,10 +512,12 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'EKG menunjukkan irama irregularly irregular tanpa gelombang P jelas (diganti gelombang fibrilasi), frekuensi bervariasi >100x/menit.',
     tatalaksana: [
-      'Kontrol laju: beta-blocker (bisoprolol) dan/atau antihipertensi bila ada hipertensi penyerta',
+      'Nilai dulu kriteria tidak stabil: Hipotensi <90/60, penurunan Kesadaran, tanda Syok (akral dingin, CRT>2), Nyeri dada, Gagal jantung — bila ADA salah satu: kardioversi tersinkronisasi segera (AF: 120-200J; AFlutter/SVT: 50-100J)',
+      'Bila stabil dengan QRS sempit reguler: kontrol laju dengan beta-blocker (bisoprolol) dan/atau antihipertensi bila ada hipertensi penyerta',
       'Evaluasi kebutuhan antikoagulasi jangka panjang berdasarkan skor risiko stroke (CHA2DS2-VASc)',
       'Edukasi: kurangi kopi/alkohol, batasi garam-gula-minyak, aktivitas fisik teratur, segera ke dokter bila muncul kelemahan anggota gerak mendadak',
     ],
+    tips: 'Selalu skrining etiologi sebelum menegakkan AF idiopatik — singkirkan hipertiroid (tremor, penurunan BB, berkeringat) dan penyebab sekunder lain lewat anamnesis dan TSH/FT4.',
   },
   'Supraventricular Tachycardia (SVT) — vagal maneuver': {
     anamnesis: [
@@ -508,29 +525,34 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Riwayat pingsan akibat berdebar, riwayat stroke/TIA 3 bulan terakhir dan riwayat infark (kontraindikasi manuver vagal)',
     ],
     pemeriksaanFisik: [
-      'EKG: irama regular, frekuensi 150-250x/menit, gelombang P tidak tampak (tertutup gelombang T), kompleks QRS normal',
+      'EKG: irama regular, frekuensi 150-250x/menit, gelombang P tidak tampak (tertutup gelombang T), kompleks QRS normal (sempit, <0,12 detik)',
     ],
     kriteriaDiagnosis: 'Takikardia regular dengan frekuensi 150-250x/menit, QRS sempit normal, gelombang P tidak terlihat pada EKG.',
     tatalaksana: [
-      'Manuver vagal: tekan salah satu arteri karotis secara sirkular selama 5-10 menit (pastikan tidak ada kontraindikasi: riwayat infark, stroke/TIA <3 bulan, riwayat VT/VF, bruit karotis)',
-      'Bila manuver vagal gagal: rujuk untuk terapi farmakologis (adenosin IV) atau kardioversi sesuai fasilitas',
+      'Nilai dulu kriteria tidak stabil (hipotensi, penurunan kesadaran, syok, nyeri dada, gagal jantung) — bila tidak stabil: kardioversi tersinkronisasi 50-100J segera',
+      'Bila stabil: manuver vagal terlebih dulu — tekan salah satu arteri karotis secara sirkular selama 5-10 detik (periksa dulu bruit karotis dan riwayat stroke 3 bulan terakhir sebagai kontraindikasi)',
+      'Bila manuver vagal gagal: adenosin 6mg IV bolus cepat, langsung diikuti flush NaCl 0,9% 20cc (dapat diulang dengan dosis lebih tinggi bila belum berhasil sesuai protokol fasilitas)',
       'Edukasi hindari pemicu: kafein, alkohol, nikotin',
     ],
-    tips: 'Hafal kontraindikasi manuver vagal — sering ditanyakan sebelum peserta diminta melakukan tindakan ini.',
+    tips: 'Hafal kontraindikasi manuver vagal dan urutan "vagal dulu → adenosin bila gagal → kardioversi bila tidak stabil" — algoritma bertingkat ini sering jadi pola penilaian station takiaritmia.',
   },
   'Ventricular Ectopic (VES) — baca EKG': {
     anamnesis: [
-      'Berdebar dengan sensasi "jantung berhenti sejenak" atau denyut ekstra, dapat asimtomatik dan ditemukan insidental',
+      'Berdebar tidak teratur, dapat asimtomatik dan ditemukan insidental',
+      'Faktor risiko/etiologi: usia tua, dehidrasi, hipokalemia, hipertensi',
     ],
     pemeriksaanFisik: [
       'EKG: irama irregular saat muncul VES, gelombang P hilang saat VES muncul, kompleks QRS melebar (>0,12 detik) dan berbentuk aneh ("wide and bizarre") saat VES, gelombang T normal saat irama dasar',
+      'Kenali pola: bigemini (normal-VES-normal-VES berulang), trigemini (normal-normal-VES berulang), couplet (2 VES berturutan), triplet (3 VES berturutan), salvo/run (≥5 VES berturutan — dianggap kriteria "life-threatening" bila menetap)',
     ],
     kriteriaDiagnosis: 'Kompleks QRS prematur, melebar, dan bizarre tanpa didahului gelombang P pada rekaman EKG, tersisip di antara irama dasar yang normal.',
     tatalaksana: [
-      'Bila asimtomatik & jarang: observasi, identifikasi & atasi faktor pencetus (elektrolit, kafein, stres, hipertiroid)',
-      'Bila simtomatik/sering (bigemini, trigemini, VES multifokal) atau ada penyakit jantung struktural: beta-blocker, evaluasi kardiologi lebih lanjut',
-      'Edukasi kurangi kafein/alkohol, kelola stres',
+      'Cek kadar kalium — bila rendah, koreksi terlebih dulu: kalium 3,5-5,5 mEq/L (normal, tidak perlu koreksi agresif); bila rendah, KCl IV 5-10 mEq dilarutkan diberikan selama 15-20 menit, dapat diulang, atau KCl oral 20-40 mEq bila tidak ada kriteria life-threatening — monitor kalium ulang tiap 2-4 jam',
+      'Bila pola VES life-threatening (salvo/run, atau simtomatik menetap setelah koreksi elektrolit): rujuk Sp.JP, pertimbangkan pemasangan Holter monitor 1-2 hari',
+      'Terapi etiologi/kontrol jangka panjang: bisoprolol 1x5mg PO, atau diltiazem 3x30mg PO sebagai alternatif',
+      'Edukasi kurangi kafein/alkohol, kelola stres, kontrol faktor risiko (dehidrasi, hipertensi)',
     ],
+    tips: 'Koreksi kalium adalah langkah pertama sebelum menambah obat antiaritmia — banyak VES membaik begitu elektrolit dikoreksi.',
   },
   'Angina Pektoris Stabil': {
     anamnesis: [
@@ -590,5 +612,67 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Di rumah sakit, lanjutkan ke algoritma ACLS (monitor irama, defibrilasi bila shockable rhythm, obat resusitasi) begitu tim & alat tersedia',
     ],
     tips: 'Station ini murni keterampilan — verbalisasi tiap langkah (safety, call for help, cek nadi, dst.) sama pentingnya dengan tindakan fisiknya karena penguji menilai kelengkapan sekuens.',
+  },
+  'Bradiaritmia / AV Block': {
+    anamnesis: [
+      'Lemas, letih, mudah lelah saat aktivitas, pingsan, sesak napas',
+      'Riwayat penyakit jantung, serangan jantung sebelumnya, hipotiroid, konsumsi obat (beta-blocker), riwayat penyalahgunaan zat, riwayat anemia',
+      'Aktivitas/pekerjaan sebagai atlet (bradikardia fisiologis atlet perlu dibedakan dari patologis)',
+    ],
+    pemeriksaanFisik: [
+      'Tanda vital: HR <60x/menit, nilai tekanan darah',
+      'Kriteria tidak stabil: hipotensi <90/60, penurunan kesadaran, tanda syok (akral dingin, CRT>2 detik), nyeri dada, gagal jantung',
+      'JVP meningkat, edema — tanda gagal jantung penyerta',
+      'EKG: AV block derajat 1 (PR interval memanjang konstan >0,2 detik tanpa drop beat); derajat 2 Mobitz I/Wenckebach (PR memanjang progresif lalu satu QRS hilang); derajat 2 Mobitz II (PR konstan, QRS tiba-tiba hilang tanpa pemanjangan progresif); derajat 3/total (gelombang P dan QRS berjalan sendiri-sendiri, tidak berhubungan/AV disosiasi)',
+    ],
+    kriteriaDiagnosis: 'HR <60x/menit dengan gambaran EKG sesuai derajat AV block; stratifikasi stabil vs tidak stabil menentukan tatalaksana.',
+    tatalaksana: [
+      'Stabil: monitor dan observasi, rawat inap, rujuk Sp.JP untuk evaluasi pacemaker sebagai terapi definitif',
+      'Tidak stabil: sulfas atropin 1mg bolus IV, dapat diulang tiap 3-5 menit hingga maksimal 3mg — efektif terutama untuk AV block derajat 1 dan derajat 2 Mobitz I',
+      'Bila atropin tidak efektif (terutama AV block derajat 2 Mobitz II dan derajat 3): dopamine 5-20 mcg/kgBB/menit atau epinefrin 2-10 mcg/kgBB/menit, atau transcutaneous pacemaker',
+      'AV block derajat 2 Mobitz II dan derajat 3 memerlukan pacemaker definitif, bukan hanya terapi obat',
+    ],
+    tips: 'AV block Mobitz I umumnya jinak (respons baik dengan atropin), sedangkan Mobitz II dan derajat 3 berisiko progresi mendadak ke asistol — keduanya butuh pacemaker, bukan sekadar obat.',
+  },
+
+  // ─── Respirasi ─────────────────────────────────────────────────────────
+  'Pneumotoraks (Tension/Terbuka) — needle decompression': {
+    anamnesis: [
+      'Sesak napas mendadak, sering dengan riwayat trauma dada (tumpul/tembus)',
+      'Riwayat penyakit paru sebelumnya (TB, PPOK, pneumonia) sebagai faktor risiko pneumotoraks spontan',
+    ],
+    pemeriksaanFisik: [
+      'Cek JVP (meningkat pada tension pneumothorax) dan tanda syok (hipotensi, takikardia, sianosis)',
+      'Inspeksi: pengembangan dada asimetris, sisi yang sakit tertinggal',
+      'Palpasi: fremitus taktil menurun pada sisi pneumotoraks',
+      'Perkusi: hipersonor pada sisi pneumotoraks',
+      'Auskultasi: suara napas menghilang/menjauh pada sisi pneumotoraks',
+    ],
+    kriteriaDiagnosis: 'Klinis (sesak + tanda fisik asimetris di atas) pada konteks trauma dada atau faktor risiko paru sebelumnya; foto toraks menyingkirkan diagnosis banding (asma, eksaserbasi PPOK, gagal jantung, pneumonia) — pada tension pneumothorax, tatalaksana tidak boleh menunggu konfirmasi radiologis.',
+    tatalaksana: [
+      'ABCDE, suplementasi oksigen, rujuk/konsul Sp.BTKV',
+      'Tension pneumothorax: needle decompression/torakosentesis jarum 14-16G di ICS V linea midaksilaris (insersi di atas iga), selanjutnya rujuk untuk torakostomi + pemasangan WSD di ICS 4-5 antara linea midaksilaris dan aksilaris anterior',
+      'Open pneumothorax: tutup luka dengan plester 3 sisi (occlusive dressing 3 sisi); bila berkembang menjadi tension pneumothorax, lakukan needle torakosentesis segera',
+    ],
+    tips: 'Pada tension pneumothorax, needle decompression adalah tindakan life-saving yang TIDAK BOLEH menunggu hasil rontgen — diagnosis dan tatalaksana murni klinis.',
+  },
+  'Hematotoraks & Flail Chest': {
+    anamnesis: [
+      'Riwayat trauma tumpul (dengan krepitasi, gerakan napas paradoksal) atau trauma tembus yang merobek pembuluh darah toraks',
+    ],
+    pemeriksaanFisik: [
+      'Cek JVP dan tanda syok (hipotensi, takikardia, sianosis)',
+      'Inspeksi: pengembangan dada asimetris (sisi sakit tertinggal); pada flail chest — gerakan napas paradoksal (segmen patah masuk ke dalam saat inspirasi, keluar saat ekspirasi, berlawanan dari dinding dada normal)',
+      'Palpasi: fremitus taktil meningkat pada sisi hematotoraks, krepitasi bila ada flail chest',
+      'Perkusi: redup pada sisi hematotoraks',
+      'Auskultasi: suara napas menurun/menghilang pada sisi hematotoraks',
+    ],
+    kriteriaDiagnosis: 'Klinis + foto toraks menunjukkan area opak pada paru yang terkena (hematotoraks); flail chest ditegakkan dari fraktur iga tersegmen ≥3 yang menyebabkan gerakan dinding dada paradoksal.',
+    tatalaksana: [
+      'ABCDE, rujuk untuk pemasangan torakostomi + WSD di ICS 4-5 antara linea midaksilaris dan aksilaris anterior',
+      'Analgesia: ketorolak 3x30mg IV',
+      'Flail chest: fiksasi dengan balutan tetap (fixed bandage) selain analgesia',
+      'Rujuk Sp.BTKV untuk torakotomi bila: drainase awal torakostomi >1000mL (trauma tembus) atau >1500mL (trauma tumpul), ATAU drainase >200cc/jam selama 3 jam berturut-turut',
+    ],
   },
 }
