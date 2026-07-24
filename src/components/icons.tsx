@@ -326,3 +326,6 @@ export const IconGauge = ({ size = 20, className = '' }: P) => (
 export const IconActivity = ({ size = 20, className = '' }: P) => (
   <svg {...base(size, className)}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
 )
+export const IconAlertTriangle = ({ size = 20, className = '' }: P) => (
+  <svg {...base(size, className)}><path d="M12 3.5 2.5 20h19L12 3.5Z" /><path d="M12 10v4M12 17.5h.01" /></svg>
+)
