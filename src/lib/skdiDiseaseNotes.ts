@@ -54,6 +54,12 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Cardona V, Ansotegui IJ, Ebisawa M, El-Gamal Y, Fernandez Rivas M, Fineman S, et al. World Allergy Organization Anaphylaxis Guidance 2020. World Allergy Organ J. 2020;13(10):100472.',
   ACREULAR2010:
     'Aletaha D, Neogi T, Silman AJ, Funovits J, Felson DT, Bingham CO 3rd, et al. 2010 Rheumatoid Arthritis Classification Criteria: an American College of Rheumatology/European League Against Rheumatism Collaborative Initiative. Arthritis Rheum. 2010;62(9):2569-81.',
+  APLEY2018:
+    "Solomon L, Warwick D, Nayagam S. Apley & Solomon's System of Orthopaedics and Trauma. 10th ed. Boca Raton: CRC Press; 2018.",
+  CAMPBELLORTHO2021:
+    "Azar FM, Beaty JH, editors. Campbell's Operative Orthopaedics. 14th ed. Philadelphia: Elsevier; 2021.",
+  ATLS2018:
+    'American College of Surgeons Committee on Trauma. Advanced Trauma Life Support: Student Course Manual. 10th ed. Chicago: American College of Surgeons; 2018.',
   ATA2016:
     'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
 }
@@ -835,5 +841,248 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     diagnosis: ['Ulkus genital nyeri dengan dasar kotor, tepi ireguler, disertai limfadenopati inguinal nyeri (bubo) — beda dari sifilis (ulkus tidak nyeri)'],
     tatalaksana: ['Azithromycin dosis tunggal atau ceftriaxone IM dosis tunggal, skrining IMS lain dan pasangan seksual'],
     referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
+  },
+
+  // ─── Muskuloskeletal ─────────────────────────────────────────────────────
+  'Fraktur terbuka, tertutup': {
+    definisi: 'Diskontinuitas tulang; terbuka bila ada hubungan fragmen fraktur dengan dunia luar melalui luka kulit, tertutup bila kulit di atasnya utuh.',
+    diagnosis: [
+      'Riwayat trauma, nyeri, bengkak, deformitas, krepitasi, keterbatasan gerak',
+      'Fraktur terbuka diklasifikasikan Gustilo-Anderson I-III berdasarkan ukuran luka dan derajat kerusakan jaringan lunak',
+      'Wajib evaluasi status neurovaskular distal sebelum dan sesudah setiap manipulasi; rontgen dua proyeksi mencakup sendi proksimal dan distal',
+    ],
+    tatalaksana: [
+      'Fraktur terbuka adalah kegawatdaruratan: irigasi dan debridement segera, antibiotik IV dalam 1 jam, profilaksis tetanus, stabilisasi fraktur',
+      'Fraktur tertutup: analgesia, imobilisasi/pembidaian mencakup sendi atas dan bawah, reduksi dan fiksasi definitif sesuai jenis fraktur',
+      'Waspadai sindrom kompartemen (nyeri tidak proporsional, nyeri saat peregangan pasif) — fasciotomi bila terjadi',
+    ],
+    referensi: ['SKDI2012', 'APLEY2018', 'ATLS2018'],
+  },
+  'Fraktur klavikula': {
+    definisi: 'Patah tulang selangka, tersering pada sepertiga tengah, umumnya akibat jatuh pada bahu atau tangan terulur.',
+    diagnosis: ['Nyeri dan deformitas di klavikula, bahu terlihat turun, nyeri saat gerakan lengan; rontgen klavikula memastikan lokasi dan pergeseran'],
+    tatalaksana: [
+      'Sebagian besar konservatif: arm sling atau figure-of-eight bandage, analgesia, mobilisasi bertahap',
+      'Operasi (fiksasi plate) bila pergeseran berat, fraktur terbuka, kominutif, atau mengancam kulit/neurovaskular',
+    ],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Fraktur patologis': {
+    definisi: 'Fraktur pada tulang yang sudah melemah oleh proses patologis (metastasis, osteoporosis, tumor primer, infeksi), terjadi akibat trauma minimal.',
+    diagnosis: ['Fraktur dengan mekanisme trauma tidak sebanding; cari lesi litik/blastik pada rontgen, riwayat keganasan, nyeri tulang mendahului fraktur'],
+    tatalaksana: ['Stabilisasi fraktur (sering memerlukan fiksasi internal), biopsi untuk diagnosis penyebab, tatalaksana penyakit dasar (onkologi, osteoporosis), radioterapi paliatif bila metastasis'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Fraktur dan dislokasi tulang belakang': {
+    definisi: 'Cedera traumatik kolumna vertebralis, berpotensi menyebabkan cedera medula spinalis permanen.',
+    diagnosis: [
+      'Riwayat trauma energi tinggi, nyeri tulang belakang, deformitas; nilai defisit neurologis (motorik, sensorik, refleks, tonus sfingter)',
+      'Imobilisasi servikal dan spine precaution sejak prehospital; CT/MRI untuk menilai stabilitas dan kompresi medula',
+    ],
+    tatalaksana: [
+      'Imobilisasi ketat (collar, log roll saat memindahkan pasien) untuk cegah cedera sekunder',
+      'Rujuk bedah saraf/ortopedi spine — dekompresi dan stabilisasi bila fraktur tidak stabil atau ada kompresi neurologis',
+      'Tatalaksana ATLS bersamaan (cedera penyerta, syok neurogenik)',
+    ],
+    referensi: ['SKDI2012', 'ATLS2018', 'APLEY2018'],
+  },
+  'Dislokasi pada sendi ekstremitas': {
+    definisi: 'Hilangnya hubungan normal permukaan sendi akibat trauma, tersering bahu dan jari.',
+    diagnosis: ['Deformitas sendi, nyeri hebat, gerakan terkunci; wajib periksa status neurovaskular distal sebelum dan sesudah reduksi; rontgen menyingkirkan fraktur penyerta'],
+    tatalaksana: ['Reduksi tertutup segera setelah analgesia/sedasi adekuat, imobilisasi pasca reduksi, rontgen ulang konfirmasi, rehabilitasi bertahap'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Osteogenesis imperfekta': {
+    definisi: 'Kelainan genetik sintesis kolagen tipe I yang menyebabkan tulang sangat rapuh dan mudah patah.',
+    diagnosis: ['Fraktur berulang dengan trauma minimal sejak usia dini, sklera biru, gangguan pendengaran, dentinogenesis imperfecta; riwayat keluarga mendukung'],
+    tatalaksana: ['Bifosfonat untuk meningkatkan densitas tulang, fisioterapi dan rehabilitasi, fiksasi intramedular (rodding) pada deformitas berat, hindari trauma'],
+    referensi: ['SKDI2012', 'APLEY2018', 'HARRISON2022'],
+  },
+  'Ricketsia, osteomalasia': {
+    definisi: 'Gangguan mineralisasi tulang akibat defisiensi vitamin D/kalsium/fosfat — disebut rakitis bila terjadi pada anak (lempeng epifisis masih terbuka), osteomalasia pada dewasa.',
+    diagnosis: [
+      'Rakitis: deformitas tungkai (genu varum/valgum), rosary rib, pelebaran metafisis pergelangan tangan, keterlambatan pertumbuhan',
+      'Osteomalasia: nyeri tulang difus, kelemahan otot proksimal; kalsium/fosfat rendah, alkali fosfatase tinggi, 25-OH vitamin D rendah',
+    ],
+    tatalaksana: ['Suplementasi vitamin D dan kalsium sesuai derajat defisiensi, paparan sinar matahari, koreksi penyebab dasar (malabsorpsi, penyakit ginjal), koreksi bedah pada deformitas berat menetap'],
+    referensi: ['SKDI2012', 'APLEY2018', 'HARRISON2022'],
+  },
+  'Osteoporosis': {
+    definisi: 'Penurunan densitas dan kualitas mikroarsitektur tulang yang meningkatkan risiko fraktur fragilitas.',
+    diagnosis: ['Sering asimtomatik hingga terjadi fraktur (vertebra, panggul, pergelangan tangan); DXA scan dengan T-score ≤ -2,5 menegakkan diagnosis'],
+    tatalaksana: [
+      'Kalsium dan vitamin D adekuat, latihan menahan beban, berhenti merokok, batasi alkohol',
+      'Bifosfonat sebagai lini pertama farmakoterapi pada risiko tinggi/riwayat fraktur fragilitas',
+      'Pencegahan jatuh pada lansia sebagai komponen penting tatalaksana',
+    ],
+    referensi: ['SKDI2012', 'HARRISON2022', 'PAPDI2014'],
+  },
+  'Akondroplasia': {
+    definisi: 'Displasia skeletal genetik (mutasi FGFR3) penyebab tersering dwarfisme dengan pemendekan tungkai proporsi rizomelik.',
+    diagnosis: ['Perawakan pendek dengan tungkai pendek disproporsional, makrosefali, frontal bossing, lordosis lumbal; rontgen menunjukkan gambaran khas'],
+    tatalaksana: ['Tidak ada terapi kuratif; pemantauan komplikasi (stenosis foramen magnum, apnea tidur, stenosis spinal), dukungan multidisiplin, konseling genetik'],
+    referensi: ['SKDI2012', 'APLEY2018', 'HARRISON2022'],
+  },
+  'Displasia fibrosa': {
+    definisi: 'Kelainan perkembangan tulang di mana jaringan tulang normal digantikan jaringan fibrosa, dapat monostotik atau poliostotik.',
+    diagnosis: ['Nyeri tulang, deformitas, atau fraktur patologis; rontgen menunjukkan lesi "ground-glass" dengan batas sklerotik'],
+    tatalaksana: ['Observasi bila asimtomatik, bifosfonat untuk nyeri tulang, stabilisasi bedah pada fraktur/deformitas berat'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Tenosinovitis supuratif': {
+    definisi: 'Infeksi bakteri pada selubung tendon, tersering tendon fleksor jari — kegawatdaruratan bedah tangan.',
+    diagnosis: ['Empat tanda Kanavel: jari posisi fleksi ringan, bengkak fusiform seluruh jari, nyeri tekan sepanjang selubung tendon, nyeri hebat saat ekstensi pasif'],
+    tatalaksana: ['Antibiotik IV segera dan rujuk bedah untuk irigasi dan drainase selubung tendon — penundaan berisiko nekrosis tendon dan kehilangan fungsi permanen'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Tumor tulang primer, sekunder': {
+    definisi: 'Neoplasma tulang; primer berasal dari jaringan tulang itu sendiri, sekunder merupakan metastasis dari keganasan organ lain (lebih sering).',
+    diagnosis: [
+      'Nyeri tulang persisten terutama malam hari, massa teraba, fraktur patologis',
+      'Rontgen: lesi litik/blastik, reaksi periosteal; MRI untuk perluasan lokal, biopsi untuk diagnosis definitif',
+      'Metastasis tulang tersering dari kanker payudara, prostat, paru, ginjal, tiroid',
+    ],
+    tatalaksana: ['Rujuk pusat onkologi ortopedi; terapi sesuai jenis dan stadium (kemoterapi, reseksi bedah, radioterapi), stabilisasi profilaksis pada lesi berisiko fraktur'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Osteosarkoma': {
+    definisi: 'Tumor tulang ganas primer tersering pada remaja, umumnya mengenai metafisis tulang panjang sekitar lutut.',
+    diagnosis: ['Nyeri dan massa di sekitar lutut/bahu pada remaja; rontgen menunjukkan lesi destruktif dengan reaksi periosteal sunburst dan segitiga Codman; biopsi untuk konfirmasi'],
+    tatalaksana: ['Kemoterapi neoadjuvan, reseksi bedah luas dengan limb salvage bila memungkinkan, dilanjutkan kemoterapi adjuvan — rujuk pusat onkologi ortopedi'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Sarcoma Ewing': {
+    definisi: 'Tumor tulang ganas primer pada anak dan remaja, sering mengenai diafisis tulang panjang dan tulang pipih (pelvis).',
+    diagnosis: ['Nyeri tulang, massa, sering disertai demam dan penurunan BB (menyerupai infeksi); rontgen menunjukkan reaksi periosteal onion-skin; biopsi dan analisis genetik (translokasi EWSR1) konfirmatif'],
+    tatalaksana: ['Kemoterapi multiagen sebagai tulang punggung terapi, dikombinasi bedah dan/atau radioterapi lokal — rujuk pusat onkologi'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Kista ganglion': {
+    definisi: 'Kista berisi cairan mukoid yang timbul dari kapsul sendi atau selubung tendon, tersering di dorsum pergelangan tangan.',
+    diagnosis: ['Benjolan kenyal, batas tegas, tidak nyeri atau nyeri ringan, transiluminasi positif; USG bila diagnosis meragukan'],
+    tatalaksana: ['Observasi (banyak yang regresi spontan), aspirasi bila mengganggu, eksisi bedah bila rekuren atau simtomatik menetap'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Trauma sendi': {
+    definisi: 'Cedera pada struktur sendi (kapsul, ligamen, kartilago) akibat trauma, tanpa harus disertai fraktur.',
+    diagnosis: ['Nyeri, bengkak, keterbatasan gerak, efusi sendi; uji stabilitas ligamen spesifik sesuai sendi; rontgen menyingkirkan fraktur, MRI untuk cedera jaringan lunak'],
+    tatalaksana: ['RICE (rest, ice, compression, elevation) fase akut, analgesia, imobilisasi sesuai derajat, fisioterapi, rujuk ortopedi bila instabilitas berat'],
+    referensi: ['SKDI2012', 'APLEY2018', 'PPKFKTP2014'],
+  },
+  'Spondilitis, spondilodisitis': {
+    definisi: 'Infeksi tulang belakang; spondilitis mengenai korpus vertebra, spondilodisitis melibatkan diskus intervertebralis — di Indonesia sering akibat tuberkulosis (Pott disease).',
+    diagnosis: ['Nyeri punggung progresif, demam, penurunan BB, gibbus (kifosis angular) pada TB spinal; MRI modalitas terbaik, kultur/biopsi untuk patogen'],
+    tatalaksana: ['OAT jangka panjang bila TB spinal (minimal 9-12 bulan), antibiotik sesuai kultur bila piogenik, imobilisasi, dekompresi bedah bila defisit neurologis atau instabilitas'],
+    referensi: ['SKDI2012', 'APLEY2018', 'PAPDI2014'],
+  },
+  'Teratoma sakrokoksigeal': {
+    definisi: 'Tumor sel germinal kongenital di regio sakrokoksigeal, tersering pada neonatus perempuan.',
+    diagnosis: ['Massa di regio sakrokoksigeal terlihat saat lahir atau terdeteksi USG antenatal; MRI menilai perluasan intrapelvik; AFP sebagai penanda'],
+    tatalaksana: ['Eksisi bedah komplet termasuk os koksigis (mencegah rekurensi) sedini mungkin, pemantauan AFP pasca operasi untuk deteksi rekurensi'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Spondilolistesis': {
+    definisi: 'Pergeseran satu korpus vertebra terhadap vertebra di bawahnya, tersering L5 terhadap S1.',
+    diagnosis: ['Nyeri punggung bawah, dapat disertai gejala radikular; rontgen lateral (termasuk fleksi-ekstensi) menunjukkan pergeseran dan derajatnya (grading Meyerding)'],
+    tatalaksana: ['Konservatif: analgesia, fisioterapi penguatan otot inti, modifikasi aktivitas; fusi bedah bila defisit neurologis progresif atau nyeri refrakter'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Spondilolisis': {
+    definisi: 'Defek pada pars interartikularis vertebra, sering akibat stres berulang pada atlet remaja, dapat berkembang menjadi spondilolistesis.',
+    diagnosis: ['Nyeri punggung bawah memberat dengan ekstensi/hiperekstensi; rontgen oblik menunjukkan gambaran "Scottie dog with collar", CT/MRI lebih sensitif'],
+    tatalaksana: ['Istirahat dari aktivitas pencetus, fisioterapi, brace pada kasus tertentu; operasi jarang diperlukan kecuali gagal konservatif'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Lesi pada ligamentosa panggul': {
+    definisi: 'Cedera struktur ligamen sekitar sendi panggul akibat trauma atau stres berulang.',
+    diagnosis: ['Nyeri panggul/selangkangan, keterbatasan gerak, nyeri saat gerakan spesifik; MRI untuk visualisasi cedera jaringan lunak'],
+    tatalaksana: ['Istirahat, analgesia, fisioterapi bertahap; rujuk ortopedi bila nyeri menetap atau ada instabilitas'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Displasia panggul': {
+    definisi: 'Developmental dysplasia of the hip (DDH) — gangguan perkembangan asetabulum dan kaput femoris, dapat menyebabkan subluksasi/dislokasi.',
+    diagnosis: ['Skrining neonatus dengan manuver Ortolani dan Barlow, asimetri lipatan paha, keterbatasan abduksi panggul; USG panggul (<6 bulan) atau rontgen (>4-6 bulan)'],
+    tatalaksana: ['Pavlik harness pada bayi <6 bulan, reduksi tertutup/terbuka dengan spica cast bila lebih tua atau gagal harness — deteksi dini sangat menentukan hasil'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Nekrosis kaput femoris': {
+    definisi: 'Kematian jaringan tulang kaput femoris akibat gangguan suplai darah (osteonekrosis avaskular).',
+    diagnosis: ['Nyeri panggul/selangkangan progresif, keterbatasan gerak; faktor risiko: steroid jangka panjang, alkohol, penyakit sel sabit, trauma; MRI paling sensitif untuk deteksi dini'],
+    tatalaksana: ['Stadium dini: kurangi pembebanan, bifosfonat, core decompression; stadium lanjut dengan kolaps: artroplasti panggul total'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Tendinitis Achilles': {
+    definisi: 'Inflamasi/degenerasi tendon Achilles akibat overuse, sering pada pelari dan olahragawan.',
+    diagnosis: ['Nyeri dan kaku di tendon Achilles terutama saat memulai aktivitas, nyeri tekan dan penebalan tendon; Thompson test negatif (membedakan dari ruptur komplit)'],
+    tatalaksana: ['Istirahat relatif, es, NSAID, latihan eksentrik betis sebagai terapi utama; hindari injeksi steroid ke tendon (risiko ruptur)'],
+    referensi: ['SKDI2012', 'APLEY2018', 'PPKFKTP2014'],
+  },
+  'Lesi meniskus, medial, dan lateral': {
+    definisi: 'Robekan kartilago meniskus lutut, umumnya akibat gerakan memutar dengan kaki terfiksasi.',
+    diagnosis: ['Nyeri sepanjang garis sendi, locking/catching sensation, efusi lutut yang muncul bertahap; McMurray dan Thessaly test positif; MRI konfirmatif'],
+    tatalaksana: ['Konservatif (fisioterapi, analgesia) untuk robekan degeneratif/stabil; artroskopi (repair bila memungkinkan, meniskektomi parsial bila tidak) untuk robekan simtomatik dengan locking'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Instabilitas sendi tumit': {
+    definisi: 'Ketidakstabilan kronik sendi pergelangan kaki akibat kelemahan ligamen, umumnya pasca sprain berulang.',
+    diagnosis: ['Riwayat sprain berulang, rasa "giving way", nyeri kronik; anterior drawer dan talar tilt test menunjukkan laksitas berlebih'],
+    tatalaksana: ['Fisioterapi proprioseptif dan penguatan peroneus sebagai lini pertama, ankle brace saat aktivitas, rekonstruksi ligamen bila gagal konservatif'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Claw foot, drop foot': {
+    definisi: 'Deformitas kaki akibat gangguan neuromuskular; claw foot (pes cavus dengan jari mencakar), drop foot (kelemahan dorsofleksi akibat lesi N. peroneus komunis atau radiks L4-L5).',
+    diagnosis: ['Drop foot: pola jalan steppage gait, kelemahan dorsofleksi kaki, cari lesi N. peroneus (fibula proksimal) atau radikulopati; EMG/NCS melokalisasi lesi'],
+    tatalaksana: ['Ankle-foot orthosis (AFO) untuk fungsi berjalan, fisioterapi, atasi penyebab dasar (dekompresi saraf, tatalaksana radikulopati), transfer tendon pada kasus permanen'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Claw hand, drop hand': {
+    definisi: 'Deformitas tangan akibat lesi saraf perifer; claw hand (lesi N. ulnaris), drop hand/wrist drop (lesi N. radialis).',
+    diagnosis: ['Claw hand: hiperekstensi MCP dan fleksi PIP/DIP jari 4-5, Froment sign positif (lesi ulnaris); Drop hand: ketidakmampuan ekstensi pergelangan tangan dan jari (lesi radialis)'],
+    tatalaksana: ['Splinting fungsional, fisioterapi untuk cegah kontraktur, atasi penyebab (dekompresi/neurolisis, tatalaksana fraktur humerus pada lesi radialis), transfer tendon bila lesi permanen'],
+    referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
+  'Ulkus pada tungkai': {
+    definisi: 'Luka terbuka kronik pada tungkai, tersering akibat insufisiensi vena, penyakit arteri perifer, neuropati diabetik, atau kombinasi.',
+    diagnosis: [
+      'Ulkus vena: maleolus medial, tepi landai, dasar granulasi, disertai edema dan hiperpigmentasi kulit',
+      'Ulkus arterial: distal/ujung jari, tepi tegas "punched-out", dasar pucat, nyeri, nadi distal lemah',
+      'Ulkus neuropatik (diabetik): di titik tekan plantar, tidak nyeri, dikelilingi kalus; nilai ABI dan sensasi monofilamen',
+    ],
+    tatalaksana: [
+      'Perawatan luka (debridement, dressing sesuai jenis luka), kontrol infeksi',
+      'Ulkus vena: kompresi sebagai terapi utama, elevasi tungkai; Ulkus arterial: revaskularisasi, JANGAN diberi kompresi',
+      'Ulkus diabetik: offloading (mengurangi tekanan), kontrol gula darah, edukasi perawatan kaki',
+    ],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'APLEY2018'],
+  },
+  'Osteomielitis': {
+    definisi: 'Infeksi tulang dan sumsum tulang, dapat akut atau kronik, akibat penyebaran hematogen, perluasan infeksi sekitar, atau inokulasi langsung (fraktur terbuka, operasi).',
+    diagnosis: ['Nyeri tulang lokal, demam, bengkak dan kemerahan; LED/CRP meningkat, rontgen sering normal pada 2 minggu pertama, MRI paling sensitif; kultur tulang/darah untuk patogen'],
+    tatalaksana: ['Antibiotik IV jangka panjang (umumnya 4-6 minggu) disesuaikan kultur, debridement bedah pada jaringan nekrotik/sekuestrum, tatalaksana kronik sering memerlukan reseksi dan rekonstruksi'],
+    referensi: ['SKDI2012', 'APLEY2018', 'PAPDI2014'],
+  },
+  'Rhabdomiosarkoma': {
+    definisi: 'Sarkoma jaringan lunak ganas berasal dari sel prekursor otot lurik, keganasan jaringan lunak tersering pada anak.',
+    diagnosis: ['Massa jaringan lunak yang membesar cepat (kepala-leher, genitourinaria, ekstremitas); MRI untuk perluasan lokal, biopsi untuk konfirmasi histopatologi'],
+    tatalaksana: ['Terapi multimodal: kemoterapi + reseksi bedah dan/atau radioterapi sesuai lokasi dan risiko — rujuk pusat onkologi anak'],
+    referensi: ['SKDI2012', 'CAMPBELLORTHO2021', 'HARRISON2022'],
+  },
+  'Leiomioma, leiomiosarkoma, liposarkoma': {
+    definisi: 'Tumor jaringan lunak; leiomioma (jinak, otot polos), leiomiosarkoma (ganas, otot polos), liposarkoma (ganas, jaringan lemak).',
+    diagnosis: ['Massa jaringan lunak; tanda curiga keganasan: ukuran >5cm, letak dalam (subfascial), tumbuh cepat, nyeri; MRI dan biopsi untuk diagnosis definitif'],
+    tatalaksana: ['Eksisi bedah luas dengan tepi bebas tumor untuk sarkoma, radioterapi adjuvan sesuai grade dan tepi reseksi, kemoterapi pada penyakit lanjut — rujuk pusat onkologi'],
+    referensi: ['SKDI2012', 'CAMPBELLORTHO2021', 'HARRISON2022'],
+  },
+  'Lipoma': {
+    definisi: 'Tumor jinak jaringan lemak subkutan, sangat umum dan tidak berbahaya.',
+    diagnosis: ['Benjolan subkutan lunak, mobile, batas tegas, tidak nyeri, pertumbuhan sangat lambat; curigai liposarkoma bila >5cm, letak dalam, tumbuh cepat, atau nyeri'],
+    tatalaksana: ['Observasi bila asimtomatik dan gambaran khas jinak; eksisi bila mengganggu kosmetik, nyeri, membesar, atau ada keraguan diagnosis'],
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'CAMPBELLORTHO2021'],
+  },
+  'Fibromatosis, fibroma, fibrosarkoma': {
+    definisi: 'Spektrum tumor jaringan fibrosa; fibroma (jinak), fibromatosis/desmoid (agresif lokal namun tidak bermetastasis), fibrosarkoma (ganas).',
+    diagnosis: ['Massa jaringan lunak padat; fibromatosis cenderung infiltratif dan rekuren lokal; MRI dan biopsi untuk membedakan jenis dan grade'],
+    tatalaksana: ['Eksisi bedah dengan tepi adekuat, radioterapi adjuvan pada kasus tertentu; fibromatosis desmoid dapat diobservasi atau diberi terapi sistemik karena tingginya rekurensi pasca operasi'],
+    referensi: ['SKDI2012', 'CAMPBELLORTHO2021', 'HARRISON2022'],
   },
 }
