@@ -237,6 +237,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Flick\'s sign: pasien diminta mengibas-ibaskan tangan — keluhan berkurang (mendukung CTS)',
       'Froment\'s sign positif mengarah ke cubital tunnel syndrome (diagnosis banding N. ulnaris, bukan CTS)',
       'Pemeriksaan lokalis thenar/hipotenar (inspeksi, palpasi, gerakan) — atrofi thenar pada kasus lanjut',
+      'Finkelstein test (fleksi ibu jari ke telapak, genggam jari lain di atasnya, lalu deviasi ulnar pergelangan tangan) — bila positif nyeri di sisi radial pergelangan, mengarah ke de Quervain tenosynovitis, bukan CTS (diagnosis banding penting)',
       'DD yang perlu disingkirkan: polineuropati DM, defisiensi vitamin B12',
     ],
     kriteriaDiagnosis: 'Gejala klinis khas + Phalen/Tinel/Flick positif; baku emas konfirmasi adalah nerve conduction study (studi konduksi saraf/EMG).',
@@ -419,6 +420,8 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     pemeriksaanFisik: [
       'Tekanan darah sangat tinggi (biasanya >180/120 mmHg)',
+      'Teknik pengukuran TD yang benar: pasien duduk tenang 5 menit, lengan setinggi jantung, cuff manset menutup 80% lingkar lengan atas, kembangkan 20-30mmHg di atas titik hilangnya pulsasi radial, turunkan perlahan 2-3mmHg/detik — sistolik = suara Korotkoff fase I (bunyi pertama terdengar), diastolik = fase V (bunyi menghilang)',
+      'Ulangi pengukuran di kedua lengan dan konfirmasi dengan pengukuran kedua setelah beberapa menit',
       'Papiledema pada funduskopi, defisit neurologis fokal dapat muncul namun biasanya reversibel dengan kontrol tekanan darah',
       'Nilai tanda gagal organ target lain (jantung, ginjal)',
     ],
@@ -1465,7 +1468,8 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Kolesistitis: nyeri menetap disertai demam (beda dari kolik bilier sederhana yang sembuh spontan)',
     ],
     pemeriksaanFisik: [
-      'Murphy sign positif (nyeri tekan hipokondrium kanan yang menghentikan inspirasi dalam saat palpasi) — khas kolesistitis akut',
+      'Teknik Murphy sign: pemeriksa meletakkan ujung jari di titik Murphy (perpotongan tepi kosta kanan dengan garis midklavikula), minta pasien tarik napas dalam — hasil positif bila pasien menghentikan inspirasi tiba-tiba karena nyeri (bukan sekadar nyeri tekan biasa)',
+      'Murphy sign positif khas kolesistitis akut; negatif pada kolelitiasis asimtomatik/kolik bilier sederhana',
       'Nyeri tekan kuadran kanan atas, dapat teraba kandung empedu membesar',
     ],
     kriteriaDiagnosis: 'USG abdomen: batu empedu, penebalan dinding kandung empedu (>3mm), cairan perikolesistik, Murphy sign sonografi positif.',
