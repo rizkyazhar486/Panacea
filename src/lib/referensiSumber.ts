@@ -114,6 +114,16 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Katz PO, Dunbar KB, Schnoll-Sussman FH, Greer KB, Yadlapati R, Spechler SJ. ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease. Am J Gastroenterol. 2022;117(1):27-56.',
   WHOSTH2020:
     'World Health Organization. 2030 Targets for Soil-Transmitted Helminthiases Control Programmes. Geneva: World Health Organization; 2020.',
+  ACRGOUT2020:
+    'FitzGerald JD, Dalbeth N, Mikuls T, Brignardello-Petersen R, Guyatt G, Abeles AM, et al. 2020 American College of Rheumatology Guideline for the Management of Gout. Arthritis Rheumatol. 2020;72(6):879-95.',
+  CDCSTI2021:
+    'Workowski KA, Bachmann LH, Chan PA, Johnston CM, Muzny CA, Park I, et al. Sexually Transmitted Infections Treatment Guidelines, 2021. MMWR Recomm Rep. 2021;70(4):1-187.',
+  IDSASSTI2014:
+    'Stevens DL, Bisno AL, Chambers HF, Dellinger EP, Goldstein EJC, Gorbach SL, et al. Practice Guidelines for the Diagnosis and Management of Skin and Soft Tissue Infections: 2014 Update by the Infectious Diseases Society of America. Clin Infect Dis. 2014;59(2):e10-52.',
+  WHOASIAPAC2000:
+    'World Health Organization Regional Office for the Western Pacific, International Association for the Study of Obesity, International Obesity Task Force. The Asia-Pacific Perspective: Redefining Obesity and Its Treatment. Sydney: Health Communications Australia; 2000.',
+  KEMENKESOBESITAS2015:
+    'Kementerian Kesehatan Republik Indonesia. Pedoman Umum Pengendalian Obesitas. Jakarta: Direktorat Jenderal Pencegahan dan Pengendalian Penyakit, Kementerian Kesehatan RI; 2015.',
   ASCRSHEM2018:
     'Davis BR, Lee-Kong SA, Migaly J, Feingold DL, Steele SR. The American Society of Colon and Rectal Surgeons Clinical Practice Guidelines for the Management of Hemorrhoids. Dis Colon Rectum. 2018;61(3):284-92.',
 }
