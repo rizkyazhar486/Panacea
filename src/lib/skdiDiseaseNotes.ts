@@ -18,105 +18,7 @@
 //     menjadi rujukan entry tersebut.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Daftar sumber rujukan, format Vancouver. Key dipakai di field `referensi`. */
-export const REFERENSI_SUMBER: Record<string, string> = {
-  SKDI2012:
-    'Konsil Kedokteran Indonesia. Standar Kompetensi Dokter Indonesia. Jakarta: Konsil Kedokteran Indonesia; 2012.',
-  PPKFKTP2014:
-    'Kementerian Kesehatan Republik Indonesia. Panduan Praktik Klinis bagi Dokter di Fasilitas Pelayanan Kesehatan Tingkat Pertama. Jakarta: Kementerian Kesehatan RI; 2014.',
-  PAPDI2014:
-    'Setiati S, Alwi I, Sudoyo AW, Simadibrata M, Setiyohadi B, Syam AF, editors. Buku Ajar Ilmu Penyakit Dalam. 6th ed. Jakarta: InternaPublishing; 2014.',
-  HARRISON2022:
-    "Loscalzo J, Fauci AS, Kasper DL, Hauser SL, Longo DL, Jameson JL, editors. Harrison's Principles of Internal Medicine. 21st ed. New York: McGraw Hill; 2022.",
-  PERKENI2021:
-    'Perkumpulan Endokrinologi Indonesia. Pedoman Pengelolaan dan Pencegahan Diabetes Melitus Tipe 2 Dewasa di Indonesia. Jakarta: PB PERKENI; 2021.',
-  ADA2024:
-    'American Diabetes Association Professional Practice Committee. Standards of Care in Diabetes—2024. Diabetes Care. 2024;47(Suppl 1):S1-S321.',
-  WHOSAM2013:
-    'World Health Organization. Guideline: Updates on the Management of Severe Acute Malnutrition in Infants and Children. Geneva: World Health Organization; 2013.',
-  FORENSIKFKUI:
-    'Budiyanto A, Widiatmaka W, Sudiono S, Winardi T, Mun’im Idries A, Sidhi, et al. Ilmu Kedokteran Forensik. Jakarta: Bagian Kedokteran Forensik Fakultas Kedokteran Universitas Indonesia; 1997.',
-  KNIGHT2016:
-    "Saukko P, Knight B. Knight's Forensic Pathology. 4th ed. Boca Raton: CRC Press; 2016.",
-  KDIGOCKD2024:
-    'Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group. KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024;105(4S):S117-S314.',
-  KDIGOAKI2012:
-    'Kidney Disease: Improving Global Outcomes (KDIGO) Acute Kidney Injury Work Group. KDIGO Clinical Practice Guideline for Acute Kidney Injury. Kidney Int Suppl. 2012;2(1):1-138.',
-  CAMPBELL2016:
-    'Wein AJ, Kavoussi LR, Partin AW, Peters CA, editors. Campbell-Walsh Urology. 11th ed. Philadelphia: Elsevier; 2016.',
-  HOFFBRAND2019:
-    "Hoffbrand AV, Moss PAH. Hoffbrand's Essential Haematology. 8th ed. Oxford: Wiley-Blackwell; 2019.",
-  SSC2021:
-    'Evans L, Rhodes A, Alhazzani W, Antonelli M, Coopersmith CM, French C, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063-e1143.',
-  WHODENGUE2009:
-    'World Health Organization. Dengue: Guidelines for Diagnosis, Treatment, Prevention and Control. New ed. Geneva: World Health Organization; 2009.',
-  WAO2020:
-    'Cardona V, Ansotegui IJ, Ebisawa M, El-Gamal Y, Fernandez Rivas M, Fineman S, et al. World Allergy Organization Anaphylaxis Guidance 2020. World Allergy Organ J. 2020;13(10):100472.',
-  ACREULAR2010:
-    'Aletaha D, Neogi T, Silman AJ, Funovits J, Felson DT, Bingham CO 3rd, et al. 2010 Rheumatoid Arthritis Classification Criteria: an American College of Rheumatology/European League Against Rheumatism Collaborative Initiative. Arthritis Rheum. 2010;62(9):2569-81.',
-  WILLIAMSOB2022:
-    "Cunningham FG, Leveno KJ, Dashe JS, Hoffman BL, Spong CY, Casey BM, editors. Williams Obstetrics. 26th ed. New York: McGraw Hill; 2022.",
-  POGI2016:
-    'Perkumpulan Obstetri dan Ginekologi Indonesia. Pedoman Nasional Pelayanan Kedokteran: Pelayanan Kesehatan Maternal dan Neonatal. Jakarta: POGI; 2016.',
-  WHOPPH2012:
-    'World Health Organization. WHO Recommendations for the Prevention and Treatment of Postpartum Haemorrhage. Geneva: World Health Organization; 2012.',
-  KANSKI2020:
-    "Salmon JF. Kanski's Clinical Ophthalmology: A Systematic Approach. 9th ed. Edinburgh: Elsevier; 2020.",
-  CUMMINGS2021:
-    'Flint PW, Francis HW, Haughey BH, Lesperance MM, Lund VJ, Robbins KT, et al., editors. Cummings Otolaryngology: Head and Neck Surgery. 7th ed. Philadelphia: Elsevier; 2021.',
-  FITZPATRICK2019:
-    "Kang S, Amagai M, Bruckner AL, Enk AH, Margolis DJ, McMichael AJ, et al., editors. Fitzpatrick's Dermatology. 9th ed. New York: McGraw Hill; 2019.",
-  PERDOSKI2021:
-    'Perhimpunan Dokter Spesialis Kulit dan Kelamin Indonesia. Panduan Praktik Klinis bagi Dokter Spesialis Kulit dan Kelamin di Indonesia. Jakarta: PERDOSKI; 2021.',
-  WHOLEPROSY2018:
-    'World Health Organization. Guidelines for the Diagnosis, Treatment and Prevention of Leprosy. New Delhi: WHO Regional Office for South-East Asia; 2018.',
-  SLEISENGER2021:
-    "Feldman M, Friedman LS, Brandt LJ, editors. Sleisenger and Fordtran's Gastrointestinal and Liver Disease. 11th ed. Philadelphia: Elsevier; 2021.",
-  WHOHEPB2024:
-    'World Health Organization. Guidelines for the Prevention, Diagnosis, Care and Treatment for People with Chronic Hepatitis B Infection. Geneva: World Health Organization; 2024.',
-  SCHWARTZ2019:
-    "Brunicardi FC, Andersen DK, Billiar TR, Dunn DL, Kao LS, Hunter JG, et al., editors. Schwartz's Principles of Surgery. 11th ed. New York: McGraw Hill; 2019.",
-  ADAMS2019:
-    "Ropper AH, Samuels MA, Klein JP, Prasad S. Adams and Victor's Principles of Neurology. 11th ed. New York: McGraw Hill; 2019.",
-  PERDOSSI2016:
-    'Perhimpunan Dokter Spesialis Saraf Indonesia. Panduan Praktik Klinis Neurologi. Jakarta: PERDOSSI; 2016.',
-  AHASTROKE2019:
-    'Powers WJ, Rabinstein AA, Ackerson T, Adeoye OM, Bambakidis NC, Becker K, et al. Guidelines for the Early Management of Patients With Acute Ischemic Stroke: 2019 Update. Stroke. 2019;50(12):e344-418.',
-  PPDGJIII:
-    'Departemen Kesehatan Republik Indonesia, Direktorat Jenderal Pelayanan Medik. Pedoman Penggolongan dan Diagnosis Gangguan Jiwa di Indonesia III (PPDGJ-III). Jakarta: Departemen Kesehatan RI; 1993.',
-  DSM5TR2022:
-    'American Psychiatric Association. Diagnostic and Statistical Manual of Mental Disorders. 5th ed., text revision (DSM-5-TR). Washington, DC: American Psychiatric Association Publishing; 2022.',
-  KAPLAN2015:
-    "Sadock BJ, Sadock VA, Ruiz P. Kaplan & Sadock's Synopsis of Psychiatry: Behavioral Sciences/Clinical Psychiatry. 11th ed. Philadelphia: Wolters Kluwer; 2015.",
-  WHOMHGAP2016:
-    'World Health Organization. mhGAP Intervention Guide for Mental, Neurological and Substance Use Disorders in Non-Specialized Health Settings. Version 2.0. Geneva: World Health Organization; 2016.',
-  PERKIHF2020:
-    'Perhimpunan Dokter Spesialis Kardiovaskular Indonesia. Pedoman Tatalaksana Gagal Jantung. 2nd ed. Jakarta: PERKI; 2020.',
-  PERKIHT2021:
-    'Perhimpunan Dokter Spesialis Kardiovaskular Indonesia. Pedoman Tatalaksana Hipertensi pada Penyakit Kardiovaskular. 2nd ed. Jakarta: PERKI; 2021.',
-  ESCACS2023:
-    'Byrne RA, Rossello X, Coughlan JJ, Barbato E, Berry C, Chieffo A, et al. 2023 ESC Guidelines for the management of acute coronary syndromes. Eur Heart J. 2023;44(38):3720-826.',
-  BRAUNWALD2022:
-    "Libby P, Bonow RO, Mann DL, Tomaselli GF, Bhatt DL, Solomon SD, editors. Braunwald's Heart Disease: A Textbook of Cardiovascular Medicine. 12th ed. Philadelphia: Elsevier; 2022.",
-  GOLD2024:
-    'Global Initiative for Chronic Obstructive Lung Disease. Global Strategy for the Diagnosis, Management, and Prevention of Chronic Obstructive Pulmonary Disease: 2024 Report. GOLD; 2024.',
-  PNPKTB2020:
-    'Kementerian Kesehatan Republik Indonesia. Pedoman Nasional Pelayanan Kedokteran Tata Laksana Tuberkulosis. Jakarta: Kementerian Kesehatan RI; 2020.',
-  WHOTBDR2022:
-    'World Health Organization. WHO Consolidated Guidelines on Tuberculosis. Module 4: Treatment — Drug-Resistant Tuberculosis Treatment, 2022 Update. Geneva: World Health Organization; 2022.',
-  MURRAY2022:
-    "Broaddus VC, Ernst JD, King TE Jr, Lazarus SC, Sarmiento KF, Schnapp LM, et al., editors. Murray & Nadel's Textbook of Respiratory Medicine. 7th ed. Philadelphia: Elsevier; 2022.",
-  ARDSBERLIN2012:
-    'ARDS Definition Task Force; Ranieri VM, Rubenfeld GD, Thompson BT, Ferguson ND, Caldwell E, et al. Acute respiratory distress syndrome: the Berlin Definition. JAMA. 2012;307(23):2526-33.',
-  APLEY2018:
-    "Solomon L, Warwick D, Nayagam S. Apley & Solomon's System of Orthopaedics and Trauma. 10th ed. Boca Raton: CRC Press; 2018.",
-  CAMPBELLORTHO2021:
-    "Azar FM, Beaty JH, editors. Campbell's Operative Orthopaedics. 14th ed. Philadelphia: Elsevier; 2021.",
-  ATLS2018:
-    'American College of Surgeons Committee on Trauma. Advanced Trauma Life Support: Student Course Manual. 10th ed. Chicago: American College of Surgeons; 2018.',
-  ATA2016:
-    'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
-}
+export { REFERENSI_SUMBER } from './referensiSumber'
 
 /**
  * Anamnesis terstruktur. Ditulis sebagai template klinis yang dapat langsung
@@ -751,10 +653,123 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'WHOSAM2013', 'PPKFKTP2014'],
   },
   'Dislipidemia': {
-    definisi: 'Kelainan profil lipid darah (kolesterol total, LDL, HDL, trigliserida) yang meningkatkan risiko kardiovaskular.',
-    diagnosis: ['Profil lipid puasa abnormal sesuai kriteria (LDL/TG tinggi, HDL rendah)'],
-    tatalaksana: ['Modifikasi gaya hidup, statin lini pertama sesuai kategori risiko kardiovaskular'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014'],
+    definisi: 'Kelainan kadar lipid plasma berupa peningkatan kolesterol total, LDL, atau trigliserida, dan/atau penurunan HDL; merupakan faktor risiko utama aterosklerosis yang bersifat ASIMTOMATIK sehingga hanya dapat ditemukan melalui skrining, dan pengendaliannya menurunkan kejadian infark miokard serta stroke secara bermakna.',
+    anamnesis: {
+      keluhanUtama: 'Umumnya TANPA KELUHAN — ditemukan saat pemeriksaan kesehatan rutin atau saat menilai risiko setelah kejadian jantung dan stroke.',
+      riwayatPenyakitSekarang:
+        'Karena dislipidemia hampir selalu tanpa gejala, arah anamnesis bukan menggali keluhan melainkan MENILAI RISIKO KARDIOVASKULAR TOTAL dan mencari petunjuk penyebab sekunder. Bila pasien datang dengan keluhan, telusuri dengan SOCRATES gejala yang mengarah pada penyakit aterosklerotik: nyeri dada saat aktivitas yang mereda dengan istirahat (angina), sesak saat aktivitas, nyeri betis saat berjalan pada jarak tertentu yang hilang dengan istirahat (klaudikasio), serta gejala neurologis sesaat. Pada hipertrigliseridemia sangat berat dapat muncul nyeri perut hebat menembus ke punggung akibat pankreatitis. Tanyakan pula gejala penyakit penyebab sekunder: mudah lelah dan intoleransi dingin (hipotiroid), poliuria dan polidipsia (diabetes), serta bengkak dan urin berbusa (sindrom nefrotik).',
+      riwayatPenyakitDahulu:
+        'Riwayat penyakit jantung koroner, infark miokard, stroke, transient ischaemic attack, dan penyakit arteri perifer — keberadaannya menempatkan pasien langsung pada kategori risiko sangat tinggi. Tanyakan pula diabetes melitus, hipertensi, penyakit ginjal kronik, hipotiroid, sindrom nefrotik, dan penyakit hati.',
+      riwayatPenyakitKeluarga:
+        'Ini bagian yang sering terlewat namun sangat menentukan. Tanyakan riwayat PENYAKIT JANTUNG KORONER DINI pada kerabat derajat pertama — laki-laki kurang dari 55 tahun atau perempuan kurang dari 65 tahun. Tanyakan pula riwayat kematian mendadak, kolesterol sangat tinggi dalam keluarga, dan riwayat keluarga dengan xanthoma — semuanya mengarah pada HIPERKOLESTEROLEMIA FAMILIAL yang memerlukan terapi jauh lebih agresif dan penapisan anggota keluarga lain.',
+      riwayatPengobatan:
+        'Statin atau obat penurun lipid yang pernah digunakan, dosis, dan alasan berhenti bila ada — terutama riwayat NYERI OTOT yang menjadi alasan penghentian. Tanyakan pula obat yang dapat memperburuk profil lipid: kortikosteroid, diuretik tiazid dosis tinggi, beta-blocker non-selektif, kontrasepsi hormonal, antiretroviral, dan siklosporin.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat intoleransi statin sebelumnya.',
+      riwayatNutrisi:
+        'Pola makan sehari-hari secara rinci: frekuensi konsumsi gorengan dan makanan bersantan, jeroan, kulit ayam, daging berlemak, mentega dan margarin, makanan olahan, serta minuman manis; kebiasaan makan di luar rumah; asupan sayur, buah, dan ikan; serta konsumsi alkohol yang sangat berpengaruh pada kadar trigliserida.',
+      riwayatSosialEkonomi:
+        'MEROKOK beserta jumlah batang dan lamanya (faktor risiko kardiovaskular utama yang dapat dimodifikasi), aktivitas fisik harian dan olahraga terstruktur, jenis pekerjaan dan tingkat sedentari, tingkat stres, kualitas tidur, serta kemampuan finansial dan akses terhadap obat jangka panjang karena terapi bersifat menahun.',
+    },
+    pemeriksaanFisik: [
+      'Sebagian besar pasien dislipidemia memiliki pemeriksaan fisik NORMAL — temuan khas justru menandakan kadar lipid yang sangat tinggi atau bentuk familial',
+      'XANTHELASMA: plak kekuningan pada kelopak mata, terutama kantus medial',
+      'XANTHOMA TENDON: penebalan pada tendon Achilles dan tendon ekstensor jari — sangat sugestif HIPERKOLESTEROLEMIA FAMILIAL dan wajib dicari secara aktif dengan palpasi',
+      'XANTHOMA ERUPTIF: papul kekuningan berkelompok pada bokong dan ekstensor ekstremitas — menandakan hipertrigliseridemia berat dengan risiko pankreatitis',
+      'ARCUS CORNEA pada usia kurang dari 45 tahun bermakna sebagai penanda dislipidemia (pada lansia merupakan temuan penuaan biasa)',
+      'Antropometri: berat badan, tinggi badan, indeks massa tubuh, dan LINGKAR PINGGANG sebagai penanda obesitas sentral',
+      'Tekanan darah pada kedua lengan',
+      'Pemeriksaan kardiovaskular: auskultasi jantung, BRUIT pada arteri karotis dan abdomen, serta palpasi nadi perifer termasuk dorsalis pedis dan tibialis posterior',
+      'Cari tanda penyebab sekunder: pembesaran tiroid dan bradikardia (hipotiroid), edema (sindrom nefrotik), moon face dan striae ungu (Cushing), serta acanthosis nigricans (resistensi insulin)',
+    ],
+    antropometri:
+      'Hitung indeks massa tubuh dengan berat badan dalam kilogram dibagi kuadrat tinggi badan dalam meter, menggunakan kriteria Asia Pasifik: kurang dari 18,5 berat kurang; 18,5-22,9 normal; 23-24,9 berat berlebih; 25-29,9 obesitas derajat I; dan 30 atau lebih obesitas derajat II. Ukur pula LINGKAR PINGGANG pada pertengahan antara tepi bawah kosta terakhir dan krista iliaka, dengan ambang obesitas sentral lebih dari 90 cm pada laki-laki dan lebih dari 80 cm pada perempuan. Obesitas sentral berkorelasi lebih kuat dengan dislipidemia aterogenik (trigliserida tinggi dengan HDL rendah dan partikel LDL kecil padat) dibanding indeks massa tubuh saja, sehingga lingkar pinggang wajib diukur meski indeks massa tubuh tampak normal. Penurunan berat badan sebesar 5-10% saja sudah menurunkan trigliserida secara bermakna dan menaikkan HDL.',
+    penunjang: [
+      'PROFIL LIPID sebagai pemeriksaan utama: kolesterol total, LDL, HDL, dan trigliserida',
+      'Puasa 9-12 jam secara tradisional dianjurkan, namun pedoman terkini menerima pemeriksaan TANPA PUASA untuk penapisan; puasa tetap diperlukan bila trigliserida sangat tinggi atau untuk pemantauan hipertrigliseridemia',
+      'Nilai rujukan umum: kolesterol total optimal kurang dari 200 mg/dL; LDL optimal kurang dari 100 mg/dL; HDL rendah bila kurang dari 40 mg/dL pada laki-laki dan kurang dari 50 mg/dL pada perempuan; trigliserida normal kurang dari 150 mg/dL',
+      'CARI PENYEBAB SEKUNDER sebelum menyimpulkan dislipidemia primer: gula darah dan HbA1c, TSH, kreatinin dan laju filtrasi glomerulus, urinalisis untuk proteinuria, serta fungsi hati',
+      'Fungsi hati (SGOT/SGPT) sebagai data dasar sebelum memulai statin; kreatin kinase diperiksa bila ada gejala nyeri otot, bukan secara rutin',
+      'Elektrokardiogram untuk menilai iskemia diam, terutama pada pasien dengan faktor risiko banyak',
+      'Hitung SKOR RISIKO KARDIOVASKULAR TOTAL menggunakan bagan risiko yang berlaku — inilah yang menentukan target LDL dan agresivitas terapi, bukan angka kolesterol semata',
+    ],
+    etiologi:
+      'Dislipidemia PRIMER bersifat genetik, mencakup hiperkolesterolemia familial akibat mutasi reseptor LDL, dislipidemia familial kombinasi, dan hipertrigliseridemia familial. Dislipidemia SEKUNDER disebabkan diabetes melitus, hipotiroid, sindrom nefrotik, penyakit ginjal kronik, penyakit hati kolestatik, obesitas, konsumsi alkohol berlebih, serta obat seperti kortikosteroid, diuretik tiazid, dan antiretroviral.',
+    patofisiologi:
+      'LDL yang beredar dalam kadar tinggi menembus lapisan endotel arteri dan tertahan di ruang subendotel, terutama pada lokasi dengan aliran turbulen seperti percabangan pembuluh. Di sana LDL mengalami OKSIDASI, dan LDL teroksidasi bersifat sangat proinflamasi: ia memicu ekspresi molekul adhesi pada endotel sehingga monosit menempel dan bermigrasi ke dinding pembuluh, lalu berdiferensiasi menjadi makrofag. Makrofag menelan LDL teroksidasi melalui reseptor scavenger yang TIDAK memiliki umpan balik negatif, sehingga makrofag terus memakan lipid hingga penuh dan berubah menjadi SEL BUSA (foam cell) — inilah komponen utama fatty streak, lesi paling awal aterosklerosis. Proses inflamasi kronik selanjutnya merangsang migrasi sel otot polos dan pembentukan kapsul fibrosa yang menutupi inti lipid. Plak yang berbahaya bukanlah yang paling menyempitkan lumen, melainkan plak dengan KAPSUL FIBROSA TIPIS dan inti lipid besar — plak semacam ini rentan RUPTUR, dan ketika ruptur terjadi, isi plak yang sangat trombogenik terpapar ke aliran darah sehingga memicu trombosis akut yang menyumbat arteri dan menimbulkan infark miokard atau stroke. Pemahaman ini menjelaskan mengapa statin bermanfaat melebihi sekadar menurunkan angka LDL: statin juga menstabilkan plak dan menurunkan inflamasi, sehingga manfaat klinisnya muncul lebih cepat daripada perubahan anatomis plak. HDL berperan berlawanan melalui transpor kolesterol balik dari jaringan perifer ke hati. Pada resistensi insulin dan obesitas sentral terbentuk pola dislipidemia aterogenik berupa trigliserida tinggi, HDL rendah, dan partikel LDL kecil padat yang lebih mudah menembus endotel serta lebih mudah teroksidasi.',
+    faktorRisiko: [
+      'Diet tinggi lemak jenuh, lemak trans, dan karbohidrat sederhana',
+      'Obesitas terutama obesitas sentral, dan aktivitas fisik rendah',
+      'Diabetes melitus dan sindrom metabolik',
+      'Merokok — menurunkan HDL dan meningkatkan oksidasi LDL',
+      'Konsumsi alkohol berlebih (terutama meningkatkan trigliserida)',
+      'Riwayat keluarga dislipidemia dan penyakit jantung koroner dini',
+      'Usia lanjut, laki-laki, dan perempuan pascamenopause',
+      'Penyakit penyerta: hipotiroid, sindrom nefrotik, penyakit ginjal kronik, penyakit hati kolestatik',
+      'Obat: kortikosteroid, diuretik tiazid dosis tinggi, beta-blocker non-selektif, kontrasepsi hormonal, antiretroviral, siklosporin',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan berdasarkan PEMERIKSAAN PROFIL LIPID PLASMA yang abnormal, dikonfirmasi dengan pemeriksaan ulang pada waktu berbeda karena kadar lipid dapat berfluktuasi. Namun yang menentukan keputusan terapi bukan sekadar angka lipid, melainkan PENILAIAN RISIKO KARDIOVASKULAR TOTAL yang menggabungkan usia, jenis kelamin, tekanan darah, status merokok, diabetes, dan kadar lipid. Pasien dengan penyakit kardiovaskular aterosklerotik yang sudah terbukti, diabetes dengan kerusakan organ target, penyakit ginjal kronik berat, atau hiperkolesterolemia familial langsung digolongkan risiko tinggi hingga sangat tinggi tanpa perlu perhitungan skor.',
+    diagnosisBanding: [
+      'Dislipidemia sekunder akibat HIPOTIROID — periksa TSH pada setiap pasien dislipidemia baru, karena mengobati hipotiroidnya saja sering memperbaiki profil lipid',
+      'Dislipidemia sekunder akibat DIABETES MELITUS dan sindrom metabolik',
+      'SINDROM NEFROTIK — hiperkolesterolemia berat dengan edema dan proteinuria masif',
+      'Penyakit hati kolestatik dan penyakit ginjal kronik',
+      'Dislipidemia akibat obat (kortikosteroid, tiazid, antiretroviral)',
+      'HIPERKOLESTEROLEMIA FAMILIAL — LDL sangat tinggi, xanthoma tendon, riwayat keluarga penyakit jantung dini; memerlukan terapi lebih agresif dan penapisan kaskade pada keluarga',
+      'Konsumsi alkohol berlebih sebagai penyebab hipertrigliseridemia',
+    ],
+    pengkajian:
+      'Dipikirkan dislipidemia pada pasien ini atas dasar hasil profil lipid yang menunjukkan peningkatan kolesterol LDL disertai trigliserida tinggi dan HDL rendah, ditemukan pada pemeriksaan penapisan tanpa disertai keluhan, pada latar obesitas sentral, pola makan tinggi lemak jenuh, aktivitas fisik rendah, dan kebiasaan merokok. Karena dislipidemia bersifat asimtomatik, penegakan diagnosis semata dari angka laboratorium sesungguhnya belum memadai — langkah yang menentukan berikutnya adalah MENYINGKIRKAN PENYEBAB SEKUNDER sebelum menyimpulkan bentuk primer, sebab mengobati penyakit dasarnya sering memperbaiki profil lipid tanpa perlu menambah obat. Hipotiroid merupakan penyebab sekunder yang paling sering terlewat dan wajib disingkirkan dengan pemeriksaan TSH, karena hipotiroid menurunkan aktivitas reseptor LDL sehingga menimbulkan hiperkolesterolemia yang membaik dengan substitusi hormon tiroid. Diabetes melitus dan sindrom metabolik dipertimbangkan karena menghasilkan pola dislipidemia aterogenik yang khas berupa trigliserida tinggi dengan HDL rendah, sesuai gambaran pasien ini, sehingga pemeriksaan gula darah dan HbA1c menjadi keharusan. Sindrom nefrotik dipertimbangkan bila terdapat edema dan proteinuria masif, sedangkan penyakit hati kolestatik dan penyakit ginjal kronik disingkirkan melalui pemeriksaan fungsi hati dan ginjal. Hiperkolesterolemia familial wajib dicurigai bila LDL sangat tinggi, ditemukan xanthoma tendon pada palpasi tendon Achilles dan ekstensor jari, atau terdapat riwayat penyakit jantung koroner dini dalam keluarga — pengenalannya penting karena memerlukan terapi jauh lebih agresif sejak usia muda dan penapisan berjenjang terhadap anggota keluarga lain. Hal terpenting yang harus ditegaskan adalah bahwa keputusan memberikan statin TIDAK ditentukan oleh angka kolesterol semata, melainkan oleh PENILAIAN RISIKO KARDIOVASKULAR TOTAL yang menggabungkan usia, tekanan darah, status merokok, diabetes, dan kadar lipid — sebab manfaat terapi paling besar justru pada pasien dengan risiko absolut tinggi, bukan pada mereka yang angkanya tinggi namun risiko keseluruhannya rendah.',
+    terapiSuportif: [
+      'TERAPI NUTRISI MEDIS sebagai dasar pada semua pasien: batasi lemak jenuh kurang dari 7% total kalori dan hindari lemak trans sepenuhnya',
+      'Ganti lemak jenuh dengan lemak tak jenuh: minyak zaitun, minyak kanola, alpukat, dan kacang-kacangan',
+      'Tingkatkan serat larut 10-25 gram per hari dari oat, kacang-kacangan, apel, dan sayuran — terbukti menurunkan LDL',
+      'Konsumsi ikan berlemak (kembung, tongkol, salmon) dua kali seminggu sebagai sumber omega-3',
+      'Batasi kolesterol makanan, kurangi jeroan, kuning telur berlebih, kulit unggas, dan makanan bersantan kental',
+      'Pada HIPERTRIGLISERIDEMIA: batasi ketat karbohidrat sederhana, gula, dan ALKOHOL — ketiganya paling kuat menaikkan trigliserida',
+      'Target penurunan berat badan 5-10% pada pasien obesitas; penurunan sebesar ini saja sudah memperbaiki trigliserida dan HDL secara bermakna',
+    ],
+    tatalaksana: [
+      'MODIFIKASI GAYA HIDUP diberikan pada SEMUA pasien tanpa kecuali, baik yang menerima obat maupun tidak',
+      'BERHENTI MEROKOK merupakan intervensi tunggal dengan dampak terbesar terhadap risiko kardiovaskular — sering lebih besar daripada menurunkan LDL',
+      'Aktivitas fisik aerobik intensitas sedang 150-300 menit per minggu, ditambah latihan beban 2 kali per minggu',
+      'STATIN merupakan obat lini pertama karena satu-satunya kelas yang paling konsisten terbukti menurunkan kejadian kardiovaskular dan kematian',
+      'Intensitas statin disesuaikan kategori risiko: intensitas tinggi (atorvastatin 40-80 mg atau rosuvastatin 20-40 mg) pada risiko sangat tinggi; intensitas sedang (atorvastatin 10-20 mg, rosuvastatin 5-10 mg, atau simvastatin 20-40 mg) pada risiko sedang',
+      'Statin diminum pada MALAM HARI untuk jenis dengan waktu paruh pendek seperti simvastatin, karena sintesis kolesterol hati memuncak pada malam hari; atorvastatin dan rosuvastatin berwaktu paruh panjang sehingga dapat diminum kapan saja',
+      'Target LDL disesuaikan kategori risiko: umumnya kurang dari 100 mg/dL pada risiko tinggi dan kurang dari 70 mg/dL pada risiko sangat tinggi',
+      'EZETIMIBE ditambahkan bila target belum tercapai dengan statin dosis maksimal yang dapat ditoleransi',
+      'FIBRAT (fenofibrat, gemfibrozil) diindikasikan pada HIPERTRIGLISERIDEMIA BERAT lebih dari 500 mg/dL untuk mencegah PANKREATITIS — pada keadaan ini menurunkan trigliserida menjadi prioritas di atas menurunkan LDL',
+      'Hati-hati kombinasi statin dengan gemfibrozil karena meningkatkan risiko miopati; fenofibrat lebih aman untuk dikombinasikan',
+      'Pantau fungsi hati sebelum dan sekitar 8-12 minggu setelah memulai atau menaikkan dosis statin; kreatin kinase diperiksa bila timbul gejala otot, bukan rutin',
+      'Nilai ulang profil lipid 6-12 minggu setelah memulai atau mengubah terapi, lalu setiap 6-12 bulan bila sudah stabil',
+      'STATIN KONTRAINDIKASI pada KEHAMILAN dan menyusui — pastikan kontrasepsi efektif pada perempuan usia subur yang menerima statin',
+    ],
+    edukasi: [
+      'Jelaskan bahwa dislipidemia TIDAK MENIMBULKAN GEJALA namun diam-diam merusak pembuluh darah selama bertahun-tahun — inilah alasan obat tetap harus diminum meski pasien merasa sehat. Ini adalah penyebab utama ketidakpatuhan',
+      'Penjadwalan makan: makan teratur tiga kali sehari dengan dua kali selingan sehat; hindari makan besar larut malam. Statin jenis simvastatin diminum malam hari, sedangkan atorvastatin dan rosuvastatin dapat kapan saja asalkan konsisten',
+      'Porsi dan komposisi: terapkan isi piringku dengan setengah piring sayur dan buah, seperempat karbohidrat kompleks, dan seperempat protein tanpa lemak. Ganti cara masak dari GORENG menjadi rebus, kukus, panggang, atau tumis dengan sedikit minyak — perubahan cara masak sering lebih berdampak daripada mengganti jenis bahan',
+      'Batasi santan kental, jeroan, kulit ayam, dan makanan olahan; batasi kuning telur bila LDL sangat tinggi. Perbanyak ikan, tempe, tahu, kacang-kacangan, oat, dan buah berserat',
+      'Jam tidur: tidur 7-8 jam dengan jadwal teratur — kurang tidur memperburuk profil lipid dan resistensi insulin. Skrining sleep apnea bila mendengkur keras dan mengantuk pada siang hari',
+      'Pola olahraga: aktivitas aerobik intensitas sedang (jalan cepat, sepeda, berenang) 30-60 menit sebanyak 5 hari per minggu, ditambah latihan beban 2 kali per minggu. Mulai bertahap bila selama ini tidak aktif. Olahraga paling efektif menaikkan HDL dan menurunkan trigliserida',
+      'BERHENTI MEROKOK sepenuhnya, termasuk rokok elektrik; tawarkan bantuan berhenti merokok secara aktif, bukan sekadar menyarankan',
+      'Batasi alkohol; pada pasien dengan trigliserida tinggi, alkohol sebaiknya dihentikan sama sekali',
+      'Efek samping statin: laporkan bila timbul NYERI OTOT, kelemahan otot, atau urin berwarna gelap. Jelaskan bahwa sebagian besar nyeri otot ringan dapat diatasi dengan mengganti jenis atau dosis statin, sehingga JANGAN menghentikan obat sendiri tanpa berkonsultasi',
+      'Jadwal kontrol: profil lipid dan fungsi hati diperiksa ulang 6-12 minggu setelah memulai atau mengubah terapi, lalu setiap 6-12 bulan bila sudah mencapai target',
+      'SEGERA periksa bila muncul nyeri dada, sesak saat aktivitas, nyeri betis saat berjalan, kelemahan separuh tubuh, atau bicara pelo — tanda penyakit aterosklerotik yang memerlukan penanganan segera',
+      'Sarankan penapisan profil lipid pada anggota keluarga bila dicurigai hiperkolesterolemia familial',
+    ],
+    komplikasi: [
+      'Penyakit jantung koroner: angina, infark miokard, dan kematian jantung mendadak',
+      'Stroke iskemik dan transient ischaemic attack',
+      'Penyakit arteri perifer dengan klaudikasio hingga iskemia tungkai kritis',
+      'Aneurisma aorta abdominalis',
+      'PANKREATITIS AKUT pada hipertrigliseridemia berat (trigliserida lebih dari 500-1000 mg/dL)',
+      'Perlemakan hati non-alkoholik',
+      'Miopati hingga rabdomiolisis sebagai efek samping statin (jarang namun serius)',
+    ],
+    prognosis:
+      'Prognosis sangat baik bila dislipidemia dikenali dan dikendalikan sebelum terjadi kejadian kardiovaskular. Terapi statin terbukti menurunkan kejadian infark miokard, stroke, dan kematian kardiovaskular secara bermakna, dengan manfaat absolut terbesar pada pasien berisiko tinggi. Yang menentukan luaran bukan seberapa rendah angka kolesterol tercapai dalam waktu singkat, melainkan KEPATUHAN JANGKA PANJANG terhadap obat dan gaya hidup — dan di sinilah tantangan terbesarnya, karena penyakit ini tidak menimbulkan gejala sehingga banyak pasien berhenti minum obat setelah merasa sehat. Pada hiperkolesterolemia familial yang tidak diobati, kejadian kardiovaskular dapat terjadi pada usia sangat muda, sehingga pengenalan dini dan penapisan keluarga menjadi sangat menentukan.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014', 'BRAUNWALD2022', 'PERKIHT2021'],
   },
   'Porfiria': {
     definisi: 'Kelompok gangguan metabolik akibat defek enzim sintesis heme, menyebabkan akumulasi porfirin/prekursornya.',
@@ -3514,10 +3529,115 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PPKFKTP2014', 'HARRISON2022', 'FITZPATRICK2019'],
   },
   'Varisela tanpa komplikasi': {
-    definisi: 'Cacar air — infeksi primer virus varisela-zoster dengan erupsi vesikuler generalisata.',
-    diagnosis: ['Demam ringan diikuti lesi polimorfik (makula, papul, vesikel, krusta bersamaan dalam satu waktu — dewdrop on rose petal), penyebaran sentrifugal dimulai dari badan; sangat menular hingga semua lesi berkrusta'],
-    tatalaksana: ['Anak imunokompeten umumnya suportif: antipiretik (HINDARI aspirin — risiko sindrom Reye), antihistamin untuk gatal, jaga kebersihan kulit dan potong kuku; asiklovir pada remaja/dewasa, imunokompromais, atau kasus berat; isolasi dan vaksinasi sebagai pencegahan'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'FITZPATRICK2019'],
+    definisi: 'Cacar air — infeksi PRIMER virus varisela-zoster yang bermanifestasi sebagai erupsi vesikuler generalisata; sangat menular, umumnya ringan pada anak sehat namun jauh lebih berat pada remaja, dewasa, ibu hamil, dan pasien imunokompromais.',
+    anamnesis: {
+      keluhanUtama: 'Muncul bintil berair di seluruh badan sejak beberapa hari, disertai demam dan gatal.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan SOCRATES. Site: lesi dimulai dari BADAN lalu menyebar ke wajah dan ekstremitas — pola SENTRIFUGAL, kebalikan dari campak; dapat mengenai mukosa mulut, mata, dan genital. Onset: demam ringan dan lemas mendahului erupsi 1-2 hari; pada dewasa gejala prodromal lebih berat. Character: lesi terasa GATAL, berkembang cepat dari makula menjadi papul, vesikel jernih di atas dasar kemerahan (gambaran embun di atas kelopak mawar), lalu keruh dan menjadi krusta. Radiation: penyebaran dari sentral ke perifer dalam beberapa hari. Associations: demam, lemas, nyeri kepala, nafsu makan turun; tanyakan nyeri menelan bila ada lesi mukosa mulut. Time course: yang KHAS adalah munculnya lesi dalam beberapa gelombang sehingga pada satu waktu terlihat BERBAGAI STADIUM BERSAMAAN (makula, papul, vesikel, dan krusta) — ini pembeda paling penting dari variola. Exacerbating: garukan memperberat dan memicu infeksi sekunder serta jaringan parut. Severity: nilai apakah masih mau makan-minum, ada sesak, atau tampak sangat lemas.',
+      riwayatPenyakitDahulu:
+        'Riwayat cacar air sebelumnya (infeksi alami memberi kekebalan seumur hidup), riwayat herpes zoster, penyakit kulit kronik seperti dermatitis atopik yang memperberat, serta imunodefisiensi termasuk HIV, keganasan, dan penggunaan kortikosteroid atau imunosupresan.',
+      riwayatPenyakitKeluarga: 'Adakah anggota keluarga, teman sekolah, atau kontak yang mengalami cacar air atau herpes zoster dalam 2-3 minggu terakhir; tanyakan pula adakah bayi, ibu hamil, atau orang dengan daya tahan tubuh rendah di rumah yang perlu dilindungi.',
+      riwayatPengobatan:
+        'Obat yang sudah diberikan — tanyakan secara SPESIFIK apakah diberi ASPIRIN atau obat mengandung salisilat, karena berisiko sindrom Reye; tanyakan pula penggunaan kortikosteroid yang memperberat perjalanan penyakit, serta bedak atau ramuan yang dioleskan.',
+      riwayatAlergi: 'Riwayat alergi obat, termasuk riwayat reaksi terhadap vaksin sebelumnya.',
+      riwayatKehamilanPersalinan:
+        'Pada perempuan usia subur WAJIB ditanyakan status kehamilan dan usia kehamilan — varisela pada kehamilan berisiko sindrom varisela kongenital bila terjadi sebelum 20 minggu, dan varisela neonatal berat bila ibu terinfeksi 5 hari sebelum hingga 2 hari setelah persalinan.',
+      riwayatImunisasi: 'Status vaksinasi varisela; vaksin tidak termasuk program imunisasi dasar nasional sehingga banyak yang belum menerima.',
+      riwayatSosialEkonomi: 'Kepadatan hunian, riwayat kontak di sekolah, asrama, atau tempat penitipan anak, serta adanya anggota rumah tangga berisiko tinggi yang memerlukan profilaksis.',
+    },
+    pemeriksaanFisik: [
+      'Keadaan umum dan tanda bahaya: sesak napas, letargi, kaku kuduk, ataksia, atau kejang yang menandakan komplikasi',
+      'Suhu tubuh — demam umumnya ringan sampai sedang pada anak, lebih tinggi pada dewasa',
+      'LESI POLIMORFIK: makula, papul, vesikel jernih, vesikel keruh, dan krusta ditemukan BERSAMAAN dalam satu area — temuan kunci diagnosis',
+      'Vesikel superfisial berdinding tipis di atas dasar eritematosa (dewdrop on a rose petal)',
+      'Distribusi SENTRIFUGAL: lebih padat di badan dan wajah, lebih jarang di ekstremitas distal — kebalikan dari variola yang sentripetal',
+      'Periksa MUKOSA mulut, faring, konjungtiva, dan genital untuk lesi enantem',
+      'Cari tanda INFEKSI SEKUNDER: pustul, krusta kekuningan seperti madu, selulitis, eritema meluas, dan nyeri tekan berlebihan — komplikasi tersering pada anak',
+      'Auskultasi paru untuk mencari pneumonia varisela, terutama pada dewasa, perokok, dan ibu hamil',
+      'Pemeriksaan neurologis: ataksia serebelar merupakan komplikasi neurologis tersering pada anak',
+    ],
+    penunjang: [
+      'Diagnosis pada kasus khas ditegakkan secara KLINIS — pemeriksaan penunjang tidak diperlukan rutin',
+      'Tzanck smear dari dasar vesikel menunjukkan sel datia berinti banyak (multinucleated giant cells); tidak membedakan varisela dari herpes simpleks',
+      'PCR dari cairan vesikel merupakan pemeriksaan paling sensitif dan spesifik bila diperlukan konfirmasi',
+      'Serologi IgM dan IgG varisela-zoster untuk menilai status imunitas, terutama pada ibu hamil yang terpapar dan tidak yakin pernah sakit',
+      'Darah lengkap bila dicurigai infeksi sekunder bakteri; foto toraks bila ada gejala pernapasan',
+      'Fungsi hati dan pemeriksaan lain sesuai komplikasi yang dicurigai',
+    ],
+    etiologi: 'Virus varisela-zoster (human herpesvirus 3), suatu DNA virus dari famili Herpesviridae dengan manusia sebagai satu-satunya reservoir.',
+    patofisiologi:
+      'Virus masuk melalui droplet saluran napas atau kontak langsung dengan cairan vesikel, lalu bereplikasi di mukosa saluran napas atas dan jaringan limfoid regional. Viremia primer menyebarkan virus ke sistem retikuloendotelial, dan setelah replikasi lebih lanjut terjadi viremia sekunder yang membawa virus ke kulit dan mukosa sehingga muncul erupsi. Karena virus mencapai kulit dalam beberapa gelombang viremia, lesi timbul secara bertahap — inilah dasar mengapa pada satu waktu terlihat berbagai stadium lesi bersamaan, berbeda dari variola yang lesinya seragam karena muncul serentak. Sifat paling penting dari virus ini adalah kemampuannya menetap dalam keadaan LATEN di ganglion radiks dorsalis dan ganglion saraf kranial setelah infeksi primer sembuh; puluhan tahun kemudian, ketika imunitas selular menurun akibat penuaan, stres, atau imunosupresi, virus dapat REAKTIVASI dan menjalar sepanjang saraf sensorik menuju dermatom yang dipersarafinya, menimbulkan HERPES ZOSTER. Karena itu varisela dan herpes zoster merupakan dua manifestasi dari virus yang sama, dan seseorang yang belum pernah menderita varisela dapat tertular varisela dari pasien herpes zoster melalui kontak dengan cairan vesikelnya. Masa penularan berlangsung sejak 1-2 hari sebelum erupsi hingga SELURUH lesi berkrusta.',
+    faktorRisiko: [
+      'Belum pernah menderita varisela dan belum divaksinasi',
+      'Kontak erat dengan penderita varisela atau herpes zoster',
+      'Usia remaja dan dewasa — perjalanan penyakit lebih berat daripada anak',
+      'Kehamilan',
+      'Imunokompromais: HIV, keganasan, kortikosteroid, kemoterapi, pascatransplantasi',
+      'Dermatitis atopik dan penyakit kulit luas',
+      'Neonatus dari ibu yang terinfeksi menjelang persalinan',
+      'Lingkungan padat: sekolah, asrama, tempat penitipan anak',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara KLINIS berdasarkan erupsi vesikuler generalisata yang gatal dengan lesi dalam BERBAGAI STADIUM bersamaan dan distribusi sentrifugal, disertai riwayat kontak. Bila konfirmasi diperlukan, baku emas adalah PCR dari cairan vesikel; kultur virus juga dapat dilakukan namun kurang sensitif dan lebih lambat.',
+    diagnosisBanding: [
+      'Herpes zoster — lesi vesikel berkelompok UNILATERAL terbatas pada satu dermatom dan tidak menyeberang garis tengah, didahului nyeri',
+      'Impetigo bulosa — lesi bula dan krusta madu terlokalisasi, tidak generalisata, tanpa demam bermakna',
+      'Insect bite dan prurigo — papul gatal tanpa vesikel sejati, distribusi pada area terpapar',
+      'Hand-foot-mouth disease — vesikel pada telapak tangan, telapak kaki, dan mulut dengan distribusi khas, umumnya tanpa lesi badan yang luas',
+      'Skabies berkrusta — gatal hebat dengan terowongan, riwayat penularan serumah, tanpa vesikel berstadium',
+      'Erupsi obat vesikobulosa dan Stevens-Johnson syndrome — riwayat obat, nyeri kulit menonjol, keterlibatan mukosa berat, tanda Nikolsky positif',
+      'Variola (cacar) — secara historis dibedakan oleh lesi yang SERAGAM dalam satu stadium dan distribusi SENTRIPETAL; penyakit ini telah dieradikasi',
+    ],
+    pengkajian:
+      'Dipikirkan varisela tanpa komplikasi pada pasien ini atas dasar erupsi vesikuler generalisata yang gatal, didahului demam ringan dan lemas, dengan lesi yang tersebar mulai dari badan lalu meluas ke wajah dan ekstremitas secara sentrifugal, pada latar riwayat kontak dengan penderita serupa dan belum pernah menderita cacar air maupun divaksinasi. Temuan yang paling menentukan diagnosis adalah adanya lesi dalam BERBAGAI STADIUM SECARA BERSAMAAN dalam satu area kulit — makula, papul, vesikel jernih, vesikel keruh, dan krusta terlihat berdampingan — yang merupakan konsekuensi langsung dari viremia bergelombang, dan inilah pembeda klasik dari variola yang lesinya seragam dalam satu stadium dengan distribusi sentripetal. Herpes zoster dipertimbangkan karena disebabkan virus yang sama, namun pada zoster lesi terbatas pada SATU DERMATOM secara unilateral, tidak menyeberang garis tengah, dan hampir selalu didahului nyeri atau rasa terbakar; sedangkan pada pasien ini lesi generalisata dan menyebar. Impetigo bulosa dapat menyerupai pada fase krusta, namun lesinya terlokalisasi dengan krusta berwarna madu tanpa perjalanan bergelombang dan tanpa gejala sistemik yang jelas. Hand-foot-mouth disease dibedakan melalui distribusi khas pada telapak tangan, telapak kaki, dan mulut. Erupsi obat berat serta sindrom Stevens-Johnson wajib dipertimbangkan bila nyeri kulit lebih menonjol daripada gatal, terdapat keterlibatan dua permukaan mukosa atau lebih, dan tanda Nikolsky positif — hal yang tidak dijumpai di sini. Yang perlu ditegaskan dalam pengkajian ini adalah bahwa penetapan sebagai varisela TANPA komplikasi mensyaratkan tidak adanya sesak napas, ataksia, kaku kuduk, penurunan kesadaran, maupun tanda infeksi sekunder yang meluas, serta pasien bukan termasuk kelompok berisiko tinggi seperti remaja, dewasa, ibu hamil, neonatus, atau imunokompromais — sebab pada kelompok tersebut penyakit ini jauh dari ringan dan memerlukan antivirus serta pemantauan lebih ketat.',
+    terapiSuportif: [
+      'Pertahankan hidrasi dan asupan kalori; berikan makanan lunak bila terdapat lesi mukosa mulut yang nyeri',
+      'Parasetamol 10-15 mg/kgBB per kali untuk demam dan nyeri',
+      'HINDARI MUTLAK aspirin dan salisilat pada anak dan remaja karena risiko SINDROM REYE — ini kesalahan yang berakibat fatal',
+      'Obat antiinflamasi nonsteroid sebaiknya juga dihindari karena dikaitkan dengan peningkatan risiko infeksi jaringan lunak berat',
+      'Antihistamin oral untuk mengendalikan gatal, terutama sediaan sedatif pada malam hari agar anak dapat tidur dan tidak menggaruk',
+      'Losion calamine topikal untuk meredakan gatal; hindari sediaan yang mengandung antihistamin topikal karena berisiko sensitisasi',
+      'MANDI SEPERTI BIASA dengan air suam-suam kuku dan sabun lembut — menjaga kebersihan kulit justru menurunkan risiko infeksi sekunder; larangan mandi merupakan mitos yang memperburuk',
+      'Potong kuku pendek dan jaga kebersihan tangan; pada bayi dapat digunakan sarung tangan katun untuk mencegah garukan',
+    ],
+    tatalaksana: [
+      'ANAK SEHAT IMUNOKOMPETEN umumnya cukup terapi suportif — antivirus tidak rutin diberikan karena penyakit bersifat swasirna dan manfaatnya kecil bila dimulai terlambat',
+      'ASIKLOVIR ORAL diindikasikan bila diberikan dalam 24 JAM PERTAMA sejak erupsi muncul pada kelompok berisiko: usia lebih dari 12 tahun, penyakit kulit atau paru kronik, terapi salisilat jangka panjang, terapi kortikosteroid, dan kasus sekunder dalam rumah tangga yang biasanya lebih berat',
+      'Dosis asiklovir oral anak 20 mg/kgBB per kali diberikan 4 kali sehari selama 5 hari (maksimal 800 mg per kali); dewasa 800 mg lima kali sehari selama 7 hari',
+      'ASIKLOVIR INTRAVENA pada varisela berat, pneumonia varisela, ensefalitis, neonatus, dan pasien imunokompromais — 10 mg/kgBB setiap 8 jam',
+      'Antibiotik hanya bila terbukti INFEKSI SEKUNDER bakteri; pilih yang mencakup Staphylococcus aureus dan Streptococcus pyogenes',
+      'ISOLASI hingga SELURUH lesi berkrusta (umumnya sekitar 5-7 hari sejak erupsi); pada perawatan di rumah sakit gunakan kewaspadaan AIRBORNE dan KONTAK',
+      'PROFILAKSIS PASCAPAJANAN: vaksin varisela dalam 3-5 hari setelah paparan pada kontak rentan yang tidak memiliki kontraindikasi',
+      'IMUNOGLOBULIN VARISELA-ZOSTER (VZIG) untuk kontak rentan berisiko tinggi yang tidak boleh menerima vaksin hidup: ibu hamil, neonatus dari ibu yang terinfeksi 5 hari sebelum hingga 2 hari setelah melahirkan, bayi prematur, dan pasien imunokompromais',
+      'PENCEGAHAN: vaksin varisela hidup dilemahkan, dua dosis; KONTRAINDIKASI pada kehamilan dan imunodefisiensi berat',
+    ],
+    edukasi: [
+      'LURUSKAN MITOS: pasien varisela TETAP BOLEH DAN DIANJURKAN MANDI. Larangan mandi justru meningkatkan risiko infeksi kulit sekunder. Tidak ada pula pantangan makanan tertentu — gizi yang baik membantu pemulihan',
+      'JANGAN memberikan aspirin atau obat penurun panas yang mengandung salisilat kepada anak — risiko sindrom Reye yang dapat berakibat fatal. Gunakan parasetamol',
+      'Jelaskan bahwa menggaruk menyebabkan infeksi dan JARINGAN PARUT MENETAP; potong kuku pendek dan alihkan perhatian anak',
+      'Penjadwalan dan porsi makan: berikan makanan lunak porsi kecil namun sering bila ada sariawan di mulut; hindari makanan asam, pedas, dan terlalu panas. Perbanyak cairan',
+      'Jam tidur: istirahat cukup; antihistamin sedatif malam hari membantu tidur bila gatal mengganggu',
+      'Aktivitas dan olahraga dibatasi selama fase demam, lalu ditingkatkan bertahap; anak boleh kembali bersekolah setelah SELURUH lesi berkrusta, bukan setelah demam turun',
+      'ISOLASI di rumah: jauhkan dari BAYI, IBU HAMIL yang belum pernah cacar air, dan orang dengan daya tahan tubuh rendah — pada kelompok ini varisela dapat berakibat sangat berat',
+      'TANDA BAHAYA yang mengharuskan segera kembali: sesak napas atau napas cepat, demam tinggi yang menetap atau muncul kembali setelah sempat turun, lesi yang menjadi bernanah dengan kemerahan meluas dan sangat nyeri, kejang, jalan sempoyongan atau tidak seimbang, kaku kuduk, muntah terus-menerus, penurunan kesadaran, dan tidak mau minum',
+      'Kontrol dalam 2-3 hari atau lebih cepat bila muncul tanda bahaya',
+      'PENCEGAHAN: vaksin varisela tersedia dan efektif; sarankan terutama untuk anak yang belum pernah sakit, remaja, dan dewasa rentan. Jelaskan bahwa setelah sembuh virus tetap tidur di saraf dan dapat muncul kembali sebagai herpes zoster di kemudian hari',
+    ],
+    komplikasi: [
+      'INFEKSI SEKUNDER BAKTERI pada kulit — komplikasi tersering pada anak, mulai dari impetigo hingga selulitis, fasciitis nekrotikans, dan sepsis',
+      'PNEUMONIA VARISELA — komplikasi tersering dan paling berat pada DEWASA, ibu hamil, dan perokok',
+      'Ataksia serebelar akut — komplikasi neurologis tersering pada anak, umumnya sembuh sempurna',
+      'Ensefalitis, meningitis, dan mielitis transversa',
+      'Sindrom Reye bila diberikan aspirin',
+      'Hepatitis, trombositopenia, dan glomerulonefritis',
+      'SINDROM VARISELA KONGENITAL bila ibu terinfeksi sebelum 20 minggu: hipoplasia ekstremitas, jaringan parut kulit, kelainan mata dan otak',
+      'VARISELA NEONATAL berat dengan mortalitas tinggi bila ibu terinfeksi 5 hari sebelum hingga 2 hari setelah persalinan',
+      'Jaringan parut permanen akibat garukan dan infeksi sekunder',
+      'Reaktivasi di kemudian hari sebagai herpes zoster',
+    ],
+    prognosis:
+      'Sangat baik pada anak sehat imunokompeten — penyakit bersifat swasirna dalam 7-10 hari dan memberi kekebalan seumur hidup terhadap infeksi primer. Namun prognosis memburuk secara nyata pada remaja dan dewasa yang berisiko pneumonia varisela, pada ibu hamil, neonatus, dan pasien imunokompromais yang dapat mengalami varisela diseminata dengan mortalitas bermakna. Perlu ditekankan bahwa kesembuhan bukan berarti virus hilang: virus menetap laten di ganglion saraf dan dapat reaktivasi sebagai herpes zoster puluhan tahun kemudian, terutama saat imunitas selular menurun. Vaksinasi merupakan cara paling efektif mencegah penyakit maupun komplikasinya.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'FITZPATRICK2019', 'HARRISON2022'],
   },
   'Herpes simpleks tanpa komplikasi': {
     definisi: 'Infeksi virus herpes simpleks tipe 1 (umumnya orolabial) atau tipe 2 (umumnya genital) dengan kecenderungan rekuren.',

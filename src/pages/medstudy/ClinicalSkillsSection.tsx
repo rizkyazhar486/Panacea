@@ -3,7 +3,7 @@ import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconStethoscope } from '../../components/icons'
 import { SkillDiagram } from '../../components/SkillDiagrams'
 import { CLINICAL_SKILLS, SKILL_CATEGORIES, type SkillCategory } from '../../lib/clinicalSkills'
-import { REFERENSI_SUMBER } from '../../lib/skdiDiseaseNotes'
+import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
 
 export default function ClinicalSkillsSection() {
   const [query, setQuery] = useState('')
