@@ -102,4 +102,18 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'American College of Surgeons Committee on Trauma. Advanced Trauma Life Support: Student Course Manual. 10th ed. Chicago: American College of Surgeons; 2018.',
   ATA2016:
     'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
+  ICHD3:
+    'Headache Classification Committee of the International Headache Society (IHS). The International Classification of Headache Disorders, 3rd edition. Cephalalgia. 2018;38(1):1-211.',
+  AAOBPPV2017:
+    'Bhattacharyya N, Gubbels SP, Schwartz SR, Edlow JA, El-Kashlan H, Fife T, et al. Clinical Practice Guideline: Benign Paroxysmal Positional Vertigo (Update). Otolaryngol Head Neck Surg. 2017;156(3 Suppl):S1-S47.',
+  AAOBELL2013:
+    "Baugh RF, Basura GJ, Ishii LE, Schwartz SR, Drumheller CM, Burkholder R, et al. Clinical practice guideline: Bell's palsy. Otolaryngol Head Neck Surg. 2013;149(3 Suppl):S1-27.",
+  IDSAFLU2018:
+    'Uyeki TM, Bernstein HH, Bradley JS, Englund JA, File TM Jr, Fry AM, et al. Clinical Practice Guidelines by the Infectious Diseases Society of America: 2018 Update on Diagnosis, Treatment, Chemoprophylaxis, and Institutional Outbreak Management of Seasonal Influenza. Clin Infect Dis. 2019;68(6):e1-e47.',
+  ACGGERD2022:
+    'Katz PO, Dunbar KB, Schnoll-Sussman FH, Greer KB, Yadlapati R, Spechler SJ. ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease. Am J Gastroenterol. 2022;117(1):27-56.',
+  WHOSTH2020:
+    'World Health Organization. 2030 Targets for Soil-Transmitted Helminthiases Control Programmes. Geneva: World Health Organization; 2020.',
+  ASCRSHEM2018:
+    'Davis BR, Lee-Kong SA, Migaly J, Feingold DL, Steele SR. The American Society of Colon and Rectal Surgeons Clinical Practice Guidelines for the Management of Hemorrhoids. Dis Colon Rectum. 2018;61(3):284-92.',
 }
