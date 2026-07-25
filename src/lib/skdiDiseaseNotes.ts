@@ -118,12 +118,60 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
 }
 
+/**
+ * Anamnesis terstruktur. Ditulis sebagai template klinis yang dapat langsung
+ * dipakai saat menghadapi pasien dengan diagnosis ini — bukan riwayat satu
+ * pasien tertentu.
+ */
+export interface AnamnesisTerstruktur {
+  keluhanUtama: string
+  /** RPS diuraikan dengan kerangka SOCRATES. */
+  riwayatPenyakitSekarang: string
+  riwayatPenyakitDahulu?: string
+  riwayatPenyakitKeluarga?: string
+  riwayatPengobatan?: string
+  riwayatAlergi?: string
+  riwayatKehamilanPersalinan?: string
+  riwayatTumbuhKembang?: string
+  riwayatNutrisi?: string
+  riwayatImunisasi?: string
+  riwayatSosialEkonomi?: string
+}
+
 export interface SkdiDiseaseNote {
   definisi: string
   diagnosis: string[]
   tatalaksana: string[]
   /** Key ke REFERENSI_SUMBER — pedoman yang menjadi rujukan konsep entry ini. */
   referensi: string[]
+
+  // ── Pendalaman klinis (opsional; diisi bertahap, diprioritaskan level 4A) ──
+  /** Anamnesis terstruktur lengkap dengan kerangka SOCRATES pada RPS. */
+  anamnesis?: AnamnesisTerstruktur
+  /** Temuan pemeriksaan fisik yang khas untuk diagnosis ini. */
+  pemeriksaanFisik?: string[]
+  /** Interpretasi antropometri (BB/U, TB/U, BB/TB, IMT) bila relevan. */
+  antropometri?: string
+  /** Pemeriksaan penunjang beserta interpretasi temuan yang diharapkan. */
+  penunjang?: string[]
+  etiologi?: string
+  patofisiologi?: string
+  faktorRisiko?: string[]
+  /** Baku emas penegakan diagnosis. */
+  goldStandard?: string
+  diagnosisBanding?: string[]
+  /**
+   * Paragraf pengkajian yang diawali "Dipikirkan …" — menjelaskan alur
+   * penalaran dari anamnesis, pemeriksaan fisik, dan penunjang menuju
+   * diagnosis, dibandingkan terhadap diagnosis bandingnya.
+   */
+  pengkajian?: string
+  /** Terapi suportif: resusitasi, balans cairan, kebutuhan kalori, urine output. */
+  terapiSuportif?: string[]
+  /** Edukasi: pola makan, tidur, olahraga, dan jadwal kontrol. */
+  edukasi?: string[]
+  komplikasi?: string[]
+  prognosis?: string
 }
 
 export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
@@ -323,16 +371,105 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Diabetes melitus tipe 2': {
-    definisi: 'DM akibat resistensi insulin dengan defisiensi insulin relatif, terkait obesitas dan gaya hidup, onset biasanya usia dewasa.',
+    definisi: 'DM akibat resistensi insulin pada jaringan perifer disertai defisiensi insulin relatif akibat disfungsi sel beta pankreas yang progresif; erat kaitannya dengan obesitas sentral dan gaya hidup, onset umumnya usia dewasa.',
+    anamnesis: {
+      keluhanUtama: 'Sering buang air kecil, banyak minum, dan banyak makan disertai penurunan berat badan tanpa sebab jelas — atau tanpa keluhan sama sekali dan ditemukan saat pemeriksaan gula darah rutin.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan non-nyeri. Site: keluhan bersifat sistemik, bukan terlokalisasi pada satu organ. Onset: umumnya perlahan dalam hitungan bulan hingga tahun, berbeda dari DM tipe 1 yang mendadak. Character: poliuria terutama malam hari sehingga terbangun berkali-kali, polidipsia yang tidak hilang meski banyak minum, polifagia namun berat badan justru turun. Radiation: gali keluhan penyerta yang menandakan komplikasi — kesemutan dan baal simetris pada kedua kaki (neuropati), pandangan kabur atau berbayang (retinopati), luka yang lama sembuh, gatal pada kemaluan atau keputihan berulang (kandidiasis), serta disfungsi ereksi. Associations: lemas, mudah lelah, penurunan berat badan yang dikuantifikasi dalam kilogram per periode waktu. Time course: apakah keluhan menetap, memberat, atau berfluktuasi mengikuti pola makan. Exacerbating/relieving: hubungan keluhan dengan asupan karbohidrat, kepatuhan obat, aktivitas fisik, dan stres atau infeksi penyerta. Severity: dampak terhadap pekerjaan, kualitas tidur, dan aktivitas harian.',
+      riwayatPenyakitDahulu:
+        'Riwayat hipertensi, dislipidemia, penyakit jantung koroner, stroke, dan penyakit ginjal. Riwayat diabetes gestasional atau melahirkan bayi dengan berat lahir lebih dari 4 kg pada perempuan. Riwayat pankreatitis atau penggunaan kortikosteroid jangka panjang yang dapat memicu hiperglikemia sekunder. Riwayat infeksi berulang seperti tuberkulosis, infeksi saluran kemih, atau infeksi kulit.',
+      riwayatPenyakitKeluarga:
+        'Riwayat diabetes melitus pada orang tua dan saudara kandung sangat meningkatkan risiko; tanyakan pula riwayat keluarga dengan hipertensi, penyakit jantung dini, dan stroke untuk menilai risiko kardiovaskular keluarga.',
+      riwayatPengobatan:
+        'Obat antidiabetik yang pernah dan sedang digunakan beserta dosis dan kepatuhannya, riwayat hipoglikemia akibat obat, serta penggunaan kortikosteroid, diuretik tiazid, antipsikotik atipik, dan obat herbal yang tidak jelas kandungannya.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama golongan sulfa yang relevan untuk pemilihan sulfonilurea.',
+      riwayatNutrisi:
+        'Pola makan sehari-hari termasuk frekuensi, porsi, dan jenis karbohidrat; konsumsi minuman manis, gorengan, dan camilan; kebiasaan makan malam larut; serta upaya diet yang pernah dijalani beserta hasilnya.',
+      riwayatSosialEkonomi:
+        'Aktivitas fisik harian dan olahraga terstruktur, kebiasaan merokok dan konsumsi alkohol, jenis pekerjaan dan tingkat sedentari, kualitas dan durasi tidur, tingkat stres, serta kemampuan finansial dan akses terhadap obat dan pemeriksaan berkala yang menentukan keberlanjutan terapi.',
+    },
+    pemeriksaanFisik: [
+      'Antropometri: berat badan, tinggi badan, indeks massa tubuh, dan lingkar pinggang sebagai penanda obesitas sentral',
+      'Tekanan darah pada kedua lengan dalam posisi duduk setelah istirahat 5 menit; nilai pula hipotensi ortostatik sebagai tanda neuropati otonom',
+      'Kulit: acanthosis nigricans pada leher dan aksila sebagai penanda resistensi insulin, xanthoma, luka atau infeksi jamur pada lipatan',
+      'Pemeriksaan kaki diabetik menyeluruh: inspeksi kulit, kalus, deformitas dan ulkus; palpasi nadi dorsalis pedis dan tibialis posterior; uji sensasi protektif dengan monofilamen 10 g pada sepuluh titik dan uji getar dengan garpu tala 128 Hz',
+      'Funduskopi untuk mencari mikroaneurisma, perdarahan dot-blot, eksudat keras, dan neovaskularisasi',
+      'Pemeriksaan jantung dan pembuluh darah perifer termasuk auskultasi bruit karotis dan abdomen',
+    ],
+    antropometri:
+      'Hitung indeks massa tubuh dengan rumus berat badan dalam kilogram dibagi kuadrat tinggi badan dalam meter. Menurut kriteria Asia Pasifik: kurang dari 18,5 berarti berat kurang; 18,5 sampai 22,9 normal; 23 sampai 24,9 berat berlebih; 25 sampai 29,9 obesitas derajat I; dan 30 atau lebih obesitas derajat II. Obesitas sentral ditegakkan bila lingkar pinggang lebih dari 90 cm pada laki-laki atau lebih dari 80 cm pada perempuan, dan merupakan prediktor risiko kardiometabolik yang lebih kuat daripada indeks massa tubuh saja.',
+    penunjang: [
+      'Glukosa darah puasa, glukosa 2 jam setelah pembebanan 75 gram glukosa, dan glukosa darah sewaktu untuk penegakan diagnosis',
+      'HbA1c untuk menilai kendali glikemik rerata 2-3 bulan terakhir; hasil dapat menyesatkan pada anemia, hemoglobinopati, dan penyakit ginjal kronik',
+      'Profil lipid puasa: kolesterol total, LDL, HDL, dan trigliserida untuk stratifikasi risiko kardiovaskular',
+      'Kreatinin serum dengan perhitungan laju filtrasi glomerulus, serta rasio albumin-kreatinin urin sebagai penanda nefropati dini',
+      'Elektrokardiogram untuk mencari iskemia diam yang sering terjadi tanpa nyeri dada pada pasien diabetes',
+      'Fungsi hati sebagai data dasar sebelum terapi dan untuk menilai perlemakan hati yang sering menyertai',
+    ],
+    etiologi:
+      'Kombinasi predisposisi genetik poligenik dengan faktor lingkungan berupa asupan kalori berlebih, obesitas sentral, dan aktivitas fisik rendah.',
+    patofisiologi:
+      'Kelebihan jaringan lemak viseral meningkatkan pelepasan asam lemak bebas dan sitokin proinflamasi yang mengganggu jalur sinyal insulin pada otot dan hati, sehingga ambilan glukosa perifer menurun dan produksi glukosa hepatik meningkat. Sel beta pankreas awalnya mengompensasi dengan hipersekresi insulin sehingga glukosa masih normal; ketika kapasitas kompensasi terlampaui dan massa sel beta menurun secara progresif, muncul hiperglikemia. Hiperglikemia kronik menimbulkan kerusakan mikrovaskular melalui jalur poliol, pembentukan advanced glycation end products, dan stres oksidatif, serta mempercepat aterosklerosis makrovaskular.',
+    faktorRisiko: [
+      'Usia 40 tahun atau lebih',
+      'Indeks massa tubuh 23 kg/m² atau lebih dan obesitas sentral',
+      'Riwayat keluarga diabetes pada kerabat derajat pertama',
+      'Hipertensi, dislipidemia, dan sindrom metabolik',
+      'Riwayat diabetes gestasional atau melahirkan bayi lebih dari 4 kg',
+      'Sindrom ovarium polikistik',
+      'Aktivitas fisik kurang dan pola makan tinggi kalori',
+      'Riwayat toleransi glukosa terganggu atau glukosa puasa terganggu',
+    ],
     diagnosis: [
-      'GDP ≥126 mg/dL, GD 2 jam PP (TTGO) ≥200 mg/dL, GDS ≥200 mg/dL + gejala, atau HbA1c ≥6,5%',
-      'Sering asimtomatik, ditemukan skrining rutin atau saat komplikasi muncul',
+      'Glukosa darah puasa 126 mg/dL atau lebih setelah puasa minimal 8 jam',
+      'Glukosa 2 jam setelah tes toleransi glukosa oral 75 gram sebesar 200 mg/dL atau lebih',
+      'Glukosa darah sewaktu 200 mg/dL atau lebih disertai gejala klasik poliuria, polidipsia, dan penurunan berat badan tanpa sebab jelas',
+      'HbA1c 6,5% atau lebih pada laboratorium terstandar',
+      'Tanpa gejala klasik, diperlukan dua hasil abnormal untuk konfirmasi',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan bila glukosa darah puasa 126 mg/dL atau lebih, atau glukosa 2 jam setelah tes toleransi glukosa oral 75 gram 200 mg/dL atau lebih, atau HbA1c 6,5% atau lebih. Bila pasien tanpa gejala klasik, diperlukan dua hasil abnormal — baik dari dua pemeriksaan berbeda pada satu sampel maupun dari pemeriksaan ulang pada hari berbeda. Glukosa darah sewaktu 200 mg/dL atau lebih disertai gejala klasik sudah cukup untuk diagnosis tanpa konfirmasi ulang.',
+    diagnosisBanding: [
+      'Diabetes melitus tipe 1 — usia lebih muda, kurus, onset cepat, cenderung ketoasidosis, C-peptide rendah, autoantibodi positif',
+      'Diabetes tipe lain akibat obat (kortikosteroid), penyakit pankreas, atau endokrinopati (Cushing, akromegali, hipertiroid)',
+      'Maturity-onset diabetes of the young — onset usia muda, riwayat keluarga tiga generasi, tidak obesitas, tidak ketosis',
+      'Diabetes insipidus — poliuria dan polidipsia berat namun glukosa darah normal dan urin sangat encer',
+    ],
+    pengkajian:
+      'Dipikirkan diabetes melitus tipe 2 pada pasien ini atas dasar keluhan klasik poliuria, polidipsia, dan polifagia yang berlangsung perlahan disertai penurunan berat badan, yang muncul pada usia dewasa dengan latar obesitas sentral dan gaya hidup sedentari serta riwayat keluarga diabetes. Perjalanan yang bertahap tersebut menjauhkan dari diabetes melitus tipe 1 yang khasnya timbul mendadak pada usia lebih muda dengan perawakan kurus dan sering langsung bermanifestasi sebagai ketoasidosis; pada pemeriksaan, temuan acanthosis nigricans justru memperkuat adanya resistensi insulin yang menjadi dasar patofisiologi tipe 2. Poliuria dan polidipsia pada kasus ini juga perlu dibedakan dari diabetes insipidus, namun pada diabetes insipidus glukosa darah normal dan urin sangat encer dengan osmolaritas rendah, sedangkan di sini glukosa darah jelas meningkat. Kemungkinan diabetes tipe lain disingkirkan dengan menelusuri riwayat penggunaan kortikosteroid, penyakit pankreas, dan tanda endokrinopati seperti moon face, striae ungu, atau pembesaran akral yang tidak ditemukan. Adanya kesemutan simetris pada kedua tungkai dan pandangan kabur menunjukkan hiperglikemia telah berlangsung lama sebelum terdiagnosis, sehingga skrining komplikasi mikrovaskular dan makrovaskular perlu dikerjakan sejak diagnosis ditegakkan, berbeda dari diabetes tipe 1 yang skrining komplikasinya dimulai lima tahun setelah diagnosis.',
+    terapiSuportif: [
+      'Kebutuhan kalori dihitung dari berat badan ideal menggunakan rumus Broca, yaitu tinggi badan dalam sentimeter dikurangi 100 lalu dikurangi 10 persen. Kebutuhan basal 25-30 kkal/kg berat badan ideal per hari, disesuaikan faktor aktivitas dan stres, lalu dikurangi 500 kkal per hari bila ditargetkan penurunan berat badan',
+      'Komposisi makronutrien: karbohidrat 45-65% dengan mengutamakan indeks glikemik rendah dan tinggi serat, protein 10-20% (diturunkan bila sudah ada nefropati), lemak 20-25% dengan lemak jenuh kurang dari 7%',
+      'Serat 20-35 gram per hari dan pembatasan garam kurang dari 5 gram per hari terutama bila disertai hipertensi',
+      'Pemantauan glukosa darah mandiri; pada pasien dengan insulin atau sulfonilurea, ajarkan pengenalan dan penanganan hipoglikemia dengan aturan 15 yaitu 15 gram karbohidrat cepat serap lalu evaluasi ulang setelah 15 menit',
     ],
     tatalaksana: [
-      'Modifikasi gaya hidup + metformin lini pertama, kombinasi OAD/insulin bertahap sesuai target HbA1c',
-      'Skrining dan tatalaksana komorbid kardiovaskular (hipertensi, dislipidemia)',
+      'Modifikasi gaya hidup pada semua pasien: penurunan berat badan 5-10%, aktivitas aerobik sedang minimal 150 menit per minggu terbagi minimal 3 hari dengan jeda tidak lebih dari 2 hari berturut-turut, ditambah latihan beban 2-3 kali per minggu',
+      'Metformin sebagai lini pertama, dimulai 500 mg satu kali sehari bersama makan lalu dititrasi bertahap hingga maksimal 2000-2550 mg per hari terbagi; kontraindikasi bila laju filtrasi glomerulus kurang dari 30 mL/menit/1,73 m² dan perlu dihentikan sementara sebelum pemberian kontras beryodium',
+      'Bila HbA1c belum mencapai target setelah 3 bulan, tambahkan obat kedua sesuai komorbid: penghambat SGLT2 bila ada gagal jantung atau penyakit ginjal kronik, agonis reseptor GLP-1 bila ada penyakit kardiovaskular aterosklerotik atau perlu penurunan berat badan, sulfonilurea atau penghambat DPP-4 bila pertimbangan utama adalah biaya',
+      'Insulin dimulai bila HbA1c sangat tinggi (di atas 9-10%) dengan gejala katabolik, saat sakit berat atau perioperatif, atau bila kombinasi obat oral gagal; mulai dengan insulin basal 10 unit atau 0,1-0,2 unit/kg berat badan sebelum tidur dan titrasi berdasarkan glukosa darah puasa',
+      'Target terapi umum: HbA1c kurang dari 7%, glukosa puasa 80-130 mg/dL, glukosa 2 jam setelah makan kurang dari 180 mg/dL; target dilonggarkan pada usia lanjut, harapan hidup terbatas, riwayat hipoglikemia berat, atau komorbid berat',
+      'Statin diberikan pada sebagian besar pasien diabetes usia 40 tahun ke atas untuk pencegahan kardiovaskular; target tekanan darah umumnya kurang dari 140/90 mmHg dengan penghambat ACE atau ARB sebagai pilihan bila disertai albuminuria',
+      'Skrining komplikasi sejak diagnosis dan diulang setiap tahun: funduskopi, rasio albumin-kreatinin urin dan laju filtrasi glomerulus, pemeriksaan kaki, profil lipid, serta elektrokardiogram sesuai indikasi',
     ],
-    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
+    edukasi: [
+      'Penjadwalan makan: tiga kali makan utama dengan jarak 5-6 jam ditambah 2-3 kali selingan; makan pada jam yang konsisten setiap hari agar sesuai dengan kerja obat dan mencegah hipoglikemia',
+      'Porsi menggunakan metode piring: setengah piring sayur non-tepung, seperempat protein tanpa lemak, dan seperempat karbohidrat kompleks; batasi gula sederhana dan minuman manis, ganti nasi putih dengan nasi merah atau kentang berkulit',
+      'Tidur 7-8 jam per malam dengan jadwal teratur — kurang tidur dan gangguan tidur memperburuk resistensi insulin; skrining sleep apnea bila mendengkur keras dan mengantuk berat pada siang hari',
+      'Pola olahraga: jalan cepat, sepeda, atau berenang 30 menit per hari selama 5 hari seminggu pada intensitas sedang (masih dapat berbicara namun tidak dapat bernyanyi). Jangan berolahraga bila glukosa darah kurang dari 100 mg/dL tanpa asupan karbohidrat terlebih dahulu, atau bila glukosa lebih dari 250 mg/dL disertai keton. Gunakan alas kaki yang pas dan periksa kaki setelah berolahraga',
+      'Perawatan kaki harian: periksa telapak dan sela jari setiap hari termasuk dengan bantuan cermin, keringkan sela jari setelah mandi, potong kuku lurus, jangan berjalan tanpa alas kaki, dan segera periksakan setiap luka sekecil apa pun',
+      'Jadwal kontrol: setiap 2-4 minggu saat penyesuaian dosis hingga target tercapai, lalu setiap 3 bulan bersamaan pemeriksaan HbA1c; segera datang bila muncul gejala hipoglikemia berulang, luka pada kaki, demam, muntah, atau penurunan kesadaran',
+      'Saat sakit (sick day rules): jangan menghentikan obat antidiabetik sendiri, perbanyak cairan, periksa glukosa lebih sering, dan segera ke fasilitas kesehatan bila tidak dapat makan-minum atau muntah terus-menerus',
+    ],
+    komplikasi: [
+      'Akut: ketoasidosis diabetik, status hiperglikemik hiperosmolar, dan hipoglikemia akibat terapi',
+      'Mikrovaskular: retinopati hingga kebutaan, nefropati hingga penyakit ginjal tahap akhir, dan neuropati perifer maupun otonom',
+      'Makrovaskular: penyakit jantung koroner, stroke, dan penyakit arteri perifer',
+      'Kaki diabetik dengan ulkus, infeksi, hingga amputasi; serta kerentanan terhadap infeksi termasuk tuberkulosis',
+    ],
+    prognosis:
+      'Penyakit bersifat kronik progresif namun komplikasi sangat dapat dicegah. Kendali glikemik, tekanan darah, dan lipid secara simultan terbukti menurunkan kejadian komplikasi mikrovaskular dan makrovaskular secara bermakna. Prognosis paling ditentukan oleh kepatuhan jangka panjang, pengendalian faktor risiko kardiovaskular, dan keteraturan skrining komplikasi.',
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024', 'PAPDI2014', 'HARRISON2022'],
   },
   'Ketoasidosis diabetikum nonketotik': {
     definisi: 'Merujuk pada Hyperosmolar Hyperglycemic State (HHS) — dekompensasi hiperglikemik berat tanpa ketosis signifikan, khas pada DM tipe 2 lansia.',
@@ -3983,5 +4120,242 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     diagnosis: ['Ejakulasi dini: ejakulasi terjadi sangat cepat, sulit dikendalikan, dan menimbulkan distres; Retrograd: orgasme tanpa keluarnya semen dengan urin keruh setelahnya (ditemukan sperma pada urinalisis pascaejakulasi) — terkait DM, operasi prostat, alpha-blocker; nilai faktor psikologis dan obat (SSRI menyebabkan ejakulasi tertunda)'],
     tatalaksana: ['Ejakulasi dini: teknik perilaku (stop-start, squeeze), anestetik topikal, SSRI atau dapoksetin, libatkan pasangan dalam terapi; Retrograd: tinjau ulang obat penyebab, simpatomimetik pada kasus tertentu, pengambilan sperma dari urin bila menginginkan fertilitas; atasi penyakit dasar dan berikan konseling seksual'],
     referensi: ['SKDI2012', 'CAMPBELL2016', 'KAPLAN2015'],
+  },
+
+  // ─── Entri pelengkap: penyakit SKDI tanpa padanan catatan OSCE ────────────
+  // Ditulis tersendiri karena tidak ada station note yang benar-benar setara.
+  // (Pencocokan otomatis akan salah — mis. "Koma" → "Glaukoma", "Xanthelasma"
+  // → "Asma" — sehingga entri ini sengaja dibuat manual.)
+  'Ensefalopati': {
+    definisi: 'Disfungsi otak difus akibat penyebab sistemik (metabolik, toksik, infeksi, hipoksia) yang bermanifestasi sebagai perubahan status mental — bukan lesi struktural fokal.',
+    diagnosis: [
+      'Penurunan kesadaran atau perubahan perilaku/kognisi yang berfluktuasi, umumnya TANPA defisit neurologis fokal (membedakan dari stroke)',
+      'Cari penyebab sistemik: hepatik (asteriksis, fetor hepatikum, riwayat sirosis), uremik, hipoglikemia, hiponatremia, hiperkarbia, sepsis, obat/intoksikasi, defisiensi tiamin (Wernicke)',
+      'Pemeriksaan wajib: gula darah kapiler SEGERA, elektrolit, ureum-kreatinin, fungsi hati dan amonia, analisis gas darah, urinalisis dan kultur; CT kepala bila ada defisit fokal, trauma, atau antikoagulan',
+    ],
+    tatalaksana: [
+      'Amankan ABC dan posisi; koreksi hipoglikemia segera (dekstrosa 40% IV) dan berikan TIAMIN 100 mg IV sebelum/bersama glukosa pada pasien berisiko (alkohol, malnutrisi)',
+      'Ensefalopati hepatik: laktulosa 3x30 mL dititrasi hingga BAB 2-3x/hari, rifaksimin, atasi pencetus (perdarahan saluran cerna, infeksi, konstipasi, gangguan elektrolit)',
+      'Koreksi gangguan elektrolit secara BERTAHAP (koreksi hiponatremia terlalu cepat berisiko mielinolisis pontin)',
+      'Hentikan/kurangi obat sedatif dan nefrotoksik, atasi infeksi, dukungan nutrisi',
+    ],
+    referensi: ['SKDI2012', 'ADAMS2019', 'SLEISENGER2021'],
+  },
+  'Koma': {
+    definisi: 'Keadaan tidak sadar yang dalam dan menetap, pasien tidak dapat dibangunkan dan tidak menunjukkan respons bertujuan terhadap rangsang — kedaruratan neurologis.',
+    diagnosis: [
+      'Nilai GCS (mata, verbal, motorik) dan pola pernapasan; periksa PUPIL (ukuran, simetri, refleks cahaya) dan refleks batang otak (kornea, okulosefalik, muntah) untuk lokalisasi',
+      'Pupil pinpoint reaktif → intoksikasi opioid atau lesi pons; pupil dilatasi unilateral non-reaktif → herniasi unkal (kedaruratan bedah saraf); pupil dilatasi bilateral → hipoksia berat atau intoksikasi antikolinergik',
+      'Singkirkan penyebab reversibel dengan cepat: gula darah kapiler, elektrolit, gas darah, kadar obat/toksin, suhu tubuh; CT kepala segera bila lateralisasi, trauma, atau penyebab tidak jelas',
+    ],
+    tatalaksana: [
+      'ABC dan proteksi jalan napas — intubasi bila GCS ≤8 atau refleks proteksi jalan napas hilang; imobilisasi servikal bila kemungkinan trauma',
+      '"Coma cocktail" terarah: dekstrosa 40% IV bila hipoglikemia, TIAMIN 100 mg IV (sebelum glukosa pada pasien berisiko), nalokson bila dicurigai opioid',
+      'Cegah cedera otak sekunder: hindari hipotensi, hipoksia, hipertermia, dan hipo/hiperglikemia; elevasi kepala 30° bila tekanan intrakranial meningkat',
+      'Rujuk untuk pencitraan dan tatalaksana penyebab; tentukan prognosis hanya setelah penyebab reversibel disingkirkan dan pasien tidak dalam pengaruh sedatif',
+    ],
+    referensi: ['SKDI2012', 'ADAMS2019', 'ATLS2018'],
+  },
+  'Kejang': {
+    definisi: 'Manifestasi klinis akibat lepas muatan listrik neuron serebral yang berlebihan dan sinkron; dapat merupakan kejang provokasi (akut simtomatik) maupun bagian dari epilepsi.',
+    diagnosis: [
+      'Bedakan dari sinkop dan kejang psikogenik: kejang epileptik umumnya disertai fase tonik-klonik, mata TERBUKA dan deviasi, lidah tergigit sisi lateral, inkontinensia, diikuti fase pascaiktal yang bingung dan mengantuk',
+      'Cari PROVOKASI (kejang akut simtomatik): hipoglikemia, hiponatremia, hipokalsemia, demam pada anak, infeksi SSP, trauma kepala, stroke, putus alkohol/obat, intoksikasi, eklampsia pada kehamilan',
+      'Pemeriksaan awal: gula darah kapiler segera, elektrolit termasuk kalsium dan magnesium, fungsi ginjal, tes kehamilan pada wanita usia subur; EEG dan pencitraan otak sesuai indikasi',
+    ],
+    tatalaksana: [
+      'Saat kejang: posisi miring, amankan dari cedera (JANGAN memasukkan benda ke mulut atau menahan gerakan), oksigen, catat durasi',
+      'Kejang >5 menit ditangani sebagai status epileptikus: benzodiazepin (diazepam/lorazepam IV, midazolam IM bila tanpa akses IV) dilanjutkan antiepilepsi lini kedua bila berlanjut',
+      'KOREKSI PENYEBAB adalah kunci pada kejang provokasi — antiepilepsi jangka panjang umumnya TIDAK diindikasikan bila kejang murni akibat provokasi yang sudah diatasi',
+      'Edukasi keselamatan (hindari berenang sendiri, mengemudi sesuai ketentuan, bekerja di ketinggian) dan kepatuhan obat bila epilepsi',
+    ],
+    referensi: ['SKDI2012', 'PERDOSSI2016', 'ADAMS2019'],
+  },
+  'Gangguan campuran cemas depresi': {
+    definisi: 'Gangguan dengan gejala cemas dan depresi yang muncul bersamaan, masing-masing tidak cukup berat untuk memenuhi kriteria diagnosis tersendiri.',
+    diagnosis: [
+      'Gejala cemas (khawatir berlebihan, tegang, gelisah, gangguan otonom) dan depresi (mood turun, anhedonia, mudah lelah) muncul bersamaan dengan intensitas ringan-sedang',
+      'Tidak memenuhi kriteria penuh gangguan cemas menyeluruh maupun episode depresi; sangat sering ditemukan di layanan primer',
+      'Skrining risiko bunuh diri WAJIB ditanyakan secara langsung pada setiap pasien dengan gejala depresi',
+    ],
+    tatalaksana: [
+      'Psikoedukasi, teknik relaksasi dan pernapasan, aktivasi perilaku, higiene tidur, dan aktivitas fisik teratur sebagai lini pertama',
+      'SSRI bila gejala menetap atau mengganggu fungsi; jelaskan efek terapeutik baru terasa 2-4 minggu dan jangan dihentikan mendadak',
+      'Hindari benzodiazepin jangka panjang (risiko ketergantungan); atasi stresor psikososial dan libatkan dukungan keluarga',
+      'Rujuk psikiatri bila ada risiko bunuh diri, gejala psikotik, atau tidak respons terapi',
+    ],
+    referensi: ['SKDI2012', 'PPDGJIII', 'WHOMHGAP2016'],
+  },
+  'Xanthelasma': {
+    definisi: 'Deposit lipid berwarna kekuningan pada kulit kelopak mata, tersering di kantus medial — penanda kulit yang dapat menunjukkan dislipidemia.',
+    diagnosis: [
+      'Plak kekuningan lunak berbatas tegas simetris pada kelopak mata, tidak nyeri dan tidak mengganggu penglihatan',
+      'WAJIB periksa profil lipid — sebagian pasien normolipidemik, namun xanthelasma tetap berkaitan dengan peningkatan risiko aterosklerosis dan penyakit jantung koroner',
+      'Cari xantoma di lokasi lain (tendon Achilles, ekstensor jari) yang sangat sugestif hiperkolesterolemia familial',
+    ],
+    tatalaksana: [
+      'Fokus utama: tatalaksana dislipidemia dan penilaian risiko kardiovaskular total (statin sesuai kategori risiko, modifikasi gaya hidup)',
+      'Tindakan lokal untuk alasan kosmetik: eksisi bedah, laser, atau asam trikloroasetat — EDUKASI bahwa rekurensi sering terjadi bila dislipidemia tidak dikendalikan',
+    ],
+    referensi: ['SKDI2012', 'FITZPATRICK2019', 'PAPDI2014'],
+  },
+  'Skleritis': {
+    definisi: 'Peradangan sklera yang bersifat nyeri dan destruktif, sering berkaitan dengan penyakit autoimun sistemik — berbeda dari episkleritis yang jinak dan swasirna.',
+    diagnosis: [
+      'NYERI HEBAT menembus hingga ke kepala yang mengganggu tidur (episkleritis hanya rasa tidak nyaman ringan), mata merah kebiruan/keunguan, nyeri tekan bola mata, dapat disertai penurunan penglihatan',
+      'Kemerahan TIDAK memucat dengan tetes fenilefrin topikal (pada episkleritis memucat) — pembeda klinis penting di layanan primer',
+      'Cari penyakit sistemik penyerta: artritis reumatoid, granulomatosis dengan poliangiitis, SLE, dan penyakit jaringan ikat lain',
+    ],
+    tatalaksana: [
+      'RUJUK oftalmologi — skleritis dapat menyebabkan penipisan sklera, perforasi, dan kehilangan penglihatan permanen',
+      'NSAID sistemik pada kasus ringan, kortikosteroid sistemik dan imunosupresan pada skleritis nekrotikans atau terkait penyakit autoimun',
+      'Kortikosteroid topikal saja TIDAK adekuat; evaluasi dan tatalaksana penyakit sistemik yang mendasari bersama reumatologi',
+    ],
+    referensi: ['SKDI2012', 'KANSKI2020', 'HARRISON2022'],
+  },
+  'Kerato-konjungtivitis sicca': {
+    definisi: 'Sindrom mata kering dengan keterlibatan kornea dan konjungtiva akibat defisiensi atau instabilitas film air mata.',
+    diagnosis: [
+      'Rasa berpasir, perih, terbakar, mata cepat lelah, kadang justru berair berlebihan (epifora refleks); memberat saat kerja layar, di ruang ber-AC, dan sore hari',
+      'Uji Schirmer menurun, tear break-up time memendek, pewarnaan fluoresein/rose bengal menunjukkan pungtata pada kornea dan konjungtiva',
+      'Bila disertai MULUT KERING dan artritis, curigai sindrom Sjögren — periksa anti-Ro/SSA dan anti-La/SSB',
+    ],
+    tatalaksana: [
+      'Air mata buatan tanpa pengawet bila pemakaian sering (>4-6x/hari), gel atau salep mata malam hari',
+      'Kompres hangat dan pembersihan kelopak bila disertai disfungsi kelenjar Meibom; aturan 20-20-20 saat kerja layar dan hindari embusan AC/kipas langsung ke wajah',
+      'Siklosporin atau kortikosteroid topikal jangka pendek pada kasus sedang-berat, punctal plug bila refrakter',
+      'Tinjau obat yang memperberat (antihistamin, antikolinergik, isotretinoin) dan tatalaksana penyakit autoimun yang mendasari',
+    ],
+    referensi: ['SKDI2012', 'KANSKI2020', 'HARRISON2022'],
+  },
+  'Hernia (diaframatika, hiatus)': {
+    definisi: 'Herniasi isi abdomen ke rongga toraks; hernia diafragmatika kongenital pada neonatus, hernia hiatus berupa naiknya lambung melalui hiatus esofagus.',
+    diagnosis: [
+      'Hernia diafragmatika kongenital: distres napas berat segera setelah lahir, abdomen skafoid (cekung), suara napas menghilang dan bising usus terdengar di dada, mediastinum bergeser; rontgen toraks menunjukkan usus di rongga dada',
+      'Hernia hiatus: sering asimtomatik atau bermanifestasi sebagai gejala refluks (heartburn, regurgitasi); barium swallow atau endoskopi memastikan',
+    ],
+    tatalaksana: [
+      'Hernia diafragmatika kongenital: JANGAN berikan ventilasi tekanan positif dengan sungkup (memperberat distensi usus di dada) — intubasi dini, pasang NGT untuk dekompresi, stabilkan lalu rujuk bedah anak',
+      'Hernia hiatus: tatalaksana refluks (modifikasi gaya hidup, PPI); operasi fundoplikasi bila gejala refrakter, hernia besar, atau ada komplikasi (volvulus lambung, strangulasi)',
+    ],
+    referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
+  },
+  'Pes': {
+    definisi: 'Penyakit pes (plague) — infeksi Yersinia pestis yang ditularkan melalui gigitan pinjal tikus; penyakit karantina dengan potensi wabah.',
+    diagnosis: [
+      'Bentuk bubonik (tersering): demam tinggi mendadak, menggigil, dan BUBO yaitu pembesaran kelenjar getah bening yang sangat nyeri (inguinal/aksila/servikal) dengan edema sekitarnya',
+      'Bentuk pneumonik: pneumonia berat dengan hemoptisis, menular antarmanusia melalui droplet; bentuk septikemik: sepsis dengan purpura dan gangren akral',
+      'Riwayat tinggal/berkunjung ke daerah fokus pes dan kontak dengan tikus atau hewan mati; konfirmasi dengan pewarnaan dan kultur aspirat bubo, darah, atau sputum',
+    ],
+    tatalaksana: [
+      'Antibiotik SEGERA tanpa menunggu konfirmasi laboratorium (streptomisin/gentamisin, alternatif doksisiklin atau siprofloksasin) — keterlambatan meningkatkan mortalitas secara tajam',
+      'ISOLASI dengan kewaspadaan droplet pada bentuk pneumonik, profilaksis antibiotik untuk kontak erat',
+      'WAJIB LAPOR ke dinas kesehatan sebagai penyakit berpotensi wabah, pengendalian tikus dan pinjal di lingkungan',
+    ],
+    referensi: ['SKDI2012', 'HARRISON2022', 'PPKFKTP2014'],
+  },
+  'Neoplasma hepar': {
+    definisi: 'Tumor hati, mencakup karsinoma hepatoselular (primer, umumnya pada hati sirotik) dan metastasis hati yang jauh lebih sering.',
+    diagnosis: [
+      'Nyeri perut kanan atas, penurunan BB, hepatomegali berbenjol, dekompensasi mendadak pada pasien sirosis stabil',
+      'Karsinoma hepatoselular: faktor risiko sirosis, hepatitis B dan C kronik; alfa-fetoprotein meningkat, CT/MRI empat fase menunjukkan pola khas hipervaskular fase arteri dengan washout — sering dapat didiagnosis tanpa biopsi',
+      'SURVEILANS 6 bulanan dengan USG (± AFP) pada semua pasien sirosis dan hepatitis B berisiko adalah kunci deteksi dini',
+    ],
+    tatalaksana: [
+      'Stadium dini: reseksi, ablasi, atau transplantasi hati (kriteria Milan) — satu-satunya pilihan kuratif',
+      'Stadium menengah: kemoembolisasi transarterial; stadium lanjut: terapi sistemik (inhibitor tirosin kinase, imunoterapi)',
+      'Metastasis hati: tatalaksana sesuai keganasan primer; perawatan paliatif dan penanganan nyeri sejak dini',
+      'PENCEGAHAN: vaksinasi hepatitis B, terapi antivirus hepatitis B/C, hindari alkohol dan aflatoksin',
+    ],
+    referensi: ['SKDI2012', 'SLEISENGER2021', 'WHOHEPB2024'],
+  },
+  'Abses (peri)anal': {
+    definisi: 'Kumpulan pus di ruang perianal atau perirektal, umumnya berasal dari infeksi kelenjar anal (kripta) — pendahulu terbentuknya fistula ani.',
+    diagnosis: [
+      'Nyeri anus hebat terus-menerus yang memberat saat duduk dan defekasi, bengkak, kemerahan, dan fluktuasi di perianal, dapat disertai demam',
+      'Abses yang lebih dalam (iskiorektal, supralevator) mungkin TIDAK tampak dari luar — nyeri hebat tanpa temuan luar yang jelas tetap memerlukan pemeriksaan colok dubur dan pencitraan',
+      'Cari faktor predisposisi: DM, imunosupresi, penyakit Crohn, keganasan',
+    ],
+    tatalaksana: [
+      'INSISI DAN DRAINASE adalah terapi utama dan tidak boleh ditunda — antibiotik saja tidak menyembuhkan abses yang sudah terbentuk',
+      'Antibiotik sebagai tambahan bila selulitis luas, demam, DM, imunosupresi, atau penyakit katup jantung',
+      'Rendam duduk hangat, analgesia, pelunak tinja setelah drainase; EDUKASI bahwa sekitar sepertiga kasus berkembang menjadi fistula ani yang memerlukan tindakan lanjutan',
+    ],
+    referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
+  },
+  'Infeksi pada kehamilan: TORCH, hepatitis B, malaria': {
+    definisi: 'Infeksi maternal yang dapat ditransmisikan ke janin atau memperberat luaran kehamilan — Toxoplasma, Others (sifilis, varisela, parvovirus), Rubella, Cytomegalovirus, Herpes, ditambah hepatitis B dan malaria.',
+    diagnosis: [
+      'Sering asimtomatik pada ibu — ditemukan melalui SKRINING ANTENATAL rutin (HBsAg, sifilis, HIV; malaria pada daerah endemis)',
+      'Petunjuk pada janin/neonatus: pertumbuhan janin terhambat, mikrosefali, kalsifikasi intrakranial, hepatosplenomegali, ikterik dini, ruam, katarak, gangguan pendengaran',
+      'Serologi IgM/IgG dengan aviditas untuk menentukan infeksi akut vs lampau; malaria dikonfirmasi apus darah tebal/tipis atau RDT',
+    ],
+    tatalaksana: [
+      'Hepatitis B: bayi dari ibu HBsAg positif WAJIB mendapat vaksin HB dan HBIg dalam 12 JAM pertama kehidupan; antivirus pada ibu dengan viral load tinggi trimester ketiga',
+      'Sifilis: benzatin penisilin G (satu-satunya yang mencegah sifilis kongenital — lakukan desensitisasi bila alergi)',
+      'Toksoplasmosis akut: spiramisin untuk cegah transmisi, pirimetamin-sulfadiazin bila janin terinfeksi',
+      'Malaria dalam kehamilan: obati sesuai pedoman dengan obat yang aman menurut trimester, gunakan kelambu berinsektisida; malaria meningkatkan risiko anemia berat, abortus, dan berat lahir rendah',
+      'PENCEGAHAN: vaksinasi rubela prakonsepsi, higiene makanan dan kontak kucing untuk toksoplasma, skrining antenatal lengkap',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'WHOHEPB2024'],
+  },
+  'Anemia defisiensi besi pada kehamilan': {
+    definisi: 'Anemia akibat kekurangan besi selama kehamilan, kondisi yang sangat umum karena kebutuhan besi meningkat tajam untuk ekspansi massa eritrosit ibu dan pertumbuhan janin.',
+    diagnosis: [
+      'Anemia dalam kehamilan bila Hb <11 g/dL (trimester I dan III) atau <10,5 g/dL (trimester II); gejala lemas, pusing, pucat, sesak saat aktivitas',
+      'Gambaran mikrositik hipokrom dengan feritin serum rendah (penanda paling spesifik); bedakan dari hemodilusi fisiologis kehamilan dan thalassemia',
+      'Skrining Hb rutin pada kunjungan antenatal pertama dan trimester ketiga',
+    ],
+    tatalaksana: [
+      'Tablet tambah darah rutin sebagai PENCEGAHAN pada semua ibu hamil sesuai program nasional; pada anemia berikan besi elemental dosis terapi',
+      'Minum bersama vitamin C dan hindari bersamaan teh, kopi, susu, atau kalsium; edukasi efek samping (mual, konstipasi, tinja hitam) agar kepatuhan terjaga',
+      'Besi intravena bila intoleransi oral berat, anemia sedang-berat mendekati persalinan, atau respons oral tidak adekuat',
+      'Transfusi hanya pada anemia berat simtomatik atau mendekati persalinan dengan risiko perdarahan',
+      'EDUKASI: anemia meningkatkan risiko perdarahan pascapersalinan, persalinan preterm, dan berat lahir rendah — kepatuhan minum tablet besi sangat penting',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'WILLIAMSOB2022'],
+  },
+  'Corpus alienum vaginae': {
+    definisi: 'Benda asing dalam vagina; pada anak sering benda kecil atau tisu, pada dewasa sering tampon tertinggal, kondom, atau pesarium terlupakan.',
+    diagnosis: [
+      'Duh vagina BERBAU SANGAT BUSUK dan persisten, dapat disertai bercak darah dan iritasi — pada ANAK, duh berbau busuk atau berdarah adalah petunjuk kuat benda asing',
+      'Inspeksi vagina; pada anak dilakukan dengan sangat hati-hati dan sering memerlukan pemeriksaan dalam sedasi/anestesi oleh tenaga yang kompeten',
+      'PENTING: pada anak dengan benda asing vagina, pertimbangkan dan evaluasi kemungkinan kekerasan seksual sesuai prosedur perlindungan anak',
+    ],
+    tatalaksana: [
+      'Ekstraksi benda asing (irigasi lembut atau dengan forsep; pada anak sebaiknya di bawah sedasi/anestesi oleh tenaga terlatih)',
+      'Antibiotik bila terdapat infeksi sekunder atau tanda selulitis; sebagian besar duh membaik cepat setelah benda asing diangkat',
+      'Edukasi higiene; rujuk sesuai protokol perlindungan anak bila dicurigai kekerasan seksual',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'PPKFKTP2014'],
+  },
+  'Eritrasma': {
+    definisi: 'Infeksi superfisial kulit oleh Corynebacterium minutissimum pada area lipatan — bakteri, bukan jamur, sehingga sering salah diterapi sebagai tinea.',
+    diagnosis: [
+      'Bercak cokelat kemerahan berbatas tegas dengan skuama halus pada lipatan (sela jari kaki, inguinal, aksila, inframama), gatal ringan atau tanpa gejala',
+      'LAMPU WOOD menunjukkan fluoresensi MERAH KORAL yang khas — pemeriksaan sederhana yang langsung membedakannya dari tinea kruris',
+      'KOH negatif (tidak ada hifa) menyingkirkan dermatofitosis; faktor risiko: DM, obesitas, hiperhidrosis, iklim panas dan lembap',
+    ],
+    tatalaksana: [
+      'Eritromisin topikal atau oral, atau klindamisin topikal; asam fusidat topikal sebagai alternatif',
+      'Jaga area lipatan tetap kering, pakaian longgar menyerap keringat, turunkan berat badan bila obesitas',
+      'SKRINING DIABETES pada kasus luas atau berulang; obati tinea pedis penyerta bila ada',
+    ],
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
+  },
+  'Melasma': {
+    definisi: 'Hipermelanosis didapat berupa bercak cokelat simetris pada wajah, dipicu paparan sinar matahari dan faktor hormonal (kehamilan, kontrasepsi hormonal).',
+    diagnosis: [
+      'Makula cokelat berbatas tidak tegas dan SIMETRIS pada wajah dengan pola sentrofasial, malar, atau mandibular; lebih sering pada wanita dan kulit berwarna gelap',
+      'Lampu Wood membantu menilai kedalaman pigmen (epidermal lebih responsif terapi daripada dermal)',
+      'Cari faktor pencetus: paparan UV, kehamilan (kloasma gravidarum), pil kontrasepsi, terapi hormon, obat fotosensitif',
+    ],
+    tatalaksana: [
+      'TABIR SURYA spektrum luas SPF tinggi setiap hari dan diulang berkala adalah fondasi terapi — tanpa ini semua terapi lain akan gagal dan cepat kambuh',
+      'Agen pencerah topikal: hidrokuinon, kombinasi triple (hidrokuinon-tretinoin-kortikosteroid), asam azelaik, asam traneksamat',
+      'Hentikan kontrasepsi hormonal pencetus bila memungkinkan; peeling kimia atau laser hanya oleh tenaga berpengalaman (risiko hiperpigmentasi pascainflamasi justru memperburuk)',
+      'EDUKASI: terapi memerlukan waktu berbulan-bulan, bersifat mengendalikan bukan menyembuhkan, dan sangat mudah kambuh bila proteksi matahari lalai',
+    ],
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
 }
