@@ -1,12 +1,50 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconBook } from '../../components/icons'
-import { OSCE_STATION_NOTES } from '../../lib/osceStationNotes'
+import type { OsceStationNote } from '../../lib/osceStationNotes'
 import { SKDI_DISEASE_LIST, SKDI_DISEASE_SYSTEMS, type SkdiDiseaseSystem } from '../../lib/skdiDiseaseList'
-import { SKDI_DISEASE_NOTES } from '../../lib/skdiDiseaseNotes'
+import type { SkdiDiseaseNote } from '../../lib/skdiDiseaseNotes'
 import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
-import { SKDI_DISEASE_NOTE_ALIASES } from '../../lib/skdiDiseaseNoteAliases'
 import { levelTone, levelLabel } from './shared'
+
+/**
+ * The three note datasets total well over a megabyte — far too much to ship in
+ * the chunk that renders the directory list itself. They are pulled in with
+ * dynamic import() after mount, so the 700+ disease list paints immediately and
+ * the notes hydrate a moment later.
+ *
+ * Loading them on mount (rather than on first expand) is deliberate: the note
+ * toggles have to know which diseases have notes, and deriving that from a
+ * hand-maintained key index would silently drift every time a note is added.
+ */
+interface NoteData {
+  notes: Record<string, SkdiDiseaseNote>
+  stations: Record<string, OsceStationNote>
+  aliases: Record<string, string>
+}
+
+function useNoteData() {
+  const [data, setData] = useState<NoteData | null>(null)
+  useEffect(() => {
+    let alive = true
+    Promise.all([
+      import('../../lib/skdiDiseaseNotes'),
+      import('../../lib/osceStationNotes'),
+      import('../../lib/skdiDiseaseNoteAliases'),
+    ]).then(([n, o, a]) => {
+      if (!alive) return
+      setData({
+        notes: n.SKDI_DISEASE_NOTES,
+        stations: o.OSCE_STATION_NOTES,
+        aliases: a.SKDI_DISEASE_NOTE_ALIASES,
+      })
+    })
+    return () => {
+      alive = false
+    }
+  }, [])
+  return data
+}
 
 /**
  * Resolves the note shown for a disease. Every SKDI disease has one of:
@@ -15,7 +53,7 @@ import { levelTone, levelLabel } from './shared'
  *    condition — anamnesis, pemeriksaan fisik, kriteria diagnosis, tatalaksana.
  * The alias table is hand-checked; no fuzzy matching is used.
  */
-const ANAMNESIS_LABELS: [keyof NonNullable<(typeof SKDI_DISEASE_NOTES)[string]['anamnesis']>, string][] = [
+const ANAMNESIS_LABELS: [keyof NonNullable<SkdiDiseaseNote['anamnesis']>, string][] = [
   ['keluhanUtama', 'Keluhan Utama'],
   ['riwayatPenyakitSekarang', 'Riwayat Penyakit Sekarang (SOCRATES)'],
   ['riwayatPenyakitDahulu', 'Riwayat Penyakit Dahulu'],
@@ -29,8 +67,9 @@ const ANAMNESIS_LABELS: [keyof NonNullable<(typeof SKDI_DISEASE_NOTES)[string]['
   ['riwayatSosialEkonomi', 'Riwayat Sosial Ekonomi & Lingkungan'],
 ]
 
-function resolveNote(disease: string) {
-  const own = SKDI_DISEASE_NOTES[disease]
+function resolveNote(disease: string, data: NoteData | null) {
+  if (!data) return null
+  const own = data.notes[disease]
   if (own) {
     const blocks: { title: string; items: string[] }[] = []
     if (own.pemeriksaanFisik) blocks.push({ title: 'Pemeriksaan Fisik', items: own.pemeriksaanFisik })
@@ -52,8 +91,8 @@ function resolveNote(disease: string) {
       tips: undefined as string | undefined,
     }
   }
-  const aliasKey = SKDI_DISEASE_NOTE_ALIASES[disease]
-  const station = aliasKey ? OSCE_STATION_NOTES[aliasKey] : undefined
+  const aliasKey = data.aliases[disease]
+  const station = aliasKey ? data.stations[aliasKey] : undefined
   if (!station) return null
   return {
     kind: 'osce' as const,
@@ -76,6 +115,7 @@ export default function SkdiDiseaseDirectorySection() {
   const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
   const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const noteData = useNoteData()
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -105,6 +145,9 @@ export default function SkdiDiseaseDirectorySection() {
           catatan station lengkap (anamnesis/PF/tatalaksana) ditandai badge "Catatan OSCE" — buka di
           tab OSCE Case Bank.
         </p>
+        {!noteData && (
+          <p className="mt-2 text-[12px] font-semibold text-brand-dark">Memuat catatan penyakit…</p>
+        )}
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           placeholder="Cari penyakit (mis. malaria, hipertensi, katarak)…"
@@ -130,7 +173,7 @@ export default function SkdiDiseaseDirectorySection() {
           <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys} · {diseases.length}</div>
           <div className="mt-2 space-y-2">
             {diseases.map((e, i) => {
-              const note = resolveNote(e.disease)
+              const note = resolveNote(e.disease, noteData)
               const isOpen = expanded === e.disease
               return (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -138,11 +181,13 @@ export default function SkdiDiseaseDirectorySection() {
                     className="flex w-full items-start justify-between gap-2 text-left"
                     onClick={() => note && setExpanded(isOpen ? null : e.disease)}
                   >
-                    <div>
+                    {/* min-w-0 lets the long disease names wrap instead of forcing
+                        the badge row past the viewport on narrow screens. */}
+                    <div className="min-w-0 flex-1">
                       <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
                       {e.subsection && <span className="ml-2 text-[11px] text-neutral-400">{e.subsection}</span>}
                     </div>
-                    <div className="flex shrink-0 items-center gap-1.5">
+                    <div className="flex flex-wrap items-center justify-end gap-1.5">
                       {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
                       <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
                       {note && <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
