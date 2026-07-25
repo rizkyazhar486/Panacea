@@ -128,9 +128,73 @@ export function AbcdeDiagram() {
   )
 }
 
+/** Pola jahitan dasar dan penampang jahitan yang benar. */
+export function SuturePatternsDiagram() {
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        <div className="text-[12px] font-black text-ink dark:text-white">Simpul terputus (simple interrupted)</div>
+        <svg viewBox="0 0 240 70" className="mt-1 w-full" role="img" aria-label="Pola jahitan simpul terputus">
+          {/* kulit */}
+          <rect x="10" y="28" width="220" height="16" className="fill-amber-200/70 dark:fill-amber-300/25" />
+          {/* garis luka */}
+          <line x1="120" y1="26" x2="120" y2="46" stroke={SKIN} strokeWidth="1.5" className="text-rose-500" strokeDasharray="2 2" />
+          {/* jahitan */}
+          {[55, 85, 155, 185].map((x) => (
+            <g key={x}>
+              <path d={`M ${x} 24 L ${x} 48`} stroke={SKIN} strokeWidth="1.8" className="text-brand" fill="none" />
+            </g>
+          ))}
+          {[70, 170].map((x) => (
+            <g key={x}>
+              <path d={`M ${x - 15} 24 Q ${x} 12 ${x + 15} 24`} stroke={SKIN} strokeWidth="1.8" className="text-brand" fill="none" />
+              <path d={`M ${x - 15} 48 Q ${x} 58 ${x + 15} 48`} stroke={SKIN} strokeWidth="1.8" className="text-brand" fill="none" />
+              <circle cx={x + 6} cy="18" r="2" className="fill-brand" />
+            </g>
+          ))}
+          <text x="12" y="66" className="fill-neutral-500 text-[7px] dark:fill-neutral-400">
+            Jarak antarjahitan ≈ jarak jahitan ke tepi luka · simpul diletakkan di satu sisi, bukan di atas garis luka
+          </text>
+        </svg>
+      </div>
+
+      <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        <div className="text-[12px] font-black text-ink dark:text-white">Penampang — kedalaman & eversi tepi</div>
+        <svg viewBox="0 0 240 86" className="mt-1 w-full" role="img" aria-label="Penampang jahitan dengan eversi tepi luka">
+          {/* BENAR */}
+          <text x="12" y="12" className="fill-emerald-600 text-[8px] font-bold dark:fill-emerald-400">BENAR — tepi eversi, kedalaman sama</text>
+          <path d="M 20 34 Q 50 30 58 24" className="fill-none stroke-amber-300 dark:stroke-amber-300/50" strokeWidth="9" />
+          <path d="M 100 24 Q 108 30 138 34" className="fill-none stroke-amber-300 dark:stroke-amber-300/50" strokeWidth="9" />
+          <path d="M 46 20 C 52 44, 106 44, 112 20" stroke={SKIN} strokeWidth="1.8" className="text-brand" fill="none" />
+          <circle cx="79" cy="17" r="2.5" className="fill-brand" />
+
+          {/* SALAH */}
+          <text x="12" y="60" className="fill-rose-600 text-[8px] font-bold dark:fill-rose-400">SALAH — tepi inversi / kedalaman tidak sama</text>
+          <path d="M 20 78 Q 52 74 62 80" className="fill-none stroke-amber-300 dark:stroke-amber-300/50" strokeWidth="9" />
+          <path d="M 96 80 Q 106 70 138 74" className="fill-none stroke-amber-300 dark:stroke-amber-300/50" strokeWidth="9" />
+          <path d="M 48 70 C 54 88, 104 84, 110 66" stroke={SKIN} strokeWidth="1.8" className="text-rose-400" fill="none" />
+
+          <text x="150" y="34" className="fill-neutral-500 text-[7px] dark:fill-neutral-400">Tepi sedikit terangkat</text>
+          <text x="150" y="44" className="fill-neutral-500 text-[7px] dark:fill-neutral-400">→ parut lebih halus</text>
+          <text x="150" y="78" className="fill-neutral-500 text-[7px] dark:fill-neutral-400">Tepi masuk / bertingkat</text>
+          <text x="150" y="86" className="fill-neutral-500 text-[7px] dark:fill-neutral-400">→ parut lebih jelas</text>
+        </svg>
+      </div>
+
+      <p className="px-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+        Ambil <span className="font-bold">kedalaman yang sama</span> pada kedua tepi agar luka bertemu
+        rata. Ikat secukupnya untuk mendekatkan tepi —{' '}
+        <span className="font-bold">jangan terlalu kencang</span>, karena edema akan membuat tepi luka
+        iskemik dan nekrosis.
+      </p>
+    </div>
+  )
+}
+
 export function SkillDiagram({ kind }: { kind: string }) {
   if (kind === 'injectionAngles') return <InjectionAnglesDiagram />
   if (kind === 'ivGauges') return <IvGaugesDiagram />
   if (kind === 'abcde') return <AbcdeDiagram />
+  if (kind === 'suturePatterns') return <SuturePatternsDiagram />
   return null
 }

@@ -823,4 +823,607 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
     ],
     referensi: ['PPKFKTP2014', 'HARRISON2022', 'POGI2016'],
   },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'ngt',
+    category: 'Saluran Cerna & Kemih',
+    title: 'Pemasangan NGT (Nasogastric Tube)',
+    subtitle: 'Dekompresi lambung, pemberian nutrisi, dan bilas lambung',
+    indikasi: [
+      'Dekompresi lambung pada ileus obstruktif, distensi abdomen, dan persiapan operasi',
+      'Pemberian nutrisi enteral pada pasien yang tidak dapat menelan',
+      'Pemberian obat pada pasien tidak sadar dengan saluran cerna berfungsi',
+      'Bilas lambung pada keracunan tertentu',
+      'Evaluasi perdarahan saluran cerna atas',
+    ],
+    kontraindikasi: [
+      'FRAKTUR BASIS KRANII atau trauma wajah berat — pemasangan lewat hidung berisiko tube masuk ke rongga kranium; gunakan jalur ORAL (OGT)',
+      'Striktur atau riwayat operasi esofagus, varises esofagus yang berdarah aktif (relatif)',
+      'Menelan zat korosif — pemasangan buta berisiko perforasi',
+      'Koagulopati berat (relatif, risiko epistaksis)',
+    ],
+    alat: [
+      'NGT ukuran sesuai: dewasa 14-18 Fr, anak 8-12 Fr, bayi 5-8 Fr',
+      'Jeli pelumas larut air, spuit 50 mL (catheter tip), stetoskop',
+      'Sarung tangan, plester fiksasi, segelas air dan sedotan (bila pasien sadar)',
+      'Kertas pH atau lakmus, bengkok, kantong penampung, tisu',
+    ],
+    fases: [
+      {
+        fase: 'Persiapan',
+        steps: [
+          'Perkenalkan diri, konfirmasi identitas, jelaskan prosedur dan tujuannya, lalu minta persetujuan.',
+          'Tanyakan riwayat trauma wajah, operasi hidung, deviasi septum, dan epistaksis.',
+          'Posisikan pasien duduk atau semi-Fowler 45-90 derajat dengan kepala sedikit fleksi. Bila pasien tidak sadar, posisikan terlentang dengan kepala miring.',
+          'Cuci tangan dan pakai sarung tangan.',
+          'Periksa patensi kedua lubang hidung dengan meminta pasien bernapas melalui satu lubang bergantian; pilih yang lebih paten.',
+        ],
+      },
+      {
+        fase: 'Pengukuran panjang',
+        steps: [
+          'Ukur dengan metode NEX: dari ujung HIDUNG (Nose) → daun TELINGA (Ear) → prosesus XIPHOIDEUS (Xiphoid).',
+          'Alternatif pada anak gunakan metode NEMU: hidung → telinga → titik tengah antara prosesus xiphoideus dan umbilikus.',
+          'Tandai panjang tersebut pada selang dengan plester agar tidak terlalu dangkal maupun terlalu dalam.',
+        ],
+      },
+      {
+        fase: 'Insersi',
+        steps: [
+          'Lumasi ujung selang sepanjang 10-15 cm dengan jeli LARUT AIR (jangan gunakan pelumas berbahan minyak karena berisiko pneumonia lipoid bila masuk paru).',
+          'Masukkan selang melalui lubang hidung dengan arah HORIZONTAL menyusuri dasar rongga hidung, bukan diarahkan ke atas.',
+          'Setelah selang mencapai nasofaring (sekitar 10-15 cm), minta pasien MENUNDUKKAN kepala (fleksi leher) — gerakan ini menutup jalan napas dan mengarahkan selang ke esofagus.',
+          'Minta pasien MENELAN atau menyedot air melalui sedotan, dan majukan selang bersamaan dengan gerakan menelan.',
+          'Lanjutkan memasukkan selang hingga mencapai batas tanda yang telah dibuat.',
+          'HENTIKAN SEGERA dan tarik selang bila pasien batuk hebat, tersedak, sianosis, suara menghilang, atau tampak distres napas — tanda selang masuk ke trakea.',
+        ],
+      },
+      {
+        fase: 'Konfirmasi posisi',
+        steps: [
+          'Aspirasi cairan lambung dengan spuit, lalu uji pH menggunakan kertas indikator. pH 5,5 ATAU KURANG mendukung posisi di lambung — ini metode di samping tempat tidur yang paling dapat diandalkan.',
+          'Uji auskultasi (memasukkan udara 20-30 mL sambil mendengarkan bunyi di epigastrium) masih banyak dipakai namun TIDAK DAPAT DIANDALKAN sebagai satu-satunya konfirmasi, karena bunyi serupa dapat terdengar meski selang berada di paru atau esofagus.',
+          'Foto rontgen merupakan BAKU EMAS konfirmasi dan wajib dilakukan sebelum pemberian nutrisi atau obat pada pasien berisiko tinggi (tidak sadar, ventilasi mekanik, gangguan refleks menelan).',
+          'Jangan pernah memberikan apa pun melalui NGT sebelum posisi dipastikan.',
+        ],
+      },
+      {
+        fase: 'Fiksasi & perawatan',
+        steps: [
+          'Fiksasi selang pada hidung dengan plester tanpa menekan atau menarik ala nasi (mencegah nekrosis tekan).',
+          'Sambungkan ke kantong penampung untuk dekompresi, atau tutup bila untuk pemberian nutrisi.',
+          'Catat panjang selang di luar hidung sebagai acuan pemantauan pergeseran.',
+          'Bilas selang dengan air sebelum dan sesudah pemberian nutrisi atau obat agar tidak tersumbat.',
+          'Rawat kebersihan hidung dan mulut, serta evaluasi posisi selang secara berkala.',
+          'Dokumentasikan ukuran selang, panjang, cara konfirmasi, karakter cairan, dan toleransi pasien.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Pengukuran panjang — "NEX"',
+        kepanjangan: ['N — Nose (ujung hidung)', 'E — Ear (daun telinga)', 'X — Xiphoid (prosesus xiphoideus)'],
+      },
+      {
+        akronim: 'Manuver insersi — "Horizontal lalu Menunduk"',
+        kepanjangan: [
+          'Masuk HORIZONTAL menyusuri dasar hidung (bukan ke atas)',
+          'Setelah di nasofaring, minta pasien MENUNDUK',
+          'Majukan selang bersamaan pasien MENELAN',
+        ],
+        catatan: 'Menundukkan kepala menutup jalan napas dan membuka esofagus — inilah kunci agar selang tidak masuk trakea.',
+      },
+    ],
+    tips: [
+      'Pada dugaan fraktur basis kranii (raccoon eyes, Battle sign, rinore/otore cairan serebrospinal), pasang lewat MULUT — bukan hidung.',
+      'pH aspirat 5,5 atau kurang adalah konfirmasi bedside terbaik; auskultasi saja tidak cukup dan sudah ditinggalkan sebagai metode tunggal.',
+      'Jika pasien batuk hebat atau tidak dapat bersuara saat insersi, segera tarik selang.',
+      'Gunakan pelumas larut air, bukan vaselin atau minyak.',
+      'Pada pasien sadar, kerja sama menelan sangat menentukan keberhasilan — jelaskan lebih dahulu apa yang harus dilakukan.',
+    ],
+    komplikasi: [
+      'Salah posisi masuk ke trakea dan paru — berisiko pneumonia aspirasi hingga kematian bila diberi nutrisi',
+      'Epistaksis dan trauma mukosa hidung',
+      'Nekrosis tekan pada ala nasi akibat fiksasi terlalu ketat',
+      'Sinusitis dan otitis media pada pemakaian lama',
+      'Perforasi esofagus (jarang)',
+      'Refluks dan aspirasi isi lambung',
+    ],
+    referensi: ['SCHWARTZ2019', 'SLEISENGER2021', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'kateter-urin',
+    category: 'Saluran Cerna & Kemih',
+    title: 'Pemasangan Kateter Urin',
+    subtitle: 'Teknik steril, ukuran Fr, dan kontraindikasi mutlak pada trauma',
+    indikasi: [
+      'Retensi urin akut maupun kronik',
+      'Pemantauan produksi urin ketat pada pasien kritis, syok, dan luka bakar',
+      'Perioperatif pada operasi lama atau operasi daerah panggul',
+      'Pengambilan sampel urin steril bila cara lain tidak memungkinkan',
+      'Irigasi kandung kemih pada hematuria dengan bekuan',
+      'Perawatan paliatif dan pasien imobilisasi dengan luka sakral',
+    ],
+    kontraindikasi: [
+      'DUGAAN RUPTUR URETRA — merupakan kontraindikasi MUTLAK untuk kateterisasi buta. Tandanya: darah pada meatus uretra, hematoma perineum berbentuk kupu-kupu, prostat melayang atau tidak teraba pada colok dubur, dan riwayat trauma pelvis. Pada keadaan ini lakukan sistostomi suprapubik dan uretrografi retrograd lebih dahulu',
+      'Striktur uretra berat dan riwayat operasi uretra (relatif — perlu operator berpengalaman)',
+      'Infeksi akut uretra atau prostatitis akut (relatif)',
+    ],
+    alat: [
+      'Kateter Foley ukuran sesuai: dewasa laki-laki 16-18 Fr, dewasa perempuan 14-16 Fr, anak 6-10 Fr',
+      'Sarung tangan steril, duk steril berlubang, kasa steril',
+      'Jeli lidokain 2% (anestesi sekaligus pelumas), povidon iodin atau klorheksidin',
+      'Spuit 10 mL berisi AQUADES STERIL (bukan NaCl — kristal garam dapat menyumbat balon)',
+      'Urine bag, plester fiksasi, bengkok, pinset',
+    ],
+    fases: [
+      {
+        fase: 'Persiapan',
+        steps: [
+          'Perkenalkan diri, jelaskan prosedur, dan minta persetujuan. Jaga PRIVASI pasien dengan sampiran dan buka area seperlunya saja.',
+          'SEBELUM memasang, singkirkan tanda ruptur uretra: periksa meatus untuk darah, perineum untuk hematoma, dan lakukan colok dubur pada trauma untuk menilai posisi prostat.',
+          'Posisikan pasien: laki-laki terlentang dengan tungkai sedikit abduksi; perempuan posisi litotomi atau dorsal rekumben dengan lutut fleksi dan abduksi.',
+          'Cuci tangan, siapkan alat steril di atas duk, dan pakai sarung tangan steril.',
+          'Uji balon kateter dengan mengembangkannya menggunakan aquades lalu kempiskan kembali sebelum digunakan.',
+        ],
+      },
+      {
+        fase: 'Antisepsis',
+        steps: [
+          'LAKI-LAKI: pegang penis dengan tangan non-dominan dan tarik preputium ke belakang (retraksi) untuk membuka glans. Bersihkan meatus secara melingkar dari dalam ke luar sebanyak tiga kali dengan kasa antiseptik berbeda.',
+          'PEREMPUAN: buka labia dengan tangan non-dominan dan pertahankan posisinya (tangan ini menjadi tidak steril). Bersihkan dari arah DEPAN KE BELAKANG, dimulai dari labia mayora, labia minora, lalu meatus di tengah, masing-masing dengan kasa berbeda.',
+          'Pasang duk steril berlubang.',
+        ],
+      },
+      {
+        fase: 'Insersi — laki-laki',
+        steps: [
+          'Masukkan jeli lidokain 2% sebanyak 10-20 mL ke dalam uretra melalui meatus, lalu jepit meatus selama 3-5 menit agar anestesi bekerja.',
+          'Pegang penis TEGAK LURUS (90 derajat) terhadap tubuh dengan sedikit traksi — posisi ini meluruskan uretra pars pendulans.',
+          'Masukkan kateter perlahan hingga hampir seluruh panjangnya (sekitar 18-22 cm) atau sampai percabangan kateter menyentuh meatus.',
+          'Bila terasa tahanan pada uretra pars membranasea, TURUNKAN penis ke arah kaudal dan minta pasien menarik napas dalam atau seperti akan berkemih — jangan pernah memaksa mendorong.',
+          'Pastikan urin KELUAR sebelum mengembangkan balon.',
+        ],
+      },
+      {
+        fase: 'Insersi — perempuan',
+        steps: [
+          'Identifikasi meatus uretra yang terletak di antara klitoris dan introitus vagina.',
+          'Berikan pelumas pada ujung kateter dan masukkan perlahan sekitar 5-7 cm hingga urin keluar.',
+          'Bila kateter tidak sengaja masuk ke vagina, TINGGALKAN kateter tersebut sebagai penanda, lalu gunakan kateter BARU yang steril untuk uretra.',
+          'Setelah urin keluar, majukan kateter 2-3 cm lagi sebelum mengembangkan balon.',
+        ],
+      },
+      {
+        fase: 'Fiksasi & pascatindakan',
+        steps: [
+          'Kembangkan balon dengan AQUADES STERIL sesuai volume yang tertera pada kateter (umumnya 10 mL pada dewasa).',
+          'JANGAN mengembangkan balon sebelum urin keluar — mengembangkan balon di dalam uretra menyebabkan ruptur uretra.',
+          'Tarik kateter perlahan hingga terasa tahanan balon pada leher kandung kemih.',
+          'PADA LAKI-LAKI, KEMBALIKAN PREPUTIUM ke posisi semula — bila lupa akan terjadi PARAFIMOSIS yang merupakan kedaruratan.',
+          'Sambungkan ke urine bag dan letakkan kantong LEBIH RENDAH dari kandung kemih untuk mencegah aliran balik, namun jangan menyentuh lantai.',
+          'Fiksasi kateter pada paha (perempuan) atau abdomen bawah (laki-laki, untuk mencegah nekrosis penoskrotal pada pemakaian lama).',
+          'Pada retensi urin lama, keluarkan urin secara BERTAHAP untuk mengurangi risiko hematuria ex vacuo dan hipotensi.',
+          'Dokumentasikan ukuran kateter, volume urin awal, karakteristik urin, dan toleransi pasien.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Kontraindikasi mutlak — tanda ruptur uretra',
+        kepanjangan: [
+          '1 — Darah pada meatus uretra',
+          '2 — Hematoma perineum berbentuk kupu-kupu',
+          '3 — Prostat melayang / tidak teraba pada colok dubur',
+          '4 — Riwayat trauma pelvis',
+        ],
+        catatan: 'Bila ada salah satu tanda ini, JANGAN memasang kateter uretra. Lakukan sistostomi suprapubik dan uretrografi retrograd.',
+      },
+      {
+        akronim: 'Tiga kesalahan fatal',
+        kepanjangan: [
+          '1 — Mengembangkan balon SEBELUM urin keluar → ruptur uretra',
+          '2 — Lupa mengembalikan PREPUTIUM → parafimosis',
+          '3 — Memaksa mendorong saat ada tahanan → false passage',
+        ],
+      },
+    ],
+    tips: [
+      'Gunakan AQUADES untuk balon, bukan NaCl — kristal garam dapat menyumbat saluran balon sehingga sulit dikempiskan saat pelepasan.',
+      'Jeli lidokain berfungsi ganda sebagai anestesi dan pelumas; beri waktu 3-5 menit agar bekerja.',
+      'Kateter yang tidak diperlukan adalah sumber utama infeksi saluran kemih terkait perawatan kesehatan — evaluasi indikasi setiap hari dan lepas sedini mungkin.',
+      'Jangan mengobati bakteriuria asimtomatik pada pasien berkateter; hanya mendorong resistensi tanpa manfaat.',
+      'Pada OSCE, verbalisasikan pemeriksaan tanda ruptur uretra SEBELUM menyentuh kateter — ini sering menjadi poin penilaian kritis.',
+    ],
+    komplikasi: [
+      'Infeksi saluran kemih terkait kateter dan urosepsis',
+      'Trauma uretra dan pembentukan false passage',
+      'Ruptur uretra akibat pengembangan balon di dalam uretra',
+      'Parafimosis akibat preputium tidak dikembalikan',
+      'Striktur uretra pada pemakaian lama',
+      'Hematuria ex vacuo pada pengosongan terlalu cepat',
+      'Nekrosis penoskrotal akibat fiksasi yang salah',
+    ],
+    referensi: ['CAMPBELL2016', 'ATLS2018', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'pungsi-suprapubik',
+    category: 'Saluran Cerna & Kemih',
+    title: 'Pungsi & Sistostomi Suprapubik',
+    subtitle: 'Jalan keluar urin saat kateterisasi uretra tidak mungkin dilakukan',
+    indikasi: [
+      'Retensi urin dengan kateterisasi uretra gagal atau merupakan kontraindikasi',
+      'DUGAAN RUPTUR URETRA pada trauma pelvis',
+      'Striktur uretra berat dan fimosis berat yang menghalangi akses',
+      'Prostatitis akut berat di mana kateterisasi uretra sebaiknya dihindari',
+      'Pengambilan sampel urin steril pada bayi (aspirasi suprapubik)',
+    ],
+    kontraindikasi: [
+      'Kandung kemih TIDAK teraba atau tidak penuh — risiko melukai usus; wajib dipastikan dengan palpasi, perkusi, atau USG',
+      'Riwayat operasi abdomen bawah dengan perlengketan (relatif)',
+      'Koagulopati yang tidak terkoreksi',
+      'Kecurigaan keganasan kandung kemih (risiko penyebaran sepanjang jalur tusukan)',
+      'Kehamilan (relatif)',
+    ],
+    alat: [
+      'Set sistostomi atau trokar suprapubik dengan kateter (10-16 Fr)',
+      'Untuk aspirasi diagnostik: spuit 10-20 mL dengan jarum spinal 22 G atau jarum panjang',
+      'Antiseptik, duk steril berlubang, sarung tangan steril',
+      'Lidokain 1-2% untuk anestesi lokal, spuit 5 mL, jarum 23-25 G',
+      'Bisturi, benang dan jarum untuk fiksasi, kasa steril, urine bag',
+      'USG bedside bila tersedia — sangat dianjurkan untuk memastikan kandung kemih penuh',
+    ],
+    fases: [
+      {
+        fase: 'Persiapan & penentuan lokasi',
+        steps: [
+          'Jelaskan prosedur, jelaskan alasan mengapa kateter uretra tidak dapat dipasang, lalu minta persetujuan tindakan.',
+          'PASTIKAN KANDUNG KEMIH PENUH: palpasi massa di suprapubik, perkusi redup, dan idealnya konfirmasi dengan USG. Ini adalah syarat keamanan yang tidak boleh dilewati.',
+          'Posisikan pasien terlentang dengan sedikit Trendelenburg agar usus bergeser ke kranial.',
+          'Tentukan titik tusukan: GARIS TENGAH, sekitar 2 JARI (2-4 cm) DI ATAS SIMFISIS PUBIS — di atas titik ini terdapat risiko mengenai peritoneum dan usus.',
+          'Cukur rambut bila perlu, lakukan antisepsis luas, dan pasang duk steril.',
+        ],
+      },
+      {
+        fase: 'Tindakan',
+        steps: [
+          'Berikan anestesi lokal lidokain infiltrasi pada kulit hingga fasia, sambil melakukan aspirasi berkala.',
+          'Untuk ASPIRASI DIAGNOSTIK (misalnya pengambilan sampel urin steril pada bayi): tusukkan jarum tegak lurus 90 derajat terhadap kulit atau sedikit mengarah ke kaudal, sambil melakukan aspirasi terus-menerus hingga urin keluar.',
+          'Untuk SISTOSTOMI: buat insisi kecil pada kulit dengan bisturi, lalu masukkan trokar dengan arah tegak lurus atau sedikit ke arah kaudal (menjauhi peritoneum).',
+          'Setelah terasa sensasi menembus dinding kandung kemih dan urin mengalir, majukan kateter ke dalam kandung kemih lalu tarik trokar.',
+          'Kembangkan balon bila menggunakan kateter berbalon, lalu tarik perlahan hingga terasa tahanan.',
+          'Keluarkan urin secara BERTAHAP pada retensi lama untuk mencegah hematuria ex vacuo.',
+        ],
+      },
+      {
+        fase: 'Fiksasi & pemantauan',
+        steps: [
+          'Fiksasi kateter pada kulit dengan jahitan dan plester, lalu tutup dengan kasa steril.',
+          'Sambungkan ke urine bag dan posisikan lebih rendah dari kandung kemih.',
+          'Pantau warna urin, jumlah, tanda perdarahan, dan tanda iritasi peritoneum.',
+          'Dokumentasikan indikasi, volume urin, dan kondisi pascatindakan; rujuk ke urologi untuk penanganan definitif penyebab retensi.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Syarat aman — "PENUH, TENGAH, DUA JARI"',
+        kepanjangan: [
+          'PENUH — kandung kemih harus teraba/perkusi redup (idealnya konfirmasi USG)',
+          'TENGAH — tusukan pada garis tengah (midline)',
+          'DUA JARI — sekitar 2-4 cm di atas simfisis pubis',
+        ],
+        catatan: 'Menusuk terlalu tinggi atau saat kandung kemih kosong berisiko melukai usus dan peritoneum.',
+      },
+    ],
+    tips: [
+      'Kandung kemih yang tidak penuh adalah alasan paling sering terjadinya cedera usus — jangan pernah menusuk "coba-coba".',
+      'Arahkan jarum sedikit ke KAUDAL untuk menjauhi rongga peritoneum.',
+      'Pada trauma dengan dugaan ruptur uretra, sistostomi suprapubik adalah tindakan yang BENAR, sedangkan memaksakan kateter uretra justru memperburuk cedera.',
+      'USG bedside sangat menurunkan risiko komplikasi dan sebaiknya digunakan bila tersedia.',
+    ],
+    komplikasi: [
+      'Perforasi usus dan peritonitis',
+      'Perdarahan dan hematuria',
+      'Infeksi luka dan selulitis di sekitar lokasi',
+      'Kebocoran urin ke rongga perivesika',
+      'Kateter tersumbat atau terlepas',
+    ],
+    referensi: ['CAMPBELL2016', 'SCHWARTZ2019', 'ATLS2018'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'hecting',
+    category: 'Bedah Minor & Luka',
+    title: 'Hecting — Penjahitan Luka',
+    subtitle: 'Anestesi lokal, pemilihan benang, pola jahitan, dan waktu angkat jahitan',
+    diagram: 'suturePatterns',
+    indikasi: [
+      'Luka terbuka dengan tepi yang dapat didekatkan',
+      'Luka yang memerlukan hemostasis',
+      'Luka pada area yang memerlukan hasil kosmetik baik',
+    ],
+    kontraindikasi: [
+      'Luka gigitan binatang atau manusia pada umumnya TIDAK dijahit primer (kecuali pada wajah dengan pertimbangan kosmetik dan setelah irigasi sangat adekuat) — risiko infeksi tinggi',
+      'Luka terkontaminasi berat atau luka lebih dari 6-8 jam pada ekstremitas — pertimbangkan penjahitan primer tertunda',
+      'Luka tusuk dalam yang tidak dapat dieksplorasi seluruhnya',
+      'Adanya benda asing atau jaringan nekrotik yang belum dibersihkan',
+      'Tanda infeksi aktif pada luka',
+    ],
+    alat: [
+      'Hecting set: needle holder, pinset chirurgis, pinset anatomis, gunting benang, gunting jaringan, klem arteri',
+      'Benang dan jarum sesuai lokasi (lihat panduan pemilihan)',
+      'Lidokain 1-2%; gunakan TANPA epinefrin pada jari, penis, hidung, dan telinga',
+      'Spuit 3-5 mL dengan jarum 25-27 G untuk anestesi',
+      'NaCl 0,9% untuk irigasi (idealnya 250-1000 mL tergantung ukuran luka), spuit 20-50 mL untuk irigasi bertekanan',
+      'Povidon iodin atau klorheksidin untuk kulit sekitar, duk steril berlubang, sarung tangan steril, kasa',
+    ],
+    fases: [
+      {
+        fase: 'Penilaian luka',
+        steps: [
+          'Nilai mekanisme cedera, waktu kejadian (golden period), derajat kontaminasi, dan kemungkinan benda asing.',
+          'Periksa status NEUROVASKULAR dan fungsi TENDON di distal luka SEBELUM anestesi — setelah dianestesi penilaian sensorik menjadi tidak valid.',
+          'Nilai kedalaman luka dan struktur di bawahnya; luka pada tangan sering melibatkan tendon dan memerlukan rujukan.',
+          'Tanyakan riwayat imunisasi tetanus dan riwayat alergi obat.',
+          'Foto rontgen bila dicurigai benda asing radiopak atau fraktur di bawahnya.',
+        ],
+      },
+      {
+        fase: 'Anestesi lokal',
+        steps: [
+          'Aspirasi sebelum menyuntik untuk memastikan tidak masuk pembuluh darah.',
+          'Infiltrasi lidokain 1-2% pada tepi luka dari DALAM luka (lebih tidak nyeri) atau dari kulit sekitar, secara perlahan.',
+          'Dosis maksimal lidokain: 4,5 mg/kgBB tanpa epinefrin, dan 7 mg/kgBB dengan epinefrin. Ingat bahwa lidokain 1% berarti 10 mg per mL.',
+          'JANGAN menggunakan lidokain dengan epinefrin pada bagian tubuh dengan sirkulasi ujung: jari, penis, hidung, daun telinga — risiko iskemia dan nekrosis.',
+          'Untuk luka pada jari gunakan blok digital dengan menyuntik pada kedua sisi basis jari.',
+          'Uji efektivitas anestesi dengan pinset sebelum memulai penjahitan.',
+        ],
+      },
+      {
+        fase: 'Pembersihan luka',
+        steps: [
+          'IRIGASI adalah langkah paling menentukan dalam mencegah infeksi — gunakan NaCl 0,9% bertekanan dengan spuit 20-50 mL, sebanyak sekitar 50-100 mL per sentimeter panjang luka.',
+          'Bersihkan kulit di sekitar luka dengan antiseptik; hindari menuangkan povidon iodin pekat langsung ke dalam luka karena bersifat toksik terhadap jaringan.',
+          'Lakukan debridement jaringan nekrotik dan angkat benda asing dengan pinset.',
+          'Eksplorasi luka untuk menilai kedalaman dan struktur yang terlibat.',
+          'Pasang duk steril berlubang.',
+        ],
+      },
+      {
+        fase: 'Teknik penjahitan',
+        steps: [
+          'Pegang needle holder dengan jarum dijepit pada sepertiga posterior hingga tengah jarum.',
+          'Tusukkan jarum TEGAK LURUS 90 derajat terhadap permukaan kulit pada jarak dari tepi luka yang sebanding dengan tebal kulit (umumnya 3-5 mm).',
+          'Ikuti LENGKUNG jarum saat mendorong (gerakan supinasi pergelangan), jangan mendorong lurus karena dapat membengkokkan jarum.',
+          'Ambil kedalaman yang SAMA pada kedua tepi luka agar tepi bertemu rata tanpa bertingkat.',
+          'JAHITAN SIMPUL TERPUTUS (simple interrupted) merupakan pilihan paling umum dan paling aman karena bila satu simpul lepas, sisanya tetap bertahan.',
+          'Jarak antarjahitan kurang lebih sama dengan jarak jahitan dari tepi luka.',
+          'Tepi luka harus sedikit EVERSI (terangkat ke luar) — tepi yang inversi menyebabkan penyembuhan buruk dan bekas luka lebih jelas.',
+          'Ikat simpul dengan tegangan secukupnya untuk mendekatkan tepi, JANGAN terlalu kencang karena edema akan menyebabkan iskemia dan nekrosis tepi luka.',
+          'Letakkan simpul di SATU SISI luka, bukan tepat di atas garis luka.',
+          'Untuk luka dalam, jahit lapis demi lapis: jahitan subkutan dengan benang absorbable untuk menghilangkan rongga mati, lalu kulit.',
+        ],
+      },
+      {
+        fase: 'Pascatindakan',
+        steps: [
+          'Bersihkan darah, olesi salep antibiotik bila diindikasikan, lalu tutup dengan kasa steril.',
+          'Berikan PROFILAKSIS TETANUS sesuai status imunisasi dan jenis luka.',
+          'Antibiotik TIDAK rutin diberikan pada luka bersih; diberikan pada luka gigitan, luka terkontaminasi, luka tembus, pasien diabetes, atau imunokompromais.',
+          'Edukasi perawatan luka: jaga tetap kering dan bersih, ganti balutan sesuai anjuran, serta kenali tanda infeksi.',
+          'Jadwalkan kontrol dan waktu angkat jahitan sesuai lokasi luka.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Waktu angkat jahitan menurut lokasi',
+        kepanjangan: [
+          'WAJAH — 3-5 hari (kosmetik; makin cepat makin baik)',
+          'KULIT KEPALA — 7-10 hari',
+          'LEHER — 5-7 hari',
+          'BADAN / DADA / PERUT — 7-10 hari',
+          'LENGAN & TUNGKAI — 10-14 hari',
+          'SENDI & TELAPAK / PUNGGUNG TANGAN & KAKI — 14 hari',
+        ],
+        catatan: 'Semakin banyak tegangan dan gerakan pada suatu area, semakin lama jahitan dipertahankan.',
+      },
+      {
+        akronim: 'Pemilihan benang',
+        kepanjangan: [
+          'WAJAH — non-absorbable halus 5-0 atau 6-0 (nilon/prolene)',
+          'BADAN & EKSTREMITAS — 3-0 atau 4-0',
+          'KULIT KEPALA — 3-0 (lebih kuat)',
+          'MUKOSA & SUBKUTAN — absorbable (catgut/vicryl) karena tidak perlu diangkat',
+          'Makin besar angka, makin HALUS benangnya',
+        ],
+      },
+      {
+        akronim: 'Anestesi lokal — dosis maksimal lidokain',
+        kepanjangan: [
+          'TANPA epinefrin — 4,5 mg/kgBB',
+          'DENGAN epinefrin — 7 mg/kgBB',
+          'Lidokain 1% = 10 mg/mL',
+          'JANGAN pakai epinefrin pada: jari, penis, hidung, telinga',
+        ],
+      },
+    ],
+    tips: [
+      'IRIGASI yang adekuat jauh lebih menentukan pencegahan infeksi daripada pemberian antibiotik.',
+      'Periksa fungsi saraf dan tendon SEBELUM memberikan anestesi — setelahnya penilaian tidak lagi dapat dipercaya.',
+      'Simpul yang terlalu kencang menyebabkan nekrosis tepi luka; sisakan ruang untuk edema.',
+      'Eversi tepi luka menghasilkan bekas luka yang lebih halus dibanding tepi yang datar atau masuk ke dalam.',
+      'Luka gigitan umumnya tidak dijahit primer; irigasi sangat adekuat, berikan antibiotik, dan pertimbangkan profilaksis rabies serta tetanus.',
+      'Pada OSCE, verbalisasikan penilaian neurovaskular, riwayat tetanus, dan irigasi — ketiganya sering menjadi poin penilaian yang terlewat.',
+    ],
+    komplikasi: [
+      'Infeksi luka dan abses',
+      'Dehisensi (luka terbuka kembali)',
+      'Nekrosis tepi luka akibat jahitan terlalu kencang',
+      'Jaringan parut hipertrofik dan keloid',
+      'Cedera struktur di bawah luka yang tidak terdeteksi (tendon, saraf, pembuluh darah)',
+      'Reaksi terhadap benang atau anestesi lokal, hingga toksisitas sistemik lidokain bila dosis berlebih',
+      'Tetanus bila profilaksis terlewat',
+    ],
+    referensi: ['SCHWARTZ2019', 'ATLS2018', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'bidai',
+    category: 'Muskuloskeletal',
+    title: 'Pembidaian (Splinting) Fraktur',
+    subtitle: 'Klavikula, brachii, antebrachii, manus, femur, tibia, dan pedis',
+    indikasi: [
+      'Fraktur atau dugaan fraktur pada ekstremitas',
+      'Dislokasi dan cedera ligamen berat',
+      'Imobilisasi sebelum dan selama transportasi pasien',
+      'Mengurangi nyeri, perdarahan, dan risiko cedera jaringan lunak lanjutan',
+    ],
+    kontraindikasi: [
+      'Tidak ada kontraindikasi mutlak; namun pembidaian TIDAK boleh menunda penanganan kegawatan jalan napas, pernapasan, dan sirkulasi',
+      'Pada fraktur terbuka, jangan mendorong kembali tulang yang menonjol ke dalam luka',
+    ],
+    alat: [
+      'Bidai kaku (spalk kayu, bidai vakum, atau bidai udara) dengan panjang memadai',
+      'Mitela (kain segitiga), verban elastis, kasa gulung, dan padding (kapas atau kasa tebal)',
+      'Gunting, plester, bantal atau selimut untuk penyangga',
+      'Sarung tangan dan kasa steril untuk menutup luka pada fraktur terbuka',
+    ],
+    fases: [
+      {
+        fase: 'Prinsip umum pembidaian',
+        steps: [
+          'Nilai dan catat status NEUROVASKULAR DISTAL sebelum dan sesudah pembidaian: warna, suhu, capillary refill, pulsasi, sensasi, dan gerakan. Dokumentasikan keduanya.',
+          'Berikan analgesia yang memadai sebelum melakukan manipulasi.',
+          'Buka atau gunting pakaian pada area cedera; lepaskan cincin, jam, dan gelang sebelum pembengkakan bertambah.',
+          'Tutup luka pada fraktur terbuka dengan kasa steril lebih dahulu; JANGAN mendorong kembali tulang yang menonjol.',
+          'IMOBILISASI harus mencakup SENDI DI PROKSIMAL DAN DI DISTAL lokasi fraktur.',
+          'Beri padding yang cukup terutama pada tonjolan tulang untuk mencegah luka tekan.',
+          'Bidai dalam POSISI DITEMUKAN bila terdapat deformitas berat dan nadi distal masih baik; luruskan hati-hati hanya bila perfusi distal terganggu.',
+          'Ikat bidai secukupnya — tidak boleh terlalu ketat sehingga menghambat sirkulasi; periksa ulang setelah terpasang.',
+          'Elevasi ekstremitas dan berikan kompres dingin bila memungkinkan.',
+        ],
+      },
+      {
+        fase: 'Klavikula',
+        steps: [
+          'Gunakan MITELA (arm sling) untuk menyangga lengan sisi yang cedera, atau balutan RANSEL (figure-of-eight bandage) untuk menarik bahu ke belakang.',
+          'Pada mitela, siku difleksikan 90 derajat dan lengan bawah disangga dengan pergelangan tangan sedikit lebih tinggi dari siku.',
+          'Simpul mitela diletakkan di sisi leher yang SEHAT agar tidak menekan tulang belakang leher dan tidak menimbulkan nyeri.',
+          'Periksa sirkulasi dan sensasi lengan setelah pemasangan; balutan ransel yang terlalu ketat dapat menekan pleksus brakialis.',
+        ],
+      },
+      {
+        fase: 'Humerus (brachii)',
+        steps: [
+          'Pasang bidai pada sisi lateral lengan atas dari BAHU hingga melewati SIKU.',
+          'Sangga lengan bawah dengan mitela dan tambahkan swathe (balutan melingkar dada) untuk memfiksasi lengan ke dinding dada.',
+          'Periksa fungsi NERVUS RADIALIS: kemampuan ekstensi pergelangan tangan dan jari, serta sensasi pada dorsum tangan antara ibu jari dan telunjuk — nervus radialis paling sering cedera pada fraktur humerus.',
+        ],
+      },
+      {
+        fase: 'Antebrachii (radius-ulna)',
+        steps: [
+          'Pasang bidai dari SIKU hingga melewati PERGELANGAN TANGAN sampai pangkal jari.',
+          'Posisikan lengan bawah dalam posisi netral atau pronasi ringan, dengan pergelangan tangan sedikit ekstensi.',
+          'Sangga dengan mitela dan pastikan siku terfiksasi dalam fleksi 90 derajat.',
+          'Fraktur distal radius (Colles) menimbulkan deformitas khas menyerupai garpu makan (dinner fork deformity).',
+        ],
+      },
+      {
+        fase: 'Manus (tangan & jari)',
+        steps: [
+          'Imobilisasi tangan dalam POSISI FUNGSIONAL: pergelangan ekstensi sekitar 20-30 derajat, sendi metakarpofalang fleksi 70-90 derajat, dan sendi interfalang hampir lurus — posisi seperti sedang menggenggam gelas.',
+          'Letakkan gulungan kasa pada telapak tangan untuk mempertahankan posisi tersebut.',
+          'Untuk fraktur jari, dapat digunakan buddy taping yaitu mengikat jari yang cedera pada jari sehat di sebelahnya dengan pemisah kasa.',
+          'Elevasi tangan untuk mengurangi pembengkakan.',
+        ],
+      },
+      {
+        fase: 'Femur',
+        steps: [
+          'Fraktur femur dapat menyebabkan kehilangan darah 1-2 liter ke dalam paha — nilai tanda syok dan pasang jalur infus.',
+          'Gunakan BIDAI TRAKSI (traction splint) bila tersedia untuk fraktur batang femur tertutup, karena mengurangi nyeri, perdarahan, dan spasme otot.',
+          'BIDAI TRAKSI merupakan KONTRAINDIKASI pada fraktur pelvis, fraktur leher femur, cedera lutut, dan fraktur tungkai bawah yang menyertai.',
+          'Bila bidai traksi tidak tersedia, pasang bidai panjang dari PANGGUL (setinggi krista iliaka atau aksila) hingga melewati LUTUT sampai pergelangan kaki, dan ikat kedua tungkai bersama dengan padding di antaranya.',
+          'Periksa pulsasi arteri dorsalis pedis dan tibialis posterior sebelum dan sesudah pemasangan.',
+        ],
+      },
+      {
+        fase: 'Tibia-fibula (cruris)',
+        steps: [
+          'Pasang bidai dari atas LUTUT hingga melewati PERGELANGAN KAKI, idealnya pada sisi medial dan lateral.',
+          'Posisikan pergelangan kaki dalam 90 derajat (posisi netral) untuk mencegah kontraktur equinus.',
+          'Beri padding pada maleolus dan kaput fibula — NERVUS PERONEUS KOMUNIS berjalan superfisial di kaput fibula dan mudah tertekan sehingga menimbulkan drop foot.',
+          'WASPADAI SINDROM KOMPARTEMEN pada fraktur tibia: nyeri hebat tidak sebanding dengan cedera, nyeri saat peregangan pasif jari kaki, parestesia, dan tegang pada kompartemen. Bila dicurigai, LONGGARKAN semua balutan dan segera rujuk untuk fasciotomi.',
+        ],
+      },
+      {
+        fase: 'Pedis (kaki & pergelangan kaki)',
+        steps: [
+          'Gunakan bidai posterior berbentuk L dari belakang tungkai bawah hingga telapak kaki, dengan pergelangan kaki dipertahankan 90 derajat.',
+          'Alternatif: gunakan bantal atau selimut yang dilipat mengelilingi kaki dan pergelangan kaki lalu diikat.',
+          'Jangan menutup jari-jari kaki agar sirkulasi tetap dapat dipantau.',
+          'Elevasi tungkai dan berikan kompres dingin.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Prinsip bidai — "PNP"',
+        kepanjangan: [
+          'P — Periksa neurovaskular distal SEBELUM dan SESUDAH',
+          'N — Netralkan dengan melewati sendi Proksimal dan Distal',
+          'P — Padding cukup, ikat tidak terlalu ketat',
+        ],
+      },
+      {
+        akronim: 'Sindrom kompartemen — 6P',
+        kepanjangan: [
+          'Pain — nyeri hebat tidak sebanding cedera (tanda paling awal)',
+          'Pain on passive stretch — nyeri saat peregangan pasif (paling sensitif)',
+          'Paresthesia — kesemutan',
+          'Pallor — pucat',
+          'Pulselessness — nadi hilang (tanda LAMBAT)',
+          'Paralysis — lumpuh (tanda LAMBAT)',
+        ],
+        catatan: 'Jangan menunggu nadi hilang untuk mendiagnosis — pada saat itu kerusakan otot dan saraf sudah terjadi.',
+      },
+      {
+        akronim: 'Saraf yang berisiko menurut lokasi fraktur',
+        kepanjangan: [
+          'HUMERUS batang — N. radialis (drop hand)',
+          'HUMERUS suprakondilar (anak) — N. medianus & a. brakialis',
+          'KAPUT FIBULA — N. peroneus komunis (drop foot)',
+          'DISLOKASI BAHU — N. aksilaris (baal di regio deltoid)',
+          'DISLOKASI PANGGUL posterior — N. iskiadikus',
+        ],
+      },
+    ],
+    tips: [
+      'Dokumentasi status neurovaskular sebelum dan sesudah pembidaian adalah keharusan medikolegal, bukan sekadar formalitas.',
+      'Fraktur femur dapat menyembunyikan perdarahan 1-2 liter — selalu nilai tanda syok.',
+      'Jangan pernah mendorong kembali tulang yang menonjol pada fraktur terbuka; tutup dengan kasa steril lembap dan berikan antibiotik serta profilaksis tetanus.',
+      'Balutan yang terlalu ketat adalah penyebab sindrom kompartemen iatrogenik — periksa ulang secara berkala.',
+      'Selalu sisakan ujung jari tangan atau kaki terbuka agar perfusi dapat dipantau.',
+      'Pada fraktur terbuka, antibiotik dalam 1 jam pertama menurunkan risiko infeksi secara bermakna.',
+    ],
+    komplikasi: [
+      'Sindrom kompartemen akibat balutan terlalu ketat atau pembengkakan progresif',
+      'Cedera neurovaskular akibat manipulasi yang kasar',
+      'Luka tekan pada tonjolan tulang akibat padding tidak memadai',
+      'Fraktur tertutup berubah menjadi terbuka akibat manipulasi berlebihan',
+      'Kontraktur akibat imobilisasi pada posisi yang salah',
+      'Emboli lemak pada fraktur tulang panjang',
+    ],
+    referensi: ['ATLS2018', 'APLEY2018', 'CAMPBELLORTHO2021'],
+  },
 ]
