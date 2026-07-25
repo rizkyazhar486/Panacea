@@ -138,9 +138,18 @@ export interface AnamnesisTerstruktur {
   riwayatSosialEkonomi?: string
 }
 
-export interface SkdiDiseaseNote {
+/**
+ * Catatan penyakit. Ringkasan kriteria diagnosis boleh diberikan lewat
+ * `diagnosis` (format ringkas) atau `goldStandard` (format mendalam) — tipe di
+ * bawah memaksa minimal salah satunya ada, sehingga tidak mungkin ada entri
+ * tanpa keterangan cara menegakkan diagnosis.
+ */
+export type SkdiDiseaseNote = SkdiDiseaseNoteBase &
+  ({ diagnosis: string[] } | { goldStandard: string })
+
+interface SkdiDiseaseNoteBase {
   definisi: string
-  diagnosis: string[]
+  diagnosis?: string[]
   tatalaksana: string[]
   /** Key ke REFERENSI_SUMBER — pedoman yang menjadi rujukan konsep entry ini. */
   referensi: string[]
@@ -2654,10 +2663,108 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'SLEISENGER2021', 'HARRISON2022'],
   },
   'Gastroenteritis (termasuk kolera, giardiasis)': {
-    definisi: 'Inflamasi saluran cerna oleh infeksi yang menyebabkan diare dengan/tanpa muntah; kolera menimbulkan diare sekretorik masif.',
-    diagnosis: ['Diare akut, dapat disertai demam dan muntah; kolera: tinja seperti air cucian beras dengan dehidrasi cepat dan berat; giardiasis: diare kronik berlemak dan kembung; nilai derajat dehidrasi sebagai prioritas'],
-    tatalaksana: ['REHIDRASI adalah terapi utama — oralit pada dehidrasi ringan-sedang, cairan IV (RL) pada dehidrasi berat; zink 10-14 hari pada anak; antibiotik selektif (doksisiklin/azitromisin pada kolera, metronidazol pada giardiasis); hindari antimotilitas pada diare berdarah/anak'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'SLEISENGER2021'],
+    definisi: 'Peradangan mukosa lambung dan usus akibat infeksi yang bermanifestasi sebagai diare akut dengan atau tanpa muntah; masih menjadi penyebab kematian anak balita terbanyak kedua di dunia, dan hampir seluruh kematiannya disebabkan dehidrasi yang sebenarnya dapat dicegah.',
+    anamnesis: {
+      keluhanUtama: 'Buang air besar cair lebih dari tiga kali sehari sejak beberapa hari, disertai muntah dan lemas.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan SOCRATES. Site: nyeri perut periumbilikal pada enteritis usus halus, atau nyeri perut bawah dan tenesmus pada kolitis. Onset: mendadak; catat waktu tepat dimulainya untuk memperkirakan penyebab — toksin praterbentuk seperti Staphylococcus aureus menimbulkan gejala dalam 1-6 jam, sedangkan patogen invasif seperti Salmonella dalam 12-72 jam. Character: KUANTIFIKASI diare — frekuensi per hari, volume tiap kali (seberapa banyak dibanding gelas), konsistensi (cair, lembek, seperti air cucian beras pada kolera), dan yang paling penting ADA TIDAKNYA DARAH DAN LENDIR yang menandakan disentri. Radiation: nyeri menjalar ke seluruh perut. Associations: muntah dan frekuensinya, demam, nyeri kepala, kram otot akibat gangguan elektrolit, tenesmus, dan yang terpenting FREKUENSI SERTA VOLUME BUANG AIR KECIL TERAKHIR sebagai penanda dehidrasi paling praktis. Time course: diare akut kurang dari 14 hari, persisten 14-30 hari, kronik lebih dari 30 hari; giardiasis khas berlangsung kronik dengan tinja berlemak dan kembung. Exacerbating: hubungan dengan makanan atau minuman tertentu, riwayat jajan di luar, dan sumber air minum. Severity: kemampuan minum dan makan, tingkat kelemahan, serta apakah masih dapat beraktivitas.',
+      riwayatPenyakitDahulu: 'Riwayat diare berulang, penyakit saluran cerna kronik, imunodefisiensi termasuk HIV, diabetes, dan penyakit ginjal yang memperberat gangguan cairan.',
+      riwayatPenyakitKeluarga: 'Apakah ada anggota keluarga atau orang lain yang makan bersama juga mengalami keluhan serupa — mengarah pada keracunan makanan atau wabah setempat.',
+      riwayatPengobatan:
+        'Penggunaan ANTIBIOTIK dalam 3 bulan terakhir (mengarahkan pada kolitis akibat Clostridioides difficile), obat antidiare yang sudah diminum sendiri, obat pencahar, dan jamu; tanyakan pula penggunaan obat antiinflamasi nonsteroid dan penghambat pompa proton.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi makanan yang dapat menjadi diagnosis banding.',
+      riwayatTumbuhKembang: 'Pada anak: berat badan sebelum sakit sebagai pembanding, riwayat pertumbuhan pada KMS, dan riwayat diare berulang yang berdampak pada status gizi.',
+      riwayatNutrisi:
+        'Pada bayi: apakah mendapat ASI eksklusif, penggunaan susu formula dan cara penyiapannya (kebersihan botol dan air), serta usia dan jenis MPASI. Pada semua usia: riwayat makanan dan minuman dalam 72 jam terakhir, terutama makanan tidak dimasak matang, es batu, jajanan pinggir jalan, dan makanan yang disimpan lama.',
+      riwayatImunisasi: 'Status imunisasi rotavirus dan campak pada anak — campak meningkatkan risiko diare berat.',
+      riwayatSosialEkonomi:
+        'Sumber air minum dan cara pengolahannya, ketersediaan jamban sehat, kebiasaan cuci tangan pakai sabun, kondisi sanitasi lingkungan, riwayat banjir, serta akses ke fasilitas kesehatan bila kondisi memburuk.',
+    },
+    pemeriksaanFisik: [
+      'PENILAIAN DERAJAT DEHIDRASI adalah pemeriksaan terpenting dan menentukan seluruh rencana terapi',
+      'Tanpa dehidrasi: sadar penuh, mata normal, minum biasa, turgor kembali cepat',
+      'Dehidrasi ringan-sedang: gelisah atau rewel, mata cekung, HAUS dan ingin minum banyak, turgor kembali lambat (kurang dari 2 detik)',
+      'Dehidrasi berat: letargi atau tidak sadar, mata sangat cekung, TIDAK BISA MINUM atau malas minum, turgor kembali sangat lambat (2 detik atau lebih), nadi cepat lemah, akral dingin, capillary refill memanjang',
+      'Timbang berat badan — selisih terhadap berat sebelum sakit merupakan estimasi defisit cairan paling akurat (penurunan 1 kg setara 1 liter)',
+      'Tanda vital lengkap termasuk suhu, nadi, tekanan darah, dan frekuensi napas; napas cepat dan dalam menandakan asidosis metabolik',
+      'Ubun-ubun besar cekung pada bayi, mulut dan lidah kering, air mata berkurang saat menangis',
+      'Abdomen: bising usus meningkat, nyeri tekan difus; waspadai distensi dengan bising usus menghilang yang menandakan ileus akibat hipokalemia',
+      'Inspeksi perianal untuk ekskoriasi, dan periksa tinja secara makroskopis untuk darah dan lendir',
+    ],
+    antropometri:
+      'Pada anak, plot berat badan menurut umur, tinggi badan menurut umur, dan berat badan menurut tinggi badan pada kurva WHO. Berat badan menurut tinggi badan kurang dari -3 standar deviasi menandakan gizi buruk yang memerlukan tatalaksana khusus dan meningkatkan risiko kematian akibat diare secara bermakna. Persentase penurunan berat badan terhadap berat sebelum sakit memperkirakan derajat dehidrasi: kurang dari 5% ringan, 5-10% sedang, dan lebih dari 10% berat. Pada anak dengan gizi buruk, tanda klinis dehidrasi seperti turgor dan mata cekung menjadi TIDAK ANDAL karena hilangnya lemak subkutan, sehingga penilaian harus lebih hati-hati dan rehidrasi menggunakan ReSoMal, bukan oralit standar.',
+    penunjang: [
+      'Sebagian besar diare akut TIDAK memerlukan pemeriksaan penunjang — diagnosis dan tatalaksana berdasarkan penilaian klinis derajat dehidrasi',
+      'Pemeriksaan tinja rutin dan mikroskopis bila diare berdarah, dicurigai amubiasis (ditemukan trofozoit dengan eritrosit di dalamnya), atau giardiasis (kista atau trofozoit Giardia)',
+      'Kultur tinja pada diare berdarah, demam tinggi, imunokompromais, atau dugaan wabah',
+      'Elektrolit, ureum, kreatinin, dan analisis gas darah pada dehidrasi berat, kejang, atau penurunan kesadaran — cari hipokalemia, hipernatremia atau hiponatremia, dan asidosis metabolik',
+      'Darah lengkap bila dicurigai infeksi bakteri invasif atau sepsis; gula darah pada penurunan kesadaran',
+      'Pada kolera: konfirmasi dengan kultur atau rapid test untuk kepentingan surveilans dan pelaporan wabah',
+    ],
+    etiologi:
+      'Virus merupakan penyebab tersering pada anak, terutama rotavirus dan norovirus. Bakteri meliputi Escherichia coli patogen, Shigella, Salmonella, Campylobacter, dan Vibrio cholerae. Parasit meliputi Entamoeba histolytica, Giardia lamblia, dan Cryptosporidium.',
+    patofisiologi:
+      'Terdapat dua mekanisme utama. Diare SEKRETORIK terjadi ketika enterotoksin, misalnya toksin kolera, mengaktifkan adenilat siklase sehingga kadar siklik AMP dalam enterosit meningkat dan memicu sekresi klorida beserta air ke lumen usus secara masif — akibatnya diare berlangsung tanpa henti meski pasien dipuasakan, dan volume kehilangan cairan dapat mencapai beberapa liter per hari. Diare INVASIF atau inflamatorik terjadi ketika patogen seperti Shigella menginvasi mukosa kolon, menimbulkan ulserasi dan respons inflamasi sehingga tinja mengandung darah, lendir, dan leukosit, disertai demam dan tenesmus. Kunci terapi rehidrasi oral terletak pada mekanisme kotransporter natrium-glukosa di brush border enterosit yang TETAP UTUH meski terjadi infeksi: penyerapan glukosa menarik natrium, dan natrium menarik air secara osmotik. Inilah sebabnya oralit harus mengandung glukosa dan garam dalam perbandingan tepat, dan mengapa air putih saja atau minuman manis tinggi gula justru tidak efektif bahkan dapat memperberat diare osmotik.',
+    faktorRisiko: [
+      'Sanitasi buruk, air minum tidak layak, dan jamban tidak sehat',
+      'Tidak mendapat ASI eksklusif dan penyiapan susu formula yang tidak higienis',
+      'Status gizi buruk dan defisiensi zink serta vitamin A',
+      'Usia balita dan usia lanjut',
+      'Imunodefisiensi termasuk HIV',
+      'Kepadatan hunian, musim hujan, dan riwayat banjir',
+      'Penggunaan antibiotik yang mengganggu flora normal usus',
+    ],
+    goldStandard:
+      'Diagnosis gastroenteritis akut ditegakkan secara KLINIS berdasarkan buang air besar cair tiga kali atau lebih dalam 24 jam yang berlangsung kurang dari 14 hari, disertai penilaian derajat dehidrasi sesuai klasifikasi WHO/Kemenkes. Identifikasi etiologi melalui kultur atau mikroskopi tinja bukan syarat diagnosis dan hanya diperlukan pada diare berdarah, kecurigaan wabah, kasus persisten, atau pasien imunokompromais.',
+    diagnosisBanding: [
+      'Disentri basiler atau amuba — diare berdarah dengan tenesmus; amubiasis khas dengan tinja berlendir darah dan nyeri perut kanan bawah tanpa demam tinggi',
+      'Demam tifoid — demam bertahap mendominasi dengan diare atau justru konstipasi, bradikardia relatif, lidah kotor',
+      'Kolera — diare cair sangat masif seperti air cucian beras tanpa nyeri dan tanpa demam, dehidrasi berat dalam hitungan jam',
+      'Alergi atau intoleransi makanan — berulang dan berkaitan jelas dengan makanan tertentu, tanpa demam',
+      'Apendisitis dan invaginasi pada anak — nyeri perut mendominasi, diare hanya sedikit; invaginasi khas dengan tinja lendir darah seperti selai kismis dan massa berbentuk sosis',
+      'Malaria pada daerah endemis dapat bermanifestasi sebagai diare pada anak',
+    ],
+    pengkajian:
+      'Dipikirkan gastroenteritis akut pada pasien ini atas dasar buang air besar cair yang timbul mendadak dengan frekuensi lebih dari tiga kali sehari disertai muntah, berlangsung kurang dari empat belas hari, pada latar riwayat konsumsi makanan atau minuman yang diragukan kebersihannya dan sanitasi lingkungan yang kurang memadai. Ketiadaan darah dan lendir pada tinja mengarahkan pada mekanisme non-invasif, sehingga kemungkinan disentri basiler maupun amuba menjadi kurang mendukung; pada disentri, tinja berdarah berlendir disertai tenesmus merupakan gambaran yang menonjol, dan pada amubiasis khas ditemukan nyeri perut kanan bawah dengan demam yang tidak terlalu tinggi. Demam tifoid dipertimbangkan karena sama-sama dapat menimbulkan gangguan saluran cerna, namun pada tifoid yang mendominasi adalah demam yang naik bertahap dengan pola anak tangga selama lebih dari satu minggu disertai lidah kotor bertepi hiperemis dan bradikardia relatif, sedangkan diare justru sering ringan atau bahkan digantikan konstipasi. Kolera menjadi pertimbangan penting bila diare sangat masif menyerupai air cucian beras tanpa nyeri perut dan tanpa demam dengan dehidrasi yang berkembang sangat cepat, terutama pada situasi wabah. Pada anak, invaginasi wajib disingkirkan bila nyeri perut bersifat kolik hebat dengan tangisan episodik, tinja berlendir darah menyerupai selai kismis, dan teraba massa berbentuk sosis di abdomen, karena kondisi ini merupakan kegawatdaruratan bedah. Namun yang paling menentukan keselamatan pasien pada kasus ini bukanlah penentuan etiologi, melainkan PENILAIAN DERAJAT DEHIDRASI — karena hampir seluruh kematian akibat diare disebabkan oleh kehilangan cairan dan elektrolit, bukan oleh kuman penyebabnya, sehingga rehidrasi yang tepat dan segera menjadi prioritas utama sebelum pertimbangan pemberian antimikroba.',
+    terapiSuportif: [
+      'RENCANA TERAPI A (tanpa dehidrasi, di rumah): berikan cairan lebih banyak dari biasanya. Oralit setiap kali buang air besar — 50-100 mL pada anak kurang dari 2 tahun, 100-200 mL pada anak 2-10 tahun, dan sebanyak yang diinginkan pada anak lebih besar dan dewasa',
+      'RENCANA TERAPI B (dehidrasi ringan-sedang): oralit 75 mL/kgBB diberikan dalam 3 jam pertama di fasilitas kesehatan, lalu nilai ulang derajat dehidrasi',
+      'RENCANA TERAPI C (dehidrasi berat): ringer laktat intravena 100 mL/kgBB dengan pembagian — pada bayi kurang dari 12 bulan, 30 mL/kgBB dalam 1 jam pertama dilanjutkan 70 mL/kgBB dalam 5 jam berikutnya; pada anak lebih dari 12 bulan dan dewasa, 30 mL/kgBB dalam 30 menit pertama dilanjutkan 70 mL/kgBB dalam 2,5 jam berikutnya',
+      'Nilai ulang setiap 15-30 menit pada dehidrasi berat; bila nadi masih lemah ulangi bolus. Mulai oralit segera setelah pasien mampu minum, umumnya setelah 3-4 jam',
+      'Target PRODUKSI URIN minimal 0,5-1 mL/kg/jam sebagai penanda perfusi yang paling praktis; pemulihan kesadaran dan kembalinya rasa haus normal menandakan rehidrasi berhasil',
+      'Kebutuhan kalori tetap dipenuhi — jangan puasakan pasien. Pemberian makan yang dilanjutkan mempercepat pemulihan mukosa usus, mengurangi durasi diare, dan mencegah penurunan berat badan',
+      'Pada anak dengan gizi buruk gunakan ReSoMal (rehydration solution for malnutrition) yang lebih rendah natrium dan lebih tinggi kalium, dengan pemberian LEBIH LAMBAT dan pemantauan ketat karena risiko gagal jantung akibat kelebihan cairan',
+    ],
+    tatalaksana: [
+      'LIMA LANGKAH TUNTASKAN DIARE (LINTAS Diare) sesuai program nasional: (1) oralit osmolaritas rendah, (2) zink 10-14 hari, (3) teruskan pemberian ASI dan makanan, (4) antibiotik SELEKTIF saja, (5) edukasi kepada orang tua',
+      'ZINK diberikan pada semua anak dengan diare selama 10-14 hari BERTURUT-TURUT meskipun diare sudah berhenti: 10 mg per hari untuk bayi kurang dari 6 bulan dan 20 mg per hari untuk anak 6 bulan ke atas — terbukti memperpendek durasi, mengurangi keparahan, dan menurunkan kekambuhan dalam 2-3 bulan berikutnya',
+      'ASI dan makanan DITERUSKAN selama diare; jangan mengencerkan susu formula dan jangan menghentikan makan',
+      'Antibiotik hanya untuk indikasi jelas: disentri (siprofloksasin atau sefiksim pada anak), kolera (doksisiklin dosis tunggal atau azitromisin), amubiasis dan giardiasis (metronidazol), serta dugaan kolera pada situasi wabah',
+      'Antibiotik TIDAK diberikan pada diare cair akut tanpa darah — sebagian besar disebabkan virus, dan pemberian antibiotik justru memperpanjang diare, mendorong resistensi, serta meningkatkan risiko kolitis akibat Clostridioides difficile',
+      'OBAT ANTIMOTILITAS seperti loperamid MERUPAKAN KONTRAINDIKASI pada anak dan pada diare berdarah maupun demam — dapat memicu ileus, megakolon toksik, dan memperlama pembuangan kuman',
+      'Koreksi hipokalemia dan asidosis; antiemetik hanya bila muntah menghalangi rehidrasi oral',
+      'Lapor dan lakukan penyelidikan epidemiologi bila dicurigai kolera atau kejadian luar biasa',
+    ],
+    edukasi: [
+      'Ajarkan CARA MEMBUAT DAN MEMBERI ORALIT dengan benar: satu bungkus dilarutkan dalam 200 mL air matang, diberikan sedikit-sedikit dengan sendok setiap 1-2 menit — bukan diminum sekaligus yang justru memicu muntah. Bila muntah, hentikan 10 menit lalu lanjutkan lebih lambat',
+      'Penjadwalan dan porsi makan: berikan makanan porsi KECIL namun SERING, sekitar 6 kali sehari, dengan makanan lunak yang mudah dicerna seperti bubur, pisang, dan kentang. Tambahkan satu kali makan ekstra setiap hari selama dua minggu setelah diare berhenti untuk mengejar pertumbuhan pada anak',
+      'Hindari minuman bersoda, jus buah kemasan, teh manis pekat, dan minuman energi karena kandungan gula tinggi memperberat diare osmotik; hindari pula makanan berlemak dan berserat sangat tinggi selama fase akut',
+      'Istirahat dan tidur cukup selama fase akut; aktivitas dan olahraga dilanjutkan bertahap setelah rehidrasi tercapai dan tenaga pulih, umumnya dalam beberapa hari',
+      'TANDA BAHAYA yang mengharuskan segera kembali: tidak mau minum atau tidak bisa minum, muntah terus-menerus, buang air besar cair sangat sering, timbul darah pada tinja, demam tinggi, sangat lemas atau tidak sadar, mata makin cekung, kejang, dan TIDAK BUANG AIR KECIL lebih dari 6 jam',
+      'Kontrol dalam 3 hari bila tidak membaik, atau segera bila muncul tanda bahaya di atas',
+      'PENCEGAHAN: cuci tangan pakai sabun sebelum menyiapkan makanan dan setelah dari jamban, gunakan air minum yang direbus hingga mendidih, buang air besar di jamban sehat, berikan ASI eksklusif enam bulan, lengkapi imunisasi rotavirus dan campak, serta suplementasi vitamin A sesuai program',
+    ],
+    komplikasi: [
+      'Dehidrasi berat, syok hipovolemik, dan kematian',
+      'Gangguan elektrolit: hipokalemia dengan ileus dan aritmia, hipernatremia atau hiponatremia dengan kejang',
+      'Asidosis metabolik dengan napas Kussmaul',
+      'Gagal ginjal akut prarenal',
+      'Kejang akibat gangguan elektrolit atau demam',
+      'Malnutrisi dan gagal tumbuh akibat diare berulang atau persisten, serta intoleransi laktosa sekunder',
+    ],
+    prognosis:
+      'Sangat baik bila rehidrasi diberikan tepat dan segera — sebagian besar diare akut bersifat swasirna dalam 3-7 hari. Terapi rehidrasi oral merupakan salah satu intervensi kesehatan masyarakat paling berdampak dalam sejarah kedokteran modern dan telah menyelamatkan puluhan juta jiwa. Kematian hampir selalu disebabkan keterlambatan pengenalan dehidrasi, bukan oleh virulensi kuman; prognosis memburuk pada bayi, gizi buruk, dan pasien imunokompromais.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'SLEISENGER2021', 'WHOSAM2013'],
   },
   'Refluks gastroesofagus': {
     definisi: 'Naiknya isi lambung ke esofagus yang menimbulkan gejala mengganggu dan/atau komplikasi.',
@@ -3124,10 +3231,98 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
   },
   'Skabies': {
-    definisi: 'Infestasi tungau Sarcoptes scabiei var. hominis yang membuat terowongan di stratum korneum.',
-    diagnosis: ['Empat tanda kardinal (2 dari 4 menegakkan diagnosis): gatal MEMBERAT MALAM HARI, mengenai sekelompok orang serumah, ditemukan terowongan/kunikulus pada tempat predileksi (sela jari, pergelangan tangan volar, aksila, areola, genital), dan ditemukan tungau'],
-    tatalaksana: ['Permetrin 5% dioleskan seluruh tubuh dari leher ke bawah, didiamkan 8-12 jam, diulang 1 minggu kemudian; OBATI SELURUH ANGGOTA KELUARGA/kontak serumah SERENTAK meski tanpa gejala; cuci dan jemur sprei-pakaian; edukasi gatal dapat bertahan 2-4 minggu setelah tungau mati (bukan kegagalan terapi)'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi: 'Infestasi kulit oleh tungau Sarcoptes scabiei varietas hominis yang membuat terowongan di stratum korneum; sangat menular melalui kontak kulit langsung yang lama dan merupakan masalah kesehatan utama di lingkungan padat seperti pesantren, asrama, panti, dan lembaga pemasyarakatan.',
+    anamnesis: {
+      keluhanUtama: 'Gatal hebat di sela-sela jari tangan dan lipatan tubuh yang SANGAT MEMBERAT PADA MALAM HARI sejak beberapa minggu.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan SOCRATES. Site: predileksi khas pada sela jari tangan, pergelangan tangan sisi volar, siku bagian luar, lipat ketiak depan, areola mamma pada perempuan, umbilikus, bokong, dan genitalia eksterna pada laki-laki; pada bayi dan anak kecil dapat mengenai wajah, kulit kepala, telapak tangan, dan telapak kaki yang biasanya terhindar pada dewasa. Onset: bertahap, dan pada infestasi pertama gatal baru muncul 4-6 minggu setelah terpapar karena perlu waktu untuk sensitisasi — pada reinfestasi gatal timbul jauh lebih cepat dalam 1-3 hari. Character: gatal hebat yang membuat pasien menggaruk hingga lecet dan sulit tidur. Radiation: menyebar ke lipatan tubuh lain seiring waktu. Associations: adanya lesi bernanah akibat infeksi sekunder, dan yang paling penting ADAKAH ORANG SERUMAH ATAU SEASRAMA YANG MENGALAMI KELUHAN SERUPA — ini merupakan salah satu tanda kardinal. Time course: gatal khas MEMBERAT PADA MALAM HARI dan saat tubuh hangat setelah mandi air panas atau berolahraga, karena tungau lebih aktif pada suhu hangat. Exacerbating: suhu hangat, keringat, dan malam hari; garukan memperberat serta memicu infeksi sekunder. Severity: dampak terhadap kualitas tidur, konsentrasi belajar atau bekerja, dan aktivitas sehari-hari.',
+      riwayatPenyakitDahulu: 'Riwayat skabies sebelumnya dan terapi yang pernah diterima, riwayat dermatitis atopik yang memperberat gatal, serta kondisi imunokompromais seperti HIV, penggunaan kortikosteroid jangka panjang, atau keganasan yang berisiko menimbulkan skabies berkrusta (skabies Norwegia).',
+      riwayatPenyakitKeluarga: 'Anggota keluarga serumah atau teman sekamar dengan keluhan gatal serupa — informasi ini menentukan strategi terapi karena SEMUA kontak harus diobati serentak.',
+      riwayatPengobatan:
+        'Obat yang sudah dipakai sendiri termasuk salep antigatal, KORTIKOSTEROID TOPIKAL yang dapat menyamarkan gambaran klinis menjadi skabies inkognito, antihistamin, serta obat tradisional. Tanyakan pula riwayat terapi skabies sebelumnya, cara pemakaian, dan apakah kontak serumah ikut diobati — kegagalan terapi paling sering disebabkan cara pakai yang salah atau kontak yang tidak diobati.',
+      riwayatAlergi: 'Riwayat alergi obat topikal dan riwayat dermatitis kontak.',
+      riwayatSosialEkonomi:
+        'Kondisi tempat tinggal: jumlah penghuni per kamar, kebiasaan tidur bersama, berbagi tempat tidur, handuk, pakaian, atau sajadah; riwayat tinggal di pesantren, asrama, panti asuhan, atau lembaga pemasyarakatan; ketersediaan air bersih dan fasilitas mencuci; frekuensi mengganti dan menjemur sprei serta pakaian; dan kemampuan finansial untuk mengobati seluruh anggota keluarga sekaligus.',
+    },
+    pemeriksaanFisik: [
+      'KUNIKULUS (terowongan): garis halus berkelok sepanjang beberapa milimeter berwarna keabuan dengan papul atau vesikel kecil di ujungnya — temuan patognomonik namun sering sulit dilihat karena tertutup bekas garukan',
+      'Papul, vesikel, dan ekskoriasi pada tempat predileksi; distribusi lesi jauh lebih membantu diagnosis daripada bentuk lesi itu sendiri',
+      'Nodul skabies berwarna kecokelatan yang sangat gatal pada skrotum, penis, dan aksila — dapat bertahan berminggu-minggu setelah tungau mati dan bukan berarti terapi gagal',
+      'Pada bayi: lesi juga mengenai wajah, kulit kepala, telapak tangan, dan telapak kaki, sering berupa vesikel dan pustul',
+      'Tanda infeksi sekunder: pustul, krusta kekuningan seperti madu (impetigenisasi), selulitis, dan limfadenopati regional',
+      'Skabies berkrusta pada imunokompromais: krusta tebal berlapis yang mengandung ribuan hingga jutaan tungau, gatal justru dapat ringan, dan SANGAT MENULAR',
+      'Periksa seluruh permukaan tubuh termasuk area genital dengan menjaga privasi pasien',
+    ],
+    penunjang: [
+      'Diagnosis umumnya KLINIS berdasarkan empat tanda kardinal — pemeriksaan penunjang tidak wajib bila gambaran klinis khas',
+      'Kerokan kulit dari kunikulus atau papul yang belum tergaruk, diperiksa dengan KOH atau minyak mineral di bawah mikroskop untuk menemukan tungau, telur, atau skibala (kotoran tungau); temuan positif memastikan diagnosis namun hasil negatif TIDAK menyingkirkan karena jumlah tungau pada skabies klasik hanya sekitar 10-15 ekor',
+      'Uji tinta Burrow: teteskan tinta pada lesi lalu hapus dengan alkohol — tinta akan tertinggal mengisi terowongan dan memperjelas gambarannya',
+      'Dermoskopi menunjukkan gambaran delta wing jet atau hang glider berupa struktur segitiga gelap di ujung terowongan',
+      'Pemeriksaan tambahan bila terdapat infeksi sekunder luas atau kecurigaan skabies berkrusta: darah lengkap dan skrining HIV sesuai indikasi',
+    ],
+    etiologi: 'Tungau Sarcoptes scabiei varietas hominis, parasit obligat manusia berukuran sekitar 0,3-0,4 mm.',
+    patofisiologi:
+      'Tungau betina yang telah dibuahi menggali terowongan di stratum korneum dengan kecepatan sekitar 2 mm per hari dan meletakkan 2-3 telur setiap hari selama masa hidupnya yang berlangsung 4-6 minggu. Telur menetas dalam 3-4 hari menjadi larva yang keluar ke permukaan kulit, lalu berkembang menjadi tungau dewasa dalam sekitar 2 minggu. Gatal timbul bukan akibat gigitan langsung melainkan karena REAKSI HIPERSENSITIVITAS TIPE LAMBAT terhadap tungau, telur, dan kotorannya. Inilah sebabnya pada infestasi pertama gatal baru muncul 4-6 minggu setelah paparan yaitu setelah proses sensitisasi selesai, sedangkan pada reinfestasi gatal timbul dalam hitungan hari karena sistem imun sudah tersensitisasi. Mekanisme yang sama menjelaskan mengapa gatal masih dapat bertahan 2-4 minggu setelah seluruh tungau mati — reaksi imun memerlukan waktu untuk mereda, dan hal ini sering disalahartikan sebagai kegagalan terapi sehingga pasien mengoleskan obat berulang kali hingga timbul dermatitis iritan. Penularan memerlukan kontak kulit langsung yang cukup lama, sedangkan penularan melalui pakaian dan sprei berperan kecil pada skabies klasik namun menjadi sangat penting pada skabies berkrusta yang beban tungaunya sangat tinggi.',
+    faktorRisiko: [
+      'Hunian padat: pesantren, asrama, panti asuhan, barak, lembaga pemasyarakatan',
+      'Higiene perorangan dan sanitasi lingkungan yang kurang, keterbatasan air bersih',
+      'Kebiasaan berbagi tempat tidur, handuk, pakaian, dan perlengkapan ibadah',
+      'Kontak erat dengan penderita skabies',
+      'Status sosial ekonomi rendah dan tingkat pengetahuan terbatas',
+      'Imunokompromais dan usia lanjut untuk skabies berkrusta',
+    ],
+    goldStandard:
+      'Baku emas adalah identifikasi tungau, telur, atau skibala melalui kerokan kulit yang diperiksa mikroskopis, atau visualisasi langsung dengan dermoskopi. Namun dalam praktik, diagnosis ditegakkan secara klinis bila terpenuhi minimal DUA dari EMPAT TANDA KARDINAL: (1) pruritus nokturna yaitu gatal yang memberat pada malam hari, (2) menyerang sekelompok orang yang tinggal bersama, (3) ditemukan kunikulus pada tempat predileksi, dan (4) ditemukan tungau pada pemeriksaan.',
+    diagnosisBanding: [
+      'Prurigo — papul gatal kronik pada ekstensor ekstremitas, tidak berkelompok pada sela jari, tidak ada kunikulus, dan tidak menular pada orang serumah',
+      'Dermatitis atopik — riwayat atopi dan predileksi fleksural, gatal tidak khas nokturnal, tidak menular',
+      'Pedikulosis korporis — gatal dengan lesi pada area yang tertutup pakaian, ditemukan kutu dan telur pada serat pakaian',
+      'Dermatitis kontak — lesi terbatas pada area kontak dengan batas tegas dan riwayat pajanan jelas',
+      'Reaksi gigitan serangga — lesi lebih sporadis dengan punctum sentral, tidak ada terowongan, tidak ada penularan pada kontak serumah',
+      'Urtikaria papular dan erupsi obat — pola distribusi dan riwayat berbeda',
+    ],
+    pengkajian:
+      'Dipikirkan skabies pada pasien ini atas dasar gatal hebat yang khas memberat pada malam hari, dengan lesi berupa papul dan ekskoriasi pada tempat predileksi yaitu sela jari tangan, pergelangan tangan sisi volar, dan lipatan tubuh, disertai riwayat keluhan serupa pada anggota keluarga atau teman sekamar yang tinggal bersama, pada latar hunian padat dengan kebiasaan berbagi perlengkapan pribadi. Kombinasi pruritus nokturna, distribusi lesi yang khas, dan penularan pada orang sekitar telah memenuhi tanda kardinal sehingga diagnosis dapat ditegakkan secara klinis meski tungau tidak selalu berhasil ditemukan pada kerokan — hal ini wajar mengingat jumlah tungau pada skabies klasik hanya sekitar sepuluh hingga lima belas ekor sehingga hasil negatif tidak menyingkirkan diagnosis. Prurigo menjadi pertimbangan karena sama-sama menimbulkan papul yang sangat gatal dan kronik, namun pada prurigo lesi berpredileksi pada sisi ekstensor ekstremitas, tidak ditemukan kunikulus, gatal tidak berpola nokturnal yang jelas, dan yang paling membedakan adalah tidak adanya penularan kepada orang serumah. Dermatitis atopik dipertimbangkan pada pasien dengan latar atopi, namun distribusinya fleksural dengan riwayat perjalanan kronik hilang timbul sejak kecil serta tidak menular. Pedikulosis korporis dapat menyerupai karena gatal dan lesi garukan, namun lesinya terdapat pada area yang tertutup pakaian dan kutu beserta telurnya ditemukan pada serat pakaian, bukan pada kulit. Reaksi gigitan serangga menimbulkan papul gatal namun tersebar sporadis dengan punctum sentral tanpa terowongan dan tanpa pola penularan. Yang menentukan keberhasilan terapi pada kasus ini bukanlah ketepatan memilih obat skabisida, melainkan PENGOBATAN SERENTAK SELURUH KONTAK SERUMAH beserta dekontaminasi pakaian dan alas tidur — sebab pengobatan pasien tunggal tanpa menyertakan kontak yang asimtomatik hampir selalu berakhir dengan reinfestasi berulang.',
+    terapiSuportif: [
+      'Antihistamin oral untuk mengendalikan gatal, terutama sediaan sedatif pada malam hari agar pasien dapat tidur',
+      'Emolien untuk memperbaiki sawar kulit yang rusak akibat garukan dan pemakaian skabisida',
+      'Potong kuku pendek dan jaga kebersihan tangan untuk mengurangi kerusakan kulit serta risiko infeksi sekunder akibat garukan',
+      'Antibiotik topikal atau sistemik bila terdapat infeksi sekunder — impetigenisasi diobati lebih dahulu atau bersamaan sebelum kulit menjadi terlalu rusak untuk menerima skabisida',
+      'Kortikosteroid topikal potensi ringan dapat diberikan SETELAH terapi skabisida selesai untuk meredakan dermatitis pascaskabies, bukan sebagai terapi awal',
+    ],
+    tatalaksana: [
+      'PERMETRIN 5% krim sebagai lini pertama: oleskan MERATA ke SELURUH TUBUH dari leher ke bawah termasuk sela jari tangan dan kaki, lipatan, umbilikus, genitalia, dan di bawah kuku; pada bayi dan anak kecil termasuk wajah dan kulit kepala dengan menghindari mata dan mulut',
+      'Diamkan 8-12 jam (dioleskan malam hari sebelum tidur lalu dibilas keesokan paginya), ULANGI 7 HARI KEMUDIAN untuk membunuh tungau yang menetas dari telur yang tidak terbunuh pada aplikasi pertama',
+      'Bila mencuci tangan dalam masa aplikasi, oleskan ulang krim pada tangan tersebut',
+      'Alternatif: salep sulfur presipitatum 5-10% dioleskan 3 malam berturut-turut (pilihan untuk bayi kurang dari 2 bulan dan ibu hamil, murah namun berbau dan mengotori pakaian), atau ivermektin oral 200 mcg/kgBB dosis tunggal diulang 7-14 hari kemudian pada kasus luas, gagal terapi, skabies berkrusta, atau wabah di institusi',
+      'IVERMEKTIN tidak diberikan pada anak dengan berat kurang dari 15 kg dan pada ibu hamil maupun menyusui',
+      'OBATI SEMUA KONTAK SERUMAH DAN KONTAK ERAT SECARA SERENTAK pada hari yang sama, termasuk yang belum bergejala — ini merupakan langkah paling menentukan keberhasilan terapi',
+      'Dekontaminasi: cuci sprei, sarung bantal, handuk, dan pakaian yang dipakai 3 hari terakhir dengan air panas lalu setrika atau jemur di bawah sinar matahari; barang yang tidak dapat dicuci dimasukkan kantong plastik tertutup selama 3-7 hari karena tungau mati di luar tubuh manusia dalam 2-3 hari',
+      'Skabies berkrusta memerlukan kombinasi ivermektin oral berulang dengan skabisida topikal, keratolitik untuk melunakkan krusta, serta isolasi kontak karena tingkat penularannya sangat tinggi',
+      'Evaluasi ulang 2 dan 4 minggu setelah terapi; dinyatakan gagal terapi bila ditemukan lesi BARU atau tungau pada pemeriksaan ulang, bukan semata karena gatal masih ada',
+    ],
+    edukasi: [
+      'GATAL DAPAT BERTAHAN 2-4 MINGGU setelah seluruh tungau mati karena reaksi alergi terhadap sisa tungau masih berlangsung — ini BUKAN kegagalan terapi. Pesan ini paling penting disampaikan agar pasien tidak mengoleskan skabisida berulang-ulang yang justru menimbulkan dermatitis iritan',
+      'Cara pakai obat yang benar: mandi bersih dan keringkan tubuh, oleskan tipis merata ke seluruh permukaan kulit tanpa ada bagian yang terlewat, gunakan pada malam hari, dan jangan mandi selama masa aplikasi',
+      'Seluruh anggota keluarga harus diobati BERSAMAAN pada hari yang sama meski tidak gatal — bila bergantian, yang sudah sembuh akan tertular kembali dari yang belum diobati',
+      'Jangan berbagi handuk, pakaian, sabun batangan, tempat tidur, dan sajadah selama masa pengobatan',
+      'Tidur: gatal malam hari sangat mengganggu istirahat sehingga antihistamin sedatif dapat membantu; perbaikan tidur umumnya terasa dalam minggu pertama terapi',
+      'Pola aktivitas dan olahraga tetap normal; mandi dan berkeringat justru dianjurkan untuk kebersihan namun hindari mandi air terlalu panas yang memperberat gatal',
+      'Jaga kuku tetap pendek dan hindari menggaruk untuk mencegah infeksi sekunder yang dapat berujung pada impetigo dan pada kasus tertentu glomerulonefritis pascastreptokokus',
+      'Kontrol 1-2 minggu setelah aplikasi kedua, atau segera bila muncul lesi bernanah, demam, atau bengkak pada wajah dan tungkai yang dapat menandakan komplikasi ginjal',
+      'Pencegahan di lingkungan padat: mandi teratur dengan sabun, jemur kasur dan bantal secara berkala, ganti sprei minimal seminggu sekali, dan lakukan pengobatan massal serentak bila terjadi wabah di pesantren atau asrama',
+    ],
+    komplikasi: [
+      'Infeksi sekunder bakteri: impetigo, ektima, folikulitis, selulitis, hingga sepsis pada kasus berat',
+      'Glomerulonefritis akut pascastreptokokus akibat infeksi sekunder Streptococcus',
+      'Demam reumatik dan penyakit jantung reumatik sebagai konsekuensi jangka panjang infeksi streptokokus berulang',
+      'Dermatitis iritan akibat penggunaan skabisida berlebihan',
+      'Nodul skabies persisten dan hiperpigmentasi pascainflamasi',
+      'Gangguan tidur, penurunan konsentrasi belajar, dan dampak psikososial berupa stigma',
+    ],
+    prognosis:
+      'Sangat baik dengan terapi yang tepat — angka kesembuhan tinggi bila obat digunakan dengan cara benar dan seluruh kontak diobati serentak. Kegagalan terapi hampir selalu disebabkan tiga hal yang dapat dicegah: cara pengolesan yang tidak menyeluruh, kontak serumah yang tidak ikut diobati, dan reinfestasi dari lingkungan yang tidak didekontaminasi. Pada skabies berkrusta prognosis lebih berat dan memerlukan terapi kombinasi berulang serta penanganan penyakit dasar yang menyebabkan imunosupresi.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019'],
   },
   'Reaksi gigitan serangga': {
     definisi: 'Reaksi hipersensitivitas lokal atau sistemik terhadap gigitan atau sengatan serangga.',
