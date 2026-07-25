@@ -1426,4 +1426,483 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
     ],
     referensi: ['ATLS2018', 'APLEY2018', 'CAMPBELLORTHO2021'],
   },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'sirkumsisi',
+    category: 'Bedah Minor & Luka',
+    title: 'Sirkumsisi & Dorsumsisi',
+    subtitle: 'Teknik dorsal slit dan pembedahan; dorsumsisi sebagai tindakan darurat parafimosis',
+    indikasi: [
+      'SIRKUMSISI: fimosis patologis, balanopostitis berulang, parafimosis rekuren, kondiloma preputium, serta indikasi agama dan budaya',
+      'DORSUMSISI (dorsal slit): PARAFIMOSIS yang tidak berhasil direduksi manual — merupakan tindakan darurat untuk membebaskan jepitan',
+      'Fimosis berat dengan retensi urin yang memerlukan pembebasan segera',
+    ],
+    kontraindikasi: [
+      'HIPOSPADIA dan EPISPADIA — KONTRAINDIKASI MUTLAK, karena kulit preputium diperlukan untuk rekonstruksi uretra di kemudian hari',
+      'Kelainan kongenital penis lain: chordee, mikropenis, penis tersembunyi (buried penis), webbed penis',
+      'Gangguan pembekuan darah yang belum terkoreksi (hemofilia, trombositopenia berat)',
+      'Infeksi lokal akut yang aktif (tunda hingga tenang, kecuali dorsumsisi darurat)',
+      'Bayi belum stabil, prematur, atau dengan penyakit penyerta yang belum teratasi',
+    ],
+    alat: [
+      'Sirkumsisi set: klem lurus dan bengkok, gunting jaringan, needle holder, pinset chirurgis, klem bengkok (mosquito), duk klem',
+      'Lidokain 1-2% TANPA EPINEFRIN (mutlak — epinefrin berisiko nekrosis penis)',
+      'Spuit 3-5 mL dengan jarum 25-27 G',
+      'Benang absorbable halus (catgut/vicryl 4-0 atau 5-0)',
+      'Antiseptik povidon iodin, duk steril berlubang, sarung tangan steril, kasa steril',
+      'Kauter atau klem untuk hemostasis, salep antibiotik',
+    ],
+    fases: [
+      {
+        fase: 'Persiapan & informed consent',
+        steps: [
+          'Jelaskan prosedur, manfaat, risiko, dan perawatan pascatindakan; minta persetujuan tertulis dari pasien atau orang tua.',
+          'PERIKSA ANATOMI PENIS DENGAN TELITI SEBELUM TINDAKAN — pastikan tidak ada hipospadia (muara uretra tidak di ujung glans), epispadia, atau chordee. Ini adalah langkah keselamatan yang tidak boleh dilewati.',
+          'Tanyakan riwayat perdarahan pada pasien dan keluarga, serta riwayat alergi obat.',
+          'Posisikan pasien terlentang; jaga privasi dan kehangatan terutama pada bayi.',
+          'Antisepsis lapangan operasi dari glans ke arah luar secara melingkar, lalu pasang duk steril berlubang.',
+        ],
+      },
+      {
+        fase: 'Anestesi',
+        steps: [
+          'BLOK PENIS (dorsal penile nerve block): suntikkan lidokain 1% tanpa epinefrin pada posisi jam 10 dan jam 2 di basis penis, tepat di bawah fasia Buck, setelah melakukan aspirasi.',
+          'Tambahkan infiltrasi cincin (ring block) melingkar di basis penis untuk melengkapi anestesi.',
+          'Dosis pada anak disesuaikan berat badan; batas aman lidokain tanpa epinefrin adalah 4,5 mg/kgBB.',
+          'MUTLAK JANGAN menggunakan lidokain dengan epinefrin — penis merupakan organ dengan sirkulasi ujung sehingga vasokonstriksi dapat menyebabkan nekrosis.',
+          'Tunggu 5-10 menit dan uji efektivitas anestesi dengan pinset sebelum memulai.',
+        ],
+      },
+      {
+        fase: 'DORSUMSISI (dorsal slit) — darurat parafimosis',
+        steps: [
+          'Coba lebih dahulu REDUKSI MANUAL: kompres dingin dan tekan glans secara konstan selama beberapa menit untuk mengurangi edema, lalu dorong glans ke belakang sambil menarik preputium ke depan.',
+          'Bila reduksi manual gagal, lakukan dorsumsisi sebagai tindakan penyelamatan.',
+          'Setelah anestesi bekerja, jepit preputium pada posisi jam 12 dengan dua klem, satu di sisi luar dan satu di sisi dalam preputium.',
+          'Gunting preputium pada garis di antara kedua klem ke arah proksimal hingga melewati cincin jepitan (constricting band) — inilah yang membebaskan jepitan.',
+          'Jahit tepi luka dengan benang absorbable secara jelujur atau simpul terputus untuk hemostasis.',
+          'Dorsumsisi bersifat SEMENTARA dan tidak rapi secara kosmetik; jadwalkan sirkumsisi definitif setelah edema dan inflamasi mereda.',
+        ],
+      },
+      {
+        fase: 'SIRKUMSISI — teknik dorsal slit dengan eksisi',
+        steps: [
+          'Bebaskan perlekatan antara preputium dan glans dengan sonde atau klem secara hati-hati, lalu bersihkan smegma.',
+          'Tandai batas insisi: sekitar 0,5-1 cm proksimal dari sulkus koronarius pada lembar luar, dan sejajar sulkus pada lembar dalam.',
+          'Lakukan dorsal slit pada posisi jam 12 hingga sekitar 0,5-1 cm dari sulkus koronarius.',
+          'Eksisi preputium secara melingkar mengikuti garis penandaan, dengan menyisakan mukosa dalam sekitar 3-5 mm dari sulkus.',
+          'JAGA JARAK AMAN dari glans dan frenulum; hati-hati pada arteri frenularis di posisi jam 6 yang sering menjadi sumber perdarahan.',
+          'Lakukan hemostasis dengan klem dan ligasi atau kauter; pastikan tidak ada perdarahan aktif sebelum menjahit.',
+          'Jahit tepi kulit dengan mukosa menggunakan benang absorbable 4-0 atau 5-0, dimulai dari jam 12, 6, 3, dan 9 sebagai jahitan penyangga, lalu lengkapi di antaranya.',
+          'Jahitan frenulum dikerjakan dengan cermat karena merupakan lokasi perdarahan tersering pascatindakan.',
+        ],
+      },
+      {
+        fase: 'Pascatindakan & edukasi',
+        steps: [
+          'Olesi salep antibiotik dan balut longgar dengan kasa; jangan membalut terlalu ketat karena berisiko iskemia.',
+          'Observasi 15-30 menit untuk memastikan tidak ada perdarahan aktif sebelum pasien pulang.',
+          'Berikan analgesik (parasetamol) dan antibiotik bila diindikasikan.',
+          'Edukasi: jaga area tetap bersih dan kering, boleh mandi setelah 1-2 hari sesuai anjuran, gunakan celana longgar, dan hindari aktivitas berat serta bersepeda selama 1-2 minggu.',
+          'Jelaskan bahwa bengkak dan warna kebiruan ringan adalah normal pada beberapa hari pertama.',
+          'SEGERA kembali bila: perdarahan yang tidak berhenti dengan penekanan, bengkak hebat, nanah, demam, atau TIDAK BISA BUANG AIR KECIL.',
+          'Kontrol dalam 3-7 hari; benang absorbable akan lepas sendiri.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Kontraindikasi mutlak — "HEC"',
+        kepanjangan: [
+          'H — Hipospadia (dan Epispadia)',
+          'E — Epispadia',
+          'C — Chordee dan kelainan kongenital penis lain',
+        ],
+        catatan: 'Preputium diperlukan sebagai bahan rekonstruksi uretra. Menyirkumsisi pasien hipospadia menghilangkan bahan tersebut dan menyulitkan operasi perbaikan di kemudian hari.',
+      },
+      {
+        akronim: 'Fimosis vs Parafimosis',
+        kepanjangan: [
+          'FIMOSIS — preputium TIDAK BISA DITARIK ke belakang; umumnya tidak darurat',
+          'PARAFIMOSIS — preputium sudah tertarik ke belakang dan TIDAK BISA DIKEMBALIKAN, menjepit batang penis; DARURAT karena berisiko iskemia glans',
+        ],
+        catatan: 'Penyebab parafimosis iatrogenik paling sering adalah lupa mengembalikan preputium setelah pemasangan kateter.',
+      },
+    ],
+    tips: [
+      'Periksa muara uretra SEBELUM menyentuh pisau — hipospadia yang terlewat adalah kesalahan yang tidak dapat diperbaiki.',
+      'Lidokain untuk penis WAJIB tanpa epinefrin.',
+      'Perdarahan pascasirkumsisi paling sering berasal dari arteri frenularis di posisi jam 6 — pastikan hemostasis di titik ini.',
+      'Pada parafimosis, selalu coba reduksi manual dengan kompres dingin lebih dahulu sebelum memutuskan dorsumsisi.',
+      'Balutan yang terlalu ketat dapat menyebabkan iskemia glans — balut longgar.',
+      'Retensi urin pascatindakan merupakan tanda bahaya yang memerlukan evaluasi segera.',
+    ],
+    komplikasi: [
+      'Perdarahan (terutama dari arteri frenularis)',
+      'Infeksi luka operasi',
+      'Cedera glans atau uretra akibat eksisi terlalu dalam',
+      'Eksisi kulit berlebihan atau kurang, hasil kosmetik tidak simetris',
+      'Stenosis meatus di kemudian hari',
+      'Nekrosis penis akibat penggunaan epinefrin atau balutan terlalu ketat',
+      'Pembentukan adhesi dan jembatan kulit (skin bridge)',
+    ],
+    referensi: ['CAMPBELL2016', 'SCHWARTZ2019', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'iud',
+    category: 'Obstetri & Ginekologi',
+    title: 'Pemasangan & Pelepasan AKDR (IUD)',
+    subtitle: 'Teknik withdrawal, waktu pemasangan, dan penanganan benang tidak terlihat',
+    indikasi: [
+      'Kontrasepsi jangka panjang yang sangat efektif dan reversibel',
+      'Perempuan yang menginginkan kontrasepsi tanpa hormon (AKDR tembaga)',
+      'Kontrasepsi darurat: AKDR tembaga dapat dipasang hingga 5 hari pascasenggama tanpa pelindung',
+      'AKDR levonorgestrel juga bermanfaat untuk menorrhagia dan proteksi endometrium',
+    ],
+    kontraindikasi: [
+      'KEHAMILAN atau dugaan kehamilan — wajib disingkirkan sebelum pemasangan',
+      'Perdarahan pervaginam yang belum diketahui penyebabnya',
+      'Infeksi panggul aktif, servisitis purulen, atau infeksi menular seksual aktif',
+      'Sepsis pascapersalinan dan pascaabortus septik',
+      'Keganasan serviks, endometrium, atau penyakit trofoblas ganas',
+      'Kelainan kavum uteri yang mengganggu pemasangan (mioma submukosa besar, malformasi uterus)',
+      'Alergi tembaga dan penyakit Wilson (khusus AKDR tembaga)',
+    ],
+    alat: [
+      'AKDR dalam kemasan steril yang belum kedaluwarsa (CuT-380A atau LNG-IUS)',
+      'Spekulum Sims atau cocor bebek, tenakulum, sonde uterus, gunting benang panjang',
+      'Sarung tangan steril, antiseptik povidon iodin, kasa dan tampon tang',
+      'Lampu sorot, meja ginekologi, alas bokong',
+      'Tes kehamilan urin bila status kehamilan belum pasti',
+    ],
+    fases: [
+      {
+        fase: 'Konseling & persiapan',
+        steps: [
+          'Lakukan konseling metode kontrasepsi secara menyeluruh; jelaskan cara kerja, efektivitas, lama pemakaian, efek samping, dan cara pelepasan. Minta persetujuan.',
+          'SINGKIRKAN KEHAMILAN: tanyakan hari pertama haid terakhir dan riwayat senggama; lakukan tes kehamilan bila ragu.',
+          'Tapis kontraindikasi dan risiko infeksi menular seksual; obati infeksi lebih dahulu bila ada.',
+          'WAKTU PEMASANGAN: dapat kapan saja dalam siklus asalkan dipastikan tidak hamil. Saat haid memudahkan karena serviks lebih terbuka dan kehamilan dapat disingkirkan. Pascapersalinan dapat dalam 10 menit setelah plasenta lahir, atau setelah 4 minggu. Pascaabortus dapat segera bila tidak ada infeksi.',
+          'Minta pasien mengosongkan kandung kemih, lalu posisikan litotomi.',
+          'Cuci tangan dan pakai sarung tangan.',
+        ],
+      },
+      {
+        fase: 'Pemeriksaan bimanual & antisepsis',
+        steps: [
+          'Lakukan PEMERIKSAAN BIMANUAL untuk menentukan UKURAN, POSISI (antefleksi atau retrofleksi), dan konsistensi uterus, serta menilai adanya massa atau nyeri goyang serviks.',
+          'Langkah ini krusial — memasang AKDR tanpa mengetahui arah uterus adalah penyebab utama perforasi.',
+          'Pasang spekulum dan inspeksi serviks untuk menilai adanya duh purulen, lesi, atau tanda infeksi.',
+          'Usap serviks dan vagina dengan antiseptik dua kali menggunakan kasa berbeda.',
+        ],
+      },
+      {
+        fase: 'Pemasangan — teknik withdrawal',
+        steps: [
+          'Jepit bibir depan serviks dengan TENAKULUM pada posisi jam 11 dan jam 1; lakukan perlahan dan beri tahu pasien akan terasa seperti dicubit.',
+          'Lakukan traksi lembut pada tenakulum untuk MELURUSKAN sudut antara kanalis servikalis dan kavum uteri.',
+          'Masukkan SONDE UTERUS dengan teknik tanpa sentuh (no-touch technique) untuk mengukur kedalaman dan arah kavum uteri; kedalaman normal 6-9 cm. Bila kurang dari 6,5 cm, pemasangan umumnya tidak dianjurkan.',
+          'Atur leher biru (blue flange) pada tabung inserter sesuai kedalaman hasil sonde, dan pastikan bidangnya sejajar dengan lengan horizontal AKDR.',
+          'Masukkan tabung inserter berisi AKDR ke dalam kavum uteri hingga leher biru menyentuh serviks.',
+          'TEKNIK WITHDRAWAL: tahan pendorong (plunger) tetap di tempatnya, lalu TARIK TABUNG INSERTER ke arah luar sehingga lengan AKDR terlepas membuka membentuk huruf T. Teknik ini mengurangi risiko perforasi dibandingkan teknik mendorong.',
+          'Setelah lengan terbuka, dorong tabung inserter perlahan ke atas hingga terasa menyentuh fundus, lalu tarik keluar pendorong terlebih dahulu, baru tabung inserter.',
+          'Gunting benang AKDR menyisakan sekitar 3-4 cm dari ostium eksternum.',
+          'Lepaskan tenakulum, periksa perdarahan pada bekas jepitan, lalu lepaskan spekulum.',
+        ],
+      },
+      {
+        fase: 'Pascapemasangan & edukasi',
+        steps: [
+          'Minta pasien beristirahat sejenak dan pantau adanya reaksi vasovagal (pusing, berkeringat, bradikardia).',
+          'AJARKAN PASIEN MEMERIKSA BENANG sendiri secara berkala, terutama setelah haid, dengan cara mencuci tangan lalu meraba benang di mulut rahim.',
+          'Catat jenis AKDR, tanggal pemasangan, panjang sonde, dan tanggal perkiraan pelepasan pada kartu peserta.',
+          'Jadwalkan kontrol 4-6 minggu setelah pemasangan atau setelah haid berikutnya.',
+          'EDUKASI TANDA BAHAYA dengan mnemonik PAINS.',
+          'PELEPASAN: jepit benang dengan klem lalu tarik perlahan dengan traksi mantap. Bila benang tidak terlihat, jangan memaksa — lakukan USG untuk memastikan AKDR masih di dalam kavum, lalu lepaskan dengan alat khusus atau histeroskopi.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Tanda bahaya AKDR — "PAINS"',
+        kepanjangan: [
+          'P — Period late (haid terlambat, curiga hamil) atau perdarahan abnormal',
+          'A — Abdominal pain (nyeri perut) atau nyeri saat berhubungan',
+          'I — Infection (duh vagina abnormal atau berbau)',
+          'N — Not feeling well (demam, menggigil, tidak enak badan)',
+          'S — String missing (benang tidak teraba, lebih pendek, atau lebih panjang)',
+        ],
+      },
+      {
+        akronim: 'Benang tidak terlihat — tiga kemungkinan',
+        kepanjangan: [
+          '1 — Benang terlipat masuk ke kanalis servikalis (paling sering)',
+          '2 — EKSPULSI (AKDR keluar tanpa disadari) → risiko kehamilan',
+          '3 — PERFORASI dan migrasi ke rongga abdomen',
+        ],
+        catatan: 'Selalu singkirkan KEHAMILAN lebih dahulu, lalu lakukan USG untuk memastikan lokasi AKDR sebelum tindakan lain.',
+      },
+    ],
+    tips: [
+      'Pemeriksaan bimanual untuk menentukan arah uterus adalah langkah pencegahan perforasi yang paling penting — jangan pernah dilewati.',
+      'Gunakan teknik WITHDRAWAL (menarik tabung), bukan mendorong AKDR, untuk menurunkan risiko perforasi.',
+      'Traksi tenakulum meluruskan sudut uterus dan membuat pemasangan jauh lebih mudah serta lebih aman.',
+      'AKDR tembaga adalah kontrasepsi darurat paling efektif dan dapat dipasang hingga 5 hari pascasenggama.',
+      'Bila pasien hamil dengan AKDR terpasang dan benang terlihat, AKDR sebaiknya dilepas untuk menurunkan risiko abortus septik — konsultasikan.',
+      'Nyeri perut hebat dengan demam pada pengguna AKDR harus dievaluasi sebagai penyakit radang panggul sampai terbukti sebaliknya.',
+    ],
+    komplikasi: [
+      'Perforasi uterus saat pemasangan',
+      'Ekspulsi, terutama pada bulan-bulan pertama',
+      'Penyakit radang panggul (risiko tertinggi pada 20 hari pertama pascapemasangan)',
+      'Perdarahan haid lebih banyak dan nyeri haid (khas pada AKDR tembaga)',
+      'Kehamilan dengan AKDR in situ, termasuk peningkatan proporsi kehamilan ektopik',
+      'Reaksi vasovagal saat pemasangan',
+      'Benang hilang dan AKDR tertanam (embedded)',
+    ],
+    referensi: ['POGI2016', 'WILLIAMSOB2022', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'implan',
+    category: 'Obstetri & Ginekologi',
+    title: 'Pemasangan & Pencabutan Implan (Susuk KB)',
+    subtitle: 'Insersi subdermal lengan atas non-dominan dan teknik pencabutan',
+    indikasi: [
+      'Kontrasepsi jangka panjang 3 tahun yang sangat efektif dan reversibel',
+      'Perempuan yang menginginkan metode tanpa estrogen (aman untuk ibu menyusui)',
+      'Kesulitan mematuhi kontrasepsi harian seperti pil',
+      'Kontraindikasi terhadap estrogen (migren dengan aura, riwayat tromboemboli)',
+    ],
+    kontraindikasi: [
+      'Kehamilan atau dugaan kehamilan',
+      'Perdarahan pervaginam yang belum diketahui penyebabnya',
+      'Kanker payudara saat ini atau riwayat kanker payudara',
+      'Penyakit hati berat dan tumor hati',
+      'Tromboemboli vena aktif (relatif)',
+      'Penggunaan obat yang menginduksi enzim hati (rifampisin, sebagian antiepilepsi) yang menurunkan efektivitas',
+    ],
+    alat: [
+      'Implan dalam kemasan steril dengan aplikator (batang tunggal atau dua batang sesuai jenis)',
+      'Lidokain 1% tanpa epinefrin, spuit 3-5 mL, jarum 25-27 G',
+      'Sarung tangan steril, antiseptik, duk steril berlubang, kasa',
+      'Untuk pencabutan: bisturi 11, klem mosquito lurus dan bengkok, needle holder',
+      'Plester, verban elastis untuk balut tekan',
+    ],
+    fases: [
+      {
+        fase: 'Konseling & persiapan',
+        steps: [
+          'Konseling menyeluruh: cara kerja, efektivitas sangat tinggi, lama pemakaian 3 tahun, dan yang PALING PENTING — efek samping berupa PERUBAHAN POLA HAID yang hampir selalu terjadi (haid tidak teratur, bercak, atau tidak haid sama sekali).',
+          'Konseling pola haid ini merupakan penentu utama kepuasan dan kelangsungan pemakaian; banyak pencabutan dini terjadi hanya karena pasien tidak diberi tahu sebelumnya.',
+          'Singkirkan kehamilan; tapis kontraindikasi dan riwayat obat penginduksi enzim hati.',
+          'WAKTU PEMASANGAN: hari ke-1 sampai ke-7 siklus haid tidak memerlukan kontrasepsi tambahan. Di luar itu, pastikan tidak hamil dan gunakan kontrasepsi tambahan selama 7 hari.',
+          'Posisikan pasien terlentang dengan LENGAN NON-DOMINAN diabduksikan dan siku difleksikan, tangan di bawah kepala.',
+        ],
+      },
+      {
+        fase: 'Penentuan lokasi & anestesi',
+        steps: [
+          'Tentukan lokasi insersi: sisi MEDIAL lengan atas non-dominan, sekitar 8-10 cm di atas epikondilus medialis, di alur antara m. biceps dan m. triceps.',
+          'Lokasi ini dipilih karena JAUH dari sulkus bisipitalis tempat berjalannya nervus ulnaris dan pembuluh darah brakialis.',
+          'Tandai jalur insersi dengan pena steril.',
+          'Antisepsis area yang luas dan pasang duk steril berlubang.',
+          'Anestesi lidokain 1% tanpa epinefrin secara SUBDERMAL sepanjang jalur yang telah ditandai (sekitar 2-3 mL), setelah aspirasi.',
+        ],
+      },
+      {
+        fase: 'Insersi',
+        steps: [
+          'Regangkan kulit pada area insersi.',
+          'Tusukkan ujung aplikator dengan sudut sekitar 30 derajat hanya sampai menembus kulit.',
+          'Setelah menembus dermis, TURUNKAN aplikator hingga hampir SEJAJAR permukaan kulit — implan harus berada tepat di bawah kulit (subdermal), bukan di dalam otot.',
+          'Angkat kulit dengan ujung aplikator (tenting) sambil memajukan aplikator secara perlahan sepanjang jalur; batang implan harus TERABA dan hampir terlihat membayang di bawah kulit.',
+          'Setelah aplikator masuk seluruhnya, lepaskan implan sesuai mekanisme alat (umumnya dengan menarik aplikator sambil menahan pendorong).',
+          'RABA IMPLAN dengan jari untuk memastikan posisi dan jumlah batang sudah benar; MINTA PASIEN JUGA MERABANYA agar ia dapat memeriksanya sendiri di rumah.',
+          'Tutup luka tusuk dengan plester; tidak diperlukan jahitan.',
+          'Pasang balut tekan dengan verban elastis selama 24-48 jam untuk mengurangi memar dan hematoma.',
+        ],
+      },
+      {
+        fase: 'Pencabutan',
+        steps: [
+          'Raba dan tentukan lokasi ujung implan yang paling dekat dengan permukaan; tandai.',
+          'Antisepsis dan berikan anestesi lokal TEPAT DI BAWAH ujung distal implan (bukan di atasnya, agar implan tidak terdorong lebih dalam dan tetap teraba).',
+          'Buat insisi kecil 2-3 mm pada kulit di dekat ujung implan.',
+          'Dorong implan ke arah insisi dengan jari, lalu jepit dengan klem mosquito dan tarik keluar.',
+          'Bila implan terbungkus jaringan fibrosa, bersihkan selubung tersebut dengan bisturi atau kasa sebelum menarik.',
+          'Pastikan JUMLAH BATANG yang dikeluarkan SESUAI dengan yang dipasang.',
+          'Bila implan tidak teraba, JANGAN melakukan eksplorasi buta — rujuk untuk lokalisasi dengan USG frekuensi tinggi atau pencitraan lain.',
+          'Tutup insisi dengan plester; jahitan umumnya tidak diperlukan. Pasang balut tekan.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Lokasi aman — "NON-DOMINAN, MEDIAL, 8-10 cm"',
+        kepanjangan: [
+          'Lengan NON-DOMINAN',
+          'Sisi MEDIAL, di alur antara biceps dan triceps',
+          '8-10 cm DI ATAS epikondilus medialis',
+        ],
+        catatan: 'Menjauhi sulkus bisipitalis melindungi nervus ulnaris dan pembuluh brakialis dari cedera.',
+      },
+      {
+        akronim: 'Kunci keberhasilan konseling',
+        kepanjangan: [
+          'Perubahan POLA HAID hampir selalu terjadi dan merupakan hal normal',
+          'Bukan tanda bahaya dan tidak mengganggu kesuburan setelah dicabut',
+          'Konseling yang jelas di awal mencegah pencabutan dini',
+        ],
+      },
+    ],
+    tips: [
+      'Implan harus SUBDERMAL — bila terlalu dalam (intramuskular), pencabutan menjadi sangat sulit dan berisiko melukai saraf.',
+      'Minta pasien meraba implannya sendiri setelah pemasangan; ini memberdayakan pasien sekaligus memastikan posisi benar.',
+      'Anestesi saat pencabutan diberikan DI BAWAH implan, bukan di atasnya.',
+      'Jangan pernah melakukan eksplorasi buta bila implan tidak teraba — rujuk untuk pencitraan.',
+      'Obat penginduksi enzim hati seperti rifampisin menurunkan efektivitas implan secara bermakna; sarankan metode tambahan.',
+      'Kesuburan kembali dengan cepat setelah pencabutan — sampaikan ini pada konseling.',
+    ],
+    komplikasi: [
+      'Memar, hematoma, dan nyeri lokal',
+      'Infeksi pada lokasi insersi',
+      'Implan terpasang terlalu dalam sehingga sulit dicabut',
+      'Migrasi implan (jarang)',
+      'Cedera saraf atau pembuluh darah bila lokasi insersi salah',
+      'Perubahan pola haid yang mengganggu dan menjadi alasan pencabutan dini',
+      'Jaringan parut pada lokasi insisi',
+    ],
+    referensi: ['POGI2016', 'WILLIAMSOB2022', 'PPKFKTP2014'],
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'iva-papsmear',
+    category: 'Obstetri & Ginekologi',
+    title: 'IVA & Pap Smear — Skrining Kanker Serviks',
+    subtitle: 'Inspeksi visual asam asetat dan sitologi serviks',
+    indikasi: [
+      'Skrining kanker serviks pada perempuan usia 30-50 tahun yang sudah pernah berhubungan seksual',
+      'IVA diulang setiap 3-5 tahun bila hasil negatif; Pap smear setiap 3 tahun (atau 5 tahun bila dikombinasi tes HPV)',
+      'Skrining lebih dini dan lebih sering pada perempuan dengan HIV atau imunokompromais',
+    ],
+    kontraindikasi: [
+      'Sedang menstruasi (tunda hingga selesai) — darah mengganggu penilaian dan kualitas sediaan',
+      'Infeksi serviks atau vagina akut — obati lebih dahulu',
+      'Belum pernah berhubungan seksual',
+      'Kehamilan bukan kontraindikasi mutlak untuk IVA, namun pengambilan sampel endoserviks pada Pap smear perlu kehati-hatian',
+      'Pascapersalinan kurang dari 6 minggu',
+    ],
+    alat: [
+      'Spekulum cocor bebek (Cusco) berbagai ukuran, lampu sorot yang terang',
+      'IVA: asam asetat 3-5% (dapat dibuat dari cuka dapur yang diencerkan), lidi kapas besar, wadah',
+      'Pap smear: spatula Ayre dan/atau cytobrush, kaca objek dengan label, alkohol 95% atau fiksatif semprot, atau media cair untuk liquid-based cytology',
+      'Sarung tangan, meja ginekologi, alas bokong, formulir permintaan pemeriksaan',
+    ],
+    fases: [
+      {
+        fase: 'Persiapan pasien',
+        steps: [
+          'Jelaskan tujuan skrining, prosedur, dan bahwa pemeriksaan mungkin terasa tidak nyaman namun singkat. Minta persetujuan dan JAGA PRIVASI.',
+          'Anjuran sebelum pemeriksaan: tidak berhubungan seksual, tidak menggunakan obat atau bilasan vagina, dan tidak sedang haid dalam 24-48 jam sebelumnya.',
+          'Minta pasien mengosongkan kandung kemih, lalu posisikan litotomi dengan penutup tubuh yang memadai.',
+          'Cuci tangan dan pakai sarung tangan.',
+        ],
+      },
+      {
+        fase: 'Pemasangan spekulum & inspeksi',
+        steps: [
+          'Inspeksi genitalia eksterna untuk menilai lesi, duh, dan tanda infeksi.',
+          'Masukkan spekulum dalam posisi miring lalu putar hingga horizontal; buka perlahan hingga SELURUH SERVIKS TERLIHAT dan kunci.',
+          'Gunakan pelumas seminimal mungkin atau air saja pada Pap smear karena pelumas dapat mengganggu interpretasi sitologi.',
+          'Identifikasi SAMBUNGAN SKUAMOKOLUMNAR (SSK) atau zona transformasi — inilah lokasi tempat hampir semua lesi prakanker berkembang, dan pemeriksaan dinyatakan tidak adekuat bila zona ini tidak terlihat.',
+          'Bersihkan lendir berlebih dengan lidi kapas secara lembut tanpa menggosok keras.',
+        ],
+      },
+      {
+        fase: 'IVA — Inspeksi Visual dengan Asam Asetat',
+        steps: [
+          'Oleskan asam asetat 3-5% secara merata pada seluruh permukaan serviks menggunakan lidi kapas besar.',
+          'TUNGGU 1 MENIT PENUH — ini adalah langkah yang paling sering dipersingkat dan menyebabkan hasil negatif palsu.',
+          'Amati perubahan warna pada zona transformasi di bawah pencahayaan yang baik.',
+          'IVA POSITIF: tampak bercak PUTIH (acetowhite) yang TEBAL, BERBATAS TEGAS, OPAK, dan MENEMPEL pada zona transformasi atau dekat sambungan skuamokolumnar.',
+          'IVA NEGATIF: serviks licin tanpa bercak putih bermakna; bercak putih tipis, samar, atau jauh dari zona transformasi tidak dianggap positif.',
+          'CURIGA KANKER: tampak massa berbenjol, mudah berdarah, ulkus, atau pertumbuhan seperti bunga kol — pada keadaan ini langsung RUJUK, tidak perlu menilai hasil IVA.',
+          'Sampaikan hasil kepada pasien segera setelah pemeriksaan — inilah keunggulan utama IVA sebagai metode see and treat.',
+        ],
+      },
+      {
+        fase: 'Pap smear — pengambilan sediaan',
+        steps: [
+          'Gunakan SPATULA AYRE dengan ujung panjang dimasukkan ke ostium eksternum, lalu putar 360 DERAJAT untuk mengambil sel dari ektoserviks dan zona transformasi.',
+          'Gunakan CYTOBRUSH yang dimasukkan ke kanalis servikalis dan diputar 90-180 derajat untuk mengambil sel endoserviks.',
+          'Sediaan konvensional: oleskan bahan pada kaca objek SATU ARAH secara merata dan TIPIS, jangan bolak-balik karena merusak sel.',
+          'FIKSASI SEGERA dalam hitungan detik dengan alkohol 95% atau fiksatif semprot — sediaan yang mengering sebelum difiksasi menjadi tidak dapat dibaca dan merupakan penyebab tersering sampel ditolak laboratorium.',
+          'Pada liquid-based cytology, masukkan alat pengambil ke dalam media cair dan bilas sesuai petunjuk.',
+          'Beri label identitas pasien pada kaca objek dan lengkapi formulir dengan data klinis termasuk hari pertama haid terakhir, riwayat kontrasepsi, dan keluhan.',
+        ],
+      },
+      {
+        fase: 'Pascatindakan & tindak lanjut',
+        steps: [
+          'Lepaskan spekulum perlahan sambil menginspeksi dinding vagina.',
+          'Beri tahu pasien bahwa bercak darah ringan selama 1-2 hari adalah wajar.',
+          'IVA POSITIF: dapat langsung ditawarkan KRIOTERAPI pada pendekatan see and treat bila memenuhi syarat (lesi kecil, seluruhnya terlihat, tidak mencurigakan kanker), atau dirujuk untuk kolposkopi.',
+          'CURIGA KANKER: rujuk segera untuk biopsi dan penanganan onkologi ginekologi.',
+          'Pap smear abnormal: tindak lanjut sesuai derajat kelainan, umumnya dengan kolposkopi dan biopsi terarah.',
+          'Jadwalkan skrining ulang sesuai hasil dan pedoman; catat pada rekam medis dan kartu pasien.',
+          'EDUKASI PENCEGAHAN: vaksinasi HPV, hubungan seksual yang aman, berhenti merokok, dan pentingnya skrining berkala.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'IVA — "OLES, TUNGGU 1 MENIT, LIHAT"',
+        kepanjangan: [
+          'OLES asam asetat 3-5% merata pada seluruh serviks',
+          'TUNGGU 1 MENIT PENUH (jangan dipersingkat)',
+          'LIHAT bercak putih tebal berbatas tegas pada zona transformasi',
+        ],
+      },
+      {
+        akronim: 'Interpretasi IVA',
+        kepanjangan: [
+          'NEGATIF — serviks licin, tanpa bercak putih bermakna',
+          'POSITIF — bercak acetowhite TEBAL, BERBATAS TEGAS, di zona transformasi',
+          'CURIGA KANKER — massa berbenjol, mudah berdarah, ulkus → RUJUK langsung',
+        ],
+      },
+      {
+        akronim: 'Pap smear — kesalahan yang membuat sampel ditolak',
+        kepanjangan: [
+          '1 — Sediaan MENGERING sebelum difiksasi (paling sering)',
+          '2 — Zona transformasi TIDAK terambil (tidak ada sel endoserviks)',
+          '3 — Olesan terlalu tebal atau bolak-balik sehingga sel rusak',
+          '4 — Terlalu banyak darah atau lendir',
+          '5 — Label dan data klinis tidak lengkap',
+        ],
+      },
+    ],
+    tips: [
+      'Zona transformasi adalah tempat hampir semua lesi prakanker berkembang — bila tidak terlihat, pemeriksaan dianggap tidak adekuat.',
+      'Menunggu satu menit penuh pada IVA bukan formalitas; mempersingkatnya menghasilkan negatif palsu.',
+      'Fiksasi Pap smear harus dalam hitungan detik — siapkan fiksatif sebelum mulai mengambil sampel.',
+      'Bila tampak massa yang jelas mencurigakan kanker, JANGAN menunggu hasil skrining — langsung rujuk untuk biopsi.',
+      'IVA sangat sesuai untuk fasilitas dengan sumber daya terbatas karena murah, hasil langsung diketahui, dan memungkinkan pendekatan see and treat.',
+      'Vaksinasi HPV tidak menggantikan skrining — perempuan yang sudah divaksin tetap perlu diskrining sesuai jadwal.',
+    ],
+    komplikasi: [
+      'Perdarahan bercak ringan pascatindakan',
+      'Rasa tidak nyaman dan nyeri saat pemasangan spekulum',
+      'Reaksi vasovagal',
+      'Hasil negatif palsu akibat teknik yang tidak tepat sehingga lesi terlewat',
+      'Kecemasan akibat hasil positif palsu',
+    ],
+    referensi: ['POGI2016', 'WILLIAMSOB2022', 'PPKFKTP2014'],
+  },
 ]
