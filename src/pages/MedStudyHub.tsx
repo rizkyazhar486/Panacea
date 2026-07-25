@@ -4,7 +4,7 @@ import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../compone
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
 
-type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'therapy' | 'diseases' | 'techniques' | 'timeline'
+type Section = 'practice' | 'osce' | 'case-bank' | 'station-sim' | 'skills' | 'procedures' | 'therapy' | 'diseases' | 'techniques' | 'timeline'
 
 const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'practice', label: 'Question Bank', emoji: '❓' },
@@ -12,6 +12,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'case-bank', label: 'OSCE Case Bank', emoji: '📋' },
   { id: 'station-sim', label: 'Station Simulator', emoji: '🎭' },
   { id: 'skills', label: 'SKDI Skills Checklist', emoji: '✅' },
+  { id: 'procedures', label: 'Keterampilan Klinis', emoji: '🧰' },
   { id: 'therapy', label: 'SKDI Therapy Reference', emoji: '💊' },
   { id: 'diseases', label: 'Daftar Penyakit SKDI', emoji: '📖' },
   { id: 'techniques', label: 'How to Study', emoji: '🧠' },
@@ -27,6 +28,7 @@ const SkdiTherapySection = lazy(() => import('./medstudy/SkdiTherapySection'))
 const SkdiDiseaseDirectorySection = lazy(() => import('./medstudy/SkdiDiseaseDirectorySection'))
 const OsceCaseBankSection = lazy(() => import('./medstudy/OsceCaseBankSection'))
 const StationSimulatorSection = lazy(() => import('./medstudy/StationSimulatorSection'))
+const ClinicalSkillsSection = lazy(() => import('./medstudy/ClinicalSkillsSection'))
 
 function SectionFallback() {
   return (
@@ -94,6 +96,7 @@ export function MedStudyHub() {
         {section === 'case-bank' && <OsceCaseBankSection />}
         {section === 'station-sim' && <StationSimulatorSection />}
         {section === 'skills' && <SkdiSkillsSection />}
+        {section === 'procedures' && <ClinicalSkillsSection />}
         {section === 'therapy' && <SkdiTherapySection />}
         {section === 'diseases' && <SkdiDiseaseDirectorySection />}
       </Suspense>
