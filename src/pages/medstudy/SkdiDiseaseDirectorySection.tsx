@@ -14,16 +14,39 @@ import { levelTone, levelLabel } from './shared'
  *    condition — anamnesis, pemeriksaan fisik, kriteria diagnosis, tatalaksana.
  * The alias table is hand-checked; no fuzzy matching is used.
  */
+const ANAMNESIS_LABELS: [keyof NonNullable<(typeof SKDI_DISEASE_NOTES)[string]['anamnesis']>, string][] = [
+  ['keluhanUtama', 'Keluhan Utama'],
+  ['riwayatPenyakitSekarang', 'Riwayat Penyakit Sekarang (SOCRATES)'],
+  ['riwayatPenyakitDahulu', 'Riwayat Penyakit Dahulu'],
+  ['riwayatPenyakitKeluarga', 'Riwayat Penyakit Keluarga'],
+  ['riwayatPengobatan', 'Riwayat Pengobatan'],
+  ['riwayatAlergi', 'Riwayat Alergi'],
+  ['riwayatKehamilanPersalinan', 'Riwayat Kehamilan & Persalinan'],
+  ['riwayatTumbuhKembang', 'Riwayat Tumbuh Kembang'],
+  ['riwayatNutrisi', 'Riwayat Nutrisi'],
+  ['riwayatImunisasi', 'Riwayat Imunisasi'],
+  ['riwayatSosialEkonomi', 'Riwayat Sosial Ekonomi & Lingkungan'],
+]
+
 function resolveNote(disease: string) {
   const own = SKDI_DISEASE_NOTES[disease]
   if (own) {
+    const blocks: { title: string; items: string[] }[] = []
+    if (own.pemeriksaanFisik) blocks.push({ title: 'Pemeriksaan Fisik', items: own.pemeriksaanFisik })
+    if (own.penunjang) blocks.push({ title: 'Pemeriksaan Penunjang & Interpretasi', items: own.penunjang })
+    if (own.faktorRisiko) blocks.push({ title: 'Faktor Risiko', items: own.faktorRisiko })
+    blocks.push({ title: 'Diagnosis', items: own.diagnosis })
+    if (own.diagnosisBanding) blocks.push({ title: 'Diagnosis Banding', items: own.diagnosisBanding })
+    if (own.terapiSuportif) blocks.push({ title: 'Terapi Suportif', items: own.terapiSuportif })
+    blocks.push({ title: 'Tatalaksana', items: own.tatalaksana })
+    if (own.edukasi) blocks.push({ title: 'Edukasi', items: own.edukasi })
+    if (own.komplikasi) blocks.push({ title: 'Komplikasi', items: own.komplikasi })
     return {
       kind: 'ringkas' as const,
+      sourceStation: undefined as string | undefined,
       definisi: own.definisi,
-      blocks: [
-        { title: 'Diagnosis', items: own.diagnosis },
-        { title: 'Tatalaksana', items: own.tatalaksana },
-      ],
+      deep: own,
+      blocks,
       referensi: own.referensi,
       tips: undefined as string | undefined,
     }
@@ -35,6 +58,7 @@ function resolveNote(disease: string) {
     kind: 'osce' as const,
     sourceStation: aliasKey,
     definisi: undefined as string | undefined,
+    deep: undefined,
     blocks: [
       { title: 'Anamnesis', items: station.anamnesis },
       { title: 'Pemeriksaan Fisik', items: station.pemeriksaanFisik },
@@ -133,6 +157,44 @@ export default function SkdiDiseaseDirectorySection() {
                           Dari catatan station OSCE: {note.sourceStation}
                         </p>
                       )}
+
+                      {note.deep?.anamnesis && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Anamnesis</div>
+                          <div className="mt-1 space-y-1.5">
+                            {ANAMNESIS_LABELS.map(([key, label]) => {
+                              const v = note.deep!.anamnesis![key]
+                              if (!v) return null
+                              return (
+                                <div key={key}>
+                                  <div className="text-[11px] font-bold text-neutral-500 dark:text-neutral-300">{label}</div>
+                                  <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{v}</p>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {note.deep?.antropometri && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Interpretasi Antropometri</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.antropometri}</p>
+                        </div>
+                      )}
+
+                      {(note.deep?.etiologi || note.deep?.patofisiologi) && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Etiologi & Patofisiologi</div>
+                          {note.deep.etiologi && (
+                            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.etiologi}</p>
+                          )}
+                          {note.deep.patofisiologi && (
+                            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.patofisiologi}</p>
+                          )}
+                        </div>
+                      )}
+
                       {note.blocks.map((b) => (
                         <div key={b.title}>
                           <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">{b.title}</div>
@@ -141,6 +203,27 @@ export default function SkdiDiseaseDirectorySection() {
                           </ul>
                         </div>
                       ))}
+                      {note.deep?.goldStandard && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Baku Emas Diagnosis</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.goldStandard}</p>
+                        </div>
+                      )}
+
+                      {note.deep?.pengkajian && (
+                        <div className="rounded-lg bg-neutral-100 p-3 dark:bg-white/10">
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pengkajian Masalah</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{note.deep.pengkajian}</p>
+                        </div>
+                      )}
+
+                      {note.deep?.prognosis && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Prognosis</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.prognosis}</p>
+                        </div>
+                      )}
+
                       {note.tips && (
                         <div className="rounded-lg bg-brand-50 p-2.5 text-[12px] leading-relaxed text-brand-dark dark:bg-brand/10">
                           <span className="font-black">Tips: </span>{note.tips}

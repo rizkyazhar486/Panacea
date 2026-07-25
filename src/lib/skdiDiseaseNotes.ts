@@ -118,12 +118,60 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Ross DS, Burch HB, Cooper DS, Greenlee MC, Laurberg P, Maia AL, et al. 2016 American Thyroid Association Guidelines for Diagnosis and Management of Hyperthyroidism and Other Causes of Thyrotoxicosis. Thyroid. 2016;26(10):1343-421.',
 }
 
+/**
+ * Anamnesis terstruktur. Ditulis sebagai template klinis yang dapat langsung
+ * dipakai saat menghadapi pasien dengan diagnosis ini — bukan riwayat satu
+ * pasien tertentu.
+ */
+export interface AnamnesisTerstruktur {
+  keluhanUtama: string
+  /** RPS diuraikan dengan kerangka SOCRATES. */
+  riwayatPenyakitSekarang: string
+  riwayatPenyakitDahulu?: string
+  riwayatPenyakitKeluarga?: string
+  riwayatPengobatan?: string
+  riwayatAlergi?: string
+  riwayatKehamilanPersalinan?: string
+  riwayatTumbuhKembang?: string
+  riwayatNutrisi?: string
+  riwayatImunisasi?: string
+  riwayatSosialEkonomi?: string
+}
+
 export interface SkdiDiseaseNote {
   definisi: string
   diagnosis: string[]
   tatalaksana: string[]
   /** Key ke REFERENSI_SUMBER — pedoman yang menjadi rujukan konsep entry ini. */
   referensi: string[]
+
+  // ── Pendalaman klinis (opsional; diisi bertahap, diprioritaskan level 4A) ──
+  /** Anamnesis terstruktur lengkap dengan kerangka SOCRATES pada RPS. */
+  anamnesis?: AnamnesisTerstruktur
+  /** Temuan pemeriksaan fisik yang khas untuk diagnosis ini. */
+  pemeriksaanFisik?: string[]
+  /** Interpretasi antropometri (BB/U, TB/U, BB/TB, IMT) bila relevan. */
+  antropometri?: string
+  /** Pemeriksaan penunjang beserta interpretasi temuan yang diharapkan. */
+  penunjang?: string[]
+  etiologi?: string
+  patofisiologi?: string
+  faktorRisiko?: string[]
+  /** Baku emas penegakan diagnosis. */
+  goldStandard?: string
+  diagnosisBanding?: string[]
+  /**
+   * Paragraf pengkajian yang diawali "Dipikirkan …" — menjelaskan alur
+   * penalaran dari anamnesis, pemeriksaan fisik, dan penunjang menuju
+   * diagnosis, dibandingkan terhadap diagnosis bandingnya.
+   */
+  pengkajian?: string
+  /** Terapi suportif: resusitasi, balans cairan, kebutuhan kalori, urine output. */
+  terapiSuportif?: string[]
+  /** Edukasi: pola makan, tidur, olahraga, dan jadwal kontrol. */
+  edukasi?: string[]
+  komplikasi?: string[]
+  prognosis?: string
 }
 
 export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
@@ -323,16 +371,105 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Diabetes melitus tipe 2': {
-    definisi: 'DM akibat resistensi insulin dengan defisiensi insulin relatif, terkait obesitas dan gaya hidup, onset biasanya usia dewasa.',
+    definisi: 'DM akibat resistensi insulin pada jaringan perifer disertai defisiensi insulin relatif akibat disfungsi sel beta pankreas yang progresif; erat kaitannya dengan obesitas sentral dan gaya hidup, onset umumnya usia dewasa.',
+    anamnesis: {
+      keluhanUtama: 'Sering buang air kecil, banyak minum, dan banyak makan disertai penurunan berat badan tanpa sebab jelas — atau tanpa keluhan sama sekali dan ditemukan saat pemeriksaan gula darah rutin.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan non-nyeri. Site: keluhan bersifat sistemik, bukan terlokalisasi pada satu organ. Onset: umumnya perlahan dalam hitungan bulan hingga tahun, berbeda dari DM tipe 1 yang mendadak. Character: poliuria terutama malam hari sehingga terbangun berkali-kali, polidipsia yang tidak hilang meski banyak minum, polifagia namun berat badan justru turun. Radiation: gali keluhan penyerta yang menandakan komplikasi — kesemutan dan baal simetris pada kedua kaki (neuropati), pandangan kabur atau berbayang (retinopati), luka yang lama sembuh, gatal pada kemaluan atau keputihan berulang (kandidiasis), serta disfungsi ereksi. Associations: lemas, mudah lelah, penurunan berat badan yang dikuantifikasi dalam kilogram per periode waktu. Time course: apakah keluhan menetap, memberat, atau berfluktuasi mengikuti pola makan. Exacerbating/relieving: hubungan keluhan dengan asupan karbohidrat, kepatuhan obat, aktivitas fisik, dan stres atau infeksi penyerta. Severity: dampak terhadap pekerjaan, kualitas tidur, dan aktivitas harian.',
+      riwayatPenyakitDahulu:
+        'Riwayat hipertensi, dislipidemia, penyakit jantung koroner, stroke, dan penyakit ginjal. Riwayat diabetes gestasional atau melahirkan bayi dengan berat lahir lebih dari 4 kg pada perempuan. Riwayat pankreatitis atau penggunaan kortikosteroid jangka panjang yang dapat memicu hiperglikemia sekunder. Riwayat infeksi berulang seperti tuberkulosis, infeksi saluran kemih, atau infeksi kulit.',
+      riwayatPenyakitKeluarga:
+        'Riwayat diabetes melitus pada orang tua dan saudara kandung sangat meningkatkan risiko; tanyakan pula riwayat keluarga dengan hipertensi, penyakit jantung dini, dan stroke untuk menilai risiko kardiovaskular keluarga.',
+      riwayatPengobatan:
+        'Obat antidiabetik yang pernah dan sedang digunakan beserta dosis dan kepatuhannya, riwayat hipoglikemia akibat obat, serta penggunaan kortikosteroid, diuretik tiazid, antipsikotik atipik, dan obat herbal yang tidak jelas kandungannya.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama golongan sulfa yang relevan untuk pemilihan sulfonilurea.',
+      riwayatNutrisi:
+        'Pola makan sehari-hari termasuk frekuensi, porsi, dan jenis karbohidrat; konsumsi minuman manis, gorengan, dan camilan; kebiasaan makan malam larut; serta upaya diet yang pernah dijalani beserta hasilnya.',
+      riwayatSosialEkonomi:
+        'Aktivitas fisik harian dan olahraga terstruktur, kebiasaan merokok dan konsumsi alkohol, jenis pekerjaan dan tingkat sedentari, kualitas dan durasi tidur, tingkat stres, serta kemampuan finansial dan akses terhadap obat dan pemeriksaan berkala yang menentukan keberlanjutan terapi.',
+    },
+    pemeriksaanFisik: [
+      'Antropometri: berat badan, tinggi badan, indeks massa tubuh, dan lingkar pinggang sebagai penanda obesitas sentral',
+      'Tekanan darah pada kedua lengan dalam posisi duduk setelah istirahat 5 menit; nilai pula hipotensi ortostatik sebagai tanda neuropati otonom',
+      'Kulit: acanthosis nigricans pada leher dan aksila sebagai penanda resistensi insulin, xanthoma, luka atau infeksi jamur pada lipatan',
+      'Pemeriksaan kaki diabetik menyeluruh: inspeksi kulit, kalus, deformitas dan ulkus; palpasi nadi dorsalis pedis dan tibialis posterior; uji sensasi protektif dengan monofilamen 10 g pada sepuluh titik dan uji getar dengan garpu tala 128 Hz',
+      'Funduskopi untuk mencari mikroaneurisma, perdarahan dot-blot, eksudat keras, dan neovaskularisasi',
+      'Pemeriksaan jantung dan pembuluh darah perifer termasuk auskultasi bruit karotis dan abdomen',
+    ],
+    antropometri:
+      'Hitung indeks massa tubuh dengan rumus berat badan dalam kilogram dibagi kuadrat tinggi badan dalam meter. Menurut kriteria Asia Pasifik: kurang dari 18,5 berarti berat kurang; 18,5 sampai 22,9 normal; 23 sampai 24,9 berat berlebih; 25 sampai 29,9 obesitas derajat I; dan 30 atau lebih obesitas derajat II. Obesitas sentral ditegakkan bila lingkar pinggang lebih dari 90 cm pada laki-laki atau lebih dari 80 cm pada perempuan, dan merupakan prediktor risiko kardiometabolik yang lebih kuat daripada indeks massa tubuh saja.',
+    penunjang: [
+      'Glukosa darah puasa, glukosa 2 jam setelah pembebanan 75 gram glukosa, dan glukosa darah sewaktu untuk penegakan diagnosis',
+      'HbA1c untuk menilai kendali glikemik rerata 2-3 bulan terakhir; hasil dapat menyesatkan pada anemia, hemoglobinopati, dan penyakit ginjal kronik',
+      'Profil lipid puasa: kolesterol total, LDL, HDL, dan trigliserida untuk stratifikasi risiko kardiovaskular',
+      'Kreatinin serum dengan perhitungan laju filtrasi glomerulus, serta rasio albumin-kreatinin urin sebagai penanda nefropati dini',
+      'Elektrokardiogram untuk mencari iskemia diam yang sering terjadi tanpa nyeri dada pada pasien diabetes',
+      'Fungsi hati sebagai data dasar sebelum terapi dan untuk menilai perlemakan hati yang sering menyertai',
+    ],
+    etiologi:
+      'Kombinasi predisposisi genetik poligenik dengan faktor lingkungan berupa asupan kalori berlebih, obesitas sentral, dan aktivitas fisik rendah.',
+    patofisiologi:
+      'Kelebihan jaringan lemak viseral meningkatkan pelepasan asam lemak bebas dan sitokin proinflamasi yang mengganggu jalur sinyal insulin pada otot dan hati, sehingga ambilan glukosa perifer menurun dan produksi glukosa hepatik meningkat. Sel beta pankreas awalnya mengompensasi dengan hipersekresi insulin sehingga glukosa masih normal; ketika kapasitas kompensasi terlampaui dan massa sel beta menurun secara progresif, muncul hiperglikemia. Hiperglikemia kronik menimbulkan kerusakan mikrovaskular melalui jalur poliol, pembentukan advanced glycation end products, dan stres oksidatif, serta mempercepat aterosklerosis makrovaskular.',
+    faktorRisiko: [
+      'Usia 40 tahun atau lebih',
+      'Indeks massa tubuh 23 kg/m² atau lebih dan obesitas sentral',
+      'Riwayat keluarga diabetes pada kerabat derajat pertama',
+      'Hipertensi, dislipidemia, dan sindrom metabolik',
+      'Riwayat diabetes gestasional atau melahirkan bayi lebih dari 4 kg',
+      'Sindrom ovarium polikistik',
+      'Aktivitas fisik kurang dan pola makan tinggi kalori',
+      'Riwayat toleransi glukosa terganggu atau glukosa puasa terganggu',
+    ],
     diagnosis: [
-      'GDP ≥126 mg/dL, GD 2 jam PP (TTGO) ≥200 mg/dL, GDS ≥200 mg/dL + gejala, atau HbA1c ≥6,5%',
-      'Sering asimtomatik, ditemukan skrining rutin atau saat komplikasi muncul',
+      'Glukosa darah puasa 126 mg/dL atau lebih setelah puasa minimal 8 jam',
+      'Glukosa 2 jam setelah tes toleransi glukosa oral 75 gram sebesar 200 mg/dL atau lebih',
+      'Glukosa darah sewaktu 200 mg/dL atau lebih disertai gejala klasik poliuria, polidipsia, dan penurunan berat badan tanpa sebab jelas',
+      'HbA1c 6,5% atau lebih pada laboratorium terstandar',
+      'Tanpa gejala klasik, diperlukan dua hasil abnormal untuk konfirmasi',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan bila glukosa darah puasa 126 mg/dL atau lebih, atau glukosa 2 jam setelah tes toleransi glukosa oral 75 gram 200 mg/dL atau lebih, atau HbA1c 6,5% atau lebih. Bila pasien tanpa gejala klasik, diperlukan dua hasil abnormal — baik dari dua pemeriksaan berbeda pada satu sampel maupun dari pemeriksaan ulang pada hari berbeda. Glukosa darah sewaktu 200 mg/dL atau lebih disertai gejala klasik sudah cukup untuk diagnosis tanpa konfirmasi ulang.',
+    diagnosisBanding: [
+      'Diabetes melitus tipe 1 — usia lebih muda, kurus, onset cepat, cenderung ketoasidosis, C-peptide rendah, autoantibodi positif',
+      'Diabetes tipe lain akibat obat (kortikosteroid), penyakit pankreas, atau endokrinopati (Cushing, akromegali, hipertiroid)',
+      'Maturity-onset diabetes of the young — onset usia muda, riwayat keluarga tiga generasi, tidak obesitas, tidak ketosis',
+      'Diabetes insipidus — poliuria dan polidipsia berat namun glukosa darah normal dan urin sangat encer',
+    ],
+    pengkajian:
+      'Dipikirkan diabetes melitus tipe 2 pada pasien ini atas dasar keluhan klasik poliuria, polidipsia, dan polifagia yang berlangsung perlahan disertai penurunan berat badan, yang muncul pada usia dewasa dengan latar obesitas sentral dan gaya hidup sedentari serta riwayat keluarga diabetes. Perjalanan yang bertahap tersebut menjauhkan dari diabetes melitus tipe 1 yang khasnya timbul mendadak pada usia lebih muda dengan perawakan kurus dan sering langsung bermanifestasi sebagai ketoasidosis; pada pemeriksaan, temuan acanthosis nigricans justru memperkuat adanya resistensi insulin yang menjadi dasar patofisiologi tipe 2. Poliuria dan polidipsia pada kasus ini juga perlu dibedakan dari diabetes insipidus, namun pada diabetes insipidus glukosa darah normal dan urin sangat encer dengan osmolaritas rendah, sedangkan di sini glukosa darah jelas meningkat. Kemungkinan diabetes tipe lain disingkirkan dengan menelusuri riwayat penggunaan kortikosteroid, penyakit pankreas, dan tanda endokrinopati seperti moon face, striae ungu, atau pembesaran akral yang tidak ditemukan. Adanya kesemutan simetris pada kedua tungkai dan pandangan kabur menunjukkan hiperglikemia telah berlangsung lama sebelum terdiagnosis, sehingga skrining komplikasi mikrovaskular dan makrovaskular perlu dikerjakan sejak diagnosis ditegakkan, berbeda dari diabetes tipe 1 yang skrining komplikasinya dimulai lima tahun setelah diagnosis.',
+    terapiSuportif: [
+      'Kebutuhan kalori dihitung dari berat badan ideal menggunakan rumus Broca, yaitu tinggi badan dalam sentimeter dikurangi 100 lalu dikurangi 10 persen. Kebutuhan basal 25-30 kkal/kg berat badan ideal per hari, disesuaikan faktor aktivitas dan stres, lalu dikurangi 500 kkal per hari bila ditargetkan penurunan berat badan',
+      'Komposisi makronutrien: karbohidrat 45-65% dengan mengutamakan indeks glikemik rendah dan tinggi serat, protein 10-20% (diturunkan bila sudah ada nefropati), lemak 20-25% dengan lemak jenuh kurang dari 7%',
+      'Serat 20-35 gram per hari dan pembatasan garam kurang dari 5 gram per hari terutama bila disertai hipertensi',
+      'Pemantauan glukosa darah mandiri; pada pasien dengan insulin atau sulfonilurea, ajarkan pengenalan dan penanganan hipoglikemia dengan aturan 15 yaitu 15 gram karbohidrat cepat serap lalu evaluasi ulang setelah 15 menit',
     ],
     tatalaksana: [
-      'Modifikasi gaya hidup + metformin lini pertama, kombinasi OAD/insulin bertahap sesuai target HbA1c',
-      'Skrining dan tatalaksana komorbid kardiovaskular (hipertensi, dislipidemia)',
+      'Modifikasi gaya hidup pada semua pasien: penurunan berat badan 5-10%, aktivitas aerobik sedang minimal 150 menit per minggu terbagi minimal 3 hari dengan jeda tidak lebih dari 2 hari berturut-turut, ditambah latihan beban 2-3 kali per minggu',
+      'Metformin sebagai lini pertama, dimulai 500 mg satu kali sehari bersama makan lalu dititrasi bertahap hingga maksimal 2000-2550 mg per hari terbagi; kontraindikasi bila laju filtrasi glomerulus kurang dari 30 mL/menit/1,73 m² dan perlu dihentikan sementara sebelum pemberian kontras beryodium',
+      'Bila HbA1c belum mencapai target setelah 3 bulan, tambahkan obat kedua sesuai komorbid: penghambat SGLT2 bila ada gagal jantung atau penyakit ginjal kronik, agonis reseptor GLP-1 bila ada penyakit kardiovaskular aterosklerotik atau perlu penurunan berat badan, sulfonilurea atau penghambat DPP-4 bila pertimbangan utama adalah biaya',
+      'Insulin dimulai bila HbA1c sangat tinggi (di atas 9-10%) dengan gejala katabolik, saat sakit berat atau perioperatif, atau bila kombinasi obat oral gagal; mulai dengan insulin basal 10 unit atau 0,1-0,2 unit/kg berat badan sebelum tidur dan titrasi berdasarkan glukosa darah puasa',
+      'Target terapi umum: HbA1c kurang dari 7%, glukosa puasa 80-130 mg/dL, glukosa 2 jam setelah makan kurang dari 180 mg/dL; target dilonggarkan pada usia lanjut, harapan hidup terbatas, riwayat hipoglikemia berat, atau komorbid berat',
+      'Statin diberikan pada sebagian besar pasien diabetes usia 40 tahun ke atas untuk pencegahan kardiovaskular; target tekanan darah umumnya kurang dari 140/90 mmHg dengan penghambat ACE atau ARB sebagai pilihan bila disertai albuminuria',
+      'Skrining komplikasi sejak diagnosis dan diulang setiap tahun: funduskopi, rasio albumin-kreatinin urin dan laju filtrasi glomerulus, pemeriksaan kaki, profil lipid, serta elektrokardiogram sesuai indikasi',
     ],
-    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
+    edukasi: [
+      'Penjadwalan makan: tiga kali makan utama dengan jarak 5-6 jam ditambah 2-3 kali selingan; makan pada jam yang konsisten setiap hari agar sesuai dengan kerja obat dan mencegah hipoglikemia',
+      'Porsi menggunakan metode piring: setengah piring sayur non-tepung, seperempat protein tanpa lemak, dan seperempat karbohidrat kompleks; batasi gula sederhana dan minuman manis, ganti nasi putih dengan nasi merah atau kentang berkulit',
+      'Tidur 7-8 jam per malam dengan jadwal teratur — kurang tidur dan gangguan tidur memperburuk resistensi insulin; skrining sleep apnea bila mendengkur keras dan mengantuk berat pada siang hari',
+      'Pola olahraga: jalan cepat, sepeda, atau berenang 30 menit per hari selama 5 hari seminggu pada intensitas sedang (masih dapat berbicara namun tidak dapat bernyanyi). Jangan berolahraga bila glukosa darah kurang dari 100 mg/dL tanpa asupan karbohidrat terlebih dahulu, atau bila glukosa lebih dari 250 mg/dL disertai keton. Gunakan alas kaki yang pas dan periksa kaki setelah berolahraga',
+      'Perawatan kaki harian: periksa telapak dan sela jari setiap hari termasuk dengan bantuan cermin, keringkan sela jari setelah mandi, potong kuku lurus, jangan berjalan tanpa alas kaki, dan segera periksakan setiap luka sekecil apa pun',
+      'Jadwal kontrol: setiap 2-4 minggu saat penyesuaian dosis hingga target tercapai, lalu setiap 3 bulan bersamaan pemeriksaan HbA1c; segera datang bila muncul gejala hipoglikemia berulang, luka pada kaki, demam, muntah, atau penurunan kesadaran',
+      'Saat sakit (sick day rules): jangan menghentikan obat antidiabetik sendiri, perbanyak cairan, periksa glukosa lebih sering, dan segera ke fasilitas kesehatan bila tidak dapat makan-minum atau muntah terus-menerus',
+    ],
+    komplikasi: [
+      'Akut: ketoasidosis diabetik, status hiperglikemik hiperosmolar, dan hipoglikemia akibat terapi',
+      'Mikrovaskular: retinopati hingga kebutaan, nefropati hingga penyakit ginjal tahap akhir, dan neuropati perifer maupun otonom',
+      'Makrovaskular: penyakit jantung koroner, stroke, dan penyakit arteri perifer',
+      'Kaki diabetik dengan ulkus, infeksi, hingga amputasi; serta kerentanan terhadap infeksi termasuk tuberkulosis',
+    ],
+    prognosis:
+      'Penyakit bersifat kronik progresif namun komplikasi sangat dapat dicegah. Kendali glikemik, tekanan darah, dan lipid secara simultan terbukti menurunkan kejadian komplikasi mikrovaskular dan makrovaskular secara bermakna. Prognosis paling ditentukan oleh kepatuhan jangka panjang, pengendalian faktor risiko kardiovaskular, dan keteraturan skrining komplikasi.',
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024', 'PAPDI2014', 'HARRISON2022'],
   },
   'Ketoasidosis diabetikum nonketotik': {
     definisi: 'Merujuk pada Hyperosmolar Hyperglycemic State (HHS) — dekompensasi hiperglikemik berat tanpa ketosis signifikan, khas pada DM tipe 2 lansia.',
