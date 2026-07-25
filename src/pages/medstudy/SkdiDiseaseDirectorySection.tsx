@@ -35,7 +35,7 @@ function resolveNote(disease: string) {
     if (own.pemeriksaanFisik) blocks.push({ title: 'Pemeriksaan Fisik', items: own.pemeriksaanFisik })
     if (own.penunjang) blocks.push({ title: 'Pemeriksaan Penunjang & Interpretasi', items: own.penunjang })
     if (own.faktorRisiko) blocks.push({ title: 'Faktor Risiko', items: own.faktorRisiko })
-    blocks.push({ title: 'Diagnosis', items: own.diagnosis })
+    if (own.diagnosis) blocks.push({ title: 'Diagnosis', items: own.diagnosis })
     if (own.diagnosisBanding) blocks.push({ title: 'Diagnosis Banding', items: own.diagnosisBanding })
     if (own.terapiSuportif) blocks.push({ title: 'Terapi Suportif', items: own.terapiSuportif })
     blocks.push({ title: 'Tatalaksana', items: own.tatalaksana })
