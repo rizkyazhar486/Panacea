@@ -3984,4 +3984,241 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     tatalaksana: ['Ejakulasi dini: teknik perilaku (stop-start, squeeze), anestetik topikal, SSRI atau dapoksetin, libatkan pasangan dalam terapi; Retrograd: tinjau ulang obat penyebab, simpatomimetik pada kasus tertentu, pengambilan sperma dari urin bila menginginkan fertilitas; atasi penyakit dasar dan berikan konseling seksual'],
     referensi: ['SKDI2012', 'CAMPBELL2016', 'KAPLAN2015'],
   },
+
+  // ─── Entri pelengkap: penyakit SKDI tanpa padanan catatan OSCE ────────────
+  // Ditulis tersendiri karena tidak ada station note yang benar-benar setara.
+  // (Pencocokan otomatis akan salah — mis. "Koma" → "Glaukoma", "Xanthelasma"
+  // → "Asma" — sehingga entri ini sengaja dibuat manual.)
+  'Ensefalopati': {
+    definisi: 'Disfungsi otak difus akibat penyebab sistemik (metabolik, toksik, infeksi, hipoksia) yang bermanifestasi sebagai perubahan status mental — bukan lesi struktural fokal.',
+    diagnosis: [
+      'Penurunan kesadaran atau perubahan perilaku/kognisi yang berfluktuasi, umumnya TANPA defisit neurologis fokal (membedakan dari stroke)',
+      'Cari penyebab sistemik: hepatik (asteriksis, fetor hepatikum, riwayat sirosis), uremik, hipoglikemia, hiponatremia, hiperkarbia, sepsis, obat/intoksikasi, defisiensi tiamin (Wernicke)',
+      'Pemeriksaan wajib: gula darah kapiler SEGERA, elektrolit, ureum-kreatinin, fungsi hati dan amonia, analisis gas darah, urinalisis dan kultur; CT kepala bila ada defisit fokal, trauma, atau antikoagulan',
+    ],
+    tatalaksana: [
+      'Amankan ABC dan posisi; koreksi hipoglikemia segera (dekstrosa 40% IV) dan berikan TIAMIN 100 mg IV sebelum/bersama glukosa pada pasien berisiko (alkohol, malnutrisi)',
+      'Ensefalopati hepatik: laktulosa 3x30 mL dititrasi hingga BAB 2-3x/hari, rifaksimin, atasi pencetus (perdarahan saluran cerna, infeksi, konstipasi, gangguan elektrolit)',
+      'Koreksi gangguan elektrolit secara BERTAHAP (koreksi hiponatremia terlalu cepat berisiko mielinolisis pontin)',
+      'Hentikan/kurangi obat sedatif dan nefrotoksik, atasi infeksi, dukungan nutrisi',
+    ],
+    referensi: ['SKDI2012', 'ADAMS2019', 'SLEISENGER2021'],
+  },
+  'Koma': {
+    definisi: 'Keadaan tidak sadar yang dalam dan menetap, pasien tidak dapat dibangunkan dan tidak menunjukkan respons bertujuan terhadap rangsang — kedaruratan neurologis.',
+    diagnosis: [
+      'Nilai GCS (mata, verbal, motorik) dan pola pernapasan; periksa PUPIL (ukuran, simetri, refleks cahaya) dan refleks batang otak (kornea, okulosefalik, muntah) untuk lokalisasi',
+      'Pupil pinpoint reaktif → intoksikasi opioid atau lesi pons; pupil dilatasi unilateral non-reaktif → herniasi unkal (kedaruratan bedah saraf); pupil dilatasi bilateral → hipoksia berat atau intoksikasi antikolinergik',
+      'Singkirkan penyebab reversibel dengan cepat: gula darah kapiler, elektrolit, gas darah, kadar obat/toksin, suhu tubuh; CT kepala segera bila lateralisasi, trauma, atau penyebab tidak jelas',
+    ],
+    tatalaksana: [
+      'ABC dan proteksi jalan napas — intubasi bila GCS ≤8 atau refleks proteksi jalan napas hilang; imobilisasi servikal bila kemungkinan trauma',
+      '"Coma cocktail" terarah: dekstrosa 40% IV bila hipoglikemia, TIAMIN 100 mg IV (sebelum glukosa pada pasien berisiko), nalokson bila dicurigai opioid',
+      'Cegah cedera otak sekunder: hindari hipotensi, hipoksia, hipertermia, dan hipo/hiperglikemia; elevasi kepala 30° bila tekanan intrakranial meningkat',
+      'Rujuk untuk pencitraan dan tatalaksana penyebab; tentukan prognosis hanya setelah penyebab reversibel disingkirkan dan pasien tidak dalam pengaruh sedatif',
+    ],
+    referensi: ['SKDI2012', 'ADAMS2019', 'ATLS2018'],
+  },
+  'Kejang': {
+    definisi: 'Manifestasi klinis akibat lepas muatan listrik neuron serebral yang berlebihan dan sinkron; dapat merupakan kejang provokasi (akut simtomatik) maupun bagian dari epilepsi.',
+    diagnosis: [
+      'Bedakan dari sinkop dan kejang psikogenik: kejang epileptik umumnya disertai fase tonik-klonik, mata TERBUKA dan deviasi, lidah tergigit sisi lateral, inkontinensia, diikuti fase pascaiktal yang bingung dan mengantuk',
+      'Cari PROVOKASI (kejang akut simtomatik): hipoglikemia, hiponatremia, hipokalsemia, demam pada anak, infeksi SSP, trauma kepala, stroke, putus alkohol/obat, intoksikasi, eklampsia pada kehamilan',
+      'Pemeriksaan awal: gula darah kapiler segera, elektrolit termasuk kalsium dan magnesium, fungsi ginjal, tes kehamilan pada wanita usia subur; EEG dan pencitraan otak sesuai indikasi',
+    ],
+    tatalaksana: [
+      'Saat kejang: posisi miring, amankan dari cedera (JANGAN memasukkan benda ke mulut atau menahan gerakan), oksigen, catat durasi',
+      'Kejang >5 menit ditangani sebagai status epileptikus: benzodiazepin (diazepam/lorazepam IV, midazolam IM bila tanpa akses IV) dilanjutkan antiepilepsi lini kedua bila berlanjut',
+      'KOREKSI PENYEBAB adalah kunci pada kejang provokasi — antiepilepsi jangka panjang umumnya TIDAK diindikasikan bila kejang murni akibat provokasi yang sudah diatasi',
+      'Edukasi keselamatan (hindari berenang sendiri, mengemudi sesuai ketentuan, bekerja di ketinggian) dan kepatuhan obat bila epilepsi',
+    ],
+    referensi: ['SKDI2012', 'PERDOSSI2016', 'ADAMS2019'],
+  },
+  'Gangguan campuran cemas depresi': {
+    definisi: 'Gangguan dengan gejala cemas dan depresi yang muncul bersamaan, masing-masing tidak cukup berat untuk memenuhi kriteria diagnosis tersendiri.',
+    diagnosis: [
+      'Gejala cemas (khawatir berlebihan, tegang, gelisah, gangguan otonom) dan depresi (mood turun, anhedonia, mudah lelah) muncul bersamaan dengan intensitas ringan-sedang',
+      'Tidak memenuhi kriteria penuh gangguan cemas menyeluruh maupun episode depresi; sangat sering ditemukan di layanan primer',
+      'Skrining risiko bunuh diri WAJIB ditanyakan secara langsung pada setiap pasien dengan gejala depresi',
+    ],
+    tatalaksana: [
+      'Psikoedukasi, teknik relaksasi dan pernapasan, aktivasi perilaku, higiene tidur, dan aktivitas fisik teratur sebagai lini pertama',
+      'SSRI bila gejala menetap atau mengganggu fungsi; jelaskan efek terapeutik baru terasa 2-4 minggu dan jangan dihentikan mendadak',
+      'Hindari benzodiazepin jangka panjang (risiko ketergantungan); atasi stresor psikososial dan libatkan dukungan keluarga',
+      'Rujuk psikiatri bila ada risiko bunuh diri, gejala psikotik, atau tidak respons terapi',
+    ],
+    referensi: ['SKDI2012', 'PPDGJIII', 'WHOMHGAP2016'],
+  },
+  'Xanthelasma': {
+    definisi: 'Deposit lipid berwarna kekuningan pada kulit kelopak mata, tersering di kantus medial — penanda kulit yang dapat menunjukkan dislipidemia.',
+    diagnosis: [
+      'Plak kekuningan lunak berbatas tegas simetris pada kelopak mata, tidak nyeri dan tidak mengganggu penglihatan',
+      'WAJIB periksa profil lipid — sebagian pasien normolipidemik, namun xanthelasma tetap berkaitan dengan peningkatan risiko aterosklerosis dan penyakit jantung koroner',
+      'Cari xantoma di lokasi lain (tendon Achilles, ekstensor jari) yang sangat sugestif hiperkolesterolemia familial',
+    ],
+    tatalaksana: [
+      'Fokus utama: tatalaksana dislipidemia dan penilaian risiko kardiovaskular total (statin sesuai kategori risiko, modifikasi gaya hidup)',
+      'Tindakan lokal untuk alasan kosmetik: eksisi bedah, laser, atau asam trikloroasetat — EDUKASI bahwa rekurensi sering terjadi bila dislipidemia tidak dikendalikan',
+    ],
+    referensi: ['SKDI2012', 'FITZPATRICK2019', 'PAPDI2014'],
+  },
+  'Skleritis': {
+    definisi: 'Peradangan sklera yang bersifat nyeri dan destruktif, sering berkaitan dengan penyakit autoimun sistemik — berbeda dari episkleritis yang jinak dan swasirna.',
+    diagnosis: [
+      'NYERI HEBAT menembus hingga ke kepala yang mengganggu tidur (episkleritis hanya rasa tidak nyaman ringan), mata merah kebiruan/keunguan, nyeri tekan bola mata, dapat disertai penurunan penglihatan',
+      'Kemerahan TIDAK memucat dengan tetes fenilefrin topikal (pada episkleritis memucat) — pembeda klinis penting di layanan primer',
+      'Cari penyakit sistemik penyerta: artritis reumatoid, granulomatosis dengan poliangiitis, SLE, dan penyakit jaringan ikat lain',
+    ],
+    tatalaksana: [
+      'RUJUK oftalmologi — skleritis dapat menyebabkan penipisan sklera, perforasi, dan kehilangan penglihatan permanen',
+      'NSAID sistemik pada kasus ringan, kortikosteroid sistemik dan imunosupresan pada skleritis nekrotikans atau terkait penyakit autoimun',
+      'Kortikosteroid topikal saja TIDAK adekuat; evaluasi dan tatalaksana penyakit sistemik yang mendasari bersama reumatologi',
+    ],
+    referensi: ['SKDI2012', 'KANSKI2020', 'HARRISON2022'],
+  },
+  'Kerato-konjungtivitis sicca': {
+    definisi: 'Sindrom mata kering dengan keterlibatan kornea dan konjungtiva akibat defisiensi atau instabilitas film air mata.',
+    diagnosis: [
+      'Rasa berpasir, perih, terbakar, mata cepat lelah, kadang justru berair berlebihan (epifora refleks); memberat saat kerja layar, di ruang ber-AC, dan sore hari',
+      'Uji Schirmer menurun, tear break-up time memendek, pewarnaan fluoresein/rose bengal menunjukkan pungtata pada kornea dan konjungtiva',
+      'Bila disertai MULUT KERING dan artritis, curigai sindrom Sjögren — periksa anti-Ro/SSA dan anti-La/SSB',
+    ],
+    tatalaksana: [
+      'Air mata buatan tanpa pengawet bila pemakaian sering (>4-6x/hari), gel atau salep mata malam hari',
+      'Kompres hangat dan pembersihan kelopak bila disertai disfungsi kelenjar Meibom; aturan 20-20-20 saat kerja layar dan hindari embusan AC/kipas langsung ke wajah',
+      'Siklosporin atau kortikosteroid topikal jangka pendek pada kasus sedang-berat, punctal plug bila refrakter',
+      'Tinjau obat yang memperberat (antihistamin, antikolinergik, isotretinoin) dan tatalaksana penyakit autoimun yang mendasari',
+    ],
+    referensi: ['SKDI2012', 'KANSKI2020', 'HARRISON2022'],
+  },
+  'Hernia (diaframatika, hiatus)': {
+    definisi: 'Herniasi isi abdomen ke rongga toraks; hernia diafragmatika kongenital pada neonatus, hernia hiatus berupa naiknya lambung melalui hiatus esofagus.',
+    diagnosis: [
+      'Hernia diafragmatika kongenital: distres napas berat segera setelah lahir, abdomen skafoid (cekung), suara napas menghilang dan bising usus terdengar di dada, mediastinum bergeser; rontgen toraks menunjukkan usus di rongga dada',
+      'Hernia hiatus: sering asimtomatik atau bermanifestasi sebagai gejala refluks (heartburn, regurgitasi); barium swallow atau endoskopi memastikan',
+    ],
+    tatalaksana: [
+      'Hernia diafragmatika kongenital: JANGAN berikan ventilasi tekanan positif dengan sungkup (memperberat distensi usus di dada) — intubasi dini, pasang NGT untuk dekompresi, stabilkan lalu rujuk bedah anak',
+      'Hernia hiatus: tatalaksana refluks (modifikasi gaya hidup, PPI); operasi fundoplikasi bila gejala refrakter, hernia besar, atau ada komplikasi (volvulus lambung, strangulasi)',
+    ],
+    referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
+  },
+  'Pes': {
+    definisi: 'Penyakit pes (plague) — infeksi Yersinia pestis yang ditularkan melalui gigitan pinjal tikus; penyakit karantina dengan potensi wabah.',
+    diagnosis: [
+      'Bentuk bubonik (tersering): demam tinggi mendadak, menggigil, dan BUBO yaitu pembesaran kelenjar getah bening yang sangat nyeri (inguinal/aksila/servikal) dengan edema sekitarnya',
+      'Bentuk pneumonik: pneumonia berat dengan hemoptisis, menular antarmanusia melalui droplet; bentuk septikemik: sepsis dengan purpura dan gangren akral',
+      'Riwayat tinggal/berkunjung ke daerah fokus pes dan kontak dengan tikus atau hewan mati; konfirmasi dengan pewarnaan dan kultur aspirat bubo, darah, atau sputum',
+    ],
+    tatalaksana: [
+      'Antibiotik SEGERA tanpa menunggu konfirmasi laboratorium (streptomisin/gentamisin, alternatif doksisiklin atau siprofloksasin) — keterlambatan meningkatkan mortalitas secara tajam',
+      'ISOLASI dengan kewaspadaan droplet pada bentuk pneumonik, profilaksis antibiotik untuk kontak erat',
+      'WAJIB LAPOR ke dinas kesehatan sebagai penyakit berpotensi wabah, pengendalian tikus dan pinjal di lingkungan',
+    ],
+    referensi: ['SKDI2012', 'HARRISON2022', 'PPKFKTP2014'],
+  },
+  'Neoplasma hepar': {
+    definisi: 'Tumor hati, mencakup karsinoma hepatoselular (primer, umumnya pada hati sirotik) dan metastasis hati yang jauh lebih sering.',
+    diagnosis: [
+      'Nyeri perut kanan atas, penurunan BB, hepatomegali berbenjol, dekompensasi mendadak pada pasien sirosis stabil',
+      'Karsinoma hepatoselular: faktor risiko sirosis, hepatitis B dan C kronik; alfa-fetoprotein meningkat, CT/MRI empat fase menunjukkan pola khas hipervaskular fase arteri dengan washout — sering dapat didiagnosis tanpa biopsi',
+      'SURVEILANS 6 bulanan dengan USG (± AFP) pada semua pasien sirosis dan hepatitis B berisiko adalah kunci deteksi dini',
+    ],
+    tatalaksana: [
+      'Stadium dini: reseksi, ablasi, atau transplantasi hati (kriteria Milan) — satu-satunya pilihan kuratif',
+      'Stadium menengah: kemoembolisasi transarterial; stadium lanjut: terapi sistemik (inhibitor tirosin kinase, imunoterapi)',
+      'Metastasis hati: tatalaksana sesuai keganasan primer; perawatan paliatif dan penanganan nyeri sejak dini',
+      'PENCEGAHAN: vaksinasi hepatitis B, terapi antivirus hepatitis B/C, hindari alkohol dan aflatoksin',
+    ],
+    referensi: ['SKDI2012', 'SLEISENGER2021', 'WHOHEPB2024'],
+  },
+  'Abses (peri)anal': {
+    definisi: 'Kumpulan pus di ruang perianal atau perirektal, umumnya berasal dari infeksi kelenjar anal (kripta) — pendahulu terbentuknya fistula ani.',
+    diagnosis: [
+      'Nyeri anus hebat terus-menerus yang memberat saat duduk dan defekasi, bengkak, kemerahan, dan fluktuasi di perianal, dapat disertai demam',
+      'Abses yang lebih dalam (iskiorektal, supralevator) mungkin TIDAK tampak dari luar — nyeri hebat tanpa temuan luar yang jelas tetap memerlukan pemeriksaan colok dubur dan pencitraan',
+      'Cari faktor predisposisi: DM, imunosupresi, penyakit Crohn, keganasan',
+    ],
+    tatalaksana: [
+      'INSISI DAN DRAINASE adalah terapi utama dan tidak boleh ditunda — antibiotik saja tidak menyembuhkan abses yang sudah terbentuk',
+      'Antibiotik sebagai tambahan bila selulitis luas, demam, DM, imunosupresi, atau penyakit katup jantung',
+      'Rendam duduk hangat, analgesia, pelunak tinja setelah drainase; EDUKASI bahwa sekitar sepertiga kasus berkembang menjadi fistula ani yang memerlukan tindakan lanjutan',
+    ],
+    referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
+  },
+  'Infeksi pada kehamilan: TORCH, hepatitis B, malaria': {
+    definisi: 'Infeksi maternal yang dapat ditransmisikan ke janin atau memperberat luaran kehamilan — Toxoplasma, Others (sifilis, varisela, parvovirus), Rubella, Cytomegalovirus, Herpes, ditambah hepatitis B dan malaria.',
+    diagnosis: [
+      'Sering asimtomatik pada ibu — ditemukan melalui SKRINING ANTENATAL rutin (HBsAg, sifilis, HIV; malaria pada daerah endemis)',
+      'Petunjuk pada janin/neonatus: pertumbuhan janin terhambat, mikrosefali, kalsifikasi intrakranial, hepatosplenomegali, ikterik dini, ruam, katarak, gangguan pendengaran',
+      'Serologi IgM/IgG dengan aviditas untuk menentukan infeksi akut vs lampau; malaria dikonfirmasi apus darah tebal/tipis atau RDT',
+    ],
+    tatalaksana: [
+      'Hepatitis B: bayi dari ibu HBsAg positif WAJIB mendapat vaksin HB dan HBIg dalam 12 JAM pertama kehidupan; antivirus pada ibu dengan viral load tinggi trimester ketiga',
+      'Sifilis: benzatin penisilin G (satu-satunya yang mencegah sifilis kongenital — lakukan desensitisasi bila alergi)',
+      'Toksoplasmosis akut: spiramisin untuk cegah transmisi, pirimetamin-sulfadiazin bila janin terinfeksi',
+      'Malaria dalam kehamilan: obati sesuai pedoman dengan obat yang aman menurut trimester, gunakan kelambu berinsektisida; malaria meningkatkan risiko anemia berat, abortus, dan berat lahir rendah',
+      'PENCEGAHAN: vaksinasi rubela prakonsepsi, higiene makanan dan kontak kucing untuk toksoplasma, skrining antenatal lengkap',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'WHOHEPB2024'],
+  },
+  'Anemia defisiensi besi pada kehamilan': {
+    definisi: 'Anemia akibat kekurangan besi selama kehamilan, kondisi yang sangat umum karena kebutuhan besi meningkat tajam untuk ekspansi massa eritrosit ibu dan pertumbuhan janin.',
+    diagnosis: [
+      'Anemia dalam kehamilan bila Hb <11 g/dL (trimester I dan III) atau <10,5 g/dL (trimester II); gejala lemas, pusing, pucat, sesak saat aktivitas',
+      'Gambaran mikrositik hipokrom dengan feritin serum rendah (penanda paling spesifik); bedakan dari hemodilusi fisiologis kehamilan dan thalassemia',
+      'Skrining Hb rutin pada kunjungan antenatal pertama dan trimester ketiga',
+    ],
+    tatalaksana: [
+      'Tablet tambah darah rutin sebagai PENCEGAHAN pada semua ibu hamil sesuai program nasional; pada anemia berikan besi elemental dosis terapi',
+      'Minum bersama vitamin C dan hindari bersamaan teh, kopi, susu, atau kalsium; edukasi efek samping (mual, konstipasi, tinja hitam) agar kepatuhan terjaga',
+      'Besi intravena bila intoleransi oral berat, anemia sedang-berat mendekati persalinan, atau respons oral tidak adekuat',
+      'Transfusi hanya pada anemia berat simtomatik atau mendekati persalinan dengan risiko perdarahan',
+      'EDUKASI: anemia meningkatkan risiko perdarahan pascapersalinan, persalinan preterm, dan berat lahir rendah — kepatuhan minum tablet besi sangat penting',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'WILLIAMSOB2022'],
+  },
+  'Corpus alienum vaginae': {
+    definisi: 'Benda asing dalam vagina; pada anak sering benda kecil atau tisu, pada dewasa sering tampon tertinggal, kondom, atau pesarium terlupakan.',
+    diagnosis: [
+      'Duh vagina BERBAU SANGAT BUSUK dan persisten, dapat disertai bercak darah dan iritasi — pada ANAK, duh berbau busuk atau berdarah adalah petunjuk kuat benda asing',
+      'Inspeksi vagina; pada anak dilakukan dengan sangat hati-hati dan sering memerlukan pemeriksaan dalam sedasi/anestesi oleh tenaga yang kompeten',
+      'PENTING: pada anak dengan benda asing vagina, pertimbangkan dan evaluasi kemungkinan kekerasan seksual sesuai prosedur perlindungan anak',
+    ],
+    tatalaksana: [
+      'Ekstraksi benda asing (irigasi lembut atau dengan forsep; pada anak sebaiknya di bawah sedasi/anestesi oleh tenaga terlatih)',
+      'Antibiotik bila terdapat infeksi sekunder atau tanda selulitis; sebagian besar duh membaik cepat setelah benda asing diangkat',
+      'Edukasi higiene; rujuk sesuai protokol perlindungan anak bila dicurigai kekerasan seksual',
+    ],
+    referensi: ['SKDI2012', 'POGI2016', 'PPKFKTP2014'],
+  },
+  'Eritrasma': {
+    definisi: 'Infeksi superfisial kulit oleh Corynebacterium minutissimum pada area lipatan — bakteri, bukan jamur, sehingga sering salah diterapi sebagai tinea.',
+    diagnosis: [
+      'Bercak cokelat kemerahan berbatas tegas dengan skuama halus pada lipatan (sela jari kaki, inguinal, aksila, inframama), gatal ringan atau tanpa gejala',
+      'LAMPU WOOD menunjukkan fluoresensi MERAH KORAL yang khas — pemeriksaan sederhana yang langsung membedakannya dari tinea kruris',
+      'KOH negatif (tidak ada hifa) menyingkirkan dermatofitosis; faktor risiko: DM, obesitas, hiperhidrosis, iklim panas dan lembap',
+    ],
+    tatalaksana: [
+      'Eritromisin topikal atau oral, atau klindamisin topikal; asam fusidat topikal sebagai alternatif',
+      'Jaga area lipatan tetap kering, pakaian longgar menyerap keringat, turunkan berat badan bila obesitas',
+      'SKRINING DIABETES pada kasus luas atau berulang; obati tinea pedis penyerta bila ada',
+    ],
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
+  },
+  'Melasma': {
+    definisi: 'Hipermelanosis didapat berupa bercak cokelat simetris pada wajah, dipicu paparan sinar matahari dan faktor hormonal (kehamilan, kontrasepsi hormonal).',
+    diagnosis: [
+      'Makula cokelat berbatas tidak tegas dan SIMETRIS pada wajah dengan pola sentrofasial, malar, atau mandibular; lebih sering pada wanita dan kulit berwarna gelap',
+      'Lampu Wood membantu menilai kedalaman pigmen (epidermal lebih responsif terapi daripada dermal)',
+      'Cari faktor pencetus: paparan UV, kehamilan (kloasma gravidarum), pil kontrasepsi, terapi hormon, obat fotosensitif',
+    ],
+    tatalaksana: [
+      'TABIR SURYA spektrum luas SPF tinggi setiap hari dan diulang berkala adalah fondasi terapi — tanpa ini semua terapi lain akan gagal dan cepat kambuh',
+      'Agen pencerah topikal: hidrokuinon, kombinasi triple (hidrokuinon-tretinoin-kortikosteroid), asam azelaik, asam traneksamat',
+      'Hentikan kontrasepsi hormonal pencetus bila memungkinkan; peeling kimia atau laser hanya oleh tenaga berpengalaman (risiko hiperpigmentasi pascainflamasi justru memperburuk)',
+      'EDUKASI: terapi memerlukan waktu berbulan-bulan, bersifat mengendalikan bukan menyembuhkan, dan sangat mudah kambuh bila proteksi matahari lalai',
+    ],
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
+  },
 }
