@@ -756,10 +756,104 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'SSC2021', 'PAPDI2014'],
   },
   'Demam dengue, DHF': {
-    definisi: 'Infeksi virus dengue dengan spektrum dari demam dengue ringan hingga DHF dengan kebocoran plasma.',
-    diagnosis: ['Demam akut + 2 gejala penyerta (nyeri kepala, mialgia, ruam, uji tourniquet positif) + trombositopenia + tanda kebocoran plasma untuk DHF'],
-    tatalaksana: ['Cairan oral/IV sesuai derajat, monitor Hct dan trombosit serial, hindari NSAID/aspirin'],
-    referensi: ['SKDI2012', 'WHODENGUE2009', 'PPKFKTP2014'],
+    definisi: 'Penyakit infeksi akibat virus dengue (serotipe DEN-1 sampai DEN-4) yang ditularkan nyamuk Aedes aegypti, dengan spektrum dari demam dengue tanpa komplikasi hingga demam berdarah dengue yang ditandai kebocoran plasma dan sindrom syok dengue.',
+    anamnesis: {
+      keluhanUtama: 'Demam tinggi mendadak sejak beberapa hari, disertai nyeri kepala, nyeri di belakang mata, dan nyeri seluruh badan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan SOCRATES. Site: nyeri kepala di regio frontal dan retro-orbital, disertai mialgia dan artralgia menyeluruh yang khas disebut breakbone fever. Onset: demam timbul MENDADAK tinggi, bukan bertahap seperti demam tifoid. Character: demam terus-menerus, nyeri terasa pegal menusuk hingga ke tulang. Radiation: nyeri menyebar ke seluruh otot dan sendi. Associations: mual, muntah, nyeri perut, ruam kulit, serta manifestasi perdarahan berupa bintik merah di kulit, mimisan, gusi berdarah, muntah hitam, atau tinja hitam. Time course: HITUNG HARI DEMAM dengan tepat karena menentukan fase penyakit — fase demam hari 1-3, FASE KRITIS hari 4-6 saat demam mulai turun, dan fase penyembuhan setelahnya. Exacerbating: penurunan asupan cairan memperberat perjalanan penyakit. Severity: gali tanda bahaya (warning signs) secara aktif — nyeri perut hebat dan terus-menerus, muntah persisten, perdarahan mukosa, letargi atau gelisah, pembesaran hati, penurunan produksi urin, dan tangan-kaki teraba dingin.',
+      riwayatPenyakitDahulu:
+        'Riwayat pernah menderita demam berdarah sebelumnya sangat penting — infeksi sekunder oleh serotipe berbeda meningkatkan risiko DBD berat melalui mekanisme antibody-dependent enhancement. Tanyakan pula komorbid yang memperburuk prognosis: diabetes, penyakit ginjal, penyakit jantung, obesitas, thalassemia, dan tukak lambung.',
+      riwayatPenyakitKeluarga: 'Adakah anggota keluarga atau tetangga yang menderita demam berdarah dalam 1-2 minggu terakhir — mendukung adanya penularan setempat.',
+      riwayatPengobatan:
+        'Obat yang sudah diminum sebelum datang, terutama ASPIRIN dan obat antiinflamasi nonsteroid yang meningkatkan risiko perdarahan dan harus dihentikan; tanyakan pula penggunaan antikoagulan dan kortikosteroid.',
+      riwayatAlergi: 'Riwayat alergi obat sebelum pemberian terapi.',
+      riwayatSosialEkonomi:
+        'Lingkungan tempat tinggal: keberadaan genangan air, bak mandi, vas bunga, ban bekas, dan tempat penampungan air yang menjadi tempat perindukan nyamuk; riwayat fogging di lingkungan; kebiasaan menguras bak; riwayat bepergian ke daerah endemis; dan akses ke fasilitas kesehatan bila terjadi perburukan.',
+    },
+    pemeriksaanFisik: [
+      'Tanda vital lengkap dengan penekanan pada TEKANAN NADI — penyempitan menjadi 20 mmHg atau kurang merupakan tanda syok dini yang sering mendahului penurunan tekanan sistolik',
+      'Nilai perfusi: akral dingin, capillary refill time lebih dari 2 detik, nadi cepat dan lemah, produksi urin menurun',
+      'Uji tourniquet (Rumple Leede): pasang manset pada tekanan antara sistolik dan diastolik selama 5 menit, dinyatakan positif bila timbul 10 petekie atau lebih dalam area 1 inci persegi',
+      'Kulit: petekie, purpura, ekimosis, dan ruam konvalesens berupa eritema konfluens dengan pulau-pulau kulit normal (islands of white in a sea of red) pada fase penyembuhan',
+      'Perdarahan mukosa: epistaksis, perdarahan gusi, hematemesis, melena',
+      'Abdomen: nyeri tekan epigastrium dan hipokondrium kanan, HEPATOMEGALI yang nyeri, serta tanda asites berupa shifting dullness',
+      'Toraks: nilai efusi pleura melalui perkusi redup dan penurunan suara napas basal, umumnya sisi kanan',
+      'Status kesadaran dan tanda ensefalopati dengue pada kasus berat',
+    ],
+    penunjang: [
+      'Darah lengkap SERIAL minimal dua kali sehari pada fase kritis: leukopenia sering mendahului fase kritis; TROMBOSITOPENIA kurang dari 100.000/µL; dan PENINGKATAN HEMATOKRIT 20% atau lebih dari nilai dasar sebagai penanda kebocoran plasma',
+      'Penurunan hematokrit setelah pemberian cairan menandakan respons baik; penurunan hematokrit disertai perburukan klinis justru mencurigakan perdarahan internal',
+      'NS1 antigen positif pada hari 1-3 demam; IgM dan IgG dengue mulai terdeteksi setelah hari ke-5',
+      'Albumin serum menurun dan transaminase (SGOT lebih dominan daripada SGPT) meningkat sebagai penanda kebocoran plasma dan keterlibatan hati',
+      'USG abdomen atau rontgen toraks lateral dekubitus kanan untuk mendeteksi asites dan efusi pleura sebagai bukti objektif kebocoran plasma',
+      'Pada kasus berat: analisis gas darah, elektrolit, gula darah, dan profil koagulasi untuk menilai asidosis dan koagulopati',
+    ],
+    etiologi:
+      'Virus dengue, anggota famili Flaviviridae, dengan empat serotipe yang ditularkan melalui gigitan nyamuk Aedes aegypti dan Aedes albopictus yang aktif menggigit pada pagi dan sore hari.',
+    patofisiologi:
+      'Setelah masa inkubasi 4-10 hari, virus bereplikasi dan memicu respons imun yang melepaskan sitokin proinflamasi secara masif. Sitokin ini meningkatkan permeabilitas endotel kapiler sehingga plasma merembes ke rongga interstisial, pleura, dan peritoneum — inilah kebocoran plasma yang membedakan demam berdarah dengue dari demam dengue biasa. Kebocoran memuncak pada fase kritis, yaitu saat suhu tubuh justru mulai turun, dan berlangsung sekitar 24-48 jam. Hemokonsentrasi terjadi karena plasma keluar sementara sel darah tetap di intravaskular, sehingga hematokrit meningkat. Trombositopenia terjadi akibat supresi sumsum tulang, destruksi trombosit oleh mekanisme imun, dan peningkatan konsumsi. Bila kebocoran tidak dikompensasi dengan cairan yang adekuat, volume intravaskular menurun hingga terjadi syok hipovolemik. Pada infeksi sekunder oleh serotipe berbeda, antibodi non-netralisasi dari infeksi sebelumnya justru memfasilitasi masuknya virus ke sel melalui reseptor Fc, memperbesar beban virus dan respons sitokin.',
+    faktorRisiko: [
+      'Tinggal atau bepergian ke daerah endemis dengue',
+      'Musim hujan dan lingkungan dengan banyak tempat perindukan nyamuk',
+      'Infeksi dengue sekunder oleh serotipe berbeda',
+      'Usia anak dan bayi, serta usia lanjut',
+      'Komorbid: diabetes, obesitas, penyakit ginjal, thalassemia, tukak peptik',
+      'Kehamilan',
+    ],
+    diagnosis: [
+      'Demam akut mendadak 2-7 hari disertai minimal dua gejala: nyeri kepala, nyeri retro-orbital, mialgia, artralgia, ruam, atau manifestasi perdarahan',
+      'Uji tourniquet positif (≥10 petekie per inci persegi) atau perdarahan spontan',
+      'Trombositopenia kurang dari 100.000/µL',
+      'Bukti kebocoran plasma: peningkatan hematokrit ≥20%, efusi pleura, asites, atau hipoalbuminemia — inilah pembeda DBD dari demam dengue biasa',
+      'Tentukan FASE penyakit dari hitungan hari demam; fase kritis pada hari 4-6 saat demam mulai turun',
+    ],
+    goldStandard:
+      'Konfirmasi laboratorium melalui deteksi NS1 antigen atau RNA virus dengan RT-PCR pada fase akut (hari 1-5), atau serokonversi IgM dengue maupun kenaikan titer IgG empat kali lipat pada sampel berpasangan setelah hari kelima. Secara klinis, demam berdarah dengue ditegakkan bila terdapat demam akut 2-7 hari, kecenderungan perdarahan (minimal uji tourniquet positif), trombositopenia kurang dari 100.000/µL, DAN bukti kebocoran plasma berupa peningkatan hematokrit 20% atau lebih, efusi pleura, asites, atau hipoalbuminemia.',
+    diagnosisBanding: [
+      'Demam tifoid — demam naik bertahap seperti anak tangga dan lebih tinggi sore-malam, bradikardia relatif, lidah kotor tepi hiperemis, tanpa kebocoran plasma',
+      'Malaria — demam periodik dengan menggigil dan berkeringat, splenomegali, parasit pada apus darah',
+      'Chikungunya — artralgia jauh lebih menonjol dan dapat menetap berbulan-bulan, kebocoran plasma tidak terjadi',
+      'Leptospirosis — nyeri betis, injeksi konjungtiva, ikterik, riwayat kontak air banjir',
+      'Sepsis bakterial dan infeksi virus lain, serta demam pada kondisi hematologi seperti leukemia akut',
+    ],
+    pengkajian:
+      'Dipikirkan demam berdarah dengue pada pasien ini atas dasar demam tinggi yang timbul mendadak selama beberapa hari disertai nyeri kepala retro-orbital, mialgia, dan artralgia yang khas, ditambah manifestasi perdarahan berupa petekie dengan uji tourniquet positif, pada latar lingkungan tempat tinggal yang endemis dan adanya kasus serupa di sekitar rumah. Temuan trombositopenia bersama peningkatan hematokrit dan hipoalbuminemia menunjukkan telah terjadi kebocoran plasma, yang secara konseptual merupakan pembeda utama demam berdarah dengue dari demam dengue biasa; bukti ini diperkuat bila ditemukan efusi pleura atau asites pada pencitraan. Diagnosis banding demam tifoid dipertimbangkan karena sama-sama menimbulkan demam berkepanjangan, namun pada tifoid demam naik secara bertahap dengan pola anak tangga dan memuncak pada sore hingga malam hari, disertai lidah kotor dengan tepi hiperemis dan bradikardia relatif, serta tidak disertai hemokonsentrasi maupun kebocoran plasma. Malaria disingkirkan karena tidak dijumpai pola demam periodik dengan fase menggigil dan berkeringat yang jelas maupun splenomegali, dan apus darah tebal tidak menunjukkan parasit. Chikungunya menjadi pertimbangan karena kemiripan gejala nyeri sendi, namun pada chikungunya artralgia jauh mendominasi gambaran klinis dan tidak terjadi kebocoran plasma maupun syok. Leptospirosis dipertimbangkan bila terdapat riwayat kontak dengan air banjir, namun tidak ditemukan nyeri tekan otot betis yang khas maupun injeksi konjungtiva. Yang paling menentukan tatalaksana pada kasus ini bukanlah semata penegakan etiologi, melainkan penentuan FASE penyakit berdasarkan hitungan hari demam, sebab fase kritis justru dimulai ketika suhu tubuh mulai turun pada hari keempat hingga keenam — periode saat pasien tampak membaik namun sesungguhnya paling berisiko jatuh ke dalam syok.',
+    terapiSuportif: [
+      'Kebutuhan cairan rumatan dihitung dengan rumus Holliday-Segar: 100 mL/kg untuk 10 kg pertama, ditambah 50 mL/kg untuk 10 kg berikutnya, ditambah 20 mL/kg untuk sisa berat badan',
+      'Pada dewasa dan anak besar dapat digunakan perhitungan berdasarkan berat badan ideal; cairan pilihan adalah kristaloid isotonik seperti ringer laktat atau NaCl 0,9%',
+      'Target PRODUKSI URIN 0,5-1 mL/kg/jam sebagai penanda perfusi yang paling praktis dipantau — pasang kateter pada kasus syok untuk pemantauan ketat',
+      'Pantau tanda vital, tekanan nadi, capillary refill, hematokrit, dan produksi urin secara berkala; frekuensi pemantauan ditingkatkan pada fase kritis',
+      'Cairan diberikan dalam jumlah paling sedikit yang mampu mempertahankan perfusi adekuat — kelebihan cairan menyebabkan edema paru dan distres napas, terutama saat fase reabsorpsi',
+      'Nutrisi: diet lunak tinggi kalori dan protein sesuai toleransi, hindari makanan berwarna merah atau cokelat gelap yang dapat mengaburkan penilaian perdarahan saluran cerna',
+    ],
+    tatalaksana: [
+      'Demam dengue tanpa tanda bahaya: rawat jalan dengan cairan oral banyak (oralit, jus, sup), parasetamol 10-15 mg/kgBB per kali maksimal 4 kali sehari untuk demam',
+      'HINDARI MUTLAK aspirin, obat antiinflamasi nonsteroid, dan injeksi intramuskular karena meningkatkan risiko perdarahan',
+      'Dengan tanda bahaya: rawat inap dan mulai kristaloid intravena 5-7 mL/kg/jam selama 1-2 jam, lalu diturunkan bertahap menjadi 3-5 mL/kg/jam dan 2-3 mL/kg/jam sesuai perbaikan klinis dan hematokrit',
+      'Sindrom syok dengue: bolus kristaloid 10-20 mL/kg secepatnya, evaluasi respons dalam 15-30 menit; bila belum membaik ulangi bolus, dan bila tetap tidak respons pertimbangkan koloid serta cari perdarahan tersembunyi',
+      'Transfusi darah bila terdapat perdarahan bermakna atau penurunan hematokrit dengan perburukan hemodinamik; TRANSFUSI TROMBOSIT TIDAK diberikan sebagai profilaksis semata berdasarkan angka trombosit rendah tanpa perdarahan aktif',
+      'Koreksi gangguan elektrolit, gula darah, dan asidosis pada kasus berat; hindari pemberian kortikosteroid dan imunoglobulin karena tidak terbukti bermanfaat',
+      'Kriteria pemulangan: bebas demam minimal 24-48 jam tanpa antipiretik, nafsu makan membaik, klinis stabil, produksi urin cukup, hematokrit stabil, dan trombosit menunjukkan tren naik',
+    ],
+    edukasi: [
+      'FASE KRITIS TERJADI SAAT DEMAM TURUN — jelaskan bahwa suhu yang membaik pada hari keempat hingga keenam bukan berarti sembuh, justru saat itulah pemantauan paling ketat diperlukan. Ini pesan edukasi terpenting pada dengue',
+      'Penjadwalan makan: porsi kecil namun sering (5-6 kali sehari) karena mual sering menurunkan nafsu makan; utamakan makanan lunak tinggi kalori dan cairan',
+      'Asupan cairan oral ditingkatkan pada pasien rawat jalan: oralit, air kelapa, jus buah, dan sup; hindari cairan berwarna merah atau cokelat gelap agar perdarahan saluran cerna tidak terlewat',
+      'Istirahat total dan tidur cukup selama fase demam dan kritis; aktivitas fisik dan olahraga baru dimulai bertahap setelah pemulihan penuh dan trombosit kembali normal, umumnya setelah 1-2 minggu',
+      'TANDA BAHAYA yang mengharuskan segera kembali ke fasilitas kesehatan: nyeri perut hebat, muntah terus-menerus, perdarahan dari hidung atau gusi, muntah atau tinja kehitaman, tangan dan kaki dingin, gelisah atau sangat lemas, tidak buang air kecil lebih dari 4-6 jam, dan napas terasa sesak',
+      'Kontrol setiap hari pada pasien rawat jalan selama fase demam untuk pemeriksaan darah, dan segera bila muncul tanda bahaya',
+      'Pencegahan dengan 3M Plus: menguras tempat penampungan air seminggu sekali, menutup rapat penampungan air, memanfaatkan atau mendaur ulang barang bekas, ditambah penggunaan kelambu, repelan, dan larvasida; libatkan seluruh keluarga dan lingkungan karena nyamuk Aedes menggigit pada pagi dan sore hari',
+    ],
+    komplikasi: [
+      'Sindrom syok dengue dan syok berulang',
+      'Perdarahan masif saluran cerna',
+      'Kelebihan cairan dengan edema paru dan distres napas',
+      'Ensefalopati dengue, miokarditis, dan gangguan fungsi hati berat',
+      'Koagulasi intravaskular diseminata pada kasus syok berkepanjangan',
+    ],
+    prognosis:
+      'Sangat baik bila dikenali dan dipantau dengan tepat — angka kematian demam berdarah dengue yang tertangani baik kurang dari 1%, namun dapat mencapai 10-20% pada sindrom syok dengue yang terlambat ditangani. Kunci prognosis bukan pada pemberian obat khusus melainkan pada ketepatan penentuan fase penyakit, pemantauan berkala, dan pemberian cairan yang tepat jumlah dan tepat waktu.',
+    referensi: ['SKDI2012', 'WHODENGUE2009', 'PPKFKTP2014', 'PAPDI2014', 'HARRISON2022'],
   },
   'Dengue shock syndrome': {
     definisi: 'Bentuk DHF paling berat dengan kegagalan sirkulasi akibat kebocoran plasma masif.',
@@ -804,10 +898,101 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Reaksi anafilaktik': {
-    definisi: 'Reaksi hipersensitivitas sistemik berat dan mendadak, dapat mengancam nyawa melalui gangguan jalan napas dan syok.',
-    diagnosis: ['Onset cepat setelah paparan alergen: urtikaria, angioedema, sesak/stridor, hipotensi — klinis, tidak perlu menunggu pemeriksaan penunjang'],
-    tatalaksana: ['Epinefrin IM 0,3-0,5mg (1:1000) di paha anterolateral segera sebagai lini pertama, dapat diulang tiap 5-15 menit; oksigen, cairan IV, antihistamin dan kortikosteroid sebagai adjuvan (bukan pengganti epinefrin)'],
-    referensi: ['SKDI2012', 'WAO2020', 'PPKFKTP2014'],
+    definisi: 'Reaksi hipersensitivitas sistemik berat yang timbul cepat dan dapat menyebabkan kematian; melibatkan pelepasan mediator sel mast dan basofil secara masif sehingga terjadi obstruksi jalan napas, bronkospasme, dan syok distributif.',
+    anamnesis: {
+      keluhanUtama: 'Sesak napas, bengkak pada wajah dan bibir, serta bentol gatal di seluruh tubuh yang timbul mendadak setelah terpapar obat, makanan, atau sengatan serangga.',
+      riwayatPenyakitSekarang:
+        'Anamnesis dilakukan SINGKAT DAN SIMULTAN dengan tindakan — jangan menunda pemberian epinefrin untuk melengkapi riwayat. Site: keluhan bersifat sistemik mengenai kulit, saluran napas, kardiovaskular, dan saluran cerna sekaligus. Onset: MENDADAK, umumnya dalam hitungan menit hingga 2 jam setelah paparan; makin cepat onset makin berat reaksinya. Character: sesak disertai suara mengi atau stridor, rasa tercekik dan sulit menelan, suara serak, gatal pada telapak tangan dan kaki serta kulit kepala, rasa hangat dan kemerahan, serta perasaan akan terjadi sesuatu yang buruk (impending doom). Radiation: bengkak menyebar dari wajah ke bibir, lidah, dan tenggorokan. Associations: mual, muntah, nyeri perut kram, diare, pusing berputar, pandangan gelap, hingga pingsan. Time course: apakah keluhan progresif memberat, dan apakah sempat membaik lalu memberat kembali yang menandakan reaksi bifasik. Exacerbating: posisi berdiri mendadak dapat memicu kolaps kardiovaskular fatal. Severity: nilai berdasarkan keterlibatan jalan napas dan sirkulasi, bukan luas ruam.',
+      riwayatPenyakitDahulu:
+        'Riwayat reaksi alergi atau anafilaksis sebelumnya beserta pencetusnya, riwayat asma (asma yang tidak terkontrol merupakan faktor risiko anafilaksis fatal), rinitis alergi, dermatitis atopik, dan mastositosis.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi dan alergi pada keluarga.',
+      riwayatPengobatan:
+        'Obat yang baru diminum atau disuntikkan dan waktunya secara TEPAT; penggunaan PENYEKAT BETA dan penghambat ACE penting diketahui karena penyekat beta membuat pasien resisten terhadap epinefrin sehingga memerlukan glukagon.',
+      riwayatAlergi:
+        'Rincian alergen yang diketahui — obat (antibiotik golongan beta-laktam, obat antiinflamasi nonsteroid, media kontras, relaksan otot), makanan (kacang, seafood, telur, susu), sengatan serangga (tawon, lebah), dan lateks; catat pula jenis reaksi yang timbul sebelumnya.',
+      riwayatSosialEkonomi: 'Ketersediaan dan kemampuan menggunakan epinefrin autoinjektor, serta jarak tempat tinggal ke fasilitas kesehatan terdekat.',
+    },
+    pemeriksaanFisik: [
+      'Nilai AIRWAY terlebih dahulu: suara serak, stridor, edema lidah dan uvula, kesulitan menelan air liur — tanda ancaman obstruksi total yang menuntut pengamanan jalan napas segera',
+      'Breathing: frekuensi napas, saturasi oksigen, retraksi, wheezing difus akibat bronkospasme',
+      'Circulation: takikardia, HIPOTENSI, akral dingin, capillary refill memanjang, nadi lemah',
+      'Kulit: urtikaria generalisata, angioedema pada kelopak mata dan bibir, eritema difus, dan rasa hangat — perlu diingat bahwa gejala kulit TIDAK MUNCUL pada sekitar 10-20% kasus anafilaksis sehingga ketiadaannya tidak menyingkirkan diagnosis',
+      'Neurologis: gelisah, bingung, penurunan kesadaran akibat hipoperfusi serebral',
+      'Cari lokasi sengatan serangga atau bekas suntikan sebagai sumber paparan',
+    ],
+    penunjang: [
+      'Diagnosis anafilaksis adalah DIAGNOSIS KLINIS — tidak ada pemeriksaan penunjang yang boleh menunda pemberian epinefrin',
+      'Triptase serum diambil dalam 15 menit sampai 3 jam sejak onset dan dibandingkan dengan kadar basal setelah pemulihan; berguna untuk konfirmasi retrospektif namun hasil normal tidak menyingkirkan diagnosis',
+      'Pemeriksaan penunjang lain (darah lengkap, elektrolit, elektrokardiogram, analisis gas darah) dikerjakan setelah stabilisasi untuk menilai komplikasi dan diagnosis banding',
+      'Rujukan ke alergi-imunologi untuk uji kulit atau IgE spesifik dilakukan 4-6 minggu setelah episode, bukan pada fase akut',
+    ],
+    etiologi:
+      'Tersering akibat obat (antibiotik beta-laktam, obat antiinflamasi nonsteroid, media kontras beryodium, relaksan otot), makanan (kacang tanah, kacang pohon, seafood, telur, susu, gandum), sengatan serangga ordo Hymenoptera, dan lateks. Sebagian kasus bersifat idiopatik.',
+    patofisiologi:
+      'Pada mekanisme klasik yang diperantarai IgE, paparan ulang alergen mengikat silang IgE pada permukaan sel mast dan basofil sehingga terjadi degranulasi masif dengan pelepasan histamin, triptase, prostaglandin, leukotrien, dan faktor pengaktif trombosit. Histamin menyebabkan vasodilatasi arteriol dan peningkatan permeabilitas kapiler sehingga plasma keluar ke interstisium — hingga 35% volume plasma dapat berpindah dalam 10 menit, menghasilkan syok distributif sekaligus hipovolemik relatif. Pada saluran napas terjadi edema mukosa laring dan bronkospasme, sedangkan pada jantung terjadi penurunan preload dan depresi miokard langsung. Sebagian reaksi tidak diperantarai IgE (misalnya akibat media kontras atau opioid) melalui aktivasi sel mast langsung, namun gambaran klinis dan tatalaksananya identik. Reaksi bifasik terjadi pada 1-20% kasus, umumnya 1-8 jam setelah reaksi awal mereda, akibat pelepasan mediator fase lambat.',
+    faktorRisiko: [
+      'Riwayat anafilaksis atau reaksi alergi berat sebelumnya',
+      'Asma yang tidak terkontrol — faktor risiko utama anafilaksis fatal',
+      'Penyakit atopi lain dan mastositosis',
+      'Penggunaan penyekat beta dan penghambat ACE yang memperberat reaksi dan mengurangi respons terapi',
+      'Usia remaja dan dewasa muda (perilaku berisiko dan keterlambatan menggunakan autoinjektor)',
+      'Pemberian obat secara parenteral dibanding oral',
+    ],
+    diagnosis: [
+      'DIAGNOSIS KLINIS — jangan menunda epinefrin untuk pemeriksaan penunjang apa pun',
+      'Onset akut dalam menit hingga beberapa jam setelah paparan alergen',
+      'Keterlibatan kulit/mukosa (urtikaria generalisata, angioedema) DISERTAI gangguan respirasi atau penurunan tekanan darah',
+      'Atau: hipotensi, bronkospasme, maupun keterlibatan laring setelah paparan alergen yang diketahui, meskipun tanpa gejala kulit',
+      'Gejala kulit tidak muncul pada 10-20% kasus sehingga ketiadaannya TIDAK menyingkirkan diagnosis',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis bila memenuhi salah satu dari dua kriteria: (1) onset akut dalam menit hingga beberapa jam dengan keterlibatan kulit dan/atau mukosa (urtikaria generalisata, gatal, kemerahan, bengkak bibir-lidah-uvula) DISERTAI minimal salah satu dari gangguan respirasi (sesak, wheezing, stridor, hipoksemia) atau penurunan tekanan darah maupun gejala disfungsi organ (sinkop, inkontinensia); ATAU (2) onset akut hipotensi, bronkospasme, atau keterlibatan laring setelah paparan alergen yang diketahui atau sangat mungkin bagi pasien tersebut, meskipun tanpa gejala kulit.',
+    diagnosisBanding: [
+      'Reaksi vasovagal — bradikardia, pucat, berkeringat, tanpa urtikaria maupun bronkospasme, dan membaik dengan posisi berbaring',
+      'Asma eksaserbasi akut — bronkospasme tanpa hipotensi, urtikaria, atau angioedema',
+      'Angioedema herediter atau akibat penghambat ACE — bengkak tanpa urtikaria dan tanpa gatal, TIDAK RESPONS terhadap epinefrin, antihistamin, maupun steroid',
+      'Sindrom karsinoid, mastositosis sistemik, dan skombroid akibat konsumsi ikan dengan kadar histamin tinggi',
+      'Serangan panik — sesak dan rasa tercekik tanpa temuan objektif hipoksemia, hipotensi, atau urtikaria',
+    ],
+    pengkajian:
+      'Dipikirkan reaksi anafilaktik pada pasien ini atas dasar onset gejala yang sangat cepat dalam hitungan menit setelah paparan alergen yang jelas, dengan keterlibatan lebih dari satu sistem organ secara bersamaan — kulit berupa urtikaria generalisata dan angioedema, saluran napas berupa sesak dengan stridor dan wheezing, serta kardiovaskular berupa hipotensi dan takikardia. Kombinasi multisistem inilah yang membedakannya dari reaksi alergi lokal maupun urtikaria akut biasa yang terbatas pada kulit tanpa mengancam jalan napas atau sirkulasi. Reaksi vasovagal menjadi pertimbangan karena sama-sama dapat menimbulkan pingsan setelah tindakan medis, namun pada vasovagal denyut jantung justru melambat, kulit tampak pucat dan berkeringat tanpa urtikaria, dan kondisi membaik cepat dengan posisi berbaring serta elevasi tungkai — berbeda dengan kasus ini yang menunjukkan takikardia disertai kelainan kulit yang khas. Asma eksaserbasi dipertimbangkan karena adanya wheezing, namun pada asma murni tidak dijumpai hipotensi, urtikaria, maupun angioedema. Angioedema akibat penghambat ACE penting disingkirkan melalui riwayat obat, sebab bengkaknya tidak disertai gatal maupun urtikaria dan yang terpenting TIDAK MEMBAIK dengan epinefrin, antihistamin, atau kortikosteroid sehingga memerlukan terapi berbeda berupa ikatibant atau konsentrat C1-inhibitor. Serangan panik dipertimbangkan pada pasien cemas dengan rasa tercekik, namun tidak disertai hipoksemia objektif, hipotensi, maupun temuan kulit. Yang menentukan luaran pada kasus ini bukanlah ketepatan membedakan seluruh diagnosis banding tersebut, melainkan KECEPATAN pemberian epinefrin intramuskular — keterlambatan pemberian epinefrin merupakan faktor tunggal yang paling konsisten ditemukan pada kasus anafilaksis yang berakhir fatal.',
+    terapiSuportif: [
+      'Posisi: baringkan pasien TERLENTANG dengan tungkai dielevasi; pada distres napas posisi setengah duduk, dan pada ibu hamil posisi miring kiri. JANGAN mendudukkan atau menyuruh pasien berdiri mendadak — perubahan posisi ke tegak dapat memicu empty ventricle syndrome yang fatal',
+      'Oksigen aliran tinggi 6-8 L/menit dengan sungkup, target saturasi 94-98%',
+      'Resusitasi cairan kristaloid: 20 mL/kgBB bolus cepat pada anak, dan 500-1000 mL bolus pada dewasa, diulang sesuai respons — kebocoran plasma masif membuat kebutuhan cairan sering jauh lebih besar dari perkiraan awal',
+      'Pasang dua akses intravena berdiameter besar, pantau tekanan darah, nadi, saturasi, dan produksi urin dengan target 0,5-1 mL/kg/jam',
+      'Siapkan peralatan intubasi dan jalur bedah jalan napas sejak awal bila terdapat edema laring — edema berkembang sangat cepat sehingga intubasi tertunda menjadi jauh lebih sulit',
+    ],
+    tatalaksana: [
+      'EPINEFRIN INTRAMUSKULAR adalah terapi lini pertama dan harus diberikan SEGERA tanpa menunggu pemeriksaan apa pun: dosis 0,01 mg/kgBB larutan 1:1000, maksimal 0,5 mg pada dewasa dan 0,3 mg pada anak, disuntikkan pada PAHA ANTEROLATERAL (vastus lateralis)',
+      'Paha anterolateral dipilih karena absorpsi lebih cepat dan kadar puncak lebih tinggi dibanding deltoid maupun jalur subkutan; ulangi setiap 5-15 menit bila belum ada perbaikan',
+      'TIDAK ADA kontraindikasi absolut pemberian epinefrin pada anafilaksis — termasuk pada usia lanjut dan penyakit jantung, karena risiko tidak memberikan epinefrin jauh lebih besar',
+      'Bila tidak respons setelah beberapa dosis intramuskular: epinefrin infus kontinu dengan pemantauan ketat di fasilitas yang mampu, serta pertimbangkan vasopresor tambahan',
+      'Pada pasien yang menggunakan penyekat beta dan tidak respons epinefrin: GLUKAGON 1-5 mg intravena perlahan dilanjutkan infus, karena glukagon bekerja melalui reseptor yang tidak terblok',
+      'Bronkodilator inhalasi (salbutamol nebulisasi) sebagai TAMBAHAN untuk bronkospasme yang menetap, bukan pengganti epinefrin',
+      'Antihistamin H1 (difenhidramin) dan H2 (ranitidin) serta kortikosteroid (metilprednisolon) merupakan terapi ADJUVAN yang hanya meredakan gejala kulit dan mungkin mengurangi reaksi bifasik — keduanya BUKAN penyelamat nyawa dan tidak boleh mendahului epinefrin',
+      'Observasi minimal 4-6 jam setelah gejala mereda, diperpanjang hingga 12-24 jam pada reaksi berat, memerlukan lebih dari satu dosis epinefrin, atau riwayat reaksi bifasik — mengingat risiko reaksi bifasik',
+      'Sebelum pulang: resepkan DUA epinefrin autoinjektor, latih cara penggunaannya bersama keluarga, buat rencana tindakan tertulis, dan rujuk ke alergi-imunologi',
+    ],
+    edukasi: [
+      'Identifikasi dan hindari pencetus secara ketat: ajarkan membaca label komposisi makanan dan obat, serta memberi tahu setiap tenaga kesehatan tentang riwayat alerginya sebelum menerima obat atau tindakan',
+      'Bawa epinefrin autoinjektor SETIAP SAAT dan pastikan pasien serta keluarga mampu memperagakan cara penggunaannya; periksa tanggal kedaluwarsa berkala',
+      'Gunakan gelang atau kartu identitas alergi yang mencantumkan alergen dan riwayat anafilaksis',
+      'Setelah menyuntikkan epinefrin, TETAP segera ke fasilitas kesehatan meski gejala membaik — karena risiko reaksi bifasik dalam beberapa jam berikutnya',
+      'Penjadwalan makan pada alergi makanan: hindari makan di tempat yang komposisinya tidak dapat dipastikan, waspadai kontaminasi silang di dapur, dan bawa bekal sendiri saat bepergian',
+      'Pola olahraga: pada anafilaksis yang dipicu olahraga terkait makanan, hindari berolahraga dalam 4-6 jam setelah makan alergen pencetus dan jangan berolahraga sendirian',
+      'Tidur dan aktivitas normal setelah pemulihan; asma penyerta harus dikontrol optimal karena merupakan faktor risiko utama anafilaksis fatal',
+      'Kontrol ke alergi-imunologi 4-6 minggu setelah episode untuk uji alergi dan pertimbangan imunoterapi (terutama pada alergi sengatan serangga yang sangat efektif dengan imunoterapi venom)',
+    ],
+    komplikasi: [
+      'Obstruksi jalan napas total akibat edema laring hingga henti napas',
+      'Syok refrakter, aritmia, iskemia miokard, dan henti jantung',
+      'Ensefalopati hipoksik-iskemik akibat hipoperfusi berkepanjangan',
+      'Reaksi bifasik yang muncul beberapa jam setelah reaksi awal mereda',
+    ],
+    prognosis:
+      'Sangat baik bila epinefrin diberikan dini — sebagian besar pasien pulih sempurna tanpa gejala sisa. Kematian umumnya terjadi dalam 30-60 menit pertama akibat obstruksi jalan napas atau kolaps kardiovaskular, dan analisis kasus fatal secara konsisten menunjukkan keterlambatan atau kegagalan pemberian epinefrin sebagai faktor yang dapat dicegah. Risiko berulang tetap ada seumur hidup sehingga penghindaran alergen dan ketersediaan autoinjektor menentukan keselamatan jangka panjang.',
+    referensi: ['SKDI2012', 'WAO2020', 'PPKFKTP2014', 'HARRISON2022'],
   },
   'Demam reumatik': {
     definisi: 'Reaksi autoimun pasca infeksi Streptococcus grup A yang dapat menyerang jantung, sendi, SSP, dan kulit.',
@@ -1576,14 +1761,111 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'GOLD2024', 'BRAUNWALD2022'],
   },
   'Hipertensi esensial': {
-    definisi: 'Peningkatan tekanan darah persisten tanpa penyebab sekunder yang teridentifikasi (>90% kasus hipertensi).',
-    diagnosis: ['TD ≥140/90 mmHg pada pengukuran berulang dengan teknik benar; konfirmasi dengan pengukuran di rumah/ABPM; evaluasi kerusakan organ target (jantung, ginjal, mata) dan risiko kardiovaskular total'],
-    tatalaksana: [
-      'Modifikasi gaya hidup: restriksi garam <5 g/hari, penurunan BB, aktivitas fisik, batasi alkohol, berhenti merokok',
-      'Farmakoterapi: ACE-inhibitor/ARB, calcium channel blocker, atau diuretik tiazid; kombinasi dosis rendah lebih dianjurkan daripada monoterapi dosis maksimal',
-      'Target umumnya <140/90 mmHg, lebih ketat pada pasien tertentu sesuai toleransi',
+    definisi: 'Peningkatan tekanan darah arteri yang menetap tanpa penyebab sekunder yang dapat diidentifikasi; mencakup lebih dari 90% seluruh kasus hipertensi dan merupakan faktor risiko utama stroke, penyakit jantung koroner, gagal jantung, dan penyakit ginjal kronik.',
+    anamnesis: {
+      keluhanUtama: 'Umumnya TANPA KELUHAN dan ditemukan saat pemeriksaan rutin — inilah sebabnya hipertensi disebut silent killer. Bila bergejala: nyeri kepala terutama pada tengkuk saat bangun tidur, pusing, atau jantung berdebar.',
+      riwayatPenyakitSekarang:
+        'Bila terdapat nyeri kepala, telusuri dengan SOCRATES. Site: khas di regio oksipital atau tengkuk. Onset: sering dirasakan saat bangun pagi dan berkurang seiring siang hari. Character: rasa berat atau menekan, bukan berdenyut. Radiation: menjalar ke bahu dan leher. Associations: gali gejala kerusakan organ target — nyeri dada atau sesak saat aktivitas (jantung), pandangan kabur mendadak (retina), kelemahan sesisi atau bicara pelo (serebrovaskular), urin berbusa atau bengkak tungkai (ginjal), serta klaudikasio. Time course: berapa lama tekanan darah diketahui tinggi, hasil pengukuran tertinggi, dan pola pengukuran mandiri di rumah. Exacerbating: konsumsi garam berlebih, stres, kurang tidur, penghentian obat mendadak. Severity: dampak terhadap aktivitas dan kualitas hidup. Wajib tanyakan gejala krisis hipertensi: nyeri kepala hebat mendadak, penurunan kesadaran, kejang, nyeri dada berat, atau sesak napas hebat.',
+      riwayatPenyakitDahulu:
+        'Riwayat diabetes melitus, dislipidemia, penyakit jantung koroner, stroke atau serangan iskemik sepintas, gagal jantung, penyakit ginjal, gout, dan asma (relevan untuk pemilihan beta-blocker). Pada perempuan tanyakan riwayat preeklampsia yang meningkatkan risiko hipertensi di kemudian hari.',
+      riwayatPenyakitKeluarga: 'Riwayat hipertensi, stroke, penyakit jantung koroner dini (laki-laki kurang dari 55 tahun, perempuan kurang dari 65 tahun), diabetes, dan penyakit ginjal pada keluarga.',
+      riwayatPengobatan:
+        'Obat antihipertensi yang pernah dan sedang digunakan beserta dosis, efek samping yang dialami, dan alasan penghentian. Telusuri obat yang MENAIKKAN tekanan darah: obat antiinflamasi nonsteroid, kortikosteroid, dekongestan hidung, pil kontrasepsi kombinasi, eritropoietin, siklosporin, serta jamu dan suplemen yang tidak jelas kandungannya.',
+      riwayatAlergi: 'Riwayat alergi obat, termasuk riwayat angioedema akibat penghambat ACE yang menjadi kontraindikasi mutlak golongan tersebut.',
+      riwayatNutrisi:
+        'Perkirakan asupan garam harian dari kebiasaan menambah garam di meja makan, konsumsi makanan olahan dan diawetkan, ikan asin, mi instan, dan makanan cepat saji. Tanyakan pula konsumsi buah dan sayur, serta minuman berkafein dan berenergi.',
+      riwayatSosialEkonomi:
+        'Kebiasaan merokok termasuk jumlah batang per hari dan lama merokok, konsumsi alkohol, aktivitas fisik, jenis pekerjaan dan tingkat stres kerja, durasi dan kualitas tidur termasuk gejala sleep apnea (mendengkur keras, apnea disaksikan, mengantuk siang hari), serta kemampuan finansial dan akses obat yang menentukan kepatuhan jangka panjang.',
+    },
+    pemeriksaanFisik: [
+      'Pengukuran tekanan darah dengan teknik benar: pasien duduk tenang minimal 5 menit tanpa merokok atau kafein 30 menit sebelumnya, punggung bersandar, kaki menapak lantai tidak menyilang, lengan disangga setinggi jantung, manset menutup 80% lingkar lengan dan 40% lebar lengan',
+      'Kembangkan manset 20-30 mmHg di atas titik hilangnya pulsasi radial, turunkan perlahan 2-3 mmHg per detik; sistolik dibaca pada suara Korotkoff fase I dan diastolik pada fase V',
+      'Ukur pada KEDUA lengan pada kunjungan pertama — selisih lebih dari 15-20 mmHg mengarah pada penyakit arteri; gunakan lengan dengan nilai lebih tinggi untuk pemantauan selanjutnya',
+      'Ukur tekanan darah berdiri setelah 1 dan 3 menit pada pasien lanjut usia dan diabetes untuk menilai hipotensi ortostatik',
+      'Antropometri: indeks massa tubuh dan lingkar pinggang',
+      'Funduskopi untuk retinopati hipertensif: penyempitan arteriol, AV nicking, perdarahan flame-shaped, cotton wool spots, hingga papiledema pada hipertensi maligna',
+      'Jantung: iktus kordis bergeser ke lateral dan kuat angkat sebagai tanda hipertrofi ventrikel kiri, bunyi jantung S4, murmur',
+      'Auskultasi bruit pada arteri karotis, abdomen (bruit renalis mengarah ke stenosis arteri renalis), dan femoralis; palpasi nadi perifer keempat ekstremitas serta nilai radiofemoral delay untuk menyingkirkan koarktasio aorta',
+      'Palpasi ginjal untuk massa (ginjal polikistik) dan periksa edema tungkai',
     ],
-    referensi: ['SKDI2012', 'PERKIHT2021', 'BRAUNWALD2022'],
+    antropometri:
+      'Hitung indeks massa tubuh dari berat badan dalam kilogram dibagi kuadrat tinggi badan dalam meter, dengan ambang Asia Pasifik: 23 sampai 24,9 berat berlebih dan 25 atau lebih obesitas. Lingkar pinggang lebih dari 90 cm pada laki-laki atau lebih dari 80 cm pada perempuan menandakan obesitas sentral. Penurunan berat badan 1 kg secara rerata menurunkan tekanan darah sistolik sekitar 1 mmHg, sehingga penurunan 10 kg dapat setara dengan efek satu obat antihipertensi.',
+    penunjang: [
+      'Urinalisis untuk proteinuria dan hematuria, serta rasio albumin-kreatinin urin sebagai penanda kerusakan ginjal dini',
+      'Kreatinin serum dengan perhitungan laju filtrasi glomerulus',
+      'Elektrolit terutama kalium — hipokalemia spontan tanpa diuretik mengarah pada hiperaldosteronisme primer',
+      'Glukosa darah puasa dan profil lipid untuk stratifikasi risiko kardiovaskular total',
+      'Asam urat sebagai data dasar sebelum pemberian diuretik tiazid',
+      'Elektrokardiogram untuk hipertrofi ventrikel kiri (kriteria Sokolow-Lyon atau Cornell), strain pattern, dan bukti iskemia atau infark lama',
+      'Ekokardiografi bila tersedia untuk menilai massa ventrikel kiri dan fungsi diastolik',
+    ],
+    etiologi:
+      'Multifaktorial: interaksi predisposisi genetik poligenik dengan faktor lingkungan berupa asupan natrium tinggi, obesitas, aktivitas fisik rendah, konsumsi alkohol, stres kronik, dan gangguan tidur.',
+    patofisiologi:
+      'Tekanan darah merupakan hasil curah jantung dikalikan resistensi vaskular perifer. Pada hipertensi esensial, gangguan awal berupa retensi natrium dan air oleh ginjal serta aktivasi berlebihan sistem renin-angiotensin-aldosteron dan sistem saraf simpatis meningkatkan volume dan tonus vaskular. Angiotensin II menyebabkan vasokonstriksi, remodeling dinding pembuluh, dan fibrosis; disfungsi endotel menurunkan ketersediaan nitrit oksida sehingga vasodilatasi terganggu. Seiring waktu terjadi hipertrofi tunika media arteriol dan kekakuan arteri besar yang meningkatkan tekanan sistolik dan tekanan nadi. Beban tekanan kronik memicu hipertrofi ventrikel kiri konsentrik yang akhirnya berkembang menjadi disfungsi diastolik dan gagal jantung, sementara pada ginjal terjadi nefrosklerosis dan penurunan laju filtrasi glomerulus.',
+    faktorRisiko: [
+      'Usia lanjut dan riwayat keluarga hipertensi',
+      'Asupan garam berlebih dan pola makan rendah buah-sayur',
+      'Obesitas dan obesitas sentral',
+      'Aktivitas fisik kurang',
+      'Merokok dan konsumsi alkohol berlebih',
+      'Stres kronik dan gangguan tidur termasuk sleep apnea obstruktif',
+      'Diabetes melitus dan dislipidemia',
+    ],
+    diagnosis: [
+      'Tekanan darah sistolik 140 mmHg atau lebih dan/atau diastolik 90 mmHg atau lebih pada dua kali pengukuran atau lebih di dua kunjungan berbeda',
+      'Pengukuran dilakukan dengan teknik benar setelah istirahat 5 menit, manset sesuai ukuran lengan, dan diukur pada kedua lengan saat kunjungan pertama',
+      'Konfirmasi dengan pemantauan mandiri di rumah atau ambulatori untuk menyingkirkan hipertensi jas putih',
+      'Klasifikasi: derajat 1 (140-159/90-99), derajat 2 (160-179/100-109), derajat 3 (≥180/110 mmHg)',
+      'Lengkapi dengan penilaian kerusakan organ target dan stratifikasi risiko kardiovaskular total',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dari rerata dua kali pengukuran atau lebih pada dua kunjungan berbeda atau lebih dengan teknik yang benar, menunjukkan tekanan darah sistolik 140 mmHg atau lebih dan/atau diastolik 90 mmHg atau lebih. Pemantauan tekanan darah ambulatori 24 jam merupakan rujukan terbaik untuk menyingkirkan hipertensi jas putih dan mendeteksi hipertensi terselubung, dengan ambang rerata 24 jam 130/80 mmHg. Klasifikasi: derajat 1 yaitu 140-159/90-99 mmHg, derajat 2 yaitu 160-179/100-109 mmHg, dan derajat 3 yaitu 180/110 mmHg atau lebih.',
+    diagnosisBanding: [
+      'Hipertensi jas putih — tinggi hanya di fasilitas kesehatan, normal pada pengukuran rumah atau ambulatori',
+      'Hipertensi sekunder akibat penyakit ginjal kronik, stenosis arteri renalis, hiperaldosteronisme primer, feokromositoma, sindrom Cushing, koarktasio aorta, atau sleep apnea',
+      'Hipertensi akibat obat — antiinflamasi nonsteroid, kortikosteroid, kontrasepsi hormonal, dekongestan',
+      'Krisis hipertensi: urgensi tanpa kerusakan organ akut versus emergensi dengan kerusakan organ akut yang memerlukan penurunan segera',
+    ],
+    pengkajian:
+      'Dipikirkan hipertensi esensial pada pasien ini atas dasar tekanan darah yang menetap di atas ambang pada pengukuran berulang dengan teknik yang benar, muncul bertahap pada usia pertengahan dengan latar riwayat keluarga hipertensi, obesitas sentral, asupan garam tinggi, dan gaya hidup sedentari, tanpa petunjuk klinis yang mengarah pada penyebab sekunder. Kemungkinan hipertensi jas putih dipertimbangkan karena tekanan darah dapat meningkat semata akibat kecemasan di fasilitas kesehatan, namun hal ini disingkirkan melalui pengukuran mandiri di rumah atau pemantauan ambulatori yang tetap menunjukkan nilai tinggi. Hipertensi sekunder menjadi pertimbangan penting bila onset terjadi pada usia sangat muda atau di atas 55 tahun, tekanan darah resisten terhadap tiga obat, atau terjadi perburukan mendadak pada pasien yang sebelumnya terkontrol; pada kasus ini tidak ditemukan bruit abdomen yang mengarah pada stenosis arteri renalis, tidak ada hipokalemia spontan yang menyertai hiperaldosteronisme primer, tidak ada trias nyeri kepala-palpitasi-berkeringat yang khas feokromositoma, tidak ada moon face maupun striae ungu pada sindrom Cushing, dan tidak dijumpai radiofemoral delay yang menandakan koarktasio aorta. Temuan funduskopi dan elektrokardiogram menjadi penentu apakah telah terjadi kerusakan organ target, karena keberadaannya mengubah stratifikasi risiko sekaligus mempertegas indikasi memulai farmakoterapi tanpa menunggu percobaan modifikasi gaya hidup terlebih dahulu.',
+    terapiSuportif: [
+      'Restriksi natrium kurang dari 2 gram natrium atau setara kurang dari 5 gram garam dapur per hari — setara satu sendok teh peres',
+      'Pola makan DASH: tinggi buah, sayur, biji-bijian utuh, dan produk susu rendah lemak; kaya kalium, magnesium, dan kalsium; rendah lemak jenuh dan gula tambahan',
+      'Asupan kalium ditingkatkan melalui buah dan sayur kecuali pada pasien dengan penyakit ginjal kronik atau yang menggunakan diuretik hemat kalium',
+      'Batasi alkohol maksimal 2 unit per hari pada laki-laki dan 1 unit pada perempuan; berhenti merokok sepenuhnya',
+      'Pemantauan tekanan darah mandiri di rumah dua kali pagi dan dua kali malam dengan alat lengan atas yang tervalidasi, dicatat untuk dibawa saat kontrol',
+    ],
+    tatalaksana: [
+      'Modifikasi gaya hidup diberikan pada SEMUA pasien; pada hipertensi derajat 1 tanpa risiko tinggi dan tanpa kerusakan organ target, dapat dicoba 3-6 bulan sebelum memulai obat',
+      'Farmakoterapi dimulai segera bersama modifikasi gaya hidup bila derajat 2 atau lebih, atau derajat 1 dengan diabetes, penyakit ginjal kronik, penyakit kardiovaskular, atau kerusakan organ target',
+      'Lini pertama: penghambat ACE (misalnya ramipril 2,5-10 mg per hari) atau ARB (misalnya kandesartan 8-32 mg per hari); penghambat kanal kalsium (amlodipin 5-10 mg per hari); diuretik tiazid (hidroklorotiazid 12,5-25 mg per hari)',
+      'Utamakan KOMBINASI dua obat dosis rendah dalam satu tablet dibanding menaikkan satu obat ke dosis maksimal — efektivitas lebih baik dengan efek samping lebih sedikit dan kepatuhan lebih tinggi',
+      'Pemilihan berdasarkan komorbid: penghambat ACE atau ARB pada diabetes dengan albuminuria, penyakit ginjal kronik, gagal jantung, dan pascainfark; beta-blocker bila ada penyakit jantung koroner, gagal jantung, atau aritmia; penghambat kanal kalsium pada usia lanjut dan hipertensi sistolik terisolasi',
+      'JANGAN mengombinasikan penghambat ACE dengan ARB (risiko gagal ginjal dan hiperkalemia); penghambat ACE dan ARB merupakan KONTRAINDIKASI pada kehamilan',
+      'Target umum kurang dari 140/90 mmHg; dapat dipertimbangkan kurang dari 130/80 mmHg pada pasien berisiko tinggi bila dapat ditoleransi; pada usia lanjut rapuh utamakan menghindari hipotensi ortostatik dan jatuh',
+      'Periksa kreatinin dan kalium 1-2 minggu setelah memulai atau menaikkan dosis penghambat ACE, ARB, atau diuretik; kenaikan kreatinin sampai 30% masih dapat diterima',
+      'Statin dan aspirin diberikan sesuai risiko kardiovaskular total, bukan berdasarkan nilai tekanan darah semata',
+    ],
+    edukasi: [
+      'Penjadwalan makan: tiga kali makan utama pada jam teratur; masak sendiri untuk mengendalikan garam, kurangi garam bertahap agar lidah beradaptasi, gunakan bumbu rempah, jeruk nipis, dan bawang sebagai pengganti rasa asin',
+      'Porsi metode piring: setengah piring sayur dan buah, seperempat protein tanpa lemak seperti ikan dan ayam tanpa kulit, seperempat karbohidrat kompleks; hindari ikan asin, telur asin, kornet, sosis, mi instan, dan makanan kaleng',
+      'Tidur 7-8 jam per malam dengan jadwal konsisten; kurang tidur dan sleep apnea yang tidak diobati merupakan penyebab hipertensi resisten yang sering terlewat — skrining bila mendengkur keras dan mengantuk berat pada siang hari',
+      'Pola olahraga: aktivitas aerobik intensitas sedang seperti jalan cepat, sepeda, atau berenang 30 menit per hari selama 5-7 hari per minggu, ditambah latihan beban ringan 2-3 kali per minggu. Hindari mengangkat beban sangat berat dengan menahan napas (manuver Valsava) karena melonjakkan tekanan darah sesaat',
+      'Kepatuhan obat: tekankan bahwa hipertensi umumnya memerlukan obat SEUMUR HIDUP dan obat tidak boleh dihentikan sendiri meski tekanan darah sudah normal — tekanan normal justru menandakan obat bekerja. Minum obat pada jam yang sama setiap hari dan gunakan pengingat',
+      'Jadwal kontrol: setiap 2-4 minggu saat penyesuaian dosis hingga target tercapai, lalu setiap 3-6 bulan bila stabil, dengan pemeriksaan laboratorium tahunan',
+      'Segera ke fasilitas kesehatan bila muncul nyeri kepala hebat mendadak, nyeri dada, sesak berat, pandangan kabur mendadak, kelemahan sesisi, bicara pelo, atau penurunan kesadaran',
+    ],
+    komplikasi: [
+      'Jantung: hipertrofi ventrikel kiri, penyakit jantung koroner, infark miokard, gagal jantung, fibrilasi atrium',
+      'Otak: stroke iskemik dan hemoragik, serangan iskemik sepintas, demensia vaskular',
+      'Ginjal: nefrosklerosis hipertensif hingga penyakit ginjal tahap akhir',
+      'Mata: retinopati hipertensif hingga kehilangan penglihatan',
+      'Pembuluh darah besar: aneurisma dan diseksi aorta, penyakit arteri perifer',
+    ],
+    prognosis:
+      'Sangat baik bila tekanan darah terkontrol. Penurunan tekanan darah sistolik sebesar 10 mmHg menurunkan risiko stroke sekitar sepertiga dan kejadian jantung koroner sekitar seperlima. Prognosis ditentukan bukan hanya oleh angka tekanan darah, melainkan oleh pengendalian risiko kardiovaskular secara menyeluruh dan kepatuhan jangka panjang; hipertensi yang tidak terkontrol memperpendek harapan hidup secara bermakna.',
+    referensi: ['SKDI2012', 'PERKIHT2021', 'BRAUNWALD2022', 'PPKFKTP2014', 'HARRISON2022'],
   },
   'Hipertensi sekunder': {
     definisi: 'Hipertensi dengan penyebab spesifik yang dapat diidentifikasi dan berpotensi dikoreksi.',
