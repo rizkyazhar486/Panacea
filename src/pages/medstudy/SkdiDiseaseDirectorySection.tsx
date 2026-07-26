@@ -3,6 +3,7 @@ import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconBook } from '../../components/icons'
 import type { OsceStationNote } from '../../lib/osceStationNotes'
 import { SKDI_DISEASE_LIST, SKDI_DISEASE_SYSTEMS, type SkdiDiseaseSystem } from '../../lib/skdiDiseaseList'
+import { SKDI_NOTE_KEYS } from '../../lib/skdiDiseaseNoteIndex'
 import type { SkdiDiseaseNote } from '../../lib/skdiDiseaseNotes'
 import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
 import { levelTone, levelLabel } from './shared'
@@ -23,9 +24,19 @@ interface NoteData {
   aliases: Record<string, string>
 }
 
-function useNoteData() {
+/**
+ * Loads the note corpus on demand.
+ *
+ * The notes are ~1 MB — far too much to fetch just so the list can decide which
+ * rows get an expand toggle. `SKDI_NOTE_KEYS` (a few kB) answers that question,
+ * so the corpus is only requested once `armed` flips true, i.e. the first time a
+ * user actually opens a disease. Browsing, searching, and filtering the whole
+ * 718-row list never touch it.
+ */
+function useNoteData(armed: boolean) {
   const [data, setData] = useState<NoteData | null>(null)
   useEffect(() => {
+    if (!armed || data) return
     let alive = true
     Promise.all([
       import('../../lib/skdiDiseaseNotes'),
@@ -42,7 +53,7 @@ function useNoteData() {
     return () => {
       alive = false
     }
-  }, [])
+  }, [armed, data])
   return data
 }
 
@@ -115,7 +126,9 @@ export default function SkdiDiseaseDirectorySection() {
   const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
   const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
   const [expanded, setExpanded] = useState<string | null>(null)
-  const noteData = useNoteData()
+  // Fetching the note corpus starts on the first expand, not on mount.
+  const [wantNotes, setWantNotes] = useState(false)
+  const noteData = useNoteData(wantNotes)
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -145,7 +158,7 @@ export default function SkdiDiseaseDirectorySection() {
           catatan station lengkap (anamnesis/PF/tatalaksana) ditandai badge "Catatan OSCE" — buka di
           tab OSCE Case Bank.
         </p>
-        {!noteData && (
+        {wantNotes && !noteData && (
           <p className="mt-2 text-[12px] font-semibold text-brand-dark">Memuat catatan penyakit…</p>
         )}
         <input
@@ -173,13 +186,21 @@ export default function SkdiDiseaseDirectorySection() {
           <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys} · {diseases.length}</div>
           <div className="mt-2 space-y-2">
             {diseases.map((e, i) => {
+              // The toggle is drawn from the lightweight key index, so it is
+              // present before the corpus has been fetched; `note` fills in once
+              // the fetch triggered by the first expand resolves.
+              const hasNote = SKDI_NOTE_KEYS.has(e.disease)
               const note = resolveNote(e.disease, noteData)
               const isOpen = expanded === e.disease
               return (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                   <button
                     className="flex w-full items-start justify-between gap-2 text-left"
-                    onClick={() => note && setExpanded(isOpen ? null : e.disease)}
+                    onClick={() => {
+                      if (!hasNote) return
+                      setWantNotes(true)
+                      setExpanded(isOpen ? null : e.disease)
+                    }}
                   >
                     {/* min-w-0 lets the long disease names wrap instead of forcing
                         the badge row past the viewport on narrow screens. */}
@@ -190,9 +211,14 @@ export default function SkdiDiseaseDirectorySection() {
                     <div className="flex flex-wrap items-center justify-end gap-1.5">
                       {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
                       <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
-                      {note && <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
+                      {hasNote && <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
                     </div>
                   </button>
+                  {isOpen && !note && (
+                    <p className="mt-3 border-t border-neutral-200 pt-3 text-[12px] font-semibold text-brand-dark dark:border-white/10">
+                      Memuat catatan…
+                    </p>
+                  )}
                   {isOpen && note && (
                     <div className="mt-3 space-y-2 border-t border-neutral-200 pt-3 dark:border-white/10">
                       {note.definisi && (
