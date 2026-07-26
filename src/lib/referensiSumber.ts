@@ -114,6 +114,10 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Katz PO, Dunbar KB, Schnoll-Sussman FH, Greer KB, Yadlapati R, Spechler SJ. ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease. Am J Gastroenterol. 2022;117(1):27-56.',
   WHOSTH2020:
     'World Health Organization. 2030 Targets for Soil-Transmitted Helminthiases Control Programmes. Geneva: World Health Organization; 2020.',
+  IDSAUTI2011:
+    'Gupta K, Hooton TM, Naber KG, Wullt B, Colgan R, Miller LG, et al. International Clinical Practice Guidelines for the Treatment of Acute Uncomplicated Cystitis and Pyelonephritis in Women: A 2010 Update by the Infectious Diseases Society of America and the European Society for Microbiology and Infectious Diseases. Clin Infect Dis. 2011;52(5):e103-20.',
+  NICEMISC2023:
+    'National Institute for Health and Care Excellence. Ectopic Pregnancy and Miscarriage: Diagnosis and Initial Management. NICE guideline NG126. London: NICE; 2023.',
   ACRGOUT2020:
     'FitzGerald JD, Dalbeth N, Mikuls T, Brignardello-Petersen R, Guyatt G, Abeles AM, et al. 2020 American College of Rheumatology Guideline for the Management of Gout. Arthritis Rheumatol. 2020;72(6):879-95.',
   CDCSTI2021:
