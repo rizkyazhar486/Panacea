@@ -1177,10 +1177,117 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
   },
   'Limfadenitis': {
-    definisi: 'Inflamasi kelenjar getah bening akibat infeksi, umumnya bakteri (limfadenitis supuratif) atau TB (skrofuloderma).',
-    diagnosis: ['Kelenjar bengkak, nyeri, hangat, dapat fluktuatif bila abses; cari fokus infeksi primer'],
-    tatalaksana: ['Antibiotik sesuai sumber infeksi, insisi drainase bila abses, OAT bila limfadenitis TB'],
-    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014'],
+    definisi:
+      'Peradangan kelenjar getah bening akibat infeksi, paling sering oleh bakteri piogenik pada bentuk akut supuratif, oleh virus pada bentuk reaktif, atau oleh Mycobacterium tuberculosis pada bentuk menahun yang bila menembus kulit disebut skrofuloderma.',
+    anamnesis: {
+      keluhanUtama: 'Benjolan di leher yang membesar dan terasa nyeri.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: lokasi kelenjar yang membesar dan apakah satu kelompok saja atau tersebar di beberapa daerah — pembesaran yang terbatas pada satu kelompok mengarah pada sebab setempat, sedangkan pembesaran menyeluruh mengarah pada penyakit sistemik. Telusuri pula daerah aliran limfe kelenjar tersebut untuk mencari fokus infeksi: kulit kepala, telinga, gigi, tonsil, dan wajah untuk kelenjar leher; tangan dan lengan untuk kelenjar ketiak; tungkai dan daerah kelamin untuk kelenjar lipat paha. Onset: mendadak dalam beberapa hari mengarah pada infeksi bakteri akut, sedangkan perlahan dalam hitungan minggu hingga bulan mengarah pada tuberkulosis atau keganasan. Character: PEMBEDA PALING PENTING — kelenjar yang nyeri, hangat, kemerahan, dan lunak mengarah pada infeksi, sedangkan kelenjar yang tidak nyeri, keras seperti karet atau seperti batu, dan melekat pada jaringan sekitar mengarah pada keganasan. Radiation: nyeri menjalar dan adanya garis kemerahan sepanjang saluran limfe. Associations: demam, dan yang wajib ditanyakan adalah GEJALA B berupa demam yang naik turun, keringat malam yang sampai membasahi pakaian, dan penurunan berat badan tanpa sebab jelas — ketiganya mengarah pada tuberkulosis maupun limfoma; tanyakan pula batuk lebih dari dua minggu, nyeri tenggorokan, sakit gigi, dan luka pada kulit. Time course: apakah benjolan bertambah besar, menetap, atau mengecil, dan apakah pernah pecah mengeluarkan nanah. Exacerbating: nyeri saat menoleh atau menelan. Severity: gangguan menelan, bernapas, dan aktivitas.',
+      riwayatPenyakitDahulu:
+        'Riwayat tuberkulosis dan pengobatannya, riwayat infeksi HIV, diabetes melitus, keganasan, serta pemakaian obat imunosupresan. Riwayat infeksi gigi, tonsilitis berulang, dan penyakit kulit di daerah aliran limfe yang bersangkutan.',
+      riwayatPenyakitKeluarga:
+        'RIWAYAT KONTAK ERAT DENGAN PENDERITA TUBERKULOSIS PARU wajib ditanyakan, terutama serumah — pada limfadenitis tuberkulosis inilah petunjuk epidemiologis yang paling menentukan. Tanyakan pula riwayat keganasan pada keluarga.',
+      riwayatPengobatan:
+        'Antibiotik yang sudah dipakai beserta jenis, dosis, dan lamanya — kelenjar yang tidak mengecil setelah antibiotik yang adekuat merupakan petunjuk penting ke arah tuberkulosis atau keganasan. Riwayat obat antituberkulosis sebelumnya. Obat yang dapat menyebabkan pembesaran kelenjar seperti fenitoin.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik dan obat antituberkulosis.',
+      riwayatImunisasi:
+        'Riwayat imunisasi BCG dan adanya parut BCG pada lengan, terutama pada anak.',
+      riwayatNutrisi:
+        'Status gizi dan penurunan berat badan yang dikuantifikasi dalam kilogram serta periode waktunya; malnutrisi merupakan faktor risiko sekaligus akibat pada limfadenitis tuberkulosis.',
+      riwayatSosialEkonomi:
+        'Kepadatan hunian dan ventilasi rumah yang berkaitan dengan penularan tuberkulosis, kontak dengan hewan terutama kucing yang mencakar untuk penyakit cakaran kucing, konsumsi susu yang tidak dipasteurisasi, riwayat bepergian, perilaku seksual berisiko, serta kemampuan menjalani pengobatan jangka panjang yang menentukan keberhasilan terapi tuberkulosis.',
+    },
+    pemeriksaanFisik: [
+      'Deskripsikan setiap kelenjar secara sistematis: lokasi, jumlah, ukuran dalam sentimeter, konsistensi, nyeri tekan, suhu dan warna kulit di atasnya, mobilitas terhadap jaringan sekitar, dan ada tidaknya fluktuasi maupun fistula',
+      'Konsistensi adalah petunjuk kunci: lunak dan nyeri mengarah pada infeksi akut, kenyal seperti karet mengarah pada limfoma, keras seperti batu dan melekat mengarah pada keganasan metastasis, sedangkan kelenjar yang saling menyatu membentuk untaian dengan fluktuasi mengarah pada tuberkulosis',
+      'Cari fistula dan jaringan parut yang tidak beraturan pada kulit di atas kelenjar — gambaran skrofuloderma pada limfadenitis tuberkulosis',
+      'PERIKSA SELURUH DAERAH KELENJAR GETAH BENING, bukan hanya yang dikeluhkan: leher, submandibula, supraklavikula, ketiak, dan lipat paha — sebab pembesaran menyeluruh mengubah arah diagnosis sepenuhnya',
+      'Kelenjar supraklavikula yang membesar selalu bermakna dan menuntut penelusuran keganasan pada rongga dada maupun perut, terlepas dari ukurannya',
+      'Cari fokus infeksi primer secara aktif: kulit kepala, liang telinga, gigi geligi, tonsil dan faring, kulit wajah, serta luka maupun infeksi pada anggota gerak sesuai daerah aliran limfe',
+      'Palpasi hati dan limpa; pembesaran keduanya mengarah pada penyakit sistemik',
+      'Periksa paru dan cari tanda tuberkulosis paru yang menyertai; timbang berat badan dan catat suhu tubuh',
+    ],
+    penunjang: [
+      'Darah lengkap dengan hitung jenis: leukositosis neutrofilik mendukung infeksi bakteri, limfositosis dengan limfosit atipik mendukung infeksi virus, sedangkan gambaran yang menyimpang dengan sel muda menuntut penelusuran keganasan hematologi',
+      'Laju endap darah dan C-reactive protein sebagai penanda peradangan',
+      'Uji tuberkulin atau interferon gamma release assay, serta foto toraks untuk mencari tuberkulosis paru yang menyertai',
+      'BIOPSI ASPIRASI JARUM HALUS merupakan pemeriksaan awal yang paling berguna: dapat memperlihatkan nanah pada limfadenitis supuratif, gambaran granuloma dengan nekrosis perkijuan pada tuberkulosis, atau sel ganas',
+      'Pemeriksaan Xpert MTB/RIF dan biakan Mycobacterium tuberculosis dari bahan aspirasi — pemeriksaan molekuler ini sekaligus menilai resistensi rifampisin',
+      'BIOPSI EKSISI dengan pemeriksaan histopatologi merupakan baku emas bila aspirasi tidak menjawab, bila kelenjar menetap lebih dari 4-6 minggu, atau bila dicurigai keganasan; jaringan dikirim untuk pemeriksaan histopatologi sekaligus biakan',
+      'Tes HIV ditawarkan pada limfadenitis tuberkulosis dan pada pembesaran kelenjar menyeluruh',
+      'Ultrasonografi untuk menilai ukuran, struktur dalam, dan ada tidaknya abses; pencitraan lanjutan sesuai kecurigaan sumber',
+      'Kultur dan uji kepekaan dari nanah pada limfadenitis supuratif',
+    ],
+    etiologi:
+      'Bakteri piogenik terutama Staphylococcus aureus dan Streptococcus pyogenes pada bentuk akut; virus seperti Epstein-Barr, sitomegalovirus, dan virus saluran napas pada bentuk reaktif; Mycobacterium tuberculosis pada bentuk menahun; serta penyebab lain seperti Bartonella henselae pada penyakit cakaran kucing dan Toxoplasma gondii.',
+    patofisiologi:
+      'Kelenjar getah bening adalah stasiun penyaring yang menerima aliran limfe dari daerah tertentu, sehingga letak kelenjar yang membesar menunjuk langsung pada wilayah asal masalahnya — dasar mengapa mencari fokus infeksi di daerah aliran limfe jauh lebih berguna daripada memeriksa kelenjarnya saja. Pada infeksi, antigen yang terbawa limfe merangsang proliferasi limfosit dan makrofag di dalam kelenjar sehingga kelenjar membesar; kapsulnya yang meregang dengan cepat menimbulkan nyeri, dan inilah sebabnya pembesaran yang cepat terasa nyeri sedangkan pembesaran perlahan pada keganasan justru tidak. Pada limfadenitis bakteri piogenik, kuman menimbulkan reaksi neutrofilik dengan nekrosis dan pembentukan nanah sehingga terjadi abses yang berfluktuasi. Pada tuberkulosis, respons imun seluler membentuk granuloma dengan sel epiteloid dan sel datia Langhans yang mengalami nekrosis perkijuan; proses ini berlangsung lambat, kelenjar saling melekat membentuk untaian, lalu dapat menembus kulit membentuk fistula dengan jaringan parut yang tidak beraturan sebagai gambaran skrofuloderma. Pada keganasan, sel tumor mengganti arsitektur kelenjar dan menembus kapsul sehingga kelenjar menjadi keras, melekat, dan tidak nyeri.',
+    faktorRisiko: [
+      'Kontak erat dengan penderita tuberkulosis paru, terutama dalam satu rumah',
+      'Infeksi HIV, diabetes melitus, malnutrisi, dan keadaan imunitas menurun lainnya',
+      'Hunian padat dengan ventilasi buruk',
+      'Fokus infeksi yang tidak diobati pada gigi, tonsil, telinga, dan kulit',
+      'Luka pada anggota gerak dan gigitan maupun cakaran hewan',
+      'Konsumsi susu yang tidak dipasteurisasi',
+      'Usia anak dengan sistem imun yang belum matang',
+    ],
+    goldStandard:
+      'Diagnosis limfadenitis ditegakkan secara klinis, namun penentuan penyebabnya memerlukan pemeriksaan jaringan. Biopsi aspirasi jarum halus merupakan langkah awal yang paling berguna, dan biopsi eksisi dengan pemeriksaan histopatologi merupakan baku emas — terutama bila kelenjar menetap lebih dari 4-6 minggu, tidak mengecil setelah antibiotik yang adekuat, berukuran lebih dari 2 sentimeter, keras dan melekat, berada di daerah supraklavikula, atau disertai gejala B. Pada kecurigaan tuberkulosis, bahan aspirasi maupun biopsi dikirim untuk pemeriksaan Xpert MTB/RIF dan biakan, dengan temuan granuloma disertai nekrosis perkijuan sebagai gambaran khasnya.',
+    diagnosisBanding: [
+      'Limfadenitis tuberkulosis atau skrofuloderma — perjalanan menahun, kelenjar menyatu membentuk untaian, dapat berfluktuasi dan membentuk fistula dengan jaringan parut tidak beraturan, disertai gejala B dan riwayat kontak tuberkulosis',
+      'Limfoma Hodgkin dan non-Hodgkin — kelenjar kenyal seperti karet, tidak nyeri, membesar perlahan namun terus-menerus, sering di leher maupun supraklavikula, disertai gejala B',
+      'Metastasis karsinoma — kelenjar keras seperti batu dan melekat, umumnya pada usia lebih tua, dengan tumor primer di kepala, leher, payudara, paru, atau saluran cerna',
+      'Limfadenopati reaktif akibat infeksi virus — kelenjar kecil, lunak, sedikit nyeri, menyertai infeksi saluran napas atas dan mengecil sendiri dalam beberapa minggu',
+      'Mononukleosis infeksiosa — pembesaran kelenjar menyeluruh disertai faringitis, demam, dan pembesaran limpa dengan limfosit atipik pada darah tepi',
+      'Penyakit cakaran kucing — riwayat cakaran atau gigitan kucing dengan papul pada tempat masuk dan pembesaran kelenjar regional',
+      'Kista brankial, kista duktus tiroglosus, dan higroma kistik — massa leher bawaan yang bukan kelenjar getah bening',
+      'Parotitis dan abses leher dalam — massa yang letaknya tidak sesuai dengan kelompok kelenjar getah bening',
+    ],
+    pengkajian:
+      'Dipikirkan limfadenitis pada pasien ini atas dasar pembesaran kelenjar getah bening pada satu kelompok yang disertai nyeri tekan, kulit di atasnya hangat, dan demam, dengan ditemukannya fokus infeksi pada daerah yang mengalirkan limfe ke kelenjar tersebut — kesesuaian antara letak kelenjar dan letak fokus infeksi inilah yang menjadikan diagnosis ini masuk akal secara anatomis, bukan sekadar cocok secara gejala. Sifat nyeri, lunak, dan mudah digerakkan mengarahkan pada proses radang dan sekaligus menjauhkan dari keganasan, yang khasnya justru tidak nyeri, keras, dan melekat pada jaringan sekitar; perjalanan yang cepat dalam hitungan hari juga tidak sesuai dengan limfoma maupun metastasis yang membesar perlahan selama berminggu-minggu. Limfadenitis tuberkulosis tetap harus dipikirkan mengingat tingginya angka tuberkulosis di Indonesia, namun pada kasus ini tidak ditemukan kelenjar yang saling menyatu membentuk untaian, tidak ada fistula maupun jaringan parut tidak beraturan pada kulit di atasnya, dan tidak ada gejala B berupa keringat malam serta penurunan berat badan — meskipun demikian, riwayat kontak tuberkulosis tetap ditelusuri karena bila keluhan tidak mereda setelah antibiotik yang adekuat, kemungkinan inilah yang pertama harus ditinjau kembali. Limfadenopati reaktif akibat infeksi virus dipertimbangkan namun kurang sesuai karena kelenjar di sini cukup besar, sangat nyeri, dan disertai tanda radang setempat yang jelas. Perlu ditegaskan bahwa kelenjar yang menetap lebih dari empat hingga enam minggu, berukuran lebih dari dua sentimeter, terletak di daerah supraklavikula, atau tidak mengecil setelah pengobatan yang benar merupakan indikasi biopsi — menunda biopsi dengan memberikan antibiotik berulang kali adalah cara paling sering keganasan dan tuberkulosis terlambat dikenali.',
+    terapiSuportif: [
+      'Kompres hangat pada kelenjar yang meradang untuk mengurangi nyeri dan membantu drainase',
+      'Analgesik dan antipiretik: parasetamol 500-1000 mg tiap 6-8 jam pada dewasa, atau 10-15 mg/kg per kali pada anak',
+      'Asupan cairan dan nutrisi yang cukup; pada limfadenitis tuberkulosis, perbaikan gizi merupakan bagian dari pengobatan dan bukan sekadar anjuran',
+      'Istirahat cukup dan pengobatan fokus infeksi primer seperti perawatan gigi maupun perawatan luka kulit — tanpa ini, kelenjar akan terus terangsang meski antibiotik diberikan',
+      'Pemantauan ukuran kelenjar dengan pengukuran yang dicatat, bukan sekadar kesan, agar perkembangannya dapat dinilai secara objektif pada kunjungan berikutnya',
+    ],
+    tatalaksana: [
+      'Limfadenitis bakteri akut: antibiotik yang mengarah pada Staphylococcus aureus dan Streptococcus — amoksisilin-asam klavulanat, sefaleksin, atau kloksasilin selama 10-14 hari; pada anak sesuaikan dosis dengan berat badan',
+      'Nilai ulang setelah 48-72 jam; perbaikan yang jelas mendukung diagnosis, sedangkan tidak adanya perbaikan menuntut peninjauan ulang diagnosis alih-alih sekadar mengganti antibiotik',
+      'Insisi dan drainase bila sudah terbentuk abses dengan fluktuasi, disertai pengiriman nanah untuk pewarnaan Gram, biakan, dan pemeriksaan Xpert MTB/RIF',
+      'Limfadenitis tuberkulosis: obat antituberkulosis kategori 1 dengan fase awal rifampisin, isoniazid, pirazinamid, dan etambutol selama 2 bulan, dilanjutkan rifampisin dan isoniazid selama 4 bulan; pada kasus tertentu pengobatan diperpanjang hingga 9-12 bulan sesuai respons klinis',
+      'Jelaskan kepada pasien bahwa pada limfadenitis tuberkulosis kelenjar dapat MEMBESAR untuk sementara pada awal pengobatan sebagai reaksi paradoks — ini bukan tanda kegagalan terapi dan bukan alasan menghentikan obat',
+      'Limfadenitis virus tidak memerlukan antibiotik dan cukup ditangani dengan terapi suportif serta pemantauan',
+      'Rujuk untuk biopsi bila kelenjar menetap lebih dari 4-6 minggu, berukuran lebih dari 2 sentimeter dan terus membesar, keras dan melekat, terletak di supraklavikula, disertai gejala B, atau tidak membaik dengan antibiotik yang adekuat',
+      'KORTIKOSTEROID TIDAK DIBERIKAN untuk mengecilkan kelenjar tanpa diagnosis pasti — obat ini dapat menyamarkan limfoma dan menyulitkan penegakan diagnosis kemudian',
+      'Lakukan pelacakan kontak dan penapisan pada anggota keluarga serumah bila ditegakkan limfadenitis tuberkulosis',
+    ],
+    edukasi: [
+      'Jelaskan bahwa kelenjar getah bening adalah penyaring yang membesar karena melawan infeksi di daerah tertentu, sehingga mengobati sumber infeksinya sama pentingnya dengan mengobati kelenjarnya',
+      'Jangan memijat, menekan, atau berusaha memecahkan benjolan karena dapat menyebarkan infeksi dan merusak jaringan',
+      'Habiskan antibiotik sesuai lama yang ditentukan meskipun benjolan sudah mengecil',
+      'Pada limfadenitis tuberkulosis, tekankan bahwa pengobatan berlangsung minimal 6 bulan dan harus diminum setiap hari tanpa putus; berhenti di tengah jalan adalah penyebab utama kekambuhan dan kekebalan kuman terhadap obat. Sertakan pengawas menelan obat di rumah',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan bergizi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, susu, tahu, dan tempe, lengkapi dengan sayur dan buah, serta minum 8 gelas air per hari. Pada limfadenitis tuberkulosis, kenaikan berat badan merupakan salah satu penanda keberhasilan pengobatan sehingga penimbangan berkala menjadi bagian dari pemantauan. Obat antituberkulosis diminum saat perut kosong, satu jam sebelum makan pagi, dalam satu waktu sekaligus',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; istirahat cukup mendukung kerja sistem kekebalan tubuh. Pada limfadenitis tuberkulosis dengan tuberkulosis paru yang menyertai, tidurlah di kamar dengan ventilasi baik dan jendela terbuka',
+      'Pola olahraga: selama fase akut dengan demam, cukup istirahat dan jalan ringan di dalam rumah. Setelah demam mereda, mulai kembali dengan jalan kaki 15-20 menit sehari lalu tingkatkan bertahap menuju 30 menit sehari selama 5 hari seminggu. Hindari olahraga kontak dan angkat beban berat selama kelenjar masih membesar dan nyeri, dan jangan memakai pakaian maupun tali tas yang menekan benjolan',
+      'Rawat kebersihan gigi dan mulut dengan menyikat gigi dua kali sehari dan memeriksakan gigi berlubang, karena fokus infeksi gigi adalah penyebab limfadenitis leher yang sering terlewat',
+      'Follow up: kontrol dalam 48-72 jam untuk menilai respons antibiotik, lalu setiap 2 minggu sampai kelenjar mengecil. Pada limfadenitis tuberkulosis, kontrol setiap bulan selama pengobatan',
+      'TANDA BAHAYA yang mengharuskan datang segera: sesak napas, sulit menelan atau membuka mulut, benjolan membesar dengan cepat, kulit di atasnya menghitam atau pecah, demam tinggi yang tidak turun, atau munculnya keringat malam dan penurunan berat badan',
+    ],
+    komplikasi: [
+      'Abses kelenjar yang memerlukan insisi dan drainase',
+      'Selulitis dan penyebaran infeksi ke jaringan sekitar hingga abses leher dalam',
+      'Bakteremia dan sepsis',
+      'Fistula menahun dengan jaringan parut yang tidak beraturan pada limfadenitis tuberkulosis',
+      'Penekanan jalan napas, pembuluh darah besar, dan saraf pada kelenjar yang sangat besar',
+      'Trombosis vena jugularis dan penyebaran ke mediastinum pada kasus berat',
+      'Keterlambatan mengenali limfoma atau keganasan metastasis akibat pemberian antibiotik berulang tanpa evaluasi ulang',
+      'Kekambuhan dan resistensi obat pada limfadenitis tuberkulosis yang pengobatannya tidak tuntas',
+    ],
+    prognosis:
+      'Baik pada limfadenitis bakteri akut yang mendapat antibiotik adekuat dan pengobatan fokus infeksinya, dengan kelenjar mengecil dalam 2-4 minggu; perlu diketahui bahwa kelenjar sering baru kembali ke ukuran semula setelah beberapa minggu meski infeksinya sudah teratasi. Limfadenitis tuberkulosis memiliki prognosis baik bila pengobatan dijalani tuntas, meskipun dapat meninggalkan jaringan parut. Prognosis paling ditentukan bukan oleh pilihan antibiotik melainkan oleh ketepatan mengenali kapan sebuah kelenjar bukan lagi sekadar radang — kelenjar yang menetap, membesar terus, keras, melekat, atau berada di supraklavikula menuntut biopsi, dan penundaannya merupakan penyebab tersering keterlambatan diagnosis keganasan.',
+    referensi: ['SKDI2012', 'HOFFBRAND2019', 'PAPDI2014', 'PNPKTB2020'],
   },
   'Bakteremia': {
     definisi: 'Keberadaan bakteri dalam aliran darah, dapat transien atau menetap, berpotensi berkembang menjadi sepsis.',
@@ -5247,10 +5354,116 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PPKFKTP2014', 'FITZPATRICK2019', 'HARRISON2022'],
   },
   'Herpes simpleks tanpa komplikasi': {
-    definisi: 'Infeksi virus herpes simpleks tipe 1 (umumnya orolabial) atau tipe 2 (umumnya genital) dengan kecenderungan rekuren.',
-    diagnosis: ['Vesikel berkelompok di atas dasar eritematosa yang mudah pecah menjadi erosi, didahului gejala prodromal (gatal/terbakar); rekurensi di lokasi yang sama; Tzanck smear menunjukkan multinucleated giant cells'],
-    tatalaksana: ['Asiklovir/valasiklovir oral sedini mungkin pada episode, terapi supresif jangka panjang bila rekurensi sering (≥6x/tahun), analgesia dan perawatan lesi; edukasi penularan — hindari kontak saat lesi aktif'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi:
+      'Infeksi oleh virus herpes simpleks tipe 1 yang umumnya menimbulkan lesi orolabial atau tipe 2 yang umumnya menimbulkan lesi genital, dengan ciri khas menetap laten di ganglion sensorik dan cenderung berulang di lokasi yang sama, tanpa keterlibatan mata, susunan saraf pusat, penyebaran luas, maupun infeksi neonatal.',
+    anamnesis: {
+      keluhanUtama:
+        'Bintil berair berkelompok yang perih pada bibir atau kelamin, sering didahului rasa gatal dan terbakar, dan berulang di tempat yang sama.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: lokasi lesi yang tepat — tepi bibir dan sekitar mulut pada tipe 1, atau batang penis, vulva, perineum, dan daerah sekitar anus pada tipe 2; TANYAKAN APAKAH LESI SELALU MUNCUL DI TEMPAT YANG SAMA, karena rekurensi di lokasi identik adalah ciri paling khas penyakit ini. Onset: gejala prodromal berupa gatal, perih, dan terbakar yang mendahului lesi beberapa jam hingga dua hari; pada episode pertama keluhan jauh lebih berat dan lebih lama dibandingkan episode berulang. Character: vesikel kecil berkelompok di atas dasar kemerahan yang mudah pecah menjadi erosi dangkal yang nyeri, kemudian mengering. Radiation: nyeri dapat menjalar sesuai perjalanan saraf sebelum lesi muncul. Associations: pada episode pertama tanyakan demam, nyeri kepala, nyeri otot, dan pembesaran kelenjar getah bening lipat paha yang nyeri; pada lesi genital tanyakan nyeri saat berkemih dan kesulitan berkemih; tanyakan pula sariawan luas dan nyeri menelan pada anak dengan gingivostomatitis. Time course: berapa kali kambuh dalam setahun — angka ini yang menentukan perlu tidaknya terapi supresif; catat pula berapa hari sejak keluhan sekarang dimulai karena antivirus paling bermanfaat bila dimulai dalam 72 jam atau bahkan saat masih fase prodromal. Exacerbating: demam, paparan sinar matahari, haid, kelelahan, stres, dan tindakan pada wajah maupun gigi. Severity: nyeri, gangguan makan dan minum, gangguan berkemih, serta dampak emosional yang pada herpes genital sering jauh lebih berat daripada lesinya.',
+      riwayatPenyakitDahulu:
+        'Riwayat episode serupa sebelumnya beserta frekuensi dan pencetusnya. Riwayat dermatitis atopik yang berisiko menimbulkan eksema herpetikum bila terinfeksi. Kondisi yang menurunkan imunitas seperti infeksi HIV, keganasan, kemoterapi, dan pemakaian obat imunosupresan yang membuat perjalanan penyakit lebih berat dan berkepanjangan.',
+      riwayatPenyakitKeluarga:
+        'Riwayat lesi serupa pada pasangan atau anggota keluarga serumah, serta adanya bayi, ibu hamil, atau orang dengan imunitas menurun di rumah yang berisiko tertular.',
+      riwayatPengobatan:
+        'Antivirus yang pernah dipakai beserta dosis, lama, dan responsnya. Kortikosteroid topikal yang keliru dioleskan pada lesi dan justru memperberat. Obat imunosupresan.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama asiklovir dan analgesik.',
+      riwayatKehamilanPersalinan:
+        'Pada perempuan usia subur, tanyakan status kehamilan dan usia kehamilannya. Herpes genital yang aktif menjelang persalinan berisiko menularkan infeksi berat pada bayi baru lahir, sehingga hal ini harus diketahui jauh sebelum waktu persalinan.',
+      riwayatNutrisi:
+        'Asupan makan dan minum, terutama pada anak dengan gingivostomatitis yang sering menolak makan dan minum sehingga berisiko dehidrasi.',
+      riwayatSosialEkonomi:
+        'Riwayat hubungan seksual termasuk jumlah pasangan, penggunaan kondom, dan jenis kontak, ditanyakan dengan cara yang tidak menghakimi. Pekerjaan yang berisiko seperti tenaga kesehatan dengan kontak langsung, dan olahraga kontak seperti gulat yang dapat menularkan lesi ke kulit. Tingkat stres dan kualitas tidur sebagai pencetus.',
+    },
+    pemeriksaanFisik: [
+      'Karakterisasi lesi: vesikel kecil berkelompok di atas dasar eritematosa yang seragam ukurannya, mudah pecah menjadi erosi dangkal dengan tepi bergerigi, lalu mengering menjadi krusta',
+      'Pada episode pertama lesi jauh lebih luas, lebih nyeri, dan bilateral; pada episode berulang lesi lebih sedikit, lebih terbatas, dan cenderung satu sisi',
+      'Periksa rongga mulut, gusi, lidah, dan faring pada anak dengan kecurigaan gingivostomatitis herpetika — gusi tampak merah, bengkak, dan mudah berdarah dengan erosi luas di mukosa',
+      'Palpasi kelenjar getah bening regional yang membesar dan nyeri, terutama pada episode pertama',
+      'Pada lesi genital, periksa seluruh area genital, perineum, dan sekitar anus, serta pada perempuan lakukan pemeriksaan dengan spekulum bila memungkinkan',
+      'Periksa mata dan sekitarnya untuk menyingkirkan keratitis herpetika yang merupakan bentuk berkomplikasi dan memerlukan rujukan',
+      'Cari tanda eksema herpetikum pada pasien dengan dermatitis atopik berupa lesi vesikuler yang tersebar luas di atas kulit yang sedang meradang — ini adalah kegawatan',
+      'Nilai tanda infeksi sekunder bakterial dan tanda dehidrasi terutama pada anak',
+    ],
+    penunjang: [
+      'Diagnosis pada gambaran khas ditegakkan secara klinis; pemeriksaan penunjang tidak rutin diperlukan',
+      'PCR dari cairan vesikel atau usapan dasar lesi merupakan pemeriksaan paling sensitif dan spesifik serta dapat menentukan tipe virus',
+      'Tzanck smear menunjukkan sel datia berinti banyak — mendukung infeksi kelompok herpes namun TIDAK membedakan herpes simpleks dari varisela-zoster',
+      'Serologi IgG spesifik tipe hanya berguna untuk mengetahui pernah tidaknya seseorang terinfeksi, bukan untuk mendiagnosis lesi yang sedang aktif; IgM tidak dianjurkan karena kerap menyesatkan',
+      'Pada lesi genital, tawarkan penapisan infeksi menular seksual lain termasuk HIV, sifilis, gonore, dan klamidia',
+      'Pemeriksaan darah lengkap hanya bila dicurigai infeksi sekunder atau perjalanan berat',
+    ],
+    etiologi:
+      'Virus herpes simpleks tipe 1 dan tipe 2; keduanya dapat menimbulkan lesi orolabial maupun genital tergantung jenis kontak, sehingga lokasi lesi tidak lagi dapat dipakai untuk menyimpulkan tipe virusnya.',
+    patofisiologi:
+      'Virus masuk melalui kulit yang lecet atau mukosa, bereplikasi pada sel epitel, dan menimbulkan lesi vesikuler dengan degenerasi balon sel epidermis. Dari ujung saraf sensorik setempat, virus berjalan retrograd sepanjang akson menuju ganglion sensorik — ganglion trigeminal untuk lesi orolabial dan ganglion sakral untuk lesi genital — lalu menetap laten seumur hidup dengan ekspresi gen yang sangat terbatas sehingga tidak dikenali sistem imun. Karena latensi ini berada di dalam neuron dan bukan di kulit, tidak ada terapi yang dapat menghilangkan virus dari tubuh; inilah alasan penyakit ini dikendalikan, bukan disembuhkan. Ketika terjadi pemicu berupa demam, paparan sinar ultraviolet, haid, stres, kelelahan, atau penurunan imunitas, virus mengaktifkan kembali replikasinya dan berjalan anterograd kembali ke kulit melalui akson yang sama, sehingga lesi selalu muncul di daerah persarafan yang sama. Episode pertama berlangsung lebih berat karena tubuh belum memiliki antibodi maupun imunitas seluler spesifik, sedangkan episode berikutnya lebih ringan dan lebih singkat karena sudah ada respons imun. Pelepasan virus tanpa disertai lesi yang tampak tetap dapat terjadi, dan inilah mekanisme utama penularan yang tidak disadari.',
+    faktorRisiko: [
+      'Kontak langsung dengan lesi aktif maupun dengan sekret dari orang yang sedang melepaskan virus tanpa gejala',
+      'Jumlah pasangan seksual yang banyak dan tidak menggunakan kondom',
+      'Infeksi HIV dan keadaan imunitas menurun lainnya',
+      'Dermatitis atopik yang meningkatkan risiko eksema herpetikum',
+      'Paparan sinar matahari berlebih, demam, haid, kelelahan, dan stres sebagai pencetus kekambuhan',
+      'Olahraga kontak seperti gulat yang dapat menularkan melalui kulit',
+      'Tindakan pada wajah dan gigi yang memicu reaktivasi lesi orolabial',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari vesikel berkelompok di atas dasar eritematosa yang mudah pecah menjadi erosi dangkal, didahului gejala prodromal berupa gatal dan terbakar, dan berulang di lokasi yang sama. Konfirmasi terbaik adalah PCR dari cairan vesikel atau usapan dasar lesi, yang sekaligus menentukan tipe virus. Serologi tidak dipakai untuk mendiagnosis lesi aktif.',
+    diagnosisBanding: [
+      'Herpes zoster — lesi mengikuti satu dermatom penuh, unilateral, jauh lebih luas, nyeri lebih hebat, dan umumnya tidak berulang di tempat yang sama',
+      'Sifilis primer — ulkus genital soliter dengan dasar bersih, tepi teratur dan terindurasi, serta TIDAK NYERI; berbeda tegas dari erosi herpes yang multipel, dangkal, dan sangat nyeri',
+      'Chancroid — ulkus genital yang nyeri dengan dasar kotor, tepi tidak teratur dan bergaung, disertai pembesaran kelenjar lipat paha yang dapat bernanah',
+      'Impetigo — krusta kuning keemasan tanpa gejala prodromal berupa nyeri dan tanpa riwayat berulang di tempat yang sama',
+      'Stomatitis aftosa rekuren — ulkus mulut dengan tepi kemerahan dan dasar keputihan yang tidak didahului vesikel dan tidak mengenai gusi maupun bibir bagian luar',
+      'Sindrom Behçet — ulkus mulut dan genital berulang disertai keterlibatan mata dan kulit',
+      'Erupsi obat tetap (fixed drug eruption) — lesi berulang tepat di tempat yang sama sehingga mirip, namun berkaitan dengan konsumsi obat tertentu dan meninggalkan bercak kehitaman',
+    ],
+    pengkajian:
+      'Dipikirkan herpes simpleks tanpa komplikasi pada pasien ini atas dasar munculnya vesikel kecil berkelompok di atas dasar kemerahan yang cepat pecah menjadi erosi dangkal yang nyeri, didahului rasa gatal dan terbakar beberapa jam sebelumnya, dan yang paling menentukan — keluhan serupa berulang di lokasi yang persis sama pada episode-episode sebelumnya. Pola rekurensi di tempat identik ini merupakan cerminan langsung dari latensi virus di satu ganglion sensorik, dan sekaligus menjauhkan dari herpes zoster yang lesinya mengisi satu dermatom penuh secara unilateral dengan nyeri jauh lebih hebat serta umumnya tidak berulang. Pada lesi genital, sifilis primer merupakan banding yang wajib disingkirkan dan hal itu dapat dikerjakan di samping tempat tidur: ulkus sifilis bersifat soliter, dasarnya bersih, tepinya terindurasi, dan yang paling khas adalah tidak nyeri, sedangkan lesi pada kasus ini multipel, dangkal, dan sangat nyeri. Chancroid juga menimbulkan ulkus yang nyeri, namun dasarnya kotor dengan tepi bergaung dan tidak didahului fase vesikel. Stomatitis aftosa disingkirkan pada lesi mulut karena keluhan di sini didahului vesikel dan mengenai gusi serta bibir bagian luar, yang tidak terjadi pada aftosa. Erupsi obat tetap perlu diingat karena sama-sama berulang di tempat yang sama, namun tidak ada kaitan dengan konsumsi obat tertentu dan tidak meninggalkan bercak kehitaman menetap pada kasus ini. Kasus digolongkan tanpa komplikasi karena tidak ada keterlibatan mata, tidak ada tanda ensefalitis, tidak ada penyebaran luas maupun eksema herpetikum, dan pasien tidak dalam keadaan imunitas menurun. Frekuensi kekambuhan per tahun ditelusuri bukan sebagai catatan tambahan melainkan karena angka itulah yang menentukan apakah pasien cukup diterapi per episode atau memerlukan terapi supresif harian.',
+    terapiSuportif: [
+      'Analgesia adekuat: parasetamol atau obat antiinflamasi nonsteroid; pada gingivostomatitis anak, nyeri yang tidak tertangani adalah penyebab utama anak menolak minum sehingga jatuh dehidrasi',
+      'Kompres dingin atau kompres salin pada lesi untuk meredakan nyeri dan mempercepat pengeringan',
+      'Anestesi topikal atau obat kumur yang mengandung anestetik pada lesi mulut dapat diberikan sebelum makan agar asupan tetap masuk',
+      'Pastikan asupan cairan: berikan minuman dingin, es krim, dan makanan lunak yang tidak asam maupun pedas; nilai tanda dehidrasi pada anak dan berikan cairan intravena bila asupan oral gagal',
+      'Jaga lesi tetap bersih dan kering, jangan memecah vesikel, dan cuci tangan setelah menyentuh lesi',
+      'Pada disuria berat akibat lesi genital, berkemih sambil menyiramkan air hangat atau berkemih di dalam air dapat sangat membantu; pemasangan kateter dipertimbangkan bila terjadi retensi urin',
+    ],
+    tatalaksana: [
+      'Antivirus dimulai sesegera mungkin, idealnya pada fase prodromal atau dalam 72 jam sejak lesi muncul; memulai lebih lambat pada episode berulang memberi manfaat yang jauh berkurang',
+      'Episode pertama herpes genital: asiklovir 400 mg tiga kali sehari selama 7-10 hari, atau valasiklovir 1000 mg dua kali sehari selama 7-10 hari',
+      'Episode berulang: asiklovir 800 mg tiga kali sehari selama 2 hari, atau valasiklovir 500 mg dua kali sehari selama 3 hari — regimen pendek yang sama efektifnya dengan regimen panjang',
+      'Herpes labialis: asiklovir topikal memberi manfaat kecil; antivirus oral lebih efektif dan sebaiknya dimulai pada fase prodromal',
+      'Terapi supresif bila kekambuhan enam kali atau lebih per tahun, bila kekambuhan sangat mengganggu, atau untuk menurunkan risiko penularan kepada pasangan: asiklovir 400 mg dua kali sehari atau valasiklovir 500 mg sekali sehari, dievaluasi ulang setiap tahun',
+      'Gingivostomatitis herpetika pada anak: asiklovir oral bila diberikan dalam 72 sampai 96 jam pertama, disertai analgesia dan penjagaan asupan cairan sebagai prioritas',
+      'Antibiotik hanya bila terdapat infeksi sekunder bakterial',
+      'KORTIKOSTEROID TOPIKAL TIDAK BOLEH DIOLESKAN pada lesi herpes karena memperberat dan memperluas infeksi',
+      'Rujuk segera bila ada keterlibatan mata, kecurigaan ensefalitis berupa penurunan kesadaran maupun kejang, eksema herpetikum, lesi luas pada pasien dengan imunitas menurun, atau herpes genital pada ibu hamil menjelang persalinan',
+    ],
+    edukasi: [
+      'Jelaskan secara jujur bahwa virus menetap di dalam saraf seumur hidup dan tidak ada obat yang dapat menghilangkannya, tetapi kekambuhan dapat dikurangi frekuensi dan beratnya, dan bagi sebagian besar orang kekambuhan justru semakin jarang seiring waktu',
+      'Pada herpes genital, dampak emosional dan rasa bersalah sering jauh lebih berat daripada lesinya; sampaikan bahwa infeksi ini sangat lazim, tidak menandakan kegagalan moral, dan tidak menghalangi seseorang menjalani hubungan maupun memiliki anak',
+      'Penularan: hindari kontak langsung dengan lesi sejak fase prodromal hingga semua lesi mengering; jangan berbagi alat makan, handuk, lipstik, maupun pisau cukur; dan pahami bahwa penularan tetap mungkin terjadi tanpa lesi yang tampak, sehingga kondom menurunkan tetapi tidak menghapus risiko',
+      'JANGAN mencium bayi saat ada lesi di bibir — infeksi herpes pada bayi baru lahir dapat berakibat sangat berat',
+      'Bagi perempuan, beri tahu tenaga kesehatan tentang riwayat herpes genital sejak awal kehamilan, jauh sebelum waktu persalinan, agar rencana persalinan dapat disiapkan',
+      'Kenali dan hindari pencetus pribadi; gunakan pelembap bibir dengan tabir surya bila paparan sinar matahari terbukti menjadi pemicu lesi orolabial',
+      'Jadwal dan porsi makan: pertahankan tiga kali makan utama pada jam tetap dengan dua selingan. Selama lesi mulut aktif, pilih makanan lunak dan dingin seperti bubur, puding, dan es krim, hindari makanan asam, pedas, keras, dan panas, serta makan porsi kecil lebih sering agar asupan tetap tercukupi. Cukupkan protein dan minum minimal 8 gelas air per hari',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap — kurang tidur adalah salah satu pencetus kekambuhan yang paling sering dan paling dapat dikendalikan',
+      'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu membantu mengelola stres yang menjadi pencetus. Namun HINDARI OLAHRAGA KONTAK seperti gulat, judo, dan bela diri bergumul selama masih ada lesi aktif karena dapat menularkan langsung melalui kulit; jangan berbagi handuk maupun matras tanpa pelapis, dan tunda kembali berlatih sampai seluruh lesi mengering',
+      'Simpan persediaan antivirus di rumah bila kekambuhan sering, dan mulai minum sejak muncul rasa gatal atau terbakar pertama tanpa menunggu lesi terlihat — inilah cara memperoleh manfaat terbesar dari obat',
+      'Follow up: kontrol dalam 1 minggu pada episode pertama; pada kekambuhan enam kali atau lebih per tahun, kembali untuk membahas terapi supresif. Segera datang bila muncul keluhan mata, sakit kepala hebat, kejang, penurunan kesadaran, atau lesi yang menyebar luas',
+    ],
+    komplikasi: [
+      'Infeksi sekunder bakterial pada lesi',
+      'Keratitis herpetika yang dapat berujung pada gangguan penglihatan permanen',
+      'Ensefalitis herpes simpleks — jarang namun mengancam jiwa',
+      'Eksema herpetikum pada pasien dermatitis atopik dengan penyebaran luas dan perjalanan berat',
+      'Herpes neonatal akibat penularan saat persalinan dengan angka kematian dan kecacatan yang tinggi',
+      'Retensi urin dan radikulitis sakral pada herpes genital berat',
+      'Peningkatan risiko penularan dan penerimaan infeksi HIV akibat adanya erosi mukosa',
+      'Dampak psikologis berupa kecemasan, rasa malu, dan gangguan hubungan pada herpes genital',
+    ],
+    prognosis:
+      'Baik pada orang dengan imunitas normal. Episode pertama sembuh dalam 2-3 minggu dan episode berulang dalam 5-10 hari, tanpa meninggalkan jaringan parut. Virus menetap seumur hidup sehingga kekambuhan dapat terjadi, namun frekuensinya umumnya menurun seiring waktu dan sangat dapat dikendalikan dengan terapi supresif bila mengganggu. Prognosis menjadi serius pada infeksi neonatal, ensefalitis, keterlibatan mata, dan pada pasien dengan imunitas menurun berat — dan justru karena itulah mengenali bentuk berkomplikasi sejak awal lebih menentukan daripada pengobatan lesi kulitnya sendiri.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'CDCSTI2021', 'PPKFKTP2014'],
   },
   'Impetigo': {
     definisi:
@@ -5822,10 +6035,118 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'WHOLEPROSY2018', 'PERDOSKI2021'],
   },
   'Sifilis stadium 1 dan 2': {
-    definisi: 'Infeksi Treponema pallidum menular seksual; stadium primer ditandai chancre, stadium sekunder oleh erupsi generalisata.',
-    diagnosis: ['Primer: ulkus soliter dasar bersih, tepi teratur, TIDAK NYERI (membedakan dari chancroid), limfadenopati tidak nyeri; Sekunder: ruam makulopapular termasuk telapak tangan dan kaki, kondiloma lata; serologi non-treponemal (VDRL/RPR) dan treponemal (TPHA)'],
-    tatalaksana: ['Benzatin penisilin G 2,4 juta unit IM dosis tunggal (stadium dini), doksisiklin bila alergi penisilin; obati pasangan seksual, skrining IMS lain termasuk HIV, pantau titer serologi untuk respons; edukasi reaksi Jarisch-Herxheimer'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi:
+      'Infeksi menular seksual sistemik oleh bakteri spiroket Treponema pallidum; stadium primer ditandai ulkus tunggal tidak nyeri pada tempat masuk kuman, sedangkan stadium sekunder merupakan penyebaran sistemik yang khasnya menimbulkan erupsi menyeluruh termasuk pada telapak tangan dan telapak kaki.',
+    anamnesis: {
+      keluhanUtama:
+        'Luka pada kelamin yang tidak terasa nyeri, atau bercak merah di seluruh badan termasuk telapak tangan dan kaki.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: lokasi ulkus pada stadium primer sesuai tempat masuk kuman — batang penis, vulva, serviks, anus, bibir, atau rongga mulut; ulkus pada serviks maupun anus kerap tidak disadari sama sekali. Pada stadium sekunder, tanyakan sebaran ruam dan khususnya APAKAH TELAPAK TANGAN DAN TELAPAK KAKI IKUT TERKENA, karena keterlibatan kedua daerah ini sangat khas dan jarang dijumpai pada penyakit kulit lain. Onset: ulkus primer muncul sekitar 3 minggu setelah kontak dengan rentang 10-90 hari, sedangkan erupsi sekunder muncul 4-10 minggu setelah ulkus primer. Character: ULKUS PRIMER TIDAK NYERI, soliter, dasarnya bersih, tepinya teratur dan terindurasi seperti karet — sifat tidak nyeri inilah yang menjadi pembeda utama dan sekaligus alasan penyakit ini sering terlambat diobati. Ruam sekunder berupa makula dan papul kemerahan hingga kecoklatan yang tidak gatal. Radiation: pada stadium sekunder keluhan bersifat menyeluruh karena kuman sudah menyebar melalui darah. Associations: pembesaran kelenjar lipat paha yang tidak nyeri pada stadium primer; pada stadium sekunder tanyakan demam, nyeri kepala, nyeri tenggorokan, nyeri otot dan sendi, rambut rontok berbercak, serta benjolan basah di daerah lipatan yang merupakan kondiloma lata. Time course: PENTING — ulkus primer sembuh sendiri dalam 3-6 minggu tanpa diobati dan pasien merasa telah sembuh, padahal kuman terus menyebar; tanyakan riwayat luka kelamin yang pernah sembuh sendiri berbulan-bulan sebelumnya. Exacerbating dan relieving: tidak khas. Severity: umumnya keluhan ringan sehingga tidak menggambarkan beratnya penyakit — hal yang justru berbahaya.',
+      riwayatPenyakitDahulu:
+        'Riwayat infeksi menular seksual sebelumnya termasuk sifilis beserta pengobatannya, riwayat pemeriksaan dan status HIV, serta riwayat penyakit lain yang menurunkan imunitas.',
+      riwayatPenyakitKeluarga:
+        'Riwayat infeksi menular seksual pada pasangan; pada perempuan hamil, telusuri riwayat keguguran berulang, bayi lahir mati, dan bayi dengan kelainan bawaan yang dapat berkaitan dengan sifilis kongenital.',
+      riwayatPengobatan:
+        'Antibiotik yang pernah diminum dalam beberapa bulan terakhir, karena pemakaian antibiotik untuk keluhan lain dapat mengaburkan gambaran penyakit. Riwayat pengobatan sifilis sebelumnya beserta jenis obat, dosis, dan hasil pemantauan titer serologinya.',
+      riwayatAlergi:
+        'RIWAYAT ALERGI PENISILIN HARUS DITANYAKAN SECARA RINCI, termasuk bentuk reaksinya, karena penisilin adalah satu-satunya obat dengan bukti terbaik dan pada ibu hamil merupakan satu-satunya pilihan yang dapat diterima.',
+      riwayatKehamilanPersalinan:
+        'Status kehamilan dan usia kehamilan pada perempuan usia subur — sifilis pada kehamilan dapat menular ke janin dan menyebabkan keguguran, lahir mati, maupun sifilis kongenital, sehingga penemuan dan pengobatannya bersifat mendesak.',
+      riwayatSosialEkonomi:
+        'Riwayat seksual yang ditanyakan dengan cara yang tidak menghakimi namun jelas: jumlah pasangan dalam setahun terakhir, jenis hubungan seksual termasuk oral dan anal, penggunaan kondom, hubungan dengan pekerja seks, serta apakah pasangan memiliki keluhan serupa. Tanyakan pula penggunaan napza suntik dan riwayat transfusi. Sampaikan sejak awal bahwa informasi ini bersifat rahasia dan diperlukan untuk mengobati pasien beserta pasangannya.',
+    },
+    pemeriksaanFisik: [
+      'Stadium primer: ulkus soliter dengan dasar bersih, tepi teratur dan terindurasi, TIDAK NYERI saat ditekan; palpasi tepi ulkus untuk merasakan indurasi yang khas seperti karet',
+      'Periksa seluruh area genital, perineum, anus, rongga mulut, dan bibir — ulkus di serviks, anus, dan rongga mulut sering tidak disadari pasien dan hanya ditemukan bila dicari',
+      'Palpasi kelenjar getah bening lipat paha: membesar, kenyal, tidak nyeri, dan tidak menyatu',
+      'Stadium sekunder: erupsi makulopapular menyeluruh berwarna merah tembaga yang TIDAK GATAL, dengan KETERLIBATAN TELAPAK TANGAN DAN TELAPAK KAKI sebagai temuan yang paling khas',
+      'Cari kondiloma lata berupa papul dan plak yang lembap, meninggi, dan sangat menular pada daerah lipatan yang hangat seperti perineum dan sekitar anus — berbeda dari kondiloma akuminata yang bertangkai dan bergerigi',
+      'Cari bercak lendir keputihan pada mukosa mulut, tenggorokan, dan genital',
+      'Alopesia berbercak dengan gambaran seperti dimakan ngengat pada kulit kepala, serta penipisan alis bagian luar',
+      'Periksa seluruh permukaan kulit dan seluruh kelompok kelenjar getah bening karena stadium sekunder bersifat sistemik; nilai pula mata dan saraf kranial karena keterlibatan mata maupun susunan saraf dapat terjadi pada stadium dini',
+    ],
+    penunjang: [
+      'Pemeriksaan serologi non-treponemal — VDRL atau RPR — dipakai untuk penapisan dan untuk MEMANTAU KEBERHASILAN PENGOBATAN karena titernya turun setelah terapi berhasil',
+      'Pemeriksaan serologi treponemal — TPHA, TP-Rapid, atau FTA-ABS — dipakai untuk konfirmasi; hasilnya tetap positif seumur hidup sehingga TIDAK dapat dipakai menilai keberhasilan terapi maupun membedakan infeksi baru dari infeksi lama',
+      'Kedua jenis pemeriksaan harus dibaca bersama: non-treponemal positif dengan treponemal positif menandakan sifilis, sedangkan non-treponemal positif dengan treponemal negatif menandakan hasil positif palsu yang dapat timbul pada kehamilan, penyakit autoimun, dan infeksi lain',
+      'Titer non-treponemal dicatat angkanya, bukan sekadar positif atau negatif, karena perbandingan titer antarwaktu inilah yang menilai keberhasilan pengobatan',
+      'Waspadai fenomena prozon: pada stadium sekunder dengan kadar antibodi sangat tinggi, VDRL dapat terbaca negatif palsu bila serum tidak diencerkan',
+      'Mikroskop lapangan gelap dari serum ulkus dapat memperlihatkan spiroket secara langsung bila tersedia, dan bermanfaat pada stadium primer yang serologinya masih negatif',
+      'TES HIV WAJIB DITAWARKAN pada setiap pasien sifilis, bersama penapisan gonore, klamidia, dan hepatitis B',
+      'Pungsi lumbal bila ada gejala neurologis maupun mata, atau bila titer tidak turun sebagaimana diharapkan setelah pengobatan',
+    ],
+    etiologi: 'Bakteri spiroket Treponema pallidum subspesies pallidum, ditularkan melalui kontak seksual, dari ibu ke janin, dan jarang melalui transfusi.',
+    patofisiologi:
+      'Treponema pallidum masuk melalui mukosa utuh maupun kulit yang lecet saat kontak seksual, lalu berkembang biak di tempat masuk dan menimbulkan reaksi peradangan dengan endarteritis obliterans pada pembuluh darah kecil. Reaksi ini menyebabkan iskemia setempat dan terbentuknya ulkus dengan tepi yang terindurasi; kerusakan ujung saraf oleh proses ini diduga menjadi sebab ulkus tidak terasa nyeri — ciri yang membuat pasien tidak merasa perlu berobat, sehingga penyakit terus berjalan. Sejak sangat dini kuman sudah masuk ke pembuluh limfe dan darah, sehingga sifilis pada dasarnya merupakan penyakit sistemik bahkan ketika manifestasinya masih berupa satu ulkus setempat. Ulkus primer sembuh sendiri dalam 3-6 minggu karena respons imun setempat, namun kuman tidak dibasmi dan terus bersirkulasi. Setelah beberapa minggu hingga bulan, penyebaran hematogen menimbulkan stadium sekunder dengan erupsi menyeluruh, dan keterlibatan telapak tangan serta telapak kaki mencerminkan penyebaran melalui darah alih-alih kontak setempat. Stadium sekunder pun mereda dengan sendirinya dan penyakit memasuki fase laten tanpa gejala, di mana kuman tetap hidup dan dapat merusak susunan saraf pusat, jantung, serta pembuluh darah besar bertahun-tahun kemudian. Perjalanan yang berulang kali tampak sembuh sendiri inilah yang menjelaskan mengapa sifilis dijuluki peniru ulung dan mengapa pengobatan tetap wajib meski keluhan sudah hilang.',
+    faktorRisiko: [
+      'Hubungan seksual tanpa kondom dan berganti pasangan',
+      'Pasangan dengan infeksi menular seksual',
+      'Infeksi HIV — sifilis dan HIV saling meningkatkan risiko penularan satu sama lain',
+      'Laki-laki yang berhubungan seksual dengan laki-laki',
+      'Pekerja seks dan pelanggannya',
+      'Penggunaan napza yang menurunkan kewaspadaan dan napza suntik',
+      'Kehamilan tanpa penapisan sifilis pada pemeriksaan kehamilan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dari gambaran klinis yang sesuai stadium disertai konfirmasi serologi dengan dua jenis pemeriksaan yang dibaca bersama: pemeriksaan non-treponemal seperti VDRL atau RPR yang bertiter, dan pemeriksaan treponemal seperti TPHA. Pemeriksaan treponemal menegakkan bahwa pernah terjadi infeksi treponema, sedangkan titer non-treponemal menunjukkan aktivitas penyakit dan menjadi satu-satunya alat untuk menilai keberhasilan pengobatan. Pada stadium primer sangat dini, serologi dapat masih negatif sehingga pemeriksaan perlu diulang setelah 2-4 minggu; bila tersedia, mikroskop lapangan gelap dari serum ulkus dapat memperlihatkan spiroket secara langsung.',
+    diagnosisBanding: [
+      'Herpes genitalis — vesikel berkelompok yang pecah menjadi erosi dangkal MULTIPEL dan SANGAT NYERI, berulang di tempat yang sama; berlawanan sifat dengan ulkus sifilis yang soliter dan tidak nyeri',
+      'Chancroid — ulkus nyeri dengan dasar kotor, tepi tidak teratur dan bergaung, tidak terindurasi, dengan kelenjar lipat paha yang nyeri dan dapat bernanah',
+      'Limfogranuloma venereum — ulkus kecil yang cepat menghilang disertai pembesaran kelenjar lipat paha yang mencolok dan nyeri',
+      'Pitiriasis rosea — menyerupai ruam sifilis sekunder namun didahului bercak induk (herald patch), lesinya mengikuti garis lipatan kulit, dan TIDAK mengenai telapak tangan maupun telapak kaki',
+      'Erupsi obat — riwayat obat yang jelas, umumnya gatal, dan tidak khas mengenai telapak tangan maupun kaki',
+      'Psoriasis gutata — papul dengan skuama tebal keperakan, sering setelah infeksi tenggorokan',
+      'Skabies pada stadium lanjut dan liken planus — gatal menjadi keluhan utama, berbeda dari ruam sifilis sekunder yang tidak gatal',
+      'Kondiloma akuminata — vegetasi bertangkai dengan permukaan bergerigi seperti bunga kol, berbeda dari kondiloma lata yang berpermukaan datar, lembap, dan lebar',
+    ],
+    pengkajian:
+      'Dipikirkan sifilis pada pasien ini atas dasar temuan yang sangat khas dan justru berlawanan dengan naluri klinis biasa: pada stadium primer ditemukan ulkus tunggal pada tempat masuk kuman yang dasarnya bersih, tepinya teratur dan terasa terindurasi seperti karet, namun sama sekali tidak nyeri saat ditekan, disertai pembesaran kelenjar lipat paha yang juga tidak nyeri. Sifat tidak nyeri inilah yang paling menentukan dan sekaligus memisahkannya dari herpes genitalis yang lesinya multipel, dangkal, dan sangat nyeri, serta dari chancroid yang ulkusnya nyeri dengan dasar kotor, tepi bergaung, dan kelenjar lipat paha yang nyeri hingga bernanah. Pada stadium sekunder, penalaran bertumpu pada erupsi makulopapular menyeluruh yang tidak gatal dengan keterlibatan telapak tangan dan telapak kaki — sebaran yang mencerminkan penyebaran melalui aliran darah dan hampir tidak dijumpai pada penyakit kulit lain. Pitiriasis rosea merupakan penyerupa yang paling sering menyesatkan, namun didahului bercak induk, lesinya tersusun mengikuti garis lipatan kulit pada punggung, dan tidak mengenai telapak tangan maupun kaki. Erupsi obat disingkirkan karena tidak ada riwayat obat yang bersesuaian dan lesi tidak gatal. Riwayat adanya luka kelamin yang pernah sembuh sendiri beberapa bulan sebelumnya perlu digali secara khusus, sebab penyembuhan spontan ulkus primer membuat pasien merasa telah sembuh padahal kuman terus menyebar — inilah alasan sifilis kerap baru ditemukan pada stadium sekunder. Diagnosis dipastikan dengan membaca dua jenis serologi secara bersamaan: pemeriksaan treponemal menegaskan pernah terjadinya infeksi, sedangkan titer non-treponemal menunjukkan aktivitas penyakit dan menjadi satu-satunya alat menilai keberhasilan terapi kelak. Penapisan HIV ditawarkan pada kasus ini bukan sebagai tambahan, melainkan karena keduanya berbagi jalur penularan dan saling memperbesar risiko satu sama lain.',
+    terapiSuportif: [
+      'Perawatan lesi dengan menjaga kebersihan dan kekeringan; kondiloma lata sangat menular sehingga kontak langsung harus dihindari',
+      'Analgesik bila ada nyeri kepala, nyeri otot, dan demam pada stadium sekunder',
+      'Konseling yang menjaga kerahasiaan pasien, karena rasa malu dan takut merupakan hambatan terbesar bagi pasien untuk kembali kontrol dan untuk memberi tahu pasangannya',
+      'Pantau pasien selama minimal 30 menit setelah suntikan penisilin untuk mengantisipasi reaksi alergi, dan pastikan epinefrin tersedia',
+      'Untuk reaksi Jarisch-Herxheimer, berikan parasetamol dan cairan yang cukup; pada ibu hamil, reaksi ini perlu pemantauan lebih ketat karena dapat memicu kontraksi dan gawat janin',
+    ],
+    tatalaksana: [
+      'Sifilis dini yaitu stadium primer, sekunder, dan laten dini: benzatin penisilin G 2,4 juta unit intramuskular DOSIS TUNGGAL, disuntikkan terbagi pada kedua bokong',
+      'Penisilin adalah obat pilihan utama dan satu-satunya yang dapat diterima pada ibu hamil; pada ibu hamil dengan alergi penisilin, tindakan yang benar adalah desensitisasi penisilin, BUKAN mengganti dengan doksisiklin yang berbahaya bagi janin',
+      'Alternatif pada pasien tidak hamil dengan alergi penisilin: doksisiklin 100 mg dua kali sehari selama 14 hari, atau tetrasiklin 500 mg empat kali sehari selama 14 hari',
+      'AZITROMISIN TIDAK DIANJURKAN karena telah dilaporkan resistensi',
+      'PENGOBATAN PASANGAN SEKSUAL ADALAH BAGIAN DARI TERAPI, bukan anjuran tambahan — seluruh pasangan dalam 90 hari terakhir diobati meskipun hasil serologinya negatif, dan pasangan yang lebih lama diperiksa serta diobati sesuai hasil',
+      'Pantau titer non-treponemal pada bulan ke-3, ke-6, dan ke-12; keberhasilan ditandai penurunan titer empat kali lipat atau lebih dalam 6-12 bulan',
+      'Titer yang tidak turun, menetap, atau justru naik empat kali lipat menandakan kegagalan terapi maupun infeksi ulang, dan menuntut penilaian ulang termasuk pemeriksaan cairan serebrospinal serta penapisan HIV',
+      'Tawarkan tes HIV dan penapisan infeksi menular seksual lain pada setiap pasien; bila HIV positif, pemantauan dilakukan lebih ketat',
+      'Rujuk bila ada gejala neurologis, gangguan penglihatan atau pendengaran, sifilis pada kehamilan, sifilis kongenital, atau kegagalan terapi',
+      'Laporkan kasus sesuai ketentuan program pengendalian infeksi menular seksual setempat',
+    ],
+    edukasi: [
+      'Jelaskan bahwa sifilis dapat disembuhkan sepenuhnya dengan satu kali suntikan penisilin pada stadium dini, namun kerusakan yang sudah terjadi tidak dapat dikembalikan — inilah alasan pengobatan tidak boleh ditunda',
+      'Tekankan bahwa hilangnya luka maupun ruam BUKAN berarti sembuh; penyakit ini justru berbahaya karena berulang kali tampak menghilang dengan sendirinya sementara kuman terus merusak tubuh dari dalam',
+      'Peringatkan tentang REAKSI JARISCH-HERXHEIMER: demam, menggigil, nyeri kepala, dan nyeri otot yang timbul dalam 24 jam pertama setelah suntikan. Reaksi ini disebabkan matinya kuman dalam jumlah besar, berlangsung singkat, dan BUKAN alergi obat maupun tanda penyakit memberat — menjelaskan hal ini di awal mencegah pasien panik dan menolak pengobatan berikutnya',
+      'Tidak berhubungan seksual sama sekali sampai pengobatan selesai dan seluruh lesi sembuh, serta sampai pasangan juga selesai diobati',
+      'Beri tahu pasangan seksual agar diperiksa dan diobati; ini adalah bagian dari kesembuhan pasien sendiri, karena tanpa itu infeksi ulang hampir pasti terjadi. Bila pasien merasa berat menyampaikannya, tawarkan bantuan melalui layanan penelusuran pasangan',
+      'Gunakan kondom secara benar dan konsisten pada setiap hubungan seksual setelah pengobatan selesai; kondom menurunkan namun tidak menghapus risiko karena lesi dapat berada di luar area yang tertutup',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan khusus. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, cukupkan protein 1-1,2 gram per kilogram berat badan per hari, perbanyak sayur dan buah, dan minum 8 gelas air per hari — terutama pada hari penyuntikan untuk membantu tubuh melewati reaksi Jarisch-Herxheimer. Hindari alkohol karena menurunkan kepatuhan berobat dan kewaspadaan',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; pada 1-2 hari setelah suntikan, perbanyak istirahat karena demam dan nyeri otot akibat reaksi Jarisch-Herxheimer sering muncul',
+      'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu dapat diteruskan seperti biasa. Istirahatkan olahraga pada 24-48 jam setelah suntikan bila timbul demam dan nyeri otot, lalu lanjutkan bertahap. Hindari kolam renang umum dan sauna selama masih ada lesi basah maupun kondiloma lata karena lesi tersebut sangat menular',
+      'Follow up: PEMERIKSAAN DARAH ULANG pada bulan ke-3, ke-6, dan ke-12 merupakan bagian yang tidak boleh dilewatkan — tanpa pemantauan titer, tidak ada cara untuk mengetahui apakah pengobatan berhasil',
+      'Segera datang bila muncul gangguan penglihatan atau pendengaran, sakit kepala hebat, leher kaku, kelemahan anggota gerak, atau bila timbul kembali luka maupun ruam',
+      'Pada perempuan, sampaikan bahwa penapisan sifilis merupakan bagian wajib pemeriksaan kehamilan dan bahwa pengobatan yang tepat waktu selama kehamilan mencegah penularan kepada bayi',
+    ],
+    komplikasi: [
+      'Sifilis laten yang berlanjut menjadi sifilis tersier dengan gumma pada kulit, tulang, dan organ dalam',
+      'Neurosifilis termasuk meningitis sifilitika, tabes dorsalis, dan demensia paralitika; dapat pula terjadi pada stadium dini',
+      'Sifilis kardiovaskular berupa aortitis dengan aneurisma aorta dan insufisiensi katup aorta',
+      'Sifilis okular berupa uveitis dan neuritis optik yang dapat menyebabkan kebutaan, serta gangguan pendengaran',
+      'Sifilis kongenital dengan keguguran, lahir mati, kelahiran prematur, dan kecacatan berat pada bayi',
+      'Peningkatan risiko penularan dan penerimaan infeksi HIV akibat adanya ulkus mukosa',
+      'Reaksi Jarisch-Herxheimer yang pada ibu hamil dapat memicu kontraksi dan gawat janin',
+      'Dampak psikologis dan sosial berupa rasa malu, kecemasan, serta gangguan hubungan dengan pasangan',
+    ],
+    prognosis:
+      'Sangat baik pada stadium dini yang mendapat pengobatan tepat — satu dosis benzatin penisilin G menyembuhkan sebagian besar kasus. Prognosis paling ditentukan oleh kecepatan diagnosis, dan justru di sinilah letak masalahnya: ulkus primer yang tidak nyeri serta gejala yang berulang kali mereda sendiri membuat pasien tidak merasa perlu berobat, sehingga penyakit kerap baru ditemukan setelah menyebar. Kerusakan pada susunan saraf, jantung, dan pembuluh darah besar yang telah terjadi bersifat menetap meski kuman berhasil dibasmi. Pemantauan titer serologi dan pengobatan pasangan merupakan dua hal yang paling menentukan keberhasilan jangka panjang, karena tanpa keduanya infeksi ulang sangat mungkin terjadi.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'CDCSTI2021', 'PPKFKTP2014'],
   },
   'Tinea kapitis': {
     definisi:
@@ -6423,10 +6744,105 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019', 'IDSASSTI2014'],
   },
   'Pitiriasis vesikolor': {
-    definisi: 'Infeksi superfisial oleh ragi Malassezia yang menimbulkan makula hipopigmentasi atau hiperpigmentasi berskuama halus.',
-    diagnosis: ['Makula berbatas tegas dengan skuama halus di badan dan lengan atas, tanda finger nail sign positif; KOH menunjukkan gambaran spaghetti and meatballs (hifa pendek dan spora bergerombol)'],
-    tatalaksana: ['Antijamur topikal (ketokonazol krim/sampo, selenium sulfida), sistemik bila luas atau rekuren; EDUKASI bahwa perbedaan warna kulit menetap berbulan-bulan setelah jamur mati — bukan tanda kegagalan terapi; rekurensi sering, dapat diberikan profilaksis berkala'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
+    definisi:
+      'Infeksi jamur superfisial pada stratum korneum oleh ragi lipofilik genus Malassezia yang merupakan flora normal kulit, menimbulkan makula hipopigmentasi maupun hiperpigmentasi berbatas tegas dengan skuama halus, terutama pada badan dan lengan atas.',
+    anamnesis: {
+      keluhanUtama: 'Bercak putih atau kecoklatan berbatas tegas dengan sisik halus di punggung, dada, dan lengan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: sebaran khas pada daerah yang kaya kelenjar sebasea yaitu punggung atas, dada, bahu, leher, dan lengan atas; pada anak dan remaja dapat pula mengenai wajah. Onset: perlahan dalam hitungan minggu hingga bulan, sering baru disadari setelah berjemur karena kulit di sekitarnya menjadi lebih gelap sementara bercaknya tidak ikut menggelap. Character: bercak berbatas tegas yang warnanya dapat lebih terang maupun lebih gelap daripada kulit sekitarnya — pada satu orang kedua jenis warna dapat ditemukan bersamaan; permukaannya bersisik sangat halus yang baru tampak jelas bila digores. Radiation: bercak kecil-kecil yang bertambah banyak lalu menyatu membentuk area yang luas. Associations: gatal ringan atau tidak gatal sama sekali; gatal hebat justru mengarahkan ke diagnosis lain. Time course: perjalanan menahun dengan kecenderungan berulang, memberat pada musim panas dan lembap; tanyakan riwayat pengobatan sebelumnya dan apakah pernah dinyatakan sembuh lalu bercaknya dianggap kambuh padahal hanya sisa warna. Exacerbating: cuaca panas dan lembap, keringat berlebih, pakaian ketat dan tidak menyerap keringat, pemakaian minyak dan losion berminyak pada badan, serta kortikosteroid. Severity: umumnya keluhan bersifat kosmetik semata, namun nilai dampaknya terhadap kepercayaan diri karena inilah yang sesungguhnya membawa pasien datang berobat.',
+      riwayatPenyakitDahulu:
+        'Riwayat keluhan serupa sebelumnya dan pengobatan yang pernah dijalani beserta hasilnya. Diabetes melitus, sindrom Cushing, keadaan malnutrisi, dan keadaan imunitas menurun yang membuat penyakit lebih luas dan lebih sering berulang. Riwayat dermatitis seboroik yang juga berkaitan dengan Malassezia.',
+      riwayatPenyakitKeluarga:
+        'Riwayat keluhan serupa pada anggota keluarga; kecenderungan ini lebih berkaitan dengan faktor bawaan dan lingkungan yang sama daripada dengan penularan, karena ragi penyebabnya adalah flora normal kulit.',
+      riwayatPengobatan:
+        'Pemakaian kortikosteroid topikal maupun sistemik yang mendorong pertumbuhan ragi, obat imunosupresan, serta kontrasepsi hormonal. Tanyakan pula produk perawatan tubuh yang dipakai, khususnya minyak dan losion berminyak yang menjadi sumber lipid bagi ragi.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap antijamur topikal sebelumnya.',
+      riwayatNutrisi: 'Status gizi; malnutrisi merupakan salah satu faktor predisposisi.',
+      riwayatSosialEkonomi:
+        'Pekerjaan yang membuat banyak berkeringat atau terpapar panas, kebiasaan berolahraga dan segera tidaknya mandi setelahnya, jenis pakaian yang dipakai sehari-hari, kebiasaan memakai minyak badan, serta kondisi tempat tinggal yang panas dan lembap.',
+    },
+    pemeriksaanFisik: [
+      'Makula berbatas tegas dengan berbagai ukuran yang dapat menyatu, warnanya bervariasi dari putih, kecoklatan, hingga kemerahan — keragaman warna pada satu pasien inilah asal nama versikolor',
+      'TANDA GORES SKUAMA (finger nail sign atau tanda Besnier): goreskan kuku atau ujung objek gelas pada lesi, maka akan tampak skuama halus seperti tepung yang terangkat — pemeriksaan sederhana di samping tempat tidur yang sangat menguatkan diagnosis',
+      'Sebaran pada daerah kaya kelenjar sebasea: punggung atas, dada, bahu, leher, dan lengan atas',
+      'Pemeriksaan dengan lampu Wood memperlihatkan fluoresensi kuning keemasan pada sebagian kasus, meskipun tidak selalu ada sehingga hasil negatif tidak menyingkirkan diagnosis',
+      'Nilai batas lesi: berbatas tegas dan tidak ada tepi yang lebih aktif maupun meninggi, berbeda dari tinea korporis',
+      'Periksa sensasi raba pada lesi hipopigmentasi — SENSASI HARUS NORMAL; adanya penurunan sensasi mengarahkan pada kusta dan wajib ditelusuri lebih lanjut',
+      'Periksa kulit kepala dan wajah untuk tanda dermatitis seboroik yang sering menyertai',
+    ],
+    penunjang: [
+      'Pemeriksaan kerokan kulit dengan larutan KOH 10-20% merupakan pemeriksaan penegak diagnosis dan mudah dikerjakan: tampak hifa pendek bersegmen bersama spora bergerombol yang digambarkan sebagai spaghetti and meatballs',
+      'Lampu Wood memberikan fluoresensi kuning keemasan pada sebagian kasus sebagai pemeriksaan pelengkap',
+      'Kultur jamur tidak dikerjakan rutin karena Malassezia memerlukan media khusus yang diperkaya lipid dan hasilnya tidak mengubah tatalaksana',
+      'Biopsi kulit hampir tidak pernah diperlukan',
+      'Pemeriksaan gula darah bila lesi sangat luas, berulang terus-menerus, atau disertai tanda lain yang mengarah pada gangguan metabolik',
+    ],
+    etiologi:
+      'Ragi lipofilik genus Malassezia, terutama Malassezia globosa dan Malassezia furfur, yang merupakan flora normal kulit dan berubah dari bentuk ragi menjadi bentuk miselium yang patogenik pada keadaan yang mendukung.',
+    patofisiologi:
+      'Malassezia hidup normal pada kulit manusia dan bergantung pada lipid sebum untuk pertumbuhannya. Pada keadaan panas, lembap, keringat berlebih, produksi sebum yang meningkat, atau penurunan imunitas setempat, ragi berubah menjadi bentuk miselium dan berproliferasi di dalam stratum korneum. Karena penyakit ini merupakan perubahan perilaku flora normal dan bukan infeksi dari luar, penularan antarorang bukan mekanisme utamanya — hal ini menjelaskan mengapa penyakit sangat mudah berulang pada orang yang sama meski sudah diobati sampai bersih. Ragi menghasilkan asam dikarboksilat, terutama asam azelaik, yang menghambat enzim tirosinase pada melanosit sehingga produksi melanin menurun dan timbul bercak yang lebih terang; pada individu lain, reaksi peradangan ringan justru meningkatkan ukuran melanosom sehingga timbul bercak yang lebih gelap. Penghambatan melanosit ini tidak segera pulih setelah raginya mati, dan inilah dasar biologis mengapa perbedaan warna kulit bertahan berbulan-bulan setelah pengobatan berhasil — fakta yang harus dijelaskan di awal agar pasien tidak menyimpulkan terapinya gagal.',
+    faktorRisiko: [
+      'Iklim panas dan lembap serta hiperhidrosis',
+      'Kulit berminyak dan usia remaja hingga dewasa muda saat aktivitas kelenjar sebasea memuncak',
+      'Pemakaian minyak dan losion berminyak pada badan',
+      'Pakaian ketat, tebal, dan tidak menyerap keringat',
+      'Pemakaian kortikosteroid dan obat imunosupresan',
+      'Diabetes melitus, sindrom Cushing, malnutrisi, dan kehamilan',
+      'Kecenderungan bawaan dalam keluarga',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dari gambaran klinis berupa makula berbatas tegas dengan skuama halus pada daerah kaya kelenjar sebasea, diperkuat tanda gores skuama yang positif, dan dikonfirmasi dengan pemeriksaan kerokan kulit menggunakan larutan KOH yang memperlihatkan hifa pendek bersama spora bergerombol dalam gambaran spaghetti and meatballs. Fluoresensi kuning keemasan pada lampu Wood mendukung diagnosis namun tidak selalu ada sehingga hasil negatif tidak menyingkirkannya.',
+    diagnosisBanding: [
+      'Kusta tipe pausibasilar — bercak hipopigmentasi dengan PENURUNAN SENSASI raba, nyeri, dan suhu, dapat disertai penebalan saraf tepi; pemeriksaan sensasi wajib dikerjakan pada setiap bercak putih dan tidak boleh dilewatkan',
+      'Vitiligo — bercak depigmentasi total yang benar-benar putih seperti kapur tanpa skuama, tepi sering hiperpigmentasi, dan KOH negatif',
+      'Pitiriasis alba — bercak hipopigmentasi berbatas tidak tegas dengan skuama halus pada wajah anak, berkaitan dengan atopi, KOH negatif',
+      'Tinea korporis — lesi dengan tepi aktif yang meninggi dan bagian tengah lebih tenang, gatal lebih menonjol, KOH menunjukkan hifa panjang bersepta bercabang',
+      'Dermatitis seboroik — eritema dengan skuama berminyak pada daerah berambut dan lipatan wajah',
+      'Hipopigmentasi pascainflamasi — ada riwayat lesi radang sebelumnya di tempat yang sama, tanpa skuama dan KOH negatif',
+      'Eritrasma — bercak kecoklatan pada lipatan dengan fluoresensi merah bata pada lampu Wood, berbeda dari kuning keemasan',
+    ],
+    pengkajian:
+      'Dipikirkan pitiriasis versikolor pada pasien ini atas dasar ditemukannya makula berbatas tegas dengan warna yang beragam pada punggung, dada, dan lengan atas — daerah yang kaya kelenjar sebasea — disertai skuama sangat halus yang baru tampak jelas setelah lesi digores, dengan keluhan gatal yang ringan atau tidak ada sama sekali. Kombinasi antara sebaran pada daerah seboroik, batas yang tegas tanpa tepi aktif, dan tanda gores skuama yang positif sudah sangat mengarahkan, dan konfirmasinya diperoleh melalui pemeriksaan kerokan kulit dengan larutan KOH yang memperlihatkan gambaran hifa pendek bersama spora bergerombol. Kusta tipe pausibasilar merupakan banding yang paling wajib disingkirkan pada setiap bercak putih dan itu dikerjakan dengan memeriksa sensasi raba pada lesi; pada kasus ini sensasi tetap normal dan tidak ditemukan penebalan saraf tepi, sehingga kusta dapat ditinggalkan — melewatkan langkah sederhana ini adalah kesalahan yang berkonsekuensi berat. Vitiligo disingkirkan karena lesi di sini tidak berupa depigmentasi total seperti kapur dan masih memiliki skuama, sedangkan pada vitiligo permukaannya mulus tanpa sisik. Tinea korporis tidak sesuai karena lesi pada kasus ini tidak memiliki tepi yang meninggi dan aktif dengan bagian tengah yang lebih tenang, dan gatalnya jauh lebih ringan. Hipopigmentasi pascainflamasi juga dipertimbangkan namun tidak didahului lesi radang di lokasi yang sama. Hal yang perlu ditegaskan sejak awal pada kasus ini adalah bahwa perbedaan warna kulit akan bertahan berbulan-bulan meskipun jamur sudah mati, sebab penghambatan melanosit tidak pulih seketika; tanpa penjelasan ini, pasien akan menganggap pengobatan gagal dan berpindah-pindah obat tanpa perlu.',
+    terapiSuportif: [
+      'Mandi dua kali sehari dan segera setelah berkeringat banyak, lalu keringkan badan dengan benar terutama pada punggung dan lipatan',
+      'Gunakan pakaian longgar yang menyerap keringat seperti katun, dan ganti segera pakaian yang basah oleh keringat',
+      'Hentikan pemakaian minyak dan losion berminyak pada badan yang menjadi sumber lipid bagi ragi',
+      'Jemur dan setrika pakaian, handuk, serta seprai; hindari memakai handuk bersama',
+      'Kendalikan faktor predisposisi yang dapat diperbaiki seperti gula darah pada penderita diabetes dan penghentian kortikosteroid yang tidak diperlukan',
+    ],
+    tatalaksana: [
+      'Lesi terbatas: antijamur topikal selama 2-4 minggu — ketokonazol krim 2% sekali sehari, atau golongan azol lain seperti mikonazol dan klotrimazol dua kali sehari',
+      'Sampo ketokonazol 2% atau selenium sulfida 2,5% dioleskan pada seluruh badan dari leher hingga lutut, dibiarkan 5-10 menit lalu dibilas, dikerjakan setiap hari selama 1-2 minggu — cara ini praktis dan murah untuk lesi yang luas',
+      'Lesi luas, berulang, atau gagal dengan terapi topikal: ketokonazol oral 200 mg per hari selama 5-10 hari, atau itrakonazol 200 mg per hari selama 5-7 hari; flukonazol 300 mg per minggu selama 2 minggu merupakan alternatif',
+      'GRISEOFULVIN DAN TERBINAFIN ORAL TIDAK EFEKTIF terhadap Malassezia — pemberiannya adalah kesalahan lazim yang membuat terapi tampak gagal padahal obatnya memang tidak bekerja; terbinafin hanya efektif dalam bentuk topikal',
+      'Perhatikan fungsi hati dan interaksi obat pada pemakaian antijamur oral, dan hindari ketokonazol oral bila ada alternatif karena risiko hepatotoksisitasnya',
+      'Profilaksis untuk mencegah kekambuhan pada pasien yang sering berulang: sampo ketokonazol 2% dipakai sekali atau dua kali seminggu, atau antijamur oral dosis tunggal berkala pada kasus tertentu',
+      'Tidak ada terapi yang mempercepat kembalinya warna kulit; yang dibutuhkan adalah waktu dan paparan sinar matahari yang wajar',
+    ],
+    edukasi: [
+      'EDUKASI TERPENTING: jelaskan sejak kunjungan pertama bahwa perbedaan warna kulit akan menetap berbulan-bulan setelah jamurnya mati, dan bahwa hal itu BUKAN tanda pengobatan gagal. Tanpa penjelasan ini pasien akan berganti-ganti obat dan menganggap penyakitnya tidak sembuh',
+      'Ukuran keberhasilan terapi adalah hilangnya sisik dan tidak munculnya bercak baru, bukan samanya warna kulit',
+      'Penyakit ini sangat mudah berulang terutama pada iklim panas dan lembap, karena penyebabnya adalah jamur yang memang hidup normal di kulit; kekambuhan bukan berarti kebersihan pasien buruk',
+      'Penyakit ini pada dasarnya tidak menular dari orang ke orang, sehingga tidak perlu memisahkan diri dari keluarga',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan khusus. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayur dan buah, batasi makanan tinggi gula dan berlemak yang berkaitan dengan produksi sebum, dan minum 8 gelas air per hari. Pada penderita diabetes, pengendalian gula darah merupakan bagian dari pengobatan kulitnya',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; tidur di ruangan yang berventilasi baik dan tidak terlalu panas, gunakan pakaian tidur katun yang longgar, dan ganti seprai serta sarung bantal minimal seminggu sekali',
+      'Pola olahraga: olahraga tetap dianjurkan 30 menit sehari selama 5 hari seminggu dan tidak perlu dihentikan. Yang penting adalah segera mandi setelah berolahraga alih-alih membiarkan keringat mengering di badan, langsung mengganti pakaian olahraga yang basah, memakai kaus yang menyerap keringat, tidak memakai handuk bersama di tempat kebugaran, dan mengeringkan punggung dengan benar setelah mandi',
+      'Pemakaian sampo antijamur secara berkala setelah sembuh adalah cara paling efektif mencegah kekambuhan, terutama menjelang musim panas',
+      'Follow up: kontrol dalam 2-4 minggu untuk menilai hilangnya sisik dan tidak adanya lesi baru; bila masih ditemukan sisik pada pemeriksaan gores, terapi diperpanjang atau ditingkatkan',
+      'Datang lebih awal bila lesi meluas cepat, sangat gatal, muncul bercak putih yang mati rasa, atau bila timbul keluhan lain di luar kulit',
+    ],
+    komplikasi: [
+      'Kekambuhan yang sering, terjadi pada sebagian besar pasien terutama di daerah beriklim panas dan lembap',
+      'Perbedaan warna kulit yang menetap berbulan-bulan hingga lebih dari satu tahun',
+      'Dampak psikologis dan penurunan kepercayaan diri karena tampilan kulit',
+      'Perluasan lesi hingga ke wajah dan lipatan pada pasien dengan imunitas menurun',
+      'Folikulitis akibat Malassezia sebagai bentuk lain infeksi ragi yang sama',
+      'Iritasi kulit akibat pemakaian antijamur topikal yang berlebihan',
+      'Hepatotoksisitas dan interaksi obat pada pemakaian antijamur oral, terutama ketokonazol',
+    ],
+    prognosis:
+      'Baik. Jamur mudah dibasmi dengan terapi topikal maupun oral dalam hitungan minggu, dan penyakit ini tidak berbahaya serta tidak menimbulkan jaringan parut. Namun angka kekambuhan tinggi karena penyebabnya merupakan flora normal kulit yang tidak dapat dihilangkan seluruhnya, sehingga keberhasilan jangka panjang lebih ditentukan oleh pengendalian faktor pencetus dan pemakaian sampo antijamur berkala daripada oleh pemilihan obat. Perbedaan warna kulit memerlukan waktu berbulan-bulan untuk pulih dan hal ini merupakan perjalanan alami, bukan kegagalan terapi.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019', 'PPKFKTP2014'],
   },
   'Kandidosis mukokutan ringan': {
     definisi: 'Infeksi Candida pada kulit dan/atau mukosa dengan derajat ringan.',
@@ -6547,10 +6963,113 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019'],
   },
   'Reaksi gigitan serangga': {
-    definisi: 'Reaksi hipersensitivitas lokal atau sistemik terhadap gigitan atau sengatan serangga.',
-    diagnosis: ['Papul urtika dengan punctum sentral, gatal, dapat berkelompok atau linear; reaksi sistemik (urtikaria generalisata, sesak, hipotensi) menandakan anafilaksis'],
-    tatalaksana: ['Kompres dingin, antihistamin oral, kortikosteroid topikal untuk lesi lokal; ANAFILAKSIS: epinefrin IM segera; hindari menggaruk (infeksi sekunder), gunakan repelan dan kelambu'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'WAO2020'],
+    definisi:
+      'Reaksi peradangan kulit setempat maupun reaksi sistemik akibat gigitan atau sengatan serangga, yang timbul karena efek langsung bahan yang disuntikkan serangga maupun karena reaksi hipersensitivitas terhadapnya.',
+    anamnesis: {
+      keluhanUtama: 'Bentol merah yang sangat gatal dengan titik di tengahnya setelah digigit serangga.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: sebaran lesi pada bagian tubuh yang TERBUKA dan tidak tertutup pakaian merupakan petunjuk khas; pada kutu busuk lesi sering tersusun berderet atau berkelompok tiga yang dijuluki sarapan, makan siang, dan makan malam. Onset: hubungan dengan waktu dan tempat — apakah muncul setelah tidur di tempat tertentu, setelah berkegiatan di kebun, atau setelah bepergian; tanyakan pula apakah serangganya sempat terlihat. Character: papul urtika dengan titik gigitan di tengahnya, sangat gatal; pada sengatan lebah maupun tawon rasa nyeri dan terbakar justru mendahului gatal. Radiation: pembengkakan yang meluas dari titik gigitan; pada reaksi lokal luas, bengkak dapat melebihi 10 sentimeter dan memuncak dalam 24-48 jam. Associations: PERTANYAAN YANG PALING MENENTUKAN adalah tanda reaksi sistemik — bentol menyeluruh di luar tempat gigitan, sesak napas, suara serak, rasa tercekik, bengkak pada bibir dan lidah, mual, muntah, nyeri perut, pusing berputar, atau rasa mau pingsan; adanya salah satu dari ini mengubah penanganan dari salep menjadi epinefrin segera. Time course: reaksi setempat memuncak dalam 24-48 jam dan mereda dalam beberapa hari, sedangkan lesi yang bertahan berminggu-minggu mengarah pada prurigo maupun infeksi sekunder akibat garukan. Exacerbating: garukan, panas, dan keringat. Severity: derajat gatal, gangguan tidur, dan ada tidaknya keterbatasan gerak akibat bengkak.',
+      riwayatPenyakitDahulu:
+        'Riwayat reaksi terhadap gigitan maupun sengatan serangga sebelumnya beserta beratnya — riwayat reaksi sistemik sebelumnya merupakan penanda risiko paling kuat untuk reaksi berat pada sengatan berikutnya. Riwayat atopi berupa asma, rinitis alergika, dan dermatitis atopik. Riwayat penyakit jantung dan penggunaan penyekat beta yang membuat penanganan anafilaksis lebih sulit.',
+      riwayatPenyakitKeluarga:
+        'Riwayat atopi pada keluarga, serta adanya anggota keluarga serumah dengan keluhan gatal serupa yang mengarahkan pada sumber di dalam rumah seperti kutu busuk maupun tungau — atau justru pada skabies yang memerlukan pengobatan seluruh penghuni rumah.',
+      riwayatPengobatan:
+        'Obat yang sudah dipakai termasuk salep dan obat oral. Penyekat beta dan penghambat ACE yang mempersulit penanganan anafilaksis. Ketersediaan epinefrin autoinjektor pada pasien dengan riwayat reaksi sistemik.',
+      riwayatAlergi:
+        'Riwayat alergi terhadap sengatan lebah, tawon, dan semut api beserta bentuk reaksinya; riwayat alergi obat dan makanan.',
+      riwayatNutrisi: 'Status gizi umum; tidak berkaitan langsung namun relevan bila lesi menahun dan berulang pada anak.',
+      riwayatSosialEkonomi:
+        'Keadaan tempat tinggal termasuk kebersihan kasur dan seprai, keberadaan hewan peliharaan beserta perawatannya, adanya genangan air dan tumpukan sampah di sekitar rumah, pemakaian kelambu maupun obat nyamuk, pekerjaan dan hobi yang berkaitan dengan paparan seperti berkebun dan beternak, serta riwayat bepergian ke daerah dengan penyakit yang ditularkan serangga.',
+    },
+    pemeriksaanFisik: [
+      'NILAI TANDA VITAL DAN JALAN NAPAS LEBIH DAHULU pada setiap kasus sengatan: tekanan darah, laju nadi, laju napas, saturasi oksigen, suara serak, stridor, mengi, dan pembengkakan lidah maupun uvula',
+      'Karakterisasi lesi: papul urtika dengan titik gigitan di tengahnya (punctum) — temuan yang sangat mendukung dan sebaiknya dicari dengan cermat',
+      'Perhatikan susunan lesi: berderet atau berkelompok mengarah pada kutu busuk, sedangkan tersebar acak pada area terbuka mengarah pada nyamuk',
+      'Perhatikan sebaran: lesi hanya pada bagian tubuh yang terbuka merupakan petunjuk kuat, berbeda dari skabies yang justru menyerang sela jari, pergelangan, dan daerah tertutup',
+      'Nilai luas pembengkakan setempat dan ukur diameternya; reaksi lokal luas melebihi 10 sentimeter tetap bukan anafilaksis dan tidak dengan sendirinya memerlukan epinefrin',
+      'Cari sengat yang masih tertinggal pada kulit setelah sengatan lebah',
+      'Cari tanda infeksi sekunder akibat garukan: pustul, krusta kuning keemasan, nyeri bertambah, eritema meluas, dan pembesaran kelenjar getah bening regional',
+      'Nilai adanya bekas garukan, likenifikasi, dan hiperpigmentasi yang menandakan proses sudah berulang dan menahun',
+    ],
+    penunjang: [
+      'Diagnosis ditegakkan secara klinis; pemeriksaan penunjang tidak diperlukan pada kasus khas',
+      'Pemeriksaan kerokan kulit untuk mencari tungau bila gambaran mengarah pada skabies',
+      'Darah lengkap bila dicurigai infeksi sekunder yang berat',
+      'Kultur dari lesi hanya bila infeksi sekunder tidak membaik dengan terapi awal',
+      'Pemeriksaan IgE spesifik terhadap racun serangga penyengat dan rujukan untuk imunoterapi hanya pada pasien dengan riwayat reaksi sistemik',
+      'Pemeriksaan sesuai kecurigaan penyakit yang ditularkan serangga bila disertai demam, misalnya pemeriksaan darah untuk demam berdarah dengue atau malaria di daerah endemis',
+    ],
+    etiologi:
+      'Nyamuk, kutu busuk, pinjal, tungau, semut, serta serangga penyengat berbisa seperti lebah, tawon, dan semut api; reaksi timbul akibat bahan dalam air liur maupun bisa yang disuntikkan.',
+    patofisiologi:
+      'Serangga penggigit menyuntikkan air liur yang mengandung antikoagulan dan protein asing untuk memperlancar pengisapan darah, sedangkan serangga penyengat menyuntikkan bisa yang mengandung enzim dan amina vasoaktif. Protein asing tersebut memicu degranulasi sel mast dan pelepasan histamin sehingga terjadi vasodilatasi, peningkatan permeabilitas kapiler, dan rangsangan saraf gatal — inilah dasar papul urtika dengan titik gigitan di tengahnya. Pada orang yang belum tersensitisasi, reaksi bersifat ringan dan setempat; setelah sensitisasi, gigitan berikutnya menimbulkan reaksi yang lebih besar dan lebih lama, yang menjelaskan mengapa satu orang dalam rumah bereaksi hebat sementara yang lain yang digigit serangga sama tidak merasakan apa pun. Reaksi setempat yang luas diperantarai IgE dan bersifat lambat sehingga memuncak dalam 24-48 jam, tetapi tetap terbatas pada satu area dan tidak berbahaya. Pada sebagian kecil orang, IgE spesifik yang sudah terbentuk memicu degranulasi sel mast secara sistemik sehingga histamin dilepaskan ke seluruh tubuh dan menimbulkan anafilaksis dengan bronkospasme serta kebocoran plasma yang menyebabkan syok — mekanisme inilah yang menjadikan sengatan serangga, meski lukanya sangat kecil, dapat mematikan dalam hitungan menit. Garukan berulang merusak sawar kulit dan membuka jalan bagi infeksi bakteri, serta pada sebagian orang menimbulkan papul menahun yang sangat gatal berupa prurigo.',
+    faktorRisiko: [
+      'Riwayat reaksi sistemik terhadap sengatan sebelumnya — penanda risiko terkuat',
+      'Riwayat atopi pribadi maupun keluarga',
+      'Tinggal atau bekerja di lingkungan dengan banyak serangga, termasuk berkebun, bertani, dan beternak lebah',
+      'Kebersihan tempat tidur dan hunian yang kurang terjaga, serta hewan peliharaan yang tidak dirawat',
+      'Genangan air dan tumpukan sampah di sekitar rumah',
+      'Tidak memakai kelambu, obat nyamuk, maupun pakaian pelindung',
+      'Usia anak yang lebih sering menggaruk sehingga rentan infeksi sekunder',
+      'Pemakaian penyekat beta yang mempersulit penanganan anafilaksis bila terjadi',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari papul urtika yang gatal dengan titik gigitan di tengahnya pada bagian tubuh yang terbuka, disertai riwayat paparan serangga yang sesuai. Yang lebih menentukan daripada penegakan diagnosis itu sendiri adalah penilaian derajat reaksi: reaksi setempat, reaksi setempat yang luas, atau reaksi sistemik — sebab hanya reaksi sistemik yang merupakan kegawatan dan memerlukan epinefrin, sedangkan bengkak setempat yang luas sekalipun tidak.',
+    diagnosisBanding: [
+      'Skabies — gatal HEBAT TERUTAMA MALAM HARI, terowongan pada sela jari dan pergelangan tangan, mengenai daerah tertutup, dan ada anggota keluarga serumah dengan keluhan serupa',
+      'Urtikaria akut — bentol berpindah-pindah tanpa titik gigitan di tengah, setiap lesi hilang dalam kurang dari 24 jam',
+      'Dermatitis kontak — lesi mengikuti area kontak bahan dengan batas tegas, tanpa punctum',
+      'Varisela — vesikel dalam berbagai stadium disertai demam, mengenai badan dan wajah termasuk kulit kepala',
+      'Prurigo nodularis — papul dan nodul menahun yang sangat gatal akibat garukan berulang, kerap merupakan kelanjutan dari gigitan serangga yang tidak tertangani',
+      'Impetigo — krusta kuning keemasan tanpa titik gigitan; dapat pula merupakan infeksi sekunder di atas bekas gigitan',
+      'Dermatitis herpetiformis — papulovesikel sangat gatal yang simetris pada siku, lutut, dan bokong, berkaitan dengan penyakit seliak',
+      'Erupsi obat — riwayat obat yang jelas dengan sebaran menyeluruh, tanpa punctum',
+    ],
+    pengkajian:
+      'Dipikirkan reaksi gigitan serangga pada pasien ini atas dasar munculnya papul urtika yang sangat gatal dengan titik gigitan yang masih dapat dikenali di tengah lesi, tersebar pada bagian tubuh yang terbuka dan tidak tertutup pakaian, timbul setelah paparan yang sesuai baik menurut waktu maupun tempat. Adanya punctum dan sebaran yang terbatas pada area terbuka merupakan dua petunjuk yang paling menentukan. Skabies merupakan banding utama dan disingkirkan karena gatal pada kasus ini tidak memberat khas pada malam hari, tidak ditemukan terowongan pada sela jari maupun pergelangan tangan, lesi justru berada pada daerah terbuka alih-alih daerah tertutup, dan tidak ada anggota keluarga serumah dengan keluhan serupa — perbedaan ini penting karena skabies menuntut pengobatan seluruh penghuni rumah sekaligus. Urtikaria akut disingkirkan karena lesi pada kasus ini menetap di tempat yang sama selama beberapa hari dan memiliki titik gigitan, sedangkan bentol urtikaria berpindah-pindah dan hilang dalam kurang dari 24 jam tanpa bekas. Dermatitis kontak tidak sesuai karena lesi tidak mengikuti area kontak suatu bahan dengan batas tegas. Hal yang dinilai lebih dahulu pada kasus ini sesungguhnya bukan jenis serangganya, melainkan derajat reaksinya: tidak ditemukan bentol menyeluruh di luar tempat gigitan, tidak ada sesak, suara serak, bengkak lidah, maupun penurunan tekanan darah, sehingga reaksi masih terbatas pada kulit dan cukup ditangani dengan antihistamin serta kortikosteroid topikal. Perlu ditegaskan bahwa pembengkakan setempat yang luas sekalipun bukan anafilaksis dan tidak dengan sendirinya memerlukan epinefrin — kekeliruan menyamakan keduanya sama merugikannya dengan mengabaikan reaksi sistemik yang sesungguhnya.',
+    terapiSuportif: [
+      'BILA ADA TANDA ANAFILAKSIS: epinefrin 0,3-0,5 mg (anak 0,01 mg/kg, maksimal 0,3 mg) larutan 1:1000 intramuskular pada paha bagian luar tengah, diulang tiap 5-15 menit bila perlu — jangan menunda demi memberikan antihistamin maupun kortikosteroid lebih dahulu',
+      'Pada anafilaksis, baringkan pasien dengan tungkai ditinggikan kecuali bila sesak, berikan oksigen aliran tinggi, pasang jalur intravena, dan berikan kristaloid 20 mL/kg bila hipotensi; observasi minimal 4-6 jam karena reaksi dapat kembali muncul',
+      'Cabut sengat lebah yang masih menempel sesegera mungkin dengan menggeser benda tumpul seperti kartu; kecepatan mencabut lebih penting daripada caranya',
+      'Kompres dingin pada lesi selama 10-15 menit beberapa kali sehari untuk mengurangi gatal dan bengkak',
+      'Cuci area gigitan dengan sabun dan air bersih untuk mengurangi risiko infeksi sekunder',
+      'Tinggikan anggota gerak yang bengkak pada reaksi setempat yang luas',
+      'Potong kuku pendek dan gunakan sarung tangan katun saat tidur pada anak untuk mencegah luka akibat garukan',
+    ],
+    tatalaksana: [
+      'Reaksi setempat: kortikosteroid topikal potensi sedang seperti mometason furoat 0,1% sekali sehari selama 5-7 hari; pada wajah dan lipatan gunakan potensi rendah seperti hidrokortison 1%',
+      'Antihistamin H1 oral untuk gatal: setirizin 10 mg atau loratadin 10 mg sekali sehari; antihistamin generasi pertama seperti klorfeniramin maleat dapat dipakai malam hari bila gatal mengganggu tidur',
+      'Reaksi setempat yang luas: kompres dingin, peninggian anggota gerak, kortikosteroid topikal, dan pada kasus berat kortikosteroid oral jangka pendek selama 3-5 hari',
+      'Infeksi sekunder: antibiotik topikal seperti mupirosin pada lesi terbatas, atau antibiotik oral yang mengarah pada kuman kulit seperti sefaleksin maupun kloksasilin bila lesi luas dan disertai tanda sistemik',
+      'Anafilaksis: epinefrin intramuskular sebagai terapi utama; antihistamin dan kortikosteroid hanya terapi tambahan yang TIDAK boleh menggantikannya',
+      'Bekali resep epinefrin autoinjektor beserta latihan cara pakainya pada setiap pasien dengan riwayat reaksi sistemik, bila tersedia',
+      'Rujuk ke spesialis alergi untuk pemeriksaan IgE spesifik dan pertimbangan imunoterapi racun serangga pada pasien dengan riwayat reaksi sistemik terhadap sengatan — imunoterapi ini sangat efektif menurunkan risiko reaksi berat berikutnya',
+      'Bila lesi menetap menahun dan sangat gatal sehingga menjadi prurigo, diperlukan penanganan lebih lanjut termasuk kortikosteroid potensi lebih kuat dan pengendalian sumber gigitan',
+    ],
+    edukasi: [
+      'Jelaskan bahwa lesi umumnya mereda dalam beberapa hari, dan bahwa MENGGARUK adalah penyebab utama infeksi dan bekas hitam yang menetap jauh lebih lama daripada gigitannya sendiri',
+      'AJARKAN TANDA BAHAYA yang mengharuskan ke unit gawat darurat segera tanpa menunggu: sesak napas, suara serak, rasa tercekik, bengkak pada bibir atau lidah, bentol menyeluruh di seluruh tubuh, nyeri perut hebat, muntah, pusing berputar, atau rasa mau pingsan',
+      'Pengendalian sumber di rumah: pasang kelambu dan kasa jendela, kuras dan tutup tempat penampungan air serta kubur barang bekas untuk memberantas sarang nyamuk, cuci seprai dan sarung bantal dengan air panas lalu jemur kasur di bawah sinar matahari bila dicurigai kutu busuk, rawat dan obati hewan peliharaan terhadap pinjal, serta bersihkan tumpukan sampah dan semak di sekitar rumah',
+      'Perlindungan diri: gunakan pakaian lengan panjang dan celana panjang berwarna terang saat berkegiatan di luar terutama pada pagi dan sore hari, oleskan repelan pada kulit yang terbuka sesuai petunjuk pemakaian dan usia, serta jangan memakai parfum maupun pakaian bermotif bunga mencolok di area yang banyak lebah',
+      'Bila didekati lebah atau tawon, jangan mengibaskan tangan maupun berlari panik — gerakan mendadak justru memancing serangan; menjauhlah dengan tenang',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan khusus dan pembatasan tanpa dasar tidak dianjurkan. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, cukupkan protein untuk penyembuhan kulit, perbanyak sayur dan buah, dan minum 8 gelas air per hari. Makan di luar rumah sebaiknya tidak sambil membiarkan minuman manis terbuka karena menarik tawon',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; gatal yang mengganggu tidur ditangani dengan antihistamin yang menyebabkan kantuk sebelum tidur, mandi air suam-suam kuku bukan air panas, kompres dingin sebelum berbaring, serta pakaian tidur katun yang longgar. Gunakan kelambu saat tidur di daerah yang banyak nyamuk',
+      'Pola olahraga: olahraga tetap dianjurkan 30 menit sehari selama 5 hari seminggu dan tidak perlu dihentikan. Bila berolahraga di luar ruangan, pilih pakaian tertutup dan gunakan repelan, hindari berlari di dekat semak berbunga maupun sarang lebah, dan segera mandi setelah berkeringat karena keringat memperberat gatal. PASIEN DENGAN RIWAYAT REAKSI SISTEMIK sebaiknya membawa epinefrin autoinjektor saat berolahraga di luar ruangan dan tidak berolahraga sendirian di tempat terpencil',
+      'Follow up: kontrol dalam 3-7 hari bila keluhan belum membaik; datang lebih awal bila muncul nanah, demam, nyeri bertambah, atau kemerahan yang meluas',
+      'Pasien dengan riwayat reaksi sistemik perlu dirujuk untuk pemeriksaan alergi dan pertimbangan imunoterapi, serta sebaiknya membawa kartu atau gelang penanda alergi',
+    ],
+    komplikasi: [
+      'Infeksi sekunder bakterial berupa impetigo, selulitis, hingga abses',
+      'Anafilaksis dengan obstruksi jalan napas dan syok yang dapat berakibat fatal',
+      'Prurigo nodularis dan likenifikasi akibat garukan menahun',
+      'Hiperpigmentasi pascainflamasi dan jaringan parut',
+      'Gangguan tidur dan penurunan kualitas hidup akibat gatal',
+      'Penularan penyakit melalui vektor seperti demam berdarah dengue, malaria, cikungunya, dan filariasis',
+      'Reaksi toksik akibat sengatan dalam jumlah sangat banyak yang dapat menimbulkan rabdomiolisis dan gagal ginjal',
+    ],
+    prognosis:
+      'Sangat baik pada reaksi setempat, dengan lesi mereda dalam beberapa hari hingga satu minggu tanpa bekas bila tidak digaruk. Reaksi setempat yang luas juga tidak berbahaya meski memerlukan waktu lebih lama. Prognosis sepenuhnya berbeda pada pasien dengan riwayat reaksi sistemik: risiko reaksi berat pada sengatan berikutnya nyata, sehingga penyediaan epinefrin autoinjektor dan pertimbangan imunoterapi menjadi penentu utama keselamatan — imunoterapi racun serangga terbukti menurunkan risiko reaksi sistemik berikutnya secara bermakna. Pada kasus berulang, keberhasilan jangka panjang lebih ditentukan oleh pengendalian sumber serangga di lingkungan daripada oleh pengobatan lesinya.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'WAO2020', 'PPKFKTP2014'],
   },
   'Dermatitis kontak iritan': {
     definisi:
@@ -7062,10 +7581,115 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
   'Vulnus laseratum, punctum': {
-    definisi: 'Luka robek akibat trauma tumpul (laseratum) dan luka tusuk akibat benda runcing (punctum).',
-    diagnosis: ['Nilai mekanisme, waktu kejadian (golden period), kedalaman, kontaminasi, benda asing, dan cedera struktur di bawahnya (tendon, saraf, pembuluh darah); periksa status neurovaskular distal dan riwayat imunisasi tetanus'],
-    tatalaksana: ['Kontrol perdarahan dengan penekanan, anestesi lokal, irigasi dengan NaCl 0,9% bertekanan, debridement jaringan mati, penjahitan primer bila luka bersih dan <6-8 jam (luka kotor/terlambat dibiarkan terbuka atau jahit primer tertunda); profilaksis tetanus sesuai status imunisasi, antibiotik pada luka terkontaminasi'],
-    referensi: ['SKDI2012', 'ATLS2018', 'PPKFKTP2014'],
+    definisi:
+      'Vulnus laseratum adalah luka robek akibat trauma tumpul dengan tepi tidak rata dan sering disertai jembatan jaringan, sedangkan vulnus punctum adalah luka tusuk akibat benda runcing yang kedalamannya melebihi panjang luka di permukaan sehingga kerusakan sesungguhnya kerap jauh lebih besar daripada yang tampak.',
+    anamnesis: {
+      keluhanUtama: 'Luka terbuka yang berdarah setelah terkena benda keras atau tertusuk benda tajam.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: lokasi luka yang tepat, serta tanyakan bagian tubuh mana yang berada di bawahnya — luka di daerah dengan tendon, saraf, pembuluh darah besar, atau sendi mengubah seluruh penanganan. Onset: JAM BERAPA kejadiannya, karena jarak waktu sejak cedera menentukan boleh tidaknya luka dijahit primer. Character: MEKANISME CEDERA HARUS DIRINCI — benda tumpul, benda tajam, gigitan hewan atau manusia, luka tusuk, atau cedera akibat mesin bertekanan tinggi; pada luka tusuk tanyakan panjang dan jenis benda yang menusuk serta apakah benda tersebut sudah tercabut seluruhnya. Radiation: nyeri, baal, atau kesemutan pada bagian yang lebih ujung dari luka yang menandakan cedera saraf. Associations: kelemahan atau ketidakmampuan menggerakkan jari maupun sendi di bawah luka yang menandakan cedera tendon; perdarahan yang menyembur menandakan cedera arteri. Time course: berapa banyak perdarahan sejak kejadian dan apa yang sudah dilakukan. Exacerbating: gerakan memperberat nyeri dan dapat menarik ujung tendon yang putus menjauh. Severity: skala nyeri, jumlah perdarahan, dan hilangnya fungsi.',
+      riwayatPenyakitDahulu:
+        'Diabetes melitus, penyakit pembuluh darah perifer, penyakit ginjal kronik, dan keadaan imunitas menurun yang memperlambat penyembuhan serta menaikkan risiko infeksi. Riwayat gangguan pembekuan darah. Riwayat keloid pada luka sebelumnya. Riwayat operasi atau cedera pada daerah yang sama.',
+      riwayatPenyakitKeluarga:
+        'Riwayat gangguan pembekuan darah dan kecenderungan keloid pada keluarga.',
+      riwayatPengobatan:
+        'Antikoagulan dan antiagregasi trombosit yang memperpanjang perdarahan, kortikosteroid jangka panjang yang menghambat penyembuhan, serta obat imunosupresan. Tanyakan pula apa yang sudah dibubuhkan pada luka sebelum datang, karena kopi bubuk, daun, dan ramuan tradisional lazim dipakai dan harus dibersihkan.',
+      riwayatAlergi:
+        'Riwayat alergi obat, terutama anestesi lokal golongan amida, antibiotik, dan lateks.',
+      riwayatImunisasi:
+        'STATUS IMUNISASI TETANUS WAJIB DITANYAKAN pada setiap luka terbuka: kapan dosis terakhir dan berapa jumlah dosis seumur hidup. Luka tusuk yang dalam, sempit, dan terkontaminasi tanah merupakan luka paling rawan tetanus karena lingkungannya miskin oksigen.',
+      riwayatNutrisi:
+        'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan luka secara bermakna.',
+      riwayatSosialEkonomi:
+        'Pekerjaan dan aktivitas yang berkaitan dengan mekanisme cedera, kebersihan lingkungan tempat kejadian, kemampuan merawat luka dan datang kontrol, serta — bila keterangan kejadian tidak sesuai dengan pola luka, atau pada anak, lansia, dan perempuan dengan luka berulang — pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+    },
+    pemeriksaanFisik: [
+      'Nilai jalan napas, pernapasan, dan sirkulasi lebih dulu bila luka besar atau perdarahan banyak; hentikan perdarahan dengan penekanan langsung, bukan dengan torniket sebagai langkah pertama',
+      'PEMERIKSAAN NEUROVASKULAR DISTAL SEBELUM ANESTESI — nilai sensasi, kekuatan motorik, nadi, warna, suhu, dan pengisian kapiler di sebelah ujung luka; setelah anestesi disuntikkan, pemeriksaan ini tidak lagi dapat dipercaya',
+      'Uji fungsi tendon secara aktif satu per satu terhadap tahanan, bukan sekadar meminta pasien menggerakkan tangannya secara umum — tendon yang putus sebagian masih dapat bergerak namun lemah dan nyeri',
+      'Deskripsikan luka: panjang, kedalaman, bentuk tepi, ada tidaknya jembatan jaringan, jaringan mati, dan benda asing',
+      'Pada luka tusuk, JANGAN menilai kedalaman hanya dari ukuran luka di permukaan; telusuri arah tusukan dan pikirkan struktur di bawahnya, dan pada tusukan di dada maupun perut pikirkan penetrasi rongga',
+      'Eksplorasi luka di bawah pencahayaan yang baik dan lapangan yang tidak berdarah untuk mencari benda asing seperti pecahan kaca, serpihan kayu, atau kerikil',
+      'Periksa apakah luka melewati sendi atau menembus kapsul sendi, dan apakah tampak tulang',
+      'Nilai derajat kontaminasi dan waktu sejak cedera karena keduanya menentukan jenis penutupan luka',
+    ],
+    penunjang: [
+      'Sebagian besar luka sederhana tidak memerlukan pemeriksaan penunjang',
+      'Foto polos bila dicurigai benda asing radioopak seperti kaca atau logam, atau bila dicurigai fraktur maupun luka menembus sendi; ingat bahwa kayu dan duri umumnya tidak tampak pada foto polos',
+      'Ultrasonografi bermanfaat untuk mencari benda asing yang tidak radioopak',
+      'Darah lengkap dan golongan darah bila perdarahan banyak',
+      'Gula darah pada pasien diabetes atau luka yang tampak lambat sembuh',
+      'Kultur luka tidak dikerjakan rutin pada luka baru; hanya bila sudah ada tanda infeksi yang tidak membaik',
+    ],
+    etiologi:
+      'Vulnus laseratum akibat benda tumpul yang merobek jaringan hingga melampaui daya regangnya; vulnus punctum akibat benda runcing seperti paku, jarum, duri, pecahan kaca, atau taring hewan.',
+    patofisiologi:
+      'Penyembuhan luka berlangsung melalui fase hemostasis, inflamasi, proliferasi, dan remodeling yang berlangsung hingga berbulan-bulan. Pada vulnus laseratum, tepi luka tidak rata dan sebagian jaringan mengalami memar serta iskemia akibat energi tumpul, sehingga terdapat jaringan mati yang menjadi media pertumbuhan kuman — inilah alasan debridemen dan irigasi jauh lebih menentukan hasil daripada teknik jahitan yang rapi. Pada vulnus punctum, luka di permukaan kecil dan cepat menutup sendiri, sementara saluran luka yang dalam tetap terkontaminasi dan tertutup dari udara; lingkungan miskin oksigen inilah yang ideal bagi kuman anaerob, terutama Clostridium tetani, sehingga luka tusuk yang tampak sepele justru paling rawan tetanus. Kontaminasi bakteri yang melampaui ambang tertentu mengubah luka dari terkontaminasi menjadi terinfeksi, dan risiko ini meningkat seiring waktu sejak cedera — dasar dari konsep golden period. Benda asing yang tertinggal mempertahankan peradangan, menghalangi penutupan, dan menjadi sumber infeksi menahun.',
+    faktorRisiko: [
+      'Luka yang terkontaminasi tanah, kotoran hewan, air kotor, atau bahan organik',
+      'Waktu sejak cedera yang panjang sebelum penanganan',
+      'Luka tusuk dalam dan sempit yang sulit dibersihkan',
+      'Gigitan hewan maupun manusia yang beban kumannya sangat tinggi',
+      'Diabetes melitus, penyakit pembuluh darah perifer, dan keadaan imunitas menurun',
+      'Malnutrisi, usia lanjut, merokok, dan pemakaian kortikosteroid',
+      'Riwayat imunisasi tetanus yang tidak lengkap atau tidak diketahui',
+    ],
+    goldStandard:
+      'Diagnosis luka bersifat klinis; yang menentukan penanganan bukan penamaan lukanya melainkan penilaian empat hal: mekanisme dan waktu cedera, derajat kontaminasi, ada tidaknya benda asing, dan ada tidaknya cedera struktur di bawah luka yang dibuktikan melalui pemeriksaan neurovaskular serta uji fungsi tendon sebelum anestesi diberikan. Pada luka tusuk, kedalaman sejati tidak boleh disimpulkan dari ukuran luka di permukaan.',
+    diagnosisBanding: [
+      'Vulnus scissum (luka iris) — tepi rata tanpa jembatan jaringan, khas benda bermata tajam',
+      'Vulnus morsum (luka gigitan) — beban kuman sangat tinggi, umumnya TIDAK dijahit primer kecuali pada wajah dengan pertimbangan khusus',
+      'Vulnus excoriatum (luka lecet) — hanya mengenai epidermis, tidak memerlukan jahitan',
+      'Luka tembak — memerlukan penanganan dan dokumentasi forensik tersendiri',
+      'Luka akibat suntikan bertekanan tinggi — luka di permukaan tampak sangat kecil namun merupakan kegawatan bedah yang memerlukan eksplorasi segera',
+      'Luka kronik seperti ulkus diabetik atau ulkus vena yang menyerupai luka trauma — riwayat menahun yang membedakan',
+    ],
+    pengkajian:
+      'Dipikirkan vulnus laseratum pada pasien ini atas dasar riwayat benturan dengan benda tumpul yang diikuti terbukanya kulit dengan tepi luka yang tidak rata dan tampaknya jembatan jaringan pada dasar luka — gambaran tepi inilah yang membedakannya dari vulnus scissum akibat benda bermata tajam yang tepinya rata tanpa jembatan jaringan. Pada luka tusuk, penilaian dilakukan dengan kewaspadaan berbeda karena ukuran luka di permukaan tidak mencerminkan kedalaman sesungguhnya, sehingga arah dan panjang benda penusuk ditelusuri dan struktur di bawahnya dipikirkan meskipun luka luar tampak sepele. Pemeriksaan neurovaskular dan uji fungsi tendon dikerjakan lebih dahulu sebelum anestesi lokal disuntikkan, sebab setelah anestesi bekerja pemeriksaan tersebut tidak lagi dapat dipercaya dan cedera tendon maupun saraf dapat terlewat — kekeliruan urutan inilah yang paling sering membuat cedera penyerta luput. Waktu sejak cedera dan derajat kontaminasi dinilai karena keduanya, bukan panjang luka, yang menentukan apakah luka boleh dijahit primer, dibiarkan terbuka, atau dijahit primer tertunda. Vulnus morsum disingkirkan karena tidak ada riwayat gigitan; hal ini penting sebab luka gigitan pada dasarnya tidak dijahit primer akibat beban kumannya yang sangat tinggi. Status imunisasi tetanus ditelusuri pada kasus ini bukan sebagai formalitas melainkan karena luka dengan kontaminasi tanah, terlebih luka tusuk yang dalam dan sempit, merupakan lingkungan yang ideal bagi Clostridium tetani.',
+    terapiSuportif: [
+      'Hentikan perdarahan dengan penekanan langsung dan peninggian anggota gerak; torniket hanya untuk perdarahan arteri yang mengancam jiwa dan tidak dapat dikendalikan, dengan pencatatan waktu pemasangan',
+      'Analgesia yang memadai sebelum tindakan; nyeri yang tidak tertangani membuat irigasi dan eksplorasi tidak dapat dikerjakan dengan benar',
+      'Anestesi lokal dengan lidokain 1-2%; hindari campuran adrenalin pada daerah ujung seperti jari, hidung, telinga, dan penis',
+      'IRIGASI ADALAH TINDAKAN YANG PALING MENURUNKAN RISIKO INFEKSI — gunakan larutan salin 0,9% atau air matang dalam jumlah banyak, sekitar 50-100 mL untuk setiap sentimeter panjang luka, dengan tekanan yang cukup melalui spuit dan kateter',
+      'JANGAN mengguyur luka dengan povidon iodin pekat, hidrogen peroksida, atau alkohol ke dalam jaringan karena bahan-bahan ini merusak sel penyembuh dan justru memperlambat penutupan',
+      'Debridemen jaringan mati dan pengangkatan seluruh benda asing secara menyeluruh',
+      'Tinggikan bagian tubuh yang terkena untuk mengurangi edema, dan imobilisasi bila luka melewati sendi',
+      'Nutrisi tinggi protein dan cukup vitamin C serta zink untuk mendukung penyembuhan',
+    ],
+    tatalaksana: [
+      'Penjahitan primer dilakukan pada luka bersih yang ditangani dalam sekitar 6-8 jam sejak cedera; pada wajah dengan perdarahan yang baik, tenggang waktu ini dapat diperpanjang hingga sekitar 24 jam karena vaskularisasinya sangat kaya',
+      'Luka kotor, terkontaminasi berat, atau yang datang terlambat dibiarkan terbuka dan dirawat dengan penggantian balutan, lalu dijahit primer tertunda pada hari ke-3 sampai ke-5 bila tidak ada tanda infeksi',
+      'LUKA TUSUK UMUMNYA TIDAK DIJAHIT — menutupnya justru memerangkap kuman anaerob di dalam saluran luka; luka dibiarkan terbuka setelah dibersihkan menyeluruh',
+      'Pilihan benang dan waktu pelepasan jahitan: wajah menggunakan benang 5-0 atau 6-0 dan dilepas pada hari ke-5; badan dan lengan menggunakan 4-0 dan dilepas pada hari ke-7 sampai ke-10; tungkai dan punggung menggunakan 3-0 atau 4-0 dan dilepas pada hari ke-10 sampai ke-14',
+      'Profilaksis tetanus sesuai status imunisasi: pada luka bersih dan kecil, berikan toksoid bila dosis terakhir lebih dari 10 tahun; pada luka rawan tetanus, berikan toksoid bila lebih dari 5 tahun, dan tambahkan imunoglobulin tetanus bila riwayat imunisasi tidak lengkap atau tidak diketahui',
+      'ANTIBIOTIK TIDAK DIBERIKAN RUTIN pada luka bersih yang sudah diirigasi dengan baik — irigasi yang benar lebih bermakna daripada antibiotik',
+      'Antibiotik diberikan pada luka gigitan, luka terkontaminasi berat, luka yang menembus sendi atau tulang, luka pada pasien diabetes maupun imunitas menurun, dan luka tusuk pada telapak kaki yang menembus alas sepatu; pilihan umumnya amoksisilin-asam klavulanat',
+      'Rujuk bila terdapat cedera tendon, saraf, atau pembuluh darah besar, luka menembus rongga dada maupun perut, luka pada kelopak mata dengan keterlibatan tepi, luka yang melibatkan saluran air mata atau bibir dengan pergeseran garis bibir, fraktur terbuka, atau luka akibat suntikan bertekanan tinggi',
+      'Dokumentasikan luka secara rinci berupa lokasi, ukuran, bentuk tepi, dan mekanisme — bila kejadian berkaitan dengan tindak pidana, deskripsi ini menjadi dasar visum et repertum atas permintaan resmi penyidik',
+    ],
+    edukasi: [
+      'Jaga luka tetap bersih dan kering pada 24-48 jam pertama; setelah itu luka boleh dibersihkan lembut dengan air bersih, lalu dikeringkan dengan menepuk dan ditutup kembali',
+      'Jangan membubuhkan kopi bubuk, daun, pasta gigi, atau ramuan tradisional pada luka karena meningkatkan risiko infeksi dan tetanus',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; penyembuhan luka menaikkan kebutuhan energi dan protein sehingga porsi tidak boleh dikurangi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe; tambahkan buah sumber vitamin C serta makanan sumber zink seperti kacang-kacangan dan hati, dan minum 8 gelas air per hari. Tidak ada dasar untuk memantang telur maupun ikan pada luka — pantangan seperti ini justru memperlambat penyembuhan',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap, karena hormon pertumbuhan yang berperan pada perbaikan jaringan bekerja terutama saat tidur dalam. Tinggikan bagian tubuh yang terluka dengan bantal saat tidur untuk mengurangi bengkak dan nyeri berdenyut',
+      'Pola olahraga: hindari olahraga berat, berenang, dan berendam sampai jahitan dilepas dan luka menutup rapat. Bila luka pada tungkai, jalan santai ringan tetap dianjurkan dengan bagian yang terluka ditinggikan saat istirahat; bila luka melewati sendi, mulai gerakan sendi ringan sesuai anjuran agar tidak kaku. Aktivitas penuh kembali bertahap sekitar 2 minggu setelah jahitan dilepas',
+      'Berhenti merokok selama masa penyembuhan — merokok menyempitkan pembuluh darah kecil dan merupakan salah satu penghambat penyembuhan luka yang paling kuat',
+      'Setelah luka menutup, lindungi jaringan parut dari sinar matahari selama minimal 6 bulan dengan penutup atau tabir surya untuk mencegah bekas menjadi gelap menetap',
+      'Follow up: kontrol dalam 48 jam untuk menilai tanda infeksi, kemudian sesuai jadwal pelepasan jahitan menurut lokasinya',
+      'TANDA BAHAYA yang mengharuskan datang segera: nyeri yang bertambah hebat, bengkak dan kemerahan yang meluas dari tepi luka, keluar nanah, luka berbau, demam, garis merah yang menjalar ke arah pangkal anggota gerak, atau bagian ujung yang terasa baal, pucat, dan dingin. Kekakuan rahang, kesulitan membuka mulut, atau kaku pada leher dan punggung harus dianggap kegawatan dan memerlukan pertolongan segera',
+    ],
+    komplikasi: [
+      'Infeksi luka lokal, selulitis, abses, hingga sepsis',
+      'Tetanus, terutama pada luka tusuk yang dalam dan terkontaminasi dengan status imunisasi tidak lengkap',
+      'Benda asing yang tertinggal dan menimbulkan peradangan menahun serta luka yang tidak kunjung menutup',
+      'Cedera tendon, saraf, atau pembuluh darah yang terlewat sehingga menimbulkan gangguan fungsi menetap',
+      'Osteomielitis dan artritis septik pada luka yang menembus tulang maupun sendi',
+      'Jaringan parut hipertrofik dan keloid, serta kontraktur pada luka yang melewati sendi',
+      'Dehisensi luka dan penyembuhan yang tertunda pada diabetes, malnutrisi, dan perokok',
+      'Rabies pada luka gigitan hewan yang tidak mendapat penanganan pascapajanan',
+    ],
+    prognosis:
+      'Baik pada luka bersih yang ditangani secara benar dan tepat waktu, dengan penyembuhan dalam 1-2 minggu. Prognosis paling ditentukan oleh mutu irigasi dan debridemen serta ketepatan keputusan menutup atau tidak menutup luka, bukan oleh kerapian jahitan. Luka tusuk memerlukan kewaspadaan lebih besar karena tampilan luarnya kerap jauh lebih ringan daripada kerusakan yang sesungguhnya, dan cedera tendon maupun saraf yang terlewat pada kunjungan pertama merupakan penyebab tersering gangguan fungsi menetap.',
+    referensi: ['SKDI2012', 'ATLS2018', 'SCHWARTZ2019', 'PPKFKTP2014'],
   },
   'Vulnus perforatum, penetratum': {
     definisi: 'Luka tembus yang menembus rongga tubuh (perforatum) atau menembus jaringan hingga kedalaman tertentu (penetratum).',
