@@ -49,6 +49,7 @@ const GymEquipment = lazy(() => import('./pages/GymEquipment').then((m) => ({ de
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
+const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
@@ -220,6 +221,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLab />} />
+              <Route path="/owner-analytics" element={<OwnerAnalytics />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/fitness-test" element={<FitnessTest />} />
