@@ -89,6 +89,7 @@ const nav: Nav[] = [
   { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/alat-fitness', label: 'Alat Fitness & Hyrox', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/sports-lab', label: 'Sports Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/connect', label: 'Connect', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/carbon-diet', label: 'Carbon-Footprint Diet', icon: IconLeaf, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/hydration', label: 'Hydration Calculator', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
