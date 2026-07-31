@@ -8249,10 +8249,112 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
 
   // ─── Indera ──────────────────────────────────────────────────────────────
   'Benda asing di konjungtiva': {
-    definisi: 'Partikel asing yang menempel pada konjungtiva, sering di forniks atau di bawah kelopak mata atas.',
-    diagnosis: ['Rasa mengganjal, mata merah, berair, blefarospasme; WAJIB eversi kelopak mata atas untuk mencari benda asing tersembunyi; nilai tajam penglihatan dan singkirkan trauma tembus'],
-    tatalaksana: ['Anestesi topikal, irigasi atau angkat dengan lidi kapas basah/jarum tumpul, antibiotik topikal setelahnya; rujuk bila benda asing menempel di kornea, tertanam dalam, atau curiga penetrasi bola mata'],
-    referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
+    definisi:
+      'Menempelnya benda dari luar pada permukaan konjungtiva, tersering pada konjungtiva tarsal kelopak atas maupun forniks, yang menimbulkan rasa mengganjal dan iritasi mekanis; termasuk kegawatan mata ringan yang dapat ditangani di layanan primer selama tidak menembus bola mata.',
+    anamnesis: {
+      keluhanUtama: 'Mata terasa kemasukan sesuatu, perih, dan berair setelah terkena debu atau serpihan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: satu mata; pasien sering dapat menunjuk sisi mana yang terasa mengganjal. Onset: MENDADAK DAN JELAS WAKTUNYA — riwayat yang tegas inilah yang paling mengarahkan. Character: rasa mengganjal seperti tertusuk yang BERTAMBAH SETIAP KALI BERKEDIP, karena benda pada konjungtiva tarsal kelopak atas menyapu kornea pada setiap kedipan. Radiation: tidak khas. Associations: mata berair, merah, dan silau; TANYAKAN MEKANISME CEDERANYA SECARA RINCI — bila benda datang dengan kecepatan tinggi seperti saat menggerinda, memalu logam, atau ledakan, maka kemungkinan benda asing menembus bola mata harus dianggap ada sampai terbukti sebaliknya, dan pasien seperti ini tidak boleh sekadar dibersihkan matanya lalu dipulangkan. Time course: keluhan menetap sampai bendanya dikeluarkan. Exacerbating: berkedip dan menggosok mata. Relieving: memejamkan mata. Severity: nilai adanya penurunan penglihatan yang menandakan keterlibatan kornea maupun bagian dalam mata.',
+      riwayatPenyakitDahulu:
+        'Riwayat operasi mata, trauma mata sebelumnya, kelainan refraksi, dan pemakaian lensa kontak. Diabetes melitus yang memperlambat penyembuhan epitel.',
+      riwayatPenyakitKeluarga: 'Tidak relevan.',
+      riwayatPengobatan:
+        'Tetes mata yang sudah dipakai sendiri sebelum datang; tanyakan khusus pemakaian tetes yang mengandung kortikosteroid, karena berbahaya bila ada luka kornea maupun infeksi.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama anestesi topikal dan antibiotik tetes.',
+      riwayatImunisasi:
+        'Status imunisasi tetanus, karena cedera mata dengan benda kotor termasuk luka yang berisiko tetanus.',
+      riwayatSosialEkonomi:
+        'PEKERJAAN DAN PENGGUNAAN ALAT PELINDUNG MATA merupakan inti anamnesis pada kasus ini — tukang las, penggerinda, pekerja bengkel, pekerja kayu, dan petani berisiko tinggi, dan sebagian besar kejadian dapat dicegah sepenuhnya dengan kacamata pelindung. Tanyakan pula apakah kejadian ini berulang.',
+    },
+    pemeriksaanFisik: [
+      'PERIKSA DAN CATAT TAJAM PENGLIHATAN SEBELUM TINDAKAN APA PUN — ini penting secara klinis sekaligus secara medikolegal pada cedera mata',
+      'Teteskan anestesi topikal agar pemeriksaan dapat dikerjakan dengan tuntas; tanpa itu pasien tidak akan mampu membuka mata dengan baik',
+      'BALIK KELOPAK MATA ATAS (eversi) — LANGKAH YANG PALING SERING DILEWATKAN DAN PALING SERING MENJADI JAWABAN, karena benda asing tersering tersembunyi pada konjungtiva tarsal kelopak atas; tanpa eversi, benda tersebut tidak akan pernah terlihat',
+      'Periksa pula forniks atas dan bawah dengan menarik kelopak, serta seluruh permukaan konjungtiva bulbi',
+      'Periksa kornea dengan cermat: cari benda asing, luka, dan cincin karat bila bendanya berupa logam',
+      'PEWARNAAN FLUORESEIN untuk menampakkan erosi kornea; goresan linier vertikal yang berjajar (ice rink sign) merupakan tanda khas adanya benda asing yang masih tertinggal di bawah kelopak atas',
+      'Nilai tanda benda asing menembus bola mata: pupil tidak bulat, bilik mata depan dangkal maupun berisi darah, tekanan bola mata rendah, luka pada kornea maupun sklera, dan uji Seidel positif berupa aliran cairan jernih yang mengencerkan fluoresein',
+      'Nilai refleks pupil dan periksa funduskopi bila memungkinkan; bandingkan dengan mata sebelahnya',
+    ],
+    penunjang: [
+      'Pada benda asing konjungtiva sederhana, tidak diperlukan pemeriksaan penunjang',
+      'FOTO POLOS ORBITA ATAU CT SCAN bila mekanisme cedera berkecepatan tinggi seperti menggerinda maupun memalu logam, meskipun mata tampak tenang dan pasien merasa baik — benda asing intraokular dapat memberi keluhan yang sangat ringan pada awalnya',
+      'CT scan merupakan pemeriksaan pilihan untuk mencari benda asing intraokular; MRI DIHINDARI bila kemungkinan bendanya logam',
+      'Uji Seidel dengan fluoresein sebagai pemeriksaan di tempat untuk membuktikan kebocoran bola mata',
+      'Kultur bila sudah ada tanda infeksi pada luka kornea',
+    ],
+    etiologi:
+      'Debu, pasir, serpihan logam, serbuk gerinda, serpihan kayu, sekam, bulu, dan serangga kecil yang masuk ke mata; sebagian besar berkaitan dengan pekerjaan maupun aktivitas di luar ruangan tanpa pelindung mata.',
+    patofisiologi:
+      'Benda asing yang masuk umumnya terperangkap pada konjungtiva tarsal kelopak atas atau pada forniks, karena kedua tempat itu merupakan cekungan alami tempat partikel tertahan saat mata berkedip. Setiap kedipan menyeret benda tersebut melintasi permukaan kornea, sehingga menimbulkan goresan epitel berulang yang khasnya berbentuk garis-garis lurus sejajar mengikuti arah gerakan kelopak — inilah dasar tanda goresan berjajar pada pewarnaan fluoresein, dan mengapa temuan goresan seperti itu harus dianggap sebagai bukti masih adanya benda asing yang belum ditemukan. Kerusakan epitel merangsang ujung saraf kornea yang sangat padat sehingga menimbulkan nyeri hebat dan air mata refleks, serta memicu vasodilatasi pembuluh konjungtiva yang membuat mata merah. Epitel kornea memiliki daya pulih yang cepat dan umumnya menutup dalam 24-48 jam setelah penyebabnya dihilangkan, sehingga keluhan mereda dengan cepat begitu benda dikeluarkan. Benda asing dari logam yang menempel lama melepaskan besi yang teroksidasi dan meninggalkan cincin karat pada jaringan sekitarnya, yang tetap mempertahankan peradangan meski benda utamanya sudah diangkat. Berbeda dari itu, benda berkecepatan tinggi dapat menembus dinding bola mata dan masuk ke dalamnya dengan luka masuk yang sangat kecil dan nyeri yang justru ringan — keadaan yang menipu dan menjadi alasan mekanisme cedera harus selalu ditanyakan.',
+    faktorRisiko: [
+      'Pekerjaan menggerinda, mengelas, memalu logam, pertukangan kayu, dan bertani tanpa pelindung mata',
+      'Berkendara sepeda motor tanpa kaca helm maupun kacamata',
+      'Berada di lingkungan berdebu dan berangin',
+      'Pemakaian lensa kontak yang mempermudah terperangkapnya partikel',
+      'Anak yang bermain dengan pasir maupun benda kecil',
+      'Kebiasaan menggosok mata saat kemasukan sesuatu, yang justru menggeser benda dan memperluas goresan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dengan menemukan benda asing secara langsung, dan hal itu mengharuskan pembalikan kelopak mata atas serta pemeriksaan forniks — tanpa langkah ini benda asing tersering justru tidak akan terlihat. Pewarnaan fluoresein membuktikan kerusakan epitel dan pola goresan linier berjajar merupakan petunjuk kuat bahwa masih ada benda yang tertinggal. Yang sama pentingnya adalah menyingkirkan benda asing yang menembus bola mata melalui mekanisme cedera, pemeriksaan tanda perforasi, dan uji Seidel.',
+    diagnosisBanding: [
+      'Benda asing pada kornea — melekat pada kornea itu sendiri, sering disertai cincin karat bila berupa logam',
+      'BENDA ASING INTRAOKULAR — mekanisme berkecepatan tinggi, luka masuk kecil, keluhan dapat ringan dan menipu; merupakan kegawatan yang tidak boleh terlewat',
+      'Erosi kornea tanpa benda asing — riwayat tergores kuku, ranting, maupun ujung kertas',
+      'Konjungtivitis akut — mengenai kedua mata, disertai sekret, tanpa riwayat kemasukan benda',
+      'Keratitis dan ulkus kornea — kekeruhan kornea dengan perjalanan lebih lambat',
+      'Trikiasis dan entropion — rasa mengganjal MENAHUN akibat bulu mata yang menggesek, bukan mendadak',
+      'Mata kering — rasa berpasir pada kedua mata yang berulang tanpa riwayat cedera',
+      'Luka bakar kimia pada mata — memerlukan irigasi segera sebelum tindakan apa pun',
+    ],
+    pengkajian:
+      'Dipikirkan benda asing pada konjungtiva pada pasien ini atas dasar riwayat yang tegas berupa mata kemasukan sesuatu dengan waktu kejadian yang jelas, diikuti rasa mengganjal seperti tertusuk yang bertambah setiap kali berkedip, disertai mata berair, merah, dan silau pada satu mata. Bertambahnya nyeri saat berkedip merupakan petunjuk yang sangat mengarahkan, sebab menggambarkan benda yang tertahan pada konjungtiva tarsal kelopak atas dan menyapu kornea pada setiap kedipan. Langkah yang menentukan pada kasus ini bukanlah pemilihan obat melainkan pembalikan kelopak mata atas — tindakan sederhana yang paling sering dilewatkan dan justru paling sering menjadi jawaban, karena tanpa eversi benda asing yang tersembunyi di sana tidak akan pernah terlihat dan pasien akan pulang dengan tetes mata sementara penyebabnya masih tertinggal. Pewarnaan fluoresein pada kasus ini memperlihatkan goresan linier vertikal yang berjajar pada kornea, dan pola tersebut bukan sekadar tanda kerusakan melainkan bukti bahwa masih ada benda yang belum ditemukan. Konjungtivitis akut disingkirkan karena keluhan mengenai satu mata, timbul mendadak setelah kejadian yang jelas, dan tidak disertai sekret bernanah. Trikiasis dan mata kering disingkirkan karena keluhan bersifat mendadak alih-alih menahun. Yang paling penting dan tidak boleh dilewatkan adalah menyingkirkan benda asing yang menembus bola mata: mekanisme cedera ditanyakan secara rinci, sebab benda yang datang dengan kecepatan tinggi saat menggerinda atau memalu logam dapat masuk ke dalam bola mata melalui luka yang sangat kecil dengan keluhan yang justru ringan dan mata yang tampak tenang. Pada kasus ini pupil bulat, bilik mata depan dalam dan jernih, tekanan bola mata tidak rendah, serta uji Seidel negatif, sehingga perforasi dapat ditinggalkan — namun bila mekanismenya berkecepatan tinggi, pencitraan tetap dikerjakan meskipun seluruh pemeriksaan tampak normal.',
+    terapiSuportif: [
+      'Bila ada kemungkinan bahan kimia, IRIGASI LEBIH DAHULU dengan larutan salin maupun air bersih dalam jumlah banyak selama minimal 15-30 menit sebelum melakukan pemeriksaan lain',
+      'Anestesi topikal untuk memungkinkan pemeriksaan dan tindakan; JANGAN diberikan kepada pasien untuk dipakai sendiri di rumah karena menghambat penyembuhan epitel dan menutupi gejala yang memburuk',
+      'Irigasi dengan larutan salin sering sudah cukup untuk mengeluarkan partikel yang tidak melekat',
+      'Cegah pasien menggosok mata, karena hal itu menggeser benda dan memperluas goresan',
+      'Analgesik oral untuk nyeri setelah tindakan',
+      'Kompres dingin bila ada pembengkakan kelopak',
+    ],
+    tatalaksana: [
+      'Keluarkan benda asing setelah anestesi topikal dengan lidi kapas basah untuk benda pada konjungtiva; benda yang melekat pada kornea memerlukan jarum khusus maupun rujukan',
+      'Periksa ulang seluruh permukaan setelah pengangkatan, termasuk mengulangi eversi kelopak atas, karena BENDA ASING KERAP LEBIH DARI SATU',
+      'Ulangi pewarnaan fluoresein setelah tindakan untuk memastikan tidak ada goresan linier yang tersisa sebagai petunjuk benda yang belum ditemukan',
+      'Antibiotik topikal seperti kloramfenikol maupun salep antibiotik selama 3-5 hari untuk mencegah infeksi pada epitel yang terluka',
+      'Sikloplegik jangka pendek bila ada erosi kornea yang luas dan nyeri hebat, untuk mengurangi kejang otot siliaris',
+      'Balut tekan tidak lagi dianjurkan secara rutin pada erosi kornea kecil dan TIDAK BOLEH dipakai bila cederanya berkaitan dengan bahan organik maupun lensa kontak karena meningkatkan risiko infeksi',
+      'Profilaksis tetanus sesuai status imunisasi bila benda asing kotor dan ada luka',
+      'JANGAN memberikan tetes yang mengandung kortikosteroid pada luka kornea yang belum menutup',
+      'Rujuk segera bila benda asing melekat pada kornea di daerah tengah, ada cincin karat, ada tanda perforasi, uji Seidel positif, penurunan tajam penglihatan, mekanisme berkecepatan tinggi, atau bila benda tidak dapat ditemukan meski keluhan menetap',
+      'Pada kecurigaan perforasi: JANGAN menekan bola mata dan jangan mencoba mengeluarkan benda yang menancap; tutup mata dengan pelindung kaku tanpa penekanan, puasakan pasien, berikan antibiotik sistemik, dan rujuk segera',
+    ],
+    edukasi: [
+      'Jelaskan bahwa nyeri dan rasa mengganjal masih dapat terasa selama 24-48 jam setelah benda dikeluarkan karena epitel kornea perlu waktu menutup — bukan berarti masih ada benda yang tertinggal',
+      'JANGAN MENGGOSOK MATA saat kemasukan sesuatu; berkediplah beberapa kali, biarkan air mata mengalir, atau bilas dengan air bersih mengalir',
+      'Jangan mencoba mengeluarkan benda yang menancap dengan pinset, jarum, peniti, maupun ujung kain di rumah',
+      'Jangan menggunakan tetes anestesi berulang kali; obat ini menghilangkan rasa sakit namun menghambat penyembuhan dan menyembunyikan tanda bahaya',
+      'PENCEGAHAN ADALAH INTI EDUKASI: gunakan kacamata pelindung yang sesuai standar saat menggerinda, mengelas, memalu, bertukang kayu, dan bekerja di tempat berdebu. Sebagian besar kejadian ini sepenuhnya dapat dicegah, dan pasien yang datang sekali dengan keluhan ini berisiko tinggi datang lagi bila kebiasaannya tidak berubah',
+      'Gunakan kaca helm atau kacamata saat berkendara sepeda motor',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, cukupkan protein serta vitamin A dan C untuk mempercepat penyembuhan permukaan mata, dan minum 8 gelas air per hari',
+      'Jam tidur: 7-8 jam per malam; tidur dengan cukup membantu penyembuhan epitel. Gunakan salep antibiotik sebelum tidur bila diresepkan, dan jangan mengucek mata saat bangun tidur',
+      'Pola olahraga: aktivitas ringan boleh diteruskan, namun HINDARI berenang, berendam, dan olahraga di tempat berdebu maupun berangin selama 48-72 jam sampai luka kornea menutup, karena epitel yang belum utuh sangat rentan infeksi. Hindari olahraga kontak selama beberapa hari, jangan memakai lensa kontak sampai dinyatakan sembuh, dan gunakan pelindung mata saat kembali berolahraga',
+      'Follow up: kontrol dalam 24 jam bila ada erosi kornea untuk memastikan luka menutup dan tidak ada infeksi',
+      'TANDA BAHAYA yang mengharuskan segera kembali: nyeri yang bertambah hebat alih-alih berkurang setelah 24 jam, penglihatan menurun, mata bertambah merah, keluar nanah, bercak putih pada bagian bening mata, atau silau yang memberat',
+    ],
+    komplikasi: [
+      'Erosi kornea dan erosi kornea berulang',
+      'Keratitis dan ulkus kornea akibat infeksi sekunder',
+      'Jaringan parut kornea dengan penurunan penglihatan menetap bila mengenai bagian tengah',
+      'Cincin karat yang tertinggal dan mempertahankan peradangan pada benda asing logam',
+      'Benda asing intraokular yang terlewat dengan risiko endoftalmitis, siderosis akibat besi, dan kebutaan',
+      'Endoftalmitis pada cedera menembus, terutama bila bahannya organik',
+      'Perlambatan penyembuhan dan ulkus akibat pemakaian anestesi topikal berulang',
+      'Kekambuhan pada pekerja yang tidak menggunakan pelindung mata',
+    ],
+    prognosis:
+      'Sangat baik pada benda asing konjungtiva sederhana — epitel menutup dalam 24-48 jam setelah benda dikeluarkan dan keluhan hilang tanpa meninggalkan bekas. Yang menentukan hasil bukan sulitnya tindakan melainkan kelengkapan pemeriksaan: melewatkan pembalikan kelopak atas berarti benda tertinggal dan keluhan berlanjut, sedangkan melewatkan mekanisme cedera berkecepatan tinggi berarti benda asing intraokular tidak terdeteksi pada mata yang tampak tenang, dan hal itu dapat berakhir dengan kehilangan penglihatan. Dari sisi kesehatan kerja, hampir seluruh kejadian ini dapat dicegah dengan kacamata pelindung, sehingga edukasi pencegahan bernilai lebih besar daripada tindakannya sendiri.',
+    referensi: ['SKDI2012', 'KANSKI2020', 'ATLS2018', 'PPKFKTP2014'],
   },
   'Pterigium': {
     definisi: 'Pertumbuhan jaringan fibrovaskular konjungtiva berbentuk segitiga yang menjalar ke kornea, terkait paparan UV kronik.',
@@ -8363,9 +8465,117 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Mata kering': {
-    definisi: 'Dry eye disease — gangguan film air mata akibat produksi kurang atau evaporasi berlebihan.',
-    diagnosis: ['Rasa berpasir, perih, terbakar, mata lelah, kadang justru berair berlebihan (refleks); uji Schirmer menurun, tear break-up time memendek; cari faktor: usia, layar, lensa kontak, obat antikolinergik, sindrom Sjögren'],
-    tatalaksana: ['Air mata buatan (preservative-free bila sering dipakai), kompres hangat dan pembersihan kelopak bila disfungsi kelenjar Meibom, aturan 20-20-20 saat kerja layar, hindari AC/kipas langsung ke wajah; siklosporin topikal pada kasus sedang-berat; evaluasi penyakit autoimun bila disertai mulut kering'],
+    definisi:
+      'Penyakit multifaktorial permukaan mata akibat hilangnya keseimbangan lapisan air mata, ditandai peningkatan osmolaritas air mata dan peradangan permukaan mata, sehingga menimbulkan rasa tidak nyaman dan gangguan penglihatan yang hilang timbul.',
+    anamnesis: {
+      keluhanUtama: 'Mata terasa berpasir, perih, dan cepat lelah; kadang justru berair.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: kedua mata, dirasakan pada permukaan mata bukan di dalam bola mata. Onset: perlahan dan menahun. Character: rasa berpasir, mengganjal, panas, perih, dan berat pada kelopak; PARADOKS YANG KHAS ADALAH MATA JUSTRU BERAIR BERLEBIHAN — air mata refleks yang encer keluar sebagai reaksi terhadap kekeringan, sehingga keluhan mata berair tidak menyingkirkan diagnosis ini melainkan sering justru menandakannya. Radiation: rasa lelah menjalar ke sekitar mata dan dahi. Associations: penglihatan kabur yang HILANG TIMBUL DAN MEMBAIK SETELAH BERKEDIP — tanda yang sangat khas karena lapisan air mata yang pecah membuat permukaan optik tidak rata; tanyakan pula silau, sulit memakai lensa kontak, mulut kering, dan nyeri sendi yang mengarah pada sindrom Sjogren. Time course: MEMBERAT PADA SORE DAN MALAM HARI setelah seharian bekerja, berbeda dari blefaritis yang justru paling berat saat bangun tidur. Exacerbating: menatap layar lama karena frekuensi berkedip menurun, kipas angin dan pendingin ruangan yang mengarah ke wajah, angin, asap rokok, dan udara kering. Relieving: memejamkan mata, tetes air mata buatan, dan udara lembap. Severity: dampak terhadap pekerjaan, membaca, dan mengemudi.',
+      riwayatPenyakitDahulu:
+        'Penyakit autoimun terutama sindrom Sjogren, artritis reumatoid, dan lupus. Penyakit tiroid dengan mata menonjol sehingga permukaan mata lebih terpapar. Diabetes melitus. Riwayat operasi mata termasuk bedah refraktif dan operasi katarak, serta riwayat radioterapi kepala dan leher. Riwayat blefaritis dan rosasea.',
+      riwayatPenyakitKeluarga: 'Riwayat penyakit autoimun pada keluarga.',
+      riwayatPengobatan:
+        'OBAT SISTEMIK MERUPAKAN PENYEBAB YANG SANGAT SERING DAN MUDAH TERLEWAT: antihistamin, dekongestan, antidepresan, obat antikolinergik, diuretik, penyekat beta, isotretinoin, dan kontrasepsi hormonal. Tanyakan pula tetes mata yang dipakai jangka panjang, khususnya tetes pemerah mata dan tetes berpengawet yang justru memperburuk.',
+      riwayatAlergi: 'Riwayat alergi mata dan rinitis alergika, serta alergi terhadap pengawet dalam tetes mata.',
+      riwayatNutrisi:
+        'Asupan cairan harian dan asupan asam lemak omega-3 dari ikan; kekurangan vitamin A pada keadaan gizi buruk merupakan penyebab kekeringan mata yang berat.',
+      riwayatSosialEkonomi:
+        'LAMA MENATAP LAYAR SETIAP HARI, arah pendingin ruangan dan kipas angin di tempat kerja maupun kamar tidur, paparan asap dan debu, merokok termasuk sebagai perokok pasif, pemakaian lensa kontak beserta lama pemakaiannya, serta pemakaian riasan mata dan cara membersihkannya.',
+    },
+    pemeriksaanFisik: [
+      'Periksa tajam penglihatan; pada mata kering dapat sedikit menurun namun MEMBAIK SETELAH PASIEN BERKEDIP BEBERAPA KALI — pemeriksaan sederhana yang sangat mendukung diagnosis',
+      'Nilai frekuensi berkedip dan kesempurnaan penutupan kelopak; penutupan yang tidak sempurna saat tidur menyebabkan kekeringan berat pada bagian bawah kornea',
+      'Periksa tepi kelopak dan muara kelenjar Meibom: penyumbatan, sekret seperti pasta gigi saat ditekan, telangiektasia, dan krusta pada pangkal bulu mata yang menandakan blefaritis — disfungsi kelenjar Meibom merupakan penyebab tersering mata kering dan harus dicari secara aktif',
+      'Nilai tinggi meniskus air mata pada tepi kelopak bawah; meniskus yang tipis menandakan produksi air mata yang kurang',
+      'UJI WAKTU PECAH LAPISAN AIR MATA (tear break-up time) dengan fluoresein: nilai kurang dari 10 detik menandakan lapisan air mata tidak stabil',
+      'Pewarnaan fluoresein untuk menilai kerusakan permukaan kornea berupa keratitis pungtata superfisial, terutama pada bagian bawah',
+      'UJI SCHIRMER: kertas saring diletakkan pada forniks bawah selama 5 menit; hasil kurang dari 10 mm menandakan produksi air mata berkurang, dan kurang dari 5 mm menandakan kekurangan yang berat',
+      'Periksa konjungtiva untuk bercak Bitot yang menandakan kekurangan vitamin A, serta nilai sensasi kornea',
+    ],
+    penunjang: [
+      'Diagnosis pada dasarnya klinis; uji waktu pecah lapisan air mata, pewarnaan fluoresein, dan uji Schirmer merupakan pemeriksaan di tempat yang sudah memadai di layanan primer',
+      'Pemeriksaan dengan lampu celah untuk menilai permukaan mata secara rinci',
+      'Pemeriksaan autoimun berupa antibodi anti-Ro dan anti-La, faktor reumatoid, dan ANA bila dicurigai sindrom Sjogren, terutama bila disertai mulut kering dan nyeri sendi',
+      'Fungsi tiroid bila ada mata menonjol maupun tanda penyakit tiroid',
+      'Pengukuran osmolaritas air mata dan penanda peradangan bila tersedia, meskipun tidak diperlukan untuk penanganan sehari-hari',
+      'Gula darah bila ada faktor risiko diabetes',
+    ],
+    etiologi:
+      'Dua mekanisme yang sering berjalan bersama: berkurangnya produksi air mata (defisiensi akuos) seperti pada sindrom Sjogren, usia lanjut, dan obat; serta penguapan berlebihan (evaporatif) akibat disfungsi kelenjar Meibom, jarangnya berkedip, dan paparan lingkungan — mekanisme evaporatif merupakan yang tersering.',
+    patofisiologi:
+      'Lapisan air mata terdiri atas tiga komponen yang saling bergantung: lapisan lipid dari kelenjar Meibom di tepi kelopak yang menghambat penguapan, lapisan akuos dari kelenjar lakrimal, dan lapisan musin dari sel goblet konjungtiva yang membuat air mata melekat merata pada permukaan kornea. Gangguan pada salah satu lapisan membuat lapisan air mata cepat pecah, sehingga permukaan kornea tidak lagi rata secara optik — inilah dasar mengapa penglihatan menjadi kabur namun membaik seketika setelah berkedip, karena berkedip membentuk kembali lapisan tersebut. Kekeringan meningkatkan osmolaritas air mata, yang merangsang pelepasan sitokin proinflamasi dan merusak sel epitel serta sel goblet. Kerusakan sel goblet mengurangi musin, yang membuat lapisan air mata makin cepat pecah — sebuah lingkaran yang memberi makan dirinya sendiri, dan alasan mengapa penanganan mata kering yang sudah berlangsung lama memerlukan pengendalian peradangan, bukan sekadar penambahan cairan. Kerusakan epitel merangsang ujung saraf kornea sehingga timbul rasa berpasir sekaligus memicu air mata refleks yang encer dan miskin lipid; air mata ini menetes keluar tanpa memperbaiki keadaan, sehingga pasien mengeluh mata berair padahal sesungguhnya kekurangan air mata yang bermutu. Menatap layar menurunkan frekuensi berkedip hingga sepertiganya, memperpanjang waktu permukaan mata terpapar udara, dan menjadi penyebab yang makin lazim.',
+    faktorRisiko: [
+      'Usia lanjut dan jenis kelamin perempuan, terutama setelah menopause',
+      'Menatap layar dalam waktu lama',
+      'Pendingin ruangan, kipas angin yang mengarah ke wajah, dan lingkungan berdebu maupun berasap',
+      'Pemakaian lensa kontak',
+      'Obat antihistamin, antidepresan, antikolinergik, diuretik, dan isotretinoin',
+      'Penyakit autoimun terutama sindrom Sjogren',
+      'Disfungsi kelenjar Meibom, blefaritis, dan rosasea',
+      'Riwayat bedah refraktif maupun operasi mata lain',
+      'Kekurangan vitamin A dan asupan omega-3 yang rendah',
+      'Merokok termasuk paparan asap sebagai perokok pasif',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dari kombinasi keluhan khas berupa rasa berpasir dan penglihatan kabur yang membaik setelah berkedip, dengan bukti objektif ketidakstabilan lapisan air mata: waktu pecah lapisan air mata kurang dari 10 detik, pewarnaan kornea yang menunjukkan kerusakan epitel, dan uji Schirmer kurang dari 10 mm pada jenis defisiensi akuos. Penegakan diagnosis belum lengkap sebelum ditentukan apakah mekanismenya evaporatif akibat disfungsi kelenjar Meibom atau akibat berkurangnya produksi air mata, sebab keduanya memerlukan penanganan yang berbeda.',
+    diagnosisBanding: [
+      'Blefaritis — krusta pada pangkal bulu mata dengan keluhan PALING BERAT SAAT BANGUN TIDUR, berbeda dari mata kering yang memberat pada sore hari; keduanya sangat sering menyertai satu sama lain',
+      'Konjungtivitis alergika — GATAL merupakan keluhan utama, disertai konjungtiva yang tampak seperti kaca dan gambaran folikel maupun papil',
+      'Konjungtivitis infeksi — sekret nyata, mata merah menyeluruh, dan perjalanan akut',
+      'Keratitis dan erosi kornea — nyeri jauh lebih hebat dengan silau dan penurunan penglihatan yang menetap',
+      'Benda asing pada konjungtiva atau di bawah kelopak atas — rasa mengganjal pada SATU mata dan mendadak; kelopak atas harus dibalik untuk memeriksanya',
+      'Trikiasis dan entropion — bulu mata yang menggesek kornea',
+      'Kekurangan vitamin A — kekeringan berat dengan bercak Bitot dan buta senja, terutama pada anak dengan gizi buruk',
+      'Insufisiensi konvergensi dan kelainan refraksi yang belum terkoreksi sebagai penyebab lain mata cepat lelah',
+    ],
+    pengkajian:
+      'Dipikirkan mata kering pada pasien ini atas dasar keluhan menahun berupa rasa berpasir dan mengganjal pada kedua mata yang memberat pada sore hari setelah seharian menatap layar, disertai penglihatan kabur yang hilang timbul dan membaik seketika setelah berkedip. Gambaran kabur yang pulih dengan berkedip merupakan petunjuk yang sangat khas karena mencerminkan lapisan air mata yang pecah sehingga permukaan kornea kehilangan kerataan optiknya, dan pemeriksaan itu dapat dikerjakan tanpa alat apa pun. Keluhan mata berair yang juga dirasakan pasien tidak menyingkirkan diagnosis dan justru mendukungnya, sebab air mata refleks yang encer dan miskin lipid keluar sebagai reaksi terhadap kekeringan tanpa memperbaiki keadaan — paradoks yang kerap membuat penyakit ini keliru dianggap sebagai infeksi. Blefaritis merupakan banding sekaligus penyerta yang paling sering, dan pola waktunya membedakan keduanya: blefaritis paling berat saat bangun tidur sedangkan mata kering paling berat pada sore hari; pemeriksaan tepi kelopak dan muara kelenjar Meibom tetap wajib karena disfungsi kelenjar tersebut merupakan penyebab mata kering yang tersering dan menentukan pilihan terapi. Konjungtivitis alergika disingkirkan karena gatal bukan keluhan yang mendominasi pada kasus ini, sedangkan konjungtivitis infeksi disingkirkan karena tidak ada sekret nyata dan perjalanannya menahun alih-alih akut. Keratitis dan benda asing disingkirkan karena keluhan mengenai kedua mata, tidak ada nyeri hebat maupun silau yang menetap, dan kornea tampak jernih. Yang menentukan arah pengobatan pada kasus ini bukan sekadar menegakkan diagnosis melainkan memilah mekanismenya: bila penyebabnya penguapan berlebih akibat kelenjar Meibom, kompres hangat dan pembersihan tepi kelopak justru lebih menentukan daripada tetes air mata buatan. Obat sistemik yang sedang diminum ditelusuri secara khusus karena antihistamin dan golongan antikolinergik sangat sering menjadi penyebab namun hampir tidak pernah dilaporkan pasien sebagai penyebab keluhan matanya.',
+    terapiSuportif: [
+      'KOMPRES HANGAT pada kelopak selama 5-10 menit dua kali sehari, dilanjutkan pemijatan lembut tepi kelopak ke arah muara kelenjar — inilah terapi utama pada mata kering jenis evaporatif akibat disfungsi kelenjar Meibom',
+      'Bersihkan tepi kelopak dan pangkal bulu mata dengan sampo bayi yang sangat encer atau pembersih kelopak khusus',
+      'Sadari untuk berkedip penuh secara berkala saat bekerja dengan layar; terapkan aturan 20-20-20',
+      'Turunkan posisi layar sedikit di bawah tinggi mata sehingga kelopak lebih menutup dan permukaan mata yang terpapar berkurang',
+      'Jauhkan arah kipas angin dan pendingin ruangan dari wajah, terutama saat tidur; gunakan pelembap ruangan bila udara sangat kering',
+      'Gunakan kacamata yang menutup sisi samping saat berada di luar ruangan yang berangin dan berdebu',
+      'Berhenti merokok dan hindari paparan asap',
+      'Cukupkan asupan cairan dan pertimbangkan penambahan asupan asam lemak omega-3',
+    ],
+    tatalaksana: [
+      'Air mata buatan sebagai terapi dasar, digunakan secara TERJADWAL dan bukan hanya saat terasa tidak nyaman — misalnya 4-6 kali sehari pada kasus sedang',
+      'PILIH SEDIAAN TANPA PENGAWET bila pemakaian lebih dari 4-6 kali sehari, karena pengawet benzalkonium klorida merusak epitel kornea dan memperburuk penyakit dalam jangka panjang',
+      'Gel atau salep mata pada malam hari bila keluhan berat atau bila kelopak tidak menutup sempurna saat tidur',
+      'JANGAN GUNAKAN TETES PEMERAH MATA yang mengandung vasokonstriktor — obat ini hanya memucatkan pembuluh darah, tidak mengobati kekeringan, dan menimbulkan kemerahan berulang yang lebih hebat setelah dihentikan',
+      'Disfungsi kelenjar Meibom: kompres hangat dan pembersihan kelopak sebagai terapi utama; pada kasus sedang hingga berat dapat ditambahkan doksisiklin dosis rendah maupun azitromisin oral atas pertimbangan efek antiperadangannya',
+      'Siklosporin A topikal maupun kortikosteroid topikal jangka pendek untuk mengendalikan peradangan pada kasus sedang hingga berat, dengan pengawasan tekanan bola mata',
+      'Tinjau ulang obat sistemik yang menjadi penyebab bersama dokter yang meresepkan; mengganti antihistamin yang tidak lagi diperlukan sering memberi perbaikan lebih besar daripada menambah tetes mata',
+      'Sumbat pungtum lakrimal dipertimbangkan pada defisiensi akuos yang tidak membaik dengan terapi baku, dan bukan wewenang layanan primer',
+      'Tangani penyakit yang mendasari seperti sindrom Sjogren, penyakit tiroid, dan rosasea',
+      'Rujuk bila ada penurunan penglihatan yang menetap, kerusakan kornea yang bermakna, kecurigaan sindrom Sjogren, tidak membaik dengan terapi baku, atau bila kelopak tidak menutup sempurna',
+    ],
+    edukasi: [
+      'Jelaskan bahwa ini adalah penyakit MENAHUN yang dikendalikan, bukan disembuhkan sekali jalan; keluhan dapat hilang timbul dan terapi rumatan tetap diperlukan',
+      'Jelaskan bahwa mata yang berair justru dapat merupakan tanda mata kering, sehingga menghentikan tetes air mata karena merasa mata sudah cukup basah adalah keliru',
+      'Gunakan air mata buatan sesuai jadwal, bukan hanya ketika terasa perih — menunggu sampai tidak nyaman berarti permukaan mata sudah rusak lebih dahulu',
+      'JANGAN memakai tetes pemerah mata yang dijual bebas; obat ini memperburuk keadaan dalam jangka panjang',
+      'Bila memakai lensa kontak, kurangi lama pemakaian, gunakan tetes yang sesuai untuk lensa kontak, dan lepaskan lebih awal saat mata terasa kering',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam teratur dengan dua selingan. Sertakan ikan berlemak seperti kembung, tongkol, atau salmon 2-3 kali seminggu sebagai sumber omega-3, tambahkan kacang-kacangan dan biji-bijian, serta sayuran hijau dan buah berwarna oranye sebagai sumber vitamin A. Minum 8-10 gelas air per hari karena kekurangan cairan tubuh langsung memperberat keluhan. Batasi kafein berlebihan dan alkohol yang bersifat diuretik',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; kurang tidur nyata memperberat mata kering. Jauhkan arah kipas angin dan pendingin ruangan dari wajah saat tidur, gunakan pelembap ruangan bila udara kering, dan hentikan layar 1 jam sebelum tidur. Bila kelopak tidak menutup sempurna saat tidur, gunakan salep mata sebelum tidur sesuai anjuran',
+      'Pola olahraga: aktivitas aerobik sedang 30 menit sehari selama 5 hari seminggu justru bermanfaat karena meningkatkan produksi air mata dan memperbaiki aliran kelenjar Meibom. Namun hindari bersepeda maupun berlari melawan angin kencang tanpa pelindung mata — gunakan kacamata yang menutup sisi samping. Berkediplah dengan sadar saat berolahraga karena konsentrasi membuat orang lupa berkedip, sediakan air mata buatan di tas olahraga, dan lepaskan lensa kontak sebelum berenang serta gunakan kacamata renang',
+      'Follow up: kontrol dalam 4-6 minggu untuk menilai respons; perbaikan pada mata kering berlangsung bertahap dalam hitungan minggu sampai bulan, bukan dalam beberapa hari',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: nyeri mata yang hebat, penurunan penglihatan yang menetap dan tidak membaik setelah berkedip, silau berat, mata merah dengan sekret bernanah, atau bercak putih pada bagian bening mata',
+    ],
+    komplikasi: [
+      'Keratitis pungtata superfisial hingga erosi kornea berulang',
+      'Ulkus kornea dan jaringan parut kornea pada kasus berat yang tidak tertangani',
+      'Infeksi sekunder pada permukaan mata yang epitelnya rusak',
+      'Penurunan tajam penglihatan menetap pada kerusakan kornea yang luas',
+      'Intoleransi lensa kontak',
+      'Penurunan kualitas hidup, gangguan produktivitas, dan kesulitan mengemudi malam hari',
+      'Kerusakan epitel akibat pemakaian tetes berpengawet dalam jangka panjang',
+      'Kenaikan tekanan bola mata dan katarak akibat pemakaian kortikosteroid topikal yang tidak diawasi',
+    ],
+    prognosis:
+      'Keluhan umumnya dapat dikendalikan dengan baik, meskipun penyakitnya bersifat menahun dan cenderung berulang. Perbaikan berlangsung bertahap dalam hitungan minggu hingga bulan, sehingga harapan akan kesembuhan cepat perlu diluruskan sejak awal agar pasien tidak berpindah-pindah obat. Prognosis paling ditentukan oleh dua hal yang sering diabaikan: mengenali dan menangani disfungsi kelenjar Meibom sebagai mekanisme tersering, dan meninjau ulang obat sistemik maupun kebiasaan menatap layar yang menjadi penyebabnya — tanpa keduanya, penambahan tetes air mata saja hanya memberi perbaikan sementara. Kasus dengan penyakit autoimun yang mendasari cenderung lebih berat dan memerlukan pengawasan jangka panjang.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Chalazion': {
@@ -8387,9 +8597,106 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Trikiasis': {
-    definisi: 'Tumbuhnya bulu mata ke arah dalam sehingga menggesek kornea dan konjungtiva, dengan posisi kelopak normal.',
-    diagnosis: ['Rasa mengganjal, mata merah dan berair kronik; tampak bulu mata mengarah ke bola mata; fluoresein menunjukkan erosi kornea; komplikasi trakoma merupakan penyebab penting di daerah endemis'],
-    tatalaksana: ['Epilasi (mencabut bulu mata) sebagai tindakan sementara karena akan tumbuh kembali, terapi definitif dengan elektrolisis, krioterapi, atau bedah; lubrikan dan antibiotik topikal bila ada erosi kornea'],
+    definisi:
+      'Salah arah tumbuhnya bulu mata sehingga mengarah ke dalam dan menggesek permukaan bola mata, sementara posisi dan bentuk kelopak mata sendiri tetap normal — ciri terakhir inilah yang membedakannya dari entropion.',
+    anamnesis: {
+      keluhanUtama: 'Mata terasa mengganjal seperti ada yang menusuk, berair terus, dan merah menahun.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: umumnya satu mata dan terasa terpusat pada satu titik sesuai letak bulu mata yang salah arah. Onset: perlahan dan menahun, sering sudah berlangsung berbulan-bulan sebelum pasien berobat. Character: rasa mengganjal, menusuk, dan seperti ada pasir; nyeri bertambah saat berkedip karena bulu mata menyapu kornea pada setiap kedipan. Radiation: tidak khas. Associations: mata berair terus-menerus, merah menetap, silau, dan penglihatan yang mulai kabur bila kornea sudah rusak; tanyakan pula riwayat mata merah berulang yang selalu diobati dengan tetes antibiotik namun kambuh lagi — pola ini sangat khas untuk penyebab mekanis seperti trikiasis. Time course: keluhan menetap dan tidak sembuh dengan obat tetes apa pun, ini merupakan petunjuk penting. Exacerbating: berkedip, angin, dan debu. Relieving: memejamkan mata; keluhan sementara hilang bila bulu mata tercabut sendiri. Severity: nilai gangguan penglihatan dan aktivitas.',
+      riwayatPenyakitDahulu:
+        'RIWAYAT TRAKOMA merupakan penyebab tersering di daerah endemis dan wajib ditanyakan. Riwayat blefaritis menahun, trauma dan luka bakar kimia pada kelopak, operasi kelopak, sindrom Stevens-Johnson, pemfigoid membran mukosa, serta herpes zoster oftalmikus — semuanya meninggalkan jaringan parut yang mengubah arah tumbuh bulu mata.',
+      riwayatPenyakitKeluarga: 'Umumnya tidak relevan, kecuali pada kelainan bawaan kelopak.',
+      riwayatPengobatan:
+        'Tetes mata yang sudah dipakai beserta lamanya — riwayat pemakaian antibiotik tetes berulang tanpa perbaikan justru mendukung penyebab mekanis. Tanyakan pula riwayat mencabut bulu mata sendiri.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi terhadap tetes mata sebelumnya.',
+      riwayatSosialEkonomi:
+        'Tempat tinggal di daerah dengan trakoma, ketersediaan air bersih dan kebiasaan mencuci muka, sanitasi lingkungan, pekerjaan yang terpapar debu dan angin, serta kemampuan datang berkala untuk tindakan yang mungkin perlu diulang.',
+    },
+    pemeriksaanFisik: [
+      'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah menahun',
+      'Periksa dengan pembesaran yang baik dan identifikasi bulu mata yang salah arah SATU PER SATU beserta letaknya, karena jumlah dan sebarannya menentukan pilihan tindakan',
+      'PASTIKAN TEPI KELOPAK BERADA PADA POSISI NORMAL — bila tepi kelopak sendiri melipat ke dalam, diagnosisnya entropion dan bukan trikiasis; keduanya memerlukan tindakan yang berbeda',
+      'Balik kelopak atas untuk menilai konjungtiva tarsal: jaringan parut berbentuk garis putih mendatar merupakan tanda khas bekas trakoma',
+      'Pewarnaan fluoresein untuk menilai kerusakan kornea; erosi biasanya terdapat pada bagian kornea yang sesuai dengan letak bulu mata yang menggesek',
+      'Nilai kejernihan kornea dan cari jaringan parut maupun neovaskularisasi yang menandakan gesekan sudah berlangsung lama',
+      'Nilai penutupan kelopak, kedudukan pungtum lakrimal, dan tanda blefaritis yang menyertai',
+      'Periksa sensasi kornea; sensasi yang menurun meningkatkan risiko kerusakan tanpa disadari',
+    ],
+    penunjang: [
+      'Diagnosis ditegakkan secara klinis; tidak diperlukan pemeriksaan penunjang khusus',
+      'Pemeriksaan dengan lampu celah untuk menilai kornea dan tepi kelopak secara rinci',
+      'Pewarnaan fluoresein sebagai pemeriksaan sederhana yang membuktikan adanya kerusakan kornea',
+      'Pemeriksaan untuk trakoma sesuai penilaian program bila berada di daerah endemis',
+      'Biopsi konjungtiva bila dicurigai pemfigoid membran mukosa sebagai penyebab jaringan parut yang progresif',
+    ],
+    etiologi:
+      'Jaringan parut pada tepi kelopak akibat trakoma, blefaritis menahun, trauma, luka bakar kimia, sindrom Stevens-Johnson, pemfigoid membran mukosa, atau operasi kelopak; sebagian kasus bersifat idiopatik.',
+    patofisiologi:
+      'Bulu mata normal tumbuh dari folikel pada tepi kelopak dengan arah menjauhi bola mata. Peradangan menahun maupun cedera pada tepi kelopak menimbulkan jaringan parut yang menarik dan memutar folikel, sehingga arah tumbuh bulu mata berubah ke dalam meskipun kedudukan kelopak secara keseluruhan tetap normal — perbedaan inilah yang memisahkan trikiasis dari entropion, di mana seluruh tepi kelopak melipat ke dalam sehingga seluruh barisan bulu mata ikut menyentuh mata. Setiap kali pasien berkedip, ujung bulu mata yang keras menyapu epitel kornea dan menimbulkan erosi berulang. Epitel yang terus terluka tidak sempat pulih, sehingga timbul keratitis menetap, kemudian neovaskularisasi dan jaringan parut kornea yang bersifat permanen. Karena penyebabnya bersifat mekanis, keluhan tidak akan mereda dengan tetes antibiotik maupun tetes antiperadangan sebanyak apa pun — pemahaman ini penting karena pasien kerap sudah berulang kali diobati sebagai konjungtivitis. Pada trakoma, peradangan berulang oleh Chlamydia trachomatis membentuk jaringan parut mendatar pada konjungtiva tarsal yang perlahan memutar tepi kelopak dan folikel bulu mata, dan proses inilah yang menjadikan trakoma sebagai penyebab kebutaan akibat infeksi yang paling sering di dunia — kebutaan yang seluruhnya dapat dicegah bila bulu mata yang salah arah ditangani tepat waktu.',
+    faktorRisiko: [
+      'Tinggal di daerah endemis trakoma dengan air bersih yang terbatas dan sanitasi yang buruk',
+      'Blefaritis menahun yang tidak tertangani',
+      'Riwayat trauma, luka bakar kimia, dan operasi pada kelopak mata',
+      'Sindrom Stevens-Johnson dan pemfigoid membran mukosa',
+      'Herpes zoster oftalmikus',
+      'Usia lanjut',
+      'Kebiasaan mencabut bulu mata sendiri, yang membuat bulu mata tumbuh kembali lebih kasar dan tetap salah arah',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dengan melihat langsung bulu mata yang tumbuh mengarah ke bola mata pada tepi kelopak yang kedudukannya normal, disertai bukti gesekan pada kornea melalui pewarnaan fluoresein. Membedakannya dari entropion merupakan bagian yang tidak boleh dilewatkan, karena pada entropion seluruh tepi kelopak melipat ke dalam dan penanganannya berupa koreksi kedudukan kelopak, bukan penanganan bulu mata satu per satu.',
+    diagnosisBanding: [
+      'Entropion — SELURUH TEPI KELOPAK melipat ke dalam sehingga seluruh barisan bulu mata menyentuh bola mata; memerlukan pembedahan kelopak',
+      'Distikiasis — barisan bulu mata tambahan yang tumbuh dari muara kelenjar Meibom, umumnya bawaan',
+      'Benda asing pada konjungtiva atau di bawah kelopak atas — keluhan mendadak, bukan menahun; kelopak atas wajib dibalik untuk memeriksanya',
+      'Konjungtivitis menahun — mata merah dengan sekret, tanpa bulu mata yang salah arah',
+      'Mata kering — rasa berpasir pada kedua mata yang memberat pada sore hari, tanpa temuan mekanis',
+      'Blefaritis — krusta pada pangkal bulu mata dengan keluhan terberat saat bangun tidur; sering menjadi penyebab sekaligus penyerta trikiasis',
+      'Keratitis akibat sebab lain seperti infeksi maupun paparan pada mata yang tidak menutup sempurna',
+    ],
+    pengkajian:
+      'Dipikirkan trikiasis pada pasien ini atas dasar keluhan menahun berupa rasa mengganjal dan menusuk pada satu mata yang bertambah setiap kali berkedip, disertai mata berair dan merah yang menetap, dan yang paling menentukan — ditemukannya bulu mata yang tumbuh mengarah ke bola mata pada tepi kelopak yang kedudukannya tetap normal. Riwayat mata merah berulang yang selalu diobati sebagai infeksi namun tidak pernah benar-benar sembuh merupakan petunjuk yang kuat ke arah penyebab mekanis, sebab gesekan tidak akan mereda oleh tetes antibiotik sebanyak apa pun. Entropion merupakan banding yang paling penting dan dibedakan dengan melihat tepi kelopaknya: pada entropion seluruh tepi kelopak melipat ke dalam sehingga seluruh barisan bulu mata menyentuh mata, sedangkan pada kasus ini kedudukan kelopak normal dan hanya beberapa helai bulu mata yang salah arah — perbedaan ini bukan sekadar penamaan, karena entropion memerlukan koreksi kedudukan kelopak melalui pembedahan sementara trikiasis dapat ditangani per helai. Benda asing disingkirkan karena keluhan berlangsung menahun alih-alih mendadak, meskipun membalik kelopak atas tetap dikerjakan untuk memastikan. Mata kering disingkirkan karena keluhan terpusat pada satu mata dan pada satu titik, sedangkan mata kering mengenai kedua mata secara merata. Konjungtivitis menahun tidak sesuai karena tidak ada sekret yang bermakna dan kemerahan terpusat pada bagian yang tergesek. Pewarnaan fluoresein pada kasus ini memperlihatkan erosi kornea yang letaknya bersesuaian dengan bulu mata yang menyimpang, dan temuan tersebut sekaligus membuktikan mekanisme sekaligus menunjukkan bahwa kerusakan sudah terjadi. Riwayat trakoma ditelusuri secara khusus karena merupakan penyebab tersering di daerah endemis, dan jaringan parut mendatar pada konjungtiva tarsal saat kelopak dibalik akan memastikannya. Perlu ditekankan bahwa keadaan ini merupakan penyebab kebutaan yang sepenuhnya dapat dicegah, sehingga menunda tindakan berarti membiarkan kornea rusak permanen oleh sesuatu yang penanganannya sederhana.',
+    terapiSuportif: [
+      'Air mata buatan dan gel mata untuk mengurangi gesekan dan melindungi permukaan kornea sementara menunggu tindakan definitif',
+      'Salep mata pada malam hari bila kerusakan kornea sudah bermakna',
+      'Kompres hangat dan pembersihan tepi kelopak bila disertai blefaritis, karena mengendalikan blefaritis mengurangi peradangan yang menjadi penyebab berulangnya kelainan arah bulu mata',
+      'Hindari paparan angin dan debu dengan menggunakan kacamata pelindung',
+      'JANGAN membiarkan pasien mencabut sendiri bulu matanya berulang kali tanpa penilaian, karena bulu mata akan tumbuh kembali lebih kasar dan tetap salah arah',
+    ],
+    tatalaksana: [
+      'Epilasi yaitu pencabutan bulu mata dengan pinset merupakan tindakan sementara yang mudah dan segera melegakan, namun BULU MATA AKAN TUMBUH KEMBALI DALAM 4-6 MINGGU dan sering menjadi lebih kasar — pasien harus diberi tahu bahwa ini bukan penyembuhan',
+      'Tindakan definitif untuk beberapa helai bulu mata: elektrolisis atau ablasi radiofrekuensi untuk merusak folikelnya',
+      'Krioterapi pada bulu mata salah arah yang jumlahnya banyak dan tersebar',
+      'Pembedahan rotasi tarsal merupakan tindakan pilihan pada trikiasis akibat trakoma dengan bulu mata salah arah yang luas, dan merupakan komponen bedah dalam strategi pengendalian trakoma',
+      'Bila ternyata entropion, penanganannya adalah pembedahan koreksi kedudukan kelopak dan bukan tindakan pada bulu mata',
+      'Obati blefaritis dan peradangan tepi kelopak yang mendasari untuk mengurangi kekambuhan',
+      'Antibiotik topikal hanya bila sudah terjadi infeksi sekunder pada kornea, bukan sebagai terapi utama',
+      'Azitromisin oral dosis tunggal sesuai program bila terdapat trakoma aktif, disertai penanganan pada keluarga dan komunitas',
+      'Rujuk ke dokter spesialis mata untuk tindakan definitif, dan rujuk SEGERA bila sudah ada kekeruhan kornea, ulkus, atau penurunan tajam penglihatan',
+    ],
+    edukasi: [
+      'Jelaskan bahwa penyebab keluhan adalah bulu mata yang menggesek permukaan mata, bukan infeksi — sehingga tetes antibiotik tidak akan menyembuhkannya betapapun sering dipakai',
+      'Jelaskan bahwa mencabut bulu mata hanya melegakan sementara karena akan tumbuh kembali dalam 4-6 minggu, sehingga tindakan definitif tetap diperlukan',
+      'JANGAN mencabut bulu mata sendiri dengan pinset yang tidak bersih maupun dengan tangan, karena berisiko melukai kelopak dan menimbulkan infeksi',
+      'Tekankan bahwa keadaan ini dapat menyebabkan kebutaan bila dibiarkan bertahun-tahun, namun kebutaan tersebut SEPENUHNYA DAPAT DICEGAH bila ditangani tepat waktu — inilah alasan tindakan tidak boleh ditunda meskipun keluhannya terasa ringan',
+      'Gunakan air mata buatan secara teratur sambil menunggu tindakan untuk melindungi kornea',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayuran hijau, wortel, telur, dan hati sebagai sumber vitamin A yang mendukung penyembuhan permukaan mata, dan minum 8 gelas air per hari agar produksi air mata tetap baik',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; gunakan salep mata sebelum tidur bila dianjurkan, dan jauhkan arah kipas angin dari wajah. Jangan tidur dengan mata terpapar angin langsung karena permukaan mata yang sudah terluka lebih mudah kering dan pecah',
+      'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu tetap dianjurkan. GUNAKAN KACAMATA PELINDUNG saat bersepeda, berlari di luar ruangan, atau berolahraga di tempat berdebu, karena angin dan debu memperberat gesekan pada kornea yang sudah terluka. Hindari berenang di kolam umum selama masih ada luka pada kornea karena risiko infeksi, dan jangan menggosok mata setelah berkeringat — bilas dengan air bersih',
+      'Follow up: kontrol berkala setiap 4-6 minggu setelah epilasi karena bulu mata akan tumbuh kembali; setelah tindakan definitif, kontrol sesuai anjuran untuk menilai kekambuhan',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: nyeri mata yang bertambah hebat, penglihatan menurun, silau berat, bercak putih pada bagian bening mata, atau keluar nanah — semuanya menandakan kornea sudah terluka berat atau terinfeksi',
+      'Di daerah trakoma, terapkan kebiasaan mencuci muka setiap hari dan perbaiki sanitasi lingkungan; ajak anggota keluarga lain diperiksa karena trakoma menular dalam satu rumah',
+    ],
+    komplikasi: [
+      'Erosi kornea berulang dan keratitis menetap',
+      'Ulkus kornea dan infeksi sekunder',
+      'Jaringan parut kornea dan neovaskularisasi yang menyebabkan penurunan penglihatan permanen',
+      'KEBUTAAN, terutama pada trikiasis akibat trakoma yang tidak ditangani — dan merupakan salah satu penyebab kebutaan yang sepenuhnya dapat dicegah',
+      'Kekambuhan setelah epilasi maupun setelah tindakan definitif',
+      'Kerusakan kelopak dan infeksi akibat pencabutan bulu mata yang dilakukan sendiri',
+      'Ketergantungan pada pencabutan berulang tanpa pernah mendapat tindakan definitif',
+    ],
+    prognosis:
+      'Baik bila ditangani sebelum kornea rusak — tindakan definitif dapat menghilangkan keluhan secara menetap meskipun kekambuhan tetap mungkin terjadi dan memerlukan pemantauan. Prognosis penglihatan sepenuhnya bergantung pada seberapa lama gesekan sudah berlangsung: kerusakan epitel bersifat pulih, sedangkan jaringan parut kornea yang sudah terbentuk bersifat permanen. Inilah yang menjadikan trikiasis penting jauh melampaui beratnya keluhan — penyakit dengan gejala yang terasa ringan namun merupakan penyebab kebutaan yang seluruhnya dapat dicegah, sehingga penundaan tindakan adalah kerugian yang paling nyata.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Lagoftalmus': {
@@ -8941,10 +9248,122 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'KANSKI2020', 'ADAMS2019'],
   },
   'Buta senja': {
-    definisi: 'Niktalopia — gangguan penglihatan pada cahaya redup akibat disfungsi sel batang retina.',
-    diagnosis: ['Kesulitan melihat saat senja atau di ruang gelap, sulit beradaptasi dari terang ke gelap; penyebab tersering DEFISIENSI VITAMIN A (gejala paling awal xeroftalmia), juga retinitis pigmentosa dan miopia tinggi'],
-    tatalaksana: ['Suplementasi vitamin A dosis terapi bila defisiensi (respons cepat dalam beberapa hari), perbaikan gizi; rujuk oftalmologi bila tidak respons untuk evaluasi distrofi retina; edukasi keamanan (hindari mengemudi malam)'],
-    referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
+    definisi:
+      'Gangguan penglihatan pada keadaan cahaya redup dan kesulitan mata menyesuaikan diri saat berpindah dari terang ke gelap; bukan penyakit tersendiri melainkan GEJALA, yang di Indonesia paling sering menandakan kekurangan vitamin A pada anak dan merupakan tanda paling dini dari xeroftalmia.',
+    anamnesis: {
+      keluhanUtama:
+        'Sulit melihat saat menjelang magrib atau di ruangan yang remang; pada anak sering dilaporkan sebagai menabrak benda dan tidak mau bermain saat hari mulai gelap.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kedua mata. Onset: perlahan; pada kekurangan vitamin A berkembang dalam hitungan minggu hingga bulan seiring memburuknya gizi. Character: kesulitan yang HANYA muncul pada cahaya redup sementara penglihatan siang hari tetap baik, serta waktu penyesuaian yang jauh lebih lama saat masuk ke ruangan gelap. Radiation: tidak khas. Associations: TANYAKAN TANDA XEROFTALMIA LAIN — mata terasa kering, konjungtiva tampak kusam dan berkerut, bercak putih berbusa pada konjungtiva, kornea yang tampak suram, dan pada tahap lanjut kornea yang melunak; tanyakan pula sering sakit, diare berulang, campak dalam waktu dekat, dan penurunan berat badan. Pada dewasa, tanyakan penyempitan lapang pandang tepi dan riwayat keluarga yang mengarah pada retinitis pigmentosa. Time course: apakah memberat, dan apakah berkaitan dengan periode sakit maupun kekurangan makan. Exacerbating: cahaya redup dan malam hari. Severity: apakah anak sampai tidak mampu menemukan makanan atau mainannya sendiri saat senja — pertanyaan konkret ini jauh lebih dapat diandalkan daripada menanyakan penglihatan secara umum kepada orang tua.',
+      riwayatPenyakitDahulu:
+        'Campak dalam 3 bulan terakhir, diare berulang, infeksi saluran napas berulang, tuberkulosis, cacingan, dan penyakit yang mengganggu penyerapan lemak seperti penyakit hati, penyakit pankreas, penyakit seliak, dan fibrosis kistik. Riwayat operasi bariatrik pada dewasa. Riwayat miopia tinggi, katarak, dan glaukoma yang juga menyulitkan penglihatan malam.',
+      riwayatPenyakitKeluarga:
+        'RIWAYAT BUTA SENJA SEJAK KECIL DAN PENYEMPITAN LAPANG PANDANG PADA KELUARGA mengarah pada retinitis pigmentosa yang bersifat menurun; tanyakan pula riwayat perkawinan sedarah.',
+      riwayatPengobatan:
+        'Riwayat pemberian kapsul vitamin A dan kapan terakhir diberikan, riwayat pengobatan cacing, serta obat yang memengaruhi penyerapan lemak.',
+      riwayatAlergi: 'Riwayat alergi obat.',
+      riwayatKehamilanPersalinan:
+        'Pada ibu, riwayat pemberian vitamin A setelah melahirkan; buta senja pada ibu hamil merupakan penanda kekurangan vitamin A yang berkaitan dengan meningkatnya risiko kematian ibu dan bayi.',
+      riwayatTumbuhKembang:
+        'Berat dan tinggi badan menurut usia, riwayat gagal tumbuh, serta perkembangan anak secara umum.',
+      riwayatNutrisi:
+        'INTI ANAMNESIS PADA KASUS INI: pola makan sehari-hari, konsumsi sumber vitamin A seperti hati, telur, susu, ikan, sayuran hijau tua, wortel, labu kuning, dan buah berwarna oranye; riwayat pemberian air susu ibu eksklusif dan lama menyusui; usia mulai makanan pendamping serta keragamannya; serta praktik pantangan makanan yang berlaku di keluarga.',
+      riwayatSosialEkonomi:
+        'Kemampuan ekonomi keluarga dan ketahanan pangan rumah tangga, akses ke posyandu dan kelengkapan pemberian kapsul vitamin A, sanitasi lingkungan dan sumber air, serta pendidikan orang tua — kekurangan vitamin A pada dasarnya merupakan penyakit kemiskinan dan penanganannya tidak dapat dilepaskan dari hal ini.',
+    },
+    pemeriksaanFisik: [
+      'Periksa tajam penglihatan sesuai usia; pada kekurangan vitamin A tahap awal, tajam penglihatan siang hari masih normal',
+      'PERIKSA KONJUNGTIVA UNTUK XEROSIS berupa permukaan yang kusam, kering, dan berkerut kehilangan kilaunya',
+      'Cari BERCAK BITOT: bercak putih keabu-abuan berbusa seperti sabun pada konjungtiva bulbi, umumnya di sisi temporal — tanda yang sangat khas untuk kekurangan vitamin A',
+      'Periksa kornea: xerosis kornea berupa permukaan yang suram dan kasar, kemudian ulkus kornea, dan pada tahap paling berat keratomalasia berupa pelunakan kornea yang dapat berakhir dengan pecahnya bola mata — TAHAP INI MERUPAKAN KEGAWATAN',
+      'Nilai status gizi secara menyeluruh: berat badan menurut umur dan berat badan menurut panjang atau tinggi badan, lingkar lengan atas, serta tanda gizi buruk berupa edema, wasting, rambut mudah dicabut, dan kulit bersisik',
+      'Cari tanda kekurangan zat gizi lain dan tanda infeksi penyerta',
+      'Funduskopi pada dewasa untuk mencari gambaran retinitis pigmentosa berupa bercak pigmen seperti spikula tulang, pembuluh darah yang menyempit, dan papil yang pucat',
+      'Pada dewasa, periksa lapang pandang dan lensa untuk menyingkirkan glaukoma serta katarak sebagai penyebab lain kesulitan melihat malam',
+    ],
+    penunjang: [
+      'Diagnosis kekurangan vitamin A pada anak ditegakkan secara KLINIS dari buta senja beserta tanda mata lainnya — pemeriksaan laboratorium TIDAK BOLEH menunda pemberian vitamin A',
+      'Kadar retinol serum kurang dari 20 mikrogram/dL menandakan kekurangan, namun kadarnya dipengaruhi infeksi dan kadar protein sehingga dapat menyesatkan',
+      'Darah lengkap untuk anemia yang sering menyertai, serta penanda infeksi',
+      'Pemeriksaan tinja untuk cacing di daerah endemis',
+      'Albumin dan penilaian gizi lain pada gizi buruk',
+      'ELEKTRORETINOGRAFI dan pemeriksaan lapang pandang pada dewasa dengan kecurigaan retinitis pigmentosa; pemeriksaan genetik bila tersedia',
+      'Pengukuran tekanan bola mata dan pemeriksaan lensa pada dewasa untuk menyingkirkan glaukoma dan katarak',
+    ],
+    etiologi:
+      'Di Indonesia paling sering karena kekurangan vitamin A akibat asupan yang kurang, gangguan penyerapan, maupun kebutuhan yang meningkat saat infeksi; penyebab lain meliputi retinitis pigmentosa, miopia tinggi, katarak, glaukoma, dan gangguan penyerapan lemak.',
+    patofisiologi:
+      'Penglihatan pada cahaya redup bergantung pada sel batang retina yang mengandung pigmen rodopsin, dan rodopsin dibentuk dari gabungan protein opsin dengan retinal yang berasal langsung dari vitamin A. Ketika cahaya mengenai rodopsin, pigmen tersebut terurai dan harus dibentuk kembali agar sel batang dapat menangkap cahaya berikutnya. Bila vitamin A kurang, pembentukan kembali rodopsin terhambat sehingga sel batang kehilangan kepekaannya lebih dahulu daripada sel kerucut yang bertanggung jawab pada penglihatan terang — inilah dasar mengapa buta senja merupakan gejala PALING DINI dari kekurangan vitamin A, muncul jauh sebelum ada kelainan yang terlihat pada mata, dan mengapa menanyakannya merupakan cara penapisan yang murah namun sangat berdaya. Vitamin A juga diperlukan untuk mempertahankan epitel yang menghasilkan lendir; kekurangannya menyebabkan metaplasia keratinisasi pada konjungtiva sehingga permukaannya menjadi kusam dan kering, lalu terbentuk bercak Bitot yang tersusun atas sel tanduk dan kuman. Bila kekurangan berlanjut, kornea ikut mengalami xerosis, kemudian ulkus, dan akhirnya keratomalasia yaitu pelunakan kornea yang dapat berlangsung dalam hitungan hari dan berakhir dengan kebutaan permanen. Infeksi seperti campak dan diare memperberat keadaan ini melalui dua jalur sekaligus — meningkatkan kebutuhan sekaligus meningkatkan kehilangan vitamin A — sehingga kebutaan pada anak gizi buruk kerap dipicu oleh satu episode campak.',
+    faktorRisiko: [
+      'Anak usia 6 bulan sampai 5 tahun dengan gizi kurang maupun gizi buruk',
+      'Tidak mendapat air susu ibu eksklusif dan makanan pendamping yang kurang beragam',
+      'Kemiskinan dan ketahanan pangan rumah tangga yang rendah',
+      'Campak, diare berulang, dan infeksi saluran napas berulang',
+      'Cacingan',
+      'Tidak mendapat kapsul vitamin A pada jadwal pemberian di posyandu',
+      'Penyakit yang mengganggu penyerapan lemak dan penyakit hati',
+      'Kehamilan dan menyusui yang meningkatkan kebutuhan',
+      'Riwayat keluarga dengan retinitis pigmentosa pada kasus dewasa',
+    ],
+    goldStandard:
+      'Pada anak, diagnosis kekurangan vitamin A ditegakkan secara klinis dari riwayat buta senja bersama tanda xeroftalmia berupa xerosis konjungtiva, bercak Bitot, maupun kelainan kornea, dan pengobatan harus dimulai berdasarkan penilaian klinis tanpa menunggu hasil laboratorium. Kadar retinol serum kurang dari 20 mikrogram/dL mendukung namun dapat menyesatkan pada keadaan infeksi. Pada dewasa tanpa faktor risiko gizi, penegakan penyebab memerlukan funduskopi, pemeriksaan lapang pandang, dan elektroretinografi untuk mengenali retinitis pigmentosa.',
+    diagnosisBanding: [
+      'Retinitis pigmentosa — buta senja sejak masa anak yang terus memberat, disertai penyempitan lapang pandang tepi, gambaran spikula tulang pada funduskopi, dan riwayat keluarga',
+      'Miopia tinggi yang belum terkoreksi — penglihatan malam lebih sulit karena pupil melebar; membaik dengan kacamata',
+      'Katarak — silau dan kabur pada cahaya redup maupun terang, dengan lensa yang keruh',
+      'Glaukoma — penyempitan lapang pandang tepi yang perlahan dengan penglihatan sentral yang lama tetap baik',
+      'Gangguan penyerapan lemak akibat penyakit hati, pankreas, penyakit seliak, maupun pascaoperasi bariatrik — menyebabkan kekurangan vitamin A pada dewasa',
+      'Kekurangan zink yang mengganggu pengangkutan vitamin A sehingga terapi vitamin A tampak tidak berhasil',
+      'Retinopati akibat obat tertentu',
+      'Kelainan bawaan sel batang yang bersifat menetap sejak lahir',
+    ],
+    pengkajian:
+      'Dipikirkan buta senja akibat kekurangan vitamin A pada anak ini atas dasar keluhan orang tua bahwa anak menjadi sulit melihat dan menabrak benda saat hari mulai gelap sementara penglihatan siang harinya tampak biasa saja, pada anak dengan status gizi kurang, riwayat makan yang miskin sumber vitamin A, riwayat diare berulang maupun campak dalam waktu dekat, dan riwayat kapsul vitamin A yang tidak lengkap. Sifat gangguan yang hanya muncul pada cahaya redup merupakan cerminan langsung dari terhambatnya pembentukan kembali rodopsin pada sel batang, dan inilah sebabnya buta senja menjadi tanda paling dini yang muncul jauh sebelum kelainan apa pun terlihat pada mata. Pemeriksaan konjungtiva menjadi langkah yang menentukan derajat penyakit: xerosis berupa permukaan yang kusam dan berkerut serta bercak Bitot yang berbusa menandakan kekurangan sudah berlanjut, sedangkan kornea yang mulai suram menandakan keadaan sudah mendekati tahap yang mengancam penglihatan secara permanen. Retinitis pigmentosa dipertimbangkan sebagai banding utama karena juga menimbulkan buta senja, namun pada penyakit tersebut keluhan berlangsung menetap sejak usia dini dan terus memberat disertai penyempitan lapang pandang serta riwayat keluarga, sedangkan pada kasus ini keluhan muncul bersamaan dengan memburuknya keadaan gizi. Miopia tinggi yang belum terkoreksi, katarak, dan glaukoma lebih relevan sebagai banding pada dewasa dan tidak sesuai dengan gambaran anak ini. Yang paling menentukan pada kasus ini bukanlah ketepatan penamaan melainkan kecepatan bertindak: pemberian vitamin A dosis tinggi harus dimulai berdasarkan penilaian klinis tanpa menunggu pemeriksaan laboratorium, sebab perjalanan dari kornea yang mulai kering menuju keratomalasia dapat berlangsung dalam hitungan hari dan berakhir dengan kebutaan yang tidak dapat dipulihkan. Perlu pula disadari bahwa buta senja pada seorang anak menandakan adanya masalah gizi pada keluarga dan lingkungannya, sehingga penanganan tidak berhenti pada anak yang datang berobat.',
+    terapiSuportif: [
+      'Perbaikan gizi menyeluruh dengan makanan tinggi energi dan protein sesuai tata laksana gizi buruk bila ada',
+      'Obati infeksi yang menyertai — campak, diare, infeksi saluran napas, dan cacingan — karena semuanya meningkatkan kebutuhan sekaligus kehilangan vitamin A',
+      'Berikan zink sesuai anjuran, karena zink diperlukan untuk pengangkutan vitamin A dan kekurangannya membuat terapi vitamin A tampak tidak berhasil',
+      'Air mata buatan dan salep mata untuk melindungi permukaan mata pada xerosis',
+      'Pantau berat badan dan asupan secara berkala sebagai penanda keberhasilan',
+      'Teruskan pemberian air susu ibu pada bayi dan anak yang masih menyusu',
+    ],
+    tatalaksana: [
+      'VITAMIN A DOSIS TINGGI DIBERIKAN SEGERA berdasarkan penilaian klinis, tanpa menunggu hasil laboratorium',
+      'Dosis menurut usia: bayi kurang dari 6 bulan 50.000 IU, usia 6-11 bulan 100.000 IU, dan usia 12 bulan ke atas 200.000 IU',
+      'JADWAL PEMBERIAN: hari pertama, hari kedua, dan diulang pada hari ke-15 — jadwal tiga kali inilah yang sering keliru diberikan hanya satu kali sehingga kekurangan tidak benar-benar terkoreksi',
+      'Berikan vitamin A pada setiap anak dengan campak, gizi buruk, dan xeroftalmia sesuai pedoman program',
+      'Kelainan kornea merupakan KEGAWATAN — berikan vitamin A segera, tambahkan antibiotik topikal maupun sistemik untuk mencegah infeksi sekunder, dan rujuk pada hari yang sama',
+      'Antibiotik topikal pada xerosis kornea maupun ulkus untuk mencegah infeksi sekunder',
+      'Obat cacing sesuai program di daerah endemis',
+      'Pastikan anak masuk kembali ke dalam program pemberian kapsul vitamin A rutin di posyandu setiap Februari dan Agustus',
+      'PERIKSA SAUDARA KANDUNG DAN ANAK LAIN DI RUMAH — buta senja pada satu anak menandakan risiko yang sama pada anak lain dalam keluarga tersebut',
+      'Pada dewasa tanpa faktor risiko gizi, rujuk ke dokter spesialis mata untuk penelusuran retinitis pigmentosa dan penyebab lain',
+      'HATI-HATI PADA IBU HAMIL: vitamin A dosis tinggi bersifat teratogenik sehingga pemberiannya mengikuti aturan dosis rendah harian sesuai pedoman, bukan dosis tinggi seperti pada anak',
+    ],
+    edukasi: [
+      'Jelaskan bahwa buta senja merupakan tanda PALING AWAL kekurangan vitamin A dan sepenuhnya dapat dipulihkan pada tahap ini — umumnya membaik dalam 1-2 hari setelah pengobatan, namun bila dibiarkan dapat berlanjut menjadi kebutaan permanen dalam hitungan hari sampai minggu',
+      'Tekankan bahwa kapsul vitamin A di posyandu setiap Februari dan Agustus bukan sekadar formalitas melainkan pencegahan kebutaan, dan harus diikuti meskipun anak tampak sehat',
+      'Jadwal dan porsi makan: berikan tiga kali makan utama pada jam tetap ditambah 2-3 selingan bergizi setiap hari. Sertakan sumber vitamin A hewani yang paling mudah diserap seperti hati ayam atau sapi 1-2 kali seminggu, telur setiap hari, ikan, dan susu; lengkapi dengan sumber nabati berupa sayuran hijau tua seperti bayam, kangkung, dan daun singkong, serta wortel, labu kuning, ubi jalar oranye, pepaya, dan mangga. MASAK SAYUR DENGAN SEDIKIT MINYAK ATAU SANTAN, karena vitamin A larut dalam lemak dan tidak akan terserap baik bila dimasak tanpa lemak sama sekali — hal sederhana ini sering menjadi sebab mengapa keluarga yang sudah makan sayur tetap kekurangan. Teruskan air susu ibu sampai usia 2 tahun, dan hindari pantangan makanan yang tidak berdasar pada anak',
+      'Jam tidur: anak usia sekolah memerlukan 9-11 jam per malam dan balita 11-14 jam termasuk tidur siang, dengan jadwal tetap. Berikan penerangan yang cukup di rumah pada malam hari dan singkirkan benda yang dapat membuat anak tersandung, karena anak dengan buta senja berisiko jatuh dan cedera saat gelap',
+      'Pola olahraga: anak tetap dianjurkan bermain aktif 60 menit sehari, dan sebisa mungkin PADA SIANG HARI DI LUAR RUMAH ketika penglihatannya masih baik. Hindari bermain di luar rumah menjelang magrib sampai buta senjanya pulih, karena risiko jatuh dan tertabrak sangat nyata. Pada dewasa dengan retinitis pigmentosa, hindari berolahraga sendirian di tempat gelap maupun berkendara pada malam hari',
+      'Awasi tanda memburuk pada mata dan bawa segera bila muncul',
+      'Follow up: kontrol dalam 2 hari untuk menilai perbaikan buta senja, lalu pada hari ke-15 saat pemberian dosis ketiga, dan pemantauan berat badan secara berkala',
+      'TANDA BAHAYA yang mengharuskan datang pada hari yang sama: bagian bening mata tampak suram, keruh, atau keputihan; mata sangat kering dan tidak berair; anak tidak mau membuka mata; atau penglihatan menurun pada siang hari — semuanya menandakan kornea sudah terlibat dan kebutaan dapat terjadi dalam hitungan hari',
+      'Periksakan pula saudara kandung dan anak lain di rumah, karena kekurangan gizi jarang terjadi hanya pada satu anak dalam keluarga',
+    ],
+    komplikasi: [
+      'Xerosis konjungtiva dan bercak Bitot',
+      'Xerosis kornea, ulkus kornea, dan keratomalasia yang menyebabkan KEBUTAAN PERMANEN',
+      'Perforasi bola mata dan endoftalmitis pada keratomalasia berat',
+      'Meningkatnya angka kesakitan dan kematian akibat campak, diare, dan infeksi saluran napas, karena vitamin A juga berperan pada kekebalan tubuh',
+      'Gangguan pertumbuhan dan perkembangan anak',
+      'Anemia yang menyertai',
+      'Cedera akibat jatuh maupun tertabrak saat gelap',
+      'Keracunan vitamin A bila dosis tinggi diberikan berlebihan atau berulang tanpa jarak waktu yang benar',
+    ],
+    prognosis:
+      'Sangat baik bila ditangani pada tahap buta senja — keluhan pulih dalam 1-2 hari setelah pemberian vitamin A dan tidak meninggalkan gangguan apa pun. Prognosis memburuk sangat cepat begitu kornea terlibat: keratomalasia dapat berkembang dalam hitungan hari dan menyebabkan kebutaan yang tidak dapat dipulihkan meskipun vitamin A kemudian diberikan. Justru karena itulah buta senja bernilai jauh melampaui keluhannya sendiri — merupakan peringatan dini yang murah, mudah ditanyakan, dan sepenuhnya dapat ditindaklanjuti, sehingga kebutaan akibat kekurangan vitamin A pada dasarnya merupakan kebutaan yang tidak seharusnya terjadi. Pada retinitis pigmentosa, perjalanannya progresif dan belum ada terapi yang menyembuhkan, sehingga penanganan berfokus pada rehabilitasi penglihatan dan konseling keluarga.',
+    referensi: ['SKDI2012', 'WHOSAM2013', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Skotoma': {
     definisi: 'Area kehilangan penglihatan (bintik buta) di dalam lapang pandang yang dikelilingi penglihatan normal.',
