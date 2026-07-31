@@ -7,6 +7,7 @@ import { api, backendEnabled, apiBaseUrl } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
+import { mergeVitals } from '../lib/healthVitals'
 import { generateInsights } from '../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
 
@@ -74,6 +75,17 @@ export function HealthProfile() {
         try { const remote = await api.getHealthProfile(); if (remote && Object.keys(remote).length) data = { ...data, ...(remote as Partial<HealthProfile>) } } catch { /* offline */ }
       }
       if (!alive) return
+      // Anything the server holds — including readings pushed straight from the
+      // phone by the Health Auto Export webhook — is republished to the shared
+      // vitals store, so a webhook sync reaches the rest of the app too and not
+      // just this form.
+      mergeVitals({
+        weightKg: data.weightKg, heightCm: data.heightCm, bodyFatPct: data.bodyFatPct,
+        vo2max: data.vo2max, restingHr: data.restingHr, hrvMs: data.hrvMs,
+        recoveryPct: data.recoveryPct, strain: data.strain, sleepH: data.sleepH,
+        steps: data.steps, activeKcal: data.activeKcal,
+        source: data.deviceSyncSource ?? data.source, measuredAt: data.lastDeviceSyncAt,
+      })
       if (initial) { setP({ ...DEF, ...data }); setSavedAt((data as HealthProfile).updatedAt ?? null); setLoading(false) }
       else if (Object.keys(data).length) {
         // Merge server-authoritative device fields over the current form without
@@ -139,7 +151,20 @@ export function HealthProfile() {
         recoveryPct: r.recoveryPct ?? x.recoveryPct, strain: r.strain ?? x.strain, sleepH: r.sleepH ?? x.sleepH,
         weightKg: r.weightKg ?? x.weightKg, bodyFatPct: r.bodyFatPct ?? x.bodyFatPct,
       }))
-      setNote(`Filled from ${r.source}: ${keys.length} values. Review, then press Save.`)
+      // Publish to the shared store so every other page (Vita Pulse, the
+      // calculators, dashboards) prefills from this import immediately —
+      // previously the data stopped here and the rest of the app kept its
+      // hardcoded defaults.
+      mergeVitals({
+        vo2max: r.vo2max, restingHr: r.restingHr, hrvMs: r.hrvMs, sleepH: r.sleepH,
+        recoveryPct: r.recoveryPct, strain: r.strain,
+        weightKg: r.weightKg, bodyFatPct: r.bodyFatPct, leanMassKg: r.leanMassKg,
+        heartRate: r.heartRate, spo2Pct: r.spo2Pct, respRate: r.respRate,
+        systolic: r.systolic, diastolic: r.diastolic, bodyTempC: r.bodyTempC,
+        steps: r.steps, activeKcal: r.activeKcal, exerciseMin: r.exerciseMin, distanceKm: r.distanceKm,
+        source: r.source, measuredAt: r.measuredAt,
+      })
+      setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app. Review, then press Save.`)
     } catch {
       setNote(''); setErr('Failed to read the file.')
     } finally {
