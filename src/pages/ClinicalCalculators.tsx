@@ -880,11 +880,144 @@ function AlvaradoCalc() {
   )
 }
 
+
+/* ══════════════════ SIRIRAJ STROKE SCORE ══════════════════ */
+// Siriraj = (2.5 x consciousness) + (2 x vomiting) + (2 x headache)
+//           + (0.1 x diastolic BP) - (3 x atheroma markers) - 12
+// > 1  => haemorrhagic;  < -1 => ischaemic;  -1 to 1 => indeterminate.
+function SirirajCalc() {
+  const [conscious, setConscious] = useState(0)   // 0 alert, 1 drowsy/stupor, 2 semicoma/coma
+  const [vomiting, setVomiting] = useState(0)
+  const [headache, setHeadache] = useState(0)     // within 2 hours
+  const [dbp, setDbp] = useState(90)
+  const [atheroma, setAtheroma] = useState(0)     // DM, angina, claudication
+
+  const score = 2.5 * conscious + 2 * vomiting + 2 * headache + 0.1 * dbp - 3 * atheroma - 12
+  const rounded = Math.round(score * 100) / 100
+  const verdict =
+    score > 1 ? { l: 'Suggests HAEMORRHAGIC stroke', tone: 'critical' as const }
+    : score < -1 ? { l: 'Suggests ISCHAEMIC stroke', tone: 'low' as const }
+    : { l: 'Indeterminate — imaging required', tone: 'high' as const }
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Siriraj Stroke Score"
+        subtitle="Bedside discrimination of haemorrhagic vs ischaemic stroke" />
+      <div className="mt-3 space-y-3">
+        <div>
+          <div className="text-[12px] font-bold text-ink dark:text-white">Consciousness</div>
+          <div className="mt-1"><SegButtons value={conscious} onChange={setConscious}
+            options={[{ v: 0, l: 'Alert' }, { v: 1, l: 'Drowsy/stupor' }, { v: 2, l: 'Semicoma/coma' }]} /></div>
+        </div>
+        <div>
+          <div className="text-[12px] font-bold text-ink dark:text-white">Vomiting (within 2 h of onset)</div>
+          <div className="mt-1"><SegButtons value={vomiting} onChange={setVomiting}
+            options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
+        </div>
+        <div>
+          <div className="text-[12px] font-bold text-ink dark:text-white">Headache (within 2 h of onset)</div>
+          <div className="mt-1"><SegButtons value={headache} onChange={setHeadache}
+            options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
+        </div>
+        <Field label="Diastolic blood pressure (mmHg)">
+          <input className={inputClass} type="number" value={dbp}
+            onChange={(e) => setDbp(Number(e.target.value) || 0)} />
+        </Field>
+        <div>
+          <div className="text-[12px] font-bold text-ink dark:text-white">Atheroma markers</div>
+          <div className="text-[10px] italic text-neutral-400">Diabetes, angina, or intermittent claudication — any one counts</div>
+          <div className="mt-1"><SegButtons value={atheroma} onChange={setAtheroma}
+            options={[{ v: 0, l: 'None' }, { v: 1, l: 'One or more' }]} /></div>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        <div className="flex items-center justify-between">
+          <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
+          <span className="text-2xl font-black text-ink dark:text-white">{rounded > 0 ? '+' : ''}{rounded}</span>
+        </div>
+        <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
+        <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">
+          (2.5 × {conscious}) + (2 × {vomiting}) + (2 × {headache}) + (0.1 × {dbp}) − (3 × {atheroma}) − 12
+        </div>
+      </div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
+        <li><b>This does not replace a CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
+        <li>Scores between −1 and +1 are explicitly indeterminate — that band is common, and it means "image the patient", not "pick the likelier one".</li>
+        <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
+      </ul>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        Source: Poungvarin N, Viriyavejakul A, Komontri C. Siriraj stroke score and validation study to
+        distinguish supratentorial intracerebral haemorrhage from infarction. BMJ. 1991;302(6792):1565-7.
+      </p>
+    </Card>
+  )
+}
+
+/* ══════════════════ ALGORITMA STROKE GADJAH MADA ══════════════════ */
+// Decision tree on three signs: decreased consciousness, headache, Babinski.
+// Published by the Faculty of Medicine, Universitas Gadjah Mada, and widely
+// taught in Indonesia alongside Siriraj.
+function GadjahMadaCalc() {
+  const [loc, setLoc] = useState(false)       // penurunan kesadaran
+  const [headache, setHeadache] = useState(false)
+  const [babinski, setBabinski] = useState(false)
+
+  // The published algorithm: any of LOC / headache / Babinski present in the
+  // specific combinations below decides the branch.
+  const result = (() => {
+    if (loc && headache) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran + nyeri kepala' }
+    if (loc && !headache && !babinski) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran tanpa nyeri kepala dan Babinski negatif' }
+    if (loc && !headache && babinski) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Penurunan kesadaran dengan Babinski positif' }
+    if (!loc && headache) return { l: 'Perdarahan intraserebral (haemorrhagic)', tone: 'critical' as const, why: 'Nyeri kepala tanpa penurunan kesadaran' }
+    if (!loc && !headache && babinski) return { l: 'Stroke iskemik (infark)', tone: 'low' as const, why: 'Tanpa penurunan kesadaran dan nyeri kepala, Babinski positif' }
+    return { l: 'Stroke iskemik (infark)', tone: 'low' as const, why: 'Ketiga tanda negatif' }
+  })()
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Algoritma Stroke Gadjah Mada"
+        subtitle="Bedside algorithm — three signs, taught widely in Indonesia" />
+      <div className="mt-3 space-y-3">
+        {[
+          { l: 'Penurunan kesadaran (decreased consciousness)', v: loc, set: setLoc },
+          { l: 'Nyeri kepala (headache)', v: headache, set: setHeadache },
+          { l: 'Refleks Babinski positif', v: babinski, set: setBabinski },
+        ].map((r) => (
+          <div key={r.l}>
+            <div className="text-[12px] font-bold text-ink dark:text-white">{r.l}</div>
+            <div className="mt-1"><SegButtons value={r.v ? 1 : 0} onChange={(n) => r.set(n === 1)}
+              options={[{ v: 0, l: 'Tidak' }, { v: 1, l: 'Ya' }]} /></div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        <div className="text-[12px] font-bold text-neutral-500">Kesimpulan algoritma</div>
+        <div className="mt-1"><Badge tone={result.tone}>{result.l}</Badge></div>
+        <div className="mt-2 text-[11px] leading-relaxed text-neutral-500">{result.why}</div>
+      </div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
+        <li><b>Bukan pengganti CT scan.</b> Sama seperti Siriraj, algoritma ini untuk fasilitas tanpa pencitraan — keputusan memberi antiplatelet atau trombolisis tidak boleh berdasarkan algoritma ini saja.</li>
+        <li>Bila hasil algoritma dan Siriraj berbeda, itu justru sinyal kuat bahwa pasien perlu segera dirujuk untuk pencitraan, bukan alasan memilih salah satunya.</li>
+      </ul>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        Source: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
+        Yogyakarta. Widely reproduced in Indonesian neurology teaching materials and PERDOSSI guidance.
+      </p>
+    </Card>
+  )
+}
+
 // `kw` = hidden search terms so tools are findable by clinical intent
 // (symptom, organ, situation) — not just by name.
 const TABS = [
   { id: 'apgar', label: 'APGAR', kw: 'newborn neonate birth delivery score' },
   { id: 'gcs', label: 'GCS', kw: 'coma consciousness glasgow head injury neuro' },
+  { id: 'siriraj', label: 'Siriraj', kw: 'stroke haemorrhagic ischaemic bedside neuro cva perdarahan infark' },
+  { id: 'gadjahmada', label: 'Gadjah Mada', kw: 'stroke algoritma indonesia babinski neuro cva perdarahan infark ugm' },
   { id: 'curb65', label: 'CURB-65', kw: 'pneumonia cap severity admission respiratory' },
   { id: 'bishop', label: 'Bishop', kw: 'cervix induction labor obstetric delivery' },
   { id: 'ckdepi', label: 'CKD-EPI', kw: 'egfr kidney renal creatinine gfr' },
@@ -1350,6 +1483,16 @@ function NihssCalc() {
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
       </div>
+      <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
+        <li>Score the <b>first</b> response, not the best — do not coach the patient, and do not go back to change an item once scored.</li>
+        <li>Motor items: arm at 90° sitting (45° supine) held 10 s; leg at 30° supine held 5 s. An untestable limb (amputation, joint fusion) is excluded by NIH convention — score it 0 and note why.</li>
+        <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
+        <li>The score is one input to a thrombolysis decision, never the decision itself — onset time, imaging and contraindications govern.</li>
+      </ul>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical
+        examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.
+      </p>
     </Card>
   )
 }
@@ -2489,6 +2632,8 @@ export function ClinicalCalculators() {
       </div>
       {tab === 'apgar' && <ApgarCalc />}
       {tab === 'gcs' && <GcsCalc />}
+      {tab === 'siriraj' && <SirirajCalc />}
+      {tab === 'gadjahmada' && <GadjahMadaCalc />}
       {tab === 'curb65' && <Curb65Calc />}
       {tab === 'bishop' && <BishopCalc />}
       {tab === 'ckdepi' && <CkdEpiCalc />}
