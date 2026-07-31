@@ -4199,10 +4199,116 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'WAO2020', 'PPKFKTP2014'],
   },
   'Keracunan makanan': {
-    definisi: 'Penyakit akibat konsumsi makanan terkontaminasi mikroorganisme atau toksinnya.',
-    diagnosis: ['Mual, muntah, diare, nyeri perut dengan onset sesuai penyebab (toksin preformed seperti S. aureus dalam 1-6 jam; invasif seperti Salmonella dalam 12-72 jam); riwayat makanan bersama dan kasus serupa pada orang lain'],
-    tatalaksana: ['Rehidrasi sebagai terapi utama, sebagian besar self-limiting; antibiotik hanya pada kasus tertentu (invasif berat, imunokompromais); laporkan bila kejadian luar biasa, edukasi higiene dan penyimpanan makanan'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'SLEISENGER2021'],
+    definisi:
+      'Penyakit akut yang timbul setelah menelan makanan atau minuman yang terkontaminasi mikroorganisme, toksin yang dihasilkannya, atau bahan kimia, dengan manifestasi utama pada saluran cerna berupa mual, muntah, diare, dan nyeri perut.',
+    anamnesis: {
+      keluhanUtama: 'Mual, muntah, dan diare yang timbul mendadak setelah makan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: nyeri perut umumnya difus dan kram di seluruh perut; nyeri yang terlokalisasi tajam di kanan bawah harus menimbulkan kecurigaan lain. Onset: PERTANYAAN PALING MENENTUKAN adalah berapa jam jarak antara makan dan munculnya keluhan, karena masa inkubasi menunjuk langsung pada penyebabnya — 1-6 jam mengarah pada toksin yang sudah terbentuk dalam makanan (Staphylococcus aureus, Bacillus cereus bentuk emetik) dengan muntah sebagai keluhan dominan; 8-16 jam mengarah pada Clostridium perfringens dan Bacillus cereus bentuk diare; 16-72 jam mengarah pada kuman invasif seperti Salmonella, Shigella, dan Campylobacter. Character: sifat tinja — cair tanpa darah dan lendir mengarah pada mekanisme sekretorik atau toksin, sedangkan berdarah dan berlendir dengan tenesmus mengarah pada disentri akibat kuman invasif. Radiation: nyeri kram yang mereda setelah buang air besar. Associations: demam yang menandakan proses invasif, muntah, dan tanda dehidrasi berupa haus hebat, mulut kering, mata cekung, lemas, serta berkurangnya jumlah dan frekuensi buang air kecil. Tanyakan khusus gejala neurologis — pandangan ganda, kelopak mata jatuh, sulit menelan, dan kelemahan otot yang menjalar turun mengarah pada botulisme; sedangkan kesemutan di sekitar mulut, rasa terbalik antara panas dan dingin setelah makan ikan karang mengarah pada keracunan siguatera. Time course: frekuensi muntah dan buang air besar dalam 24 jam terakhir dan apakah membaik atau memberat. Exacerbating: makan dan minum memicu muntah berulang. Severity: nilai dari jumlah cairan yang keluar, kemampuan minum, produksi urin, dan derajat kelemahan.',
+      riwayatPenyakitDahulu:
+        'Penyakit yang meningkatkan risiko perjalanan berat: diabetes melitus, penyakit ginjal kronik, sirosis hati, keganasan, infeksi HIV, dan penggunaan obat imunosupresan. Riwayat operasi lambung atau pemakaian penghambat pompa proton jangka panjang yang mengurangi keasaman lambung sehingga menurunkan sawar terhadap kuman tertelan. Riwayat penyakit jantung yang membuat pasien rentan terhadap gangguan elektrolit.',
+      riwayatPenyakitKeluarga:
+        'TANYAKAN SECARA EKSPLISIT apakah ada orang lain yang menyantap makanan yang sama dan mengalami keluhan serupa beserta berapa jumlahnya — kesamaan ini bukan sekadar informasi tambahan melainkan bukti kuat sumber makanan bersama, dan bila mengenai banyak orang wajib dilaporkan sebagai kemungkinan kejadian luar biasa.',
+      riwayatPengobatan:
+        'Obat yang sudah diminum sendiri, terutama obat antimotilitas seperti loperamid yang berbahaya bila ada disentri atau demam. Riwayat antibiotik dalam 3 bulan terakhir yang mengarahkan pada kemungkinan kolitis akibat Clostridioides difficile alih-alih keracunan makanan.',
+      riwayatAlergi:
+        'Riwayat alergi makanan dan obat; alergi makanan dapat menyerupai keracunan namun disertai gatal, bentol, dan sesak serta timbul dalam hitungan menit.',
+      riwayatNutrisi:
+        'Rincian seluruh makanan dan minuman dalam 72 jam terakhir beserta tempat membelinya dan cara penyimpanannya — perhatikan makanan yang dimasak jauh sebelum disantap lalu dibiarkan di suhu ruang, nasi yang dihangatkan berulang, makanan laut, telur setengah matang, daging kurang matang, susu tidak dipasteurisasi, serta makanan kaleng yang penyok atau menggembung yang mengarah pada botulisme.',
+      riwayatSosialEkonomi:
+        'Sumber air minum dan cara pengolahannya, sanitasi lingkungan, kebiasaan mencuci tangan, riwayat bepergian, pekerjaan sebagai penjamah makanan yang berimplikasi pada penularan lebih luas, serta apakah ada anak balita atau lansia serumah yang lebih rentan.',
+    },
+    pemeriksaanFisik: [
+      'PENILAIAN DERAJAT DEHIDRASI adalah inti pemeriksaan, bukan pencarian penyebab: kesadaran, rasa haus, kelembapan mukosa mulut dan lidah, mata cekung, air mata, turgor kulit perut, pengisian kapiler, akral, laju nadi, dan tekanan darah termasuk pengukuran dalam posisi berbaring dan berdiri untuk mencari hipotensi ortostatik',
+      'Pada anak, gunakan klasifikasi WHO: tanpa dehidrasi, dehidrasi ringan-sedang (gelisah, haus, mata cekung, turgor kembali lambat, ubun-ubun cekung), dan dehidrasi berat (letargi atau tidak sadar, tidak mampu minum, turgor kembali sangat lambat)',
+      'Timbang berat badan — selisih terhadap berat badan biasanya adalah estimasi paling objektif untuk defisit cairan, terutama pada anak',
+      'Suhu tubuh: demam mengarahkan pada proses invasif, sedangkan keracunan toksin preformed umumnya tanpa demam',
+      'Pemeriksaan abdomen: bising usus umumnya meningkat, nyeri tekan difus tanpa nyeri lepas; ADANYA DEFANS MUSKULER, NYERI LEPAS, ATAU PERUT YANG DIAM TANPA BISING USUS menyingkirkan diagnosis ini dan mengarah ke abdomen akut yang memerlukan penilaian bedah',
+      'Pemeriksaan neurologis bila ada kecurigaan botulisme: ptosis, oftalmoplegia, refleks pupil, kekuatan otot, dan kemampuan menelan serta bernapas',
+      'Inspeksi tinja bila memungkinkan: konsistensi, darah, lendir, dan warna',
+    ],
+    penunjang: [
+      'Pada kasus ringan tanpa dehidrasi berat dan tanpa tanda invasif, pemeriksaan penunjang TIDAK diperlukan — penyakit bersifat sembuh sendiri dan pemeriksaan tidak mengubah tatalaksana',
+      'Darah lengkap: leukositosis dengan pergeseran ke kiri mendukung proses invasif',
+      'Elektrolit, ureum, kreatinin, dan analisis gas darah pada dehidrasi sedang-berat, muntah hebat, atau pasien dengan komorbid — untuk menilai hipokalemia dan asidosis metabolik',
+      'Pemeriksaan tinja lengkap dan mikroskopis untuk leukosit dan eritrosit tinja sebagai penanda invasif, serta pemeriksaan parasit bila keluhan berlangsung lama',
+      'Kultur tinja hanya pada diare berdarah, demam tinggi, perjalanan berat, pasien dengan imunitas menurun, penjamah makanan, atau dalam penyelidikan kejadian luar biasa',
+      'Toksin Clostridioides difficile bila ada riwayat antibiotik dalam 3 bulan terakhir',
+      'Pemeriksaan sampel makanan sisa oleh dinas kesehatan bila dicurigai kejadian luar biasa',
+    ],
+    etiologi:
+      'Toksin yang telah terbentuk dalam makanan (Staphylococcus aureus, Bacillus cereus, Clostridium botulinum), kuman invasif atau penghasil toksin di dalam usus (Salmonella non-tifoid, Shigella, Campylobacter jejuni, Escherichia coli patogenik, Vibrio parahaemolyticus, Clostridium perfringens), virus (norovirus, rotavirus), serta bahan kimia dan toksin alami seperti jamur beracun, singkong dengan sianida, dan siguatera pada ikan karang.',
+    patofisiologi:
+      'Mekanismenya terbagi menjadi tiga jalur yang menjelaskan perbedaan masa inkubasi dan gejala. Pada jalur toksin yang sudah terbentuk di dalam makanan, tidak diperlukan waktu untuk perbanyakan kuman di dalam tubuh sehingga keluhan muncul sangat cepat dalam 1-6 jam; toksin bekerja pada reseptor saluran cerna dan merangsang pusat muntah melalui jalur aferen vagus, sehingga muntah jauh lebih menonjol daripada diare dan umumnya tanpa demam. Pada jalur enterotoksin yang diproduksi kuman setelah berkembang biak di dalam usus, dibutuhkan waktu perbanyakan sehingga inkubasi menjadi 8-16 jam; enterotoksin mengaktifkan adenilat siklase yang meningkatkan kadar siklik AMP di dalam enterosit, menyebabkan sekresi aktif klorida dan air ke lumen usus sehingga terjadi diare cair yang banyak tanpa darah. Pada jalur invasif, kuman menembus dan merusak mukosa usus halus distal serta kolon sehingga menimbulkan reaksi inflamasi dengan demam, tinja berdarah dan berlendir, serta leukosit tinja positif, dengan inkubasi paling panjang yaitu 16-72 jam. Ancaman utama pada seluruh jalur bukanlah kumannya melainkan kehilangan cairan dan elektrolit yang cepat, yang pada anak kecil dan usia lanjut dapat berlanjut menjadi syok hipovolemik, hipokalemia, dan asidosis metabolik.',
+    faktorRisiko: [
+      'Makanan yang dimasak jauh sebelum disantap lalu dibiarkan pada suhu ruang lebih dari 2 jam',
+      'Makanan mentah atau kurang matang: telur setengah matang, daging, unggas, makanan laut, dan susu tidak dipasteurisasi',
+      'Nasi atau mi yang dihangatkan berulang — kondisi khas untuk Bacillus cereus',
+      'Sanitasi dapur buruk, penjamah makanan yang sakit atau tidak mencuci tangan, dan pencampuran makanan matang dengan bahan mentah',
+      'Usia balita dan lanjut, kehamilan, serta keadaan imunitas menurun',
+      'Penggunaan penghambat pompa proton jangka panjang yang menurunkan keasaman lambung',
+      'Makan bersama dalam jumlah besar seperti hajatan dan katering, yang memperbesar peluang kejadian luar biasa',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dan epidemiologis: keluhan saluran cerna akut yang timbul dalam kurun waktu yang sesuai setelah menyantap makanan tertentu, diperkuat oleh adanya orang lain dengan keluhan serupa yang menyantap makanan yang sama. Masa inkubasi merupakan petunjuk penyebab yang paling berguna. Konfirmasi etiologi melalui kultur tinja atau pemeriksaan toksin pada sampel makanan hanya diperlukan pada kasus berat, pasien dengan imunitas menurun, atau dalam penyelidikan kejadian luar biasa, dan tidak menjadi syarat untuk memulai tatalaksana.',
+    diagnosisBanding: [
+      'Gastroenteritis virus (norovirus, rotavirus) — sangat menular antarorang, sering disertai keluhan saluran napas ringan, tidak selalu ada makanan bersama sebagai sumber',
+      'Demam tifoid — demam bertahap yang meninggi ke arah sore dan malam selama lebih dari 7 hari, nyeri kepala, lidah kotor, dan bradikardia relatif; diare bukan gejala paling menonjol',
+      'Disentri amuba — diare berdarah yang lebih menahun dengan tinja berbau amis dan dapat disertai abses hati',
+      'Kolitis akibat Clostridioides difficile — didahului riwayat antibiotik, bukan makanan',
+      'Apendisitis akut — nyeri berpindah dari ulu hati ke kanan bawah dengan nyeri lepas dan defans, diare bila ada hanya sedikit',
+      'Ketoasidosis diabetik — mual, muntah, dan nyeri perut hebat yang mudah disangka keracunan; napas cepat dalam dan gula darah tinggi yang membedakan',
+      'Reaksi anafilaksis terhadap makanan — timbul dalam hitungan menit disertai bentol, gatal, sesak, dan hipotensi',
+      'Botulisme — kelemahan otot menurun yang simetris dengan ptosis dan gangguan menelan; kegawatan yang tidak boleh terlewat karena mengancam pernapasan',
+    ],
+    pengkajian:
+      'Dipikirkan keracunan makanan pada pasien ini atas dasar keluhan mual, muntah, dan diare yang timbul mendadak dalam kurun waktu yang sesuai setelah menyantap makanan tertentu, disertai adanya orang lain yang menyantap makanan yang sama dan mengalami keluhan serupa — kesamaan sumber makanan inilah bukti epidemiologis yang paling menguatkan. Jarak waktu antara makan dan munculnya gejala dipakai untuk memperkirakan penyebab: keluhan yang muncul sangat cepat dengan muntah dominan dan tanpa demam mengarah pada toksin yang sudah terbentuk di dalam makanan, sedangkan keluhan yang muncul lebih dari satu hari kemudian disertai demam dan tinja berdarah mengarah pada kuman invasif. Gastroenteritis virus tetap menjadi kemungkinan, namun pola penularan pada kasus ini terpusat pada satu makanan bersama alih-alih penularan berantai antarorang. Demam tifoid disingkirkan karena demam pada kasus ini tidak berlangsung bertahap selama lebih dari seminggu dan keluhan saluran cerna justru mendominasi sejak awal. Apendisitis akut disingkirkan karena nyeri perut bersifat kram dan difus serta mereda setelah buang air besar, tanpa perpindahan nyeri ke kanan bawah, tanpa nyeri lepas, dan tanpa defans muskuler. Ketoasidosis diabetik juga perlu diingat sebagai penyerupa yang berbahaya, namun tidak ditemukan napas cepat dalam maupun riwayat diabetes dengan gula darah yang meninggi. Botulisme disingkirkan karena tidak ada ptosis, penglihatan ganda, gangguan menelan, maupun kelemahan otot yang menjalar turun. Yang menentukan tatalaksana pada kasus ini bukanlah jenis kumannya melainkan derajat dehidrasi, sebab ancaman sesungguhnya adalah kehilangan cairan dan elektrolit, sementara penyakitnya sendiri sebagian besar akan sembuh sendiri.',
+    terapiSuportif: [
+      'REHIDRASI ADALAH TERAPI UTAMA, bukan terapi penunjang. Tanpa dehidrasi dan dehidrasi ringan-sedang ditangani dengan oralit; dehidrasi berat memerlukan cairan intravena',
+      'Oralit osmolaritas rendah: pada anak berikan 50-75 mL/kg dalam 3-4 jam untuk dehidrasi ringan-sedang, ditambah 5-10 mL/kg setiap kali buang air besar cair; pada dewasa berikan 200 mL setiap kali buang air besar cair',
+      'Berikan oralit sedikit demi sedikit dengan sendok atau teguk kecil setiap beberapa menit; muntah bukan alasan menghentikan oralit, melainkan alasan memperlambat pemberiannya',
+      'Dehidrasi berat: Ringan laktat 100 mL/kg — pada bayi kurang dari 12 bulan berikan 30 mL/kg dalam 1 jam pertama lalu 70 mL/kg dalam 5 jam berikutnya; pada anak lebih besar dan dewasa berikan 30 mL/kg dalam 30 menit pertama lalu 70 mL/kg dalam 2,5 jam berikutnya, sambil terus dinilai ulang',
+      'Zink 20 mg per hari (10 mg pada bayi kurang dari 6 bulan) selama 10-14 hari pada anak dengan diare — menurunkan durasi dan beratnya diare serta kekambuhan dalam beberapa bulan berikutnya',
+      'LANJUTKAN PEMBERIAN MAKAN dan air susu ibu selama diare; puasa memperlambat pemulihan mukosa usus dan memperburuk status gizi',
+      'Pantau produksi urin, berat badan, dan tanda vital sebagai penanda keberhasilan rehidrasi',
+      'Koreksi hipokalemia dan asidosis metabolik pada kasus berat sesuai hasil laboratorium',
+    ],
+    tatalaksana: [
+      'Sebagian besar kasus bersifat sembuh sendiri dalam 1-3 hari dan cukup dengan rehidrasi serta pemantauan',
+      'ANTIBIOTIK TIDAK DIBERIKAN RUTIN — pada infeksi Escherichia coli penghasil toksin Shiga, antibiotik justru meningkatkan risiko sindrom uremik hemolitik, dan pada Salmonella non-tifoid antibiotik memperpanjang masa pembawa kuman',
+      'Antibiotik dipertimbangkan hanya pada disentri dengan demam tinggi, kecurigaan Shigella atau kolera, penyakit berat dengan tanda sepsis, bayi kurang dari 3 bulan, dan pasien dengan imunitas menurun — pilihan umumnya siprofloksasin pada dewasa atau sefiksim maupun azitromisin pada anak, disesuaikan pola kepekaan setempat',
+      'Metronidazol bila dicurigai amubiasis atau giardiasis',
+      'Antiemetik seperti ondansetron dosis tunggal dapat diberikan pada muntah hebat yang menghalangi rehidrasi oral, terutama pada anak',
+      'OBAT ANTIMOTILITAS SEPERTI LOPERAMID DIHINDARI pada diare berdarah, demam, dan pada anak — memperlambat pengeluaran toksin, memperpanjang penyakit, dan berisiko ileus serta megakolon toksik',
+      'Probiotik dapat sedikit mempersingkat durasi diare namun bukan terapi utama dan tidak menggantikan rehidrasi',
+      'Rawat inap bila dehidrasi berat, muntah terus-menerus sehingga rehidrasi oral gagal, gangguan kesadaran, syok, komorbid berat, atau usia sangat muda maupun sangat tua',
+      'LAPORKAN ke puskesmas atau dinas kesehatan setempat bila terdapat dua orang atau lebih dengan keluhan serupa dari sumber makanan yang sama — pelaporan ini adalah bagian dari tatalaksana, karena mencegah korban berikutnya',
+    ],
+    edukasi: [
+      'Jelaskan bahwa penyakit ini umumnya sembuh sendiri dan bahwa yang paling penting bukanlah obat melainkan mengganti cairan yang hilang',
+      'Ajarkan cara membuat dan memberikan oralit secara benar: satu bungkus dilarutkan dalam 200 mL air matang sesuai petunjuk kemasan, diminum sedikit-sedikit tetapi sering, dan larutan yang sudah lebih dari 24 jam dibuang',
+      'Jadwal dan porsi makan: JANGAN berpuasa. Berikan makanan porsi kecil namun lebih sering, sekitar 6 kali sehari dengan jarak 2-3 jam, berupa makanan lunak, rendah lemak, dan mudah dicerna seperti bubur, nasi tim, pisang, roti, dan kentang. Air susu ibu tetap diteruskan pada bayi. Hindari sementara susu tinggi laktosa bila timbul kembung setelah minum susu, makanan pedas, gorengan, kopi, dan minuman bersoda maupun minuman manis kemasan yang justru memperberat diare. Kembali ke pola makan biasa secara bertahap dalam 2-3 hari',
+      'Jam tidur: istirahat cukup 7-8 jam per malam selama fase akut, dan pada anak biarkan tidur lebih banyak; bangunkan secara berkala untuk minum oralit agar rehidrasi tidak terputus sepanjang malam',
+      'Pola olahraga: hentikan olahraga selama masih diare dan dehidrasi. Setelah keluhan mereda dan asupan kembali normal, mulai lagi dengan jalan santai 15-20 menit sehari lalu tingkatkan bertahap dalam 3-5 hari; jangan langsung berolahraga berat karena cadangan cairan dan elektrolit belum sepenuhnya pulih',
+      'Pencegahan yang konkret: cuci tangan dengan sabun sebelum mengolah dan menyantap makanan serta setelah dari kamar mandi; masak makanan sampai matang sempurna; sajikan segera setelah dimasak dan jangan biarkan lebih dari 2 jam pada suhu ruang; simpan makanan matang di lemari pendingin dan panaskan sampai benar-benar mendidih sebelum disantap kembali; pisahkan bahan mentah dari makanan matang serta gunakan talenan berbeda; gunakan air matang untuk minum; dan jangan menyantap makanan kaleng yang penyok, menggembung, atau berbau menyimpang',
+      'Penjamah makanan yang sedang sakit tidak boleh mengolah makanan sampai bebas gejala minimal 48 jam',
+      'Follow up: kontrol dalam 24-48 jam bila keluhan belum membaik; segera datang lebih awal bila muncul tanda bahaya',
+      'TANDA BAHAYA yang mengharuskan segera ke fasilitas kesehatan: tidak mampu minum atau muntah setiap kali minum, buang air kecil sangat berkurang atau tidak sama sekali selama 6-8 jam, mata sangat cekung, lemas berat atau penurunan kesadaran, tinja berdarah, demam tinggi menetap, nyeri perut hebat yang terus-menerus, atau munculnya penglihatan ganda, kelopak mata jatuh, dan kesulitan menelan maupun bernapas',
+    ],
+    komplikasi: [
+      'Dehidrasi berat, syok hipovolemik, dan gangguan ginjal akut',
+      'Gangguan elektrolit berupa hipokalemia dan hiponatremia serta asidosis metabolik',
+      'Kejang akibat gangguan elektrolit atau demam pada anak',
+      'Sindrom uremik hemolitik pada infeksi Escherichia coli penghasil toksin Shiga, terutama pada anak',
+      'Bakteremia dan infeksi fokal jauh pada pasien dengan imunitas menurun',
+      'Sindrom Guillain-Barré dan artritis reaktif pascainfeksi Campylobacter',
+      'Sindrom usus iritabel pascainfeksi dan intoleransi laktosa sementara',
+      'Gagal napas pada botulisme',
+      'Malnutrisi dan gangguan pertumbuhan pada anak dengan episode berulang',
+    ],
+    prognosis:
+      'Sangat baik pada sebagian besar kasus, dengan pemulihan sempurna dalam 1-3 hari asalkan rehidrasi dikerjakan dengan benar dan tepat waktu. Prognosis memburuk pada usia sangat muda dan sangat tua, kehamilan, keadaan imunitas menurun, serta pada infeksi Escherichia coli penghasil toksin Shiga dan botulisme. Kematian pada keracunan makanan hampir selalu disebabkan oleh dehidrasi yang tidak tertangani, bukan oleh kuman penyebabnya — dan justru karena itulah prognosis sangat ditentukan oleh kecepatan mengganti cairan.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'SLEISENGER2021', 'HARRISON2022'],
   },
   'Botulisme': {
     definisi: 'Keracunan neurotoksin Clostridium botulinum yang menghambat pelepasan asetilkolin, menyebabkan kelumpuhan flaksid desenden.',
@@ -4823,10 +4929,98 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
   'Herpes zoster tanpa komplikasi': {
-    definisi: 'Reaktivasi virus varisela-zoster laten pada ganglion sensorik, menimbulkan erupsi vesikuler sesuai dermatom.',
-    diagnosis: ['Nyeri/parestesia mendahului erupsi, vesikel berkelompok UNILATERAL sesuai dermatom yang tidak melewati garis tengah; waspada zoster oftalmikus (tanda Hutchinson pada ujung hidung)'],
-    tatalaksana: ['Antivirus (asiklovir/valasiklovir) idealnya dalam 72 jam onset untuk kurangi durasi dan risiko neuralgia pascaherpetik, analgesia adekuat termasuk obat nyeri neuropatik, perawatan lesi; rujuk oftalmologi bila zoster oftalmikus'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi:
+      'Erupsi vesikuler nyeri yang terbatas pada satu dermatom akibat reaktivasi virus varisela-zoster yang laten di ganglion radiks dorsalis atau ganglion saraf kranial setelah infeksi varisela primer, tanpa keterlibatan mata, telinga, penyebaran diseminata, maupun komplikasi neurologis.',
+    anamnesis: {
+      keluhanUtama:
+        'Nyeri disertai bintil berair berkelompok pada satu sisi tubuh yang tidak melewati garis tengah.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: nyeri terasa pada satu pita kulit sesuai dermatom, tersering torakal, kemudian lumbal dan servikal; tanyakan secara eksplisit apakah keluhan melewati garis tengah tubuh, karena sifat unilateral adalah kunci diagnosis. Onset: nyeri, rasa terbakar, gatal, atau baal biasanya mendahului lesi 2-3 hari — fase prodromal ini sering disalahartikan sebagai kolik ginjal, angina, atau nyeri muskuloskeletal bila belum ada ruam. Character: nyeri bersifat neuropatik — menusuk, panas terbakar, atau seperti tersengat listrik, kerap disertai alodinia sehingga sentuhan pakaian pun terasa nyeri. Radiation: menjalar mengikuti perjalanan saraf, bukan menyebar acak. Associations: demam ringan, malaise, dan sakit kepala; tanyakan gangguan penglihatan, mata merah, nyeri telinga, gangguan pendengaran, vertigo, dan wajah perot untuk menyingkirkan zoster oftalmikus dan sindrom Ramsay Hunt yang bukan lagi kasus tanpa komplikasi. Time course: lesi berkembang dari makula eritematosa menjadi papul, vesikel berkelompok, lalu pustul dan krusta dalam 7-10 hari; catat hari keberapa sejak lesi pertama muncul karena antivirus paling bermanfaat bila dimulai dalam 72 jam. Exacerbating/relieving: nyeri memberat saat tersentuh dan pada malam hari. Severity: nilai dengan skala nyeri numerik serta dampaknya pada tidur dan aktivitas.',
+      riwayatPenyakitDahulu:
+        'Riwayat cacar air pada masa kanak-kanak atau kontak varisela — reaktivasi hanya mungkin bila pernah terinfeksi. Gali kondisi yang menurunkan imunitas seluler: diabetes melitus, keganasan terutama limfoma dan leukemia, infeksi HIV, penyakit ginjal kronik, serta riwayat kemoterapi atau radioterapi. Zoster pada usia muda tanpa faktor risiko jelas merupakan indikasi untuk menawarkan tes HIV.',
+      riwayatPenyakitKeluarga:
+        'Umumnya tidak relevan sebagai penyebab, namun tanyakan adanya anggota keluarga serumah yang belum pernah varisela, ibu hamil, bayi, atau orang dengan imunitas menurun, karena cairan vesikel dapat menularkan varisela kepada mereka.',
+      riwayatPengobatan:
+        'Penggunaan kortikosteroid jangka panjang, obat imunosupresan, dan obat biologis. Catat pula analgesik yang sudah dipakai beserta responsnya, serta riwayat vaksinasi zoster atau varisela.',
+      riwayatAlergi: 'Riwayat alergi obat, khususnya asiklovir dan golongan analgesik yang akan diresepkan.',
+      riwayatNutrisi:
+        'Status gizi dan asupan harian; malnutrisi memperlambat penyembuhan lesi dan menandakan imunitas yang menurun.',
+      riwayatSosialEkonomi:
+        'Pekerjaan dan kontak erat di rumah maupun tempat kerja untuk menilai risiko penularan, kualitas tidur yang sering terganggu oleh nyeri, tingkat stres sebagai pencetus reaktivasi, serta kemampuan membeli antivirus yang menentukan pilihan regimen.',
+    },
+    pemeriksaanFisik: [
+      'Inspeksi seluruh permukaan kulit untuk memastikan lesi terbatas pada satu dermatom dan benar-benar tidak melewati garis tengah; adanya lebih dari 20 lesi di luar dermatom yang terkena menandakan zoster diseminata dan bukan lagi kasus tanpa komplikasi',
+      'Karakterisasi lesi: vesikel berkelompok di atas dasar eritematosa dengan berbagai stadium (vesikel, pustul, krusta) pada satu waktu',
+      'Periksa ujung dan sisi hidung untuk tanda Hutchinson — keterlibatan cabang nasosiliaris menandakan risiko tinggi zoster oftalmikus; bila ada, disertai atau tanpa mata merah, pasien harus dirujuk ke oftalmologi',
+      'Periksa liang telinga, membran timpani, dan fungsi nervus fasialis untuk menyingkirkan sindrom Ramsay Hunt',
+      'Uji sensorik pada dermatom yang terkena: alodinia, hiperestesia, atau justru hipoestesia',
+      'Palpasi kelenjar getah bening regional yang dapat membesar dan nyeri',
+      'Suhu tubuh serta tanda infeksi sekunder bakterial berupa pus, nyeri yang memberat, dan eritema yang meluas melewati batas dermatom',
+    ],
+    penunjang: [
+      'Diagnosis pada kasus khas ditegakkan secara klinis; pemeriksaan penunjang tidak rutin diperlukan',
+      'Tzanck smear dari dasar vesikel menunjukkan sel datia berinti banyak — mendukung infeksi kelompok herpes namun tidak membedakan varisela-zoster dari herpes simpleks',
+      'PCR dari cairan vesikel merupakan pemeriksaan paling sensitif dan spesifik, dipakai bila gambaran atipik atau pada pasien dengan imunitas menurun',
+      'Tes HIV ditawarkan pada zoster yang timbul di usia muda, berulang, atau melibatkan lebih dari satu dermatom',
+      'Gula darah untuk menapis diabetes sebagai faktor predisposisi yang sering belum terdiagnosis',
+    ],
+    etiologi:
+      'Reaktivasi virus varisela-zoster (human herpesvirus tipe 3) yang menetap laten di ganglion sensorik sejak infeksi varisela primer.',
+    patofisiologi:
+      'Setelah varisela primer, virus bermigrasi melalui akson sensorik dan menetap dalam keadaan laten di ganglion radiks dorsalis serta ganglion saraf kranial. Imunitas seluler spesifik terhadap virus menekan reaktivasi; ketika imunitas ini menurun karena penuaan, penyakit, obat imunosupresif, atau stres berat, virus bereplikasi kembali. Replikasi menimbulkan peradangan dan nekrosis neuron ganglion yang menghasilkan nyeri neuropatik, lalu virus menyebar sentrifugal sepanjang akson sensorik menuju kulit sehingga erupsi muncul persis mengikuti wilayah persarafan satu dermatom dan berhenti di garis tengah. Kerusakan serabut saraf yang berat serta sensitisasi sentral yang menyertainya menjadi dasar neuralgia pascaherpetik yang dapat menetap lama setelah kulit sembuh.',
+    faktorRisiko: [
+      'Usia 50 tahun ke atas — faktor risiko tunggal terkuat karena imunitas seluler menurun seiring usia',
+      'Infeksi HIV dan keganasan hematologi',
+      'Terapi kortikosteroid jangka panjang, kemoterapi, radioterapi, dan obat imunosupresan pascatransplantasi',
+      'Diabetes melitus dan penyakit ginjal kronik',
+      'Stres fisik maupun psikis berat dan kurang tidur kronik',
+      'Trauma atau tindakan bedah pada dermatom yang bersangkutan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari erupsi vesikel berkelompok di atas dasar eritematosa yang terbatas pada satu dermatom, unilateral, tidak melewati garis tengah, dan didahului nyeri neuropatik prodromal. Bila gambaran atipik atau pasien dengan imunitas menurun, konfirmasi dilakukan dengan PCR cairan vesikel yang merupakan pemeriksaan paling sensitif dan spesifik. Disebut tanpa komplikasi bila tidak ada keterlibatan mata, telinga, penyebaran diseminata, keterlibatan neurologis, maupun infeksi sekunder.',
+    diagnosisBanding: [
+      'Herpes simpleks zosteriformis — vesikel dapat tersusun mirip dermatom namun cenderung berulang di lokasi yang sama dan lesi lebih sedikit; PCR membedakan keduanya',
+      'Dermatitis kontak alergika — batas mengikuti area kontak bahan, bukan dermatom, gatal jauh lebih menonjol daripada nyeri, dan dapat bilateral',
+      'Impetigo bulosa — bula kendur dengan krusta madu, tidak mengikuti dermatom, tidak didahului nyeri neuropatik',
+      'Nyeri prodromal tanpa ruam dapat menyerupai angina pektoris, kolik ureter, kolesistitis, atau nyeri radikular akibat hernia nukleus pulposus — perjalanan waktu dan munculnya ruam yang mengklarifikasi',
+      'Zoster oftalmikus dan sindrom Ramsay Hunt — bukan diagnosis banding melainkan bentuk berkomplikasi yang harus dikenali dan dirujuk',
+    ],
+    pengkajian:
+      'Dipikirkan herpes zoster tanpa komplikasi pada pasien ini atas dasar nyeri neuropatik yang mendahului erupsi beberapa hari, diikuti munculnya vesikel berkelompok di atas dasar eritematosa yang tersusun rapi mengikuti satu dermatom, tegas berhenti di garis tengah tubuh, pada seseorang dengan riwayat cacar air sebelumnya. Sifat unilateral dan terbatas pada satu dermatom inilah yang mengarahkan diagnosis dan sekaligus menjauhkan dari dermatitis kontak alergika, yang batasnya mengikuti area kontak bahan penyebab, dapat bilateral, serta didominasi gatal alih-alih nyeri terbakar. Herpes simpleks zosteriformis memang dapat menyerupai gambaran ini, namun riwayat lesi berulang di lokasi yang sama tidak ditemukan dan jumlah lesi di sini jauh lebih banyak serta tersebar sepanjang dermatom. Impetigo bulosa disingkirkan karena tidak didahului fase nyeri prodromal dan lesinya tidak terbatas pada dermatom. Nyeri prodromal yang sempat dirasakan sebelum ruam muncul patut dicatat sebagai penjelasan mengapa keluhan awal mudah disalahartikan sebagai nyeri jantung atau kolik ginjal — begitu ruam khas muncul, ambiguitas itu selesai. Kasus ini digolongkan tanpa komplikasi karena tidak ditemukan tanda Hutchinson maupun keluhan mata, tidak ada lesi pada liang telinga atau kelumpuhan wajah yang menandakan sindrom Ramsay Hunt, tidak ada lesi tersebar di luar dermatom yang menandakan diseminasi, dan tidak ada tanda infeksi sekunder bakterial. Usia pasien dan faktor yang menurunkan imunitas perlu ditelusuri karena menentukan urgensi terapi serta perlu tidaknya penapisan HIV dan diabetes.',
+    terapiSuportif: [
+      'Kompres dingin dengan larutan salin atau air matang pada lesi yang masih basah untuk mengurangi nyeri dan mempercepat pengeringan; hindari menggaruk dan memecah vesikel',
+      'Jaga lesi tetap bersih dan kering, tutup longgar dengan kasa non-adheren bila lesi luas atau berisiko bergesekan dengan pakaian',
+      'Asupan cairan dan kalori adekuat; pada usia lanjut, nyeri hebat sering menurunkan nafsu makan dan asupan minum sehingga rentan dehidrasi',
+      'Pastikan analgesia cukup sebelum pasien pulang — nyeri yang tidak terkendali mengganggu tidur dan menjadi prediktor neuralgia pascaherpetik',
+    ],
+    tatalaksana: [
+      'Antivirus dimulai sesegera mungkin, idealnya dalam 72 jam sejak lesi pertama muncul; tetap diberikan setelah 72 jam bila masih ada lesi baru, pasien berusia lanjut, atau imunitas menurun',
+      'Asiklovir 800 mg per oral lima kali sehari selama 7 hari, atau valasiklovir 1000 mg tiga kali sehari selama 7 hari yang lebih praktis karena frekuensinya lebih jarang; sesuaikan dosis pada gangguan fungsi ginjal dan pastikan asupan cairan cukup',
+      'Analgesia bertingkat: parasetamol 500-1000 mg tiap 6-8 jam sebagai dasar, ditambah obat antiinflamasi nonsteroid bila tidak ada kontraindikasi',
+      'Nyeri neuropatik sedang hingga berat memerlukan gabapentin dimulai 300 mg malam hari lalu dititrasi bertahap, atau pregabalin dimulai 75 mg dua kali sehari; amitriptilin dosis rendah 10-25 mg malam hari dapat dipertimbangkan dengan hati-hati pada usia lanjut karena efek antikolinergiknya',
+      'Kortikosteroid sistemik tidak diberikan rutin; hanya dipertimbangkan pada pasien tertentu dengan nyeri hebat dan tanpa kontraindikasi, selalu bersama antivirus',
+      'Antibiotik hanya bila terbukti ada infeksi sekunder bakterial, mengarah pada kuman kulit dengan pilihan seperti sefaleksin atau kloksasilin',
+      'Rujuk segera bila ada tanda Hutchinson atau keluhan mata, lesi pada liang telinga dengan kelumpuhan wajah, lesi diseminata, keterlibatan neurologis, atau pasien dengan imunitas menurun berat',
+    ],
+    edukasi: [
+      'Jelaskan bahwa ini bukan penyakit menular seperti cacar air pada umumnya, tetapi cairan dalam vesikel dapat menularkan varisela kepada orang yang belum pernah terkena; tutup lesi dan hindari kontak dengan ibu hamil, bayi, dan orang dengan imunitas menurun sampai semua lesi mengering menjadi krusta',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam yang tetap dengan dua kali selingan, porsi kecil namun sering bila nyeri menurunkan nafsu makan; cukupkan protein 1-1,2 gram per kilogram berat badan per hari untuk penyembuhan jaringan, tambah buah dan sayur sumber vitamin C dan zink, serta minum 8 gelas air per hari',
+      'Jam tidur: usahakan 7-8 jam per malam dengan jam tidur dan bangun yang tetap; minum analgesik sekitar 30-60 menit sebelum tidur bila nyeri malam mengganggu, dan gunakan pakaian katun longgar agar tidak menggesek lesi',
+      'Pola olahraga: selama fase akut cukup jalan santai ringan 10-20 menit sehari sesuai toleransi; hindari olahraga berat, berenang di kolam umum, dan berbagi handuk sampai lesi mengering. Aktivitas normal dapat kembali bertahap setelah krusta lepas',
+      'Jangan memecah vesikel dan jangan mengoleskan pasta gigi, kecap, atau ramuan tradisional pada lesi karena meningkatkan risiko infeksi sekunder dan jaringan parut',
+      'Follow up: kontrol dalam 3-7 hari untuk menilai respons terapi dan kecukupan analgesia, lalu kontrol pada minggu ke-4 untuk menilai ada tidaknya neuralgia pascaherpetik. Segera datang lebih awal bila muncul keluhan mata atau penglihatan, nyeri telinga atau wajah perot, lesi menyebar ke luar dermatom, demam tinggi, atau nyeri yang tidak tertahankan',
+      'Jelaskan sejak awal bahwa nyeri dapat menetap beberapa minggu hingga bulan setelah kulit sembuh, terutama pada usia lanjut — informasi ini mencegah pasien menyimpulkan pengobatan gagal dan membuatnya kembali kontrol alih-alih berhenti berobat',
+    ],
+    komplikasi: [
+      'Neuralgia pascaherpetik — komplikasi tersering, risikonya meningkat tajam seiring usia dan beratnya nyeri fase akut',
+      'Infeksi sekunder bakterial pada lesi dengan risiko jaringan parut dan hiperpigmentasi pascainflamasi',
+      'Zoster oftalmikus dengan keratitis, uveitis, hingga gangguan penglihatan permanen',
+      'Sindrom Ramsay Hunt dengan kelumpuhan wajah perifer, gangguan pendengaran, dan vertigo',
+      'Zoster diseminata, meningoensefalitis, dan mielitis, terutama pada pasien dengan imunitas menurun',
+    ],
+    prognosis:
+      'Pada pasien imunokompeten, lesi kulit sembuh dalam 2-4 minggu dengan prognosis baik. Pemberian antivirus dalam 72 jam mempersingkat durasi lesi dan menurunkan intensitas serta durasi nyeri. Faktor penentu utama kualitas pemulihan adalah usia dan beratnya nyeri fase akut, karena keduanya paling kuat memprediksi neuralgia pascaherpetik; rekurensi pada orang dengan imunitas normal jarang terjadi.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019'],
   },
   'Morbili tanpa komplikasi': {
     definisi: 'Campak — infeksi akut oleh virus measles yang SANGAT MENULAR dengan angka reproduksi dasar 12-18, artinya satu penderita dapat menulari belasan orang rentan; masih menjadi penyebab kematian anak yang dapat dicegah dengan vaksin, dan wabah berulang muncul setiap kali cakupan imunisasi turun di bawah ambang kekebalan kelompok sekitar 95%.',
@@ -6359,10 +6553,110 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'WAO2020'],
   },
   'Dermatitis kontak iritan': {
-    definisi: 'Peradangan kulit akibat kerusakan langsung oleh bahan iritan, tanpa mekanisme imunologis.',
-    diagnosis: ['Lesi terbatas pada area kontak dengan batas tegas, muncul segera setelah paparan, rasa perih/terbakar lebih menonjol daripada gatal; riwayat paparan deterjen, sabun, pelarut, atau air berulang (sering pekerjaan)'],
-    tatalaksana: ['Hindari dan minimalkan paparan iritan, gunakan sarung tangan pelindung, emolien sebagai barrier repair, kortikosteroid topikal untuk fase inflamasi akut'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi:
+      'Peradangan kulit akibat kerusakan langsung sawar kulit oleh bahan iritan tanpa melibatkan mekanisme imunologis, sehingga dapat terjadi pada siapa saja pada paparan pertama bila bahan cukup kuat atau cukup sering.',
+    anamnesis: {
+      keluhanUtama: 'Kulit tangan kemerahan, kering, pecah-pecah, dan terasa perih.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: KUNCI DIAGNOSIS adalah kesesuaian lokasi lesi dengan area yang kontak dengan bahan — tersering punggung tangan dan sela jari, dapat pula wajah, atau daerah popok pada bayi; lesi berbatas tegas persis pada daerah kontak dan tidak menyebar ke tempat yang tidak terpapar. Onset: pada iritan kuat seperti asam atau basa, keluhan muncul segera dalam hitungan menit hingga jam setelah paparan; pada iritan lemah seperti sabun, deterjen, dan air, keluhan berkembang perlahan dalam beberapa minggu hingga bulan akibat paparan berulang. Character: PERIH DAN TERBAKAR LEBIH MENONJOL DARIPADA GATAL — perbedaan ini penting karena pada dermatitis kontak alergika gatalnya justru mendominasi. Radiation: pada paparan berkepanjangan lesi dapat meluas sedikit melewati batas kontak, namun tetap tidak menyebar jauh. Associations: kulit kering, bersisik, menebal, dan fisura yang nyeri; tanyakan pula tanda infeksi sekunder berupa nanah dan krusta kuning. Time course: TANYAKAN APAKAH KELUHAN MEMBAIK SAAT LIBUR ATAU CUTI DAN MEMBURUK SAAT KEMBALI BEKERJA — pola ini merupakan bukti terkuat hubungan dengan pekerjaan. Exacerbating: kontak dengan air berulang, sabun, deterjen, pelarut, semen, pupuk, sarung tangan lateks yang lembap, serta udara dingin dan kering. Severity: nyeri, keterbatasan menggunakan tangan, dan gangguan pekerjaan maupun tidur.',
+      riwayatPenyakitDahulu:
+        'Riwayat dermatitis atopik merupakan faktor predisposisi terkuat karena sawar kulit sudah lemah sejak awal; tanyakan pula riwayat asma dan rinitis alergika. Riwayat dermatitis serupa sebelumnya beserta pencetus dan pengobatannya.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi pada keluarga yang memperkuat kemungkinan sawar kulit yang rentan.',
+      riwayatPengobatan:
+        'Obat topikal yang sudah dipakai termasuk krim racikan tanpa label, serta antiseptik dan pembersih tangan beralkohol yang justru dapat memperberat. Perhatikan bahwa obat topikal itu sendiri kadang menjadi penyebab keluhan yang menetap.',
+      riwayatAlergi:
+        'Riwayat alergi terhadap lateks, nikel, pewangi, pengawet kosmetik, dan bahan lain — penting untuk menimbang kemungkinan komponen alergik yang menyertai.',
+      riwayatNutrisi: 'Status gizi umum; malnutrisi dan defisiensi mikronutrien memperlambat perbaikan sawar kulit.',
+      riwayatSosialEkonomi:
+        'RINCIAN PEKERJAAN ADALAH INTI ANAMNESIS: jenis pekerjaan, bahan yang disentuh setiap hari, berapa kali tangan basah dan dicuci per hari, berapa lama memakai sarung tangan tertutup, tersedia tidaknya alat pelindung diri, serta pekerjaan sampingan dan pekerjaan rumah tangga. Perhatikan pekerjaan berisiko tinggi: petugas kesehatan, penata rambut, juru masak, petugas kebersihan, pekerja bangunan dan semen, montir, serta petani. Tanyakan pula hobi seperti berkebun dan merawat kendaraan.',
+    },
+    pemeriksaanFisik: [
+      'Nilai batas lesi dengan cermat: pada dermatitis kontak iritan lesi berbatas TEGAS persis pada area kontak dan tidak menyebar ke luar area tersebut',
+      'Fase akut: eritema, edema, dan dapat disertai vesikel maupun erosi bila iritan kuat',
+      'Fase kronik: kulit kering, bersisik, likenifikasi berupa penebalan dengan garis kulit yang menjadi jelas, hiperpigmentasi, dan fisura yang dalam serta nyeri terutama pada ujung jari dan sela jari',
+      'Periksa seluruh permukaan tangan termasuk sela jari, punggung tangan, pergelangan, dan bandingkan dengan telapak tangan yang kulitnya lebih tebal sehingga lebih tahan',
+      'Cari tanda infeksi sekunder: pustul, krusta kuning keemasan, nyeri yang bertambah, eritema yang meluas, dan pembesaran kelenjar getah bening regional',
+      'Periksa kuku untuk perubahan berupa lekukan melintang dan penebalan pada dermatitis kronik',
+      'Cari tanda dermatitis atopik pada lokasi lain seperti lipat siku dan lipat lutut yang menandakan predisposisi',
+      'Pada bayi dengan dermatitis popok, perhatikan bahwa LIPATAN KULIT UMUMNYA TERHINDAR — bila lipatan justru terkena disertai lesi satelit, curigai kandidiasis',
+    ],
+    penunjang: [
+      'Diagnosis ditegakkan secara klinis dari anamnesis paparan dan gambaran lesi; pemeriksaan penunjang tidak rutin diperlukan',
+      'UJI TEMPEL (patch test) merupakan pemeriksaan kunci bukan untuk membuktikan iritan, melainkan untuk MENYINGKIRKAN komponen alergik: hasil negatif pada gambaran klinis yang sesuai mendukung dermatitis kontak iritan, sedangkan hasil positif menunjukkan adanya dermatitis kontak alergika yang menyertai',
+      'Uji tempel dikerjakan setelah lesi tenang dan setelah kortikosteroid topikal maupun sistemik dihentikan agar hasilnya tidak palsu negatif',
+      'Pemeriksaan kerokan kulit dengan larutan KOH bila lesi asimetris, bertepi aktif, atau menyerupai tinea',
+      'Kultur dan uji kepekaan dari lesi hanya bila ada infeksi sekunder yang tidak membaik dengan terapi awal',
+      'Biopsi kulit sangat jarang diperlukan, hanya pada kasus meragukan atau yang tidak membaik untuk menyingkirkan limfoma kutan dan psoriasis',
+    ],
+    etiologi:
+      'Bahan iritan kuat seperti asam, basa, dan pelarut organik yang merusak kulit pada satu kali paparan; atau iritan lemah seperti air, sabun, deterjen, dan sampo yang merusak kulit melalui paparan berulang dalam jangka panjang.',
+    patofisiologi:
+      'Bahan iritan melarutkan lipid interseluler stratum korneum dan merusak protein sawar kulit, sehingga kehilangan air transepidermal meningkat dan kulit menjadi kering serta lebih mudah ditembus bahan berikutnya. Kerusakan langsung pada keratinosit memicu pelepasan sitokin proinflamasi seperti interleukin-1 alfa dan tumor necrosis factor alfa tanpa memerlukan pengenalan antigen oleh limfosit T. Karena tidak melibatkan mekanisme imun spesifik, tidak ada fase sensitisasi, tidak diperlukan paparan sebelumnya, dan reaksi tetap terbatas pada tempat kontak — inilah dasar mengapa lesi berbatas tegas persis pada area paparan dan tidak menyebar, berbeda dari dermatitis kontak alergika yang dapat meluas melewati area kontak. Paparan berulang sebelum sawar sempat pulih menyebabkan kerusakan menumpuk, sehingga kulit yang semula tahan lama-kelamaan menjadi rentan; hal ini menjelaskan mengapa keluhan sering muncul setelah bertahun-tahun mengerjakan pekerjaan yang sama. Sawar yang sudah rusak juga mempermudah masuknya alergen, sehingga dermatitis kontak alergika kerap berkembang di atas dermatitis iritan yang berlangsung lama.',
+    faktorRisiko: [
+      'Pekerjaan dengan tangan basah lebih dari 2 jam per hari atau mencuci tangan lebih dari 20 kali per hari',
+      'Riwayat dermatitis atopik — faktor predisposisi individual terkuat',
+      'Pemakaian sarung tangan tertutup dalam waktu lama sehingga keringat terperangkap',
+      'Paparan semen, pupuk, pelarut, oli, sampo, dan bahan pembersih',
+      'Udara dingin dan kelembapan rendah yang memperberat kekeringan kulit',
+      'Usia bayi dengan sawar kulit yang belum matang dan usia lanjut dengan kulit yang menipis',
+      'Kulit yang sudah kering atau sedang mengalami dermatitis lain',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis berdasarkan tiga hal yang harus sejalan: riwayat paparan bahan iritan yang jelas, lokasi lesi yang tepat sesuai area kontak dengan batas tegas, dan perbaikan keluhan ketika paparan dihentikan seperti saat libur atau cuti. Uji tempel dikerjakan bukan untuk membuktikan iritan melainkan untuk menyingkirkan dermatitis kontak alergika; hasil negatif pada gambaran klinis yang sesuai mendukung diagnosis ini.',
+    diagnosisBanding: [
+      'Dermatitis kontak alergika — GATAL lebih menonjol daripada perih, lesi dapat MELUAS MELEWATI area kontak dan muncul di tempat jauh, memerlukan sensitisasi terlebih dahulu sehingga tidak terjadi pada paparan pertama, dan uji tempel positif',
+      'Dermatitis atopik — lesi pada lipatan siku dan lutut dengan riwayat atopi pribadi maupun keluarga, perjalanan hilang timbul sejak masa kanak-kanak, tidak terikat pada area kontak',
+      'Tinea manus — biasanya asimetris dan sering hanya mengenai satu tangan disertai dua kaki, bertepi aktif dengan bagian tengah yang lebih tenang, pemeriksaan KOH positif',
+      'Psoriasis — plak dengan sisik tebal keperakan berbatas sangat tegas, terdapat pula pada siku, lutut, dan kulit kepala, sering disertai kelainan kuku berupa pitting',
+      'Skabies — gatal hebat terutama malam hari, terowongan pada sela jari, dan ada anggota keluarga lain dengan keluhan serupa',
+      'Dermatitis numularis — lesi berbentuk koin berbatas tegas yang tersebar, tidak terkait area kontak',
+      'Pada bayi, kandidiasis daerah popok — LIPATAN KULIT JUSTRU TERKENA disertai lesi satelit, berbeda dari dermatitis popok iritan yang menyisakan lipatan',
+    ],
+    pengkajian:
+      'Dipikirkan dermatitis kontak iritan pada pasien ini atas dasar munculnya kemerahan, kekeringan, sisik, dan fisura yang terasa perih pada area kulit yang setiap hari bersentuhan dengan bahan pembersih dan air, dengan batas lesi yang tegas mengikuti area kontak dan tidak menyebar ke bagian tubuh yang tidak terpapar. Rasa perih dan terbakar yang lebih menonjol daripada gatal merupakan petunjuk penting, demikian pula riwayat keluhan yang membaik saat libur dan kembali memberat setelah bekerja, yang menghubungkan penyakit dengan paparan secara langsung. Dermatitis kontak alergika menjadi banding utama dan tidak dapat disingkirkan hanya dengan pengamatan, namun beberapa hal mengarahkan menjauh darinya: gatal bukan keluhan yang mendominasi, lesi sama sekali tidak meluas melewati area kontak maupun muncul di tempat yang jauh, dan keluhan berkembang perlahan seiring akumulasi paparan alih-alih timbul mendadak setelah kontak dengan satu bahan baru. Uji tempel tetap dianjurkan bila keluhan membandel, karena dermatitis kontak alergika kerap berkembang di atas kulit yang sawarnya sudah lama rusak, dan melewatkannya berarti pasien terus terpapar alergen yang sebenarnya dapat dihindari. Tinea manus disingkirkan karena lesi bersifat simetris pada kedua tangan tanpa tepi aktif, sedangkan pada tinea gambaran khasnya adalah satu tangan dengan dua kaki dan tepi yang meninggi. Psoriasis tidak sesuai karena tidak ditemukan sisik tebal keperakan maupun lesi pada siku, lutut, dan kulit kepala, dan skabies disingkirkan karena tidak ada gatal hebat pada malam hari, tidak ada terowongan pada sela jari, dan tidak ada anggota keluarga dengan keluhan serupa. Perlu ditekankan bahwa inti tatalaksana kasus ini terletak pada penghentian paparan dan pemulihan sawar kulit; pemberian kortikosteroid topikal tanpa mengubah paparan hanya akan menghasilkan perbaikan sementara yang berulang kali kambuh.',
+    terapiSuportif: [
+      'PEMULIHAN SAWAR KULIT ADALAH TERAPI UTAMA, bukan sekadar pelengkap: gunakan emolien tanpa pewangi dan tanpa pengawet secara berulang, minimal 4-6 kali sehari dan selalu setiap selesai mencuci tangan, dalam jumlah banyak',
+      'Pilih emolien berbasis salep atau krim yang kental pada malam hari; teknik oklusi dengan mengoleskan emolien tebal lalu memakai sarung tangan katun saat tidur sangat membantu pada fisura yang dalam',
+      'Cuci tangan dengan air suam-suam kuku bukan air panas, gunakan pembersih tanpa sabun yang lembut, dan keringkan dengan menepuk terutama pada sela jari alih-alih menggosok',
+      'Pada kulit yang masih utuh namun kering, pembersih tangan beralkohol justru kurang mengiritasi dibandingkan mencuci berulang dengan sabun; namun bila sudah ada fisura, alkohol akan sangat perih dan sebaiknya dihindari',
+      'Kompres larutan salin atau kompres basah pada fase akut yang basah dan mengeluarkan cairan',
+      'Sarung tangan pelindung yang sesuai bahan paparan, dilapisi sarung tangan katun di dalamnya, dan digunakan hanya seperlunya karena pemakaian tertutup terlalu lama justru melembapkan berlebih dan merusak sawar',
+    ],
+    tatalaksana: [
+      'IDENTIFIKASI DAN HENTIKAN PAPARAN adalah langkah paling menentukan; tanpa ini, terapi apa pun hanya menghasilkan perbaikan sementara',
+      'Kortikosteroid topikal potensi sedang seperti mometason furoat 0,1% atau triamsinolon asetonid 0,1% sekali sehari selama 2-4 minggu untuk fase inflamasi; pada wajah, lipatan, dan bayi gunakan potensi rendah seperti hidrokortison 1% dan batasi durasinya',
+      'Pada kulit tangan dan telapak yang sangat tebal, kadang diperlukan kortikosteroid potensi kuat dalam jangka pendek dengan pengawasan',
+      'Penghambat kalsineurin topikal seperti takrolimus dapat menjadi pilihan untuk pemakaian jangka panjang pada wajah dan lipatan guna menghindari efek samping kortikosteroid',
+      'Antihistamin oral tidak mengobati penyakitnya, namun antihistamin yang menyebabkan kantuk dapat membantu tidur bila gatal mengganggu malam hari',
+      'Antibiotik topikal atau sistemik yang mengarah pada kuman kulit hanya bila terbukti ada infeksi sekunder',
+      'Kortikosteroid sistemik jangka pendek hanya pada kasus akut yang berat dan luas, tidak untuk pemakaian rutin maupun berulang',
+      'Rujuk ke dokter spesialis kulit untuk uji tempel bila keluhan menetap lebih dari 6-8 minggu meski paparan sudah dikurangi, atau bila berkaitan dengan pekerjaan sehingga menyangkut penetapan penyakit akibat kerja',
+      'Pertimbangkan penyesuaian tugas di tempat kerja bila paparan tidak dapat dihindari; penyelesaian kasus ini sering bersifat okupasional dan bukan semata medis',
+    ],
+    edukasi: [
+      'Jelaskan bahwa penyakit ini disebabkan kerusakan sawar kulit oleh bahan yang disentuh setiap hari, bukan oleh alergi maupun oleh kurang bersih, dan bahwa kulit memerlukan waktu berminggu-minggu untuk memperbaiki sawarnya meski paparan sudah dihentikan',
+      'Tekankan bahwa pelembap bukan kosmetik melainkan obat pada penyakit ini, dan harus tetap dipakai bahkan setelah kulit tampak sembuh untuk mencegah kekambuhan',
+      'Lepaskan cincin sebelum mencuci tangan karena sabun dan air terperangkap di bawahnya dan menjadi sumber paparan yang terus-menerus',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan khusus dan pembatasan makanan tanpa dasar justru merugikan. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan; cukupkan protein 1-1,2 gram per kilogram berat badan per hari, perbanyak sayur dan buah sumber vitamin C dan zink, sertakan sumber asam lemak omega-3 seperti ikan, dan minum 8 gelas air per hari untuk mendukung perbaikan sawar kulit',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap, karena kurang tidur meningkatkan hormon stres yang memperlambat perbaikan sawar dan memperberat gatal. Oleskan emolien tebal lalu kenakan sarung tangan katun sebelum tidur, dan potong kuku pendek agar garukan saat tidur tidak melukai kulit',
+      'Pola olahraga: olahraga tetap dianjurkan 30 menit sehari selama 5 hari seminggu. Segera bilas keringat setelah berolahraga karena keringat yang mengering mengiritasi kulit yang sawarnya rusak, lalu segera oleskan emolien setelah mandi saat kulit masih lembap. Hindari sarung tangan angkat beban yang lembap, mandi air panas dan berendam air panas, serta berenang di kolam berkaporit tinggi selama masih ada fisura terbuka',
+      'Di tempat kerja: kenali dan catat bahan yang menjadi pencetus, gunakan alat pelindung yang sesuai, dan laporkan kepada penanggung jawab kesehatan kerja bila ada — kasus akibat kerja perlu penyesuaian tugas, bukan sekadar obat',
+      'Di rumah: gunakan sarung tangan saat mencuci piring dan pakaian, pilih deterjen tanpa pewangi, dan bilas pakaian sampai bersih dari sisa deterjen',
+      'Follow up: kontrol dalam 2 minggu untuk menilai respons kortikosteroid topikal, lalu setiap 4 minggu hingga keluhan terkendali. Bila belum membaik dalam 6-8 minggu meski paparan sudah dikurangi, pasien perlu dirujuk untuk uji tempel',
+      'Tanda bahaya yang mengharuskan datang lebih awal: nanah, krusta kuning, nyeri yang bertambah hebat, kemerahan yang meluas cepat, demam, atau lesi yang menyebar ke daerah yang tidak pernah bersentuhan dengan bahan apa pun',
+    ],
+    komplikasi: [
+      'Infeksi sekunder bakterial, tersering oleh Staphylococcus aureus',
+      'Likenifikasi dan fisura kronik yang nyeri serta mengganggu fungsi tangan',
+      'Berkembangnya dermatitis kontak alergika di atas kulit yang sawarnya sudah rusak',
+      'Hiperpigmentasi maupun hipopigmentasi pascainflamasi',
+      'Atrofi kulit, telangiektasia, dan striae akibat pemakaian kortikosteroid topikal potensi kuat yang berkepanjangan',
+      'Kehilangan pekerjaan atau keharusan berpindah pekerjaan pada kasus akibat kerja yang berat',
+      'Gangguan tidur dan penurunan kualitas hidup',
+    ],
+    prognosis:
+      'Baik bila paparan dapat dihentikan dan sawar kulit dipulihkan secara konsisten, dengan perbaikan dalam beberapa minggu. Prognosis menjadi kurang baik bila paparan tidak dapat dihindari karena tuntutan pekerjaan, bila terdapat riwayat dermatitis atopik, atau bila penyakit sudah berlangsung lama sehingga terjadi likenifikasi. Faktor penentu utama bukanlah pilihan kortikosteroid melainkan keberhasilan mengubah paparan dan kedisiplinan memakai emolien jangka panjang; tanpa keduanya, kekambuhan hampir pasti terjadi.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019'],
   },
   'Dermatitis kontak alergika': {
     definisi: 'Peradangan kulit akibat reaksi hipersensitivitas tipe IV terhadap alergen kontak.',
@@ -6401,10 +6695,109 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
   'Akne vulgaris ringan': {
-    definisi: 'Penyakit unit pilosebasea dengan komedo dan lesi inflamasi ringan, tanpa nodul atau jaringan parut bermakna.',
-    diagnosis: ['Komedo terbuka (blackhead) dan tertutup (whitehead) dominan, dengan sedikit papul dan pustul, tanpa nodul/kista; predileksi wajah, dada, punggung'],
-    tatalaksana: ['Retinoid topikal (tretinoin/adapalen) sebagai dasar untuk komedo, benzoil peroksida untuk lesi inflamasi, pembersih wajah lembut 2x/hari; edukasi jangan memencet lesi, gunakan pelembap dan tabir surya non-komedogenik, hasil terlihat setelah 6-8 minggu'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014'],
+    definisi:
+      'Penyakit kronik unit pilosebasea yang ditandai komedo terbuka dan tertutup disertai sedikit papul dan pustul, tanpa nodul, kista, maupun jaringan parut bermakna; berpredileksi pada wajah, dada, dan punggung.',
+    anamnesis: {
+      keluhanUtama: 'Jerawat berupa komedo dan bintil kecil di wajah yang tidak kunjung hilang.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: sebaran lesi pada wajah terutama dahi, hidung, dan dagu, serta pada dada dan punggung atas — daerah dengan kelenjar sebasea terbanyak. Onset: umumnya dimulai sekitar masa pubertas dan berlangsung bertahun-tahun; awitan mendadak pada usia dewasa, apalagi disertai tanda maskulinisasi, mengarahkan pada sebab hormonal atau obat. Character: bedakan lesi tidak meradang berupa komedo terbuka yang berwarna hitam dan komedo tertutup yang berwarna putih, dari lesi meradang berupa papul dan pustul; tanyakan pula apakah ada benjolan besar yang nyeri di bawah kulit yang menandakan nodul dan berarti bukan lagi derajat ringan. Radiation: perluasan ke leher, dada, dan punggung. Associations: pada perempuan tanyakan keteraturan haid, pertumbuhan rambut berlebih di wajah dan tubuh, rambut kepala menipis, dan kenaikan berat badan yang mengarah pada sindrom ovarium polikistik. Time course: hubungan dengan siklus haid, memberat menjelang haid adalah pola yang lazim; tanyakan pula perjalanan sejak pertama muncul dan respons terhadap pengobatan sebelumnya. Exacerbating: pemakaian kosmetik dan pelembap berminyak, sering menyentuh dan memencet wajah, penggunaan helm dan masker ketat, keringat, stres, kurang tidur, serta obat tertentu. Severity: dampak terhadap kepercayaan diri, pergaulan, dan suasana hati — dimensi ini sering jauh lebih berat daripada gambaran kulitnya dan wajib ditanyakan.',
+      riwayatPenyakitDahulu:
+        'Riwayat akne sebelumnya dan pengobatan yang pernah dijalani. Pada perempuan, riwayat haid tidak teratur, sindrom ovarium polikistik, dan gangguan endokrin lain. Riwayat depresi maupun kecemasan yang perlu diketahui sebelum mempertimbangkan terapi tertentu.',
+      riwayatPenyakitKeluarga:
+        'Riwayat akne berat pada orang tua atau saudara kandung meningkatkan risiko akne yang lebih berat dan lebih lama pada pasien.',
+      riwayatPengobatan:
+        'Obat yang dapat mencetuskan atau memperberat akne: kortikosteroid sistemik maupun topikal, steroid anabolik dan suplemen binaraga, hormon androgen, litium, isoniazid, fenitoin, serta vitamin B12 dosis tinggi. Tanyakan pula seluruh produk yang dioleskan ke wajah termasuk krim pemutih dan racikan tanpa label yang lazim mengandung steroid dan justru memperparah setelah dihentikan.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap produk perawatan kulit sebelumnya.',
+      riwayatNutrisi:
+        'Pola makan sehari-hari, khususnya konsumsi makanan dengan indeks glikemik tinggi seperti minuman manis, roti putih, dan camilan manis, serta konsumsi susu terutama susu rendah lemak — keduanya berkaitan dengan perburukan akne meskipun bukan penyebab utama.',
+      riwayatSosialEkonomi:
+        'Kebiasaan perawatan wajah termasuk frekuensi mencuci muka dan jenis pembersih yang dipakai, penggunaan kosmetik dan tabir surya, paparan pekerjaan terhadap minyak dan oli, tingkat stres, durasi tidur, serta kemampuan finansial dan kesabaran untuk menjalani terapi berbulan-bulan yang menentukan keberhasilan pengobatan.',
+    },
+    pemeriksaanFisik: [
+      'Periksa di bawah cahaya yang terang dan merata, meliputi seluruh wajah, leher, dada, punggung atas, dan bahu',
+      'Hitung dan bedakan jenis lesi: komedo terbuka, komedo tertutup, papul, dan pustul — keberadaan komedo adalah temuan yang menegakkan diagnosis akne dan membedakannya dari erupsi menyerupai akne',
+      'Pastikan TIDAK ADA nodul maupun kista, karena keberadaannya menaikkan derajat menjadi sedang atau berat dan mengubah pilihan terapi',
+      'Nilai ada tidaknya jaringan parut, baik atrofik maupun hipertrofik, serta hiperpigmentasi maupun eritema pascainflamasi',
+      'Nilai jenis kulit dan derajat seborea',
+      'Pada perempuan dengan akne yang membandel, cari tanda hiperandrogenisme: hirsutisme, kebotakan pola androgenik, akantosis nigrikans, dan obesitas sentral',
+      'Perhatikan tanda pemakaian kortikosteroid topikal jangka panjang berupa kulit menipis, telangiektasia, dan eritema menetap',
+    ],
+    penunjang: [
+      'Akne vulgaris ringan adalah diagnosis klinis — pemeriksaan penunjang TIDAK diperlukan',
+      'Pemeriksaan hormonal berupa testosteron total dan bebas, DHEAS, serta rasio LH terhadap FSH hanya bila ada tanda hiperandrogenisme, haid tidak teratur, atau akne yang timbul mendadak dan berat pada usia dewasa',
+      'Pemeriksaan kerokan kulit dengan larutan KOH bila dicurigai folikulitis akibat jamur Malassezia yang dapat menyerupai akne namun lesinya seragam, sangat gatal, dan tanpa komedo',
+      'Tes kehamilan wajib pada perempuan usia subur sebelum pemberian retinoid oral — namun retinoid oral bukan terapi untuk derajat ringan',
+    ],
+    etiologi:
+      'Interaksi empat faktor: peningkatan produksi sebum akibat rangsangan androgen, hiperkeratinisasi saluran folikel, kolonisasi Cutibacterium acnes, dan reaksi inflamasi; dengan latar predisposisi genetik.',
+    patofisiologi:
+      'Androgen yang meningkat pada masa pubertas merangsang kelenjar sebasea memproduksi sebum lebih banyak. Bersamaan dengan itu terjadi hiperkeratinisasi dan peningkatan daya lekat sel keratin pada saluran folikel sehingga saluran tersumbat dan terbentuk mikrokomedo, yaitu lesi awal yang belum terlihat mata. Sumbatan yang tetap tertutup di bawah permukaan tampak sebagai komedo tertutup berwarna putih, sedangkan sumbatan yang terbuka ke permukaan mengalami oksidasi melanin sehingga tampak hitam — warna hitam ini berasal dari oksidasi, bukan dari kotoran, dan inilah sebabnya mencuci muka lebih sering tidak menghilangkannya. Lingkungan folikel yang kaya sebum dan miskin oksigen menjadi tempat ideal bagi Cutibacterium acnes untuk berkembang biak; kuman ini memecah trigliserida sebum menjadi asam lemak bebas dan mengaktifkan reseptor imun bawaan sehingga memicu pelepasan sitokin proinflamasi. Peradangan inilah yang mengubah komedo menjadi papul dan pustul, dan bila peradangan meluas serta merusak dinding folikel akan terbentuk nodul dan kista dengan risiko jaringan parut permanen. Pemahaman ini menjelaskan mengapa terapi harus menyasar sumbatan folikel sejak awal dan mengapa hasilnya baru terlihat setelah beberapa minggu — satu siklus pematangan folikel memakan waktu berminggu-minggu.',
+    faktorRisiko: [
+      'Usia remaja dan dewasa muda pada masa peningkatan androgen',
+      'Riwayat akne berat pada keluarga',
+      'Kulit berminyak dan seborea',
+      'Penggunaan kosmetik serta pelembap berminyak yang bersifat komedogenik',
+      'Obat: kortikosteroid, steroid anabolik dan suplemen binaraga, litium, isoniazid, dan fenitoin',
+      'Pola makan tinggi indeks glikemik dan konsumsi susu berlebih',
+      'Gesekan dan tekanan berulang dari helm, masker, tali tas, dan kebiasaan menopang dagu',
+      'Stres, kurang tidur, dan sindrom ovarium polikistik pada perempuan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari adanya komedo terbuka maupun tertutup — temuan yang wajib ada — disertai papul dan pustul pada daerah dengan kelenjar sebasea terbanyak. Derajat ringan ditetapkan bila lesi didominasi komedo dengan sedikit lesi meradang, tanpa nodul, tanpa kista, dan tanpa jaringan parut bermakna. Tidak ada pemeriksaan laboratorium yang menegakkan diagnosis; penilaian derajat inilah yang menentukan pilihan terapi.',
+    diagnosisBanding: [
+      'Rosasea — eritema menetap pada bagian tengah wajah dengan telangiektasia dan papulopustul namun TANPA KOMEDO, umumnya pada usia lebih tua dan dipicu panas, makanan pedas, serta alkohol',
+      'Folikulitis akibat Malassezia (pitirosporum) — papulopustul kecil yang sangat seragam ukurannya, sangat gatal, terutama di dada dan punggung, tanpa komedo, dan justru membaik dengan antijamur bukan antibiotik',
+      'Dermatitis perioral — papul dan pustul kecil di sekitar mulut dengan sisi bibir yang bebas lesi, sering berkaitan dengan pemakaian kortikosteroid topikal di wajah',
+      'Erupsi akneiformis akibat obat — lesi monomorfik yang muncul serentak tanpa komedo, terkait kortikosteroid, litium, atau obat lain',
+      'Folikulitis bakterial — pustul dengan rambut di tengahnya, terasa nyeri, tanpa komedo',
+      'Veruka plana dan milia — papul kecil tanpa peradangan yang dapat disangka komedo tertutup',
+    ],
+    pengkajian:
+      'Dipikirkan akne vulgaris derajat ringan pada pasien ini atas dasar ditemukannya komedo terbuka dan tertutup sebagai lesi yang dominan, disertai sejumlah kecil papul dan pustul, pada daerah predileksi kelenjar sebasea yaitu wajah bagian tengah, dada, dan punggung atas, yang berlangsung menahun sejak masa pubertas. Keberadaan komedo merupakan temuan penentu, sebab komedo adalah tanda sumbatan folikel yang menjadi lesi dasar akne dan justru tidak dijumpai pada penyerupanya. Rosasea disingkirkan karena tidak ditemukan komedo sama sekali pada penyakit tersebut, dan gambarannya didominasi eritema menetap dengan telangiektasia pada usia yang umumnya lebih tua. Folikulitis akibat Malassezia disingkirkan karena lesi pada kasus ini beragam bentuk dan ukurannya serta tidak disertai rasa gatal hebat yang khas, sementara pada folikulitis jamur lesi tampak seragam dan terpusat di badan. Erupsi akneiformis akibat obat juga tidak sesuai karena lesi di sini tidak muncul serentak dalam waktu singkat, tidak monomorfik, dan tidak ada riwayat kortikosteroid maupun obat pencetus. Derajat ditetapkan ringan karena tidak dijumpai nodul, kista, maupun jaringan parut, dan penetapan derajat ini bukan sekadar label melainkan penentu terapi — pada derajat ringan cukup dengan terapi topikal tanpa memerlukan antibiotik sistemik apalagi retinoid oral. Perlu pula ditelusuri kemungkinan pencetus yang dapat dikoreksi berupa kosmetik komedogenik, obat, dan pada perempuan tanda hiperandrogenisme, karena mengabaikannya membuat terapi topikal apa pun terlihat gagal.',
+    terapiSuportif: [
+      'Pembersihan wajah dua kali sehari dengan pembersih lembut tanpa sabun keras dan tanpa butiran kasar; mencuci muka lebih sering TIDAK memperbaiki akne dan justru mengiritasi kulit serta memicu produksi sebum berlebih',
+      'Gunakan pelembap berlabel bebas minyak dan non-komedogenik — pelembap bukan musuh akne, melainkan penopang agar terapi retinoid dapat ditoleransi',
+      'Tabir surya non-komedogenik setiap pagi, karena retinoid dan benzoil peroksida meningkatkan kepekaan terhadap sinar matahari dan paparan sinar memperberat hiperpigmentasi pascainflamasi',
+      'Hentikan seluruh krim racikan tanpa label yang berpotensi mengandung kortikosteroid, serta hentikan kosmetik berminyak dan berbahan dasar minyak',
+      'Dukungan psikologis: akui secara eksplisit dampak akne terhadap kepercayaan diri dan suasana hati, dan tapis gejala depresi maupun kecemasan bila ada tanda ke arah itu',
+    ],
+    tatalaksana: [
+      'Retinoid topikal adalah tulang punggung terapi karena satu-satunya golongan yang bekerja pada sumbatan folikel sebagai lesi dasar: adapalen 0,1% atau tretinoin 0,025-0,05% dioleskan tipis pada seluruh area yang cenderung berjerawat — bukan hanya pada lesi yang terlihat — satu kali sehari pada malam hari',
+      'Mulai perlahan untuk menghindari iritasi: dua sampai tiga malam per minggu pada 2 minggu pertama, oleskan pada kulit yang benar-benar kering, dan gunakan pelembap sesudahnya; tingkatkan menjadi setiap malam sesuai toleransi',
+      'Benzoil peroksida 2,5-5% untuk lesi meradang, dipakai pagi hari; konsentrasi 2,5% sama efektifnya dengan yang lebih tinggi namun lebih sedikit menimbulkan iritasi. Peringatkan bahwa bahan ini memutihkan warna handuk, sarung bantal, dan pakaian',
+      'Kombinasi retinoid pada malam hari dengan benzoil peroksida pada pagi hari lebih efektif daripada salah satunya saja; jangan mencampur keduanya pada waktu bersamaan karena sebagian formulasi retinoid terurai oleh benzoil peroksida',
+      'Asam salisilat 0,5-2% dapat menjadi alternatif pada kulit yang tidak menoleransi retinoid, meskipun efeknya lebih lemah',
+      'Antibiotik topikal seperti klindamisin 1% hanya digunakan BERSAMA benzoil peroksida dan tidak pernah sebagai obat tunggal, karena pemakaian tunggal menimbulkan resistensi Cutibacterium acnes; batasi penggunaannya hingga sekitar 12 minggu',
+      'ANTIBIOTIK SISTEMIK TIDAK DIINDIKASIKAN pada derajat ringan — pemberiannya adalah kesalahan lazim yang mendorong resistensi tanpa manfaat tambahan',
+      'Isotretinoin oral tidak diindikasikan pada derajat ringan dan hanya untuk akne berat, nodulokistik, atau yang membandel terhadap terapi baku',
+      'Pada perempuan dengan akne yang jelas dipengaruhi hormon, kontrasepsi oral kombinasi dapat dipertimbangkan setelah menimbang kontraindikasi dan bila terapi topikal belum memadai',
+      'Ekstraksi komedo oleh tenaga terlatih dapat mempercepat perbaikan tampilan namun bukan terapi utama dan tidak menggantikan retinoid',
+      'Evaluasi terapi pada minggu ke-8 hingga ke-12; naikkan tingkat terapi bila tidak ada perbaikan bermakna atau bila muncul nodul dan jaringan parut',
+    ],
+    edukasi: [
+      'HARAPAN YANG REALISTIS adalah bagian terpenting dari edukasi: hasil baru terlihat setelah 6-8 minggu, dan kulit sering tampak sedikit memburuk pada 2-4 minggu pertama pemakaian retinoid sebelum membaik. Menjelaskan hal ini di awal adalah alasan utama pasien tidak berhenti berobat di tengah jalan',
+      'Akne adalah penyakit menahun yang dikendalikan, bukan disembuhkan sekali jalan; terapi rumatan tetap diperlukan setelah lesi mereda agar tidak kambuh',
+      'JANGAN MEMENCET, MENGOREK, ATAU MENGGARUK lesi — inilah penyebab utama jaringan parut permanen dan bercak hitam yang jauh lebih sulit diobati daripada jerawatnya sendiri',
+      'Akne bukan disebabkan oleh wajah yang kotor; warna hitam pada komedo berasal dari oksidasi, bukan dari kotoran, sehingga menggosok wajah lebih keras dan lebih sering hanya merusak sawar kulit',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam yang teratur dengan dua kali selingan; kurangi makanan berindeks glikemik tinggi seperti minuman manis kemasan, roti putih, mi instan, dan camilan manis, serta batasi susu terutama susu rendah lemak menjadi tidak lebih dari satu gelas per hari. Perbanyak sayur, buah utuh, biji-bijian utuh, dan ikan, dan minum air putih 8 gelas per hari. Tidak ada bukti bahwa cokelat atau gorengan harus dipantang total, sehingga pembatasan makanan yang berlebihan tidak dianjurkan',
+      'Jam tidur: 7-9 jam per malam dengan jadwal yang tetap; kurang tidur meningkatkan hormon stres yang memperberat akne. Ganti sarung bantal setiap 2-3 hari, dan pahami bahwa benzoil peroksida akan memutihkan warna kain tersebut',
+      'Pola olahraga: aktivitas aerobik sedang 30 menit sehari selama 5 hari seminggu membantu mengelola stres yang menjadi pemberat. Segera bersihkan wajah dan mandi setelah berkeringat, hindari menyeka wajah dengan handuk kotor yang dipakai bersama, bersihkan tali helm dan alat pelindung secara berkala, dan hindari memakai riasan tebal saat berolahraga',
+      'Cara memakai obat dengan benar: oleskan tipis dan merata pada seluruh area rawan jerawat, bukan menitik hanya pada jerawat yang terlihat, karena terapi bekerja mencegah lesi baru bukan mengeringkan lesi yang sudah ada',
+      'Follow up: kontrol pada minggu ke-8 sampai ke-12 untuk menilai respons dan menyesuaikan terapi; datang lebih awal bila timbul iritasi berat, atau bila muncul benjolan besar yang nyeri dan jaringan parut yang berarti derajatnya meningkat',
+      'Bila akne menimbulkan tekanan batin, rasa rendah diri, atau menghindari pergaulan, sampaikan hal tersebut saat kontrol — dampak psikologis merupakan bagian dari penyakit ini dan layak ditangani, bukan dianggap berlebihan',
+    ],
+    komplikasi: [
+      'Jaringan parut atrofik berupa ice pick, boxcar, dan rolling scar yang bersifat permanen',
+      'Jaringan parut hipertrofik dan keloid, terutama pada dada dan punggung',
+      'Hiperpigmentasi dan eritema pascainflamasi yang dapat bertahan berbulan-bulan',
+      'Perkembangan menjadi akne derajat sedang hingga berat bila tidak ditangani',
+      'Dampak psikologis berupa penurunan kepercayaan diri, kecemasan, depresi, dan penarikan diri dari pergaulan',
+      'Dermatitis kontak iritan akibat pemakaian obat topikal yang berlebihan',
+      'Akne akibat kortikosteroid dan penipisan kulit akibat pemakaian krim racikan berkortikosteroid',
+    ],
+    prognosis:
+      'Baik. Akne derajat ringan umumnya terkendali dengan terapi topikal, dan sebagian besar kasus mereda dengan sendirinya pada dekade ketiga kehidupan. Prognosis paling ditentukan oleh kepatuhan menjalani terapi selama berbulan-bulan dan oleh kebiasaan tidak memencet lesi, sebab jaringan parut yang terbentuk bersifat permanen dan jauh lebih sulit ditangani daripada akne yang menyebabkannya. Pengobatan yang dimulai lebih dini menurunkan risiko jaringan parut dan dampak psikologis jangka panjang.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'PPKFKTP2014', 'FITZPATRICK2019'],
   },
   'Akne vulgaris sedang-berat': {
     definisi: 'Akne dengan lesi inflamasi luas, nodul, atau kista yang berisiko meninggalkan jaringan parut permanen.',
@@ -6443,10 +6836,104 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
   'Urtikaria akut': {
-    definisi: 'Erupsi bentol (wheal) gatal yang berlangsung kurang dari 6 minggu, akibat pelepasan histamin dari sel mast.',
-    diagnosis: ['Bentol eritematosa dengan tepi meninggi dan pusat pucat, sangat gatal, INDIVIDUAL LESI HILANG <24 JAM tanpa bekas (bila menetap >24 jam atau meninggalkan bekas, curigai urtikaria vaskulitis); cari pemicu: obat, makanan, infeksi, gigitan serangga'],
-    tatalaksana: ['Antihistamin H1 non-sedatif dosis standar, dapat dinaikkan hingga 4x dosis bila perlu; hindari pemicu yang teridentifikasi dan NSAID; kortikosteroid sistemik jangka pendek pada kasus berat; waspadai tanda anafilaksis (sesak, hipotensi) yang memerlukan epinefrin'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'WAO2020'],
+    definisi:
+      'Erupsi bentol (wheal) yang sangat gatal dengan atau tanpa angioedema, berlangsung kurang dari 6 minggu, akibat pelepasan histamin dan mediator lain dari sel mast kulit; setiap lesi individual menghilang dalam waktu kurang dari 24 jam tanpa meninggalkan bekas.',
+    anamnesis: {
+      keluhanUtama: 'Bentol-bentol merah yang sangat gatal, berpindah-pindah, dan timbul mendadak.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan gatal. Site: sebaran lesi — dapat di mana saja pada tubuh dan berpindah tempat dari jam ke jam; tanyakan keterlibatan kelopak mata, bibir, lidah, dan alat kelamin yang menandakan angioedema. Onset: mendadak, sering dalam hitungan menit hingga jam setelah paparan; tanyakan secara rinci apa yang dimakan, diminum, dan dikonsumsi sebagai obat dalam 24 jam terakhir, serta riwayat gigitan serangga dan infeksi yang sedang berlangsung. Character: bentol meninggi dengan tepi eritematosa dan pusat lebih pucat, terasa gatal hebat dan kadang seperti tersengat, bukan nyeri. Radiation: lesi meluas dan menyatu membentuk peta yang tidak beraturan. Associations: PERTANYAAN PALING PENTING adalah tanda anafilaksis — sesak napas, suara serak, rasa tercekik, sulit menelan, nyeri perut hebat, muntah, pusing berputar, atau rasa mau pingsan; adanya salah satu dari ini mengubah tatalaksana dari antihistamin menjadi epinefrin segera. Time course: KUNCI DIAGNOSIS — tanyakan berapa lama satu bentol bertahan di satu titik sebelum hilang; pada urtikaria, satu lesi individual hilang dalam kurang dari 24 jam tanpa bekas, sedangkan lesi yang menetap lebih dari 24 jam atau meninggalkan memar dan hiperpigmentasi mengarah ke urtikaria vaskulitis. Exacerbating: panas, keringat, tekanan pakaian, garukan, olahraga, alkohol, stres, dan obat antiinflamasi nonsteroid. Severity: nilai dengan derajat gatal dan jumlah bentol per hari, serta dampaknya terhadap tidur dan aktivitas.',
+      riwayatPenyakitDahulu:
+        'Riwayat atopi berupa asma, rinitis alergika, dan dermatitis atopik. Riwayat episode urtikaria atau angioedema sebelumnya beserta pencetusnya. Riwayat penyakit tiroid autoimun dan penyakit autoimun lain yang lebih berkaitan dengan urtikaria kronik. Riwayat infeksi saluran napas atas, infeksi saluran cerna, atau infeksi gigi yang sedang berlangsung, karena infeksi merupakan pencetus urtikaria akut yang sangat sering terutama pada anak.',
+      riwayatPenyakitKeluarga:
+        'Riwayat atopi dan urtikaria pada keluarga. Riwayat angioedema berulang tanpa bentol pada beberapa anggota keluarga mengarah pada angioedema herediter yang tidak berespons terhadap antihistamin maupun epinefrin dan memerlukan penanganan berbeda.',
+      riwayatPengobatan:
+        'Daftar seluruh obat dalam 2 minggu terakhir termasuk obat bebas, jamu, dan suplemen. Perhatikan khusus antibiotik golongan beta-laktam, obat antiinflamasi nonsteroid, penghambat ACE yang khas menyebabkan angioedema tanpa bentol, opioid, dan media kontras.',
+      riwayatAlergi:
+        'Riwayat alergi obat, makanan (telur, susu, kacang, ikan, udang), lateks, dan sengatan serangga beserta bentuk reaksinya — apakah hanya kulit atau pernah disertai sesak dan penurunan kesadaran.',
+      riwayatNutrisi:
+        'Rincian makanan dan minuman 24 jam terakhir, termasuk makanan olahan, pengawet, pewarna, dan makanan tinggi histamin seperti ikan tidak segar, keju matang, dan makanan fermentasi.',
+      riwayatSosialEkonomi:
+        'Paparan pekerjaan terhadap lateks, bahan kimia, atau hewan; aktivitas sebelum keluhan muncul seperti olahraga, mandi air panas, atau paparan dingin; tingkat stres; serta kualitas tidur yang sering terganggu oleh gatal malam hari.',
+    },
+    pemeriksaanFisik: [
+      'PERTAMA-TAMA nilai jalan napas, pernapasan, dan sirkulasi: tekanan darah, laju nadi, laju napas, saturasi oksigen, suara serak, stridor, mengi, dan pembengkakan lidah maupun uvula — bukan pemeriksaan kulit yang didahulukan',
+      'Karakterisasi lesi: bentol meninggi berbatas tegas dengan tepi eritematosa dan pusat lebih pucat, ukuran bervariasi dari beberapa milimeter hingga plak luas yang menyatu',
+      'Tandai batas beberapa lesi dengan pena lalu evaluasi ulang setelah beberapa jam — cara sederhana yang membuktikan apakah lesi benar berpindah dan hilang dalam kurang dari 24 jam',
+      'Cari angioedema pada kelopak mata, bibir, lidah, dan genitalia — pembengkakan di jaringan submukosa yang terasa lebih tegang daripada gatal',
+      'Dermografisme: goreskan ujung tumpul pada kulit punggung, munculnya bentol linier dalam beberapa menit menandakan urtikaria dermografik',
+      'Cari petunjuk penyebab: fokus infeksi pada faring, tonsil, telinga, dan gigi; bekas gigitan serangga; serta pembesaran kelenjar getah bening',
+      'Perhatikan ada tidaknya purpura, hiperpigmentasi bekas lesi, atau lesi yang nyeri alih-alih gatal, yang semuanya mengarah pada urtikaria vaskulitis',
+    ],
+    penunjang: [
+      'Pada urtikaria akut khas dengan pencetus yang jelas, pemeriksaan penunjang TIDAK diperlukan — diagnosis murni klinis dan pemeriksaan luas justru menyesatkan',
+      'Darah lengkap dengan hitung jenis bila dicurigai infeksi atau infestasi parasit sebagai pencetus',
+      'Laju endap darah dan C-reactive protein bila dicurigai urtikaria vaskulitis atau penyakit sistemik',
+      'Biopsi kulit hanya bila lesi menetap lebih dari 24 jam, nyeri, atau meninggalkan purpura — untuk membuktikan vaskulitis',
+      'Uji tusuk kulit atau IgE spesifik hanya bila anamnesis mengarah kuat pada alergen tertentu yang dapat dihindari, dikerjakan setelah fase akut mereda',
+      'Kadar C4 dan C1 inhibitor bila terdapat angioedema berulang tanpa bentol yang tidak berespons terhadap antihistamin',
+    ],
+    etiologi:
+      'Tersering adalah infeksi (terutama infeksi virus saluran napas atas pada anak), obat, makanan, dan sengatan serangga; sebagian besar kasus tidak ditemukan penyebab pastinya dan tetap sembuh sendiri.',
+    patofisiologi:
+      'Sel mast pada dermis superfisial mengalami degranulasi dan melepaskan histamin bersama mediator lain seperti leukotrien, prostaglandin, dan sitokin. Degranulasi dapat terjadi melalui jalur imunologis, yaitu ikatan silang antara alergen dengan IgE spesifik pada permukaan sel mast, maupun jalur non-imunologis melalui aktivasi langsung oleh obat, media kontras, atau makanan tertentu tanpa melibatkan IgE. Histamin bekerja pada reseptor H1 di endotel dan ujung saraf sensorik sehingga terjadi vasodilatasi, peningkatan permeabilitas kapiler dengan ekstravasasi plasma ke dermis, dan rangsangan gatal. Karena edema ini berada di dermis superfisial dan cepat direabsorpsi, lesi bersifat sementara dan berpindah — inilah dasar biologis mengapa satu bentol tidak bertahan lebih dari 24 jam. Bila edema terjadi lebih dalam pada dermis profunda dan jaringan submukosa, gambarannya menjadi angioedema yang lebih terasa tegang daripada gatal.',
+    faktorRisiko: [
+      'Riwayat atopi pribadi maupun keluarga',
+      'Infeksi virus yang sedang berlangsung, terutama pada anak',
+      'Penggunaan obat antiinflamasi nonsteroid dan antibiotik beta-laktam',
+      'Riwayat reaksi alergi terhadap makanan atau sengatan serangga sebelumnya',
+      'Paparan pekerjaan terhadap lateks dan bahan kimia',
+      'Stres psikis dan kurang tidur sebagai pencetus maupun pemberat',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari bentol gatal berbatas tegas yang berpindah-pindah, dengan syarat kunci bahwa setiap lesi individual menghilang dalam kurang dari 24 jam tanpa meninggalkan bekas, dan keseluruhan episode berlangsung kurang dari 6 minggu. Menandai batas lesi lalu menilainya ulang beberapa jam kemudian adalah cara praktis membuktikan syarat tersebut. Lesi yang menetap lebih dari 24 jam, terasa nyeri, atau meninggalkan purpura dan hiperpigmentasi memerlukan biopsi kulit untuk membuktikan urtikaria vaskulitis.',
+    diagnosisBanding: [
+      'Urtikaria vaskulitis — lesi menetap lebih dari 24 jam, terasa nyeri atau terbakar alih-alih gatal, dan meninggalkan purpura serta hiperpigmentasi; ditegakkan dengan biopsi',
+      'Anafilaksis — bukan sekadar diagnosis banding melainkan kegawatan yang harus disingkirkan lebih dahulu; ditandai keterlibatan sistem lain berupa sesak, hipotensi, atau gejala saluran cerna',
+      'Angioedema herediter — angioedema berulang tanpa bentol, riwayat keluarga positif, tidak berespons terhadap antihistamin maupun epinefrin, C4 rendah',
+      'Angioedema akibat penghambat ACE — pembengkakan bibir dan lidah tanpa bentol dan tanpa gatal, dapat muncul setelah berbulan-bulan pemakaian',
+      'Eritema multiforme — lesi target dengan tiga zona yang menetap di tempat yang sama selama berhari-hari, tidak berpindah',
+      'Reaksi gigitan serangga (papular urtikaria) — lesi terkelompok pada area terbuka, ada titik gigitan di tengah, menetap berhari-hari',
+      'Mastositosis kutan — lesi coklat kemerahan menetap yang menjadi bentol saat digosok (tanda Darier)',
+    ],
+    pengkajian:
+      'Dipikirkan urtikaria akut pada pasien ini atas dasar timbulnya bentol meninggi berbatas tegas dengan tepi eritematosa dan pusat lebih pucat yang sangat gatal, muncul mendadak, berpindah-pindah lokasi, dan setiap lesinya menghilang dalam waktu kurang dari 24 jam tanpa meninggalkan bekas apa pun. Sifat sementara dan berpindah inilah yang paling menentukan, dan sekaligus menjauhkan dari urtikaria vaskulitis yang lesinya justru menetap lebih dari 24 jam, terasa nyeri alih-alih gatal, dan meninggalkan purpura atau hiperpigmentasi. Eritema multiforme disingkirkan karena lesi pada kasus ini tidak berbentuk target dengan tiga zona dan tidak menetap di tempat yang sama, sementara reaksi gigitan serangga disingkirkan karena tidak ditemukan titik gigitan di tengah lesi dan sebarannya tidak terbatas pada area kulit yang terbuka. Langkah pertama yang dikerjakan pada kasus ini bukanlah menegakkan diagnosis melainkan menyingkirkan anafilaksis, karena urtikaria adalah manifestasi kulit yang paling sering menyertainya; tidak adanya sesak napas, suara serak, pembengkakan lidah, nyeri perut hebat, maupun hipotensi menegaskan reaksi masih terbatas pada kulit sehingga cukup ditangani dengan antihistamin. Bila terdapat angioedema tanpa bentol sama sekali, terutama pada pemakai penghambat ACE atau dengan riwayat keluarga serupa, penalaran harus dialihkan ke angioedema akibat obat atau angioedema herediter yang tidak akan membaik dengan antihistamin. Pencetus ditelusuri dari obat, makanan, sengatan serangga, dan infeksi yang sedang berlangsung, namun perlu dijelaskan bahwa pada sebagian besar kasus penyebab pastinya memang tidak ditemukan dan hal itu tidak mengubah tatalaksana maupun prognosis.',
+    terapiSuportif: [
+      'Bila ada tanda anafilaksis: epinefrin 0,3-0,5 mg (anak 0,01 mg/kg, maksimal 0,3 mg) larutan 1:1000 intramuskular pada paha bagian luar tengah, diulang tiap 5-15 menit bila perlu — jangan menunda demi memberikan antihistamin lebih dulu',
+      'Pada anafilaksis, baringkan pasien dengan tungkai ditinggikan (kecuali sesak, maka posisi duduk), berikan oksigen aliran tinggi, pasang jalur intravena, dan berikan kristaloid 20 mL/kg bila hipotensi',
+      'Kompres dingin pada area yang gatal untuk meredakan keluhan; hindari mandi air panas yang justru memperberat',
+      'Hentikan segera obat atau makanan yang dicurigai sebagai pencetus dan catat namanya di rekam medis serta beri tahu pasien untuk diingat seumur hidup',
+      'Asupan cairan cukup dan istirahat; sebagian besar kasus tidak memerlukan rawat inap',
+    ],
+    tatalaksana: [
+      'Antihistamin H1 generasi kedua yang non-sedatif sebagai lini pertama: setirizin 10 mg sekali sehari, loratadin 10 mg sekali sehari, atau feksofenadin 180 mg sekali sehari (dosis anak disesuaikan berat badan)',
+      'Bila keluhan belum terkendali setelah 2 minggu, dosis dapat dinaikkan bertahap hingga empat kali dosis standar — menaikkan dosis satu jenis lebih dianjurkan daripada mencampur beberapa jenis antihistamin',
+      'Antihistamin generasi pertama seperti klorfeniramin maleat 4 mg dapat ditambahkan pada malam hari bila gatal sangat mengganggu tidur, dengan peringatan efek mengantuk sehingga tidak boleh mengemudi atau mengoperasikan mesin',
+      'Kortikosteroid sistemik jangka pendek hanya untuk kasus berat atau dengan angioedema luas: prednison 0,5-1 mg/kg per hari selama 3-5 hari tanpa perlu tapering; bukan terapi rutin dan tidak untuk jangka panjang',
+      'Epinefrin intramuskular adalah terapi utama bila disertai tanda anafilaksis — antihistamin dan kortikosteroid hanya terapi tambahan yang tidak boleh menggantikannya',
+      'Hindari pemicu yang teridentifikasi, serta hindari obat antiinflamasi nonsteroid dan aspirin selama fase akut karena dapat memperberat pada sebagian besar pasien',
+      'Obati infeksi yang menjadi pencetus bila ditemukan; pada anak, infeksi virus saluran napas atas adalah penyebab tersering dan urtikaria akan mereda seiring sembuhnya infeksi',
+      'Bekali resep epinefrin autoinjektor dan latih cara pakainya pada pasien dengan riwayat anafilaksis, bila tersedia',
+    ],
+    edukasi: [
+      'Jelaskan bahwa sebagian besar urtikaria akut sembuh sendiri dalam beberapa hari hingga beberapa minggu, dan bahwa tidak ditemukannya penyebab adalah hal yang lazim serta tidak berarti pemeriksaan kurang lengkap',
+      'Jadwal dan porsi makan: pertahankan tiga kali makan utama pada jam yang tetap dengan porsi biasa; TIDAK dianjurkan pantang makanan secara luas tanpa bukti, karena membatasi banyak makanan sekaligus justru merugikan gizi tanpa memperbaiki penyakit. Bila ada makanan yang jelas terkait, catat dalam buku harian makanan dan hindari makanan itu saja. Batasi sementara alkohol, makanan sangat pedas, dan makanan tinggi histamin seperti ikan tidak segar, keju matang, dan makanan fermentasi',
+      'Jam tidur: 7-8 jam per malam dengan jam tidur tetap; kurang tidur menurunkan ambang gatal. Bila gatal malam mengganggu, minum antihistamin yang menyebabkan kantuk sebelum tidur, mandi air suam-suam kuku bukan air panas, dan gunakan pakaian katun longgar serta seprai bersih',
+      'Pola olahraga: aktivitas ringan sampai sedang seperti jalan cepat 30 menit sehari boleh diteruskan; hindari olahraga berat, sauna, dan mandi air panas selama fase akut karena panas dan keringat memperberat. Bila keluhan justru muncul saat berolahraga, hentikan dan laporkan karena mengarah pada urtikaria akibat olahraga',
+      'Jangan menggaruk karena garukan memicu bentol baru; potong kuku pendek dan gunakan kompres dingin sebagai pengganti',
+      'AJARKAN TANDA BAHAYA yang mengharuskan datang ke unit gawat darurat segera, bukan menunggu jadwal kontrol: sesak napas, suara serak atau berubah, rasa tercekik, sulit menelan, bengkak pada lidah atau bibir, nyeri perut hebat, muntah berulang, pusing berputar, atau rasa mau pingsan',
+      'Follow up: kontrol dalam 3-7 hari untuk menilai respons; bila keluhan berlanjut melewati 6 minggu, diagnosis berubah menjadi urtikaria kronik dan perlu penilaian ulang yang lebih menyeluruh',
+      'Bawa dan simpan catatan nama obat yang dicurigai menjadi pencetus, dan tunjukkan pada setiap dokter maupun apoteker di kemudian hari',
+    ],
+    komplikasi: [
+      'Anafilaksis dengan obstruksi jalan napas dan syok — komplikasi yang paling ditakuti dan dapat berakibat fatal',
+      'Angioedema laring yang mengancam jalan napas',
+      'Gangguan tidur dan penurunan kualitas hidup akibat gatal yang hebat',
+      'Infeksi sekunder pada kulit akibat garukan berlebihan',
+      'Perkembangan menjadi urtikaria kronik bila keluhan menetap lebih dari 6 minggu',
+    ],
+    prognosis:
+      'Sangat baik. Sebagian besar kasus mereda dalam beberapa hari hingga kurang dari 6 minggu dan berespons baik terhadap antihistamin. Sekitar seperempat kasus dapat berlanjut menjadi urtikaria kronik. Prognosis terutama ditentukan oleh ada tidaknya keterlibatan sistemik: selama reaksi terbatas pada kulit, risiko serius rendah, sedangkan episode yang disertai gejala saluran napas atau kardiovaskular menandakan risiko anafilaksis pada paparan berikutnya sehingga penghindaran pencetus menjadi penentu utama keselamatan jangka panjang.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'WAO2020', 'PPKFKTP2014'],
   },
   'Urtikaria kronis': {
     definisi: 'Urtikaria yang berlangsung lebih dari 6 minggu, sebagian besar bersifat spontan/idiopatik.',
@@ -6587,10 +7074,111 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'ATLS2018', 'SCHWARTZ2019'],
   },
   'Luka bakar derajat 1 dan 2': {
-    definisi: 'Luka bakar superfisial (derajat 1, epidermis) dan sebagian ketebalan (derajat 2, mengenai dermis).',
-    diagnosis: ['Derajat 1: eritema nyeri tanpa bula, sembuh tanpa jaringan parut; Derajat 2 superfisial: bula, dasar merah basah, SANGAT NYERI, capillary refill positif; hitung luas dengan rule of nine (atau telapak tangan pasien ≈1%); derajat 1 TIDAK dihitung dalam estimasi luas untuk resusitasi cairan'],
-    tatalaksana: ['Dinginkan dengan air mengalir suhu ruang 20 menit (JANGAN es, odol, atau kecap), analgesia adekuat, tutup dengan dressing steril non-adheren, bula besar dirawat sesuai protokol; resusitasi cairan formula Parkland bila luas (>10% anak, >15-20% dewasa); profilaksis tetanus; rujuk bila luas, mengenai wajah/tangan/genital/persendian, atau melingkar'],
-    referensi: ['SKDI2012', 'ATLS2018', 'SCHWARTZ2019'],
+    definisi:
+      'Kerusakan jaringan kulit akibat panas, listrik, bahan kimia, atau radiasi yang terbatas pada epidermis (derajat 1) atau meluas hingga sebagian ketebalan dermis (derajat 2), tanpa mengenai seluruh ketebalan kulit.',
+    anamnesis: {
+      keluhanUtama: 'Kulit melepuh dan terasa sangat nyeri setelah terkena air panas, api, atau benda panas.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: bagian tubuh mana saja yang terkena; tanyakan khusus keterlibatan wajah, leher, tangan, kaki, persendian besar, perineum, dan area melingkar pada anggota gerak atau dada karena semuanya menjadi indikasi rujukan meskipun luasnya kecil. Onset: JAM BERAPA kejadiannya — waktu ini menentukan perhitungan resusitasi cairan yang dihitung sejak saat cedera, bukan sejak pasien tiba. Character: nyeri hebat dan perih menandakan ujung saraf masih utuh sehingga sesuai derajat 1 atau 2; area yang justru mati rasa mencurigakan ke arah derajat 3. Mekanisme cedera harus dirinci: air panas, minyak panas, uap, api langsung, kontak benda panas, listrik, atau bahan kimia — pada bahan kimia tanyakan jenis dan konsentrasinya, pada listrik tanyakan tegangannya. Radiation: apakah kejadian berlangsung di ruang tertutup, ada asap tebal, atau pasien sempat pingsan — mengarahkan pada cedera inhalasi. Associations: suara serak, batuk dengan dahak kehitaman, bulu hidung dan alis terbakar, sesak napas; tanyakan pula cedera penyerta akibat terjatuh atau ledakan. Time course: apa yang sudah dilakukan sejak kejadian sampai tiba di fasilitas kesehatan. Exacerbating: kontak dengan udara dan gesekan memperberat nyeri. Severity: skala nyeri dan kemampuan menggerakkan bagian yang terkena.',
+      riwayatPenyakitDahulu:
+        'Diabetes melitus dan penyakit pembuluh darah perifer yang memperlambat penyembuhan, penyakit jantung dan ginjal yang memengaruhi toleransi terhadap resusitasi cairan, epilepsi atau gangguan neurologis yang mungkin menjadi sebab kejadian, serta gangguan penglihatan atau mobilitas pada usia lanjut.',
+      riwayatPenyakitKeluarga: 'Umumnya tidak relevan; namun pada anak, telaah keadaan rumah dan pengasuhan tetap perlu.',
+      riwayatPengobatan:
+        'Obat rutin yang dikonsumsi, terutama antikoagulan dan kortikosteroid. Tanyakan pula apa yang sudah dioleskan pada luka sebelum datang — pasta gigi, kecap, mentega, atau ramuan tradisional sangat lazim dipakai dan harus dibersihkan karena menghambat penilaian luka serta meningkatkan risiko infeksi.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama analgesik, antibiotik, dan sulfa yang relevan untuk salep perak sulfadiazin.',
+      riwayatImunisasi:
+        'STATUS IMUNISASI TETANUS wajib ditanyakan pada setiap luka bakar: kapan dosis terakhir diberikan, karena luka bakar merupakan luka rawan tetanus.',
+      riwayatNutrisi: 'Status gizi sebelum cedera; luka bakar meningkatkan kebutuhan kalori dan protein untuk penyembuhan.',
+      riwayatSosialEkonomi:
+        'Keadaan tempat tinggal dan pekerjaan yang menjelaskan mekanisme cedera dan risiko berulangnya, kemampuan merawat luka di rumah dan mengganti balutan, akses ke fasilitas kesehatan, serta pada anak dan lansia — nilai kesesuaian antara cerita kejadian dan pola luka, karena pola yang tidak sesuai menimbulkan kecurigaan kekerasan atau penelantaran.',
+    },
+    pemeriksaanFisik: [
+      'Nilai jalan napas, pernapasan, dan sirkulasi lebih dulu; cari tanda cedera inhalasi berupa suara serak, stridor, luka bakar di wajah, bulu hidung terbakar, jelaga di rongga mulut, dan dahak kehitaman — bila ada, jalan napas diamankan sebelum edema berkembang',
+      'Derajat 1: eritema dan nyeri tanpa bula, kulit kering, tidak ada kerusakan lapisan dermis',
+      'Derajat 2 superfisial: bula dengan dasar merah muda basah, sangat nyeri, capillary refill cepat dan positif, biasanya sembuh dalam 2-3 minggu tanpa jaringan parut bermakna',
+      'Derajat 2 dalam: bula dengan dasar lebih pucat atau merah tua, nyeri berkurang, capillary refill lambat, penyembuhan lebih dari 3 minggu dan berisiko jaringan parut',
+      'Perkirakan luas dengan rule of nine pada dewasa, atau tabel Lund-Browder pada anak yang memperhitungkan proporsi kepala yang lebih besar; luas kecil dan tersebar diperkirakan dengan telapak tangan pasien beserta jarinya yang setara sekitar 1% luas permukaan tubuh',
+      'DERAJAT 1 TIDAK IKUT DIHITUNG dalam estimasi luas untuk resusitasi cairan — memasukkannya menyebabkan pemberian cairan berlebih',
+      'Periksa perfusi distal pada luka bakar melingkar di anggota gerak: nadi, pengisian kapiler, warna, suhu, dan sensasi',
+      'Timbang berat badan karena seluruh perhitungan cairan bergantung padanya, serta ukur produksi urin sebagai penanda kecukupan resusitasi',
+    ],
+    penunjang: [
+      'Pada luka bakar derajat 1 dan 2 dengan luas kecil, pemeriksaan penunjang umumnya tidak diperlukan — penilaian klinis sudah memadai',
+      'Darah lengkap, elektrolit, ureum, dan kreatinin bila luas dan memerlukan resusitasi cairan',
+      'Analisis gas darah dan kadar karboksihemoglobin bila terdapat kecurigaan cedera inhalasi atau keracunan karbon monoksida',
+      'Gula darah pada pasien diabetes atau bila kesadaran menurun',
+      'Kultur dari luka hanya bila muncul tanda infeksi; kultur rutin pada luka bersih tidak bermanfaat dan menyesatkan',
+      'Elektrokardiogram dan enzim jantung serta urinalisis untuk mioglobinuria pada luka bakar listrik',
+    ],
+    etiologi:
+      'Tersering adalah cedera termal berupa air atau minyak panas dan api; penyebab lain meliputi kontak benda panas, listrik, bahan kimia asam maupun basa, dan radiasi.',
+    patofisiologi:
+      'Panas mendenaturasi protein sel dan menimbulkan zona kerusakan yang menurut model Jackson terdiri atas tiga lapis: zona koagulasi di pusat yang jaringannya sudah mati, zona stasis di sekelilingnya yang perfusinya terganggu tetapi masih dapat diselamatkan, dan zona hiperemia di tepi yang akan pulih sendiri. Perawatan luka bakar dini pada dasarnya adalah upaya menyelamatkan zona stasis — pendinginan yang tepat, analgesia, dan resusitasi cairan yang adekuat mencegah zona ini berkembang menjadi nekrosis dan memperdalam derajat luka. Kerusakan jaringan melepaskan mediator inflamasi yang meningkatkan permeabilitas kapiler sehingga plasma keluar ke ruang interstisial; pada luka luas hal ini menimbulkan edema masif dan syok hipovolemik meski tidak ada perdarahan. Hilangnya sawar kulit sekaligus menghilangkan pertahanan terhadap mikroorganisme dan kemampuan mengatur suhu serta penguapan air, sehingga risiko infeksi dan hipotermia meningkat.',
+    faktorRisiko: [
+      'Anak usia balita — tersering akibat tersiram air atau minyak panas di dapur',
+      'Usia lanjut dengan gangguan mobilitas, penglihatan, atau kognitif',
+      'Epilepsi dan gangguan kesadaran',
+      'Pekerjaan dengan paparan api, uap, bahan kimia, atau listrik',
+      'Memasak dengan kompor di lantai dan penyimpanan bahan mudah terbakar di dalam rumah',
+      'Pengaruh alkohol atau zat yang menurunkan kewaspadaan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis melalui penentuan derajat kedalaman dan estimasi luas. Derajat ditentukan dari ada tidaknya bula, warna dan kelembapan dasar luka, pengisian kapiler, serta sensasi nyeri: nyeri hebat menandakan ujung saraf masih utuh dan sesuai derajat 1 atau 2, sedangkan area yang mati rasa dengan dasar putih atau seperti kulit tersamak menunjukkan derajat 3. Luas dihitung dengan rule of nine pada dewasa dan tabel Lund-Browder pada anak, dengan derajat 1 tidak diikutsertakan dalam perhitungan untuk resusitasi cairan. Kedalaman sejati kadang baru jelas setelah 48-72 jam sehingga penilaian ulang wajib dilakukan.',
+    diagnosisBanding: [
+      'Luka bakar derajat 3 — dasar luka putih, coklat, atau seperti kulit tersamak, kering, TIDAK NYERI karena ujung saraf rusak, capillary refill negatif; memerlukan eksisi dan cangkok kulit',
+      'Sindrom Stevens-Johnson dan nekrolisis epidermal toksik — pelepasan epidermis luas menyerupai luka bakar namun didahului obat dan disertai keterlibatan mukosa mulut, mata, dan genital tanpa riwayat trauma panas',
+      'Staphylococcal scalded skin syndrome — pada anak, pengelupasan kulit luas akibat toksin stafilokokus, tanpa riwayat kontak panas, mukosa tidak terlibat',
+      'Impetigo bulosa — bula lokal dengan krusta madu tanpa riwayat cedera panas',
+      'Dermatitis kontak iritan berat akibat bahan kimia — sebenarnya merupakan luka bakar kimia dan ditangani sebagai luka bakar',
+    ],
+    pengkajian:
+      'Dipikirkan luka bakar derajat 2 pada pasien ini atas dasar riwayat kontak dengan sumber panas yang jelas beserta waktu kejadiannya, diikuti munculnya bula dengan dasar merah muda yang basah, pengisian kapiler yang masih cepat, dan nyeri yang sangat hebat pada area tersebut. Nyeri hebat justru merupakan penanda yang menenangkan pada konteks ini karena membuktikan ujung saraf pada dermis masih utuh, dan inilah yang membedakannya dari luka bakar derajat 3 yang dasarnya kering, berwarna putih atau seperti kulit tersamak, serta tidak nyeri sama sekali. Area lain yang hanya eritematosa tanpa bula digolongkan derajat 1 dan sengaja tidak diikutkan dalam perhitungan luas, karena memasukkannya akan melebih-lebihkan kebutuhan cairan dan berisiko menimbulkan kelebihan cairan. Sindrom Stevens-Johnson dan nekrolisis epidermal toksik disingkirkan karena terdapat riwayat trauma panas yang tegas, lesi terbatas pada area yang benar-benar terpapar, dan tidak ada keterlibatan mukosa mulut, mata, maupun genital; staphylococcal scalded skin syndrome juga tidak sesuai karena pada kasus ini pengelupasan kulit mengikuti pola paparan, bukan tersebar menyeluruh. Perlu ditegaskan bahwa kedalaman luka bakar bersifat dinamis dan baru dapat dinilai pasti setelah 48-72 jam, sehingga penilaian ulang terjadwal merupakan bagian dari diagnosis, bukan sekadar pemantauan. Keputusan merujuk pada kasus ini tidak semata bergantung pada luas, melainkan juga pada lokasi luka — keterlibatan wajah, tangan, kaki, persendian, perineum, atau luka melingkar tetap menjadi indikasi rujukan meski luasnya kecil.',
+    terapiSuportif: [
+      'Hentikan proses cedera: jauhkan dari sumber panas, lepaskan pakaian dan perhiasan yang terkena atau menjerat sebelum edema berkembang',
+      'Dinginkan dengan air mengalir bersuhu ruang (sekitar 15-25 derajat Celsius) selama 20 menit, efektif hingga 3 jam setelah kejadian; JANGAN gunakan es atau air es karena menimbulkan vasokonstriksi yang justru memperdalam luka, dan JANGAN oleskan pasta gigi, kecap, mentega, minyak, atau ramuan tradisional',
+      'Pada luka bakar kimia, siram dengan air mengalir dalam jumlah banyak dan waktu lebih lama; jangan mencoba menetralkan asam dengan basa atau sebaliknya',
+      'Cegah hipotermia terutama pada anak dan luka luas — pendinginan hanya pada area luka, sisa tubuh tetap dijaga hangat dan selimuti setelah pendinginan selesai',
+      'Analgesia adekuat dan dini; nyeri luka bakar sering diremehkan dan analgesia yang kurang membuat perawatan luka tidak dapat dikerjakan dengan baik',
+      'Resusitasi cairan dengan formula Parkland bila luas melebihi 15-20% pada dewasa atau 10% pada anak: 4 mL Ringer laktat dikalikan berat badan dalam kilogram dikalikan persentase luas luka bakar derajat 2 dan 3; separuhnya diberikan dalam 8 jam PERTAMA SEJAK WAKTU CEDERA dan sisanya dalam 16 jam berikutnya',
+      'Formula hanyalah titik awal — target sesungguhnya adalah produksi urin 0,5 mL/kg/jam pada dewasa dan 1 mL/kg/jam pada anak, sehingga laju cairan dititrasi mengikuti produksi urin, bukan dipaksakan mengikuti angka hitungan',
+      'Pada anak, tambahkan cairan rumatan mengandung glukosa di luar perhitungan resusitasi karena cadangan glikogennya terbatas',
+      'Nutrisi tinggi kalori dan tinggi protein dimulai dini; kebutuhan protein sekitar 1,5-2 gram per kilogram berat badan per hari untuk mendukung penyembuhan',
+    ],
+    tatalaksana: [
+      'Bersihkan luka dengan sabun lembut dan air mengalir atau larutan salin; buang jaringan epidermis yang sudah terlepas',
+      'Bula kecil dan utuh terutama di telapak tangan dibiarkan sebagai pembalut biologis alami; bula besar, tegang, melewati persendian, atau yang sudah pecah sebaiknya dikeluarkan isinya secara steril dan kulitnya dibuang',
+      'Tutup dengan dressing non-adheren berlapis kasa; salep perak sulfadiazin dapat digunakan namun bukan keharusan dan tidak dipakai pada wajah, pada bayi kurang dari 2 bulan, maupun pada ibu hamil',
+      'Luka bakar derajat 1 cukup dengan pelembap dan analgesia, tidak memerlukan balutan',
+      'Ganti balutan setiap 1-3 hari sesuai jenis dressing dan jumlah eksudat, sambil menilai ulang kedalaman dan tanda infeksi setiap kali penggantian',
+      'Profilaksis tetanus sesuai status imunisasi: berikan booster toksoid tetanus bila dosis terakhir lebih dari 5 tahun, dan tambahkan imunoglobulin tetanus bila riwayat imunisasi tidak lengkap atau tidak diketahui',
+      'ANTIBIOTIK SISTEMIK TIDAK DIBERIKAN SEBAGAI PROFILAKSIS — hanya bila terbukti ada infeksi, mengarah pada kuman kulit dan disesuaikan hasil kultur',
+      'Tinggikan bagian tubuh yang terkena untuk mengurangi edema, dan mulai latihan gerak dini bila luka melewati persendian agar tidak terjadi kontraktur',
+      'Rujuk ke pusat luka bakar bila: luas melebihi 10% pada anak atau 15-20% pada dewasa, mengenai wajah, tangan, kaki, persendian besar, atau perineum, luka melingkar, luka bakar listrik atau kimia, ada cedera inhalasi, ada komorbid berat, atau pada usia sangat muda maupun sangat tua',
+    ],
+    edukasi: [
+      'Jelaskan bahwa derajat 1 sembuh dalam 5-7 hari tanpa bekas, derajat 2 superfisial dalam 2-3 minggu dengan kemungkinan perubahan warna sementara, sedangkan derajat 2 dalam memerlukan waktu lebih lama dan berisiko meninggalkan jaringan parut',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan bergizi; penyembuhan luka menaikkan kebutuhan energi sehingga porsi tidak boleh dikurangi. Utamakan protein 1,5-2 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe, lengkapi dengan buah dan sayur sumber vitamin C serta zink, dan minum minimal 8 gelas air per hari',
+      'Jam tidur: 7-8 jam per malam; nyeri malam ditangani dengan minum analgesik sekitar 30-60 menit sebelum tidur dan meninggikan bagian tubuh yang terkena dengan bantal',
+      'Pola olahraga: latihan gerak sendi ringan beberapa kali sehari sejak dini bila luka melewati persendian, karena inilah yang mencegah kontraktur. Hindari olahraga berat, berenang, dan berendam sampai luka menutup sempurna; aktivitas dapat ditingkatkan bertahap setelahnya',
+      'Perawatan luka di rumah: cuci tangan sebelum dan sesudah mengganti balutan, jaga balutan tetap kering dan bersih, dan jangan memecah bula sendiri',
+      'Setelah luka menutup, lindungi kulit baru dari sinar matahari dengan pakaian tertutup dan tabir surya selama minimal 6-12 bulan untuk mencegah hiperpigmentasi menetap; gunakan pelembap secara teratur karena kulit baru cenderung kering dan gatal',
+      'Follow up: kontrol dalam 24-48 jam untuk menilai ulang kedalaman yang sering baru jelas setelah 48-72 jam, kemudian setiap 3-5 hari sampai luka menutup. Luka derajat 2 yang belum menutup dalam 3 minggu harus dirujuk untuk pertimbangan cangkok kulit',
+      'Tanda bahaya yang mengharuskan datang segera: demam, nyeri yang bertambah hebat, luka berbau, keluar nanah, kemerahan yang meluas dari tepi luka, atau bagian ujung anggota gerak yang terasa baal, pucat, atau dingin',
+      'Pencegahan berulang: jauhkan air panas, minyak panas, dan kompor dari jangkauan anak; masak di ketinggian yang aman bukan di lantai; pasang pengaman pada tempat memasak; dan periksa suhu air mandi sebelum digunakan pada anak dan usia lanjut',
+    ],
+    komplikasi: [
+      'Infeksi luka lokal hingga sepsis — penyebab kematian tersering pada luka bakar setelah fase akut',
+      'Pendalaman luka dari derajat 2 menjadi derajat 3 akibat pendinginan yang salah, infeksi, atau resusitasi yang tidak adekuat',
+      'Syok hipovolemik pada luka luas dan gangguan ginjal akut',
+      'Hipotermia terutama pada anak dan luka luas',
+      'Jaringan parut hipertrofik dan keloid, kontraktur pada luka yang melewati persendian',
+      'Hiperpigmentasi atau hipopigmentasi menetap serta rasa gatal berkepanjangan pada kulit yang baru sembuh',
+      'Sindrom kompartemen pada luka bakar melingkar di anggota gerak',
+      'Dampak psikologis berupa gangguan stres pascatrauma dan gangguan citra tubuh, terutama bila mengenai wajah',
+    ],
+    prognosis:
+      'Baik pada luka bakar derajat 1 dan 2 superfisial yang tidak luas dan tidak berlokasi khusus, dengan penyembuhan sempurna tanpa jaringan parut bermakna. Prognosis paling ditentukan oleh kedalaman sejati, luas, lokasi, usia, komorbid, ada tidaknya cedera inhalasi, dan mutu perawatan luka pada minggu-minggu pertama. Luka derajat 2 dalam yang belum menutup dalam 3 minggu berisiko tinggi meninggalkan jaringan parut hipertrofik dan kontraktur sehingga sebaiknya dinilai untuk cangkok kulit.',
+    referensi: ['SKDI2012', 'ATLS2018', 'SCHWARTZ2019', 'PPKFKTP2014'],
   },
   'Luka bakar derajat 3 dan 4': {
     definisi: 'Luka bakar ketebalan penuh (derajat 3, seluruh dermis) dan yang mengenai struktur di bawahnya seperti otot dan tulang (derajat 4).',
