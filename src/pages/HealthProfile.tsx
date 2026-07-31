@@ -8,6 +8,7 @@ import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
 import { mergeVitals } from '../lib/healthVitals'
+import { diagnose, type SyncDiagnosis } from '../lib/syncDiagnostics'
 import { generateInsights } from '../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
 
@@ -241,6 +242,7 @@ export function HealthProfile() {
       </Card>
 
       {backendEnabled && <AutoSyncCard />}
+      <SyncDiagnosticsCard />
 
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
 
@@ -532,6 +534,101 @@ function AutoSyncCard() {
       <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
         {busy ? 'Processing…' : 'Regenerate link (if leaked)'}
       </button>
+    </Card>
+  )
+}
+
+/**
+ * Lets a user find out WHY a sync produced nothing, without reading server logs.
+ *
+ * The four causes look identical from the outside — phone says success, website
+ * shows nothing — but need opposite fixes, so guessing wastes everyone's time.
+ * Paste the payload, get the actual cause named.
+ */
+function SyncDiagnosticsCard() {
+  const [open, setOpen] = useState(false)
+  const [text, setText] = useState('')
+  const [d, setD] = useState<SyncDiagnosis | null>(null)
+
+  const TONE: Record<SyncDiagnosis['verdict'], 'normal' | 'high' | 'critical'> = {
+    ok: 'normal', 'empty-samples': 'high', 'name-mismatch': 'critical',
+    'no-payload': 'critical', 'not-json': 'critical',
+  }
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle icon={<IconActivity size={20} />} title="Diagnostik Sinkronisasi"
+        subtitle="Cari tahu mengapa data dari iPhone tidak masuk" />
+      {!open ? (
+        <button onClick={() => setOpen(true)}
+          className="mt-3 w-full rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">
+          Buka alat diagnostik
+        </button>
+      ) : (
+        <>
+          <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+            Di Health Auto Export, ekspor sebagai <b>JSON</b>, buka filenya, salin seluruh isinya,
+            lalu tempelkan di bawah. Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
+          </p>
+          <textarea
+            className={inputClass + ' mt-2 h-28 font-mono !text-[10px]'}
+            placeholder='{"data":{"metrics":[ … ]}}'
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <div className="mt-2 flex gap-2">
+            <Button className="flex-1" onClick={() => setD(diagnose(text))}>Periksa</Button>
+            <button onClick={() => { setText(''); setD(null) }}
+              className="rounded-xl bg-neutral-100 px-4 text-sm font-bold text-neutral-600 dark:bg-white/10">Bersihkan</button>
+          </div>
+
+          {d && (
+            <div className="mt-3 space-y-3">
+              <div>
+                <Badge tone={TONE[d.verdict]}>{d.headline}</Badge>
+                <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{d.explanation}</p>
+              </div>
+
+              <div className="rounded-xl bg-brand-50 p-3 dark:bg-brand/10">
+                <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Yang perlu dilakukan</div>
+                <ol className="mt-1 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">
+                  {d.actions.map((a, i) => <li key={i}>{a}</li>)}
+                </ol>
+              </div>
+
+              {d.unknownNames.length > 0 && (
+                <div className="rounded-xl bg-rose-50 p-3 dark:bg-rose-500/10">
+                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300">Nama yang belum kami kenali</div>
+                  <p className="mt-1 break-all font-mono text-[10px] leading-relaxed text-neutral-700 dark:text-neutral-200">
+                    {d.unknownNames.join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {d.metrics.length > 0 && (
+                <div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
+                    Rincian · {d.matchedCount} dikenali · {d.emptyCount} kosong · {d.metrics.length} total
+                  </div>
+                  <div className="mt-1.5 space-y-1">
+                    {d.metrics.map((m, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 rounded-lg bg-neutral-50 px-2.5 py-1.5 dark:bg-white/5">
+                        <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-neutral-600 dark:text-neutral-300">{m.name}</span>
+                        <span className="shrink-0 text-[10px] text-neutral-400">{m.sampleCount} sampel</span>
+                        <span className={`shrink-0 text-[10px] font-bold ${
+                          m.sampleCount === 0 ? 'text-amber-600'
+                          : m.recognised ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {m.sampleCount === 0 ? 'kosong' : m.recognised ? `→ ${m.mappedTo}` : 'tidak dikenali'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </Card>
   )
 }
