@@ -8261,9 +8261,105 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Perdarahan subkonjungtiva': {
-    definisi: 'Perdarahan di bawah konjungtiva akibat pecahnya pembuluh darah kecil, umumnya jinak.',
-    diagnosis: ['Bercak merah homogen berbatas tegas pada sklera TANPA nyeri, tanpa gangguan penglihatan, tanpa sekret; cari pemicu (batuk, mengejan, hipertensi, antikoagulan, trauma); bila akibat trauma tumpul berat, singkirkan ruptur bola mata'],
-    tatalaksana: ['Tidak perlu terapi — REASSURANCE bahwa darah akan diserap dalam 1-3 minggu dengan perubahan warna seperti memar; periksa tekanan darah, evaluasi bila rekuren; kompres dingin hari pertama bila akibat trauma'],
+    definisi:
+      'Perdarahan pada ruang antara konjungtiva dan sklera akibat pecahnya pembuluh darah kecil konjungtiva, menimbulkan bercak merah terang berbatas tegas yang TIDAK NYERI, tidak mengganggu penglihatan, dan tidak disertai kotoran mata.',
+    anamnesis: {
+      keluhanUtama: 'Bercak merah pada bagian putih mata yang muncul tiba-tiba tanpa rasa sakit.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: bercak terbatas pada satu bagian bola mata dengan batas tegas, umumnya satu mata. Onset: mendadak dan biasanya disadari saat bercermin atau diberi tahu orang lain — bukan karena keluhan; TANYAKAN PENCETUS seperti batuk keras, bersin, mengedan, muntah, mengangkat beban berat, atau trauma. Character: TIDAK NYERI, hanya kadang terasa mengganjal ringan; adanya nyeri hebat menyingkirkan diagnosis ini. Radiation: bercak dapat meluas sedikit dalam 1-2 hari pertama, dan hal ini normal. Associations: TANYAKAN SECARA TEGAS ADA TIDAKNYA PENURUNAN PENGLIHATAN, KOTORAN MATA, DAN SILAU — ketiganya tidak boleh ada pada perdarahan subkonjungtiva, dan bila ada maka penyebabnya bukan ini. Tanyakan pula perdarahan di tempat lain seperti gusi, hidung, dan memar yang mudah timbul, yang mengarah pada gangguan pembekuan darah. Time course: warna berubah dari merah terang menjadi kehijauan lalu kekuningan seperti memar, dan menghilang dalam 1-3 minggu. Exacerbating: tidak ada. Severity: keluhan sesungguhnya bersifat kosmetik dan kecemasan, bukan gangguan fungsi.',
+      riwayatPenyakitDahulu:
+        'HIPERTENSI merupakan hal yang paling penting ditanyakan dan diukur, terutama pada kejadian berulang. Diabetes melitus, gangguan pembekuan darah, penyakit hati, dan riwayat perdarahan subkonjungtiva sebelumnya beserta frekuensinya. Riwayat operasi dan trauma mata.',
+      riwayatPenyakitKeluarga: 'Riwayat gangguan pembekuan darah dan hipertensi pada keluarga.',
+      riwayatPengobatan:
+        'OBAT PENGENCER DARAH seperti aspirin, klopidogrel, dan warfarin maupun antikoagulan oral baru — sangat sering menjadi penyebab dan mudah terlewat bila tidak ditanyakan langsung. Tanyakan pula obat herbal dan suplemen yang memengaruhi pembekuan.',
+      riwayatAlergi: 'Riwayat alergi obat.',
+      riwayatSosialEkonomi:
+        'Pekerjaan yang melibatkan mengangkat beban berat atau mengedan, riwayat trauma di tempat kerja, kebiasaan menggosok mata, dan pemakaian lensa kontak. Pada anak dengan perdarahan subkonjungtiva berulang tanpa sebab jelas, pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+    },
+    pemeriksaanFisik: [
+      'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah tanpa kecuali — tajam penglihatan yang normal merupakan salah satu penopang utama diagnosis ini',
+      'Bercak merah terang homogen dengan BATAS TEGAS, tidak memucat saat ditekan, dan sklera di bawahnya tidak terlihat; pembuluh darah tidak dapat dibedakan satu per satu di dalam bercak',
+      'Konjungtiva di luar bercak tampak tenang, tanpa injeksi menyeluruh dan tanpa sekret',
+      'Kornea jernih, bilik mata depan dalam dan jernih, pupil bulat dengan refleks cahaya normal',
+      'UKUR TEKANAN DARAH pada setiap pasien, terutama bila kejadiannya berulang — hipertensi yang belum terdiagnosis kerap pertama kali terungkap lewat keluhan sederhana ini',
+      'Bila ada riwayat trauma, cari tanda cedera yang lebih berat: perdarahan pada bilik mata depan, pupil yang tidak bulat, tekanan bola mata yang rendah, dan perdarahan yang menutupi seluruh bola mata tanpa terlihat batas belakangnya — yang terakhir dapat menandakan pecahnya bola mata dan merupakan kegawatan',
+      'Cari tanda perdarahan di tempat lain: petekie, memar, dan perdarahan gusi',
+      'Pada trauma kepala, perdarahan subkonjungtiva yang batas belakangnya tidak terlihat dapat menandakan patah tulang dasar tengkorak',
+    ],
+    penunjang: [
+      'Pada kejadian pertama tanpa faktor risiko dan tanpa tanda bahaya, TIDAK diperlukan pemeriksaan penunjang sama sekali',
+      'Pengukuran tekanan darah — bukan pemeriksaan laboratorium namun merupakan pemeriksaan paling penting pada kasus ini',
+      'Darah lengkap, waktu protrombin, dan APTT bila kejadian berulang, ada perdarahan di tempat lain, atau ada pemakaian obat pengencer darah',
+      'INR pada pengguna warfarin untuk menilai apakah dosisnya berlebihan',
+      'Gula darah bila ada faktor risiko diabetes',
+      'Pencitraan sesuai indikasi pada kasus trauma untuk mencari patah tulang orbita maupun benda asing',
+    ],
+    etiologi:
+      'Pecahnya pembuluh darah kecil konjungtiva akibat peningkatan tekanan vena mendadak (batuk, bersin, mengedan, muntah, mengangkat beban), trauma termasuk menggosok mata, hipertensi, gangguan pembekuan darah, pemakaian obat pengencer darah, atau tanpa sebab yang dapat diidentifikasi.',
+    patofisiologi:
+      'Konjungtiva bulbi mengandung jaringan pembuluh darah halus yang berdinding tipis dan hanya ditopang longgar oleh jaringan ikat di bawahnya. Peningkatan mendadak tekanan vena — seperti saat batuk keras, bersin, mengedan, atau muntah — diteruskan ke pembuluh ini dan dapat memecahkannya. Darah kemudian mengisi ruang potensial antara konjungtiva dan sklera; karena ruang tersebut datar dan tertutup, darah menyebar sebagai lapisan tipis berbatas tegas alih-alih membentuk benjolan. Perdarahan berhenti sendiri karena jumlah darah yang keluar sedikit dan ruangnya terbatas. Darah yang terkumpul tidak dapat diserap kembali dengan cepat sehingga harus diuraikan setempat, dan pemecahan hemoglobin menghasilkan perubahan warna berurutan dari merah terang menjadi kehijauan lalu kekuningan persis seperti memar di kulit — pemahaman ini penting karena pasien kerap panik melihat warnanya berubah dan menganggap penyakitnya memburuk. Karena darah berada di luar bola mata dan tidak menyentuh jalur penglihatan, tajam penglihatan sama sekali tidak terganggu, dan karena konjungtiva miskin serabut nyeri pada lapisan ini, keluhan nyeri praktis tidak ada. Justru dua hal itulah — penglihatan normal dan tidak ada nyeri — yang menjadikan penyakit ini mudah dibedakan dari mata merah yang berbahaya.',
+    faktorRisiko: [
+      'Hipertensi, terutama pada kejadian berulang',
+      'Pemakaian obat pengencer darah dan antiagregasi trombosit',
+      'Usia lanjut dengan dinding pembuluh darah yang lebih rapuh',
+      'Batuk kronik, sembelit dengan mengedan, dan muntah berulang',
+      'Trauma mata dan kebiasaan menggosok mata',
+      'Diabetes melitus dan gangguan pembekuan darah',
+      'Pemakaian lensa kontak',
+      'Persalinan dengan mengedan lama, serta pada bayi baru lahir akibat proses persalinan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari bercak merah terang berbatas tegas pada konjungtiva bulbi, dengan tiga syarat yang harus terpenuhi bersamaan: tajam penglihatan normal, tidak ada nyeri, dan tidak ada sekret. Tidak diperlukan pemeriksaan penunjang untuk menegakkannya; pemeriksaan justru diarahkan untuk mencari penyebab pada kasus berulang, terutama pengukuran tekanan darah dan penilaian pembekuan darah.',
+    diagnosisBanding: [
+      'Konjungtivitis — mata merah MENYELURUH dengan pembuluh darah yang masih dapat dibedakan, disertai SEKRET, dan sering mengenai kedua mata',
+      'Keratitis dan ulkus kornea — mata merah dengan NYERI, silau, penurunan penglihatan, dan kekeruhan kornea',
+      'Uveitis anterior — nyeri, silau, penglihatan menurun, kemerahan terutama di sekitar kornea, dan pupil mengecil',
+      'GLAUKOMA SUDUT TERTUTUP AKUT — nyeri hebat, penglihatan turun, melihat pelangi, pupil melebar lonjong, kornea keruh, dan mual muntah; kegawatan yang tidak boleh terlewat',
+      'Skleritis — nyeri dalam yang hebat sampai mengganggu tidur, kemerahan keunguan yang tidak memucat dengan tetes vasokonstriktor',
+      'Pterigium dan pinguekula yang meradang — massa yang tampak jelas pada konjungtiva',
+      'Sarkoma Kaposi pada konjungtiva — lesi merah yang MENETAP dan tidak menghilang dalam beberapa minggu, berkaitan dengan HIV',
+      'Pecahnya bola mata pada trauma — perdarahan konjungtiva yang sangat luas tanpa terlihat batas belakangnya, dengan bola mata yang lunak; kegawatan bedah',
+    ],
+    pengkajian:
+      'Dipikirkan perdarahan subkonjungtiva pada pasien ini atas dasar munculnya bercak merah terang yang homogen dan berbatas tegas pada bagian putih mata secara tiba-tiba, tanpa rasa nyeri, tanpa kotoran mata, dan tanpa penurunan tajam penglihatan sama sekali. Ketiadaan nyeri dan normalnya tajam penglihatan merupakan dua hal yang paling menentukan, sebab keduanya sekaligus menyingkirkan hampir seluruh penyebab mata merah yang berbahaya. Konjungtivitis disingkirkan karena kemerahan pada kasus ini terbatas pada satu bagian dengan batas tegas alih-alih menyeluruh, pembuluh darah tidak lagi dapat dibedakan satu per satu di dalam bercak, dan tidak ditemukan sekret. Keratitis dan uveitis anterior disingkirkan karena tidak ada nyeri, tidak ada silau, kornea tetap jernih, dan pupil bulat dengan refleks cahaya yang normal. Glaukoma sudut tertutup akut wajib dipikirkan pada setiap mata merah dan disingkirkan di sini karena tidak ada nyeri hebat, tidak ada mual maupun muntah, tidak ada keluhan melihat lingkaran pelangi, serta kornea jernih dengan bilik mata depan yang dalam. Skleritis tidak sesuai karena tidak ada nyeri dalam yang mengganggu tidur. Pencetus berupa batuk keras, bersin, mengedan, atau mengangkat beban ditelusuri karena menjelaskan mekanismenya, namun ketiadaan pencetus yang jelas tidak menyingkirkan diagnosis. Yang tidak boleh dilewatkan pada kasus ini justru bukan penanganan matanya melainkan pencarian penyebab sistemik: tekanan darah wajib diukur karena hipertensi yang belum terdiagnosis kerap pertama kali terungkap melalui keluhan sederhana ini, dan pemakaian obat pengencer darah harus ditanyakan langsung karena sangat sering menjadi penyebab namun jarang dilaporkan pasien secara spontan. Pada kejadian berulang, penilaian pembekuan darah menjadi bagian dari penanganan alih-alih pemeriksaan tambahan.',
+    terapiSuportif: [
+      'Tidak diperlukan tindakan khusus pada mata; perdarahan akan diserap sendiri',
+      'Kompres dingin pada 24-48 jam pertama bila berkaitan dengan trauma untuk mengurangi perluasan, dilanjutkan kompres hangat setelahnya untuk mempercepat penyerapan',
+      'Air mata buatan bila ada rasa mengganjal',
+      'Hindari menggosok mata',
+      'Hentikan sementara pemakaian lensa kontak sampai bercak menghilang',
+      'Tangani pencetus: obati batuk yang menetap, atasi sembelit agar tidak mengedan, dan kendalikan muntah',
+    ],
+    tatalaksana: [
+      'TIDAK MEMERLUKAN PENGOBATAN — perdarahan diserap sendiri dalam 1-3 minggu',
+      'ANTIBIOTIK TETES TIDAK DIINDIKASIKAN karena ini bukan infeksi; pemberiannya merupakan kesalahan lazim yang tidak bermanfaat dan berisiko menimbulkan iritasi maupun resistensi',
+      'Kendalikan tekanan darah bila ditemukan hipertensi — inilah tatalaksana yang sesungguhnya pada banyak kasus berulang',
+      'Tinjau ulang dosis obat pengencer darah bersama dokter yang meresepkan bila kejadian berulang; JANGAN menghentikan obat pengencer darah sendiri, karena risiko stroke maupun serangan jantung jauh lebih besar daripada perdarahan mata yang tidak berbahaya ini',
+      'Obati gangguan pembekuan darah yang mendasari bila ditemukan',
+      'Rujuk segera bila ada nyeri, penurunan penglihatan, riwayat trauma dengan kecurigaan cedera bola mata, perdarahan yang batas belakangnya tidak terlihat, pupil tidak bulat, atau bola mata terasa lunak',
+      'Rujuk pula bila lesi merah tidak menghilang setelah 3-4 minggu, karena lesi yang menetap bukan perdarahan melainkan kelainan lain',
+    ],
+    edukasi: [
+      'MENENANGKAN PASIEN ADALAH TERAPI UTAMA: jelaskan bahwa keadaan ini tidak berbahaya, tidak memengaruhi penglihatan, tidak menular, dan akan hilang sendiri dalam 1-3 minggu',
+      'Peringatkan bahwa bercak akan tampak MELUAS SEDIKIT pada 1-2 hari pertama dan warnanya akan berubah menjadi kehijauan lalu kekuningan seperti memar sebelum menghilang — tanpa penjelasan ini pasien akan kembali dengan cemas menyangka penyakitnya bertambah parah',
+      'Tidak ada obat tetes maupun obat minum yang mempercepat penyerapan; membeli obat tetes tidak diperlukan',
+      'Bila sedang minum obat pengencer darah, JANGAN MENGHENTIKANNYA sendiri — laporkan kejadian ini saat kontrol agar dosisnya dinilai ulang oleh dokter yang meresepkan',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan; bila ditemukan hipertensi, batasi garam kurang dari 5 gram per hari, kurangi makanan olahan dan gorengan, dan perbanyak sayur, buah, serta biji-bijian utuh. Perbanyak serat dan minum 8 gelas air per hari untuk mencegah sembelit, karena mengedan saat buang air besar merupakan pencetus yang sangat sering dan mudah dihindari',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; kurang tidur menaikkan tekanan darah yang menjadi salah satu penyebab. Tidak perlu mengubah posisi tidur maupun menutup mata saat tidur',
+      'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu tetap dianjurkan dan bahkan membantu mengendalikan tekanan darah. Namun HINDARI SEMENTARA angkat beban berat, latihan yang memerlukan menahan napas dan mengedan, serta gerakan dengan kepala menunduk di bawah jantung selama 1-2 minggu sampai bercak memudar, karena semuanya menaikkan tekanan vena secara mendadak. Saat mengangkat beban, biasakan mengembuskan napas alih-alih menahannya. Gunakan pelindung mata pada olahraga kontak',
+      'Follow up: tidak diperlukan kontrol rutin bila keluhan sesuai gambaran khas; kontrol bila bercak belum menghilang setelah 3-4 minggu atau bila kejadian berulang lebih dari dua kali dalam setahun',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: nyeri pada mata, penglihatan menurun atau kabur, silau, keluar kotoran mata, mata bertambah merah menyeluruh, atau bila kejadian ini timbul setelah benturan pada mata',
+    ],
+    komplikasi: [
+      'Praktis tidak ada komplikasi pada mata itu sendiri',
+      'Kekambuhan bila penyebabnya seperti hipertensi maupun gangguan pembekuan darah tidak diatasi',
+      'Iritasi dan reaksi alergi akibat obat tetes yang diberikan tanpa indikasi',
+      'Terlewatnya hipertensi, gangguan pembekuan darah, atau dosis antikoagulan yang berlebihan bila kasus dianggap sebagai keluhan mata semata',
+      'Terlewatnya cedera bola mata yang lebih berat pada kasus dengan riwayat trauma',
+      'Kecemasan berkepanjangan bila pasien tidak diberi penjelasan mengenai perubahan warna dan perluasan bercak',
+    ],
+    prognosis:
+      'Sangat baik. Perdarahan diserap sendiri sepenuhnya dalam 1-3 minggu tanpa meninggalkan bekas dan tanpa memengaruhi penglihatan, dan tidak diperlukan pengobatan apa pun. Nilai klinis kasus ini justru terletak pada apa yang ditemukan di baliknya: pada kejadian berulang, penyakit ini merupakan petunjuk yang berguna ke arah hipertensi yang belum terkendali, gangguan pembekuan darah, atau dosis obat pengencer darah yang berlebihan — sehingga memeriksa tekanan darah dan menanyakan obat jauh lebih bermakna daripada meresepkan tetes mata.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Mata kering': {
@@ -8423,27 +8519,401 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Hipermetropia ringan': {
-    definisi: 'Rabun dekat — bayangan jatuh di belakang retina karena kekuatan refraksi kurang atau bola mata terlalu pendek.',
-    diagnosis: ['Penglihatan dekat kabur (dan jauh pada derajat tinggi), mata cepat lelah dan sakit kepala saat membaca; koreksi dengan lensa SFERIS POSITIF (plus) terkecil yang memberi tajam penglihatan terbaik; pada anak gunakan sikloplegik karena akomodasi kuat dapat menutupi hipermetropia'],
-    tatalaksana: ['Kacamata atau lensa kontak sferis positif; pada anak, hipermetropia tinggi yang tidak dikoreksi berisiko esotropia akomodatif dan ambliopia — koreksi dini penting; pemeriksaan mata berkala'],
+    definisi:
+      'Kelainan refraksi berupa berkas cahaya sejajar yang jatuh di BELAKANG retina saat mata dalam keadaan istirahat tanpa akomodasi, sehingga mata harus terus berakomodasi untuk memperjelas bayangan; pada derajat ringan penglihatan jauh sering masih normal namun disertai keluhan kelelahan mata.',
+    anamnesis: {
+      keluhanUtama:
+        'Mata cepat lelah dan sakit kepala setelah membaca, sedangkan tajam penglihatan jauh sering masih terasa baik.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: nyeri kepala yang khas berada di daerah dahi dan sekitar mata. Onset: perlahan; pada anak dan dewasa muda keluhan lebih menonjol sebagai kelelahan mata daripada sebagai penglihatan kabur, dan hal inilah yang membuat hipermetropia ringan sering tidak terdeteksi. Character: KELUHAN KHAS BUKAN KABUR MELAINKAN ASTENOPIA — mata terasa berat, pegal, panas, berair, dan pandangan sesekali mengabur lalu jernih kembali. Radiation: nyeri kepala menjalar ke pelipis dan tengkuk. Associations: mengantuk saat membaca, sulit berkonsentrasi, kadang mual; tanyakan pula mata juling ke dalam yang muncul saat melihat dekat, karena akomodasi yang berlebihan memicu konvergensi berlebih. Time course: keluhan MEMBERAT PADA SORE HARI DAN SETELAH LAMA MEMBACA, dan mereda setelah istirahat maupun tidur — pola waktu ini merupakan petunjuk yang sangat khas. Exacerbating: pekerjaan dekat yang lama, kelelahan, dan pencahayaan yang kurang. Relieving: istirahat mata dan menjauhkan bacaan. Severity: dampak terhadap kemampuan belajar dan bekerja.',
+      riwayatPenyakitDahulu:
+        'Riwayat kacamata sebelumnya, mata malas, juling terutama juling ke dalam, trauma dan operasi mata. Pada anak, riwayat kelahiran dan tumbuh kembang. Diabetes melitus yang dapat mengubah refraksi secara sementara.',
+      riwayatPenyakitKeluarga:
+        'Riwayat hipermetropia, juling ke dalam, dan mata malas pada keluarga — hipermetropia merupakan penyebab tersering juling akomodatif pada anak yang sering ditemukan berulang dalam satu keluarga.',
+      riwayatPengobatan: 'Obat mata dan obat sistemik yang memengaruhi akomodasi maupun ukuran pupil.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai kacamata.',
+      riwayatTumbuhKembang:
+        'Pada anak, nilai perkembangan penglihatan, kemampuan mengenali benda dan wajah dari jarak jauh, serta prestasi belajar dan kemauan membaca — anak dengan hipermetropia yang tidak terkoreksi sering dianggap malas membaca padahal sebenarnya cepat lelah.',
+      riwayatSosialEkonomi:
+        'Lama pekerjaan dekat setiap hari, jenis pekerjaan, pencahayaan tempat belajar dan bekerja, serta kemampuan membeli kacamata.',
+    },
+    pemeriksaanFisik: [
+      'Periksa tajam penglihatan jauh dan DEKAT masing-masing mata secara terpisah — pada hipermetropia ringan, tajam penglihatan jauh sering masih 6/6 sehingga pemeriksaan jauh saja akan melewatkan diagnosis',
+      'Uji pinhole untuk memastikan penyebabnya kelainan refraksi',
+      'Koreksi dengan lensa sferis positif; prinsipnya adalah memilih lensa positif TERBESAR yang masih memberikan tajam penglihatan terbaik, karena tujuan koreksi adalah membebaskan mata dari akomodasi yang berlebihan — prinsip ini berlawanan dengan miopia yang memilih lensa negatif terkecil',
+      'Periksa kedudukan mata dan gerakan bola mata; cari juling ke dalam terutama saat melihat dekat',
+      'Uji tutup buka mata (cover test) untuk menilai juling laten maupun nyata',
+      'Nilai amplitudo akomodasi dan konvergensi bila memungkinkan',
+      'Periksa segmen anterior dan funduskopi; papil saraf optik pada hipermetropia dapat tampak kecil dengan batas yang tampak kabur menyerupai papiledema semu',
+      'PEMERIKSAAN DENGAN SIKLOPLEGIK MUTLAK DIPERLUKAN pada anak dan dewasa muda, karena akomodasi yang kuat menyembunyikan sebagian besar derajat hipermetropia sehingga hasil tanpa sikloplegik akan jauh lebih rendah dari sebenarnya',
+    ],
+    penunjang: [
+      'Refraksi objektif dengan autorefraktometer maupun retinoskopi dilanjutkan refraksi subjektif',
+      'REFRAKSI SIKLOPLEGIK merupakan pemeriksaan yang menentukan pada hipermetropia, jauh lebih penting daripada pada miopia',
+      'Pengukuran tekanan bola mata; mata hipermetropia cenderung memiliki bilik mata depan yang dangkal sehingga berisiko glaukoma sudut tertutup',
+      'Penilaian kedalaman bilik mata depan sebelum pemberian obat pelebar pupil pada usia lanjut',
+      'Pemeriksaan penglihatan binokular dan status juling bila ada kecurigaan',
+      'Gula darah bila terjadi perubahan refraksi yang cepat dan berfluktuasi',
+    ],
+    etiologi:
+      'Bola mata yang terlalu pendek (hipermetropia aksial) sebagai penyebab tersering, atau kekuatan pembiasan kornea maupun lensa yang terlalu lemah (hipermetropia refraktif).',
+    patofisiologi:
+      'Pada hipermetropia, panjang bola mata tidak sepadan dengan daya biasnya sehingga titik fokus jatuh di belakang retina. Berbeda dari miopia, mata memiliki kemampuan mengoreksi keadaan ini sendiri melalui akomodasi — lensa mencembung sehingga daya biasnya bertambah dan bayangan tertarik maju ke retina. Kemampuan inilah yang menjelaskan mengapa hipermetropia ringan pada usia muda sering tidak menimbulkan penglihatan kabur sama sekali, tetapi menimbulkan kelelahan: mata harus berakomodasi terus-menerus bahkan saat melihat jauh, dan lebih keras lagi saat melihat dekat. Otot siliaris yang bekerja tanpa henti menimbulkan astenopia berupa nyeri kepala di dahi, mata pegal, dan pandangan yang sesekali mengabur, yang khasnya memberat pada sore hari dan mereda setelah istirahat. Karena akomodasi selalu disertai konvergensi secara refleks, akomodasi berlebihan dapat menarik kedua mata ke dalam dan menimbulkan juling akomodatif — hubungan inilah yang menjadikan hipermetropia sebagai penyebab tersering juling ke dalam pada anak, dan mengapa memberikan kacamata positif dapat meluruskan mata tanpa operasi. Seiring bertambahnya usia, daya akomodasi menurun sehingga hipermetropia yang sebelumnya tersembunyi mulai muncul sebagai penglihatan kabur, mula-mula untuk jarak dekat lalu untuk jarak jauh.',
+    faktorRisiko: [
+      'Riwayat hipermetropia dan juling pada keluarga',
+      'Usia anak — hampir semua bayi lahir dengan hipermetropia fisiologis yang berkurang seiring pertumbuhan bola mata',
+      'Bertambahnya usia yang menurunkan daya akomodasi sehingga hipermetropia tersembunyi menjadi nyata',
+      'Bola mata yang lebih kecil karena kelainan bawaan',
+      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dengan refraksi sikloplegik, yang merupakan baku emas pada hipermetropia karena akomodasi aktif dapat menyembunyikan sebagian besar derajatnya. Koreksi menggunakan lensa sferis positif dengan prinsip memilih lensa positif terbesar yang masih memberikan tajam penglihatan terbaik, sebab tujuannya membebaskan mata dari akomodasi berlebih — berlawanan dengan prinsip pada miopia.',
+    diagnosisBanding: [
+      'Presbiopia — juga menimbulkan kesulitan melihat dekat namun timbul pada usia di atas 40 tahun akibat menurunnya daya akomodasi, dengan penglihatan jauh yang tetap normal tanpa koreksi',
+      'Astigmatisme — kelelahan mata dan sakit kepala serupa, namun disertai bayangan berbayang dan memerlukan lensa silinder',
+      'Nyeri kepala tipe tegang dan migren — tidak berkaitan khusus dengan pekerjaan dekat dan tidak membaik dengan koreksi refraksi',
+      'Insufisiensi konvergensi — kelelahan mata dan penglihatan ganda saat membaca dengan refraksi yang normal',
+      'Sinusitis dan kelainan gigi sebagai penyebab nyeri kepala daerah dahi',
+      'Glaukoma sudut tertutup — nyeri mata hebat dengan mata merah, melihat pelangi di sekeliling lampu, dan penurunan penglihatan; risikonya justru lebih tinggi pada mata hipermetropia',
+      'Kejang akomodasi yang menimbulkan gambaran miopia semu pada anak dan remaja',
+    ],
+    pengkajian:
+      'Dipikirkan hipermetropia ringan pada pasien ini atas dasar keluhan yang justru bukan berupa penglihatan kabur melainkan mata cepat lelah, pegal, dan nyeri kepala di daerah dahi yang muncul setelah lama membaca, memberat pada sore hari, dan mereda setelah beristirahat. Pola keluhan yang terikat pada pekerjaan dekat dan pada waktu inilah yang paling mengarahkan, sebab menggambarkan otot siliaris yang bekerja tanpa henti untuk menarik bayangan dari belakang retina ke retina. Tajam penglihatan jauh yang masih normal pada pemeriksaan tidak menyingkirkan diagnosis, dan justru merupakan gambaran khas hipermetropia ringan pada usia muda — memeriksa penglihatan jauh saja akan membuat diagnosis ini terlewat, sehingga pemeriksaan penglihatan dekat serta pemberian lensa sferis positif percobaan menjadi langkah yang menentukan. Presbiopia dipertimbangkan karena sama-sama menyulitkan penglihatan dekat, namun usia pasien belum mencapai rentang presbiopia dan keluhan sudah berlangsung sejak lama. Astigmatisme disingkirkan karena tidak ada keluhan bayangan berbayang dan koreksi silinder tidak memberi tambahan perbaikan. Nyeri kepala tipe tegang maupun migren tidak sesuai karena nyeri pada kasus ini terikat erat dengan aktivitas melihat dekat dan hilang saat mata diistirahatkan. Yang tidak boleh dilewatkan adalah pemeriksaan dengan sikloplegik, sebab kemampuan akomodasi yang kuat pada usia muda menyembunyikan sebagian besar derajat hipermetropia sehingga hasil pemeriksaan tanpa sikloplegik akan jauh lebih rendah daripada keadaan sebenarnya dan kacamata yang diresepkan tidak akan menghilangkan keluhan. Pada anak, penilaian kedudukan mata juga dikerjakan karena akomodasi berlebihan dapat menarik mata ke dalam, dan pada keadaan itu pemberian kacamata positif dapat meluruskan juling tanpa memerlukan operasi.',
+    terapiSuportif: [
+      'Perbaiki penerangan tempat membaca dan bekerja serta pertahankan jarak baca yang wajar',
+      'Terapkan aturan 20-20-20 untuk mengistirahatkan otot akomodasi secara berkala',
+      'Selingi pekerjaan dekat yang panjang dengan jeda dan aktivitas melihat jauh',
+      'Hindari membaca sambil berbaring dan dalam pencahayaan yang redup',
+      'Pada anak, sampaikan kepada guru bahwa keengganan membaca dapat berakar pada kelelahan mata, bukan pada kemalasan',
+    ],
+    tatalaksana: [
+      'Koreksi dengan kacamata lensa sferis positif merupakan penanganan utama',
+      'Prinsip peresepan: berikan lensa positif TERBESAR yang masih memberikan tajam penglihatan terbaik, agar mata terbebas dari akomodasi berlebihan yang menjadi sumber keluhan',
+      'Pada hipermetropia ringan tanpa keluhan sama sekali dan tanpa juling maupun mata malas, koreksi tidak selalu diperlukan',
+      'Pada anak dengan juling akomodatif, koreksi penuh hasil refraksi sikloplegik wajib diberikan dan sering meluruskan mata tanpa operasi',
+      'Pada anak dengan mata malas, koreksi harus diberikan segera dan disertai terapi penutupan mata sesuai anjuran dokter spesialis mata',
+      'Lensa kontak dapat menjadi pilihan pada dewasa dengan edukasi kebersihan yang ketat',
+      'HATI-HATI MEMBERIKAN OBAT PELEBAR PUPIL pada mata hipermetropia usia lanjut dengan bilik mata depan yang dangkal, karena berisiko memicu glaukoma sudut tertutup akut',
+      'Rujuk bila ada juling, mata malas, tajam penglihatan tidak terkoreksi penuh, keluhan menetap meski sudah berkacamata, atau ditemukan kelainan pada pemeriksaan segmen anterior maupun funduskopi',
+    ],
+    edukasi: [
+      'Jelaskan bahwa keluhan utama penyakit ini adalah kelelahan mata dan sakit kepala, bukan penglihatan kabur — sehingga penglihatan jauh yang masih baik tidak berarti mata tidak bermasalah',
+      'Kacamata tidak melemahkan mata; pada anak dengan juling akomodatif, kacamata justru merupakan pengobatan yang dapat meluruskan mata tanpa operasi',
+      'Pakai kacamata sesuai anjuran, terutama saat membaca dan bekerja dekat; pada anak dengan juling maupun mata malas, kacamata dipakai sepanjang hari',
+      'Jelaskan bahwa keluhan yang timbul kembali di kemudian hari merupakan hal wajar seiring menurunnya daya akomodasi karena usia, dan memerlukan penyesuaian ukuran',
+      'Jadwal dan porsi makan: tidak ada makanan maupun suplemen yang mengubah ukuran refraksi. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, sertakan sayuran hijau, telur, ikan, dan buah berwarna untuk kesehatan mata secara umum, dan minum 8 gelas air per hari karena dehidrasi memperberat rasa lelah pada mata',
+      'Jam tidur: 7-9 jam per malam pada dewasa dan 9-11 jam pada anak usia sekolah, dengan jadwal tetap. Tidur yang cukup sangat berpengaruh pada penyakit ini karena otot akomodasi memerlukan pemulihan; keluhan yang memberat setiap sore biasanya membaik nyata setelah tidur yang cukup. Hindari membaca sambil berbaring dan hentikan layar 1 jam sebelum tidur',
+      'Pola olahraga: aktivitas fisik 30 menit sehari selama 5 hari seminggu pada dewasa dan 60 menit sehari pada anak, diutamakan di luar ruangan agar mata banyak melihat jarak jauh dan otot akomodasi beristirahat — ini melengkapi kacamata dan bukan menggantikannya. Gunakan lensa tahan benturan saat berolahraga dan lepaskan lensa kontak sebelum berenang',
+      'Follow up: periksa ulang setiap 6-12 bulan pada anak dan setiap 1-2 tahun pada dewasa; datang lebih awal bila keluhan menetap meski sudah berkacamata, mata mulai juling, atau penglihatan memburuk',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: nyeri mata hebat disertai mata merah, melihat lingkaran pelangi di sekeliling lampu, mual dan muntah bersama nyeri kepala hebat, atau penurunan penglihatan mendadak — gejala ini mengarah pada glaukoma sudut tertutup akut yang risikonya lebih tinggi pada mata hipermetropia',
+    ],
+    komplikasi: [
+      'Juling akomodatif ke dalam, terutama pada anak',
+      'Mata malas bila hipermetropia tidak seimbang antara kedua mata dan tidak dikoreksi sejak dini',
+      'Astenopia menahun dengan nyeri kepala berulang yang mengganggu belajar dan bekerja',
+      'Gangguan prestasi belajar pada anak yang keliru dianggap malas membaca',
+      'Glaukoma sudut tertutup pada mata dengan bilik mata depan yang dangkal, terutama pada usia lanjut',
+      'Munculnya keluhan lebih dini dan lebih berat saat memasuki usia presbiopia',
+    ],
+    prognosis:
+      'Sangat baik pada hipermetropia ringan yang dikoreksi dengan tepat — keluhan kelelahan mata dan nyeri kepala umumnya hilang dalam beberapa hari hingga minggu setelah memakai kacamata yang sesuai. Yang menentukan adalah ketepatan pemeriksaan: tanpa refraksi sikloplegik, ukuran yang diberikan cenderung terlalu rendah sehingga keluhan menetap dan pasien menyimpulkan kacamata tidak menolong. Pada anak, pengenalan dini menentukan segalanya, karena hipermetropia yang tidak terkoreksi dapat menimbulkan juling dan mata malas yang tidak lagi dapat dipulihkan sepenuhnya setelah masa perkembangan penglihatan berakhir.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Miopia ringan': {
-    definisi: 'Rabun jauh — bayangan jatuh di depan retina karena kekuatan refraksi berlebih atau bola mata terlalu panjang.',
-    diagnosis: ['Penglihatan jauh kabur, penglihatan dekat jelas, sering memicingkan mata; koreksi dengan lensa SFERIS NEGATIF (minus) terkecil yang memberi tajam penglihatan terbaik'],
-    tatalaksana: ['Kacamata atau lensa kontak sferis negatif, bedah refraktif pada dewasa dengan refraksi stabil; pada anak: aktivitas luar ruangan dan pembatasan kerja jarak dekat dapat memperlambat progresi; miopia tinggi perlu skrining berkala retina (risiko ablasio, degenerasi makula miopik)'],
+    definisi:
+      'Kelainan refraksi berupa berkas cahaya sejajar yang jatuh di DEPAN retina saat mata dalam keadaan istirahat tanpa akomodasi, sehingga penglihatan jauh kabur sementara penglihatan dekat tetap jelas; disebut ringan bila derajatnya kurang dari 3 dioptri.',
+    anamnesis: {
+      keluhanUtama: 'Penglihatan jauh kabur, tulisan di papan tulis tidak terbaca, sedangkan membaca dekat tetap jelas.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan penglihatan. Site: satu mata atau kedua mata, dan apakah keluhan menetap pada seluruh lapang pandang. Onset: perlahan, umumnya mulai pada usia sekolah dan bertambah selama masa pertumbuhan; PENURUNAN PENGLIHATAN YANG MENDADAK BUKAN GAMBARAN KELAINAN REFRAKSI dan harus dianggap sebagai kelainan lain sampai terbukti sebaliknya. Character: kabur yang membaik bila objek didekatkan atau bila mata dipicingkan — kebiasaan memicingkan mata merupakan petunjuk yang sangat khas karena mempersempit celah pupil sehingga bayangan menjadi lebih tajam. Radiation: tidak ada. Associations: sakit kepala, mata lelah, dan mata berair setelah lama melihat jauh; TANYAKAN GEJALA YANG MENANDAKAN KELAINAN LAIN — melihat kilatan cahaya, bayangan melayang yang bertambah banyak mendadak, atau tirai gelap pada sebagian lapang pandang mengarah pada ablasio retina dan merupakan kegawatan. Time course: apakah derajat kaburnya bertambah cepat, karena pertambahan yang cepat memerlukan pemeriksaan lebih sering. Exacerbating: cahaya redup dan malam hari karena pupil melebar. Severity: dampak terhadap prestasi sekolah, pekerjaan, dan keselamatan berkendara.',
+      riwayatPenyakitDahulu:
+        'Riwayat pemakaian kacamata sebelumnya beserta ukurannya dan kapan terakhir diperiksa, riwayat trauma mata, operasi mata, mata malas, juling, serta penyakit mata lain. Riwayat prematur dan retinopati prematuritas pada anak. Diabetes melitus, karena perubahan gula darah dapat mengubah ukuran refraksi secara sementara.',
+      riwayatPenyakitKeluarga:
+        'Riwayat miopia pada orang tua dan saudara kandung — faktor bawaan sangat kuat, dan risiko anak meningkat bermakna bila kedua orang tua miopia. Tanyakan pula riwayat miopia derajat tinggi, glaukoma, dan ablasio retina pada keluarga.',
+      riwayatPengobatan: 'Obat mata yang sedang dipakai serta obat sistemik yang dapat memengaruhi akomodasi.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai maupun lensa kontak.',
+      riwayatSosialEkonomi:
+        'LAMA WAKTU MELIHAT DEKAT SETIAP HARI termasuk membaca, telepon genggam, dan komputer, serta LAMA WAKTU BERAKTIVITAS DI LUAR RUANGAN — keduanya merupakan faktor lingkungan yang paling berkaitan dengan perkembangan miopia pada anak. Tanyakan pula pencahayaan saat belajar, jarak baca, jenis pekerjaan, kemampuan membeli kacamata, dan pada anak posisi tempat duduk di kelas.',
+    },
+    pemeriksaanFisik: [
+      'PERIKSA TAJAM PENGLIHATAN masing-masing mata secara terpisah dengan kartu Snellen pada jarak 6 meter, dengan dan tanpa koreksi yang sedang dipakai',
+      'UJI PINHOLE merupakan pemeriksaan kunci di layanan primer: tajam penglihatan yang MEMBAIK dengan pinhole menunjukkan penyebabnya kelainan refraksi, sedangkan yang tidak membaik mengarah pada kelainan media refrakta maupun retina dan saraf optik sehingga harus dirujuk',
+      'Koreksi dengan lensa coba: pada miopia digunakan lensa sferis negatif, dan dipilih lensa negatif TERKECIL yang memberikan tajam penglihatan terbaik untuk menghindari koreksi berlebih yang memaksa akomodasi',
+      'Periksa segmen anterior: kornea, bilik mata depan, iris, pupil, dan lensa untuk menyingkirkan kekeruhan sebagai penyebab kabur',
+      'Nilai refleks pupil langsung dan tidak langsung',
+      'Periksa gerakan bola mata dan kedudukan mata untuk menilai juling',
+      'Funduskopi untuk menilai papil saraf optik dan retina, terutama untuk mencari perubahan miopia pada retina bagian tepi',
+      'Pada anak, penilaian sebaiknya dilakukan dengan sikloplegik karena akomodasi yang kuat dapat menyembunyikan derajat sesungguhnya',
+    ],
+    penunjang: [
+      'Refraksi objektif dengan autorefraktometer maupun retinoskopi sebagai titik awal, dilanjutkan refraksi subjektif untuk penentuan akhir',
+      'REFRAKSI SIKLOPLEGIK WAJIB PADA ANAK dan pada dewasa muda dengan keluhan yang tidak sesuai hasil pemeriksaan, karena akomodasi yang aktif dapat membuat mata tampak lebih miopia daripada sebenarnya',
+      'Pengukuran tekanan bola mata sebagai penapisan glaukoma, terutama pada miopia yang lebih tinggi',
+      'Pemeriksaan retina bagian tepi dengan pupil yang dilebarkan pada miopia sedang hingga tinggi untuk mencari robekan maupun penipisan retina',
+      'Pengukuran panjang sumbu bola mata bila tersedia, berguna untuk memantau perkembangan miopia pada anak',
+      'Gula darah bila perubahan ukuran refraksi terjadi cepat dan berfluktuasi',
+    ],
+    etiologi:
+      'Ketidaksesuaian antara panjang sumbu bola mata dengan kekuatan pembiasan kornea dan lensa; tersering karena bola mata yang terlalu panjang (miopia aksial), dan lebih jarang karena kekuatan pembiasan yang terlalu besar (miopia refraktif).',
+    patofisiologi:
+      'Pada mata normal, berkas cahaya sejajar dari objek jauh dibiaskan kornea dan lensa sehingga tepat jatuh di retina saat mata tidak berakomodasi. Pada miopia, bola mata tumbuh terlalu panjang atau daya biasnya terlalu kuat, sehingga titik fokus jatuh di depan retina dan bayangan yang sampai ke retina menjadi kabur. Objek yang didekatkan memiliki berkas cahaya yang menyebar, sehingga titik fokusnya bergeser mundur dan jatuh tepat di retina — inilah sebabnya penderita miopia justru melihat dekat dengan jelas tanpa alat bantu, dan mengapa keluhan pertama hampir selalu berupa kesulitan melihat papan tulis alih-alih kesulitan membaca. Karena pertumbuhan bola mata berlangsung selama masa anak dan remaja, derajat miopia umumnya bertambah pada periode tersebut lalu cenderung stabil pada dewasa muda. Aktivitas melihat dekat yang berkepanjangan dan kurangnya waktu di luar ruangan diduga mendorong pemanjangan sumbu bola mata, sedangkan paparan cahaya terang di luar ruangan merangsang pelepasan dopamin retina yang menghambatnya — dasar mengapa anjuran bermain di luar rumah merupakan pencegahan yang nyata dan bukan sekadar saran umum. Koreksi dilakukan dengan lensa sferis negatif yang menyebarkan berkas cahaya sebelum masuk mata sehingga titik fokus bergeser mundur tepat ke retina.',
+    faktorRisiko: [
+      'Riwayat miopia pada orang tua, terutama bila keduanya miopia',
+      'Aktivitas melihat dekat yang lama dan terus-menerus',
+      'Waktu di luar ruangan yang kurang dari 2 jam per hari pada anak',
+      'Usia sekolah dan remaja saat bola mata masih bertumbuh',
+      'Prematuritas dan riwayat retinopati prematuritas',
+      'Pencahayaan yang kurang dan jarak baca yang terlalu dekat',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dengan pemeriksaan refraksi: tajam penglihatan jauh yang menurun, membaik dengan uji pinhole, dan terkoreksi menjadi normal dengan lensa sferis negatif. Prinsip penentuan ukuran adalah memilih lensa negatif terkecil yang memberikan tajam penglihatan terbaik. Pada anak, refraksi harus dikerjakan dengan sikloplegik karena akomodasi yang kuat dapat melebih-lebihkan derajat miopia.',
+    diagnosisBanding: [
+      'Kelainan refraksi lain berupa hipermetropia dan astigmatisme yang juga membaik dengan pinhole namun memerlukan jenis lensa berbeda',
+      'Katarak — kabur yang tidak sepenuhnya membaik dengan pinhole, disertai silau; katarak nuklir dapat menimbulkan pergeseran miopia sehingga pasien usia lanjut tiba-tiba dapat membaca tanpa kacamata',
+      'Glaukoma — penyempitan lapang pandang tepi dengan tajam penglihatan sentral yang lama tetap baik',
+      'Retinopati diabetik dan kelainan makula — kabur yang tidak membaik dengan pinhole disertai penglihatan bergelombang',
+      'Ablasio retina — penurunan penglihatan MENDADAK dengan kilatan cahaya, bayangan melayang, dan tirai gelap; kegawatan yang tidak boleh dikelirukan sebagai kacamata yang kurang kuat',
+      'Neuritis optik — penurunan penglihatan cepat disertai nyeri saat menggerakkan mata dan gangguan penglihatan warna',
+      'Miopia sementara akibat gula darah yang tinggi, obat tertentu, atau kejang akomodasi',
+    ],
+    pengkajian:
+      'Dipikirkan miopia ringan pada pasien ini atas dasar keluhan penglihatan jauh yang kabur secara perlahan sementara penglihatan dekat tetap jelas — kombinasi yang sangat khas dan langsung mencerminkan letak titik fokus yang jatuh di depan retina. Kebiasaan memicingkan mata saat melihat kejauhan memperkuat dugaan tersebut, sebab tindakan itu mempersempit berkas cahaya yang masuk sehingga bayangan sementara menjadi lebih tajam. Uji pinhole merupakan langkah yang paling menentukan di layanan primer: membaiknya tajam penglihatan dengan pinhole membuktikan bahwa penyebab kabur terletak pada pembiasan cahaya dan bukan pada kekeruhan media, retina, maupun saraf optik — dan justru karena itulah katarak, kelainan makula, dan neuropati optik dapat ditinggalkan tanpa memerlukan alat canggih. Koreksi dengan lensa sferis negatif yang mengembalikan tajam penglihatan menjadi normal memastikan diagnosis, dengan prinsip memilih lensa negatif terkecil yang memberi hasil terbaik agar mata tidak dipaksa berakomodasi terus-menerus. Ablasio retina merupakan hal yang wajib disingkirkan pada setiap keluhan penglihatan, dan pada kasus ini disingkirkan karena keluhan berkembang perlahan selama berbulan-bulan tanpa kilatan cahaya, tanpa bayangan melayang yang bertambah mendadak, dan tanpa tirai gelap pada lapang pandang — penurunan penglihatan yang mendadak tidak pernah boleh dianggap sekadar kacamata yang kurang kuat. Pada anak, penilaian perlu dilakukan dengan sikloplegik karena kemampuan akomodasi yang sangat kuat dapat membuat mata tampak lebih miopia daripada keadaan sebenarnya, sehingga peresepan tanpa sikloplegik berisiko memberikan ukuran yang berlebihan.',
+    terapiSuportif: [
+      'Perbaiki kebiasaan melihat: jarak baca sekitar 30-40 sentimeter, penerangan yang cukup dan merata, serta posisi duduk tegak',
+      'Terapkan aturan 20-20-20: setiap 20 menit melihat dekat, alihkan pandangan ke objek berjarak sekitar 6 meter selama 20 detik',
+      'Anjurkan anak beraktivitas di luar ruangan minimal 2 jam setiap hari — ini merupakan tindakan pencegahan dengan bukti terkuat untuk memperlambat perkembangan miopia',
+      'Atur posisi duduk anak di kelas agar dapat melihat papan tulis dengan jelas sampai kacamata tersedia',
+      'Batasi waktu layar dan berikan jeda teratur',
+    ],
+    tatalaksana: [
+      'Koreksi dengan kacamata lensa sferis negatif merupakan penanganan utama, aman, dan paling terjangkau',
+      'Pilih lensa negatif TERKECIL yang memberikan tajam penglihatan terbaik; koreksi berlebih menimbulkan sakit kepala dan mata lelah',
+      'Lensa kontak dapat menjadi pilihan pada pasien yang memerlukannya, dengan edukasi ketat tentang kebersihan dan lama pemakaian mengingat risiko keratitis mikroba',
+      'Bedah refraktif hanya dipertimbangkan pada usia dewasa setelah ukuran stabil minimal satu tahun, dan bukan wewenang layanan primer',
+      'Pada anak dengan miopia yang bertambah cepat, tersedia upaya pengendalian miopia berupa atropin dosis rendah maupun lensa khusus — perlu rujukan ke dokter spesialis mata',
+      'Rujuk bila tajam penglihatan tidak membaik dengan pinhole maupun koreksi lensa, ada kecurigaan mata malas atau juling, ditemukan kelainan pada segmen anterior maupun funduskopi, miopia bertambah sangat cepat, atau muncul tanda ablasio retina',
+      'Pada anak dengan mata malas, koreksi harus segera diberikan karena penanganan yang terlambat setelah masa perkembangan penglihatan berakhir tidak lagi memberi hasil optimal',
+    ],
+    edukasi: [
+      'Jelaskan bahwa memakai kacamata TIDAK membuat mata menjadi semakin lemah maupun bergantung — anggapan ini sangat lazim dan menyebabkan anak dibiarkan tidak berkacamata sehingga prestasi sekolahnya terganggu',
+      'Kacamata dipakai sesuai anjuran; pada anak umumnya dipakai terus-menerus agar penglihatan berkembang normal',
+      'Jelaskan bahwa ukuran miopia umumnya bertambah selama masa pertumbuhan dan cenderung stabil pada usia dewasa muda, sehingga penggantian ukuran merupakan hal yang wajar dan bukan tanda kegagalan',
+      'Jadwal dan porsi makan: tidak ada makanan maupun suplemen yang dapat menyembuhkan miopia, dan wortel tidak memperbaiki ukuran kacamata. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayuran hijau, telur, ikan, dan buah berwarna yang mengandung lutein serta omega-3 untuk kesehatan retina secara umum, dan minum 8 gelas air per hari. Waspadai janji obat tetes maupun terapi yang mengaku dapat menghilangkan miopia',
+      'Jam tidur: 7-9 jam per malam pada dewasa dan 9-11 jam pada anak usia sekolah, dengan jadwal tetap. Hentikan penggunaan layar minimal 1 jam sebelum tidur, dan jangan membaca maupun bermain telepon genggam dalam gelap sambil berbaring karena memaksa mata bekerja pada jarak sangat dekat',
+      'Pola olahraga: aktivitas fisik 60 menit sehari pada anak dan 30 menit sehari selama 5 hari seminggu pada dewasa, dan SEBISA MUNGKIN DI LUAR RUANGAN — paparan cahaya alami inilah yang terbukti memperlambat bertambahnya miopia pada anak, sehingga olahraga di luar rumah memiliki manfaat ganda. Gunakan kacamata berlensa tahan benturan saat berolahraga, lepaskan lensa kontak sebelum berenang, dan gunakan kacamata renang',
+      'Follow up: periksa ulang setiap 6-12 bulan pada anak dan setiap 1-2 tahun pada dewasa; datang lebih awal bila penglihatan memburuk cepat, sakit kepala menetap, atau kacamata terasa tidak lagi menolong',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: penglihatan turun mendadak, melihat kilatan cahaya, bayangan melayang yang bertambah banyak dengan tiba-tiba, tirai gelap yang menutup sebagian lapang pandang, mata merah dengan nyeri hebat, atau melihat lingkaran pelangi di sekeliling lampu',
+    ],
+    komplikasi: [
+      'Mata malas dan juling bila kelainan refraksi tidak dikoreksi pada masa perkembangan penglihatan anak',
+      'Gangguan prestasi belajar dan perkembangan sosial pada anak yang tidak terkoreksi',
+      'Sakit kepala dan mata lelah menahun akibat koreksi yang tidak tepat',
+      'Perkembangan menjadi miopia derajat tinggi dengan risiko ablasio retina, degenerasi makula miopik, glaukoma, dan katarak yang lebih dini',
+      'Keratitis mikroba akibat pemakaian lensa kontak yang tidak higienis',
+      'Kecelakaan lalu lintas akibat penglihatan jauh yang tidak terkoreksi',
+    ],
+    prognosis:
+      'Sangat baik. Miopia ringan terkoreksi sepenuhnya dengan kacamata dan tidak menimbulkan kerusakan mata. Ukuran umumnya bertambah selama masa pertumbuhan lalu stabil pada dewasa muda. Yang menentukan hasil jangka panjang adalah pengenalan dini pada anak — koreksi yang terlambat pada masa perkembangan penglihatan dapat menimbulkan mata malas yang tidak lagi dapat diperbaiki sepenuhnya di kemudian hari, sedangkan miopia yang terkoreksi tepat waktu tidak meninggalkan akibat apa pun.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Astigmatism ringan': {
-    definisi: 'Kelainan refraksi akibat kelengkungan kornea atau lensa yang tidak sama pada meridian berbeda.',
-    diagnosis: ['Penglihatan kabur atau terdistorsi pada semua jarak, sakit kepala, memicingkan mata; koreksi memerlukan lensa SILINDRIS dengan aksis yang tepat; keratometri/topografi menilai kelengkungan kornea'],
-    tatalaksana: ['Kacamata dengan lensa silindris atau lensa kontak toric, bedah refraktif pada dewasa; astigmatisme ireguler yang berat memerlukan lensa kontak rigid — pertimbangkan keratokonus bila astigmatisme cepat berubah'],
+    definisi:
+      'Kelainan refraksi akibat kelengkungan kornea atau lensa yang tidak sama pada semua meridian, sehingga berkas cahaya tidak terfokus pada satu titik melainkan membentuk dua garis fokus; akibatnya bayangan tampak berbayang atau memanjang baik pada jarak jauh maupun dekat.',
+    anamnesis: {
+      keluhanUtama: 'Penglihatan berbayang atau seperti ada garis memanjang, disertai mata cepat lelah dan sakit kepala.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: satu atau kedua mata; keluhan dirasakan pada seluruh jarak. Onset: perlahan, umumnya sudah ada sejak masa anak karena bentuk kornea bersifat bawaan; astigmatisme yang timbul atau bertambah cepat pada dewasa harus dicurigai akibat keratokonus, trauma, jaringan parut kornea, maupun pascaoperasi. Character: PEMBEDA UTAMA DARI KELAINAN REFRAKSI LAIN ADALAH BAYANGAN BERBAYANG ATAU MEMANJANG, bukan sekadar kabur; pasien sering menggambarkan huruf yang tampak ganda samar atau lampu yang memanjang seperti garis. Radiation: nyeri kepala di daerah dahi dan pelipis. Associations: mata lelah, memicingkan mata, memiringkan kepala, dan silau terutama saat menyetir malam hari karena lampu tampak menyilaukan dengan pancaran memanjang. Time course: relatif menetap; bila bertambah cepat, telusuri keratokonus terutama pada remaja yang sering menggosok mata. Exacerbating: cahaya redup, kelelahan, dan pekerjaan dekat lama. Severity: dampak terhadap belajar, bekerja, dan berkendara malam hari.',
+      riwayatPenyakitDahulu:
+        'Riwayat kacamata sebelumnya beserta ada tidaknya lensa silinder, riwayat trauma dan operasi mata, riwayat infeksi kornea yang meninggalkan jaringan parut, riwayat bintitan besar maupun tumor kelopak yang menekan bola mata, serta riwayat mata malas dan juling.',
+      riwayatPenyakitKeluarga:
+        'Riwayat astigmatisme, keratokonus, dan kelainan refraksi lain pada keluarga; keratokonus memiliki kecenderungan bawaan.',
+      riwayatPengobatan: 'Obat mata yang sedang dipakai serta riwayat pemakaian lensa kontak.',
+      riwayatAlergi:
+        'RIWAYAT ALERGI MATA DAN RINITIS ALERGIKA PENTING DITANYAKAN — mata alergi menimbulkan gatal hebat sehingga pasien sering menggosok mata, dan menggosok mata berulang merupakan faktor risiko keratokonus yang memperberat astigmatisme.',
+      riwayatSosialEkonomi:
+        'Jenis pekerjaan, lama pekerjaan dekat, kebiasaan mengemudi malam hari, kebiasaan menggosok mata, serta kemampuan membeli kacamata dengan lensa silinder yang harganya lebih tinggi daripada lensa biasa.',
+    },
+    pemeriksaanFisik: [
+      'Periksa tajam penglihatan jauh dan dekat masing-masing mata secara terpisah',
+      'Uji pinhole; pada astigmatisme tajam penglihatan membaik dengan pinhole karena berkas cahaya dipersempit',
+      'Koreksi dilakukan dua tahap: tentukan lensa sferis terbaik lebih dahulu, kemudian tambahkan LENSA SILINDER dengan menentukan sumbu dan kekuatannya',
+      'Gunakan kipas astigmat (astigmatic fan) atau juring jam untuk menentukan sumbu — pasien melihat salah satu garis lebih jelas daripada yang lain, dan arah garis itulah petunjuk sumbunya',
+      'Lakukan uji silang silinder untuk menyempurnakan sumbu dan kekuatan sebelum diresepkan',
+      'Periksa kornea dengan cermat untuk mencari jaringan parut, kekeruhan, dan penipisan; pada keratokonus kornea menonjol berbentuk kerucut',
+      'Cari tanda keratokonus pada pemeriksaan sederhana: bayangan seperti gunting pada retinoskopi dan tanda Munson berupa lekukan kelopak bawah saat pasien melirik ke bawah',
+      'Periksa kelopak mata untuk massa yang menekan bola mata, serta funduskopi dan tekanan bola mata sesuai indikasi',
+    ],
+    penunjang: [
+      'Refraksi objektif dengan autorefraktometer maupun retinoskopi dilanjutkan refraksi subjektif dengan penentuan sumbu silinder',
+      'Refraksi sikloplegik pada anak dan dewasa muda',
+      'KERATOMETRI DAN TOPOGRAFI KORNEA bila astigmatisme tinggi, tidak beraturan, bertambah cepat, atau bila tajam penglihatan tidak terkoreksi penuh — pemeriksaan inilah yang mengenali keratokonus',
+      'Pemeriksaan dengan lampu celah untuk menilai kornea secara rinci',
+      'Pengukuran tekanan bola mata dan funduskopi sebagai bagian pemeriksaan mata menyeluruh',
+    ],
+    etiologi:
+      'Tersering merupakan kelainan bentuk kelengkungan kornea yang bersifat bawaan; penyebab didapat meliputi keratokonus, jaringan parut kornea pascainfeksi maupun trauma, pterigium yang meluas, tumor atau bintitan besar pada kelopak, dan tindakan bedah mata.',
+    patofisiologi:
+      'Kornea normal berbentuk hampir seperti permukaan bola sehingga daya biasnya sama pada semua arah dan cahaya terfokus pada satu titik. Pada astigmatisme, kelengkungan pada satu meridian berbeda dari meridian yang tegak lurus terhadapnya — bentuknya lebih menyerupai permukaan bola rugbi — sehingga cahaya dibiaskan dengan kekuatan berbeda menurut arahnya dan membentuk dua garis fokus yang terpisah alih-alih satu titik. Inilah dasar mengapa keluhannya bukan sekadar kabur melainkan bayangan yang tampak berbayang atau memanjang ke satu arah, dan mengapa lampu pada malam hari terlihat memancar seperti garis. Karena kesalahannya bergantung pada arah, koreksinya pun harus berarah: lensa silinder hanya membiaskan pada satu meridian, sehingga selain kekuatannya, SUMBUNYA harus tepat — kesalahan sumbu membuat kacamata terasa tidak nyaman meskipun kekuatannya benar, dan hal ini merupakan sebab tersering pasien mengeluh pusing dengan kacamata barunya. Pada astigmatisme tidak beraturan seperti keratokonus, permukaan kornea tidak lagi memiliki dua meridian utama yang teratur sehingga tidak dapat dikoreksi sepenuhnya dengan kacamata dan memerlukan lensa kontak keras maupun tindakan lain. Astigmatisme yang tidak dikoreksi pada masa perkembangan penglihatan anak menyebabkan bayangan yang selalu kabur pada semua jarak, sehingga berisiko menimbulkan mata malas.',
+    faktorRisiko: [
+      'Riwayat astigmatisme dan keratokonus pada keluarga',
+      'Kebiasaan menggosok mata, terutama pada penderita alergi mata',
+      'Riwayat infeksi kornea, trauma, dan operasi mata',
+      'Pterigium yang meluas hingga menarik kornea',
+      'Bintitan besar, kalazion, maupun tumor kelopak yang menekan bola mata',
+      'Prematuritas',
+      'Sindrom Down dan penyakit jaringan ikat tertentu yang berkaitan dengan keratokonus',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dengan refraksi subjektif yang menentukan kekuatan dan sumbu lensa silinder, didahului penentuan komponen sferisnya. Tajam penglihatan yang terkoreksi penuh dengan kombinasi lensa sferis dan silinder memastikan astigmatisme beraturan. Bila tajam penglihatan tidak terkoreksi penuh atau astigmatismenya bertambah cepat, topografi kornea diperlukan untuk mengenali astigmatisme tidak beraturan dan keratokonus.',
+    diagnosisBanding: [
+      'Miopia dan hipermetropia murni — kabur tanpa gambaran berbayang maupun memanjang, terkoreksi penuh dengan lensa sferis saja',
+      'Keratokonus — astigmatisme tidak beraturan yang bertambah cepat pada remaja dan dewasa muda, tidak terkoreksi penuh dengan kacamata, disertai penonjolan dan penipisan kornea',
+      'Katarak, terutama katarak subkapsular posterior — penglihatan ganda pada satu mata dan silau, tidak terkoreksi dengan kacamata',
+      'Kekeruhan maupun jaringan parut kornea pascainfeksi dan trauma',
+      'Subluksasi lensa yang menimbulkan penglihatan ganda pada satu mata',
+      'Penglihatan ganda akibat kelainan otot mata — dibedakan karena menghilang bila salah satu mata ditutup, sedangkan pada astigmatisme bayangan berbayang tetap ada meski satu mata ditutup',
+      'Mata kering yang menimbulkan kabur hilang timbul dan membaik setelah berkedip',
+    ],
+    pengkajian:
+      'Dipikirkan astigmatisme ringan pada pasien ini atas dasar keluhan penglihatan yang tidak sekadar kabur melainkan tampak berbayang dan memanjang ke satu arah, dirasakan baik pada jarak jauh maupun dekat, disertai mata cepat lelah, nyeri kepala, dan silau saat melihat lampu pada malam hari. Sifat bayangan yang berbayang inilah pembeda utamanya dari miopia maupun hipermetropia murni yang hanya menimbulkan kekaburan tanpa penggandaan, dan gambaran tersebut mencerminkan cahaya yang terfokus menjadi dua garis alih-alih satu titik akibat kelengkungan kornea yang tidak sama pada semua arah. Penglihatan ganda akibat kelainan otot mata disingkirkan dengan cara sederhana yaitu menutup salah satu mata: pada kelainan otot, bayangan ganda menghilang, sedangkan pada astigmatisme bayangan berbayang tetap ada meski hanya satu mata yang dipakai. Katarak dan kekeruhan kornea dipertimbangkan karena juga dapat menimbulkan penglihatan ganda pada satu mata dan silau, namun disingkirkan melalui pemeriksaan segmen anterior serta oleh terkoreksinya tajam penglihatan menjadi normal dengan kombinasi lensa sferis dan silinder. Keratokonus merupakan kemungkinan yang paling perlu diwaspadai karena juga menimbulkan astigmatisme, namun pada kasus ini astigmatisme bersifat menetap alih-alih bertambah cepat, kornea tampak jernih tanpa penonjolan maupun penipisan, dan tajam penglihatan terkoreksi penuh dengan kacamata — bila salah satu dari itu tidak terpenuhi, topografi kornea menjadi wajib. Riwayat menggosok mata dan alergi mata ditelusuri secara khusus pada kasus ini, sebab kebiasaan tersebut merupakan faktor risiko keratokonus yang dapat dicegah, dan menghentikannya merupakan bagian dari tatalaksana alih-alih sekadar anjuran kebersihan. Perlu ditekankan bahwa ketepatan sumbu lensa silinder sama pentingnya dengan kekuatannya, karena sumbu yang meleset membuat pasien merasa pusing dengan kacamata barunya meski ukurannya benar.',
+    terapiSuportif: [
+      'HENTIKAN KEBIASAAN MENGGOSOK MATA dan obati alergi mata yang menjadi penyebabnya — langkah ini merupakan pencegahan keratokonus yang paling nyata',
+      'Perbaiki penerangan saat membaca dan bekerja',
+      'Terapkan aturan 20-20-20 pada pekerjaan dekat yang lama',
+      'Kurangi menyetir malam hari sampai koreksi diberikan, mengingat silau yang mengganggu',
+      'Berikan waktu penyesuaian saat pertama memakai kacamata silinder dan jelaskan bahwa lantai maupun garis tegak dapat terasa miring pada hari-hari pertama',
+    ],
+    tatalaksana: [
+      'Koreksi dengan kacamata berlensa silinder, dikombinasikan dengan lensa sferis sesuai kebutuhan, merupakan penanganan utama',
+      'KETEPATAN SUMBU SAMA PENTINGNYA DENGAN KEKUATAN — sumbu yang meleset menimbulkan pusing dan rasa tidak nyaman meski ukurannya benar',
+      'Pada astigmatisme ringan tanpa keluhan dan tanpa penurunan tajam penglihatan, koreksi tidak selalu diperlukan',
+      'Pada anak, koreksi diberikan bila astigmatisme cukup bermakna untuk berisiko menimbulkan mata malas, meskipun anak belum mengeluh',
+      'Lensa kontak toris dapat menjadi pilihan pada dewasa dengan edukasi kebersihan yang ketat',
+      'Astigmatisme tidak beraturan seperti pada keratokonus memerlukan lensa kontak keras yang tembus gas maupun tindakan seperti cross-linking, dan bukan wewenang layanan primer',
+      'Obati penyebab yang dapat dikoreksi seperti pterigium yang meluas, kalazion besar, maupun tumor kelopak',
+      'Rujuk bila tajam penglihatan tidak terkoreksi penuh, astigmatisme bertambah cepat, ditemukan kelainan kornea, ada kecurigaan keratokonus, atau bila ada mata malas maupun juling pada anak',
+    ],
+    edukasi: [
+      'Jelaskan bahwa astigmatisme disebabkan bentuk permukaan kornea yang tidak sama rata pada semua arah, bukan karena kebiasaan membaca yang salah maupun karena mata dipakai berlebihan',
+      'Peringatkan bahwa pada hari-hari pertama memakai kacamata silinder, lantai dapat terasa miring atau melengkung dan benda tampak sedikit berubah bentuk — ini normal dan umumnya hilang dalam beberapa hari sampai dua minggu. Tanpa penjelasan ini, banyak pasien berhenti memakai kacamatanya dan menganggap ukurannya salah',
+      'JANGAN MENGGOSOK MATA — kebiasaan ini dapat mengubah bentuk kornea dan meningkatkan risiko keratokonus; bila mata gatal, obati alerginya alih-alih menggosoknya',
+      'Kacamata tidak melemahkan mata dan tidak membuat ketergantungan',
+      'Jadwal dan porsi makan: tidak ada makanan yang mengubah bentuk kornea. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayuran hijau, ikan, telur, dan buah berwarna untuk kesehatan mata secara umum, dan minum 8 gelas air per hari karena mata yang kering memperberat rasa berbayang dan silau',
+      'Jam tidur: 7-9 jam per malam pada dewasa dan 9-11 jam pada anak usia sekolah, dengan jadwal tetap; kelelahan jelas memperberat keluhan berbayang dan nyeri kepala. Hentikan layar 1 jam sebelum tidur dan jangan membaca dalam gelap',
+      'Pola olahraga: aktivitas fisik 30 menit sehari selama 5 hari seminggu pada dewasa dan 60 menit sehari pada anak, diutamakan di luar ruangan. Gunakan kacamata berlensa tahan benturan saat berolahraga karena trauma pada mata dapat menimbulkan jaringan parut kornea yang justru memperberat astigmatisme; hindari olahraga kontak tanpa pelindung mata. Bila berkeringat dan mata terasa gatal, bilas dengan air bersih alih-alih menggosoknya. Lepaskan lensa kontak sebelum berenang dan gunakan kacamata renang',
+      'Follow up: periksa ulang setiap 6-12 bulan pada anak dan setiap 1-2 tahun pada dewasa; datang lebih awal bila penglihatan memburuk cepat, kacamata terasa tidak lagi menolong, atau ukuran silinder bertambah cepat pada setiap pemeriksaan',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: penurunan penglihatan mendadak, mata merah dengan nyeri hebat, silau yang bertambah hebat dengan cepat, atau perubahan ukuran kacamata yang sangat cepat pada usia remaja',
+    ],
+    komplikasi: [
+      'Mata malas bila astigmatisme bermakna tidak dikoreksi pada masa perkembangan penglihatan anak',
+      'Astenopia menahun dengan nyeri kepala dan mata lelah',
+      'Gangguan prestasi belajar pada anak yang tidak terkoreksi',
+      'Bahaya saat berkendara malam hari akibat silau dan bayangan memanjang',
+      'Perkembangan menjadi keratokonus pada pasien dengan kebiasaan menggosok mata',
+      'Ketidaknyamanan menetap akibat sumbu silinder yang tidak tepat sehingga kacamata tidak dipakai',
+    ],
+    prognosis:
+      'Sangat baik pada astigmatisme ringan yang beraturan — terkoreksi sepenuhnya dengan kacamata dan derajatnya cenderung menetap sepanjang hidup. Keberhasilan lebih ditentukan oleh ketepatan penentuan sumbu dan oleh penjelasan mengenai masa penyesuaian daripada oleh besarnya ukuran, sebab kacamata yang tidak dipakai tidak menolong siapa pun. Prognosis berbeda pada astigmatisme tidak beraturan seperti keratokonus, yang bersifat progresif dan memerlukan penanganan khusus — karena itu astigmatisme yang bertambah cepat pada usia muda tidak boleh sekadar diganti ukurannya, melainkan harus ditelusuri penyebabnya.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Presbiopia': {
-    definisi: 'Berkurangnya kemampuan akomodasi lensa seiring usia sehingga penglihatan dekat terganggu.',
-    diagnosis: ['Kesulitan membaca dekat mulai usia sekitar 40 tahun, cenderung menjauhkan bacaan, perlu cahaya lebih terang; koreksi dengan lensa adisi positif sesuai usia (umumnya +1,00 D usia 40 meningkat bertahap hingga +3,00 D usia 60)'],
-    tatalaksana: ['Kacamata baca, bifokal, atau progresif; lensa kontak multifokal atau monovision sebagai alternatif; edukasi bahwa ini proses fisiologis penuaan dan adisi akan meningkat bertahap hingga sekitar usia 65 lalu stabil'],
+    definisi:
+      'Berkurangnya kemampuan mata melihat dekat akibat menurunnya daya akomodasi lensa secara fisiologis seiring bertambahnya usia, umumnya mulai dirasakan pada usia sekitar 40 tahun; merupakan proses penuaan yang normal dan dialami semua orang, bukan penyakit.',
+    anamnesis: {
+      keluhanUtama:
+        'Sulit membaca tulisan kecil sehingga harus menjauhkan bacaan, sementara penglihatan jauh tetap jelas.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES. Site: keluhan hanya pada penglihatan dekat. Onset: perlahan mulai usia sekitar 40 tahun, dan lebih dini pada penderita hipermetropia yang cadangan akomodasinya sudah terpakai sejak lama. Character: TANDA YANG PALING KHAS ADALAH KEBIASAAN MENJAUHKAN BACAAN untuk memperjelas huruf — gejala ini hampir selalu dikenali pasien sendiri bila ditanyakan. Radiation: nyeri kepala di daerah dahi setelah membaca lama. Associations: mata lelah, pegal, berair, mengantuk saat membaca, dan pandangan yang perlu waktu untuk menyesuaikan saat berpindah dari melihat jauh ke dekat. Time course: MEMBERAT PADA SORE DAN MALAM HARI serta saat lelah, dan lebih terasa dalam pencahayaan yang redup karena pupil melebar sehingga kedalaman fokus berkurang. Exacerbating: cahaya kurang, kelelahan, dan huruf berukuran kecil. Relieving: menjauhkan bacaan dan menambah penerangan. Severity: dampak terhadap pekerjaan, membaca, dan penggunaan telepon genggam.',
+      riwayatPenyakitDahulu:
+        'Riwayat kelainan refraksi sebelumnya dan pemakaian kacamata, riwayat operasi mata termasuk operasi katarak, trauma mata, serta diabetes melitus yang dapat mempercepat menurunnya akomodasi dan mengubah refraksi secara berfluktuasi.',
+      riwayatPenyakitKeluarga: 'Riwayat glaukoma dan katarak pada keluarga sebagai bagian penapisan pada kelompok usia ini.',
+      riwayatPengobatan:
+        'Obat yang dapat mengganggu akomodasi seperti antikolinergik, antidepresan trisiklik, dan antihistamin; obat mata yang sedang dipakai.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai kacamata.',
+      riwayatSosialEkonomi:
+        'JENIS PEKERJAAN DAN JARAK KERJA SEHARI-HARI sangat menentukan ukuran kacamata yang diresepkan — penjahit, pembaca, pengguna komputer, dan pekerja bengkel memerlukan jarak kerja yang berbeda sehingga tambahan lensa yang tepat pun berbeda. Tanyakan pula pencahayaan tempat kerja dan kemampuan membeli kacamata.',
+    },
+    pemeriksaanFisik: [
+      'Periksa tajam penglihatan JAUH lebih dahulu dan koreksi kelainan refraksi jauh bila ada — tambahan untuk penglihatan dekat hanya bermakna bila koreksi jauh sudah tepat',
+      'Periksa tajam penglihatan dekat dengan kartu Jaeger atau kartu baca pada jarak baca yang biasa dipakai pasien',
+      'Tentukan tambahan lensa positif untuk dekat dengan menambahkan lensa positif secara bertahap sampai pasien dapat membaca huruf kecil dengan nyaman pada jarak kerjanya',
+      'Pedoman kasar tambahan menurut usia: sekitar +1,00 D pada usia 40 tahun, +1,50 D pada 45 tahun, +2,00 D pada 50 tahun, +2,50 D pada 55 tahun, dan +3,00 D pada 60 tahun ke atas',
+      'SESUAIKAN TAMBAHAN DENGAN JARAK KERJA NYATA, bukan semata dengan usia — pekerja dengan jarak kerja lebih jauh memerlukan tambahan lebih kecil',
+      'Periksa segmen anterior untuk menyingkirkan katarak yang juga mengganggu penglihatan dekat',
+      'PERIKSA TEKANAN BOLA MATA DAN FUNDUSKOPI pada setiap pasien usia ini — kunjungan untuk kacamata baca merupakan kesempatan penting menapis glaukoma dan retinopati diabetik yang keduanya tidak bergejala pada tahap awal',
+      'Nilai penglihatan binokular dan kenyamanan dengan koreksi yang dipilih sebelum diresepkan',
+    ],
+    penunjang: [
+      'Umumnya tidak diperlukan; diagnosis ditegakkan dari usia, keluhan khas, dan hasil pemeriksaan refraksi',
+      'Refraksi lengkap untuk jauh dan dekat',
+      'Pengukuran tekanan bola mata sebagai penapisan glaukoma',
+      'Funduskopi untuk menilai papil saraf optik, makula, dan retina',
+      'Gula darah bila ada keluhan penglihatan yang berfluktuasi atau faktor risiko diabetes',
+      'PRESBIOPIA YANG MUNCUL SEBELUM USIA 35-40 TAHUN TIDAK WAJAR dan menuntut penelusuran hipermetropia yang belum terkoreksi, diabetes, obat tertentu, atau kelainan neurologis',
+    ],
+    etiologi:
+      'Proses penuaan alami berupa mengerasnya lensa kristalina disertai berkurangnya elastisitas kapsul lensa dan melemahnya otot siliaris, sehingga daya akomodasi menurun secara bertahap.',
+    patofisiologi:
+      'Melihat objek dekat memerlukan akomodasi, yaitu mencembungnya lensa akibat kontraksi otot siliaris yang mengendurkan serat zonula. Sejak masa anak, daya akomodasi sebenarnya sudah menurun secara perlahan setiap tahun, namun cadangannya masih jauh melebihi kebutuhan sehingga tidak dirasakan. Lensa terus membentuk serat baru sepanjang hidup tanpa membuang yang lama, sehingga intinya makin padat dan kaku, sementara elastisitas kapsul berkurang. Ketika daya akomodasi turun di bawah sekitar 3 dioptri — umumnya sekitar usia 40 tahun — mata tidak lagi mampu memfokuskan objek pada jarak baca 33 sentimeter, dan pasien mulai menjauhkan bacaan agar kebutuhan akomodasinya berkurang. Perilaku menjauhkan bacaan ini bukan kebiasaan melainkan koreksi alami terhadap keterbatasan tersebut, dan karena itu menjadi gejala yang paling khas. Cahaya yang redup memperberat keluhan karena pupil melebar sehingga kedalaman fokus berkurang, sedangkan cahaya terang menyempitkan pupil dan sedikit memperbaiki penglihatan dekat — inilah sebabnya menambah penerangan seringkali sudah sangat membantu. Penderita hipermetropia mengalami presbiopia lebih dini karena sebagian cadangan akomodasinya sudah terpakai untuk mengoreksi kelainan refraksinya sendiri, sedangkan penderita miopia ringan yang melepas kacamata dapat membaca tanpa alat bantu lebih lama.',
+    faktorRisiko: [
+      'Usia 40 tahun ke atas — faktor yang bersifat universal dan tidak dapat dihindari',
+      'Hipermetropia yang belum terkoreksi, yang memunculkan presbiopia lebih dini',
+      'Diabetes melitus dan penyakit kardiovaskular',
+      'Obat antikolinergik, antidepresan, dan antihistamin',
+      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan lebih cepat disadari',
+      'Tinggal di daerah beriklim panas dilaporkan berkaitan dengan awitan yang lebih dini',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari usia yang sesuai, keluhan khas berupa kesulitan melihat dekat dengan kebiasaan menjauhkan bacaan, penglihatan jauh yang tetap baik, serta terkoreksinya penglihatan dekat dengan penambahan lensa sferis positif. Penentuan ukuran didasarkan pada pemeriksaan langsung dengan jarak kerja nyata pasien, bukan semata pada tabel usia.',
+    diagnosisBanding: [
+      'Hipermetropia yang belum terkoreksi — menimbulkan keluhan serupa namun pada usia lebih muda dan disertai kelelahan mata sejak lama',
+      'Katarak dini — mengganggu penglihatan dekat maupun jauh, disertai silau; katarak nuklir dapat menimbulkan pergeseran miopia sehingga pasien justru dapat membaca kembali tanpa kacamata, keadaan yang keliru dianggap sebagai membaiknya penglihatan',
+      'Degenerasi makula terkait usia — penglihatan sentral kabur dan garis lurus tampak bergelombang, tidak membaik dengan kacamata baca',
+      'Retinopati diabetik dan edema makula',
+      'Glaukoma — lapang pandang tepi menyempit dengan penglihatan sentral yang lama tetap baik, sering tanpa keluhan pada tahap awal',
+      'Insufisiensi konvergensi dan kelumpuhan akomodasi akibat obat maupun kelainan neurologis, terutama bila keluhan muncul pada usia muda',
+      'Mata kering — keluhan kabur yang hilang timbul dan membaik setelah berkedip',
+    ],
+    pengkajian:
+      'Dipikirkan presbiopia pada pasien ini atas dasar kesulitan membaca tulisan kecil yang timbul perlahan pada usia sekitar empat puluh tahun, dengan kebiasaan menjauhkan bacaan agar huruf menjadi lebih jelas, sementara penglihatan jauh tetap baik tanpa alat bantu. Kebiasaan menjauhkan bacaan merupakan gejala yang paling khas dan sekaligus merupakan koreksi alami pasien terhadap berkurangnya daya akomodasi, sedangkan memberatnya keluhan pada sore hari dan dalam cahaya redup mencerminkan melebarnya pupil yang mengurangi kedalaman fokus. Hipermetropia yang belum terkoreksi merupakan banding utama karena menimbulkan keluhan yang hampir sama, namun pada hipermetropia keluhan kelelahan mata sudah dirasakan sejak usia jauh lebih muda dan pemeriksaan refraksi jauh akan menunjukkan kelainan; pada kasus ini penglihatan jauh normal tanpa koreksi. Katarak dini wajib dipertimbangkan pada kelompok usia ini dan disingkirkan melalui pemeriksaan segmen anterior, terlebih karena katarak nuklir dapat menimbulkan pergeseran miopia yang membuat pasien seolah dapat membaca kembali tanpa kacamata — perbaikan semu yang justru menandakan penyakit dan bukan kesembuhan. Degenerasi makula terkait usia disingkirkan karena tidak ada keluhan garis lurus yang tampak bergelombang maupun bercak gelap di tengah penglihatan, dan penglihatan dekat terkoreksi sempurna dengan penambahan lensa positif. Yang perlu ditekankan adalah bahwa kunjungan untuk sekadar meminta kacamata baca merupakan kesempatan penting untuk menapis glaukoma dan retinopati diabetik, karena keduanya tidak menimbulkan keluhan pada tahap awal dan justru berada pada rentang usia yang sama; melewatkan pengukuran tekanan bola mata dan funduskopi berarti kehilangan kesempatan tersebut. Perlu pula ditegaskan bahwa presbiopia adalah proses penuaan yang normal dan akan terus bertambah sampai sekitar usia enam puluh tahun, sehingga penggantian ukuran secara berkala merupakan hal yang wajar.',
+    terapiSuportif: [
+      'Tambahkan penerangan saat membaca — cahaya terang menyempitkan pupil dan memperbaiki penglihatan dekat, sehingga sering sudah sangat membantu',
+      'Perbesar ukuran huruf pada telepon genggam dan komputer',
+      'Atur jarak dan tinggi layar komputer sekitar 50-70 sentimeter dengan bagian atas layar sedikit di bawah tinggi mata',
+      'Terapkan aturan 20-20-20 saat bekerja dekat dalam waktu lama',
+      'Hindari membaca dalam pencahayaan redup dan saat sangat lelah',
+    ],
+    tatalaksana: [
+      'Koreksi dengan kacamata baca berlensa sferis positif merupakan penanganan utama, aman, dan terjangkau',
+      'Tentukan tambahan berdasarkan pemeriksaan langsung pada jarak kerja nyata pasien, dengan tabel usia hanya sebagai titik awal',
+      'Koreksi kelainan refraksi jauh terlebih dahulu; pada pasien yang juga memerlukan koreksi jauh, tersedia kacamata bifokal maupun progresif',
+      'Jelaskan bahwa lensa progresif memerlukan masa penyesuaian dan mempersempit lapang pandang di bagian tepi, sehingga perlu berhati-hati saat menuruni tangga pada masa awal pemakaian',
+      'Kacamata baca siap pakai yang dijual bebas dapat digunakan pada pasien tanpa kelainan refraksi jauh dan dengan kedua mata berukuran sama, namun tidak menggantikan pemeriksaan mata yang menyeluruh',
+      'Lensa kontak multifokal maupun monovision dapat menjadi pilihan pada pasien tertentu',
+      'Rujuk bila tajam penglihatan tidak terkoreksi penuh, ditemukan katarak yang bermakna, tekanan bola mata meninggi, ada kelainan pada funduskopi, atau bila presbiopia muncul pada usia di bawah 35-40 tahun',
+    ],
+    edukasi: [
+      'Jelaskan bahwa presbiopia adalah proses penuaan yang normal dan dialami setiap orang, bukan penyakit dan bukan tanda mata menjadi rusak',
+      'Kacamata baca tidak membuat mata semakin lemah maupun bergantung; menunda pemakaiannya tidak memperlambat proses ini dan hanya menimbulkan kelelahan serta nyeri kepala yang tidak perlu',
+      'Jelaskan bahwa ukuran akan bertambah secara berkala sampai sekitar usia 60 tahun lalu cenderung menetap — penggantian kacamata bukan berarti pengobatan sebelumnya keliru',
+      'Waspadai janji obat tetes, terapi, maupun latihan yang mengaku dapat menghilangkan presbiopia; tidak ada bukti yang mendukungnya',
+      'Jadwal dan porsi makan: tidak ada makanan yang mengembalikan daya akomodasi. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayuran hijau, ikan berlemak, telur, dan buah berwarna untuk kesehatan retina, batasi gula dan garam terutama bila ada diabetes maupun hipertensi karena keduanya merusak mata melalui pembuluh darah, dan minum 8 gelas air per hari karena dehidrasi memperberat mata kering yang menambah keluhan',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; keluhan presbiopia jelas memberat saat tubuh lelah, sehingga tidur yang cukup nyata mengurangi rasa pegal dan nyeri kepala setelah membaca. Hentikan penggunaan layar 1 jam sebelum tidur dan jangan membaca dalam gelap',
+      'Pola olahraga: aktivitas aerobik sedang 30 menit sehari selama 5 hari seminggu ditambah latihan beban 2 kali seminggu. Olahraga tidak memperbaiki presbiopia, tetapi mengendalikan tekanan darah, gula darah, dan berat badan yang justru merupakan penentu utama kesehatan mata pada usia ini. Berhati-hatilah pada masa awal memakai lensa progresif saat menuruni tangga, berlari di jalan tidak rata, atau bersepeda, karena bagian bawah lensa mengaburkan pandangan ke lantai; gunakan lensa tahan benturan saat berolahraga',
+      'Follow up: periksa ulang setiap 1-2 tahun untuk penyesuaian ukuran, sekaligus penapisan glaukoma dan retinopati diabetik yang keduanya tidak bergejala pada tahap awal',
+      'TANDA BAHAYA yang mengharuskan segera diperiksa: penurunan penglihatan mendadak, garis lurus tampak bergelombang, bercak gelap di tengah penglihatan, nyeri mata hebat dengan mata merah, melihat lingkaran pelangi di sekeliling lampu, kilatan cahaya, atau bayangan melayang yang bertambah tiba-tiba',
+      'Bila tiba-tiba dapat membaca kembali tanpa kacamata pada usia lanjut, jangan dianggap penglihatan membaik — periksakan diri, karena hal ini sering menandakan katarak yang sedang berkembang',
+    ],
+    komplikasi: [
+      'Astenopia menahun dengan nyeri kepala dan mata lelah bila tidak dikoreksi',
+      'Penurunan produktivitas kerja dan keterbatasan aktivitas sehari-hari',
+      'Kesalahan membaca label obat pada usia lanjut yang berisiko keliru minum obat',
+      'Jatuh dan cedera pada masa penyesuaian pemakaian lensa progresif maupun bifokal',
+      'Terlewatnya glaukoma, katarak, dan retinopati diabetik bila pasien hanya membeli kacamata siap pakai tanpa pernah menjalani pemeriksaan mata menyeluruh',
+      'Ketidaknyamanan dan nyeri kepala akibat kacamata siap pakai yang ukurannya tidak sesuai atau tidak sepadan antara kedua mata',
+    ],
+    prognosis:
+      'Sangat baik dalam arti keluhannya sepenuhnya dapat diatasi dengan kacamata baca, meskipun prosesnya sendiri tidak dapat dihentikan maupun dikembalikan. Daya akomodasi akan terus menurun sampai sekitar usia 60 tahun lalu menetap, sehingga penyesuaian ukuran secara berkala merupakan bagian normal dari perjalanannya. Nilai terbesar dari penanganan presbiopia justru terletak di luar kacamata itu sendiri: kunjungan berkala pada kelompok usia ini merupakan kesempatan menapis glaukoma, katarak, dan retinopati diabetik yang tidak bergejala pada tahap awal namun dapat menyebabkan kebutaan bila terlambat ditemukan.',
     referensi: ['SKDI2012', 'KANSKI2020', 'PPKFKTP2014'],
   },
   'Anisometropia pada dewasa': {
