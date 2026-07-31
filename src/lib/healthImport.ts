@@ -107,14 +107,23 @@ export function parseHealthAutoExport(text: string): ImportResult {
     if (!best) continue
     if (Number.isFinite(bestT) && bestT > newest) newest = bestT
 
-    // Sleep carries its own field names rather than qty/Avg.
+    // Sleep carries its own field names rather than qty/Avg, AND its unit
+    // varies between app versions — hours on some, minutes on others. Trust the
+    // declared `units`, then fall back to magnitude, because nobody sleeps more
+    // than 24 hours. The server-side webhook parser applies the identical rule
+    // so the same night yields the same number by either delivery path.
     if (name.startsWith('sleep')) {
-      const hrs = (k: string) => {
+      const num = (k: string) => {
         const v = best![k]
         return typeof v === 'number' && Number.isFinite(v) ? v : undefined
       }
-      const asleep = hrs('asleep') ?? hrs('totalSleep') ?? hrs('core')
-      if (asleep != null) out.sleepH = +asleep.toFixed(1)
+      const raw = num('asleep') ?? num('totalSleep') ?? num('core')
+      const units = typeof m?.units === 'string' ? m.units.toLowerCase() : ''
+      if (raw != null && raw > 0) {
+        out.sleepH = units.startsWith('hr') || units.startsWith('hour') ? +raw.toFixed(1)
+          : units.startsWith('min') ? +(raw / 60).toFixed(1)
+          : +(raw > 24 ? raw / 60 : raw).toFixed(1)
+      }
       continue
     }
 
