@@ -13,12 +13,25 @@ export interface HealthWebhookResult {
   bodyFatPct?: number
   steps?: number
   activeKcal?: number
+  // Widened to match the browser-side parser. Previously the live webhook
+  // delivered only the eight fields above while a manually uploaded file
+  // yielded fifteen, so the same phone produced different data depending on
+  // which path it travelled.
+  heartRate?: number
+  spo2Pct?: number
+  respRate?: number
+  systolic?: number
+  diastolic?: number
+  leanMassKg?: number
+  bodyTempC?: number
+  exerciseMin?: number
+  distanceKm?: number
 }
 
 // When the user turns on Health Auto Export's "Summarize Data" option, samples
 // can arrive as { Min, Avg, Max } instead of a single { qty }, for ANY metric
 // (not just heart rate) — so every matcher below must tolerate both shapes.
-interface MetricSample { date?: string; qty?: number; asleep?: number; Min?: number; Avg?: number; Max?: number }
+interface MetricSample { date?: string; qty?: number; asleep?: number; totalSleep?: number; Min?: number; Avg?: number; Max?: number }
 interface Metric { name?: string; units?: string; data?: MetricSample[] }
 interface Payload { data?: { metrics?: Metric[] } }
 
@@ -57,6 +70,21 @@ function anyValue(s: MetricSample): number | undefined {
   return s.qty ?? s.Avg ?? s.Max ?? s.Min
 }
 
+/**
+ * Sleep arrives in hours on some Health Auto Export versions and minutes on
+ * others, so the unit cannot be assumed — this previously disagreed with the
+ * browser-side parser and the same night produced 7.1 h on one path and 0.1 h
+ * on the other. Trust the declared `units` first, then fall back to magnitude:
+ * nobody sleeps more than 24 hours, so a larger number must be minutes.
+ */
+function sleepToHours(raw: number | undefined, units: string | undefined): number | undefined {
+  if (typeof raw !== 'number' || !Number.isFinite(raw) || raw <= 0) return undefined
+  const u = (units ?? '').toLowerCase()
+  if (u.startsWith('hr') || u.startsWith('hour')) return +raw.toFixed(1)
+  if (u.startsWith('min')) return +(raw / 60).toFixed(1)
+  return +(raw > 24 ? raw / 60 : raw).toFixed(1)
+}
+
 const MATCHERS: { key: keyof HealthWebhookResult; test: (n: string) => boolean; pick: (s: MetricSample) => number | undefined }[] = [
   { key: 'vo2max', test: (n) => n.includes('vo2'), pick: anyValue },
   { key: 'restingHr', test: (n) => n.includes('restingheartrate'), pick: anyValue },
@@ -65,6 +93,15 @@ const MATCHERS: { key: keyof HealthWebhookResult; test: (n: string) => boolean; 
   { key: 'bodyFatPct', test: (n) => n.includes('bodyfatpercentage'), pick: (s) => { const v = anyValue(s); return v != null ? (v <= 1 ? v * 100 : v) : undefined } },
   { key: 'steps', test: (n) => n.includes('stepcount'), pick: anyValue },
   { key: 'activeKcal', test: (n) => n.includes('activeenergy'), pick: anyValue },
+  { key: 'heartRate', test: (n) => n === 'heartrate' || n.includes('walkingheartrate'), pick: anyValue },
+  { key: 'spo2Pct', test: (n) => n.includes('oxygensaturation') || n.includes('bloodoxygen'), pick: (s) => { const v = anyValue(s); return v != null ? (v <= 1 ? v * 100 : v) : undefined } },
+  { key: 'respRate', test: (n) => n.includes('respiratoryrate'), pick: anyValue },
+  { key: 'systolic', test: (n) => n.includes('bloodpressuresystolic'), pick: anyValue },
+  { key: 'diastolic', test: (n) => n.includes('bloodpressurediastolic'), pick: anyValue },
+  { key: 'leanMassKg', test: (n) => n.includes('leanbodymass'), pick: anyValue },
+  { key: 'bodyTempC', test: (n) => n.includes('bodytemperature') || n.includes('wristtemperature'), pick: anyValue },
+  { key: 'exerciseMin', test: (n) => n.includes('exercisetime'), pick: anyValue },
+  { key: 'distanceKm', test: (n) => n.includes('distancewalkingrunning'), pick: anyValue },
 ]
 
 export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
@@ -77,10 +114,10 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
     const n = norm(m.name)
 
     if (n.includes('sleep')) {
-      const s = latestSample(m.data as (MetricSample & { asleep?: number; totalSleep?: number })[])
-      const asleepMin = (s as { asleep?: number; totalSleep?: number } | undefined)?.asleep
-        ?? (s as { asleep?: number; totalSleep?: number } | undefined)?.totalSleep
-      if (typeof asleepMin === 'number' && asleepMin > 0) out.sleepH = +(asleepMin / 60).toFixed(1)
+      const s = latestSample(m.data)
+      const raw = s?.asleep ?? s?.totalSleep
+      const h = sleepToHours(raw, m.units)
+      if (h != null) out.sleepH = h
       continue
     }
 
