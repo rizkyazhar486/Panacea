@@ -88,6 +88,7 @@ const nav: Nav[] = [
   { to: '/sehat-sibuk', label: 'Sehat Tapi Sibuk', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/macro-lab', label: 'Macro Lab', icon: IconToken, roles: ['owner', 'dokter', 'pasien'], group: 'Health' },
+  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Health' },
   { to: '/alat-fitness', label: 'Alat Fitness & Hyrox', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/sports-lab', label: 'Sports Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/connect', label: 'Connect', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
