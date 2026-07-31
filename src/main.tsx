@@ -50,6 +50,7 @@ const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default:
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
 const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
+const Markets = lazy(() => import('./pages/Markets').then((m) => ({ default: m.Markets })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
@@ -222,6 +223,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLab />} />
               <Route path="/owner-analytics" element={<OwnerAnalytics />} />
+              <Route path="/pasar" element={<Markets />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/fitness-test" element={<FitnessTest />} />

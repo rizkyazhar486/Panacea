@@ -1,3 +1,15 @@
+
+export interface MarketInstrument { symbol: string; label: string; group: string }
+export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
+export interface MarketQuote {
+  symbol: string; name: string; currency: string
+  price: number | null; previousClose: number | null
+  change: number | null; changePct: number | null
+  marketTime: string | null; exchange: string | null
+  series: MarketCandle[]
+  delayed: true
+  source: string
+}
 // Frontend client for the Panaceamed backend (real Google login + Midtrans
 // payments). When VITE_API_URL is unset (e.g. the GitHub Pages demo), the app
 // falls back to its in-browser simulation and none of this is used.
@@ -169,6 +181,16 @@ export const api = {
     req<{ ok: boolean; balance: number; expires: string; authorCut: number; adminCut: number }>('/api/creator/subscribe', { method: 'POST', body: JSON.stringify({ authorEmail }) }),
   // live medical news (server-proxied Google News RSS; free, keyless)
   news: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/news'),
+  // Live market data (server-proxied Yahoo Finance; free, keyless).
+  // `delayed: true` always rides along so no caller can present it as live ticks.
+  marketInstruments: () =>
+    req<{ instruments: MarketInstrument[]; ranges: string[] }>('/api/markets/instruments'),
+  marketQuote: (symbol: string, range: string) =>
+    req<MarketQuote>(`/api/markets/quote?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(range)}`),
+  marketWatchlist: (symbols: string[], range: string) =>
+    req<{ quotes: MarketQuote[]; failed: string[] }>(
+      `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
+  marketNews: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/markets/news'),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),

@@ -99,6 +99,7 @@ import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload } from './healthWebhook.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
+import { fetchQuote, fetchQuotes, INSTRUMENTS, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
 import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
@@ -876,6 +877,62 @@ app.get('/api/news', async (_req, res) => {
   }
   newsCache = { items, at: Date.now() }
   res.json({ items, fetchedAt: newsCache.at, cached: false })
+})
+
+// --- Market data (free, no-key: Yahoo Finance public chart endpoint) ---
+// Public routes: prices are not user data. Delayed/indicative — the payload
+// carries `delayed: true` so the client cannot present it as live tick data.
+app.get('/api/markets/instruments', (_req, res) => {
+  res.json({ instruments: INSTRUMENTS, ranges: RANGES })
+})
+
+app.get('/api/markets/quote', async (req, res) => {
+  const symbol = String(req.query.symbol ?? '').trim()
+  const range = String(req.query.range ?? '1mo') as Range
+  if (!isValidSymbol(symbol)) return res.status(400).json({ error: 'invalid_symbol' })
+  if (!RANGES.includes(range)) return res.status(400).json({ error: 'invalid_range' })
+  try {
+    res.json(await fetchQuote(symbol, range))
+  } catch (e) {
+    console.log('[markets] quote error:', (e as Error).message)
+    res.status(503).json({ error: 'market_unavailable' })
+  }
+})
+
+app.get('/api/markets/watchlist', async (req, res) => {
+  const raw = String(req.query.symbols ?? '').split(',').map((x) => x.trim()).filter(Boolean)
+  const symbols = (raw.length ? raw : INSTRUMENTS.map((i) => i.symbol)).slice(0, 20)
+  if (symbols.some((s) => !isValidSymbol(s))) return res.status(400).json({ error: 'invalid_symbol' })
+  const range = String(req.query.range ?? '1mo') as Range
+  if (!RANGES.includes(range)) return res.status(400).json({ error: 'invalid_range' })
+  try {
+    res.json(await fetchQuotes(symbols, range))
+  } catch (e) {
+    console.log('[markets] watchlist error:', (e as Error).message)
+    res.status(503).json({ error: 'market_unavailable' })
+  }
+})
+
+// Business & finance headlines, same Google News RSS proxy the health feed uses.
+let bizNewsCache: { items: LiveNewsItem[]; at: number } | null = null
+app.get('/api/markets/news', async (_req, res) => {
+  if (bizNewsCache && Date.now() - bizNewsCache.at < NEWS_TTL_MS) {
+    return res.json({ items: bizNewsCache.items, fetchedAt: bizNewsCache.at, cached: true })
+  }
+  const [dom, intl] = await Promise.allSettled([
+    fetchNewsFeed('https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=id&gl=ID&ceid=ID:id', 'domestic'),
+    fetchNewsFeed('https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-US&gl=US&ceid=US:en', 'international'),
+  ])
+  const items = [
+    ...(dom.status === 'fulfilled' ? dom.value.slice(0, 12) : []),
+    ...(intl.status === 'fulfilled' ? intl.value.slice(0, 12) : []),
+  ]
+  if (items.length === 0) {
+    if (bizNewsCache) return res.json({ items: bizNewsCache.items, fetchedAt: bizNewsCache.at, cached: true, stale: true })
+    return res.status(503).json({ error: 'news_unavailable' })
+  }
+  bizNewsCache = { items, at: Date.now() }
+  res.json({ items, fetchedAt: bizNewsCache.at, cached: false })
 })
 
 // --- Web Push notifications ---
