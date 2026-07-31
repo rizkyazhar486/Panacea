@@ -401,10 +401,117 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
   },
   'Hipoglikemia ringan': {
-    definisi: 'Penurunan gula darah <70 mg/dL dengan gejala otonom (berkeringat, gemetar, jantung berdebar) tanpa gangguan kesadaran berat.',
-    diagnosis: ['Gejala adrenergik + GDS rendah, membaik setelah asupan glukosa (whipple triad)'],
-    tatalaksana: ['Rule of 15: 15g karbohidrat cepat serap oral, ulangi cek GDS 15 menit, edukasi penyesuaian dosis obat DM'],
-    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024'],
+    definisi:
+      'Penurunan kadar glukosa darah di bawah 70 mg/dL yang menimbulkan gejala namun pasien masih sadar penuh dan MAMPU MENOLONG DIRINYA SENDIRI dengan mengonsumsi karbohidrat per oral — kemampuan menolong diri inilah, bukan angka glukosanya, yang membedakan hipoglikemia ringan dari hipoglikemia berat.',
+    anamnesis: {
+      keluhanUtama: 'Berkeringat dingin, gemetar, jantung berdebar, dan lemas mendadak yang membaik setelah makan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan bersifat menyeluruh. Onset: mendadak dalam hitungan menit; TANYAKAN JARAK WAKTU TERHADAP MAKAN TERAKHIR, WAKTU MINUM OBAT, DAN AKTIVITAS FISIK — ketiganya hampir selalu menjelaskan penyebabnya. Character: gejala terbagi dua kelompok yang urutannya bermakna — gejala otonom lebih dahulu berupa gemetar, berkeringat dingin, jantung berdebar, cemas, dan rasa lapar hebat; kemudian gejala neuroglikopenik berupa sulit berkonsentrasi, bicara melantur, pandangan kabur, perubahan perilaku, dan mengantuk. Radiation: tidak khas. Associations: TANYAKAN APAKAH PASIEN MASIH DAPAT MAKAN DAN MINUM SENDIRI SAAT SERANGAN — jawaban inilah yang menentukan penggolongan ringan atau berat. Time course: berapa sering serangan terjadi, pada jam berapa umumnya, dan apakah pernah terjadi saat tidur yang ditandai mimpi buruk, berkeringat saat bangun, dan nyeri kepala pagi hari. Exacerbating: melewatkan makan, menambah dosis obat sendiri, berolahraga lebih berat dari biasa, minum alkohol, dan berpuasa. Relieving: membaik cepat setelah makan atau minum yang manis. Severity: apakah pernah sampai memerlukan pertolongan orang lain, dan apakah gejala peringatan masih terasa.',
+      riwayatPenyakitDahulu:
+        'Diabetes melitus beserta lamanya, karena hipoglikemia hampir selalu terkait pengobatan diabetes. Riwayat hipoglikemia sebelumnya dan beratnya. Penyakit ginjal kronik dan penyakit hati yang memperpanjang kerja obat serta mengurangi produksi glukosa. Insufisiensi adrenal dan hipotiroid. Riwayat operasi lambung yang menyebabkan hipoglikemia reaktif setelah makan.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes pada keluarga; umumnya tidak menentukan pada episode akut.',
+      riwayatPengobatan:
+        'RINCI SELURUH OBAT DIABETES beserta dosis, jam minum, dan perubahan terakhirnya — golongan sulfonilurea seperti glibenklamid dan glimepirid serta insulin adalah penyebab utama, sedangkan metformin sendiri jarang menimbulkan hipoglikemia. Tanyakan apakah pasien menaikkan dosis sendiri, keliru membaca skala insulin, atau menyuntik dua kali karena lupa. Tanyakan pula obat lain yang memperkuat efek seperti sulfa, kuinin, dan penyekat beta yang sekaligus menyamarkan gejala peringatan.',
+      riwayatAlergi: 'Riwayat alergi obat.',
+      riwayatNutrisi:
+        'Jadwal makan sehari-hari, apakah ada makan yang dilewatkan, porsi karbohidrat, kebiasaan berpuasa, serta konsumsi alkohol yang menghambat produksi glukosa oleh hati.',
+      riwayatSosialEkonomi:
+        'Pekerjaan berisiko tinggi seperti mengemudi, bekerja di ketinggian, dan mengoperasikan mesin — pada pekerjaan ini hipoglikemia membahayakan orang lain, bukan hanya pasien. Tanyakan pula apakah tinggal sendiri, apakah keluarga mengetahui cara menolong, kemampuan membeli obat dan makanan secara teratur, serta kepemilikan alat pemeriksa gula darah mandiri.',
+    },
+    pemeriksaanFisik: [
+      'Nilai kesadaran lebih dahulu — pasien yang tidak sadar, kejang, atau tidak mampu menelan dengan aman BUKAN termasuk hipoglikemia ringan dan memerlukan penanganan intravena segera',
+      'Tanda vital: takikardia, tekanan darah dapat sedikit meninggi, kulit dingin dan basah oleh keringat, serta pucat',
+      'Tremor halus pada tangan yang terentang',
+      'Nilai kemampuan menelan secara aman sebelum memberikan apa pun per oral',
+      'Nilai status neurologis: orientasi, kemampuan berbicara, kekuatan motorik, dan tanda defisit fokal — hipoglikemia dapat menyerupai stroke dengan kelemahan satu sisi yang pulih sempurna setelah glukosa diberikan',
+      'Periksa tempat penyuntikan insulin untuk lipohipertrofi yang menyebabkan penyerapan tidak menentu',
+      'Cari faktor pencetus: tanda infeksi, tanda dehidrasi, dan tanda penyakit hati maupun ginjal',
+      'Ulangi pemeriksaan setelah koreksi untuk memastikan gejala benar-benar hilang bersamaan dengan naiknya glukosa',
+    ],
+    penunjang: [
+      'Glukosa darah kapiler segera dengan glukometer — pemeriksaan ini tidak boleh menunda pemberian terapi bila gejala sudah jelas',
+      'Glukosa darah vena bila hasil kapiler meragukan atau tidak sesuai dengan gambaran klinis',
+      'Pada hipoglikemia yang tidak dapat dijelaskan pada orang TANPA diabetes, ambil sampel saat gejala berlangsung untuk memeriksa insulin, C-peptide, dan proinsulin sebelum glukosa dikoreksi — kesempatan ini tidak dapat diulang setelah pasien membaik',
+      'C-peptide yang tinggi bersama insulin tinggi mengarah pada insulinoma atau pemakaian sulfonilurea, sedangkan C-peptide rendah dengan insulin tinggi mengarah pada penyuntikan insulin dari luar',
+      'Fungsi ginjal dan fungsi hati untuk mencari sebab yang memperpanjang kerja obat',
+      'Kortisol pagi dan fungsi tiroid bila dicurigai insufisiensi adrenal atau hipotiroid',
+      'HbA1c untuk menilai kendali glikemik keseluruhan — nilai yang rendah pada pasien yang sering hipoglikemia menandakan target terapi terlalu ketat',
+    ],
+    etiologi:
+      'Paling sering merupakan akibat pengobatan diabetes, terutama insulin dan sulfonilurea, yang dipicu oleh makan yang terlewat, dosis berlebih, atau aktivitas fisik yang bertambah; penyebab lain meliputi alkohol, gagal ginjal, gagal hati, insufisiensi adrenal, sepsis, dan yang jarang berupa insulinoma.',
+    patofisiologi:
+      'Otak hampir sepenuhnya bergantung pada glukosa dan tidak dapat menyimpannya, sehingga pasokan yang terputus segera mengganggu fungsinya. Tubuh memiliki pertahanan berlapis yang bekerja berurutan: sekresi insulin berhenti pada kadar sekitar 80 mg/dL, glukagon dan adrenalin dilepaskan pada sekitar 65-70 mg/dL, lalu kortisol dan hormon pertumbuhan menyusul. Pelepasan adrenalin inilah yang menimbulkan gejala otonom berupa gemetar, berkeringat, dan berdebar — gejala ini berfungsi sebagai sistem peringatan dini yang memberi tahu pasien untuk segera makan. Bila glukosa terus turun di bawah sekitar 50 mg/dL, fungsi otak mulai terganggu dan muncul gejala neuroglikopenik hingga penurunan kesadaran dan kejang. Pada diabetes yang berlangsung lama, respons glukagon menghilang lebih dahulu sehingga pertahanan bergantung pada adrenalin saja. Yang berbahaya adalah hipoglikemia berulang menumpulkan respons adrenalin ini, sehingga ambang munculnya gejala peringatan turun dan pasien tidak lagi merasakan tanda apa pun sampai kesadaran menurun — keadaan yang disebut hipoglycaemia unawareness. Fenomena ini menjelaskan mengapa mencegah episode ringan bukan urusan kenyamanan semata, melainkan cara mempertahankan sistem peringatan yang dapat menyelamatkan nyawa.',
+    faktorRisiko: [
+      'Terapi insulin dan sulfonilurea, terutama glibenklamid yang masa kerjanya panjang',
+      'Usia lanjut dengan asupan makan yang tidak menentu',
+      'Penyakit ginjal kronik dan penyakit hati yang memperlambat pembuangan obat',
+      'Makan yang terlewat, berpuasa, dan muntah',
+      'Aktivitas fisik yang lebih berat dari biasanya, termasuk hingga beberapa jam sesudahnya',
+      'Konsumsi alkohol terutama tanpa makan',
+      'Target HbA1c yang terlalu ketat, khususnya pada usia lanjut',
+      'Riwayat hipoglikemia sebelumnya dan hilangnya gejala peringatan',
+      'Penggunaan penyekat beta yang menyamarkan gejala otonom',
+      'Tinggal sendiri tanpa pendamping yang mengetahui cara menolong',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan dengan trias Whipple: adanya gejala yang sesuai hipoglikemia, terbuktinya kadar glukosa darah yang rendah pada saat gejala berlangsung, dan hilangnya gejala setelah glukosa dikoreksi. Penggolongan ringan ditentukan bukan oleh angka glukosanya melainkan oleh kemampuan pasien menolong dirinya sendiri secara oral; begitu diperlukan bantuan orang lain, kasus tersebut digolongkan berat berapa pun kadar glukosanya.',
+    diagnosisBanding: [
+      'Stroke atau serangan iskemik sepintas — hipoglikemia dapat menimbulkan kelemahan satu sisi dan bicara pelo yang menyerupai stroke; PERIKSA GULA DARAH PADA SETIAP PASIEN DENGAN DEFISIT NEUROLOGIS MENDADAK sebelum menyimpulkan stroke',
+      'Serangan panik dan gangguan cemas — gemetar, berdebar, dan berkeringat yang sangat mirip, namun gula darah normal dan tidak membaik dengan makan',
+      'Aritmia jantung dan sinkop kardiogenik — berdebar dan rasa mau pingsan tanpa keterkaitan dengan waktu makan',
+      'Kejang akibat epilepsi — perlu dibedakan karena hipoglikemia berat juga dapat menimbulkan kejang',
+      'Intoksikasi alkohol — dapat menyerupai sekaligus menyebabkan hipoglikemia',
+      'Feokromositoma — episode berdebar, berkeringat, dan nyeri kepala dengan tekanan darah yang meninggi tajam',
+      'Hipoglikemia reaktif pascamakan pada pasien dengan riwayat operasi lambung',
+      'Insulinoma dan pemakaian obat diabetes secara tersembunyi pada orang tanpa diabetes',
+    ],
+    pengkajian:
+      'Dipikirkan hipoglikemia ringan pada pasien ini atas dasar munculnya gemetar, keringat dingin, jantung berdebar, dan rasa lapar hebat secara mendadak pada seorang penyandang diabetes yang menggunakan obat penurun gula darah, dengan riwayat melewatkan waktu makan atau beraktivitas lebih berat dari biasanya, disertai kadar glukosa darah yang rendah pada saat gejala berlangsung dan hilangnya seluruh keluhan setelah mengonsumsi karbohidrat — rangkaian ini memenuhi trias Whipple sehingga diagnosis tidak lagi bersifat dugaan. Penggolongan sebagai ringan ditetapkan bukan karena angka glukosanya melainkan karena pasien tetap sadar penuh dan mampu makan sendiri tanpa bantuan orang lain; batasan ini penting karena kadar glukosa yang sama dapat tergolong berat pada pasien lain yang sudah tidak mampu menolong dirinya. Serangan panik merupakan penyerupa yang paling sering karena gejala otonomnya nyaris identik, namun pada serangan panik kadar glukosa normal dan keluhan tidak mereda dengan makan. Stroke dan serangan iskemik sepintas wajib dipikirkan bila muncul kelemahan satu sisi atau bicara pelo, dan justru karena itulah pemeriksaan gula darah dikerjakan pada setiap defisit neurologis mendadak — hipoglikemia yang keliru dianggap stroke berarti terapi yang menyelamatkan tertunda padahal jawabannya sederhana. Aritmia jantung dipertimbangkan namun tidak sesuai karena keluhan berkaitan jelas dengan waktu makan dan obat. Langkah yang tidak boleh berhenti pada penegakan diagnosis adalah menemukan penyebabnya: dosis obat, jadwal makan, aktivitas fisik, fungsi ginjal, dan konsumsi alkohol ditelusuri satu per satu, sebab mengoreksi gula darah tanpa memperbaiki pencetusnya hanya memastikan kejadian yang sama berulang. Perlu pula dinilai apakah gejala peringatan masih dirasakan, karena hipoglikemia berulang menumpulkan respons tubuh sehingga episode berikutnya dapat langsung berupa penurunan kesadaran tanpa didahului tanda apa pun.',
+    terapiSuportif: [
+      'ATURAN 15: berikan 15 gram karbohidrat cepat serap, tunggu 15 menit, lalu periksa ulang glukosa darah; bila masih kurang dari 70 mg/dL, ulangi pemberian',
+      'Contoh 15 gram karbohidrat cepat serap: 3 sendok teh gula pasir dilarutkan dalam air, 150 mL jus buah atau minuman ringan biasa yang bukan versi rendah gula, atau 3 butir permen',
+      'JANGAN gunakan cokelat, es krim, atau makanan berlemak untuk koreksi cepat karena lemak memperlambat penyerapan gula',
+      'Setelah glukosa kembali normal, berikan makanan mengandung karbohidrat kompleks dan protein bila waktu makan berikutnya masih lama, untuk mencegah kekambuhan',
+      'Bila pasien tidak sadar atau tidak dapat menelan dengan aman: JANGAN memberikan apa pun lewat mulut; berikan dekstrosa 40% sebanyak 25-50 mL intravena atau glukagon 1 mg intramuskular, lalu rujuk',
+      'Pada hipoglikemia akibat sulfonilurea, observasi diperpanjang minimal 24 jam karena masa kerja obat yang panjang membuat hipoglikemia sering berulang setelah tampak membaik',
+      'Pantau glukosa darah berkala setelah koreksi, jangan langsung memulangkan pasien setelah satu kali pemeriksaan normal',
+    ],
+    tatalaksana: [
+      'Koreksi segera dengan aturan 15 dan pastikan gejala benar-benar hilang bersamaan dengan naiknya glukosa',
+      'CARI DAN PERBAIKI PENYEBABNYA — inilah inti tatalaksana; mengoreksi gula darah tanpa menyesuaikan obat, jadwal makan, atau aktivitas hanya menunda kejadian berikutnya',
+      'Turunkan atau hentikan obat penyebab: kurangi dosis sulfonilurea maupun insulin, atau ganti glibenklamid yang masa kerjanya panjang dengan glimepirid maupun golongan yang lebih aman seperti penghambat DPP-4 pada usia lanjut',
+      'Longgarkan target HbA1c pada usia lanjut, pasien dengan penyakit ginjal kronik, harapan hidup terbatas, riwayat hipoglikemia berat, atau yang sudah kehilangan gejala peringatan',
+      'Sesuaikan panduan insulin: tinjau jenis, dosis, waktu penyuntikan, teknik, dan lokasi suntikan termasuk mencari lipohipertrofi',
+      'Obati penyakit penyerta yang menjadi pencetus seperti infeksi, gagal ginjal, gagal hati, dan insufisiensi adrenal',
+      'Pada pasien yang sudah kehilangan gejala peringatan, longgarkan target glukosa selama beberapa minggu untuk MEMULIHKAN respons peringatan tubuh',
+      'Rujuk bila hipoglikemia berulang tanpa sebab jelas, terjadi pada orang tanpa diabetes, atau bila dicurigai insulinoma maupun insufisiensi adrenal',
+      'Latih anggota keluarga cara mengenali dan menolong, termasuk penggunaan glukagon bila tersedia',
+    ],
+    edukasi: [
+      'Ajarkan mengenali gejala dini secara spesifik: gemetar, keringat dingin, berdebar, lapar mendadak, dan sulit berkonsentrasi. Segera periksa gula darah dan makan sesuatu yang manis TANPA MENUNDA — jangan menunggu sampai lebih parah',
+      'Ajarkan ATURAN 15 dan minta pasien mengulanginya kembali di depan Anda untuk memastikan benar-benar dipahami',
+      'SELALU BAWA GULA ATAU PERMEN di saku, tas, mobil, dan di dekat tempat tidur; kebiasaan sederhana ini adalah pencegahan yang paling efektif',
+      'Jangan pernah menaikkan atau menurunkan dosis obat sendiri tanpa berkonsultasi',
+      'JANGAN MENGEMUDI bila gula darah kurang dari 90 mg/dL; periksa terlebih dahulu sebelum menyetir, berhenti segera bila muncul gejala, dan jangan melanjutkan perjalanan sampai gula darah naik dan gejala hilang sepenuhnya selama minimal 30-45 menit',
+      'Beri tahu keluarga, rekan kerja, dan guru pada anak tentang kondisi ini serta cara menolong; kenakan gelang atau kartu penanda diabetes',
+      'Jadwal dan porsi makan: JANGAN PERNAH MELEWATKAN WAKTU MAKAN — tiga kali makan utama dengan jarak 5-6 jam ditambah 2-3 selingan, pada jam yang konsisten setiap hari agar sesuai dengan kerja obat. Sertakan karbohidrat kompleks dan protein pada setiap kali makan agar gula darah lebih stabil, dan tambahkan selingan sebelum tidur bila sering mengalami hipoglikemia malam hari. Bila berpuasa, konsultasikan penyesuaian dosis obat terlebih dahulu — jangan berpuasa dengan dosis yang sama. Hindari alkohol, dan bila tetap dikonsumsi jangan pernah dalam keadaan perut kosong karena alkohol menghambat produksi gula oleh hati sampai berjam-jam kemudian',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap. Bila terbangun dengan keringat, mimpi buruk, atau bangun pagi dengan nyeri kepala, curigai hipoglikemia malam hari dan periksalah gula darah sekitar pukul 2-3 dini hari beberapa kali. Sediakan gula, permen, atau jus di meja samping tempat tidur',
+      'Pola olahraga: olahraga sangat dianjurkan 30 menit sehari selama 5 hari seminggu, tetapi harus direncanakan. PERIKSA GULA DARAH SEBELUM BEROLAHRAGA — bila kurang dari 100 mg/dL, makanlah 15-30 gram karbohidrat terlebih dahulu. Bawa gula selama berolahraga, jangan berolahraga sendirian di tempat terpencil, dan hindari menyuntik insulin pada anggota gerak yang akan banyak digunakan karena penyerapannya menjadi lebih cepat. Ingat bahwa risiko hipoglikemia berlanjut sampai 6-12 jam SETELAH olahraga berat, sehingga periksa gula darah malam harinya dan pertimbangkan menambah selingan',
+      'Catat setiap kejadian hipoglikemia beserta waktu, dugaan penyebab, dan kadar gula darahnya, lalu bawa catatan itu saat kontrol — catatan inilah yang memungkinkan dosis obat disesuaikan dengan tepat',
+      'Follow up: kontrol dalam 1-2 minggu setelah penyesuaian dosis; datang lebih awal bila hipoglikemia berulang lebih dari sekali seminggu, terjadi saat tidur, atau bila gejala peringatan tidak lagi terasa',
+    ],
+    komplikasi: [
+      'Perkembangan menjadi hipoglikemia berat dengan penurunan kesadaran, kejang, dan koma',
+      'Hilangnya gejala peringatan akibat episode berulang, sehingga episode berikutnya langsung berupa penurunan kesadaran',
+      'Kecelakaan lalu lintas dan kecelakaan kerja, serta jatuh dengan patah tulang pada usia lanjut',
+      'Aritmia jantung, iskemia miokard, dan kematian mendadak terutama pada pasien dengan penyakit jantung',
+      'Gangguan kognitif menetap pada hipoglikemia berat yang berulang, terutama pada anak dan usia lanjut',
+      'Ketakutan berlebihan terhadap hipoglikemia yang menyebabkan pasien sengaja membiarkan gula darahnya tinggi, sehingga kendali diabetes justru memburuk',
+      'Kenaikan berat badan akibat makan berlebih untuk mencegah serangan',
+    ],
+    prognosis:
+      'Sangat baik pada episode ringan yang dikenali dan dikoreksi dengan cepat — pemulihan sempurna dalam hitungan menit tanpa efek menetap. Namun episode ringan tidak boleh dianggap tidak berarti, karena pengulangannya menumpulkan sistem peringatan tubuh dan merupakan jalan menuju hipoglikemia berat yang berbahaya. Prognosis jangka panjang ditentukan oleh keberhasilan menemukan dan memperbaiki pencetusnya serta oleh penetapan target glikemik yang realistis; pada pasien yang telah kehilangan gejala peringatan, melonggarkan target untuk sementara dapat mengembalikan respons peringatan tersebut dan merupakan langkah yang menyelamatkan.',
+    referensi: ['SKDI2012', 'PERKENI2021', 'ADA2024', 'PPKFKTP2014'],
   },
   'Hipoglikemia berat': {
     definisi: 'Hipoglikemia dengan gangguan kesadaran/kejang, memerlukan bantuan orang lain untuk penanganan — kegawatdaruratan.',
@@ -3153,10 +3260,121 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'ADAMS2019', 'PERDOSSI2016'],
   },
   'HIV AIDS tanpa komplikasi': {
-    definisi: 'Infeksi Human Immunodeficiency Virus yang menyerang limfosit CD4, tanpa infeksi oportunistik atau keganasan terkait saat ini.',
-    diagnosis: ['Skrining dengan tiga rapid test berurutan sesuai algoritma nasional; nilai stadium klinis WHO dan kadar CD4 serta viral load sebagai baseline'],
-    tatalaksana: ['ARV segera untuk semua ODHIV tanpa memandang CD4 (test and treat), kombinasi standar 2 NRTI + 1 NNRTI/INSTI, edukasi kepatuhan seumur hidup, profilaksis kotrimoksazol bila CD4 rendah, skrining TB dan IMS, pencegahan penularan'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'HARRISON2022'],
+    definisi:
+      'Infeksi human immunodeficiency virus yang merusak limfosit T CD4 secara progresif, pada tahap yang belum disertai infeksi oportunistik aktif, keganasan terkait HIV, maupun kegawatan lain, sehingga penatalaksanaannya berpusat pada memulai terapi antiretroviral sedini mungkin di layanan primer.',
+    anamnesis: {
+      keluhanUtama:
+        'Dapat tanpa keluhan sama sekali dan ditemukan dari penapisan, atau berupa penurunan berat badan, sariawan berulang, diare menahun, dan demam hilang timbul.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan sistemik. Site: keluhan bersifat menyeluruh dan tidak terlokalisasi pada satu organ. Onset: perlahan dalam hitungan bulan; tanyakan pula riwayat sindrom retroviral akut beberapa minggu setelah paparan berupa demam, nyeri tenggorokan, ruam, dan pembesaran kelenjar yang saat itu sering dikira sakit flu biasa. Character: penurunan berat badan yang dikuantifikasi dalam kilogram dan periode waktunya, sariawan yang berulang dan lama sembuh, diare yang berlangsung lebih dari sebulan, keringat malam, dan rasa lelah menahun. Radiation: tidak khas. Associations: TANYAKAN GEJALA YANG MENANDAKAN INFEKSI OPORTUNISTIK karena keberadaannya membuat kasus ini bukan lagi tanpa komplikasi — batuk lebih dari dua minggu dan demam berkeringat malam untuk tuberkulosis, sakit kepala hebat dengan leher kaku dan penurunan kesadaran untuk meningitis kriptokokus maupun toksoplasmosis, sesak dengan batuk kering yang memberat saat beraktivitas untuk pneumonia Pneumocystis, nyeri menelan untuk kandidiasis esofagus, serta gangguan penglihatan untuk retinitis sitomegalovirus. Time course: perjalanan bertahun-tahun tanpa gejala sebelum daya tahan menurun. Exacerbating: infeksi penyerta dan putus obat. Severity: kemampuan bekerja dan beraktivitas sehari-hari.',
+      riwayatPenyakitDahulu:
+        'Riwayat tuberkulosis dan pengobatannya, herpes zoster pada usia muda, kandidiasis mulut berulang, diare menahun, pneumonia berulang, dan infeksi menular seksual — semuanya merupakan petunjuk penurunan imunitas yang sering mendahului diagnosis. Riwayat hepatitis B dan C. Riwayat transfusi darah.',
+      riwayatPenyakitKeluarga:
+        'Status HIV pasangan dan anak. Pada perempuan, riwayat kehamilan dan status HIV anak yang dilahirkan. Riwayat tuberkulosis pada anggota keluarga serumah.',
+      riwayatPengobatan:
+        'Riwayat terapi antiretroviral sebelumnya termasuk pernah berhenti dan alasannya, karena hal ini menentukan kemungkinan resistensi. Obat lain yang sedang diminum beserta potensi interaksinya dengan antiretroviral, khususnya rifampisin, antikonvulsan, dan obat penurun asam lambung. Riwayat profilaksis kotrimoksazol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama kotrimoksazol dan nevirapin yang dapat menimbulkan reaksi kulit berat.',
+      riwayatKehamilanPersalinan:
+        'Status kehamilan dan rencana kehamilan pada perempuan usia subur — terapi antiretroviral pada kehamilan mencegah penularan kepada bayi dan merupakan indikasi mendesak, bukan pilihan.',
+      riwayatNutrisi:
+        'Pola makan, asupan kalori dan protein harian, serta penurunan berat badan yang dicatat angkanya; status gizi merupakan penentu penting keberhasilan pengobatan.',
+      riwayatSosialEkonomi:
+        'Ditanyakan dengan cara yang tidak menghakimi dan dengan jaminan kerahasiaan: riwayat seksual termasuk jumlah pasangan dan penggunaan kondom, penggunaan napza suntik dan berbagi jarum, pekerjaan, dukungan keluarga, keterbukaan status kepada orang terdekat, serta kemampuan datang mengambil obat setiap bulan seumur hidup — dukungan sosial dan akses inilah yang paling menentukan kepatuhan jangka panjang.',
+    },
+    pemeriksaanFisik: [
+      'Timbang berat badan dan hitung indeks massa tubuh; pencatatan berat badan berkala merupakan penanda sederhana yang sangat berguna untuk memantau keberhasilan terapi',
+      'Periksa rongga mulut dengan teliti: kandidiasis berupa bercak putih yang dapat dikerok, oral hairy leukoplakia pada tepi lidah yang tidak dapat dikerok, ulkus, dan sarkoma Kaposi berupa lesi keunguan pada langit-langit',
+      'Periksa seluruh kelompok kelenjar getah bening — limfadenopati menyeluruh yang menetap merupakan temuan yang lazim',
+      'Periksa kulit menyeluruh: dermatitis seboroik yang luas, prurigo, herpes zoster maupun bekasnya, moluskum kontagiosum yang banyak dan besar, serta lesi keunguan sarkoma Kaposi',
+      'Periksa paru dan cari tanda tuberkulosis; TAPIS GEJALA TUBERKULOSIS PADA SETIAP KUNJUNGAN yaitu batuk, demam, keringat malam, dan penurunan berat badan',
+      'Periksa susunan saraf: kesadaran, tanda rangsang meningeal, defisit neurologis fokal, dan tanda neuropati perifer',
+      'Periksa mata termasuk funduskopi bila ada keluhan penglihatan, untuk mencari retinitis sitomegalovirus',
+      'Periksa area genital dan anus untuk infeksi menular seksual yang menyertai; pada perempuan lakukan penapisan kanker leher rahim',
+    ],
+    penunjang: [
+      'Tes HIV dengan strategi tiga reagen berbeda sesuai pedoman nasional untuk penegakan diagnosis; pada bayi kurang dari 18 bulan diperlukan pemeriksaan virologi karena antibodi ibu masih ada',
+      'Hitung CD4 untuk menilai derajat penurunan imunitas dan menentukan perlunya profilaksis infeksi oportunistik — namun TIDAK lagi menjadi syarat untuk memulai terapi antiretroviral',
+      'Viral load HIV sebagai pemantau utama keberhasilan terapi, diperiksa pada bulan ke-6, ke-12, lalu setiap tahun bila tersupresi',
+      'Darah lengkap, fungsi hati, fungsi ginjal, dan gula darah sebagai data dasar sebelum memulai obat',
+      'Penapisan tuberkulosis pada setiap kunjungan; foto toraks dan pemeriksaan Xpert MTB/RIF bila ada gejala',
+      'Penapisan hepatitis B dan C — penting karena menentukan pemilihan panduan antiretroviral',
+      'Penapisan sifilis dan infeksi menular seksual lain, serta penapisan kanker leher rahim pada perempuan',
+      'Antigen kriptokokus bila CD4 sangat rendah, sesuai ketersediaan',
+      'Tes kehamilan pada perempuan usia subur',
+    ],
+    etiologi:
+      'Human immunodeficiency virus tipe 1 dan lebih jarang tipe 2, ditularkan melalui hubungan seksual tanpa pelindung, darah dan alat suntik yang terkontaminasi, serta dari ibu kepada bayi selama kehamilan, persalinan, dan menyusui.',
+    patofisiologi:
+      'HIV merupakan retrovirus yang menempel pada reseptor CD4 bersama koreseptor CCR5 atau CXCR4, lalu memasukkan materi genetiknya ke dalam sel. Enzim reverse transcriptase mengubah RNA virus menjadi DNA, integrase menyisipkannya ke dalam genom sel inang, dan protease memotong protein virus menjadi bentuk matang — ketiga enzim inilah yang menjadi sasaran obat antiretroviral, dan karena itu kombinasi beberapa golongan obat diperlukan agar virus tidak mudah lolos. Sel CD4 yang terinfeksi dihancurkan baik oleh virus maupun oleh sistem imun sendiri, sehingga jumlahnya menurun perlahan selama bertahun-tahun. Karena limfosit CD4 adalah pengatur utama imunitas seluler, penurunannya melumpuhkan pertahanan terhadap kuman intrasel, jamur, dan sel yang berubah menjadi ganas — inilah sebabnya penyakit yang muncul bukan disebabkan HIV secara langsung melainkan berupa infeksi oportunistik dan keganasan. Virus juga menetap dalam reservoir sel memori yang tidak aktif sehingga tidak terjangkau obat; hal inilah yang menjadikan HIV belum dapat disembuhkan dan obat harus diminum seumur hidup. Terapi antiretroviral yang berhasil menekan virus hingga tidak terdeteksi memungkinkan CD4 pulih, mencegah munculnya infeksi oportunistik, dan membuat pasien tidak menularkan virus melalui hubungan seksual.',
+    faktorRisiko: [
+      'Hubungan seksual tanpa kondom dan berganti pasangan',
+      'Pasangan dengan HIV yang belum menjalani terapi',
+      'Infeksi menular seksual lain, terutama yang menimbulkan ulkus',
+      'Penggunaan napza suntik dan berbagi jarum',
+      'Bayi dari ibu dengan HIV yang tidak mendapat pencegahan penularan',
+      'Tenaga kesehatan dengan cedera tertusuk jarum',
+      'Transfusi darah yang tidak melalui penapisan',
+    ],
+    goldStandard:
+      'Diagnosis pada dewasa dan anak di atas 18 bulan ditegakkan dengan pemeriksaan antibodi HIV menggunakan strategi tiga reagen berbeda sesuai pedoman nasional; ketiganya harus reaktif untuk menyatakan hasil positif. Pada bayi kurang dari 18 bulan, antibodi yang terdeteksi dapat berasal dari ibu sehingga diperlukan pemeriksaan virologi berupa PCR DNA atau RNA HIV. Hitung CD4 dan viral load bukan alat diagnosis melainkan alat menilai derajat penyakit dan keberhasilan terapi.',
+    diagnosisBanding: [
+      'Tuberkulosis — sangat sering menyertai HIV dan bukan sekadar diagnosis banding; setiap pasien HIV wajib ditapis tuberkulosis pada setiap kunjungan',
+      'Keganasan limfoma dan keganasan lain yang menimbulkan penurunan berat badan, demam, dan pembesaran kelenjar',
+      'Diabetes melitus dan hipertiroid yang menyebabkan penurunan berat badan disertai nafsu makan yang tetap baik',
+      'Infeksi kronik lain seperti hepatitis kronik dan endokarditis',
+      'Malnutrisi dan penyakit ginjal kronik pada penurunan berat badan menahun',
+      'Sindrom retroviral akut yang menyerupai mononukleosis infeksiosa, demam berdarah, atau infeksi virus lain pada fase awal',
+    ],
+    pengkajian:
+      'Dipikirkan infeksi HIV pada pasien ini atas dasar sekumpulan keluhan yang tidak menunjuk satu organ tertentu — penurunan berat badan yang berlangsung berbulan-bulan, sariawan yang berulang dan lama sembuh, diare menahun, serta demam hilang timbul dengan keringat malam — pada seseorang dengan riwayat paparan yang sesuai. Yang mengarahkan bukan satu gejala melainkan pola berkumpulnya beberapa penyakit yang seharusnya jarang terjadi bersamaan pada orang dengan daya tahan normal, seperti kandidiasis mulut berulang dan herpes zoster pada usia muda. Tuberkulosis merupakan hal pertama yang ditapis pada kasus ini, bukan sebagai pesaing diagnosis melainkan karena keduanya sangat sering berjalan bersama dan tuberkulosis merupakan penyebab kematian tersering pada orang dengan HIV di Indonesia. Keganasan seperti limfoma dipertimbangkan karena sama-sama menimbulkan penurunan berat badan, demam, dan pembesaran kelenjar, namun pada kasus ini kelenjar bersifat menyeluruh, kecil, kenyal, dan tidak melekat, yang lebih sesuai dengan limfadenopati menetap pada HIV. Diabetes melitus dan hipertiroid disingkirkan sebagai penyebab penurunan berat badan setelah pemeriksaan yang sesuai. Kasus ini digolongkan tanpa komplikasi karena penapisan tidak menemukan infeksi oportunistik yang sedang aktif: tidak ada batuk lama maupun gambaran tuberkulosis, tidak ada sesak dengan batuk kering yang mengarah pada pneumonia Pneumocystis, tidak ada nyeri kepala dengan tanda rangsang meningeal, tidak ada nyeri menelan yang mengarah pada kandidiasis esofagus, dan tidak ada gangguan penglihatan. Penggolongan ini bukan sekadar penamaan, sebab pada keadaan tanpa komplikasi terapi antiretroviral dapat dimulai segera, sedangkan bila terdapat infeksi oportunistik tertentu — khususnya meningitis kriptokokus dan tuberkulosis meningeal — urutannya harus dibalik agar tidak memicu sindrom pulih imun yang berbahaya.',
+    terapiSuportif: [
+      'Perbaikan gizi dengan asupan kalori dan protein yang cukup; catat berat badan setiap kunjungan sebagai penanda objektif',
+      'Profilaksis kotrimoksazol 960 mg sekali sehari bila CD4 kurang dari 200 sel/mm3 atau pada stadium klinis lanjut, untuk mencegah pneumonia Pneumocystis dan toksoplasmosis',
+      'Terapi pencegahan tuberkulosis dengan isoniazid pada pasien tanpa tuberkulosis aktif setelah penapisan yang cermat',
+      'Imunisasi sesuai pedoman termasuk hepatitis B, influenza, dan pneumokokus, dengan memperhatikan pantangan vaksin hidup pada imunitas sangat rendah',
+      'Dukungan psikologis dan konseling kepatuhan sejak kunjungan pertama; sebagian besar kegagalan terapi berakar pada masalah kepatuhan dan penerimaan diri, bukan pada obatnya',
+      'Pengobatan infeksi menular seksual dan komorbid lain yang menyertai',
+    ],
+    tatalaksana: [
+      'TERAPI ANTIRETROVIRAL DIMULAI PADA SEMUA ORANG DENGAN HIV tanpa memandang jumlah CD4 maupun stadium klinis, dan sedini mungkin setelah diagnosis ditegakkan',
+      'Panduan lini pertama yang dianjurkan saat ini adalah kombinasi tenofovir, lamivudin, dan dolutegravir dalam satu tablet sekali sehari; dolutegravir dipilih karena sangat efektif, ditoleransi baik, dan ambang resistensinya tinggi',
+      'Alternatif bila dolutegravir tidak tersedia atau tidak dapat digunakan adalah efavirenz, dengan memperhatikan efek samping susunan saraf pusat',
+      'Pemberian bersama rifampisin pada pengobatan tuberkulosis memerlukan penyesuaian dosis dolutegravir menjadi dua kali sehari',
+      'Pada tuberkulosis yang menyertai, obat antituberkulosis dimulai lebih dahulu dan antiretroviral menyusul dalam 2 minggu bila CD4 sangat rendah atau dalam 8 minggu bila CD4 lebih tinggi; pada meningitis tuberkulosis maupun kriptokokus, antiretroviral SENGAJA DITUNDA sekitar 4-6 minggu untuk menghindari sindrom pulih imun yang berakibat fatal',
+      'Pantau viral load pada bulan ke-6 dan ke-12 lalu setiap tahun; viral load yang tetap terdeteksi menuntut penilaian kepatuhan lebih dahulu sebelum menyimpulkan resistensi dan mengganti panduan',
+      'Pantau fungsi ginjal pada pengguna tenofovir, dan pantau berat badan karena dolutegravir dapat menyebabkan kenaikan berat badan',
+      'Tawarkan tes HIV, konseling, dan bila perlu profilaksis kepada pasangan; pada pasangan yang belum terinfeksi, tersedia profilaksis pra-pajanan sesuai program',
+      'Pada ibu hamil, terapi antiretroviral diberikan seumur hidup dan dimulai segera untuk mencegah penularan kepada bayi, dilanjutkan dengan profilaksis pada bayi dan pengaturan cara pemberian minum sesuai pedoman nasional',
+      'Rujuk bila ada infeksi oportunistik berat, kecurigaan kegagalan terapi, keganasan, kehamilan, atau pada anak',
+    ],
+    edukasi: [
+      'Sampaikan diagnosis dengan menjaga kerahasiaan sepenuhnya dan tanpa penghakiman; ketakutan akan stigma adalah alasan terbesar orang tidak berobat, sehingga cara menyampaikan diagnosis ikut menentukan keberhasilan terapi',
+      'Jelaskan bahwa HIV kini merupakan penyakit menahun yang dapat dikendalikan; dengan obat yang diminum teratur, harapan hidup mendekati orang tanpa HIV dan pasien dapat bekerja, menikah, serta memiliki anak',
+      'Jelaskan prinsip TIDAK TERDETEKSI SAMA DENGAN TIDAK MENULARKAN: bila virus tertekan hingga tidak terdeteksi secara menetap, HIV tidak ditularkan melalui hubungan seksual. Ini adalah informasi yang paling mengembalikan harapan sekaligus mendorong kepatuhan',
+      'Obat diminum SETIAP HARI PADA JAM YANG SAMA SEUMUR HIDUP; kepatuhan di bawah 95 persen sangat berisiko menimbulkan kekebalan virus terhadap obat. Gunakan pengingat alarm, kotak obat harian, dan pendamping minum obat',
+      'Jangan berhenti minum obat meskipun merasa sehat — merasa sehat justru merupakan tanda obatnya bekerja',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan bergizi. Kebutuhan energi meningkat sekitar 10 persen pada keadaan tanpa gejala dan lebih tinggi lagi bila ada infeksi; cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe. Masak makanan sampai matang sempurna, hindari daging setengah matang, telur mentah, susu tidak dipasteurisasi, dan makanan yang dibiarkan lama di suhu ruang, karena daya tahan yang menurun membuat keracunan makanan lebih berbahaya. Gunakan air matang dan cuci buah serta sayur dengan bersih. Minum 8 gelas air per hari',
+      'Jam tidur: 7-9 jam per malam dengan jadwal tetap; kurang tidur menurunkan daya tahan tubuh. Bila memakai efavirenz, minumlah menjelang tidur dan pahami bahwa mimpi yang terasa nyata serta pusing pada minggu-minggu pertama umumnya mereda dengan sendirinya',
+      'Pola olahraga: olahraga sangat dianjurkan dan aman — aktivitas aerobik sedang 30 menit sehari selama 5 hari seminggu ditambah latihan beban 2-3 kali seminggu membantu mempertahankan massa otot, memperbaiki suasana hati, dan menjaga kesehatan jantung serta tulang. Mulai bertahap bila berat badan sedang turun, jangan berolahraga sampai kelelahan berat, dan tunda olahraga berat saat demam atau sedang ada infeksi. Tutup luka lecet dengan plester dan jangan berbagi pisau cukur maupun sikat gigi',
+      'Gunakan kondom secara konsisten untuk mencegah infeksi menular seksual lain dan kehamilan yang tidak direncanakan',
+      'Ajak pasangan dan anak untuk diperiksa; membuka status kepada orang terdekat yang dipercaya sangat membantu kepatuhan, namun keputusan dan waktunya sepenuhnya di tangan pasien',
+      'Follow up: ambil obat dan kontrol setiap bulan pada awal terapi, lalu dapat diperpanjang menjadi setiap 3 bulan bila stabil; pemeriksaan viral load pada bulan ke-6 dan ke-12 lalu setiap tahun',
+      'TANDA BAHAYA yang mengharuskan datang segera: demam tinggi menetap, batuk lebih dari dua minggu, sesak napas, sakit kepala hebat dengan leher kaku, kejang atau penurunan kesadaran, gangguan penglihatan, nyeri menelan hebat, diare berkepanjangan dengan lemas, atau ruam kulit luas setelah minum obat baru',
+    ],
+    komplikasi: [
+      'Infeksi oportunistik: tuberkulosis, pneumonia Pneumocystis, kandidiasis esofagus, toksoplasmosis serebral, meningitis kriptokokus, dan retinitis sitomegalovirus',
+      'Keganasan terkait HIV berupa sarkoma Kaposi, limfoma non-Hodgkin, dan kanker leher rahim',
+      'Sindrom pulih imun setelah memulai antiretroviral, terutama bila CD4 sangat rendah',
+      'Wasting syndrome dan malnutrisi berat',
+      'Neuropati perifer dan gangguan neurokognitif terkait HIV',
+      'Nefropati terkait HIV serta gangguan ginjal dan tulang akibat tenofovir',
+      'Resistensi obat akibat kepatuhan yang buruk',
+      'Penularan kepada pasangan dan kepada bayi bila tidak diobati',
+      'Dampak psikososial berupa depresi, kecemasan, stigma, dan diskriminasi',
+    ],
+    prognosis:
+      'Sangat baik pada pasien yang memulai terapi antiretroviral sedini mungkin dan meminumnya secara teratur — harapan hidup mendekati orang tanpa HIV dan risiko penularan kepada pasangan menjadi nol ketika virus tersupresi. Prognosis paling ditentukan oleh dua hal yang keduanya bersifat manusiawi alih-alih medis: seberapa dini diagnosis ditegakkan, dan seberapa konsisten obat diminum seumur hidup. Keterlambatan diagnosis hingga muncul infeksi oportunistik berat serta putus obat akibat stigma dan hambatan akses merupakan penyebab utama perburukan, bukan keterbatasan obatnya.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'PAPDI2014', 'HARRISON2022'],
   },
   'AIDS dengan komplikasi': {
     definisi: 'HIV stadium lanjut dengan infeksi oportunistik dan/atau keganasan terkait AIDS.',
@@ -3885,10 +4103,117 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'PPKFKTP2014'],
   },
   'Kandidiasis mulut': {
-    definisi: 'Infeksi jamur Candida pada mukosa mulut, umum pada bayi, lansia, pengguna kortikosteroid inhalasi, dan imunokompromais.',
-    diagnosis: ['Plak putih seperti susu yang dapat dikerok meninggalkan dasar eritematosa dan mudah berdarah; pada dewasa tanpa faktor risiko jelas, skrining HIV dan DM'],
-    tatalaksana: ['Antijamur topikal (nistatin drop/gel mikonazol) sebagai lini pertama, flukonazol oral bila luas/rekuren atau imunokompromais; atasi faktor predisposisi (kumur setelah steroid inhalasi, kebersihan dot dan gigi palsu)'],
-    referensi: ['SKDI2012', 'PPKFKTP2014', 'SLEISENGER2021'],
+    definisi:
+      'Infeksi jamur pada mukosa rongga mulut oleh Candida, tersering Candida albicans yang merupakan flora normal, sehingga munculnya penyakit ini hampir selalu menandakan adanya faktor predisposisi setempat maupun sistemik yang harus dicari.',
+    anamnesis: {
+      keluhanUtama: 'Bercak putih di lidah dan bagian dalam pipi yang dapat dikerok, disertai rasa tidak nyaman saat makan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: sebaran bercak pada lidah, mukosa pipi, langit-langit, dan gusi; tanyakan pula apakah terasa sampai ke tenggorokan. Onset: perlahan dalam beberapa hari; pada bayi sering muncul pada minggu-minggu pertama kehidupan. Character: bercak putih seperti sisa susu yang DAPAT DIKEROK dan meninggalkan dasar kemerahan yang mudah berdarah — sifat dapat dikerok inilah pembeda utamanya; bentuk lain berupa kemerahan tanpa bercak putih dengan lidah terasa perih dan licin. Radiation: perluasan ke sudut bibir berupa keilitis angularis. Associations: PERTANYAAN YANG PALING MENENTUKAN ADALAH NYERI SAAT MENELAN dan rasa makanan tersangkut di dada — keluhan ini menandakan kandidiasis esofagus yang bukan lagi infeksi ringan dan merupakan penanda penurunan imunitas berat. Tanyakan pula rasa terbakar di mulut, perubahan rasa, dan berkurangnya nafsu makan. Time course: berulang atau menetap meski diobati mengarahkan pada faktor predisposisi yang belum diatasi. Exacerbating: makanan pedas, asam, dan panas. Severity: gangguan makan dan minum, penurunan berat badan, dan pada bayi penolakan menyusu yang berisiko dehidrasi.',
+      riwayatPenyakitDahulu:
+        'Diabetes melitus yang sering baru terdiagnosis lewat keluhan ini, infeksi HIV, keganasan, dan keadaan imunitas menurun lainnya. Riwayat kandidiasis berulang. Mulut kering akibat sindrom Sjogren maupun radioterapi kepala dan leher. Pada bayi, riwayat prematur dan berat lahir rendah.',
+      riwayatPenyakitKeluarga:
+        'Pada bayi yang menyusu, tanyakan apakah ibu mengalami nyeri pada puting yang menusuk dan menetap setelah menyusui — kandidiasis puting dan kandidiasis mulut bayi harus diobati bersamaan, sebab mengobati salah satunya saja berarti keduanya akan saling menularkan kembali.',
+      riwayatPengobatan:
+        'KORTIKOSTEROID HIRUP pada penderita asma dan penyakit paru obstruktif kronik merupakan penyebab yang sangat sering dan mudah terlewat, terutama bila pasien tidak berkumur setelah memakainya. Tanyakan pula antibiotik spektrum luas dalam waktu dekat, kortikosteroid sistemik, obat imunosupresan, kemoterapi, dan obat yang menyebabkan mulut kering.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antijamur golongan azol.',
+      riwayatNutrisi:
+        'Asupan makan dan minum yang berkurang akibat nyeri, kekurangan zat besi, asam folat, dan vitamin B12, serta pada bayi cara pemberian minum dan kebersihan botol maupun dot.',
+      riwayatSosialEkonomi:
+        'Kebersihan mulut sehari-hari, pemakaian gigi tiruan beserta cara membersihkan dan kebiasaan melepasnya saat tidur, kebiasaan merokok, serta pada bayi kebersihan botol, dot, dan empeng.',
+    },
+    pemeriksaanFisik: [
+      'Periksa seluruh rongga mulut dengan penerangan yang baik: lidah termasuk sisi dan bawahnya, mukosa pipi, langit-langit keras dan lunak, gusi, dan dasar mulut',
+      'BUKTIKAN BAHWA BERCAK DAPAT DIKEROK dengan spatula atau kasa — dasar yang kemerahan dan mudah berdarah setelah dikerok merupakan temuan yang menegakkan diagnosis dan membedakannya dari leukoplakia maupun lichen planus yang tidak dapat dikerok',
+      'Kenali bentuk lain: bentuk eritematosa berupa kemerahan pada langit-langit dan lidah yang licin tanpa bercak putih, sering pada pemakai gigi tiruan dan kortikosteroid hirup',
+      'Periksa sudut bibir untuk keilitis angularis',
+      'Pada pemakai gigi tiruan, LEPASKAN GIGI TIRUANNYA saat pemeriksaan — kemerahan pada langit-langit yang persis mengikuti bentuk gigi tiruan sering baru terlihat setelah dilepas',
+      'Periksa faring dan nilai kemampuan menelan; nyeri menelan menandakan kemungkinan kandidiasis esofagus',
+      'Cari tanda penurunan imunitas: penurunan berat badan, limfadenopati menyeluruh, dermatitis seboroik luas, dan oral hairy leukoplakia pada tepi lidah',
+      'Timbang berat badan; pada bayi nilai status gizi, tanda dehidrasi, dan pola menyusu',
+    ],
+    penunjang: [
+      'Diagnosis ditegakkan secara klinis; pemeriksaan penunjang tidak rutin diperlukan',
+      'Pemeriksaan kerokan dengan larutan KOH atau pewarnaan Gram memperlihatkan sel ragi bertunas dan pseudohifa',
+      'Kultur jamur hanya bila tidak membaik dengan terapi baku, untuk mengenali spesies non-albicans yang kerap kurang peka terhadap flukonazol',
+      'GULA DARAH WAJIB DIPERIKSA pada dewasa dengan kandidiasis mulut tanpa faktor predisposisi yang jelas — penyakit ini kerap menjadi petunjuk pertama diabetes yang belum terdiagnosis',
+      'Tes HIV ditawarkan pada dewasa tanpa faktor predisposisi yang jelas, pada kasus berulang, atau bila disertai nyeri menelan',
+      'Darah lengkap serta pemeriksaan besi, asam folat, dan vitamin B12 bila dicurigai kekurangan zat gizi',
+      'Endoskopi bila ada nyeri menelan yang menetap untuk membuktikan kandidiasis esofagus',
+    ],
+    etiologi:
+      'Candida albicans pada sebagian besar kasus, serta spesies non-albicans seperti Candida glabrata dan Candida krusei yang lebih sering pada pasien dengan pajanan antijamur berulang.',
+    patofisiologi:
+      'Candida merupakan penghuni normal rongga mulut yang keberadaannya ditahan oleh keutuhan mukosa, aliran air liur, dan keseimbangan dengan bakteri flora normal. Penyakit timbul ketika keseimbangan ini terganggu — antibiotik spektrum luas menekan bakteri pesaing, kortikosteroid menekan imunitas setempat, mulut kering menghilangkan efek pembilasan dan zat antimikroba air liur, sedangkan diabetes menyediakan kadar glukosa yang tinggi pada mukosa. Karena itu kandidiasis mulut pada dasarnya bukan penyakit tentang jamurnya melainkan tentang keadaan yang mengizinkan jamur itu tumbuh, dan inilah sebabnya mencari faktor predisposisi lebih menentukan daripada memilih antijamur. Ragi berubah menjadi bentuk pseudohifa yang mampu menembus lapisan epitel dan melekat kuat; kumpulan pseudohifa, sel epitel yang mati, dan sel radang membentuk membran putih yang khas. Membran ini melekat longgar sehingga dapat dikerok dan menyisakan dasar epitel yang meradang serta mudah berdarah. Bila imunitas seluler menurun berat, terutama pada penurunan CD4, infeksi menyebar ke esofagus dan menimbulkan nyeri menelan — perluasan ini merupakan penanda penting bahwa daya tahan tubuh sudah terganggu secara bermakna.',
+    faktorRisiko: [
+      'Bayi baru lahir dengan flora mulut dan imunitas yang belum matang',
+      'Usia lanjut, terutama pemakai gigi tiruan',
+      'Kortikosteroid hirup tanpa berkumur setelah pemakaian',
+      'Antibiotik spektrum luas dan kortikosteroid sistemik',
+      'Diabetes melitus yang tidak terkendali',
+      'Infeksi HIV, keganasan, kemoterapi, dan obat imunosupresan',
+      'Mulut kering akibat obat, sindrom Sjogren, dan radioterapi kepala serta leher',
+      'Kebersihan mulut yang buruk dan merokok',
+      'Malnutrisi serta kekurangan besi, asam folat, dan vitamin B12',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis dari bercak putih pada mukosa mulut yang dapat dikerok dan meninggalkan dasar kemerahan yang mudah berdarah; bentuk eritematosa ditegakkan dari kemerahan pada mukosa dengan faktor predisposisi yang sesuai. Bila diperlukan, kerokan dengan larutan KOH atau pewarnaan Gram memperlihatkan sel ragi bertunas dan pseudohifa. Penegakan diagnosis belum lengkap sebelum faktor predisposisinya ditemukan, sebab tanpa itu kekambuhan hampir pasti terjadi.',
+    diagnosisBanding: [
+      'Sisa susu pada bayi — TIDAK melekat dan hilang begitu saja saat diusap tanpa meninggalkan dasar kemerahan; membedakannya cukup dengan satu usapan kasa',
+      'Leukoplakia — bercak putih yang TIDAK DAPAT DIKEROK, merupakan lesi prakanker dan memerlukan biopsi',
+      'Oral hairy leukoplakia — plak putih berkerut pada tepi lidah yang tidak dapat dikerok, sangat berkaitan dengan infeksi HIV',
+      'Lichen planus oral — garis-garis putih seperti jala (striae Wickham) pada mukosa pipi yang tidak dapat dikerok',
+      'Stomatitis aftosa — ulkus dengan dasar keputihan dan tepi kemerahan, sangat nyeri, bukan berupa bercak yang melekat di permukaan',
+      'Lidah berselaput akibat kebersihan mulut yang buruk atau merokok — lapisan dapat dibersihkan namun tanpa dasar yang meradang dan KOH negatif',
+      'Difteri — membran keabu-abuan yang sangat melekat pada tonsil dan faring, MUDAH BERDARAH bila dilepas, disertai keadaan umum yang buruk dan pembengkakan leher; kegawatan yang tidak boleh dikelirukan',
+      'Luka bakar akibat bahan kimia atau makanan panas dengan riwayat paparan yang jelas',
+    ],
+    pengkajian:
+      'Dipikirkan kandidiasis mulut pada pasien ini atas dasar ditemukannya bercak putih pada lidah dan mukosa pipi yang dapat dikerok dengan spatula serta meninggalkan dasar kemerahan yang mudah berdarah — sifat dapat dikerok inilah temuan yang paling menentukan dan sekaligus memisahkannya dari leukoplakia serta lichen planus oral yang justru melekat erat dan tidak dapat dilepaskan. Pada bayi, sisa susu merupakan penyerupa yang paling sering dan paling mudah dibedakan, sebab sisa susu hilang dengan sekali usapan tanpa meninggalkan mukosa yang meradang. Difteri wajib dipikirkan sekilas karena sama-sama menghasilkan lapisan berwarna pucat, namun membrannya keabu-abuan, sangat melekat, berdarah hebat bila dilepas paksa, dan disertai keadaan umum yang buruk serta pembengkakan leher — tidak satu pun dari gambaran itu ditemukan di sini. Stomatitis aftosa disingkirkan karena keluhan berupa bercak yang melekat di permukaan mukosa, bukan ulkus dengan tepi kemerahan yang sangat nyeri. Yang tidak boleh berhenti pada penegakan diagnosis adalah pencarian faktor predisposisi, sebab Candida merupakan flora normal sehingga munculnya penyakit ini selalu menandakan ada sesuatu yang berubah pada pertahanan pasien: pemakaian kortikosteroid hirup tanpa berkumur, antibiotik spektrum luas yang baru saja dipakai, gigi tiruan yang tidak dilepas saat tidur, mulut kering, atau diabetes yang belum terdiagnosis. Pada orang dewasa tanpa faktor predisposisi yang jelas, pemeriksaan gula darah dan penawaran tes HIV bukan langkah berlebihan melainkan bagian dari diagnosis itu sendiri, karena kandidiasis mulut kerap menjadi petunjuk pertama keduanya. Adanya nyeri menelan akan mengubah penilaian sepenuhnya karena menandakan perluasan ke esofagus yang merupakan tanda penurunan imunitas berat dan memerlukan terapi sistemik serta penelusuran lebih lanjut.',
+    terapiSuportif: [
+      'Jaga kebersihan mulut: sikat gigi dua kali sehari dengan sikat berbulu lembut dan bersihkan lidah dengan perlahan',
+      'Berkumur dengan air matang atau larutan salin setelah makan; hindari obat kumur yang mengandung alkohol karena mengeringkan dan mengiritasi mukosa',
+      'Pada pemakai gigi tiruan: lepaskan saat tidur, sikat dan rendam dalam larutan pembersih setiap malam — tanpa membersihkan gigi tiruannya, kekambuhan hampir pasti terjadi',
+      'Pada pemakai kortikosteroid hirup: BERKUMUR DAN BERLUDAH setiap selesai memakai obat, dan gunakan spacer bila tersedia',
+      'Pada bayi: rebus botol, dot, dan empeng setiap hari; bersihkan mulut bayi dengan kasa lembap setelah menyusu',
+      'Makanan lunak, dingin, dan tidak asam maupun pedas untuk mengurangi nyeri agar asupan tetap masuk',
+      'Pastikan asupan cairan dan kalori, terutama pada bayi dan usia lanjut yang mudah jatuh dehidrasi bila menolak makan',
+    ],
+    tatalaksana: [
+      'Bayi dan kasus ringan: nistatin suspensi oral 100.000 unit/mL — pada bayi berikan 1-2 mL empat kali sehari, pada dewasa 4-6 mL empat kali sehari; dioleskan atau dikumur lalu ditelan',
+      'Cara pemakaian sangat menentukan: berikan SETELAH makan atau menyusu, tahan di dalam mulut selama mungkin sebelum ditelan, dan jangan makan maupun minum selama sekitar 20-30 menit setelahnya',
+      'Lanjutkan pengobatan 48 jam SETELAH lesi tampak hilang untuk mencegah kekambuhan',
+      'Alternatif topikal: mikonazol gel oral, yang pada bayi harus diberikan dengan hati-hati karena risiko tersedak',
+      'Kandidiasis puting pada ibu menyusui diobati bersamaan dengan bayinya menggunakan krim antijamur pada puting — mengobati salah satu saja membuat keduanya saling menularkan kembali',
+      'Kasus sedang hingga berat, tidak membaik dengan topikal, atau pada pasien dengan imunitas menurun: flukonazol 100-200 mg per hari selama 7-14 hari',
+      'Kandidiasis esofagus: flukonazol sistemik dengan dosis lebih tinggi dan durasi 14-21 hari, disertai penelusuran penyebab penurunan imunitas',
+      'ATASI FAKTOR PREDISPOSISI — kendalikan gula darah, perbaiki teknik pemakaian kortikosteroid hirup, hentikan antibiotik yang tidak diperlukan, dan tangani mulut kering; tanpa langkah ini penyakit akan berulang berapa kali pun antijamur diberikan',
+      'Rujuk bila tidak membaik setelah terapi adekuat, ada nyeri menelan, kasus berulang tanpa sebab jelas, atau ditemukan tanda penurunan imunitas berat',
+    ],
+    edukasi: [
+      'Jelaskan bahwa jamur penyebabnya memang hidup normal di mulut, sehingga munculnya penyakit ini menandakan ada faktor yang perlu diperbaiki — bukan berarti pasien kotor atau lalai',
+      'Tekankan cara memakai obat dengan benar: setelah makan, ditahan lama di mulut, dan tidak minum sesudahnya. Obat yang langsung ditelan atau segera dibilas air praktis tidak bekerja',
+      'Habiskan pengobatan dan lanjutkan 48 jam setelah bercak hilang; berhenti terlalu dini adalah penyebab kekambuhan yang paling sering',
+      'Bagi pengguna obat asma hirup: berkumur dan berludah setiap kali selesai memakainya — kebiasaan sederhana ini mencegah sebagian besar kekambuhan',
+      'Bagi pemakai gigi tiruan: lepas saat tidur dan rendam semalaman dalam larutan pembersih',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; selama mulut nyeri, pilih makanan lunak dan dingin seperti bubur, puding, dan buah lembut, serta hindari makanan pedas, asam, panas, keras, dan minuman bersoda. Batasi makanan dan minuman manis karena gula mempercepat pertumbuhan jamur. Perbanyak makanan sumber zat besi, asam folat, dan vitamin B12, dan minum 8 gelas air per hari untuk melawan mulut kering. Pada bayi, teruskan pemberian air susu ibu',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap. Sikat gigi dan bersihkan lidah sebelum tidur, lepaskan gigi tiruan, dan sediakan air minum di dekat tempat tidur bila mulut terasa kering pada malam hari',
+      'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu tetap dianjurkan karena membantu mengendalikan gula darah pada penderita diabetes — dan pengendalian gula darah inilah yang mencegah kekambuhan. Bawa air minum dan sering berkumur saat berolahraga karena bernapas lewat mulut membuat mulut kering; jangan berbagi botol minum',
+      'Berhenti merokok, karena merokok merusak mukosa dan mempermudah pertumbuhan jamur',
+      'Follow up: kontrol dalam 1 minggu untuk menilai respons; datang lebih awal bila muncul nyeri menelan, rasa makanan tersangkut di dada, demam, atau bila bayi menolak menyusu dan tampak lemas',
+      'Bila kekambuhan terjadi berulang, sampaikan bahwa yang perlu ditinjau bukan pilihan obatnya melainkan faktor penyebabnya — termasuk kemungkinan diabetes atau gangguan daya tahan tubuh yang belum diketahui',
+    ],
+    komplikasi: [
+      'Kandidiasis esofagus dengan nyeri menelan dan penurunan asupan',
+      'Kandidiasis diseminata dan kandidemia pada pasien dengan imunitas menurun berat',
+      'Malnutrisi dan dehidrasi akibat nyeri yang menghambat makan dan minum, terutama pada bayi dan usia lanjut',
+      'Gagal tumbuh pada bayi yang menolak menyusu',
+      'Keilitis angularis dan infeksi jamur pada puting ibu menyusui',
+      'Kekambuhan berulang bila faktor predisposisi tidak diatasi',
+      'Resistensi terhadap flukonazol pada pemakaian berulang, khususnya spesies non-albicans',
+    ],
+    prognosis:
+      'Sangat baik pada kasus tanpa penyulit — lesi umumnya hilang dalam 1-2 minggu dengan antijamur topikal. Prognosis sepenuhnya bergantung pada faktor predisposisinya, bukan pada jamurnya: bila penyebabnya dapat diperbaiki seperti teknik pemakaian obat hirup atau kebersihan gigi tiruan, penyakit tidak berulang; bila penyebabnya berupa penurunan imunitas berat, kekambuhan akan terus terjadi dan justru menjadi penanda perjalanan penyakit dasarnya. Kandidiasis mulut pada dewasa tanpa sebab yang jelas harus selalu memicu penelusuran diabetes dan HIV.',
+    referensi: ['SKDI2012', 'PPKFKTP2014', 'FITZPATRICK2019', 'HARRISON2022'],
   },
   'Ulkus mulut (aptosa, herpes)': {
     definisi: 'Luka pada mukosa mulut; stomatitis aftosa rekuren (sariawan) bersifat idiopatik, sedangkan herpes oral disebabkan HSV-1.',
@@ -7208,10 +7533,109 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
   'Pitiriasis rosea': {
-    definisi: 'Erupsi papuloskuamosa akut yang self-limiting, diduga berkaitan dengan reaktivasi virus herpes tipe 6/7.',
-    diagnosis: ['Diawali herald patch (bercak soliter lebih besar) diikuti 1-2 minggu kemudian erupsi lesi oval lebih kecil dengan skuama halus di tepi (collarette), tersusun mengikuti garis kulit membentuk gambaran POHON CEMARA di punggung; wajib singkirkan sifilis sekunder'],
-    tatalaksana: ['Umumnya sembuh spontan dalam 6-8 minggu — EDUKASI dan reassurance adalah terapi utama; emolien dan antihistamin untuk gatal, kortikosteroid topikal ringan bila perlu; hindari iritasi dan mandi air terlalu panas'],
-    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
+    definisi:
+      'Erupsi kulit akut yang sembuh sendiri, diduga berkaitan dengan reaktivasi virus herpes manusia tipe 6 dan 7, ditandai bercak induk yang mendahului, diikuti erupsi menyeluruh berbentuk lonjong yang tersusun mengikuti garis lipatan kulit pada punggung.',
+    anamnesis: {
+      keluhanUtama: 'Bercak merah bersisik yang mula-mula satu lalu menyebar ke seluruh badan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: lesi terutama pada badan, leher, lengan atas, dan paha atas — daerah yang tertutup pakaian; wajah, telapak tangan, dan telapak kaki umumnya TIDAK terkena, dan hal ini penting untuk membedakannya dari sifilis sekunder. Onset: TANYAKAN SECARA KHUSUS APAKAH ADA SATU BERCAK YANG MUNCUL LEBIH DAHULU beberapa hari hingga dua minggu sebelum yang lain — bercak induk ini ditemukan pada sebagian besar kasus namun kerap tidak dilaporkan pasien karena dianggap tidak berarti atau dikira panu maupun kurap. Character: bercak lonjong berwarna merah muda dengan sisik halus di bagian dalam tepi lesi (collarette scale), sedangkan bercak induk berukuran lebih besar dengan tepi yang lebih jelas. Radiation: penyebaran cepat dalam 1-2 minggu setelah bercak induk. Associations: gatal ringan sampai sedang pada sebagian pasien, kadang didahului gejala menyerupai flu ringan berupa lemas dan nyeri kepala; TANYAKAN RIWAYAT OBAT BARU dan riwayat seksual, karena erupsi obat dan sifilis sekunder adalah dua hal yang wajib disingkirkan. Time course: perjalanan khas 6-8 minggu lalu menghilang sendiri. Exacerbating: mandi air panas, keringat, dan sabun yang keras. Severity: umumnya ringan; nilai gatal dan dampaknya terhadap tidur serta kepercayaan diri.',
+      riwayatPenyakitDahulu:
+        'Riwayat penyakit kulit sebelumnya, riwayat atopi, dan riwayat infeksi saluran napas atas beberapa minggu sebelumnya. Riwayat pitiriasis rosea sebelumnya, yang jarang berulang.',
+      riwayatPenyakitKeluarga:
+        'Adanya anggota keluarga dengan keluhan serupa; penularan antarorang bukan pola yang khas pada penyakit ini sehingga temuan tersebut justru menuntut peninjauan diagnosis lain.',
+      riwayatPengobatan:
+        'DAFTAR SELURUH OBAT dalam 4-6 minggu terakhir termasuk obat bebas dan jamu — beberapa obat dapat menimbulkan erupsi yang menyerupai pitiriasis rosea, dan menghentikan obatnya adalah terapinya. Perhatikan obat antihipertensi, obat antiinflamasi nonsteroid, dan antibiotik tertentu.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat erupsi kulit akibat obat sebelumnya.',
+      riwayatKehamilanPersalinan:
+        'Status kehamilan pada perempuan usia subur — pitiriasis rosea yang timbul pada trimester pertama dilaporkan berkaitan dengan peningkatan risiko keguguran, sehingga memerlukan pemantauan kehamilan yang lebih cermat.',
+      riwayatNutrisi: 'Umumnya tidak relevan terhadap perjalanan penyakit.',
+      riwayatSosialEkonomi:
+        'Riwayat seksual ditanyakan dengan cara yang tidak menghakimi untuk menimbang perlunya pemeriksaan sifilis; tanyakan pula tingkat kecemasan pasien terhadap penyakitnya, karena erupsi yang luas dan tiba-tiba sering menimbulkan ketakutan yang tidak sebanding dengan beratnya penyakit.',
+    },
+    pemeriksaanFisik: [
+      'CARI BERCAK INDUK (herald patch): lesi soliter berukuran 2-5 sentimeter, lonjong, berwarna merah muda dengan tepi meninggi dan sisik halus, umumnya pada badan; menemukannya sangat menyederhanakan diagnosis',
+      'Lesi sekunder: makula dan plak lonjong berukuran lebih kecil dengan sisik halus yang melekat di bagian dalam tepi lesi — gambaran collarette scale yang khas',
+      'SUSUNAN LESI MENGIKUTI GARIS LIPATAN KULIT sehingga pada punggung membentuk gambaran seperti pohon cemara terbalik; mintalah pasien membuka punggungnya karena susunan ini paling jelas terlihat di sana',
+      'Periksa TELAPAK TANGAN DAN TELAPAK KAKI — keterlibatan keduanya bukan gambaran pitiriasis rosea dan justru sangat mengarahkan pada sifilis sekunder',
+      'Periksa rongga mulut dan area genital untuk lesi mukosa yang tidak lazim pada penyakit ini',
+      'Palpasi kelenjar getah bening; pembesaran menyeluruh yang mencolok mengarahkan pada sifilis sekunder maupun infeksi virus lain',
+      'Nilai kulit kepala dan kuku untuk menyingkirkan psoriasis',
+      'Pada kulit berwarna gelap, lesi dapat tampak lebih gelap atau keunguan dan lebih sering meninggalkan perubahan warna setelah sembuh',
+    ],
+    penunjang: [
+      'Diagnosis ditegakkan secara klinis; pemeriksaan penunjang tidak diperlukan pada gambaran khas',
+      'PEMERIKSAAN SEROLOGI SIFILIS berupa VDRL atau RPR bersama TPHA dikerjakan bila terdapat keraguan, terutama bila telapak tangan maupun kaki terkena, tidak ditemukan bercak induk, ada limfadenopati menyeluruh, atau ada riwayat seksual berisiko — kekeliruan mengira sifilis sekunder sebagai pitiriasis rosea berarti membiarkan penyakit yang dapat disembuhkan berjalan ke stadium lanjut',
+      'Pemeriksaan kerokan kulit dengan larutan KOH untuk menyingkirkan tinea korporis, terutama pada bercak induk yang menyerupai kurap',
+      'Biopsi kulit hanya pada kasus atipik atau yang tidak menghilang setelah lebih dari 3 bulan',
+      'Tes HIV dipertimbangkan bila terdapat faktor risiko atau gambaran yang tidak khas',
+    ],
+    etiologi:
+      'Belum sepenuhnya pasti; bukti terkuat mengarah pada reaktivasi endogen virus herpes manusia tipe 6 dan tipe 7, bukan pada infeksi baru dari luar maupun jamur.',
+    patofisiologi:
+      'Penyakit ini diduga merupakan hasil reaktivasi virus herpes manusia tipe 6 dan 7 yang telah menetap sejak masa kanak-kanak, dengan viremia ringan yang memicu respons imun seluler pada kulit. Karena mekanismenya berupa reaktivasi virus di dalam tubuh sendiri alih-alih penularan dari orang lain, penyakit ini praktis tidak menular — pemahaman ini penting karena pasien dan keluarganya hampir selalu mengkhawatirkan penularan. Bercak induk muncul lebih dahulu sebagai tempat reaksi imun awal, kemudian penyebaran melalui darah menimbulkan erupsi menyeluruh beberapa hari hingga dua minggu berikutnya, sehingga jeda waktu antara bercak induk dan erupsi umum merupakan cerminan langsung dari perjalanan tersebut. Susunan lesi yang mengikuti garis lipatan kulit terjadi karena peradangan menyebar sepanjang arah serat kolagen dan garis ketegangan kulit, menghasilkan gambaran seperti pohon cemara terbalik pada punggung. Sisik yang melekat pada bagian dalam tepi lesi terbentuk karena peradangan mereda dari tengah ke arah tepi sehingga lapisan tanduk terlepas menghadap ke dalam. Respons imun akhirnya mengendalikan reaktivasi tersebut dan erupsi menghilang sendiri dalam 6-8 minggu, umumnya tanpa kekambuhan karena imunitas yang terbentuk bertahan lama.',
+    faktorRisiko: [
+      'Usia 10-35 tahun sebagai kelompok yang paling sering terkena',
+      'Musim peralihan dan cuaca dingin, dengan kejadian yang cenderung mengelompok',
+      'Infeksi saluran napas atas beberapa minggu sebelumnya',
+      'Keadaan stres dan kelelahan',
+      'Kehamilan, yang berkaitan dengan perjalanan penyakit yang lebih luas',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan secara klinis atas dasar tiga hal: adanya bercak induk yang mendahului erupsi, lesi lonjong dengan sisik yang melekat pada bagian dalam tepi, dan susunan lesi yang mengikuti garis lipatan kulit pada badan tanpa mengenai wajah, telapak tangan, maupun telapak kaki, dengan perjalanan sembuh sendiri dalam 6-8 minggu. Tidak ada pemeriksaan laboratorium yang menegakkannya; peran pemeriksaan justru untuk menyingkirkan sifilis sekunder, yang merupakan satu-satunya banding yang berbahaya bila terlewat.',
+    diagnosisBanding: [
+      'SIFILIS SEKUNDER — banding terpenting; MENGENAI TELAPAK TANGAN DAN TELAPAK KAKI, tidak didahului bercak induk, sering disertai limfadenopati menyeluruh, kondiloma lata, dan rambut rontok berbercak; serologi menegakkannya',
+      'Tinea korporis — lesi dengan tepi aktif meninggi dan bagian tengah lebih tenang, jumlahnya sedikit, KOH positif; sering dikelirukan dengan bercak induk',
+      'Erupsi obat menyerupai pitiriasis rosea — riwayat obat yang jelas, lesi cenderung lebih luas dan lebih gatal, perjalanan lebih lama, dan membaik setelah obat dihentikan',
+      'Psoriasis gutata — papul dengan sisik tebal keperakan, sering setelah infeksi tenggorokan, disertai kelainan kuku dan lesi pada siku maupun lutut',
+      'Dermatitis numularis — lesi berbentuk koin yang lebih tebal, lebih gatal, dan cenderung basah',
+      'Pitiriasis versikolor — makula dengan skuama sangat halus tanpa bercak induk dan tanpa susunan mengikuti garis lipatan, KOH positif dengan gambaran khas',
+      'Eksantema virus lain dan liken planus',
+    ],
+    pengkajian:
+      'Dipikirkan pitiriasis rosea pada pasien ini atas dasar rangkaian perjalanan yang sangat khas: satu bercak berukuran lebih besar muncul lebih dahulu pada badan, kemudian disusul dalam satu hingga dua minggu oleh erupsi menyeluruh berupa bercak-bercak lonjong yang lebih kecil dengan sisik halus melekat pada bagian dalam tepinya, tersusun mengikuti garis lipatan kulit sehingga pada punggung membentuk gambaran seperti pohon cemara terbalik. Ketiga ciri tersebut — bercak induk yang mendahului, sisik yang menghadap ke dalam, dan susunan mengikuti garis lipatan kulit — bersama-sama sudah cukup menegakkan diagnosis tanpa memerlukan pemeriksaan laboratorium. Yang justru wajib dikerjakan adalah menyingkirkan sifilis sekunder, sebab keduanya sama-sama berupa erupsi menyeluruh yang tidak gatal pada dewasa muda, dan sifilis merupakan penyakit yang dapat disembuhkan namun akan terus berjalan merusak bila dikira penyakit yang sembuh sendiri. Pembedanya diperiksa langsung di samping tempat tidur: pada kasus ini telapak tangan dan telapak kaki tidak terkena sama sekali, ditemukan bercak induk yang jelas, dan tidak ada pembesaran kelenjar getah bening menyeluruh, kondiloma lata, maupun rambut rontok berbercak — sebaliknya, bila salah satu dari itu ditemukan, pemeriksaan serologi sifilis harus dikerjakan tanpa ragu. Tinea korporis dipertimbangkan terutama untuk bercak induk yang memang menyerupai kurap, namun jumlah lesi pada kasus ini sangat banyak dan tersebar dengan pola yang teratur, sedangkan tinea umumnya sedikit dan tepinya jauh lebih aktif; pemeriksaan kerokan dengan larutan KOH dapat memastikannya bila perlu. Psoriasis gutata disingkirkan karena sisik pada kasus ini halus dan menghadap ke dalam alih-alih tebal keperakan, serta tidak ditemukan lesi pada siku, lutut, kulit kepala, maupun kelainan kuku. Erupsi obat yang menyerupai penyakit ini juga ditelusuri melalui riwayat obat dalam enam minggu terakhir, karena bila itu penyebabnya maka terapinya adalah menghentikan obat, bukan mengobati kulitnya. Hal terpenting yang perlu disampaikan pada kasus ini adalah bahwa penyakit akan hilang sendiri dalam enam sampai delapan minggu dan praktis tidak menular — informasi yang justru merupakan pengobatan utama, mengingat kecemasan pasien umumnya jauh melampaui beratnya penyakit.',
+    terapiSuportif: [
+      'Emolien atau pelembap untuk mengurangi kekeringan dan gatal',
+      'Mandi dengan air suam-suam kuku dan sabun yang lembut; hindari air panas dan sabun keras yang memperberat gatal',
+      'Gunakan pakaian katun yang longgar dan hindari bahan wol maupun pakaian ketat yang menggesek lesi',
+      'Hindari menggaruk untuk mencegah infeksi sekunder dan bekas kehitaman',
+      'Paparan sinar matahari pagi secukupnya dapat membantu mempercepat memudarnya lesi pada sebagian pasien',
+      'Dukungan penjelasan yang menenangkan merupakan bagian terapi yang paling bermakna, mengingat sebagian besar penderitaan pada penyakit ini bersifat kecemasan',
+    ],
+    tatalaksana: [
+      'Sebagian besar kasus TIDAK MEMERLUKAN OBAT sama sekali — penyakit sembuh sendiri dalam 6-8 minggu dan pengobatan tidak mempersingkat perjalanan alaminya secara berarti',
+      'Gatal: antihistamin H1 oral seperti setirizin 10 mg atau loratadin 10 mg sekali sehari; antihistamin yang menyebabkan kantuk dapat dipakai malam hari bila gatal mengganggu tidur',
+      'Kortikosteroid topikal potensi rendah sampai sedang untuk mengurangi gatal dan peradangan pada lesi yang mengganggu; bukan untuk mempercepat kesembuhan',
+      'Fototerapi sinar ultraviolet B dipertimbangkan pada kasus luas dengan gatal berat, bila tersedia',
+      'Asiklovir dosis tinggi dilaporkan dapat mempersingkat perjalanan penyakit bila dimulai sangat dini pada kasus berat dan luas, namun bukan terapi baku dan tidak diperlukan pada kasus biasa',
+      'ANTIJAMUR TIDAK DIPERLUKAN — pemberiannya adalah kesalahan lazim akibat bercak induk yang dikira kurap',
+      'Kortikosteroid sistemik tidak dianjurkan karena dapat memperluas erupsi dan memperpanjang perjalanannya',
+      'Hentikan obat yang dicurigai bila gambarannya mengarah pada erupsi obat menyerupai pitiriasis rosea',
+      'Rujuk bila erupsi tidak menghilang setelah lebih dari 3 bulan, gambaran atipik, atau serologi sifilis reaktif',
+    ],
+    edukasi: [
+      'EDUKASI ADALAH TERAPI UTAMA pada penyakit ini: jelaskan bahwa erupsi akan hilang dengan sendirinya dalam 6-8 minggu, bahwa penyakit ini tidak berbahaya, dan bahwa tidak adanya obat yang diberikan bukan berarti penyakitnya diabaikan',
+      'Jelaskan bahwa penyakit ini praktis TIDAK MENULAR sehingga pasien tidak perlu diasingkan, tetap dapat bersekolah, bekerja, dan berkumpul dengan keluarga',
+      'Peringatkan bahwa lesi baru masih dapat muncul selama beberapa minggu pertama — ini bagian dari perjalanan alaminya dan bukan tanda penyakit memberat',
+      'Jelaskan bahwa setelah sembuh dapat tertinggal bercak lebih gelap atau lebih terang selama beberapa bulan, terutama pada kulit berwarna gelap, dan hal itu akan memudar sendiri tanpa pengobatan',
+      'Jadwal dan porsi makan: tidak ada pantangan makanan dan tidak ada makanan yang memperburuk penyakit ini. Pertahankan tiga kali makan utama pada jam teratur dengan dua selingan, perbanyak sayur dan buah, dan minum 8 gelas air per hari. Menghindari telur, ikan, atau makanan lain tanpa dasar hanya merugikan gizi tanpa memengaruhi perjalanan penyakit',
+      'Jam tidur: 7-8 jam per malam dengan jadwal tetap; bila gatal mengganggu, minum antihistamin yang menyebabkan kantuk sebelum tidur, mandi air suam-suam kuku bukan air panas, gunakan pakaian tidur katun longgar, dan potong kuku pendek agar garukan saat tidur tidak melukai kulit',
+      'Pola olahraga: olahraga tetap boleh dan dianjurkan 30 menit sehari selama 5 hari seminggu. Namun keringat dan panas memperberat gatal, sehingga sebaiknya berolahraga di tempat yang sejuk, memakai kaus katun yang menyerap keringat, segera mandi dengan air suam-suam kuku setelah selesai, lalu mengoleskan pelembap. Hindari sauna, mandi air panas, dan berendam air panas selama erupsi masih ada. Berenang tetap boleh karena penyakit ini tidak menular, meskipun air berkaporit dapat menambah kekeringan sehingga bilas dan lembapkan kulit setelahnya',
+      'Follow up: kontrol dalam 2-4 minggu bila keluhan mengganggu, atau lebih awal bila muncul lesi pada telapak tangan maupun telapak kaki, luka pada kelamin, rambut rontok berbercak, atau demam — ketiganya menuntut peninjauan ulang ke arah sifilis',
+      'Bila erupsi masih ada setelah 3 bulan, diagnosis perlu ditinjau kembali dan pasien harus datang untuk pemeriksaan ulang',
+      'Pada perempuan hamil, terutama trimester pertama, sampaikan agar pemeriksaan kehamilan dijalani lebih cermat dan segera melapor bila ada keluhan pada kehamilannya',
+    ],
+    komplikasi: [
+      'Hiperpigmentasi maupun hipopigmentasi pascainflamasi yang dapat bertahan beberapa bulan, terutama pada kulit berwarna gelap',
+      'Infeksi sekunder bakterial akibat garukan',
+      'Gangguan tidur akibat gatal',
+      'Dampak psikologis berupa kecemasan dan rasa malu karena erupsi yang luas dan tampak mencolok',
+      'Perjalanan yang lebih luas dan lebih lama pada kehamilan, dengan laporan peningkatan risiko keguguran bila timbul pada trimester pertama',
+      'Perluasan erupsi akibat pemberian kortikosteroid sistemik yang tidak diperlukan',
+      'Keterlambatan diagnosis sifilis sekunder bila keduanya dikelirukan',
+    ],
+    prognosis:
+      'Sangat baik. Penyakit sembuh sendiri dalam 6-8 minggu tanpa meninggalkan jaringan parut, dan kekambuhan sangat jarang karena imunitas yang terbentuk bertahan lama. Tidak diperlukan pengobatan khusus pada sebagian besar kasus. Satu-satunya hal yang benar-benar dapat memperburuk hasil akhir adalah kekeliruan diagnosis — mengira sifilis sekunder sebagai pitiriasis rosea berarti membiarkan penyakit yang dapat disembuhkan berkembang ke stadium lanjut, sehingga kewaspadaan terhadap keterlibatan telapak tangan dan telapak kaki merupakan bagian terpenting dari penanganan penyakit yang selebihnya jinak ini.',
+    referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019', 'PPKFKTP2014'],
   },
   'Akne vulgaris ringan': {
     definisi:
@@ -9951,20 +10375,120 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'POGI2016', 'WHOHEPB2024'],
   },
   'Anemia defisiensi besi pada kehamilan': {
-    definisi: 'Anemia akibat kekurangan besi selama kehamilan, kondisi yang sangat umum karena kebutuhan besi meningkat tajam untuk ekspansi massa eritrosit ibu dan pertumbuhan janin.',
-    diagnosis: [
-      'Anemia dalam kehamilan bila Hb <11 g/dL (trimester I dan III) atau <10,5 g/dL (trimester II); gejala lemas, pusing, pucat, sesak saat aktivitas',
-      'Gambaran mikrositik hipokrom dengan feritin serum rendah (penanda paling spesifik); bedakan dari hemodilusi fisiologis kehamilan dan thalassemia',
-      'Skrining Hb rutin pada kunjungan antenatal pertama dan trimester ketiga',
+    definisi:
+      'Anemia pada kehamilan akibat cadangan besi yang tidak mencukupi kebutuhan, ditegakkan bila kadar hemoglobin kurang dari 11 g/dL pada trimester pertama dan ketiga atau kurang dari 10,5 g/dL pada trimester kedua, disertai bukti kekurangan besi.',
+    anamnesis: {
+      keluhanUtama: 'Lemas, mudah lelah, dan pusing berkunang-kunang selama kehamilan.',
+      riwayatPenyakitSekarang:
+        'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan sistemik. Site: keluhan bersifat menyeluruh berupa lemah dan cepat lelah. Onset: perlahan seiring bertambahnya usia kehamilan, tersering pada trimester kedua dan ketiga saat kebutuhan besi memuncak. Character: lemas yang tidak sebanding dengan aktivitas, pusing berkunang-kunang terutama saat berdiri dari duduk, jantung berdebar, dan sesak saat menaiki tangga. Radiation: tidak khas. Associations: TANYAKAN PIKA yaitu keinginan kuat memakan bahan bukan makanan seperti es batu dalam jumlah banyak, tanah, atau kapur — gejala ini sangat khas untuk kekurangan besi dan sering tidak dilaporkan pasien kecuali ditanyakan langsung. Tanyakan pula rambut rontok, kuku mudah patah, sariawan di sudut bibir, serta sindrom kaki gelisah. Time course: apakah memberat seiring bertambahnya usia kehamilan. Exacerbating: aktivitas fisik dan perubahan posisi. Severity: kemampuan mengerjakan pekerjaan rumah tangga dan bekerja, serta ada tidaknya sesak saat istirahat yang menandakan anemia berat.',
+      riwayatPenyakitDahulu:
+        'Riwayat anemia pada kehamilan sebelumnya, riwayat perdarahan haid yang banyak dan lama sebelum hamil, riwayat penyakit lambung dan pemakaian obat penurun asam lambung yang mengurangi penyerapan besi, riwayat cacingan, riwayat operasi lambung, serta riwayat penyakit ginjal kronik dan penyakit menahun lain.',
+      riwayatPenyakitKeluarga:
+        'Riwayat talasemia dan anemia bawaan pada keluarga — penting karena talasemia trait menyerupai anemia defisiensi besi pada pemeriksaan darah rutin namun tidak boleh diobati dengan besi berlebihan.',
+      riwayatPengobatan:
+        'Kepatuhan meminum tablet tambah darah yang diberikan pada pemeriksaan kehamilan, termasuk apakah pernah dihentikan karena mual maupun sembelit. Penggunaan antasida dan penghambat pompa proton, kalsium, serta obat lain yang mengganggu penyerapan besi.',
+      riwayatAlergi: 'Riwayat alergi obat dan intoleransi terhadap sediaan besi oral sebelumnya.',
+      riwayatKehamilanPersalinan:
+        'Usia kehamilan saat ini, jumlah kehamilan dan persalinan sebelumnya, JARAK ANTARKEHAMILAN yang bila kurang dari dua tahun tidak memberi waktu cadangan besi pulih, riwayat perdarahan pada kehamilan atau persalinan sebelumnya, kehamilan kembar yang menggandakan kebutuhan besi, serta ada tidaknya perdarahan pervaginam saat ini.',
+      riwayatNutrisi:
+        'Asupan sumber besi hewani seperti daging merah, hati, dan ikan yang jauh lebih mudah diserap daripada besi nabati; kebiasaan minum teh maupun kopi bersamaan dengan makan yang menghambat penyerapan besi; asupan sayuran hijau, kacang-kacangan, dan buah sumber vitamin C; serta mual dan muntah kehamilan yang mengurangi asupan.',
+      riwayatSosialEkonomi:
+        'Kemampuan membeli bahan makanan bergizi, akses ke pemeriksaan kehamilan dan tablet tambah darah, sanitasi lingkungan dan kebiasaan bertelanjang kaki yang berkaitan dengan cacing tambang, beban kerja fisik sehari-hari, serta dukungan keluarga dalam merawat kehamilan.',
+    },
+    pemeriksaanFisik: [
+      'Nilai tanda vital termasuk tekanan darah, nadi, dan laju napas; takikardia saat istirahat menandakan anemia yang sudah bermakna',
+      'Periksa konjungtiva palpebra, telapak tangan, mukosa mulut, dan dasar kuku untuk menilai pucat',
+      'Cari tanda khas kekurangan besi: koilonikia berupa kuku berbentuk sendok, keilitis angularis pada sudut bibir, glositis dengan lidah yang licin dan nyeri',
+      'Auskultasi jantung untuk bising sistolik fungsional yang lazim menyertai anemia',
+      'Timbang berat badan dan nilai kenaikannya terhadap usia kehamilan',
+      'Pemeriksaan obstetri: tinggi fundus uteri dibandingkan usia kehamilan, denyut jantung janin, dan letak janin',
+      'Cari tanda gagal jantung pada anemia berat: sesak saat istirahat, ronki basah pada basal paru, peningkatan tekanan vena jugularis, dan edema tungkai yang melampaui edema fisiologis kehamilan',
+      'Cari tanda penyebab lain seperti pembesaran limpa yang mengarahkan pada hemolisis atau talasemia',
+    ],
+    penunjang: [
+      'Hemoglobin dan hematokrit sebagai penapisan yang dikerjakan minimal pada trimester pertama dan trimester ketiga',
+      'Darah lengkap dengan indeks eritrosit: MCV dan MCH yang menurun menunjukkan anemia mikrositik hipokromik',
+      'FERITIN SERUM merupakan pemeriksaan terbaik untuk membuktikan kekurangan besi; nilai kurang dari 30 ng/mL pada kehamilan sudah menandakan cadangan besi habis. Perlu diingat feritin merupakan protein fase akut sehingga dapat meninggi palsu bila ada infeksi maupun peradangan',
+      'Besi serum yang menurun, kapasitas ikat besi total yang meninggi, dan saturasi transferin yang menurun sebagai pelengkap',
+      'Apusan darah tepi: eritrosit mikrositik hipokromik dengan anisositosis dan poikilositosis',
+      'RDW yang meninggi mendukung defisiensi besi, sedangkan RDW yang normal pada anemia mikrositik lebih mengarah pada talasemia trait',
+      'Pemeriksaan tinja untuk telur cacing di daerah endemis kecacingan',
+      'Elektroforesis hemoglobin bila dicurigai talasemia, yaitu bila anemia mikrositik tidak membaik dengan besi atau ada riwayat keluarga',
+      'Penapisan malaria di daerah endemis dan pemeriksaan lain sesuai kecurigaan penyebab',
+    ],
+    etiologi:
+      'Kebutuhan besi yang meningkat tajam selama kehamilan melebihi asupan dan cadangan; diperberat oleh asupan besi yang rendah, jarak kehamilan yang dekat, kehamilan kembar, kehilangan darah menahun, dan infeksi cacing tambang.',
+    patofisiologi:
+      'Kehamilan meningkatkan kebutuhan besi total hingga sekitar 1000 mg untuk pertumbuhan janin dan plasenta, penambahan massa sel darah merah ibu, serta persiapan kehilangan darah saat persalinan. Kebutuhan ini memuncak pada trimester kedua dan ketiga, jauh melampaui yang dapat dipenuhi dari makanan sehari-hari — inilah dasar mengapa suplementasi besi diberikan kepada semua ibu hamil dan bukan hanya kepada yang sudah anemia. Volume plasma bertambah sekitar 50 persen sedangkan massa sel darah merah hanya bertambah sekitar 25 persen, sehingga terjadi pengenceran darah fisiologis yang menurunkan kadar hemoglobin tanpa adanya kekurangan besi; hal inilah yang menjadi alasan ambang diagnosis anemia pada kehamilan dibuat lebih rendah daripada pada perempuan tidak hamil. Ketika cadangan besi di sumsum tulang habis, sintesis hem terganggu sehingga eritrosit yang terbentuk berukuran kecil dan kurang berwarna. Menariknya, plasenta tetap mengambil besi untuk janin secara aktif meski ibu kekurangan, sehingga janin relatif terlindungi dan bayi umumnya lahir dengan kadar hemoglobin yang cukup — namun cadangan besinya rendah, sehingga bayi berisiko mengalami anemia dan gangguan perkembangan saraf pada bulan-bulan pertama kehidupan.',
+    faktorRisiko: [
+      'Jarak antarkehamilan kurang dari 2 tahun dan jumlah kehamilan yang banyak',
+      'Kehamilan kembar',
+      'Asupan besi rendah, pola makan vegetarian tanpa pengaturan, dan kebiasaan minum teh maupun kopi bersamaan dengan makan',
+      'Riwayat perdarahan haid yang banyak sebelum hamil',
+      'Infeksi cacing tambang di daerah endemis dan sanitasi yang buruk',
+      'Anemia pada kehamilan sebelumnya',
+      'Usia remaja saat hamil, karena kebutuhan pertumbuhan ibu sendiri masih tinggi',
+      'Mual dan muntah kehamilan yang berat sehingga asupan berkurang',
+      'Kemiskinan dan keterbatasan akses ke pemeriksaan kehamilan',
+    ],
+    goldStandard:
+      'Diagnosis ditegakkan bila hemoglobin kurang dari 11 g/dL pada trimester pertama dan ketiga atau kurang dari 10,5 g/dL pada trimester kedua, disertai bukti kekurangan besi. Bukti terbaik adalah feritin serum kurang dari 30 ng/mL, yang merupakan penanda paling dini dan paling spesifik untuk cadangan besi yang habis; gambaran mikrositik hipokromik pada darah tepi mendukung namun tidak spesifik karena juga dijumpai pada talasemia. Bila anemia mikrositik tidak membaik setelah pemberian besi yang adekuat, diagnosis harus ditinjau ulang dengan elektroforesis hemoglobin.',
+    diagnosisBanding: [
+      'Anemia fisiologis kehamilan (hemodilusi) — penurunan hemoglobin ringan tanpa perubahan indeks eritrosit dan dengan feritin normal; bukan penyakit dan tidak memerlukan terapi selain suplementasi rutin',
+      'Talasemia trait — anemia mikrositik dengan MCV sangat rendah namun jumlah eritrosit justru normal atau meninggi, RDW normal, feritin normal atau meninggi, dan riwayat keluarga positif; pemberian besi berlebihan pada keadaan ini merugikan',
+      'Anemia penyakit kronik — feritin normal atau meninggi dengan kapasitas ikat besi total yang justru menurun, disertai penyakit peradangan menahun',
+      'Anemia defisiensi asam folat dan vitamin B12 — anemia makrositik dengan MCV meninggi',
+      'Anemia akibat perdarahan akut seperti plasenta previa dan solusio plasenta — kegawatan obstetri yang harus disingkirkan bila ada perdarahan pervaginam',
+      'Anemia hemolitik — disertai ikterus, pembesaran limpa, retikulositosis, dan bilirubin indirek meninggi',
+      'Anemia akibat malaria di daerah endemis',
+    ],
+    pengkajian:
+      'Dipikirkan anemia defisiensi besi pada kehamilan atas dasar keluhan lemas, mudah lelah, dan pusing berkunang-kunang yang memberat seiring bertambahnya usia kehamilan, disertai konjungtiva yang pucat, dengan kadar hemoglobin di bawah ambang untuk trimester yang bersangkutan dan gambaran darah tepi yang mikrositik hipokromik. Adanya keinginan kuat mengunyah es batu yang digali secara khusus dalam anamnesis semakin menguatkan, karena pika merupakan gejala yang sangat khas untuk kekurangan besi dan hampir tidak pernah dilaporkan pasien bila tidak ditanyakan. Anemia fisiologis kehamilan akibat pengenceran darah merupakan hal pertama yang harus dipertimbangkan agar ibu tidak diobati untuk sesuatu yang normal, namun keadaan tersebut tidak disertai penurunan indeks eritrosit maupun feritin yang rendah, sedangkan pada kasus ini keduanya ditemukan. Talasemia trait merupakan banding yang paling menyesatkan karena sama-sama menghasilkan anemia mikrositik dan sering luput; pembedanya adalah jumlah eritrosit yang justru normal atau meninggi dengan RDW yang normal dan feritin yang tidak rendah — perbedaan ini bukan sekadar akademis, sebab memberi besi terus-menerus pada talasemia trait tidak memperbaiki anemia dan justru berisiko menimbulkan kelebihan besi. Anemia penyakit kronik disingkirkan karena feritin pada kasus ini rendah, bukan normal maupun meninggi. Perdarahan akut pada kehamilan seperti plasenta previa dan solusio plasenta disingkirkan karena tidak ada perdarahan pervaginam dan keluhan berkembang perlahan. Perlu ditekankan bahwa anemia pada kehamilan bukan sekadar keluhan ibu, melainkan berkaitan langsung dengan kelahiran prematur, berat lahir rendah, dan meningkatnya risiko perdarahan pascapersalinan — sehingga koreksinya bersifat mendesak dan terikat waktu, karena besi memerlukan waktu berminggu-minggu untuk bekerja sementara tanggal persalinan tidak dapat ditunda.',
+    terapiSuportif: [
+      'Perbaikan pola makan dengan mengutamakan sumber besi hewani yang penyerapannya jauh lebih baik: daging merah, hati, ikan, dan unggas',
+      'Sertakan sumber vitamin C seperti jeruk, jambu biji, dan tomat pada waktu makan yang sama untuk meningkatkan penyerapan besi nabati',
+      'Beri jarak minimal 2 jam antara tablet besi dengan teh, kopi, susu, dan suplemen kalsium yang menghambat penyerapan',
+      'Penanganan mual dan muntah kehamilan agar asupan dapat masuk, termasuk makan porsi kecil lebih sering',
+      'Pemberian obat cacing setelah trimester pertama di daerah endemis kecacingan sesuai pedoman program',
+      'Tangani sembelit akibat tablet besi dengan asupan serat, cairan yang cukup, dan aktivitas fisik ringan agar ibu tidak berhenti minum obat',
     ],
     tatalaksana: [
-      'Tablet tambah darah rutin sebagai PENCEGAHAN pada semua ibu hamil sesuai program nasional; pada anemia berikan besi elemental dosis terapi',
-      'Minum bersama vitamin C dan hindari bersamaan teh, kopi, susu, atau kalsium; edukasi efek samping (mual, konstipasi, tinja hitam) agar kepatuhan terjaga',
-      'Besi intravena bila intoleransi oral berat, anemia sedang-berat mendekati persalinan, atau respons oral tidak adekuat',
-      'Transfusi hanya pada anemia berat simtomatik atau mendekati persalinan dengan risiko perdarahan',
-      'EDUKASI: anemia meningkatkan risiko perdarahan pascapersalinan, persalinan preterm, dan berat lahir rendah — kepatuhan minum tablet besi sangat penting',
+      'Suplementasi besi diberikan kepada SEMUA ibu hamil sebagai pencegahan: tablet tambah darah berisi 60 mg besi elemental dan 400 mikrogram asam folat, satu tablet per hari selama minimal 90 hari',
+      'Anemia yang sudah terjadi: besi elemental 100-200 mg per hari terbagi, umumnya dalam bentuk ferro sulfat, ferro fumarat, atau ferro glukonat, diminum saat perut kosong satu jam sebelum makan bersama sumber vitamin C',
+      'Bila mual atau nyeri lambung membuat obat tidak dapat diminum, lebih baik diminum bersama makanan atau diberikan selang sehari daripada dihentikan sama sekali — kepatuhan lebih menentukan daripada dosis maksimal',
+      'Evaluasi hemoglobin setelah 2-4 minggu; kenaikan sekitar 1 g/dL menandakan terapi berhasil dan sekaligus memastikan diagnosis. Retikulosit sudah meningkat dalam 5-10 hari sebagai tanda respons paling dini',
+      'TERAPI DILANJUTKAN 3 BULAN SETELAH HEMOGLOBIN NORMAL dan diteruskan hingga 6 minggu pascapersalinan untuk mengisi kembali cadangan besi — menghentikan begitu hemoglobin normal adalah kesalahan lazim yang membuat anemia berulang',
+      'Besi intravena dipertimbangkan bila besi oral tidak dapat ditoleransi, tidak memberi respons, anemia berat pada usia kehamilan lanjut, atau waktu menjelang persalinan terlalu singkat untuk terapi oral',
+      'Transfusi darah hanya pada anemia berat dengan gangguan hemodinamik, gagal jantung, atau menjelang persalinan dengan hemoglobin sangat rendah — bukan untuk memperbaiki angka semata',
+      'Bila tidak ada respons setelah 4 minggu terapi yang diminum dengan benar, tinjau ulang diagnosis: pertimbangkan talasemia, kehilangan darah yang berlanjut, infeksi, atau gangguan penyerapan',
+      'Rujuk bila hemoglobin kurang dari 7 g/dL, ada tanda gagal jantung, anemia tidak membaik dengan terapi adekuat, atau usia kehamilan sudah lanjut dengan anemia berat',
+      'Rencanakan persalinan di fasilitas yang mampu menangani perdarahan, dan siapkan manajemen aktif kala tiga untuk mencegah perdarahan pascapersalinan',
     ],
-    referensi: ['SKDI2012', 'POGI2016', 'WILLIAMSOB2022'],
+    edukasi: [
+      'Jelaskan bahwa anemia pada kehamilan bukan hal sepele: berkaitan dengan kelahiran prematur, berat lahir rendah, dan risiko perdarahan saat melahirkan, sehingga tablet tambah darah bukan sekadar vitamin penambah tenaga',
+      'Cara meminum tablet besi dengan benar: satu jam sebelum makan bersama air jeruk atau air putih, JANGAN dengan teh, kopi, atau susu',
+      'Peringatkan bahwa tinja akan berwarna kehitaman selama minum tablet besi — ini normal dan bukan perdarahan; tanpa penjelasan ini banyak ibu berhenti minum obat karena panik',
+      'Bila timbul mual atau sembelit, jangan berhenti — laporkan agar cara minumnya disesuaikan',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan. Sertakan sumber besi hewani seperti daging merah, hati ayam, atau ikan minimal 3-4 kali seminggu karena penyerapannya jauh lebih baik daripada besi dari sayuran; lengkapi dengan sayuran hijau seperti bayam dan kacang-kacangan, dan selalu sertakan buah sumber vitamin C seperti jeruk, jambu biji, atau pepaya pada waktu makan yang sama. Beri jarak minimal 2 jam sebelum atau sesudah makan untuk minum teh maupun kopi. Minum 8-10 gelas air per hari. Bila mual, makanlah porsi kecil tetapi lebih sering dan hindari perut kosong terlalu lama',
+      'Jam tidur: 7-9 jam per malam ditambah istirahat siang 1-2 jam, karena kelelahan pada anemia jauh melampaui kelelahan kehamilan biasa. Tidur miring ke kiri pada kehamilan lanjut untuk memperlancar aliran darah ke rahim. Bangunlah perlahan dari posisi berbaring atau duduk untuk mencegah pusing dan jatuh',
+      'Pola olahraga: aktivitas ringan sampai sedang 20-30 menit sehari selama 5 hari seminggu seperti jalan kaki, senam hamil, atau berenang tetap dianjurkan dan aman. Namun pada anemia sedang hingga berat, kurangi intensitas dan berhenti bila muncul pusing, jantung berdebar kencang, atau sesak; jangan berolahraga sampai kehabisan napas. Hindari mengangkat beban berat, berdiri terlalu lama, dan bekerja di tempat panas. Bila hemoglobin sangat rendah, utamakan istirahat sampai anemia terkoreksi',
+      'Bertelanjang kaki di tanah adalah jalan masuk cacing tambang — gunakan alas kaki, dan ikuti pemberian obat cacing sesuai anjuran',
+      'Follow up: periksa hemoglobin ulang setelah 2-4 minggu terapi, lalu sesuai jadwal pemeriksaan kehamilan. Teruskan tablet besi sampai 3 bulan setelah hemoglobin normal dan hingga 6 minggu setelah melahirkan',
+      'TANDA BAHAYA yang mengharuskan datang segera: sesak napas saat istirahat, jantung berdebar kencang terus-menerus, pingsan, bengkak yang bertambah pada tungkai dan wajah, perdarahan dari jalan lahir, nyeri perut hebat, atau berkurangnya gerakan janin',
+      'Rencanakan jarak kehamilan berikutnya minimal 2 tahun agar cadangan besi tubuh sempat pulih — ini merupakan pencegahan yang paling menentukan untuk kehamilan mendatang',
+    ],
+    komplikasi: [
+      'Pada ibu: kelelahan berat, penurunan daya tahan terhadap infeksi, gagal jantung pada anemia berat, dan risiko perdarahan pascapersalinan yang jauh lebih berbahaya karena cadangan tubuh sudah rendah',
+      'Meningkatnya kebutuhan transfusi darah saat persalinan',
+      'Pada janin dan bayi: kelahiran prematur, berat lahir rendah, pertumbuhan janin terhambat, dan cadangan besi bayi yang rendah',
+      'Anemia dan gangguan perkembangan saraf serta kognitif pada bayi di bulan-bulan pertama kehidupan',
+      'Meningkatnya angka kematian ibu dan kematian perinatal pada anemia berat',
+      'Depresi pascapersalinan dan gangguan produksi air susu ibu',
+      'Sembelit dan gangguan lambung akibat terapi besi yang menyebabkan pasien berhenti berobat',
+    ],
+    prognosis:
+      'Sangat baik bila dikenali dan diobati sejak dini — sebagian besar kasus memberi respons terhadap besi oral dengan kenaikan hemoglobin sekitar 1 g/dL dalam 2-4 minggu. Yang menentukan bukan hanya keberhasilan menaikkan angka hemoglobin, melainkan waktu: koreksi harus tercapai sebelum persalinan, dan semakin lanjut usia kehamilan saat anemia ditemukan semakin sempit peluang memperbaikinya dengan besi oral saja. Prognosis memburuk pada anemia berat yang baru ditemukan menjelang persalinan, dan sebaliknya sangat baik bila penapisan dikerjakan sejak trimester pertama serta terapi diteruskan sampai cadangan besi terisi kembali.',
+    referensi: ['SKDI2012', 'WILLIAMSOB2022', 'POGI2016', 'HOFFBRAND2019'],
   },
   'Corpus alienum vaginae': {
     definisi: 'Benda asing dalam vagina; pada anak sering benda kecil atau tisu, pada dewasa sering tampon tertinggal, kondom, atau pesarium terlupakan.',
