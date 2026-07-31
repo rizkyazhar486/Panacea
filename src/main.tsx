@@ -44,6 +44,7 @@ const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
 const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const RealisticHealth = lazy(() => import('./pages/RealisticHealth').then((m) => ({ default: m.RealisticHealth })))
+const MoneyHub = lazy(() => import('./pages/MoneyHub').then((m) => ({ default: m.MoneyHub })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
@@ -210,6 +211,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/community" element={<Community />} />
               <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/sehat-sibuk" element={<RealisticHealth />} />
+              <Route path="/keuangan" element={<MoneyHub />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/fitness-test" element={<FitnessTest />} />
