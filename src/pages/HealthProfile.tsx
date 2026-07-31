@@ -495,8 +495,24 @@ function AutoSyncCard() {
   const [token, setToken] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
+  // Connection state. Worth surfacing because "is the server even up?" is the
+  // first thing to rule out when a sync produces nothing, and until now the
+  // only way to answer it was to guess a URL by hand.
+  const [conn, setConn] = useState<'checking' | 'up' | 'down'>('checking')
+  const [lastSync, setLastSync] = useState<string | null>(null)
 
-  useEffect(() => { api.getHealthWebhookToken().then(setToken).catch(() => {}) }, [])
+  const checkConnection = async () => {
+    setConn('checking')
+    try { await api.health(); setConn('up') } catch { setConn('down') }
+  }
+
+  useEffect(() => {
+    api.getHealthWebhookToken().then(setToken).catch(() => {})
+    checkConnection()
+    api.getHealthProfile()
+      .then((r) => setLastSync((r as { lastDeviceSyncAt?: string })?.lastDeviceSyncAt ?? null))
+      .catch(() => {})
+  }, [])
 
   const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
 
@@ -515,6 +531,39 @@ function AutoSyncCard() {
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
         A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>
+
+      {/* Server reachability + last push, so the two questions that actually
+          matter when nothing arrives are answered without leaving the page. */}
+      <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Server Panaceamed</span>
+          <div className="flex items-center gap-2">
+            <Badge tone={conn === 'up' ? 'normal' : conn === 'down' ? 'critical' : 'low'}>
+              {conn === 'up' ? 'Terhubung' : conn === 'down' ? 'Tidak merespons' : 'Memeriksa…'}
+            </Badge>
+            <button onClick={checkConnection} className="text-[11px] font-bold text-brand-dark hover:underline">Cek ulang</button>
+          </div>
+        </div>
+        <div className="mt-1.5 flex items-center justify-between gap-2">
+          <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Kiriman terakhir dari perangkat</span>
+          <span className="text-[12px] font-black text-ink dark:text-white">
+            {lastSync ? timeAgoShort(new Date(lastSync)) : "belum pernah"}
+          </span>
+        </div>
+        {conn === 'down' && (
+          <p className="mt-2 text-[11px] leading-relaxed text-rose-600 dark:text-rose-400">
+            Server tidak menjawab. Selama ini terjadi, tidak ada data dari iPhone yang bisa masuk —
+            periksa status deployment sebelum menelusuri pengaturan di aplikasi.
+          </p>
+        )}
+        {conn === 'up' && !lastSync && (
+          <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
+            Server sehat, tetapi belum pernah menerima kiriman dari perangkat Anda. Artinya
+            masalahnya ada di sisi iPhone — URL, izin Health, atau otomatisasi yang belum berjalan —
+            bukan di server.
+          </p>
+        )}
+      </div>
 
       <div className="mt-3">
         <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Private Sync Link</div>
