@@ -19,6 +19,8 @@ import { WeatherWidget } from '../components/WeatherWidget'
 import { getDemo } from '../lib/profile'
 import { Portal } from '../components/Portal'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
+import { useVitals, useVitalField } from '../lib/useVitals'
+import { vitalsAge } from '../lib/healthVitals'
 
 /* ═══════════════════════════════════════════════════════
    GPS SPORTS MODES
@@ -1628,26 +1630,30 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const { state, addSelfVital, addSleepLog, toggleEduBookmark, logVo2Max, addGoal, removeGoal } = useStore()
 
   // 1. Kalkulator BMI & Kalori Harian (TDEE)
-  const [weight, setWeight] = useState(70)
-  const [height, setHeight] = useState(170)
-  const [age, setAge] = useState(30)
+  // Seeded from the device/Health Profile via useVitalField so a user who has
+  // synced their watch never sees the old hardcoded 70 kg / 170 cm / 30 y
+  // placeholders. Typing in a field takes it off device-follow.
+  const vitals = useVitals()
+  const [weight, setWeight, weightFromDevice] = useVitalField('weightKg', 70)
+  const [height, setHeight, heightFromDevice] = useVitalField('heightCm', 170)
+  const [age, setAge] = useState(() => getDemo().age || 30)
   const [activity, setActivity] = useState(1.4)
   const bmi = weight / Math.pow(height / 100, 2)
   const bmiCat = bmiCategory(bmi)
   const tdee = Math.round((10 * weight + 6.25 * height - 5 * age + 5) * activity)
 
   // 2. Kalkulator Tekanan Darah
-  const [sys, setSys] = useState(120)
-  const [dia, setDia] = useState(80)
+  const [sys, setSys, sysFromDevice] = useVitalField('systolic', 120)
+  const [dia, setDia, diaFromDevice] = useVitalField('diastolic', 80)
   const bpCat = bpCategory(sys, dia)
 
   // 3. Kalkulator Kebutuhan Cairan Harian
   const waterMl = Math.round(weight * 33 * (activity > 1.3 ? 1.15 : 1))
 
   // 4. Monitor Vital Realtime
-  const [hr, setHr] = useState(72)
-  const [spo2, setSpo2] = useState(98)
-  const [tempC, setTempC] = useState(36.5)
+  const [hr, setHr, hrFromDevice] = useVitalField('heartRate', 72)
+  const [spo2, setSpo2, spo2FromDevice] = useVitalField('spo2Pct', 98)
+  const [tempC, setTempC, tempFromDevice] = useVitalField('bodyTempC', 36.5)
   const lastVital = state.selfVitals[0]
 
   // #8: Web Bluetooth — baca detak jantung langsung dari strap BLE (Heart Rate Service 0x180D).
@@ -1687,8 +1693,10 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(sleepHours, 9) / 9) * 70 + (bedtimeConsistent ? 30 : 0))))
   const todaySleep = state.sleepLogs.find((s) => s.date === new Date().toISOString().slice(0, 10))
 
-  // VO2Max — estimasi non-exercise dari HR istirahat & HR maksimal (Uth-Sørensen formula)
-  const [hrRest, setHrRest] = useState(65)
+  // VO2Max — estimasi non-exercise dari HR istirahat & HR maksimal (Uth-Sørensen formula).
+  // Resting HR follows the watch when available, so the estimate uses the
+  // user's real measurement instead of a placeholder.
+  const [hrRest, setHrRest] = useVitalField('restingHr', 65).slice(0, 2) as [number, (n: number) => void]
   const [hrMaxInput, setHrMaxInput] = useState(220 - age)
   const vo2max = Math.round((15.3 * (hrMaxInput / Math.max(hrRest, 1))) * 10) / 10
   const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Cukup', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
@@ -1794,9 +1802,27 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   if (checkInStreak >= 3) insights.push(`Great job! ${checkInStreak}-day check-in streak. Consistency is the key to long-term health. 🔥`)
   insights.push(`Today's fluid target is ~${(waterMl / 1000).toFixed(1)} liters. Spread it throughout the day rather than all at once.`)
 
+  // Which visible fields are currently following the device, for the badge.
+  const deviceFields = [
+    weightFromDevice && 'berat', heightFromDevice && 'tinggi',
+    hrFromDevice && 'nadi', spo2FromDevice && 'SpO\u2082', tempFromDevice && 'suhu',
+    sysFromDevice && diaFromDevice && 'tekanan darah',
+  ].filter(Boolean) as string[]
+
   return (
     <div className="space-y-4">
       <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Real-Time Health Center</h4>
+
+      {/* Proof-of-sync. Without this, prefilled numbers are indistinguishable
+          from the old hardcoded defaults and the user cannot tell whether their
+          watch data actually arrived. */}
+      {deviceFields.length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark dark:bg-brand/10">
+          <span>⌚ Terisi otomatis dari {vitals.source ?? 'perangkat Anda'}</span>
+          {vitalsAge(vitals) && <span className="text-neutral-500">· {vitalsAge(vitals)}</span>}
+          <span className="text-neutral-500">· {deviceFields.join(', ')}</span>
+        </div>
+      )}
 
       {/* #6 + #7: Asisten Kesehatan AI dengan deteksi anomali */}
       <Card className="space-y-3">
