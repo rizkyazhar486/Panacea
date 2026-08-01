@@ -96,6 +96,7 @@ const nav: Nav[] = [
   { to: '/riwayat-latihan', label: 'Riwayat Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/log-detak-jantung', label: 'Log Detak Jantung', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/pola-tidur', label: 'Pola Tidur', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/fisiologi-latihan', label: 'Fisiologi Latihan', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/alat-fitness', label: 'Alat Fitness & Hyrox', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/sports-lab', label: 'Sports Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/connect', label: 'Connect', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },

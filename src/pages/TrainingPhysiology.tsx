@@ -1,0 +1,389 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Card, SectionTitle } from '../components/ui'
+import { IconHeart, IconActivity, IconTimer, IconRun } from '../components/icons'
+import { getWorkouts } from '../lib/workoutStore'
+import { getDemo } from '../lib/profile'
+import { useVitals } from '../lib/useVitals'
+import { api, backendEnabled, type SleepNight } from '../lib/api'
+import {
+  hitungSesi, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
+  perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
+  UNAVAILABLE, type Sesi,
+} from '../lib/trainingPhysiology'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fisiologi Latihan — padanan kelompok metrik Garmin, dari data Apple Health.
+//
+// Urutan halaman disengaja: kesiapan hari ini di atas (satu-satunya yang
+// menuntut keputusan sekarang), lalu beban dan status, lalu ambang dan
+// ketahanan yang berubah lambat, dan terakhir daftar terbuka tentang apa yang
+// TIDAK bisa dihitung beserta alasannya.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function TrainingPhysiology() {
+  const vitals = useVitals()
+  const demo = useMemo(() => getDemo(), [])
+  const [nights, setNights] = useState<SleepNight[]>([])
+  const [riwayat, setRiwayat] = useState<{ date: string; hrvMs?: number; restingHr?: number }[]>([])
+
+  useEffect(() => {
+    if (!backendEnabled) return
+    api.sleepSeries().then(setNights).catch(() => {})
+    api.getHealthProfile()
+      .then((r) => {
+        const h = (r as { history?: { date: string; hrvMs?: number; restingHr?: number }[] })?.history
+        if (Array.isArray(h)) setRiwayat(h)
+      })
+      .catch(() => {})
+  }, [])
+
+  const workouts = useMemo(() => getWorkouts(), [vitals])
+
+  const ctx = useMemo(() => {
+    const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
+    const usia = demo.age || 30
+    // Denyut tertinggi yang pernah tercatat ATAU rumus, mana yang lebih besar.
+    // Memakai yang teramati saja menggeser seluruh zona ke atas bagi orang yang
+    // memang belum pernah benar-benar maksimal.
+    return {
+      hrMax: Math.max(teramati, demo.sex === 'F' ? 226 - usia : 220 - usia),
+      hrRest: vitals.restingHr || 60,
+      sex: demo.sex,
+      beratKg: demo.weightKg,
+      vo2max: vitals.vo2max,
+    }
+  }, [workouts, demo, vitals])
+
+  const sesi = useMemo<Sesi[]>(() => workouts.map((w) => ({
+    id: w.id, nama: w.nama, mulai: w.mulai, durasiDetik: w.durasi,
+    jarakKm: w.jarakKm, avgHr: w.avgHr, maxHr: w.maxHr, hr: w.hr,
+  })), [workouts])
+
+  const calc = useMemo(() => hitungSesi(sesi, ctx), [sesi, ctx])
+  const beban = useMemo(() => ringkasBeban(calc), [calc])
+
+  const malamTerakhir = useMemo(
+    () => [...nights].sort((a, b) => b.date.localeCompare(a.date))[0],
+    [nights],
+  )
+  /**
+   * Baseline harus datang dari RIWAYAT, bukan dari nilai hari ini.
+   * Membandingkan sebuah angka dengan dirinya sendiri selalu menghasilkan
+   * "normal" dan membuat faktornya tampak dinilai padahal tidak — lebih buruk
+   * daripada tidak menampilkannya sama sekali. Bila riwayatnya belum cukup,
+   * faktor itu memang dihilangkan.
+   */
+  const baseline = useMemo(() => {
+    const ambil = (k: 'hrvMs' | 'restingHr') => {
+      const hariIni = new Date().toISOString().slice(0, 10)
+      const v = riwayat
+        .filter((r) => r.date !== hariIni)
+        .slice(-28)
+        .map((r) => r[k])
+        .filter((x): x is number => typeof x === 'number' && x > 0)
+      if (v.length < 5) return undefined
+      // Median: satu malam buruk tidak menggeser pembandingnya.
+      return [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)]
+    }
+    return { hrv: ambil('hrvMs'), resting: ambil('restingHr') }
+  }, [riwayat])
+
+  const terbaru = calc[0] ?? null
+  const pemulihan = useMemo(
+    () => waktuPemulihan(terbaru, beban.kronis, {
+      tidurJam: malamTerakhir?.totalH, hrvMs: vitals.hrvMs, hrvBaseline: baseline.hrv, acwr: beban.acwr,
+    }),
+    [terbaru, beban, malamTerakhir, vitals, baseline],
+  )
+  const sisaJam = pemulihan ? Math.max(0, (Date.parse(pemulihan.selesaiPada) - Date.now()) / 3600_000) : 0
+
+  const siap = useMemo(() => kesiapan({
+    tidurJam: malamTerakhir?.totalH,
+    tidurDeepJam: malamTerakhir?.deepH,
+    hrvMs: vitals.hrvMs,
+    hrvBaseline: baseline.hrv,
+    restingHr: vitals.restingHr,
+    restingBaseline: baseline.resting,
+    pemulihanSisaJam: sisaJam,
+    acwr: beban.acwrDapatDipercaya ? beban.acwr : null,
+  }), [malamTerakhir, vitals, baseline, sisaJam, beban])
+
+  const status = useMemo(() => statusLatihan(beban, null), [beban])
+  const lthr = useMemo(() => perkiraanLTHR(calc, ctx.hrMax), [calc, ctx])
+  const performa = useMemo(() => kondisiPerforma(calc), [calc])
+  const ketahanan = useMemo(() => skorKetahanan(calc), [calc])
+  const saran = useMemo(() => saranSesiHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
+  const teTerbaru = useMemo(() => (terbaru ? trainingEffect(terbaru, beban.kronis) : null), [terbaru, beban])
+
+  if (!workouts.length) {
+    return (
+      <div className="space-y-4">
+        <SectionTitle icon={<IconActivity />} title="Fisiologi Latihan" subtitle="Beban, status, pemulihan, dan kesiapan" />
+        <Card>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung
+            tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.
+          </p>
+          <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+            Nyalakan <strong className="text-slate-200">Include Workouts</strong> di Health Auto Export, lalu
+            sinkronkan. Panduannya ada di{' '}
+            <Link to="/health-data/tutorial" className="font-semibold text-white underline">panduan sinkronisasi</Link>.
+          </p>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <SectionTitle
+        icon={<IconActivity />}
+        title="Fisiologi Latihan"
+        subtitle={`${calc.length} sesi · HRmaks dipakai ${ctx.hrMax} bpm · istirahat ${ctx.hrRest} bpm`}
+      />
+
+      {/* Kesiapan — satu-satunya yang menuntut keputusan hari ini */}
+      <Card>
+        <SectionTitle icon={<IconHeart />} title="Kesiapan hari ini" />
+        <div className="mt-2 flex items-center gap-4">
+          <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full"
+            style={{ background: `conic-gradient(${siap.warna} ${siap.skor * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}>
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-slate-900">
+              <span className="text-xl font-bold tabular-nums" style={{ color: siap.warna }}>{siap.skor}</span>
+            </div>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-lg font-semibold" style={{ color: siap.warna }}>{siap.label}</div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">{siap.saran}</p>
+          </div>
+        </div>
+
+        {siap.faktor.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            {siap.faktor.map((f) => (
+              <div key={f.nama} className="flex items-center gap-2 text-xs">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${f.arah === 'baik' ? 'bg-emerald-400' : f.arah === 'kurang' ? 'bg-rose-400' : 'bg-slate-500'}`} />
+                <span className="min-w-0 flex-1 truncate text-slate-300">{f.nama}</span>
+                <span className="text-slate-500">{f.nilai}</span>
+                <span className={`w-8 text-right tabular-nums ${f.arah === 'kurang' ? 'text-rose-300' : 'text-emerald-300'}`}>{f.bobot}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+          Rinciannya ditampilkan dengan sengaja: satu angka tanpa alasannya tidak bisa ditindaklanjuti.
+          {(baseline.hrv == null || baseline.resting == null) && (
+            <> Variabilitas denyut dan denyut istirahat baru ikut dinilai setelah ada sekitar lima hari
+            riwayat — sebelum itu tidak ada pembanding, dan membandingkan angka dengan dirinya sendiri
+            hanya akan menghasilkan penilaian palsu.</>
+          )}
+        </p>
+      </Card>
+
+      {/* Saran sesi */}
+      <Card>
+        <SectionTitle icon={<IconRun />} title="Saran sesi hari ini" />
+        <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3">
+          <div className="text-sm font-semibold text-white">{saran.judul}</div>
+          <p className="mt-1 text-sm text-slate-300 leading-relaxed">{saran.rincian}</p>
+          <p className="mt-2 text-sm text-slate-400 leading-relaxed"><span className="text-slate-500">Alasan: </span>{saran.alasan}</p>
+        </div>
+      </Card>
+
+      {/* Pemulihan */}
+      {pemulihan && (
+        <Card>
+          <SectionTitle icon={<IconTimer />} title="Waktu pemulihan" />
+          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-sm text-slate-400">Sisa sampai siap untuk sesi berat</span>
+            <span className={`text-2xl font-semibold tabular-nums ${sisaJam > 12 ? 'text-amber-300' : 'text-emerald-300'}`}>
+              {sisaJam < 1 ? 'siap' : `${Math.round(sisaJam)} jam`}
+            </span>
+          </div>
+          <div className="mt-2 space-y-1">
+            {pemulihan.dasar.map((d, i) => (
+              <div key={i} className="flex gap-2 text-xs text-slate-400"><span className="text-slate-600">·</span><span>{d}</span></div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+            Ini <b>bukan larangan bergerak</b>. Jalan kaki dan sesi mudah tetap boleh dan justru mempercepat
+            pemulihan — yang dimaksud adalah kesiapan untuk sesi keras.
+          </p>
+        </Card>
+      )}
+
+      {/* Status & beban */}
+      <Card>
+        <SectionTitle icon={<IconActivity />} title="Status latihan" />
+        <div className="mt-2 rounded-lg border p-3" style={{ borderColor: `${status.warna}44`, background: `${status.warna}12` }}>
+          <div className="text-base font-semibold" style={{ color: status.warna }}>{status.label}</div>
+          <p className="mt-1 text-sm leading-relaxed text-slate-300">{status.penjelasan}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-emerald-200/80">{status.saran}</p>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Stat label="Beban akut (7h)" value={beban.akut.toFixed(0)} sub="per hari" />
+          <Stat label="Beban kronis (28h)" value={beban.kronis.toFixed(0)} sub="per hari" />
+          <Stat label="Nisbah 7:28" value={beban.acwr != null ? beban.acwr.toFixed(2) : '—'} sub={beban.acwrDapatDipercaya ? 'sasaran 0,8–1,3' : 'belum bermakna'} />
+          <Stat label="Hari aktif" value={`${beban.hariAktif7}/7`} />
+        </div>
+
+        {beban.pctAerobikRendah != null && (
+          <div className="mt-4">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Sebaran intensitas 28 hari</div>
+            <div className="mt-1.5 flex h-3 overflow-hidden rounded-full bg-white/5">
+              <div style={{ width: `${beban.pctAerobikRendah}%`, background: '#34d399' }} />
+              <div style={{ width: `${beban.pctAerobikTinggi}%`, background: '#fbbf24' }} />
+              <div style={{ width: `${beban.pctAnaerobik}%`, background: '#f87171' }} />
+            </div>
+            <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+              <span className="text-emerald-300">Mudah (Z1-2) {beban.pctAerobikRendah}%</span>
+              <span className="text-amber-300">Aerobik tinggi (Z3-4) {beban.pctAerobikTinggi}%</span>
+              <span className="text-rose-300">Anaerobik (Z5) {beban.pctAnaerobik}%</span>
+            </div>
+            {beban.pctAerobikRendah < 60 && (
+              <p className="mt-2 text-sm leading-relaxed text-amber-100/90">
+                Sasaran yang lazim dipakai adalah sekitar 80% waktu pada zona mudah. Punya Anda {beban.pctAerobikRendah}%.
+                Ini pola yang terasa produktif namun paling sering membuat kemajuan mandek — terlalu berat untuk
+                pemulihan, terlalu ringan untuk memicu adaptasi kecepatan.
+              </p>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {/* Training effect sesi terakhir */}
+      {teTerbaru && terbaru && (
+        <Card>
+          <SectionTitle icon={<IconRun />} title="Efek latihan — sesi terakhir"
+            subtitle={new Date(terbaru.mulai).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })} />
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <TeBar label="Aerobik" value={teTerbaru.aerobik} teks={teTerbaru.labelAerobik} warna="#34d399" />
+            <TeBar label="Anaerobik" value={teTerbaru.anaerobik} teks={teTerbaru.labelAnaerobik} warna="#f87171" />
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Stat label="Beban sesi" value={terbaru.trimp.toFixed(0)} sub="TRIMP" />
+            <Stat label="Durasi" value={`${Math.round(terbaru.durasiDetik / 60)}`} sub="menit" />
+            <Stat label="Rata-rata" value={terbaru.avgHr ? `${terbaru.avgHr}` : '—'} sub="bpm" />
+          </div>
+          <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+            Skala 0–5: 0 tidak ada · 1 ringan · 2 mempertahankan · 3 meningkatkan · 4 sangat meningkatkan · 5 berlebih.
+            Dinilai <b>relatif terhadap kebugaran Anda sendiri</b> — sesi yang sama berat bagi pemula dan ringan
+            bagi pelari terlatih, sehingga ambang tetap akan menyesatkan.
+          </p>
+        </Card>
+      )}
+
+      {/* Ambang & performa */}
+      <Card>
+        <SectionTitle icon={<IconHeart />} title="Ambang & kondisi performa" />
+        <div className="mt-2 space-y-3">
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-semibold text-white">Denyut ambang laktat (LTHR)</span>
+              <span className="text-lg font-semibold tabular-nums text-white">
+                {lthr.lthr != null ? `${lthr.lthr} bpm` : '—'}
+                {lthr.pctHrMax != null && <span className="ml-1 text-xs text-slate-500">{lthr.pctHrMax}% HRmaks</span>}
+              </span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">{lthr.metode}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
+              Di atas ambang ini kelelahan menumpuk jauh lebih cepat dan performa cepat menurun. Inilah
+              batas yang memisahkan &quot;berat tapi terkendali&quot; dari &quot;tidak bisa dipertahankan&quot;.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-semibold text-white">Kondisi performa</span>
+              <span className={`text-lg font-semibold tabular-nums ${
+                performa.nilai == null ? 'text-slate-500' : performa.nilai > 0 ? 'text-emerald-300' : performa.nilai < 0 ? 'text-amber-300' : 'text-white'}`}>
+                {performa.nilai == null ? '—' : performa.nilai > 0 ? `+${performa.nilai}` : performa.nilai}
+              </span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">{performa.arti}</p>
+            {performa.ef != null && performa.efBaseline != null && (
+              <p className="mt-1.5 text-[11px] text-slate-500">
+                Efisiensi sesi terakhir {performa.ef} meter per menit per denyut, dibanding kebiasaan {performa.efBaseline}.
+                Efisiensi berubah lebih dahulu daripada VO2max, sehingga ia tanda kebugaran yang paling awal terlihat.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-semibold text-white">Skor ketahanan</span>
+              <span className="text-lg font-semibold tabular-nums text-white">
+                {ketahanan.skor ?? '—'}{ketahanan.skor != null && <span className="ml-1 text-xs text-slate-500">{ketahanan.label}</span>}
+              </span>
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">{ketahanan.penjelasan}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Dasar perhitungan */}
+      <Card>
+        <SectionTitle icon={<IconActivity />} title="Dasar perhitungannya" />
+        <p className="mt-2 text-sm leading-relaxed text-slate-300">
+          Garmin menghitung beban dari <b>EPOC</b> yang diperkirakan lewat model berpemilik Firstbeat, memakai
+          detak jantung detik per detik beserta variabilitas antarketukan. Apple Watch tidak mengeluarkan data
+          sedetail itu, jadi halaman ini <b>tidak mengaku menghitung EPOC</b>.
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+          Yang dipakai adalah <b>TRIMP (Banister)</b> — ukuran beban berbasis detak jantung yang sudah lama
+          dipakai di lapangan maupun penelitian, dengan pembobotan eksponensial sehingga satu menit intensitas
+          tinggi dihitung jauh lebih berat daripada satu menit ringan. Angkanya <b>tidak sebanding dengan angka
+          Garmin</b>; yang bermakna adalah kecenderungannya pada diri Anda sendiri.
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+          Nisbah beban 7:28 hari dipakai luas, namun bukti bahwa ia meramalkan cedera masih diperdebatkan.
+          Ia dipakai di sini sebagai penanda perubahan, bukan sebagai ramalan.
+        </p>
+      </Card>
+
+      {/* Yang tidak bisa dibuat */}
+      <Card>
+        <SectionTitle icon={<IconTimer />} title="Yang tidak bisa dihitung dari Apple Watch"
+          subtitle="Disebutkan terbuka, supaya tidak disangka rusak" />
+        <div className="mt-2 space-y-2">
+          {UNAVAILABLE.map((u) => (
+            <div key={u.fitur} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <div className="text-sm font-semibold text-slate-300">{u.fitur}</div>
+              <p className="mt-1 text-sm leading-relaxed text-slate-400">{u.kenapa}</p>
+              <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Perlu: </span>{u.syarat}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  )
+}
+
+function TeBar({ label, value, teks, warna }: { label: string; value: number; teks: string; warna: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">{label}</span>
+        <span className="text-lg font-semibold tabular-nums" style={{ color: warna }}>{value.toFixed(1)}</span>
+      </div>
+      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/5">
+        <div className="h-full rounded-full" style={{ width: `${(value / 5) * 100}%`, background: warna }} />
+      </div>
+      <div className="mt-1 text-[11px] text-slate-400">{teks}</div>
+    </div>
+  )
+}
+
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
+      <div className="text-base font-semibold tabular-nums text-white">{value}</div>
+      <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">{label}</div>
+      {sub && <div className="text-[10px] text-slate-500">{sub}</div>}
+    </div>
+  )
+}
+
+export default TrainingPhysiology
