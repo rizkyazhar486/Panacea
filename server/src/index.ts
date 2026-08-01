@@ -611,24 +611,38 @@ app.post('/api/health-webhook/:token', (req, res) => {
   const rawMetrics = (req.body as { data?: { metrics?: { name?: string; data?: unknown[] }[] } })?.data?.metrics
   const metricNames = Array.isArray(rawMetrics) ? rawMetrics.map((m) => `${m?.name ?? '?'}(${m?.data?.length ?? 0})`) : []
   const mapped = parseHealthWebhookPayload(req.body)
-  console.log(`[health-webhook] ${email}: groups=${metricNames.join(', ') || 'none'} matched=${Object.keys(mapped).join(',') || 'none'}`)
-  if (!Object.keys(mapped).length) {
-    res.status(200).json({
-      ok: true, imported: 0,
-      hint: 'Tidak ada metrik yang cocok — kemungkinan belum ada data untuk rentang tanggal yang dipilih (mis. VO2max/berat badan tidak tercatat setiap hari). Coba perluas Date Range ke "Last 7 Days".',
-      metricsReceived: metricNames,
-    })
-    return
-  }
+  const workoutCount = Array.isArray((req.body as { data?: { workouts?: unknown[] } })?.data?.workouts)
+    ? (req.body as { data: { workouts: unknown[] } }).data.workouts.length
+    : 0
+  console.log(`[health-webhook] ${email}: groups=${metricNames.join(', ') || 'none'} workouts=${workoutCount} matched=${Object.keys(mapped).join(',') || 'none'}`)
+
   try {
+    // Series FIRST, and unconditionally. Health Auto Export sends one Data Type
+    // per automation, so a "Workouts" automation arrives with data.workouts and
+    // NO data.metrics at all. Bailing out on an empty metric map would have
+    // thrown that entire payload away — including the densest heart-rate data
+    // the phone can produce.
+    const hrBaru = appendHrSamples(email, extractHeartRateSeries(req.body))
+    const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
+
+    if (!Object.keys(mapped).length) {
+      res.status(200).json({
+        ok: true,
+        imported: 0,
+        hrSamples: hrBaru,
+        sleepNights: tidurBaru,
+        hint: hrBaru > 0 || tidurBaru > 0
+          ? 'Tidak ada metrik ringkas yang cocok, namun deret sampel tetap tersimpan — ini normal untuk otomatisasi bertipe Workouts.'
+          : 'Tidak ada metrik yang cocok — kemungkinan belum ada data untuk rentang tanggal yang dipilih (mis. VO2max/berat badan tidak tercatat setiap hari). Coba perluas Date Range ke "Last 7 Days".',
+        metricsReceived: metricNames,
+      })
+      return
+    }
+
     // Store the latest values AND auto-append a dated snapshot to the trend
     // history + stamp the sync time, so device data is processed and shown on
     // the website automatically with no manual save.
     const profile = recordDeviceHealthSync(email, mapped, 'Apple Watch')
-    // Keep the SAMPLES too, not just the latest value — that is what makes a
-    // heart-rate log and a per-stage sleep view possible at all.
-    const hrBaru = appendHrSamples(email, extractHeartRateSeries(req.body))
-    const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
     res.json({
       ok: true,
       imported: Object.keys(mapped).length,
