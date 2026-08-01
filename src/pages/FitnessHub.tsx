@@ -19,6 +19,7 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
       { to: '/athlete', name: 'Athlete', what: 'Your training dashboard — HR zones, load, GPS runs', kw: 'athlete dashboard heart rate zones gps run', tag: 'Core' },
       { to: '/workout', name: 'Workout', what: 'Guided sessions with movement-form demo videos', kw: 'workout exercise session movement demo', tag: 'Core' },
       { to: '/training-plan', name: 'AI Program', what: 'A structured, adaptive training plan', kw: 'training plan program ai schedule periodization', tag: 'Core' },
+      { to: '/lari-sepeda-renang', name: 'Lari, Sepeda, Renang', what: 'Power zones, swim CSS, speed work and posture across three sports', kw: 'lari sepeda renang cycling swimming triathlon ftp watt power zone css critical swim speed cadence bike fit kecepatan speed', tag: 'Core' },
       { to: '/latihan-dasar', name: 'Latihan Dasar & Postur', what: 'Running pace zones, push/pull/sit-up progressions, posture correction', kw: 'lari run pace easy tempo interval long push up pull up sit up kalistenik calisthenics postur posture vdot', tag: 'Core' },
       { to: '/fitness-test', name: 'Fitness Test', what: 'AI form & posture check from a photo of your movement', kw: 'fitness test form posture ai photo injury risk', tag: 'AI' },
     ],

@@ -47,6 +47,7 @@ const RealisticHealth = lazy(() => import('./pages/RealisticHealth').then((m) =>
 const MoneyHub = lazy(() => import('./pages/MoneyHub').then((m) => ({ default: m.MoneyHub })))
 const GymEquipment = lazy(() => import('./pages/GymEquipment').then((m) => ({ default: m.GymEquipment })))
 const BaseTraining = lazy(() => import('./pages/BaseTraining').then((m) => ({ default: m.BaseTraining })))
+const MultiSport = lazy(() => import('./pages/MultiSport').then((m) => ({ default: m.MultiSport })))
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
@@ -221,6 +222,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/keuangan" element={<MoneyHub />} />
               <Route path="/alat-fitness" element={<GymEquipment />} />
               <Route path="/latihan-dasar" element={<BaseTraining />} />
+              <Route path="/lari-sepeda-renang" element={<MultiSport />} />
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLab />} />
