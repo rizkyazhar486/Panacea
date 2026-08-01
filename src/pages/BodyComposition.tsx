@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
+import { useVitals } from '../lib/useVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../components/icons'
 import { getHealthCache, pushBiometrics } from '../lib/profile'
 
@@ -232,6 +233,8 @@ export function BodyComposition() {
         <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
       </div>
 
+      <ScaleMeasurements />
+
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
@@ -334,6 +337,95 @@ export function BodyComposition() {
         not a substitute for clinical measurement. Data is stored on your device (offline-ready).
       </div>
     </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Angka yang HANYA diberikan alat komposisi tubuh (InBody, timbangan BIA), dan
+// tidak dimiliki jam tangan maupun perhitungan dari lingkar badan. Ditampilkan
+// terpisah supaya jelas asalnya dari pengukuran, bukan dari rumus.
+// ─────────────────────────────────────────────────────────────────────────────
+function ScaleMeasurements() {
+  const v = useVitals()
+  const rows: { label: string; nilai?: number; satuan: string; rujukan: string; arti: string }[] = [
+    {
+      label: 'Air tubuh', nilai: v.bodyWaterPct, satuan: '%',
+      rujukan: 'Umumnya 50-65% pada pria dan 45-60% pada wanita',
+      arti: 'Sebagian besar tubuh adalah air, dan sebagian besar air itu berada DI DALAM otot. Karena itu persentase air yang rendah biasanya menandakan massa otot yang kurang, bukan sekadar kurang minum — dan angkanya turun-naik beberapa persen sepanjang hari mengikuti minum, keringat, serta makanan asin.',
+    },
+    {
+      label: 'Protein', nilai: v.proteinPct, satuan: '%',
+      rujukan: 'Umumnya sekitar 16-20% dari berat badan',
+      arti: 'Perkiraan bagian tubuh yang berupa protein struktural, hampir seluruhnya otot dan organ. Nilai rendah biasanya berjalan seiring massa otot yang rendah.',
+    },
+    {
+      label: 'Massa otot', nilai: v.musclePct, satuan: '%',
+      rujukan: 'Bergantung usia dan jenis kelamin; dinilai bersama berat badan, bukan sendirian',
+      arti: 'Persentase, bukan kilogram — sehingga ia bisa NAIK hanya karena lemak berkurang meskipun ototnya tidak bertambah sedikit pun. Untuk menilai kemajuan latihan, massa otot dalam kilogram lebih jujur daripada persentasenya.',
+    },
+    {
+      label: 'Massa tulang', nilai: v.boneMassKg, satuan: 'kg',
+      rujukan: 'Umumnya 2-4 kg; berubah sangat lambat',
+      arti: 'Perkiraan dari impedansi listrik, BUKAN pengukuran kepadatan tulang. Angka ini tidak dapat dipakai untuk menilai osteoporosis — itu memerlukan pemeriksaan DEXA. Perubahan dari minggu ke minggu pada alat ini hampir selalu berupa derau pengukuran.',
+    },
+    {
+      label: 'Lemak bawah kulit', nilai: v.subcutaneousFatKg, satuan: 'kg',
+      rujukan: 'Tidak ada nilai baku — berguna dibandingkan dengan diri sendiri',
+      arti: 'Lemak yang berada tepat di bawah kulit. Berbeda dari lemak viseral, lemak jenis ini jauh lebih kecil kaitannya dengan risiko penyakit jantung dan metabolik.',
+    },
+    {
+      label: 'Lemak viseral', nilai: v.visceralFatIndex ?? v.visceralFatLevel, satuan: '',
+      rujukan: 'Umumnya dianggap baik pada nilai di bawah 10 pada skala alat ini',
+      arti: 'Lemak yang mengelilingi organ dalam perut. INILAH jenis lemak yang paling berkaitan dengan diabetes tipe 2, hipertensi, dan penyakit jantung — dan ia bisa tinggi meskipun berat badan tampak normal. Yang paling menurunkannya adalah aktivitas aerobik teratur dan pengurangan gula sederhana, bukan latihan perut.',
+    },
+    {
+      label: 'Laju metabolisme basal', nilai: v.bmrKcal, satuan: 'kkal/hari',
+      rujukan: 'Kebutuhan tubuh saat istirahat penuh',
+      arti: 'Energi yang dipakai tubuh untuk hidup saja tanpa bergerak. Menjadi dasar perhitungan kebutuhan kalori harian, dan turun ketika massa otot berkurang — inilah salah satu alasan diet ketat berulang menjadi makin sulit setiap kali diulang.',
+    },
+    {
+      label: 'Total energi harian', nilai: v.amrKcal, satuan: 'kkal/hari',
+      rujukan: 'Basal ditambah aktivitas',
+      arti: 'Perkiraan kebutuhan kalori sehari termasuk aktivitas. Angka dari alat ini merupakan perkiraan kasar; yang lebih dapat dipercaya adalah menyesuaikannya berdasarkan perubahan berat badan nyata selama dua sampai tiga minggu.',
+    },
+    {
+      label: 'Usia tubuh', nilai: v.bodyAge, satuan: 'tahun',
+      rujukan: 'Dibandingkan dengan usia sebenarnya',
+      arti: 'Bukan besaran medis. Alat menghitungnya dari komposisi tubuh memakai rumus tertutup yang berbeda-beda antarmerek, sehingga tidak dapat dibandingkan antaralat dan tidak bermakna secara klinis. Berguna sebagai penyemangat, tidak lebih.',
+    },
+  ]
+
+  const ada = rows.filter((r) => r.nilai != null && Number.isFinite(r.nilai))
+  if (!ada.length) return null
+
+  return (
+    <Card className="!p-5">
+      <SectionTitle
+        icon={<IconActivity size={20} />}
+        title="Dari alat komposisi tubuh"
+        subtitle="Angka yang hanya diberikan InBody maupun timbangan BIA — bukan hasil rumus"
+      />
+      <div className="mt-3 space-y-2">
+        {ada.map((r) => (
+          <div key={r.label} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-bold text-ink dark:text-white">{r.label}</span>
+              <span className="text-lg font-extrabold tabular-nums text-brand-dark">
+                {r.nilai}{r.satuan ? ` ${r.satuan}` : ''}
+              </span>
+            </div>
+            <div className="text-[11px] text-neutral-400">{r.rujukan}</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{r.arti}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
+        Alat BIA mengukur hambatan listrik lalu MEMPERKIRAKAN komposisi dari situ, sehingga hasilnya
+        dipengaruhi status cairan, makan, olahraga, dan waktu pengukuran. Agar dapat dibandingkan,
+        ukur pada keadaan yang sama: pagi hari, setelah buang air kecil, sebelum makan dan minum,
+        dan sebelum berolahraga.
+      </p>
+    </Card>
   )
 }
 

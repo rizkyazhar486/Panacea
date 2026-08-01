@@ -49,6 +49,7 @@ const GymEquipment = lazy(() => import('./pages/GymEquipment').then((m) => ({ de
 const BaseTraining = lazy(() => import('./pages/BaseTraining').then((m) => ({ default: m.BaseTraining })))
 const MultiSport = lazy(() => import('./pages/MultiSport').then((m) => ({ default: m.MultiSport })))
 const GaitAnalysis = lazy(() => import('./pages/GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
+const WorkoutHistory = lazy(() => import('./pages/WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
@@ -225,6 +226,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/latihan-dasar" element={<BaseTraining />} />
               <Route path="/lari-sepeda-renang" element={<MultiSport />} />
               <Route path="/analisis-gerak" element={<GaitAnalysis />} />
+              <Route path="/riwayat-latihan" element={<WorkoutHistory />} />
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLab />} />
