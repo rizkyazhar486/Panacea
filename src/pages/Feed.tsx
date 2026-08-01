@@ -20,6 +20,7 @@ import { getDemo } from '../lib/profile'
 import { Portal } from '../components/Portal'
 import type { SocialPost, PostType, Role, ProfileEdit, Story, MoodEntry, HealthGoal } from '../lib/types'
 import { useVitals, useVitalField } from '../lib/useVitals'
+import { useLiveHeartRate } from '../lib/useLiveHeartRate'
 import { vitalsAge } from '../lib/healthVitals'
 
 /* ═══════════════════════════════════════════════════════
@@ -386,7 +387,13 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
   const [pts, setPts] = useState<GpsPoint[]>([])
   const [plan, setPlan] = useState<Waypoint[]>([])
   const [dur, setDur] = useState(0)
-  const [hr, setHr] = useState(0)
+  // Heart rate no longer lives in a local useState that only the manual input
+  // could write to — it comes from the shared source (BLE strap > watch sync >
+  // typed), which is why a run used to record "No HR data" even with a watch on.
+  const liveHr = useLiveHeartRate()
+  const restingHr = useVitals().restingHr ?? 0
+  const hr = liveHr.bpm
+  const setHr = liveHr.setManual
   const [gpsErr, setGpsErr] = useState('')
   const [open, setOpen] = useState(false) // collapsed by default — logo only, expand on tap
   const wRef = useRef<number | null>(null)
@@ -417,8 +424,10 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
     tRef.current = window.setInterval(() => setDur((Date.now() - sRef.current) / 1000), 1000)
     if (!navigator.geolocation) { setGpsErr('GPS is not supported by this browser.'); return }
     wRef.current = navigator.geolocation.watchPosition(
+      // Read HR through the ref: this callback lives for the whole run, so a
+      // captured `hr` would freeze at whatever it was when the run started.
       pos => setPts(p => {
-        return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]
+        return [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: liveHr.bpmRef.current || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]
       }),
       err => setGpsErr('GPS error: ' + err.message),
       { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
@@ -429,7 +438,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
     setMode('tracking'); const off = dur * 1000; sRef.current = Date.now() - off
     tRef.current = window.setInterval(() => setDur((Date.now() - sRef.current) / 1000), 1000)
     wRef.current = navigator.geolocation.watchPosition(
-      pos => setPts(p => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: hr || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]),
+      pos => setPts(p => [...p, { lat: pos.coords.latitude, lng: pos.coords.longitude, t: Date.now(), hr: liveHr.bpmRef.current || undefined, spd: pos.coords.speed ?? undefined, alt: pos.coords.altitude ?? undefined }]),
       () => {}, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
     )
   }
@@ -588,7 +597,9 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               </p>
             </div>
 
-            <HealthMetricsBar weight={weight} height={height} age={age} gender={gender as 'M' | 'F'} hrRest={hr || undefined} />
+            {/* VO2max needs RESTING heart rate — feeding it the live running HR
+                produced a nonsense number. Use the synced resting HR instead. */}
+            <HealthMetricsBar weight={weight} height={height} age={age} gender={gender as 'M' | 'F'} hrRest={restingHr || undefined} />
           </>
         )}
       </div>
@@ -596,11 +607,39 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
       {/* Controls */}
       <div className="p-5 space-y-3">
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
-          <div className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-2.5">
-            <span className="text-lg">💗</span>
-            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Heart Rate</div></div>
-            <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
-            <span className="text-[10px] text-neutral-400">bpm</span>
+          <div className="rounded-xl bg-neutral-50 px-4 py-2.5 space-y-2">
+            <div className="flex items-center gap-3">
+              <span className={'text-lg ' + (liveHr.isLive ? 'animate-pulse' : '')}>💗</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Heart Rate</div>
+                <div className="truncate text-[9px] text-neutral-500">{liveHr.label}</div>
+              </div>
+              <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr || ''} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
+              <span className="text-[10px] text-neutral-400">bpm</span>
+            </div>
+            {liveHr.source !== 'ble' && (
+              liveHr.bleSupported ? (
+                <button onClick={liveHr.connectStrap} disabled={liveHr.bleStatus === 'connecting'}
+                  className="w-full rounded-lg border border-brand/30 bg-brand/5 px-3 py-1.5 text-[10px] font-bold text-brand-dark disabled:opacity-50">
+                  {liveHr.bleStatus === 'connecting' ? 'Searching for strap…'
+                    : liveHr.bleStatus === 'error' ? 'Connection failed — tap to retry'
+                      : '⌚ Connect Bluetooth HR strap for live data'}
+                </button>
+              ) : (
+                // Not a bug the user can fix by tapping: iOS Safari ships no Web
+                // Bluetooth, so say what actually works instead of a dead button.
+                <p className="text-[9px] leading-relaxed text-neutral-400">
+                  This browser cannot read Bluetooth heart-rate straps — iPhone browsers do not support it at all.
+                  Sync your watch through <a href="#/health-data" className="font-bold text-brand-dark underline">Data Kesehatan</a> to
+                  fill HR automatically, or type your bpm above.
+                </p>
+              )
+            )}
+            {liveHr.source === 'ble' && (
+              <button onClick={liveHr.disconnectStrap} className="w-full rounded-lg border border-neutral-200 px-3 py-1.5 text-[10px] font-bold text-neutral-500">
+                Disconnect strap
+              </button>
+            )}
           </div>
         )}
 
