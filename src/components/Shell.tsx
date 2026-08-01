@@ -69,7 +69,7 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 
 // Sidebar groups (accordion sections) — order defines display order. Grouped by
 // intent with short labels so the menu stays scannable and icon-led.
-const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitness', 'Clinical & AI', 'Services', 'Content', 'Manage', 'Account']
+const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitness', 'Clinical & AI', 'Services', 'Money', 'Content', 'Manage', 'Account']
 
 const nav: Nav[] = [
   // Beranda (rendered as plain links — the most-used, social-first destinations)
@@ -85,29 +85,14 @@ const nav: Nav[] = [
   // places at once.
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/sehat-sibuk', label: 'Sehat Tapi Sibuk', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/pasar', label: 'Data Pasar', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/macro-lab', label: 'Macro Lab', icon: IconToken, roles: ['owner', 'dokter', 'pasien'], group: 'Health' },
-  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Health' },
-  { to: '/latihan-dasar', label: 'Latihan Dasar & Postur', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/lari-sepeda-renang', label: 'Lari, Sepeda, Renang', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/analisis-gerak', label: 'Analisis Gerak', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/riwayat-latihan', label: 'Riwayat Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/log-detak-jantung', label: 'Log Detak Jantung', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/pola-tidur', label: 'Pola Tidur', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/fisiologi-latihan', label: 'Fisiologi Latihan', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/alat-endurance', label: 'Alat Endurance', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/pelacak-klinis', label: 'Pelacak Klinis', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/alat-fitness', label: 'Alat Fitness & Hyrox', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/sports-lab', label: 'Sports Lab', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/connect', label: 'Connect', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/pasar', label: 'Data Pasar', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
-  { to: '/carbon-diet', label: 'Carbon-Footprint Diet', icon: IconLeaf, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/hydration', label: 'Hydration Calculator', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Health' },
+  { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
+  { to: '/fitness-hub', label: '🏃 Latihan & Performa (semua)', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/wellness-hub', label: '✨ More health & screening tools', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging — trimmed to the flagship entries; the rest (breathwork,
   // gratitude, sleep debt, thermal therapy, ikigai, life compass, resilience

@@ -55,6 +55,9 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     feats: [
       { to: '/fasting', name: 'Metabolic Fasting', what: 'Time-restricted eating window & metabolic phases', kw: 'fasting intermittent eating window metabolic autophagy', tag: 'Metabolic' },
       { to: '/thermal-therapy', name: 'Thermal Therapy', what: 'Sauna & cold-exposure protocols with the evidence', kw: 'sauna cold plunge heat ice thermal recovery', tag: 'New' },
+      { to: '/macro-lab', name: 'Macro Lab', what: 'Macronutrient targets and meal composition', kw: 'macro protein karbohidrat lemak gizi makro kalori', tag: 'Wellness' },
+      { to: '/sehat-sibuk', name: 'Sehat Tapi Sibuk', what: 'Health habits that fit a packed schedule', kw: 'sibuk busy habit kebiasaan praktis waktu terbatas', tag: 'Wellness' },
+      { to: '/carbon-diet', name: 'Carbon-Footprint Diet', what: 'Dietary choices weighed by carbon footprint', kw: 'carbon jejak karbon diet lingkungan iklim makanan', tag: 'Wellness' },
       { to: '/nutrition', name: 'Nutrition & BMR', what: 'Calories, macros, and metabolic rate', kw: 'nutrition calorie macro bmr tdee diet', tag: 'Wellness' },
       { to: '/hydration', name: 'Hydration', what: 'Your daily water target', kw: 'water hydration drink fluid', tag: 'Wellness' },
       { to: '/alcohol', name: 'Alcohol Unit & BAC Estimator', what: 'Standard drinks and an educational BAC estimate', kw: 'alcohol drink bac widmark unit', tag: 'Wellness' },
