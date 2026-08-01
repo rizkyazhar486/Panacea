@@ -630,7 +630,8 @@ export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi
   },
   {
     fitur: 'Body Battery dan pemantauan stres sepanjang hari',
-    kenapa: 'Ini SATU-SATUNYA yang benar-benar tidak dibuat. Ia dibangun dari variabilitas denyut yang diukur terus-menerus; Apple Watch mencatatnya hanya beberapa kali sehari dan tidak teratur, sehingga kurva sepanjang hari tidak bisa dibentuk tanpa mengarang bagian di antaranya. Kesiapan latihan di halaman ini menjawab pertanyaan yang mirip dari data yang memang ada.',
-    syarat: 'Perangkat yang merekam variabilitas denyut secara berkelanjutan.',
+    kenapa: 'Garmin membangunnya dari variabilitas denyut yang diukur terus-menerus, dan Apple Watch tidak merekamnya seperti itu. Jalan keluarnya bukan mengarang kurva, melainkan memakai posisi denyut terhadap cadangan denyut — data yang memang ada — dan menolak menjembatani celah lebih dari 30 menit. Hasilnya kurva yang jujur terputus saat data memang tidak ada, lengkap dengan angka cakupannya.',
+    syarat: 'Deret denyut. Makin rapat sampelnya, makin utuh kurvanya.',
+    adaDi: '/body-battery',
   },
 ]

@@ -123,15 +123,13 @@ const nav: Nav[] = [
   { to: '/sports-scores', label: 'Live Scores', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Fitness' },
   // Klinis & AI
   { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  { to: '/trials', label: 'Clinical Trials Finder', icon: IconSearch, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
   { to: '/second-opinion', label: 'Second Opinion', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical', label: 'Clinical Data', icon: IconHeart, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/emr', label: 'AI-EMR', icon: IconEMR, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
-  { to: '/longevity-curriculum', label: 'Longevity Curriculum', icon: IconHeart, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Clinical & AI' },
-  { to: '/sexual-health', label: 'Sexual Health & OB-GYN', icon: IconUsers, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
+  { to: '/clinical-hub', label: '🩺 More clinical & AI tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   // Layanan
   { to: '/consult', label: 'Consultation', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/hospitals', label: 'Health Facilities', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Services' },
