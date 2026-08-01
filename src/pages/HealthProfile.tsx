@@ -8,6 +8,8 @@ import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
 import { mergeVitals } from '../lib/healthVitals'
+import { parseWorkouts, parseHrNotifications } from '../lib/workoutImport'
+import { mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import { diagnose, type SyncDiagnosis } from '../lib/syncDiagnostics'
 import { generateInsights } from '../lib/healthInsights'
 import { benchmarkVo2max, benchmarkRestingHr, benchmarkSleep, BENCHMARK_DISCLAIMER, type BenchmarkItem } from '../lib/benchmark'
@@ -156,16 +158,26 @@ export function HealthProfile() {
       // calculators, dashboards) prefills from this import immediately —
       // previously the data stopped here and the rest of the app kept its
       // hardcoded defaults.
-      mergeVitals({
-        vo2max: r.vo2max, restingHr: r.restingHr, hrvMs: r.hrvMs, sleepH: r.sleepH,
-        recoveryPct: r.recoveryPct, strain: r.strain,
-        weightKg: r.weightKg, bodyFatPct: r.bodyFatPct, leanMassKg: r.leanMassKg,
-        heartRate: r.heartRate, spo2Pct: r.spo2Pct, respRate: r.respRate,
-        systolic: r.systolic, diastolic: r.diastolic, bodyTempC: r.bodyTempC,
-        steps: r.steps, activeKcal: r.activeKcal, exerciseMin: r.exerciseMin, distanceKm: r.distanceKm,
-        source: r.source, measuredAt: r.measuredAt,
-      })
-      setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app. Review, then press Save.`)
+      // Spread rather than listing fields one by one: every field on
+      // ImportResult is a Vitals field, and the hand-written list silently
+      // dropped each newly-parsed metric until someone remembered to add it
+      // here too — which is how gait, running form and sleep stages stayed
+      // invisible after they were already being parsed correctly.
+      mergeVitals({ ...r, source: r.source, measuredAt: r.measuredAt })
+
+      // Workouts and heart-rate notifications live in the same file but are not
+      // "latest value of a metric", so they go to their own store instead of
+      // being flattened away.
+      const w = parseWorkouts(text)
+      const n = parseHrNotifications(text)
+      const wBaru = mergeWorkouts(w)
+      const nBaru = mergeHrNotifications(n)
+      const extra = [
+        wBaru ? `${wBaru} latihan baru` : '',
+        nBaru ? `${nBaru} peringatan denyut` : '',
+      ].filter(Boolean).join(', ')
+
+      setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app.${extra ? ` Plus ${extra}.` : ''} Review, then press Save.`)
     } catch {
       setNote(''); setErr('Failed to read the file.')
     } finally {

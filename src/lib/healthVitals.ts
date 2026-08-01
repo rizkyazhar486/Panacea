@@ -52,6 +52,15 @@ export interface Vitals {
   bodyWaterL?: number
   visceralFatLevel?: number
   waistHipRatio?: number
+  bodyWaterPct?: number
+  proteinPct?: number
+  bonePct?: number
+  musclePct?: number
+  subcutaneousFatKg?: number
+  boneMassKg?: number
+  bodyAge?: number
+  amrKcal?: number
+  visceralFatIndex?: number
   // Gait quality
   walkingSpeedKmh?: number
   walkingAsymmetryPct?: number

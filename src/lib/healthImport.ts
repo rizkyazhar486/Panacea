@@ -37,6 +37,17 @@ export interface ImportResult {
   visceralFatLevel?: number
   waistHipRatio?: number
   bmrKcal?: number
+  // Smart-scale / BIA reports (MovingLife, Xiaomi-class scales) publish these
+  // as percentages of body mass rather than absolute kilograms.
+  bodyWaterPct?: number
+  proteinPct?: number
+  bonePct?: number
+  musclePct?: number
+  subcutaneousFatKg?: number
+  boneMassKg?: number
+  bodyAge?: number
+  amrKcal?: number
+  visceralFatIndex?: number
   // Sleep architecture. Total sleep alone hides the thing that actually
   // matters after night shifts: whether deep and REM were reached at all.
   sleepDeepH?: number
@@ -356,6 +367,21 @@ export function parseWearableJson(text: string, sourceHint?: 'WHOOP' | 'Garmin')
   else if (typeof sleepHrs === 'number') out.sleepH = sleepHrs
   out.weightKg = findKey(flat, [/weightkg/, /weightinkilograms/, /^weight$/])
   out.bodyFatPct = pct(findKey(flat, [/bodyfatpercentage/, /bodyfat/]))
+  // Body-composition scales (MovingLife and the Xiaomi-class devices behind it)
+  // report proportions of body mass that no other source gives us.
+  out.bodyWaterPct = findKey(flat, [/bodywaterpercentage/, /^bodywater$/, /totalbodywaterpct/])
+  out.proteinPct = findKey(flat, [/proteinpercentage/, /^protein$/])
+  out.bonePct = findKey(flat, [/bonepercentage/, /^bone$/])
+  out.musclePct = findKey(flat, [/musclepercentage/, /^muscle$/])
+  out.subcutaneousFatKg = findKey(flat, [/subcutaneousfat/])
+  out.boneMassKg = findKey(flat, [/bonemass/, /bonemineralcontent/])
+  out.bodyAge = findKey(flat, [/bodyage/, /metabolicage/])
+  out.bmrKcal = out.bmrKcal ?? findKey(flat, [/^bmr$/, /basalmetabolicrate/])
+  out.amrKcal = findKey(flat, [/^amr$/, /activemetabolicrate/])
+  out.visceralFatIndex = findKey(flat, [/visceralfatindex/, /visceralfatlevel/])
+  out.skeletalMuscleKg = findKey(flat, [/skeletalmusclemass/])
+  out.leanMassKg = out.leanMassKg ?? findKey(flat, [/leanbodymass/])
+  out.bmi = findKey(flat, [/^bmi$/, /bodymassindex/])
   return prune(out)
 }
 
@@ -404,6 +430,17 @@ export function parseInBodyCsv(text: string): ImportResult {
   out.waistHipRatio = val('waist hip ratio')
   // Soft lean mass is the closest InBody column to Apple's lean body mass.
   out.leanMassKg = val('soft lean mass')
+  out.boneMassKg = val('bone mineral content')
+  const tbw = val('total body water')
+  const berat = out.weightKg
+  // InBody gives body water in litres; the percentage is what scales report,
+  // so derive it rather than leaving the two sources incomparable.
+  if (tbw != null && berat != null && berat > 0) out.bodyWaterPct = +((tbw / berat) * 100).toFixed(1)
+  const protein = val('protein(kg)')
+  if (protein != null && berat != null && berat > 0) out.proteinPct = +((protein / berat) * 100).toFixed(1)
+  if (out.skeletalMuscleKg != null && berat != null && berat > 0) {
+    out.musclePct = +((out.skeletalMuscleKg / berat) * 100).toFixed(1)
+  }
 
   const ts = (row[dateIdx] || '').trim()
   if (/^\d{14}$/.test(ts)) {
