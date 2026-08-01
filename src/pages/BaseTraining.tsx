@@ -6,6 +6,10 @@ import {
   fmtPace, parsePace, trainingPaces, paceFromRun, weeklyTemplate,
   type RunType, type Ladder,
 } from '../lib/baseTraining'
+import {
+  MUSCLE_GROUPS, STRETCH_RULES, ROUTINES, RED_FLAGS, WEEKLY_TARGET_SEC,
+  stretchDose, fmtDur, type Wilayah,
+} from '../lib/stretching'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Latihan Dasar — lari, push-up, pull-up, sit-up, dan koreksi postur.
@@ -16,7 +20,7 @@ import {
 // Seluruh perhitungan berjalan offline.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Tab = 'lari' | 'kalistenik' | 'postur' | 'jadwal'
+type Tab = 'lari' | 'kalistenik' | 'postur' | 'peregangan' | 'jadwal'
 
 const ZONE_COLOR: Record<RunType, string> = {
   easy: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
@@ -46,6 +50,7 @@ export function BaseTraining() {
           ['lari', '🏃 Pace Lari'],
           ['kalistenik', '💪 Push/Pull/Sit-Up'],
           ['postur', '🧍 Koreksi Postur'],
+          ['peregangan', '🧘 Peregangan'],
           ['jadwal', '🗓️ Susunan Seminggu'],
         ] as [Tab, string][]).map(([k, label]) => (
           <button
@@ -63,6 +68,7 @@ export function BaseTraining() {
       {tab === 'lari' && <RunTab />}
       {tab === 'kalistenik' && <CalisthenicsTab />}
       {tab === 'postur' && <PostureTab />}
+      {tab === 'peregangan' && <StretchTab />}
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
@@ -365,6 +371,245 @@ function ScheduleTab() {
         <strong className="text-white"> kurangi jumlah sesi alih-alih memaksakan semuanya</strong> — berlatih dengan
         kurang tidur memberi hasil yang lebih buruk daripada berlatih lebih sedikit dengan tidur cukup.
       </p>
+    </Card>
+  )
+}
+
+// ─── Peregangan ─────────────────────────────────────────────────────────────
+// Disusun sebagai: aturan dulu, baru gerakan. Urutan ini disengaja — kesalahan
+// tersering bukan pada pemilihan gerakan melainkan pada waktu, dosis, dan rasa
+// yang dituju, sehingga daftar gerakan tanpa aturannya justru menyesatkan.
+
+const WILAYAH_LABEL: Record<Wilayah, string> = {
+  atas: 'Tubuh atas',
+  inti: 'Panggul & batang tubuh',
+  bawah: 'Tungkai',
+}
+
+function StretchTab() {
+  const [wilayah, setWilayah] = useState<Wilayah | 'semua'>('semua')
+  const [buka, setBuka] = useState<string | null>(MUSCLE_GROUPS[0].key)
+
+  const groups = useMemo(
+    () => (wilayah === 'semua' ? MUSCLE_GROUPS : MUSCLE_GROUPS.filter((g) => g.wilayah === wilayah)),
+    [wilayah],
+  )
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <SectionTitle icon={<IconActivity />} title="Empat hal yang menentukan peregangan berhasil atau sia-sia" />
+        <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+          Kesalahan tersering bukan pada memilih gerakan, melainkan pada
+          <strong className="text-white"> kapan</strong>,
+          <strong className="text-white"> seberapa lama</strong>, dan
+          <strong className="text-white"> seberapa kuat</strong> — ditambah satu hal yang hampir tidak pernah
+          disampaikan: <strong className="text-white">otot yang terasa kencang belum tentu otot yang memendek</strong>.
+          Otot yang lemah dan tertarik memanjang menimbulkan rasa kencang yang sama persis, dan meregangkannya lebih
+          jauh justru memperburuk keadaan.
+        </p>
+        <div className="space-y-3 mt-3">
+          {STRETCH_RULES.map((r) => (
+            <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+              <div className="text-sm font-semibold text-white">{r.judul}</div>
+              <p className="text-sm text-slate-400 mt-1 leading-relaxed">{r.isi}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <DoseCalculator />
+
+      <Card>
+        <SectionTitle icon={<IconTimer />} title="Rutin siap pakai" subtitle="Empat waktu yang berbeda menuntut jenis peregangan yang berbeda" />
+        <div className="space-y-3 mt-2">
+          {ROUTINES.map((r) => (
+            <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="font-semibold text-white text-sm">{r.nama}</span>
+                <Badge>{r.durasi}</Badge>
+              </div>
+              <div className="text-xs text-slate-500 mt-1">{r.kapan}</div>
+              <p className="text-sm text-slate-400 mt-1 leading-relaxed">{r.untuk}</p>
+              <ol className="mt-2 space-y-1">
+                {r.langkah.map((l, i) => (
+                  <li key={i} className="text-sm text-slate-300 flex gap-2">
+                    <span className="text-slate-600 tabular-nums">{i + 1}.</span>
+                    <span>{l}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle icon={<IconRun />} title="Per kelompok otot" subtitle="Posisi, di mana seharusnya terasa, dan kesalahan tersering" />
+
+        <div className="flex flex-wrap gap-2 mt-3">
+          {([['semua', 'Semua'], ['atas', 'Tubuh atas'], ['inti', 'Panggul & batang tubuh'], ['bawah', 'Tungkai']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setWilayah(k)}
+              className={`px-3 py-1 rounded-lg text-xs border ${wilayah === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-slate-400'}`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-2 mt-3">
+          {groups.map((g) => {
+            const terbuka = buka === g.key
+            return (
+              <div key={g.key} className="rounded-lg border border-white/10 bg-white/[0.03] overflow-hidden">
+                <button
+                  onClick={() => setBuka(terbuka ? null : g.key)}
+                  className="w-full text-left p-3 flex items-center gap-3"
+                >
+                  <span className="text-lg shrink-0">{g.ikon}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-semibold text-white text-sm">{g.nama}</span>
+                    <span className="block text-xs text-slate-500">{WILAYAH_LABEL[g.wilayah]} · {g.stretches.length} gerakan</span>
+                  </span>
+                  <span className="text-slate-500 text-xs shrink-0">{terbuka ? '▲' : '▼'}</span>
+                </button>
+
+                {terbuka && (
+                  <div className="px-3 pb-3 space-y-3">
+                    <div className="rounded-lg bg-white/[0.03] border border-white/10 p-3">
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Kenapa memendek</div>
+                      <p className="text-sm text-slate-300 mt-1 leading-relaxed">{g.kenapaTegang}</p>
+                      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mt-3">Akibatnya</div>
+                      <p className="text-sm text-slate-400 mt-1 leading-relaxed">{g.akibat}</p>
+                    </div>
+
+                    {g.stretches.map((st) => (
+                      <div key={st.nama} className="rounded-lg border border-white/10 p-3">
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                          <span className="font-semibold text-white text-sm">{st.nama}</span>
+                          <Badge>{st.durasi}</Badge>
+                        </div>
+                        <div className="text-xs text-slate-500 mt-0.5">{st.otot}</div>
+
+                        <ol className="mt-2 space-y-1">
+                          {st.posisi.map((l, i) => (
+                            <li key={i} className="text-sm text-slate-300 flex gap-2">
+                              <span className="text-slate-600 tabular-nums">{i + 1}.</span>
+                              <span>{l}</span>
+                            </li>
+                          ))}
+                        </ol>
+
+                        <div className="mt-2 rounded-md bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1.5">
+                          <span className="text-xs text-emerald-400/80">Seharusnya terasa di: </span>
+                          <span className="text-sm text-emerald-200">{st.terasaDi}</span>
+                        </div>
+
+                        <div className="mt-1.5 rounded-md bg-amber-500/10 border border-amber-500/25 px-2.5 py-1.5">
+                          <span className="text-xs text-amber-400/80">Kesalahan tersering: </span>
+                          <span className="text-sm text-amber-100/90">{st.salah}</span>
+                        </div>
+
+                        {st.hatiHati && (
+                          <div className="mt-1.5 rounded-md bg-rose-500/10 border border-rose-500/25 px-2.5 py-1.5">
+                            <span className="text-xs text-rose-400/80">Hati-hati: </span>
+                            <span className="text-sm text-rose-100/90">{st.hatiHati}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle icon={<IconHeart />} title="Berhenti meregang dan periksakan bila ada ini" />
+        <p className="text-sm text-slate-400 mt-2 leading-relaxed">
+          Tanda-tanda berikut bukan masalah kelenturan. Meregangkannya lebih jauh tidak menolong dan dapat
+          memperburuk keadaan.
+        </p>
+        <ul className="mt-2 space-y-1.5">
+          {RED_FLAGS.map((f) => (
+            <li key={f} className="text-sm text-rose-200/90 flex gap-2">
+              <span className="text-rose-500 shrink-0">•</span>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-slate-500 mt-3 leading-relaxed">
+          Isi halaman ini adalah edukasi latihan untuk orang sehat, bukan terapi untuk cedera maupun nyeri yang
+          sedang berlangsung.
+        </p>
+      </Card>
+    </div>
+  )
+}
+
+function DoseCalculator() {
+  const [hold, setHold] = useState('30')
+  const [reps, setReps] = useState('2')
+  const [sesi, setSesi] = useState('3')
+
+  const hasil = useMemo(
+    () => stretchDose(Number(hold), Number(reps), Number(sesi)),
+    [hold, reps, sesi],
+  )
+
+  const pct = hasil ? Math.min(100, (hasil.perMingguDetik / WEEKLY_TARGET_SEC) * 100) : 0
+
+  return (
+    <Card>
+      <SectionTitle
+        icon={<IconTimer />}
+        title="Cukupkah dosis peregangan Anda"
+        subtitle="Yang menentukan hasil adalah total waktu per otot per minggu, bukan kedalaman tarikan"
+      />
+
+      <div className="grid grid-cols-3 gap-3 mt-3">
+        <Field label="Tahan (detik)">
+          <input className={inputClass} value={hold} onChange={(e) => setHold(e.target.value)} inputMode="numeric" />
+        </Field>
+        <Field label="Ulangan">
+          <input className={inputClass} value={reps} onChange={(e) => setReps(e.target.value)} inputMode="numeric" />
+        </Field>
+        <Field label="Sesi/minggu">
+          <input className={inputClass} value={sesi} onChange={(e) => setSesi(e.target.value)} inputMode="numeric" />
+        </Field>
+      </div>
+
+      {hasil == null ? (
+        <p className="text-sm text-slate-500 mt-3">Isi ketiga kolom dengan angka lebih dari nol.</p>
+      ) : (
+        <div className="mt-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-sm text-slate-400">Per otot per minggu</span>
+            <span className={`text-lg font-semibold ${hasil.cukup ? 'text-emerald-300' : 'text-amber-300'}`}>
+              {fmtDur(hasil.perMingguDetik)}
+            </span>
+          </div>
+
+          <div className="h-2 rounded-full bg-white/10 overflow-hidden mt-2">
+            <div
+              className={`h-full rounded-full transition-all ${hasil.cukup ? 'bg-emerald-500' : 'bg-amber-500'}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <span>{fmtDur(hasil.perSesiDetik)} per sesi</span>
+            <span>ambang {fmtDur(WEEKLY_TARGET_SEC)}</span>
+          </div>
+
+          <p className={`text-sm mt-3 leading-relaxed ${hasil.cukup ? 'text-emerald-200/90' : 'text-amber-100/90'}`}>
+            {hasil.saran}
+          </p>
+        </div>
+      )}
     </Card>
   )
 }
