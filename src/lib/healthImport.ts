@@ -29,6 +29,44 @@ export interface ImportResult {
   bodyTempC?: number
   exerciseMin?: number
   distanceKm?: number
+  // Body composition beyond weight/fat — InBody and smart scales report these.
+  bmi?: number
+  heightCm?: number
+  skeletalMuscleKg?: number
+  bodyWaterL?: number
+  visceralFatLevel?: number
+  waistHipRatio?: number
+  bmrKcal?: number
+  // Sleep architecture. Total sleep alone hides the thing that actually
+  // matters after night shifts: whether deep and REM were reached at all.
+  sleepDeepH?: number
+  sleepRemH?: number
+  sleepCoreH?: number
+  sleepAwakeH?: number
+  // Gait quality — Apple derives these from the phone in a pocket. Asymmetry
+  // and double-support are the two the app never read despite being the ones
+  // that speak to posture and fall risk.
+  walkingSpeedKmh?: number
+  walkingAsymmetryPct?: number
+  walkingDoubleSupportPct?: number
+  walkingStepLengthCm?: number
+  stairSpeedUpMs?: number
+  stairSpeedDownMs?: number
+  sixMinWalkM?: number
+  // Running form.
+  runningPowerW?: number
+  runningSpeedKmh?: number
+  runningStrideLengthM?: number
+  runningGroundContactMs?: number
+  runningVerticalOscCm?: number
+  // Other daily signals.
+  cardioRecoveryBpm?: number
+  flightsClimbed?: number
+  standHours?: number
+  daylightMin?: number
+  audioExposureDb?: number
+  headphoneAudioDb?: number
+  basalKcal?: number
   measuredAt?: string
   source?: string
 }
@@ -58,8 +96,33 @@ const HAE_FIELD: Record<string, keyof ImportResult> = {
   blood_pressure_diastolic: 'diastolic',
   step_count: 'steps',
   active_energy: 'activeKcal',
+  basal_energy_burned: 'basalKcal',
   apple_exercise_time: 'exerciseMin',
   distance_walking_running: 'distanceKm',
+  // The export actually written by current Health Auto Export versions uses
+  // this word order. Only the reversed spelling was mapped, so walking and
+  // running distance silently never imported from a real file.
+  walking_running_distance: 'distanceKm',
+  body_mass_index: 'bmi',
+  height: 'heightCm',
+  walking_speed: 'walkingSpeedKmh',
+  walking_asymmetry_percentage: 'walkingAsymmetryPct',
+  walking_double_support_percentage: 'walkingDoubleSupportPct',
+  walking_step_length: 'walkingStepLengthCm',
+  stair_speed_up: 'stairSpeedUpMs',
+  stair_speed_down: 'stairSpeedDownMs',
+  six_minute_walking_test_distance: 'sixMinWalkM',
+  running_power: 'runningPowerW',
+  running_speed: 'runningSpeedKmh',
+  running_stride_length: 'runningStrideLengthM',
+  running_ground_contact_time: 'runningGroundContactMs',
+  running_vertical_oscillation: 'runningVerticalOscCm',
+  cardio_recovery: 'cardioRecoveryBpm',
+  flights_climbed: 'flightsClimbed',
+  apple_stand_hour: 'standHours',
+  time_in_daylight: 'daylightMin',
+  environmental_audio_exposure: 'audioExposureDb',
+  headphone_audio_exposure: 'headphoneAudioDb',
   weight_body_mass: 'weightKg',
   body_mass: 'weightKg',
   body_fat_percentage: 'bodyFatPct',
@@ -113,31 +176,53 @@ export function parseHealthAutoExport(text: string): ImportResult {
     // than 24 hours. The server-side webhook parser applies the identical rule
     // so the same night yields the same number by either delivery path.
     if (name.startsWith('sleep')) {
+      // Treat 0 as "not recorded", not as a value: current exports write
+      // asleep:0 alongside a real totalSleep, and `??` would have accepted the
+      // zero and thrown the actual night away.
       const num = (k: string) => {
         const v = best![k]
-        return typeof v === 'number' && Number.isFinite(v) ? v : undefined
+        return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined
       }
       const raw = num('asleep') ?? num('totalSleep') ?? num('core')
       const units = typeof m?.units === 'string' ? m.units.toLowerCase() : ''
-      if (raw != null && raw > 0) {
-        out.sleepH = units.startsWith('hr') || units.startsWith('hour') ? +raw.toFixed(1)
-          : units.startsWith('min') ? +(raw / 60).toFixed(1)
-          : +(raw > 24 ? raw / 60 : raw).toFixed(1)
-      }
+      const toH = (v: number) =>
+        units.startsWith('hr') || units.startsWith('hour') ? +v.toFixed(1)
+          : units.startsWith('min') ? +(v / 60).toFixed(1)
+          : +(v > 24 ? v / 60 : v).toFixed(1)
+      if (raw != null) out.sleepH = toH(raw)
+      // Stages, when the watch recorded them. Total hours alone hides the
+      // thing that actually matters after night shifts — whether deep and REM
+      // were reached at all — so keep them rather than collapsing to one number.
+      const deep = num('deep'); if (deep != null) out.sleepDeepH = toH(deep)
+      const rem = num('rem'); if (rem != null) out.sleepRemH = toH(rem)
+      const core = num('core'); if (core != null) out.sleepCoreH = toH(core)
+      const awake = num('awake'); if (awake != null) out.sleepAwakeH = toH(awake)
       continue
     }
 
     const field = HAE_FIELD[name]
     if (!field) continue
-    const raw = haeValue(best)
+    let raw = haeValue(best)
     if (raw == null) continue
+
+    // UNITS ARE NOT FIXED. Apple exports energy in kilojoules on a metric
+    // locale and kilocalories elsewhere, and height in metres. Storing the raw
+    // number meant a 931 kJ run was recorded as 931 kcal — more than four times
+    // the real figure. Trust the declared `units` rather than the field name.
+    const units = typeof m?.units === 'string' ? m.units.toLowerCase() : ''
+    if ((field === 'activeKcal' || field === 'basalKcal') && units.startsWith('kj')) raw = raw / 4.184
+    if (field === 'heightCm' && (units === 'm' || units.startsWith('metre') || units.startsWith('meter'))) raw = raw * 100
+    if (field === 'distanceKm' && units === 'm') raw = raw / 1000
 
     // Apple stores proportions (0.98 = 98%) for saturation and body fat.
     if (field === 'spo2Pct' || field === 'bodyFatPct') out[field] = pct(raw) as never
     else if (field === 'hrvMs' || field === 'restingHr' || field === 'heartRate' || field === 'systolic'
-      || field === 'diastolic' || field === 'steps' || field === 'activeKcal' || field === 'exerciseMin') {
+      || field === 'diastolic' || field === 'steps' || field === 'activeKcal' || field === 'basalKcal'
+      || field === 'exerciseMin' || field === 'heightCm' || field === 'flightsClimbed' || field === 'standHours'
+      || field === 'daylightMin' || field === 'sixMinWalkM' || field === 'cardioRecoveryBpm'
+      || field === 'runningPowerW' || field === 'runningGroundContactMs') {
       out[field] = round(raw) as never
-    } else out[field] = (+raw.toFixed(1)) as never
+    } else out[field] = (+raw.toFixed(2)) as never
   }
 
   if (Number.isFinite(newest) && newest > 0) out.measuredAt = new Date(newest).toISOString()
@@ -274,6 +359,61 @@ export function parseWearableJson(text: string, sourceHint?: 'WHOOP' | 'Garmin')
   return prune(out)
 }
 
+
+// InBody CSV (H30 and similar). One row per measurement, newest not guaranteed
+// first, and unmeasured segments written as a bare "-" rather than left empty.
+// Date is a bare timestamp: 20260710091228 = 2026-07-10 09:12:28.
+//
+// Worth parsing separately rather than through the generic CSV path because
+// InBody is the only source here that measures body water and skeletal muscle
+// directly instead of estimating them — so when it disagrees with a smart
+// scale, InBody is the number to keep.
+export function parseInBodyCsv(text: string): ImportResult {
+  const lines = text.replace(/^\ufeff/, '').trim().split(/\r?\n/)
+  if (lines.length < 2) return {}
+  const header = splitCsv(lines[0]).map((h) => h.trim().toLowerCase())
+
+  const rows = lines.slice(1).map(splitCsv).filter((r) => r.some((c) => c.trim() !== ''))
+  if (!rows.length) return {}
+
+  const dateIdx = header.findIndex((h) => h.startsWith('date'))
+  const stamp = (r: string[]) => {
+    const raw = (r[dateIdx] || '').trim()
+    return /^\d{8,14}$/.test(raw) ? Number(raw) : 0
+  }
+  // Newest measurement wins regardless of file order.
+  const row = rows.reduce((a, b) => (stamp(b) >= stamp(a) ? b : a))
+
+  const val = (frag: string): number | undefined => {
+    const i = header.findIndex((h) => h.includes(frag))
+    if (i < 0) return undefined
+    const cell = (row[i] || '').trim()
+    if (!cell || cell === '-') return undefined // InBody writes "-" for segments it could not measure
+    const n = parseFloat(cell.replace(',', '.'))
+    return Number.isFinite(n) ? n : undefined
+  }
+
+  const out: ImportResult = { source: 'InBody' }
+  out.weightKg = val('weight(')
+  out.skeletalMuscleKg = val('skeletal muscle mass')
+  out.bodyFatPct = val('percent body fat')
+  out.bmi = val('bmi')
+  out.bmrKcal = val('basal metabolic rate')
+  out.bodyWaterL = val('total body water')
+  out.visceralFatLevel = val('visceral fat level')
+  out.waistHipRatio = val('waist hip ratio')
+  // Soft lean mass is the closest InBody column to Apple's lean body mass.
+  out.leanMassKg = val('soft lean mass')
+
+  const ts = (row[dateIdx] || '').trim()
+  if (/^\d{14}$/.test(ts)) {
+    const iso = `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}T${ts.slice(8, 10)}:${ts.slice(10, 12)}:${ts.slice(12, 14)}`
+    const t = Date.parse(iso)
+    if (!Number.isNaN(t)) out.measuredAt = new Date(t).toISOString()
+  }
+  return prune(out)
+}
+
 // Dispatch by file name / content sniffing.
 export function parseHealthFile(name: string, text: string): ImportResult {
   const lower = name.toLowerCase()
@@ -286,7 +426,13 @@ export function parseHealthFile(name: string, text: string): ImportResult {
     if (Object.keys(hae).filter((k) => k !== 'source').length) return hae
     return parseWearableJson(text)
   }
-  if (lower.endsWith('.csv') || text.includes(',')) return parseWhoopCsv(text)
+  if (lower.endsWith('.csv') || lower.endsWith('.tsv') || text.includes(',')) {
+    const head = text.slice(0, 2000).toLowerCase()
+    // Route by what the header actually contains — filename alone is unreliable
+    // because both apps export a plain .csv.
+    if (head.includes('skeletal muscle mass') || head.includes('inbody score')) return parseInBodyCsv(text)
+    return parseWhoopCsv(text)
+  }
   return {}
 }
 

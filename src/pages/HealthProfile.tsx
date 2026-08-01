@@ -225,7 +225,7 @@ export function HealthProfile() {
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · WHOOP .csv/.json · Garmin .json" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           <b>Apple Watch</b> can auto-sync below. <b>Garmin and WHOOP don't offer a live sync link</b>,
           so export your data from the Garmin Connect or WHOOP app and upload the file here — the
@@ -645,14 +645,15 @@ function SyncDiagnosticsCard() {
       ) : (
         <>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-            Di Health Auto Export, ekspor sebagai <b>JSON</b>, lalu <b>pilih filenya langsung</b> di bawah.
+            Pilih berkas ekspor apa pun secara langsung — <b>JSON</b> dari Health Auto Export,
+            <b> CSV</b> dari InBody maupun WHOOP, atau <b>XML</b> dari Apple Health.
             Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
           </p>
 
-          <input ref={fileRef} type="file" accept=".json,application/json,text/plain" className="hidden"
+          <input ref={fileRef} type="file" accept=".json,.csv,.xml,.txt,.tsv,application/json,text/csv,text/xml,text/plain" className="hidden"
             onChange={(e) => { onPickFile(e.target.files?.[0]); e.target.value = '' }} />
           <Button className="mt-2 w-full" onClick={() => fileRef.current?.click()}>
-            📄 Pilih file JSON dari iPhone
+            📄 Pilih berkas (.json · .csv · .xml)
           </Button>
           {fileNote && <p className="mt-1 text-[11px] text-neutral-500">{fileNote}</p>}
 
