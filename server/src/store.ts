@@ -578,9 +578,51 @@ export function getSettings(userId: string): Record<string, any> {
   if (!db.settings) db.settings = {}
   return db.settings[userId] ?? {}
 }
+/**
+ * Settings keys the SERVER owns. A client must never be able to write these.
+ *
+ * The settings blob does double duty: it holds ordinary user preferences AND
+ * entitlements granted by payment or by an admin. Because `PUT /api/settings`
+ * accepted whatever it was given, any logged-in user could grant themselves
+ * paid features and verified-professional status with a single request —
+ * confirmed by reproducing it against a running server before this fix.
+ *
+ * A denylist rather than an allowlist because the preference surface is large
+ * and still growing, so an allowlist would silently drop legitimate settings.
+ * ANY new entitlement or server-controlled flag must be registered here.
+ */
+export const SERVER_OWNED_SETTING_KEYS: readonly string[] = [
+  'clinicalCalcUnlocked',   // paid one-time unlock
+  'chronicLifetime',        // paid lifetime subscription
+  'chronicSubExpires',      // paid subscription expiry
+  'longevitySubExpires',    // paid subscription expiry
+  'strStatus',              // professional verification — gates AI-EMR
+  'hrZoneLastAlertAt',      // alert cooldown; client-writable = spam bypass
+  'sleepLastFiredOn',       // once-a-day guard; client-writable = repeat sends
+]
+
+/** Strips server-owned keys from a client-supplied settings patch. */
+export function stripServerOwnedSettings(prefs: Record<string, any>): {
+  safe: Record<string, any>
+  rejected: string[]
+} {
+  const safe: Record<string, any> = {}
+  const rejected: string[] = []
+  for (const [k, v] of Object.entries(prefs ?? {})) {
+    if (SERVER_OWNED_SETTING_KEYS.includes(k)) rejected.push(k)
+    else safe[k] = v
+  }
+  return { safe, rejected }
+}
+
 export function saveSettings(userId: string, prefs: Record<string, any>) {
+  if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) throw new Error('invalid settings payload')
   if (!db.settings) db.settings = {}
-  db.settings[userId] = { ...db.settings[userId], ...prefs }
+  const merged = { ...db.settings[userId], ...prefs }
+  // Settings ride the same JSON file as everything else; without a cap one
+  // account can bloat the whole store.
+  if (JSON.stringify(merged).length > 256 * 1024) throw new Error('settings too large')
+  db.settings[userId] = merged
   save()
 }
 
@@ -597,7 +639,11 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('invalid health profile payload')
   if (JSON.stringify(data).length > 64 * 1024) throw new Error('health profile payload too large')
   if (!db.healthProfiles) db.healthProfiles = {}
-  db.healthProfiles[email] = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
+  const merged = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
+  // The per-call cap alone is not enough: each save merges, so a loop of small
+  // payloads carrying fresh keys grows the stored object without limit.
+  if (JSON.stringify(merged).length > 256 * 1024) throw new Error('health profile too large')
+  db.healthProfiles[email] = merged
   save()
   return db.healthProfiles[email]
 }

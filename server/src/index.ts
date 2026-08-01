@@ -87,7 +87,7 @@ import {
   type Meet,
   type Club,
   type SecondOpinion,
-  appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts,
+  appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts, stripServerOwnedSettings,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -561,9 +561,21 @@ app.put('/api/settings', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const prefs = (req.body as { settings?: Record<string, unknown> }).settings ?? {}
   // Defensive: never persist the Anthropic API key server-side.
-  const { apiKey: _drop, ...safe } = prefs as Record<string, unknown>
-  saveSettings(u.id, safe)
-  res.json({ ok: true, settings: getSettings(u.id) })
+  const { apiKey: _drop, ...rest } = prefs as Record<string, unknown>
+  // Entitlements and alert-cooldown stamps live in this same blob, so an
+  // unfiltered write let a user grant themselves paid features and verified
+  // status. Only the server may set those.
+  const { safe, rejected } = stripServerOwnedSettings(rest)
+  if (rejected.length) {
+    console.warn(`[settings] ${u.email} attempted to write server-owned keys: ${rejected.join(', ')}`)
+  }
+  try {
+    saveSettings(u.id, safe)
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message })
+    return
+  }
+  res.json({ ok: true, settings: getSettings(u.id), rejected })
 })
 
 // Per-user health profile (manual / WHOOP / Apple Watch / other). Stored by
