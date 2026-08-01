@@ -44,10 +44,14 @@ function norm(name: string): string {
 // Health Auto Export dates look like "2026-07-05 07:00:00 +0700" (space-separated,
 // numeric offset, not ISO) — Date.parse() chokes on this. Reshape to ISO 8601.
 function parseExportDate(date: string): number {
-  const m = date.trim().match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})\s*(Z|[+-]\d{2}:?\d{2})?$/)
+  // Fractional seconds are optional: Health Auto Export writes
+  // "2026-08-01 07:00:00 +0700", but plain ISO 8601 from any other producer
+  // carries ".123" and was being silently dropped as unparseable.
+  const m = date.trim().match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?\s*(Z|[+-]\d{2}:?\d{2})?$/)
   if (!m) return NaN
-  const offset = !m[3] || m[3] === 'Z' ? 'Z' : m[3].length === 5 ? `${m[3].slice(0, 3)}:${m[3].slice(3)}` : m[3]
-  return Date.parse(`${m[1]}T${m[2]}${offset}`)
+  const raw = m[4]
+  const offset = !raw || raw === 'Z' ? 'Z' : raw.length === 5 ? `${raw.slice(0, 3)}:${raw.slice(3)}` : raw
+  return Date.parse(`${m[1]}T${m[2]}${m[3] ?? ''}${offset}`)
 }
 
 // Pick the sample with the latest parseable date. If none parse, assume the
