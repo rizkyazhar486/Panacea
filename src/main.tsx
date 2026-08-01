@@ -165,6 +165,8 @@ const PostureBreaks = lazy(() => import('./pages/PostureBreaks').then((m) => ({ 
 const PainDiary = lazy(() => import('./pages/PainDiary').then((m) => ({ default: m.PainDiary })))
 const OrganDonorCard = lazy(() => import('./pages/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 const FitnessHub = lazy(() => import('./pages/FitnessHub').then((m) => ({ default: m.FitnessHub })))
+const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
+const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
 const SleepToolkit = lazy(() => import('./pages/SleepToolkit').then((m) => ({ default: m.SleepToolkit })))
 const MovementToolkit = lazy(() => import('./pages/MovementToolkit').then((m) => ({ default: m.MovementToolkit })))
 const MindToolkit = lazy(() => import('./pages/MindToolkit').then((m) => ({ default: m.MindToolkit })))
@@ -282,6 +284,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/pain-diary" element={<PainDiary />} />
               <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/fitness-hub" element={<FitnessHub />} />
+              <Route path="/body-battery" element={<BodyBattery />} />
+              <Route path="/clinical-hub" element={<ClinicalHub />} />
               <Route path="/sleep-toolkit" element={<SleepToolkit />} />
               <Route path="/movement-toolkit" element={<MovementToolkit />} />
               <Route path="/mind-toolkit" element={<MindToolkit />} />

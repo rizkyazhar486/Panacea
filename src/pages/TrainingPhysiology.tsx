@@ -363,11 +363,11 @@ function KartuBelumDariJam() {
   return (
     <Card>
       <SectionTitle icon={<IconTimer />} title="Yang tidak datang dari jam tangan"
-        subtitle="Bukan berarti tidak ada — sebagian besar sudah dibuat sebagai alat tersendiri" />
+        subtitle="Bukan berarti tidak ada — semuanya sudah dibuat sebagai alat tersendiri" />
       <p className="mt-2 text-sm leading-relaxed text-slate-400">
         Yang berikut ini <strong className="text-white">tidak bisa dihitung dari ekspor Apple Watch</strong>,
-        dan itu tidak sama dengan tidak bisa dibuat. Sebagian besar hanya memerlukan masukannya sendiri,
-        dan sudah tersedia — tautannya ada di tiap baris.
+        dan itu tidak sama dengan tidak bisa dibuat. Masing-masing hanya memerlukan masukannya sendiri,
+        dan kini <strong className="text-white">semuanya sudah tersedia</strong> — tautannya ada di tiap baris.
       </p>
       <div className="mt-3 space-y-2">
         {UNAVAILABLE.map((u) => (
