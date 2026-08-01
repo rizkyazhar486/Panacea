@@ -34,22 +34,58 @@ const STEPS: { title: string; body: string; icon: React.ReactNode }[] = [
   {
     icon: <IconGauge size={22} />,
     title: '4. Paste the link & choose JSON format',
-    body: 'Paste the Private Sync Link from step 2 into the URL field. Make sure the export format is set to JSON (not CSV) — the Panaceamed server only reads this format.',
+    body: 'Paste the Private Sync Link into the URL field — ONCE, and nothing else. Clear the field first: if the box already contains part of the address, pasting on top produces a doubled URL like ".../api/health-webhook/https://.../api/health-webhook/TOKEN", which the server can never recognise, and every sync silently fails. Also set the export format to JSON, not CSV.',
   },
   {
     icon: <IconHeart size={22} />,
     title: '5. Select the metrics to sync',
-    body: 'Check: VO2 Max, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Weight Body Mass, Body Fat Percentage. You may check other metrics too, but only these six are read by Panaceamed for now.',
+    body: 'Simplest option: select all of them — Panaceamed now reads about forty, and anything it does not recognise is ignored rather than causing an error. At minimum check Heart Rate, Resting Heart Rate, Heart Rate Variability, Sleep Analysis, Step Count, Active Energy, VO2 Max, Weight & Body Mass, and Body Fat Percentage.',
   },
   {
     icon: <IconTimer size={22} />,
     title: '6. Turn on the automatic schedule',
-    body: 'Turn on "Automatically Export" and set a schedule (recommended: every morning). Health Auto Export will send your latest data to Panaceamed without you opening any app.',
+    body: 'Turn on "Automatically Export" and set the interval to every 5 minutes. Once a day is enough to keep a profile current, but it cannot produce a heart-rate log — the next step is what decides how much detail actually arrives.',
+  },
+  {
+    icon: <IconGauge size={22} />,
+    title: '7. Set the three options that decide data density',
+    body: 'These three matter more than everything above combined, and two of them default the wrong way. Turn Include Workouts ON, turn Aggregate Data OFF, and set the automation interval to 5 minutes. They are detailed in the card below.',
   },
   {
     icon: <IconCheck size={22} />,
-    title: '7. Run one manual test',
+    title: '8. Run one manual test',
     body: 'Press the "Export" button in the app to send data for the first time. Reopen Health Data in Panaceamed — your VO2max, HRV, and resting HR will fill in automatically within a few seconds.',
+  },
+]
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The three options that decide how much detail actually arrives. Given their
+// own card because two of them default the wrong way, and because someone can
+// otherwise sync faithfully for months and still receive one number an hour.
+// Label wording shifts a little between app versions, so each row says what to
+// look for rather than promising an exact screen position.
+// ─────────────────────────────────────────────────────────────────────────────
+const DENSITY: { name: string; set: string; where: string; why: string; ifWrong: string }[] = [
+  {
+    name: 'Include Workouts',
+    set: 'ON',
+    where: 'Inside the automation you created, in the same list of toggles as the metric selection. Sometimes labelled "Workouts" or "Export Workouts".',
+    why: 'The heart-rate series recorded during a workout is far denser than the daily summary — it is the closest thing to continuous data that exists. It also carries distance, pace, cadence and the post-session recovery series.',
+    ifWrong: 'Every run you do is never sent at all, even though your daily metrics arrive perfectly. This is the single most common reason a heart-rate log stays empty.',
+  },
+  {
+    name: 'Aggregate Data',
+    set: 'OFF',
+    where: 'In the automation settings, near the export format. May appear as "Aggregate" with a separate "Aggregation interval" underneath.',
+    why: 'When on, the app compresses samples into one Min/Average/Max row per interval. Turning it off sends the raw samples instead.',
+    ifWrong: 'You get one point per minute even though the watch recorded roughly every 5 seconds — about a twelvefold loss of detail during exercise. Measured on a real export: 60 seconds between points where 5 was available.',
+  },
+  {
+    name: 'Automation interval',
+    set: 'Every 5 minutes',
+    where: 'The schedule or cadence field of the automation, next to "Automatically Export".',
+    why: 'Controls how long data waits on the phone before being sent. It changes freshness, not density.',
+    ifWrong: 'At 15 minutes or once a day the log runs that far behind. Going below 5 minutes adds nothing, because Apple Health does not write faster than that anyway.',
   },
 ]
 
@@ -64,7 +100,15 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Where does the data go? Does Panaceamed store my raw file?',
-    a: 'No. The server only extracts six numbers (VO2max, resting HR, HRV, sleep, weight, body fat) from what the app sends, then discards the rest. No raw HealthKit file is stored.',
+    a: 'The raw file itself is never stored. The server extracts about forty metrics, plus your heart-rate samples, sleep stages and workout sessions, and keeps those — that is what makes the heart-rate log and the sleep breakdown possible. Everything else in the payload is discarded. You can wipe the stored series at any time from the Heart Rate Log page.',
+  },
+  {
+    q: 'Can it show my heart rate live, second by second?',
+    a: 'No, and no app can. Apple Watch does not record heart rate every second: roughly every 5 seconds during a workout, and only every few minutes at rest. That data simply does not exist in Apple Health, so nothing can export it. Combined with the minutes-scale automation interval, the honest ceiling is every sample Apple Health actually holds, arriving a few minutes late — a log, not a live monitor.',
+  },
+  {
+    q: 'I set everything up but the heart-rate log stays empty.',
+    a: 'Almost always one of two things. First, Include Workouts is off, so the densest data never leaves the phone. Second, the sync URL was pasted twice into the same field and is doubled — open the automation and read the whole URL to the end. The Sync Diagnostics tool on the Health Data page will tell you which metrics are actually arriving.',
   },
   {
     q: 'Can I use Android / Garmin / Samsung Health?',
@@ -117,6 +161,47 @@ export function HealthSyncTutorial() {
           </Card>
         ))}
       </div>
+
+      {/* The density options — deliberately separate from the numbered steps so
+          they cannot be skimmed past as just another checkbox. */}
+      <Card className="!p-5">
+        <SectionTitle
+          icon={<IconGauge size={20} />}
+          title="The three options that decide data density"
+          subtitle="More important than every other step combined — and two of them default the wrong way"
+        />
+        <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">
+          Steps 1–6 decide <b>whether</b> data arrives. These decide <b>how much</b>. Without them you can
+          sync faithfully for months and still receive one heart-rate number per hour.
+        </p>
+        <div className="mt-3 space-y-3">
+          {DENSITY.map((d) => (
+            <div key={d.name} className="rounded-xl border border-neutral-100 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm font-extrabold text-ink">{d.name}</span>
+                <span className="rounded-lg bg-brand-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-brand-dark">
+                  Set to {d.set}
+                </span>
+              </div>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
+                <span className="font-bold text-neutral-600">Where: </span>{d.where}
+              </p>
+              <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">
+                <span className="font-bold">Why: </span>{d.why}
+              </p>
+              <p className="mt-1 text-[12px] leading-relaxed text-rose-700">
+                <span className="font-bold">If left wrong: </span>{d.ifWrong}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+          After changing them, press Export once manually, then open{' '}
+          <Link to="/log-detak-jantung" className="font-bold text-brand-dark underline">Log Detak Jantung</Link>.
+          That page measures the real spacing between your samples and states it, so you can confirm the change
+          took effect instead of guessing.
+        </p>
+      </Card>
 
       {/* Live link preview, if logged in with backend enabled */}
       {backendEnabled && (
