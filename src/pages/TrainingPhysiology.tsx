@@ -131,6 +131,10 @@ export function TrainingPhysiology() {
             <Link to="/health-data/tutorial" className="font-semibold text-white underline">panduan sinkronisasi</Link>.
           </p>
         </Card>
+
+        {/* Justru orang yang belum punya data inilah yang paling perlu tahu
+            bahwa banyak alat lain sudah tersedia tanpa menunggu sinkronisasi. */}
+        <KartuBelumDariJam />
       </div>
     )
   }
@@ -343,21 +347,43 @@ export function TrainingPhysiology() {
         </p>
       </Card>
 
-      {/* Yang tidak bisa dibuat */}
-      <Card>
-        <SectionTitle icon={<IconTimer />} title="Yang tidak bisa dihitung dari Apple Watch"
-          subtitle="Disebutkan terbuka, supaya tidak disangka rusak" />
-        <div className="mt-2 space-y-2">
-          {UNAVAILABLE.map((u) => (
-            <div key={u.fitur} className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-              <div className="text-sm font-semibold text-slate-300">{u.fitur}</div>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{u.kenapa}</p>
-              <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Perlu: </span>{u.syarat}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <KartuBelumDariJam />
+
     </div>
+  )
+}
+
+/**
+ * Daftar hal yang tidak datang dari jam tangan, beserta tautan ke tempat hal
+ * itu SUDAH dibuat. Dipakai pada dua keadaan — halaman terisi maupun kosong —
+ * karena pengguna yang belum punya data justru paling perlu tahu bahwa banyak
+ * alat lain tidak menunggu sinkronisasi apa pun.
+ */
+function KartuBelumDariJam() {
+  return (
+    <Card>
+      <SectionTitle icon={<IconTimer />} title="Yang tidak datang dari jam tangan"
+        subtitle="Bukan berarti tidak ada — sebagian besar sudah dibuat sebagai alat tersendiri" />
+      <p className="mt-2 text-sm leading-relaxed text-slate-400">
+        Yang berikut ini <strong className="text-white">tidak bisa dihitung dari ekspor Apple Watch</strong>,
+        dan itu tidak sama dengan tidak bisa dibuat. Sebagian besar hanya memerlukan masukannya sendiri,
+        dan sudah tersedia — tautannya ada di tiap baris.
+      </p>
+      <div className="mt-3 space-y-2">
+        {UNAVAILABLE.map((u) => (
+          <div key={u.fitur} className={`rounded-lg border p-3 ${u.adaDi ? 'border-emerald-500/25 bg-emerald-500/[0.05]' : 'border-white/10 bg-white/[0.02]'}`}>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-semibold text-slate-200">{u.fitur}</span>
+              {u.adaDi
+                ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Sudah ada →</Link>
+                : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Belum dibuat</span>}
+            </div>
+            <p className="mt-1 text-sm leading-relaxed text-slate-400">{u.kenapa}</p>
+            <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Perlu: </span>{u.syarat}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
   )
 }
 

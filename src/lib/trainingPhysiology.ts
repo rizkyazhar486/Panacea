@@ -566,54 +566,71 @@ export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ket
 // ── 10. Yang sengaja tidak dibuat ───────────────────────────────────────────
 
 /**
- * Ditulis di dalam kode DAN ditampilkan di layar. Menyembunyikan keterbatasan
- * akan membuat pengguna mengira fitur ini rusak, padahal datanya memang tidak
- * pernah ada.
+ * Ditulis di dalam kode DAN ditampilkan di layar.
+ *
+ * Daftar ini pernah keliru: sebelumnya ia menyatakan sembilan hal "tidak bisa
+ * dibuat", padahal yang benar adalah "tidak bisa dihitung dari ekspor jam
+ * tangan". Keduanya tidak sama — sebagian besar hanya memerlukan masukannya
+ * sendiri, dan kini memang sudah dibuat. `adaDi` menunjuk ke tempatnya.
  */
-export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string }[] = [
+export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi?: string }[] = [
   {
-    fitur: 'Smart fueling / pengingat minum & karbohidrat saat lomba',
-    kenapa: 'Memerlukan sesi yang berjalan langsung di perangkat beserta rencana lomba dan laju keringat. Panaceamed membaca data SETELAH tersinkron beberapa menit kemudian, sehingga pengingat saat lomba tidak akan pernah tepat waktu.',
-    syarat: 'Aplikasi asli di jam tangan yang berjalan selama sesi.',
+    fitur: 'Smart fueling / rencana minum & karbohidrat',
+    kenapa: 'Tidak bisa dihitung dari ekspor jam tangan, karena ia merencanakan sesuatu yang BELUM terjadi. Karena itu dibuat sebagai alat tersendiri dengan masukan Anda: durasi, intensitas, suhu, dan laju keringat Anda sendiri.',
+    syarat: 'Masukan manual — tidak perlu sinkronisasi.',
+    adaDi: '/alat-endurance',
   },
   {
-    fitur: 'Power Guide untuk lomba bersepeda',
-    kenapa: 'Membutuhkan berkas rute beserta profil elevasi DAN FTP dari power meter. Ekspor Anda tidak memuat rute, dan tidak ada data daya sepeda sama sekali.',
-    syarat: 'Power meter sepeda dan berkas rute lomba.',
+    fitur: 'Power Guide untuk lomba',
+    kenapa: 'Ekspor Anda tidak memuat rute, jadi profil tanjakan tidak bisa dibaca otomatis. Segmen dimasukkan sendiri, lalu target watt per segmen dihitung dari persamaan tenaga bersepeda beserta perkiraan waktunya.',
+    syarat: 'Profil segmen dimasukkan sendiri, dan FTP.',
+    adaDi: '/alat-endurance',
   },
   {
     fitur: 'FTP sepeda dalam watt dan watt/kg',
-    kenapa: 'Apple Health Anda tidak memuat daya bersepeda. Daya LARI ada, namun hanya sebagai satu angka rata-rata per hari, bukan deret — sehingga usaha terbaik 20 menit tidak dapat dicari.',
-    syarat: 'Power meter sepeda, atau daya lari per detik.',
+    kenapa: 'Apple Health Anda tidak memuat daya bersepeda, sehingga FTP tidak dapat dibaca otomatis. Yang dibuat adalah penghitung dari protokol tes — 20 menit, 2×8 menit, maupun ramp — beserta tujuh zona daya.',
+    syarat: 'Hasil satu tes daya, dari power meter maupun trainer mana pun.',
+    adaDi: '/alat-endurance',
   },
   {
     fitur: 'Aklimatisasi panas dan ketinggian',
-    kenapa: 'Memerlukan suhu, kelembapan, dan ketinggian di setiap sesi. Ekspor Anda tidak menyertakan rute maupun data cuaca.',
-    syarat: 'Rute GPS beserta data cuaca dan elevasi.',
+    kenapa: 'Rute dan cuaca tidak ikut disinkronkan, jadi paparan tidak terdeteksi sendiri. Paparan dicatat sendiri (suhu dan lama, maupun ketinggian dan lama tinggal), lalu status aklimatisasi dihitung beserta peluruhannya.',
+    syarat: 'Catat paparan sendiri.',
+    adaDi: '/alat-endurance',
   },
   {
-    fitur: 'Body Battery dan pemantauan stres sepanjang hari',
-    kenapa: 'Dibangun dari variabilitas denyut yang diukur terus-menerus sepanjang hari. Apple Watch mencatat variabilitas hanya beberapa kali sehari dan tidak teratur, sehingga kurva sepanjang hari tidak dapat dibentuk tanpa mengarang bagian di antaranya.',
-    syarat: 'Perangkat yang merekam variabilitas denyut secara berkelanjutan.',
+    fitur: 'Catatan saturasi oksigen',
+    kenapa: 'Pemantauan BERKELANJUTAN tidak mungkin — Apple Watch hanya mengukur sesekali. Yang dibuat adalah catatan dan kecenderungan bacaan, lengkap dengan penyesuaian untuk ketinggian dan daftar sebab bacaan rendah yang keliru.',
+    syarat: 'Bacaan dari alat mana pun, dicatat sendiri.',
+    adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Pulse ox berkelanjutan',
-    kenapa: 'Yang tersedia adalah pengukuran sesekali, bukan pemantauan malam yang berkelanjutan.',
-    syarat: 'Perangkat dengan pengukuran saturasi berkelanjutan.',
-  },
-  {
-    fitur: 'Notifikasi EKG',
-    kenapa: 'Rekaman EKG Apple Watch tidak ikut dalam ekspor ini, dan penafsiran EKG merupakan wilayah alat kesehatan berizin — bukan sesuatu yang layak ditiru oleh perhitungan di sini.',
-    syarat: 'Lihat langsung di aplikasi Health; bawa hasilnya ke dokter bila ada temuan.',
+    fitur: 'Catatan hasil EKG',
+    kenapa: 'Penafsiran gelombang EKG merupakan wilayah alat kesehatan berizin dan tenaga medis, dan tidak ditiru di sini. Yang dibuat adalah catatan LABEL yang sudah dikeluarkan alat berizin beserta gejala yang menyertainya, sehingga polanya dapat dibawa saat berobat.',
+    syarat: 'Rekam di aplikasi bawaan jam tangan, lalu salin hasilnya.',
+    adaDi: '/pelacak-klinis',
   },
   {
     fitur: 'Penasihat jet lag',
-    kenapa: 'Memerlukan deteksi perjalanan lintas zona waktu dari GPS. Data lokasi tidak ikut disinkronkan.',
-    syarat: 'Data rute GPS.',
+    kenapa: 'Data lokasi tidak ikut disinkronkan, jadi perjalanan tidak terdeteksi sendiri. Zona waktu dimasukkan sendiri, lalu disusun rencana cahaya dan tidur harian sebelum, saat, dan sesudah terbang.',
+    syarat: 'Zona waktu asal dan tujuan.',
+    adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Pelacakan kehamilan dan fisiologi kursi roda',
-    kenapa: 'Bukan tidak mungkin, tetapi memerlukan model dan rujukan tersendiri yang tidak boleh diperkirakan dari data lari.',
-    syarat: 'Dibuat tersendiri bila memang dibutuhkan.',
+    fitur: 'Kehamilan dan aktivitas',
+    kenapa: 'Tidak berkaitan dengan data jam tangan sama sekali. Usia kehamilan dihitung dari hari pertama haid terakhir, dan panduan aktivitasnya memakai uji bicara — bukan zona denyut jantung, yang menyesatkan dalam kehamilan.',
+    syarat: 'Hari pertama haid terakhir.',
+    adaDi: '/pelacak-klinis',
+  },
+  {
+    fitur: 'Fisiologi kursi roda',
+    kenapa: 'Memerlukan rujukan tersendiri, bukan perkiraan dari data lari. Zona dihitung dari denyut puncak saat mendorong, disertai panduan menjaga bahu dan peringatan disrefleksia otonom.',
+    syarat: 'Denyut puncak yang diamati saat mendorong.',
+    adaDi: '/pelacak-klinis',
+  },
+  {
+    fitur: 'Body Battery dan pemantauan stres sepanjang hari',
+    kenapa: 'Ini SATU-SATUNYA yang benar-benar tidak dibuat. Ia dibangun dari variabilitas denyut yang diukur terus-menerus; Apple Watch mencatatnya hanya beberapa kali sehari dan tidak teratur, sehingga kurva sepanjang hari tidak bisa dibentuk tanpa mengarang bagian di antaranya. Kesiapan latihan di halaman ini menjawab pertanyaan yang mirip dari data yang memang ada.',
+    syarat: 'Perangkat yang merekam variabilitas denyut secara berkelanjutan.',
   },
 ]
