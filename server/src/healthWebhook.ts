@@ -130,3 +130,157 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
   }
   return out
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SERIES EXTRACTION
+//
+// Everything above answers "what is the latest value of each metric" and throws
+// every other sample away. That is the right shape for filling a profile form
+// and the wrong shape for two things the user actually wants: a heart-rate LOG,
+// and sleep broken down by stage.
+//
+// What is honestly achievable, stated here because the UI must not promise more:
+//
+//   * Apple Watch does NOT record heart rate every second. During a workout it
+//     samples roughly every 5 seconds; at rest it samples every few minutes and
+//     irregularly, taking more readings when something looks unusual. Per-second
+//     data does not exist in HealthKit outside a workout, so no exporter can
+//     deliver it.
+//   * Health Auto Export's automation runs on a minutes-scale interval, so the
+//     freshest a value can arrive is that interval, not "live".
+//
+// So the ceiling is: every sample HealthKit actually holds, delivered a few
+// minutes behind real time. That is genuinely useful — it is a log, not a
+// monitor — and calling it anything else would be a lie the data cannot back.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface HrSample {
+  /** Epoch milliseconds. */
+  t: number
+  bpm: number
+  /** Min/Max when the export summarised the window; absent for exact samples. */
+  lo?: number
+  hi?: number
+  /** Which metric produced it, so a resting reading is not mistaken for a workout one. */
+  kind: 'heart_rate' | 'resting' | 'walking_avg' | 'workout'
+}
+
+export interface SleepSession {
+  /** Night identifier: the date the sleep ENDED, which is how people name a night. */
+  date: string
+  start?: string
+  end?: string
+  totalH?: number
+  deepH?: number
+  remH?: number
+  coreH?: number
+  awakeH?: number
+  inBedH?: number
+  source?: string
+}
+
+function toHours(raw: number | undefined, units: string | undefined): number | undefined {
+  return sleepToHours(raw, units)
+}
+
+/** Every heart-rate sample in the payload, not just the newest. */
+export function extractHeartRateSeries(body: unknown): HrSample[] {
+  const metrics = (body as Payload)?.data?.metrics
+  const out: HrSample[] = []
+  if (Array.isArray(metrics)) {
+    for (const m of metrics) {
+      if (!m?.name || !Array.isArray(m.data)) continue
+      const n = norm(m.name)
+      const kind: HrSample['kind'] | null =
+        n === 'heartrate' ? 'heart_rate'
+          : n.includes('restingheartrate') ? 'resting'
+            : n.includes('walkingheartrate') ? 'walking_avg' : null
+      if (!kind) continue
+      for (const s of m.data) {
+        const t = s?.date ? parseExportDate(s.date) : NaN
+        const bpm = anyValue(s)
+        if (Number.isNaN(t) || typeof bpm !== 'number' || !Number.isFinite(bpm) || bpm <= 0) continue
+        out.push({
+          t,
+          bpm: Math.round(bpm),
+          lo: typeof s.Min === 'number' ? Math.round(s.Min) : undefined,
+          hi: typeof s.Max === 'number' ? Math.round(s.Max) : undefined,
+          kind,
+        })
+      }
+    }
+  }
+
+  // Workout heart-rate series are far denser than the daily metric, so they are
+  // the closest thing to continuous data that exists. Pull them in too.
+  const workouts = (body as { data?: { workouts?: Record<string, unknown>[] } })?.data?.workouts
+  if (Array.isArray(workouts)) {
+    for (const w of workouts) {
+      const hrd = (w as { heartRateData?: MetricSample[] })?.heartRateData
+      if (!Array.isArray(hrd)) continue
+      for (const s of hrd) {
+        const t = s?.date ? parseExportDate(s.date) : NaN
+        const bpm = anyValue(s)
+        if (Number.isNaN(t) || typeof bpm !== 'number' || !Number.isFinite(bpm) || bpm <= 0) continue
+        out.push({
+          t,
+          bpm: Math.round(bpm),
+          lo: typeof s.Min === 'number' ? Math.round(s.Min) : undefined,
+          hi: typeof s.Max === 'number' ? Math.round(s.Max) : undefined,
+          kind: 'workout',
+        })
+      }
+    }
+  }
+
+  return out.sort((a, b) => a.t - b.t)
+}
+
+/** Every night in the payload, with stages, not just the newest total. */
+export function extractSleepSessions(body: unknown): SleepSession[] {
+  const metrics = (body as Payload)?.data?.metrics
+  if (!Array.isArray(metrics)) return []
+  const out: SleepSession[] = []
+
+  for (const m of metrics) {
+    if (!m?.name || !Array.isArray(m.data)) continue
+    if (!norm(m.name).includes('sleep')) continue
+
+    for (const raw of m.data as Record<string, unknown>[]) {
+      const num = (k: string) => {
+        const v = raw[k]
+        return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined
+      }
+      const str = (k: string) => (typeof raw[k] === 'string' ? (raw[k] as string) : undefined)
+
+      const start = str('sleepStart') ?? str('inBedStart') ?? str('startDate')
+      const end = str('sleepEnd') ?? str('inBedEnd') ?? str('endDate')
+      // Name the night by when it ENDED — that is how people refer to it, and it
+      // keeps a session that began before midnight on the right day.
+      const endT = end ? parseExportDate(end) : NaN
+      const dateT = !Number.isNaN(endT) ? endT : raw.date ? parseExportDate(String(raw.date)) : NaN
+      if (Number.isNaN(dateT)) continue
+
+      // asleep can legitimately be 0 alongside a real totalSleep on current
+      // exports, so it must not shadow it.
+      const total = toHours(num('asleep') ?? num('totalSleep'), m.units)
+      const deep = toHours(num('deep'), m.units)
+      const rem = toHours(num('rem'), m.units)
+      const core = toHours(num('core'), m.units)
+      const awake = toHours(num('awake'), m.units)
+      const inBed = toHours(num('inBed'), m.units)
+      if (total == null && deep == null && rem == null && core == null) continue
+
+      out.push({
+        date: new Date(dateT).toISOString().slice(0, 10),
+        start: !Number.isNaN(start ? parseExportDate(start) : NaN) ? new Date(parseExportDate(start!)).toISOString() : undefined,
+        end: !Number.isNaN(endT) ? new Date(endT).toISOString() : undefined,
+        totalH: total, deepH: deep, remH: rem, coreH: core, awakeH: awake, inBedH: inBed,
+        source: str('source'),
+      })
+    }
+  }
+
+  // Newest night last; one entry per night, later payloads refresh it upstream.
+  return out.sort((a, b) => a.date.localeCompare(b.date))
+}

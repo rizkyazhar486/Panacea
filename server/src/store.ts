@@ -103,6 +103,8 @@ interface DB {
   applications?: Application[] // professional onboarding applications (doctor/writer/verifier)
   healthProfiles?: Record<string, Record<string, any>> // email -> health data blob (manual/wearable)
   healthWebhookTokens?: Record<string, string> // opaque token -> email, for Apple Health auto-export (Health Auto Export app)
+  hrSeries?: Record<string, { t: number; bpm: number; lo?: number; hi?: number; kind: string }[]> // email -> heart-rate log
+  sleepSeries?: Record<string, Record<string, any>[]> // email -> one entry per night, with stages
   sportsFavorites?: Record<string, string[]> // userId -> followed team keys, e.g. "epl:Arsenal"
   feedback?: Feedback[] // in-app "Pesan & Saran" — delivered to the owner only
   reminders?: Record<string, MedReminder[]> // userId -> medication reminders
@@ -627,6 +629,82 @@ export function recordDeviceHealthSync(email: string, mapped: Record<string, any
   }
   save()
   return db.healthProfiles[email]
+}
+
+// ── Time series ─────────────────────────────────────────────────────────────
+//
+// The profile blob above holds only the newest value of each metric. These two
+// keep the SAMPLES, which is what a log and a sleep breakdown need.
+//
+// Both are capped and deduplicated by timestamp, because Health Auto Export
+// resends an overlapping window on every run — an automation firing every five
+// minutes over a rolling day would otherwise store the same readings dozens of
+// times over.
+
+const MAX_HR_SAMPLES = 20000 // ≈ several days of workout-density data per user
+const MAX_SLEEP_NIGHTS = 400
+
+export function appendHrSamples(
+  email: string,
+  samples: { t: number; bpm: number; lo?: number; hi?: number; kind: string }[],
+): number {
+  if (!samples.length) return 0
+  if (!db.hrSeries) db.hrSeries = {}
+  const prev = db.hrSeries[email] ?? []
+  const seen = new Map<string, (typeof prev)[number]>()
+  // Key on timestamp+kind: a resting reading and a workout reading can share a
+  // second and both are meaningful, but the same one resent is not.
+  for (const s of prev) seen.set(`${s.t}|${s.kind}`, s)
+  let baru = 0
+  for (const s of samples) {
+    const k = `${s.t}|${s.kind}`
+    if (!seen.has(k)) baru++
+    seen.set(k, s)
+  }
+  const next = [...seen.values()].sort((a, b) => a.t - b.t).slice(-MAX_HR_SAMPLES)
+  db.hrSeries[email] = next
+  save()
+  return baru
+}
+
+export function getHrSamples(email: string, sinceMs?: number): { t: number; bpm: number; lo?: number; hi?: number; kind: string }[] {
+  const all = db.hrSeries?.[email] ?? []
+  return sinceMs ? all.filter((s) => s.t >= sinceMs) : all
+}
+
+export function appendSleepSessions(email: string, sessions: Record<string, any>[]): number {
+  if (!sessions.length) return 0
+  if (!db.sleepSeries) db.sleepSeries = {}
+  const prev = db.sleepSeries[email] ?? []
+  const byDate = new Map<string, Record<string, any>>()
+  for (const s of prev) if (s?.date) byDate.set(s.date, s)
+  let baru = 0
+  for (const s of sessions) {
+    if (!s?.date) continue
+    const prevNight = byDate.get(s.date)
+    if (!prevNight) { baru++; byDate.set(s.date, s); continue }
+    // A date can legitimately carry two sessions — a nap and the night. Blindly
+    // spreading the later one over the earlier would let a 1-hour nap replace a
+    // 7-hour night, so the LONGER session is treated as that night's sleep.
+    // Keeping only the longer also makes a re-export idempotent.
+    const prevLen = Number(prevNight.totalH ?? 0)
+    const nextLen = Number(s.totalH ?? 0)
+    byDate.set(s.date, nextLen >= prevLen ? { ...prevNight, ...s } : prevNight)
+  }
+  const next = [...byDate.values()].sort((a, b) => String(a.date).localeCompare(String(b.date))).slice(-MAX_SLEEP_NIGHTS)
+  db.sleepSeries[email] = next
+  save()
+  return baru
+}
+
+export function getSleepSessions(email: string): Record<string, any>[] {
+  return db.sleepSeries?.[email] ?? []
+}
+
+export function clearHealthSeries(email: string) {
+  if (db.hrSeries) delete db.hrSeries[email]
+  if (db.sleepSeries) delete db.sleepSeries[email]
+  save()
 }
 
 // Opaque per-user webhook token — lets an automation on the user's phone (e.g.

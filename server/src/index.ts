@@ -87,6 +87,7 @@ import {
   type Meet,
   type Club,
   type SecondOpinion,
+  appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -96,7 +97,7 @@ import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
-import { parseHealthWebhookPayload } from './healthWebhook.js'
+import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions } from './healthWebhook.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, INSTRUMENTS, RANGES, isValidSymbol, type Range } from './markets.js'
@@ -624,10 +625,42 @@ app.post('/api/health-webhook/:token', (req, res) => {
     // history + stamp the sync time, so device data is processed and shown on
     // the website automatically with no manual save.
     const profile = recordDeviceHealthSync(email, mapped, 'Apple Watch')
-    res.json({ ok: true, imported: Object.keys(mapped).length, syncedAt: profile.lastDeviceSyncAt, profile })
+    // Keep the SAMPLES too, not just the latest value — that is what makes a
+    // heart-rate log and a per-stage sleep view possible at all.
+    const hrBaru = appendHrSamples(email, extractHeartRateSeries(req.body))
+    const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
+    res.json({
+      ok: true,
+      imported: Object.keys(mapped).length,
+      hrSamples: hrBaru,
+      sleepNights: tidurBaru,
+      syncedAt: profile.lastDeviceSyncAt,
+      profile,
+    })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
+})
+
+// Heart-rate log. `since` is epoch ms; defaults to the last 24 hours so a
+// casual open never drags the whole ring buffer over the wire.
+app.get('/api/health-series/heart-rate', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const since = Number(req.query.since)
+  const from = Number.isFinite(since) && since > 0 ? since : Date.now() - 24 * 3600_000
+  const samples = getHrSamples(u.email, from)
+  res.json({ samples, from, count: samples.length })
+})
+
+app.get('/api/health-series/sleep', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ sessions: getSleepSessions(u.email) })
+})
+
+app.delete('/api/health-series', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  clearHealthSeries(u.email)
+  res.json({ ok: true })
 })
 
 // --- Sports scores (free, no-key sources: ESPN site API + Jolpica-F1) ---
