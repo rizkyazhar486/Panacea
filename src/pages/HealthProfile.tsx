@@ -527,11 +527,23 @@ function AutoSyncCard() {
   }, [])
 
   const url = token ? `${apiBaseUrl}/api/health-webhook/${token}` : ''
+  // Rotating silently swaps the token and breaks the phone until the new link is
+  // pasted over the old one. That consequence has to be on screen, not implied.
+  const [baruDiputar, setBaruDiputar] = useState(false)
 
   async function rotate() {
-    if (!confirm('Regenerate the sync link? The old link will stop working — you will need to update the URL in the Health Auto Export app.')) return
+    if (!confirm(
+      'Buat tautan sinkronisasi baru?\n\n'
+      + 'Tautan LAMA langsung berhenti bekerja. Sampai Anda menempelkan tautan baru ke Health Auto Export, '
+      + 'tidak ada data dari iPhone yang masuk.\n\n'
+      + 'Lakukan ini bila tautan Anda pernah terkirim ke orang lain, tertangkap layar, maupun tertempel di tempat umum.'
+    )) return
+    setBaruDiputar(false)
     setBusy(true)
-    try { setToken(await api.rotateHealthWebhookToken()) } finally { setBusy(false) }
+    try {
+      setToken(await api.rotateHealthWebhookToken())
+      setBaruDiputar(true)
+    } finally { setBusy(false) }
   }
   async function copy() {
     try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { /* ignore */ }
@@ -583,18 +595,42 @@ function AutoSyncCard() {
           <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
           <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
-        <p className="mt-1 text-[10px] text-neutral-400">Keep this link secret — anyone who has it can send data to your account.</p>
+        <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+          Rahasiakan tautan ini — siapa pun yang memilikinya bisa mengirim data ke akun Anda.
+          Saat menempelkannya di Health Auto Export, <b>kosongkan dahulu kolom URL</b> lalu tempel
+          sekali; menempel di atas isi lama menghasilkan alamat ganda yang tidak akan pernah dikenali server.
+        </p>
       </div>
+
+      {baruDiputar && (
+        <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
+          <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">Tautan baru dibuat — sinkronisasi Anda sekarang MATI</div>
+          <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-amber-900 dark:text-amber-100/90">
+            <li>Tekan <b>Copy</b> pada tautan baru di atas.</li>
+            <li>Buka Health Auto Export → otomatisasi Anda → <b>kosongkan kolom URL</b>, tempel sekali.</li>
+            <li>Tekan <b>Update</b> di kanan atas, lalu <b>Manual Export</b> sekali.</li>
+            <li>Ulangi untuk setiap otomatisasi yang memakai tautan ini.</li>
+          </ol>
+        </div>
+      )}
 
       <Link to="/health-data/tutorial"
         className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm font-bold text-brand-dark transition hover:bg-brand-50/80">
-        📖 View the Full Setup Tutorial (7 steps, ~5 min)
+        📖 Buka panduan lengkap (8 langkah, ~5 menit)
         <IconChevronRight size={16} className="shrink-0" />
       </Link>
 
-      <button onClick={rotate} disabled={busy || !token} className="mt-3 text-[11px] font-semibold text-rose-600 hover:underline disabled:opacity-50">
-        {busy ? 'Processing…' : 'Regenerate link (if leaked)'}
+      <button
+        onClick={rotate}
+        disabled={busy || !token}
+        className="mt-3 w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-700 transition hover:bg-rose-100 disabled:opacity-50 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+      >
+        {busy ? 'Memproses…' : '🔑 Buat tautan baru (bila tautan lama bocor)'}
       </button>
+      <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+        Setelah ini tautan lama langsung tidak berlaku, dan Anda harus memperbarui URL di aplikasi
+        sebelum data bisa masuk lagi.
+      </p>
     </Card>
   )
 }
