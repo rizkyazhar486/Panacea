@@ -34,8 +34,41 @@ export interface Vitals {
   exerciseMin?: number
   distanceKm?: number
   sleepH?: number
+  sleepDeepH?: number
+  sleepRemH?: number
+  sleepCoreH?: number
+  sleepAwakeH?: number
   recoveryPct?: number
   strain?: number
+  basalKcal?: number
+  flightsClimbed?: number
+  standHours?: number
+  daylightMin?: number
+  cardioRecoveryBpm?: number
+  // Body composition from InBody / smart scales
+  bmi?: number
+  bmrKcal?: number
+  skeletalMuscleKg?: number
+  bodyWaterL?: number
+  visceralFatLevel?: number
+  waistHipRatio?: number
+  // Gait quality
+  walkingSpeedKmh?: number
+  walkingAsymmetryPct?: number
+  walkingDoubleSupportPct?: number
+  walkingStepLengthCm?: number
+  stairSpeedUpMs?: number
+  stairSpeedDownMs?: number
+  sixMinWalkM?: number
+  // Running form
+  runningPowerW?: number
+  runningSpeedKmh?: number
+  runningStrideLengthM?: number
+  runningGroundContactMs?: number
+  runningVerticalOscCm?: number
+  // Hearing exposure
+  audioExposureDb?: number
+  headphoneAudioDb?: number
   // Provenance — shown in the UI so a user always knows where a number came
   // from and how old it is, rather than seeing an unexplained prefilled field.
   source?: string
