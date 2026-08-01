@@ -193,6 +193,13 @@ export const api = {
   marketNews: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/markets/news'),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),
+  // Heart-rate log. `since` is epoch ms; omit for the last 24 hours.
+  hrSeries: (since?: number) =>
+    req<{ samples: HrSample[]; from: number; count: number }>(
+      `/api/health-series/heart-rate${since ? `?since=${since}` : ''}`,
+    ),
+  sleepSeries: () => req<{ sessions: SleepNight[] }>('/api/health-series/sleep').then((r) => r.sessions),
+  clearHealthSeries: () => req<{ ok: boolean }>('/api/health-series', { method: 'DELETE' }),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),
   // web push
   pushKey: () => req<{ key: string | null }>('/api/push/key').then((r) => r.key),
@@ -312,6 +319,28 @@ export interface LiveNewsItem {
   source: string
   pubDate: string
   region: 'domestic' | 'international'
+}
+
+export interface HrSample {
+  /** Epoch milliseconds. */
+  t: number
+  bpm: number
+  lo?: number
+  hi?: number
+  kind: 'heart_rate' | 'resting' | 'walking_avg' | 'workout'
+}
+
+export interface SleepNight {
+  date: string
+  start?: string
+  end?: string
+  totalH?: number
+  deepH?: number
+  remH?: number
+  coreH?: number
+  awakeH?: number
+  inBedH?: number
+  source?: string
 }
 
 export interface Notif {

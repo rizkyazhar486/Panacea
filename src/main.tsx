@@ -51,6 +51,8 @@ const MultiSport = lazy(() => import('./pages/MultiSport').then((m) => ({ defaul
 const GaitAnalysis = lazy(() => import('./pages/GaitAnalysis').then((m) => ({ default: m.GaitAnalysis })))
 const WorkoutHistory = lazy(() => import('./pages/WorkoutHistory').then((m) => ({ default: m.WorkoutHistory })))
 const Notifications = lazy(() => import('./pages/Notifications').then((m) => ({ default: m.Notifications })))
+const HeartRateLog = lazy(() => import('./pages/HeartRateLog').then((m) => ({ default: m.HeartRateLog })))
+const SleepPattern = lazy(() => import('./pages/SleepPattern').then((m) => ({ default: m.SleepPattern })))
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
@@ -228,6 +230,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/lari-sepeda-renang" element={<MultiSport />} />
               <Route path="/analisis-gerak" element={<GaitAnalysis />} />
               <Route path="/riwayat-latihan" element={<WorkoutHistory />} />
+              <Route path="/log-detak-jantung" element={<HeartRateLog />} />
+              <Route path="/pola-tidur" element={<SleepPattern />} />
               <Route path="/notifikasi" element={<Notifications />} />
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
