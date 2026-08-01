@@ -594,10 +594,39 @@ function AutoSyncCard() {
  * shows nothing — but need opposite fixes, so guessing wastes everyone's time.
  * Paste the payload, get the actual cause named.
  */
+// A real 7-day Apple Health export is megabytes of text. Holding that in React
+// state and re-rendering this whole page on every keystroke of a paste is what
+// made the tab die repeatedly on iPhone ("a problem repeatedly occurred") — so
+// the textarea here is deliberately UNCONTROLLED: the browser owns the string,
+// React only reads it once when the user presses Periksa. Better still, the
+// file picker never puts the text on screen at all.
 function SyncDiagnosticsCard() {
   const [open, setOpen] = useState(false)
-  const [text, setText] = useState('')
+  const taRef = useRef<HTMLTextAreaElement | null>(null)
+  const fileRef = useRef<HTMLInputElement | null>(null)
   const [d, setD] = useState<SyncDiagnosis | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [fileNote, setFileNote] = useState('')
+
+  const MAX_ROWS = 60 // never render thousands of metric rows on a phone
+
+  const run = (raw: string) => {
+    setBusy(true)
+    // Yield a frame first so the button paints its busy state before a large
+    // parse blocks the main thread.
+    setTimeout(() => {
+      try { setD(diagnose(raw)) } finally { setBusy(false) }
+    }, 0)
+  }
+
+  const onPickFile = (f: File | undefined) => {
+    if (!f) return
+    setFileNote(`${f.name} · ${(f.size / 1e6).toFixed(2)} MB`)
+    const r = new FileReader()
+    r.onload = () => run(String(r.result ?? ''))
+    r.onerror = () => setFileNote('File tidak bisa dibaca. Coba salin isinya ke kotak di bawah.')
+    r.readAsText(f)
+  }
 
   const TONE: Record<SyncDiagnosis['verdict'], 'normal' | 'high' | 'critical'> = {
     ok: 'normal', 'empty-samples': 'high', 'name-mismatch': 'critical',
@@ -616,18 +645,32 @@ function SyncDiagnosticsCard() {
       ) : (
         <>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-            Di Health Auto Export, ekspor sebagai <b>JSON</b>, buka filenya, salin seluruh isinya,
-            lalu tempelkan di bawah. Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
+            Di Health Auto Export, ekspor sebagai <b>JSON</b>, lalu <b>pilih filenya langsung</b> di bawah.
+            Isinya diperiksa di perangkat Anda sendiri — tidak dikirim ke mana pun.
+          </p>
+
+          <input ref={fileRef} type="file" accept=".json,application/json,text/plain" className="hidden"
+            onChange={(e) => { onPickFile(e.target.files?.[0]); e.target.value = '' }} />
+          <Button className="mt-2 w-full" onClick={() => fileRef.current?.click()}>
+            📄 Pilih file JSON dari iPhone
+          </Button>
+          {fileNote && <p className="mt-1 text-[11px] text-neutral-500">{fileNote}</p>}
+
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+            Menempel isinya juga bisa, tapi file 7 hari bisa berukuran beberapa megabyte dan berat
+            untuk browser di HP — memilih file jauh lebih aman.
           </p>
           <textarea
-            className={inputClass + ' mt-2 h-28 font-mono !text-[10px]'}
+            ref={taRef}
+            className={inputClass + ' mt-1 h-28 font-mono !text-[10px]'}
             placeholder='{"data":{"metrics":[ … ]}}'
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            defaultValue=""
           />
           <div className="mt-2 flex gap-2">
-            <Button className="flex-1" onClick={() => setD(diagnose(text))}>Periksa</Button>
-            <button onClick={() => { setText(''); setD(null) }}
+            <Button className="flex-1" disabled={busy} onClick={() => run(taRef.current?.value ?? '')}>
+              {busy ? 'Memeriksa…' : 'Periksa'}
+            </Button>
+            <button onClick={() => { if (taRef.current) taRef.current.value = ''; setD(null); setFileNote('') }}
               className="rounded-xl bg-neutral-100 px-4 text-sm font-bold text-neutral-600 dark:bg-white/10">Bersihkan</button>
           </div>
 
@@ -660,7 +703,7 @@ function SyncDiagnosticsCard() {
                     Rincian · {d.matchedCount} dikenali · {d.emptyCount} kosong · {d.metrics.length} total
                   </div>
                   <div className="mt-1.5 space-y-1">
-                    {d.metrics.map((m, i) => (
+                    {d.metrics.slice(0, MAX_ROWS).map((m, i) => (
                       <div key={i} className="flex items-center justify-between gap-2 rounded-lg bg-neutral-50 px-2.5 py-1.5 dark:bg-white/5">
                         <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-neutral-600 dark:text-neutral-300">{m.name}</span>
                         <span className="shrink-0 text-[10px] text-neutral-400">{m.sampleCount} sampel</span>
@@ -671,6 +714,11 @@ function SyncDiagnosticsCard() {
                         </span>
                       </div>
                     ))}
+                    {d.metrics.length > MAX_ROWS && (
+                      <p className="pt-1 text-[10px] text-neutral-400">
+                        …dan {d.metrics.length - MAX_ROWS} metrik lain (disembunyikan agar halaman tetap ringan).
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
