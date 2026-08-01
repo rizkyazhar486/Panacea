@@ -87,7 +87,7 @@ import {
   type Meet,
   type Club,
   type SecondOpinion,
-  appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries,
+  appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -98,6 +98,7 @@ import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions } from './healthWebhook.js'
+import { checkHrZoneAlert, checkBedtimeReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, INSTRUMENTS, RANGES, isValidSymbol, type Range } from './markets.js'
@@ -622,8 +623,14 @@ app.post('/api/health-webhook/:token', (req, res) => {
     // NO data.metrics at all. Bailing out on an empty metric map would have
     // thrown that entire payload away — including the densest heart-rate data
     // the phone can produce.
-    const hrBaru = appendHrSamples(email, extractHeartRateSeries(req.body))
+    const hrSamples = extractHeartRateSeries(req.body)
+    const hrBaru = appendHrSamples(email, hrSamples)
     const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
+
+    // Zone alert rides on the sync that just delivered the data — there is no
+    // other moment the server learns a heart rate changed.
+    const zoneUser = getUserByEmail(email)
+    if (zoneUser) checkHrZoneAlert(zoneUser.id, hrSamples).catch(() => {})
 
     if (!Object.keys(mapped).length) {
       res.status(200).json({
@@ -664,6 +671,16 @@ app.get('/api/health-series/heart-rate', requireAuth, (req, res) => {
   const from = Number.isFinite(since) && since > 0 ? since : Date.now() - 24 * 3600_000
   const samples = getHrSamples(u.email, from)
   res.json({ samples, from, count: samples.length })
+})
+
+// Everything the alert settings screen needs, computed server-side so the
+// suggested bedtime comes from the same data the scheduler will actually use.
+app.get('/api/health-alerts/context', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({
+    suggestedBedtime: suggestedBedtime(u.email),
+    zones: ZONES,
+  })
 })
 
 app.get('/api/health-series/sleep', requireAuth, (req, res) => {
@@ -1228,6 +1245,15 @@ setInterval(() => {
     updateReminder(userId, reminder.id, { nextFireAt: new Date(new Date(reminder.nextFireAt).getTime() + 86_400_000).toISOString() })
   }
 }, 60_000)
+// Bedtime reminder — checked every minute like the medication scheduler. Each
+// user's own local clock is used via the UTC offset their client stored, so a
+// 22:30 target means 22:30 where they actually are.
+setInterval(() => {
+  for (const u of allUsersForAlerts()) {
+    checkBedtimeReminder(u.id, u.email).catch(() => {})
+  }
+}, 60_000)
+
 server.listen(config.port, () => {
   console.log(`Panaceamed backend on http://localhost:${config.port}`)
   console.log(`  AI:           ${aiStatus()}`)

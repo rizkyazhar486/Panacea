@@ -200,6 +200,10 @@ export const api = {
     ),
   sleepSeries: () => req<{ sessions: SleepNight[] }>('/api/health-series/sleep').then((r) => r.sessions),
   clearHealthSeries: () => req<{ ok: boolean }>('/api/health-series', { method: 'DELETE' }),
+  healthAlertContext: () =>
+    req<{ suggestedBedtime: string | null; zones: { zone: number; name: string; from: number; to: number; meaning: string }[] }>(
+      '/api/health-alerts/context',
+    ),
   markNotificationsRead: () => req<{ ok: boolean }>('/api/notifications/read', { method: 'POST' }),
   // web push
   pushKey: () => req<{ key: string | null }>('/api/push/key').then((r) => r.key),

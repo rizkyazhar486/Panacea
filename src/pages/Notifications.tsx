@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconBell } from '../components/icons'
 import { api, backendEnabled, type Notif } from '../lib/api'
+import { HealthAlertSettings } from '../components/HealthAlertSettings'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Halaman penuh untuk seluruh pemberitahuan.
@@ -112,6 +113,8 @@ export function Notifications() {
         title="Pemberitahuan"
         subtitle={belum > 0 ? `${belum} belum dibaca dari ${items.length}` : `${items.length} pemberitahuan`}
       />
+
+      <HealthAlertSettings />
 
       <Card>
         <div className="flex flex-wrap items-center gap-2">

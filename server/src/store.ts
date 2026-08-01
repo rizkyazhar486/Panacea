@@ -816,6 +816,12 @@ export function removeReminder(userId: string, id: string) {
   save()
 }
 // All (userId, reminder) pairs across every user — used by the scheduler.
+/** Users the per-minute alert loops need to scan. Kept here so the loop never
+ *  reaches into `db` directly. */
+export function allUsersForAlerts(): { id: string; email: string }[] {
+  return db.users.map((u) => ({ id: u.id, email: u.email }))
+}
+
 export function allReminders(): { userId: string; reminder: MedReminder }[] {
   const out: { userId: string; reminder: MedReminder }[] = []
   for (const [userId, list] of Object.entries(db.reminders ?? {})) {
