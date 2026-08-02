@@ -112,6 +112,7 @@ interface DB {
   clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
   secondOpinions?: SecondOpinion[] // AI-drafted, doctor-reviewed second opinions
   deviceWorkouts?: Record<string, Record<string, any>[]> // email -> raw workout objects pushed by the exporter
+  hrNotifications?: Record<string, Record<string, any>[]> // email -> raw high/low/irregular HR notifications
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
 }
 
@@ -1245,6 +1246,22 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
     })
   }
 
+  // A payload that arrives and produces nothing anywhere is the failure mode
+  // that hid the workouts bug for so long: the exporter reports success, and
+  // the app stays empty with no error on either side.
+  const hampa = recent.filter(
+    (x) => !x.matched.length && x.hrSamples === 0 && x.sleepNights === 0 && x.workouts === 0,
+  )
+  if (hampa.length === recent.length && recent.length >= 3) {
+    findings.push({
+      level: 'warn',
+      judul: 'Kiriman sampai tetapi tidak menghasilkan apa pun',
+      detail: 'Server menerima kiriman, namun tidak ada satu pun yang bisa disimpan darinya. Telepon akan tetap melaporkan sukses, jadi kegagalan ini tidak terlihat dari sisi mana pun. Coba perluas rentang tanggal; bila tetap begini, kirimkan tangkapan layar halaman ini.',
+      setelan: 'Export Period / Data Type',
+      ubahKe: '"Last 7 Days", dan pastikan metrik yang diinginkan tercentang',
+    })
+  }
+
   if (!findings.length) {
     findings.push({
       level: 'ok',
@@ -1322,4 +1339,48 @@ export function appendWorkouts(email: string, workouts: Record<string, any>[]): 
 
 export function getWorkouts(email: string): Record<string, any>[] {
   return db.deviceWorkouts?.[email] ?? []
+}
+
+// ── Heart-rate notifications pushed by the device ───────────────────────────
+//
+// The "Heart Rate Notifications" data type had NO server handling at all: the
+// payload was accepted, logged as containing no matching metrics, and dropped.
+// These were only ever parsed client-side from a manual upload.
+//
+// Same approach as workouts: keep the exporter's own shape so the frontend can
+// run parseHrNotifications() rather than a second implementation.
+
+const MAX_HR_NOTIFS = 200
+
+function notifKey(n: Record<string, any>): string {
+  return `${String(n?.start ?? '')}|${String(n?.heartNotification ?? '')}`
+}
+
+export function appendHrNotifications(email: string, notifs: Record<string, any>[]): number {
+  if (!Array.isArray(notifs) || !notifs.length) return 0
+  if (!db.hrNotifications) db.hrNotifications = {}
+  const prev = db.hrNotifications[email] ?? []
+
+  const byKey = new Map<string, Record<string, any>>()
+  for (const n of prev) byKey.set(notifKey(n), n)
+
+  let baru = 0
+  for (const raw of notifs) {
+    if (!raw || typeof raw !== 'object') continue
+    const start = String(raw?.start ?? '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}/.test(start)) continue
+    const key = notifKey(raw)
+    if (!byKey.has(key)) baru++
+    byKey.set(key, trimWorkout(raw)) // same trimming: no routes, capped series
+  }
+
+  db.hrNotifications[email] = [...byKey.values()]
+    .sort((a, b) => Date.parse(String(a?.start ?? 0)) - Date.parse(String(b?.start ?? 0)))
+    .slice(-MAX_HR_NOTIFS)
+  save()
+  return baru
+}
+
+export function getHrNotifications(email: string): Record<string, any>[] {
+  return db.hrNotifications?.[email] ?? []
 }

@@ -90,6 +90,8 @@ import {
   appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts, stripServerOwnedSettings,
   appendWorkouts,
   getWorkouts,
+  appendHrNotifications,
+  getHrNotifications,
   recordWebhookDelivery,
   getWebhookDeliveries,
   diagnoseSync,
@@ -647,6 +649,11 @@ app.post('/api/health-webhook/:token', (req, res) => {
     // Riwayat Latihan, because that screen only ever read localStorage.
     const rawWorkouts = (req.body as { data?: { workouts?: Record<string, unknown>[] } })?.data?.workouts
     const latihanBaru = appendWorkouts(email, Array.isArray(rawWorkouts) ? rawWorkouts as Record<string, any>[] : [])
+
+    // The "Heart Rate Notifications" data type had no handling at all: the
+    // payload was accepted, logged as matching nothing, and dropped.
+    const rawNotifs = (req.body as { data?: { heartRateNotifications?: Record<string, unknown>[] } })?.data?.heartRateNotifications
+    const notifBaru = appendHrNotifications(email, Array.isArray(rawNotifs) ? rawNotifs as Record<string, any>[] : [])
     const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
 
     // Zone alert rides on the sync that just delivered the data — there is no
@@ -677,7 +684,8 @@ app.post('/api/health-webhook/:token', (req, res) => {
         hrSamples: hrBaru,
         sleepNights: tidurBaru,
         workoutsSaved: latihanBaru,
-        hint: hrBaru > 0 || tidurBaru > 0
+        hrNotifications: notifBaru,
+        hint: hrBaru > 0 || tidurBaru > 0 || latihanBaru > 0 || notifBaru > 0
           ? 'Tidak ada metrik ringkas yang cocok, namun deret sampel tetap tersimpan — ini normal untuk otomatisasi bertipe Workouts.'
           : 'Tidak ada metrik yang cocok — kemungkinan belum ada data untuk rentang tanggal yang dipilih (mis. VO2max/berat badan tidak tercatat setiap hari). Coba perluas Date Range ke "Last 7 Days".',
         metricsReceived: metricNames,
@@ -695,6 +703,7 @@ app.post('/api/health-webhook/:token', (req, res) => {
       hrSamples: hrBaru,
       sleepNights: tidurBaru,
       workoutsSaved: latihanBaru,
+      hrNotifications: notifBaru,
       syncedAt: profile.lastDeviceSyncAt,
       profile,
     })
@@ -709,6 +718,12 @@ app.get('/api/workouts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const workouts = getWorkouts(u.email)
   res.json({ workouts, count: workouts.length })
+})
+
+app.get('/api/hr-notifications', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const notifications = getHrNotifications(u.email)
+  res.json({ notifications, count: notifications.length })
 })
 
 // Why is nothing arriving? Answers with named settings, not vague advice.

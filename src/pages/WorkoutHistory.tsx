@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
 import { IconRun, IconHeart, IconActivity, IconTimer } from '../components/icons'
-import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts } from '../lib/workoutStore'
+import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts, mergeHrNotifications } from '../lib/workoutStore'
 import {
-  zoneBreakdown, hrMaxFromAge, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts,
+  zoneBreakdown, hrMaxFromAge, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts, parseHrNotifications,
   type ImportedWorkout,
 } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
@@ -39,11 +39,16 @@ export function WorkoutHistory() {
   useEffect(() => {
     if (!backendEnabled) return
     let hidup = true
-    api.deviceWorkouts()
-      .then((r) => {
-        if (!hidup || !r.workouts.length) return
-        const baru = mergeWorkouts(parseWorkouts(JSON.stringify({ data: { workouts: r.workouts } })))
-        if (baru) setTarikan((n) => n + 1)
+    Promise.all([
+      api.deviceWorkouts().catch(() => ({ workouts: [] as Record<string, unknown>[] })),
+      api.deviceHrNotifications().catch(() => ({ notifications: [] as Record<string, unknown>[] })),
+    ])
+      .then(([w, n]) => {
+        if (!hidup) return
+        let baru = 0
+        if (w.workouts.length) baru += mergeWorkouts(parseWorkouts(JSON.stringify({ data: { workouts: w.workouts } })))
+        if (n.notifications.length) baru += mergeHrNotifications(parseHrNotifications(JSON.stringify({ data: { heartRateNotifications: n.notifications } })))
+        if (baru) setTarikan((n2) => n2 + 1)
       })
       .catch(() => { /* offline: yang tersimpan lokal tetap tampil */ })
     return () => { hidup = false }
