@@ -1,5 +1,15 @@
 
 export interface MarketInstrument { symbol: string; label: string; group: string; unggulan?: boolean }
+export interface SyncFinding { level: 'error' | 'warn' | 'ok'; judul: string; detail: string; setelan?: string; ubahKe?: string }
+export interface WebhookDelivery {
+  at: string
+  metricGroups: { name: string; samples: number }[]
+  workouts: number
+  hrSamples: number
+  sleepNights: number
+  matched: string[]
+  newestSampleDate: string | null
+}
 export interface SymbolHit { symbol: string; name: string; exchange: string | null; type: string | null }
 export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
 export interface MarketQuote {
@@ -191,6 +201,9 @@ export const api = {
   marketWatchlist: (symbols: string[], range: string) =>
     req<{ quotes: MarketQuote[]; failed: string[] }>(
       `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
+  syncDiagnosis: () =>
+    req<{ findings: SyncFinding[]; deliveries: number; lastAt: string | null; recent: WebhookDelivery[] }>(
+      '/api/health-sync/diagnosis'),
   marketSearch: (q: string) =>
     req<{ results: SymbolHit[] }>(`/api/markets/search?q=${encodeURIComponent(q)}`),
   marketNews: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/markets/news'),

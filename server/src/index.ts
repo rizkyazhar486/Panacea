@@ -88,6 +88,9 @@ import {
   type Club,
   type SecondOpinion,
   appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts, stripServerOwnedSettings,
+  recordWebhookDelivery,
+  getWebhookDeliveries,
+  diagnoseSync,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
@@ -97,7 +100,7 @@ import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
-import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions } from './healthWebhook.js'
+import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
@@ -644,6 +647,22 @@ app.post('/api/health-webhook/:token', (req, res) => {
     const zoneUser = getUserByEmail(email)
     if (zoneUser) checkHrZoneAlert(zoneUser.id, hrSamples).catch(() => {})
 
+    // Record what this payload actually contained, so the app can diagnose a
+    // silent misconfiguration itself instead of the user having to send in
+    // their exporter config for someone to read by hand.
+    const diukurPada = newestSampleDate(req.body)
+    recordWebhookDelivery(email, {
+      at: new Date().toISOString(),
+      metricGroups: Array.isArray(rawMetrics)
+        ? rawMetrics.map((m) => ({ name: String(m?.name ?? '?'), samples: m?.data?.length ?? 0 }))
+        : [],
+      workouts: workoutCount,
+      hrSamples: hrBaru,
+      sleepNights: tidurBaru,
+      matched: Object.keys(mapped),
+      newestSampleDate: diukurPada,
+    })
+
     if (!Object.keys(mapped).length) {
       res.status(200).json({
         ok: true,
@@ -661,7 +680,7 @@ app.post('/api/health-webhook/:token', (req, res) => {
     // Store the latest values AND auto-append a dated snapshot to the trend
     // history + stamp the sync time, so device data is processed and shown on
     // the website automatically with no manual save.
-    const profile = recordDeviceHealthSync(email, mapped, 'Apple Watch')
+    const profile = recordDeviceHealthSync(email, mapped, 'Apple Watch', diukurPada)
     res.json({
       ok: true,
       imported: Object.keys(mapped).length,
@@ -673,6 +692,12 @@ app.post('/api/health-webhook/:token', (req, res) => {
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
+})
+
+// Why is nothing arriving? Answers with named settings, not vague advice.
+app.get('/api/health-sync/diagnosis', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ ...diagnoseSync(u.email), recent: getWebhookDeliveries(u.email).slice(-10).reverse() })
 })
 
 // Heart-rate log. `since` is epoch ms; defaults to the last 24 hours so a
