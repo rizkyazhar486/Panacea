@@ -48,6 +48,7 @@ import { OnboardingTour, AssessmentPrompt } from './OnboardingTour'
 import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
+import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 
 // Public entry: marketing landing first, then the login screen on demand.
 function PublicEntry() {
@@ -71,6 +72,12 @@ const ALL: Role[] = ['pasien', 'dokter', 'kontributor', 'verifikator', 'admin', 
 // intent with short labels so the menu stays scannable and icon-led.
 const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitness', 'Clinical & AI', 'Services', 'Money', 'Content', 'Manage', 'Account']
 
+/**
+ * Dipakai layar "Atur Fitur" agar daftarnya berasal dari sumber yang sama
+ * dengan menu. Daftar terpisah yang ditulis ulang pasti akan tertinggal.
+ */
+export const NAV_UNTUK_PENGATURAN: { to: string; label: string; group: string; roles: Role[] }[] = []
+
 const nav: Nav[] = [
   // Beranda (rendered as plain links — the most-used, social-first destinations)
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
@@ -92,8 +99,8 @@ const nav: Nav[] = [
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
-  { to: '/fitness-hub', label: '🏃 Latihan & Performa (semua)', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/wellness-hub', label: '✨ More health & screening tools', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/latihan', label: 'Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/tubuh', label: 'Sinyal Tubuh', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging — trimmed to the flagship entries; the rest (breathwork,
   // gratitude, sleep debt, thermal therapy, ikigai, life compass, resilience
   // stories, fasting, gene info, aesthetic) live in Wellness Hub, searchable.
@@ -150,9 +157,15 @@ const nav: Nav[] = [
   { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
   // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
+  { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
   { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
 ]
+
+// Isi daftar untuk layar pengaturan dari `nav` itu sendiri.
+NAV_UNTUK_PENGATURAN.push(
+  ...nav.map((n) => ({ to: n.to, label: n.label, group: n.group ?? 'Account', roles: n.roles })),
+)
 
 // Pages that show the active-patient context. Patients see only their own data
 // (no selector); doctors manage patients via the selector.
@@ -239,6 +252,12 @@ export function Shell({ children }: { children: ReactNode }) {
   // Auto-hide the floating bottom nav while scrolling down through a feed
   // (it otherwise sits on top of post action buttons); bring it back on any
   // upward scroll or once near the top, so it's never more than a flick away.
+  // Harus di atas `if (!account)`: hook tidak boleh berada setelah return
+  // bersyarat, karena jumlah hook akan berbeda antara render sebelum dan
+  // sesudah login — React menolaknya dan seluruh halaman gagal dirender.
+  const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
+  useEffect(() => langgananFitur(setTersembunyi), [])
+
   useEffect(() => {
     let lastY = window.scrollY
     let ticking = false
@@ -260,8 +279,7 @@ export function Shell({ children }: { children: ReactNode }) {
   }, [])
 
   if (!account) return <PublicEntry />
-
-  const items = nav.filter((n) => n.roles.includes(account.role))
+  const items = saring(nav.filter((n) => n.roles.includes(account.role)), tersembunyi)
   const title = items.find((n) => navMatches(n, loc.pathname))
   // Only doctors switch between patients; patients see their own data only.
   const showPatient = PATIENT_PAGES.includes(loc.pathname) && account.role === 'dokter'
@@ -592,7 +610,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 { to: '/community', label: 'Community', icon: IconUsers },
                 { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
                 { to: '/health-data', label: 'Health', icon: IconHeart },
-                { to: '/riwayat-latihan', label: 'Latihan', icon: IconRun },
+                { to: '/latihan', label: 'Latihan', icon: IconRun },
                 { to: '/sports-scores', label: 'Scores', icon: IconFlame },
                 { to: '/profile', label: 'Profile', icon: IconUser },
               ].map((t) => (

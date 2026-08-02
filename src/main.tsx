@@ -1,6 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { applyAppearance } from './lib/theme'
 import { applyLang, getLang } from './lib/i18n'
@@ -165,6 +165,9 @@ const PostureBreaks = lazy(() => import('./pages/PostureBreaks').then((m) => ({ 
 const PainDiary = lazy(() => import('./pages/PainDiary').then((m) => ({ default: m.PainDiary })))
 const OrganDonorCard = lazy(() => import('./pages/OrganDonorCard').then((m) => ({ default: m.OrganDonorCard })))
 const FitnessHub = lazy(() => import('./pages/FitnessHub').then((m) => ({ default: m.FitnessHub })))
+const PusatLatihan = lazy(() => import('./pages/PusatLatihan').then((m) => ({ default: m.PusatLatihan })))
+const PusatTubuh = lazy(() => import('./pages/PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
+const AturFitur = lazy(() => import('./pages/AturFitur').then((m) => ({ default: m.AturFitur })))
 const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
 const ClinicalHub = lazy(() => import('./pages/ClinicalHub').then((m) => ({ default: m.ClinicalHub })))
@@ -234,13 +237,6 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/alat-fitness" element={<GymEquipment />} />
               <Route path="/latihan-dasar" element={<BaseTraining />} />
               <Route path="/lari-sepeda-renang" element={<MultiSport />} />
-              <Route path="/analisis-gerak" element={<GaitAnalysis />} />
-              <Route path="/riwayat-latihan" element={<WorkoutHistory />} />
-              <Route path="/log-detak-jantung" element={<HeartRateLog />} />
-              <Route path="/pola-tidur" element={<SleepPattern />} />
-              <Route path="/fisiologi-latihan" element={<TrainingPhysiology />} />
-              <Route path="/alat-endurance" element={<EnduranceTools />} />
-              <Route path="/pelacak-klinis" element={<ClinicalTrackers />} />
               <Route path="/notifikasi" element={<Notifications />} />
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
@@ -285,8 +281,20 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/pain-diary" element={<PainDiary />} />
               <Route path="/organ-donor" element={<OrganDonorCard />} />
               <Route path="/fitness-hub" element={<FitnessHub />} />
-              <Route path="/analisis-pro" element={<AnalisisPro />} />
-              <Route path="/body-battery" element={<BodyBattery />} />
+              <Route path="/latihan" element={<PusatLatihan />} />
+              <Route path="/tubuh" element={<PusatTubuh />} />
+              <Route path="/atur-fitur" element={<AturFitur />} />
+              {/* Rute lama tetap hidup dan mengalihkan ke tab yang tepat, agar
+                  penanda halaman dan tautan lama tidak ada yang putus. */}
+              <Route path="/riwayat-latihan" element={<Navigate to="/latihan?t=pelatih" replace />} />
+              <Route path="/fisiologi-latihan" element={<Navigate to="/latihan?t=fisiologi" replace />} />
+              <Route path="/alat-endurance" element={<Navigate to="/latihan?t=endurance" replace />} />
+              <Route path="/body-battery" element={<Navigate to="/tubuh?t=energi" replace />} />
+              <Route path="/log-detak-jantung" element={<Navigate to="/tubuh?t=jantung" replace />} />
+              <Route path="/pola-tidur" element={<Navigate to="/tubuh?t=tidur" replace />} />
+              <Route path="/analisis-gerak" element={<Navigate to="/tubuh?t=gerak" replace />} />
+              <Route path="/pelacak-klinis" element={<Navigate to="/tubuh?t=klinis" replace />} />
+              <Route path="/analisis-pro" element={<Navigate to="/latihan?t=analisis" replace />} />
               <Route path="/clinical-hub" element={<ClinicalHub />} />
               <Route path="/sleep-toolkit" element={<SleepToolkit />} />
               <Route path="/movement-toolkit" element={<MovementToolkit />} />
