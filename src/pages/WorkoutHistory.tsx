@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
 import { IconRun, IconHeart, IconActivity, IconTimer } from '../components/icons'
-import { getWorkouts, getHrNotifications, clearWorkouts } from '../lib/workoutStore'
+import { getWorkouts, getHrNotifications, clearWorkouts, mergeWorkouts } from '../lib/workoutStore'
 import {
-  zoneBreakdown, hrMaxFromAge, summarise, fmtDurasi, fmtPace, NOTIF_INFO,
+  zoneBreakdown, hrMaxFromAge, summarise, fmtDurasi, fmtPace, NOTIF_INFO, parseWorkouts,
   type ImportedWorkout,
 } from '../lib/workoutImport'
+import { api, backendEnabled } from '../lib/api'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 
@@ -25,9 +26,28 @@ export function WorkoutHistory() {
   const vitals = useVitals()
   const demo = useMemo(() => getDemo(), [])
   // Membaca ulang tiap kali store menyiarkan perubahan (vitals ikut berubah).
-  const workouts = useMemo(() => getWorkouts(), [vitals])
-  const notifs = useMemo(() => getHrNotifications(), [vitals])
   const [buka, setBuka] = useState<string | null>(null)
+  const [tarikan, setTarikan] = useState(0)
+  const workouts = useMemo(() => getWorkouts(), [vitals, tarikan])
+  const notifs = useMemo(() => getHrNotifications(), [vitals, tarikan])
+
+  // Sessions pushed by the device live on the server; this screen used to read
+  // localStorage only, so a correctly-configured Workouts automation still
+  // showed nothing here. Parsed with the SAME parser as a manual upload — the
+  // server deliberately keeps the exporter's own shape so there is only one
+  // implementation to keep correct.
+  useEffect(() => {
+    if (!backendEnabled) return
+    let hidup = true
+    api.deviceWorkouts()
+      .then((r) => {
+        if (!hidup || !r.workouts.length) return
+        const baru = mergeWorkouts(parseWorkouts(JSON.stringify({ data: { workouts: r.workouts } })))
+        if (baru) setTarikan((n) => n + 1)
+      })
+      .catch(() => { /* offline: yang tersimpan lokal tetap tampil */ })
+    return () => { hidup = false }
+  }, [])
 
   const hrMax = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
@@ -51,8 +71,15 @@ export function WorkoutHistory() {
             dengan deret detak jantung per menit.
           </p>
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-            Pastikan pada Health Auto Export pilihan <strong className="text-slate-300">Include Workouts</strong> dinyalakan;
-            bila mati, larik latihan tidak ikut terkirim meskipun metriknya terkirim lengkap.
+            Tidak harus diunggah manual: sesi juga masuk sendiri lewat sinkronisasi otomatis, asalkan
+            di Health Auto Export ada otomatisasi dengan <strong className="text-slate-300">Data Type: Workouts</strong>
+            {' '}(atau <strong className="text-slate-300">Include Workouts</strong> dinyalakan) dan
+            {' '}<strong className="text-slate-300">Date Range: Today</strong>. Bila salah satunya meleset,
+            larik latihan tidak ikut terkirim meskipun metriknya terkirim lengkap.
+          </p>
+          <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+            <Link to="/health-data/tutorial" className="font-semibold text-white underline">Diagnosa sinkronisasi</Link>
+            {' '}memeriksa kiriman yang benar-benar sampai dan menyebutkan setelan mana yang salah.
           </p>
         </Card>
       </div>
