@@ -104,6 +104,7 @@ import { sendPush, notify } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
+import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
@@ -718,6 +719,16 @@ app.get('/api/workouts', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const workouts = getWorkouts(u.email)
   res.json({ workouts, count: workouts.length })
+})
+
+// Katalog metrik: dipakai layar profil untuk menampilkan SEMUA yang tertangkap,
+// beserta label, kategori dan satuannya, tanpa menduplikasi daftar di frontend.
+app.get('/api/health-metrics/catalog', (_req, res) => {
+  res.json({
+    metrics: KATALOG.map((d) => ({ kunci: d.kunci, label: d.label, kategori: d.kategori, satuan: d.tampil })),
+    kategori: KATEGORI,
+    total: KATALOG.length,
+  })
 })
 
 app.get('/api/hr-notifications', requireAuth, (req, res) => {

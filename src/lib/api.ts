@@ -1,5 +1,6 @@
 
 export interface MarketInstrument { symbol: string; label: string; group: string; unggulan?: boolean }
+export interface KatalogMetrik { kunci: string; label: string; kategori: string; satuan: string }
 export interface SyncFinding { level: 'error' | 'warn' | 'ok'; judul: string; detail: string; setelan?: string; ubahKe?: string }
 export interface WebhookDelivery {
   at: string
@@ -203,6 +204,8 @@ export const api = {
       `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
   deviceWorkouts: () =>
     req<{ workouts: Record<string, unknown>[]; count: number }>('/api/workouts'),
+  metricCatalog: () =>
+    req<{ metrics: KatalogMetrik[]; kategori: string[]; total: number }>('/api/health-metrics/catalog'),
   deviceHrNotifications: () =>
     req<{ notifications: Record<string, unknown>[]; count: number }>('/api/hr-notifications'),
   syncDiagnosis: () =>

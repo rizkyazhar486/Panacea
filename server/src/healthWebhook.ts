@@ -4,7 +4,12 @@
 // Most metrics carry { qty, date }; sleep carries { asleep, sleepStart, sleepEnd, ... }.
 // Ref: https://github.com/Lybron/health-auto-export/wiki/API-Export---JSON-Format
 
+import { cariMetrik, keKanonik } from './healthMetrics.js'
+
+// Kunci apa pun dari katalog boleh muncul; yang disebut eksplisit di bawah
+// hanyalah yang sudah dipakai layar lama, agar tetap ikut diperiksa tipenya.
 export interface HealthWebhookResult {
+  [kunci: string]: number | undefined
   vo2max?: number
   restingHr?: number
   hrvMs?: number
@@ -89,35 +94,31 @@ function sleepToHours(raw: number | undefined, units: string | undefined): numbe
   return +(raw > 24 ? raw / 60 : raw).toFixed(1)
 }
 
-const MATCHERS: { key: keyof HealthWebhookResult; test: (n: string) => boolean; pick: (s: MetricSample) => number | undefined }[] = [
-  { key: 'vo2max', test: (n) => n.includes('vo2'), pick: anyValue },
-  { key: 'restingHr', test: (n) => n.includes('restingheartrate'), pick: anyValue },
-  { key: 'hrvMs', test: (n) => n.includes('heartratevariability') || n.includes('hrv'), pick: anyValue },
-  { key: 'weightKg', test: (n) => n.includes('weightbodymass') || n === 'bodyweight' || n === 'weight', pick: anyValue },
-  { key: 'bodyFatPct', test: (n) => n.includes('bodyfatpercentage'), pick: (s) => { const v = anyValue(s); return v != null ? (v <= 1 ? v * 100 : v) : undefined } },
-  { key: 'steps', test: (n) => n.includes('stepcount'), pick: anyValue },
-  { key: 'activeKcal', test: (n) => n.includes('activeenergy'), pick: anyValue },
-  { key: 'heartRate', test: (n) => n === 'heartrate' || n.includes('walkingheartrate'), pick: anyValue },
-  { key: 'spo2Pct', test: (n) => n.includes('oxygensaturation') || n.includes('bloodoxygen'), pick: (s) => { const v = anyValue(s); return v != null ? (v <= 1 ? v * 100 : v) : undefined } },
-  { key: 'respRate', test: (n) => n.includes('respiratoryrate'), pick: anyValue },
-  { key: 'systolic', test: (n) => n.includes('bloodpressuresystolic'), pick: anyValue },
-  { key: 'diastolic', test: (n) => n.includes('bloodpressurediastolic'), pick: anyValue },
-  { key: 'leanMassKg', test: (n) => n.includes('leanbodymass'), pick: anyValue },
-  { key: 'bodyTempC', test: (n) => n.includes('bodytemperature') || n.includes('wristtemperature'), pick: anyValue },
-  { key: 'exerciseMin', test: (n) => n.includes('exercisetime'), pick: anyValue },
-  { key: 'distanceKm', test: (n) => n.includes('distancewalkingrunning'), pick: anyValue },
-]
-
+/**
+ * Baca SETIAP metrik yang dikenali katalog, bukan hanya belasan yang kebetulan
+ * ada di formulir profil.
+ *
+ * Dua aturan yang membedakan hasilnya dari versi sebelumnya:
+ *
+ *   * Metrik kumulatif (langkah, jarak, kalori, gizi) DIJUMLAHKAN untuk hari
+ *     terbaru, bukan diambil sampel terakhirnya. Mengambil yang terakhir dari
+ *     ekspor per jam berarti melaporkan langkah satu jam terakhir sebagai
+ *     langkah sehari — angka yang selalu terlalu kecil dan tidak pernah
+ *     terlihat salah.
+ *   * Setiap nilai dikonversi menurut satuan yang dinyatakan payload, sehingga
+ *     pengguna dengan setelan imperial tidak lagi menyimpan pon sebagai
+ *     kilogram.
+ */
 export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
   const out: HealthWebhookResult = {}
   const metrics = (body as Payload)?.data?.metrics
   if (!Array.isArray(metrics)) return out
 
   for (const m of metrics) {
-    if (!m?.name || !Array.isArray(m.data)) continue
-    const n = norm(m.name)
+    if (!m?.name || !Array.isArray(m.data) || !m.data.length) continue
+    const nm = norm(m.name)
 
-    if (n.includes('sleep')) {
+    if (nm.includes('sleep') && !nm.includes('wristtemperature')) {
       const s = latestSample(m.data)
       const raw = s?.asleep ?? s?.totalSleep
       const h = sleepToHours(raw, m.units)
@@ -125,12 +126,41 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
       continue
     }
 
-    const matcher = MATCHERS.find((mm) => mm.test(n))
-    if (!matcher) continue
-    const s = latestSample(m.data)
-    if (!s) continue
-    const v = matcher.pick(s)
-    if (typeof v === 'number' && Number.isFinite(v) && v > 0) out[matcher.key] = Math.round(v * 10) / 10
+    const def = cariMetrik(m.name)
+    if (!def) continue
+
+    let nilai: number | undefined
+    if (def.jumlahkan) {
+      // Jumlahkan hanya sampel dari hari terbaru yang ada di payload, agar
+      // ekspor "Last 7 Days" tidak menumpuk tujuh hari menjadi satu angka.
+      let hariTerbaru = ''
+      for (const s of m.data) {
+        const d = typeof s?.date === 'string' ? s.date.trim().slice(0, 10) : ''
+        if (d && d > hariTerbaru) hariTerbaru = d
+      }
+      let total = 0
+      let ada = false
+      for (const s of m.data) {
+        const d = typeof s?.date === 'string' ? s.date.trim().slice(0, 10) : ''
+        if (hariTerbaru && d !== hariTerbaru) continue
+        const v = anyValue(s)
+        if (typeof v === 'number' && Number.isFinite(v)) { total += v; ada = true }
+      }
+      if (ada) nilai = total
+    } else {
+      const s = latestSample(m.data)
+      const v = s ? anyValue(s) : undefined
+      if (typeof v === 'number' && Number.isFinite(v)) nilai = v
+    }
+
+    if (nilai == null) continue
+    const dikonversi = keKanonik(nilai, m.units, def.satuan)
+    // Nol dibiarkan lolos untuk metrik kumulatif: "hari ini nol langkah" adalah
+    // fakta, sedangkan nol pada pengukuran seperti berat badan tidak masuk akal.
+    if (!Number.isFinite(dikonversi)) continue
+    if (!def.jumlahkan && dikonversi <= 0) continue
+    if (def.jumlahkan && dikonversi < 0) continue
+    out[def.kunci] = Math.round(dikonversi * 100) / 100
   }
   return out
 }
