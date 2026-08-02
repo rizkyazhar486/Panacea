@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
+import { KATALOG } from './healthMetrics.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DB_PATH = join(__dirname, '..', 'data.json')
@@ -645,7 +646,7 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
   const merged = { ...db.healthProfiles[email], ...data, updatedAt: new Date().toISOString() }
   // The per-call cap alone is not enough: each save merges, so a loop of small
   // payloads carrying fresh keys grows the stored object without limit.
-  if (JSON.stringify(merged).length > 256 * 1024) throw new Error('health profile too large')
+  if (JSON.stringify(merged).length > 1024 * 1024) throw new Error('health profile too large')
   db.healthProfiles[email] = merged
   save()
   return db.healthProfiles[email]
@@ -655,7 +656,11 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
 // it's automatically folded into the same per-day trend history the manual form
 // keeps, and stamped with a device-sync time. This makes device-pushed metrics
 // appear and accumulate on the website with no manual "Save" step.
-const TRACKED_TREND_KEYS = ['vo2max', 'restingHr', 'hrvMs', 'sleepH', 'weightKg', 'bodyFatPct', 'steps', 'activeKcal'] as const
+// Dulu hanya delapan kunci yang masuk riwayat tren, sehingga sembilan puluh
+// metrik lain tidak punya grafik sama sekali meski datanya tiba tiap hari.
+// Sekarang seluruh katalog ikut, ditambah sleepH yang tidak berasal dari
+// katalog karena bentuk sampelnya berbeda.
+const TRACKED_TREND_KEYS: readonly string[] = [...KATALOG.map((d) => d.kunci), 'sleepH']
 export function recordDeviceHealthSync(
   email: string,
   mapped: Record<string, any>,

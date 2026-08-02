@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconCheck, IconChevronRight } from '../components/icons'
-import { api, backendEnabled, apiBaseUrl } from '../lib/api'
+import { api, backendEnabled, apiBaseUrl, type KatalogMetrik } from '../lib/api'
 import { useStore } from '../lib/store'
 import { setDemo } from '../lib/profile'
 import { parseHealthFile, type ImportResult } from '../lib/healthImport'
@@ -453,48 +453,95 @@ function TrendChart({ history }: { history: Snapshot[] }) {
 // every processed metric, so device data is visibly "displayed & processed
 // automatically" the moment it's pushed, no manual entry.
 function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
-  const metrics: { label: string; value: string }[] = []
-  const add = (label: string, v: number | undefined, unit = '', dp = 0) => {
-    if (typeof v === 'number' && v > 0) metrics.push({ label, value: `${v.toFixed(dp)}${unit}` })
+  // Dulu kartu ini menampilkan delapan angka yang ditulis tangan satu per satu,
+  // sehingga metrik yang baru dikenali server tidak akan pernah muncul di sini
+  // tanpa mengubah kode lagi. Sekarang isinya digerakkan oleh katalog server:
+  // apa pun yang berhasil ditangkap akan tampil, lengkap dengan label, satuan
+  // dan kategorinya.
+  const [katalog, setKatalog] = useState<KatalogMetrik[]>([])
+  const [semua, setSemua] = useState(false)
+
+  useEffect(() => {
+    if (!backendEnabled) return
+    let hidup = true
+    api.metricCatalog().then((r) => { if (hidup) setKatalog(r.metrics) }).catch(() => { /* offline */ })
+    return () => { hidup = false }
+  }, [])
+
+  const blob = profile as unknown as Record<string, unknown>
+  const terisi = katalog.filter((d) => {
+    const v = blob[d.kunci]
+    return typeof v === 'number' && Number.isFinite(v)
+  })
+
+  // Beberapa nilai tidak berasal dari katalog (tidur punya bentuk sampel
+  // sendiri), jadi ditambahkan terpisah agar tidak hilang.
+  const tambahan: KatalogMetrik[] = typeof blob.sleepH === 'number' && (blob.sleepH as number) > 0
+    ? [{ kunci: 'sleepH', label: 'Durasi tidur', kategori: 'Tidur', satuan: 'jam' }]
+    : []
+  const daftar = [...terisi, ...tambahan]
+
+  const perKategori = new Map<string, KatalogMetrik[]>()
+  for (const d of daftar) {
+    const arr = perKategori.get(d.kategori) ?? []
+    arr.push(d)
+    perKategori.set(d.kategori, arr)
   }
-  add('VO₂max', profile.vo2max, ' ml/kg/min', 1)
-  add('Resting HR', profile.restingHr, ' bpm')
-  add('HRV', profile.hrvMs, ' ms')
-  add('Sleep', profile.sleepH, ' h', 1)
-  add('Weight', profile.weightKg, ' kg', 1)
-  add('Body fat', profile.bodyFatPct, ' %', 1)
-  add('Steps', profile.steps, '')
-  add('Active energy', profile.activeKcal, ' kcal')
+  const kategoriTampil = [...perKategori.entries()]
+  const terlihat = semua ? kategoriTampil : kategoriTampil.slice(0, 3)
+
+  const fmt = (v: number, satuan: string) => {
+    const bulat = Math.abs(v) >= 100 || Number.isInteger(v)
+    return `${bulat ? Math.round(v).toLocaleString('id-ID') : v.toFixed(1)}${satuan ? ' ' + satuan : ''}`
+  }
 
   const when = profile.lastDeviceSyncAt ? new Date(profile.lastDeviceSyncAt) : null
   const ago = when ? timeAgoShort(when) : ''
 
   return (
     <Card className="!p-5">
-      <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconActivity size={20} />} title="Synced from Your Device" subtitle={`${profile.deviceSyncSource ?? 'Device'} · processed automatically`} />
-        <span className="flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold text-brand-dark">
+      <div className="flex items-center justify-between gap-3">
+        <SectionTitle icon={<IconActivity size={20} />} title="Synced from Your Device"
+          subtitle={`${profile.deviceSyncSource ?? 'Device'} · ${daftar.length} metrik terisi otomatis`} />
+        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold text-brand-dark">
           <span className="h-2 w-2 rounded-full bg-brand vital-dot" /> {ago}
         </span>
       </div>
-      {metrics.length > 0 ? (
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {metrics.map((m) => (
-            <div key={m.label} className="rounded-xl border border-neutral-100 bg-neutral-50 p-2.5 text-center">
-              <div className="text-sm font-extrabold text-ink">{m.value}</div>
-              <div className="text-[10px] font-semibold text-neutral-400">{m.label}</div>
+
+      {daftar.length > 0 ? (
+        <>
+          {terlihat.map(([kategori, items]) => (
+            <div key={kategori} className="mt-3">
+              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-400">{kategori}</div>
+              <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {items.map((d) => (
+                  <div key={d.kunci} className="rounded-xl border border-neutral-100 bg-neutral-50 p-2.5 text-center dark:border-white/10 dark:bg-white/5">
+                    <div className="text-sm font-extrabold text-ink dark:text-white">
+                      {fmt(blob[d.kunci] as number, d.satuan)}
+                    </div>
+                    <div className="text-[10px] font-semibold leading-tight text-neutral-400">{d.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
-        </div>
+          {kategoriTampil.length > 3 && (
+            <button onClick={() => setSemua(!semua)}
+              className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white">
+              {semua ? 'Tampilkan lebih sedikit' : `Tampilkan ${kategoriTampil.length - 3} kategori lainnya`}
+            </button>
+          )}
+        </>
       ) : (
-        <p className="mt-2 text-xs text-neutral-400">Your device connected, but this sync carried no matching metrics — widen the Date Range in Health Auto Export and it will fill in here.</p>
+        <p className="mt-2 text-xs text-neutral-400">
+          Perangkat tersambung, tetapi sinkronisasi ini tidak membawa metrik yang cocok — perluas
+          Date Range di Health Auto Export dan angkanya akan terisi di sini.
+        </p>
       )}
-      <p className="mt-3 text-[10px] text-neutral-400">These values flow straight into your calculators and the trend chart below — no manual entry needed. Reopen this page (or refocus the tab) to pull the latest sync.</p>
     </Card>
   )
 }
 
-// Compact "Xm ago" / "Xh ago" / "Xd ago" for the last sync stamp.
 function timeAgoShort(d: Date): string {
   const s = Math.floor((Date.now() - d.getTime()) / 1000)
   if (s < 60) return 'just now'
