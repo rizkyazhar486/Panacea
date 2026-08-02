@@ -1,5 +1,6 @@
 
-export interface MarketInstrument { symbol: string; label: string; group: string }
+export interface MarketInstrument { symbol: string; label: string; group: string; unggulan?: boolean }
+export interface SymbolHit { symbol: string; name: string; exchange: string | null; type: string | null }
 export interface MarketCandle { t: number; c: number; o?: number; h?: number; l?: number; v?: number }
 export interface MarketQuote {
   symbol: string; name: string; currency: string
@@ -190,6 +191,8 @@ export const api = {
   marketWatchlist: (symbols: string[], range: string) =>
     req<{ quotes: MarketQuote[]; failed: string[] }>(
       `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
+  marketSearch: (q: string) =>
+    req<{ results: SymbolHit[] }>(`/api/markets/search?q=${encodeURIComponent(q)}`),
   marketNews: () => req<{ items: LiveNewsItem[]; fetchedAt: number }>('/api/markets/news'),
   // in-app notification inbox
   notifications: () => req<{ notifications: Notif[] }>('/api/notifications').then((r) => r.notifications),

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, inputClass } from '../components/ui'
 import { IconToken } from '../components/icons'
-import { api, backendEnabled, type MarketQuote, type MarketInstrument, type LiveNewsItem } from '../lib/api'
+import { api, backendEnabled, type MarketQuote, type MarketInstrument, type LiveNewsItem, type SymbolHit } from '../lib/api'
 
 // Live market data: prices, charts, business news.
 //
@@ -55,15 +55,22 @@ export function Markets() {
   const [news, setNews] = useState<LiveNewsItem[]>([])
   const [group, setGroup] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [hits, setHits] = useState<SymbolHit[]>([])
+  const [searching, setSearching] = useState(false)
   const [err, setErr] = useState('')
   const [fetchedAt, setFetchedAt] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const timer = useRef<number | null>(null)
 
-  const symbols = useMemo(
-    () => (group ? instruments.filter((i) => i.group === group) : instruments).map((i) => i.symbol),
-    [instruments, group],
-  )
+  // "Semua" cannot carry every instrument: the server caps one watchlist request
+  // at 20 symbols, and sending the full list would silently keep whichever came
+  // first in declaration order — all indices, no crypto. The featured spread is
+  // the honest stand-in for "everything".
+  const symbols = useMemo(() => {
+    if (group) return instruments.filter((i) => i.group === group).map((i) => i.symbol)
+    const unggulan = instruments.filter((i) => i.unggulan)
+    return (unggulan.length ? unggulan : instruments.slice(0, 20)).map((i) => i.symbol)
+  }, [instruments, group])
 
   const loadWatchlist = useCallback(async () => {
     if (!symbols.length) return
@@ -106,6 +113,38 @@ export function Markets() {
     const q = search.toLowerCase().trim()
     return quotes.filter((x) => !q || `${x.symbol} ${x.name}`.toLowerCase().includes(q))
   }, [quotes, search])
+
+  // The box used to filter ONLY what was already on screen, so typing "Solana"
+  // searched a list that never contained Solana and came back empty — which
+  // reads as a broken page, not as a short watchlist. Now anything the source
+  // knows about is reachable, debounced so each keystroke is not a request.
+  useEffect(() => {
+    const q = search.trim()
+    if (q.length < 2) { setHits([]); setSearching(false); return }
+    setSearching(true)
+    const id = window.setTimeout(() => {
+      api.marketSearch(q)
+        .then((r) => setHits(r.results))
+        .catch(() => setHits([]))
+        .finally(() => setSearching(false))
+    }, 350)
+    return () => { window.clearTimeout(id); setSearching(false) }
+  }, [search])
+
+  // Only worth showing what the watchlist did not already cover.
+  const hitsBaru = useMemo(() => {
+    const ada = new Set(visible.map((q) => q.symbol.toUpperCase()))
+    return hits.filter((h) => !ada.has(h.symbol.toUpperCase()))
+  }, [hits, visible])
+
+  // A symbol opened from search is not in the watchlist, so without this it
+  // would be fetched and then never rendered — the tap would look ignored.
+  const daftar = useMemo(() => {
+    if (detail && !visible.some((q) => q.symbol.toUpperCase() === detail.symbol.toUpperCase())) {
+      return [detail, ...visible]
+    }
+    return visible
+  }, [detail, visible])
 
   if (!backendEnabled) {
     return (
@@ -155,7 +194,7 @@ export function Markets() {
       )}
 
       <Card className="!p-4">
-        <input className={inputClass} placeholder="Cari (mis. BBCA, AAPL, IHSG)…"
+        <input className={inputClass} placeholder="Cari apa pun (mis. Solana, ringgit, BBCA, emas)…"
           value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="mt-2 flex flex-wrap gap-1.5">
           <button onClick={() => setGroup(null)}
@@ -181,7 +220,45 @@ export function Markets() {
 
       {loading && <Card className="!p-4"><p className="text-[12px] text-neutral-500">Memuat data pasar…</p></Card>}
 
-      {visible.map((q) => {
+      {search.trim().length >= 2 && (
+        <Card className="!p-4">
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
+            Hasil pencarian "{search.trim()}"
+          </div>
+          {searching && <p className="mt-2 text-[12px] text-neutral-500">Mencari…</p>}
+          {!searching && !hitsBaru.length && !visible.length && (
+            <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
+              Tidak ada yang cocok. Coba nama lain, kode bursanya, atau bahasa Inggris —
+              misalnya "Solana", "SOL-USD", atau "gold".
+            </p>
+          )}
+          {!searching && !!hitsBaru.length && (
+            <>
+              <p className="mt-1 text-[11px] text-neutral-400">Di luar daftar pantau — ketuk untuk membuka</p>
+              <div className="mt-2 space-y-1.5">
+                {hitsBaru.map((h) => (
+                  <button key={h.symbol} onClick={() => { setSelected(h.symbol); setSearch('') }}
+                    className="flex w-full items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-left transition hover:bg-brand/10 dark:bg-white/5">
+                    <div className="min-w-0">
+                      <div className="truncate text-[13px] font-bold text-ink dark:text-white">{h.name}</div>
+                      <div className="text-[10px] text-neutral-400">
+                        {h.symbol}{h.exchange ? ` · ${h.exchange}` : ''}
+                      </div>
+                    </div>
+                    {h.type && (
+                      <span className="shrink-0 rounded-md bg-neutral-200 px-1.5 py-0.5 text-[9px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">
+                        {h.type}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </Card>
+      )}
+
+      {daftar.map((q) => {
         const up = (q.changePct ?? 0) >= 0
         const isOpen = selected === q.symbol
         const chart = isOpen && detail ? detail.series : q.series
