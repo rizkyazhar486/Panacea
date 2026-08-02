@@ -203,6 +203,8 @@ export const api = {
       `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
   deviceWorkouts: () =>
     req<{ workouts: Record<string, unknown>[]; count: number }>('/api/workouts'),
+  deviceHrNotifications: () =>
+    req<{ notifications: Record<string, unknown>[]; count: number }>('/api/hr-notifications'),
   syncDiagnosis: () =>
     req<{ findings: SyncFinding[]; deliveries: number; lastAt: string | null; recent: WebhookDelivery[] }>(
       '/api/health-sync/diagnosis'),
