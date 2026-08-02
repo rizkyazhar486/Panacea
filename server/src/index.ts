@@ -101,7 +101,7 @@ import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions
 import { checkHrZoneAlert, checkBedtimeReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { searchPubmed } from './pubmed.js'
-import { fetchQuote, fetchQuotes, INSTRUMENTS, RANGES, isValidSymbol, type Range } from './markets.js'
+import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
 import { lookupDrug } from './openfda.js'
 import { lookupGene } from './mygene.js'
@@ -977,7 +977,10 @@ app.get('/api/markets/quote', async (req, res) => {
 
 app.get('/api/markets/watchlist', async (req, res) => {
   const raw = String(req.query.symbols ?? '').split(',').map((x) => x.trim()).filter(Boolean)
-  const symbols = (raw.length ? raw : INSTRUMENTS.map((i) => i.symbol)).slice(0, 20)
+  // Falling back to the whole INSTRUMENTS list would silently truncate to the
+  // first symbols in declaration order, i.e. all indices and no crypto. The
+  // featured spread is the honest default for "everything".
+  const symbols = (raw.length ? raw : UNGGULAN).slice(0, WATCHLIST_MAX)
   if (symbols.some((s) => !isValidSymbol(s))) return res.status(400).json({ error: 'invalid_symbol' })
   const range = String(req.query.range ?? '1mo') as Range
   if (!RANGES.includes(range)) return res.status(400).json({ error: 'invalid_range' })
@@ -985,6 +988,18 @@ app.get('/api/markets/watchlist', async (req, res) => {
     res.json(await fetchQuotes(symbols, range))
   } catch (e) {
     console.log('[markets] watchlist error:', (e as Error).message)
+    res.status(503).json({ error: 'market_unavailable' })
+  }
+})
+
+// Symbol lookup, so the search box can reach beyond the built-in watchlist.
+app.get('/api/markets/search', async (req, res) => {
+  const q = String(req.query.q ?? '').trim().slice(0, 40)
+  if (q.length < 2) return res.json({ results: [] })
+  try {
+    res.json({ results: await searchSymbols(q) })
+  } catch (e) {
+    console.log('[markets] search error:', (e as Error).message)
     res.status(503).json({ error: 'market_unavailable' })
   }
 })
