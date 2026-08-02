@@ -111,6 +111,7 @@ interface DB {
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
   clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
   secondOpinions?: SecondOpinion[] // AI-drafted, doctor-reviewed second opinions
+  deviceWorkouts?: Record<string, Record<string, any>[]> // email -> raw workout objects pushed by the exporter
   webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
 }
 
@@ -1252,4 +1253,73 @@ export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveri
     })
   }
   return { findings, deliveries: d.length, lastAt: last!.at }
+}
+
+// ── Workouts pushed by the device ───────────────────────────────────────────
+//
+// Until now an incoming payload's `data.workouts` was mined for heart-rate
+// samples and then thrown away, so "Riwayat Latihan" — which reads only from
+// the browser's localStorage — could never show a run that arrived by webhook.
+// Someone with a perfectly configured Workouts automation still saw nothing.
+//
+// The raw export objects are kept (trimmed) rather than a normalised shape, so
+// the frontend can run the exact same parser it uses for manual uploads instead
+// of a second implementation that would drift from it.
+
+const MAX_WORKOUTS = 300
+/** Route arrays are large, unused by any current screen, and privacy-sensitive. */
+const ROUTE_KEYS = ['route', 'routeData', 'routes', 'locations', 'gpx']
+/** Enough for a very long session at one point per second. */
+const MAX_SERIES_POINTS = 20000
+
+function trimWorkout(w: Record<string, any>): Record<string, any> {
+  const out: Record<string, any> = {}
+  for (const [k, v] of Object.entries(w ?? {})) {
+    if (ROUTE_KEYS.includes(k)) continue
+    out[k] = Array.isArray(v) && v.length > MAX_SERIES_POINTS ? v.slice(-MAX_SERIES_POINTS) : v
+  }
+  return out
+}
+
+/** Start time is the natural identity: one session cannot begin twice. */
+function workoutKey(w: Record<string, any>): string {
+  return `${String(w?.start ?? w?.startDate ?? '')}|${String(w?.name ?? '')}`
+}
+
+export function appendWorkouts(email: string, workouts: Record<string, any>[]): number {
+  if (!Array.isArray(workouts) || !workouts.length) return 0
+  if (!db.deviceWorkouts) db.deviceWorkouts = {}
+  const prev = db.deviceWorkouts[email] ?? []
+
+  const byKey = new Map<string, Record<string, any>>()
+  for (const w of prev) byKey.set(workoutKey(w), w)
+
+  let baru = 0
+  for (const raw of workouts) {
+    if (!raw || typeof raw !== 'object') continue
+    // Without a start time a session has no identity, so it can neither be
+    // deduplicated nor ordered — every resend would pile up another copy.
+    // Match the leading date only. Date.parse cannot read the exporter's own
+    // "2026-08-02 17:20:00 +0700" format, so using it here would reject every
+    // real session.
+    const start = String(raw?.start ?? raw?.startDate ?? '').trim()
+    if (!/^\d{4}-\d{2}-\d{2}/.test(start)) continue
+    const key = workoutKey(raw)
+    // A rolling export resends the same session repeatedly; the later copy is
+    // the more complete one, so it replaces rather than duplicates.
+    if (!byKey.has(key)) baru++
+    byKey.set(key, trimWorkout(raw))
+  }
+
+  const merged = [...byKey.values()].sort(
+    (a, b) => Date.parse(String(a?.start ?? 0)) - Date.parse(String(b?.start ?? 0)),
+  ).slice(-MAX_WORKOUTS)
+
+  db.deviceWorkouts[email] = merged
+  save()
+  return baru
+}
+
+export function getWorkouts(email: string): Record<string, any>[] {
+  return db.deviceWorkouts?.[email] ?? []
 }

@@ -88,6 +88,8 @@ import {
   type Club,
   type SecondOpinion,
   appendHrSamples, getHrSamples, appendSleepSessions, getSleepSessions, clearHealthSeries, allUsersForAlerts, stripServerOwnedSettings,
+  appendWorkouts,
+  getWorkouts,
   recordWebhookDelivery,
   getWebhookDeliveries,
   diagnoseSync,
@@ -640,6 +642,11 @@ app.post('/api/health-webhook/:token', (req, res) => {
     // the phone can produce.
     const hrSamples = extractHeartRateSeries(req.body)
     const hrBaru = appendHrSamples(email, hrSamples)
+    // Store the sessions themselves, not just their heart rates. Without this
+    // a correctly-configured Workouts automation still produced an empty
+    // Riwayat Latihan, because that screen only ever read localStorage.
+    const rawWorkouts = (req.body as { data?: { workouts?: Record<string, unknown>[] } })?.data?.workouts
+    const latihanBaru = appendWorkouts(email, Array.isArray(rawWorkouts) ? rawWorkouts as Record<string, any>[] : [])
     const tidurBaru = appendSleepSessions(email, extractSleepSessions(req.body))
 
     // Zone alert rides on the sync that just delivered the data — there is no
@@ -669,6 +676,7 @@ app.post('/api/health-webhook/:token', (req, res) => {
         imported: 0,
         hrSamples: hrBaru,
         sleepNights: tidurBaru,
+        workoutsSaved: latihanBaru,
         hint: hrBaru > 0 || tidurBaru > 0
           ? 'Tidak ada metrik ringkas yang cocok, namun deret sampel tetap tersimpan — ini normal untuk otomatisasi bertipe Workouts.'
           : 'Tidak ada metrik yang cocok — kemungkinan belum ada data untuk rentang tanggal yang dipilih (mis. VO2max/berat badan tidak tercatat setiap hari). Coba perluas Date Range ke "Last 7 Days".',
@@ -686,12 +694,21 @@ app.post('/api/health-webhook/:token', (req, res) => {
       imported: Object.keys(mapped).length,
       hrSamples: hrBaru,
       sleepNights: tidurBaru,
+      workoutsSaved: latihanBaru,
       syncedAt: profile.lastDeviceSyncAt,
       profile,
     })
   } catch (e) {
     res.status(400).json({ error: (e as Error).message })
   }
+})
+
+// Sessions pushed by the device, in the exporter's own shape so the frontend
+// can reuse the same parser it uses for manual uploads.
+app.get('/api/workouts', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const workouts = getWorkouts(u.email)
+  res.json({ workouts, count: workouts.length })
 })
 
 // Why is nothing arriving? Answers with named settings, not vague advice.

@@ -201,6 +201,8 @@ export const api = {
   marketWatchlist: (symbols: string[], range: string) =>
     req<{ quotes: MarketQuote[]; failed: string[] }>(
       `/api/markets/watchlist?symbols=${encodeURIComponent(symbols.join(','))}&range=${encodeURIComponent(range)}`),
+  deviceWorkouts: () =>
+    req<{ workouts: Record<string, unknown>[]; count: number }>('/api/workouts'),
   syncDiagnosis: () =>
     req<{ findings: SyncFinding[]; deliveries: number; lastAt: string | null; recent: WebhookDelivery[] }>(
       '/api/health-sync/diagnosis'),
