@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
+import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Clinical Hub — one searchable index for the clinical & AI suite, same pattern
@@ -48,15 +49,20 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
 
 export function ClinicalHub() {
   const [query, setQuery] = useState('')
+  // Fitur yang disembunyikan pengguna juga hilang dari hub, bukan hanya dari
+  // menu — kalau tidak, "disembunyikan" hanya berarti pindah tempat.
+  const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
+  useEffect(() => langgananFitur(setTersembunyi), [])
   const q = query.trim().toLowerCase()
 
   const filtered = useMemo(() => {
-    if (!q) return GROUPS
-    return GROUPS.map((g) => ({
+    const dasar = GROUPS.map((g) => ({ ...g, tools: saring(g.tools, tersembunyi) })).filter((g) => g.tools.length > 0)
+    if (!q) return dasar
+    return dasar.map((g) => ({
       ...g,
       tools: g.tools.filter((t) => (t.name + ' ' + t.what + ' ' + t.kw).toLowerCase().includes(q)),
     })).filter((g) => g.tools.length > 0)
-  }, [q])
+  }, [q, tersembunyi])
 
   const total = GROUPS.reduce((s, g) => s + g.tools.length, 0)
 

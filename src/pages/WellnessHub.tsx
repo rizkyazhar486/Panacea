@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconSparkle } from '../components/icons'
+import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wellness Hub — one flagship surface for the longevity / mental-health /
@@ -137,12 +138,17 @@ const TAG_STYLE: Record<string, string> = {
 
 export function WellnessHub() {
   const [query, setQuery] = useState('')
+  // Fitur yang disembunyikan pengguna juga hilang dari hub, bukan hanya dari
+  // menu — kalau tidak, "disembunyikan" hanya berarti pindah tempat.
+  const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
+  useEffect(() => langgananFitur(setTersembunyi), [])
   const q = query.trim().toLowerCase()
 
   const filtered = useMemo(() => {
-    if (!q) return GROUPS
-    return GROUPS.map((g) => ({ ...g, feats: g.feats.filter((f) => (f.name + ' ' + f.what + ' ' + f.kw).toLowerCase().includes(q)) })).filter((g) => g.feats.length > 0)
-  }, [q])
+    const dasar = GROUPS.map((g) => ({ ...g, feats: saring(g.feats, tersembunyi) })).filter((g) => g.feats.length > 0)
+    if (!q) return dasar
+    return dasar.map((g) => ({ ...g, feats: g.feats.filter((f) => (f.name + ' ' + f.what + ' ' + f.kw).toLowerCase().includes(q)) })).filter((g) => g.feats.length > 0)
+  }, [q, tersembunyi])
 
   const total = GROUPS.reduce((s, g) => s + g.feats.length, 0)
 
