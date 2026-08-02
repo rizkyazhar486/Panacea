@@ -592,7 +592,8 @@ export function Shell({ children }: { children: ReactNode }) {
                 { to: '/community', label: 'Community', icon: IconUsers },
                 { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
                 { to: '/health-data', label: 'Health', icon: IconHeart },
-                { to: '/sports-scores', label: 'Scores', icon: IconRun },
+                { to: '/riwayat-latihan', label: 'Latihan', icon: IconRun },
+                { to: '/sports-scores', label: 'Scores', icon: IconFlame },
                 { to: '/profile', label: 'Profile', icon: IconUser },
               ].map((t) => (
                 <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
