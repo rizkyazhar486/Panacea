@@ -9,6 +9,8 @@ import {
   type ImportedWorkout,
 } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
+import { KolomPelatih } from '../components/KolomPelatih'
+import { usahaTerbaik, kemajuanTarget, type Target, type JenisTarget, type PeriodeTarget } from '../lib/analisisPro'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 
@@ -64,6 +66,20 @@ export function WorkoutHistory() {
 
   const ringkas = useMemo(() => summarise(workouts, hrMax), [workouts, hrMax])
 
+  const konteks = useMemo(
+    () => ({ hrMax, hrRest: demo.restingHr && demo.restingHr > 0 ? demo.restingHr : 60, sex: demo.sex }),
+    [hrMax, demo],
+  )
+  const pr = useMemo(() => usahaTerbaik(workouts), [workouts])
+  const [target, setTarget] = useState<Target>(() => {
+    try { const r = localStorage.getItem('pmd-target-latihan'); if (r) return JSON.parse(r) } catch { /* abaikan */ }
+    return { jenis: 'jarak', periode: 'pekan', nilai: 20 }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('pmd-target-latihan', JSON.stringify(target)) } catch { /* kuota */ }
+  }, [target])
+  const kemajuan = useMemo(() => kemajuanTarget(workouts, target), [workouts, target])
+
   if (!workouts.length) {
     return (
       <div className="space-y-4">
@@ -94,6 +110,70 @@ export function WorkoutHistory() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconRun />} title="Riwayat Latihan" subtitle={`${workouts.length} sesi tersimpan · HRmax dipakai ${hrMax} bpm`} />
+
+      {/* Kolom pelatih ditaruh paling atas: pertanyaan yang dibawa orang saat
+          membuka halaman ini adalah "berikutnya apa", bukan "berapa totalnya". */}
+      <KolomPelatih workouts={workouts} konteks={konteks} />
+
+      {/* Target — dibuat bisa diatur langsung di sini agar perencanaan tidak
+          perlu berpindah halaman. */}
+      <Card>
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Untuk perencanaan latihan ke depan" />
+        <div className="mt-3 flex flex-wrap gap-2">
+          <select value={target.jenis} onChange={(e) => setTarget({ ...target, jenis: e.target.value as JenisTarget })}
+            className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white">
+            <option value="jarak" className="bg-slate-900">Jarak</option>
+            <option value="waktu" className="bg-slate-900">Waktu</option>
+            <option value="sesi" className="bg-slate-900">Jumlah sesi</option>
+          </select>
+          <select value={target.periode} onChange={(e) => setTarget({ ...target, periode: e.target.value as PeriodeTarget })}
+            className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white">
+            <option value="pekan" className="bg-slate-900">Per pekan</option>
+            <option value="bulan" className="bg-slate-900">Per bulan</option>
+            <option value="tahun" className="bg-slate-900">Per tahun</option>
+          </select>
+          <input type="number" min={1} value={target.nilai}
+            onChange={(e) => setTarget({ ...target, nilai: Math.max(0, Number(e.target.value) || 0) })}
+            className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
+        </div>
+        <div className="mt-3 flex items-baseline justify-between">
+          <span className="text-2xl font-black text-white">
+            {kemajuan.tercapai} <span className="text-sm font-bold text-slate-400">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
+          </span>
+          <span className={`text-sm font-bold ${kemajuan.diJalur ? 'text-emerald-400' : 'text-amber-400'}`}>{kemajuan.pct}%</span>
+        </div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full rounded-full" style={{ width: `${kemajuan.pct}%`, background: kemajuan.diJalur ? '#22c55e' : '#f59e0b' }} />
+        </div>
+        <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+          {kemajuan.pct >= 100
+            ? 'Target periode ini sudah tercapai.'
+            : `Sisa ${kemajuan.sisaHari} hari — perlu sekitar ${kemajuan.perluPerHari} ${kemajuan.satuan} per hari.`}
+        </p>
+      </Card>
+
+      {pr.length > 0 && (
+        <Card>
+          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Waktu tercepat per jarak" />
+          <div className="mt-3 space-y-1.5">
+            {pr.map((p) => (
+              <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
+                <div>
+                  <div className="text-[13px] font-bold text-white">{p.label}</div>
+                  <div className="text-[10px] text-slate-500">
+                    {new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {p.diskalakan && ' · diskalakan'}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[15px] font-black tabular-nums text-white">{fmtDurasi(p.detik)}</div>
+                  <div className="text-[10px] text-slate-400">{fmtPace(p.paceSec)}/km</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card>
         <SectionTitle icon={<IconTimer />} title="Ringkasan" />

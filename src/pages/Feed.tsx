@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+import { WidgetBeranda } from '../components/WidgetBeranda'
 
 // Real map (Leaflet + OpenStreetMap, free) — lazy so the heavy lib loads only
 // when the GPS tracker is opened.
@@ -2231,6 +2232,11 @@ export default function SportsSocialFeed() {
         viewerName={currentUser.name}
         onAddStory={addStory}
       />
+
+      {/* Kartu pilihan pengguna — apa yang tampil di sini ditentukan sendiri
+          lewat "Atur kartu beranda", karena fitur sudah terlalu banyak untuk
+          ditebak mana yang penting bagi setiap orang. */}
+      <WidgetBeranda />
 
       {/* Widget Atas: GPS Tracking Engine (collapsed → logo only) */}
       <GpsTrackerCard onShareToFeed={handleShareGpsToFeed} authorName={currentUser.name} />
