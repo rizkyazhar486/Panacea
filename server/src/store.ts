@@ -111,6 +111,7 @@ interface DB {
   meets?: Meet[] // Club Hub meets — real, user-created, server-persisted
   clubs?: Club[] // Club Hub clubs — real, user-created, server-persisted
   secondOpinions?: SecondOpinion[] // AI-drafted, doctor-reviewed second opinions
+  webhookDeliveries?: Record<string, WebhookDelivery[]> // email -> what recent syncs actually contained
 }
 
 // A single daily medication reminder. `nextFireAt` is a UTC ISO timestamp —
@@ -653,11 +654,20 @@ export function saveHealthProfile(email: string, data: Record<string, any>): Rec
 // keeps, and stamped with a device-sync time. This makes device-pushed metrics
 // appear and accumulate on the website with no manual "Save" step.
 const TRACKED_TREND_KEYS = ['vo2max', 'restingHr', 'hrvMs', 'sleepH', 'weightKg', 'bodyFatPct', 'steps', 'activeKcal'] as const
-export function recordDeviceHealthSync(email: string, mapped: Record<string, any>, source: string): Record<string, any> {
+export function recordDeviceHealthSync(
+  email: string,
+  mapped: Record<string, any>,
+  source: string,
+  /** Date the samples were MEASURED (phone-local). Falls back to arrival date. */
+  measuredOn?: string | null,
+): Record<string, any> {
   if (!db.healthProfiles) db.healthProfiles = {}
   const prev = db.healthProfiles[email] ?? {}
   const now = new Date().toISOString()
-  const today = now.slice(0, 10)
+  // Stamping by arrival date is wrong whenever the exporter is set to anything
+  // other than "Today": yesterday's numbers would be filed under today, so the
+  // trend never gains a genuinely new point and shows the wrong day's value.
+  const today = (measuredOn && /^\d{4}-\d{2}-\d{2}$/.test(measuredOn)) ? measuredOn : now.slice(0, 10)
 
   // Merge today's snapshot into the trend history (one row per day; later syncs
   // in the same day refresh that day's values rather than duplicating).
@@ -1121,4 +1131,125 @@ export function setOrderStatus(id: string, status: Order['status']) {
     o.status = status
     save()
   }
+}
+
+// ── Webhook delivery log ─────────────────────────────────────────────────────
+//
+// A short history of what each incoming payload actually CONTAINED. Without it
+// the only answer to "my run isn't showing up" is to read the exporter's config
+// file by hand — the app can see every delivery and should be able to say which
+// setting is wrong on its own.
+//
+// Stores counts and metric NAMES only, never values.
+
+export interface WebhookDelivery {
+  at: string
+  metricGroups: { name: string; samples: number }[]
+  workouts: number
+  hrSamples: number
+  sleepNights: number
+  matched: string[]
+  /** Newest sample date in the payload (phone-local), if any. */
+  newestSampleDate: string | null
+}
+
+const MAX_DELIVERIES = 25
+
+export function recordWebhookDelivery(email: string, d: WebhookDelivery): void {
+  if (!db.webhookDeliveries) db.webhookDeliveries = {}
+  const prev = db.webhookDeliveries[email] ?? []
+  db.webhookDeliveries[email] = [...prev, d].slice(-MAX_DELIVERIES)
+  save()
+}
+
+export function getWebhookDeliveries(email: string): WebhookDelivery[] {
+  return db.webhookDeliveries?.[email] ?? []
+}
+
+export interface SyncFinding {
+  level: 'error' | 'warn' | 'ok'
+  judul: string
+  detail: string
+  setelan?: string
+  ubahKe?: string
+}
+
+/**
+ * Turn the delivery log into named, actionable findings.
+ *
+ * Each rule below corresponds to a specific Health Auto Export setting, so the
+ * answer is "turn X on", not "something is wrong".
+ */
+export function diagnoseSync(email: string): { findings: SyncFinding[]; deliveries: number; lastAt: string | null } {
+  const d = getWebhookDeliveries(email)
+  const findings: SyncFinding[] = []
+  const last = d.length ? d[d.length - 1] : null
+
+  if (!d.length) {
+    findings.push({
+      level: 'error',
+      judul: 'Belum ada satu pun kiriman yang sampai',
+      detail: 'Server belum pernah menerima data dari telepon ini. Biasanya berarti URL di aplikasi Health Auto Export salah, tokennya sudah dirotasi sehingga yang lama tidak berlaku lagi, atau otomatisasinya belum pernah benar-benar berjalan.',
+      setelan: 'REST API URL',
+      ubahKe: 'Tempel ulang Private Sync Link terbaru dari halaman ini',
+    })
+    return { findings, deliveries: 0, lastAt: null }
+  }
+
+  // Recent window — an old misconfiguration that has since been fixed should
+  // stop being reported.
+  const recent = d.slice(-10)
+
+  if (recent.every((x) => x.workouts === 0)) {
+    findings.push({
+      level: 'error',
+      judul: 'Latihan tidak pernah ikut terkirim',
+      detail: `Dari ${recent.length} kiriman terakhir, tidak satu pun memuat data latihan. Inilah sebabnya sesi lari tidak muncul di Riwayat Latihan — datanya memang tidak pernah dikirim. Deret detak jantung saat latihan juga ikut hilang, padahal itu data paling rapat yang bisa dihasilkan jam tangan.`,
+      setelan: 'Include Workouts',
+      ubahKe: 'NYALAKAN (dan biarkan Workout Types kosong agar semua jenis ikut)',
+    })
+  }
+
+  const hariIni = new Date().toISOString().slice(0, 10)
+  const adaTanggal = recent.filter((x) => x.newestSampleDate)
+  if (adaTanggal.length >= 3 && adaTanggal.every((x) => x.newestSampleDate !== hariIni)) {
+    const terbaru = adaTanggal[adaTanggal.length - 1].newestSampleDate!
+    findings.push({
+      level: 'error',
+      judul: 'Data hari ini tidak pernah ikut terkirim',
+      detail: `Sampel terbaru yang pernah sampai tertanggal ${terbaru}, padahal hari ini ${hariIni}. Artinya rentang ekspor tidak mencakup hari berjalan, sehingga tren berhenti di kemarin dan apa pun yang Anda lakukan hari ini tidak akan pernah muncul — berapa kali pun sinkronisasi berjalan.`,
+      setelan: 'Export Period',
+      ubahKe: '"Today" (atau "Last 7 Days" bila ingin sekalian menambal hari yang bolong)',
+    })
+  }
+
+  if (recent.every((x) => x.hrSamples === 0)) {
+    findings.push({
+      level: 'warn',
+      judul: 'Tidak ada satu pun sampel detak jantung tersimpan',
+      detail: 'Kiriman sampai, tetapi tidak membawa deret detak jantung. Body Battery, Log Detak Jantung dan Fisiologi Latihan semuanya bergantung pada deret ini.',
+      setelan: 'Aggregate Data',
+      ubahKe: 'MATIKAN, dan pastikan metrik "Heart Rate" tercentang',
+    })
+  }
+
+  const kosong = recent.filter((x) => x.metricGroups.length > 0 && x.metricGroups.every((g) => g.samples === 0))
+  if (kosong.length === recent.length && recent.length >= 3) {
+    findings.push({
+      level: 'warn',
+      judul: 'Metrik terkirim tanpa isi',
+      detail: 'Nama metriknya sampai, tetapi semuanya kosong. Ini khas rentang tanggal yang tidak memuat data apa pun.',
+      setelan: 'Export Period',
+      ubahKe: '"Last 7 Days"',
+    })
+  }
+
+  if (!findings.length) {
+    findings.push({
+      level: 'ok',
+      judul: 'Sinkronisasi terlihat sehat',
+      detail: `${d.length} kiriman tercatat, yang terakhir membawa ${last!.hrSamples} sampel detak jantung dan ${last!.workouts} latihan.`,
+    })
+  }
+  return { findings, deliveries: d.length, lastAt: last!.at }
 }

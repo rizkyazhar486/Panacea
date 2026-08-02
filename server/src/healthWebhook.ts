@@ -135,6 +135,39 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
   return out
 }
 
+/**
+ * Local date (YYYY-MM-DD) of the newest sample in the payload.
+ *
+ * The trend history used to stamp every arriving payload with the date it was
+ * RECEIVED. That is only correct when Health Auto Export is set to "Today":
+ * with "Yesterday" — a common setting, and the default in some versions —
+ * yesterday's numbers get filed under today, so the chart shows the wrong value
+ * against the wrong day and never actually gains a fresh point.
+ *
+ * Uses the offset in the exported timestamp, which is the phone's own local
+ * time, rather than the server's timezone.
+ */
+export function newestSampleDate(body: unknown): string | null {
+  const metrics = (body as Payload)?.data?.metrics
+  if (!Array.isArray(metrics)) return null
+  let bestT = -Infinity
+  let bestRaw = ''
+  for (const m of metrics) {
+    if (!Array.isArray(m?.data)) continue
+    for (const s of m.data) {
+      if (!s?.date) continue
+      const t = parseExportDate(s.date)
+      if (Number.isNaN(t) || t <= bestT) continue
+      bestT = t
+      bestRaw = s.date
+    }
+  }
+  if (!bestRaw) return null
+  // "2026-08-01 17:20:00 +0700" — the leading date is already phone-local.
+  const m = bestRaw.trim().match(/^(\d{4}-\d{2}-\d{2})/)
+  return m ? m[1] : null
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SERIES EXTRACTION
 //

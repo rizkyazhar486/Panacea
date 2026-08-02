@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import {
   IconHeart, IconActivity, IconDownload, IconKey, IconShield, IconCheck,
   IconTimer, IconGauge, IconChevronRight,
 } from '../components/icons'
-import { api, backendEnabled } from '../lib/api'
+import { api, backendEnabled, type SyncFinding } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public-facing, step-by-step guide for connecting Apple Watch / Apple Health
@@ -130,6 +130,19 @@ export function HealthSyncTutorial() {
       .catch(() => {})
   }, [])
 
+  // Diagnosis of what has ACTUALLY been arriving. Without this the only way to
+  // find a wrong exporter setting is to read the config file by hand — the
+  // server sees every delivery and can name the setting itself.
+  const [diag, setDiag] = useState<{ findings: SyncFinding[]; deliveries: number; lastAt: string | null } | null>(null)
+  const [cek, setCek] = useState(false)
+
+  const jalankanDiagnosa = useCallback(() => {
+    setCek(true)
+    api.syncDiagnosis().then(setDiag).catch(() => setDiag(null)).finally(() => setCek(false))
+  }, [])
+
+  useEffect(() => { if (backendEnabled) jalankanDiagnosa() }, [jalankanDiagnosa])
+
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
@@ -143,6 +156,55 @@ export function HealthSyncTutorial() {
           <Badge tone="normal">~5 minutes</Badge>
           <Badge tone="neutral">Requires iPhone + Apple Watch</Badge>
         </div>
+      </Card>
+
+      <Card className="!p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-black text-ink dark:text-white">Diagnosa sinkronisasi</div>
+            <p className="mt-0.5 text-[12px] text-neutral-500">
+              Diperiksa dari kiriman yang benar-benar sampai ke server, bukan dari tebakan.
+            </p>
+          </div>
+          <button onClick={jalankanDiagnosa} disabled={cek}
+            className="shrink-0 rounded-xl bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-ink disabled:opacity-50 dark:bg-white/10 dark:text-white">
+            {cek ? 'Memeriksa…' : 'Periksa lagi'}
+          </button>
+        </div>
+
+        {diag && (
+          <>
+            <div className="mt-2 text-[11px] text-neutral-400">
+              {diag.deliveries} kiriman tercatat
+              {diag.lastAt ? ` · terakhir ${new Date(diag.lastAt).toLocaleString('id-ID')}` : ''}
+            </div>
+            <div className="mt-3 space-y-2">
+              {diag.findings.map((f, i) => {
+                const nada = f.level === 'error'
+                  ? 'border-rose-500/30 bg-rose-500/[0.06]'
+                  : f.level === 'warn' ? 'border-amber-500/30 bg-amber-500/[0.06]'
+                    : 'border-emerald-500/30 bg-emerald-500/[0.06]'
+                const ikon = f.level === 'error' ? '\u2716' : f.level === 'warn' ? '\u26a0' : '\u2713'
+                return (
+                  <div key={i} className={`rounded-xl border p-3 ${nada}`}>
+                    <div className="text-[13px] font-bold text-ink dark:text-white">{ikon} {f.judul}</div>
+                    <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{f.detail}</p>
+                    {f.setelan && (
+                      <div className="mt-2 rounded-lg bg-black/5 px-2.5 py-2 text-[12px] dark:bg-white/10">
+                        <div className="text-neutral-500">Setelan di Health Auto Export</div>
+                        <div className="font-black text-ink dark:text-white">{f.setelan}</div>
+                        <div className="mt-0.5 text-neutral-600 dark:text-neutral-300">Ubah ke: <b>{f.ubahKe}</b></div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+        {!diag && !cek && (
+          <p className="mt-3 text-[12px] text-neutral-500">Diagnosa belum bisa diambil. Pastikan Anda sudah masuk.</p>
+        )}
       </Card>
 
       {/* Steps */}
