@@ -7,6 +7,13 @@
 //
 // Bawaannya sengaja sedikit — tiga kartu — karena beranda yang penuh sejak awal
 // justru membuat orang berhenti membacanya. Sisanya tinggal dinyalakan.
+//
+// PENTING SAAT MENAMBAH HALAMAN BARU: daftar ini ditulis manual dan TIDAK
+// diturunkan dari navigasi, karena tiap kartu punya label dan ringkasan yang
+// digubah khusus untuk beranda. Akibatnya halaman baru tidak muncul di sini
+// sampai didaftarkan — itu yang sempat terjadi pada CrossFit, Peregangan dan
+// Harada. Kalau Anda menambah halaman yang layak jadi pintasan beranda,
+// tambahkan barisnya di sini juga.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface WidgetDef {
@@ -28,6 +35,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'detakJantung', label: 'Detak Jantung', ringkas: 'Sampel terbaru dari jam tangan', ke: '/log-detak-jantung', emoji: '❤️' },
   { id: 'tidur', label: 'Pola Tidur', ringkas: 'Durasi dan tahapan tidur semalam', ke: '/pola-tidur', emoji: '😴' },
   { id: 'healthData', label: 'Data Kesehatan', ringkas: 'Metrik yang terisi otomatis dari perangkat', ke: '/health-data', emoji: '🩺' },
+  { id: 'latihanTerpandu', label: 'Latihan Terpandu', ringkas: 'Sesi berpanduan dengan video bentuk gerakan', ke: '/workout', emoji: '🏋️' },
+  { id: 'crossfit', label: 'CrossFit & AMRAP', ringkas: 'Benchmark bernama dengan jam mulai, jeda dan ketuk ronde', ke: '/crossfit', emoji: '🔥' },
+  { id: 'peregangan', label: 'Peregangan & Postur', ringkas: 'Rutinitas sebelum lari, sesudah sepeda, jeda kerja duduk', ke: '/peregangan', emoji: '🧘' },
+  { id: 'harada', label: 'Kisi Harada 9×9', ringkas: 'Satu sasaran, delapan penopang, 64 tindakan', ke: '/harada', emoji: '🧩' },
   { id: 'nutrisi', label: 'Nutrisi', ringkas: 'Asupan hari ini', ke: '/nutrition', emoji: '🥗' },
   { id: 'obat', label: 'Pengingat Obat', ringkas: 'Jadwal minum obat berikutnya', ke: '/med-reminders', emoji: '💊' },
   { id: 'skor', label: 'Skor Olahraga', ringkas: 'Pertandingan tim yang Anda ikuti', ke: '/sports-scores', emoji: '⚽' },
