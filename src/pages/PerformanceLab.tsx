@@ -3,6 +3,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
 import { getDemo } from '../lib/profile'
+import { awal, awalBulat } from '../lib/nilaiAwal'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Performa — data-driven calculators for the full strength/endurance/speed
@@ -180,7 +181,7 @@ function RpeCard() {
 }
 
 function VtLtCard() {
-  const [vo2, setVo2] = useState(41)
+  const [vo2, setVo2] = useState(() => awal('vo2max', 41))
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🌬️ Ventilatory & Lactate Threshold</div>
@@ -430,7 +431,7 @@ function FieldTestTab() {
 function GripCard() {
   const [r, setR] = useState(38)
   const [l, setL] = useState(36)
-  const [bw, setBw] = useState(65)
+  const [bw, setBw] = useState(() => awal('weightKg', 65))
   const avg = (r + l) / 2
   const asym = Math.max(r, l) > 0 ? (Math.abs(r - l) / Math.max(r, l)) * 100 : 0
   const ratio = avg / bw
@@ -516,7 +517,7 @@ function VentilationCard() {
 }
 
 function HydrationCard() {
-  const [pre, setPre] = useState(65)
+  const [pre, setPre] = useState(() => awal('weightKg', 65))
   const [post, setPost] = useState(64)
   const [fluid, setFluid] = useState(0.5)
   const [hrs, setHrs] = useState(1)
@@ -645,7 +646,7 @@ function TssCard() {
 
 function KarvonenCard() {
   const [hrmax, setHrmax] = useState(190)
-  const [hrrest, setHrrest] = useState(60)
+  const [hrrest, setHrrest] = useState(() => awalBulat('restingHr', 60))
   const [lo, setLo] = useState(60)
   const [hi, setHi] = useState(70)
   const target = (pct: number) => Math.round((hrmax - hrrest) * (pct / 100) + hrrest)

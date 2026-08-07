@@ -15,6 +15,14 @@ const KEY = 'pmd_profile'
 export function getDemo(): Demo {
   try { return { ...DEMO_DEFAULT, ...JSON.parse(localStorage.getItem(KEY) || '{}') } } catch { return DEMO_DEFAULT }
 }
+// Demografi yang BENAR-BENAR disimpan pengguna, tanpa nilai bawaan dicampur.
+// getDemo() selalu mengembalikan berat 70 dan tinggi 170 walau pengguna belum
+// pernah mengisi apa pun, jadi pemeriksaan "sudah terisi?" memakainya akan
+// selalu bernilai benar — dan data dari perangkat tidak pernah bisa masuk.
+export function getDemoTersimpan(): Partial<Demo> {
+  try { return JSON.parse(localStorage.getItem(KEY) || '{}') as Partial<Demo> } catch { return {} }
+}
+
 // Broadcast that health/demographic data changed so any mounted page can
 // re-sync immediately (not just on window focus). Pages listen for
 // 'panacea:health-updated' alongside their focus handler.
@@ -54,4 +62,23 @@ export function pushBiometrics(patch: { vo2max?: number; restingHr?: number; hrv
   if (!Object.keys(clean).length) return
   try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* ignore */ }
   setDemo(clean as Partial<Demo>)
+}
+
+/**
+ * Tulis nilai perangkat ke cache Health Profile.
+ *
+ * Ini penyimpanan KETIGA yang dibaca aplikasi: Longevity, Body Composition dan
+ * kalkulator klinis membaca `pmd_health_profile` langsung, bukan lewat
+ * healthVitals. Tanpa ini, auto-isi mengisi dua penyimpanan lalu berhenti tepat
+ * sebelum tempat yang justru dipakai halaman-halaman itu.
+ */
+export function mergeHealthCache(patch: Record<string, unknown>): void {
+  const clean: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(patch ?? {})) {
+    if (typeof v === 'number' && Number.isFinite(v) && v > 0) clean[k] = v
+    else if (typeof v === 'string' && v) clean[k] = v
+  }
+  if (!Object.keys(clean).length) return
+  try { localStorage.setItem(HP_KEY, JSON.stringify({ ...getHealthCache(), ...clean })) } catch { /* kuota */ }
+  broadcastHealthUpdate()
 }

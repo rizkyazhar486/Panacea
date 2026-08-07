@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { KartuDataPerangkat } from '../components/KartuDataPerangkat'
 import { useNavigate } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
@@ -2608,6 +2609,7 @@ export function ClinicalCalculators() {
         </div>
       )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
+      <KartuDataPerangkat />
       <input
         className={inputClass}
         placeholder="Search 40 tools: sepsis, burn, stroke, newborn, dosing…"

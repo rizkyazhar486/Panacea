@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconMoon, IconChartUp } from '../components/icons'
+import { awal, awalBulat } from '../lib/nilaiAwal'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Recovery & Strain — WHOOP-style daily loop, fully manual & offline:
@@ -120,6 +121,20 @@ export function Readiness() {
   const today: DayLog = store[tk] ?? { behaviors: [], workouts: [] }
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(store)) } catch { /* ignore */ } }, [store])
   const upd = (p: Partial<DayLog>) => setStore((s) => ({ ...s, [tk]: { ...today, ...p } }))
+
+  // Isi otomatis dari perangkat. HRV, denyut istirahat dan durasi tidur sudah
+  // diukur jam tangan semalam; meminta pengguna mengetik ulang angka yang sudah
+  // ada di ponselnya adalah alasan skor pemulihan sering kosong seharian.
+  // Hanya kolom yang masih kosong yang diisi — angka yang sudah diketik atau
+  // sudah dikoreksi pengguna tidak pernah ditimpa.
+  useEffect(() => {
+    const p: Partial<DayLog> = {}
+    if (!today.hrv) { const v = awal('hrvMs', 0); if (v > 0) p.hrv = Math.round(v) }
+    if (!today.rhr) { const v = awalBulat('restingHr', 0); if (v > 0) p.rhr = v }
+    if (!today.sleepH) { const v = awal('sleepH', 0); if (v > 0) p.sleepH = Math.round(v * 10) / 10 }
+    if (Object.keys(p).length) upd(p)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tk, today.hrv, today.rhr, today.sleepH])
 
   const hrvBase = useMemo(() => baseline(store, 'hrv'), [store])
   const rhrBase = useMemo(() => baseline(store, 'rhr'), [store])
