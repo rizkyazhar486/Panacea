@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { simpanBerkas } from '../lib/unduh'
 import { IconX } from './icons'
 import { Portal } from './Portal'
 import { useStore, uid } from '../lib/store'
@@ -149,12 +150,7 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
   }
 
   function download(blob: Blob) {
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = 'panaceamed-activity.png'
-    document.body.appendChild(a); a.click(); a.remove()
-    // Revoking too soon can abort the async download on Safari/iOS.
-    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    void simpanBerkas(blob, 'panaceamed-activity.png', 'Panaceamed.id')
   }
 
   async function handleDownload() {

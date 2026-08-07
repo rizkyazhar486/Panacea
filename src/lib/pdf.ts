@@ -1,3 +1,4 @@
+import { simpanBerkas } from './unduh'
 // Minimal client-side PDF generator that stamps a per-buyer watermark on every
 // page, so purchased materials are traceable to the buyer's ID.
 
@@ -75,15 +76,5 @@ export function makeWatermarkedPdf(title: string, meta: string, bodyText: string
 
 export function downloadWatermarkedPdf(opts: { title: string; meta: string; body: string; buyerId: string }) {
   const blob = makeWatermarkedPdf(opts.title, opts.meta, opts.body, `Panaceamed.id - ${opts.buyerId}`)
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = opts.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.pdf'
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  // Revoking right after click() can abort the download mid-flight on some
-  // browsers (notably Safari/iOS) since the actual file write is async —
-  // give it headroom before freeing the object URL.
-  setTimeout(() => URL.revokeObjectURL(url), 10_000)
+  void simpanBerkas(blob, opts.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 40) + '.pdf', opts.title)
 }

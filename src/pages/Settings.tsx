@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { simpanTeks } from '../lib/unduh'
 import { hariIni } from '../lib/tanggal'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
@@ -112,18 +113,8 @@ export function Settings() {
   function exportData() {
     const { account: _a, ...rest } = state
     const slim = { ...rest, posts: rest.posts.map((p) => ({ ...p, photos: undefined, videoUrl: undefined })) }
-    const blob = new Blob([JSON.stringify(slim, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `panaceamed-data-${hariIni()}.json`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    // Revoking right after click() can abort the download mid-flight on some
-    // browsers (notably Safari/iOS) since the actual file write is async —
-    // give it headroom before freeing the object URL.
-    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    void simpanTeks(JSON.stringify(slim, null, 2), `panaceamed-data-${hariIni()}.json`,
+      'application/json', 'Data Panaceamed.id')
   }
 
   return (

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { simpanTeks } from '../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../lib/biaGambar'
 import { hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
@@ -240,10 +241,7 @@ export function HealthProfile() {
   }
 
   function download(name: string, text: string, type: string) {
-    const url = URL.createObjectURL(new Blob([text], { type }))
-    const a = document.createElement('a')
-    a.href = url; a.download = name; a.click()
-    setTimeout(() => URL.revokeObjectURL(url), 2000)
+    void simpanTeks(text, name, type, 'Panaceamed.id')
   }
   function exportJson() {
     download(`health-data-${hariIni()}.json`, JSON.stringify(p, null, 2), 'application/json')

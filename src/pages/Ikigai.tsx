@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { simpanTeks } from '../lib/unduh'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Field } from '../components/ui'
 import { IconSparkle, IconHeart } from '../components/icons'
@@ -58,12 +59,7 @@ export function Ikigai() {
       d.habitToKeep.trim() && `ONE HABIT I WANT TO KEEP FOR DECADES\n${d.habitToKeep.trim()}\n`,
       filled === 4 && `MY IKIGAI\nWhat I love: ${d.love.trim()}\nWhat I'm good at: ${d.goodAt.trim()}\nWhat the world needs: ${d.worldNeeds.trim()}\nWhat I can be paid for: ${d.paidFor.trim()}\n`,
     ].filter(Boolean).join('\n')
-    const blob = new Blob([lines], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = `legacy-letter-${hariIni()}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
+    void simpanTeks(lines, `legacy-letter-${hariIni()}.txt`, 'text/plain;charset=utf-8', 'Legacy Letter')
   }
 
   const hasLetterContent = [d.mattersMost, d.rememberedFor, d.adviceToFuture, d.habitToKeep].some((s) => s.trim())
