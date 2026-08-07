@@ -1,0 +1,235 @@
+import { useMemo, useState } from 'react'
+import { Card, SectionTitle, inputClass } from '../components/ui'
+import { IconLeaf } from '../components/icons'
+import {
+  GERAKAN, PROTOKOL, SALAH_KAPRAH, RUJUKAN_PEREGANGAN,
+  type Kapan,
+} from '../lib/peregangan'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Peregangan & Postur.
+//
+// Disusun menurut KAPAN, bukan menurut otot, karena kesalahan yang sebenarnya
+// terjadi bukan salah memilih otot melainkan salah memilih waktu: peregangan
+// statis sebelum latihan menurunkan tenaga dan tidak menurunkan risiko cedera.
+// Halaman yang menyusunnya per otot diam-diam mendorong kesalahan itu.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TAB: { id: Kapan | 'semua'; label: string; emoji: string }[] = [
+  { id: 'semua', label: 'Semua', emoji: '📋' },
+  { id: 'sebelum', label: 'Sebelum', emoji: '⚡' },
+  { id: 'sesudah', label: 'Sesudah', emoji: '🧘' },
+  { id: 'harian', label: 'Harian', emoji: '💺' },
+  { id: 'yoga', label: 'Yoga & Pilates', emoji: '🕉️' },
+]
+
+const WARNA: Record<Kapan, string> = {
+  sebelum: 'text-amber-400', sesudah: 'text-emerald-400',
+  harian: 'text-sky-400', yoga: 'text-violet-400',
+}
+const LABEL_KAPAN: Record<Kapan, string> = {
+  sebelum: 'dinamis · sebelum latihan', sesudah: 'statis · sesudah latihan',
+  harian: 'harian · postur', yoga: 'yoga & pilates',
+}
+
+export function Peregangan() {
+  const [tab, setTab] = useState<Kapan | 'semua'>('semua')
+  const [cari, setCari] = useState('')
+  const [buka, setBuka] = useState<string | null>(null)
+  const [protokol, setProtokol] = useState<string | null>(null)
+
+  const daftar = useMemo(() => {
+    const q = cari.trim().toLowerCase()
+    return GERAKAN.filter((g) => {
+      if (tab !== 'semua' && g.kapan !== tab) return false
+      if (!q) return true
+      return (g.nama + ' ' + g.target + ' ' + g.untuk.join(' ')).toLowerCase().includes(q)
+    })
+  }, [tab, cari])
+
+  const pAktif = PROTOKOL.find((p) => p.id === protokol) ?? null
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <SectionTitle
+        icon={<IconLeaf />}
+        title="Peregangan & Postur"
+        subtitle="Disusun menurut kapan, bukan menurut otot"
+      />
+
+      {/* Hal yang paling sering salah, ditaruh paling atas. */}
+      <Card className="!border-amber-500/30 !bg-amber-500/5">
+        <div className="text-[11px] font-black uppercase tracking-wide text-amber-400">Satu hal yang perlu diluruskan dulu</div>
+        <p className="mt-2 text-[12px] leading-relaxed text-slate-300">
+          Peregangan <b>statis</b> sebelum latihan — menahan posisi 30 detik atau lebih — menurunkan
+          tenaga dan kekuatan untuk sementara, dan <b>tidak</b> menurunkan risiko cedera. Yang sebelum
+          latihan seharusnya <b>dinamis</b>: gerakan yang membawa sendi melewati rentang geraknya
+          berulang kali.
+        </p>
+        <p className="mt-2 text-[12px] leading-relaxed text-slate-300">
+          Peregangan statis tetap punya tempat — setelah latihan, atau sebagai sesi tersendiri untuk
+          menambah rentang gerak. Hanya waktunya yang selama ini keliru.
+        </p>
+      </Card>
+
+      {/* Protokol siap pakai */}
+      <Card>
+        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Rutinitas siap pakai</div>
+        <p className="mt-1 text-[12px] text-slate-400">Pilih situasinya, bukan ototnya.</p>
+        <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+          {PROTOKOL.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setProtokol(protokol === p.id ? null : p.id)}
+              aria-pressed={protokol === p.id}
+              className={`rounded-xl p-2.5 text-left transition ${
+                protokol === p.id ? 'bg-brand/25 ring-2 ring-brand' : 'bg-white/5'
+              }`}>
+              <div className="text-lg">{p.ikon}</div>
+              <div className="text-[12px] font-black leading-tight text-white">{p.nama}</div>
+              <div className="text-[10px] text-slate-400">{p.ringkas}</div>
+            </button>
+          ))}
+        </div>
+
+        {pAktif && (
+          <div className="mt-3 rounded-xl bg-white/5 p-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <div className="text-[13px] font-black text-white">{pAktif.ikon} {pAktif.nama}</div>
+              <div className="text-[10px] font-bold text-slate-400">{pAktif.durasiTotal}</div>
+            </div>
+            <ol className="mt-2 space-y-1">
+              {pAktif.urutan.map((id, i) => {
+                const g = GERAKAN.find((x) => x.id === id)
+                if (!g) return null
+                return (
+                  <li key={id}>
+                    <button
+                      onClick={() => { setBuka(id); setTab('semua') }}
+                      className="flex w-full items-baseline gap-2 rounded-lg px-1 py-1 text-left hover:bg-white/5">
+                      <span className="text-[11px] font-black text-brand">{i + 1}.</span>
+                      <span className="flex-1 text-[12px] font-semibold text-white">{g.nama}</span>
+                      <span className="text-[10px] text-slate-400">{g.durasi}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ol>
+            <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{pAktif.catatan}</p>
+          </div>
+        )}
+      </Card>
+
+      {/* Daftar gerakan */}
+      <Card>
+        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Gerakan</div>
+        <input
+          className={`${inputClass} mt-2`}
+          placeholder="Cari: hamstring, bahu, lari, duduk…"
+          value={cari}
+          onChange={(e) => setCari(e.target.value)}
+          aria-label="Cari gerakan"
+        />
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {TAB.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${
+                tab === t.id ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'
+              }`}>
+              {t.emoji} {t.label}
+            </button>
+          ))}
+        </div>
+
+        {daftar.length === 0 && (
+          <p className="mt-3 text-[12px] text-slate-400">Tidak ada yang cocok dengan "{cari}".</p>
+        )}
+
+        <div className="mt-3 space-y-1.5">
+          {daftar.map((g) => {
+            const terbuka = buka === g.id
+            return (
+              <div key={g.id} className="overflow-hidden rounded-xl bg-white/5">
+                <button
+                  onClick={() => setBuka(terbuka ? null : g.id)}
+                  aria-expanded={terbuka}
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[13px] font-black text-white">{g.nama}</span>
+                      {g.video && <span className="text-[10px]">🎬</span>}
+                    </div>
+                    <div className={`truncate text-[10px] font-bold ${WARNA[g.kapan]}`}>{LABEL_KAPAN[g.kapan]}</div>
+                  </div>
+                  <span className={`shrink-0 text-slate-400 transition ${terbuka ? 'rotate-90' : ''}`}>›</span>
+                </button>
+                {terbuka && (
+                  <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
+                    {g.video && (
+                      <video src={g.video} autoPlay muted loop playsInline preload="metadata"
+                        aria-label={`Demonstrasi ${g.nama}`}
+                        className="aspect-square w-full rounded-xl object-cover" />
+                    )}
+                    <div className="flex flex-wrap gap-2 text-[11px] text-slate-400">
+                      <span><b className="text-slate-300">Target:</b> {g.target}</span>
+                      <span><b className="text-slate-300">Durasi:</b> {g.durasi}</span>
+                    </div>
+                    <ol className="space-y-1">
+                      {g.cara.map((c, i) => (
+                        <li key={c} className="flex gap-2 text-[12px] leading-snug text-slate-200">
+                          <span className="font-black text-brand">{i + 1}.</span><span>{c}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="flex flex-wrap gap-1">
+                      {g.untuk.map((u) => (
+                        <span key={u} className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-slate-300">{u}</span>
+                      ))}
+                    </div>
+                    {g.hindari && (
+                      <div className="rounded-lg bg-rose-500/10 p-2">
+                        <div className="text-[10px] font-black uppercase text-rose-400">Hindari</div>
+                        <p className="text-[12px] leading-snug text-slate-300">{g.hindari}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </Card>
+
+      {/* Salah kaprah */}
+      <Card>
+        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Empat salah kaprah</div>
+        <div className="mt-2 space-y-2">
+          {SALAH_KAPRAH.map((s) => (
+            <div key={s.klaim} className="rounded-xl bg-white/5 p-3">
+              <div className="text-[12px] font-bold text-rose-400">✗ {s.klaim}</div>
+              <p className="mt-1 text-[12px] leading-relaxed text-slate-300">{s.fakta}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Rujukan</div>
+        <ul className="mt-2 space-y-1">
+          {RUJUKAN_PEREGANGAN.map((r) => (
+            <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
+          ))}
+        </ul>
+        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+          Klip demonstrasi dihasilkan AI sebagai ilustrasi gerakan, bukan rekaman instruktur.
+          Bila ada nyeri tajam, kesemutan atau baal saat melakukan salah satu gerakan, hentikan
+          dan konsultasikan — itu tanda saraf, bukan otot.
+        </p>
+      </Card>
+    </div>
+  )
+}
+
+export default Peregangan
