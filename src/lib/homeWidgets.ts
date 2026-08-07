@@ -37,6 +37,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'healthData', label: 'Data Kesehatan', ringkas: 'Metrik yang terisi otomatis dari perangkat', ke: '/health-data', emoji: '🩺' },
   { id: 'latihanTerpandu', label: 'Latihan Terpandu', ringkas: 'Sesi berpanduan dengan video bentuk gerakan', ke: '/workout', emoji: '🏋️' },
   { id: 'crossfit', label: 'CrossFit & AMRAP', ringkas: 'Benchmark bernama dengan jam mulai, jeda dan ketuk ronde', ke: '/crossfit', emoji: '🔥' },
+  { id: 'teknikLari', label: 'Teknik Lari', ringkas: 'Irama langkah, jangkauan kaki, napas, start', ke: '/teknik-lari', emoji: '🏃‍♂️' },
   { id: 'peregangan', label: 'Peregangan & Postur', ringkas: 'Rutinitas sebelum lari, sesudah sepeda, jeda kerja duduk', ke: '/peregangan', emoji: '🧘' },
   { id: 'harada', label: 'Kisi Harada 9×9', ringkas: 'Satu sasaran, delapan penopang, 64 tindakan', ke: '/harada', emoji: '🧩' },
   { id: 'nutrisi', label: 'Nutrisi', ringkas: 'Asupan hari ini', ke: '/nutrition', emoji: '🥗' },
