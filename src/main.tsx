@@ -101,6 +101,8 @@ const CrossFit = lazy(() => import('./pages/CrossFit').then((m) => ({ default: m
 const Peregangan = lazy(() => import('./pages/Peregangan').then((m) => ({ default: m.Peregangan })))
 const Jelajah = lazy(() => import('./pages/Jelajah').then((m) => ({ default: m.Jelajah })))
 const TeknikLari = lazy(() => import('./pages/TeknikLari').then((m) => ({ default: m.TeknikLari })))
+const VerifikasiConnect = lazy(() => import('./pages/VerifikasiConnect').then((m) => ({ default: m.VerifikasiConnect })))
+const TinjauConnect = lazy(() => import('./pages/TinjauConnect').then((m) => ({ default: m.TinjauConnect })))
 const CarbonDiet = lazy(() => import('./pages/CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
 const CaffeineCalculator = lazy(() => import('./pages/CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const HydrationCalculator = lazy(() => import('./pages/HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
@@ -329,6 +331,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/peregangan" element={<Peregangan />} />
               <Route path="/jelajah" element={<Jelajah />} />
               <Route path="/teknik-lari" element={<TeknikLari />} />
+              <Route path="/verifikasi-connect" element={<VerifikasiConnect />} />
+              <Route path="/tinjau-connect" element={<TinjauConnect />} />
               <Route path="/carbon-diet" element={<CarbonDiet />} />
               <Route path="/caffeine" element={<CaffeineCalculator />} />
               <Route path="/hydration" element={<HydrationCalculator />} />
