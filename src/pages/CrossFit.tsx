@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { JamWod } from '../components/JamWod'
 import {
   FORMAT, BENCHMARK, ARKETIPE, RABDO, ATURAN_AMAN, RUJUKAN,
   type Benchmark,
@@ -201,6 +202,7 @@ export function CrossFit() {
                       <p className="text-[12px] leading-snug text-slate-300">{b.skala}</p>
                     </div>
                     {b.catatan && <p className="text-[11px] leading-relaxed text-slate-400">{b.catatan}</p>}
+                    {b.jam && <JamWod nama={b.nama} setelan={b.jam} ronde={b.isi} />}
                   </div>
                 )}
               </div>
