@@ -159,7 +159,8 @@ export function Peregangan() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[13px] font-black text-white">{g.nama}</span>
-                      {g.video && <span className="text-[10px]">🎬</span>}
+                      {g.video ? <span className="text-[10px]" title="Ada klip">🎬</span>
+                        : g.gambar ? <span className="text-[10px]" title="Ada foto acuan">🖼️</span> : null}
                     </div>
                     <div className={`truncate text-[10px] font-bold ${WARNA[g.kapan]}`}>{LABEL_KAPAN[g.kapan]}</div>
                   </div>
@@ -167,11 +168,14 @@ export function Peregangan() {
                 </button>
                 {terbuka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
-                    {g.video && (
+                    {g.video ? (
                       <video src={g.video} autoPlay muted loop playsInline preload="metadata"
                         aria-label={`Demonstrasi ${g.nama}`}
                         className="aspect-square w-full rounded-xl object-cover" />
-                    )}
+                    ) : g.gambar ? (
+                      <img src={g.gambar} alt={`Posisi akhir ${g.nama}`} loading="lazy"
+                        className="aspect-square w-full rounded-xl object-cover" />
+                    ) : null}
                     <div className="flex flex-wrap gap-2 text-[11px] text-slate-400">
                       <span><b className="text-slate-300">Target:</b> {g.target}</span>
                       <span><b className="text-slate-300">Durasi:</b> {g.durasi}</span>
