@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { Role } from './store.js'
+import { kotaDariTeks, jarakKm } from './kota.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Connect — verifikasi, kredit kepercayaan, pelaporan dan pemblokiran.
@@ -362,6 +363,82 @@ export function profilPublik(email: string): {
     terverifikasi: true,
     kredit: a.kredit,
   }
+}
+
+// ── Deck: siapa yang muncul untuk siapa ──────────────────────────────────────
+//
+// Sampai sekarang radius tersimpan tetapi tidak menyaring apa pun. Ini yang
+// menyaringnya. Urutan pemeriksaan dipilih supaya yang paling murah dan paling
+// menentukan berjalan lebih dulu, dan supaya tidak ada jalan pintas: setiap
+// calon harus lolos SEMUA saringan.
+//
+//   1. Diri sendiri tidak muncul.
+//   2. Hanya akun terverifikasi. Verifikasi adalah seluruh alasan fitur ini ada.
+//   3. Blokir dua arah — yang memblokir maupun yang diblokir sama-sama hilang.
+//      Ini yang membuat "tidak bisa dihubungi" berarti benar-benar tidak
+//      terlihat, bukan sekadar tidak bisa dikirimi pesan.
+//   4. Kredit di bawah ambang bahaya tidak diedarkan. Akun yang sedang dalam
+//      penilaian tidak pantas dipertemukan dengan orang baru.
+//   5. Orientasi harus saling cocok — dihitung di server dan tidak pernah
+//      dikirim ke klien, karena orientasi adalah data pribadi spesifik.
+//   6. Jarak antar-pusat-kota harus di dalam radius KEDUANYA. Radius yang
+//      dipasang seseorang membatasi siapa yang ia lihat sekaligus siapa yang
+//      melihat dia; kalau hanya satu arah, radius lebar sepihak akan menembus
+//      batas yang dipasang orang lain.
+//
+// Kota yang tidak dikenali tidak dianggap "jarak nol". Orang tanpa letak yang
+// bisa dipastikan tetap muncul, tetapi ditandai jarak null, supaya kesalahan
+// data tidak diam-diam menjadi klaim kedekatan yang salah.
+
+export interface KartuDeck {
+  email: string
+  nama: string
+  umur: number
+  pekerjaan: string
+  pendidikan: string
+  kota: string
+  jarakKm: number | null
+  kredit: number
+}
+
+/** Apakah dua orientasi saling menerima. Dihitung hanya di server. */
+function saling(a: Preferensi, b: Preferensi): boolean {
+  // Model sederhana yang tidak berpura-pura lengkap: biseksual menerima semua,
+  // sisanya harus sama. Ini disengaja konservatif — memasangkan orang di luar
+  // preferensinya lebih merugikan daripada menampilkan calon lebih sedikit.
+  if (a === 'biseksual' || b === 'biseksual') return true
+  return a === b
+}
+
+export function dek(email: string, batas = 50): KartuDeck[] {
+  const saya = db.akun[email]
+  if (!saya?.data || saya.status !== 'terverifikasi') return []
+  const kotaSaya = kotaDariTeks(saya.data.tempatTinggal)
+
+  const hasil: KartuDeck[] = []
+  for (const lain of Object.values(db.akun)) {
+    if (lain.email === email) continue
+    if (lain.status !== 'terverifikasi' || !lain.data) continue
+    if (terblokir(email, lain.email)) continue
+    if (lain.kredit <= KREDIT_BAHAYA) continue
+    if (!saling(saya.data.preferensi, lain.data.preferensi)) continue
+
+    const kotaLain = kotaDariTeks(lain.data.tempatTinggal)
+    let jarak: number | null = null
+    if (kotaSaya && kotaLain) {
+      jarak = Math.round(jarakKm(kotaSaya.lat, kotaSaya.lon, kotaLain.lat, kotaLain.lon))
+      // Radius keduanya harus dipenuhi, bukan hanya radius si peminta.
+      if (jarak > saya.radiusKm || jarak > lain.radiusKm) continue
+    }
+
+    const p = profilPublik(lain.email)
+    if (!p) continue
+    hasil.push({ ...p, jarakKm: jarak })
+  }
+
+  // Yang terdekat lebih dulu; yang letaknya tidak diketahui di belakang.
+  hasil.sort((a, b) => (a.jarakKm ?? Infinity) - (b.jarakKm ?? Infinity))
+  return hasil.slice(0, Math.max(1, Math.min(200, batas)))
 }
 
 /** Akun yang sudah lewat tenggat penghapusan. Dipanggil tugas berkala. */

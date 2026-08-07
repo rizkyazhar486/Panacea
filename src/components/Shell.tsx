@@ -160,6 +160,7 @@ const nav: Nav[] = [
   { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
   // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
+  { to: '/dek-connect', label: 'Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/verifikasi-connect', label: 'Verifikasi Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/tinjau-connect', label: 'Tinjauan Connect', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },

@@ -278,6 +278,11 @@ export const api = {
     req<{ ok: true }>('/api/connect/verifikasi', { method: 'POST', body: JSON.stringify(data) }),
   connectRadius: (km: number) =>
     req<{ radiusKm: number }>('/api/connect/radius', { method: 'POST', body: JSON.stringify({ km }) }),
+  connectDek: (batas = 50) =>
+    req<{ kartu: {
+      email: string; nama: string; umur: number; pekerjaan: string
+      pendidikan: string; kota: string; jarakKm: number | null; kredit: number
+    }[] }>(`/api/connect/dek?batas=${batas}`).then((r) => r.kartu),
   connectBlokir: (email: string, buka = false) =>
     req<{ ok: true }>('/api/connect/blokir', { method: 'POST', body: JSON.stringify({ email, buka }) }),
   connectLapor: (email: string, alasan: string, catatan?: string) =>

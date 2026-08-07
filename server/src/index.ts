@@ -2,7 +2,7 @@ import { createServer } from 'node:http'
 import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
   profilPublik, bolehDilihat, ajuanMenunggu, laporanMenunggu, putuskanVerifikasi,
-  putuskanLaporan, kurangiKredit, pulihkanKredit, jatuhTempoHapus, hapusAkunConnect,
+  putuskanLaporan, kurangiKredit, pulihkanKredit, jatuhTempoHapus, hapusAkunConnect, dek,
 } from './connect.js'
 import express from 'express'
 import cors from 'cors'
@@ -1238,6 +1238,16 @@ app.post('/api/connect/verifikasi', requireAuth, (req, res) => {
 app.post('/api/connect/radius', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   res.json({ radiusKm: setelRadius(u.email, Number((req.body ?? {}).km)) })
+})
+
+// Deck: kartu calon kenalan yang sudah lolos verifikasi, blokir, kredit,
+// kecocokan orientasi, dan radius kedua belah pihak. Semua penyaringan terjadi
+// di server — klien tidak pernah menerima daftar mentah lalu menyaringnya
+// sendiri, karena daftar mentah itulah yang tidak boleh sampai ke klien.
+app.get('/api/connect/dek', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const batas = Number(req.query.batas)
+  res.json({ kartu: dek(u.email, Number.isFinite(batas) ? batas : 50) })
 })
 
 app.post('/api/connect/blokir', requireAuth, (req, res) => {
