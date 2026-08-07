@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { simpanTeks } from '../lib/unduh'
 import { createPortal } from 'react-dom'
 
 const MeetMap = lazy(() => import('../components/MeetMap'))
@@ -60,12 +61,8 @@ function downloadIcs(m: Meet) {
     `SUMMARY:${m.title} — ${m.club}`, `LOCATION:${m.venue}, ${m.address}`,
     'END:VEVENT', 'END:VCALENDAR',
   ].join('\r\n')
-  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }))
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${m.id}-${m.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.ics`
-  a.click()
-  URL.revokeObjectURL(url)
+  void simpanTeks(ics, `${m.id}-${m.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.ics`,
+    'text/calendar;charset=utf-8', m.title)
 }
 function mapsUrl(m: Meet): string {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${m.venue}, ${m.address}`)

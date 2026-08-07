@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { simpanBerkas } from '../lib/unduh'
 import { useStore, uid } from '../lib/store'
 import { uploadOrLocal } from '../lib/upload'
 import { IconShare2, IconX, IconDownload } from './icons'
@@ -179,22 +180,9 @@ export function ShareStatCard(props: StatCardProps) {
     const blob = await getBlob()
     if (!blob) return
     const file = new File([blob], 'panaceamed-stat.png', { type: 'image/png' })
-    const nav = navigator as Navigator & { canShare?: (data: { files: File[] }) => boolean }
-    if (nav.share && nav.canShare?.({ files: [file] })) {
-      try { await nav.share({ files: [file], title: 'Panaceamed.id', text: caption }); return } catch { /* user cancelled or unsupported — fall through */ }
-    }
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'panaceamed-stat.png'
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    // Revoking immediately can kill the download mid-flight (the actual
-    // file write happens async after click()) — Safari/iOS in particular
-    // then shows the download stuck forever instead of completing. Give it
-    // a few seconds of headroom before freeing the object URL.
-    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    // Satu jalur untuk semuanya: lembar berbagi lebih dulu (satu-satunya cara
+    // yang bekerja di iOS), lalu atribut download, lalu buka di tab baru.
+    await simpanBerkas(blob, 'panaceamed-stat.png', 'Panaceamed.id')
   }
 
   async function publishInApp(as: 'post' | 'story') {
@@ -266,9 +254,9 @@ export function ShareStatCard(props: StatCardProps) {
                 📣 Post to Panaceamed
               </button>
             </div>
-            <a href={dataUrl} download="panaceamed-stat.png" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600">
+            <button type="button" onClick={() => { void fetch(dataUrl).then(r => r.blob()).then(b => simpanBerkas(b, 'panaceamed-stat.png', 'Panaceamed.id')) }} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600">
               <IconDownload size={14} /> Download image
-            </a>
+            </button>
           </div>
         </div>
         </Portal>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { simpanKanvas, pesanSimpan } from '../lib/unduh'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
@@ -115,14 +116,13 @@ function ReportCard() {
 
   useEffect(() => { draw() }, [done])
 
-  const download = () => {
+  const [pesan, setPesan] = useState('')
+  const download = async () => {
     draw()
     const canvas = canvasRef.current
     if (!canvas) return
-    const link = document.createElement('a')
-    link.download = `longevity-report-${today}.png`
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+    const nama = `longevity-report-${today}.png`
+    setPesan(pesanSimpan(await simpanKanvas(canvas, nama, 'Longevity Report Card'), nama))
   }
 
   return (
@@ -131,7 +131,8 @@ function ReportCard() {
       <div className="mt-3 overflow-hidden rounded-2xl">
         <canvas ref={canvasRef} className="w-full" style={{ aspectRatio: '4/5' }} />
       </div>
-      <button onClick={download} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Download to share</button>
+      <button onClick={() => void download()} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Simpan / bagikan</button>
+      {pesan && <p className="mt-2 text-center text-[11px] text-neutral-500" role="status">{pesan}</p>}
     </Card>
   )
 }

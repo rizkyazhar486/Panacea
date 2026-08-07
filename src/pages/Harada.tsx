@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { simpanTeks } from '../lib/unduh'
 import { Card, SectionTitle, Button, inputClass } from '../components/ui'
 import { IconSparkle, IconChartUp } from '../components/icons'
 import { hariIni } from '../lib/tanggal'
@@ -139,13 +140,8 @@ export function Harada() {
       p.aksi.forEach((a) => { if (a.trim()) baris.push(`   [${p.selesai.includes(a) ? 'x' : ' '}] ${a}`) })
       baris.push('')
     })
-    const blob = new Blob([baris.filter((x) => x !== undefined).join('\n')], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `harada-${hariIni()}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
+    void simpanTeks(baris.filter((x) => x !== undefined).join('\n'),
+      `harada-${hariIni()}.txt`, 'text/plain;charset=utf-8', 'Kisi Harada')
   }
 
   function kosongkan() {
