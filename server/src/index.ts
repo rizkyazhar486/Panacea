@@ -122,6 +122,37 @@ const app = express()
 // JSON clients without protecting the frontend).
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.set('trust proxy', 1) // behind Render's proxy — needed for correct client IPs in rate limiting
+
+// Webhook kesehatan: satu-satunya pintu masuk data yang tidak butuh login, jadi
+// dijaga LEBIH DULU daripada parser JSON global.
+//
+// Sebelum ini, siapa pun yang menembak /api/health-webhook/<tebakan> tetap
+// membuat server membaca dan mem-parsing seluruh badan permintaan sampai 12 MB
+// sebelum akhirnya menjawab 404 — terukur 267 ms untuk 5,6 MB, berbanding 6 ms
+// untuk badan kecil. Dengan batas global 300 permintaan/menit, satu alamat bisa
+// memaksa server mem-parsing lebih dari satu gigabita JSON per menit tanpa
+// pernah memegang token yang sah.
+//
+// Dua lapis, berurutan:
+//   1. Token diperiksa lebih dulu. Token tak dikenal ditolak tanpa satu bita pun
+//      badan permintaan dibaca.
+//   2. Batas badan sendiri (5 MB), jauh di bawah 12 MB yang memang diperlukan
+//      jalur lain untuk gambar base64. Ekspor harian Health Auto Export jauh di
+//      bawah angka ini; 12 MB hanya membuka ruang penyalahgunaan.
+const webhookLimiter = rateLimit({
+  windowMs: 60_000, max: 60, standardHeaders: true, legacyHeaders: false,
+  message: { error: 'rate_limited' },
+})
+app.use('/api/health-webhook/:token', webhookLimiter, (req, res, next) => {
+  const t = req.params.token
+  if (!t || !emailForWebhookToken(t)) {
+    res.status(404).json({ error: 'unknown_token' })
+    return
+  }
+  next()
+})
+app.use('/api/health-webhook', express.json({ limit: '5mb' }))
+
 app.use(express.json({ limit: '12mb' })) // allow base64 images for AI vision
 app.use(cookieParser())
 app.use(
@@ -1310,6 +1341,25 @@ function alertOwner(kind: string, detail: string) {
 
 // Express error-handling middleware (must be registered AFTER all routes).
 app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // Kesalahan KLIEN dipisahkan dari kesalahan server. Sebelumnya semuanya
+  // dijawab 500 dan semuanya memicu peringatan ke pemilik — dua akibat buruk:
+  //
+  //   1. Badan permintaan yang terlalu besar atau JSON rusak dijawab 500,
+  //      sehingga terlihat seperti bug server. Kalau ekspor Health Auto Export
+  //      suatu hari melewati batas, gejalanya sama persis dengan kegagalan
+  //      senyap yang selama ini paling sulit dilacak.
+  //   2. Siapa pun bisa membanjiri peringatan pemilik hanya dengan mengirim
+  //      JSON rusak berulang kali.
+  const e = err as { type?: string; status?: number; statusCode?: number }
+  const kode = e?.status ?? e?.statusCode
+  if (e?.type === 'entity.too.large' || kode === 413) {
+    if (!res.headersSent) res.status(413).json({ error: 'payload_too_large' })
+    return
+  }
+  if (e?.type === 'entity.parse.failed' || (typeof kode === 'number' && kode >= 400 && kode < 500)) {
+    if (!res.headersSent) res.status(400).json({ error: 'bad_request' })
+    return
+  }
   const msg = err instanceof Error ? `${err.message}\n${err.stack ?? ''}` : String(err)
   alertOwner(`Route error @ ${req.method} ${req.path}`, msg)
   if (!res.headersSent) res.status(500).json({ error: 'internal_error' })
