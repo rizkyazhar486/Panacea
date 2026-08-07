@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { Role } from './store.js'
 import { kotaDariTeks, jarakKm } from './kota.js'
+import { normalizePhone } from './otp.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Connect — verifikasi, kredit kepercayaan, pelaporan dan pemblokiran.
@@ -9,15 +10,23 @@ import { kotaDariTeks, jarakKm } from './kota.js'
 // keputusan berikut dibuat sadar dan ditulis di sini agar tidak diubah tanpa
 // memahami akibatnya.
 //
-// 1. NIK TIDAK PERNAH DISIMPAN UTUH.
-//    Yang disimpan hanya sidik (hash) ber-garam dan empat digit terakhir.
-//    Tujuan NIK di sini adalah "satu orang, satu akun" — dan sidik memenuhi
-//    tujuan itu sepenuhnya: NIK yang sama selalu menghasilkan sidik yang sama,
-//    jadi pendaftaran ganda tetap ketahuan. Yang hilang hanyalah kemampuan
-//    membaca kembali nomornya, dan itu justru intinya: basis data yang bocor
-//    tidak bisa memberi nomor kependudukan siapa pun kepada penyerang.
-//    Verifikasi identitas dikerjakan lewat selfie berpose dan pencocokan media
-//    sosial, bukan lewat menatap angka NIK.
+// 1. IDENTITAS DIIKAT KE NOMOR TELEPON, BUKAN NIK.
+//    Sebelumnya NIK dipakai untuk menegakkan "satu orang, satu akun". Secara
+//    teknis itu berjalan, tetapi dasar hukumnya tidak ada: pemakaian NIK oleh
+//    pihak swasta diatur UU Adminduk 24/2013 dan turunannya, dan verifikasi
+//    NIK yang sah hanya bisa dilakukan lewat kerja sama resmi dengan Dukcapil.
+//    Menyidik nomornya memperkecil kerugian bila bocor, tetapi tidak memberi
+//    hak untuk memintanya.
+//
+//    Nomor telepon yang sudah dibuktikan lewat OTP justru lebih baik untuk
+//    tujuan ini, bukan sekadar lebih aman secara hukum. NIK hanya membuktikan
+//    nomornya ADA — siapa pun yang mengetahui NIK orang lain bisa memakainya.
+//    OTP membuktikan pemohon MEMEGANG nomor itu sekarang, dan satu nomor
+//    hanya bisa dipegang satu orang pada satu waktu.
+//
+//    Yang disimpan tetap hanya sidik ber-garam dan empat digit terakhir.
+//    Nomor utuhnya tidak disimpan di data verifikasi, jadi basis data yang
+//    bocor tidak memberi penyerang daftar nomor untuk dihubungi.
 //
 // 2. AGAMA DAN ORIENTASI SEKSUAL TIDAK PERNAH KELUAR KE PENGGUNA LAIN.
 //    Keduanya adalah data pribadi spesifik menurut UU PDP 27/2022. Di
@@ -54,10 +63,10 @@ export interface DataVerifikasi {
   sosialMedia: string[]
   /** URL selfie berpose (jari membentuk huruf P). */
   selfieUrl: string
-  /** Empat digit terakhir NIK — untuk pemilik mencocokkan, bukan menyimpan. */
-  nikAkhir: string
-  /** Sidik NIK ber-garam. Tidak bisa dikembalikan ke nomor aslinya. */
-  nikSidik: string
+  /** Empat digit terakhir nomor telepon — untuk pemilik mengenali, bukan menghubungi. */
+  teleponAkhir: string
+  /** Sidik nomor telepon ber-garam. Tidak bisa dikembalikan ke nomor aslinya. */
+  teleponSidik: string
 }
 
 export interface Pelanggaran {
@@ -89,6 +98,12 @@ export interface AkunConnect {
   pelanggaran: Pelanggaran[]
   /** Bukti persetujuan per tujuan (UU PDP Pasal 20-22). */
   persetujuan: CatatanPersetujuan[]
+  /** Sidik nomor telepon yang sudah dibuktikan lewat OTP. */
+  teleponSidik?: string
+  /** Empat digit terakhirnya, untuk pemilik mengenali saat meninjau. */
+  teleponAkhir?: string
+  /** Kapan nomor itu dibuktikan. */
+  teleponPada?: string
   /** Radius pencarian dalam km, ditentukan pengguna sendiri. */
   radiusKm: number
   /** Email yang diblokir oleh akun ini. Berlaku di semua perangkat. */
@@ -125,10 +140,10 @@ export function isiConnect(): DbConnect { return db }
 
 function uid(): string { return randomBytes(9).toString('hex') }
 
-/** Sidik NIK. Tidak bisa dikembalikan; hanya untuk mendeteksi akun ganda. */
-export function sidikNik(nik: string): string {
-  const bersih = nik.replace(/\D/g, '')
-  return createHash('sha256').update(db.garam + '|' + bersih).digest('hex')
+/** Sidik nomor telepon. Tidak dapat dikembalikan; hanya mendeteksi akun ganda. */
+export function sidikTelepon(telepon: string): string {
+  const bersih = telepon.replace(/\D/g, '')
+  return createHash('sha256').update(db.garam + '|tel|' + bersih).digest('hex')
 }
 
 export function akunConnect(email: string): AkunConnect {
@@ -179,7 +194,7 @@ export const VERSI_PEMBERITAHUAN = '2026-08-07'
 export type TujuanPersetujuan =
   | 'biometrik_selfie'      // data pribadi spesifik: biometrik
   | 'orientasi_seksual'     // data pribadi spesifik
-  | 'nik_sidik'             // identitas kependudukan (disidik, tidak disimpan)
+  | 'telepon_sidik'         // nomor telepon terbukti lewat OTP (disidik, tidak disimpan)
 
 export interface CatatanPersetujuan {
   tujuan: TujuanPersetujuan
@@ -188,7 +203,7 @@ export interface CatatanPersetujuan {
   dicabutPada?: string
 }
 
-export const TUJUAN_WAJIB: TujuanPersetujuan[] = ['biometrik_selfie', 'orientasi_seksual', 'nik_sidik']
+export const TUJUAN_WAJIB: TujuanPersetujuan[] = ['biometrik_selfie', 'orientasi_seksual', 'telepon_sidik']
 
 export function catatPersetujuan(email: string, tujuan: TujuanPersetujuan[]): void {
   const a = akunConnect(email)
@@ -222,15 +237,17 @@ export function tarikPersetujuan(email: string): HasilAjuan {
   const pada = new Date().toISOString()
   for (const p of a.persetujuan) if (!p.dicabutPada) p.dicabutPada = pada
   delete a.data
+  // Ikatan nomor ikut dilepas: dasar untuk menyimpan sidiknya adalah persetujuan
+  // yang baru saja ditarik. Nomornya bebas dipakai akun lain setelah ini.
+  delete a.teleponSidik
+  delete a.teleponAkhir
+  delete a.teleponPada
   a.status = 'belum'
   a.alasanTolak = undefined
   return { ok: true }
 }
 
-/** NIK Indonesia: 16 digit. */
-export function nikSah(nik: string): boolean {
-  return /^\d{16}$/.test(nik.replace(/\D/g, ''))
-}
+
 
 // ─── Media sosial yang diterima untuk pencocokan ─────────────────────────────
 //
@@ -267,10 +284,45 @@ export function platformDariUrl(url: string): PlatformSosial | null {
   return null
 }
 
+/**
+ * Ikat nomor telepon yang SUDAH terbukti lewat OTP ke akun Connect.
+ *
+ * Fungsi ini tidak memeriksa kode apa pun — pemeriksaannya milik lapisan OTP,
+ * dan pemanggil wajib melakukannya lebih dulu. Pemisahan ini disengaja supaya
+ * jelas siapa yang bertanggung jawab atas apa, tetapi ia juga berarti fungsi
+ * ini berbahaya bila dipanggil tanpa pembuktian. Hanya ada satu pemanggil, di
+ * rute /api/connect/telepon/verifikasi, tepat setelah Twilio menjawab approved.
+ *
+ * Di sinilah aturan satu orang satu akun ditegakkan, dan sengaja ditegakkan di
+ * sini — bukan saat mengajukan verifikasi. Nomor yang sudah dipakai akun lain
+ * ditolak SEBELUM pemohon mengisi seluruh formulir, bukan sesudahnya.
+ */
+export function ikatTelepon(email: string, telepon: string): HasilAjuan {
+  // Dinormalkan DI SINI, bukan hanya di rutenya. "081234567890" dan
+  // "+6281234567890" adalah nomor yang sama; tanpa normalisasi keduanya
+  // menghasilkan sidik berbeda dan satu orang bisa membuat dua akun — persis
+  // aturan yang seharusnya ditegakkan fungsi ini. Menyandarkannya pada
+  // pemanggil berarti aturannya hilang begitu ada pemanggil kedua.
+  const e164 = normalizePhone(telepon)
+  if (!e164) return { ok: false, galat: 'telepon_tidak_sah' }
+  const bersih = e164.replace(/\D/g, '')
+  if (bersih.length < 9) return { ok: false, galat: 'telepon_tidak_sah' }
+  const sidik = sidikTelepon(bersih)
+
+  const bentrok = Object.values(db.akun).find(
+    (x) => x.email !== email && x.teleponSidik === sidik && x.status !== 'ditolak')
+  if (bentrok) return { ok: false, galat: 'telepon_sudah_dipakai' }
+
+  const a = akunConnect(email)
+  a.teleponSidik = sidik
+  a.teleponAkhir = bersih.slice(-4)
+  a.teleponPada = new Date().toISOString()
+  return { ok: true }
+}
+
 export function ajukanVerifikasi(
   email: string,
-  masuk: Omit<DataVerifikasi, 'nikSidik' | 'nikAkhir'> & {
-    nik: string
+  masuk: Omit<DataVerifikasi, 'teleponSidik' | 'teleponAkhir'> & {
     /** Tujuan yang disetujui pengguna secara tegas, satu per satu. */
     persetujuan?: TujuanPersetujuan[]
   },
@@ -282,7 +334,10 @@ export function ajukanVerifikasi(
   const setuju = new Set(masuk.persetujuan ?? [])
   if (!TUJUAN_WAJIB.every((t) => setuju.has(t))) return { ok: false, galat: 'persetujuan_belum_lengkap' }
   if (a.status === 'terverifikasi') return { ok: false, galat: 'sudah_terverifikasi' }
-  if (!nikSah(masuk.nik)) return { ok: false, galat: 'nik_tidak_sah' }
+  // Nomor telepon TIDAK diterima dari formulir ini. Ia harus sudah diikat lebih
+  // dulu lewat OTP — nomor yang sekadar diketik hanya membuktikan pemohon tahu
+  // nomornya, bukan bahwa ia memegangnya.
+  if (!a.teleponSidik || !a.teleponAkhir) return { ok: false, galat: 'telepon_belum_diverifikasi' }
   if (!masuk.selfieUrl) return { ok: false, galat: 'selfie_wajib' }
   const tautan = (masuk.sosialMedia ?? []).map((s) => s.trim()).filter(Boolean)
   if (!tautan.length) return { ok: false, galat: 'sosial_media_wajib' }
@@ -292,22 +347,13 @@ export function ajukanVerifikasi(
   if (!masuk.nama?.trim()) return { ok: false, galat: 'nama_wajib' }
   if (!(masuk.umur >= 18)) return { ok: false, galat: 'umur_minimal_18' }
 
-  const sidik = sidikNik(masuk.nik)
-  // Satu orang, satu akun — diperiksa lewat sidik, tanpa menyimpan nomornya.
-  const bentrok = Object.values(db.akun).find(
-    (x) => x.email !== email && x.data?.nikSidik === sidik && x.status !== 'ditolak')
-  if (bentrok) return { ok: false, galat: 'nik_sudah_dipakai' }
-
-  const nikBersih = masuk.nik.replace(/\D/g, '')
   a.data = {
     ...masuk,
     sosialMedia: tautan,
-    nikSidik: sidik,
-    nikAkhir: nikBersih.slice(-4),
+    teleponSidik: a.teleponSidik,
+    teleponAkhir: a.teleponAkhir,
   } as DataVerifikasi
-  // Nomor mentah tidak boleh ikut tersimpan lewat sebaran objek di atas.
-  delete (a.data as unknown as Record<string, unknown>).nik
-  // Begitu pula daftar persetujuan: tempatnya di a.persetujuan sebagai catatan
+  // Daftar persetujuan: tempatnya di a.persetujuan sebagai catatan
   // bertanggal, bukan disalin mentah ke dalam data verifikasi.
   delete (a.data as unknown as Record<string, unknown>).persetujuan
   // Persetujuan dicatat hanya setelah semua pemeriksaan lolos, supaya tidak ada
@@ -443,6 +489,8 @@ export function ringkasanSaya(email: string) {
     hapusPada: a.hapusPada,
     radiusKm: a.radiusKm,
     persetujuan: a.persetujuan,
+    teleponAkhir: a.teleponAkhir,
+    teleponTerverifikasi: !!a.teleponSidik,
     versiPemberitahuan: VERSI_PEMBERITAHUAN,
     diblokir: a.diblokir,
     pelanggaran: a.pelanggaran,

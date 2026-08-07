@@ -106,7 +106,7 @@ export function TinjauConnect() {
                 <span>Pendidikan: {a.data.pendidikanTerakhir}</span>
                 <span>Lahir: {a.data.tempatLahir}, {a.data.tanggalLahir}</span>
                 <span className="col-span-2">Tinggal: {a.data.tempatTinggal}</span>
-                <span className="col-span-2">NIK: •••• •••• •••• {a.data.nikAkhir}</span>
+                <span className="col-span-2">Telepon: ••••••••{a.data.teleponAkhir} · terbukti lewat SMS</span>
               </div>
 
               {/* Yang dipakai memutuskan: selfie berpose vs foto media sosial. */}
@@ -132,7 +132,7 @@ export function TinjauConnect() {
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
                   Cocokkan wajah di selfie dengan foto di akun media sosialnya. Perhatikan juga
                   riwayat unggahan dan tanggal bergabung — akun yang baru dibuat kemarin tidak
-                  membuktikan apa pun. NIK sengaja tidak ditampilkan utuh; nomornya memang tidak disimpan.
+                  membuktikan apa pun. Nomor teleponnya sudah dibuktikan lewat kode SMS, jadi Anda tidak perlu menilainya — dan nomornya memang tidak disimpan.
                 </p>
               </div>
 

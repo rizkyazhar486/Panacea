@@ -39,6 +39,44 @@ function phoneEmail(phone: string): string {
 // Rate-limit OTP starts per phone (anti-spam / cost control).
 const lastStart = new Map<string, number>()
 
+// ── Inti yang bisa dipakai ulang ────────────────────────────────────────────
+//
+// Verifikasi Connect butuh membuktikan kepemilikan nomor telepon, dan itu
+// pekerjaan yang sama persis dengan masuk lewat OTP — hanya hasil akhirnya
+// berbeda (mengikat nomor, bukan membuat sesi). Alur Twilio-nya dipisah ke dua
+// fungsi ini supaya tidak ada jalur OTP kedua yang harus dijaga sendiri; jalur
+// yang bercabang adalah jalur yang salah satunya lupa diperbaiki.
+
+/** Kirim kode ke nomor. Mengembalikan galat sebagai string, bukan melempar. */
+export async function kirimKodeOtp(phone: string): Promise<{ ok: true } | { ok: false; galat: string }> {
+  if (!otpLive) return { ok: false, galat: 'otp_not_configured' }
+  const now = Date.now()
+  if (now - (lastStart.get(phone) ?? 0) < 30_000) return { ok: false, galat: 'too_soon' }
+  lastStart.set(phone, now)
+  try {
+    const r = await fetch(`https://verify.twilio.com/v2/Services/${VERIFY_SID}/Verifications`, {
+      method: 'POST',
+      headers: { Authorization: twAuth(), 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ To: phone, Channel: 'sms' }),
+    })
+    return r.ok ? { ok: true } : { ok: false, galat: 'otp_send_failed' }
+  } catch { return { ok: false, galat: 'otp_send_failed' } }
+}
+
+/** Periksa kode. true hanya bila Twilio menjawab 'approved'. */
+export async function periksaKodeOtp(phone: string, code: string): Promise<boolean> {
+  if (!otpLive) return false
+  try {
+    const r = await fetch(`https://verify.twilio.com/v2/Services/${VERIFY_SID}/VerificationCheck`, {
+      method: 'POST',
+      headers: { Authorization: twAuth(), 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ To: phone, Code: code }),
+    })
+    const data = (await r.json().catch(() => ({}))) as { status?: string }
+    return r.ok && data?.status === 'approved'
+  } catch { return false }
+}
+
 export async function otpStart(req: Request, res: Response) {
   if (!otpLive) return res.status(503).json({ error: 'otp_not_configured' })
   const phone = normalizePhone(String((req.body as any)?.phone || ''))

@@ -3,7 +3,7 @@ import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
   profilPublik, bolehDilihat, ajuanMenunggu, laporanMenunggu, putuskanVerifikasi,
   putuskanLaporan, kurangiKredit, pulihkanKredit, jatuhTempoHapus, hapusAkunConnect, dek,
-  tarikPersetujuan,
+  tarikPersetujuan, ikatTelepon,
 } from './connect.js'
 import express from 'express'
 import cors from 'cors'
@@ -104,7 +104,7 @@ import {
   diagnoseSync,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
+import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive, kirimKodeOtp, periksaKodeOtp, normalizePhone } from './otp.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
@@ -1245,6 +1245,33 @@ app.post('/api/connect/radius', requireAuth, (req, res) => {
 // kecocokan orientasi, dan radius kedua belah pihak. Semua penyaringan terjadi
 // di server — klien tidak pernah menerima daftar mentah lalu menyaringnya
 // sendiri, karena daftar mentah itulah yang tidak boleh sampai ke klien.
+// Pengikatan nomor telepon — pengganti NIK untuk aturan satu orang satu akun.
+//
+// Dua rute, karena pembuktian kepemilikan memang dua langkah: kirim kode, lalu
+// periksa. Nomor hanya diikat setelah Twilio menjawab 'approved'; tidak ada
+// jalan lain menuju ikatTelepon().
+app.post('/api/connect/telepon/kirim', requireAuth, async (req, res) => {
+  const telepon = normalizePhone(String((req.body ?? {}).telepon || ''))
+  if (!telepon) { res.status(400).json({ error: 'telepon_tidak_sah' }); return }
+  const r = await kirimKodeOtp(telepon)
+  if (!r.ok) { res.status(r.galat === 'too_soon' ? 429 : 502).json({ error: r.galat }); return }
+  res.json({ ok: true })
+})
+
+app.post('/api/connect/telepon/verifikasi', requireAuth, async (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const { telepon: mentah, kode } = (req.body ?? {}) as { telepon?: string; kode?: string }
+  const telepon = normalizePhone(String(mentah || ''))
+  if (!telepon || !String(kode || '').trim()) { res.status(400).json({ error: 'bad_input' }); return }
+  if (!(await periksaKodeOtp(telepon, String(kode).trim()))) {
+    res.status(401).json({ error: 'kode_salah' }); return
+  }
+  const r = ikatTelepon(u.email, telepon)
+  if (!r.ok) { res.status(409).json({ error: r.galat }); return }
+  addAudit(u, 'connect_ikat_telepon', u.email)
+  res.json({ ok: true })
+})
+
 // Penarikan persetujuan (UU PDP Pasal 9). Harus semudah memberikannya, jadi
 // satu permintaan sudah cukup — tanpa surel, tanpa alasan, tanpa antrean.
 app.post('/api/connect/tarik-persetujuan', requireAuth, (req, res) => {

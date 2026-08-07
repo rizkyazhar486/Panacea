@@ -273,6 +273,8 @@ export const api = {
     hapusPada?: string; radiusKm: number; diblokir: string[]
     persetujuan: { tujuan: string; pada: string; versiPemberitahuan: string; dicabutPada?: string }[]
     versiPemberitahuan: string
+    teleponAkhir?: string
+    teleponTerverifikasi: boolean
     pelanggaran: { id: string; pada: string; alasan: string; poin: number }[]
     ambang: { awal: number; bahaya: number; hapus: number }
   }>('/api/connect/saya'),
@@ -280,6 +282,10 @@ export const api = {
     req<{ ok: true }>('/api/connect/verifikasi', { method: 'POST', body: JSON.stringify(data) }),
   connectRadius: (km: number) =>
     req<{ radiusKm: number }>('/api/connect/radius', { method: 'POST', body: JSON.stringify({ km }) }),
+  connectTeleponKirim: (telepon: string) =>
+    req<{ ok: true }>('/api/connect/telepon/kirim', { method: 'POST', body: JSON.stringify({ telepon }) }),
+  connectTeleponVerifikasi: (telepon: string, kode: string) =>
+    req<{ ok: true }>('/api/connect/telepon/verifikasi', { method: 'POST', body: JSON.stringify({ telepon, kode }) }),
   connectTarikPersetujuan: () =>
     req<{ ok: boolean }>('/api/connect/tarik-persetujuan', { method: 'POST' }),
   connectDek: (batas = 50) =>
