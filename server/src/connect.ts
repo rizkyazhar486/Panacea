@@ -142,6 +142,41 @@ export function nikSah(nik: string): boolean {
   return /^\d{16}$/.test(nik.replace(/\D/g, ''))
 }
 
+// ─── Media sosial yang diterima untuk pencocokan ─────────────────────────────
+//
+// Hanya LinkedIn, Facebook, dan Instagram. Batasan ini bukan soal selera:
+// pencocokan wajah hanya berarti bila halaman pembandingnya sulit dikarang
+// mendadak. Ketiganya punya riwayat unggahan, daftar teman atau koneksi, dan
+// tanggal bergabung yang terlihat — pemilik bisa menilai apakah akunnya hidup
+// atau baru dibuat kemarin. Tautan bebas ke situs mana pun tidak memberi itu:
+// pemohon bisa memasang foto siapa saja di halaman yang ia kuasai sendiri.
+//
+// Host dicek dari hasil parse URL, bukan dari `includes`. "instagram.com.jahat.id"
+// mengandung "instagram.com" tetapi bukan Instagram.
+export const PLATFORM_SOSIAL = {
+  linkedin: { label: 'LinkedIn', host: ['linkedin.com'], contoh: 'https://linkedin.com/in/nama-anda' },
+  facebook: { label: 'Facebook', host: ['facebook.com', 'fb.com', 'm.facebook.com'], contoh: 'https://facebook.com/nama.anda' },
+  instagram: { label: 'Instagram', host: ['instagram.com'], contoh: 'https://instagram.com/namaanda' },
+} as const
+
+export type PlatformSosial = keyof typeof PLATFORM_SOSIAL
+
+/** Platform dari sebuah URL, atau null bila bukan salah satu dari ketiganya. */
+export function platformDariUrl(url: string): PlatformSosial | null {
+  let host: string
+  try {
+    const u = new URL(url.trim())
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return null
+    host = u.hostname.toLowerCase().replace(/^www\./, '')
+  } catch { return null }
+
+  for (const [id, p] of Object.entries(PLATFORM_SOSIAL)) {
+    // Cocok persis, atau subdomain sah (id.linkedin.com) — bukan sekadar berisi.
+    if (p.host.some((h) => host === h || host.endsWith('.' + h))) return id as PlatformSosial
+  }
+  return null
+}
+
 export function ajukanVerifikasi(
   email: string,
   masuk: Omit<DataVerifikasi, 'nikSidik' | 'nikAkhir'> & { nik: string },
@@ -150,7 +185,11 @@ export function ajukanVerifikasi(
   if (a.status === 'terverifikasi') return { ok: false, galat: 'sudah_terverifikasi' }
   if (!nikSah(masuk.nik)) return { ok: false, galat: 'nik_tidak_sah' }
   if (!masuk.selfieUrl) return { ok: false, galat: 'selfie_wajib' }
-  if (!masuk.sosialMedia?.filter(Boolean).length) return { ok: false, galat: 'sosial_media_wajib' }
+  const tautan = (masuk.sosialMedia ?? []).map((s) => s.trim()).filter(Boolean)
+  if (!tautan.length) return { ok: false, galat: 'sosial_media_wajib' }
+  if (tautan.some((t) => platformDariUrl(t) === null)) {
+    return { ok: false, galat: 'sosial_media_tidak_dikenal' }
+  }
   if (!masuk.nama?.trim()) return { ok: false, galat: 'nama_wajib' }
   if (!(masuk.umur >= 18)) return { ok: false, galat: 'umur_minimal_18' }
 
@@ -163,6 +202,7 @@ export function ajukanVerifikasi(
   const nikBersih = masuk.nik.replace(/\D/g, '')
   a.data = {
     ...masuk,
+    sosialMedia: tautan,
     nikSidik: sidik,
     nikAkhir: nikBersih.slice(-4),
   } as DataVerifikasi

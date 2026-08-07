@@ -22,6 +22,23 @@ import { useStore } from '../lib/store'
 
 const AMBANG = { bahaya: 80, hapus: 70 }
 
+// Cerminan PLATFORM_SOSIAL di server. Host dibaca dari hasil parse URL, bukan
+// dengan `includes` — "instagram.com.jahat.id" mengandung "instagram.com".
+const HOST_PLATFORM: Record<string, string[]> = {
+  linkedin: ['linkedin.com'],
+  facebook: ['facebook.com', 'fb.com', 'm.facebook.com'],
+  instagram: ['instagram.com'],
+}
+
+function platformSosial(url: string): string | null {
+  let host: string
+  try { host = new URL(url.trim()).hostname.toLowerCase().replace(/^www\./, '') } catch { return null }
+  for (const [id, daftar] of Object.entries(HOST_PLATFORM)) {
+    if (daftar.some((h) => host === h || host.endsWith('.' + h))) return id
+  }
+  return null
+}
+
 export function TinjauConnect() {
   const { account } = useStore()
   const [ajuan, setAjuan] = useState<any[]>([])
@@ -97,13 +114,25 @@ export function TinjauConnect() {
                 <div className="text-[10px] font-black uppercase text-slate-400">Bukti identitas</div>
                 <a href={a.data.selfieUrl} target="_blank" rel="noopener noreferrer"
                   className="mt-1 block text-[11px] font-bold text-brand underline">Buka selfie berpose (jari huruf P) →</a>
-                {(a.data.sosialMedia ?? []).map((s: string) => (
-                  <a key={s} href={s} target="_blank" rel="noopener noreferrer"
-                    className="mt-0.5 block truncate text-[11px] text-sky-400 underline">{s}</a>
-                ))}
+                {(a.data.sosialMedia ?? []).map((s: string) => {
+                  const p = platformSosial(s)
+                  return (
+                    <a key={s} href={s} target="_blank" rel="noopener noreferrer"
+                      className="mt-1 flex items-baseline gap-1.5 text-[11px] text-sky-400 underline">
+                      {/* Platform diberi label agar tautan yang host-nya tidak sesuai
+                          langsung terlihat, tanpa perlu membaca URL panjangnya. */}
+                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-black uppercase no-underline ${
+                        p ? 'bg-sky-500/15 text-sky-300' : 'bg-rose-500/15 text-rose-300'}`}>
+                        {p ?? 'tidak dikenal'}
+                      </span>
+                      <span className="truncate">{s}</span>
+                    </a>
+                  )
+                })}
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
-                  Cocokkan wajah di selfie dengan foto di akun media sosialnya. NIK sengaja tidak
-                  ditampilkan utuh — nomornya memang tidak disimpan.
+                  Cocokkan wajah di selfie dengan foto di akun media sosialnya. Perhatikan juga
+                  riwayat unggahan dan tanggal bergabung — akun yang baru dibuat kemarin tidak
+                  membuktikan apa pun. NIK sengaja tidak ditampilkan utuh; nomornya memang tidak disimpan.
                 </p>
               </div>
 

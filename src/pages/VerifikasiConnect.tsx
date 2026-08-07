@@ -21,6 +21,15 @@ import { api, backendEnabled } from '../lib/api'
 //   * Selfie berpose hanya dilihat pemilik saat meninjau.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Tiga platform yang diterima untuk pencocokan. Daftar ini harus tetap sama
+// dengan PLATFORM_SOSIAL di server/src/connect.ts — server yang menolak, bukan
+// formulir ini, jadi formulir hanya boleh menawarkan yang pasti diterima.
+const PLATFORM = [
+  { id: 'linkedin' as const, label: 'LinkedIn', contoh: 'https://linkedin.com/in/nama-anda' },
+  { id: 'facebook' as const, label: 'Facebook', contoh: 'https://facebook.com/nama.anda' },
+  { id: 'instagram' as const, label: 'Instagram', contoh: 'https://instagram.com/namaanda' },
+]
+
 const PREFERENSI = [
   { id: 'straight', l: 'Straight' },
   { id: 'gay', l: 'Gay' },
@@ -32,7 +41,8 @@ const GALAT: Record<string, string> = {
   nik_tidak_sah: 'NIK harus 16 digit angka.',
   nik_sudah_dipakai: 'NIK ini sudah dipakai akun lain. Satu orang hanya boleh punya satu akun.',
   selfie_wajib: 'Selfie berpose wajib diunggah.',
-  sosial_media_wajib: 'Isi minimal satu tautan media sosial.',
+  sosial_media_wajib: 'Isi minimal satu tautan LinkedIn, Facebook, atau Instagram.',
+  sosial_media_tidak_dikenal: 'Tautan hanya boleh ke LinkedIn, Facebook, atau Instagram. Periksa alamat yang Anda tempel.',
   nama_wajib: 'Nama wajib diisi.',
   umur_minimal_18: 'Connect hanya untuk 18 tahun ke atas.',
   sudah_terverifikasi: 'Akun Anda sudah terverifikasi.',
@@ -42,7 +52,7 @@ export function VerifikasiConnect() {
   const [f, setF] = useState({
     nama: '', tempatLahir: '', tanggalLahir: '', pekerjaan: '', status: '',
     preferensi: 'straight', agama: '', pendidikanTerakhir: '', tempatTinggal: '',
-    nik: '', selfieUrl: '', sosial1: '', sosial2: '',
+    nik: '', selfieUrl: '', linkedin: '', facebook: '', instagram: '',
   })
   const [umur, setUmur] = useState<number | undefined>(undefined)
   const [kirim, setKirim] = useState(false)
@@ -65,7 +75,7 @@ export function VerifikasiConnect() {
         umur: umur ?? 0, pekerjaan: f.pekerjaan, status: f.status,
         preferensi: f.preferensi, agama: f.agama, pendidikanTerakhir: f.pendidikanTerakhir,
         tempatTinggal: f.tempatTinggal, nik: f.nik, selfieUrl: f.selfieUrl,
-        sosialMedia: [f.sosial1, f.sosial2].filter(Boolean),
+        sosialMedia: PLATFORM.map((p) => f[p.id]).filter(Boolean),
       })
       setPesan('Ajuan terkirim. Pemilik akan meninjau selfie dan media sosial Anda.')
       setSaya(await api.connectSaya())
@@ -171,10 +181,19 @@ export function VerifikasiConnect() {
               </p>
             </div>
             <div className="mt-2 grid grid-cols-1 gap-2">
-              <Field label="Media sosial 1"><input className={inputClass} placeholder="https://instagram.com/…" value={f.sosial1} onChange={(e) => set('sosial1', e.target.value)} aria-label="Media sosial 1" /></Field>
-              <Field label="Media sosial 2 (opsional)"><input className={inputClass} value={f.sosial2} onChange={(e) => set('sosial2', e.target.value)} aria-label="Media sosial 2" /></Field>
+              {PLATFORM.map((p) => (
+                <Field key={p.id} label={p.label}>
+                  <input className={inputClass} placeholder={p.contoh} value={f[p.id]}
+                    onChange={(e) => set(p.id, e.target.value)} aria-label={p.label} />
+                </Field>
+              ))}
             </div>
-            <p className="mt-1 text-[10px] text-slate-500">Pemilik mencocokkan wajah di selfie dengan foto di akun media sosial Anda.</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+              Isi <b>minimal satu</b> dari ketiganya. Hanya tiga ini yang diterima karena pencocokan
+              wajah baru berarti bila halaman pembandingnya sulit dikarang mendadak — ketiganya
+              memperlihatkan riwayat unggahan, koneksi, dan tanggal bergabung. Tautan ke situs lain
+              tidak memberi pemilik apa pun untuk dinilai.
+            </p>
           </Card>
 
           {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
