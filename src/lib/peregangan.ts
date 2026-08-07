@@ -24,6 +24,7 @@ export interface Gerakan {
   untuk: string[]      // cabang olahraga / situasi
   hindari?: string
   video?: string       // URL klip demonstrasi, bila ada
+  gambar?: string      // Foto acuan posisi, untuk gerakan yang belum berklip
 }
 
 export const GERAKAN: Gerakan[] = [
@@ -64,6 +65,7 @@ export const GERAKAN: Gerakan[] = [
       'Berdiri, ulangi. Kedalaman biasanya bertambah tiap pengulangan.',
     ],
     untuk: ['Angkat beban', 'CrossFit', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085407_31fa57a2-2b37-41e3-a3af-342e5504f179.png',
   },
   {
     id: 'lengan-renang', nama: 'Putaran lengan & tarikan bahu', kapan: 'sebelum', target: 'Bahu, dada, punggung atas',
@@ -75,6 +77,7 @@ export const GERAKAN: Gerakan[] = [
     ],
     untuk: ['Renang', 'Angkat beban', 'Umum'],
     hindari: 'Kalau bahu pernah dislokasi atau ada nyeri saat mengangkat lengan, konsultasikan dulu.',
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085406_34944294-f6ec-4adb-ac1e-4983a9e43e27.png',
   },
   // ── Sesudah latihan: statis ───────────────────────────────────────────────
   {
@@ -100,6 +103,7 @@ export const GERAKAN: Gerakan[] = [
       'Napas keluar saat memperdalam.',
     ],
     untuk: ['Lari', 'Sepeda', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085432_e780e996-aace-4073-a072-947753781a8b.png',
   },
   {
     id: 'betis-dinding', nama: 'Peregangan betis di dinding', kapan: 'sesudah', target: 'Gastrocnemius, soleus',
@@ -111,6 +115,7 @@ export const GERAKAN: Gerakan[] = [
       'Keduanya perlu; kebanyakan orang hanya melakukan yang pertama.',
     ],
     untuk: ['Lari', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085432_ead9605a-09f0-473b-9815-53fb9c568f27.png',
   },
   {
     id: 'piriformis', nama: 'Peregangan gluteus & piriformis', kapan: 'sesudah', target: 'Gluteus, piriformis',
@@ -121,6 +126,7 @@ export const GERAKAN: Gerakan[] = [
       'Kepala dan bahu tetap rileks di lantai.',
     ],
     untuk: ['Lari', 'Sepeda', 'Kerja duduk lama'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085503_590bd489-2d5e-41a7-85e9-25eb752f4658.png',
   },
   {
     id: 'dada-pintu', nama: 'Peregangan dada di kusen pintu', kapan: 'sesudah', target: 'Pektoralis, bahu depan',
@@ -131,6 +137,7 @@ export const GERAKAN: Gerakan[] = [
       'Ulangi dengan siku lebih tinggi dan lebih rendah untuk serat yang berbeda.',
     ],
     untuk: ['Renang', 'Angkat beban', 'Kerja duduk lama'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085503_8edb16dc-a6bd-497a-848d-721a539ed363.png',
   },
   // ── Harian / postur ───────────────────────────────────────────────────────
   {
@@ -155,6 +162,7 @@ export const GERAKAN: Gerakan[] = [
     ],
     untuk: ['Kerja duduk lama', 'Umum'],
     hindari: 'Jangan memutar leher penuh melingkar — gerakan itu menekan sendi facet tanpa manfaat tambahan.',
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085538_f55f314e-6a3e-4b9c-9ed7-11b44fe85481.png',
   },
   {
     id: 'kucing-sapi', nama: 'Kucing-sapi', kapan: 'harian', target: 'Seluruh tulang belakang',
@@ -166,6 +174,7 @@ export const GERAKAN: Gerakan[] = [
       'Gerakannya lambat dan mengikuti napas, bukan dikejar jumlahnya.',
     ],
     untuk: ['Kerja duduk lama', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085538_b100a43e-221f-4597-a8dc-e2cc527dbc13.png',
   },
   // ── Yoga & pilates ────────────────────────────────────────────────────────
   {
@@ -177,6 +186,7 @@ export const GERAKAN: Gerakan[] = [
       'Dorong lantai menjauh lewat telapak tangan; telinga sejajar lengan.',
     ],
     untuk: ['Yoga', 'Lari', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085706_011d1bd8-8060-455b-b5cb-2733a711366c.png',
   },
   {
     id: 'merpati', nama: 'Pigeon pose', kapan: 'yoga', target: 'Rotator pinggul luar',
@@ -188,6 +198,7 @@ export const GERAKAN: Gerakan[] = [
     ],
     untuk: ['Yoga', 'Lari', 'Sepeda'],
     hindari: 'Kalau lutut depan terasa nyeri (bukan pinggul), keluar dari posisi. Ini posisi yang paling sering membebani lutut secara salah.',
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085706_5508cca5-bb3a-4948-b2b4-39be75a05e5d.png',
   },
   {
     id: 'gulung-pilates', nama: 'Roll down pilates', kapan: 'yoga', target: 'Kontrol tulang belakang, hamstring',
@@ -199,6 +210,7 @@ export const GERAKAN: Gerakan[] = [
       'Perut tetap aktif sepanjang gerakan.',
     ],
     untuk: ['Pilates', 'Kerja duduk lama', 'Umum'],
+    gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_085731_adfb9240-f931-4763-99ed-6b8fb8164f92.png',
   },
 ]
 
