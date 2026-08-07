@@ -1,4 +1,9 @@
 import { createServer } from 'node:http'
+import {
+  ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
+  profilPublik, bolehDilihat, ajuanMenunggu, laporanMenunggu, putuskanVerifikasi,
+  putuskanLaporan, kurangiKredit, pulihkanKredit, jatuhTempoHapus, hapusAkunConnect,
+} from './connect.js'
 import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -1211,6 +1216,94 @@ function isOwner(u: User): boolean {
   return u.email.toLowerCase() === config.ownerEmail || u.role === 'owner'
 }
 
+// ── Connect: verifikasi, kredit kepercayaan, laporan, blokir ────────────────
+//
+// Pemisahannya tegas: yang bisa dilakukan pengguna atas dirinya sendiri, dan
+// yang HANYA boleh dilakukan pemilik. Tidak ada endpoint yang mengembalikan
+// agama, orientasi seksual, atau NIK kepada siapa pun selain pemilik akun itu
+// sendiri dan pemilik aplikasi saat meninjau.
+
+app.get('/api/connect/saya', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json(ringkasanSaya(u.email))
+})
+
+app.post('/api/connect/verifikasi', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const r = ajukanVerifikasi(u.email, req.body ?? {})
+  if (!r.ok) return res.status(400).json({ error: r.galat })
+  res.json({ ok: true })
+})
+
+app.post('/api/connect/radius', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  res.json({ radiusKm: setelRadius(u.email, Number((req.body ?? {}).km)) })
+})
+
+app.post('/api/connect/blokir', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const { email, buka } = (req.body ?? {}) as { email?: string; buka?: boolean }
+  if (!email) return res.status(400).json({ error: 'email_wajib' })
+  const r = buka ? bukaBlokir(u.email, email) : blokir(u.email, email)
+  if (!r.ok) return res.status(400).json({ error: r.galat })
+  res.json({ ok: true })
+})
+
+app.post('/api/connect/lapor', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const { email, alasan, catatan } = (req.body ?? {}) as { email?: string; alasan?: string; catatan?: string }
+  const r = laporkan(u.email, String(email ?? ''), String(alasan ?? ''), catatan)
+  if (!r.ok) return res.status(400).json({ error: r.galat })
+  res.json({ ok: true })
+})
+
+app.get('/api/connect/profil/:email', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const target = req.params.email
+  if (!bolehDilihat(u.email, target)) return res.status(404).json({ error: 'tidak_tersedia' })
+  res.json({ profil: profilPublik(target) })
+})
+
+// ── Hanya pemilik ────────────────────────────────────────────────────────────
+app.get('/api/connect/tinjau', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  res.json({ ajuan: ajuanMenunggu(), laporan: laporanMenunggu() })
+})
+
+app.post('/api/connect/tinjau/verifikasi', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { email, setuju, alasan } = (req.body ?? {}) as { email?: string; setuju?: boolean; alasan?: string }
+  const r = putuskanVerifikasi(String(email ?? ''), !!setuju, alasan)
+  if (!r.ok) return res.status(400).json({ error: r.galat })
+  addAudit(u, setuju ? 'connect_verifikasi_setuju' : 'connect_verifikasi_tolak', String(email))
+  res.json({ ok: true })
+})
+
+app.post('/api/connect/tinjau/laporan', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { id, poin, catatan } = (req.body ?? {}) as { id?: string; poin?: number; catatan?: string }
+  const r = putuskanLaporan(String(id ?? ''), Number(poin ?? 0), u.email, catatan)
+  if (!r.ok) return res.status(400).json({ error: r.galat })
+  addAudit(u, 'connect_putus_laporan', `${id}:${poin}`)
+  res.json({ ok: true })
+})
+
+app.post('/api/connect/tinjau/kredit', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  if (!isOwner(u)) return res.status(403).json({ error: 'forbidden' })
+  const { email, poin, alasan, pulihkan } = (req.body ?? {}) as
+    { email?: string; poin?: number; alasan?: string; pulihkan?: boolean }
+  if (!email) return res.status(400).json({ error: 'email_wajib' })
+  const hasil = pulihkan
+    ? pulihkanKredit(String(email), Number(poin ?? 0))
+    : kurangiKredit(String(email), Number(poin ?? 0), String(alasan ?? 'Pelanggaran'), u.email)
+  addAudit(u, pulihkan ? 'connect_pulihkan_kredit' : 'connect_kurangi_kredit', `${email}:${poin}`)
+  res.json(hasil)
+})
+
 // --- audit log (Permenkes 24/2022) — owner-only access ---
 app.get('/api/audit', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
@@ -1379,6 +1472,17 @@ process.on('unhandledRejection', (e) => alertOwner('Unhandled promise rejection'
 const server = createServer(app)
 attachRealtime(server)
 await initStore()
+// Penghapusan akun Connect yang kreditnya jatuh di bawah ambang. Dijadwalkan
+// tujuh hari, bukan seketika: keputusan yang keliru masih bisa ditarik pemilik
+// lewat pulihkanKredit, dan penghapusan yang tidak bisa dibatalkan bukan hal
+// yang pantas dijalankan tanpa jeda.
+setInterval(() => {
+  for (const email of jatuhTempoHapus()) {
+    hapusAkunConnect(email)
+    console.log('[connect] akun dihapus karena kredit di bawah ambang:', email)
+  }
+}, 3600_000)
+
 setInterval(() => { pollSportsFavorites().catch((e) => console.log('[sports] poll error:', (e as Error).message)) }, 90_000)
 // Medication reminder scheduler — checked every minute; a reminder is due
 // once Date.now() passes its nextFireAt (a UTC instant the client computed

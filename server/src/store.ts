@@ -1,6 +1,7 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { isiConnect, muatConnect } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
@@ -97,6 +98,7 @@ interface DB {
   posts: Post[]
   clinical: Clinical
   settings: Record<string, any> // userId -> preference blob (no secrets)
+  connect?: any // Connect: verifikasi, kredit kepercayaan, laporan, blokir
   pushSubs: Record<string, any[]> // userId -> Web Push subscriptions
   notifications: Record<string, Notif[]> // userId -> in-app notification inbox
   creatorSubs: { subscriberId: string; authorEmail: string; at: string; expires: string }[]
@@ -286,6 +288,7 @@ function loadFile() {
   if (existsSync(DB_PATH)) {
     try {
       db = JSON.parse(readFileSync(DB_PATH, 'utf-8'))
+      muatConnect(db.connect)
     } catch {
       /* keep defaults */
     }
@@ -293,6 +296,10 @@ function loadFile() {
 }
 
 function save() {
+  // Keadaan Connect ikut disimpan bersama basis data utama. Tanpa ini, garam
+  // sidik NIK lahir baru setiap kali server hidup — dan pemeriksaan akun ganda
+  // diam-diam berhenti bekerja karena sidik lama tidak akan pernah cocok lagi.
+  try { db.connect = isiConnect() } catch { /* modul belum siap */ }
   // Local file (harmless; ephemeral on hosts like Render).
   try {
     writeFileSync(DB_PATH, JSON.stringify(db, null, 2))
@@ -324,7 +331,7 @@ export async function initStore() {
     const dbName = process.env.MONGODB_DB || 'panaceamed'
     mongoCol = client.db(dbName).collection('app')
     const doc = await mongoCol.findOne({ _id: 'state' })
-    if (doc?.data) db = doc.data as DB
+    if (doc?.data) { db = doc.data as DB; muatConnect(db.connect) }
     else await mongoCol.updateOne({ _id: 'state' }, { $set: { data: db, at: new Date() } }, { upsert: true })
     console.log('[store] MongoDB connected — permanent mode')
   } catch (e) {

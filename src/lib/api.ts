@@ -267,6 +267,30 @@ export const api = {
   saveSettings: (settings: Record<string, unknown>) =>
     req<{ ok: boolean }>('/api/settings', { method: 'PUT', body: JSON.stringify({ settings }) }),
   posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
+  // ── Connect: verifikasi, kredit kepercayaan, laporan, blokir ──────────────
+  connectSaya: () => req<{
+    status: string; alasanTolak?: string; kredit: number; bahaya: boolean
+    hapusPada?: string; radiusKm: number; diblokir: string[]
+    pelanggaran: { id: string; pada: string; alasan: string; poin: number }[]
+    ambang: { awal: number; bahaya: number; hapus: number }
+  }>('/api/connect/saya'),
+  connectVerifikasi: (data: Record<string, unknown>) =>
+    req<{ ok: true }>('/api/connect/verifikasi', { method: 'POST', body: JSON.stringify(data) }),
+  connectRadius: (km: number) =>
+    req<{ radiusKm: number }>('/api/connect/radius', { method: 'POST', body: JSON.stringify({ km }) }),
+  connectBlokir: (email: string, buka = false) =>
+    req<{ ok: true }>('/api/connect/blokir', { method: 'POST', body: JSON.stringify({ email, buka }) }),
+  connectLapor: (email: string, alasan: string, catatan?: string) =>
+    req<{ ok: true }>('/api/connect/lapor', { method: 'POST', body: JSON.stringify({ email, alasan, catatan }) }),
+  connectTinjau: () => req<{ ajuan: any[]; laporan: any[] }>('/api/connect/tinjau'),
+  connectPutusVerifikasi: (email: string, setuju: boolean, alasan?: string) =>
+    req<{ ok: true }>('/api/connect/tinjau/verifikasi', { method: 'POST', body: JSON.stringify({ email, setuju, alasan }) }),
+  connectPutusLaporan: (id: string, poin: number, catatan?: string) =>
+    req<{ ok: true }>('/api/connect/tinjau/laporan', { method: 'POST', body: JSON.stringify({ id, poin, catatan }) }),
+  connectKredit: (email: string, poin: number, alasan?: string, pulihkan = false) =>
+    req<{ kredit: number; bahaya: boolean; dijadwalkanHapus: boolean }>(
+      '/api/connect/tinjau/kredit', { method: 'POST', body: JSON.stringify({ email, poin, alasan, pulihkan }) }),
+
   // Hanya nama, peran dan gambar — server sengaja tidak mengembalikan email.
   cariOrang: (q: string) =>
     req<{ results: { id: string; name: string; role: Role; picture?: string }[] }>(
