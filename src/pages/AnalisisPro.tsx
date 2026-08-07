@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useJam } from '../lib/useJam'
 import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
@@ -59,6 +60,8 @@ export function AnalisisPro() {
     try { localStorage.setItem(KUNCI_TARGET, JSON.stringify(target)) } catch { /* kuota */ }
   }, [target])
 
+  const sekarang = useJam()
+
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
@@ -68,7 +71,9 @@ export function AnalisisPro() {
     }
   }, [workouts, demo])
 
-  const ff = useMemo(() => kebugaranKesegaran(workouts, konteks, 120), [workouts, konteks])
+  // `sekarang` ikut dependensi: kelelahan meluruh terhadap jam berjalan, bukan
+  // terhadap tanggal sesi terakhir.
+  const ff = useMemo(() => kebugaranKesegaran(workouts, konteks, 120, sekarang), [workouts, konteks, sekarang])
   const kini = ff.length ? ff[ff.length - 1] : null
   const baca = kini ? bacaKesegaran(kini.kesegaran) : null
   const pr = useMemo(() => usahaTerbaik(workouts), [workouts])

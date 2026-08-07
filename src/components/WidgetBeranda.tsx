@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useJam } from '../lib/useJam'
 import { Card } from './ui'
 import { Portal } from './Portal'
 import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
@@ -33,6 +34,8 @@ export function WidgetBeranda() {
   }, [])
 
   const workouts = useMemo(() => getWorkouts(), [vitals])
+  // Kelelahan meluruh terhadap jam berjalan; tanpa ini kartu beranda membeku.
+  const sekarang = useJam()
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
@@ -74,7 +77,7 @@ export function WidgetBeranda() {
   }
 
   if (punya('kebugaran') && workouts.length > 0) {
-    const ff = kebugaranKesegaran(workouts, konteks, 90)
+    const ff = kebugaranKesegaran(workouts, konteks, 90, sekarang)
     const kini = ff.length ? ff[ff.length - 1] : null
     if (kini) {
       const b = bacaKesegaran(kini.kesegaran)

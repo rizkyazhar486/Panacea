@@ -5,6 +5,7 @@ import { IconRun, IconActivity, IconTimer } from './icons'
 import type { ImportedWorkout } from '../lib/workoutImport'
 import type { Konteks } from '../lib/trainingPhysiology'
 import { debrief, saranBerikutnya, jadwalPekan, dukungan, statusSingkat } from '../lib/pelatih'
+import { useJam } from '../lib/useJam'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kolom Pelatih — bagian yang berbicara, bukan yang menampilkan angka.
@@ -27,11 +28,15 @@ export function KolomPelatih({
     [workouts],
   )
   const terakhir = urut[0]
-  const saran = useMemo(() => saranBerikutnya(workouts, konteks), [workouts, konteks])
+  // Angka di bawah dihitung terhadap waktu sekarang, jadi `sekarang` harus ikut
+  // menjadi dependensi — kalau tidak, halaman yang dibiarkan terbuka semalaman
+  // akan menampilkan kelelahan kemarin dan terlihat seolah tidak pernah turun.
+  const sekarang = useJam()
+  const saran = useMemo(() => saranBerikutnya(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const db = useMemo(() => (terakhir ? debrief(terakhir, konteks, workouts) : null), [terakhir, konteks, workouts])
-  const status = useMemo(() => statusSingkat(workouts, konteks), [workouts, konteks])
-  const jadwal = useMemo(() => jadwalPekan(workouts, konteks), [workouts, konteks])
-  const dk = useMemo(() => dukungan(workouts, konteks), [workouts, konteks])
+  const status = useMemo(() => statusSingkat(workouts, konteks, sekarang), [workouts, konteks, sekarang])
+  const jadwal = useMemo(() => jadwalPekan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
+  const dk = useMemo(() => dukungan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
 
   if (ringkas) {
     return (
