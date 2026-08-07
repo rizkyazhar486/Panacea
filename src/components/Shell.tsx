@@ -96,6 +96,7 @@ const nav: Nav[] = [
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/pasar', label: 'Data Pasar', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/makro-ekonomi', label: 'Macro Lab (Ekonomi)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },

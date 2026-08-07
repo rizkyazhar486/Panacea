@@ -59,6 +59,7 @@ const ClinicalTrackers = lazy(() => import('./pages/ClinicalTrackers').then((m) 
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
 const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
+const MacroLabGizi = lazy(() => import('./pages/MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
 const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
 const Markets = lazy(() => import('./pages/Markets').then((m) => ({ default: m.Markets })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
@@ -245,7 +246,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/notifikasi" element={<Notifications />} />
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
-              <Route path="/macro-lab" element={<MacroLab />} />
+              <Route path="/macro-lab" element={<MacroLabGizi />} />
+              <Route path="/makro-ekonomi" element={<MacroLab />} />
               <Route path="/owner-analytics" element={<OwnerAnalytics />} />
               <Route path="/pasar" element={<Markets />} />
               <Route path="/messages" element={<Messages />} />

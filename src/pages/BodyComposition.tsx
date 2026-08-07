@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { useVitals } from '../lib/useVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../components/icons'
@@ -220,11 +221,13 @@ export function BodyComposition() {
           {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
         </span>
       }>
-        <div className="flex items-center gap-1">
-          <input className={inputClass} type="number" step={step} aria-label={label}
-            value={(b[key] as number) || ''}
-            onChange={(e) => u({ [key]: +e.target.value } as Partial<Body>)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }} />
+        <div className="flex items-center gap-1"
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }}>
+          <KolomAngka
+            nilai={b[key] as number | undefined}
+            onNilai={(n) => u({ [key]: n } as Partial<Body>)}
+            step={step}
+            ariaLabel={label} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
               title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle, IconHeart, IconChartUp, IconActivity } from '../components/icons'
 import { getHealthCache, pushBiometrics } from '../lib/profile'
@@ -187,8 +188,8 @@ export function AestheticVitality() {
 
   const num = (label: string, key: keyof AesData, step = 1, ph = '') => (
     <Field label={label}>
-      <input className={inputClass} type="number" step={step} placeholder={ph}
-        value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<AesData>)} />
+      <KolomAngka step={step} placeholder={ph}
+        nilai={d[key] as number | undefined} onNilai={(n) => u({ [key]: n } as Partial<AesData>)} ariaLabel={label} />
     </Field>
   )
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
 import { getHealthCache, getDemo, pushBiometrics } from '../lib/profile'
@@ -167,7 +168,7 @@ export function BiologicalAge() {
 
   const field = (label: string, key: keyof BioData, step = 1) => (
     <Field label={label}>
-      <input className={inputClass} type="number" step={step} value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<BioData>)} />
+      <KolomAngka nilai={d[key] as number | undefined} onNilai={(n) => u({ [key]: n } as Partial<BioData>)} step={step} ariaLabel={label} />
     </Field>
   )
 

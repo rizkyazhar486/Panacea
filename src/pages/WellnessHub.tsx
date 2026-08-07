@@ -31,6 +31,7 @@ export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
     title: 'Mind & Mental Wellness',
     emoji: '🧠',
     feats: [
+      { to: '/connect', name: 'Connect — Cari Teman & Pasangan', what: 'Profil, filter dan kecocokan berbasis gaya hidup sehat — bukan pemasangan perangkat', kw: 'connect kenalan teman pasangan jodoh relasi relationship match kecocokan deck profil sosial dating', tag: 'Wellness' },
       { to: '/breathwork', name: 'Breathwork Pacer', what: 'Animated paced breathing to calm you in minutes', kw: 'breathing box 478 coherence anxiety stress calm vagus', tag: 'New' },
       { to: '/gratitude', name: 'Gratitude Journal', what: '"Three Good Things" — a proven mood lift', kw: 'gratitude journal happiness positive psychology mood', tag: 'New' },
       { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
