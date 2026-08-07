@@ -36,6 +36,7 @@ const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
       { to: '/mental-health-screen', name: 'Mental Health Check', what: 'Validated depression & anxiety screening', kw: 'phq gad depression anxiety screen mental', tag: 'Mental' },
       { to: '/substance-use-screen', name: 'Alcohol & Tobacco Screening', what: 'Validated substance-use screening', kw: 'audit fagerstrom alcohol tobacco smoking screen substance', tag: 'Mental' },
       { to: '/ikigai', name: 'Ikigai & Purpose', what: 'Find your reason for being', kw: 'ikigai purpose meaning japanese', tag: 'Wellness' },
+      { to: '/harada', name: 'Harada 9×9 Goal Grid', what: 'One goal, eight pillars, 64 concrete actions', kw: 'harada mandal-art mandala 9x9 goal target sasaran tujuan rencana ohtani grid kisi', tag: 'Wellness' },
       { to: '/life-compass', name: 'Life Compass', what: 'Plan your vision, mission, and next step', kw: 'vision mission purpose goals future anxiety worry planning', tag: 'New' },
       { to: '/resilience-stories', name: 'Resilience Stories', what: 'Real people, real hardship, real comebacks', kw: 'motivation inspiration resilience hardship comeback stories', tag: 'New' },
     ],
