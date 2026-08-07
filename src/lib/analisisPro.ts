@@ -168,6 +168,115 @@ export function kebugaranKesegaran(
   return out
 }
 
+// ── Laju penambahan beban ────────────────────────────────────────────────────
+//
+// Kesegaran (TSB) baru berarti setelah kebugaran sempat terisi, kira-kira enam
+// pekan. Sebelum itu ia diam saja — padahal justru pekan-pekan awal yang paling
+// rawan. Yang bisa diukur sejak hari pertama bukan seberapa lelah seseorang,
+// melainkan SEBERAPA CEPAT bebannya bertambah.
+//
+// Dua ukuran dipakai bersama karena keduanya menangkap hal berbeda:
+//
+//   * ACWR — beban 7 hari dibagi rata-rata beban 28 hari. Menangkap lonjakan
+//     mendadak: pekan ini jauh lebih berat daripada kebiasaan sebulan terakhir.
+//   * Penambahan jarak antarpekan. Menangkap tanjakan yang stabil tapi terlalu
+//     curam, yang tidak terlihat oleh ACWR karena naiknya mulus.
+//
+// TENTANG ANGKANYA. Rentang "aman" 0,8–1,3 berasal dari penelitian Gabbett dkk.
+// pada atlet tim, dan sejak itu dikritik cukup keras — pembaginya ikut naik
+// bersama pembilangnya, sehingga rasio bisa terlihat jinak justru saat beban
+// melonjak, dan bukti kausalnya lemah. Karena itu di sini ACWR TIDAK dipakai
+// sebagai vonis cedera. Ia dipakai sebagai satu-satunya hal jujur yang bisa
+// dikatakan pada riwayat pendek: "kenaikannya secepat ini, dan itu lebih cepat
+// daripada yang biasanya disarankan". Ambangnya disebut sebagai rambu, bukan
+// batas keselamatan, dan kalimatnya menyatakan ketidakpastian itu.
+//
+// Pada riwayat kurang dari 28 hari, pembaginya belum penuh. Itu tidak
+// disembunyikan: hasilnya ditandai `cukupData: false` dan dibacakan lebih
+// hati-hati, bukan dibulatkan menjadi kepastian palsu.
+
+export interface LajuBeban {
+  /** Total beban tujuh hari terakhir. */
+  akut: number
+  /** Rata-rata beban tujuh harian selama 28 hari terakhir. */
+  kronis: number
+  /** akut / kronis. null bila kronis nol (belum ada dasar sama sekali). */
+  rasio: number | null
+  /** Jarak pekan ini dibanding pekan sebelumnya, dalam persen. null bila nol. */
+  naikJarakPct: number | null
+  kmPekanIni: number
+  kmPekanLalu: number
+  /** Riwayat sudah mencapai 28 hari sehingga pembagi kronis penuh. */
+  cukupData: boolean
+  judul: string
+  arti: string
+  warna: string
+}
+
+export function lajuBeban(
+  workouts: ImportedWorkout[],
+  k: Konteks,
+  sekarang = Date.now(),
+): LajuBeban | null {
+  if (!workouts.length) return null
+
+  const hariSejak = (w: ImportedWorkout) => (sekarang - Date.parse(w.mulai)) / 86400_000
+  let akut = 0, beban28 = 0, kmIni = 0, kmLalu = 0
+  for (const w of workouts) {
+    const d = hariSejak(w)
+    if (Number.isNaN(d) || d < 0) continue
+    const skor = upayaRelatif(w, k).skor
+    if (d < 7) { akut += skor; kmIni += w.jarakKm ?? 0 }
+    if (d >= 7 && d < 14) kmLalu += w.jarakKm ?? 0
+    if (d < 28) beban28 += skor
+  }
+
+  const umur = hariRiwayatLatihan(workouts, sekarang)
+  const cukupData = umur >= 28
+  // Pembagi kronis: rata-rata per tujuh hari. Pada riwayat pendek, membagi
+  // dengan 28 hari penuh akan mengecilkan pembagi secara palsu dan membuat
+  // rasio meledak, jadi dibagi dengan lama riwayat yang sebenarnya.
+  const hariDasar = Math.max(7, Math.min(28, umur))
+  const kronis = beban28 / (hariDasar / 7)
+  const rasio = kronis > 0 ? Math.round((akut / kronis) * 100) / 100 : null
+  const naikJarakPct = kmLalu > 0 ? Math.round(((kmIni - kmLalu) / kmLalu) * 100) : null
+
+  const ragu = cukupData ? '' : ` Riwayat Anda baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
+
+  let judul: string, arti: string, warna: string
+  if (rasio === null) {
+    judul = 'Belum ada pembanding'
+    arti = 'Belum ada beban sebelumnya untuk dibandingkan. Setelah dua pekan berjalan, laju penambahan Anda bisa dihitung.'
+    warna = '#94a3b8'
+    // Lonjakan jarak SAJA tidak cukup untuk memicu peringatan merah. Jadwal
+    // selang-sehari menaruh empat sesi di satu pekan dan tiga di pekan lain —
+    // selisih 33% yang murni akibat penggalan kalender, bukan penambahan beban.
+    // Karena itu jarak hanya menaikkan derajat peringatan bila rasio ikut naik.
+  } else if (rasio > 1.5 || (naikJarakPct !== null && naikJarakPct > 30 && rasio > 1.3)) {
+    judul = 'Naik terlalu cepat'
+    arti = `Beban tujuh hari terakhir ${rasio}× kebiasaan Anda${naikJarakPct !== null ? `, jarak naik ${naikJarakPct}% dari pekan lalu` : ''}. Yang paling sering mendahului cedera bukan latihan berat, melainkan penambahan yang cepat. Menahan laju sekarang jauh lebih murah daripada berhenti enam pekan nanti.${ragu}`
+    warna = '#ef4444'
+  } else if (rasio > 1.3) {
+    judul = 'Agak cepat'
+    arti = `Beban pekan ini ${rasio}× kebiasaan Anda. Masih wajar untuk satu pekan berat, asalkan pekan berikutnya lebih ringan.${ragu}`
+    warna = '#f59e0b'
+  } else if (rasio < 0.8) {
+    judul = 'Sedang menurun'
+    arti = `Beban pekan ini ${rasio}× kebiasaan Anda — lebih ringan. Bagus sebagai pekan pemulihan; bila berlanjut beberapa pekan, kebugaran yang sudah dibangun akan ikut turun.${ragu}`
+    warna = '#60a5fa'
+  } else {
+    judul = 'Laju sehat'
+    arti = `Beban pekan ini ${rasio}× kebiasaan Anda — penambahannya bertahap. Ini pola yang paling bisa dipertahankan.${ragu}`
+    warna = '#22c55e'
+  }
+
+  return {
+    akut: Math.round(akut), kronis: Math.round(kronis), rasio, naikJarakPct,
+    kmPekanIni: Math.round(kmIni * 10) / 10, kmPekanLalu: Math.round(kmLalu * 10) / 10,
+    cukupData, judul, arti, warna,
+  }
+}
+
 /** Umur riwayat dalam hari: dari sesi paling awal sampai sekarang. */
 export function hariRiwayatLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
   let paling = Infinity

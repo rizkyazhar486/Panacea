@@ -11,7 +11,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
-  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, TIDAK_DIBANGUN,
+  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
 
@@ -77,6 +77,9 @@ export function AnalisisPro() {
   const kini = ff.length ? ff[ff.length - 1] : null
   const umurRiwayat = useMemo(() => hariRiwayatLatihan(workouts, sekarang), [workouts, sekarang])
   const baca = kini ? bacaKesegaran(kini.kesegaran, umurRiwayat) : null
+  // Dipasang berdampingan dengan kesegaran karena keduanya menjawab pertanyaan
+  // berbeda, dan pada riwayat pendek hanya yang ini yang punya jawaban.
+  const laju = useMemo(() => lajuBeban(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const pr = useMemo(() => usahaTerbaik(workouts), [workouts])
   const log = useMemo(() => logLatihan(workouts, konteks, satuanLog), [workouts, konteks, satuanLog])
   const kemajuan = useMemo(() => kemajuanTarget(workouts, target), [workouts, target])
@@ -149,6 +152,31 @@ export function AnalisisPro() {
             <div className="text-sm font-bold" style={{ color: baca.warna }}>{baca.judul}</div>
             <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{baca.arti}</p>
           </div>
+
+          {/* Laju penambahan beban — bisa dihitung sejak pekan kedua, jadi
+              inilah yang menjaga orang selama kesegaran belum bisa dibaca. */}
+          {laju && (
+            <div className="mt-2 rounded-xl p-3" style={{ background: `${laju.warna}14`, border: `1px solid ${laju.warna}33` }}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="text-sm font-bold" style={{ color: laju.warna }}>{laju.judul}</span>
+                {laju.rasio !== null && (
+                  <span className="text-[11px] font-bold text-slate-400">
+                    beban 7 hari {laju.akut} · kebiasaan {laju.kronis} · rasio {laju.rasio}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{laju.arti}</p>
+              {laju.kmPekanLalu > 0 && (
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Jarak: {laju.kmPekanIni} km pekan ini, {laju.kmPekanLalu} km pekan lalu.
+                </p>
+              )}
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-600">
+                Rambu 0,8–1,3 berasal dari penelitian pada atlet tim dan sejak itu banyak dikritik —
+                ia menandai kecepatan penambahan, bukan meramalkan cedera.
+              </p>
+            </div>
+          )}
         </Card>
       )}
 
