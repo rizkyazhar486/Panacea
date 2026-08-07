@@ -3,7 +3,7 @@ import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { JamWod } from '../components/JamWod'
 import {
-  FORMAT, BENCHMARK, ARKETIPE, RABDO, ATURAN_AMAN, RUJUKAN,
+  FORMAT, BENCHMARK, ARKETIPE, RABDO, ATURAN_AMAN, RUJUKAN, GAMBAR_SKALA,
   type Benchmark,
 } from '../lib/crossfit'
 
@@ -116,7 +116,9 @@ export function CrossFit() {
           {ARKETIPE.map((a) => (
             <div key={a.id} className="rounded-xl bg-white/5 p-3">
               <div className="flex items-center gap-2">
-                <span className="text-xl">{a.ikon}</span>
+                {a.gambar
+                  ? <img src={a.gambar} alt="" loading="lazy" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                  : <span className="text-xl">{a.ikon}</span>}
                 <div className="min-w-0">
                   <div className="text-[13px] font-black leading-tight text-white">{a.nama}</div>
                   <div className="text-[10px] text-slate-400">{a.sifat}</div>
@@ -190,6 +192,10 @@ export function CrossFit() {
                 </button>
                 {buka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
+                    {b.gambar && (
+                      <img src={b.gambar} alt={`Ilustrasi gerakan khas ${b.nama}`} loading="lazy"
+                        className="aspect-square w-full rounded-xl object-cover" />
+                    )}
                     <ul className="space-y-0.5">
                       {b.isi.map((x) => (
                         <li key={x} className="text-[12px] text-slate-200">• {x}</li>
@@ -214,6 +220,8 @@ export function CrossFit() {
       {/* Aturan aman */}
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Enam aturan yang menjaga Anda tetap berlatih</div>
+        <img src={GAMBAR_SKALA} alt="Push-up dari lutut — contoh gerakan yang diskalakan" loading="lazy"
+          className="mt-2 aspect-video w-full rounded-xl object-cover" />
         <ul className="mt-2 space-y-1.5">
           {ATURAN_AMAN.map((a, i) => (
             <li key={a} className="flex gap-2 text-[12px] leading-relaxed text-slate-300">
