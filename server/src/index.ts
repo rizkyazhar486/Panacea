@@ -42,6 +42,7 @@ import {
   getHealthWebhookToken,
   rotateHealthWebhookToken,
   emailForWebhookToken,
+  cariOrang,
   getSportsFavorites,
   setSportsFavorites,
   allSportsFavorites,
@@ -1089,6 +1090,13 @@ app.get('/api/markets/watchlist', async (req, res) => {
     console.log('[markets] watchlist error:', (e as Error).message)
     res.status(503).json({ error: 'market_unavailable' })
   }
+})
+
+// Pencarian orang untuk kotak pencarian global. Wajib masuk — direktori
+// pengguna aplikasi kesehatan bukan sesuatu yang pantas terbuka bagi anonim.
+app.get('/api/users/search', requireAuth, (req, res) => {
+  const q = String(req.query.q ?? '')
+  res.json({ results: cariOrang(q) })
 })
 
 // Symbol lookup, so the search box can reach beyond the built-in watchlist.

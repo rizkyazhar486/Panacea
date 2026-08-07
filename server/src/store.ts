@@ -367,6 +367,32 @@ export function getUserByEmail(email: string): User | undefined {
 // Resolve a registered patient-user from a self-patient id ("self-<sanitized
 // email>"), mirroring the frontend's id derivation. Returns undefined for
 // doctor-created patients (no linked account).
+/**
+ * Cari orang untuk kotak pencarian.
+ *
+ * SENGAJA TIDAK MENGEMBALIKAN EMAIL. Pencarian orang di aplikasi sosial mudah
+ * berubah menjadi alat pemanenan alamat surel: cukup menelusuri "a", "b", "c"
+ * dan seluruh daftar pengguna ikut terbawa. Yang keluar hanya nama, peran, dan
+ * gambar profil — cukup untuk mengenali orang, tidak cukup untuk menghubunginya
+ * di luar aplikasi.
+ *
+ * Pencocokan hanya pada NAMA. Membiarkan pencocokan lewat email berarti orang
+ * yang menebak alamat surel seseorang bisa memastikan apakah alamat itu
+ * terdaftar di sini — dan ini aplikasi kesehatan, jadi keanggotaan itu sendiri
+ * sudah merupakan informasi pribadi.
+ */
+export function cariOrang(q: string, batas = 8): { id: string; name: string; role: Role; picture?: string }[] {
+  const t = q.trim().toLowerCase()
+  if (t.length < 2) return []
+  const hasil: { id: string; name: string; role: Role; picture?: string }[] = []
+  for (const u of db.users) {
+    if (!u.name?.toLowerCase().includes(t)) continue
+    hasil.push({ id: u.id, name: u.name, role: u.role, picture: u.picture })
+    if (hasil.length >= batas) break
+  }
+  return hasil
+}
+
 export function findUserBySelfPatientId(patientId: string): User | undefined {
   if (!patientId?.startsWith('self-')) return undefined
   const suffix = patientId.slice(5).toLowerCase()

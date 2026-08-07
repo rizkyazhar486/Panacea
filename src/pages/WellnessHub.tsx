@@ -12,7 +12,7 @@ import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembuny
 
 interface Feat { to: string; name: string; what: string; kw: string; tag: string }
 
-const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
+export const GROUPS: { title: string; emoji: string; feats: Feat[] }[] = [
   {
     title: 'Longevity & Anti-Aging',
     emoji: '🧬',
