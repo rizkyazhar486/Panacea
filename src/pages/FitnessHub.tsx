@@ -12,7 +12,7 @@ import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembuny
 
 interface Tool { to: string; name: string; what: string; kw: string; tag: string }
 
-const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
+export const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
   {
     title: 'Daily Training',
     emoji: '🏃',

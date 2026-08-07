@@ -267,6 +267,10 @@ export const api = {
   saveSettings: (settings: Record<string, unknown>) =>
     req<{ ok: boolean }>('/api/settings', { method: 'PUT', body: JSON.stringify({ settings }) }),
   posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
+  // Hanya nama, peran dan gambar — server sengaja tidak mengembalikan email.
+  cariOrang: (q: string) =>
+    req<{ results: { id: string; name: string; role: Role; picture?: string }[] }>(
+      `/api/users/search?q=${encodeURIComponent(q)}`).then((r) => r.results),
   createPost: (p: Partial<BackendPost>) =>
     req<{ post: BackendPost }>('/api/posts', { method: 'POST', body: JSON.stringify(p) }).then((r) => r.post),
   likePost: (id: string) => req<{ post: BackendPost }>(`/api/posts/${id}/like`, { method: 'POST' }).then((r) => r.post),

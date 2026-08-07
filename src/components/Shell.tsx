@@ -1,4 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { PencarianGlobal } from './PencarianGlobal'
 import { useState, useEffect, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
@@ -242,6 +243,17 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [cariBuka, setCariBuka] = useState(false)
+
+  // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
+  // satunya cara membukanya tanpa memindahkan tangan dari papan ketik.
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setCariBuka(true) }
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
   const [navHidden, setNavHidden] = useState(false)
@@ -427,6 +439,17 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
+          {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
+              dulu. Ditaruh di header supaya tersedia dari halaman mana pun. */}
+          <button
+            onClick={() => setCariBuka(true)}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
+            aria-label="Cari fitur, orang, atau tagar"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
+            </svg>
+          </button>
 
           <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
             {['pasien', 'dokter', 'owner'].includes(account.role) && (
@@ -512,6 +535,7 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+        <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
 
         {/* Quick actions — one-tap shortcuts (mobile only) */}
         <div className="relative border-b border-black/5 bg-white lg:hidden">
