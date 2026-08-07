@@ -3,6 +3,7 @@ import {
   ringkasanSaya, ajukanVerifikasi, setelRadius, blokir, bukaBlokir, laporkan,
   profilPublik, bolehDilihat, ajuanMenunggu, laporanMenunggu, putuskanVerifikasi,
   putuskanLaporan, kurangiKredit, pulihkanKredit, jatuhTempoHapus, hapusAkunConnect, dek,
+  tarikPersetujuan,
 } from './connect.js'
 import express from 'express'
 import cors from 'cors'
@@ -1244,6 +1245,15 @@ app.post('/api/connect/radius', requireAuth, (req, res) => {
 // kecocokan orientasi, dan radius kedua belah pihak. Semua penyaringan terjadi
 // di server — klien tidak pernah menerima daftar mentah lalu menyaringnya
 // sendiri, karena daftar mentah itulah yang tidak boleh sampai ke klien.
+// Penarikan persetujuan (UU PDP Pasal 9). Harus semudah memberikannya, jadi
+// satu permintaan sudah cukup — tanpa surel, tanpa alasan, tanpa antrean.
+app.post('/api/connect/tarik-persetujuan', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const r = tarikPersetujuan(u.email)
+  addAudit(u, 'connect_tarik_persetujuan', u.email)
+  res.status(r.ok ? 200 : 400).json(r)
+})
+
 app.get('/api/connect/dek', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const batas = Number(req.query.batas)

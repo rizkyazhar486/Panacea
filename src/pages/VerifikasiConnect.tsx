@@ -15,10 +15,15 @@ import { api, backendEnabled } from '../lib/api'
 //   * NIK tidak disimpan. Yang disimpan hanya sidiknya, untuk memastikan satu
 //     orang satu akun. Nomornya tidak bisa dibaca kembali oleh siapa pun,
 //     termasuk pemilik aplikasi.
-//   * Agama dan orientasi seksual tidak pernah ditampilkan kepada pengguna
-//     lain. Keduanya data pribadi spesifik menurut UU PDP 27/2022, dan di
-//     Indonesia daftar semacam itu bisa membahayakan keselamatan orang.
-//   * Selfie berpose hanya dilihat pemilik saat meninjau.
+//   * Orientasi seksual tidak pernah ditampilkan kepada pengguna lain. Ia data
+//     pribadi spesifik menurut UU PDP 27/2022, dan di Indonesia daftar semacam
+//     itu bisa membahayakan keselamatan orang.
+//   * Selfie berpose adalah data biometrik. Ia hanya dilihat pemilik saat
+//     meninjau, lalu DIHAPUS begitu putusan diambil.
+//
+// Persetujuan diminta terpisah per tujuan, bukan satu centang untuk semuanya,
+// karena UU PDP Pasal 20-22 menuntut persetujuan yang tegas untuk tujuan yang
+// spesifik — dan karena satu centang besar tidak memberi orang pilihan nyata.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Tiga platform yang diterima untuk pencocokan. Daftar ini harus tetap sama
@@ -29,6 +34,29 @@ const PLATFORM = [
   { id: 'facebook' as const, label: 'Facebook', contoh: 'https://facebook.com/nama.anda' },
   { id: 'instagram' as const, label: 'Instagram', contoh: 'https://instagram.com/namaanda' },
 ]
+
+// Tujuan pemrosesan yang perlu persetujuan tegas. Idnya harus sama dengan
+// TujuanPersetujuan di server.
+const TUJUAN = [
+  {
+    id: 'biometrik_selfie' as const,
+    judul: 'Memproses foto wajah saya (data biometrik)',
+    isi: 'Selfie berpose dipakai satu kali oleh pemilik untuk mencocokkan wajah Anda dengan foto di akun media sosial Anda. Setelah putusan diambil, tautannya dihapus.',
+  },
+  {
+    id: 'orientasi_seksual' as const,
+    judul: 'Memproses preferensi saya (orientasi seksual)',
+    isi: 'Dipakai hanya di server untuk menentukan siapa yang muncul di deck Anda. Tidak pernah dikirim ke perangkat pengguna lain dan tidak muncul di profil.',
+  },
+  {
+    id: 'nik_sidik' as const,
+    judul: 'Menyidik NIK saya untuk mencegah akun ganda',
+    isi: 'Nomornya tidak disimpan — hanya sidik satu arahnya dan empat digit terakhir. Sidik tidak bisa dikembalikan menjadi nomor.',
+  },
+]
+
+const JUDUL_TUJUAN: Record<string, string> = Object.fromEntries(
+  TUJUAN.map((t) => [t.id, t.judul]))
 
 const PREFERENSI = [
   { id: 'straight', l: 'Straight' },
@@ -46,15 +74,18 @@ const GALAT: Record<string, string> = {
   nama_wajib: 'Nama wajib diisi.',
   umur_minimal_18: 'Connect hanya untuk 18 tahun ke atas.',
   sudah_terverifikasi: 'Akun Anda sudah terverifikasi.',
+  persetujuan_belum_lengkap: 'Ketiga persetujuan di bawah harus dicentang. Tanpa itu tidak ada dasar hukum untuk memproses data Anda.',
 }
 
 export function VerifikasiConnect() {
   const [f, setF] = useState({
     nama: '', tempatLahir: '', tanggalLahir: '', pekerjaan: '', status: '',
-    preferensi: 'straight', agama: '', pendidikanTerakhir: '', tempatTinggal: '',
+    preferensi: 'straight', pendidikanTerakhir: '', tempatTinggal: '',
     nik: '', selfieUrl: '', linkedin: '', facebook: '', instagram: '',
   })
   const [umur, setUmur] = useState<number | undefined>(undefined)
+  const [setuju, setSetuju] = useState<Record<string, boolean>>({})
+  const [tarik, setTarik] = useState(false)
   const [kirim, setKirim] = useState(false)
   const [pesan, setPesan] = useState('')
   const [galat, setGalat] = useState('')
@@ -73,9 +104,10 @@ export function VerifikasiConnect() {
       await api.connectVerifikasi({
         nama: f.nama, tempatLahir: f.tempatLahir, tanggalLahir: f.tanggalLahir,
         umur: umur ?? 0, pekerjaan: f.pekerjaan, status: f.status,
-        preferensi: f.preferensi, agama: f.agama, pendidikanTerakhir: f.pendidikanTerakhir,
+        preferensi: f.preferensi, pendidikanTerakhir: f.pendidikanTerakhir,
         tempatTinggal: f.tempatTinggal, nik: f.nik, selfieUrl: f.selfieUrl,
         sosialMedia: PLATFORM.map((p) => f[p.id]).filter(Boolean),
+        persetujuan: TUJUAN.filter((t) => setuju[t.id]).map((t) => t.id),
       })
       setPesan('Ajuan terkirim. Pemilik akan meninjau selfie dan media sosial Anda.')
       setSaya(await api.connectSaya())
@@ -83,6 +115,15 @@ export function VerifikasiConnect() {
       const k = (e as Error)?.message ?? ''
       setGalat(GALAT[k] ?? 'Gagal mengirim ajuan. Coba lagi.')
     } finally { setKirim(false) }
+  }
+
+  async function lakukanTarik() {
+    try {
+      await api.connectTarikPersetujuan()
+      setSaya(await api.connectSaya())
+      setTarik(false)
+      setPesan('Persetujuan ditarik dan data verifikasi Anda dihapus.')
+    } catch { setGalat('Gagal menarik persetujuan. Coba lagi.') }
   }
 
   const status = saya?.status ?? 'belum'
@@ -121,11 +162,22 @@ export function VerifikasiConnect() {
           <li>• <b>NIK tidak disimpan.</b> Yang disimpan hanya sidiknya, untuk memastikan satu orang
             satu akun. Nomornya tidak bisa dibaca kembali oleh siapa pun — termasuk pemilik aplikasi.
             Hanya empat digit terakhir yang terlihat saat peninjauan.</li>
-          <li>• <b>Agama dan orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
-            Keduanya hanya dipakai mesin pencocokan di server.</li>
-          <li>• <b>Alamat tidak ditampilkan utuh</b> — pengguna lain hanya melihat kotanya.</li>
-          <li>• <b>Selfie hanya dilihat pemilik saat meninjau</b>, tidak muncul di profil.</li>
+          <li>• <b>Orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
+            Ia hanya dipakai mesin pencocokan di server.</li>
+          <li>• <b>Alamat tidak ditampilkan utuh</b> — pengguna lain hanya melihat kotanya.
+            Jarak dihitung antar pusat kota, bukan dari GPS.</li>
+          <li>• <b>Selfie dihapus setelah putusan.</b> Ia dilihat pemilik satu kali untuk
+            mencocokkan wajah, lalu tautannya dibuang — baik ajuan Anda disetujui maupun ditolak.</li>
+          <li>• <b>Agama tidak lagi diminta.</b> Dulu kolomnya ada, tetapi tidak dipakai oleh apa
+            pun; data yang tidak dipakai tidak boleh diminta.</li>
+          <li>• <b>Persetujuan bisa Anda tarik kapan saja</b>, dan penarikannya menghapus data
+            verifikasi Anda.</li>
         </ul>
+        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+          Dasar: UU No. 27/2022 tentang Pelindungan Data Pribadi — Pasal 4 ayat (2) untuk data
+          pribadi spesifik, Pasal 16 untuk pembatasan tujuan, Pasal 20-22 untuk persetujuan,
+          Pasal 9 untuk penarikan persetujuan, dan Pasal 43 untuk penghapusan.
+        </p>
       </Card>
 
       {status !== 'terverifikasi' && status !== 'menunggu' && (
@@ -140,7 +192,6 @@ export function VerifikasiConnect() {
               <Field label="Pekerjaan"><input className={inputClass} value={f.pekerjaan} onChange={(e) => set('pekerjaan', e.target.value)} aria-label="Pekerjaan" /></Field>
               <Field label="Status"><input className={inputClass} placeholder="lajang / menikah" value={f.status} onChange={(e) => set('status', e.target.value)} aria-label="Status" /></Field>
               <Field label="Pendidikan terakhir"><input className={inputClass} value={f.pendidikanTerakhir} onChange={(e) => set('pendidikanTerakhir', e.target.value)} aria-label="Pendidikan terakhir" /></Field>
-              <Field label="Agama"><input className={inputClass} value={f.agama} onChange={(e) => set('agama', e.target.value)} aria-label="Agama" /></Field>
             </div>
             <div className="mt-2">
               <Field label="Tempat tinggal (kota, provinsi)">
@@ -196,6 +247,31 @@ export function VerifikasiConnect() {
             </p>
           </Card>
 
+          {/* Persetujuan terpisah per tujuan — bukan satu centang untuk semuanya. */}
+          <Card>
+            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+              Persetujuan pemrosesan
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+              Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah
+              satu tidak Anda setujui, verifikasi tidak bisa dijalankan. Yang dipisah di sini adalah
+              informasinya — Anda berhak tahu persis apa yang Anda setujui, satu per satu.
+            </p>
+            <div className="mt-2 space-y-2">
+              {TUJUAN.map((t) => (
+                <label key={t.id} className="flex cursor-pointer items-start gap-2 rounded-xl bg-white/5 p-2.5">
+                  <input type="checkbox" className="mt-0.5 shrink-0" checked={!!setuju[t.id]}
+                    aria-label={t.judul}
+                    onChange={(e) => setSetuju((s) => ({ ...s, [t.id]: e.target.checked }))} />
+                  <span>
+                    <span className="block text-[12px] font-bold text-slate-200">{t.judul}</span>
+                    <span className="mt-0.5 block text-[11px] leading-relaxed text-slate-400">{t.isi}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </Card>
+
           {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
           {pesan && <Card className="!border-emerald-500/30 !bg-emerald-500/5"><p className="text-[12px] text-emerald-400">{pesan}</p></Card>}
 
@@ -203,6 +279,50 @@ export function VerifikasiConnect() {
             {kirim ? 'Mengirim…' : 'Ajukan verifikasi'}
           </Button>
         </>
+      )}
+
+      {/* Penarikan persetujuan — hak Pasal 9, jadi diletakkan di halaman yang
+          sama dengan pemberiannya, bukan disembunyikan di menu lain. */}
+      {saya && saya.persetujuan?.some((p) => !p.dicabutPada) && (
+        <Card>
+          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Persetujuan Anda</div>
+          <div className="mt-2 space-y-1">
+            {saya.persetujuan.filter((p) => !p.dicabutPada).map((p) => (
+              <div key={p.tujuan} className="flex items-baseline justify-between gap-2 rounded-lg bg-white/5 px-2 py-1">
+                <span className="text-[11px] text-slate-300">{JUDUL_TUJUAN[p.tujuan] ?? p.tujuan}</span>
+                <span className="shrink-0 text-[10px] text-slate-500">{p.pada.slice(0, 10)}</span>
+              </div>
+            ))}
+          </div>
+          {tarik ? (
+            <div className="mt-2 rounded-xl bg-rose-500/10 p-3">
+              <p className="text-[12px] leading-relaxed text-slate-300">
+                Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status
+                belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya
+                lagi. Kredit kepercayaan dan riwayat pelanggaran tetap tersimpan.
+              </p>
+              <div className="mt-2 flex gap-2">
+                <button onClick={() => void lakukanTarik()}
+                  className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-white">
+                  Ya, tarik persetujuan
+                </button>
+                <button onClick={() => setTarik(false)}
+                  className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-slate-300">
+                  Batal
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setTarik(true)}
+              className="mt-2 text-[12px] font-bold text-rose-400 underline">
+              Tarik persetujuan dan hapus data verifikasi saya
+            </button>
+          )}
+          <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+            Catatan persetujuan beserta tanggal penarikannya tetap disimpan — justru itulah bukti
+            bahwa penarikan Anda dihormati.
+          </p>
+        </Card>
       )}
 
       {/* Kredit kepercayaan */}

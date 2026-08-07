@@ -48,7 +48,6 @@ export interface DataVerifikasi {
   pekerjaan: string
   status: string              // lajang / menikah / dst
   preferensi: Preferensi
-  agama: string
   pendidikanTerakhir: string
   tempatTinggal: string
   /** Tautan profil media sosial untuk dicocokkan pemilik. */
@@ -88,6 +87,8 @@ export interface AkunConnect {
   alasanTolak?: string
   kredit: number
   pelanggaran: Pelanggaran[]
+  /** Bukti persetujuan per tujuan (UU PDP Pasal 20-22). */
+  persetujuan: CatatanPersetujuan[]
   /** Radius pencarian dalam km, ditentukan pengguna sendiri. */
   radiusKm: number
   /** Email yang diblokir oleh akun ini. Berlaku di semua perangkat. */
@@ -108,7 +109,13 @@ const db: DbConnect = { akun: {}, laporan: [], garam: randomBytes(32).toString('
 /** Muat keadaan dari penyimpanan luar (dipanggil store utama saat boot). */
 export function muatConnect(data: Partial<DbConnect> | undefined) {
   if (!data) return
-  if (data.akun) db.akun = data.akun
+  if (data.akun) {
+    db.akun = data.akun
+    // Akun yang tersimpan sebelum pencatatan persetujuan ada belum punya
+    // fieldnya. Diisi larik kosong agar pembacaan tidak melempar; kosong juga
+    // jujur secara hukum — memang belum ada bukti persetujuan untuk akun itu.
+    for (const a of Object.values(db.akun)) if (!Array.isArray(a.persetujuan)) a.persetujuan = []
+  }
   if (Array.isArray(data.laporan)) db.laporan = data.laporan
   // Garam WAJIB bertahan: garam baru membuat semua sidik NIK lama tidak cocok,
   // sehingga pemeriksaan akun ganda diam-diam berhenti bekerja.
@@ -128,7 +135,7 @@ export function akunConnect(email: string): AkunConnect {
   let a = db.akun[email]
   if (!a) {
     a = {
-      email, status: 'belum', kredit: KREDIT_AWAL, pelanggaran: [],
+      email, status: 'belum', kredit: KREDIT_AWAL, pelanggaran: [], persetujuan: [],
       radiusKm: 25, diblokir: [], dibuat: new Date().toISOString(),
     }
     db.akun[email] = a
@@ -137,6 +144,88 @@ export function akunConnect(email: string): AkunConnect {
 }
 
 export interface HasilAjuan { ok: boolean; galat?: string }
+
+// ─── Persetujuan menurut UU PDP 27/2022 ──────────────────────────────────────
+//
+// Verifikasi Connect memproses dua jenis DATA PRIBADI SPESIFIK (Pasal 4 ayat 2):
+// data biometrik — selfie wajah — dan data orientasi seksual. Untuk keduanya
+// undang-undang menuntut lebih dari sekadar tombol "Saya setuju" di bawah satu
+// blok syarat dan ketentuan:
+//
+//   * Pasal 20-22: persetujuan harus SAH, yaitu diberikan secara tegas untuk
+//     TUJUAN YANG SPESIFIK, dan pengendali harus dapat MEMBUKTIKANNYA. Karena
+//     itu tiap tujuan dicatat terpisah beserta waktunya dan versi pemberitahuan
+//     yang dibaca pengguna saat itu — persetujuan atas teks yang sudah berubah
+//     bukan persetujuan atas teks yang sekarang.
+//   * Pasal 9: subjek data berhak MENARIK persetujuan. Penarikan harus semudah
+//     pemberiannya, jadi ia tidak disembunyikan di balik permintaan surel.
+//   * Pasal 16 ayat 2: data yang diproses harus TERBATAS DAN SPESIFIK, sah
+//     menurut hukum, dan transparan. Inilah alasan kolom agama dihapus: ia
+//     dikumpulkan dan disimpan, tetapi tidak dipakai oleh apa pun. Data yang
+//     tidak dipakai tidak boleh diminta.
+//   * Pasal 43: data wajib dihapus setelah masa retensi berakhir atau tujuannya
+//     tercapai. Tujuan selfie adalah satu kali pencocokan wajah oleh pemilik.
+//     Setelah putusan diambil, tujuannya tercapai dan selfie dihapus.
+//
+// Yang TIDAK bisa diselesaikan dengan kode, dan harus disebut apa adanya:
+// pemakaian NIK oleh pihak swasta diatur UU Adminduk 24/2013 dan turunannya —
+// verifikasi NIK yang sah dilakukan lewat kerja sama resmi dengan Dukcapil.
+// Menyimpan sidik ber-garam memperkecil kerugian bila bocor, tetapi tidak
+// dengan sendirinya memberi dasar hukum untuk memintanya.
+
+/** Versi pemberitahuan privasi. Naikkan bila teksnya berubah bermakna. */
+export const VERSI_PEMBERITAHUAN = '2026-08-07'
+
+export type TujuanPersetujuan =
+  | 'biometrik_selfie'      // data pribadi spesifik: biometrik
+  | 'orientasi_seksual'     // data pribadi spesifik
+  | 'nik_sidik'             // identitas kependudukan (disidik, tidak disimpan)
+
+export interface CatatanPersetujuan {
+  tujuan: TujuanPersetujuan
+  pada: string
+  versiPemberitahuan: string
+  dicabutPada?: string
+}
+
+export const TUJUAN_WAJIB: TujuanPersetujuan[] = ['biometrik_selfie', 'orientasi_seksual', 'nik_sidik']
+
+export function catatPersetujuan(email: string, tujuan: TujuanPersetujuan[]): void {
+  const a = akunConnect(email)
+  const pada = new Date().toISOString()
+  for (const t of tujuan) {
+    const lama = a.persetujuan.find((p) => p.tujuan === t && !p.dicabutPada)
+    if (lama && lama.versiPemberitahuan === VERSI_PEMBERITAHUAN) continue
+    a.persetujuan.push({ tujuan: t, pada, versiPemberitahuan: VERSI_PEMBERITAHUAN })
+  }
+}
+
+export function persetujuanAktif(email: string): TujuanPersetujuan[] {
+  const a = db.akun[email]
+  if (!a) return []
+  return a.persetujuan.filter((p) => !p.dicabutPada).map((p) => p.tujuan)
+}
+
+/**
+ * Penarikan persetujuan (Pasal 9 huruf f).
+ *
+ * Menarik persetujuan atas biometrik, orientasi, atau NIK berarti dasar hukum
+ * untuk memproses data verifikasi hilang seluruhnya — dan tanpa data verifikasi
+ * akun tidak bisa berstatus terverifikasi. Karena itu penarikan mengembalikan
+ * akun ke status 'belum' dan MENGHAPUS data verifikasinya, bukan sekadar
+ * menandainya. Catatan persetujuan sendiri tetap disimpan dengan tanggal
+ * pencabutan, karena itulah bukti bahwa penarikan dihormati.
+ */
+export function tarikPersetujuan(email: string): HasilAjuan {
+  const a = db.akun[email]
+  if (!a) return { ok: false, galat: 'tidak_ada_akun' }
+  const pada = new Date().toISOString()
+  for (const p of a.persetujuan) if (!p.dicabutPada) p.dicabutPada = pada
+  delete a.data
+  a.status = 'belum'
+  a.alasanTolak = undefined
+  return { ok: true }
+}
 
 /** NIK Indonesia: 16 digit. */
 export function nikSah(nik: string): boolean {
@@ -180,9 +269,18 @@ export function platformDariUrl(url: string): PlatformSosial | null {
 
 export function ajukanVerifikasi(
   email: string,
-  masuk: Omit<DataVerifikasi, 'nikSidik' | 'nikAkhir'> & { nik: string },
+  masuk: Omit<DataVerifikasi, 'nikSidik' | 'nikAkhir'> & {
+    nik: string
+    /** Tujuan yang disetujui pengguna secara tegas, satu per satu. */
+    persetujuan?: TujuanPersetujuan[]
+  },
 ): HasilAjuan {
   const a = akunConnect(email)
+  // Tanpa persetujuan tegas atas ketiga tujuan, tidak ada dasar hukum memproses
+  // biometrik dan orientasi seksual — jadi ajuan ditolak SEBELUM datanya
+  // disentuh, bukan disimpan dulu lalu dinilai belakangan.
+  const setuju = new Set(masuk.persetujuan ?? [])
+  if (!TUJUAN_WAJIB.every((t) => setuju.has(t))) return { ok: false, galat: 'persetujuan_belum_lengkap' }
   if (a.status === 'terverifikasi') return { ok: false, galat: 'sudah_terverifikasi' }
   if (!nikSah(masuk.nik)) return { ok: false, galat: 'nik_tidak_sah' }
   if (!masuk.selfieUrl) return { ok: false, galat: 'selfie_wajib' }
@@ -209,6 +307,12 @@ export function ajukanVerifikasi(
   } as DataVerifikasi
   // Nomor mentah tidak boleh ikut tersimpan lewat sebaran objek di atas.
   delete (a.data as unknown as Record<string, unknown>).nik
+  // Begitu pula daftar persetujuan: tempatnya di a.persetujuan sebagai catatan
+  // bertanggal, bukan disalin mentah ke dalam data verifikasi.
+  delete (a.data as unknown as Record<string, unknown>).persetujuan
+  // Persetujuan dicatat hanya setelah semua pemeriksaan lolos, supaya tidak ada
+  // bukti persetujuan untuk pemrosesan yang sebenarnya tidak pernah terjadi.
+  catatPersetujuan(email, TUJUAN_WAJIB)
   a.status = 'menunggu'
   a.alasanTolak = undefined
   return { ok: true }
@@ -226,6 +330,11 @@ export function putuskanVerifikasi(email: string, setuju: boolean, alasan?: stri
   if (!a || a.status !== 'menunggu') return { ok: false, galat: 'tidak_ada_ajuan' }
   a.status = setuju ? 'terverifikasi' : 'ditolak'
   if (!setuju) a.alasanTolak = alasan?.trim() || 'Tidak memenuhi syarat verifikasi.'
+  // Tujuan selfie adalah satu kali pencocokan wajah oleh pemilik. Putusan sudah
+  // diambil, jadi tujuannya tercapai dan data biometriknya tidak boleh disimpan
+  // lebih lama (UU PDP Pasal 43). Ini berlaku baik untuk yang disetujui maupun
+  // yang ditolak — penolakan bukan alasan menyimpan wajah orang.
+  if (a.data) a.data.selfieUrl = ''
   return { ok: true }
 }
 
@@ -333,6 +442,8 @@ export function ringkasanSaya(email: string) {
     bahaya: a.kredit <= KREDIT_BAHAYA,
     hapusPada: a.hapusPada,
     radiusKm: a.radiusKm,
+    persetujuan: a.persetujuan,
+    versiPemberitahuan: VERSI_PEMBERITAHUAN,
     diblokir: a.diblokir,
     pelanggaran: a.pelanggaran,
     ambang: { awal: KREDIT_AWAL, bahaya: KREDIT_BAHAYA, hapus: KREDIT_HAPUS },

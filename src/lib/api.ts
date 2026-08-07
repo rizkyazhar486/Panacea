@@ -271,6 +271,8 @@ export const api = {
   connectSaya: () => req<{
     status: string; alasanTolak?: string; kredit: number; bahaya: boolean
     hapusPada?: string; radiusKm: number; diblokir: string[]
+    persetujuan: { tujuan: string; pada: string; versiPemberitahuan: string; dicabutPada?: string }[]
+    versiPemberitahuan: string
     pelanggaran: { id: string; pada: string; alasan: string; poin: number }[]
     ambang: { awal: number; bahaya: number; hapus: number }
   }>('/api/connect/saya'),
@@ -278,6 +280,8 @@ export const api = {
     req<{ ok: true }>('/api/connect/verifikasi', { method: 'POST', body: JSON.stringify(data) }),
   connectRadius: (km: number) =>
     req<{ radiusKm: number }>('/api/connect/radius', { method: 'POST', body: JSON.stringify({ km }) }),
+  connectTarikPersetujuan: () =>
+    req<{ ok: boolean }>('/api/connect/tarik-persetujuan', { method: 'POST' }),
   connectDek: (batas = 50) =>
     req<{ kartu: {
       email: string; nama: string; umur: number; pekerjaan: string
