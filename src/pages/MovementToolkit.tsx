@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconRun } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -100,13 +101,13 @@ const SQUAT_KEY = 'pmd_squat_challenge_v1'
 function SquatChallenge() {
   const [days, setDays] = useState<Record<string, number>>(() => { try { return JSON.parse(localStorage.getItem(SQUAT_KEY) || '{}') } catch { return {} } })
   useEffect(() => { try { localStorage.setItem(SQUAT_KEY, JSON.stringify(days)) } catch { /* ignore */ } }, [days])
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const total = Object.values(days).reduce((a, b) => a + b, 0)
   const streak = useMemo(() => {
     let s = 0
     for (let i = 0; ; i++) {
       const d = new Date(); d.setDate(d.getDate() - i)
-      const key = d.toISOString().slice(0, 10)
+      const key = kunciHari(d)
       if (days[key] > 0) s++
       else break
     }

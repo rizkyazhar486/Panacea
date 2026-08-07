@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -112,13 +113,13 @@ function SymptomBodyMap() {
 
 const NEAT_KEY = 'pmd_neat_tracker_v1'
 function NeatTracker() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [minutes, setMinutes] = useState<Record<string, number>>(() => { try { return JSON.parse(localStorage.getItem(NEAT_KEY) || '{}') } catch { return {} } })
   useEffect(() => { try { localStorage.setItem(NEAT_KEY, JSON.stringify(minutes)) } catch { /* ignore */ } }, [minutes])
   const todayMin = minutes[today] || 0
   const weekTotal = useMemo(() => {
     let s = 0
-    for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); s += minutes[d.toISOString().slice(0, 10)] || 0 }
+    for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); s += minutes[kunciHari(d)] || 0 }
     return s
   }, [minutes])
   return (

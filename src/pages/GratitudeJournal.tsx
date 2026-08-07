@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -20,13 +21,13 @@ function streakOf(entries: Entry[]): number {
   let s = 0
   const d = new Date()
   // count back from today (or yesterday if today not done yet)
-  if (!dates.has(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1)
-  while (dates.has(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+  if (!dates.has(kunciHari(d))) d.setDate(d.getDate() - 1)
+  while (dates.has(kunciHari(d))) { s++; d.setDate(d.getDate() - 1) }
   return s
 }
 
 export function GratitudeJournal() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [entries, setEntries] = useState<Entry[]>(load)
   const todayEntry = entries.find((e) => e.date === today)
   const [items, setItems] = useState<string[]>(todayEntry?.items ?? ['', '', ''])

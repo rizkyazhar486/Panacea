@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconShield } from '../components/icons'
 
@@ -122,7 +123,7 @@ export function VaccineTracker() {
           </div>
           <div className="mt-3 flex items-end gap-2">
             <Field label="Last dose date">
-              <input className={inputClass} type="date" value={last || ''} onChange={(e) => setDate(v.id, e.target.value)} max={new Date().toISOString().slice(0, 10)} />
+              <input className={inputClass} type="date" value={last || ''} onChange={(e) => setDate(v.id, e.target.value)} max={hariIni()} />
             </Field>
             {last && <button onClick={() => clear(v.id)} className="mb-0.5 rounded-xl bg-neutral-100 px-3 py-2.5 text-[12px] font-bold text-neutral-500 dark:bg-white/10">Clear</button>}
           </div>

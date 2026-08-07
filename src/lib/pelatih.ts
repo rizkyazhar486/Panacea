@@ -1,5 +1,5 @@
 import { zoneBreakdown, type ImportedWorkout } from './workoutImport'
-import { upayaRelatif, kebugaranKesegaran, bacaKesegaran } from './analisisPro'
+import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, kunciHari } from './analisisPro'
 import type { Konteks } from './trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -331,8 +331,14 @@ export function jadwalPekan(
 
   return pola.map((p, i) => {
     const d = new Date(mulai.getTime() + i * 86400_000)
-    const tanggal = d.toISOString().slice(0, 10)
-    const sudah = riwayat.some((w) => w.mulai.slice(0, 10) === tanggal)
+    // Kalender setempat di kedua sisi. toISOString() selalu UTC, jadi di WIB
+    // label harinya bergeser dan dibandingkan dengan tanggal mentah sesi yang
+    // memang setempat — sesi yang sudah dijalankan tidak pernah dikenali.
+    const tanggal = kunciHari(d)
+    const sudah = riwayat.some((w) => {
+      const t = Date.parse(w.mulai)
+      return !Number.isNaN(t) && kunciHari(new Date(t)) === tanggal
+    })
     return {
       hari: HARI[d.getDay()],
       tanggal,

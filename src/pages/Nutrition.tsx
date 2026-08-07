@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
@@ -14,7 +15,7 @@ import { evaluateVitals, overallStatus, STATUS_COLOR, STATUS_LABEL } from '../li
 const HealthTrends = lazy(() => import('../components/HealthTrends'))
 import type { VitalSign } from '../lib/types'
 
-const today = () => new Date().toISOString().slice(0, 10)
+const today = () => hariIni()
 const GOAL_SLEEP = 8
 const GOAL_WATER = 2000
 const C = { ok: '#00BF63', warn: '#f59e0b', bad: '#ef4444', blue: '#2563eb', pur: '#8b5cf6', ind: '#818cf8', org: '#f97316', cyan: '#06b6d4', pink: '#ec4899' }
@@ -1185,7 +1186,7 @@ function ManualEx({ body, ex, onComplete }: { body: Body; ex: Exer; onComplete: 
 function SleepWater({ body }: { body: Body }) {
   const { state, logWellness } = useStore()
   const wt = getW(state, today())
-  const weekMet = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return getW(state, d.toISOString().slice(0, 10)).metHours }).reduce((a, b) => a + b, 0)
+  const weekMet = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return getW(state, kunciHari(d)).metHours }).reduce((a, b) => a + b, 0)
   return (
     <Card className="!p-5">
       <SectionTitle icon={<span className="text-lg">{'\u{1F4A4}'}</span>} title="Sleep, Water, Sunlight & Weekly" />

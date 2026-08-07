@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconDrop } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -83,7 +84,7 @@ export function BloodDonation() {
           </Field>
         </div>
         <Field label="Date of your last whole-blood donation (leave blank if never / doesn't apply)">
-          <input className={`${inputClass} mt-1`} type="date" value={lastDonation} onChange={(e) => { setLastDonation(e.target.value); update({ lastDonation: e.target.value }) }} max={new Date().toISOString().slice(0, 10)} />
+          <input className={`${inputClass} mt-1`} type="date" value={lastDonation} onChange={(e) => { setLastDonation(e.target.value); update({ lastDonation: e.target.value }) }} max={hariIni()} />
         </Field>
         <div className="mt-3 space-y-2">
           {[

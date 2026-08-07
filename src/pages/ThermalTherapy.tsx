@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { hariLalu, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconFlame } from '../components/icons'
 
@@ -37,10 +38,10 @@ export function ThermalTherapy() {
     try { localStorage.setItem(LS_KEY, JSON.stringify(sessions)) } catch { /* ignore */ }
   }, [sessions])
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const log = (kind: Session['kind']) => setSessions((prev) => [{ date: today, kind }, ...prev].slice(0, 200))
 
-  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10)
+  const weekAgo = hariLalu(7)
   const thisWeek = sessions.filter((s) => s.date >= weekAgo)
   const saunaCount = thisWeek.filter((s) => s.kind === 'sauna').length
   const coldCount = thisWeek.filter((s) => s.kind === 'cold').length

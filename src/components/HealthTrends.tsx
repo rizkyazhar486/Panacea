@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 // 7-day trend of BMI, BMR & VO₂Max. A real snapshot is appended to localStorage
@@ -29,7 +30,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
   // Record today's snapshot (one per calendar day) whenever inputs change.
   useEffect(() => {
     if (!weight || !height || !age) return
-    const today = new Date().toISOString().slice(0, 10)
+    const today = hariIni()
     const bmi = +bmiOf(weight, height).toFixed(1)
     const bmr = Math.round(bmrOf(weight, height, age, gender))
     const vo2 = +vo2Of(age, bmi, gender, hrRest).toFixed(1)

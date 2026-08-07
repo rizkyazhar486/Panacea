@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity, IconHeart, IconTimer, IconRun } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -370,7 +371,7 @@ function TabPanduan() {
 function TabAklimatisasi() {
   const [panas, setPanas] = useState<PaparanPanas[]>(() => muat<PaparanPanas>(KEY_PANAS))
   const [tinggi, setTinggi] = useState<PaparanKetinggian[]>(() => muat<PaparanKetinggian>(KEY_TINGGI))
-  const hariIni = new Date().toISOString().slice(0, 10)
+  const tglHariIni = hariIni()
   const [pSuhu, setPSuhu] = useState('32')
   const [pMenit, setPMenit] = useState('60')
   const [tMeter, setTMeter] = useState('2500')
@@ -381,11 +382,11 @@ function TabAklimatisasi() {
   const penalti = useMemo(() => penaltiKetinggian(Number(tMeter) || 0), [tMeter])
 
   const tambahPanas = () => {
-    const next = [...panas, { tanggal: hariIni, suhuC: Number(pSuhu) || 0, menit: Number(pMenit) || 0 }]
+    const next = [...panas, { tanggal: tglHariIni, suhuC: Number(pSuhu) || 0, menit: Number(pMenit) || 0 }]
     setPanas(next); simpan(KEY_PANAS, next)
   }
   const tambahTinggi = () => {
-    const next = [...tinggi, { tanggal: hariIni, meter: Number(tMeter) || 0, jam: Number(tJam) || 0 }]
+    const next = [...tinggi, { tanggal: tglHariIni, meter: Number(tMeter) || 0, jam: Number(tJam) || 0 }]
     setTinggi(next); simpan(KEY_TINGGI, next)
   }
 

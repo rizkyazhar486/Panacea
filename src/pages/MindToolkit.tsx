@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -517,13 +518,13 @@ const MEDITATION_KEY = 'pmd_meditation_streak_v1'
 function MeditationStreak() {
   const [days, setDays] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem(MEDITATION_KEY) || '[]') } catch { return [] } })
   useEffect(() => { try { localStorage.setItem(MEDITATION_KEY, JSON.stringify(days)) } catch { /* ignore */ } }, [days])
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const doneToday = days.includes(today)
   const streak = useMemo(() => {
     let s = 0
     for (let i = 0; ; i++) {
       const d = new Date(); d.setDate(d.getDate() - i)
-      if (days.includes(d.toISOString().slice(0, 10))) s++
+      if (days.includes(kunciHari(d))) s++
       else break
     }
     return s

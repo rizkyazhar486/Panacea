@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { kunciHari } from '../lib/tanggal'
 import { useStore } from '../lib/store'
 import { Card } from '../components/ui'
 import { HealthSnapshot } from '../components/HealthSnapshot'
@@ -27,7 +28,7 @@ export function Logs() {
     const out: { day: string; date: string; rpe: number | null }[] = []
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today); d.setDate(d.getDate() - i)
-      const key = d.toISOString().slice(0, 10)
+      const key = kunciHari(d)
       out.push({ day: `${d.getDate()}/${d.getMonth() + 1}`, date: key, rpe: byDate.has(key) ? byDate.get(key)! : null })
     }
     return out
@@ -51,8 +52,8 @@ export function Logs() {
   const myCheckInDates = state.checkIns.filter((c) => c.email === account.email).map((c) => c.date)
   const streak = useMemo(() => {
     let s = 0, d = new Date()
-    if (!myCheckInDates.includes(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1)
-    while (myCheckInDates.includes(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+    if (!myCheckInDates.includes(kunciHari(d))) d.setDate(d.getDate() - 1)
+    while (myCheckInDates.includes(kunciHari(d))) { s++; d.setDate(d.getDate() - 1) }
     return s
   }, [state.checkIns])
   const sharedCommunities = state.communities.filter((c) => c.memberNames.includes(me) && state.buddyName && c.memberNames.includes(state.buddyName))

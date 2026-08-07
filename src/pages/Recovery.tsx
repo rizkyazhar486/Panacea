@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
@@ -9,7 +10,7 @@ type RecoveryType = 'surgery' | 'injury' | 'illness' | 'overtraining'
 interface RecoveryProfile { type: RecoveryType; startDate: string }
 
 const KEY = 'pm_recovery_profile'
-const def: RecoveryProfile = { type: 'injury', startDate: new Date().toISOString().slice(0, 10) }
+const def: RecoveryProfile = { type: 'injury', startDate: hariIni() }
 function load(): RecoveryProfile {
   try { const d = JSON.parse(localStorage.getItem(KEY) || ''); return d.startDate ? d : def } catch { return def }
 }

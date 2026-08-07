@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
 import { IconToken } from '../components/icons'
 import {
@@ -96,7 +97,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
   const [category, setCategory] = useState<Category>('food')
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(() => hariIni())
 
   function add() {
     const n = Number(amount.replace(/[^\d]/g, ''))

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -22,7 +23,7 @@ const BINGO_HABITS = [
 const BINGO_KEY = 'pmd_habit_bingo_v1'
 
 function BingoBoard() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [done, setDone] = useState<boolean[]>(() => {
     try { const s = JSON.parse(localStorage.getItem(BINGO_KEY) || '{}'); return s.day === today ? s.cells : Array(25).fill(false) } catch { return Array(25).fill(false) }
   })
@@ -72,7 +73,7 @@ function BingoBoard() {
 function ReportCard() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [done, setDone] = useState<boolean[]>(Array(25).fill(false))
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
 
   useEffect(() => {
     try { const s = JSON.parse(localStorage.getItem(BINGO_KEY) || '{}'); if (s.day === today) setDone(s.cells) } catch { /* ignore */ }

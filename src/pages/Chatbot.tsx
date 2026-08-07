@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { useNavigate } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, Button, Badge } from '../components/ui'
@@ -321,7 +322,7 @@ export function Chatbot() {
     if (messages.length === 0) return
     let text = `Anamnesis Chat — ${activePatient.name}\nDate: ${new Date().toLocaleDateString('en-US')}\n${'═'.repeat(50)}\n\n`
     for (const m of messages) { const t = m.at ? new Date(m.at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''; text += `[${t}] ${m.role === 'user' ? '👤 Patient' : '🤖 AI'}:\n${m.content.replace(/[*_#>`~]/g, '')}\n\n` }
-    const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chat-${activePatient.name}-${new Date().toISOString().slice(0, 10)}.txt`; a.click()
+    const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chat-${activePatient.name}-${hariIni()}.txt`; a.click()
     setTimeout(() => { URL.revokeObjectURL(a.href) }, 1000)
   }
 

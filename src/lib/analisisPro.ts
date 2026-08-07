@@ -1,5 +1,8 @@
 import { trimpSesi, type Sesi, type Konteks } from './trainingPhysiology'
 import type { ImportedWorkout } from './workoutImport'
+import { kunciHari } from './tanggal'
+
+export { kunciHari }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Analisis Pro — padanan fitur analisis berbayar Strava, dihitung dari data
@@ -98,13 +101,15 @@ export function kebugaranKesegaran(
 ): TitikKebugaran[] {
   if (!workouts.length) return []
 
-  // Upaya per hari kalender.
+  // Upaya per hari KALENDER SETEMPAT. Sebelumnya hari diambil dari
+  // toISOString(), yang selalu UTC: di WIB (UTC+7) setiap sesi sebelum pukul
+  // 07.00 tercatat pada hari sebelumnya, dan label tanggal pada grafik ikut
+  // bergeser satu hari. Itu sebabnya tanggal dan log tidak cocok.
   const perHari = new Map<string, number>()
   for (const w of workouts) {
     const t = Date.parse(w.mulai)
     if (Number.isNaN(t)) continue
-    const d = new Date(t).toISOString().slice(0, 10)
-    perHari.set(d, (perHari.get(d) ?? 0) + upayaRelatif(w, k).skor)
+    perHari.set(kunciHari(new Date(t)), (perHari.get(kunciHari(new Date(t))) ?? 0) + upayaRelatif(w, k).skor)
   }
 
   const mulai = new Date(sekarang - hariKeBelakang * 86400_000)
@@ -118,7 +123,7 @@ export function kebugaranKesegaran(
 
   for (let i = 0; i <= hariKeBelakang; i++) {
     const hari = new Date(mulai.getTime() + i * 86400_000)
-    const key = hari.toISOString().slice(0, 10)
+    const key = kunciHari(hari)
     const upaya = perHari.get(key) ?? 0
     // Hari tanpa latihan tetap dihitung: justru hari itulah kelelahan meluruh.
     kebugaran += aKeb * (upaya - kebugaran)
@@ -126,11 +131,40 @@ export function kebugaranKesegaran(
     out.push({
       tanggal: key,
       kebugaran: Math.round(kebugaran * 10) / 10,
-      kelelahan: Math.round(kelelahan * 10) / 10,
       kesegaran: Math.round((kebugaran - kelelahan) * 10) / 10,
+      kelelahan: Math.round(kelelahan * 10) / 10,
       upaya,
     })
   }
+
+  // Titik terakhir dihitung ulang secara BERKELANJUTAN terhadap jam, bukan
+  // dipatok ke tengah malam. Dengan ember harian, angka hari ini terkunci sejak
+  // sesi selesai sampai lewat tengah malam — istirahat lima jam tidak
+  // menggerakkannya sedikit pun, dan itulah "angkanya stuck" yang terlihat.
+  //
+  // Bentuk berkelanjutan ini identik dengan rekursi harian di atas pada jam 00
+  // (rekursi x_n = a·Σ L_k·e^^-(n-k)/τ), hanya saja Δ-nya pecahan hari, jadi
+  // skalanya tidak berubah — hanya resolusinya yang bertambah.
+  const kini = out[out.length - 1]
+  if (kini) {
+    const luruh = (tau: number, a: number) => {
+      let total = 0
+      for (const w of workouts) {
+        const t = Date.parse(w.mulai)
+        if (Number.isNaN(t) || t > sekarang) continue
+        const hari = (sekarang - t) / 86400_000
+        if (hari > tau * 6) continue // sumbangannya sudah <0,3%
+        total += upayaRelatif(w, k).skor * Math.exp(-hari / tau)
+      }
+      return a * total
+    }
+    const keb = luruh(TAU_KEBUGARAN, aKeb)
+    const kel = luruh(TAU_KELELAHAN, aKel)
+    kini.kebugaran = Math.round(keb * 10) / 10
+    kini.kelelahan = Math.round(kel * 10) / 10
+    kini.kesegaran = Math.round((keb - kel) * 10) / 10
+  }
+
   return out
 }
 

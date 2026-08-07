@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
 
@@ -152,7 +153,7 @@ const BEDTIME_STEPS = [
 ]
 const BEDTIME_KEY = 'pmd_bedtime_checklist_v1'
 function BedtimeChecklist() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [done, setDone] = useState<Record<string, boolean>>(() => {
     try { const s = JSON.parse(localStorage.getItem(BEDTIME_KEY) || '{}'); return s.day === today ? s.items : {} } catch { return {} }
   })

@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { KolomVitalTerikat } from '../components/KolomVital'
 import { WidgetBeranda } from '../components/WidgetBeranda'
 
@@ -1408,14 +1409,14 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
   const [joinNameDraft, setJoinNameDraft] = useState(viewerName)
 
   const myCheckIns = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const checkedInToday = myCheckIns.includes(today)
   // Consecutive-day streak ending today/yesterday.
   const streak = useMemo(() => {
     let s = 0
     let d = new Date()
     if (!checkedInToday) d.setDate(d.getDate() - 1)
-    while (myCheckIns.includes(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+    while (myCheckIns.includes(kunciHari(d))) { s++; d.setDate(d.getDate() - 1) }
     return s
   }, [myCheckIns, checkedInToday])
 
@@ -1739,7 +1740,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const [sleepHours, setSleepHours] = useState(7)
   const [bedtimeConsistent, setBedtimeConsistent] = useState(true)
   const sleepScore = Math.max(0, Math.min(100, Math.round((Math.min(sleepHours, 9) / 9) * 70 + (bedtimeConsistent ? 30 : 0))))
-  const todaySleep = state.sleepLogs.find((s) => s.date === new Date().toISOString().slice(0, 10))
+  const todaySleep = state.sleepLogs.find((s) => s.date === hariIni())
 
   // VO2Max — estimasi non-exercise dari HR istirahat & HR maksimal (Uth-Sørensen formula).
   // Resting HR follows the watch when available, so the estimate uses the
@@ -1781,8 +1782,8 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const myCheckInDates = state.checkIns.filter((c) => c.email === viewerEmail).map((c) => c.date).sort()
   const checkInStreak = useMemo(() => {
     let s = 0, d = new Date()
-    if (!myCheckInDates.includes(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1)
-    while (myCheckInDates.includes(d.toISOString().slice(0, 10))) { s++; d.setDate(d.getDate() - 1) }
+    if (!myCheckInDates.includes(kunciHari(d))) d.setDate(d.getDate() - 1)
+    while (myCheckInDates.includes(kunciHari(d))) { s++; d.setDate(d.getDate() - 1) }
     return s
   }, [myCheckInDates])
   const goalCurrent = (metric: HealthGoal['metric']): number => {

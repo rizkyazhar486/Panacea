@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconFood } from '../components/icons'
 
@@ -15,7 +16,7 @@ type Tab = 'mediterranean' | 'sugar' | 'antioxidant' | 'plants' | 'coffee' | 'el
 const MED_FOODS = ['Olive oil', 'Leafy greens', 'Whole grains', 'Legumes/beans', 'Nuts & seeds', 'Fatty fish', 'Fresh fruit', 'Tomatoes/vegetables', 'Herbs & garlic', 'Fermented dairy (yogurt/kefir)']
 const MED_KEY = 'pmd_med_checklist_v1'
 function MediterraneanChecklist() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [done, setDone] = useState<Record<string, boolean>>(() => {
     try { const s = JSON.parse(localStorage.getItem(MED_KEY) || '{}'); return s.day === today ? s.items : {} } catch { return {} }
   })
@@ -65,7 +66,7 @@ const COLORS = [
 ]
 const ANTIOX_KEY = 'pmd_antioxidant_v1'
 function AntioxidantTracker() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [done, setDone] = useState<Record<string, boolean>>(() => {
     try { const s = JSON.parse(localStorage.getItem(ANTIOX_KEY) || '{}'); return s.day === today ? s.items : {} } catch { return {} }
   })
@@ -91,7 +92,7 @@ function AntioxidantTracker() {
 
 const PLANTS_KEY = 'pmd_plant_diversity_v1'
 function PlantDiversity() {
-  const weekKey = useMemo(() => { const d = new Date(); const day = d.getDay(); d.setDate(d.getDate() - day); return d.toISOString().slice(0, 10) }, [])
+  const weekKey = useMemo(() => { const d = new Date(); const day = d.getDay(); d.setDate(d.getDate() - day); return kunciHari(d) }, [])
   const [plants, setPlants] = useState<string[]>(() => {
     try { const s = JSON.parse(localStorage.getItem(PLANTS_KEY) || '{}'); return s.week === weekKey ? s.list : [] } catch { return [] }
   })
