@@ -11,7 +11,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
-  kemajuanTarget, zonaPace, perkiraanPaceAmbang, TIDAK_DIBANGUN,
+  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
 
@@ -75,7 +75,8 @@ export function AnalisisPro() {
   // terhadap tanggal sesi terakhir.
   const ff = useMemo(() => kebugaranKesegaran(workouts, konteks, 120, sekarang), [workouts, konteks, sekarang])
   const kini = ff.length ? ff[ff.length - 1] : null
-  const baca = kini ? bacaKesegaran(kini.kesegaran) : null
+  const umurRiwayat = useMemo(() => hariRiwayatLatihan(workouts, sekarang), [workouts, sekarang])
+  const baca = kini ? bacaKesegaran(kini.kesegaran, umurRiwayat) : null
   const pr = useMemo(() => usahaTerbaik(workouts), [workouts])
   const log = useMemo(() => logLatihan(workouts, konteks, satuanLog), [workouts, konteks, satuanLog])
   const kemajuan = useMemo(() => kemajuanTarget(workouts, target), [workouts, target])
@@ -124,7 +125,7 @@ export function AnalisisPro() {
           </div>
           <div className="mt-3 h-52">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={ff} margin={{ top: 4, right: 4, bottom: 0, left: -24 }}>
+              <ComposedChart data={ff} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="fitFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.35} />
@@ -133,9 +134,10 @@ export function AnalisisPro() {
                 </defs>
                 <XAxis dataKey="tanggal" tick={{ fontSize: 9, fill: '#9ca3af' }} minTickGap={44}
                   tickFormatter={(v) => new Date(v).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })} />
-                <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} width={38} />
+                <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} width={30} />
                 <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10 }}
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10, background: '#0f172a', border: '1px solid #334155', color: '#e2e8f0' }}
+                  wrapperStyle={{ outline: 'none' }} isAnimationActive={false}
                   labelFormatter={(v) => new Date(v as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} />
                 <Area type="monotone" dataKey="kebugaran" name="Kebugaran" stroke="#60a5fa" strokeWidth={2} fill="url(#fitFill)" dot={false} />
                 <Line type="monotone" dataKey="kelelahan" name="Kelelahan" stroke="#f87171" strokeWidth={1.6} dot={false} />

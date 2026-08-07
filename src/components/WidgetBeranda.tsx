@@ -9,7 +9,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
-import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, type Target } from '../lib/analisisPro'
+import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, type Target } from '../lib/analisisPro'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kartu pilihan pengguna di Beranda.
@@ -80,7 +80,7 @@ export function WidgetBeranda() {
     const ff = kebugaranKesegaran(workouts, konteks, 90, sekarang)
     const kini = ff.length ? ff[ff.length - 1] : null
     if (kini) {
-      const b = bacaKesegaran(kini.kesegaran)
+      const b = bacaKesegaran(kini.kesegaran, hariRiwayatLatihan(workouts, sekarang))
       kartu.push(
         <Card key="kebugaran">
           <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Kebugaran & kesegaran</div>

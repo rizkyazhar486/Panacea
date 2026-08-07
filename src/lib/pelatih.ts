@@ -1,5 +1,5 @@
 import { zoneBreakdown, type ImportedWorkout } from './workoutImport'
-import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, kunciHari } from './analisisPro'
+import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, kunciHari } from './analisisPro'
 import type { Konteks } from './trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -414,5 +414,5 @@ export function statusSingkat(riwayat: ImportedWorkout[], k: Konteks, sekarang =
   const ff = kebugaranKesegaran(riwayat, k, 90, sekarang)
   if (!ff.length) return null
   const kini = ff[ff.length - 1]
-  return { ...kini, baca: bacaKesegaran(kini.kesegaran) }
+  return { ...kini, baca: bacaKesegaran(kini.kesegaran, hariRiwayatLatihan(riwayat, sekarang)) }
 }

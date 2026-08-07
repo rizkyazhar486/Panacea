@@ -168,13 +168,44 @@ export function kebugaranKesegaran(
   return out
 }
 
+/** Umur riwayat dalam hari: dari sesi paling awal sampai sekarang. */
+export function hariRiwayatLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
+  let paling = Infinity
+  for (const w of workouts) {
+    const t = Date.parse(w.mulai)
+    if (!Number.isNaN(t) && t < paling) paling = t
+  }
+  return Number.isFinite(paling) ? Math.max(0, (sekarang - paling) / 86400_000) : 0
+}
+
 export interface BacaKesegaran {
   judul: string
   arti: string
   warna: string
 }
 
-export function bacaKesegaran(kesegaran: number): BacaKesegaran {
+/**
+ * Membaca angka kesegaran menjadi kalimat.
+ *
+ * `hariRiwayat` bukan hiasan. Kebugaran memakai τ 42 hari, kelelahan τ 7 hari,
+ * jadi pada awal riwayat kelelahan naik kira-kira enam kali lebih cepat daripada
+ * kebugaran. Siapa pun yang baru dua atau tiga pekan berlatih akan menunjukkan
+ * kesegaran yang sangat negatif — bukan karena tubuhnya kelelahan, melainkan
+ * karena penyebut kebugarannya belum sempat terisi. Membacakan "Sangat lelah,
+ * risiko cedera" pada keadaan itu bukan sekadar tidak berguna; ia menyuruh orang
+ * beristirahat justru ketika ia sedang membangun dasar.
+ *
+ * Karena itu selama riwayat lebih pendek dari satu tetapan waktu kebugaran
+ * (42 hari), angkanya tetap ditampilkan tetapi tidak dibacakan sebagai vonis.
+ */
+export function bacaKesegaran(kesegaran: number, hariRiwayat?: number): BacaKesegaran {
+  if (hariRiwayat !== undefined && hariRiwayat < TAU_KEBUGARAN && kesegaran < -10) {
+    return {
+      judul: 'Belum bisa dibaca',
+      arti: `Riwayat Anda baru ${Math.round(hariRiwayat)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
+      warna: '#94a3b8',
+    }
+  }
   if (kesegaran >= 15) return { judul: 'Sangat segar', arti: 'Beban sudah mengendap sepenuhnya. Bagus untuk lomba atau tes, tetapi bila bertahan lama biasanya berarti latihan sedang terlalu sedikit untuk menambah kebugaran.', warna: '#22c55e' }
   if (kesegaran >= 5) return { judul: 'Segar', arti: 'Siap untuk sesi kualitas atau lomba.', warna: '#84cc16' }
   if (kesegaran >= -10) return { judul: 'Seimbang', arti: 'Beban dan pemulihan sedang sepadan. Ini keadaan yang paling produktif untuk membangun kebugaran.', warna: '#60a5fa' }
