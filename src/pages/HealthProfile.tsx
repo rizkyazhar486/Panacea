@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { bacaTeksBia, PERINTAH_BACA } from '../lib/biaGambar'
 import { hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
@@ -135,6 +136,34 @@ export function HealthProfile() {
   }
 
   const MAX_IMPORT_BYTES = 60 * 1024 * 1024 // 60 MB — big Apple Health exports can freeze the tab if loaded whole
+  /**
+   * Baca tangkapan layar laporan timbangan.
+   *
+   * Pembacaan hurufnya dikerjakan model penglihatan di server; pencocokan label
+   * dan pemeriksaan satuan dikerjakan `bacaTeksBia`, yang bisa diuji tanpa
+   * jaringan. Galatnya dilempar apa adanya agar pemanggil bisa membedakan
+   * "AI belum aktif" dari "gambar tidak terbaca" — dua hal yang butuh saran
+   * berbeda bagi pengguna.
+   */
+  async function bacaGambarBia(file: File): Promise<ImportResult> {
+    setNote('Membaca gambar…')
+    const dataUrl = await new Promise<string>((res, rej) => {
+      const fr = new FileReader()
+      fr.onload = () => res(String(fr.result))
+      fr.onerror = () => rej(new Error('read_failed'))
+      fr.readAsDataURL(file)
+    })
+    let teks: string
+    try {
+      const r = await api.aiVision(dataUrl, PERINTAH_BACA)
+      teks = r.text ?? ''
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? '')
+      throw new Error(/503|not_configured/.test(msg) ? 'ai_not_configured' : 'ai_failed')
+    }
+    return bacaTeksBia(teks)
+  }
+
   async function onImport(file?: File) {
     if (!file) return
     if (file.size > MAX_IMPORT_BYTES) {
@@ -144,10 +173,27 @@ export function HealthProfile() {
     }
     setNote('Reading file…'); setErr('')
     try {
-      const text = await file.text()
-      const r: ImportResult = parseHealthFile(file.name, text)
+      // Gambar ditangani jalur tersendiri: aplikasi timbangan seperti Moving
+      // Life sering tidak punya tombol ekspor sama sekali, jadi tangkapan layar
+      // adalah SATU-SATUNYA bentuk data yang bisa dibawa keluar penggunanya.
+      // Menolak gambar berarti menyuruh mereka mengetik ulang delapan belas
+      // angka dari layar yang sudah ada di tangan.
+      const gambar = /^image\//.test(file.type) || /\.(jpe?g|png|webp|heic)$/i.test(file.name)
+      let r: ImportResult
+      if (gambar) {
+        r = await bacaGambarBia(file)
+      } else {
+        const text = await file.text()
+        r = parseHealthFile(file.name, text)
+      }
       const keys = Object.keys(r).filter((k) => k !== 'source')
-      if (!keys.length) { setNote(''); setErr('No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.'); return }
+      if (!keys.length) {
+        setNote('')
+        setErr(gambar
+          ? 'Tidak ada angka yang terbaca dari gambar itu. Pastikan seluruh daftar terlihat dan tidak terpotong, lalu coba lagi.'
+          : 'No recognizable data found in that file. Try export.xml (Apple Health), physiological_cycles.csv (WHOOP), or a JSON export from WHOOP/Garmin Connect.')
+        return
+      }
       setP((x) => ({
         ...x,
         source: (r.source as Src) ?? x.source,
@@ -169,6 +215,8 @@ export function HealthProfile() {
       // Workouts and heart-rate notifications live in the same file but are not
       // "latest value of a metric", so they go to their own store instead of
       // being flattened away.
+      // Tangkapan layar tidak memuat sesi latihan; lewati saja.
+      const text = gambar ? '' : await file.text()
       const w = parseWorkouts(text)
       const n = parseHrNotifications(text)
       const wBaru = mergeWorkouts(w)
@@ -179,8 +227,13 @@ export function HealthProfile() {
       ].filter(Boolean).join(', ')
 
       setNote(`Filled from ${r.source}: ${keys.length} values — now shared across the app.${extra ? ` Plus ${extra}.` : ''} Review, then press Save.`)
-    } catch {
-      setNote(''); setErr('Failed to read the file.')
+    } catch (e) {
+      setNote('')
+      const m = (e as Error)?.message
+      setErr(m === 'ai_not_configured'
+        ? 'Membaca gambar memerlukan AI yang belum aktif di server ini. Sementara itu, isi angkanya manual di bawah.'
+        : m === 'ai_failed' ? 'Gagal membaca gambar. Coba lagi, atau isi angkanya manual di bawah.'
+        : 'Failed to read the file.')
     } finally {
       if (fileRef.current) fileRef.current.value = ''
     }
@@ -238,15 +291,25 @@ export function HealthProfile() {
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · tangkapan layar timbangan .jpg/.png" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           <b>Apple Watch</b> can auto-sync below. <b>Garmin and WHOOP don't offer a live sync link</b>,
           so export your data from the Garmin Connect or WHOOP app and upload the file here — the
-          fields fill in automatically, and you'll see exactly what was found before saving. Files are
-          processed on your device, never uploaded when read.
+          fields fill in automatically, and you'll see exactly what was found before saving.
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
+          <b>Timbangan pintar (Moving Life, Xiaomi dan sekelasnya)</b> sering tidak punya tombol
+          ekspor sama sekali — unggah saja <b>tangkapan layar</b> laporannya dan angkanya dibaca
+          otomatis.
+        </p>
+        <p className="mt-1 text-[11px] leading-relaxed text-amber-600 dark:text-amber-400">
+          Berkas .xml/.csv/.json diproses di perangkat Anda dan tidak pernah diunggah.
+          <b> Tangkapan layar berbeda:</b> gambarnya dikirim ke server untuk dibaca, karena
+          pembacaan huruf memerlukan model penglihatan. Kalau laporan itu memuat nama atau hal lain
+          yang tidak ingin Anda kirim, potong dulu bagian itu sebelum mengunggah.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <input ref={fileRef} type="file" accept=".xml,.csv,.json,text/xml,text/csv,application/json" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
+          <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
           <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
           <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
           <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>

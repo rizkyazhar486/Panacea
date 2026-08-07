@@ -48,6 +48,16 @@ export interface ImportResult {
   bodyAge?: number
   amrKcal?: number
   visceralFatIndex?: number
+  /** Kapasitas cadangan otot — skor timbangan BIA, bukan satuan fisik. */
+  muscleReserveCapacity?: number
+  /** Garam anorganik (mineral tubuh) dalam kg. */
+  inorganicSaltKg?: number
+  /** Somatotipe sebagai label, mis. "Standard" / "Slim muscular". */
+  somatotype?: string
+  /** Skor tubuh gabungan 0-100 dari aplikasi timbangan. */
+  bodyScore?: number
+  /** Otot rangka sebagai persen massa tubuh (timbangan BIA melaporkan %, InBody kg). */
+  skeletalMusclePct?: number
   // Sleep architecture. Total sleep alone hides the thing that actually
   // matters after night shifts: whether deep and REM were reached at all.
   sleepDeepH?: number
@@ -379,6 +389,10 @@ export function parseWearableJson(text: string, sourceHint?: 'WHOOP' | 'Garmin')
   out.bmrKcal = out.bmrKcal ?? findKey(flat, [/^bmr$/, /basalmetabolicrate/])
   out.amrKcal = findKey(flat, [/^amr$/, /activemetabolicrate/])
   out.visceralFatIndex = findKey(flat, [/visceralfatindex/, /visceralfatlevel/])
+  out.muscleReserveCapacity = findKey(flat, [/musclereservecapacity/, /musclereserve/])
+  out.inorganicSaltKg = findKey(flat, [/inorganicsalt/, /^mineral$/, /bodymineral/])
+  out.bodyScore = findKey(flat, [/bodyscore/])
+  out.skeletalMusclePct = findKey(flat, [/skeletalmusclepercentage/, /skeletalmusclepct/])
   out.skeletalMuscleKg = findKey(flat, [/skeletalmusclemass/])
   out.leanMassKg = out.leanMassKg ?? findKey(flat, [/leanbodymass/])
   out.bmi = findKey(flat, [/^bmi$/, /bodymassindex/])
