@@ -51,6 +51,19 @@ function satuanNorm(satuan: string): string {
 
 export function keKanonik(nilai: number, satuan: string | undefined, target: Kanonik): number {
   const u = satuanNorm(satuan ?? '')
+
+  // Persentase diperiksa SEBELUM penjaga satuan kosong di bawah. satuanNorm
+  // membuang setiap karakter non-alfanumerik, sehingga satuan "%" runtuh
+  // menjadi string kosong — dan penjaga itu memulangkan nilainya apa adanya.
+  // Akibatnya setiap persentase yang Apple kirim sebagai rasio 0–1 (saturasi
+  // oksigen 0,96; asimetri berjalan 0,03) tersimpan seratus kali terlalu kecil,
+  // lalu tampil sebagai "0,96%" tanpa pernah terlihat seperti galat.
+  //
+  // Penentunya memang NILAI, bukan satuannya: tidak ada persentase tubuh yang
+  // sah bernilai ≤ 1 dalam skala 0–100 (saturasi 1%, lemak tubuh 1%), jadi
+  // angka di bawah itu selalu berarti rasio.
+  if (target === 'pct') return nilai > 0 && nilai <= 1 ? nilai * 100 : nilai
+
   if (!u) return nilai
   switch (target) {
     case 'kg':
@@ -137,9 +150,6 @@ export function keKanonik(nilai: number, satuan: string | undefined, target: Kan
       if (u === 'mg') return nilai * 1000
       if (u === 'g' || u === 'grams') return nilai * 1_000_000
       return nilai
-    case 'pct':
-      // Apple mengirim rasio 0–1 untuk sebagian persentase.
-      return nilai <= 1 ? nilai * 100 : nilai
     default:
       return nilai
   }
@@ -201,6 +211,10 @@ export const KATALOG: DefinisiMetrik[] = [
   M('bodyTempC', 'Suhu tubuh', 'Suhu', 'C', '°C', ['body_temperature']),
   M('basalTempC', 'Suhu basal', 'Suhu', 'C', '°C', ['basal_body_temperature']),
   M('wristTempC', 'Suhu pergelangan saat tidur', 'Suhu', 'C', '°C', ['apple_sleeping_wrist_temperature']),
+  // Metrik tidur Apple yang BUKAN tahapan tidur. Keduanya diambil lewat
+  // katalog, bukan lewat cabang sesi tidur, karena nilainya satu angka per
+  // malam dan bukan rincian tahapan.
+  M('gangguanNapasTidur', 'Gangguan napas saat tidur', 'Pernapasan', 'apaAdanya', '/jam', ['apple_sleeping_breathing_disturbances', 'sleeping_breathing_disturbances']),
 
   // ── Aktivitas harian ──
   M('steps', 'Langkah', 'Aktivitas', 'apaAdanya', 'langkah', ['step_count'], true),

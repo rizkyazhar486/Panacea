@@ -59,6 +59,30 @@ function parseExportDate(date: string): number {
   return Date.parse(`${m[1]}T${m[2]}${m[3] ?? ''}${offset}`)
 }
 
+/**
+ * Tanggal kalender menurut zona waktu YANG TERTULIS DI PAYLOAD.
+ *
+ * `new Date(t).toISOString().slice(0, 10)` memberi tanggal UTC. Server ini
+ * berjalan di UTC sementara penggunanya di WIB (+07:00), jadi tidur yang
+ * berakhir pukul 06.20 tanggal 7 tercatat sebagai malam tanggal 6 — mundur satu
+ * hari, setiap malam. Ponsel sudah memberi tahu offsetnya di dalam string
+ * tanggal ("+0700"); yang benar adalah memakai offset itu, bukan zona server
+ * dan bukan UTC.
+ */
+export function tanggalDiOffset(date: string): string | null {
+  const m = date.trim().match(/^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?\s*(Z|[+-]\d{2}:?\d{2})?$/)
+  if (!m) return null
+  const t = parseExportDate(date)
+  if (Number.isNaN(t)) return null
+  const raw = m[4]
+  if (!raw || raw === 'Z') return new Date(t).toISOString().slice(0, 10)
+  const tanda = raw[0] === '-' ? -1 : 1
+  const jj = Number(raw.slice(1, 3))
+  const mm = Number(raw.slice(raw.length - 2))
+  const menit = tanda * (jj * 60 + mm)
+  return new Date(t + menit * 60_000).toISOString().slice(0, 10)
+}
+
 // Pick the sample with the latest parseable date. If none parse, assume the
 // export is chronological and fall back to the last entry in the array.
 function latestSample(samples: MetricSample[] | undefined): MetricSample | undefined {
@@ -118,7 +142,14 @@ export function parseHealthWebhookPayload(body: unknown): HealthWebhookResult {
     if (!m?.name || !Array.isArray(m.data) || !m.data.length) continue
     const nm = norm(m.name)
 
-    if (nm.includes('sleep') && !nm.includes('wristtemperature')) {
+    // Hanya metrik TAHAPAN TIDUR yang ditangani di sini. Sebelumnya syaratnya
+    // "mengandung sleep" dengan satu pengecualian yang ditulis tangan, jadi
+    // setiap metrik tidur baru dari Apple — gangguan napas saat tidur, dan apa
+    // pun yang menyusul — ikut tertelan cabang ini dan hilang tanpa jejak,
+    // persis pola kegagalan senyap yang paling sulit dilacak. Sekarang yang
+    // tidak dikenali diteruskan ke katalog.
+    const tahapanTidur = /^sleep(analysis|_?stage)?$/.test(nm) || nm === 'sleepanalysis'
+    if (tahapanTidur) {
       const s = latestSample(m.data)
       const raw = s?.asleep ?? s?.totalSleep
       const h = sleepToHours(raw, m.units)
@@ -327,6 +358,9 @@ export function extractSleepSessions(body: unknown): SleepSession[] {
       const endT = end ? parseExportDate(end) : NaN
       const dateT = !Number.isNaN(endT) ? endT : raw.date ? parseExportDate(String(raw.date)) : NaN
       if (Number.isNaN(dateT)) continue
+      // Tanggalnya diambil menurut offset yang tertulis di payload, bukan UTC.
+      const tanggal = tanggalDiOffset(!Number.isNaN(endT) && end ? end : String(raw.date ?? ''))
+        ?? new Date(dateT).toISOString().slice(0, 10)
 
       // asleep can legitimately be 0 alongside a real totalSleep on current
       // exports, so it must not shadow it.
@@ -339,7 +373,7 @@ export function extractSleepSessions(body: unknown): SleepSession[] {
       if (total == null && deep == null && rem == null && core == null) continue
 
       out.push({
-        date: new Date(dateT).toISOString().slice(0, 10),
+        date: tanggal,
         start: !Number.isNaN(start ? parseExportDate(start) : NaN) ? new Date(parseExportDate(start!)).toISOString() : undefined,
         end: !Number.isNaN(endT) ? new Date(endT).toISOString() : undefined,
         totalH: total, deepH: deep, remH: rem, coreH: core, awakeH: awake, inBedH: inBed,
