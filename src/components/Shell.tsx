@@ -49,6 +49,7 @@ import { api, backendEnabled } from '../lib/api'
 import { trackVisit, rankByUsage } from '../lib/usage'
 import type { Role } from '../lib/types'
 import { ambilTersembunyi, saring, langgananFitur } from '../lib/fiturTersembunyi'
+import { autoIsiDariPerangkat } from '../lib/autoIsi'
 
 // Public entry: marketing landing first, then the login screen on demand.
 function PublicEntry() {
@@ -255,6 +256,13 @@ export function Shell({ children }: { children: ReactNode }) {
   // Harus di atas `if (!account)`: hook tidak boleh berada setelah return
   // bersyarat, karena jumlah hook akan berbeda antara render sebelum dan
   // sesudah login — React menolaknya dan seluruh halaman gagal dirender.
+  // Sebarkan data perangkat ke seluruh aplikasi sekali saat dibuka. Sebelum
+  // ini, Longevity/Fitness/Klinis baru melihat angka pengguna bila ia kebetulan
+  // membuka /health-data lebih dulu.
+  // Bergantung pada `account`: percobaan pertama terjadi sebelum sesi ada dan
+  // pasti gagal, jadi harus dijalankan lagi begitu pengguna masuk.
+  useEffect(() => { if (account) void autoIsiDariPerangkat() }, [account])
+
   const [tersembunyi, setTersembunyi] = useState<string[]>(ambilTersembunyi)
   useEffect(() => langgananFitur(setTersembunyi), [])
 

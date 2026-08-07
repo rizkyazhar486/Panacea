@@ -13,6 +13,9 @@
 import { broadcastHealthUpdate } from './profile'
 
 export interface Vitals {
+  // Katalog metrik server kini memuat 113 entri; menuliskannya satu per satu di
+  // sini berarti metrik baru diam-diam terbuang saat disalurkan ke halaman lain.
+  [kunci: string]: number | string | undefined
   // Body
   weightKg?: number
   heightCm?: number
