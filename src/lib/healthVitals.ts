@@ -58,6 +58,16 @@ export interface Vitals {
   bodyWaterPct?: number
   proteinPct?: number
   bonePct?: number
+  /** Kapasitas cadangan otot — skor timbangan BIA, bukan satuan fisik. */
+  muscleReserveCapacity?: number
+  /** Garam anorganik (mineral tubuh) dalam kg. */
+  inorganicSaltKg?: number
+  /** Somatotipe sebagai label, mis. "Standard". */
+  somatotype?: string
+  /** Skor tubuh gabungan 0-100 dari aplikasi timbangan. */
+  bodyScore?: number
+  /** Otot rangka sebagai persen massa tubuh. */
+  skeletalMusclePct?: number
   musclePct?: number
   subcutaneousFatKg?: number
   boneMassKg?: number
