@@ -113,6 +113,24 @@ export const FORMAT: Format[] = [
   },
 ]
 
+/**
+ * Setelan jam untuk sesi ini.
+ *
+ *   amrap    hitung mundur dari `menit`; skornya jumlah ronde.
+ *   fortime  hitung maju sampai dihentikan; skornya waktu. `batas` adalah
+ *            batas waktu keras (time cap) bila ada.
+ *   emom     hitung maju, menandai tiap `interval` detik selama `menit`.
+ *   tabata   8 putaran 20 detik kerja / 10 detik istirahat.
+ */
+export interface SetelanJam {
+  jenis: 'amrap' | 'fortime' | 'emom' | 'tabata'
+  menit?: number
+  batas?: number
+  interval?: number
+  /** Ronde yang direncanakan, untuk memperlihatkan sisa pada For Time. */
+  ronde?: number
+}
+
 export interface Benchmark {
   nama: string
   kelompok: 'girls' | 'hero' | 'pemula'
@@ -123,6 +141,7 @@ export interface Benchmark {
   bodyweight: boolean
   skala: string
   catatan?: string
+  jam?: SetelanJam
 }
 
 export const BENCHMARK: Benchmark[] = [
@@ -133,6 +152,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 8-12 ronde · menengah 15-20 · mahir 20+',
     skala: 'Pull-up jadi ring row atau band-assisted; push-up dari lutut atau miring pada kotak. Kalau ronde pertama butuh lebih dari 90 detik, turunkan repetisinya jadi 3-6-9.',
     catatan: 'Benchmark bodyweight paling terkenal dan titik masuk terbaik: tidak ada barbel, tidak ada teknik olimpik.',
+    jam: { jenis: 'amrap', menit: 20 },
   },
   {
     nama: 'Mary', kelompok: 'girls', format: 'AMRAP 20 menit', bodyweight: true,
@@ -140,6 +160,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula jarang Rx — 5-8 ronde sudah bagus',
     skala: 'Handstand push-up jadi pike push-up di kotak; pistol jadi squat satu kaki ke bangku dengan pegangan.',
     catatan: 'Terlihat seperti Cindy tetapi jauh lebih teknis. Butuh mobilitas bahu dan pergelangan kaki yang sudah siap.',
+    jam: { jenis: 'amrap', menit: 20 },
   },
   {
     nama: 'Angie', kelompok: 'girls', format: 'For Time', bodyweight: true,
@@ -147,6 +168,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 25-35 mnt · menengah 18-22 · mahir <15',
     skala: 'Versi "Half Angie" (50 tiap gerakan) adalah titik masuk yang jujur. Semua gerakan diselesaikan sebelum lanjut.',
     catatan: 'Volume 400 repetisi. Ini termasuk sesi berisiko rabdomiolisis pada orang yang belum terbiasa — lihat peringatan di bawah.',
+    jam: { jenis: 'fortime', batas: 40, ronde: 4 }
   },
   {
     nama: 'Barbara', kelompok: 'girls', format: '5 ronde, istirahat 3 menit', bodyweight: true,
@@ -154,6 +176,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Tiap ronde 5-7 menit; total 35-50 menit',
     skala: 'Kurangi jadi 3 ronde atau setengahkan repetisinya. Istirahat 3 menit WAJIB diambil penuh — itu bagian dari desainnya.',
     catatan: 'Istirahat terjadwal membuat setiap ronde bisa dikerjakan cepat. Membandingkan waktu antarronde memperlihatkan daya tahan Anda dengan sangat jujur.',
+    jam: { jenis: 'fortime', batas: 60, ronde: 5 }
   },
   {
     nama: 'Chelsea', kelompok: 'girls', format: 'EMOM 30 menit', bodyweight: true,
@@ -161,6 +184,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Selesai berapa menit sebelum tertinggal — 15 menit sudah bagus untuk pemula',
     skala: 'Jadikan E2MOM (tiap dua menit) atau potong jadi 3-6-9. Berhenti saat Anda tidak lagi selesai dalam satu menit.',
     catatan: 'Cindy versi EMOM. Volumenya sama besar dengan Angie — perlakukan dengan hormat yang sama.',
+    jam: { jenis: 'emom', menit: 30, interval: 60 }
   },
   {
     nama: 'Annie', kelompok: 'girls', format: 'For Time (50-40-30-20-10)', bodyweight: true,
@@ -168,6 +192,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 12-18 mnt · mahir <7',
     skala: 'Double-under jadi single-under dengan repetisi ganda (100-80-60-40-20) — bukan setengahnya.',
     catatan: 'Bagus untuk belajar double-under, karena kelelahannya rendah dan pengulangannya banyak.',
+    jam: { jenis: 'fortime', batas: 25, ronde: 5 }
   },
   // ── Melibatkan beban ──────────────────────────────────────────────────────
   {
@@ -176,6 +201,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 8-12 mnt · menengah 5-7 · elite <3',
     skala: 'Turunkan beban sampai set 21 bisa dikerjakan dalam maksimal dua set. Kalau harus dipecah lebih dari itu, bebannya terlalu berat untuk tujuan sesi ini.',
     catatan: 'Benchmark paling terkenal. Justru karena pendek, godaan memakai beban terlalu berat paling besar di sini.',
+    jam: { jenis: 'fortime', batas: 20, ronde: 3 }
   },
   {
     nama: 'Helen', kelompok: 'girls', format: '3 ronde For Time', bodyweight: false,
@@ -183,6 +209,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 14-18 mnt · menengah 10-12 · mahir <9',
     skala: 'Lari jadi 200-300 m; kettlebell diturunkan agar 21 ayunan bisa tanpa berhenti.',
     catatan: 'Triplet dengan keseimbangan bagus antara lari, tarik dan engsel pinggul.',
+    jam: { jenis: 'fortime', batas: 25, ronde: 3 }
   },
   {
     nama: 'Grace', kelompok: 'girls', format: 'For Time', bodyweight: false,
@@ -190,6 +217,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 6-10 mnt · mahir <3',
     skala: 'Pakai beban yang bisa Anda angkat 10 kali berturut-turut saat segar — biasanya jauh lebih ringan dari perkiraan.',
     catatan: 'Gerakan olimpik tunggal berulang. JANGAN dikerjakan sebelum teknik clean & jerk Anda dinilai pelatih.',
+    jam: { jenis: 'fortime', batas: 20 }
   },
   {
     nama: 'Karen', kelompok: 'girls', format: 'For Time', bodyweight: false,
@@ -197,6 +225,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 12-18 mnt · mahir <7',
     skala: 'Turunkan jadi 100 atau 75 repetisi sebelum menurunkan beban bolanya.',
     catatan: 'Sederhana dan brutal. Nyeri otot paha depan setelahnya biasanya berlangsung beberapa hari.',
+    jam: { jenis: 'fortime', batas: 25 }
   },
   // ── Hero WOD ──────────────────────────────────────────────────────────────
   {
@@ -206,6 +235,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 55-75 mnt · menengah 40-50 · mahir <35',
     skala: 'Tanpa rompi, pecah jadi 20 ronde 5-10-15, dan potong separuh ("Half Murph") pada percobaan pertama. Ini sesi yang paling sering menyebabkan rabdomiolisis dalam setahun.',
     catatan: 'Dinamai Letnan Michael Murphy, Navy SEAL yang gugur di Afghanistan 2005. Biasa dikerjakan saat Memorial Day.',
+    jam: { jenis: 'fortime', batas: 90, ronde: 5 }
   },
   {
     nama: 'Chad', kelompok: 'hero', format: 'For Time', bodyweight: true,
@@ -213,6 +243,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: '60-100 menit',
     skala: 'Tanpa ransel, kotak lebih rendah, dan 500 repetisi untuk percobaan pertama.',
     catatan: 'Dinamai Chad Wilkinson, Navy SEAL yang meninggal karena bunuh diri pada 2018; sesi ini digunakan untuk penggalangan kesadaran pencegahan bunuh diri di kalangan veteran.',
+    jam: { jenis: 'fortime', batas: 120 }
   },
   {
     nama: 'JT', kelompok: 'hero', format: 'For Time (21-15-9)', bodyweight: true,
@@ -220,6 +251,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Pemula 15-25 mnt · mahir <8',
     skala: 'Pike push-up, bench dip, push-up lutut. Tangga turun membantu — bagian tersulit ada di awal.',
     catatan: 'Dinamai Petty Officer Jeff Taylor, gugur pada operasi yang sama dengan Michael Murphy.',
+    jam: { jenis: 'fortime', batas: 30, ronde: 3 }
   },
   // ── Titik masuk ───────────────────────────────────────────────────────────
   {
@@ -228,6 +260,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: '6-10 ronde',
     skala: 'Kalau 10 ronde terasa mudah, naikkan durasinya dulu jadi 15 menit sebelum menaikkan repetisi.',
     catatan: 'Mulai dari sini kalau ini pekan pertama Anda. Tidak ada yang memalukan dari memulai di sini.',
+    jam: { jenis: 'amrap', menit: 10 }
   },
   {
     nama: 'EMOM Pengenalan', kelompok: 'pemula', format: 'EMOM 10 menit', bodyweight: true,
@@ -235,6 +268,7 @@ export const BENCHMARK: Benchmark[] = [
     targetWaktu: 'Selesai tanpa napas tersengal',
     skala: 'Naikkan repetisi hanya kalau Anda masih punya 30 detik istirahat tiap menit kerja.',
     catatan: 'Format teraman untuk mempelajari gerakan sambil tetap terasa seperti latihan.',
+    jam: { jenis: 'emom', menit: 10, interval: 60 }
   },
 ]
 
