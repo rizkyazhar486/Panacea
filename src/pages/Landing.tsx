@@ -67,19 +67,20 @@ const MARQUEE = [
 ]
 
 // ── History of longevity, anti-aging, wellness & healthcare systems ──────────────
-const HISTORY_ERAS: { era: string; when: string; emoji: string; title: string; body: string }[] = [
+const HISTORY_ERAS: { era: string; when: string; emoji: string; title: string; body: string; video?: string }[] = [
   { era: 'Ancient Egypt', when: '≈3000–300 BCE', emoji: '𓂀', title: 'Pharaohs & Medical Papyri',
-    body: 'The Edwin Smith and Ebers papyri recorded prescriptions, surgery, and hygiene. Pharaohs pursued eternal life through mummification; Imhotep was revered as a physician. Cosmetics & oils (moringa, honey) became the earliest anti-aging remedies.' },
+    body: 'The Edwin Smith and Ebers papyri recorded prescriptions, surgery, and hygiene. Pharaohs pursued eternal life through mummification; Imhotep was revered as a physician. Cosmetics & oils (moringa, honey) became the earliest anti-aging remedies.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091507_583431ed-8898-4dfa-b8f9-c5b0dbbe2f60.mp4' },
   { era: 'Age of the Prophets', when: '≈2000 BCE–632 CE', emoji: '☾', title: 'Prophetic Tradition & Hygiene',
-    body: 'Prophetic teachings emphasized ablution/cleanliness, periodic fasting, honey & black seed, and moderate eating ("a third for food, a third for drink, a third for breath"). These principles of prevention and moderation align closely with modern longevity science.' },
+    body: 'Prophetic teachings emphasized ablution/cleanliness, periodic fasting, honey & black seed, and moderate eating ("a third for food, a third for drink, a third for breath"). These principles of prevention and moderation align closely with modern longevity science.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091443_997b4cca-33e8-4172-a8bf-196145536064.mp4' },
   { era: 'Greco-Roman', when: '≈500 BCE–500 CE', emoji: '🏛️', title: 'Hippocrates & Galen',
-    body: 'Hippocrates: "let food be thy medicine" and the Hippocratic Oath (medical ethics). Galen systematized physiology. The Romans built aqueducts, bathhouses, and public sanitation — the first public health system.' },
+    body: 'Hippocrates: "let food be thy medicine" and the Hippocratic Oath (medical ethics). Galen systematized physiology. The Romans built aqueducts, bathhouses, and public sanitation — the first public health system.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091602_57f19059-6460-40e3-a9eb-05fcdf9d0fee.mp4' },
   { era: 'Chinese Dynasties', when: '≈200 BCE–1912 CE', emoji: '🐉', title: 'Qi, Herbs & Elixirs of Longevity',
-    body: 'The Huangdi Neijing laid the foundations of TCM. Emperors sought an "elixir of immortality" (some, ironically, containing mercury). Qigong, acupuncture, ginseng, and yin-yang balance formed a holistic approach to healthspan.' },
+    body: 'The Huangdi Neijing laid the foundations of TCM. Emperors sought an "elixir of immortality" (some, ironically, containing mercury). Qigong, acupuncture, ginseng, and yin-yang balance formed a holistic approach to healthspan.', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091631_5438f5ac-1e17-4937-b4a9-01346777ee0c.mp4' },
   { era: 'Mongol Empire', when: '≈1206–1368 CE', emoji: '🏹', title: 'Cross-Cultural Medicine',
-    body: 'The Pax Mongolica connected Persian, Chinese, and Arab physicians along the Silk Road — exchanging surgical, pharmaceutical, and quarantine knowledge. Mobile hospitals and soldier fitness standards were early forms of "performance medicine".' },
+    body: 'The Pax Mongolica connected Persian, Chinese, and Arab physicians along the Silk Road — exchanging surgical, pharmaceutical, and quarantine knowledge. Mobile hospitals and soldier fitness standards were early forms of "performance medicine".', video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091728_c9ef0932-4b2b-46fc-ae0b-a33a276529ac.mp4' },
   { era: 'Islamic Golden Age', when: '≈800–1300 CE', emoji: '⚕️', title: 'Ibn Sina & Hospitals (Bimaristan)',
-    body: "Ibn Sina's Al-Qanun (Canon of Medicine) remained the world's reference for 600 years. Al-Razi pioneered clinical record-keeping. The Bimaristan — hospitals with medical records, pharmacies, and specializations — was the forerunner of modern healthcare systems." },
+    body: "Ibn Sina's Al-Qanun (Canon of Medicine) remained the world's reference for 600 years. Al-Razi pioneered clinical record-keeping. The Bimaristan — hospitals with medical records, pharmacies, and specializations — was the forerunner of modern healthcare systems.",
+    video: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_091759_7444344d-fd5c-47c7-a0a5-d551e686742f.mp4' },
 ]
 const HISTORY_MODERN: { decade: string; title: string; body: string }[] = [
   { decade: '1900–1950', title: 'Antibiotics & Vaccines', body: 'Penicillin (Fleming, 1928), mass vaccination, and sanitation dramatically extended life expectancy. Focus: infectious disease.' },
@@ -429,6 +430,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                       <span className="text-[10px] text-neutral-400">· {e.when}</span>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.body}</p>
+                    {e.video && (
+                      <video src={e.video} autoPlay muted loop playsInline preload="none"
+                        aria-label={`Suasana era ${e.era}`}
+                        className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover" />
+                    )}
                   </div>
                 </div>
               </Reveal>
