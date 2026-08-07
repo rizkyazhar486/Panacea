@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { hariIni } from './tanggal'
 import { api, backendEnabled, type BackendPost } from './api'
 import type {
   AppState,
@@ -778,7 +779,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => {
           const email = st.account?.email
           if (!email) return st
-          const today = new Date().toISOString().slice(0, 10)
+          const today = hariIni()
           if (st.checkIns.some((c) => c.email === email && c.date === today)) return st
           return { ...st, checkIns: [...st.checkIns, { email, date: today }] }
         }),
@@ -859,7 +860,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState((st) => ({ ...st, selfVitals: [{ id: uid(), at: new Date().toISOString(), ...v }, ...st.selfVitals].slice(0, 50) })),
       addSleepLog: (hours, bedtimeConsistent) =>
         setState((st) => {
-          const date = new Date().toISOString().slice(0, 10)
+          const date = hariIni()
           const without = st.sleepLogs.filter((s) => s.date !== date)
           return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
         }),
@@ -882,7 +883,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addTrainingLog: (rpe, type, note) =>
         setState((st) => ({
           ...st,
-          trainingLogs: [{ id: uid(), date: new Date().toISOString().slice(0, 10), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
+          trainingLogs: [{ id: uid(), date: hariIni(), rpe: Math.max(1, Math.min(10, Math.round(rpe))), type: type.trim() || 'Latihan', note: note?.trim() || undefined }, ...st.trainingLogs].slice(0, 365),
         })),
       setActiveProgram: (program) => setState((st) => ({ ...st, activeProgram: program })),
       addFood: (f) => setState((st) => ({ ...st, foods: [f, ...st.foods] })),

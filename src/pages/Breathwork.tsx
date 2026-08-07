@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { hariLalu, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 
@@ -85,9 +86,9 @@ export function Breathwork() {
   }
   const finish = () => {
     setRunning(false)
-    const today = new Date().toISOString().slice(0, 10)
+    const today = hariIni()
     if (streak.last !== today) {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+      const yesterday = hariLalu(1)
       const days = streak.last === yesterday ? streak.days + 1 : 1
       const next = { last: today, days }
       setStreak(next)

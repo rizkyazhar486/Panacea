@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconHeart, IconActivity, IconTimer, IconRun } from '../components/icons'
@@ -76,9 +77,9 @@ export function TrainingPhysiology() {
    */
   const baseline = useMemo(() => {
     const ambil = (k: 'hrvMs' | 'restingHr') => {
-      const hariIni = new Date().toISOString().slice(0, 10)
+      const tglHariIni = hariIni()
       const v = riwayat
-        .filter((r) => r.date !== hariIni)
+        .filter((r) => r.date !== tglHariIni)
         .slice(-28)
         .map((r) => r[k])
         .filter((x): x is number => typeof x === 'number' && x > 0)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Field } from '../components/ui'
 import { IconSparkle, IconHeart } from '../components/icons'
 
@@ -60,7 +61,7 @@ export function Ikigai() {
     const blob = new Blob([lines], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = `legacy-letter-${new Date().toISOString().slice(0, 10)}.txt`
+    a.href = url; a.download = `legacy-letter-${hariIni()}.txt`
     a.click()
     URL.revokeObjectURL(url)
   }

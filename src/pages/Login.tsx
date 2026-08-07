@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { useStore, uid, OWNER_EMAIL } from '../lib/store'
 import { Wordmark } from '../components/Logo'
 import { Button, inputClass } from '../components/ui'
@@ -278,7 +279,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Date of Birth</label>
                   <input className={inputClass} value={f.dob}
                     onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
-                    max={new Date().toISOString().slice(0, 10)} />
+                    max={hariIni()} />
                   {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Age: {ageFromDob(f.dob)} years</p>}
                 </div>
               </div>

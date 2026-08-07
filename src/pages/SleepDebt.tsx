@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
@@ -22,7 +23,7 @@ function load(): Night[] {
 export function SleepDebt() {
   const [need, setNeed] = useState(8)
   const [nights, setNights] = useState<Night[]>(load)
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [hours, setHours] = useState(() => {
     const v = getHealthCache().sleepH
     return typeof v === 'number' && v > 0 ? v : 7

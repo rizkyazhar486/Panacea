@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { kunciHari } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHeart, IconUsers, IconHospital, IconShield } from '../components/icons'
 import { HOSPITALS, fetchNearbyFacilities, type NearbyFacility } from '../lib/hospitals'
@@ -53,7 +54,7 @@ function saveCycle(d: CycleData) {
 
 function addDays(iso: string, days: number): string {
   const d = new Date(iso); d.setDate(d.getDate() + days)
-  return d.toISOString().slice(0, 10)
+  return kunciHari(d)
 }
 function fmtIdDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })

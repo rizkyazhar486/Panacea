@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Button, inputClass } from '../components/ui'
@@ -115,7 +116,7 @@ export function Settings() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `panaceamed-data-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `panaceamed-data-${hariIni()}.json`
     document.body.appendChild(a)
     a.click()
     a.remove()

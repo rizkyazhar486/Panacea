@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni, hariLalu } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconMoon, IconChartUp } from '../components/icons'
 import { awal, awalBulat } from '../lib/nilaiAwal'
@@ -32,8 +33,8 @@ type Store = Record<string, DayLog> // key: yyyy-mm-dd
 
 const KEY = 'pmd_readiness_v1'
 const load = (): Store => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') } catch { return {} } }
-const todayKey = () => new Date().toISOString().slice(0, 10)
-const dayKey = (offset: number) => { const d = new Date(); d.setDate(d.getDate() - offset); return d.toISOString().slice(0, 10) }
+const todayKey = () => hariIni()
+const dayKey = (offset: number) => hariLalu(offset)
 
 const BEHAVIORS = [
   { id: 'caffeine_late', label: '☕ Afternoon/evening caffeine', bad: true },

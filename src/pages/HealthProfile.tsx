@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
@@ -106,7 +107,7 @@ export function HealthProfile() {
 
   // Append/replace today's snapshot for the trend chart.
   function withSnapshot(cur: HealthProfile): Snapshot[] {
-    const today = new Date().toISOString().slice(0, 10)
+    const today = hariIni()
     const snap: Snapshot = {
       date: today,
       vo2max: cur.vo2max || undefined, restingHr: cur.restingHr || undefined,
@@ -192,14 +193,14 @@ export function HealthProfile() {
     setTimeout(() => URL.revokeObjectURL(url), 2000)
   }
   function exportJson() {
-    download(`health-data-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(p, null, 2), 'application/json')
+    download(`health-data-${hariIni()}.json`, JSON.stringify(p, null, 2), 'application/json')
   }
   function exportCsv() {
     const rows = p.history ?? []
     if (!rows.length) { setErr('No history to export yet — save your data first.'); return }
     const cols: (keyof Snapshot)[] = ['date', 'vo2max', 'restingHr', 'hrvMs', 'recoveryPct', 'sleepH']
     const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => r[c] ?? '').join(','))].join('\n')
-    download(`health-history-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv')
+    download(`health-history-${hariIni()}.csv`, csv, 'text/csv')
   }
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (

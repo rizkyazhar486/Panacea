@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 
@@ -56,7 +57,7 @@ const DISRUPTORS = [
 ]
 
 function DailyHabits() {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   const [done, setDone] = useState<Record<string, boolean>>(() => {
     try { const s = JSON.parse(localStorage.getItem(HABIT_KEY) || '{}'); return s.day === today ? s.items : {} } catch { return {} }
   })

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, inputClass } from '../components/ui'
 import { IconActivity, IconFlame, IconRun, IconCheck, IconPlus } from '../components/icons'
 import { VideoGallery } from '../components/VideoGallery'
@@ -139,12 +140,12 @@ export function Workout() {
   ), [muscle, modality, type])
 
   function logExercise(exId: string) {
-    const entry: LogEntry = { id: `${Date.now()}`, exId, date: new Date().toISOString().slice(0, 10), sets, reps, weight }
+    const entry: LogEntry = { id: `${Date.now()}`, exId, date: hariIni(), sets, reps, weight }
     const next = [entry, ...log]
     setLog(next); saveLog(next)
   }
 
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = hariIni()
   const todayLog = log.filter((l) => l.date === todayStr)
   const weekLog = log.filter((l) => Date.now() - new Date(l.date).getTime() <= 7 * 86400000)
   const weeklyVolume = weekLog.reduce((a, l) => a + l.sets * l.reps * (l.weight || 1), 0)

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconTimer } from '../components/icons'
 
@@ -21,7 +22,7 @@ const TIPS = [
 
 interface Saved { intervalMin: number; breaksToday: number; day: string }
 function load(): Saved {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = hariIni()
   try {
     const raw = localStorage.getItem(LS_KEY)
     if (raw) {
