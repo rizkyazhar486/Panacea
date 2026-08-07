@@ -2,10 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconMoon, IconChartUp } from '../components/icons'
 import { awal, awalBulat } from '../lib/nilaiAwal'
+import { useVitals } from '../lib/useVitals'
+import { mergeVitals } from '../lib/healthVitals'
+import { mergeHealthCache } from '../lib/profile'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Recovery & Strain — WHOOP-style daily loop, fully manual & offline:
+// Recovery & Strain — WHOOP-style daily loop, offline:
 //   1. Morning check-in: HRV, resting HR, sleep hours+quality, behavior journal.
+//      HRV, denyut istirahat dan durasi tidur terisi sendiri dari perangkat;
+//      yang diketik manual dikirim balik ke penyimpanan bersama lewat Enter.
 //   2. Recovery Score 0-100% (green/yellow/red) vs your own rolling baseline.
 //   3. Strain 0-21 (log-like scale) from logged workouts (duration × RPE).
 //   4. Optimal Strain Target for today given recovery — the WHOOP killer
@@ -117,6 +122,8 @@ function Ring({ value, max, color, size = 120, children }: { value: number; max:
 
 export function Readiness() {
   const [store, setStore] = useState<Store>(load)
+  const vitals = useVitals()
+  const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const tk = todayKey()
   const today: DayLog = store[tk] ?? { behaviors: [], workouts: [] }
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(store)) } catch { /* ignore */ } }, [store])
@@ -191,11 +198,50 @@ export function Readiness() {
   const [wRpe, setWRpe] = useState(6)
   const [wMin, setWMin] = useState(45)
 
-  const num = (label: string, key: 'hrv' | 'rhr' | 'sleepH', step = 1, ph = '') => (
-    <Field label={label}>
-      <input className={inputClass} type="number" step={step} placeholder={ph} value={today[key] ?? ''} onChange={(e) => upd({ [key]: +e.target.value || undefined } as Partial<DayLog>)} />
-    </Field>
-  )
+  // Kolom check-in pagi. Angkanya sudah diisi dari jam tangan lewat efek di
+  // atas; yang ditambahkan di sini adalah dua hal yang membuatnya jujur:
+  // penanda ⌚ kalau angkanya memang datang dari perangkat, dan tombol ↵ yang
+  // MENGIRIM koreksi manual ke penyimpanan bersama. Tanpa yang kedua, ralat
+  // yang Anda ketik di sini tidak pernah terlihat oleh halaman lain.
+  const KUNCI_VITAL: Record<'hrv' | 'rhr' | 'sleepH', string> = {
+    hrv: 'hrvMs', rhr: 'restingHr', sleepH: 'sleepH',
+  }
+  const num = (label: string, key: 'hrv' | 'rhr' | 'sleepH', step = 1, ph = '') => {
+    const nilai = today[key]
+    const perangkat = vitals[KUNCI_VITAL[key]]
+    const dariPerangkat = typeof nilai === 'number' && typeof perangkat === 'number'
+      && Math.abs(nilai - perangkat) < 0.05
+    const kirim = () => {
+      if (typeof nilai !== 'number' || !(nilai > 0) || dariPerangkat) return
+      mergeVitals({ [KUNCI_VITAL[key]]: nilai, source: 'Manual', measuredAt: new Date().toISOString() })
+      mergeHealthCache({ [KUNCI_VITAL[key]]: nilai })
+      setBaruDisimpan(key)
+      setTimeout(() => setBaruDisimpan(null), 1800)
+    }
+    const perluSimpan = typeof nilai === 'number' && nilai > 0 && !dariPerangkat
+    return (
+      <Field label={
+        <span className="flex items-center gap-1">
+          <span>{label}</span>
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
+        </span>
+      }>
+        <div className="flex items-center gap-1">
+          <input className={inputClass} type="number" step={step} placeholder={ph}
+            aria-label={label}
+            value={nilai ?? ''}
+            onChange={(e) => upd({ [key]: +e.target.value || undefined } as Partial<DayLog>)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }} />
+          {perluSimpan && baruDisimpan !== key && (
+            <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
+              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+          )}
+          {baruDisimpan === key && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
+        </div>
+      </Field>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">

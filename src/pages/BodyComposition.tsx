@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { useVitals } from '../lib/useVitals'
 import { IconHeart, IconActivity, IconChartUp, IconMoon } from '../components/icons'
-import { getHealthCache, pushBiometrics } from '../lib/profile'
+import { getHealthCache, pushBiometrics, mergeHealthCache } from '../lib/profile'
+import { mergeVitals } from '../lib/healthVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Komposisi Tubuh — InBody-style visual page. All values are entered manually
-// (from a smart scale / InBody printout / Apple Watch) then visualized with
+// Komposisi Tubuh — InBody-style visual page. Nilai yang diketahui perangkat
+// terisi sendiri; sisanya diketik (dari timbangan pintar / cetakan InBody) lalu
+// divisualkan dengan
 // Under–Normal–Over bars, a 9-cell body-type grid and longevity indicators.
 // Persists locally so it works offline.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -137,6 +139,8 @@ export function BodyComposition() {
     return initial
   })
   const [syncNote, setSyncNote] = useState('')
+  const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
+  const vital = useVitals()
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(b)) } catch { /* ignore */ } }, [b])
   // Keep the shared Health Profile cache in sync with manual edits made here too,
   // so calculators elsewhere in the app don't drift from what's shown on this page.
@@ -188,9 +192,49 @@ export function BodyComposition() {
     return { bmi, pbf, fatMass, lean, smm, whr, basal, visceral, vo2Tier, lifeExp, restorative, battery, readiness, aging, score }
   }, [b])
 
-  const num = (label: string, key: keyof Body, step = 1) => (
-    <Field label={label}><input className={inputClass} type="number" step={step} value={(b[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<Body>)} /></Field>
-  )
+  // Kolom yang sudah diisi perangkat diberi penanda ⌚ supaya angka yang
+  // terisi sendiri tidak pernah disangka ketikan sendiri, dan koreksi manual
+  // punya tombol ↵ (atau Enter) yang menyiarkannya ke seluruh aplikasi.
+  const KE_VITAL: Partial<Record<keyof Body, string>> = {
+    w: 'weightKg', vo2: 'vo2max', rhr: 'restingHr', hrv: 'hrvMs',
+    sleepH: 'sleepH', smm: 'muscleMassKg',
+  }
+  const num = (label: string, key: keyof Body, step = 1) => {
+    const kv = KE_VITAL[key]
+    const nilai = b[key] as number
+    const perangkat = kv ? vital[kv] : undefined
+    const dariPerangkat = typeof nilai === 'number' && typeof perangkat === 'number'
+      && Math.abs(nilai - perangkat) < 0.05
+    const kirim = () => {
+      if (!kv || typeof nilai !== 'number' || !(nilai > 0) || dariPerangkat) return
+      mergeVitals({ [kv]: nilai, source: 'Manual', measuredAt: new Date().toISOString() })
+      mergeHealthCache({ [kv]: nilai })
+      setBaruDisimpan(String(key))
+      setTimeout(() => setBaruDisimpan(null), 1800)
+    }
+    const perluSimpan = !!kv && typeof nilai === 'number' && nilai > 0 && !dariPerangkat
+    return (
+      <Field label={
+        <span className="flex items-center gap-1">
+          <span>{label}</span>
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
+        </span>
+      }>
+        <div className="flex items-center gap-1">
+          <input className={inputClass} type="number" step={step} aria-label={label}
+            value={(b[key] as number) || ''}
+            onChange={(e) => u({ [key]: +e.target.value } as Partial<Body>)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }} />
+          {perluSimpan && baruDisimpan !== String(key) && (
+            <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
+              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+          )}
+          {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
+        </div>
+      </Field>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">

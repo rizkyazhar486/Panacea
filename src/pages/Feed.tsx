@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+import { KolomVitalTerikat } from '../components/KolomVital'
 import { WidgetBeranda } from '../components/WidgetBeranda'
 
 // Real map (Leaflet + OpenStreetMap, free) — lazy so the heavy lib loads only
@@ -1674,8 +1675,10 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   // synced their watch never sees the old hardcoded 70 kg / 170 cm / 30 y
   // placeholders. Typing in a field takes it off device-follow.
   const vitals = useVitals()
-  const [weight, setWeight, weightFromDevice] = useVitalField('weightKg', 70)
-  const [height, setHeight, heightFromDevice] = useVitalField('heightCm', 170)
+  const ikatWeight = useVitalField('weightKg', 70)
+  const [weight, setWeight, weightFromDevice] = ikatWeight
+  const ikatHeight = useVitalField('heightCm', 170)
+  const [height, setHeight, heightFromDevice] = ikatHeight
   const [age, setAge] = useState(() => getDemo().age || 30)
   const [activity, setActivity] = useState(1.4)
   const bmi = weight / Math.pow(height / 100, 2)
@@ -1683,17 +1686,22 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const tdee = Math.round((10 * weight + 6.25 * height - 5 * age + 5) * activity)
 
   // 2. Kalkulator Tekanan Darah
-  const [sys, setSys, sysFromDevice] = useVitalField('systolic', 120)
-  const [dia, setDia, diaFromDevice] = useVitalField('diastolic', 80)
+  const ikatSys = useVitalField('systolic', 120)
+  const [sys, setSys, sysFromDevice] = ikatSys
+  const ikatDia = useVitalField('diastolic', 80)
+  const [dia, setDia, diaFromDevice] = ikatDia
   const bpCat = bpCategory(sys, dia)
 
   // 3. Kalkulator Kebutuhan Cairan Harian
   const waterMl = Math.round(weight * 33 * (activity > 1.3 ? 1.15 : 1))
 
   // 4. Monitor Vital Realtime
-  const [hr, setHr, hrFromDevice] = useVitalField('heartRate', 72)
-  const [spo2, setSpo2, spo2FromDevice] = useVitalField('spo2Pct', 98)
-  const [tempC, setTempC, tempFromDevice] = useVitalField('bodyTempC', 36.5)
+  const ikatHr = useVitalField('heartRate', 72)
+  const [hr, setHr, hrFromDevice] = ikatHr
+  const ikatSpo2 = useVitalField('spo2Pct', 98)
+  const [spo2, setSpo2, spo2FromDevice] = ikatSpo2
+  const ikatTempC = useVitalField('bodyTempC', 36.5)
+  const [tempC, setTempC, tempFromDevice] = ikatTempC
   const lastVital = state.selfVitals[0]
 
   // #8: Web Bluetooth — baca detak jantung langsung dari strap BLE (Heart Rate Service 0x180D).
@@ -1890,8 +1898,8 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🧮 BMI, Calorie & Fluid Calculator</div>
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <Field label="Weight (kg)"><input type="number" value={weight} onChange={(e) => setWeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Height (cm)"><input type="number" value={height} onChange={(e) => setHeight(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <KolomVitalTerikat ikat={ikatWeight} label="Weight (kg)" satuan="kg" step={0.1} kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatHeight} label="Height (cm)" satuan="cm" kelas="text-xs" />
           <Field label="Age"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <select value={activity} onChange={(e) => setActivity(+e.target.value)} className={inputClass + ' text-xs'}>
@@ -1923,16 +1931,16 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🩺 Blood Pressure & Vital Monitor</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Field label="Systolic"><input type="number" value={sys} onChange={(e) => setSys(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Diastolic"><input type="number" value={dia} onChange={(e) => setDia(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <KolomVitalTerikat ikat={ikatSys} label="Systolic" satuan="mmHg" kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatDia} label="Diastolic" satuan="mmHg" kelas="text-xs" />
         </div>
         <div className="rounded-xl p-2 text-center text-white" style={{ background: bpCat.color }}>
           <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-2 text-xs">
-          <Field label="HR (bpm)"><input type="number" value={hr} onChange={(e) => setHr(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="SpO2 (%)"><input type="number" value={spo2} onChange={(e) => setSpo2(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
-          <Field label="Temperature (°C)"><input type="number" step={0.1} value={tempC} onChange={(e) => setTempC(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <KolomVitalTerikat ikat={ikatHr} label="HR (bpm)" satuan="bpm" kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatSpo2} label="SpO2 (%)" satuan="%" kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatTempC} label="Temperature (°C)" satuan="°C" step={0.1} kelas="text-xs" />
         </div>
         {/* #8: koneksi wearable BLE untuk HR live */}
         {bleStatus !== 'unsupported' && (

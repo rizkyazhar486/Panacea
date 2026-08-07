@@ -3,7 +3,8 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
 import { getDemo } from '../lib/profile'
-import { awal, awalBulat } from '../lib/nilaiAwal'
+import { useVitalField } from '../lib/useVitals'
+import { KolomVitalTerikat } from '../components/KolomVital'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lab Performa — data-driven calculators for the full strength/endurance/speed
@@ -181,11 +182,12 @@ function RpeCard() {
 }
 
 function VtLtCard() {
-  const [vo2, setVo2] = useState(() => awal('vo2max', 41))
+  const ikatVo2 = useVitalField('vo2max', 41)
+  const [vo2] = ikatVo2
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🌬️ Ventilatory & Lactate Threshold</div>
-      <Field label="VO₂max (ml/kg/min)"><input className={inputClass} type="number" value={vo2} onChange={(e) => setVo2(+e.target.value)} /></Field>
+      <KolomVitalTerikat ikat={ikatVo2} label="VO₂max (ml/kg/min)" satuan="ml/kg/min" step={0.1} />
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VT1/LT1</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.6).toFixed(1)}</div></div>
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VT2/LT2</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.85).toFixed(1)}</div></div>
@@ -431,7 +433,8 @@ function FieldTestTab() {
 function GripCard() {
   const [r, setR] = useState(38)
   const [l, setL] = useState(36)
-  const [bw, setBw] = useState(() => awal('weightKg', 65))
+  const ikatBw = useVitalField('weightKg', 65)
+  const [bw] = ikatBw
   const avg = (r + l) / 2
   const asym = Math.max(r, l) > 0 ? (Math.abs(r - l) / Math.max(r, l)) * 100 : 0
   const ratio = avg / bw
@@ -441,7 +444,7 @@ function GripCard() {
       <div className="mt-2 grid grid-cols-3 gap-2">
         <Field label="Right (kg)"><input className={inputClass} type="number" value={r} onChange={(e) => setR(+e.target.value)} /></Field>
         <Field label="Left (kg)"><input className={inputClass} type="number" value={l} onChange={(e) => setL(+e.target.value)} /></Field>
-        <Field label="Weight (kg)"><input className={inputClass} type="number" value={bw} onChange={(e) => setBw(+e.target.value)} /></Field>
+        <KolomVitalTerikat ikat={ikatBw} label="Weight (kg)" satuan="kg" step={0.1} />
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Average</div><div className="text-lg font-extrabold text-brand-dark">{avg.toFixed(1)} kg</div></div>
@@ -517,7 +520,8 @@ function VentilationCard() {
 }
 
 function HydrationCard() {
-  const [pre, setPre] = useState(() => awal('weightKg', 65))
+  const ikatPre = useVitalField('weightKg', 65)
+  const [pre] = ikatPre
   const [post, setPost] = useState(64)
   const [fluid, setFluid] = useState(0.5)
   const [hrs, setHrs] = useState(1)
@@ -527,7 +531,7 @@ function HydrationCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">💧 Sweat Rate & Hydration</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Weight before (kg)"><input className={inputClass} type="number" step="0.1" value={pre} onChange={(e) => setPre(+e.target.value)} /></Field>
+        <KolomVitalTerikat ikat={ikatPre} label="Weight before (kg)" satuan="kg" step={0.1} />
         <Field label="Weight after (kg)"><input className={inputClass} type="number" step="0.1" value={post} onChange={(e) => setPost(+e.target.value)} /></Field>
         <Field label="Fluid consumed (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>
@@ -646,7 +650,8 @@ function TssCard() {
 
 function KarvonenCard() {
   const [hrmax, setHrmax] = useState(190)
-  const [hrrest, setHrrest] = useState(() => awalBulat('restingHr', 60))
+  const ikatHrrest = useVitalField('restingHr', 60)
+  const [hrrest] = ikatHrrest
   const [lo, setLo] = useState(60)
   const [hi, setHi] = useState(70)
   const target = (pct: number) => Math.round((hrmax - hrrest) * (pct / 100) + hrrest)
@@ -655,7 +660,7 @@ function KarvonenCard() {
       <div className="text-sm font-extrabold">🎯 Training HR Zones (Karvonen)</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Field label="HRmax"><input className={inputClass} type="number" value={hrmax} onChange={(e) => setHrmax(+e.target.value)} /></Field>
-        <Field label="Resting HR"><input className={inputClass} type="number" value={hrrest} onChange={(e) => setHrrest(+e.target.value)} /></Field>
+        <KolomVitalTerikat ikat={ikatHrrest} label="Resting HR" satuan="bpm" />
         <Field label="Low intensity (%)"><input className={inputClass} type="number" value={lo} onChange={(e) => setLo(+e.target.value)} /></Field>
         <Field label="High intensity (%)"><input className={inputClass} type="number" value={hi} onChange={(e) => setHi(+e.target.value)} /></Field>
       </div>

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
 import { PrefillBadge } from '../components/HealthSnapshot'
-import { hasHealth, pushBiometrics } from '../lib/profile'
+import { pushBiometrics, mergeHealthCache } from '../lib/profile'
+import { mergeVitals } from '../lib/healthVitals'
+import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,6 +171,8 @@ export function Longevity() {
   // push-back effect below can never overwrite fresher cache values with a
   // stale localStorage copy — same race fixed on the Body Composition page.
   const [d, setD] = useState<LongevityData>(() => syncFromDevices(load()).next)
+  const vitals = useVitals()
+  const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const [syncNote, setSyncNote] = useState('')
   useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(d)) } catch { /* ignore */ } }, [d])
   // Sync edited biometrics back to the central Health Profile so the whole app agrees.
@@ -206,13 +210,40 @@ export function Longevity() {
 
   const scoreColor = score == null ? '#a3a3a3' : score >= 75 ? '#00BF63' : score >= 55 ? '#f59e0b' : '#ef4444'
 
-  const HEALTH_FIELD: Partial<Record<keyof LongevityData, 'vo2max' | 'restingHr' | 'sleepH'>> = { vo2: 'vo2max', rhr: 'restingHr', sleepH: 'sleepH' }
+  // Kunci di sini dipetakan ke penyimpanan vitals bersama, bukan hanya ke tiga
+  // kolom seperti sebelumnya — tekanan darah sistolik dan rasio pinggang-pinggul
+  // juga sudah diketahui perangkat/timbangan dan tidak perlu diketik ulang.
+  const KE_VITAL: Partial<Record<keyof LongevityData, string>> = {
+    vo2: 'vo2max', rhr: 'restingHr', sleepH: 'sleepH', sbp: 'systolic', whr: 'waistHipRatio',
+  }
   const num = (label: string, key: keyof LongevityData, step = 1, ph = '') => {
-    const hf = HEALTH_FIELD[key]
+    const kv = KE_VITAL[key]
+    const nilai = d[key] as number
+    const perangkat = kv ? vitals[kv] : undefined
+    const dariPerangkat = typeof nilai === 'number' && typeof perangkat === 'number'
+      && Math.abs(nilai - perangkat) < 0.05
+    const kirim = () => {
+      if (!kv || typeof nilai !== 'number' || !(nilai > 0) || dariPerangkat) return
+      mergeVitals({ [kv]: nilai, source: 'Manual', measuredAt: new Date().toISOString() })
+      mergeHealthCache({ [kv]: nilai })
+      setBaruDisimpan(String(key))
+      setTimeout(() => setBaruDisimpan(null), 1800)
+    }
+    const perluSimpan = !!kv && typeof nilai === 'number' && nilai > 0 && !dariPerangkat
     return (
-      <Field label={<>{label}<PrefillBadge show={!!hf && hasHealth(hf)} /></>}>
-        <input className={inputClass} type="number" step={step} placeholder={ph}
-          value={(d[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)} />
+      <Field label={<>{label}<PrefillBadge show={dariPerangkat} /></>}>
+        <div className="flex items-center gap-1">
+          <input className={inputClass} type="number" step={step} placeholder={ph} aria-label={label}
+            value={(d[key] as number) || ''}
+            onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }} />
+          {perluSimpan && baruDisimpan !== String(key) && (
+            <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
+              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+          )}
+          {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
+        </div>
       </Field>
     )
   }
