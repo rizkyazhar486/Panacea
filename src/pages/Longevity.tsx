@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
 import { PrefillBadge } from '../components/HealthSnapshot'
@@ -232,11 +233,11 @@ export function Longevity() {
     const perluSimpan = !!kv && typeof nilai === 'number' && nilai > 0 && !dariPerangkat
     return (
       <Field label={<>{label}<PrefillBadge show={dariPerangkat} /></>}>
-        <div className="flex items-center gap-1">
-          <input className={inputClass} type="number" step={step} placeholder={ph} aria-label={label}
-            value={(d[key] as number) || ''}
-            onChange={(e) => u({ [key]: +e.target.value } as Partial<LongevityData>)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }} />
+        <div className="flex items-center gap-1"
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); kirim() } }}>
+          <KolomAngka step={step} placeholder={ph} ariaLabel={label}
+            nilai={d[key] as number | undefined}
+            onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
               title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { KolomAngka } from '../components/KolomAngka'
 import { simpanTeks } from '../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../lib/biaGambar'
 import { hariIni } from '../lib/tanggal'
@@ -256,8 +257,8 @@ export function HealthProfile() {
 
   const num = (label: string, key: keyof HealthProfile, step = 1, ph = '') => (
     <Field label={label}>
-      <input className={inputClass} type="number" step={step} min={0} placeholder={ph}
-        value={(p[key] as number) || ''} onChange={(e) => u({ [key]: +e.target.value } as Partial<HealthProfile>)} />
+      <KolomAngka step={step} placeholder={ph}
+        nilai={p[key] as number | undefined} onNilai={(n) => u({ [key]: n } as Partial<HealthProfile>)} ariaLabel={label} />
     </Field>
   )
 
