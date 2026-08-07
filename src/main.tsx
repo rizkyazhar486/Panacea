@@ -96,6 +96,7 @@ const DrugInfo = lazy(() => import('./pages/DrugInfo').then((m) => ({ default: m
 const GeneInfo = lazy(() => import('./pages/GeneInfo').then((m) => ({ default: m.GeneInfo })))
 const Ikigai = lazy(() => import('./pages/Ikigai').then((m) => ({ default: m.Ikigai })))
 const Harada = lazy(() => import('./pages/Harada').then((m) => ({ default: m.Harada })))
+const CrossFit = lazy(() => import('./pages/CrossFit').then((m) => ({ default: m.CrossFit })))
 const CarbonDiet = lazy(() => import('./pages/CarbonDiet').then((m) => ({ default: m.CarbonDiet })))
 const CaffeineCalculator = lazy(() => import('./pages/CaffeineCalculator').then((m) => ({ default: m.CaffeineCalculator })))
 const HydrationCalculator = lazy(() => import('./pages/HydrationCalculator').then((m) => ({ default: m.HydrationCalculator })))
@@ -319,6 +320,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/gene-info" element={<GeneInfo />} />
               <Route path="/ikigai" element={<Ikigai />} />
               <Route path="/harada" element={<Harada />} />
+              <Route path="/crossfit" element={<CrossFit />} />
               <Route path="/carbon-diet" element={<CarbonDiet />} />
               <Route path="/caffeine" element={<CaffeineCalculator />} />
               <Route path="/hydration" element={<HydrationCalculator />} />
