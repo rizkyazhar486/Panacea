@@ -10,13 +10,12 @@ import { normalizePhone } from './otp.js'
 // keputusan berikut dibuat sadar dan ditulis di sini agar tidak diubah tanpa
 // memahami akibatnya.
 //
-// 1. IDENTITAS DIIKAT KE NOMOR TELEPON, BUKAN NIK.
-//    Sebelumnya NIK dipakai untuk menegakkan "satu orang, satu akun". Secara
-//    teknis itu berjalan, tetapi dasar hukumnya tidak ada: pemakaian NIK oleh
-//    pihak swasta diatur UU Adminduk 24/2013 dan turunannya, dan verifikasi
-//    NIK yang sah hanya bisa dilakukan lewat kerja sama resmi dengan Dukcapil.
-//    Menyidik nomornya memperkecil kerugian bila bocor, tetapi tidak memberi
-//    hak untuk memintanya.
+// 1. IDENTITAS DIIKAT KE NOMOR TELEPON. NIK TIDAK DIPAKAI DI MANA PUN.
+//    Pemakaian NIK oleh pihak swasta diatur UU Adminduk 24/2013 dan menuntut
+//    kerja sama resmi dengan Dukcapil, yang tidak dimiliki produk ini. Karena
+//    itu NIK tidak diminta, tidak disidik, dan tidak disimpan — bukan sekadar
+//    "belum", melainkan keputusan yang tidak akan diubah tanpa perjanjian
+//    Dukcapil yang sah lebih dulu.
 //
 //    NOMOR TIDAK DIBUKTIKAN LEWAT OTP — pemilik memutuskan demikian. Artinya
 //    nomor yang diketik hanya membuktikan pemohon TAHU nomor itu, sama
@@ -137,7 +136,7 @@ export function muatConnect(data: Partial<DbConnect> | undefined) {
     for (const a of Object.values(db.akun)) if (!Array.isArray(a.persetujuan)) a.persetujuan = []
   }
   if (Array.isArray(data.laporan)) db.laporan = data.laporan
-  // Garam WAJIB bertahan: garam baru membuat semua sidik NIK lama tidak cocok,
+  // Garam WAJIB bertahan: garam baru membuat semua sidik lama tidak cocok,
   // sehingga pemeriksaan akun ganda diam-diam berhenti bekerja.
   if (typeof data.garam === 'string' && data.garam.length >= 32) db.garam = data.garam
 }
@@ -187,11 +186,8 @@ export interface HasilAjuan { ok: boolean; galat?: string }
 //     tercapai. Tujuan selfie adalah satu kali pencocokan wajah oleh pemilik.
 //     Setelah putusan diambil, tujuannya tercapai dan selfie dihapus.
 //
-// Yang TIDAK bisa diselesaikan dengan kode, dan harus disebut apa adanya:
-// pemakaian NIK oleh pihak swasta diatur UU Adminduk 24/2013 dan turunannya —
-// verifikasi NIK yang sah dilakukan lewat kerja sama resmi dengan Dukcapil.
-// Menyimpan sidik ber-garam memperkecil kerugian bila bocor, tetapi tidak
-// dengan sendirinya memberi dasar hukum untuk memintanya.
+// NIK sengaja tidak ada dalam daftar tujuan ini, karena NIK tidak diminta
+// sama sekali. Lihat catatan nomor 1 di kepala berkas.
 
 /** Versi pemberitahuan privasi. Naikkan bila teksnya berubah bermakna. */
 export const VERSI_PEMBERITAHUAN = '2026-08-07'

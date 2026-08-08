@@ -65,7 +65,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [role, setRole] = useState<Role>('pasien')
   const [f, setF] = useState({
     email: '', name: '', sex: 'L' as 'L' | 'P', dob: '',
-    nik: '', occupation: '', background: '',
+    occupation: '', background: '',
     str: '', gelar: '', keahlian: '', universitas: '',
     tahunLulus: '', spesialis: '', subspesialis: '', pdfName: '',
   })
@@ -140,7 +140,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
       sex: simple ? undefined : f.sex,
       dob: simple || !f.dob ? undefined : f.dob,
       age: simple || !f.dob ? undefined : ageFromDob(f.dob),
-      nik: f.nik.trim() || undefined, occupation: f.occupation.trim() || undefined,
+      occupation: f.occupation.trim() || undefined,
       background: f.background.trim() || undefined,
       str: clinical ? f.str.trim() : undefined,
       keahlian: f.keahlian.trim() || undefined, universitas: f.universitas.trim() || undefined,
@@ -332,7 +332,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <Collapse title="Additional details (optional)">
                 <div className="grid grid-cols-2 gap-2">
                   <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Employee" />
-                  <Mini label="National ID (NIK)" value={f.nik} onChange={v => setF(p => ({ ...p, nik: v.replace(/\D/g, '').slice(0, 16) }))} placeholder="16 digits" numeric />
                 </div>
                 <Mini label="Health background" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Family history of hypertension, etc." />
               </Collapse>

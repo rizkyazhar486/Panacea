@@ -164,7 +164,8 @@ export function VerifikasiConnect() {
         <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-slate-300">
           <li>• <b>NIK tidak lagi diminta.</b> Pemakaian NIK oleh pihak swasta diatur UU Adminduk
             24/2013 dan menuntut kerja sama resmi dengan Dukcapil. Identitas kini diikat ke
-            <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.</li>
+            <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.
+            NIK tidak diminta di bagian mana pun aplikasi ini.</li>
           <li>• <b>Phone number tidak disimpan.</b> Hanya sidiknya dan empat digit terakhir, jadi
             basis data yang bocor tidak memberi siapa pun daftar nomor untuk dihubungi.</li>
           <li>• <b>Orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
