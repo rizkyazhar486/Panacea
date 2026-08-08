@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { PencarianGlobal } from './PencarianGlobal'
-import { useState, useEffect, type ReactNode } from 'react'
+import { useGestur } from '../lib/useGestur'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
   IconDashboard,
@@ -160,6 +161,7 @@ const nav: Nav[] = [
   { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
   // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
+  { to: '/learn', label: 'Learn', icon: IconChartUp, roles: ALL, group: 'Account' },
   { to: '/dek-connect', label: 'Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/verifikasi-connect', label: 'Verifikasi Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/tinjau-connect', label: 'Tinjauan Connect', icon: IconShield, roles: ['owner'], group: 'Manage' },
@@ -248,6 +250,29 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
+
+  // Beranda tidak punya "kembali" yang masuk akal, dan riwayat yang kosong
+  // (mis. tautan dibuka langsung) akan membawa pengguna keluar dari aplikasi.
+  const bisaKembali = loc.pathname !== '/' && window.history.length > 1
+  const kembali = useCallback(() => {
+    if (loc.pathname === '/') return
+    if (window.history.length > 1) navigate(-1)
+    else navigate('/')
+  }, [loc.pathname, navigate])
+
+  // Menyegarkan tanpa memuat ulang seluruh aplikasi: React dipaksa memasang
+  // ulang halaman lewat kunci, sehingga setiap useEffect pengambil data
+  // berjalan lagi. Memuat ulang peramban akan membuang seluruh bundel dan
+  // terasa jauh lebih lambat di ponsel.
+  const [nonceSegar, setNonceSegar] = useState(0)
+  const [sedangSegar, setSedangSegar] = useState(false)
+  const segarkan = useCallback(() => {
+    setSedangSegar(true)
+    setNonceSegar((n) => n + 1)
+    window.setTimeout(() => setSedangSegar(false), 600)
+  }, [])
+
+  const tarikan = useGestur({ onKembali: kembali, onSegarkan: segarkan, mati: cariBuka || menuOpen })
 
   // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
   // satunya cara membukanya tanpa memindahkan tangan dari papan ketik.
@@ -441,6 +466,20 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
+            {/* Tombol kembali: gestur geser saja tidak cukup — ia tidak ada di
+                desktop, tidak terlihat, dan tidak bisa dijangkau papan ketik. */}
+            {bisaKembali && (
+              <button
+                onClick={kembali}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
+                aria-label="Go back"
+                title="Back"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
           {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
@@ -569,6 +608,26 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="fade-edge-surface pointer-events-none absolute inset-y-0 right-0 w-8" />
         </div>
 
+        {/* Umpan balik tarikan: tanpa ini gestur terasa seperti tidak terjadi
+            apa-apa sampai tiba-tiba halaman berkedip. */}
+        {(tarikan > 0 || sedangSegar) && (
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center pt-2" aria-hidden="true">
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full bg-white text-brand-dark shadow-lg"
+              style={{
+                opacity: sedangSegar ? 1 : tarikan,
+                transform: `scale(${sedangSegar ? 1 : 0.6 + tarikan * 0.4}) rotate(${tarikan * 300}deg)`,
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                strokeLinecap="round" className={sedangSegar ? 'animate-spin' : ''}>
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+              </svg>
+            </span>
+          </div>
+        )}
+
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
           {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
@@ -592,7 +651,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           )}
-          <div key={loc.pathname} className="page-enter">
+          <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter">
             {children}
           </div>
         </main>
