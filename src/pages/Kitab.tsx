@@ -4,9 +4,10 @@ import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
 import {
   daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN,
-  TOTAL_SURAH, TOTAL_AYAT_HAFS,
-  type Surah, type Ayat,
+  TOTAL_SURAH, TOTAL_AYAT_HAFS, bacaAlkitab, bacaTanakh, PENGANTAR, SUMBER,
+  type Surah, type Ayat, type Bacaan,
 } from '../lib/kitab'
+import { Field, inputClass } from '../components/ui'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Scripture — pembaca kitab suci.
@@ -22,7 +23,10 @@ import {
 // modern. Menyatakan batas kewenangan adalah bagian dari menghormati teksnya.
 // ─────────────────────────────────────────────────────────────────────────────
 
+type Tab = 'quran' | 'bible' | 'tanakh' | 'lain'
+
 export function Kitab() {
+  const [tab, setTab] = useState<Tab>('quran')
   const [surah, setSurah] = useState<Surah[]>([])
   const [buka, setBuka] = useState<number | null>(null)
   const [isi, setIsi] = useState<{ surah: Surah; ayat: Ayat[] } | null>(null)
@@ -59,6 +63,21 @@ export function Kitab() {
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconShield />} title="Scripture"
         subtitle="Read from the source, with the source named" />
+
+      <div className="flex flex-wrap gap-1.5">
+        {([['quran', 'Qur’an'], ['bible', 'Bible'], ['tanakh', 'Torah / Tanakh'], ['lain', 'Other traditions']] as const)
+          .map(([id, l]) => (
+            <button key={id} onClick={() => setTab(id)} aria-pressed={tab === id}
+              className={`rounded-lg px-2.5 py-1.5 text-[12px] font-bold ${
+                tab === id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>{l}</button>
+          ))}
+      </div>
+
+      {tab === 'bible' && <Petikan jenis="bible" />}
+      {tab === 'tanakh' && <Petikan jenis="tanakh" />}
+      {tab === 'lain' && <Lain />}
+      {tab !== 'quran' ? null : (
+      <>
 
       {/* Ditaruh paling atas dan tidak bisa dilewati. */}
       <Card className="!border-sky-500/30 !bg-sky-500/5">
@@ -227,18 +246,149 @@ export function Kitab() {
         </>
       )}
 
-      <Ringkas ikon="📚" judul="Other traditions"
-        anak={
-          <div className="space-y-1.5">
-            <Poin ikon="✝️"><b>Bible</b> and <b>Tanakh</b> — readers are planned using the same
-              approach: fetched from a named provider, never written by us.</Poin>
-            <Poin ikon="🕉️"><b>Vedas, Pali Canon, Confucian texts</b> — short introductions with
-              pointers to primary sources, rather than partial text we cannot verify.</Poin>
-            <Poin ikon="⚖️">Including a tradition here is not a claim about which is true. It is a
-              reader for people who already have one.</Poin>
-          </div>
-        } />
+      </>
+      )}
     </div>
+  )
+}
+
+/**
+ * Pembaca petikan untuk Alkitab dan Tanakh.
+ *
+ * Berbentuk pencarian rujukan, bukan daftar seluruh kitab, karena jumlah kitab
+ * BERBEDA antar-kanon — Protestan, Katolik, dan Ortodoks tidak sama. Menampilkan
+ * satu daftar berarti diam-diam memilih satu kanon dan menyebutnya "Alkitab".
+ * Perbedaan itu disebut di layar, bukan disembunyikan.
+ */
+function Petikan({ jenis }: { jenis: 'bible' | 'tanakh' }) {
+  const [rujukan, setRujukan] = useState(jenis === 'bible' ? 'John 1:1-5' : 'Genesis 1:1')
+  const [hasil, setHasil] = useState<{ utama: Bacaan; kedua?: Bacaan } | null>(null)
+  const [galat, setGalat] = useState('')
+  const [muat, setMuat] = useState(false)
+  const sumber = SUMBER[jenis]
+
+  async function cari() {
+    setMuat(true); setGalat(''); setHasil(null)
+    try {
+      if (jenis === 'bible') {
+        setHasil({ utama: await bacaAlkitab(rujukan) })
+      } else {
+        const r = await bacaTanakh(rujukan)
+        setHasil({ utama: r.ibrani, kedua: r.terjemahan })
+      }
+    } catch (e) {
+      const m = (e as Error)?.message ?? ''
+      // Hanya pesan dari pemeriksaan keutuhan kita sendiri yang ditampilkan apa
+      // adanya; galat jaringan mentah seperti "Failed to fetch" tidak berarti
+      // apa-apa bagi pembaca dan justru terlihat seperti aplikasi yang rusak.
+      setGalat(/nothing is shown/i.test(m)
+        ? m
+        : 'Could not reach the provider, or that reference was not found. Nothing is shown.')
+    } finally { setMuat(false) }
+  }
+
+  return (
+    <>
+      <Card>
+        <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Serving this text</div>
+        <p className="mt-1 text-[13px] font-bold text-ink">{sumber.penerbit}</p>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">{sumber.catatan}</p>
+        <a href={sumber.situs} target="_blank" rel="noopener noreferrer"
+          className="mt-1 inline-block text-[11px] font-bold text-brand underline">{sumber.situs} →</a>
+        <div className="mt-2.5">
+          <Ringkas ikon="⚖️" judul="Why there is no full book list here"
+            anak={
+              <div className="space-y-1.5">
+                <Poin ikon="📚">The number of books differs between canons — Protestant, Catholic,
+                  and Orthodox do not agree. Showing one list would quietly pick one and call it
+                  the whole.</Poin>
+                <Poin ikon="🔤">Translation is named on every passage, because different
+                  translations can carry different meaning.</Poin>
+                <Poin ikon="🛡️">Passages are checked before display: not empty, correct script,
+                  no corrupted encoding, and never a web page returned in place of text.</Poin>
+              </div>
+            } />
+        </div>
+      </Card>
+
+      <Card>
+        <Field label={jenis === 'bible' ? 'Reference (e.g. John 1:1-5)' : 'Reference (e.g. Genesis 1:1)'}>
+          <input className={inputClass} value={rujukan} aria-label="Reference"
+            onChange={(e) => setRujukan(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') void cari() }} />
+        </Field>
+        <div className="mt-2"><Button onClick={() => void cari()} disabled={muat}>
+          {muat ? 'Loading…' : 'Read'}</Button></div>
+      </Card>
+
+      {galat && (
+        <Card className="!border-rose-500/30 !bg-rose-500/5">
+          <p className="text-[12px] leading-relaxed text-rose-700">{galat}</p>
+        </Card>
+      )}
+
+      {hasil && (
+        <Card>
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+            {hasil.utama.rujukan} · {hasil.utama.edisi}
+          </div>
+          <p className={`mt-2 text-[15px] leading-relaxed text-ink ${jenis === 'tanakh' ? 'text-right' : ''}`}
+            dir={jenis === 'tanakh' ? 'rtl' : 'ltr'} lang={jenis === 'tanakh' ? 'he' : undefined}>
+            {hasil.utama.teks}
+          </p>
+          {hasil.kedua && (
+            <>
+              <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">
+                {hasil.kedua.edisi}
+              </div>
+              <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">{hasil.kedua.teks}</p>
+            </>
+          )}
+        </Card>
+      )}
+    </>
+  )
+}
+
+/** Tradisi yang teksnya tidak dimuat — keterangan, bukan kutipan. */
+function Lain() {
+  return (
+    <>
+      <Card className="!border-sky-500/30 !bg-sky-500/5">
+        <p className="text-[12px] leading-relaxed text-neutral-600">
+          These are descriptions, not quotations. Naming a text is description; reproducing its
+          contents from memory is the thing this app refuses to do — and that refusal does not
+          weaken because the tradition changed.
+        </p>
+      </Card>
+      {PENGANTAR.map((x) => (
+        <Card key={x.tradisi}>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl" aria-hidden="true">{x.ikon}</span>
+            <h3 className="text-[15px] font-black text-ink">{x.nama}</h3>
+          </div>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600">{x.ringkas}</p>
+          <div className="mt-2 space-y-1">
+            {x.susunan.map((y) => <Poin key={y} ikon="•">{y}</Poin>)}
+          </div>
+          <div className="mt-2 text-[10px] font-black uppercase tracking-wide text-neutral-500">
+            Where to read it properly
+          </div>
+          <div className="mt-1 space-y-0.5">
+            {x.sumberUtama.map((sx) => (
+              <a key={sx.situs} href={sx.situs} target="_blank" rel="noopener noreferrer"
+                className="block text-[11px] font-bold text-brand underline">{sx.nama} →</a>
+            ))}
+          </div>
+        </Card>
+      ))}
+      <Card>
+        <p className="text-[11px] leading-relaxed text-neutral-500">
+          Including a tradition here is not a claim about which is true. This is a reader for
+          people who already have one.
+        </p>
+      </Card>
+    </>
   )
 }
 

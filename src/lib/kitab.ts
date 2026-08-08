@@ -429,3 +429,129 @@ export function renunganUntuk(surah: number, ayat: number): string {
   // pertanyaan yang kemarin ia pikirkan, bukan pertanyaan acak baru.
   return RENUNGAN[(surah * 31 + ayat) % RENUNGAN.length]
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Kitab lain — aturan yang sama, tanpa pengecualian.
+//
+// Alkitab dan Tanakh diambil dari penyedia yang disebut namanya, diperiksa
+// keutuhannya, dan tidak pernah ditulis dari ingatan. Yang berbeda hanya
+// pemeriksaannya: Al-Qur'an punya jumlah surah dan ayat yang disepakati
+// universal, sedangkan jumlah kitab Alkitab BERBEDA antar-kanon — Protestan,
+// Katolik, dan Ortodoks tidak sama. Maka memaksakan satu angka justru akan
+// menolak kanon yang sah.
+//
+// Karena itu pemeriksaannya di sini bersifat struktural, bukan jumlah:
+// jawaban harus berisi teks, teksnya harus beraksara yang benar, dan tidak
+// boleh mengandung penanda kerusakan. Perbedaan kanon disebut di layar
+// sebagai perbedaan, bukan disembunyikan dengan memilih satu diam-diam.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Bacaan {
+  rujukan: string
+  teks: string
+  /** Terjemahan atau edisi yang dipakai — wajib, karena maknanya bisa berbeda. */
+  edisi: string
+}
+
+const IBRANI = /[֐-׿]/
+
+/**
+ * Periksa satu bacaan non-Arab.
+ *
+ * `aksara` menentukan huruf apa yang harus ada. Untuk teks terjemahan Latin
+ * pemeriksaannya hanya "ada isinya dan tidak rusak", karena memaksakan pola
+ * huruf pada bahasa terjemahan akan salah menolak.
+ */
+export function periksaBacaan(b: Bacaan, aksara?: 'ibrani'): HasilPeriksa {
+  if (!b.teks || b.teks.trim().length < 2) {
+    return { utuh: false, alasan: 'The passage came back empty, so nothing is shown.' }
+  }
+  if (RUSAK.test(b.teks)) {
+    return { utuh: false, alasan: 'The passage contains replacement characters, which means the encoding was corrupted in transit. Nothing is shown.' }
+  }
+  if (/<\/?(html|body|script)\b/i.test(b.teks)) {
+    return { utuh: false, alasan: 'The provider returned a web page rather than text. Nothing is shown.' }
+  }
+  if (aksara === 'ibrani' && !IBRANI.test(b.teks)) {
+    return { utuh: false, alasan: 'The Hebrew text did not arrive in Hebrew script, so nothing is shown.' }
+  }
+  return { utuh: true }
+}
+
+/** Alkitab — satu petikan. Terjemahannya selalu ikut dilaporkan. */
+export async function bacaAlkitab(rujukan: string, terjemahan = 'web'): Promise<Bacaan> {
+  const url = `${SUMBER.bible.basis}/${encodeURIComponent(rujukan)}?translation=${encodeURIComponent(terjemahan)}`
+  const j = await ambil<Record<string, unknown>>(url, `bible-${rujukan}-${terjemahan}`)
+  const b: Bacaan = {
+    rujukan: String(j['reference'] ?? rujukan),
+    teks: String(j['text'] ?? '').trim(),
+    edisi: String(j['translation_name'] ?? terjemahan),
+  }
+  const c = periksaBacaan(b)
+  if (!c.utuh) throw new Error(c.alasan)
+  return b
+}
+
+/** Tanakh / Taurat — teks Ibrani beserta terjemahannya. */
+export async function bacaTanakh(rujukan: string): Promise<{ ibrani: Bacaan; terjemahan: Bacaan }> {
+  const url = `${SUMBER.tanakh.basis}/texts/${encodeURIComponent(rujukan)}?context=0`
+  const j = await ambil<Record<string, unknown>>(url, `tanakh-${rujukan}`)
+  const gabung = (v: unknown): string =>
+    Array.isArray(v) ? v.map(gabung).join(' ') : String(v ?? '').replace(/<[^>]+>/g, '').trim()
+
+  const ibrani: Bacaan = { rujukan, teks: gabung(j['he']), edisi: String(j['heVersionTitle'] ?? 'Hebrew') }
+  const terjemahan: Bacaan = { rujukan, teks: gabung(j['text']), edisi: String(j['versionTitle'] ?? 'English') }
+
+  const a = periksaBacaan(ibrani, 'ibrani')
+  if (!a.utuh) throw new Error(a.alasan)
+  const b = periksaBacaan(terjemahan)
+  if (!b.utuh) throw new Error(b.alasan)
+  return { ibrani, terjemahan }
+}
+
+/**
+ * Pengantar ringkas untuk tradisi yang teksnya TIDAK dimuat.
+ *
+ * Ditulis sebagai keterangan, bukan kutipan. Tidak ada satu pun petikan kitab
+ * di sini — menyebutkan sebuah kitab itu keterangan, mengutip isinya dari
+ * ingatan adalah hal yang sudah dilarang di kepala berkas ini, dan larangan
+ * itu tidak berhenti hanya karena tradisinya berbeda.
+ */
+export interface Pengantar {
+  tradisi: Tradisi
+  nama: string
+  ikon: string
+  ringkas: string
+  susunan: string[]
+  /** Ke mana pembaca yang serius harus pergi. */
+  sumberUtama: { nama: string; situs: string }[]
+}
+
+export const PENGANTAR: Pengantar[] = [
+  {
+    tradisi: 'veda', nama: 'Vedas & Upanishads', ikon: '🕉️',
+    ringkas: 'The oldest layer of Hindu scripture, transmitted orally for centuries before being written. The Upanishads sit at the end of that corpus and turn from ritual toward questions of self and reality.',
+    susunan: ['Four Vedas: Rig, Yajur, Sama, Atharva', 'Each with Samhita, Brahmana, Aranyaka, and Upanishad layers', 'Principal Upanishads number around a dozen by most reckonings'],
+    sumberUtama: [
+      { nama: 'GRETIL — Göttingen Register of Electronic Texts in Indian Languages', situs: 'http://gretil.sub.uni-goettingen.de' },
+      { nama: 'Sacred-texts archive', situs: 'https://sacred-texts.com/hin' },
+    ],
+  },
+  {
+    tradisi: 'buddhist', nama: 'Pali Canon (Tipiṭaka)', ikon: '☸️',
+    ringkas: 'The earliest complete Buddhist canon, preserved in Pali. Its name means "three baskets" — monastic rule, discourses, and systematic analysis.',
+    susunan: ['Vinaya Piṭaka — monastic discipline', 'Sutta Piṭaka — discourses', 'Abhidhamma Piṭaka — systematic analysis'],
+    sumberUtama: [
+      { nama: 'SuttaCentral — original texts with translations', situs: 'https://suttacentral.net' },
+      { nama: 'Access to Insight', situs: 'https://accesstoinsight.org' },
+    ],
+  },
+  {
+    tradisi: 'confucian', nama: 'Confucian classics', ikon: '📜',
+    ringkas: 'A body of texts on conduct, governance, and self-cultivation. Read as ethical and social philosophy more often than as revelation, which is itself a difference worth noticing.',
+    susunan: ['Four Books: Analects, Mencius, Great Learning, Doctrine of the Mean', 'Five Classics, including the Book of Changes and Book of Odes'],
+    sumberUtama: [
+      { nama: 'Chinese Text Project — original texts with translations', situs: 'https://ctext.org' },
+    ],
+  },
+]
