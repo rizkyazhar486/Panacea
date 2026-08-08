@@ -30,7 +30,7 @@ function dayLabel(iso: string): string {
   const now = new Date()
   const same = (a: Date, b: Date) => a.toDateString() === b.toDateString()
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
-  if (same(d, now)) return 'Hari ini'
+  if (same(d, now)) return 'Today'
   if (same(d, kemarin)) return 'Kemarin'
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }

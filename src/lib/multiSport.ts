@@ -344,7 +344,7 @@ export const CROSS_RULES: { judul: string; isi: string }[] = [
     isi: 'Berenang menguatkan otot punggung yang justru melemah pada postur bungkuk, sedangkan bersepeda memperkuat posisi bungkuk itu sendiri. Karena itu setiap sesi sepeda yang panjang sebaiknya diikuti peregangan dada dan latihan tarik, sementara renang tidak memerlukannya.',
   },
   {
-    judul: 'Latihan kekuatan bukan pilihan tambahan',
+    judul: 'Strength training bukan pilihan tambahan',
     isi: 'Latihan beban 2 kali seminggu menurunkan risiko cedera pada ketiga cabang dan memperbaiki efisiensi gerak. Pada orang yang memperbaiki postur, latihan tarik justru merupakan bagian yang paling menentukan dan tidak tergantikan oleh olahraga aerobik apa pun.',
   },
 ]

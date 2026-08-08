@@ -25,7 +25,7 @@ export interface BenchmarkItem {
 export const BENCHMARK_DISCLAIMER =
   'Estimated from general population norms (ACSM/Cooper Institute), adjusted for age & sex — not a direct comparison with other Panaceamed users (our user base isn\'t yet large enough for that). For medical decisions, consult a doctor.'
 
-// Same anchor table as TrainingPlan's vo2Category: [Cukup, Baik, Sangat Baik, Superior]
+// Same anchor table as TrainingPlan's vo2Category: [Adequate, Baik, Sangat Baik, Superior]
 // boundaries in ml/kg/min for a 30-year-old, shifted -0.3/yr past age 30.
 function vo2Anchors(age: number, sex: Sex): number[] {
   const base = sex === 'M' ? [32, 38, 44, 51] : [27, 33, 39, 45]

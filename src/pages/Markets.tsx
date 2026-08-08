@@ -176,7 +176,7 @@ export function Markets() {
           <span className="text-base">⚠️</span>
           <p className="text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
             Harga di halaman ini <b>tertunda dan bersifat indikatif</b> — sumber gratis umumnya
-            tertinggal sekitar 15 menit dari bursa dan sesekali bisa kosong. Cukup untuk memantau
+            tertinggal sekitar 15 menit dari bursa dan sesekali bisa kosong. Adequate untuk memantau
             dan belajar, <b>tidak layak dipakai untuk keputusan jual-beli yang bergantung pada harga
             saat ini</b>. Halaman ini juga tidak memberi rekomendasi membeli maupun menjual apa pun.
           </p>

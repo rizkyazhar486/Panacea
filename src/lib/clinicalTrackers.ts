@@ -380,7 +380,7 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
     anjuran: [
       'Sasaran umum sekitar 150 menit aktivitas intensitas sedang per pekan, dibagi ke beberapa hari.',
       'Ukur intensitas dengan UJI BICARA, bukan dengan denyut jantung: intensitas sedang berarti masih bisa berbicara dalam kalimat penuh. Denyut jantung berubah dalam kehamilan sehingga zona denyut menjadi menyesatkan.',
-      'Latihan kekuatan ringan sampai sedang bermanfaat dan aman pada kehamilan tanpa penyulit.',
+      'Strength training ringan sampai sedang bermanfaat dan aman pada kehamilan tanpa penyulit.',
       'Latihan otot dasar panggul membantu pemulihan setelah melahirkan dan mengurangi keluhan kebocoran kencing.',
       'Minum cukup dan hindari berolahraga pada suhu maupun kelembapan yang tinggi.',
       'Berjalan, berenang, sepeda statis, dan senam hamil merupakan pilihan dengan risiko paling rendah.',

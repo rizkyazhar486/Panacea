@@ -175,7 +175,7 @@ export function ringkasBeban(sesi: SessionsTerhitung[], sekarang = Date.now()): 
 
 // ── 3. Training status ───────────────────────────────────────────────────────
 
-export type StatusKey = 'tidakCukupData' | 'istirahat' | 'menurun' | 'pemeliharaan' | 'produktif' | 'puncak' | 'berlebih' | 'tidakProduktif'
+export type StatusKey = 'tidakAdequateData' | 'istirahat' | 'menurun' | 'pemeliharaan' | 'produktif' | 'puncak' | 'berlebih' | 'tidakProduktif'
 
 export interface StatusLatihan {
   key: StatusKey
@@ -197,7 +197,7 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
     abu: '#94a3b8', hijau: '#34d399', biru: '#60a5fa', kuning: '#fbbf24', merah: '#f87171',
   }
   if (b.total28 <= 0 || b.hariAktif7 === 0 && b.kronis === 0) {
-    return { key: 'tidakCukupData', label: 'Data belum cukup', warna: W.abu,
+    return { key: 'tidakAdequateData', label: 'Data belum cukup', warna: W.abu,
       penjelasan: 'Belum ada sesi dengan detak jantung dalam 28 hari terakhir.',
       saran: 'Nyalakan Include Workouts di Health Auto Export, lalu catat beberapa sesi.' }
   }
@@ -476,10 +476,10 @@ export function kesiapan(opsi: {
   }
 
   skor = Math.max(1, Math.min(100, Math.round(skor)))
-  const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Cukup siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
+  const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Adequate siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
   const warna = skor >= 80 ? '#34d399' : skor >= 65 ? '#a3e635' : skor >= 45 ? '#fbbf24' : '#f87171'
   const saran = skor >= 80 ? 'Hari yang baik untuk sesi kualitas bila memang terjadwal.'
-    : skor >= 65 ? 'Sesi terjadwal boleh dijalankan; nilai kembali setelah pemanasan.'
+    : skor >= 65 ? 'The scheduled session can go ahead; reassess after the warm-up.'
       : skor >= 45 ? 'Condongkan ke sesi mudah. Bila terasa baik setelah 10 menit pemanasan, boleh dinaikkan.'
         : 'Pilih sesi mudah maupun istirahat. Memaksakan sesi keras pada keadaan ini menambah kelelahan tanpa menambah kebugaran.'
 
@@ -506,7 +506,7 @@ export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJ
         rincian: 'Pertahankan denyut 60-70% HRmaks. Bila harus melambat sampai terasa terlalu pelan, itu justru tandanya benar.',
         alasan: `Kesiapan Anda baik, namun hanya ${b.pctAerobikRendah ?? 0}% waktu latihan Anda berada di zona mudah. Menambah sesi keras sekarang bukan yang paling menolong.` }
     }
-    return { judul: 'Sesi kualitas: tempo 20-25 menit',
+    return { judul: 'Quality session: 20–25 minute tempo',
       rincian: 'Setelah 15 menit pemanasan, jalankan pada denyut sekitar ambang, lalu pendinginan 10 menit.',
       alasan: 'Kesiapan baik dan beban terkendali — hari yang tepat untuk sesi yang menuntut.' }
   }
@@ -515,9 +515,9 @@ export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJ
       rincian: 'Zona 2. Nilai ulang setelah 10 menit; bila terasa berat, perpendek.',
       alasan: 'Kesiapan sedang — volume mudah tetap menambah basis aerobik tanpa menambah kelelahan berarti.' }
   }
-  return { judul: 'Sesi mudah 20-30 menit atau istirahat',
+  return { judul: 'Easy session 20–30 minutes, or rest',
     rincian: 'Zona 1-2 saja.',
-    alasan: 'Kesiapan di bawah kebiasaan. Sesi ringan tetap membantu pemulihan; sesi keras tidak.' }
+    alasan: 'Readiness is below your normal. An easy session still aids recovery; a hard one does not.' }
 }
 
 // ── 9. Skor ketahanan ───────────────────────────────────────────────────────

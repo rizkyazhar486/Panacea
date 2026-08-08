@@ -213,7 +213,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
   const verdict =
     summary.net < 0 ? { l: 'Pengeluaran melebihi pemasukan', tone: 'critical' as const }
     : summary.savingsRatePct < 10 ? { l: 'Sisa tipis', tone: 'high' as const }
-    : summary.savingsRatePct < 20 ? { l: 'Cukup sehat', tone: 'low' as const }
+    : summary.savingsRatePct < 20 ? { l: 'Adequate sehat', tone: 'low' as const }
     : { l: 'Sehat', tone: 'normal' as const }
 
   return (

@@ -23,7 +23,7 @@ import {
 const SLOTS: { v: Slot; l: string; sub: string }[] = [
   { v: 2, l: '2 menit', sub: 'Sedang tidak punya waktu sama sekali' },
   { v: 10, l: '10 menit', sub: 'Ada sela di antara pekerjaan' },
-  { v: 30, l: '30 menit', sub: 'Hari ini agak longgar' },
+  { v: 30, l: '30 menit', sub: 'Today agak longgar' },
 ]
 
 export function RealisticHealth() {
@@ -67,7 +67,7 @@ export function RealisticHealth() {
 
       {/* Step 1 — the only inputs, kept to three taps. */}
       <Card className="!p-4">
-        <SectionTitle icon={<IconHeart size={18} />} title="Hari ini realistisnya berapa?" subtitle="Jawab jujur — jawaban kecil justru berguna" />
+        <SectionTitle icon={<IconHeart size={18} />} title="Today realistisnya berapa?" subtitle="Jawab jujur — jawaban kecil justru berguna" />
 
         <div className="mt-3 grid gap-2">
           {SLOTS.map((s) => (

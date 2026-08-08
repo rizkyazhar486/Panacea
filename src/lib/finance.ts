@@ -130,7 +130,7 @@ export function emergencyVerdict(months: number): { label: string; tone: 'critic
     advice: 'Teruskan menambah sampai minimal 3 bulan pengeluaran pokok sebelum menambah porsi investasi berisiko.',
   }
   if (months < 6) return {
-    label: 'Cukup', tone: 'low',
+    label: 'Adequate', tone: 'low',
     advice: 'Sudah memadai untuk sebagian besar keadaan. Target 6 bulan bila penghasilan Anda tidak tetap, bekerja lepas, atau menjadi satu-satunya pencari nafkah.',
   }
   return {

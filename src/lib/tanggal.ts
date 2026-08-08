@@ -18,7 +18,7 @@ export function kunciHari(d: Date = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-/** Hari ini menurut kalender setempat. */
+/** Today menurut kalender setempat. */
 export function hariIni(): string {
   return kunciHari(new Date())
 }

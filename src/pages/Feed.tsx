@@ -1748,7 +1748,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
   const [hrRest, setHrRest] = useVitalField('restingHr', 65).slice(0, 2) as [number, (n: number) => void]
   const [hrMaxInput, setHrMaxInput] = useState(220 - age)
   const vo2max = Math.round((15.3 * (hrMaxInput / Math.max(hrRest, 1))) * 10) / 10
-  const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Cukup', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
+  const vo2Cat = vo2max >= 55 ? { l: 'Sangat Baik', c: '#00BF63' } : vo2max >= 45 ? { l: 'Baik', c: '#84CC16' } : vo2max >= 35 ? { l: 'Adequate', c: '#F59E0B' } : { l: 'Rendah', c: '#EF4444' }
   // #5: Tes Cooper — jarak (meter) yang ditempuh dalam lari 12 menit.
   const [cooperMeters, setCooperMeters] = useState(2400)
   const cooperVo2 = Math.round(((cooperMeters - 504.9) / 44.73) * 10) / 10

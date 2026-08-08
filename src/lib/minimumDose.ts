@@ -111,7 +111,7 @@ export const DOSES: DoseAction[] = [
     id: 'strength-10',
     title: 'Kekuatan 10 menit tanpa alat',
     how: '3 putaran: 10 squat berdiri dari kursi, 8 push-up (boleh bertumpu di meja), 20 detik plank. Istirahat sesuka Anda.',
-    why: 'Latihan kekuatan dua kali seminggu memberi manfaat yang tidak bisa digantikan aerobik — massa otot, kepadatan tulang, dan sensitivitas insulin. Sepuluh menit dua kali seminggu sudah melewati ambang "tidak pernah sama sekali", dan itu lompatan terbesarnya.',
+    why: 'Strength training dua kali seminggu memberi manfaat yang tidak bisa digantikan aerobik — massa otot, kepadatan tulang, dan sensitivitas insulin. Sepuluh menit dua kali seminggu sudah melewati ambang "tidak pernah sama sekali", dan itu lompatan terbesarnya.',
     minutes: 10, effort: 'medium', helps: ['movement', 'energy'], safeWhenWrecked: false,
   },
   {
@@ -139,7 +139,7 @@ export const DOSES: DoseAction[] = [
   },
   {
     id: 'full-strength',
-    title: 'Latihan kekuatan penuh 30 menit',
+    title: 'Strength training penuh 30 menit',
     how: '2-3 putaran: squat, dorongan (push-up/dumbbell press), tarikan (row), engsel pinggul (hip hinge), plank. 8-12 repetisi.',
     why: 'Mencakup semua pola gerak dasar dalam satu sesi. Dua sesi seminggu memenuhi anjuran kekuatan tanpa perlu masuk gym setiap hari.',
     minutes: 30, effort: 'medium', helps: ['movement', 'pain'], safeWhenWrecked: false,
