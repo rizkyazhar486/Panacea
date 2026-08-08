@@ -28,8 +28,8 @@ import type { Role } from '../lib/types'
 //      mudah untuk membocorkannya kembali.
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface HasilFitur { to: string; label: string; grup: string; kw?: string }
-interface HasilOrang { id: string; name: string; role: Role; picture?: string }
+interface HasilFeatures { to: string; label: string; grup: string; kw?: string }
+interface HasilPeople { id: string; name: string; role: Role; picture?: string }
 
 /** Skor kecocokan: awalan kata lebih tinggi daripada sekadar mengandung. */
 function skor(teks: string, q: string): number {
@@ -44,9 +44,9 @@ function skor(teks: string, q: string): number {
 export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => void }) {
   const nav = useNavigate()
   const [q, setQ] = useState('')
-  const [katalog, setKatalog] = useState<HasilFitur[] | null>(null)
-  const [orang, setOrang] = useState<HasilOrang[]>([])
-  const [tagar, setTagar] = useState<{ tag: string; jumlah: number }[]>([])
+  const [katalog, setKatalog] = useState<HasilFeatures[] | null>(null)
+  const [orang, setPeople] = useState<HasilPeople[]>([])
+  const [tagar, setHashtags] = useState<{ tag: string; jumlah: number }[]>([])
   const [sorot, setSorot] = useState(0)
   const kotak = useRef<HTMLInputElement>(null)
 
@@ -56,7 +56,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
     let batal = false
     void (async () => {
       const tersembunyi = new Set(ambilTersembunyi())
-      const peta = new Map<string, HasilFitur>()
+      const peta = new Map<string, HasilFeatures>()
       for (const n of NAV_UNTUK_PENGATURAN) {
         if (tersembunyi.has(n.to)) continue
         peta.set(n.to, { to: n.to, label: n.label.replace(/^[^\p{L}\p{N}]+/u, '').trim(), grup: n.group })
@@ -84,20 +84,20 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
   useEffect(() => { if (buka) setTimeout(() => kotak.current?.focus(), 50) }, [buka])
   useEffect(() => { setSorot(0) }, [q])
 
-  // Orang: dari server, ditunda agar tiap ketukan tidak jadi satu permintaan.
+  // People: dari server, ditunda agar tiap ketukan tidak jadi satu permintaan.
   useEffect(() => {
     const t = q.trim()
-    if (!buka || !backendEnabled || t.length < 2) { setOrang([]); return }
+    if (!buka || !backendEnabled || t.length < 2) { setPeople([]); return }
     const id = setTimeout(() => {
-      void api.cariOrang(t).then((r) => setOrang(r)).catch(() => setOrang([]))
+      void api.cariOrang(t).then((r) => setPeople(r)).catch(() => setPeople([]))
     }, 250)
     return () => clearTimeout(id)
   }, [q, buka])
 
-  // Tagar: dihitung dari kiriman yang memang sudah boleh dilihat pengguna ini.
+  // Hashtags: dihitung dari kiriman yang memang sudah boleh dilihat pengguna ini.
   useEffect(() => {
     const t = q.trim().replace(/^#/, '')
-    if (!buka || !backendEnabled || t.length < 1) { setTagar([]); return }
+    if (!buka || !backendEnabled || t.length < 1) { setHashtags([]); return }
     const id = setTimeout(() => {
       void api.posts().then((posts) => {
         const hitung = new Map<string, number>()
@@ -108,11 +108,11 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
             hitung.set(tag, (hitung.get(tag) ?? 0) + 1)
           }
         }
-        setTagar([...hitung.entries()]
+        setHashtags([...hitung.entries()]
           .filter(([tag]) => tag.includes(t.toLowerCase()))
           .sort((a, b) => b[1] - a[1]).slice(0, 6)
           .map(([tag, jumlah]) => ({ tag, jumlah })))
-      }).catch(() => setTagar([]))
+      }).catch(() => setHashtags([]))
     }, 300)
     return () => clearTimeout(id)
   }, [q, buka])
@@ -163,25 +163,25 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
               aria-label="Search features, people, or hashtags"
             />
             <button onClick={tutup} aria-label="Close search"
-              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Tutup</button>
+              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Close</button>
           </div>
 
           <div className="max-h-[calc(100vh-64px)] overflow-y-auto p-2 sm:max-h-[calc(70vh-64px)]">
             {!q.trim() && (
               <p className="px-3 py-6 text-center text-[12px] leading-relaxed text-slate-500">
-                Ketik nama fitur — "peregangan", "kalkulator", "tidur" — atau nama orang, atau #tagar.
+                Type a feature name — "stretching", "calculator", "sleep" — or a person, or a #hashtag.
               </p>
             )}
 
             {q.trim() && semua.length === 0 && (
               <p className="px-3 py-6 text-center text-[12px] text-slate-500">
-                Tidak ada yang cocok dengan "{q}".
+                No matches for "{q}".
               </p>
             )}
 
             {fitur.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Fitur</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Features</div>
                 {fitur.map((f, i) => (
                   <button key={f.to} onClick={() => pergi(f.to)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
@@ -195,7 +195,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
             {orang.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Orang</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">People</div>
                 {orang.map((o) => (
                   <button key={o.id} onClick={() => pergi(`/jelajah?orang=${encodeURIComponent(o.name)}`)}
                     className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left ${
@@ -214,7 +214,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
             {tagar.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Tagar</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Hashtags</div>
                 {tagar.map((h) => (
                   <button key={h.tag} onClick={() => pergi(`/jelajah?tag=${h.tag}`)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${

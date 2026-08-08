@@ -20,6 +20,15 @@
 // memeriksa tipe, bukan apakah tulisan bisa dibaca. Jadi pemeriksaannya harus
 // dibuat terpisah, dan dijalankan sebelum menyerahkan pekerjaan.
 //
+// PELAJARAN KETIGA, ditambahkan setelah terulang: kamus penggantian tidak boleh
+// berisi SATU KATA yang juga muncul di dalam nama identifier. "Orang" mengubah
+// api.cariOrang menjadi api.cariPeople dan memutus panggilannya; "Sesi",
+// "Tinggal", dan "Lahir" melakukan hal yang sama sebelumnya. Typecheck menangkap
+// dua di antaranya hanya karena kebetulan merusak sintaks. Karena itu pemeriksa
+// ini SELALU dijalankan berdampingan dengan `npx tsc --noEmit`, tidak
+// menggantikannya — dan penggantian teks massal sebaiknya dibatasi pada frasa
+// berspasi, bukan kata tunggal.
+//
 // Pakai:  node scripts/periksaTeks.mjs [--semua]
 // Keluar dengan kode 1 bila ada temuan, supaya bisa dipasang di CI.
 // ─────────────────────────────────────────────────────────────────────────────

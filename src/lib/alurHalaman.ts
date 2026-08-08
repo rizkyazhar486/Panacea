@@ -31,6 +31,7 @@ const INDUK: Record<string, string> = {
   '/dek-connect': '/',
   '/learn': '/',
   '/change': '/',
+  '/scripture': '/',
   '/analisis-pro': '/latihan',
   '/riwayat-latihan': '/latihan',
   '/macro-lab': '/nutrition',
