@@ -59,7 +59,7 @@ export function ClinicalTrials() {
             className="min-h-[64px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand dark:border-white/10 dark:bg-white/5" />
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-white">
+          <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-ink">
             <input type="checkbox" checked={recruiting} onChange={(e) => setRecruiting(e.target.checked)} /> Recruiting only
           </label>
           <div className="w-40"><Field label="Country (optional)"><input className={inputClass} value={country} onChange={(e) => setCountry(e.target.value)} placeholder="e.g. Indonesia" /></Field></div>
@@ -92,7 +92,7 @@ export function ClinicalTrials() {
             <Card key={t.nctId} className="!p-4">
               <a href={t.url} target="_blank" rel="noreferrer" className="block">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-bold leading-snug text-ink dark:text-white">{t.title}</h3>
+                  <h3 className="text-sm font-bold leading-snug text-ink dark:text-ink">{t.title}</h3>
                   <Badge tone={statusTone(t.status)}>{t.status.replace(/_/g, ' ')}</Badge>
                 </div>
                 {t.conditions && <div className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-400">{t.conditions}</div>}

@@ -41,7 +41,7 @@ export interface AnamnesisTerstruktur {
 }
 
 /**
- * Catatan penyakit. Summary kriteria diagnosis boleh diberikan lewat
+ * Catatan penyakit. Ringkasan kriteria diagnosis boleh diberikan lewat
  * `diagnosis` (format ringkas) atau `goldStandard` (format mendalam) — tipe di
  * bawah memaksa minimal salah satunya ada, sehingga tidak mungkin ada entri
  * tanpa keterangan cara menegakkan diagnosis.
@@ -96,10 +96,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan kerangka SOCRATES sambil MENCATAT KATA-KATA PASIEN SECARA APA ADANYA DALAM TANDA KUTIP tanpa ditafsirkan. Site: letak setiap luka dinyatakan terhadap patokan anatomi tetap seperti garis tengah tubuh dan tumit, bukan sekadar "di lengan". Onset: WAKTU KEJADIAN setepat mungkin — tanggal dan jam — karena menentukan perkiraan umur luka. Character: tanyakan cara terjadinya menurut pasien, benda apa yang mengenai, arah datangnya, dan posisi pasien saat itu. Radiation: nyeri menjalar yang mengarah pada cedera dalam maupun patah tulang. Associations: TANYAKAN PINGSAN, MUNTAH, NYERI KEPALA, DAN LUPA KEJADIAN untuk menyaring cedera kepala; nyeri perut, kencing berdarah, dan sesak untuk cedera organ dalam. Time course: apakah nyeri makin berat, karena perdarahan dalam bertambah seiring waktu. Exacerbating: gerakan dan tekanan setempat. Severity: nilai dengan skala nyeri serta hambatan gerak dan aktivitas.',
       riwayatPenyakitDahulu:
         'Penyakit yang membuat mudah memar seperti penyakit hati, penyakit ginjal, dan kelainan pembekuan darah; riwayat patah tulang berulang, osteoporosis, dan kejang; serta riwayat cedera lama yang dapat mengacaukan penilaian umur luka.',
-      riwayatPenyakitKeluarga: 'History kelainan perdarahan bawaan dan penyakit tulang rapuh bawaan pada keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat kelainan perdarahan bawaan dan penyakit tulang rapuh bawaan pada keluarga.',
       riwayatPengobatan:
         'PENGENCER DARAH seperti warfarin, antiagregat, dan antikoagulan oral baru; kortikosteroid jangka panjang yang menipiskan kulit; serta alkohol dan obat penenang yang berkaitan dengan riwayat terjatuh.',
-      riwayatAlergi: 'History alergi obat, antiseptik, dan bahan plester.',
+      riwayatAlergi: 'Riwayat alergi obat, antiseptik, dan bahan plester.',
       riwayatSosialEkonomi:
         'Tanyakan dengan hati-hati dan SENDIRIAN TANPA PENGANTAR mengenai keamanan di rumah, hubungan dengan pelaku, kejadian serupa sebelumnya, dan tempat aman untuk pulang; nilai pula pekerjaan berisiko, penggunaan alkohol, dan ketergantungan ekonomi pada pelaku.',
     },
@@ -135,7 +135,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Penggunaan alkohol dan zat oleh pelaku maupun korban',
       'Usia sangat muda dan lanjut usia yang bergantung pada perawat',
       'Anak dengan kebutuhan khusus dan keterlambatan perkembangan',
-      'Occupation berisiko dan berkendara tanpa alat pelindung',
+      'Pekerjaan berisiko dan berkendara tanpa alat pelindung',
       'Penggunaan pengencer darah dan penyakit yang membuat mudah memar',
       'Osteoporosis dan riwayat jatuh berulang pada lanjut usia',
     ],
@@ -211,10 +211,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan kerangka SOCRATES sambil MENCATAT KETERANGAN PASIEN SECARA APA ADANYA DALAM TANDA KUTIP. Site: letak luka terhadap patokan anatomi tetap dan tinggi dari tumit. Onset: waktu kejadian setepat mungkin. Character: benda apa yang mengenai — pisau, pecahan kaca, celurit, gunting — serta ukurannya bila diketahui, arah datangnya, dan posisi pasien maupun pelaku. Radiation: nyeri menjalar dan rasa kesemutan yang mengarah pada terpotongnya saraf. Associations: TANYAKAN JUMLAH PERDARAHAN yang keluar, pusing, pandangan gelap, dan sesak; tanyakan pula kelemahan maupun mati rasa di bagian ujung anggota gerak. Time course: perdarahan yang masih aktif maupun sudah berhenti. Exacerbating: gerakan menambah nyeri dan dapat membuka luka kembali. Severity: nilai dengan skala nyeri, jumlah perdarahan, dan hilangnya fungsi.',
       riwayatPenyakitDahulu:
         'Diabetes, penyakit ginjal kronik, dan penyakit hati yang memperlambat penyembuhan; kelainan pembekuan darah; riwayat luka sayat berulang pada lengan yang mengarah pada perilaku melukai diri; serta riwayat gangguan jiwa dan percobaan bunuh diri.',
-      riwayatPenyakitKeluarga: 'History kelainan perdarahan bawaan dan riwayat gangguan jiwa pada keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat kelainan perdarahan bawaan dan riwayat gangguan jiwa pada keluarga.',
       riwayatPengobatan:
         'Pengencer darah dan antiagregat yang memperbanyak perdarahan; kortikosteroid jangka panjang; serta alkohol dan zat yang berkaitan dengan peristiwa kekerasan.',
-      riwayatAlergi: 'History alergi obat bius lokal terutama lidokain, antibiotik, antiseptik, dan bahan plester.',
+      riwayatAlergi: 'Riwayat alergi obat bius lokal terutama lidokain, antibiotik, antiseptik, dan bahan plester.',
       riwayatImunisasi: 'STATUS IMUNISASI TETANUS dan kapan penguat terakhir diberikan — wajib ditanyakan pada setiap luka terbuka.',
       riwayatSosialEkonomi:
         'Tanyakan SENDIRIAN TANPA PENGANTAR mengenai keamanan di rumah, hubungan dengan pelaku, dan kejadian serupa sebelumnya; nilai pula pekerjaan yang berhubungan dengan benda tajam, penggunaan alkohol, serta niat melukai diri maupun mengakhiri hidup bila pola luka mengarah ke sana.',
@@ -250,7 +250,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kekerasan dalam rumah tangga dan lingkungan dengan riwayat kekerasan',
       'Penggunaan alkohol dan zat pada pelaku maupun korban',
       'Gangguan jiwa, depresi, dan riwayat percobaan bunuh diri pada perlukaan diri',
-      'Occupation yang menggunakan benda tajam seperti juru masak, pekerja logam, dan petani',
+      'Pekerjaan yang menggunakan benda tajam seperti juru masak, pekerja logam, dan petani',
       'Usia muda dan jenis kelamin laki-laki pada perkelahian',
       'Penggunaan pengencer darah dan kelainan pembekuan darah',
       'Diabetes dan penyakit pembuluh darah tepi yang memperlambat penyembuhan luka',
@@ -326,7 +326,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   'Trauma kimia': {
     definisi: 'Cedera jaringan akibat kontak dengan bahan kimia korosif (asam/basa), dapat mengenai kulit, mata, atau saluran cerna.',
     diagnosis: [
-      'History kontak dengan zat kimia spesifik (identifikasi jenis asam/basa bila mungkin)',
+      'Riwayat kontak dengan zat kimia spesifik (identifikasi jenis asam/basa bila mungkin)',
       'Luka bakar kimia: nekrosis koagulasi (asam) atau likuefaksi (basa, lebih dalam dan progresif)',
       'Pada tertelan: nilai risiko cedera esofagus/lambung, endoskopi dini bila indikasi',
     ],
@@ -410,7 +410,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   'Tenggelam': {
     definisi: 'Asfiksia akibat terendamnya jalan napas dalam cairan, dapat fatal atau non-fatal (near-drowning) tergantung durasi dan pertolongan.',
     diagnosis: [
-      'History terendam air, ditemukan tidak sadar di air/dekat air',
+      'Riwayat terendam air, ditemukan tidak sadar di air/dekat air',
       'Otopsi: buih halus di jalan napas (jamur buih), paru-paru membesar dan berat (paru cadaver), diatom dalam jaringan pada kasus tertentu',
       'Bedakan tenggelam basah (aspirasi cairan) vs kering (spasme laring)',
     ],
@@ -495,12 +495,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan non-nyeri. Site: keluhan bersifat sistemik, bukan terlokalisasi pada satu organ. Onset: umumnya perlahan dalam hitungan bulan hingga tahun, berbeda dari DM tipe 1 yang mendadak. Character: poliuria terutama malam hari sehingga terbangun berkali-kali, polidipsia yang tidak hilang meski banyak minum, polifagia namun berat badan justru turun. Radiation: gali keluhan penyerta yang menandakan komplikasi — kesemutan dan baal simetris pada kedua kaki (neuropati), pandangan kabur atau berbayang (retinopati), luka yang lama sembuh, gatal pada kemaluan atau keputihan berulang (kandidiasis), serta disfungsi ereksi. Associations: lemas, mudah lelah, penurunan berat badan yang dikuantifikasi dalam kilogram per periode waktu. Time course: apakah keluhan menetap, memberat, atau berfluktuasi mengikuti pola makan. Exacerbating/relieving: hubungan keluhan dengan asupan karbohidrat, kepatuhan obat, aktivitas fisik, dan stres atau infeksi penyerta. Severity: dampak terhadap pekerjaan, kualitas tidur, dan aktivitas harian.',
       riwayatPenyakitDahulu:
-        'History hipertensi, dislipidemia, penyakit jantung koroner, stroke, dan penyakit ginjal. History diabetes gestasional atau melahirkan bayi dengan berat lahir lebih dari 4 kg pada perempuan. History pankreatitis atau penggunaan kortikosteroid jangka panjang yang dapat memicu hiperglikemia sekunder. History infeksi berulang seperti tuberkulosis, infeksi saluran kemih, atau infeksi kulit.',
+        'Riwayat hipertensi, dislipidemia, penyakit jantung koroner, stroke, dan penyakit ginjal. Riwayat diabetes gestasional atau melahirkan bayi dengan berat lahir lebih dari 4 kg pada perempuan. Riwayat pankreatitis atau penggunaan kortikosteroid jangka panjang yang dapat memicu hiperglikemia sekunder. Riwayat infeksi berulang seperti tuberkulosis, infeksi saluran kemih, atau infeksi kulit.',
       riwayatPenyakitKeluarga:
-        'History diabetes melitus pada orang tua dan saudara kandung sangat meningkatkan risiko; tanyakan pula riwayat keluarga dengan hipertensi, penyakit jantung dini, dan stroke untuk menilai risiko kardiovaskular keluarga.',
+        'Riwayat diabetes melitus pada orang tua dan saudara kandung sangat meningkatkan risiko; tanyakan pula riwayat keluarga dengan hipertensi, penyakit jantung dini, dan stroke untuk menilai risiko kardiovaskular keluarga.',
       riwayatPengobatan:
         'Obat antidiabetik yang pernah dan sedang digunakan beserta dosis dan kepatuhannya, riwayat hipoglikemia akibat obat, serta penggunaan kortikosteroid, diuretik tiazid, antipsikotik atipik, dan obat herbal yang tidak jelas kandungannya.',
-      riwayatAlergi: 'History alergi obat, terutama golongan sulfa yang relevan untuk pemilihan sulfonilurea.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama golongan sulfa yang relevan untuk pemilihan sulfonilurea.',
       riwayatNutrisi:
         'Pola makan sehari-hari termasuk frekuensi, porsi, dan jenis karbohidrat; konsumsi minuman manis, gorengan, dan camilan; kebiasaan makan malam larut; serta upaya diet yang pernah dijalani beserta hasilnya.',
       riwayatSosialEkonomi:
@@ -531,12 +531,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Usia 40 tahun atau lebih',
       'Indeks massa tubuh 23 kg/m² atau lebih dan obesitas sentral',
-      'History keluarga diabetes pada kerabat derajat pertama',
+      'Riwayat keluarga diabetes pada kerabat derajat pertama',
       'Hipertensi, dislipidemia, dan sindrom metabolik',
-      'History diabetes gestasional atau melahirkan bayi lebih dari 4 kg',
+      'Riwayat diabetes gestasional atau melahirkan bayi lebih dari 4 kg',
       'Sindrom ovarium polikistik',
       'Aktivitas fisik kurang dan pola makan tinggi kalori',
-      'History toleransi glukosa terganggu atau glukosa puasa terganggu',
+      'Riwayat toleransi glukosa terganggu atau glukosa puasa terganggu',
     ],
     diagnosis: [
       'Glukosa darah puasa 126 mg/dL atau lebih setelah puasa minimal 8 jam',
@@ -615,15 +615,15 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan bersifat menyeluruh. Onset: mendadak dalam hitungan menit; TANYAKAN JARAK WAKTU TERHADAP MAKAN TERAKHIR, WAKTU MINUM OBAT, DAN AKTIVITAS FISIK — ketiganya hampir selalu menjelaskan penyebabnya. Character: gejala terbagi dua kelompok yang urutannya bermakna — gejala otonom lebih dahulu berupa gemetar, berkeringat dingin, jantung berdebar, cemas, dan rasa lapar hebat; kemudian gejala neuroglikopenik berupa sulit berkonsentrasi, bicara melantur, pandangan kabur, perubahan perilaku, dan mengantuk. Radiation: tidak khas. Associations: TANYAKAN APAKAH PASIEN MASIH DAPAT MAKAN DAN MINUM SENDIRI SAAT SERANGAN — jawaban inilah yang menentukan penggolongan ringan atau berat. Time course: berapa sering serangan terjadi, pada jam berapa umumnya, dan apakah pernah terjadi saat tidur yang ditandai mimpi buruk, berkeringat saat bangun, dan nyeri kepala pagi hari. Exacerbating: melewatkan makan, menambah dosis obat sendiri, berolahraga lebih berat dari biasa, minum alkohol, dan berpuasa. Relieving: membaik cepat setelah makan atau minum yang manis. Severity: apakah pernah sampai memerlukan pertolongan orang lain, dan apakah gejala peringatan masih terasa.',
       riwayatPenyakitDahulu:
-        'Diabetes melitus beserta lamanya, karena hipoglikemia hampir selalu terkait pengobatan diabetes. History hipoglikemia sebelumnya dan beratnya. Penyakit ginjal kronik dan penyakit hati yang memperpanjang kerja obat serta mengurangi produksi glukosa. Insufisiensi adrenal dan hipotiroid. History operasi lambung yang menyebabkan hipoglikemia reaktif setelah makan.',
-      riwayatPenyakitKeluarga: 'History diabetes pada keluarga; umumnya tidak menentukan pada episode akut.',
+        'Diabetes melitus beserta lamanya, karena hipoglikemia hampir selalu terkait pengobatan diabetes. Riwayat hipoglikemia sebelumnya dan beratnya. Penyakit ginjal kronik dan penyakit hati yang memperpanjang kerja obat serta mengurangi produksi glukosa. Insufisiensi adrenal dan hipotiroid. Riwayat operasi lambung yang menyebabkan hipoglikemia reaktif setelah makan.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes pada keluarga; umumnya tidak menentukan pada episode akut.',
       riwayatPengobatan:
         'RINCI SELURUH OBAT DIABETES beserta dosis, jam minum, dan perubahan terakhirnya — golongan sulfonilurea seperti glibenklamid dan glimepirid serta insulin adalah penyebab utama, sedangkan metformin sendiri jarang menimbulkan hipoglikemia. Tanyakan apakah pasien menaikkan dosis sendiri, keliru membaca skala insulin, atau menyuntik dua kali karena lupa. Tanyakan pula obat lain yang memperkuat efek seperti sulfa, kuinin, dan penyekat beta yang sekaligus menyamarkan gejala peringatan.',
-      riwayatAlergi: 'History alergi obat.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatNutrisi:
         'Jadwal makan sehari-hari, apakah ada makan yang dilewatkan, porsi karbohidrat, kebiasaan berpuasa, serta konsumsi alkohol yang menghambat produksi glukosa oleh hati.',
       riwayatSosialEkonomi:
-        'Occupation berisiko tinggi seperti mengemudi, bekerja di ketinggian, dan mengoperasikan mesin — pada pekerjaan ini hipoglikemia membahayakan orang lain, bukan hanya pasien. Tanyakan pula apakah tinggal sendiri, apakah keluarga mengetahui cara menolong, kemampuan membeli obat dan makanan secara teratur, serta kepemilikan alat pemeriksa gula darah mandiri.',
+        'Pekerjaan berisiko tinggi seperti mengemudi, bekerja di ketinggian, dan mengoperasikan mesin — pada pekerjaan ini hipoglikemia membahayakan orang lain, bukan hanya pasien. Tanyakan pula apakah tinggal sendiri, apakah keluarga mengetahui cara menolong, kemampuan membeli obat dan makanan secara teratur, serta kepemilikan alat pemeriksa gula darah mandiri.',
     },
     pemeriksaanFisik: [
       'Nilai kesadaran lebih dahulu — pasien yang tidak sadar, kejang, atau tidak mampu menelan dengan aman BUKAN termasuk hipoglikemia ringan dan memerlukan penanganan intravena segera',
@@ -656,7 +656,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Aktivitas fisik yang lebih berat dari biasanya, termasuk hingga beberapa jam sesudahnya',
       'Konsumsi alkohol terutama tanpa makan',
       'Target HbA1c yang terlalu ketat, khususnya pada usia lanjut',
-      'History hipoglikemia sebelumnya dan hilangnya gejala peringatan',
+      'Riwayat hipoglikemia sebelumnya dan hilangnya gejala peringatan',
       'Penggunaan penyekat beta yang menyamarkan gejala otonom',
       'Tinggal sendiri tanpa pendamping yang mengetahui cara menolong',
     ],
@@ -841,14 +841,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES yang disesuaikan. Site: pada kwashiorkor, EDEMA dimulai simetris dari punggung kaki lalu naik ke tungkai, wajah, hingga seluruh tubuh; pada marasmus tampak kekurusan menyeluruh terutama pada bokong dan lengan. Onset: berlangsung perlahan berbulan-bulan — tanyakan kapan orang tua pertama kali menyadari anak makin kurus atau bengkak. Character: nafsu makan menurun atau justru hilang sama sekali (nafsu makan yang sangat buruk merupakan tanda bahaya dan indikasi rawat inap), anak tampak lemah, rewel atau justru terlalu diam dan apatis. Radiation: gali penyakit penyerta yang memperberat — diare berulang, batuk lama, demam berulang, dan luka yang tidak sembuh. Associations: rambut menipis dan berubah warna menjadi kemerahan atau mudah dicabut tanpa nyeri, kulit bersisik atau mengelupas, perut membuncit, serta anak tampak lebih tua dari usianya. Time course: apakah berat badan pernah turun atau tidak naik selama beberapa bulan berturut-turut — periksa langsung grafik pada buku KIA/KMS. Exacerbating: episode diare atau infeksi yang memicu penurunan berat badan tajam, penyapihan mendadak, dan kondisi ekonomi yang memburuk. Severity: apakah anak masih mau menyusu atau makan, masih bisa duduk dan bermain, atau sudah terlalu lemah.',
       riwayatPenyakitDahulu:
-        'History diare berulang atau persisten, tuberkulosis, campak, infeksi saluran napas berulang, HIV, kelainan jantung bawaan, celah bibir dan langit-langit yang mengganggu menyusu, serta riwayat rawat inap sebelumnya karena gizi buruk.',
-      riwayatPenyakitKeluarga: 'History tuberkulosis pada anggota serumah, HIV pada ibu, dan status gizi saudara kandung — anak lain dalam keluarga yang juga kurus menandakan masalah pada tingkat rumah tangga, bukan hanya individu.',
+        'Riwayat diare berulang atau persisten, tuberkulosis, campak, infeksi saluran napas berulang, HIV, kelainan jantung bawaan, celah bibir dan langit-langit yang mengganggu menyusu, serta riwayat rawat inap sebelumnya karena gizi buruk.',
+      riwayatPenyakitKeluarga: 'Riwayat tuberkulosis pada anggota serumah, HIV pada ibu, dan status gizi saudara kandung — anak lain dalam keluarga yang juga kurus menandakan masalah pada tingkat rumah tangga, bukan hanya individu.',
       riwayatPengobatan: 'Obat cacing terakhir, vitamin A terakhir, suplementasi zat besi, obat tuberkulosis, dan pengobatan tradisional yang pernah diberikan termasuk pantangan makanan yang dianjurkan orang lain.',
-      riwayatAlergi: 'History alergi susu sapi atau makanan lain yang menyebabkan orang tua membatasi asupan anak.',
+      riwayatAlergi: 'Riwayat alergi susu sapi atau makanan lain yang menyebabkan orang tua membatasi asupan anak.',
       riwayatKehamilanPersalinan:
         'Berat badan lahir (berat lahir rendah merupakan faktor risiko kuat), usia kehamilan saat lahir, kondisi gizi dan penyakit ibu selama hamil, serta riwayat persalinan dan komplikasinya.',
       riwayatTumbuhKembang:
-        'History kenaikan berat badan pada buku KIA/KMS — kapan grafik mulai mendatar atau menurun; capaian milestone motorik, bahasa, dan sosial dibanding usia, karena gizi buruk kronik berdampak pada perkembangan kognitif yang sebagiannya tidak dapat dipulihkan.',
+        'Riwayat kenaikan berat badan pada buku KIA/KMS — kapan grafik mulai mendatar atau menurun; capaian milestone motorik, bahasa, dan sosial dibanding usia, karena gizi buruk kronik berdampak pada perkembangan kognitif yang sebagiannya tidak dapat dipulihkan.',
       riwayatNutrisi:
         'Ini merupakan bagian TERPENTING pada kasus gizi buruk. Apakah mendapat inisiasi menyusu dini dan ASI eksklusif enam bulan; kapan dan bagaimana MPASI dimulai termasuk jenis, tekstur, frekuensi, serta porsi; kapan disapih dan bagaimana caranya; berapa kali makan sehari saat ini dan seberapa banyak yang benar-benar dihabiskan; apakah anak makan sendiri atau disuapi; penggunaan susu formula beserta cara pengenceran (pengenceran berlebihan untuk berhemat merupakan penyebab yang sering luput); serta kepercayaan atau pantangan makanan yang dianut keluarga.',
       riwayatImunisasi: 'Kelengkapan imunisasi sesuai usia, terutama campak yang bila terlewat sangat meningkatkan risiko gizi buruk berat, serta riwayat pemberian kapsul vitamin A.',
@@ -963,10 +963,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan bersifat menyeluruh dan mengenai banyak sistem sekaligus, yang justru merupakan petunjuk. Onset: perlahan dalam hitungan bulan. Character: TANYAKAN KELUHAN YANG MENGARAH PADA VITAMIN TERTENTU — sulit melihat saat senja mengarah pada vitamin A; nyeri tulang, otot lemah, dan mudah patah mengarah pada vitamin D; kesemutan simetris pada kedua kaki dan bengkak mengarah pada vitamin B1; sariawan berulang, sudut bibir pecah, dan lidah merah licin mengarah pada B2, B3, B6, dan B12; kesemutan disertai gangguan keseimbangan dan pelupa mengarah pada B12; gusi berdarah dan memar mudah timbul mengarah pada vitamin C. Radiation: tidak khas. Associations: nilai keluhan lain pada sistem berbeda karena kekurangan vitamin jarang tunggal. Time course: berbulan-bulan sampai bertahun-tahun. Exacerbating: pola makan yang terbatas dan penyakit penyerta. Severity: nilai hambatan fungsi dan tanda kerusakan menetap.',
       riwayatPenyakitDahulu:
         'PENYAKIT YANG MENGGANGGU PENYERAPAN merupakan hal terpenting: penyakit seliak, penyakit radang usus, insufisiensi pankreas, penyakit hati dan empedu, serta RIWAYAT OPERASI BARIATRIK maupun reseksi usus. Tanyakan pula alkoholisme, penyakit ginjal kronik, dan infeksi HIV.',
-      riwayatPenyakitKeluarga: 'History penyakit autoimun seperti anemia pernisiosa dan penyakit tiroid; riwayat penyakit seliak pada keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat penyakit autoimun seperti anemia pernisiosa dan penyakit tiroid; riwayat penyakit seliak pada keluarga.',
       riwayatPengobatan:
         'OBAT YANG MENGURAS VITAMIN SANGAT SERING TERLEWAT: metformin dan penghambat pompa proton menurunkan vitamin B12; isoniazid menurunkan vitamin B6 dan menimbulkan neuropati; fenitoin dan fenobarbital menurunkan vitamin D dan asam folat; metotreksat menurunkan asam folat; kolestiramin dan orlistat mengganggu penyerapan vitamin larut lemak. Tanyakan pula suplemen yang diminum sendiri beserta dosisnya.',
-      riwayatAlergi: 'History alergi obat dan alergi makanan yang menyebabkan pembatasan pola makan.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi makanan yang menyebabkan pembatasan pola makan.',
       riwayatKehamilanPersalinan: 'Kehamilan dan menyusui meningkatkan kebutuhan secara bermakna; tanyakan pula riwayat bayi dengan cacat tabung saraf yang mengarah pada kekurangan asam folat.',
       riwayatNutrisi:
         'INTI ANAMNESIS: pola makan sehari-hari secara rinci, keragaman jenis makanan, POLA MAKAN VEGETARIAN MAUPUN VEGAN TANPA SUPLEMEN yang hampir pasti menimbulkan kekurangan vitamin B12, pantangan makanan yang dijalani, cara memasak yang berlebihan sehingga vitamin rusak, serta konsumsi alkohol.',
@@ -1022,7 +1022,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Infeksi menahun termasuk tuberkulosis dan HIV',
     ],
     pengkajian:
-      'Dipikirkan kekurangan vitamin pada pasien ini atas dasar keluhan yang berlangsung berbulan-bulan dan mengenai beberapa sistem sekaligus — lemas, sariawan berulang, sudut bibir pecah, dan kesemutan pada kedua kaki — pada seseorang dengan pola makan yang terbatas. Mengenainya beberapa sistem sekaligus justru merupakan petunjuk alih-alih kebingungan, sebab vitamin bekerja sebagai kofaktor enzim di banyak jaringan sehingga kekurangannya tidak terbatas pada satu organ; jaringan dengan perputaran sel tinggi seperti sumsum tulang, mukosa mulut, dan saraf terkena lebih dahulu, dan inilah sebabnya sariawan serta anemia kerap menjadi tanda paling awal. Pemeriksaan diarahkan oleh pola gejala alih-alih memeriksa seluruh panel vitamin sekaligus. Ditemukannya anemia makrositik pada pemeriksaan darah mengarahkan pada kekurangan vitamin B12 maupun asam folat, dan pemeriksaan sensasi getar serta posisi sendi menjadi langkah yang menentukan — gangguan pada keduanya sangat khas untuk kekurangan vitamin B12 karena mengenai kolumna posterior sumsum tulang belakang, dan itulah yang membedakannya dari neuropati diabetik yang rasa getarnya relatif lebih terjaga. History obat ditelusuri secara khusus karena merupakan penyebab yang sangat sering terlewat: metformin dan penghambat pompa proton menurunkan vitamin B12, isoniazid menguras vitamin B6, dan fenitoin menurunkan vitamin D serta asam folat. Pola makan vegetarian tanpa suplemen juga ditanyakan karena hampir pasti menimbulkan kekurangan B12. Hipotiroid dan depresi dipertimbangkan sebagai penyebab lemas menahun dan ditapis. Yang paling menentukan pada kasus ini adalah tidak menunda pengobatan bila ada keluhan neurologis, sebab kerusakan saraf akibat kekurangan vitamin B12 yang berlangsung lama bersifat MENETAP meskipun vitaminnya kemudian diberikan — dan mencari penyebab kekurangannya sama pentingnya dengan menggantinya, karena memberi suplemen tanpa mengatasi gangguan penyerapan hanya menunda masalah yang sama.',
+      'Dipikirkan kekurangan vitamin pada pasien ini atas dasar keluhan yang berlangsung berbulan-bulan dan mengenai beberapa sistem sekaligus — lemas, sariawan berulang, sudut bibir pecah, dan kesemutan pada kedua kaki — pada seseorang dengan pola makan yang terbatas. Mengenainya beberapa sistem sekaligus justru merupakan petunjuk alih-alih kebingungan, sebab vitamin bekerja sebagai kofaktor enzim di banyak jaringan sehingga kekurangannya tidak terbatas pada satu organ; jaringan dengan perputaran sel tinggi seperti sumsum tulang, mukosa mulut, dan saraf terkena lebih dahulu, dan inilah sebabnya sariawan serta anemia kerap menjadi tanda paling awal. Pemeriksaan diarahkan oleh pola gejala alih-alih memeriksa seluruh panel vitamin sekaligus. Ditemukannya anemia makrositik pada pemeriksaan darah mengarahkan pada kekurangan vitamin B12 maupun asam folat, dan pemeriksaan sensasi getar serta posisi sendi menjadi langkah yang menentukan — gangguan pada keduanya sangat khas untuk kekurangan vitamin B12 karena mengenai kolumna posterior sumsum tulang belakang, dan itulah yang membedakannya dari neuropati diabetik yang rasa getarnya relatif lebih terjaga. Riwayat obat ditelusuri secara khusus karena merupakan penyebab yang sangat sering terlewat: metformin dan penghambat pompa proton menurunkan vitamin B12, isoniazid menguras vitamin B6, dan fenitoin menurunkan vitamin D serta asam folat. Pola makan vegetarian tanpa suplemen juga ditanyakan karena hampir pasti menimbulkan kekurangan B12. Hipotiroid dan depresi dipertimbangkan sebagai penyebab lemas menahun dan ditapis. Yang paling menentukan pada kasus ini adalah tidak menunda pengobatan bila ada keluhan neurologis, sebab kerusakan saraf akibat kekurangan vitamin B12 yang berlangsung lama bersifat MENETAP meskipun vitaminnya kemudian diberikan — dan mencari penyebab kekurangannya sama pentingnya dengan menggantinya, karena memberi suplemen tanpa mengatasi gangguan penyerapan hanya menunda masalah yang sama.',
     terapiSuportif: [
       'Perbaikan pola makan dengan makanan beragam merupakan dasar penanganan dan pencegahan jangka panjang',
       'Rujuk ke ahli gizi untuk menyusun pola makan yang memenuhi kebutuhan, terutama pada pantangan makanan maupun pola makan vegetarian',
@@ -1079,10 +1079,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan menyeluruh. Onset: perlahan dalam hitungan bulan sampai tahun. Character: TANYAKAN KELUHAN YANG MENGARAH PADA MINERAL TERTENTU — lemas, pucat, dan mudah lelah mengarah pada besi; benjolan di leher, lambat berpikir, dan mudah kedinginan mengarah pada yodium; diare berulang, luka yang lambat sembuh, dan rambut rontok mengarah pada zink; kram otot dan kesemutan di sekitar mulut mengarah pada kalsium dan magnesium. Radiation: tidak khas. Associations: TANYAKAN PIKA yaitu keinginan kuat memakan bahan bukan makanan seperti es batu maupun tanah, yang sangat khas untuk kekurangan besi dan hampir tidak pernah dilaporkan bila tidak ditanyakan. Tanyakan pula perdarahan haid yang banyak, tinja hitam, dan wasir sebagai sumber kehilangan besi. Time course: menahun. Exacerbating: pola makan terbatas dan kehilangan darah yang berlanjut. Severity: nilai hambatan aktivitas, prestasi belajar pada anak, dan pertumbuhan.',
       riwayatPenyakitDahulu:
         'Penyakit yang mengganggu penyerapan seperti penyakit seliak, penyakit radang usus, dan riwayat operasi lambung maupun usus. Penyakit ginjal kronik, penyakit hati, diabetes, dan gagal jantung. RIWAYAT CACINGAN, terutama cacing tambang yang merupakan penyebab kehilangan besi yang penting di daerah endemis.',
-      riwayatPenyakitKeluarga: 'History talasemia dan anemia bawaan pada keluarga — penting karena talasemia trait menyerupai kekurangan besi namun tidak boleh diberi besi berlebihan.',
+      riwayatPenyakitKeluarga: 'Riwayat talasemia dan anemia bawaan pada keluarga — penting karena talasemia trait menyerupai kekurangan besi namun tidak boleh diberi besi berlebihan.',
       riwayatPengobatan:
         'Penghambat pompa proton dan antasida yang mengurangi penyerapan besi; obat antiinflamasi nonsteroid dan antikoagulan yang menimbulkan perdarahan saluran cerna tersembunyi; diuretik yang menguras magnesium, kalium, dan zink. Tanyakan pula suplemen yang diminum sendiri, karena SUPLEMEN ZINK DOSIS TINGGI JANGKA PANJANG MENIMBULKAN KEKURANGAN TEMBAGA.',
-      riwayatAlergi: 'History alergi obat dan intoleransi terhadap sediaan besi oral sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan intoleransi terhadap sediaan besi oral sebelumnya.',
       riwayatKehamilanPersalinan: 'Kehamilan dan menyusui yang meningkatkan kebutuhan; jarak antarkehamilan yang dekat; serta riwayat perdarahan pascapersalinan.',
       riwayatNutrisi:
         'Pola makan sehari-hari, konsumsi sumber besi hewani yang penyerapannya jauh lebih baik daripada nabati, KEBIASAAN MINUM TEH MAUPUN KOPI BERSAMAAN DENGAN MAKAN yang menghambat penyerapan besi, penggunaan GARAM BERYODIUM, serta pola makan vegetarian yang berisiko kekurangan besi dan zink.',
@@ -1141,7 +1141,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Hipoparatiroid dan penyakit ginjal kronik pada kadar kalsium yang rendah',
     ],
     pengkajian:
-      'Dipikirkan kekurangan mineral pada pasien ini atas dasar keluhan lemas dan pucat yang berlangsung berbulan-bulan, disertai konjungtiva yang pucat dan kuku berbentuk sendok, dengan pola makan yang miskin sumber besi hewani serta kebiasaan minum teh bersamaan dengan makan. Ditemukannya anemia mikrositik hipokromik dengan feritin yang rendah memastikan kekurangan besi. Keinginan kuat mengunyah es batu yang digali secara khusus dalam anamnesis semakin menguatkan, karena pika merupakan gejala yang sangat khas dan hampir tidak pernah dilaporkan pasien bila tidak ditanyakan langsung. Talasemia trait merupakan banding yang paling menyesatkan karena sama-sama menghasilkan anemia mikrositik; pembedanya adalah jumlah eritrosit yang justru normal maupun meninggi dengan RDW normal dan feritin yang tidak rendah — perbedaan ini bukan akademis, sebab memberi besi terus-menerus pada talasemia trait tidak memperbaiki anemia dan berisiko menimbulkan kelebihan besi. Anemia penyakit kronik disingkirkan karena feritin pada kasus ini rendah alih-alih normal maupun meninggi. Yang tidak boleh berhenti pada penggantian besinya adalah pencarian sumber kehilangannya, sebab kekurangan besi merupakan gejala alih-alih diagnosis akhir: pada perempuan usia subur, perdarahan haid yang banyak merupakan sebab tersering; sedangkan PADA LAKI-LAKI DAN PEREMPUAN PASCAMENOPAUSE, kekurangan besi menuntut penelusuran perdarahan saluran cerna termasuk kemungkinan keganasan — dan melewatkan langkah ini merupakan kekeliruan yang berkonsekuensi berat. History cacingan dan kebiasaan bertelanjang kaki juga ditelusuri karena cacing tambang merupakan penyebab kehilangan besi yang penting di daerah endemis. Bila keluhan yang menonjol berupa benjolan di leher, penalaran beralih ke kekurangan yodium, dan pada keadaan itu perlu diingat bahwa dampaknya yang paling berat bukan pada gondoknya melainkan pada perkembangan otak janin bila terjadi saat kehamilan — kerusakan yang bersifat menetap dan justru merupakan penyebab keterbelakangan mental yang paling dapat dicegah.',
+      'Dipikirkan kekurangan mineral pada pasien ini atas dasar keluhan lemas dan pucat yang berlangsung berbulan-bulan, disertai konjungtiva yang pucat dan kuku berbentuk sendok, dengan pola makan yang miskin sumber besi hewani serta kebiasaan minum teh bersamaan dengan makan. Ditemukannya anemia mikrositik hipokromik dengan feritin yang rendah memastikan kekurangan besi. Keinginan kuat mengunyah es batu yang digali secara khusus dalam anamnesis semakin menguatkan, karena pika merupakan gejala yang sangat khas dan hampir tidak pernah dilaporkan pasien bila tidak ditanyakan langsung. Talasemia trait merupakan banding yang paling menyesatkan karena sama-sama menghasilkan anemia mikrositik; pembedanya adalah jumlah eritrosit yang justru normal maupun meninggi dengan RDW normal dan feritin yang tidak rendah — perbedaan ini bukan akademis, sebab memberi besi terus-menerus pada talasemia trait tidak memperbaiki anemia dan berisiko menimbulkan kelebihan besi. Anemia penyakit kronik disingkirkan karena feritin pada kasus ini rendah alih-alih normal maupun meninggi. Yang tidak boleh berhenti pada penggantian besinya adalah pencarian sumber kehilangannya, sebab kekurangan besi merupakan gejala alih-alih diagnosis akhir: pada perempuan usia subur, perdarahan haid yang banyak merupakan sebab tersering; sedangkan PADA LAKI-LAKI DAN PEREMPUAN PASCAMENOPAUSE, kekurangan besi menuntut penelusuran perdarahan saluran cerna termasuk kemungkinan keganasan — dan melewatkan langkah ini merupakan kekeliruan yang berkonsekuensi berat. Riwayat cacingan dan kebiasaan bertelanjang kaki juga ditelusuri karena cacing tambang merupakan penyebab kehilangan besi yang penting di daerah endemis. Bila keluhan yang menonjol berupa benjolan di leher, penalaran beralih ke kekurangan yodium, dan pada keadaan itu perlu diingat bahwa dampaknya yang paling berat bukan pada gondoknya melainkan pada perkembangan otak janin bila terjadi saat kehamilan — kerusakan yang bersifat menetap dan justru merupakan penyebab keterbelakangan mental yang paling dapat dicegah.',
     terapiSuportif: [
       'Perbaikan pola makan dengan sumber mineral yang penyerapannya baik, terutama sumber hewani untuk besi dan zink',
       'Sertakan sumber vitamin C pada waktu makan yang sama untuk meningkatkan penyerapan besi dari sumber nabati',
@@ -1197,12 +1197,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Karena dislipidemia hampir selalu tanpa gejala, arah anamnesis bukan menggali keluhan melainkan MENILAI RISIKO KARDIOVASKULAR TOTAL dan mencari petunjuk penyebab sekunder. Bila pasien datang dengan keluhan, telusuri dengan SOCRATES gejala yang mengarah pada penyakit aterosklerotik: nyeri dada saat aktivitas yang mereda dengan istirahat (angina), sesak saat aktivitas, nyeri betis saat berjalan pada jarak tertentu yang hilang dengan istirahat (klaudikasio), serta gejala neurologis sesaat. Pada hipertrigliseridemia sangat berat dapat muncul nyeri perut hebat menembus ke punggung akibat pankreatitis. Tanyakan pula gejala penyakit penyebab sekunder: mudah lelah dan intoleransi dingin (hipotiroid), poliuria dan polidipsia (diabetes), serta bengkak dan urin berbusa (sindrom nefrotik).',
       riwayatPenyakitDahulu:
-        'History penyakit jantung koroner, infark miokard, stroke, transient ischaemic attack, dan penyakit arteri perifer — keberadaannya menempatkan pasien langsung pada kategori risiko sangat tinggi. Tanyakan pula diabetes melitus, hipertensi, penyakit ginjal kronik, hipotiroid, sindrom nefrotik, dan penyakit hati.',
+        'Riwayat penyakit jantung koroner, infark miokard, stroke, transient ischaemic attack, dan penyakit arteri perifer — keberadaannya menempatkan pasien langsung pada kategori risiko sangat tinggi. Tanyakan pula diabetes melitus, hipertensi, penyakit ginjal kronik, hipotiroid, sindrom nefrotik, dan penyakit hati.',
       riwayatPenyakitKeluarga:
         'Ini bagian yang sering terlewat namun sangat menentukan. Tanyakan riwayat PENYAKIT JANTUNG KORONER DINI pada kerabat derajat pertama — laki-laki kurang dari 55 tahun atau perempuan kurang dari 65 tahun. Tanyakan pula riwayat kematian mendadak, kolesterol sangat tinggi dalam keluarga, dan riwayat keluarga dengan xanthoma — semuanya mengarah pada HIPERKOLESTEROLEMIA FAMILIAL yang memerlukan terapi jauh lebih agresif dan penapisan anggota keluarga lain.',
       riwayatPengobatan:
         'Statin atau obat penurun lipid yang pernah digunakan, dosis, dan alasan berhenti bila ada — terutama riwayat NYERI OTOT yang menjadi alasan penghentian. Tanyakan pula obat yang dapat memperburuk profil lipid: kortikosteroid, diuretik tiazid dosis tinggi, beta-blocker non-selektif, kontrasepsi hormonal, antiretroviral, dan siklosporin.',
-      riwayatAlergi: 'History alergi obat dan riwayat intoleransi statin sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat intoleransi statin sebelumnya.',
       riwayatNutrisi:
         'Pola makan sehari-hari secara rinci: frekuensi konsumsi gorengan dan makanan bersantan, jeroan, kulit ayam, daging berlemak, mentega dan margarin, makanan olahan, serta minuman manis; kebiasaan makan di luar rumah; asupan sayur, buah, dan ikan; serta konsumsi alkohol yang sangat berpengaruh pada kadar trigliserida.',
       riwayatSosialEkonomi:
@@ -1240,7 +1240,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Diabetes melitus dan sindrom metabolik',
       'Merokok — menurunkan HDL dan meningkatkan oksidasi LDL',
       'Konsumsi alkohol berlebih (terutama meningkatkan trigliserida)',
-      'History keluarga dislipidemia dan penyakit jantung koroner dini',
+      'Riwayat keluarga dislipidemia dan penyakit jantung koroner dini',
       'Usia lanjut, laki-laki, dan perempuan pascamenopause',
       'Penyakit penyerta: hipotiroid, sindrom nefrotik, penyakit ginjal kronik, penyakit hati kolestatik',
       'Obat: kortikosteroid, diuretik tiazid dosis tinggi, beta-blocker non-selektif, kontrasepsi hormonal, antiretroviral, siklosporin',
@@ -1324,17 +1324,17 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: pada gout, sendi yang terkena paling sering adalah METATARSOFALANGEAL PERTAMA (podagra), diikuti pergelangan kaki, lutut, pergelangan tangan, dan sendi jari tangan; serangan pertama umumnya MONOARTIKULER dan mengenai ekstremitas BAWAH. Onset: sangat MENDADAK dan mencapai puncak nyeri dalam 6-12 jam, khas terjadi pada DINI HARI sehingga membangunkan pasien dari tidur — kecepatan mencapai puncak inilah pembeda paling berguna dari artritis lain yang berkembang perlahan. Character: nyeri sangat hebat, berdenyut, dengan sendi yang tampak merah, bengkak, dan panas; pasien sering menggambarkan bahwa sekadar tersentuh selimut atau embusan angin pun terasa sangat nyeri (alodinia). Radiation: nyeri terbatas pada sendi yang terkena. Associations: demam ringan, menggigil, dan rasa lemas dapat menyertai serangan berat; tanyakan adanya BENJOLAN KERAS tidak nyeri pada daun telinga, siku, jari tangan, atau tendon Achilles yang merupakan TOFUS; tanyakan pula riwayat KOLIK saluran kemih dan keluarnya batu. WAJIB pertimbangkan ARTRITIS SEPTIK sebagai kegawatan: demam tinggi, menggigil, sendi yang sangat nyeri dengan gerakan sangat terbatas, dan adanya sumber infeksi lain — sebab kedua keadaan ini dapat tampak identik dan keterlambatan menangani artritis septik merusak sendi secara permanen dalam hitungan hari. Time course: serangan gout akut yang tidak diobati mereda SENDIRI dalam 7-14 hari, dan di antara serangan pasien benar-benar bebas gejala (periode interkritikal) — pola sembuh total di antara serangan ini sangat khas dan membedakannya dari artritis reumatoid yang berlangsung terus-menerus. Exacerbating: telusuri PEMICU serangan — konsumsi jeroan, seafood, daging merah berlebih, ALKOHOL terutama bir, minuman manis berfruktosa, dehidrasi, puasa atau diet ketat mendadak, trauma, pembedahan, infeksi, dan MEMULAI obat penurun asam urat tanpa profilaksis. Severity: frekuensi serangan per tahun, jumlah sendi yang pernah terkena, keterbatasan aktivitas, dan hari kerja yang hilang.',
       riwayatPenyakitDahulu:
-        'History serangan serupa sebelumnya dan berapa kali per tahun (menentukan indikasi terapi penurun urat), riwayat BATU GINJAL, penyakit GINJAL KRONIK yang merupakan penyebab tersering hiperurisemia sekunder sekaligus menentukan pilihan obat, HIPERTENSI, DIABETES MELITUS, DISLIPIDEMIA, OBESITAS, penyakit jantung koroner, psoriasis, keganasan hematologi, anemia hemolitik, riwayat kemoterapi, serta riwayat penyakit hati.',
+        'Riwayat serangan serupa sebelumnya dan berapa kali per tahun (menentukan indikasi terapi penurun urat), riwayat BATU GINJAL, penyakit GINJAL KRONIK yang merupakan penyebab tersering hiperurisemia sekunder sekaligus menentukan pilihan obat, HIPERTENSI, DIABETES MELITUS, DISLIPIDEMIA, OBESITAS, penyakit jantung koroner, psoriasis, keganasan hematologi, anemia hemolitik, riwayat kemoterapi, serta riwayat penyakit hati.',
       riwayatPenyakitKeluarga:
-        'History gout dan batu ginjal dalam keluarga (terdapat komponen genetik yang kuat melalui varian transporter urat SLC2A9 dan ABCG2), serta riwayat penyakit kardiovaskular dan sindrom metabolik.',
+        'Riwayat gout dan batu ginjal dalam keluarga (terdapat komponen genetik yang kuat melalui varian transporter urat SLC2A9 dan ABCG2), serta riwayat penyakit kardiovaskular dan sindrom metabolik.',
       riwayatPengobatan:
         'OBAT YANG MENINGKATKAN ASAM URAT dan sering menjadi penyebab yang terlewat: DIURETIK terutama tiazid dan furosemid (penyebab obat tersering), aspirin dosis rendah, siklosporin dan takrolimus, pirazinamid dan etambutol, levodopa, serta niasin. Tanyakan pula obat yang sudah diminum untuk keluhan sendi — NSAID, kortikosteroid, kolkisin, allopurinol — beserta dosis, lama pemakaian, dan responsnya; khusus untuk ALLOPURINOL tanyakan apakah pernah timbul ruam kulit, sebab reaksi hipersensitivitas terhadap allopurinol meski jarang dapat berakibat fatal.',
       riwayatAlergi:
-        'History alergi obat, khususnya ALLOPURINOL dan NSAID; riwayat ruam kulit setelah minum obat apa pun perlu ditelusuri secara terperinci.',
+        'Riwayat alergi obat, khususnya ALLOPURINOL dan NSAID; riwayat ruam kulit setelah minum obat apa pun perlu ditelusuri secara terperinci.',
       riwayatNutrisi:
         'Konsumsi JEROAN (hati, ampela, usus, otak, paru), makanan laut terutama kerang, udang, teri, sarden, dan ikan tongkol; daging merah dan daging olahan; kacang-kacangan tertentu; kuah kaldu kental dan emping melinjo yang di Indonesia sangat sering menjadi pemicu. Tanyakan konsumsi ALKOHOL terutama BIR yang mengandung purin sekaligus menghambat ekskresi urat, serta MINUMAN MANIS BERFRUKTOSA (soda, sirup, minuman kemasan) yang merupakan pemicu penting namun jarang ditanyakan. Tanyakan pula asupan cairan harian dan konsumsi produk susu rendah lemak yang justru bersifat protektif.',
       riwayatSosialEkonomi:
-        'Occupation dan dampak serangan terhadap kemampuan bekerja, kebiasaan minum alkohol dalam lingkungan sosial, tingkat aktivitas fisik, kemampuan mengakses obat jangka panjang dan pemeriksaan laboratorium berkala, serta keyakinan pasien mengenai penyakit ini — banyak pasien meyakini semua nyeri sendi disebabkan asam urat dan meminum obat asam urat tanpa indikasi.',
+        'Pekerjaan dan dampak serangan terhadap kemampuan bekerja, kebiasaan minum alkohol dalam lingkungan sosial, tingkat aktivitas fisik, kemampuan mengakses obat jangka panjang dan pemeriksaan laboratorium berkala, serta keyakinan pasien mengenai penyakit ini — banyak pasien meyakini semua nyeri sendi disebabkan asam urat dan meminum obat asam urat tanpa indikasi.',
     },
     pemeriksaanFisik: [
       'Tanda vital termasuk SUHU — demam tinggi dengan menggigil harus mengarahkan kecurigaan pada artritis septik, bukan sekadar gout',
@@ -1379,7 +1379,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Asupan tinggi purin: jeroan, makanan laut (kerang, udang, teri, sarden), daging merah, kuah kaldu kental, emping melinjo',
       'Obat: aspirin dosis rendah, siklosporin, takrolimus, pirazinamid, etambutol, levodopa, niasin',
       'Dehidrasi, puasa berkepanjangan, dan diet sangat rendah kalori yang menimbulkan ketosis',
-      'History keluarga dengan gout (varian genetik transporter urat)',
+      'Riwayat keluarga dengan gout (varian genetik transporter urat)',
       'Penyakit mieloproliferatif, limfoproliferatif, anemia hemolitik, psoriasis, dan kemoterapi (sindrom lisis tumor)',
       'Keracunan timbal kronik',
     ],
@@ -1477,7 +1477,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'OBESITAS pada orang tua dan saudara kandung (faktor genetik menyumbang bermakna, meski lingkungan keluarga berbagi pola makan juga berperan), serta riwayat keluarga dengan diabetes melitus tipe 2, hipertensi, penyakit jantung koroner dini, stroke, dan dislipidemia — kumpulan ini menentukan risiko kardiovaskular total pasien.',
       riwayatPengobatan:
         'OBAT YANG MENYEBABKAN KENAIKAN BERAT BADAN dan sering luput ditanyakan: KORTIKOSTEROID, insulin dan sulfonilurea, antipsikotik (olanzapin, klozapin, risperidon), antidepresan (mirtazapin, amitriptilin, paroksetin), antiepilepsi (asam valproat, gabapentin, karbamazepin), penyekat beta, dan kontrasepsi hormonal progestin. Tanyakan pula obat pelangsing yang dibeli bebas, jamu, dan suplemen — banyak produk pelangsing ilegal mengandung sibutramin atau bahkan diuretik dan laksatif yang berbahaya.',
-      riwayatAlergi: 'History alergi obat dan intoleransi makanan.',
+      riwayatAlergi: 'Riwayat alergi obat dan intoleransi makanan.',
       riwayatKehamilanPersalinan:
         'Pada perempuan: jumlah kehamilan, kenaikan berat badan selama tiap kehamilan dan berapa yang tidak turun kembali setelah melahirkan, riwayat diabetes gestasional yang meningkatkan risiko diabetes tipe 2, riwayat bayi besar (makrosomia), keteraturan siklus haid, dan status menopause.',
       riwayatNutrisi:
@@ -1529,7 +1529,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pola makan tinggi energi: makanan padat kalori, tinggi lemak jenuh dan gula sederhana, porsi besar',
       'MINUMAN MANIS — teh manis, kopi kemasan, soda, dan jus kemasan sebagai sumber kalori tersembunyi terbesar',
       'Aktivitas fisik rendah dan gaya hidup duduk berkepanjangan',
-      'History obesitas dalam keluarga dan predisposisi genetik',
+      'Riwayat obesitas dalam keluarga dan predisposisi genetik',
       'KURANG TIDUR (kurang dari 6 jam per malam) dan kerja shift malam',
       'Stres kronik, depresi, gangguan cemas, dan pola makan emosional',
       'Obat: kortikosteroid, insulin, sulfonilurea, antipsikotik atipikal, antidepresan tertentu, asam valproat, penyekat beta',
@@ -1722,14 +1722,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: lokasi kelenjar yang membesar dan apakah satu kelompok saja atau tersebar di beberapa daerah — pembesaran yang terbatas pada satu kelompok mengarah pada sebab setempat, sedangkan pembesaran menyeluruh mengarah pada penyakit sistemik. Telusuri pula daerah aliran limfe kelenjar tersebut untuk mencari fokus infeksi: kulit kepala, telinga, gigi, tonsil, dan wajah untuk kelenjar leher; tangan dan lengan untuk kelenjar ketiak; tungkai dan daerah kelamin untuk kelenjar lipat paha. Onset: mendadak dalam beberapa hari mengarah pada infeksi bakteri akut, sedangkan perlahan dalam hitungan minggu hingga bulan mengarah pada tuberkulosis atau keganasan. Character: PEMBEDA PALING PENTING — kelenjar yang nyeri, hangat, kemerahan, dan lunak mengarah pada infeksi, sedangkan kelenjar yang tidak nyeri, keras seperti karet atau seperti batu, dan melekat pada jaringan sekitar mengarah pada keganasan. Radiation: nyeri menjalar dan adanya garis kemerahan sepanjang saluran limfe. Associations: demam, dan yang wajib ditanyakan adalah GEJALA B berupa demam yang naik turun, keringat malam yang sampai membasahi pakaian, dan penurunan berat badan tanpa sebab jelas — ketiganya mengarah pada tuberkulosis maupun limfoma; tanyakan pula batuk lebih dari dua minggu, nyeri tenggorokan, sakit gigi, dan luka pada kulit. Time course: apakah benjolan bertambah besar, menetap, atau mengecil, dan apakah pernah pecah mengeluarkan nanah. Exacerbating: nyeri saat menoleh atau menelan. Severity: gangguan menelan, bernapas, dan aktivitas.',
       riwayatPenyakitDahulu:
-        'History tuberkulosis dan pengobatannya, riwayat infeksi HIV, diabetes melitus, keganasan, serta pemakaian obat imunosupresan. History infeksi gigi, tonsilitis berulang, dan penyakit kulit di daerah aliran limfe yang bersangkutan.',
+        'Riwayat tuberkulosis dan pengobatannya, riwayat infeksi HIV, diabetes melitus, keganasan, serta pemakaian obat imunosupresan. Riwayat infeksi gigi, tonsilitis berulang, dan penyakit kulit di daerah aliran limfe yang bersangkutan.',
       riwayatPenyakitKeluarga:
         'RIWAYAT KONTAK ERAT DENGAN PENDERITA TUBERKULOSIS PARU wajib ditanyakan, terutama serumah — pada limfadenitis tuberkulosis inilah petunjuk epidemiologis yang paling menentukan. Tanyakan pula riwayat keganasan pada keluarga.',
       riwayatPengobatan:
-        'Antibiotik yang sudah dipakai beserta jenis, dosis, dan lamanya — kelenjar yang tidak mengecil setelah antibiotik yang adekuat merupakan petunjuk penting ke arah tuberkulosis atau keganasan. History obat antituberkulosis sebelumnya. Obat yang dapat menyebabkan pembesaran kelenjar seperti fenitoin.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik dan obat antituberkulosis.',
+        'Antibiotik yang sudah dipakai beserta jenis, dosis, dan lamanya — kelenjar yang tidak mengecil setelah antibiotik yang adekuat merupakan petunjuk penting ke arah tuberkulosis atau keganasan. Riwayat obat antituberkulosis sebelumnya. Obat yang dapat menyebabkan pembesaran kelenjar seperti fenitoin.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik dan obat antituberkulosis.',
       riwayatImunisasi:
-        'History imunisasi BCG dan adanya parut BCG pada lengan, terutama pada anak.',
+        'Riwayat imunisasi BCG dan adanya parut BCG pada lengan, terutama pada anak.',
       riwayatNutrisi:
         'Status gizi dan penurunan berat badan yang dikuantifikasi dalam kilogram serta periode waktunya; malnutrisi merupakan faktor risiko sekaligus akibat pada limfadenitis tuberkulosis.',
       riwayatSosialEkonomi:
@@ -1806,7 +1806,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Jangan memijat, menekan, atau berusaha memecahkan benjolan karena dapat menyebarkan infeksi dan merusak jaringan',
       'Habiskan antibiotik sesuai lama yang ditentukan meskipun benjolan sudah mengecil',
       'Pada limfadenitis tuberkulosis, tekankan bahwa pengobatan berlangsung minimal 6 bulan dan harus diminum setiap hari tanpa putus; berhenti di tengah jalan adalah penyebab utama kekambuhan dan kekebalan kuman terhadap obat. Sertakan pengawas menelan obat di rumah',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan bergizi. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, susu, tahu, dan tempe, lengkapi dengan sayur dan buah, serta minum 8 gelas air per hari. Pada limfadenitis tuberkulosis, kenaikan berat badan merupakan salah satu penanda keberhasilan pengobatan sehingga penimbangan berkala menjadi bagian dari pemantauan. Obat antituberkulosis diminum saat perut kosong, satu jam sebelum makan pagi, dalam satu waktu sekaligus',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan bergizi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, susu, tahu, dan tempe, lengkapi dengan sayur dan buah, serta minum 8 gelas air per hari. Pada limfadenitis tuberkulosis, kenaikan berat badan merupakan salah satu penanda keberhasilan pengobatan sehingga penimbangan berkala menjadi bagian dari pemantauan. Obat antituberkulosis diminum saat perut kosong, satu jam sebelum makan pagi, dalam satu waktu sekaligus',
       'Jam tidur: 7-8 jam per malam dengan jadwal tetap; istirahat cukup mendukung kerja sistem kekebalan tubuh. Pada limfadenitis tuberkulosis dengan tuberkulosis paru yang menyertai, tidurlah di kamar dengan ventilasi baik dan jendela terbuka',
       'Pola olahraga: selama fase akut dengan demam, cukup istirahat dan jalan ringan di dalam rumah. Setelah demam mereda, mulai kembali dengan jalan kaki 15-20 menit sehari lalu tingkatkan bertahap menuju 30 menit sehari selama 5 hari seminggu. Hindari olahraga kontak dan angkat beban berat selama kelenjar masih membesar dan nyeri, dan jangan memakai pakaian maupun tali tas yang menekan benjolan',
       'Rawat kebersihan gigi dan mulut dengan menyikat gigi dua kali sehari dan memeriksakan gigi berlubang, karena fokus infeksi gigi adalah penyebab limfadenitis leher yang sering terlewat',
@@ -1840,11 +1840,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: nyeri kepala di regio frontal dan retro-orbital, disertai mialgia dan artralgia menyeluruh yang khas disebut breakbone fever. Onset: demam timbul MENDADAK tinggi, bukan bertahap seperti demam tifoid. Character: demam terus-menerus, nyeri terasa pegal menusuk hingga ke tulang. Radiation: nyeri menyebar ke seluruh otot dan sendi. Associations: mual, muntah, nyeri perut, ruam kulit, serta manifestasi perdarahan berupa bintik merah di kulit, mimisan, gusi berdarah, muntah hitam, atau tinja hitam. Time course: HITUNG HARI DEMAM dengan tepat karena menentukan fase penyakit — fase demam hari 1-3, FASE KRITIS hari 4-6 saat demam mulai turun, dan fase penyembuhan setelahnya. Exacerbating: penurunan asupan cairan memperberat perjalanan penyakit. Severity: gali tanda bahaya (warning signs) secara aktif — nyeri perut hebat dan terus-menerus, muntah persisten, perdarahan mukosa, letargi atau gelisah, pembesaran hati, penurunan produksi urin, dan tangan-kaki teraba dingin.',
       riwayatPenyakitDahulu:
-        'History pernah menderita demam berdarah sebelumnya sangat penting — infeksi sekunder oleh serotipe berbeda meningkatkan risiko DBD berat melalui mekanisme antibody-dependent enhancement. Tanyakan pula komorbid yang memperburuk prognosis: diabetes, penyakit ginjal, penyakit jantung, obesitas, thalassemia, dan tukak lambung.',
+        'Riwayat pernah menderita demam berdarah sebelumnya sangat penting — infeksi sekunder oleh serotipe berbeda meningkatkan risiko DBD berat melalui mekanisme antibody-dependent enhancement. Tanyakan pula komorbid yang memperburuk prognosis: diabetes, penyakit ginjal, penyakit jantung, obesitas, thalassemia, dan tukak lambung.',
       riwayatPenyakitKeluarga: 'Adakah anggota keluarga atau tetangga yang menderita demam berdarah dalam 1-2 minggu terakhir — mendukung adanya penularan setempat.',
       riwayatPengobatan:
         'Obat yang sudah diminum sebelum datang, terutama ASPIRIN dan obat antiinflamasi nonsteroid yang meningkatkan risiko perdarahan dan harus dihentikan; tanyakan pula penggunaan antikoagulan dan kortikosteroid.',
-      riwayatAlergi: 'History alergi obat sebelum pemberian terapi.',
+      riwayatAlergi: 'Riwayat alergi obat sebelum pemberian terapi.',
       riwayatSosialEkonomi:
         'Lingkungan tempat tinggal: keberadaan genangan air, bak mandi, vas bunga, ban bekas, dan tempat penampungan air yang menjadi tempat perindukan nyamuk; riwayat fogging di lingkungan; kebiasaan menguras bak; riwayat bepergian ke daerah endemis; dan akses ke fasilitas kesehatan bila terjadi perburukan.',
     },
@@ -1982,8 +1982,8 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Anamnesis dilakukan SINGKAT DAN SIMULTAN dengan tindakan — jangan menunda pemberian epinefrin untuk melengkapi riwayat. Site: keluhan bersifat sistemik mengenai kulit, saluran napas, kardiovaskular, dan saluran cerna sekaligus. Onset: MENDADAK, umumnya dalam hitungan menit hingga 2 jam setelah paparan; makin cepat onset makin berat reaksinya. Character: sesak disertai suara mengi atau stridor, rasa tercekik dan sulit menelan, suara serak, gatal pada telapak tangan dan kaki serta kulit kepala, rasa hangat dan kemerahan, serta perasaan akan terjadi sesuatu yang buruk (impending doom). Radiation: bengkak menyebar dari wajah ke bibir, lidah, dan tenggorokan. Associations: mual, muntah, nyeri perut kram, diare, pusing berputar, pandangan gelap, hingga pingsan. Time course: apakah keluhan progresif memberat, dan apakah sempat membaik lalu memberat kembali yang menandakan reaksi bifasik. Exacerbating: posisi berdiri mendadak dapat memicu kolaps kardiovaskular fatal. Severity: nilai berdasarkan keterlibatan jalan napas dan sirkulasi, bukan luas ruam.',
       riwayatPenyakitDahulu:
-        'History reaksi alergi atau anafilaksis sebelumnya beserta pencetusnya, riwayat asma (asma yang tidak terkontrol merupakan faktor risiko anafilaksis fatal), rinitis alergi, dermatitis atopik, dan mastositosis.',
-      riwayatPenyakitKeluarga: 'History atopi dan alergi pada keluarga.',
+        'Riwayat reaksi alergi atau anafilaksis sebelumnya beserta pencetusnya, riwayat asma (asma yang tidak terkontrol merupakan faktor risiko anafilaksis fatal), rinitis alergi, dermatitis atopik, dan mastositosis.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi dan alergi pada keluarga.',
       riwayatPengobatan:
         'Obat yang baru diminum atau disuntikkan dan waktunya secara TEPAT; penggunaan PENYEKAT BETA dan penghambat ACE penting diketahui karena penyekat beta membuat pasien resisten terhadap epinefrin sehingga memerlukan glukagon.',
       riwayatAlergi:
@@ -2009,7 +2009,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Pada mekanisme klasik yang diperantarai IgE, paparan ulang alergen mengikat silang IgE pada permukaan sel mast dan basofil sehingga terjadi degranulasi masif dengan pelepasan histamin, triptase, prostaglandin, leukotrien, dan faktor pengaktif trombosit. Histamin menyebabkan vasodilatasi arteriol dan peningkatan permeabilitas kapiler sehingga plasma keluar ke interstisium — hingga 35% volume plasma dapat berpindah dalam 10 menit, menghasilkan syok distributif sekaligus hipovolemik relatif. Pada saluran napas terjadi edema mukosa laring dan bronkospasme, sedangkan pada jantung terjadi penurunan preload dan depresi miokard langsung. Sebagian reaksi tidak diperantarai IgE (misalnya akibat media kontras atau opioid) melalui aktivasi sel mast langsung, namun gambaran klinis dan tatalaksananya identik. Reaksi bifasik terjadi pada 1-20% kasus, umumnya 1-8 jam setelah reaksi awal mereda, akibat pelepasan mediator fase lambat.',
     faktorRisiko: [
-      'History anafilaksis atau reaksi alergi berat sebelumnya',
+      'Riwayat anafilaksis atau reaksi alergi berat sebelumnya',
       'Asma yang tidak terkontrol — faktor risiko utama anafilaksis fatal',
       'Penyakit atopi lain dan mastositosis',
       'Penggunaan penyekat beta dan penghambat ACE yang memperberat reaksi dan mengurangi respons terapi',
@@ -2117,11 +2117,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: nyeri suprapubik pada sistitis, sedangkan nyeri pinggang unilateral yang menjalar ke depan mengarah pada pielonefritis. Onset: umumnya mendadak dalam hitungan hari. Character: disuria berupa rasa perih atau terbakar saat berkemih, frekuensi bertambah dengan volume tiap kali sedikit, urgensi, rasa tidak tuntas setelah berkemih, dan nokturia. Radiation: nyeri pinggang yang menjalar ke selangkangan lebih mengarah pada kolik akibat batu daripada infeksi murni. Associations: DEMAM DAN MENGGIGIL merupakan pembeda kunci — sistitis tanpa komplikasi umumnya TANPA demam, sedangkan demam tinggi dengan menggigil menandakan infeksi telah naik ke ginjal; tanyakan pula mual, muntah, hematuria makroskopis, urin keruh atau berbau menyengat, serta keluarnya duh dari uretra yang mengarah pada uretritis akibat infeksi menular seksual. Time course: berapa lama keluhan berlangsung, apakah pernah berulang, dan berapa kali dalam setahun terakhir. Exacerbating: hubungan dengan aktivitas seksual, menahan kencing, dan asupan cairan yang kurang. Severity: dampak terhadap tidur dan aktivitas, serta apakah masih mampu makan-minum yang menentukan pilihan terapi oral atau parenteral.',
       riwayatPenyakitDahulu:
-        'History infeksi saluran kemih sebelumnya dan frekuensinya, riwayat batu saluran kemih, kelainan anatomi saluran kemih termasuk refluks vesikoureter pada anak, pembesaran prostat pada laki-laki, diabetes melitus, penyakit ginjal, imunosupresi, serta riwayat pemasangan kateter atau tindakan urologi.',
-      riwayatPenyakitKeluarga: 'History batu saluran kemih, penyakit ginjal polikistik, dan kelainan bawaan saluran kemih dalam keluarga.',
+        'Riwayat infeksi saluran kemih sebelumnya dan frekuensinya, riwayat batu saluran kemih, kelainan anatomi saluran kemih termasuk refluks vesikoureter pada anak, pembesaran prostat pada laki-laki, diabetes melitus, penyakit ginjal, imunosupresi, serta riwayat pemasangan kateter atau tindakan urologi.',
+      riwayatPenyakitKeluarga: 'Riwayat batu saluran kemih, penyakit ginjal polikistik, dan kelainan bawaan saluran kemih dalam keluarga.',
       riwayatPengobatan:
         'Antibiotik yang pernah digunakan untuk keluhan serupa beserta responsnya — penting untuk memperkirakan pola resistensi; penggunaan antibiotik dalam 3 bulan terakhir; serta obat yang menurunkan imunitas seperti kortikosteroid dan kemoterapi.',
-      riwayatAlergi: 'History alergi antibiotik terutama golongan sulfa, penisilin, dan kuinolon yang menentukan pilihan terapi.',
+      riwayatAlergi: 'Riwayat alergi antibiotik terutama golongan sulfa, penisilin, dan kuinolon yang menentukan pilihan terapi.',
       riwayatKehamilanPersalinan:
         'Pada perempuan usia subur WAJIB ditanyakan kemungkinan hamil dan tanggal haid terakhir — status kehamilan mengubah pilihan antibiotik secara mendasar dan menjadikan bakteriuria asimtomatik pun harus diobati.',
       riwayatNutrisi: 'Asupan cairan harian dan kebiasaan minum, konsumsi kopi dan minuman beralkohol yang bersifat iritatif terhadap kandung kemih.',
@@ -2256,7 +2256,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Ginjal polikistik simtomatik': {
     definisi: 'Penyakit ginjal genetik dengan kista multipel progresif, tersering tipe autosomal dominan (ADPKD).',
-    diagnosis: ['History keluarga, nyeri pinggang kronik, hipertensi, hematuria; USG/CT menunjukkan kista multipel bilateral'],
+    diagnosis: ['Riwayat keluarga, nyeri pinggang kronik, hipertensi, hematuria; USG/CT menunjukkan kista multipel bilateral'],
     tatalaksana: ['Kontrol tekanan darah ketat, tolvaptan dapat memperlambat progresi pada kasus terpilih, tatalaksana komplikasi (infeksi kista, batu, CKD)'],
     referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
   },
@@ -2275,11 +2275,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: NYERI PINGGANG unilateral (kadang bilateral) pada daerah sudut kostovertebra, dapat disertai nyeri perut. Onset: umumnya akut dalam 1-2 hari, sering DIDAHULUI gejala sistitis berupa disuria dan frekuensi beberapa hari sebelumnya — urutan ini mendukung mekanisme infeksi asenden dan berguna ditanyakan. Character: nyeri pinggang tumpul yang MENETAP dan terus-menerus, disertai demam tinggi dengan menggigil hebat. Radiation: nyeri dapat menjalar ke perut bawah dan selangkangan; nyeri yang bersifat KOLIK dan menjalar dari pinggang ke selangkangan secara berulang justru lebih mengarah pada BATU dengan obstruksi, dan bila disertai demam merupakan KEGAWATAN urologi. Associations: mual dan muntah yang sering menentukan apakah pasien dapat menerima terapi per oral, rasa lemas hebat, nafsu makan hilang, serta gejala sistitis penyerta. WAJIB tanyakan TANDA SEPSIS: kesadaran menurun atau bingung (terutama pada usia lanjut, di mana kebingungan mendadak dapat menjadi satu-satunya gejala), napas cepat, jantung berdebar, badan teraba dingin dan lembap, serta jumlah kencing yang berkurang drastis. Tanyakan pula ANURIA atau kesulitan berkemih yang mengarah pada obstruksi. Time course: memburuk cepat tanpa terapi; dengan antibiotik yang tepat, demam mereda dalam 48-72 jam. Exacerbating: tidak khas. Severity: derajat demam, kemampuan makan dan minum, produksi urin, dan kemampuan berjalan.',
       riwayatPenyakitDahulu:
-        'History infeksi saluran kemih dan pielonefritis sebelumnya, BATU SALURAN KEMIH yang merupakan penyebab tersering pielonefritis yang tidak membaik, kelainan anatomi saluran kemih dan REFLUKS VESIKOURETER, riwayat operasi maupun tindakan instrumentasi urologi, pemasangan KATETER atau stent ureter, DIABETES MELITUS yang meningkatkan risiko bentuk berat seperti pielonefritis emfisematosa dan nekrosis papila, penyakit ginjal kronik, imunokompromais termasuk HIV dan penggunaan kortikosteroid, penyakit sel sabit, serta gangguan pengosongan kandung kemih.',
-      riwayatPenyakitKeluarga: 'History batu saluran kemih, penyakit ginjal, kelainan bawaan saluran kemih, dan diabetes melitus dalam keluarga.',
+        'Riwayat infeksi saluran kemih dan pielonefritis sebelumnya, BATU SALURAN KEMIH yang merupakan penyebab tersering pielonefritis yang tidak membaik, kelainan anatomi saluran kemih dan REFLUKS VESIKOURETER, riwayat operasi maupun tindakan instrumentasi urologi, pemasangan KATETER atau stent ureter, DIABETES MELITUS yang meningkatkan risiko bentuk berat seperti pielonefritis emfisematosa dan nekrosis papila, penyakit ginjal kronik, imunokompromais termasuk HIV dan penggunaan kortikosteroid, penyakit sel sabit, serta gangguan pengosongan kandung kemih.',
+      riwayatPenyakitKeluarga: 'Riwayat batu saluran kemih, penyakit ginjal, kelainan bawaan saluran kemih, dan diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Antibiotik yang diminum dalam 3-6 bulan terakhir dan jenisnya — sangat menentukan kemungkinan resistensi termasuk bakteri penghasil ESBL, sehingga memengaruhi pilihan empirik; tanyakan pula analgesik, NSAID yang perlu diperhatikan pada gangguan fungsi ginjal, obat imunosupresan, dan obat tradisional.',
-      riwayatAlergi: 'History alergi obat terutama penisilin, sefalosporin, sulfonamid, dan kuinolon, beserta bentuk reaksinya.',
+      riwayatAlergi: 'Riwayat alergi obat terutama penisilin, sefalosporin, sulfonamid, dan kuinolon, beserta bentuk reaksinya.',
       riwayatKehamilanPersalinan:
         'STATUS KEHAMILAN wajib dipastikan — pielonefritis pada kehamilan tergolong BERKOMPLIKASI, merupakan penyebab rawat inap non-obstetrik tersering pada ibu hamil, dan berkaitan dengan persalinan prematur, sindrom distres pernapasan akut, serta sepsis maternal. Tanyakan usia gestasi, riwayat bakteriuria dan infeksi saluran kemih pada kehamilan ini, riwayat persalinan prematur, serta gerakan janin dan tanda kontraksi.',
       riwayatSosialEkonomi:
@@ -2318,7 +2318,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Sebagian besar pielonefritis terjadi secara ASENDEN, yaitu kelanjutan dari kolonisasi periuretra dan sistitis; hanya sebagian kecil terjadi secara HEMATOGEN, umumnya oleh Staphylococcus aureus pada endokarditis atau bakteremia, yang khas menimbulkan abses ginjal multipel. Pertanyaan mengapa sebagian sistitis naik ke ginjal sementara sebagian besar tidak dijawab oleh sifat bakterinya: galur Escherichia coli yang memiliki FIMBRIA P mampu mengikat glikolipid globosida pada epitel saluran kemih atas, sehingga tidak tersapu keluar dan dapat menaiki ureter — inilah sebabnya fimbria P dijumpai pada sebagian besar isolat pielonefritis namun jarang pada sistitis sederhana. Bakteri juga melepaskan endotoksin yang MELUMPUHKAN PERISTALSIS URETER, sehingga aliran urin melambat dan bakteri lebih mudah naik; mekanisme yang sama menjelaskan mengapa setiap keadaan yang menimbulkan STASIS atau REFLUKS — batu, obstruksi, kehamilan, refluks vesikoureter, kandung kemih neurogenik — secara dramatis meningkatkan risiko. Setelah mencapai ginjal, bakteri menginvasi parenkim melalui duktus koligentes dan menimbulkan peradangan supuratif dengan infiltrasi neutrofil pada interstisium serta pembentukan silinder leukosit di dalam tubulus — dan karena inilah SILINDER LEUKOSIT pada urinalisis menjadi penanda keterlibatan jaringan ginjal, bukan sekadar kandung kemih. Perbedaan mendasar dari sistitis adalah bahwa ini merupakan infeksi JARINGAN yang memiliki suplai darah kaya, sehingga bakteri mudah masuk ke sirkulasi dan menimbulkan BAKTEREMIA pada 20-30% kasus, dengan risiko sepsis dan syok. Konsekuensi terapeutiknya langsung dan penting: antibiotik yang dipilih harus mencapai KADAR JARINGAN yang memadai, bukan sekadar kadar tinggi dalam urin. Inilah alasan mengapa NITROFURANTOIN dan FOSFOMISIN — yang sangat baik untuk sistitis karena terkonsentrasi di urin — TIDAK BOLEH digunakan untuk pielonefritis, sebab penetrasinya ke jaringan ginjal tidak memadai; kekeliruan ini tampak masuk akal di permukaan namun berakibat kegagalan terapi. Penyembuhan meninggalkan jaringan PARUT pada korteks ginjal; pada dewasa dengan satu episode hal ini jarang bermakna, namun pada ANAK dengan refluks vesikoureter, infeksi berulang menimbulkan parut yang luas sehingga berujung pada hipertensi dan penyakit ginjal kronik di kemudian hari — dasar mengapa satu episode pielonefritis pada anak sudah menuntut pencitraan. Pada penyandang DIABETES, glukosa dalam urin menjadi media pertumbuhan, fungsi neutrofil terganggu, dan mikroangiopati menurunkan perfusi; kombinasi ini melahirkan bentuk-bentuk berat yang khas yaitu PIELONEFRITIS EMFISEMATOSA dengan pembentukan gas dalam jaringan ginjal serta NEKROSIS PAPILA. Pada KEHAMILAN, dilatasi ureter akibat progesteron dan penekanan uterus menimbulkan stasis fisiologis sehingga pielonefritis jauh lebih sering, lebih berat, dan berkaitan dengan persalinan prematur serta sindrom distres pernapasan akut — alasan mengapa ibu hamil dengan pielonefritis pada umumnya DIRAWAT INAP alih-alih diobati jalan.',
     faktorRisiko: [
-      'History sistitis yang tidak diobati atau diobati tidak adekuat',
+      'Riwayat sistitis yang tidak diobati atau diobati tidak adekuat',
       'Jenis kelamin perempuan dan aktivitas seksual, terutama dengan pasangan baru',
       'Penggunaan spermisida dan diafragma',
       'KEHAMILAN — stasis urin akibat progesteron dan penekanan uterus',
@@ -2329,7 +2329,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kandung kemih neurogenik dan pengosongan kandung kemih yang tidak sempurna',
       'Pembesaran prostat pada laki-laki',
       'Imunokompromais: HIV, keganasan, kortikosteroid, pascatransplantasi',
-      'History pielonefritis sebelumnya dan riwayat ISK pada ibu',
+      'Riwayat pielonefritis sebelumnya dan riwayat ISK pada ibu',
       'Usia lanjut dan penyakit ginjal kronik',
     ],
     goldStandard:
@@ -2349,7 +2349,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Infark ginjal dan trombosis vena renalis',
     ],
     pengkajian:
-      'Dipikirkan pielonefritis akut pada pasien ini atas dasar demam tinggi disertai menggigil, nyeri pinggang unilateral yang menetap, mual dan muntah, dengan NYERI KETOK SUDUT KOSTOVERTEBRA POSITIF pada sisi yang sama, serta urinalisis yang menunjukkan piuria dan bakteriuria. Ditemukannya SILINDER LEUKOSIT memperkuat bahwa yang terlibat adalah parenkim ginjal dan bukan sekadar kandung kemih. History gejala sistitis beberapa hari sebelumnya sesuai dengan mekanisme infeksi asenden. SISTITIS dapat disingkirkan justru oleh temuan-temuan tersebut, dan pembedaan ini bukan soal penamaan melainkan menentukan durasi terapi: mengobati pielonefritis dengan regimen sistitis tiga hari merupakan salah satu kekeliruan yang paling merugikan di layanan primer. Dengan alasan mekanistik yang sama, NITROFURANTOIN dan FOSFOMISIN tidak boleh dipilih di sini meskipun keduanya sangat baik untuk sistitis — obat itu terkonsentrasi di urin namun penetrasinya ke JARINGAN ginjal tidak memadai, sehingga pilihan yang tampak masuk akal justru berakhir dengan kegagalan terapi. Yang paling mendesak dinilai adalah ADA TIDAKNYA OBSTRUKSI: bila nyeri bersifat kolik hebat menjalar ke selangkangan pada pasien dengan riwayat batu, maka yang dihadapi mungkin PIONEFROSIS, yaitu sistem saluran kemih tersumbat yang terinfeksi — sebuah kegawatan urologi yang memerlukan DEKOMPRESI segera dengan stent atau nefrostomi, sebab antibiotik betapapun tepatnya tidak akan menyembuhkan rongga tertutup yang berisi nanah, dan penundaan berujung pada syok septik. Karena itu ambang untuk melakukan ultrasonografi harus rendah pada pasien dengan riwayat batu, nyeri kolik, produksi urin yang berkurang, atau yang tidak membaik dalam 48-72 jam. Diagnosis banding lain yang wajib disingkirkan pada perempuan usia subur adalah KEHAMILAN EKTOPIK terganggu, sehingga tes kehamilan dikerjakan pada setiap pasien tanpa kecuali; apendisitis retrosekal juga dipertimbangkan karena dapat menimbulkan nyeri pinggang dengan piuria, dan pneumonia lobus bawah disingkirkan melalui auskultasi paru. Keputusan berikutnya adalah RAWAT JALAN ATAU RAWAT INAP, dan ini ditentukan bukan oleh diagnosisnya melainkan oleh keadaan pasien: muntah yang membuat obat oral tidak dapat diterima, tanda sepsis berupa takipnea, hipotensi, atau kebingungan, kehamilan, diabetes, imunokompromais, kecurigaan obstruksi, dan tidak adanya pendamping di rumah semuanya memiringkan keputusan ke arah rawat inap. Perlu dicatat khusus bahwa pada USIA LANJUT demam dapat tidak muncul sama sekali dan KEBINGUNGAN MENDADAK dapat menjadi satu-satunya tanda, sehingga memeriksa nyeri ketok sudut kostovertebra pada pasien lanjut usia yang tiba-tiba bingung merupakan langkah sederhana yang kerap menyelamatkan. Terakhir, penilaian respons harus dilakukan pada 48-72 jam: demam yang menetap melewati tenggat itu meski antibiotik sesuai kepekaan tidak boleh disikapi dengan sekadar mengganti antibiotik, melainkan menuntut pencitraan untuk mencari ABSES atau OBSTRUKSI yang tersembunyi.',
+      'Dipikirkan pielonefritis akut pada pasien ini atas dasar demam tinggi disertai menggigil, nyeri pinggang unilateral yang menetap, mual dan muntah, dengan NYERI KETOK SUDUT KOSTOVERTEBRA POSITIF pada sisi yang sama, serta urinalisis yang menunjukkan piuria dan bakteriuria. Ditemukannya SILINDER LEUKOSIT memperkuat bahwa yang terlibat adalah parenkim ginjal dan bukan sekadar kandung kemih. Riwayat gejala sistitis beberapa hari sebelumnya sesuai dengan mekanisme infeksi asenden. SISTITIS dapat disingkirkan justru oleh temuan-temuan tersebut, dan pembedaan ini bukan soal penamaan melainkan menentukan durasi terapi: mengobati pielonefritis dengan regimen sistitis tiga hari merupakan salah satu kekeliruan yang paling merugikan di layanan primer. Dengan alasan mekanistik yang sama, NITROFURANTOIN dan FOSFOMISIN tidak boleh dipilih di sini meskipun keduanya sangat baik untuk sistitis — obat itu terkonsentrasi di urin namun penetrasinya ke JARINGAN ginjal tidak memadai, sehingga pilihan yang tampak masuk akal justru berakhir dengan kegagalan terapi. Yang paling mendesak dinilai adalah ADA TIDAKNYA OBSTRUKSI: bila nyeri bersifat kolik hebat menjalar ke selangkangan pada pasien dengan riwayat batu, maka yang dihadapi mungkin PIONEFROSIS, yaitu sistem saluran kemih tersumbat yang terinfeksi — sebuah kegawatan urologi yang memerlukan DEKOMPRESI segera dengan stent atau nefrostomi, sebab antibiotik betapapun tepatnya tidak akan menyembuhkan rongga tertutup yang berisi nanah, dan penundaan berujung pada syok septik. Karena itu ambang untuk melakukan ultrasonografi harus rendah pada pasien dengan riwayat batu, nyeri kolik, produksi urin yang berkurang, atau yang tidak membaik dalam 48-72 jam. Diagnosis banding lain yang wajib disingkirkan pada perempuan usia subur adalah KEHAMILAN EKTOPIK terganggu, sehingga tes kehamilan dikerjakan pada setiap pasien tanpa kecuali; apendisitis retrosekal juga dipertimbangkan karena dapat menimbulkan nyeri pinggang dengan piuria, dan pneumonia lobus bawah disingkirkan melalui auskultasi paru. Keputusan berikutnya adalah RAWAT JALAN ATAU RAWAT INAP, dan ini ditentukan bukan oleh diagnosisnya melainkan oleh keadaan pasien: muntah yang membuat obat oral tidak dapat diterima, tanda sepsis berupa takipnea, hipotensi, atau kebingungan, kehamilan, diabetes, imunokompromais, kecurigaan obstruksi, dan tidak adanya pendamping di rumah semuanya memiringkan keputusan ke arah rawat inap. Perlu dicatat khusus bahwa pada USIA LANJUT demam dapat tidak muncul sama sekali dan KEBINGUNGAN MENDADAK dapat menjadi satu-satunya tanda, sehingga memeriksa nyeri ketok sudut kostovertebra pada pasien lanjut usia yang tiba-tiba bingung merupakan langkah sederhana yang kerap menyelamatkan. Terakhir, penilaian respons harus dilakukan pada 48-72 jam: demam yang menetap melewati tenggat itu meski antibiotik sesuai kepekaan tidak boleh disikapi dengan sekadar mengganti antibiotik, melainkan menuntut pencitraan untuk mencari ABSES atau OBSTRUKSI yang tersembunyi.',
     terapiSuportif: [
       'HIDRASI adekuat — per oral bila pasien mampu, atau cairan intravena bila muntah atau terdapat tanda dehidrasi dan sepsis',
       'Antipiretik dan analgesik: parasetamol merupakan pilihan utama; NSAID digunakan dengan hati-hati karena dapat memperburuk fungsi ginjal terutama pada pasien yang dehidrasi',
@@ -2411,7 +2411,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Nekrosis tubular akut': {
     definisi: 'Penyebab tersering AKI intrinsik, akibat iskemia atau toksin langsung merusak sel tubulus ginjal.',
-    diagnosis: ['History hipotensi/syok/nefrotoksin, FENa >2%, sedimen urin menunjukkan muddy brown casts'],
+    diagnosis: ['Riwayat hipotensi/syok/nefrotoksin, FENa >2%, sedimen urin menunjukkan muddy brown casts'],
     tatalaksana: ['Suportif: optimalkan hemodinamik, hindari nefrotoksin tambahan, dialisis bila indikasi, umumnya reversibel dalam 1-3 minggu bila penyebab diatasi'],
     referensi: ['SKDI2012', 'KDIGOAKI2012', 'PAPDI2014'],
   },
@@ -2483,7 +2483,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Ruptur ginjal': {
     definisi: 'Cedera traumatik ginjal, diklasifikasikan derajat I-V berdasarkan luas kerusakan (AAST grading).',
-    diagnosis: ['History trauma tumpul/tajam pinggang/abdomen, hematuria (dapat tidak sebanding derajat cedera), nyeri pinggang; CT kontras untuk staging'],
+    diagnosis: ['Riwayat trauma tumpul/tajam pinggang/abdomen, hematuria (dapat tidak sebanding derajat cedera), nyeri pinggang; CT kontras untuk staging'],
     tatalaksana: ['Sebagian besar (derajat rendah) tatalaksana konservatif dengan observasi ketat, derajat tinggi/tidak stabil hemodinamik memerlukan intervensi/nefrektomi'],
     referensi: ['SKDI2012', 'CAMPBELL2016', 'PAPDI2014'],
   },
@@ -2540,7 +2540,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   'Fraktur terbuka, tertutup': {
     definisi: 'Diskontinuitas tulang; terbuka bila ada hubungan fragmen fraktur dengan dunia luar melalui luka kulit, tertutup bila kulit di atasnya utuh.',
     diagnosis: [
-      'History trauma, nyeri, bengkak, deformitas, krepitasi, keterbatasan gerak',
+      'Riwayat trauma, nyeri, bengkak, deformitas, krepitasi, keterbatasan gerak',
       'Fraktur terbuka diklasifikasikan Gustilo-Anderson I-III berdasarkan ukuran luka dan derajat kerusakan jaringan lunak',
       'Wajib evaluasi status neurovaskular distal sebelum dan sesudah setiap manipulasi; rontgen dua proyeksi mencakup sendi proksimal dan distal',
     ],
@@ -2569,7 +2569,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   'Fraktur dan dislokasi tulang belakang': {
     definisi: 'Cedera traumatik kolumna vertebralis, berpotensi menyebabkan cedera medula spinalis permanen.',
     diagnosis: [
-      'History trauma energi tinggi, nyeri tulang belakang, deformitas; nilai defisit neurologis (motorik, sensorik, refleks, tonus sfingter)',
+      'Riwayat trauma energi tinggi, nyeri tulang belakang, deformitas; nilai defisit neurologis (motorik, sensorik, refleks, tonus sfingter)',
       'Imobilisasi servikal dan spine precaution sejak prehospital; CT/MRI untuk menilai stabilitas dan kompresi medula',
     ],
     tatalaksana: [
@@ -2718,7 +2718,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Instabilitas sendi tumit': {
     definisi: 'Ketidakstabilan kronik sendi pergelangan kaki akibat kelemahan ligamen, umumnya pasca sprain berulang.',
-    diagnosis: ['History sprain berulang, rasa "giving way", nyeri kronik; anterior drawer dan talar tilt test menunjukkan laksitas berlebih'],
+    diagnosis: ['Riwayat sprain berulang, rasa "giving way", nyeri kronik; anterior drawer dan talar tilt test menunjukkan laksitas berlebih'],
     tatalaksana: ['Fisioterapi proprioseptif dan penguatan peroneus sebagai lini pertama, ankle brace saat aktivitas, rekonstruksi ligamen bila gagal konservatif'],
     referensi: ['SKDI2012', 'APLEY2018', 'CAMPBELLORTHO2021'],
   },
@@ -2742,17 +2742,17 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: LETAK LUKA MERUPAKAN PETUNJUK PENYEBAB YANG PALING KUAT — ulkus vena khasnya di sekitar mata kaki bagian dalam, ulkus arteri di ujung jari, tumit, dan tonjolan tulang, sedangkan ulkus diabetik pada titik tumpuan telapak kaki. Onset: perlahan, sering setelah luka kecil yang tidak kunjung menutup. Character: ulkus vena dangkal dengan tepi tidak rata dan dasar bergranulasi; ulkus arteri dalam dengan tepi tegas seperti dilubangi dan dasar pucat; ulkus diabetik dikelilingi kalus tebal. Radiation: tidak khas. Associations: PERTANYAAN YANG PALING MEMISAHKAN KETIGANYA ADALAH NYERI — ulkus vena terasa pegal dan berat yang MEMBAIK BILA TUNGKAI DITINGGIKAN; ulkus arteri terasa nyeri hebat yang justru MEMBURUK BILA DITINGGIKAN dan membaik bila tungkai digantung ke bawah; ulkus diabetik sering TIDAK NYERI SAMA SEKALI karena saraf sudah rusak. Tanyakan pula nyeri betis saat berjalan yang hilang saat istirahat (klaudikasio) dan kesemutan maupun baal pada kaki. Time course: berbulan-bulan sampai bertahun-tahun dengan riwayat sembuh lalu kambuh. Exacerbating: berdiri lama pada ulkus vena, berjalan pada ulkus arteri. Severity: nyeri, gangguan tidur, dan hambatan berjalan.',
       riwayatPenyakitDahulu:
-        'DIABETES MELITUS beserta lamanya dan kendali gula darahnya. Hipertensi, dislipidemia, penyakit jantung koroner, dan stroke sebagai penanda penyakit pembuluh darah menyeluruh. History trombosis vena dalam, varises, kehamilan berulang, dan operasi maupun patah tulang pada tungkai. History ulkus sebelumnya dan penyakit autoimun.',
-      riwayatPenyakitKeluarga: 'History varises, diabetes, dan penyakit pembuluh darah pada keluarga.',
+        'DIABETES MELITUS beserta lamanya dan kendali gula darahnya. Hipertensi, dislipidemia, penyakit jantung koroner, dan stroke sebagai penanda penyakit pembuluh darah menyeluruh. Riwayat trombosis vena dalam, varises, kehamilan berulang, dan operasi maupun patah tulang pada tungkai. Riwayat ulkus sebelumnya dan penyakit autoimun.',
+      riwayatPenyakitKeluarga: 'Riwayat varises, diabetes, dan penyakit pembuluh darah pada keluarga.',
       riwayatPengobatan:
-        'Obat yang sedang digunakan termasuk kortikosteroid dan obat imunosupresan yang memperlambat penyembuhan. History obat luka dan balutan yang sudah dipakai. Tanyakan pula bahan yang dibubuhkan sendiri pada luka, karena dermatitis kontak terhadap obat luka sangat sering terjadi pada ulkus menahun.',
+        'Obat yang sedang digunakan termasuk kortikosteroid dan obat imunosupresan yang memperlambat penyembuhan. Riwayat obat luka dan balutan yang sudah dipakai. Tanyakan pula bahan yang dibubuhkan sendiri pada luka, karena dermatitis kontak terhadap obat luka sangat sering terjadi pada ulkus menahun.',
       riwayatAlergi:
-        'History alergi obat dan RIWAYAT ALERGI TERHADAP OBAT LUKA maupun perekat balutan — pada ulkus vena menahun, dermatitis kontak alergika terhadap bahan topikal merupakan penyebab tersering luka tampak memburuk.',
+        'Riwayat alergi obat dan RIWAYAT ALERGI TERHADAP OBAT LUKA maupun perekat balutan — pada ulkus vena menahun, dermatitis kontak alergika terhadap bahan topikal merupakan penyebab tersering luka tampak memburuk.',
       riwayatImunisasi: 'Status imunisasi tetanus.',
       riwayatNutrisi:
         'Status gizi, asupan protein, serta kemungkinan kekurangan zat besi, zink, dan vitamin C yang memperlambat penyembuhan luka.',
       riwayatSosialEkonomi:
-        'MEROKOK — faktor terkuat yang dapat diubah pada ulkus arteri. Occupation yang menuntut berdiri lama, kemampuan membeli balutan dan stoking kompresi, kemampuan datang untuk perawatan luka berkala, serta siapa yang membantu merawat luka di rumah.',
+        'MEROKOK — faktor terkuat yang dapat diubah pada ulkus arteri. Pekerjaan yang menuntut berdiri lama, kemampuan membeli balutan dan stoking kompresi, kemampuan datang untuk perawatan luka berkala, serta siapa yang membantu merawat luka di rumah.',
     },
     pemeriksaanFisik: [
       'Deskripsikan ulkus: lokasi, ukuran dalam sentimeter yang DICATAT ANGKANYA, kedalaman, tepi, dasar, jumlah dan sifat cairan, serta bau',
@@ -2785,7 +2785,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'MEROKOK, hipertensi, dan dislipidemia untuk penyakit arteri',
       'Usia lanjut dan keterbatasan gerak',
       'Obesitas dan pekerjaan yang menuntut berdiri lama',
-      'History ulkus tungkai sebelumnya',
+      'Riwayat ulkus tungkai sebelumnya',
       'Malnutrisi dan kekurangan protein',
       'Penyakit autoimun dan pemakaian kortikosteroid',
       'Trauma berulang dan alas kaki yang tidak sesuai',
@@ -2837,7 +2837,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'PERIKSA KAKI SETIAP HARI termasuk sela jari dan telapak, gunakan cermin bila sulit menjangkau, dan laporkan luka sekecil apa pun',
       'Jangan berjalan tanpa alas kaki, dan periksa bagian dalam sepatu sebelum memakainya',
       'BERHENTI MEROKOK — pada ulkus arteri inilah tindakan tunggal dengan dampak terbesar',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; PENYEMBUHAN LUKA MENAIKKAN KEBUTUHAN GIZI sehingga porsi tidak boleh dikurangi. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe, tambahkan buah sumber vitamin C dan makanan sumber zink. Pada penderita diabetes, pengendalian gula darah merupakan bagian dari pengobatan luka — batasi gula sederhana dan makanan berindeks glikemik tinggi. Batasi garam bila ada edema, dan minum 8 gelas air per hari kecuali ada pembatasan cairan. Tidak ada dasar memantang telur maupun ikan pada luka',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; PENYEMBUHAN LUKA MENAIKKAN KEBUTUHAN GIZI sehingga porsi tidak boleh dikurangi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe, tambahkan buah sumber vitamin C dan makanan sumber zink. Pada penderita diabetes, pengendalian gula darah merupakan bagian dari pengobatan luka — batasi gula sederhana dan makanan berindeks glikemik tinggi. Batasi garam bila ada edema, dan minum 8 gelas air per hari kecuali ada pembatasan cairan. Tidak ada dasar memantang telur maupun ikan pada luka',
       'Jam tidur: 7-8 jam per malam dengan jadwal tetap. PADA ULKUS VENA, TINGGIKAN KAKI DENGAN BANTAL SAAT TIDUR sehingga berada di atas ketinggian jantung — ini mengurangi bengkak semalaman dan mempercepat penyembuhan. Sebaliknya PADA ULKUS ARTERI, meninggikan kaki justru menambah nyeri; sebagian pasien tidur dengan kaki menggantung, dan bila demikian hal itu perlu dilaporkan karena menandakan penyakit arteri yang berat',
       'Pola olahraga: pada ULKUS VENA, berjalan justru merupakan bagian pengobatan karena otot betis bekerja sebagai pompa yang mendorong darah kembali ke jantung — targetkan jalan kaki 30 menit sehari dan lakukan gerakan menekuk serta meluruskan pergelangan kaki 10-20 kali setiap jam saat duduk. Hindari BERDIRI DIAM MAUPUN DUDUK BERJUNTAI DALAM WAKTU LAMA, yang justru memperberat. Pada ULKUS ARTERI, program berjalan bertahap sampai timbul nyeri lalu istirahat, diulang beberapa kali, terbukti memperbaiki jarak tempuh — namun harus atas arahan dokter. Pada ULKUS DIABETIK, hindari olahraga yang menumpu pada kaki yang luka; pilih berenang setelah luka menutup, bersepeda statis, maupun latihan tubuh bagian atas',
       'Follow up: kontrol setiap 1-2 minggu untuk perawatan luka dan pengukuran ukuran luka; luka yang tidak mengecil setelah 4 minggu terapi yang benar menuntut peninjauan ulang diagnosis',
@@ -2883,12 +2883,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Benjolan lunak di bawah kulit yang tidak nyeri dan membesar sangat perlahan.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: tersering pada punggung, bahu, leher, lengan, dan paha; dapat pula di tempat lain. Onset: sangat perlahan selama bertahun-tahun, sering baru disadari secara tidak sengaja. Character: benjolan LUNAK SEPERTI KARET, batas tegas, MUDAH DIGERAKKAN terhadap kulit maupun jaringan di bawahnya, dan TIDAK NYERI. Radiation: tidak ada. Associations: umumnya tanpa keluhan lain; nyeri hanya timbul bila menekan saraf maupun pada varian angiolipoma. Time course: PERTANYAAN YANG PALING MENENTUKAN ADALAH KECEPATAN TUMBUHNYA — lipoma membesar sangat lambat dalam hitungan tahun; benjolan yang membesar cepat dalam hitungan minggu sampai bulan bukan gambaran lipoma dan harus ditelusuri sebagai kemungkinan keganasan. Exacerbating: tidak khas. Severity: umumnya hanya masalah kosmetik maupun rasa mengganjal; nilai apakah mengganggu gerakan atau tertekan pakaian.',
-      riwayatPenyakitDahulu: 'History lipoma sebelumnya dan tindakan yang pernah dijalani; riwayat trauma pada lokasi tersebut; obesitas dan dislipidemia.',
+      riwayatPenyakitDahulu: 'Riwayat lipoma sebelumnya dan tindakan yang pernah dijalani; riwayat trauma pada lokasi tersebut; obesitas dan dislipidemia.',
       riwayatPenyakitKeluarga:
         'RIWAYAT BENJOLAN SERUPA PADA KELUARGA — lipomatosis familial diturunkan dan menimbulkan lipoma yang banyak; tanyakan pula riwayat sindrom Gardner yang berkaitan dengan poliposis usus dan meningkatkan risiko kanker usus besar.',
       riwayatPengobatan: 'Obat yang sedang digunakan; kortikosteroid jangka panjang dapat menimbulkan penumpukan lemak yang menyerupai lipoma.',
-      riwayatAlergi: 'History alergi obat, terutama anestesi lokal bila direncanakan tindakan.',
-      riwayatSosialEkonomi: 'Occupation dan aktivitas yang membuat benjolan tergesek maupun tertekan, serta harapan pasien terhadap tindakan.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama anestesi lokal bila direncanakan tindakan.',
+      riwayatSosialEkonomi: 'Pekerjaan dan aktivitas yang membuat benjolan tergesek maupun tertekan, serta harapan pasien terhadap tindakan.',
     },
     pemeriksaanFisik: [
       'Benjolan berbatas tegas, LUNAK SEPERTI KARET, mudah digerakkan, dan tidak nyeri saat ditekan',
@@ -2914,7 +2914,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Lipoma terbentuk dari proliferasi klonal sel lemak matang yang terbungkus kapsul tipis jaringan ikat. Adanya kapsul inilah yang menjelaskan seluruh gambaran khasnya: batas terasa tegas, benjolan mudah digerakkan terhadap jaringan sekitarnya, dan meluncur menjauh saat tepinya ditekan. Karena selnya merupakan sel lemak matang yang tidak berkembang biak dengan cepat, pertumbuhannya sangat lambat dan berlangsung bertahun-tahun — sifat inilah yang menjadikan kecepatan tumbuh sebagai pertanyaan paling menentukan dalam anamnesis, sebab benjolan lemak yang membesar cepat justru menjauhkan diagnosis dari lipoma. Lipoma tumbuh di dalam lapisan lemak subkutan di atas fasia, dan letak superfisial ini juga bermakna: massa lemak yang berada di bawah fasia maupun di dalam otot memiliki kemungkinan keganasan yang jauh lebih tinggi dan menuntut pencitraan sebelum disentuh. Lipoma tidak berubah menjadi ganas — liposarkoma merupakan tumor yang berbeda sejak awal, bukan lipoma yang berkembang — sehingga kekhawatiran bahwa membiarkan lipoma akan membuatnya menjadi kanker tidak berdasar, dan menjelaskan hal ini sering menjadi bagian pengobatan yang paling bernilai.',
     faktorRisiko: [
       'Usia 40-60 tahun sebagai kelompok tersering',
-      'History lipoma pada keluarga dan lipomatosis familial',
+      'Riwayat lipoma pada keluarga dan lipomatosis familial',
       'Obesitas dan dislipidemia',
       'Sindrom Gardner dan sindrom genetik lain yang berkaitan',
       'Trauma pada lokasi tersebut, meskipun hubungannya belum pasti',
@@ -2994,11 +2994,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Anggota keluarga serumah dengan gejala serupa dan berapa lama sebelumnya (menentukan rantai penularan), serta adanya anggota keluarga berisiko tinggi di rumah — bayi kurang dari 6 bulan, ibu hamil, atau lansia dengan penyakit kronik — yang perlu dilindungi.',
       riwayatPengobatan:
         'Obat yang sudah diminum sendiri terutama parasetamol dan obat flu kombinasi yang sering mengandung parasetamol sehingga berisiko dosis ganda, ASPIRIN yang harus ditanyakan khusus pada anak karena berhubungan dengan sindrom Reye, antibiotik yang diminum tanpa indikasi, obat imunosupresan, dan status pengobatan penyakit kronik yang dimiliki.',
-      riwayatAlergi: 'History alergi obat termasuk oseltamivir dan antibiotik, serta riwayat alergi telur terkait vaksinasi influenza.',
+      riwayatAlergi: 'Riwayat alergi obat termasuk oseltamivir dan antibiotik, serta riwayat alergi telur terkait vaksinasi influenza.',
       riwayatKehamilanPersalinan:
         'Status kehamilan dan usia gestasi pada perempuan usia subur — ibu hamil, terutama trimester kedua dan ketiga serta 2 minggu pascapersalinan, merupakan kelompok risiko tinggi komplikasi berat dan menjadi indikasi pemberian antivirus tanpa menunggu konfirmasi laboratorium.',
       riwayatImunisasi:
-        'History VAKSINASI INFLUENZA dan kapan terakhir diberikan — vaksin memerlukan pengulangan setiap tahun karena galur virus berubah; tanyakan juga status vaksinasi pneumokokus pada kelompok risiko tinggi, dan pada anak lengkapi status imunisasi dasar.',
+        'Riwayat VAKSINASI INFLUENZA dan kapan terakhir diberikan — vaksin memerlukan pengulangan setiap tahun karena galur virus berubah; tanyakan juga status vaksinasi pneumokokus pada kelompok risiko tinggi, dan pada anak lengkapi status imunisasi dasar.',
       riwayatNutrisi: 'Asupan makan dan minum selama sakit, serta status gizi sebelumnya — malnutrisi memperberat perjalanan penyakit.',
       riwayatSosialEkonomi:
         'Lingkungan kerja atau sekolah dengan kasus serupa, kepadatan hunian, pekerjaan sebagai tenaga kesehatan atau di peternakan unggas, kebiasaan merokok yang memperberat gejala pernapasan dan risiko komplikasi, serta kemampuan untuk mengisolasi diri di rumah dan mendapat cuti sakit.',
@@ -3178,7 +3178,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Aspirasi': {
     definisi: 'Masuknya material (cairan lambung, makanan, benda asing) ke saluran napas bawah, dapat menyebabkan pneumonitis kimia atau pneumonia aspirasi.',
-    diagnosis: ['History penurunan kesadaran/gangguan menelan, batuk dan sesak mendadak saat/setelah makan; infiltrat pada segmen dependen paru (lobus bawah kanan bila posisi tegak)'],
+    diagnosis: ['Riwayat penurunan kesadaran/gangguan menelan, batuk dan sesak mendadak saat/setelah makan; infiltrat pada segmen dependen paru (lobus bawah kanan bila posisi tegak)'],
     tatalaksana: ['Bebaskan jalan napas dan suction, oksigenasi; antibiotik bila terbukti pneumonia aspirasi (bukan profilaksis rutin pada pneumonitis kimia murni), cegah rekurensi (posisi, evaluasi menelan)'],
     referensi: ['SKDI2012', 'MURRAY2022', 'PPKFKTP2014'],
   },
@@ -3191,11 +3191,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: tentukan saluran mana — napas, cerna, telinga, hidung, mata, atau jaringan lunak. Onset: TANYAKAN APAKAH ADA SAAT TERSEDAK YANG DISAKSIKAN, yaitu batuk hebat mendadak pada anak yang sebelumnya sehat sambil makan kacang maupun bermain benda kecil; peristiwa ini merupakan petunjuk terkuat dan sering satu-satunya. Character: batuk menggonggong, suara serak, mengi sebelah, maupun rasa mengganjal yang menetap. Radiation: nyeri menjalar ke telinga pada benda asing tenggorokan. Associations: TANYAKAN BENDA APA, BERAPA BANYAK, DAN KAPAN — baterai kancing, magnet, benda tajam, dan bahan organik seperti kacang masing-masing berbeda penanganannya; tanyakan air liur yang menetes dan tidak bisa menelan sebagai tanda sumbatan esofagus lengkap. Time course: gejala dapat mereda setelah fase awal sehingga tampak membaik padahal benda masih ada — INI JEBAKAN UTAMA. Exacerbating: makan dan minum memperberat bila esofagus tersumbat. Severity: nilai sesak, kemampuan bicara dan menangis, serta warna kulit.',
       riwayatPenyakitDahulu:
-        'History batuk berulang maupun radang paru berulang di sisi yang sama, yang mengarah pada benda asing lama yang terlewat. Gangguan menelan, penyakit saraf, dan riwayat operasi maupun penyempitan esofagus. History keluar cairan telinga menahun.',
+        'Riwayat batuk berulang maupun radang paru berulang di sisi yang sama, yang mengarah pada benda asing lama yang terlewat. Gangguan menelan, penyakit saraf, dan riwayat operasi maupun penyempitan esofagus. Riwayat keluar cairan telinga menahun.',
       riwayatPenyakitKeluarga: 'Umumnya tidak bermakna langsung.',
       riwayatPengobatan:
         'Tanyakan tindakan yang sudah dilakukan sendiri di rumah — MENGOREK TELINGA MAUPUN HIDUNG DENGAN COTTON BUD, PINSET, ATAU JEPIT RAMBUT justru mendorong benda lebih dalam dan melukai; tanyakan pula pemberian minum maupun upaya memuntahkan.',
-      riwayatAlergi: 'History alergi obat, terutama obat bius lokal dan sedasi bila direncanakan tindakan pengeluaran.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama obat bius lokal dan sedasi bila direncanakan tindakan pengeluaran.',
       riwayatTumbuhKembang:
         'Usia dan tahap perkembangan — puncak kejadian pada anak usia 6 bulan sampai 3 tahun yang memasukkan benda ke mulut sebagai cara mengenal lingkungan; nilai pula keterlambatan perkembangan dan gangguan perilaku yang meningkatkan risiko berulang.',
       riwayatSosialEkonomi:
@@ -3233,7 +3233,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Gangguan menelan, usia lanjut, dan pemakaian gigi palsu',
       'Penyempitan esofagus dan esofagitis eosinofilik pada dewasa muda dengan benda asing makanan berulang',
       'Keracunan alkohol dan penggunaan obat penenang',
-      'Occupation menggerinda, mengelas, dan bertukang tanpa pelindung mata',
+      'Pekerjaan menggerinda, mengelas, dan bertukang tanpa pelindung mata',
       'Kebiasaan mengorek telinga dan hidung dengan benda',
     ],
     goldStandard:
@@ -3386,7 +3386,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Haematothorax': {
     definisi: 'Terkumpulnya darah dalam rongga pleura, umumnya akibat trauma toraks.',
-    diagnosis: ['History trauma, sesak, perkusi redup, suara napas menurun, dapat disertai syok hipovolemik; rontgen toraks menunjukkan perselubungan'],
+    diagnosis: ['Riwayat trauma, sesak, perkusi redup, suara napas menurun, dapat disertai syok hipovolemik; rontgen toraks menunjukkan perselubungan'],
     tatalaksana: ['Pemasangan WSD untuk evakuasi darah dan pemantauan produksi, resusitasi cairan/darah; torakotomi bila drainase awal >1500 mL atau perdarahan berlanjut >200 mL/jam selama 2-4 jam'],
     referensi: ['SKDI2012', 'ATLS2018', 'MURRAY2022'],
   },
@@ -3398,7 +3398,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Pnemokoniasis': {
     definisi: 'Penyakit paru akibat inhalasi debu mineral di tempat kerja (silikosis, asbestosis, coal workers pneumoconiosis).',
-    diagnosis: ['History paparan okupasional bertahun-tahun, sesak progresif, batuk kering; rontgen/HRCT menunjukkan nodul atau fibrosis dengan pola khas sesuai jenis debu'],
+    diagnosis: ['Riwayat paparan okupasional bertahun-tahun, sesak progresif, batuk kering; rontgen/HRCT menunjukkan nodul atau fibrosis dengan pola khas sesuai jenis debu'],
     tatalaksana: ['Tidak ada terapi kuratif — hentikan paparan, terapi suportif dan rehabilitasi paru, skrining TB (silikosis meningkatkan risiko) dan keganasan (asbestosis), pelaporan sebagai penyakit akibat kerja'],
     referensi: ['SKDI2012', 'MURRAY2022', 'HARRISON2022'],
   },
@@ -3532,11 +3532,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Bila terdapat nyeri kepala, telusuri dengan SOCRATES. Site: khas di regio oksipital atau tengkuk. Onset: sering dirasakan saat bangun pagi dan berkurang seiring siang hari. Character: rasa berat atau menekan, bukan berdenyut. Radiation: menjalar ke bahu dan leher. Associations: gali gejala kerusakan organ target — nyeri dada atau sesak saat aktivitas (jantung), pandangan kabur mendadak (retina), kelemahan sesisi atau bicara pelo (serebrovaskular), urin berbusa atau bengkak tungkai (ginjal), serta klaudikasio. Time course: berapa lama tekanan darah diketahui tinggi, hasil pengukuran tertinggi, dan pola pengukuran mandiri di rumah. Exacerbating: konsumsi garam berlebih, stres, kurang tidur, penghentian obat mendadak. Severity: dampak terhadap aktivitas dan kualitas hidup. Wajib tanyakan gejala krisis hipertensi: nyeri kepala hebat mendadak, penurunan kesadaran, kejang, nyeri dada berat, atau sesak napas hebat.',
       riwayatPenyakitDahulu:
-        'History diabetes melitus, dislipidemia, penyakit jantung koroner, stroke atau serangan iskemik sepintas, gagal jantung, penyakit ginjal, gout, dan asma (relevan untuk pemilihan beta-blocker). Pada perempuan tanyakan riwayat preeklampsia yang meningkatkan risiko hipertensi di kemudian hari.',
-      riwayatPenyakitKeluarga: 'History hipertensi, stroke, penyakit jantung koroner dini (laki-laki kurang dari 55 tahun, perempuan kurang dari 65 tahun), diabetes, dan penyakit ginjal pada keluarga.',
+        'Riwayat diabetes melitus, dislipidemia, penyakit jantung koroner, stroke atau serangan iskemik sepintas, gagal jantung, penyakit ginjal, gout, dan asma (relevan untuk pemilihan beta-blocker). Pada perempuan tanyakan riwayat preeklampsia yang meningkatkan risiko hipertensi di kemudian hari.',
+      riwayatPenyakitKeluarga: 'Riwayat hipertensi, stroke, penyakit jantung koroner dini (laki-laki kurang dari 55 tahun, perempuan kurang dari 65 tahun), diabetes, dan penyakit ginjal pada keluarga.',
       riwayatPengobatan:
         'Obat antihipertensi yang pernah dan sedang digunakan beserta dosis, efek samping yang dialami, dan alasan penghentian. Telusuri obat yang MENAIKKAN tekanan darah: obat antiinflamasi nonsteroid, kortikosteroid, dekongestan hidung, pil kontrasepsi kombinasi, eritropoietin, siklosporin, serta jamu dan suplemen yang tidak jelas kandungannya.',
-      riwayatAlergi: 'History alergi obat, termasuk riwayat angioedema akibat penghambat ACE yang menjadi kontraindikasi mutlak golongan tersebut.',
+      riwayatAlergi: 'Riwayat alergi obat, termasuk riwayat angioedema akibat penghambat ACE yang menjadi kontraindikasi mutlak golongan tersebut.',
       riwayatNutrisi:
         'Perkirakan asupan garam harian dari kebiasaan menambah garam di meja makan, konsumsi makanan olahan dan diawetkan, ikan asin, mi instan, dan makanan cepat saji. Tanyakan pula konsumsi buah dan sayur, serta minuman berkafein dan berenergi.',
       riwayatSosialEkonomi:
@@ -3706,7 +3706,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Penyakit jantung reumatik': {
     definisi: 'Kerusakan katup jantung permanen sebagai sekuele demam reumatik akut pasca infeksi Streptococcus grup A; katup mitral tersering terkena.',
-    diagnosis: ['History demam reumatik, murmur jantung (stenosis/regurgitasi mitral), gejala gagal jantung atau fibrilasi atrium; ekokardiografi menilai katup dan derajat keparahan'],
+    diagnosis: ['Riwayat demam reumatik, murmur jantung (stenosis/regurgitasi mitral), gejala gagal jantung atau fibrilasi atrium; ekokardiografi menilai katup dan derajat keparahan'],
     tatalaksana: ['Profilaksis penisilin jangka panjang untuk mencegah serangan berulang, terapi gagal jantung dan aritmia, antikoagulasi bila fibrilasi atrium, intervensi katup (valvuloplasti/penggantian) bila berat'],
     referensi: ['SKDI2012', 'BRAUNWALD2022', 'PAPDI2014'],
   },
@@ -3762,7 +3762,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   // ─── Psikiatri ───────────────────────────────────────────────────────────
   'Intoksikasi akut zat psikoaktif': {
     definisi: 'Kondisi akut akibat konsumsi zat psikoaktif dalam dosis yang menimbulkan gangguan kesadaran, kognisi, persepsi, afek, atau perilaku.',
-    diagnosis: ['History penggunaan zat, gejala sesuai jenis: opioid (pupil pinpoint, depresi napas, kesadaran menurun), stimulan (pupil midriasis, agitasi, hipertensi, takikardia), alkohol (bicara cadel, ataksia); skrining toksikologi urin bila tersedia'],
+    diagnosis: ['Riwayat penggunaan zat, gejala sesuai jenis: opioid (pupil pinpoint, depresi napas, kesadaran menurun), stimulan (pupil midriasis, agitasi, hipertensi, takikardia), alkohol (bicara cadel, ataksia); skrining toksikologi urin bila tersedia'],
     tatalaksana: ['Amankan ABC, monitor tanda vital dan kesadaran; nalokson pada intoksikasi opioid dengan depresi napas, tatalaksana suportif dan lingkungan tenang pada stimulan, tiamin sebelum glukosa pada intoksikasi alkohol; rujuk untuk rehabilitasi setelah fase akut'],
     referensi: ['SKDI2012', 'WHOMHGAP2016', 'KAPLAN2015'],
   },
@@ -3840,15 +3840,15 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES seperti pada keluhan fisik lain — MENELUSURINYA DENGAN SUNGGUH-SUNGGUH MERUPAKAN BAGIAN TERAPI, karena pasien yang merasa keluhannya tidak diperiksa dengan serius akan mencari dokter berikutnya dan memulai lagi seluruh rangkaian pemeriksaan. Site: keluhan dapat berpindah maupun mengenai banyak sistem sekaligus — nyeri, keluhan saluran cerna, jantung berdebar, sesak, kesemutan, dan pusing. Onset: umumnya berlangsung berbulan-bulan sampai bertahun-tahun. Character: uraikan sebagaimana adanya tanpa menyiratkan keraguan. Associations: TANYAKAN TIGA HAL YANG MENENTUKAN DIAGNOSIS — seberapa besar waktu dan tenaga yang tersita untuk memikirkan keluhan ini, seberapa besar kecemasan terhadap kemungkinan penyakit berat, dan seberapa jauh keluhan menghambat pekerjaan serta hubungan. Ketiganya, bukan ada tidaknya kelainan organ, yang menegakkan diagnosis. Time course: hubungkan awal maupun perburukan keluhan dengan peristiwa hidup — kehilangan, konflik keluarga, beban pekerjaan, maupun tekanan yang tidak dapat disuarakan. Exacerbating: stres, kelelahan, dan membaca informasi kesehatan. Severity: nilai hambatan fungsi sehari-hari secara konkret.',
       riwayatPenyakitDahulu:
-        'History penyakit fisik yang benar-benar ada — PENTING KARENA GANGGUAN INI TIDAK MENIADAKAN KEMUNGKINAN PENYAKIT ORGANIK, dan keduanya dapat berjalan bersamaan. History depresi, gangguan cemas, dan gangguan panik yang sangat sering menyertai. RIWAYAT KEKERASAN, PENELANTARAN, MAUPUN PENGALAMAN TRAUMATIK PADA MASA KANAK, ditanyakan dengan sangat hati-hati dan hanya setelah hubungan terbangun.',
+        'Riwayat penyakit fisik yang benar-benar ada — PENTING KARENA GANGGUAN INI TIDAK MENIADAKAN KEMUNGKINAN PENYAKIT ORGANIK, dan keduanya dapat berjalan bersamaan. Riwayat depresi, gangguan cemas, dan gangguan panik yang sangat sering menyertai. RIWAYAT KEKERASAN, PENELANTARAN, MAUPUN PENGALAMAN TRAUMATIK PADA MASA KANAK, ditanyakan dengan sangat hati-hati dan hanya setelah hubungan terbangun.',
       riwayatPenyakitKeluarga:
-        'History gangguan jiwa pada keluarga, serta riwayat penyakit berat maupun kematian dalam keluarga yang menjadi sumber kekhawatiran pasien terhadap keluhannya sendiri.',
+        'Riwayat gangguan jiwa pada keluarga, serta riwayat penyakit berat maupun kematian dalam keluarga yang menjadi sumber kekhawatiran pasien terhadap keluhannya sendiri.',
       riwayatPengobatan:
         'DAFTAR SELURUH PEMERIKSAAN DAN TINDAKAN YANG SUDAH DIJALANI beserta hasilnya — daftar ini penting bukan untuk menunjukkan bahwa pasien berlebihan, melainkan untuk mencegah pengulangan pemeriksaan yang sama dan untuk memperlihatkan bahwa keluhannya sudah ditelusuri dengan sungguh-sungguh. Tanyakan pula obat yang sedang diminum termasuk obat bebas dan jamu, serta ketergantungan pada obat nyeri maupun obat penenang.',
-      riwayatAlergi: 'History alergi obat.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatNutrisi: 'Pola makan dan perubahan berat badan; penurunan berat badan yang bermakna menuntut penelusuran penyakit organik.',
       riwayatSosialEkonomi:
-        'Occupation dan hambatan yang ditimbulkan keluhan, hubungan dengan keluarga dan pasangan, dukungan sosial, beban keuangan akibat berobat berulang, serta APA YANG PASIEN SENDIRI TAKUTKAN mengenai keluhannya — pertanyaan ini sering membuka penyebab kecemasan yang selama ini tidak pernah ditanyakan siapa pun.',
+        'Pekerjaan dan hambatan yang ditimbulkan keluhan, hubungan dengan keluarga dan pasangan, dukungan sosial, beban keuangan akibat berobat berulang, serta APA YANG PASIEN SENDIRI TAKUTKAN mengenai keluhannya — pertanyaan ini sering membuka penyebab kecemasan yang selama ini tidak pernah ditanyakan siapa pun.',
     },
     pemeriksaanFisik: [
       'LAKUKAN PEMERIKSAAN FISIK YANG MENYELURUH DAN SUNGGUH-SUNGGUH pada setiap kunjungan — bukan formalitas. Pemeriksaan yang dikerjakan dengan tenang dan lengkap memiliki nilai terapeutik nyata, dan pemeriksaan yang terburu-buru mengirim pesan bahwa keluhannya tidak dianggap ada',
@@ -3873,9 +3873,9 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Tubuh terus-menerus menghasilkan sinyal — denyut jantung, gerakan usus, ketegangan otot — yang pada keadaan normal disaring dan tidak disadari. Pada gangguan somatoform, penyaringan ini berubah: perhatian terfokus pada sinyal tubuh, ambang untuk menyadarinya menurun, dan sinyal yang biasa ditafsirkan sebagai tanda penyakit. Penafsiran tersebut menimbulkan kecemasan, dan kecemasan mengaktifkan sistem saraf simpatis yang menghasilkan gejala fisik yang nyata — jantung berdebar, otot menegang, gerakan usus berubah, dan napas menjadi pendek. Gejala baru ini kemudian memperkuat keyakinan bahwa ada penyakit, sehingga terbentuk lingkaran yang memberi makan dirinya sendiri. Inilah dasar dari kenyataan yang paling penting dalam menangani gangguan ini: KELUHANNYA BENAR-BENAR ADA SECARA FISIOLOGIS, bukan dibayangkan maupun dibuat-buat — nyeri yang dirasakan sungguh diproses oleh jalur nyeri di otak, dan jantung memang benar-benar berdebar. Mengatakan kepada pasien bahwa keluhannya "tidak ada apa-apa" karena hasil pemeriksaan normal karena itu terasa seperti dituduh berbohong, dan hampir selalu memutus hubungan terapeutik. Pemeriksaan yang diulang-ulang memperberat melalui mekanisme yang sama: setiap pemeriksaan memusatkan kembali perhatian pada tubuh dan menyiratkan bahwa memang ada sesuatu yang dicari.',
     faktorRisiko: [
-      'History kekerasan, penelantaran, maupun trauma pada masa kanak',
+      'Riwayat kekerasan, penelantaran, maupun trauma pada masa kanak',
       'Depresi dan gangguan cemas yang menyertai',
-      'History penyakit berat pada diri sendiri maupun keluarga dekat',
+      'Riwayat penyakit berat pada diri sendiri maupun keluarga dekat',
       'Peristiwa hidup yang menekan dan konflik yang tidak dapat disuarakan',
       'Jenis kelamin perempuan dan tingkat pendidikan yang lebih rendah pada sebagian penelitian',
       'Pengalaman tidak menyenangkan dengan layanan kesehatan sebelumnya',
@@ -3994,7 +3994,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Pica': {
     definisi: 'Konsumsi berulang zat non-nutritif (tanah, kapur, es, rambut) selama minimal 1 bulan dan tidak sesuai tahap perkembangan.',
-    diagnosis: ['History konsumsi bahan non-makanan menetap; skrining defisiensi besi dan zink, kadar timbal bila konsumsi cat/tanah, evaluasi disabilitas intelektual atau kehamilan sebagai konteks'],
+    diagnosis: ['Riwayat konsumsi bahan non-makanan menetap; skrining defisiensi besi dan zink, kadar timbal bila konsumsi cat/tanah, evaluasi disabilitas intelektual atau kehamilan sebagai konteks'],
     tatalaksana: ['Koreksi defisiensi nutrisi (terutama besi), terapi perilaku dan pengawasan lingkungan, atasi komplikasi (obstruksi, keracunan timbal, infeksi parasit)'],
     referensi: ['SKDI2012', 'DSM5TR2022', 'PPKFKTP2014'],
   },
@@ -4123,12 +4123,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan sistemik. Site: keluhan bersifat menyeluruh dan tidak terlokalisasi pada satu organ. Onset: perlahan dalam hitungan bulan; tanyakan pula riwayat sindrom retroviral akut beberapa minggu setelah paparan berupa demam, nyeri tenggorokan, ruam, dan pembesaran kelenjar yang saat itu sering dikira sakit flu biasa. Character: penurunan berat badan yang dikuantifikasi dalam kilogram dan periode waktunya, sariawan yang berulang dan lama sembuh, diare yang berlangsung lebih dari sebulan, keringat malam, dan rasa lelah menahun. Radiation: tidak khas. Associations: TANYAKAN GEJALA YANG MENANDAKAN INFEKSI OPORTUNISTIK karena keberadaannya membuat kasus ini bukan lagi tanpa komplikasi — batuk lebih dari dua minggu dan demam berkeringat malam untuk tuberkulosis, sakit kepala hebat dengan leher kaku dan penurunan kesadaran untuk meningitis kriptokokus maupun toksoplasmosis, sesak dengan batuk kering yang memberat saat beraktivitas untuk pneumonia Pneumocystis, nyeri menelan untuk kandidiasis esofagus, serta gangguan penglihatan untuk retinitis sitomegalovirus. Time course: perjalanan bertahun-tahun tanpa gejala sebelum daya tahan menurun. Exacerbating: infeksi penyerta dan putus obat. Severity: kemampuan bekerja dan beraktivitas sehari-hari.',
       riwayatPenyakitDahulu:
-        'History tuberkulosis dan pengobatannya, herpes zoster pada usia muda, kandidiasis mulut berulang, diare menahun, pneumonia berulang, dan infeksi menular seksual — semuanya merupakan petunjuk penurunan imunitas yang sering mendahului diagnosis. History hepatitis B dan C. History transfusi darah.',
+        'Riwayat tuberkulosis dan pengobatannya, herpes zoster pada usia muda, kandidiasis mulut berulang, diare menahun, pneumonia berulang, dan infeksi menular seksual — semuanya merupakan petunjuk penurunan imunitas yang sering mendahului diagnosis. Riwayat hepatitis B dan C. Riwayat transfusi darah.',
       riwayatPenyakitKeluarga:
-        'Status HIV pasangan dan anak. Pada perempuan, riwayat kehamilan dan status HIV anak yang dilahirkan. History tuberkulosis pada anggota keluarga serumah.',
+        'Status HIV pasangan dan anak. Pada perempuan, riwayat kehamilan dan status HIV anak yang dilahirkan. Riwayat tuberkulosis pada anggota keluarga serumah.',
       riwayatPengobatan:
-        'History terapi antiretroviral sebelumnya termasuk pernah berhenti dan alasannya, karena hal ini menentukan kemungkinan resistensi. Obat lain yang sedang diminum beserta potensi interaksinya dengan antiretroviral, khususnya rifampisin, antikonvulsan, dan obat penurun asam lambung. History profilaksis kotrimoksazol.',
-      riwayatAlergi: 'History alergi obat, terutama kotrimoksazol dan nevirapin yang dapat menimbulkan reaksi kulit berat.',
+        'Riwayat terapi antiretroviral sebelumnya termasuk pernah berhenti dan alasannya, karena hal ini menentukan kemungkinan resistensi. Obat lain yang sedang diminum beserta potensi interaksinya dengan antiretroviral, khususnya rifampisin, antikonvulsan, dan obat penurun asam lambung. Riwayat profilaksis kotrimoksazol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama kotrimoksazol dan nevirapin yang dapat menimbulkan reaksi kulit berat.',
       riwayatKehamilanPersalinan:
         'Status kehamilan dan rencana kehamilan pada perempuan usia subur — terapi antiretroviral pada kehamilan mencegah penularan kepada bayi dan merupakan indikasi mendesak, bukan pilihan.',
       riwayatNutrisi:
@@ -4282,14 +4282,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: BILATERAL — daerah frontal, temporal, oksipital, atau terasa melingkari kepala seperti memakai ikat kepala; berbeda dengan migren yang khas unilateral. Onset: perlahan, tidak mendadak — nyeri kepala yang mencapai puncak dalam hitungan detik (thunderclap) BUKAN tension headache dan wajib dicurigai perdarahan subaraknoid. Character: menekan, mengikat, berat, pegal — TIDAK berdenyut; sifat berdenyut lebih mengarah ke migren. Radiation: sering menjalar ke tengkuk dan bahu karena keterlibatan otot perikranial. Associations: tidak disertai mual dan muntah bermakna, dan menurut ICHD-3 hanya boleh disertai fotofobia ATAU fonofobia — TIDAK KEDUANYA; tidak ada aura; tanyakan gejala penyerta bahaya seperti demam, kaku kuduk, kejang, penurunan kesadaran, kelemahan anggota gerak, gangguan penglihatan, atau penurunan berat badan. Time course: berlangsung 30 menit hingga 7 hari, khas memberat pada sore atau malam hari setelah seharian bekerja, dan berkurang saat akhir pekan atau liburan. Exacerbating: stres psikososial, kurang tidur, posisi kerja statis di depan layar, kelelahan mata, dan melewatkan waktu makan; relieving: istirahat, pijatan pada tengkuk, dan analgesik sederhana. Severity: umumnya ringan-sedang, pasien MASIH DAPAT beraktivitas — bila nyeri sampai membuat pasien harus berbaring di kamar gelap, pertimbangkan migren. Tanyakan pula BERAPA HARI PER BULAN nyeri muncul untuk menentukan bentuk episodik atau kronik.',
       riwayatPenyakitDahulu:
-        'History nyeri kepala serupa sejak kapan, riwayat migren, riwayat trauma kepala, riwayat penyakit sinus atau gigi, gangguan sendi temporomandibular, kelainan refraksi yang tidak terkoreksi, hipertensi, serta riwayat gangguan cemas dan depresi yang sangat sering menyertai.',
+        'Riwayat nyeri kepala serupa sejak kapan, riwayat migren, riwayat trauma kepala, riwayat penyakit sinus atau gigi, gangguan sendi temporomandibular, kelainan refraksi yang tidak terkoreksi, hipertensi, serta riwayat gangguan cemas dan depresi yang sangat sering menyertai.',
       riwayatPenyakitKeluarga:
-        'History nyeri kepala berulang dalam keluarga; riwayat migren pada keluarga meningkatkan kemungkinan diagnosis alternatif.',
+        'Riwayat nyeri kepala berulang dalam keluarga; riwayat migren pada keluarga meningkatkan kemungkinan diagnosis alternatif.',
       riwayatPengobatan:
         'SANGAT PENTING — hitung frekuensi konsumsi analgesik. Penggunaan analgesik sederhana 15 hari atau lebih per bulan, atau kombinasi analgesik/triptan/opioid 10 hari atau lebih per bulan selama lebih dari 3 bulan, menegakkan MEDICATION OVERUSE HEADACHE yang merupakan penyebab tersering nyeri kepala harian kronik dan sering luput ditanyakan. Tanyakan pula obat penenang, konsumsi kafein harian, dan obat tradisional.',
-      riwayatAlergi: 'History alergi obat, terutama NSAID dan parasetamol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama NSAID dan parasetamol.',
       riwayatSosialEkonomi:
-        'Occupation dan postur kerja (lama duduk di depan komputer, posisi leher menunduk), beban kerja dan tekanan pekerjaan, masalah keluarga atau finansial, kualitas dan durasi tidur, kebiasaan merokok, konsumsi kopi dan alkohol, aktivitas fisik, serta dampak nyeri kepala terhadap produktivitas dan jumlah hari tidak masuk kerja.',
+        'Pekerjaan dan postur kerja (lama duduk di depan komputer, posisi leher menunduk), beban kerja dan tekanan pekerjaan, masalah keluarga atau finansial, kualitas dan durasi tidur, kebiasaan merokok, konsumsi kopi dan alkohol, aktivitas fisik, serta dampak nyeri kepala terhadap produktivitas dan jumlah hari tidak masuk kerja.',
     },
     pemeriksaanFisik: [
       'Tanda vital lengkap termasuk TEKANAN DARAH dan SUHU — hipertensi berat dan demam mengarahkan ke penyebab sekunder',
@@ -4387,11 +4387,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: khas UNILATERAL berpindah sisi antar serangan, umumnya frontotemporal; pada anak sering bilateral sehingga tidak menyingkirkan diagnosis. Onset: bertahap dalam menit hingga jam, memuncak perlahan — berbeda dari nyeri kepala hebat yang memuncak dalam hitungan detik yang wajib dicurigai perdarahan subarakhnoid. Character: BERDENYUT atau berdentum seiring denyut nadi. Radiation: menjalar ke belakang mata, rahang, dan leher. Associations: mual dan muntah, fotofobia, fonofobia, osmofobia, serta AURA berupa gangguan penglihatan seperti garis berkelok, kilatan cahaya, atau bintik gelap yang berlangsung 5-60 menit dan REVERSIBEL PENUH sebelum atau saat nyeri dimulai; tanyakan pula gejala prodromal beberapa jam hingga sehari sebelumnya berupa menguap berlebihan, mengidam makanan tertentu, dan perubahan suasana perasaan. Time course: serangan berlangsung 4-72 jam bila tidak diobati; catat FREKUENSI serangan per bulan dan jumlah hari nyeri kepala per bulan karena inilah yang menentukan perlu tidaknya profilaksis. Exacerbating: memberat dengan aktivitas fisik rutin seperti naik tangga sehingga penderita cenderung berbaring di ruang gelap dan tenang; gali pemicu berupa kurang tidur atau tidur berlebihan, telat makan, dehidrasi, stres atau justru saat stres mereda, haid, cahaya terang, bau menyengat, dan makanan tertentu. Severity: dampak terhadap pekerjaan dan sekolah, berapa hari produktivitas hilang per bulan, serta apakah sampai harus berbaring.',
       riwayatPenyakitDahulu:
-        'History nyeri kepala sejak kapan dan apakah polanya BERUBAH belakangan ini (perubahan pola merupakan tanda bahaya), riwayat trauma kepala, kejang, hipertensi, penyakit kardiovaskular dan serebrovaskular yang menjadi pertimbangan sebelum meresepkan triptan, riwayat asma dan penyakit paru yang menjadi pertimbangan sebelum meresepkan propranolol, serta riwayat depresi dan gangguan cemas yang sering menyertai.',
-      riwayatPenyakitKeluarga: 'History migren pada keluarga sangat sering positif dan mendukung diagnosis; tanyakan pula riwayat stroke usia muda dan aneurisma dalam keluarga.',
+        'Riwayat nyeri kepala sejak kapan dan apakah polanya BERUBAH belakangan ini (perubahan pola merupakan tanda bahaya), riwayat trauma kepala, kejang, hipertensi, penyakit kardiovaskular dan serebrovaskular yang menjadi pertimbangan sebelum meresepkan triptan, riwayat asma dan penyakit paru yang menjadi pertimbangan sebelum meresepkan propranolol, serta riwayat depresi dan gangguan cemas yang sering menyertai.',
+      riwayatPenyakitKeluarga: 'Riwayat migren pada keluarga sangat sering positif dan mendukung diagnosis; tanyakan pula riwayat stroke usia muda dan aneurisma dalam keluarga.',
       riwayatPengobatan:
         'Obat yang digunakan saat serangan, dosisnya, dan BERAPA HARI DALAM SEBULAN obat tersebut dikonsumsi — penggunaan analgesik sederhana lebih dari 15 hari per bulan atau triptan dan kombinasi lebih dari 10 hari per bulan menimbulkan MEDICATION OVERUSE HEADACHE yang justru memperberat dan mempersering nyeri kepala. Tanyakan pula penggunaan kontrasepsi hormonal kombinasi yang berkaitan dengan risiko stroke pada migren dengan aura.',
-      riwayatAlergi: 'History alergi obat terutama obat antiinflamasi nonsteroid.',
+      riwayatAlergi: 'Riwayat alergi obat terutama obat antiinflamasi nonsteroid.',
       riwayatKehamilanPersalinan: 'Pada perempuan: hubungan serangan dengan siklus haid (migren menstrual), status kehamilan dan menyusui yang membatasi pilihan obat, serta perubahan pola serangan saat hamil dan menopause.',
       riwayatNutrisi: 'Keteraturan waktu makan (melewatkan makan merupakan pemicu kuat), asupan cairan, konsumsi kopi dan cokelat, keju yang difermentasi, makanan mengandung monosodium glutamat, serta minuman beralkohol terutama anggur merah.',
       riwayatSosialEkonomi: 'Pola dan durasi tidur termasuk kerja giliran malam, beban kerja dan tingkat stres, paparan layar berkepanjangan, kebiasaan merokok, serta dampak penyakit terhadap pekerjaan dan hubungan sosial.',
@@ -4417,7 +4417,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Migren tidak lagi dipahami sebagai sekadar penyempitan dan pelebaran pembuluh darah, melainkan sebagai gangguan otak yang melibatkan sistem trigeminovaskular. Aura disebabkan CORTICAL SPREADING DEPRESSION, yaitu gelombang depolarisasi neuron dan glia yang menjalar perlahan sekitar 3 mm per menit melintasi korteks lalu diikuti penekanan aktivitas listrik — inilah sebabnya gejala aura berkembang bertahap dalam 5-60 menit dan bersifat sementara, berbeda dengan defisit stroke yang muncul mendadak dan menetap. Gelombang ini mengaktifkan ujung saraf trigeminal yang menginervasi pembuluh darah meningeal, memicu pelepasan neuropeptida terutama CALCITONIN GENE-RELATED PEPTIDE (CGRP) serta substansi P, yang menimbulkan vasodilatasi dan inflamasi neurogenik steril pada meningen. Sinyal nyeri diteruskan melalui ganglion trigeminal ke nukleus kaudalis trigeminal di batang otak lalu ke talamus dan korteks. Sensitisasi perifer menjelaskan sifat nyeri yang berdenyut dan memberat dengan aktivitas fisik, sedangkan sensitisasi sentral menjelaskan timbulnya alodinia kulit kepala di mana menyisir rambut pun terasa nyeri. Pemahaman peran CGRP inilah yang melahirkan kelas obat baru berupa antagonis CGRP. Batang otak dan hipotalamus berperan sebagai generator serangan yang menjelaskan gejala prodromal seperti menguap dan mengidam makanan yang muncul jauh sebelum nyeri dimulai.',
     faktorRisiko: [
-      'History migren dalam keluarga',
+      'Riwayat migren dalam keluarga',
       'Jenis kelamin perempuan, dengan rasio sekitar tiga kali lipat dibanding laki-laki setelah pubertas',
       'Usia produktif, puncak insidens pada dekade ketiga dan keempat',
       'Fluktuasi hormonal: haid, kontrasepsi hormonal, dan perimenopause',
@@ -4440,7 +4440,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Transient ischaemic attack — defisit neurologis mendadak tanpa perkembangan bertahap dan tanpa gejala positif seperti kilatan cahaya',
     ],
     pengkajian:
-      'Dipikirkan migren tanpa aura pada pasien ini atas dasar nyeri kepala berulang yang telah berlangsung bertahun-tahun dengan sifat unilateral dan berdenyut, intensitas sedang hingga berat yang memberat bila beraktivitas sehingga pasien memilih berbaring di ruang gelap, disertai mual serta fotofobia dan fonofobia, dengan durasi serangan antara empat hingga tujuh puluh dua jam dan pemeriksaan neurologis yang sepenuhnya normal di antara serangan. History keluarga yang positif serta adanya pemicu yang dapat diidentifikasi seperti kurang tidur, telat makan, dan haid semakin mendukung. Nyeri kepala tipe tegang menjadi pertimbangan utama karena sama-sama merupakan nyeri kepala primer yang berulang, namun sifatnya bilateral seperti diikat dengan intensitas yang lebih ringan, TIDAK memberat dengan aktivitas fisik, dan tidak disertai mual yang bermakna — ketiga perbedaan inilah yang secara praktis memisahkan keduanya di layanan primer. Nyeri kepala klaster dipertimbangkan bila nyeri sangat hebat di sekitar mata dengan gejala otonom ipsilateral berupa mata merah berair dan hidung tersumbat, namun durasinya jauh lebih singkat dan penderita justru gelisah mondar-mandir, bukan berbaring diam seperti pada migren. Yang paling penting dan tidak boleh dilewatkan adalah menyingkirkan NYERI KEPALA SEKUNDER melalui pencarian tanda bahaya: perdarahan subarakhnoid ditandai nyeri hebat mendadak yang memuncak dalam hitungan detik disertai kaku kuduk; meningitis ditandai demam dengan rangsang meningeal; arteritis sel raksasa dicurigai pada pasien di atas lima puluh tahun dengan nyeri temporal dan klaudikasio rahang yang bila terlambat berujung kebutaan; sedangkan lesi desak ruang ditandai nyeri progresif yang memberat pagi hari atau saat mengejan disertai papiledema dan defisit neurologis. Karena pada pasien ini tidak dijumpai satu pun tanda bahaya dan pemeriksaan neurologis normal, pencitraan kepala tidak diperlukan. Satu hal yang wajib ditelusuri sebelum menyusun rencana terapi adalah JUMLAH HARI PENGGUNAAN ANALGESIK PER BULAN, sebab pemakaian berlebihan dapat mengubah migren episodik menjadi nyeri kepala harian akibat medication overuse — pada keadaan tersebut menambah dosis analgesik justru memperburuk, dan yang diperlukan adalah penghentian obat penyebab disertai pemberian profilaksis.',
+      'Dipikirkan migren tanpa aura pada pasien ini atas dasar nyeri kepala berulang yang telah berlangsung bertahun-tahun dengan sifat unilateral dan berdenyut, intensitas sedang hingga berat yang memberat bila beraktivitas sehingga pasien memilih berbaring di ruang gelap, disertai mual serta fotofobia dan fonofobia, dengan durasi serangan antara empat hingga tujuh puluh dua jam dan pemeriksaan neurologis yang sepenuhnya normal di antara serangan. Riwayat keluarga yang positif serta adanya pemicu yang dapat diidentifikasi seperti kurang tidur, telat makan, dan haid semakin mendukung. Nyeri kepala tipe tegang menjadi pertimbangan utama karena sama-sama merupakan nyeri kepala primer yang berulang, namun sifatnya bilateral seperti diikat dengan intensitas yang lebih ringan, TIDAK memberat dengan aktivitas fisik, dan tidak disertai mual yang bermakna — ketiga perbedaan inilah yang secara praktis memisahkan keduanya di layanan primer. Nyeri kepala klaster dipertimbangkan bila nyeri sangat hebat di sekitar mata dengan gejala otonom ipsilateral berupa mata merah berair dan hidung tersumbat, namun durasinya jauh lebih singkat dan penderita justru gelisah mondar-mandir, bukan berbaring diam seperti pada migren. Yang paling penting dan tidak boleh dilewatkan adalah menyingkirkan NYERI KEPALA SEKUNDER melalui pencarian tanda bahaya: perdarahan subarakhnoid ditandai nyeri hebat mendadak yang memuncak dalam hitungan detik disertai kaku kuduk; meningitis ditandai demam dengan rangsang meningeal; arteritis sel raksasa dicurigai pada pasien di atas lima puluh tahun dengan nyeri temporal dan klaudikasio rahang yang bila terlambat berujung kebutaan; sedangkan lesi desak ruang ditandai nyeri progresif yang memberat pagi hari atau saat mengejan disertai papiledema dan defisit neurologis. Karena pada pasien ini tidak dijumpai satu pun tanda bahaya dan pemeriksaan neurologis normal, pencitraan kepala tidak diperlukan. Satu hal yang wajib ditelusuri sebelum menyusun rencana terapi adalah JUMLAH HARI PENGGUNAAN ANALGESIK PER BULAN, sebab pemakaian berlebihan dapat mengubah migren episodik menjadi nyeri kepala harian akibat medication overuse — pada keadaan tersebut menambah dosis analgesik justru memperburuk, dan yang diperlukan adalah penghentian obat penyebab disertai pemberian profilaksis.',
     terapiSuportif: [
       'Saat serangan: istirahat di ruang gelap, tenang, dan sejuk; kompres dingin pada dahi atau pelipis',
       'Hidrasi adekuat, terutama bila disertai muntah — berikan cairan intravena pada serangan berat dengan muntah persisten (status migrainosus)',
@@ -4523,16 +4523,16 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: seluruh separuh wajah pada SATU sisi — dahi, kelopak mata, pipi, dan sudut mulut; pastikan dengan meminta pasien mengangkat alis, karena keterlibatan dahi merupakan pemisah kunci antara lesi perifer dan sentral. Onset: AKUT, memberat dalam hitungan jam hingga maksimal 72 jam; kelemahan wajah yang memberat PERLAHAN selama berminggu-minggu justru mengarah ke tumor dan bukan Bell palsy. Character: kelemahan motorik murni tanpa nyeri hebat, meski nyeri tumpul di belakang telinga sering mendahului kelumpuhan 1-2 hari. Radiation: tidak menjalar; kelemahan pada anggota gerak sisi yang sama menandakan lesi sentral. Associations: mata tidak dapat menutup rapat sehingga terasa perih dan berair, air atau makanan bocor dari sudut mulut, makanan terselip di antara pipi dan gusi, gangguan pengecapan pada dua pertiga anterior lidah, HIPERAKUSIS yaitu suara terdengar terlalu keras dan mengganggu akibat kelumpuhan otot stapedius, serta berkurangnya produksi air mata pada sisi yang lumpuh. Tanyakan khusus adanya VESIKEL NYERI di liang telinga, daun telinga, atau langit-langit mulut yang menandakan sindrom Ramsay Hunt, serta gangguan pendengaran dan pusing berputar. Time course: menetap sejak awitan; perbaikan umumnya mulai tampak dalam 3 minggu. Exacerbating dan relieving: tidak ada faktor yang jelas. Severity: nilai dengan derajat House-Brackmann dan dampaknya terhadap makan, bicara, dan kepercayaan diri pasien.',
       riwayatPenyakitDahulu:
-        'History Bell palsy sebelumnya dan pada sisi mana (rekurensi menuntut evaluasi lebih dalam), DIABETES MELITUS dan HIPERTENSI sebagai faktor risiko sekaligus penentu prognosis, kehamilan terutama trimester ketiga dan minggu pertama pascapersalinan, riwayat infeksi virus atau infeksi saluran napas atas dalam 2 minggu terakhir, riwayat otitis media akut maupun kronik, riwayat trauma kepala atau fraktur os temporal, riwayat operasi telinga dan parotis, riwayat gigitan caplak atau bepergian ke daerah endemis penyakit Lyme, serta riwayat HIV, sarkoidosis, dan keganasan.',
+        'Riwayat Bell palsy sebelumnya dan pada sisi mana (rekurensi menuntut evaluasi lebih dalam), DIABETES MELITUS dan HIPERTENSI sebagai faktor risiko sekaligus penentu prognosis, kehamilan terutama trimester ketiga dan minggu pertama pascapersalinan, riwayat infeksi virus atau infeksi saluran napas atas dalam 2 minggu terakhir, riwayat otitis media akut maupun kronik, riwayat trauma kepala atau fraktur os temporal, riwayat operasi telinga dan parotis, riwayat gigitan caplak atau bepergian ke daerah endemis penyakit Lyme, serta riwayat HIV, sarkoidosis, dan keganasan.',
       riwayatPenyakitKeluarga:
-        'History Bell palsy dalam keluarga (terdapat kecenderungan familial pada sebagian kecil kasus), riwayat diabetes melitus dan hipertensi.',
+        'Riwayat Bell palsy dalam keluarga (terdapat kecenderungan familial pada sebagian kecil kasus), riwayat diabetes melitus dan hipertensi.',
       riwayatPengobatan:
         'Obat yang sedang dikonsumsi, riwayat penggunaan kortikosteroid sebelumnya, dan obat yang memengaruhi kontrol gula darah — penting karena kortikosteroid dosis tinggi akan menaikkan gula darah pada penyandang diabetes.',
-      riwayatAlergi: 'History alergi obat terutama kortikosteroid dan antivirus.',
+      riwayatAlergi: 'Riwayat alergi obat terutama kortikosteroid dan antivirus.',
       riwayatKehamilanPersalinan:
         'Pada pasien perempuan usia subur: status kehamilan dan usia gestasi, karena Bell palsy tiga kali lebih sering pada kehamilan trimester ketiga dan awal masa nifas; status ini juga memengaruhi pilihan obat.',
       riwayatSosialEkonomi:
-        'Occupation yang menuntut penampilan atau komunikasi, paparan angin dingin atau AC langsung ke wajah (sering diyakini pasien sebagai penyebab meski bukti ilmiahnya lemah), dampak psikologis dan sosial akibat perubahan wajah, serta kemampuan mengakses fisioterapi dan kontrol berkala.',
+        'Pekerjaan yang menuntut penampilan atau komunikasi, paparan angin dingin atau AC langsung ke wajah (sering diyakini pasien sebagai penyebab meski bukti ilmiahnya lemah), dampak psikologis dan sosial akibat perubahan wajah, serta kemampuan mengakses fisioterapi dan kontrol berkala.',
     },
     pemeriksaanFisik: [
       'Tanda vital termasuk tekanan darah dan gula darah sewaktu bila tersedia',
@@ -4566,10 +4566,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kehamilan trimester ketiga dan minggu pertama pascapersalinan (risiko sekitar tiga kali lipat)',
       'Hipertensi',
       'Infeksi saluran napas atas dalam 2 minggu sebelumnya',
-      'History Bell palsy sebelumnya',
+      'Riwayat Bell palsy sebelumnya',
       'Obesitas dan preeklamsia',
       'Imunokompromais',
-      'History keluarga dengan Bell palsy',
+      'Riwayat keluarga dengan Bell palsy',
     ],
     goldStandard:
       'Tidak ada baku emas laboratoris maupun radiologis. Diagnosis ditegakkan secara KLINIS sebagai DIAGNOSIS EKSKLUSI dengan syarat: (1) kelemahan fasialis PERIFER unilateral yang melibatkan dahi, (2) onset akut memburuk dalam waktu kurang dari 72 jam, (3) tidak ditemukan penyebab lain pada anamnesis dan pemeriksaan fisik — khususnya tidak ada vesikel herpes, tidak ada kelainan telinga, tidak ada massa parotis, tidak ada trauma, dan tidak ada keterlibatan saraf kranial lain maupun defisit neurologis lain. Elektroneuronografi berperan sebagai penentu PROGNOSIS pada kelumpuhan komplet, bukan sebagai penegak diagnosis.',
@@ -4658,14 +4658,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: sensasi berputar yang dirasakan pada kepala atau lingkungan sekitar tampak berputar — bedakan dengan tegas dari rasa melayang, rasa mau pingsan, atau tidak seimbang saat berjalan, karena ketiganya menunjuk ke penyebab yang berbeda. Onset: MENDADAK dan selalu DIPICU PERUBAHAN POSISI KEPALA — berguling di tempat tidur (pemicu paling khas), bangun dari berbaring, berbaring dari duduk, menengadah untuk mengambil barang di rak tinggi, atau menunduk mengikat tali sepatu. Character: berputar sejati (true vertigo), sering disertai mual dan kadang muntah. Radiation: tidak ada. Associations: yang paling menentukan adalah TIDAK ADA gangguan pendengaran, TIDAK ADA telinga berdenging, dan TIDAK ADA rasa penuh di telinga — adanya gejala koklea mengarahkan ke penyakit Meniere; tanyakan pula gejala neurologis berupa pandangan ganda, kesulitan menelan, bicara pelo, baal separuh wajah atau tubuh, kelemahan anggota gerak, dan nyeri kepala hebat yang semuanya mengarah ke vertigo SENTRAL. Time course: setiap serangan berlangsung SANGAT SINGKAT, umumnya kurang dari 1 menit (khas 10-30 detik), lalu mereda spontan bila kepala dipertahankan diam; serangan berulang beberapa kali sehari selama berhari-hari hingga berminggu-minggu, dan sering muncul berkelompok lalu menghilang sendiri. Exacerbating: gerakan kepala pada bidang tertentu; relieving: diam tidak menggerakkan kepala. Severity: nilai dampaknya terhadap rasa takut bergerak, risiko jatuh, kemampuan mengemudi dan bekerja, serta apakah pasien sampai tidur setengah duduk untuk menghindari serangan.',
       riwayatPenyakitDahulu:
-        'History TRAUMA KEPALA meski ringan (penyebab BPPV sekunder tersering pada usia muda), riwayat neuritis vestibularis atau labirinitis sebelumnya, penyakit Meniere, migren vestibular, operasi telinga, tirah baring lama atau imobilisasi berkepanjangan, OSTEOPOROSIS dan defisiensi vitamin D yang berkaitan dengan metabolisme otokonia, diabetes melitus, hipertensi, dislipidemia, dan riwayat stroke atau serangan iskemik transien.',
+        'Riwayat TRAUMA KEPALA meski ringan (penyebab BPPV sekunder tersering pada usia muda), riwayat neuritis vestibularis atau labirinitis sebelumnya, penyakit Meniere, migren vestibular, operasi telinga, tirah baring lama atau imobilisasi berkepanjangan, OSTEOPOROSIS dan defisiensi vitamin D yang berkaitan dengan metabolisme otokonia, diabetes melitus, hipertensi, dislipidemia, dan riwayat stroke atau serangan iskemik transien.',
       riwayatPenyakitKeluarga:
-        'History vertigo berulang dalam keluarga, riwayat migren, serta riwayat stroke dan penyakit kardiovaskular dini.',
+        'Riwayat vertigo berulang dalam keluarga, riwayat migren, serta riwayat stroke dan penyakit kardiovaskular dini.',
       riwayatPengobatan:
         'Penggunaan obat vestibular supresan seperti betahistin, dimenhidrinat, atau flunarizin dan sudah berapa lama — penggunaan jangka panjang justru MENGHAMBAT kompensasi sentral dan memperpanjang keluhan; tanyakan pula obat ototoksik (aminoglikosida, furosemid dosis tinggi, sisplatin), antihipertensi yang dapat menimbulkan hipotensi ortostatik, sedatif, dan antidepresan.',
-      riwayatAlergi: 'History alergi obat.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatSosialEkonomi:
-        'Occupation yang berisiko bila terjadi serangan mendadak seperti mengemudi, bekerja di ketinggian, atau mengoperasikan mesin; kondisi rumah terkait risiko jatuh terutama pada usia lanjut (penerangan, kamar mandi licin, tangga, karpet lepas); status tinggal sendiri atau bersama keluarga; serta dampak terhadap kemandirian dan produktivitas.',
+        'Pekerjaan yang berisiko bila terjadi serangan mendadak seperti mengemudi, bekerja di ketinggian, atau mengoperasikan mesin; kondisi rumah terkait risiko jatuh terutama pada usia lanjut (penerangan, kamar mandi licin, tangga, karpet lepas); status tinggal sendiri atau bersama keluarga; serta dampak terhadap kemandirian dan produktivitas.',
     },
     pemeriksaanFisik: [
       'Tanda vital, termasuk pengukuran tekanan darah BERBARING dan BERDIRI untuk menyingkirkan hipotensi ortostatik yang sering disalahartikan sebagai vertigo',
@@ -4694,13 +4694,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Usia lanjut — puncak insidens pada dekade kelima hingga ketujuh',
       'Jenis kelamin perempuan (sekitar dua kali lipat)',
-      'History trauma kepala, termasuk trauma ringan',
-      'History gangguan vestibular lain: neuritis vestibularis, labirinitis, penyakit Meniere',
+      'Riwayat trauma kepala, termasuk trauma ringan',
+      'Riwayat gangguan vestibular lain: neuritis vestibularis, labirinitis, penyakit Meniere',
       'Migren',
       'Osteoporosis, osteopenia, dan defisiensi vitamin D',
       'Tirah baring lama dan imobilisasi',
       'Diabetes melitus, hipertensi, dan dislipidemia',
-      'History operasi telinga atau prosedur gigi yang lama dengan posisi kepala tengadah',
+      'Riwayat operasi telinga atau prosedur gigi yang lama dengan posisi kepala tengadah',
     ],
     goldStandard:
       'Baku emas diagnosis adalah MANUVER POSISIONAL yang memicu vertigo disertai nistagmus dengan karakteristik khas: manuver DIX-HALLPIKE untuk kanalis posterior dan anterior, serta UJI SUPINE ROLL untuk kanalis horizontal. Diagnosis BPPV kanalis posterior ditegakkan bila manuver Dix-Hallpike menimbulkan vertigo disertai nistagmus torsional-upbeat dengan latensi 1-5 detik, durasi kurang dari 1 menit, dan bersifat fatigable, pada pasien yang pendengarannya normal dan pemeriksaan neurologisnya tidak menunjukkan kelainan. Tidak ada pemeriksaan laboratorium maupun pencitraan yang dapat menegakkan diagnosis ini.',
@@ -4861,7 +4861,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Hematom epidural': {
     definisi: 'Perdarahan antara duramater dan tulang tengkorak, umumnya arterial (a. meningea media) akibat fraktur temporal.',
-    diagnosis: ['History trauma kepala dengan lucid interval klasik (sadar sesaat lalu menurun cepat), pupil anisokor ipsilateral dan hemiparesis kontralateral bila herniasi; CT menunjukkan lesi hiperdens bikonveks (lentikular) yang tidak melewati sutura'],
+    diagnosis: ['Riwayat trauma kepala dengan lucid interval klasik (sadar sesaat lalu menurun cepat), pupil anisokor ipsilateral dan hemiparesis kontralateral bila herniasi; CT menunjukkan lesi hiperdens bikonveks (lentikular) yang tidak melewati sutura'],
     tatalaksana: ['Evakuasi bedah darurat (kraniotomi) — prognosis sangat baik bila cepat ditangani sebelum kerusakan sekunder; kontrol tekanan intrakranial, hindari hipotensi dan hipoksia sambil menunggu operasi'],
     referensi: ['SKDI2012', 'ATLS2018', 'ADAMS2019'],
   },
@@ -4965,12 +4965,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: sebaran bercak pada lidah, mukosa pipi, langit-langit, dan gusi; tanyakan pula apakah terasa sampai ke tenggorokan. Onset: perlahan dalam beberapa hari; pada bayi sering muncul pada minggu-minggu pertama kehidupan. Character: bercak putih seperti sisa susu yang DAPAT DIKEROK dan meninggalkan dasar kemerahan yang mudah berdarah — sifat dapat dikerok inilah pembeda utamanya; bentuk lain berupa kemerahan tanpa bercak putih dengan lidah terasa perih dan licin. Radiation: perluasan ke sudut bibir berupa keilitis angularis. Associations: PERTANYAAN YANG PALING MENENTUKAN ADALAH NYERI SAAT MENELAN dan rasa makanan tersangkut di dada — keluhan ini menandakan kandidiasis esofagus yang bukan lagi infeksi ringan dan merupakan penanda penurunan imunitas berat. Tanyakan pula rasa terbakar di mulut, perubahan rasa, dan berkurangnya nafsu makan. Time course: berulang atau menetap meski diobati mengarahkan pada faktor predisposisi yang belum diatasi. Exacerbating: makanan pedas, asam, dan panas. Severity: gangguan makan dan minum, penurunan berat badan, dan pada bayi penolakan menyusu yang berisiko dehidrasi.',
       riwayatPenyakitDahulu:
-        'Diabetes melitus yang sering baru terdiagnosis lewat keluhan ini, infeksi HIV, keganasan, dan keadaan imunitas menurun lainnya. History kandidiasis berulang. Mulut kering akibat sindrom Sjogren maupun radioterapi kepala dan leher. Pada bayi, riwayat prematur dan berat lahir rendah.',
+        'Diabetes melitus yang sering baru terdiagnosis lewat keluhan ini, infeksi HIV, keganasan, dan keadaan imunitas menurun lainnya. Riwayat kandidiasis berulang. Mulut kering akibat sindrom Sjogren maupun radioterapi kepala dan leher. Pada bayi, riwayat prematur dan berat lahir rendah.',
       riwayatPenyakitKeluarga:
         'Pada bayi yang menyusu, tanyakan apakah ibu mengalami nyeri pada puting yang menusuk dan menetap setelah menyusui — kandidiasis puting dan kandidiasis mulut bayi harus diobati bersamaan, sebab mengobati salah satunya saja berarti keduanya akan saling menularkan kembali.',
       riwayatPengobatan:
         'KORTIKOSTEROID HIRUP pada penderita asma dan penyakit paru obstruktif kronik merupakan penyebab yang sangat sering dan mudah terlewat, terutama bila pasien tidak berkumur setelah memakainya. Tanyakan pula antibiotik spektrum luas dalam waktu dekat, kortikosteroid sistemik, obat imunosupresan, kemoterapi, dan obat yang menyebabkan mulut kering.',
-      riwayatAlergi: 'History alergi obat, terutama antijamur golongan azol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antijamur golongan azol.',
       riwayatNutrisi:
         'Asupan makan dan minum yang berkurang akibat nyeri, kekurangan zat besi, asam folat, dan vitamin B12, serta pada bayi cara pemberian minum dan kebersihan botol maupun dot.',
       riwayatSosialEkonomi:
@@ -5078,12 +5078,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: PEMBEDA ANATOMIS YANG PENTING — aftosa mengenai mukosa yang TIDAK berkeratin yaitu bagian dalam pipi, bibir bagian dalam, dasar lidah, dan langit-langit lunak; sedangkan herpes rekuren mengenai mukosa yang BERKERATIN dan MELEKAT PADA TULANG yaitu gusi dan langit-langit keras, serta tepi bibir bagian luar. Onset: aftosa didahului rasa terbakar 1-2 hari sebelum luka muncul; herpes primer pada anak didahului demam tinggi, lemas, dan gusi yang membengkak. Character: aftosa berupa ulkus bulat maupun lonjong dengan dasar keputihan atau kekuningan dikelilingi tepi kemerahan yang tegas, umumnya satu sampai beberapa; herpes berupa VESIKEL BERKELOMPOK yang cepat pecah menjadi erosi kecil-kecil yang menyatu. Radiation: nyeri menjalar saat mengunyah dan menelan. Associations: TANYAKAN DEMAM DAN PEMBESARAN KELENJAR — herpes primer disertai demam tinggi dan kelenjar leher membesar, sedangkan aftosa umumnya tanpa demam. Tanyakan pula sariawan berulang disertai luka pada kelamin dan gangguan mata yang mengarah pada sindrom Behcet, serta nyeri sendi dan diare yang mengarah pada penyakit sistemik. Time course: aftosa sembuh dalam 7-14 hari dan berulang; herpes rekuren sembuh dalam 7-10 hari di lokasi yang sama. Exacerbating: makanan asam, pedas, panas, dan keras; trauma akibat tergigit dan sikat gigi; stres dan haid. Severity: nilai kemampuan makan dan minum, terutama pada anak yang berisiko dehidrasi.',
       riwayatPenyakitDahulu:
-        'Frekuensi kekambuhan sariawan per tahun; riwayat anemia, penyakit saluran cerna seperti seliak dan penyakit radang usus, infeksi HIV, dan keganasan. History sariawan yang timbul setelah minum obat tertentu.',
+        'Frekuensi kekambuhan sariawan per tahun; riwayat anemia, penyakit saluran cerna seperti seliak dan penyakit radang usus, infeksi HIV, dan keganasan. Riwayat sariawan yang timbul setelah minum obat tertentu.',
       riwayatPenyakitKeluarga:
-        'History sariawan berulang pada keluarga yang lazim pada aftosa; riwayat penyakit seliak, penyakit radang usus, dan sindrom Behcet.',
+        'Riwayat sariawan berulang pada keluarga yang lazim pada aftosa; riwayat penyakit seliak, penyakit radang usus, dan sindrom Behcet.',
       riwayatPengobatan:
         'Obat yang dapat menimbulkan ulkus mulut seperti obat antiinflamasi nonsteroid, nikorandil, metotreksat, dan kemoterapi; obat kumur yang sudah dipakai; serta obat imunosupresan.',
-      riwayatAlergi: 'History alergi obat, serta riwayat sariawan setelah makanan tertentu maupun pasta gigi yang mengandung sodium lauryl sulfate.',
+      riwayatAlergi: 'Riwayat alergi obat, serta riwayat sariawan setelah makanan tertentu maupun pasta gigi yang mengandung sodium lauryl sulfate.',
       riwayatNutrisi:
         'Asupan makan dan minum selama sakit; telusuri kemungkinan KEKURANGAN BESI, ASAM FOLAT, DAN VITAMIN B12 yang merupakan penyebab sariawan berulang yang sering terlewat, serta kekurangan zink.',
       riwayatSosialEkonomi:
@@ -5114,7 +5114,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Pada stomatitis aftosa rekuren, terjadi reaksi imun seluler setempat terhadap mukosa mulut sendiri yang dipicu oleh berbagai faktor; limfosit T menyerang epitel mukosa sehingga terbentuk ulkus dengan dasar fibrin dan tepi peradangan yang tegas. Karena bukan infeksi, penyakit ini TIDAK MENULAR sama sekali — hal yang perlu ditegaskan karena kekeliruan ini sangat lazim dan menimbulkan pengucilan yang tidak perlu. Aftosa hanya mengenai mukosa yang tidak berkeratin karena lapisan tersebut lebih tipis dan lebih mudah rusak. Sebaliknya, virus herpes simpleks yang menetap laten di ganglion trigeminal bereaktivasi dan berjalan turun melalui akson menuju mukosa yang berkeratin dan melekat pada tulang, yaitu gusi dan langit-langit keras; virus menimbulkan degenerasi balon sel epitel sehingga terbentuk vesikel berkelompok yang cepat pecah di dalam mulut yang basah dan menyatu menjadi erosi. Perbedaan lokasi ini bukan kebetulan melainkan mencerminkan mekanisme yang berbeda — aftosa berasal dari mukosa itu sendiri sedangkan herpes datang melalui saraf — dan justru karena itulah keterlibatan gusi menjadi pembeda yang paling dapat diandalkan. Kekurangan besi, asam folat, dan vitamin B12 mengganggu pembaruan sel epitel mulut yang berlangsung sangat cepat, sehingga mukosa menjadi rapuh dan mudah membentuk ulkus — dasar mengapa memeriksa dan mengoreksi kekurangan ini dapat menghentikan sariawan yang berulang bertahun-tahun.',
     faktorRisiko: [
-      'History sariawan berulang pada keluarga',
+      'Riwayat sariawan berulang pada keluarga',
       'Trauma pada mukosa akibat tergigit, sikat gigi keras, kawat gigi, dan gigi palsu yang tidak pas',
       'Stres dan kurang tidur',
       'Perubahan hormon dan siklus haid',
@@ -5213,12 +5213,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: pembengkakan berpusat di depan dan di bawah daun telinga; TANDA KHAS ADALAH DAUN TELINGA TERANGKAT DAN TERDORONG KE LUAR serta hilangnya lekukan sudut rahang — inilah yang membedakannya dari pembesaran kelenjar getah bening leher yang letaknya lebih ke bawah dan tidak mengangkat daun telinga. Onset: pada gondongan didahului demam, nyeri kepala, dan lemas selama 1-2 hari, lalu pembengkakan muncul dan memuncak dalam 1-3 hari. Character: nyeri tumpul yang bertambah saat mengunyah dan saat makan makanan asam; pada parotitis bakteri nyeri jauh lebih hebat dengan kulit di atasnya merah dan panas. Radiation: nyeri menjalar ke telinga dan rahang. Associations: TANYAKAN KETERLIBATAN ORGAN LAIN pada gondongan — nyeri dan bengkak pada buah zakar pada laki-laki pascapubertas, nyeri perut yang menandakan pankreatitis, nyeri kepala hebat dengan leher kaku yang menandakan meningitis, serta gangguan pendengaran. Time course: gondongan mereda dalam 7-10 hari; parotitis bakteri memburuk cepat dengan demam tinggi. Exacerbating: mengunyah, membuka mulut, dan makanan asam. Severity: kemampuan makan dan minum serta tanda dehidrasi.',
       riwayatPenyakitDahulu:
-        'History gondongan sebelumnya, karena infeksi alami memberi kekebalan seumur hidup sehingga riwayat yang jelas membuat diagnosis gondongan menjadi kurang mungkin. History batu kelenjar liur, mulut kering, sindrom Sjogren, diabetes melitus, keadaan imunitas menurun, dan riwayat radioterapi kepala dan leher.',
+        'Riwayat gondongan sebelumnya, karena infeksi alami memberi kekebalan seumur hidup sehingga riwayat yang jelas membuat diagnosis gondongan menjadi kurang mungkin. Riwayat batu kelenjar liur, mulut kering, sindrom Sjogren, diabetes melitus, keadaan imunitas menurun, dan riwayat radioterapi kepala dan leher.',
       riwayatPenyakitKeluarga:
         'ADANYA TEMAN SEKOLAH ATAU ANGGOTA KELUARGA DENGAN KELUHAN SERUPA DALAM 2-3 MINGGU TERAKHIR sangat mendukung gondongan, mengingat masa inkubasinya sekitar 16-18 hari.',
       riwayatPengobatan:
-        'Obat yang menyebabkan mulut kering seperti antikolinergik, antihistamin, dan antidepresan, yang mempermudah parotitis bakteri. History antibiotik yang sudah diminum.',
-      riwayatAlergi: 'History alergi obat.',
+        'Obat yang menyebabkan mulut kering seperti antikolinergik, antihistamin, dan antidepresan, yang mempermudah parotitis bakteri. Riwayat antibiotik yang sudah diminum.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatImunisasi:
         'STATUS IMUNISASI MMR MERUPAKAN PERTANYAAN YANG PALING MENENTUKAN — anak yang sudah mendapat dua dosis sangat kecil kemungkinannya menderita gondongan, sehingga penyebab lain harus lebih dipikirkan.',
       riwayatNutrisi:
@@ -5348,7 +5348,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Lesi korosif pada esofagus': {
     definisi: 'Kerusakan esofagus akibat menelan zat korosif (asam kuat atau basa kuat), dapat menyebabkan perforasi akut dan striktur kronik.',
-    diagnosis: ['History menelan zat korosif, nyeri menelan hebat, air liur berlebih, luka bakar di bibir/mulut; endoskopi dini (12-24 jam) untuk menilai derajat — hindari setelah 48 jam karena risiko perforasi'],
+    diagnosis: ['Riwayat menelan zat korosif, nyeri menelan hebat, air liur berlebih, luka bakar di bibir/mulut; endoskopi dini (12-24 jam) untuk menilai derajat — hindari setelah 48 jam karena risiko perforasi'],
     tatalaksana: ['JANGAN merangsang muntah, JANGAN memasang NGT buta, JANGAN memberi zat penetral (reaksi eksotermik memperberat); puasa, cairan IV, analgesia, PPI; rujuk untuk endoskopi dan pemantauan striktur jangka panjang'],
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
   },
@@ -5389,10 +5389,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Pusar bayi merah, bengkak, bernanah, dan berbau.',
       riwayatPenyakitSekarang:
         'Telusuri melalui keterangan pengasuh. Site: pangkal tali pusat dan kulit di sekitarnya; NILAI SEBERAPA JAUH KEMERAHAN MELUAS DARI PANGKAL TALI PUSAT — perluasan lebih dari 2 sentimeter ke dinding perut mengubah kasus dari ringan menjadi berat. Onset: umumnya pada minggu pertama kehidupan. Character: kemerahan, bengkak, keluar nanah, dan bau tidak sedap; perdarahan dari tali pusat perlu ditanyakan tersendiri. Radiation: kemerahan menjalar ke dinding perut, terutama ke arah atas mengikuti pembuluh darah pusat. Associations: TANYAKAN TANDA SEPSIS PADA BAYI, YANG SERINGKALI TIDAK KHAS — malas menyusu, tidak mau menetek, lemas dan kurang bergerak, suhu tubuh tinggi MAUPUN RENDAH, napas cepat maupun berhenti sejenak, kuning, kejang, dan perut kembung. Pada bayi baru lahir, suhu yang RENDAH sama berbahayanya dengan demam. Time course: dapat memburuk sangat cepat dalam hitungan jam. Exacerbating: perawatan tali pusat yang tidak bersih. Severity: nilai kemampuan menyusu, kesadaran, dan tanda vital.',
-      riwayatPenyakitDahulu: 'History kelahiran prematur, berat lahir rendah, dan ketuban pecah dini yang meningkatkan risiko infeksi.',
-      riwayatPenyakitKeluarga: 'History infeksi pada ibu saat kehamilan dan persalinan; riwayat gangguan imun bawaan pada keluarga bila infeksi berulang.',
+      riwayatPenyakitDahulu: 'Riwayat kelahiran prematur, berat lahir rendah, dan ketuban pecah dini yang meningkatkan risiko infeksi.',
+      riwayatPenyakitKeluarga: 'Riwayat infeksi pada ibu saat kehamilan dan persalinan; riwayat gangguan imun bawaan pada keluarga bila infeksi berulang.',
       riwayatPengobatan: 'Apa yang sudah dibubuhkan pada tali pusat — RAMUAN TRADISIONAL, ABU, KUNYIT, MINYAK, DAN BEDAK SANGAT LAZIM DIPAKAI dan merupakan sumber kuman yang penting; tanyakan langsung karena jarang dilaporkan spontan.',
-      riwayatAlergi: 'History alergi obat pada keluarga.',
+      riwayatAlergi: 'Riwayat alergi obat pada keluarga.',
       riwayatImunisasi:
         'STATUS IMUNISASI TETANUS TOKSOID PADA IBU SELAMA KEHAMILAN — pertanyaan ini menentukan risiko tetanus neonatorum, dan pada bayi dengan tali pusat terinfeksi merupakan pertanyaan yang tidak boleh dilewatkan.',
       riwayatKehamilanPersalinan:
@@ -5505,11 +5505,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Buang air besar cair lebih dari tiga kali sehari sejak beberapa hari, disertai muntah dan lemas.',
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: nyeri perut periumbilikal pada enteritis usus halus, atau nyeri perut bawah dan tenesmus pada kolitis. Onset: mendadak; catat waktu tepat dimulainya untuk memperkirakan penyebab — toksin praterbentuk seperti Staphylococcus aureus menimbulkan gejala dalam 1-6 jam, sedangkan patogen invasif seperti Salmonella dalam 12-72 jam. Character: KUANTIFIKASI diare — frekuensi per hari, volume tiap kali (seberapa banyak dibanding gelas), konsistensi (cair, lembek, seperti air cucian beras pada kolera), dan yang paling penting ADA TIDAKNYA DARAH DAN LENDIR yang menandakan disentri. Radiation: nyeri menjalar ke seluruh perut. Associations: muntah dan frekuensinya, demam, nyeri kepala, kram otot akibat gangguan elektrolit, tenesmus, dan yang terpenting FREKUENSI SERTA VOLUME BUANG AIR KECIL TERAKHIR sebagai penanda dehidrasi paling praktis. Time course: diare akut kurang dari 14 hari, persisten 14-30 hari, kronik lebih dari 30 hari; giardiasis khas berlangsung kronik dengan tinja berlemak dan kembung. Exacerbating: hubungan dengan makanan atau minuman tertentu, riwayat jajan di luar, dan sumber air minum. Severity: kemampuan minum dan makan, tingkat kelemahan, serta apakah masih dapat beraktivitas.',
-      riwayatPenyakitDahulu: 'History diare berulang, penyakit saluran cerna kronik, imunodefisiensi termasuk HIV, diabetes, dan penyakit ginjal yang memperberat gangguan cairan.',
+      riwayatPenyakitDahulu: 'Riwayat diare berulang, penyakit saluran cerna kronik, imunodefisiensi termasuk HIV, diabetes, dan penyakit ginjal yang memperberat gangguan cairan.',
       riwayatPenyakitKeluarga: 'Apakah ada anggota keluarga atau orang lain yang makan bersama juga mengalami keluhan serupa — mengarah pada keracunan makanan atau wabah setempat.',
       riwayatPengobatan:
         'Penggunaan ANTIBIOTIK dalam 3 bulan terakhir (mengarahkan pada kolitis akibat Clostridioides difficile), obat antidiare yang sudah diminum sendiri, obat pencahar, dan jamu; tanyakan pula penggunaan obat antiinflamasi nonsteroid dan penghambat pompa proton.',
-      riwayatAlergi: 'History alergi obat dan alergi makanan yang dapat menjadi diagnosis banding.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi makanan yang dapat menjadi diagnosis banding.',
       riwayatTumbuhKembang: 'Pada anak: berat badan sebelum sakit sebagai pembanding, riwayat pertumbuhan pada KMS, dan riwayat diare berulang yang berdampak pada status gizi.',
       riwayatNutrisi:
         'Pada bayi: apakah mendapat ASI eksklusif, penggunaan susu formula dan cara penyiapannya (kebersihan botol dan air), serta usia dan jenis MPASI. Pada semua usia: riwayat makanan dan minuman dalam 72 jam terakhir, terutama makanan tidak dimasak matang, es batu, jajanan pinggir jalan, dan makanan yang disimpan lama.',
@@ -5612,12 +5612,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: retrosternal, bermula dari epigastrium dan menjalar ke atas menuju leher dan tenggorokan. Onset: perlahan dan berulang selama berbulan-bulan, khas muncul 30-60 menit SETELAH MAKAN, terutama makanan berlemak atau porsi besar. Character: rasa TERBAKAR atau panas (heartburn), disertai REGURGITASI yaitu naiknya cairan atau makanan asam-pahit ke mulut tanpa didahului mual dan tanpa usaha muntah — kedua gejala inilah yang khas untuk GERD. Radiation: menjalar ke leher, tenggorokan, punggung, dan kadang menyerupai nyeri jantung. Associations: mulut terasa asam, sering berdehem, batuk kering kronik terutama malam hari, suara serak pada pagi hari, nyeri tenggorokan, rasa mengganjal di tenggorokan (globus), sesak menyerupai asma, dan erosi gigi — kelompok gejala EKSTRAESOFAGUS ini sering menjadi keluhan utama sehingga pasien lebih dulu berobat ke THT atau paru. WAJIB tanyakan ALARM SYMPTOMS: DISFAGIA (sulit menelan) dan odinofagia, PENURUNAN BERAT BADAN yang tidak disengaja, muntah berulang, MUNTAH DARAH atau BAB HITAM, anemia, riwayat keluarga kanker saluran cerna, dan usia awitan di atas 50-60 tahun. Time course: memberat saat BERBARING, MEMBUNGKUK, atau MENGEJAN, dan sering membangunkan pasien pada malam hari. Exacerbating: makanan berlemak, gorengan, cokelat, kopi, teh, minuman bersoda, makanan pedas, buah asam, tomat, bawang, mint, alkohol, merokok, porsi besar, dan berbaring segera setelah makan; relieving: antasida, posisi tegak, dan minum air. Severity: frekuensi keluhan per minggu, gangguan tidur, dan dampak terhadap pekerjaan.',
       riwayatPenyakitDahulu:
-        'History GERD sebelumnya dan hasil endoskopi bila pernah dikerjakan, riwayat ulkus peptikum dan infeksi Helicobacter pylori, hernia hiatus, obesitas, ASMA (hubungannya dua arah dengan GERD), diabetes melitus dengan gastroparesis, skleroderma, riwayat operasi lambung atau esofagus, serta riwayat penyakit jantung koroner yang wajib ditanyakan karena nyeri dadanya dapat menyerupai GERD.',
+        'Riwayat GERD sebelumnya dan hasil endoskopi bila pernah dikerjakan, riwayat ulkus peptikum dan infeksi Helicobacter pylori, hernia hiatus, obesitas, ASMA (hubungannya dua arah dengan GERD), diabetes melitus dengan gastroparesis, skleroderma, riwayat operasi lambung atau esofagus, serta riwayat penyakit jantung koroner yang wajib ditanyakan karena nyeri dadanya dapat menyerupai GERD.',
       riwayatPenyakitKeluarga:
-        'History GERD, hernia hiatus, dan terutama KANKER ESOFAGUS atau LAMBUNG dalam keluarga yang menjadi salah satu alarm feature dan menurunkan ambang untuk melakukan endoskopi.',
+        'Riwayat GERD, hernia hiatus, dan terutama KANKER ESOFAGUS atau LAMBUNG dalam keluarga yang menjadi salah satu alarm feature dan menurunkan ambang untuk melakukan endoskopi.',
       riwayatPengobatan:
         'Obat yang memperberat refluks dengan menurunkan tonus sfingter esofagus bawah atau melukai mukosa: NSAID dan aspirin, penghambat kanal kalsium, nitrat, teofilin, antikolinergik, bifosfonat, doksisiklin, kalium klorida, benzodiazepin, dan antidepresan trisiklik. Tanyakan pula obat yang sudah dicoba sendiri — antasida, ranitidin, atau PPI — berapa lama, dosisnya, dan bagaimana responsnya, karena respons terhadap PPI merupakan bagian dari penegakan diagnosis.',
-      riwayatAlergi: 'History alergi obat dan intoleransi makanan tertentu.',
+      riwayatAlergi: 'Riwayat alergi obat dan intoleransi makanan tertentu.',
       riwayatKehamilanPersalinan:
         'Status kehamilan dan usia gestasi — GERD sangat sering pada kehamilan trimester ketiga akibat peningkatan tekanan intraabdomen dan efek progesteron yang melemaskan sfingter esofagus bawah; hal ini juga menentukan pilihan obat yang aman.',
       riwayatNutrisi:
@@ -5784,7 +5784,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Abses apendiks': {
     definisi: 'Kumpulan pus terlokalisasi akibat apendisitis yang mengalami perforasi namun terbungkus omentum dan usus sekitarnya.',
-    diagnosis: ['History nyeri perut kanan bawah >5 hari, teraba massa di kuadran kanan bawah, demam; USG/CT menunjukkan koleksi cairan berdinding'],
+    diagnosis: ['Riwayat nyeri perut kanan bawah >5 hari, teraba massa di kuadran kanan bawah, demam; USG/CT menunjukkan koleksi cairan berdinding'],
     tatalaksana: ['Antibiotik IV dan drainase perkutan bila abses besar (pendekatan konservatif awal), apendektomi interval dipertimbangkan 6-8 minggu kemudian; operasi segera lebih sulit karena jaringan rapuh dan berisiko cedera usus'],
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
   },
@@ -5808,11 +5808,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: keluhan TERBATAS PADA SALURAN CERNA — kembung, nyeri perut, dan diare; tidak ada bentol, bengkak, maupun sesak. Onset: umumnya 30 menit sampai beberapa jam setelah makan, lebih lambat daripada alergi tipe cepat. Character: perut terasa penuh dan bergerak-gerak, banyak buang angin, mulas, dan tinja cair yang kadang berbusa dan berbau asam pada intoleransi laktosa. Radiation: nyeri kram menyebar di seluruh perut. Associations: TANYAKAN SECARA TEGAS ADA TIDAKNYA BENTOL, BENGKAK BIBIR, DAN SESAK — ketiadaannya mendukung intoleransi dan menyingkirkan alergi. Time course: berlangsung menahun dan berulang mengikuti pola makan. Exacerbating: PERTANYAAN KUNCI ADALAH APAKAH KELUHAN BERGANTUNG PADA JUMLAH — pada intoleransi, susu segelas kecil sering masih dapat ditoleransi sementara segelas besar menimbulkan keluhan, sedangkan pada alergi jumlah sekecil apa pun dapat memicu reaksi. Relieving: menghindari makanan penyebab, dan pada intoleransi laktosa keluhan berkurang bila susu diminum bersama makanan lain. Severity: nilai dampak terhadap gizi, aktivitas, dan kualitas hidup.',
       riwayatPenyakitDahulu:
-        'History diare berkepanjangan maupun infeksi usus yang dapat menimbulkan intoleransi laktosa sementara, penyakit seliak, penyakit radang usus, operasi saluran cerna, dan sindrom usus iritabel.',
+        'Riwayat diare berkepanjangan maupun infeksi usus yang dapat menimbulkan intoleransi laktosa sementara, penyakit seliak, penyakit radang usus, operasi saluran cerna, dan sindrom usus iritabel.',
       riwayatPenyakitKeluarga:
-        'History keluhan serupa pada keluarga; intoleransi laktosa primer sangat dipengaruhi keturunan dan sangat lazim pada populasi Asia sehingga riwayat keluarga hampir selalu positif.',
+        'Riwayat keluhan serupa pada keluarga; intoleransi laktosa primer sangat dipengaruhi keturunan dan sangat lazim pada populasi Asia sehingga riwayat keluarga hampir selalu positif.',
       riwayatPengobatan: 'Obat yang dapat menimbulkan keluhan saluran cerna, pemakaian antibiotik yang mengubah flora usus, serta suplemen enzim yang sudah dicoba.',
-      riwayatAlergi: 'History alergi makanan maupun obat sebelumnya, ditanyakan justru untuk membedakannya dari keluhan saat ini.',
+      riwayatAlergi: 'Riwayat alergi makanan maupun obat sebelumnya, ditanyakan justru untuk membedakannya dari keluhan saat ini.',
       riwayatNutrisi:
         'INTI ANAMNESIS: catatan harian makanan beserta jumlah dan waktu, dihubungkan dengan waktu munculnya keluhan. Telusuri konsumsi susu dan olahannya, makanan mengandung fruktosa dan pemanis buatan, makanan fermentasi dan tinggi histamin, kafein, serta zat tambahan seperti monosodium glutamat, sulfit, dan pewarna.',
       riwayatSosialEkonomi:
@@ -5846,7 +5846,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Keturunan Asia, Afrika, dan Amerika Latin dengan penurunan aktivitas laktase yang lazim setelah masa anak',
       'Bertambahnya usia',
-      'History diare berkepanjangan maupun infeksi usus yang merusak permukaan usus',
+      'Riwayat diare berkepanjangan maupun infeksi usus yang merusak permukaan usus',
       'Penyakit seliak, penyakit radang usus, dan giardiasis',
       'Operasi saluran cerna dan pertumbuhan bakteri berlebih di usus halus',
       'Konsumsi pemanis buatan berjenis poliol dan makanan tinggi fruktosa',
@@ -5917,8 +5917,8 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan menyeluruh dan tidak terbatas pada saluran cerna — inilah yang membedakannya dari intoleransi. Onset: PERTANYAAN PALING MENENTUKAN ADALAH JARAK WAKTU ANTARA MAKAN DAN TIMBULNYA GEJALA — reaksi yang diperantarai IgE muncul dalam hitungan MENIT SAMPAI 2 JAM, sedangkan keluhan yang baru muncul setelah berjam-jam sampai berhari-hari umumnya bukan alergi tipe cepat. Character: bentol gatal, bengkak pada bibir dan kelopak mata, mual, muntah, nyeri perut, dan diare. Radiation: keluhan menyebar ke seluruh tubuh karena bersifat sistemik. Associations: TANYAKAN TANDA ANAFILAKSIS SECARA LANGSUNG — sesak napas, mengi, suara serak, rasa tercekik, sulit menelan, pusing berputar, rasa mau pingsan, dan pucat dingin; keterlibatan dua sistem organ atau lebih setelah makan sudah cukup untuk menegakkan anafilaksis. Time course: apakah reaksi selalu berulang setiap kali makanan yang sama dimakan — sifat berulang dan konsisten inilah yang memperkuat dugaan alergi. Exacerbating: olahraga, alkohol, obat antiinflamasi nonsteroid, dan infeksi dapat menurunkan ambang reaksi sehingga makanan yang biasanya aman menjadi memicu. Severity: apakah pernah sampai memerlukan pertolongan darurat maupun epinefrin.',
       riwayatPenyakitDahulu:
-        'History atopi berupa dermatitis atopik, asma, dan rinitis alergika; ASMA YANG TIDAK TERKENDALI MERUPAKAN FAKTOR RISIKO TERBESAR UNTUK ANAFILAKSIS YANG FATAL. History reaksi terhadap makanan sebelumnya beserta beratnya, serta riwayat esofagitis eosinofilik.',
-      riwayatPenyakitKeluarga: 'History atopi dan alergi makanan pada orang tua serta saudara kandung, yang meningkatkan risiko secara bermakna.',
+        'Riwayat atopi berupa dermatitis atopik, asma, dan rinitis alergika; ASMA YANG TIDAK TERKENDALI MERUPAKAN FAKTOR RISIKO TERBESAR UNTUK ANAFILAKSIS YANG FATAL. Riwayat reaksi terhadap makanan sebelumnya beserta beratnya, serta riwayat esofagitis eosinofilik.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi dan alergi makanan pada orang tua serta saudara kandung, yang meningkatkan risiko secara bermakna.',
       riwayatPengobatan:
         'Obat yang sedang diminum, khususnya PENYEKAT BETA DAN PENGHAMBAT ACE yang mempersulit penanganan anafilaksis; ketersediaan epinefrin autoinjektor; serta obat antiinflamasi nonsteroid yang dapat menjadi kofaktor.',
       riwayatAlergi: 'Daftar seluruh makanan, obat, lateks, dan sengatan serangga yang pernah menimbulkan reaksi, beserta bentuk dan beratnya reaksi masing-masing.',
@@ -5952,11 +5952,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Pada alergi yang diperantarai IgE, paparan pertama menimbulkan sensitisasi berupa pembentukan IgE spesifik yang menempel pada permukaan sel mast dan basofil. Pada paparan berikutnya, protein makanan mengikat silang IgE tersebut sehingga sel mast mengalami degranulasi dan melepaskan histamin serta mediator lain dalam hitungan menit — inilah dasar mengapa reaksi tipe cepat muncul dalam menit sampai dua jam, dan mengapa jarak waktu menjadi pertanyaan yang paling menentukan dalam anamnesis. Mediator ini menimbulkan vasodilatasi, kebocoran plasma, kontraksi otot polos saluran napas dan saluran cerna, sehingga muncul urtikaria, angioedema, mengi, muntah, dan pada keadaan berat penurunan tekanan darah. Karena mediator dilepaskan ke seluruh tubuh, alergi makanan pada dasarnya bersifat sistemik dan dapat mengancam jiwa — berbeda mendasar dari intoleransi makanan yang tidak melibatkan sistem imun dan terbatas pada saluran cerna. Kofaktor seperti olahraga, alkohol, obat antiinflamasi nonsteroid, dan infeksi meningkatkan penyerapan protein makanan maupun menurunkan ambang degranulasi, sehingga makanan yang biasanya aman dapat memicu reaksi pada keadaan tertentu — hal ini menjelaskan reaksi yang tampak tidak konsisten. Sebagian anak mengembangkan toleransi seiring usia, terutama terhadap susu dan telur, sedangkan alergi kacang dan makanan laut cenderung menetap seumur hidup.',
     faktorRisiko: [
-      'History atopi pribadi maupun keluarga',
+      'Riwayat atopi pribadi maupun keluarga',
       'Dermatitis atopik pada bayi, terutama yang berat dan timbul dini',
       'ASMA YANG TIDAK TERKENDALI sebagai faktor risiko utama anafilaksis yang fatal',
       'Usia bayi dan anak kecil dengan sawar usus yang belum matang',
-      'History reaksi terhadap makanan sebelumnya',
+      'Riwayat reaksi terhadap makanan sebelumnya',
       'Penundaan pengenalan makanan berpotensi alergen yang justru meningkatkan risiko',
       'Pemakaian penyekat beta dan penghambat ACE yang mempersulit penanganan reaksi',
     ],
@@ -5973,7 +5973,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Gangguan kecemasan dan serangan panik yang dikaitkan dengan makanan',
     ],
     pengkajian:
-      'Dipikirkan alergi makanan yang diperantarai IgE pada pasien ini atas dasar timbulnya bentol gatal menyeluruh disertai bengkak pada bibir dalam waktu kurang dari dua jam setelah menyantap makanan tertentu, dengan keluhan yang berulang secara konsisten setiap kali makanan yang sama dimakan. Jarak waktu yang singkat antara makan dan munculnya gejala merupakan petunjuk yang paling menentukan, sebab reaksi yang diperantarai IgE terjadi dalam hitungan menit sampai dua jam, sedangkan keluhan yang baru muncul setelah berjam-jam umumnya bukan alergi tipe cepat. Keterlibatan kulit yang menyeluruh menunjukkan bahwa reaksi bersifat sistemik dan bukan terbatas pada saluran cerna — inilah pembeda mendasar dari intoleransi makanan, yang tidak melibatkan sistem imun, keluhannya terbatas pada perut, umumnya bergantung pada jumlah yang dimakan, dan tidak pernah menyebabkan anafilaksis. Keracunan makanan disingkirkan karena tidak ada orang lain yang menyantap makanan yang sama dan mengalami keluhan serupa, dan gambarannya bukan berupa mual muntah semata melainkan disertai bentol dan bengkak. Keracunan skombroid akibat ikan yang tidak segar patut diingat karena menyerupai alergi, namun pada keadaan itu semua orang yang memakan ikan tersebut akan bereaksi tanpa memandang riwayat alergi. Sindrom alergi oral dipertimbangkan namun keluhan pada kasus ini tidak terbatas pada rasa gatal di mulut. Langkah pertama pada kasus ini sesungguhnya bukan menegakkan diagnosis melainkan menilai beratnya reaksi: keterlibatan dua sistem organ atau lebih setelah makan sudah cukup untuk menegakkan anafilaksis, dan pada keadaan itu epinefrin intramuskular diberikan segera tanpa menunggu. History asma juga ditelusuri secara khusus karena asma yang tidak terkendali merupakan faktor risiko terbesar untuk anafilaksis yang berakhir fatal. Perlu ditegaskan bahwa pemeriksaan alergi hanya dikerjakan terarah sesuai dugaan dari anamnesis; memeriksa panel makanan secara luas menghasilkan banyak hasil positif yang hanya menandakan sensitisasi tanpa alergi klinis, dan pantangan yang lahir dari situ merugikan gizi tanpa memberi manfaat.',
+      'Dipikirkan alergi makanan yang diperantarai IgE pada pasien ini atas dasar timbulnya bentol gatal menyeluruh disertai bengkak pada bibir dalam waktu kurang dari dua jam setelah menyantap makanan tertentu, dengan keluhan yang berulang secara konsisten setiap kali makanan yang sama dimakan. Jarak waktu yang singkat antara makan dan munculnya gejala merupakan petunjuk yang paling menentukan, sebab reaksi yang diperantarai IgE terjadi dalam hitungan menit sampai dua jam, sedangkan keluhan yang baru muncul setelah berjam-jam umumnya bukan alergi tipe cepat. Keterlibatan kulit yang menyeluruh menunjukkan bahwa reaksi bersifat sistemik dan bukan terbatas pada saluran cerna — inilah pembeda mendasar dari intoleransi makanan, yang tidak melibatkan sistem imun, keluhannya terbatas pada perut, umumnya bergantung pada jumlah yang dimakan, dan tidak pernah menyebabkan anafilaksis. Keracunan makanan disingkirkan karena tidak ada orang lain yang menyantap makanan yang sama dan mengalami keluhan serupa, dan gambarannya bukan berupa mual muntah semata melainkan disertai bentol dan bengkak. Keracunan skombroid akibat ikan yang tidak segar patut diingat karena menyerupai alergi, namun pada keadaan itu semua orang yang memakan ikan tersebut akan bereaksi tanpa memandang riwayat alergi. Sindrom alergi oral dipertimbangkan namun keluhan pada kasus ini tidak terbatas pada rasa gatal di mulut. Langkah pertama pada kasus ini sesungguhnya bukan menegakkan diagnosis melainkan menilai beratnya reaksi: keterlibatan dua sistem organ atau lebih setelah makan sudah cukup untuk menegakkan anafilaksis, dan pada keadaan itu epinefrin intramuskular diberikan segera tanpa menunggu. Riwayat asma juga ditelusuri secara khusus karena asma yang tidak terkendali merupakan faktor risiko terbesar untuk anafilaksis yang berakhir fatal. Perlu ditegaskan bahwa pemeriksaan alergi hanya dikerjakan terarah sesuai dugaan dari anamnesis; memeriksa panel makanan secara luas menghasilkan banyak hasil positif yang hanya menandakan sensitisasi tanpa alergi klinis, dan pantangan yang lahir dari situ merugikan gizi tanpa memberi manfaat.',
     terapiSuportif: [
       'PADA REAKSI AKUT DENGAN TANDA ANAFILAKSIS: epinefrin 0,3-0,5 mg (anak 0,01 mg/kg, maksimal 0,3 mg) larutan 1:1000 intramuskular pada paha bagian luar tengah, diulang tiap 5-15 menit bila perlu — jangan menunda demi antihistamin',
       'Baringkan pasien dengan tungkai ditinggikan kecuali bila sesak, berikan oksigen aliran tinggi, pasang jalur intravena, dan berikan kristaloid 20 mL/kg bila hipotensi',
@@ -6026,13 +6026,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: nyeri perut umumnya difus dan kram di seluruh perut; nyeri yang terlokalisasi tajam di kanan bawah harus menimbulkan kecurigaan lain. Onset: PERTANYAAN PALING MENENTUKAN adalah berapa jam jarak antara makan dan munculnya keluhan, karena masa inkubasi menunjuk langsung pada penyebabnya — 1-6 jam mengarah pada toksin yang sudah terbentuk dalam makanan (Staphylococcus aureus, Bacillus cereus bentuk emetik) dengan muntah sebagai keluhan dominan; 8-16 jam mengarah pada Clostridium perfringens dan Bacillus cereus bentuk diare; 16-72 jam mengarah pada kuman invasif seperti Salmonella, Shigella, dan Campylobacter. Character: sifat tinja — cair tanpa darah dan lendir mengarah pada mekanisme sekretorik atau toksin, sedangkan berdarah dan berlendir dengan tenesmus mengarah pada disentri akibat kuman invasif. Radiation: nyeri kram yang mereda setelah buang air besar. Associations: demam yang menandakan proses invasif, muntah, dan tanda dehidrasi berupa haus hebat, mulut kering, mata cekung, lemas, serta berkurangnya jumlah dan frekuensi buang air kecil. Tanyakan khusus gejala neurologis — pandangan ganda, kelopak mata jatuh, sulit menelan, dan kelemahan otot yang menjalar turun mengarah pada botulisme; sedangkan kesemutan di sekitar mulut, rasa terbalik antara panas dan dingin setelah makan ikan karang mengarah pada keracunan siguatera. Time course: frekuensi muntah dan buang air besar dalam 24 jam terakhir dan apakah membaik atau memberat. Exacerbating: makan dan minum memicu muntah berulang. Severity: nilai dari jumlah cairan yang keluar, kemampuan minum, produksi urin, dan derajat kelemahan.',
       riwayatPenyakitDahulu:
-        'Penyakit yang meningkatkan risiko perjalanan berat: diabetes melitus, penyakit ginjal kronik, sirosis hati, keganasan, infeksi HIV, dan penggunaan obat imunosupresan. History operasi lambung atau pemakaian penghambat pompa proton jangka panjang yang mengurangi keasaman lambung sehingga menurunkan sawar terhadap kuman tertelan. History penyakit jantung yang membuat pasien rentan terhadap gangguan elektrolit.',
+        'Penyakit yang meningkatkan risiko perjalanan berat: diabetes melitus, penyakit ginjal kronik, sirosis hati, keganasan, infeksi HIV, dan penggunaan obat imunosupresan. Riwayat operasi lambung atau pemakaian penghambat pompa proton jangka panjang yang mengurangi keasaman lambung sehingga menurunkan sawar terhadap kuman tertelan. Riwayat penyakit jantung yang membuat pasien rentan terhadap gangguan elektrolit.',
       riwayatPenyakitKeluarga:
         'TANYAKAN SECARA EKSPLISIT apakah ada orang lain yang menyantap makanan yang sama dan mengalami keluhan serupa beserta berapa jumlahnya — kesamaan ini bukan sekadar informasi tambahan melainkan bukti kuat sumber makanan bersama, dan bila mengenai banyak orang wajib dilaporkan sebagai kemungkinan kejadian luar biasa.',
       riwayatPengobatan:
-        'Obat yang sudah diminum sendiri, terutama obat antimotilitas seperti loperamid yang berbahaya bila ada disentri atau demam. History antibiotik dalam 3 bulan terakhir yang mengarahkan pada kemungkinan kolitis akibat Clostridioides difficile alih-alih keracunan makanan.',
+        'Obat yang sudah diminum sendiri, terutama obat antimotilitas seperti loperamid yang berbahaya bila ada disentri atau demam. Riwayat antibiotik dalam 3 bulan terakhir yang mengarahkan pada kemungkinan kolitis akibat Clostridioides difficile alih-alih keracunan makanan.',
       riwayatAlergi:
-        'History alergi makanan dan obat; alergi makanan dapat menyerupai keracunan namun disertai gatal, bentol, dan sesak serta timbul dalam hitungan menit.',
+        'Riwayat alergi makanan dan obat; alergi makanan dapat menyerupai keracunan namun disertai gatal, bentol, dan sesak serta timbul dalam hitungan menit.',
       riwayatNutrisi:
         'Rincian seluruh makanan dan minuman dalam 72 jam terakhir beserta tempat membelinya dan cara penyimpanannya — perhatikan makanan yang dimasak jauh sebelum disantap lalu dibiarkan di suhu ruang, nasi yang dihangatkan berulang, makanan laut, telur setengah matang, daging kurang matang, susu tidak dipasteurisasi, serta makanan kaleng yang penyok atau menggembung yang mengarah pada botulisme.',
       riwayatSosialEkonomi:
@@ -6145,12 +6145,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: keluhan bersifat sistemik akibat anemia — lemah seluruh badan, pusing, dan berkunang-kunang; nyeri perut bila ada bersifat samar di epigastrium atau sekitar pusar. Onset: sangat PERLAHAN selama berbulan-bulan hingga bertahun-tahun, sehingga pasien sering sudah beradaptasi dengan kadar hemoglobin yang sangat rendah dan baru mengeluh saat anemia berat — inilah sebabnya pasien dapat datang dengan hemoglobin 4-6 g/dL namun masih mampu berjalan sendiri ke puskesmas. Character: lemas, mudah lelah, sesak saat beraktivitas, berdebar, sulit berkonsentrasi. Radiation: tidak khas. Associations: pucat, sakit kepala, telinga berdenging, kaki bengkak pada anemia berat, nafsu makan menurun, mual, kembung, kadang diare atau tinja berwarna gelap. Tanyakan khusus gejala PIKA yaitu keinginan memakan benda bukan makanan seperti TANAH, es batu, atau kapur, yang merupakan petunjuk klasik defisiensi besi berat. Telusuri pula gejala pada fase awal infeksi: rasa GATAL DAN RUAM pada kaki atau sela jari kaki tempat larva menembus kulit ("ground itch" atau di masyarakat dikenal sebagai kutu air atau kaskado), serta batuk dan sesak sementara saat larva bermigrasi melalui paru. Time course: keluhan progresif perlahan dan menetap. Exacerbating: aktivitas fisik memperberat sesak dan berdebar; relieving: istirahat. Severity: nilai kemampuan bekerja dan beraktivitas, jarak berjalan sebelum sesak, serta pada anak nilai prestasi sekolah dan aktivitas bermain.',
       riwayatPenyakitDahulu:
-        'History anemia sebelumnya dan pernahkah menerima transfusi darah, riwayat kecacingan dan pengobatannya, riwayat penyakit lambung atau perdarahan saluran cerna, riwayat hemoroid, riwayat penyakit ginjal kronik, riwayat malaria, dan riwayat penyakit kronik lain yang dapat menyebabkan anemia.',
+        'Riwayat anemia sebelumnya dan pernahkah menerima transfusi darah, riwayat kecacingan dan pengobatannya, riwayat penyakit lambung atau perdarahan saluran cerna, riwayat hemoroid, riwayat penyakit ginjal kronik, riwayat malaria, dan riwayat penyakit kronik lain yang dapat menyebabkan anemia.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga dengan keluhan pucat dan lemas serupa, serta riwayat kelainan darah bawaan seperti talasemia yang perlu dipertimbangkan sebagai penyebab anemia mikrositik alternatif.',
       riwayatPengobatan:
-        'History pemberian OBAT CACING dan kapan terakhir, riwayat konsumsi TABLET TAMBAH DARAH termasuk kepatuhannya (pasien sering berhenti minum karena tinja menjadi hitam atau mual, padahal keduanya wajar), penggunaan NSAID dan aspirin yang dapat menyebabkan perdarahan saluran cerna, serta obat tradisional.',
-      riwayatAlergi: 'History alergi obat.',
+        'Riwayat pemberian OBAT CACING dan kapan terakhir, riwayat konsumsi TABLET TAMBAH DARAH termasuk kepatuhannya (pasien sering berhenti minum karena tinja menjadi hitam atau mual, padahal keduanya wajar), penggunaan NSAID dan aspirin yang dapat menyebabkan perdarahan saluran cerna, serta obat tradisional.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatKehamilanPersalinan:
         'Pada perempuan usia subur: status kehamilan dan usia gestasi, jumlah kehamilan dan persalinan, jarak antar kehamilan, serta riwayat perdarahan pascapersalinan. Tanyakan pula siklus HAID — lama, banyaknya (jumlah pembalut per hari), dan adanya gumpalan — karena menoragia merupakan penyebab bersamaan defisiensi besi yang sangat sering pada kelompok ini. Ibu hamil dengan cacing tambang berisiko anemia berat, berat lahir rendah, dan kematian maternal.',
       riwayatNutrisi:
@@ -6191,7 +6191,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Telur yang keluar bersama tinja menetas di tanah yang lembap, hangat, dan teduh menjadi larva rabditiform, lalu berkembang menjadi LARVA FILARIFORM yang infektif dalam sekitar satu minggu. Larva ini menembus kulit utuh — paling sering di sela jari kaki dan punggung kaki orang yang berjalan tanpa alas kaki — menimbulkan reaksi lokal berupa papulovesikel gatal yang dikenal sebagai ground itch. Larva kemudian masuk ke pembuluh darah, terbawa ke jantung kanan dan PARU, menembus alveolus, naik melalui bronkus dan trakea ke faring, tertelan, dan akhirnya sampai ke usus halus tempatnya menjadi dewasa dalam sekitar 5-9 minggu. Di usus halus — terutama jejunum — cacing dewasa MENEMPEL erat pada mukosa dengan bukal kapsul atau gigi pemotongnya, menyayat mukosa, lalu MENGISAP DARAH. Di sinilah letak perbedaan mendasar dengan askariasis: kerugian utama bukan berupa persaingan nutrien melainkan KEHILANGAN DARAH yang berlangsung terus-menerus. Setiap ekor N. americanus menyebabkan kehilangan sekitar 0,03 mL darah per hari, sedangkan A. duodenale yang lebih rakus menyebabkan sekitar 0,15 mL per hari; dengan infestasi ratusan hingga ribuan ekor, kehilangan harian dapat mencapai puluhan mililiter darah. Cacing juga mengeluarkan zat ANTIKOAGULAN yang menghambat faktor Xa sehingga luka tempat perlekatan terus merembes bahkan SETELAH cacing berpindah ke lokasi baru — hal ini melipatgandakan kehilangan darah melebihi yang diisap secara langsung. Kehilangan darah kronik ini menguras cadangan besi tubuh secara bertahap: mula-mula cadangan besi sumsum tulang habis (feritin turun) tanpa gejala apa pun, lalu terjadi eritropoiesis defisiensi besi, dan akhirnya anemia mikrositik hipokrom yang nyata. Karena prosesnya berlangsung sangat lambat selama bertahun-tahun, tubuh sempat melakukan adaptasi berupa peningkatan curah jantung, pergeseran kurva disosiasi oksihemoglobin ke kanan melalui peningkatan 2,3-DPG, dan redistribusi aliran darah — inilah yang menjelaskan mengapa pasien dapat berjalan sendiri ke fasilitas kesehatan dengan hemoglobin 4 g/dL, dan sekaligus mengapa TRANSFUSI HARUS DIBERIKAN SANGAT HATI-HATI pada anemia kronik berat, sebab volume plasma sudah meningkat sebagai kompensasi sehingga transfusi cepat mudah memicu kelebihan beban cairan dan edema paru. Pada anak dan ibu hamil yang kebutuhan besinya tinggi, defisit ini terjadi lebih cepat dan berdampak lebih berat berupa hambatan pertumbuhan, gangguan kognitif, berat lahir rendah, dan kelahiran prematur.',
     faktorRisiko: [
       'BERJALAN dan BEKERJA TANPA ALAS KAKI di tanah lembap — faktor risiko paling langsung',
-      'Occupation bertani, berkebun (karet, kelapa sawit, teh, kopi), dan pertambangan',
+      'Pekerjaan bertani, berkebun (karet, kelapa sawit, teh, kopi), dan pertambangan',
       'Sanitasi buruk: tidak memiliki jamban dan buang air besar sembarangan di kebun atau tanah',
       'Iklim tropis dengan tanah gembur, lembap, hangat, dan teduh yang ideal bagi perkembangan larva',
       'Anak yang bermain di tanah tanpa alas kaki',
@@ -6279,11 +6279,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: keluhan saluran cerna terpusat di ulu hati; ruam kulit khasnya pada perut, bokong, dan paha. Onset: dapat berlangsung bertahun-tahun dengan keluhan hilang timbul, bahkan puluhan tahun setelah meninggalkan daerah endemis. Character: nyeri ulu hati seperti maag, kembung, diare berselang dengan sembelit; ruam berupa GARIS KEMERAHAN YANG BERGERAK SANGAT CEPAT — beberapa sentimeter PER JAM — yang disebut larva currens, dan kecepatan inilah yang membedakannya dari cutaneous larva migrans yang bergerak beberapa milimeter per hari. Radiation: gatal menjalar mengikuti jalur larva. Associations: batuk kering dan mengi saat larva melewati paru; tanyakan pula penurunan berat badan dan lemas. Time course: KELUHAN HILANG TIMBUL SELAMA BERTAHUN-TAHUN merupakan gambaran khas akibat autoinfeksi. Exacerbating: PERTANYAAN YANG PALING PENTING ADALAH PEMAKAIAN KORTIKOSTEROID — obat ini dapat mengubah infeksi yang tenang menjadi hiperinfeksi yang mematikan. Severity: nilai penurunan berat badan, gangguan gizi, dan tanda penyakit berat.',
       riwayatPenyakitDahulu:
-        'History tinggal maupun bepergian ke daerah tropis dan subtropis, bahkan puluhan tahun lalu. INFEKSI HTLV-1, keganasan hematologi, dan keadaan imunitas menurun. History penyakit yang memerlukan kortikosteroid seperti asma, penyakit paru obstruktif kronik, dan penyakit autoimun.',
+        'Riwayat tinggal maupun bepergian ke daerah tropis dan subtropis, bahkan puluhan tahun lalu. INFEKSI HTLV-1, keganasan hematologi, dan keadaan imunitas menurun. Riwayat penyakit yang memerlukan kortikosteroid seperti asma, penyakit paru obstruktif kronik, dan penyakit autoimun.',
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan keluhan serupa maupun riwayat cacingan; sanitasi lingkungan yang sama.',
       riwayatPengobatan:
         'RIWAYAT KORTIKOSTEROID MERUPAKAN PERTANYAAN TERPENTING pada penyakit ini — baik yang sedang, pernah, maupun akan diberikan. Tanyakan pula obat imunosupresan, kemoterapi, dan riwayat obat cacing yang pernah diminum beserta jenisnya, karena albendazol kurang efektif dibandingkan ivermektin untuk cacing ini.',
-      riwayatAlergi: 'History alergi obat, terutama ivermektin dan albendazol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama ivermektin dan albendazol.',
       riwayatNutrisi: 'Status gizi dan penurunan berat badan; infeksi menahun menimbulkan gangguan penyerapan.',
       riwayatSosialEkonomi:
         'BERJALAN TANPA ALAS KAKI DI TANAH merupakan jalur penularan utama — tanyakan kebiasaan ini beserta pekerjaan bertani maupun berkebun. Tanyakan pula sanitasi, ketersediaan jamban, sumber air, dan kondisi tanah di sekitar rumah.',
@@ -6388,12 +6388,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: nyeri perut yang tidak terlokalisasi dengan jelas, umumnya di sekitar pusar. Onset: perlahan dan berlangsung berbulan-bulan; sebagian besar infeksi bahkan bersifat ASIMTOMATIK dan baru diketahui saat cacing keluar bersama tinja atau dimuntahkan. Character: nyeri perut tumpul dan hilang timbul, perut terasa kembung, mual, kadang muntah. Radiation: tidak khas; nyeri yang menjadi hebat, terus-menerus, dan menjalar merupakan tanda komplikasi obstruksi. Associations: penurunan nafsu makan, berat badan sulit naik, anak tampak pucat dan lesu, prestasi sekolah menurun, gatal pada anus, dan riwayat MENGELUARKAN CACING lewat tinja, mulut, atau bahkan hidung yang merupakan petunjuk paling meyakinkan. Tanyakan pula gejala PARU berupa batuk kering, mengi, sesak, dan demam yang berlangsung 1-2 minggu — sindrom Loeffler akibat migrasi larva melalui paru, yang sering salah didiagnosis sebagai asma atau bronkitis. WAJIB tanyakan TANDA BAHAYA komplikasi: nyeri perut hebat yang menetap, perut membesar dan tegang, muntah hijau, tidak dapat buang air besar maupun buang angin, serta demam dengan mata kuning dan nyeri perut kanan atas yang menandakan askariasis bilier. Time course: keluhan kronik hilang timbul. Exacerbating dan relieving: tidak khas. Severity: nilai dampak terhadap berat badan, nafsu makan, aktivitas bermain, dan kehadiran di sekolah.',
       riwayatPenyakitDahulu:
-        'History kecacingan sebelumnya dan pengobatan yang pernah diterima, riwayat anemia, riwayat batuk berulang atau didiagnosis asma, riwayat operasi perut, serta riwayat penyakit yang menurunkan kekebalan.',
+        'Riwayat kecacingan sebelumnya dan pengobatan yang pernah diterima, riwayat anemia, riwayat batuk berulang atau didiagnosis asma, riwayat operasi perut, serta riwayat penyakit yang menurunkan kekebalan.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga lain, terutama saudara kandung dan teman sepermainan, dengan keluhan serupa atau riwayat mengeluarkan cacing — infeksi ini bersifat kelompok karena penularannya lingkungan.',
       riwayatPengobatan:
-        'History pemberian OBAT CACING dan kapan terakhir diberikan — program pemberian obat cacing massal umumnya dilakukan dua kali setahun pada anak usia prasekolah dan sekolah di daerah endemis; tanyakan pula obat tradisional dan suplemen zat besi.',
-      riwayatAlergi: 'History alergi obat dan riwayat atopi yang perlu dipertimbangkan pada keluhan mengi.',
+        'Riwayat pemberian OBAT CACING dan kapan terakhir diberikan — program pemberian obat cacing massal umumnya dilakukan dua kali setahun pada anak usia prasekolah dan sekolah di daerah endemis; tanyakan pula obat tradisional dan suplemen zat besi.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat atopi yang perlu dipertimbangkan pada keluhan mengi.',
       riwayatNutrisi:
         'Asupan makan sehari-hari secara terperinci meliputi jenis, jumlah, dan frekuensi; kebiasaan jajan di luar rumah dan jajanan yang tidak tertutup; konsumsi sayuran mentah atau lalapan yang dicuci dengan air tidak bersih; serta perubahan berat badan dalam beberapa bulan terakhir.',
       riwayatTumbuhKembang:
@@ -6520,11 +6520,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Demam berkepanjangan, diare berdarah, dan perut membesar setelah pernah tinggal di daerah danau.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: keluhan tergantung tahap — kulit pada tahap awal, saluran cerna dan hati pada tahap menahun. Onset: RUAM GATAL muncul dalam beberapa jam setelah kontak air (swimmer’s itch); demam Katayama muncul 2-8 minggu setelah paparan; keluhan menahun muncul setelah berbulan-bulan sampai bertahun-tahun. Character: tahap akut berupa demam, menggigil, nyeri otot, batuk, dan biduran; tahap menahun berupa diare berdarah, nyeri perut, dan perut membesar akibat pembesaran hati serta limpa. Radiation: tidak khas. Associations: penurunan berat badan, lemas, dan pada anak gangguan pertumbuhan; tanyakan muntah darah maupun buang air besar hitam yang menandakan pecahnya pembuluh darah esofagus akibat hipertensi portal. Time course: bertahun-tahun bila tidak diobati. Exacerbating: paparan air berulang. Severity: nilai penurunan berat badan, anemia, dan tanda hipertensi portal.',
-      riwayatPenyakitDahulu: 'History infeksi serupa sebelumnya, hepatitis B dan C yang memperberat kerusakan hati, serta penyakit hati lain.',
+      riwayatPenyakitDahulu: 'Riwayat infeksi serupa sebelumnya, hepatitis B dan C yang memperberat kerusakan hati, serta penyakit hati lain.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga maupun tetangga dengan keluhan serupa — penyakit ini bersifat terpusat pada wilayah tertentu sehingga penderita hampir selalu berkelompok.',
-      riwayatPengobatan: 'History pengobatan massal prazikuantel yang dijalankan program di daerah endemis, beserta kepatuhannya.',
-      riwayatAlergi: 'History alergi obat, terutama prazikuantel.',
+      riwayatPengobatan: 'Riwayat pengobatan massal prazikuantel yang dijalankan program di daerah endemis, beserta kepatuhannya.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama prazikuantel.',
       riwayatNutrisi: 'Status gizi, penurunan berat badan, dan pada anak riwayat pertumbuhan serta prestasi belajar yang menurun.',
       riwayatSosialEkonomi:
         'INTI ANAMNESIS ADALAH RIWAYAT KONTAK DENGAN AIR TAWAR DI DAERAH ENDEMIS — tanyakan secara spesifik apakah pernah tinggal, bekerja, bertani di sawah, mandi, mencuci, maupun menyeberang sungai dan danau di daerah Lindu, Napu, dan Bada di Sulawesi Tengah, termasuk bertahun-tahun lalu. Tanyakan pula pekerjaan sebagai petani, nelayan, dan pekerja irigasi, serta ketersediaan air bersih dan jamban.',
@@ -6558,7 +6558,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Tinggal maupun bekerja di daerah endemis Lindu, Napu, dan Bada di Sulawesi Tengah',
       'Kontak dengan air tawar untuk bertani, mandi, mencuci, dan menyeberang sungai',
-      'Occupation petani, nelayan, dan pekerja irigasi',
+      'Pekerjaan petani, nelayan, dan pekerja irigasi',
       'Usia anak dan remaja yang sering bermain di air',
       'Sanitasi buruk dan buang air besar di sekitar perairan',
       'Ketiadaan air bersih sehingga air danau dan sungai dipakai sehari-hari',
@@ -6578,7 +6578,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Dermatitis serkaria akibat serkaria burung — ruam gatal setelah kontak air tanpa infeksi lanjutan pada manusia',
     ],
     pengkajian:
-      'Dipikirkan skistosomiasis pada pasien ini atas dasar keluhan diare berdarah dan perut membesar yang berlangsung menahun, disertai pembesaran hati dan limpa yang mencolok serta eosinofilia, pada seseorang dengan riwayat tinggal dan bertani di daerah danau di Sulawesi Tengah dan sering bersentuhan dengan air tawar. History paparan itulah yang paling menentukan pada penyakit ini, sebab di Indonesia skistosomiasis hanya ditemukan di tiga daerah yaitu Lindu, Napu, dan Bada — sehingga tanpa riwayat berada di daerah tersebut, diagnosis ini praktis dapat ditinggalkan, dan sebaliknya dengan riwayat itu penyakit ini harus dipikirkan meskipun paparannya sudah bertahun-tahun berlalu. Sirosis hati merupakan banding utama mengingat sama-sama menimbulkan pembesaran limpa dan perut membesar, namun terdapat satu perbedaan yang sangat khas dan dapat dinilai dengan pemeriksaan sederhana: pada skistosomiasis, hipertensi portal terjadi karena telur yang tersangkut menimbulkan fibrosis di sekitar cabang vena porta sementara SEL HATI SENDIRI RELATIF TIDAK RUSAK, sehingga fungsi hati masih normal dan pasien tampak relatif baik meskipun limpanya sangat besar — sedangkan pada sirosis, hipertensi portal berjalan bersama kegagalan fungsi hati. Temuan fungsi hati yang normal pada pasien dengan hipertensi portal yang nyata karenanya justru mendukung diagnosis ini alih-alih menyingkirkannya. Malaria dipertimbangkan mengingat demam dengan pembesaran limpa di daerah endemis, namun apus darah tidak menemukan parasit. Amubiasis dan disentri basiler dipertimbangkan pada diare berdarah namun tidak menjelaskan pembesaran organ maupun eosinofilia. Perlu diketahui bahwa pemeriksaan tinja tunggal dapat negatif karena pengeluaran telur tidak menentu, sehingga hasil negatif tidak menyingkirkan diagnosis dan pemeriksaan perlu diulang; bila kecurigaan tetap tinggi, biopsi rektum dapat menemukan telur. Penapisan hepatitis B dan C dikerjakan karena keduanya memperberat kerusakan hati bila berdampingan.',
+      'Dipikirkan skistosomiasis pada pasien ini atas dasar keluhan diare berdarah dan perut membesar yang berlangsung menahun, disertai pembesaran hati dan limpa yang mencolok serta eosinofilia, pada seseorang dengan riwayat tinggal dan bertani di daerah danau di Sulawesi Tengah dan sering bersentuhan dengan air tawar. Riwayat paparan itulah yang paling menentukan pada penyakit ini, sebab di Indonesia skistosomiasis hanya ditemukan di tiga daerah yaitu Lindu, Napu, dan Bada — sehingga tanpa riwayat berada di daerah tersebut, diagnosis ini praktis dapat ditinggalkan, dan sebaliknya dengan riwayat itu penyakit ini harus dipikirkan meskipun paparannya sudah bertahun-tahun berlalu. Sirosis hati merupakan banding utama mengingat sama-sama menimbulkan pembesaran limpa dan perut membesar, namun terdapat satu perbedaan yang sangat khas dan dapat dinilai dengan pemeriksaan sederhana: pada skistosomiasis, hipertensi portal terjadi karena telur yang tersangkut menimbulkan fibrosis di sekitar cabang vena porta sementara SEL HATI SENDIRI RELATIF TIDAK RUSAK, sehingga fungsi hati masih normal dan pasien tampak relatif baik meskipun limpanya sangat besar — sedangkan pada sirosis, hipertensi portal berjalan bersama kegagalan fungsi hati. Temuan fungsi hati yang normal pada pasien dengan hipertensi portal yang nyata karenanya justru mendukung diagnosis ini alih-alih menyingkirkannya. Malaria dipertimbangkan mengingat demam dengan pembesaran limpa di daerah endemis, namun apus darah tidak menemukan parasit. Amubiasis dan disentri basiler dipertimbangkan pada diare berdarah namun tidak menjelaskan pembesaran organ maupun eosinofilia. Perlu diketahui bahwa pemeriksaan tinja tunggal dapat negatif karena pengeluaran telur tidak menentu, sehingga hasil negatif tidak menyingkirkan diagnosis dan pemeriksaan perlu diulang; bila kecurigaan tetap tinggi, biopsi rektum dapat menemukan telur. Penapisan hepatitis B dan C dikerjakan karena keduanya memperberat kerusakan hati bila berdampingan.',
     terapiSuportif: [
       'Perbaikan gizi dengan asupan protein dan kalori yang cukup, terutama pada anak dengan gangguan pertumbuhan',
       'Koreksi anemia dengan zat besi dan penanganan penyebabnya',
@@ -6605,7 +6605,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Gunakan jamban dan jangan buang air besar di sekitar perairan — telur yang keluar bersama tinja melanjutkan siklus penularan ke seluruh kampung',
       'Ikuti pengobatan massal yang dijalankan program meskipun sedang tidak merasa sakit, karena infeksi ringan sering tanpa keluhan namun tetap merusak hati',
       'Ajak anggota keluarga dan tetangga diperiksa, karena penularannya bersifat terpusat pada satu wilayah',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam teratur ditambah dua selingan; penyakit ini menimbulkan anemia dan gangguan gizi sehingga porsi tidak boleh dikurangi. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari, perbanyak sumber zat besi seperti daging merah, hati, dan sayuran hijau, sertakan buah sumber vitamin C agar zat besi terserap, dan minum 8 gelas air per hari dari sumber yang aman. PRAZIKUANTEL DIMINUM BERSAMA MAKANAN untuk mengurangi mual dan meningkatkan penyerapan. HINDARI ALKOHOL sepenuhnya bila sudah ada kerusakan hati',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam teratur ditambah dua selingan; penyakit ini menimbulkan anemia dan gangguan gizi sehingga porsi tidak boleh dikurangi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari, perbanyak sumber zat besi seperti daging merah, hati, dan sayuran hijau, sertakan buah sumber vitamin C agar zat besi terserap, dan minum 8 gelas air per hari dari sumber yang aman. PRAZIKUANTEL DIMINUM BERSAMA MAKANAN untuk mengurangi mual dan meningkatkan penyerapan. HINDARI ALKOHOL sepenuhnya bila sudah ada kerusakan hati',
       'Jam tidur: 7-9 jam per malam pada dewasa dan lebih banyak pada anak, dengan jadwal tetap; tubuh memerlukan istirahat untuk memulihkan gizi dan anemia. Bila perut terasa penuh karena limpa membesar, tidur dengan kepala sedikit lebih tinggi',
       'Pola olahraga: aktivitas fisik ringan sampai sedang 30 menit sehari tetap dianjurkan dan membantu memperbaiki nafsu makan serta kebugaran. Namun BILA LIMPA MEMBESAR NYATA, HINDARI OLAHRAGA KONTAK, bela diri, sepak bola, dan kegiatan dengan risiko benturan pada perut — limpa yang membesar jauh lebih mudah pecah dan itu merupakan kegawatan yang mengancam jiwa. Pilih jalan kaki, sepeda statis, dan latihan ringan. YANG PALING PENTING: JANGAN BERENANG DI DANAU, SUNGAI, MAUPUN SAWAH sebagai olahraga di daerah endemis — gunakan kolam berklorin bila tersedia',
       'Follow up: kontrol setelah 4-6 minggu untuk pemeriksaan tinja ulang; pada yang sudah ada kelainan hati, pemantauan berkala jangka panjang',
@@ -6773,12 +6773,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: darah keluar dari anus, dan rasa tidak nyaman atau mengganjal pada dubur. Onset: perlahan dan berulang selama berbulan-bulan, khas berkaitan dengan periode konstipasi atau mengejan berlebihan. Character: darah MERAH SEGAR yang MENETES setelah tinja keluar, atau menyelaputi permukaan tinja dan menempel pada tisu — BUKAN darah yang bercampur merata dengan tinja dan bukan darah kehitaman; darah bercampur lendir atau berwarna gelap mengarah pada lesi yang lebih proksimal termasuk keganasan. Radiation: tidak ada. Associations: rasa mengganjal, benjolan yang keluar saat mengejan dan MASUK SENDIRI (derajat 2) atau harus didorong dengan jari (derajat 3), gatal perianal, keluarnya lendir, dan rasa buang air besar tidak tuntas. TANYAKAN NYERI dengan cermat — hemoroid interna derajat 1-2 pada dasarnya TIDAK NYERI; adanya nyeri hebat saat dan setelah buang air besar justru mengarahkan ke FISURA ANI, sedangkan benjolan yang nyeri hebat mendadak mengarah ke hemoroid eksterna dengan trombosis atau hemoroid interna derajat 4 yang terjepit. WAJIB tanyakan ALARM SYMPTOMS: perubahan pola buang air besar yang menetap, tinja menjadi kecil-kecil seperti pensil, penurunan berat badan tanpa sebab, rasa lemas dan pucat, darah bercampur lendir, riwayat keluarga kanker kolorektal, dan usia di atas 40-50 tahun. Time course: berulang saat konstipasi dan mereda saat tinja lunak. Exacerbating: konstipasi, mengejan lama, duduk berlama-lama di toilet sambil membaca atau bermain telepon genggam, diet rendah serat, dan angkat beban berat; relieving: tinja yang lunak, rendam duduk hangat. Severity: berapa banyak darah (menetes, memancing, atau memenuhi kloset), frekuensi, apakah sampai menimbulkan lemas dan pucat, dan dampak terhadap aktivitas.',
       riwayatPenyakitDahulu:
-        'History hemoroid sebelumnya dan tindakan yang pernah dijalani, riwayat KONSTIPASI KRONIK, riwayat fisura ani atau fistula perianal, riwayat penyakit hati kronik dengan HIPERTENSI PORTAL yang menimbulkan varises anorektal menyerupai hemoroid, riwayat penyakit radang usus, riwayat polip atau kanker kolorektal, riwayat kelainan pembekuan darah, dan riwayat operasi daerah anus.',
+        'Riwayat hemoroid sebelumnya dan tindakan yang pernah dijalani, riwayat KONSTIPASI KRONIK, riwayat fisura ani atau fistula perianal, riwayat penyakit hati kronik dengan HIPERTENSI PORTAL yang menimbulkan varises anorektal menyerupai hemoroid, riwayat penyakit radang usus, riwayat polip atau kanker kolorektal, riwayat kelainan pembekuan darah, dan riwayat operasi daerah anus.',
       riwayatPenyakitKeluarga:
-        'History KANKER KOLOREKTAL, POLIPOSIS, dan penyakit radang usus dalam keluarga — riwayat ini menurunkan ambang untuk melakukan kolonoskopi meski gambaran klinisnya khas hemoroid.',
+        'Riwayat KANKER KOLOREKTAL, POLIPOSIS, dan penyakit radang usus dalam keluarga — riwayat ini menurunkan ambang untuk melakukan kolonoskopi meski gambaran klinisnya khas hemoroid.',
       riwayatPengobatan:
         'Obat yang menyebabkan konstipasi: opioid, antikolinergik, antidepresan trisiklik, suplemen besi, dan antasida berbasis aluminium. Tanyakan pula ANTIKOAGULAN dan ANTIPLATELET (warfarin, aspirin, klopidogrel, antikoagulan oral baru) yang memperberat perdarahan dan memerlukan pertimbangan khusus sebelum tindakan, serta obat yang sudah dipakai sendiri berupa salep atau supositoria, laksatif, dan obat tradisional.',
-      riwayatAlergi: 'History alergi obat, termasuk anestesi lokal yang terkandung dalam sediaan topikal.',
+      riwayatAlergi: 'Riwayat alergi obat, termasuk anestesi lokal yang terkandung dalam sediaan topikal.',
       riwayatKehamilanPersalinan:
         'Pada perempuan: jumlah kehamilan dan persalinan, riwayat persalinan pervaginam dengan kala dua yang lama, dan status kehamilan saat ini beserta usia gestasi — hemoroid sangat sering muncul atau memberat pada trimester ketiga dan masa nifas akibat peningkatan tekanan intraabdomen, pembesaran uterus yang menekan vena, serta efek progesteron; status ini menentukan pilihan obat dan menunda tindakan invasif.',
       riwayatNutrisi:
@@ -6819,11 +6819,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebiasaan DUDUK BERLAMA-LAMA di toilet, termasuk sambil membaca atau bermain telepon genggam',
       'KEHAMILAN dan persalinan pervaginam',
       'Obesitas',
-      'Occupation dengan posisi duduk atau berdiri berjam-jam, dan pekerjaan mengangkat beban berat',
+      'Pekerjaan dengan posisi duduk atau berdiri berjam-jam, dan pekerjaan mengangkat beban berat',
       'Usia lanjut akibat melemahnya jaringan penyangga',
       'Diare kronik',
       'Hipertensi portal pada sirosis hati (menimbulkan varises anorektal yang menyerupai hemoroid)',
-      'History keluarga',
+      'Riwayat keluarga',
       'Kurangnya aktivitas fisik',
     ],
     goldStandard:
@@ -6947,13 +6947,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: punggung tangan, jari, sekitar kuku, lutut, dan siku; pada telapak kaki disebut veruka plantaris yang tumbuh ke dalam sehingga terasa nyeri saat berjalan. Onset: perlahan dalam hitungan minggu hingga bulan setelah masa inkubasi yang dapat mencapai beberapa bulan, sehingga pasien jarang dapat menunjuk sumber penularannya. Character: papul padat berwarna seperti kulit sampai keabu-abuan dengan permukaan kasar berbenjol seperti kembang kol; TANYAKAN APAKAH ADA TITIK-TITIK HITAM DI PERMUKAANNYA, karena titik itu merupakan pembuluh darah yang mengalami trombosis dan sangat khas untuk kutil. Radiation: PENYEBARAN MENGIKUTI GARIS GARUKAN ATAU LUKA (fenomena Koebner) — bertambahnya kutil sepanjang bekas garukan merupakan petunjuk sekaligus alasan mengapa mengorek kutil justru memperbanyaknya. Associations: umumnya tidak nyeri dan tidak gatal kecuali pada telapak kaki maupun sekitar kuku. Time course: menahun; sebagian sembuh sendiri dalam 1-2 tahun terutama pada anak. Exacerbating: menggigit kutil, menggaruk, dan bercukur pada daerah yang terkena. Severity: nilai dampak kosmetik, nyeri saat berjalan pada veruka plantaris, dan gangguan pekerjaan.',
       riwayatPenyakitDahulu:
-        'History kutil sebelumnya beserta pengobatan yang pernah dijalani, dermatitis atopik yang membuat sawar kulit lemah, diabetes melitus, keadaan imunitas menurun termasuk infeksi HIV, dan riwayat transplantasi organ dengan obat imunosupresan — pada keadaan imunitas menurun kutil menjadi banyak, luas, dan sulit diobati.',
+        'Riwayat kutil sebelumnya beserta pengobatan yang pernah dijalani, dermatitis atopik yang membuat sawar kulit lemah, diabetes melitus, keadaan imunitas menurun termasuk infeksi HIV, dan riwayat transplantasi organ dengan obat imunosupresan — pada keadaan imunitas menurun kutil menjadi banyak, luas, dan sulit diobati.',
       riwayatPenyakitKeluarga: 'Anggota keluarga serumah dengan kutil serupa, karena penularan melalui kontak dan barang bersama sangat sering.',
       riwayatPengobatan:
         'Obat dan tindakan yang sudah dijalani termasuk obat oles dari apotek, tindakan bakar maupun beku, dan pengobatan tradisional; tanyakan pula kortikosteroid dan obat imunosupresan yang sedang dipakai.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap obat oles sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap obat oles sebelumnya.',
       riwayatSosialEkonomi:
-        'Occupation yang membuat tangan sering basah maupun terluka seperti penjagal, tukang daging, dan pekerja pengolahan ikan; kebiasaan berjalan tanpa alas kaki di kolam renang dan kamar mandi umum; olahraga kontak; serta kebiasaan menggigit kuku dan mengorek kutil yang menyebarkannya.',
+        'Pekerjaan yang membuat tangan sering basah maupun terluka seperti penjagal, tukang daging, dan pekerja pengolahan ikan; kebiasaan berjalan tanpa alas kaki di kolam renang dan kamar mandi umum; olahraga kontak; serta kebiasaan menggigit kuku dan mengorek kutil yang menyebarkannya.',
     },
     pemeriksaanFisik: [
       'Papul padat berbatas tegas dengan permukaan kasar berbenjol dan hiperkeratotik, berwarna seperti kulit sampai keabu-abuan',
@@ -6982,7 +6982,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kulit yang lecet, dermatitis atopik, dan sawar kulit yang lemah',
       'Kebiasaan menggigit kuku, mengorek kutil, dan bercukur pada daerah yang terkena',
       'Berjalan tanpa alas kaki di kolam renang, kamar mandi umum, dan ruang ganti',
-      'Occupation dengan tangan basah dan sering terluka seperti pengolah daging dan ikan',
+      'Pekerjaan dengan tangan basah dan sering terluka seperti pengolah daging dan ikan',
       'Olahraga kontak dan pemakaian barang bersama',
       'Keadaan imunitas menurun termasuk infeksi HIV dan pemakaian obat imunosupresan',
       'Diabetes melitus',
@@ -7064,7 +7064,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'DERMATITIS ATOPIK merupakan faktor risiko yang sangat sering pada anak karena sawar kulit yang lemah dan garukan yang menyebarkan virus. Tanyakan pula keadaan imunitas menurun termasuk infeksi HIV, keganasan, dan pemakaian obat imunosupresan — pada keadaan itu lesi menjadi sangat banyak, besar, dan membandel.',
       riwayatPenyakitKeluarga: 'Anggota keluarga maupun teman bermain dengan keluhan serupa, serta riwayat atopi pada keluarga.',
       riwayatPengobatan: 'Obat yang sudah dipakai termasuk kortikosteroid topikal untuk eksim di sekitarnya, serta obat imunosupresan.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap obat oles sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap obat oles sebelumnya.',
       riwayatSosialEkonomi:
         'Kontak dengan anak lain di sekolah maupun tempat penitipan, kebiasaan berenang bersama dan berbagi handuk, olahraga kontak, serta PADA DEWASA riwayat seksual yang ditanyakan dengan cara tidak menghakimi karena lesi genital pada dewasa menuntut penapisan infeksi menular seksual lain. PADA ANAK DENGAN LESI GENITAL, pertimbangkan kemungkinan kekerasan seksual dan tangani sesuai prosedur yang berlaku, meskipun penularan melalui tangan sendiri jauh lebih sering.',
     },
@@ -7171,16 +7171,16 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: nyeri terasa pada satu pita kulit sesuai dermatom, tersering torakal, kemudian lumbal dan servikal; tanyakan secara eksplisit apakah keluhan melewati garis tengah tubuh, karena sifat unilateral adalah kunci diagnosis. Onset: nyeri, rasa terbakar, gatal, atau baal biasanya mendahului lesi 2-3 hari — fase prodromal ini sering disalahartikan sebagai kolik ginjal, angina, atau nyeri muskuloskeletal bila belum ada ruam. Character: nyeri bersifat neuropatik — menusuk, panas terbakar, atau seperti tersengat listrik, kerap disertai alodinia sehingga sentuhan pakaian pun terasa nyeri. Radiation: menjalar mengikuti perjalanan saraf, bukan menyebar acak. Associations: demam ringan, malaise, dan sakit kepala; tanyakan gangguan penglihatan, mata merah, nyeri telinga, gangguan pendengaran, vertigo, dan wajah perot untuk menyingkirkan zoster oftalmikus dan sindrom Ramsay Hunt yang bukan lagi kasus tanpa komplikasi. Time course: lesi berkembang dari makula eritematosa menjadi papul, vesikel berkelompok, lalu pustul dan krusta dalam 7-10 hari; catat hari keberapa sejak lesi pertama muncul karena antivirus paling bermanfaat bila dimulai dalam 72 jam. Exacerbating/relieving: nyeri memberat saat tersentuh dan pada malam hari. Severity: nilai dengan skala nyeri numerik serta dampaknya pada tidur dan aktivitas.',
       riwayatPenyakitDahulu:
-        'History cacar air pada masa kanak-kanak atau kontak varisela — reaktivasi hanya mungkin bila pernah terinfeksi. Gali kondisi yang menurunkan imunitas seluler: diabetes melitus, keganasan terutama limfoma dan leukemia, infeksi HIV, penyakit ginjal kronik, serta riwayat kemoterapi atau radioterapi. Zoster pada usia muda tanpa faktor risiko jelas merupakan indikasi untuk menawarkan tes HIV.',
+        'Riwayat cacar air pada masa kanak-kanak atau kontak varisela — reaktivasi hanya mungkin bila pernah terinfeksi. Gali kondisi yang menurunkan imunitas seluler: diabetes melitus, keganasan terutama limfoma dan leukemia, infeksi HIV, penyakit ginjal kronik, serta riwayat kemoterapi atau radioterapi. Zoster pada usia muda tanpa faktor risiko jelas merupakan indikasi untuk menawarkan tes HIV.',
       riwayatPenyakitKeluarga:
         'Umumnya tidak relevan sebagai penyebab, namun tanyakan adanya anggota keluarga serumah yang belum pernah varisela, ibu hamil, bayi, atau orang dengan imunitas menurun, karena cairan vesikel dapat menularkan varisela kepada mereka.',
       riwayatPengobatan:
         'Penggunaan kortikosteroid jangka panjang, obat imunosupresan, dan obat biologis. Catat pula analgesik yang sudah dipakai beserta responsnya, serta riwayat vaksinasi zoster atau varisela.',
-      riwayatAlergi: 'History alergi obat, khususnya asiklovir dan golongan analgesik yang akan diresepkan.',
+      riwayatAlergi: 'Riwayat alergi obat, khususnya asiklovir dan golongan analgesik yang akan diresepkan.',
       riwayatNutrisi:
         'Status gizi dan asupan harian; malnutrisi memperlambat penyembuhan lesi dan menandakan imunitas yang menurun.',
       riwayatSosialEkonomi:
-        'Occupation dan kontak erat di rumah maupun tempat kerja untuk menilai risiko penularan, kualitas tidur yang sering terganggu oleh nyeri, tingkat stres sebagai pencetus reaktivasi, serta kemampuan membeli antivirus yang menentukan pilihan regimen.',
+        'Pekerjaan dan kontak erat di rumah maupun tempat kerja untuk menilai risiko penularan, kualitas tidur yang sering terganggu oleh nyeri, tingkat stres sebagai pencetus reaktivasi, serta kemampuan membeli antivirus yang menentukan pilihan regimen.',
     },
     pemeriksaanFisik: [
       'Inspeksi seluruh permukaan kulit untuk memastikan lesi terbatas pada satu dermatom dan benar-benar tidak melewati garis tengah; adanya lebih dari 20 lesi di luar dermatom yang terkena menandakan zoster diseminata dan bukan lagi kasus tanpa komplikasi',
@@ -7262,11 +7262,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Demam tinggi selama beberapa hari yang kemudian diikuti timbulnya ruam merah mulai dari belakang telinga.',
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: RUAM dimulai dari belakang telinga dan batas rambut, lalu menyebar ke wajah, leher, badan, dan terakhir ke ekstremitas — pola SEFALOKAUDAL ini merupakan ciri khas. Onset: demam mendahului ruam selama 3-4 hari, dan yang sangat khas adalah DEMAM TIDAK TURUN bahkan MEMUNCAK justru saat ruam pertama kali muncul; demam yang menetap lebih dari 3 hari SETELAH ruam timbul menandakan adanya komplikasi. Character: ruam makulopapular eritematosa yang dapat berkonfluens membentuk bercak besar, tidak gatal atau hanya gatal ringan. Radiation: penyebaran ruam sefalokaudal dalam 3 hari. Associations: trias 3C yaitu COUGH (batuk), CORYZA (pilek), dan CONJUNCTIVITIS (mata merah berair dan silau) yang mendahului ruam, serta bercak Koplik di mukosa pipi yang muncul 1-2 hari sebelum ruam dan menghilang cepat sehingga sering terlewat; tanyakan pula nafsu makan, diare, dan sesak. Time course: ruam bertahan 5-6 hari lalu memudar dengan urutan yang sama dan meninggalkan bekas kecokelatan yang mengelupas halus (deskuamasi furfurasea). Exacerbating: kondisi gizi buruk dan defisiensi vitamin A memperberat perjalanan penyakit. Severity: nilai apakah anak masih mau minum, tampak sesak, atau letargi.',
-      riwayatPenyakitDahulu: 'History campak sebelumnya (infeksi alami memberi kekebalan seumur hidup), gizi buruk, tuberkulosis, HIV, defisiensi imun, dan penyakit kronik lain yang memperberat perjalanan penyakit.',
+      riwayatPenyakitDahulu: 'Riwayat campak sebelumnya (infeksi alami memberi kekebalan seumur hidup), gizi buruk, tuberkulosis, HIV, defisiensi imun, dan penyakit kronik lain yang memperberat perjalanan penyakit.',
       riwayatPenyakitKeluarga: 'Adakah anggota keluarga atau teman sekolah dengan keluhan serupa dalam 2-3 minggu terakhir, serta status imunisasi saudara kandung.',
       riwayatPengobatan: 'Obat yang sudah diberikan termasuk antipiretik dan antibiotik; tanyakan pula apakah anak menerima kortikosteroid atau imunosupresan yang memperburuk perjalanan campak.',
-      riwayatAlergi: 'History alergi obat, serta riwayat reaksi anafilaksis terhadap vaksin sebelumnya atau alergi berat terhadap neomisin dan gelatin yang relevan untuk vaksinasi berikutnya.',
-      riwayatTumbuhKembang: 'History pertumbuhan pada KMS dan status gizi sebelum sakit, karena campak pada anak gizi buruk berisiko jauh lebih fatal.',
+      riwayatAlergi: 'Riwayat alergi obat, serta riwayat reaksi anafilaksis terhadap vaksin sebelumnya atau alergi berat terhadap neomisin dan gelatin yang relevan untuk vaksinasi berikutnya.',
+      riwayatTumbuhKembang: 'Riwayat pertumbuhan pada KMS dan status gizi sebelum sakit, karena campak pada anak gizi buruk berisiko jauh lebih fatal.',
       riwayatNutrisi: 'Status gizi, asupan sebelum dan selama sakit, riwayat pemberian kapsul VITAMIN A, dan riwayat ASI eksklusif.',
       riwayatImunisasi:
         'Ini merupakan pertanyaan KUNCI. Apakah sudah menerima vaksin campak atau MR pada usia 9 bulan, dosis lanjutan pada usia 18 bulan, dan dosis pada anak kelas 1 SD melalui program BIAS; periksa langsung catatan pada buku KIA, bukan hanya mengandalkan ingatan orang tua. Bila belum diimunisasi, gali ALASANNYA — apakah karena akses, keraguan terhadap vaksin, atau kontraindikasi medis.',
@@ -7376,11 +7376,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: lesi dimulai dari BADAN lalu menyebar ke wajah dan ekstremitas — pola SENTRIFUGAL, kebalikan dari campak; dapat mengenai mukosa mulut, mata, dan genital. Onset: demam ringan dan lemas mendahului erupsi 1-2 hari; pada dewasa gejala prodromal lebih berat. Character: lesi terasa GATAL, berkembang cepat dari makula menjadi papul, vesikel jernih di atas dasar kemerahan (gambaran embun di atas kelopak mawar), lalu keruh dan menjadi krusta. Radiation: penyebaran dari sentral ke perifer dalam beberapa hari. Associations: demam, lemas, nyeri kepala, nafsu makan turun; tanyakan nyeri menelan bila ada lesi mukosa mulut. Time course: yang KHAS adalah munculnya lesi dalam beberapa gelombang sehingga pada satu waktu terlihat BERBAGAI STADIUM BERSAMAAN (makula, papul, vesikel, dan krusta) — ini pembeda paling penting dari variola. Exacerbating: garukan memperberat dan memicu infeksi sekunder serta jaringan parut. Severity: nilai apakah masih mau makan-minum, ada sesak, atau tampak sangat lemas.',
       riwayatPenyakitDahulu:
-        'History cacar air sebelumnya (infeksi alami memberi kekebalan seumur hidup), riwayat herpes zoster, penyakit kulit kronik seperti dermatitis atopik yang memperberat, serta imunodefisiensi termasuk HIV, keganasan, dan penggunaan kortikosteroid atau imunosupresan.',
+        'Riwayat cacar air sebelumnya (infeksi alami memberi kekebalan seumur hidup), riwayat herpes zoster, penyakit kulit kronik seperti dermatitis atopik yang memperberat, serta imunodefisiensi termasuk HIV, keganasan, dan penggunaan kortikosteroid atau imunosupresan.',
       riwayatPenyakitKeluarga: 'Adakah anggota keluarga, teman sekolah, atau kontak yang mengalami cacar air atau herpes zoster dalam 2-3 minggu terakhir; tanyakan pula adakah bayi, ibu hamil, atau orang dengan daya tahan tubuh rendah di rumah yang perlu dilindungi.',
       riwayatPengobatan:
         'Obat yang sudah diberikan — tanyakan secara SPESIFIK apakah diberi ASPIRIN atau obat mengandung salisilat, karena berisiko sindrom Reye; tanyakan pula penggunaan kortikosteroid yang memperberat perjalanan penyakit, serta bedak atau ramuan yang dioleskan.',
-      riwayatAlergi: 'History alergi obat, termasuk riwayat reaksi terhadap vaksin sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat, termasuk riwayat reaksi terhadap vaksin sebelumnya.',
       riwayatKehamilanPersalinan:
         'Pada perempuan usia subur WAJIB ditanyakan status kehamilan dan usia kehamilan — varisela pada kehamilan berisiko sindrom varisela kongenital bila terjadi sebelum 20 minggu, dan varisela neonatal berat bila ibu terinfeksi 5 hari sebelum hingga 2 hari setelah persalinan.',
       riwayatImunisasi: 'Status vaksinasi varisela; vaksin tidak termasuk program imunisasi dasar nasional sehingga banyak yang belum menerima.',
@@ -7489,18 +7489,18 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: lokasi lesi yang tepat — tepi bibir dan sekitar mulut pada tipe 1, atau batang penis, vulva, perineum, dan daerah sekitar anus pada tipe 2; TANYAKAN APAKAH LESI SELALU MUNCUL DI TEMPAT YANG SAMA, karena rekurensi di lokasi identik adalah ciri paling khas penyakit ini. Onset: gejala prodromal berupa gatal, perih, dan terbakar yang mendahului lesi beberapa jam hingga dua hari; pada episode pertama keluhan jauh lebih berat dan lebih lama dibandingkan episode berulang. Character: vesikel kecil berkelompok di atas dasar kemerahan yang mudah pecah menjadi erosi dangkal yang nyeri, kemudian mengering. Radiation: nyeri dapat menjalar sesuai perjalanan saraf sebelum lesi muncul. Associations: pada episode pertama tanyakan demam, nyeri kepala, nyeri otot, dan pembesaran kelenjar getah bening lipat paha yang nyeri; pada lesi genital tanyakan nyeri saat berkemih dan kesulitan berkemih; tanyakan pula sariawan luas dan nyeri menelan pada anak dengan gingivostomatitis. Time course: berapa kali kambuh dalam setahun — angka ini yang menentukan perlu tidaknya terapi supresif; catat pula berapa hari sejak keluhan sekarang dimulai karena antivirus paling bermanfaat bila dimulai dalam 72 jam atau bahkan saat masih fase prodromal. Exacerbating: demam, paparan sinar matahari, haid, kelelahan, stres, dan tindakan pada wajah maupun gigi. Severity: nyeri, gangguan makan dan minum, gangguan berkemih, serta dampak emosional yang pada herpes genital sering jauh lebih berat daripada lesinya.',
       riwayatPenyakitDahulu:
-        'History episode serupa sebelumnya beserta frekuensi dan pencetusnya. History dermatitis atopik yang berisiko menimbulkan eksema herpetikum bila terinfeksi. Kondisi yang menurunkan imunitas seperti infeksi HIV, keganasan, kemoterapi, dan pemakaian obat imunosupresan yang membuat perjalanan penyakit lebih berat dan berkepanjangan.',
+        'Riwayat episode serupa sebelumnya beserta frekuensi dan pencetusnya. Riwayat dermatitis atopik yang berisiko menimbulkan eksema herpetikum bila terinfeksi. Kondisi yang menurunkan imunitas seperti infeksi HIV, keganasan, kemoterapi, dan pemakaian obat imunosupresan yang membuat perjalanan penyakit lebih berat dan berkepanjangan.',
       riwayatPenyakitKeluarga:
-        'History lesi serupa pada pasangan atau anggota keluarga serumah, serta adanya bayi, ibu hamil, atau orang dengan imunitas menurun di rumah yang berisiko tertular.',
+        'Riwayat lesi serupa pada pasangan atau anggota keluarga serumah, serta adanya bayi, ibu hamil, atau orang dengan imunitas menurun di rumah yang berisiko tertular.',
       riwayatPengobatan:
         'Antivirus yang pernah dipakai beserta dosis, lama, dan responsnya. Kortikosteroid topikal yang keliru dioleskan pada lesi dan justru memperberat. Obat imunosupresan.',
-      riwayatAlergi: 'History alergi obat, terutama asiklovir dan analgesik.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama asiklovir dan analgesik.',
       riwayatKehamilanPersalinan:
         'Pada perempuan usia subur, tanyakan status kehamilan dan usia kehamilannya. Herpes genital yang aktif menjelang persalinan berisiko menularkan infeksi berat pada bayi baru lahir, sehingga hal ini harus diketahui jauh sebelum waktu persalinan.',
       riwayatNutrisi:
         'Asupan makan dan minum, terutama pada anak dengan gingivostomatitis yang sering menolak makan dan minum sehingga berisiko dehidrasi.',
       riwayatSosialEkonomi:
-        'History hubungan seksual termasuk jumlah pasangan, penggunaan kondom, dan jenis kontak, ditanyakan dengan cara yang tidak menghakimi. Occupation yang berisiko seperti tenaga kesehatan dengan kontak langsung, dan olahraga kontak seperti gulat yang dapat menularkan lesi ke kulit. Tingkat stres dan kualitas tidur sebagai pencetus.',
+        'Riwayat hubungan seksual termasuk jumlah pasangan, penggunaan kondom, dan jenis kontak, ditanyakan dengan cara yang tidak menghakimi. Pekerjaan yang berisiko seperti tenaga kesehatan dengan kontak langsung, dan olahraga kontak seperti gulat yang dapat menularkan lesi ke kulit. Tingkat stres dan kualitas tidur sebagai pencetus.',
     },
     pemeriksaanFisik: [
       'Karakterisasi lesi: vesikel kecil berkelompok di atas dasar eritematosa yang seragam ukurannya, mudah pecah menjadi erosi dangkal dengan tepi bergerigi, lalu mengering menjadi krusta',
@@ -7523,7 +7523,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     etiologi:
       'Virus herpes simpleks tipe 1 dan tipe 2; keduanya dapat menimbulkan lesi orolabial maupun genital tergantung jenis kontak, sehingga lokasi lesi tidak lagi dapat dipakai untuk menyimpulkan tipe virusnya.',
     patofisiologi:
-      'Virus masuk melalui kulit yang lecet atau mukosa, bereplikasi pada sel epitel, dan menimbulkan lesi vesikuler dengan degenerasi balon sel epidermis. Dari ujung saraf sensorik setempat, virus berjalan retrograd sepanjang akson menuju ganglion sensorik — ganglion trigeminal untuk lesi orolabial dan ganglion sakral untuk lesi genital — lalu menetap laten seumur hidup dengan ekspresi gen yang sangat terbatas sehingga unknowni sistem imun. Karena latensi ini berada di dalam neuron dan bukan di kulit, tidak ada terapi yang dapat menghilangkan virus dari tubuh; inilah alasan penyakit ini dikendalikan, bukan disembuhkan. Ketika terjadi pemicu berupa demam, paparan sinar ultraviolet, haid, stres, kelelahan, atau penurunan imunitas, virus mengaktifkan kembali replikasinya dan berjalan anterograd kembali ke kulit melalui akson yang sama, sehingga lesi selalu muncul di daerah persarafan yang sama. Episode pertama berlangsung lebih berat karena tubuh belum memiliki antibodi maupun imunitas seluler spesifik, sedangkan episode berikutnya lebih ringan dan lebih singkat karena sudah ada respons imun. Pelepasan virus tanpa disertai lesi yang tampak tetap dapat terjadi, dan inilah mekanisme utama penularan yang tidak disadari.',
+      'Virus masuk melalui kulit yang lecet atau mukosa, bereplikasi pada sel epitel, dan menimbulkan lesi vesikuler dengan degenerasi balon sel epidermis. Dari ujung saraf sensorik setempat, virus berjalan retrograd sepanjang akson menuju ganglion sensorik — ganglion trigeminal untuk lesi orolabial dan ganglion sakral untuk lesi genital — lalu menetap laten seumur hidup dengan ekspresi gen yang sangat terbatas sehingga tidak dikenali sistem imun. Karena latensi ini berada di dalam neuron dan bukan di kulit, tidak ada terapi yang dapat menghilangkan virus dari tubuh; inilah alasan penyakit ini dikendalikan, bukan disembuhkan. Ketika terjadi pemicu berupa demam, paparan sinar ultraviolet, haid, stres, kelelahan, atau penurunan imunitas, virus mengaktifkan kembali replikasinya dan berjalan anterograd kembali ke kulit melalui akson yang sama, sehingga lesi selalu muncul di daerah persarafan yang sama. Episode pertama berlangsung lebih berat karena tubuh belum memiliki antibodi maupun imunitas seluler spesifik, sedangkan episode berikutnya lebih ringan dan lebih singkat karena sudah ada respons imun. Pelepasan virus tanpa disertai lesi yang tampak tetap dapat terjadi, dan inilah mekanisme utama penularan yang tidak disadari.',
     faktorRisiko: [
       'Kontak langsung dengan lesi aktif maupun dengan sekret dari orang yang sedang melepaskan virus tanpa gejala',
       'Jumlah pasangan seksual yang banyak dan tidak menggunakan kondom',
@@ -7572,7 +7572,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'JANGAN mencium bayi saat ada lesi di bibir — infeksi herpes pada bayi baru lahir dapat berakibat sangat berat',
       'Bagi perempuan, beri tahu tenaga kesehatan tentang riwayat herpes genital sejak awal kehamilan, jauh sebelum waktu persalinan, agar rencana persalinan dapat disiapkan',
       'Kenali dan hindari pencetus pribadi; gunakan pelembap bibir dengan tabir surya bila paparan sinar matahari terbukti menjadi pemicu lesi orolabial',
-      'Jadwal dan porsi makan: pertahankan tiga kali makan utama pada jam tetap dengan dua selingan. Selama lesi mulut aktif, pilih makanan lunak dan dingin seperti bubur, puding, dan es krim, hindari makanan asam, pedas, keras, dan panas, serta makan porsi kecil lebih sering agar asupan tetap tercukupi. Adequatekan protein dan minum minimal 8 gelas air per hari',
+      'Jadwal dan porsi makan: pertahankan tiga kali makan utama pada jam tetap dengan dua selingan. Selama lesi mulut aktif, pilih makanan lunak dan dingin seperti bubur, puding, dan es krim, hindari makanan asam, pedas, keras, dan panas, serta makan porsi kecil lebih sering agar asupan tetap tercukupi. Cukupkan protein dan minum minimal 8 gelas air per hari',
       'Jam tidur: 7-8 jam per malam dengan jadwal tetap — kurang tidur adalah salah satu pencetus kekambuhan yang paling sering dan paling dapat dikendalikan',
       'Pola olahraga: aktivitas sedang 30 menit sehari selama 5 hari seminggu membantu mengelola stres yang menjadi pencetus. Namun HINDARI OLAHRAGA KONTAK seperti gulat, judo, dan bela diri bergumul selama masih ada lesi aktif karena dapat menularkan langsung melalui kulit; jangan berbagi handuk maupun matras tanpa pelapis, dan tunda kembali berlatih sampai seluruh lesi mengering',
       'Simpan persediaan antivirus di rumah bila kekambuhan sering, dan mulai minum sejak muncul rasa gatal atau terbakar pertama tanpa menunggu lesi terlihat — inilah cara memperoleh manfaat terbesar dari obat',
@@ -7601,12 +7601,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: predileksi khas pada daerah yang TERPAJAN — sekitar lubang hidung dan mulut (perioral dan perinasal), wajah, serta ekstremitas; impetigo bulosa lebih sering pada badan, lipatan, area popok, dan pada neonatus. Onset: cepat, dalam hitungan hari, sering bermula dari satu lesi lalu MENYEBAR karena digaruk (autoinokulasi). Character: bermula sebagai makula atau vesikel kecil yang cepat pecah lalu mengering membentuk KRUSTA TEBAL BERWARNA KUNING KEEMASAN SEPERTI MADU (honey-colored crust) yang merupakan gambaran patognomonik; pada bentuk bulosa berupa bula kendur berisi cairan jernih lalu keruh, yang mudah pecah meninggalkan erosi dengan tepi kolaret sisa atap bula. Radiation: menyebar ke area sekitar dan ke bagian tubuh lain melalui jari yang menggaruk. Associations: gatal ringan hingga sedang, nyeri umumnya MINIMAL, dan pasien tampak sehat tanpa gejala sistemik — adanya DEMAM TINGGI, lesi yang sangat nyeri, atau anak yang tampak sakit berat harus mengarahkan pada infeksi yang lebih dalam seperti selulitis atau pada sindrom kulit tersiram air panas stafilokokus. Telusuri PINTU MASUK kuman: gigitan serangga, luka lecet, varisela, skabies, atau dermatitis atopik yang kulitnya sudah rusak — impetigo yang timbul di atas kulit yang sudah berpenyakit disebut impetiginisasi dan penyakit dasarnya harus ikut diobati. WAJIB tanyakan gejala GLOMERULONEFRITIS pascastreptokokus yang dapat muncul 1-3 minggu setelah infeksi kulit: kencing berwarna seperti air cucian daging atau teh pekat, bengkak pada kelopak mata saat bangun tidur, bengkak tungkai, kencing berkurang, dan nyeri kepala. Time course: tanpa pengobatan dapat berlangsung berminggu-minggu dan menyebar. Exacerbating: menggaruk, kebersihan yang kurang, dan cuaca panas lembap. Severity: jumlah dan luas lesi, adanya lesi di beberapa area tubuh, serta apakah ada anggota keluarga atau teman sekolah yang tertular.',
       riwayatPenyakitDahulu:
-        'History DERMATITIS ATOPIK yang merupakan faktor predisposisi terpenting karena sawar kulit yang rusak dan kolonisasi S. aureus yang tinggi, riwayat SKABIES dan VARISELA sebagai pintu masuk, riwayat impetigo berulang yang menandakan kolonisasi kronik pada lubang hidung, diabetes melitus, malnutrisi, HIV dan kondisi imunokompromais lain, serta riwayat infeksi kulit dalam keluarga yang berulang.',
+        'Riwayat DERMATITIS ATOPIK yang merupakan faktor predisposisi terpenting karena sawar kulit yang rusak dan kolonisasi S. aureus yang tinggi, riwayat SKABIES dan VARISELA sebagai pintu masuk, riwayat impetigo berulang yang menandakan kolonisasi kronik pada lubang hidung, diabetes melitus, malnutrisi, HIV dan kondisi imunokompromais lain, serta riwayat infeksi kulit dalam keluarga yang berulang.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga serumah atau teman sekolah dengan lesi serupa — penularan melalui kontak langsung dan barang bersama sangat mudah terjadi; tanyakan pula adanya anggota keluarga yang menjadi pembawa (carrier) S. aureus di lubang hidung pada kasus berulang.',
       riwayatPengobatan:
         'Obat yang sudah dipakai sendiri: salep antibiotik bebas, KORTIKOSTEROID TOPIKAL yang justru memperburuk infeksi, obat tradisional, dan bedak; tanyakan pula riwayat penggunaan antibiotik dalam 3 bulan terakhir yang meningkatkan kemungkinan resistensi, serta riwayat pengobatan dermatitis atopik yang mendasari.',
-      riwayatAlergi: 'History alergi obat terutama penisilin dan sefalosporin, serta riwayat dermatitis kontak terhadap salep tertentu.',
+      riwayatAlergi: 'Riwayat alergi obat terutama penisilin dan sefalosporin, serta riwayat dermatitis kontak terhadap salep tertentu.',
       riwayatImunisasi: 'Kelengkapan imunisasi dasar sesuai usia dan status imunisasi varisela.',
       riwayatNutrisi: 'Status gizi dan asupan makan — malnutrisi menurunkan daya tahan kulit dan memperlambat penyembuhan.',
       riwayatTumbuhKembang: 'Pada anak: kurva pertumbuhan dan riwayat penyakit berulang yang dapat menandakan gangguan imunitas.',
@@ -7743,10 +7743,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: tersering pada tungkai bawah dan bokong — daerah yang mudah tergaruk dan terkena kotoran. Onset: bermula sebagai vesikel maupun pustul kecil yang membesar dalam beberapa hari lalu menjadi luka bertutup keropeng. Character: ulkus berbentuk cawan dengan dasar bernanah, tepi meninggi dan keras, tertutup KRUSTA TEBAL BERWARNA KOTOR KEABU-ABUAN yang melekat erat — berbeda dari impetigo krustosa yang krustanya tipis berwarna madu dan mudah lepas. Radiation: dapat bertambah banyak melalui garukan. Associations: nyeri lebih menonjol daripada gatal karena lesi lebih dalam; TANYAKAN URIN BERWARNA SEPERTI AIR CUCIAN DAGING, BENGKAK PADA KELOPAK MATA, DAN BERKURANGNYA JUMLAH KENCING yang menandakan glomerulonefritis pascastreptokokus — komplikasi yang muncul 1-3 minggu setelah infeksi kulit dan merupakan alasan penyakit ini tidak boleh dianggap sepele. Time course: menahun bila tidak diobati, berminggu-minggu. Exacerbating: garukan, kotoran, dan gigitan serangga sebagai pintu masuk. Severity: nilai nyeri, demam, dan jumlah lesi.',
       riwayatPenyakitDahulu:
-        'History skabies, gigitan serangga, dan dermatitis atopik yang menjadi pintu masuk. Diabetes melitus, malnutrisi, keadaan imunitas menurun, dan penyakit ginjal. History impetigo maupun ektima sebelumnya.',
+        'Riwayat skabies, gigitan serangga, dan dermatitis atopik yang menjadi pintu masuk. Diabetes melitus, malnutrisi, keadaan imunitas menurun, dan penyakit ginjal. Riwayat impetigo maupun ektima sebelumnya.',
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan luka serupa maupun gatal malam hari yang mengarah pada skabies serumah.',
       riwayatPengobatan: 'Obat oles dan antibiotik yang sudah dipakai beserta lamanya, serta ramuan tradisional yang dibubuhkan pada luka.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik golongan beta-laktam.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik golongan beta-laktam.',
       riwayatImunisasi: 'Status imunisasi tetanus, karena luka terbuka yang kotor berisiko tetanus.',
       riwayatNutrisi: 'Status gizi dan asupan protein; malnutrisi merupakan faktor risiko yang penting dan sekaligus memperlambat penyembuhan.',
       riwayatSosialEkonomi:
@@ -7824,7 +7824,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Habiskan antibiotik sesuai lama yang ditentukan meskipun luka sudah tampak membaik',
       'Penyakit ini menular melalui sentuhan; gunakan handuk dan pakaian pribadi, cuci dengan air panas, dan cuci tangan setelah merawat luka',
       'Obati skabies maupun gatal lain yang menjadi pintu masuk, dan periksakan anggota keluarga lain',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; PENYEMBUHAN LUKA MENAIKKAN KEBUTUHAN GIZI sehingga porsi tidak boleh dikurangi. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe, tambahkan buah sumber vitamin C dan makanan sumber zink, dan minum 8 gelas air per hari. Tidak ada dasar untuk memantang telur maupun ikan pada luka — pantangan seperti itu justru memperlambat penyembuhan',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; PENYEMBUHAN LUKA MENAIKKAN KEBUTUHAN GIZI sehingga porsi tidak boleh dikurangi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe, tambahkan buah sumber vitamin C dan makanan sumber zink, dan minum 8 gelas air per hari. Tidak ada dasar untuk memantang telur maupun ikan pada luka — pantangan seperti itu justru memperlambat penyembuhan',
       'Jam tidur: 7-9 jam per malam pada dewasa dan 9-11 jam pada anak, dengan jadwal tetap; perbaikan jaringan berlangsung terutama saat tidur. Tinggikan tungkai dengan bantal saat tidur untuk mengurangi bengkak, dan gunakan seprai bersih yang diganti berkala',
       'Pola olahraga: kurangi aktivitas berat selama luka masih basah dan nyeri; jalan santai tetap boleh dengan tungkai ditinggikan saat istirahat. HINDARI berenang, berendam, olahraga kontak, dan olahraga di tempat berdebu maupun berlumpur sampai luka menutup, karena luka terbuka mudah terinfeksi ulang dan dapat menulari orang lain. Gunakan alas kaki tertutup di luar rumah — bertelanjang kaki merupakan cara tersering luka baru terbentuk. Kembali berolahraga bertahap setelah luka kering',
       'PERIKSAKAN AIR SENI 1-3 MINGGU SETELAH SEMBUH sebagai penapisan komplikasi ginjal, dan segera datang bila air seni berwarna seperti air cucian daging, kelopak mata bengkak saat bangun tidur, atau jumlah kencing berkurang',
@@ -7852,11 +7852,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: daerah berambut yang sering tergesek dan berkeringat — tungkai, paha, bokong, punggung, dada, ketiak, dan daerah janggut; letak lesi memberi petunjuk penyebabnya. Onset: dalam beberapa hari, sering setelah bercukur, berkeringat banyak, memakai pakaian ketat, atau berendam di air hangat. Character: papul maupun pustul kecil berdiameter 1-5 milimeter dengan RAMBUT DI TENGAHNYA, dikelilingi kemerahan; nyeri ringan sampai sedang dan kadang gatal. Radiation: menyebar pada daerah yang tergesek dan tercukur. Associations: TANYAKAN GATAL YANG SANGAT HEBAT DAN LESI YANG SANGAT SERAGAM PADA DADA DAN PUNGGUNG, karena hal itu mengarah pada folikulitis akibat jamur Malassezia yang justru MEMBURUK dengan antibiotik. Tanyakan pula riwayat berendam di kolam air panas maupun bak rendam umum 1-2 hari sebelumnya yang mengarah pada folikulitis Pseudomonas. Time course: umumnya mereda dalam 7-10 hari; yang berulang terus menuntut pencarian penyebab. Exacerbating: bercukur melawan arah tumbuh rambut, pakaian ketat, keringat, dan minyak maupun losion berminyak. Severity: nyeri, jumlah lesi, dan dampak kosmetik.',
       riwayatPenyakitDahulu:
-        'DIABETES MELITUS pada kasus berulang, obesitas, keadaan imunitas menurun termasuk infeksi HIV, dermatitis atopik, dan riwayat pembawa Staphylococcus aureus di dalam hidung. History akne dan dermatitis seboroik.',
+        'DIABETES MELITUS pada kasus berulang, obesitas, keadaan imunitas menurun termasuk infeksi HIV, dermatitis atopik, dan riwayat pembawa Staphylococcus aureus di dalam hidung. Riwayat akne dan dermatitis seboroik.',
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan bisul maupun folikulitis berulang yang mengarah pada penularan kuman pembawa dalam rumah.',
       riwayatPengobatan:
         'ANTIBIOTIK JANGKA PANJANG UNTUK AKNE dapat mencetuskan folikulitis Gram negatif; kortikosteroid topikal maupun sistemik mencetuskan folikulitis steroid; tanyakan pula pemakaian minyak, losion berminyak, dan pelembap oklusif yang menyumbat folikel.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik.',
       riwayatSosialEkonomi:
         'Kebiasaan bercukur beserta arah dan alat yang dipakai, pemakaian alat cukur bergantian di pangkas rambut, pakaian ketat dan tidak menyerap keringat, pekerjaan yang berminyak maupun panas, olahraga dengan pakaian basah berkeringat, serta riwayat berendam di kolam air panas umum.',
     },
@@ -7966,7 +7966,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Anggota keluarga serumah dengan bisul berulang — penularan dalam rumah tangga dan status pembawa S. aureus bersama merupakan penyebab tersering kekambuhan yang tidak kunjung berhenti meski pasien diobati berkali-kali; tanyakan pula riwayat diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Antibiotik yang pernah diminum untuk keluhan serupa, berapa lama, dan responsnya — riwayat penggunaan antibiotik berulang meningkatkan kemungkinan MRSA; obat topikal yang sudah dipakai, kortikosteroid sistemik maupun topikal, obat imunosupresan, dan obat tradisional; tanyakan pula apakah lesi pernah dipencet sendiri atau ditusuk dengan jarum di rumah.',
-      riwayatAlergi: 'History alergi obat terutama penisilin, sefalosporin, dan sulfonamid, serta riwayat alergi terhadap anestesi lokal yang akan digunakan saat insisi.',
+      riwayatAlergi: 'Riwayat alergi obat terutama penisilin, sefalosporin, dan sulfonamid, serta riwayat alergi terhadap anestesi lokal yang akan digunakan saat insisi.',
       riwayatNutrisi: 'Status gizi, asupan protein, dan tanda defisiensi besi maupun vitamin — malnutrisi memperlambat penyembuhan dan meningkatkan kerentanan.',
       riwayatSosialEkonomi:
         'Kebersihan perorangan dan frekuensi mandi, ketersediaan air bersih, kebiasaan BERBAGI HANDUK dan pakaian, pekerjaan yang menimbulkan banyak keringat atau gesekan, penggunaan pakaian ketat, kebiasaan mencukur (bercukur merupakan pintu masuk kuman yang sering), lingkungan padat seperti asrama dan barak, olahraga kontak, kebiasaan merokok, dan kemampuan mengakses tindakan insisi drainase serta antibiotik.',
@@ -8109,14 +8109,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan SOCRATES. Site: paling sering pada TUNGKAI BAWAH (sekitar 80% kasus), diikuti WAJAH dengan gambaran klasik menyerupai kupu-kupu yang melintasi pangkal hidung. Onset: MENDADAK, dan yang sangat khas adalah GEJALA SISTEMIK MENDAHULUI GEJALA KULIT — demam tinggi dan menggigil muncul beberapa jam hingga sehari SEBELUM kemerahan tampak, sehingga pasien kadang datang dengan demam yang belum jelas sumbernya. Character: nyeri, panas, dan rasa terbakar pada kulit yang merah menyala. Radiation: perluasan kemerahan yang cepat dari hari ke hari; adanya GARIS MERAH memanjang ke arah proksimal menandakan limfangitis. Associations: demam tinggi, menggigil, sakit kepala, mual, muntah, dan rasa lemas hebat; pembengkakan kelenjar getah bening regional yang nyeri; pada kasus berat dapat timbul bula, dan bula HEMORAGIK menandakan penyakit yang lebih berat. Telusuri PINTU MASUK kuman secara aktif karena hampir selalu ada dan sering luput: sela jari kaki yang lecet dan pecah akibat TINEA PEDIS (pintu masuk tersering pada erisipelas tungkai), luka kecil, ulkus, gigitan serangga, tindik, luka bekas operasi, dan pada wajah adalah faringitis atau lesi di lubang hidung. WAJIB tanyakan TANDA BAHAYA: nyeri yang JAUH MELEBIHI tampilan lesi, kulit berubah keunguan atau kehitaman, bula hemoragik, kulit terasa BAAL, bunyi berderak saat ditekan, dan kesadaran menurun — semuanya mengarah pada FASIITIS NEKROTIKANS. Time course: memburuk cepat dalam 1-3 hari; dengan antibiotik yang tepat, demam mereda dalam 24-48 jam meski kemerahan dapat tampak menetap atau sedikit meluas pada 24 jam pertama. Exacerbating: berdiri lama dan tungkai menggantung. Severity: derajat demam, luas keterlibatan, kemampuan berjalan, dan apakah pasien mampu makan dan minum.',
       riwayatPenyakitDahulu:
         'RIWAYAT ERISIPELAS SEBELUMNYA pada lokasi yang sama — kekambuhan sangat sering dan setiap episode merusak pembuluh limfe sehingga memperbesar risiko episode berikutnya; LIMFEDEMA dan riwayat pengangkatan kelenjar getah bening (misalnya setelah operasi kanker payudara atau ginekologi), INSUFISIENSI VENA KRONIK dan varises, riwayat operasi pengambilan vena safena untuk bedah pintas koroner, DIABETES MELITUS, obesitas, penyakit arteri perifer, gagal jantung, sindrom nefrotik, TINEA PEDIS dan onikomikosis kronik, ulkus tungkai, eksim, serta imunokompromais termasuk HIV dan penggunaan kortikosteroid.',
-      riwayatPenyakitKeluarga: 'History diabetes melitus, penyakit pembuluh darah, dan penyakit autoimun dalam keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes melitus, penyakit pembuluh darah, dan penyakit autoimun dalam keluarga.',
       riwayatPengobatan:
         'Antibiotik yang sudah diminum dan responsnya, penggunaan NSAID (perlu ditanyakan karena beberapa laporan mengaitkannya dengan penyamaran gejala fasiitis nekrotikans sehingga diagnosis terlambat), kortikosteroid dan imunosupresan, diuretik, antikoagulan, serta obat topikal yang sudah dipakai.',
       riwayatAlergi:
-        'History alergi obat terutama PENISILIN — perlu ditelusuri terperinci apakah berupa ruam ringan atau reaksi anafilaksis, karena penisilin merupakan obat pilihan pada erisipelas dan label alergi yang tidak akurat sering membuat pasien menerima antibiotik yang kurang optimal.',
+        'Riwayat alergi obat terutama PENISILIN — perlu ditelusuri terperinci apakah berupa ruam ringan atau reaksi anafilaksis, karena penisilin merupakan obat pilihan pada erisipelas dan label alergi yang tidak akurat sering membuat pasien menerima antibiotik yang kurang optimal.',
       riwayatNutrisi: 'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan dan menurunkan daya tahan.',
       riwayatSosialEkonomi:
-        'Occupation yang mengharuskan BERDIRI LAMA yang memperberat bendungan limfe dan vena, kebersihan kaki dan kebiasaan memakai alas kaki, kebiasaan merawat kuku dan sela jari kaki, kondisi lingkungan yang lembap, kemampuan membeli obat dan menjalani kontrol, dukungan keluarga untuk perawatan di rumah, serta kemampuan pasien meninggikan tungkai selama masa pemulihan.',
+        'Pekerjaan yang mengharuskan BERDIRI LAMA yang memperberat bendungan limfe dan vena, kebersihan kaki dan kebiasaan memakai alas kaki, kebiasaan merawat kuku dan sela jari kaki, kondisi lingkungan yang lembap, kemampuan membeli obat dan menjalani kontrol, dukungan keluarga untuk perawatan di rumah, serta kemampuan pasien meninggikan tungkai selama masa pemulihan.',
     },
     pemeriksaanFisik: [
       'TANDA VITAL LENGKAP — demam tinggi sering ditemukan; nilai adanya TAKIKARDIA, TAKIPNEA, dan HIPOTENSI sebagai tanda sepsis yang mengubah pengelolaan menjadi kegawatan',
@@ -8159,16 +8159,16 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'LIMFEDEMA — faktor risiko TERKUAT, baik primer maupun setelah operasi pengangkatan kelenjar getah bening dan radioterapi',
       'INSUFISIENSI VENA KRONIK, varises, dan edema tungkai',
       'TINEA PEDIS dan onikomikosis sebagai pintu masuk kuman',
-      'History erisipelas atau selulitis sebelumnya — setiap episode meningkatkan risiko episode berikutnya',
+      'Riwayat erisipelas atau selulitis sebelumnya — setiap episode meningkatkan risiko episode berikutnya',
       'Luka, ulkus tungkai, eksim, gigitan serangga, dan trauma kulit',
       'OBESITAS',
       'DIABETES MELITUS',
       'Usia lanjut',
-      'History operasi pengambilan vena safena untuk bedah pintas koroner',
+      'Riwayat operasi pengambilan vena safena untuk bedah pintas koroner',
       'Imunokompromais: HIV, keganasan, kemoterapi, kortikosteroid jangka panjang, sindrom nefrotik',
       'Penyakit arteri perifer',
       'Gagal jantung dengan edema tungkai',
-      'Occupation yang mengharuskan berdiri lama',
+      'Pekerjaan yang mengharuskan berdiri lama',
       'Penyalahgunaan obat suntik',
     ],
     goldStandard:
@@ -8261,13 +8261,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: LEHER PALING SERING mengikuti letak kelenjar getah bening, diikuti ketiak, lipat paha, dan daerah di atas tulang maupun sendi yang terkena. Onset: SANGAT PERLAHAN dalam hitungan bulan — perjalanan menahun inilah yang paling membedakannya dari abses bakteri biasa yang berkembang dalam hitungan hari. Character: bermula sebagai benjolan keras yang TIDAK NYERI, lalu perlahan melunak, kulit di atasnya menjadi keunguan, kemudian pecah membentuk lubang yang mengeluarkan nanah kental maupun bahan seperti keju. Radiation: beberapa benjolan berdekatan dapat menyatu membentuk untaian. Associations: TANYAKAN GEJALA TUBERKULOSIS SISTEMIK — demam yang naik turun terutama sore hari, KERINGAT MALAM yang sampai membasahi pakaian, penurunan berat badan, lemas, dan batuk lebih dari dua minggu. Time course: berbulan-bulan sampai bertahun-tahun, dengan lesi lama menyembuh sementara lesi baru bermunculan. Exacerbating: keadaan gizi buruk dan penurunan imunitas. Severity: nilai penurunan berat badan dalam kilogram, kemampuan beraktivitas, dan luas keterlibatan.',
       riwayatPenyakitDahulu:
-        'History tuberkulosis paru maupun tuberkulosis di tempat lain beserta pengobatannya dan apakah tuntas. INFEKSI HIV, diabetes melitus, keganasan, malnutrisi, dan pemakaian obat imunosupresan.',
+        'Riwayat tuberkulosis paru maupun tuberkulosis di tempat lain beserta pengobatannya dan apakah tuntas. INFEKSI HIV, diabetes melitus, keganasan, malnutrisi, dan pemakaian obat imunosupresan.',
       riwayatPenyakitKeluarga:
         'RIWAYAT KONTAK ERAT DENGAN PENDERITA TUBERKULOSIS PARU, terutama serumah — inilah petunjuk epidemiologis yang paling menentukan dan wajib ditanyakan pada setiap kasus.',
       riwayatPengobatan:
-        'Antibiotik yang sudah dipakai beserta lamanya — TIDAK MEMBAIKNYA LESI SETELAH ANTIBIOTIK BIASA YANG ADEKUAT merupakan petunjuk penting ke arah tuberkulosis. History obat antituberkulosis sebelumnya beserta kepatuhannya, karena menentukan kemungkinan resistensi.',
-      riwayatAlergi: 'History alergi obat, terutama obat antituberkulosis.',
-      riwayatImunisasi: 'History imunisasi BCG dan adanya parut BCG pada lengan.',
+        'Antibiotik yang sudah dipakai beserta lamanya — TIDAK MEMBAIKNYA LESI SETELAH ANTIBIOTIK BIASA YANG ADEKUAT merupakan petunjuk penting ke arah tuberkulosis. Riwayat obat antituberkulosis sebelumnya beserta kepatuhannya, karena menentukan kemungkinan resistensi.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama obat antituberkulosis.',
+      riwayatImunisasi: 'Riwayat imunisasi BCG dan adanya parut BCG pada lengan.',
       riwayatNutrisi:
         'Status gizi dan penurunan berat badan yang dikuantifikasi; malnutrisi merupakan faktor risiko sekaligus akibat, dan kenaikan berat badan kelak menjadi penanda keberhasilan pengobatan.',
       riwayatSosialEkonomi:
@@ -8305,7 +8305,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Hunian padat dengan ventilasi buruk dan kemiskinan',
       'Diabetes melitus dan penyakit ginjal kronik',
       'Usia anak dan usia lanjut',
-      'History tuberkulosis yang pengobatannya tidak tuntas',
+      'Riwayat tuberkulosis yang pengobatannya tidak tuntas',
       'Konsumsi susu yang tidak dipasteurisasi',
     ],
     goldStandard:
@@ -8322,7 +8322,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kista brankial yang terinfeksi',
     ],
     pengkajian:
-      'Dipikirkan skrofuloderma pada pasien ini atas dasar benjolan pada daerah kelenjar getah bening leher yang berkembang sangat perlahan selama berbulan-bulan, mula-mula keras dan tidak nyeri, kemudian melunak dengan kulit di atasnya berwarna keunguan, lalu pecah mengeluarkan nanah kental — dan yang paling menentukan, ditemukannya jaringan parut tidak beraturan berbentuk tali dengan jembatan kulit yang menghubungkan lesi, gambaran yang hampir tidak dijumpai pada penyakit lain. Perjalanan yang menahun dan sifat tidak nyeri pada awalnya merupakan cerminan langsung peradangan granulomatosa yang berjalan lambat dari dalam ke luar, dan keduanya memisahkannya dengan tegas dari limfadenitis bakteri supuratif yang berkembang dalam hitungan hari dengan nyeri hebat serta kulit yang merah dan panas. History pasien yang sudah mendapat antibiotik biasa tanpa perbaikan memperkuat hal ini dan bukan tanda antibiotiknya salah, melainkan petunjuk bahwa penyebabnya bukan kuman biasa. Adanya beberapa lesi dalam tahap yang berbeda sekaligus — sebagian masih nodul, sebagian sedang pecah, sebagian sudah menjadi parut — juga sesuai dengan proses yang berlangsung berkepanjangan. Hidradenitis supuratif disingkirkan karena letak lesi bukan pada lipatan ketiak maupun selangkangan dan tidak ada riwayat kekambuhan bertahun-tahun pada daerah tersebut. Aktinomikosis tidak sesuai karena nanah tidak mengandung butiran kuning. Limfoma dipertimbangkan mengingat sama-sama menimbulkan pembesaran kelenjar dengan gejala sistemik, namun kelenjar pada limfoma bersifat kenyal dan membesar terus tanpa pecah membentuk fistula. History kontak dengan penderita tuberkulosis paru ditelusuri secara khusus karena merupakan petunjuk epidemiologis yang paling menentukan, dan foto toraks dikerjakan pada setiap kasus untuk mencari tuberkulosis paru yang menyertai. Tes HIV ditawarkan bukan sebagai tambahan melainkan sebagai bagian dari penanganan setiap tuberkulosis. Perlu diketahui bahwa pewarnaan tahan asam yang negatif tidak menyingkirkan diagnosis, sebab jumlah kuman pada tuberkulosis kulit umumnya sedikit — karena itu Xpert MTB/RIF dan biakan dari nanah maupun jaringan menjadi pemeriksaan yang dituju.',
+      'Dipikirkan skrofuloderma pada pasien ini atas dasar benjolan pada daerah kelenjar getah bening leher yang berkembang sangat perlahan selama berbulan-bulan, mula-mula keras dan tidak nyeri, kemudian melunak dengan kulit di atasnya berwarna keunguan, lalu pecah mengeluarkan nanah kental — dan yang paling menentukan, ditemukannya jaringan parut tidak beraturan berbentuk tali dengan jembatan kulit yang menghubungkan lesi, gambaran yang hampir tidak dijumpai pada penyakit lain. Perjalanan yang menahun dan sifat tidak nyeri pada awalnya merupakan cerminan langsung peradangan granulomatosa yang berjalan lambat dari dalam ke luar, dan keduanya memisahkannya dengan tegas dari limfadenitis bakteri supuratif yang berkembang dalam hitungan hari dengan nyeri hebat serta kulit yang merah dan panas. Riwayat pasien yang sudah mendapat antibiotik biasa tanpa perbaikan memperkuat hal ini dan bukan tanda antibiotiknya salah, melainkan petunjuk bahwa penyebabnya bukan kuman biasa. Adanya beberapa lesi dalam tahap yang berbeda sekaligus — sebagian masih nodul, sebagian sedang pecah, sebagian sudah menjadi parut — juga sesuai dengan proses yang berlangsung berkepanjangan. Hidradenitis supuratif disingkirkan karena letak lesi bukan pada lipatan ketiak maupun selangkangan dan tidak ada riwayat kekambuhan bertahun-tahun pada daerah tersebut. Aktinomikosis tidak sesuai karena nanah tidak mengandung butiran kuning. Limfoma dipertimbangkan mengingat sama-sama menimbulkan pembesaran kelenjar dengan gejala sistemik, namun kelenjar pada limfoma bersifat kenyal dan membesar terus tanpa pecah membentuk fistula. Riwayat kontak dengan penderita tuberkulosis paru ditelusuri secara khusus karena merupakan petunjuk epidemiologis yang paling menentukan, dan foto toraks dikerjakan pada setiap kasus untuk mencari tuberkulosis paru yang menyertai. Tes HIV ditawarkan bukan sebagai tambahan melainkan sebagai bagian dari penanganan setiap tuberkulosis. Perlu diketahui bahwa pewarnaan tahan asam yang negatif tidak menyingkirkan diagnosis, sebab jumlah kuman pada tuberkulosis kulit umumnya sedikit — karena itu Xpert MTB/RIF dan biakan dari nanah maupun jaringan menjadi pemeriksaan yang dituju.',
     terapiSuportif: [
       'Perbaikan gizi dengan asupan tinggi kalori dan protein — bagian dari pengobatan, bukan anjuran tambahan',
       'Perawatan luka: bersihkan dengan larutan salin, tutup dengan kasa, dan ganti balutan setiap hari',
@@ -8353,7 +8353,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Air seni akan berwarna kemerahan karena rifampisin; ini normal dan bukan perdarahan',
       'Jelaskan bahwa lesi kulit akan meninggalkan jaringan parut yang menetap meskipun kumannya sudah mati',
       'Ajak seluruh anggota keluarga serumah diperiksa; buka jendela dan perbaiki ventilasi rumah',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan bergizi. OBAT ANTITUBERKULOSIS DIMINUM SAAT PERUT KOSONG, SATU JAM SEBELUM MAKAN PAGI, DALAM SATU WAKTU SEKALIGUS — penyerapannya menurun bila diminum bersama makanan. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, susu, tahu, dan tempe, lengkapi dengan sayur dan buah, dan minum 8 gelas air per hari. KENAIKAN BERAT BADAN MERUPAKAN PENANDA KEBERHASILAN PENGOBATAN sehingga penimbangan berkala menjadi bagian pemantauan. HINDARI ALKOHOL sepenuhnya karena bersama obat antituberkulosis sangat membebani hati',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan bergizi. OBAT ANTITUBERKULOSIS DIMINUM SAAT PERUT KOSONG, SATU JAM SEBELUM MAKAN PAGI, DALAM SATU WAKTU SEKALIGUS — penyerapannya menurun bila diminum bersama makanan. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, susu, tahu, dan tempe, lengkapi dengan sayur dan buah, dan minum 8 gelas air per hari. KENAIKAN BERAT BADAN MERUPAKAN PENANDA KEBERHASILAN PENGOBATAN sehingga penimbangan berkala menjadi bagian pemantauan. HINDARI ALKOHOL sepenuhnya karena bersama obat antituberkulosis sangat membebani hati',
       'Jam tidur: 7-9 jam per malam dengan jadwal tetap dan tambahan istirahat siang selama fase awal; tidurlah di kamar dengan ventilasi baik dan jendela terbuka. Bila ada tuberkulosis paru yang menyertai, sebaiknya tidak berbagi kamar dengan anak kecil pada dua minggu pertama pengobatan',
       'Pola olahraga: selama masih demam, lemas, dan berat badan menurun, cukup istirahat dan jalan ringan di dalam rumah. Setelah demam mereda dan berat badan mulai naik — umumnya setelah 2-4 minggu pengobatan — mulai kembali dengan jalan kaki 15-20 menit sehari lalu tingkatkan bertahap menuju 30 menit sehari selama 5 hari seminggu. Latihan beban ringan membantu memulihkan massa otot yang hilang. HINDARI olahraga kontak, kolam renang, dan pusat kebugaran selama luka masih terbuka dan mengeluarkan cairan, serta jangan memakai pakaian maupun tali tas yang menekan lesi',
       'Follow up: kontrol setiap bulan selama pengobatan untuk menilai perbaikan, berat badan, kepatuhan, dan efek samping obat',
@@ -8380,11 +8380,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Bercak putih atau kemerahan di kulit yang TIDAK GATAL dan MATI RASA sejak beberapa bulan.',
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: lokasi bercak — pada tipe pausibasilar umumnya sedikit, asimetris, dan berbatas tegas; pada multibasilar banyak, simetris, berbatas kurang tegas, dengan predileksi pada wajah, telinga, dan permukaan tubuh yang lebih dingin. Onset: SANGAT PERLAHAN dalam hitungan bulan hingga tahun karena masa inkubasi 2-5 tahun bahkan dapat mencapai 20 tahun. Character: bercak hipopigmentasi atau eritematosa yang kering karena berkurangnya produksi keringat, tidak gatal, dan yang paling khas MATI RASA atau berkurang rasanya terhadap sentuhan, nyeri, dan suhu. Radiation: gali gejala keterlibatan saraf tepi — kesemutan atau baal pada tangan dan kaki, kelemahan otot, kesulitan menggenggam atau mengancing baju, kaki sering terseret, serta luka atau melepuh yang tidak terasa sakit. Associations: alis menipis atau rontok (madarosis), hidung tersumbat dan mimisan, mata kering dan sulit menutup sempurna, serta nodul pada kulit. Time course: apakah bercak bertambah jumlah dan luas; tanyakan adanya episode bercak menjadi merah, bengkak, dan nyeri mendadak atau nyeri hebat pada saraf yang menandakan REAKSI KUSTA. Exacerbating: kehamilan, infeksi penyerta, stres, dan permulaan pengobatan dapat memicu reaksi. Severity: sejauh mana keluhan mengganggu fungsi tangan, kaki, dan penglihatan, serta dampak psikososial akibat stigma.',
-      riwayatPenyakitDahulu: 'History pengobatan kusta sebelumnya beserta kelengkapannya (penting untuk membedakan kasus baru, kambuh, atau reaksi), tuberkulosis, HIV, diabetes, serta penyakit yang menurunkan imunitas.',
+      riwayatPenyakitDahulu: 'Riwayat pengobatan kusta sebelumnya beserta kelengkapannya (penting untuk membedakan kasus baru, kambuh, atau reaksi), tuberkulosis, HIV, diabetes, serta penyakit yang menurunkan imunitas.',
       riwayatPenyakitKeluarga:
         'RIWAYAT KONTAK SERUMAH ATAU KONTAK ERAT dengan penderita kusta merupakan pertanyaan kunci — risiko pada kontak serumah jauh lebih tinggi dibanding populasi umum; tanyakan pula adakah anggota keluarga dengan bercak mati rasa atau kecacatan tangan dan kaki.',
       riwayatPengobatan: 'Obat yang sudah digunakan termasuk salep antijamur atau kortikosteroid topikal yang sering diberikan karena bercak disalahartikan sebagai panu atau eksim; tanyakan pula riwayat penggunaan MDT dan kepatuhannya.',
-      riwayatAlergi: 'History alergi obat terutama dapson dan rifampisin.',
+      riwayatAlergi: 'Riwayat alergi obat terutama dapson dan rifampisin.',
       riwayatSosialEkonomi:
         'Kondisi tempat tinggal termasuk kepadatan hunian dan ventilasi, status gizi, pekerjaan, tingkat pendidikan, akses ke fasilitas kesehatan untuk pengobatan yang berlangsung 6-12 bulan, serta yang tidak kalah penting adalah PERSEPSI PASIEN DAN KELUARGA TERHADAP PENYAKIT INI — stigma merupakan penyebab utama keterlambatan berobat dan putus pengobatan.',
     },
@@ -8490,17 +8490,17 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: lokasi ulkus pada stadium primer sesuai tempat masuk kuman — batang penis, vulva, serviks, anus, bibir, atau rongga mulut; ulkus pada serviks maupun anus kerap tidak disadari sama sekali. Pada stadium sekunder, tanyakan sebaran ruam dan khususnya APAKAH TELAPAK TANGAN DAN TELAPAK KAKI IKUT TERKENA, karena keterlibatan kedua daerah ini sangat khas dan jarang dijumpai pada penyakit kulit lain. Onset: ulkus primer muncul sekitar 3 minggu setelah kontak dengan rentang 10-90 hari, sedangkan erupsi sekunder muncul 4-10 minggu setelah ulkus primer. Character: ULKUS PRIMER TIDAK NYERI, soliter, dasarnya bersih, tepinya teratur dan terindurasi seperti karet — sifat tidak nyeri inilah yang menjadi pembeda utama dan sekaligus alasan penyakit ini sering terlambat diobati. Ruam sekunder berupa makula dan papul kemerahan hingga kecoklatan yang tidak gatal. Radiation: pada stadium sekunder keluhan bersifat menyeluruh karena kuman sudah menyebar melalui darah. Associations: pembesaran kelenjar lipat paha yang tidak nyeri pada stadium primer; pada stadium sekunder tanyakan demam, nyeri kepala, nyeri tenggorokan, nyeri otot dan sendi, rambut rontok berbercak, serta benjolan basah di daerah lipatan yang merupakan kondiloma lata. Time course: PENTING — ulkus primer sembuh sendiri dalam 3-6 minggu tanpa diobati dan pasien merasa telah sembuh, padahal kuman terus menyebar; tanyakan riwayat luka kelamin yang pernah sembuh sendiri berbulan-bulan sebelumnya. Exacerbating dan relieving: tidak khas. Severity: umumnya keluhan ringan sehingga tidak menggambarkan beratnya penyakit — hal yang justru berbahaya.',
       riwayatPenyakitDahulu:
-        'History infeksi menular seksual sebelumnya termasuk sifilis beserta pengobatannya, riwayat pemeriksaan dan status HIV, serta riwayat penyakit lain yang menurunkan imunitas.',
+        'Riwayat infeksi menular seksual sebelumnya termasuk sifilis beserta pengobatannya, riwayat pemeriksaan dan status HIV, serta riwayat penyakit lain yang menurunkan imunitas.',
       riwayatPenyakitKeluarga:
-        'History infeksi menular seksual pada pasangan; pada perempuan hamil, telusuri riwayat keguguran berulang, bayi lahir mati, dan bayi dengan kelainan bawaan yang dapat berkaitan dengan sifilis kongenital.',
+        'Riwayat infeksi menular seksual pada pasangan; pada perempuan hamil, telusuri riwayat keguguran berulang, bayi lahir mati, dan bayi dengan kelainan bawaan yang dapat berkaitan dengan sifilis kongenital.',
       riwayatPengobatan:
-        'Antibiotik yang pernah diminum dalam beberapa bulan terakhir, karena pemakaian antibiotik untuk keluhan lain dapat mengaburkan gambaran penyakit. History pengobatan sifilis sebelumnya beserta jenis obat, dosis, dan hasil pemantauan titer serologinya.',
+        'Antibiotik yang pernah diminum dalam beberapa bulan terakhir, karena pemakaian antibiotik untuk keluhan lain dapat mengaburkan gambaran penyakit. Riwayat pengobatan sifilis sebelumnya beserta jenis obat, dosis, dan hasil pemantauan titer serologinya.',
       riwayatAlergi:
         'RIWAYAT ALERGI PENISILIN HARUS DITANYAKAN SECARA RINCI, termasuk bentuk reaksinya, karena penisilin adalah satu-satunya obat dengan bukti terbaik dan pada ibu hamil merupakan satu-satunya pilihan yang dapat diterima.',
       riwayatKehamilanPersalinan:
         'Status kehamilan dan usia kehamilan pada perempuan usia subur — sifilis pada kehamilan dapat menular ke janin dan menyebabkan keguguran, lahir mati, maupun sifilis kongenital, sehingga penemuan dan pengobatannya bersifat mendesak.',
       riwayatSosialEkonomi:
-        'History seksual yang ditanyakan dengan cara yang tidak menghakimi namun jelas: jumlah pasangan dalam setahun terakhir, jenis hubungan seksual termasuk oral dan anal, penggunaan kondom, hubungan dengan pekerja seks, serta apakah pasangan memiliki keluhan serupa. Tanyakan pula penggunaan napza suntik dan riwayat transfusi. Sampaikan sejak awal bahwa informasi ini bersifat rahasia dan diperlukan untuk mengobati pasien beserta pasangannya.',
+        'Riwayat seksual yang ditanyakan dengan cara yang tidak menghakimi namun jelas: jumlah pasangan dalam setahun terakhir, jenis hubungan seksual termasuk oral dan anal, penggunaan kondom, hubungan dengan pekerja seks, serta apakah pasangan memiliki keluhan serupa. Tanyakan pula penggunaan napza suntik dan riwayat transfusi. Sampaikan sejak awal bahwa informasi ini bersifat rahasia dan diperlukan untuk mengobati pasien beserta pasangannya.',
     },
     pemeriksaanFisik: [
       'Stadium primer: ulkus soliter dengan dasar bersih, tepi teratur dan terindurasi, TIDAK NYERI saat ditekan; palpasi tepi ulkus untuk merasakan indurasi yang khas seperti karet',
@@ -8547,7 +8547,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kondiloma akuminata — vegetasi bertangkai dengan permukaan bergerigi seperti bunga kol, berbeda dari kondiloma lata yang berpermukaan datar, lembap, dan lebar',
     ],
     pengkajian:
-      'Dipikirkan sifilis pada pasien ini atas dasar temuan yang sangat khas dan justru berlawanan dengan naluri klinis biasa: pada stadium primer ditemukan ulkus tunggal pada tempat masuk kuman yang dasarnya bersih, tepinya teratur dan terasa terindurasi seperti karet, namun sama sekali tidak nyeri saat ditekan, disertai pembesaran kelenjar lipat paha yang juga tidak nyeri. Sifat tidak nyeri inilah yang paling menentukan dan sekaligus memisahkannya dari herpes genitalis yang lesinya multipel, dangkal, dan sangat nyeri, serta dari chancroid yang ulkusnya nyeri dengan dasar kotor, tepi bergaung, dan kelenjar lipat paha yang nyeri hingga bernanah. Pada stadium sekunder, penalaran bertumpu pada erupsi makulopapular menyeluruh yang tidak gatal dengan keterlibatan telapak tangan dan telapak kaki — sebaran yang mencerminkan penyebaran melalui aliran darah dan hampir tidak dijumpai pada penyakit kulit lain. Pitiriasis rosea merupakan penyerupa yang paling sering menyesatkan, namun didahului bercak induk, lesinya tersusun mengikuti garis lipatan kulit pada punggung, dan tidak mengenai telapak tangan maupun kaki. Erupsi obat disingkirkan karena tidak ada riwayat obat yang bersesuaian dan lesi tidak gatal. History adanya luka kelamin yang pernah sembuh sendiri beberapa bulan sebelumnya perlu digali secara khusus, sebab penyembuhan spontan ulkus primer membuat pasien merasa telah sembuh padahal kuman terus menyebar — inilah alasan sifilis kerap baru ditemukan pada stadium sekunder. Diagnosis dipastikan dengan membaca dua jenis serologi secara bersamaan: pemeriksaan treponemal menegaskan pernah terjadinya infeksi, sedangkan titer non-treponemal menunjukkan aktivitas penyakit dan menjadi satu-satunya alat menilai keberhasilan terapi kelak. Penapisan HIV ditawarkan pada kasus ini bukan sebagai tambahan, melainkan karena keduanya berbagi jalur penularan dan saling memperbesar risiko satu sama lain.',
+      'Dipikirkan sifilis pada pasien ini atas dasar temuan yang sangat khas dan justru berlawanan dengan naluri klinis biasa: pada stadium primer ditemukan ulkus tunggal pada tempat masuk kuman yang dasarnya bersih, tepinya teratur dan terasa terindurasi seperti karet, namun sama sekali tidak nyeri saat ditekan, disertai pembesaran kelenjar lipat paha yang juga tidak nyeri. Sifat tidak nyeri inilah yang paling menentukan dan sekaligus memisahkannya dari herpes genitalis yang lesinya multipel, dangkal, dan sangat nyeri, serta dari chancroid yang ulkusnya nyeri dengan dasar kotor, tepi bergaung, dan kelenjar lipat paha yang nyeri hingga bernanah. Pada stadium sekunder, penalaran bertumpu pada erupsi makulopapular menyeluruh yang tidak gatal dengan keterlibatan telapak tangan dan telapak kaki — sebaran yang mencerminkan penyebaran melalui aliran darah dan hampir tidak dijumpai pada penyakit kulit lain. Pitiriasis rosea merupakan penyerupa yang paling sering menyesatkan, namun didahului bercak induk, lesinya tersusun mengikuti garis lipatan kulit pada punggung, dan tidak mengenai telapak tangan maupun kaki. Erupsi obat disingkirkan karena tidak ada riwayat obat yang bersesuaian dan lesi tidak gatal. Riwayat adanya luka kelamin yang pernah sembuh sendiri beberapa bulan sebelumnya perlu digali secara khusus, sebab penyembuhan spontan ulkus primer membuat pasien merasa telah sembuh padahal kuman terus menyebar — inilah alasan sifilis kerap baru ditemukan pada stadium sekunder. Diagnosis dipastikan dengan membaca dua jenis serologi secara bersamaan: pemeriksaan treponemal menegaskan pernah terjadinya infeksi, sedangkan titer non-treponemal menunjukkan aktivitas penyakit dan menjadi satu-satunya alat menilai keberhasilan terapi kelak. Penapisan HIV ditawarkan pada kasus ini bukan sebagai tambahan, melainkan karena keduanya berbagi jalur penularan dan saling memperbesar risiko satu sama lain.',
     terapiSuportif: [
       'Perawatan lesi dengan menjaga kebersihan dan kekeringan; kondiloma lata sangat menular sehingga kontak langsung harus dihindari',
       'Analgesik bila ada nyeri kepala, nyeri otot, dan demam pada stadium sekunder',
@@ -8604,12 +8604,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: kulit kepala, dapat satu atau beberapa bercak; tanyakan pula keterlibatan alis dan bulu mata. Onset: perlahan selama beberapa minggu hingga bulan, membesar secara bertahap. Character: bercak bersisik dengan RAMBUT YANG PATAH tepat di permukaan kulit sehingga tampak seperti titik-titik hitam (black dot), atau rambut patah beberapa milimeter di atas kulit; gatal ringan sampai sedang. Radiation: meluas secara sentrifugal dan dapat muncul bercak baru di tempat lain. Associations: adanya benjolan lunak basah yang NYERI dan bernanah (KERION) yang merupakan reaksi hipersensitivitas hebat dan berisiko menimbulkan kebotakan permanen bila terlambat diobati; pembesaran kelenjar getah bening di belakang telinga dan tengkuk yang sangat mendukung diagnosis; demam pada kerion luas. Tanyakan pula munculnya ruam gatal di badan atau tangan yang tidak mengandung jamur (reaksi ide atau dermatofitid) yang dapat timbul setelah terapi dimulai dan sering disalahartikan sebagai alergi obat. Time course: menetap dan progresif tanpa pengobatan; tidak sembuh sendiri. Exacerbating: berbagi sisir, topi, dan bantal; relieving: tidak khas. Severity: luas bercak, derajat kerontokan, adanya kerion, dampak sosial pada anak (diejek teman, malu ke sekolah). WAJIB telusuri SUMBER PENULARAN: teman sekolah dengan keluhan serupa, anggota keluarga serumah, dan terutama KONTAK DENGAN HEWAN — kucing, anjing, atau kelinci yang bulunya rontok berbentuk bulat, sebab spesies zoofilik menimbulkan peradangan yang jauh lebih hebat.',
       riwayatPenyakitDahulu:
-        'History tinea di bagian tubuh lain (korporis, kruris, pedis, unguium), riwayat dermatitis atopik, dermatitis seboroik, psoriasis, riwayat pengobatan antijamur sebelumnya beserta lama dan kepatuhannya, malnutrisi, diabetes melitus pada remaja, dan kondisi imunokompromais termasuk HIV serta penggunaan kortikosteroid.',
+        'Riwayat tinea di bagian tubuh lain (korporis, kruris, pedis, unguium), riwayat dermatitis atopik, dermatitis seboroik, psoriasis, riwayat pengobatan antijamur sebelumnya beserta lama dan kepatuhannya, malnutrisi, diabetes melitus pada remaja, dan kondisi imunokompromais termasuk HIV serta penggunaan kortikosteroid.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga serumah dengan bercak bersisik di kulit kepala atau badan — penting karena pembawa tanpa gejala (asymptomatic carrier) di antara anggota keluarga merupakan sebab kekambuhan yang paling sering luput; tanyakan pula riwayat kebotakan berpola dalam keluarga sebagai pembanding.',
       riwayatPengobatan:
         'Obat yang sudah dipakai: krim antijamur oles (perlu ditegaskan bahwa ini TIDAK CUKUP untuk tinea kapitis), KRIM KORTIKOSTEROID atau krim kombinasi antijamur-kortikosteroid yang sangat sering dibeli bebas dan menghasilkan gambaran menyamar (tinea inkognito), obat tradisional, minyak rambut, serta sampo yang digunakan. Tanyakan pula obat lain yang diminum karena griseofulvin dan terbinafin memiliki interaksi obat yang perlu diperhatikan.',
-      riwayatAlergi: 'History alergi obat, khususnya griseofulvin dan golongan azol; riwayat alergi terhadap penisilin tidak relevan namun perlu dicatat.',
+      riwayatAlergi: 'Riwayat alergi obat, khususnya griseofulvin dan golongan azol; riwayat alergi terhadap penisilin tidak relevan namun perlu dicatat.',
       riwayatNutrisi:
         'Asupan makan sehari-hari dan status gizi — malnutrisi memperberat perjalanan penyakit; penting pula karena GRISEOFULVIN diserap jauh lebih baik bila diminum bersama MAKANAN BERLEMAK, sehingga kebiasaan makan anak menentukan keberhasilan terapi.',
       riwayatTumbuhKembang: 'Pada anak: kurva pertumbuhan berat dan tinggi badan, serta dampak psikososial penyakit terhadap kepercayaan diri dan kemauan bersekolah.',
@@ -8742,11 +8742,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: daerah berjanggut dan berkumis, umumnya satu sisi wajah, dagu, dan leher — hampir selalu pada laki-laki dewasa karena memerlukan rambut terminal. Onset: perlahan dalam beberapa minggu, sering setelah bercukur maupun kontak dengan hewan ternak. Character: dua bentuk yang perlu dibedakan — bentuk superfisial menyerupai tinea biasa dengan tepi bersisik, dan BENTUK DALAM berupa nodul dan plak merah yang bernanah dengan rambut yang mudah dicabut tanpa nyeri. Radiation: meluas perlahan ke sekitarnya. Associations: nyeri, gatal, dan pada bentuk dalam dapat disertai demam serta pembesaran kelenjar getah bening leher. Time course: TANYAKAN RIWAYAT PENGOBATAN SEBELUMNYA — kasus ini hampir selalu sudah diobati sebagai folikulitis bakteri dengan antibiotik tanpa perbaikan, dan riwayat gagal antibiotik itu justru merupakan petunjuk penting. Exacerbating: bercukur yang menyebarkan jamur, dan pemakaian kortikosteroid topikal. Severity: nyeri, dampak kosmetik, dan kekhawatiran akan kebotakan menetap.',
       riwayatPenyakitDahulu:
-        'History tinea di bagian tubuh lain, diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid sistemik maupun topikal.',
+        'Riwayat tinea di bagian tubuh lain, diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid sistemik maupun topikal.',
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan keluhan kulit serupa.',
       riwayatPengobatan:
         'Antibiotik yang sudah diminum beserta lamanya — tidak adanya perbaikan dengan antibiotik yang adekuat sangat mengarahkan pada penyebab jamur. Tanyakan pula krim kortikosteroid dan krim racikan yang menyamarkan gambaran.',
-      riwayatAlergi: 'History alergi obat, terutama antijamur sistemik dan antibiotik.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antijamur sistemik dan antibiotik.',
       riwayatSosialEkonomi:
         'KONTAK DENGAN HEWAN TERNAK seperti sapi, kambing, dan kuda merupakan sumber tersering karena penyebabnya umumnya dermatofita dari hewan; tanyakan pekerjaan sebagai peternak maupun petani. Tanyakan pula kebiasaan bercukur, penggunaan alat cukur di pangkas rambut yang dipakai bergantian, dan berbagi handuk.',
     },
@@ -8783,7 +8783,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Iklim panas lembap dan kebersihan diri yang kurang',
     ],
     goldStandard:
-      'Diagnosis ditegakkan dari gambaran klinis berupa peradangan bernanah pada daerah berjanggut dengan rambut yang mudah tercabut tanpa nyeri, dan dipastikan dengan pemeriksaan larutan KOH dari kerokan kulit serta cabutan rambut yang memperlihatkan hifa dan spora pada batang rambut. Kultur jamur sangat dianjurkan karena terapi sistemik berlangsung berminggu-minggu. History tidak membaik dengan antibiotik yang adekuat merupakan petunjuk klinis yang kuat.',
+      'Diagnosis ditegakkan dari gambaran klinis berupa peradangan bernanah pada daerah berjanggut dengan rambut yang mudah tercabut tanpa nyeri, dan dipastikan dengan pemeriksaan larutan KOH dari kerokan kulit serta cabutan rambut yang memperlihatkan hifa dan spora pada batang rambut. Kultur jamur sangat dianjurkan karena terapi sistemik berlangsung berminggu-minggu. Riwayat tidak membaik dengan antibiotik yang adekuat merupakan petunjuk klinis yang kuat.',
     diagnosisBanding: [
       'FOLIKULITIS BAKTERI — banding tersering; rambut MASIH MELEKAT KUAT dan pencabutan terasa nyeri, berespons terhadap antibiotik',
       'Pseudofolikulitis barbae — akibat rambut yang tumbuh ke dalam setelah bercukur, terutama pada rambut keriting, tanpa jamur',
@@ -8795,7 +8795,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Aktinomikosis servikofasial — massa keras dengan fistula yang mengeluarkan butiran kuning',
     ],
     pengkajian:
-      'Dipikirkan tinea barbe pada pasien ini atas dasar munculnya nodul dan plak merah yang meradang dengan pustul pada muara folikel di daerah janggut satu sisi wajah, pada seorang laki-laki dewasa yang bekerja dengan hewan ternak, dan yang paling menentukan — rambut pada lesi dapat tercabut dengan mudah tanpa menimbulkan rasa nyeri. Mudahnya rambut tercabut tanpa nyeri menandakan akar rambut sudah dirusak jamur, dan inilah yang memisahkannya dari folikulitis bakteri yang rambutnya masih melekat kuat sehingga pencabutan terasa nyeri. History sudah diobati dengan antibiotik tanpa perbaikan pada kasus ini bukan sekadar catatan pengobatan melainkan petunjuk diagnostik yang berarti, sebab peradangan bernanah pada wajah hampir selalu diperlakukan sebagai infeksi bakteri terlebih dahulu. Pseudofolikulitis barbae disingkirkan karena lesi tidak berkaitan dengan rambut yang tumbuh ke dalam setelah bercukur dan tidak tersebar merata pada seluruh daerah cukur. Furunkel dan karbunkel tidak sesuai karena lesi pada kasus ini berupa beberapa folikel yang meradang pada satu daerah alih-alih satu abses yang berpusat. Herpes simpleks disingkirkan karena tidak ada vesikel berkelompok dan tidak ada riwayat berulang di tempat yang sama. Kontak dengan hewan ternak ditelusuri secara khusus karena penyebab tersering pada tinea barbe adalah dermatofita yang berasal dari hewan, dan jamur jenis ini menimbulkan reaksi peradangan yang jauh lebih hebat karena tidak beradaptasi dengan manusia. Hal yang paling menentukan penanganan adalah kesadaran bahwa jamur berada di dalam folikel sehingga krim antijamur tidak akan pernah mencapainya dengan kadar yang memadai — terapi harus bersifat sistemik sejak awal, dan setiap penundaan berarti peradangan terus merusak folikel sehingga meninggalkan kebotakan menetap yang tidak dapat dipulihkan.',
+      'Dipikirkan tinea barbe pada pasien ini atas dasar munculnya nodul dan plak merah yang meradang dengan pustul pada muara folikel di daerah janggut satu sisi wajah, pada seorang laki-laki dewasa yang bekerja dengan hewan ternak, dan yang paling menentukan — rambut pada lesi dapat tercabut dengan mudah tanpa menimbulkan rasa nyeri. Mudahnya rambut tercabut tanpa nyeri menandakan akar rambut sudah dirusak jamur, dan inilah yang memisahkannya dari folikulitis bakteri yang rambutnya masih melekat kuat sehingga pencabutan terasa nyeri. Riwayat sudah diobati dengan antibiotik tanpa perbaikan pada kasus ini bukan sekadar catatan pengobatan melainkan petunjuk diagnostik yang berarti, sebab peradangan bernanah pada wajah hampir selalu diperlakukan sebagai infeksi bakteri terlebih dahulu. Pseudofolikulitis barbae disingkirkan karena lesi tidak berkaitan dengan rambut yang tumbuh ke dalam setelah bercukur dan tidak tersebar merata pada seluruh daerah cukur. Furunkel dan karbunkel tidak sesuai karena lesi pada kasus ini berupa beberapa folikel yang meradang pada satu daerah alih-alih satu abses yang berpusat. Herpes simpleks disingkirkan karena tidak ada vesikel berkelompok dan tidak ada riwayat berulang di tempat yang sama. Kontak dengan hewan ternak ditelusuri secara khusus karena penyebab tersering pada tinea barbe adalah dermatofita yang berasal dari hewan, dan jamur jenis ini menimbulkan reaksi peradangan yang jauh lebih hebat karena tidak beradaptasi dengan manusia. Hal yang paling menentukan penanganan adalah kesadaran bahwa jamur berada di dalam folikel sehingga krim antijamur tidak akan pernah mencapainya dengan kadar yang memadai — terapi harus bersifat sistemik sejak awal, dan setiap penundaan berarti peradangan terus merusak folikel sehingga meninggalkan kebotakan menetap yang tidak dapat dipulihkan.',
     terapiSuportif: [
       'HENTIKAN BERCUKUR pada daerah yang terkena sampai lesi mereda, karena bercukur menyebarkan jamur ke folikel yang belum terinfeksi',
       'Kompres hangat untuk melunakkan krusta dan membantu pengeluaran nanah',
@@ -8850,12 +8850,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: pipi, dahi, sekitar mata, dan hidung; umumnya satu sisi dan tidak simetris — asimetri ini merupakan petunjuk penting karena penyakit kulit wajah lain seperti dermatitis seboroik dan lupus cenderung simetris. Onset: perlahan dalam hitungan minggu, meluas dari satu titik ke sekitarnya. Character: bercak merah dengan TEPI YANG MENINGGI DAN AKTIF disertai sisik dan kadang papul maupun pustul kecil, sedangkan bagian tengahnya lebih tenang — gambaran cincin yang khas. Radiation: meluas ke arah luar secara memusat. Associations: gatal yang bertambah saat berkeringat dan terkena sinar matahari. Time course: TANYAKAN SECARA KHUSUS APAKAH PERNAH DIOLESI KRIM DARI APOTEK ATAU KRIM RACIKAN — riwayat pemakaian kortikosteroid topikal sangat lazim dan mengubah gambaran menjadi tidak khas, membaik sementara lalu memburuk setiap obat dihentikan. Exacerbating: berkeringat, sinar matahari, dan penghentian krim kortikosteroid. Relieving: perbaikan semu selama memakai kortikosteroid. Severity: gatal, dampak kosmetik, dan kepercayaan diri.',
       riwayatPenyakitDahulu:
-        'History tinea di bagian tubuh lain terutama kaki dan selangkangan, karena penyebaran dari sana melalui tangan sangat sering. Diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid sistemik. History dermatitis atopik.',
+        'Riwayat tinea di bagian tubuh lain terutama kaki dan selangkangan, karena penyebaran dari sana melalui tangan sangat sering. Diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid sistemik. Riwayat dermatitis atopik.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga serumah dengan keluhan kulit serupa, serta keberadaan hewan peliharaan seperti kucing dan anjing yang kulitnya berkerak maupun berbulu rontok — dermatofita dari hewan menimbulkan peradangan yang lebih hebat.',
       riwayatPengobatan:
         'RINCIAN KRIM YANG SUDAH DIPAKAI SANGAT PENTING: krim racikan tanpa label, krim pemutih, dan krim kombinasi yang mengandung kortikosteroid bersama antijamur — semuanya menyamarkan gambaran dan memperluas infeksi. Tanyakan pula antijamur yang pernah dipakai beserta lama pemakaiannya.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap krim sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap krim sebelumnya.',
       riwayatSosialEkonomi:
         'Kontak dengan hewan, olahraga kontak seperti gulat, pemakaian handuk dan bantal bersama, kebiasaan berkeringat banyak, serta kondisi hunian yang lembap.',
     },
@@ -8957,15 +8957,15 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: badan, punggung, dada, lengan, atau tungkai; catat jumlah dan sebaran lesi. Onset: perlahan, bermula sebagai bercak kecil kemerahan lalu MELEBAR secara sentrifugal membentuk cincin. Character: bercak berbentuk CINCIN dengan tepi meninggi, kemerahan, dan bersisik, sedangkan bagian TENGAHNYA justru menyembuh dan tampak lebih bersih atau kecokelatan; gatal yang khas MEMBERAT SAAT BERKERINGAT dan saat cuaca panas. Radiation: meluas ke kulit sekitar dan dapat berpindah ke bagian tubuh lain melalui garukan (autoinokulasi). Associations: adanya lesi serupa di lipat paha, sela jari kaki, atau kelainan kuku — sangat penting ditanyakan karena TINEA PEDIS dan ONIKOMIKOSIS sering menjadi sumber penyebaran ke badan dan bila tidak ikut diobati akan menjadi sumber kekambuhan; tanyakan pula nyeri, nanah, dan demam yang menandakan infeksi bakteri sekunder. Time course: menetap dan progresif tanpa pengobatan, tidak sembuh sendiri. Exacerbating: keringat, cuaca panas lembap, pakaian ketat dan tidak menyerap keringat, olahraga kontak; relieving: menjaga kulit tetap kering. Severity: luas dan jumlah lesi, derajat gatal, gangguan tidur, dan dampak kosmetik. WAJIB tanyakan PEMAKAIAN KRIM KORTIKOSTEROID atau krim campuran yang dibeli bebas — sangat lazim di Indonesia dan menghasilkan TINEA INKOGNITO, yaitu lesi yang kehilangan tepi khasnya, tampak lebih luas, kurang bersisik, dan menjadi sulit dikenali. Telusuri pula SUMBER PENULARAN: anggota keluarga dengan keluhan serupa, kontak dengan hewan peliharaan berbulu rontok, olahraga kontak seperti gulat dan judo, serta pemakaian pakaian atau handuk bersama.',
       riwayatPenyakitDahulu:
-        'History tinea sebelumnya di bagian tubuh mana pun beserta pengobatannya, TINEA PEDIS dan ONIKOMIKOSIS yang sering menjadi reservoir, DIABETES MELITUS, obesitas, dermatitis atopik, HIV dan kondisi imunokompromais, penggunaan kortikosteroid sistemik maupun topikal jangka panjang, keganasan, serta riwayat penyakit hati yang menentukan keamanan antijamur sistemik.',
+        'Riwayat tinea sebelumnya di bagian tubuh mana pun beserta pengobatannya, TINEA PEDIS dan ONIKOMIKOSIS yang sering menjadi reservoir, DIABETES MELITUS, obesitas, dermatitis atopik, HIV dan kondisi imunokompromais, penggunaan kortikosteroid sistemik maupun topikal jangka panjang, keganasan, serta riwayat penyakit hati yang menentukan keamanan antijamur sistemik.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga serumah dengan bercak gatal serupa — penularan antar anggota keluarga sangat lazim dan pengobatan satu orang saja berujung penularan bolak-balik; tanyakan pula riwayat diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Ditanyakan secara khusus dan terperinci: KRIM KORTIKOSTEROID tunggal maupun KRIM KOMBINASI antijamur-kortikosteroid-antibiotik yang dijual bebas — pemakaiannya mula-mula membuat gatal mereda sehingga pasien menganggapnya cocok, padahal jamur justru menyebar lebih luas; tanyakan juga antijamur oles yang sudah dipakai, berapa lama, seberapa luas dioleskan, obat tradisional, serta obat lain yang diminum karena berpotensi berinteraksi dengan antijamur sistemik.',
-      riwayatAlergi: 'History alergi obat termasuk golongan azol dan terbinafin, serta riwayat dermatitis kontak terhadap krim tertentu.',
+      riwayatAlergi: 'Riwayat alergi obat termasuk golongan azol dan terbinafin, serta riwayat dermatitis kontak terhadap krim tertentu.',
       riwayatNutrisi: 'Status gizi dan pengendalian gula darah pada penyandang diabetes — hiperglikemia memperberat dan memperpanjang infeksi jamur.',
       riwayatSosialEkonomi:
-        'Occupation yang menimbulkan banyak keringat atau bekerja di lingkungan panas dan lembap, penggunaan pakaian ketat berbahan sintetis, kebiasaan mandi dan mengganti pakaian setelah berkeringat, kebiasaan BERBAGI HANDUK dan pakaian, kepadatan hunian, olahraga kontak dan penggunaan fasilitas umum seperti kolam renang serta ruang ganti, kepemilikan hewan peliharaan, dan kemampuan membeli obat untuk pemakaian beberapa minggu.',
+        'Pekerjaan yang menimbulkan banyak keringat atau bekerja di lingkungan panas dan lembap, penggunaan pakaian ketat berbahan sintetis, kebiasaan mandi dan mengganti pakaian setelah berkeringat, kebiasaan BERBAGI HANDUK dan pakaian, kepadatan hunian, olahraga kontak dan penggunaan fasilitas umum seperti kolam renang serta ruang ganti, kepemilikan hewan peliharaan, dan kemampuan membeli obat untuk pemakaian beberapa minggu.',
     },
     pemeriksaanFisik: [
       'Tanda vital; umumnya normal pada tinea korporis tanpa komplikasi',
@@ -9098,13 +9098,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: SATU TANGAN SAJA pada sebagian besar kasus — sifat satu sisi ini merupakan petunjuk terpenting karena eksim tangan dan dermatitis kontak cenderung mengenai kedua tangan. Onset: perlahan dalam hitungan bulan hingga tahun, sering dianggap sekadar kulit kering. Character: kulit telapak tangan menebal dengan SISIK HALUS SEPERTI TEPUNG yang menonjol pada garis-garis telapak tangan; bentuk lain berupa vesikel pada tepi telapak yang terasa gatal. Radiation: dapat meluas ke punggung tangan dengan tepi aktif seperti pada tinea korporis, dan menjalar ke kuku. Associations: gatal ringan hingga sedang; sebagian pasien tidak gatal sama sekali sehingga hanya mengeluh kulit kering. TANYAKAN SECARA KHUSUS KEADAAN KEDUA KAKI DAN KUKU, karena tinea pedis dan tinea unguium hampir selalu menyertai dan merupakan sumbernya. Time course: menahun dan tidak pernah benar-benar sembuh dengan pelembap maupun salep biasa. Exacerbating: mencuci berulang dan cuaca kering. Severity: retakan yang nyeri pada telapak dan gangguan pekerjaan.',
       riwayatPenyakitDahulu:
-        'History tinea pedis dan tinea unguium; diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid. History dermatitis atopik dan psoriasis yang menjadi banding.',
+        'Riwayat tinea pedis dan tinea unguium; diabetes melitus, keadaan imunitas menurun, dan pemakaian kortikosteroid. Riwayat dermatitis atopik dan psoriasis yang menjadi banding.',
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan keluhan kulit maupun kuku serupa, serta riwayat psoriasis untuk banding.',
       riwayatPengobatan:
         'Krim yang sudah dipakai, khususnya kortikosteroid topikal dan krim kombinasi yang menyamarkan gambaran; pelembap dan obat racikan.',
-      riwayatAlergi: 'History alergi obat dan alergi kontak yang relevan untuk banding dermatitis kontak.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi kontak yang relevan untuk banding dermatitis kontak.',
       riwayatSosialEkonomi:
-        'Occupation dan paparan tangan terhadap air maupun bahan kimia untuk membedakan dari dermatitis kontak iritan, kebiasaan menggaruk kaki dengan tangan yang menjelaskan penularan, pemakaian sarung tangan, serta kebiasaan berjalan tanpa alas kaki di tempat umum yang lembap.',
+        'Pekerjaan dan paparan tangan terhadap air maupun bahan kimia untuk membedakan dari dermatitis kontak iritan, kebiasaan menggaruk kaki dengan tangan yang menjelaskan penularan, pemakaian sarung tangan, serta kebiasaan berjalan tanpa alas kaki di tempat umum yang lembap.',
     },
     pemeriksaanFisik: [
       'PERIKSA KEDUA TANGAN DAN KEDUA KAKI SEKALIGUS — menemukan pola dua kaki satu tangan hampir memastikan diagnosis dan merupakan pemeriksaan yang tidak boleh dilewatkan',
@@ -9136,7 +9136,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Diabetes melitus dan keadaan imunitas menurun',
       'Pemakaian kortikosteroid topikal pada tangan',
       'Berjalan tanpa alas kaki di tempat umum yang lembap',
-      'Occupation dengan tangan sering basah',
+      'Pekerjaan dengan tangan sering basah',
     ],
     goldStandard:
       'Diagnosis ditegakkan dari gambaran klinis berupa penebalan dan sisik halus pada telapak tangan yang mengenai satu sisi, terlebih bila ditemukan pola dua kaki satu tangan, dan dipastikan dengan kerokan kulit menggunakan larutan KOH yang memperlihatkan hifa bersepta bercabang. Pemeriksaan kuku merupakan bagian dari penegakan diagnosis, sebab tinea unguium yang menyertai menentukan lama dan jenis pengobatan.',
@@ -9204,14 +9204,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kuku mana saja yang terkena dan berapa jumlahnya; KUKU IBU JARI KAKI PALING SERING TERKENA LEBIH DAHULU, dan perubahan umumnya dimulai dari tepi bebas maupun sisi kuku lalu menjalar ke arah pangkal. Onset: sangat perlahan dalam hitungan bulan hingga tahun sehingga pasien kerap tidak tahu kapan mulainya. Character: kuku menebal, berwarna kekuningan sampai kecoklatan, rapuh dan mudah patah, dengan bahan seperti serbuk di bawahnya yang menyebabkan kuku terangkat dari dasarnya. Radiation: menyebar dari satu kuku ke kuku lain dan ke kulit sekitarnya. Associations: umumnya TIDAK NYERI DAN TIDAK GATAL — keluhannya bersifat kosmetik, dan justru itulah sebabnya pasien datang terlambat; nyeri baru muncul bila kuku menekan sepatu atau ada infeksi sekunder. Time course: menahun dan progresif, tidak pernah membaik sendiri. Exacerbating: sepatu tertutup yang lembap dan trauma berulang pada kuku. Severity: nilai dampak kosmetik, nyeri saat berjalan, dan pada penderita diabetes nilai risikonya sebagai pintu masuk infeksi.',
       riwayatPenyakitDahulu:
-        'DIABETES MELITUS dan penyakit pembuluh darah perifer, karena keduanya mengubah penyakit ini dari masalah kosmetik menjadi pintu masuk selulitis dan kaki diabetik. History tinea pedis dan tinea manus, psoriasis yang menjadi banding utama, keadaan imunitas menurun, dan trauma pada kuku.',
+        'DIABETES MELITUS dan penyakit pembuluh darah perifer, karena keduanya mengubah penyakit ini dari masalah kosmetik menjadi pintu masuk selulitis dan kaki diabetik. Riwayat tinea pedis dan tinea manus, psoriasis yang menjadi banding utama, keadaan imunitas menurun, dan trauma pada kuku.',
       riwayatPenyakitKeluarga:
         'Anggota keluarga serumah dengan kuku maupun kulit serupa; riwayat psoriasis pada keluarga penting untuk banding.',
       riwayatPengobatan:
         'Antijamur yang pernah dipakai beserta lama dan cara pemakaiannya — kegagalan sebelumnya paling sering karena lama terapi yang kurang. Obat imunosupresan dan kortikosteroid. Tanyakan pula pemakaian cat kuku dan kuku palsu.',
-      riwayatAlergi: 'History alergi obat, terutama antijamur sistemik.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antijamur sistemik.',
       riwayatSosialEkonomi:
-        'Occupation dengan sepatu tertutup sepanjang hari maupun sepatu bot, olahraga yang membuat kaki lembap, kebiasaan berjalan tanpa alas kaki di tempat umum, kunjungan ke salon kuku dengan alat yang dipakai bersama, serta KEMAMPUAN MENJALANI PENGOBATAN BERBULAN-BULAN yang menentukan keberhasilan.',
+        'Pekerjaan dengan sepatu tertutup sepanjang hari maupun sepatu bot, olahraga yang membuat kaki lembap, kebiasaan berjalan tanpa alas kaki di tempat umum, kunjungan ke salon kuku dengan alat yang dipakai bersama, serta KEMAMPUAN MENJALANI PENGOBATAN BERBULAN-BULAN yang menentukan keberhasilan.',
     },
     pemeriksaanFisik: [
       'Periksa SELURUH kuku tangan dan kaki, bukan hanya yang dikeluhkan, serta hitung berapa kuku yang terkena dan berapa bagian tiap kuku yang terlibat',
@@ -9317,14 +9317,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: lipat paha, meluas ke paha bagian dalam, bokong, dan daerah perianal; tanyakan secara khusus apakah SKROTUM ikut terkena, sebab keterlibatan skrotum mengarahkan pada kandidiasis dan bukan tinea. Onset: perlahan selama beberapa minggu, sering berulang pada musim panas atau saat banyak berkeringat. Character: bercak kemerahan sampai kecokelatan dengan TEPI AKTIF yang meninggi dan bersisik, meluas dari lipatan ke arah bawah membentuk gambaran setengah bulan; gatal yang menonjol dan kadang rasa terbakar. Radiation: meluas secara sentrifugal dan sering BILATERAL meski tidak selalu simetris. Associations: tanyakan dengan sungguh-sungguh adanya keluhan pada SELA JARI KAKI, telapak kaki, dan KUKU — tinea pedis merupakan sumber penularan tersering ke lipat paha melalui tangan maupun melalui celana dalam yang dipakai dengan cara melangkahkan kaki ke dalamnya; tanyakan pula nyeri, nanah, dan bau yang menandakan infeksi bakteri sekunder atau eritrasma. Time course: kronik hilang timbul, memberat pada cuaca panas dan lembap. Exacerbating: keringat, pakaian dalam ketat dan berbahan sintetis, duduk lama, obesitas, dan mengenakan pakaian basah; relieving: menjaga daerah tetap kering. Severity: derajat gatal, gangguan tidur, gangguan aktivitas dan kenyamanan bekerja, serta dampak pada hubungan seksual. WAJIB tanyakan pemakaian KRIM KORTIKOSTEROID atau krim kombinasi yang dibeli bebas — daerah lipatan sangat rentan terhadap efek samping kortikosteroid berupa penipisan kulit dan striae, sekaligus menghasilkan tinea inkognito.',
       riwayatPenyakitDahulu:
-        'History tinea kruris sebelumnya dan seberapa sering kambuh, TINEA PEDIS dan ONIKOMIKOSIS, tinea korporis, DIABETES MELITUS, obesitas, hiperhidrosis, inkontinensia urin yang membuat daerah selalu lembap, HIV dan kondisi imunokompromais, penggunaan kortikosteroid, serta riwayat penyakit hati sebelum mempertimbangkan antijamur sistemik.',
+        'Riwayat tinea kruris sebelumnya dan seberapa sering kambuh, TINEA PEDIS dan ONIKOMIKOSIS, tinea korporis, DIABETES MELITUS, obesitas, hiperhidrosis, inkontinensia urin yang membuat daerah selalu lembap, HIV dan kondisi imunokompromais, penggunaan kortikosteroid, serta riwayat penyakit hati sebelum mempertimbangkan antijamur sistemik.',
       riwayatPenyakitKeluarga: 'Anggota keluarga serumah dengan keluhan gatal serupa di lipat paha atau kaki, serta riwayat diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'KRIM KORTIKOSTEROID dan KRIM KOMBINASI yang dijual bebas — sangat lazim dipakai untuk gatal selangkangan dan berbahaya karena kulit lipatan tipis serta oklusif sehingga penyerapan kortikosteroid sangat tinggi; tanyakan pula antijamur yang sudah dipakai beserta lama dan cara pemakaiannya, bedak, obat tradisional, serta antibiotik.',
-      riwayatAlergi: 'History alergi obat dan riwayat dermatitis kontak terhadap sabun, deterjen, pelembut pakaian, atau krim tertentu.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat dermatitis kontak terhadap sabun, deterjen, pelembut pakaian, atau krim tertentu.',
       riwayatNutrisi: 'Status gizi, berat badan, dan pengendalian gula darah pada penyandang diabetes.',
       riwayatSosialEkonomi:
-        'Occupation yang menuntut duduk berjam-jam atau bekerja di lingkungan panas seperti sopir, petugas keamanan, pekerja pabrik, dan tentara; jenis PAKAIAN DALAM yang digunakan (ketat atau longgar, katun atau sintetis) dan frekuensi menggantinya; kebiasaan mandi dan mengeringkan lipatan setelah mandi; kebiasaan mengenakan kembali pakaian yang sudah dipakai; kebiasaan berbagi handuk; penggunaan kamar mandi umum, kolam renang, dan ruang ganti; serta kemampuan membeli obat untuk pemakaian beberapa minggu.',
+        'Pekerjaan yang menuntut duduk berjam-jam atau bekerja di lingkungan panas seperti sopir, petugas keamanan, pekerja pabrik, dan tentara; jenis PAKAIAN DALAM yang digunakan (ketat atau longgar, katun atau sintetis) dan frekuensi menggantinya; kebiasaan mandi dan mengeringkan lipatan setelah mandi; kebiasaan mengenakan kembali pakaian yang sudah dipakai; kebiasaan berbagi handuk; penggunaan kamar mandi umum, kolam renang, dan ruang ganti; serta kemampuan membeli obat untuk pemakaian beberapa minggu.',
     },
     pemeriksaanFisik: [
       'Tanda vital; umumnya normal',
@@ -9363,7 +9363,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebiasaan tidak segera mengganti pakaian yang basah oleh keringat',
       'OBESITAS dengan lipatan kulit yang dalam dan lembap',
       'TINEA PEDIS dan ONIKOMIKOSIS yang tidak diobati — reservoir utama',
-      'Occupation dengan duduk berjam-jam atau di lingkungan panas',
+      'Pekerjaan dengan duduk berjam-jam atau di lingkungan panas',
       'DIABETES MELITUS',
       'Imunokompromais termasuk HIV dan penggunaan kortikosteroid',
       'Berbagi handuk dan pakaian',
@@ -9464,7 +9464,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Anggota keluarga serumah dengan keluhan serupa dan kebiasaan berbagi alas kaki maupun lantai kamar mandi; riwayat diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Antijamur oles yang sudah dipakai beserta lama dan luas pemakaiannya, KRIM KORTIKOSTEROID dan krim kombinasi yang dibeli bebas, bedak, obat tradisional termasuk merendam kaki dengan berbagai larutan, serta antibiotik. Tanyakan pula obat lain yang diminum karena berpotensi berinteraksi dengan antijamur sistemik, dan status pengobatan diabetes.',
-      riwayatAlergi: 'History alergi obat termasuk golongan azol dan terbinafin, serta riwayat dermatitis kontak terhadap bahan sepatu (karet, kromat pada kulit samak, perekat) yang merupakan diagnosis banding penting.',
+      riwayatAlergi: 'Riwayat alergi obat termasuk golongan azol dan terbinafin, serta riwayat dermatitis kontak terhadap bahan sepatu (karet, kromat pada kulit samak, perekat) yang merupakan diagnosis banding penting.',
       riwayatNutrisi: 'Status gizi dan pengendalian gula darah pada penyandang diabetes.',
       riwayatSosialEkonomi:
         'PEKERJAAN yang mengharuskan memakai SEPATU TERTUTUP berjam-jam seperti tentara, polisi, petugas keamanan, pekerja pabrik, dan tenaga kesehatan; jenis sepatu dan kaus kaki serta frekuensi menggantinya; kebiasaan mengeringkan sela jari setelah mandi; penggunaan FASILITAS UMUM yang basah seperti kolam renang, kamar mandi bersama, ruang ganti, masjid, dan pesantren; kebiasaan berwudu berulang tanpa mengeringkan kaki; kebiasaan berjalan tanpa alas kaki; berbagi alas kaki, kaus kaki, dan handuk; serta kemampuan membeli obat untuk pemakaian yang berlangsung beberapa minggu hingga bulan.',
@@ -9505,7 +9505,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pemakaian SEPATU TERTUTUP berjam-jam dan kaus kaki yang tidak menyerap keringat',
       'Hiperhidrosis dan kaki yang sering basah',
       'Berjalan TANPA ALAS KAKI di tempat umum yang basah: kamar mandi bersama, kolam renang, ruang ganti, masjid, pesantren, dan asrama',
-      'Occupation yang mengharuskan bersepatu lama: tentara, polisi, petugas keamanan, pekerja pabrik, atlet',
+      'Pekerjaan yang mengharuskan bersepatu lama: tentara, polisi, petugas keamanan, pekerja pabrik, atlet',
       'Iklim panas dan lembap serta musim hujan',
       'ONIKOMIKOSIS yang tidak diobati sebagai reservoir',
       'DIABETES MELITUS — meningkatkan risiko sekaligus mengubah konsekuensinya menjadi jauh lebih berat',
@@ -9606,15 +9606,15 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: sebaran khas pada daerah yang kaya kelenjar sebasea yaitu punggung atas, dada, bahu, leher, dan lengan atas; pada anak dan remaja dapat pula mengenai wajah. Onset: perlahan dalam hitungan minggu hingga bulan, sering baru disadari setelah berjemur karena kulit di sekitarnya menjadi lebih gelap sementara bercaknya tidak ikut menggelap. Character: bercak berbatas tegas yang warnanya dapat lebih terang maupun lebih gelap daripada kulit sekitarnya — pada satu orang kedua jenis warna dapat ditemukan bersamaan; permukaannya bersisik sangat halus yang baru tampak jelas bila digores. Radiation: bercak kecil-kecil yang bertambah banyak lalu menyatu membentuk area yang luas. Associations: gatal ringan atau tidak gatal sama sekali; gatal hebat justru mengarahkan ke diagnosis lain. Time course: perjalanan menahun dengan kecenderungan berulang, memberat pada musim panas dan lembap; tanyakan riwayat pengobatan sebelumnya dan apakah pernah dinyatakan sembuh lalu bercaknya dianggap kambuh padahal hanya sisa warna. Exacerbating: cuaca panas dan lembap, keringat berlebih, pakaian ketat dan tidak menyerap keringat, pemakaian minyak dan losion berminyak pada badan, serta kortikosteroid. Severity: umumnya keluhan bersifat kosmetik semata, namun nilai dampaknya terhadap kepercayaan diri karena inilah yang sesungguhnya membawa pasien datang berobat.',
       riwayatPenyakitDahulu:
-        'History keluhan serupa sebelumnya dan pengobatan yang pernah dijalani beserta hasilnya. Diabetes melitus, sindrom Cushing, keadaan malnutrisi, dan keadaan imunitas menurun yang membuat penyakit lebih luas dan lebih sering berulang. History dermatitis seboroik yang juga berkaitan dengan Malassezia.',
+        'Riwayat keluhan serupa sebelumnya dan pengobatan yang pernah dijalani beserta hasilnya. Diabetes melitus, sindrom Cushing, keadaan malnutrisi, dan keadaan imunitas menurun yang membuat penyakit lebih luas dan lebih sering berulang. Riwayat dermatitis seboroik yang juga berkaitan dengan Malassezia.',
       riwayatPenyakitKeluarga:
-        'History keluhan serupa pada anggota keluarga; kecenderungan ini lebih berkaitan dengan faktor bawaan dan lingkungan yang sama daripada dengan penularan, karena ragi penyebabnya adalah flora normal kulit.',
+        'Riwayat keluhan serupa pada anggota keluarga; kecenderungan ini lebih berkaitan dengan faktor bawaan dan lingkungan yang sama daripada dengan penularan, karena ragi penyebabnya adalah flora normal kulit.',
       riwayatPengobatan:
         'Pemakaian kortikosteroid topikal maupun sistemik yang mendorong pertumbuhan ragi, obat imunosupresan, serta kontrasepsi hormonal. Tanyakan pula produk perawatan tubuh yang dipakai, khususnya minyak dan losion berminyak yang menjadi sumber lipid bagi ragi.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap antijamur topikal sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap antijamur topikal sebelumnya.',
       riwayatNutrisi: 'Status gizi; malnutrisi merupakan salah satu faktor predisposisi.',
       riwayatSosialEkonomi:
-        'Occupation yang membuat banyak berkeringat atau terpapar panas, kebiasaan berolahraga dan segera tidaknya mandi setelahnya, jenis pakaian yang dipakai sehari-hari, kebiasaan memakai minyak badan, serta kondisi tempat tinggal yang panas dan lembap.',
+        'Pekerjaan yang membuat banyak berkeringat atau terpapar panas, kebiasaan berolahraga dan segera tidaknya mandi setelahnya, jenis pakaian yang dipakai sehari-hari, kebiasaan memakai minyak badan, serta kondisi tempat tinggal yang panas dan lembap.',
     },
     pemeriksaanFisik: [
       'Makula berbatas tegas dengan berbagai ukuran yang dapat menyatu, warnanya bervariasi dari putih, kecoklatan, hingga kemerahan — keragaman warna pada satu pasien inilah asal nama versikolor',
@@ -9707,14 +9707,14 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: daerah yang hangat, lembap, dan bergesekan — lipatan selangkangan, ketiak, bawah payudara, lipatan perut, sela jari tangan dan kaki, sudut bibir, serta daerah sekitar kuku; pada perempuan dapat mengenai vulva dan vagina. Character: kemerahan menyala dengan permukaan basah dan mengilap, terasa GATAL SEKALIGUS PERIH — rasa perih yang menonjol membedakannya dari infeksi jamur dermatofita yang lebih dominan gatal. Radiation: TANDA PALING KHAS ADALAH LESI SATELIT berupa papul dan pustul kecil yang tersebar di luar tepi lesi utama — tanyakan dan cari secara khusus karena inilah pembeda utamanya. Onset: perlahan dalam beberapa hari sampai minggu. Associations: pada perempuan tanyakan keputihan kental menggumpal seperti kepala susu dengan gatal hebat; tanyakan pula sariawan putih di mulut. Time course: menahun dan berulang bila faktor predisposisi tidak diatasi. Exacerbating: keringat, cuaca panas, pakaian ketat, tangan yang sering basah, dan gula darah yang tinggi. Severity: nilai gangguan tidur, aktivitas, dan pekerjaan.',
       riwayatPenyakitDahulu:
-        'DIABETES MELITUS merupakan hal yang paling penting ditelusuri, terutama pada kandidiasis yang luas maupun berulang. Obesitas, infeksi HIV, keganasan, dan keadaan imunitas menurun lainnya. History kandidiasis sebelumnya beserta frekuensinya.',
-      riwayatPenyakitKeluarga: 'History diabetes pada keluarga; pada bayi, tanyakan keluhan nyeri puting yang menusuk pada ibu yang menyusui.',
+        'DIABETES MELITUS merupakan hal yang paling penting ditelusuri, terutama pada kandidiasis yang luas maupun berulang. Obesitas, infeksi HIV, keganasan, dan keadaan imunitas menurun lainnya. Riwayat kandidiasis sebelumnya beserta frekuensinya.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes pada keluarga; pada bayi, tanyakan keluhan nyeri puting yang menusuk pada ibu yang menyusui.',
       riwayatPengobatan:
         'ANTIBIOTIK SPEKTRUM LUAS dalam waktu dekat yang menekan bakteri pesaing, kortikosteroid topikal maupun sistemik, obat imunosupresan, kemoterapi, dan kontrasepsi hormonal. Tanyakan pula krim racikan tanpa label.',
-      riwayatAlergi: 'History alergi obat, terutama antijamur golongan azol.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antijamur golongan azol.',
       riwayatNutrisi: 'Asupan gula dan status gizi; malnutrisi maupun kekurangan besi dan zink mempermudah kandidiasis.',
       riwayatSosialEkonomi:
-        'Occupation dengan tangan yang sering basah seperti juru masak, pencuci, dan petugas kebersihan; pakaian ketat dan tidak menyerap keringat; kebersihan dan cara mengeringkan lipatan setelah mandi; serta pemakaian popok pada bayi maupun gigi tiruan pada usia lanjut.',
+        'Pekerjaan dengan tangan yang sering basah seperti juru masak, pencuci, dan petugas kebersihan; pakaian ketat dan tidak menyerap keringat; kebersihan dan cara mengeringkan lipatan setelah mandi; serta pemakaian popok pada bayi maupun gigi tiruan pada usia lanjut.',
     },
     pemeriksaanFisik: [
       'Kandidiasis intertriginosa: kemerahan MENYALA dengan permukaan basah dan mengilap, tepi tidak rata, kadang disertai maserasi keputihan',
@@ -9745,7 +9745,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'DIABETES MELITUS yang tidak terkendali',
       'Antibiotik spektrum luas dan kortikosteroid',
       'Keadaan imunitas menurun termasuk infeksi HIV, keganasan, dan kemoterapi',
-      'Occupation dengan tangan sering basah',
+      'Pekerjaan dengan tangan sering basah',
       'Bayi dengan popok dan usia lanjut dengan gigi tiruan',
       'Kehamilan dan pemakaian kontrasepsi hormonal',
       'Malnutrisi serta kekurangan besi dan zink',
@@ -9817,10 +9817,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Garis berkelok kemerahan yang sangat gatal dan berpindah tempat di telapak kaki.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: KAKI DAN TELAPAK KAKI PALING SERING, diikuti bokong, paha, dan tangan — yaitu bagian tubuh yang bersentuhan langsung dengan tanah maupun pasir. Onset: rasa gatal dan tersengat muncul beberapa jam sampai beberapa hari setelah kontak dengan tanah maupun pasir pantai. Character: LESI BERUPA GARIS BERKELOK-KELOK YANG MENINGGI SEPERTI BENANG, kemerahan, dengan gatal yang sangat hebat terutama malam hari. Radiation: PETUNJUK YANG PALING MENENTUKAN ADALAH BAHWA UJUNG LESI BERGERAK MAJU BEBERAPA MILIMETER SAMPAI SENTIMETER SETIAP HARI — tanyakan langsung apakah garisnya bertambah panjang dari hari ke hari, karena tidak ada penyakit kulit lain yang berpindah seperti ini. Associations: gatal hebat yang mengganggu tidur, luka garukan, dan kadang vesikel di sepanjang jalur; tanyakan tanda infeksi sekunder. Time course: larva mati sendiri dalam beberapa minggu sampai bulan, namun gatalnya sangat mengganggu selama itu. Exacerbating: malam hari dan panas. Severity: gangguan tidur dan aktivitas, serta risiko infeksi akibat garukan.',
-      riwayatPenyakitDahulu: 'History dermatitis atopik, keadaan imunitas menurun, dan riwayat keluhan serupa sebelumnya.',
+      riwayatPenyakitDahulu: 'Riwayat dermatitis atopik, keadaan imunitas menurun, dan riwayat keluhan serupa sebelumnya.',
       riwayatPenyakitKeluarga: 'Anggota keluarga maupun teman yang berkegiatan bersama di tempat yang sama dan mengalami keluhan serupa.',
       riwayatPengobatan: 'Obat oles maupun oral yang sudah dipakai; tanyakan pemakaian kortikosteroid topikal yang meredakan gatal namun tidak membunuh larva.',
-      riwayatAlergi: 'History alergi obat, terutama albendazol dan ivermektin.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama albendazol dan ivermektin.',
       riwayatSosialEkonomi:
         'INTI ANAMNESIS ADALAH RIWAYAT PAPARAN: berjalan maupun berbaring tanpa alas di pasir pantai, tanah lembap, dan tanah berpasir; berkebun tanpa alas kaki dan tanpa sarung tangan; bermain di tanah pada anak; pekerjaan sebagai petani, tukang kebun, dan tukang ledeng yang bekerja di bawah rumah; serta keberadaan kucing dan anjing liar maupun peliharaan yang buang air di sekitar rumah maupun di pantai.',
     },
@@ -9850,7 +9850,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Berjalan maupun berbaring tanpa alas di pasir pantai dan tanah lembap',
       'Berkebun dan bertani tanpa alas kaki maupun sarung tangan',
       'Anak yang bermain di tanah dan pasir',
-      'Occupation tukang ledeng dan tukang bangunan yang bekerja merangkak di bawah rumah',
+      'Pekerjaan tukang ledeng dan tukang bangunan yang bekerja merangkak di bawah rumah',
       'Lingkungan dengan banyak kucing dan anjing liar yang buang air sembarangan',
       'Iklim tropis dan subtropis yang hangat dan lembap',
       'Bepergian ke daerah pantai tropis',
@@ -9921,12 +9921,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Gatal hebat di kulit kepala terutama di belakang telinga dan tengkuk.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kulit kepala dengan predileksi khas di BELAKANG TELINGA DAN TENGKUK, karena daerah tersebut paling hangat dan terlindung. Onset: gatal baru muncul 4-6 minggu setelah infestasi pertama karena memerlukan waktu untuk tersensitisasi — hal ini menjelaskan mengapa penularan sudah berlangsung lama sebelum keluhan disadari. Character: gatal yang hebat dan mengganggu, kadang disertai rasa ada yang bergerak di kepala. Radiation: dapat meluas ke seluruh kulit kepala dan tengkuk. Associations: luka garukan, kulit kepala yang berkerak, dan pembesaran kelenjar getah bening leher belakang maupun belakang telinga; tanyakan pula gangguan tidur dan konsentrasi di sekolah. Time course: menetap dan berulang, sering sudah beberapa kali diobati tanpa tuntas. Exacerbating: malam hari dan cuaca panas. Severity: gangguan tidur, prestasi sekolah, dan dampak sosial berupa dijauhi teman.',
-      riwayatPenyakitDahulu: 'History pedikulosis sebelumnya beserta pengobatannya, dermatitis seboroik dan psoriasis kulit kepala sebagai banding, serta riwayat infeksi kulit kepala.',
+      riwayatPenyakitDahulu: 'Riwayat pedikulosis sebelumnya beserta pengobatannya, dermatitis seboroik dan psoriasis kulit kepala sebagai banding, serta riwayat infeksi kulit kepala.',
       riwayatPenyakitKeluarga:
         'TANYAKAN SIAPA SAJA DI RUMAH YANG JUGA GATAL — pedikulosis hampir selalu mengenai lebih dari satu orang dalam satu rumah maupun satu kelas, dan mengobati satu orang saja memastikan penularan berulang.',
       riwayatPengobatan:
         'Obat yang sudah dipakai beserta cara dan lama pemakaiannya; KEGAGALAN TERAPI PALING SERING BUKAN KARENA RESISTENSI MELAINKAN KARENA CARA PAKAI YANG SALAH ATAU TIDAK DIULANG PADA HARI KE-7 SAMPAI KE-9. Tanyakan pula pemakaian minyak tanah, bensin, dan bahan berbahaya lain yang lazim dipakai secara tradisional.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi kulit kepala terhadap obat sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi kulit kepala terhadap obat sebelumnya.',
       riwayatSosialEkonomi:
         'Lingkungan sekolah dan asrama, kebiasaan berbagi sisir, jepit rambut, topi, kerudung, bantal, dan handuk, kepadatan hunian, serta ketersediaan air bersih. Tanyakan pula apakah anak sudah dijauhi teman maupun diminta tidak masuk sekolah, karena stigma pada penyakit ini sering lebih merugikan daripada penyakitnya.',
     },
@@ -10030,11 +10030,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Gatal hebat di daerah kemaluan terutama pada malam hari.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: rambut kemaluan; namun kutu ini juga dapat mengenai RAMBUT KASAR LAIN — paha, perut, ketiak, janggut, bulu mata, dan alis. Onset: gatal muncul beberapa minggu setelah infestasi karena memerlukan waktu untuk tersensitisasi terhadap air liur kutu. Character: gatal hebat yang memberat pada malam hari. Radiation: meluas ke daerah berambut kasar lainnya. Associations: TANYAKAN BERCAK KEBIRUAN KEABU-ABUAN pada kulit paha dan perut bagian bawah yang disebut makula serulea — bercak ini tidak gatal, tidak hilang saat ditekan, dan sangat khas. Tanyakan pula bintik kehitaman pada pakaian dalam yang merupakan kotoran kutu, serta luka akibat garukan. Time course: menetap dan memberat bila tidak diobati. Exacerbating: malam hari dan kehangatan. Severity: gangguan tidur dan dampak pada hubungan.',
-      riwayatPenyakitDahulu: 'History infeksi menular seksual sebelumnya, status HIV, dan riwayat infestasi serupa.',
+      riwayatPenyakitDahulu: 'Riwayat infeksi menular seksual sebelumnya, status HIV, dan riwayat infestasi serupa.',
       riwayatPenyakitKeluarga:
         'Pasangan seksual maupun anggota keluarga serumah dengan keluhan gatal serupa — pasangan hampir selalu ikut terinfestasi meskipun belum bergejala.',
       riwayatPengobatan: 'Obat yang sudah dipakai beserta cara dan lama pemakaiannya, termasuk bahan berbahaya seperti minyak tanah yang lazim dipakai secara tradisional.',
-      riwayatAlergi: 'History alergi obat, terutama permetrin dan malation.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama permetrin dan malation.',
       riwayatSosialEkonomi:
         'RIWAYAT SEKSUAL DITANYAKAN DENGAN CARA YANG TIDAK MENGHAKIMI namun jelas: jumlah pasangan, waktu kontak terakhir, dan penggunaan kondom — meskipun kondom tidak mencegah penularan kutu karena penularannya melalui kontak kulit dan rambut. Tanyakan pula berbagi handuk, seprai, dan pakaian. PADA ANAK, KEBERADAAN KUTU KEMALUAN MENUNTUT PENILAIAN KEMUNGKINAN KEKERASAN SEKSUAL dan penanganan sesuai prosedur yang berlaku, meskipun penularan melalui barang bersama juga mungkin.',
     },
@@ -10133,11 +10133,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Gatal hebat di sela-sela jari tangan dan lipatan tubuh yang SANGAT MEMBERAT PADA MALAM HARI sejak beberapa minggu.',
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES. Site: predileksi khas pada sela jari tangan, pergelangan tangan sisi volar, siku bagian luar, lipat ketiak depan, areola mamma pada perempuan, umbilikus, bokong, dan genitalia eksterna pada laki-laki; pada bayi dan anak kecil dapat mengenai wajah, kulit kepala, telapak tangan, dan telapak kaki yang biasanya terhindar pada dewasa. Onset: bertahap, dan pada infestasi pertama gatal baru muncul 4-6 minggu setelah terpapar karena perlu waktu untuk sensitisasi — pada reinfestasi gatal timbul jauh lebih cepat dalam 1-3 hari. Character: gatal hebat yang membuat pasien menggaruk hingga lecet dan sulit tidur. Radiation: menyebar ke lipatan tubuh lain seiring waktu. Associations: adanya lesi bernanah akibat infeksi sekunder, dan yang paling penting ADAKAH ORANG SERUMAH ATAU SEASRAMA YANG MENGALAMI KELUHAN SERUPA — ini merupakan salah satu tanda kardinal. Time course: gatal khas MEMBERAT PADA MALAM HARI dan saat tubuh hangat setelah mandi air panas atau berolahraga, karena tungau lebih aktif pada suhu hangat. Exacerbating: suhu hangat, keringat, dan malam hari; garukan memperberat serta memicu infeksi sekunder. Severity: dampak terhadap kualitas tidur, konsentrasi belajar atau bekerja, dan aktivitas sehari-hari.',
-      riwayatPenyakitDahulu: 'History skabies sebelumnya dan terapi yang pernah diterima, riwayat dermatitis atopik yang memperberat gatal, serta kondisi imunokompromais seperti HIV, penggunaan kortikosteroid jangka panjang, atau keganasan yang berisiko menimbulkan skabies berkrusta (skabies Norwegia).',
+      riwayatPenyakitDahulu: 'Riwayat skabies sebelumnya dan terapi yang pernah diterima, riwayat dermatitis atopik yang memperberat gatal, serta kondisi imunokompromais seperti HIV, penggunaan kortikosteroid jangka panjang, atau keganasan yang berisiko menimbulkan skabies berkrusta (skabies Norwegia).',
       riwayatPenyakitKeluarga: 'Anggota keluarga serumah atau teman sekamar dengan keluhan gatal serupa — informasi ini menentukan strategi terapi karena SEMUA kontak harus diobati serentak.',
       riwayatPengobatan:
         'Obat yang sudah dipakai sendiri termasuk salep antigatal, KORTIKOSTEROID TOPIKAL yang dapat menyamarkan gambaran klinis menjadi skabies inkognito, antihistamin, serta obat tradisional. Tanyakan pula riwayat terapi skabies sebelumnya, cara pemakaian, dan apakah kontak serumah ikut diobati — kegagalan terapi paling sering disebabkan cara pakai yang salah atau kontak yang tidak diobati.',
-      riwayatAlergi: 'History alergi obat topikal dan riwayat dermatitis kontak.',
+      riwayatAlergi: 'Riwayat alergi obat topikal dan riwayat dermatitis kontak.',
       riwayatSosialEkonomi:
         'Kondisi tempat tinggal: jumlah penghuni per kamar, kebiasaan tidur bersama, berbagi tempat tidur, handuk, pakaian, atau sajadah; riwayat tinggal di pesantren, asrama, panti asuhan, atau lembaga pemasyarakatan; ketersediaan air bersih dan fasilitas mencuci; frekuensi mengganti dan menjemur sprei serta pakaian; dan kemampuan finansial untuk mengobati seluruh anggota keluarga sekaligus.',
     },
@@ -10229,13 +10229,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: sebaran lesi pada bagian tubuh yang TERBUKA dan tidak tertutup pakaian merupakan petunjuk khas; pada kutu busuk lesi sering tersusun berderet atau berkelompok tiga yang dijuluki sarapan, makan siang, dan makan malam. Onset: hubungan dengan waktu dan tempat — apakah muncul setelah tidur di tempat tertentu, setelah berkegiatan di kebun, atau setelah bepergian; tanyakan pula apakah serangganya sempat terlihat. Character: papul urtika dengan titik gigitan di tengahnya, sangat gatal; pada sengatan lebah maupun tawon rasa nyeri dan terbakar justru mendahului gatal. Radiation: pembengkakan yang meluas dari titik gigitan; pada reaksi lokal luas, bengkak dapat melebihi 10 sentimeter dan memuncak dalam 24-48 jam. Associations: PERTANYAAN YANG PALING MENENTUKAN adalah tanda reaksi sistemik — bentol menyeluruh di luar tempat gigitan, sesak napas, suara serak, rasa tercekik, bengkak pada bibir dan lidah, mual, muntah, nyeri perut, pusing berputar, atau rasa mau pingsan; adanya salah satu dari ini mengubah penanganan dari salep menjadi epinefrin segera. Time course: reaksi setempat memuncak dalam 24-48 jam dan mereda dalam beberapa hari, sedangkan lesi yang bertahan berminggu-minggu mengarah pada prurigo maupun infeksi sekunder akibat garukan. Exacerbating: garukan, panas, dan keringat. Severity: derajat gatal, gangguan tidur, dan ada tidaknya keterbatasan gerak akibat bengkak.',
       riwayatPenyakitDahulu:
-        'History reaksi terhadap gigitan maupun sengatan serangga sebelumnya beserta beratnya — riwayat reaksi sistemik sebelumnya merupakan penanda risiko paling kuat untuk reaksi berat pada sengatan berikutnya. History atopi berupa asma, rinitis alergika, dan dermatitis atopik. History penyakit jantung dan penggunaan penyekat beta yang membuat penanganan anafilaksis lebih sulit.',
+        'Riwayat reaksi terhadap gigitan maupun sengatan serangga sebelumnya beserta beratnya — riwayat reaksi sistemik sebelumnya merupakan penanda risiko paling kuat untuk reaksi berat pada sengatan berikutnya. Riwayat atopi berupa asma, rinitis alergika, dan dermatitis atopik. Riwayat penyakit jantung dan penggunaan penyekat beta yang membuat penanganan anafilaksis lebih sulit.',
       riwayatPenyakitKeluarga:
-        'History atopi pada keluarga, serta adanya anggota keluarga serumah dengan keluhan gatal serupa yang mengarahkan pada sumber di dalam rumah seperti kutu busuk maupun tungau — atau justru pada skabies yang memerlukan pengobatan seluruh penghuni rumah.',
+        'Riwayat atopi pada keluarga, serta adanya anggota keluarga serumah dengan keluhan gatal serupa yang mengarahkan pada sumber di dalam rumah seperti kutu busuk maupun tungau — atau justru pada skabies yang memerlukan pengobatan seluruh penghuni rumah.',
       riwayatPengobatan:
         'Obat yang sudah dipakai termasuk salep dan obat oral. Penyekat beta dan penghambat ACE yang mempersulit penanganan anafilaksis. Ketersediaan epinefrin autoinjektor pada pasien dengan riwayat reaksi sistemik.',
       riwayatAlergi:
-        'History alergi terhadap sengatan lebah, tawon, dan semut api beserta bentuk reaksinya; riwayat alergi obat dan makanan.',
+        'Riwayat alergi terhadap sengatan lebah, tawon, dan semut api beserta bentuk reaksinya; riwayat alergi obat dan makanan.',
       riwayatNutrisi: 'Status gizi umum; tidak berkaitan langsung namun relevan bila lesi menahun dan berulang pada anak.',
       riwayatSosialEkonomi:
         'Keadaan tempat tinggal termasuk kebersihan kasur dan seprai, keberadaan hewan peliharaan beserta perawatannya, adanya genangan air dan tumpukan sampah di sekitar rumah, pemakaian kelambu maupun obat nyamuk, pekerjaan dan hobi yang berkaitan dengan paparan seperti berkebun dan beternak, serta riwayat bepergian ke daerah dengan penyakit yang ditularkan serangga.',
@@ -10263,8 +10263,8 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Serangga penggigit menyuntikkan air liur yang mengandung antikoagulan dan protein asing untuk memperlancar pengisapan darah, sedangkan serangga penyengat menyuntikkan bisa yang mengandung enzim dan amina vasoaktif. Protein asing tersebut memicu degranulasi sel mast dan pelepasan histamin sehingga terjadi vasodilatasi, peningkatan permeabilitas kapiler, dan rangsangan saraf gatal — inilah dasar papul urtika dengan titik gigitan di tengahnya. Pada orang yang belum tersensitisasi, reaksi bersifat ringan dan setempat; setelah sensitisasi, gigitan berikutnya menimbulkan reaksi yang lebih besar dan lebih lama, yang menjelaskan mengapa satu orang dalam rumah bereaksi hebat sementara yang lain yang digigit serangga sama tidak merasakan apa pun. Reaksi setempat yang luas diperantarai IgE dan bersifat lambat sehingga memuncak dalam 24-48 jam, tetapi tetap terbatas pada satu area dan tidak berbahaya. Pada sebagian kecil orang, IgE spesifik yang sudah terbentuk memicu degranulasi sel mast secara sistemik sehingga histamin dilepaskan ke seluruh tubuh dan menimbulkan anafilaksis dengan bronkospasme serta kebocoran plasma yang menyebabkan syok — mekanisme inilah yang menjadikan sengatan serangga, meski lukanya sangat kecil, dapat mematikan dalam hitungan menit. Garukan berulang merusak sawar kulit dan membuka jalan bagi infeksi bakteri, serta pada sebagian orang menimbulkan papul menahun yang sangat gatal berupa prurigo.',
     faktorRisiko: [
-      'History reaksi sistemik terhadap sengatan sebelumnya — penanda risiko terkuat',
-      'History atopi pribadi maupun keluarga',
+      'Riwayat reaksi sistemik terhadap sengatan sebelumnya — penanda risiko terkuat',
+      'Riwayat atopi pribadi maupun keluarga',
       'Tinggal atau bekerja di lingkungan dengan banyak serangga, termasuk berkebun, bertani, dan beternak lebah',
       'Kebersihan tempat tidur dan hunian yang kurang terjaga, serta hewan peliharaan yang tidak dirawat',
       'Genangan air dan tumpukan sampah di sekitar rumah',
@@ -10338,12 +10338,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: KUNCI DIAGNOSIS adalah kesesuaian lokasi lesi dengan area yang kontak dengan bahan — tersering punggung tangan dan sela jari, dapat pula wajah, atau daerah popok pada bayi; lesi berbatas tegas persis pada daerah kontak dan tidak menyebar ke tempat yang tidak terpapar. Onset: pada iritan kuat seperti asam atau basa, keluhan muncul segera dalam hitungan menit hingga jam setelah paparan; pada iritan lemah seperti sabun, deterjen, dan air, keluhan berkembang perlahan dalam beberapa minggu hingga bulan akibat paparan berulang. Character: PERIH DAN TERBAKAR LEBIH MENONJOL DARIPADA GATAL — perbedaan ini penting karena pada dermatitis kontak alergika gatalnya justru mendominasi. Radiation: pada paparan berkepanjangan lesi dapat meluas sedikit melewati batas kontak, namun tetap tidak menyebar jauh. Associations: kulit kering, bersisik, menebal, dan fisura yang nyeri; tanyakan pula tanda infeksi sekunder berupa nanah dan krusta kuning. Time course: TANYAKAN APAKAH KELUHAN MEMBAIK SAAT LIBUR ATAU CUTI DAN MEMBURUK SAAT KEMBALI BEKERJA — pola ini merupakan bukti terkuat hubungan dengan pekerjaan. Exacerbating: kontak dengan air berulang, sabun, deterjen, pelarut, semen, pupuk, sarung tangan lateks yang lembap, serta udara dingin dan kering. Severity: nyeri, keterbatasan menggunakan tangan, dan gangguan pekerjaan maupun tidur.',
       riwayatPenyakitDahulu:
-        'History dermatitis atopik merupakan faktor predisposisi terkuat karena sawar kulit sudah lemah sejak awal; tanyakan pula riwayat asma dan rinitis alergika. History dermatitis serupa sebelumnya beserta pencetus dan pengobatannya.',
-      riwayatPenyakitKeluarga: 'History atopi pada keluarga yang memperkuat kemungkinan sawar kulit yang rentan.',
+        'Riwayat dermatitis atopik merupakan faktor predisposisi terkuat karena sawar kulit sudah lemah sejak awal; tanyakan pula riwayat asma dan rinitis alergika. Riwayat dermatitis serupa sebelumnya beserta pencetus dan pengobatannya.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi pada keluarga yang memperkuat kemungkinan sawar kulit yang rentan.',
       riwayatPengobatan:
         'Obat topikal yang sudah dipakai termasuk krim racikan tanpa label, serta antiseptik dan pembersih tangan beralkohol yang justru dapat memperberat. Perhatikan bahwa obat topikal itu sendiri kadang menjadi penyebab keluhan yang menetap.',
       riwayatAlergi:
-        'History alergi terhadap lateks, nikel, pewangi, pengawet kosmetik, dan bahan lain — penting untuk menimbang kemungkinan komponen alergik yang menyertai.',
+        'Riwayat alergi terhadap lateks, nikel, pewangi, pengawet kosmetik, dan bahan lain — penting untuk menimbang kemungkinan komponen alergik yang menyertai.',
       riwayatNutrisi: 'Status gizi umum; malnutrisi dan defisiensi mikronutrien memperlambat perbaikan sawar kulit.',
       riwayatSosialEkonomi:
         'RINCIAN PEKERJAAN ADALAH INTI ANAMNESIS: jenis pekerjaan, bahan yang disentuh setiap hari, berapa kali tangan basah dan dicuci per hari, berapa lama memakai sarung tangan tertutup, tersedia tidaknya alat pelindung diri, serta pekerjaan sampingan dan pekerjaan rumah tangga. Perhatikan pekerjaan berisiko tinggi: petugas kesehatan, penata rambut, juru masak, petugas kebersihan, pekerja bangunan dan semen, montir, serta petani. Tanyakan pula hobi seperti berkebun dan merawat kendaraan.',
@@ -10371,8 +10371,8 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Bahan iritan melarutkan lipid interseluler stratum korneum dan merusak protein sawar kulit, sehingga kehilangan air transepidermal meningkat dan kulit menjadi kering serta lebih mudah ditembus bahan berikutnya. Kerusakan langsung pada keratinosit memicu pelepasan sitokin proinflamasi seperti interleukin-1 alfa dan tumor necrosis factor alfa tanpa memerlukan pengenalan antigen oleh limfosit T. Karena tidak melibatkan mekanisme imun spesifik, tidak ada fase sensitisasi, tidak diperlukan paparan sebelumnya, dan reaksi tetap terbatas pada tempat kontak — inilah dasar mengapa lesi berbatas tegas persis pada area paparan dan tidak menyebar, berbeda dari dermatitis kontak alergika yang dapat meluas melewati area kontak. Paparan berulang sebelum sawar sempat pulih menyebabkan kerusakan menumpuk, sehingga kulit yang semula tahan lama-kelamaan menjadi rentan; hal ini menjelaskan mengapa keluhan sering muncul setelah bertahun-tahun mengerjakan pekerjaan yang sama. Sawar yang sudah rusak juga mempermudah masuknya alergen, sehingga dermatitis kontak alergika kerap berkembang di atas dermatitis iritan yang berlangsung lama.',
     faktorRisiko: [
-      'Occupation dengan tangan basah lebih dari 2 jam per hari atau mencuci tangan lebih dari 20 kali per hari',
-      'History dermatitis atopik — faktor predisposisi individual terkuat',
+      'Pekerjaan dengan tangan basah lebih dari 2 jam per hari atau mencuci tangan lebih dari 20 kali per hari',
+      'Riwayat dermatitis atopik — faktor predisposisi individual terkuat',
       'Pemakaian sarung tangan tertutup dalam waktu lama sehingga keringat terperangkap',
       'Paparan semen, pupuk, pelarut, oli, sampo, dan bahan pembersih',
       'Udara dingin dan kelembapan rendah yang memperberat kekeringan kulit',
@@ -10450,12 +10450,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: tersering pada tungkai bawah, punggung tangan, lengan, dan badan; umumnya beberapa lesi dan cenderung simetris. Onset: perlahan, sering pada musim kemarau maupun saat udara kering dan dingin. Character: BENTUK BULAT ATAU LONJONG SEPERTI KOIN DENGAN BATAS TEGAS berdiameter 1-5 sentimeter; pada fase akut permukaannya basah dengan vesikel kecil dan berkeropeng, sedangkan pada fase kronik menjadi kering, bersisik, dan menebal. Radiation: lesi baru bermunculan di sekitarnya maupun di tempat lain. Associations: GATAL SANGAT HEBAT terutama malam hari dan mengganggu tidur; tanyakan pula kulit yang kering menyeluruh. Time course: menahun dengan perjalanan hilang timbul selama berbulan-bulan sampai tahun. Exacerbating: udara kering dan dingin, mandi air panas dan terlalu sering, sabun keras, wol, stres, dan garukan. Relieving: pelembap dan udara lembap. Severity: nilai gangguan tidur, pekerjaan, dan kualitas hidup.',
       riwayatPenyakitDahulu:
-        'History dermatitis atopik, asma, dan rinitis alergika; riwayat dermatitis kontak; INSUFISIENSI VENA PADA TUNGKAI yang sering menyertai bila lesi terpusat di tungkai bawah. History penyakit yang menyebabkan kulit kering seperti hipotiroid dan penyakit ginjal kronik.',
-      riwayatPenyakitKeluarga: 'History atopi pada keluarga.',
+        'Riwayat dermatitis atopik, asma, dan rinitis alergika; riwayat dermatitis kontak; INSUFISIENSI VENA PADA TUNGKAI yang sering menyertai bila lesi terpusat di tungkai bawah. Riwayat penyakit yang menyebabkan kulit kering seperti hipotiroid dan penyakit ginjal kronik.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi pada keluarga.',
       riwayatPengobatan:
         'Obat oles yang sudah dipakai termasuk kortikosteroid dan potensinya, obat racikan, serta obat sistemik yang menyebabkan kulit kering seperti isotretinoin dan diuretik.',
       riwayatAlergi:
-        'History alergi kontak terhadap nikel, pewangi, dan pengawet — penting karena dermatitis kontak alergika dapat menyerupai maupun menyertai penyakit ini.',
+        'Riwayat alergi kontak terhadap nikel, pewangi, dan pengawet — penting karena dermatitis kontak alergika dapat menyerupai maupun menyertai penyakit ini.',
       riwayatNutrisi: 'Status gizi umum dan asupan cairan; kulit kering pada usia lanjut sering berkaitan dengan asupan yang kurang.',
       riwayatSosialEkonomi:
         'Frekuensi dan suhu air mandi, jenis sabun yang dipakai, pekerjaan dengan paparan bahan kimia maupun air, penggunaan pendingin ruangan yang mengeringkan udara, tingkat stres, dan kebiasaan merokok serta konsumsi alkohol yang berkaitan dengan perjalanan yang lebih berat.',
@@ -10487,7 +10487,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kulit kering dan usia lanjut',
       'Udara kering dan dingin, musim kemarau, serta pendingin ruangan',
       'Mandi air panas, terlalu sering, dan dengan sabun keras',
-      'History dermatitis atopik dan atopi pada keluarga',
+      'Riwayat dermatitis atopik dan atopi pada keluarga',
       'INSUFISIENSI VENA pada lesi tungkai bawah',
       'Kolonisasi Staphylococcus aureus dan infeksi kulit setempat',
       'Paparan iritan dan alergen kontak di pekerjaan',
@@ -10568,11 +10568,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk bayi melalui keterangan pengasuh. Site: bokong, paha bagian dalam, perut bawah, dan daerah kemaluan — yaitu PERMUKAAN YANG MENONJOL DAN BERSENTUHAN LANGSUNG DENGAN POPOK, sementara lipatan paha dan lipatan bokong relatif terhindar karena tidak bersentuhan dengan popok. Onset: bertahap dalam beberapa hari, sering setelah diare, pergantian merek popok, maupun popok yang jarang diganti. Character: kemerahan mengilap dengan permukaan yang kadang berkilat, dapat disertai papul, erosi, dan pada kasus berat luka dangkal; bayi tampak perih dan menangis saat dibersihkan. Radiation: meluas mengikuti daerah yang tertutup popok. Associations: TANYAKAN APAKAH KEMERAHAN JUSTRU MASUK KE DALAM LIPATAN DAN ADA BINTIL-BINTIL KECIL DI TEPINYA, karena hal itu menandakan kandidiasis yang memerlukan antijamur; tanyakan pula riwayat diare, pemakaian antibiotik, dan sariawan putih di mulut bayi. Time course: membaik cepat bila popok lebih sering diganti; yang menetap lebih dari 3 hari meski perawatan sudah benar mengarah pada kandidiasis. Exacerbating: popok jarang diganti, diare, tisu basah beralkohol dan berpewangi, sabun keras, dan popok yang terlalu ketat. Severity: nilai rewel, gangguan tidur, dan gangguan menyusu.',
       riwayatPenyakitDahulu:
-        'History dermatitis atopik pada bayi, riwayat diare berulang, riwayat pemakaian antibiotik dalam waktu dekat, dan riwayat keluhan serupa sebelumnya beserta pengobatannya.',
-      riwayatPenyakitKeluarga: 'History atopi berupa asma, rinitis alergika, dan dermatitis atopik pada orang tua maupun saudara kandung; riwayat psoriasis untuk banding.',
+        'Riwayat dermatitis atopik pada bayi, riwayat diare berulang, riwayat pemakaian antibiotik dalam waktu dekat, dan riwayat keluhan serupa sebelumnya beserta pengobatannya.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi berupa asma, rinitis alergika, dan dermatitis atopik pada orang tua maupun saudara kandung; riwayat psoriasis untuk banding.',
       riwayatPengobatan:
         'Krim dan bedak yang sudah dipakai, khususnya KRIM KORTIKOSTEROID POTENSI KUAT yang berbahaya pada kulit bayi di daerah tertutup, dan krim racikan tanpa label. Tanyakan pula antibiotik yang sedang maupun baru saja diminum bayi.',
-      riwayatAlergi: 'History alergi dan riwayat iritasi terhadap merek popok, tisu basah, maupun sabun tertentu.',
+      riwayatAlergi: 'Riwayat alergi dan riwayat iritasi terhadap merek popok, tisu basah, maupun sabun tertentu.',
       riwayatNutrisi:
         'Cara pemberian minum, air susu ibu maupun susu formula, usia mulai makanan pendamping, serta perubahan makanan yang bertepatan dengan timbulnya keluhan karena dapat mengubah sifat tinja.',
       riwayatTumbuhKembang: 'Berat badan menurut usia dan pertumbuhan bayi secara umum.',
@@ -10687,17 +10687,17 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: lesi terutama pada badan, leher, lengan atas, dan paha atas — daerah yang tertutup pakaian; wajah, telapak tangan, dan telapak kaki umumnya TIDAK terkena, dan hal ini penting untuk membedakannya dari sifilis sekunder. Onset: TANYAKAN SECARA KHUSUS APAKAH ADA SATU BERCAK YANG MUNCUL LEBIH DAHULU beberapa hari hingga dua minggu sebelum yang lain — bercak induk ini ditemukan pada sebagian besar kasus namun kerap tidak dilaporkan pasien karena dianggap tidak berarti atau dikira panu maupun kurap. Character: bercak lonjong berwarna merah muda dengan sisik halus di bagian dalam tepi lesi (collarette scale), sedangkan bercak induk berukuran lebih besar dengan tepi yang lebih jelas. Radiation: penyebaran cepat dalam 1-2 minggu setelah bercak induk. Associations: gatal ringan sampai sedang pada sebagian pasien, kadang didahului gejala menyerupai flu ringan berupa lemas dan nyeri kepala; TANYAKAN RIWAYAT OBAT BARU dan riwayat seksual, karena erupsi obat dan sifilis sekunder adalah dua hal yang wajib disingkirkan. Time course: perjalanan khas 6-8 minggu lalu menghilang sendiri. Exacerbating: mandi air panas, keringat, dan sabun yang keras. Severity: umumnya ringan; nilai gatal dan dampaknya terhadap tidur serta kepercayaan diri.',
       riwayatPenyakitDahulu:
-        'History penyakit kulit sebelumnya, riwayat atopi, dan riwayat infeksi saluran napas atas beberapa minggu sebelumnya. History pitiriasis rosea sebelumnya, yang jarang berulang.',
+        'Riwayat penyakit kulit sebelumnya, riwayat atopi, dan riwayat infeksi saluran napas atas beberapa minggu sebelumnya. Riwayat pitiriasis rosea sebelumnya, yang jarang berulang.',
       riwayatPenyakitKeluarga:
         'Adanya anggota keluarga dengan keluhan serupa; penularan antarorang bukan pola yang khas pada penyakit ini sehingga temuan tersebut justru menuntut peninjauan diagnosis lain.',
       riwayatPengobatan:
         'DAFTAR SELURUH OBAT dalam 4-6 minggu terakhir termasuk obat bebas dan jamu — beberapa obat dapat menimbulkan erupsi yang menyerupai pitiriasis rosea, dan menghentikan obatnya adalah terapinya. Perhatikan obat antihipertensi, obat antiinflamasi nonsteroid, dan antibiotik tertentu.',
-      riwayatAlergi: 'History alergi obat dan riwayat erupsi kulit akibat obat sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat erupsi kulit akibat obat sebelumnya.',
       riwayatKehamilanPersalinan:
         'Status kehamilan pada perempuan usia subur — pitiriasis rosea yang timbul pada trimester pertama dilaporkan berkaitan dengan peningkatan risiko keguguran, sehingga memerlukan pemantauan kehamilan yang lebih cermat.',
       riwayatNutrisi: 'Umumnya tidak relevan terhadap perjalanan penyakit.',
       riwayatSosialEkonomi:
-        'History seksual ditanyakan dengan cara yang tidak menghakimi untuk menimbang perlunya pemeriksaan sifilis; tanyakan pula tingkat kecemasan pasien terhadap penyakitnya, karena erupsi yang luas dan tiba-tiba sering menimbulkan ketakutan yang tidak sebanding dengan beratnya penyakit.',
+        'Riwayat seksual ditanyakan dengan cara yang tidak menghakimi untuk menimbang perlunya pemeriksaan sifilis; tanyakan pula tingkat kecemasan pasien terhadap penyakitnya, karena erupsi yang luas dan tiba-tiba sering menimbulkan ketakutan yang tidak sebanding dengan beratnya penyakit.',
     },
     pemeriksaanFisik: [
       'CARI BERCAK INDUK (herald patch): lesi soliter berukuran 2-5 sentimeter, lonjong, berwarna merah muda dengan tepi meninggi dan sisik halus, umumnya pada badan; menemukannya sangat menyederhanakan diagnosis',
@@ -10792,12 +10792,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan kulit. Site: sebaran lesi pada wajah terutama dahi, hidung, dan dagu, serta pada dada dan punggung atas — daerah dengan kelenjar sebasea terbanyak. Onset: umumnya dimulai sekitar masa pubertas dan berlangsung bertahun-tahun; awitan mendadak pada usia dewasa, apalagi disertai tanda maskulinisasi, mengarahkan pada sebab hormonal atau obat. Character: bedakan lesi tidak meradang berupa komedo terbuka yang berwarna hitam dan komedo tertutup yang berwarna putih, dari lesi meradang berupa papul dan pustul; tanyakan pula apakah ada benjolan besar yang nyeri di bawah kulit yang menandakan nodul dan berarti bukan lagi derajat ringan. Radiation: perluasan ke leher, dada, dan punggung. Associations: pada perempuan tanyakan keteraturan haid, pertumbuhan rambut berlebih di wajah dan tubuh, rambut kepala menipis, dan kenaikan berat badan yang mengarah pada sindrom ovarium polikistik. Time course: hubungan dengan siklus haid, memberat menjelang haid adalah pola yang lazim; tanyakan pula perjalanan sejak pertama muncul dan respons terhadap pengobatan sebelumnya. Exacerbating: pemakaian kosmetik dan pelembap berminyak, sering menyentuh dan memencet wajah, penggunaan helm dan masker ketat, keringat, stres, kurang tidur, serta obat tertentu. Severity: dampak terhadap kepercayaan diri, pergaulan, dan suasana hati — dimensi ini sering jauh lebih berat daripada gambaran kulitnya dan wajib ditanyakan.',
       riwayatPenyakitDahulu:
-        'History akne sebelumnya dan pengobatan yang pernah dijalani. Pada perempuan, riwayat haid tidak teratur, sindrom ovarium polikistik, dan gangguan endokrin lain. History depresi maupun kecemasan yang perlu diketahui sebelum mempertimbangkan terapi tertentu.',
+        'Riwayat akne sebelumnya dan pengobatan yang pernah dijalani. Pada perempuan, riwayat haid tidak teratur, sindrom ovarium polikistik, dan gangguan endokrin lain. Riwayat depresi maupun kecemasan yang perlu diketahui sebelum mempertimbangkan terapi tertentu.',
       riwayatPenyakitKeluarga:
-        'History akne berat pada orang tua atau saudara kandung meningkatkan risiko akne yang lebih berat dan lebih lama pada pasien.',
+        'Riwayat akne berat pada orang tua atau saudara kandung meningkatkan risiko akne yang lebih berat dan lebih lama pada pasien.',
       riwayatPengobatan:
         'Obat yang dapat mencetuskan atau memperberat akne: kortikosteroid sistemik maupun topikal, steroid anabolik dan suplemen binaraga, hormon androgen, litium, isoniazid, fenitoin, serta vitamin B12 dosis tinggi. Tanyakan pula seluruh produk yang dioleskan ke wajah termasuk krim pemutih dan racikan tanpa label yang lazim mengandung steroid dan justru memperparah setelah dihentikan.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap produk perawatan kulit sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap produk perawatan kulit sebelumnya.',
       riwayatNutrisi:
         'Pola makan sehari-hari, khususnya konsumsi makanan dengan indeks glikemik tinggi seperti minuman manis, roti putih, dan camilan manis, serta konsumsi susu terutama susu rendah lemak — keduanya berkaitan dengan perburukan akne meskipun bukan penyebab utama.',
       riwayatSosialEkonomi:
@@ -10824,7 +10824,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Androgen yang meningkat pada masa pubertas merangsang kelenjar sebasea memproduksi sebum lebih banyak. Bersamaan dengan itu terjadi hiperkeratinisasi dan peningkatan daya lekat sel keratin pada saluran folikel sehingga saluran tersumbat dan terbentuk mikrokomedo, yaitu lesi awal yang belum terlihat mata. Sumbatan yang tetap tertutup di bawah permukaan tampak sebagai komedo tertutup berwarna putih, sedangkan sumbatan yang terbuka ke permukaan mengalami oksidasi melanin sehingga tampak hitam — warna hitam ini berasal dari oksidasi, bukan dari kotoran, dan inilah sebabnya mencuci muka lebih sering tidak menghilangkannya. Lingkungan folikel yang kaya sebum dan miskin oksigen menjadi tempat ideal bagi Cutibacterium acnes untuk berkembang biak; kuman ini memecah trigliserida sebum menjadi asam lemak bebas dan mengaktifkan reseptor imun bawaan sehingga memicu pelepasan sitokin proinflamasi. Peradangan inilah yang mengubah komedo menjadi papul dan pustul, dan bila peradangan meluas serta merusak dinding folikel akan terbentuk nodul dan kista dengan risiko jaringan parut permanen. Pemahaman ini menjelaskan mengapa terapi harus menyasar sumbatan folikel sejak awal dan mengapa hasilnya baru terlihat setelah beberapa minggu — satu siklus pematangan folikel memakan waktu berminggu-minggu.',
     faktorRisiko: [
       'Usia remaja dan dewasa muda pada masa peningkatan androgen',
-      'History akne berat pada keluarga',
+      'Riwayat akne berat pada keluarga',
       'Kulit berminyak dan seborea',
       'Penggunaan kosmetik serta pelembap berminyak yang bersifat komedogenik',
       'Obat: kortikosteroid, steroid anabolik dan suplemen binaraga, litium, isoniazid, dan fenitoin',
@@ -10903,12 +10903,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: daerah lipatan yang kaya kelenjar apokrin — KETIAK, SELANGKANGAN, BAWAH PAYUDARA, SEKITAR ANUS, DAN LIPATAN BOKONG; sebaran pada daerah-daerah inilah yang membedakannya dari abses biasa yang dapat muncul di mana saja. Onset: umumnya setelah pubertas, jarang sebelum haid pertama. Character: nodul yang keras dan sangat nyeri, terasa dalam, kemudian dapat melunak, pecah, dan mengeluarkan nanah berbau; berbeda dari furunkel karena TIDAK ADA RAMBUT DI TENGAH LESI dan tidak ada mata bisul. Radiation: nyeri menjalar dan membatasi gerakan lengan maupun tungkai. Associations: TANYAKAN SALURAN KECIL YANG MENGELUARKAN CAIRAN dan jaringan parut seperti tali di bawah kulit — keduanya menandakan penyakit sudah berlanjut. Time course: PERTANYAAN YANG PALING MENENTUKAN — apakah bisul ini BERULANG di tempat yang sama selama berbulan-bulan sampai bertahun-tahun; sifat berulang inilah yang memisahkannya dari abses tunggal. Tanyakan berapa kali sudah diinsisi dan diberi antibiotik tanpa pernah benar-benar selesai. Exacerbating: gesekan, keringat, pakaian ketat, merokok, kenaikan berat badan, dan pada perempuan menjelang haid. Severity: nilai nyeri, jumlah lokasi, keterbatasan gerak, dan dampak terhadap pekerjaan, hubungan, serta suasana hati.',
       riwayatPenyakitDahulu:
-        'History akne berat, sinus pilonidal, dan penyakit radang usus terutama penyakit Crohn yang berkaitan erat. Sindrom metabolik, diabetes melitus, dan sindrom ovarium polikistik pada perempuan. History depresi dan kecemasan yang sangat sering menyertai dan kerap tidak ditanyakan.',
+        'Riwayat akne berat, sinus pilonidal, dan penyakit radang usus terutama penyakit Crohn yang berkaitan erat. Sindrom metabolik, diabetes melitus, dan sindrom ovarium polikistik pada perempuan. Riwayat depresi dan kecemasan yang sangat sering menyertai dan kerap tidak ditanyakan.',
       riwayatPenyakitKeluarga:
         'RIWAYAT KELUHAN SERUPA PADA KELUARGA ditemukan pada sekitar sepertiga pasien dan mendukung diagnosis; tanyakan pula riwayat penyakit radang usus.',
       riwayatPengobatan:
         'Antibiotik yang sudah dipakai beserta berapa kali dan berapa lama; riwayat insisi berulang. Tanyakan pula kontrasepsi hormonal dan obat lain yang sedang digunakan.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik dan sulfa.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik dan sulfa.',
       riwayatNutrisi: 'Berat badan dan perubahannya, pola makan, serta konsumsi produk susu dan makanan berindeks glikemik tinggi yang pada sebagian pasien memperberat.',
       riwayatSosialEkonomi:
         'MEROKOK MERUPAKAN FAKTOR YANG PALING KUAT DAN PALING DAPAT DIUBAH — tanyakan jumlah dan lamanya. Tanyakan pula pekerjaan yang panas dan berkeringat, pakaian ketat, serta dampak penyakit terhadap kepercayaan diri, hubungan intim, dan kehidupan sosial, karena beban psikologis penyakit ini kerap jauh melampaui luas lesinya.',
@@ -10939,7 +10939,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'MEROKOK — faktor risiko terkuat yang dapat diubah',
       'Obesitas dan sindrom metabolik',
-      'History keluarga, ditemukan pada sekitar sepertiga pasien',
+      'Riwayat keluarga, ditemukan pada sekitar sepertiga pasien',
       'Jenis kelamin perempuan dan usia dewasa muda setelah pubertas',
       'Gesekan, pakaian ketat, dan berkeringat berlebihan',
       'Penyakit radang usus, terutama penyakit Crohn',
@@ -10959,7 +10959,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Karsinoma sel skuamosa pada lesi menahun yang bertahun-tahun tidak sembuh',
     ],
     pengkajian:
-      'Dipikirkan hidradenitis supuratif pada pasien ini atas dasar nodul yang dalam, keras, dan sangat nyeri pada ketiak serta selangkangan, yang berulang di tempat yang sama selama bertahun-tahun, disertai saluran kecil yang mengeluarkan cairan berbau dan tali jaringan parut yang teraba di bawah kulit. Tiga hal yang menegakkannya hadir bersamaan: bentuk lesinya, letaknya pada daerah lipatan yang kaya kelenjar apokrin, dan sifatnya yang berulang. Furunkel dan abses biasa merupakan hal yang paling sering dikira, dan justru inilah kekeliruan yang membuat penyakit ini rata-rata baru terdiagnosis setelah bertahun-tahun; pembedanya sederhana dan dapat diperiksa langsung — pada furunkel terdapat rambut di tengah lesi beserta mata bisul, lesinya tunggal, dan sembuh tuntas setelah didrainase, sedangkan pada kasus ini tidak ada rambut di tengah lesi, lesi berulang terus di lokasi yang sama, dan riwayat pasien menunjukkan sudah berkali-kali diinsisi serta diberi antibiotik tanpa pernah benar-benar selesai. History gagal berulang itu bukan tanda antibiotik yang salah maupun kebersihan yang kurang, melainkan konsekuensi langsung dari mekanismenya: penyakit ini pada dasarnya adalah peradangan berlebihan terhadap folikel yang pecah, bukan infeksi — sehingga antibiotik tidak menyelesaikannya, dan karena masalahnya berada di seluruh unit folikel daerah tersebut, menginsisi satu abses tidak mencegah abses berikutnya. Penyakit Crohn dengan fistula perianal dipertimbangkan dan ditelusuri melalui pertanyaan tentang diare menahun serta darah pada tinja, sebab keduanya dapat berdampingan. Skrofuloderma disingkirkan karena letak lesi bukan pada leher dan tidak ada gejala tuberkulosis. Derajat Hurley ditentukan karena inilah yang menentukan pilihan terapi, dan pada derajat lanjut dengan fistula yang sudah terbentuk, pembedahan pengangkatan area menjadi satu-satunya cara menyelesaikannya — fistula yang sudah berepitel tidak akan menutup sendiri. Status merokok ditanyakan secara khusus karena merupakan faktor terkuat yang dapat diubah, dan suasana hati ditapis karena beban psikologis penyakit ini kerap jauh melampaui luas lesinya.',
+      'Dipikirkan hidradenitis supuratif pada pasien ini atas dasar nodul yang dalam, keras, dan sangat nyeri pada ketiak serta selangkangan, yang berulang di tempat yang sama selama bertahun-tahun, disertai saluran kecil yang mengeluarkan cairan berbau dan tali jaringan parut yang teraba di bawah kulit. Tiga hal yang menegakkannya hadir bersamaan: bentuk lesinya, letaknya pada daerah lipatan yang kaya kelenjar apokrin, dan sifatnya yang berulang. Furunkel dan abses biasa merupakan hal yang paling sering dikira, dan justru inilah kekeliruan yang membuat penyakit ini rata-rata baru terdiagnosis setelah bertahun-tahun; pembedanya sederhana dan dapat diperiksa langsung — pada furunkel terdapat rambut di tengah lesi beserta mata bisul, lesinya tunggal, dan sembuh tuntas setelah didrainase, sedangkan pada kasus ini tidak ada rambut di tengah lesi, lesi berulang terus di lokasi yang sama, dan riwayat pasien menunjukkan sudah berkali-kali diinsisi serta diberi antibiotik tanpa pernah benar-benar selesai. Riwayat gagal berulang itu bukan tanda antibiotik yang salah maupun kebersihan yang kurang, melainkan konsekuensi langsung dari mekanismenya: penyakit ini pada dasarnya adalah peradangan berlebihan terhadap folikel yang pecah, bukan infeksi — sehingga antibiotik tidak menyelesaikannya, dan karena masalahnya berada di seluruh unit folikel daerah tersebut, menginsisi satu abses tidak mencegah abses berikutnya. Penyakit Crohn dengan fistula perianal dipertimbangkan dan ditelusuri melalui pertanyaan tentang diare menahun serta darah pada tinja, sebab keduanya dapat berdampingan. Skrofuloderma disingkirkan karena letak lesi bukan pada leher dan tidak ada gejala tuberkulosis. Derajat Hurley ditentukan karena inilah yang menentukan pilihan terapi, dan pada derajat lanjut dengan fistula yang sudah terbentuk, pembedahan pengangkatan area menjadi satu-satunya cara menyelesaikannya — fistula yang sudah berepitel tidak akan menutup sendiri. Status merokok ditanyakan secara khusus karena merupakan faktor terkuat yang dapat diubah, dan suasana hati ditapis karena beban psikologis penyakit ini kerap jauh melampaui luas lesinya.',
     terapiSuportif: [
       'BERHENTI MEROKOK — intervensi tunggal dengan dampak terbesar yang dapat dikerjakan pasien sendiri; tawarkan bantuan berhenti merokok secara konkret, bukan sekadar menganjurkan',
       'Turunkan berat badan bila berlebih; penurunan berat badan yang bermakna memperbaiki perjalanan penyakit',
@@ -11016,11 +11016,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Bintil-bintil kecil merah di sekitar mulut yang terasa panas dan perih.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kulit di sekitar mulut, lipatan hidung, dan dagu; dapat pula di sekitar mata dan hidung sehingga disebut dermatitis periorifisial. TANYAKAN DAN PERIKSA APAKAH ADA JARAK BEBAS LESI SELEBAR BEBERAPA MILIMETER TEPAT DI SISI BIBIR — ciri ini sangat khas dan hampir memastikan diagnosis. Onset: perlahan dalam beberapa minggu. Character: papul dan papulopustul kecil berwarna merah dengan sisik halus, disertai rasa PANAS, PERIH, DAN TERTARIK alih-alih gatal — perbedaan rasa ini membedakannya dari eksim. Radiation: meluas mengelilingi mulut dan dapat menyebar ke sekitar hidung dan mata. Associations: kulit terasa kencang dan kering. Time course: PERTANYAAN YANG PALING MENENTUKAN — apakah keluhan membaik saat memakai krim tertentu lalu memburuk kembali setiap krim dihentikan; pola membaik-memburuk ini merupakan tanda ketergantungan kortikosteroid dan sekaligus menjelaskan mengapa pasien terus memakainya. Exacerbating: kortikosteroid topikal, krim pelembap tebal, pasta gigi berfluorida, dan kosmetik oklusif. Severity: dampak kosmetik dan kepercayaan diri yang kerap berat karena letaknya di wajah.',
-      riwayatPenyakitDahulu: 'History dermatitis atopik, akne, rosasea, dan penyakit kulit wajah lain beserta pengobatannya. History asma yang memakai obat hirup berkortikosteroid.',
-      riwayatPenyakitKeluarga: 'History atopi dan rosasea pada keluarga.',
+      riwayatPenyakitDahulu: 'Riwayat dermatitis atopik, akne, rosasea, dan penyakit kulit wajah lain beserta pengobatannya. Riwayat asma yang memakai obat hirup berkortikosteroid.',
+      riwayatPenyakitKeluarga: 'Riwayat atopi dan rosasea pada keluarga.',
       riwayatPengobatan:
         'INTI ANAMNESIS: telusuri secara rinci SELURUH krim yang pernah dioleskan ke wajah — kortikosteroid topikal dengan berbagai nama, krim racikan tanpa label, krim pemutih, dan krim dari penjual bebas. Tanyakan pula pemakaian kortikosteroid hirup untuk asma yang mengenai daerah sekitar mulut, serta kortikosteroid semprot hidung.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap kosmetik maupun pasta gigi.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap kosmetik maupun pasta gigi.',
       riwayatSosialEkonomi:
         'Pemakaian kosmetik, pelembap, tabir surya, dan produk perawatan wajah; kebiasaan berganti-ganti produk; sumber tempat memperoleh krim yang dipakai; serta tekanan sosial terhadap penampilan yang mendorong pemakaian krim pemutih.',
     },
@@ -11051,7 +11051,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pemakaian pelembap tebal, kosmetik oklusif, dan tabir surya berminyak',
       'Kortikosteroid hirup untuk asma dan kortikosteroid semprot hidung',
       'Pasta gigi berfluorida pada sebagian pasien',
-      'History dermatitis atopik dan sawar kulit yang lemah',
+      'Riwayat dermatitis atopik dan sawar kulit yang lemah',
       'Perubahan hormon dan pemakaian kontrasepsi hormonal',
       'Anak yang memakai kortikosteroid topikal pada wajah untuk eksim',
     ],
@@ -11122,11 +11122,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: daerah yang tertutup pakaian dan mengalami gesekan — dahi, leher, dada, punggung, lipatan ketiak, dan selangkangan; pada bayi tersering di dahi, leher, dan punggung serta daerah yang tertekan alas tidur. Onset: mendadak dalam beberapa jam sampai hari setelah berkeringat banyak, demam, cuaca panas, maupun berbaring lama. Character: bedakan dua bentuk utama — MILIARIA KRISTALINA berupa vesikel jernih sangat kecil seperti tetesan embun yang MUDAH PECAH DAN TIDAK GATAL karena sumbatan berada di lapisan paling luar; MILIARIA RUBRA berupa papul dan papulovesikel MERAH yang GATAL DAN PERIH karena sumbatan lebih dalam sehingga menimbulkan peradangan. Radiation: meluas pada daerah yang tertutup dan lembap. Associations: rasa panas dan menyengat pada kulit, serta berkurangnya keringat pada daerah yang terkena; tanyakan demam dan tanda infeksi sekunder. Time course: membaik cepat dalam beberapa hari begitu pasien berada di lingkungan sejuk. Exacerbating: panas, kelembapan tinggi, pakaian ketat dan tebal, demam, aktivitas fisik berat, dan berbaring lama pada pasien yang dirawat. Relieving: udara sejuk dan mandi. Severity: gangguan tidur akibat gatal dan pada bayi rewel serta sulit menyusu.',
       riwayatPenyakitDahulu:
-        'History keluhan serupa pada cuaca panas sebelumnya, dermatitis atopik, penyakit yang menyebabkan demam berkepanjangan, dan keadaan yang mengharuskan berbaring lama. Pada bayi, riwayat kelahiran dan cara perawatan.',
+        'Riwayat keluhan serupa pada cuaca panas sebelumnya, dermatitis atopik, penyakit yang menyebabkan demam berkepanjangan, dan keadaan yang mengharuskan berbaring lama. Pada bayi, riwayat kelahiran dan cara perawatan.',
       riwayatPenyakitKeluarga: 'Umumnya tidak relevan; tanyakan riwayat atopi bila keluhan berulang dan gatal hebat.',
       riwayatPengobatan:
         'Pemakaian bedak, minyak, dan losion berminyak yang justru menyumbat saluran keringat; salep tebal; serta obat yang meningkatkan keringat. Tanyakan pula pemakaian plester dan pembalut yang menutup kulit.',
-      riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap produk perawatan kulit.',
+      riwayatAlergi: 'Riwayat alergi obat dan riwayat iritasi terhadap produk perawatan kulit.',
       riwayatNutrisi: 'Pada bayi, cara pemberian minum dan kecukupan cairan; keringat berlebih dapat menambah kehilangan cairan.',
       riwayatSosialEkonomi:
         'Suhu dan ventilasi tempat tinggal, ketersediaan kipas angin maupun pendingin ruangan, jenis pakaian yang dipakai sehari-hari, PADA BAYI KEBIASAAN MEMBEDONG DAN MEMAKAIKAN PAKAIAN BERLAPIS yang sangat lazim dan merupakan penyebab utama, serta pekerjaan di tempat panas seperti dapur, pabrik, dan lapangan.',
@@ -11159,7 +11159,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pakaian ketat, tebal, dan tidak menyerap keringat',
       'Berbaring lama pada pasien yang dirawat, sehingga punggung tertekan dan lembap',
       'Pemakaian bedak berlebihan, minyak, losion berminyak, dan salep tebal yang menyumbat',
-      'Occupation di tempat panas seperti dapur, pabrik, dan lapangan',
+      'Pekerjaan di tempat panas seperti dapur, pabrik, dan lapangan',
       'Aktivitas fisik berat dan olahraga di cuaca panas',
     ],
     goldStandard:
@@ -11183,7 +11183,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'HENTIKAN pemakaian bedak tebal, minyak, losion berminyak, dan salep yang menyumbat — bedak yang menumpuk bersama keringat justru memperberat sumbatan',
       'Pada bayi, kurangi lapisan pakaian dan hentikan kebiasaan membedong pada cuaca panas; aturan sederhananya adalah pakaikan satu lapis lebih banyak dari yang dikenakan orang dewasa di ruangan yang sama, bukan lebih',
       'Pada pasien yang berbaring lama, ubah posisi secara berkala dan jaga alas tidur tetap kering',
-      'Adequatekan asupan cairan, terutama pada cuaca panas dan pada bayi',
+      'Cukupkan asupan cairan, terutama pada cuaca panas dan pada bayi',
     ],
     tatalaksana: [
       'Sebagian besar kasus SEMBUH SENDIRI dalam beberapa hari begitu paparan panas dihilangkan, dan tidak memerlukan obat',
@@ -11222,7 +11222,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Toxic epidermal necrolysis': {
     definisi: 'Reaksi obat berat dengan nekrosis dan pelepasan epidermis luas (>30% luas permukaan tubuh) — mengancam nyawa.',
-    diagnosis: ['History obat pencetus 1-3 minggu sebelumnya (sulfonamid, antiepilepsi, allopurinol, NSAID), didahului gejala mirip flu, lalu makula purpurik nyeri yang meluas, tanda Nikolsky positif, keterlibatan mukosa multipel (mulut, mata, genital)'],
+    diagnosis: ['Riwayat obat pencetus 1-3 minggu sebelumnya (sulfonamid, antiepilepsi, allopurinol, NSAID), didahului gejala mirip flu, lalu makula purpurik nyeri yang meluas, tanda Nikolsky positif, keterlibatan mukosa multipel (mulut, mata, genital)'],
     tatalaksana: ['HENTIKAN SEGERA semua obat yang dicurigai (menentukan prognosis), rujuk unit luka bakar/ICU, resusitasi cairan dan elektrolit, perawatan luka steril, nutrisi, perawatan mata untuk cegah kebutaan; hitung skor SCORTEN untuk prognosis; hindari antibiotik profilaksis rutin'],
     referensi: ['SKDI2012', 'PERDOSKI2021', 'FITZPATRICK2019'],
   },
@@ -11240,13 +11240,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan gatal. Site: sebaran lesi — dapat di mana saja pada tubuh dan berpindah tempat dari jam ke jam; tanyakan keterlibatan kelopak mata, bibir, lidah, dan alat kelamin yang menandakan angioedema. Onset: mendadak, sering dalam hitungan menit hingga jam setelah paparan; tanyakan secara rinci apa yang dimakan, diminum, dan dikonsumsi sebagai obat dalam 24 jam terakhir, serta riwayat gigitan serangga dan infeksi yang sedang berlangsung. Character: bentol meninggi dengan tepi eritematosa dan pusat lebih pucat, terasa gatal hebat dan kadang seperti tersengat, bukan nyeri. Radiation: lesi meluas dan menyatu membentuk peta yang tidak beraturan. Associations: PERTANYAAN PALING PENTING adalah tanda anafilaksis — sesak napas, suara serak, rasa tercekik, sulit menelan, nyeri perut hebat, muntah, pusing berputar, atau rasa mau pingsan; adanya salah satu dari ini mengubah tatalaksana dari antihistamin menjadi epinefrin segera. Time course: KUNCI DIAGNOSIS — tanyakan berapa lama satu bentol bertahan di satu titik sebelum hilang; pada urtikaria, satu lesi individual hilang dalam kurang dari 24 jam tanpa bekas, sedangkan lesi yang menetap lebih dari 24 jam atau meninggalkan memar dan hiperpigmentasi mengarah ke urtikaria vaskulitis. Exacerbating: panas, keringat, tekanan pakaian, garukan, olahraga, alkohol, stres, dan obat antiinflamasi nonsteroid. Severity: nilai dengan derajat gatal dan jumlah bentol per hari, serta dampaknya terhadap tidur dan aktivitas.',
       riwayatPenyakitDahulu:
-        'History atopi berupa asma, rinitis alergika, dan dermatitis atopik. History episode urtikaria atau angioedema sebelumnya beserta pencetusnya. History penyakit tiroid autoimun dan penyakit autoimun lain yang lebih berkaitan dengan urtikaria kronik. History infeksi saluran napas atas, infeksi saluran cerna, atau infeksi gigi yang sedang berlangsung, karena infeksi merupakan pencetus urtikaria akut yang sangat sering terutama pada anak.',
+        'Riwayat atopi berupa asma, rinitis alergika, dan dermatitis atopik. Riwayat episode urtikaria atau angioedema sebelumnya beserta pencetusnya. Riwayat penyakit tiroid autoimun dan penyakit autoimun lain yang lebih berkaitan dengan urtikaria kronik. Riwayat infeksi saluran napas atas, infeksi saluran cerna, atau infeksi gigi yang sedang berlangsung, karena infeksi merupakan pencetus urtikaria akut yang sangat sering terutama pada anak.',
       riwayatPenyakitKeluarga:
-        'History atopi dan urtikaria pada keluarga. History angioedema berulang tanpa bentol pada beberapa anggota keluarga mengarah pada angioedema herediter yang tidak berespons terhadap antihistamin maupun epinefrin dan memerlukan penanganan berbeda.',
+        'Riwayat atopi dan urtikaria pada keluarga. Riwayat angioedema berulang tanpa bentol pada beberapa anggota keluarga mengarah pada angioedema herediter yang tidak berespons terhadap antihistamin maupun epinefrin dan memerlukan penanganan berbeda.',
       riwayatPengobatan:
         'Daftar seluruh obat dalam 2 minggu terakhir termasuk obat bebas, jamu, dan suplemen. Perhatikan khusus antibiotik golongan beta-laktam, obat antiinflamasi nonsteroid, penghambat ACE yang khas menyebabkan angioedema tanpa bentol, opioid, dan media kontras.',
       riwayatAlergi:
-        'History alergi obat, makanan (telur, susu, kacang, ikan, udang), lateks, dan sengatan serangga beserta bentuk reaksinya — apakah hanya kulit atau pernah disertai sesak dan penurunan kesadaran.',
+        'Riwayat alergi obat, makanan (telur, susu, kacang, ikan, udang), lateks, dan sengatan serangga beserta bentuk reaksinya — apakah hanya kulit atau pernah disertai sesak dan penurunan kesadaran.',
       riwayatNutrisi:
         'Rincian makanan dan minuman 24 jam terakhir, termasuk makanan olahan, pengawet, pewarna, dan makanan tinggi histamin seperti ikan tidak segar, keju matang, dan makanan fermentasi.',
       riwayatSosialEkonomi:
@@ -11274,10 +11274,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Sel mast pada dermis superfisial mengalami degranulasi dan melepaskan histamin bersama mediator lain seperti leukotrien, prostaglandin, dan sitokin. Degranulasi dapat terjadi melalui jalur imunologis, yaitu ikatan silang antara alergen dengan IgE spesifik pada permukaan sel mast, maupun jalur non-imunologis melalui aktivasi langsung oleh obat, media kontras, atau makanan tertentu tanpa melibatkan IgE. Histamin bekerja pada reseptor H1 di endotel dan ujung saraf sensorik sehingga terjadi vasodilatasi, peningkatan permeabilitas kapiler dengan ekstravasasi plasma ke dermis, dan rangsangan gatal. Karena edema ini berada di dermis superfisial dan cepat direabsorpsi, lesi bersifat sementara dan berpindah — inilah dasar biologis mengapa satu bentol tidak bertahan lebih dari 24 jam. Bila edema terjadi lebih dalam pada dermis profunda dan jaringan submukosa, gambarannya menjadi angioedema yang lebih terasa tegang daripada gatal.',
     faktorRisiko: [
-      'History atopi pribadi maupun keluarga',
+      'Riwayat atopi pribadi maupun keluarga',
       'Infeksi virus yang sedang berlangsung, terutama pada anak',
       'Penggunaan obat antiinflamasi nonsteroid dan antibiotik beta-laktam',
-      'History reaksi alergi terhadap makanan atau sengatan serangga sebelumnya',
+      'Riwayat reaksi alergi terhadap makanan atau sengatan serangga sebelumnya',
       'Paparan pekerjaan terhadap lateks dan bahan kimia',
       'Stres psikis dan kurang tidur sebagai pencetus maupun pemberat',
     ],
@@ -11364,11 +11364,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: pada erupsi eksantematosa ruam bermula pada badan lalu menyebar ke anggota gerak secara simetris; pada erupsi obat tetap lesi soliter maupun beberapa dengan predileksi bibir, alat kelamin, tangan, dan kaki. Onset: PERTANYAAN YANG PALING MENENTUKAN ADALAH JARAK WAKTU TERHADAP MULAINYA OBAT — erupsi eksantematosa muncul 4-14 hari setelah obat pertama kali diminum, namun HANYA DALAM HITUNGAN JAM SAMPAI 2 HARI bila obat yang sama pernah dipakai sebelumnya; erupsi obat tetap muncul dalam 30 menit sampai 8 jam setelah minum obat pada paparan berulang. Character: erupsi eksantematosa berupa makula dan papul merah yang menyatu dan gatal; erupsi obat tetap berupa plak bulat berbatas tegas berwarna merah keunguan yang terasa panas dan perih, kadang disertai bula di tengahnya. Radiation: pada erupsi eksantematosa menyebar dari badan ke seluruh tubuh. Associations: TANYAKAN TANDA BAHAYA YANG MENANDAKAN ERUPSI OBAT BERAT — demam tinggi, nyeri kulit yang melebihi gatal, lepuh, luka pada mulut, mata, dan kelamin, wajah bengkak, kulit terkelupas, serta pembesaran kelenjar getah bening menyeluruh; semuanya mengubah kasus dari ringan menjadi kegawatan. Time course: TANYAKAN APAKAH LESI SELALU MUNCUL DI TEMPAT YANG SAMA setiap kali minum obat tertentu — sifat berulang di lokasi identik ini praktis menegakkan erupsi obat tetap. Exacerbating: melanjutkan obat penyebab. Severity: luas kulit yang terkena, demam, dan keterlibatan mukosa.',
       riwayatPenyakitDahulu:
-        'History erupsi obat sebelumnya beserta nama obatnya, riwayat penyakit ginjal dan hati yang memengaruhi pembuangan obat, infeksi HIV yang meningkatkan risiko secara bermakna, serta penyakit autoimun.',
-      riwayatPenyakitKeluarga: 'History reaksi obat berat pada keluarga, karena sebagian berkaitan dengan faktor genetik tertentu.',
+        'Riwayat erupsi obat sebelumnya beserta nama obatnya, riwayat penyakit ginjal dan hati yang memengaruhi pembuangan obat, infeksi HIV yang meningkatkan risiko secara bermakna, serta penyakit autoimun.',
+      riwayatPenyakitKeluarga: 'Riwayat reaksi obat berat pada keluarga, karena sebagian berkaitan dengan faktor genetik tertentu.',
       riwayatPengobatan:
         'INTI ANAMNESIS: buat DAFTAR SELURUH OBAT DALAM 8 MINGGU TERAKHIR beserta TANGGAL MULAI DAN BERHENTI masing-masing, termasuk obat bebas, jamu, suplemen, dan obat yang dianggap tidak penting. Perhatikan obat tersangka tersering: antibiotik terutama beta-laktam dan kotrimoksazol, obat antiinflamasi nonsteroid, antikonvulsan seperti karbamazepin dan fenitoin, alopurinol, dan obat antituberkulosis. Buat garis waktu yang menghubungkan tanggal mulai tiap obat dengan tanggal munculnya ruam',
-      riwayatAlergi: 'History alergi obat sebelumnya beserta bentuk reaksinya, dan apakah pasien memiliki catatan maupun kartu alergi.',
+      riwayatAlergi: 'Riwayat alergi obat sebelumnya beserta bentuk reaksinya, dan apakah pasien memiliki catatan maupun kartu alergi.',
       riwayatNutrisi: 'Asupan makan dan minum, terutama bila ada keterlibatan mukosa mulut yang menghambat makan.',
       riwayatSosialEkonomi:
         'Kebiasaan membeli obat bebas tanpa resep, penggunaan jamu dan obat racikan, serta sumber tempat memperoleh obat — hal ini penting karena obat penyebab kerap berasal dari luar resep dokter dan tidak dilaporkan spontan.',
@@ -11400,7 +11400,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Jumlah obat yang dikonsumsi bersamaan',
       'INFEKSI HIV, yang meningkatkan risiko erupsi obat secara sangat bermakna',
-      'History erupsi obat sebelumnya',
+      'Riwayat erupsi obat sebelumnya',
       'Infeksi virus yang sedang berlangsung, terutama mononukleosis infeksiosa dengan pemberian ampisilin',
       'Penyakit ginjal dan hati yang memperlambat pembuangan obat',
       'Penyakit autoimun seperti lupus',
@@ -11571,19 +11571,19 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: lokasi luka yang tepat, serta tanyakan bagian tubuh mana yang berada di bawahnya — luka di daerah dengan tendon, saraf, pembuluh darah besar, atau sendi mengubah seluruh penanganan. Onset: JAM BERAPA kejadiannya, karena jarak waktu sejak cedera menentukan boleh tidaknya luka dijahit primer. Character: MEKANISME CEDERA HARUS DIRINCI — benda tumpul, benda tajam, gigitan hewan atau manusia, luka tusuk, atau cedera akibat mesin bertekanan tinggi; pada luka tusuk tanyakan panjang dan jenis benda yang menusuk serta apakah benda tersebut sudah tercabut seluruhnya. Radiation: nyeri, baal, atau kesemutan pada bagian yang lebih ujung dari luka yang menandakan cedera saraf. Associations: kelemahan atau ketidakmampuan menggerakkan jari maupun sendi di bawah luka yang menandakan cedera tendon; perdarahan yang menyembur menandakan cedera arteri. Time course: berapa banyak perdarahan sejak kejadian dan apa yang sudah dilakukan. Exacerbating: gerakan memperberat nyeri dan dapat menarik ujung tendon yang putus menjauh. Severity: skala nyeri, jumlah perdarahan, dan hilangnya fungsi.',
       riwayatPenyakitDahulu:
-        'Diabetes melitus, penyakit pembuluh darah perifer, penyakit ginjal kronik, dan keadaan imunitas menurun yang memperlambat penyembuhan serta menaikkan risiko infeksi. History gangguan pembekuan darah. History keloid pada luka sebelumnya. History operasi atau cedera pada daerah yang sama.',
+        'Diabetes melitus, penyakit pembuluh darah perifer, penyakit ginjal kronik, dan keadaan imunitas menurun yang memperlambat penyembuhan serta menaikkan risiko infeksi. Riwayat gangguan pembekuan darah. Riwayat keloid pada luka sebelumnya. Riwayat operasi atau cedera pada daerah yang sama.',
       riwayatPenyakitKeluarga:
-        'History gangguan pembekuan darah dan kecenderungan keloid pada keluarga.',
+        'Riwayat gangguan pembekuan darah dan kecenderungan keloid pada keluarga.',
       riwayatPengobatan:
         'Antikoagulan dan antiagregasi trombosit yang memperpanjang perdarahan, kortikosteroid jangka panjang yang menghambat penyembuhan, serta obat imunosupresan. Tanyakan pula apa yang sudah dibubuhkan pada luka sebelum datang, karena kopi bubuk, daun, dan ramuan tradisional lazim dipakai dan harus dibersihkan.',
       riwayatAlergi:
-        'History alergi obat, terutama anestesi lokal golongan amida, antibiotik, dan lateks.',
+        'Riwayat alergi obat, terutama anestesi lokal golongan amida, antibiotik, dan lateks.',
       riwayatImunisasi:
         'STATUS IMUNISASI TETANUS WAJIB DITANYAKAN pada setiap luka terbuka: kapan dosis terakhir dan berapa jumlah dosis seumur hidup. Luka tusuk yang dalam, sempit, dan terkontaminasi tanah merupakan luka paling rawan tetanus karena lingkungannya miskin oksigen.',
       riwayatNutrisi:
         'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan luka secara bermakna.',
       riwayatSosialEkonomi:
-        'Occupation dan aktivitas yang berkaitan dengan mekanisme cedera, kebersihan lingkungan tempat kejadian, kemampuan merawat luka dan datang kontrol, serta — bila keterangan kejadian tidak sesuai dengan pola luka, atau pada anak, lansia, dan perempuan dengan luka berulang — pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+        'Pekerjaan dan aktivitas yang berkaitan dengan mekanisme cedera, kebersihan lingkungan tempat kejadian, kemampuan merawat luka dan datang kontrol, serta — bila keterangan kejadian tidak sesuai dengan pola luka, atau pada anak, lansia, dan perempuan dengan luka berulang — pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
     },
     pemeriksaanFisik: [
       'Nilai jalan napas, pernapasan, dan sirkulasi lebih dulu bila luka besar atau perdarahan banyak; hentikan perdarahan dengan penekanan langsung, bukan dengan torniket sebagai langkah pertama',
@@ -11614,7 +11614,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Gigitan hewan maupun manusia yang beban kumannya sangat tinggi',
       'Diabetes melitus, penyakit pembuluh darah perifer, dan keadaan imunitas menurun',
       'Malnutrisi, usia lanjut, merokok, dan pemakaian kortikosteroid',
-      'History imunisasi tetanus yang tidak lengkap atau tidak diketahui',
+      'Riwayat imunisasi tetanus yang tidak lengkap atau tidak diketahui',
     ],
     goldStandard:
       'Diagnosis luka bersifat klinis; yang menentukan penanganan bukan penamaan lukanya melainkan penilaian empat hal: mekanisme dan waktu cedera, derajat kontaminasi, ada tidaknya benda asing, dan ada tidaknya cedera struktur di bawah luka yang dibuktikan melalui pemeriksaan neurovaskular serta uji fungsi tendon sebelum anestesi diberikan. Pada luka tusuk, kedalaman sejati tidak boleh disimpulkan dari ukuran luka di permukaan.',
@@ -11652,7 +11652,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     edukasi: [
       'Jaga luka tetap bersih dan kering pada 24-48 jam pertama; setelah itu luka boleh dibersihkan lembut dengan air bersih, lalu dikeringkan dengan menepuk dan ditutup kembali',
       'Jangan membubuhkan kopi bubuk, daun, pasta gigi, atau ramuan tradisional pada luka karena meningkatkan risiko infeksi dan tetanus',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; penyembuhan luka menaikkan kebutuhan energi dan protein sehingga porsi tidak boleh dikurangi. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe; tambahkan buah sumber vitamin C serta makanan sumber zink seperti kacang-kacangan dan hati, dan minum 8 gelas air per hari. Tidak ada dasar untuk memantang telur maupun ikan pada luka — pantangan seperti ini justru memperlambat penyembuhan',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah dua selingan; penyembuhan luka menaikkan kebutuhan energi dan protein sehingga porsi tidak boleh dikurangi. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe; tambahkan buah sumber vitamin C serta makanan sumber zink seperti kacang-kacangan dan hati, dan minum 8 gelas air per hari. Tidak ada dasar untuk memantang telur maupun ikan pada luka — pantangan seperti ini justru memperlambat penyembuhan',
       'Jam tidur: 7-8 jam per malam dengan jadwal tetap, karena hormon pertumbuhan yang berperan pada perbaikan jaringan bekerja terutama saat tidur dalam. Tinggikan bagian tubuh yang terluka dengan bantal saat tidur untuk mengurangi bengkak dan nyeri berdenyut',
       'Pola olahraga: hindari olahraga berat, berenang, dan berendam sampai jahitan dilepas dan luka menutup rapat. Bila luka pada tungkai, jalan santai ringan tetap dianjurkan dengan bagian yang terluka ditinggikan saat istirahat; bila luka melewati sendi, mulai gerakan sendi ringan sesuai anjuran agar tidak kaku. Aktivitas penuh kembali bertahap sekitar 2 minggu setelah jahitan dilepas',
       'Berhenti merokok selama masa penyembuhan — merokok menyempitkan pembuluh darah kecil dan merupakan salah satu penghambat penyembuhan luka yang paling kuat',
@@ -11692,7 +11692,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Umumnya tidak relevan; namun pada anak, telaah keadaan rumah dan pengasuhan tetap perlu.',
       riwayatPengobatan:
         'Obat rutin yang dikonsumsi, terutama antikoagulan dan kortikosteroid. Tanyakan pula apa yang sudah dioleskan pada luka sebelum datang — pasta gigi, kecap, mentega, atau ramuan tradisional sangat lazim dipakai dan harus dibersihkan karena menghambat penilaian luka serta meningkatkan risiko infeksi.',
-      riwayatAlergi: 'History alergi obat, terutama analgesik, antibiotik, dan sulfa yang relevan untuk salep perak sulfadiazin.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama analgesik, antibiotik, dan sulfa yang relevan untuk salep perak sulfadiazin.',
       riwayatImunisasi:
         'STATUS IMUNISASI TETANUS wajib ditanyakan pada setiap luka bakar: kapan dosis terakhir diberikan, karena luka bakar merupakan luka rawan tetanus.',
       riwayatNutrisi: 'Status gizi sebelum cedera; luka bakar meningkatkan kebutuhan kalori dan protein untuk penyembuhan.',
@@ -11725,7 +11725,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Anak usia balita — tersering akibat tersiram air atau minyak panas di dapur',
       'Usia lanjut dengan gangguan mobilitas, penglihatan, atau kognitif',
       'Epilepsi dan gangguan kesadaran',
-      'Occupation dengan paparan api, uap, bahan kimia, atau listrik',
+      'Pekerjaan dengan paparan api, uap, bahan kimia, atau listrik',
       'Memasak dengan kompor di lantai dan penyimpanan bahan mudah terbakar di dalam rumah',
       'Pengaruh alkohol atau zat yang menurunkan kewaspadaan',
     ],
@@ -11795,7 +11795,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Luka akibat bahan kimia': {
     definisi: 'Cedera jaringan akibat kontak bahan kimia korosif; basa menyebabkan nekrosis likuefaksi (lebih dalam dan progresif), asam menyebabkan nekrosis koagulasi.',
-    diagnosis: ['History paparan zat kimia — identifikasi jenis dan konsentrasi bila mungkin; nilai luas, kedalaman, dan keterlibatan mata; kerusakan dapat terus berlanjut selama zat masih kontak dengan kulit'],
+    diagnosis: ['Riwayat paparan zat kimia — identifikasi jenis dan konsentrasi bila mungkin; nilai luas, kedalaman, dan keterlibatan mata; kerusakan dapat terus berlanjut selama zat masih kontak dengan kulit'],
     tatalaksana: ['IRIGASI segera dan lama dengan air mengalir (minimal 20-30 menit, lebih lama untuk basa), lepaskan pakaian dan perhiasan terkontaminasi, sikat bubuk kering sebelum irigasi; JANGAN menetralkan dengan zat lawan (reaksi eksotermik memperburuk); irigasi mata segera dan rujuk oftalmologi; gunakan alat pelindung diri saat menolong'],
     referensi: ['SKDI2012', 'ATLS2018', 'SCHWARTZ2019'],
   },
@@ -11815,11 +11815,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: satu mata; pasien sering dapat menunjuk sisi mana yang terasa mengganjal. Onset: MENDADAK DAN JELAS WAKTUNYA — riwayat yang tegas inilah yang paling mengarahkan. Character: rasa mengganjal seperti tertusuk yang BERTAMBAH SETIAP KALI BERKEDIP, karena benda pada konjungtiva tarsal kelopak atas menyapu kornea pada setiap kedipan. Radiation: tidak khas. Associations: mata berair, merah, dan silau; TANYAKAN MEKANISME CEDERANYA SECARA RINCI — bila benda datang dengan kecepatan tinggi seperti saat menggerinda, memalu logam, atau ledakan, maka kemungkinan benda asing menembus bola mata harus dianggap ada sampai terbukti sebaliknya, dan pasien seperti ini tidak boleh sekadar dibersihkan matanya lalu dipulangkan. Time course: keluhan menetap sampai bendanya dikeluarkan. Exacerbating: berkedip dan menggosok mata. Relieving: memejamkan mata. Severity: nilai adanya penurunan penglihatan yang menandakan keterlibatan kornea maupun bagian dalam mata.',
       riwayatPenyakitDahulu:
-        'History operasi mata, trauma mata sebelumnya, kelainan refraksi, dan pemakaian lensa kontak. Diabetes melitus yang memperlambat penyembuhan epitel.',
+        'Riwayat operasi mata, trauma mata sebelumnya, kelainan refraksi, dan pemakaian lensa kontak. Diabetes melitus yang memperlambat penyembuhan epitel.',
       riwayatPenyakitKeluarga: 'Tidak relevan.',
       riwayatPengobatan:
         'Tetes mata yang sudah dipakai sendiri sebelum datang; tanyakan khusus pemakaian tetes yang mengandung kortikosteroid, karena berbahaya bila ada luka kornea maupun infeksi.',
-      riwayatAlergi: 'History alergi obat, terutama anestesi topikal dan antibiotik tetes.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama anestesi topikal dan antibiotik tetes.',
       riwayatImunisasi:
         'Status imunisasi tetanus, karena cedera mata dengan benda kotor termasuk luka yang berisiko tetanus.',
       riwayatSosialEkonomi:
@@ -11847,7 +11847,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Benda asing yang masuk umumnya terperangkap pada konjungtiva tarsal kelopak atas atau pada forniks, karena kedua tempat itu merupakan cekungan alami tempat partikel tertahan saat mata berkedip. Setiap kedipan menyeret benda tersebut melintasi permukaan kornea, sehingga menimbulkan goresan epitel berulang yang khasnya berbentuk garis-garis lurus sejajar mengikuti arah gerakan kelopak — inilah dasar tanda goresan berjajar pada pewarnaan fluoresein, dan mengapa temuan goresan seperti itu harus dianggap sebagai bukti masih adanya benda asing yang belum ditemukan. Kerusakan epitel merangsang ujung saraf kornea yang sangat padat sehingga menimbulkan nyeri hebat dan air mata refleks, serta memicu vasodilatasi pembuluh konjungtiva yang membuat mata merah. Epitel kornea memiliki daya pulih yang cepat dan umumnya menutup dalam 24-48 jam setelah penyebabnya dihilangkan, sehingga keluhan mereda dengan cepat begitu benda dikeluarkan. Benda asing dari logam yang menempel lama melepaskan besi yang teroksidasi dan meninggalkan cincin karat pada jaringan sekitarnya, yang tetap mempertahankan peradangan meski benda utamanya sudah diangkat. Berbeda dari itu, benda berkecepatan tinggi dapat menembus dinding bola mata dan masuk ke dalamnya dengan luka masuk yang sangat kecil dan nyeri yang justru ringan — keadaan yang menipu dan menjadi alasan mekanisme cedera harus selalu ditanyakan.',
     faktorRisiko: [
-      'Occupation menggerinda, mengelas, memalu logam, pertukangan kayu, dan bertani tanpa pelindung mata',
+      'Pekerjaan menggerinda, mengelas, memalu logam, pertukangan kayu, dan bertani tanpa pelindung mata',
       'Berkendara sepeda motor tanpa kaca helm maupun kacamata',
       'Berada di lingkungan berdebu dan berangin',
       'Pemakaian lensa kontak yang mempermudah terperangkapnya partikel',
@@ -11929,13 +11929,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: bercak terbatas pada satu bagian bola mata dengan batas tegas, umumnya satu mata. Onset: mendadak dan biasanya disadari saat bercermin atau diberi tahu orang lain — bukan karena keluhan; TANYAKAN PENCETUS seperti batuk keras, bersin, mengedan, muntah, mengangkat beban berat, atau trauma. Character: TIDAK NYERI, hanya kadang terasa mengganjal ringan; adanya nyeri hebat menyingkirkan diagnosis ini. Radiation: bercak dapat meluas sedikit dalam 1-2 hari pertama, dan hal ini normal. Associations: TANYAKAN SECARA TEGAS ADA TIDAKNYA PENURUNAN PENGLIHATAN, KOTORAN MATA, DAN SILAU — ketiganya tidak boleh ada pada perdarahan subkonjungtiva, dan bila ada maka penyebabnya bukan ini. Tanyakan pula perdarahan di tempat lain seperti gusi, hidung, dan memar yang mudah timbul, yang mengarah pada gangguan pembekuan darah. Time course: warna berubah dari merah terang menjadi kehijauan lalu kekuningan seperti memar, dan menghilang dalam 1-3 minggu. Exacerbating: tidak ada. Severity: keluhan sesungguhnya bersifat kosmetik dan kecemasan, bukan gangguan fungsi.',
       riwayatPenyakitDahulu:
-        'HIPERTENSI merupakan hal yang paling penting ditanyakan dan diukur, terutama pada kejadian berulang. Diabetes melitus, gangguan pembekuan darah, penyakit hati, dan riwayat perdarahan subkonjungtiva sebelumnya beserta frekuensinya. History operasi dan trauma mata.',
-      riwayatPenyakitKeluarga: 'History gangguan pembekuan darah dan hipertensi pada keluarga.',
+        'HIPERTENSI merupakan hal yang paling penting ditanyakan dan diukur, terutama pada kejadian berulang. Diabetes melitus, gangguan pembekuan darah, penyakit hati, dan riwayat perdarahan subkonjungtiva sebelumnya beserta frekuensinya. Riwayat operasi dan trauma mata.',
+      riwayatPenyakitKeluarga: 'Riwayat gangguan pembekuan darah dan hipertensi pada keluarga.',
       riwayatPengobatan:
         'OBAT PENGENCER DARAH seperti aspirin, klopidogrel, dan warfarin maupun antikoagulan oral baru — sangat sering menjadi penyebab dan mudah terlewat bila tidak ditanyakan langsung. Tanyakan pula obat herbal dan suplemen yang memengaruhi pembekuan.',
-      riwayatAlergi: 'History alergi obat.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatSosialEkonomi:
-        'Occupation yang melibatkan mengangkat beban berat atau mengedan, riwayat trauma di tempat kerja, kebiasaan menggosok mata, dan pemakaian lensa kontak. Pada anak dengan perdarahan subkonjungtiva berulang tanpa sebab jelas, pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+        'Pekerjaan yang melibatkan mengangkat beban berat atau mengedan, riwayat trauma di tempat kerja, kebiasaan menggosok mata, dan pemakaian lensa kontak. Pada anak dengan perdarahan subkonjungtiva berulang tanpa sebab jelas, pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
     },
     pemeriksaanFisik: [
       'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah tanpa kecuali — tajam penglihatan yang normal merupakan salah satu penopang utama diagnosis ini',
@@ -12031,11 +12031,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: kedua mata, dirasakan pada permukaan mata bukan di dalam bola mata. Onset: perlahan dan menahun. Character: rasa berpasir, mengganjal, panas, perih, dan berat pada kelopak; PARADOKS YANG KHAS ADALAH MATA JUSTRU BERAIR BERLEBIHAN — air mata refleks yang encer keluar sebagai reaksi terhadap kekeringan, sehingga keluhan mata berair tidak menyingkirkan diagnosis ini melainkan sering justru menandakannya. Radiation: rasa lelah menjalar ke sekitar mata dan dahi. Associations: penglihatan kabur yang HILANG TIMBUL DAN MEMBAIK SETELAH BERKEDIP — tanda yang sangat khas karena lapisan air mata yang pecah membuat permukaan optik tidak rata; tanyakan pula silau, sulit memakai lensa kontak, mulut kering, dan nyeri sendi yang mengarah pada sindrom Sjogren. Time course: MEMBERAT PADA SORE DAN MALAM HARI setelah seharian bekerja, berbeda dari blefaritis yang justru paling berat saat bangun tidur. Exacerbating: menatap layar lama karena frekuensi berkedip menurun, kipas angin dan pendingin ruangan yang mengarah ke wajah, angin, asap rokok, dan udara kering. Relieving: memejamkan mata, tetes air mata buatan, dan udara lembap. Severity: dampak terhadap pekerjaan, membaca, dan mengemudi.',
       riwayatPenyakitDahulu:
-        'Penyakit autoimun terutama sindrom Sjogren, artritis reumatoid, dan lupus. Penyakit tiroid dengan mata menonjol sehingga permukaan mata lebih terpapar. Diabetes melitus. History operasi mata termasuk bedah refraktif dan operasi katarak, serta riwayat radioterapi kepala dan leher. History blefaritis dan rosasea.',
-      riwayatPenyakitKeluarga: 'History penyakit autoimun pada keluarga.',
+        'Penyakit autoimun terutama sindrom Sjogren, artritis reumatoid, dan lupus. Penyakit tiroid dengan mata menonjol sehingga permukaan mata lebih terpapar. Diabetes melitus. Riwayat operasi mata termasuk bedah refraktif dan operasi katarak, serta riwayat radioterapi kepala dan leher. Riwayat blefaritis dan rosasea.',
+      riwayatPenyakitKeluarga: 'Riwayat penyakit autoimun pada keluarga.',
       riwayatPengobatan:
         'OBAT SISTEMIK MERUPAKAN PENYEBAB YANG SANGAT SERING DAN MUDAH TERLEWAT: antihistamin, dekongestan, antidepresan, obat antikolinergik, diuretik, penyekat beta, isotretinoin, dan kontrasepsi hormonal. Tanyakan pula tetes mata yang dipakai jangka panjang, khususnya tetes pemerah mata dan tetes berpengawet yang justru memperburuk.',
-      riwayatAlergi: 'History alergi mata dan rinitis alergika, serta alergi terhadap pengawet dalam tetes mata.',
+      riwayatAlergi: 'Riwayat alergi mata dan rinitis alergika, serta alergi terhadap pengawet dalam tetes mata.',
       riwayatNutrisi:
         'Asupan cairan harian dan asupan asam lemak omega-3 dari ikan; kekurangan vitamin A pada keadaan gizi buruk merupakan penyebab kekeringan mata yang berat.',
       riwayatSosialEkonomi:
@@ -12071,7 +12071,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Obat antihistamin, antidepresan, antikolinergik, diuretik, dan isotretinoin',
       'Penyakit autoimun terutama sindrom Sjogren',
       'Disfungsi kelenjar Meibom, blefaritis, dan rosasea',
-      'History bedah refraktif maupun operasi mata lain',
+      'Riwayat bedah refraktif maupun operasi mata lain',
       'Kekurangan vitamin A dan asupan omega-3 yang rendah',
       'Merokok termasuk paparan asap sebagai perokok pasif',
     ],
@@ -12097,7 +12097,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Jauhkan arah kipas angin dan pendingin ruangan dari wajah, terutama saat tidur; gunakan pelembap ruangan bila udara sangat kering',
       'Gunakan kacamata yang menutup sisi samping saat berada di luar ruangan yang berangin dan berdebu',
       'Berhenti merokok dan hindari paparan asap',
-      'Adequatekan asupan cairan dan pertimbangkan penambahan asupan asam lemak omega-3',
+      'Cukupkan asupan cairan dan pertimbangkan penambahan asupan asam lemak omega-3',
     ],
     tatalaksana: [
       'Air mata buatan sebagai terapi dasar, digunakan secara TERJADWAL dan bukan hanya saat terasa tidak nyaman — misalnya 4-6 kali sehari pada kasus sedang',
@@ -12163,13 +12163,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: umumnya satu mata dan terasa terpusat pada satu titik sesuai letak bulu mata yang salah arah. Onset: perlahan dan menahun, sering sudah berlangsung berbulan-bulan sebelum pasien berobat. Character: rasa mengganjal, menusuk, dan seperti ada pasir; nyeri bertambah saat berkedip karena bulu mata menyapu kornea pada setiap kedipan. Radiation: tidak khas. Associations: mata berair terus-menerus, merah menetap, silau, dan penglihatan yang mulai kabur bila kornea sudah rusak; tanyakan pula riwayat mata merah berulang yang selalu diobati dengan tetes antibiotik namun kambuh lagi — pola ini sangat khas untuk penyebab mekanis seperti trikiasis. Time course: keluhan menetap dan tidak sembuh dengan obat tetes apa pun, ini merupakan petunjuk penting. Exacerbating: berkedip, angin, dan debu. Relieving: memejamkan mata; keluhan sementara hilang bila bulu mata tercabut sendiri. Severity: nilai gangguan penglihatan dan aktivitas.',
       riwayatPenyakitDahulu:
-        'RIWAYAT TRAKOMA merupakan penyebab tersering di daerah endemis dan wajib ditanyakan. History blefaritis menahun, trauma dan luka bakar kimia pada kelopak, operasi kelopak, sindrom Stevens-Johnson, pemfigoid membran mukosa, serta herpes zoster oftalmikus — semuanya meninggalkan jaringan parut yang mengubah arah tumbuh bulu mata.',
+        'RIWAYAT TRAKOMA merupakan penyebab tersering di daerah endemis dan wajib ditanyakan. Riwayat blefaritis menahun, trauma dan luka bakar kimia pada kelopak, operasi kelopak, sindrom Stevens-Johnson, pemfigoid membran mukosa, serta herpes zoster oftalmikus — semuanya meninggalkan jaringan parut yang mengubah arah tumbuh bulu mata.',
       riwayatPenyakitKeluarga: 'Umumnya tidak relevan, kecuali pada kelainan bawaan kelopak.',
       riwayatPengobatan:
         'Tetes mata yang sudah dipakai beserta lamanya — riwayat pemakaian antibiotik tetes berulang tanpa perbaikan justru mendukung penyebab mekanis. Tanyakan pula riwayat mencabut bulu mata sendiri.',
-      riwayatAlergi: 'History alergi obat dan alergi terhadap tetes mata sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan alergi terhadap tetes mata sebelumnya.',
       riwayatSosialEkonomi:
-        'Residence di daerah dengan trakoma, ketersediaan air bersih dan kebiasaan mencuci muka, sanitasi lingkungan, pekerjaan yang terpapar debu dan angin, serta kemampuan datang berkala untuk tindakan yang mungkin perlu diulang.',
+        'Tempat tinggal di daerah dengan trakoma, ketersediaan air bersih dan kebiasaan mencuci muka, sanitasi lingkungan, pekerjaan yang terpapar debu dan angin, serta kemampuan datang berkala untuk tindakan yang mungkin perlu diulang.',
     },
     pemeriksaanFisik: [
       'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah menahun',
@@ -12195,7 +12195,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Tinggal di daerah endemis trakoma dengan air bersih yang terbatas dan sanitasi yang buruk',
       'Blefaritis menahun yang tidak tertangani',
-      'History trauma, luka bakar kimia, dan operasi pada kelopak mata',
+      'Riwayat trauma, luka bakar kimia, dan operasi pada kelopak mata',
       'Sindrom Stevens-Johnson dan pemfigoid membran mukosa',
       'Herpes zoster oftalmikus',
       'Usia lanjut',
@@ -12213,7 +12213,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Keratitis akibat sebab lain seperti infeksi maupun paparan pada mata yang tidak menutup sempurna',
     ],
     pengkajian:
-      'Dipikirkan trikiasis pada pasien ini atas dasar keluhan menahun berupa rasa mengganjal dan menusuk pada satu mata yang bertambah setiap kali berkedip, disertai mata berair dan merah yang menetap, dan yang paling menentukan — ditemukannya bulu mata yang tumbuh mengarah ke bola mata pada tepi kelopak yang kedudukannya tetap normal. History mata merah berulang yang selalu diobati sebagai infeksi namun tidak pernah benar-benar sembuh merupakan petunjuk yang kuat ke arah penyebab mekanis, sebab gesekan tidak akan mereda oleh tetes antibiotik sebanyak apa pun. Entropion merupakan banding yang paling penting dan dibedakan dengan melihat tepi kelopaknya: pada entropion seluruh tepi kelopak melipat ke dalam sehingga seluruh barisan bulu mata menyentuh mata, sedangkan pada kasus ini kedudukan kelopak normal dan hanya beberapa helai bulu mata yang salah arah — perbedaan ini bukan sekadar penamaan, karena entropion memerlukan koreksi kedudukan kelopak melalui pembedahan sementara trikiasis dapat ditangani per helai. Benda asing disingkirkan karena keluhan berlangsung menahun alih-alih mendadak, meskipun membalik kelopak atas tetap dikerjakan untuk memastikan. Mata kering disingkirkan karena keluhan terpusat pada satu mata dan pada satu titik, sedangkan mata kering mengenai kedua mata secara merata. Konjungtivitis menahun tidak sesuai karena tidak ada sekret yang bermakna dan kemerahan terpusat pada bagian yang tergesek. Pewarnaan fluoresein pada kasus ini memperlihatkan erosi kornea yang letaknya bersesuaian dengan bulu mata yang menyimpang, dan temuan tersebut sekaligus membuktikan mekanisme sekaligus menunjukkan bahwa kerusakan sudah terjadi. History trakoma ditelusuri secara khusus karena merupakan penyebab tersering di daerah endemis, dan jaringan parut mendatar pada konjungtiva tarsal saat kelopak dibalik akan memastikannya. Perlu ditekankan bahwa keadaan ini merupakan penyebab kebutaan yang sepenuhnya dapat dicegah, sehingga menunda tindakan berarti membiarkan kornea rusak permanen oleh sesuatu yang penanganannya sederhana.',
+      'Dipikirkan trikiasis pada pasien ini atas dasar keluhan menahun berupa rasa mengganjal dan menusuk pada satu mata yang bertambah setiap kali berkedip, disertai mata berair dan merah yang menetap, dan yang paling menentukan — ditemukannya bulu mata yang tumbuh mengarah ke bola mata pada tepi kelopak yang kedudukannya tetap normal. Riwayat mata merah berulang yang selalu diobati sebagai infeksi namun tidak pernah benar-benar sembuh merupakan petunjuk yang kuat ke arah penyebab mekanis, sebab gesekan tidak akan mereda oleh tetes antibiotik sebanyak apa pun. Entropion merupakan banding yang paling penting dan dibedakan dengan melihat tepi kelopaknya: pada entropion seluruh tepi kelopak melipat ke dalam sehingga seluruh barisan bulu mata menyentuh mata, sedangkan pada kasus ini kedudukan kelopak normal dan hanya beberapa helai bulu mata yang salah arah — perbedaan ini bukan sekadar penamaan, karena entropion memerlukan koreksi kedudukan kelopak melalui pembedahan sementara trikiasis dapat ditangani per helai. Benda asing disingkirkan karena keluhan berlangsung menahun alih-alih mendadak, meskipun membalik kelopak atas tetap dikerjakan untuk memastikan. Mata kering disingkirkan karena keluhan terpusat pada satu mata dan pada satu titik, sedangkan mata kering mengenai kedua mata secara merata. Konjungtivitis menahun tidak sesuai karena tidak ada sekret yang bermakna dan kemerahan terpusat pada bagian yang tergesek. Pewarnaan fluoresein pada kasus ini memperlihatkan erosi kornea yang letaknya bersesuaian dengan bulu mata yang menyimpang, dan temuan tersebut sekaligus membuktikan mekanisme sekaligus menunjukkan bahwa kerusakan sudah terjadi. Riwayat trakoma ditelusuri secara khusus karena merupakan penyebab tersering di daerah endemis, dan jaringan parut mendatar pada konjungtiva tarsal saat kelopak dibalik akan memastikannya. Perlu ditekankan bahwa keadaan ini merupakan penyebab kebutaan yang sepenuhnya dapat dicegah, sehingga menunda tindakan berarti membiarkan kornea rusak permanen oleh sesuatu yang penanganannya sederhana.',
     terapiSuportif: [
       'Air mata buatan dan gel mata untuk mengurangi gesekan dan melindungi permukaan kornea sementara menunggu tindakan definitif',
       'Salep mata pada malam hari bila kerusakan kornea sudah bermakna',
@@ -12393,11 +12393,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: nyeri kepala yang khas berada di daerah dahi dan sekitar mata. Onset: perlahan; pada anak dan dewasa muda keluhan lebih menonjol sebagai kelelahan mata daripada sebagai penglihatan kabur, dan hal inilah yang membuat hipermetropia ringan sering tidak terdeteksi. Character: KELUHAN KHAS BUKAN KABUR MELAINKAN ASTENOPIA — mata terasa berat, pegal, panas, berair, dan pandangan sesekali mengabur lalu jernih kembali. Radiation: nyeri kepala menjalar ke pelipis dan tengkuk. Associations: mengantuk saat membaca, sulit berkonsentrasi, kadang mual; tanyakan pula mata juling ke dalam yang muncul saat melihat dekat, karena akomodasi yang berlebihan memicu konvergensi berlebih. Time course: keluhan MEMBERAT PADA SORE HARI DAN SETELAH LAMA MEMBACA, dan mereda setelah istirahat maupun tidur — pola waktu ini merupakan petunjuk yang sangat khas. Exacerbating: pekerjaan dekat yang lama, kelelahan, dan pencahayaan yang kurang. Relieving: istirahat mata dan menjauhkan bacaan. Severity: dampak terhadap kemampuan belajar dan bekerja.',
       riwayatPenyakitDahulu:
-        'History kacamata sebelumnya, mata malas, juling terutama juling ke dalam, trauma dan operasi mata. Pada anak, riwayat kelahiran dan tumbuh kembang. Diabetes melitus yang dapat mengubah refraksi secara sementara.',
+        'Riwayat kacamata sebelumnya, mata malas, juling terutama juling ke dalam, trauma dan operasi mata. Pada anak, riwayat kelahiran dan tumbuh kembang. Diabetes melitus yang dapat mengubah refraksi secara sementara.',
       riwayatPenyakitKeluarga:
-        'History hipermetropia, juling ke dalam, dan mata malas pada keluarga — hipermetropia merupakan penyebab tersering juling akomodatif pada anak yang sering ditemukan berulang dalam satu keluarga.',
+        'Riwayat hipermetropia, juling ke dalam, dan mata malas pada keluarga — hipermetropia merupakan penyebab tersering juling akomodatif pada anak yang sering ditemukan berulang dalam satu keluarga.',
       riwayatPengobatan: 'Obat mata dan obat sistemik yang memengaruhi akomodasi maupun ukuran pupil.',
-      riwayatAlergi: 'History alergi obat dan bahan bingkai kacamata.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai kacamata.',
       riwayatTumbuhKembang:
         'Pada anak, nilai perkembangan penglihatan, kemampuan mengenali benda dan wajah dari jarak jauh, serta prestasi belajar dan kemauan membaca — anak dengan hipermetropia yang tidak terkoreksi sering dianggap malas membaca padahal sebenarnya cepat lelah.',
       riwayatSosialEkonomi:
@@ -12426,11 +12426,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Pada hipermetropia, panjang bola mata tidak sepadan dengan daya biasnya sehingga titik fokus jatuh di belakang retina. Berbeda dari miopia, mata memiliki kemampuan mengoreksi keadaan ini sendiri melalui akomodasi — lensa mencembung sehingga daya biasnya bertambah dan bayangan tertarik maju ke retina. Kemampuan inilah yang menjelaskan mengapa hipermetropia ringan pada usia muda sering tidak menimbulkan penglihatan kabur sama sekali, tetapi menimbulkan kelelahan: mata harus berakomodasi terus-menerus bahkan saat melihat jauh, dan lebih keras lagi saat melihat dekat. Otot siliaris yang bekerja tanpa henti menimbulkan astenopia berupa nyeri kepala di dahi, mata pegal, dan pandangan yang sesekali mengabur, yang khasnya memberat pada sore hari dan mereda setelah istirahat. Karena akomodasi selalu disertai konvergensi secara refleks, akomodasi berlebihan dapat menarik kedua mata ke dalam dan menimbulkan juling akomodatif — hubungan inilah yang menjadikan hipermetropia sebagai penyebab tersering juling ke dalam pada anak, dan mengapa memberikan kacamata positif dapat meluruskan mata tanpa operasi. Seiring bertambahnya usia, daya akomodasi menurun sehingga hipermetropia yang sebelumnya tersembunyi mulai muncul sebagai penglihatan kabur, mula-mula untuk jarak dekat lalu untuk jarak jauh.',
     faktorRisiko: [
-      'History hipermetropia dan juling pada keluarga',
+      'Riwayat hipermetropia dan juling pada keluarga',
       'Usia anak — hampir semua bayi lahir dengan hipermetropia fisiologis yang berkurang seiring pertumbuhan bola mata',
       'Bertambahnya usia yang menurunkan daya akomodasi sehingga hipermetropia tersembunyi menjadi nyata',
       'Bola mata yang lebih kecil karena kelainan bawaan',
-      'Occupation yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan',
+      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan',
     ],
     goldStandard:
       'Diagnosis ditegakkan dengan refraksi sikloplegik, yang merupakan baku emas pada hipermetropia karena akomodasi aktif dapat menyembunyikan sebagian besar derajatnya. Koreksi menggunakan lensa sferis positif dengan prinsip memilih lensa positif terbesar yang masih memberikan tajam penglihatan terbaik, sebab tujuannya membebaskan mata dari akomodasi berlebih — berlawanan dengan prinsip pada miopia.',
@@ -12493,11 +12493,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan penglihatan. Site: satu mata atau kedua mata, dan apakah keluhan menetap pada seluruh lapang pandang. Onset: perlahan, umumnya mulai pada usia sekolah dan bertambah selama masa pertumbuhan; PENURUNAN PENGLIHATAN YANG MENDADAK BUKAN GAMBARAN KELAINAN REFRAKSI dan harus dianggap sebagai kelainan lain sampai terbukti sebaliknya. Character: kabur yang membaik bila objek didekatkan atau bila mata dipicingkan — kebiasaan memicingkan mata merupakan petunjuk yang sangat khas karena mempersempit celah pupil sehingga bayangan menjadi lebih tajam. Radiation: tidak ada. Associations: sakit kepala, mata lelah, dan mata berair setelah lama melihat jauh; TANYAKAN GEJALA YANG MENANDAKAN KELAINAN LAIN — melihat kilatan cahaya, bayangan melayang yang bertambah banyak mendadak, atau tirai gelap pada sebagian lapang pandang mengarah pada ablasio retina dan merupakan kegawatan. Time course: apakah derajat kaburnya bertambah cepat, karena pertambahan yang cepat memerlukan pemeriksaan lebih sering. Exacerbating: cahaya redup dan malam hari karena pupil melebar. Severity: dampak terhadap prestasi sekolah, pekerjaan, dan keselamatan berkendara.',
       riwayatPenyakitDahulu:
-        'History pemakaian kacamata sebelumnya beserta ukurannya dan kapan terakhir diperiksa, riwayat trauma mata, operasi mata, mata malas, juling, serta penyakit mata lain. History prematur dan retinopati prematuritas pada anak. Diabetes melitus, karena perubahan gula darah dapat mengubah ukuran refraksi secara sementara.',
+        'Riwayat pemakaian kacamata sebelumnya beserta ukurannya dan kapan terakhir diperiksa, riwayat trauma mata, operasi mata, mata malas, juling, serta penyakit mata lain. Riwayat prematur dan retinopati prematuritas pada anak. Diabetes melitus, karena perubahan gula darah dapat mengubah ukuran refraksi secara sementara.',
       riwayatPenyakitKeluarga:
-        'History miopia pada orang tua dan saudara kandung — faktor bawaan sangat kuat, dan risiko anak meningkat bermakna bila kedua orang tua miopia. Tanyakan pula riwayat miopia derajat tinggi, glaukoma, dan ablasio retina pada keluarga.',
+        'Riwayat miopia pada orang tua dan saudara kandung — faktor bawaan sangat kuat, dan risiko anak meningkat bermakna bila kedua orang tua miopia. Tanyakan pula riwayat miopia derajat tinggi, glaukoma, dan ablasio retina pada keluarga.',
       riwayatPengobatan: 'Obat mata yang sedang dipakai serta obat sistemik yang dapat memengaruhi akomodasi.',
-      riwayatAlergi: 'History alergi obat dan bahan bingkai maupun lensa kontak.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai maupun lensa kontak.',
       riwayatSosialEkonomi:
         'LAMA WAKTU MELIHAT DEKAT SETIAP HARI termasuk membaca, telepon genggam, dan komputer, serta LAMA WAKTU BERAKTIVITAS DI LUAR RUANGAN — keduanya merupakan faktor lingkungan yang paling berkaitan dengan perkembangan miopia pada anak. Tanyakan pula pencahayaan saat belajar, jarak baca, jenis pekerjaan, kemampuan membeli kacamata, dan pada anak posisi tempat duduk di kelas.',
     },
@@ -12524,7 +12524,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Pada mata normal, berkas cahaya sejajar dari objek jauh dibiaskan kornea dan lensa sehingga tepat jatuh di retina saat mata tidak berakomodasi. Pada miopia, bola mata tumbuh terlalu panjang atau daya biasnya terlalu kuat, sehingga titik fokus jatuh di depan retina dan bayangan yang sampai ke retina menjadi kabur. Objek yang didekatkan memiliki berkas cahaya yang menyebar, sehingga titik fokusnya bergeser mundur dan jatuh tepat di retina — inilah sebabnya penderita miopia justru melihat dekat dengan jelas tanpa alat bantu, dan mengapa keluhan pertama hampir selalu berupa kesulitan melihat papan tulis alih-alih kesulitan membaca. Karena pertumbuhan bola mata berlangsung selama masa anak dan remaja, derajat miopia umumnya bertambah pada periode tersebut lalu cenderung stabil pada dewasa muda. Aktivitas melihat dekat yang berkepanjangan dan kurangnya waktu di luar ruangan diduga mendorong pemanjangan sumbu bola mata, sedangkan paparan cahaya terang di luar ruangan merangsang pelepasan dopamin retina yang menghambatnya — dasar mengapa anjuran bermain di luar rumah merupakan pencegahan yang nyata dan bukan sekadar saran umum. Koreksi dilakukan dengan lensa sferis negatif yang menyebarkan berkas cahaya sebelum masuk mata sehingga titik fokus bergeser mundur tepat ke retina.',
     faktorRisiko: [
-      'History miopia pada orang tua, terutama bila keduanya miopia',
+      'Riwayat miopia pada orang tua, terutama bila keduanya miopia',
       'Aktivitas melihat dekat yang lama dan terus-menerus',
       'Waktu di luar ruangan yang kurang dari 2 jam per hari pada anak',
       'Usia sekolah dan remaja saat bola mata masih bertumbuh',
@@ -12590,9 +12590,9 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: satu atau kedua mata; keluhan dirasakan pada seluruh jarak. Onset: perlahan, umumnya sudah ada sejak masa anak karena bentuk kornea bersifat bawaan; astigmatisme yang timbul atau bertambah cepat pada dewasa harus dicurigai akibat keratokonus, trauma, jaringan parut kornea, maupun pascaoperasi. Character: PEMBEDA UTAMA DARI KELAINAN REFRAKSI LAIN ADALAH BAYANGAN BERBAYANG ATAU MEMANJANG, bukan sekadar kabur; pasien sering menggambarkan huruf yang tampak ganda samar atau lampu yang memanjang seperti garis. Radiation: nyeri kepala di daerah dahi dan pelipis. Associations: mata lelah, memicingkan mata, memiringkan kepala, dan silau terutama saat menyetir malam hari karena lampu tampak menyilaukan dengan pancaran memanjang. Time course: relatif menetap; bila bertambah cepat, telusuri keratokonus terutama pada remaja yang sering menggosok mata. Exacerbating: cahaya redup, kelelahan, dan pekerjaan dekat lama. Severity: dampak terhadap belajar, bekerja, dan berkendara malam hari.',
       riwayatPenyakitDahulu:
-        'History kacamata sebelumnya beserta ada tidaknya lensa silinder, riwayat trauma dan operasi mata, riwayat infeksi kornea yang meninggalkan jaringan parut, riwayat bintitan besar maupun tumor kelopak yang menekan bola mata, serta riwayat mata malas dan juling.',
+        'Riwayat kacamata sebelumnya beserta ada tidaknya lensa silinder, riwayat trauma dan operasi mata, riwayat infeksi kornea yang meninggalkan jaringan parut, riwayat bintitan besar maupun tumor kelopak yang menekan bola mata, serta riwayat mata malas dan juling.',
       riwayatPenyakitKeluarga:
-        'History astigmatisme, keratokonus, dan kelainan refraksi lain pada keluarga; keratokonus memiliki kecenderungan bawaan.',
+        'Riwayat astigmatisme, keratokonus, dan kelainan refraksi lain pada keluarga; keratokonus memiliki kecenderungan bawaan.',
       riwayatPengobatan: 'Obat mata yang sedang dipakai serta riwayat pemakaian lensa kontak.',
       riwayatAlergi:
         'RIWAYAT ALERGI MATA DAN RINITIS ALERGIKA PENTING DITANYAKAN — mata alergi menimbulkan gatal hebat sehingga pasien sering menggosok mata, dan menggosok mata berulang merupakan faktor risiko keratokonus yang memperberat astigmatisme.',
@@ -12621,9 +12621,9 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Kornea normal berbentuk hampir seperti permukaan bola sehingga daya biasnya sama pada semua arah dan cahaya terfokus pada satu titik. Pada astigmatisme, kelengkungan pada satu meridian berbeda dari meridian yang tegak lurus terhadapnya — bentuknya lebih menyerupai permukaan bola rugbi — sehingga cahaya dibiaskan dengan kekuatan berbeda menurut arahnya dan membentuk dua garis fokus yang terpisah alih-alih satu titik. Inilah dasar mengapa keluhannya bukan sekadar kabur melainkan bayangan yang tampak berbayang atau memanjang ke satu arah, dan mengapa lampu pada malam hari terlihat memancar seperti garis. Karena kesalahannya bergantung pada arah, koreksinya pun harus berarah: lensa silinder hanya membiaskan pada satu meridian, sehingga selain kekuatannya, SUMBUNYA harus tepat — kesalahan sumbu membuat kacamata terasa tidak nyaman meskipun kekuatannya benar, dan hal ini merupakan sebab tersering pasien mengeluh pusing dengan kacamata barunya. Pada astigmatisme tidak beraturan seperti keratokonus, permukaan kornea tidak lagi memiliki dua meridian utama yang teratur sehingga tidak dapat dikoreksi sepenuhnya dengan kacamata dan memerlukan lensa kontak keras maupun tindakan lain. Astigmatisme yang tidak dikoreksi pada masa perkembangan penglihatan anak menyebabkan bayangan yang selalu kabur pada semua jarak, sehingga berisiko menimbulkan mata malas.',
     faktorRisiko: [
-      'History astigmatisme dan keratokonus pada keluarga',
+      'Riwayat astigmatisme dan keratokonus pada keluarga',
       'Kebiasaan menggosok mata, terutama pada penderita alergi mata',
-      'History infeksi kornea, trauma, dan operasi mata',
+      'Riwayat infeksi kornea, trauma, dan operasi mata',
       'Pterigium yang meluas hingga menarik kornea',
       'Bintitan besar, kalazion, maupun tumor kelopak yang menekan bola mata',
       'Prematuritas',
@@ -12641,7 +12641,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Mata kering yang menimbulkan kabur hilang timbul dan membaik setelah berkedip',
     ],
     pengkajian:
-      'Dipikirkan astigmatisme ringan pada pasien ini atas dasar keluhan penglihatan yang tidak sekadar kabur melainkan tampak berbayang dan memanjang ke satu arah, dirasakan baik pada jarak jauh maupun dekat, disertai mata cepat lelah, nyeri kepala, dan silau saat melihat lampu pada malam hari. Sifat bayangan yang berbayang inilah pembeda utamanya dari miopia maupun hipermetropia murni yang hanya menimbulkan kekaburan tanpa penggandaan, dan gambaran tersebut mencerminkan cahaya yang terfokus menjadi dua garis alih-alih satu titik akibat kelengkungan kornea yang tidak sama pada semua arah. Penglihatan ganda akibat kelainan otot mata disingkirkan dengan cara sederhana yaitu menutup salah satu mata: pada kelainan otot, bayangan ganda menghilang, sedangkan pada astigmatisme bayangan berbayang tetap ada meski hanya satu mata yang dipakai. Katarak dan kekeruhan kornea dipertimbangkan karena juga dapat menimbulkan penglihatan ganda pada satu mata dan silau, namun disingkirkan melalui pemeriksaan segmen anterior serta oleh terkoreksinya tajam penglihatan menjadi normal dengan kombinasi lensa sferis dan silinder. Keratokonus merupakan kemungkinan yang paling perlu diwaspadai karena juga menimbulkan astigmatisme, namun pada kasus ini astigmatisme bersifat menetap alih-alih bertambah cepat, kornea tampak jernih tanpa penonjolan maupun penipisan, dan tajam penglihatan terkoreksi penuh dengan kacamata — bila salah satu dari itu tidak terpenuhi, topografi kornea menjadi wajib. History menggosok mata dan alergi mata ditelusuri secara khusus pada kasus ini, sebab kebiasaan tersebut merupakan faktor risiko keratokonus yang dapat dicegah, dan menghentikannya merupakan bagian dari tatalaksana alih-alih sekadar anjuran kebersihan. Perlu ditekankan bahwa ketepatan sumbu lensa silinder sama pentingnya dengan kekuatannya, karena sumbu yang meleset membuat pasien merasa pusing dengan kacamata barunya meski ukurannya benar.',
+      'Dipikirkan astigmatisme ringan pada pasien ini atas dasar keluhan penglihatan yang tidak sekadar kabur melainkan tampak berbayang dan memanjang ke satu arah, dirasakan baik pada jarak jauh maupun dekat, disertai mata cepat lelah, nyeri kepala, dan silau saat melihat lampu pada malam hari. Sifat bayangan yang berbayang inilah pembeda utamanya dari miopia maupun hipermetropia murni yang hanya menimbulkan kekaburan tanpa penggandaan, dan gambaran tersebut mencerminkan cahaya yang terfokus menjadi dua garis alih-alih satu titik akibat kelengkungan kornea yang tidak sama pada semua arah. Penglihatan ganda akibat kelainan otot mata disingkirkan dengan cara sederhana yaitu menutup salah satu mata: pada kelainan otot, bayangan ganda menghilang, sedangkan pada astigmatisme bayangan berbayang tetap ada meski hanya satu mata yang dipakai. Katarak dan kekeruhan kornea dipertimbangkan karena juga dapat menimbulkan penglihatan ganda pada satu mata dan silau, namun disingkirkan melalui pemeriksaan segmen anterior serta oleh terkoreksinya tajam penglihatan menjadi normal dengan kombinasi lensa sferis dan silinder. Keratokonus merupakan kemungkinan yang paling perlu diwaspadai karena juga menimbulkan astigmatisme, namun pada kasus ini astigmatisme bersifat menetap alih-alih bertambah cepat, kornea tampak jernih tanpa penonjolan maupun penipisan, dan tajam penglihatan terkoreksi penuh dengan kacamata — bila salah satu dari itu tidak terpenuhi, topografi kornea menjadi wajib. Riwayat menggosok mata dan alergi mata ditelusuri secara khusus pada kasus ini, sebab kebiasaan tersebut merupakan faktor risiko keratokonus yang dapat dicegah, dan menghentikannya merupakan bagian dari tatalaksana alih-alih sekadar anjuran kebersihan. Perlu ditekankan bahwa ketepatan sumbu lensa silinder sama pentingnya dengan kekuatannya, karena sumbu yang meleset membuat pasien merasa pusing dengan kacamata barunya meski ukurannya benar.',
     terapiSuportif: [
       'HENTIKAN KEBIASAAN MENGGOSOK MATA dan obati alergi mata yang menjadi penyebabnya — langkah ini merupakan pencegahan keratokonus yang paling nyata',
       'Perbaiki penerangan saat membaca dan bekerja',
@@ -12691,11 +12691,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: keluhan hanya pada penglihatan dekat. Onset: perlahan mulai usia sekitar 40 tahun, dan lebih dini pada penderita hipermetropia yang cadangan akomodasinya sudah terpakai sejak lama. Character: TANDA YANG PALING KHAS ADALAH KEBIASAAN MENJAUHKAN BACAAN untuk memperjelas huruf — gejala ini hampir selalu dikenali pasien sendiri bila ditanyakan. Radiation: nyeri kepala di daerah dahi setelah membaca lama. Associations: mata lelah, pegal, berair, mengantuk saat membaca, dan pandangan yang perlu waktu untuk menyesuaikan saat berpindah dari melihat jauh ke dekat. Time course: MEMBERAT PADA SORE DAN MALAM HARI serta saat lelah, dan lebih terasa dalam pencahayaan yang redup karena pupil melebar sehingga kedalaman fokus berkurang. Exacerbating: cahaya kurang, kelelahan, dan huruf berukuran kecil. Relieving: menjauhkan bacaan dan menambah penerangan. Severity: dampak terhadap pekerjaan, membaca, dan penggunaan telepon genggam.',
       riwayatPenyakitDahulu:
-        'History kelainan refraksi sebelumnya dan pemakaian kacamata, riwayat operasi mata termasuk operasi katarak, trauma mata, serta diabetes melitus yang dapat mempercepat menurunnya akomodasi dan mengubah refraksi secara berfluktuasi.',
-      riwayatPenyakitKeluarga: 'History glaukoma dan katarak pada keluarga sebagai bagian penapisan pada kelompok usia ini.',
+        'Riwayat kelainan refraksi sebelumnya dan pemakaian kacamata, riwayat operasi mata termasuk operasi katarak, trauma mata, serta diabetes melitus yang dapat mempercepat menurunnya akomodasi dan mengubah refraksi secara berfluktuasi.',
+      riwayatPenyakitKeluarga: 'Riwayat glaukoma dan katarak pada keluarga sebagai bagian penapisan pada kelompok usia ini.',
       riwayatPengobatan:
         'Obat yang dapat mengganggu akomodasi seperti antikolinergik, antidepresan trisiklik, dan antihistamin; obat mata yang sedang dipakai.',
-      riwayatAlergi: 'History alergi obat dan bahan bingkai kacamata.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan bingkai kacamata.',
       riwayatSosialEkonomi:
         'JENIS PEKERJAAN DAN JARAK KERJA SEHARI-HARI sangat menentukan ukuran kacamata yang diresepkan — penjahit, pembaca, pengguna komputer, dan pekerja bengkel memerlukan jarak kerja yang berbeda sehingga tambahan lensa yang tepat pun berbeda. Tanyakan pula pencahayaan tempat kerja dan kemampuan membeli kacamata.',
     },
@@ -12726,7 +12726,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Hipermetropia yang belum terkoreksi, yang memunculkan presbiopia lebih dini',
       'Diabetes melitus dan penyakit kardiovaskular',
       'Obat antikolinergik, antidepresan, dan antihistamin',
-      'Occupation yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan lebih cepat disadari',
+      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan lebih cepat disadari',
       'Tinggal di daerah beriklim panas dilaporkan berkaitan dengan awitan yang lebih dini',
     ],
     goldStandard:
@@ -12815,12 +12815,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kedua mata. Onset: perlahan; pada kekurangan vitamin A berkembang dalam hitungan minggu hingga bulan seiring memburuknya gizi. Character: kesulitan yang HANYA muncul pada cahaya redup sementara penglihatan siang hari tetap baik, serta waktu penyesuaian yang jauh lebih lama saat masuk ke ruangan gelap. Radiation: tidak khas. Associations: TANYAKAN TANDA XEROFTALMIA LAIN — mata terasa kering, konjungtiva tampak kusam dan berkerut, bercak putih berbusa pada konjungtiva, kornea yang tampak suram, dan pada tahap lanjut kornea yang melunak; tanyakan pula sering sakit, diare berulang, campak dalam waktu dekat, dan penurunan berat badan. Pada dewasa, tanyakan penyempitan lapang pandang tepi dan riwayat keluarga yang mengarah pada retinitis pigmentosa. Time course: apakah memberat, dan apakah berkaitan dengan periode sakit maupun kekurangan makan. Exacerbating: cahaya redup dan malam hari. Severity: apakah anak sampai tidak mampu menemukan makanan atau mainannya sendiri saat senja — pertanyaan konkret ini jauh lebih dapat diandalkan daripada menanyakan penglihatan secara umum kepada orang tua.',
       riwayatPenyakitDahulu:
-        'Campak dalam 3 bulan terakhir, diare berulang, infeksi saluran napas berulang, tuberkulosis, cacingan, dan penyakit yang mengganggu penyerapan lemak seperti penyakit hati, penyakit pankreas, penyakit seliak, dan fibrosis kistik. History operasi bariatrik pada dewasa. History miopia tinggi, katarak, dan glaukoma yang juga menyulitkan penglihatan malam.',
+        'Campak dalam 3 bulan terakhir, diare berulang, infeksi saluran napas berulang, tuberkulosis, cacingan, dan penyakit yang mengganggu penyerapan lemak seperti penyakit hati, penyakit pankreas, penyakit seliak, dan fibrosis kistik. Riwayat operasi bariatrik pada dewasa. Riwayat miopia tinggi, katarak, dan glaukoma yang juga menyulitkan penglihatan malam.',
       riwayatPenyakitKeluarga:
         'RIWAYAT BUTA SENJA SEJAK KECIL DAN PENYEMPITAN LAPANG PANDANG PADA KELUARGA mengarah pada retinitis pigmentosa yang bersifat menurun; tanyakan pula riwayat perkawinan sedarah.',
       riwayatPengobatan:
-        'History pemberian kapsul vitamin A dan kapan terakhir diberikan, riwayat pengobatan cacing, serta obat yang memengaruhi penyerapan lemak.',
-      riwayatAlergi: 'History alergi obat.',
+        'Riwayat pemberian kapsul vitamin A dan kapan terakhir diberikan, riwayat pengobatan cacing, serta obat yang memengaruhi penyerapan lemak.',
+      riwayatAlergi: 'Riwayat alergi obat.',
       riwayatKehamilanPersalinan:
         'Pada ibu, riwayat pemberian vitamin A setelah melahirkan; buta senja pada ibu hamil merupakan penanda kekurangan vitamin A yang berkaitan dengan meningkatnya risiko kematian ibu dan bayi.',
       riwayatTumbuhKembang:
@@ -12862,7 +12862,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Tidak mendapat kapsul vitamin A pada jadwal pemberian di posyandu',
       'Penyakit yang mengganggu penyerapan lemak dan penyakit hati',
       'Kehamilan dan menyusui yang meningkatkan kebutuhan',
-      'History keluarga dengan retinitis pigmentosa pada kasus dewasa',
+      'Riwayat keluarga dengan retinitis pigmentosa pada kasus dewasa',
     ],
     goldStandard:
       'Pada anak, diagnosis kekurangan vitamin A ditegakkan secara klinis dari riwayat buta senja bersama tanda xeroftalmia berupa xerosis konjungtiva, bercak Bitot, maupun kelainan kornea, dan pengobatan harus dimulai berdasarkan penilaian klinis tanpa menunggu hasil laboratorium. Kadar retinol serum kurang dari 20 mikrogram/dL mendukung namun dapat menyesatkan pada keadaan infeksi. Pada dewasa tanpa faktor risiko gizi, penegakan penyebab memerlukan funduskopi, pemeriksaan lapang pandang, dan elektroretinografi untuk mengenali retinitis pigmentosa.',
@@ -13098,11 +13098,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: keluhan bersifat menyeluruh dengan pusat pada perut dan kepala. Onset: muncul beberapa menit sampai jam setelah perjalanan dimulai; TANYAKAN JENIS PERJALANANNYA — mobil di jalan berkelok, kapal, pesawat, kereta, wahana permainan, maupun permainan realitas maya. Character: diawali rasa tidak enak di perut, menguap berulang, dan mengantuk, kemudian keringat dingin, air liur bertambah, pucat, mual, dan muntah; PERLU DIKETAHUI BAHWA GEJALA AWAL SERING BERUPA MENGUAP DAN RASA TIDAK ENAK YANG SAMAR, sehingga mengenalinya memungkinkan tindakan pencegahan sebelum muntah terjadi. Radiation: nyeri kepala menyertai. Associations: TANYAKAN GEJALA YANG BUKAN MABUK PERJALANAN — vertigo berputar yang timbul saat DIAM dan tidak sedang bepergian, gangguan pendengaran, telinga berdenging, penglihatan ganda, kelemahan anggota gerak, dan bicara pelo; semuanya mengarah pada kelainan telinga dalam maupun susunan saraf pusat. Time course: keluhan mereda dalam beberapa menit sampai jam setelah perjalanan berakhir dan tubuh menyesuaikan diri. Exacerbating: MEMBACA MAUPUN MELIHAT LAYAR SELAMA PERJALANAN, duduk di kursi belakang, ruangan pengap dan berbau tajam, perut yang terlalu kosong maupun terlalu penuh, alkohol, dan kecemasan. Relieving: melihat cakrawala, udara segar, berbaring, dan tidur. Severity: dampak terhadap pekerjaan, pendidikan, dan kemauan bepergian.',
       riwayatPenyakitDahulu:
-        'History migren yang sangat berkaitan dengan kepekaan terhadap gerakan; riwayat vertigo, penyakit Meniere, dan gangguan telinga dalam. History mabuk perjalanan sejak kecil.',
-      riwayatPenyakitKeluarga: 'History mabuk perjalanan dan migren pada keluarga, karena kepekaan ini sangat dipengaruhi keturunan.',
+        'Riwayat migren yang sangat berkaitan dengan kepekaan terhadap gerakan; riwayat vertigo, penyakit Meniere, dan gangguan telinga dalam. Riwayat mabuk perjalanan sejak kecil.',
+      riwayatPenyakitKeluarga: 'Riwayat mabuk perjalanan dan migren pada keluarga, karena kepekaan ini sangat dipengaruhi keturunan.',
       riwayatPengobatan:
         'Obat yang sudah dicoba beserta hasil dan efek sampingnya, khususnya rasa kantuk; obat lain yang menyebabkan kantuk maupun mual; serta obat antikolinergik yang berpotensi berinteraksi.',
-      riwayatAlergi: 'History alergi obat, terutama antihistamin dan skopolamin.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antihistamin dan skopolamin.',
       riwayatKehamilanPersalinan:
         'Status kehamilan pada perempuan usia subur, karena keluhan mual dapat berasal dari kehamilan dan pilihan obat pun berbeda.',
       riwayatNutrisi: 'Kebiasaan makan sebelum bepergian, konsumsi makanan berlemak dan berbau tajam, serta konsumsi alkohol.',
@@ -13134,7 +13134,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Usia 2-12 tahun sebagai kelompok paling rentan',
       'Jenis kelamin perempuan, terutama saat haid dan kehamilan',
-      'History migren dan riwayat mabuk perjalanan pada keluarga',
+      'Riwayat migren dan riwayat mabuk perjalanan pada keluarga',
       'MEMBACA MAUPUN MELIHAT LAYAR SELAMA PERJALANAN',
       'Duduk di kursi belakang maupun di bagian belakang kapal dan pesawat',
       'Ruangan pengap, panas, dan berbau tajam',
@@ -13229,12 +13229,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: pada vestibulum hidung yaitu bagian berambut di pintu masuk lubang hidung, umumnya satu sisi. Onset: dalam beberapa hari, sering didahului mencabut bulu hidung, mengorek hidung, atau memencet jerawat di sekitar hidung. Character: NYERI YANG TIDAK SEBANDING DENGAN UKURANNYA — benjolan kecil namun terasa berdenyut hebat, karena kulit vestibulum melekat erat pada tulang rawan sehingga pembengkakan sekecil apa pun menimbulkan tekanan besar. Radiation: nyeri menjalar ke ujung hidung, pipi, dan gigi atas. Associations: TANYAKAN TANDA PENYEBARAN YANG MENGANCAM JIWA — demam tinggi, menggigil, nyeri kepala hebat, penglihatan ganda atau kabur, kelopak mata bengkak, mata menonjol, dan penurunan kesadaran; semuanya mengarah pada trombosis sinus kavernosus dan merupakan kegawatan. Time course: umumnya memuncak dalam 3-5 hari lalu pecah sendiri; perburukan yang cepat dengan pembengkakan meluas ke pipi dan kelopak mata sangat mencurigakan. Exacerbating: menyentuh, memencet, dan mengunyah. Severity: nilai nyeri, demam, dan gangguan tidur.',
       riwayatPenyakitDahulu:
-        'DIABETES MELITUS wajib ditanyakan dan diperiksa, terutama pada furunkel yang berulang maupun berat. History furunkel berulang di tempat lain, keadaan imunitas menurun, infeksi HIV, dan penyakit kulit menahun. History infeksi kulit oleh Staphylococcus aureus resisten metisilin.',
+        'DIABETES MELITUS wajib ditanyakan dan diperiksa, terutama pada furunkel yang berulang maupun berat. Riwayat furunkel berulang di tempat lain, keadaan imunitas menurun, infeksi HIV, dan penyakit kulit menahun. Riwayat infeksi kulit oleh Staphylococcus aureus resisten metisilin.',
       riwayatPenyakitKeluarga:
         'Adanya anggota keluarga dengan bisul berulang, karena pembawa kuman Staphylococcus aureus di dalam hidung dapat menular dalam satu rumah.',
       riwayatPengobatan:
         'Obat yang sudah dipakai termasuk salep dan antibiotik, kortikosteroid jangka panjang, dan obat imunosupresan. Tanyakan pula apakah benjolan sudah dipencet, ditusuk jarum, atau diberi ramuan tradisional.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik golongan beta-laktam.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik golongan beta-laktam.',
       riwayatNutrisi: 'Status gizi; malnutrisi menurunkan daya tahan terhadap infeksi kulit.',
       riwayatSosialEkonomi:
         'KEBIASAAN MENGOREK HIDUNG DAN MENCABUT BULU HIDUNG merupakan pencetus tersering dan harus ditanyakan langsung karena jarang dilaporkan spontan. Tanyakan pula kebersihan diri, kebiasaan mencuci tangan, pekerjaan yang berdebu maupun berminyak, dan kondisi hunian.',
@@ -13270,7 +13270,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebersihan tangan yang buruk',
       'Obesitas dan malnutrisi',
       'Pemakaian kortikosteroid jangka panjang',
-      'History furunkel berulang di bagian tubuh lain',
+      'Riwayat furunkel berulang di bagian tubuh lain',
     ],
     goldStandard:
       'Diagnosis ditegakkan secara klinis dari papul maupun pustul nyeri berbatas tegas pada vestibulum hidung dengan rambut di tengahnya. Yang lebih menentukan daripada diagnosisnya adalah penilaian ada tidaknya perluasan: pembengkakan yang melewati vestibulum menuju ujung hidung, pipi, bibir atas, maupun kelopak mata menandakan selulitis wajah, sedangkan gejala mata dan saraf kranial menandakan trombosis sinus kavernosus yang menuntut pencitraan segera dan antibiotik intravena.',
@@ -13292,7 +13292,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'JANGAN MEMENCET, MENUSUK, ATAU MENGOREK lesi dengan cara apa pun',
       'Jaga kebersihan tangan dan hindari menyentuh daerah hidung',
       'Hentikan kebiasaan mengorek hidung dan mencabut bulu hidung; gunting bulu hidung dengan gunting kecil bila perlu alih-alih mencabutnya',
-      'Adequatekan asupan cairan dan nutrisi, serta kendalikan gula darah bila ada diabetes',
+      'Cukupkan asupan cairan dan nutrisi, serta kendalikan gula darah bila ada diabetes',
     ],
     tatalaksana: [
       'Antibiotik sistemik yang mengarah pada Staphylococcus aureus diberikan pada SEMUA furunkel hidung — berbeda dari furunkel di tempat lain yang dapat cukup dengan tindakan setempat, karena letaknya berisiko tinggi',
@@ -13337,12 +13337,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: kedua lubang hidung; sumbatan yang hanya pada satu sisi dan menetap, terlebih pada anak, harus menimbulkan kecurigaan benda asing. Onset: mendadak dalam 1-2 hari, sering didahului rasa kering dan gatal di hidung serta tenggorokan. Character: PERJALANAN SEKRET MERUPAKAN PETUNJUK YANG PALING SERING DISALAHPAHAMI — sekret mula-mula encer dan jernih, lalu menjadi kental dan berwarna kekuningan atau kehijauan pada hari ke-3 sampai ke-5, kemudian menipis kembali; perubahan warna ini merupakan bagian perjalanan alami virus dan BUKAN bukti infeksi bakteri. Radiation: rasa berat pada wajah dan dahi. Associations: bersin berulang, hidung gatal, mata berair, nyeri tenggorokan, batuk, demam ringan, nyeri kepala, nyeri otot, dan penciuman berkurang. Time course: PUNCAK KELUHAN PADA HARI KE-3 SAMPAI KE-5 lalu membaik bertahap dan sembuh dalam 7-10 hari; keluhan yang menetap lebih dari 10 hari tanpa perbaikan, atau yang membaik lalu memburuk kembali, mengarah pada rinosinusitis bakteri. Exacerbating: udara dingin dan berbaring. Severity: gangguan tidur, makan, dan aktivitas; pada bayi sumbatan hidung mengganggu menyusu.',
       riwayatPenyakitDahulu:
-        'History rinitis alergika, asma, sinusitis berulang, dan polip hidung. History penyakit yang menurunkan imunitas seperti diabetes melitus dan infeksi HIV. History operasi hidung dan deviasi septum.',
+        'Riwayat rinitis alergika, asma, sinusitis berulang, dan polip hidung. Riwayat penyakit yang menurunkan imunitas seperti diabetes melitus dan infeksi HIV. Riwayat operasi hidung dan deviasi septum.',
       riwayatPenyakitKeluarga:
         'Adanya anggota keluarga maupun teman dengan keluhan serupa dalam beberapa hari terakhir mendukung penularan virus; riwayat atopi pada keluarga bila dicurigai rinitis alergika.',
       riwayatPengobatan:
         'Obat bebas yang sudah dipakai, khususnya TETES ATAU SEMPROT HIDUNG DEKONGESTAN — tanyakan berapa lama sudah dipakai, karena pemakaian lebih dari 3-5 hari menimbulkan sumbatan yang justru bertambah setiap kali obat habis. Tanyakan pula antibiotik yang diminum sendiri.',
-      riwayatAlergi: 'History alergi obat, serta riwayat alergi debu, tungau, dan serbuk sari yang relevan untuk banding rinitis alergika.',
+      riwayatAlergi: 'Riwayat alergi obat, serta riwayat alergi debu, tungau, dan serbuk sari yang relevan untuk banding rinitis alergika.',
       riwayatNutrisi: 'Asupan makan dan minum selama sakit; pada anak nilai kecukupan cairan.',
       riwayatSosialEkonomi:
         'Lingkungan tempat tinggal dan tempat kerja, kepadatan hunian, paparan asap rokok termasuk sebagai perokok pasif, paparan debu dan polusi, serta anak yang menitip di tempat penitipan maupun bersekolah sebagai sumber penularan.',
@@ -13447,13 +13447,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: kedua lubang hidung, khasnya SUMBATAN BERPINDAH-PINDAH DARI SATU SISI KE SISI LAIN dan berubah mengikuti posisi tubuh — sisi yang tertindih saat berbaring miring menjadi lebih tersumbat. Onset: menahun dan berulang, umumnya mulai pada usia dewasa, berbeda dari rinitis alergika yang lebih sering dimulai sejak usia muda. Character: sekret ENCER SEPERTI AIR yang berlimpah dan sumbatan hidung; PEMBEDA PENTING ADALAH TIDAK ADA GATAL PADA HIDUNG MAUPUN MATA — gatal merupakan tanda perantaraan histamin dan ketiadaannya sangat mengarahkan menjauh dari alergi. Radiation: rasa penuh pada wajah. Associations: bersin ada namun tidak berderet panjang seperti pada alergi; tidak ada mata gatal dan berair, tidak ada demam. Time course: keluhan hilang timbul bertahun-tahun tanpa pola musiman yang jelas. Exacerbating: PENCETUS BERSIFAT FISIK BUKAN ALERGEN — udara dingin, perubahan suhu mendadak, asap rokok, parfum dan bau menyengat, polusi, MAKANAN PEDAS DAN PANAS, alkohol, cahaya terang, serta stres emosional. Relieving: menghindari pencetus dan berada di udara hangat. Severity: gangguan tidur, kualitas hidup, dan produktivitas.',
       riwayatPenyakitDahulu:
-        'History rinitis alergika, asma, dan polip hidung. History trauma maupun operasi hidung dan deviasi septum. Hipotiroid yang dapat menimbulkan gambaran serupa. Diabetes melitus.',
+        'Riwayat rinitis alergika, asma, dan polip hidung. Riwayat trauma maupun operasi hidung dan deviasi septum. Hipotiroid yang dapat menimbulkan gambaran serupa. Diabetes melitus.',
       riwayatPenyakitKeluarga:
-        'History atopi pada keluarga; riwayat atopi yang kuat justru mengarahkan kembali ke rinitis alergika sehingga perlu ditimbang ulang.',
+        'Riwayat atopi pada keluarga; riwayat atopi yang kuat justru mengarahkan kembali ke rinitis alergika sehingga perlu ditimbang ulang.',
       riwayatPengobatan:
         'OBAT MERUPAKAN PENYEBAB YANG SERING DAN MUDAH TERLEWAT: penyekat beta, penghambat ACE, obat antihipertensi golongan lain, aspirin dan obat antiinflamasi nonsteroid, kontrasepsi hormonal, serta obat disfungsi ereksi. Tanyakan pula pemakaian semprot dekongestan jangka panjang yang menimbulkan rinitis medikamentosa, dan riwayat penggunaan kokain.',
       riwayatAlergi:
-        'History alergi harus ditanyakan secara rinci justru untuk MENYINGKIRKANNYA — tanyakan hubungan keluhan dengan debu rumah, tungau, bulu hewan, serbuk sari, dan kapuk.',
+        'Riwayat alergi harus ditanyakan secara rinci justru untuk MENYINGKIRKANNYA — tanyakan hubungan keluhan dengan debu rumah, tungau, bulu hewan, serbuk sari, dan kapuk.',
       riwayatKehamilanPersalinan:
         'Kehamilan dapat menimbulkan rinitis kehamilan dengan gambaran serupa yang muncul pada trimester akhir dan mereda dalam 2 minggu setelah melahirkan.',
       riwayatNutrisi: 'Kebiasaan makan makanan pedas dan panas serta konsumsi alkohol sebagai pencetus.',
@@ -13610,7 +13610,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Abses Bezold': {
     definisi: 'Komplikasi mastoiditis di mana pus menembus ujung mastoid dan menyebar ke ruang leher dalam di bawah m. sternokleidomastoideus.',
-    diagnosis: ['History otitis media/mastoiditis, pembengkakan dan nyeri di leher lateral bawah ujung mastoid, demam tinggi, tortikolis; CT tulang temporal dan leher menilai perluasan abses dan destruksi mastoid'],
+    diagnosis: ['Riwayat otitis media/mastoiditis, pembengkakan dan nyeri di leher lateral bawah ujung mastoid, demam tinggi, tortikolis; CT tulang temporal dan leher menilai perluasan abses dan destruksi mastoid'],
     tatalaksana: ['Antibiotik IV spektrum luas dan DRAINASE BEDAH (mastoidektomi dan drainase leher) — kedaruratan karena dapat menyebar ke mediastinum dan intrakranial; rujuk THT segera'],
     referensi: ['SKDI2012', 'CUMMINGS2021', 'SCHWARTZ2019'],
   },
@@ -13638,10 +13638,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan SOCRATES. Site: nyeri suprapubik dan rasa terbakar pada uretra saat berkemih; TANYAKAN SECARA KHUSUS ADA TIDAKNYA NYERI PINGGANG, sebab nyeri pinggang mengubah diagnosis menjadi pielonefritis dengan lama terapi dan risiko yang jauh berbeda. Onset: mendadak dalam 1-3 hari. Character: DISURIA berupa perih dan panas saat berkemih, FREKUENSI berupa berkemih sedikit-sedikit namun sering, URGENSI berupa rasa ingin berkemih yang tidak tertahan, dan rasa tidak tuntas setelah berkemih. Radiation: nyeri dapat terasa hingga uretra dan perineum. Associations: urin keruh dan berbau menyengat, HEMATURIA yang tampak mata (terjadi pada sekitar sepertiga sistitis dan bukan pertanda infeksi berat), serta nyeri suprapubik. WAJIB tanyakan gejala yang menandakan infeksi telah naik ke ginjal atau menjadi sistemik: DEMAM, MENGGIGIL, nyeri pinggang, mual dan muntah, serta rasa lemas hebat — sistitis tanpa komplikasi khasnya TIDAK DEMAM, sehingga adanya demam harus mengubah arah penilaian. Tanyakan pula DUH dari vagina atau uretra, gatal, nyeri saat berhubungan, dan nyeri perut bawah yang mengarahkan pada vaginitis, servisitis, atau penyakit radang panggul sebagai penyebab disuria yang bukan infeksi kandung kemih. Time course: menetap dan memberat tanpa terapi. Exacerbating: hubungan seksual, menahan kencing, dan kurang minum. Severity: jumlah kali berkemih per malam, gangguan tidur dan pekerjaan, serta kemampuan minum obat per oral.',
       riwayatPenyakitDahulu:
         'RIWAYAT INFEKSI SALURAN KEMIH SEBELUMNYA dan berapa kali dalam setahun (tiga episode atau lebih per tahun, atau dua dalam enam bulan, tergolong ISK BERULANG dan menuntut pendekatan berbeda), riwayat pielonefritis, BATU SALURAN KEMIH, kelainan anatomi saluran kemih dan refluks vesikoureter, riwayat operasi urologi atau ginekologi, pemasangan KATETER, DIABETES MELITUS, penyakit ginjal kronik, imunokompromais termasuk HIV, gangguan pengosongan kandung kemih akibat kelainan neurologis, prolaps organ panggul, serta status MENOPAUSE karena defisiensi estrogen mengubah flora vagina dan meningkatkan risiko.',
-      riwayatPenyakitKeluarga: 'History infeksi saluran kemih berulang, batu saluran kemih, penyakit ginjal, dan diabetes melitus dalam keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat infeksi saluran kemih berulang, batu saluran kemih, penyakit ginjal, dan diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Antibiotik yang pernah diminum untuk keluhan serupa dalam 3-6 bulan terakhir beserta jenisnya — sangat penting karena menentukan kemungkinan resistensi dan memengaruhi pilihan empirik; tanyakan pula apakah antibiotik sebelumnya dihabiskan atau dihentikan di tengah jalan, penggunaan analgesik, obat tradisional dan jamu, SPERMISIDA dan diafragma sebagai kontrasepsi yang meningkatkan risiko, serta obat imunosupresan.',
-      riwayatAlergi: 'History alergi obat terutama SULFONAMID (kotrimoksazol), penisilin, sefalosporin, dan kuinolon; telusuri bentuk reaksinya karena label alergi yang tidak akurat sering mempersempit pilihan tanpa alasan.',
+      riwayatAlergi: 'Riwayat alergi obat terutama SULFONAMID (kotrimoksazol), penisilin, sefalosporin, dan kuinolon; telusuri bentuk reaksinya karena label alergi yang tidak akurat sering mempersempit pilihan tanpa alasan.',
       riwayatKehamilanPersalinan:
         'STATUS KEHAMILAN wajib dipastikan pada setiap perempuan usia subur — hal ini mengubah seluruh pendekatan, sebab pada kehamilan bahkan BAKTERIURIA TANPA GEJALA pun harus diobati untuk mencegah pielonefritis dan persalinan prematur, dan sejumlah antibiotik dikontraindikasikan. Tanyakan pula usia gestasi, riwayat infeksi saluran kemih pada kehamilan sebelumnya, dan riwayat persalinan prematur.',
       riwayatSosialEkonomi:
@@ -13681,7 +13681,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Jenis kelamin perempuan (uretra pendek dan dekat dengan anus)',
       'AKTIVITAS SEKSUAL, terutama frekuensi tinggi dan pasangan baru',
       'Penggunaan SPERMISIDA dan diafragma yang mengganggu flora vagina normal',
-      'History infeksi saluran kemih sebelumnya dan riwayat ISK pada ibu',
+      'Riwayat infeksi saluran kemih sebelumnya dan riwayat ISK pada ibu',
       'MENOPAUSE dan defisiensi estrogen',
       'KEHAMILAN',
       'DIABETES MELITUS',
@@ -13783,11 +13783,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Telusuri dengan SOCRATES. Site: vulva — bedakan apakah keluhan pada labia mayora, labia minora, klitoris, perineum, atau meluas ke perianal dan lipat paha; tanyakan pula apakah ada keluhan DI DALAM vagina yang mengarahkan pada vaginitis penyerta. Onset: akut pada dermatitis kontak, atau kronik dan berangsur pada liken sklerosus dan atrofi. Character: GATAL yang mendominasi mengarah pada dermatitis, kandidiasis, atau liken sklerosus; NYERI dan rasa terbakar tanpa gatal mengarah pada infeksi herpes, fisura, atau vulvodinia; rasa KERING dan nyeri saat berhubungan mengarah pada atrofi. Radiation: perluasan ke lipat paha dan perianal mengarahkan pada tinea, psoriasis inversa, atau kandidiasis. Associations: DUH VAGINA dan sifatnya — bila ada, telusuri penyebab vaginitis; tanyakan juga disuria yang bersifat EKSTERNAL (perih saat urin mengenai kulit yang lecet), nyeri saat berhubungan, perdarahan, dan lecet akibat garukan. WAJIB tanyakan gejala yang menuntut kewaspadaan lebih: LUKA atau ULKUS, BENJOLAN yang menetap, PERUBAHAN WARNA KULIT menjadi putih atau menebal, lesi yang tidak sembuh meski diobati berbulan-bulan, serta perdarahan spontan — semuanya menuntut pemeriksaan lebih lanjut dan pertimbangan BIOPSI. Time course: hilang timbul atau menetap; kaitan dengan siklus haid, penggunaan produk tertentu, dan pemakaian obat. Exacerbating: telusuri secara sistematis SEMUA yang bersentuhan dengan vulva — sabun, sabun antiseptik dan sabun sirih, pembersih kewanitaan, ratus, tisu basah, pembalut dan pantyliner beraroma, deterjen dan pelembut pakaian, pelumas, kondom lateks, spermisida, obat oles, dan pakaian ketat; Severity: gangguan tidur akibat gatal malam hari, gangguan aktivitas dan hubungan seksual, serta dampak psikologis.',
       riwayatPenyakitDahulu:
         'DIABETES MELITUS yang merupakan penyakit penyerta terpenting pada kandidiasis vulva berulang, riwayat keputihan berulang, DERMATITIS ATOPIK dan riwayat atopi lain (asma, rinitis alergi) yang menjadi latar dermatitis vulva, PSORIASIS, LIKEN SKLEROSUS yang bersifat kronik dan merupakan faktor risiko karsinoma sel skuamosa vulva, riwayat infeksi menular seksual dan herpes genital, inkontinensia urin maupun alvi yang menimbulkan iritasi kronik, riwayat radioterapi panggul, keganasan, HIV dan imunokompromais lain, serta riwayat penyakit tiroid dan autoimun yang sering menyertai liken sklerosus.',
-      riwayatPenyakitKeluarga: 'History diabetes melitus, penyakit atopi, psoriasis, penyakit autoimun, dan keganasan ginekologi dalam keluarga.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes melitus, penyakit atopi, psoriasis, penyakit autoimun, dan keganasan ginekologi dalam keluarga.',
       riwayatPengobatan:
         'Ditanyakan secara terperinci karena sering menjadi penyebab sekaligus penghalang penyembuhan: KRIM KORTIKOSTEROID dan krim kombinasi bebas, ANTIJAMUR yang dipakai berulang tanpa diagnosis, antibiotik sistemik yang memicu kandidiasis, obat tradisional, ratus dan tapel, serta anestesi lokal topikal seperti benzokain yang justru merupakan penyebab dermatitis kontak alergi yang lazim. Tanyakan pula kontrasepsi hormonal, kortikosteroid sistemik, dan imunosupresan.',
       riwayatAlergi:
-        'History alergi obat, dan secara khusus riwayat DERMATITIS KONTAK terhadap parfum, nikel, pewarna, karet, lateks, dan bahan pengawet dalam produk perawatan — sangat relevan karena vulva merupakan kulit yang tipis, lembap, dan tertutup sehingga jauh lebih mudah menyerap serta bereaksi terhadap bahan kimia dibanding kulit di tempat lain.',
+        'Riwayat alergi obat, dan secara khusus riwayat DERMATITIS KONTAK terhadap parfum, nikel, pewarna, karet, lateks, dan bahan pengawet dalam produk perawatan — sangat relevan karena vulva merupakan kulit yang tipis, lembap, dan tertutup sehingga jauh lebih mudah menyerap serta bereaksi terhadap bahan kimia dibanding kulit di tempat lain.',
       riwayatKehamilanPersalinan:
         'Status kehamilan, siklus haid, status MENOPAUSE dan sudah berapa lama (menentukan kemungkinan vulvitis atrofik), riwayat persalinan pervaginam dan robekan perineum, penggunaan terapi hormon, serta riwayat pemeriksaan Papanicolaou dan hasilnya.',
       riwayatSosialEkonomi:
@@ -13834,7 +13834,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'DIABETES MELITUS',
       'Penggunaan antibiotik dan kortikosteroid',
       'MENOPAUSE, masa menyusui, dan keadaan lain dengan estrogen rendah',
-      'History atopi, psoriasis, dan penyakit autoimun',
+      'Riwayat atopi, psoriasis, dan penyakit autoimun',
       'Inkontinensia urin maupun alvi yang menimbulkan iritasi kronik',
       'Obesitas dengan lipatan yang lembap dan bergesekan',
       'Kebiasaan mencukur atau mencabut rambut kemaluan yang menimbulkan mikrotrauma dan folikulitis',
@@ -13859,7 +13859,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Penyakit Paget ekstramamari dan penyakit Behcet',
     ],
     pengkajian:
-      'Pada pasien dengan keluhan gatal dan perih pada vulva ini, hal yang menentukan bukanlah memilih obat melainkan MENAHAN DIRI UNTUK TIDAK LANGSUNG MEMBERI ANTIJAMUR dan sebaliknya mencari penyebabnya secara sistematis. History bahwa keluhan TIDAK MEMBAIK meski sudah beberapa kali memakai salep dari apotek merupakan informasi yang paling berharga dalam anamnesis ini: pada vulva, kegagalan berulang terapi antijamur bukan alasan untuk mengulanginya melainkan sinyal bahwa diagnosisnya keliru sejak awal. Penelusuran pajanan harus dikerjakan secara menyeluruh — sabun antiseptik, sabun sirih, pembersih kewanitaan, tisu basah, pembalut beraroma, deterjen, pelembut pakaian, hingga anestesi topikal dalam salep bebas yang justru merupakan penyebab dermatitis kontak alergi yang lazim. Alasannya bersifat anatomik: kulit vulva jauh lebih tipis, lembap, dan tertutup sehingga penyerapan bahan kimia jauh melampaui kulit di tempat lain, dan produk yang aman di lengan dapat menimbulkan peradangan hebat di sini. Karena itu langkah terapeutik pertama pada hampir semua vulvitis adalah MENGHENTIKAN SEMUA yang bersentuhan dengan daerah tersebut, bukan menambahkan obat baru. Kandidiasis dipertimbangkan bila terdapat eritema merah menyala dengan lesi satelit dan duh putih menggumpal dengan pH normal serta KOH positif; bila gambaran ini BERULANG, maka yang diperlukan bukan mengulang antijamur melainkan menapis DIABETES dan memeriksa kemungkinan spesies non-albicans. Pada perempuan PASCAMENOPAUSE, VULVITIS ATROFIK wajib dipikirkan — mukosa pucat dan tipis dengan rasa kering dan nyeri saat berhubungan; keadaan ini tidak akan membaik dengan antijamur maupun antibiotik betapapun sering diberikan, dan hanya membaik dengan ESTROGEN TOPIKAL, sehingga mengenalinya menghentikan siklus pengobatan yang sia-sia bertahun-tahun. Yang paling penting untuk tidak dilewatkan adalah LIKEN SKLEROSUS, dikenali dari kulit yang PUTIH seperti porselen, tipis dan rapuh, dan terutama dari HILANGNYA ARSITEKTUR berupa labia minora yang menghilang serta preputium klitoris yang menyatu. Penyakit ini menuntut kortikosteroid sangat poten jangka panjang, dan pemberiannya secara dini bukan sekadar meredakan gatal melainkan MENCEGAH KECACATAN permanen; selain itu liken sklerosus meningkatkan risiko karsinoma sel skuamosa vulva sekitar empat sampai lima persen sehingga memerlukan pemantauan seumur hidup. Dari sinilah lahir kaidah yang menjadi inti pengelolaan kasus ini: setiap lesi vulva yang TIDAK SEMBUH setelah empat sampai delapan minggu terapi yang tepat, atau yang berupa ulkus menetap, plak menebal, nodul, maupun perubahan warna, WAJIB DIBIOPSI. Menunda biopsi merupakan sebab tersering keterlambatan diagnosis keganasan vulva, dan di antara pasien-pasien yang telah bertahun-tahun diobati sebagai jamur inilah kerap ditemukan neoplasia intraepitelial bahkan karsinoma. Perlu ditambahkan satu kehati-hatian: kortikosteroid topikal pada vulva jauh lebih cepat menimbulkan penipisan kulit dan striae permanen dibanding di tempat lain, sehingga kekuatan dan lama pemakaiannya harus ditentukan dengan sengaja, bukan diteruskan tanpa evaluasi.',
+      'Pada pasien dengan keluhan gatal dan perih pada vulva ini, hal yang menentukan bukanlah memilih obat melainkan MENAHAN DIRI UNTUK TIDAK LANGSUNG MEMBERI ANTIJAMUR dan sebaliknya mencari penyebabnya secara sistematis. Riwayat bahwa keluhan TIDAK MEMBAIK meski sudah beberapa kali memakai salep dari apotek merupakan informasi yang paling berharga dalam anamnesis ini: pada vulva, kegagalan berulang terapi antijamur bukan alasan untuk mengulanginya melainkan sinyal bahwa diagnosisnya keliru sejak awal. Penelusuran pajanan harus dikerjakan secara menyeluruh — sabun antiseptik, sabun sirih, pembersih kewanitaan, tisu basah, pembalut beraroma, deterjen, pelembut pakaian, hingga anestesi topikal dalam salep bebas yang justru merupakan penyebab dermatitis kontak alergi yang lazim. Alasannya bersifat anatomik: kulit vulva jauh lebih tipis, lembap, dan tertutup sehingga penyerapan bahan kimia jauh melampaui kulit di tempat lain, dan produk yang aman di lengan dapat menimbulkan peradangan hebat di sini. Karena itu langkah terapeutik pertama pada hampir semua vulvitis adalah MENGHENTIKAN SEMUA yang bersentuhan dengan daerah tersebut, bukan menambahkan obat baru. Kandidiasis dipertimbangkan bila terdapat eritema merah menyala dengan lesi satelit dan duh putih menggumpal dengan pH normal serta KOH positif; bila gambaran ini BERULANG, maka yang diperlukan bukan mengulang antijamur melainkan menapis DIABETES dan memeriksa kemungkinan spesies non-albicans. Pada perempuan PASCAMENOPAUSE, VULVITIS ATROFIK wajib dipikirkan — mukosa pucat dan tipis dengan rasa kering dan nyeri saat berhubungan; keadaan ini tidak akan membaik dengan antijamur maupun antibiotik betapapun sering diberikan, dan hanya membaik dengan ESTROGEN TOPIKAL, sehingga mengenalinya menghentikan siklus pengobatan yang sia-sia bertahun-tahun. Yang paling penting untuk tidak dilewatkan adalah LIKEN SKLEROSUS, dikenali dari kulit yang PUTIH seperti porselen, tipis dan rapuh, dan terutama dari HILANGNYA ARSITEKTUR berupa labia minora yang menghilang serta preputium klitoris yang menyatu. Penyakit ini menuntut kortikosteroid sangat poten jangka panjang, dan pemberiannya secara dini bukan sekadar meredakan gatal melainkan MENCEGAH KECACATAN permanen; selain itu liken sklerosus meningkatkan risiko karsinoma sel skuamosa vulva sekitar empat sampai lima persen sehingga memerlukan pemantauan seumur hidup. Dari sinilah lahir kaidah yang menjadi inti pengelolaan kasus ini: setiap lesi vulva yang TIDAK SEMBUH setelah empat sampai delapan minggu terapi yang tepat, atau yang berupa ulkus menetap, plak menebal, nodul, maupun perubahan warna, WAJIB DIBIOPSI. Menunda biopsi merupakan sebab tersering keterlambatan diagnosis keganasan vulva, dan di antara pasien-pasien yang telah bertahun-tahun diobati sebagai jamur inilah kerap ditemukan neoplasia intraepitelial bahkan karsinoma. Perlu ditambahkan satu kehati-hatian: kortikosteroid topikal pada vulva jauh lebih cepat menimbulkan penipisan kulit dan striae permanen dibanding di tempat lain, sehingga kekuatan dan lama pemakaiannya harus ditentukan dengan sengaja, bukan diteruskan tanpa evaluasi.',
     terapiSuportif: [
       'HENTIKAN SELURUH IRITAN — langkah terapeutik pertama dan paling menentukan: hentikan sabun antiseptik, sabun sirih, pembersih kewanitaan, semprotan vagina, ratus, tisu basah, pembalut dan pantyliner beraroma, serta douching',
       'Bersihkan hanya bagian LUAR dengan AIR BERSIH saja, satu sampai dua kali sehari, atau dengan pembersih non-sabun yang lembut dan tanpa pewangi; keringkan dengan MENEPUK, bukan menggosok',
@@ -13892,7 +13892,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     edukasi: [
       'Jelaskan bahwa vulva adalah KULIT yang sangat tipis dan sensitif — jauh lebih mudah menyerap bahan kimia dibanding kulit lengan; karena itu sabun dan produk yang biasa dipakai untuk badan justru dapat menjadi penyebab keluhan',
       'PESAN PENGOBATAN YANG PALING PENTING: HENTIKAN SEMUA produk yang menyentuh daerah kewanitaan — sabun antiseptik, sabun sirih, pembersih kewanitaan, semprotan, ratus, tisu basah, dan pembalut beraroma. Menghentikan ini seringkali lebih menyembuhkan daripada menambah obat baru',
-      'Adequate bersihkan bagian LUAR dengan AIR BERSIH saja, satu sampai dua kali sehari, dari depan ke belakang; keringkan dengan MENEPUK lembut, jangan digosok',
+      'Cukup bersihkan bagian LUAR dengan AIR BERSIH saja, satu sampai dua kali sehari, dari depan ke belakang; keringkan dengan MENEPUK lembut, jangan digosok',
       'JANGAN membilas bagian dalam vagina (douching) — vagina membersihkan dirinya sendiri',
       'Oleskan pelembap sederhana tanpa pewangi sebagai pelindung, dan boleh dioleskan sebelum buang air kecil bila kulit sedang lecet dan perih',
       'JANGAN MENGGARUK meski gatal — garukan merusak kulit sehingga gatal justru bertambah dan menetap; potong kuku pendek, gunakan kompres dingin, dan minum obat antigatal pada malam hari sesuai anjuran',
@@ -13933,15 +13933,15 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan SOCRATES, dan arahkan pada tiga sumbu yang memisahkan ketiga penyebab — sifat duh, derajat gatal, dan bau. Site: vagina dan vulva; tanyakan apakah keluhan terutama di dalam atau di bagian luar. Onset: bertahap; kandidiasis sering muncul setelah pemakaian antibiotik. Character: KANDIDIASIS memberi duh PUTIH KENTAL MENGGUMPAL seperti keju atau susu basi, TIDAK BERBAU, dengan GATAL HEBAT sebagai keluhan yang mendominasi; TRIKOMONIASIS memberi duh KUNING KEHIJAUAN, BERBUSA, BERBAU, dengan gatal dan rasa terbakar; VAGINOSIS BAKTERIALIS memberi duh encer homogen putih keabuan dengan BAU AMIS dan gatal yang minimal. Associations: rasa terbakar pada vulva, DISURIA yang bersifat EKSTERNAL yaitu perih saat urin mengenai vulva yang meradang (berbeda dari infeksi saluran kemih yang disertai frekuensi dan urgensi), nyeri saat berhubungan, dan lecet akibat garukan. WAJIB tanyakan gejala yang menandakan infeksi telah naik: nyeri perut bawah, demam, perdarahan di luar haid, dan perdarahan setelah berhubungan — semuanya mengarahkan pada servisitis atau penyakit radang panggul yang tata laksananya berbeda. Time course: kandidiasis sering memberat menjelang haid; vaginosis bakterialis dan trikomoniasis memberat setelah haid dan setelah berhubungan karena darah dan semen bersifat basa. Exacerbating: douching, sabun antiseptik, pakaian ketat, kelembapan, dan antibiotik; Severity: gangguan tidur akibat gatal, gangguan aktivitas dan hubungan seksual, serta seberapa sering pasien mengobati sendiri.',
       riwayatPenyakitDahulu:
-        'History keputihan berulang dan berapa kali dalam setahun (empat episode atau lebih kandidiasis per tahun tergolong REKUREN dan menuntut terapi rumatan serta penapisan penyakit penyerta), DIABETES MELITUS yang merupakan penyakit penyerta terpenting pada kandidiasis berulang, HIV dan imunokompromais lain, riwayat infeksi menular seksual dan penyakit radang panggul, penggunaan kortikosteroid, keganasan, dan riwayat operasi ginekologi.',
-      riwayatPenyakitKeluarga: 'History diabetes melitus dalam keluarga; riwayat keganasan ginekologi.',
+        'Riwayat keputihan berulang dan berapa kali dalam setahun (empat episode atau lebih kandidiasis per tahun tergolong REKUREN dan menuntut terapi rumatan serta penapisan penyakit penyerta), DIABETES MELITUS yang merupakan penyakit penyerta terpenting pada kandidiasis berulang, HIV dan imunokompromais lain, riwayat infeksi menular seksual dan penyakit radang panggul, penggunaan kortikosteroid, keganasan, dan riwayat operasi ginekologi.',
+      riwayatPenyakitKeluarga: 'Riwayat diabetes melitus dalam keluarga; riwayat keganasan ginekologi.',
       riwayatPengobatan:
         'ANTIBIOTIK yang baru saja digunakan — pemicu kandidiasis yang paling sering dan paling mudah dikenali; KONTRASEPSI HORMONAL, kortikosteroid, imunosupresan, serta obat antijamur bebas yang dibeli sendiri (sangat lazim, dan sekitar dua pertiga perempuan yang mendiagnosis sendiri keputihannya sebagai jamur ternyata keliru). Tanyakan pula pemakaian pembersih kewanitaan, ratus, dan obat tradisional.',
-      riwayatAlergi: 'History alergi obat termasuk metronidazol dan golongan azol, serta riwayat dermatitis kontak terhadap sabun, pembalut, kondom lateks, atau pelumas.',
+      riwayatAlergi: 'Riwayat alergi obat termasuk metronidazol dan golongan azol, serta riwayat dermatitis kontak terhadap sabun, pembalut, kondom lateks, atau pelumas.',
       riwayatKehamilanPersalinan:
         'STATUS KEHAMILAN dan usia gestasi — menentukan pilihan obat: flukonazol oral DIHINDARI pada kehamilan dan diganti antijamur topikal, sedangkan metronidazol dapat digunakan. Tanyakan pula siklus haid, riwayat persalinan prematur, jenis kontrasepsi, dan status menyusui.',
       riwayatSosialEkonomi:
-        'History seksual yang ditanyakan secara privat dan tanpa menghakimi: status hubungan, jumlah pasangan dalam 6-12 bulan terakhir, pasangan baru, penggunaan kondom, dan adanya gejala pada pasangan (duh uretra atau nyeri berkemih pada pasangan laki-laki). Tanyakan pula kebiasaan DOUCHING dan pembersihan bagian dalam vagina, jenis pakaian dalam, kebiasaan mengganti pembalut dan pantyliner, kondisi kelembapan lingkungan kerja, serta kemampuan mengakses pemeriksaan mikroskopis dan pengobatan.',
+        'Riwayat seksual yang ditanyakan secara privat dan tanpa menghakimi: status hubungan, jumlah pasangan dalam 6-12 bulan terakhir, pasangan baru, penggunaan kondom, dan adanya gejala pada pasangan (duh uretra atau nyeri berkemih pada pasangan laki-laki). Tanyakan pula kebiasaan DOUCHING dan pembersihan bagian dalam vagina, jenis pakaian dalam, kebiasaan mengganti pembalut dan pantyliner, kondisi kelembapan lingkungan kerja, serta kemampuan mengakses pemeriksaan mikroskopis dan pengobatan.',
     },
     pemeriksaanFisik: [
       'Tanda vital; pada vaginitis tanpa komplikasi seluruhnya normal dan pasien AFEBRIS — demam mengarahkan pada penyakit radang panggul',
@@ -14036,7 +14036,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'HABISKAN OBAT sesuai jadwal meskipun keluhan sudah hilang dalam 2-3 hari',
       'JANGAN MINUM ALKOHOL selama minum metronidazol dan sehari setelahnya karena dapat menimbulkan mual hebat, muntah, wajah memerah, dan jantung berdebar',
       'PESAN PENCEGAHAN YANG PALING PENTING: HENTIKAN membilas bagian dalam vagina dengan air, sabun sirih, sabun antiseptik, pembersih kewanitaan, atau ratus — vagina membersihkan dirinya sendiri, dan membilas bagian dalamnya justru membuang bakteri baik pelindung sehingga keputihan datang berulang',
-      'Adequate bersihkan bagian LUAR dengan air bersih dari depan ke belakang, lalu keringkan dengan menepuk',
+      'Cukup bersihkan bagian LUAR dengan air bersih dari depan ke belakang, lalu keringkan dengan menepuk',
       'Gunakan pakaian dalam KATUN yang longgar dan ganti setiap hari; hindari celana ketat, pakaian dalam sintetis, dan pemakaian pantyliner setiap hari',
       'Jangan menggaruk meski gatal; potong kuku pendek dan gunakan kompres dingin untuk meredakan',
       'Jadwal dan porsi makan: makan bergizi seimbang 3 kali sehari dengan sayur dan buah; tidak ada pantangan makanan dan tidak benar bahwa keputihan disebabkan makanan tertentu; yoghurt berprobiotik boleh dikonsumsi namun bukan pengganti obat. PADA PENYANDANG DIABETES, mengendalikan gula darah merupakan bagian dari pengobatan — jamur tumbuh subur pada kadar gula yang tinggi, sehingga tanpa pengendalian gula darah keputihan akan berulang terus',
@@ -14074,11 +14074,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Umumnya tidak berperan; tanyakan riwayat diabetes melitus dalam keluarga.',
       riwayatPengobatan:
         'Obat yang sudah dipakai sendiri: antibiotik, obat antijamur bebas yang sangat sering dibeli sendiri dengan anggapan semua keputihan adalah jamur, pembersih vagina (feminine hygiene), dan obat tradisional termasuk ratus atau tapel vagina. Tanyakan pula riwayat penggunaan ANTIBIOTIK sistemik belakangan ini, kortikosteroid, dan imunosupresan, serta jenis KONTRASEPSI yang digunakan.',
-      riwayatAlergi: 'History alergi obat, khususnya METRONIDAZOL dan klindamisin.',
+      riwayatAlergi: 'Riwayat alergi obat, khususnya METRONIDAZOL dan klindamisin.',
       riwayatKehamilanPersalinan:
         'STATUS KEHAMILAN dan usia gestasi — hal ini menentukan keputusan mengobati karena vaginosis bakterialis dalam kehamilan berkaitan dengan persalinan prematur, ketuban pecah dini, korioamnionitis, berat lahir rendah, dan endometritis pascapersalinan. Tanyakan pula jumlah kehamilan dan persalinan, riwayat persalinan prematur sebelumnya, siklus haid, dan status menyusui.',
       riwayatSosialEkonomi:
-        'History seksual yang ditanyakan dengan cara yang tidak menghakimi dan dalam suasana privat: status hubungan, jumlah pasangan seksual dalam 6-12 bulan terakhir, pasangan baru, jenis kelamin pasangan (vaginosis bakterialis lebih sering pada perempuan yang berhubungan dengan perempuan), penggunaan kondom, dan gejala pada pasangan. Tanyakan pula KEBIASAAN MEMBERSIHKAN VAGINA — praktik DOUCHING atau membilas bagian dalam vagina, penggunaan sabun antiseptik, sabun sirih, ratus, dan pembersih kewanitaan, karena semua ini merusak flora normal dan justru merupakan penyebab yang paling dapat dikoreksi; kebiasaan merokok; penggunaan pantyliner setiap hari; jenis pakaian dalam; serta akses terhadap pengobatan dan pemeriksaan lanjutan.',
+        'Riwayat seksual yang ditanyakan dengan cara yang tidak menghakimi dan dalam suasana privat: status hubungan, jumlah pasangan seksual dalam 6-12 bulan terakhir, pasangan baru, jenis kelamin pasangan (vaginosis bakterialis lebih sering pada perempuan yang berhubungan dengan perempuan), penggunaan kondom, dan gejala pada pasangan. Tanyakan pula KEBIASAAN MEMBERSIHKAN VAGINA — praktik DOUCHING atau membilas bagian dalam vagina, penggunaan sabun antiseptik, sabun sirih, ratus, dan pembersih kewanitaan, karena semua ini merusak flora normal dan justru merupakan penyebab yang paling dapat dikoreksi; kebiasaan merokok; penggunaan pantyliner setiap hari; jenis pakaian dalam; serta akses terhadap pengobatan dan pemeriksaan lanjutan.',
     },
     pemeriksaanFisik: [
       'Tanda vital; pada vaginosis bakterialis tanpa komplikasi seluruhnya normal dan pasien AFEBRIS — demam mengarahkan pada penyakit radang panggul',
@@ -14119,7 +14119,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Penggunaan antibiotik sistemik',
       'Alat kontrasepsi dalam rahim',
       'Kurangnya Lactobacillus penghasil hidrogen peroksida (variasi individu dan ras)',
-      'History vaginosis bakterialis sebelumnya',
+      'Riwayat vaginosis bakterialis sebelumnya',
       'Infeksi HIV dan kondisi imunokompromais',
       'Status sosial ekonomi rendah dan keterbatasan akses air bersih',
       'Perlu dicatat: vaginosis bakterialis DAPAT terjadi pada perempuan yang belum pernah berhubungan seksual, sehingga bukan penanda perilaku seksual dan tidak boleh disampaikan sebagai tuduhan',
@@ -14216,11 +14216,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Umumnya tidak berperan langsung; tanyakan riwayat keganasan ginekologi dan penyakit radang usus dalam keluarga sebagai pembanding.',
       riwayatPengobatan:
         'Antibiotik yang sudah diminum dan jenisnya — pemakaian antibiotik parsial dapat menyamarkan gambaran klinis sehingga penyakit tampak ringan padahal kerusakan tuba berlanjut; tanyakan pula analgesik yang sudah dipakai, kontrasepsi yang digunakan, dan obat tradisional.',
-      riwayatAlergi: 'History alergi obat terutama sefalosporin, penisilin, doksisiklin, dan metronidazol.',
+      riwayatAlergi: 'Riwayat alergi obat terutama sefalosporin, penisilin, doksisiklin, dan metronidazol.',
       riwayatKehamilanPersalinan:
         'HARI PERTAMA HAID TERAKHIR dan keteraturan siklus, kemungkinan kehamilan saat ini (tes kehamilan WAJIB pada setiap pasien), jumlah kehamilan dan persalinan, riwayat keguguran dan kuretase, riwayat KEHAMILAN EKTOPIK, riwayat kesulitan hamil, jenis kontrasepsi, serta rencana kehamilan di masa depan — hal terakhir penting karena memengaruhi cara menyampaikan risiko infertilitas dan urgensi pengobatan.',
       riwayatSosialEkonomi:
-        'History seksual yang ditanyakan secara privat, tanpa menghakimi, dan tanpa dihadiri pasangan maupun keluarga: usia pertama berhubungan seksual, jumlah pasangan dalam 6-12 bulan terakhir, PASANGAN BARU, penggunaan kondom, gejala pada pasangan, dan riwayat infeksi menular seksual pada pasangan. Tanyakan pula kebiasaan douching yang memudahkan bakteri naik, merokok, status pendidikan dan ekonomi, kemampuan menebus antibiotik selama 14 hari, kemampuan kembali untuk kontrol dalam 72 jam, serta ketersediaan dukungan bila memerlukan rawat inap.',
+        'Riwayat seksual yang ditanyakan secara privat, tanpa menghakimi, dan tanpa dihadiri pasangan maupun keluarga: usia pertama berhubungan seksual, jumlah pasangan dalam 6-12 bulan terakhir, PASANGAN BARU, penggunaan kondom, gejala pada pasangan, dan riwayat infeksi menular seksual pada pasangan. Tanyakan pula kebiasaan douching yang memudahkan bakteri naik, merokok, status pendidikan dan ekonomi, kemampuan menebus antibiotik selama 14 hari, kemampuan kembali untuk kontrol dalam 72 jam, serta ketersediaan dukungan bila memerlukan rawat inap.',
     },
     pemeriksaanFisik: [
       'TANDA VITAL LENGKAP: suhu (demam di atas 38,3 derajat Celsius merupakan salah satu kriteria tambahan), nadi, frekuensi napas, dan TEKANAN DARAH — hipotensi dan takikardia menandakan sepsis atau perdarahan intraabdomen pada kehamilan ektopik yang pecah',
@@ -14366,9 +14366,9 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Hipertensi, diabetes melitus, kehamilan kembar, kelainan bawaan, thalassemia, dan gangguan pembekuan darah dalam keluarga.',
       riwayatPengobatan:
         'Semua obat yang sedang dikonsumsi termasuk obat rutin untuk penyakit kronik, jamu, dan suplemen — tinjau keamanannya dalam kehamilan; tanyakan pula konsumsi asam folat sebelum dan sejak hamil, serta kepatuhan tablet tambah darah.',
-      riwayatAlergi: 'History alergi obat dan makanan, terutama alergi penisilin yang menentukan pilihan antibiotik bila kelak diperlukan.',
+      riwayatAlergi: 'Riwayat alergi obat dan makanan, terutama alergi penisilin yang menentukan pilihan antibiotik bila kelak diperlukan.',
       riwayatKehamilanPersalinan:
-        'Ini merupakan bagian TERPENTING. Catat status GRAVIDA, PARA, ABORTUS. Untuk setiap kehamilan sebelumnya: tahun, usia kehamilan saat lahir, cara persalinan (spontan, vakum, forsep, atau seksio beserta indikasinya), berat lahir bayi, jenis kelamin, kondisi bayi saat lahir dan sekarang, serta penyulit yang terjadi seperti preeklamsia, perdarahan pascapersalinan, retensio plasenta, persalinan lama, atau kematian janin. History abortus, kehamilan ektopik, dan mola. History bayi besar lebih dari 4 kg yang mengarahkan pada diabetes gestasional, dan riwayat persalinan preterm yang meningkatkan risiko berulang. Tanyakan pula jarak kehamilan dan riwayat penggunaan kontrasepsi sebelum hamil ini.',
+        'Ini merupakan bagian TERPENTING. Catat status GRAVIDA, PARA, ABORTUS. Untuk setiap kehamilan sebelumnya: tahun, usia kehamilan saat lahir, cara persalinan (spontan, vakum, forsep, atau seksio beserta indikasinya), berat lahir bayi, jenis kelamin, kondisi bayi saat lahir dan sekarang, serta penyulit yang terjadi seperti preeklamsia, perdarahan pascapersalinan, retensio plasenta, persalinan lama, atau kematian janin. Riwayat abortus, kehamilan ektopik, dan mola. Riwayat bayi besar lebih dari 4 kg yang mengarahkan pada diabetes gestasional, dan riwayat persalinan preterm yang meningkatkan risiko berulang. Tanyakan pula jarak kehamilan dan riwayat penggunaan kontrasepsi sebelum hamil ini.',
       riwayatNutrisi:
         'Pola makan sehari-hari dan kecukupannya, kenaikan berat badan sejak hamil, pantangan makanan yang dianut, kebiasaan mengonsumsi makanan mentah atau setengah matang (risiko toksoplasmosis dan listeriosis), serta asupan kalsium, zat besi, dan yodium.',
       riwayatImunisasi: 'Status imunisasi tetanus (TT atau Td) beserta jumlah dosis yang sudah diterima seumur hidup, serta riwayat imunisasi rubela sebelum hamil.',
@@ -14406,7 +14406,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Usia ibu kurang dari 20 tahun atau lebih dari 35 tahun',
       'Tinggi badan kurang dari 145 cm dan lingkar lengan atas kurang dari 23,5 cm',
       'Paritas tinggi (empat atau lebih) dan jarak kehamilan kurang dari 2 tahun',
-      'History seksio sesarea, preeklamsia, perdarahan pascapersalinan, atau kematian janin sebelumnya',
+      'Riwayat seksio sesarea, preeklamsia, perdarahan pascapersalinan, atau kematian janin sebelumnya',
       'Penyakit penyerta: hipertensi, diabetes, penyakit jantung, anemia, tuberkulosis, HIV',
       'Kehamilan ganda dan kelainan letak janin',
       'Merokok aktif maupun pasif, konsumsi alkohol, dan zat terlarang',
@@ -14503,10 +14503,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitDahulu:
         'RIWAYAT KEGUGURAN SEBELUMNYA dan berapa kali (tiga kali berturut-turut atau lebih tergolong KEGUGURAN BERULANG dan menuntut penelusuran penyebab), riwayat KEHAMILAN EKTOPIK, riwayat kuretase dan komplikasinya, riwayat operasi rahim termasuk bedah sesar dan miomektomi, mioma uteri, kelainan bentuk rahim, sindrom Asherman, SINDROM ANTIFOSFOLIPID dan penyakit autoimun lain, gangguan tiroid, DIABETES MELITUS yang tidak terkendali, penyakit ginjal kronik, trombofilia, serta infeksi menular seksual dan penyakit radang panggul.',
       riwayatPenyakitKeluarga:
-        'History keguguran berulang, kelainan bawaan, dan kelainan kromosom dalam keluarga; riwayat gangguan pembekuan darah dan penyakit autoimun; riwayat diabetes melitus dan penyakit tiroid.',
+        'Riwayat keguguran berulang, kelainan bawaan, dan kelainan kromosom dalam keluarga; riwayat gangguan pembekuan darah dan penyakit autoimun; riwayat diabetes melitus dan penyakit tiroid.',
       riwayatPengobatan:
         'Obat yang dikonsumsi selama kehamilan termasuk yang dibeli bebas dan jamu, obat yang berpotensi teratogenik, penggunaan MISOPROSTOL atau obat lain yang mungkin dipakai untuk menggugurkan (tanyakan dengan hati-hati, tanpa menghakimi, dan dengan menjaga kerahasiaan — informasi ini penting untuk keselamatan pasien, terutama untuk menilai risiko abortus septik), suplemen asam folat, obat untuk penyakit kronik, serta ANTIKOAGULAN.',
-      riwayatAlergi: 'History alergi obat, khususnya antibiotik dan analgesik.',
+      riwayatAlergi: 'Riwayat alergi obat, khususnya antibiotik dan analgesik.',
       riwayatKehamilanPersalinan:
         'Ini merupakan bagian anamnesis yang paling menentukan: HARI PERTAMA HAID TERAKHIR dan usia kehamilan, jumlah kehamilan-persalinan-keguguran-anak hidup (GPAH), riwayat setiap kehamilan sebelumnya beserta keluarannya, hasil pemeriksaan kehamilan ini termasuk apakah pernah dilakukan ULTRASONOGRAFI dan apakah pernah terlihat denyut jantung janin (informasi ini sangat berarti untuk memastikan bahwa yang terjadi memang keguguran dan bukan kehamilan ektopik), riwayat perdarahan sebelumnya pada kehamilan ini, GOLONGAN DARAH dan RHESUS yang wajib diketahui karena menentukan kebutuhan imunoglobulin anti-D, riwayat pemeriksaan antenatal, serta jenis kontrasepsi sebelum hamil dan rencana kehamilan berikutnya.',
       riwayatNutrisi: 'Status gizi, asupan asam folat sebelum dan selama kehamilan, serta tanda anemia sebelumnya.',
@@ -14543,7 +14543,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Sebagian besar keguguran trimester pertama bermula dari KEMATIAN EMBRIO atau JANIN, bukan dari kelemahan rahim ibu — urutan ini penting dipahami karena menjadi dasar seluruh penjelasan yang perlu disampaikan kepada pasien. Pada sekitar separuh hingga enam puluh persen kasus, penyebabnya adalah kelainan kromosom yang terjadi secara ACAK saat pembelahan sel, umumnya berupa trisomi autosom, monosomi X, atau poliploidi. Kelainan ini tidak sesuai dengan kehidupan, sehingga perkembangan berhenti dan hasil konsepsi mati. Kematian jaringan konsepsi menyebabkan kadar hormon progesteron dan hCG yang dihasilkan trofoblas MENURUN; desidua kehilangan penyokong hormonalnya lalu mengalami nekrosis dan perdarahan pada lapisan basal. Perdarahan ini memisahkan hasil konsepsi dari dinding rahim, dan hasil konsepsi yang telah terlepas kini bertindak sebagai BENDA ASING yang merangsang kontraksi uterus. Kontraksi inilah yang dirasakan pasien sebagai mulas yang menghebat, dan yang membuka serviks serta mendorong jaringan keluar. Bila SELURUH jaringan berhasil keluar — keadaan yang paling sering terjadi pada usia kehamilan kurang dari 8-10 minggu ketika plasenta belum melekat dalam — maka rahim dapat berkontraksi dengan baik, pembuluh darah spiralis terjepit oleh serat otot miometrium yang saling menganyam, perdarahan berhenti, dan serviks menutup kembali. Inilah rangkaian yang menghasilkan gambaran khas ABORTUS KOMPLIT: perdarahan dan nyeri yang MEREDA setelah jaringan keluar, ostium yang TERTUTUP, dan uterus yang mengecil. Sebaliknya, bila sebagian jaringan tertinggal, sisa tersebut MENGHALANGI kontraksi rahim sehingga pembuluh darah tetap terbuka — akibatnya perdarahan JUSTRU MENETAP atau bertambah dan ostium tetap terbuka, yaitu gambaran ABORTUS INKOMPLIT yang memerlukan evakuasi. Perbedaan mekanistik inilah yang membuat pertanyaan sederhana "apakah perdarahan berkurang setelah jaringan keluar" memiliki nilai diagnostik yang tinggi. Pemahaman ini juga menjelaskan dua hal yang penting bagi keselamatan pasien. Pertama, sisa jaringan yang tertinggal bukan hanya menimbulkan perdarahan melainkan juga menjadi media pertumbuhan bakteri, sehingga dapat berkembang menjadi ABORTUS SEPTIK dengan risiko sepsis. Kedua, pada ibu dengan RHESUS NEGATIF, perdarahan saat keguguran memungkinkan eritrosit janin yang rhesus positif masuk ke sirkulasi ibu dan memicu pembentukan antibodi; antibodi ini akan menembus plasenta pada kehamilan berikutnya dan menghancurkan eritrosit janin sehingga menimbulkan penyakit hemolitik pada bayi — inilah dasar pemberian IMUNOGLOBULIN ANTI-D, sebuah tindakan pencegahan sederhana yang akibatnya baru terasa bertahun-tahun kemudian bila terlewat. Terakhir, perlu ditegaskan bahwa aktivitas fisik biasa, hubungan seksual, kelelahan, terpeleset ringan, mengangkat benda, maupun perasaan sedih TIDAK menyebabkan keguguran — keyakinan sebaliknya sangat lazim di masyarakat dan menimbulkan rasa bersalah yang mendalam serta tuduhan dari keluarga, sehingga meluruskannya merupakan bagian nyata dari pengobatan, bukan sekadar penghiburan.',
     faktorRisiko: [
       'USIA IBU LANJUT — faktor terkuat; risiko meningkat tajam setelah 35 tahun dan sangat tinggi di atas 40 tahun akibat meningkatnya kelainan kromosom oosit',
-      'History keguguran sebelumnya, dengan risiko yang meningkat mengikuti jumlah episode',
+      'Riwayat keguguran sebelumnya, dengan risiko yang meningkat mengikuti jumlah episode',
       'Usia ayah lanjut',
       'MEROKOK, konsumsi alkohol, dan penggunaan narkoba',
       'Konsumsi kafein berlebihan',
@@ -14553,7 +14553,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kelainan anatomi rahim: septum uteri, mioma submukosa, sindrom Asherman',
       'Infeksi tertentu dan penyakit radang panggul',
       'Paparan bahan kimia, pestisida, dan radiasi',
-      'History tindakan pada serviks dan serviks inkompeten (terutama trimester kedua)',
+      'Riwayat tindakan pada serviks dan serviks inkompeten (terutama trimester kedua)',
       'Trombofilia',
       'Penyakit kronik yang tidak terkendali',
     ],
@@ -14702,7 +14702,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Inkompeten serviks': {
     definisi: 'Ketidakmampuan serviks mempertahankan kehamilan akibat kelemahan struktural, menyebabkan pembukaan tanpa kontraksi.',
-    diagnosis: ['History kehilangan kehamilan trimester kedua yang berulang, TANPA NYERI dan tanpa kontraksi bermakna, dengan pembukaan serviks progresif; USG transvaginal menunjukkan pemendekan serviks dan funneling; faktor risiko: riwayat konisasi, trauma serviks, kelainan kongenital'],
+    diagnosis: ['Riwayat kehilangan kehamilan trimester kedua yang berulang, TANPA NYERI dan tanpa kontraksi bermakna, dengan pembukaan serviks progresif; USG transvaginal menunjukkan pemendekan serviks dan funneling; faktor risiko: riwayat konisasi, trauma serviks, kelainan kongenital'],
     tatalaksana: ['Serklase serviks (profilaksis berdasarkan riwayat pada 12-14 minggu, atau berdasarkan USG/pemeriksaan), progesteron vaginal untuk serviks pendek; batasi aktivitas berat; pelepasan serklase pada 36-37 minggu atau bila inpartu/ketuban pecah'],
     referensi: ['SKDI2012', 'POGI2016', 'WILLIAMSOB2022'],
   },
@@ -14809,10 +14809,10 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       keluhanUtama: 'Nyeri pada jalan lahir setelah melahirkan disertai perdarahan dari luka.',
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES. Site: perineum, dinding vagina, dan sekitar anus. Onset: segera setelah persalinan. Character: nyeri perih yang bertambah saat duduk, berjalan, dan buang air. Radiation: menjalar ke bokong dan sekitar anus. Associations: TANYAKAN SECARA LANGSUNG APAKAH IBU DAPAT MENAHAN BUANG ANGIN DAN BUANG AIR BESAR — pertanyaan ini menentukan apakah sfingter ani terlibat, dan sering tidak ditanyakan karena dianggap tidak sopan. Tanyakan pula nyeri saat berkemih dan kesulitan berkemih. Time course: nyeri memuncak pada 2-3 hari pertama lalu mereda; nyeri yang justru bertambah setelah hari ketiga mengarah pada infeksi maupun hematoma. Exacerbating: duduk, mengedan, dan buang air besar. Severity: nilai kemampuan duduk, merawat bayi, dan menyusui.',
-      riwayatPenyakitDahulu: 'History robekan perineum maupun episiotomi pada persalinan sebelumnya, riwayat operasi daerah perineum, penyakit yang memperlambat penyembuhan seperti diabetes, dan gangguan pembekuan darah.',
+      riwayatPenyakitDahulu: 'Riwayat robekan perineum maupun episiotomi pada persalinan sebelumnya, riwayat operasi daerah perineum, penyakit yang memperlambat penyembuhan seperti diabetes, dan gangguan pembekuan darah.',
       riwayatPenyakitKeluarga: 'Umumnya tidak relevan.',
       riwayatPengobatan: 'Obat yang sedang diminum termasuk antikoagulan, kortikosteroid, dan obat yang memengaruhi menyusui.',
-      riwayatAlergi: 'History alergi obat, terutama anestesi lokal dan antibiotik.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama anestesi lokal dan antibiotik.',
       riwayatKehamilanPersalinan:
         'INTI ANAMNESIS: jumlah kehamilan dan persalinan, berat lahir bayi, lama kala dua, cara persalinan apakah spontan maupun dengan bantuan alat, posisi persalinan, ada tidaknya episiotomi, letak bayi, dan distosia bahu. Persalinan dengan forsep, bayi besar, dan kala dua yang panjang merupakan faktor risiko utama robekan yang lebih berat.',
       riwayatNutrisi: 'Asupan makan dan cairan, serta pola buang air besar — sembelit memperberat nyeri dan berisiko merusak jahitan.',
@@ -14847,7 +14847,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Distosia bahu dan letak belakang kepala posisi oksiput posterior',
       'Episiotomi garis tengah, yang justru menaikkan risiko robekan meluas ke sfingter',
       'Kepala lahir terlalu cepat tanpa dikendalikan',
-      'History robekan perineum sebelumnya',
+      'Riwayat robekan perineum sebelumnya',
       'Perineum yang pendek dan jaringan yang kaku',
     ],
     goldStandard:
@@ -14888,7 +14888,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Jaga perineum tetap bersih dan kering; cebok dari depan ke belakang dan keringkan dengan menepuk',
       'Duduk dengan bantal berlubang maupun miring ke satu sisi pada hari-hari pertama untuk mengurangi tekanan pada jahitan',
       'JANGAN MENGEDAN KERAS saat buang air besar; bila terasa nyeri, tekan perlahan area jahitan dengan tisu bersih saat mengedan ringan',
-      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan; ibu menyusui memerlukan tambahan sekitar 300-500 kkal per hari sehingga porsi TIDAK boleh dikurangi demi menurunkan berat badan. Adequatekan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe untuk penyembuhan luka. PERBANYAK SERAT dari sayur, buah, dan biji-bijian utuh, serta MINUM 10-12 GELAS AIR PER HARI — mencegah sembelit merupakan bagian dari melindungi jahitan, karena tinja yang keras memaksa mengedan dan dapat merusaknya. Tidak ada dasar memantang telur maupun ikan setelah melahirkan; pantangan seperti itu justru memperlambat penyembuhan',
+      'Jadwal dan porsi makan: tiga kali makan utama pada jam tetap ditambah 2-3 selingan; ibu menyusui memerlukan tambahan sekitar 300-500 kkal per hari sehingga porsi TIDAK boleh dikurangi demi menurunkan berat badan. Cukupkan protein 1,2-1,5 gram per kilogram berat badan per hari dari telur, ikan, ayam, tahu, dan tempe untuk penyembuhan luka. PERBANYAK SERAT dari sayur, buah, dan biji-bijian utuh, serta MINUM 10-12 GELAS AIR PER HARI — mencegah sembelit merupakan bagian dari melindungi jahitan, karena tinja yang keras memaksa mengedan dan dapat merusaknya. Tidak ada dasar memantang telur maupun ikan setelah melahirkan; pantangan seperti itu justru memperlambat penyembuhan',
       'Jam tidur: usahakan total 7-8 jam meskipun terpecah mengikuti jadwal menyusui — tidurlah saat bayi tidur alih-alih mengerjakan hal lain. Tidur MIRING untuk mengurangi tekanan pada perineum, dan gunakan bantal di antara lutut agar posisi lebih nyaman. Kurang tidur pada masa nifas berkaitan dengan depresi pascapersalinan, sehingga meminta bantuan agar bisa tidur bukan kemanjaan melainkan kebutuhan',
       'Pola olahraga: MULAI LATIHAN OTOT DASAR PANGGUL (senam Kegel) sesegera nyeri memungkinkan, umumnya beberapa hari setelah melahirkan — kencangkan otot seperti menahan buang air kecil selama 5 detik lalu lepaskan, 10 kali sebanyak 3 set per hari. Inilah latihan yang paling menentukan pemulihan fungsi menahan kencing dan kekuatan dasar panggul jangka panjang. Untuk aktivitas umum, mulai dengan jalan kaki ringan di dalam rumah 5-10 menit sehari pada minggu pertama, lalu tingkatkan bertahap. HINDARI mengangkat beban lebih berat daripada bayi, berlari, melompat, sit-up, dan bersepeda selama minimal 6 minggu sampai dinyatakan pulih pada kontrol nifas. Jangan berenang maupun berendam sampai luka menutup dan darah nifas berhenti',
       'Tunda hubungan seksual sampai luka sembuh, darah nifas berhenti, dan ibu merasa siap — umumnya sekitar 6 minggu, dan tidak perlu terburu-buru',
@@ -14947,7 +14947,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
   },
   'Inkontinensia feses': {
     definisi: 'Ketidakmampuan menahan feses atau flatus, pada wanita sering akibat cedera sfingter ani saat persalinan.',
-    diagnosis: ['History robekan perineum derajat 3-4 atau persalinan operatif pervaginam, colok dubur menilai tonus sfingter, USG endoanal menilai defek sfingter; nilai dampak psikososial yang sering besar dan tidak dilaporkan pasien kecuali ditanya'],
+    diagnosis: ['Riwayat robekan perineum derajat 3-4 atau persalinan operatif pervaginam, colok dubur menilai tonus sfingter, USG endoanal menilai defek sfingter; nilai dampak psikososial yang sering besar dan tidak dilaporkan pasien kecuali ditanya'],
     tatalaksana: ['Pengaturan konsistensi tinja (serat, antidiare), latihan otot dasar panggul dan biofeedback, perawatan kulit perianal; repair sfingter atau sakral neuromodulasi pada kasus terpilih; TANYAKAN AKTIF pada pasien pascapersalinan berisiko karena pasien sering malu melaporkan'],
     referensi: ['SKDI2012', 'SLEISENGER2021', 'POGI2016'],
   },
@@ -14975,7 +14975,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan bisul berulang, yang mengarah pada penularan kuman pembawa dalam satu rumah.',
       riwayatPengobatan:
         'Antibiotik yang sudah dipakai beserta lamanya — TIDAK MEMBAIKNYA ABSES DENGAN ANTIBIOTIK YANG BENAR BUKAN BERARTI ANTIBIOTIKNYA SALAH, melainkan menandakan nanah perlu dikeluarkan. Tanyakan pula kortikosteroid, obat imunosupresan, dan apakah benjolan sudah dipencet maupun ditusuk sendiri.',
-      riwayatAlergi: 'History alergi obat, terutama antibiotik dan anestesi lokal.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama antibiotik dan anestesi lokal.',
       riwayatNutrisi: 'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan dan meningkatkan kerentanan.',
       riwayatSosialEkonomi:
         'Kebersihan diri dan ketersediaan air bersih, kebiasaan bercukur beserta alat yang dipakai bergantian, pakaian ketat, olahraga kontak, pemakaian handuk bersama, kepadatan hunian, dan pekerjaan yang panas maupun berminyak.',
@@ -15224,13 +15224,13 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan. Site: satu maupun kedua puting; PUTING YANG TERTARIK HANYA PADA SATU SISI JAUH LEBIH MENCURIGAKAN daripada kedua sisi. Onset: PERTANYAAN YANG PALING MENENTUKAN — apakah sudah begini SEJAK REMAJA atau BARU BERUBAH belakangan. Bawaan sejak masa pubertas hampir selalu jinak; perubahan baru pada usia dewasa menuntut penelusuran keganasan. Character: apakah puting dapat dikeluarkan dengan menarik lembut, dan apakah bertahan keluar setelah dilepas. Radiation: tidak khas. Associations: TANYAKAN TANDA BAHAYA — benjolan pada payudara, keluar cairan terutama berdarah dari puting, kulit payudara berkerut maupun menyerupai kulit jeruk, luka pada puting yang tidak sembuh, dan benjolan di ketiak. Pada ibu menyusui, tanyakan kesulitan bayi melekat, nyeri saat menyusui, dan kecukupan air susu. Time course: menetap bila bawaan, progresif bila akibat penarikan oleh massa. Severity: nilai dampak pada menyusui dan kepercayaan diri.',
       riwayatPenyakitDahulu:
-        'History operasi payudara, abses payudara, mastitis berulang, dan trauma payudara — semuanya dapat menarik puting melalui jaringan parut. History keganasan payudara sebelumnya dan riwayat radioterapi dada.',
+        'Riwayat operasi payudara, abses payudara, mastitis berulang, dan trauma payudara — semuanya dapat menarik puting melalui jaringan parut. Riwayat keganasan payudara sebelumnya dan riwayat radioterapi dada.',
       riwayatPenyakitKeluarga:
         'RIWAYAT KANKER PAYUDARA DAN INDUNG TELUR PADA KELUARGA, terutama pada kerabat derajat pertama dan pada usia muda — menentukan seberapa rendah ambang untuk melakukan pencitraan.',
       riwayatPengobatan: 'Kontrasepsi hormonal, terapi hormon, dan obat yang menimbulkan keluarnya air susu di luar menyusui.',
-      riwayatAlergi: 'History alergi obat dan bahan pelindung puting.',
+      riwayatAlergi: 'Riwayat alergi obat dan bahan pelindung puting.',
       riwayatKehamilanPersalinan:
-        'History kehamilan dan persalinan, riwayat menyusui sebelumnya beserta keberhasilan maupun kesulitannya, dan bila sedang hamil, usia kehamilannya.',
+        'Riwayat kehamilan dan persalinan, riwayat menyusui sebelumnya beserta keberhasilan maupun kesulitannya, dan bila sedang hamil, usia kehamilannya.',
       riwayatNutrisi: 'Pada ibu menyusui, nilai kecukupan asupan dan pola menyusui.',
       riwayatSosialEkonomi:
         'Dampak terhadap kepercayaan diri dan citra tubuh, dukungan keluarga untuk menyusui, akses ke konselor laktasi, serta kekhawatiran yang dimiliki pasien sendiri — sering yang paling menekan adalah ketakutan tidak dapat menyusui kelak.',
@@ -15260,11 +15260,11 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Puting normal ditopang oleh saluran susu dan jaringan ikat yang cukup panjang sehingga dapat menonjol. Pada bentuk bawaan, saluran susu dan pita jaringan ikat di bawah puting lebih pendek dan menarik puting ke dalam sejak jaringan payudara berkembang pada masa pubertas — karena itu keadaan ini muncul saat remaja, bersifat menetap, umumnya mengenai kedua sisi, dan tidak menandakan penyakit apa pun. Derajat keparahannya ditentukan oleh seberapa pendek dan seberapa banyak pita jaringan ikat tersebut, dan inilah yang menjelaskan mengapa sebagian puting masih dapat dikeluarkan dengan tarikan sementara sebagian lain tidak sama sekali. Sebaliknya, puting yang semula normal lalu tertarik masuk berarti ada sesuatu yang MENARIKNYA DARI DALAM. Penyebab jinak seperti jaringan parut pascaabses maupun ektasia duktus memang mungkin, namun keganasan payudara menghasilkan gambaran yang persis sama melalui mekanisme yang sama: tumor yang tumbuh menimbulkan reaksi jaringan ikat yang memendek dan menarik struktur di sekitarnya, sehingga puting tertarik ke dalam dan kulit di atasnya berkerut. Perbedaan antara bawaan dan didapat karena itu bukan soal derajat melainkan soal arti — dan itulah sebabnya pertanyaan sederhana tentang sejak kapan keadaan ini ada merupakan pertanyaan terpenting pada keluhan ini. Pada menyusui, puting terbenam menyulitkan bayi melekat, namun perlu dipahami bahwa bayi menyusu pada AREOLA dan bukan pada puting semata, sehingga sebagian besar ibu dengan puting terbenam tetap dapat menyusui dengan bantuan teknik yang tepat.',
     faktorRisiko: [
       'Bawaan dan riwayat keluarga dengan bentuk puting serupa',
-      'History abses payudara dan mastitis berulang',
-      'History operasi maupun trauma payudara',
+      'Riwayat abses payudara dan mastitis berulang',
+      'Riwayat operasi maupun trauma payudara',
       'Ektasia duktus, terutama pada perempuan usia perimenopause dan perokok',
       'Usia lanjut dan riwayat keluarga kanker payudara untuk bentuk yang didapat',
-      'History radioterapi dada',
+      'Riwayat radioterapi dada',
     ],
     goldStandard:
       'Penentuan yang paling menentukan bukan derajatnya melainkan apakah bersifat BAWAAN atau DIDAPAT. Bentuk bawaan yang menetap sejak remaja pada kedua sisi tanpa tanda bahaya ditegakkan secara klinis dan tidak memerlukan pemeriksaan. Puting yang baru tertarik masuk pada usia dewasa, terlebih pada satu sisi, wajib ditelusuri dengan ultrasonografi maupun mamografi sesuai usia, dan setiap massa yang ditemukan dibiopsi.',
@@ -15278,7 +15278,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Eksim puting pada dermatitis atopik — berbeda dari Paget karena membaik dengan kortikosteroid dan sering mengenai kedua sisi',
     ],
     pengkajian:
-      'Dipikirkan puting terbenam bawaan pada pasien ini atas dasar puting yang tertarik ke dalam pada kedua payudara, sudah demikian sejak masa remaja tanpa pernah berubah, dan tidak disertai benjolan, cairan dari puting, kulit yang berkerut, maupun pembesaran kelenjar getah bening. History sejak kapan keadaan ini ada merupakan pertanyaan yang paling menentukan pada keluhan ini, sebab bentuk bawaan yang muncul saat jaringan payudara berkembang pada masa pubertas bersifat jinak sepenuhnya, sedangkan puting yang semula normal lalu tertarik masuk berarti ada sesuatu yang menariknya dari dalam. Keterlibatan kedua sisi juga menenangkan, karena tarikan akibat keganasan hampir selalu mengenai satu sisi. Kanker payudara merupakan hal yang wajib disingkirkan pada setiap tarikan puting yang didapat, dan pada kasus ini disingkirkan atas dasar riwayat yang menetap sejak remaja beserta pemeriksaan payudara yang tidak menemukan massa maupun perubahan kulit — namun perlu ditegaskan bahwa bila riwayatnya berbeda, yaitu perubahan baru pada usia dewasa terlebih pada satu sisi, maka ultrasonografi maupun mamografi menjadi wajib tanpa memandang seberapa yakin pemeriksaan fisik terasa. Penyakit Paget pada payudara disebut secara khusus karena lesinya menyerupai eksim pada puting dan kerap diobati sebagai eksim selama berbulan-bulan; setiap luka berkerak pada puting yang tidak sembuh dengan kortikosteroid harus dibiopsi alih-alih diganti mereknya. Ektasia duktus dipertimbangkan pada perempuan usia perimenopause dengan cairan puting, namun tidak sesuai di sini. Yang perlu disampaikan kepada pasien adalah bahwa keadaan ini tidak berbahaya dan bahwa sebagian besar ibu dengan puting terbenam tetap dapat menyusui, sebab bayi menyusu pada areola alih-alih pada puting semata — kekhawatiran tidak dapat menyusui kerap merupakan beban terbesar pada keluhan ini dan jarang ditanyakan.',
+      'Dipikirkan puting terbenam bawaan pada pasien ini atas dasar puting yang tertarik ke dalam pada kedua payudara, sudah demikian sejak masa remaja tanpa pernah berubah, dan tidak disertai benjolan, cairan dari puting, kulit yang berkerut, maupun pembesaran kelenjar getah bening. Riwayat sejak kapan keadaan ini ada merupakan pertanyaan yang paling menentukan pada keluhan ini, sebab bentuk bawaan yang muncul saat jaringan payudara berkembang pada masa pubertas bersifat jinak sepenuhnya, sedangkan puting yang semula normal lalu tertarik masuk berarti ada sesuatu yang menariknya dari dalam. Keterlibatan kedua sisi juga menenangkan, karena tarikan akibat keganasan hampir selalu mengenai satu sisi. Kanker payudara merupakan hal yang wajib disingkirkan pada setiap tarikan puting yang didapat, dan pada kasus ini disingkirkan atas dasar riwayat yang menetap sejak remaja beserta pemeriksaan payudara yang tidak menemukan massa maupun perubahan kulit — namun perlu ditegaskan bahwa bila riwayatnya berbeda, yaitu perubahan baru pada usia dewasa terlebih pada satu sisi, maka ultrasonografi maupun mamografi menjadi wajib tanpa memandang seberapa yakin pemeriksaan fisik terasa. Penyakit Paget pada payudara disebut secara khusus karena lesinya menyerupai eksim pada puting dan kerap diobati sebagai eksim selama berbulan-bulan; setiap luka berkerak pada puting yang tidak sembuh dengan kortikosteroid harus dibiopsi alih-alih diganti mereknya. Ektasia duktus dipertimbangkan pada perempuan usia perimenopause dengan cairan puting, namun tidak sesuai di sini. Yang perlu disampaikan kepada pasien adalah bahwa keadaan ini tidak berbahaya dan bahwa sebagian besar ibu dengan puting terbenam tetap dapat menyusui, sebab bayi menyusu pada areola alih-alih pada puting semata — kekhawatiran tidak dapat menyusui kerap merupakan beban terbesar pada keluhan ini dan jarang ditanyakan.',
     terapiSuportif: [
       'Pada bentuk bawaan tanpa keluhan, TIDAK DIPERLUKAN TINDAKAN APA PUN — cukup penjelasan bahwa keadaan ini jinak',
       'Untuk menyusui: pijat dan tarik lembut puting sebelum menyusui, maupun gunakan pompa manual sesaat untuk mengeluarkan puting',
@@ -15501,7 +15501,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     diagnosis: [
       'Bentuk bubonik (tersering): demam tinggi mendadak, menggigil, dan BUBO yaitu pembesaran kelenjar getah bening yang sangat nyeri (inguinal/aksila/servikal) dengan edema sekitarnya',
       'Bentuk pneumonik: pneumonia berat dengan hemoptisis, menular antarmanusia melalui droplet; bentuk septikemik: sepsis dengan purpura dan gangren akral',
-      'History tinggal/berkunjung ke daerah fokus pes dan kontak dengan tikus atau hewan mati; konfirmasi dengan pewarnaan dan kultur aspirat bubo, darah, atau sputum',
+      'Riwayat tinggal/berkunjung ke daerah fokus pes dan kontak dengan tikus atau hewan mati; konfirmasi dengan pewarnaan dan kultur aspirat bubo, darah, atau sputum',
     ],
     tatalaksana: [
       'Antibiotik SEGERA tanpa menunggu konfirmasi laboratorium (streptomisin/gentamisin, alternatif doksisiklin atau siprofloksasin) — keterlambatan meningkatkan mortalitas secara tajam',
@@ -15563,12 +15563,12 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitSekarang:
         'Telusuri dengan kerangka SOCRATES yang disesuaikan untuk keluhan sistemik. Site: keluhan bersifat menyeluruh berupa lemah dan cepat lelah. Onset: perlahan seiring bertambahnya usia kehamilan, tersering pada trimester kedua dan ketiga saat kebutuhan besi memuncak. Character: lemas yang tidak sebanding dengan aktivitas, pusing berkunang-kunang terutama saat berdiri dari duduk, jantung berdebar, dan sesak saat menaiki tangga. Radiation: tidak khas. Associations: TANYAKAN PIKA yaitu keinginan kuat memakan bahan bukan makanan seperti es batu dalam jumlah banyak, tanah, atau kapur — gejala ini sangat khas untuk kekurangan besi dan sering tidak dilaporkan pasien kecuali ditanyakan langsung. Tanyakan pula rambut rontok, kuku mudah patah, sariawan di sudut bibir, serta sindrom kaki gelisah. Time course: apakah memberat seiring bertambahnya usia kehamilan. Exacerbating: aktivitas fisik dan perubahan posisi. Severity: kemampuan mengerjakan pekerjaan rumah tangga dan bekerja, serta ada tidaknya sesak saat istirahat yang menandakan anemia berat.',
       riwayatPenyakitDahulu:
-        'History anemia pada kehamilan sebelumnya, riwayat perdarahan haid yang banyak dan lama sebelum hamil, riwayat penyakit lambung dan pemakaian obat penurun asam lambung yang mengurangi penyerapan besi, riwayat cacingan, riwayat operasi lambung, serta riwayat penyakit ginjal kronik dan penyakit menahun lain.',
+        'Riwayat anemia pada kehamilan sebelumnya, riwayat perdarahan haid yang banyak dan lama sebelum hamil, riwayat penyakit lambung dan pemakaian obat penurun asam lambung yang mengurangi penyerapan besi, riwayat cacingan, riwayat operasi lambung, serta riwayat penyakit ginjal kronik dan penyakit menahun lain.',
       riwayatPenyakitKeluarga:
-        'History talasemia dan anemia bawaan pada keluarga — penting karena talasemia trait menyerupai anemia defisiensi besi pada pemeriksaan darah rutin namun tidak boleh diobati dengan besi berlebihan.',
+        'Riwayat talasemia dan anemia bawaan pada keluarga — penting karena talasemia trait menyerupai anemia defisiensi besi pada pemeriksaan darah rutin namun tidak boleh diobati dengan besi berlebihan.',
       riwayatPengobatan:
         'Kepatuhan meminum tablet tambah darah yang diberikan pada pemeriksaan kehamilan, termasuk apakah pernah dihentikan karena mual maupun sembelit. Penggunaan antasida dan penghambat pompa proton, kalsium, serta obat lain yang mengganggu penyerapan besi.',
-      riwayatAlergi: 'History alergi obat dan intoleransi terhadap sediaan besi oral sebelumnya.',
+      riwayatAlergi: 'Riwayat alergi obat dan intoleransi terhadap sediaan besi oral sebelumnya.',
       riwayatKehamilanPersalinan:
         'Usia kehamilan saat ini, jumlah kehamilan dan persalinan sebelumnya, JARAK ANTARKEHAMILAN yang bila kurang dari dua tahun tidak memberi waktu cadangan besi pulih, riwayat perdarahan pada kehamilan atau persalinan sebelumnya, kehamilan kembar yang menggandakan kebutuhan besi, serta ada tidaknya perdarahan pervaginam saat ini.',
       riwayatNutrisi:
@@ -15605,7 +15605,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Jarak antarkehamilan kurang dari 2 tahun dan jumlah kehamilan yang banyak',
       'Kehamilan kembar',
       'Asupan besi rendah, pola makan vegetarian tanpa pengaturan, dan kebiasaan minum teh maupun kopi bersamaan dengan makan',
-      'History perdarahan haid yang banyak sebelum hamil',
+      'Riwayat perdarahan haid yang banyak sebelum hamil',
       'Infeksi cacing tambang di daerah endemis dan sanitasi yang buruk',
       'Anemia pada kehamilan sebelumnya',
       'Usia remaja saat hamil, karena kebutuhan pertumbuhan ibu sendiri masih tinggi',
@@ -15697,9 +15697,9 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatPenyakitKeluarga: 'Anggota keluarga dengan keluhan serupa; riwayat diabetes pada keluarga.',
       riwayatPengobatan:
         'ANTIJAMUR YANG SUDAH DIPAKAI BESERTA LAMANYA — tidak membaiknya lesi dengan antijamur yang dipakai benar merupakan petunjuk kuat bahwa penyebabnya bukan jamur. Tanyakan pula krim kortikosteroid dan krim racikan.',
-      riwayatAlergi: 'History alergi obat, terutama makrolid dan antibiotik topikal.',
+      riwayatAlergi: 'Riwayat alergi obat, terutama makrolid dan antibiotik topikal.',
       riwayatSosialEkonomi:
-        'Occupation yang panas dan membuat banyak berkeringat, pakaian ketat dan berlapis, kebiasaan mandi dan mengeringkan lipatan setelah mandi, kondisi hunian yang lembap, serta berat badan dan aktivitas fisik.',
+        'Pekerjaan yang panas dan membuat banyak berkeringat, pakaian ketat dan berlapis, kebiasaan mandi dan mengeringkan lipatan setelah mandi, kondisi hunian yang lembap, serta berat badan dan aktivitas fisik.',
     },
     pemeriksaanFisik: [
       'Bercak berwarna coklat kemerahan sampai coklat, BERBATAS TEGAS, dengan tepi rata yang TIDAK MENINGGI dan TIDAK ADA TEPI AKTIF — berbeda tegas dari tinea kruris yang tepinya meninggi dan aktif dengan bagian tengah lebih tenang',
@@ -15730,7 +15730,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebersihan yang terbatas dan pakaian ketat yang tidak menyerap keringat',
       'Keadaan imunitas menurun',
       'Usia lanjut',
-      'Occupation di tempat panas dan aktivitas yang membuat banyak berkeringat',
+      'Pekerjaan di tempat panas dan aktivitas yang membuat banyak berkeringat',
     ],
     goldStandard:
       'Diagnosis ditegakkan dari bercak kecoklatan berbatas tegas dengan sisik halus pada daerah lipatan tanpa tepi aktif, dan dipastikan dengan pemeriksaan lampu Wood yang memperlihatkan fluoresensi merah bata. Pemeriksaan larutan KOH dikerjakan untuk menyingkirkan jamur. Perlu diingat bahwa fluoresensi dapat negatif palsu bila daerah tersebut baru dibersihkan, sehingga pemeriksaan tidak dilakukan segera setelah mandi.',

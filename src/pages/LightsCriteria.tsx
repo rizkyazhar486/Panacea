@@ -62,7 +62,7 @@ export function LightsCriteria() {
           {criteria.map((c) => (
             <div key={c.label} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <div>
-                <div className="text-sm font-bold text-ink dark:text-white">{c.label}</div>
+                <div className="text-sm font-bold text-ink dark:text-ink">{c.label}</div>
                 <div className="text-[11px] text-neutral-400">Value: {c.value}</div>
               </div>
               <Badge tone={c.met ? 'critical' : 'brand'}>{c.met ? 'Met' : 'Not met'}</Badge>

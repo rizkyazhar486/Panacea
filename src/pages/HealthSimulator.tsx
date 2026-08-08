@@ -144,7 +144,7 @@ export function HealthSimulator() {
             <label key={l.id} className="flex items-start gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded" checked={!!active[l.id]} onChange={() => setActive((a) => ({ ...a, [l.id]: !a[l.id] }))} />
               <span>
-                <span className="text-sm font-bold text-ink dark:text-white">{l.label}</span>
+                <span className="text-sm font-bold text-ink dark:text-ink">{l.label}</span>
                 <span className="block text-[12px] leading-snug text-neutral-500">{l.detail}</span>
               </span>
             </label>
@@ -159,7 +159,7 @@ export function HealthSimulator() {
             <div className="mt-2 grid grid-cols-2 gap-4">
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Now</div>
-                <div className="mt-1 text-3xl font-black text-ink dark:text-white">{baseRisk!.toFixed(1)}%</div>
+                <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{baseRisk!.toFixed(1)}%</div>
                 <Badge tone={cvdBand(baseRisk!).tone}>{cvdBand(baseRisk!).label}</Badge>
               </div>
               <div>

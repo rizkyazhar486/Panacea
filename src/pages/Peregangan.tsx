@@ -24,8 +24,8 @@ const TAB: { id: Kapan | 'semua'; label: string; emoji: string }[] = [
 ]
 
 const WARNA: Record<Kapan, string> = {
-  sebelum: 'text-amber-400', sesudah: 'text-emerald-400',
-  harian: 'text-sky-400', yoga: 'text-violet-400',
+  sebelum: 'text-amber-700', sesudah: 'text-emerald-700',
+  harian: 'text-sky-700', yoga: 'text-violet-700',
 }
 const LABEL_KAPAN: Record<Kapan, string> = {
   sebelum: 'dinamis · sebelum latihan', sesudah: 'statis · sesudah latihan',
@@ -59,14 +59,14 @@ export function Peregangan() {
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-amber-400">Satu hal yang perlu diluruskan dulu</div>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-300">
+        <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Satu hal yang perlu diluruskan dulu</div>
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
           Peregangan <b>statis</b> sebelum latihan — menahan posisi 30 detik atau lebih — menurunkan
           tenaga dan kekuatan untuk sementara, dan <b>tidak</b> menurunkan risiko cedera. Yang sebelum
           latihan seharusnya <b>dinamis</b>: gerakan yang membawa sendi melewati rentang geraknya
           berulang kali.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-300">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
           Peregangan statis tetap punya tempat — setelah latihan, atau sebagai sesi tersendiri untuk
           menambah rentang gerak. Hanya waktunya yang selama ini keliru.
         </p>
@@ -74,8 +74,8 @@ export function Peregangan() {
 
       {/* Protokol siap pakai */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Rutinitas siap pakai</div>
-        <p className="mt-1 text-[12px] text-slate-400">Pilih situasinya, bukan ototnya.</p>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rutinitas siap pakai</div>
+        <p className="mt-1 text-[12px] text-neutral-500">Pilih situasinya, bukan ototnya.</p>
         <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {PROTOKOL.map((p) => (
             <button
@@ -86,8 +86,8 @@ export function Peregangan() {
                 protokol === p.id ? 'bg-brand/25 ring-2 ring-brand' : 'bg-white/5'
               }`}>
               <div className="text-lg">{p.ikon}</div>
-              <div className="text-[12px] font-black leading-tight text-white">{p.nama}</div>
-              <div className="text-[10px] text-slate-400">{p.ringkas}</div>
+              <div className="text-[12px] font-black leading-tight text-ink">{p.nama}</div>
+              <div className="text-[10px] text-neutral-500">{p.ringkas}</div>
             </button>
           ))}
         </div>
@@ -95,8 +95,8 @@ export function Peregangan() {
         {pAktif && (
           <div className="mt-3 rounded-xl bg-white/5 p-3">
             <div className="flex items-baseline justify-between gap-2">
-              <div className="text-[13px] font-black text-white">{pAktif.ikon} {pAktif.nama}</div>
-              <div className="text-[10px] font-bold text-slate-400">{pAktif.durasiTotal}</div>
+              <div className="text-[13px] font-black text-ink">{pAktif.ikon} {pAktif.nama}</div>
+              <div className="text-[10px] font-bold text-neutral-500">{pAktif.durasiTotal}</div>
             </div>
             <ol className="mt-2 space-y-1">
               {pAktif.urutan.map((id, i) => {
@@ -108,21 +108,21 @@ export function Peregangan() {
                       onClick={() => { setBuka(id); setTab('semua') }}
                       className="flex w-full items-baseline gap-2 rounded-lg px-1 py-1 text-left hover:bg-white/5">
                       <span className="text-[11px] font-black text-brand">{i + 1}.</span>
-                      <span className="flex-1 text-[12px] font-semibold text-white">{g.nama}</span>
-                      <span className="text-[10px] text-slate-400">{g.durasi}</span>
+                      <span className="flex-1 text-[12px] font-semibold text-ink">{g.nama}</span>
+                      <span className="text-[10px] text-neutral-500">{g.durasi}</span>
                     </button>
                   </li>
                 )
               })}
             </ol>
-            <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{pAktif.catatan}</p>
+            <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{pAktif.catatan}</p>
           </div>
         )}
       </Card>
 
       {/* Daftar gerakan */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Gerakan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Gerakan</div>
         <input
           className={`${inputClass} mt-2`}
           placeholder="Cari: hamstring, bahu, lari, duduk…"
@@ -136,7 +136,7 @@ export function Peregangan() {
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${
-                tab === t.id ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'
+                tab === t.id ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'
               }`}>
               {t.emoji} {t.label}
             </button>
@@ -144,7 +144,7 @@ export function Peregangan() {
         </div>
 
         {daftar.length === 0 && (
-          <p className="mt-3 text-[12px] text-slate-400">Tidak ada yang cocok dengan "{cari}".</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Tidak ada yang cocok dengan "{cari}".</p>
         )}
 
         <div className="mt-3 space-y-1.5">
@@ -158,13 +158,13 @@ export function Peregangan() {
                   className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left">
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[13px] font-black text-white">{g.nama}</span>
+                      <span className="text-[13px] font-black text-ink">{g.nama}</span>
                       {g.video ? <span className="text-[10px]" title="Ada klip">🎬</span>
                         : g.gambar ? <span className="text-[10px]" title="Ada foto acuan">🖼️</span> : null}
                     </div>
                     <div className={`truncate text-[10px] font-bold ${WARNA[g.kapan]}`}>{LABEL_KAPAN[g.kapan]}</div>
                   </div>
-                  <span className={`shrink-0 text-slate-400 transition ${terbuka ? 'rotate-90' : ''}`}>›</span>
+                  <span className={`shrink-0 text-neutral-500 transition ${terbuka ? 'rotate-90' : ''}`}>›</span>
                 </button>
                 {terbuka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
@@ -176,26 +176,26 @@ export function Peregangan() {
                       <img src={g.gambar} alt={`Posisi akhir ${g.nama}`} loading="lazy"
                         className="aspect-square w-full rounded-xl object-cover" />
                     ) : null}
-                    <div className="flex flex-wrap gap-2 text-[11px] text-slate-400">
-                      <span><b className="text-slate-300">Target:</b> {g.target}</span>
-                      <span><b className="text-slate-300">Durasi:</b> {g.durasi}</span>
+                    <div className="flex flex-wrap gap-2 text-[11px] text-neutral-500">
+                      <span><b className="text-neutral-600">Target:</b> {g.target}</span>
+                      <span><b className="text-neutral-600">Durasi:</b> {g.durasi}</span>
                     </div>
                     <ol className="space-y-1">
                       {g.cara.map((c, i) => (
-                        <li key={c} className="flex gap-2 text-[12px] leading-snug text-slate-200">
+                        <li key={c} className="flex gap-2 text-[12px] leading-snug text-ink">
                           <span className="font-black text-brand">{i + 1}.</span><span>{c}</span>
                         </li>
                       ))}
                     </ol>
                     <div className="flex flex-wrap gap-1">
                       {g.untuk.map((u) => (
-                        <span key={u} className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-slate-300">{u}</span>
+                        <span key={u} className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-neutral-600">{u}</span>
                       ))}
                     </div>
                     {g.hindari && (
                       <div className="rounded-lg bg-rose-500/10 p-2">
-                        <div className="text-[10px] font-black uppercase text-rose-400">Hindari</div>
-                        <p className="text-[12px] leading-snug text-slate-300">{g.hindari}</p>
+                        <div className="text-[10px] font-black uppercase text-rose-600">Hindari</div>
+                        <p className="text-[12px] leading-snug text-neutral-600">{g.hindari}</p>
                       </div>
                     )}
                   </div>
@@ -208,25 +208,25 @@ export function Peregangan() {
 
       {/* Salah kaprah */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Empat salah kaprah</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Empat salah kaprah</div>
         <div className="mt-2 space-y-2">
           {SALAH_KAPRAH.map((s) => (
             <div key={s.klaim} className="rounded-xl bg-white/5 p-3">
-              <div className="text-[12px] font-bold text-rose-400">✗ {s.klaim}</div>
-              <p className="mt-1 text-[12px] leading-relaxed text-slate-300">{s.fakta}</p>
+              <div className="text-[12px] font-bold text-rose-600">✗ {s.klaim}</div>
+              <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">{s.fakta}</p>
             </div>
           ))}
         </div>
       </Card>
 
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Rujukan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rujukan</div>
         <ul className="mt-2 space-y-1">
           {RUJUKAN_PEREGANGAN.map((r) => (
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
           Klip demonstrasi dihasilkan AI sebagai ilustrasi gerakan, bukan rekaman instruktur.
           Bila ada nyeri tajam, kesemutan atau baal saat melakukan salah satu gerakan, hentikan
           dan konsultasikan — itu tanda saraf, bukan otot.

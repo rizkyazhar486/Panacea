@@ -235,9 +235,9 @@ export function AestheticVitality() {
             {indicators.map((i) => (
               <div key={i.id} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-2 text-sm font-bold text-ink dark:text-white"><span>{i.emoji}</span>{i.name}</span>
+                  <span className="flex items-center gap-2 text-sm font-bold text-ink dark:text-ink"><span>{i.emoji}</span>{i.name}</span>
                   <span className="flex items-center gap-2">
-                    <span className="text-sm font-black text-ink dark:text-white">{i.value}</span>
+                    <span className="text-sm font-black text-ink dark:text-ink">{i.value}</span>
                     <Badge tone={i.score >= 75 ? 'brand' : i.score >= 50 ? 'low' : 'critical'}>{Math.round(i.score)}</Badge>
                   </span>
                 </div>
@@ -288,7 +288,7 @@ export function AestheticVitality() {
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-              <div className="flex items-center gap-2 text-sm font-bold text-ink dark:text-white"><span className="text-lg">{p.emoji}</span>{p.title}</div>
+              <div className="flex items-center gap-2 text-sm font-bold text-ink dark:text-ink"><span className="text-lg">{p.emoji}</span>{p.title}</div>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{p.body}</p>
             </div>
           ))}

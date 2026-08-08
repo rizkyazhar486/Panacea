@@ -125,7 +125,7 @@ export function AllergyTracker() {
       )}
 
       <Card className="!p-4">
-        <div className="text-[13px] font-black text-ink dark:text-white">{editingId ? 'Edit allergy' : 'Add an allergy'}</div>
+        <div className="text-[13px] font-black text-ink dark:text-ink">{editingId ? 'Edit allergy' : 'Add an allergy'}</div>
         <div className="mt-3 space-y-3">
           <Field label="Category">
             <select className={inputClass} value={draft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value as Category }))}>
@@ -183,7 +183,7 @@ export function AllergyTracker() {
               <Card key={e.id} className="!p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-[15px] font-black text-ink dark:text-white">{e.name}</div>
+                    <div className="text-[15px] font-black text-ink dark:text-ink">{e.name}</div>
                     {e.reaction && <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">Reaction: {e.reaction}</p>}
                     {e.notes && <p className="mt-1 text-[12px] leading-relaxed text-neutral-400">{e.notes}</p>}
                   </div>

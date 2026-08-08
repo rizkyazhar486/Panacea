@@ -138,30 +138,30 @@ export function VerifikasiConnect() {
 
       {status === 'terverifikasi' && (
         <Card className="!border-emerald-500/30 !bg-emerald-500/5">
-          <p className="text-[13px] font-bold text-emerald-400">✓ Your account is already verified.</p>
-          <p className="mt-1 text-[12px] text-slate-300">
+          <p className="text-[13px] font-bold text-emerald-700">✓ Your account is already verified.</p>
+          <p className="mt-1 text-[12px] text-neutral-600">
             Trust credit Anda <b>{saya?.kredit}</b> dari {saya?.ambang.awal}.
-            {saya?.bahaya && ' Credit Anda berada di zona bahaya.'}
+            {saya?.bahaya && ' Your credit berada di zona bahaya.'}
           </p>
         </Card>
       )}
       {status === 'menunggu' && (
         <Card className="!border-amber-500/30 !bg-amber-500/5">
-          <p className="text-[13px] font-bold text-amber-400">Waiting for owner review.</p>
-          <p className="mt-1 text-[12px] text-slate-300">You will be able to use Connect once approved.</p>
+          <p className="text-[13px] font-bold text-amber-700">Waiting for owner review.</p>
+          <p className="mt-1 text-[12px] text-neutral-600">You will be able to use Connect once approved.</p>
         </Card>
       )}
       {status === 'ditolak' && (
         <Card className="!border-rose-500/30 !bg-rose-500/5">
-          <p className="text-[13px] font-bold text-rose-400">Submission rejected.</p>
-          <p className="mt-1 text-[12px] text-slate-300">{saya?.alasanReject}</p>
+          <p className="text-[13px] font-bold text-rose-600">Submission rejected.</p>
+          <p className="mt-1 text-[12px] text-neutral-600">{saya?.alasanReject}</p>
         </Card>
       )}
 
       {/* Yang terjadi pada data Anda — di depan, bukan di catatan kaki. */}
       <Card className="!border-sky-500/30 !bg-sky-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-sky-400">What happens to your data</div>
-        <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-slate-300">
+        <div className="text-[11px] font-black uppercase tracking-wide text-sky-700">What happens to your data</div>
+        <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-neutral-600">
           <li>• <b>NIK tidak lagi diminta.</b> Pemakaian NIK oleh pihak swasta diatur UU Adminduk
             24/2013 dan menuntut kerja sama resmi dengan Dukcapil. Identitas kini diikat ke
             <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.
@@ -189,7 +189,7 @@ export function VerifikasiConnect() {
       {status !== 'terverifikasi' && status !== 'menunggu' && (
         <>
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Personal details</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Personal details</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <Field label="Full name"><input className={inputClass} value={f.nama} onChange={(e) => set('nama', e.target.value)} aria-label="Full name" /></Field>
               <Field label="Age"><KolomAngka nilai={umur} onNilai={setAge} ariaLabel="Age" /></Field>
@@ -205,11 +205,11 @@ export function VerifikasiConnect() {
               </Field>
             </div>
             <div className="mt-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Preference</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Preference</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {PREFERENSI.map((p) => (
                   <button key={p.id} onClick={() => set('preferensi', p.id)} aria-pressed={f.preferensi === p.id}
-                    className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${f.preferensi === p.id ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'}`}>
+                    className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${f.preferensi === p.id ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'}`}>
                     {p.l}
                   </button>
                 ))}
@@ -219,13 +219,13 @@ export function VerifikasiConnect() {
           </Card>
 
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Proof of identity</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Proof of identity</div>
             <div className="mt-2">
               <Field label="Phone number">
                 <input className={inputClass} inputMode="tel" placeholder="08123456789"
                   value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Phone number" />
               </Field>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                 Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan —
                 hanya sidiknya dan empat digit terakhir, jadi ia tidak bisa dibaca kembali maupun
                 dipakai menghubungi Anda.
@@ -236,7 +236,7 @@ export function VerifikasiConnect() {
                 <input className={inputClass} placeholder="https://…" value={f.selfieUrl}
                   onChange={(e) => set('selfieUrl', e.target.value)} aria-label="Selfie link" />
               </Field>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                 Foto wajah Anda sambil <b>membentuk huruf P dengan jari</b>. Pose ini yang membuktikan
                 fotonya diambil sekarang oleh Anda sendiri, bukan diambil dari internet.
               </p>
@@ -249,7 +249,7 @@ export function VerifikasiConnect() {
                 </Field>
               ))}
             </div>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+            <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
               Isi <b>minimal satu</b> dari ketiganya. Satu akun media sosial hanya boleh dipakai
               satu akun Connect. Hanya tiga ini yang diterima karena pencocokan
               wajah baru berarti bila halaman pembandingnya sulit dikarang mendadak — ketiganya
@@ -260,10 +260,10 @@ export function VerifikasiConnect() {
 
           {/* Persetujuan terpisah per tujuan — bukan satu centang untuk semuanya. */}
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               Processing consent
             </div>
-            <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+            <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
               Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah
               satu tidak Anda setujui, verifikasi tidak bisa dijalankan. Yang dipisah di sini adalah
               informasinya — Anda berhak tahu persis apa yang Anda setujui, satu per satu.
@@ -275,16 +275,16 @@ export function VerifikasiConnect() {
                     aria-label={t.judul}
                     onChange={(e) => setSetuju((s) => ({ ...s, [t.id]: e.target.checked }))} />
                   <span>
-                    <span className="block text-[12px] font-bold text-slate-200">{t.judul}</span>
-                    <span className="mt-0.5 block text-[11px] leading-relaxed text-slate-400">{t.isi}</span>
+                    <span className="block text-[12px] font-bold text-ink">{t.judul}</span>
+                    <span className="mt-0.5 block text-[11px] leading-relaxed text-neutral-500">{t.isi}</span>
                   </span>
                 </label>
               ))}
             </div>
           </Card>
 
-          {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
-          {pesan && <Card className="!border-emerald-500/30 !bg-emerald-500/5"><p className="text-[12px] text-emerald-400">{pesan}</p></Card>}
+          {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-600">{galat}</p></Card>}
+          {pesan && <Card className="!border-emerald-500/30 !bg-emerald-500/5"><p className="text-[12px] text-emerald-700">{pesan}</p></Card>}
 
           <Button onClick={() => void ajukan()} disabled={kirim}>
             {kirim ? 'Submitting…' : 'Submit verification'}
@@ -296,36 +296,36 @@ export function VerifikasiConnect() {
           sama dengan pemberiannya, bukan disembunyikan di menu lain. */}
       {saya && saya.persetujuan?.some((p) => !p.dicabutPada) && (
         <Card>
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Your consents</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Your consents</div>
           <div className="mt-2 space-y-1">
             {saya.persetujuan.filter((p) => !p.dicabutPada).map((p) => (
               <div key={p.tujuan} className="flex items-baseline justify-between gap-2 rounded-lg bg-white/5 px-2 py-1">
-                <span className="text-[11px] text-slate-300">{JUDUL_TUJUAN[p.tujuan] ?? p.tujuan}</span>
+                <span className="text-[11px] text-neutral-600">{JUDUL_TUJUAN[p.tujuan] ?? p.tujuan}</span>
                 <span className="shrink-0 text-[10px] text-slate-500">{p.pada.slice(0, 10)}</span>
               </div>
             ))}
           </div>
           {tarik ? (
             <div className="mt-2 rounded-xl bg-rose-500/10 p-3">
-              <p className="text-[12px] leading-relaxed text-slate-300">
+              <p className="text-[12px] leading-relaxed text-neutral-600">
                 Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status
                 belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya
                 lagi. Trust credit dan riwayat pelanggaran tetap tersimpan.
               </p>
               <div className="mt-2 flex gap-2">
                 <button onClick={() => void lakukanTarik()}
-                  className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-white">
+                  className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-ink">
                   Yes, withdraw consent
                 </button>
                 <button onClick={() => setTarik(false)}
-                  className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-slate-300">
+                  className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-neutral-600">
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
             <button onClick={() => setTarik(true)}
-              className="mt-2 text-[12px] font-bold text-rose-400 underline">
+              className="mt-2 text-[12px] font-bold text-rose-600 underline">
               Withdraw consent and delete my verification data
             </button>
           )}
@@ -339,19 +339,19 @@ export function VerifikasiConnect() {
       {/* Trust credit */}
       {saya && (
         <Card>
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Trust credit</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Trust credit</div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className={`text-3xl font-black ${saya.kredit <= saya.ambang.hapus ? 'text-rose-500' : saya.bahaya ? 'text-amber-400' : 'text-emerald-400'}`}>
+            <span className={`text-3xl font-black ${saya.kredit <= saya.ambang.hapus ? 'text-rose-500' : saya.bahaya ? 'text-amber-700' : 'text-emerald-700'}`}>
               {saya.kredit}
             </span>
-            <span className="text-[11px] text-slate-400">dari {saya.ambang.awal}</span>
+            <span className="text-[11px] text-neutral-500">dari {saya.ambang.awal}</span>
           </div>
-          <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+          <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
             Di bawah {saya.ambang.bahaya} akun berada dalam bahaya. Di bawah {saya.ambang.hapus} akun
             dijadwalkan dihapus — dijadwalkan, bukan langsung, supaya keputusan yang keliru masih bisa ditarik.
           </p>
           {saya.hapusPada && (
-            <p className="mt-2 rounded-lg bg-rose-500/10 p-2 text-[12px] font-bold text-rose-400">
+            <p className="mt-2 rounded-lg bg-rose-500/10 p-2 text-[12px] font-bold text-rose-600">
               Akun dijadwalkan dihapus pada {saya.hapusPada.slice(0, 10)}.
             </p>
           )}
@@ -359,8 +359,8 @@ export function VerifikasiConnect() {
             <div className="mt-2 space-y-1">
               {saya.pelanggaran.map((p) => (
                 <div key={p.id} className="flex items-baseline justify-between rounded-lg bg-white/5 px-2 py-1">
-                  <span className="text-[11px] text-slate-300">{p.alasan}</span>
-                  <span className="text-[11px] font-bold text-rose-400">−{p.poin}</span>
+                  <span className="text-[11px] text-neutral-600">{p.alasan}</span>
+                  <span className="text-[11px] font-bold text-rose-600">−{p.poin}</span>
                 </div>
               ))}
             </div>

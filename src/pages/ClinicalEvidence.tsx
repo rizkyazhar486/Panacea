@@ -190,7 +190,7 @@ export function ClinicalEvidence() {
               <Badge tone={STRENGTH_META[answer.strength].tone}>{STRENGTH_META[answer.strength].label}</Badge>
               <Badge tone={CERTAINTY_META[answer.overallCertainty].tone}>{CERTAINTY_META[answer.overallCertainty].label}</Badge>
             </div>
-            <h2 className="mt-3 text-lg font-black text-ink dark:text-white">Bottom line</h2>
+            <h2 className="mt-3 text-lg font-black text-ink dark:text-ink">Bottom line</h2>
             <p className="mt-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">{answer.bottomLine}</p>
             <div className="mt-3">
               <div className="mb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-neutral-400">
@@ -207,7 +207,7 @@ export function ClinicalEvidence() {
                 {answer.keyPoints.map((p, i) => (
                   <div key={i} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm font-bold text-ink dark:text-white">{p.claim}</span>
+                      <span className="text-sm font-bold text-ink dark:text-ink">{p.claim}</span>
                       <Badge tone={CERTAINTY_META[p.certainty].tone}>{CERTAINTY_META[p.certainty].label}</Badge>
                     </div>
                     <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{p.detail}</p>
@@ -257,7 +257,7 @@ export function ClinicalEvidence() {
             <div className="mt-3 space-y-2">
               {articles.map((a) => (
                 <a key={a.pmid} href={a.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-neutral-200 bg-white p-3 transition hover:border-brand dark:border-white/10 dark:bg-white/5">
-                  <div className="text-sm font-bold leading-snug text-ink dark:text-white">{a.title}</div>
+                  <div className="text-sm font-bold leading-snug text-ink dark:text-ink">{a.title}</div>
                   <div className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">{a.authors}</div>
                   <div className="mt-0.5 text-[11px] text-neutral-400">{[a.journal, a.year].filter(Boolean).join(' · ')} · PMID {a.pmid}</div>
                 </a>
@@ -275,7 +275,7 @@ export function ClinicalEvidence() {
             {links.map((l) => (
               <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-3 py-2.5 transition hover:border-brand dark:border-white/10 dark:bg-white/5">
                 <span>
-                  <span className="block text-sm font-bold text-ink dark:text-white">{l.label}</span>
+                  <span className="block text-sm font-bold text-ink dark:text-ink">{l.label}</span>
                   <span className="block text-[11px] text-neutral-400">{l.note}</span>
                 </span>
                 <span className="text-brand-dark">↗</span>

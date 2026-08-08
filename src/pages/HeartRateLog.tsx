@@ -126,10 +126,10 @@ export function HeartRateLog() {
       <div className="space-y-4">
         <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-neutral-600 leading-relaxed">
             Log ini diisi oleh server melalui sinkronisasi otomatis, dan saat ini aplikasi berjalan
             tanpa server. History latihan yang Anda unggah sendiri tetap bisa dilihat di{' '}
-            <Link to="/riwayat-latihan" className="font-semibold text-white underline">History Latihan</Link>.
+            <Link to="/riwayat-latihan" className="font-semibold text-ink underline">History Latihan</Link>.
           </p>
         </Card>
       </div>
@@ -146,23 +146,23 @@ export function HeartRateLog() {
 
       <Card>
         <SectionTitle icon={<IconTimer />} title="How close this is to real time" />
-        <p className="text-sm text-slate-300 mt-2 leading-relaxed">
-          Jujur di depan supaya harapannya tepat: <strong className="text-white">detak jantung per detik
+        <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
+          Jujur di depan supaya harapannya tepat: <strong className="text-ink">detak jantung per detik
           tidak tersedia</strong>, dan itu bukan batasan Panaceamed melainkan batasan datanya sendiri.
         </p>
-        <ul className="mt-2 space-y-1.5 text-sm text-slate-400">
+        <ul className="mt-2 space-y-1.5 text-sm text-neutral-500">
           <li className="flex gap-2"><span className="text-slate-600">•</span><span>
-            Apple Watch <strong className="text-slate-200">tidak mencatat denyut tiap detik</strong>. Saat latihan
+            Apple Watch <strong className="text-ink">tidak mencatat denyut tiap detik</strong>. Saat latihan
             ia mengambil sampel sekitar tiap 5 detik; saat istirahat hanya beberapa menit sekali dan tidak teratur.
             Data per detik memang tidak pernah ada di Apple Health, sehingga tidak ada aplikasi mana pun yang bisa mengirimkannya.
           </span></li>
           <li className="flex gap-2"><span className="text-slate-600">•</span><span>
-            Otomatisasi Health Auto Export berjalan pada selang <strong className="text-slate-200">menit</strong>, bukan detik.
+            Otomatisasi Health Auto Export berjalan pada selang <strong className="text-ink">menit</strong>, bukan detik.
             Paling cepat yang bisa dicapai adalah beberapa menit di belakang waktu nyata.
           </span></li>
         </ul>
-        <p className="text-sm text-slate-400 mt-2 leading-relaxed">
-          Jadi yang benar-benar bisa diberikan adalah <strong className="text-white">seluruh sampel yang memang
+        <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
+          Jadi yang benar-benar bisa diberikan adalah <strong className="text-ink">seluruh sampel yang memang
           direkam Apple Health, tertunda beberapa menit</strong> — sebuah catatan, bukan monitor. Untuk denyut yang
           benar-benar hidup per detik, satu-satunya jalan adalah strap dada Bluetooth, dan browser di iPhone
           tidak mendukungnya sama sekali.
@@ -179,19 +179,19 @@ export function HeartRateLog() {
           {SETELAN.map((x) => (
             <div key={x.nama} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm font-semibold text-white">{x.nama}</span>
+                <span className="text-sm font-semibold text-ink">{x.nama}</span>
                 <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300">
                   {x.setKe}
                 </span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{x.kenapa}</p>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">{x.kenapa}</p>
             </div>
           ))}
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
           Ketiganya ada di Health Auto Export, pada layar pengaturan ekspor otomatis yang sama tempat
           Anda menempelkan tautan sinkronisasi. Panduan lengkapnya di{' '}
-          <Link to="/health-data/tutorial" className="font-semibold text-slate-300 underline">panduan sinkronisasi</Link>.
+          <Link to="/health-data/tutorial" className="font-semibold text-neutral-600 underline">panduan sinkronisasi</Link>.
         </p>
       </Card>
 
@@ -202,7 +202,7 @@ export function HeartRateLog() {
               key={r.key}
               onClick={() => setRentang(r.key)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                rentang === r.key ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-slate-400'
+                rentang === r.key ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'
               }`}
             >
               {r.label}
@@ -212,12 +212,12 @@ export function HeartRateLog() {
           <button
             onClick={() => setAutoRefresh((v) => !v)}
             className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${
-              autoRefresh ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-white/10 text-slate-400'
+              autoRefresh ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-white/10 text-neutral-500'
             }`}
           >
             {autoRefresh ? '● Menyegarkan tiap menit' : '○ Segarkan manual'}
           </button>
-          <button onClick={load} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-slate-400">
+          <button onClick={load} className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-neutral-500">
             Muat ulang
           </button>
         </div>
@@ -231,18 +231,18 @@ export function HeartRateLog() {
 
       {gagal ? (
         <Card>
-          <p className="text-sm text-slate-400">Tidak bisa memuat log. Periksa sambungan internet Anda.</p>
+          <p className="text-sm text-neutral-500">Tidak bisa memuat log. Periksa sambungan internet Anda.</p>
           <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
         </Card>
       ) : !samples.length ? (
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-neutral-600 leading-relaxed">
             Belum ada sampel pada rentang ini.
           </p>
-          <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+          <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
             Log terisi otomatis begitu otomatisasi Health Auto Export mengirim data ke tautan sinkronisasi Anda.
             Bila belum pernah terisi sama sekali, periksa dahulu bahwa URL webhook di aplikasi itu benar dan
-            <strong className="text-slate-200"> tidak tertulis dua kali</strong> — kesalahan tempel yang membuat
+            <strong className="text-ink"> tidak tertulis dua kali</strong> — kesalahan tempel yang membuat
             server tidak pernah menerima apa pun.
           </p>
           <Link to="/health-data" className="mt-3 inline-block rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
@@ -305,7 +305,7 @@ export function HeartRateLog() {
                   <span className="w-28 shrink-0 text-slate-500 tabular-nums">
                     {new Date(s.t).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <span className="w-14 shrink-0 font-semibold text-white tabular-nums">{s.bpm} bpm</span>
+                  <span className="w-14 shrink-0 font-semibold text-ink tabular-nums">{s.bpm} bpm</span>
                   {s.lo != null && s.hi != null && (
                     <span className="w-20 shrink-0 text-slate-500 tabular-nums">{s.lo}–{s.hi}</span>
                   )}
@@ -345,7 +345,7 @@ function fmtSelang(detik: number): string {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-lg font-semibold text-white tabular-nums">{value}</div>
+      <div className="text-lg font-semibold text-ink tabular-nums">{value}</div>
       <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{label}</div>
       {sub && <div className="text-[10px] text-slate-500 mt-0.5">{sub}</div>}
     </div>

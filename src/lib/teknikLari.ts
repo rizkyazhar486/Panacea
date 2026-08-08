@@ -34,11 +34,11 @@ export interface Bagian {
 }
 
 export const LABEL_BUKTI: Record<Bukti, { label: string; warna: string; arti: string }> = {
-  kuat: { label: 'Bukti kuat', warna: 'text-emerald-400',
+  kuat: { label: 'Bukti kuat', warna: 'text-emerald-700',
     arti: 'Beberapa uji terkendali menunjukkan manfaatnya. Layak diprioritaskan.' },
-  sedang: { label: 'Moderate evidence', warna: 'text-amber-400',
+  sedang: { label: 'Moderate evidence', warna: 'text-amber-700',
     arti: 'Biomechanically plausible and supported by some research, but not settled.' },
-  lemah: { label: 'Kebiasaan pelatih', warna: 'text-slate-400',
+  lemah: { label: 'Kebiasaan pelatih', warna: 'text-neutral-500',
     arti: 'Widely taught, but thinly evidenced. Do not change it if your running is comfortable and injury-free.' },
 }
 

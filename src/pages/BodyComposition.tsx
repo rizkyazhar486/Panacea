@@ -231,7 +231,7 @@ export function BodyComposition() {
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
               title="Save this value across the app (or press Enter)"
-              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
         </div>
@@ -373,7 +373,7 @@ export function BodyComposition() {
               : 'Mental condition looks good. Keep up meditation, regular sleep & a gratitude journal.'}
           </p>
           <div className="mt-2 flex gap-2">
-            <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-white active:scale-95">💬 AI Consultation</a>
+            <a href="#/chatbot" className="rounded-full bg-brand px-4 py-2 text-[11px] font-bold text-ink active:scale-95">💬 AI Consultation</a>
             <a href="#/recovery" className="rounded-full bg-neutral-200 px-4 py-2 text-[11px] font-bold text-neutral-600 active:scale-95">🧘 Meditation & Recovery</a>
           </div>
         </div>
@@ -456,7 +456,7 @@ function ScaleMeasurements() {
         {ada.map((r) => (
           <div key={r.label} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-bold text-ink dark:text-white">{r.label}</span>
+              <span className="text-sm font-bold text-ink dark:text-ink">{r.label}</span>
               <span className="text-lg font-extrabold tabular-nums text-brand-dark">
                 {r.nilai}{r.satuan ? ` ${r.satuan}` : ''}
               </span>

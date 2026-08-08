@@ -301,7 +301,7 @@ export function HealthProfile() {
           ekspor sama sekali — unggah saja <b>tangkapan layar</b> laporannya dan angkanya dibaca
           otomatis.
         </p>
-        <p className="mt-1 text-[11px] leading-relaxed text-amber-600 dark:text-amber-400">
+        <p className="mt-1 text-[11px] leading-relaxed text-amber-600 dark:text-amber-700">
           Berkas .xml/.csv/.json diproses di perangkat Anda dan tidak pernah diunggah.
           <b> Tangkapan layar berbeda:</b> gambarnya dikirim ke server untuk dibaca, karena
           pembacaan huruf memerlukan model penglihatan. Kalau laporan itu memuat nama atau hal lain
@@ -579,7 +579,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
               <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {items.map((d) => (
                   <div key={d.kunci} className="rounded-xl border border-neutral-100 bg-neutral-50 p-2.5 text-center dark:border-white/10 dark:bg-white/5">
-                    <div className="text-sm font-extrabold text-ink dark:text-white">
+                    <div className="text-sm font-extrabold text-ink dark:text-ink">
                       {fmt(blob[d.kunci] as number, d.satuan)}
                     </div>
                     <div className="text-[10px] font-semibold leading-tight text-neutral-400">{d.label}</div>
@@ -680,12 +680,12 @@ function AutoSyncCard() {
         </div>
         <div className="mt-1.5 flex items-center justify-between gap-2">
           <span className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Kiriman terakhir dari perangkat</span>
-          <span className="text-[12px] font-black text-ink dark:text-white">
+          <span className="text-[12px] font-black text-ink dark:text-ink">
             {lastSync ? timeAgoShort(new Date(lastSync)) : "belum pernah"}
           </span>
         </div>
         {conn === 'down' && (
-          <p className="mt-2 text-[11px] leading-relaxed text-rose-600 dark:text-rose-400">
+          <p className="mt-2 text-[11px] leading-relaxed text-rose-600 dark:text-rose-600">
             Server tidak menjawab. Selama ini terjadi, tidak ada data dari iPhone yang bisa masuk —
             periksa status deployment sebelum menelusuri pengaturan di aplikasi.
           </p>

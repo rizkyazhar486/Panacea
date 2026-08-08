@@ -170,9 +170,9 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
             {q.trim() && (
               <div className="mt-2 flex gap-2">
                 <a href={`https://open.spotify.com/search/${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
-                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-white">Open in Spotify</a>
+                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-ink">Open in Spotify</a>
                 <a href={`https://music.apple.com/search?term=${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
-                  className="rounded-full bg-neutral-900 px-3 py-1.5 text-[10px] font-bold text-white"> Apple Music</a>
+                  className="rounded-full bg-neutral-900 px-3 py-1.5 text-[10px] font-bold text-ink"> Apple Music</a>
               </div>
             )}
             <div className="mt-2 space-y-1.5">
@@ -480,7 +480,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         </div>
         <div className="flex items-center gap-2">
           {mode === 'done' && (
-            <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
+            <button onClick={shareToFeed} className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>
               <IconShare2 size={13} /> Share
             </button>
           )}
@@ -513,7 +513,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
           rencanakan jalur (klik peta = tambah waypoint), dan rekam rute. */}
       <div className="mx-5 overflow-hidden rounded-2xl border border-neutral-100 relative">
         {mode === 'planning' && (
-          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
+          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-ink">
             📍 Tap the map to add a route point {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
@@ -531,8 +531,8 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
           <div className="grid grid-cols-3 gap-px bg-neutral-900">
             {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVATION']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-1.5 py-2 text-center">
-                <div className="text-xs font-extrabold text-white tabular-nums">{v}</div>
-                <div className="text-[7px] font-bold uppercase tracking-widest text-white/40">{l}</div>
+                <div className="text-xs font-extrabold text-ink tabular-nums">{v}</div>
+                <div className="text-[7px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
               </div>
             ))}
           </div>
@@ -544,7 +544,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <>
             <div className="rounded-xl p-3 flex items-center gap-3" style={{ background: `${hiit.color}10`, border: `1px solid ${hiit.color}30` }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-xs" style={{ background: hiit.color, boxShadow: `0 4px 12px ${hiit.color}44` }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-ink font-black text-xs" style={{ background: hiit.color, boxShadow: `0 4px 12px ${hiit.color}44` }}>
                 {hiit.intensity}%
               </div>
               <div className="flex-1 min-w-0">
@@ -647,23 +647,23 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         )}
 
         {mode === 'done' && (
-          <div className="rounded-xl p-4 text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #064e36)' }}>
+          <div className="rounded-xl p-4 text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #064e36)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Summary</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Summary</div>
                 <div className="text-xl font-extrabold">{sport.emoji} {sport.name}</div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-extrabold">{kcal}<span className="text-sm font-medium text-white/60"> kcal</span></div>
-                <div className="text-[10px] text-white/70">MET {sport.met} · {vo2Est > 0 ? `VO₂Max ~${vo2Est.toFixed(1)}` : '—'}</div>
+                <div className="text-2xl font-extrabold">{kcal}<span className="text-sm font-medium text-ink/60"> kcal</span></div>
+                <div className="text-[10px] text-ink/70">MET {sport.met} · {vo2Est > 0 ? `VO₂Max ~${vo2Est.toFixed(1)}` : '—'}</div>
               </div>
             </div>
             <div className="mt-2 grid grid-cols-5 gap-2 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-white/50">Distance</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-white/50">Duration</div></div>
-              <div><div className="font-bold">{Math.round(speed)}</div><div className="text-white/50">km/h</div></div>
-              <div><div className="font-bold">{hr || '—'}</div><div className="text-white/50">HR</div></div>
-              <div><div className="font-bold">{acceleration.toFixed(1)}</div><div className="text-white/50">m/s²</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Distance</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Duration</div></div>
+              <div><div className="font-bold">{Math.round(speed)}</div><div className="text-ink/50">km/h</div></div>
+              <div><div className="font-bold">{hr || '—'}</div><div className="text-ink/50">HR</div></div>
+              <div><div className="font-bold">{acceleration.toFixed(1)}</div><div className="text-ink/50">m/s²</div></div>
             </div>
           </div>
         )}
@@ -672,20 +672,20 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
         <div className="flex gap-2">
           {mode === 'idle' && <>
-            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Start GPS</button>
+            <button onClick={startTrack} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 14px rgba(0,191,99,0.3)' }}>▶ Start GPS</button>
             <button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all active:scale-95">📍 Plan Route</button>
           </>}
           {mode === 'planning' && <>
             <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Clear</button>
             <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Cancel</button>
-            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Start</button>
+            <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Start</button>
           </>}
           {mode === 'tracking' && <>
             <button onClick={pause} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all active:scale-95">⏸ Pause</button>
             <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
           {mode === 'paused' && <>
-            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Resume</button>
+            <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Resume</button>
             <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
           {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Done & Reset</button>}
@@ -760,9 +760,9 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
         {/* Header */}
         <div className="absolute left-0 right-0 top-5 z-10 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: group.mediaColor }}>{initials(group.authorName)}</div>
-            <div className="text-xs font-bold text-white drop-shadow">{group.authorName}</div>
-            <div className="text-[10px] text-white/70">{timeAgo(story.at)}</div>
+            <div className="grid h-8 w-8 place-items-center rounded-full text-xs font-bold text-ink" style={{ backgroundColor: group.mediaColor }}>{initials(group.authorName)}</div>
+            <div className="text-xs font-bold text-ink drop-shadow">{group.authorName}</div>
+            <div className="text-[10px] text-ink/70">{timeAgo(story.at)}</div>
           </div>
           <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full bg-black/30 text-white"><IconX size={16} /></button>
         </div>
@@ -777,10 +777,10 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
             ? <video src={story.video} className="h-full w-full object-contain" autoPlay muted playsInline />
             : story.image
               ? <img src={story.image} className="h-full w-full object-contain" alt="" />
-              : <div className="px-8 text-center text-lg font-bold text-white">{story.caption}</div>}
+              : <div className="px-8 text-center text-lg font-bold text-ink">{story.caption}</div>}
         </div>
         {story.caption && (story.image || story.video) && (
-          <div className="absolute bottom-20 left-0 right-0 px-4 text-center text-sm font-semibold text-white drop-shadow">{story.caption}</div>
+          <div className="absolute bottom-20 left-0 right-0 px-4 text-center text-sm font-semibold text-ink drop-shadow">{story.caption}</div>
         )}
 
         {/* Live comment feed (most recent on top, IG-style direct reply) */}
@@ -811,7 +811,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
           ))}
           <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
             placeholder="Reply directly..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
-          <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={16} />
           </button>
         </div>
@@ -875,7 +875,7 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
       {groups.map((g) => (
         <button key={g.authorEmail} onClick={() => setOpenEmail(g.authorEmail)} className="flex shrink-0 flex-col items-center gap-1">
           <span className="grid h-14 w-14 place-items-center rounded-full p-[2px]" style={{ background: 'linear-gradient(135deg, #00BF63, #f59e0b, #FF3131)' }}>
-            <span className="grid h-full w-full place-items-center rounded-full border-2 border-white text-sm font-bold text-white" style={{ backgroundColor: g.mediaColor }}>
+            <span className="grid h-full w-full place-items-center rounded-full border-2 border-white text-sm font-bold text-ink" style={{ backgroundColor: g.mediaColor }}>
               {initials(g.authorName)}
             </span>
           </span>
@@ -967,7 +967,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Quick Share Actions */}
         <div className="px-5 py-3 flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          <button onClick={() => { onShareGps(); onClose() }} className="shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
+          <button onClick={() => { onShareGps(); onClose() }} className="shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
             <span>📍</span> GPS Activity
           </button>
         </div>
@@ -1029,7 +1029,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
           </div>
 
           <div className="flex justify-end">
-            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-white shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <button onClick={submit} disabled={busy || (!caption.trim() && photos.length === 0 && !videoUrl)} className="group inline-flex min-h-[44px] items-center gap-2 rounded-full py-2 pl-6 pr-2 text-sm font-bold text-ink shadow-[0_8px_22px_-8px_rgba(0,191,99,0.6)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               Post
               <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5">
                 <IconSend size={15} />
@@ -1175,7 +1175,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-2">
       <div className="flex items-start justify-between">
         {premium ? (
-          <span className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-white shadow backdrop-blur-sm">
+          <span className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-ink shadow backdrop-blur-sm">
             🔒 Premium
           </span>
         ) : <span />}
@@ -1191,7 +1191,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
       </div>
       <div className="flex justify-end">
         <button onClick={copyUrl} aria-label="Copy URL" title="Copy post link"
-          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold text-white shadow backdrop-blur-sm transition active:scale-95">
+          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold text-ink shadow backdrop-blur-sm transition active:scale-95">
           {copied ? '✓ Copied' : '📋 Copy URL'}
         </button>
       </div>
@@ -1203,7 +1203,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
       {/* Header + share logo (top-right) */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <div className="relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
+          <div className="relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-ink font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
             {initials(post.authorName)}
             {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Currently active" />}
           </div>
@@ -1233,7 +1233,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           )}
           {/* Share button rendered as a logo only (no text) */}
           <button onClick={share} aria-label="Share to social media" title="Share"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90"
             style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
             <IconShare2 size={15} />
           </button>
@@ -1266,13 +1266,13 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             <video src={post.videoUrl} controls={!gated} className="max-h-80 w-full object-contain" />
           </div>
           {post.videoSec ? (
-            <span className="absolute right-2 bottom-2 z-20 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+            <span className="absolute right-2 bottom-2 z-20 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-ink">
               {Math.floor(post.videoSec / 60)}:{String(post.videoSec % 60).padStart(2, '0')}
             </span>
           ) : null}
           {mediaOverlay}
           {gated && (
-            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
+            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-ink">
               <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
             </button>
           )}
@@ -1288,7 +1288,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           </div>
           {mediaOverlay}
           {gated && (
-            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-white">
+            <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-ink">
               <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
             </button>
           )}
@@ -1352,7 +1352,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           <div className="flex items-center gap-2">
             <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addComment() }}
               placeholder="Write a comment..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
-            <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               <IconSend size={15} />
             </button>
           </div>
@@ -1458,7 +1458,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             <div className="text-neutral-500">{checkedInToday ? 'You\'ve checked in today.' : 'Not checked in yet today.'}</div>
           </div>
           <button onClick={checkInToday} disabled={checkedInToday}
-            className="rounded-xl px-4 py-2 text-xs font-bold text-white transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="rounded-xl px-4 py-2 text-xs font-bold text-ink transition disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             {checkedInToday ? '✓ Checked in' : 'Check In Now'}
           </button>
         </div>
@@ -1477,8 +1477,8 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         )}
         {/* Item 2: achievement badges with color tiers */}
         <div className="flex items-center gap-2 border-t border-neutral-100 pt-2 text-[11px] font-bold">
-          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-white" style={{ background: fireTier.color }}>🔥 {fireTier.label}</span>
-          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-white" style={{ background: loveTier.color }}>❤️ {loveTier.label}</span>
+          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-ink" style={{ background: fireTier.color }}>🔥 {fireTier.label}</span>
+          <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-ink" style={{ background: loveTier.color }}>❤️ {loveTier.label}</span>
         </div>
         {state.buddyName && (
           <div className="rounded-xl bg-pink-50 p-2.5 text-[11px] text-pink-700">
@@ -1540,7 +1540,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
           <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Send a quick word of encouragement..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
           </button>
         </div>
@@ -1612,7 +1612,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <input value={gratTo} onChange={(e) => setGratTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
           <input value={gratText} onChange={(e) => setGratText(e.target.value)} placeholder="A note of thanks..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { addGratitude(gratTo, gratText); setGratTo(''); setGratText('') }} disabled={!gratText.trim() || !gratTo.trim()}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
           </button>
         </div>
@@ -1910,7 +1910,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <option value={1.9}>Heavy exercise</option>
         </select>
         <div className="grid grid-cols-3 gap-2">
-          <div className="rounded-xl p-2 text-center text-white" style={{ background: bmiCat.c }}>
+          <div className="rounded-xl p-2 text-center text-ink" style={{ background: bmiCat.c }}>
             <div className="text-[10px] opacity-90">BMI</div>
             <div className="text-sm font-black">{bmi.toFixed(1)}</div>
             <div className="text-[10px] font-bold">{bmiCat.l}</div>
@@ -1935,7 +1935,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <KolomVitalTerikat ikat={ikatSys} label="Systolic" satuan="mmHg" kelas="text-xs" />
           <KolomVitalTerikat ikat={ikatDia} label="Diastolic" satuan="mmHg" kelas="text-xs" />
         </div>
-        <div className="rounded-xl p-2 text-center text-white" style={{ background: bpCat.color }}>
+        <div className="rounded-xl p-2 text-center text-ink" style={{ background: bpCat.color }}>
           <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
         </div>
         <div className="grid grid-cols-3 gap-2 border-t border-neutral-100 pt-2 text-xs">
@@ -1951,7 +1951,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           </button>
         )}
         <button onClick={() => addSelfVital({ systolic: sys, diastolic: dia, heartRate: hr, spo2, tempC })}
-          className="w-full rounded-xl px-4 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+          className="w-full rounded-xl px-4 py-2 text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           Record Vitals Now
         </button>
         {lastVital && (
@@ -2002,7 +2002,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <Field label="Max HR (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <p className="text-[10px] text-neutral-400">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
-        <div className="flex items-center justify-between rounded-xl p-2 text-white" style={{ background: vo2Cat.c }}>
+        <div className="flex items-center justify-between rounded-xl p-2 text-ink" style={{ background: vo2Cat.c }}>
           <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
           <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Record</button>
         </div>
@@ -2017,7 +2017,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
               <span className="text-sm font-black">{cooperVo2 > 0 ? cooperVo2 : '—'}</span> <span className="text-[10px] font-bold">mL/kg/min</span>
             </div>
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
-              className="rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
+              className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
           </div>
           <p className="text-[10px] text-neutral-400">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</p>
         </div>
@@ -2115,7 +2115,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <div key={g.id} className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-semibold text-neutral-600">{done ? '🏅 ' : ''}{g.label} <span className="text-neutral-400">· target {g.target} {g.unit}</span></span>
-                <button onClick={() => removeGoal(g.id)} className="text-neutral-300 hover:text-red-400">✕</button>
+                <button onClick={() => removeGoal(g.id)} className="text-neutral-300 hover:text-red-600">✕</button>
               </div>
               {trackable ? (
                 <>
@@ -2300,7 +2300,7 @@ export default function SportsSocialFeed() {
         onClick={() => setIsComposeOpen(true)}
         aria-label="Create a new post or story"
         data-tour="compose"
-        className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-white shadow-lg transition active:scale-95 lg:grid"
+        className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-ink shadow-lg transition active:scale-95 lg:grid"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
       >
         <IconPlus size={26} />

@@ -110,7 +110,7 @@ export function DermatologyLesionMapper() {
               {matches.map((m, i) => (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                   <div className="flex items-center gap-2 text-[12px]"><Badge tone="neutral">{m.morphology}</Badge><Badge tone="neutral">{m.site}</Badge></div>
-                  <div className="mt-1.5 text-[13px] font-semibold text-ink dark:text-white">{m.differential.join(' · ')}</div>
+                  <div className="mt-1.5 text-[13px] font-semibold text-ink dark:text-ink">{m.differential.join(' · ')}</div>
                 </div>
               ))}
             </div>
@@ -125,7 +125,7 @@ export function DermatologyLesionMapper() {
         <div className="text-xs font-black uppercase tracking-wide text-neutral-400">ABCDE — Pigmented Lesion Red Flags</div>
         <div className="mt-3 space-y-2">
           {ABCDE.map((r) => (
-            <div key={r.k} className="flex justify-between text-[13px]"><span className="font-bold text-ink dark:text-white">{r.k}</span><span className="text-neutral-500 text-right">{r.v}</span></div>
+            <div key={r.k} className="flex justify-between text-[13px]"><span className="font-bold text-ink dark:text-ink">{r.k}</span><span className="text-neutral-500 text-right">{r.v}</span></div>
           ))}
         </div>
         <p className="mt-3 text-[11px] text-neutral-400">Any pigmented lesion meeting ABCDE criteria, or the "ugly duckling" sign (looks different from the patient's other moles), warrants dermatology referral/biopsy — not something this tool, or any photo, should be used to rule out.</p>

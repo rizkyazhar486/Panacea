@@ -76,7 +76,7 @@ export function LdlCalculator() {
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Non-HDL cholesterol</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{nonHdl.toFixed(0)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{nonHdl.toFixed(0)}</div>
             <div className="text-[11px] text-neutral-400">mg/dL</div>
             <p className="mt-1 text-[11px] text-neutral-400">Valid at any TG level; secondary target is usually LDL goal + 30.</p>
           </div>

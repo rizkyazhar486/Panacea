@@ -236,7 +236,7 @@ export function Readiness() {
           {perluSimpan && baruDisimpan !== key && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
               title="Save this value across the app (or press Enter)"
-              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === key && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
         </div>
@@ -344,7 +344,7 @@ export function Readiness() {
             {today.workouts.map((w, i) => (
               <div key={i} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-xs">
                 <span>🏋️ {w.min} min · RPE {w.rpe} <span className="text-neutral-400">(+{(w.rpe * w.min)} load)</span></span>
-                <button onClick={() => upd({ workouts: today.workouts.filter((_, j) => j !== i) })} className="font-bold text-rose-400">✕</button>
+                <button onClick={() => upd({ workouts: today.workouts.filter((_, j) => j !== i) })} className="font-bold text-rose-600">✕</button>
               </div>
             ))}
           </div>

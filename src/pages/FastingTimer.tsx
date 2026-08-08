@@ -97,7 +97,7 @@ export function FastingTimer() {
           {start && (
             <div className="mt-3 text-center">
               <div className="text-2xl">{phase.emoji}</div>
-              <div className="text-sm font-black text-ink dark:text-white">{phase.name}</div>
+              <div className="text-sm font-black text-ink dark:text-ink">{phase.name}</div>
               <Badge tone={reached ? 'brand' : 'low'}>{reached ? 'Goal reached 🎉' : `${fmt(remainingMs)} to goal`}</Badge>
             </div>
           )}
@@ -128,7 +128,7 @@ export function FastingTimer() {
           {PHASES.map((p) => (
             <div key={p.name} className={'rounded-xl border p-3 ' + (start && elapsedH >= p.from && elapsedH < p.to ? 'border-brand bg-brand-50 dark:bg-white/5' : 'border-neutral-100 dark:border-white/10')}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-ink dark:text-white">{p.emoji} {p.name}</span>
+                <span className="text-sm font-bold text-ink dark:text-ink">{p.emoji} {p.name}</span>
                 <span className="text-[11px] font-bold text-neutral-400">{p.from}–{p.to === 72 ? '24+' : p.to}h</span>
               </div>
               <p className="mt-0.5 text-[12px] text-neutral-500 dark:text-neutral-400">{p.note}</p>

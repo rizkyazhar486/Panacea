@@ -164,7 +164,7 @@ export function Markets() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📈</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Data Pasar</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Data Pasar</h1>
           <p className="text-xs text-neutral-400">Harga, grafik, dan berita — diperbarui otomatis</p>
         </div>
       </div>
@@ -190,7 +190,7 @@ export function Markets() {
       </Card>
 
       {err && (
-        <Card className="!p-4"><p className="text-[12px] leading-relaxed text-rose-600 dark:text-rose-400">{err}</p></Card>
+        <Card className="!p-4"><p className="text-[12px] leading-relaxed text-rose-600 dark:text-rose-600">{err}</p></Card>
       )}
 
       <Card className="!p-4">
@@ -240,7 +240,7 @@ export function Markets() {
                   <button key={h.symbol} onClick={() => { setSelected(h.symbol); setSearch('') }}
                     className="flex w-full items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-left transition hover:bg-brand/10 dark:bg-white/5">
                     <div className="min-w-0">
-                      <div className="truncate text-[13px] font-bold text-ink dark:text-white">{h.name}</div>
+                      <div className="truncate text-[13px] font-bold text-ink dark:text-ink">{h.name}</div>
                       <div className="text-[10px] text-neutral-400">
                         {h.symbol}{h.exchange ? ` · ${h.exchange}` : ''}
                       </div>
@@ -267,11 +267,11 @@ export function Markets() {
             <button className="flex w-full items-start justify-between gap-2 text-left"
               onClick={() => setSelected(isOpen ? null : q.symbol)}>
               <div className="min-w-0">
-                <div className="text-[13px] font-black text-ink dark:text-white">{q.name}</div>
+                <div className="text-[13px] font-black text-ink dark:text-ink">{q.name}</div>
                 <div className="text-[10px] text-neutral-400">{q.symbol}{q.exchange ? ` · ${q.exchange}` : ''}</div>
               </div>
               <div className="shrink-0 text-right">
-                <div className="text-[14px] font-black text-ink dark:text-white">{fmtPrice(q.price, q.currency)}</div>
+                <div className="text-[14px] font-black text-ink dark:text-ink">{fmtPrice(q.price, q.currency)}</div>
                 <div className={`text-[11px] font-bold ${up ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {q.change != null ? `${up ? '+' : ''}${q.change.toFixed(2)}` : '—'}
                   {q.changePct != null ? ` (${up ? '+' : ''}${q.changePct.toFixed(2)}%)` : ''}
@@ -305,11 +305,11 @@ export function Markets() {
             {isOpen && detail && (
               <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 rounded-xl bg-neutral-50 p-3 text-[11px] dark:bg-white/5">
                 <span className="text-neutral-500">Penutupan sebelumnya</span>
-                <span className="text-right font-bold text-ink dark:text-white">{fmtPrice(detail.previousClose, detail.currency)}</span>
+                <span className="text-right font-bold text-ink dark:text-ink">{fmtPrice(detail.previousClose, detail.currency)}</span>
                 <span className="text-neutral-500">Titik data</span>
-                <span className="text-right font-bold text-ink dark:text-white">{detail.series.length}</span>
+                <span className="text-right font-bold text-ink dark:text-ink">{detail.series.length}</span>
                 <span className="text-neutral-500">Waktu pasar</span>
-                <span className="text-right font-bold text-ink dark:text-white">{detail.marketTime ? ago(detail.marketTime) : '—'}</span>
+                <span className="text-right font-bold text-ink dark:text-ink">{detail.marketTime ? ago(detail.marketTime) : '—'}</span>
               </div>
             )}
           </Card>
@@ -333,7 +333,7 @@ export function Markets() {
             {news.slice(0, 14).map((n, i) => (
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer"
                 className="block rounded-xl bg-neutral-50 p-3 transition hover:bg-neutral-100 dark:bg-white/5">
-                <div className="text-[12px] font-semibold leading-snug text-ink dark:text-white">{n.title}</div>
+                <div className="text-[12px] font-semibold leading-snug text-ink dark:text-ink">{n.title}</div>
                 <div className="mt-0.5 flex items-center gap-2 text-[10px] text-neutral-400">
                   <Badge tone="low">{n.region === 'domestic' ? 'Domestik' : 'Internasional'}</Badge>
                   {n.source && <span>{n.source}</span>}

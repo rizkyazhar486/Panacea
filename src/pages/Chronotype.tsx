@@ -91,7 +91,7 @@ export function Chronotype() {
 
       {QUESTIONS.map((q, qi) => (
         <Card key={qi} className="!p-5">
-          <div className="text-sm font-bold text-ink dark:text-white">{qi + 1}. {q.text}</div>
+          <div className="text-sm font-bold text-ink dark:text-ink">{qi + 1}. {q.text}</div>
           <div className="mt-3 flex flex-col gap-2">
             {q.options.map((o) => (
               <button

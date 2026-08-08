@@ -91,7 +91,7 @@ function PatientView({ email }: { email: string }) {
           {r.status === 'completed' && r.finalOpinion && (
             <div className="mt-3 rounded-xl bg-brand/10 p-3">
               <div className="text-[11px] font-bold text-brand-dark">Dr. {r.doctorName}'s opinion</div>
-              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-ink dark:text-white">{r.finalOpinion}</p>
+              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-ink dark:text-ink">{r.finalOpinion}</p>
             </div>
           )}
         </Card>
@@ -150,7 +150,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
           <Card key={r.id} className="!p-0 overflow-hidden">
             <button onClick={() => setOpen(isOpen ? null : r.id)} className="flex w-full items-center justify-between gap-3 p-4 text-left">
               <div className="min-w-0">
-                <div className="text-[15px] font-black text-ink dark:text-white">{r.patientName}</div>
+                <div className="text-[15px] font-black text-ink dark:text-ink">{r.patientName}</div>
                 <div className="truncate text-[12px] text-neutral-500">{r.currentDiagnosis || r.symptoms}</div>
               </div>
               <span className="shrink-0 text-neutral-300">{isOpen ? '−' : '+'}</span>

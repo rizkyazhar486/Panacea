@@ -85,22 +85,22 @@ export function TinjauConnect() {
       <SectionTitle icon={<IconShield />} title="Connect Review"
         subtitle="Account verification and decisions on reports — owner only" />
 
-      {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
-      {muat && <Card><p className="text-[13px] text-slate-400">Loading…</p></Card>}
+      {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-600">{galat}</p></Card>}
+      {muat && <Card><p className="text-[13px] text-neutral-500">Loading…</p></Card>}
 
       {/* Verification requests */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
           Verification requests ({ajuan.length})
         </div>
         {ajuan.length === 0 && !muat && (
-          <p className="mt-2 text-[12px] text-slate-400">No requests waiting.</p>
+          <p className="mt-2 text-[12px] text-neutral-500">No requests waiting.</p>
         )}
         <div className="mt-2 space-y-2">
           {ajuan.map((a) => (
             <div key={a.email} className="rounded-xl bg-white/5 p-3">
-              <div className="text-[13px] font-black text-white">{a.data.nama}, {a.data.umur}</div>
-              <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-slate-300">
+              <div className="text-[13px] font-black text-ink">{a.data.nama}, {a.data.umur}</div>
+              <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-neutral-600">
                 <span>Occupation: {a.data.pekerjaan}</span>
                 <span>Status: {a.data.status}</span>
                 <span>Education: {a.data.pendidikanTerakhir}</span>
@@ -111,14 +111,14 @@ export function TinjauConnect() {
 
               {/* Yang dipakai memutuskan: selfie berpose vs foto media sosial. */}
               <div className="mt-2 rounded-lg bg-black/20 p-2">
-                <div className="text-[10px] font-black uppercase text-slate-400">Identity evidence</div>
+                <div className="text-[10px] font-black uppercase text-neutral-500">Identity evidence</div>
                 <a href={a.data.selfieUrl} target="_blank" rel="noopener noreferrer"
                   className="mt-1 block text-[11px] font-bold text-brand underline">Open posed selfie (fingers forming P) →</a>
                 {(a.data.sosialMedia ?? []).map((s: string) => {
                   const p = platformSosial(s)
                   return (
                     <a key={s} href={s} target="_blank" rel="noopener noreferrer"
-                      className="mt-1 flex items-baseline gap-1.5 text-[11px] text-sky-400 underline">
+                      className="mt-1 flex items-baseline gap-1.5 text-[11px] text-sky-700 underline">
                       {/* Platform diberi label agar tautan yang host-nya tidak sesuai
                           langsung terlihat, tanpa perlu membaca URL panjangnya. */}
                       <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-black uppercase no-underline ${
@@ -134,7 +134,7 @@ export function TinjauConnect() {
                   the posting history and join date too — an account created yesterday proves
                   nothing.
                 </p>
-                <p className="mt-1 text-[10px] leading-relaxed text-amber-400/80">
+                <p className="mt-1 text-[10px] leading-relaxed text-amber-700/80">
                   Phone number tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi
                   nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama
                   tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda
@@ -148,7 +148,7 @@ export function TinjauConnect() {
               <div className="mt-2 flex gap-2">
                 <Button onClick={() => void putusVerifikasi(a.email, true)}>Approve</Button>
                 <button onClick={() => void putusVerifikasi(a.email, false)}
-                  className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-rose-400">Reject</button>
+                  className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-rose-600">Reject</button>
               </div>
             </div>
           ))}
@@ -157,25 +157,25 @@ export function TinjauConnect() {
 
       {/* Laporan */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
           Reports waiting ({laporan.length})
         </div>
         {laporan.length === 0 && !muat && (
-          <p className="mt-2 text-[12px] text-slate-400">No reports waiting.</p>
+          <p className="mt-2 text-[12px] text-neutral-500">No reports waiting.</p>
         )}
         <div className="mt-2 space-y-2">
           {laporan.map((l) => {
             const p = poin[l.id] ?? 0
             return (
               <div key={l.id} className="rounded-xl bg-white/5 p-3">
-                <div className="text-[12px] font-bold text-white">{l.alasan}</div>
-                {l.catatan && <p className="mt-0.5 text-[11px] text-slate-400">{l.catatan}</p>}
+                <div className="text-[12px] font-bold text-ink">{l.alasan}</div>
+                {l.catatan && <p className="mt-0.5 text-[11px] text-neutral-500">{l.catatan}</p>}
                 <div className="mt-1 text-[10px] text-slate-500">
                   Reported: {l.terlaporEmail} · oleh {l.pelaporEmail} · {l.pada.slice(0, 10)}
                 </div>
                 <div className="mt-2 flex items-end gap-2">
                   <div className="w-28">
-                    <div className="text-[10px] font-bold uppercase text-slate-400">Points deducted</div>
+                    <div className="text-[10px] font-bold uppercase text-neutral-500">Points deducted</div>
                     <KolomAngka nilai={poin[l.id]} onNilai={(n) => setPoin((s) => ({ ...s, [l.id]: n }))}
                       ariaLabel={`Poin untuk laporan ${l.id}`} />
                   </div>
@@ -194,7 +194,7 @@ export function TinjauConnect() {
       </Card>
 
       <Card>
-        <p className="text-[11px] leading-relaxed text-slate-400">
+        <p className="text-[11px] leading-relaxed text-neutral-500">
           Every decision is recorded in the audit log with the email of the owner who made it. Credit
           already deducted can be restored, and a restoration that brings credit back above
           {' '}{AMBANG.hapus} automatically cancels the scheduled deletion.

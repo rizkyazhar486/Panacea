@@ -389,13 +389,13 @@ function RunnerCoach() {
       <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Your Estimated VO₂max</div>
-            <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-white/50">ml/kg/min</span></div>
-            <div className="text-[10px] text-white/50">this run's pace: {fmtPace(runPaceSec)}/km · O₂ at that pace {vo2atRun.toFixed(0)}</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Your Estimated VO₂max</div>
+            <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-ink/50">ml/kg/min</span></div>
+            <div className="text-[10px] text-ink/50">this run's pace: {fmtPace(runPaceSec)}/km · O₂ at that pace {vo2atRun.toFixed(0)}</div>
           </div>
           {cat && <Badge tone={cat.tone}>{cat.label}</Badge>}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-white/80">
+        <p className="mt-2 text-[11px] leading-relaxed text-ink/80">
           {effort === 'easy'
             ? '⚠️ Because this was an EASY run, your actual VO₂max is FAR higher than simply converting this pace to a Cooper Test. Easy runs are SUPPOSED to feel slow — that\'s the correct principle (80% of training should be easy).'
             : effort === 'moderate'
@@ -703,20 +703,20 @@ export function TrainingPlan() {
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">VO₂max Cooper (all-out)</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">VO₂max Cooper (all-out)</div>
               <div className="text-2xl font-extrabold text-brand">{cooper > 600 ? vo2FromCooper.toFixed(1) : '—'}</div>
-              <div className="text-[10px] text-white/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ far below your watch VO₂max — the test was likely not all-out' : '(distance − 504.9) ÷ 44.73'}</div>
+              <div className="text-[10px] text-ink/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ far below your watch VO₂max — the test was likely not all-out' : '(distance − 504.9) ÷ 44.73'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-white/50">Realistic target</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Realistic target</div>
               <div className="text-2xl font-extrabold text-amber-300">{vo2Now > 0 ? vo2Target : '—'}</div>
-              <div className="text-[10px] text-white/50">{vo2Now > 0 ? `±${monthsToTarget} months with regular 4×4 (≈+0.5/month)` : 'fill in your VO₂max'}</div>
+              <div className="text-[10px] text-ink/50">{vo2Now > 0 ? `±${monthsToTarget} months with regular 4×4 (≈+0.5/month)` : 'fill in your VO₂max'}</div>
             </div>
           </div>
           <div className="relative mt-3 h-2.5 overflow-hidden rounded-full bg-white/15">
             <div className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${Math.min(100, (vo2Now / vo2Target) * 100)}%` }} />
           </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-white/80">
+          <p className="mt-2 text-[11px] leading-relaxed text-ink/80">
             VO₂max is highly trainable — beginners gain 15-30% in 8-12 weeks.
             Recipe: <b>2× Norwegian 4×4</b> + <b>3× Zone 2</b> (45-60 min) + <b>2× strength</b> per week.
             A 1 MET increase (±3.5 ml/kg/min) lowers mortality risk by ~12-17%.

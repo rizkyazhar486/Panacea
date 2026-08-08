@@ -122,7 +122,7 @@ export function SleepPattern() {
       <div className="space-y-4">
         <SectionTitle icon={<IconTimer />} title="Sleep Pattern" />
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-neutral-600 leading-relaxed">
             Rincian tidur per tahapan diisi server melalui sinkronisasi otomatis, dan saat ini aplikasi
             berjalan tanpa server.
           </p>
@@ -140,14 +140,14 @@ export function SleepPattern() {
       />
 
       <Card>
-        <p className="text-sm text-slate-300 leading-relaxed">
+        <p className="text-sm text-neutral-600 leading-relaxed">
           Total jam tidur adalah angka yang paling sering dilihat dan paling sedikit artinya.
-          <strong className="text-white"> Tujuh jam yang terpecah-pecah dengan tidur dalam nyaris nol tidak
+          <strong className="text-ink"> Tujuh jam yang terpecah-pecah dengan tidur dalam nyaris nol tidak
           sama dengan tujuh jam yang utuh</strong> — dan hanya rincian tahapan yang bisa membedakannya.
         </p>
-        <p className="text-sm text-slate-400 mt-2 leading-relaxed">
+        <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
           Bagi orang yang jadwal jaganya berantakan, yang paling menentukan justru bukan lamanya melainkan
-          <strong className="text-white"> keteraturan jamnya</strong>. Jam tidur yang berpindah-pindah tiap
+          <strong className="text-ink"> keteraturan jamnya</strong>. Jam tidur yang berpindah-pindah tiap
           malam memberi tubuh sinyal waktu yang saling bertentangan, dan itu memberi rasa lelah yang tidak
           hilang meskipun jumlah jamnya cukup.
         </p>
@@ -155,16 +155,16 @@ export function SleepPattern() {
 
       {gagal ? (
         <Card>
-          <p className="text-sm text-slate-400">Tidak bisa memuat data tidur.</p>
+          <p className="text-sm text-neutral-500">Tidak bisa memuat data tidur.</p>
           <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
         </Card>
       ) : memuat ? (
         <Card><p className="text-sm text-slate-500">Loading…</p></Card>
       ) : !urut.length ? (
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">Belum ada malam yang tercatat.</p>
-          <p className="mt-2 text-sm text-slate-400 leading-relaxed">
-            Pastikan <strong className="text-slate-200">Sleep Analysis</strong> ikut dicentang di Health Auto Export,
+          <p className="text-sm text-neutral-600 leading-relaxed">Belum ada malam yang tercatat.</p>
+          <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+            Pastikan <strong className="text-ink">Sleep Analysis</strong> ikut dicentang di Health Auto Export,
             dan Anda memakai jam tangan saat tidur. Rincian tahapan hanya ada bila jam tangan dipakai
             sepanjang malam — bila hanya iPhone yang di dekat tempat tidur, yang terekam paling jauh adalah
             waktu di tempat tidur, tanpa tahapan.
@@ -188,9 +188,9 @@ export function SleepPattern() {
             </div>
 
             {ringkas!.rerataJamTidur != null && (
-              <p className="mt-3 text-sm text-slate-400 leading-relaxed">
-                Rata-rata Anda mulai tidur sekitar pukul <strong className="text-white">{fmtJam(ringkas!.rerataJamTidur)}</strong>
-                {ringkas!.rerataJamBangun != null && <> dan bangun sekitar <strong className="text-white">{fmtJam(ringkas!.rerataJamBangun)}</strong></>}.
+              <p className="mt-3 text-sm text-neutral-500 leading-relaxed">
+                Rata-rata Anda mulai tidur sekitar pukul <strong className="text-ink">{fmtJam(ringkas!.rerataJamTidur)}</strong>
+                {ringkas!.rerataJamBangun != null && <> dan bangun sekitar <strong className="text-ink">{fmtJam(ringkas!.rerataJamBangun)}</strong></>}.
                 {' '}Dihitung melingkar, sehingga jam sebelum dan sesudah tengah malam tidak dirata-ratakan menjadi siang hari.
               </p>
             )}
@@ -208,7 +208,7 @@ export function SleepPattern() {
             <SectionTitle title="Per malam" subtitle="Bar length is proportional to time asleep" />
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
               {([['deep', 'Dalam'], ['rem', 'REM'], ['core', 'Inti'], ['awake', 'Terbangun']] as const).map(([k, l]) => (
-                <span key={k} className="flex items-center gap-1.5 text-slate-400">
+                <span key={k} className="flex items-center gap-1.5 text-neutral-500">
                   <span className="h-2 w-2 rounded-full" style={{ background: WARNA[k] }} />{l}
                 </span>
               ))}
@@ -229,10 +229,10 @@ export function SleepPattern() {
                 return (
                   <div key={n.date}>
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <span className="text-xs font-semibold text-white">
+                      <span className="text-xs font-semibold text-ink">
                         {new Date(n.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                       </span>
-                      <span className="text-xs text-slate-400 tabular-nums">
+                      <span className="text-xs text-neutral-500 tabular-nums">
                         {fmtDurasi(n.totalH)}
                         {n.start && n.end && (
                           <span className="text-slate-500"> · {fmtJam(jamDesimal(n.start))}–{fmtJam(jamDesimal(n.end))}</span>
@@ -267,8 +267,8 @@ export function SleepPattern() {
                 ['Batas alat ini', 'Tahapan tidur dari jam tangan merupakan PERKIRAAN dari gerakan dan denyut jantung, bukan hasil rekaman gelombang otak. Ia cukup baik untuk melihat kecenderungan diri sendiri, dan tidak dapat dipakai untuk menegakkan diagnosis gangguan tidur. Mendengkur keras dengan henti napas yang disaksikan orang lain, maupun rasa mengantuk berat di siang hari, perlu diperiksakan langsung dan tidak akan terjawab oleh angka di halaman ini.'],
               ].map(([judul, isi]) => (
                 <div key={judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-                  <div className="text-sm font-semibold text-white">{judul}</div>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-400">{isi}</p>
+                  <div className="text-sm font-semibold text-ink">{judul}</div>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-500">{isi}</p>
                 </div>
               ))}
             </div>
@@ -282,7 +282,7 @@ export function SleepPattern() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-base font-semibold text-white tabular-nums">{value}</div>
+      <div className="text-base font-semibold text-ink tabular-nums">{value}</div>
       <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{label}</div>
     </div>
   )

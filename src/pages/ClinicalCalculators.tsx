@@ -906,17 +906,17 @@ function SirirajCalc() {
         subtitle="Bedside discrimination of haemorrhagic vs ischaemic stroke" />
       <div className="mt-3 space-y-3">
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Consciousness</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Consciousness</div>
           <div className="mt-1"><SegButtons value={conscious} onChange={setConscious}
             options={[{ v: 0, l: 'Alert' }, { v: 1, l: 'Drowsy/stupor' }, { v: 2, l: 'Semicoma/coma' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Vomiting (within 2 h of onset)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Vomiting (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={vomiting} onChange={setVomiting}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Headache (within 2 h of onset)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Headache (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={headache} onChange={setHeadache}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
@@ -925,7 +925,7 @@ function SirirajCalc() {
             onChange={(e) => setDbp(Number(e.target.value) || 0)} />
         </Field>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Atheroma markers</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Atheroma markers</div>
           <div className="text-[10px] italic text-neutral-400">Diabetes, angina, or intermittent claudication — any one counts</div>
           <div className="mt-1"><SegButtons value={atheroma} onChange={setAtheroma}
             options={[{ v: 0, l: 'None' }, { v: 1, l: 'One or more' }]} /></div>
@@ -935,7 +935,7 @@ function SirirajCalc() {
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
-          <span className="text-2xl font-black text-ink dark:text-white">{rounded > 0 ? '+' : ''}{rounded}</span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
         </div>
         <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
         <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">
@@ -987,7 +987,7 @@ function GadjahMadaCalc() {
           { l: 'Refleks Babinski positif', v: babinski, set: setBabinski },
         ].map((r) => (
           <div key={r.l}>
-            <div className="text-[12px] font-bold text-ink dark:text-white">{r.l}</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">{r.l}</div>
             <div className="mt-1"><SegButtons value={r.v ? 1 : 0} onChange={(n) => r.set(n === 1)}
               options={[{ v: 0, l: 'Tidak' }, { v: 1, l: 'Ya' }]} /></div>
           </div>
@@ -1830,7 +1830,7 @@ function AtlsCalc() {
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Primary Survey Note — ready to paste into the medical record</div>
-          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-white">{copied ? '✓ Copied' : 'Copy Note'}</button>
+          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-ink">{copied ? '✓ Copied' : 'Copy Note'}</button>
         </div>
         <pre className="mt-2 whitespace-pre-wrap font-sans text-[11px] leading-relaxed text-neutral-600">{formattedNote}</pre>
         <p className="mt-2 text-[10px] text-neutral-400">{assessedCount}/{totalCount} items assessed.</p>
@@ -2563,7 +2563,7 @@ function AclsCalc() {
         <ol className="mt-3 space-y-3">
           {active.steps.map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-black text-white">{i + 1}</span>
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-black text-ink">{i + 1}</span>
               <p className="text-[12px] leading-relaxed text-neutral-700">{step}</p>
             </li>
           ))}

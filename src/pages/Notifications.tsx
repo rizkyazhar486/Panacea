@@ -180,7 +180,7 @@ export function Notifications() {
                       <span className="mt-0.5 text-base leading-none shrink-0">{kat.ikon}</span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-bold text-ink dark:text-white">{n.title}</span>
+                          <span className="text-sm font-bold text-ink dark:text-ink">{n.title}</span>
                           {!n.read && <Badge tone="brand">Baru</Badge>}
                         </div>
                         <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>

@@ -38,9 +38,9 @@ export function ClinicalTrackers() {
         subtitle="Saturation, ECG, jet lag, pregnancy, and wheelchair physiology" />
 
       <Card>
-        <p className="text-sm leading-relaxed text-slate-300">
-          Semua di sini dicatat sendiri, jadi <strong className="text-white">tidak bergantung pada perangkat
-          mana pun</strong>. Halaman ini <strong className="text-white">mencatat dan menjelaskan</strong>, dan
+        <p className="text-sm leading-relaxed text-neutral-600">
+          Semua di sini dicatat sendiri, jadi <strong className="text-ink">tidak bergantung pada perangkat
+          mana pun</strong>. Halaman ini <strong className="text-ink">mencatat dan menjelaskan</strong>, dan
           sengaja tidak menafsirkan rekaman mentah — membaca EKG adalah wilayah alat berizin dan tenaga medis,
           dan menirunya justru berbahaya ketika hasilnya salah.
         </p>
@@ -55,7 +55,7 @@ export function ClinicalTrackers() {
           ['kursiRoda', '♿ Kursi Roda'],
         ] as [Tab, string][]).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
-            className={`rounded-lg border px-3 py-1.5 text-sm transition ${tab === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-slate-400'}`}>
+            className={`rounded-lg border px-3 py-1.5 text-sm transition ${tab === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'}`}>
             {l}
           </button>
         ))}
@@ -105,7 +105,7 @@ function TabSpo2() {
         <div className="mt-2 flex flex-wrap gap-2">
           {(['istirahat', 'tidur', 'aktivitas', 'ketinggian'] as const).map((k) => (
             <button key={k} onClick={() => setKonteks(k)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${konteks === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-slate-400'}`}>{k}</button>
+              className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${konteks === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'}`}>{k}</button>
           ))}
         </div>
         {konteks === 'ketinggian' && (
@@ -118,7 +118,7 @@ function TabSpo2() {
         <Card>
           <div className="flex items-center gap-4">
             <div className="text-3xl font-bold tabular-nums" style={{ color: warna }}>{analisis.terakhir!.spo2}%</div>
-            <p className="min-w-0 flex-1 text-sm leading-relaxed text-slate-300">{analisis.arti}</p>
+            <p className="min-w-0 flex-1 text-sm leading-relaxed text-neutral-600">{analisis.arti}</p>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Stat label="Rata-rata" value={`${analisis.rerata}%`} />
@@ -145,13 +145,13 @@ function TabSpo2() {
 
       <Card>
         <SectionTitle title="Before you panic: reasons a low reading can be wrong" />
-        <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
-          Alat di jam tangan dan oksimeter jari <strong className="text-white">bukan alat diagnostik</strong>.
+        <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
+          Alat di jam tangan dan oksimeter jari <strong className="text-ink">bukan alat diagnostik</strong>.
           Angka rendah yang berdiri sendiri tanpa gejala paling sering merupakan kesalahan pengukuran.
         </p>
         <ul className="mt-2 space-y-1">
           {SEBAB_SPO2_KELIRU.map((s) => (
-            <li key={s} className="flex gap-2 text-sm text-slate-400"><span className="text-slate-600">•</span><span>{s}</span></li>
+            <li key={s} className="flex gap-2 text-sm text-neutral-500"><span className="text-slate-600">•</span><span>{s}</span></li>
           ))}
         </ul>
       </Card>
@@ -179,9 +179,9 @@ function TabEkg() {
   return (
     <div className="space-y-4">
       <Card>
-        <p className="text-sm leading-relaxed text-slate-300">
-          Rekam EKG di aplikasi bawaan jam tangan Anda, lalu <strong className="text-white">salin hasilnya ke
-          sini</strong> beserta gejala saat itu. Yang berguna bagi dokter adalah <strong className="text-white">pola
+        <p className="text-sm leading-relaxed text-neutral-600">
+          Rekam EKG di aplikasi bawaan jam tangan Anda, lalu <strong className="text-ink">salin hasilnya ke
+          sini</strong> beserta gejala saat itu. Yang berguna bagi dokter adalah <strong className="text-ink">pola
           dari waktu ke waktu</strong> — kapan terjadi, seberapa sering, dan apa yang Anda rasakan — bukan satu
           rekaman tunggal.
         </p>
@@ -206,7 +206,7 @@ function TabEkg() {
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {GEJALA_EKG.map((g) => (
               <button key={g} onClick={() => toggleGejala(g)}
-                className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold ${gejala.includes(g) ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-slate-400'}`}>{g}</button>
+                className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold ${gejala.includes(g) ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-neutral-500'}`}>{g}</button>
             ))}
           </div>
         </div>
@@ -215,24 +215,24 @@ function TabEkg() {
 
       <Card>
         <SectionTitle title={`Arti "${INFO_EKG[klas].label}"`} />
-        <p className="mt-1.5 text-sm leading-relaxed text-slate-300">{INFO_EKG[klas].arti}</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">{INFO_EKG[klas].arti}</p>
         <p className="mt-2 text-sm leading-relaxed text-emerald-200/80"><span className="text-emerald-500/80">Langkah: </span>{INFO_EKG[klas].langkah}</p>
       </Card>
 
       {list.length > 0 && (
         <Card>
           <SectionTitle icon={<IconActivity />} title="History" subtitle={`${ringkas.total} rekaman`} />
-          <p className={`mt-2 rounded-lg border p-3 text-sm leading-relaxed ${ringkas.darurat ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100' : 'border-white/10 bg-white/[0.03] text-slate-300'}`}>
+          <p className={`mt-2 rounded-lg border p-3 text-sm leading-relaxed ${ringkas.darurat ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100' : 'border-white/10 bg-white/[0.03] text-neutral-600'}`}>
             {ringkas.saran}
           </p>
           <div className="mt-3 space-y-1.5">
             {[...list].reverse().slice(0, 30).map((c, i) => (
               <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-2.5 py-2 text-xs">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: INFO_EKG[c.klasifikasi].warna }} />
-                <span className="font-semibold text-white">{INFO_EKG[c.klasifikasi].label}</span>
+                <span className="font-semibold text-ink">{INFO_EKG[c.klasifikasi].label}</span>
                 {c.nadi && <span className="text-slate-500">{c.nadi} bpm</span>}
                 <span className="text-slate-500">{new Date(c.waktu).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                {c.gejala.length > 0 && <span className="w-full text-slate-400">{c.gejala.join(', ')}</span>}
+                {c.gejala.length > 0 && <span className="w-full text-neutral-500">{c.gejala.join(', ')}</span>}
               </div>
             ))}
           </div>
@@ -266,7 +266,7 @@ function TabJetLag() {
           <Field label="Hari persiapan"><input className={inputClass} inputMode="numeric" value={siap} onChange={(e) => setSiap(e.target.value)} /></Field>
         </div>
         <p className="mt-2 text-[11px] text-slate-500">Jakarta UTC+7 · Singapura UTC+8 · London UTC+0/+1 · Tokyo UTC+9 · New York UTC−5/−4</p>
-        <p className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-slate-300">{rencana.ringkas}</p>
+        <p className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-neutral-600">{rencana.ringkas}</p>
       </Card>
 
       {rencana.langkah.length > 0 && (
@@ -275,10 +275,10 @@ function TabJetLag() {
           <div className="mt-2 space-y-2">
             {rencana.langkah.map((l) => (
               <div key={l.hari} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-                <div className="text-sm font-semibold text-white">{l.hari}</div>
+                <div className="text-sm font-semibold text-ink">{l.hari}</div>
                 <ul className="mt-1 space-y-1">
                   {l.isi.map((x, i) => (
-                    <li key={i} className="flex gap-2 text-sm leading-relaxed text-slate-400"><span className="text-slate-600">·</span><span>{x}</span></li>
+                    <li key={i} className="flex gap-2 text-sm leading-relaxed text-neutral-500"><span className="text-slate-600">·</span><span>{x}</span></li>
                   ))}
                 </ul>
               </div>
@@ -292,7 +292,7 @@ function TabJetLag() {
           <SectionTitle title="Kenapa waktunya penting" />
           <div className="mt-2 space-y-2">
             {rencana.catatan.map((c, i) => (
-              <p key={i} className="text-sm leading-relaxed text-slate-400">{c}</p>
+              <p key={i} className="text-sm leading-relaxed text-neutral-500">{c}</p>
             ))}
           </div>
         </Card>
@@ -325,7 +325,7 @@ function TabHamil() {
 
       <Card>
         <SectionTitle icon={<IconActivity />} title={`Aktivitas — trimester ${status?.trimester ?? 1}`} />
-        <p className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-slate-300">{panduan.catatanTrimester}</p>
+        <p className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm leading-relaxed text-neutral-600">{panduan.catatanTrimester}</p>
         <Daftar judul="Dianjurkan" isi={panduan.anjuran} warna="emerald" />
         <Daftar judul="Dihindari" isi={panduan.hindari} warna="amber" />
       </Card>
@@ -343,7 +343,7 @@ function TabHamil() {
         <SectionTitle title="Conditions where exercise is not advised" />
         <ul className="mt-2 space-y-1">
           {panduan.kontraindikasiMutlak.map((t) => (
-            <li key={t} className="flex gap-2 text-sm text-slate-300"><span className="text-slate-600">•</span><span>{t}</span></li>
+            <li key={t} className="flex gap-2 text-sm text-neutral-600"><span className="text-slate-600">•</span><span>{t}</span></li>
           ))}
         </ul>
         <p className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-3 text-sm leading-relaxed text-amber-100/90">{DISCLAIMER_HAMIL}</p>
@@ -367,10 +367,10 @@ function TabKursiRoda() {
           {panduan.zona.map((z) => (
             <div key={z.z} className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm font-semibold text-white">Z{z.z} — {z.nama}</span>
-                <span className="text-sm tabular-nums text-slate-300">{z.dari}–{z.sampai} bpm</span>
+                <span className="text-sm font-semibold text-ink">Z{z.z} — {z.nama}</span>
+                <span className="text-sm tabular-nums text-neutral-600">{z.dari}–{z.sampai} bpm</span>
               </div>
-              <div className="text-[11px] leading-relaxed text-slate-400">{z.tujuan}</div>
+              <div className="text-[11px] leading-relaxed text-neutral-500">{z.tujuan}</div>
             </div>
           ))}
         </div>
@@ -381,8 +381,8 @@ function TabKursiRoda() {
         <div className="mt-2 space-y-2">
           {panduan.bahu.map((b) => (
             <div key={b.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-sm font-semibold text-white">{b.judul}</div>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{b.isi}</p>
+              <div className="text-sm font-semibold text-ink">{b.judul}</div>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">{b.isi}</p>
             </div>
           ))}
         </div>
@@ -392,7 +392,7 @@ function TabKursiRoda() {
         <SectionTitle title="What to be aware of" />
         <div className="mt-2 space-y-2">
           {panduan.catatan.map((c, i) => (
-            <p key={i} className={`rounded-lg border p-2.5 text-sm leading-relaxed ${/disrefleksia/i.test(c) ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100/90' : 'border-white/10 text-slate-400'}`}>{c}</p>
+            <p key={i} className={`rounded-lg border p-2.5 text-sm leading-relaxed ${/disrefleksia/i.test(c) ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100/90' : 'border-white/10 text-neutral-500'}`}>{c}</p>
           ))}
         </div>
       </Card>
@@ -418,7 +418,7 @@ function Daftar({ judul, isi, warna }: { judul: string; isi: string[]; warna: 'e
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-sm font-semibold tabular-nums text-white">{value}</div>
+      <div className="text-sm font-semibold tabular-nums text-ink">{value}</div>
       <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">{label}</div>
     </div>
   )

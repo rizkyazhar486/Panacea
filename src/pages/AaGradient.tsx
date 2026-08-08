@@ -62,7 +62,7 @@ export function AaGradient() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">PAO₂ (alveolar)</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{alveolar.toFixed(0)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{alveolar.toFixed(0)}</div>
             <div className="text-[11px] text-neutral-400">mmHg</div>
           </div>
           <div>
@@ -72,7 +72,7 @@ export function AaGradient() {
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Expected for age</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">≤{expectedForAge.toFixed(0)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">≤{expectedForAge.toFixed(0)}</div>
             <div className="text-[11px] text-neutral-400">mmHg (≈ age/4 + 4)</div>
           </div>
         </div>

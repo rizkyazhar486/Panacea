@@ -145,7 +145,7 @@ export function FamilyHealth() {
             {members.map((m) => (
               <div key={m.id} className="flex items-start justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div>
-                  <div className="text-sm font-bold text-ink dark:text-white">{relLabel(m.relativeId)}{m.ageDx ? ` · dx at ${m.ageDx}` : ''}</div>
+                  <div className="text-sm font-bold text-ink dark:text-ink">{relLabel(m.relativeId)}{m.ageDx ? ` · dx at ${m.ageDx}` : ''}</div>
                   <div className="mt-0.5 text-[12px] text-neutral-500 dark:text-neutral-400">{m.conditions.map(condLabel).join(', ')}</div>
                 </div>
                 <button onClick={() => removeMember(m.id)} className="shrink-0 text-xs font-bold text-rose-500">Remove</button>
@@ -163,7 +163,7 @@ export function FamilyHealth() {
             {flags.map((f, i) => (
               <div key={i} className={'rounded-xl border p-3 ' + (f.level === 'high' ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-ink dark:text-white">{f.condition}</span>
+                  <span className="text-sm font-bold text-ink dark:text-ink">{f.condition}</span>
                   <Badge tone={f.level === 'high' ? 'critical' : 'low'}>{f.level === 'high' ? 'Higher risk' : 'Elevated'}</Badge>
                 </div>
                 <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">{f.reason}</div>

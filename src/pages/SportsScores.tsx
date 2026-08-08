@@ -180,7 +180,7 @@ export function SportsScores() {
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <button onClick={() => toggleFav(ev.home.name)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                    <span className={`shrink-0 text-sm ${isFav(ev.home.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <span className={`shrink-0 text-sm ${isFav(ev.home.name) ? 'text-amber-700' : 'text-neutral-300'}`}>★</span>
                     <TeamLogo src={ev.home.logo} alt={ev.home.name} />
                     <span className="truncate text-sm font-semibold text-ink">{ev.home.name}</span>
                   </button>
@@ -188,7 +188,7 @@ export function SportsScores() {
                   <button onClick={() => toggleFav(ev.away.name)} className="flex min-w-0 flex-1 items-center justify-end gap-2 text-right">
                     <span className="truncate text-sm font-semibold text-ink">{ev.away.name}</span>
                     <TeamLogo src={ev.away.logo} alt={ev.away.name} />
-                    <span className={`shrink-0 text-sm ${isFav(ev.away.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <span className={`shrink-0 text-sm ${isFav(ev.away.name) ? 'text-amber-700' : 'text-neutral-300'}`}>★</span>
                   </button>
                 </div>
               </Card>

@@ -56,7 +56,7 @@ function QuestionSet({ items, answers, setAnswers }: { items: string[]; answers:
     <div className="space-y-3">
       {items.map((text, qi) => (
         <Card key={qi} className="!p-4">
-          <div className="text-sm font-semibold text-ink dark:text-white">{qi + 1}. {text}</div>
+          <div className="text-sm font-semibold text-ink dark:text-ink">{qi + 1}. {text}</div>
           <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {SCALE.map((label, pts) => (
               <button

@@ -79,12 +79,12 @@ export function Marketplace() {
                   <h3 className="text-lg font-extrabold">AI Longevity Subscription</h3>
                   {active && <Badge tone="neutral">Active · {daysLeft} days</Badge>}
                 </div>
-                <p className="mt-1 max-w-lg text-sm text-white/85">
+                <p className="mt-1 max-w-lg text-sm text-ink/85">
                   Unlock AI-powered Longevity Scores in the Nutrition & Calories menu. Valid for 30 days, renew monthly.
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-extrabold">Rp49.000<span className="text-sm font-medium text-white/70">/30 days</span></div>
+                <div className="text-2xl font-extrabold">Rp49.000<span className="text-sm font-medium text-ink/70">/30 days</span></div>
                 <Button variant="outline" className="mt-1 border-white !text-white hover:!bg-white/15" onClick={() => { buyLongevitySub(); notify(active ? 'AI Longevity subscription extended by 30 days.' : 'AI Longevity subscription active for 30 days.') }}>
                   {active ? 'Renew' : 'Subscribe Now'}
                 </Button>

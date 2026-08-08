@@ -151,7 +151,7 @@ function PeriodTracker() {
             <div className="mt-4 grid grid-cols-2 gap-2">
               <div className="rounded-xl bg-red-50 p-3 text-center">
                 <div className="text-sm font-black text-red-700">{fmtIdDate(nextPeriod)}</div>
-                <div className="mt-0.5 text-[10px] font-bold uppercase text-red-400">Next Period Estimate</div>
+                <div className="mt-0.5 text-[10px] font-bold uppercase text-red-600">Next Period Estimate</div>
               </div>
               <div className="rounded-xl bg-brand-50 p-3 text-center">
                 <div className="text-sm font-black text-brand-dark">{ovulationDay ? fmtIdDate(ovulationDay) : '—'}</div>

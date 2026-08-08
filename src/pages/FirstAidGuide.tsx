@@ -175,7 +175,7 @@ export function FirstAidGuide() {
             <button onClick={() => setOpen(isOpen ? null : g.id)} className="flex w-full items-center gap-3 p-4 text-left">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-xl dark:bg-red-500/10">{g.emoji}</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-black text-ink dark:text-white">{g.title}</div>
+                <div className="text-[15px] font-black text-ink dark:text-ink">{g.title}</div>
                 <Badge tone="low">{g.category}</Badge>
               </div>
               <span className="shrink-0 text-neutral-300">{isOpen ? '−' : '+'}</span>

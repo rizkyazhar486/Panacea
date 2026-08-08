@@ -81,7 +81,7 @@ export function SerumOsmolality() {
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Osmolal gap</div>
             {gap != null ? (
               <>
-                <div className="mt-1 text-2xl font-black text-ink dark:text-white">{gap.toFixed(0)}</div>
+                <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{gap.toFixed(0)}</div>
                 <div className="text-[11px] text-neutral-400">mOsm/kg</div>
                 {gBand && <Badge tone={gBand.tone}>{gBand.label}</Badge>}
               </>

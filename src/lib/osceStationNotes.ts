@@ -44,7 +44,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Kelemahan wajah sepihak mendadak (onset jam-hari), tanpa kelemahan anggota gerak',
       'Gejala penyerta: nyeri di belakang telinga, gangguan pengecapan 2/3 anterior lidah, hiperakusis, mata kering/berair',
-      'History infeksi virus sebelumnya (herpes simpleks sering dicurigai sebagai etiologi)',
+      'Riwayat infeksi virus sebelumnya (herpes simpleks sering dicurigai sebagai etiologi)',
       'Singkirkan faktor risiko stroke — bila ada kelemahan anggota gerak, curigai lesi sentral bukan Bell’s palsy',
     ],
     pemeriksaanFisik: [
@@ -120,7 +120,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Anak usia 6 bulan - 5 tahun dengan kejang saat demam (biasanya suhu naik cepat)',
       'Kejang umum tonik-klonik, durasi <15 menit, hanya 1 kali dalam 24 jam',
       'Tidak ada riwayat kejang tanpa demam sebelumnya, tidak ada tanda infeksi SSP',
-      'History kejang demam pada keluarga (faktor risiko genetik)',
+      'Riwayat kejang demam pada keluarga (faktor risiko genetik)',
     ],
     pemeriksaanFisik: [
       'Pasca-kejang, anak kembali sadar penuh (tidak ada defisit neurologis fokal residual)',
@@ -193,7 +193,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Trias klasik: demam, nyeri kepala hebat, kaku kuduk — onset akut (bakterial) vs subakut (TB/jamur)',
       'Pada ensefalitis tambahkan: penurunan kesadaran, kejang, perubahan perilaku (keterlibatan parenkim otak)',
-      'History kontak/wabah, status imunisasi (Hib, pneumokokus, meningokokus), status imun (HIV)',
+      'Riwayat kontak/wabah, status imunisasi (Hib, pneumokokus, meningokokus), status imun (HIV)',
     ],
     pemeriksaanFisik: [
       'Kaku kuduk, tanda Brudzinski (fleksi leher memicu fleksi lutut-panggul involunter), tanda Kernig (nyeri/tahanan ekstensi lutut saat panggul fleksi 90°)',
@@ -287,7 +287,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Neuropati Perifer e.c. DM': {
     anamnesis: [
       'Kesemutan/mati rasa distal simetris ("stocking-glove" distribution), dimulai dari kaki',
-      'History DM lama/kontrol gula buruk',
+      'Riwayat DM lama/kontrol gula buruk',
       'Nyeri neuropatik (terbakar, seperti ditusuk) terutama malam hari',
     ],
     pemeriksaanFisik: [
@@ -359,7 +359,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Guillain-Barré Syndrome': {
     anamnesis: [
       'Kelemahan motorik asendens (mulai dari kaki naik ke atas), progresif dalam hari, biasanya simetris',
-      'History infeksi saluran cerna/napas 1-3 minggu sebelumnya (sering Campylobacter jejuni)',
+      'Riwayat infeksi saluran cerna/napas 1-3 minggu sebelumnya (sering Campylobacter jejuni)',
       'Gangguan sensorik ringan, gangguan otonom (aritmia, labilitas tekanan darah)',
     ],
     pemeriksaanFisik: [
@@ -376,7 +376,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Trauma Medulla Spinalis dengan Fraktur Kompresi': {
     anamnesis: [
-      'History trauma (jatuh, kecelakaan) dengan nyeri punggung hebat, kelemahan/mati rasa di bawah level cedera',
+      'Riwayat trauma (jatuh, kecelakaan) dengan nyeri punggung hebat, kelemahan/mati rasa di bawah level cedera',
       'Gangguan BAB/BAK (retensi urin atau inkontinensia menandakan keterlibatan medula spinalis)',
     ],
     pemeriksaanFisik: [
@@ -416,7 +416,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Ensefalopati Hipertensi': {
     anamnesis: [
       'Nyeri kepala hebat, penurunan kesadaran/kebingungan, gangguan penglihatan mendadak, pada pasien dengan tekanan darah sangat tinggi',
-      'History hipertensi kronis tidak terkontrol atau kondisi baru (preeklamsia/eklamsia pada wanita hamil)',
+      'Riwayat hipertensi kronis tidak terkontrol atau kondisi baru (preeklamsia/eklamsia pada wanita hamil)',
     ],
     pemeriksaanFisik: [
       'Tekanan darah sangat tinggi (biasanya >180/120 mmHg)',
@@ -436,7 +436,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   // ─── Psikiatri ─────────────────────────────────────────────────────────
   'Post-Traumatic Stress Disorder (PTSD)': {
     anamnesis: [
-      'History peristiwa traumatis (kecelakaan, bencana, kekerasan) — gali detail kejadian dan kapan terjadi',
+      'Riwayat peristiwa traumatis (kecelakaan, bencana, kekerasan) — gali detail kejadian dan kapan terjadi',
       'Gejala re-experiencing: mimpi buruk berulang, flashback, teringat terus peristiwa',
       'Gejala penghindaran: menghindari tempat/situasi/percakapan yang mengingatkan trauma',
       'Gejala hiperarousal: mudah terkejut, sulit tidur, mudah marah, waspada berlebihan',
@@ -477,7 +477,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Waham kejar/persekutorik (merasa diawasi, dimata-matai, akan dicelakai)',
       'Halusinasi auditorik (mendengar suara-suara yang mengomentari/memerintah)',
       'Durasi gejala ≥1 bulan',
-      'History fungsi sosial/pekerjaan menurun, riwayat keluarga skizofrenia, penggunaan zat psikoaktif',
+      'Riwayat fungsi sosial/pekerjaan menurun, riwayat keluarga skizofrenia, penggunaan zat psikoaktif',
     ],
     pemeriksaanFisik: [
       'Status mental: penampilan kadang kurang terawat, kontak mata kurang, waham kejar (+), halusinasi auditorik (+), reality testing ability terganggu, tilikan buruk (derajat 1-2)',
@@ -494,7 +494,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Episode manik: mood meningkat/iritabel, energi berlebih, bicara cepat tak terhenti, flight of ideas, kebutuhan tidur berkurang tanpa lelah, perilaku impulsif/boros, grandiositas',
       'Episode depresi: mood turun, anhedonia, energi menurun, gangguan tidur, nafsu makan berubah, ide bunuh diri',
-      'History episode sebelumnya (pola siklik manik-depresi-eutimia)',
+      'Riwayat episode sebelumnya (pola siklik manik-depresi-eutimia)',
     ],
     pemeriksaanFisik: [
       'Episode manik: dandanan mencolok, hiperaktif, pembicaraan cepat/produktif, flight of ideas, mood elevated/labil, waham kebesaran mungkin ada, tilikan buruk',
@@ -594,7 +594,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Somatisasi: keluhan fisik multipel, berpindah-pindah, berulang bertahun-tahun tanpa penjelasan medis adekuat meski sudah diperiksa berulang',
       'Hipokondriasis: keyakinan menetap menderita penyakit serius tertentu meski hasil pemeriksaan berulang normal, preokupasi berlebihan terhadap sensasi tubuh normal',
-      'History pemeriksaan/konsultasi dokter berulang tanpa hasil abnormal signifikan',
+      'Riwayat pemeriksaan/konsultasi dokter berulang tanpa hasil abnormal signifikan',
     ],
     pemeriksaanFisik: [
       'Status mental: preokupasi somatik menonjol, mood cemas terkait keluhan fisik, tidak ada waham (pasien masih bisa menerima kemungkinan bukan penyakit serius meski sulit)',
@@ -655,9 +655,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Intoksikasi Alkohol / Zat Psikoaktif': {
     anamnesis: [
-      'History konsumsi alkohol/zat (jenis, jumlah, waktu terakhir) sebelum onset gejala',
+      'Riwayat konsumsi alkohol/zat (jenis, jumlah, waktu terakhir) sebelum onset gejala',
       'Gejala intoksikasi alkohol: bicara pelo, jalan sempoyongan, disinhibisi perilaku, penurunan kesadaran pada kasus berat',
-      'History penggunaan kronis untuk menilai risiko withdrawal/delirium tremens bila dihentikan',
+      'Riwayat penggunaan kronis untuk menilai risiko withdrawal/delirium tremens bila dihentikan',
     ],
     pemeriksaanFisik: [
       'Status mental: kesadaran berkabut hingga stupor tergantung derajat, bau alkohol dari napas, nistagmus, disartria, ataksia gaya berjalan',
@@ -693,7 +693,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Mata merah, gatal/nyeri, sekret — tanyakan karakter sekret: purulen kental (bakteri), gatal hebat + sekret mukoid (vernal/alergi), berair + riwayat ISPA/kontak (viral)',
       'Unilateral vs bilateral, riwayat kontak dengan penderita serupa (viral sangat menular)',
-      'History atopi/alergi (vernal), penggunaan lensa kontak',
+      'Riwayat atopi/alergi (vernal), penggunaan lensa kontak',
     ],
     pemeriksaanFisik: [
       'Injeksi konjungtiva, sekret (deskripsikan warna/konsistensi)',
@@ -743,7 +743,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi': {
     anamnesis: [
-      'History kemasukan benda asing, rasa mengganjal/nyeri, tanyakan jenis benda (organik/anorganik) dan waktu kejadian',
+      'Riwayat kemasukan benda asing, rasa mengganjal/nyeri, tanyakan jenis benda (organik/anorganik) dan waktu kejadian',
     ],
     pemeriksaanFisik: [
       'Mata: eversi kelopak untuk mencari benda asing subtarsal, pewarnaan fluoresein untuk defek kornea sekunder',
@@ -792,7 +792,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Hifema': {
     anamnesis: [
-      'History trauma tumpul mata (bola, tinju, dll), nyeri, penglihatan kabur/gelap',
+      'Riwayat trauma tumpul mata (bola, tinju, dll), nyeri, penglihatan kabur/gelap',
     ],
     pemeriksaanFisik: [
       'Darah terlihat di bilik mata depan (level darah terlihat dengan pasien duduk), nilai derajat hifema (grade 1-4 berdasarkan persentase pengisian bilik mata depan)',
@@ -961,7 +961,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   // ─── Kardiovaskular ────────────────────────────────────────────────────
   'Syok Anafilaktik — tindakan resusitasi': {
     anamnesis: [
-      'History paparan alergen (obat, makanan, sengatan serangga) sesaat sebelum gejala muncul',
+      'Riwayat paparan alergen (obat, makanan, sengatan serangga) sesaat sebelum gejala muncul',
       'Onset cepat: sesak napas, gatal seluruh tubuh, bengkak wajah/bibir, pusing/lemas',
     ],
     pemeriksaanFisik: [
@@ -984,7 +984,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Syok Hipovolemik / Hemoragik — pasang IV line': {
     anamnesis: [
-      'History trauma/perdarahan (luka, cedera) dengan estimasi jumlah darah yang hilang',
+      'Riwayat trauma/perdarahan (luka, cedera) dengan estimasi jumlah darah yang hilang',
       'Keluhan lemas, pusing, berdebar',
     ],
     pemeriksaanFisik: [
@@ -1030,7 +1030,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Berdebar-debar — tanyakan onset mendadak vs bertahap, teratur vs tidak teratur: "cepat dan tidak teratur" mengarah ke AF',
       'Gejala penyerta: nyeri dada, lemas, sesak, tremor (tremor + berkeringat curiga hipertiroid sebagai pencetus)',
-      'History hipertensi, DM, penyakit jantung, penyakit gondok; riwayat stroke/kelumpuhan sebelumnya (kontraindikasi manuver vagal & penanda risiko emboli)',
+      'Riwayat hipertensi, DM, penyakit jantung, penyakit gondok; riwayat stroke/kelumpuhan sebelumnya (kontraindikasi manuver vagal & penanda risiko emboli)',
       'Konsumsi kopi/alkohol/rokok, obat yang dapat memicu palpitasi (simpatomimetik, teofilin, amitriptilin)',
     ],
     pemeriksaanFisik: [
@@ -1050,7 +1050,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Supraventricular Tachycardia (SVT) — vagal maneuver': {
     anamnesis: [
       'Berdebar muncul bertahap (semakin lama semakin cepat), cepat dan teratur — berbeda dari AF (tidak teratur) dan sinus takikardia (muncul mendadak)',
-      'History pingsan akibat berdebar, riwayat stroke/TIA 3 bulan terakhir dan riwayat infark (kontraindikasi manuver vagal)',
+      'Riwayat pingsan akibat berdebar, riwayat stroke/TIA 3 bulan terakhir dan riwayat infark (kontraindikasi manuver vagal)',
     ],
     pemeriksaanFisik: [
       'EKG: irama regular, frekuensi 150-250x/menit, gelombang P tidak tampak (tertutup gelombang T), kompleks QRS normal (sempit, <0,12 detik)',
@@ -1106,7 +1106,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Sesak napas saat aktivitas (dyspnea on exertion), memberat saat berbaring (ortopnea — tanyakan jumlah bantal yang dipakai untuk tidur), sesak mendadak malam hari (paroxysmal nocturnal dyspnea)',
       'Edema tungkai, perut membuncit (asites), cepat lelah',
-      'History penyakit jantung sebelumnya (infark, hipertensi, katup), riwayat penyakit paru kronis (untuk cor pulmonale)',
+      'Riwayat penyakit jantung sebelumnya (infark, hipertensi, katup), riwayat penyakit paru kronis (untuk cor pulmonale)',
     ],
     pemeriksaanFisik: [
       'Peningkatan JVP, ronki basah halus di basal paru, S3 gallop, edema tungkai pitting bilateral',
@@ -1144,7 +1144,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Bradiaritmia / AV Block': {
     anamnesis: [
       'Lemas, letih, mudah lelah saat aktivitas, pingsan, sesak napas',
-      'History penyakit jantung, serangan jantung sebelumnya, hipotiroid, konsumsi obat (beta-blocker), riwayat penyalahgunaan zat, riwayat anemia',
+      'Riwayat penyakit jantung, serangan jantung sebelumnya, hipotiroid, konsumsi obat (beta-blocker), riwayat penyalahgunaan zat, riwayat anemia',
       'Aktivitas/pekerjaan sebagai atlet (bradikardia fisiologis atlet perlu dibedakan dari patologis)',
     ],
     pemeriksaanFisik: [
@@ -1167,7 +1167,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Asma (berbagai derajat & eksaserbasi) — tindakan nebulisasi': {
     anamnesis: [
       'Sesak napas episodik, mengi, batuk terutama malam/dini hari, dipicu alergen/aktivitas fisik/udara dingin/infeksi virus',
-      'History atopi pribadi/keluarga (rinitis alergi, dermatitis atopik)',
+      'Riwayat atopi pribadi/keluarga (rinitis alergi, dermatitis atopik)',
       'Frekuensi serangan dan penggunaan obat pelega untuk menilai derajat kontrol',
     ],
     pemeriksaanFisik: [
@@ -1175,7 +1175,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Tanda vital: takipnea, takikardia, SpO2',
       'Arus puncak ekspirasi (APE/peak flow) untuk menilai derajat obstruksi',
     ],
-    kriteriaDiagnosis: 'History episode mengi/sesak berulang reversibel + pemeriksaan mendukung obstruksi jalan napas reversibel (spirometri: peningkatan FEV1 ≥12% pasca-bronkodilator).',
+    kriteriaDiagnosis: 'Riwayat episode mengi/sesak berulang reversibel + pemeriksaan mendukung obstruksi jalan napas reversibel (spirometri: peningkatan FEV1 ≥12% pasca-bronkodilator).',
     tatalaksana: [
       'Serangan akut: oksigen untuk SpO2≥90%, nebulisasi agonis β2 kerja pendek (salbutamol) ± ipratropium bromida, kortikosteroid sistemik bila respons tidak segera/berat',
       'Kontrol jangka panjang: kortikosteroid inhalasi dosis rendah-sedang sebagai pengontrol, agonis β2 kerja lama bila belum terkontrol',
@@ -1186,7 +1186,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'PPOK Eksaserbasi Akut': {
     anamnesis: [
       'Sesak memberat dari baseline, peningkatan volume/purulensi sputum',
-      'History merokok lama (pack-years), riwayat PPOK terdiagnosis sebelumnya',
+      'Riwayat merokok lama (pack-years), riwayat PPOK terdiagnosis sebelumnya',
     ],
     pemeriksaanFisik: [
       'Barrel chest, penggunaan otot bantu napas, hipersonor pada perkusi, ekspirasi memanjang, mengi/ronki pada auskultasi',
@@ -1271,7 +1271,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Tuberkulosis Paru': {
     anamnesis: [
       'Batuk kronis >2 minggu (berdahak, kadang berdarah), keringat malam, penurunan berat badan, demam subfebris sore-malam',
-      'History kontak dengan penderita TB, status imun (HIV)',
+      'Riwayat kontak dengan penderita TB, status imun (HIV)',
     ],
     pemeriksaanFisik: [
       'Dapat normal atau ditemukan ronki di apeks paru, tanda konsolidasi/kavitas pada kasus lanjut, penurunan berat badan/kaheksia',
@@ -1347,7 +1347,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Pneumotoraks (Tension/Terbuka) — needle decompression': {
     anamnesis: [
       'Sesak napas mendadak, sering dengan riwayat trauma dada (tumpul/tembus)',
-      'History penyakit paru sebelumnya (TB, PPOK, pneumonia) sebagai faktor risiko pneumotoraks spontan',
+      'Riwayat penyakit paru sebelumnya (TB, PPOK, pneumonia) sebagai faktor risiko pneumotoraks spontan',
     ],
     pemeriksaanFisik: [
       'Cek JVP (meningkat pada tension pneumothorax) dan tanda syok (hipotensi, takikardia, sianosis)',
@@ -1366,7 +1366,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Hematotoraks & Flail Chest': {
     anamnesis: [
-      'History trauma tumpul (dengan krepitasi, gerakan napas paradoksal) atau trauma tembus yang merobek pembuluh darah toraks',
+      'Riwayat trauma tumpul (dengan krepitasi, gerakan napas paradoksal) atau trauma tembus yang merobek pembuluh darah toraks',
     ],
     pemeriksaanFisik: [
       'Cek JVP dan tanda syok (hipotensi, takikardia, sianosis)',
@@ -1388,7 +1388,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Demam Tifoid': {
     anamnesis: [
       'Demam step-ladder (naik bertahap tiap hari, mereda pagi memberat sore/malam) berlangsung >1 minggu, nyeri kepala, nyeri perut, konstipasi atau diare, lidah kotor',
-      'History konsumsi makanan/minuman kurang higienis',
+      'Riwayat konsumsi makanan/minuman kurang higienis',
     ],
     pemeriksaanFisik: [
       'Demam, bradikardia relatif (nadi tidak meningkat proporsional dengan suhu), lidah kotor (kotor di tengah, tepi & ujung merah), hepatosplenomegali ringan',
@@ -1881,7 +1881,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   },
   'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)': {
     anamnesis: [
-      'History obstetri, rencana jumlah anak, kontraindikasi metode tertentu (riwayat tromboemboli untuk hormonal kombinasi, infeksi panggul aktif untuk AKDR), preferensi pasien',
+      'Riwayat obstetri, rencana jumlah anak, kontraindikasi metode tertentu (riwayat tromboemboli untuk hormonal kombinasi, infeksi panggul aktif untuk AKDR), preferensi pasien',
     ],
     pemeriksaanFisik: [
       'Pemeriksaan panggul sebelum pemasangan AKDR (menyingkirkan infeksi/kehamilan), pemeriksaan lengan sebelum pemasangan implan',
@@ -1912,10 +1912,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'DM Tipe 2 (edukasi & tatalaksana)': {
     anamnesis: [
       'Poliuria, polidipsia, polifagia, penurunan berat badan tanpa sebab jelas',
-      'History keluarga DM, riwayat DM gestasional, riwayat melahirkan bayi besar (>4kg)',
+      'Riwayat keluarga DM, riwayat DM gestasional, riwayat melahirkan bayi besar (>4kg)',
       'Gejala komplikasi: kesemutan/baal kaki (neuropati), pandangan kabur (retinopati), luka sulit sembuh',
       'Faktor risiko: obesitas, aktivitas fisik kurang, hipertensi, dislipidemia',
-      'History pengobatan sebelumnya dan kepatuhan diet',
+      'Riwayat pengobatan sebelumnya dan kepatuhan diet',
     ],
     pemeriksaanFisik: [
       'BMI dan lingkar pinggang (obesitas sentral)',
@@ -1940,7 +1940,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Ketoasidosis Diabetik (KAD) — resusitasi cairan': {
     anamnesis: [
-      'History DM tipe 1 (atau tipe 2 dengan faktor pencetus: infeksi, tidak patuh obat, stres)',
+      'Riwayat DM tipe 1 (atau tipe 2 dengan faktor pencetus: infeksi, tidak patuh obat, stres)',
       'Poliuria, polidipsia berat, mual muntah, nyeri perut',
       'Napas cepat dan dalam (Kussmaul), bau nafas aseton',
       'Penurunan kesadaran progresif',
@@ -1993,9 +1993,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Sindrom Metabolik': {
     anamnesis: [
-      'History obesitas sentral, kurang aktivitas fisik, riwayat keluarga DM/penyakit jantung',
+      'Riwayat obesitas sentral, kurang aktivitas fisik, riwayat keluarga DM/penyakit jantung',
       'Gejala mungkin asimtomatik, ditemukan saat skrining rutin',
-      'History hipertensi, dislipidemia, hiperurisemia',
+      'Riwayat hipertensi, dislipidemia, hiperurisemia',
     ],
     pemeriksaanFisik: [
       'Lingkar pinggang: pria >90cm, wanita >80cm (kriteria Asia)',
@@ -2017,9 +2017,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Dislipidemia': {
     anamnesis: [
       'Biasanya asimtomatik, ditemukan saat skrining atau setelah kejadian kardiovaskular',
-      'History keluarga dislipidemia familial atau penyakit jantung koroner dini',
-      'History diet tinggi lemak jenuh, kurang aktivitas fisik, konsumsi alkohol',
-      'History DM, hipotiroid, penyakit ginjal kronik (penyebab sekunder)',
+      'Riwayat keluarga dislipidemia familial atau penyakit jantung koroner dini',
+      'Riwayat diet tinggi lemak jenuh, kurang aktivitas fisik, konsumsi alkohol',
+      'Riwayat DM, hipotiroid, penyakit ginjal kronik (penyebab sekunder)',
     ],
     pemeriksaanFisik: [
       'Xanthelasma (kelopak mata), xanthoma tendon (Achilles) — tanda dislipidemia familial',
@@ -2044,7 +2044,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Penurunan BB meski nafsu makan meningkat, palpitasi, tremor, intoleransi panas, berkeringat berlebih',
       'Gelisah, sulit tidur, diare',
       'Pada Grave: mata menonjol (eksoftalmus), gangguan penglihatan',
-      'History tinggal di daerah endemik defisiensi iodium (goiter endemik)',
+      'Riwayat tinggal di daerah endemik defisiensi iodium (goiter endemik)',
       'Siklus menstruasi tidak teratur pada wanita',
     ],
     pemeriksaanFisik: [
@@ -2071,7 +2071,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Lemas, mudah lelah, penambahan BB meski nafsu makan menurun, intoleransi dingin',
       'Konstipasi, kulit kering, rambut rontok, suara serak',
       'Gangguan konsentrasi, depresi, gangguan siklus menstruasi (menorrhagia)',
-      'History tiroidektomi, terapi iodine radioaktif, atau penyakit autoimun (Hashimoto)',
+      'Riwayat tiroidektomi, terapi iodine radioaktif, atau penyakit autoimun (Hashimoto)',
     ],
     pemeriksaanFisik: [
       'Bradikardia, kulit kering dan dingin, edema non-pitting (myxedema)',
@@ -2095,9 +2095,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Obesitas (berbagai grade)': {
     anamnesis: [
       'Pola makan, aktivitas fisik, riwayat penambahan BB progresif',
-      'History keluarga obesitas, DM, penyakit kardiovaskular',
+      'Riwayat keluarga obesitas, DM, penyakit kardiovaskular',
       'Skrining komorbid: sleep apnea (mendengkur, mengantuk siang hari), nyeri sendi, gangguan menstruasi',
-      'History diet/program penurunan BB sebelumnya dan hasilnya',
+      'Riwayat diet/program penurunan BB sebelumnya dan hasilnya',
     ],
     pemeriksaanFisik: [
       'BMI: overweight 23-24,9, obesitas I 25-29,9, obesitas II ≥30 (kriteria Asia Pasifik)',
@@ -2119,11 +2119,11 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Marasmus / Kwashiorkor (gizi buruk anak)': {
     anamnesis: [
-      'History asupan makan tidak adekuat, penyapihan dini, pola makan keluarga',
+      'Riwayat asupan makan tidak adekuat, penyapihan dini, pola makan keluarga',
       'Marasmus: penurunan BB progresif, tampak sangat kurus (wasting)',
       'Kwashiorkor: edema, perubahan kulit dan rambut, meski BB tidak terlalu rendah',
-      'History diare berulang, infeksi berulang, sosioekonomi rendah',
-      'History imunisasi dan pemantauan tumbuh kembang sebelumnya',
+      'Riwayat diare berulang, infeksi berulang, sosioekonomi rendah',
+      'Riwayat imunisasi dan pemantauan tumbuh kembang sebelumnya',
     ],
     pemeriksaanFisik: [
       'Marasmus: wasting berat, "old man face", iga gambang, baggy pants (kulit longgar di bokong)',
@@ -2146,10 +2146,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Imunisasi & Interpretasi KMS/Tumbang (anak)': {
     anamnesis: [
-      'History imunisasi dasar lengkap (usia pemberian tiap vaksin) dan booster',
-      'History KIPI (kejadian ikutan pasca imunisasi) sebelumnya',
-      'History tumbuh kembang: milestone motorik, bahasa, sosial sesuai usia',
-      'History penyakit yang mungkin jadi kontraindikasi imunisasi (imunodefisiensi, demam tinggi akut)',
+      'Riwayat imunisasi dasar lengkap (usia pemberian tiap vaksin) dan booster',
+      'Riwayat KIPI (kejadian ikutan pasca imunisasi) sebelumnya',
+      'Riwayat tumbuh kembang: milestone motorik, bahasa, sosial sesuai usia',
+      'Riwayat penyakit yang mungkin jadi kontraindikasi imunisasi (imunodefisiensi, demam tinggi akut)',
     ],
     pemeriksaanFisik: [
       'Plot BB, TB/PB, dan lingkar kepala pada kurva WHO/KMS — interpretasi status gizi dan pertumbuhan',
@@ -2176,7 +2176,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Nyeri kepala retro-orbital, mialgia, artralgia (breakbone fever)',
       'Tanda perdarahan: petekie, epistaksis, gusi berdarah, hematemesis/melena',
       'Nyeri perut hebat, muntah persisten (tanda warning sign)',
-      'History bepergian/tinggal di daerah endemis dengue',
+      'Riwayat bepergian/tinggal di daerah endemis dengue',
     ],
     pemeriksaanFisik: [
       'Suhu tubuh, tanda ruam kulit (rash konfluens dengan islands of white)',
@@ -2199,7 +2199,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Malaria (falciparum/vivax) — apus darah tebal/tipis': {
     anamnesis: [
       'Demam periodik (tersiana/kuartana tergantung spesies), menggigil, berkeringat',
-      'History bepergian/tinggal di daerah endemis malaria',
+      'Riwayat bepergian/tinggal di daerah endemis malaria',
       'Nyeri kepala, mialgia, mual muntah',
       'Pada malaria berat: penurunan kesadaran, kejang, ikterik',
     ],
@@ -2225,8 +2225,8 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Lemas, mudah lelah, pucat, pusing',
       'Pica (mengunyah es/tanah), disfagia (Plummer-Vinson syndrome)',
-      'History menstruasi banyak/lama, kehamilan, perdarahan GI kronik',
-      'History diet rendah zat besi, vegetarian ketat',
+      'Riwayat menstruasi banyak/lama, kehamilan, perdarahan GI kronik',
+      'Riwayat diet rendah zat besi, vegetarian ketat',
       'Pada anak: riwayat ASI eksklusif lama tanpa MPASI kaya besi',
     ],
     pemeriksaanFisik: [
@@ -2249,10 +2249,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Thalassemia': {
     anamnesis: [
-      'History anemia sejak kecil, transfusi berulang',
-      'History keluarga thalassemia (penyakit genetik autosomal resesif)',
+      'Riwayat anemia sejak kecil, transfusi berulang',
+      'Riwayat keluarga thalassemia (penyakit genetik autosomal resesif)',
       'Pertumbuhan terhambat, mudah lelah, pucat kronik',
-      'History pemberian kelasi besi bila sudah rutin transfusi',
+      'Riwayat pemberian kelasi besi bila sudah rutin transfusi',
     ],
     pemeriksaanFisik: [
       'Facies Cooley (frontal bossing, hipertelorisme, maksila prominen) pada thalassemia mayor',
@@ -2274,7 +2274,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Leptospirosis / Weil Disease': {
     anamnesis: [
-      'History kontak air banjir/tanah tergenang/tikus (pekerjaan berisiko: petani, pekerja selokan)',
+      'Riwayat kontak air banjir/tanah tergenang/tikus (pekerjaan berisiko: petani, pekerja selokan)',
       'Demam mendadak tinggi, nyeri kepala hebat, mialgia berat (terutama betis)',
       'Fase kedua (imun): demam berulang, meningismus, ikterik, penurunan produksi urin',
       'Injeksi konjungtiva tanpa sekret (khas)',
@@ -2300,10 +2300,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Filariasis': {
     anamnesis: [
-      'History tinggal di daerah endemis filariasis, gigitan nyamuk berulang',
+      'Riwayat tinggal di daerah endemis filariasis, gigitan nyamuk berulang',
       'Episode demam berulang disertai limfangitis (garis merah menjalar dari pangkal ke ujung tungkai)',
       'Pembengkakan tungkai/skrotum yang progresif dan kronik',
-      'History pengobatan massal filariasis sebelumnya',
+      'Riwayat pengobatan massal filariasis sebelumnya',
     ],
     pemeriksaanFisik: [
       'Limfedema tungkai (elephantiasis pada kasus kronik)',
@@ -2352,7 +2352,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Ruam malar (butterfly rash) yang memburuk dengan paparan sinar matahari (fotosensitivitas)',
       'Nyeri sendi multipel, sariawan berulang, rambut rontok',
       'Gejala sistemik: demam, lelah, penurunan BB',
-      'History keguguran berulang (sindrom antifosfolipid terkait), gejala ginjal (edema, urin berbusa)',
+      'Riwayat keguguran berulang (sindrom antifosfolipid terkait), gejala ginjal (edema, urin berbusa)',
     ],
     pemeriksaanFisik: [
       'Ruam malar melintasi pangkal hidung, tidak mengenai lipatan nasolabial',
@@ -2376,7 +2376,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     anamnesis: [
       'Lemas, pucat mendadak, ikterik',
       'Urin berwarna gelap (hemoglobinuria pada hemolisis intravaskular)',
-      'History penyakit autoimun lain (SLE), keganasan limfoproliferatif, atau infeksi/obat pencetus',
+      'Riwayat penyakit autoimun lain (SLE), keganasan limfoproliferatif, atau infeksi/obat pencetus',
       'Gejala anemia akut: sesak, palpitasi bila derajat berat',
     ],
     pemeriksaanFisik: [
@@ -2400,7 +2400,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   // ─── Muskuloskeletal ─────────────────────────────────────────────────────
   'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai': {
     anamnesis: [
-      'History trauma (jatuh, kecelakaan lalu lintas, olahraga) dengan mekanisme jelas',
+      'Riwayat trauma (jatuh, kecelakaan lalu lintas, olahraga) dengan mekanisme jelas',
       'Nyeri hebat pada lokasi cedera, tidak dapat menggerakkan/menumpu anggota gerak',
       'Bengkak dan deformitas segera setelah trauma',
       'Tanyakan waktu kejadian, riwayat pertolongan pertama, alergi obat/lateks sebelum tindakan',
@@ -2425,7 +2425,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Ankle Sprain / Knee Sprain': {
     anamnesis: [
-      'History trauma inversi/eversi pergelangan kaki atau twisting pada lutut (olahraga, terpeleset)',
+      'Riwayat trauma inversi/eversi pergelangan kaki atau twisting pada lutut (olahraga, terpeleset)',
       'Nyeri, bengkak segera atau dalam beberapa jam setelah cedera',
       'Rasa "pop" atau tidak stabil pada lutut (curiga ruptur ligamen)',
       'Kemampuan menumpu berat badan setelah cedera (relevan untuk kriteria Ottawa)',
@@ -2451,9 +2451,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Gout Artritis': {
     anamnesis: [
       'Nyeri sendi mendadak, sangat hebat, biasanya malam/dini hari, sering di ibu jari kaki (podagra)',
-      'History serangan berulang sebelumnya, faktor pencetus: alkohol, makanan tinggi purin, dehidrasi, trauma minor',
-      'History komorbid: hipertensi, sindrom metabolik, penggunaan diuretik',
-      'History keluarga gout/hiperurisemia',
+      'Riwayat serangan berulang sebelumnya, faktor pencetus: alkohol, makanan tinggi purin, dehidrasi, trauma minor',
+      'Riwayat komorbid: hipertensi, sindrom metabolik, penggunaan diuretik',
+      'Riwayat keluarga gout/hiperurisemia',
     ],
     pemeriksaanFisik: [
       'Sendi bengkak, kemerahan, hangat, sangat nyeri tekan (bahkan sentuhan ringan/sprei)',
@@ -2500,10 +2500,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Dislokasi Patela': {
     anamnesis: [
-      'History trauma twisting pada lutut atau benturan langsung, sering pada aktivitas olahraga',
+      'Riwayat trauma twisting pada lutut atau benturan langsung, sering pada aktivitas olahraga',
       'Nyeri hebat mendadak, lutut terasa "keluar dari tempatnya"',
       'Ketidakmampuan meluruskan/menekuk lutut, bengkak cepat',
-      'History dislokasi patela sebelumnya (rekurensi sering pada laxity ligamen)',
+      'Riwayat dislokasi patela sebelumnya (rekurensi sering pada laxity ligamen)',
     ],
     pemeriksaanFisik: [
       'Deformitas terlihat jelas: patela bergeser (biasanya lateral)',
@@ -2525,7 +2525,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Ruptur Tendon Achilles': {
     anamnesis: [
-      'History trauma mendadak saat aktivitas fisik (lari, lompat), sering merasa seperti "ditendang" di betis',
+      'Riwayat trauma mendadak saat aktivitas fisik (lari, lompat), sering merasa seperti "ditendang" di betis',
       'Bunyi "pop" terdengar saat cedera',
       'Nyeri tajam mendadak di belakang pergelangan kaki, kesulitan berjalan/menjinjit',
       'Faktor risiko: usia paruh baya, riwayat penggunaan fluoroquinolone/steroid, olahraga tidak rutin',
@@ -2551,9 +2551,9 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
   'Tinea Corporis': {
     anamnesis: [
       'Lesi kulit gatal, meluas perlahan dengan bagian tengah tampak lebih sembuh (central clearing)',
-      'History kontak dengan hewan peliharaan, penderita lain, atau lingkungan lembap',
+      'Riwayat kontak dengan hewan peliharaan, penderita lain, atau lingkungan lembap',
       'Gatal terutama saat berkeringat',
-      'History penggunaan kortikosteroid topikal sebelumnya (tinea incognito bila bentuk atypical)',
+      'Riwayat penggunaan kortikosteroid topikal sebelumnya (tinea incognito bila bentuk atypical)',
     ],
     pemeriksaanFisik: [
       'Lesi anular/polisiklik dengan tepi aktif eritematosa meninggi, skuama, central clearing',
@@ -2576,7 +2576,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Gatal kronik hilang timbul sejak usia dini, riwayat atopi keluarga (asma, rinitis alergi, dermatitis atopik)',
       'Lokasi khas: lipatan (fleksural) pada anak besar/dewasa, wajah dan ekstensor pada bayi',
       'Gejala memberat dengan stres, cuaca dingin/kering, kontak iritan/alergen',
-      'History penggunaan pelembap dan respons terhadap terapi sebelumnya',
+      'Riwayat penggunaan pelembap dan respons terhadap terapi sebelumnya',
     ],
     pemeriksaanFisik: [
       'Kulit kering (xerosis), likenifikasi pada lesi kronik akibat garukan berulang',
@@ -2601,7 +2601,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Gatal/tidak gatal dengan skuama berminyak pada area kaya kelenjar sebasea (kulit kepala, wajah, dada)',
       'Perjalanan kronik hilang timbul, memberat saat stres/cuaca dingin',
       'Pada bayi: "cradle cap" pada kulit kepala tanpa gatal signifikan',
-      'History imunosupresi (HIV, Parkinson) berkaitan dengan bentuk lebih berat',
+      'Riwayat imunosupresi (HIV, Parkinson) berkaitan dengan bentuk lebih berat',
     ],
     pemeriksaanFisik: [
       'Plak eritematosa dengan skuama kuning berminyak pada kulit kepala, alis, lipatan nasolabial, dada',
@@ -2621,10 +2621,10 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   'Dermatitis Venenata / Kontak': {
     anamnesis: [
-      'History kontak dengan bahan iritan (deterjen, sabun) atau alergen (nikel, kosmetik, tanaman) sebelum lesi muncul',
+      'Riwayat kontak dengan bahan iritan (deterjen, sabun) atau alergen (nikel, kosmetik, tanaman) sebelum lesi muncul',
       'Gatal/perih, lokasi lesi sesuai area kontak',
       'Dermatitis venenata: riwayat kontak serangga (tersentuh/tergencet) dengan pola lesi linear',
-      'History penggunaan produk baru (perhiasan, sabun, kosmetik)',
+      'Riwayat penggunaan produk baru (perhiasan, sabun, kosmetik)',
     ],
     pemeriksaanFisik: [
       'Lesi eritematosa, vesikel, bahkan bulla pada kasus akut, sesuai pola kontak (misal: bentuk linear pada dermatitis venenata, bentuk sesuai perhiasan pada alergi nikel)',
@@ -2670,7 +2670,7 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
       'Insect bite: papul gatal muncul setelah gigitan serangga, sering multipel, riwayat aktivitas luar ruangan',
       'Fixed drug eruption: lesi muncul berulang di lokasi yang sama setiap kali terpapar obat pencetus (NSAID, antibiotik, dll)',
       'Tanyakan riwayat obat yang dikonsumsi sebelum onset lesi (FDE)',
-      'History gigitan/pajanan serangga terakhir (insect bite)',
+      'Riwayat gigitan/pajanan serangga terakhir (insect bite)',
     ],
     pemeriksaanFisik: [
       'Insect bite: papul urtika dengan punctum sentral, gatal, dapat berkelompok',

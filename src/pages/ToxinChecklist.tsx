@@ -69,7 +69,7 @@ function DailyHabits() {
         {DAILY_HABITS.map((h) => (
           <label key={h.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
             <input type="checkbox" checked={!!done[h.id]} onChange={(e) => setDone((d) => ({ ...d, [h.id]: e.target.checked }))} className="h-4 w-4 accent-brand" />
-            <span className={`text-[13px] font-semibold ${done[h.id] ? 'text-neutral-400 line-through' : 'text-ink dark:text-white'}`}>{h.label}</span>
+            <span className={`text-[13px] font-semibold ${done[h.id] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{h.label}</span>
           </label>
         ))}
       </div>
@@ -111,7 +111,7 @@ export function ToxinChecklist() {
         <div className="mt-3 space-y-2">
           {filteredDisruptors.map((d) => (
             <div key={d.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-              <div className="text-[13px] font-bold text-ink dark:text-white">{d.name}</div>
+              <div className="text-[13px] font-bold text-ink dark:text-ink">{d.name}</div>
               <div className="text-[11px] text-neutral-400">Found in: {d.where}</div>
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{d.note}</p>
             </div>

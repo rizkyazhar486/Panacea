@@ -238,7 +238,7 @@ export function BiologicalAge() {
             {markers.map((m) => (
               <div key={m.label} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div className="min-w-0">
-                  <div className="text-sm font-bold text-ink dark:text-white">{m.label}</div>
+                  <div className="text-sm font-bold text-ink dark:text-ink">{m.label}</div>
                   <div className="text-[11px] text-neutral-500 dark:text-neutral-400">{m.note}</div>
                 </div>
                 <Badge tone={m.delta <= -0.3 ? 'brand' : m.delta <= 0.3 ? 'low' : 'critical'}>

@@ -94,11 +94,11 @@ export function CharlsonIndex() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Comorbidity</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{comorbidityPts}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{comorbidityPts}</div>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Age points</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{agePts(age)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{agePts(age)}</div>
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Total CCI</div>

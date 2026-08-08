@@ -116,7 +116,7 @@ export function VaccineTracker() {
         <Card key={v.id} className="!p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[15px] font-black text-ink dark:text-white">{v.name}</div>
+              <div className="text-[15px] font-black text-ink dark:text-ink">{v.name}</div>
               <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">{v.note}</p>
             </div>
             {v.everyYears && <Badge tone="brand">Every {v.everyYears}y</Badge>}

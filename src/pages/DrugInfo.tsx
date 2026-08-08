@@ -63,7 +63,7 @@ export function DrugInfo() {
       {drug && (
         <>
           <Card className="!p-5">
-            <div className="text-xl font-black text-ink dark:text-white">{drug.brand}</div>
+            <div className="text-xl font-black text-ink dark:text-ink">{drug.brand}</div>
             {drug.generic && <div className="text-sm text-neutral-500">Generic: {drug.generic}</div>}
             {drug.manufacturer && <div className="mt-0.5 text-[11px] text-neutral-400">{drug.manufacturer}</div>}
           </Card>

@@ -50,7 +50,7 @@ export function RealisticHealth() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌱</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Sehat Tapi Sibuk</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Sehat Tapi Sibuk</h1>
           <p className="text-xs text-neutral-400">Satu tindakan yang muat di hari Anda — bukan skor yang membuat Anda merasa gagal</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function RealisticHealth() {
               }`}
             >
               <div className="text-[13px] font-bold">{s.l}</div>
-              <div className={`text-[11px] ${slot === s.v ? 'text-white/80' : 'text-neutral-500'}`}>{s.sub}</div>
+              <div className={`text-[11px] ${slot === s.v ? 'text-ink/80' : 'text-neutral-500'}`}>{s.sub}</div>
             </button>
           ))}
         </div>
@@ -123,7 +123,7 @@ export function RealisticHealth() {
       {primary && (
         <Card className="!p-5">
           <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Lakukan ini saja hari ini</div>
-          <h2 className="mt-1 text-[17px] font-black leading-snug text-ink dark:text-white">{primary.title}</h2>
+          <h2 className="mt-1 text-[17px] font-black leading-snug text-ink dark:text-ink">{primary.title}</h2>
           <p className="mt-2 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{primary.how}</p>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">{primary.why}</p>
           <button
@@ -149,7 +149,7 @@ export function RealisticHealth() {
             {alternatives.map((d) => (
               <div key={d.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="text-[13px] font-bold text-ink dark:text-white">{d.title}</div>
+                  <div className="text-[13px] font-bold text-ink dark:text-ink">{d.title}</div>
                   <Badge tone="low">{d.minutes} mnt</Badge>
                 </div>
                 <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{d.how}</p>
@@ -171,7 +171,7 @@ export function RealisticHealth() {
           <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
             Soal angka Anda {vitalsAge(vitals) ? `· ${vitalsAge(vitals)}` : ''}
           </div>
-          <h3 className="mt-1 text-[14px] font-black text-ink dark:text-white">{triage.headline}</h3>
+          <h3 className="mt-1 text-[14px] font-black text-ink dark:text-ink">{triage.headline}</h3>
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{triage.meaning}</p>
           <div className="mt-3 rounded-xl bg-brand-50 p-3 dark:bg-brand/10">
             <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Yang berguna hari ini</div>

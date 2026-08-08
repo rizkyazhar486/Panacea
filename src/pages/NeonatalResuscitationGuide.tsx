@@ -84,7 +84,7 @@ export function NeonatalResuscitationGuide() {
             <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center gap-2">
                 <Badge tone="neutral">{s.t}</Badge>
-                <span className="text-[13px] font-bold text-ink dark:text-white">{s.text}</span>
+                <span className="text-[13px] font-bold text-ink dark:text-ink">{s.text}</span>
               </div>
               <p className="mt-1 text-[12px] text-neutral-500">{s.note}</p>
             </div>

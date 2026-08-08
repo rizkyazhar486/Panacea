@@ -73,7 +73,7 @@ export function ThermalTherapy() {
 
       {PROTOCOLS.map((p) => (
         <Card key={p.kind} className="!p-5">
-          <div className="flex items-center gap-2 text-[15px] font-black text-ink dark:text-white">{p.emoji} {p.title}</div>
+          <div className="flex items-center gap-2 text-[15px] font-black text-ink dark:text-ink">{p.emoji} {p.title}</div>
           <div className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] font-semibold text-neutral-600 dark:bg-white/5 dark:text-neutral-300">Dose: {p.dose}</div>
           <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">{p.benefit}</p>
           <p className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">

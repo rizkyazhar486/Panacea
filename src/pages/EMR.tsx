@@ -543,7 +543,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
     <div className="mb-4 rounded-xl border-2 border-brand/20 bg-brand-50/40 p-3">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div className="text-xs font-bold uppercase tracking-wide text-brand-dark">🩺 Primary Diagnosis (ICD-10)</div>
-        <button onClick={autoMatch} className="rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-white hover:bg-brand-dark">
+        <button onClick={autoMatch} className="rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-ink hover:bg-brand-dark">
           ✨ Match AI Suggestion
         </button>
       </div>
@@ -678,9 +678,9 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
     <div className="space-y-4">
       {/* Hero slide */}
       <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Patient Education</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/70">Patient Education</div>
         <h3 className="mt-1 text-2xl font-extrabold leading-tight">{sheet.diagnosis}</h3>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/90">{sheet.ringkas}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/90">{sheet.ringkas}</p>
       </div>
 
       {/* Key actions — 1·2·3 cards */}

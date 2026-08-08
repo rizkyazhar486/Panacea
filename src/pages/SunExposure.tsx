@@ -120,12 +120,12 @@ export function SunExposure() {
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
                 <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Time to sunburn risk</div>
-                <div className="text-lg font-black text-ink dark:text-white">{Number.isFinite(burnMin!) ? `~${burnMin!.toFixed(0)} min` : '—'}</div>
+                <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(burnMin!) ? `~${burnMin!.toFixed(0)} min` : '—'}</div>
                 <div className="text-[9px] text-neutral-400">Unprotected, {skin.label}</div>
               </div>
               <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
                 <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Rough vitamin D window</div>
-                <div className="text-lg font-black text-ink dark:text-white">{uvIndex >= 3 && vitDMin != null && Number.isFinite(vitDMin) ? `~${vitDMin.toFixed(0)} min` : 'Minimal today'}</div>
+                <div className="text-lg font-black text-ink dark:text-ink">{uvIndex >= 3 && vitDMin != null && Number.isFinite(vitDMin) ? `~${vitDMin.toFixed(0)} min` : 'Minimal today'}</div>
                 <div className="text-[9px] text-neutral-400">Arms + legs exposed</div>
               </div>
             </div>

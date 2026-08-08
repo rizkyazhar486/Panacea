@@ -357,23 +357,23 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
+    <div className="overflow-hidden rounded-2xl p-5 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
       <div className="flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
         <div>
           <div className="text-sm font-black">AI Clinical Insight</div>
-          <div className="text-[10px] font-semibold text-white/60">Powered by Panaceamed AI · Beta</div>
+          <div className="text-[10px] font-semibold text-ink/60">Powered by Panaceamed AI · Beta</div>
         </div>
       </div>
 
       {text ? (
-        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-white/90">{text}</div>
+        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-ink/90">{text}</div>
       ) : (
-        <p className="mt-3 text-[13px] leading-relaxed text-white/70">
+        <p className="mt-3 text-[13px] leading-relaxed text-ink/70">
           Ask AI to summarize this patient's latest vital signs & supportive results into a brief clinical analysis and action recommendations.
         </p>
       )}
-      {err && <p className="mt-2 text-[11px] text-white/80">{err}</p>}
+      {err && <p className="mt-2 text-[11px] text-ink/80">{err}</p>}
 
       <button
         onClick={requestInsight}
@@ -412,7 +412,7 @@ export function Dashboard() {
       <div className="mx-auto max-w-xl space-y-10 py-16">
         <div className="text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
-            <IconHeart size={34} className="text-white" />
+            <IconHeart size={34} className="text-ink" />
           </div>
           <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
@@ -436,7 +436,7 @@ export function Dashboard() {
         <button onClick={() => setShowAddPatient((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-neutral-200 px-4 py-2 text-[11px] font-semibold text-neutral-500 transition-all duration-200 hover:border-[#00BF63] hover:text-[#00BF63] hover:bg-[rgba(0,191,99,0.05)] active:scale-[0.97]">
           <IconPlus size={13} /> New Patient
         </button>
-        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-white transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
+        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
         {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
@@ -457,7 +457,7 @@ export function Dashboard() {
           <div className="relative -mt-12 px-5 pb-5">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-end gap-4">
-                <span className="grid h-24 w-24 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-white transition-transform duration-300 hover:scale-[1.04]" style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 24px ${p.avatarColor}44` }}>
+                <span className="grid h-24 w-24 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-ink transition-transform duration-300 hover:scale-[1.04]" style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 24px ${p.avatarColor}44` }}>
                   {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
                 </span>
                 <div className="pb-1">

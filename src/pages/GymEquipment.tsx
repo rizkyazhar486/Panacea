@@ -23,7 +23,7 @@ export function GymEquipment() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🏋️</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Alat Fitness & Hyrox</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Alat Fitness & Hyrox</h1>
           <p className="text-xs text-neutral-400">Cara pakai, otot sasaran, dan perbandingan jujur dengan calisthenic</p>
         </div>
       </div>
@@ -70,7 +70,7 @@ export function GymEquipment() {
             <button className="flex w-full items-start justify-between gap-2 text-left"
               onClick={() => setOpenId(open ? null : e.id)}>
               <div className="min-w-0">
-                <div className="text-[14px] font-black text-ink dark:text-white">{e.name}</div>
+                <div className="text-[14px] font-black text-ink dark:text-ink">{e.name}</div>
                 <div className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">{e.purpose}</div>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
@@ -101,7 +101,7 @@ export function GymEquipment() {
                 </div>
 
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-600 dark:text-rose-400">Kesalahan Umum</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-600 dark:text-rose-600">Kesalahan Umum</div>
                   <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                     {e.mistakes.map((m, i) => <li key={i}>{m}</li>)}
                   </ul>

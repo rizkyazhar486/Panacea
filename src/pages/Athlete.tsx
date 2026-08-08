@@ -35,7 +35,7 @@ function AthleteQuotePopup() {
         <p className="text-lg font-bold leading-snug text-ink">“{q.quote}”</p>
         <div className="mt-4 text-sm font-black text-brand-dark">{q.author}</div>
         <div className="text-xs text-neutral-400">{q.feat}</div>
-        <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-white transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
+        <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-ink transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           Let's Train! 💪
         </button>
       </div>
@@ -298,8 +298,8 @@ export function Athlete() {
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-ink p-4 text-white">
-            <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Estimated VO₂max</div>
-            <div className="text-3xl font-extrabold text-brand">{v.toFixed(1)}<span className="ml-1 text-sm font-medium text-white/50">ml/kg/min</span></div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Estimated VO₂max</div>
+            <div className="text-3xl font-extrabold text-brand">{v.toFixed(1)}<span className="ml-1 text-sm font-medium text-ink/50">ml/kg/min</span></div>
             <Badge tone="brand">{tier}</Badge>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
@@ -351,7 +351,7 @@ export function Athlete() {
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-white/50">ACWR Ratio</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">ACWR Ratio</div>
               <div className="text-3xl font-extrabold text-brand">{acwr > 0 ? acwr.toFixed(2) : '—'}</div>
             </div>
             <Badge tone={acwrZ.tone}>{acwrZ.label}</Badge>
@@ -361,8 +361,8 @@ export function Athlete() {
             <div className="absolute inset-y-0 bg-emerald-400/30" style={{ left: `${(0.8 / 2) * 100}%`, width: `${((1.3 - 0.8) / 2) * 100}%` }} />
             {acwr > 0 && <div className="absolute top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white" style={{ left: `${Math.min(acwr / 2, 1) * 100}%` }} />}
           </div>
-          <div className="mt-1 flex justify-between text-[9px] text-white/40"><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>1.5+</span></div>
-          <p className="mt-3 text-xs leading-relaxed text-white/80">{acwrZ.advice}</p>
+          <div className="mt-1 flex justify-between text-[9px] text-ink/40"><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>1.5+</span></div>
+          <p className="mt-3 text-xs leading-relaxed text-ink/80">{acwrZ.advice}</p>
         </div>
         <details className="mt-2 text-[11px] text-neutral-500">
           <summary className="cursor-pointer font-semibold text-brand-dark">Don't have Load numbers? Calculate sRPE manually</summary>
@@ -467,7 +467,7 @@ function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number
           <div className="text-xl font-extrabold text-amber-600">{has ? atl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-ink p-3 text-center text-white">
-          <div className="text-[9px] font-bold uppercase text-white/50">Form (TSB)</div>
+          <div className="text-[9px] font-bold uppercase text-ink/50">Form (TSB)</div>
           <div className={'text-xl font-extrabold ' + (tsb >= 0 ? 'text-brand' : 'text-amber-300')}>{has ? (tsb > 0 ? '+' : '') + tsb.toFixed(0) : '—'}</div>
         </div>
       </div>
@@ -504,16 +504,16 @@ function RacePlannerCard() {
       {race.date && daysOut > 0 && (
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="flex items-baseline justify-between">
-            <div><span className="text-3xl font-extrabold text-brand">{daysOut}</span><span className="ml-1 text-xs text-white/60">days to go</span></div>
+            <div><span className="text-3xl font-extrabold text-brand">{daysOut}</span><span className="ml-1 text-xs text-ink/60">days to go</span></div>
             {pred > 0 && (
               <div className="text-right">
-                <div className="text-[10px] uppercase text-white/50">Predicted finish</div>
+                <div className="text-[10px] uppercase text-ink/50">Predicted finish</div>
                 <div className="text-xl font-extrabold">{Math.floor(pred / 60) > 0 ? `${Math.floor(pred / 60)}h ` : ''}{Math.round(pred % 60)}m</div>
-                <div className="text-[10px] text-white/60">pace {Math.floor(predPace)}:{String(Math.round((predPace % 1) * 60)).padStart(2, '0')} /km</div>
+                <div className="text-[10px] text-ink/60">pace {Math.floor(predPace)}:{String(Math.round((predPace % 1) * 60)).padStart(2, '0')} /km</div>
               </div>
             )}
           </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-white/80">📋 {phase}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-ink/80">📋 {phase}</p>
         </div>
       )}
     </Card>

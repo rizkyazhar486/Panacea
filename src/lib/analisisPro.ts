@@ -241,7 +241,7 @@ export function lajuBeban(
   const rasio = kronis > 0 ? Math.round((akut / kronis) * 100) / 100 : null
   const naikJarakPct = kmLalu > 0 ? Math.round(((kmIni - kmLalu) / kmLalu) * 100) : null
 
-  const ragu = cukupData ? '' : ` History Anda baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
+  const ragu = cukupData ? '' : ` Your history baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
 
   let judul: string, arti: string, warna: string
   if (rasio === null) {
@@ -311,7 +311,7 @@ export function bacaKesegaran(kesegaran: number, hariHistory?: number): BacaKese
   if (hariHistory !== undefined && hariHistory < TAU_KEBUGARAN && kesegaran < -10) {
     return {
       judul: 'Belum bisa dibaca',
-      arti: `History Anda baru ${Math.round(hariHistory)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
+      arti: `Your history baru ${Math.round(hariHistory)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
       warna: '#94a3b8',
     }
   }

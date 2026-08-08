@@ -292,11 +292,11 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                 className="aspect-video w-full object-cover"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+              <div className="absolute bottom-0 left-0 right-0 p-5 text-ink">
                 <h2 className="text-xl font-extrabold sm:text-2xl">
                   Nature. Humanity. <span className="font-serif-display italic text-emerald-300">Vitality.</span>
                 </h2>
-                <p className="mt-1 max-w-xl text-[13px] text-white/80">Extending healthspan through science — adding life to your years.</p>
+                <p className="mt-1 max-w-xl text-[13px] text-ink/80">Extending healthspan through science — adding life to your years.</p>
               </div>
             </div>
           </Reveal>
@@ -579,8 +579,8 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             <div className="orb pointer-events-none absolute -left-10 -top-10 h-48 w-48 rounded-full bg-white/15 blur-3xl" />
             <div className="orb pointer-events-none absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-emerald-900/30 blur-3xl" style={{ animationDelay: '-8s' }} />
             <div className="relative">
-              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Start your <span className="font-serif-display italic">healthspan</span> journey</h2>
-              <p className="mx-auto mt-3 max-w-xl text-white/85">
+              <h2 className="text-3xl font-extrabold text-ink sm:text-4xl">Start your <span className="font-serif-display italic">healthspan</span> journey</h2>
+              <p className="mx-auto mt-3 max-w-xl text-ink/85">
                 Free to try — choose your role and experience an AI co-physician verified by doctors.
               </p>
               <button

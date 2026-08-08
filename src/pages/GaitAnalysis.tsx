@@ -39,9 +39,9 @@ export function GaitAnalysis() {
       />
 
       <Card>
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Jumlah langkah hanya mengatakan <strong className="text-white">seberapa banyak</strong> Anda bergerak.
-          Angka di halaman ini mengatakan <strong className="text-white">sebaik apa</strong> Anda bergerak — dan
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          Jumlah langkah hanya mengatakan <strong className="text-ink">seberapa banyak</strong> Anda bergerak.
+          Angka di halaman ini mengatakan <strong className="text-ink">sebaik apa</strong> Anda bergerak — dan
           ketimpangan langkah maupun fase tumpuan yang memanjang sering menjadi petunjuk paling awal adanya
           kompensasi akibat nyeri, kelemahan sesisi, maupun postur yang sudah lama menyimpang.
         </p>
@@ -70,11 +70,11 @@ export function GaitAnalysis() {
             {sorot.map((r) => (
               <div key={r.key} className="rounded-lg border border-rose-500/25 bg-rose-500/[0.07] p-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="font-semibold text-white text-sm">{r.label}</span>
+                  <span className="font-semibold text-ink text-sm">{r.label}</span>
                   <span className="text-lg font-semibold text-rose-200 tabular-nums">{r.tampil}</span>
                 </div>
                 <div className="text-xs text-slate-500 mt-0.5">{r.rujukan}</div>
-                <p className="text-sm text-slate-300 mt-1.5 leading-relaxed">{r.arti}</p>
+                <p className="text-sm text-neutral-600 mt-1.5 leading-relaxed">{r.arti}</p>
                 {r.langkah && (
                   <p className="text-sm text-emerald-200/90 mt-1.5 leading-relaxed">
                     <span className="text-emerald-500/80">Yang bisa dilakukan: </span>{r.langkah}
@@ -94,9 +94,9 @@ export function GaitAnalysis() {
             <Stat label="Kecepatan" value={`${(vitals.runningSpeedKmh ?? 0).toFixed(1)} km/j`} />
             <Stat label="VO₂max" value={vitals.vo2max ? String(vitals.vo2max) : '—'} />
           </div>
-          <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+          <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
             Dari sini, pace latihan untuk tiap jenis lari bisa dihitung di{' '}
-            <Link to="/latihan-dasar" className="font-semibold text-white underline">Foundation Training</Link>.
+            <Link to="/latihan-dasar" className="font-semibold text-ink underline">Foundation Training</Link>.
           </p>
         </Card>
       )}
@@ -104,7 +104,7 @@ export function GaitAnalysis() {
       {sections.map((s) => (
         <Card key={s.key}>
           <SectionTitle title={`${s.ikon} ${s.judul}`} />
-          <p className="text-sm text-slate-400 mt-1 leading-relaxed">{s.pengantar}</p>
+          <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{s.pengantar}</p>
           <div className="space-y-2 mt-3">
             {s.readings.map((r) => <ReadingRow key={r.key} r={r} />)}
           </div>
@@ -113,7 +113,7 @@ export function GaitAnalysis() {
 
       <Card>
         <SectionTitle icon={<IconHeart />} title="Limits worth knowing" />
-        <p className="text-sm text-slate-400 mt-2 leading-relaxed">{DISCLAIMER}</p>
+        <p className="text-sm text-neutral-500 mt-2 leading-relaxed">{DISCLAIMER}</p>
       </Card>
     </div>
   )
@@ -126,15 +126,15 @@ function ReadingRow({ r }: { r: Reading }) {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="flex items-center gap-2 min-w-0">
           <span className={`h-2 w-2 rounded-full shrink-0 ${st.dot}`} />
-          <span className="font-semibold text-white text-sm">{r.label}</span>
+          <span className="font-semibold text-ink text-sm">{r.label}</span>
         </span>
         <span className="flex items-baseline gap-2">
-          <span className="text-lg font-semibold text-white tabular-nums">{r.tampil}</span>
+          <span className="text-lg font-semibold text-ink tabular-nums">{r.tampil}</span>
           <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-semibold ${st.chip}`}>{st.label}</span>
         </span>
       </div>
       <div className="text-xs text-slate-500 mt-0.5">{r.rujukan}</div>
-      <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">{r.arti}</p>
+      <p className="text-sm text-neutral-500 mt-1.5 leading-relaxed">{r.arti}</p>
       {r.langkah && r.band !== 'baik' && r.band !== 'takTersedia' && (
         <p className="text-sm text-emerald-200/80 mt-1.5 leading-relaxed">
           <span className="text-emerald-500/80">Yang bisa dilakukan: </span>{r.langkah}
@@ -147,7 +147,7 @@ function ReadingRow({ r }: { r: Reading }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-base font-semibold text-white tabular-nums">{value}</div>
+      <div className="text-base font-semibold text-ink tabular-nums">{value}</div>
       <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{label}</div>
     </div>
   )

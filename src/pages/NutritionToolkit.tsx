@@ -32,7 +32,7 @@ function MediterraneanChecklist() {
         {MED_FOODS.map((f) => (
           <label key={f} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
             <input type="checkbox" checked={!!done[f]} onChange={(e) => setDone((d) => ({ ...d, [f]: e.target.checked }))} className="h-4 w-4 accent-brand" />
-            <span className={`text-[13px] font-semibold ${done[f] ? 'text-neutral-400 line-through' : 'text-ink dark:text-white'}`}>{f}</span>
+            <span className={`text-[13px] font-semibold ${done[f] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{f}</span>
           </label>
         ))}
       </div>
@@ -80,7 +80,7 @@ function AntioxidantTracker() {
             <input type="checkbox" checked={!!done[c.name]} onChange={(e) => setDone((d) => ({ ...d, [c.name]: e.target.checked }))} className="h-4 w-4 accent-brand" />
             <span className="text-lg">{c.emoji}</span>
             <div>
-              <div className={`text-[13px] font-bold ${done[c.name] ? 'text-neutral-400 line-through' : 'text-ink dark:text-white'}`}>{c.name}</div>
+              <div className={`text-[13px] font-bold ${done[c.name] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{c.name}</div>
               <div className="text-[11px] text-neutral-400">{c.ex}</div>
             </div>
           </label>

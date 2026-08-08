@@ -163,7 +163,7 @@ export function ResilienceStories() {
       {filtered.map((s) => (
         <Card key={s.name} className="!p-5">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-black text-ink dark:text-white">{s.name}</span>
+            <span className="text-[15px] font-black text-ink dark:text-ink">{s.name}</span>
             <Badge tone="brand">{s.field}</Badge>
           </div>
           <p className="mt-2 text-[13px] leading-relaxed text-neutral-500"><span className="font-bold text-neutral-600 dark:text-neutral-300">The struggle: </span>{s.hardship}</p>

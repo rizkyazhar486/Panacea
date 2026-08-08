@@ -27,7 +27,7 @@ function BrainPuzzle() {
   return (
     <Card className="!p-6 text-center">
       <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What comes next?</div>
-      <div className="mt-3 text-2xl font-black text-ink dark:text-white">{p.seq}</div>
+      <div className="mt-3 text-2xl font-black text-ink dark:text-ink">{p.seq}</div>
       {revealed ? (
         <div className="mt-4 rounded-xl bg-brand/10 p-3">
           <div className="text-xl font-black text-brand-dark">{p.answer}</div>
@@ -121,7 +121,7 @@ function ReactionTime() {
 
   return (
     <Card className="!p-5 text-center">
-      <button onClick={onClick} className={`flex h-56 w-full items-center justify-center rounded-2xl text-lg font-black text-white transition ${bg}`}>{label}</button>
+      <button onClick={onClick} className={`flex h-56 w-full items-center justify-center rounded-2xl text-lg font-black text-ink transition ${bg}`}>{label}</button>
       <p className="mt-3 text-[12px] text-neutral-400">Best: {best > 0 ? `${best}ms` : '—'}</p>
     </Card>
   )
@@ -171,7 +171,7 @@ function StressInventory() {
       <div className="mt-3 space-y-1.5">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
-            <span className="flex-1 text-[13px] text-ink dark:text-white">{item}</span>
+            <span className="flex-1 text-[13px] text-ink dark:text-ink">{item}</span>
             <button onClick={() => move(i, -1)} className="text-neutral-400">↑</button>
             <button onClick={() => move(i, 1)} className="text-neutral-400">↓</button>
             <button onClick={() => remove(i)} className="text-red-500">✕</button>
@@ -243,7 +243,7 @@ function StroopTest() {
         <>
           <div className="mt-4 text-4xl font-black" style={{ color: ink.hex }}>{word.name}</div>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            {STROOP_COLORS.map((c) => <button key={c.name} onClick={() => answer(c)} className="rounded-xl py-3 text-sm font-bold text-white" style={{ background: c.hex }}>{c.name}</button>)}
+            {STROOP_COLORS.map((c) => <button key={c.name} onClick={() => answer(c)} className="rounded-xl py-3 text-sm font-bold text-ink" style={{ background: c.hex }}>{c.name}</button>)}
           </div>
         </>
       )}

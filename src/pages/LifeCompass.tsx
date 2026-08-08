@@ -113,7 +113,7 @@ export function LifeCompass() {
         <div className="mt-3 space-y-3">
           {WISDOM.map((w) => (
             <div key={w.tradition} className="rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
-              <div className="text-[12px] font-black text-ink dark:text-white">{w.tradition}</div>
+              <div className="text-[12px] font-black text-ink dark:text-ink">{w.tradition}</div>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{w.teaching}</p>
             </div>
           ))}

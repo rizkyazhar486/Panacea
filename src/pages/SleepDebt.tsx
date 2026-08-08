@@ -85,7 +85,7 @@ export function SleepDebt() {
           </div>
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Avg nightly sleep</div>
-            <div className="mt-1 text-3xl font-black text-ink dark:text-white">{avg.toFixed(1)}h</div>
+            <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{avg.toFixed(1)}h</div>
           </div>
         </div>
         <div className="mt-3"><Badge tone={tone}>{verdict}</Badge></div>
@@ -112,7 +112,7 @@ export function SleepDebt() {
           <div className="mt-3 space-y-1.5">
             {nights.slice(0, 14).map((n) => (
               <div key={n.date} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
-                <span className="font-black text-ink dark:text-white">{n.hours}h</span>
+                <span className="font-black text-ink dark:text-ink">{n.hours}h</span>
                 <span className={`flex-1 ${n.hours >= need ? 'text-brand-dark' : 'text-neutral-500'}`}>{n.date} · {n.hours >= need ? 'met your need' : `${(need - n.hours).toFixed(1)}h short`}</span>
                 <button onClick={() => removeNight(n.date)} aria-label="Delete" className="font-bold text-neutral-400 hover:text-red-500">✕</button>
               </div>

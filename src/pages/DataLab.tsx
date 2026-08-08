@@ -61,7 +61,7 @@ export function DataLab() {
         <>
           <Card className="!p-5">
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Summary</div>
-            <p className="mt-1 text-sm font-semibold text-ink dark:text-white">{result.headline}</p>
+            <p className="mt-1 text-sm font-semibold text-ink dark:text-ink">{result.headline}</p>
           </Card>
 
           {result.columns.map((c) => (
@@ -69,7 +69,7 @@ export function DataLab() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-ink dark:text-white">{c.label}</h3>
+                    <h3 className="text-base font-black text-ink dark:text-ink">{c.label}</h3>
                     {c.unit && <span className="text-xs text-neutral-400">{c.unit}</span>}
                   </div>
                   {c.metric === 'generic' && <div className="text-[11px] text-neutral-400">Column: {c.key}</div>}

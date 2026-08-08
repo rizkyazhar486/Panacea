@@ -139,7 +139,7 @@ export function PostureBreaks() {
           <div className="mt-2 flex items-start gap-3">
             <span className="text-3xl">{TIPS[tipIndex].emoji}</span>
             <div>
-              <div className="text-[15px] font-black text-ink dark:text-white">{TIPS[tipIndex].title}</div>
+              <div className="text-[15px] font-black text-ink dark:text-ink">{TIPS[tipIndex].title}</div>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-500">{TIPS[tipIndex].text}</p>
             </div>
           </div>

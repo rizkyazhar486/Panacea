@@ -165,7 +165,7 @@ function BedtimeChecklist() {
           <label key={s.text} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
             <input type="checkbox" checked={!!done[s.text]} onChange={(e) => setDone((d) => ({ ...d, [s.text]: e.target.checked }))} className="h-4 w-4 accent-brand" />
             <span className="text-lg">{s.emoji}</span>
-            <span className={`text-[13px] font-semibold ${done[s.text] ? 'text-neutral-400 line-through' : 'text-ink dark:text-white'}`}>{s.text}</span>
+            <span className={`text-[13px] font-semibold ${done[s.text] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{s.text}</span>
           </label>
         ))}
       </div>

@@ -102,7 +102,7 @@ export function QTcCalculator() {
           {rows.map((r) => (
             <div key={r.name} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <div>
-                <div className="text-sm font-bold text-ink dark:text-white">{r.name}</div>
+                <div className="text-sm font-bold text-ink dark:text-ink">{r.name}</div>
                 <div className="text-[11px] text-neutral-400">{r.note}</div>
               </div>
               <div className="text-lg font-black text-brand-dark">{r.value.toFixed(0)} ms</div>

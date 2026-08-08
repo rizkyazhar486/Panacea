@@ -71,15 +71,15 @@ export function DekConnect() {
       <SectionTitle icon={<IconShield />} title="Connect"
         subtitle="Meet verified people, within a radius you set" />
 
-      {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
-      {muat && <Card><p className="text-[13px] text-slate-400">Loading…</p></Card>}
+      {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-600">{galat}</p></Card>}
+      {muat && <Card><p className="text-[13px] text-neutral-500">Loading…</p></Card>}
 
       {!muat && status !== 'terverifikasi' && (
         <Card className="!border-amber-500/30 !bg-amber-500/5">
-          <p className="text-[13px] font-bold text-amber-400">
+          <p className="text-[13px] font-bold text-amber-700">
             {status === 'menunggu' ? 'Your submission is under review.' : 'Your account is not verified yet.'}
           </p>
-          <p className="mt-1 text-[12px] leading-relaxed text-slate-300">
+          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">
             Connect hanya mempertemukan akun terverifikasi. Itu satu-satunya alasan fitur ini ada:
             supaya orang yang Anda temui benar orangnya.
           </p>
@@ -94,12 +94,12 @@ export function DekConnect() {
       {status === 'terverifikasi' && (
         <>
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Search radius</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Search radius</div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {PILIHAN_RADIUS.map((km) => (
                 <button key={km} onClick={() => void ubahRadius(km)} aria-pressed={radius === km}
                   className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
-                    radius === km ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'}`}>
+                    radius === km ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'}`}>
                   {km} km
                 </button>
               ))}
@@ -114,11 +114,11 @@ export function DekConnect() {
           </Card>
 
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               People you could meet ({kartu.length})
             </div>
             {kartu.length === 0 && (
-              <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+              <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
                 Belum ada yang cocok. Yang muncul di sini hanya akun terverifikasi, dengan kredit
                 kepercayaan di atas ambang bahaya, preferensi yang saling cocok, dan berada di dalam
                 radius Anda maupun radius mereka. Melebarkan radius biasanya yang paling berpengaruh.
@@ -128,21 +128,21 @@ export function DekConnect() {
               {kartu.map((k) => (
                 <div key={k.email} className="rounded-xl bg-white/5 p-3">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[14px] font-black text-white">{k.nama}, {k.umur}</span>
-                    <span className="shrink-0 text-[11px] font-bold text-slate-400">
+                    <span className="text-[14px] font-black text-ink">{k.nama}, {k.umur}</span>
+                    <span className="shrink-0 text-[11px] font-bold text-neutral-500">
                       {k.jarakKm === null ? 'distance unknown'
                         : k.jarakKm === 0 ? 'same city' : `± ${k.jarakKm} km`}
                     </span>
                   </div>
-                  <div className="mt-0.5 text-[12px] text-slate-300">{k.pekerjaan} · {k.pendidikan}</div>
+                  <div className="mt-0.5 text-[12px] text-neutral-600">{k.pekerjaan} · {k.pendidikan}</div>
                   <div className="text-[11px] text-slate-500">{k.kota}</div>
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black text-emerald-400">
+                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black text-emerald-700">
                       Verified
                     </span>
                     <span className="text-[10px] text-slate-500">Credit {k.kredit}</span>
                     <button onClick={() => void blokir(k.email)}
-                      className="ml-auto rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-rose-400">
+                      className="ml-auto rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-rose-600">
                       Block
                     </button>
                   </div>
@@ -152,7 +152,7 @@ export function DekConnect() {
           </Card>
 
           <Card>
-            <p className="text-[11px] leading-relaxed text-slate-400">
+            <p className="text-[11px] leading-relaxed text-neutral-500">
               Memblokir seseorang membuatnya hilang dari kedua sisi sekaligus — ia tidak lagi
               melihat Anda dan tidak bisa menghubungi Anda dari perangkat mana pun yang tersambung
               ke akunnya. Bila ada yang mengganggu, laporkan; laporan dinilai pemilik, dan

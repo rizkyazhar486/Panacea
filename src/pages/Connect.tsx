@@ -83,7 +83,7 @@ export function Connect() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🤝</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Connect</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Connect</h1>
           <p className="text-xs text-neutral-400">Cari teman olahraga atau pasangan — perempuan yang memulai</p>
         </div>
       </div>
@@ -106,7 +106,7 @@ export function Connect() {
           <SectionTitle icon={<IconUsers size={18} />} title="Preference" subtitle="Decides who appears in Explore" />
           <div className="mt-3 space-y-3">
             <div>
-              <div className="text-[12px] font-bold text-ink dark:text-white">Tertarik pada</div>
+              <div className="text-[12px] font-bold text-ink dark:text-ink">Tertarik pada</div>
               <div className="mt-1 flex gap-1.5">
                 {(['P', 'L'] as Sex[]).map((s) => (
                   <button key={s} onClick={() => setPrefs({ ...prefs, interestedIn: s })}
@@ -127,7 +127,7 @@ export function Connect() {
               </Field>
             </div>
             <div>
-              <div className="text-[12px] font-bold text-ink dark:text-white">Jarak maksimum</div>
+              <div className="text-[12px] font-bold text-ink dark:text-ink">Jarak maksimum</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {BANDS.map((b) => (
                   <button key={b} onClick={() => setPrefs({ ...prefs, maxDistanceBand: b })}
@@ -189,7 +189,7 @@ export function Connect() {
             <div className="mt-2 space-y-2">
               {matches.map((m) => (
                 <div key={m.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                  <div className="text-[13px] font-bold text-ink dark:text-white">{m.displayName}, {m.age}</div>
+                  <div className="text-[13px] font-bold text-ink dark:text-ink">{m.displayName}, {m.age}</div>
                   <div className="text-[11px] text-neutral-400">{m.city} · {m.distanceBand}</div>
                   {profile && (
                     <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
@@ -243,7 +243,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
     <Card className="!p-5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-[17px] font-black text-ink dark:text-white">{them.displayName}, {them.age}</h2>
+          <h2 className="text-[17px] font-black text-ink dark:text-ink">{them.displayName}, {them.age}</h2>
           <div className="text-[11px] text-neutral-400">{them.city} · {them.distanceBand} · mencari {them.lookingFor}</div>
         </div>
         <Badge tone={c.label === 'Banyak kesamaan' ? 'normal' : c.label === 'Beberapa kesamaan' ? 'low' : 'neutral'}>{c.label}</Badge>
@@ -262,7 +262,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
 
       {c.agreements.length > 0 && (
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Kesamaan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-emerald-700 dark:text-emerald-700">Kesamaan</div>
           <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             {c.agreements.map((a, i) => <li key={i}>{a}</li>)}
           </ul>
@@ -271,7 +271,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
 
       {c.frictions.length > 0 && (
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-400">Perbedaan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-amber-700 dark:text-amber-700">Perbedaan</div>
           <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             {c.frictions.map((f, i) => <li key={i}>{f}</li>)}
           </ul>
@@ -323,7 +323,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
           <Field label="Usia"><input className={inputClass} inputMode="numeric" value={p.age} onChange={(e) => setP({ ...p, age: Number(e.target.value) || 18 })} /></Field>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Jenis kelamin</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Jenis kelamin</div>
           <div className="mt-1 flex gap-1.5">
             {(['P', 'L'] as Sex[]).map((s) => (
               <button key={s} onClick={() => setP({ ...p, sex: s })}
@@ -340,7 +340,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
         <Field label="Tentang Anda"><input className={inputClass} placeholder="Suka lari pagi, kerja di rumah sakit" value={p.bio} onChange={(e) => setP({ ...p, bio: e.target.value })} /></Field>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Olahraga yang Anda lakukan</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Olahraga yang Anda lakukan</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {ACTIVITY_OPTIONS.map((a) => (
               <button key={a} onClick={() => toggleActivity(a)}
@@ -352,7 +352,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
         </div>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Mencari</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Mencari</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {(['teman olahraga', 'hubungan serius', 'belum yakin'] as const).map((l) => (
               <button key={l} onClick={() => setP({ ...p, lookingFor: l })}
@@ -364,7 +364,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
         </div>
 
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Anak</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Anak</div>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {(['ya', 'tidak', 'belum yakin'] as const).map((w) => (
               <button key={w} onClick={() => setP({ ...p, lifestyle: { ...p.lifestyle, wantsChildren: w } })}

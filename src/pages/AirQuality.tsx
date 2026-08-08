@@ -80,7 +80,7 @@ export function AirQuality() {
           right={<button onClick={locate} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">📍 Refresh</button>}
         />
 
-        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-white">
+        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-ink">
           <input type="checkbox" checked={sensitive} onChange={(e) => setSens(e.target.checked)} />
           I have asthma, COPD, or airborne allergies
         </label>
@@ -142,7 +142,7 @@ function Pollutant({ label, value, unit, note }: { label: string; value: number;
   return (
     <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
       <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
-      <div className="text-lg font-black text-ink dark:text-white">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[9px] font-medium text-neutral-400">{unit}</span></div>
+      <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[9px] font-medium text-neutral-400">{unit}</span></div>
       <div className="text-[9px] text-neutral-400">{note}</div>
     </div>
   )

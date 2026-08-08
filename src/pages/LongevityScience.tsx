@@ -89,7 +89,7 @@ export function LongevityScience() {
           <Card key={e.id} className="!p-0 overflow-hidden">
             <button onClick={() => setOpen(isOpen ? null : e.id)} className="flex w-full items-center gap-3 p-4 text-left">
               <span className="text-2xl">{e.emoji}</span>
-              <span className="flex-1 text-[15px] font-black text-ink dark:text-white">{e.title}</span>
+              <span className="flex-1 text-[15px] font-black text-ink dark:text-ink">{e.title}</span>
               <span className="text-neutral-300">{isOpen ? '−' : '+'}</span>
             </button>
             {isOpen && (

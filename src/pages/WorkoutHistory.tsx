@@ -85,21 +85,21 @@ export function WorkoutHistory() {
       <div className="space-y-4">
         <SectionTitle icon={<IconRun />} title="History Latihan" subtitle="Real sessions with per-minute heart rate" />
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-neutral-600 leading-relaxed">
             Belum ada sesi tersimpan. Unggah berkas ekspor Health Auto Export di{' '}
-            <Link to="/health-data" className="font-semibold text-white underline">Health Data</Link> —
+            <Link to="/health-data" className="font-semibold text-ink underline">Health Data</Link> —
             berkas yang sama yang mengisi angka kesehatan Anda juga memuat setiap sesi latihan lengkap
             dengan deret detak jantung per menit.
           </p>
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
             Tidak harus diunggah manual: sesi juga masuk sendiri lewat sinkronisasi otomatis, asalkan
-            di Health Auto Export ada otomatisasi dengan <strong className="text-slate-300">Data Type: Workouts</strong>
-            {' '}(atau <strong className="text-slate-300">Include Workouts</strong> dinyalakan) dan
-            {' '}<strong className="text-slate-300">Date Range: Today</strong>. Bila salah satunya meleset,
+            di Health Auto Export ada otomatisasi dengan <strong className="text-neutral-600">Data Type: Workouts</strong>
+            {' '}(atau <strong className="text-neutral-600">Include Workouts</strong> dinyalakan) dan
+            {' '}<strong className="text-neutral-600">Date Range: Today</strong>. Bila salah satunya meleset,
             larik latihan tidak ikut terkirim meskipun metriknya terkirim lengkap.
           </p>
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-            <Link to="/health-data/tutorial" className="font-semibold text-white underline">Diagnosa sinkronisasi</Link>
+            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">Diagnosa sinkronisasi</Link>
             {' '}memeriksa kiriman yang benar-benar sampai dan menyebutkan setelan mana yang salah.
           </p>
         </Card>
@@ -137,15 +137,15 @@ export function WorkoutHistory() {
             className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
         </div>
         <div className="mt-3 flex items-baseline justify-between">
-          <span className="text-2xl font-black text-white">
-            {kemajuan.tercapai} <span className="text-sm font-bold text-slate-400">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
+          <span className="text-2xl font-black text-ink">
+            {kemajuan.tercapai} <span className="text-sm font-bold text-neutral-500">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
           </span>
-          <span className={`text-sm font-bold ${kemajuan.diJalur ? 'text-emerald-400' : 'text-amber-400'}`}>{kemajuan.pct}%</span>
+          <span className={`text-sm font-bold ${kemajuan.diJalur ? 'text-emerald-700' : 'text-amber-700'}`}>{kemajuan.pct}%</span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
           <div className="h-full rounded-full" style={{ width: `${kemajuan.pct}%`, background: kemajuan.diJalur ? '#22c55e' : '#f59e0b' }} />
         </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           {kemajuan.pct >= 100
             ? 'Target periode ini sudah tercapai.'
             : `Sisa ${kemajuan.sisaHari} hari — perlu sekitar ${kemajuan.perluPerHari} ${kemajuan.satuan} per hari.`}
@@ -159,15 +159,15 @@ export function WorkoutHistory() {
             {pr.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
                 <div>
-                  <div className="text-[13px] font-bold text-white">{p.label}</div>
+                  <div className="text-[13px] font-bold text-ink">{p.label}</div>
                   <div className="text-[10px] text-slate-500">
                     {new Date(p.tanggal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {p.diskalakan && ' · diskalakan'}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[15px] font-black tabular-nums text-white">{fmtDurasi(p.detik)}</div>
-                  <div className="text-[10px] text-slate-400">{fmtPace(p.paceSec)}/km</div>
+                  <div className="text-[15px] font-black tabular-nums text-ink">{fmtDurasi(p.detik)}</div>
+                  <div className="text-[10px] text-neutral-500">{fmtPace(p.paceSec)}/km</div>
                 </div>
               </div>
             ))}
@@ -187,7 +187,7 @@ export function WorkoutHistory() {
         {ringkas.pctMudah != null && (
           <div className="mt-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm text-slate-400">Waktu pada zona mudah (1-2)</span>
+              <span className="text-sm text-neutral-500">Waktu pada zona mudah (1-2)</span>
               <span className={`text-lg font-semibold ${ringkas.pctMudah >= 70 ? 'text-emerald-300' : 'text-amber-300'}`}>
                 {ringkas.pctMudah}%
               </span>
@@ -202,12 +202,12 @@ export function WorkoutHistory() {
               <span>sasaran sekitar 80%</span>
               <span>100%</span>
             </div>
-            <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+            <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
               {ringkas.pctMudah >= 70
                 ? 'Sebaran ini sehat: sebagian besar waktu dijalankan pada intensitas yang membangun basis aerobik, sehingga sesi keras yang sedikit itu benar-benar bisa dijalankan keras.'
                 : 'Sebagian besar waktu lari Anda dijalankan di atas zona mudah. Pola ini terasa produktif namun justru yang paling sering membuat kemajuan mandek: terlalu berat untuk pemulihan, terlalu ringan untuk memicu adaptasi kecepatan. Cara memperbaikinya bukan menambah latihan, melainkan MEMPERLAMBAT sebagian besar sesi.'}
               {' '}Kerangka lengkapnya ada di{' '}
-              <Link to="/latihan-dasar" className="font-semibold text-white underline">Foundation Training</Link>.
+              <Link to="/latihan-dasar" className="font-semibold text-ink underline">Foundation Training</Link>.
             </p>
           </div>
         )}
@@ -231,7 +231,7 @@ export function WorkoutHistory() {
         </p>
         <button
           onClick={() => { if (confirm('Hapus seluruh riwayat latihan yang tersimpan di perangkat ini?')) clearWorkouts() }}
-          className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-slate-400"
+          className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-neutral-500"
         >
           Hapus riwayat tersimpan
         </button>
@@ -252,7 +252,7 @@ function NotifCard() {
           return (
             <div key={i} className="rounded-lg border border-amber-500/25 bg-amber-500/[0.07] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-white text-sm">{n.label}</span>
+                <span className="font-semibold text-ink text-sm">{n.label}</span>
                 <span className="text-sm text-amber-200 tabular-nums">
                   {n.puncakBpm ? `puncak ${n.puncakBpm} bpm` : ''}{n.ambang ? ` · ambang ${n.ambang}` : ''}
                 </span>
@@ -260,9 +260,9 @@ function NotifCard() {
               <div className="text-xs text-slate-500 mt-0.5">
                 {n.mulai ? new Date(n.mulai).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
               </div>
-              <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">{info.arti}</p>
+              <p className="text-sm text-neutral-500 mt-1.5 leading-relaxed">{info.arti}</p>
               <p className="text-sm text-rose-200/90 mt-1.5 leading-relaxed">
-                <span className="text-rose-400/80">Kapan ini penting: </span>{info.kapanPenting}
+                <span className="text-rose-600/80">Kapan ini penting: </span>{info.kapanPenting}
               </p>
             </div>
           )
@@ -281,7 +281,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
     <div className="rounded-lg border border-white/10 bg-white/[0.03] overflow-hidden">
       <button onClick={onToggle} className="w-full text-left p-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="font-semibold text-white text-sm">
+          <span className="font-semibold text-ink text-sm">
             {w.nama}
             {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · luar ruangan</span>}
           </span>
@@ -289,7 +289,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
             {tgl.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
           </span>
         </div>
-        <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
+        <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
           <span>{fmtDurasi(w.durasi)}</span>
           {w.jarakKm != null && <span>{w.jarakKm} km</span>}
           {w.paceSec != null && <span>{fmtPace(w.paceSec)}/km</span>}
@@ -342,9 +342,9 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
                 {zones.filter((z) => z.menit > 0).map((z) => (
                   <div key={z.zona} className="flex items-center gap-2 text-xs">
                     <span className="h-2 w-2 rounded-full shrink-0" style={{ background: z.warna }} />
-                    <span className="text-slate-300 flex-1 min-w-0 truncate">Z{z.zona} {z.nama}</span>
+                    <span className="text-neutral-600 flex-1 min-w-0 truncate">Z{z.zona} {z.nama}</span>
                     <span className="text-slate-500 tabular-nums">{Math.round(z.dariPct)}-{z.hinggaPct > 100 ? 'max' : Math.round(z.hinggaPct)}%</span>
-                    <span className="text-white tabular-nums w-16 text-right">{z.menit} mnt</span>
+                    <span className="text-ink tabular-nums w-16 text-right">{z.menit} mnt</span>
                     <span className="text-slate-500 tabular-nums w-9 text-right">{z.pctWaktu}%</span>
                   </div>
                 ))}
@@ -355,12 +355,12 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
           {w.hrr1 != null && (
             <div className={`rounded-lg border p-3 ${w.hrr1 >= 13 ? 'border-emerald-500/25 bg-emerald-500/[0.07]' : 'border-amber-500/25 bg-amber-500/[0.07]'}`}>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm font-semibold text-white">Pemulihan menit pertama</span>
+                <span className="text-sm font-semibold text-ink">Pemulihan menit pertama</span>
                 <span className={`text-lg font-semibold tabular-nums ${w.hrr1 >= 13 ? 'text-emerald-300' : 'text-amber-300'}`}>
                   −{w.hrr1} bpm
                 </span>
               </div>
-              <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+              <p className="text-sm text-neutral-500 mt-1 leading-relaxed">
                 Dihitung dari deret pemulihan sesi ini sendiri. Turun lebih dari 12 bpm dalam satu menit
                 dianggap normal, dan makin besar makin baik.
                 {w.hrr1 < 13 && ' Angka rendah pada satu sesi belum berarti apa-apa — yang bermakna adalah bila polanya menetap, terutama bila sesi berakhir dengan pendinginan mendadak alih-alih melambat bertahap.'}
@@ -376,7 +376,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-base font-semibold text-white tabular-nums">{value}</div>
+      <div className="text-base font-semibold text-ink tabular-nums">{value}</div>
       <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{label}</div>
     </div>
   )

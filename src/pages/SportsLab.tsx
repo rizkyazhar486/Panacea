@@ -37,7 +37,7 @@ export function SportsLab() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Sports Lab</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Sports Lab</h1>
           <p className="text-xs text-neutral-400">Valuasi pemain multi-agen & pencarian pemain serupa</p>
         </div>
       </div>
@@ -105,7 +105,7 @@ export function SportsLab() {
               <Card className="!p-5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h2 className="text-[16px] font-black text-ink dark:text-white">{selected.name}</h2>
+                    <h2 className="text-[16px] font-black text-ink dark:text-ink">{selected.name}</h2>
                     <div className="text-[11px] text-neutral-400">{selected.position} · {selected.ageYears} th · {selected.matchesPlayed} laga</div>
                   </div>
                   <button onClick={() => setPlayers((x) => x.filter((y) => y.id !== selected.id))}
@@ -114,7 +114,7 @@ export function SportsLab() {
 
                 <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
                   <div className="text-[11px] font-bold uppercase text-neutral-500">Nilai gabungan</div>
-                  <div className="text-3xl font-black text-ink dark:text-white">
+                  <div className="text-3xl font-black text-ink dark:text-ink">
                     {valuation.overall}
                     <span className="text-base font-bold text-neutral-400"> ± {valuation.confidence}</span>
                   </div>
@@ -131,7 +131,7 @@ export function SportsLab() {
                   {valuation.agents.map((a) => (
                     <div key={a.agent} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                       <div className="flex items-center justify-between">
-                        <div className="text-[12px] font-black text-ink dark:text-white">{a.agent}</div>
+                        <div className="text-[12px] font-black text-ink dark:text-ink">{a.agent}</div>
                         <div className="text-[14px] font-black text-brand-dark">{a.score}</div>
                       </div>
                       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
@@ -165,7 +165,7 @@ export function SportsLab() {
                     {similar.map((s) => (
                       <div key={s.player.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[12px] font-bold text-ink dark:text-white">{s.player.name}</span>
+                          <span className="text-[12px] font-bold text-ink dark:text-ink">{s.player.name}</span>
                           <span className="text-[12px] font-black text-brand-dark">{(s.similarity * 100).toFixed(0)}%</span>
                         </div>
                         {s.sharedStrengths.length > 0 && (
@@ -204,7 +204,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-neutral-50 p-2.5 dark:bg-white/5">
       <div className="text-[10px] font-bold uppercase text-neutral-500">{label}</div>
-      <div className="text-[14px] font-black text-ink dark:text-white">{value}</div>
+      <div className="text-[14px] font-black text-ink dark:text-ink">{value}</div>
     </div>
   )
 }
@@ -240,7 +240,7 @@ function AddPlayer({ sport, onAdd }: { sport: Sport; onAdd: (p: Player) => void 
   return (
     <Card className="!p-4">
       <button className="flex w-full items-center justify-between" onClick={() => setOpen(!open)}>
-        <span className="text-[13px] font-black text-ink dark:text-white">Tambah pemain</span>
+        <span className="text-[13px] font-black text-ink dark:text-ink">Tambah pemain</span>
         <span className="text-[11px] font-bold text-neutral-400">{open ? 'Tutup ▲' : 'Buka ▼'}</span>
       </button>
 

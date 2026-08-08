@@ -54,7 +54,7 @@ export function CorrectedCalcium() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Measured total Ca</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{totalCa.toFixed(1)}</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{totalCa.toFixed(1)}</div>
             <Badge tone={totalBand.tone}>{totalBand.label}</Badge>
           </div>
           <div>

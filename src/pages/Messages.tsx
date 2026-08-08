@@ -75,7 +75,7 @@ export function Messages() {
           className="flex-1 rounded-xl border border-neutral-200 px-3 py-2.5 text-sm outline-none focus:border-brand"
         />
         <button onClick={start} disabled={!draft.trim()} aria-label="Start conversation"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink disabled:opacity-40"
           style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           <IconSend size={18} />
         </button>
@@ -102,7 +102,7 @@ export function Messages() {
                 </span>
                 <span className="flex-1 truncate text-sm font-semibold text-ink">{t.peer}</span>
               </button>
-              <button onClick={() => remove(t.id)} aria-label="Delete conversation" className="grid h-8 w-8 place-items-center rounded-full text-neutral-300 hover:bg-neutral-100 hover:text-red-400">
+              <button onClick={() => remove(t.id)} aria-label="Delete conversation" className="grid h-8 w-8 place-items-center rounded-full text-neutral-300 hover:bg-neutral-100 hover:text-red-600">
                 <IconX size={16} />
               </button>
             </div>

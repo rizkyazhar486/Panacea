@@ -147,7 +147,7 @@ export function Breathwork() {
 
       <Card className="!p-4 flex items-center justify-between">
         <div>
-          <div className="text-xs font-black text-ink dark:text-white">🔥 Daily streak</div>
+          <div className="text-xs font-black text-ink dark:text-ink">🔥 Daily streak</div>
           <p className="text-[11px] text-neutral-500">Finish one session a day to keep it alive.</p>
         </div>
         <Badge tone={streak.days > 0 ? 'brand' : 'low'}>{streak.days} day{streak.days === 1 ? '' : 's'}</Badge>

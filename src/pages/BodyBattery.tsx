@@ -76,7 +76,7 @@ export function BodyBattery() {
       <div className="space-y-4">
         <SectionTitle icon={<IconActivity />} title="Body Battery" />
         <Card>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed text-neutral-600">
             Body Battery dihitung dari deret denyut yang dikumpulkan server lewat sinkronisasi
             otomatis, dan saat ini aplikasi berjalan tanpa server.
           </p>
@@ -108,11 +108,11 @@ export function BodyBattery() {
       </div>
 
       {memuat && <Card><p className="text-sm text-neutral-400">Loading…</p></Card>}
-      {gagal && <Card><p className="text-sm text-red-400">Gagal memuat data. Coba muat ulang halaman.</p></Card>}
+      {gagal && <Card><p className="text-sm text-red-600">Gagal memuat data. Coba muat ulang halaman.</p></Card>}
 
       {!memuat && !gagal && !hasil.cukupData && (
         <Card>
-          <p className="text-sm font-bold text-ink dark:text-white">Belum bisa dihitung</p>
+          <p className="text-sm font-bold text-ink dark:text-ink">Belum bisa dihitung</p>
           <p className="mt-1 text-sm leading-relaxed text-neutral-500">{hasil.alasan}</p>
           <p className="mt-3 text-sm leading-relaxed text-neutral-500">
             Body Battery butuh deret denyut, bukan sekadar ringkasan harian. Cara memperbanyaknya ada
@@ -135,8 +135,8 @@ export function BodyBattery() {
                 <div className="mt-1 text-sm font-bold" style={{ color: saran.warna }}>{saran.judul}</div>
               </div>
               <div className="text-right text-xs text-neutral-400">
-                <div>Tertinggi <b className="tabular-nums text-ink dark:text-white">{hasil.tertinggi}</b></div>
-                <div>Terendah <b className="tabular-nums text-ink dark:text-white">{hasil.terendah}</b></div>
+                <div>Tertinggi <b className="tabular-nums text-ink dark:text-ink">{hasil.tertinggi}</b></div>
+                <div>Terendah <b className="tabular-nums text-ink dark:text-ink">{hasil.terendah}</b></div>
               </div>
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
@@ -206,7 +206,7 @@ export function BodyBattery() {
                 {hasil.peristiwa.map((p, i) => (
                   <div key={i} className="flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
                     <div className="min-w-0">
-                      <div className="text-sm font-bold text-ink dark:text-white">{p.label}</div>
+                      <div className="text-sm font-bold text-ink dark:text-ink">{p.label}</div>
                       <div className="text-[12px] text-neutral-500">{jam(p.mulai)} – {jam(p.selesai)}</div>
                     </div>
                     <span className={`shrink-0 text-sm font-black tabular-nums ${p.jenis === 'isi' ? 'text-emerald-500' : 'text-red-500'}`}>
@@ -223,11 +223,11 @@ export function BodyBattery() {
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
                 <div className="text-[11px] text-neutral-400">Denyut istirahat</div>
-                <div className="font-black tabular-nums text-ink dark:text-white">{hasil.istirahat} bpm</div>
+                <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.istirahat} bpm</div>
               </div>
               <div>
                 <div className="text-[11px] text-neutral-400">Denyut maksimum</div>
-                <div className="font-black tabular-nums text-ink dark:text-white">{hasil.hrMaks} bpm</div>
+                <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.hrMaks} bpm</div>
               </div>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-neutral-500">

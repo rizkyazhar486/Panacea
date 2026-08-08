@@ -97,7 +97,7 @@ export function OrganDonorCard() {
       {intend !== 'undecided' && (
         <Card className="!p-0 overflow-hidden">
           <div
-            className={intend === 'yes' ? 'p-5 text-white' : 'p-5'}
+            className={intend === 'yes' ? 'p-5 text-ink' : 'p-5'}
             style={intend === 'yes' ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' } : undefined}
           >
             <div className="text-xs font-black uppercase tracking-wide opacity-80">Organ Donor Card</div>
@@ -114,7 +114,7 @@ export function OrganDonorCard() {
         <div className="mt-2 space-y-3">
           {FAQS.map((f) => (
             <div key={f.q}>
-              <div className="text-[13px] font-bold text-ink dark:text-white">{f.q}</div>
+              <div className="text-[13px] font-bold text-ink dark:text-ink">{f.q}</div>
               <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">{f.a}</p>
             </div>
           ))}

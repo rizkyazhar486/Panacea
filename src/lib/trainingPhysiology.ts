@@ -204,7 +204,7 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
   const r = b.acwrDapatDipercaya ? b.acwr : null
   if (!b.acwrDapatDipercaya && b.hariAktif7 > 0) {
     return { key: 'pemeliharaan', label: 'Sedang membangun dasar', warna: W.biru,
-      penjelasan: `History Anda baru mencakup ${b.rentangHariData} hari. Nisbah beban 7:28 hari belum bermakna sebelum ada sekitar empat pekan riwayat — pada awal berlatih, angkanya selalu tampak melonjak semata karena pembandingnya masih hampir kosong, bukan karena Anda berlebihan.`,
+      penjelasan: `Your history baru mencakup ${b.rentangHariData} hari. Nisbah beban 7:28 hari belum bermakna sebelum ada sekitar empat pekan riwayat — pada awal berlatih, angkanya selalu tampak melonjak semata karena pembandingnya masih hampir kosong, bukan karena Anda berlebihan.`,
       saran: 'Lanjutkan dengan menambah volume paling banyak 10% per minggu. Penilaian beban akan mulai bermakna setelah empat pekan.' }
   }
   if (b.hariAktif7 === 0) {

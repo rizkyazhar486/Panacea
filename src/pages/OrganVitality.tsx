@@ -206,11 +206,11 @@ export function OrganVitality() {
           <div className="mt-2 flex items-center justify-around rounded-2xl bg-ink p-4 text-white">
             <div className="text-center">
               <div className="text-4xl font-extrabold" style={{ color: sScore >= 75 ? '#00BF63' : sScore >= 50 ? '#f59e0b' : '#ef4444' }}>{sScore}</div>
-              <div className="text-[9px] uppercase tracking-widest text-white/50">Skin Score</div>
+              <div className="text-[9px] uppercase tracking-widest text-ink/50">Skin Score</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-extrabold text-amber-300">+{skinBioAge}</div>
-              <div className="text-[9px] uppercase tracking-widest text-white/50">Estimated extra "skin age"</div>
+              <div className="text-[9px] uppercase tracking-widest text-ink/50">Estimated extra "skin age"</div>
             </div>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-3">

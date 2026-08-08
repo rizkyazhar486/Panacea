@@ -169,7 +169,7 @@ export default function ClinicalSkillsSection() {
 
 function Block({ title, items, tone }: { title: string; items: string[]; tone?: 'warn' | 'tip' }) {
   const color =
-    tone === 'warn' ? 'text-rose-600 dark:text-rose-400' : tone === 'tip' ? 'text-amber-700 dark:text-amber-300' : 'text-brand-dark'
+    tone === 'warn' ? 'text-rose-600 dark:text-rose-600' : tone === 'tip' ? 'text-amber-700 dark:text-amber-300' : 'text-brand-dark'
   return (
     <div>
       <div className={`text-[11px] font-black uppercase tracking-wide ${color}`}>{title}</div>

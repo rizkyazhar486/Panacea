@@ -240,7 +240,7 @@ function MetabolicMapCard() {
   return (
     <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
       <div className="text-sm font-extrabold">🗺️ The Metabolic Map — Response to Training</div>
-      <p className="text-[10px] text-white/50">Illustration of fat/carbohydrate oxidation & lactate per zone (not your direct test results)</p>
+      <p className="text-[10px] text-ink/50">Illustration of fat/carbohydrate oxidation & lactate per zone (not your direct test results)</p>
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full">
         <path d={path((p) => yPct(p.fat))} fill="none" stroke="#f59e0b" strokeWidth="2" />
         <path d={path((p) => yPct(p.cho))} fill="none" stroke="#ef4444" strokeWidth="2" />
@@ -252,7 +252,7 @@ function MetabolicMapCard() {
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-white/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-ink/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</p>
     </div>
   )
 }

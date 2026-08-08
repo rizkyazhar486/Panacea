@@ -113,7 +113,7 @@ export function MacroLabGizi() {
       />
 
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Data Anda</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Data Anda</div>
         <div className="mt-2 grid grid-cols-3 gap-2">
           <KolomVitalTerikat ikat={ikatBerat} label="Berat (kg)" satuan="kg" step={0.1} />
           <KolomVitalTerikat ikat={ikatTinggi} label="Tinggi (cm)" satuan="cm" />
@@ -124,22 +124,22 @@ export function MacroLabGizi() {
           agar dipakai di seluruh aplikasi.
         </p>
 
-        <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-slate-400">Tujuan</div>
+        <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-neutral-500">Tujuan</div>
         <div className="mt-2 grid grid-cols-3 gap-1.5">
           {TUJUAN.map((t) => (
             <button key={t.id} onClick={() => setTujuan(t.id)} aria-pressed={tujuan === t.id}
               className={`rounded-xl p-2 text-left transition ${tujuan === t.id ? 'bg-brand/25 ring-2 ring-brand' : 'bg-white/5'}`}>
-              <div className="text-[12px] font-black text-white">{t.label}</div>
-              <div className="text-[10px] text-slate-400">{t.ringkas}</div>
+              <div className="text-[12px] font-black text-ink">{t.label}</div>
+              <div className="text-[10px] text-neutral-500">{t.ringkas}</div>
             </button>
           ))}
         </div>
 
-        <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-slate-400">Aktivitas</div>
+        <div className="mt-3 text-[11px] font-black uppercase tracking-wide text-neutral-500">Aktivitas</div>
         <div className="mt-2 grid grid-cols-2 gap-1.5">
           {AKTIVITAS.map((a) => (
             <button key={a.id} onClick={() => setAktivitas(a.id)} aria-pressed={aktivitas === a.id}
-              className={`rounded-xl px-2.5 py-2 text-left text-[12px] font-bold transition ${aktivitas === a.id ? 'bg-brand/25 ring-2 ring-brand text-white' : 'bg-white/5 text-slate-300'}`}>
+              className={`rounded-xl px-2.5 py-2 text-left text-[12px] font-bold transition ${aktivitas === a.id ? 'bg-brand/25 ring-2 ring-brand text-white' : 'bg-white/5 text-neutral-600'}`}>
               {a.label}
             </button>
           ))}
@@ -149,20 +149,20 @@ export function MacroLabGizi() {
       {/* Hasil */}
       <Card>
         <div className="flex items-baseline justify-between">
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Target harian</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Target harian</div>
           <div className="text-[10px] text-slate-500">BMR {h.bmr} · TDEE {h.tdee} kkal</div>
         </div>
         <div className="mt-2 text-center">
           <div className="text-4xl font-black text-brand">{h.target}</div>
-          <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">kkal per hari</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">kkal per hari</div>
         </div>
 
         <div className="mt-3 space-y-2">
           {bar.map((x) => (
             <div key={x.l}>
               <div className="flex items-baseline justify-between text-[12px]">
-                <span className="font-bold text-white">{x.l}</span>
-                <span className="tabular-nums text-slate-300">{x.g} g · {x.pct}%</span>
+                <span className="font-bold text-ink">{x.l}</span>
+                <span className="tabular-nums text-neutral-600">{x.g} g · {x.pct}%</span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/10">
                 <div className={`h-full rounded-full ${x.w}`} style={{ width: `${Math.min(100, x.pct)}%` }} />
@@ -173,12 +173,12 @@ export function MacroLabGizi() {
 
         <div className="mt-3 grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-white/5 p-2.5">
-            <div className="text-[10px] font-black uppercase text-slate-400">Serat</div>
-            <div className="text-lg font-black text-white">{h.seratG} g</div>
+            <div className="text-[10px] font-black uppercase text-neutral-500">Serat</div>
+            <div className="text-lg font-black text-ink">{h.seratG} g</div>
           </div>
           <div className="rounded-xl bg-white/5 p-2.5">
-            <div className="text-[10px] font-black uppercase text-slate-400">Air</div>
-            <div className="text-lg font-black text-white">{h.airL} L</div>
+            <div className="text-[10px] font-black uppercase text-neutral-500">Air</div>
+            <div className="text-lg font-black text-ink">{h.airL} L</div>
           </div>
         </div>
       </Card>
@@ -186,7 +186,7 @@ export function MacroLabGizi() {
       {/* Komposisi per makan */}
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Komposisi per makan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Komposisi per makan</div>
           <div className="w-24">
             <Field label="Kali makan">
               <KolomAngka nilai={makanPerHari} onNilai={setMakanPerHari} ariaLabel="Kali makan per hari" />
@@ -201,12 +201,12 @@ export function MacroLabGizi() {
             { l: 'lemak', v: `${h.perMakan.lemak} g` },
           ].map((x) => (
             <div key={x.l} className="rounded-xl bg-white/5 p-2">
-              <div className="text-[13px] font-black text-white">{x.v}</div>
-              <div className="text-[9px] font-bold uppercase text-slate-400">{x.l}</div>
+              <div className="text-[13px] font-black text-ink">{x.v}</div>
+              <div className="text-[9px] font-bold uppercase text-neutral-500">{x.l}</div>
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           Pembagian rata hanya titik awal. Yang berpengaruh pada otot adalah <b>protein cukup di
           setiap kali makan</b> — sekitar {Math.max(25, h.perMakan.protein)} g sekali makan lebih
           berguna daripada menumpuk seluruh protein di makan malam.
@@ -215,11 +215,11 @@ export function MacroLabGizi() {
 
       {/* Dua hal yang paling sering salah */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Kenapa dihitung begini</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kenapa dihitung begini</div>
         <div className="mt-2 space-y-2">
           <div className="rounded-xl bg-white/5 p-3">
-            <div className="text-[12px] font-bold text-emerald-400">Protein dari berat badan, bukan persen kalori</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-300">
+            <div className="text-[12px] font-bold text-emerald-700">Protein dari berat badan, bukan persen kalori</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">
               Rentang Anda <b>{h.proteinLo}-{h.proteinHi} g</b> ({PROTEIN_PER_KG[tujuan][0]}-{PROTEIN_PER_KG[tujuan][1]} g/kg).
               "30% kalori dari protein" memberi angka yang sangat berbeda pada dua orang berberat sama
               tapi berkalori berbeda — padahal yang menentukan kebutuhan protein adalah jaringan yang
@@ -227,8 +227,8 @@ export function MacroLabGizi() {
             </p>
           </div>
           <div className="rounded-xl bg-white/5 p-3">
-            <div className="text-[12px] font-bold text-amber-400">Lemak punya lantai, bukan sekadar sisa</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-300">
+            <div className="text-[12px] font-bold text-amber-700">Lemak punya lantai, bukan sekadar sisa</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">
               Lemak dijaga minimal <b>0,8 g/kg</b>. Menaruhnya sebagai "sisa kalori setelah protein dan
               karbohidrat" bisa menjatuhkannya ke bawah 0,5 g/kg, yang mengganggu hormon dan penyerapan
               vitamin A, D, E, K. Karbohidrat yang menjadi penyeimbang, bukan lemak.
@@ -238,7 +238,7 @@ export function MacroLabGizi() {
       </Card>
 
       <Card>
-        <p className="text-[12px] leading-relaxed text-slate-300">
+        <p className="text-[12px] leading-relaxed text-neutral-600">
           Untuk mencatat apa yang benar-benar Anda makan hari ini, buka{' '}
           <Link to="/nutrition" className="font-bold text-brand underline">Nutrisi</Link>.
           Halaman ini hanya menghitung targetnya.

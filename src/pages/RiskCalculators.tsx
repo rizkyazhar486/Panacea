@@ -68,7 +68,7 @@ export function RiskCalculators() {
     <Field label={label}><input className={inputClass} type="number" step={step} value={val || ''} onChange={(e) => set(+e.target.value)} /></Field>
   )
   const toggle = (label: string, val: boolean, set: (b: boolean) => void) => (
-    <label className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-white">
+    <label className="flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-ink">
       <input type="checkbox" checked={val} onChange={(e) => set(e.target.checked)} /> {label}
     </label>
   )

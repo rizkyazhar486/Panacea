@@ -831,7 +831,7 @@ function Pillar({ label, v, hl }: { label: string; v: number; hl?: boolean }) {
   return (
     <div>
       <div className="mb-0.5 flex justify-between text-[11px] font-medium">
-        <span className={hl ? 'text-white font-bold' : 'text-white/70'}>{label}</span>
+        <span className={hl ? 'text-ink font-bold' : 'text-ink/70'}>{label}</span>
         <span className="font-bold">{v}</span>
       </div>
       <div className={'h-1.5 overflow-hidden rounded-full ' + (hl ? 'bg-white/30' : 'bg-white/20')}>
@@ -937,7 +937,7 @@ function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }
   }
   return (
     <div className="mt-4 rounded-2xl border border-dashed border-brand/40 bg-brand-50/50 p-3">
-      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
+      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-ink transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
         {busy ? '⏳ AI analyzing photo…' : '📸 Food Photo → AI auto-fills journal'}
         <input type="file" accept="image/*" capture="environment" className="hidden" onChange={pick} disabled={busy} />
@@ -1010,10 +1010,10 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           const rec = activeProtocol && activeProtocol.specialFoods.some(sf => f.name.includes(sf))
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
-            <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-400 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
+            <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
               {f.emoji} {f.name} <span className="text-neutral-400">{f.k}</span>
               {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
-              {avo && <span className="ml-0.5 text-red-400">{'\u274C'}</span>}
+              {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
             </button>
           )
         })}
@@ -1025,9 +1025,9 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
             <span style={{ color: '#0B7A4B' }}>{pv.k} kcal</span>
             <span className="text-amber-500">K{pv.c}</span>
             <span className="text-green-600">P{pv.p}</span>
-            <span className="text-red-400">L{pv.f}</span>
+            <span className="text-red-600">L{pv.f}</span>
             <span className="text-purple-500">S{pv.fb}</span>
-            <span className="text-blue-400">Na{pv.na}</span>
+            <span className="text-blue-700">Na{pv.na}</span>
             {pv.omega3 > 0 && <span className="text-cyan-500">{'\u{1F41F}'}{pv.omega3}g</span>}
           </div>
           {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[9px] text-neutral-500">{t}</span>)}</div>}
@@ -1101,7 +1101,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
           a path by tapping the map. */}
       <div className="relative mx-5 overflow-hidden rounded-2xl border border-neutral-100">
         {mode === 'planning' && (
-          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
+          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-ink">
             {'\u{1F4CD}'} Tap the map to add route points {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
@@ -1117,8 +1117,8 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
           <div className="grid grid-cols-4 gap-px bg-neutral-900">
             {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(dur > 0 ? (dist / dur) * 3.6 : 0) + ' km/h', 'SPEED'], [fmtPace(dur, dist), 'PACE']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-2 py-2 text-center">
-                <div className="text-sm font-extrabold text-white tabular-nums">{v}</div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-white/40">{l}</div>
+                <div className="text-sm font-extrabold text-ink tabular-nums">{v}</div>
+                <div className="text-[8px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
               </div>
             ))}
           </div>
@@ -1136,14 +1136,14 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {mode === 'done' && (
           <div className="rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-4 text-white">
             <div className="flex items-center justify-between">
-              <div><div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Summary</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
-              <div className="text-right"><div className="text-3xl font-extrabold">{kcal}<span className="text-sm font-medium text-white/60"> kcal</span></div><div className="text-xs text-white/70">MET {exType.met} {'\u00B7'} {metH.toFixed(2)} MET-hours</div></div>
+              <div><div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Summary</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
+              <div className="text-right"><div className="text-3xl font-extrabold">{kcal}<span className="text-sm font-medium text-ink/60"> kcal</span></div><div className="text-xs text-ink/70">MET {exType.met} {'\u00B7'} {metH.toFixed(2)} MET-hours</div></div>
             </div>
             <div className="mt-2 grid grid-cols-4 gap-3 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-white/50">Distance</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-white/50">Duration</div></div>
-              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-white/50">Speed</div></div>
-              <div><div className="font-bold">{hr || '-'}</div><div className="text-white/50">HR</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Distance</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Duration</div></div>
+              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-ink/50">Speed</div></div>
+              <div><div className="font-bold">{hr || '-'}</div><div className="text-ink/50">HR</div></div>
             </div>
           </div>
         )}
@@ -1541,7 +1541,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
   return (
     <Card className="!p-0 overflow-hidden">
-      <div className="relative p-6 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
+      <div className="relative p-6 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
         <div className="absolute right-4 top-4 opacity-[0.04]">
           <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" fill="none" stroke="white" strokeWidth="2" /><circle cx="40" cy="40" r="28" fill="none" stroke="white" strokeWidth="1.5" /><circle cx="40" cy="40" r="20" fill="none" stroke="white" strokeWidth="1" /></svg>
         </div>
@@ -1551,9 +1551,9 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">Longevity Score</span>
-            <span className="text-[9px] text-white/20">{'\u00B7'}</span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
+            <span className="text-[9px] text-ink/20">{'\u00B7'}</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
@@ -1565,14 +1565,14 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-black tabular-nums">{lng.score}</span>
-                <span className="text-[10px] text-white/30">/100</span>
+                <span className="text-[10px] text-ink/30">/100</span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-2xl font-black leading-tight">{scoreLabel}</div>
               <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: 'rgba(255,255,255,0.1)' }}>
                 <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: scoreColor, boxShadow: '0 0 6px ' + scoreColor }} />
-                <span className="text-[11px] font-semibold text-white/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
+                <span className="text-[11px] font-semibold text-ink/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
               </div>
             </div>
           </div>
@@ -1586,20 +1586,20 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
           {/* Quick Vitals */}
           <div className="mt-4 grid grid-cols-4 gap-2">
-            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
-            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
-            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
-            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
+            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
+            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
+            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
+            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative mt-5 flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-black tracking-wider text-white/25">PANACEA</span>
+            <span className="text-[11px] font-black tracking-wider text-ink/25">PANACEA</span>
             <span className="text-[11px] font-black tracking-wider" style={{ color: 'rgba(0,191,99,0.5)' }}>MED</span>
           </div>
-          <span className="text-[10px] font-mono text-white/20">.id</span>
+          <span className="text-[10px] font-mono text-ink/20">.id</span>
         </div>
       </div>
     </Card>

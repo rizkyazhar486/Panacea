@@ -60,7 +60,7 @@ export function GeneInfo() {
         <>
           <Card className="!p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xl font-black text-ink dark:text-white">{gene.symbol}</span>
+              <span className="text-xl font-black text-ink dark:text-ink">{gene.symbol}</span>
               {gene.type && <Badge tone="neutral">{gene.type}</Badge>}
             </div>
             {gene.name && <div className="mt-0.5 text-sm text-neutral-500">{gene.name}</div>}

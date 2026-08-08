@@ -95,15 +95,15 @@ export function AnalisisPro() {
       <div className="space-y-4 pb-24">
         <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Fitness, freshness, relative effort, records and targets" />
         <Card>
-          <p className="text-sm leading-relaxed text-slate-300">
+          <p className="text-sm leading-relaxed text-neutral-600">
             Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di
             halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
             Sesi masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
-            <strong className="text-slate-300"> Data Type: Workouts</strong> dengan
-            <strong className="text-slate-300"> Date Range: Today</strong>. Periksa di{' '}
-            <Link to="/health-data/tutorial" className="font-semibold text-white underline">Diagnosa sinkronisasi</Link>.
+            <strong className="text-neutral-600"> Data Type: Workouts</strong> dengan
+            <strong className="text-neutral-600"> Date Range: Today</strong>. Periksa di{' '}
+            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">Diagnosa sinkronisasi</Link>.
           </p>
         </Card>
         <KartuTidakDibangun />
@@ -150,7 +150,7 @@ export function AnalisisPro() {
           </div>
           <div className="mt-2 rounded-xl p-3" style={{ background: `${baca.warna}1a` }}>
             <div className="text-sm font-bold" style={{ color: baca.warna }}>{baca.judul}</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{baca.arti}</p>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{baca.arti}</p>
           </div>
 
           {/* Laju penambahan beban — bisa dihitung sejak pekan kedua, jadi
@@ -160,12 +160,12 @@ export function AnalisisPro() {
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-sm font-bold" style={{ color: laju.warna }}>{laju.judul}</span>
                 {laju.rasio !== null && (
-                  <span className="text-[11px] font-bold text-slate-400">
+                  <span className="text-[11px] font-bold text-neutral-500">
                     beban 7 hari {laju.akut} · kebiasaan {laju.kronis} · rasio {laju.rasio}
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{laju.arti}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{laju.arti}</p>
               {laju.kmPekanLalu > 0 && (
                 <p className="mt-1 text-[11px] text-slate-500">
                   Jarak: {laju.kmPekanIni} km pekan ini, {laju.kmPekanLalu} km pekan lalu.
@@ -193,17 +193,17 @@ export function AnalisisPro() {
             className="w-24 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white" />
         </div>
         <div className="mt-3 flex items-baseline justify-between">
-          <span className="text-2xl font-black text-white">
-            {kemajuan.tercapai} <span className="text-sm font-bold text-slate-400">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
+          <span className="text-2xl font-black text-ink">
+            {kemajuan.tercapai} <span className="text-sm font-bold text-neutral-500">/ {kemajuan.sasaran} {kemajuan.satuan}</span>
           </span>
-          <span className={`text-sm font-bold ${kemajuan.diJalur ? 'text-emerald-400' : 'text-amber-400'}`}>
+          <span className={`text-sm font-bold ${kemajuan.diJalur ? 'text-emerald-700' : 'text-amber-700'}`}>
             {kemajuan.pct}%
           </span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
           <div className="h-full rounded-full" style={{ width: `${kemajuan.pct}%`, background: kemajuan.diJalur ? '#22c55e' : '#f59e0b' }} />
         </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           {kemajuan.pct >= 100
             ? 'Target periode ini sudah tercapai.'
             : `Sisa ${kemajuan.sisaHari} hari — perlu sekitar ${kemajuan.perluPerHari} ${kemajuan.satuan} per hari. ${kemajuan.diJalur ? 'Saat ini masih di jalur.' : 'Saat ini tertinggal dari laju yang dibutuhkan.'}`}
@@ -220,7 +220,7 @@ export function AnalisisPro() {
             return (
               <div key={w.id} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-bold text-white">{w.nama}</div>
+                  <div className="truncate text-[13px] font-bold text-ink">{w.nama}</div>
                   <div className="text-[10px] text-slate-500">
                     {new Date(w.mulai).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                     {' · '}{fmtDurasi(w.durasi)}{w.jarakKm ? ` · ${w.jarakKm} km` : ''}
@@ -250,15 +250,15 @@ export function AnalisisPro() {
             {pr.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
                 <div>
-                  <div className="text-[13px] font-bold text-white">{p.label}</div>
+                  <div className="text-[13px] font-bold text-ink">{p.label}</div>
                   <div className="text-[10px] text-slate-500">
                     {new Date(p.tanggal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {p.diskalakan && ' · diskalakan dari jarak yang tidak persis'}
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[15px] font-black tabular-nums text-white">{fmtDurasi(p.detik)}</div>
-                  <div className="text-[10px] text-slate-400">{fmtPace(p.paceSec)}/km</div>
+                  <div className="text-[15px] font-black tabular-nums text-ink">{fmtDurasi(p.detik)}</div>
+                  <div className="text-[10px] text-neutral-500">{fmtPace(p.paceSec)}/km</div>
                 </div>
               </div>
             ))}
@@ -277,13 +277,13 @@ export function AnalisisPro() {
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: z.warna }} />
                   <div className="min-w-0">
-                    <div className="text-[13px] font-bold text-white">{z.nama}</div>
+                    <div className="text-[13px] font-bold text-ink">{z.nama}</div>
                     <div className="text-[10px] text-slate-500">
                       {z.hinggaSec === Infinity ? `lebih lambat dari ${fmtPace(z.dariSec)}` : `${fmtPace(z.hinggaSec)} – ${fmtPace(z.dariSec)}`}/km
                     </div>
                   </div>
                 </div>
-                <div className="shrink-0 text-right text-[12px] tabular-nums text-slate-300">
+                <div className="shrink-0 text-right text-[12px] tabular-nums text-neutral-600">
                   {z.sesi} sesi · {z.km} km
                 </div>
               </div>
@@ -299,7 +299,7 @@ export function AnalisisPro() {
           <div className="flex shrink-0 gap-1">
             {(['pekan', 'bulan'] as const).map((s) => (
               <button key={s} onClick={() => setSatuanLog(s)}
-                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold ${satuanLog === s ? 'bg-brand text-white' : 'bg-white/10 text-slate-400'}`}>
+                className={`rounded-lg px-2.5 py-1 text-[11px] font-bold ${satuanLog === s ? 'bg-brand text-white' : 'bg-white/10 text-neutral-500'}`}>
                 {s === 'pekan' ? 'Pekan' : 'Bulan'}
               </button>
             ))}
@@ -319,11 +319,11 @@ export function AnalisisPro() {
             <tbody>
               {log.slice(0, 12).map((b) => (
                 <tr key={b.kunci} className="border-t border-white/5">
-                  <td className="py-2 pr-3 font-semibold text-white">{b.label}</td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-slate-300">{b.sesi}</td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-slate-300">{b.menit} m</td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-slate-300">{b.km} km</td>
-                  <td className="py-2 text-right tabular-nums text-slate-300">{b.upaya}</td>
+                  <td className="py-2 pr-3 font-semibold text-ink">{b.label}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{b.sesi}</td>
+                  <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{b.menit} m</td>
+                  <td className="py-2 pr-3 text-right tabular-nums text-neutral-600">{b.km} km</td>
+                  <td className="py-2 text-right tabular-nums text-neutral-600">{b.upaya}</td>
                 </tr>
               ))}
             </tbody>
@@ -344,8 +344,8 @@ function KartuTidakDibangun() {
       <div className="mt-3 space-y-2">
         {TIDAK_DIBANGUN.map((t) => (
           <div key={t.fitur} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-            <div className="text-[13px] font-semibold text-slate-200">{t.fitur}</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{t.kenapa}</p>
+            <div className="text-[13px] font-semibold text-ink">{t.fitur}</div>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{t.kenapa}</p>
           </div>
         ))}
       </div>

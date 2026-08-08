@@ -138,11 +138,11 @@ function AlcoholCard() {
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
           <div className="text-[10px] font-bold uppercase text-neutral-400">Drinks / year</div>
-          <div className="text-xl font-black text-ink dark:text-white">{unitsYear}</div>
+          <div className="text-xl font-black text-ink dark:text-ink">{unitsYear}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
           <div className="text-[10px] font-bold uppercase text-neutral-400">Pure alcohol / year</div>
-          <div className="text-xl font-black text-ink dark:text-white">{(gramsYear / 1000).toFixed(1)} kg</div>
+          <div className="text-xl font-black text-ink dark:text-ink">{(gramsYear / 1000).toFixed(1)} kg</div>
         </div>
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-400">

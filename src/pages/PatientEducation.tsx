@@ -53,9 +53,9 @@ export function PatientEducation() {
         ) : (
           <div className="space-y-4">
             <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Diagnosis</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/70">Diagnosis</div>
               <h3 className="mt-1 text-2xl font-extrabold">{sheet.diagnosis}</h3>
-              <p className="mt-2 text-sm text-white/90">{sheet.ringkas}</p>
+              <p className="mt-2 text-sm text-ink/90">{sheet.ringkas}</p>
             </div>
             <div>
               <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">How to Maintain Your Health</div>

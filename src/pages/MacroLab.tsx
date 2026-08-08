@@ -39,7 +39,7 @@ export function MacroLab() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌐</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Macro Lab</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Macro Lab</h1>
           <p className="text-xs text-neutral-400">Ekonomi makro, suku bunga, dan perdagangan — dengan asumsi yang terbuka</p>
         </div>
       </div>
@@ -140,7 +140,7 @@ function CountryTab() {
                 <div className={`h-full rounded-full ${c.code === 'ID' ? 'bg-brand' : 'bg-brand/50'}`}
                   style={{ width: `${Math.max(2, (v / max) * 100)}%` }} />
               </div>
-              <div className="w-24 shrink-0 text-right text-[11px] font-bold text-ink dark:text-white">{fmt(v)}</div>
+              <div className="w-24 shrink-0 text-right text-[11px] font-bold text-ink dark:text-ink">{fmt(v)}</div>
             </div>
           ))}
         </div>
@@ -152,7 +152,7 @@ function CountryTab() {
           {rows.map(({ c }) => (
             <div key={c.code} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-black text-ink dark:text-white">{c.name}</span>
+                <span className="text-[13px] font-black text-ink dark:text-ink">{c.name}</span>
                 <Badge tone={c.code === 'ID' ? 'brand' : 'low'}>{c.blocs.map((b) => BLOC_LABEL[b]).join(' · ')}</Badge>
               </div>
               <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-neutral-600 dark:text-neutral-300">
@@ -185,7 +185,7 @@ function RateTab() {
         <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="The mechanical consequences of your assumptions" />
         <div className="mt-3 space-y-3">
           <div>
-            <div className="text-[12px] font-bold text-ink dark:text-white">Perubahan suku bunga acuan</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">Perubahan suku bunga acuan</div>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {[-2, -1, -0.5, 0.5, 1, 2].map((d) => (
                 <button key={d} onClick={() => setDelta(d)}
@@ -210,13 +210,13 @@ function RateTab() {
         <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
             <span className="text-[12px] font-bold text-neutral-500">Bunga kredit bergerak</span>
-            <span className="text-xl font-black text-ink dark:text-white">
+            <span className="text-xl font-black text-ink dark:text-ink">
               {r.lendingRateChangePp > 0 ? '+' : ''}{r.lendingRateChangePp.toFixed(2)} pp
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between">
             <span className="text-[12px] font-bold text-neutral-500">Perkiraan cicilan bulanan</span>
-            <span className="text-[15px] font-black text-ink dark:text-white">
+            <span className="text-[15px] font-black text-ink dark:text-ink">
               {r.monthlyPaymentChangePct > 0 ? '+' : ''}{r.monthlyPaymentChangePct.toFixed(1)}%
             </span>
           </div>
@@ -226,7 +226,7 @@ function RateTab() {
           {r.channels.map((c) => (
             <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center justify-between">
-                <span className="text-[12px] font-bold text-ink dark:text-white">{c.name}</span>
+                <span className="text-[12px] font-bold text-ink dark:text-ink">{c.name}</span>
                 <Badge tone={c.direction === 'naik' ? 'high' : 'low'}>{c.direction}</Badge>
               </div>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">{c.note}</p>
@@ -281,7 +281,7 @@ function SimTab() {
           </Field>
         </div>
         <div className="mt-2">
-          <div className="text-[12px] font-bold text-ink dark:text-white">Jumlah kuartal</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Jumlah kuartal</div>
           <div className="mt-1 flex gap-1.5">
             {[4, 8, 12, 20].map((q) => (
               <button key={q} onClick={() => setQuarters(q)}
@@ -362,11 +362,11 @@ function TradeTab() {
           </div>
           <div className="mt-1 flex items-center justify-between text-[12px]">
             <span className="text-neutral-500">Terhadap PDB</span>
-            <span className="font-bold text-ink dark:text-white">{a.balancePctGdp.toFixed(2)}%</span>
+            <span className="font-bold text-ink dark:text-ink">{a.balancePctGdp.toFixed(2)}%</span>
           </div>
           <div className="mt-1 flex items-center justify-between text-[12px]">
             <span className="text-neutral-500">Keterbukaan perdagangan</span>
-            <span className="font-bold text-ink dark:text-white">{a.tradeOpennessPct.toFixed(1)}% PDB</span>
+            <span className="font-bold text-ink dark:text-ink">{a.tradeOpennessPct.toFixed(1)}% PDB</span>
           </div>
         </div>
         <div className="mt-2"><Badge tone={a.balanceUsdBn >= 0 ? 'normal' : 'high'}>{a.verdict}</Badge></div>

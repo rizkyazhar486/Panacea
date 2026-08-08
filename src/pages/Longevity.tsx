@@ -241,7 +241,7 @@ export function Longevity() {
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
               title="Save this value across the app (or press Enter)"
-              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
         </div>
@@ -368,18 +368,18 @@ export function Longevity() {
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">
-              <div className="text-xs font-bold text-white/60">Your VO₂max is {d.vo2} now →</div>
+              <div className="text-xs font-bold text-ink/60">Your VO₂max is {d.vo2} now →</div>
               <div className="mt-2 grid grid-cols-2 gap-3 text-center">
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Age 60</div>
-                  <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj60.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj60.trained.toFixed(0)}</span></div>
+                  <div className="text-[10px] uppercase text-ink/50">Age 60</div>
+                  <div className="text-lg font-extrabold"><span className="text-rose-600">{vo2Proj60.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj60.trained.toFixed(0)}</span></div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Age 80</div>
-                  <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj80.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj80.trained.toFixed(0)}</span></div>
+                  <div className="text-[10px] uppercase text-ink/50">Age 80</div>
+                  <div className="text-lg font-extrabold"><span className="text-rose-600">{vo2Proj80.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj80.trained.toFixed(0)}</span></div>
                 </div>
               </div>
-              <p className="mt-2 text-[10px] leading-relaxed text-white/70">
+              <p className="mt-2 text-[10px] leading-relaxed text-ink/70">
                 Independence threshold ≈18 (climbing stairs, carrying groceries). {vo2Proj80.untrained < 18 ? '⚠️ Without training, you are projected to fall BELOW the independence threshold by age 80 — the trained path keeps you above it.' : 'Both paths stay above the threshold — keep it up.'}
                 {' '}Red = untrained · Green = trained regularly.
               </p>
@@ -428,7 +428,7 @@ export function Longevity() {
                 </div>
                 <Badge tone={overdue ? 'critical' : 'brand'}>{dueTxt}</Badge>
                 <button onClick={() => u({ tests: { ...d.tests, [p.id]: new Date().toISOString() } })}
-                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-white active:scale-95">✓ Done</button>
+                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-ink active:scale-95">✓ Done</button>
               </div>
             )
           })}

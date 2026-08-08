@@ -174,7 +174,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             Longevity Medical-AI{' '}
             <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
           </h1>
-          <p className="mt-3 max-w-md text-white/85">
+          <p className="mt-3 max-w-md text-ink/85">
             AI handles history-taking & education; doctors verify. Tokenized medical records,
             continuous monitoring for healthspan.
           </p>
@@ -184,7 +184,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-white/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
+        <p className="relative text-xs text-ink/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
       </div>
 
       {/* ── Form panel ────────────────────────────── */}

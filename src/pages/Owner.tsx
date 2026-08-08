@@ -31,13 +31,13 @@ export function Owner() {
           subtitle="Panaceamed monetary summary (all revenue streams)"
         />
         <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Estimated Gross Revenue</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-ink/70">Estimated Gross Revenue</div>
           <div className="text-4xl font-extrabold">Rp{grossIdr.toLocaleString('en-GB')}</div>
-          <div className="mt-1 text-sm text-white/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('en-GB')} consultations</div>
+          <div className="mt-1 text-sm text-ink/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('en-GB')} consultations</div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
             <div className="h-full rounded-full bg-white" style={{ width: `${Math.min(100, (grossIdr / monthlyTarget) * 100)}%` }} />
           </div>
-          <div className="mt-1 text-[11px] text-white/70">Monthly target Rp{monthlyTarget.toLocaleString('en-GB')}</div>
+          <div className="mt-1 text-[11px] text-ink/70">Monthly target Rp{monthlyTarget.toLocaleString('en-GB')}</div>
         </div>
       </Card>
 

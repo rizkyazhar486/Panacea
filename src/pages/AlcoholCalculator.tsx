@@ -110,7 +110,7 @@ export function AlcoholCalculator() {
             </div>
           </div>
           <div className="mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{bacPermille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">({bacPercent.toFixed(3)}% BAC)</span></div>
+            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{bacPermille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-700">({bacPercent.toFixed(3)}% BAC)</span></div>
             <p className="mt-1 text-[11px] leading-relaxed text-amber-700/80 dark:text-amber-300/80">
               Estimated blood alcohol concentration right now, {hoursElapsed}h after you started drinking. Legal
               driving limits vary by country and this estimate can be meaningfully off in either direction —

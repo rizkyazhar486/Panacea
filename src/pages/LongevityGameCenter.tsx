@@ -51,7 +51,7 @@ function BingoBoard() {
         {hasBingo && <Badge tone="brand">🎉 BINGO!</Badge>}
       </div>
       {celebrated && hasBingo && (
-        <div className="mt-2 rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-3 text-center text-sm font-black text-white">
+        <div className="mt-2 rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-3 text-center text-sm font-black text-ink">
           🎉 Bingo! Great day for your longevity habits.
         </div>
       )}
@@ -154,7 +154,7 @@ function DailyQuote() {
   return (
     <Card className="!p-8 text-center">
       <div className="text-4xl">💬</div>
-      <p className="mt-4 text-lg font-black leading-snug text-ink dark:text-white">"{QUOTES[dayIndex]}"</p>
+      <p className="mt-4 text-lg font-black leading-snug text-ink dark:text-ink">"{QUOTES[dayIndex]}"</p>
       <p className="mt-3 text-[12px] text-neutral-400">panaceamed.id · daily longevity quote</p>
     </Card>
   )

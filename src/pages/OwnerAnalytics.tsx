@@ -41,7 +41,7 @@ export function OwnerAnalytics() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-white">Owner Analytics</h1>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Owner Analytics</h1>
           <p className="text-xs text-neutral-400">SEO, eksperimen, segmentasi, dan sentimen</p>
         </div>
       </div>
@@ -102,7 +102,7 @@ function SeoTab() {
       <Card className="!p-4">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Skor pemeriksaan</span>
-          <span className="text-2xl font-black text-ink dark:text-white">{r.score}<span className="text-sm text-neutral-400">/100</span></span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{r.score}<span className="text-sm text-neutral-400">/100</span></span>
         </div>
         <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
           Skor ini hanya mengukur item teknis di daftar ini. SEO sesungguhnya ditentukan oleh isi
@@ -113,7 +113,7 @@ function SeoTab() {
           {r.findings.map((f) => (
             <div key={f.area} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[12px] font-bold text-ink dark:text-white">{f.area}</span>
+                <span className="text-[12px] font-bold text-ink dark:text-ink">{f.area}</span>
                 <Badge tone={f.status === 'baik' ? 'normal' : f.status === 'kritis' ? 'critical' : 'high'}>{f.status}</Badge>
               </div>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{f.detail}</p>
@@ -155,7 +155,7 @@ function AbTab() {
         <div className="mt-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
             <span className="text-[12px] font-bold text-neutral-500">Butuh per kelompok</span>
-            <span className="text-xl font-black text-ink dark:text-white">{need.toLocaleString('en-GB')}</span>
+            <span className="text-xl font-black text-ink dark:text-ink">{need.toLocaleString('en-GB')}</span>
           </div>
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
             Pada kekuatan 80% dan tingkat signifikansi 5%. Tetapkan angka ini dulu, lalu jalankan
@@ -178,11 +178,11 @@ function AbTab() {
 
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[12px]">
-            <span className="text-neutral-500">Kontrol</span><span className="text-right font-bold text-ink dark:text-white">{r.controlRate.toFixed(2)}%</span>
-            <span className="text-neutral-500">Variasi</span><span className="text-right font-bold text-ink dark:text-white">{r.variantRate.toFixed(2)}%</span>
-            <span className="text-neutral-500">Selisih</span><span className="text-right font-bold text-ink dark:text-white">{r.absoluteLiftPp >= 0 ? '+' : ''}{r.absoluteLiftPp.toFixed(2)} pp</span>
-            <span className="text-neutral-500">Nilai p</span><span className="text-right font-bold text-ink dark:text-white">{r.pValue < 0.0001 ? '<0,0001' : r.pValue.toFixed(4)}</span>
-            <span className="text-neutral-500">Selang kepercayaan 95%</span><span className="text-right font-bold text-ink dark:text-white">{r.ciLowPp.toFixed(2)} … {r.ciHighPp.toFixed(2)} pp</span>
+            <span className="text-neutral-500">Kontrol</span><span className="text-right font-bold text-ink dark:text-ink">{r.controlRate.toFixed(2)}%</span>
+            <span className="text-neutral-500">Variasi</span><span className="text-right font-bold text-ink dark:text-ink">{r.variantRate.toFixed(2)}%</span>
+            <span className="text-neutral-500">Selisih</span><span className="text-right font-bold text-ink dark:text-ink">{r.absoluteLiftPp >= 0 ? '+' : ''}{r.absoluteLiftPp.toFixed(2)} pp</span>
+            <span className="text-neutral-500">Nilai p</span><span className="text-right font-bold text-ink dark:text-ink">{r.pValue < 0.0001 ? '<0,0001' : r.pValue.toFixed(4)}</span>
+            <span className="text-neutral-500">Selang kepercayaan 95%</span><span className="text-right font-bold text-ink dark:text-ink">{r.ciLowPp.toFixed(2)} … {r.ciHighPp.toFixed(2)} pp</span>
           </div>
           <div className="mt-2"><Badge tone={r.significant ? 'normal' : r.readyToCall ? 'neutral' : 'high'}>{r.verdict}</Badge></div>
         </div>
@@ -251,7 +251,7 @@ function SegmentTab() {
             {segs.map((s) => (
               <div key={s.customer.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[13px] font-bold text-ink dark:text-white">{s.customer.name}</span>
+                  <span className="text-[13px] font-bold text-ink dark:text-ink">{s.customer.name}</span>
                   <Badge tone={s.segment === 'Juara' ? 'normal' : s.segment === 'Hilang' ? 'critical' : s.segment === 'Berisiko pergi' ? 'high' : 'low'}>{s.segment}</Badge>
                 </div>
                 <div className="mt-0.5 text-[10px] text-neutral-400">
@@ -287,10 +287,10 @@ function SentimentTab() {
           <Badge tone={r.label === 'positif' ? 'normal' : r.label === 'negatif' ? 'critical' : 'neutral'}>{r.label}</Badge>
         </div>
         {r.matchedPositive.length > 0 && (
-          <p className="mt-2 text-[11px] leading-relaxed text-emerald-700 dark:text-emerald-400">Positif: {r.matchedPositive.join(', ')}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-emerald-700 dark:text-emerald-700">Positif: {r.matchedPositive.join(', ')}</p>
         )}
         {r.matchedNegative.length > 0 && (
-          <p className="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-400">Negatif: {r.matchedNegative.join(', ')}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-600">Negatif: {r.matchedNegative.join(', ')}</p>
         )}
       </div>
       <div className="mt-3 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">

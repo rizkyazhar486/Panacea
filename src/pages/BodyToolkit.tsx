@@ -46,7 +46,7 @@ function SkincareBuilder() {
         {routine[period].map((s, i) => (
           <div key={s} className="flex items-center gap-2 rounded-xl bg-brand/10 px-3 py-2">
             <span className="text-[11px] font-black text-brand-dark">{i + 1}</span>
-            <span className="flex-1 text-[13px] font-semibold text-ink dark:text-white">{s}</span>
+            <span className="flex-1 text-[13px] font-semibold text-ink dark:text-ink">{s}</span>
             <button onClick={() => move(period, i, -1)} className="text-neutral-400">↑</button>
             <button onClick={() => move(period, i, 1)} className="text-neutral-400">↓</button>
             <button onClick={() => toggle(period, s)} className="text-red-500">✕</button>
@@ -102,7 +102,7 @@ function SymptomBodyMap() {
       <div className="mt-4 space-y-2">
         {logs.slice(0, 8).map((l) => (
           <div key={l.t} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
-            <span className="font-bold text-ink dark:text-white">{l.region}</span>
+            <span className="font-bold text-ink dark:text-ink">{l.region}</span>
             <span className="text-neutral-500">{l.severity}/10 · {new Date(l.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         ))}

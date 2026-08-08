@@ -73,7 +73,7 @@ export function Architecture() {
           <div className="text-lg">
             CombinedScore<sub>i</sub> = α·V<sub>i</sub> + β·L<sub>i</sub> + γ·S<sub>i</sub>
           </div>
-          <div className="mt-2 text-sm text-white/70">
+          <div className="mt-2 text-sm text-ink/70">
             α={WEIGHTS.alpha} · β={WEIGHTS.beta} · γ={WEIGHTS.gamma}
           </div>
           <div className="mt-4 text-base">
@@ -189,7 +189,7 @@ function Legend({ tag, title, desc, color }: { tag: string; title: string; desc:
   return (
     <div className="rounded-xl border border-neutral-100 p-3">
       <div className="flex items-center gap-2">
-        <span className="grid h-6 w-6 place-items-center rounded-lg text-xs font-bold text-white" style={{ background: color }}>
+        <span className="grid h-6 w-6 place-items-center rounded-lg text-xs font-bold text-ink" style={{ background: color }}>
           {tag}
         </span>
         <span className="text-sm font-bold">{title}</span>

@@ -83,7 +83,7 @@ export function EmpiricTherapyReference() {
         {filtered.map((e) => (
           <Card key={e.diagnosis} className="!p-4">
             <div className="flex items-start justify-between gap-2">
-              <div className="text-[14px] font-bold text-ink dark:text-white">{e.diagnosis}</div>
+              <div className="text-[14px] font-bold text-ink dark:text-ink">{e.diagnosis}</div>
               <Badge tone="neutral">{e.category}</Badge>
             </div>
             <div className="mt-1 text-[13px] font-semibold text-brand-dark">{e.firstLine}</div>

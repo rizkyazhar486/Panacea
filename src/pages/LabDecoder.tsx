@@ -100,7 +100,7 @@ export function LabDecoder() {
             {flagged.map((r) => (
               <div key={r.def.id} className={'rounded-xl border p-3 ' + (r.bad ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-ink dark:text-white">{r.def.name}</span>
+                  <span className="text-sm font-bold text-ink dark:text-ink">{r.def.name}</span>
                   <span className="flex items-center gap-2">
                     <span className="text-sm font-black">{r.v} {r.def.unit}</span>
                     <Badge tone={r.bad ? 'critical' : 'low'}>{r.flag === 'high' ? 'High' : 'Low'}</Badge>

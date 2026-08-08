@@ -67,17 +67,17 @@ export function Billing() {
           />
           <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-ink p-5 text-white">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Balance</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Balance</div>
               <div className="flex items-center gap-2 text-4xl font-extrabold">
                 <IconToken size={28} className="text-brand" />
                 {wallet.balance}
-                <span className="text-base font-medium text-white/50">PNC</span>
+                <span className="text-base font-medium text-ink/50">PNC</span>
               </div>
-              <div className="mt-1 text-sm text-white/60">
+              <div className="mt-1 text-sm text-ink/60">
                 ≈ Rp{(wallet.balance * TOKEN_TO_IDR).toLocaleString('en-GB')}
               </div>
             </div>
-            <IconShield size={40} className="text-white/20" />
+            <IconShield size={40} className="text-ink/20" />
           </div>
 
           <div className="mt-5 space-y-5">
@@ -578,8 +578,8 @@ function BackendWallet() {
       />
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-brand p-5 text-white">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Server balance</div>
-          <div className="text-3xl font-extrabold">{balance} <span className="text-base font-medium text-white/70">PNC</span></div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-ink/70">Server balance</div>
+          <div className="text-3xl font-extrabold">{balance} <span className="text-base font-medium text-ink/70">PNC</span></div>
         </div>
         <Button variant="ghost" className="bg-white/15 text-white hover:bg-white/25" onClick={refresh}>Refresh</Button>
       </div>

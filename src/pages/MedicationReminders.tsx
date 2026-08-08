@@ -98,7 +98,7 @@ export function MedicationReminders() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-ink dark:text-white">{r.medName}</span>
+                      <span className="text-sm font-bold text-ink dark:text-ink">{r.medName}</span>
                       <Badge tone={r.active ? 'brand' : 'neutral'}>{r.active ? 'Active' : 'Paused'}</Badge>
                     </div>
                     <div className="mt-0.5 text-xs text-neutral-500">

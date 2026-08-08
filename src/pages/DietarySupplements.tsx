@@ -408,7 +408,7 @@ function SubstanceCard({ s }: { s: Substance }) {
         <span className="text-2xl">{s.emoji}</span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-ink dark:text-white">{s.name}</span>
+            <span className="font-bold text-ink dark:text-ink">{s.name}</span>
           </div>
           {s.aka && <div className="truncate text-xs text-neutral-400">{s.aka}</div>}
           <div className="mt-1.5"><StatusPills s={s} /></div>
@@ -484,7 +484,7 @@ export function DietarySupplements() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">{active.emoji}</span>
           <div>
-            <h2 className="text-lg font-black text-ink dark:text-white">{active.label}</h2>
+            <h2 className="text-lg font-black text-ink dark:text-ink">{active.label}</h2>
             <p className={'mt-1 text-sm leading-relaxed ' + (active.danger ? 'text-rose-600 dark:text-rose-300' : 'text-neutral-500 dark:text-neutral-300')}>{active.blurb}</p>
           </div>
         </div>
@@ -547,7 +547,7 @@ export function DietarySupplements() {
           {PREVALENCE.map((p) => (
             <div key={p.group} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-sm font-bold text-ink dark:text-white">{p.group}</span>
+                <span className="text-sm font-bold text-ink dark:text-ink">{p.group}</span>
                 <span className="shrink-0 text-sm font-black text-brand-dark">{p.range}</span>
               </div>
               <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{p.note}</p>
