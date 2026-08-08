@@ -22,8 +22,12 @@ import { normalizePhone } from './otp.js'
 //    nomor yang diketik hanya membuktikan pemohon TAHU nomor itu, sama
 //    lemahnya dengan NIK dulu. Pemeriksaan bentrok mencegah satu nomor dipakai
 //    dua akun, tetapi tidak mencegah seseorang memakai nomor orang lain.
-//    Penahan akun ganda yang sebenarnya kini adalah tinjauan manual pemilik
-//    atas selfie berpose dan akun media sosial.
+//    Penahan akun ganda yang sebenarnya kini ada di dua tempat: keharusan satu
+//    akun media sosial hanya untuk satu akun Connect (lihat kunciSosial), dan
+//    tinjauan manual pemilik atas selfie berpose. Nomor telepon gratis dibuat
+//    berapa pun banyaknya; akun media sosial dengan riwayat unggahan dan
+//    koneksi tidak bisa dikarang mendadak dalam jumlah banyak, jadi justru
+//    itulah saringan yang paling menahan — dan ia tidak berbiaya.
 //
 //    Yang disimpan tetap hanya sidik ber-garam dan empat digit terakhir.
 //    Nomor utuhnya tidak disimpan di data verifikasi, jadi basis data yang
@@ -327,6 +331,53 @@ export function ikatTelepon(email: string, telepon: string): HasilAjuan {
   return { ok: true }
 }
 
+/**
+ * Kunci identitas sebuah profil media sosial: platform + nama pengguna.
+ *
+ * Dipakai menegakkan bahwa satu akun media sosial hanya boleh dipakai satu akun
+ * Connect. Tanpa OTP berbayar, INILAH penahan akun ganda yang paling kuat yang
+ * dimiliki sistem — dan ia gratis. Nomor telepon bebas dibuat berapa pun
+ * banyaknya; akun Instagram atau LinkedIn yang punya riwayat unggahan dan
+ * koneksi tidak bisa dikarang mendadak dalam jumlah banyak.
+ *
+ * Normalisasi harus cukup agresif, karena satu orang yang ingin membuat dua
+ * akun akan mencoba variasi yang paling jelas lebih dulu:
+ *
+ *   https://instagram.com/Budi/
+ *   https://www.instagram.com/budi?hl=id
+ *   https://m.facebook.com/budi#about
+ *
+ * Ketiganya harus menghasilkan kunci yang sama. Kueri, fragmen, garis miring
+ * penutup, awalan www/m, dan besar-kecil huruf semuanya dibuang. Facebook
+ * "profile.php?id=123" ditangani khusus karena identitasnya justru ada di
+ * kuerinya.
+ */
+export function kunciSosial(url: string): string | null {
+  const platform = platformDariUrl(url)
+  if (!platform) return null
+  let u: URL
+  try { u = new URL(url.trim()) } catch { return null }
+
+  // Facebook lama menaruh identitas di kueri, bukan di jalur.
+  if (platform === 'facebook') {
+    const id = u.searchParams.get('id')
+    if (id && /^\d+$/.test(id)) return 'facebook|' + id
+  }
+
+  const jalur = u.pathname
+    .toLowerCase()
+    .replace(/\/+$/, '')       // garis miring penutup
+    .replace(/^\/+/, '')       // garis miring pembuka
+    .replace(/^@/, '')         // sebagian orang menempel @
+  if (!jalur) return null
+
+  // LinkedIn selalu berbentuk in/nama atau company/nama; sisanya ambil segmen
+  // pertama saja supaya /budi/reels/123 tetap satu orang yang sama.
+  const bagian = jalur.split('/').filter(Boolean)
+  const nama = platform === 'linkedin' ? bagian.slice(0, 2).join('/') : bagian[0]
+  return nama ? `${platform}|${nama}` : null
+}
+
 export function ajukanVerifikasi(
   email: string,
   masuk: Omit<DataVerifikasi, 'teleponSidik' | 'teleponAkhir'> & {
@@ -356,6 +407,17 @@ export function ajukanVerifikasi(
   if (tautan.some((t) => platformDariUrl(t) === null)) {
     return { ok: false, galat: 'sosial_media_tidak_dikenal' }
   }
+  // Satu akun media sosial hanya untuk satu akun Connect. Diperiksa terhadap
+  // akun lain yang belum ditolak — ajuan yang sudah ditolak tidak boleh
+  // mengunci akun media sosial orang selamanya.
+  const kunciSaya = tautan.map(kunciSosial).filter((k): k is string => !!k)
+  const bentrokSosial = Object.values(db.akun).some((x) =>
+    x.email !== email && x.status !== 'ditolak' &&
+    (x.data?.sosialMedia ?? []).some((s) => {
+      const k = kunciSosial(s)
+      return !!k && kunciSaya.includes(k)
+    }))
+  if (bentrokSosial) return { ok: false, galat: 'sosial_media_sudah_dipakai' }
   if (!masuk.nama?.trim()) return { ok: false, galat: 'nama_wajib' }
   if (!(masuk.umur >= 18)) return { ok: false, galat: 'umur_minimal_18' }
 

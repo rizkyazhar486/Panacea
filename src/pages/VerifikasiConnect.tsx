@@ -73,6 +73,7 @@ const GALAT: Record<string, string> = {
   selfie_wajib: 'Selfie berpose wajib diunggah.',
   sosial_media_wajib: 'Isi minimal satu tautan LinkedIn, Facebook, atau Instagram.',
   sosial_media_tidak_dikenal: 'Tautan hanya boleh ke LinkedIn, Facebook, atau Instagram. Periksa alamat yang Anda tempel.',
+  sosial_media_sudah_dipakai: 'Akun media sosial ini sudah dipakai akun Connect lain. Satu akun media sosial hanya untuk satu orang.',
   nama_wajib: 'Nama wajib diisi.',
   umur_minimal_18: 'Connect hanya untuk 18 tahun ke atas.',
   sudah_terverifikasi: 'Akun Anda sudah terverifikasi.',
@@ -248,7 +249,8 @@ export function VerifikasiConnect() {
               ))}
             </div>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-              Isi <b>minimal satu</b> dari ketiganya. Hanya tiga ini yang diterima karena pencocokan
+              Isi <b>minimal satu</b> dari ketiganya. Satu akun media sosial hanya boleh dipakai
+              satu akun Connect. Hanya tiga ini yang diterima karena pencocokan
               wajah baru berarti bila halaman pembandingnya sulit dikarang mendadak — ketiganya
               memperlihatkan riwayat unggahan, koneksi, dan tanggal bergabung. Tautan ke situs lain
               tidak memberi pemilik apa pun untuk dinilai.
