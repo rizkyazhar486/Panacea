@@ -159,7 +159,7 @@ export function SleepPattern() {
           <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
         </Card>
       ) : memuat ? (
-        <Card><p className="text-sm text-slate-500">Memuat…</p></Card>
+        <Card><p className="text-sm text-slate-500">Loading…</p></Card>
       ) : !urut.length ? (
         <Card>
           <p className="text-sm text-slate-300 leading-relaxed">Belum ada malam yang tercatat.</p>

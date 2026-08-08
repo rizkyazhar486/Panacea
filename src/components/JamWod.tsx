@@ -258,7 +258,7 @@ export function JamWod({ nama, setelan, ronde }: {
               {catatan.length} tercatat
             </div>
             {fase !== 'done' && (
-              <button onClick={batalKetuk} aria-label="Batalkan ketukan terakhir"
+              <button onClick={batalKetuk} aria-label="Cancelkan ketukan terakhir"
                 className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-400">
                 batalkan terakhir
               </button>

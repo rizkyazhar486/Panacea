@@ -277,7 +277,7 @@ export function lajuBeban(
   }
 }
 
-/** Umur riwayat dalam hari: dari sesi paling awal sampai sekarang. */
+/** Age riwayat dalam hari: dari sesi paling awal sampai sekarang. */
 export function hariHistoryLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
   let paling = Infinity
   for (const w of workouts) {

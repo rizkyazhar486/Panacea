@@ -71,7 +71,7 @@ export function Jelajah() {
       )}
 
       {posts === null && (
-        <Card><p className="text-[13px] text-slate-400">Memuat…</p></Card>
+        <Card><p className="text-[13px] text-slate-400">Loading…</p></Card>
       )}
 
       {galat && (

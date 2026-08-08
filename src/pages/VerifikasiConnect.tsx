@@ -41,18 +41,18 @@ const PLATFORM = [
 const TUJUAN = [
   {
     id: 'biometrik_selfie' as const,
-    judul: 'Memproses foto wajah saya (data biometrik)',
-    isi: 'Selfie berpose dipakai satu kali oleh pemilik untuk mencocokkan wajah Anda dengan foto di akun media sosial Anda. Setelah putusan diambil, tautannya dihapus.',
+    judul: 'Process my face photo (biometric data)',
+    isi: 'The posed selfie is used once by the owner to match your face against the photo on your social account. Once a decision is made, the link is deleted.',
   },
   {
     id: 'orientasi_seksual' as const,
-    judul: 'Memproses preferensi saya (orientasi seksual)',
-    isi: 'Dipakai hanya di server untuk menentukan siapa yang muncul di deck Anda. Tidak pernah dikirim ke perangkat pengguna lain dan tidak muncul di profil.',
+    judul: 'Process my preference (sexual orientation)',
+    isi: 'Used only on the server to decide who appears in your deck. It is never sent to the device of another user and never appears on a profile.',
   },
   {
     id: 'telepon_sidik' as const,
-    judul: 'Menyidik nomor telepon saya untuk mencegah akun ganda',
-    isi: 'Nomornya tidak disimpan — hanya sidik satu arahnya dan empat digit terakhir. Sidik tidak bisa dikembalikan menjadi nomor, jadi basis data yang bocor tidak memberi siapa pun daftar nomor untuk dihubungi.',
+    judul: 'Fingerprint my phone number to prevent duplicate accounts',
+    isi: 'The number itself is not stored — only a one-way fingerprint and the last four digits. A fingerprint cannot be turned back into a number, so a leaked database gives nobody a list of numbers to contact.',
   },
 ]
 
@@ -63,21 +63,21 @@ const PREFERENSI = [
   { id: 'straight', l: 'Straight' },
   { id: 'gay', l: 'Gay' },
   { id: 'lesbian', l: 'Lesbian' },
-  { id: 'biseksual', l: 'Biseksual' },
+  { id: 'biseksual', l: 'Bisexual' },
 ]
 
 const GALAT: Record<string, string> = {
-  telepon_tidak_sah: 'Nomor telepon tidak sah. Contoh: 08123456789.',
-  telepon_sudah_dipakai: 'Nomor ini sudah dipakai akun lain. Satu orang hanya boleh punya satu akun.',
-  telepon_wajib: 'Nomor telepon wajib diisi.',
-  selfie_wajib: 'Selfie berpose wajib diunggah.',
-  sosial_media_wajib: 'Isi minimal satu tautan LinkedIn, Facebook, atau Instagram.',
-  sosial_media_tidak_dikenal: 'Tautan hanya boleh ke LinkedIn, Facebook, atau Instagram. Periksa alamat yang Anda tempel.',
-  sosial_media_sudah_dipakai: 'Akun media sosial ini sudah dipakai akun Connect lain. Satu akun media sosial hanya untuk satu orang.',
-  nama_wajib: 'Nama wajib diisi.',
-  umur_minimal_18: 'Connect hanya untuk 18 tahun ke atas.',
-  sudah_terverifikasi: 'Akun Anda sudah terverifikasi.',
-  persetujuan_belum_lengkap: 'Ketiga persetujuan di bawah harus dicentang. Tanpa itu tidak ada dasar hukum untuk memproses data Anda.',
+  telepon_tidak_sah: 'That phone number is not valid. Example: 08123456789.',
+  telepon_sudah_dipakai: 'This number is already used by another account. One person may have only one account.',
+  telepon_wajib: 'Phone number is required.',
+  selfie_wajib: 'A posed selfie is required.',
+  sosial_media_wajib: 'Enter at least one LinkedIn, Facebook, or Instagram link.',
+  sosial_media_tidak_dikenal: 'Links may only point to LinkedIn, Facebook, or Instagram. Check the address you pasted.',
+  sosial_media_sudah_dipakai: 'This social account is already used by another Connect account. One social account belongs to one person.',
+  nama_wajib: 'Name is required.',
+  umur_minimal_18: 'Connect is for 18 and over only.',
+  sudah_terverifikasi: 'Your account is already verified.',
+  persetujuan_belum_lengkap: 'All three consents below must be ticked. Without them there is no lawful basis to process your data.',
 }
 
 export function VerifikasiConnect() {
@@ -86,7 +86,7 @@ export function VerifikasiConnect() {
     preferensi: 'straight', pendidikanTerakhir: '', tempatTinggal: '',
     telepon: '', selfieUrl: '', linkedin: '', facebook: '', instagram: '',
   })
-  const [umur, setUmur] = useState<number | undefined>(undefined)
+  const [umur, setAge] = useState<number | undefined>(undefined)
   const [setuju, setSetuju] = useState<Record<string, boolean>>({})
   const [tarik, setTarik] = useState(false)
   const [kirim, setKirim] = useState(false)
@@ -112,11 +112,11 @@ export function VerifikasiConnect() {
         sosialMedia: PLATFORM.map((p) => f[p.id]).filter(Boolean),
         persetujuan: TUJUAN.filter((t) => setuju[t.id]).map((t) => t.id),
       })
-      setPesan('Ajuan terkirim. Pemilik akan meninjau selfie dan media sosial Anda.')
+      setPesan('Submitted. The owner will review your selfie and social accounts.')
       setSaya(await api.connectSaya())
     } catch (e) {
       const k = (e as Error)?.message ?? ''
-      setGalat(GALAT[k] ?? 'Gagal mengirim ajuan. Coba lagi.')
+      setGalat(GALAT[k] ?? 'Could not submit. Please try again.')
     } finally { setKirim(false) }
   }
 
@@ -125,47 +125,47 @@ export function VerifikasiConnect() {
       await api.connectTarikPersetujuan()
       setSaya(await api.connectSaya())
       setTarik(false)
-      setPesan('Persetujuan ditarik dan data verifikasi Anda dihapus.')
-    } catch { setGalat('Gagal menarik persetujuan. Coba lagi.') }
+      setPesan('Consent withdrawn and your verification data deleted.')
+    } catch { setGalat('Could not withdraw consent. Please try again.') }
   }
 
   const status = saya?.status ?? 'belum'
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      <SectionTitle icon={<IconShield />} title="Verifikasi Connect"
+      <SectionTitle icon={<IconShield />} title="Connect Verification"
         subtitle="Required before you can meet anyone — so the person you meet is really them" />
 
       {status === 'terverifikasi' && (
         <Card className="!border-emerald-500/30 !bg-emerald-500/5">
-          <p className="text-[13px] font-bold text-emerald-400">✓ Akun Anda sudah terverifikasi.</p>
+          <p className="text-[13px] font-bold text-emerald-400">✓ Your account is already verified.</p>
           <p className="mt-1 text-[12px] text-slate-300">
-            Kredit kepercayaan Anda <b>{saya?.kredit}</b> dari {saya?.ambang.awal}.
-            {saya?.bahaya && ' Kredit Anda berada di zona bahaya.'}
+            Trust credit Anda <b>{saya?.kredit}</b> dari {saya?.ambang.awal}.
+            {saya?.bahaya && ' Credit Anda berada di zona bahaya.'}
           </p>
         </Card>
       )}
       {status === 'menunggu' && (
         <Card className="!border-amber-500/30 !bg-amber-500/5">
-          <p className="text-[13px] font-bold text-amber-400">Menunggu tinjauan pemilik.</p>
-          <p className="mt-1 text-[12px] text-slate-300">Anda akan bisa memakai Connect setelah disetujui.</p>
+          <p className="text-[13px] font-bold text-amber-400">Waiting for owner review.</p>
+          <p className="mt-1 text-[12px] text-slate-300">You will be able to use Connect once approved.</p>
         </Card>
       )}
       {status === 'ditolak' && (
         <Card className="!border-rose-500/30 !bg-rose-500/5">
-          <p className="text-[13px] font-bold text-rose-400">Ajuan ditolak.</p>
-          <p className="mt-1 text-[12px] text-slate-300">{saya?.alasanTolak}</p>
+          <p className="text-[13px] font-bold text-rose-400">Submission rejected.</p>
+          <p className="mt-1 text-[12px] text-slate-300">{saya?.alasanReject}</p>
         </Card>
       )}
 
       {/* Yang terjadi pada data Anda — di depan, bukan di catatan kaki. */}
       <Card className="!border-sky-500/30 !bg-sky-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-sky-400">Apa yang terjadi pada data Anda</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-sky-400">What happens to your data</div>
         <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-slate-300">
           <li>• <b>NIK tidak lagi diminta.</b> Pemakaian NIK oleh pihak swasta diatur UU Adminduk
             24/2013 dan menuntut kerja sama resmi dengan Dukcapil. Identitas kini diikat ke
             <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.</li>
-          <li>• <b>Nomor telepon tidak disimpan.</b> Hanya sidiknya dan empat digit terakhir, jadi
+          <li>• <b>Phone number tidak disimpan.</b> Hanya sidiknya dan empat digit terakhir, jadi
             basis data yang bocor tidak memberi siapa pun daftar nomor untuk dihubungi.</li>
           <li>• <b>Orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
             Ia hanya dipakai mesin pencocokan di server.</li>
@@ -188,23 +188,23 @@ export function VerifikasiConnect() {
       {status !== 'terverifikasi' && status !== 'menunggu' && (
         <>
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Data diri</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Personal details</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Field label="Nama lengkap"><input className={inputClass} value={f.nama} onChange={(e) => set('nama', e.target.value)} aria-label="Nama lengkap" /></Field>
-              <Field label="Umur"><KolomAngka nilai={umur} onNilai={setUmur} ariaLabel="Umur" /></Field>
-              <Field label="Tempat lahir"><input className={inputClass} value={f.tempatLahir} onChange={(e) => set('tempatLahir', e.target.value)} aria-label="Tempat lahir" /></Field>
-              <Field label="Tanggal lahir"><input className={inputClass} type="date" value={f.tanggalLahir} onChange={(e) => set('tanggalLahir', e.target.value)} aria-label="Tanggal lahir" /></Field>
-              <Field label="Pekerjaan"><input className={inputClass} value={f.pekerjaan} onChange={(e) => set('pekerjaan', e.target.value)} aria-label="Pekerjaan" /></Field>
-              <Field label="Status"><input className={inputClass} placeholder="lajang / menikah" value={f.status} onChange={(e) => set('status', e.target.value)} aria-label="Status" /></Field>
-              <Field label="Pendidikan terakhir"><input className={inputClass} value={f.pendidikanTerakhir} onChange={(e) => set('pendidikanTerakhir', e.target.value)} aria-label="Pendidikan terakhir" /></Field>
+              <Field label="Full name"><input className={inputClass} value={f.nama} onChange={(e) => set('nama', e.target.value)} aria-label="Full name" /></Field>
+              <Field label="Age"><KolomAngka nilai={umur} onNilai={setAge} ariaLabel="Age" /></Field>
+              <Field label="Place of birth"><input className={inputClass} value={f.tempatLahir} onChange={(e) => set('tempatLahir', e.target.value)} aria-label="Place of birth" /></Field>
+              <Field label="Date of birth"><input className={inputClass} type="date" value={f.tanggalLahir} onChange={(e) => set('tanggalLahir', e.target.value)} aria-label="Date of birth" /></Field>
+              <Field label="Occupation"><input className={inputClass} value={f.pekerjaan} onChange={(e) => set('pekerjaan', e.target.value)} aria-label="Occupation" /></Field>
+              <Field label="Status"><input className={inputClass} placeholder="single / married" value={f.status} onChange={(e) => set('status', e.target.value)} aria-label="Status" /></Field>
+              <Field label="Highest education"><input className={inputClass} value={f.pendidikanTerakhir} onChange={(e) => set('pendidikanTerakhir', e.target.value)} aria-label="Highest education" /></Field>
             </div>
             <div className="mt-2">
-              <Field label="Tempat tinggal (kota, provinsi)">
-                <input className={inputClass} placeholder="Bandung, Jawa Barat" value={f.tempatTinggal} onChange={(e) => set('tempatTinggal', e.target.value)} aria-label="Tempat tinggal" />
+              <Field label="Residence (city, province)">
+                <input className={inputClass} placeholder="Bandung, Jawa Barat" value={f.tempatTinggal} onChange={(e) => set('tempatTinggal', e.target.value)} aria-label="Residence" />
               </Field>
             </div>
             <div className="mt-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Preferensi</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Preference</div>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {PREFERENSI.map((p) => (
                   <button key={p.id} onClick={() => set('preferensi', p.id)} aria-pressed={f.preferensi === p.id}
@@ -213,16 +213,16 @@ export function VerifikasiConnect() {
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-[10px] text-slate-500">Tidak pernah ditampilkan kepada pengguna lain.</p>
+              <p className="mt-1 text-[10px] text-slate-500">Never shown to other users.</p>
             </div>
           </Card>
 
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Pembuktian identitas</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Proof of identity</div>
             <div className="mt-2">
-              <Field label="Nomor telepon">
+              <Field label="Phone number">
                 <input className={inputClass} inputMode="tel" placeholder="08123456789"
-                  value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Nomor telepon" />
+                  value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Phone number" />
               </Field>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
                 Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan —
@@ -231,9 +231,9 @@ export function VerifikasiConnect() {
               </p>
             </div>
             <div className="mt-2">
-              <Field label="Tautan selfie berpose">
+              <Field label="Posed selfie link">
                 <input className={inputClass} placeholder="https://…" value={f.selfieUrl}
-                  onChange={(e) => set('selfieUrl', e.target.value)} aria-label="Tautan selfie" />
+                  onChange={(e) => set('selfieUrl', e.target.value)} aria-label="Selfie link" />
               </Field>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
                 Foto wajah Anda sambil <b>membentuk huruf P dengan jari</b>. Pose ini yang membuktikan
@@ -260,7 +260,7 @@ export function VerifikasiConnect() {
           {/* Persetujuan terpisah per tujuan — bukan satu centang untuk semuanya. */}
           <Card>
             <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
-              Persetujuan pemrosesan
+              Processing consent
             </div>
             <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
               Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah
@@ -286,7 +286,7 @@ export function VerifikasiConnect() {
           {pesan && <Card className="!border-emerald-500/30 !bg-emerald-500/5"><p className="text-[12px] text-emerald-400">{pesan}</p></Card>}
 
           <Button onClick={() => void ajukan()} disabled={kirim}>
-            {kirim ? 'Mengirim…' : 'Ajukan verifikasi'}
+            {kirim ? 'Submitting…' : 'Submit verification'}
           </Button>
         </>
       )}
@@ -295,7 +295,7 @@ export function VerifikasiConnect() {
           sama dengan pemberiannya, bukan disembunyikan di menu lain. */}
       {saya && saya.persetujuan?.some((p) => !p.dicabutPada) && (
         <Card>
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Persetujuan Anda</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Your consents</div>
           <div className="mt-2 space-y-1">
             {saya.persetujuan.filter((p) => !p.dicabutPada).map((p) => (
               <div key={p.tujuan} className="flex items-baseline justify-between gap-2 rounded-lg bg-white/5 px-2 py-1">
@@ -309,23 +309,23 @@ export function VerifikasiConnect() {
               <p className="text-[12px] leading-relaxed text-slate-300">
                 Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status
                 belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya
-                lagi. Kredit kepercayaan dan riwayat pelanggaran tetap tersimpan.
+                lagi. Trust credit dan riwayat pelanggaran tetap tersimpan.
               </p>
               <div className="mt-2 flex gap-2">
                 <button onClick={() => void lakukanTarik()}
                   className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-white">
-                  Ya, tarik persetujuan
+                  Yes, withdraw consent
                 </button>
                 <button onClick={() => setTarik(false)}
                   className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-slate-300">
-                  Batal
+                  Cancel
                 </button>
               </div>
             </div>
           ) : (
             <button onClick={() => setTarik(true)}
               className="mt-2 text-[12px] font-bold text-rose-400 underline">
-              Tarik persetujuan dan hapus data verifikasi saya
+              Withdraw consent and delete my verification data
             </button>
           )}
           <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
@@ -335,10 +335,10 @@ export function VerifikasiConnect() {
         </Card>
       )}
 
-      {/* Kredit kepercayaan */}
+      {/* Trust credit */}
       {saya && (
         <Card>
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Kredit kepercayaan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Trust credit</div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className={`text-3xl font-black ${saya.kredit <= saya.ambang.hapus ? 'text-rose-500' : saya.bahaya ? 'text-amber-400' : 'text-emerald-400'}`}>
               {saya.kredit}

@@ -57,7 +57,7 @@ export function MacroLabGizi() {
   const ikatTinggi = useVitalField('heightCm', demo.heightCm || 170)
   const [berat] = ikatBerat
   const [tinggi] = ikatTinggi
-  const [umur, setUmur] = useState<number | undefined>(demo.age || 30)
+  const [umur, setAge] = useState<number | undefined>(demo.age || 30)
   const [tujuan, setTujuan] = useState<Tujuan>('rawat')
   const [aktivitas, setAktivitas] = useState<Aktivitas>('sedang')
   const [makanPerHari, setMakanPerHari] = useState<number | undefined>(3)
@@ -117,7 +117,7 @@ export function MacroLabGizi() {
         <div className="mt-2 grid grid-cols-3 gap-2">
           <KolomVitalTerikat ikat={ikatBerat} label="Berat (kg)" satuan="kg" step={0.1} />
           <KolomVitalTerikat ikat={ikatTinggi} label="Tinggi (cm)" satuan="cm" />
-          <Field label="Umur"><KolomAngka nilai={umur} onNilai={setUmur} ariaLabel="Umur" /></Field>
+          <Field label="Age"><KolomAngka nilai={umur} onNilai={setAge} ariaLabel="Age" /></Field>
         </div>
         <p className="mt-1 text-[10px] text-slate-500">
           Berat dan tinggi terisi dari perangkat bila sudah tersinkron; tekan Enter setelah mengubahnya

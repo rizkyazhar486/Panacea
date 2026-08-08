@@ -18,7 +18,7 @@ import { api, backendEnabled } from '../lib/api'
 //     pernah meminta letak persis Anda. Jarak presisi yang dibaca dari
 //     beberapa titik bisa dipakai menghitung letak rumah seseorang, dan basis
 //     data semacam itu membahayakan keselamatan orang bila bocor. Akibatnya
-//     jujur: semua orang di kota yang sama berjarak 0 km, jadi radius di bawah
+//     jujur: semua orang di same city berjarak 0 km, jadi radius di bawah
 //     jarak antarkota tidak menyaring apa-apa di dalam satu kota.
 //   * RADIUS BERLAKU DUA ARAH. Radius Anda membatasi siapa yang Anda lihat
 //     sekaligus siapa yang melihat Anda. Memasang radius lebar tidak menembus
@@ -45,7 +45,7 @@ export function DekConnect() {
       // (belum terverifikasi) tidak muncul sebagai pesan galat yang menakutkan.
       if (saya.status === 'terverifikasi') setKartu(await api.connectDek())
       setGalat('')
-    } catch { setGalat('Gagal memuat. Periksa sambungan Anda.') }
+    } catch { setGalat('Could not load. Check your connection.') }
     finally { setMuat(false) }
   }, [])
 
@@ -56,14 +56,14 @@ export function DekConnect() {
     try {
       await api.connectRadius(km)
       setKartu(await api.connectDek())
-    } catch { setGalat('Radius gagal disimpan.') }
+    } catch { setGalat('Radius could not be saved.') }
   }
 
   async function blokir(email: string) {
     try {
-      await api.connectBlokir(email)
+      await api.connectBlock(email)
       setKartu((s) => s.filter((k) => k.email !== email))
-    } catch { setGalat('Gagal memblokir.') }
+    } catch { setGalat('Could not block.') }
   }
 
   return (
@@ -72,12 +72,12 @@ export function DekConnect() {
         subtitle="Meet verified people, within a radius you set" />
 
       {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
-      {muat && <Card><p className="text-[13px] text-slate-400">Memuat…</p></Card>}
+      {muat && <Card><p className="text-[13px] text-slate-400">Loading…</p></Card>}
 
       {!muat && status !== 'terverifikasi' && (
         <Card className="!border-amber-500/30 !bg-amber-500/5">
           <p className="text-[13px] font-bold text-amber-400">
-            {status === 'menunggu' ? 'Ajuan Anda sedang ditinjau.' : 'Akun Anda belum terverifikasi.'}
+            {status === 'menunggu' ? 'Your submission is under review.' : 'Your account is not verified yet.'}
           </p>
           <p className="mt-1 text-[12px] leading-relaxed text-slate-300">
             Connect hanya mempertemukan akun terverifikasi. Itu satu-satunya alasan fitur ini ada:
@@ -85,7 +85,7 @@ export function DekConnect() {
           </p>
           {status !== 'menunggu' && (
             <Link to="/verifikasi-connect" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
-              Ajukan verifikasi →
+              Submit verification →
             </Link>
           )}
         </Card>
@@ -94,7 +94,7 @@ export function DekConnect() {
       {status === 'terverifikasi' && (
         <>
           <Card>
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Radius pencarian</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Search radius</div>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {PILIHAN_RADIUS.map((km) => (
                 <button key={km} onClick={() => void ubahRadius(km)} aria-pressed={radius === km}
@@ -107,7 +107,7 @@ export function DekConnect() {
             <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
               Jarak dihitung antar <b>pusat kota</b>, bukan dari GPS — aplikasi ini tidak pernah
               meminta letak persis Anda, karena jarak presisi bisa dipakai melacak tempat tinggal
-              seseorang. Akibatnya: semua orang di kota yang sama tercatat 0 km. Radius juga
+              seseorang. Akibatnya: semua orang di same city tercatat 0 km. Radius juga
               berlaku <b>dua arah</b> — memasangnya lebar tidak menembus batas sempit orang lain.
               Batas terjauh 500 km.
             </p>
@@ -115,7 +115,7 @@ export function DekConnect() {
 
           <Card>
             <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
-              Calon kenalan ({kartu.length})
+              People you could meet ({kartu.length})
             </div>
             {kartu.length === 0 && (
               <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
@@ -130,20 +130,20 @@ export function DekConnect() {
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-[14px] font-black text-white">{k.nama}, {k.umur}</span>
                     <span className="shrink-0 text-[11px] font-bold text-slate-400">
-                      {k.jarakKm === null ? 'jarak tidak diketahui'
-                        : k.jarakKm === 0 ? 'kota yang sama' : `± ${k.jarakKm} km`}
+                      {k.jarakKm === null ? 'distance unknown'
+                        : k.jarakKm === 0 ? 'same city' : `± ${k.jarakKm} km`}
                     </span>
                   </div>
                   <div className="mt-0.5 text-[12px] text-slate-300">{k.pekerjaan} · {k.pendidikan}</div>
                   <div className="text-[11px] text-slate-500">{k.kota}</div>
                   <div className="mt-2 flex items-center gap-2">
                     <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black text-emerald-400">
-                      Terverifikasi
+                      Verified
                     </span>
-                    <span className="text-[10px] text-slate-500">Kredit {k.kredit}</span>
+                    <span className="text-[10px] text-slate-500">Credit {k.kredit}</span>
                     <button onClick={() => void blokir(k.email)}
                       className="ml-auto rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-rose-400">
-                      Blokir
+                      Block
                     </button>
                   </div>
                 </div>
@@ -159,7 +159,7 @@ export function DekConnect() {
               pengurangan kredit dicatat beserta alasannya.
             </p>
             <Link to="/verifikasi-connect" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
-              Lihat kredit kepercayaan saya →
+              See my trust credit →
             </Link>
           </Card>
         </>

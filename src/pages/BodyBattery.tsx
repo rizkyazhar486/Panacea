@@ -107,7 +107,7 @@ export function BodyBattery() {
         ))}
       </div>
 
-      {memuat && <Card><p className="text-sm text-neutral-400">Memuat…</p></Card>}
+      {memuat && <Card><p className="text-sm text-neutral-400">Loading…</p></Card>}
       {gagal && <Card><p className="text-sm text-red-400">Gagal memuat data. Coba muat ulang halaman.</p></Card>}
 
       {!memuat && !gagal && !hasil.cukupData && (

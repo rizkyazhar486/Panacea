@@ -869,7 +869,7 @@ function SyncDiagnosticsCard() {
                         <span className={`shrink-0 text-[10px] font-bold ${
                           m.sampleCount === 0 ? 'text-amber-600'
                           : m.recognised ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {m.sampleCount === 0 ? 'kosong' : m.recognised ? `→ ${m.mappedTo}` : 'tidak dikenali'}
+                          {m.sampleCount === 0 ? 'kosong' : m.recognised ? `→ ${m.mappedTo}` : 'unknowni'}
                         </span>
                       </div>
                     ))}

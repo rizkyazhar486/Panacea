@@ -130,7 +130,7 @@ export function HealthAlertSettings() {
       {gagal && (
         <p className="mt-3 text-sm text-rose-600">Could not load settings. <button onClick={load} className="underline">Coba lagi</button></p>
       )}
-      {memuat && <p className="mt-3 text-sm text-neutral-400">Memuat…</p>}
+      {memuat && <p className="mt-3 text-sm text-neutral-400">Loading…</p>}
 
       {!memuat && (
         <div className="mt-3 space-y-3">

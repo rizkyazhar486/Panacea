@@ -72,7 +72,7 @@ export function Connect() {
 
   const TABS = [
     { id: 'profil', l: 'Profil' },
-    { id: 'filter', l: 'Preferensi' },
+    { id: 'filter', l: 'Preference' },
     { id: 'deck', l: 'Jelajah' },
     { id: 'match', l: `Cocok (${matches.length})` },
     { id: 'aman', l: 'Keamanan' },
@@ -103,7 +103,7 @@ export function Connect() {
 
       {tab === 'filter' && (
         <Card className="!p-4">
-          <SectionTitle icon={<IconUsers size={18} />} title="Preferensi" subtitle="Decides who appears in Explore" />
+          <SectionTitle icon={<IconUsers size={18} />} title="Preference" subtitle="Decides who appears in Explore" />
           <div className="mt-3 space-y-3">
             <div>
               <div className="text-[12px] font-bold text-ink dark:text-white">Tertarik pada</div>
@@ -164,7 +164,7 @@ export function Connect() {
           <Card className="!p-4">
             <p className="text-[12px] leading-relaxed text-neutral-500">
               Tidak ada profil lain yang cocok dengan preferensi Anda saat ini. Longgarkan filter di
-              tab <b>Preferensi</b>, atau tunggu lebih banyak pengguna bergabung. Halaman ini tidak
+              tab <b>Preference</b>, atau tunggu lebih banyak pengguna bergabung. Halaman ini tidak
               menampilkan profil buatan — yang muncul hanya orang sungguhan.
             </p>
           </Card>

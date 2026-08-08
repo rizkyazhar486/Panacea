@@ -23,7 +23,7 @@ export type Category =
 
 export const CATEGORY_LABEL: Record<Category, string> = {
   income: 'Pemasukan',
-  housing: 'Tempat tinggal',
+  housing: 'Residence',
   food: 'Makan & bahan pokok',
   transport: 'Transportasi',
   utilities: 'Listrik, air, internet',

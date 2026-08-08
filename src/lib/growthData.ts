@@ -144,9 +144,9 @@ export function growthSet(sex: 'L' | 'P'): GrowthSet {
 export type GrowthMetric = 'weightForAge' | 'heightForAge' | 'bmiForAge'
 
 export const METRIC_LABEL: Record<GrowthMetric, { title: string; unit: string; short: string }> = {
-  weightForAge: { title: 'Berat Badan menurut Umur (BB/U)', unit: 'kg', short: 'BB/U' },
-  heightForAge: { title: 'Tinggi Badan menurut Umur (TB/U)', unit: 'cm', short: 'TB/U' },
-  bmiForAge: { title: 'IMT menurut Umur (IMT/U)', unit: 'kg/m²', short: 'IMT/U' },
+  weightForAge: { title: 'Berat Badan menurut Age (BB/U)', unit: 'kg', short: 'BB/U' },
+  heightForAge: { title: 'Tinggi Badan menurut Age (TB/U)', unit: 'cm', short: 'TB/U' },
+  bmiForAge: { title: 'IMT menurut Age (IMT/U)', unit: 'kg/m²', short: 'IMT/U' },
 }
 
 // ---------------------------------------------------------------------------

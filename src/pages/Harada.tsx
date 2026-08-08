@@ -310,7 +310,7 @@ export function Harada() {
                   <button
                     onClick={() => alihSelesai(buka, a)}
                     disabled={!a.trim()}
-                    aria-label={sudah ? `Batalkan centang tindakan ${j + 1}` : `Centang tindakan ${j + 1}`}
+                    aria-label={sudah ? `Cancelkan centang tindakan ${j + 1}` : `Centang tindakan ${j + 1}`}
                     className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[12px] font-black transition ${
                       sudah ? 'bg-emerald-500 text-white' : a.trim() ? 'bg-white/10 text-slate-400' : 'bg-white/5 text-slate-600'
                     }`}>

@@ -150,7 +150,7 @@ export function Notifications() {
           <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
         </Card>
       ) : memuat ? (
-        <Card><p className="text-sm text-neutral-400">Memuat…</p></Card>
+        <Card><p className="text-sm text-neutral-400">Loading…</p></Card>
       ) : tersaring.length === 0 ? (
         <Card>
           <p className="text-sm text-neutral-500">

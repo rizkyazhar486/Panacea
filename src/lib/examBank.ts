@@ -1531,7 +1531,7 @@ export const EXAM_BANK: Record<ExamTrack, ExamQuestion[]> = {
   plab: [
     { id: 'plab-1',
       vignette: 'Anak perempuan 15 tahun datang sendiri meminta resep pil kontrasepsi, menolak orang tuanya diberi tahu. Ia tampak memahami risiko & manfaat terapi dengan baik.',
-      options: ['Tolak meresepkan tanpa persetujuan orang tua', 'Nilai kompetensi Gillick — jika terpenuhi, boleh diresepkan tanpa memberi tahu orang tua', 'Hubungi orang tua terlebih dahulu sebelum konsultasi lanjut', 'Rujuk ke polisi karena di bawah umur'],
+      options: ['Reject meresepkan tanpa persetujuan orang tua', 'Nilai kompetensi Gillick — jika terpenuhi, boleh diresepkan tanpa memberi tahu orang tua', 'Hubungi orang tua terlebih dahulu sebelum konsultasi lanjut', 'Rujuk ke polisi karena di bawah umur'],
       answer: 1,
       explanation: 'Prinsip "Gillick competence" (kasus hukum Gillick v West Norfolk, 1985) memungkinkan anak di bawah 16 tahun menerima layanan kesehatan tanpa persetujuan orang tua jika dokter menilai ia cukup matang memahami implikasi keputusannya — inti pendekatan GMC pada etika & kerahasiaan remaja.' },
     { id: 'plab-2',
@@ -1561,7 +1561,7 @@ export const EXAM_BANK: Record<ExamTrack, ExamQuestion[]> = {
       explanation: 'Batuk paroksismal dengan whoop pada bayi dengan riwayat vaksinasi tidak lengkap sangat sugestif pertusis — makrolid (azitromisin/eritromisin) mengurangi penularan meski efek terhadap durasi batuk terbatas jika diberikan lambat; profilaksis pasca-pajanan pada kontak dekat penting karena bayi <6 bulan berisiko tinggi komplikasi apnea/pneumonia.' },
     { id: 'plab-7',
       vignette: 'Pasien datang meminta second opinion setelah tidak puas dengan diagnosis dokter sebelumnya, dan meminta salinan rekam medis lengkapnya dikirim ke dokter baru.',
-      options: ['Tolak memberikan rekam medis tanpa alasan', 'Pasien berhak mengakses & meminta salinan rekam medisnya sendiri (Data Protection Act/UK GDPR) — proses permintaan sesuai prosedur, umumnya tanpa biaya', 'Hanya dokter yang boleh memutuskan apakah rekam medis dibagikan', 'Perlu izin pengadilan untuk transfer rekam medis'],
+      options: ['Reject memberikan rekam medis tanpa alasan', 'Pasien berhak mengakses & meminta salinan rekam medisnya sendiri (Data Protection Act/UK GDPR) — proses permintaan sesuai prosedur, umumnya tanpa biaya', 'Hanya dokter yang boleh memutuskan apakah rekam medis dibagikan', 'Perlu izin pengadilan untuk transfer rekam medis'],
       answer: 1,
       explanation: 'Di bawah UK GDPR/Data Protection Act, pasien memiliki hak akses subjek data (subject access right) atas rekam medisnya sendiri — permintaan transfer ke penyedia layanan lain harus difasilitasi dalam kerangka waktu yang ditetapkan hukum, mencerminkan prinsip otonomi & kepemilikan data pasien atas informasi kesehatannya.' },
     { id: 'plab-8',

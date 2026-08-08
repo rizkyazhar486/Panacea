@@ -135,7 +135,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Penggunaan alkohol dan zat oleh pelaku maupun korban',
       'Usia sangat muda dan lanjut usia yang bergantung pada perawat',
       'Anak dengan kebutuhan khusus dan keterlambatan perkembangan',
-      'Pekerjaan berisiko dan berkendara tanpa alat pelindung',
+      'Occupation berisiko dan berkendara tanpa alat pelindung',
       'Penggunaan pengencer darah dan penyakit yang membuat mudah memar',
       'Osteoporosis dan riwayat jatuh berulang pada lanjut usia',
     ],
@@ -250,7 +250,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kekerasan dalam rumah tangga dan lingkungan dengan riwayat kekerasan',
       'Penggunaan alkohol dan zat pada pelaku maupun korban',
       'Gangguan jiwa, depresi, dan riwayat percobaan bunuh diri pada perlukaan diri',
-      'Pekerjaan yang menggunakan benda tajam seperti juru masak, pekerja logam, dan petani',
+      'Occupation yang menggunakan benda tajam seperti juru masak, pekerja logam, dan petani',
       'Usia muda dan jenis kelamin laki-laki pada perkelahian',
       'Penggunaan pengencer darah dan kelainan pembekuan darah',
       'Diabetes dan penyakit pembuluh darah tepi yang memperlambat penyembuhan luka',
@@ -623,7 +623,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Jadwal makan sehari-hari, apakah ada makan yang dilewatkan, porsi karbohidrat, kebiasaan berpuasa, serta konsumsi alkohol yang menghambat produksi glukosa oleh hati.',
       riwayatSosialEkonomi:
-        'Pekerjaan berisiko tinggi seperti mengemudi, bekerja di ketinggian, dan mengoperasikan mesin — pada pekerjaan ini hipoglikemia membahayakan orang lain, bukan hanya pasien. Tanyakan pula apakah tinggal sendiri, apakah keluarga mengetahui cara menolong, kemampuan membeli obat dan makanan secara teratur, serta kepemilikan alat pemeriksa gula darah mandiri.',
+        'Occupation berisiko tinggi seperti mengemudi, bekerja di ketinggian, dan mengoperasikan mesin — pada pekerjaan ini hipoglikemia membahayakan orang lain, bukan hanya pasien. Tanyakan pula apakah tinggal sendiri, apakah keluarga mengetahui cara menolong, kemampuan membeli obat dan makanan secara teratur, serta kepemilikan alat pemeriksa gula darah mandiri.',
     },
     pemeriksaanFisik: [
       'Nilai kesadaran lebih dahulu — pasien yang tidak sadar, kejang, atau tidak mampu menelan dengan aman BUKAN termasuk hipoglikemia ringan dan memerlukan penanganan intravena segera',
@@ -1334,7 +1334,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Konsumsi JEROAN (hati, ampela, usus, otak, paru), makanan laut terutama kerang, udang, teri, sarden, dan ikan tongkol; daging merah dan daging olahan; kacang-kacangan tertentu; kuah kaldu kental dan emping melinjo yang di Indonesia sangat sering menjadi pemicu. Tanyakan konsumsi ALKOHOL terutama BIR yang mengandung purin sekaligus menghambat ekskresi urat, serta MINUMAN MANIS BERFRUKTOSA (soda, sirup, minuman kemasan) yang merupakan pemicu penting namun jarang ditanyakan. Tanyakan pula asupan cairan harian dan konsumsi produk susu rendah lemak yang justru bersifat protektif.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan dampak serangan terhadap kemampuan bekerja, kebiasaan minum alkohol dalam lingkungan sosial, tingkat aktivitas fisik, kemampuan mengakses obat jangka panjang dan pemeriksaan laboratorium berkala, serta keyakinan pasien mengenai penyakit ini — banyak pasien meyakini semua nyeri sendi disebabkan asam urat dan meminum obat asam urat tanpa indikasi.',
+        'Occupation dan dampak serangan terhadap kemampuan bekerja, kebiasaan minum alkohol dalam lingkungan sosial, tingkat aktivitas fisik, kemampuan mengakses obat jangka panjang dan pemeriksaan laboratorium berkala, serta keyakinan pasien mengenai penyakit ini — banyak pasien meyakini semua nyeri sendi disebabkan asam urat dan meminum obat asam urat tanpa indikasi.',
     },
     pemeriksaanFisik: [
       'Tanda vital termasuk SUHU — demam tinggi dengan menggigil harus mengarahkan kecurigaan pada artritis septik, bukan sekadar gout',
@@ -2752,7 +2752,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Status gizi, asupan protein, serta kemungkinan kekurangan zat besi, zink, dan vitamin C yang memperlambat penyembuhan luka.',
       riwayatSosialEkonomi:
-        'MEROKOK — faktor terkuat yang dapat diubah pada ulkus arteri. Pekerjaan yang menuntut berdiri lama, kemampuan membeli balutan dan stoking kompresi, kemampuan datang untuk perawatan luka berkala, serta siapa yang membantu merawat luka di rumah.',
+        'MEROKOK — faktor terkuat yang dapat diubah pada ulkus arteri. Occupation yang menuntut berdiri lama, kemampuan membeli balutan dan stoking kompresi, kemampuan datang untuk perawatan luka berkala, serta siapa yang membantu merawat luka di rumah.',
     },
     pemeriksaanFisik: [
       'Deskripsikan ulkus: lokasi, ukuran dalam sentimeter yang DICATAT ANGKANYA, kedalaman, tepi, dasar, jumlah dan sifat cairan, serta bau',
@@ -2888,7 +2888,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'RIWAYAT BENJOLAN SERUPA PADA KELUARGA — lipomatosis familial diturunkan dan menimbulkan lipoma yang banyak; tanyakan pula riwayat sindrom Gardner yang berkaitan dengan poliposis usus dan meningkatkan risiko kanker usus besar.',
       riwayatPengobatan: 'Obat yang sedang digunakan; kortikosteroid jangka panjang dapat menimbulkan penumpukan lemak yang menyerupai lipoma.',
       riwayatAlergi: 'History alergi obat, terutama anestesi lokal bila direncanakan tindakan.',
-      riwayatSosialEkonomi: 'Pekerjaan dan aktivitas yang membuat benjolan tergesek maupun tertekan, serta harapan pasien terhadap tindakan.',
+      riwayatSosialEkonomi: 'Occupation dan aktivitas yang membuat benjolan tergesek maupun tertekan, serta harapan pasien terhadap tindakan.',
     },
     pemeriksaanFisik: [
       'Benjolan berbatas tegas, LUNAK SEPERTI KARET, mudah digerakkan, dan tidak nyeri saat ditekan',
@@ -3233,7 +3233,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Gangguan menelan, usia lanjut, dan pemakaian gigi palsu',
       'Penyempitan esofagus dan esofagitis eosinofilik pada dewasa muda dengan benda asing makanan berulang',
       'Keracunan alkohol dan penggunaan obat penenang',
-      'Pekerjaan menggerinda, mengelas, dan bertukang tanpa pelindung mata',
+      'Occupation menggerinda, mengelas, dan bertukang tanpa pelindung mata',
       'Kebiasaan mengorek telinga dan hidung dengan benda',
     ],
     goldStandard:
@@ -3848,7 +3848,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatAlergi: 'History alergi obat.',
       riwayatNutrisi: 'Pola makan dan perubahan berat badan; penurunan berat badan yang bermakna menuntut penelusuran penyakit organik.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan hambatan yang ditimbulkan keluhan, hubungan dengan keluarga dan pasangan, dukungan sosial, beban keuangan akibat berobat berulang, serta APA YANG PASIEN SENDIRI TAKUTKAN mengenai keluhannya — pertanyaan ini sering membuka penyebab kecemasan yang selama ini tidak pernah ditanyakan siapa pun.',
+        'Occupation dan hambatan yang ditimbulkan keluhan, hubungan dengan keluarga dan pasangan, dukungan sosial, beban keuangan akibat berobat berulang, serta APA YANG PASIEN SENDIRI TAKUTKAN mengenai keluhannya — pertanyaan ini sering membuka penyebab kecemasan yang selama ini tidak pernah ditanyakan siapa pun.',
     },
     pemeriksaanFisik: [
       'LAKUKAN PEMERIKSAAN FISIK YANG MENYELURUH DAN SUNGGUH-SUNGGUH pada setiap kunjungan — bukan formalitas. Pemeriksaan yang dikerjakan dengan tenang dan lengkap memiliki nilai terapeutik nyata, dan pemeriksaan yang terburu-buru mengirim pesan bahwa keluhannya tidak dianggap ada',
@@ -4289,7 +4289,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'SANGAT PENTING — hitung frekuensi konsumsi analgesik. Penggunaan analgesik sederhana 15 hari atau lebih per bulan, atau kombinasi analgesik/triptan/opioid 10 hari atau lebih per bulan selama lebih dari 3 bulan, menegakkan MEDICATION OVERUSE HEADACHE yang merupakan penyebab tersering nyeri kepala harian kronik dan sering luput ditanyakan. Tanyakan pula obat penenang, konsumsi kafein harian, dan obat tradisional.',
       riwayatAlergi: 'History alergi obat, terutama NSAID dan parasetamol.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan postur kerja (lama duduk di depan komputer, posisi leher menunduk), beban kerja dan tekanan pekerjaan, masalah keluarga atau finansial, kualitas dan durasi tidur, kebiasaan merokok, konsumsi kopi dan alkohol, aktivitas fisik, serta dampak nyeri kepala terhadap produktivitas dan jumlah hari tidak masuk kerja.',
+        'Occupation dan postur kerja (lama duduk di depan komputer, posisi leher menunduk), beban kerja dan tekanan pekerjaan, masalah keluarga atau finansial, kualitas dan durasi tidur, kebiasaan merokok, konsumsi kopi dan alkohol, aktivitas fisik, serta dampak nyeri kepala terhadap produktivitas dan jumlah hari tidak masuk kerja.',
     },
     pemeriksaanFisik: [
       'Tanda vital lengkap termasuk TEKANAN DARAH dan SUHU — hipertensi berat dan demam mengarahkan ke penyebab sekunder',
@@ -4532,7 +4532,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatKehamilanPersalinan:
         'Pada pasien perempuan usia subur: status kehamilan dan usia gestasi, karena Bell palsy tiga kali lebih sering pada kehamilan trimester ketiga dan awal masa nifas; status ini juga memengaruhi pilihan obat.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang menuntut penampilan atau komunikasi, paparan angin dingin atau AC langsung ke wajah (sering diyakini pasien sebagai penyebab meski bukti ilmiahnya lemah), dampak psikologis dan sosial akibat perubahan wajah, serta kemampuan mengakses fisioterapi dan kontrol berkala.',
+        'Occupation yang menuntut penampilan atau komunikasi, paparan angin dingin atau AC langsung ke wajah (sering diyakini pasien sebagai penyebab meski bukti ilmiahnya lemah), dampak psikologis dan sosial akibat perubahan wajah, serta kemampuan mengakses fisioterapi dan kontrol berkala.',
     },
     pemeriksaanFisik: [
       'Tanda vital termasuk tekanan darah dan gula darah sewaktu bila tersedia',
@@ -4665,7 +4665,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Penggunaan obat vestibular supresan seperti betahistin, dimenhidrinat, atau flunarizin dan sudah berapa lama — penggunaan jangka panjang justru MENGHAMBAT kompensasi sentral dan memperpanjang keluhan; tanyakan pula obat ototoksik (aminoglikosida, furosemid dosis tinggi, sisplatin), antihipertensi yang dapat menimbulkan hipotensi ortostatik, sedatif, dan antidepresan.',
       riwayatAlergi: 'History alergi obat.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang berisiko bila terjadi serangan mendadak seperti mengemudi, bekerja di ketinggian, atau mengoperasikan mesin; kondisi rumah terkait risiko jatuh terutama pada usia lanjut (penerangan, kamar mandi licin, tangga, karpet lepas); status tinggal sendiri atau bersama keluarga; serta dampak terhadap kemandirian dan produktivitas.',
+        'Occupation yang berisiko bila terjadi serangan mendadak seperti mengemudi, bekerja di ketinggian, atau mengoperasikan mesin; kondisi rumah terkait risiko jatuh terutama pada usia lanjut (penerangan, kamar mandi licin, tangga, karpet lepas); status tinggal sendiri atau bersama keluarga; serta dampak terhadap kemandirian dan produktivitas.',
     },
     pemeriksaanFisik: [
       'Tanda vital, termasuk pengukuran tekanan darah BERBARING dan BERDIRI untuk menyingkirkan hipotensi ortostatik yang sering disalahartikan sebagai vertigo',
@@ -6191,7 +6191,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Telur yang keluar bersama tinja menetas di tanah yang lembap, hangat, dan teduh menjadi larva rabditiform, lalu berkembang menjadi LARVA FILARIFORM yang infektif dalam sekitar satu minggu. Larva ini menembus kulit utuh — paling sering di sela jari kaki dan punggung kaki orang yang berjalan tanpa alas kaki — menimbulkan reaksi lokal berupa papulovesikel gatal yang dikenal sebagai ground itch. Larva kemudian masuk ke pembuluh darah, terbawa ke jantung kanan dan PARU, menembus alveolus, naik melalui bronkus dan trakea ke faring, tertelan, dan akhirnya sampai ke usus halus tempatnya menjadi dewasa dalam sekitar 5-9 minggu. Di usus halus — terutama jejunum — cacing dewasa MENEMPEL erat pada mukosa dengan bukal kapsul atau gigi pemotongnya, menyayat mukosa, lalu MENGISAP DARAH. Di sinilah letak perbedaan mendasar dengan askariasis: kerugian utama bukan berupa persaingan nutrien melainkan KEHILANGAN DARAH yang berlangsung terus-menerus. Setiap ekor N. americanus menyebabkan kehilangan sekitar 0,03 mL darah per hari, sedangkan A. duodenale yang lebih rakus menyebabkan sekitar 0,15 mL per hari; dengan infestasi ratusan hingga ribuan ekor, kehilangan harian dapat mencapai puluhan mililiter darah. Cacing juga mengeluarkan zat ANTIKOAGULAN yang menghambat faktor Xa sehingga luka tempat perlekatan terus merembes bahkan SETELAH cacing berpindah ke lokasi baru — hal ini melipatgandakan kehilangan darah melebihi yang diisap secara langsung. Kehilangan darah kronik ini menguras cadangan besi tubuh secara bertahap: mula-mula cadangan besi sumsum tulang habis (feritin turun) tanpa gejala apa pun, lalu terjadi eritropoiesis defisiensi besi, dan akhirnya anemia mikrositik hipokrom yang nyata. Karena prosesnya berlangsung sangat lambat selama bertahun-tahun, tubuh sempat melakukan adaptasi berupa peningkatan curah jantung, pergeseran kurva disosiasi oksihemoglobin ke kanan melalui peningkatan 2,3-DPG, dan redistribusi aliran darah — inilah yang menjelaskan mengapa pasien dapat berjalan sendiri ke fasilitas kesehatan dengan hemoglobin 4 g/dL, dan sekaligus mengapa TRANSFUSI HARUS DIBERIKAN SANGAT HATI-HATI pada anemia kronik berat, sebab volume plasma sudah meningkat sebagai kompensasi sehingga transfusi cepat mudah memicu kelebihan beban cairan dan edema paru. Pada anak dan ibu hamil yang kebutuhan besinya tinggi, defisit ini terjadi lebih cepat dan berdampak lebih berat berupa hambatan pertumbuhan, gangguan kognitif, berat lahir rendah, dan kelahiran prematur.',
     faktorRisiko: [
       'BERJALAN dan BEKERJA TANPA ALAS KAKI di tanah lembap — faktor risiko paling langsung',
-      'Pekerjaan bertani, berkebun (karet, kelapa sawit, teh, kopi), dan pertambangan',
+      'Occupation bertani, berkebun (karet, kelapa sawit, teh, kopi), dan pertambangan',
       'Sanitasi buruk: tidak memiliki jamban dan buang air besar sembarangan di kebun atau tanah',
       'Iklim tropis dengan tanah gembur, lembap, hangat, dan teduh yang ideal bagi perkembangan larva',
       'Anak yang bermain di tanah tanpa alas kaki',
@@ -6558,7 +6558,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     faktorRisiko: [
       'Tinggal maupun bekerja di daerah endemis Lindu, Napu, dan Bada di Sulawesi Tengah',
       'Kontak dengan air tawar untuk bertani, mandi, mencuci, dan menyeberang sungai',
-      'Pekerjaan petani, nelayan, dan pekerja irigasi',
+      'Occupation petani, nelayan, dan pekerja irigasi',
       'Usia anak dan remaja yang sering bermain di air',
       'Sanitasi buruk dan buang air besar di sekitar perairan',
       'Ketiadaan air bersih sehingga air danau dan sungai dipakai sehari-hari',
@@ -6819,7 +6819,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebiasaan DUDUK BERLAMA-LAMA di toilet, termasuk sambil membaca atau bermain telepon genggam',
       'KEHAMILAN dan persalinan pervaginam',
       'Obesitas',
-      'Pekerjaan dengan posisi duduk atau berdiri berjam-jam, dan pekerjaan mengangkat beban berat',
+      'Occupation dengan posisi duduk atau berdiri berjam-jam, dan pekerjaan mengangkat beban berat',
       'Usia lanjut akibat melemahnya jaringan penyangga',
       'Diare kronik',
       'Hipertensi portal pada sirosis hati (menimbulkan varises anorektal yang menyerupai hemoroid)',
@@ -6953,7 +6953,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Obat dan tindakan yang sudah dijalani termasuk obat oles dari apotek, tindakan bakar maupun beku, dan pengobatan tradisional; tanyakan pula kortikosteroid dan obat imunosupresan yang sedang dipakai.',
       riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap obat oles sebelumnya.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang membuat tangan sering basah maupun terluka seperti penjagal, tukang daging, dan pekerja pengolahan ikan; kebiasaan berjalan tanpa alas kaki di kolam renang dan kamar mandi umum; olahraga kontak; serta kebiasaan menggigit kuku dan mengorek kutil yang menyebarkannya.',
+        'Occupation yang membuat tangan sering basah maupun terluka seperti penjagal, tukang daging, dan pekerja pengolahan ikan; kebiasaan berjalan tanpa alas kaki di kolam renang dan kamar mandi umum; olahraga kontak; serta kebiasaan menggigit kuku dan mengorek kutil yang menyebarkannya.',
     },
     pemeriksaanFisik: [
       'Papul padat berbatas tegas dengan permukaan kasar berbenjol dan hiperkeratotik, berwarna seperti kulit sampai keabu-abuan',
@@ -6982,7 +6982,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kulit yang lecet, dermatitis atopik, dan sawar kulit yang lemah',
       'Kebiasaan menggigit kuku, mengorek kutil, dan bercukur pada daerah yang terkena',
       'Berjalan tanpa alas kaki di kolam renang, kamar mandi umum, dan ruang ganti',
-      'Pekerjaan dengan tangan basah dan sering terluka seperti pengolah daging dan ikan',
+      'Occupation dengan tangan basah dan sering terluka seperti pengolah daging dan ikan',
       'Olahraga kontak dan pemakaian barang bersama',
       'Keadaan imunitas menurun termasuk infeksi HIV dan pemakaian obat imunosupresan',
       'Diabetes melitus',
@@ -7180,7 +7180,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Status gizi dan asupan harian; malnutrisi memperlambat penyembuhan lesi dan menandakan imunitas yang menurun.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan kontak erat di rumah maupun tempat kerja untuk menilai risiko penularan, kualitas tidur yang sering terganggu oleh nyeri, tingkat stres sebagai pencetus reaktivasi, serta kemampuan membeli antivirus yang menentukan pilihan regimen.',
+        'Occupation dan kontak erat di rumah maupun tempat kerja untuk menilai risiko penularan, kualitas tidur yang sering terganggu oleh nyeri, tingkat stres sebagai pencetus reaktivasi, serta kemampuan membeli antivirus yang menentukan pilihan regimen.',
     },
     pemeriksaanFisik: [
       'Inspeksi seluruh permukaan kulit untuk memastikan lesi terbatas pada satu dermatom dan benar-benar tidak melewati garis tengah; adanya lebih dari 20 lesi di luar dermatom yang terkena menandakan zoster diseminata dan bukan lagi kasus tanpa komplikasi',
@@ -7500,7 +7500,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Asupan makan dan minum, terutama pada anak dengan gingivostomatitis yang sering menolak makan dan minum sehingga berisiko dehidrasi.',
       riwayatSosialEkonomi:
-        'History hubungan seksual termasuk jumlah pasangan, penggunaan kondom, dan jenis kontak, ditanyakan dengan cara yang tidak menghakimi. Pekerjaan yang berisiko seperti tenaga kesehatan dengan kontak langsung, dan olahraga kontak seperti gulat yang dapat menularkan lesi ke kulit. Tingkat stres dan kualitas tidur sebagai pencetus.',
+        'History hubungan seksual termasuk jumlah pasangan, penggunaan kondom, dan jenis kontak, ditanyakan dengan cara yang tidak menghakimi. Occupation yang berisiko seperti tenaga kesehatan dengan kontak langsung, dan olahraga kontak seperti gulat yang dapat menularkan lesi ke kulit. Tingkat stres dan kualitas tidur sebagai pencetus.',
     },
     pemeriksaanFisik: [
       'Karakterisasi lesi: vesikel kecil berkelompok di atas dasar eritematosa yang seragam ukurannya, mudah pecah menjadi erosi dangkal dengan tepi bergerigi, lalu mengering menjadi krusta',
@@ -7523,7 +7523,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     etiologi:
       'Virus herpes simpleks tipe 1 dan tipe 2; keduanya dapat menimbulkan lesi orolabial maupun genital tergantung jenis kontak, sehingga lokasi lesi tidak lagi dapat dipakai untuk menyimpulkan tipe virusnya.',
     patofisiologi:
-      'Virus masuk melalui kulit yang lecet atau mukosa, bereplikasi pada sel epitel, dan menimbulkan lesi vesikuler dengan degenerasi balon sel epidermis. Dari ujung saraf sensorik setempat, virus berjalan retrograd sepanjang akson menuju ganglion sensorik — ganglion trigeminal untuk lesi orolabial dan ganglion sakral untuk lesi genital — lalu menetap laten seumur hidup dengan ekspresi gen yang sangat terbatas sehingga tidak dikenali sistem imun. Karena latensi ini berada di dalam neuron dan bukan di kulit, tidak ada terapi yang dapat menghilangkan virus dari tubuh; inilah alasan penyakit ini dikendalikan, bukan disembuhkan. Ketika terjadi pemicu berupa demam, paparan sinar ultraviolet, haid, stres, kelelahan, atau penurunan imunitas, virus mengaktifkan kembali replikasinya dan berjalan anterograd kembali ke kulit melalui akson yang sama, sehingga lesi selalu muncul di daerah persarafan yang sama. Episode pertama berlangsung lebih berat karena tubuh belum memiliki antibodi maupun imunitas seluler spesifik, sedangkan episode berikutnya lebih ringan dan lebih singkat karena sudah ada respons imun. Pelepasan virus tanpa disertai lesi yang tampak tetap dapat terjadi, dan inilah mekanisme utama penularan yang tidak disadari.',
+      'Virus masuk melalui kulit yang lecet atau mukosa, bereplikasi pada sel epitel, dan menimbulkan lesi vesikuler dengan degenerasi balon sel epidermis. Dari ujung saraf sensorik setempat, virus berjalan retrograd sepanjang akson menuju ganglion sensorik — ganglion trigeminal untuk lesi orolabial dan ganglion sakral untuk lesi genital — lalu menetap laten seumur hidup dengan ekspresi gen yang sangat terbatas sehingga unknowni sistem imun. Karena latensi ini berada di dalam neuron dan bukan di kulit, tidak ada terapi yang dapat menghilangkan virus dari tubuh; inilah alasan penyakit ini dikendalikan, bukan disembuhkan. Ketika terjadi pemicu berupa demam, paparan sinar ultraviolet, haid, stres, kelelahan, atau penurunan imunitas, virus mengaktifkan kembali replikasinya dan berjalan anterograd kembali ke kulit melalui akson yang sama, sehingga lesi selalu muncul di daerah persarafan yang sama. Episode pertama berlangsung lebih berat karena tubuh belum memiliki antibodi maupun imunitas seluler spesifik, sedangkan episode berikutnya lebih ringan dan lebih singkat karena sudah ada respons imun. Pelepasan virus tanpa disertai lesi yang tampak tetap dapat terjadi, dan inilah mekanisme utama penularan yang tidak disadari.',
     faktorRisiko: [
       'Kontak langsung dengan lesi aktif maupun dengan sekret dari orang yang sedang melepaskan virus tanpa gejala',
       'Jumlah pasangan seksual yang banyak dan tidak menggunakan kondom',
@@ -8116,7 +8116,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'History alergi obat terutama PENISILIN — perlu ditelusuri terperinci apakah berupa ruam ringan atau reaksi anafilaksis, karena penisilin merupakan obat pilihan pada erisipelas dan label alergi yang tidak akurat sering membuat pasien menerima antibiotik yang kurang optimal.',
       riwayatNutrisi: 'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan dan menurunkan daya tahan.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang mengharuskan BERDIRI LAMA yang memperberat bendungan limfe dan vena, kebersihan kaki dan kebiasaan memakai alas kaki, kebiasaan merawat kuku dan sela jari kaki, kondisi lingkungan yang lembap, kemampuan membeli obat dan menjalani kontrol, dukungan keluarga untuk perawatan di rumah, serta kemampuan pasien meninggikan tungkai selama masa pemulihan.',
+        'Occupation yang mengharuskan BERDIRI LAMA yang memperberat bendungan limfe dan vena, kebersihan kaki dan kebiasaan memakai alas kaki, kebiasaan merawat kuku dan sela jari kaki, kondisi lingkungan yang lembap, kemampuan membeli obat dan menjalani kontrol, dukungan keluarga untuk perawatan di rumah, serta kemampuan pasien meninggikan tungkai selama masa pemulihan.',
     },
     pemeriksaanFisik: [
       'TANDA VITAL LENGKAP — demam tinggi sering ditemukan; nilai adanya TAKIKARDIA, TAKIPNEA, dan HIPOTENSI sebagai tanda sepsis yang mengubah pengelolaan menjadi kegawatan',
@@ -8168,7 +8168,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Imunokompromais: HIV, keganasan, kemoterapi, kortikosteroid jangka panjang, sindrom nefrotik',
       'Penyakit arteri perifer',
       'Gagal jantung dengan edema tungkai',
-      'Pekerjaan yang mengharuskan berdiri lama',
+      'Occupation yang mengharuskan berdiri lama',
       'Penyalahgunaan obat suntik',
     ],
     goldStandard:
@@ -8965,7 +8965,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatAlergi: 'History alergi obat termasuk golongan azol dan terbinafin, serta riwayat dermatitis kontak terhadap krim tertentu.',
       riwayatNutrisi: 'Status gizi dan pengendalian gula darah pada penyandang diabetes — hiperglikemia memperberat dan memperpanjang infeksi jamur.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang menimbulkan banyak keringat atau bekerja di lingkungan panas dan lembap, penggunaan pakaian ketat berbahan sintetis, kebiasaan mandi dan mengganti pakaian setelah berkeringat, kebiasaan BERBAGI HANDUK dan pakaian, kepadatan hunian, olahraga kontak dan penggunaan fasilitas umum seperti kolam renang serta ruang ganti, kepemilikan hewan peliharaan, dan kemampuan membeli obat untuk pemakaian beberapa minggu.',
+        'Occupation yang menimbulkan banyak keringat atau bekerja di lingkungan panas dan lembap, penggunaan pakaian ketat berbahan sintetis, kebiasaan mandi dan mengganti pakaian setelah berkeringat, kebiasaan BERBAGI HANDUK dan pakaian, kepadatan hunian, olahraga kontak dan penggunaan fasilitas umum seperti kolam renang serta ruang ganti, kepemilikan hewan peliharaan, dan kemampuan membeli obat untuk pemakaian beberapa minggu.',
     },
     pemeriksaanFisik: [
       'Tanda vital; umumnya normal pada tinea korporis tanpa komplikasi',
@@ -9104,7 +9104,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Krim yang sudah dipakai, khususnya kortikosteroid topikal dan krim kombinasi yang menyamarkan gambaran; pelembap dan obat racikan.',
       riwayatAlergi: 'History alergi obat dan alergi kontak yang relevan untuk banding dermatitis kontak.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan paparan tangan terhadap air maupun bahan kimia untuk membedakan dari dermatitis kontak iritan, kebiasaan menggaruk kaki dengan tangan yang menjelaskan penularan, pemakaian sarung tangan, serta kebiasaan berjalan tanpa alas kaki di tempat umum yang lembap.',
+        'Occupation dan paparan tangan terhadap air maupun bahan kimia untuk membedakan dari dermatitis kontak iritan, kebiasaan menggaruk kaki dengan tangan yang menjelaskan penularan, pemakaian sarung tangan, serta kebiasaan berjalan tanpa alas kaki di tempat umum yang lembap.',
     },
     pemeriksaanFisik: [
       'PERIKSA KEDUA TANGAN DAN KEDUA KAKI SEKALIGUS — menemukan pola dua kaki satu tangan hampir memastikan diagnosis dan merupakan pemeriksaan yang tidak boleh dilewatkan',
@@ -9136,7 +9136,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Diabetes melitus dan keadaan imunitas menurun',
       'Pemakaian kortikosteroid topikal pada tangan',
       'Berjalan tanpa alas kaki di tempat umum yang lembap',
-      'Pekerjaan dengan tangan sering basah',
+      'Occupation dengan tangan sering basah',
     ],
     goldStandard:
       'Diagnosis ditegakkan dari gambaran klinis berupa penebalan dan sisik halus pada telapak tangan yang mengenai satu sisi, terlebih bila ditemukan pola dua kaki satu tangan, dan dipastikan dengan kerokan kulit menggunakan larutan KOH yang memperlihatkan hifa bersepta bercabang. Pemeriksaan kuku merupakan bagian dari penegakan diagnosis, sebab tinea unguium yang menyertai menentukan lama dan jenis pengobatan.',
@@ -9211,7 +9211,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Antijamur yang pernah dipakai beserta lama dan cara pemakaiannya — kegagalan sebelumnya paling sering karena lama terapi yang kurang. Obat imunosupresan dan kortikosteroid. Tanyakan pula pemakaian cat kuku dan kuku palsu.',
       riwayatAlergi: 'History alergi obat, terutama antijamur sistemik.',
       riwayatSosialEkonomi:
-        'Pekerjaan dengan sepatu tertutup sepanjang hari maupun sepatu bot, olahraga yang membuat kaki lembap, kebiasaan berjalan tanpa alas kaki di tempat umum, kunjungan ke salon kuku dengan alat yang dipakai bersama, serta KEMAMPUAN MENJALANI PENGOBATAN BERBULAN-BULAN yang menentukan keberhasilan.',
+        'Occupation dengan sepatu tertutup sepanjang hari maupun sepatu bot, olahraga yang membuat kaki lembap, kebiasaan berjalan tanpa alas kaki di tempat umum, kunjungan ke salon kuku dengan alat yang dipakai bersama, serta KEMAMPUAN MENJALANI PENGOBATAN BERBULAN-BULAN yang menentukan keberhasilan.',
     },
     pemeriksaanFisik: [
       'Periksa SELURUH kuku tangan dan kaki, bukan hanya yang dikeluhkan, serta hitung berapa kuku yang terkena dan berapa bagian tiap kuku yang terlibat',
@@ -9324,7 +9324,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatAlergi: 'History alergi obat dan riwayat dermatitis kontak terhadap sabun, deterjen, pelembut pakaian, atau krim tertentu.',
       riwayatNutrisi: 'Status gizi, berat badan, dan pengendalian gula darah pada penyandang diabetes.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang menuntut duduk berjam-jam atau bekerja di lingkungan panas seperti sopir, petugas keamanan, pekerja pabrik, dan tentara; jenis PAKAIAN DALAM yang digunakan (ketat atau longgar, katun atau sintetis) dan frekuensi menggantinya; kebiasaan mandi dan mengeringkan lipatan setelah mandi; kebiasaan mengenakan kembali pakaian yang sudah dipakai; kebiasaan berbagi handuk; penggunaan kamar mandi umum, kolam renang, dan ruang ganti; serta kemampuan membeli obat untuk pemakaian beberapa minggu.',
+        'Occupation yang menuntut duduk berjam-jam atau bekerja di lingkungan panas seperti sopir, petugas keamanan, pekerja pabrik, dan tentara; jenis PAKAIAN DALAM yang digunakan (ketat atau longgar, katun atau sintetis) dan frekuensi menggantinya; kebiasaan mandi dan mengeringkan lipatan setelah mandi; kebiasaan mengenakan kembali pakaian yang sudah dipakai; kebiasaan berbagi handuk; penggunaan kamar mandi umum, kolam renang, dan ruang ganti; serta kemampuan membeli obat untuk pemakaian beberapa minggu.',
     },
     pemeriksaanFisik: [
       'Tanda vital; umumnya normal',
@@ -9363,7 +9363,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebiasaan tidak segera mengganti pakaian yang basah oleh keringat',
       'OBESITAS dengan lipatan kulit yang dalam dan lembap',
       'TINEA PEDIS dan ONIKOMIKOSIS yang tidak diobati — reservoir utama',
-      'Pekerjaan dengan duduk berjam-jam atau di lingkungan panas',
+      'Occupation dengan duduk berjam-jam atau di lingkungan panas',
       'DIABETES MELITUS',
       'Imunokompromais termasuk HIV dan penggunaan kortikosteroid',
       'Berbagi handuk dan pakaian',
@@ -9505,7 +9505,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pemakaian SEPATU TERTUTUP berjam-jam dan kaus kaki yang tidak menyerap keringat',
       'Hiperhidrosis dan kaki yang sering basah',
       'Berjalan TANPA ALAS KAKI di tempat umum yang basah: kamar mandi bersama, kolam renang, ruang ganti, masjid, pesantren, dan asrama',
-      'Pekerjaan yang mengharuskan bersepatu lama: tentara, polisi, petugas keamanan, pekerja pabrik, atlet',
+      'Occupation yang mengharuskan bersepatu lama: tentara, polisi, petugas keamanan, pekerja pabrik, atlet',
       'Iklim panas dan lembap serta musim hujan',
       'ONIKOMIKOSIS yang tidak diobati sebagai reservoir',
       'DIABETES MELITUS — meningkatkan risiko sekaligus mengubah konsekuensinya menjadi jauh lebih berat',
@@ -9614,7 +9614,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatAlergi: 'History alergi obat dan riwayat iritasi terhadap antijamur topikal sebelumnya.',
       riwayatNutrisi: 'Status gizi; malnutrisi merupakan salah satu faktor predisposisi.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang membuat banyak berkeringat atau terpapar panas, kebiasaan berolahraga dan segera tidaknya mandi setelahnya, jenis pakaian yang dipakai sehari-hari, kebiasaan memakai minyak badan, serta kondisi tempat tinggal yang panas dan lembap.',
+        'Occupation yang membuat banyak berkeringat atau terpapar panas, kebiasaan berolahraga dan segera tidaknya mandi setelahnya, jenis pakaian yang dipakai sehari-hari, kebiasaan memakai minyak badan, serta kondisi tempat tinggal yang panas dan lembap.',
     },
     pemeriksaanFisik: [
       'Makula berbatas tegas dengan berbagai ukuran yang dapat menyatu, warnanya bervariasi dari putih, kecoklatan, hingga kemerahan — keragaman warna pada satu pasien inilah asal nama versikolor',
@@ -9714,7 +9714,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatAlergi: 'History alergi obat, terutama antijamur golongan azol.',
       riwayatNutrisi: 'Asupan gula dan status gizi; malnutrisi maupun kekurangan besi dan zink mempermudah kandidiasis.',
       riwayatSosialEkonomi:
-        'Pekerjaan dengan tangan yang sering basah seperti juru masak, pencuci, dan petugas kebersihan; pakaian ketat dan tidak menyerap keringat; kebersihan dan cara mengeringkan lipatan setelah mandi; serta pemakaian popok pada bayi maupun gigi tiruan pada usia lanjut.',
+        'Occupation dengan tangan yang sering basah seperti juru masak, pencuci, dan petugas kebersihan; pakaian ketat dan tidak menyerap keringat; kebersihan dan cara mengeringkan lipatan setelah mandi; serta pemakaian popok pada bayi maupun gigi tiruan pada usia lanjut.',
     },
     pemeriksaanFisik: [
       'Kandidiasis intertriginosa: kemerahan MENYALA dengan permukaan basah dan mengilap, tepi tidak rata, kadang disertai maserasi keputihan',
@@ -9745,7 +9745,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'DIABETES MELITUS yang tidak terkendali',
       'Antibiotik spektrum luas dan kortikosteroid',
       'Keadaan imunitas menurun termasuk infeksi HIV, keganasan, dan kemoterapi',
-      'Pekerjaan dengan tangan sering basah',
+      'Occupation dengan tangan sering basah',
       'Bayi dengan popok dan usia lanjut dengan gigi tiruan',
       'Kehamilan dan pemakaian kontrasepsi hormonal',
       'Malnutrisi serta kekurangan besi dan zink',
@@ -9850,7 +9850,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Berjalan maupun berbaring tanpa alas di pasir pantai dan tanah lembap',
       'Berkebun dan bertani tanpa alas kaki maupun sarung tangan',
       'Anak yang bermain di tanah dan pasir',
-      'Pekerjaan tukang ledeng dan tukang bangunan yang bekerja merangkak di bawah rumah',
+      'Occupation tukang ledeng dan tukang bangunan yang bekerja merangkak di bawah rumah',
       'Lingkungan dengan banyak kucing dan anjing liar yang buang air sembarangan',
       'Iklim tropis dan subtropis yang hangat dan lembap',
       'Bepergian ke daerah pantai tropis',
@@ -10371,7 +10371,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Bahan iritan melarutkan lipid interseluler stratum korneum dan merusak protein sawar kulit, sehingga kehilangan air transepidermal meningkat dan kulit menjadi kering serta lebih mudah ditembus bahan berikutnya. Kerusakan langsung pada keratinosit memicu pelepasan sitokin proinflamasi seperti interleukin-1 alfa dan tumor necrosis factor alfa tanpa memerlukan pengenalan antigen oleh limfosit T. Karena tidak melibatkan mekanisme imun spesifik, tidak ada fase sensitisasi, tidak diperlukan paparan sebelumnya, dan reaksi tetap terbatas pada tempat kontak — inilah dasar mengapa lesi berbatas tegas persis pada area paparan dan tidak menyebar, berbeda dari dermatitis kontak alergika yang dapat meluas melewati area kontak. Paparan berulang sebelum sawar sempat pulih menyebabkan kerusakan menumpuk, sehingga kulit yang semula tahan lama-kelamaan menjadi rentan; hal ini menjelaskan mengapa keluhan sering muncul setelah bertahun-tahun mengerjakan pekerjaan yang sama. Sawar yang sudah rusak juga mempermudah masuknya alergen, sehingga dermatitis kontak alergika kerap berkembang di atas dermatitis iritan yang berlangsung lama.',
     faktorRisiko: [
-      'Pekerjaan dengan tangan basah lebih dari 2 jam per hari atau mencuci tangan lebih dari 20 kali per hari',
+      'Occupation dengan tangan basah lebih dari 2 jam per hari atau mencuci tangan lebih dari 20 kali per hari',
       'History dermatitis atopik — faktor predisposisi individual terkuat',
       'Pemakaian sarung tangan tertutup dalam waktu lama sehingga keringat terperangkap',
       'Paparan semen, pupuk, pelarut, oli, sampo, dan bahan pembersih',
@@ -11159,7 +11159,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Pakaian ketat, tebal, dan tidak menyerap keringat',
       'Berbaring lama pada pasien yang dirawat, sehingga punggung tertekan dan lembap',
       'Pemakaian bedak berlebihan, minyak, losion berminyak, dan salep tebal yang menyumbat',
-      'Pekerjaan di tempat panas seperti dapur, pabrik, dan lapangan',
+      'Occupation di tempat panas seperti dapur, pabrik, dan lapangan',
       'Aktivitas fisik berat dan olahraga di cuaca panas',
     ],
     goldStandard:
@@ -11583,7 +11583,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       riwayatNutrisi:
         'Status gizi dan asupan protein; malnutrisi memperlambat penyembuhan luka secara bermakna.',
       riwayatSosialEkonomi:
-        'Pekerjaan dan aktivitas yang berkaitan dengan mekanisme cedera, kebersihan lingkungan tempat kejadian, kemampuan merawat luka dan datang kontrol, serta — bila keterangan kejadian tidak sesuai dengan pola luka, atau pada anak, lansia, dan perempuan dengan luka berulang — pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+        'Occupation dan aktivitas yang berkaitan dengan mekanisme cedera, kebersihan lingkungan tempat kejadian, kemampuan merawat luka dan datang kontrol, serta — bila keterangan kejadian tidak sesuai dengan pola luka, atau pada anak, lansia, dan perempuan dengan luka berulang — pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
     },
     pemeriksaanFisik: [
       'Nilai jalan napas, pernapasan, dan sirkulasi lebih dulu bila luka besar atau perdarahan banyak; hentikan perdarahan dengan penekanan langsung, bukan dengan torniket sebagai langkah pertama',
@@ -11725,7 +11725,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Anak usia balita — tersering akibat tersiram air atau minyak panas di dapur',
       'Usia lanjut dengan gangguan mobilitas, penglihatan, atau kognitif',
       'Epilepsi dan gangguan kesadaran',
-      'Pekerjaan dengan paparan api, uap, bahan kimia, atau listrik',
+      'Occupation dengan paparan api, uap, bahan kimia, atau listrik',
       'Memasak dengan kompor di lantai dan penyimpanan bahan mudah terbakar di dalam rumah',
       'Pengaruh alkohol atau zat yang menurunkan kewaspadaan',
     ],
@@ -11847,7 +11847,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     patofisiologi:
       'Benda asing yang masuk umumnya terperangkap pada konjungtiva tarsal kelopak atas atau pada forniks, karena kedua tempat itu merupakan cekungan alami tempat partikel tertahan saat mata berkedip. Setiap kedipan menyeret benda tersebut melintasi permukaan kornea, sehingga menimbulkan goresan epitel berulang yang khasnya berbentuk garis-garis lurus sejajar mengikuti arah gerakan kelopak — inilah dasar tanda goresan berjajar pada pewarnaan fluoresein, dan mengapa temuan goresan seperti itu harus dianggap sebagai bukti masih adanya benda asing yang belum ditemukan. Kerusakan epitel merangsang ujung saraf kornea yang sangat padat sehingga menimbulkan nyeri hebat dan air mata refleks, serta memicu vasodilatasi pembuluh konjungtiva yang membuat mata merah. Epitel kornea memiliki daya pulih yang cepat dan umumnya menutup dalam 24-48 jam setelah penyebabnya dihilangkan, sehingga keluhan mereda dengan cepat begitu benda dikeluarkan. Benda asing dari logam yang menempel lama melepaskan besi yang teroksidasi dan meninggalkan cincin karat pada jaringan sekitarnya, yang tetap mempertahankan peradangan meski benda utamanya sudah diangkat. Berbeda dari itu, benda berkecepatan tinggi dapat menembus dinding bola mata dan masuk ke dalamnya dengan luka masuk yang sangat kecil dan nyeri yang justru ringan — keadaan yang menipu dan menjadi alasan mekanisme cedera harus selalu ditanyakan.',
     faktorRisiko: [
-      'Pekerjaan menggerinda, mengelas, memalu logam, pertukangan kayu, dan bertani tanpa pelindung mata',
+      'Occupation menggerinda, mengelas, memalu logam, pertukangan kayu, dan bertani tanpa pelindung mata',
       'Berkendara sepeda motor tanpa kaca helm maupun kacamata',
       'Berada di lingkungan berdebu dan berangin',
       'Pemakaian lensa kontak yang mempermudah terperangkapnya partikel',
@@ -11935,7 +11935,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'OBAT PENGENCER DARAH seperti aspirin, klopidogrel, dan warfarin maupun antikoagulan oral baru — sangat sering menjadi penyebab dan mudah terlewat bila tidak ditanyakan langsung. Tanyakan pula obat herbal dan suplemen yang memengaruhi pembekuan.',
       riwayatAlergi: 'History alergi obat.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang melibatkan mengangkat beban berat atau mengedan, riwayat trauma di tempat kerja, kebiasaan menggosok mata, dan pemakaian lensa kontak. Pada anak dengan perdarahan subkonjungtiva berulang tanpa sebab jelas, pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
+        'Occupation yang melibatkan mengangkat beban berat atau mengedan, riwayat trauma di tempat kerja, kebiasaan menggosok mata, dan pemakaian lensa kontak. Pada anak dengan perdarahan subkonjungtiva berulang tanpa sebab jelas, pertimbangkan kemungkinan kekerasan dan tangani sesuai prosedur yang berlaku.',
     },
     pemeriksaanFisik: [
       'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah tanpa kecuali — tajam penglihatan yang normal merupakan salah satu penopang utama diagnosis ini',
@@ -12169,7 +12169,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'Tetes mata yang sudah dipakai beserta lamanya — riwayat pemakaian antibiotik tetes berulang tanpa perbaikan justru mendukung penyebab mekanis. Tanyakan pula riwayat mencabut bulu mata sendiri.',
       riwayatAlergi: 'History alergi obat dan alergi terhadap tetes mata sebelumnya.',
       riwayatSosialEkonomi:
-        'Tempat tinggal di daerah dengan trakoma, ketersediaan air bersih dan kebiasaan mencuci muka, sanitasi lingkungan, pekerjaan yang terpapar debu dan angin, serta kemampuan datang berkala untuk tindakan yang mungkin perlu diulang.',
+        'Residence di daerah dengan trakoma, ketersediaan air bersih dan kebiasaan mencuci muka, sanitasi lingkungan, pekerjaan yang terpapar debu dan angin, serta kemampuan datang berkala untuk tindakan yang mungkin perlu diulang.',
     },
     pemeriksaanFisik: [
       'PERIKSA TAJAM PENGLIHATAN pada setiap mata merah menahun',
@@ -12430,7 +12430,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Usia anak — hampir semua bayi lahir dengan hipermetropia fisiologis yang berkurang seiring pertumbuhan bola mata',
       'Bertambahnya usia yang menurunkan daya akomodasi sehingga hipermetropia tersembunyi menjadi nyata',
       'Bola mata yang lebih kecil karena kelainan bawaan',
-      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan',
+      'Occupation yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan',
     ],
     goldStandard:
       'Diagnosis ditegakkan dengan refraksi sikloplegik, yang merupakan baku emas pada hipermetropia karena akomodasi aktif dapat menyembunyikan sebagian besar derajatnya. Koreksi menggunakan lensa sferis positif dengan prinsip memilih lensa positif terbesar yang masih memberikan tajam penglihatan terbaik, sebab tujuannya membebaskan mata dari akomodasi berlebih — berlawanan dengan prinsip pada miopia.',
@@ -12726,7 +12726,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Hipermetropia yang belum terkoreksi, yang memunculkan presbiopia lebih dini',
       'Diabetes melitus dan penyakit kardiovaskular',
       'Obat antikolinergik, antidepresan, dan antihistamin',
-      'Pekerjaan yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan lebih cepat disadari',
+      'Occupation yang menuntut penglihatan dekat berkepanjangan sebagai faktor yang memunculkan keluhan lebih cepat disadari',
       'Tinggal di daerah beriklim panas dilaporkan berkaitan dengan awitan yang lebih dini',
     ],
     goldStandard:
@@ -15699,7 +15699,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
         'ANTIJAMUR YANG SUDAH DIPAKAI BESERTA LAMANYA — tidak membaiknya lesi dengan antijamur yang dipakai benar merupakan petunjuk kuat bahwa penyebabnya bukan jamur. Tanyakan pula krim kortikosteroid dan krim racikan.',
       riwayatAlergi: 'History alergi obat, terutama makrolid dan antibiotik topikal.',
       riwayatSosialEkonomi:
-        'Pekerjaan yang panas dan membuat banyak berkeringat, pakaian ketat dan berlapis, kebiasaan mandi dan mengeringkan lipatan setelah mandi, kondisi hunian yang lembap, serta berat badan dan aktivitas fisik.',
+        'Occupation yang panas dan membuat banyak berkeringat, pakaian ketat dan berlapis, kebiasaan mandi dan mengeringkan lipatan setelah mandi, kondisi hunian yang lembap, serta berat badan dan aktivitas fisik.',
     },
     pemeriksaanFisik: [
       'Bercak berwarna coklat kemerahan sampai coklat, BERBATAS TEGAS, dengan tepi rata yang TIDAK MENINGGI dan TIDAK ADA TEPI AKTIF — berbeda tegas dari tinea kruris yang tepinya meninggi dan aktif dengan bagian tengah lebih tenang',
@@ -15730,7 +15730,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
       'Kebersihan yang terbatas dan pakaian ketat yang tidak menyerap keringat',
       'Keadaan imunitas menurun',
       'Usia lanjut',
-      'Pekerjaan di tempat panas dan aktivitas yang membuat banyak berkeringat',
+      'Occupation di tempat panas dan aktivitas yang membuat banyak berkeringat',
     ],
     goldStandard:
       'Diagnosis ditegakkan dari bercak kecoklatan berbatas tegas dengan sisik halus pada daerah lipatan tanpa tepi aktif, dan dipastikan dengan pemeriksaan lampu Wood yang memperlihatkan fluoresensi merah bata. Pemeriksaan larutan KOH dikerjakan untuk menyingkirkan jamur. Perlu diingat bahwa fluoresensi dapat negatif palsu bila daerah tersebut baru dibersihkan, sehingga pemeriksaan tidak dilakukan segera setelah mandi.',
