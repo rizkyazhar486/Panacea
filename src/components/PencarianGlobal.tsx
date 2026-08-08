@@ -29,7 +29,7 @@ import type { Role } from '../lib/types'
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface HasilFeatures { to: string; label: string; grup: string; kw?: string }
-interface HasilPeople { id: string; name: string; role: Role; picture?: string }
+interface HasilOrang { id: string; name: string; role: Role; picture?: string }
 
 /** Skor kecocokan: awalan kata lebih tinggi daripada sekadar mengandung. */
 function skor(teks: string, q: string): number {
@@ -45,7 +45,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
   const nav = useNavigate()
   const [q, setQ] = useState('')
   const [katalog, setKatalog] = useState<HasilFeatures[] | null>(null)
-  const [orang, setPeople] = useState<HasilPeople[]>([])
+  const [orang, setOrang] = useState<HasilOrang[]>([])
   const [tagar, setHashtags] = useState<{ tag: string; jumlah: number }[]>([])
   const [sorot, setSorot] = useState(0)
   const kotak = useRef<HTMLInputElement>(null)
@@ -87,9 +87,9 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
   // People: dari server, ditunda agar tiap ketukan tidak jadi satu permintaan.
   useEffect(() => {
     const t = q.trim()
-    if (!buka || !backendEnabled || t.length < 2) { setPeople([]); return }
+    if (!buka || !backendEnabled || t.length < 2) { setOrang([]); return }
     const id = setTimeout(() => {
-      void api.cariOrang(t).then((r) => setPeople(r)).catch(() => setPeople([]))
+      void api.cariOrang(t).then((r) => setOrang(r)).catch(() => setOrang([]))
     }, 250)
     return () => clearTimeout(id)
   }, [q, buka])

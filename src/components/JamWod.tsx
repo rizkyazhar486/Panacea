@@ -29,7 +29,7 @@ interface History { tanggal: string; wod: string; skor: string; ronde: number; d
 
 const KEY_RIWAYAT = 'pmd_wod_riwayat_v1'
 
-function muatHistory(): History[] {
+function muatRiwayat(): History[] {
   try { return JSON.parse(localStorage.getItem(KEY_RIWAYAT) || '[]') as History[] } catch { return [] }
 }
 
@@ -49,7 +49,7 @@ export function JamWod({ nama, setelan, ronde }: {
   const [fase, setFase] = useState<Fase>('siap')
   const [sekarang, setSekarang] = useState(0)      // detik berjalan
   const [catatan, setCatatan] = useState<Catatan[]>([])
-  const [riwayat, setHistory] = useState<History[]>(muatHistory)
+  const [riwayat, setHistory] = useState<History[]>(muatRiwayat)
   const mulaiRef = useRef(0)                        // Date.now() saat mulai/lanjut
   const akumulasiRef = useRef(0)                    // detik sebelum jeda terakhir
 

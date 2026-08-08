@@ -626,7 +626,7 @@ export const ROUTINES: Routine[] = [
 // ─── Dosis mingguan ─────────────────────────────────────────────────────────
 
 export interface DoseResult {
-  perSessionsDetik: number
+  perSesiDetik: number
   perMingguDetik: number
   /** Ambang akumulasi yang berkaitan dengan pertambahan lingkup gerak menetap. */
   targetDetik: number
@@ -647,8 +647,8 @@ export const WEEKLY_TARGET_SEC = 300 // ~5 menit per kelompok otot per minggu
  */
 export function stretchDose(holdSec: number, reps: number, sessionsPerWeek: number): DoseResult | null {
   if (!(holdSec > 0) || !(reps > 0) || !(sessionsPerWeek > 0)) return null
-  const perSessionsDetik = Math.round(holdSec * reps)
-  const perMingguDetik = Math.round(perSessionsDetik * sessionsPerWeek)
+  const perSesiDetik = Math.round(holdSec * reps)
+  const perMingguDetik = Math.round(perSesiDetik * sessionsPerWeek)
   const kurangDetik = Math.max(0, WEEKLY_TARGET_SEC - perMingguDetik)
   const cukup = kurangDetik === 0
 
@@ -659,11 +659,11 @@ export function stretchDose(holdSec: number, reps: number, sessionsPerWeek: numb
         ? 'Sudah jauh melewati ambang. Menambah lagi memberi hasil yang semakin kecil — lebih baik alihkan waktunya ke penguatan.'
         : 'Sudah memenuhi ambang. Pertahankan, dan jangan tergoda menambah kedalaman tarikan sebagai gantinya.'
   } else {
-    const tambahSessions = Math.ceil(kurangDetik / Math.max(perSessionsDetik, 1))
-    saran = `Kurang ${Math.round(kurangDetik / 60 * 10) / 10} menit per minggu. Cara termudah menutupnya adalah menambah ${tambahSessions} sesi lagi dalam seminggu, bukan menarik lebih dalam.`
+    const tambahSesi = Math.ceil(kurangDetik / Math.max(perSesiDetik, 1))
+    saran = `Kurang ${Math.round(kurangDetik / 60 * 10) / 10} menit per minggu. Cara termudah menutupnya adalah menambah ${tambahSesi} sesi lagi dalam seminggu, bukan menarik lebih dalam.`
   }
 
-  return { perSessionsDetik, perMingguDetik, targetDetik: WEEKLY_TARGET_SEC, cukup, kurangDetik, saran }
+  return { perSesiDetik, perMingguDetik, targetDetik: WEEKLY_TARGET_SEC, cukup, kurangDetik, saran }
 }
 
 /** Format detik menjadi "3 mnt 30 dtk". */

@@ -601,7 +601,7 @@ function DoseCalculator() {
             />
           </div>
           <div className="flex justify-between text-xs text-slate-500 mt-1">
-            <span>{fmtDur(hasil.perSessionsDetik)} per sesi</span>
+            <span>{fmtDur(hasil.perSesiDetik)} per sesi</span>
             <span>ambang {fmtDur(WEEKLY_TARGET_SEC)}</span>
           </div>
 

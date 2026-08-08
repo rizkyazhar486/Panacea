@@ -1,4 +1,4 @@
-import { trimpSessions, type Sessions, type Konteks } from './trainingPhysiology'
+import { trimpSesi, type Sesi, type Konteks } from './trainingPhysiology'
 import type { ImportedWorkout } from './workoutImport'
 import { kunciHari } from './tanggal'
 
@@ -23,7 +23,7 @@ export { kunciHari }
 // zona, dan target — semuanya dihitung dari sesi nyata.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function sesiDariWorkout(w: ImportedWorkout): Sessions {
+export function sesiDariWorkout(w: ImportedWorkout): Sesi {
   return {
     id: w.id,
     nama: w.nama,
@@ -58,7 +58,7 @@ export interface UpayaRelatif {
 }
 
 export function upayaRelatif(w: ImportedWorkout, k: Konteks): UpayaRelatif {
-  const skor = Math.round(trimpSessions(sesiDariWorkout(w), k) * SKALA_UPAYA)
+  const skor = Math.round(trimpSesi(sesiDariWorkout(w), k) * SKALA_UPAYA)
   const dariDeret = w.hr.length >= 2
   const [label, warna] =
     skor >= 250 ? ['Sangat berat', '#ef4444']
@@ -231,7 +231,7 @@ export function lajuBeban(
     if (d < 28) beban28 += skor
   }
 
-  const umur = hariHistoryLatihan(workouts, sekarang)
+  const umur = hariRiwayatLatihan(workouts, sekarang)
   const cukupData = umur >= 28
   // Pembagi kronis: rata-rata per tujuh hari. Pada riwayat pendek, membagi
   // dengan 28 hari penuh akan mengecilkan pembagi secara palsu dan membuat
@@ -241,7 +241,7 @@ export function lajuBeban(
   const rasio = kronis > 0 ? Math.round((akut / kronis) * 100) / 100 : null
   const naikJarakPct = kmLalu > 0 ? Math.round(((kmIni - kmLalu) / kmLalu) * 100) : null
 
-  const ragu = cukupData ? '' : ` Your history baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
+  const ragu = cukupData ? '' : ` Your history is only ${Math.round(umur)} days long, so the comparison is not yet complete and this figure is still rough.`
 
   let judul: string, arti: string, warna: string
   if (rasio === null) {
@@ -278,7 +278,7 @@ export function lajuBeban(
 }
 
 /** Age riwayat dalam hari: dari sesi paling awal sampai sekarang. */
-export function hariHistoryLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
+export function hariRiwayatLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
   let paling = Infinity
   for (const w of workouts) {
     const t = Date.parse(w.mulai)
@@ -296,7 +296,7 @@ export interface BacaKesegaran {
 /**
  * Membaca angka kesegaran menjadi kalimat.
  *
- * `hariHistory` bukan hiasan. Kebugaran memakai τ 42 hari, kelelahan τ 7 hari,
+ * `hariRiwayat` bukan hiasan. Kebugaran memakai τ 42 hari, kelelahan τ 7 hari,
  * jadi pada awal riwayat kelelahan naik kira-kira enam kali lebih cepat daripada
  * kebugaran. Siapa pun yang baru dua atau tiga pekan berlatih akan menunjukkan
  * kesegaran yang sangat negatif — bukan karena tubuhnya kelelahan, melainkan
@@ -307,11 +307,11 @@ export interface BacaKesegaran {
  * Karena itu selama riwayat lebih pendek dari satu tetapan waktu kebugaran
  * (42 hari), angkanya tetap ditampilkan tetapi tidak dibacakan sebagai vonis.
  */
-export function bacaKesegaran(kesegaran: number, hariHistory?: number): BacaKesegaran {
-  if (hariHistory !== undefined && hariHistory < TAU_KEBUGARAN && kesegaran < -10) {
+export function bacaKesegaran(kesegaran: number, hariRiwayat?: number): BacaKesegaran {
+  if (hariRiwayat !== undefined && hariRiwayat < TAU_KEBUGARAN && kesegaran < -10) {
     return {
       judul: 'Belum bisa dibaca',
-      arti: `Your history baru ${Math.round(hariHistory)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
+      arti: `Your history is only ${Math.round(hariRiwayat)} days long. Fitness is computed with a 42-day time constant, so the number is still filling in and will sit well below fatigue for a while — that is what the start of every history looks like, not a sign that you are worn out. Freshness only becomes trustworthy after roughly six weeks of consistently logged sessions.`,
       warna: '#94a3b8',
     }
   }

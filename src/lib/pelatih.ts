@@ -1,5 +1,5 @@
 import { zoneBreakdown, type ImportedWorkout } from './workoutImport'
-import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, hariHistoryLatihan, kunciHari } from './analisisPro'
+import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, kunciHari } from './analisisPro'
 import type { Konteks } from './trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ import type { Konteks } from './trainingPhysiology'
 //     penggunanya sadar.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type JenisSessions = 'pemulihan' | 'easy' | 'long' | 'tempo' | 'interval' | 'sprint' | 'kekuatan' | 'lainnya'
+export type JenisSesi = 'pemulihan' | 'easy' | 'long' | 'tempo' | 'interval' | 'sprint' | 'kekuatan' | 'lainnya'
 export type Olahraga = 'lari' | 'sepeda' | 'renang' | 'kekuatan' | 'lainnya'
 
 export function olahragaDari(nama: string): Olahraga {
@@ -34,7 +34,7 @@ export function olahragaDari(nama: string): Olahraga {
 }
 
 export interface Klasifikasi {
-  jenis: JenisSessions
+  jenis: JenisSesi
   label: string
   warna: string
   /** Kenapa disimpulkan begitu — supaya bisa dibantah, bukan diterima buta. */
@@ -53,7 +53,7 @@ export interface Klasifikasi {
  * judul akan selalu salah. Sebaran waktu per zona membedakan easy dari tempo
  * dan tempo dari interval — dan durasi memisahkan easy dari long run.
  */
-export function klasifikasiSessions(w: ImportedWorkout, hrMax: number): Klasifikasi {
+export function klasifikasiSesi(w: ImportedWorkout, hrMax: number): Klasifikasi {
   const zona = zoneBreakdown(w.hr, hrMax)
   const total = zona.reduce((a, z) => a + z.menit, 0)
   const bagian = (dari: number, hingga: number) =>
@@ -143,7 +143,7 @@ function fmtPaceSingkat(sec: number): string {
  * yang berubah dibandingkan sesi sejenis sebelumnya.
  */
 export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout[]): Debrief {
-  const kl = klasifikasiSessions(w, k.hrMax)
+  const kl = klasifikasiSesi(w, k.hrMax)
   const u = upayaRelatif(w, k)
   const poin: Debrief['poin'] = []
 
@@ -165,7 +165,7 @@ export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout
   let banding: string | undefined
   const sejenis = riwayat
     .filter((x) => x.id !== w.id && Date.parse(x.mulai) < Date.parse(w.mulai))
-    .filter((x) => klasifikasiSessions(x, k.hrMax).jenis === kl.jenis)
+    .filter((x) => klasifikasiSesi(x, k.hrMax).jenis === kl.jenis)
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
   const lalu = sejenis[0]
   if (lalu && w.paceSec && lalu.paceSec && w.avgHr && lalu.avgHr) {
@@ -194,7 +194,7 @@ export interface SaranBerikutnya {
   judul: string
   isi: string
   kapan: string
-  jenis: JenisSessions
+  jenis: JenisSesi
   warna: string
   /** Dasar keputusannya, terbuka untuk diperiksa. */
   dasar: string
@@ -224,14 +224,14 @@ export function saranBerikutnya(
   }
 
   const jamSejak = (sekarang - Date.parse(terakhir.mulai)) / 3_600_000
-  const kl = klasifikasiSessions(terakhir, k.hrMax)
+  const kl = klasifikasiSesi(terakhir, k.hrMax)
   const ff = kebugaranKesegaran(riwayat, k, 90, sekarang)
   const kini = ff.length ? ff[ff.length - 1] : null
   const segar = kini ? kini.kesegaran : 0
 
   const pekanIni = riwayat.filter((w) => sekarang - Date.parse(w.mulai) < 7 * 86400_000)
   const kerasPekanIni = pekanIni.filter((w) => {
-    const j = klasifikasiSessions(w, k.hrMax).jenis
+    const j = klasifikasiSesi(w, k.hrMax).jenis
     return j === 'interval' || j === 'sprint' || j === 'tempo'
   }).length
 
@@ -297,7 +297,7 @@ export function saranBerikutnya(
 export interface HariJadwal {
   hari: string
   tanggal: string
-  jenis: JenisSessions
+  jenis: JenisSesi
   label: string
   isi: string
   warna: string
@@ -314,7 +314,7 @@ export function jadwalPekan(
   k: Konteks,
   sekarang = Date.now(),
 ): HariJadwal[] {
-  const pola: { jenis: JenisSessions; label: string; isi: string; warna: string }[] = [
+  const pola: { jenis: JenisSesi; label: string; isi: string; warna: string }[] = [
     { jenis: 'easy', label: 'Easy run', isi: '40–50 menit, laju bisa mengobrol', warna: '#34d399' },
     { jenis: 'tempo', label: 'Tempo', isi: '15 menit pemanasan, 20 menit tempo, 10 menit pendinginan', warna: '#fbbf24' },
     { jenis: 'pemulihan', label: 'Pemulihan / libur', isi: 'Walking, mobility, or complete rest', warna: '#94a3b8' },
@@ -414,5 +414,5 @@ export function statusSingkat(riwayat: ImportedWorkout[], k: Konteks, sekarang =
   const ff = kebugaranKesegaran(riwayat, k, 90, sekarang)
   if (!ff.length) return null
   const kini = ff[ff.length - 1]
-  return { ...kini, baca: bacaKesegaran(kini.kesegaran, hariHistoryLatihan(riwayat, sekarang)) }
+  return { ...kini, baca: bacaKesegaran(kini.kesegaran, hariRiwayatLatihan(riwayat, sekarang)) }
 }

@@ -22,7 +22,7 @@
 // di UNAVAILABLE di bagian bawah berkas ini.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface Sessions {
+export interface Sesi {
   id: string
   nama: string
   mulai: string
@@ -56,7 +56,7 @@ export interface Konteks {
  * interval tidak disamakan dengan 30 menit jalan santai — kesalahan yang
  * dilakukan oleh perhitungan berbasis durasi semata.
  */
-export function trimpSessions(sesi: Sessions, k: Konteks): number {
+export function trimpSesi(sesi: Sesi, k: Konteks): number {
   const span = k.hrMax - k.hrRest
   if (!(span > 0)) return 0
 
@@ -109,16 +109,16 @@ export interface BebanRingkas {
   acwrDapatDipercaya: boolean
 }
 
-export interface SessionsTerhitung extends Sessions {
+export interface SesiTerhitung extends Sesi {
   trimp: number
   zona: { z: 1 | 2 | 3 | 4 | 5; menit: number }[]
 }
 
-export function hitungSessions(sesi: Sessions[], k: Konteks): SessionsTerhitung[] {
-  return sesi.map((s) => ({ ...s, trimp: trimpSessions(s, k), zona: zonaMenit(s, k) }))
+export function hitungSesi(sesi: Sesi[], k: Konteks): SesiTerhitung[] {
+  return sesi.map((s) => ({ ...s, trimp: trimpSesi(s, k), zona: zonaMenit(s, k) }))
 }
 
-function zonaMenit(sesi: Sessions, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: number }[] {
+function zonaMenit(sesi: Sesi, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: number }[] {
   const batas: [1 | 2 | 3 | 4 | 5, number, number][] = [
     [1, 0, 0.6], [2, 0.6, 0.7], [3, 0.7, 0.8], [4, 0.8, 0.9], [5, 0.9, 9],
   ]
@@ -136,7 +136,7 @@ function zonaMenit(sesi: Sessions, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: n
   return out.map((o) => ({ ...o, menit: +o.menit.toFixed(1) }))
 }
 
-export function ringkasBeban(sesi: SessionsTerhitung[], sekarang = Date.now()): BebanRingkas {
+export function ringkasBeban(sesi: SesiTerhitung[], sekarang = Date.now()): BebanRingkas {
   const hari = (n: number) => sekarang - n * 86_400_000
   const dalam = (n: number) => sesi.filter((s) => Date.parse(s.mulai) >= hari(n))
 
@@ -147,7 +147,7 @@ export function ringkasBeban(sesi: SessionsTerhitung[], sekarang = Date.now()): 
   const akut = total7 / 7
   const kronis = total28 / 28
 
-  const menitZ = (list: SessionsTerhitung[], zs: number[]) =>
+  const menitZ = (list: SesiTerhitung[], zs: number[]) =>
     list.reduce((a, s) => a + s.zona.filter((z) => zs.includes(z.z)).reduce((b, z) => b + z.menit, 0), 0)
   const semua = menitZ(s28, [1, 2, 3, 4, 5])
 
@@ -261,7 +261,7 @@ export function labelTE(v: number): string {
  * pelari terlatih. Memakai ambang tetap akan menyatakan hal yang sama untuk
  * dua orang yang keadaannya berbeda jauh.
  */
-export function trainingEffect(sesi: SessionsTerhitung, kronisHarian: number): TrainingEffect {
+export function trainingEffect(sesi: SesiTerhitung, kronisHarian: number): TrainingEffect {
   const acuan = Math.max(kronisHarian, 8) // lantai supaya pengguna baru tidak selalu "berlebih"
   const rasio = sesi.trimp / acuan
 
@@ -295,7 +295,7 @@ export interface Pemulihan {
  * mempercepat pemulihan. Yang dimaksud adalah kesiapan untuk sesi KERAS.
  */
 export function waktuPemulihan(
-  sesiTerakhir: SessionsTerhitung | null,
+  sesiTerakhir: SesiTerhitung | null,
   kronisHarian: number,
   opsi: { tidurJam?: number; hrvMs?: number; hrvBaseline?: number; acwr?: number | null } = {},
 ): Pemulihan | null {
@@ -340,7 +340,7 @@ export interface Ambang {
  * dipertahankan — mengikuti gagasan uji lapangan Friel, dengan catatan bahwa
  * ini perkiraan dari data harian, bukan tes khusus.
  */
-export function perkiraanLTHR(sesi: SessionsTerhitung[], hrMax: number): Ambang {
+export function perkiraanLTHR(sesi: SesiTerhitung[], hrMax: number): Ambang {
   let terbaik = 0
   for (const s of sesi) {
     if (s.hr.length < 3) continue
@@ -380,13 +380,13 @@ export interface KondisiPerforma {
  * kebugaran yang paling awal terlihat — jauh lebih cepat berubah daripada
  * VO2max.
  */
-export function kondisiPerforma(sesi: SessionsTerhitung[], sekarang = Date.now()): KondisiPerforma {
-  const ef = (s: SessionsTerhitung) => {
+export function kondisiPerforma(sesi: SesiTerhitung[], sekarang = Date.now()): KondisiPerforma {
+  const ef = (s: SesiTerhitung) => {
     if (!s.jarakKm || !s.avgHr || s.durasiDetik <= 0 || s.avgHr <= 0) return null
     const mPerMenit = (s.jarakKm * 1000) / (s.durasiDetik / 60)
     return mPerMenit / s.avgHr
   }
-  const beri = (list: SessionsTerhitung[]) => list.map(ef).filter((v): v is number => v != null && Number.isFinite(v))
+  const beri = (list: SesiTerhitung[]) => list.map(ef).filter((v): v is number => v != null && Number.isFinite(v))
 
   const urut = [...sesi].sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
   const terbaru = urut[0]
@@ -488,13 +488,13 @@ export function kesiapan(opsi: {
 
 // ── 8. Saran sesi harian ────────────────────────────────────────────────────
 
-export interface SaranSessions {
+export interface SaranSesi {
   judul: string
   rincian: string
   alasan: string
 }
 
-export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: number): SaranSessions {
+export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: number): SaranSesi {
   if (pemulihanSisaJam > 20 || k.skor < 35) {
     return { judul: 'Istirahat atau jalan santai 20-30 menit',
       rincian: 'Jaga denyut di bawah 60% HRmaks. Tidak perlu berlari.',
@@ -535,7 +535,7 @@ export interface Ketahanan {
  * kecepatan — dua hal yang sering tertukar. Orang bisa cepat pada 5 km dan
  * tetap tidak punya ketahanan.
  */
-export function skorKetahanan(sesi: SessionsTerhitung[], sekarang = Date.now()): Ketahanan {
+export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ketahanan {
   const s90 = sesi.filter((s) => Date.parse(s.mulai) >= sekarang - 90 * 86_400_000)
   if (s90.length < 3) {
     return { skor: null, label: 'Belum cukup data', terpanjangKm: null, terpanjangMenit: null,

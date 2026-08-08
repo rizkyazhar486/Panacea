@@ -8,9 +8,9 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
 import {
-  hitungSessions, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
-  perkiraanLTHR, kondisiPerforma, kesiapan, saranSessionsHarian, skorKetahanan,
-  UNAVAILABLE, type Sessions,
+  hitungSesi, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
+  perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
+  UNAVAILABLE, type Sesi,
 } from '../lib/trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,12 +56,12 @@ export function TrainingPhysiology() {
     }
   }, [workouts, demo, vitals])
 
-  const sesi = useMemo<Sessions[]>(() => workouts.map((w) => ({
+  const sesi = useMemo<Sesi[]>(() => workouts.map((w) => ({
     id: w.id, nama: w.nama, mulai: w.mulai, durasiDetik: w.durasi,
     jarakKm: w.jarakKm, avgHr: w.avgHr, maxHr: w.maxHr, hr: w.hr,
   })), [workouts])
 
-  const calc = useMemo(() => hitungSessions(sesi, ctx), [sesi, ctx])
+  const calc = useMemo(() => hitungSesi(sesi, ctx), [sesi, ctx])
   const beban = useMemo(() => ringkasBeban(calc), [calc])
 
   const malamTerakhir = useMemo(
@@ -114,7 +114,7 @@ export function TrainingPhysiology() {
   const lthr = useMemo(() => perkiraanLTHR(calc, ctx.hrMax), [calc, ctx])
   const performa = useMemo(() => kondisiPerforma(calc), [calc])
   const ketahanan = useMemo(() => skorKetahanan(calc), [calc])
-  const saran = useMemo(() => saranSessionsHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
+  const saran = useMemo(() => saranSesiHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
   const teTerbaru = useMemo(() => (terbaru ? trainingEffect(terbaru, beban.kronis) : null), [terbaru, beban])
 
   if (!workouts.length) {

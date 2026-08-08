@@ -11,7 +11,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
-  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariHistoryLatihan, lajuBeban, TIDAK_DIBANGUN,
+  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
 
@@ -75,8 +75,8 @@ export function AnalisisPro() {
   // terhadap tanggal sesi terakhir.
   const ff = useMemo(() => kebugaranKesegaran(workouts, konteks, 120, sekarang), [workouts, konteks, sekarang])
   const kini = ff.length ? ff[ff.length - 1] : null
-  const umurHistory = useMemo(() => hariHistoryLatihan(workouts, sekarang), [workouts, sekarang])
-  const baca = kini ? bacaKesegaran(kini.kesegaran, umurHistory) : null
+  const umurRiwayat = useMemo(() => hariRiwayatLatihan(workouts, sekarang), [workouts, sekarang])
+  const baca = kini ? bacaKesegaran(kini.kesegaran, umurRiwayat) : null
   // Dipasang berdampingan dengan kesegaran karena keduanya menjawab pertanyaan
   // berbeda, dan pada riwayat pendek hanya yang ini yang punya jawaban.
   const laju = useMemo(() => lajuBeban(workouts, konteks, sekarang), [workouts, konteks, sekarang])

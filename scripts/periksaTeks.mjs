@@ -91,6 +91,58 @@ const CAMPUR = /\b(Sessions|Training|Fitness|Summary|History|Result|Settings|Rec
  */
 const IDENT_RUSAK = /\b[a-z][a-zA-Z]*[ \t]+(?:in|Lives|Born)[ \t]*:/
 
+/**
+ * Identifier HIBRIDA: potongan kata Indonesia dan kata Inggris hasil
+ * penggantian massal, tersambung dalam satu nama camelCase.
+ *
+ * Ini kebocoran yang paling sulit dilihat dari semua, dan penjaga ini
+ * ditambahkan setelah ia lolos sekali. Ketika sebuah kata diganti di SELURUH
+ * repositori, nama variabel ikut terganti — dan karena gantinya konsisten,
+ * hasilnya tetap lolos typecheck, tetap lolos build, dan tetap berjalan benar.
+ * Yang rusak hanya bisa dibaca manusia:
+ *
+ *   perSesiDetik      → perSessionsDetik
+ *   hariRiwayatLatihan → hariHistoryLatihan
+ *   JenisSesi         → JenisSessions
+ *   trimpSesi         → trimpSessions
+ *
+ * Tiga belas nama seperti itu hidup berbulan-bulan di dalam repositori tanpa
+ * satu pun alat menyebutnya.
+ *
+ * Cara mengenalinya: sebuah nama ditandai hanya bila ia memuat kata Inggris
+ * pengganti DAN sekaligus potongan kata Indonesia. Nama yang seluruhnya
+ * Inggris (getSleepSessions, WorkoutHistory, matchedPeople) tidak ditandai,
+ * begitu pula yang seluruhnya Indonesia — yang salah adalah campurannya.
+ */
+const KATA_PENGGANTI = ['Sessions', 'History', 'People', 'Occupation', 'Lives', 'Born', 'Verified']
+const POTONGAN_ID = [
+  'hari', 'umur', 'muat', 'jenis', 'klasifikasi', 'per', 'tambah', 'hitung', 'saran',
+  'riwayat', 'simpan', 'baca', 'tulis', 'daftar', 'jumlah', 'total', 'awal', 'akhir',
+  'semua', 'kunci', 'isi', 'cek', 'periksa', 'buat', 'ambil', 'sesi', 'latihan',
+  'harian', 'mingguan', 'detik', 'menit', 'jam', 'kali', 'orang', 'nama', 'tempat',
+  'tanggal', 'waktu', 'beban', 'kesegaran', 'kebugaran', 'kelelahan', 'terhitung',
+  'ringkas', 'putus', 'hasil', 'galat', 'pilih', 'urut', 'cari', 'kirim', 'terima',
+  'batas', 'ambang', 'laju', 'arti', 'catat', 'trimp', 'pelatih', 'gerak', 'tubuh',
+]
+
+/** Pecah camelCase / PascalCase menjadi potongan huruf kecil. */
+function potong(nama) {
+  return nama.replace(/([a-z0-9])([A-Z])/g, '$1 $2').split(/[\s_]+/).map((x) => x.toLowerCase()).filter(Boolean)
+}
+
+function identHibrida(isi) {
+  const keluar = []
+  for (const m of isi.matchAll(/\b[A-Za-z][A-Za-z0-9]{3,}\b/g)) {
+    const nama = m[0]
+    if (!KATA_PENGGANTI.some((k) => nama.includes(k))) continue
+    const bagian = potong(nama)
+    const adaInggris = bagian.some((b) => KATA_PENGGANTI.some((k) => k.toLowerCase() === b))
+    const adaIndonesia = bagian.some((b) => POTONGAN_ID.includes(b))
+    if (adaInggris && adaIndonesia) keluar.push(nama)
+  }
+  return keluar
+}
+
 function berkas() {
   const keluaran = execSync('git ls-files "src/**/*.ts" "src/**/*.tsx"', { encoding: 'utf8' })
   return keluaran.split('\n').filter(Boolean)
@@ -119,6 +171,13 @@ for (const f of berkas()) {
   // 2. Identifier rusak.
   for (const m of isi.matchAll(new RegExp(IDENT_RUSAK, 'g'))) {
     temuan.ident.push(`${f}: ${m[0]}`)
+  }
+  // 2b. Identifier hibrida Indonesia-Inggris. Diperiksa pada berkas MENTAH,
+  //     termasuk komentarnya: nama yang rusak biasanya juga tersalin ke dalam
+  //     penjelasan di atasnya, dan penjelasan yang menyebut nama yang salah
+  //     ikut menyesatkan pembaca berikutnya.
+  for (const nama of new Set(identHibrida(mentah))) {
+    temuan.ident.push(`${f}: ${nama}`)
   }
 
   // 3. Warna tema gelap di halaman. Komponen bersama dikecualikan karena
