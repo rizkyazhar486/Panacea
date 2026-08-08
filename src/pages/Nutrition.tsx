@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
+import { Ringkas, Poin } from '../components/Ringkas'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
@@ -1801,26 +1802,47 @@ export function Nutrition() {
             </button>
           ))}
         </div>
-        <div className="mt-4 rounded-2xl border border-brand/10 bg-gradient-to-br from-brand-50/70 to-transparent p-5 text-center">
-          <p className="text-[13px] leading-relaxed text-neutral-600">
-            <b className="text-brand-dark">Panaceamed</b> is designed to clinical standards — from supporting elite athletes
-            (<i>Ronaldo, Messi, Mbappé, Kipchoge, Phelps</i>) to caring for critically ill patients
-            (<b>CHF, COPD, Diabetes, Kidney Failure, Cancer</b>, and 15+ chronic conditions). Every recommendation
-            is calculated <b>in real-time</b> from your data.
-          </p>
-          <p className="mt-2 text-xs font-semibold italic text-brand-dark">🌿 May this benefit humanity.</p>
+        {/* Semula satu paragraf padat. Yang perlu dibaca semua orang cuma
+            barisnya; daftar atlet dan penyakitnya hanya menarik bagi yang
+            bertanya "seberapa serius?", jadi ia dipindah ke balik satu ketukan. */}
+        <div className="mt-4">
+          <Ringkas
+            ikon="🌿"
+            judul="Built to clinical standards — calculated live from your data"
+            anak={
+              <div className="space-y-1.5">
+                <Poin ikon="🏅">Tuned on the demands of elite endurance and team sport athletes.</Poin>
+                <Poin ikon="🫀">Covers 15+ chronic conditions, including heart failure, COPD, diabetes, kidney failure, and cancer.</Poin>
+                <Poin ikon="⚡">Every target recalculates as your own numbers change — nothing is a fixed table.</Poin>
+              </div>
+            }
+          />
         </div>
       </Card>
 
       {/* Nutrition Data Sources */}
       <Card className="!p-5">
         <SectionTitle icon={<span className="text-lg">📚</span>} title="Nutrition Data Sources" subtitle="Food composition references underlying the Panaceamed nutrition database" />
-        <ul className="mt-2 space-y-2 text-[12px] leading-relaxed text-neutral-600">
-          <li>• <b>TKPI</b> (Indonesian Food Composition Table), Ministry of Health of the Republic of Indonesia — the primary reference for the nutritional content of traditional/local Indonesian foods.</li>
-          <li>• <b>USDA FoodData Central</b> (U.S. Department of Agriculture) — a supplementary reference for international items or more detailed micronutrient data.</li>
-          <li>• <b>AKG 2019</b> (Indonesian Recommended Dietary Allowance, Ministry of Health Regulation) — the baseline reference for daily needs (protein, fiber, micronutrients) used for the targets/scores on this page.</li>
-        </ul>
-        <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">The nutritional values per 100g in this database are representative estimates per food category (e.g. "Grilled chicken" represents common recipe variations), not laboratory test results for a specific item — recipe variation, portion size, and product brand affect the actual values. For high-precision medical needs (e.g. chronic kidney disease, severe allergies), verify product labels & consult a clinical dietitian.</p>
+        <div className="mt-2 space-y-1.5">
+          <Poin ikon="🇮🇩"><b>TKPI</b> — Indonesian food composition, Ministry of Health. Main source.</Poin>
+          <Poin ikon="🌐"><b>USDA FoodData Central</b> — international items and detailed micronutrients.</Poin>
+          <Poin ikon="🎯"><b>AKG 2019</b> — the daily targets and scores on this page.</Poin>
+        </div>
+        {/* Peringatan ketelitian tetap ada dan tetap bisa ditemukan, tetapi
+            tidak lagi menjadi dinding teks abu-abu yang dilewati semua orang. */}
+        <div className="mt-3">
+          <Ringkas
+            ikon="⚠️"
+            nada="hati-hati"
+            judul="These are category estimates, not lab results for your exact food"
+            anak={
+              <div className="space-y-1.5">
+                <Poin ikon="🍗">"Grilled chicken" stands for common recipes — your recipe, portion, and brand shift the real numbers.</Poin>
+                <Poin ikon="🩺">If precision matters medically — kidney disease, severe allergies — read the product label and ask a clinical dietitian.</Poin>
+              </div>
+            }
+          />
+        </div>
       </Card>
     </div>
   )

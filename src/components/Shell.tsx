@@ -294,7 +294,7 @@ export function Shell({ children }: { children: ReactNode }) {
     window.setTimeout(() => setSedangSegar(false), 600)
   }, [])
 
-  const tarikan = useGestur({
+  const { tarikan, geser, menggeser } = useGestur({
     onKembali: kembali, onLanjut: lanjut, onSegarkan: segarkan,
     mati: cariBuka || menuOpen,
   })
@@ -639,12 +639,18 @@ export function Shell({ children }: { children: ReactNode }) {
         {/* Umpan balik tarikan: tanpa ini gestur terasa seperti tidak terjadi
             apa-apa sampai tiba-tiba halaman berkedip. */}
         {(tarikan > 0 || sedangSegar) && (
-          <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center pt-2" aria-hidden="true">
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center" aria-hidden="true">
             <span
               className="grid h-9 w-9 place-items-center rounded-full bg-white text-brand-dark shadow-lg"
               style={{
-                opacity: sedangSegar ? 1 : tarikan,
-                transform: `scale(${sedangSegar ? 1 : 0.6 + tarikan * 0.4}) rotate(${tarikan * 300}deg)`,
+                opacity: sedangSegar ? 1 : Math.min(1, tarikan * 1.4),
+                // Ikut turun bersama tarikan, bukan diam di tempat: penanda yang
+                // tidak ikut bergerak terasa terlepas dari gerakan jari.
+                transform: `translate3d(0,${sedangSegar ? 44 : 8 + tarikan * 36}px,0) scale(${
+                  sedangSegar ? 1 : 0.7 + tarikan * 0.3}) rotate(${tarikan * 300}deg)`,
+                transition: sedangSegar
+                  ? 'transform 0.5s cubic-bezier(0.32,0.72,0,1), opacity 0.3s ease'
+                  : 'none',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
@@ -656,7 +662,15 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         )}
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
+        {/* Isi halaman mengikuti jari saat digeser, lalu memantul pulih. Kelas
+            transisi hanya dipasang SETELAH jari diangkat — bila dipasang selagi
+            menggeser, gerakannya tertinggal di belakang jari dan justru terasa
+            berat. */}
+        <main
+          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6 ${
+            menggeser ? 'geser-ikut' : 'geser-pulih'}`}
+          style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
+        >
           {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
             <div className="mb-5 hidden lg:block">

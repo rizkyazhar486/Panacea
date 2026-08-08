@@ -47,9 +47,27 @@ export interface OpsiGestur {
   mati?: boolean
 }
 
-/** Seberapa jauh tarikan segarkan sudah berjalan, 0–1, untuk umpan balik visual. */
-export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur) {
+export interface KeadaanGestur {
+  /** Kemajuan tarikan segarkan, 0–1. */
+  tarikan: number
+  /** Pergeseran mendatar yang sedang berlangsung, dalam piksel. */
+  geser: number
+  /** Sedang menggeser mendatar — dipakai mematikan transisi agar tidak tertinggal. */
+  menggeser: boolean
+}
+
+/**
+ * Gestur berikut keadaan langsungnya.
+ *
+ * Nilai `geser` ada supaya halaman bisa MENGIKUTI JARI, bukan melompat setelah
+ * jari diangkat. Perbedaannya besar: gestur tanpa umpan balik langsung terasa
+ * seperti tombol yang kadang tidak berfungsi, karena tidak ada yang memberi
+ * tahu bahwa gestur sedang dikenali dan seberapa jauh lagi harus digeser.
+ */
+export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur): KeadaanGestur {
   const [tarikan, setTarikan] = useState(0)
+  const [geser, setGeser] = useState(0)
+  const [menggeser, setMenggeser] = useState(false)
   // Callback disimpan di ref agar pendengar tidak perlu dipasang ulang tiap
   // render — memasang ulang listener sentuh di tengah gestur membatalkannya.
   const cb = useRef({ onKembali, onLanjut, onSegarkan })
@@ -74,7 +92,7 @@ export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur)
 
     const gerak = (e: TouchEvent) => {
       if (!aktif) return
-      if (e.touches.length !== 1) { aktif = false; setTarikan(0); return }
+      if (e.touches.length !== 1) { aktif = false; setTarikan(0); setGeser(0); setMenggeser(false); return }
       const t = e.touches[0]
       const dx = t.clientX - x0
       const dy = t.clientY - y0
@@ -97,7 +115,20 @@ export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur)
       }
 
       if (mode === 'segarkan') {
-        setTarikan(Math.min(1, Math.abs(dy) / JARAK_SEGARKAN))
+        // Akar kuadrat memberi rasa lawan yang meningkat: awalnya mengikuti
+        // jari, makin jauh makin berat. Gerak linier terasa seperti benda
+        // tanpa massa yang tergelincir.
+        setTarikan(Math.min(1, Math.sqrt(Math.abs(dy) / JARAK_SEGARKAN)))
+      } else if (mode === 'kembali' || mode === 'lanjut') {
+        setMenggeser(true)
+        // Digeret dengan peredam: melebihi ambang, tambahannya makin kecil,
+        // sehingga halaman tidak pernah terlepas jauh dari tepinya.
+        const arah = Math.sign(dx)
+        const jauh = Math.abs(dx)
+        const teredam = jauh <= JARAK_PINDAH
+          ? jauh
+          : JARAK_PINDAH + Math.sqrt(jauh - JARAK_PINDAH) * 6
+        setGeser(arah * Math.min(teredam, JARAK_PINDAH * 1.8))
       }
     }
 
@@ -112,11 +143,15 @@ export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur)
       else if (mode === 'lanjut' && dx >= JARAK_PINDAH) cb.current.onLanjut?.()
       else if (mode === 'segarkan' && Math.abs(dy) >= JARAK_SEGARKAN) cb.current.onSegarkan?.()
 
+      // Dikembalikan ke nol SETELAH menggeser dimatikan, sehingga kelas transisi
+      // sempat terpasang dan halaman memantul pulih alih-alih menghilang.
+      setMenggeser(false)
+      setGeser(0)
       setTarikan(0)
       mode = 'belum'
     }
 
-    const batal = () => { aktif = false; setTarikan(0) }
+    const batal = () => { aktif = false; setTarikan(0); setGeser(0); setMenggeser(false) }
 
     // passive: pendengar ini tidak pernah memanggil preventDefault, jadi gulir
     // asli peramban tetap berjalan mulus dan tidak ada peringatan konsol.
@@ -133,7 +168,7 @@ export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur)
     }
   }, [mati])
 
-  return tarikan
+  return { tarikan, geser, menggeser }
 }
 
 export default useGestur

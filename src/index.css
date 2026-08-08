@@ -497,9 +497,12 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
     0 1px 2px rgba(12,20,16,0.06),
     0 12px 32px -8px rgba(12,20,16,0.14),
     inset 0 1px 0 rgba(255,255,255,0.85);
+  /* Naik dan turun tidak memakai waktu yang sama. Benda nyata berangkat cepat
+     dan mendarat perlahan; durasi tunggal untuk keduanya adalah penyebab paling
+     umum gerak terasa "seperti animasi" alih-alih seperti benda. */
   transition:
-    transform 0.5s cubic-bezier(0.32,0.72,0,1),
-    box-shadow 0.5s cubic-bezier(0.32,0.72,0,1);
+    transform 0.34s cubic-bezier(0.32,0.72,0,1),
+    box-shadow 0.34s cubic-bezier(0.32,0.72,0,1);
 }
 
 /* Pantulan. pointer-events: none wajib — lapisan ini menutupi seluruh kartu,
@@ -577,6 +580,7 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    seperti benda bermassa, bukan seperti animasi. */
 .kaca-angkat:hover {
   transform: translateY(-2px);
+  transition-duration: 0.42s;
   box-shadow:
     0 1px 2px rgba(12,20,16,0.06),
     0 22px 48px -12px rgba(12,20,16,0.2),
@@ -590,7 +594,7 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 }
 .kaca-tekan:active {
   transform: scale(0.985) translateY(0);
-  transition-duration: 0.12s;
+  transition-duration: 0.1s;
 }
 
 /* Masuk halaman: naik sedikit sambil memburam-tajam, meniru lapisan yang
@@ -618,4 +622,43 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   .kaca, .kaca::before { transition: none; }
   .kaca-angkat:hover, .kaca-tekan:active { transform: none; }
   .page-enter > * { animation: none; }
+}
+
+/* Gulir dengan momentum di iOS, dan lompatan jangkar diperhalus. `smooth` hanya
+   berlaku bagi yang tidak meminta gerak dikurangi — bagi yang meminta, gulir
+   yang bergerak sendiri justru memperparah keluhannya. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+html { -webkit-overflow-scrolling: touch; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Buka-tutup yang halus tanpa mengukur tinggi.
+   Animasi tinggi biasanya menuntut JavaScript mengukur scrollHeight lebih dulu,
+   dan ukuran itu langsung basi begitu isinya berubah atau font selesai dimuat.
+   grid-template-rows dari 0fr ke 1fr membiarkan peramban yang menghitung, jadi
+   isinya boleh setinggi apa pun dan tetap mulus.
+   ───────────────────────────────────────────────────────────────────────── */
+.buka-halus {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.42s cubic-bezier(0.32,0.72,0,1),
+    opacity 0.32s ease;
+  opacity: 0;
+}
+.buka-halus[data-buka='true'] { grid-template-rows: 1fr; opacity: 1; }
+/* Anak wajib overflow hidden, kalau tidak isinya menyembul saat tingginya nol. */
+.buka-halus > * { overflow: hidden; min-height: 0; }
+
+/* Halaman ikut jari saat digeser. Transform dipakai, bukan left/margin, supaya
+   bergerak di compositor dan tidak memicu layout ulang tiap bingkai. */
+.geser-ikut { will-change: transform; }
+.geser-pulih {
+  transition: transform 0.52s cubic-bezier(0.32,0.72,0,1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buka-halus { transition: none; }
+  .geser-pulih { transition: none; }
 }

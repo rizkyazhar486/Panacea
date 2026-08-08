@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp } from '../components/icons'
 import { TOPICS, TIER_LABEL, type Topic, type Tier } from '../lib/learn'
+import { Ringkas, Poin } from '../components/Ringkas'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Learn — the English education section.
@@ -28,22 +29,32 @@ export function Learn() {
       <SectionTitle icon={<IconChartUp />} title="Learn"
         subtitle="Health evidence, with its uncertainty attached" />
 
+      {/* Semula tiga kalimat pengantar plus tiga penjelasan tingkat bukti —
+          sembilan baris sebelum topik pertama terlihat. Sekarang satu baris,
+          dan penjelasannya tersedia bagi yang bertanya. */}
       <Card>
-        <p className="text-[13px] leading-relaxed text-neutral-600">
-          Every claim on these pages is labelled with how good the evidence behind it is, and every
-          claim says what would make it wrong. That second part is the point: knowing why something
-          might be mistaken is what lets you decide for yourself.
+        <p className="text-[13px] font-semibold leading-snug text-ink">
+          Every claim shows how strong its evidence is — and what would make it wrong.
         </p>
-        <div className="mt-3 space-y-2">
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {(Object.keys(TIER_LABEL) as Tier[]).map((t) => (
-            <div key={t} className="flex items-start gap-2">
-              <span className="mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase"
-                style={{ background: `${TIER_LABEL[t].color}22`, color: TIER_LABEL[t].color }}>
-                {TIER_LABEL[t].label}
-              </span>
-              <span className="text-[11px] leading-relaxed text-neutral-500">{TIER_LABEL[t].blurb}</span>
-            </div>
+            <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase"
+              style={{ background: `${TIER_LABEL[t].color}22`, color: TIER_LABEL[t].color }}>
+              {TIER_LABEL[t].label}
+            </span>
           ))}
+        </div>
+        <div className="mt-2.5">
+          <Ringkas ikon="📏" judul="What these labels mean"
+            anak={
+              <div className="space-y-1.5">
+                {(Object.keys(TIER_LABEL) as Tier[]).map((t) => (
+                  <Poin key={t} ikon="•">
+                    <b style={{ color: TIER_LABEL[t].color }}>{TIER_LABEL[t].label}</b> — {TIER_LABEL[t].blurb}
+                  </Poin>
+                ))}
+              </div>
+            } />
         </div>
       </Card>
 
@@ -71,15 +82,31 @@ export function Learn() {
         ))}
       </div>
 
-      <Card>
-        <p className="text-[11px] leading-relaxed text-neutral-400">
-          This is education, not medical advice, and it deliberately contains no doses or protocols.
-          Nothing here is tailored to you — decisions about your own treatment belong with a
-          clinician who can examine you and knows your history.
-        </p>
-      </Card>
+      <Ringkas ikon="ℹ️" judul="Education, not medical advice"
+        anak={
+          <div className="space-y-1.5">
+            <Poin ikon="🚫">No doses and no protocols, on purpose.</Poin>
+            <Poin ikon="👤">Nothing here is tailored to you.</Poin>
+            <Poin ikon="🩺">Treatment decisions belong with a clinician who can examine you.</Poin>
+          </div>
+        } />
     </div>
   )
+}
+
+/**
+ * Kalimat pertama sebuah blok. Dipakai sebagai inti yang berdiri sendiri.
+ *
+ * Pemenggalannya sengaja sederhana dan konservatif: bila kalimat pertama
+ * ternyata sangat panjang, seluruh blok dibiarkan tampil apa adanya. Lebih baik
+ * satu kartu terlihat panjang daripada satu kalimat kesehatan terpotong di
+ * tempat yang mengubah artinya.
+ */
+function inti(teks: string): string {
+  const m = teks.match(/^[\s\S]*?[.!?](?=\s|$)/)
+  const kalimat = m?.[0]?.trim()
+  if (!kalimat || kalimat.length > 220) return teks
+  return kalimat
 }
 
 /** Jumlah bagian per tingkat bukti, untuk lencana ringkas di daftar. */
@@ -122,14 +149,17 @@ function TopicView({ topic, onClose }: { topic: Topic; onClose: () => void }) {
               {TIER_LABEL[s.tier].label}
             </span>
           </div>
-          <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
-          {/* Caveat berada di dalam kartu yang sama, bukan di catatan kaki —
-              lihat catatan di kepala berkas. */}
-          <div className="mt-3 rounded-xl border-l-2 border-amber-500/50 bg-amber-500/5 p-3">
-            <div className="text-[10px] font-black uppercase tracking-wide text-amber-700">
-              What would change this
-            </div>
-            <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{s.caveat}</p>
+          {/* Kalimat pertama berdiri sendiri sebagai inti; sisanya dibuka bila
+              pembaca memang ingin alasannya. Kalimat pertama dipilih, bukan
+              dipotong — teks yang terputus di tengah membuat orang mengarang. */}
+          <p className="mt-2 text-[13px] font-medium leading-relaxed text-ink">{inti(s.body)}</p>
+          <div className="mt-2 space-y-1.5">
+            <Ringkas ikon="📖" judul="Read the full explanation"
+              anak={<p className="leading-relaxed">{s.body}</p>} />
+            {/* Caveat tetap sekali ketuk dari klaimnya, tidak dipindah ke
+                catatan kaki — lihat catatan di kepala berkas. */}
+            <Ringkas ikon="⚠️" nada="hati-hati" judul="What would change this"
+              anak={<p className="leading-relaxed">{s.caveat}</p>} />
           </div>
         </Card>
       ))}
