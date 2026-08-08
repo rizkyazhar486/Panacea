@@ -19,7 +19,7 @@ type Saring = 'semua' | 'belum' | 'sudah'
 function fullTime(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleString('id-ID', {
+  return d.toLocaleString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   })
@@ -32,7 +32,7 @@ function dayLabel(iso: string): string {
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
   if (same(d, now)) return 'Hari ini'
   if (same(d, kemarin)) return 'Kemarin'
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function kategori(n: Notif): { ikon: string; label: string } {

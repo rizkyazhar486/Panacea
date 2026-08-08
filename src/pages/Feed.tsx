@@ -1462,7 +1462,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             {checkedInToday ? '✓ Checked in' : 'Check In Now'}
           </button>
         </div>
-        {/* Riwayat check-in (log) */}
+        {/* History check-in (log) */}
         {myCheckIns.length > 0 && (
           <div className="border-t border-neutral-100 pt-2">
             <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Check-in History ({myCheckIns.length})</div>
@@ -2132,7 +2132,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         })}
       </Card>
 
-      {/* 10. Dashboard Ringkasan Realtime — agregasi semua metrik di atas */}
+      {/* 10. Dashboard Summary Realtime — agregasi semua metrik di atas */}
       <Card className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="text-xs font-black text-ink">📊 Real-Time Summary</div>

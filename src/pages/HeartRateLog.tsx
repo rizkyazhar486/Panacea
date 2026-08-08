@@ -8,7 +8,7 @@ import { getDemo } from '../lib/profile'
 import { hrMaxFromAge } from '../lib/workoutImport'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Log Detak Jantung — setiap sampel yang dikirim jam tangan, bukan hanya nilai
+// Heart Rate Log — setiap sampel yang dikirim jam tangan, bukan hanya nilai
 // terakhirnya.
 //
 // Halaman ini sengaja TIDAK menyebut dirinya monitor real time, karena data
@@ -124,12 +124,12 @@ export function HeartRateLog() {
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconHeart />} title="Log Detak Jantung" />
+        <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
         <Card>
           <p className="text-sm text-slate-300 leading-relaxed">
             Log ini diisi oleh server melalui sinkronisasi otomatis, dan saat ini aplikasi berjalan
-            tanpa server. Riwayat latihan yang Anda unggah sendiri tetap bisa dilihat di{' '}
-            <Link to="/riwayat-latihan" className="font-semibold text-white underline">Riwayat Latihan</Link>.
+            tanpa server. History latihan yang Anda unggah sendiri tetap bisa dilihat di{' '}
+            <Link to="/riwayat-latihan" className="font-semibold text-white underline">History Latihan</Link>.
           </p>
         </Card>
       </div>
@@ -140,12 +140,12 @@ export function HeartRateLog() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconHeart />}
-        title="Log Detak Jantung"
-        subtitle="Setiap sampel yang dikirim jam tangan, bukan hanya nilai terakhirnya"
+        title="Heart Rate Log"
+        subtitle="Every sample your watch sends, not just the latest value"
       />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Sedekat apa ini dengan real time" />
+        <SectionTitle icon={<IconTimer />} title="How close this is to real time" />
         <p className="text-sm text-slate-300 mt-2 leading-relaxed">
           Jujur di depan supaya harapannya tepat: <strong className="text-white">detak jantung per detik
           tidak tersedia</strong>, dan itu bukan batasan Panaceamed melainkan batasan datanya sendiri.
@@ -172,8 +172,8 @@ export function HeartRateLog() {
       <Card>
         <SectionTitle
           icon={<IconActivity />}
-          title="Tiga setelan yang menentukan kerapatan data"
-          subtitle="Ini yang benar-benar mengubah hasilnya — bukan seberapa sering Anda membuka halaman ini"
+          title="Three settings that decide data density"
+          subtitle="This is what actually changes the result — not how often you open this page"
         />
         <div className="mt-2 space-y-2">
           {SETELAN.map((x) => (
@@ -223,7 +223,7 @@ export function HeartRateLog() {
         </div>
         {terakhirCek && (
           <p className="mt-2 text-[11px] text-slate-500">
-            Terakhir diperiksa {new Date(terakhirCek).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            Terakhir diperiksa {new Date(terakhirCek).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             {memuat && ' · memuat…'}
           </p>
         )}
@@ -282,13 +282,13 @@ export function HeartRateLog() {
                   <ReferenceArea y1={hrMax * 0.9} y2={hrMax} fill="#f87171" fillOpacity={0.09} />
                   <XAxis
                     dataKey="t" type="number" domain={['dataMin', 'dataMax']}
-                    tickFormatter={(v) => new Date(v).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    tickFormatter={(v) => new Date(v).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                     tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} minTickGap={40}
                   />
                   <YAxis domain={['dataMin - 6', 'dataMax + 6']} tick={{ fontSize: 9, fill: '#64748b' }} tickLine={false} axisLine={false} width={34} />
                   <Tooltip
                     contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 11 }}
-                    labelFormatter={(v) => new Date(Number(v)).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    labelFormatter={(v) => new Date(Number(v)).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     formatter={(v) => [`${v} bpm`, 'Denyut']}
                   />
                   <Area type="monotone" dataKey="bpm" stroke="#f43f5e" strokeWidth={1.6} fill="url(#hrFill)" dot={false} isAnimationActive={false} />
@@ -303,7 +303,7 @@ export function HeartRateLog() {
               {[...samples].reverse().slice(0, 200).map((s, i) => (
                 <div key={`${s.t}-${s.kind}-${i}`} className="flex items-center gap-2 border-b border-white/5 py-1.5 text-xs last:border-0">
                   <span className="w-28 shrink-0 text-slate-500 tabular-nums">
-                    {new Date(s.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(s.t).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span className="w-14 shrink-0 font-semibold text-white tabular-nums">{s.bpm} bpm</span>
                   {s.lo != null && s.hi != null && (

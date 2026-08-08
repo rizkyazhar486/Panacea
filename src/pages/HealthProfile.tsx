@@ -555,7 +555,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
 
   const fmt = (v: number, satuan: string) => {
     const bulat = Math.abs(v) >= 100 || Number.isInteger(v)
-    return `${bulat ? Math.round(v).toLocaleString('id-ID') : v.toFixed(1)}${satuan ? ' ' + satuan : ''}`
+    return `${bulat ? Math.round(v).toLocaleString('en-GB') : v.toFixed(1)}${satuan ? ' ' + satuan : ''}`
   }
 
   const when = profile.lastDeviceSyncAt ? new Date(profile.lastDeviceSyncAt) : null
@@ -794,7 +794,7 @@ function SyncDiagnosticsCard() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Diagnostik Sinkronisasi"
-        subtitle="Cari tahu mengapa data dari iPhone tidak masuk" />
+        subtitle="Find out why data from your iPhone is not arriving" />
       {!open ? (
         <button onClick={() => setOpen(true)}
           className="mt-3 w-full rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">

@@ -18,7 +18,7 @@ const CAT_LABELS: Record<string, string> = {
   Vitamin: 'Vitamins',
   Topikal: 'Topical',
 }
-const rupiah = (n: number) => `Rp${n.toLocaleString('id-ID')}`
+const rupiah = (n: number) => `Rp${n.toLocaleString('en-GB')}`
 
 export function Pharmacy() {
   const { state, account, addOrder, addProduct, removeProduct } = useStore()
@@ -55,7 +55,7 @@ export function Pharmacy() {
   function checkout() {
     if (count === 0) return
     const names = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find((p) => p.id === id)?.name} ×${qty}`)
-    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} more` : ''}`, detail: `${names.join(', ')} · service Rp${SERVICE_FEE.toLocaleString('id-ID')} · delivery Rp${DELIVERY_FEE.toLocaleString('id-ID')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
+    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} more` : ''}`, detail: `${names.join(', ')} · service Rp${SERVICE_FEE.toLocaleString('en-GB')} · delivery Rp${DELIVERY_FEE.toLocaleString('en-GB')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
     setDone(true); setCart({})
     setTimeout(() => setDone(false), 3500)
   }

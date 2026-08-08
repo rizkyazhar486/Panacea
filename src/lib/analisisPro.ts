@@ -1,4 +1,4 @@
-import { trimpSesi, type Sesi, type Konteks } from './trainingPhysiology'
+import { trimpSessions, type Sessions, type Konteks } from './trainingPhysiology'
 import type { ImportedWorkout } from './workoutImport'
 import { kunciHari } from './tanggal'
 
@@ -23,7 +23,7 @@ export { kunciHari }
 // zona, dan target — semuanya dihitung dari sesi nyata.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function sesiDariWorkout(w: ImportedWorkout): Sesi {
+export function sesiDariWorkout(w: ImportedWorkout): Sessions {
   return {
     id: w.id,
     nama: w.nama,
@@ -41,7 +41,7 @@ export function sesiDariWorkout(w: ImportedWorkout): Sesi {
 /**
  * Satu angka untuk "seberapa berat sesi ini", berbasis denyut.
  *
- * Dasarnya TRIMP Banister yang sudah dipakai di Fisiologi Latihan, diskalakan
+ * Dasarnya TRIMP Banister yang sudah dipakai di Training Physiology, diskalakan
  * agar rentangnya terasa wajar dibaca (sesi mudah sejam ≈ 50). Skala tidak akan
  * sama persis dengan angka Strava — perusahaan itu tidak menerbitkan rumusnya —
  * tetapi urutan dan perbandingan antar sesi Anda tetap sahih, dan itulah yang
@@ -58,7 +58,7 @@ export interface UpayaRelatif {
 }
 
 export function upayaRelatif(w: ImportedWorkout, k: Konteks): UpayaRelatif {
-  const skor = Math.round(trimpSesi(sesiDariWorkout(w), k) * SKALA_UPAYA)
+  const skor = Math.round(trimpSessions(sesiDariWorkout(w), k) * SKALA_UPAYA)
   const dariDeret = w.hr.length >= 2
   const [label, warna] =
     skor >= 250 ? ['Sangat berat', '#ef4444']
@@ -206,7 +206,7 @@ export interface LajuBeban {
   naikJarakPct: number | null
   kmPekanIni: number
   kmPekanLalu: number
-  /** Riwayat sudah mencapai 28 hari sehingga pembagi kronis penuh. */
+  /** History sudah mencapai 28 hari sehingga pembagi kronis penuh. */
   cukupData: boolean
   judul: string
   arti: string
@@ -231,7 +231,7 @@ export function lajuBeban(
     if (d < 28) beban28 += skor
   }
 
-  const umur = hariRiwayatLatihan(workouts, sekarang)
+  const umur = hariHistoryLatihan(workouts, sekarang)
   const cukupData = umur >= 28
   // Pembagi kronis: rata-rata per tujuh hari. Pada riwayat pendek, membagi
   // dengan 28 hari penuh akan mengecilkan pembagi secara palsu dan membuat
@@ -241,7 +241,7 @@ export function lajuBeban(
   const rasio = kronis > 0 ? Math.round((akut / kronis) * 100) / 100 : null
   const naikJarakPct = kmLalu > 0 ? Math.round(((kmIni - kmLalu) / kmLalu) * 100) : null
 
-  const ragu = cukupData ? '' : ` Riwayat Anda baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
+  const ragu = cukupData ? '' : ` History Anda baru ${Math.round(umur)} hari, jadi pembandingnya belum penuh dan angka ini masih kasar.`
 
   let judul: string, arti: string, warna: string
   if (rasio === null) {
@@ -278,7 +278,7 @@ export function lajuBeban(
 }
 
 /** Umur riwayat dalam hari: dari sesi paling awal sampai sekarang. */
-export function hariRiwayatLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
+export function hariHistoryLatihan(workouts: ImportedWorkout[], sekarang = Date.now()): number {
   let paling = Infinity
   for (const w of workouts) {
     const t = Date.parse(w.mulai)
@@ -296,7 +296,7 @@ export interface BacaKesegaran {
 /**
  * Membaca angka kesegaran menjadi kalimat.
  *
- * `hariRiwayat` bukan hiasan. Kebugaran memakai τ 42 hari, kelelahan τ 7 hari,
+ * `hariHistory` bukan hiasan. Kebugaran memakai τ 42 hari, kelelahan τ 7 hari,
  * jadi pada awal riwayat kelelahan naik kira-kira enam kali lebih cepat daripada
  * kebugaran. Siapa pun yang baru dua atau tiga pekan berlatih akan menunjukkan
  * kesegaran yang sangat negatif — bukan karena tubuhnya kelelahan, melainkan
@@ -307,11 +307,11 @@ export interface BacaKesegaran {
  * Karena itu selama riwayat lebih pendek dari satu tetapan waktu kebugaran
  * (42 hari), angkanya tetap ditampilkan tetapi tidak dibacakan sebagai vonis.
  */
-export function bacaKesegaran(kesegaran: number, hariRiwayat?: number): BacaKesegaran {
-  if (hariRiwayat !== undefined && hariRiwayat < TAU_KEBUGARAN && kesegaran < -10) {
+export function bacaKesegaran(kesegaran: number, hariHistory?: number): BacaKesegaran {
+  if (hariHistory !== undefined && hariHistory < TAU_KEBUGARAN && kesegaran < -10) {
     return {
       judul: 'Belum bisa dibaca',
-      arti: `Riwayat Anda baru ${Math.round(hariRiwayat)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
+      arti: `History Anda baru ${Math.round(hariHistory)} hari. Kebugaran dihitung dengan tetapan waktu 42 hari, jadi angkanya masih terus terisi dan wajar tertinggal jauh di bawah kelelahan — ini pola setiap awal riwayat, bukan tanda tubuh Anda kelelahan. Kesegaran mulai bisa dipercaya setelah sekitar enam pekan sesi tercatat rutin.`,
       warna: '#94a3b8',
     }
   }
@@ -407,7 +407,7 @@ export function usahaTerbaik(workouts: ImportedWorkout[]): UsahaTerbaik[] {
   return out
 }
 
-// ── 5. Log Latihan (Training Log) ───────────────────────────────────────────
+// ── 5. Training Log (Training Log) ───────────────────────────────────────────
 
 export interface BarisPeriode {
   kunci: string
@@ -444,7 +444,7 @@ export function logLatihan(
     const kunci = satuan === 'pekan' ? pekanKe(d) : d.toISOString().slice(0, 7)
     const label = satuan === 'pekan'
       ? `Pekan ${kunci.split('-P')[1]} ${kunci.slice(0, 4)}`
-      : d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+      : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
     const b = peta.get(kunci) ?? { kunci, label, sesi: 0, menit: 0, km: 0, kcal: 0, upaya: 0 }
     b.sesi += 1
     b.menit += w.durasi / 60

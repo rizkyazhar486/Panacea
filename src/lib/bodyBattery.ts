@@ -295,7 +295,7 @@ export function hitungStres(samples: HrSample[], istirahat: number, hrMaks: numb
 /** Saran singkat berdasarkan nilai baterai saat ini. */
 export function saranBaterai(nilai: number): { judul: string; isi: string; warna: string } {
   if (nilai >= 75) return { judul: 'Cadangan penuh', isi: 'Ini saat terbaik untuk sesi berat atau hari yang padat.', warna: '#22c55e' }
-  if (nilai >= 50) return { judul: 'Cukup', isi: 'Sesi sedang masih aman. Sisakan ruang bila besok ada rencana berat.', warna: '#84cc16' }
+  if (nilai >= 50) return { judul: 'Cukup', isi: 'Sessions sedang masih aman. Sisakan ruang bila besok ada rencana berat.', warna: '#84cc16' }
   if (nilai >= 25) return { judul: 'Menipis', isi: 'Pilih sesi ringan atau pemulihan. Tidur lebih awal akan terasa besar efeknya.', warna: '#f59e0b' }
   return { judul: 'Hampir habis', isi: 'Tubuh sedang menuntut pemulihan. Hindari sesi berat hari ini.', warna: '#ef4444' }
 }

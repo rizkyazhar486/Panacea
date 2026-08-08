@@ -46,7 +46,7 @@ function dayName(offset: number): string {
   return new Date(Date.now() + offset * DAY_MS).toLocaleDateString('en-US', { weekday: 'long' })
 }
 function fmtFee(rp: number): string {
-  return rp === 0 ? 'Free' : 'Rp' + rp.toLocaleString('id-ID')
+  return rp === 0 ? 'Free' : 'Rp' + rp.toLocaleString('en-GB')
 }
 function icsStamp(d: Date): string {
   return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')

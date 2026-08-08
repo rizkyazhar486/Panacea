@@ -78,7 +78,7 @@ export function Consult() {
       id: uid(),
       to: account?.email ?? '',
       subject: `Consultation scheduled with ${name}`,
-      body: `Your consultation session (Rp${FEE.toLocaleString('id-ID')}, paid via ${pay}) has been scheduled. The session link will be sent before the appointment.`,
+      body: `Your consultation session (Rp${FEE.toLocaleString('en-GB')}, paid via ${pay}) has been scheduled. The session link will be sent before the appointment.`,
       at,
     })
     setDone(name)
@@ -119,7 +119,7 @@ export function Consult() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
-              <b>Rp{AI_FEE.toLocaleString('id-ID')}</b> for the AI consultation — includes referral to a registered specialist.
+              <b>Rp{AI_FEE.toLocaleString('en-GB')}</b> for the AI consultation — includes referral to a registered specialist.
             </div>
             <Button onClick={payAITriage} disabled={!complaint.trim()}>
               <IconCheck size={16} /> Pay & Start AI Triage
@@ -205,7 +205,7 @@ export function Consult() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('id-ID')}<span className="text-xs font-medium text-neutral-400">/session</span></span>
+                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('en-GB')}<span className="text-xs font-medium text-neutral-400">/session</span></span>
                   <div className="flex gap-2">
                     {backendEnabled && (
                       <Button variant="outline" onClick={() => setChatRoom('consult-' + slug(d.name))} disabled={!d.online}>Chat</Button>
@@ -252,8 +252,8 @@ function Sessions() {
         <div key={c.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-sm">
           <span className="font-medium">{c.doctorName}</span>
           <span className="flex items-center gap-2 text-xs text-neutral-500">
-            {new Date(c.at).toLocaleString('id-ID')}
-            <Badge tone="brand">Rp{c.feeIdr.toLocaleString('id-ID')}</Badge>
+            {new Date(c.at).toLocaleString('en-GB')}
+            <Badge tone="brand">Rp{c.feeIdr.toLocaleString('en-GB')}</Badge>
           </span>
         </div>
       ))}

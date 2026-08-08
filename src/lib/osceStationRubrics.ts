@@ -189,7 +189,7 @@ export const OSCE_STATION_RUBRICS: OsceStationRubric[] = [
     standardPatient: {
       nama: '-', usia: '45 tahun', jenisKelamin: 'Laki-laki', pekerjaan: 'Kuli bangunan',
       keluhanUtama: 'Berdebar',
-      riwayatPenyakitSekarang: '2 minggu, berdebar tidak beraturan terus-menerus, diperparah aktivitas dan kopi, mengurang istirahat. Riwayat darah tinggi.',
+      riwayatPenyakitSekarang: '2 minggu, berdebar tidak beraturan terus-menerus, diperparah aktivitas dan kopi, mengurang istirahat. History darah tinggi.',
       peranWajib: 'Posisi duduk, ekspresi cemas.',
     },
     author: 'dr. Anggia Chairuddin Lubis, Teuku Bob Haykal — Kardiologi FK USU',
@@ -322,7 +322,7 @@ export const OSCE_STATION_RUBRICS: OsceStationRubric[] = [
       'Lakukan komunikasi dan edukasi',
     ],
     examinerFindings: {
-      anamnesis: 'Sejak kapan tukak timbul? Nyeri/panas? Riwayat kontak seksual, kapan terakhir, berganti pasangan, pakai kondom? Sudah diobati?',
+      anamnesis: 'Sejak kapan tukak timbul? Nyeri/panas? History kontak seksual, kapan terakhir, berganti pasangan, pakai kondom? Sudah diobati?',
       physicalExam: 'Genitalia: ulkus soliter, pinggir indurasi, dasar bersih, tidak nyeri tekan. KGB inguinal bilateral membesar, tidak nyeri tekan.',
       supportingExam: 'Lapangan gelap: T. pallidum (+). VDRL 1/16, TPHA 1/80.',
       diagnosis: 'Sifilis stadium 1',
@@ -505,7 +505,7 @@ export const OSCE_STATION_RUBRICS: OsceStationRubric[] = [
       'Lakukan edukasi kelanjutan terapi',
     ],
     examinerFindings: {
-      anamnesis: 'Sejak kapan gejala timbul? Mudah marah? Tidur terganggu? Lebih boros? Pernah episode depresi (mengurung diri, menangis)? Riwayat keluarga sama? Zat adiktif? Trauma kepala? Pembedahan? Obat rutin? Alergi?',
+      anamnesis: 'Sejak kapan gejala timbul? Mudah marah? Tidur terganggu? Lebih boros? Pernah episode depresi (mengurung diri, menangis)? History keluarga sama? Zat adiktif? Trauma kepala? Pembedahan? Obat rutin? Alergi?',
       physicalExam: 'Dandanan mencolok berlebihan, hiperaktif, GCS E4V5M6, mood elevated/labil, pembicaraan cepat/produktif, flight of ideas (+), halusinasi dengar (+), waham kebesaran (yakin dirinya artis terkenal), konsentrasi terganggu, pengendalian impuls terganggu, tilikan derajat 1.',
       diagnosis: 'Gangguan afektif bipolar, episode kini manik dengan gejala psikotik',
       differentials: ['Episode manik tanpa gejala psikotik', 'Gangguan Skizoafektif Tipe Manik', 'Skizofrenia Paranoid'],

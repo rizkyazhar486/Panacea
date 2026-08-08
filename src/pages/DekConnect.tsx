@@ -69,7 +69,7 @@ export function DekConnect() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle icon={<IconShield />} title="Connect"
-        subtitle="Berkenalan dengan orang yang sudah diverifikasi, dalam radius yang Anda tentukan" />
+        subtitle="Meet verified people, within a radius you set" />
 
       {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-400">{galat}</p></Card>}
       {muat && <Card><p className="text-[13px] text-slate-400">Memuat…</p></Card>}

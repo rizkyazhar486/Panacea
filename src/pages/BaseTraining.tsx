@@ -12,7 +12,7 @@ import {
 } from '../lib/stretching'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Latihan Dasar — lari, push-up, pull-up, sit-up, dan koreksi postur.
+// Foundation Training — lari, push-up, pull-up, sit-up, dan koreksi postur.
 //
 // Dua hal yang tidak ada di halaman fitness lain: kalkulator pace latihan
 // (supaya orang berhenti menjalankan semua sesi lari sekencang mungkin) dan
@@ -34,7 +34,7 @@ export function BaseTraining() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Latihan Dasar" subtitle="Lari, push-up, pull-up, sit-up, dan koreksi postur" />
+      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Running, push-ups, pull-ups, sit-ups, and posture correction" />
 
       <Card>
         <p className="text-sm text-slate-300 leading-relaxed">
@@ -72,7 +72,7 @@ export function BaseTraining() {
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Aturan yang paling sering dilanggar" />
+        <SectionTitle icon={<IconHeart />} title="The rule broken most often" />
         <div className="space-y-3 mt-2">
           {RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -104,7 +104,7 @@ function RunTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Kalkulator pace latihan" subtitle="Dari pace lomba Anda, hitung pace untuk tiap jenis lari" />
+        <SectionTitle icon={<IconTimer />} title="Training pace calculator" subtitle="From your race pace, work out the pace for each kind of run" />
 
         <div className="flex gap-2 mt-3 mb-3">
           {([['pace', 'Saya tahu pace lomba'], ['waktu', 'Saya tahu waktu lari terakhir']] as ['pace' | 'waktu', string][]).map(([k, l]) => (
@@ -172,7 +172,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Empat jenis lari, empat tujuan berbeda" subtitle="Jangan semua latihan lari sekencang mungkin" />
+        <SectionTitle icon={<IconRun />} title="Empat jenis lari, empat tujuan berbeda" subtitle="Do not run every session as hard as you can" />
         <div className="space-y-3 mt-2">
           {RUN_ZONES.map((z) => (
             <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -193,7 +193,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle title="Tabel pace lengkap" subtitle="Untuk pace lomba 3:00-6:00 per km" />
+        <SectionTitle title="Tabel pace lengkap" subtitle="For race paces of 3:00–6:00 per km" />
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
@@ -290,7 +290,7 @@ function PostureTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Kenapa postur rusak, dan apa yang sebenarnya harus diperbaiki" />
+        <SectionTitle icon={<IconActivity />} title="Why posture breaks down, and what actually needs fixing" />
         <p className="text-sm text-slate-300 mt-2 leading-relaxed">
           Berdiri membungkuk maupun duduk berjam-jam menghasilkan pola yang dapat diprediksi:
           <strong className="text-white"> otot depan memendek dan otot belakang melemah</strong> — dada dan otot leher
@@ -341,7 +341,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Susunan seminggu" subtitle="Menggabungkan lari, kalistenik, dan pemulihan" />
+      <SectionTitle icon={<IconTimer />} title="Susunan seminggu" subtitle="Combining running, calisthenics, and recovery" />
 
       <div className="flex gap-2 mt-3">
         {([3, 4, 5] as const).map((n) => (
@@ -398,7 +398,7 @@ function StretchTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Empat hal yang menentukan peregangan berhasil atau sia-sia" />
+        <SectionTitle icon={<IconActivity />} title="Four things that decide whether stretching works or is wasted" />
         <p className="text-sm text-slate-300 mt-2 leading-relaxed">
           Kesalahan tersering bukan pada memilih gerakan, melainkan pada
           <strong className="text-white"> kapan</strong>,
@@ -421,7 +421,7 @@ function StretchTab() {
       <DoseCalculator />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Rutin siap pakai" subtitle="Empat waktu yang berbeda menuntut jenis peregangan yang berbeda" />
+        <SectionTitle icon={<IconTimer />} title="Rutin siap pakai" subtitle="Four different moments call for different kinds of stretching" />
         <div className="space-y-3 mt-2">
           {ROUTINES.map((r) => (
             <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -445,7 +445,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Per kelompok otot" subtitle="Posisi, di mana seharusnya terasa, dan kesalahan tersering" />
+        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Position, where it should be felt, and the most common mistake" />
 
         <div className="flex flex-wrap gap-2 mt-3">
           {([['semua', 'Semua'], ['atas', 'Tubuh atas'], ['inti', 'Panggul & batang tubuh'], ['bawah', 'Tungkai']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
@@ -529,7 +529,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Berhenti meregang dan periksakan bila ada ini" />
+        <SectionTitle icon={<IconHeart />} title="Stop stretching and get checked if you have these" />
         <p className="text-sm text-slate-400 mt-2 leading-relaxed">
           Tanda-tanda berikut bukan masalah kelenturan. Meregangkannya lebih jauh tidak menolong dan dapat
           memperburuk keadaan.
@@ -554,7 +554,7 @@ function StretchTab() {
 function DoseCalculator() {
   const [hold, setHold] = useState('30')
   const [reps, setReps] = useState('2')
-  const [sesi, setSesi] = useState('3')
+  const [sesi, setSessions] = useState('3')
 
   const hasil = useMemo(
     () => stretchDose(Number(hold), Number(reps), Number(sesi)),
@@ -567,8 +567,8 @@ function DoseCalculator() {
     <Card>
       <SectionTitle
         icon={<IconTimer />}
-        title="Cukupkah dosis peregangan Anda"
-        subtitle="Yang menentukan hasil adalah total waktu per otot per minggu, bukan kedalaman tarikan"
+        title="Is your stretching dose enough"
+        subtitle="What decides the result is total time per muscle per week, not how deep you pull"
       />
 
       <div className="grid grid-cols-3 gap-3 mt-3">
@@ -578,8 +578,8 @@ function DoseCalculator() {
         <Field label="Ulangan">
           <input className={inputClass} value={reps} onChange={(e) => setReps(e.target.value)} inputMode="numeric" />
         </Field>
-        <Field label="Sesi/minggu">
-          <input className={inputClass} value={sesi} onChange={(e) => setSesi(e.target.value)} inputMode="numeric" />
+        <Field label="Sessions/minggu">
+          <input className={inputClass} value={sesi} onChange={(e) => setSessions(e.target.value)} inputMode="numeric" />
         </Field>
       </div>
 
@@ -601,7 +601,7 @@ function DoseCalculator() {
             />
           </div>
           <div className="flex justify-between text-xs text-slate-500 mt-1">
-            <span>{fmtDur(hasil.perSesiDetik)} per sesi</span>
+            <span>{fmtDur(hasil.perSessionsDetik)} per sesi</span>
             <span>ambang {fmtDur(WEEKLY_TARGET_SEC)}</span>
           </div>
 

@@ -100,14 +100,14 @@ function CountryTab() {
 
   const max = Math.max(...rows.map((r) => r.v), 1)
   const fmt = (v: number) =>
-    metric === 'perCapita' ? '$' + Math.round(v).toLocaleString('id-ID')
+    metric === 'perCapita' ? '$' + Math.round(v).toLocaleString('en-GB')
     : metric === 'gdpUsdTn' ? '$' + v.toFixed(1) + ' T'
     : v.toFixed(1) + '%'
 
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Perbandingan negara" subtitle={`Data acuan per ${DATA_AS_OF}`} />
+        <SectionTitle icon={<IconToken size={18} />} title="Perbandingan negara" subtitle={`Reference data as of ${DATA_AS_OF}`} />
         <div className="mt-3 flex flex-wrap gap-1.5">
           <button onClick={() => setBloc(null)}
             className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!bloc ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
@@ -157,7 +157,7 @@ function CountryTab() {
               </div>
               <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-neutral-600 dark:text-neutral-300">
                 <span>PDB: ${c.gdpUsdTn.toFixed(1)} T</span>
-                <span>Per kapita: ${Math.round(gdpPerCapitaUsd(c)).toLocaleString('id-ID')}</span>
+                <span>Per kapita: ${Math.round(gdpPerCapitaUsd(c)).toLocaleString('en-GB')}</span>
                 <span>Inflasi: {c.inflationPct}%</span>
                 <span>Suku bunga: {c.policyRatePct}%</span>
                 <span>Pengangguran: {c.unemploymentPct}%</span>
@@ -182,7 +182,7 @@ function RateTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="Konsekuensi mekanis dari asumsi Anda" />
+        <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="The mechanical consequences of your assumptions" />
         <div className="mt-3 space-y-3">
           <div>
             <div className="text-[12px] font-bold text-ink dark:text-white">Perubahan suku bunga acuan</div>
@@ -344,7 +344,7 @@ function TradeTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Analisis perdagangan" subtitle="Neraca, keterbukaan, dan tafsirannya" />
+        <SectionTitle icon={<IconToken size={18} />} title="Analisis perdagangan" subtitle="Balance sheet, disclosure, and how to read it" />
         <div className="mt-3 grid gap-2">
           <Field label="Ekspor (miliar USD)"><input className={inputClass} inputMode="decimal" value={ex} onChange={(e) => setEx(e.target.value)} /></Field>
           <Field label="Impor (miliar USD)"><input className={inputClass} inputMode="decimal" value={im} onChange={(e) => setIm(e.target.value)} /></Field>

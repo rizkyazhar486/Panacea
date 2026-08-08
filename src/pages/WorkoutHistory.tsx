@@ -15,7 +15,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Riwayat Latihan — sesi nyata beserta deret detak jantung per menit.
+// History Latihan — sesi nyata beserta deret detak jantung per menit.
 //
 // Bagian ekspor Apple Health yang paling berharga dan paling lama terbuang:
 // larik `workouts`. Setiap sesi membawa detak jantung per menit, sehingga
@@ -83,7 +83,7 @@ export function WorkoutHistory() {
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconRun />} title="Riwayat Latihan" subtitle="Sesi nyata beserta detak jantung per menit" />
+        <SectionTitle icon={<IconRun />} title="History Latihan" subtitle="Real sessions with per-minute heart rate" />
         <Card>
           <p className="text-sm text-slate-300 leading-relaxed">
             Belum ada sesi tersimpan. Unggah berkas ekspor Health Auto Export di{' '}
@@ -109,7 +109,7 @@ export function WorkoutHistory() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Riwayat Latihan" subtitle={`${workouts.length} sesi tersimpan · HRmax dipakai ${hrMax} bpm`} />
+      <SectionTitle icon={<IconRun />} title="History Latihan" subtitle={`${workouts.length} sessions stored · HRmax used ${hrMax} bpm`} />
 
       {/* Kolom pelatih ditaruh paling atas: pertanyaan yang dibawa orang saat
           membuka halaman ini adalah "berikutnya apa", bukan "berapa totalnya". */}
@@ -118,7 +118,7 @@ export function WorkoutHistory() {
       {/* Target — dibuat bisa diatur langsung di sini agar perencanaan tidak
           perlu berpindah halaman. */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Untuk perencanaan latihan ke depan" />
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="For planning future training" />
         <div className="mt-3 flex flex-wrap gap-2">
           <select value={target.jenis} onChange={(e) => setTarget({ ...target, jenis: e.target.value as JenisTarget })}
             className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white">
@@ -154,14 +154,14 @@ export function WorkoutHistory() {
 
       {pr.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Waktu tercepat per jarak" />
+          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Fastest time per distance" />
           <div className="mt-3 space-y-1.5">
             {pr.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
                 <div>
                   <div className="text-[13px] font-bold text-white">{p.label}</div>
                   <div className="text-[10px] text-slate-500">
-                    {new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {new Date(p.tanggal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {p.diskalakan && ' · diskalakan'}
                   </div>
                 </div>
@@ -176,9 +176,9 @@ export function WorkoutHistory() {
       )}
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Ringkasan" />
+        <SectionTitle icon={<IconTimer />} title="Summary" />
         <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
-          <Stat label="Sesi" value={String(ringkas.sesi)} />
+          <Stat label="Sessions" value={String(ringkas.sesi)} />
           <Stat label="Total waktu" value={fmtDurasi(ringkas.totalMenit * 60)} />
           <Stat label="Total jarak" value={`${ringkas.totalKm} km`} />
           <Stat label="Total kalori" value={`${ringkas.totalKcal}`} />
@@ -207,7 +207,7 @@ export function WorkoutHistory() {
                 ? 'Sebaran ini sehat: sebagian besar waktu dijalankan pada intensitas yang membangun basis aerobik, sehingga sesi keras yang sedikit itu benar-benar bisa dijalankan keras.'
                 : 'Sebagian besar waktu lari Anda dijalankan di atas zona mudah. Pola ini terasa produktif namun justru yang paling sering membuat kemajuan mandek: terlalu berat untuk pemulihan, terlalu ringan untuk memicu adaptasi kecepatan. Cara memperbaikinya bukan menambah latihan, melainkan MEMPERLAMBAT sebagian besar sesi.'}
               {' '}Kerangka lengkapnya ada di{' '}
-              <Link to="/latihan-dasar" className="font-semibold text-white underline">Latihan Dasar</Link>.
+              <Link to="/latihan-dasar" className="font-semibold text-white underline">Foundation Training</Link>.
             </p>
           </div>
         )}
@@ -216,7 +216,7 @@ export function WorkoutHistory() {
       {notifs.length > 0 && <NotifCard />}
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Sesi" subtitle="Ketuk satu sesi untuk melihat kurva denyut dan sebaran zonanya" />
+        <SectionTitle icon={<IconActivity />} title="Sessions" subtitle="Tap a session to see its heart-rate curve and zone spread" />
         <div className="space-y-2 mt-2">
           {workouts.map((w) => (
             <WorkoutRow key={w.id} w={w} hrMax={hrMax} terbuka={buka === w.id} onToggle={() => setBuka(buka === w.id ? null : w.id)} />
@@ -245,7 +245,7 @@ function NotifCard() {
   const notifs = useMemo(() => getHrNotifications(), [vitals])
   return (
     <Card>
-      <SectionTitle icon={<IconHeart />} title="Peringatan denyut jantung" subtitle={`${notifs.length} kejadian tercatat jam tangan`} />
+      <SectionTitle icon={<IconHeart />} title="Heart rate alerts" subtitle={`${notifs.length} kejadian tercatat jam tangan`} />
       <div className="space-y-2 mt-2">
         {notifs.map((n, i) => {
           const info = NOTIF_INFO[n.jenis]
@@ -258,7 +258,7 @@ function NotifCard() {
                 </span>
               </div>
               <div className="text-xs text-slate-500 mt-0.5">
-                {n.mulai ? new Date(n.mulai).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                {n.mulai ? new Date(n.mulai).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
               </div>
               <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">{info.arti}</p>
               <p className="text-sm text-rose-200/90 mt-1.5 leading-relaxed">
@@ -286,7 +286,7 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
             {w.diDalamRuangan === false && <span className="text-slate-500 font-normal"> · luar ruangan</span>}
           </span>
           <span className="text-xs text-slate-500">
-            {tgl.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })}
+            {tgl.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
           </span>
         </div>
         <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">

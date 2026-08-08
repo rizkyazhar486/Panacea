@@ -97,16 +97,16 @@ const nav: Nav[] = [
   // places at once.
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/pasar', label: 'Data Pasar', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/makro-ekonomi', label: 'Macro Lab (Ekonomi)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/keuangan', label: 'Finance', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/pasar', label: 'Market Data', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/makro-ekonomi', label: 'Macro Lab (Economics)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
-  { to: '/latihan', label: 'Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/tubuh', label: 'Sinyal Tubuh', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/tubuh', label: 'Body Signals', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging — trimmed to the flagship entries; the rest (breathwork,
   // gratitude, sleep debt, thermal therapy, ikigai, life compass, resilience
   // stories, fasting, gene info, aesthetic) live in Wellness Hub, searchable.
@@ -165,9 +165,9 @@ const nav: Nav[] = [
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
   { to: '/learn', label: 'Learn', icon: IconChartUp, roles: ALL, group: 'Account' },
   { to: '/dek-connect', label: 'Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
-  { to: '/verifikasi-connect', label: 'Verifikasi Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
-  { to: '/tinjau-connect', label: 'Tinjauan Connect', icon: IconShield, roles: ['owner'], group: 'Manage' },
-  { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
+  { to: '/verifikasi-connect', label: 'Connect Verification', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
+  { to: '/tinjau-connect', label: 'Connect Review', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/atur-fitur', label: 'Manage Features', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
   { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
 ]
@@ -515,7 +515,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <button
             onClick={() => setCariBuka(true)}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
-            aria-label="Cari fitur, orang, atau tagar"
+            aria-label="Search features, people, or hashtags"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
@@ -747,7 +747,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 { to: '/community', label: 'Community', icon: IconUsers },
                 { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
                 { to: '/health-data', label: 'Health', icon: IconHeart },
-                { to: '/latihan', label: 'Latihan', icon: IconRun },
+                { to: '/latihan', label: 'Training', icon: IconRun },
                 { to: '/sports-scores', label: 'Scores', icon: IconFlame },
                 { to: '/profile', label: 'Profile', icon: IconUser },
               ].map((t) => (

@@ -261,7 +261,7 @@ function demoDraft(ctx: PatientContext): EMRDraft {
     keluhanUtama: 'Nyeri kepala dan mudah lelah sejak 1 minggu (simulasi demo).',
     rps:
       '⚠️ SIMULASI EDUKASI — temuan direkayasa untuk pembelajaran. Pasien mengeluh nyeri kepala (Site: oksipital; Onset: bertahap; Character: tertekan; Radiation: tidak menjalar; Associations: pusing berputar ringan; Time: memberat pagi hari; Exacerbating: aktivitas; Severity: 5/10). Disertai mudah lelah dan tengkuk terasa kaku.',
-    rpd: `Riwayat ${chronic}, kontrol tidak teratur.`,
+    rpd: `History ${chronic}, kontrol tidak teratur.`,
     rpk: 'Ibu dengan hipertensi dan DM tipe 2.',
     riwayatPengobatan: 'Amlodipin 5 mg/hari (sering lupa minum).',
     riwayatAlergi: ctx.patient.allergies.join(', ') || 'Tidak ada alergi diketahui.',

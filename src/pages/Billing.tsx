@@ -63,7 +63,7 @@ export function Billing() {
           <SectionTitle
             icon={<IconWallet size={20} />}
             title="PanaceaToken Wallet"
-            subtitle={`1 PNC = Rp${TOKEN_TO_IDR.toLocaleString('id-ID')}`}
+            subtitle={`1 PNC = Rp${TOKEN_TO_IDR.toLocaleString('en-GB')}`}
           />
           <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-ink p-5 text-white">
             <div>
@@ -74,7 +74,7 @@ export function Billing() {
                 <span className="text-base font-medium text-white/50">PNC</span>
               </div>
               <div className="mt-1 text-sm text-white/60">
-                ≈ Rp{(wallet.balance * TOKEN_TO_IDR).toLocaleString('id-ID')}
+                ≈ Rp{(wallet.balance * TOKEN_TO_IDR).toLocaleString('en-GB')}
               </div>
             </div>
             <IconShield size={40} className="text-white/20" />
@@ -104,7 +104,7 @@ export function Billing() {
                   variant="outline"
                   onClick={() => {
                     const r = withdrawTokens(Number(withdraw) || 0, bank)
-                    setMsg(r.ok ? `Withdrawal of Rp${((withdraw || 0) * TOKEN_TO_IDR).toLocaleString('id-ID')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
+                    setMsg(r.ok ? `Withdrawal of Rp${((withdraw || 0) * TOKEN_TO_IDR).toLocaleString('en-GB')} to ${bank} is being processed.` : r.reason ?? 'Failed.')
                     setTimeout(() => setMsg(''), 2800)
                   }}
                 >
@@ -129,7 +129,7 @@ export function Billing() {
             </div>
             {subscription.since && (
               <div className="text-xs text-neutral-500">
-                since {new Date(subscription.since).toLocaleDateString('id-ID')}
+                since {new Date(subscription.since).toLocaleDateString('en-GB')}
               </div>
             )}
           </div>
@@ -215,7 +215,7 @@ export function Billing() {
               {wallet.transactions.map((t) => (
                 <tr key={t.id} className="border-t border-neutral-100">
                   <td className="py-2.5 pr-4 text-neutral-500">
-                    {new Date(t.at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(t.at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td className="py-2.5 pr-4">
                     <Badge tone={txMeta[t.type].tone}>{txMeta[t.type].label}</Badge>
@@ -382,7 +382,7 @@ function ManualBankTransfer() {
   async function submitManual() {
     if (amount <= 0) { setReqMsg('Enter a PNC amount.'); return }
     if (!proof) { setReqMsg('Upload a photo of the transfer proof first.'); return }
-    const idr = (amount * TOKEN_TO_IDR).toLocaleString('id-ID')
+    const idr = (amount * TOKEN_TO_IDR).toLocaleString('en-GB')
     try {
       const key = 'pm_topup_proofs'
       const list = JSON.parse(localStorage.getItem(key) || '[]')
@@ -428,7 +428,7 @@ function ManualBankTransfer() {
       <div className="mt-3 flex flex-wrap items-end gap-3">
         <div className="w-28"><Field label="Amount (PNC)"><input className={inputClass} type="number" min={1} value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
         <div className="rounded-xl bg-white px-3 py-2 text-sm">
-          Total transfer: <b>Rp{(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}</b>
+          Total transfer: <b>Rp{(amount * TOKEN_TO_IDR).toLocaleString('en-GB')}</b>
         </div>
       </div>
 
@@ -503,7 +503,7 @@ function ProofVerification() {
               </button>
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-bold">{r.amount} PNC <span className="font-normal text-neutral-400">· Rp{r.idr}</span></div>
-                <div className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('id-ID')}</div>
+                <div className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('en-GB')}</div>
               </div>
               {r.status === 'pending' ? (
                 <div className="flex shrink-0 gap-2">
@@ -554,7 +554,7 @@ function BackendWallet() {
       const r = await api.withdraw(amount, bank, accountNumber.trim(), accountHolder.trim())
       setBalance(r.balance)
       syncWalletBalance(r.balance)
-      const idr = `Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')}`
+      const idr = `Rp${(amount * TOKEN_TO_IDR).toLocaleString('en-GB')}`
       setMsg(
         r.payout?.status === 'processed'
           ? `✅ ${idr} is being sent automatically (Iris) to ${bank} a.n. ${accountHolder}. Ref ${r.payout.referenceNo ?? '-'}.`
@@ -593,7 +593,7 @@ function BackendWallet() {
         </div>
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div className="w-28"><Field label="Amount (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
-          <Button variant="outline" onClick={withdraw}>Withdraw Rp{(amount * TOKEN_TO_IDR).toLocaleString('id-ID')} to Bank</Button>
+          <Button variant="outline" onClick={withdraw}>Withdraw Rp{(amount * TOKEN_TO_IDR).toLocaleString('en-GB')} to Bank</Button>
         </div>
         <p className="mt-2 text-[11px] text-neutral-400">Funds are withdrawn to an account in your name. Make sure the details are correct — account errors are not the platform's responsibility.</p>
       </div>

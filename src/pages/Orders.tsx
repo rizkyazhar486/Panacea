@@ -66,7 +66,7 @@ export function Orders() {
   // group by date (yyyy-mm-dd)
   const groups = new Map<string, Order[]>()
   for (const o of filtered) {
-    const d = new Date(o.at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+    const d = new Date(o.at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
     groups.set(d, [...(groups.get(d) ?? []), o])
   }
   const totalByCat = (c: OrderCategory) => state.orders.filter((o) => o.category === c).reduce((a, o) => a + o.amountIdr, 0)
@@ -79,7 +79,7 @@ export function Orders() {
           {(['Obat', 'Konsultasi', 'Langganan', 'Lab'] as OrderCategory[]).map((c) => (
             <div key={c} className="rounded-xl bg-neutral-50 p-3">
               <div className="flex items-center gap-1.5 text-neutral-400">{catIcon[c]}<span className="text-[11px] font-semibold uppercase tracking-wide">{CAT_LABELS[c] ?? c}</span></div>
-              <div className="mt-1 text-lg font-extrabold">Rp{totalByCat(c).toLocaleString('id-ID')}</div>
+              <div className="mt-1 text-lg font-extrabold">Rp{totalByCat(c).toLocaleString('en-GB')}</div>
             </div>
           ))}
         </div>
@@ -106,9 +106,9 @@ export function Orders() {
                       <Badge tone={statusTone[o.status]}>{STATUS_LABELS[o.status] ?? o.status}</Badge>
                     </div>
                     {o.detail && <p className="truncate text-xs text-neutral-500">{o.detail}</p>}
-                    <p className="text-[11px] text-neutral-400">{new Date(o.at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {CAT_LABELS[o.category] ?? o.category}</p>
+                    <p className="text-[11px] text-neutral-400">{new Date(o.at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })} · {CAT_LABELS[o.category] ?? o.category}</p>
                   </div>
-                  <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('id-ID')}</span>
+                  <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('en-GB')}</span>
                 </div>
                 <StatusProgress status={o.status} />
               </Card>

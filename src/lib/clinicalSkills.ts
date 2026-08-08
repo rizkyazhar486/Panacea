@@ -1018,7 +1018,7 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
           '1 — Darah pada meatus uretra',
           '2 — Hematoma perineum berbentuk kupu-kupu',
           '3 — Prostat melayang / tidak teraba pada colok dubur',
-          '4 — Riwayat trauma pelvis',
+          '4 — History trauma pelvis',
         ],
         catatan: 'Bila ada salah satu tanda ini, JANGAN memasang kateter uretra. Lakukan sistostomi suprapubik dan uretrografi retrograd.',
       },
@@ -1065,7 +1065,7 @@ export const CLINICAL_SKILLS: ClinicalSkill[] = [
     ],
     kontraindikasi: [
       'Kandung kemih TIDAK teraba atau tidak penuh — risiko melukai usus; wajib dipastikan dengan palpasi, perkusi, atau USG',
-      'Riwayat operasi abdomen bawah dengan perlengketan (relatif)',
+      'History operasi abdomen bawah dengan perlengketan (relatif)',
       'Koagulopati yang tidak terkoreksi',
       'Kecurigaan keganasan kandung kemih (risiko penyebaran sepanjang jalur tusukan)',
       'Kehamilan (relatif)',

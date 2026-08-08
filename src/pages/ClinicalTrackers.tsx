@@ -35,7 +35,7 @@ export function ClinicalTrackers() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconHeart />} title="Pelacak Klinis"
-        subtitle="Saturasi, EKG, jet lag, kehamilan, dan fisiologi kursi roda" />
+        subtitle="Saturation, ECG, jet lag, pregnancy, and wheelchair physiology" />
 
       <Card>
         <p className="text-sm leading-relaxed text-slate-300">
@@ -97,7 +97,7 @@ function TabSpo2() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Catat bacaan" subtitle="Dari jam tangan, oksimeter jari, atau alat mana pun" />
+        <SectionTitle icon={<IconActivity />} title="Catat bacaan" subtitle="From a watch, a fingertip oximeter, or any device" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="SpO₂ (%)"><input className={inputClass} inputMode="numeric" value={nilai} onChange={(e) => setNilai(e.target.value)} /></Field>
           <Field label="Nadi (opsional)"><input className={inputClass} inputMode="numeric" value={nadi} onChange={(e) => setNadi(e.target.value)} /></Field>
@@ -144,7 +144,7 @@ function TabSpo2() {
       )}
 
       <Card>
-        <SectionTitle title="Sebelum panik: sebab bacaan rendah yang keliru" />
+        <SectionTitle title="Before you panic: reasons a low reading can be wrong" />
         <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
           Alat di jam tangan dan oksimeter jari <strong className="text-white">bukan alat diagnostik</strong>.
           Angka rendah yang berdiri sendiri tanpa gejala paling sering merupakan kesalahan pengukuran.
@@ -188,7 +188,7 @@ function TabEkg() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Catat hasil" />
+        <SectionTitle icon={<IconHeart />} title="Record result" />
         <div className="mt-2 space-y-1.5">
           {(Object.keys(INFO_EKG) as KlasifikasiEkg[]).map((k) => (
             <button key={k} onClick={() => setKlas(k)}
@@ -221,7 +221,7 @@ function TabEkg() {
 
       {list.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconActivity />} title="Riwayat" subtitle={`${ringkas.total} rekaman`} />
+          <SectionTitle icon={<IconActivity />} title="History" subtitle={`${ringkas.total} rekaman`} />
           <p className={`mt-2 rounded-lg border p-3 text-sm leading-relaxed ${ringkas.darurat ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100' : 'border-white/10 bg-white/[0.03] text-slate-300'}`}>
             {ringkas.saran}
           </p>
@@ -231,7 +231,7 @@ function TabEkg() {
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: INFO_EKG[c.klasifikasi].warna }} />
                 <span className="font-semibold text-white">{INFO_EKG[c.klasifikasi].label}</span>
                 {c.nadi && <span className="text-slate-500">{c.nadi} bpm</span>}
-                <span className="text-slate-500">{new Date(c.waktu).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="text-slate-500">{new Date(c.waktu).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                 {c.gejala.length > 0 && <span className="w-full text-slate-400">{c.gejala.join(', ')}</span>}
               </div>
             ))}
@@ -258,7 +258,7 @@ function TabJetLag() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Rencana penyesuaian" />
+        <SectionTitle icon={<IconTimer />} title="Adjustment plan" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="Zona waktu asal (UTC+)"><input className={inputClass} inputMode="numeric" value={asal} onChange={(e) => setAsal(e.target.value)} /></Field>
           <Field label="Zona waktu tujuan (UTC+)"><input className={inputClass} inputMode="numeric" value={tujuan} onChange={(e) => setTujuan(e.target.value)} /></Field>
@@ -271,7 +271,7 @@ function TabJetLag() {
 
       {rencana.langkah.length > 0 && (
         <Card>
-          <SectionTitle title="Langkah harian" />
+          <SectionTitle title="Daily steps" />
           <div className="mt-2 space-y-2">
             {rencana.langkah.map((l) => (
               <div key={l.hari} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -317,7 +317,7 @@ function TabHamil() {
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Stat label="Usia" value={`${status.usiaMinggu}m ${status.usiaHari}h`} />
             <Stat label="Trimester" value={`${status.trimester}`} />
-            <Stat label="Perkiraan lahir" value={new Date(status.perkiraanLahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} />
+            <Stat label="Perkiraan lahir" value={new Date(status.perkiraanLahir).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} />
           </div>
         )}
         {hpht && !status && <p className="mt-2 text-sm text-amber-200/90">Tanggal tidak menghasilkan usia kehamilan yang masuk akal.</p>}
@@ -331,7 +331,7 @@ function TabHamil() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Hentikan aktivitas dan hubungi tenaga kesehatan bila muncul" />
+        <SectionTitle icon={<IconHeart />} title="Stop and contact a clinician if these appear" />
         <ul className="mt-2 space-y-1">
           {panduan.tandaBerhenti.map((t) => (
             <li key={t} className="flex gap-2 text-sm text-rose-100/90"><span className="text-rose-500">•</span><span>{t}</span></li>
@@ -340,7 +340,7 @@ function TabHamil() {
       </Card>
 
       <Card>
-        <SectionTitle title="Keadaan yang membuat olahraga tidak dianjurkan" />
+        <SectionTitle title="Conditions where exercise is not advised" />
         <ul className="mt-2 space-y-1">
           {panduan.kontraindikasiMutlak.map((t) => (
             <li key={t} className="flex gap-2 text-sm text-slate-300"><span className="text-slate-600">•</span><span>{t}</span></li>
@@ -361,7 +361,7 @@ function TabKursiRoda() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Zona mendorong" subtitle="Dihitung dari denyut puncak saat MENDORONG, bukan dari rumus" />
+        <SectionTitle icon={<IconHeart />} title="Zona mendorong" subtitle="Computed from peak heart rate while PUSHING, not from a formula" />
         <div className="mt-2"><Field label="Denyut puncak saat mendorong keras (bpm)"><input className={inputClass} inputMode="numeric" value={puncak} onChange={(e) => setPuncak(e.target.value)} /></Field></div>
         <div className="mt-3 space-y-1.5">
           {panduan.zona.map((z) => (
@@ -389,7 +389,7 @@ function TabKursiRoda() {
       </Card>
 
       <Card>
-        <SectionTitle title="Yang perlu disadari" />
+        <SectionTitle title="What to be aware of" />
         <div className="mt-2 space-y-2">
           {panduan.catatan.map((c, i) => (
             <p key={i} className={`rounded-lg border p-2.5 text-sm leading-relaxed ${/disrefleksia/i.test(c) ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100/90' : 'border-white/10 text-slate-400'}`}>{c}</p>

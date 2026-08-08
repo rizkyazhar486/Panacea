@@ -10,7 +10,7 @@ import { IconActivity, IconChartUp, IconHeart } from '../components/icons'
 // personal data leaves the device. Designed to be screenshot-worthy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('id-ID')
+const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('en-GB')
 
 // ── Smoking cost ─────────────────────────────────────────────────────────────
 function SmokingCard() {

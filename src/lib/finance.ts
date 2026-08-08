@@ -259,5 +259,5 @@ export function project(monthly: number, years: number, annualRatePct: number, s
 
 export function formatIdr(n: number): string {
   if (!Number.isFinite(n)) return '—'
-  return 'Rp ' + Math.round(n).toLocaleString('id-ID')
+  return 'Rp ' + Math.round(n).toLocaleString('en-GB')
 }

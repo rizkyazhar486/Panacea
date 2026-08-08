@@ -54,7 +54,7 @@ export function Peregangan() {
       <SectionTitle
         icon={<IconLeaf />}
         title="Peregangan & Postur"
-        subtitle="Disusun menurut kapan, bukan menurut otot"
+        subtitle="Organised by when, not by muscle"
       />
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}

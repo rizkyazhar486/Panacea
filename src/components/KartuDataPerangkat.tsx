@@ -16,7 +16,7 @@ import { getVitals, vitalsAge, type Vitals } from '../lib/healthVitals'
 
 const BARIS: { kunci: keyof Vitals; label: string; satuan: string; bulat?: boolean }[] = [
   { kunci: 'weightKg', label: 'Berat', satuan: 'kg' },
-  { kunci: 'heightCm', label: 'Tinggi', satuan: 'cm', bulat: true },
+  { kunci: 'heightCm', label: 'Height', satuan: 'cm', bulat: true },
   { kunci: 'restingHr', label: 'Denyut istirahat', satuan: 'bpm', bulat: true },
   { kunci: 'spo2Pct', label: 'SpO₂', satuan: '%', bulat: true },
   { kunci: 'respRate', label: 'Napas', satuan: '/mnt', bulat: true },
@@ -49,7 +49,7 @@ export function KartuDataPerangkat() {
   return (
     <div className="rounded-2xl border border-neutral-100 bg-white p-4 dark:border-white/10 dark:bg-white/5">
       <div className="flex items-baseline justify-between gap-3">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">⌚ Data perangkat Anda</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">⌚ Your device data</div>
         {umur && <div className="text-[10px] text-neutral-400">{umur}</div>}
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">

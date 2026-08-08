@@ -23,13 +23,13 @@ function timeAgo(iso: string): string {
   const h = Math.floor(m / 60)
   if (h < 24) return `${h} jam lalu`
   const d = Math.floor(h / 24)
-  return d < 7 ? `${d} hari lalu` : new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+  return d < 7 ? `${d} hari lalu` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
 function fullTime(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleString('id-ID', {
+  return d.toLocaleString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   })
@@ -41,9 +41,9 @@ function dayLabel(iso: string): string {
   const now = new Date()
   const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString()
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
-  if (sameDay(d, now)) return 'Hari ini'
+  if (sameDay(d, now)) return 'Today'
   if (sameDay(d, kemarin)) return 'Kemarin'
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 /**
@@ -185,15 +185,15 @@ export function NotificationBell() {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {gagal ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-neutral-500">Tidak bisa memuat pemberitahuan.</p>
-              <p className="mt-1 text-[11px] text-neutral-400">Periksa sambungan internet Anda.</p>
+              <p className="text-sm text-neutral-500">Could not load notifications.</p>
+              <p className="mt-1 text-[11px] text-neutral-400">Check your internet connection.</p>
               <button onClick={load} className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
                 Coba lagi
               </button>
             </div>
           ) : items.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-sm text-neutral-500">Belum ada pemberitahuan.</p>
+              <p className="text-sm text-neutral-500">No notifications yet.</p>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
                 Pengingat obat, jadwal konsultasi, dan pembaruan akun akan muncul di sini.
               </p>

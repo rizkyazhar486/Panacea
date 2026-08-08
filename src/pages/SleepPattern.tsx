@@ -5,7 +5,7 @@ import { IconHeart, IconActivity, IconTimer } from '../components/icons'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Pola Tidur — per tahapan, per malam.
+// Sleep Pattern — per tahapan, per malam.
 //
 // Total jam tidur adalah angka yang paling sering dilihat dan paling sedikit
 // artinya. Tujuh jam yang terpecah-pecah dengan tidur dalam nyaris nol tidak
@@ -120,7 +120,7 @@ export function SleepPattern() {
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconTimer />} title="Pola Tidur" />
+        <SectionTitle icon={<IconTimer />} title="Sleep Pattern" />
         <Card>
           <p className="text-sm text-slate-300 leading-relaxed">
             Rincian tidur per tahapan diisi server melalui sinkronisasi otomatis, dan saat ini aplikasi
@@ -135,8 +135,8 @@ export function SleepPattern() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconTimer />}
-        title="Pola Tidur"
-        subtitle="Per tahapan dan per malam, dari Apple Watch melalui sinkronisasi otomatis"
+        title="Sleep Pattern"
+        subtitle="By stage and by night, from Apple Watch via automatic sync"
       />
 
       <Card>
@@ -176,7 +176,7 @@ export function SleepPattern() {
       ) : (
         <>
           <Card>
-            <SectionTitle icon={<IconActivity />} title="Ringkasan" subtitle={`${ringkas!.malam} malam terakhir`} />
+            <SectionTitle icon={<IconActivity />} title="Summary" subtitle={`${ringkas!.malam} malam terakhir`} />
             <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
               <Stat label="Rata-rata tidur" value={fmtDurasi(ringkas!.reratatotal)} />
               <Stat label="Tidur dalam" value={fmtDurasi(ringkas!.rerataDeep)} />
@@ -205,7 +205,7 @@ export function SleepPattern() {
           </Card>
 
           <Card>
-            <SectionTitle title="Per malam" subtitle="Panjang batang sebanding dengan lama tidur" />
+            <SectionTitle title="Per malam" subtitle="Bar length is proportional to time asleep" />
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
               {([['deep', 'Dalam'], ['rem', 'REM'], ['core', 'Inti'], ['awake', 'Terbangun']] as const).map(([k, l]) => (
                 <span key={k} className="flex items-center gap-1.5 text-slate-400">
@@ -230,7 +230,7 @@ export function SleepPattern() {
                   <div key={n.date}>
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <span className="text-xs font-semibold text-white">
-                        {new Date(n.date + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })}
+                        {new Date(n.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                       </span>
                       <span className="text-xs text-slate-400 tabular-nums">
                         {fmtDurasi(n.totalH)}
@@ -245,7 +245,7 @@ export function SleepPattern() {
                           ? stages.map((s) => s.v > 0 && (
                               <div key={s.k} style={{ width: `${(s.v / jumlahStage) * 100}%`, background: WARNA[s.k] }} title={`${s.k} ${fmtDurasi(s.v)}`} />
                             ))
-                          : <div className="w-full bg-slate-600" title="tahapan tidak terekam" />}
+                          : <div className="w-full bg-slate-600" title="stages not recorded" />}
                       </div>
                     </div>
                     {jumlahStage === 0 && (

@@ -225,7 +225,7 @@ export function Readiness() {
       <Field label={
         <span className="flex items-center gap-1">
           <span>{label}</span>
-          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Filled automatically from your device">⌚</span>}
         </span>
       }>
         <div className="flex items-center gap-1"
@@ -235,7 +235,7 @@ export function Readiness() {
             onNilai={(n) => upd({ [key]: n } as Partial<DayLog>)} />
           {perluSimpan && baruDisimpan !== key && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              title="Save this value across the app (or press Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
           )}
           {baruDisimpan === key && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}

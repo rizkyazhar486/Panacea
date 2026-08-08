@@ -31,7 +31,7 @@ export function MultiSport() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Lari, Sepeda, Renang" subtitle="Zona intensitas, kerja kecepatan, dan postur untuk tiga cabang" />
+      <SectionTitle icon={<IconRun />} title="Lari, Sepeda, Renang" subtitle="Intensity zones, speed work, and posture for three sports" />
 
       <Card>
         <p className="text-sm text-slate-300 leading-relaxed">
@@ -130,7 +130,7 @@ function RunTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Zona pace lari" subtitle="Dari pace lomba Anda" />
+      <SectionTitle icon={<IconTimer />} title="Zona pace lari" subtitle="From your race pace" />
       <Field label="Pace lomba (menit:detik per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
@@ -153,7 +153,7 @@ function RunTab() {
       )}
       <p className="text-sm text-slate-400 mt-4 leading-relaxed">
         Untuk penjelasan lengkap tiap jenis lari beserta kesalahan yang paling sering, lihat halaman
-        <strong className="text-white"> Latihan Dasar &amp; Postur</strong>.
+        <strong className="text-white"> Foundation Training &amp; Postur</strong>.
       </p>
     </Card>
   )
@@ -169,7 +169,7 @@ function BikeTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconChartUp />} title="Zona daya sepeda" subtitle="Dari tes 20 menit semaksimal mungkin" />
+        <SectionTitle icon={<IconChartUp />} title="Zona daya sepeda" subtitle="From an all-out 20-minute test" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Daya rata-rata 20 menit (watt)">
@@ -227,7 +227,7 @@ function BikeTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Penyetelan sepeda" subtitle="Angka yang menentukan nyeri lutut, leher, dan punggung" />
+        <SectionTitle icon={<IconActivity />} title="Penyetelan sepeda" subtitle="The numbers behind knee, neck, and back pain" />
         <div className="space-y-2 mt-2">
           {BIKE_FIT.map((f) => (
             <div key={f.bagian} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -278,7 +278,7 @@ function SwimTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="Dari tes 400 m dan 200 m semaksimal mungkin" />
+        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="From all-out 400 m and 200 m tests" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Waktu 400 m (menit:detik)">

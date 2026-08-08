@@ -52,7 +52,7 @@ export function KolomVitalTerikat({
         <span>{label}</span>
         {dariPerangkat && (
           <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark"
-            title="Terisi otomatis dari perangkat">⌚</span>
+            title="Filled automatically from your device">⌚</span>
         )}
       </span>
     }>
@@ -68,7 +68,7 @@ export function KolomVitalTerikat({
         />
         {belumDisimpan && (
           <button type="button" onClick={komit}
-            title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+            title="Save this value across the app (or press Enter)"
             aria-label={`Simpan ${label}`}
             className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
         )}
@@ -110,7 +110,7 @@ export function KolomVital({
         <span>{label}</span>
         {dariPerangkat && (
           <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark"
-            title="Terisi otomatis dari perangkat">⌚</span>
+            title="Filled automatically from your device">⌚</span>
         )}
       </span>
     }>
@@ -126,7 +126,7 @@ export function KolomVital({
         />
         {belumDisimpan && (
           <button type="button" onClick={komit}
-            title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+            title="Save this value across the app (or press Enter)"
             aria-label={`Simpan ${label}`}
             className="shrink-0 rounded-lg bg-brand px-2.5 py-2 text-[12px] font-black text-white">↵</button>
         )}

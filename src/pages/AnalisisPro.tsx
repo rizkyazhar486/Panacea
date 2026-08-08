@@ -11,7 +11,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
-  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariRiwayatLatihan, lajuBeban, TIDAK_DIBANGUN,
+  kemajuanTarget, zonaPace, perkiraanPaceAmbang, hariHistoryLatihan, lajuBeban, TIDAK_DIBANGUN,
   type Target, type JenisTarget, type PeriodeTarget,
 } from '../lib/analisisPro'
 
@@ -75,8 +75,8 @@ export function AnalisisPro() {
   // terhadap tanggal sesi terakhir.
   const ff = useMemo(() => kebugaranKesegaran(workouts, konteks, 120, sekarang), [workouts, konteks, sekarang])
   const kini = ff.length ? ff[ff.length - 1] : null
-  const umurRiwayat = useMemo(() => hariRiwayatLatihan(workouts, sekarang), [workouts, sekarang])
-  const baca = kini ? bacaKesegaran(kini.kesegaran, umurRiwayat) : null
+  const umurHistory = useMemo(() => hariHistoryLatihan(workouts, sekarang), [workouts, sekarang])
+  const baca = kini ? bacaKesegaran(kini.kesegaran, umurHistory) : null
   // Dipasang berdampingan dengan kesegaran karena keduanya menjawab pertanyaan
   // berbeda, dan pada riwayat pendek hanya yang ini yang punya jawaban.
   const laju = useMemo(() => lajuBeban(workouts, konteks, sekarang), [workouts, konteks, sekarang])
@@ -93,14 +93,14 @@ export function AnalisisPro() {
   if (!workouts.length) {
     return (
       <div className="space-y-4 pb-24">
-        <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Kebugaran, kesegaran, upaya relatif, rekor dan target" />
+        <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Fitness, freshness, relative effort, records and targets" />
         <Card>
           <p className="text-sm leading-relaxed text-slate-300">
             Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di
             halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
-            Sesi masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
+            Sessions masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
             <strong className="text-slate-300"> Data Type: Workouts</strong> dengan
             <strong className="text-slate-300"> Date Range: Today</strong>. Periksa di{' '}
             <Link to="/health-data/tutorial" className="font-semibold text-white underline">Diagnosa sinkronisasi</Link>.
@@ -114,13 +114,13 @@ export function AnalisisPro() {
   return (
     <div className="space-y-4 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Analisis Pro"
-        subtitle={`${workouts.length} sesi · HRmax ${konteks.hrMax} · HRistirahat ${konteks.hrRest} bpm`} />
+        subtitle={`${workouts.length} sessions · HRmax ${konteks.hrMax} · Resting HR ${konteks.hrRest} bpm`} />
 
       {/* ── Kebugaran & Kesegaran ── */}
       {kini && baca && (
         <Card>
           <SectionTitle icon={<IconChartUp />} title="Kebugaran & Kesegaran"
-            subtitle="Beban yang mengendap (42 hari) melawan kelelahan yang masih terasa (7 hari)" />
+            subtitle="Load that has settled in (42 days) against fatigue still with you (7 days)" />
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Stat label="Kebugaran" value={String(Math.round(kini.kebugaran))} warna="#60a5fa" />
             <Stat label="Kelelahan" value={String(Math.round(kini.kelelahan))} warna="#f87171" />
@@ -136,12 +136,12 @@ export function AnalisisPro() {
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="tanggal" tick={{ fontSize: 9, fill: '#9ca3af' }} minTickGap={44}
-                  tickFormatter={(v) => new Date(v).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })} />
+                  tickFormatter={(v) => new Date(v).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} />
                 <YAxis tick={{ fontSize: 9, fill: '#9ca3af' }} width={30} />
                 <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10, background: '#0f172a', border: '1px solid #334155', color: '#e2e8f0' }}
                   wrapperStyle={{ outline: 'none' }} isAnimationActive={false}
-                  labelFormatter={(v) => new Date(v as string).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} />
+                  labelFormatter={(v) => new Date(v as string).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} />
                 <Area type="monotone" dataKey="kebugaran" name="Kebugaran" stroke="#60a5fa" strokeWidth={2} fill="url(#fitFill)" dot={false} />
                 <Line type="monotone" dataKey="kelelahan" name="Kelelahan" stroke="#f87171" strokeWidth={1.6} dot={false} />
                 <Line type="monotone" dataKey="kesegaran" name="Kesegaran" stroke="#34d399" strokeWidth={1.6} strokeDasharray="4 3" dot={false} />
@@ -182,7 +182,7 @@ export function AnalisisPro() {
 
       {/* ── Target ── */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Tentukan sendiri, dihitung dari sesi yang benar-benar tercatat" />
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Set your own, computed from sessions actually recorded" />
         <div className="mt-3 flex flex-wrap gap-2">
           <Pilih value={target.jenis} onChange={(v) => setTarget({ ...target, jenis: v as JenisTarget })}
             opsi={[['jarak', 'Jarak'], ['waktu', 'Waktu'], ['sesi', 'Jumlah sesi']]} />
@@ -213,7 +213,7 @@ export function AnalisisPro() {
       {/* ── Upaya relatif ── */}
       <Card>
         <SectionTitle icon={<IconActivity />} title="Upaya Relatif"
-          subtitle="Seberapa berat tiap sesi, dari denyut — bukan dari durasi saja" />
+          subtitle="How hard each session was, from heart rate — not duration alone" />
         <div className="mt-3 space-y-1.5">
           {terbaru.map((w) => {
             const u = upayaRelatif(w, konteks)
@@ -222,7 +222,7 @@ export function AnalisisPro() {
                 <div className="min-w-0">
                   <div className="truncate text-[13px] font-bold text-white">{w.nama}</div>
                   <div className="text-[10px] text-slate-500">
-                    {new Date(w.mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                    {new Date(w.mulai).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                     {' · '}{fmtDurasi(w.durasi)}{w.jarakKm ? ` · ${w.jarakKm} km` : ''}
                     {!u.dariDeret && ' · dari rata-rata'}
                   </div>
@@ -245,14 +245,14 @@ export function AnalisisPro() {
       {/* ── Usaha terbaik ── */}
       {pr.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Waktu tercepat per jarak" />
+          <SectionTitle icon={<IconRun />} title="Usaha Terbaik" subtitle="Fastest time per distance" />
           <div className="mt-3 space-y-1.5">
             {pr.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
                 <div>
                   <div className="text-[13px] font-bold text-white">{p.label}</div>
                   <div className="text-[10px] text-slate-500">
-                    {new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {new Date(p.tanggal).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     {p.diskalakan && ' · diskalakan dari jarak yang tidak persis'}
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export function AnalisisPro() {
       {zp.length > 0 && ambang && (
         <Card>
           <SectionTitle icon={<IconTimer />} title="Zona Pace"
-            subtitle={`Dari pace ambang ${fmtPace(ambang)}/km, jadi zonanya ikut bergeser saat kebugaran berubah`} />
+            subtitle={`From a threshold pace of ${fmtPace(ambang)}/km, so the zones shift as your fitness changes`} />
           <div className="mt-3 space-y-1.5">
             {zp.map((z) => (
               <div key={z.nama} className="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2">
@@ -295,7 +295,7 @@ export function AnalisisPro() {
       {/* ── Log latihan ── */}
       <Card>
         <div className="flex items-start justify-between gap-3">
-          <SectionTitle icon={<IconChartUp />} title="Log Latihan" subtitle="Ringkasan per periode" />
+          <SectionTitle icon={<IconChartUp />} title="Training Log" subtitle="Summary per period" />
           <div className="flex shrink-0 gap-1">
             {(['pekan', 'bulan'] as const).map((s) => (
               <button key={s} onClick={() => setSatuanLog(s)}
@@ -310,7 +310,7 @@ export function AnalisisPro() {
             <thead>
               <tr className="text-[10px] uppercase tracking-wide text-slate-500">
                 <th className="pb-2 pr-3 font-bold">Periode</th>
-                <th className="pb-2 pr-3 text-right font-bold">Sesi</th>
+                <th className="pb-2 pr-3 text-right font-bold">Sessions</th>
                 <th className="pb-2 pr-3 text-right font-bold">Waktu</th>
                 <th className="pb-2 pr-3 text-right font-bold">Jarak</th>
                 <th className="pb-2 text-right font-bold">Upaya</th>
@@ -339,8 +339,8 @@ export function AnalisisPro() {
 function KartuTidakDibangun() {
   return (
     <Card>
-      <SectionTitle icon={<IconActivity />} title="Yang tidak dibangun di sini"
-        subtitle="Beserta alasannya — bukan sekadar 'belum tersedia'" />
+      <SectionTitle icon={<IconActivity />} title="What is not built here"
+        subtitle="With the reason â not merely ‘not available yet’" />
       <div className="mt-3 space-y-2">
         {TIDAK_DIBANGUN.map((t) => (
           <div key={t.fitur} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">

@@ -306,7 +306,7 @@ export function weeklyTemplate(hariLari: 3 | 4 | 5): WeekPlan[] {
   return base
 }
 
-/** Aturan yang paling sering dilanggar dan paling sering menyebabkan cedera. */
+/** The rule broken most often dan paling sering menyebabkan cedera. */
 export const RULES: { judul: string; isi: string }[] = [
   {
     judul: 'Naikkan jarak maksimal 10% per minggu',

@@ -50,7 +50,7 @@ export function AturFitur() {
   return (
     <div className="space-y-4 pb-24">
       <SectionTitle icon={<IconSettings />} title="Atur Fitur"
-        subtitle="Sembunyikan yang tidak Anda pakai agar menu tetap ringkas" />
+        subtitle="Hide what you do not use so the menu stays short" />
 
       <Card>
         <p className="text-sm leading-relaxed text-slate-300">
@@ -114,7 +114,7 @@ export function AturFitur() {
                     </span>
                     {kunci ? (
                       <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500"
-                        title="Selalu tersedia demi keamanan dan agar pengaturan tidak terkunci">
+                        title="Always available for safety, and so settings can never lock you out">
                         selalu ada
                       </span>
                     ) : (

@@ -240,7 +240,7 @@ export function Longevity() {
             onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              title="Save this value across the app (or press Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}

@@ -218,7 +218,7 @@ export function BodyComposition() {
       <Field label={
         <span className="flex items-center gap-1">
           <span>{label}</span>
-          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Filled automatically from your device">⌚</span>}
         </span>
       }>
         <div className="flex items-center gap-1"
@@ -230,7 +230,7 @@ export function BodyComposition() {
             ariaLabel={label} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
+              title="Save this value across the app (or press Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -449,8 +449,8 @@ function ScaleMeasurements() {
     <Card className="!p-5">
       <SectionTitle
         icon={<IconActivity size={20} />}
-        title="Dari alat komposisi tubuh"
-        subtitle="Angka yang hanya diberikan InBody maupun timbangan BIA — bukan hasil rumus"
+        title="From a body-composition device"
+        subtitle="Values only an InBody or BIA scale can give — not formula estimates"
       />
       <div className="mt-3 space-y-2">
         {ada.map((r) => (

@@ -9,7 +9,7 @@ import {
 } from '../lib/gaitAnalysis'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Analisis Gerak — kualitas berjalan, bentuk lari, pemulihan, dan paparan.
+// Movement Analysis — kualitas berjalan, bentuk lari, pemulihan, dan paparan.
 //
 // Halaman ini tidak meminta data baru apa pun. Seluruh isinya berasal dari
 // metrik yang SELAMA INI sudah ikut terkirim pada tiap sinkronisasi Apple
@@ -34,8 +34,8 @@ export function GaitAnalysis() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconRun />}
-        title="Analisis Gerak"
-        subtitle="Kualitas berjalan, bentuk lari, dan pemulihan — dari data jam tangan yang selama ini tidak terbaca"
+        title="Movement Analysis"
+        subtitle="Walking quality, running form, and recovery — from watch data that has been going unread"
       />
 
       <Card>
@@ -50,7 +50,7 @@ export function GaitAnalysis() {
           {vitals.source && <Badge>{vitals.source}</Badge>}
           {vitals.measuredAt && (
             <span className="text-xs text-slate-500">
-              terakhir {new Date(vitals.measuredAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+              terakhir {new Date(vitals.measuredAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           )}
         </div>
@@ -65,7 +65,7 @@ export function GaitAnalysis() {
 
       {sorot.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconHeart />} title="Yang paling layak diperhatikan" subtitle="Diurutkan dari yang paling menyimpang dari rentang rujukan" />
+          <SectionTitle icon={<IconHeart />} title="Most worth your attention" subtitle="Ordered by how far each sits outside its reference range" />
           <div className="space-y-2 mt-2">
             {sorot.map((r) => (
               <div key={r.key} className="rounded-lg border border-rose-500/25 bg-rose-500/[0.07] p-3">
@@ -88,7 +88,7 @@ export function GaitAnalysis() {
 
       {pace != null && (
         <Card>
-          <SectionTitle icon={<IconActivity />} title="Ringkasan lari terakhir" />
+          <SectionTitle icon={<IconActivity />} title="Last run summary" />
           <div className="grid grid-cols-3 gap-2 mt-2">
             <Stat label="Pace" value={`${fmtPaceSec(pace)}/km`} />
             <Stat label="Kecepatan" value={`${(vitals.runningSpeedKmh ?? 0).toFixed(1)} km/j`} />
@@ -96,7 +96,7 @@ export function GaitAnalysis() {
           </div>
           <p className="text-sm text-slate-400 mt-3 leading-relaxed">
             Dari sini, pace latihan untuk tiap jenis lari bisa dihitung di{' '}
-            <Link to="/latihan-dasar" className="font-semibold text-white underline">Latihan Dasar</Link>.
+            <Link to="/latihan-dasar" className="font-semibold text-white underline">Foundation Training</Link>.
           </p>
         </Card>
       )}
@@ -112,7 +112,7 @@ export function GaitAnalysis() {
       ))}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Batas yang perlu disadari" />
+        <SectionTitle icon={<IconHeart />} title="Limits worth knowing" />
         <p className="text-sm text-slate-400 mt-2 leading-relaxed">{DISCLAIMER}</p>
       </Card>
     </div>

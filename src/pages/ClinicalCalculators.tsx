@@ -2347,7 +2347,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
     <Card>
       <SectionTitle icon={<IconShield size={20} />} title="Unlock Clinical Calculators" subtitle="34 internationally standard clinical decision-support scores & tools" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
-        🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('id-ID')}).
+        🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('en-GB')}).
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <button

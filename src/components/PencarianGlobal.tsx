@@ -156,13 +156,13 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
             <input
               ref={kotak}
               className="min-w-0 flex-1 bg-transparent text-[15px] text-white outline-none placeholder:text-slate-500"
-              placeholder="Cari fitur, orang, atau #tagar…"
+              placeholder="Search features, people, or #hashtags…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={padaTombol}
-              aria-label="Cari fitur, orang, atau tagar"
+              aria-label="Search features, people, or hashtags"
             />
-            <button onClick={tutup} aria-label="Tutup pencarian"
+            <button onClick={tutup} aria-label="Close search"
               className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Tutup</button>
           </div>
 

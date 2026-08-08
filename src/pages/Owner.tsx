@@ -32,12 +32,12 @@ export function Owner() {
         />
         <div className="rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
           <div className="text-xs font-semibold uppercase tracking-wide text-white/70">Estimated Gross Revenue</div>
-          <div className="text-4xl font-extrabold">Rp{grossIdr.toLocaleString('id-ID')}</div>
-          <div className="mt-1 text-sm text-white/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('id-ID')} consultations</div>
+          <div className="text-4xl font-extrabold">Rp{grossIdr.toLocaleString('en-GB')}</div>
+          <div className="mt-1 text-sm text-white/80">≈ {grossPNC} PNC + Rp{consultRevenue.toLocaleString('en-GB')} consultations</div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
             <div className="h-full rounded-full bg-white" style={{ width: `${Math.min(100, (grossIdr / monthlyTarget) * 100)}%` }} />
           </div>
-          <div className="mt-1 text-[11px] text-white/70">Monthly target Rp{monthlyTarget.toLocaleString('id-ID')}</div>
+          <div className="mt-1 text-[11px] text-white/70">Monthly target Rp{monthlyTarget.toLocaleString('en-GB')}</div>
         </div>
       </Card>
 
@@ -56,8 +56,8 @@ export function Owner() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={<IconWalletDot />} label="Subscriptions" value={`${subsRevenue} PNC`} sub="recurring" />
         <Stat icon={<IconStore size={18} />} label="Marketplace Fee" value={`${platformFeeRevenue} PNC`} sub={`${PLATFORM_FEE * 100}% royalty`} />
-        <Stat icon={<IconUsers size={18} />} label="Consultations" value={`Rp${consultRevenue.toLocaleString('id-ID')}`} sub={`${state.consults.length} sessions`} />
-        <Stat icon={<IconToken size={18} />} label="Tokens Sold" value={`${tokenSalesPNC} PNC`} sub={`Rp${(tokenSalesPNC * TOKEN_TO_IDR).toLocaleString('id-ID')}`} />
+        <Stat icon={<IconUsers size={18} />} label="Consultations" value={`Rp${consultRevenue.toLocaleString('en-GB')}`} sub={`${state.consults.length} sessions`} />
+        <Stat icon={<IconToken size={18} />} label="Tokens Sold" value={`${tokenSalesPNC} PNC`} sub={`Rp${(tokenSalesPNC * TOKEN_TO_IDR).toLocaleString('en-GB')}`} />
       </div>
 
       <Card>
@@ -174,7 +174,7 @@ function CompliancePanel() {
                 <span className="font-semibold">{actionLabel[e.action] ?? e.action}</span>
                 {e.target && <span className="text-[11px] text-neutral-400">#{e.target}</span>}
                 <span className="ml-auto truncate text-[11px] text-neutral-400">{e.userEmail}</span>
-                <span className="shrink-0 text-[11px] text-neutral-400">{new Date(e.at).toLocaleString('id-ID')}</span>
+                <span className="shrink-0 text-[11px] text-neutral-400">{new Date(e.at).toLocaleString('en-GB')}</span>
               </div>
             ))}
           </div>
@@ -203,7 +203,7 @@ function RealtimeStats() {
         { label: 'Patients', value: s.patients },
         { label: 'Paid Top-ups', value: s.paidOrders },
         { label: 'Push Subscribers', value: s.pushSubscribers },
-        { label: 'Revenue', value: `Rp${s.revenueIdr.toLocaleString('id-ID')}` },
+        { label: 'Revenue', value: `Rp${s.revenueIdr.toLocaleString('en-GB')}` },
       ]
     : []
 
@@ -379,9 +379,9 @@ function UserDirectoryPanel() {
                   <Badge tone="neutral">{ROLE_LABEL[r.role] ?? r.role}</Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
-                  <span>Joined {new Date(r.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span>Joined {new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   <span>Balance {r.walletBalance} PNC</span>
-                  <span>{r.paidOrdersCount} paid transactions{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('id-ID')})` : ''}</span>
+                  <span>{r.paidOrdersCount} paid transactions{r.totalPaidIdr > 0 ? ` (Rp${r.totalPaidIdr.toLocaleString('en-GB')})` : ''}</span>
                 </div>
                 {(r.subscriptions.longevityActive || r.subscriptions.chronicActive || r.subscriptions.clinicalCalcUnlocked) && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -432,7 +432,7 @@ function FeedbackInboxPanel() {
                 <span className="text-xs font-bold text-ink">{r.userName}</span>
                 <span className="text-[11px] text-neutral-400">{r.userEmail}</span>
               </div>
-              <span className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <p className="mt-1.5 text-sm text-neutral-700">{r.text}</p>
             {!r.read && (
@@ -549,7 +549,7 @@ function ManualTopupPanel() {
           <div key={r.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
             <div className="min-w-0 flex-1">
               <div className="font-bold">{r.name} <span className="text-xs font-normal text-neutral-500">· {r.email}</span></div>
-              <div className="text-sm text-neutral-600">{r.amountPnc} PNC · <b>Rp{r.amountIdr.toLocaleString('id-ID')}</b> · {new Date(r.at).toLocaleString('id-ID')}</div>
+              <div className="text-sm text-neutral-600">{r.amountPnc} PNC · <b>Rp{r.amountIdr.toLocaleString('en-GB')}</b> · {new Date(r.at).toLocaleString('en-GB')}</div>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => decide(r.id, true)} disabled={busy === r.id} className="!px-3 !py-1.5 text-xs"><IconCheck size={14} /> Approve</Button>
@@ -582,11 +582,11 @@ function MiniChart({ title, data, labels, color, money }: { title: string; data:
     <div className="rounded-xl border border-neutral-100 p-3">
       <div className="flex items-baseline justify-between">
         <span className="text-xs font-semibold text-neutral-500">{title}</span>
-        <span className="text-xs font-bold">{money ? `Rp${total.toLocaleString('id-ID')}` : total}</span>
+        <span className="text-xs font-bold">{money ? `Rp${total.toLocaleString('en-GB')}` : total}</span>
       </div>
       <div className="mt-2 flex h-20 items-end gap-1">
         {data.map((v, i) => (
-          <div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${labels[i]}: ${money ? 'Rp' + v.toLocaleString('id-ID') : v}`}>
+          <div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${labels[i]}: ${money ? 'Rp' + v.toLocaleString('en-GB') : v}`}>
             <div className="w-full rounded-t transition-all" style={{ height: `${(v / max) * 100}%`, minHeight: 2, background: color }} />
             <span className="text-[8px] text-neutral-400">{labels[i]}</span>
           </div>
@@ -735,7 +735,7 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
     <div>
       <div className="mb-1 flex justify-between text-sm">
         <span>{label}</span>
-        <span className="font-bold">Rp{value.toLocaleString('id-ID')} ({pct}%)</span>
+        <span className="font-bold">Rp{value.toLocaleString('en-GB')} ({pct}%)</span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />

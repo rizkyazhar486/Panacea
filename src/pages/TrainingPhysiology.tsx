@@ -8,13 +8,13 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
 import {
-  hitungSesi, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
-  perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
-  UNAVAILABLE, type Sesi,
+  hitungSessions, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
+  perkiraanLTHR, kondisiPerforma, kesiapan, saranSessionsHarian, skorKetahanan,
+  UNAVAILABLE, type Sessions,
 } from '../lib/trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Fisiologi Latihan — padanan kelompok metrik Garmin, dari data Apple Health.
+// Training Physiology — padanan kelompok metrik Garmin, dari data Apple Health.
 //
 // Urutan halaman disengaja: kesiapan hari ini di atas (satu-satunya yang
 // menuntut keputusan sekarang), lalu beban dan status, lalu ambang dan
@@ -26,7 +26,7 @@ export function TrainingPhysiology() {
   const vitals = useVitals()
   const demo = useMemo(() => getDemo(), [])
   const [nights, setNights] = useState<SleepNight[]>([])
-  const [riwayat, setRiwayat] = useState<{ date: string; hrvMs?: number; restingHr?: number }[]>([])
+  const [riwayat, setHistory] = useState<{ date: string; hrvMs?: number; restingHr?: number }[]>([])
 
   useEffect(() => {
     if (!backendEnabled) return
@@ -34,7 +34,7 @@ export function TrainingPhysiology() {
     api.getHealthProfile()
       .then((r) => {
         const h = (r as { history?: { date: string; hrvMs?: number; restingHr?: number }[] })?.history
-        if (Array.isArray(h)) setRiwayat(h)
+        if (Array.isArray(h)) setHistory(h)
       })
       .catch(() => {})
   }, [])
@@ -56,12 +56,12 @@ export function TrainingPhysiology() {
     }
   }, [workouts, demo, vitals])
 
-  const sesi = useMemo<Sesi[]>(() => workouts.map((w) => ({
+  const sesi = useMemo<Sessions[]>(() => workouts.map((w) => ({
     id: w.id, nama: w.nama, mulai: w.mulai, durasiDetik: w.durasi,
     jarakKm: w.jarakKm, avgHr: w.avgHr, maxHr: w.maxHr, hr: w.hr,
   })), [workouts])
 
-  const calc = useMemo(() => hitungSesi(sesi, ctx), [sesi, ctx])
+  const calc = useMemo(() => hitungSessions(sesi, ctx), [sesi, ctx])
   const beban = useMemo(() => ringkasBeban(calc), [calc])
 
   const malamTerakhir = useMemo(
@@ -114,13 +114,13 @@ export function TrainingPhysiology() {
   const lthr = useMemo(() => perkiraanLTHR(calc, ctx.hrMax), [calc, ctx])
   const performa = useMemo(() => kondisiPerforma(calc), [calc])
   const ketahanan = useMemo(() => skorKetahanan(calc), [calc])
-  const saran = useMemo(() => saranSesiHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
+  const saran = useMemo(() => saranSessionsHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
   const teTerbaru = useMemo(() => (terbaru ? trainingEffect(terbaru, beban.kronis) : null), [terbaru, beban])
 
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconActivity />} title="Fisiologi Latihan" subtitle="Beban, status, pemulihan, dan kesiapan" />
+        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery, and readiness" />
         <Card>
           <p className="text-sm text-slate-300 leading-relaxed">
             Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung
@@ -144,8 +144,8 @@ export function TrainingPhysiology() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconActivity />}
-        title="Fisiologi Latihan"
-        subtitle={`${calc.length} sesi · HRmaks dipakai ${ctx.hrMax} bpm · istirahat ${ctx.hrRest} bpm`}
+        title="Training Physiology"
+        subtitle={`${calc.length} sessions · HRmax used ${ctx.hrMax} bpm · resting ${ctx.hrRest} bpm`}
       />
 
       {/* Kesiapan — satu-satunya yang menuntut keputusan hari ini */}
@@ -188,7 +188,7 @@ export function TrainingPhysiology() {
 
       {/* Saran sesi */}
       <Card>
-        <SectionTitle icon={<IconRun />} title="Saran sesi hari ini" />
+        <SectionTitle icon={<IconRun />} title="Suggested session today" />
         <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3">
           <div className="text-sm font-semibold text-white">{saran.judul}</div>
           <p className="mt-1 text-sm text-slate-300 leading-relaxed">{saran.rincian}</p>
@@ -199,7 +199,7 @@ export function TrainingPhysiology() {
       {/* Pemulihan */}
       {pemulihan && (
         <Card>
-          <SectionTitle icon={<IconTimer />} title="Waktu pemulihan" />
+          <SectionTitle icon={<IconTimer />} title="Recovery time" />
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-sm text-slate-400">Sisa sampai siap untuk sesi berat</span>
             <span className={`text-2xl font-semibold tabular-nums ${sisaJam > 12 ? 'text-amber-300' : 'text-emerald-300'}`}>
@@ -220,7 +220,7 @@ export function TrainingPhysiology() {
 
       {/* Status & beban */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Status latihan" />
+        <SectionTitle icon={<IconActivity />} title="Training status" />
         <div className="mt-2 rounded-lg border p-3" style={{ borderColor: `${status.warna}44`, background: `${status.warna}12` }}>
           <div className="text-base font-semibold" style={{ color: status.warna }}>{status.label}</div>
           <p className="mt-1 text-sm leading-relaxed text-slate-300">{status.penjelasan}</p>
@@ -261,8 +261,8 @@ export function TrainingPhysiology() {
       {/* Training effect sesi terakhir */}
       {teTerbaru && terbaru && (
         <Card>
-          <SectionTitle icon={<IconRun />} title="Efek latihan — sesi terakhir"
-            subtitle={new Date(terbaru.mulai).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })} />
+          <SectionTitle icon={<IconRun />} title="Training effect — last session"
+            subtitle={new Date(terbaru.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} />
           <div className="mt-2 grid grid-cols-2 gap-2">
             <TeBar label="Aerobik" value={teTerbaru.aerobik} teks={teTerbaru.labelAerobik} warna="#34d399" />
             <TeBar label="Anaerobik" value={teTerbaru.anaerobik} teks={teTerbaru.labelAnaerobik} warna="#f87171" />
@@ -363,8 +363,8 @@ export function TrainingPhysiology() {
 function KartuBelumDariJam() {
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Yang tidak datang dari jam tangan"
-        subtitle="Bukan berarti tidak ada — semuanya sudah dibuat sebagai alat tersendiri" />
+      <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
+        subtitle="That does not mean it is missing — each exists as its own tool" />
       <p className="mt-2 text-sm leading-relaxed text-slate-400">
         Yang berikut ini <strong className="text-white">tidak bisa dihitung dari ekspor Apple Watch</strong>,
         dan itu tidak sama dengan tidak bisa dibuat. Masing-masing hanya memerlukan masukannya sendiri,

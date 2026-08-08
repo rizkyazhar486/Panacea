@@ -27,10 +27,10 @@ const RENTANG = [
 ] as const
 
 function jam(t: number): string {
-  return new Date(t).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+  return new Date(t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 function tanggalJam(t: number): string {
-  return new Date(t).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
 export function BodyBattery() {
@@ -90,7 +90,7 @@ export function BodyBattery() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Battery"
-        subtitle="Cadangan energi 0–100, dihitung dari denyut jantung sepanjang hari"
+        subtitle="Energy reserve 0–100, computed from heart rate across the day"
       />
 
       <div className="flex gap-2">
@@ -116,7 +116,7 @@ export function BodyBattery() {
           <p className="mt-1 text-sm leading-relaxed text-neutral-500">{hasil.alasan}</p>
           <p className="mt-3 text-sm leading-relaxed text-neutral-500">
             Body Battery butuh deret denyut, bukan sekadar ringkasan harian. Cara memperbanyaknya ada
-            di <Link to="/log-detak-jantung" className="font-semibold underline">Log Detak Jantung</Link> —
+            di <Link to="/log-detak-jantung" className="font-semibold underline">Heart Rate Log</Link> —
             singkatnya, nyalakan <b>Include Workouts</b> dan matikan <b>Aggregate Data</b> di Health Auto Export.
           </p>
         </Card>
@@ -251,10 +251,10 @@ export function BodyBattery() {
 
           <div className="flex gap-2">
             <Link to="/log-detak-jantung" className="flex-1 rounded-xl bg-neutral-100 px-3 py-2.5 text-center text-sm font-bold text-ink transition hover:bg-brand/10 dark:bg-white/5 dark:text-white">
-              <IconHeart size={14} className="mr-1 inline" /> Log Detak Jantung
+              <IconHeart size={14} className="mr-1 inline" /> Heart Rate Log
             </Link>
             <Link to="/pola-tidur" className="flex-1 rounded-xl bg-neutral-100 px-3 py-2.5 text-center text-sm font-bold text-ink transition hover:bg-brand/10 dark:bg-white/5 dark:text-white">
-              <IconMoon size={14} className="mr-1 inline" /> Pola Tidur
+              <IconMoon size={14} className="mr-1 inline" /> Sleep Pattern
             </Link>
           </div>
         </>

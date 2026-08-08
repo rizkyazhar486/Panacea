@@ -22,7 +22,7 @@
 // di UNAVAILABLE di bagian bawah berkas ini.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface Sesi {
+export interface Sessions {
   id: string
   nama: string
   mulai: string
@@ -56,7 +56,7 @@ export interface Konteks {
  * interval tidak disamakan dengan 30 menit jalan santai — kesalahan yang
  * dilakukan oleh perhitungan berbasis durasi semata.
  */
-export function trimpSesi(sesi: Sesi, k: Konteks): number {
+export function trimpSessions(sesi: Sessions, k: Konteks): number {
   const span = k.hrMax - k.hrRest
   if (!(span > 0)) return 0
 
@@ -109,16 +109,16 @@ export interface BebanRingkas {
   acwrDapatDipercaya: boolean
 }
 
-export interface SesiTerhitung extends Sesi {
+export interface SessionsTerhitung extends Sessions {
   trimp: number
   zona: { z: 1 | 2 | 3 | 4 | 5; menit: number }[]
 }
 
-export function hitungSesi(sesi: Sesi[], k: Konteks): SesiTerhitung[] {
-  return sesi.map((s) => ({ ...s, trimp: trimpSesi(s, k), zona: zonaMenit(s, k) }))
+export function hitungSessions(sesi: Sessions[], k: Konteks): SessionsTerhitung[] {
+  return sesi.map((s) => ({ ...s, trimp: trimpSessions(s, k), zona: zonaMenit(s, k) }))
 }
 
-function zonaMenit(sesi: Sesi, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: number }[] {
+function zonaMenit(sesi: Sessions, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: number }[] {
   const batas: [1 | 2 | 3 | 4 | 5, number, number][] = [
     [1, 0, 0.6], [2, 0.6, 0.7], [3, 0.7, 0.8], [4, 0.8, 0.9], [5, 0.9, 9],
   ]
@@ -136,7 +136,7 @@ function zonaMenit(sesi: Sesi, k: Konteks): { z: 1 | 2 | 3 | 4 | 5; menit: numbe
   return out.map((o) => ({ ...o, menit: +o.menit.toFixed(1) }))
 }
 
-export function ringkasBeban(sesi: SesiTerhitung[], sekarang = Date.now()): BebanRingkas {
+export function ringkasBeban(sesi: SessionsTerhitung[], sekarang = Date.now()): BebanRingkas {
   const hari = (n: number) => sekarang - n * 86_400_000
   const dalam = (n: number) => sesi.filter((s) => Date.parse(s.mulai) >= hari(n))
 
@@ -147,7 +147,7 @@ export function ringkasBeban(sesi: SesiTerhitung[], sekarang = Date.now()): Beba
   const akut = total7 / 7
   const kronis = total28 / 28
 
-  const menitZ = (list: SesiTerhitung[], zs: number[]) =>
+  const menitZ = (list: SessionsTerhitung[], zs: number[]) =>
     list.reduce((a, s) => a + s.zona.filter((z) => zs.includes(z.z)).reduce((b, z) => b + z.menit, 0), 0)
   const semua = menitZ(s28, [1, 2, 3, 4, 5])
 
@@ -173,7 +173,7 @@ export function ringkasBeban(sesi: SesiTerhitung[], sekarang = Date.now()): Beba
   }
 }
 
-// ── 3. Status latihan ───────────────────────────────────────────────────────
+// ── 3. Training status ───────────────────────────────────────────────────────
 
 export type StatusKey = 'tidakCukupData' | 'istirahat' | 'menurun' | 'pemeliharaan' | 'produktif' | 'puncak' | 'berlebih' | 'tidakProduktif'
 
@@ -204,7 +204,7 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
   const r = b.acwrDapatDipercaya ? b.acwr : null
   if (!b.acwrDapatDipercaya && b.hariAktif7 > 0) {
     return { key: 'pemeliharaan', label: 'Sedang membangun dasar', warna: W.biru,
-      penjelasan: `Riwayat Anda baru mencakup ${b.rentangHariData} hari. Nisbah beban 7:28 hari belum bermakna sebelum ada sekitar empat pekan riwayat — pada awal berlatih, angkanya selalu tampak melonjak semata karena pembandingnya masih hampir kosong, bukan karena Anda berlebihan.`,
+      penjelasan: `History Anda baru mencakup ${b.rentangHariData} hari. Nisbah beban 7:28 hari belum bermakna sebelum ada sekitar empat pekan riwayat — pada awal berlatih, angkanya selalu tampak melonjak semata karena pembandingnya masih hampir kosong, bukan karena Anda berlebihan.`,
       saran: 'Lanjutkan dengan menambah volume paling banyak 10% per minggu. Penilaian beban akan mulai bermakna setelah empat pekan.' }
   }
   if (b.hariAktif7 === 0) {
@@ -261,7 +261,7 @@ export function labelTE(v: number): string {
  * pelari terlatih. Memakai ambang tetap akan menyatakan hal yang sama untuk
  * dua orang yang keadaannya berbeda jauh.
  */
-export function trainingEffect(sesi: SesiTerhitung, kronisHarian: number): TrainingEffect {
+export function trainingEffect(sesi: SessionsTerhitung, kronisHarian: number): TrainingEffect {
   const acuan = Math.max(kronisHarian, 8) // lantai supaya pengguna baru tidak selalu "berlebih"
   const rasio = sesi.trimp / acuan
 
@@ -280,7 +280,7 @@ export function trainingEffect(sesi: SesiTerhitung, kronisHarian: number): Train
   return { aerobik, anaerobik, labelAerobik: labelTE(aerobik), labelAnaerobik: labelTE(anaerobik) }
 }
 
-// ── 5. Waktu pemulihan ──────────────────────────────────────────────────────
+// ── 5. Recovery time ──────────────────────────────────────────────────────
 
 export interface Pemulihan {
   jam: number
@@ -295,7 +295,7 @@ export interface Pemulihan {
  * mempercepat pemulihan. Yang dimaksud adalah kesiapan untuk sesi KERAS.
  */
 export function waktuPemulihan(
-  sesiTerakhir: SesiTerhitung | null,
+  sesiTerakhir: SessionsTerhitung | null,
   kronisHarian: number,
   opsi: { tidurJam?: number; hrvMs?: number; hrvBaseline?: number; acwr?: number | null } = {},
 ): Pemulihan | null {
@@ -340,7 +340,7 @@ export interface Ambang {
  * dipertahankan — mengikuti gagasan uji lapangan Friel, dengan catatan bahwa
  * ini perkiraan dari data harian, bukan tes khusus.
  */
-export function perkiraanLTHR(sesi: SesiTerhitung[], hrMax: number): Ambang {
+export function perkiraanLTHR(sesi: SessionsTerhitung[], hrMax: number): Ambang {
   let terbaik = 0
   for (const s of sesi) {
     if (s.hr.length < 3) continue
@@ -380,13 +380,13 @@ export interface KondisiPerforma {
  * kebugaran yang paling awal terlihat — jauh lebih cepat berubah daripada
  * VO2max.
  */
-export function kondisiPerforma(sesi: SesiTerhitung[], sekarang = Date.now()): KondisiPerforma {
-  const ef = (s: SesiTerhitung) => {
+export function kondisiPerforma(sesi: SessionsTerhitung[], sekarang = Date.now()): KondisiPerforma {
+  const ef = (s: SessionsTerhitung) => {
     if (!s.jarakKm || !s.avgHr || s.durasiDetik <= 0 || s.avgHr <= 0) return null
     const mPerMenit = (s.jarakKm * 1000) / (s.durasiDetik / 60)
     return mPerMenit / s.avgHr
   }
-  const beri = (list: SesiTerhitung[]) => list.map(ef).filter((v): v is number => v != null && Number.isFinite(v))
+  const beri = (list: SessionsTerhitung[]) => list.map(ef).filter((v): v is number => v != null && Number.isFinite(v))
 
   const urut = [...sesi].sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
   const terbaru = urut[0]
@@ -479,7 +479,7 @@ export function kesiapan(opsi: {
   const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Cukup siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
   const warna = skor >= 80 ? '#34d399' : skor >= 65 ? '#a3e635' : skor >= 45 ? '#fbbf24' : '#f87171'
   const saran = skor >= 80 ? 'Hari yang baik untuk sesi kualitas bila memang terjadwal.'
-    : skor >= 65 ? 'Sesi terjadwal boleh dijalankan; nilai kembali setelah pemanasan.'
+    : skor >= 65 ? 'Sessions terjadwal boleh dijalankan; nilai kembali setelah pemanasan.'
       : skor >= 45 ? 'Condongkan ke sesi mudah. Bila terasa baik setelah 10 menit pemanasan, boleh dinaikkan.'
         : 'Pilih sesi mudah maupun istirahat. Memaksakan sesi keras pada keadaan ini menambah kelelahan tanpa menambah kebugaran.'
 
@@ -488,13 +488,13 @@ export function kesiapan(opsi: {
 
 // ── 8. Saran sesi harian ────────────────────────────────────────────────────
 
-export interface SaranSesi {
+export interface SaranSessions {
   judul: string
   rincian: string
   alasan: string
 }
 
-export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: number): SaranSesi {
+export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: number): SaranSessions {
   if (pemulihanSisaJam > 20 || k.skor < 35) {
     return { judul: 'Istirahat atau jalan santai 20-30 menit',
       rincian: 'Jaga denyut di bawah 60% HRmaks. Tidak perlu berlari.',
@@ -506,7 +506,7 @@ export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: 
         rincian: 'Pertahankan denyut 60-70% HRmaks. Bila harus melambat sampai terasa terlalu pelan, itu justru tandanya benar.',
         alasan: `Kesiapan Anda baik, namun hanya ${b.pctAerobikRendah ?? 0}% waktu latihan Anda berada di zona mudah. Menambah sesi keras sekarang bukan yang paling menolong.` }
     }
-    return { judul: 'Sesi kualitas: tempo 20-25 menit',
+    return { judul: 'Sessions kualitas: tempo 20-25 menit',
       rincian: 'Setelah 15 menit pemanasan, jalankan pada denyut sekitar ambang, lalu pendinginan 10 menit.',
       alasan: 'Kesiapan baik dan beban terkendali — hari yang tepat untuk sesi yang menuntut.' }
   }
@@ -515,9 +515,9 @@ export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: 
       rincian: 'Zona 2. Nilai ulang setelah 10 menit; bila terasa berat, perpendek.',
       alasan: 'Kesiapan sedang — volume mudah tetap menambah basis aerobik tanpa menambah kelelahan berarti.' }
   }
-  return { judul: 'Sesi mudah 20-30 menit atau istirahat',
+  return { judul: 'Sessions mudah 20-30 menit atau istirahat',
     rincian: 'Zona 1-2 saja.',
-    alasan: 'Kesiapan di bawah kebiasaan. Sesi ringan tetap membantu pemulihan; sesi keras tidak.' }
+    alasan: 'Kesiapan di bawah kebiasaan. Sessions ringan tetap membantu pemulihan; sesi keras tidak.' }
 }
 
 // ── 9. Skor ketahanan ───────────────────────────────────────────────────────
@@ -535,7 +535,7 @@ export interface Ketahanan {
  * kecepatan — dua hal yang sering tertukar. Orang bisa cepat pada 5 km dan
  * tetap tidak punya ketahanan.
  */
-export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ketahanan {
+export function skorKetahanan(sesi: SessionsTerhitung[], sekarang = Date.now()): Ketahanan {
   const s90 = sesi.filter((s) => Date.parse(s.mulai) >= sekarang - 90 * 86_400_000)
   if (s90.length < 3) {
     return { skor: null, label: 'Belum cukup data', terpanjangKm: null, terpanjangMenit: null,

@@ -27,7 +27,7 @@ interface SupportiveResult {
    ═══════════════════════════════════════════ */
 
 function fmt(iso: string): string {
-  return new Date(iso).toLocaleString('id-ID', {
+  return new Date(iso).toLocaleString('en-GB', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',

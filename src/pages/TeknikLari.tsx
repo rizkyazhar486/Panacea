@@ -31,7 +31,7 @@ export function TeknikLari() {
       <SectionTitle
         icon={<IconRun />}
         title="Teknik Lari"
-        subtitle="Dari start sampai napas — diurutkan menurut seberapa kuat buktinya"
+        subtitle="From the start to breathing — ordered by how strong the evidence is"
       />
 
       {/* Yang paling sering salah dipahami, ditaruh paling atas. */}
@@ -161,7 +161,7 @@ export function TeknikLari() {
         <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Pace Anda sendiri</div>
         <p className="mt-2 text-[12px] leading-relaxed text-slate-300">
           Angka pace easy, tempo dan interval bergantung pada kebugaran Anda sekarang, jadi ia tidak
-          diulang di sini. Halaman <b>Latihan Dasar &amp; Postur</b> menghitungnya dari hasil lomba
+          diulang di sini. Halaman <b>Foundation Training &amp; Postur</b> menghitungnya dari hasil lomba
           atau tes Anda memakai kerangka VDOT, dan <b>Analisis Pro</b> membaca zona pace langsung
           dari sesi yang sudah tersinkron.
         </p>

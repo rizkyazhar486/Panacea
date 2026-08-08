@@ -19,7 +19,7 @@ interface NewsItem {
   /** editorial status label — honest curation, not a fake citation */
   kind: 'Nobel' | 'Clinical Trial' | 'Research' | 'Device' | 'New'
   /** international vs domestic (Indonesia) coverage — default international */
-  region?: 'Internasional' | 'Dalam Negeri'
+  region?: 'Internasional' | 'Domestic'
 }
 
 const CURATED: NewsItem[] = [
@@ -39,12 +39,12 @@ const CURATED: NewsItem[] = [
   { cat: 'Performance', kind: 'Research', title: 'Lactate zones guide training and recovery', detail: 'Mapping lactate thresholds is optimizing high-intensity training loads and athlete recovery schedules.' },
   { cat: 'Immunology', kind: 'Research', title: 'CAR-T cells take aim at autoimmune disease', detail: 'Engineered T-cell therapy, originally developed for blood cancers, is now being trialed for lupus and severe autoimmune conditions.' },
   // --- Domestic (Indonesia) ---
-  { cat: 'SATUSEHAT', kind: 'New', title: 'SATUSEHAT becomes the backbone of national medical records', detail: 'Indonesia’s health ministry is driving interoperability of health data across facilities through the SATUSEHAT platform — the foundation for a unified electronic medical record system nationwide.', region: 'Dalam Negeri' },
-  { cat: 'Telemedicine', kind: 'New', title: 'Telemedicine adoption accelerates post-pandemic', detail: 'Remote consultations and digital prescriptions are becoming standard in Indonesia’s major cities, extending access to doctors in outlying regions.', region: 'Dalam Negeri' },
-  { cat: 'JKN', kind: 'New', title: 'KRIS — a standardized inpatient class for BPJS', detail: 'The Standard Inpatient Class (KRIS) is being rolled out in stages to equalize care quality for JKN/BPJS Kesehatan (Indonesia’s national health insurance) participants.', region: 'Dalam Negeri' },
-  { cat: 'Tropical Disease', kind: 'Clinical Trial', title: 'Wolbachia mosquitoes curb dengue cases', detail: 'Wolbachia technology deployed across several Indonesian cities has been shown to significantly reduce dengue fever cases.', region: 'Dalam Negeri' },
-  { cat: 'Stunting', kind: 'Research', title: 'Reducing stunting becomes a national priority', detail: 'Nutrition interventions during the first 1,000 days of life and growth monitoring are being intensified to lower child stunting rates.', region: 'Dalam Negeri' },
-  { cat: 'Immunization', kind: 'New', title: 'HPV vaccine joins the national immunization program', detail: 'Expanded HPV vaccination for schoolgirls aims to reduce cervical cancer — one of the most common cancers among Indonesian women.', region: 'Dalam Negeri' },
+  { cat: 'SATUSEHAT', kind: 'New', title: 'SATUSEHAT becomes the backbone of national medical records', detail: 'Indonesia’s health ministry is driving interoperability of health data across facilities through the SATUSEHAT platform — the foundation for a unified electronic medical record system nationwide.', region: 'Domestic' },
+  { cat: 'Telemedicine', kind: 'New', title: 'Telemedicine adoption accelerates post-pandemic', detail: 'Remote consultations and digital prescriptions are becoming standard in Indonesia’s major cities, extending access to doctors in outlying regions.', region: 'Domestic' },
+  { cat: 'JKN', kind: 'New', title: 'KRIS — a standardized inpatient class for BPJS', detail: 'The Standard Inpatient Class (KRIS) is being rolled out in stages to equalize care quality for JKN/BPJS Kesehatan (Indonesia’s national health insurance) participants.', region: 'Domestic' },
+  { cat: 'Tropical Disease', kind: 'Clinical Trial', title: 'Wolbachia mosquitoes curb dengue cases', detail: 'Wolbachia technology deployed across several Indonesian cities has been shown to significantly reduce dengue fever cases.', region: 'Domestic' },
+  { cat: 'Stunting', kind: 'Research', title: 'Reducing stunting becomes a national priority', detail: 'Nutrition interventions during the first 1,000 days of life and growth monitoring are being intensified to lower child stunting rates.', region: 'Domestic' },
+  { cat: 'Immunization', kind: 'New', title: 'HPV vaccine joins the national immunization program', detail: 'Expanded HPV vaccination for schoolgirls aims to reduce cervical cancer — one of the most common cancers among Indonesian women.', region: 'Domestic' },
 ]
 
 interface Quote {
@@ -85,7 +85,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 // Region pill — distinguishes domestic (Indonesia) from international coverage.
 function RegionTag({ region }: { region?: NewsItem['region'] }) {
-  const dom = region === 'Dalam Negeri'
+  const dom = region === 'Domestic'
   return (
     <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${dom ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-600'}`}>
       {dom ? '🇮🇩 Domestic' : '🌍 International'}
@@ -150,7 +150,7 @@ export function MedicalNews() {
   // international and domestic (Indonesia) coverage every time.
   const { lead, rest } = useMemo(() => {
     const intl = shuffle(CURATED.filter((n) => (n.region ?? 'Internasional') === 'Internasional'))
-    const dom = shuffle(CURATED.filter((n) => n.region === 'Dalam Negeri'))
+    const dom = shuffle(CURATED.filter((n) => n.region === 'Domestic'))
     const mixed = shuffle([...intl.slice(1, 5), ...dom.slice(0, 3)]).slice(0, 6)
     return { lead: intl[0], rest: mixed }
   }, [])
@@ -187,7 +187,7 @@ export function MedicalNews() {
             <a href={liveMix.lead.link} target="_blank" rel="noreferrer" className="group relative flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-dark">Breaking</span>
-                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
+                <RegionTag region={liveMix.lead.region === 'domestic' ? 'Domestic' : 'Internasional'} />
               </div>
               <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-[28px]">
                 {cleanTitle(liveMix.lead.title, liveMix.lead.source)}
@@ -213,7 +213,7 @@ export function MedicalNews() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{n.source || 'Health'}</span>
-                        <RegionTag region={n.region === 'domestic' ? 'Dalam Negeri' : 'Internasional'} />
+                        <RegionTag region={n.region === 'domestic' ? 'Domestic' : 'Internasional'} />
                       </div>
                       <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
                         {cleanTitle(n.title, n.source)}

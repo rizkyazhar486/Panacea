@@ -222,7 +222,7 @@ export interface RencanaJetLag {
 }
 
 /**
- * Rencana penyesuaian jam biologis dari zona waktu asal dan tujuan.
+ * Adjustment plan jam biologis dari zona waktu asal dan tujuan.
  *
  * Dua hal yang menentukan dan sering terbalik dilakukan orang:
  *
@@ -411,7 +411,7 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
       'Kehamilan kembar dengan risiko kelahiran prematur',
       'Perdarahan menetap pada trimester kedua maupun ketiga',
       'Plasenta previa setelah 26 minggu',
-      'Riwayat maupun ancaman persalinan prematur pada kehamilan ini',
+      'History maupun ancaman persalinan prematur pada kehamilan ini',
       'Ketuban pecah dini',
       'Preeklamsia maupun hipertensi dalam kehamilan yang tidak terkendali',
       'Anemia berat',

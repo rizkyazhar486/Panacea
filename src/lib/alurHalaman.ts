@@ -4,7 +4,7 @@
 // Tombol kembali yang hanya memanggil history.back() terasa benar sampai
 // riwayatnya tidak seperti yang dibayangkan, dan itu sering terjadi:
 //
-//   * Tautan dibuka langsung dari pesan atau notifikasi. Riwayatnya kosong,
+//   * Tautan dibuka langsung dari pesan atau notifikasi. Historynya kosong,
 //     sehingga "kembali" melempar pengguna KELUAR dari aplikasi.
 //   * Pengguna berputar-putar: A → B → A → B. history.back() membawanya ke B
 //     lagi, bukan naik ke induknya.

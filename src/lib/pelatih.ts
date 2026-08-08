@@ -1,5 +1,5 @@
 import { zoneBreakdown, type ImportedWorkout } from './workoutImport'
-import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, kunciHari } from './analisisPro'
+import { upayaRelatif, kebugaranKesegaran, bacaKesegaran, hariHistoryLatihan, kunciHari } from './analisisPro'
 import type { Konteks } from './trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ import type { Konteks } from './trainingPhysiology'
 //     penggunanya sadar.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type JenisSesi = 'pemulihan' | 'easy' | 'long' | 'tempo' | 'interval' | 'sprint' | 'kekuatan' | 'lainnya'
+export type JenisSessions = 'pemulihan' | 'easy' | 'long' | 'tempo' | 'interval' | 'sprint' | 'kekuatan' | 'lainnya'
 export type Olahraga = 'lari' | 'sepeda' | 'renang' | 'kekuatan' | 'lainnya'
 
 export function olahragaDari(nama: string): Olahraga {
@@ -34,7 +34,7 @@ export function olahragaDari(nama: string): Olahraga {
 }
 
 export interface Klasifikasi {
-  jenis: JenisSesi
+  jenis: JenisSessions
   label: string
   warna: string
   /** Kenapa disimpulkan begitu — supaya bisa dibantah, bukan diterima buta. */
@@ -53,7 +53,7 @@ export interface Klasifikasi {
  * judul akan selalu salah. Sebaran waktu per zona membedakan easy dari tempo
  * dan tempo dari interval — dan durasi memisahkan easy dari long run.
  */
-export function klasifikasiSesi(w: ImportedWorkout, hrMax: number): Klasifikasi {
+export function klasifikasiSessions(w: ImportedWorkout, hrMax: number): Klasifikasi {
   const zona = zoneBreakdown(w.hr, hrMax)
   const total = zona.reduce((a, z) => a + z.menit, 0)
   const bagian = (dari: number, hingga: number) =>
@@ -77,7 +77,7 @@ export function klasifikasiSesi(w: ImportedWorkout, hrMax: number): Klasifikasi 
   if (!w.hr.length) {
     return {
       jenis: 'lainnya', label: 'Tidak bisa dinilai', warna: '#94a3b8',
-      alasan: 'Sesi ini tidak membawa deret detak jantung, jadi jenisnya tidak bisa disimpulkan. Nyalakan Include Workouts dan matikan Aggregate Data agar deretnya ikut terkirim.',
+      alasan: 'Sessions ini tidak membawa deret detak jantung, jadi jenisnya tidak bisa disimpulkan. Nyalakan Include Workouts dan matikan Aggregate Data agar deretnya ikut terkirim.',
       mudahPct, menengahPct, kerasPct, yakin: 'rendah',
     }
   }
@@ -91,7 +91,7 @@ export function klasifikasiSesi(w: ImportedWorkout, hrMax: number): Klasifikasi 
   // Interval: keras berulang di sesi lebih panjang.
   if (kerasPct >= 18) {
     return { jenis: 'interval', label: 'Interval', warna: '#f97316',
-      alasan: `${kerasPct}% waktu di zona 4–5 diselingi pemulihan. Sesi seperti ini menaikkan VO₂max, dan menuntut pemulihan paling banyak di antara semua jenis.`,
+      alasan: `${kerasPct}% waktu di zona 4–5 diselingi pemulihan. Sessions seperti ini menaikkan VO₂max, dan menuntut pemulihan paling banyak di antara semua jenis.`,
       mudahPct, menengahPct, kerasPct, yakin }
   }
   // Tempo: banyak di zona 3, sedikit di zona 4–5.
@@ -109,7 +109,7 @@ export function klasifikasiSesi(w: ImportedWorkout, hrMax: number): Klasifikasi 
   // Pemulihan: sangat ringan dan singkat.
   if (mudahPct >= 85 && menit <= 45) {
     return { jenis: 'pemulihan', label: 'Pemulihan', warna: '#94a3b8',
-      alasan: `${mudahPct}% waktu di zona paling ringan selama ${Math.round(menit)} menit. Sesi ini menambah aliran darah tanpa menambah kelelahan.`,
+      alasan: `${mudahPct}% waktu di zona paling ringan selama ${Math.round(menit)} menit. Sessions ini menambah aliran darah tanpa menambah kelelahan.`,
       mudahPct, menengahPct, kerasPct, yakin }
   }
   return { jenis: 'easy', label: 'Easy run', warna: '#34d399',
@@ -143,7 +143,7 @@ function fmtPaceSingkat(sec: number): string {
  * yang berubah dibandingkan sesi sejenis sebelumnya.
  */
 export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout[]): Debrief {
-  const kl = klasifikasiSesi(w, k.hrMax)
+  const kl = klasifikasiSessions(w, k.hrMax)
   const u = upayaRelatif(w, k)
   const poin: Debrief['poin'] = []
 
@@ -165,7 +165,7 @@ export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout
   let banding: string | undefined
   const sejenis = riwayat
     .filter((x) => x.id !== w.id && Date.parse(x.mulai) < Date.parse(w.mulai))
-    .filter((x) => klasifikasiSesi(x, k.hrMax).jenis === kl.jenis)
+    .filter((x) => klasifikasiSessions(x, k.hrMax).jenis === kl.jenis)
     .sort((a, b) => Date.parse(b.mulai) - Date.parse(a.mulai))
   const lalu = sejenis[0]
   if (lalu && w.paceSec && lalu.paceSec && w.avgHr && lalu.avgHr) {
@@ -181,9 +181,9 @@ export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout
   }
 
   const ringkas =
-    kl.jenis === 'kekuatan' ? 'Sesi kekuatan tercatat. Ini melengkapi lari, bukan menggantikannya.'
-      : kl.jenis === 'lainnya' ? 'Sesi tercatat, tetapi tanpa deret denyut belum bisa dinilai jenisnya.'
-        : `Sesi ini terbaca sebagai ${kl.label.toLowerCase()}. ${kl.alasan}`
+    kl.jenis === 'kekuatan' ? 'Sessions kekuatan tercatat. Ini melengkapi lari, bukan menggantikannya.'
+      : kl.jenis === 'lainnya' ? 'Sessions tercatat, tetapi tanpa deret denyut belum bisa dinilai jenisnya.'
+        : `Sessions ini terbaca sebagai ${kl.label.toLowerCase()}. ${kl.alasan}`
 
   return { judul: `Rangkuman: ${kl.label}`, ringkas, poin, klasifikasi: kl, upaya: u.skor, banding }
 }
@@ -194,7 +194,7 @@ export interface SaranBerikutnya {
   judul: string
   isi: string
   kapan: string
-  jenis: JenisSesi
+  jenis: JenisSessions
   warna: string
   /** Dasar keputusannya, terbuka untuk diperiksa. */
   dasar: string
@@ -203,7 +203,7 @@ export interface SaranBerikutnya {
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 
 /**
- * Sesi berikutnya, dari tiga hal: seberapa berat sesi terakhir, berapa lama
+ * Sessions berikutnya, dari tiga hal: seberapa berat sesi terakhir, berapa lama
  * sejak itu, dan seberapa lelah tubuh menurut model kebugaran/kesegaran.
  */
 export function saranBerikutnya(
@@ -224,27 +224,27 @@ export function saranBerikutnya(
   }
 
   const jamSejak = (sekarang - Date.parse(terakhir.mulai)) / 3_600_000
-  const kl = klasifikasiSesi(terakhir, k.hrMax)
+  const kl = klasifikasiSessions(terakhir, k.hrMax)
   const ff = kebugaranKesegaran(riwayat, k, 90, sekarang)
   const kini = ff.length ? ff[ff.length - 1] : null
   const segar = kini ? kini.kesegaran : 0
 
   const pekanIni = riwayat.filter((w) => sekarang - Date.parse(w.mulai) < 7 * 86400_000)
   const kerasPekanIni = pekanIni.filter((w) => {
-    const j = klasifikasiSesi(w, k.hrMax).jenis
+    const j = klasifikasiSessions(w, k.hrMax).jenis
     return j === 'interval' || j === 'sprint' || j === 'tempo'
   }).length
 
   const besok = new Date(sekarang + 86400_000)
   const namaBesok = HARI[besok.getDay()]
 
-  // Sesi berat baru saja: pulihkan dulu.
+  // Sessions berat baru saja: pulihkan dulu.
   if ((kl.jenis === 'interval' || kl.jenis === 'sprint') && jamSejak < 36) {
     return {
       judul: 'Hari pemulihan', jenis: 'pemulihan', warna: '#94a3b8',
-      isi: 'Sesi terakhir Anda intens. Hari ini sebaiknya jalan kaki, jogging sangat ringan 20–30 menit, atau libur penuh. Adaptasi terjadi saat pulih, bukan saat ditumpuk.',
+      isi: 'Sessions terakhir Anda intens. Hari ini sebaiknya jalan kaki, jogging sangat ringan 20–30 menit, atau libur penuh. Adaptasi terjadi saat pulih, bukan saat ditumpuk.',
       kapan: 'Hari ini',
-      dasar: `Sesi terakhir ${kl.label.toLowerCase()} sekitar ${Math.round(jamSejak)} jam lalu.`,
+      dasar: `Sessions terakhir ${kl.label.toLowerCase()} sekitar ${Math.round(jamSejak)} jam lalu.`,
     }
   }
 
@@ -280,15 +280,15 @@ export function saranBerikutnya(
       judul: 'Easy run pendek', jenis: 'easy', warna: '#34d399',
       isi: 'Setelah sesi panjang, sesi pendek dan mudah membantu kaki pulih lebih cepat daripada libur total. 30–40 menit sudah cukup.',
       kapan: `Besok (${namaBesok})`,
-      dasar: 'Sesi terakhir adalah long run.',
+      dasar: 'Sessions terakhir adalah long run.',
     }
   }
 
   return {
     judul: 'Easy run', jenis: 'easy', warna: '#34d399',
-    isi: 'Pertahankan dasar aerobik: 40–60 menit pada laju yang masih memungkinkan berbicara. Sesi seperti inilah yang seharusnya mengisi sebagian besar pekan.',
+    isi: 'Pertahankan dasar aerobik: 40–60 menit pada laju yang masih memungkinkan berbicara. Sessions seperti inilah yang seharusnya mengisi sebagian besar pekan.',
     kapan: jamSejak >= 24 ? 'Hari ini' : `Besok (${namaBesok})`,
-    dasar: `Sesi terakhir ${kl.label.toLowerCase()}, kesegaran ${Math.round(segar)}.`,
+    dasar: `Sessions terakhir ${kl.label.toLowerCase()}, kesegaran ${Math.round(segar)}.`,
   }
 }
 
@@ -297,7 +297,7 @@ export function saranBerikutnya(
 export interface HariJadwal {
   hari: string
   tanggal: string
-  jenis: JenisSesi
+  jenis: JenisSessions
   label: string
   isi: string
   warna: string
@@ -314,7 +314,7 @@ export function jadwalPekan(
   k: Konteks,
   sekarang = Date.now(),
 ): HariJadwal[] {
-  const pola: { jenis: JenisSesi; label: string; isi: string; warna: string }[] = [
+  const pola: { jenis: JenisSessions; label: string; isi: string; warna: string }[] = [
     { jenis: 'easy', label: 'Easy run', isi: '40–50 menit, laju bisa mengobrol', warna: '#34d399' },
     { jenis: 'tempo', label: 'Tempo', isi: '15 menit pemanasan, 20 menit tempo, 10 menit pendinginan', warna: '#fbbf24' },
     { jenis: 'pemulihan', label: 'Pemulihan / libur', isi: 'Jalan kaki, mobilitas, atau libur penuh', warna: '#94a3b8' },
@@ -409,10 +409,10 @@ export function dukungan(riwayat: ImportedWorkout[], k: Konteks, sekarang = Date
     isi: `${pekanIni.length} sesi, ${kmIni} km. Lebih ringan daripada pekan lalu (${kmLalu} km). Pekan ringan yang disengaja adalah bagian dari program; yang perlu diperhatikan hanya bila ia tidak disengaja dan berulang.` }
 }
 
-/** Ringkasan kesegaran untuk ditampilkan di kolom pelatih. */
+/** Summary kesegaran untuk ditampilkan di kolom pelatih. */
 export function statusSingkat(riwayat: ImportedWorkout[], k: Konteks, sekarang = Date.now()) {
   const ff = kebugaranKesegaran(riwayat, k, 90, sekarang)
   if (!ff.length) return null
   const kini = ff[ff.length - 1]
-  return { ...kini, baca: bacaKesegaran(kini.kesegaran, hariRiwayatLatihan(riwayat, sekarang)) }
+  return { ...kini, baca: bacaKesegaran(kini.kesegaran, hariHistoryLatihan(riwayat, sekarang)) }
 }

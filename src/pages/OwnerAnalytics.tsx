@@ -78,7 +78,7 @@ function SeoTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconShield size={18} />} title="Audit SEO" subtitle="Masukkan kondisi halaman yang ingin dinilai" />
+        <SectionTitle icon={<IconShield size={18} />} title="Audit SEO" subtitle="Enter the conditions you want assessed" />
         <div className="mt-3 grid gap-2">
           <Field label="Title tag"><input className={inputClass} value={i.title} onChange={(e) => set({ title: e.target.value })} /></Field>
           <Field label="Meta description"><input className={inputClass} value={i.metaDescription} onChange={(e) => set({ metaDescription: e.target.value })} /></Field>
@@ -155,7 +155,7 @@ function AbTab() {
         <div className="mt-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
           <div className="flex items-center justify-between">
             <span className="text-[12px] font-bold text-neutral-500">Butuh per kelompok</span>
-            <span className="text-xl font-black text-ink dark:text-white">{need.toLocaleString('id-ID')}</span>
+            <span className="text-xl font-black text-ink dark:text-white">{need.toLocaleString('en-GB')}</span>
           </div>
           <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
             Pada kekuatan 80% dan tingkat signifikansi 5%. Tetapkan angka ini dulu, lalu jalankan
@@ -165,7 +165,7 @@ function AbTab() {
       </Card>
 
       <Card className="!p-4">
-        <SectionTitle icon={<IconShield size={18} />} title="Hasil uji" subtitle="Uji z dua proporsi" />
+        <SectionTitle icon={<IconShield size={18} />} title="Test result" subtitle="Uji z dua proporsi" />
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Field label="Kontrol — pengunjung"><input className={inputClass} inputMode="numeric" value={cv} onChange={(e) => setCv(e.target.value)} /></Field>
           <Field label="Kontrol — konversi"><input className={inputClass} inputMode="numeric" value={cc} onChange={(e) => setCc(e.target.value)} /></Field>

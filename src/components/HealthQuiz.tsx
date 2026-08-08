@@ -119,7 +119,7 @@ export function HealthQuiz() {
           <div className="font-bold">{isCorrect ? '✓ Benar!' : '✕ Kurang tepat.'}</div>
           <p className="mt-1 opacity-90">{q.explanation}</p>
           {q.source && <p className="mt-1 text-[10px] opacity-60">Sumber: {q.source}</p>}
-          <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Lanjut →</button>
+          <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Next →</button>
         </div>
       )}
     </div>

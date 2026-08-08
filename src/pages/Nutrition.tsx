@@ -1388,7 +1388,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                 }).length
                 return (
                   <tr key={lab.date + li} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition">
-                    <td className="py-2 pr-3 font-bold text-neutral-700 whitespace-nowrap sticky left-0 bg-white">{new Date(lab.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
+                    <td className="py-2 pr-3 font-bold text-neutral-700 whitespace-nowrap sticky left-0 bg-white">{new Date(lab.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
                     {labKeys.map(k => {
                       const v = lab.values[k]; const st = v != null ? labStatus(k, v) : null
                       return (
@@ -1553,7 +1553,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">Longevity Score</span>
             <span className="text-[9px] text-white/20">{'\u00B7'}</span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 

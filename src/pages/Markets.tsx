@@ -30,7 +30,7 @@ const RANGES = [
 function fmtPrice(v: number | null, currency: string): string {
   if (v == null) return '—'
   const digits = Math.abs(v) >= 1000 ? 0 : Math.abs(v) >= 10 ? 2 : 4
-  const n = v.toLocaleString('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits })
+  const n = v.toLocaleString('en-GB', { minimumFractionDigits: digits, maximumFractionDigits: digits })
   return currency === 'IDR' ? `Rp ${n}` : currency === 'USD' ? `$${n}` : `${n} ${currency}`
 }
 
@@ -290,11 +290,11 @@ export function Markets() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                    <XAxis dataKey="t" tick={{ fontSize: 9 }} tickFormatter={(v) => new Date(v).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })} minTickGap={40} />
+                    <XAxis dataKey="t" tick={{ fontSize: 9 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} minTickGap={40} />
                     <YAxis tick={{ fontSize: 9 }} domain={['auto', 'auto']} width={54} />
                     <Tooltip
                       contentStyle={{ fontSize: 11 }}
-                      labelFormatter={(v) => new Date(v as number).toLocaleString('id-ID')}
+                      labelFormatter={(v) => new Date(v as number).toLocaleString('en-GB')}
                       formatter={(v) => [fmtPrice(typeof v === 'number' ? v : null, q.currency), 'Harga']} />
                     <Area type="monotone" dataKey="c" stroke={up ? '#00BF63' : '#ef4444'} strokeWidth={2} fill={`url(#g-${q.symbol})`} />
                   </AreaChart>
@@ -328,7 +328,7 @@ export function Markets() {
 
       {news.length > 0 && (
         <Card className="!p-4">
-          <SectionTitle icon={<IconToken size={18} />} title="Berita ekonomi & bisnis" subtitle="Google News — domestik dan internasional" />
+          <SectionTitle icon={<IconToken size={18} />} title="Berita ekonomi & bisnis" subtitle="Google News — domestic and international" />
           <div className="mt-2 space-y-2">
             {news.slice(0, 14).map((n, i) => (
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer"

@@ -66,16 +66,16 @@ function useNoteData(armed: boolean) {
  */
 const ANAMNESIS_LABELS: [keyof NonNullable<SkdiDiseaseNote['anamnesis']>, string][] = [
   ['keluhanUtama', 'Keluhan Utama'],
-  ['riwayatPenyakitSekarang', 'Riwayat Penyakit Sekarang (SOCRATES)'],
-  ['riwayatPenyakitDahulu', 'Riwayat Penyakit Dahulu'],
-  ['riwayatPenyakitKeluarga', 'Riwayat Penyakit Keluarga'],
-  ['riwayatPengobatan', 'Riwayat Pengobatan'],
-  ['riwayatAlergi', 'Riwayat Alergi'],
-  ['riwayatKehamilanPersalinan', 'Riwayat Kehamilan & Persalinan'],
-  ['riwayatTumbuhKembang', 'Riwayat Tumbuh Kembang'],
-  ['riwayatNutrisi', 'Riwayat Nutrisi'],
-  ['riwayatImunisasi', 'Riwayat Imunisasi'],
-  ['riwayatSosialEkonomi', 'Riwayat Sosial Ekonomi & Lingkungan'],
+  ['riwayatPenyakitSekarang', 'History Penyakit Sekarang (SOCRATES)'],
+  ['riwayatPenyakitDahulu', 'History Penyakit Dahulu'],
+  ['riwayatPenyakitKeluarga', 'History Penyakit Keluarga'],
+  ['riwayatPengobatan', 'History Pengobatan'],
+  ['riwayatAlergi', 'History Alergi'],
+  ['riwayatKehamilanPersalinan', 'History Kehamilan & Persalinan'],
+  ['riwayatTumbuhKembang', 'History Tumbuh Kembang'],
+  ['riwayatNutrisi', 'History Nutrisi'],
+  ['riwayatImunisasi', 'History Imunisasi'],
+  ['riwayatSosialEkonomi', 'History Sosial Ekonomi & Lingkungan'],
 ]
 
 function resolveNote(disease: string, data: NoteData | null) {

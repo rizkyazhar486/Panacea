@@ -134,7 +134,7 @@ export function VerifikasiConnect() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle icon={<IconShield />} title="Verifikasi Connect"
-        subtitle="Wajib sebelum bisa berkenalan — supaya yang Anda temui benar orangnya" />
+        subtitle="Required before you can meet anyone — so the person you meet is really them" />
 
       {status === 'terverifikasi' && (
         <Card className="!border-emerald-500/30 !bg-emerald-500/5">

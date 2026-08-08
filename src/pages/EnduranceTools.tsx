@@ -36,7 +36,7 @@ export function EnduranceTools() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconActivity />} title="Alat Endurance"
-        subtitle="Bahan bakar, FTP, panduan daya, dan aklimatisasi — semua dari masukan Anda sendiri" />
+        subtitle="Fuelling, FTP, power guidance, and acclimatisation — all from your own input" />
 
       <Card>
         <p className="text-sm leading-relaxed text-slate-300">
@@ -99,7 +99,7 @@ function TabBahanBakar() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Sekali saja, lalu semua rencana cairan memakai angka Anda sendiri" />
+        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Once only, then every fluid plan uses your own numbers" />
         <p className="mt-2 text-sm leading-relaxed text-slate-400">
           Timbang tanpa baju sebelum dan sesudah sesi, catat berapa yang diminum. Laju keringat berbeda
           sampai <strong className="text-white">tiga kali lipat</strong> antarorang pada suhu yang sama —
@@ -124,7 +124,7 @@ function TabBahanBakar() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Rencana untuk satu sesi" />
+        <SectionTitle icon={<IconRun />} title="Plan for a single session" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="Durasi (menit)"><input className={inputClass} inputMode="numeric" value={durasi} onChange={(e) => setDurasi(e.target.value)} /></Field>
           <Field label="Suhu (°C)"><input className={inputClass} inputMode="numeric" value={suhu} onChange={(e) => setSuhu(e.target.value)} /></Field>
@@ -203,7 +203,7 @@ function TabFtp() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Daya yang bisa dipertahankan sekitar satu jam" />
+        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Power you can hold for about an hour" />
         <p className="mt-2 text-sm leading-relaxed text-slate-400">
           FTP adalah batas yang memisahkan &quot;berat tapi bisa dijalani&quot; dari &quot;kelelahan menumpuk
           cepat&quot;. Di atasnya, laktat menumpuk lebih cepat daripada yang bisa dibersihkan, dan performa
@@ -286,7 +286,7 @@ function TabPanduan() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Target watt per segmen, dari profil tanjakan" />
+        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Target watts per segment, from the climb profile" />
         <p className="mt-2 text-sm leading-relaxed text-slate-400">
           Aturan intinya berlawanan dengan naluri kebanyakan orang: <strong className="text-white">naik
           tanjakan pakai daya lebih tinggi, turun dan datar pakai lebih rendah</strong>. Saat menanjak
@@ -313,7 +313,7 @@ function TabPanduan() {
       </Card>
 
       <Card>
-        <SectionTitle title="Segmen rute" subtitle="Bagi rute menjadi bagian datar, tanjakan, dan turunan" />
+        <SectionTitle title="Segmen rute" subtitle="Split the route into flat, climbing, and descending parts" />
         <div className="mt-2 space-y-2">
           {segmen.map((s, i) => (
             <div key={i} className="rounded-lg border border-white/10 p-2.5">
