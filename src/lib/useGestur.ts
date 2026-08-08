@@ -1,57 +1,65 @@
 import { useEffect, useRef, useState } from 'react'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Gestur sentuh: geser ke kanan untuk kembali, dan tarik untuk menyegarkan.
+// Gestur sentuh: geser mendatar untuk berpindah halaman, geser tegak untuk
+// menyegarkan.
 //
 // Gestur berbagi layar dengan menggulir, jadi aturan utamanya satu: SEBUAH
 // GESTUR TIDAK BOLEH MERAMPAS SENTUHAN YANG SEBENARNYA DIMAKSUDKAN UNTUK HAL
 // LAIN. Semua keputusan di bawah berasal dari aturan itu.
 //
-// GESER KANAN = KEMBALI
-//   * Harus dimulai dari tepi kiri (28 px pertama). Tanpa syarat ini, setiap
-//     geseran mendatar di tengah layar akan memicu kembali — padahal di tengah
-//     layar ada carousel, tab yang bisa digeser, dan slider.
+// GESER KIRI = KEMBALI, GESER KANAN = LANJUT
+//   Pemetaan ini ditentukan pemilik. Perlu dicatat bahwa ia KEBALIKAN dari
+//   kebiasaan iOS dan Android, yang keduanya memakai geser-kanan untuk kembali;
+//   pengguna yang terbiasa akan salah arah pada percobaan pertama. Karena itu
+//   tombol kembali di header tetap ada dan tetap menjadi jalan utama.
+//
+//   * Harus dimulai dari TEPI (28 px). Kembali dari tepi kanan, lanjut dari
+//     tepi kiri. Tanpa syarat ini setiap geseran mendatar di tengah layar akan
+//     berpindah halaman — padahal di sana ada carousel, tab yang bisa digeser,
+//     dan slider.
 //   * Arahnya harus jelas mendatar (dua kali lebih jauh mendatar daripada
 //     menegak), supaya gulir menyerong tidak salah dibaca.
 //   * Dibatalkan bila jari menyentuh lebih dari satu, karena itu cubit-zum.
 //
-// TARIK = SEGARKAN
-//   Diminta "geser ke atas untuk menyegarkan". Ditafsirkan sebagai geseran di
-//   BATAS GULIR, bukan geseran ke atas di sembarang tempat — geseran ke atas di
-//   tengah halaman adalah cara orang menggulir ke bawah, dan merampasnya akan
-//   membuat halaman mustahil dibaca. Karena itu keduanya diterima, dan
-//   keduanya hanya di ujung:
+// GESER TEGAK = SEGARKAN
+//   Diminta "geser ke atas untuk menyegarkan". Dijalankan hanya di BATAS
+//   GULIR, bukan di sembarang tempat — geseran ke atas di tengah halaman adalah
+//   cara orang menggulir ke bawah, dan merampasnya akan membuat halaman panjang
+//   mustahil dibaca. Jadi:
+//     * dorong ke atas saat sudah di paling bawah (yang diminta), dan
 //     * tarik ke bawah saat sudah di paling atas (kebiasaan yang dikenal luas)
-//     * dorong ke atas saat sudah di paling bawah (yang diminta)
 //   Ambangnya 90 px supaya lenting karet iOS tidak menyegarkan tanpa sengaja.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LEBAR_TEPI = 28
-const JARAK_KEMBALI = 70
+const JARAK_PINDAH = 70
 const JARAK_SEGARKAN = 90
 
 export interface OpsiGestur {
-  /** Dipanggil saat geseran kembali selesai. */
+  /** Geser kiri dari tepi kanan. */
   onKembali?: () => void
-  /** Dipanggil saat tarikan segarkan selesai. */
+  /** Geser kanan dari tepi kiri. */
+  onLanjut?: () => void
+  /** Dipanggil saat geseran segarkan selesai. */
   onSegarkan?: () => void
   /** Matikan seluruh gestur (mis. saat modal terbuka). */
   mati?: boolean
 }
 
 /** Seberapa jauh tarikan segarkan sudah berjalan, 0–1, untuk umpan balik visual. */
-export function useGestur({ onKembali, onSegarkan, mati }: OpsiGestur) {
+export function useGestur({ onKembali, onLanjut, onSegarkan, mati }: OpsiGestur) {
   const [tarikan, setTarikan] = useState(0)
   // Callback disimpan di ref agar pendengar tidak perlu dipasang ulang tiap
   // render — memasang ulang listener sentuh di tengah gestur membatalkannya.
-  const cb = useRef({ onKembali, onSegarkan })
-  cb.current = { onKembali, onSegarkan }
+  const cb = useRef({ onKembali, onLanjut, onSegarkan })
+  cb.current = { onKembali, onLanjut, onSegarkan }
 
   useEffect(() => {
     if (mati) return
 
     let x0 = 0, y0 = 0, aktif = false
-    let mode: 'belum' | 'kembali' | 'segarkan' | 'batal' = 'belum'
+    let mode: 'belum' | 'kembali' | 'lanjut' | 'segarkan' | 'batal' = 'belum'
 
     const diPalingAtas = () => window.scrollY <= 2
     const diPalingBawah = () =>
@@ -76,7 +84,11 @@ export function useGestur({ onKembali, onSegarkan, mati }: OpsiGestur) {
         // berganti di tengah membuat gestur terasa "meleset" saat jari
         // bergoyang sedikit.
         if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 2) {
-          mode = dx > 0 && x0 <= LEBAR_TEPI ? 'kembali' : 'batal'
+          const dariKiri = x0 <= LEBAR_TEPI
+          const dariKanan = x0 >= window.innerWidth - LEBAR_TEPI
+          if (dx < 0 && dariKanan) mode = 'kembali'
+          else if (dx > 0 && dariKiri) mode = 'lanjut'
+          else mode = 'batal'
         } else if (Math.abs(dy) > 10) {
           const tarikBawah = dy > 0 && diPalingAtas()
           const dorongAtas = dy < 0 && diPalingBawah()
@@ -96,7 +108,8 @@ export function useGestur({ onKembali, onSegarkan, mati }: OpsiGestur) {
       const dx = t.clientX - x0
       const dy = t.clientY - y0
 
-      if (mode === 'kembali' && dx >= JARAK_KEMBALI) cb.current.onKembali?.()
+      if (mode === 'kembali' && -dx >= JARAK_PINDAH) cb.current.onKembali?.()
+      else if (mode === 'lanjut' && dx >= JARAK_PINDAH) cb.current.onLanjut?.()
       else if (mode === 'segarkan' && Math.abs(dy) >= JARAK_SEGARKAN) cb.current.onSegarkan?.()
 
       setTarikan(0)

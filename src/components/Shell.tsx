@@ -2,7 +2,8 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
 import { pasangKilau } from '../lib/kilau'
-import { useState, useEffect, useCallback, type ReactNode } from 'react'
+import { indukRute } from '../lib/alurHalaman'
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
   IconDashboard,
@@ -252,14 +253,34 @@ export function Shell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
 
-  // Beranda tidak punya "kembali" yang masuk akal, dan riwayat yang kosong
-  // (mis. tautan dibuka langsung) akan membawa pengguna keluar dari aplikasi.
-  const bisaKembali = loc.pathname !== '/' && window.history.length > 1
+  // Kembali mengikuti ALUR HALAMAN, bukan sekadar satu langkah mundur di
+  // riwayat. Alasannya ada di lib/alurHalaman.ts: riwayat sering tidak seperti
+  // yang dibayangkan — tautan yang dibuka langsung punya riwayat kosong,
+  // sehingga history.back() melempar pengguna keluar dari aplikasi.
+  const bisaKembali = loc.pathname !== '/'
+
+  // Halaman sebelumnya diingat karena menentukan CARA kembali, bukan tujuannya.
+  // Bila induk kebetulan sama dengan halaman sebelumnya, mundur di riwayat
+  // lebih baik daripada mendorong entri baru — mendorong entri membuat "lanjut"
+  // tidak pernah punya tujuan, karena riwayat ke depan selalu kosong.
+  const sebelumnya = useRef<string | null>(null)
+  useEffect(() => {
+    return () => { sebelumnya.current = loc.pathname }
+  }, [loc.pathname])
+
   const kembali = useCallback(() => {
     if (loc.pathname === '/') return
-    if (window.history.length > 1) navigate(-1)
+    const induk = indukRute(loc.pathname)
+    if (induk && induk === sebelumnya.current) navigate(-1)
+    else if (induk) navigate(induk)
+    else if (window.history.length > 1) navigate(-1)
     else navigate('/')
   }, [loc.pathname, navigate])
+
+  // Maju: hanya berarti bila ada yang bisa dimajui. Tidak ada cara membaca
+  // panjang riwayat ke depan di peramban, jadi navigate(1) dipanggil apa adanya
+  // — bila tidak ada, peramban mengabaikannya dan tidak terjadi apa-apa.
+  const lanjut = useCallback(() => navigate(1), [navigate])
 
   // Menyegarkan tanpa memuat ulang seluruh aplikasi: React dipaksa memasang
   // ulang halaman lewat kunci, sehingga setiap useEffect pengambil data
@@ -273,7 +294,10 @@ export function Shell({ children }: { children: ReactNode }) {
     window.setTimeout(() => setSedangSegar(false), 600)
   }, [])
 
-  const tarikan = useGestur({ onKembali: kembali, onSegarkan: segarkan, mati: cariBuka || menuOpen })
+  const tarikan = useGestur({
+    onKembali: kembali, onLanjut: lanjut, onSegarkan: segarkan,
+    mati: cariBuka || menuOpen,
+  })
 
   // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
   // satunya cara membukanya tanpa memindahkan tangan dari papan ketik.
