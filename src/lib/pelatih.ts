@@ -77,7 +77,7 @@ export function klasifikasiSessions(w: ImportedWorkout, hrMax: number): Klasifik
   if (!w.hr.length) {
     return {
       jenis: 'lainnya', label: 'Tidak bisa dinilai', warna: '#94a3b8',
-      alasan: 'Sessions ini tidak membawa deret detak jantung, jadi jenisnya tidak bisa disimpulkan. Nyalakan Include Workouts dan matikan Aggregate Data agar deretnya ikut terkirim.',
+      alasan: 'Sesi ini tidak membawa deret detak jantung, jadi jenisnya tidak bisa disimpulkan. Nyalakan Include Workouts dan matikan Aggregate Data agar deretnya ikut terkirim.',
       mudahPct, menengahPct, kerasPct, yakin: 'rendah',
     }
   }
@@ -91,7 +91,7 @@ export function klasifikasiSessions(w: ImportedWorkout, hrMax: number): Klasifik
   // Interval: keras berulang di sesi lebih panjang.
   if (kerasPct >= 18) {
     return { jenis: 'interval', label: 'Interval', warna: '#f97316',
-      alasan: `${kerasPct}% waktu di zona 4–5 diselingi pemulihan. Sessions seperti ini menaikkan VO₂max, dan menuntut pemulihan paling banyak di antara semua jenis.`,
+      alasan: `${kerasPct}% waktu di zona 4–5 diselingi pemulihan. Sesi seperti ini menaikkan VO₂max, dan menuntut pemulihan paling banyak di antara semua jenis.`,
       mudahPct, menengahPct, kerasPct, yakin }
   }
   // Tempo: banyak di zona 3, sedikit di zona 4–5.
@@ -109,7 +109,7 @@ export function klasifikasiSessions(w: ImportedWorkout, hrMax: number): Klasifik
   // Pemulihan: sangat ringan dan singkat.
   if (mudahPct >= 85 && menit <= 45) {
     return { jenis: 'pemulihan', label: 'Pemulihan', warna: '#94a3b8',
-      alasan: `${mudahPct}% waktu di zona paling ringan selama ${Math.round(menit)} menit. Sessions ini menambah aliran darah tanpa menambah kelelahan.`,
+      alasan: `${mudahPct}% waktu di zona paling ringan selama ${Math.round(menit)} menit. Sesi ini menambah aliran darah tanpa menambah kelelahan.`,
       mudahPct, menengahPct, kerasPct, yakin }
   }
   return { jenis: 'easy', label: 'Easy run', warna: '#34d399',
@@ -181,9 +181,9 @@ export function debrief(w: ImportedWorkout, k: Konteks, riwayat: ImportedWorkout
   }
 
   const ringkas =
-    kl.jenis === 'kekuatan' ? 'Sessions kekuatan tercatat. Ini melengkapi lari, bukan menggantikannya.'
-      : kl.jenis === 'lainnya' ? 'Sessions tercatat, tetapi tanpa deret denyut belum bisa dinilai jenisnya.'
-        : `Sessions ini terbaca sebagai ${kl.label.toLowerCase()}. ${kl.alasan}`
+    kl.jenis === 'kekuatan' ? 'Sesi kekuatan tercatat. Ini melengkapi lari, bukan menggantikannya.'
+      : kl.jenis === 'lainnya' ? 'Sesi tercatat, tetapi tanpa deret denyut belum bisa dinilai jenisnya.'
+        : `Sesi ini terbaca sebagai ${kl.label.toLowerCase()}. ${kl.alasan}`
 
   return { judul: `Rangkuman: ${kl.label}`, ringkas, poin, klasifikasi: kl, upaya: u.skor, banding }
 }
@@ -203,7 +203,7 @@ export interface SaranBerikutnya {
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 
 /**
- * Sessions berikutnya, dari tiga hal: seberapa berat sesi terakhir, berapa lama
+ * Sesi berikutnya, dari tiga hal: seberapa berat sesi terakhir, berapa lama
  * sejak itu, dan seberapa lelah tubuh menurut model kebugaran/kesegaran.
  */
 export function saranBerikutnya(
@@ -238,13 +238,13 @@ export function saranBerikutnya(
   const besok = new Date(sekarang + 86400_000)
   const namaBesok = HARI[besok.getDay()]
 
-  // Sessions berat baru saja: pulihkan dulu.
+  // Sesi berat baru saja: pulihkan dulu.
   if ((kl.jenis === 'interval' || kl.jenis === 'sprint') && jamSejak < 36) {
     return {
       judul: 'Hari pemulihan', jenis: 'pemulihan', warna: '#94a3b8',
-      isi: 'Sessions terakhir Anda intens. Hari ini sebaiknya jalan kaki, jogging sangat ringan 20–30 menit, atau libur penuh. Adaptasi terjadi saat pulih, bukan saat ditumpuk.',
+      isi: 'Sesi terakhir Anda intens. Hari ini sebaiknya jalan kaki, jogging sangat ringan 20–30 menit, atau libur penuh. Adaptasi terjadi saat pulih, bukan saat ditumpuk.',
       kapan: 'Hari ini',
-      dasar: `Sessions terakhir ${kl.label.toLowerCase()} sekitar ${Math.round(jamSejak)} jam lalu.`,
+      dasar: `Sesi terakhir ${kl.label.toLowerCase()} sekitar ${Math.round(jamSejak)} jam lalu.`,
     }
   }
 
@@ -280,15 +280,15 @@ export function saranBerikutnya(
       judul: 'Easy run pendek', jenis: 'easy', warna: '#34d399',
       isi: 'Setelah sesi panjang, sesi pendek dan mudah membantu kaki pulih lebih cepat daripada libur total. 30–40 menit sudah cukup.',
       kapan: `Besok (${namaBesok})`,
-      dasar: 'Sessions terakhir adalah long run.',
+      dasar: 'Sesi terakhir adalah long run.',
     }
   }
 
   return {
     judul: 'Easy run', jenis: 'easy', warna: '#34d399',
-    isi: 'Pertahankan dasar aerobik: 40–60 menit pada laju yang masih memungkinkan berbicara. Sessions seperti inilah yang seharusnya mengisi sebagian besar pekan.',
+    isi: 'Pertahankan dasar aerobik: 40–60 menit pada laju yang masih memungkinkan berbicara. Sesi seperti inilah yang seharusnya mengisi sebagian besar pekan.',
     kapan: jamSejak >= 24 ? 'Hari ini' : `Besok (${namaBesok})`,
-    dasar: `Sessions terakhir ${kl.label.toLowerCase()}, kesegaran ${Math.round(segar)}.`,
+    dasar: `Sesi terakhir ${kl.label.toLowerCase()}, kesegaran ${Math.round(segar)}.`,
   }
 }
 

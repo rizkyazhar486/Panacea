@@ -479,7 +479,7 @@ export function kesiapan(opsi: {
   const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Cukup siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
   const warna = skor >= 80 ? '#34d399' : skor >= 65 ? '#a3e635' : skor >= 45 ? '#fbbf24' : '#f87171'
   const saran = skor >= 80 ? 'Hari yang baik untuk sesi kualitas bila memang terjadwal.'
-    : skor >= 65 ? 'Sessions terjadwal boleh dijalankan; nilai kembali setelah pemanasan.'
+    : skor >= 65 ? 'Sesi terjadwal boleh dijalankan; nilai kembali setelah pemanasan.'
       : skor >= 45 ? 'Condongkan ke sesi mudah. Bila terasa baik setelah 10 menit pemanasan, boleh dinaikkan.'
         : 'Pilih sesi mudah maupun istirahat. Memaksakan sesi keras pada keadaan ini menambah kelelahan tanpa menambah kebugaran.'
 
@@ -506,7 +506,7 @@ export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJ
         rincian: 'Pertahankan denyut 60-70% HRmaks. Bila harus melambat sampai terasa terlalu pelan, itu justru tandanya benar.',
         alasan: `Kesiapan Anda baik, namun hanya ${b.pctAerobikRendah ?? 0}% waktu latihan Anda berada di zona mudah. Menambah sesi keras sekarang bukan yang paling menolong.` }
     }
-    return { judul: 'Sessions kualitas: tempo 20-25 menit',
+    return { judul: 'Sesi kualitas: tempo 20-25 menit',
       rincian: 'Setelah 15 menit pemanasan, jalankan pada denyut sekitar ambang, lalu pendinginan 10 menit.',
       alasan: 'Kesiapan baik dan beban terkendali — hari yang tepat untuk sesi yang menuntut.' }
   }
@@ -515,9 +515,9 @@ export function saranSessionsHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJ
       rincian: 'Zona 2. Nilai ulang setelah 10 menit; bila terasa berat, perpendek.',
       alasan: 'Kesiapan sedang — volume mudah tetap menambah basis aerobik tanpa menambah kelelahan berarti.' }
   }
-  return { judul: 'Sessions mudah 20-30 menit atau istirahat',
+  return { judul: 'Sesi mudah 20-30 menit atau istirahat',
     rincian: 'Zona 1-2 saja.',
-    alasan: 'Kesiapan di bawah kebiasaan. Sessions ringan tetap membantu pemulihan; sesi keras tidak.' }
+    alasan: 'Kesiapan di bawah kebiasaan. Sesi ringan tetap membantu pemulihan; sesi keras tidak.' }
 }
 
 // ── 9. Skor ketahanan ───────────────────────────────────────────────────────

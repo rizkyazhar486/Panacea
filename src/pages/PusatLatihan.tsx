@@ -22,7 +22,7 @@ const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ defa
 
 const TABS: TabDef[] = [
   { id: 'pelatih', label: 'Pelatih', emoji: '🏃', komponen: WorkoutHistory,
-    ringkas: 'Sessions berikutnya, rangkuman sesi terakhir, riwayat, target dan rekor' },
+    ringkas: 'Sesi berikutnya, rangkuman sesi terakhir, riwayat, target dan rekor' },
   { id: 'analisis', label: 'Analisis', emoji: '📈', komponen: AnalisisPro,
     ringkas: 'Kebugaran & kesegaran, upaya relatif, log latihan, zona pace' },
   { id: 'fisiologi', label: 'Fisiologi', emoji: '🫀', komponen: TrainingPhysiology,

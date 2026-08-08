@@ -403,7 +403,7 @@ export function aklimatisasiPanas(paparan: PaparanPanas[], sekarang = Date.now()
     saran: persen >= 80
       ? 'Pertahankan dengan paparan panas 2-3 kali sepekan. Tanpa paparan, sekitar seperempatnya luruh tiap pekan.'
       : persen >= 50
-        ? 'Lanjutkan paparan harian. Sessions mudah di suhu panas sudah cukup — tidak perlu sesi keras, dan sesi keras dalam panas justru menambah risiko.'
+        ? 'Lanjutkan paparan harian. Sesi mudah di suhu panas sudah cukup — tidak perlu sesi keras, dan sesi keras dalam panas justru menambah risiko.'
         : 'Mulai dengan sesi mudah 30-60 menit dalam suhu panas, dan naikkan durasinya bertahap. Jangan memulai dengan sesi keras.',
   }
 }

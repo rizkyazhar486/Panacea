@@ -100,7 +100,7 @@ export function AnalisisPro() {
             halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
-            Sessions masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
+            Sesi masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
             <strong className="text-slate-300"> Data Type: Workouts</strong> dengan
             <strong className="text-slate-300"> Date Range: Today</strong>. Periksa di{' '}
             <Link to="/health-data/tutorial" className="font-semibold text-white underline">Diagnosa sinkronisasi</Link>.

@@ -27,7 +27,7 @@ export interface WidgetDef {
 }
 
 export const WIDGETS: WidgetDef[] = [
-  { id: 'pelatih', label: 'Pelatih Latihan', ringkas: 'Sessions berikutnya, rangkuman sesi terakhir, dan status kesegaran', ke: '/riwayat-latihan', emoji: '🏃', bawaan: true },
+  { id: 'pelatih', label: 'Pelatih Latihan', ringkas: 'Sesi berikutnya, rangkuman sesi terakhir, dan status kesegaran', ke: '/riwayat-latihan', emoji: '🏃', bawaan: true },
   { id: 'bodyBattery', label: 'Body Battery', ringkas: 'Cadangan energi hari ini', ke: '/body-battery', emoji: '🔋', bawaan: true },
   { id: 'targetLatihan', label: 'Target Latihan', ringkas: 'Kemajuan target pekan atau bulan ini', ke: '/analisis-pro', emoji: '🎯', bawaan: true },
   { id: 'kebugaran', label: 'Kebugaran & Kesegaran', ringkas: 'Beban kronis melawan kelelahan akut', ke: '/analisis-pro', emoji: '📈' },
@@ -35,7 +35,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'detakJantung', label: 'Detak Jantung', ringkas: 'Sampel terbaru dari jam tangan', ke: '/log-detak-jantung', emoji: '❤️' },
   { id: 'tidur', label: 'Sleep Pattern', ringkas: 'Durasi dan tahapan tidur semalam', ke: '/pola-tidur', emoji: '😴' },
   { id: 'healthData', label: 'Data Kesehatan', ringkas: 'Metrik yang terisi otomatis dari perangkat', ke: '/health-data', emoji: '🩺' },
-  { id: 'latihanTerpandu', label: 'Latihan Terpandu', ringkas: 'Sessions berpanduan dengan video bentuk gerakan', ke: '/workout', emoji: '🏋️' },
+  { id: 'latihanTerpandu', label: 'Latihan Terpandu', ringkas: 'Sesi berpanduan dengan video bentuk gerakan', ke: '/workout', emoji: '🏋️' },
   { id: 'crossfit', label: 'CrossFit & AMRAP', ringkas: 'Benchmark bernama dengan jam mulai, jeda dan ketuk ronde', ke: '/crossfit', emoji: '🔥' },
   { id: 'teknikLari', label: 'Teknik Lari', ringkas: 'Irama langkah, jangkauan kaki, napas, start', ke: '/teknik-lari', emoji: '🏃‍♂️' },
   { id: 'peregangan', label: 'Peregangan & Postur', ringkas: 'Rutinitas sebelum lari, sesudah sepeda, jeda kerja duduk', ke: '/peregangan', emoji: '🧘' },

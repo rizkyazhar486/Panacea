@@ -259,7 +259,7 @@ export const PROTOKOL: Protokol[] = [
     id: 'meja', nama: 'Jeda kerja duduk', ikon: '💺', ringkas: 'Postur, 4 menit',
     urutan: ['leher-dagu', 'rotasi-toraks', 'dada-pintu', 'fleksor-pinggul'],
     durasiTotal: '4 menit',
-    catatan: 'Lakukan tiap 2-3 jam. Sessions pendek yang sering jauh lebih berguna daripada satu sesi panjang di akhir hari.',
+    catatan: 'Lakukan tiap 2-3 jam. Sesi pendek yang sering jauh lebih berguna daripada satu sesi panjang di akhir hari.',
   },
   {
     id: 'pagi', nama: 'Bangun tidur', ikon: '🌅', ringkas: 'Lembut, 5 menit',
