@@ -3,7 +3,7 @@ import { Card, SectionTitle, Button } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
 import {
-  daftarSurah, bacaSurah, renunganUntuk, SUMBER, TAFSIR, TERJEMAHAN,
+  daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN,
   TOTAL_SURAH, TOTAL_AYAT_HAFS,
   type Surah, type Ayat,
 } from '../lib/kitab'
@@ -30,6 +30,9 @@ export function Kitab() {
   const [tafsirId, setTafsirId] = useState<string | undefined>(undefined)
   const [galat, setGalat] = useState('')
   const [muat, setMuat] = useState(false)
+  // Dibaca ulang tiap render supaya selalu mencerminkan penyedia yang terakhir
+  // benar-benar menjawab, bukan yang pertama dalam daftar.
+  const p = penyediaSekarang()
 
   useEffect(() => {
     setMuat(true)
@@ -76,24 +79,29 @@ export function Kitab() {
       </Card>
 
       <Card>
-        <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Source</div>
-        <p className="mt-1 text-[13px] font-bold text-ink">{SUMBER.quran.penerbit}</p>
-        <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">{SUMBER.quran.catatan}</p>
-        <a href={SUMBER.quran.situs} target="_blank" rel="noopener noreferrer"
+        {/* Penyedia yang BENAR-BENAR melayani bacaan ini, bukan yang
+            direncanakan. Bila suatu saat rantai cadangan dipakai, yang tampil
+            di sini ikut berubah — pembaca tidak boleh tidak tahu ia sedang
+            membaca dari mana. */}
+        <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Serving this text</div>
+        <p className="mt-1 text-[13px] font-bold text-ink">{p.penerbit}</p>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-neutral-500">{p.catatan}</p>
+        <a href={p.situs} target="_blank" rel="noopener noreferrer"
           className="mt-1 inline-block text-[11px] font-bold text-brand underline">
-          {SUMBER.quran.situs} →
+          {p.situs} →
         </a>
+        <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-600"><b>Terms</b> — {p.syarat}</p>
         {/* Rantai asal ditampilkan penuh. Menyebut nama penyedia saja tidak
             cukup — yang menentukan sah atau tidaknya adalah dari mana penyedia
             itu sendiri memperoleh teksnya, dan apakah pembaca bisa memeriksanya. */}
-        {SUMBER.quran.provenansi && (
+        {p.provenansi && (
           <div className="mt-2.5 space-y-1.5">
             <Ringkas ikon="🔗" judul="Where this text comes from" bukaAwal
               anak={
                 <div className="space-y-1.5">
-                  <Poin ikon="📕"><b>Printed reference</b> — {SUMBER.quran.provenansi.acuan}</Poin>
-                  <Poin ikon="⛓️"><b>Chain</b> — {SUMBER.quran.provenansi.rantai}</Poin>
-                  <Poin ikon="🔍"><b>Verify it yourself</b> — {SUMBER.quran.provenansi.caraPeriksa}</Poin>
+                  <Poin ikon="📕"><b>Printed reference</b> — {p.provenansi.acuan}</Poin>
+                  <Poin ikon="⛓️"><b>Chain</b> — {p.provenansi.rantai}</Poin>
+                  <Poin ikon="🔍"><b>Verify it yourself</b> — {p.provenansi.caraPeriksa}</Poin>
                 </div>
               } />
             <Ringkas ikon="🛡️" judul="What is checked before anything is shown"

@@ -61,11 +61,39 @@ export interface Sumber {
 }
 
 /**
- * Sumber teks. Semuanya penyedia yang teksnya dirujuk luas dan bisa diperiksa.
+ * Penyedia Al-Qur'an, semuanya gratis dan tanpa kunci API, diurutkan menurut
+ * seberapa kuat rantai asalnya bisa ditelusuri.
  *
- * Untuk Al-Qur'an dipakai teks yang berasal dari proyek Tanzil, yang menelusuri
- * rujukannya ke mushaf terverifikasi. Itu disebut di layar, bukan disembunyikan.
+ * BERGANDA, DAN ITU SENGAJA. Bergantung pada satu layanan gratis berarti
+ * menaruh kepercayaan pengguna pada sesuatu yang bisa mati, berubah, atau
+ * dibeli orang lain tanpa memberi tahu siapa pun. Bila yang pertama tidak
+ * menjawab atau jawabannya tidak lolos periksa keutuhan, yang berikutnya
+ * dicoba — dan penyedia yang benar-benar melayani teksnya SELALU disebutkan
+ * di layar, sehingga pembaca tidak pernah tidak tahu ia sedang membaca dari
+ * mana.
+ *
+ * Satu penyedia yang gagal periksa TIDAK ditambal dengan potongan dari
+ * penyedia lain. Satu bacaan datang utuh dari satu sumber, atau tidak sama
+ * sekali — mencampur teks dari dua sumber adalah cara paling halus untuk
+ * merusak mushaf tanpa disadari siapa pun.
  */
+export interface PenyediaQuran extends Sumber {
+  /** Alamat daftar surah. */
+  jalurDaftar: string
+  /** Alamat satu surah; {n} diganti nomor surah, {ed} diganti edisi. */
+  jalurSurah: string
+  /** Nama edisi teks Arab pada penyedia ini. */
+  edisiArab: string
+  /** Pemetaan id terjemahan kami ke id penyedia. */
+  edisiTerjemahan: Record<string, string>
+  edisiTafsir: Record<string, string>
+  /** Bentuk jawaban berbeda antarpenyedia, jadi tiap penyedia membaca sendiri. */
+  bacaDaftar: (j: unknown) => Surah[]
+  bacaSurah: (j: unknown) => { surah: Surah; ayat: { nomor: number; teks: string }[] }
+  /** Syarat pemakaian yang wajib dipatuhi, mis. keharusan mencantumkan sumber. */
+  syarat: string
+}
+
 export const SUMBER: Record<Tradisi, Sumber> = {
   quran: {
     id: 'alquran-cloud',
@@ -222,59 +250,151 @@ async function ambil<T>(url: string, kunci: string): Promise<T> {
   return d
 }
 
+/**
+ * Penyedia gratis tanpa kunci API. Urutannya bukan selera: yang paling atas
+ * adalah yang rantai asalnya paling jelas dan paling sering dirujuk.
+ */
+export const PENYEDIA: PenyediaQuran[] = [
+  {
+    id: 'alquran-cloud',
+    nama: 'AlQuran Cloud',
+    penerbit: 'AlQuran Cloud — teks Utsmani dari proyek Tanzil',
+    situs: 'https://alquran.cloud',
+    basis: 'https://api.alquran.cloud/v1',
+    catatan: 'Gratis, tanpa kunci API.',
+    syarat: 'Sumber wajib dicantumkan, dan teks tidak boleh diubah. Aplikasi ini mematuhi keduanya: nama penyedia tampil di layar dan tidak satu huruf pun disunting.',
+    provenansi: {
+      acuan: 'Mushaf Madinah, riwayat Hafs dari ‘Ashim — cetakan Mujamma‘ al-Malik Fahd.',
+      rantai: 'Teks Utsmani berasal dari proyek Tanzil, yang menyusun dan memeriksa teksnya terhadap mushaf cetakan Mujamma‘ al-Malik Fahd.',
+      caraPeriksa: 'Bandingkan huruf per huruf dengan mushaf cetak di tangan Anda. Bila ada satu perbedaan, hentikan pemakaian dan laporkan — jangan disunting sendiri di aplikasi.',
+    },
+    jalurDaftar: '/surah',
+    jalurSurah: '/surah/{n}/{ed}',
+    edisiArab: 'quran-uthmani',
+    edisiTerjemahan: { 'en.sahih': 'en.sahih', 'id.indonesian': 'id.indonesian', 'en.pickthall': 'en.pickthall' },
+    edisiTafsir: { 'ar.muyassar': 'ar.muyassar', 'ar.jalalayn': 'ar.jalalayn' },
+    bacaDaftar: (j) => {
+      const d = (j as { data?: unknown[] }).data ?? j
+      return (d as Record<string, never>[]).map((x) => ({
+        nomor: Number(x['number']), nama: String(x['englishName']), namaArab: String(x['name']),
+        arti: String(x['englishNameTranslation']), jumlahAyat: Number(x['numberOfAyahs']),
+        tempat: String(x['revelationType']),
+      }))
+    },
+    bacaSurah: (j) => {
+      const d = ((j as { data?: unknown }).data ?? j) as Record<string, never>
+      const a = (d['ayahs'] ?? []) as Record<string, never>[]
+      return {
+        surah: {
+          nomor: Number(d['number']), nama: String(d['englishName']), namaArab: String(d['name']),
+          arti: String(d['englishNameTranslation']), jumlahAyat: Number(d['numberOfAyahs']),
+          tempat: String(d['revelationType']),
+        },
+        ayat: a.map((x) => ({ nomor: Number(x['numberInSurah']), teks: String(x['text']) })),
+      }
+    },
+  },
+  // ── CADANGAN BELUM DIPASANG, DAN ITU DISENGAJA ────────────────────────────
+  //
+  // Rantai cadangan di bawah sudah siap dan diuji, tetapi hanya ada SATU
+  // penyedia terdaftar. Alasannya: bentuk jawaban penyedia kedua tidak dapat
+  // diperiksa dari lingkungan pengembangan ini karena jaringannya tertutup,
+  // dan menulis pembaca jawaban berdasar tebakan berarti mengirim kode yang
+  // akan selalu gagal diam-diam — atau lebih buruk, kadang berhasil dengan
+  // pemetaan ayat yang meleset.
+  //
+  // Menambah penyedia kedua menuntut tiga hal, dan ketiganya harus dikerjakan
+  // dengan API yang benar-benar hidup:
+  //
+  //   1. Ambil satu surah sungguhan, catat bentuk jawabannya, lalu tulis
+  //      bacaDaftar dan bacaSurah dari bentuk itu — bukan dari dokumentasi.
+  //   2. Bandingkan ayat pertama dan terakhir beberapa surah dengan penyedia
+  //      utama. Bila berbeda satu huruf saja, jangan dipasang.
+  //   3. Isi provenansi dengan jujur. Bila rantai asalnya tidak dapat
+  //      ditelusuri sampai mushaf cetak, katakan begitu — jangan dikarang.
+  //
+  // Sampai itu dikerjakan, satu penyedia lebih baik daripada dua yang salah
+  // satunya tidak dipahami.
+]
+
+/** Penyedia yang benar-benar melayani bacaan terakhir, untuk ditampilkan. */
+let penyediaTerpakai: PenyediaQuran = PENYEDIA[0]
+export function penyediaSekarang(): PenyediaQuran { return penyediaTerpakai }
+
+/**
+ * Coba tiap penyedia berurutan sampai ada yang menjawab DAN lolos periksa.
+ *
+ * Penyedia yang jawabannya tidak lolos diperlakukan sama dengan penyedia yang
+ * mati — ia dilewati. Teks yang meragukan tidak lebih baik daripada tidak ada
+ * teks; ia lebih buruk, karena tampak sah.
+ */
+async function lewatPenyedia<T>(
+  kerja: (p: PenyediaQuran) => Promise<T>,
+): Promise<T> {
+  let galatTerakhir: Error | null = null
+  for (const p of PENYEDIA) {
+    if (!p.jalurDaftar) continue
+    try {
+      const hasil = await kerja(p)
+      penyediaTerpakai = p
+      return hasil
+    } catch (e) {
+      galatTerakhir = e as Error
+    }
+  }
+  throw galatTerakhir ?? new Error('gagal_memuat_0')
+}
+
 /** Daftar 114 surah. */
 export async function daftarSurah(): Promise<Surah[]> {
-  type Mentah = { number: number; englishName: string; name: string
-    englishNameTranslation: string; numberOfAyahs: number; revelationType: string }
-  const d = await ambil<Mentah[]>(`${SUMBER.quran.basis}/surah`, 'surah-list')
-  const out = d.map((s) => ({
-    nomor: s.number, nama: s.englishName, namaArab: s.name,
-    arti: s.englishNameTranslation, jumlahAyat: s.numberOfAyahs, tempat: s.revelationType,
-  }))
-  const p = periksaDaftarSurah(out)
-  if (!p.utuh) throw new Error(p.alasan)
-  return out
+  return lewatPenyedia(async (p) => {
+    const j = await ambil<unknown>(`${p.basis}${p.jalurDaftar}`, `${p.id}-surah-list`)
+    const out = p.bacaDaftar(j)
+    const c = periksaDaftarSurah(out)
+    if (!c.utuh) throw new Error(c.alasan)
+    return out
+  })
 }
 
 /**
  * Satu surah lengkap: Arab, terjemahan, dan tafsir bila diminta.
  *
- * Tiga permintaan digabung sekaligus karena membaca satu surah tanpa
- * terjemahannya bukan membaca, dan menunggu dua kali muat membuat orang
- * menutup halaman.
+ * Ketiganya diminta sekaligus karena membaca satu surah tanpa terjemahannya
+ * bukan membaca, dan menunggu dua kali muat membuat orang menutup halaman.
  */
 export async function bacaSurah(
   nomor: number,
   terjemahan = 'en.sahih',
   tafsirId?: string,
 ): Promise<{ surah: Surah; ayat: Ayat[] }> {
-  type A = { number: number; numberInSurah: number; text: string }
-  type S = { number: number; englishName: string; name: string
-    englishNameTranslation: string; numberOfAyahs: number; revelationType: string; ayahs: A[] }
+  return lewatPenyedia(async (p) => {
+    const url = (ed: string) => `${p.basis}${p.jalurSurah.replace('{n}', String(nomor)).replace('{ed}', ed)}`
+    const edTerj = p.edisiTerjemahan[terjemahan] ?? terjemahan
+    const edTaf = tafsirId ? p.edisiTafsir[tafsirId] : undefined
 
-  const [arab, terj, taf] = await Promise.all([
-    ambil<S>(`${SUMBER.quran.basis}/surah/${nomor}/quran-uthmani`, `s-${nomor}-ar`),
-    ambil<S>(`${SUMBER.quran.basis}/surah/${nomor}/${terjemahan}`, `s-${nomor}-${terjemahan}`),
-    tafsirId
-      ? ambil<S>(`${SUMBER.quran.basis}/surah/${nomor}/${tafsirId}`, `s-${nomor}-${tafsirId}`).catch(() => null)
-      : Promise.resolve(null),
-  ])
+    const [arab, terj, taf] = await Promise.all([
+      ambil<unknown>(url(p.edisiArab), `${p.id}-s${nomor}-ar`),
+      ambil<unknown>(url(edTerj), `${p.id}-s${nomor}-${edTerj}`),
+      edTaf ? ambil<unknown>(url(edTaf), `${p.id}-s${nomor}-${edTaf}`).catch(() => null) : Promise.resolve(null),
+    ])
 
-  const surah: Surah = {
-    nomor: arab.number, nama: arab.englishName, namaArab: arab.name,
-    arti: arab.englishNameTranslation, jumlahAyat: arab.numberOfAyahs, tempat: arab.revelationType,
-  }
-  const ayat: Ayat[] = arab.ayahs.map((a, i) => ({
-    nomor: a.numberInSurah,
-    arab: a.text,
-    terjemahan: terj.ayahs[i]?.text ?? '',
-    tafsir: taf?.ayahs[i]?.text
-      ? { teks: taf.ayahs[i].text, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? tafsirId! }
-      : undefined,
-  }))
-  const p = periksaSurah(surah, ayat)
-  if (!p.utuh) throw new Error(p.alasan)
-  return { surah, ayat }
+    const A = p.bacaSurah(arab)
+    const T = p.bacaSurah(terj)
+    const F = taf ? p.bacaSurah(taf) : null
+
+    const ayat: Ayat[] = A.ayat.map((x, i) => ({
+      nomor: x.nomor,
+      arab: x.teks,
+      terjemahan: T.ayat[i]?.teks ?? '',
+      tafsir: F?.ayat[i]?.teks
+        ? { teks: F.ayat[i].teks, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? String(tafsirId) }
+        : undefined,
+    }))
+
+    const c = periksaSurah(A.surah, ayat)
+    if (!c.utuh) throw new Error(c.alasan)
+    return { surah: A.surah, ayat }
+  })
 }
 
 /** Tafsir yang tersedia, selalu ditampilkan bersama nama penyusunnya. */
