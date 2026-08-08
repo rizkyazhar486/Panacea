@@ -31,6 +31,23 @@
 
 export type Tradisi = 'quran' | 'bible' | 'tanakh' | 'veda' | 'buddhist' | 'confucian'
 
+/**
+ * Rantai asal teks — dari mana penyedia mendapatkannya, dan bagaimana pembaca
+ * bisa memeriksanya sendiri.
+ *
+ * Ditulis terpisah dari alamat API karena inilah yang sebenarnya menentukan
+ * boleh-tidaknya sebuah sumber dipakai. Sebuah API yang cepat dan gratis tetapi
+ * tidak bisa menyebutkan asal teksnya tidak layak dipakai untuk kitab suci.
+ */
+export interface Provenansi {
+  /** Rujukan cetak yang menjadi acuan, bila ada. */
+  acuan: string
+  /** Bagaimana penyedia memperoleh dan memverifikasi teksnya. */
+  rantai: string
+  /** Cara pembaca membuktikan sendiri bahwa teks di layar benar. */
+  caraPeriksa: string
+}
+
 export interface Sumber {
   id: string
   nama: string
@@ -40,6 +57,7 @@ export interface Sumber {
   /** Pangkalan API. Diambil peramban pengguna, bukan server aplikasi ini. */
   basis: string
   catatan: string
+  provenansi?: Provenansi
 }
 
 /**
@@ -56,6 +74,11 @@ export const SUMBER: Record<Tradisi, Sumber> = {
     situs: 'https://alquran.cloud',
     basis: 'https://api.alquran.cloud/v1',
     catatan: 'Teks Arab, terjemahan, dan tafsir diambil langsung dari penyedia. Aplikasi ini tidak menulis ulang satu huruf pun.',
+    provenansi: {
+      acuan: 'Mushaf Madinah, riwayat Hafs dari ‘Ashim — cetakan Mujamma‘ al-Malik Fahd (King Fahd Glorious Qur’an Printing Complex).',
+      rantai: 'Penyedia menyajikan teks Utsmani yang berasal dari proyek Tanzil, yang teksnya disusun dan diperiksa terhadap mushaf cetakan Mujamma‘ al-Malik Fahd. Aplikasi ini tidak menambah lapisan penyuntingan apa pun di atasnya.',
+      caraPeriksa: 'Buka mushaf cetak di tangan Anda pada surah dan ayat yang sama, lalu bandingkan huruf per huruf. Bila ada satu perbedaan saja, hentikan pemakaian dan laporkan — jangan diperbaiki sendiri di aplikasi.',
+    },
   },
   bible: {
     id: 'bible-api',
@@ -104,6 +127,65 @@ export interface Ayat {
   tafsir?: { teks: string; oleh: string }
 }
 
+// ── Pemeriksaan keutuhan ─────────────────────────────────────────────────────
+//
+// Sumber yang sah pun bisa sampai dalam keadaan rusak: permintaan terpotong,
+// proksi yang menyisipkan halaman galat, pengodean huruf yang salah. Karena
+// aplikasi ini tidak boleh menampilkan teks yang meragukan, teks yang datang
+// DIPERIKSA lebih dulu, dan bila gagal ia TIDAK DITAMPILKAN sama sekali.
+//
+// Yang diperiksa sengaja hanya hal yang disepakati universal dan bisa dihitung,
+// bukan isi teksnya — kami tidak berwenang menilai isi:
+//
+//   * Jumlah surah harus 114.
+//   * Jumlah ayat yang diterima harus sama dengan jumlah yang dinyatakan
+//     penyedia sendiri untuk surah itu. Ini menangkap pemotongan.
+//   * Jumlah seluruh ayat harus 6236 (hitungan riwayat Hafs).
+//   * Setiap ayat harus berisi huruf Arab, tanpa aksara Latin dan tanpa tanda
+//     pengganti U+FFFD yang menandakan pengodean rusak.
+//
+// Pemeriksaan ini tidak membuktikan teksnya benar — hanya mushaf cetak yang
+// bisa. Ia membuktikan teksnya sampai utuh.
+
+/** Jumlah ayat seluruh Al-Qur'an menurut hitungan riwayat Hafs. */
+export const TOTAL_AYAT_HAFS = 6236
+export const TOTAL_SURAH = 114
+
+const ARAB = /[\u0600-\u06FF\u0750-\u077F]/
+const LATIN = /[A-Za-z]/
+const RUSAK = /\uFFFD/
+
+export interface HasilPeriksa { utuh: boolean; alasan?: string }
+
+export function periksaDaftarSurah(s: Surah[]): HasilPeriksa {
+  if (s.length !== TOTAL_SURAH) {
+    return { utuh: false, alasan: `Expected ${TOTAL_SURAH} surahs, received ${s.length}. The response is incomplete, so nothing is shown.` }
+  }
+  const total = s.reduce((a, x) => a + x.jumlahAyat, 0)
+  if (total !== TOTAL_AYAT_HAFS) {
+    return { utuh: false, alasan: `Ayah counts total ${total}, not the expected ${TOTAL_AYAT_HAFS} of the Hafs reading. The source does not match what it should, so nothing is shown.` }
+  }
+  return { utuh: true }
+}
+
+export function periksaSurah(surah: Surah, ayat: Ayat[]): HasilPeriksa {
+  if (ayat.length !== surah.jumlahAyat) {
+    return { utuh: false, alasan: `This surah should have ${surah.jumlahAyat} ayat but ${ayat.length} arrived. The response was truncated, so nothing is shown.` }
+  }
+  for (const a of ayat) {
+    if (!a.arab || !ARAB.test(a.arab)) {
+      return { utuh: false, alasan: `Ayah ${a.nomor} contains no Arabic script. The text did not arrive intact, so nothing is shown.` }
+    }
+    if (RUSAK.test(a.arab)) {
+      return { utuh: false, alasan: `Ayah ${a.nomor} contains replacement characters, which means the encoding was corrupted in transit. Nothing is shown.` }
+    }
+    if (LATIN.test(a.arab)) {
+      return { utuh: false, alasan: `Ayah ${a.nomor} contains Latin letters, which should never appear in the Arabic text. Nothing is shown.` }
+    }
+  }
+  return { utuh: true }
+}
+
 const KUNCI_CACHE = 'pmd-kitab-v1'
 
 interface Cache { [k: string]: { pada: number; data: unknown } }
@@ -145,10 +227,13 @@ export async function daftarSurah(): Promise<Surah[]> {
   type Mentah = { number: number; englishName: string; name: string
     englishNameTranslation: string; numberOfAyahs: number; revelationType: string }
   const d = await ambil<Mentah[]>(`${SUMBER.quran.basis}/surah`, 'surah-list')
-  return d.map((s) => ({
+  const out = d.map((s) => ({
     nomor: s.number, nama: s.englishName, namaArab: s.name,
     arti: s.englishNameTranslation, jumlahAyat: s.numberOfAyahs, tempat: s.revelationType,
   }))
+  const p = periksaDaftarSurah(out)
+  if (!p.utuh) throw new Error(p.alasan)
+  return out
 }
 
 /**
@@ -187,6 +272,8 @@ export async function bacaSurah(
       ? { teks: taf.ayahs[i].text, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? tafsirId! }
       : undefined,
   }))
+  const p = periksaSurah(surah, ayat)
+  if (!p.utuh) throw new Error(p.alasan)
   return { surah, ayat }
 }
 

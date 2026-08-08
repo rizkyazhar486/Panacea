@@ -4,6 +4,7 @@ import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
 import {
   daftarSurah, bacaSurah, renunganUntuk, SUMBER, TAFSIR, TERJEMAHAN,
+  TOTAL_SURAH, TOTAL_AYAT_HAFS,
   type Surah, type Ayat,
 } from '../lib/kitab'
 
@@ -34,7 +35,9 @@ export function Kitab() {
     setMuat(true)
     daftarSurah()
       .then(setSurah)
-      .catch(() => setGalat('Could not reach the text provider. Check your connection — nothing is stored on our side to fall back to.'))
+      .catch((e: Error) => setGalat(e?.message?.startsWith('gagal_memuat')
+        ? 'Could not reach the text provider. Check your connection — nothing is stored on our side to fall back to.'
+        : e.message))
       .finally(() => setMuat(false))
   }, [])
 
@@ -43,7 +46,9 @@ export function Kitab() {
     setMuat(true); setGalat('')
     bacaSurah(buka, terjemahan, tafsirId)
       .then(setIsi)
-      .catch(() => setGalat('Could not load this surah.'))
+      .catch((e: Error) => setGalat(e?.message?.startsWith('gagal_memuat')
+        ? 'Could not load this surah.'
+        : e.message))
       .finally(() => setMuat(false))
   }, [buka, terjemahan, tafsirId])
 
@@ -78,6 +83,31 @@ export function Kitab() {
           className="mt-1 inline-block text-[11px] font-bold text-brand underline">
           {SUMBER.quran.situs} →
         </a>
+        {/* Rantai asal ditampilkan penuh. Menyebut nama penyedia saja tidak
+            cukup — yang menentukan sah atau tidaknya adalah dari mana penyedia
+            itu sendiri memperoleh teksnya, dan apakah pembaca bisa memeriksanya. */}
+        {SUMBER.quran.provenansi && (
+          <div className="mt-2.5 space-y-1.5">
+            <Ringkas ikon="🔗" judul="Where this text comes from" bukaAwal
+              anak={
+                <div className="space-y-1.5">
+                  <Poin ikon="📕"><b>Printed reference</b> — {SUMBER.quran.provenansi.acuan}</Poin>
+                  <Poin ikon="⛓️"><b>Chain</b> — {SUMBER.quran.provenansi.rantai}</Poin>
+                  <Poin ikon="🔍"><b>Verify it yourself</b> — {SUMBER.quran.provenansi.caraPeriksa}</Poin>
+                </div>
+              } />
+            <Ringkas ikon="🛡️" judul="What is checked before anything is shown"
+              anak={
+                <div className="space-y-1.5">
+                  <Poin ikon="1️⃣">There must be exactly {TOTAL_SURAH} surahs.</Poin>
+                  <Poin ikon="2️⃣">The ayah counts must total {TOTAL_AYAT_HAFS} — the count of the Hafs reading.</Poin>
+                  <Poin ikon="3️⃣">Each surah must arrive with the exact number of ayat it declares, which catches truncation.</Poin>
+                  <Poin ikon="4️⃣">Every ayah must contain Arabic script, with no Latin letters and no replacement characters.</Poin>
+                  <Poin ikon="⚠️">If any check fails, nothing is displayed at all. These checks prove the text arrived intact — only a printed mushaf can prove it is correct.</Poin>
+                </div>
+              } />
+          </div>
+        )}
       </Card>
 
       {galat && (
