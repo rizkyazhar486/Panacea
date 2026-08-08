@@ -28,11 +28,11 @@ export interface ZoneDef {
 }
 
 export const ZONES: ZoneDef[] = [
-  { zone: 1, name: 'Pemulihan', from: 0, to: 0.6, meaning: 'Sangat ringan — untuk pemulihan aktif.' },
-  { zone: 2, name: 'Aerobik dasar', from: 0.6, to: 0.7, meaning: 'Inilah zona yang membangun basis daya tahan. Masih bisa bicara kalimat penuh.' },
-  { zone: 3, name: 'Tempo', from: 0.7, to: 0.8, meaning: 'Sedang-berat. Hanya bisa bicara beberapa kata.' },
-  { zone: 4, name: 'Ambang laktat', from: 0.8, to: 0.9, meaning: 'Berat. Hanya boleh untuk sesi terjadwal, bukan untuk lari mudah.' },
-  { zone: 5, name: 'Maksimal', from: 0.9, to: 99, meaning: 'Maksimal. Hanya untuk interval pendek.' },
+  { zone: 1, name: 'Recovery', from: 0, to: 0.6, meaning: 'Very light — for active recovery.' },
+  { zone: 2, name: 'Base aerobic', from: 0.6, to: 0.7, meaning: 'This is the zone that builds your endurance base. You can still speak full sentences.' },
+  { zone: 3, name: 'Tempo', from: 0.7, to: 0.8, meaning: 'Moderately hard. Only a few words at a time.' },
+  { zone: 4, name: 'Lactate threshold', from: 0.8, to: 0.9, meaning: 'Hard. For scheduled sessions only, never for an easy run.' },
+  { zone: 5, name: 'Maximum', from: 0.9, to: 99, meaning: 'All out. Short intervals only.' },
 ]
 
 export function zoneFor(bpm: number, hrMax: number): ZoneDef {
@@ -100,8 +100,8 @@ export async function checkHrZoneAlert(
 
   saveSettings(userId, { hrZoneLastAlertAt: Date.now() })
   await notify(userId, {
-    title: `❤️ Zona ${z.zone} — ${z.name} · ${newest.bpm} bpm`,
-    body: `${z.meaning} Terbaca ${menitLalu(newest.t)}; data sampai di sini beberapa menit setelah terekam.`,
+    title: `❤️ Zone ${z.zone} — ${z.name} · ${newest.bpm} bpm`,
+    body: `${z.meaning} Read ${menitLalu(newest.t)}; data reaches us a few minutes after it is recorded.`,
     url: './#/log-detak-jantung',
     tag: 'hr-zone',
   }, 'notifHrZone').catch(() => {})
@@ -111,7 +111,7 @@ export async function checkHrZoneAlert(
 
 function menitLalu(t: number): string {
   const m = Math.max(0, Math.round((Date.now() - t) / 60000))
-  return m < 1 ? 'kurang dari semenit lalu' : `${m} menit lalu`
+  return m < 1 ? 'less than a minute ago' : `${m} min ago`
 }
 
 // ── Bedtime reminder ────────────────────────────────────────────────────────
@@ -189,10 +189,10 @@ export async function checkBedtimeReminder(userId: string, email: string): Promi
   saveSettings(userId, { sleepLastFiredOn: localDate })
   const jam = `${String(Math.floor(target / 60)).padStart(2, '0')}.${String(target % 60).padStart(2, '0')}`
   await notify(userId, {
-    title: '🌙 Waktunya bersiap tidur',
+    title: '🌙 Time to wind down',
     body: lead > 0
-      ? `Sasaran tidur Anda pukul ${jam} — ${lead} menit lagi. Yang paling menentukan bukan lamanya, melainkan jam yang tetap sama tiap malam.`
-      : `Sasaran tidur Anda pukul ${jam}. Yang paling menentukan bukan lamanya, melainkan jam yang tetap sama tiap malam.`,
+      ? `Your sleep target is ${jam} — ${lead} minutes from now. What matters most is not how long you sleep, but going to bed at the same hour every night.`
+      : `Your sleep target is ${jam}. What matters most is not how long you sleep, but going to bed at the same hour every night.`,
     url: './#/pola-tidur',
     tag: 'bedtime',
   }, 'notifSleepTime').catch(() => {})

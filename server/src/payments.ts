@@ -28,10 +28,10 @@ function fulfillOrder(order: { id: string; userId: string; amountPnc: number; am
     notify(order.userId, { title: 'Kalkulator Klinis terbuka ✅', body: 'Akses penuh ke 34 kalkulator klinis telah aktif.', url: './#/clinical-calculators' }, 'notifTransactions').catch(() => {})
   } else if (order.purpose && order.purpose.startsWith('chronic')) {
     activateChronic(order.userId, order.purpose)
-    notify(order.userId, { title: 'Langganan aktif ✅', body: 'Pemantauan Kronis & Longevity Anda telah aktif.', url: './#/nutrition' }, 'notifTransactions').catch(() => {})
+    notify(order.userId, { title: 'Subscription active ✅', body: 'Your Chronic & Longevity monitoring is now active.', url: './#/nutrition' }, 'notifTransactions').catch(() => {})
   } else {
     credit(order.userId, order.amountPnc, 'deposit', `Top-up ${order.amountPnc} PNC via ${order.method}`, order.id)
-    notify(order.userId, { title: 'Pembayaran berhasil ✅', body: `${order.amountPnc} PNC telah ditambahkan ke saldo Anda.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
+    notify(order.userId, { title: 'Payment received ✅', body: `${order.amountPnc} PNC has been added to your balance.`, url: './#/billing' }, 'notifTransactions').catch(() => {})
     const payer = getUser(order.userId)
     if (payer) sendReceipt(payer.email, payer.name, order.amountPnc, order.amountIdr, order.method).catch(() => {})
   }

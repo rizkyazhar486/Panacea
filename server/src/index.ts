@@ -105,6 +105,7 @@ import {
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
 import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
+import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
@@ -319,9 +320,9 @@ app.post('/api/wallet/topups/decide', requireAuth, (req, res) => {
   if (!t) return res.status(404).json({ error: 'not_found_or_decided' })
   if (approve) {
     credit(t.userId, t.amountPnc, 'deposit', `Top-up manual disetujui (Rp${t.amountIdr.toLocaleString('id-ID')})`)
-    notify(t.userId, { title: 'Top-up disetujui ✅', body: `Saldo Anda bertambah ${t.amountPnc} PNC.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+    notify(t.userId, { title: 'Top-up approved ✅', body: `${t.amountPnc} PNC added to your balance.`, url: '/billing' }, 'notifTransactions').catch(() => {})
   } else {
-    notify(t.userId, { title: 'Top-up ditolak', body: `Permintaan top-up ${t.amountPnc} PNC tidak disetujui. Hubungi admin bila ada pertanyaan.`, url: '/billing' }, 'notifTransactions').catch(() => {})
+    notify(t.userId, { title: 'Top-up declined', body: `Your ${t.amountPnc} PNC top-up was not approved. Contact an admin if you have questions.`, url: '/billing' }, 'notifTransactions').catch(() => {})
   }
   addAudit(u, approve ? 'wallet.topup_approve' : 'wallet.topup_reject', `${t.amountPnc} PNC · ${t.email}`)
   res.json({ ok: true, request: t, balance: balance(t.userId) })
@@ -360,8 +361,8 @@ app.post('/api/applications/decide', requireAuth, (req, res) => {
   const a = setApplicationStatus(String(id || ''), grant ? 'granted' : 'rejected')
   if (!a) return res.status(404).json({ error: 'not_found' })
   notify(a.userId, grant
-    ? { title: 'Akses disetujui ✅', body: `Pendaftaran ${a.role} Anda disetujui. Akses penuh aktif.`, url: './#/' }
-    : { title: 'Pendaftaran ditinjau', body: `Pendaftaran ${a.role} Anda belum disetujui. Hubungi admin.`, url: './#/' },
+    ? { title: 'Access approved ✅', body: `Your ${a.role} registration was approved. Full access is now active.`, url: './#/' }
+    : { title: 'Registration reviewed', body: `Your ${a.role} registration was not approved. Please contact an admin.`, url: './#/' },
   ).catch(() => {})
   addAudit(u, grant ? 'application.grant' : 'application.reject', `${a.role} · ${a.email}`)
   res.json({ ok: true, application: a })
@@ -564,8 +565,8 @@ app.post('/api/clinical/record', requireAuth, (req, res) => {
   const patientUser = findUserBySelfPatientId(patientId)
   if (patientUser && patientUser.id !== actor.id) {
     notify(patientUser.id, {
-      title: 'Rekam medis Anda diperbarui 🩺',
-      body: 'Dokter telah menyelesaikan catatan AI-EMR Anda. Buka untuk melihat edukasi & rencana.',
+      title: 'Your medical record was updated 🩺',
+      body: 'Your doctor has completed your AI-EMR note. Open it to see the education and the plan.',
       url: './#/education',
     }, 'notifVitals').catch(() => {})
   }
@@ -980,7 +981,7 @@ app.post('/api/creator/subscribe', requireAuth, (req, res) => {
   if (owner) credit(owner.id, adminCut, 'deposit', `Komisi platform langganan @${authorEmail}`)
 
   const expires = addCreatorSub(u.id, authorEmail)
-  if (author) notify(author.id, { title: 'Subscriber baru 🎉', body: `Anda mendapat ${authorCut} PNC dari langganan kreator.`, url: './#/' }).catch(() => {})
+  if (author) notify(author.id, { title: 'New subscriber 🎉', body: `You earned ${authorCut} PNC from a creator subscription.`, url: './#/' }).catch(() => {})
   res.json({ ok: true, balance: balance(u.id), expires, authorCut, adminCut })
 })
 
@@ -1508,16 +1509,21 @@ setInterval(() => { pollSportsFavorites().catch((e) => console.log('[sports] pol
 setInterval(() => {
   const now = Date.now()
   for (const { userId, reminder } of allReminders()) {
-    if (!reminder.active || new Date(reminder.nextFireAt).getTime() > now) continue
+    if (!reminder.active) continue
+    const jadwal = new Date(reminder.nextFireAt).getTime()
+    if (!Number.isFinite(jadwal) || jadwal > now) continue
+
+    // Jadwal dikejar sekaligus, dan dosis yang sudah lewat jauh tidak
+    // diberitahukan. Alasan keduanya ada di server/src/jadwal.ts.
+    const { beritahu, berikutnya } = putusanPengingat(jadwal, now)
+    updateReminder(userId, reminder.id, { nextFireAt: new Date(berikutnya).toISOString() })
+    if (!beritahu) continue
     notify(userId, {
       title: `💊 ${reminder.medName}`,
       body: reminder.dose ? `Time for your ${reminder.dose} dose.` : 'Time to take your medication.',
       url: '/med-reminders',
       tag: `reminder-${reminder.id}`,
     }, 'notifMedReminders').catch(() => {})
-    // Roll forward by exactly 24h from the scheduled time (not from "now") so
-    // a reminder never drifts later even if the server was briefly down.
-    updateReminder(userId, reminder.id, { nextFireAt: new Date(new Date(reminder.nextFireAt).getTime() + 86_400_000).toISOString() })
   }
 }, 60_000)
 // Bedtime reminder — checked every minute like the medication scheduler. Each
