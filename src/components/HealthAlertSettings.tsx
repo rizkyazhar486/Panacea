@@ -31,10 +31,10 @@ interface Prefs {
 }
 
 const ZONA = [
-  { z: 2, nama: 'Z2 — Aerobik dasar', ket: 'Paling cerewet. Hampir semua aktivitas sedang akan memicunya.' },
-  { z: 3, nama: 'Z3 — Tempo', ket: 'Memberi tahu ketika Anda naik di atas intensitas mudah.' },
-  { z: 4, nama: 'Z4 — Ambang laktat', ket: 'Pilihan yang masuk akal bagi kebanyakan orang: memberi tahu saat sesi menjadi benar-benar berat.' },
-  { z: 5, nama: 'Z5 — Maksimal', ket: 'Paling jarang. Hanya saat upaya mendekati maksimal.' },
+  { z: 2, nama: 'Z2 — Aerobik dasar', ket: 'Noisiest. Almost any moderate activity will set it off.' },
+  { z: 3, nama: 'Z3 — Tempo', ket: 'Tells you when you rise above easy intensity.' },
+  { z: 4, nama: 'Z4 — Ambang laktat', ket: 'A sensible default for most people: tells you when a session turns genuinely hard.' },
+  { z: 5, nama: 'Z5 — Maksimal', ket: 'Rarest. Only when effort approaches maximal.' },
 ]
 
 export function HealthAlertSettings() {
@@ -99,18 +99,18 @@ export function HealthAlertSettings() {
       <SectionTitle
         icon={<IconBell />}
         title="Pengingat terhubung perangkat"
-        subtitle="Nyalakan yang Anda perlukan — masing-masing punya pengaturannya sendiri"
-        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-400">menyimpan…</span>
+        subtitle="Turn on what you need — each has its own settings"
+        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-500">menyimpan…</span>
           : simpan === 'saved' ? <span className="text-[11px] font-bold text-brand-dark">tersimpan ✓</span> : undefined}
       />
 
       {push !== 'enabled' && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
           <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">
-            {push === 'unsupported' ? 'Perangkat ini belum bisa menerima pemberitahuan'
+            {push === 'unsupported' ? 'This device cannot receive notifications yet'
               : push === 'denied' ? 'Izin pemberitahuan ditolak'
-                : push === 'unavailable' ? 'Layanan pemberitahuan sedang tidak tersedia'
-                  : 'Pemberitahuan belum dinyalakan di perangkat ini'}
+                : push === 'unavailable' ? 'Notification service is unavailable'
+                  : 'Notifications are not switched on for this device'}
           </div>
           <p className="mt-1 text-[12px] leading-relaxed text-amber-900 dark:text-amber-100/90">
             {push === 'denied'
@@ -118,8 +118,8 @@ export function HealthAlertSettings() {
               // app being opened in a Safari tab, where iOS refuses push
               // outright. Sending someone to iOS Settings first would waste
               // their time, so both causes are named, likeliest first.
-              ? 'Di iPhone, penyebab tersering bukan izin yang dicabut melainkan Panaceamed dibuka dari tab Safari — iOS tidak mengizinkan pemberitahuan di sana sama sekali. Tambahkan ke layar utama (Share → Add to Home Screen) lalu buka dari ikonnya. Bila sudah begitu dan tetap ditolak, buka Pengaturan iPhone → Notifications → Panaceamed dan izinkan kembali. Selama ditolak, sakelar di bawah tetap tersimpan namun tidak ada yang sampai ke layar Anda.'
-              : 'Di iPhone, pemberitahuan hanya bekerja bila Panaceamed sudah DITAMBAHKAN KE LAYAR UTAMA (Share → Add to Home Screen) dan dibuka dari ikon itu, bukan dari tab Safari. Ini batasan iOS, bukan pengaturan yang terlewat.'}
+              ? 'On iPhone the usual cause is not a revoked permission but that Panaceamed was opened from a Safari tab — iOS allows no notifications there at all. Add it to your Home Screen (Share → Add to Home Screen) and open it from that icon. If you already have and it is still blocked, go to iPhone Settings → Notifications → Panaceamed and allow it again. While blocked, the switches below still save but nothing reaches your screen.'
+              : 'On iPhone, notifications only work if Panaceamed has been ADDED TO THE HOME SCREEN (Share → Add to Home Screen) and opened from that icon, not from a Safari tab. This is an iOS limitation, not a setting you missed.'}
           </p>
           <Link to="/settings" className="mt-2 inline-block text-[12px] font-bold text-amber-900 underline dark:text-amber-200">
             Buka pengaturan pemberitahuan →
@@ -128,9 +128,9 @@ export function HealthAlertSettings() {
       )}
 
       {gagal && (
-        <p className="mt-3 text-sm text-rose-600">Tidak bisa memuat pengaturan. <button onClick={load} className="underline">Coba lagi</button></p>
+        <p className="mt-3 text-sm text-rose-600">Could not load settings. <button onClick={load} className="underline">Coba lagi</button></p>
       )}
-      {memuat && <p className="mt-3 text-sm text-neutral-400">Memuat…</p>}
+      {memuat && <p className="mt-3 text-sm text-neutral-500">Loading…</p>}
 
       {!memuat && (
         <div className="mt-3 space-y-3">
@@ -138,14 +138,14 @@ export function HealthAlertSettings() {
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <Row
               icon={<IconHeart size={18} />}
-              title="Peringatan zona detak jantung"
-              sub="Memberi tahu ketika denyut Anda mencapai zona tertentu"
+              title="Heart-rate zone alerts"
+              sub="Tells you when your heart rate reaches a given zone"
               on={zoneOn}
               onToggle={(v) => save({ notifHrZone: v })}
             />
             {zoneOn && (
               <div className="mt-3">
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Beri tahu mulai zona</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Alert from zone</div>
                 <div className="mt-1.5 space-y-1.5">
                   {ZONA.map((z) => {
                     const dipilih = (prefs.hrZoneThreshold ?? 4) === z.z
@@ -172,7 +172,7 @@ export function HealthAlertSettings() {
                 <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                   Batas zona dihitung dari denyut maksimal Anda — dipakai denyut tertinggi yang pernah tercatat
                   bila itu lebih tinggi daripada rumus 220−usia. Lihat angkanya di{' '}
-                  <Link to="/riwayat-latihan" className="font-bold text-brand-dark underline">Riwayat Latihan</Link>.
+                  <Link to="/riwayat-latihan" className="font-bold text-brand-dark underline">Training History</Link>.
                 </p>
               </div>
             )}
@@ -182,14 +182,14 @@ export function HealthAlertSettings() {
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <Row
               icon={<span className="text-base">💊</span>}
-              title="Pengingat minum obat"
-              sub="Dikirim pada jam yang Anda tetapkan untuk tiap obat"
+              title="Medication reminders"
+              sub="Sent at the time you set for each medicine"
               on={medOn}
               onToggle={(v) => save({ notifMedReminders: v })}
             />
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
               Sakelar ini hanya mengizinkan pengirimannya. Yang menentukan kapan berbunyi adalah obat yang
-              Anda daftarkan beserta jamnya — <b>bila daftarnya kosong, tidak akan ada yang berbunyi</b>.
+              Anda daftarkan beserta jamnya — <b>if the list is empty, nothing will fire</b>.
               Inilah sebab tersering pengingat obat terasa &quot;tidak jalan&quot;.
             </p>
             <Link to="/med-reminders" className="mt-2 inline-block rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">
@@ -201,15 +201,15 @@ export function HealthAlertSettings() {
           <div className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
             <Row
               icon={<IconTimer size={18} />}
-              title="Pengingat waktunya tidur"
-              sub="Satu kali tiap malam, sebelum jam sasaran Anda"
+              title="Bedtime reminder"
+              sub="Once a night, before your target time"
               on={sleepOn}
               onToggle={(v) => save({ notifSleepTime: v, sleepTargetHHMM: prefs.sleepTargetHHMM ?? saranJam ?? '22:30' })}
             />
             {sleepOn && (
               <div className="mt-3 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Jam sasaran tidur</label>
+                  <label className="text-[12px] font-bold text-neutral-600 dark:text-neutral-300">Target bedtime</label>
                   <input
                     type="time"
                     value={prefs.sleepTargetHHMM ?? saranJam ?? '22:30'}
@@ -232,7 +232,7 @@ export function HealthAlertSettings() {
                     onChange={(e) => save({ sleepLeadMin: Number(e.target.value) })}
                     className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-sm font-bold dark:border-white/10 dark:bg-white/5 dark:text-white"
                   >
-                    {[0, 15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m === 0 ? 'tepat waktu' : `${m} menit`}</option>)}
+                    {[0, 15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m === 0 ? 'on time' : `${m} menit`}</option>)}
                   </select>
                 </div>
                 <p className="text-[11px] leading-relaxed text-neutral-500">
@@ -241,8 +241,8 @@ export function HealthAlertSettings() {
                   malam-malam yang Anda kendalikan, dan abaikan pada malam jaga.
                 </p>
                 <p className="text-[11px] leading-relaxed text-neutral-500">
-                  Dikirim menurut jam setempat Anda. Riwayat malam Anda ada di{' '}
-                  <Link to="/pola-tidur" className="font-bold text-brand-dark underline">Pola Tidur</Link>.
+                  Dikirim menurut jam setempat Anda. History malam Anda ada di{' '}
+                  <Link to="/pola-tidur" className="font-bold text-brand-dark underline">Sleep Pattern</Link>.
                 </p>
               </div>
             )}

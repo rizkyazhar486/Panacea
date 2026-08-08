@@ -25,7 +25,7 @@ export default function StationSimulatorSection() {
       <Card className="!p-4">
         <div className="flex items-center justify-between gap-2">
           <button onClick={prev} className="rounded-full bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">← Prev</button>
-          <span className="text-[11px] font-bold text-neutral-400">Station {idx + 1} / {OSCE_STATION_RUBRICS.length}</span>
+          <span className="text-[11px] font-bold text-neutral-500">Station {idx + 1} / {OSCE_STATION_RUBRICS.length}</span>
           <button onClick={next} className="rounded-full bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">Next →</button>
         </div>
       </Card>
@@ -33,20 +33,20 @@ export default function StationSimulatorSection() {
       <Card className="!p-4">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{station.system}</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{station.system}</div>
             <div className="text-[16px] font-black text-ink dark:text-white">{station.title}</div>
           </div>
           <Badge tone="brand">{station.allocatedMinutes} menit</Badge>
         </div>
-        <p className="mt-1 text-[11px] font-semibold text-neutral-400">SKDI: {station.skdiLevel}</p>
+        <p className="mt-1 text-[11px] font-semibold text-neutral-500">SKDI: {station.skdiLevel}</p>
 
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Skenario Klinik</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Skenario Klinik</div>
           <p className="mt-1 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{station.scenario}</p>
         </div>
 
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Tugas</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Tugas</div>
           <ol className="mt-1 list-decimal space-y-1 pl-4 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">
             {station.tasks.map((t, i) => <li key={i}>{t}</li>)}
           </ol>
@@ -93,22 +93,22 @@ export default function StationSimulatorSection() {
             )}
             {station.standardPatient && (
               <div className="rounded-lg bg-neutral-50 p-3 dark:bg-white/5">
-                <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Naskah Pasien Standar</div>
+                <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Naskah Pasien Standar</div>
                 <p className="mt-1 text-[12px] text-neutral-500">
                   {station.standardPatient.nama} · {station.standardPatient.usia} · {station.standardPatient.jenisKelamin} · {station.standardPatient.pekerjaan}
                 </p>
                 {station.standardPatient.keluhanUtama && <p className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300"><b>Keluhan utama:</b> {station.standardPatient.keluhanUtama}</p>}
                 {station.standardPatient.riwayatPenyakitSekarang && <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{station.standardPatient.riwayatPenyakitSekarang}</p>}
                 {station.standardPatient.pertanyaanWajib && <p className="mt-1 text-[12px] italic text-neutral-500">"{station.standardPatient.pertanyaanWajib}"</p>}
-                {station.standardPatient.peranWajib && <p className="mt-1 text-[12px] text-neutral-400">Peran: {station.standardPatient.peranWajib}</p>}
+                {station.standardPatient.peranWajib && <p className="mt-1 text-[12px] text-neutral-500">Peran: {station.standardPatient.peranWajib}</p>}
               </div>
             )}
-            {station.author && <p className="text-[10px] text-neutral-400">Penulis: {station.author}{station.reference ? ` · Referensi: ${station.reference}` : ''}</p>}
+            {station.author && <p className="text-[10px] text-neutral-500">Penulis: {station.author}{station.reference ? ` · Referensi: ${station.reference}` : ''}</p>}
           </div>
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Diadaptasi dari template station OSCE UKMPPD resmi lintas fakultas kedokteran. Gunakan sebagai
         simulasi latihan — kompetensi & pemahaman klinis tetap yang utama, bukan hafalan kasus ini saja.
       </div>

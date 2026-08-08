@@ -89,7 +89,7 @@ export function FastingTimer() {
             <div className="absolute inset-0 grid place-items-center text-center">
               <div>
                 <div className="text-3xl font-black" style={{ color }}>{start ? fmt(elapsedMs) : '—'}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{start ? `of ${planObj.fastH}h` : 'not fasting'}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{start ? `of ${planObj.fastH}h` : 'not fasting'}</div>
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function FastingTimer() {
           {start && (
             <div className="mt-3 text-center">
               <div className="text-2xl">{phase.emoji}</div>
-              <div className="text-sm font-black text-ink dark:text-white">{phase.name}</div>
+              <div className="text-sm font-black text-ink dark:text-ink">{phase.name}</div>
               <Badge tone={reached ? 'brand' : 'low'}>{reached ? 'Goal reached 🎉' : `${fmt(remainingMs)} to goal`}</Badge>
             </div>
           )}
@@ -114,7 +114,7 @@ export function FastingTimer() {
           <SectionTitle icon={<IconActivity size={20} />} title="What's happening now" />
           <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{phase.emoji} <b>{phase.name}.</b> {phase.note}</p>
           {nextPhase && (
-            <p className="mt-2 rounded-xl bg-neutral-50 p-3 text-[12px] text-neutral-500 dark:bg-white/5 dark:text-neutral-400">
+            <p className="mt-2 rounded-xl bg-neutral-50 p-3 text-[12px] text-neutral-500 dark:bg-white/5 dark:text-neutral-500">
               Next: <b>{nextPhase.emoji} {nextPhase.name}</b> at ~{nextPhase.from}h ({fmt(nextPhase.from * 3_600_000 - elapsedMs)} away).
             </p>
           )}
@@ -128,16 +128,16 @@ export function FastingTimer() {
           {PHASES.map((p) => (
             <div key={p.name} className={'rounded-xl border p-3 ' + (start && elapsedH >= p.from && elapsedH < p.to ? 'border-brand bg-brand-50 dark:bg-white/5' : 'border-neutral-100 dark:border-white/10')}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-ink dark:text-white">{p.emoji} {p.name}</span>
-                <span className="text-[11px] font-bold text-neutral-400">{p.from}–{p.to === 72 ? '24+' : p.to}h</span>
+                <span className="text-sm font-bold text-ink dark:text-ink">{p.emoji} {p.name}</span>
+                <span className="text-[11px] font-bold text-neutral-500">{p.from}–{p.to === 72 ? '24+' : p.to}h</span>
               </div>
-              <p className="mt-0.5 text-[12px] text-neutral-500 dark:text-neutral-400">{p.note}</p>
+              <p className="mt-0.5 text-[12px] text-neutral-500 dark:text-neutral-500">{p.note}</p>
             </div>
           ))}
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimates from general fasting physiology — the exact timing of ketosis and autophagy varies per person. Intermittent fasting isn't suitable for everyone (pregnancy, diabetes on medication, eating-disorder history, children). Fasts beyond ~24h and any use with a medical condition should be supervised by a clinician.
       </div>
     </div>

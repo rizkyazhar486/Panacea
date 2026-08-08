@@ -36,11 +36,11 @@ export function EnduranceTools() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconActivity />} title="Alat Endurance"
-        subtitle="Bahan bakar, FTP, panduan daya, dan aklimatisasi — semua dari masukan Anda sendiri" />
+        subtitle="Fuelling, FTP, power guidance, and acclimatisation — all from your own input" />
 
       <Card>
-        <p className="text-sm leading-relaxed text-slate-300">
-          Halaman ini <strong className="text-white">tidak memerlukan sinkronisasi apa pun</strong>. Semuanya
+        <p className="text-sm leading-relaxed text-neutral-600">
+          Halaman ini <strong className="text-ink">tidak memerlukan sinkronisasi apa pun</strong>. Semuanya
           merencanakan sesuatu yang belum terjadi — lomba, tes, paparan panas — sehingga masukannya memang
           datang dari Anda. Berguna untuk sepeda dan renang meskipun jam tangan Anda tidak mengirim apa-apa.
         </p>
@@ -54,7 +54,7 @@ export function EnduranceTools() {
           ['aklimatisasi', '🌡️ Panas & Ketinggian'],
         ] as [Tab, string][]).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
-            className={`rounded-lg border px-3 py-1.5 text-sm transition ${tab === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-slate-400'}`}>
+            className={`rounded-lg border px-3 py-1.5 text-sm transition ${tab === k ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'}`}>
             {l}
           </button>
         ))}
@@ -99,10 +99,10 @@ function TabBahanBakar() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Sekali saja, lalu semua rencana cairan memakai angka Anda sendiri" />
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Once only, then every fluid plan uses your own numbers" />
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Timbang tanpa baju sebelum dan sesudah sesi, catat berapa yang diminum. Laju keringat berbeda
-          sampai <strong className="text-white">tiga kali lipat</strong> antarorang pada suhu yang sama —
+          sampai <strong className="text-ink">tiga kali lipat</strong> antarorang pada suhu yang sama —
           itulah kenapa anjuran umum &quot;minum 500 mL per jam&quot; bisa jauh terlalu sedikit bagi satu
           orang dan berlebihan bagi yang lain.
         </p>
@@ -115,16 +115,16 @@ function TabBahanBakar() {
         {keringat && (
           <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm text-slate-400">Laju keringat Anda</span>
-              <span className="text-xl font-semibold tabular-nums text-white">{keringat.mlPerJam} mL/jam</span>
+              <span className="text-sm text-neutral-500">Laju keringat Anda</span>
+              <span className="text-xl font-semibold tabular-nums text-ink">{keringat.mlPerJam} mL/jam</span>
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{keringat.catatan}</p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{keringat.catatan}</p>
           </div>
         )}
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Rencana untuk satu sesi" />
+        <SectionTitle icon={<IconRun />} title="Plan for a single session" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="Durasi (menit)"><input className={inputClass} inputMode="numeric" value={durasi} onChange={(e) => setDurasi(e.target.value)} /></Field>
           <Field label="Suhu (°C)"><input className={inputClass} inputMode="numeric" value={suhu} onChange={(e) => setSuhu(e.target.value)} /></Field>
@@ -132,12 +132,12 @@ function TabBahanBakar() {
         <div className="mt-2 flex flex-wrap gap-2">
           {(['mudah', 'sedang', 'berat'] as const).map((i) => (
             <button key={i} onClick={() => setIntensitas(i)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${intensitas === i ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-slate-400'}`}>
+              className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${intensitas === i ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-neutral-500'}`}>
               {i}
             </button>
           ))}
           <button onClick={() => setSensitif((v) => !v)}
-            className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${sensitif ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-white/10 text-slate-400'}`}>
+            className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${sensitif ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-white/10 text-neutral-500'}`}>
             Perut sensitif
           </button>
         </div>
@@ -159,7 +159,7 @@ function TabBahanBakar() {
               {rencana.jadwal.map((j) => (
                 <div key={j.menit} className="flex gap-3 text-sm">
                   <span className="w-16 shrink-0 tabular-nums text-slate-500">menit {j.menit}</span>
-                  <span className="text-slate-300">{j.isi}</span>
+                  <span className="text-neutral-600">{j.isi}</span>
                 </div>
               ))}
             </div>
@@ -168,7 +168,7 @@ function TabBahanBakar() {
 
         <div className="mt-4 space-y-1.5">
           {rencana.dasar.map((d, i) => (
-            <p key={i} className="text-sm leading-relaxed text-slate-400"><span className="text-slate-600">· </span>{d}</p>
+            <p key={i} className="text-sm leading-relaxed text-neutral-500"><span className="text-slate-600">· </span>{d}</p>
           ))}
         </div>
         {rencana.peringatan.length > 0 && (
@@ -203,8 +203,8 @@ function TabFtp() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Daya yang bisa dipertahankan sekitar satu jam" />
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Power you can hold for about an hour" />
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           FTP adalah batas yang memisahkan &quot;berat tapi bisa dijalani&quot; dari &quot;kelelahan menumpuk
           cepat&quot;. Di atasnya, laktat menumpuk lebih cepat daripada yang bisa dibersihkan, dan performa
           menurun tajam. Setara dengan LTHR pada denyut jantung — hanya diukur dalam watt.
@@ -214,7 +214,7 @@ function TabFtp() {
             <button key={p.k} onClick={() => setMetode(p.k)}
               className={`w-full rounded-lg border p-2.5 text-left transition ${metode === p.k ? 'border-brand bg-brand/10' : 'border-white/10'}`}>
               <div className={`text-sm font-semibold ${metode === p.k ? 'text-brand-dark' : 'text-white'}`}>{p.nama}</div>
-              <div className="text-[11px] leading-relaxed text-slate-400">{p.cara}</div>
+              <div className="text-[11px] leading-relaxed text-neutral-500">{p.cara}</div>
             </button>
           ))}
         </div>
@@ -240,10 +240,10 @@ function TabFtp() {
             {hasil.zona.map((z) => (
               <div key={z.z} className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="text-sm font-semibold text-white">Z{z.z} — {z.nama}</span>
-                  <span className="text-sm tabular-nums text-slate-300">{z.dari}{z.sampai != null ? `–${z.sampai}` : '+'} W</span>
+                  <span className="text-sm font-semibold text-ink">Z{z.z} — {z.nama}</span>
+                  <span className="text-sm tabular-nums text-neutral-600">{z.dari}{z.sampai != null ? `–${z.sampai}` : '+'} W</span>
                 </div>
-                <div className="text-[11px] leading-relaxed text-slate-400">{z.tujuan}</div>
+                <div className="text-[11px] leading-relaxed text-neutral-500">{z.tujuan}</div>
               </div>
             ))}
           </div>
@@ -286,9 +286,9 @@ function TabPanduan() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Target watt per segmen, dari profil tanjakan" />
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
-          Aturan intinya berlawanan dengan naluri kebanyakan orang: <strong className="text-white">naik
+        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Target watts per segment, from the climb profile" />
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
+          Aturan intinya berlawanan dengan naluri kebanyakan orang: <strong className="text-ink">naik
           tanjakan pakai daya lebih tinggi, turun dan datar pakai lebih rendah</strong>. Saat menanjak
           kecepatan rendah sehingga hambatan udara kecil dan setiap watt tambahan langsung menghemat waktu;
           saat menurun, watt tambahan hampir seluruhnya terbuang melawan udara.
@@ -302,10 +302,10 @@ function TabPanduan() {
           Berat total = badan + sepeda + perlengkapan. {anjuran.ket}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-400">Intensitas target</span>
+          <span className="text-xs text-neutral-500">Intensitas target</span>
           {[0.65, 0.73, 0.8, 0.85, 0.95].map((v) => (
             <button key={v} onClick={() => setTargetIf(v)}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-bold tabular-nums ${Math.abs(ifDipakai - v) < 0.001 ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-slate-400'}`}>
+              className={`rounded-lg border px-2.5 py-1 text-xs font-bold tabular-nums ${Math.abs(ifDipakai - v) < 0.001 ? 'border-brand bg-brand/10 text-brand-dark' : 'border-white/10 text-neutral-500'}`}>
               {v.toFixed(2)}
             </button>
           ))}
@@ -313,7 +313,7 @@ function TabPanduan() {
       </Card>
 
       <Card>
-        <SectionTitle title="Segmen rute" subtitle="Bagi rute menjadi bagian datar, tanjakan, dan turunan" />
+        <SectionTitle title="Segmen rute" subtitle="Split the route into flat, climbing, and descending parts" />
         <div className="mt-2 space-y-2">
           {segmen.map((s, i) => (
             <div key={i} className="rounded-lg border border-white/10 p-2.5">
@@ -324,13 +324,13 @@ function TabPanduan() {
               </div>
               {segmen.length > 1 && (
                 <button onClick={() => setSegmen((x) => x.filter((_, j) => j !== i))}
-                  className="mt-1 text-[11px] font-bold text-rose-400">Hapus segmen</button>
+                  className="mt-1 text-[11px] font-bold text-rose-600">Hapus segmen</button>
               )}
             </div>
           ))}
         </div>
         <button onClick={() => setSegmen((s) => [...s, { nama: `Segmen ${s.length + 1}`, jarakKm: 5, gradienPct: 0 }])}
-          className="mt-2 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-slate-300">
+          className="mt-2 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-bold text-neutral-600">
           + Tambah segmen
         </button>
       </Card>
@@ -341,14 +341,14 @@ function TabPanduan() {
           {hasil.segmen.map((s, i) => (
             <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-sm font-semibold text-white">{s.nama}</span>
+                <span className="text-sm font-semibold text-ink">{s.nama}</span>
                 <span className="text-lg font-semibold tabular-nums text-brand-dark">{s.targetWatt} W</span>
               </div>
-              <div className="mt-0.5 flex flex-wrap gap-x-3 text-[11px] text-slate-400">
+              <div className="mt-0.5 flex flex-wrap gap-x-3 text-[11px] text-neutral-500">
                 <span>{s.pctFtp}% FTP</span><span>{s.jarakKm} km @ {s.gradienPct}%</span>
                 <span>≈ {s.perkiraanKmh} km/j</span><span>≈ {s.perkiraanMenit.toFixed(0)} menit</span>
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{s.catatan}</p>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">{s.catatan}</p>
             </div>
           ))}
         </div>
@@ -397,7 +397,7 @@ function TabAklimatisasi() {
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-white/5">
           <div className="h-full rounded-full bg-amber-500" style={{ width: `${statusPanas.persen}%` }} />
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">{statusPanas.penjelasan}</p>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">{statusPanas.penjelasan}</p>
         <p className="mt-1.5 text-sm leading-relaxed text-emerald-200/80">{statusPanas.saran}</p>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Suhu (°C)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={pSuhu} onChange={(e) => setPSuhu(e.target.value)} /></Field>
@@ -415,7 +415,7 @@ function TabAklimatisasi() {
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-white/5">
           <div className="h-full rounded-full bg-sky-500" style={{ width: `${statusTinggi.persen}%` }} />
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">{statusTinggi.penjelasan}</p>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">{statusTinggi.penjelasan}</p>
         <p className="mt-1.5 text-sm leading-relaxed text-emerald-200/80">{statusTinggi.saran}</p>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Ketinggian (m)"><input className={inputClass + ' !text-xs'} inputMode="numeric" value={tMeter} onChange={(e) => setTMeter(e.target.value)} /></Field>
@@ -424,10 +424,10 @@ function TabAklimatisasi() {
         </div>
         <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-slate-400">Penurunan kemampuan aerobik di {tMeter} m</span>
-            <span className="text-lg font-semibold tabular-nums text-white">−{penalti.pctVo2Turun}%</span>
+            <span className="text-sm text-neutral-500">Penurunan kemampuan aerobik di {tMeter} m</span>
+            <span className="text-lg font-semibold tabular-nums text-ink">−{penalti.pctVo2Turun}%</span>
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-slate-400">{penalti.ket}</p>
+          <p className="mt-1 text-sm leading-relaxed text-neutral-500">{penalti.ket}</p>
         </div>
         <p className="mt-2 text-[11px] text-slate-500">{tinggi.length} paparan tercatat. Di bawah 1500 m tidak dihitung.</p>
       </Card>
@@ -438,7 +438,7 @@ function TabAklimatisasi() {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-base font-semibold tabular-nums text-white">{value}</div>
+      <div className="text-base font-semibold tabular-nums text-ink">{value}</div>
       <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">{label}</div>
       {sub && <div className="text-[10px] text-slate-500">{sub}</div>}
     </div>

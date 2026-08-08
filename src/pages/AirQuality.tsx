@@ -80,12 +80,12 @@ export function AirQuality() {
           right={<button onClick={locate} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">📍 Refresh</button>}
         />
 
-        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-white">
+        <label className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-ink dark:border-white/10 dark:text-ink">
           <input type="checkbox" checked={sensitive} onChange={(e) => setSens(e.target.checked)} />
           I have asthma, COPD, or airborne allergies
         </label>
 
-        {status === 'loading' && <p className="mt-4 text-sm text-neutral-400">Getting your local air quality…</p>}
+        {status === 'loading' && <p className="mt-4 text-sm text-neutral-500">Getting your local air quality…</p>}
         {(status === 'denied' || status === 'error') && err && (
           <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>
         )}
@@ -95,7 +95,7 @@ export function AirQuality() {
             <div className="mt-4 flex items-center gap-5 rounded-2xl p-4" style={{ background: band.color + '18' }}>
               <div className="text-center">
                 <div className="text-5xl font-black" style={{ color: band.color }}>{aq.usAqi}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">US AQI</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">US AQI</div>
               </div>
               <div>
                 <Badge tone={aq.usAqi <= 50 ? 'brand' : aq.usAqi <= 150 ? 'low' : 'critical'}>{band.label}</Badge>
@@ -115,7 +115,7 @@ export function AirQuality() {
               <Pollutant label="PM10" value={aq.pm10} unit="µg/m³" note="Coarse particles" />
               <Pollutant label="Ozone" value={aq.ozone} unit="µg/m³" note="O₃" />
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+            <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
               Note: the US AQI headline number and the raw pollutant readings above can look slightly
               inconsistent if you try to back-calculate one from the other by hand. That's expected — the
               AQI uses the EPA's <b>NowCast</b> method (a trend-weighted average of the last several hours),
@@ -127,7 +127,7 @@ export function AirQuality() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Live data from the free Open-Meteo Air-Quality API, fetched using your device's actual GPS
         coordinates via <code>navigator.geolocation</code> (location is used only to fetch the reading,
         never stored or sent anywhere else). Educational guidance based on US AQI bands — it doesn't
@@ -141,9 +141,9 @@ export function AirQuality() {
 function Pollutant({ label, value, unit, note }: { label: string; value: number; unit: string; note: string }) {
   return (
     <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-      <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
-      <div className="text-lg font-black text-ink dark:text-white">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[9px] font-medium text-neutral-400">{unit}</span></div>
-      <div className="text-[9px] text-neutral-400">{note}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
+      <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[9px] font-medium text-neutral-500">{unit}</span></div>
+      <div className="text-[9px] text-neutral-500">{note}</div>
     </div>
   )
 }

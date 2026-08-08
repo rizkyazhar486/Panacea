@@ -160,7 +160,7 @@ export function ShapeForming() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[10px] text-neutral-400">Gradually increase load/volume (progressive overload). Check movement form in the Physical Test & Form menu.</p>
+        <p className="mt-2 text-[10px] text-neutral-500">Gradually increase load/volume (progressive overload). Check movement form in the Physical Test & Form menu.</p>
       </Card>
 
       {result && (
@@ -183,7 +183,7 @@ export function ShapeForming() {
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-[11px] text-neutral-400">See movement details & how-to instructions on the <b>AI Workout Program</b> page.</p>
+            <p className="mt-2 text-[11px] text-neutral-500">See movement details & how-to instructions on the <b>AI Workout Program</b> page.</p>
           </Card>
 
           <Card className="!p-5">

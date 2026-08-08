@@ -66,7 +66,7 @@ export function DukeCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Major criteria ({majors}/2)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Major criteria ({majors}/2)</div>
         <div className="mt-3 space-y-2">
           {MAJOR.map((c) => (
             <label key={c.key} className="flex items-start gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold leading-snug text-ink dark:bg-white/5 dark:text-white">
@@ -78,7 +78,7 @@ export function DukeCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Minor criteria ({minors}/5)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Minor criteria ({minors}/5)</div>
         <div className="mt-3 space-y-2">
           {MINOR.map((c) => (
             <label key={c.key} className="flex items-start gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold leading-snug text-ink dark:bg-white/5 dark:text-white">
@@ -90,7 +90,7 @@ export function DukeCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Classification</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Classification</div>
         <div className="mt-2">
           <Badge tone={verdict.tone}>{verdict.label}</Badge>
         </div>
@@ -98,7 +98,7 @@ export function DukeCriteria() {
         <CopyNote text={`Modified Duke: ${majors} major + ${minors} minor${pathologic ? ' + pathologic criterion' : ''} — ${verdict.label} [Durack 1994; Li 2000]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Durack, D.T., et al. (1994). <i>Am J Med</i>, 96(3), 200-209; Li, J.S., et al. (2000).
         <i> Clin Infect Dis</i>, 30(4), 633-638. Decision-support estimate — the 2023 Duke-ISCVID
         update adds newer imaging (PET/CT) and organism criteria; follow current IE guidelines for

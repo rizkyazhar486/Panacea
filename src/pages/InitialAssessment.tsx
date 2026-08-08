@@ -161,8 +161,8 @@ export function InitialAssessment() {
             <Field label="Left Hop (cm)"><input className={inputClass} type="number" value={a.asym.hopL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopL: +e.target.value } }))} /></Field>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Balance Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Hop Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Balance Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Hop Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
           </div>
           {asymFlag && <div className="mt-3 rounded-xl bg-amber-50 p-3 text-[11px] text-amber-700">⚠️ Asymmetry &gt;15% detected — consider additional unilateral training for the weaker side.</div>}
         </Card>
@@ -176,7 +176,7 @@ export function InitialAssessment() {
               {Object.keys(QOL_INSTRUMENTS).map((k) => <option key={k}>{k}</option>)}
             </select>
           </Field>
-          <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">{QOL_INSTRUMENTS[a.qolInstrument].note}</p>
+          <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">{QOL_INSTRUMENTS[a.qolInstrument].note}</p>
           <div className="mt-3 space-y-3">
             {qolItems.map((q, i) => (
               <div key={q} className="rounded-xl border border-neutral-100 p-3">
@@ -187,12 +187,12 @@ export function InitialAssessment() {
                       className={'flex-1 rounded-lg py-1.5 text-[11px] font-bold ' + ((a.qolAnswers[i] ?? -1) === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{v}</button>
                   ))}
                 </div>
-                <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Disagree</span><span>Strongly agree</span></div>
+                <div className="mt-1 flex justify-between text-[9px] text-neutral-500"><span>Disagree</span><span>Strongly agree</span></div>
               </div>
             ))}
           </div>
           <div className="mt-3 rounded-xl bg-neutral-50 p-3">
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Score</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">Score</div>
             <div className="text-lg font-extrabold text-brand-dark">{qolPct.toFixed(0)}%</div>
           </div>
         </Card>

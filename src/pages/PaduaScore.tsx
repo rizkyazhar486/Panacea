@@ -57,12 +57,12 @@ export function PaduaScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 20</span>
           <Badge tone={high ? 'critical' : 'brand'}>{high ? 'High risk (≥4)' : 'Low risk (<4)'}</Badge>
         </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           {high
             ? 'Pharmacologic thromboprophylaxis (e.g. LMWH) is recommended if bleeding risk permits — in the original cohort, ~11% of unprophylaxed high-risk patients developed VTE within 90 days vs 0.3% of low-risk.'
             : 'Routine pharmacologic prophylaxis is not indicated at this score — encourage early mobilization and reassess if the clinical picture changes.'}
@@ -70,7 +70,7 @@ export function PaduaScore() {
         <CopyNote text={`Padua ${score}/20 — ${high ? 'high VTE risk (>=4): pharmacologic prophylaxis recommended if bleeding risk permits' : 'low VTE risk (<4): routine prophylaxis not indicated'} [Barbar 2010]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Barbar, S., et al. (2010). A risk assessment model for the identification of hospitalized
         medical patients at risk for VTE: the Padua Prediction Score. <i>J Thromb Haemost</i>, 8(11),
         2450-2457. Decision-support estimate — for surgical patients use the Caprini score instead,

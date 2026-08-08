@@ -80,13 +80,13 @@ export function PediatricDkaCalculator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">1. Resuscitation</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">1. Resuscitation</div>
         <p className="mt-1 text-[13px] text-neutral-600 dark:text-neutral-300">
           NaCl 0.9% or RL — {shock ? 'shock' : 'no shock / partially corrected'} → <b>{bolusMlPerKg} mL/kg</b> {shock ? 'bolus' : 'over 1-2h'}
         </p>
         <div className="mt-1 text-2xl font-black text-brand-dark">{bolusMl.toFixed(0)} mL</div>
 
-        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-400">2. Fluid & Electrolytes (48h)</div>
+        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">2. Fluid & Electrolytes (48h)</div>
         <div className="mt-2 space-y-1 text-[13px] text-neutral-600 dark:text-neutral-300">
           <div className="flex justify-between"><span>Deficit: {dehydrationPct}% x {weightKg}kg x 1000mL</span><b>{deficitMl.toFixed(0)} mL</b></div>
           <div className="flex justify-between"><span>Maintenance (Holliday-Segar) x 2</span><b>{maintenance48hMl.toFixed(0)} mL</b></div>
@@ -97,13 +97,13 @@ export function PediatricDkaCalculator() {
           <div className="text-3xl font-black text-brand-dark">{ratePerHr.toFixed(1)} mL/hr</div>
         </div>
 
-        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-400">3. Potassium</div>
+        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">3. Potassium</div>
         <Field label="Measured serum K (mEq/L)">
           <input className={inputClass} type="number" step={0.1} min={0} value={potassiumMeq || ''} onChange={(e) => setPotassiumK(Number(e.target.value) || 0)} />
         </Field>
         <div className="mt-2"><Badge tone={kBand.tone}>{kBand.label}</Badge></div>
 
-        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-400">4. Insulin (IV infusion, no bolus)</div>
+        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">4. Insulin (IV infusion, no bolus)</div>
         <Field label="Insulin rate (U/kg/hr)">
           <input className={inputClass} type="number" step={0.01} min={0.01} max={0.1} value={insulinRateUKgHr || ''} onChange={(e) => setInsulinRate(Number(e.target.value) || 0)} />
         </Field>
@@ -112,7 +112,7 @@ export function PediatricDkaCalculator() {
         <div className="mt-4"><CopyNote text={summary} /></div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Standard pediatric DKA fluid/insulin worksheet (Holliday-Segar maintenance + deficit replacement
         over 48h). A calculation aid, not a substitute for institutional protocol, PICU/pediatric
         endocrine consultation, or clinical judgment — insulin and potassium dosing must be individually

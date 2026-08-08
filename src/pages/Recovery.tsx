@@ -92,16 +92,16 @@ function SleepScoreCard() {
         <Field label="Bedtime Variability (minutes)"><input className={inputClass} type="number" value={variance} onChange={(e) => setVariance(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{s.total}<span className="text-sm font-semibold text-neutral-400">/100</span></div>
+        <div className="text-2xl font-black text-ink">{s.total}<span className="text-sm font-semibold text-neutral-500">/100</span></div>
         <Badge tone={grade.tone}>{grade.l}</Badge>
       </div>
       <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Duration</div></div>
-        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Latency</div></div>
-        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Awakenings</div></div>
-        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Consistency</div></div>
+        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Duration</div></div>
+        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Latency</div></div>
+        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Awakenings</div></div>
+        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Consistency</div></div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</p>
     </Card>
   )
 }
@@ -216,7 +216,7 @@ function MeditationCard() {
 
       <div className="mt-3 rounded-xl border border-neutral-100 p-4">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase text-neutral-400">Step {stepIdx + 1}/{script.steps.length} · ~{script.durationMin} minutes total</span>
+          <span className="text-[10px] font-bold uppercase text-neutral-500">Step {stepIdx + 1}/{script.steps.length} · ~{script.durationMin} minutes total</span>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-ink">{script.steps[stepIdx]}</p>
         <div className="mt-3 flex gap-2">
@@ -235,10 +235,10 @@ function MeditationCard() {
         ))}
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <span className="text-[10px] font-bold uppercase text-neutral-400">Volume</span>
+        <span className="text-[10px] font-bold uppercase text-neutral-500">Volume</span>
         <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</p>
     </Card>
   )
 }
@@ -282,7 +282,7 @@ export function Recovery() {
         </div>
 
         <div className="mt-4 rounded-2xl bg-ink p-4 text-white">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/50">Day {elapsed} &middot; Current Phase</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Day {elapsed} &middot; Current Phase</div>
           <div className="mt-1 text-2xl font-extrabold text-brand">{current.label}</div>
           <Badge tone="brand">{TYPE_LABEL[p.type]}</Badge>
         </div>
@@ -301,7 +301,7 @@ export function Recovery() {
           {phases.map((ph, i) => (
             <div key={ph.label} className={'flex items-center justify-between rounded-xl border p-3 ' + (i === (idx === -1 ? phases.length - 1 : idx) ? 'border-brand/40 bg-brand-50/40' : 'border-neutral-100')}>
               <div className="text-sm font-bold">{ph.label}</div>
-              <div className="text-right text-xs font-semibold text-neutral-400">
+              <div className="text-right text-xs font-semibold text-neutral-500">
                 {ph.days[1] >= 9999 ? `>${ph.days[0]} days` : `${ph.days[0]}-${ph.days[1]} days`}
               </div>
             </div>

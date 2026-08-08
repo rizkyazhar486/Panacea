@@ -50,7 +50,7 @@ export default function SkdiSkillsSection() {
 
       {grouped.map(([sys, skills]) => (
         <Card key={sys} className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{sys}</div>
           <div className="mt-2 space-y-2">
             {skills.map((s, i) => (
               <div key={i} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -61,9 +61,9 @@ export default function SkdiSkillsSection() {
           </div>
         </Card>
       ))}
-      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
+      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil — coba kata kunci lain.</p>}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Berdasarkan Standar Kompetensi Dokter Indonesia (SKDI), Konsil Kedokteran Indonesia 2019.
         Gunakan untuk memetakan kesenjangan skill sebelum OSCE — bukan pengganti supervisi klinis langsung.
       </div>

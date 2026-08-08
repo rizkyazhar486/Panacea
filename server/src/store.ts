@@ -297,7 +297,7 @@ function loadFile() {
 
 function save() {
   // Keadaan Connect ikut disimpan bersama basis data utama. Tanpa ini, garam
-  // sidik NIK lahir baru setiap kali server hidup — dan pemeriksaan akun ganda
+  // sidik nomor telepon lahir baru setiap kali server hidup — dan pemeriksaan akun ganda
   // diam-diam berhenti bekerja karena sidik lama tidak akan pernah cocok lagi.
   try { db.connect = isiConnect() } catch { /* modul belum siap */ }
   // Local file (harmless; ephemeral on hosts like Render).

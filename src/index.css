@@ -458,3 +458,207 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 }
 .sheet-in { animation: sheet-in 0.24s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .reduce-motion .sheet-in { animation: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Liquid glass — permukaan melayang yang bereaksi.
+
+   Empat lapis, dan masing-masing punya alasan:
+
+     1. Latar berlapis        — kaca tidak berwarna rata; ia lebih terang di
+                                tepi tempat cahaya masuk.
+     2. Pantulan bergerak     — sorot lembut yang mengikuti kursor (atau gulir
+                                di ponsel). Inilah yang membedakan kaca dari
+                                plastik; permukaan buram dengan pantulan diam
+                                terbaca sebagai plastik.
+     3. Tepi spekular         — garis tipis di sisi atas, tempat cahaya
+                                membelok. Tanpa ini kartu terlihat menempel
+                                pada latar, bukan mengambang di atasnya.
+     4. Bayangan dua tingkat  — satu rapat untuk kontak, satu lebar dan lembut
+                                untuk ketinggian. Bayangan tunggal selalu
+                                terlihat seperti stiker.
+
+   BIAYA. backdrop-filter mahal, dan halaman di sini bisa memuat puluhan kartu.
+   Karena itu buramnya sedang (20px, bukan 40px), pantulan digambar dengan
+   gradien biasa alih-alih filter tambahan, dan tidak ada lapisan yang
+   dianimasikan terus-menerus. Yang bergerak hanya bereaksi pada masukan.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.kaca {
+  --kx: 50%;
+  --ky: 0%;
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,0.78), rgba(255,255,255,0.46) 55%, rgba(255,255,255,0.62));
+  backdrop-filter: blur(20px) saturate(1.7);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow:
+    0 1px 2px rgba(12,20,16,0.06),
+    0 12px 32px -8px rgba(12,20,16,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.85);
+  /* Naik dan turun tidak memakai waktu yang sama. Benda nyata berangkat cepat
+     dan mendarat perlahan; durasi tunggal untuk keduanya adalah penyebab paling
+     umum gerak terasa "seperti animasi" alih-alih seperti benda. */
+  transition:
+    transform 0.34s cubic-bezier(0.32,0.72,0,1),
+    box-shadow 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+
+/* Pantulan. pointer-events: none wajib — lapisan ini menutupi seluruh kartu,
+   dan tanpa itu setiap tombol di dalamnya berhenti bisa diklik. */
+.kaca::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at var(--kx) var(--ky),
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,255,255,0.14) 38%,
+    transparent 70%);
+  opacity: 0.9;
+  transition: background 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+
+/* Tepi spekular: gradien yang hanya terlihat di garis batas, lewat mask. */
+.kaca::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1px;
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.95),
+    rgba(255,255,255,0.1) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Di layar sentuh pantulan digerakkan oleh gulir, bukan kursor. */
+@media (pointer: coarse) {
+  .kaca { --ky: var(--kilau-gulir, 30%); }
+}
+
+.dark .kaca {
+  background:
+    linear-gradient(160deg, rgba(40,46,42,0.72), rgba(20,25,22,0.48) 55%, rgba(32,38,34,0.6));
+  border-color: rgba(255,255,255,0.12);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.5),
+    0 12px 32px -8px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.dark .kaca::before {
+  background: radial-gradient(
+    120% 90% at var(--kx) var(--ky),
+    rgba(255,255,255,0.16) 0%,
+    rgba(255,255,255,0.05) 38%,
+    transparent 70%);
+}
+.dark .kaca::after {
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,0.28),
+    rgba(255,255,255,0.04) 40%,
+    rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.1));
+}
+
+/* Melayang: naik saat disentuh perhatian, turun saat ditekan. Kurva
+   cubic-bezier(0.32,0.72,0,1) adalah kurva pegas yang dipakai di seluruh
+   berkas ini — gerak yang cepat berangkat lalu mendarat perlahan terasa
+   seperti benda bermassa, bukan seperti animasi. */
+.kaca-angkat:hover {
+  transform: translateY(-2px);
+  transition-duration: 0.42s;
+  box-shadow:
+    0 1px 2px rgba(12,20,16,0.06),
+    0 22px 48px -12px rgba(12,20,16,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.dark .kaca-angkat:hover {
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.5),
+    0 22px 48px -12px rgba(0,0,0,0.65),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.kaca-tekan:active {
+  transform: scale(0.985) translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Masuk halaman: naik sedikit sambil memburam-tajam, meniru lapisan yang
+   mengendap ke tempatnya. Jaraknya sengaja kecil (6px) — gerak masuk yang
+   besar terasa lambat setelah dilihat kelima kalinya. */
+@keyframes kaca-masuk {
+  from { opacity: 0; transform: translateY(6px) scale(0.995); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter > * {
+  animation: kaca-masuk 0.42s cubic-bezier(0.32,0.72,0,1) both;
+}
+/* Berundak, tetapi hanya untuk beberapa anak pertama. Menunda anak ke-20
+   sebesar 0.8 detik bukan lagi hiasan, melainkan halaman yang terasa rusak. */
+.page-enter > *:nth-child(1) { animation-delay: 0ms; }
+.page-enter > *:nth-child(2) { animation-delay: 40ms; }
+.page-enter > *:nth-child(3) { animation-delay: 80ms; }
+.page-enter > *:nth-child(4) { animation-delay: 120ms; }
+.page-enter > *:nth-child(5) { animation-delay: 160ms; }
+.page-enter > *:nth-child(n+6) { animation-delay: 190ms; }
+
+/* Gerak dikurangi: bagi sebagian orang ini bukan selera, melainkan mual dan
+   migrain. Permukaan kacanya tetap — yang dimatikan hanya geraknya. */
+@media (prefers-reduced-motion: reduce) {
+  .kaca, .kaca::before { transition: none; }
+  .kaca-angkat:hover, .kaca-tekan:active { transform: none; }
+  .page-enter > * { animation: none; }
+}
+
+/* Gulir dengan momentum di iOS, dan lompatan jangkar diperhalus. `smooth` hanya
+   berlaku bagi yang tidak meminta gerak dikurangi — bagi yang meminta, gulir
+   yang bergerak sendiri justru memperparah keluhannya. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+html { -webkit-overflow-scrolling: touch; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Buka-tutup yang halus tanpa mengukur tinggi.
+   Animasi tinggi biasanya menuntut JavaScript mengukur scrollHeight lebih dulu,
+   dan ukuran itu langsung basi begitu isinya berubah atau font selesai dimuat.
+   grid-template-rows dari 0fr ke 1fr membiarkan peramban yang menghitung, jadi
+   isinya boleh setinggi apa pun dan tetap mulus.
+   ───────────────────────────────────────────────────────────────────────── */
+.buka-halus {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.42s cubic-bezier(0.32,0.72,0,1),
+    opacity 0.32s ease;
+  opacity: 0;
+}
+.buka-halus[data-buka='true'] { grid-template-rows: 1fr; opacity: 1; }
+/* Anak wajib overflow hidden, kalau tidak isinya menyembul saat tingginya nol. */
+.buka-halus > * { overflow: hidden; min-height: 0; }
+
+/* Halaman ikut jari saat digeser. Transform dipakai, bukan left/margin, supaya
+   bergerak di compositor dan tidak memicu layout ulang tiap bingkai. */
+.geser-ikut { will-change: transform; }
+.geser-pulih {
+  transition: transform 0.52s cubic-bezier(0.32,0.72,0,1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buka-halus { transition: none; }
+  .geser-pulih { transition: none; }
+}

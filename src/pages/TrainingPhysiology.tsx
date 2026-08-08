@@ -8,13 +8,13 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { api, backendEnabled, type SleepNight } from '../lib/api'
 import {
-  hitungSesi, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
-  perkiraanLTHR, kondisiPerforma, kesiapan, saranSesiHarian, skorKetahanan,
-  UNAVAILABLE, type Sesi,
+  hitungSessions, ringkasBeban, statusLatihan, trainingEffect, waktuPemulihan,
+  perkiraanLTHR, kondisiPerforma, kesiapan, saranSessionsHarian, skorKetahanan,
+  UNAVAILABLE, type Sessions,
 } from '../lib/trainingPhysiology'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Fisiologi Latihan — padanan kelompok metrik Garmin, dari data Apple Health.
+// Training Physiology — padanan kelompok metrik Garmin, dari data Apple Health.
 //
 // Urutan halaman disengaja: kesiapan hari ini di atas (satu-satunya yang
 // menuntut keputusan sekarang), lalu beban dan status, lalu ambang dan
@@ -26,7 +26,7 @@ export function TrainingPhysiology() {
   const vitals = useVitals()
   const demo = useMemo(() => getDemo(), [])
   const [nights, setNights] = useState<SleepNight[]>([])
-  const [riwayat, setRiwayat] = useState<{ date: string; hrvMs?: number; restingHr?: number }[]>([])
+  const [riwayat, setHistory] = useState<{ date: string; hrvMs?: number; restingHr?: number }[]>([])
 
   useEffect(() => {
     if (!backendEnabled) return
@@ -34,7 +34,7 @@ export function TrainingPhysiology() {
     api.getHealthProfile()
       .then((r) => {
         const h = (r as { history?: { date: string; hrvMs?: number; restingHr?: number }[] })?.history
-        if (Array.isArray(h)) setRiwayat(h)
+        if (Array.isArray(h)) setHistory(h)
       })
       .catch(() => {})
   }, [])
@@ -56,12 +56,12 @@ export function TrainingPhysiology() {
     }
   }, [workouts, demo, vitals])
 
-  const sesi = useMemo<Sesi[]>(() => workouts.map((w) => ({
+  const sesi = useMemo<Sessions[]>(() => workouts.map((w) => ({
     id: w.id, nama: w.nama, mulai: w.mulai, durasiDetik: w.durasi,
     jarakKm: w.jarakKm, avgHr: w.avgHr, maxHr: w.maxHr, hr: w.hr,
   })), [workouts])
 
-  const calc = useMemo(() => hitungSesi(sesi, ctx), [sesi, ctx])
+  const calc = useMemo(() => hitungSessions(sesi, ctx), [sesi, ctx])
   const beban = useMemo(() => ringkasBeban(calc), [calc])
 
   const malamTerakhir = useMemo(
@@ -114,22 +114,22 @@ export function TrainingPhysiology() {
   const lthr = useMemo(() => perkiraanLTHR(calc, ctx.hrMax), [calc, ctx])
   const performa = useMemo(() => kondisiPerforma(calc), [calc])
   const ketahanan = useMemo(() => skorKetahanan(calc), [calc])
-  const saran = useMemo(() => saranSesiHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
+  const saran = useMemo(() => saranSessionsHarian(siap, beban, sisaJam), [siap, beban, sisaJam])
   const teTerbaru = useMemo(() => (terbaru ? trainingEffect(terbaru, beban.kronis) : null), [terbaru, beban])
 
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconActivity />} title="Fisiologi Latihan" subtitle="Beban, status, pemulihan, dan kesiapan" />
+        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery, and readiness" />
         <Card>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-neutral-600 leading-relaxed">
             Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung
             tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.
           </p>
-          <p className="mt-2 text-sm text-slate-400 leading-relaxed">
-            Nyalakan <strong className="text-slate-200">Include Workouts</strong> di Health Auto Export, lalu
+          <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+            Nyalakan <strong className="text-ink">Include Workouts</strong> di Health Auto Export, lalu
             sinkronkan. Panduannya ada di{' '}
-            <Link to="/health-data/tutorial" className="font-semibold text-white underline">panduan sinkronisasi</Link>.
+            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">panduan sinkronisasi</Link>.
           </p>
         </Card>
 
@@ -144,8 +144,8 @@ export function TrainingPhysiology() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconActivity />}
-        title="Fisiologi Latihan"
-        subtitle={`${calc.length} sesi · HRmaks dipakai ${ctx.hrMax} bpm · istirahat ${ctx.hrRest} bpm`}
+        title="Training Physiology"
+        subtitle={`${calc.length} sessions · HRmax used ${ctx.hrMax} bpm · resting ${ctx.hrRest} bpm`}
       />
 
       {/* Kesiapan — satu-satunya yang menuntut keputusan hari ini */}
@@ -160,7 +160,7 @@ export function TrainingPhysiology() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-lg font-semibold" style={{ color: siap.warna }}>{siap.label}</div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{siap.saran}</p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{siap.saran}</p>
           </div>
         </div>
 
@@ -169,7 +169,7 @@ export function TrainingPhysiology() {
             {siap.faktor.map((f) => (
               <div key={f.nama} className="flex items-center gap-2 text-xs">
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${f.arah === 'baik' ? 'bg-emerald-400' : f.arah === 'kurang' ? 'bg-rose-400' : 'bg-slate-500'}`} />
-                <span className="min-w-0 flex-1 truncate text-slate-300">{f.nama}</span>
+                <span className="min-w-0 flex-1 truncate text-neutral-600">{f.nama}</span>
                 <span className="text-slate-500">{f.nilai}</span>
                 <span className={`w-8 text-right tabular-nums ${f.arah === 'kurang' ? 'text-rose-300' : 'text-emerald-300'}`}>{f.bobot}</span>
               </div>
@@ -188,27 +188,27 @@ export function TrainingPhysiology() {
 
       {/* Saran sesi */}
       <Card>
-        <SectionTitle icon={<IconRun />} title="Saran sesi hari ini" />
+        <SectionTitle icon={<IconRun />} title="Suggested session today" />
         <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3">
-          <div className="text-sm font-semibold text-white">{saran.judul}</div>
-          <p className="mt-1 text-sm text-slate-300 leading-relaxed">{saran.rincian}</p>
-          <p className="mt-2 text-sm text-slate-400 leading-relaxed"><span className="text-slate-500">Alasan: </span>{saran.alasan}</p>
+          <div className="text-sm font-semibold text-ink">{saran.judul}</div>
+          <p className="mt-1 text-sm text-neutral-600 leading-relaxed">{saran.rincian}</p>
+          <p className="mt-2 text-sm text-neutral-500 leading-relaxed"><span className="text-slate-500">Alasan: </span>{saran.alasan}</p>
         </div>
       </Card>
 
       {/* Pemulihan */}
       {pemulihan && (
         <Card>
-          <SectionTitle icon={<IconTimer />} title="Waktu pemulihan" />
+          <SectionTitle icon={<IconTimer />} title="Recovery time" />
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-slate-400">Sisa sampai siap untuk sesi berat</span>
+            <span className="text-sm text-neutral-500">Sisa sampai siap untuk sesi berat</span>
             <span className={`text-2xl font-semibold tabular-nums ${sisaJam > 12 ? 'text-amber-300' : 'text-emerald-300'}`}>
               {sisaJam < 1 ? 'siap' : `${Math.round(sisaJam)} jam`}
             </span>
           </div>
           <div className="mt-2 space-y-1">
             {pemulihan.dasar.map((d, i) => (
-              <div key={i} className="flex gap-2 text-xs text-slate-400"><span className="text-slate-600">·</span><span>{d}</span></div>
+              <div key={i} className="flex gap-2 text-xs text-neutral-500"><span className="text-slate-600">·</span><span>{d}</span></div>
             ))}
           </div>
           <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
@@ -220,10 +220,10 @@ export function TrainingPhysiology() {
 
       {/* Status & beban */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Status latihan" />
+        <SectionTitle icon={<IconActivity />} title="Training status" />
         <div className="mt-2 rounded-lg border p-3" style={{ borderColor: `${status.warna}44`, background: `${status.warna}12` }}>
           <div className="text-base font-semibold" style={{ color: status.warna }}>{status.label}</div>
-          <p className="mt-1 text-sm leading-relaxed text-slate-300">{status.penjelasan}</p>
+          <p className="mt-1 text-sm leading-relaxed text-neutral-600">{status.penjelasan}</p>
           <p className="mt-1.5 text-sm leading-relaxed text-emerald-200/80">{status.saran}</p>
         </div>
 
@@ -261,8 +261,8 @@ export function TrainingPhysiology() {
       {/* Training effect sesi terakhir */}
       {teTerbaru && terbaru && (
         <Card>
-          <SectionTitle icon={<IconRun />} title="Efek latihan — sesi terakhir"
-            subtitle={new Date(terbaru.mulai).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })} />
+          <SectionTitle icon={<IconRun />} title="Training effect — last session"
+            subtitle={new Date(terbaru.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} />
           <div className="mt-2 grid grid-cols-2 gap-2">
             <TeBar label="Aerobik" value={teTerbaru.aerobik} teks={teTerbaru.labelAerobik} warna="#34d399" />
             <TeBar label="Anaerobik" value={teTerbaru.anaerobik} teks={teTerbaru.labelAnaerobik} warna="#f87171" />
@@ -286,14 +286,14 @@ export function TrainingPhysiology() {
         <div className="mt-2 space-y-3">
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-white">Denyut ambang laktat (LTHR)</span>
-              <span className="text-lg font-semibold tabular-nums text-white">
+              <span className="text-sm font-semibold text-ink">Denyut ambang laktat (LTHR)</span>
+              <span className="text-lg font-semibold tabular-nums text-ink">
                 {lthr.lthr != null ? `${lthr.lthr} bpm` : '—'}
                 {lthr.pctHrMax != null && <span className="ml-1 text-xs text-slate-500">{lthr.pctHrMax}% HRmaks</span>}
               </span>
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{lthr.metode}</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{lthr.metode}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
               Di atas ambang ini kelelahan menumpuk jauh lebih cepat dan performa cepat menurun. Inilah
               batas yang memisahkan &quot;berat tapi terkendali&quot; dari &quot;tidak bisa dipertahankan&quot;.
             </p>
@@ -301,13 +301,13 @@ export function TrainingPhysiology() {
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-white">Kondisi performa</span>
+              <span className="text-sm font-semibold text-ink">Kondisi performa</span>
               <span className={`text-lg font-semibold tabular-nums ${
-                performa.nilai == null ? 'text-slate-500' : performa.nilai > 0 ? 'text-emerald-300' : performa.nilai < 0 ? 'text-amber-300' : 'text-white'}`}>
+                performa.nilai == null ? 'text-slate-500' : performa.nilai > 0 ? 'text-emerald-300' : performa.nilai < 0 ? 'text-amber-300' : 'text-ink'}`}>
                 {performa.nilai == null ? '—' : performa.nilai > 0 ? `+${performa.nilai}` : performa.nilai}
               </span>
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{performa.arti}</p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{performa.arti}</p>
             {performa.ef != null && performa.efBaseline != null && (
               <p className="mt-1.5 text-[11px] text-slate-500">
                 Efisiensi sesi terakhir {performa.ef} meter per menit per denyut, dibanding kebiasaan {performa.efBaseline}.
@@ -318,12 +318,12 @@ export function TrainingPhysiology() {
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-white">Skor ketahanan</span>
-              <span className="text-lg font-semibold tabular-nums text-white">
+              <span className="text-sm font-semibold text-ink">Skor ketahanan</span>
+              <span className="text-lg font-semibold tabular-nums text-ink">
                 {ketahanan.skor ?? '—'}{ketahanan.skor != null && <span className="ml-1 text-xs text-slate-500">{ketahanan.label}</span>}
               </span>
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{ketahanan.penjelasan}</p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{ketahanan.penjelasan}</p>
           </div>
         </div>
       </Card>
@@ -331,18 +331,18 @@ export function TrainingPhysiology() {
       {/* Dasar perhitungan */}
       <Card>
         <SectionTitle icon={<IconActivity />} title="Dasar perhitungannya" />
-        <p className="mt-2 text-sm leading-relaxed text-slate-300">
+        <p className="mt-2 text-sm leading-relaxed text-neutral-600">
           Garmin menghitung beban dari <b>EPOC</b> yang diperkirakan lewat model berpemilik Firstbeat, memakai
           detak jantung detik per detik beserta variabilitas antarketukan. Apple Watch tidak mengeluarkan data
           sedetail itu, jadi halaman ini <b>tidak mengaku menghitung EPOC</b>.
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Yang dipakai adalah <b>TRIMP (Banister)</b> — ukuran beban berbasis detak jantung yang sudah lama
           dipakai di lapangan maupun penelitian, dengan pembobotan eksponensial sehingga satu menit intensitas
           tinggi dihitung jauh lebih berat daripada satu menit ringan. Angkanya <b>tidak sebanding dengan angka
           Garmin</b>; yang bermakna adalah kecenderungannya pada diri Anda sendiri.
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-slate-400">
+        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Nisbah beban 7:28 hari dipakai luas, namun bukti bahwa ia meramalkan cedera masih diperdebatkan.
           Ia dipakai di sini sebagai penanda perubahan, bukan sebagai ramalan.
         </p>
@@ -363,23 +363,23 @@ export function TrainingPhysiology() {
 function KartuBelumDariJam() {
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Yang tidak datang dari jam tangan"
-        subtitle="Bukan berarti tidak ada — semuanya sudah dibuat sebagai alat tersendiri" />
-      <p className="mt-2 text-sm leading-relaxed text-slate-400">
-        Yang berikut ini <strong className="text-white">tidak bisa dihitung dari ekspor Apple Watch</strong>,
+      <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
+        subtitle="That does not mean it is missing — each exists as its own tool" />
+      <p className="mt-2 text-sm leading-relaxed text-neutral-500">
+        Yang berikut ini <strong className="text-ink">tidak bisa dihitung dari ekspor Apple Watch</strong>,
         dan itu tidak sama dengan tidak bisa dibuat. Masing-masing hanya memerlukan masukannya sendiri,
-        dan kini <strong className="text-white">semuanya sudah tersedia</strong> — tautannya ada di tiap baris.
+        dan kini <strong className="text-ink">semuanya sudah tersedia</strong> — tautannya ada di tiap baris.
       </p>
       <div className="mt-3 space-y-2">
         {UNAVAILABLE.map((u) => (
           <div key={u.fitur} className={`rounded-lg border p-3 ${u.adaDi ? 'border-emerald-500/25 bg-emerald-500/[0.05]' : 'border-white/10 bg-white/[0.02]'}`}>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-slate-200">{u.fitur}</span>
+              <span className="text-sm font-semibold text-ink">{u.fitur}</span>
               {u.adaDi
                 ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Sudah ada →</Link>
                 : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Belum dibuat</span>}
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{u.kenapa}</p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{u.kenapa}</p>
             <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Perlu: </span>{u.syarat}</p>
           </div>
         ))}
@@ -398,7 +398,7 @@ function TeBar({ label, value, teks, warna }: { label: string; value: number; te
       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/5">
         <div className="h-full rounded-full" style={{ width: `${(value / 5) * 100}%`, background: warna }} />
       </div>
-      <div className="mt-1 text-[11px] text-slate-400">{teks}</div>
+      <div className="mt-1 text-[11px] text-neutral-500">{teks}</div>
     </div>
   )
 }
@@ -406,7 +406,7 @@ function TeBar({ label, value, teks, warna }: { label: string; value: number; te
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-center">
-      <div className="text-base font-semibold tabular-nums text-white">{value}</div>
+      <div className="text-base font-semibold tabular-nums text-ink">{value}</div>
       <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">{label}</div>
       {sub && <div className="text-[10px] text-slate-500">{sub}</div>}
     </div>

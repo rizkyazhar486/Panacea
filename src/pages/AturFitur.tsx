@@ -50,21 +50,21 @@ export function AturFitur() {
   return (
     <div className="space-y-4 pb-24">
       <SectionTitle icon={<IconSettings />} title="Atur Fitur"
-        subtitle="Sembunyikan yang tidak Anda pakai agar menu tetap ringkas" />
+        subtitle="Hide what you do not use so the menu stays short" />
 
       <Card>
-        <p className="text-sm leading-relaxed text-slate-300">
+        <p className="text-sm leading-relaxed text-neutral-600">
           Menyembunyikan fitur <b>tidak menghapusnya</b>. Halamannya tetap hidup, tautan lama dan
           penanda halaman tetap bekerja — yang hilang hanya kehadirannya di menu dan di hub.
           Semuanya bisa dikembalikan kapan pun dari halaman ini.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-white/5 px-3 py-1 text-[12px] font-bold text-slate-300">
+          <span className="rounded-full bg-white/5 px-3 py-1 text-[12px] font-bold text-neutral-600">
             {jumlahTersembunyi} disembunyikan
           </span>
           {jumlahTersembunyi > 0 && (
             <button onClick={() => { tampilkanSemua(); setTersembunyi([]) }}
-              className="rounded-full bg-brand px-3 py-1 text-[12px] font-bold text-white">
+              className="rounded-full bg-brand px-3 py-1 text-[12px] font-bold text-ink">
               Tampilkan semua lagi
             </button>
           )}
@@ -77,7 +77,7 @@ export function AturFitur() {
       </Card>
 
       {perGrup.length === 0 && (
-        <Card><p className="text-sm text-slate-400">Tidak ada fitur yang cocok dengan "{cari}".</p></Card>
+        <Card><p className="text-sm text-neutral-500">Tidak ada fitur yang cocok dengan "{cari}".</p></Card>
       )}
 
       {perGrup.map(([grup, items]) => {
@@ -86,7 +86,7 @@ export function AturFitur() {
         return (
           <Card key={grup}>
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">{grup}</div>
+              <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">{grup}</div>
               {bisa.length > 1 && (
                 <button
                   onClick={() => {
@@ -97,7 +97,7 @@ export function AturFitur() {
                     simpanTersembunyi(next)
                     setTersembunyi(next)
                   }}
-                  className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">
+                  className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-neutral-600">
                   {semuaTersembunyi ? 'Tampilkan grup' : 'Sembunyikan grup'}
                 </button>
               )}
@@ -114,13 +114,13 @@ export function AturFitur() {
                     </span>
                     {kunci ? (
                       <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500"
-                        title="Selalu tersedia demi keamanan dan agar pengaturan tidak terkunci">
+                        title="Always available for safety, and so settings can never lock you out">
                         selalu ada
                       </span>
                     ) : (
                       <button onClick={() => setTersembunyi(alihkanFitur(n.to))}
                         aria-label={off ? `Tampilkan ${n.label}` : `Sembunyikan ${n.label}`}
-                        className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold ${off ? 'bg-brand text-white' : 'bg-white/10 text-slate-300'}`}>
+                        className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold ${off ? 'bg-brand text-white' : 'bg-white/10 text-neutral-600'}`}>
                         {off ? 'Tampilkan' : 'Sembunyikan'}
                       </button>
                     )}
@@ -133,14 +133,14 @@ export function AturFitur() {
       })}
 
       <Card>
-        <p className="text-[12px] leading-relaxed text-slate-400">
+        <p className="text-[12px] leading-relaxed text-neutral-500">
           Beranda, Profil, Pengaturan dan Kartu Darurat sengaja tidak bisa disembunyikan.
           Menyembunyikan jalan menuju pengaturan akan mengunci Anda dari pengaturan Anda sendiri,
           dan tombol darurat bukan sesuatu yang pantas dihilangkan oleh aplikasi kesehatan.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           Ingin mengatur kartu di beranda? Itu terpisah dan ada di{' '}
-          <Link to="/" className="font-semibold text-white underline">Beranda</Link> lewat tombol
+          <Link to="/" className="font-semibold text-ink underline">Beranda</Link> lewat tombol
           "Atur kartu beranda".
         </p>
       </Card>

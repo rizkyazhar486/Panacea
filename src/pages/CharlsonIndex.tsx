@@ -93,15 +93,15 @@ export function CharlsonIndex() {
       <Card className="!p-5">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Comorbidity</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{comorbidityPts}</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Comorbidity</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{comorbidityPts}</div>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Age points</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{agePts(age)}</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Age points</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{agePts(age)}</div>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Total CCI</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Total CCI</div>
             <div className="mt-1 text-2xl font-black text-brand-dark">{total}</div>
           </div>
         </div>
@@ -109,11 +109,11 @@ export function CharlsonIndex() {
           <span className="text-3xl font-black text-brand-dark">{survival10y.toFixed(0)}%</span>
           <Badge tone={tone}>Estimated 10-year survival</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">10-yr survival = 0.983 ^ exp(0.9 × score) — a population-level estimate from the original cohort, not an individual prognosis.</p>
+        <p className="mt-2 text-[12px] text-neutral-500">10-yr survival = 0.983 ^ exp(0.9 × score) — a population-level estimate from the original cohort, not an individual prognosis.</p>
         <CopyNote text={`Charlson Comorbidity Index ${total} (comorbidity ${comorbidityPts} + age ${agePts(age)}) — est. 10-year survival ${survival10y.toFixed(0)}% [Charlson 1987]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Charlson, M.E., et al. (1987). A new method of classifying prognostic comorbidity in
         longitudinal studies. <i>J Chronic Dis</i>, 40(5), 373-383. Decision-support estimate —
         widely used in research and surgical risk discussion; individual prognosis depends on far

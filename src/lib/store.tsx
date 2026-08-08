@@ -716,7 +716,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           wallet: {
             balance: st.wallet.balance,
             transactions: [
-              { id: uid(), type: 'subscription' as TxType, amount: 0, note: `${lifetime ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari'} — Rp${priceIdr.toLocaleString('id-ID')} (dibayar)`, at: now.toISOString() },
+              { id: uid(), type: 'subscription' as TxType, amount: 0, note: `${lifetime ? 'Pemantauan Kronis Lifetime' : 'Pemantauan Kronis 30 hari'} — Rp${priceIdr.toLocaleString('en-GB')} (dibayar)`, at: now.toISOString() },
               ...st.wallet.transactions,
             ],
           },
@@ -913,7 +913,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'consult' as TxType,
                 amount: 0,
-                note: `Konsultasi ${c.doctorName} — Rp${c.feeIdr.toLocaleString('id-ID')} (dibayar)`,
+                note: `Konsultasi ${c.doctorName} — Rp${c.feeIdr.toLocaleString('en-GB')} (dibayar)`,
                 at: c.at,
               },
               ...st.wallet.transactions,
@@ -933,7 +933,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                 id: uid(),
                 type: 'withdraw' as TxType,
                 amount: -amount,
-                note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('id-ID')})`,
+                note: `Tarik dana ke ${bank} (Rp${(amount * TOKEN_TO_IDR).toLocaleString('en-GB')})`,
                 at: new Date().toISOString(),
               },
               ...st.wallet.transactions,

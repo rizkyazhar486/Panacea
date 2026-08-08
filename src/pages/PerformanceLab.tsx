@@ -59,7 +59,7 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
         ))}
       </div>
       <div className="mt-2.5 rounded-xl bg-neutral-50 p-3">
-        <div className="text-xl font-extrabold text-brand-dark">{display}<span className="ml-1 text-xs font-medium text-neutral-400">{unit}</span></div>
+        <div className="text-xl font-extrabold text-brand-dark">{display}<span className="ml-1 text-xs font-medium text-neutral-500">{unit}</span></div>
         <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">{note}</p>
       </div>
     </div>
@@ -172,7 +172,7 @@ function RpeCard() {
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Field label="Duration (minutes)"><input className={inputClass} type="number" value={dur} onChange={(e) => setDur(+e.target.value)} /></Field>
         <div className="rounded-xl bg-neutral-50 p-2.5">
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Training Load (sRPE)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Training Load (sRPE)</div>
           <div className="text-lg font-extrabold text-brand-dark">{load}</div>
         </div>
       </div>
@@ -189,8 +189,8 @@ function VtLtCard() {
       <div className="text-sm font-extrabold">🌬️ Ventilatory & Lactate Threshold</div>
       <KolomVitalTerikat ikat={ikatVo2} label="VO₂max (ml/kg/min)" satuan="ml/kg/min" step={0.1} />
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VT1/LT1</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.6).toFixed(1)}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VT2/LT2</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.85).toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">VT1/LT1</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.6).toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">VT2/LT2</div><div className="text-base font-extrabold text-brand-dark">{(vo2 * 0.85).toFixed(1)}</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">VT1/LT1 ≈ 55-65% VO₂max (lactate starts to rise slightly). VT2/LT2 ≈ 80-90% VO₂max (anaerobic threshold/RCP). Skinner & McLellan two-threshold model.</p>
     </div>
@@ -214,7 +214,7 @@ function LactateRecoveryCard() {
         <button onClick={() => setActive(true)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Active Recovery</button>
         <button onClick={() => setActive(false)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (!active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Passive Recovery</button>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Estimated Remaining Lactate</div><div className="text-lg font-extrabold text-brand-dark">{remaining.toFixed(1)} mmol</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Estimated Remaining Lactate</div><div className="text-lg font-extrabold text-brand-dark">{remaining.toFixed(1)} mmol</div></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Lactate half-life ≈15 minutes (active recovery/light jogging) vs ≈25 minutes (passive/rest). Exponential decay model.</p>
     </div>
   )
@@ -240,7 +240,7 @@ function MetabolicMapCard() {
   return (
     <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
       <div className="text-sm font-extrabold">🗺️ The Metabolic Map — Response to Training</div>
-      <p className="text-[10px] text-white/50">Illustration of fat/carbohydrate oxidation & lactate per zone (not your direct test results)</p>
+      <p className="text-[10px] text-ink/50">Illustration of fat/carbohydrate oxidation & lactate per zone (not your direct test results)</p>
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full">
         <path d={path((p) => yPct(p.fat))} fill="none" stroke="#f59e0b" strokeWidth="2" />
         <path d={path((p) => yPct(p.cho))} fill="none" stroke="#ef4444" strokeWidth="2" />
@@ -252,7 +252,7 @@ function MetabolicMapCard() {
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-white/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-ink/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</p>
     </div>
   )
 }
@@ -280,7 +280,7 @@ function PowerTab() {
             </Field>
             <Field label="Load (kg)"><input className={inputClass} type="number" value={w} onChange={(e) => setW(+e.target.value)} /></Field>
             <Field label="Reps"><input className={inputClass} type="number" value={reps} onChange={(e) => setReps(+e.target.value)} /></Field>
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">1RM ({ex})</div><div className="text-lg font-extrabold text-brand-dark">{oneRm.toFixed(0)} kg</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">1RM ({ex})</div><div className="text-lg font-extrabold text-brand-dark">{oneRm.toFixed(0)} kg</div></div>
           </div>
           <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Average of Epley (w×(1+reps/30)) & Brzycki (w/(1.0278−0.0278×reps)). This load is ≈{pctUsed.toFixed(0)}% of your 1RM — a safe submaximal test without lifting to full failure.</p>
         </div>
@@ -375,7 +375,7 @@ function ReactionTimeCard() {
         {state === 'idle' ? 'Press to start' : state === 'waiting' ? 'Wait for green…' : state === 'go' ? 'PRESS NOW!' : 'Too soon — try again'}
       </button>
       <div className="mt-2 rounded-xl bg-neutral-50 p-2.5">
-        <div className="text-[9px] font-bold uppercase text-neutral-400">Average ({trials.length} trials)</div>
+        <div className="text-[9px] font-bold uppercase text-neutral-500">Average ({trials.length} trials)</div>
         <div className="text-lg font-extrabold text-brand-dark">{avg > 0 ? avg.toFixed(0) : '—'} ms</div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Average adult ≈200-250ms; elite athletes can be &lt;180ms. Repeat 5× for a stable result.</p>
@@ -447,8 +447,8 @@ function GripCard() {
         <KolomVitalTerikat ikat={ikatBw} label="Weight (kg)" satuan="kg" step={0.1} />
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Average</div><div className="text-lg font-extrabold text-brand-dark">{avg.toFixed(1)} kg</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Ratio / Weight</div><div className="text-lg font-extrabold text-brand-dark">{ratio.toFixed(2)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Average</div><div className="text-lg font-extrabold text-brand-dark">{avg.toFixed(1)} kg</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Ratio / Weight</div><div className="text-lg font-extrabold text-brand-dark">{ratio.toFixed(2)}</div></div>
       </div>
       {asym > 10 && <div className="mt-2"><Badge tone="critical">⚠️ Asymmetry {asym.toFixed(0)}% — more than 10%</Badge></div>}
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Grip strength is one of the strongest predictors of mortality (PURE study). A left-right asymmetry &gt;10% indicates a potential imbalance that needs correcting.</p>
@@ -465,8 +465,8 @@ function BleepTestCard() {
       <div className="text-sm font-extrabold">🔔 Multi-Stage Fitness Test (Bleep)</div>
       <Field label="Level reached (1-21)"><input className={inputClass} type="number" min={1} max={21} value={level} onChange={(e) => setLevel(+e.target.value)} /></Field>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Final Speed</div><div className="text-lg font-extrabold text-brand-dark">{speed.toFixed(1)} km/h</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Estimated VO₂max</div><div className="text-lg font-extrabold text-brand-dark">{vo2.toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Final Speed</div><div className="text-lg font-extrabold text-brand-dark">{speed.toFixed(1)} km/h</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Estimated VO₂max</div><div className="text-lg font-extrabold text-brand-dark">{vo2.toFixed(1)}</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Léger & Gadoury (1989) formula: VO₂max = 5.857×speed(km/h) − 19.458. Field estimate, not a substitute for a lab test.</p>
     </div>
@@ -510,9 +510,9 @@ function VentilationCard() {
         <Field label="VCO₂ (L/min)"><input className={inputClass} type="number" step="0.1" value={vco2} onChange={(e) => setVco2(+e.target.value)} /></Field>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VE/VO₂</div><div className="text-base font-extrabold text-brand-dark">{veVo2.toFixed(1)}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">VE/VCO₂</div><div className="text-base font-extrabold text-brand-dark">{veVco2.toFixed(1)}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">RER</div><div className="text-base font-extrabold text-brand-dark">{rer.toFixed(2)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">VE/VO₂</div><div className="text-base font-extrabold text-brand-dark">{veVo2.toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">VE/VCO₂</div><div className="text-base font-extrabold text-brand-dark">{veVco2.toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">RER</div><div className="text-base font-extrabold text-brand-dark">{rer.toFixed(2)}</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">VE/VO₂ rises sharply without VE/VCO₂ rising = VT1. Both rising together = VT2/RCP. RER &gt;1.0 indicates increased anaerobic contribution/hyperventilation.</p>
     </div>
@@ -536,7 +536,7 @@ function HydrationCard() {
         <Field label="Fluid consumed (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Sweat Rate</div><div className="text-lg font-extrabold text-brand-dark">{rate.toFixed(2)} L/hour</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Sweat Rate</div><div className="text-lg font-extrabold text-brand-dark">{rate.toFixed(2)} L/hour</div></div>
       {lossPct > 2 && <div className="mt-2"><Badge tone="critical">⚠️ Weight loss {lossPct.toFixed(1)}% — significant dehydration</Badge></div>}
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">A loss &gt;2% of body weight reduces performance & increases heat illness risk. 1L fluid ≈ 1kg.</p>
     </div>
@@ -596,8 +596,8 @@ function IfCard() {
         <Field label="Eating window end"><input className={inputClass} type="time" value={end} onChange={(e) => setEnd(e.target.value)} /></Field>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Eating Window</div><div className="text-base font-extrabold text-brand-dark">{window.toFixed(1)} hours</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Fasting</div><div className="text-base font-extrabold text-brand-dark">{fasting.toFixed(1)} hours</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Eating Window</div><div className="text-base font-extrabold text-brand-dark">{window.toFixed(1)} hours</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Fasting</div><div className="text-base font-extrabold text-brand-dark">{fasting.toFixed(1)} hours</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Zone 2/light sessions are safe while fasted (fat-adapted). High-intensity/strength sessions should ideally be scheduled within the eating window so glycogen is sufficient.</p>
     </div>
@@ -640,8 +640,8 @@ function TssCard() {
         <Field label="FTP (W)"><input className={inputClass} type="number" value={ftp} onChange={(e) => setFtp(+e.target.value)} /></Field>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Intensity Factor</div><div className="text-base font-extrabold text-brand-dark">{ifactor.toFixed(2)}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">TSS</div><div className="text-base font-extrabold text-brand-dark">{tss.toFixed(0)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Intensity Factor</div><div className="text-base font-extrabold text-brand-dark">{ifactor.toFixed(2)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">TSS</div><div className="text-base font-extrabold text-brand-dark">{tss.toFixed(0)}</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">TSS = (duration × NP × IF)/(FTP × 3600) × 100. 100 TSS ≈ 1 hour all-out at FTP. &gt;150/session = heavy load, needs extra recovery.</p>
     </div>
@@ -664,7 +664,7 @@ function KarvonenCard() {
         <Field label="Low intensity (%)"><input className={inputClass} type="number" value={lo} onChange={(e) => setLo(+e.target.value)} /></Field>
         <Field label="High intensity (%)"><input className={inputClass} type="number" value={hi} onChange={(e) => setHi(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Target HR Range</div><div className="text-lg font-extrabold text-brand-dark">{target(lo)}–{target(hi)} bpm</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Target HR Range</div><div className="text-lg font-extrabold text-brand-dark">{target(lo)}–{target(hi)} bpm</div></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Karvonen: Target = (HRmax−HRrest)×%intensity + HRrest. More personalized than %HRmax alone since it accounts for Heart Rate Reserve.</p>
     </div>
   )
@@ -684,9 +684,9 @@ function HrMaxCard() {
         <Field label="Gender"><select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">Male</option><option value="F">Female</option></select></Field>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">220-age</div><div className="text-base font-extrabold text-brand-dark">{classic}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">Tanaka</div><div className="text-base font-extrabold text-brand-dark">{tanaka.toFixed(0)}</div></div>
-        {g === 'F' && <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">Gulati (F)</div><div className="text-base font-extrabold text-brand-dark">{gulati.toFixed(0)}</div></div>}
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">220-age</div><div className="text-base font-extrabold text-brand-dark">{classic}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">Tanaka</div><div className="text-base font-extrabold text-brand-dark">{tanaka.toFixed(0)}</div></div>
+        {g === 'F' && <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">Gulati (F)</div><div className="text-base font-extrabold text-brand-dark">{gulati.toFixed(0)}</div></div>}
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Tanaka (208−0.7×age) is generally more accurate than 220-age. Gulati (206−0.88×age) is specifically validated for women.</p>
     </div>
@@ -705,10 +705,10 @@ function TrainingLoadRecapCard() {
     <div className="rounded-2xl border border-neutral-100 p-4 sm:col-span-2">
       <div className="text-sm font-extrabold">📋 Load Summary (from the Athlete page)</div>
       <div className="mt-2 grid grid-cols-4 gap-2 text-center">
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">ACWR</div><div className="text-base font-extrabold text-brand-dark">{acwr > 0 ? acwr.toFixed(2) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">CTL (Fitness)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? ctl.toFixed(0) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">ATL (Fatigue)</div><div className="text-base font-extrabold text-brand-dark">{acute > 0 ? atl.toFixed(0) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">TSB (Form)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? tsb.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">ACWR</div><div className="text-base font-extrabold text-brand-dark">{acwr > 0 ? acwr.toFixed(2) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">CTL (Fitness)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? ctl.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">ATL (Fatigue)</div><div className="text-base font-extrabold text-brand-dark">{acute > 0 ? atl.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">TSB (Form)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? tsb.toFixed(0) : '—'}</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">This data is edited from the <a href="#/athlete" className="font-bold text-brand-dark underline">Athlete page</a> — shown here so all load metrics are visible in one Lab.</p>
     </div>
@@ -739,10 +739,10 @@ function EconomyTab() {
           <div className="text-sm font-extrabold">📍 Last GPS Activity Summary</div>
           {last ? (
             <div className="mt-2 grid grid-cols-2 gap-2 text-center">
-              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">Distance</div><div className="text-base font-extrabold text-brand-dark">{last.distKm.toFixed(2)} km</div></div>
-              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-400">Avg Speed</div><div className="text-base font-extrabold text-brand-dark">{last.avgSpeedKmh.toFixed(1)} km/h</div></div>
+              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">Distance</div><div className="text-base font-extrabold text-brand-dark">{last.distKm.toFixed(2)} km</div></div>
+              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[8px] font-bold text-neutral-500">Avg Speed</div><div className="text-base font-extrabold text-brand-dark">{last.avgSpeedKmh.toFixed(1)} km/h</div></div>
             </div>
-          ) : <p className="mt-2 text-[11px] text-neutral-400">No GPS activity recorded yet.</p>}
+          ) : <p className="mt-2 text-[11px] text-neutral-500">No GPS activity recorded yet.</p>}
           <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Elevation & terrain (flat/rolling/hilly) appear directly while recording in the GPS Tracker (Home).</p>
         </div>
       </div>
@@ -761,7 +761,7 @@ function DurabilityCard() {
         <Field label="Power/speed, early segment"><input className={inputClass} type="number" value={first} onChange={(e) => setFirst(+e.target.value)} /></Field>
         <Field label="Power/speed, late segment"><input className={inputClass} type="number" value={last} onChange={(e) => setLast(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-400">Decline</div><div className="text-lg font-extrabold text-brand-dark">{decay.toFixed(1)}%</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Decline</div><div className="text-lg font-extrabold text-brand-dark">{decay.toFixed(1)}%</div></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Use a unit where a higher number = better (power/speed, not pace). Low durability (&lt;5% decline) indicates very good endurance in long sessions.</p>
     </div>
   )

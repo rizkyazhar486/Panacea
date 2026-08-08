@@ -36,7 +36,7 @@ function SkincareBuilder() {
 
   const Period = ({ period, label }: { period: 'morning' | 'night'; label: string }) => (
     <div>
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{label}</div>
       <div className="mt-2 flex flex-wrap gap-2">
         {SKINCARE_STEPS.filter((s) => !routine[period].includes(s)).map((s) => (
           <button key={s} onClick={() => toggle(period, s)} className="rounded-full bg-neutral-100 px-3 py-1.5 text-[12px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">+ {s}</button>
@@ -46,9 +46,9 @@ function SkincareBuilder() {
         {routine[period].map((s, i) => (
           <div key={s} className="flex items-center gap-2 rounded-xl bg-brand/10 px-3 py-2">
             <span className="text-[11px] font-black text-brand-dark">{i + 1}</span>
-            <span className="flex-1 text-[13px] font-semibold text-ink dark:text-white">{s}</span>
-            <button onClick={() => move(period, i, -1)} className="text-neutral-400">↑</button>
-            <button onClick={() => move(period, i, 1)} className="text-neutral-400">↓</button>
+            <span className="flex-1 text-[13px] font-semibold text-ink dark:text-ink">{s}</span>
+            <button onClick={() => move(period, i, -1)} className="text-neutral-500">↑</button>
+            <button onClick={() => move(period, i, 1)} className="text-neutral-500">↓</button>
             <button onClick={() => toggle(period, s)} className="text-red-500">✕</button>
           </div>
         ))}
@@ -102,7 +102,7 @@ function SymptomBodyMap() {
       <div className="mt-4 space-y-2">
         {logs.slice(0, 8).map((l) => (
           <div key={l.t} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
-            <span className="font-bold text-ink dark:text-white">{l.region}</span>
+            <span className="font-bold text-ink dark:text-ink">{l.region}</span>
             <span className="text-neutral-500">{l.severity}/10 · {new Date(l.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         ))}
@@ -164,7 +164,7 @@ export function BodyToolkit() {
       {tab === 'symptom-map' && <SymptomBodyMap />}
       {tab === 'neat' && <NeatTracker />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Self-tracking tools — not a dermatology consultation or a clinical symptom assessment. Persistent
         or worsening symptoms deserve an actual exam, not just a log entry.
       </div>

@@ -227,8 +227,8 @@ export function hitungFtp(opsi: { metode: TesFtp; nilaiWatt: number; beratKg?: n
 /** Rentang kasar yang lazim dipakai untuk menempatkan diri; bukan patokan medis. */
 export function kategoriWkg(wkg: number, sex: 'M' | 'F'): string {
   const batas = sex === 'F'
-    ? [[1.4, 'Pemula'], [2.2, 'Rekreasi'], [3.1, 'Cukup terlatih'], [4.0, 'Terlatih'], [4.8, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
-    : [[1.8, 'Pemula'], [2.6, 'Rekreasi'], [3.5, 'Cukup terlatih'], [4.5, 'Terlatih'], [5.3, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
+    ? [[1.4, 'Pemula'], [2.2, 'Rekreasi'], [3.1, 'Adequate terlatih'], [4.0, 'Terlatih'], [4.8, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
+    : [[1.8, 'Pemula'], [2.6, 'Rekreasi'], [3.5, 'Adequate terlatih'], [4.5, 'Terlatih'], [5.3, 'Sangat terlatih'], [99, 'Tingkat elite']] as const
   for (const [b, l] of batas) if (wkg < b) return l
   return 'Tingkat elite'
 }

@@ -65,7 +65,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
   const [role, setRole] = useState<Role>('pasien')
   const [f, setF] = useState({
     email: '', name: '', sex: 'L' as 'L' | 'P', dob: '',
-    nik: '', occupation: '', background: '',
+    occupation: '', background: '',
     str: '', gelar: '', keahlian: '', universitas: '',
     tahunLulus: '', spesialis: '', subspesialis: '', pdfName: '',
   })
@@ -140,7 +140,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
       sex: simple ? undefined : f.sex,
       dob: simple || !f.dob ? undefined : f.dob,
       age: simple || !f.dob ? undefined : ageFromDob(f.dob),
-      nik: f.nik.trim() || undefined, occupation: f.occupation.trim() || undefined,
+      occupation: f.occupation.trim() || undefined,
       background: f.background.trim() || undefined,
       str: clinical ? f.str.trim() : undefined,
       keahlian: f.keahlian.trim() || undefined, universitas: f.universitas.trim() || undefined,
@@ -174,7 +174,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             Longevity Medical-AI{' '}
             <span className="animate-gradient-text bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">Co-Physician</span>
           </h1>
-          <p className="mt-3 max-w-md text-white/85">
+          <p className="mt-3 max-w-md text-ink/85">
             AI handles history-taking & education; doctors verify. Tokenized medical records,
             continuous monitoring for healthspan.
           </p>
@@ -184,7 +184,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             ))}
           </div>
         </div>
-        <p className="relative text-xs text-white/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
+        <p className="relative text-xs text-ink/70">⚕️ AI supports, but does not replace, licensed clinicians.</p>
       </div>
 
       {/* ── Form panel ────────────────────────────── */}
@@ -214,7 +214,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
               </button>
             ))}
           </div>
-          <p className="-mt-3 text-[11px] leading-relaxed text-neutral-400">{cur.desc}</p>
+          <p className="-mt-3 text-[11px] leading-relaxed text-neutral-500">{cur.desc}</p>
 
           {/* ── Quick login ────────────────────── */}
           {health?.googleClientId
@@ -249,7 +249,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
             </p>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-neutral-400">
+          <div className="flex items-center gap-3 text-xs text-neutral-500">
             <span className="h-px flex-1 bg-neutral-200" /> or fill in manually <span className="h-px flex-1 bg-neutral-200" />
           </div>
 
@@ -295,7 +295,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                   <input className={inputClass} value={f.str}
                     onChange={e => setF(p => ({ ...p, str: e.target.value }))}
                     placeholder="Required — STR / practice certificate" />
-                  <p className="mt-1 text-[11px] text-neutral-400">
+                  <p className="mt-1 text-[11px] text-neutral-500">
                     {role === 'dokter' ? 'AI-EMR is only for certified clinicians.' : 'Required for certified clinicians / academics.'}
                   </p>
                 </div>
@@ -322,7 +322,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
                       className="block w-full text-xs text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
                     {f.pdfName && <p className="mt-1 text-[11px] text-brand-dark">✓ {f.pdfName}</p>}
                   </div>
-                  <p className="text-[11px] text-neutral-400">Reviewed by AI-Agent & approved by Owner before full access.</p>
+                  <p className="text-[11px] text-neutral-500">Reviewed by AI-Agent & approved by Owner before full access.</p>
                 </Collapse>
               </>
             )}
@@ -332,7 +332,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <Collapse title="Additional details (optional)">
                 <div className="grid grid-cols-2 gap-2">
                   <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Employee" />
-                  <Mini label="National ID (NIK)" value={f.nik} onChange={v => setF(p => ({ ...p, nik: v.replace(/\D/g, '').slice(0, 16) }))} placeholder="16 digits" numeric />
                 </div>
                 <Mini label="Health background" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Family history of hypertension, etc." />
               </Collapse>
@@ -340,7 +339,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           </div>
 
           <Button onClick={doLogin} className="w-full">Sign in as {cur.title}</Button>
-          <p className="text-center text-[11px] text-neutral-400">⚕️ Data protected in accordance with Indonesia's PDP Law.</p>
+          <p className="text-center text-[11px] text-neutral-500">⚕️ Data protected in accordance with Indonesia's PDP Law.</p>
         </div>
 
         {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
@@ -465,7 +464,7 @@ function LegalModal({ onClose }: { onClose: () => void }) {
           <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
           <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
           <p><b>Terms.</b> AI-EMR is only for clinicians with a verified STR/SIP. Pharmacy services are subject to licensed pharmacists & BPOM regulation. In an emergency, use the SOS Emergency feature and contact the nearest healthcare facility.</p>
-          <p className="text-xs text-neutral-400">The full version is available in the "Privacy & Legal" menu after signing in.</p>
+          <p className="text-xs text-neutral-500">The full version is available in the "Privacy & Legal" menu after signing in.</p>
         </div>
         <button onClick={onClose}
           className="mt-5 w-full rounded-full bg-gradient-to-b from-[#00BF63] to-[#0b7a4b] py-2.5 text-sm font-bold text-white">

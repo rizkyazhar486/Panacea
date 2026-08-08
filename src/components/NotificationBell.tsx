@@ -23,13 +23,13 @@ function timeAgo(iso: string): string {
   const h = Math.floor(m / 60)
   if (h < 24) return `${h} jam lalu`
   const d = Math.floor(h / 24)
-  return d < 7 ? `${d} hari lalu` : new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+  return d < 7 ? `${d} hari lalu` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
 function fullTime(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleString('id-ID', {
+  return d.toLocaleString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   })
@@ -41,9 +41,9 @@ function dayLabel(iso: string): string {
   const now = new Date()
   const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString()
   const kemarin = new Date(now); kemarin.setDate(now.getDate() - 1)
-  if (sameDay(d, now)) return 'Hari ini'
+  if (sameDay(d, now)) return 'Today'
   if (sameDay(d, kemarin)) return 'Kemarin'
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 /**
@@ -177,7 +177,7 @@ export function NotificationBell() {
       >
         <div className="flex shrink-0 items-center justify-between border-b border-neutral-100 px-4 py-2.5 dark:border-white/10">
           <span className="text-sm font-bold text-ink dark:text-white">Pemberitahuan</span>
-          <span className="text-[11px] text-neutral-400">
+          <span className="text-[11px] text-neutral-500">
             {memuat ? 'memuat…' : `${items.length} item`}
           </span>
         </div>
@@ -185,23 +185,23 @@ export function NotificationBell() {
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {gagal ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-neutral-500">Tidak bisa memuat pemberitahuan.</p>
-              <p className="mt-1 text-[11px] text-neutral-400">Periksa sambungan internet Anda.</p>
+              <p className="text-sm text-neutral-500">Could not load notifications.</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Check your internet connection.</p>
               <button onClick={load} className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
                 Coba lagi
               </button>
             </div>
           ) : items.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-sm text-neutral-500">Belum ada pemberitahuan.</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-neutral-400">
+              <p className="text-sm text-neutral-500">No notifications yet.</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                 Pengingat obat, jadwal konsultasi, dan pembaruan akun akan muncul di sini.
               </p>
             </div>
           ) : (
             grup.map((g) => (
               <div key={g.hari}>
-                <div className="sticky top-0 z-10 bg-neutral-50/95 px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400 backdrop-blur dark:bg-neutral-900/95">
+                <div className="sticky top-0 z-10 bg-neutral-50/95 px-4 py-1 text-[10px] font-bold uppercase tracking-wide text-neutral-500 backdrop-blur dark:bg-neutral-900/95">
                   {g.hari}
                 </div>
                 {g.list.map((n) => {
@@ -220,21 +220,21 @@ export function NotificationBell() {
                             {!n.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />}
                             <span className="block text-sm font-bold leading-snug text-ink dark:text-white">{n.title}</span>
                           </span>
-                          <span className={`mt-0.5 block text-[12px] leading-snug text-neutral-500 dark:text-neutral-400 ${buka ? '' : 'line-clamp-2'}`}>
+                          <span className={`mt-0.5 block text-[12px] leading-snug text-neutral-500 dark:text-neutral-500 ${buka ? '' : 'line-clamp-2'}`}>
                             {n.body}
                           </span>
-                          <span className="mt-1 flex items-center gap-2 text-[10px] text-neutral-400">
+                          <span className="mt-1 flex items-center gap-2 text-[10px] text-neutral-500">
                             <span>{kat.label}</span>
                             <span>·</span>
                             <span>{timeAgo(n.at)}</span>
                           </span>
                         </span>
-                        <span className="mt-1 shrink-0 text-[10px] text-neutral-400">{buka ? '▲' : '▼'}</span>
+                        <span className="mt-1 shrink-0 text-[10px] text-neutral-500">{buka ? '▲' : '▼'}</span>
                       </button>
 
                       {buka && (
                         <div className="px-4 pb-3 pl-11">
-                          <p className="text-[11px] text-neutral-400">{fullTime(n.at)}</p>
+                          <p className="text-[11px] text-neutral-500">{fullTime(n.at)}</p>
                           {n.url ? (
                             <button
                               onClick={() => bukaTautan(n)}
@@ -243,7 +243,7 @@ export function NotificationBell() {
                               Buka halamannya →
                             </button>
                           ) : (
-                            <p className="mt-1.5 text-[11px] text-neutral-400">
+                            <p className="mt-1.5 text-[11px] text-neutral-500">
                               Pemberitahuan ini tidak menautkan ke halaman mana pun.
                             </p>
                           )}

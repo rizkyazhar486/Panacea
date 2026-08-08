@@ -46,7 +46,7 @@ function dayName(offset: number): string {
   return new Date(Date.now() + offset * DAY_MS).toLocaleDateString('en-US', { weekday: 'long' })
 }
 function fmtFee(rp: number): string {
-  return rp === 0 ? 'Free' : 'Rp' + rp.toLocaleString('id-ID')
+  return rp === 0 ? 'Free' : 'Rp' + rp.toLocaleString('en-GB')
 }
 function icsStamp(d: Date): string {
   return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
@@ -197,29 +197,29 @@ export function ClubHub() {
           </Card>
 
           {myMeetsByDay.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">
+            <Card className="!p-5 text-center text-sm text-neutral-500">
               Nothing on your schedule yet — head to the Meets tab and join one.
             </Card>
           )}
 
           {myMeetsByDay.map((g) => (
             <Card key={g.day} className="!p-4">
-              <div className="border-b border-dashed border-neutral-200 pb-2 text-base font-black text-ink dark:border-white/10 dark:text-white">{dayName(g.day)}</div>
+              <div className="border-b border-dashed border-neutral-200 pb-2 text-base font-black text-ink dark:border-white/10 dark:text-ink">{dayName(g.day)}</div>
               <div className="mt-2 space-y-3">
                 {g.meets.map((m) => {
                   const r = rsvpOf(m)
                   return (
                     <button key={m.id} onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
                       <div className="w-14 shrink-0 text-center">
-                        <div className="text-lg font-black leading-tight text-neutral-400">{m.time}</div>
+                        <div className="text-lg font-black leading-tight text-neutral-500">{m.time}</div>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-[15px] font-black text-ink dark:text-white">{m.title}</div>
+                        <div className="truncate text-[15px] font-black text-ink dark:text-ink">{m.title}</div>
                         <div className="text-[12px] text-neutral-500">{m.club}</div>
                         <span className={`mt-1 inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${r === 'joined' ? 'border-brand text-brand-dark' : 'border-amber-400 text-amber-600 dark:text-amber-300'}`}>
                           {r === 'joined' ? 'Joining' : 'Maybe'}
                         </span>
-                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-400"><IconMapPin size={12} />{m.venue}</div>
+                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-500"><IconMapPin size={12} />{m.venue}</div>
                       </div>
                       {capBadge(m)}
                     </button>
@@ -263,10 +263,10 @@ export function ClubHub() {
             </button>
           </div>
 
-          {loadingMeets && <Card className="!p-5 text-center text-sm text-neutral-400">Loading meets…</Card>}
+          {loadingMeets && <Card className="!p-5 text-center text-sm text-neutral-500">Loading meets…</Card>}
 
           {!loadingMeets && meetsToday.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
+            <Card className="!p-5 text-center text-sm text-neutral-500">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
           )}
 
           {meetView === 'map' && meetsToday.length > 0 && (() => {
@@ -277,7 +277,7 @@ export function ClubHub() {
             return (
               <Card className="!p-2">
                 {mappable.length > 0 ? (
-                  <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-400">Loading map…</div>}>
+                  <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-500">Loading map…</div>}>
                     <MeetMap
                       pins={mappable.map((m) => ({
                         id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
@@ -287,9 +287,9 @@ export function ClubHub() {
                     />
                   </Suspense>
                 ) : (
-                  <div className="flex h-[200px] items-center justify-center px-4 text-center text-sm text-neutral-400">None of today's meets have a mappable location yet — check the list view instead.</div>
+                  <div className="flex h-[200px] items-center justify-center px-4 text-center text-sm text-neutral-500">None of today's meets have a mappable location yet — check the list view instead.</div>
                 )}
-                <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">
+                <p className="px-2 py-1.5 text-center text-[11px] text-neutral-500">
                   Pin number = people actually joined · red = full · tap a pin for details
                   {mappable.length < meetsToday.length ? ` · ${meetsToday.length - mappable.length} meet(s) not shown (no location match)` : ''}
                 </p>
@@ -304,8 +304,8 @@ export function ClubHub() {
                 <button onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-xl">{m.emoji}</div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{m.club}</div>
-                    <div className="truncate text-[15px] font-black text-ink dark:text-white">{m.title}</div>
+                    <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{m.club}</div>
+                    <div className="truncate text-[15px] font-black text-ink dark:text-ink">{m.title}</div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
                       <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{m.tag}</span>
                       <span className="flex items-center gap-1"><IconMapPin size={12} />{m.venue}</span>
@@ -313,7 +313,7 @@ export function ClubHub() {
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="text-sm font-black text-ink dark:text-white">{m.time}</span>
+                    <span className="text-sm font-black text-ink dark:text-ink">{m.time}</span>
                     {capBadge(m)}
                     {r !== 'none' && (
                       <span className={`text-[11px] font-bold ${r === 'joined' ? 'text-brand-dark' : 'text-amber-600 dark:text-amber-300'}`}>{r === 'joined' ? '✓ Joining' : '? Maybe'}</span>
@@ -332,10 +332,10 @@ export function ClubHub() {
             ＋ Start a new club
           </button>
 
-          {loadingClubs && <Card className="!p-5 text-center text-sm text-neutral-400">Loading clubs…</Card>}
+          {loadingClubs && <Card className="!p-5 text-center text-sm text-neutral-500">Loading clubs…</Card>}
 
           {!loadingClubs && clubsFiltered.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">No clubs match "{query}" — start one instead.</Card>
+            <Card className="!p-5 text-center text-sm text-neutral-500">No clubs match "{query}" — start one instead.</Card>
           )}
 
           {clubsFiltered.map((c) => {
@@ -345,7 +345,7 @@ export function ClubHub() {
                 <div className="flex items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/10 text-2xl">{c.emoji}</div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-black text-ink dark:text-white">{c.name}</div>
+                    <div className="text-[15px] font-black text-ink dark:text-ink">{c.name}</div>
                     <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
                       <span className="flex items-center gap-1"><IconUsers size={12} />{c.members.length} member{c.members.length === 1 ? '' : 's'}</span>
                       <span className="flex items-center gap-1"><IconActivity size={12} />{c.level}</span>
@@ -382,7 +382,7 @@ export function ClubHub() {
                   <div className="text-[12px] font-bold text-brand-dark">
                     {start.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} @{m.time}
                   </div>
-                  <h2 className="mt-1 text-lg font-black uppercase leading-snug text-ink dark:text-white">{m.title}</h2>
+                  <h2 className="mt-1 text-lg font-black uppercase leading-snug text-ink dark:text-ink">{m.title}</h2>
                 </div>
                 <button onClick={() => setDetail(null)} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
               </div>
@@ -390,7 +390,7 @@ export function ClubHub() {
               <div className="mt-3 flex items-center gap-3 rounded-2xl bg-brand/10 p-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/20 text-xl">{m.emoji}</div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-black text-ink dark:text-white">{m.club}</div>
+                  <div className="text-sm font-black text-ink dark:text-ink">{m.club}</div>
                   <div className="text-[12px] text-neutral-500">Hosted by {m.hostName} · {m.tag}</div>
                 </div>
                 {capBadge(m)}
@@ -398,19 +398,19 @@ export function ClubHub() {
 
               <div className="mt-3 flex items-center gap-2">
                 {m.participants.slice(0, 4).map((pEmail) => (
-                  <span key={pEmail} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[12px] font-black text-white" title={pEmail}>{initials(pEmail)}</span>
+                  <span key={pEmail} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[12px] font-black text-ink" title={pEmail}>{initials(pEmail)}</span>
                 ))}
                 {count > 4 && (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-400 dark:border-white/20">+{count - 4}</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-500 dark:border-white/20">+{count - 4}</span>
                 )}
-                <span className="ml-1 text-[12px] text-neutral-400">{count} really going{m.maybes.length > 0 ? ` · ${m.maybes.length} maybe` : ''}</span>
+                <span className="ml-1 text-[12px] text-neutral-500">{count} really going{m.maybes.length > 0 ? ` · ${m.maybes.length} maybe` : ''}</span>
               </div>
 
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex items-start gap-3">
                   <span className="text-lg">🗓️</span>
                   <div>
-                    <div className="font-bold text-ink dark:text-white">{start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at {m.time}</div>
+                    <div className="font-bold text-ink dark:text-ink">{start.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at {m.time}</div>
                     <div className="text-[12px] text-neutral-500">{m.durH} hour(s)</div>
                     <button onClick={() => downloadIcs(m)} className="mt-0.5 text-[13px] font-bold text-brand-dark">Add to calendar</button>
                   </div>
@@ -418,14 +418,14 @@ export function ClubHub() {
                 <div className="flex items-start gap-3">
                   <span className="text-lg">📍</span>
                   <div>
-                    <div className="font-bold text-ink dark:text-white">{m.venue}</div>
+                    <div className="font-bold text-ink dark:text-ink">{m.venue}</div>
                     <div className="text-[12px] leading-relaxed text-neutral-500">{m.address}</div>
                     <a href={mapsUrl(m)} target="_blank" rel="noreferrer" className="mt-0.5 inline-block text-[13px] font-bold text-brand-dark">Show in maps</a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg">🏷️</span>
-                  <div className="font-bold text-ink dark:text-white">Per person · {fmtFee(m.feeRp)}</div>
+                  <div className="font-bold text-ink dark:text-ink">Per person · {fmtFee(m.feeRp)}</div>
                 </div>
                 {(m.emoji === '🏃' || m.emoji === '🩺') && (
                   <div className="flex items-center gap-3">
@@ -439,7 +439,7 @@ export function ClubHub() {
 
               {m.notes.length > 0 && (
                 <div className="mt-4 rounded-2xl bg-neutral-50 p-3 dark:bg-white/5">
-                  <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Notes</div>
+                  <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Notes</div>
                   <ul className="mt-1 list-inside list-disc space-y-0.5 text-[13px] text-neutral-600 dark:text-neutral-300">
                     {m.notes.map((n) => <li key={n}>{n}</li>)}
                   </ul>
@@ -458,7 +458,7 @@ export function ClubHub() {
                 <button
                   onClick={() => !full && setRsvp(m.id, r === 'joined' ? 'none' : 'joined')}
                   disabled={full}
-                  className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition ${r === 'joined' ? 'bg-brand/10 text-brand-dark' : full ? 'cursor-not-allowed bg-neutral-100 text-neutral-400 dark:bg-white/5' : 'bg-brand text-white'}`}
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition ${r === 'joined' ? 'bg-brand/10 text-brand-dark' : full ? 'cursor-not-allowed bg-neutral-100 text-neutral-500 dark:bg-white/5' : 'bg-brand text-white'}`}
                 >
                   {r === 'joined' ? '✓ Joining — tap to leave' : full ? 'Full' : 'Join meet'}
                 </button>
@@ -481,7 +481,7 @@ export function ClubHub() {
       {showHost && <HostMeetSheet email={email} initialDay={day} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
       {showNewClub && <NewClubSheet onClose={() => setShowNewClub(false)} onCreated={() => { setShowNewClub(false); refreshClubs() }} />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Clubs and meets are real and shared with every Panaceamed user — anyone can start a club or
         host a meet, and every "members" or "joined" count is the actual number of accounts that
         joined, never a preset number. Group exercise adherence evidence: social support is a
@@ -529,7 +529,7 @@ function HostMeetSheet({ email, initialDay, onClose, onCreated }: { email: strin
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Host a meet" onClick={onClose}>
       <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 dark:bg-neutral-900 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-black text-ink dark:text-white">Host a real meet</h2>
+          <h2 className="text-lg font-black text-ink dark:text-ink">Host a real meet</h2>
           <button onClick={onClose} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
         </div>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
@@ -600,7 +600,7 @@ function NewClubSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Start a club" onClick={onClose}>
       <div className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 dark:bg-neutral-900 sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-black text-ink dark:text-white">Start a real club</h2>
+          <h2 className="text-lg font-black text-ink dark:text-ink">Start a real club</h2>
           <button onClick={onClose} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
         </div>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">

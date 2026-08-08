@@ -78,7 +78,7 @@ function CortisolAwakening() {
       <svg viewBox="0 0 300 100" className="mt-3 w-full">
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.min * 2.4},${100 - p.level}`).join(' ')} />
       </svg>
-      <p className="mt-2 text-center text-[11px] text-neutral-400">Illustrative shape from {wakeTime} · 0-120 min after waking</p>
+      <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative shape from {wakeTime} · 0-120 min after waking</p>
       <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
         A stylized visualization of the well-documented cortisol awakening response pattern (a natural
         rise peaking ~30-45 min after waking) — not your measured cortisol, which requires a saliva or
@@ -211,7 +211,7 @@ function HealthspanDividend() {
       <svg viewBox="0 0 300 100" className="mt-3 w-full">
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.year * 9.6},${100 - (p.value / maxVal) * 90}`).join(' ')} />
       </svg>
-      <p className="mt-2 text-[11px] text-neutral-400">Compounding effect over a 30-year horizon</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Compounding effect over a 30-year horizon</p>
     </Card>
   )
 }
@@ -249,7 +249,7 @@ export function PredictiveModelsToolkit() {
       {tab === 'glycemic' && <GlycemicOptimizer />}
       {tab === 'healthspan' && <HealthspanDividend />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Illustrative educational models based on published research patterns — not personalized
         measurements, lab results, or medical advice.
       </div>

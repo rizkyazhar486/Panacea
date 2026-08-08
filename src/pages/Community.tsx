@@ -13,7 +13,7 @@ export function Community() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🫂</span>
         <div>
           <h1 className="text-lg font-black text-ink">Community</h1>
-          <p className="text-xs text-neutral-400">Supporting each other for a healthier life</p>
+          <p className="text-xs text-neutral-500">Supporting each other for a healthier life</p>
         </div>
       </div>
       <div className="mb-4">

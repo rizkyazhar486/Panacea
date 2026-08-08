@@ -120,7 +120,7 @@ export function ClinicalEvidence() {
           ) : (
             <Badge tone="neutral">{EVIDENCE_PRICE_PNC} PNC (≈ Rp150,000) per question</Badge>
           )}
-          <span className="text-neutral-400">Balance: {wallet.balance.toLocaleString()} PNC</span>
+          <span className="text-neutral-500">Balance: {wallet.balance.toLocaleString()} PNC</span>
         </div>
 
         {topupNeeded && (
@@ -156,7 +156,7 @@ export function ClinicalEvidence() {
           <Button onClick={() => ask()} disabled={loading || !q.trim()}>
             {loading ? 'Searching evidence…' : gate.needsPayment ? `🔎 Ask (${EVIDENCE_PRICE_PNC} PNC)` : '🔎 Ask'}
           </Button>
-          <span className="text-[11px] text-neutral-400">⌘/Ctrl + Enter</span>
+          <span className="text-[11px] text-neutral-500">⌘/Ctrl + Enter</span>
         </div>
         {err && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>}
       </Card>
@@ -164,7 +164,7 @@ export function ClinicalEvidence() {
       {/* Example questions */}
       {!answer && !loading && (
         <Card className="!p-5">
-          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Try an example</div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Try an example</div>
           <div className="mt-2 flex flex-col gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex} onClick={() => ask(ex)} className="rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-left text-sm text-neutral-600 transition hover:border-brand hover:text-brand-dark dark:border-white/10 dark:bg-white/5 dark:text-neutral-300">
@@ -178,7 +178,7 @@ export function ClinicalEvidence() {
       {loading && (
         <Card className="!p-8 text-center">
           <span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-          <p className="mt-3 text-sm text-neutral-400">Synthesizing evidence and grading certainty…</p>
+          <p className="mt-3 text-sm text-neutral-500">Synthesizing evidence and grading certainty…</p>
         </Card>
       )}
 
@@ -190,10 +190,10 @@ export function ClinicalEvidence() {
               <Badge tone={STRENGTH_META[answer.strength].tone}>{STRENGTH_META[answer.strength].label}</Badge>
               <Badge tone={CERTAINTY_META[answer.overallCertainty].tone}>{CERTAINTY_META[answer.overallCertainty].label}</Badge>
             </div>
-            <h2 className="mt-3 text-lg font-black text-ink dark:text-white">Bottom line</h2>
+            <h2 className="mt-3 text-lg font-black text-ink dark:text-ink">Bottom line</h2>
             <p className="mt-1 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">{answer.bottomLine}</p>
             <div className="mt-3">
-              <div className="mb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-neutral-400">
+              <div className="mb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-neutral-500">
                 <span>Overall certainty of evidence</span><span>{CERTAINTY_META[answer.overallCertainty].label}</span>
               </div>
               <CertaintyBar c={answer.overallCertainty} />
@@ -207,7 +207,7 @@ export function ClinicalEvidence() {
                 {answer.keyPoints.map((p, i) => (
                   <div key={i} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                     <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm font-bold text-ink dark:text-white">{p.claim}</span>
+                      <span className="text-sm font-bold text-ink dark:text-ink">{p.claim}</span>
                       <Badge tone={CERTAINTY_META[p.certainty].tone}>{CERTAINTY_META[p.certainty].label}</Badge>
                     </div>
                     <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{p.detail}</p>
@@ -252,14 +252,14 @@ export function ClinicalEvidence() {
         <Card className="!p-5">
           <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Live from PubMed (NCBI) for this question — real, currently-indexed papers" />
           {articlesLoading && articles.length === 0 ? (
-            <p className="mt-3 text-sm text-neutral-400">Fetching articles from PubMed…</p>
+            <p className="mt-3 text-sm text-neutral-500">Fetching articles from PubMed…</p>
           ) : (
             <div className="mt-3 space-y-2">
               {articles.map((a) => (
                 <a key={a.pmid} href={a.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-neutral-200 bg-white p-3 transition hover:border-brand dark:border-white/10 dark:bg-white/5">
-                  <div className="text-sm font-bold leading-snug text-ink dark:text-white">{a.title}</div>
-                  <div className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">{a.authors}</div>
-                  <div className="mt-0.5 text-[11px] text-neutral-400">{[a.journal, a.year].filter(Boolean).join(' · ')} · PMID {a.pmid}</div>
+                  <div className="text-sm font-bold leading-snug text-ink dark:text-ink">{a.title}</div>
+                  <div className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-500">{a.authors}</div>
+                  <div className="mt-0.5 text-[11px] text-neutral-500">{[a.journal, a.year].filter(Boolean).join(' · ')} · PMID {a.pmid}</div>
                 </a>
               ))}
             </div>
@@ -275,8 +275,8 @@ export function ClinicalEvidence() {
             {links.map((l) => (
               <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-3 py-2.5 transition hover:border-brand dark:border-white/10 dark:bg-white/5">
                 <span>
-                  <span className="block text-sm font-bold text-ink dark:text-white">{l.label}</span>
-                  <span className="block text-[11px] text-neutral-400">{l.note}</span>
+                  <span className="block text-sm font-bold text-ink dark:text-ink">{l.label}</span>
+                  <span className="block text-[11px] text-neutral-500">{l.note}</span>
                 </span>
                 <span className="text-brand-dark">↗</span>
               </a>
@@ -286,7 +286,7 @@ export function ClinicalEvidence() {
       )}
 
       {answer && (
-        <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+        <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
           {answer.disclaimer}
         </div>
       )}

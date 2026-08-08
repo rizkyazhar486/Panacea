@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useJam } from '../lib/useJam'
 import { Card } from './ui'
 import { Portal } from './Portal'
 import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
@@ -8,7 +9,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
-import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, type Target } from '../lib/analisisPro'
+import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariHistoryLatihan, type Target } from '../lib/analisisPro'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kartu pilihan pengguna di Beranda.
@@ -33,6 +34,8 @@ export function WidgetBeranda() {
   }, [])
 
   const workouts = useMemo(() => getWorkouts(), [vitals])
+  // Kelelahan meluruh terhadap jam berjalan; tanpa ini kartu beranda membeku.
+  const sekarang = useJam()
   const konteks = useMemo(() => {
     const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
     return {
@@ -59,7 +62,7 @@ export function WidgetBeranda() {
     const k = kemajuanTarget(workouts, target)
     kartu.push(
       <Card key="target">
-        <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Target latihan</div>
+        <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Training target</div>
         <div className="mt-1 flex items-baseline justify-between">
           <span className="text-lg font-black text-white">
             {k.tercapai} <span className="text-[12px] font-bold text-slate-400">/ {k.sasaran} {k.satuan}</span>
@@ -74,18 +77,18 @@ export function WidgetBeranda() {
   }
 
   if (punya('kebugaran') && workouts.length > 0) {
-    const ff = kebugaranKesegaran(workouts, konteks, 90)
+    const ff = kebugaranKesegaran(workouts, konteks, 90, sekarang)
     const kini = ff.length ? ff[ff.length - 1] : null
     if (kini) {
-      const b = bacaKesegaran(kini.kesegaran)
+      const b = bacaKesegaran(kini.kesegaran, hariHistoryLatihan(workouts, sekarang))
       kartu.push(
         <Card key="kebugaran">
-          <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Kebugaran & kesegaran</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Fitness & freshness</div>
           <div className="mt-1 flex items-center justify-between gap-3">
             <div className="flex gap-4">
-              <Mini label="Bugar" nilai={Math.round(kini.kebugaran)} warna="#60a5fa" />
-              <Mini label="Lelah" nilai={Math.round(kini.kelelahan)} warna="#f87171" />
-              <Mini label="Segar" nilai={Math.round(kini.kesegaran)} warna={b.warna} />
+              <Mini label="Fit" nilai={Math.round(kini.kebugaran)} warna="#60a5fa" />
+              <Mini label="Tired" nilai={Math.round(kini.kelelahan)} warna="#f87171" />
+              <Mini label="Fresh" nilai={Math.round(kini.kesegaran)} warna={b.warna} />
             </div>
             <span className="shrink-0 text-[11px] font-bold" style={{ color: b.warna }}>{b.judul}</span>
           </div>
@@ -148,7 +151,7 @@ export function WidgetBeranda() {
       {/* Lewat Portal, dan bukan sekadar z-index tinggi: kartu ini dirender di
           dalam feed, yang berada dalam konteks penumpukan tersendiri, sehingga
           z-50 di sini tetap kalah oleh bilah navigasi bawah dan tombol
-          "Selesai" menjadi tidak bisa diketuk di layar ponsel. */}
+          "Done" menjadi tidak bisa diketuk di layar ponsel. */}
       {buka && (
         <Portal>
         <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4"
@@ -192,7 +195,7 @@ export function WidgetBeranda() {
               <button onClick={() => { simpanWidget(widgetBawaan()); setAktif(widgetBawaan()) }}
                 className="flex-1 rounded-xl bg-white/10 py-2.5 text-[12px] font-bold text-white">Bawaan</button>
               <button onClick={() => setBuka(false)}
-                className="flex-1 rounded-xl bg-brand py-2.5 text-[12px] font-bold text-white">Selesai</button>
+                className="flex-1 rounded-xl bg-brand py-2.5 text-[12px] font-bold text-white">Done</button>
             </div>
           </div>
         </div>

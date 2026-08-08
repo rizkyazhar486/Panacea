@@ -54,14 +54,14 @@ export function DataLab() {
         </button>
         <input ref={fileRef} type="file" accept=".csv,text/csv,text/plain" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
         {err && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>}
-        <p className="mt-3 text-[11px] text-neutral-400">Recognized automatically: glucose, heart rate, HRV, steps, sleep, SpO₂, weight, systolic/diastolic BP. Other numeric columns get a basic summary.</p>
+        <p className="mt-3 text-[11px] text-neutral-500">Recognized automatically: glucose, heart rate, HRV, steps, sleep, SpO₂, weight, systolic/diastolic BP. Other numeric columns get a basic summary.</p>
       </Card>
 
       {result && (
         <>
           <Card className="!p-5">
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Summary</div>
-            <p className="mt-1 text-sm font-semibold text-ink dark:text-white">{result.headline}</p>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Summary</div>
+            <p className="mt-1 text-sm font-semibold text-ink dark:text-ink">{result.headline}</p>
           </Card>
 
           {result.columns.map((c) => (
@@ -69,10 +69,10 @@ export function DataLab() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-black text-ink dark:text-white">{c.label}</h3>
-                    {c.unit && <span className="text-xs text-neutral-400">{c.unit}</span>}
+                    <h3 className="text-base font-black text-ink dark:text-ink">{c.label}</h3>
+                    {c.unit && <span className="text-xs text-neutral-500">{c.unit}</span>}
                   </div>
-                  {c.metric === 'generic' && <div className="text-[11px] text-neutral-400">Column: {c.key}</div>}
+                  {c.metric === 'generic' && <div className="text-[11px] text-neutral-500">Column: {c.key}</div>}
                 </div>
                 <Badge tone={TONE_META[c.tone].badge}>{TONE_META[c.tone].label}</Badge>
               </div>
@@ -87,12 +87,12 @@ export function DataLab() {
 
               {/* conclusions */}
               <div className="mt-3 rounded-xl p-3" style={{ background: TONE_META[c.tone].color + '14' }}>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">What this means</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">What this means</div>
                 <ul className="mt-1 space-y-1">
                   {c.conclusions.map((t, i) => <li key={i} className="text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">• {t}</li>)}
                 </ul>
               </div>
-              <div className="mt-1.5 text-[10px] text-neutral-400">n = {c.n.toLocaleString()} readings</div>
+              <div className="mt-1.5 text-[10px] text-neutral-500">n = {c.n.toLocaleString()} readings</div>
             </Card>
           ))}
         </>
@@ -111,7 +111,7 @@ export function DataLab() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational data processing — conclusions use standard thresholds (e.g. CGM time-in-range 70–180, adult sleep 7–9h) and are not a diagnosis. Your file is parsed entirely in the browser and never uploaded. Review anything concerning with a clinician.
       </div>
     </div>
@@ -122,7 +122,7 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-xl bg-neutral-50 p-2 dark:bg-white/5">
       <div className="text-sm font-black" style={color ? { color } : undefined}>{value}</div>
-      <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
     </div>
   )
 }

@@ -81,7 +81,7 @@ export function MyMaterials() {
         />
         <div className="space-y-3">
           {mine.length === 0 && (
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-neutral-500">
               No materials yet. Upload your notes/materials from the Marketplace page.
             </p>
           )}
@@ -92,7 +92,7 @@ export function MyMaterials() {
                   <div className="mb-1 flex items-center gap-2">
                     <Badge tone="neutral">{CAT_LABELS[m.category] ?? m.category}</Badge>
                     <Badge tone="brand">{m.exam}</Badge>
-                    <span className="text-xs text-neutral-400">{m.fileType}</span>
+                    <span className="text-xs text-neutral-500">{m.fileType}</span>
                   </div>
                   <h4 className="font-bold">{m.title}</h4>
                   <p className="text-xs text-neutral-500">{m.specialty}</p>
@@ -136,9 +136,9 @@ export function MyMaterials() {
 function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
   return (
     <div className={`rounded-xl p-3 ${accent ? 'bg-brand-50' : 'bg-neutral-50'}`}>
-      <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">{label}</div>
       <div className={`text-2xl font-extrabold ${accent ? 'text-brand-dark' : ''}`}>{value}</div>
-      {sub && <div className="text-[10px] text-neutral-400">{sub}</div>}
+      {sub && <div className="text-[10px] text-neutral-500">{sub}</div>}
     </div>
   )
 }
@@ -147,12 +147,12 @@ function Step({ ok, label, sub, icon }: { ok: boolean; label: string; sub?: stri
   return (
     <div className="flex flex-col items-center text-center">
       <span
-        className={`grid h-7 w-7 place-items-center rounded-full ${ok ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-400'}`}
+        className={`grid h-7 w-7 place-items-center rounded-full ${ok ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-500'}`}
       >
         {icon === 'ai' ? <IconSparkle size={13} /> : icon === 'verify' ? <IconShield size={13} /> : '✓'}
       </span>
-      <span className={`mt-0.5 ${ok ? 'font-semibold text-neutral-700' : 'text-neutral-400'}`}>{label}</span>
-      {sub && <span className="text-[9px] text-neutral-400">{sub}</span>}
+      <span className={`mt-0.5 ${ok ? 'font-semibold text-neutral-700' : 'text-neutral-500'}`}>{label}</span>
+      {sub && <span className="text-[9px] text-neutral-500">{sub}</span>}
     </div>
   )
 }

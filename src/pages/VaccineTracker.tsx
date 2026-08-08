@@ -94,7 +94,7 @@ export function VaccineTracker() {
 
       {(overdue.length > 0 || dueSoon.length > 0) && (
         <Card className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Reminders</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Reminders</div>
           <div className="mt-2 space-y-1.5">
             {overdue.map((r) => (
               <div key={r.v.id} className="flex items-center justify-between rounded-xl bg-red-50 px-3 py-2 text-[13px] dark:bg-red-500/10">
@@ -116,7 +116,7 @@ export function VaccineTracker() {
         <Card key={v.id} className="!p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[15px] font-black text-ink dark:text-white">{v.name}</div>
+              <div className="text-[15px] font-black text-ink dark:text-ink">{v.name}</div>
               <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">{v.note}</p>
             </div>
             {v.everyYears && <Badge tone="brand">Every {v.everyYears}y</Badge>}
@@ -135,7 +135,7 @@ export function VaccineTracker() {
         </Card>
       ))}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Based on typical WHO/CDC adult immunization interval guidance — actual recommendations vary by
         country, age, prior doses, and health conditions. This is a personal reminder tool, not medical
         advice; confirm your schedule with a clinician or your local immunization program.

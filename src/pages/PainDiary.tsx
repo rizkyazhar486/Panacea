@@ -34,7 +34,7 @@ export function PainDiary() {
       <Card className="!p-5">
         <Field label={`Severity right now: ${level}/10`}>
           <input className="mt-2 w-full accent-brand" type="range" min={0} max={10} step={1} value={level} onChange={(e) => setLevel(Number(e.target.value))} />
-          <div className="mt-1 flex justify-between text-[11px] text-neutral-400"><span>0 · None</span><span>5 · Moderate</span><span>10 · Worst possible</span></div>
+          <div className="mt-1 flex justify-between text-[11px] text-neutral-500"><span>0 · None</span><span>5 · Moderate</span><span>10 · Worst possible</span></div>
         </Field>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="Location (optional)">
@@ -58,7 +58,7 @@ export function PainDiary() {
         detail={detail}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A self-reported severity trend, not a diagnosis. Bring this history to your next visit —
         clinicians often ask exactly these questions (when, where, how severe, what helps).
       </div>

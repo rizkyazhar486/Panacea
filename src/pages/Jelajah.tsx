@@ -63,7 +63,7 @@ export function Jelajah() {
 
       {!tag && !orang && (
         <Card>
-          <p className="text-[13px] leading-relaxed text-slate-300">
+          <p className="text-[13px] leading-relaxed text-neutral-600">
             Halaman ini menampilkan hasil pencarian orang dan tagar. Ketuk tombol pencarian di
             bilah atas, lalu pilih salah satu hasilnya.
           </p>
@@ -71,16 +71,16 @@ export function Jelajah() {
       )}
 
       {posts === null && (
-        <Card><p className="text-[13px] text-slate-400">Memuat…</p></Card>
+        <Card><p className="text-[13px] text-neutral-500">Loading…</p></Card>
       )}
 
       {galat && (
-        <Card><p className="text-[13px] text-slate-400">Gagal memuat kiriman. Coba lagi nanti.</p></Card>
+        <Card><p className="text-[13px] text-neutral-500">Gagal memuat kiriman. Coba lagi nanti.</p></Card>
       )}
 
       {posts !== null && (tag || orang) && hasil.length === 0 && !galat && (
         <Card>
-          <p className="text-[13px] leading-relaxed text-slate-300">
+          <p className="text-[13px] leading-relaxed text-neutral-600">
             Belum ada kiriman {tag ? <>dengan tagar <b>#{tag}</b></> : <>dari <b>{orang}</b></>}.
           </p>
           <Link to="/community" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
@@ -92,11 +92,11 @@ export function Jelajah() {
       {hasil.map((p) => (
         <Card key={p.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <div className="text-[13px] font-black text-white">{p.authorName ?? 'Tanpa nama'}</div>
+            <div className="text-[13px] font-black text-ink">{p.authorName ?? 'Tanpa nama'}</div>
             {p.at && <div className="text-[10px] text-slate-500">{p.at.slice(0, 10)}</div>}
           </div>
           {p.activity && <div className="mt-0.5 text-[11px] font-bold text-brand">{p.activity}</div>}
-          {p.caption && <p className="mt-1 text-[13px] leading-relaxed text-slate-200">{p.caption}</p>}
+          {p.caption && <p className="mt-1 text-[13px] leading-relaxed text-ink">{p.caption}</p>}
           {p.imageUrl && (
             <img src={p.imageUrl} alt="" loading="lazy" className="mt-2 w-full rounded-xl object-cover" />
           )}

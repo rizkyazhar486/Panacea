@@ -40,7 +40,7 @@ function MtorSeesaw() {
         <text x="40" y="80" textAnchor="middle" fontSize="11" fill="#00BF63" fontWeight="bold">mTOR</text>
         <text x="260" y="80" textAnchor="middle" fontSize="11" fill="#0B7A4B" fontWeight="bold">AMPK</text>
       </svg>
-      <p className="mt-3 text-[12px] text-neutral-400">Illustrative balance, not a measurement of your actual mTOR/AMPK activity.</p>
+      <p className="mt-3 text-[12px] text-neutral-500">Illustrative balance, not a measurement of your actual mTOR/AMPK activity.</p>
     </Card>
   )
 }
@@ -70,7 +70,7 @@ function CircadianOscillator() {
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.h * 12},${100 - p.per}`).join(' ')} />
         <line x1="0" y1="50" x2="300" y2="50" stroke="#e5e5e5" strokeWidth="1" strokeDasharray="4" />
       </svg>
-      <p className="mt-2 text-center text-[11px] text-neutral-400">Illustrative clock-gene oscillation over 24h — earlier, consistent light and an earlier last meal are associated with tighter circadian alignment in sleep research.</p>
+      <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative clock-gene oscillation over 24h — earlier, consistent light and an earlier last meal are associated with tighter circadian alignment in sleep research.</p>
     </Card>
   )
 }
@@ -108,7 +108,7 @@ function TelomereAttrition() {
         <rect x="20" y="20" width={Math.max(4, (pct / 100) * 160)} height="20" rx="10" fill="#00BF63" />
       </svg>
       <p className="mt-2 text-[12px] text-neutral-500">Illustrative telomere length: <b>{Math.round(pct)}%</b> of reference baseline</p>
-      <p className="mt-2 text-[11px] text-neutral-400">A stylized model from published average attrition rates — not a measurement of your actual telomere length, which requires a specialized lab (qPCR or flow-FISH) test.</p>
+      <p className="mt-2 text-[11px] text-neutral-500">A stylized model from published average attrition rates — not a measurement of your actual telomere length, which requires a specialized lab (qPCR or flow-FISH) test.</p>
     </Card>
   )
 }
@@ -140,7 +140,7 @@ export function BioSimulators() {
       {tab === 'circadian' && <CircadianOscillator />}
       {tab === 'telomere' && <TelomereAttrition />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational illustrations only — not lab measurements, medical advice, or a personalized
         biological model of your body.
       </div>

@@ -53,7 +53,7 @@ export function RansonCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">At admission</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">At admission</div>
         <div className="mt-3 space-y-2">
           {ADMISSION.map((c) => (
             <label key={c.key} className="flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
@@ -65,7 +65,7 @@ export function RansonCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">At 48 hours</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">At 48 hours</div>
         <div className="mt-3 space-y-2">
           {H48.map((c) => (
             <label key={c.key} className="flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
@@ -77,16 +77,16 @@ export function RansonCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 11</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">A score ≥3 has historically been used as a threshold suggesting severe pancreatitis and possible ICU-level monitoring.</p>
+        <p className="mt-2 text-[12px] text-neutral-500">A score ≥3 has historically been used as a threshold suggesting severe pancreatitis and possible ICU-level monitoring.</p>
         <CopyNote text={`Ranson ${score}/11 — ${result.label} [Ranson 1974]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Ranson, J.H.C., et al. (1974). Prognostic signs and the role of operative management in acute
         pancreatitis. <i>Surg Gynecol Obstet</i>, 139, 69-81. Largely superseded in modern practice by
         BISAP and APACHE II for early severity assessment — decision-support estimate only.

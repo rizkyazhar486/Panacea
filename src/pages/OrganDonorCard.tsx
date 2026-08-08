@@ -64,7 +64,7 @@ export function OrganDonorCard() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your intention</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your intention</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {([['yes', 'Yes, I want to donate'], ['no', 'No, I don\'t want to donate'], ['undecided', 'Still deciding']] as [Pledge['intend'], string][]).map(([v, label]) => (
             <button key={v} onClick={() => { setIntend(v); save({ intend: v }) }} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${intend === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{label}</button>
@@ -73,7 +73,7 @@ export function OrganDonorCard() {
 
         {intend === 'yes' && (
           <>
-            <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-400">What you're comfortable donating (optional detail)</div>
+            <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">What you're comfortable donating (optional detail)</div>
             <div className="mt-2 flex flex-wrap gap-2">
               {ORGANS.map((o) => (
                 <button key={o} onClick={() => toggleOrgan(o)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${organs.includes(o) ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{o}</button>
@@ -97,7 +97,7 @@ export function OrganDonorCard() {
       {intend !== 'undecided' && (
         <Card className="!p-0 overflow-hidden">
           <div
-            className={intend === 'yes' ? 'p-5 text-white' : 'p-5'}
+            className={intend === 'yes' ? 'p-5 text-ink' : 'p-5'}
             style={intend === 'yes' ? { background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' } : undefined}
           >
             <div className="text-xs font-black uppercase tracking-wide opacity-80">Organ Donor Card</div>
@@ -110,18 +110,18 @@ export function OrganDonorCard() {
       )}
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Common questions</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Common questions</div>
         <div className="mt-2 space-y-3">
           {FAQS.map((f) => (
             <div key={f.q}>
-              <div className="text-[13px] font-bold text-ink dark:text-white">{f.q}</div>
+              <div className="text-[13px] font-bold text-ink dark:text-ink">{f.q}</div>
               <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">{f.a}</p>
             </div>
           ))}
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         This is a personal, private record stored only on your device — it is not a legal donor
         registry and is not sent to any hospital or authority. Register through your country's
         official donor program for your decision to be legally recognized, and make sure your family

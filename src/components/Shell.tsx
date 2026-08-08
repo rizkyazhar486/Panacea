@@ -1,6 +1,9 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { PencarianGlobal } from './PencarianGlobal'
-import { useState, useEffect, type ReactNode } from 'react'
+import { useGestur } from '../lib/useGestur'
+import { pasangKilau } from '../lib/kilau'
+import { indukRute } from '../lib/alurHalaman'
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
   IconDashboard,
@@ -94,16 +97,16 @@ const nav: Nav[] = [
   // places at once.
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/keuangan', label: 'Keuangan', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/pasar', label: 'Data Pasar', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/makro-ekonomi', label: 'Macro Lab (Ekonomi)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/keuangan', label: 'Finance', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/pasar', label: 'Market Data', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
+  { to: '/makro-ekonomi', label: 'Macro Lab (Economics)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
-  { to: '/latihan', label: 'Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  { to: '/tubuh', label: 'Sinyal Tubuh', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/tubuh', label: 'Body Signals', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Longevity & aging — trimmed to the flagship entries; the rest (breathwork,
   // gratitude, sleep debt, thermal therapy, ikigai, life compass, resilience
   // stories, fasting, gene info, aesthetic) live in Wellness Hub, searchable.
@@ -160,9 +163,13 @@ const nav: Nav[] = [
   { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
   // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
-  { to: '/verifikasi-connect', label: 'Verifikasi Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
-  { to: '/tinjau-connect', label: 'Tinjauan Connect', icon: IconShield, roles: ['owner'], group: 'Manage' },
-  { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
+  { to: '/scripture', label: 'Scripture', icon: IconShield, roles: ALL, group: 'Account' },
+  { to: '/change', label: 'Change', icon: IconChartUp, roles: ALL, group: 'Account' },
+  { to: '/learn', label: 'Learn', icon: IconChartUp, roles: ALL, group: 'Account' },
+  { to: '/dek-connect', label: 'Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
+  { to: '/verifikasi-connect', label: 'Connect Verification', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
+  { to: '/tinjau-connect', label: 'Connect Review', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/atur-fitur', label: 'Manage Features', icon: IconSettings, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
   { to: '/settings', label: 'Settings', icon: IconSettings, roles: ALL, group: 'Account' },
   { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
 ]
@@ -224,7 +231,7 @@ function DrawerNav({ items }: { items: Nav[] }) {
             <button
               onClick={() => setOpen((o) => ({ ...o, [g.name]: !o[g.name] }))}
               aria-expanded={!!open[g.name]}
-              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-wide text-neutral-400 hover:bg-neutral-50"
+              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-wide text-neutral-500 hover:bg-neutral-50"
             >
               {g.name}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
@@ -248,6 +255,52 @@ export function Shell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
 
+  // Kembali mengikuti ALUR HALAMAN, bukan sekadar satu langkah mundur di
+  // riwayat. Alasannya ada di lib/alurHalaman.ts: riwayat sering tidak seperti
+  // yang dibayangkan — tautan yang dibuka langsung punya riwayat kosong,
+  // sehingga history.back() melempar pengguna keluar dari aplikasi.
+  const bisaKembali = loc.pathname !== '/'
+
+  // Halaman sebelumnya diingat karena menentukan CARA kembali, bukan tujuannya.
+  // Bila induk kebetulan sama dengan halaman sebelumnya, mundur di riwayat
+  // lebih baik daripada mendorong entri baru — mendorong entri membuat "lanjut"
+  // tidak pernah punya tujuan, karena riwayat ke depan selalu kosong.
+  const sebelumnya = useRef<string | null>(null)
+  useEffect(() => {
+    return () => { sebelumnya.current = loc.pathname }
+  }, [loc.pathname])
+
+  const kembali = useCallback(() => {
+    if (loc.pathname === '/') return
+    const induk = indukRute(loc.pathname)
+    if (induk && induk === sebelumnya.current) navigate(-1)
+    else if (induk) navigate(induk)
+    else if (window.history.length > 1) navigate(-1)
+    else navigate('/')
+  }, [loc.pathname, navigate])
+
+  // Maju: hanya berarti bila ada yang bisa dimajui. Tidak ada cara membaca
+  // panjang riwayat ke depan di peramban, jadi navigate(1) dipanggil apa adanya
+  // — bila tidak ada, peramban mengabaikannya dan tidak terjadi apa-apa.
+  const lanjut = useCallback(() => navigate(1), [navigate])
+
+  // Menyegarkan tanpa memuat ulang seluruh aplikasi: React dipaksa memasang
+  // ulang halaman lewat kunci, sehingga setiap useEffect pengambil data
+  // berjalan lagi. Memuat ulang peramban akan membuang seluruh bundel dan
+  // terasa jauh lebih lambat di ponsel.
+  const [nonceSegar, setNonceSegar] = useState(0)
+  const [sedangSegar, setSedangSegar] = useState(false)
+  const segarkan = useCallback(() => {
+    setSedangSegar(true)
+    setNonceSegar((n) => n + 1)
+    window.setTimeout(() => setSedangSegar(false), 600)
+  }, [])
+
+  const { tarikan, geser, menggeser } = useGestur({
+    onKembali: kembali, onLanjut: lanjut, onSegarkan: segarkan,
+    mati: cariBuka || menuOpen,
+  })
+
   // Ctrl/Cmd+K membuka pencarian — kebiasaan yang sudah dikenal luas, dan satu-
   // satunya cara membukanya tanpa memindahkan tangan dari papan ketik.
   useEffect(() => {
@@ -257,6 +310,9 @@ export function Shell({ children }: { children: ReactNode }) {
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [])
+
+  // Satu pendengar untuk seluruh halaman — lihat catatan di lib/kilau.ts.
+  useEffect(() => pasangKilau(), [])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
   const [navHidden, setNavHidden] = useState(false)
@@ -328,7 +384,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <LogoMark size={28} />
         <div className="leading-tight">
           <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-400">Longevity Medical-AI · Official Document</div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
       {/* Ambient animated backdrop — sits behind every page */}
@@ -346,12 +402,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 Panacea<span className="text-brand">med</span>
                 <span className="text-accent">.id</span>
               </div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
                 Longevity Medical-AI
               </div>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Hide menu" aria-label="Hide menu">
+          <button onClick={() => setSidebarOpen(false)} className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Hide menu" aria-label="Hide menu">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           </button>
         </div>
@@ -377,7 +433,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div key={g.name} className="mt-1">
                 <button
                   onClick={() => setClosedGroups((s) => ({ ...s, [g.name]: !s[g.name] }))}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-neutral-400 hover:text-neutral-600"
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-neutral-500 hover:text-neutral-600"
                 >
                   {g.name}
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${open ? '' : '-rotate-90'}`}><polyline points="6 9 12 15 18 9" /></svg>
@@ -416,7 +472,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-5">
+        <header className="kaca sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
             {/* Mobile: buka drawer */}
             <button
@@ -440,6 +496,20 @@ export function Shell({ children }: { children: ReactNode }) {
                 </svg>
               </button>
             )}
+            {/* Tombol kembali: gestur geser saja tidak cukup — ia tidak ada di
+                desktop, tidak terlihat, dan tidak bisa dijangkau papan ketik. */}
+            {bisaKembali && (
+              <button
+                onClick={kembali}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
+                aria-label="Go back"
+                title="Back"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            )}
             <h1 className="truncate text-base font-bold sm:text-lg">{title?.label ?? 'Panaceamed.id'}</h1>
           </div>
           {/* Pencarian: fitur sudah lewat 200, dan menu menuntut menebak grupnya
@@ -447,7 +517,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <button
             onClick={() => setCariBuka(true)}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
-            aria-label="Cari fitur, orang, atau tagar"
+            aria-label="Search features, people, or hashtags"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
@@ -568,11 +638,45 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="fade-edge-surface pointer-events-none absolute inset-y-0 right-0 w-8" />
         </div>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6">
+        {/* Umpan balik tarikan: tanpa ini gestur terasa seperti tidak terjadi
+            apa-apa sampai tiba-tiba halaman berkedip. */}
+        {(tarikan > 0 || sedangSegar) && (
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center" aria-hidden="true">
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full bg-white text-brand-dark shadow-lg"
+              style={{
+                opacity: sedangSegar ? 1 : Math.min(1, tarikan * 1.4),
+                // Ikut turun bersama tarikan, bukan diam di tempat: penanda yang
+                // tidak ikut bergerak terasa terlepas dari gerakan jari.
+                transform: `translate3d(0,${sedangSegar ? 44 : 8 + tarikan * 36}px,0) scale(${
+                  sedangSegar ? 1 : 0.7 + tarikan * 0.3}) rotate(${tarikan * 300}deg)`,
+                transition: sedangSegar
+                  ? 'transform 0.5s cubic-bezier(0.32,0.72,0,1), opacity 0.3s ease'
+                  : 'none',
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                strokeLinecap="round" className={sedangSegar ? 'animate-spin' : ''}>
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+              </svg>
+            </span>
+          </div>
+        )}
+
+        {/* Isi halaman mengikuti jari saat digeser, lalu memantul pulih. Kelas
+            transisi hanya dipasang SETELAH jari diangkat — bila dipasang selagi
+            menggeser, gerakannya tertinggal di belakang jari dan justru terasa
+            berat. */}
+        <main
+          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6 ${
+            menggeser ? 'geser-ikut' : 'geser-pulih'}`}
+          style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
+        >
           {onHome && <InstallBanner />}
           {onHome && homeServices.length > 0 && (
             <div className="mb-5 hidden lg:block">
-              <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
+              <div className="mb-2 flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wide text-neutral-500">
                 Your most-used services
               </div>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
@@ -591,7 +695,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           )}
-          <div key={loc.pathname} className="page-enter">
+          <div key={`${loc.pathname}:${nonceSegar}`} className="page-enter">
             {children}
           </div>
         </main>
@@ -607,10 +711,10 @@ export function Shell({ children }: { children: ReactNode }) {
                 <LogoMark size={34} />
                 <div className="leading-tight">
                   <div className="text-base font-extrabold tracking-tight">Panacea<span className="text-brand">med</span><span className="text-accent">.id</span></div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">{roleLabel[account.role]}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{roleLabel[account.role]}</div>
                 </div>
               </div>
-              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-400 hover:bg-neutral-100" aria-label="Close menu">×</button>
+              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-500 hover:bg-neutral-100" aria-label="Close menu">×</button>
             </div>
             <DrawerNav items={items} />
             <div className="border-t border-black/5 p-3">
@@ -637,7 +741,7 @@ export function Shell({ children }: { children: ReactNode }) {
           className={`fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden ${navHidden ? 'translate-y-[calc(100%+env(safe-area-inset-bottom)+16px)]' : 'translate-y-0'}`}
           aria-label="Main navigation"
         >
-          <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
+          <div className="kaca relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16">
             <div className="fade-edge-glass pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
               {[
@@ -645,7 +749,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 { to: '/community', label: 'Community', icon: IconUsers },
                 { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
                 { to: '/health-data', label: 'Health', icon: IconHeart },
-                { to: '/latihan', label: 'Latihan', icon: IconRun },
+                { to: '/latihan', label: 'Training', icon: IconRun },
                 { to: '/sports-scores', label: 'Scores', icon: IconFlame },
                 { to: '/profile', label: 'Profile', icon: IconUser },
               ].map((t) => (

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from 'react'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
+import { Ringkas, Poin } from '../components/Ringkas'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
@@ -779,7 +780,7 @@ function Empty({ e, t }: { e: string; t: string }) {
   return (
     <div className="rounded-xl border-2 border-dashed border-neutral-200 py-8 text-center">
       <span className="text-3xl">{e}</span>
-      <p className="mt-2 text-sm text-neutral-400">{t}</p>
+      <p className="mt-2 text-sm text-neutral-500">{t}</p>
     </div>
   )
 }
@@ -830,7 +831,7 @@ function Pillar({ label, v, hl }: { label: string; v: number; hl?: boolean }) {
   return (
     <div>
       <div className="mb-0.5 flex justify-between text-[11px] font-medium">
-        <span className={hl ? 'text-white font-bold' : 'text-white/70'}>{label}</span>
+        <span className={hl ? 'text-ink font-bold' : 'text-ink/70'}>{label}</span>
         <span className="font-bold">{v}</span>
       </div>
       <div className={'h-1.5 overflow-hidden rounded-full ' + (hl ? 'bg-white/30' : 'bg-white/20')}>
@@ -858,30 +859,30 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold" style={{ color: info.c }}><ANum v={bi} d={1} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">{'BMI \u00B7 ' + info.l}</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">{'BMI \u00B7 ' + info.l}</div>
           <div className="mt-1.5 h-1 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, bi / 40 * 100) + '%', background: info.c }} /></div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold text-indigo-500"><ANum v={Math.round(bm)} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">BMR kcal</div>
-          <div className="mt-1 text-[10px] text-neutral-400">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">BMR kcal</div>
+          <div className="mt-1 text-[10px] text-neutral-500">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold" style={{ color: '#0B7A4B' }}><ANum v={Math.round(td)} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">TDEE kcal</div>
-          <div className="mt-1 text-[10px] text-neutral-400">{ACT_L[b.act]}</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">TDEE kcal</div>
+          <div className="mt-1 text-[10px] text-neutral-500">{ACT_L[b.act]}</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-lg font-extrabold" style={{ color: intakeKcal > rec * 1.1 ? C.org : intakeKcal < rec * 0.8 ? C.blue : C.ok }}>
             <ANum v={intakeKcal} />/<ANum v={rec} />
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">Kcal today</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">Kcal today</div>
           <div className="mt-1 text-[10px]" style={{ color: intakeKcal > rec ? C.org : C.ok }}>
             {intakeKcal > rec ? '+' + (intakeKcal - rec) + ' surplus' : (rec - intakeKcal) + ' remaining'}
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-400">
+      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-500">
         {b.w}kg {'\u00B7'} {b.h}cm {'\u00B7'} Target: {b.goal === 'lose' ? 'Lose' : b.goal === 'gain' ? 'Gain' : 'Maintain'}
       </div>
     </Card>
@@ -936,7 +937,7 @@ function FoodPhotoAI({ onDetect }: { onDetect: (items: DetectedFood[]) => void }
   }
   return (
     <div className="mt-4 rounded-2xl border border-dashed border-brand/40 bg-brand-50/50 p-3">
-      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
+      <label className={'flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-ink transition active:scale-[0.98] ' + (busy ? 'opacity-60' : '')}
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
         {busy ? '⏳ AI analyzing photo…' : '📸 Food Photo → AI auto-fills journal'}
         <input type="file" accept="image/*" capture="environment" className="hidden" onChange={pick} disabled={busy} />
@@ -979,9 +980,9 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           <div key={l} className="flex flex-col items-center gap-1">
             <Ring value={v} max={mx} color={c}>
               <span className="text-xs font-extrabold tabular-nums" style={{ color: c }}>{v}</span>
-              <span className="text-[8px] text-neutral-400">g</span>
+              <span className="text-[8px] text-neutral-500">g</span>
             </Ring>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">{l}</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">{l}</span>
           </div>
         ))}
       </div>
@@ -1009,10 +1010,10 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           const rec = activeProtocol && activeProtocol.specialFoods.some(sf => f.name.includes(sf))
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
-            <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-400 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
-              {f.emoji} {f.name} <span className="text-neutral-400">{f.k}</span>
+            <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
+              {f.emoji} {f.name} <span className="text-neutral-500">{f.k}</span>
               {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
-              {avo && <span className="ml-0.5 text-red-400">{'\u274C'}</span>}
+              {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
             </button>
           )
         })}
@@ -1024,9 +1025,9 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
             <span style={{ color: '#0B7A4B' }}>{pv.k} kcal</span>
             <span className="text-amber-500">K{pv.c}</span>
             <span className="text-green-600">P{pv.p}</span>
-            <span className="text-red-400">L{pv.f}</span>
+            <span className="text-red-600">L{pv.f}</span>
             <span className="text-purple-500">S{pv.fb}</span>
-            <span className="text-blue-400">Na{pv.na}</span>
+            <span className="text-blue-700">Na{pv.na}</span>
             {pv.omega3 > 0 && <span className="text-cyan-500">{'\u{1F41F}'}{pv.omega3}g</span>}
           </div>
           {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[9px] text-neutral-500">{t}</span>)}</div>}
@@ -1038,8 +1039,8 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         {todays.length === 0 && <Empty e={'\u{1F37D}\uFE0F'} t="No food logged yet" />}
         {todays.map(f => { const s = FD.find(x => x.name === f.name); return (
           <div key={f.id} className="flex items-center justify-between rounded-lg px-3 py-2 transition hover:bg-neutral-50">
-            <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-400">{f.grams}g</span></div>
-            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: '#0B7A4B' }}>{f.kcal}</span><span className="text-neutral-400 ml-1">kcal</span></div>
+            <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-500">{f.grams}g</span></div>
+            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: '#0B7A4B' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
           </div>
         )})}
       </div>
@@ -1094,17 +1095,17 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
       </div>
       <div className="px-5 pb-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExType(f[0]) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-400">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       {/* Real map (OpenStreetMap) — live position, record routes & plan
           a path by tapping the map. */}
       <div className="relative mx-5 overflow-hidden rounded-2xl border border-neutral-100">
         {mode === 'planning' && (
-          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-white">
+          <div className="absolute inset-x-0 top-0 z-[500] bg-purple-600/90 px-3 py-1.5 text-center text-[11px] font-bold text-ink">
             {'\u{1F4CD}'} Tap the map to add route points {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
-        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Loading map…</div>}>
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-500">Loading map…</div>}>
           <RouteMap
             points={pts}
             planned={plan}
@@ -1116,8 +1117,8 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
           <div className="grid grid-cols-4 gap-px bg-neutral-900">
             {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(dur > 0 ? (dist / dur) * 3.6 : 0) + ' km/h', 'SPEED'], [fmtPace(dur, dist), 'PACE']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-2 py-2 text-center">
-                <div className="text-sm font-extrabold text-white tabular-nums">{v}</div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-white/40">{l}</div>
+                <div className="text-sm font-extrabold text-ink tabular-nums">{v}</div>
+                <div className="text-[8px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
               </div>
             ))}
           </div>
@@ -1127,22 +1128,22 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <div className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-2.5">
             <span className="text-lg">{'\u{1F493}'}</span>
-            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Heart Rate</div></div>
+            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div></div>
             <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
-            <span className="text-[10px] text-neutral-400">bpm</span>
+            <span className="text-[10px] text-neutral-500">bpm</span>
           </div>
         )}
         {mode === 'done' && (
           <div className="rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-4 text-white">
             <div className="flex items-center justify-between">
-              <div><div className="text-[10px] font-bold uppercase tracking-widest text-white/60">Summary</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
-              <div className="text-right"><div className="text-3xl font-extrabold">{kcal}<span className="text-sm font-medium text-white/60"> kcal</span></div><div className="text-xs text-white/70">MET {exType.met} {'\u00B7'} {metH.toFixed(2)} MET-hours</div></div>
+              <div><div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Summary</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
+              <div className="text-right"><div className="text-3xl font-extrabold">{kcal}<span className="text-sm font-medium text-ink/60"> kcal</span></div><div className="text-xs text-ink/70">MET {exType.met} {'\u00B7'} {metH.toFixed(2)} MET-hours</div></div>
             </div>
             <div className="mt-2 grid grid-cols-4 gap-3 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-white/50">Distance</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-white/50">Duration</div></div>
-              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-white/50">Speed</div></div>
-              <div><div className="font-bold">{hr || '-'}</div><div className="text-white/50">HR</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Distance</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Duration</div></div>
+              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-ink/50">Speed</div></div>
+              <div><div className="font-bold">{hr || '-'}</div><div className="text-ink/50">HR</div></div>
             </div>
           </div>
         )}
@@ -1206,7 +1207,7 @@ function SleepWater({ body }: { body: Body }) {
         <div className="rounded-xl border border-neutral-100 p-3">
           <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }}>{weekMet.toFixed(1)}</span></div>
           <div className="mt-1 h-2 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (weekMet / 15) * 100) + '%', background: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }} /></div>
-          <div className="flex justify-between text-[9px] text-neutral-400 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
+          <div className="flex justify-between text-[9px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
         </div>
       </div>
     </Card>
@@ -1234,11 +1235,11 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[9px] text-neutral-400">+{active.specialFoods.length - 6}</span>}</div></div>
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[9px] text-neutral-400">+{active.avoidFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
           </div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
         </div>
       )}
       <button onClick={() => setOpen(!open)} className="mt-3 w-full rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-xs font-bold text-neutral-500 transition hover:bg-neutral-50 hover:border-neutral-300">
@@ -1250,7 +1251,7 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             <button key={p.id} onClick={() => { onSelect(p); setOpen(false) }} className={'rounded-xl border p-3 text-left transition active:scale-95 ' + (active?.id === p.id ? 'border-current shadow-sm' : 'border-neutral-100 hover:border-neutral-200')} style={active?.id === p.id ? { borderColor: p.color, background: p.color + '08' } : {}}>
               <span className="text-lg">{p.emoji}</span>
               <div className="mt-1 text-[11px] font-bold" style={{ color: active?.id === p.id ? p.color : '#404040' }}>{p.name}</div>
-              <div className="text-[9px] text-neutral-400">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
+              <div className="text-[9px] text-neutral-500">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
             </button>
           ))}
         </div>
@@ -1372,11 +1373,11 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-neutral-100">
-                <th className="py-2 pr-3 text-left font-bold text-neutral-400 sticky left-0 bg-white">Date</th>
+                <th className="py-2 pr-3 text-left font-bold text-neutral-500 sticky left-0 bg-white">Date</th>
                 {labKeys.map(k => (
-                  <th key={k} className="py-2 px-2 text-center font-bold text-neutral-400 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
+                  <th key={k} className="py-2 px-2 text-center font-bold text-neutral-500 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
                 ))}
-                <th className="py-2 pl-2 text-center font-bold text-neutral-400">Status</th>
+                <th className="py-2 pl-2 text-center font-bold text-neutral-500">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -1387,7 +1388,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                 }).length
                 return (
                   <tr key={lab.date + li} className="border-b border-neutral-50 hover:bg-neutral-50/50 transition">
-                    <td className="py-2 pr-3 font-bold text-neutral-700 whitespace-nowrap sticky left-0 bg-white">{new Date(lab.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
+                    <td className="py-2 pr-3 font-bold text-neutral-700 whitespace-nowrap sticky left-0 bg-white">{new Date(lab.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}</td>
                     {labKeys.map(k => {
                       const v = lab.values[k]; const st = v != null ? labStatus(k, v) : null
                       return (
@@ -1410,7 +1411,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
       {/* Trend Summary */}
       {labs.length >= 2 && (
         <div className="mt-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Weekly Trend (latest vs previous)</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Weekly Trend (latest vs previous)</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {labKeys.map(k => {
               const trend = labTrend(k)
@@ -1425,7 +1426,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                     <span className="text-[10px] font-semibold text-neutral-500">{labLabels[k]}</span>
                     <span className="text-[10px]" style={{ color: trend.color }}>{trend.dir === 'up' ? '\u2191' : trend.dir === 'down' ? '\u2193' : '\u2192'} {trend.diff != null ? (trend.diff > 0 ? '+' : '') + trend.diff.toFixed(1) : ''}</span>
                   </div>
-                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[9px] font-normal text-neutral-400">{labUnits[k]}</span></div>
+                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[9px] font-normal text-neutral-500">{labUnits[k]}</span></div>
                   <div className="text-[9px] font-semibold" style={{ color: st.color }}>{st.label}</div>
                 </div>
               )
@@ -1436,7 +1437,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
 
       {/* Lab Range Reference */}
       <div className="mt-4">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Normal Reference Range</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Normal Reference Range</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
           {labKeys.map(k => {
             const range = labRanges[k]
@@ -1444,7 +1445,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
             return (
               <div key={k} className="flex items-center justify-between rounded-lg bg-neutral-50 px-2.5 py-1.5">
                 <span className="text-[10px] text-neutral-600">{labLabels[k]}</span>
-                <span className="text-[10px] font-bold tabular-nums text-neutral-400">{range[0]}-{range[1]} {labUnits[k]}</span>
+                <span className="text-[10px] font-bold tabular-nums text-neutral-500">{range[0]}-{range[1]} {labUnits[k]}</span>
               </div>
             )
           })}
@@ -1540,7 +1541,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
   return (
     <Card className="!p-0 overflow-hidden">
-      <div className="relative p-6 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
+      <div className="relative p-6 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B 0%, #064e36 40%, #0a2f1f 100%)' }}>
         <div className="absolute right-4 top-4 opacity-[0.04]">
           <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="35" fill="none" stroke="white" strokeWidth="2" /><circle cx="40" cy="40" r="28" fill="none" stroke="white" strokeWidth="1.5" /><circle cx="40" cy="40" r="20" fill="none" stroke="white" strokeWidth="1" /></svg>
         </div>
@@ -1550,9 +1551,9 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">Longevity Score</span>
-            <span className="text-[9px] text-white/20">{'\u00B7'}</span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
+            <span className="text-[9px] text-ink/20">{'\u00B7'}</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
@@ -1564,14 +1565,14 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-black tabular-nums">{lng.score}</span>
-                <span className="text-[10px] text-white/30">/100</span>
+                <span className="text-[10px] text-ink/30">/100</span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-2xl font-black leading-tight">{scoreLabel}</div>
               <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: 'rgba(255,255,255,0.1)' }}>
                 <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: scoreColor, boxShadow: '0 0 6px ' + scoreColor }} />
-                <span className="text-[11px] font-semibold text-white/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
+                <span className="text-[11px] font-semibold text-ink/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
               </div>
             </div>
           </div>
@@ -1585,20 +1586,20 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
           {/* Quick Vitals */}
           <div className="mt-4 grid grid-cols-4 gap-2">
-            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
-            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
-            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
-            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-white/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
+            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
+            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
+            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
+            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative mt-5 flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-black tracking-wider text-white/25">PANACEA</span>
+            <span className="text-[11px] font-black tracking-wider text-ink/25">PANACEA</span>
             <span className="text-[11px] font-black tracking-wider" style={{ color: 'rgba(0,191,99,0.5)' }}>MED</span>
           </div>
-          <span className="text-[10px] font-mono text-white/20">.id</span>
+          <span className="text-[10px] font-mono text-ink/20">.id</span>
         </div>
       </div>
     </Card>
@@ -1645,13 +1646,13 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
       <SectionTitle icon={<IconFlame size={18} />} title="Manual Exercise Log" subtitle="Log exercise without GPS" />
       <div className="mt-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExName(f[0].name) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-400">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       <div className="mt-3 flex items-center gap-3">
         <Stepper label="Duration" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
         <div className="shrink-0 text-right">
           <div className="text-lg font-extrabold" style={{ color: '#0B7A4B' }}>{k}</div>
-          <div className="text-[9px] text-neutral-400">kcal</div>
+          <div className="text-[9px] text-neutral-500">kcal</div>
         </div>
         <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Log</Button>
       </div>
@@ -1692,9 +1693,9 @@ function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
               {d.isRestDay && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Recovery</span>}
             </div>
             <div className="mt-1.5 grid grid-cols-1 gap-1 text-xs text-neutral-600 sm:grid-cols-3">
-              <div><b className="text-neutral-400">Breakfast:</b> {d.breakfast}</div>
-              <div><b className="text-neutral-400">Lunch:</b> {d.lunch}</div>
-              <div><b className="text-neutral-400">Dinner:</b> {d.dinner}</div>
+              <div><b className="text-neutral-500">Breakfast:</b> {d.breakfast}</div>
+              <div><b className="text-neutral-500">Lunch:</b> {d.lunch}</div>
+              <div><b className="text-neutral-500">Dinner:</b> {d.dinner}</div>
             </div>
             <div className="mt-1.5 text-xs font-semibold text-brand-dark">🏃 {d.exerciseFocus}</div>
           </div>
@@ -1750,7 +1751,7 @@ export function Nutrition() {
 
       {/* 7-day BMI / BMR / VO₂Max trends (recharts) */}
       <div id="calc-vo2max">
-        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-400 shadow-sm">Loading health trends…</div>}>
+        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Loading health trends…</div>}>
           <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
         </Suspense>
       </div>
@@ -1801,26 +1802,47 @@ export function Nutrition() {
             </button>
           ))}
         </div>
-        <div className="mt-4 rounded-2xl border border-brand/10 bg-gradient-to-br from-brand-50/70 to-transparent p-5 text-center">
-          <p className="text-[13px] leading-relaxed text-neutral-600">
-            <b className="text-brand-dark">Panaceamed</b> is designed to clinical standards — from supporting elite athletes
-            (<i>Ronaldo, Messi, Mbappé, Kipchoge, Phelps</i>) to caring for critically ill patients
-            (<b>CHF, COPD, Diabetes, Kidney Failure, Cancer</b>, and 15+ chronic conditions). Every recommendation
-            is calculated <b>in real-time</b> from your data.
-          </p>
-          <p className="mt-2 text-xs font-semibold italic text-brand-dark">🌿 May this benefit humanity.</p>
+        {/* Semula satu paragraf padat. Yang perlu dibaca semua orang cuma
+            barisnya; daftar atlet dan penyakitnya hanya menarik bagi yang
+            bertanya "seberapa serius?", jadi ia dipindah ke balik satu ketukan. */}
+        <div className="mt-4">
+          <Ringkas
+            ikon="🌿"
+            judul="Built to clinical standards — calculated live from your data"
+            anak={
+              <div className="space-y-1.5">
+                <Poin ikon="🏅">Tuned on the demands of elite endurance and team sport athletes.</Poin>
+                <Poin ikon="🫀">Covers 15+ chronic conditions, including heart failure, COPD, diabetes, kidney failure, and cancer.</Poin>
+                <Poin ikon="⚡">Every target recalculates as your own numbers change — nothing is a fixed table.</Poin>
+              </div>
+            }
+          />
         </div>
       </Card>
 
       {/* Nutrition Data Sources */}
       <Card className="!p-5">
         <SectionTitle icon={<span className="text-lg">📚</span>} title="Nutrition Data Sources" subtitle="Food composition references underlying the Panaceamed nutrition database" />
-        <ul className="mt-2 space-y-2 text-[12px] leading-relaxed text-neutral-600">
-          <li>• <b>TKPI</b> (Indonesian Food Composition Table), Ministry of Health of the Republic of Indonesia — the primary reference for the nutritional content of traditional/local Indonesian foods.</li>
-          <li>• <b>USDA FoodData Central</b> (U.S. Department of Agriculture) — a supplementary reference for international items or more detailed micronutrient data.</li>
-          <li>• <b>AKG 2019</b> (Indonesian Recommended Dietary Allowance, Ministry of Health Regulation) — the baseline reference for daily needs (protein, fiber, micronutrients) used for the targets/scores on this page.</li>
-        </ul>
-        <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">The nutritional values per 100g in this database are representative estimates per food category (e.g. "Grilled chicken" represents common recipe variations), not laboratory test results for a specific item — recipe variation, portion size, and product brand affect the actual values. For high-precision medical needs (e.g. chronic kidney disease, severe allergies), verify product labels & consult a clinical dietitian.</p>
+        <div className="mt-2 space-y-1.5">
+          <Poin ikon="🇮🇩"><b>TKPI</b> — Indonesian food composition, Ministry of Health. Main source.</Poin>
+          <Poin ikon="🌐"><b>USDA FoodData Central</b> — international items and detailed micronutrients.</Poin>
+          <Poin ikon="🎯"><b>AKG 2019</b> — the daily targets and scores on this page.</Poin>
+        </div>
+        {/* Peringatan ketelitian tetap ada dan tetap bisa ditemukan, tetapi
+            tidak lagi menjadi dinding teks abu-abu yang dilewati semua orang. */}
+        <div className="mt-3">
+          <Ringkas
+            ikon="⚠️"
+            nada="hati-hati"
+            judul="These are category estimates, not lab results for your exact food"
+            anak={
+              <div className="space-y-1.5">
+                <Poin ikon="🍗">"Grilled chicken" stands for common recipes — your recipe, portion, and brand shift the real numbers.</Poin>
+                <Poin ikon="🩺">If precision matters medically — kidney disease, severe allergies — read the product label and ask a clinical dietitian.</Poin>
+              </div>
+            }
+          />
+        </div>
       </Card>
     </div>
   )

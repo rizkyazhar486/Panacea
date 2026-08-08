@@ -98,19 +98,19 @@ export function CarbonDiet() {
       {totalWeek > 0 && (
         <>
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your estimated footprint</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your estimated footprint</div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-black text-brand-dark">{totalYear.toFixed(0)}</span>
               <span className="text-sm font-semibold text-neutral-500">kg CO₂e / year (food only)</span>
             </div>
-            <div className="mt-0.5 text-[12px] text-neutral-400">≈ {totalWeek.toFixed(1)} kg CO₂e this week</div>
+            <div className="mt-0.5 text-[12px] text-neutral-500">≈ {totalWeek.toFixed(1)} kg CO₂e this week</div>
 
             <div className="mt-4 space-y-1.5">
               {REFERENCE.map((r) => {
                 const pct = Math.min(100, (totalYear / r.kgYear) * 100)
                 const isClosest = Math.abs(totalYear - r.kgYear) === Math.min(...REFERENCE.map((x) => Math.abs(totalYear - x.kgYear)))
                 return (
-                  <div key={r.label} className={`flex items-center gap-2 text-[11px] ${isClosest ? 'font-bold text-brand-dark' : 'text-neutral-400'}`}>
+                  <div key={r.label} className={`flex items-center gap-2 text-[11px] ${isClosest ? 'font-bold text-brand-dark' : 'text-neutral-500'}`}>
                     <span className="w-40 shrink-0 truncate">{r.label}</span>
                     <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-100">
                       <span className="block h-full rounded-full bg-brand/60" style={{ width: `${pct}%` }} />
@@ -123,7 +123,7 @@ export function CarbonDiet() {
           </Card>
 
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Breakdown by food</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Breakdown by food</div>
             <div className="mt-3 space-y-2">
               {rows.filter((r) => r.co2eWeek > 0).sort((a, b) => b.co2eWeek - a.co2eWeek).map((r) => (
                 <div key={r.key} className="flex items-center gap-2 text-[12px]">
@@ -135,7 +135,7 @@ export function CarbonDiet() {
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-[11px] text-neutral-400">
+            <p className="mt-3 text-[11px] text-neutral-500">
               As a rule of thumb from this same research: swapping red meat for poultry, fish, or plant
               proteins a few times a week tends to have the single largest effect on this number for most diets.
             </p>
@@ -143,7 +143,7 @@ export function CarbonDiet() {
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Emission factors: Poore &amp; Nemecek (2018), <i>Science</i> 361(6392) — synthesized via Our World in Data.
         Estimates only; not a certified carbon audit.
       </div>

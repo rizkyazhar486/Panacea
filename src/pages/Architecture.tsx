@@ -73,7 +73,7 @@ export function Architecture() {
           <div className="text-lg">
             CombinedScore<sub>i</sub> = α·V<sub>i</sub> + β·L<sub>i</sub> + γ·S<sub>i</sub>
           </div>
-          <div className="mt-2 text-sm text-white/70">
+          <div className="mt-2 text-sm text-ink/70">
             α={WEIGHTS.alpha} · β={WEIGHTS.beta} · γ={WEIGHTS.gamma}
           </div>
           <div className="mt-4 text-base">
@@ -98,7 +98,7 @@ export function Architecture() {
         return {score: combined, V, L, S, evidence: collate_evidence(plan)}
 # Overriding a rejected plan ⇒ requires clinician justification (recorded in the audit log).`}
         </pre>
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-neutral-500">
           → Implemented directly in the <b>Planning</b> module (CDSS Safety Engine).
         </p>
       </Card>
@@ -175,7 +175,7 @@ export function Architecture() {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-neutral-400">
+        <p className="mt-3 text-xs text-neutral-500">
           Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays
           local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused
           test set before rollout, with versioning & rollback paths.
@@ -189,7 +189,7 @@ function Legend({ tag, title, desc, color }: { tag: string; title: string; desc:
   return (
     <div className="rounded-xl border border-neutral-100 p-3">
       <div className="flex items-center gap-2">
-        <span className="grid h-6 w-6 place-items-center rounded-lg text-xs font-bold text-white" style={{ background: color }}>
+        <span className="grid h-6 w-6 place-items-center rounded-lg text-xs font-bold text-ink" style={{ background: color }}>
           {tag}
         </span>
         <span className="text-sm font-bold">{title}</span>

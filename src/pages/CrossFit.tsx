@@ -46,18 +46,18 @@ export function CrossFit() {
       <SectionTitle
         icon={<IconActivity />}
         title="CrossFit & AMRAP"
-        subtitle="Format latihan, benchmark bernama, dan cara menurunkannya agar aman"
+        subtitle="Workout formats, named benchmarks, and how to scale them safely"
       />
 
       {/* Peringatan didahulukan, bukan disembunyikan di bawah. */}
       <Card className="!border-rose-500/30 !bg-rose-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-rose-400">⚠️ {RABDO.judul}</div>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-300">{RABDO.isi}</p>
-        <div className="mt-2 text-[11px] font-bold text-slate-400">Segera cari pertolongan medis bila muncul:</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-rose-600">⚠️ {RABDO.judul}</div>
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">{RABDO.isi}</p>
+        <div className="mt-2 text-[11px] font-bold text-neutral-500">Segera cari pertolongan medis bila muncul:</div>
         <ul className="mt-1 space-y-1">
           {RABDO.tanda.map((t) => (
-            <li key={t} className="flex gap-2 text-[12px] leading-snug text-slate-300">
-              <span className="text-rose-400">•</span><span>{t}</span>
+            <li key={t} className="flex gap-2 text-[12px] leading-snug text-neutral-600">
+              <span className="text-rose-600">•</span><span>{t}</span>
             </li>
           ))}
         </ul>
@@ -65,8 +65,8 @@ export function CrossFit() {
 
       {/* Format */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Format latihan</div>
-        <p className="mt-1 text-[12px] text-slate-400">
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Format latihan</div>
+        <p className="mt-1 text-[12px] text-neutral-500">
           Semua sesi CrossFit adalah salah satu dari ini. Memahami formatnya lebih berguna daripada menghafal nama workout.
         </p>
         <div className="mt-3 space-y-1.5">
@@ -79,24 +79,24 @@ export function CrossFit() {
                   aria-expanded={buka}
                   className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left">
                   <div className="min-w-0">
-                    <div className="text-[13px] font-black text-white">{f.nama}</div>
-                    <div className="truncate text-[11px] text-slate-400">{f.singkat}</div>
+                    <div className="text-[13px] font-black text-ink">{f.nama}</div>
+                    <div className="truncate text-[11px] text-neutral-500">{f.singkat}</div>
                   </div>
-                  <span className={`shrink-0 text-slate-400 transition ${buka ? 'rotate-90' : ''}`}>›</span>
+                  <span className={`shrink-0 text-neutral-500 transition ${buka ? 'rotate-90' : ''}`}>›</span>
                 </button>
                 {buka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
                     <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{f.kepanjangan}</div>
-                    <p className="text-[12px] leading-relaxed text-slate-300">{f.caraKerja}</p>
+                    <p className="text-[12px] leading-relaxed text-neutral-600">{f.caraKerja}</p>
                     <div className="rounded-lg bg-emerald-500/10 p-2">
-                      <div className="text-[10px] font-black uppercase text-emerald-400">Bagus untuk</div>
-                      <p className="text-[12px] leading-snug text-slate-300">{f.bagusUntuk}</p>
+                      <div className="text-[10px] font-black uppercase text-emerald-700">Bagus untuk</div>
+                      <p className="text-[12px] leading-snug text-neutral-600">{f.bagusUntuk}</p>
                     </div>
                     <div className="rounded-lg bg-amber-500/10 p-2">
-                      <div className="text-[10px] font-black uppercase text-amber-400">Jebakannya</div>
-                      <p className="text-[12px] leading-snug text-slate-300">{f.jebakan}</p>
+                      <div className="text-[10px] font-black uppercase text-amber-700">Jebakannya</div>
+                      <p className="text-[12px] leading-snug text-neutral-600">{f.jebakan}</p>
                     </div>
-                    <div className="text-[11px] text-slate-400"><b>Contoh:</b> {f.contoh}</div>
+                    <div className="text-[11px] text-neutral-500"><b>Contoh:</b> {f.contoh}</div>
                   </div>
                 )}
               </div>
@@ -107,8 +107,8 @@ export function CrossFit() {
 
       {/* Arketipe motivasi */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Pilih gaya Anda</div>
-        <p className="mt-1 text-[12px] leading-relaxed text-slate-400">
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pilih gaya Anda</div>
+        <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
           Enam arketipe, masing-masing menunjuk ke format yang cocok. Pilih yang paling terasa seperti
           Anda — bukan yang paling keren.
         </p>
@@ -120,13 +120,13 @@ export function CrossFit() {
                   ? <img src={a.gambar} alt="" loading="lazy" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
                   : <span className="text-xl">{a.ikon}</span>}
                 <div className="min-w-0">
-                  <div className="text-[13px] font-black leading-tight text-white">{a.nama}</div>
-                  <div className="text-[10px] text-slate-400">{a.sifat}</div>
+                  <div className="text-[13px] font-black leading-tight text-ink">{a.nama}</div>
+                  <div className="text-[10px] text-neutral-500">{a.sifat}</div>
                 </div>
               </div>
-              <div className="mt-2 text-[11px] text-slate-300"><b>Fokus:</b> {a.latihan}</div>
-              <div className="text-[11px] text-slate-300"><b>Mulai dari:</b> {a.format}</div>
-              <p className="mt-1 text-[11px] leading-snug text-slate-400">{a.kenapa}</p>
+              <div className="mt-2 text-[11px] text-neutral-600"><b>Fokus:</b> {a.latihan}</div>
+              <div className="text-[11px] text-neutral-600"><b>Mulai dari:</b> {a.format}</div>
+              <p className="mt-1 text-[11px] leading-snug text-neutral-500">{a.kenapa}</p>
             </div>
           ))}
         </div>
@@ -134,7 +134,7 @@ export function CrossFit() {
 
       {/* Benchmark */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Benchmark</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Benchmark</div>
         <input
           className={`${inputClass} mt-2`}
           placeholder="Cari: cindy, murph, pull-up, kettlebell…"
@@ -148,7 +148,7 @@ export function CrossFit() {
               key={k.id}
               onClick={() => setKelompok(k.id)}
               className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${
-                kelompok === k.id ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'
+                kelompok === k.id ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'
               }`}>
               {k.label}
             </button>
@@ -157,14 +157,14 @@ export function CrossFit() {
             onClick={() => setHanyaBodyweight((v) => !v)}
             aria-pressed={hanyaBodyweight}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition ${
-              hanyaBodyweight ? 'bg-brand text-white' : 'bg-white/5 text-slate-300'
+              hanyaBodyweight ? 'bg-brand text-white' : 'bg-white/5 text-neutral-600'
             }`}>
             Tanpa alat
           </button>
         </div>
 
         {daftar.length === 0 && (
-          <p className="mt-3 text-[12px] text-slate-400">Tidak ada yang cocok dengan "{cari}".</p>
+          <p className="mt-3 text-[12px] text-neutral-500">Tidak ada yang cocok dengan "{cari}".</p>
         )}
 
         <div className="mt-3 space-y-1.5">
@@ -178,17 +178,17 @@ export function CrossFit() {
                   className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left">
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[13px] font-black text-white">{b.nama}</span>
+                      <span className="text-[13px] font-black text-ink">{b.nama}</span>
                       {b.bodyweight && (
-                        <span className="rounded bg-emerald-500/20 px-1 text-[9px] font-bold text-emerald-400">tanpa alat</span>
+                        <span className="rounded bg-emerald-500/20 px-1 text-[9px] font-bold text-emerald-700">tanpa alat</span>
                       )}
                       {b.kelompok === 'hero' && (
-                        <span className="rounded bg-white/10 px-1 text-[9px] font-bold text-slate-300">hero</span>
+                        <span className="rounded bg-white/10 px-1 text-[9px] font-bold text-neutral-600">hero</span>
                       )}
                     </div>
-                    <div className="truncate text-[11px] text-slate-400">{b.format}</div>
+                    <div className="truncate text-[11px] text-neutral-500">{b.format}</div>
                   </div>
-                  <span className={`shrink-0 text-slate-400 transition ${buka ? 'rotate-90' : ''}`}>›</span>
+                  <span className={`shrink-0 text-neutral-500 transition ${buka ? 'rotate-90' : ''}`}>›</span>
                 </button>
                 {buka && (
                   <div className="space-y-2 border-t border-white/10 px-3 py-2.5">
@@ -198,16 +198,16 @@ export function CrossFit() {
                     )}
                     <ul className="space-y-0.5">
                       {b.isi.map((x) => (
-                        <li key={x} className="text-[12px] text-slate-200">• {x}</li>
+                        <li key={x} className="text-[12px] text-ink">• {x}</li>
                       ))}
                     </ul>
-                    {b.bebanRx && <div className="text-[11px] text-slate-400"><b>Beban Rx:</b> {b.bebanRx}</div>}
-                    <div className="text-[11px] text-slate-400"><b>Rentang waktu:</b> {b.targetWaktu}</div>
+                    {b.bebanRx && <div className="text-[11px] text-neutral-500"><b>Beban Rx:</b> {b.bebanRx}</div>}
+                    <div className="text-[11px] text-neutral-500"><b>Rentang waktu:</b> {b.targetWaktu}</div>
                     <div className="rounded-lg bg-brand/10 p-2">
                       <div className="text-[10px] font-black uppercase text-brand">Cara menurunkannya</div>
-                      <p className="text-[12px] leading-snug text-slate-300">{b.skala}</p>
+                      <p className="text-[12px] leading-snug text-neutral-600">{b.skala}</p>
                     </div>
-                    {b.catatan && <p className="text-[11px] leading-relaxed text-slate-400">{b.catatan}</p>}
+                    {b.catatan && <p className="text-[11px] leading-relaxed text-neutral-500">{b.catatan}</p>}
                     {b.jam && <JamWod nama={b.nama} setelan={b.jam} ronde={b.isi} />}
                   </div>
                 )}
@@ -219,12 +219,12 @@ export function CrossFit() {
 
       {/* Aturan aman */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Enam aturan yang menjaga Anda tetap berlatih</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Enam aturan yang menjaga Anda tetap berlatih</div>
         <img src={GAMBAR_SKALA} alt="Push-up dari lutut — contoh gerakan yang diskalakan" loading="lazy"
           className="mt-2 aspect-video w-full rounded-xl object-cover" />
         <ul className="mt-2 space-y-1.5">
           {ATURAN_AMAN.map((a, i) => (
-            <li key={a} className="flex gap-2 text-[12px] leading-relaxed text-slate-300">
+            <li key={a} className="flex gap-2 text-[12px] leading-relaxed text-neutral-600">
               <span className="font-black text-brand">{i + 1}.</span><span>{a}</span>
             </li>
           ))}
@@ -232,13 +232,13 @@ export function CrossFit() {
       </Card>
 
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Rujukan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rujukan</div>
         <ul className="mt-2 space-y-1">
           {RUJUKAN.map((r) => (
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
           "The Girls" dan "Hero WOD" adalah benchmark bernama milik CrossFit Inc. yang sudah lama
           beredar umum; yang dimuat di sini hanya daftar gerakan dan repetisinya. Hero WOD dinamai
           dari anggota militer dan petugas penyelamat yang gugur — asal namanya disebutkan karena

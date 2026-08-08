@@ -48,7 +48,7 @@ export function EpworthSleepiness() {
 
       {SITUATIONS.map((text, qi) => (
         <Card key={qi} className="!p-5">
-          <div className="text-sm font-bold text-ink dark:text-white">{qi + 1}. {text}</div>
+          <div className="text-sm font-bold text-ink dark:text-ink">{qi + 1}. {text}</div>
           <div className="mt-3 grid grid-cols-2 gap-1.5">
             {SCALE.map((label, pts) => (
               <button
@@ -57,7 +57,7 @@ export function EpworthSleepiness() {
                 className={`rounded-lg border px-2.5 py-2 text-[11px] font-semibold leading-tight transition ${
                   answers[qi] === pts
                     ? 'border-brand bg-brand-50 text-brand-dark'
-                    : 'border-neutral-200 text-neutral-500 hover:border-brand/30 dark:border-white/10 dark:text-neutral-400'
+                    : 'border-neutral-200 text-neutral-500 hover:border-brand/30 dark:border-white/10 dark:text-neutral-500'
                 }`}
               >
                 {label}
@@ -69,7 +69,7 @@ export function EpworthSleepiness() {
 
       {band && score != null && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your result</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your result</div>
           <div className="mt-2 flex items-center gap-3">
             <span className="text-3xl font-black text-brand-dark">{score}/24</span>
             <div>
@@ -80,7 +80,7 @@ export function EpworthSleepiness() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Johns, M.W. (1991). A new method for measuring daytime sleepiness: the Epworth Sleepiness Scale.
         <i> Sleep</i>, 14(6), 540-545. Screening tool only, not a diagnosis — pairs well with the
         Chronotype Quiz and Sleep Apnea Screening in this app.

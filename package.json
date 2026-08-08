@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "node scripts/gen-note-index.mjs --check && tsc -b && vite build",
     "preview": "vite preview",
-    "gen:note-index": "node scripts/gen-note-index.mjs"
+    "gen:note-index": "node scripts/gen-note-index.mjs",
+    "periksa": "node scripts/periksaTeks.mjs",
+    "periksa:semua": "node scripts/periksaTeks.mjs --semua"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

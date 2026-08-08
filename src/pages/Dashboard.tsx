@@ -27,7 +27,7 @@ interface SupportiveResult {
    ═══════════════════════════════════════════ */
 
 function fmt(iso: string): string {
-  return new Date(iso).toLocaleString('id-ID', {
+  return new Date(iso).toLocaleString('en-GB', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -97,7 +97,7 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-[28px] font-black leading-none tabular-nums" style={{ color }}>{animated}</span>
-        <span className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.18em] text-neutral-400">{band}</span>
+        <span className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.18em] text-neutral-500">{band}</span>
       </div>
     </div>
   )
@@ -162,7 +162,7 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
       </div>
       <div className="text-center">
         <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
-        <span className="ml-1 text-xs text-neutral-400">kg/m²</span>
+        <span className="ml-1 text-xs text-neutral-500">kg/m²</span>
       </div>
       <div className="text-center">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -193,11 +193,11 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
         <div>
           <div className="flex items-center gap-1.5">
             <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: accent, boxShadow: `0 0 6px ${accent}66` }} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{label}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{label}</span>
           </div>
           <div className="mt-2.5 flex items-baseline gap-1">
             <span className="text-[26px] font-black leading-none tabular-nums" style={{ color: tone === 'high' ? '#FF3131' : '#171717' }}>{value}</span>
-            <span className="text-[10px] font-medium text-neutral-400">{unit}</span>
+            <span className="text-[10px] font-medium text-neutral-500">{unit}</span>
           </div>
         </div>
         <div className="mt-1 opacity-70 transition-opacity group-hover:opacity-100">
@@ -232,7 +232,7 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
           <Badge tone={(r.flag ?? 'normal') as any}>{flagLabel}</Badge>
           <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{r.category}</span>
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-500">
           <span className="font-bold" style={{ color: s.dot }}>{r.value} {r.unit}</span>
           <span>Reference: {r.reference || '—'}</span>
         </div>
@@ -357,23 +357,23 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
+    <div className="overflow-hidden rounded-2xl p-5 text-ink" style={{ background: 'linear-gradient(135deg, #0B7A4B, #00BF63)' }}>
       <div className="flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
         <div>
           <div className="text-sm font-black">AI Clinical Insight</div>
-          <div className="text-[10px] font-semibold text-white/60">Powered by Panaceamed AI · Beta</div>
+          <div className="text-[10px] font-semibold text-ink/60">Powered by Panaceamed AI · Beta</div>
         </div>
       </div>
 
       {text ? (
-        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-white/90">{text}</div>
+        <div className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed text-ink/90">{text}</div>
       ) : (
-        <p className="mt-3 text-[13px] leading-relaxed text-white/70">
+        <p className="mt-3 text-[13px] leading-relaxed text-ink/70">
           Ask AI to summarize this patient's latest vital signs & supportive results into a brief clinical analysis and action recommendations.
         </p>
       )}
-      {err && <p className="mt-2 text-[11px] text-white/80">{err}</p>}
+      {err && <p className="mt-2 text-[11px] text-ink/80">{err}</p>}
 
       <button
         onClick={requestInsight}
@@ -412,7 +412,7 @@ export function Dashboard() {
       <div className="mx-auto max-w-xl space-y-10 py-16">
         <div className="text-center">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
-            <IconHeart size={34} className="text-white" />
+            <IconHeart size={34} className="text-ink" />
           </div>
           <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
@@ -436,7 +436,7 @@ export function Dashboard() {
         <button onClick={() => setShowAddPatient((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-neutral-200 px-4 py-2 text-[11px] font-semibold text-neutral-500 transition-all duration-200 hover:border-[#00BF63] hover:text-[#00BF63] hover:bg-[rgba(0,191,99,0.05)] active:scale-[0.97]">
           <IconPlus size={13} /> New Patient
         </button>
-        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-white transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
+        <button onClick={() => setShowAdd((s) => !s)} className="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-bold text-ink transition-all duration-200 hover:shadow-lg active:scale-[0.97]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 16px rgba(0,191,99,0.3)' }}>
           <IconHeart size={13} /> Record Vitals
         </button>
         {vitals.length > 0 && <span className="shrink-0 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300">{vitals.length} entries</span>}
@@ -457,7 +457,7 @@ export function Dashboard() {
           <div className="relative -mt-12 px-5 pb-5">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-end gap-4">
-                <span className="grid h-24 w-24 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-white transition-transform duration-300 hover:scale-[1.04]" style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 24px ${p.avatarColor}44` }}>
+                <span className="grid h-24 w-24 shrink-0 place-items-center rounded-[18px] text-2xl font-black text-ink transition-transform duration-300 hover:scale-[1.04]" style={{ background: `linear-gradient(145deg, ${p.avatarColor}, ${p.avatarColor}bb)`, boxShadow: `0 8px 24px ${p.avatarColor}44` }}>
                   {p.name.replace(/^[^ ]+ /, '').slice(0, 2).toUpperCase()}
                 </span>
                 <div className="pb-1">
@@ -468,13 +468,13 @@ export function Dashboard() {
                     <span>{ageFromDob(p.dob)} years old</span>
                     {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Type {p.bloodType}</span></>)}
                     <span className="text-neutral-200">·</span>
-                    <span className="font-mono text-xs text-neutral-400">{p.mrn}</span>
+                    <span className="font-mono text-xs text-neutral-500">{p.mrn}</span>
                   </p>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-1 sm:pb-1">
                 <LongevityRing score={longevity.score} band={longevity.band} />
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-400">Longevity Score</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
               </div>
             </div>
 
@@ -499,7 +499,7 @@ export function Dashboard() {
               )}
             </div>
 
-            <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-400">
+            <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-500">
               <IconShield size={11} className="text-[#00BF63]" /> Health data is confidential — only shared with the patient's consent.
             </p>
           </div>
@@ -535,7 +535,7 @@ export function Dashboard() {
         </div>
         {latest && (
           <div className="border-t border-neutral-50 px-5 py-2.5">
-            <p className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+            <p className="flex items-center gap-1.5 text-[11px] text-neutral-500">
               <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00BF63] animate-pulse" />
               Last updated {fmt(latest.takenAt)}
             </p>
@@ -552,11 +552,11 @@ export function Dashboard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
               <span className="text-sm text-neutral-500">Height</span>
-              <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-400">cm</span></span>
+              <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-500">cm</span></span>
             </div>
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
               <span className="text-sm text-neutral-500">Weight</span>
-              <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-400">kg</span></span>
+              <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-500">kg</span></span>
             </div>
             <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
               <p className="text-[11px] leading-relaxed text-neutral-500">
@@ -599,7 +599,7 @@ export function Dashboard() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.03)' }}>
                 <IconShield size={22} className="text-neutral-300" />
               </div>
-              <p className="text-sm text-neutral-400">No supportive results yet.</p>
+              <p className="text-sm text-neutral-500">No supportive results yet.</p>
             </div>
           ) : (
             supportive.map((r) => <SupportiveCard key={r.id} r={r} />)

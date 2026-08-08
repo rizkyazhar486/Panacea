@@ -158,7 +158,7 @@ export function RppgHeartRate() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Green-channel rPPG with autocorrelation-based frequency detection, computed entirely in your
         browser — no video is uploaded or stored anywhere. Educational/experimental use only.
       </div>

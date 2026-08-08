@@ -58,7 +58,7 @@ function GoldenMinuteTimer() {
         )}
         <button onClick={reset} className="rounded-xl bg-neutral-100 px-5 py-2.5 text-sm font-bold text-neutral-600 dark:bg-white/10">↺ Reset</button>
       </div>
-      <p className="mt-3 text-[11px] text-neutral-400">A training-aid stopwatch for drills — during a real resuscitation, follow your team's monitor and NRP-certified lead.</p>
+      <p className="mt-3 text-[11px] text-neutral-500">A training-aid stopwatch for drills — during a real resuscitation, follow your team's monitor and NRP-certified lead.</p>
     </Card>
   )
 }
@@ -78,13 +78,13 @@ export function NeonatalResuscitationGuide() {
       <GoldenMinuteTimer />
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Algorithm — Initial Steps</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Algorithm — Initial Steps</div>
         <div className="mt-3 space-y-3">
           {ALGORITHM_STEPS.map((s, i) => (
             <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="flex items-center gap-2">
                 <Badge tone="neutral">{s.t}</Badge>
-                <span className="text-[13px] font-bold text-ink dark:text-white">{s.text}</span>
+                <span className="text-[13px] font-bold text-ink dark:text-ink">{s.text}</span>
               </div>
               <p className="mt-1 text-[12px] text-neutral-500">{s.note}</p>
             </div>
@@ -93,7 +93,7 @@ export function NeonatalResuscitationGuide() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Target Preductal SpO2 (by minute of life)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Target Preductal SpO2 (by minute of life)</div>
         <div className="mt-3 grid grid-cols-3 gap-2">
           {TARGET_SPO2.map((r) => (
             <div key={r.min} className="rounded-xl bg-brand/10 p-2 text-center">
@@ -104,7 +104,7 @@ export function NeonatalResuscitationGuide() {
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Reference: American Academy of Pediatrics / American Heart Association Neonatal Resuscitation
         Program (NRP) 8th edition algorithm; ILCOR consensus. Study aid only — always defer to your
         NRP-certified training and institutional protocol during a real resuscitation.

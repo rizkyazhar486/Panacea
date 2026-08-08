@@ -78,14 +78,14 @@ export function DermatologyLesionMapper() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Primary morphology</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Primary morphology</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {MORPHOLOGIES.map((m) => (
             <button key={m} onClick={() => setMorphology(morphology === m ? null : m)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${morphology === m ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{m}</button>
           ))}
         </div>
 
-        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-400">Predilection site</div>
+        <div className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Predilection site</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {SITES.map((s) => (
             <button key={s} onClick={() => setSite(site === s ? null : s)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${site === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>{s}</button>
@@ -104,34 +104,34 @@ export function DermatologyLesionMapper() {
 
       {(morphology || site) && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Differential to consider</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Differential to consider</div>
           {matches.length > 0 ? (
             <div className="mt-3 space-y-3">
               {matches.map((m, i) => (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                   <div className="flex items-center gap-2 text-[12px]"><Badge tone="neutral">{m.morphology}</Badge><Badge tone="neutral">{m.site}</Badge></div>
-                  <div className="mt-1.5 text-[13px] font-semibold text-ink dark:text-white">{m.differential.join(' · ')}</div>
+                  <div className="mt-1.5 text-[13px] font-semibold text-ink dark:text-ink">{m.differential.join(' · ')}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-2 text-[13px] text-neutral-400">No curated teaching association for this exact combination — select just morphology or just site for broader matches, or use your standard differential-diagnosis approach.</p>
+            <p className="mt-2 text-[13px] text-neutral-500">No curated teaching association for this exact combination — select just morphology or just site for broader matches, or use your standard differential-diagnosis approach.</p>
           )}
           <div className="mt-3"><CopyNote text={summary} /></div>
         </Card>
       )}
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">ABCDE — Pigmented Lesion Red Flags</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">ABCDE — Pigmented Lesion Red Flags</div>
         <div className="mt-3 space-y-2">
           {ABCDE.map((r) => (
-            <div key={r.k} className="flex justify-between text-[13px]"><span className="font-bold text-ink dark:text-white">{r.k}</span><span className="text-neutral-500 text-right">{r.v}</span></div>
+            <div key={r.k} className="flex justify-between text-[13px]"><span className="font-bold text-ink dark:text-ink">{r.k}</span><span className="text-neutral-500 text-right">{r.v}</span></div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-400">Any pigmented lesion meeting ABCDE criteria, or the "ugly duckling" sign (looks different from the patient's other moles), warrants dermatology referral/biopsy — not something this tool, or any photo, should be used to rule out.</p>
+        <p className="mt-3 text-[11px] text-neutral-500">Any pigmented lesion meeting ABCDE criteria, or the "ugly duckling" sign (looks different from the patient's other moles), warrants dermatology referral/biopsy — not something this tool, or any photo, should be used to rule out.</p>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A structured exam-documentation and teaching-differential aid, not a diagnostic tool. Any
         concerning, changing, or non-healing lesion should be evaluated in person by a clinician —
         biopsy remains the gold standard for diagnosis.

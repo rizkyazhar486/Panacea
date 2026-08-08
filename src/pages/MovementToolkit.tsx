@@ -55,7 +55,7 @@ function BalanceTest() {
         <button onClick={() => (running ? stop() : setRunning(true))} className={`flex-1 rounded-xl py-2.5 text-sm font-bold ${running ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300' : 'bg-brand text-white'}`}>{running ? 'Stop' : 'Start'}</button>
         <button onClick={() => { setSeconds(0); setRunning(false) }} className="rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-bold text-neutral-500 dark:bg-white/10">Reset</button>
       </div>
-      <p className="mt-3 text-[12px] text-neutral-400">Best: {best}s · under ~10s at midlife is worth mentioning to a clinician</p>
+      <p className="mt-3 text-[12px] text-neutral-500">Best: {best}s · under ~10s at midlife is worth mentioning to a clinician</p>
     </Card>
   )
 }
@@ -157,7 +157,7 @@ export function MovementToolkit() {
       {tab === 'micro' && <MicroWorkout />}
       {tab === 'squats' && <SquatChallenge />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational self-tracking, not a fitness assessment by a professional — stop any exercise that
         causes pain and check with a clinician if you have an existing injury or condition.
       </div>

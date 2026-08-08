@@ -73,7 +73,7 @@ export function Verification() {
       <Card>
         <SectionTitle title="Material Verification Queue" subtitle={`${queue.length} item(s) pending`} />
         <div className="space-y-4">
-          {queue.length === 0 && <p className="text-sm text-neutral-400">No pending items. 🎉</p>}
+          {queue.length === 0 && <p className="text-sm text-neutral-500">No pending items. 🎉</p>}
           {queue.map((m) => (
             <div key={m.id} className="rounded-xl border border-neutral-100 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -81,7 +81,7 @@ export function Verification() {
                   <div className="mb-1 flex items-center gap-2">
                     <Badge tone="neutral">{m.category}</Badge>
                     <Badge tone="brand">{m.exam}</Badge>
-                    <span className="text-xs text-neutral-400">{m.fileType}</span>
+                    <span className="text-xs text-neutral-500">{m.fileType}</span>
                   </div>
                   <h4 className="font-bold">{m.title}</h4>
                   <p className="text-sm text-neutral-500">
@@ -167,7 +167,7 @@ export function Verification() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-neutral-400">
+              <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
                 <th className="pb-2 pr-4 font-semibold">Name</th>
                 <th className="pb-2 pr-4 font-semibold">Role</th>
                 <th className="pb-2 pr-4 font-semibold">Specialty</th>

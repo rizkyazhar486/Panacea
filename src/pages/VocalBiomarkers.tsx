@@ -147,13 +147,13 @@ export function VocalBiomarkers() {
                 <Badge tone={result.shimmerPct <= SHIMMER_NORMAL_MAX ? 'brand' : 'low'}>{result.shimmerPct <= SHIMMER_NORMAL_MAX ? 'Typical' : 'Elevated'}</Badge>
               </div>
             </div>
-            <p className="text-[11px] text-neutral-400">Reference: MDVP-style normal-voice cutoffs (jitter ≤{JITTER_NORMAL_MAX}%, shimmer ≤{SHIMMER_NORMAL_MAX}%) — "elevated" here reflects this specific noisy recording more often than a real vocal issue.</p>
+            <p className="text-[11px] text-neutral-500">Reference: MDVP-style normal-voice cutoffs (jitter ≤{JITTER_NORMAL_MAX}%, shimmer ≤{SHIMMER_NORMAL_MAX}%) — "elevated" here reflects this specific noisy recording more often than a real vocal issue.</p>
             <button onClick={record} className="w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Record again</button>
           </div>
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Autocorrelation-based pitch detection computed entirely in your browser — no audio is uploaded
         or stored anywhere. Educational/experimental use only, not a substitute for a clinical voice
         or neurological evaluation.

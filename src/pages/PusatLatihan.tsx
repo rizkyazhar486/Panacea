@@ -43,7 +43,7 @@ export function PusatLatihan() {
     {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
     <div className="-mt-20 pb-24">
       <Link to="/fitness-hub"
-        className="block rounded-2xl border border-dashed border-white/15 py-2.5 text-center text-[12px] font-bold text-slate-400 transition hover:border-white/30 hover:text-white">
+        className="block rounded-2xl border border-dashed border-white/15 py-2.5 text-center text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
         🔎 Semua alat latihan lainnya
       </Link>
     </div>

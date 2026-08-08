@@ -78,9 +78,9 @@ function PatientView({ email }: { email: string }) {
         {submitted && <p className="mt-2 text-center text-[12px] font-semibold text-brand-dark">Submitted — you'll see the doctor's opinion here once it's ready.</p>}
       </Card>
 
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your requests</div>
-      {loading && <Card className="!p-5 text-center text-sm text-neutral-400">Loading…</Card>}
-      {!loading && requests.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-400">No requests yet.</Card>}
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your requests</div>
+      {loading && <Card className="!p-5 text-center text-sm text-neutral-500">Loading…</Card>}
+      {!loading && requests.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-500">No requests yet.</Card>}
       {requests.map((r) => (
         <Card key={r.id} className="!p-4">
           <div className="flex items-center justify-between gap-2">
@@ -91,7 +91,7 @@ function PatientView({ email }: { email: string }) {
           {r.status === 'completed' && r.finalOpinion && (
             <div className="mt-3 rounded-xl bg-brand/10 p-3">
               <div className="text-[11px] font-bold text-brand-dark">Dr. {r.doctorName}'s opinion</div>
-              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-ink dark:text-white">{r.finalOpinion}</p>
+              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-ink dark:text-ink">{r.finalOpinion}</p>
             </div>
           )}
         </Card>
@@ -141,8 +141,8 @@ function DoctorView({ name, email }: { name: string; email: string }) {
         </p>
       </Card>
 
-      {loading && <Card className="!p-5 text-center text-sm text-neutral-400">Loading…</Card>}
-      {!loading && queue.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-400">No pending requests — queue is clear.</Card>}
+      {loading && <Card className="!p-5 text-center text-sm text-neutral-500">Loading…</Card>}
+      {!loading && queue.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-500">No pending requests — queue is clear.</Card>}
 
       {queue.map((r) => {
         const isOpen = open === r.id
@@ -150,7 +150,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
           <Card key={r.id} className="!p-0 overflow-hidden">
             <button onClick={() => setOpen(isOpen ? null : r.id)} className="flex w-full items-center justify-between gap-3 p-4 text-left">
               <div className="min-w-0">
-                <div className="text-[15px] font-black text-ink dark:text-white">{r.patientName}</div>
+                <div className="text-[15px] font-black text-ink dark:text-ink">{r.patientName}</div>
                 <div className="truncate text-[12px] text-neutral-500">{r.currentDiagnosis || r.symptoms}</div>
               </div>
               <span className="shrink-0 text-neutral-300">{isOpen ? '−' : '+'}</span>
@@ -163,7 +163,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
                   {r.symptoms && <p><b className="text-neutral-500">Symptoms:</b> {r.symptoms}</p>}
                   {r.history && <p><b className="text-neutral-500">History:</b> {r.history}</p>}
                 </div>
-                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-400">Your opinion (AI draft prefilled — edit freely)</div>
+                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-500">Your opinion (AI draft prefilled — edit freely)</div>
                 <textarea
                   className={`${inputClass} mt-1.5 min-h-40`}
                   value={draftText[r.id] ?? ''}
@@ -195,7 +195,7 @@ export function SecondOpinion() {
         ? <DoctorView name={account?.name || 'Doctor'} email={account?.email || ''} />
         : <PatientView email={account?.email || ''} />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         AI drafts a starting analysis, but every second opinion sent to a patient is written and
         approved by a licensed doctor — the same human-in-the-loop review already used for AI-EMR.
         This does not replace an in-person evaluation for anything urgent.

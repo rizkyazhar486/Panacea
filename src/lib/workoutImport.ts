@@ -300,7 +300,7 @@ export const NOTIF_INFO: Record<HrNotification['jenis'], { arti: string; kapanPe
   },
 }
 
-// ── Ringkasan mingguan ──────────────────────────────────────────────────────
+// ── Summary mingguan ──────────────────────────────────────────────────────
 
 export interface WeeklySummary {
   sesi: number

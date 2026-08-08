@@ -92,7 +92,7 @@ export function ShareToFeed({ defaultCaption = '', activity = 'Update' }: { defa
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-base font-black text-ink">Share</h3>
-              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
             <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write something…"

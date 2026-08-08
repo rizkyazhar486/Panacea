@@ -38,7 +38,7 @@ export function ExamQuiz() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-black text-ink">🎓 Latihan Ujian Dokter Internasional</div>
+        <div className="text-xs font-black text-ink">🎓 International Medical Exam Practice</div>
         <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">Skor: {score.correct}/{score.total}</span>
       </div>
 
@@ -64,7 +64,7 @@ export function ExamQuiz() {
           const isPicked = selected === i
           const tone = selected === null ? 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100'
             : isAnswer ? 'bg-brand/15 text-brand-dark font-bold'
-            : isPicked ? 'bg-rose-50 text-rose-600' : 'bg-neutral-50 text-neutral-400'
+            : isPicked ? 'bg-rose-50 text-rose-600' : 'bg-neutral-50 text-neutral-500'
           return (
             <button key={i} onClick={() => answer(i)} disabled={selected !== null}
               className={`block w-full rounded-xl px-3 py-2 text-left text-xs transition disabled:cursor-default ${tone}`}>
@@ -78,11 +78,11 @@ export function ExamQuiz() {
         <div className={`rounded-xl border p-3 text-[12px] leading-relaxed ${selected === q.answer ? 'border-brand/20 bg-brand-50/60 text-brand-dark' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
           <div className="font-bold">{selected === q.answer ? '✓ Benar!' : '✕ Kurang tepat.'}</div>
           <p className="mt-1 opacity-90">{q.explanation}</p>
-          <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Lanjut →</button>
+          <button onClick={next} className="mt-2 rounded-full bg-white/60 px-3 py-1 text-[11px] font-bold text-inherit">Next →</button>
         </div>
       )}
 
-      <p className="text-[10px] leading-relaxed text-neutral-400">
+      <p className="text-[10px] leading-relaxed text-neutral-500">
         Soal latihan orisinal mengikuti format & blueprint ujian masing-masing negara — bukan soal resmi/bocoran (hak cipta milik badan penyelenggara).
       </p>
     </div>

@@ -79,7 +79,7 @@ export function HalamanTab({
 
       {/* key memaksa pemasangan ulang saat tab berganti, sehingga setiap halaman
           menjalankan efek pemuatan datanya sendiri seperti saat dibuka langsung. */}
-      <Suspense fallback={<div className="py-10 text-center text-sm text-slate-500">Memuat…</div>}>
+      <Suspense fallback={<div className="py-10 text-center text-sm text-slate-500">Loading…</div>}>
         <div key={tab.id}><Isi /></div>
       </Suspense>
     </div>

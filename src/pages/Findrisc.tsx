@@ -97,7 +97,7 @@ export function Findrisc() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">FINDRISC Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">FINDRISC Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 26</span>
           <Badge tone={result.tone}>{result.label} risk</Badge>
@@ -113,7 +113,7 @@ export function Findrisc() {
         <CopyNote text={`FINDRISC ${score}/26 — ${result.label.toLowerCase()} 10-year type-2 diabetes risk (${result.risk}) [Lindström & Tuomilehto 2003]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Lindström, J. &amp; Tuomilehto, J. (2003). The Diabetes Risk Score. <i>Diabetes Care</i>, 26(3),
         725-731. Decision-support screen — a raised score is a prompt for prevention and testing, not
         a diagnosis.

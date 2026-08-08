@@ -107,7 +107,7 @@ export function HydrationCalculator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your estimated daily target</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your estimated daily target</div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="text-3xl font-black text-brand-dark">{totalL.toFixed(1)} L</span>
           <span className="text-sm font-semibold text-neutral-500">≈ {glasses} glasses (250 mL each)</span>
@@ -123,7 +123,7 @@ export function HydrationCalculator() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-400">
+        <p className="mt-3 text-[11px] text-neutral-500">
           Includes water from all beverages and food (roughly 20% of intake typically comes from food).
           Spread intake across the day rather than drinking it all at once.
         </p>

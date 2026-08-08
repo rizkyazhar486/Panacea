@@ -5,6 +5,7 @@ import { IconRun, IconActivity, IconTimer } from './icons'
 import type { ImportedWorkout } from '../lib/workoutImport'
 import type { Konteks } from '../lib/trainingPhysiology'
 import { debrief, saranBerikutnya, jadwalPekan, dukungan, statusSingkat } from '../lib/pelatih'
+import { useJam } from '../lib/useJam'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kolom Pelatih — bagian yang berbicara, bukan yang menampilkan angka.
@@ -27,18 +28,22 @@ export function KolomPelatih({
     [workouts],
   )
   const terakhir = urut[0]
-  const saran = useMemo(() => saranBerikutnya(workouts, konteks), [workouts, konteks])
+  // Angka di bawah dihitung terhadap waktu sekarang, jadi `sekarang` harus ikut
+  // menjadi dependensi — kalau tidak, halaman yang dibiarkan terbuka semalaman
+  // akan menampilkan kelelahan kemarin dan terlihat seolah tidak pernah turun.
+  const sekarang = useJam()
+  const saran = useMemo(() => saranBerikutnya(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const db = useMemo(() => (terakhir ? debrief(terakhir, konteks, workouts) : null), [terakhir, konteks, workouts])
-  const status = useMemo(() => statusSingkat(workouts, konteks), [workouts, konteks])
-  const jadwal = useMemo(() => jadwalPekan(workouts, konteks), [workouts, konteks])
-  const dk = useMemo(() => dukungan(workouts, konteks), [workouts, konteks])
+  const status = useMemo(() => statusSingkat(workouts, konteks, sekarang), [workouts, konteks, sekarang])
+  const jadwal = useMemo(() => jadwalPekan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
+  const dk = useMemo(() => dukungan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
 
   if (ringkas) {
     return (
       <Card>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Pelatih · berikutnya</div>
+            <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Coach · next</div>
             <div className="mt-0.5 text-[15px] font-black" style={{ color: saran.warna }}>{saran.judul}</div>
             <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-slate-400">{saran.isi}</p>
           </div>
@@ -47,12 +52,12 @@ export function KolomPelatih({
               <div className="text-xl font-black tabular-nums" style={{ color: status.baca.warna }}>
                 {Math.round(status.kesegaran)}
               </div>
-              <div className="text-[9px] uppercase tracking-wide text-slate-500">Kesegaran</div>
+              <div className="text-[9px] uppercase tracking-wide text-slate-500">Freshness</div>
             </div>
           )}
         </div>
         <Link to="/riwayat-latihan" className="mt-2 block text-[12px] font-bold text-brand-dark hover:underline">
-          Buka pelatih →
+          Open coach →
         </Link>
       </Card>
     )
@@ -62,22 +67,22 @@ export function KolomPelatih({
     <>
       {/* 1. Apa berikutnya */}
       <Card>
-        <SectionTitle icon={<IconRun />} title="Latihan berikutnya"
-          subtitle="Disusun dari sesi terakhir Anda, jarak waktunya, dan kelelahan yang masih terasa" />
+        <SectionTitle icon={<IconRun />} title="Next session"
+          subtitle="Built from your last session, how long ago it was, and the fatigue still with you" />
         <div className="mt-3 rounded-2xl p-4" style={{ background: `${saran.warna}14`, border: `1px solid ${saran.warna}33` }}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-lg font-black" style={{ color: saran.warna }}>{saran.judul}</span>
             <span className="rounded-full bg-black/20 px-2.5 py-0.5 text-[11px] font-bold text-slate-300">{saran.kapan}</span>
           </div>
           <p className="mt-2 text-sm leading-relaxed text-slate-300">{saran.isi}</p>
-          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Dasar: {saran.dasar}</p>
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Basis: {saran.dasar}</p>
         </div>
 
         {status && (
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Angka label="Kebugaran" nilai={Math.round(status.kebugaran)} warna="#60a5fa" />
-            <Angka label="Kelelahan" nilai={Math.round(status.kelelahan)} warna="#f87171" />
-            <Angka label="Kesegaran" nilai={Math.round(status.kesegaran)} warna={status.baca.warna} />
+            <Angka label="Fitness" nilai={Math.round(status.kebugaran)} warna="#60a5fa" />
+            <Angka label="Fatigue" nilai={Math.round(status.kelelahan)} warna="#f87171" />
+            <Angka label="Freshness" nilai={Math.round(status.kesegaran)} warna={status.baca.warna} />
           </div>
         )}
         {status && <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
@@ -89,7 +94,7 @@ export function KolomPelatih({
       {db && (
         <Card>
           <SectionTitle icon={<IconActivity />} title={db.judul}
-            subtitle={terakhir ? new Date(terakhir.mulai).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) : ''} />
+            subtitle={terakhir ? new Date(terakhir.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : ''} />
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full px-2.5 py-1 text-[11px] font-black"
               style={{ background: `${db.klasifikasi.warna}22`, color: db.klasifikasi.warna }}>
@@ -97,7 +102,7 @@ export function KolomPelatih({
             </span>
             {db.klasifikasi.yakin !== 'tinggi' && (
               <span className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-500">
-                keyakinan {db.klasifikasi.yakin}
+                confidence {db.klasifikasi.yakin}
               </span>
             )}
           </div>
@@ -120,8 +125,8 @@ export function KolomPelatih({
 
       {/* 3. Jadwal pekan */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Rencana pekan ini"
-          subtitle="Dua sesi kualitas, satu sesi panjang, sisanya mudah — sengaja sederhana" />
+        <SectionTitle icon={<IconTimer />} title="This week’s plan"
+          subtitle="Two quality sessions, one long, the rest easy — deliberately simple" />
         <div className="mt-3 space-y-1.5">
           {jadwal.map((h) => (
             <div key={h.tanggal}
@@ -132,7 +137,7 @@ export function KolomPelatih({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-bold" style={{ color: h.warna }}>
-                  {h.label}{h.sudah && <span className="ml-1.5 text-[10px] font-bold text-emerald-400">✓ sudah ada sesi</span>}
+                  {h.label}{h.sudah && <span className="ml-1.5 text-[10px] font-bold text-emerald-400">✓ session logged</span>}
                 </div>
                 <div className="text-[11px] leading-snug text-slate-500">{h.isi}</div>
               </div>
@@ -140,8 +145,8 @@ export function KolomPelatih({
           ))}
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-          Rencana ini contoh susunan pekan yang seimbang, bukan perintah. Geser sesi mengikuti hari
-          Anda — yang penting perbandingannya: sebagian besar mudah, sedikit yang keras.
+          This is an example of a balanced week, not an order. Move sessions to fit your days — what
+          matters is the ratio: mostly easy, a little hard.
         </p>
       </Card>
 

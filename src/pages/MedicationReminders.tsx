@@ -87,7 +87,7 @@ export function MedicationReminders() {
       {loading ? (
         <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /></Card>
       ) : reminders.length === 0 ? (
-        <Card className="!p-6 text-center text-sm text-neutral-400">No reminders yet — add your first one above.</Card>
+        <Card className="!p-6 text-center text-sm text-neutral-500">No reminders yet — add your first one above.</Card>
       ) : (
         <div className="space-y-2">
           {reminders
@@ -98,7 +98,7 @@ export function MedicationReminders() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-ink dark:text-white">{r.medName}</span>
+                      <span className="text-sm font-bold text-ink dark:text-ink">{r.medName}</span>
                       <Badge tone={r.active ? 'brand' : 'neutral'}>{r.active ? 'Active' : 'Paused'}</Badge>
                     </div>
                     <div className="mt-0.5 text-xs text-neutral-500">
@@ -115,7 +115,7 @@ export function MedicationReminders() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Reminders repeat daily at the chosen time via push notification — make sure push is turned on in
         Settings. This is a scheduling aid, not a substitute for your prescriber's instructions; always
         follow the dosing on your actual prescription/label.

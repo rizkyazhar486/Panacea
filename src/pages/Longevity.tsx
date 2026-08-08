@@ -240,8 +240,8 @@ export function Longevity() {
             onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
-              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+              title="Save this value across the app (or press Enter)"
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
         </div>
@@ -283,23 +283,23 @@ export function Longevity() {
               <div className="absolute inset-0 grid place-items-center">
                 <div>
                   <div className="text-4xl font-extrabold" style={{ color: scoreColor }}>{score ?? '—'}</div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Longevity Score</div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Longevity Score</div>
                 </div>
               </div>
             </div>
           </div>
           <div className="text-center">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Biological Age (est.)</div>
-            <div className="text-4xl font-extrabold text-ink">{bAge ?? '—'}<span className="text-sm text-neutral-400"> yrs</span></div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Biological Age (est.)</div>
+            <div className="text-4xl font-extrabold text-ink">{bAge ?? '—'}<span className="text-sm text-neutral-500"> yrs</span></div>
             {delta != null && (
               <Badge tone={delta <= 0 ? 'brand' : 'critical'}>
                 {delta <= 0 ? `${Math.abs(delta).toFixed(1)} yrs younger 🎉` : `${delta.toFixed(1)} yrs older`}
               </Badge>
             )}
-            <div className="mt-1 text-[9px] text-neutral-400">vs chronological age {d.age}</div>
+            <div className="mt-1 text-[9px] text-neutral-500">vs chronological age {d.age}</div>
           </div>
         </div>
-        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-400">Fill in at least 4 pillars below to activate your score & biological age.</p>}
+        {score == null && <p className="mt-3 text-center text-[11px] text-neutral-500">Fill in at least 4 pillars below to activate your score & biological age.</p>}
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age"><input className={inputClass} type="number" value={d.age} onChange={(e) => u({ age: +e.target.value })} /></Field>
           <Field label="Sex">
@@ -353,7 +353,7 @@ export function Longevity() {
               <div className="relative mt-1.5 h-1.5 overflow-hidden rounded-full bg-neutral-100">
                 <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${p.score}%`, background: p.score >= 75 ? '#00BF63' : p.score >= 50 ? '#f59e0b' : '#ef4444' }} />
               </div>
-              <div className="mt-1 flex justify-between text-[9px] text-neutral-400">
+              <div className="mt-1 flex justify-between text-[9px] text-neutral-500">
                 <span>{p.why}</span>
                 <span className="shrink-0 font-bold">target {p.target}</span>
               </div>
@@ -368,18 +368,18 @@ export function Longevity() {
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">
-              <div className="text-xs font-bold text-white/60">Your VO₂max is {d.vo2} now →</div>
+              <div className="text-xs font-bold text-ink/60">Your VO₂max is {d.vo2} now →</div>
               <div className="mt-2 grid grid-cols-2 gap-3 text-center">
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Age 60</div>
-                  <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj60.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj60.trained.toFixed(0)}</span></div>
+                  <div className="text-[10px] uppercase text-ink/50">Age 60</div>
+                  <div className="text-lg font-extrabold"><span className="text-rose-600">{vo2Proj60.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj60.trained.toFixed(0)}</span></div>
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase text-white/50">Age 80</div>
-                  <div className="text-lg font-extrabold"><span className="text-rose-400">{vo2Proj80.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj80.trained.toFixed(0)}</span></div>
+                  <div className="text-[10px] uppercase text-ink/50">Age 80</div>
+                  <div className="text-lg font-extrabold"><span className="text-rose-600">{vo2Proj80.untrained.toFixed(0)}</span> vs <span className="text-brand">{vo2Proj80.trained.toFixed(0)}</span></div>
                 </div>
               </div>
-              <p className="mt-2 text-[10px] leading-relaxed text-white/70">
+              <p className="mt-2 text-[10px] leading-relaxed text-ink/70">
                 Independence threshold ≈18 (climbing stairs, carrying groceries). {vo2Proj80.untrained < 18 ? '⚠️ Without training, you are projected to fall BELOW the independence threshold by age 80 — the trained path keeps you above it.' : 'Both paths stay above the threshold — keep it up.'}
                 {' '}Red = untrained · Green = trained regularly.
               </p>
@@ -391,7 +391,7 @@ export function Longevity() {
               </div>
             )}
           </div>
-        ) : <p className="mt-2 text-[11px] text-neutral-400">Fill in VO₂max (and grip) to see your projection at ages 60 & 80.</p>}
+        ) : <p className="mt-2 text-[11px] text-neutral-500">Fill in VO₂max (and grip) to see your projection at ages 60 & 80.</p>}
       </Card>
 
       {/* Lab sharpening */}
@@ -403,7 +403,7 @@ export function Longevity() {
           {num('hsCRP (mg/L)', 'crp', 0.1, '<1')}
           {num('Systolic (mmHg)', 'sbp', 1, '<118')}
         </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+        <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
           Markers above target add to your biological age (a heuristic inspired by PhenoAge — not a substitute for medical judgment).
           Discuss your lab results with your doctor; the <a href="#/chatbot" className="font-bold text-brand-dark underline">AI Consultation</a> feature can help you prepare questions.
         </p>
@@ -424,11 +424,11 @@ export function Longevity() {
               <div key={p.id} className="flex items-center gap-2 rounded-xl border border-neutral-100 p-3">
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold">{p.label}</div>
-                  <div className="text-[10px] text-neutral-400">every {p.freqM} mo · {p.where}</div>
+                  <div className="text-[10px] text-neutral-500">every {p.freqM} mo · {p.where}</div>
                 </div>
                 <Badge tone={overdue ? 'critical' : 'brand'}>{dueTxt}</Badge>
                 <button onClick={() => u({ tests: { ...d.tests, [p.id]: new Date().toISOString() } })}
-                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-white active:scale-95">✓ Done</button>
+                  className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-[10px] font-bold text-ink active:scale-95">✓ Done</button>
               </div>
             )
           })}

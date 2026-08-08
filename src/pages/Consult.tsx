@@ -78,7 +78,7 @@ export function Consult() {
       id: uid(),
       to: account?.email ?? '',
       subject: `Consultation scheduled with ${name}`,
-      body: `Your consultation session (Rp${FEE.toLocaleString('id-ID')}, paid via ${pay}) has been scheduled. The session link will be sent before the appointment.`,
+      body: `Your consultation session (Rp${FEE.toLocaleString('en-GB')}, paid via ${pay}) has been scheduled. The session link will be sent before the appointment.`,
       at,
     })
     setDone(name)
@@ -119,13 +119,13 @@ export function Consult() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-brand-50 p-3">
             <div className="text-sm text-brand-dark">
-              <b>Rp{AI_FEE.toLocaleString('id-ID')}</b> for the AI consultation — includes referral to a registered specialist.
+              <b>Rp{AI_FEE.toLocaleString('en-GB')}</b> for the AI consultation — includes referral to a registered specialist.
             </div>
             <Button onClick={payAITriage} disabled={!complaint.trim()}>
               <IconCheck size={16} /> Pay & Start AI Triage
             </Button>
           </div>
-          <p className="mt-2 text-[11px] text-neutral-400">
+          <p className="mt-2 text-[11px] text-neutral-500">
             Need a full assessment first? Open the <Link to="/chatbot" className="font-semibold text-brand-dark">AI Chatbot</Link>.
           </p>
         </Card>
@@ -178,7 +178,7 @@ export function Consult() {
       )}
       {result && recommended.length > 0 && (
         <div className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm ring-1 ring-black/5">
-          <IconSearch size={18} className="text-neutral-400" />
+          <IconSearch size={18} className="text-neutral-500" />
           <input value={docQuery} onChange={(e) => setDocQuery(e.target.value)} placeholder="Search for a doctor or specialty…" className="w-full bg-transparent text-sm outline-none" />
         </div>
       )}
@@ -187,7 +187,7 @@ export function Consult() {
           {recommended.filter((d) => { const x = docQuery.trim().toLowerCase(); return !x || d.name.toLowerCase().includes(x) || d.specialty.toLowerCase().includes(x) }).map((d) => {
             const isRec = d.tag === result.tag
             return (
-              <Card key={d.name} hover className={`flex h-full flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
+              <Card key={d.name} className={`flex h-full flex-col ${isRec ? 'ring-2 ring-brand' : ''}`}>
                 <div className="flex items-start gap-3">
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">
                     <IconStethoscope size={22} />
@@ -205,7 +205,7 @@ export function Consult() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('id-ID')}<span className="text-xs font-medium text-neutral-400">/session</span></span>
+                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('en-GB')}<span className="text-xs font-medium text-neutral-500">/session</span></span>
                   <div className="flex gap-2">
                     {backendEnabled && (
                       <Button variant="outline" onClick={() => setChatRoom('consult-' + slug(d.name))} disabled={!d.online}>Chat</Button>
@@ -245,15 +245,15 @@ export function Consult() {
 
 function Sessions() {
   const { state } = useStore()
-  if (state.consults.length === 0) return <p className="text-sm text-neutral-400">No consultation sessions yet.</p>
+  if (state.consults.length === 0) return <p className="text-sm text-neutral-500">No consultation sessions yet.</p>
   return (
     <div className="space-y-2">
       {state.consults.map((c) => (
         <div key={c.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-sm">
           <span className="font-medium">{c.doctorName}</span>
           <span className="flex items-center gap-2 text-xs text-neutral-500">
-            {new Date(c.at).toLocaleString('id-ID')}
-            <Badge tone="brand">Rp{c.feeIdr.toLocaleString('id-ID')}</Badge>
+            {new Date(c.at).toLocaleString('en-GB')}
+            <Badge tone="brand">Rp{c.feeIdr.toLocaleString('en-GB')}</Badge>
           </span>
         </div>
       ))}

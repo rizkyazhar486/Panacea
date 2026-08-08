@@ -79,7 +79,7 @@ export function Ikigai() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-sm font-black uppercase tracking-wide text-neutral-400">The Ikigai map</div>
+        <div className="text-sm font-black uppercase tracking-wide text-neutral-500">The Ikigai map</div>
         <p className="mt-1 text-[12px] text-neutral-500">Fill in as many as you can — one honest sentence each is enough.</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="What I love"><textarea className={taClass} rows={2} value={d.love} onChange={(e) => set('love', e.target.value)} placeholder="Activities that make you lose track of time" /></Field>
@@ -106,7 +106,7 @@ export function Ikigai() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-sm font-black uppercase tracking-wide text-neutral-400">Legacy letter</div>
+        <div className="text-sm font-black uppercase tracking-wide text-neutral-500">Legacy letter</div>
         <p className="mt-1 text-[12px] text-neutral-500">A short letter to your future self — revisit and update it any time.</p>
         <div className="mt-3 space-y-3">
           <Field label="What matters most to me"><textarea className={taClass} rows={2} value={d.mattersMost} onChange={(e) => set('mattersMost', e.target.value)} /></Field>
@@ -124,13 +124,13 @@ export function Ikigai() {
 
 function Overlap({ label, active, hint }: { label: string; active: boolean; hint: string }) {
   return (
-    <div className={`rounded-xl border p-2.5 text-center transition-colors ${active ? 'border-brand/30 bg-brand-50 text-brand-dark' : 'border-neutral-100 bg-neutral-50 text-neutral-400'}`}>
+    <div className={`rounded-xl border p-2.5 text-center transition-colors ${active ? 'border-brand/30 bg-brand-50 text-brand-dark' : 'border-neutral-100 bg-neutral-50 text-neutral-500'}`}>
       <div className="text-xs font-black">{label}</div>
       <div className="text-[10px]">{hint}</div>
     </div>
   )
 }
 
-const taClass = 'w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none'
+const taClass = 'w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20 resize-none'
 
 export default Ikigai

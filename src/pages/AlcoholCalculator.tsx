@@ -76,7 +76,7 @@ export function AlcoholCalculator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What did you drink?</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What did you drink?</div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {DRINKS.map((d) => (
             <Field key={d.label} label={`${d.icon} ${d.label}`}>
@@ -98,7 +98,7 @@ export function AlcoholCalculator() {
 
       {totalGrams > 0 && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Estimate</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Estimate</div>
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
               <div className="text-2xl font-black text-brand-dark">{totalUnitsUK.toFixed(1)}</div>
@@ -110,7 +110,7 @@ export function AlcoholCalculator() {
             </div>
           </div>
           <div className="mt-4 rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{bacPermille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">({bacPercent.toFixed(3)}% BAC)</span></div>
+            <div className="text-2xl font-black text-amber-700 dark:text-amber-300">{bacPermille.toFixed(2)}‰ <span className="text-sm font-semibold text-amber-600 dark:text-amber-700">({bacPercent.toFixed(3)}% BAC)</span></div>
             <p className="mt-1 text-[11px] leading-relaxed text-amber-700/80 dark:text-amber-300/80">
               Estimated blood alcohol concentration right now, {hoursElapsed}h after you started drinking. Legal
               driving limits vary by country and this estimate can be meaningfully off in either direction —
@@ -120,7 +120,7 @@ export function AlcoholCalculator() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimate only, not a medical or legal determination. If alcohol use is a concern for
         you or someone you know, please talk to a clinician — support is available and effective.
       </div>

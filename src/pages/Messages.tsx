@@ -55,7 +55,7 @@ export function Messages() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">💬</span>
         <div>
           <h1 className="text-lg font-black text-ink">Messages</h1>
-          <p className="text-xs text-neutral-400">Send messages & video calls between users</p>
+          <p className="text-xs text-neutral-500">Send messages & video calls between users</p>
         </div>
       </div>
 
@@ -75,7 +75,7 @@ export function Messages() {
           className="flex-1 rounded-xl border border-neutral-200 px-3 py-2.5 text-sm outline-none focus:border-brand"
         />
         <button onClick={start} disabled={!draft.trim()} aria-label="Start conversation"
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white disabled:opacity-40"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink disabled:opacity-40"
           style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           <IconSend size={18} />
         </button>
@@ -86,10 +86,10 @@ export function Messages() {
         <div className="space-y-2">
           <button onClick={() => setOpen(null)} className="text-xs font-bold text-brand-dark">← All messages</button>
           <ConsultChat room={dmRoom(me, open.peer)} name={me} title={`💬 ${open.peer}`} />
-          <p className="text-center text-[10px] text-neutral-400">Ask your friend to open a chat with the code/name <b>{me}</b> to connect to the same room.</p>
+          <p className="text-center text-[10px] text-neutral-500">Ask your friend to open a chat with the code/name <b>{me}</b> to connect to the same room.</p>
         </div>
       ) : threads.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
+        <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-500">
           No conversations yet. Enter a friend's name/code above to get started.
         </div>
       ) : (
@@ -102,7 +102,7 @@ export function Messages() {
                 </span>
                 <span className="flex-1 truncate text-sm font-semibold text-ink">{t.peer}</span>
               </button>
-              <button onClick={() => remove(t.id)} aria-label="Delete conversation" className="grid h-8 w-8 place-items-center rounded-full text-neutral-300 hover:bg-neutral-100 hover:text-red-400">
+              <button onClick={() => remove(t.id)} aria-label="Delete conversation" className="grid h-8 w-8 place-items-center rounded-full text-neutral-300 hover:bg-neutral-100 hover:text-red-600">
                 <IconX size={16} />
               </button>
             </div>

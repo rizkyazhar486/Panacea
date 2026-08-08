@@ -68,7 +68,7 @@ export default function ClinicalSkillsSection() {
 
       {grouped.map(([cat, skills]) => (
         <Card key={cat} className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{cat}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{cat}</div>
           <div className="mt-2 space-y-2">
             {skills.map((s) => {
               const isOpen = openId === s.id
@@ -138,8 +138,8 @@ export default function ClinicalSkillsSection() {
                       {s.komplikasi && <Block title="Komplikasi" items={s.komplikasi} />}
 
                       <div>
-                        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Referensi</div>
-                        <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Referensi</div>
+                        <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
                           {s.referensi.map((k) => (
                             <li key={k}>{REFERENSI_SUMBER[k] ?? k}</li>
                           ))}
@@ -155,10 +155,10 @@ export default function ClinicalSkillsSection() {
       ))}
 
       {filtered.length === 0 && (
-        <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>
+        <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil — coba kata kunci lain.</p>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Materi latihan untuk persiapan ujian keterampilan. Seluruh tindakan harus dipelajari dan
         dikerjakan di bawah supervisi klinis langsung — panduan tertulis tidak menggantikan latihan
         terbimbing dan penilaian kompetensi.
@@ -169,7 +169,7 @@ export default function ClinicalSkillsSection() {
 
 function Block({ title, items, tone }: { title: string; items: string[]; tone?: 'warn' | 'tip' }) {
   const color =
-    tone === 'warn' ? 'text-rose-600 dark:text-rose-400' : tone === 'tip' ? 'text-amber-700 dark:text-amber-300' : 'text-brand-dark'
+    tone === 'warn' ? 'text-rose-600 dark:text-rose-600' : tone === 'tip' ? 'text-amber-700 dark:text-amber-300' : 'text-brand-dark'
   return (
     <div>
       <div className={`text-[11px] font-black uppercase tracking-wide ${color}`}>{title}</div>

@@ -166,7 +166,7 @@ export function FirstAidGuide() {
         </div>
       </Card>
 
-      {filtered.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-400">No guide matches "{query}".</Card>}
+      {filtered.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-500">No guide matches "{query}".</Card>}
 
       {filtered.map((g) => {
         const isOpen = open === g.id
@@ -175,7 +175,7 @@ export function FirstAidGuide() {
             <button onClick={() => setOpen(isOpen ? null : g.id)} className="flex w-full items-center gap-3 p-4 text-left">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-50 text-xl dark:bg-red-500/10">{g.emoji}</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-black text-ink dark:text-white">{g.title}</div>
+                <div className="text-[15px] font-black text-ink dark:text-ink">{g.title}</div>
                 <Badge tone="low">{g.category}</Badge>
               </div>
               <span className="shrink-0 text-neutral-300">{isOpen ? '−' : '+'}</span>
@@ -185,11 +185,11 @@ export function FirstAidGuide() {
                 <div className="rounded-xl bg-red-50 p-3 text-[12px] leading-relaxed text-red-700 dark:bg-red-500/10 dark:text-red-300">
                   <b>Call emergency services when:</b> {g.whenToCall911}
                 </div>
-                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-400">Steps</div>
+                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-500">Steps</div>
                 <ol className="mt-1.5 list-inside list-decimal space-y-1.5 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-300">
                   {g.steps.map((s, i) => <li key={i}>{s}</li>)}
                 </ol>
-                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-400">Do not</div>
+                <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-500">Do not</div>
                 <ul className="mt-1.5 list-inside list-disc space-y-1 text-[13px] leading-relaxed text-neutral-500">
                   {g.doNot.map((s, i) => <li key={i}>{s}</li>)}
                 </ul>
@@ -199,7 +199,7 @@ export function FirstAidGuide() {
         )
       })}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Based on standard lay-rescuer sequences (Red Cross / American Heart Association bystander
         guidance). Educational reference only — take an accredited first aid / CPR course for hands-on
         training, and always call your local emergency number in a real emergency.

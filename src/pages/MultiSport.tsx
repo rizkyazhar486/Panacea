@@ -18,7 +18,7 @@ type Tab = 'banding' | 'lari' | 'sepeda' | 'renang' | 'kecepatan' | 'jadwal'
 const ARAH_STYLE: Record<string, string> = {
   memperbaiki: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
   merusak: 'bg-rose-500/10 border-rose-500/30 text-rose-300',
-  netral: 'bg-slate-500/10 border-slate-500/30 text-slate-300',
+  netral: 'bg-slate-500/10 border-slate-500/30 text-neutral-600',
 }
 const ARAH_LABEL: Record<string, string> = {
   memperbaiki: 'Memperbaiki postur',
@@ -31,12 +31,12 @@ export function MultiSport() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Lari, Sepeda, Renang" subtitle="Zona intensitas, kerja kecepatan, dan postur untuk tiga cabang" />
+      <SectionTitle icon={<IconRun />} title="Lari, Sepeda, Renang" subtitle="Intensity zones, speed work, and posture for three sports" />
 
       <Card>
-        <p className="text-sm text-slate-300 leading-relaxed">
+        <p className="text-sm text-neutral-600 leading-relaxed">
           Intensitas pada ketiga cabang ini diatur oleh prinsip yang sama — ambang laktat — tetapi
-          <strong className="text-white"> satuannya berbeda</strong>: lari memakai pace, sepeda memakai watt,
+          <strong className="text-ink"> satuannya berbeda</strong>: lari memakai pace, sepeda memakai watt,
           renang memakai waktu per 100 meter. Menyamakan "zona 3" antar cabang tanpa mengukur ambang
           masing-masing menghasilkan intensitas yang salah pada hampir setiap sesi. Halaman ini menghitung
           ketiganya secara terpisah.
@@ -56,7 +56,7 @@ export function MultiSport() {
             key={k}
             onClick={() => setTab(k)}
             className={`px-3 py-1.5 rounded-lg text-sm border transition ${
-              tab === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-slate-400 hover:text-slate-200'
+              tab === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-neutral-500 hover:text-ink'
             }`}
           >
             {label}
@@ -76,8 +76,8 @@ export function MultiSport() {
         <div className="space-y-3 mt-2">
           {CROSS_RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-              <div className="text-sm font-semibold text-white">{r.judul}</div>
-              <p className="text-sm text-slate-400 mt-1 leading-relaxed">{r.isi}</p>
+              <div className="text-sm font-semibold text-ink">{r.judul}</div>
+              <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{r.isi}</p>
             </div>
           ))}
         </div>
@@ -93,20 +93,20 @@ function CompareTab() {
         <Card key={s.key}>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-2xl">{s.emoji}</span>
-            <span className="text-lg font-semibold text-white">{s.nama}</span>
+            <span className="text-lg font-semibold text-ink">{s.nama}</span>
             <span className={`px-2 py-0.5 rounded-md text-xs border ${ARAH_STYLE[s.posturArah]}`}>
               {ARAH_LABEL[s.posturArah]}
             </span>
           </div>
 
           <div className="mt-3 grid gap-2 text-sm">
-            <div><span className="text-slate-500">Satuan intensitas:</span> <span className="text-slate-300">{s.satuan}</span></div>
-            <div><span className="text-slate-500">Cara mengukur ambang:</span> <span className="text-slate-300">{s.tesAmbang}</span></div>
+            <div><span className="text-slate-500">Satuan intensitas:</span> <span className="text-neutral-600">{s.satuan}</span></div>
+            <div><span className="text-slate-500">Cara mengukur ambang:</span> <span className="text-neutral-600">{s.tesAmbang}</span></div>
           </div>
 
           <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="text-xs uppercase tracking-wide text-slate-500">Beban sendi</div>
-            <p className="text-sm text-slate-400 mt-1 leading-relaxed">{s.bebanSendi}</p>
+            <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{s.bebanSendi}</p>
           </div>
 
           <div className={`mt-2 rounded-lg border p-3 ${ARAH_STYLE[s.posturArah]}`}>
@@ -130,7 +130,7 @@ function RunTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Zona pace lari" subtitle="Dari pace lomba Anda" />
+      <SectionTitle icon={<IconTimer />} title="Zona pace lari" subtitle="From your race pace" />
       <Field label="Pace lomba (menit:detik per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
@@ -142,7 +142,7 @@ function RunTab() {
             return (
               <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-semibold text-white text-sm">{z.name}</span>
+                  <span className="font-semibold text-ink text-sm">{z.name}</span>
                   <span className="text-base font-bold tabular-nums text-sky-300">{fmtPace(a)}–{fmtPace(b)}</span>
                 </div>
                 <div className="text-xs text-slate-500 mt-0.5">{z.tujuan}</div>
@@ -151,9 +151,9 @@ function RunTab() {
           })}
         </div>
       )}
-      <p className="text-sm text-slate-400 mt-4 leading-relaxed">
+      <p className="text-sm text-neutral-500 mt-4 leading-relaxed">
         Untuk penjelasan lengkap tiap jenis lari beserta kesalahan yang paling sering, lihat halaman
-        <strong className="text-white"> Latihan Dasar &amp; Postur</strong>.
+        <strong className="text-ink"> Foundation Training &amp; Postur</strong>.
       </p>
     </Card>
   )
@@ -169,7 +169,7 @@ function BikeTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconChartUp />} title="Zona daya sepeda" subtitle="Dari tes 20 menit semaksimal mungkin" />
+        <SectionTitle icon={<IconChartUp />} title="Zona daya sepeda" subtitle="From an all-out 20-minute test" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Daya rata-rata 20 menit (watt)">
@@ -185,13 +185,13 @@ function BikeTab() {
         ) : (
           <>
             <div className="mt-3 flex flex-wrap items-baseline gap-3">
-              <div className="text-sm text-slate-400">
-                FTP ≈ <span className="text-white font-bold text-lg tabular-nums">{ftp}</span> watt
+              <div className="text-sm text-neutral-500">
+                FTP ≈ <span className="text-ink font-bold text-lg tabular-nums">{ftp}</span> watt
                 <span className="text-xs text-slate-500 ml-1">(95% dari daya 20 menit)</span>
               </div>
               {wkg != null && (
-                <div className="text-sm text-slate-400">
-                  <span className="text-white font-bold tabular-nums">{wkg}</span> watt/kg
+                <div className="text-sm text-neutral-500">
+                  <span className="text-ink font-bold tabular-nums">{wkg}</span> watt/kg
                 </div>
               )}
             </div>
@@ -200,7 +200,7 @@ function BikeTab() {
             <div className="overflow-x-auto mt-4">
               <table className="w-full text-sm min-w-[460px]">
                 <thead>
-                  <tr className="text-slate-400 border-b border-white/10">
+                  <tr className="text-neutral-500 border-b border-white/10">
                     <th className="text-left py-2 pr-3 font-medium">Zona</th>
                     <th className="text-left py-2 pr-3 font-medium">Watt</th>
                     <th className="text-left py-2 pr-3 font-medium">Tujuan</th>
@@ -212,9 +212,9 @@ function BikeTab() {
                     const [lo, hi] = powerRange(ftp, z)
                     return (
                       <tr key={z.n} className="border-b border-white/5">
-                        <td className="py-2 pr-3 text-white font-semibold whitespace-nowrap">Z{z.n} {z.nama}</td>
+                        <td className="py-2 pr-3 text-ink font-semibold whitespace-nowrap">Z{z.n} {z.nama}</td>
                         <td className="py-2 pr-3 tabular-nums text-sky-300 whitespace-nowrap">{lo}–{hi ?? '∞'}</td>
-                        <td className="py-2 pr-3 text-slate-400">{z.tujuan}</td>
+                        <td className="py-2 pr-3 text-neutral-500">{z.tujuan}</td>
                         <td className="py-2 text-slate-500 whitespace-nowrap">{z.durasi}</td>
                       </tr>
                     )
@@ -227,12 +227,12 @@ function BikeTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Penyetelan sepeda" subtitle="Angka yang menentukan nyeri lutut, leher, dan punggung" />
+        <SectionTitle icon={<IconActivity />} title="Penyetelan sepeda" subtitle="The numbers behind knee, neck, and back pain" />
         <div className="space-y-2 mt-2">
           {BIKE_FIT.map((f) => (
             <div key={f.bagian} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-              <div className="font-semibold text-white text-sm">{f.bagian}</div>
-              <div className="text-sm text-slate-400 mt-1">{f.patokan}</div>
+              <div className="font-semibold text-ink text-sm">{f.bagian}</div>
+              <div className="text-sm text-neutral-500 mt-1">{f.patokan}</div>
               <div className="text-sm text-amber-300/90 mt-1"><span className="text-amber-500/80">Bila salah:</span> {f.bilaSalah}</div>
             </div>
           ))}
@@ -242,7 +242,7 @@ function BikeTab() {
       <Card>
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
           <div className="text-sm font-semibold text-rose-300">Sepeda memerlukan latihan penyeimbang — renang tidak</div>
-          <p className="text-sm text-slate-300 mt-1 leading-relaxed">
+          <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
             Bersepeda menahan punggung membungkuk dengan leher mendongak selama berjam-jam, yaitu persis pola
             postur yang ingin diperbaiki. Tanpa penyeimbang, semakin banyak bersepeda semakin kuat pola itu
             tertanam.
@@ -252,10 +252,10 @@ function BikeTab() {
           {CYCLING_COUNTER.map((c) => (
             <div key={c.nama} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-white text-sm">{c.nama}</span>
-                <span className="text-xs text-slate-400">{c.dosis}</span>
+                <span className="font-semibold text-ink text-sm">{c.nama}</span>
+                <span className="text-xs text-neutral-500">{c.dosis}</span>
               </div>
-              <p className="text-sm text-slate-400 mt-1">{c.kenapa}</p>
+              <p className="text-sm text-neutral-500 mt-1">{c.kenapa}</p>
             </div>
           ))}
         </div>
@@ -278,7 +278,7 @@ function SwimTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="Dari tes 400 m dan 200 m semaksimal mungkin" />
+        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="From all-out 400 m and 200 m tests" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Waktu 400 m (menit:detik)">
@@ -295,8 +295,8 @@ function SwimTab() {
           </p>
         ) : (
           <>
-            <div className="mt-3 text-sm text-slate-400">
-              CSS ≈ <span className="text-white font-bold text-lg tabular-nums">{fmtPace(css.cssPer100)}</span> per 100 m
+            <div className="mt-3 text-sm text-neutral-500">
+              CSS ≈ <span className="text-ink font-bold text-lg tabular-nums">{fmtPace(css.cssPer100)}</span> per 100 m
               <span className="text-xs text-slate-500 ml-2">({css.css} m/detik)</span>
             </div>
 
@@ -307,13 +307,13 @@ function SwimTab() {
                 return (
                   <div key={z.nama} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <span className="font-semibold text-white text-sm">{z.nama}</span>
+                      <span className="font-semibold text-ink text-sm">{z.nama}</span>
                       <span className="text-base font-bold tabular-nums text-sky-300">
                         {fmtPace(Math.min(lo, hi))}–{fmtPace(Math.max(lo, hi))} /100 m
                       </span>
                     </div>
                     <div className="text-xs text-slate-500 mt-0.5">{z.tujuan}</div>
-                    <div className="text-sm text-slate-400 mt-1">{z.contoh}</div>
+                    <div className="text-sm text-neutral-500 mt-1">{z.contoh}</div>
                   </div>
                 )
               })}
@@ -325,16 +325,16 @@ function SwimTab() {
       <Card>
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
           <div className="text-sm font-semibold text-emerald-300">Renang adalah satu-satunya dari ketiganya yang memperbaiki postur</div>
-          <p className="text-sm text-slate-300 mt-1 leading-relaxed">
+          <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
             Gaya bebas dan gaya punggung menarik lengan ke belakang melawan tahanan air, sehingga menguatkan
             latissimus dorsi, rhomboid, dan trapezius bawah — otot yang justru melemah akibat duduk dan berdiri
             membungkuk. Gerakannya juga meregangkan dada dan melatih rotasi punggung atas yang biasanya kaku.
-            Untuk tujuan postur, <strong className="text-white">gaya punggung adalah yang paling bermanfaat</strong>.
+            Untuk tujuan postur, <strong className="text-ink">gaya punggung adalah yang paling bermanfaat</strong>.
           </p>
         </div>
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mt-3">
           <div className="text-sm font-semibold text-amber-300">Satu hal yang perlu dijaga</div>
-          <p className="text-sm text-slate-300 mt-1 leading-relaxed">
+          <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
             Nyeri bahu pada perenang hampir selalu berasal dari volume yang naik terlalu cepat dan dari tangan
             yang menyeberang garis tengah tubuh saat masuk air. Bila bahu mulai nyeri, yang perlu diperbaiki
             lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.
@@ -352,9 +352,9 @@ function SpeedTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <p className="text-sm text-slate-300 leading-relaxed">
+        <p className="text-sm text-neutral-600 leading-relaxed">
           Kerja kecepatan berbeda dari kerja daya tahan pada satu hal yang paling sering dilanggar:
-          <strong className="text-white"> jeda harus panjang sampai benar-benar pulih</strong>. Begitu jeda
+          <strong className="text-ink"> jeda harus panjang sampai benar-benar pulih</strong>. Begitu jeda
           dipersingkat, sesi berubah menjadi latihan daya tahan anaerobik dan tujuan kecepatannya hilang.
         </p>
       </Card>
@@ -364,7 +364,7 @@ function SpeedTab() {
           <button
             key={k}
             onClick={() => setF(k)}
-            className={`px-3 py-1 rounded-lg text-xs border ${f === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-slate-400'}`}
+            className={`px-3 py-1 rounded-lg text-xs border ${f === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-neutral-500'}`}
           >
             {l}
           </button>
@@ -374,12 +374,12 @@ function SpeedTab() {
       {list.map((s) => (
         <Card key={s.nama + s.sport}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-white">{s.nama}</span>
+            <span className="font-semibold text-ink">{s.nama}</span>
             <Badge>{SPORTS.find((x) => x.key === s.sport)?.nama}</Badge>
             <span className="text-xs text-slate-500">{s.kapan}</span>
           </div>
           <div className="text-sm text-sky-300 mt-2">{s.isi}</div>
-          <p className="text-sm text-slate-400 mt-2 leading-relaxed">{s.kenapa}</p>
+          <p className="text-sm text-neutral-500 mt-2 leading-relaxed">{s.kenapa}</p>
         </Card>
       ))}
     </div>
@@ -412,7 +412,7 @@ function ScheduleTab() {
           <button
             key={k}
             onClick={() => setGoal(k)}
-            className={`px-3 py-1.5 rounded-lg text-sm border ${goal === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-slate-400'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm border ${goal === k ? 'bg-white/10 border-white/30 text-white' : 'border-white/10 text-neutral-500'}`}
           >
             {l}
           </button>
@@ -421,9 +421,9 @@ function ScheduleTab() {
 
       {goal === 'postur' && (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 mt-3">
-          <p className="text-sm text-slate-300 leading-relaxed">
-            Pada tujuan postur, porsi <strong className="text-white">renang dan latihan tarik diperbesar</strong>
-            {' '}sementara <strong className="text-white">sepeda dibatasi dan selalu disusul penyeimbang</strong> —
+          <p className="text-sm text-neutral-600 leading-relaxed">
+            Pada tujuan postur, porsi <strong className="text-ink">renang dan latihan tarik diperbesar</strong>
+            {' '}sementara <strong className="text-ink">sepeda dibatasi dan selalu disusul penyeimbang</strong> —
             karena keduanya bekerja ke arah yang berlawanan terhadap postur.
           </p>
         </div>
@@ -433,9 +433,9 @@ function ScheduleTab() {
         {plan.map((d) => (
           <div key={d.hari} className={`rounded-lg border p-3 ${warna[d.sport]}`}>
             <div className="flex flex-wrap items-baseline gap-2">
-              <span className="font-semibold text-white w-16">{d.hari}</span>
+              <span className="font-semibold text-ink w-16">{d.hari}</span>
               <span>{emoji[d.sport]}</span>
-              <span className="text-sm text-slate-300 flex-1 min-w-[180px]">{d.isi}</span>
+              <span className="text-sm text-neutral-600 flex-1 min-w-[180px]">{d.isi}</span>
             </div>
             <div className="text-xs text-slate-500 mt-1 pl-16">{d.fokus}</div>
           </div>

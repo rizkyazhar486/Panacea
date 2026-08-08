@@ -316,13 +316,13 @@ export const ARKETIPE: Arketipe[] = [
     kenapa: 'Semua gerakannya bodyweight. Kemajuan datang dari menjadi lebih kuat pada tubuh Anda sendiri, bukan dari menambah beban.' },
   { id: 'baja', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_21649ae4-79ce-4e0e-a789-7bb8e5553e63.png', ikon: '🛡️', nama: 'Sang Perisai', sifat: 'Ketahanan yang tidak habis-habis',
     latihan: 'Daya tahan jangka panjang', format: 'Murph (diskalakan) atau HYROX',
-    kenapa: 'Sesi panjang menguji hal berbeda dari sesi keras: kemampuan tetap bergerak rapi setelah menit ke-40.' },
+    kenapa: 'Long sessions test something different from hard ones: staying technically clean past the 40-minute mark.' },
   { id: 'mesin', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084027_a2c19749-889e-43f1-9508-941866f19330.png', ikon: '⚙️', nama: 'Sang Perekayasa', sifat: 'Menang lewat perhitungan dan alat, bukan otot',
     latihan: 'Pacing dan strategi', format: 'AMRAP apa pun dengan rencana pecah repetisi',
     kenapa: 'Tulis rencana pecah repetisi SEBELUM jam mulai, lalu ikuti. Ini keterampilan yang paling cepat menaikkan skor.' },
   { id: 'raksasa', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_b39923ca-18a1-48f1-a12f-4e162cfa4905.png', ikon: '💪', nama: 'Sang Raksasa', sifat: 'Kekuatan mentah, ledakan pendek',
     latihan: 'Kekuatan maksimal', format: 'Grace atau Karen',
-    kenapa: 'Sesi pendek dan berat. Justru arketipe ini yang paling perlu menahan diri: kekuatan mentah tanpa teknik adalah cara tercepat menuju cedera punggung.' },
+    kenapa: 'Short and heavy. This archetype most needs restraint: raw strength without technique is the fastest route to a back injury.' },
   { id: 'petir', gambar: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_084202_737ab391-d512-4aa6-83d8-45187a8ff5de.png', ikon: '⚡', nama: 'Sang Pelari Cepat', sifat: 'Kecepatan di atas segalanya',
     latihan: 'Tenaga anaerobik', format: 'Fran atau Tabata',
     kenapa: 'Semuanya selesai di bawah sepuluh menit. Menyenangkan — dan justru karena itu paling sering dikerjakan terlalu sering.' },
@@ -350,7 +350,7 @@ export const RABDO: Peringatan = {
 export const GAMBAR_SKALA = 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260807_083753_1db052b0-69e3-4d43-9fc4-4f8a8a4325ef.png'
 
 export const ATURAN_AMAN = [
-  'Skalakan sampai sesi selesai dalam rentang waktu yang disarankan. Sesi yang molor dua kali lipat bukan versi "lebih keras" — itu sesi yang salah dosis.',
+  'Scale until the session finishes inside the suggested time range. A session that runs twice as long is not a harder version — it is the wrong dose.',
   'Pekan pertama: kerjakan setengah volume apa pun yang tertulis, tanpa kecuali. Termasuk kalau Anda merasa bugar dari olahraga lain.',
   'Berhenti saat teknik rusak, bukan saat repetisi habis. Repetisi dengan punggung membulat tidak "tetap dihitung" oleh tubuh Anda.',
   'Jangan mengerjakan dua sesi bervolume tinggi berturut-turut. Angie, Chelsea, Barbara dan Murph masing-masing butuh 48-72 jam pulih.',

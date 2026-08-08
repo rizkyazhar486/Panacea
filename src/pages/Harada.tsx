@@ -166,13 +166,13 @@ export function Harada() {
       />
 
       <Card>
-        <p className="text-sm leading-relaxed text-slate-300">
+        <p className="text-sm leading-relaxed text-neutral-600">
           Metode ini dipakai Takashi Harada untuk membawa sekolah biasa menjadi juara nasional
           atletik, dan ditulis Shohei Ohtani saat kelas satu SMA. Yang membuatnya bekerja bukan
           kisinya, melainkan <b>paksaan mengisi 64 kotak</b>: jawaban malas habis sekitar kotak
           ke-20, dan sisanya memaksa Anda menyebut hal yang selama ini dihindari.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           Isi bertahap. Tidak harus selesai hari ini — kisi yang jujur dan setengah terisi jauh
           lebih berguna daripada 64 kotak yang diisi asal penuh.
         </p>
@@ -180,7 +180,7 @@ export function Harada() {
 
       {/* Sasaran utama */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Sasaran utama</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Sasaran utama</div>
         <input
           className={`${inputClass} mt-2`}
           placeholder="Sespesifik mungkin — 'sub-1:45 half marathon', bukan 'lebih sehat'"
@@ -197,7 +197,7 @@ export function Harada() {
             aria-label="Tenggat"
           />
           <button onClick={pakaiContoh}
-            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-slate-300">
+            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-neutral-600">
             Isi contoh
           </button>
         </div>
@@ -213,7 +213,7 @@ export function Harada() {
       {/* Kemajuan */}
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Kemajuan</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kemajuan</div>
           {tersimpan && <span className="text-[10px] font-bold text-emerald-500" role="status">tersimpan</span>}
         </div>
         <div className="mt-2 grid grid-cols-3 gap-2 text-center">
@@ -223,8 +223,8 @@ export function Harada() {
             { l: 'Dijalankan', v: `${stat.selesai}` },
           ].map((x) => (
             <div key={x.l} className="rounded-xl bg-white/5 p-2.5">
-              <div className="text-lg font-black text-white">{x.v}</div>
-              <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{x.l}</div>
+              <div className="text-lg font-black text-ink">{x.v}</div>
+              <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{x.l}</div>
             </div>
           ))}
         </div>
@@ -232,7 +232,7 @@ export function Harada() {
           <div className="h-full rounded-full bg-brand transition-all"
             style={{ width: `${(stat.aksi / 64) * 100}%` }} />
         </div>
-        <p className="mt-2 text-[11px] text-slate-400">
+        <p className="mt-2 text-[11px] text-neutral-500">
           {stat.sisa > 0
             ? `Masih ${stat.sisa} kotak kosong. Kotak yang paling sulit diisi biasanya menunjuk bidang yang paling Anda hindari.`
             : 'Ke-64 kotak terisi. Sekarang bagian yang sebenarnya: jalankan, lalu centang.'}
@@ -241,16 +241,16 @@ export function Harada() {
 
       {/* Kisi tengah 3×3 */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Kisi tengah</div>
-        <p className="mt-1 text-[11px] text-slate-400">Ketuk satu penopang untuk membuka delapan tindakannya.</p>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kisi tengah</div>
+        <p className="mt-1 text-[11px] text-neutral-500">Ketuk satu penopang untuk membuka delapan tindakannya.</p>
         <div className="mt-3 grid grid-cols-3 gap-1.5">
           {selTengah.map((sel, i) => {
             if (sel.pusat) {
               return (
                 <div key={i} className="grid aspect-square place-items-center rounded-xl bg-brand p-1.5 text-center">
                   <div>
-                    <div className="text-[8px] font-black uppercase tracking-wide text-white/70">Sasaran</div>
-                    <div className="mt-0.5 line-clamp-3 text-[10px] font-bold leading-tight text-white">
+                    <div className="text-[8px] font-black uppercase tracking-wide text-ink/70">Sasaran</div>
+                    <div className="mt-0.5 line-clamp-3 text-[10px] font-bold leading-tight text-ink">
                       {d.sasaran || '—'}
                     </div>
                   </div>
@@ -272,7 +272,7 @@ export function Harada() {
                   <div className={`line-clamp-3 text-[10px] font-bold leading-tight ${p.judul.trim() ? 'text-white' : 'text-slate-500'}`}>
                     {p.judul || `Penopang ${sel.idx + 1}`}
                   </div>
-                  <div className="mt-0.5 text-[8px] font-bold text-slate-400">{terisi}/8</div>
+                  <div className="mt-0.5 text-[8px] font-bold text-neutral-500">{terisi}/8</div>
                 </div>
               </button>
             )
@@ -284,11 +284,11 @@ export function Harada() {
       {buka != null && (
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               Penopang {buka + 1}
             </div>
             <button onClick={() => setBuka(null)}
-              className="rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">
+              className="rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-neutral-600">
               Tutup
             </button>
           </div>
@@ -299,7 +299,7 @@ export function Harada() {
             onChange={(e) => ubahPenopang(buka, { judul: e.target.value })}
             aria-label={`Judul penopang ${buka + 1}`}
           />
-          <p className="mt-2 text-[11px] text-slate-400">
+          <p className="mt-2 text-[11px] text-neutral-500">
             Delapan tindakan yang bisa dijalankan minggu ini, bukan cita-cita. Centang setelah dijalankan.
           </p>
           <div className="mt-2 space-y-1.5">
@@ -310,9 +310,9 @@ export function Harada() {
                   <button
                     onClick={() => alihSelesai(buka, a)}
                     disabled={!a.trim()}
-                    aria-label={sudah ? `Batalkan centang tindakan ${j + 1}` : `Centang tindakan ${j + 1}`}
+                    aria-label={sudah ? `Cancelkan centang tindakan ${j + 1}` : `Centang tindakan ${j + 1}`}
                     className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[12px] font-black transition ${
-                      sudah ? 'bg-emerald-500 text-white' : a.trim() ? 'bg-white/10 text-slate-400' : 'bg-white/5 text-slate-600'
+                      sudah ? 'bg-emerald-500 text-white' : a.trim() ? 'bg-white/10 text-neutral-500' : 'bg-white/5 text-slate-600'
                     }`}>
                     ✓
                   </button>
@@ -334,11 +334,11 @@ export function Harada() {
         <div className="flex flex-wrap gap-2">
           <Button onClick={unduh}>Unduh sebagai teks</Button>
           <button onClick={kosongkan}
-            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-rose-400">
+            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-rose-600">
             Kosongkan kisi
           </button>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           Tersimpan di perangkat ini saja — tidak dikirim ke server dan tidak terlihat oleh siapa pun.
           Unduh salinannya bila Anda ingin menyimpannya di luar aplikasi.
         </p>
@@ -347,9 +347,9 @@ export function Harada() {
       <Card>
         <div className="flex items-center gap-2">
           <IconChartUp size={16} />
-          <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Cara memakainya</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Cara memakainya</div>
         </div>
-        <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-slate-300">
+        <ol className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-neutral-600">
           <li><b>1.</b> Tulis sasaran yang bisa dinilai benar atau salah. "Lebih bugar" tidak bisa; "sub-1:45" bisa.</li>
           <li><b>2.</b> Isi delapan penopang sebagai <i>bidang</i>, bukan langkah. Kekuatan, pemulihan, gizi — bukan "lari Selasa".</li>
           <li><b>3.</b> Baru isi tindakan. Di sinilah langkah yang bisa dijalankan minggu ini masuk.</li>

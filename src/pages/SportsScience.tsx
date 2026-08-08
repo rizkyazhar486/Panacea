@@ -178,10 +178,10 @@ export function SportsScience() {
         </div>
         <div className="mt-4 flex items-center justify-between">
           <button onClick={() => shift(-1)} aria-label="Previous month" className="grid h-8 w-8 place-items-center rounded-full bg-neutral-100 text-neutral-500 active:scale-90">‹</button>
-          <div className="text-sm font-extrabold">{ID_MONTHS[cursor.m]} {cursor.y} <span className="ml-1 text-[11px] font-medium text-neutral-400">· {monthCount} active days</span></div>
+          <div className="text-sm font-extrabold">{ID_MONTHS[cursor.m]} {cursor.y} <span className="ml-1 text-[11px] font-medium text-neutral-500">· {monthCount} active days</span></div>
           <button onClick={() => shift(1)} aria-label="Next month" className="grid h-8 w-8 place-items-center rounded-full bg-neutral-100 text-neutral-500 active:scale-90">›</button>
         </div>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-neutral-400">
+        <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-neutral-500">
           {ID_DOW.map((d) => <div key={d}>{d}</div>)}
         </div>
         <div className="mt-1 grid grid-cols-7 gap-1">
@@ -192,7 +192,7 @@ export function SportsScience() {
             const top = items?.reduce((mx, it) => Math.max(mx, it.rpe ?? 0), 0) ?? 0
             return (
               <div key={i} className={'relative aspect-square rounded-lg border p-1 text-[10px] ' + (items ? 'border-brand/30 bg-brand-50' : 'border-neutral-100')} title={items?.map((it) => `${it.emoji} ${it.type}${it.rpe ? ` (RPE ${it.rpe})` : ''}`).join(', ')}>
-                <span className="text-neutral-400">{day}</span>
+                <span className="text-neutral-500">{day}</span>
                 {items && (
                   <div className="absolute inset-x-1 bottom-1 flex items-center gap-0.5">
                     {top > 0 && <span className={'h-1.5 w-1.5 rounded-full ' + rpeColor(top)} />}
@@ -203,13 +203,13 @@ export function SportsScience() {
             )
           })}
         </div>
-        <div className="mt-3 flex flex-wrap gap-3 text-[10px] text-neutral-400">
+        <div className="mt-3 flex flex-wrap gap-3 text-[10px] text-neutral-500">
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-300" />Light</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-brand" />Moderate</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />Hard</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Maximal (RPE 8+)</span>
         </div>
-        {monthCount === 0 && <p className="mt-3 text-center text-xs text-neutral-400">No activity this month yet. Log it in Log & Statistics or record a GPS activity.</p>}
+        {monthCount === 0 && <p className="mt-3 text-center text-xs text-neutral-500">No activity this month yet. Log it in Log & Statistics or record a GPS activity.</p>}
       </Card>
 
       {/* KPI library */}
@@ -309,11 +309,11 @@ export function SportsScience() {
           ))}
         </div>
         <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Journal & Book References</div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Journal & Book References</div>
           <ul className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-neutral-500">
             {REFERENCES.map((r) => <li key={r}>• {r}</li>)}
           </ul>
-          <p className="mt-2 text-[10px] text-neutral-400">Device indicator source: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (official Garmin manual). The citations above are landmark references underlying the concepts on this page — verify details (volume, edition year, DOI) directly on PubMed/publisher sites for formal academic purposes.</p>
+          <p className="mt-2 text-[10px] text-neutral-500">Device indicator source: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (official Garmin manual). The citations above are landmark references underlying the concepts on this page — verify details (volume, edition year, DOI) directly on PubMed/publisher sites for formal academic purposes.</p>
         </div>
       </Card>
     </div>

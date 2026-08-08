@@ -215,7 +215,7 @@ export function AestheticVitality() {
             <div className="absolute inset-0 grid place-items-center text-center">
               <div>
                 <div className="text-3xl font-black" style={{ color: scoreColor }}>{score ?? '—'}</div>
-                <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-400">Vitality Index</div>
+                <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-500">Vitality Index</div>
               </div>
             </div>
           </div>
@@ -235,16 +235,16 @@ export function AestheticVitality() {
             {indicators.map((i) => (
               <div key={i.id} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-2 text-sm font-bold text-ink dark:text-white"><span>{i.emoji}</span>{i.name}</span>
+                  <span className="flex items-center gap-2 text-sm font-bold text-ink dark:text-ink"><span>{i.emoji}</span>{i.name}</span>
                   <span className="flex items-center gap-2">
-                    <span className="text-sm font-black text-ink dark:text-white">{i.value}</span>
+                    <span className="text-sm font-black text-ink dark:text-ink">{i.value}</span>
                     <Badge tone={i.score >= 75 ? 'brand' : i.score >= 50 ? 'low' : 'critical'}>{Math.round(i.score)}</Badge>
                   </span>
                 </div>
                 <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
                   <div className="h-full rounded-full" style={{ width: `${i.score}%`, background: i.score >= 75 ? '#00BF63' : i.score >= 50 ? '#f59e0b' : '#ef4444' }} />
                 </div>
-                <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">Target {i.target} · {i.why}</p>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">Target {i.target} · {i.why}</p>
               </div>
             ))}
           </div>
@@ -270,14 +270,14 @@ export function AestheticVitality() {
           {num('Resting HR', 'rhr')}
           {num('VO₂max', 'vo2', 0.1)}
         </div>
-        <div className="mt-4 text-[11px] font-bold uppercase tracking-wide text-neutral-400">Optional facial harmony (any consistent unit)</div>
+        <div className="mt-4 text-[11px] font-bold uppercase tracking-wide text-neutral-500">Optional facial harmony (any consistent unit)</div>
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {num('Face length', 'faceLen', 0.1)}
           {num('Face width', 'faceWid', 0.1)}
           {num('Inter-eye gap', 'interocular', 0.1)}
           {num('Single eye width', 'eyeToEye', 0.1)}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           Facial ratios are one small, uncertain factor among many — enter them only if curious. Measure from a straight-on photo with a ruler; face length ÷ width near φ ({PHI}) and inter-eye gap ≈ one eye width are the classic proportion/symmetry cues.
         </p>
       </Card>
@@ -288,7 +288,7 @@ export function AestheticVitality() {
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-              <div className="flex items-center gap-2 text-sm font-bold text-ink dark:text-white"><span className="text-lg">{p.emoji}</span>{p.title}</div>
+              <div className="flex items-center gap-2 text-sm font-bold text-ink dark:text-ink"><span className="text-lg">{p.emoji}</span>{p.title}</div>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{p.body}</p>
             </div>
           ))}
@@ -296,7 +296,7 @@ export function AestheticVitality() {
       </Card>
 
       {/* Healthy framing */}
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconSparkle size={12} className="mr-1 inline" />
         This is an educational, health-forward tool: it scores the modifiable, health-linked components of appearance and explains the science of beauty. It is <b>not</b> a judgment of your worth, not a comparison to others, and not a clinical or cosmetic assessment. Beauty is partly subjective and cultural — the healthiest goal is vitality, self-expression, and appreciating the pleasant and artful, in yourself and the world.
       </div>

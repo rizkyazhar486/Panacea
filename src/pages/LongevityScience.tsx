@@ -89,7 +89,7 @@ export function LongevityScience() {
           <Card key={e.id} className="!p-0 overflow-hidden">
             <button onClick={() => setOpen(isOpen ? null : e.id)} className="flex w-full items-center gap-3 p-4 text-left">
               <span className="text-2xl">{e.emoji}</span>
-              <span className="flex-1 text-[15px] font-black text-ink dark:text-white">{e.title}</span>
+              <span className="flex-1 text-[15px] font-black text-ink dark:text-ink">{e.title}</span>
               <span className="text-neutral-300">{isOpen ? '−' : '+'}</span>
             </button>
             {isOpen && (
@@ -106,7 +106,7 @@ export function LongevityScience() {
         )
       })}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational summaries of active research areas, not medical advice or a recommendation to use
         any prescription drug off-label. Discuss any of these with a physician before acting on them.
       </div>

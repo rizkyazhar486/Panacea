@@ -225,7 +225,7 @@ export function Readiness() {
       <Field label={
         <span className="flex items-center gap-1">
           <span>{label}</span>
-          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Terisi otomatis dari perangkat">⌚</span>}
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Filled automatically from your device">⌚</span>}
         </span>
       }>
         <div className="flex items-center gap-1"
@@ -235,8 +235,8 @@ export function Readiness() {
             onNilai={(n) => upd({ [key]: n } as Partial<DayLog>)} />
           {perluSimpan && baruDisimpan !== key && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Simpan angka ini ke seluruh aplikasi (atau tekan Enter)"
-              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-white">↵</button>
+              title="Save this value across the app (or press Enter)"
+              className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === key && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
         </div>
@@ -253,8 +253,8 @@ export function Readiness() {
           <div className="flex flex-col items-center gap-1">
             <Ring value={rec ?? 0} max={100} color={tone.color}>
               <div>
-                <div className="text-3xl font-extrabold" style={{ color: tone.color }}>{rec ?? '—'}<span className="text-sm text-neutral-400">%</span></div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Recovery</div>
+                <div className="text-3xl font-extrabold" style={{ color: tone.color }}>{rec ?? '—'}<span className="text-sm text-neutral-500">%</span></div>
+                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Recovery</div>
               </div>
             </Ring>
           </div>
@@ -262,7 +262,7 @@ export function Readiness() {
             <Ring value={strain} max={21} color="#3b82f6">
               <div>
                 <div className="text-3xl font-extrabold text-blue-500">{strain.toFixed(1)}</div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Strain /21</div>
+                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Strain /21</div>
               </div>
             </Ring>
           </div>
@@ -313,14 +313,14 @@ export function Readiness() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-neutral-50 p-3 text-center">
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Need Tonight</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">Sleep Need Tonight</div>
             <div className="text-lg font-extrabold text-brand-dark">{sleepNeed.toFixed(1)} hours</div>
-            <div className="text-[9px] text-neutral-400">base {baseNeed}h + strain + sleep debt</div>
+            <div className="text-[9px] text-neutral-500">base {baseNeed}h + strain + sleep debt</div>
           </div>
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Sleep Debt (7 days)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">Sleep Debt (7 days)</div>
             <div className={'text-lg font-extrabold ' + (debt > 2 ? 'text-rose-500' : debt > 0.5 ? 'text-amber-600' : 'text-brand-dark')}>{debt.toFixed(1)} hours</div>
-            <div className="text-[9px] text-neutral-400">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
+            <div className="text-[9px] text-neutral-500">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
           </div>
         </div>
       </Card>
@@ -343,8 +343,8 @@ export function Readiness() {
           <div className="mt-2 space-y-1">
             {today.workouts.map((w, i) => (
               <div key={i} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-xs">
-                <span>🏋️ {w.min} min · RPE {w.rpe} <span className="text-neutral-400">(+{(w.rpe * w.min)} load)</span></span>
-                <button onClick={() => upd({ workouts: today.workouts.filter((_, j) => j !== i) })} className="font-bold text-rose-400">✕</button>
+                <span>🏋️ {w.min} min · RPE {w.rpe} <span className="text-neutral-500">(+{(w.rpe * w.min)} load)</span></span>
+                <button onClick={() => upd({ workouts: today.workouts.filter((_, j) => j !== i) })} className="font-bold text-rose-600">✕</button>
               </div>
             ))}
           </div>
@@ -363,12 +363,12 @@ export function Readiness() {
                   <div className="w-2.5 rounded-t" style={{ height: `${d.rec ?? 4}%`, background: c, minHeight: 4 }} title={`Recovery ${d.rec ?? '—'}%`} />
                   <div className="w-2.5 rounded-t bg-blue-400" style={{ height: `${(d.strain / 21) * 100}%`, minHeight: 2 }} title={`Strain ${d.strain.toFixed(1)}`} />
                 </div>
-                <div className="text-[8px] font-bold text-neutral-400">{new Date(d.k).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                <div className="text-[8px] font-bold text-neutral-500">{new Date(d.k).toLocaleDateString('en-US', { weekday: 'short' })}</div>
               </div>
             )
           })}
         </div>
-        {hrvBase == null && <p className="mt-2 text-center text-[11px] text-neutral-400">Fill in the check-in for ≥3 days to build your personal HRV/RHR baseline — the score will get more accurate.</p>}
+        {hrvBase == null && <p className="mt-2 text-center text-[11px] text-neutral-500">Fill in the check-in for ≥3 days to build your personal HRV/RHR baseline — the score will get more accurate.</p>}
       </Card>
 
       {/* Behavior impact */}
@@ -382,16 +382,16 @@ export function Readiness() {
                 <div key={r.label} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
                   <div>
                     <div className="text-xs font-bold">{r.label}</div>
-                    <div className="text-[10px] text-neutral-400">{r.n} days logged</div>
+                    <div className="text-[10px] text-neutral-500">{r.n} days logged</div>
                   </div>
-                  <div className={'text-sm font-extrabold ' + (diff < -2 ? 'text-rose-500' : diff > 2 ? 'text-brand-dark' : 'text-neutral-400')}>
+                  <div className={'text-sm font-extrabold ' + (diff < -2 ? 'text-rose-500' : diff > 2 ? 'text-brand-dark' : 'text-neutral-500')}>
                     {diff > 0 ? '+' : ''}{diff.toFixed(0)}% recovery
                   </div>
                 </div>
               )
             })}
           </div>
-          <p className="mt-2 text-[10px] text-neutral-400">This is a simple personal correlation, not causation — but a consistent pattern is worth acting on.</p>
+          <p className="mt-2 text-[10px] text-neutral-500">This is a simple personal correlation, not causation — but a consistent pattern is worth acting on.</p>
         </Card>
       )}
 

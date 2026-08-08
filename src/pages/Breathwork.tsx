@@ -131,7 +131,7 @@ export function Breathwork() {
             />
             <div className="z-10 text-center">
               <div className="text-lg font-black text-brand-dark">{running ? phase.label : 'Ready'}</div>
-              <div className="text-[12px] text-neutral-400">{running ? `${Math.ceil(phase.sec - elapsed)}s` : proto.name}</div>
+              <div className="text-[12px] text-neutral-500">{running ? `${Math.ceil(phase.sec - elapsed)}s` : proto.name}</div>
             </div>
           </div>
           <div className="mt-3 text-sm font-black tabular-nums text-neutral-500">{mm}:{ss}</div>
@@ -147,13 +147,13 @@ export function Breathwork() {
 
       <Card className="!p-4 flex items-center justify-between">
         <div>
-          <div className="text-xs font-black text-ink dark:text-white">🔥 Daily streak</div>
+          <div className="text-xs font-black text-ink dark:text-ink">🔥 Daily streak</div>
           <p className="text-[11px] text-neutral-500">Finish one session a day to keep it alive.</p>
         </div>
         <Badge tone={streak.days > 0 ? 'brand' : 'low'}>{streak.days} day{streak.days === 1 ? '' : 's'}</Badge>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Balban, M.Y., et al. (2023). Brief structured respiration practices enhance mood and reduce
         physiological arousal. <i>Cell Reports Medicine</i>, 4(1), 100895. Wellness tool — not a
         treatment for panic disorder or respiratory disease.

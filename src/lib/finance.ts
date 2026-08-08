@@ -23,7 +23,7 @@ export type Category =
 
 export const CATEGORY_LABEL: Record<Category, string> = {
   income: 'Pemasukan',
-  housing: 'Tempat tinggal',
+  housing: 'Residence',
   food: 'Makan & bahan pokok',
   transport: 'Transportasi',
   utilities: 'Listrik, air, internet',
@@ -130,7 +130,7 @@ export function emergencyVerdict(months: number): { label: string; tone: 'critic
     advice: 'Teruskan menambah sampai minimal 3 bulan pengeluaran pokok sebelum menambah porsi investasi berisiko.',
   }
   if (months < 6) return {
-    label: 'Cukup', tone: 'low',
+    label: 'Adequate', tone: 'low',
     advice: 'Sudah memadai untuk sebagian besar keadaan. Target 6 bulan bila penghasilan Anda tidak tetap, bekerja lepas, atau menjadi satu-satunya pencari nafkah.',
   }
   return {
@@ -259,5 +259,5 @@ export function project(monthly: number, years: number, annualRatePct: number, s
 
 export function formatIdr(n: number): string {
   if (!Number.isFinite(n)) return '—'
-  return 'Rp ' + Math.round(n).toLocaleString('id-ID')
+  return 'Rp ' + Math.round(n).toLocaleString('en-GB')
 }

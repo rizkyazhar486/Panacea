@@ -37,7 +37,7 @@ function TelomereQuiz() {
       <div className="mt-3 space-y-3">
         {TELOMERE_QS.map((item, qi) => (
           <div key={item.q}>
-            <div className="text-[13px] font-bold text-ink dark:text-white">{item.q}</div>
+            <div className="text-[13px] font-bold text-ink dark:text-ink">{item.q}</div>
             <div className="mt-1 flex flex-wrap gap-2">
               {item.opts.map(([label, val]) => (
                 <button key={label} onClick={() => setAnswers((a) => { const n = [...a]; n[qi] = val; return n })} className={`rounded-full px-3 py-1.5 text-[12px] font-bold ${answers[qi] === val ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{label}</button>
@@ -79,7 +79,7 @@ function InflammationScore() {
         {INFLAMMATION_QS.map((q) => (
           <label key={q} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
             <input type="checkbox" checked={!!checked[q]} onChange={(e) => setChecked((c) => ({ ...c, [q]: e.target.checked }))} className="h-4 w-4 accent-brand" />
-            <span className="text-[13px] text-ink dark:text-white">{q}</span>
+            <span className="text-[13px] text-ink dark:text-ink">{q}</span>
           </label>
         ))}
       </div>
@@ -126,14 +126,14 @@ function AgingFlowchart() {
     <Card className="!p-6 text-center">
       {result ? (
         <>
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your answer</div>
-          <p className="mt-2 text-[15px] font-bold leading-relaxed text-ink dark:text-white">{result}</p>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your answer</div>
+          <p className="mt-2 text-[15px] font-bold leading-relaxed text-ink dark:text-ink">{result}</p>
           <button onClick={restart} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start over</button>
         </>
       ) : (
         <>
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What's aging you?</div>
-          <p className="mt-2 text-[15px] font-bold text-ink dark:text-white">{node!.q}</p>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What's aging you?</div>
+          <p className="mt-2 text-[15px] font-bold text-ink dark:text-ink">{node!.q}</p>
           <div className="mt-4 flex gap-2">
             <button onClick={() => answer(true)} className="flex-1 rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Yes</button>
             <button onClick={() => answer(false)} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 dark:bg-white/10">No</button>
@@ -199,7 +199,7 @@ export function SelfAssessmentToolkit() {
       {tab === 'aging-factor' && <AgingFlowchart />}
       {tab === 'waist-height' && <WaistHeightRatio />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational self-assessments based on general research patterns — none of these are diagnostic
         lab tests. See a clinician for actual bloodwork, telomere testing, or inflammatory markers.
       </div>

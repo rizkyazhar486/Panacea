@@ -67,13 +67,13 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
         {metrics.map((m) => (
           <div key={m.key} className="rounded-xl border border-neutral-100 p-2.5 text-center">
             <div className="text-lg font-extrabold" style={{ color: m.color }}>{m.val ?? '—'}</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">{m.name}</div>
+            <div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">{m.name}</div>
           </div>
         ))}
       </div>
 
       {data.length < 2 ? (
-        <p className="mt-4 rounded-xl bg-neutral-50 px-3 py-4 text-center text-[12px] text-neutral-400">
+        <p className="mt-4 rounded-xl bg-neutral-50 px-3 py-4 text-center text-[12px] text-neutral-500">
           The trend chart fills in each day you visit. Today's data has already been recorded ✓
         </p>
       ) : (
@@ -82,7 +82,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
             <div key={m.key}>
               <div className="mb-1 flex items-center justify-between text-[11px]">
                 <span className="font-bold" style={{ color: m.color }}>{m.name}</span>
-                <span className="text-neutral-400">Latest: <b style={{ color: m.color }}>{m.val}{m.unit}</b></span>
+                <span className="text-neutral-500">Latest: <b style={{ color: m.color }}>{m.val}{m.unit}</b></span>
               </div>
               <ResponsiveContainer width="100%" height={90}>
                 <LineChart data={data} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>

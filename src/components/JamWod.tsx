@@ -22,15 +22,15 @@ import { hariIni } from '../lib/tanggal'
 // pacing yang terlalu berani, dan itu tidak terlihat dari skor akhir saja.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Fase = 'siap' | 'jalan' | 'jeda' | 'selesai'
+type Fase = 'siap' | 'jalan' | 'jeda' | 'done'
 
 interface Catatan { detik: number; split: number }
-interface Riwayat { tanggal: string; wod: string; skor: string; ronde: number; detik: number }
+interface History { tanggal: string; wod: string; skor: string; ronde: number; detik: number }
 
 const KEY_RIWAYAT = 'pmd_wod_riwayat_v1'
 
-function muatRiwayat(): Riwayat[] {
-  try { return JSON.parse(localStorage.getItem(KEY_RIWAYAT) || '[]') as Riwayat[] } catch { return [] }
+function muatHistory(): History[] {
+  try { return JSON.parse(localStorage.getItem(KEY_RIWAYAT) || '[]') as History[] } catch { return [] }
 }
 
 export function jam(detik: number): string {
@@ -49,7 +49,7 @@ export function JamWod({ nama, setelan, ronde }: {
   const [fase, setFase] = useState<Fase>('siap')
   const [sekarang, setSekarang] = useState(0)      // detik berjalan
   const [catatan, setCatatan] = useState<Catatan[]>([])
-  const [riwayat, setRiwayat] = useState<Riwayat[]>(muatRiwayat)
+  const [riwayat, setHistory] = useState<History[]>(muatHistory)
   const mulaiRef = useRef(0)                        // Date.now() saat mulai/lanjut
   const akumulasiRef = useRef(0)                    // detik sebelum jeda terakhir
 
@@ -66,7 +66,7 @@ export function JamWod({ nama, setelan, ronde }: {
       if (total > 0 && d >= total) {
         akumulasiRef.current = total
         setSekarang(total)
-        setFase('selesai')
+        setFase('done')
       }
     }, 100)
     return () => clearInterval(id)
@@ -114,25 +114,25 @@ export function JamWod({ nama, setelan, ronde }: {
     return () => window.removeEventListener('keydown', h)
   }, [fase, ketuk])
 
-  const selesaikan = () => {
+  const donekan = () => {
     akumulasiRef.current += fase === 'jalan' ? (Date.now() - mulaiRef.current) / 1000 : 0
     setSekarang(akumulasiRef.current)
-    setFase('selesai')
+    setFase('done')
   }
 
   const skor = useMemo(() => {
     if (setelan.jenis === 'amrap') return `${catatan.length} ronde`
-    if (setelan.jenis === 'emom') return `${catatan.length} menit selesai`
+    if (setelan.jenis === 'emom') return `${catatan.length} menit done`
     return jam(sekarang)
   }, [setelan.jenis, catatan.length, sekarang])
 
   function simpan() {
-    const baris: Riwayat = {
+    const baris: History = {
       tanggal: hariIni(), wod: nama, skor,
       ronde: catatan.length, detik: Math.round(sekarang),
     }
     const next = [baris, ...riwayat].slice(0, 100)
-    setRiwayat(next)
+    setHistory(next)
     try { localStorage.setItem(KEY_RIWAYAT, JSON.stringify(next)) } catch { /* kuota */ }
     ulang()
   }
@@ -206,7 +206,7 @@ export function JamWod({ nama, setelan, ronde }: {
               className="rounded-xl bg-white/10 px-4 py-3 text-[14px] font-black text-white">
               ⏸ Jeda
             </button>
-            <button onClick={ketuk} aria-label="Ketuk ronde"
+            <button onClick={ketuk} aria-label="Tap round"
               className="flex-1 rounded-xl bg-emerald-500 py-3 text-[14px] font-black text-white active:scale-[0.98]">
               ⊕ Ketuk — ronde {catatan.length + 1}
             </button>
@@ -214,19 +214,19 @@ export function JamWod({ nama, setelan, ronde }: {
         )}
         {fase === 'jeda' && (
           <>
-            <button onClick={lanjut} aria-label="Lanjut"
+            <button onClick={lanjut} aria-label="Resume"
               className="flex-1 rounded-xl bg-brand py-3 text-[14px] font-black text-white">
-              ▶ Lanjut
+              ▶ Resume
             </button>
-            <button onClick={selesaikan} aria-label="Selesai"
+            <button onClick={donekan} aria-label="Finish"
               className="rounded-xl bg-white/10 px-4 py-3 text-[14px] font-black text-white">
-              Selesai
+              Finish
             </button>
           </>
         )}
-        {fase === 'selesai' && (
+        {fase === 'done' && (
           <>
-            <button onClick={simpan} aria-label="Simpan hasil"
+            <button onClick={simpan} aria-label="Save result"
               className="flex-1 rounded-xl bg-brand py-3 text-[14px] font-black text-white">
               Simpan · {skor}
             </button>
@@ -239,9 +239,9 @@ export function JamWod({ nama, setelan, ronde }: {
       </div>
 
       {fase === 'jalan' && setelan.jenis === 'fortime' && (
-        <button onClick={selesaikan}
+        <button onClick={donekan}
           className="mt-2 w-full rounded-xl bg-white/5 py-2 text-[12px] font-bold text-slate-300">
-          Berhenti — sesi selesai
+          Berhenti — sesi done
         </button>
       )}
       {fase === 'jalan' && (
@@ -257,8 +257,8 @@ export function JamWod({ nama, setelan, ronde }: {
             <div className="text-[10px] font-black uppercase tracking-wide text-slate-400">
               {catatan.length} tercatat
             </div>
-            {fase !== 'selesai' && (
-              <button onClick={batalKetuk} aria-label="Batalkan ketukan terakhir"
+            {fase !== 'done' && (
+              <button onClick={batalKetuk} aria-label="Cancelkan ketukan terakhir"
                 className="rounded-lg bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-400">
                 batalkan terakhir
               </button>
@@ -292,10 +292,10 @@ export function JamWod({ nama, setelan, ronde }: {
         </div>
       )}
 
-      {/* Riwayat WOD ini */}
+      {/* History WOD ini */}
       {rekorSebelumnya.length > 0 && fase === 'siap' && (
         <div className="mt-3">
-          <div className="text-[10px] font-black uppercase tracking-wide text-slate-400">Catatan sebelumnya</div>
+          <div className="text-[10px] font-black uppercase tracking-wide text-slate-400">Previous records</div>
           <div className="mt-1 space-y-0.5">
             {rekorSebelumnya.slice(0, 4).map((r, i) => (
               <div key={i} className="flex items-baseline justify-between rounded-lg bg-white/5 px-2 py-1">

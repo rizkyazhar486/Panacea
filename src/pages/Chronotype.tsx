@@ -91,7 +91,7 @@ export function Chronotype() {
 
       {QUESTIONS.map((q, qi) => (
         <Card key={qi} className="!p-5">
-          <div className="text-sm font-bold text-ink dark:text-white">{qi + 1}. {q.text}</div>
+          <div className="text-sm font-bold text-ink dark:text-ink">{qi + 1}. {q.text}</div>
           <div className="mt-3 flex flex-col gap-2">
             {q.options.map((o) => (
               <button
@@ -112,7 +112,7 @@ export function Chronotype() {
 
       {band && score != null && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your result</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your result</div>
           <div className="mt-2 flex items-center gap-3">
             <span className="text-3xl font-black text-brand-dark">{score}</span>
             <div>
@@ -120,7 +120,7 @@ export function Chronotype() {
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
             </div>
           </div>
-          <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
             Chronotype is a real, measurable trait linked to differences in core body temperature rhythm
             and melatonin timing — it's not just a habit. It can inform when to schedule demanding tasks,
             exercise, and — for a clinician — the timing of some medications (chronotherapy) and sleep
@@ -130,7 +130,7 @@ export function Chronotype() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Adan, A., &amp; Almirall, H. (1991). Horne &amp; Östberg morningness-eveningness questionnaire: A
         reduced scale. <i>Personality and Individual Differences</i>, 12(3), 241-253. Educational
         self-assessment, not a clinical sleep disorder diagnosis.

@@ -4,18 +4,17 @@ export function Card({
   children,
   className = '',
   pad = true,
-  hover = false,
 }: {
   children: ReactNode
   className?: string
   pad?: boolean
-  hover?: boolean
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/50 bg-white/80 shadow-[0_8px_30px_rgba(12,20,16,0.05)] ring-1 ring-black/[0.03] backdrop-blur-xl ${
-        hover ? 'transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]' : ''
-      } ${pad ? 'p-5' : ''} ${className}`}
+      // `kaca` membawa seluruh bahasa liquid glass: pantulan yang mengikuti
+      // gerak, tepi spekular, dan bayangan dua tingkat. Karena setiap halaman
+      // memakai Card, mengubahnya di sini mengubah seluruh aplikasi sekaligus.
+      className={`kaca kaca-angkat rounded-2xl ${pad ? 'p-5' : ''} ${className}`}
     >
       {children}
     </div>
@@ -148,4 +147,4 @@ export function SkeletonRows({ rows = 3 }: { rows?: number }) {
 }
 
 export const inputClass =
-  'w-full min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20'
+  'w-full min-h-[44px] rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20'

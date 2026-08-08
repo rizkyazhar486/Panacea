@@ -83,17 +83,17 @@ export function EmpiricTherapyReference() {
         {filtered.map((e) => (
           <Card key={e.diagnosis} className="!p-4">
             <div className="flex items-start justify-between gap-2">
-              <div className="text-[14px] font-bold text-ink dark:text-white">{e.diagnosis}</div>
+              <div className="text-[14px] font-bold text-ink dark:text-ink">{e.diagnosis}</div>
               <Badge tone="neutral">{e.category}</Badge>
             </div>
             <div className="mt-1 text-[13px] font-semibold text-brand-dark">{e.firstLine}</div>
             <div className="mt-1 text-[12px] text-neutral-500">{e.notes}</div>
           </Card>
         ))}
-        {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">No matches — try a different search term.</p>}
+        {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">No matches — try a different search term.</p>}
       </div>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A study/reference aid summarizing commonly-published guideline first-line choices — not a
         substitute for current full guideline text, an antibiogram, or clinical/pharmacist judgment.
         Not a prescription and contains no dosing.

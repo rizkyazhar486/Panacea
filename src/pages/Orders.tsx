@@ -40,10 +40,10 @@ function StatusProgress({ status }: { status: Order['status'] }) {
           return (
             <div key={label} className="flex flex-1 items-center last:flex-none">
               <div className="flex flex-col items-center">
-                <span className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold transition ${done ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-400'}`}>
+                <span className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold transition ${done ? 'bg-brand text-white' : 'bg-neutral-200 text-neutral-500'}`}>
                   {done ? '✓' : i + 1}
                 </span>
-                <span className={`mt-1 text-[10px] font-semibold ${done ? 'text-brand-dark' : 'text-neutral-400'}`}>{STATUS_LABELS[label] ?? label}</span>
+                <span className={`mt-1 text-[10px] font-semibold ${done ? 'text-brand-dark' : 'text-neutral-500'}`}>{STATUS_LABELS[label] ?? label}</span>
               </div>
               {i < STEPS.length - 1 && (
                 <div className="mx-1 h-1 flex-1 overflow-hidden rounded-full bg-neutral-200">
@@ -66,7 +66,7 @@ export function Orders() {
   // group by date (yyyy-mm-dd)
   const groups = new Map<string, Order[]>()
   for (const o of filtered) {
-    const d = new Date(o.at).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+    const d = new Date(o.at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
     groups.set(d, [...(groups.get(d) ?? []), o])
   }
   const totalByCat = (c: OrderCategory) => state.orders.filter((o) => o.category === c).reduce((a, o) => a + o.amountIdr, 0)
@@ -78,8 +78,8 @@ export function Orders() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {(['Obat', 'Konsultasi', 'Langganan', 'Lab'] as OrderCategory[]).map((c) => (
             <div key={c} className="rounded-xl bg-neutral-50 p-3">
-              <div className="flex items-center gap-1.5 text-neutral-400">{catIcon[c]}<span className="text-[11px] font-semibold uppercase tracking-wide">{CAT_LABELS[c] ?? c}</span></div>
-              <div className="mt-1 text-lg font-extrabold">Rp{totalByCat(c).toLocaleString('id-ID')}</div>
+              <div className="flex items-center gap-1.5 text-neutral-500">{catIcon[c]}<span className="text-[11px] font-semibold uppercase tracking-wide">{CAT_LABELS[c] ?? c}</span></div>
+              <div className="mt-1 text-lg font-extrabold">Rp{totalByCat(c).toLocaleString('en-GB')}</div>
             </div>
           ))}
         </div>
@@ -91,11 +91,11 @@ export function Orders() {
       </Card>
 
       {filtered.length === 0 ? (
-        <Card className="text-center text-sm text-neutral-400">No transactions in this category yet.</Card>
+        <Card className="text-center text-sm text-neutral-500">No transactions in this category yet.</Card>
       ) : (
         [...groups.entries()].map(([date, items]) => (
           <div key={date} className="space-y-2">
-            <div className="px-1 text-xs font-bold uppercase tracking-wide text-neutral-400">{date}</div>
+            <div className="px-1 text-xs font-bold uppercase tracking-wide text-neutral-500">{date}</div>
             {items.map((o) => (
               <Card key={o.id}>
                 <div className="flex items-center gap-3">
@@ -106,9 +106,9 @@ export function Orders() {
                       <Badge tone={statusTone[o.status]}>{STATUS_LABELS[o.status] ?? o.status}</Badge>
                     </div>
                     {o.detail && <p className="truncate text-xs text-neutral-500">{o.detail}</p>}
-                    <p className="text-[11px] text-neutral-400">{new Date(o.at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' })} · {CAT_LABELS[o.category] ?? o.category}</p>
+                    <p className="text-[11px] text-neutral-500">{new Date(o.at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })} · {CAT_LABELS[o.category] ?? o.category}</p>
                   </div>
-                  <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('id-ID')}</span>
+                  <span className="shrink-0 font-extrabold">Rp{o.amountIdr.toLocaleString('en-GB')}</span>
                 </div>
                 <StatusProgress status={o.status} />
               </Card>

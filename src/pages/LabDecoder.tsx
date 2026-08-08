@@ -100,14 +100,14 @@ export function LabDecoder() {
             {flagged.map((r) => (
               <div key={r.def.id} className={'rounded-xl border p-3 ' + (r.bad ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-ink dark:text-white">{r.def.name}</span>
+                  <span className="text-sm font-bold text-ink dark:text-ink">{r.def.name}</span>
                   <span className="flex items-center gap-2">
                     <span className="text-sm font-black">{r.v} {r.def.unit}</span>
                     <Badge tone={r.bad ? 'critical' : 'low'}>{r.flag === 'high' ? 'High' : 'Low'}</Badge>
                   </span>
                 </div>
                 <div className="mt-1 text-[12px] text-neutral-600 dark:text-neutral-300">{r.def.plain(r.flag)}</div>
-                <div className="mt-0.5 text-[11px] text-neutral-400">Normal: {r.lo}–{r.hi} {r.def.unit}</div>
+                <div className="mt-0.5 text-[11px] text-neutral-500">Normal: {r.lo}–{r.hi} {r.def.unit}</div>
               </div>
             ))}
           </div>
@@ -117,13 +117,13 @@ export function LabDecoder() {
       {/* Entry form grouped */}
       {GROUPS.map((g) => (
         <Card key={g} className="!p-5">
-          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{g}</div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{g}</div>
           <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {LABS.filter((l) => l.group === g).map((def) => {
               const v = vals[def.id]
               const flag = v !== '' && v !== undefined && Number(v) > 0 ? flagFor(def, Number(v), sex) : null
               return (
-                <Field key={def.id} label={<>{def.name} <span className="text-neutral-400">({def.unit})</span></>}>
+                <Field key={def.id} label={<>{def.name} <span className="text-neutral-500">({def.unit})</span></>}>
                   <div className="flex items-center gap-2">
                     <input className={inputClass} type="number" step="any" value={v ?? ''} onChange={(e) => setVals((s) => ({ ...s, [def.id]: e.target.value === '' ? '' : +e.target.value }))} />
                     {flag && <Badge tone={flag === 'normal' ? 'brand' : (flag === 'high' && def.higherIsBad) || (flag === 'low' && def.lowerIsBad) ? 'critical' : 'low'}>{flag}</Badge>}
@@ -135,7 +135,7 @@ export function LabDecoder() {
         </Card>
       ))}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational decoder using standard adult reference ranges — these vary by laboratory, age, pregnancy, and clinical context. A single out-of-range value is often not significant. Always review your results with the doctor who ordered them. Nothing is stored or sent.
       </div>
     </div>

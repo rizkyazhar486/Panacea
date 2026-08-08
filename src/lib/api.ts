@@ -269,8 +269,12 @@ export const api = {
   posts: () => req<{ posts: BackendPost[] }>('/api/posts').then((r) => r.posts),
   // ── Connect: verifikasi, kredit kepercayaan, laporan, blokir ──────────────
   connectSaya: () => req<{
-    status: string; alasanTolak?: string; kredit: number; bahaya: boolean
+    status: string; alasanReject?: string; kredit: number; bahaya: boolean
     hapusPada?: string; radiusKm: number; diblokir: string[]
+    persetujuan: { tujuan: string; pada: string; versiPemberitahuan: string; dicabutPada?: string }[]
+    versiPemberitahuan: string
+    teleponAkhir?: string
+    teleponTerdaftar: boolean
     pelanggaran: { id: string; pada: string; alasan: string; poin: number }[]
     ambang: { awal: number; bahaya: number; hapus: number }
   }>('/api/connect/saya'),
@@ -278,7 +282,14 @@ export const api = {
     req<{ ok: true }>('/api/connect/verifikasi', { method: 'POST', body: JSON.stringify(data) }),
   connectRadius: (km: number) =>
     req<{ radiusKm: number }>('/api/connect/radius', { method: 'POST', body: JSON.stringify({ km }) }),
-  connectBlokir: (email: string, buka = false) =>
+  connectTarikPersetujuan: () =>
+    req<{ ok: boolean }>('/api/connect/tarik-persetujuan', { method: 'POST' }),
+  connectDek: (batas = 50) =>
+    req<{ kartu: {
+      email: string; nama: string; umur: number; pekerjaan: string
+      pendidikan: string; kota: string; jarakKm: number | null; kredit: number
+    }[] }>(`/api/connect/dek?batas=${batas}`).then((r) => r.kartu),
+  connectBlock: (email: string, buka = false) =>
     req<{ ok: true }>('/api/connect/blokir', { method: 'POST', body: JSON.stringify({ email, buka }) }),
   connectLapor: (email: string, alasan: string, catatan?: string) =>
     req<{ ok: true }>('/api/connect/lapor', { method: 'POST', body: JSON.stringify({ email, alasan, catatan }) }),
@@ -287,7 +298,7 @@ export const api = {
     req<{ ok: true }>('/api/connect/tinjau/verifikasi', { method: 'POST', body: JSON.stringify({ email, setuju, alasan }) }),
   connectPutusLaporan: (id: string, poin: number, catatan?: string) =>
     req<{ ok: true }>('/api/connect/tinjau/laporan', { method: 'POST', body: JSON.stringify({ id, poin, catatan }) }),
-  connectKredit: (email: string, poin: number, alasan?: string, pulihkan = false) =>
+  connectCredit: (email: string, poin: number, alasan?: string, pulihkan = false) =>
     req<{ kredit: number; bahaya: boolean; dijadwalkanHapus: boolean }>(
       '/api/connect/tinjau/kredit', { method: 'POST', body: JSON.stringify({ email, poin, alasan, pulihkan }) }),
 

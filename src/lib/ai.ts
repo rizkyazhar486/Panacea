@@ -248,7 +248,7 @@ function demoChatReply(history: ChatMessage[], ctx: PatientContext): string {
     `Halo ${name}, saya asisten klinis–longevity Anda — mendukung, bukan menggantikan, dokter pemeriksa. Boleh ceritakan **keluhan utama** Anda hari ini? Sejak kapan dirasakan?\n\n_(Catatan: respons AI penuh sedang tidak terjangkau saat ini — ini balasan contoh. Coba lagi sesaat lagi.)_`,
     `Terima kasih. Mari perdalam dengan **SOCRATES**:\n- **Site** — di mana persisnya?\n- **Onset** — mendadak atau bertahap?\n- **Character** — seperti apa rasanya (tertekan, terbakar, tertusuk)?\n- **Radiation** — menjalar ke mana?\n\nSilakan jawab satu per satu.`,
     `Baik. Beberapa pertanyaan penyaring:\n- Apakah ada **demam**, penurunan berat badan, atau keringat malam?\n- Bagaimana **pola makan, tidur, dan aktivitas** belakangan ini?\n- Adakah riwayat penyakit serupa di keluarga?`,
-    `Cukup lengkap untuk hipotesis awal. Berdasarkan keluhan dan konteks (${ctx.patient.chronicConditions.join(
+    `Adequate lengkap untuk hipotesis awal. Berdasarkan keluhan dan konteks (${ctx.patient.chronicConditions.join(
       ', ',
     ) || 'tanpa komorbid tercatat'}), saya rekomendasikan **pemeriksaan penunjang**: pemeriksaan fisik terarah, lab dasar (darah lengkap, fungsi ginjal, elektrolit, GDS), dan EKG bila ada keluhan kardiovaskular.\n\nKetuk **“Susun Draft AI-EMR”** di atas — saya akan menyusun anamnesis terstruktur + daftar masalah + usulan rencana, untuk **diverifikasi dan dilengkapi oleh dokter**.`,
   ]
@@ -261,7 +261,7 @@ function demoDraft(ctx: PatientContext): EMRDraft {
     keluhanUtama: 'Nyeri kepala dan mudah lelah sejak 1 minggu (simulasi demo).',
     rps:
       '⚠️ SIMULASI EDUKASI — temuan direkayasa untuk pembelajaran. Pasien mengeluh nyeri kepala (Site: oksipital; Onset: bertahap; Character: tertekan; Radiation: tidak menjalar; Associations: pusing berputar ringan; Time: memberat pagi hari; Exacerbating: aktivitas; Severity: 5/10). Disertai mudah lelah dan tengkuk terasa kaku.',
-    rpd: `Riwayat ${chronic}, kontrol tidak teratur.`,
+    rpd: `History ${chronic}, kontrol tidak teratur.`,
     rpk: 'Ibu dengan hipertensi dan DM tipe 2.',
     riwayatPengobatan: 'Amlodipin 5 mg/hari (sering lupa minum).',
     riwayatAlergi: ctx.patient.allergies.join(', ') || 'Tidak ada alergi diketahui.',

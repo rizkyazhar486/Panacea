@@ -51,7 +51,7 @@ function BingoBoard() {
         {hasBingo && <Badge tone="brand">🎉 BINGO!</Badge>}
       </div>
       {celebrated && hasBingo && (
-        <div className="mt-2 rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-3 text-center text-sm font-black text-white">
+        <div className="mt-2 rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-3 text-center text-sm font-black text-ink">
           🎉 Bingo! Great day for your longevity habits.
         </div>
       )}
@@ -66,7 +66,7 @@ function BingoBoard() {
           </button>
         ))}
       </div>
-      <p className="mt-3 text-center text-[11px] text-neutral-400">{done.filter(Boolean).length}/25 checked today</p>
+      <p className="mt-3 text-center text-[11px] text-neutral-500">{done.filter(Boolean).length}/25 checked today</p>
     </Card>
   )
 }
@@ -154,8 +154,8 @@ function DailyQuote() {
   return (
     <Card className="!p-8 text-center">
       <div className="text-4xl">💬</div>
-      <p className="mt-4 text-lg font-black leading-snug text-ink dark:text-white">"{QUOTES[dayIndex]}"</p>
-      <p className="mt-3 text-[12px] text-neutral-400">panaceamed.id · daily longevity quote</p>
+      <p className="mt-4 text-lg font-black leading-snug text-ink dark:text-ink">"{QUOTES[dayIndex]}"</p>
+      <p className="mt-3 text-[12px] text-neutral-500">panaceamed.id · daily longevity quote</p>
     </Card>
   )
 }
@@ -183,7 +183,7 @@ export function LongevityGameCenter() {
       {tab === 'report-card' && <ReportCard />}
       {tab === 'quote' && <DailyQuote />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Playful habit-tracking for motivation, not a clinical scoring system. The report card reflects
         exactly what you checked off — nothing is generated or exaggerated.
       </div>

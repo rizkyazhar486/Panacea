@@ -115,31 +115,31 @@ export function VisitPrepChecklist() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Bring with you</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Bring with you</div>
         <div className="mt-2 space-y-1.5">
           {bring.map((item) => (
             <label key={item} className="flex items-start gap-2 text-[13px] text-neutral-700 dark:text-neutral-300">
               <input type="checkbox" checked={!!checked[item]} onChange={() => toggle(item)} className="mt-0.5 h-4 w-4 accent-brand" />
-              <span className={checked[item] ? 'text-neutral-400 line-through' : ''}>{item}</span>
+              <span className={checked[item] ? 'text-neutral-500 line-through' : ''}>{item}</span>
             </label>
           ))}
         </div>
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Questions worth asking</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Questions worth asking</div>
         <div className="mt-2 space-y-1.5">
           {ask.map((item) => (
             <label key={item} className="flex items-start gap-2 text-[13px] text-neutral-700 dark:text-neutral-300">
               <input type="checkbox" checked={!!checked[item]} onChange={() => toggle(item)} className="mt-0.5 h-4 w-4 accent-brand" />
-              <span className={checked[item] ? 'text-neutral-400 line-through' : ''}>{item}</span>
+              <span className={checked[item] ? 'text-neutral-500 line-through' : ''}>{item}</span>
             </label>
           ))}
         </div>
         <CopyNote text={noteText} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A curated prompt list to help you prepare, not a substitute for the visit itself — every
         clinician will tailor their questions to your specific situation.
       </div>

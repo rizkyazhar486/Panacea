@@ -161,7 +161,7 @@ export function HealthSyncTutorial() {
       <Card className="!p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-black text-ink dark:text-white">Diagnosa sinkronisasi</div>
+            <div className="text-sm font-black text-ink dark:text-ink">Diagnosa sinkronisasi</div>
             <p className="mt-0.5 text-[12px] text-neutral-500">
               Diperiksa dari kiriman yang benar-benar sampai ke server, bukan dari tebakan.
             </p>
@@ -174,9 +174,9 @@ export function HealthSyncTutorial() {
 
         {diag && (
           <>
-            <div className="mt-2 text-[11px] text-neutral-400">
+            <div className="mt-2 text-[11px] text-neutral-500">
               {diag.deliveries} kiriman tercatat
-              {diag.lastAt ? ` · terakhir ${new Date(diag.lastAt).toLocaleString('id-ID')}` : ''}
+              {diag.lastAt ? ` · terakhir ${new Date(diag.lastAt).toLocaleString('en-GB')}` : ''}
             </div>
             <div className="mt-3 space-y-2">
               {diag.findings.map((f, i) => {
@@ -187,12 +187,12 @@ export function HealthSyncTutorial() {
                 const ikon = f.level === 'error' ? '\u2716' : f.level === 'warn' ? '\u26a0' : '\u2713'
                 return (
                   <div key={i} className={`rounded-xl border p-3 ${nada}`}>
-                    <div className="text-[13px] font-bold text-ink dark:text-white">{ikon} {f.judul}</div>
+                    <div className="text-[13px] font-bold text-ink dark:text-ink">{ikon} {f.judul}</div>
                     <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{f.detail}</p>
                     {f.setelan && (
                       <div className="mt-2 rounded-lg bg-black/5 px-2.5 py-2 text-[12px] dark:bg-white/10">
                         <div className="text-neutral-500">Setelan di Health Auto Export</div>
-                        <div className="font-black text-ink dark:text-white">{f.setelan}</div>
+                        <div className="font-black text-ink dark:text-ink">{f.setelan}</div>
                         <div className="mt-0.5 text-neutral-600 dark:text-neutral-300">Ubah ke: <b>{f.ubahKe}</b></div>
                       </div>
                     )}
@@ -257,9 +257,9 @@ export function HealthSyncTutorial() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
           After changing them, press Export once manually, then open{' '}
-          <Link to="/log-detak-jantung" className="font-bold text-brand-dark underline">Log Detak Jantung</Link>.
+          <Link to="/log-detak-jantung" className="font-bold text-brand-dark underline">Heart Rate Log</Link>.
           That page measures the real spacing between your samples and states it, so you can confirm the change
           took effect instead of guessing.
         </p>
@@ -299,7 +299,7 @@ export function HealthSyncTutorial() {
               <summary className="cursor-pointer list-none text-sm font-bold text-ink marker:content-none">
                 <span className="flex items-center justify-between gap-2">
                   {f.q}
-                  <IconChevronRight size={16} className="shrink-0 text-neutral-400 transition group-open:rotate-90" />
+                  <IconChevronRight size={16} className="shrink-0 text-neutral-500 transition group-open:rotate-90" />
                 </span>
               </summary>
               <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">{f.a}</p>

@@ -222,7 +222,7 @@ export interface RencanaJetLag {
 }
 
 /**
- * Rencana penyesuaian jam biologis dari zona waktu asal dan tujuan.
+ * Adjustment plan jam biologis dari zona waktu asal dan tujuan.
  *
  * Dua hal yang menentukan dan sering terbalik dilakukan orang:
  *
@@ -380,7 +380,7 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
     anjuran: [
       'Sasaran umum sekitar 150 menit aktivitas intensitas sedang per pekan, dibagi ke beberapa hari.',
       'Ukur intensitas dengan UJI BICARA, bukan dengan denyut jantung: intensitas sedang berarti masih bisa berbicara dalam kalimat penuh. Denyut jantung berubah dalam kehamilan sehingga zona denyut menjadi menyesatkan.',
-      'Latihan kekuatan ringan sampai sedang bermanfaat dan aman pada kehamilan tanpa penyulit.',
+      'Strength training ringan sampai sedang bermanfaat dan aman pada kehamilan tanpa penyulit.',
       'Latihan otot dasar panggul membantu pemulihan setelah melahirkan dan mengurangi keluhan kebocoran kencing.',
       'Minum cukup dan hindari berolahraga pada suhu maupun kelembapan yang tinggi.',
       'Berjalan, berenang, sepeda statis, dan senam hamil merupakan pilihan dengan risiko paling rendah.',
@@ -411,7 +411,7 @@ export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil
       'Kehamilan kembar dengan risiko kelahiran prematur',
       'Perdarahan menetap pada trimester kedua maupun ketiga',
       'Plasenta previa setelah 26 minggu',
-      'Riwayat maupun ancaman persalinan prematur pada kehamilan ini',
+      'History maupun ancaman persalinan prematur pada kehamilan ini',
       'Ketuban pecah dini',
       'Preeklamsia maupun hipertensi dalam kehamilan yang tidak terkendali',
       'Anemia berat',

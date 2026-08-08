@@ -53,12 +53,12 @@ export function CorrectedCalcium() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Measured total Ca</div>
-            <div className="mt-1 text-2xl font-black text-ink dark:text-white">{totalCa.toFixed(1)}</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Measured total Ca</div>
+            <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{totalCa.toFixed(1)}</div>
             <Badge tone={totalBand.tone}>{totalBand.label}</Badge>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Corrected Ca</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Corrected Ca</div>
             <div className="mt-1 text-2xl font-black text-brand-dark">{corrected.toFixed(1)}</div>
             <Badge tone={correctedBand.tone}>{correctedBand.label}</Badge>
           </div>
@@ -69,14 +69,14 @@ export function CorrectedCalcium() {
             here would be misleading.
           </p>
         )}
-        <p className="mt-3 text-[11px] text-neutral-400">
+        <p className="mt-3 text-[11px] text-neutral-500">
           When available and in critically ill or borderline cases, a directly measured ionized calcium
           is more reliable than either total or corrected calcium.
         </p>
         <CopyNote text={`Corrected Ca ${corrected.toFixed(1)} mg/dL (measured ${totalCa.toFixed(1)}, albumin ${albumin} g/dL) — ${correctedBand.label.toLowerCase()} [Payne 1973]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Payne, R.B., et al. (1973). Interpretation of serum calcium in patients with abnormal serum
         proteins. <i>BMJ</i>, 4(5893), 643-646. Decision-support estimate, not a substitute for ionized
         calcium when clinically indicated.

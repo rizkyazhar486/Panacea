@@ -72,7 +72,7 @@ export function SleepDebt() {
           </label>
         </div>
         {sleepFromDevice && (
-          <p className="mt-2 text-[11px] text-neutral-400">Prefilled from your synced sleep data — adjust it if last night was different from what synced.</p>
+          <p className="mt-2 text-[11px] text-neutral-500">Prefilled from your synced sleep data — adjust it if last night was different from what synced.</p>
         )}
         <button onClick={logNight} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Log last night ({today})</button>
       </Card>
@@ -80,12 +80,12 @@ export function SleepDebt() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">14-night debt</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">14-night debt</div>
             <div className="mt-1 text-3xl font-black text-brand-dark">{debt > 0 ? '−' : '+'}{Math.abs(debt).toFixed(1)}h</div>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Avg nightly sleep</div>
-            <div className="mt-1 text-3xl font-black text-ink dark:text-white">{avg.toFixed(1)}h</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Avg nightly sleep</div>
+            <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{avg.toFixed(1)}h</div>
           </div>
         </div>
         <div className="mt-3"><Badge tone={tone}>{verdict}</Badge></div>
@@ -108,20 +108,20 @@ export function SleepDebt() {
 
       {nights.length > 0 && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Night log</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Night log</div>
           <div className="mt-3 space-y-1.5">
             {nights.slice(0, 14).map((n) => (
               <div key={n.date} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
-                <span className="font-black text-ink dark:text-white">{n.hours}h</span>
+                <span className="font-black text-ink dark:text-ink">{n.hours}h</span>
                 <span className={`flex-1 ${n.hours >= need ? 'text-brand-dark' : 'text-neutral-500'}`}>{n.date} · {n.hours >= need ? 'met your need' : `${(need - n.hours).toFixed(1)}h short`}</span>
-                <button onClick={() => removeNight(n.date)} aria-label="Delete" className="font-bold text-neutral-400 hover:text-red-500">✕</button>
+                <button onClick={() => removeNight(n.date)} aria-label="Delete" className="font-bold text-neutral-500 hover:text-red-500">✕</button>
               </div>
             ))}
           </div>
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Van Dongen, H.P.A., et al. (2003). The cumulative cost of additional wakefulness.
         <i> Sleep</i>, 26(2), 117-126. Wellness tool — persistent insomnia or unrefreshing sleep
         despite adequate time in bed deserves a clinical sleep evaluation.

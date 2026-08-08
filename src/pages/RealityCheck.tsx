@@ -10,7 +10,7 @@ import { IconActivity, IconChartUp, IconHeart } from '../components/icons'
 // personal data leaves the device. Designed to be screenshot-worthy.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('id-ID')
+const rupiah = (n: number) => 'Rp' + Math.round(n).toLocaleString('en-GB')
 
 // ── Smoking cost ─────────────────────────────────────────────────────────────
 function SmokingCard() {
@@ -43,15 +43,15 @@ function SmokingCard() {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="rounded-xl bg-rose-50 p-3 text-center dark:bg-rose-500/10">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Total spent</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Total spent</div>
           <div className="text-xl font-black text-rose-600">{rupiah(d.costTotal)}</div>
         </div>
         <div className="rounded-xl bg-rose-50 p-3 text-center dark:bg-rose-500/10">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Est. life lost</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Est. life lost</div>
           <div className="text-xl font-black text-rose-600">{Math.round(d.daysLost)} days</div>
         </div>
         <div className="rounded-xl bg-brand-50 p-3 text-center dark:bg-white/5">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Per year</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Per year</div>
           <div className="text-xl font-black text-brand-dark">{rupiah(d.costYear)}</div>
         </div>
       </div>
@@ -97,7 +97,7 @@ function SugarCard() {
       <div className="mt-4 flex items-center gap-4">
         <div className="text-center">
           <div className="text-4xl font-black text-amber-600">{tsp.toFixed(1)}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-400">teaspoons</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">teaspoons</div>
         </div>
         <div className="flex-1">
           <div className="flex flex-wrap gap-0.5 text-2xl leading-none">
@@ -106,14 +106,14 @@ function SugarCard() {
         </div>
       </div>
       <div className="mt-3">
-        <div className="mb-1 flex justify-between text-[10px] font-bold uppercase text-neutral-400">
+        <div className="mb-1 flex justify-between text-[10px] font-bold uppercase text-neutral-500">
           <span>vs WHO daily ideal ({WHO_FREE_SUGAR_G}g)</span><span>{Math.round(pctWho)}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
           <div className="h-full rounded-full" style={{ width: `${Math.min(100, pctWho)}%`, background: pctWho > 100 ? '#ef4444' : pctWho > 60 ? '#f59e0b' : '#00BF63' }} />
         </div>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">
         {grams} g of sugar = {tsp.toFixed(1)} teaspoons. The WHO's ideal free-sugar limit is about 25 g (≈6 tsp) for a whole day — one sweet drink can blow past it.
       </p>
     </Card>
@@ -137,15 +137,15 @@ function AlcoholCard() {
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Drinks / year</div>
-          <div className="text-xl font-black text-ink dark:text-white">{unitsYear}</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Drinks / year</div>
+          <div className="text-xl font-black text-ink dark:text-ink">{unitsYear}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Pure alcohol / year</div>
-          <div className="text-xl font-black text-ink dark:text-white">{(gramsYear / 1000).toFixed(1)} kg</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Pure alcohol / year</div>
+          <div className="text-xl font-black text-ink dark:text-ink">{(gramsYear / 1000).toFixed(1)} kg</div>
         </div>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">
         A standard drink ≈ 10 g pure alcohol. Common low-risk guidance is ≤14 standard drinks/week with alcohol-free days — and current evidence finds no amount is truly "health-promoting." Less is better.
       </p>
     </Card>
@@ -164,7 +164,7 @@ export function RealityCheck() {
       <SmokingCard />
       <SugarCard />
       <AlcoholCard />
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimates using standard public-health figures (WHO sugar & alcohol guidance, the widely-cited ~11-minutes-per-cigarette estimate). Not medical advice. For help quitting smoking or alcohol, talk to a clinician — support genuinely works.
       </div>
     </div>

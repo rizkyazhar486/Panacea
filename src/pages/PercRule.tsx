@@ -66,14 +66,14 @@ export function PercRule() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Result</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-2xl font-black text-brand-dark">{positiveCount} / 8 positive</span>
           <Badge tone={percNegative && lowGestalt ? 'brand' : 'critical'}>
             {percNegative && lowGestalt ? 'PERC-negative' : percNegative ? 'PERC-negative, but gestalt not low-risk' : 'PERC-positive'}
           </Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">
+        <p className="mt-2 text-[12px] text-neutral-500">
           {percNegative && lowGestalt
             ? 'All criteria negative in a low-pretest-probability patient — PE can reasonably be excluded without further testing (false-negative rate <2%).'
             : percNegative
@@ -83,7 +83,7 @@ export function PercRule() {
         <CopyNote text={`PERC ${positiveCount}/8 positive${lowGestalt ? ', low pretest gestalt' : ', gestalt NOT low-risk'} — ${percNegative && lowGestalt ? 'PERC-negative: PE reasonably excluded without further testing' : 'PERC does not exclude PE: proceed with D-dimer/imaging'} [Kline 2004]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Kline, J.A., et al. (2004). Clinical criteria to prevent unnecessary diagnostic testing in
         emergency department patients with suspected pulmonary embolism. <i>J Thromb Haemost</i>,
         2(8), 1247-1255. Decision-support estimate — always applied in conjunction with clinical judgment.

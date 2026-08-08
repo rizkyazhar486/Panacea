@@ -18,7 +18,7 @@ const CAT_LABELS: Record<string, string> = {
   Vitamin: 'Vitamins',
   Topikal: 'Topical',
 }
-const rupiah = (n: number) => `Rp${n.toLocaleString('id-ID')}`
+const rupiah = (n: number) => `Rp${n.toLocaleString('en-GB')}`
 
 export function Pharmacy() {
   const { state, account, addOrder, addProduct, removeProduct } = useStore()
@@ -55,7 +55,7 @@ export function Pharmacy() {
   function checkout() {
     if (count === 0) return
     const names = Object.entries(cart).map(([id, qty]) => `${PRODUCTS.find((p) => p.id === id)?.name} ×${qty}`)
-    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} more` : ''}`, detail: `${names.join(', ')} · service Rp${SERVICE_FEE.toLocaleString('id-ID')} · delivery Rp${DELIVERY_FEE.toLocaleString('id-ID')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
+    addOrder({ id: uid(), category: 'Obat', title: `${names[0]}${names.length > 1 ? ` + ${names.length - 1} more` : ''}`, detail: `${names.join(', ')} · service Rp${SERVICE_FEE.toLocaleString('en-GB')} · delivery Rp${DELIVERY_FEE.toLocaleString('en-GB')}`, amountIdr: grandTotal, status: 'Diproses', at: new Date().toISOString() })
     setDone(true); setCart({})
     setTimeout(() => setDone(false), 3500)
   }
@@ -71,7 +71,7 @@ export function Pharmacy() {
             </div>
           } />
         <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
-          <IconSearch size={16} className="text-neutral-400" />
+          <IconSearch size={16} className="text-neutral-500" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search medicine… (e.g. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
         </div>
         <div className="mt-3">
@@ -113,7 +113,7 @@ export function Pharmacy() {
           <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto">
             {PRODUCTS.map((p) => (
               <div key={p.id} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-sm">
-                <span>{p.emoji} {p.name} · <span className="text-neutral-400">{rupiah(p.priceIdr)}</span></span>
+                <span>{p.emoji} {p.name} · <span className="text-neutral-500">{rupiah(p.priceIdr)}</span></span>
                 <button onClick={() => removeProduct(p.id)} className="text-xs font-semibold text-accent hover:underline">Remove</button>
               </div>
             ))}
@@ -125,7 +125,7 @@ export function Pharmacy() {
         <div className="lg:col-span-2">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {products.map((p) => (
-              <Card key={p.id} pad={false} hover className="overflow-hidden">
+              <Card key={p.id} pad={false} className="overflow-hidden">
                 {/* photo tile */}
                 <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.image ? undefined : `linear-gradient(150deg, ${p.color}22, ${p.color}55)` }}>
                   {p.image ? <img src={p.image} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" alt={p.name} /> : <span>{p.emoji}</span>}
@@ -152,14 +152,14 @@ export function Pharmacy() {
                 </div>
               </Card>
             ))}
-            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-400">No medicine found.</Card>}
+            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-500">No medicine found.</Card>}
           </div>
         </div>
 
         <div>
           <Card className="sticky top-20">
             <SectionTitle title="Cart" subtitle={`${count} items`} />
-            {count === 0 ? <p className="text-sm text-neutral-400">Your cart is still empty.</p> : (
+            {count === 0 ? <p className="text-sm text-neutral-500">Your cart is still empty.</p> : (
               <div className="space-y-2">
                 {Object.entries(cart).map(([id, qty]) => {
                   const p = PRODUCTS.find((x) => x.id === id)!

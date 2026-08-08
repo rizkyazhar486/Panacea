@@ -81,7 +81,7 @@ const DICT: Dict = {
   notifVitals: { id: 'Peringatan Tanda Vital', en: 'Vitals Alerts', zh: '生命体征警报', ar: 'تنبيهات العلامات الحيوية' },
   notifVitalsSub: { id: 'Pemberitahuan langsung untuk anomali biometrik', en: 'Immediate alerts for biometric anomalies', zh: '生物指标异常即时通知', ar: 'تنبيهات فورية للشذوذ الحيوي' },
   notifEmail: { id: 'Notifikasi Email', en: 'Email Notifications', zh: '电子邮件通知', ar: 'إشعارات البريد' },
-  notifEmailSub: { id: 'Ringkasan kesehatan & laporan mingguan', en: 'Weekly health summaries & reports', zh: '每周健康摘要和报告', ar: 'ملخصات صحية أسبوعية' },
+  notifEmailSub: { id: 'Summary kesehatan & laporan mingguan', en: 'Weekly health summaries & reports', zh: '每周健康摘要和报告', ar: 'ملخصات صحية أسبوعية' },
   notifSms: { id: 'Peringatan SMS', en: 'SMS Alerts', zh: '短信提醒', ar: 'تنبيهات الرسائل' },
   notifSmsSub: { id: 'Darurat SOS & pembaruan mendesak', en: 'Emergency SOS & urgent updates', zh: '紧急 SOS 和紧急更新', ar: 'الطوارئ والتحديثات العاجلة' },
   notifAi: { id: 'Wawasan AI Kesehatan', en: 'AI Health Insights', zh: 'AI 健康洞察', ar: 'رؤى الذكاء الاصطناعي' },

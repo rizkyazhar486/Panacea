@@ -192,10 +192,10 @@ export function ConsultChat({ room, name, title }: { room: string; name: string;
       {callError && <div className="bg-red-50 px-3 py-2 text-[11px] text-red-600">{callError}</div>}
 
       <div ref={scrollRef} className="h-56 space-y-2 overflow-y-auto bg-neutral-50 p-3">
-        {lines.length === 0 && <p className="text-center text-xs text-neutral-400">Start the conversation…</p>}
+        {lines.length === 0 && <p className="text-center text-xs text-neutral-500">Start the conversation…</p>}
         {lines.map((l, i) =>
           l.type === 'system' ? (
-            <div key={i} className="text-center text-[11px] text-neutral-400">{l.text}</div>
+            <div key={i} className="text-center text-[11px] text-neutral-500">{l.text}</div>
           ) : (
             <div key={i} className={`flex ${l.from === name ? 'justify-end' : ''}`}>
               <div className={`max-w-[80%] rounded-2xl px-3 py-1.5 text-sm ${l.from === name ? 'bg-brand text-white' : 'bg-white ring-1 ring-black/5'}`}>

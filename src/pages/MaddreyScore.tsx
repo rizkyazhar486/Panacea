@@ -48,7 +48,7 @@ export function MaddreyScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Discriminant Function</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Discriminant Function</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{df.toFixed(1)}</span>
           <Badge tone={severe ? 'critical' : 'brand'}>{severe ? 'Severe (≥32)' : 'Not severe (<32)'}</Badge>
@@ -58,7 +58,7 @@ export function MaddreyScore() {
             ? 'DF ≥32 indicates severe alcoholic hepatitis, historically associated with ~30-50% 30-day mortality untreated — corticosteroids (e.g. prednisolone) are commonly considered, weighed against infection risk and contraindications (active GI bleed, sepsis, renal failure).'
             : 'DF <32 suggests milder disease where corticosteroids have not shown clear benefit — supportive care and alcohol cessation support remain the priority.'}
         </p>
-        <p className="mt-2 text-[11px] text-neutral-400">PT − control: {ptDiff.toFixed(1)} seconds.</p>
+        <p className="mt-2 text-[11px] text-neutral-500">PT − control: {ptDiff.toFixed(1)} seconds.</p>
         <CopyNote text={`Maddrey DF ${df.toFixed(1)} (bilirubin ${bilirubin} mg/dL, PT ${patientPt}s vs control ${controlPt}s) — ${severe ? 'severe alcoholic hepatitis (≥32)' : 'not severe (<32)'} [Maddrey 1978]`} />
       </Card>
 
@@ -70,7 +70,7 @@ export function MaddreyScore() {
         detail={`Bili ${bilirubin}, PT ${patientPt}s (control ${controlPt}s)`}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Maddrey, W.C., et al. (1978). Corticosteroid therapy of alcoholic hepatitis. <i>Gastroenterology</i>,
         75(2), 193-199. Decision-support estimate — the corticosteroid decision should weigh
         infection screening (Lille score response at day 7 is often used to guide continuation) and

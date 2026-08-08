@@ -72,21 +72,21 @@ export function SerumOsmolality() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Calculated osmolality</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated osmolality</div>
             <div className="mt-1 text-2xl font-black text-brand-dark">{calculated.toFixed(0)}</div>
-            <div className="text-[11px] text-neutral-400">mOsm/kg</div>
+            <div className="text-[11px] text-neutral-500">mOsm/kg</div>
             <Badge tone={cBand.tone}>{cBand.label}</Badge>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Osmolal gap</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Osmolal gap</div>
             {gap != null ? (
               <>
-                <div className="mt-1 text-2xl font-black text-ink dark:text-white">{gap.toFixed(0)}</div>
-                <div className="text-[11px] text-neutral-400">mOsm/kg</div>
+                <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{gap.toFixed(0)}</div>
+                <div className="text-[11px] text-neutral-500">mOsm/kg</div>
                 {gBand && <Badge tone={gBand.tone}>{gBand.label}</Badge>}
               </>
             ) : (
-              <p className="mt-1 text-[12px] text-neutral-400">Enter a measured osmolality to compute the gap.</p>
+              <p className="mt-1 text-[12px] text-neutral-500">Enter a measured osmolality to compute the gap.</p>
             )}
           </div>
         </div>
@@ -99,7 +99,7 @@ export function SerumOsmolality() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Dorwart, W.V. &amp; Chalmers, L. (1975). Comparison of methods for calculating serum osmolality.
         <i> Clin Chem</i>, 21(2), 190-194. Decision-support estimate — a normal gap does not fully
         exclude toxic alcohol ingestion late in its course (the parent alcohol may already be metabolized).

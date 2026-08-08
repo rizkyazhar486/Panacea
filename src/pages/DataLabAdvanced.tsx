@@ -80,7 +80,7 @@ function GlucoseVariability() {
           </div>
         </div>
       )}
-      <p className="mt-2 text-[11px] text-neutral-400">Coefficient of variation (CV) &lt;36% is the commonly-cited threshold for "stable" glucose in CGM research (Monnier et al.) — not a diagnostic cutoff.</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Coefficient of variation (CV) &lt;36% is the commonly-cited threshold for "stable" glucose in CGM research (Monnier et al.) — not a diagnostic cutoff.</p>
     </Card>
   )
 }
@@ -118,7 +118,7 @@ function PhenoAgeCalc() {
         <div className="text-3xl font-black text-brand-dark">{phenoAge}</div>
         <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {f.age})</div>
       </div>
-      <p className="mt-2 text-[11px] text-neutral-400">Levine ME et al., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Our best-effort implementation of the published coefficients; not a substitute for validated clinical labs, and worth cross-checking against another PhenoAge calculator.</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Levine ME et al., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Our best-effort implementation of the published coefficients; not a substitute for validated clinical labs, and worth cross-checking against another PhenoAge calculator.</p>
     </Card>
   )
 }
@@ -170,8 +170,8 @@ function MicrobiomeDiversity() {
         <div className="text-2xl font-black text-brand-dark">{shannon.toFixed(2)}</div>
         <div className="text-[11px] text-neutral-500">Shannon Index · {plants.length} unique plants logged this week</div>
       </div>
-      {plants.length === 0 && <p className="mt-2 text-center text-[12px] text-neutral-400">Nothing logged yet — add plants in the Nutrition Longevity Toolkit's "Plant Diversity" tab first.</p>}
-      <p className="mt-2 text-[11px] text-neutral-400">Higher richness (more unique plants) drives a higher index — a proxy some microbiome researchers use for dietary fiber/polyphenol diversity, not a direct measurement of your actual gut microbiome (which requires stool sequencing).</p>
+      {plants.length === 0 && <p className="mt-2 text-center text-[12px] text-neutral-500">Nothing logged yet — add plants in the Nutrition Longevity Toolkit's "Plant Diversity" tab first.</p>}
+      <p className="mt-2 text-[11px] text-neutral-500">Higher richness (more unique plants) drives a higher index — a proxy some microbiome researchers use for dietary fiber/polyphenol diversity, not a direct measurement of your actual gut microbiome (which requires stool sequencing).</p>
     </Card>
   )
 }
@@ -220,7 +220,7 @@ function SupplementCombiner() {
       <svg viewBox="0 0 300 100" className="mt-4 w-full">
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={curve.map((v, h) => `${h * 12},${100 - (v / maxVal) * 90}`).join(' ')} />
       </svg>
-      <p className="text-center text-[11px] text-neutral-400">24-hour combined concentration curve (relative units)</p>
+      <p className="text-center text-[11px] text-neutral-500">24-hour combined concentration curve (relative units)</p>
 
       {overlapWarning && <div className="mt-2 rounded-xl bg-amber-50 p-3 text-[12px] text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">⚠️ Multiple stimulants taken within 6 hours of each other — overlapping peaks may compound effects.</div>}
 
@@ -232,7 +232,7 @@ function SupplementCombiner() {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-400">A simplified single-compartment exponential-decay model — real pharmacokinetics involve absorption phases, metabolism (CYP450), and individual variation this doesn't capture. Not medical advice; check real interactions with a pharmacist.</p>
+      <p className="mt-2 text-[11px] text-neutral-500">A simplified single-compartment exponential-decay model — real pharmacokinetics involve absorption phases, metabolism (CYP450), and individual variation this doesn't capture. Not medical advice; check real interactions with a pharmacist.</p>
     </Card>
   )
 }
@@ -326,7 +326,7 @@ export function DataLabAdvanced() {
       {tab === 'supplements' && <SupplementCombiner />}
       {tab === 'vault' && <EncryptedVault />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         All computation happens locally in your browser — no file, blood value, or note here is ever
         sent to a server. Educational tools, not diagnostic or medical devices.
       </div>

@@ -56,7 +56,7 @@ function QuestionSet({ items, answers, setAnswers }: { items: string[]; answers:
     <div className="space-y-3">
       {items.map((text, qi) => (
         <Card key={qi} className="!p-4">
-          <div className="text-sm font-semibold text-ink dark:text-white">{qi + 1}. {text}</div>
+          <div className="text-sm font-semibold text-ink dark:text-ink">{qi + 1}. {text}</div>
           <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {SCALE.map((label, pts) => (
               <button
@@ -65,7 +65,7 @@ function QuestionSet({ items, answers, setAnswers }: { items: string[]; answers:
                 className={`rounded-lg border px-2 py-2 text-[11px] font-semibold leading-tight transition ${
                   answers[qi] === pts
                     ? 'border-brand bg-brand-50 text-brand-dark'
-                    : 'border-neutral-200 text-neutral-500 hover:border-brand/30 dark:border-white/10 dark:text-neutral-400'
+                    : 'border-neutral-200 text-neutral-500 hover:border-brand/30 dark:border-white/10 dark:text-neutral-500'
                 }`}
               >
                 {label}
@@ -132,7 +132,7 @@ export function MentalHealthScreen() {
 
       {tab === 'phq9' && phqScore != null && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">PHQ-9 Result</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">PHQ-9 Result</div>
           <div className="mt-2 flex items-center gap-3">
             <span className="text-3xl font-black text-brand-dark">{phqScore}/27</span>
             <Badge tone={phqBand(phqScore).tone}>{phqBand(phqScore).label}</Badge>
@@ -141,7 +141,7 @@ export function MentalHealthScreen() {
       )}
       {tab === 'gad7' && gadScore != null && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">GAD-7 Result</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">GAD-7 Result</div>
           <div className="mt-2 flex items-center gap-3">
             <span className="text-3xl font-black text-brand-dark">{gadScore}/21</span>
             <Badge tone={gadBand(gadScore).tone}>{gadBand(gadScore).label}</Badge>
@@ -149,7 +149,7 @@ export function MentalHealthScreen() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Kroenke, K., Spitzer, R.L., &amp; Williams, J.B. (2001). The PHQ-9. <i>J Gen Intern Med</i>, 16(9),
         606-613. Spitzer, R.L., et al. (2006). GAD-7. <i>Arch Intern Med</i>, 166(10), 1092-1097.
         Screening tools only — a score of any level, and especially any endorsement of item 9 above,

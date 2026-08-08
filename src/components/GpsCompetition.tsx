@@ -5,7 +5,7 @@ import type { GpsActivity } from '../lib/types'
 
 // Mini bar chart (no chart lib) — visualizes a numeric series with labels.
 function BarChart({ data, color, unit }: { data: { label: string; value: number }[]; color: string; unit: string }) {
-  if (data.length === 0) return <p className="text-[11px] text-neutral-400">No data yet.</p>
+  if (data.length === 0) return <p className="text-[11px] text-neutral-500">No data yet.</p>
   const max = Math.max(...data.map((d) => d.value)) || 1
   return (
     <div className="flex items-end gap-1.5" style={{ height: 90 }}>
@@ -13,7 +13,7 @@ function BarChart({ data, color, unit }: { data: { label: string; value: number 
         <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1">
           <span className="text-[9px] font-bold text-neutral-500">{d.value}</span>
           <div className="w-full rounded-t-md transition-all" style={{ height: `${Math.max(6, (d.value / max) * 64)}px`, background: color }} />
-          <span className="truncate text-[8px] text-neutral-400">{d.label}</span>
+          <span className="truncate text-[8px] text-neutral-500">{d.label}</span>
         </div>
       ))}
       <span className="ml-1 self-end text-[8px] font-semibold text-neutral-300">{unit}</span>
@@ -81,16 +81,16 @@ export function GpsCompetition() {
       </div>
 
       {acts.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-neutral-200 p-5 text-center text-xs text-neutral-400">
+        <div className="rounded-xl border border-dashed border-neutral-200 p-5 text-center text-xs text-neutral-500">
           No activities yet. Track a run / ride / swim / triathlon with the <b className="text-brand-dark">GPS Tracker</b> on Home, then tap <b>Share</b> — stats &amp; rankings are calculated automatically (no manual entry).
         </div>
       ) : (
         <>
           {/* Totals */}
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-brand-dark">{totalKm.toFixed(1)}</div><div className="text-[10px] text-neutral-400">km</div></div>
-            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-indigo-600">{fmtDur(totalDur)}</div><div className="text-[10px] text-neutral-400">duration</div></div>
-            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-amber-600">{totalKcal}</div><div className="text-[10px] text-neutral-400">kcal</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-brand-dark">{totalKm.toFixed(1)}</div><div className="text-[10px] text-neutral-500">km</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-indigo-600">{fmtDur(totalDur)}</div><div className="text-[10px] text-neutral-500">duration</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2"><div className="text-sm font-black text-amber-600">{totalKcal}</div><div className="text-[10px] text-neutral-500">kcal</div></div>
           </div>
 
           {/* Leaderboard */}
@@ -101,7 +101,7 @@ export function GpsCompetition() {
                 <span className="w-5 text-center">{medal[i] ?? `${i + 1}.`}</span>
                 <span className="flex-1 truncate font-semibold text-neutral-700">{p.name}</span>
                 <span className="font-bold text-brand-dark">{p.km.toFixed(1)} km</span>
-                <span className="text-neutral-400">· {p.runs}×</span>
+                <span className="text-neutral-500">· {p.runs}×</span>
               </div>
             ))}
           </div>

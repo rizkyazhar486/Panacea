@@ -93,7 +93,7 @@ export function SportsScores() {
 
   if (!backendEnabled) {
     return (
-      <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-400">
+      <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-500">
         Live scores require an active server — not available in local demo mode.
       </div>
     )
@@ -104,7 +104,7 @@ export function SportsScores() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Live Scores" subtitle="Football, NBA, NFL, MLB, NHL, UFC, tennis, cricket, F1, MotoGP — free sources" />
         <label className="mt-3 block">
-          <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-neutral-400">Choose league / sport</span>
+          <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-neutral-500">Choose league / sport</span>
           <select
             value={league}
             onChange={(e) => setLeague(e.target.value)}
@@ -117,7 +117,7 @@ export function SportsScores() {
         </label>
       </Card>
 
-      {loading && <div className="py-8 text-center text-sm text-neutral-400">Loading…</div>}
+      {loading && <div className="py-8 text-center text-sm text-neutral-500">Loading…</div>}
       {err && <div className="rounded-xl bg-rose-50 p-3 text-center text-xs text-rose-600">{err}</div>}
 
       {league === 'motogp' && motogp && !loading && (
@@ -129,13 +129,13 @@ export function SportsScores() {
               {motogp.next.date && <p className="mt-0.5 text-xs font-semibold text-brand-dark">{new Date(motogp.next.date).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</p>}
             </div>
           ) : (
-            <p className="text-xs text-neutral-400">No upcoming MotoGP race found right now.</p>
+            <p className="text-xs text-neutral-500">No upcoming MotoGP race found right now.</p>
           )}
           {motogp.lastRaceName && (
             <div className="border-t border-neutral-100 pt-3">
               <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Last Race</div>
               <p className="mt-1 text-sm font-semibold text-ink">{motogp.lastRaceName}</p>
-              {motogp.lastRaceDate && <p className="text-[11px] text-neutral-400">{new Date(motogp.lastRaceDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>}
+              {motogp.lastRaceDate && <p className="text-[11px] text-neutral-500">{new Date(motogp.lastRaceDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>}
             </div>
           )}
         </Card>
@@ -163,24 +163,24 @@ export function SportsScores() {
               </div>
             </div>
           )}
-          {!f1.next && !f1.lastPodium && <p className="text-xs text-neutral-400">F1 data is unavailable right now.</p>}
+          {!f1.next && !f1.lastPodium && <p className="text-xs text-neutral-500">F1 data is unavailable right now.</p>}
         </Card>
       )}
 
       {league !== 'f1' && league !== 'motogp' && !loading && !err && (
         <div className="space-y-2">
-          {events.length === 0 && <div className="py-8 text-center text-xs text-neutral-400">No matches for this league right now.</div>}
+          {events.length === 0 && <div className="py-8 text-center text-xs text-neutral-500">No matches for this league right now.</div>}
           {events.map((ev) => {
             const badge = STATE_BADGE[ev.state]
             return (
               <Card key={ev.id} className="!p-4">
-                <div className="flex items-center justify-between text-[10px] text-neutral-400">
+                <div className="flex items-center justify-between text-[10px] text-neutral-500">
                   <span>{new Date(ev.startTime).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                   <Badge tone={badge.tone}>{ev.state === 'in' ? `🔴 ${ev.statusDetail || badge.label}` : badge.label}</Badge>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <button onClick={() => toggleFav(ev.home.name)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                    <span className={`shrink-0 text-sm ${isFav(ev.home.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <span className={`shrink-0 text-sm ${isFav(ev.home.name) ? 'text-amber-700' : 'text-neutral-300'}`}>★</span>
                     <TeamLogo src={ev.home.logo} alt={ev.home.name} />
                     <span className="truncate text-sm font-semibold text-ink">{ev.home.name}</span>
                   </button>
@@ -188,7 +188,7 @@ export function SportsScores() {
                   <button onClick={() => toggleFav(ev.away.name)} className="flex min-w-0 flex-1 items-center justify-end gap-2 text-right">
                     <span className="truncate text-sm font-semibold text-ink">{ev.away.name}</span>
                     <TeamLogo src={ev.away.logo} alt={ev.away.name} />
-                    <span className={`shrink-0 text-sm ${isFav(ev.away.name) ? 'text-amber-400' : 'text-neutral-300'}`}>★</span>
+                    <span className={`shrink-0 text-sm ${isFav(ev.away.name) ? 'text-amber-700' : 'text-neutral-300'}`}>★</span>
                   </button>
                 </div>
               </Card>
@@ -197,7 +197,7 @@ export function SportsScores() {
         </div>
       )}
 
-      <p className="text-center text-[10px] text-neutral-400">
+      <p className="text-center text-[10px] text-neutral-500">
         Star ★ your favorite teams to get goal / final-result notifications (checked server-side every ~90 seconds).
       </p>
     </div>

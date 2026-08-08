@@ -26,8 +26,8 @@ function BrainPuzzle() {
   const p = PUZZLES[i % PUZZLES.length]
   return (
     <Card className="!p-6 text-center">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What comes next?</div>
-      <div className="mt-3 text-2xl font-black text-ink dark:text-white">{p.seq}</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What comes next?</div>
+      <div className="mt-3 text-2xl font-black text-ink dark:text-ink">{p.seq}</div>
       {revealed ? (
         <div className="mt-4 rounded-xl bg-brand/10 p-3">
           <div className="text-xl font-black text-brand-dark">{p.answer}</div>
@@ -121,8 +121,8 @@ function ReactionTime() {
 
   return (
     <Card className="!p-5 text-center">
-      <button onClick={onClick} className={`flex h-56 w-full items-center justify-center rounded-2xl text-lg font-black text-white transition ${bg}`}>{label}</button>
-      <p className="mt-3 text-[12px] text-neutral-400">Best: {best > 0 ? `${best}ms` : '—'}</p>
+      <button onClick={onClick} className={`flex h-56 w-full items-center justify-center rounded-2xl text-lg font-black text-ink transition ${bg}`}>{label}</button>
+      <p className="mt-3 text-[12px] text-neutral-500">Best: {best > 0 ? `${best}ms` : '—'}</p>
     </Card>
   )
 }
@@ -141,7 +141,7 @@ function WordOfDay() {
   const w = WORDS[dayIndex]
   return (
     <Card className="!p-6 text-center">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Today's word</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Today's word</div>
       <div className="mt-2 text-2xl font-black text-brand-dark">{w.word}</div>
       <p className="mt-2 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{w.def}</p>
     </Card>
@@ -171,13 +171,13 @@ function StressInventory() {
       <div className="mt-3 space-y-1.5">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
-            <span className="flex-1 text-[13px] text-ink dark:text-white">{item}</span>
-            <button onClick={() => move(i, -1)} className="text-neutral-400">↑</button>
-            <button onClick={() => move(i, 1)} className="text-neutral-400">↓</button>
+            <span className="flex-1 text-[13px] text-ink dark:text-ink">{item}</span>
+            <button onClick={() => move(i, -1)} className="text-neutral-500">↑</button>
+            <button onClick={() => move(i, 1)} className="text-neutral-500">↓</button>
             <button onClick={() => remove(i)} className="text-red-500">✕</button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-center text-[12px] text-neutral-400">Nothing listed — good, or add what's on your mind.</p>}
+        {items.length === 0 && <p className="text-center text-[12px] text-neutral-500">Nothing listed — good, or add what's on your mind.</p>}
       </div>
     </Card>
   )
@@ -202,7 +202,7 @@ function DigitalDetox() {
       <p className="text-[13px] text-neutral-500">Track time spent away from your phone.</p>
       <div className="mt-3 text-4xl font-black tabular-nums text-brand-dark">{String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}</div>
       <button onClick={() => (running ? stop() : setRunning(true))} className={`mt-4 w-full rounded-xl py-2.5 text-sm font-bold ${running ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300' : 'bg-brand text-white'}`}>{running ? 'End session' : 'Start detox session'}</button>
-      <p className="mt-3 text-[12px] text-neutral-400">{totalMin} min tracked across {sessions.length} sessions</p>
+      <p className="mt-3 text-[12px] text-neutral-500">{totalMin} min tracked across {sessions.length} sessions</p>
     </Card>
   )
 }
@@ -243,7 +243,7 @@ function StroopTest() {
         <>
           <div className="mt-4 text-4xl font-black" style={{ color: ink.hex }}>{word.name}</div>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            {STROOP_COLORS.map((c) => <button key={c.name} onClick={() => answer(c)} className="rounded-xl py-3 text-sm font-bold text-white" style={{ background: c.hex }}>{c.name}</button>)}
+            {STROOP_COLORS.map((c) => <button key={c.name} onClick={() => answer(c)} className="rounded-xl py-3 text-sm font-bold text-ink" style={{ background: c.hex }}>{c.name}</button>)}
           </div>
         </>
       )}
@@ -420,7 +420,7 @@ function FingerTappingTest() {
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Total taps</span><b>{taps.length}</b></div>
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Taps / second</span><b>{tapsPerSecond.toFixed(1)}</b></div>
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Rhythm variability (CV)</span><b>{cv.toFixed(1)}%</b></div>
-          <p className="text-[11px] text-neutral-400">Lower variability = steadier rhythm. Not a diagnostic motor exam — just a fun, repeatable self-tracker.</p>
+          <p className="text-[11px] text-neutral-500">Lower variability = steadier rhythm. Not a diagnostic motor exam — just a fun, repeatable self-tracker.</p>
           <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
         </div>
       )}
@@ -492,13 +492,13 @@ function GoNoGoTest() {
       {phase === 'idle' && <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start test ({ROUNDS} rounds)</button>}
       {phase === 'running' && (
         <div className="mt-4">
-          <div className="text-[11px] font-bold text-neutral-400">Round {round + 1} / {ROUNDS}</div>
+          <div className="text-[11px] font-bold text-neutral-500">Round {round + 1} / {ROUNDS}</div>
           <button
             onClick={respond}
             disabled={!stimulus}
             className={`mx-auto mt-3 h-32 w-32 rounded-full transition ${stimulus === 'go' ? 'bg-emerald-500' : stimulus === 'nogo' ? 'bg-red-500' : 'bg-neutral-200 dark:bg-white/10'}`}
           />
-          <p className="mt-2 text-[11px] text-neutral-400">{stimulus === 'go' ? 'GO — tap now!' : stimulus === 'nogo' ? 'STOP — do not tap' : 'wait...'}</p>
+          <p className="mt-2 text-[11px] text-neutral-500">{stimulus === 'go' ? 'GO — tap now!' : stimulus === 'nogo' ? 'STOP — do not tap' : 'wait...'}</p>
         </div>
       )}
       {phase === 'done' && (
@@ -506,7 +506,7 @@ function GoNoGoTest() {
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Go accuracy (hit rate)</span><b>{goAccuracy.toFixed(0)}%</b></div>
           <div className="flex justify-between text-sm"><span className="text-neutral-500">No-Go accuracy (inhibition)</span><b>{nogoAccuracy.toFixed(0)}%</b></div>
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Avg. reaction time (Go)</span><b>{avgRt ? `${Math.round(avgRt)} ms` : '—'}</b></div>
-          <p className="text-[11px] text-neutral-400">Lower No-Go accuracy means more impulsive "false alarm" taps. A casual self-tracker, not a clinical inhibition assessment.</p>
+          <p className="text-[11px] text-neutral-500">Lower No-Go accuracy means more impulsive "false alarm" taps. A casual self-tracker, not a clinical inhibition assessment.</p>
           <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
         </div>
       )}
@@ -584,7 +584,7 @@ export function MindToolkit() {
       {tab === 'tapping' && <FingerTappingTest />}
       {tab === 'gonogo' && <GoNoGoTest />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Casual brain games and self-tracking — engaging, not a clinical cognitive assessment. If you're
         concerned about memory or cognitive changes, talk to a clinician.
       </div>

@@ -53,10 +53,10 @@ function ApgarCalc() {
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
         <div>
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
-        <p className="max-w-[55%] text-right text-[10px] text-neutral-400">7-10 normal · 4-6 needs assistance · 0-3 immediate resuscitation. Repeat every 5 minutes if &lt;7.</p>
+        <p className="max-w-[55%] text-right text-[10px] text-neutral-500">7-10 normal · 4-6 needs assistance · 0-3 immediate resuscitation. Repeat every 5 minutes if &lt;7.</p>
       </div>
     </Card>
   )
@@ -88,15 +88,15 @@ function GcsCalc() {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-xl font-black text-ink">E{e}V{v}M{m} = {total}<span className="text-sm font-semibold text-neutral-400">/15</span></div>
+          <div className="text-xl font-black text-ink">E{e}V{v}M{m} = {total}<span className="text-sm font-semibold text-neutral-500">/15</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-xl font-black text-ink">{gcsP}<span className="text-sm font-semibold text-neutral-400">/15 (GCS-P)</span></div>
-          <p className="mt-1 text-[10px] text-neutral-400">GCS-P = GCS total − pupil score (0/1/2)</p>
+          <div className="text-xl font-black text-ink">{gcsP}<span className="text-sm font-semibold text-neutral-500">/15 (GCS-P)</span></div>
+          <p className="mt-1 text-[10px] text-neutral-500">GCS-P = GCS total − pupil score (0/1/2)</p>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</p>
     </Card>
   )
 }
@@ -117,7 +117,7 @@ function Curb65Calc() {
   const Row = ({ label, sub, checked, onChange }: { label: string; sub: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
-      <div><div className="text-sm font-bold text-ink">{label}</div><div className="text-[11px] text-neutral-400">{sub}</div></div>
+      <div><div className="text-sm font-bold text-ink">{label}</div><div className="text-[11px] text-neutral-500">{sub}</div></div>
     </label>
   )
   return (
@@ -132,7 +132,7 @@ function Curb65Calc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/5</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/5</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
@@ -171,7 +171,7 @@ function BishopCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/13</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/13</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
@@ -206,10 +206,10 @@ function CkdEpiCalc() {
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
         <div>
-          <div className="text-2xl font-black text-ink">{result.toFixed(0)}<span className="text-sm font-semibold text-neutral-400"> mL/min/1.73m²</span></div>
+          <div className="text-2xl font-black text-ink">{result.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mL/min/1.73m²</span></div>
           <Badge tone={tone}>{stage}</Badge>
         </div>
-        <p className="max-w-[40%] text-right text-[10px] text-neutral-400">The 2021 equation removes the race coefficient used in earlier versions (CKD-EPI 2009/2012).</p>
+        <p className="max-w-[40%] text-right text-[10px] text-neutral-500">The 2021 equation removes the race coefficient used in earlier versions (CKD-EPI 2009/2012).</p>
       </div>
     </Card>
   )
@@ -320,24 +320,24 @@ function WhoGrowthCalc() {
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Weight/Age (WAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Age (WAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
           <Badge tone={wazC.tone}>{wazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Height/Age (HAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Height/Age (HAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{haz >= 0 ? '+' : ''}{haz.toFixed(2)} SD</div>
           <Badge tone={hazC.tone}>{hazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Weight/Height (WHZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Height (WHZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{whz >= 0 ? '+' : ''}{whz.toFixed(2)} SD</div>
           <Badge tone={whzC.tone}>{whzC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">BMI</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">BMI</div>
           <div className="mt-1 text-xl font-black text-ink">{bmi.toFixed(1)}</div>
-          <div className="text-[10px] text-neutral-400">kg/m²</div>
+          <div className="text-[10px] text-neutral-500">kg/m²</div>
         </div>
       </div>
 
@@ -363,7 +363,7 @@ function WhoGrowthCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         The curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for definitive clinical decisions, compare against the official WHO/KMS growth chart or Buku KIA per the Child Anthropometry Standard (Permenkes RI No. 2/2020).
       </p>
     </Card>
@@ -410,11 +410,11 @@ function WhoNeonateCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{lossFromBirth >= 0 ? lossFromBirth.toFixed(1) : '0'}%</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">{lossFromBirth >= 0 ? 'Down from birth weight' : 'Already above birth weight'}</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">{lossFromBirth >= 0 ? 'Down from birth weight' : 'Already above birth weight'}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{z >= 0 ? '+' : ''}{z.toFixed(2)} SD</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">vs. median trajectory (expected {expectedG.toFixed(0)}g)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">vs. median trajectory (expected {expectedG.toFixed(0)}g)</div>
         </div>
       </div>
 
@@ -443,7 +443,7 @@ function WhoNeonateCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Physiologic loss of up to ~7-10% of birth weight in the first 3-5 days is normal (extravascular fluid loss), with return to birth weight around day 10-14. Estimate simplified from standard reference points — compare against official neonatal charts (WHO/Fenton) for borderline cases.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Physiologic loss of up to ~7-10% of birth weight in the first 3-5 days is normal (extravascular fluid loss), with return to birth weight around day 10-14. Estimate simplified from standard reference points — compare against official neonatal charts (WHO/Fenton) for borderline cases.</p>
     </Card>
   )
 }
@@ -499,7 +499,7 @@ function CdcAnthropometryCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{bmi.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">kg/m²</span></div>
+          <div className="text-2xl font-black text-ink">{bmi.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg/m²</span></div>
           <Badge tone={cls.tone}>{cls.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] text-neutral-500">Thresholds at this age: P85 ≈ {p85.toFixed(1)} · P95 ≈ {p95.toFixed(1)} kg/m²</p>
@@ -519,7 +519,7 @@ function CdcAnthropometryCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the entire pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the entire pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</p>
     </Card>
   )
 }
@@ -650,15 +650,15 @@ P (Plan):
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{total}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Ballard Score</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Ballard Score</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{gaWeeks.toFixed(1)} wks</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Gestational Age</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Gestational Age</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
-          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">Lubchenco</div>
+          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-500">Lubchenco</div>
         </div>
       </div>
 
@@ -666,7 +666,7 @@ P (Plan):
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Gestational age estimate & Lubchenco classification are simplified from standard reference points — verify against official tables/charts for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.
       </p>
     </Card>
@@ -685,7 +685,7 @@ function QsofaCalc() {
   const Row = ({ label, sub, checked, onChange }: { label: string; sub: string; checked: boolean; onChange: (v: boolean) => void }) => (
     <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 accent-brand" />
-      <div><div className="text-sm font-bold text-ink">{label}</div><div className="text-[11px] text-neutral-400">{sub}</div></div>
+      <div><div className="text-sm font-bold text-ink">{label}</div><div className="text-[11px] text-neutral-500">{sub}</div></div>
     </label>
   )
   return (
@@ -698,7 +698,7 @@ function QsofaCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/3</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/3</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
@@ -724,14 +724,14 @@ function HollidaySegarCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{daily.toFixed(0)}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-400">mL / 24 hours</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">mL / 24 hours</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{hourly.toFixed(1)}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-400">mL / hour (maintenance rate)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">mL / hour (maintenance rate)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">First 10kg: 100 mL/kg · second 10kg: +50 mL/kg · each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10kg: 100 mL/kg · second 10kg: +50 mL/kg · each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</p>
     </Card>
   )
 }
@@ -754,18 +754,18 @@ function ParklandCalc() {
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">mL Total 24 hours</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">mL Total 24 hours</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">mL/hour (first 8 hours)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">mL/hour (first 8 hours)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">mL/hour (following 16 hours)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</p>
     </Card>
   )
 }
@@ -797,15 +797,15 @@ function NaegeleCalc() {
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-base font-black text-ink">{edd.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-400">Estimated Due Date (EDD)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Due Date (EDD)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-base font-black text-ink">{gaWeeks}wk {gaDays}d</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-400">Current Gestational Age</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Current Gestational Age</div>
           </div>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Naegele's Rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound if possible — it is more accurate than LMP alone, especially with irregular cycles.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Naegele's Rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound if possible — it is more accurate than LMP alone, especially with irregular cycles.</p>
     </Card>
   )
 }
@@ -829,12 +829,12 @@ function MapCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{map.toFixed(0)}<span className="text-sm font-semibold text-neutral-400"> mmHg</span></div>
+          <div className="text-2xl font-black text-ink">{map.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mmHg</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">MAP = (Systolic + 2×Diastolic) / 3.</p>
+      <p className="mt-3 text-[10px] text-neutral-500">MAP = (Systolic + 2×Diastolic) / 3.</p>
     </Card>
   )
 }
@@ -866,13 +866,13 @@ function AlvaradoCalc() {
           <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
             <input type="checkbox" checked={!!checked[c.key]} onChange={(e) => setChecked((s) => ({ ...s, [c.key]: e.target.checked }))} className="h-5 w-5 accent-brand" />
             <div className="flex-1 text-sm font-bold text-ink">{c.label}</div>
-            <span className="text-xs font-black text-neutral-400">+{c.pts}</span>
+            <span className="text-xs font-black text-neutral-500">+{c.pts}</span>
           </label>
         ))}
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
@@ -906,17 +906,17 @@ function SirirajCalc() {
         subtitle="Bedside discrimination of haemorrhagic vs ischaemic stroke" />
       <div className="mt-3 space-y-3">
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Consciousness</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Consciousness</div>
           <div className="mt-1"><SegButtons value={conscious} onChange={setConscious}
             options={[{ v: 0, l: 'Alert' }, { v: 1, l: 'Drowsy/stupor' }, { v: 2, l: 'Semicoma/coma' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Vomiting (within 2 h of onset)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Vomiting (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={vomiting} onChange={setVomiting}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Headache (within 2 h of onset)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Headache (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={headache} onChange={setHeadache}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
@@ -925,8 +925,8 @@ function SirirajCalc() {
             onChange={(e) => setDbp(Number(e.target.value) || 0)} />
         </Field>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-white">Atheroma markers</div>
-          <div className="text-[10px] italic text-neutral-400">Diabetes, angina, or intermittent claudication — any one counts</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Atheroma markers</div>
+          <div className="text-[10px] italic text-neutral-500">Diabetes, angina, or intermittent claudication — any one counts</div>
           <div className="mt-1"><SegButtons value={atheroma} onChange={setAtheroma}
             options={[{ v: 0, l: 'None' }, { v: 1, l: 'One or more' }]} /></div>
         </div>
@@ -935,7 +935,7 @@ function SirirajCalc() {
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
-          <span className="text-2xl font-black text-ink dark:text-white">{rounded > 0 ? '+' : ''}{rounded}</span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
         </div>
         <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
         <div className="mt-2 text-[10px] leading-relaxed text-neutral-500">
@@ -948,7 +948,7 @@ function SirirajCalc() {
         <li>Scores between −1 and +1 are explicitly indeterminate — that band is common, and it means "image the patient", not "pick the likelier one".</li>
         <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Poungvarin N, Viriyavejakul A, Komontri C. Siriraj stroke score and validation study to
         distinguish supratentorial intracerebral haemorrhage from infarction. BMJ. 1991;302(6792):1565-7.
       </p>
@@ -987,7 +987,7 @@ function GadjahMadaCalc() {
           { l: 'Refleks Babinski positif', v: babinski, set: setBabinski },
         ].map((r) => (
           <div key={r.l}>
-            <div className="text-[12px] font-bold text-ink dark:text-white">{r.l}</div>
+            <div className="text-[12px] font-bold text-ink dark:text-ink">{r.l}</div>
             <div className="mt-1"><SegButtons value={r.v ? 1 : 0} onChange={(n) => r.set(n === 1)}
               options={[{ v: 0, l: 'Tidak' }, { v: 1, l: 'Ya' }]} /></div>
           </div>
@@ -1004,7 +1004,7 @@ function GadjahMadaCalc() {
         <li><b>Bukan pengganti CT scan.</b> Sama seperti Siriraj, algoritma ini untuk fasilitas tanpa pencitraan — keputusan memberi antiplatelet atau trombolisis tidak boleh berdasarkan algoritma ini saja.</li>
         <li>Bila hasil algoritma dan Siriraj berbeda, itu justru sinyal kuat bahwa pasien perlu segera dirujuk untuk pencitraan, bukan alasan memilih salah satunya.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
         Yogyakarta. Widely reproduced in Indonesian neurology teaching materials and PERDOSSI guidance.
       </p>
@@ -1100,7 +1100,7 @@ function CentorCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
+      <p className="mt-3 text-[10px] text-neutral-500">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
     </Card>
   )
 }
@@ -1137,10 +1137,10 @@ function NaCorrectionCalc() {
         <Field label="Blood Glucose (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
       </div>
       <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">mEq/L</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Corrected Sodium</div>
+        <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">mEq/L</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Corrected Sodium</div>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</p>
 
       <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Potassium</h4>
       <div className="mt-2">
@@ -1150,12 +1150,12 @@ function NaCorrectionCalc() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-lg font-black text-ink">{measuredK < 4.0 ? `${kDeficitLow.toFixed(0)}–${kDeficitHigh.toFixed(0)} mEq` : '—'}</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-400">Estimated Total-Body K⁺ Deficit</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Total-Body K⁺ Deficit</div>
           </div>
           <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
         </div>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ 200-400 mEq total-body deficit (nonlinear relationship, affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hr peripherally (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ 200-400 mEq total-body deficit (nonlinear relationship, affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hr peripherally (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</p>
     </Card>
   )
 }
@@ -1174,10 +1174,10 @@ function BrocaCalc() {
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-400">kg</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Ideal Body Weight (Broca)</div>
+        <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approximation — for higher clinical precision needs (e.g. drug dosing), consider the Devine/Robinson formulas.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approximation — for higher clinical precision needs (e.g. drug dosing), consider the Devine/Robinson formulas.</p>
     </Card>
   )
 }
@@ -1200,9 +1200,9 @@ function MidParentalCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Male: (Father's height + Mother's height + 13) / 2. Female: (Father's height + Mother's height − 13) / 2. The ±8.5cm range covers ~90% of the genetic target — a child deviating far outside this range warrants endocrine/nutritional evaluation.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Father's height + Mother's height + 13) / 2. Female: (Father's height + Mother's height − 13) / 2. The ±8.5cm range covers ~90% of the genetic target — a child deviating far outside this range warrants endocrine/nutritional evaluation.</p>
     </Card>
   )
 }
@@ -1245,7 +1245,7 @@ function FletcherCalc() {
           <Badge tone={cls.tone}>{cls.l}</Badge>
         </div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">
+      <p className="mt-3 text-[10px] text-neutral-500">
         {mode === 'basic' ? 'Fletcher Index = average threshold at 500+1000+2000 Hz.' : 'Complete (AAO-HNS 4-frequency) = average threshold at 500+1000+2000+3000 Hz — more sensitive to noise/occupational notches.'} &lt;26dB normal · 26-40 mild · 41-55 moderate · 56-70 moderately severe · 71-90 severe · &gt;90 profound.
       </p>
     </Card>
@@ -1277,11 +1277,11 @@ function NoseCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/100</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/100</span></div>
           <Badge tone={cls.tone}>{cls.l}</Badge>
         </div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">Total = sum of 5 items (0-4 each) × 5, scale 0-100.</p>
+      <p className="mt-3 text-[10px] text-neutral-500">Total = sum of 5 items (0-4 each) × 5, scale 0-100.</p>
     </Card>
   )
 }
@@ -1315,7 +1315,7 @@ function RsiCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/45</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/45</span></div>
           <Badge tone={abnormal ? 'critical' : 'normal'}>{abnormal ? 'Abnormal' : 'Normal'}</Badge>
         </div>
         <p className="mt-2 text-[11px] text-neutral-500">Scale 0 (no problem) - 5 (severe problem) per item. A score &gt;13 is considered abnormal, suggestive of laryngopharyngeal reflux.</p>
@@ -1360,7 +1360,7 @@ function Abcd2Calc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/7</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/7</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
@@ -1387,7 +1387,7 @@ function FourScoreCalc() {
         <Field label="Respiration (R)"><SegButtons value={r} onChange={setR} options={respiration} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">E{e}M{m}B{b}R{r} = {total}<span className="text-sm font-semibold text-neutral-400">/16</span></div>
+        <div className="text-2xl font-black text-ink">E{e}M{m}B{b}R{r} = {total}<span className="text-sm font-semibold text-neutral-500">/16</span></div>
         <p className="mt-2 text-[11px] text-neutral-500">Lower score → more impaired consciousness. Superior to GCS for assessing intubated patients (assesses breathing rather than verbal response) and detecting brainstem/locked-in signs.</p>
       </div>
     </Card>
@@ -1403,10 +1403,10 @@ function McDonaldCalc() {
       <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimate gestational age from symphysis-fundal height (20-36 weeks)" />
       <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-400">weeks</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-400">Estimated Gestational Age</div>
+        <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">McDonald's Rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks in a singleton pregnancy with normal fetal growth. A deviation &gt;3cm from the true gestational age (from LMP/ultrasound) warrants further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple gestation).</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's Rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks in a singleton pregnancy with normal fetal growth. A deviation &gt;3cm from the true gestational age (from LMP/ultrasound) warrants further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple gestation).</p>
     </Card>
   )
 }
@@ -1480,7 +1480,7 @@ function NihssCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/42</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/42</span></div>
           <Badge tone={interp.tone}>{interp.l}</Badge>
         </div>
       </div>
@@ -1490,7 +1490,7 @@ function NihssCalc() {
         <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
         <li>The score is one input to a thrombolysis decision, never the decision itself — onset time, imaging and contraindications govern.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical
         examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.
       </p>
@@ -1527,11 +1527,11 @@ function FluidBalanceCalc() {
         <Field label="Other"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Total Intake</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Total Output</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Balance (mL)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total Intake</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total Output</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-400">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</p>
+      <p className="mt-3 text-[10px] text-neutral-500">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</p>
     </Card>
   )
 }
@@ -1557,11 +1557,11 @@ function PedsDoseCalc() {
         <Field label="Syrup Concentration (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">Total mg/day</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">mg/dose</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[9px] font-bold uppercase text-neutral-400">mL/dose (syrup)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mg/dose</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</p>
     </Card>
   )
 }
@@ -1608,7 +1608,7 @@ function VbacCalc() {
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-400">/10</span></div>
+          <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={total >= 7 ? 'normal' : total >= 4 ? 'low' : 'critical'}>Estimated success {successPct}</Badge>
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">A higher score → higher predicted VBAC success. This prediction model is one decision-support tool — the trial of labor after cesarean (TOLAC) decision remains individualized together with an obstetrician, taking into account emergency cesarean facilities available.</p>
@@ -1698,7 +1698,7 @@ function DenverCalc() {
         <div key={domain.key} className="mt-4">
           <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>
           <div className="mt-2 space-y-1.5">
-            {applicable.length === 0 && <p className="text-[11px] text-neutral-400">No reference milestones for this age yet.</p>}
+            {applicable.length === 0 && <p className="text-[11px] text-neutral-500">No reference milestones for this age yet.</p>}
             {applicable.map((m) => {
               const key = `${domain.key}-${m.ageMo}`
               const v = results[key] ?? 'na'
@@ -1706,7 +1706,7 @@ function DenverCalc() {
                 <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-bold text-ink">{m.label}</div>
-                    <div className="text-[9px] font-bold uppercase text-neutral-400">Typically achieved ~{m.ageMo} months</div>
+                    <div className="text-[9px] font-bold uppercase text-neutral-500">Typically achieved ~{m.ageMo} months</div>
                   </div>
                   <SegButtons value={v} onChange={(nv) => setResults((s) => ({ ...s, [key]: nv }))} options={[{ v: 'pass', l: 'Can' }, { v: 'fail', l: 'Not yet' }, { v: 'na', l: '—' }]} />
                 </div>
@@ -1722,7 +1722,7 @@ function DenverCalc() {
           <p className="mt-1 text-[11px] leading-relaxed text-amber-700">There are milestones typically achieved well below the child's current age (≥6 months earlier) that have not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II evaluation or another standardized screening instrument (e.g. KPSP, M-CHAT if relevant).</p>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</p>
     </Card>
   )
 }
@@ -1829,14 +1829,14 @@ function AtlsCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Primary Survey Note — ready to paste into the medical record</div>
-          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-white">{copied ? '✓ Copied' : 'Copy Note'}</button>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Primary Survey Note — ready to paste into the medical record</div>
+          <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-ink">{copied ? '✓ Copied' : 'Copy Note'}</button>
         </div>
         <pre className="mt-2 whitespace-pre-wrap font-sans text-[11px] leading-relaxed text-neutral-600">{formattedNote}</pre>
-        <p className="mt-2 text-[10px] text-neutral-400">{assessedCount}/{totalCount} items assessed.</p>
+        <p className="mt-2 text-[10px] text-neutral-500">{assessedCount}/{totalCount} items assessed.</p>
       </div>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</p>
     </Card>
   )
 }
@@ -1902,36 +1902,36 @@ function AbgCalc() {
       </div>
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Step 1 — pH Status</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-500">Step 1 — pH Status</div>
         <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Acidemia' : alkalemia ? 'Alkalemia' : 'Normal pH'}</Badge>
       </div>
       <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Step 2 — Primary Disorder</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-500">Step 2 — Primary Disorder</div>
         <div className="mt-1 text-sm font-black text-ink">{primary}</div>
       </div>
       {compensationNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Step 3 — Compensation Adequacy (Winter's Formula)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Step 3 — Compensation Adequacy (Winter's Formula)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{compensationNote}</p>
         </div>
       )}
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Anion Gap (albumin-corrected)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
-          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-400">AG Classification</div>
+          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-500">AG Classification</div>
         </div>
       </div>
       {deltaRatioNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-400">Step 4 — Delta Ratio (detects mixed disorders)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Step 4 — Delta Ratio (detects mixed disorders)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</p>
     </Card>
   )
 }
@@ -2033,7 +2033,7 @@ function BurnCalc() {
           <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
-          <p className="mt-1.5 text-[10px] text-neutral-400">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</p>
+          <p className="mt-1.5 text-[10px] text-neutral-500">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</p>
         </div>
       ) : (
         <>
@@ -2042,7 +2042,7 @@ function BurnCalc() {
               <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
-              <p className="mt-1.5 text-[10px] text-neutral-400">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</p>
+              <p className="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</p>
             </div>
           )}
           <div className="mt-3 flex gap-2">
@@ -2064,7 +2064,7 @@ function BurnCalc() {
               ))}
             </svg>
           </div>
-          <p className="text-center text-[10px] text-neutral-400">Tap a body area to mark a burn (red = selected)</p>
+          <p className="text-center text-[10px] text-neutral-500">Tap a body area to mark a burn (red = selected)</p>
 
           <div className="mt-3 space-y-1">
             {regions.map((r) => (
@@ -2073,7 +2073,7 @@ function BurnCalc() {
                   <input type="checkbox" checked={!!selected[r.key]} onChange={() => setSelected((s) => ({ ...s, [r.key]: !s[r.key] }))} className="h-4 w-4 accent-red-500" />
                   {r.label}
                 </span>
-                <span className="text-[11px] font-black text-neutral-400">{r.pct}%</span>
+                <span className="text-[11px] font-black text-neutral-500">{r.pct}%</span>
               </label>
             ))}
           </div>
@@ -2081,7 +2081,7 @@ function BurnCalc() {
       )}
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
-        <div className="text-2xl font-black text-ink">{tbsa.toFixed(1)}% <span className="text-sm font-semibold text-neutral-400">TBSA</span></div>
+        <div className="text-2xl font-black text-ink">{tbsa.toFixed(1)}% <span className="text-sm font-semibold text-neutral-500">TBSA</span></div>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -2092,15 +2092,15 @@ function BurnCalc() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">Total mL / 24h (Parkland)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">Total mL / 24h (Parkland)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/h (first 8 hours)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">mL/h (first 8 hours)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-400">mL/h (next 16 hours)</div>
+            <div className="text-[9px] font-bold uppercase text-neutral-500">mL/h (next 16 hours)</div>
           </div>
         </div>
       )}
@@ -2110,7 +2110,7 @@ function BurnCalc() {
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</p>
     </Card>
   )
 }
@@ -2168,7 +2168,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
             <div className="mb-1.5 flex items-center gap-2">
               <span className="text-lg">{n.icon}</span>
               <span className="text-[12px] font-black text-ink">N. {n.numeral}</span>
-              <span className="text-[11px] text-neutral-400">{n.name}</span>
+              <span className="text-[11px] text-neutral-500">{n.name}</span>
             </div>
             <SegButtons value={cn[n.key]} onChange={(v) => setCn((s) => ({ ...s, [n.key]: v }))} options={n.opts} />
           </div>
@@ -2199,7 +2199,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</p>
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</p>
     </Card>
   )
 }
@@ -2283,7 +2283,7 @@ function CompetencyTracker() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{overallPct}%</div>
-        <div className="text-[10px] font-bold uppercase text-neutral-400">Overall Progress — {tercapaiCount}/{allItems.length} competencies achieved</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-500">Overall Progress — {tercapaiCount}/{allItems.length} competencies achieved</div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-200">
           <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${overallPct}%` }} />
         </div>
@@ -2296,7 +2296,7 @@ function CompetencyTracker() {
           <div key={area.key} className="mt-4">
             <h4 className="flex items-center justify-between text-xs font-black uppercase tracking-wide text-neutral-500">
               <span>{area.area} — {area.title}</span>
-              <span className="text-neutral-400">{done}/{area.items.length}</span>
+              <span className="text-neutral-500">{done}/{area.items.length}</span>
             </h4>
             <div className="mt-2 space-y-1.5">
               {area.items.map((item, i) => {
@@ -2314,7 +2314,7 @@ function CompetencyTracker() {
         )
       })}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</p>
+      <p className="mt-4 text-[10px] leading-relaxed text-neutral-500">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</p>
     </Card>
   )
 }
@@ -2347,7 +2347,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
     <Card>
       <SectionTitle icon={<IconShield size={20} />} title="Unlock Clinical Calculators" subtitle="34 internationally standard clinical decision-support scores & tools" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
-        🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('id-ID')}).
+        🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('en-GB')}).
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <button
@@ -2370,7 +2370,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
         </button>
       </div>
       {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">All payments go through transfer to the account above — upload proof of transfer in Billing, PNC balance is added after verification.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">All payments go through transfer to the account above — upload proof of transfer in Billing, PNC balance is added after verification.</p>
     </Card>
   )
 }
@@ -2414,14 +2414,14 @@ function BrocaLorentzCalorieCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{ibw.toFixed(1)} kg</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kcal/day</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Total Calorie Requirement</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</p>
     </Card>
   )
 }
@@ -2448,14 +2448,14 @@ function IvDripCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/h</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Rate (infusion pump)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Rate (infusion pump)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} drops/min</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Drops/min (no pump)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</p>
     </Card>
   )
 }
@@ -2512,7 +2512,7 @@ function AriaCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</p>
     </Card>
   )
 }
@@ -2563,13 +2563,13 @@ function AclsCalc() {
         <ol className="mt-3 space-y-3">
           {active.steps.map((step, i) => (
             <li key={i} className="flex gap-3">
-              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-black text-white">{i + 1}</span>
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-black text-ink">{i + 1}</span>
               <p className="text-[12px] leading-relaxed text-neutral-700">{step}</p>
             </li>
           ))}
         </ol>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</p>
     </Card>
   )
 }
@@ -2617,7 +2617,7 @@ export function ClinicalCalculators() {
         onChange={(e) => setQuery(e.target.value)}
       />
       {visibleTabs.length === 0 && (
-        <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-400">
+        <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-500">
           No tool matches "{query}" — try an organ, symptom, or situation.
         </p>
       )}

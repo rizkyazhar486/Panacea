@@ -122,19 +122,19 @@ export function GraceScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">GRACE Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">GRACE Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score}</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">
+        <p className="mt-2 text-[12px] text-neutral-500">
           {result.mortality}. Categories: ≤108 low · 109-140 intermediate · {'>'}140 high. In NSTE-ACS,
           higher GRACE risk supports an earlier invasive strategy per ESC guidance.
         </p>
         <CopyNote text={`GRACE ${score} (age ${age}, HR ${hr}, SBP ${sbp}, Cr ${creat}, Killip ${['I', 'II', 'III', 'IV'][killip]}${arrest ? ', cardiac arrest at admission' : ''}${stDev ? ', ST deviation' : ''}${markers ? ', elevated biomarkers' : ''}) — ${result.label.toLowerCase()}, ${result.mortality} [Granger 2003]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Granger, C.B., et al. (2003). Predictors of hospital mortality in the Global Registry of
         Acute Coronary Events. <i>Arch Intern Med</i>, 163(19), 2345-2353. Decision-support estimate
         using the original in-hospital mortality point table (GRACE 2.0 uses a continuous online model).

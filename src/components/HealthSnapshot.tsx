@@ -19,14 +19,14 @@ export function HealthSnapshot({ className = '' }: { className?: string }) {
     <Link to="/health-data" className={'block rounded-2xl border border-brand/15 bg-brand-50/60 p-3 transition hover:border-brand/30 hover:bg-brand-50 ' + className}>
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-brand-dark">❤️ Health Data</span>
-        <span className="text-[10px] font-semibold text-neutral-400">Source: {src} · Edit →</span>
+        <span className="text-[10px] font-semibold text-neutral-500">Source: {src} · Edit →</span>
       </div>
       {stats.length ? (
         <div className="mt-2 grid grid-cols-4 gap-2">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-sm font-black text-ink">{s.value}<span className="text-[9px] font-semibold text-neutral-400">{s.unit}</span></div>
-              <div className="text-[9px] text-neutral-400">{s.label}</div>
+              <div className="text-sm font-black text-ink">{s.value}<span className="text-[9px] font-semibold text-neutral-500">{s.unit}</span></div>
+              <div className="text-[9px] text-neutral-500">{s.label}</div>
             </div>
           ))}
         </div>

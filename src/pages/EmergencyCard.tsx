@@ -72,7 +72,7 @@ export function EmergencyCard() {
         </div>
         {d.emergencyPhone && (
           <a href={`tel:${d.emergencyPhone.replace(/[^0-9+]/g, '')}`}
-            className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 py-3 text-sm font-bold text-ink transition active:scale-95 dark:border-white/10 dark:text-white">
+            className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 py-3 text-sm font-bold text-ink transition active:scale-95 dark:border-white/10 dark:text-ink">
             👤 Call emergency contact{d.emergencyName ? ` — ${d.emergencyName}` : ''}
           </a>
         )}
@@ -113,7 +113,7 @@ export function EmergencyCard() {
               <Field label="Emergency contact phone"><input className={inputClass} value={d.emergencyPhone} onChange={(e) => u({ emergencyPhone: e.target.value })} /></Field>
             </div>
             <Field label="Other notes"><input className={inputClass} value={d.notes} onChange={(e) => u({ notes: e.target.value })} placeholder="Pacemaker, pregnancy, DNR wishes…" /></Field>
-            <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-white">
+            <label className="flex items-center gap-2 text-sm font-semibold text-ink dark:text-ink">
               <input type="checkbox" checked={d.organDonor} onChange={(e) => u({ organDonor: e.target.checked })} /> Registered organ donor
             </label>
             <Button onClick={() => setEditing(false)} className="w-full">Save card</Button>
@@ -121,7 +121,7 @@ export function EmergencyCard() {
         ) : (
           <div className="space-y-3 p-5">
             <div>
-              <div className="text-2xl font-black text-ink dark:text-white">{d.name || 'Add your name'}</div>
+              <div className="text-2xl font-black text-ink dark:text-ink">{d.name || 'Add your name'}</div>
               <div className="text-sm text-neutral-500">{age != null ? `${age} yrs` : ''}{d.organDonor ? ' · 🫀 Organ donor' : ''}</div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -133,12 +133,12 @@ export function EmergencyCard() {
             <Row label="Medications" value={d.medications} />
             <Row label="Emergency contact" value={[d.emergencyName, d.emergencyPhone].filter(Boolean).join(' · ')} />
             <Row label="Notes" value={d.notes} />
-            {!d.name && <p className="text-xs text-neutral-400">Tap <b>Edit</b> to fill in your details — they're saved on this device and shown here even offline.</p>}
+            {!d.name && <p className="text-xs text-neutral-500">Tap <b>Edit</b> to fill in your details — they're saved on this device and shown here even offline.</p>}
           </div>
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconHeart size={12} className="mr-1 inline" /> Saved only on this device and shown even without internet. Location is shared only when you tap the button. Tip: install Panaceamed to your home screen and add this page as a shortcut so it's reachable fast in an emergency. Local emergency numbers vary — set yours above (112 works in many countries).
       </div>
     </div>
@@ -149,7 +149,7 @@ function Row({ label, value, danger }: { label: string; value: string; danger?: 
   if (!value) return null
   return (
     <div className="grid grid-cols-[110px_1fr] gap-3 border-t border-neutral-100 pt-2 dark:border-white/10">
-      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
       <div className={'text-sm ' + (danger ? 'font-bold text-rose-600' : 'text-ink dark:text-white')}>{value}</div>
     </div>
   )
