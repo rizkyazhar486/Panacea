@@ -43,7 +43,7 @@ export function SubstanceUseScreen() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">CAGE Questionnaire (alcohol)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">CAGE Questionnaire (alcohol)</div>
         <div className="mt-3 space-y-2">
           {CAGE_ITEMS.map((text, i) => (
             <label key={i} className="flex items-start gap-3 rounded-xl border border-neutral-200 px-3.5 py-2.5 dark:border-white/10">
@@ -59,7 +59,7 @@ export function SubstanceUseScreen() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Pack-Year Calculator (tobacco)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Pack-Year Calculator (tobacco)</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="Cigarettes per day (when smoking)">
             <input className={inputClass} type="number" min={0} value={cigsPerDay || ''} onChange={(e) => setCigsPerDay(Number(e.target.value) || 0)} />
@@ -95,7 +95,7 @@ export function SubstanceUseScreen() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Ewing, J.A. (1984). Detecting alcoholism: the CAGE questionnaire. <i>JAMA</i>, 252(14), 1905-1907.
         US Preventive Services Task Force (2021). Lung cancer screening recommendation. Screening tools
         only — not a diagnosis; discuss results with a clinician.

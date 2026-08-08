@@ -138,14 +138,14 @@ export function CalculatorHub() {
       </Card>
 
       {filtered.length === 0 && (
-        <Card className="!p-5 text-center text-sm text-neutral-400">
+        <Card className="!p-5 text-center text-sm text-neutral-500">
           Nothing matches "{query}" — try a symptom, organ, or decision (e.g. "bleeding", "liver", "prophylaxis").
         </Card>
       )}
 
       {filtered.map((g) => (
         <Card key={g.title} className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{g.emoji} {g.title}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.emoji} {g.title}</div>
           <div className="mt-3 space-y-1.5">
             {g.tools.map((t) => (
               <a key={t.to} href={`#${t.to}`} className="group flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 transition hover:bg-brand/10 dark:bg-white/5">
@@ -160,7 +160,7 @@ export function CalculatorHub() {
         </Card>
       ))}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Every tool implements its original published formula with the citation shown on-page.
         Decision-support only — not a substitute for clinical judgment.
       </div>

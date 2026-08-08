@@ -222,7 +222,7 @@ export function ShareStatCard(props: StatCardProps) {
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-base font-black text-ink">Share Results</h3>
-              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
             <div className="mb-3 overflow-hidden rounded-2xl bg-neutral-100">
@@ -254,7 +254,7 @@ export function ShareStatCard(props: StatCardProps) {
                 📣 Post to Panaceamed
               </button>
             </div>
-            <button type="button" onClick={() => { void fetch(dataUrl).then(r => r.blob()).then(b => simpanBerkas(b, 'panaceamed-stat.png', 'Panaceamed.id')) }} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600">
+            <button type="button" onClick={() => { void fetch(dataUrl).then(r => r.blob()).then(b => simpanBerkas(b, 'panaceamed-stat.png', 'Panaceamed.id')) }} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold text-neutral-500 hover:text-neutral-600">
               <IconDownload size={14} /> Download image
             </button>
           </div>

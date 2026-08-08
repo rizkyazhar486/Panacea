@@ -88,7 +88,7 @@ export function Editor() {
           <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Material content (editor)</span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={cutSelection}><IconScissors size={14} /> Cut selection</Button>
-            <span className="text-xs text-neutral-400">{body.length} characters</span>
+            <span className="text-xs text-neutral-500">{body.length} characters</span>
           </div>
         </div>
         <textarea
@@ -106,7 +106,7 @@ export function Editor() {
           <Button onClick={submit} disabled={!title.trim() || !body.trim()}><IconUpload size={16} /> Upload to Verifier</Button>
           {status && <Badge tone="brand"><IconSparkle size={12} /> {status}</Badge>}
         </div>
-        <p className="mt-2 flex items-center gap-1.5 text-xs text-neutral-400">
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-neutral-500">
           <IconCheck size={12} className="text-brand" /> Pipeline: Write → Claude AI → Verifier (Subspecialist/Professor) → Published on Marketplace.
         </p>
       </Card>

@@ -60,7 +60,7 @@ export function MoneyHub() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">💰</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Keuangan Pribadi</h1>
-          <p className="text-xs text-neutral-400">Catat, lihat ke mana uang pergi, dan tahu urutan yang benar</p>
+          <p className="text-xs text-neutral-500">Catat, lihat ke mana uang pergi, dan tahu urutan yang benar</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export function MoneyHub() {
       {tab === 'utang' && <DebtTab debts={debts} setDebts={setDebts} />}
       {tab === 'investasi' && <RiskTab />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Alat bantu edukasi keuangan pribadi. Halaman ini tidak memberi rekomendasi membeli atau
         menjual saham maupun produk investasi tertentu, dan bukan pengganti nasihat perencana
         keuangan berizin. Seluruh data disimpan di perangkat Anda sendiri.
@@ -138,7 +138,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
 
         {kind === 'expense' && (
           <div className="mt-3">
-            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Kategori</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kategori</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {EXPENSE_CATEGORIES.map((c) => (
                 <button key={c} onClick={() => setCategory(c)}
@@ -163,7 +163,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Terakhir dicatat</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Terakhir dicatat</div>
         {recent.length === 0 ? (
           <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
             Belum ada catatan. Mulai dari mencatat pengeluaran hari ini saja — jangan mencoba
@@ -178,7 +178,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
                   <div className="text-[12px] font-bold text-ink dark:text-ink">
                     {t.kind === 'income' ? 'Pemasukan' : CATEGORY_LABEL[t.category]}
                   </div>
-                  <div className="text-[10px] text-neutral-400">{t.date}{t.note ? ` · ${t.note}` : ''}</div>
+                  <div className="text-[10px] text-neutral-500">{t.date}{t.note ? ` · ${t.note}` : ''}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`text-[12px] font-black ${t.kind === 'income' ? 'text-emerald-600' : 'text-neutral-700 dark:text-neutral-200'}`}>
@@ -243,7 +243,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Pola 50/30/20</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pola 50/30/20</div>
         <div className="mt-2 space-y-2">
           {([
             ['needs', 'Kebutuhan', 50],
@@ -253,7 +253,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
             <div key={k}>
               <div className="flex items-center justify-between text-[12px]">
                 <span className="font-bold text-ink dark:text-ink">{label}</span>
-                <span className="text-neutral-500">{b[k].toFixed(0)}% <span className="text-neutral-400">(target {target}%)</span></span>
+                <span className="text-neutral-500">{b[k].toFixed(0)}% <span className="text-neutral-500">(target {target}%)</span></span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-white/10">
                 <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, b[k])}%` }} />
@@ -269,7 +269,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Ke mana uang pergi</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Ke mana uang pergi</div>
         <div className="mt-2 space-y-1.5">
           {summary.byCategory.map((c) => (
             <div key={c.category} className="flex items-center gap-2">
@@ -318,7 +318,7 @@ function EmergencyTab({ summary }: { summary: ReturnType<typeof summarise> }) {
           <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
             <div className="flex items-center justify-between">
               <span className="text-[12px] font-bold text-neutral-500">Bertahan sekitar</span>
-              <span className="text-2xl font-black text-ink dark:text-ink">{months.toFixed(1)}<span className="text-sm text-neutral-400"> bulan</span></span>
+              <span className="text-2xl font-black text-ink dark:text-ink">{months.toFixed(1)}<span className="text-sm text-neutral-500"> bulan</span></span>
             </div>
             <div className="mt-1"><Badge tone={v.tone}>{v.label}</Badge></div>
             <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{v.advice}</p>
@@ -389,7 +389,7 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
               <div key={d.id} className="flex items-center justify-between gap-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
                 <div className="min-w-0">
                   <div className="text-[12px] font-bold text-ink dark:text-ink">{i + 1}. {d.name}</div>
-                  <div className="text-[10px] text-neutral-400">{formatIdr(d.balance)} · {d.annualRatePct}% / tahun</div>
+                  <div className="text-[10px] text-neutral-500">{formatIdr(d.balance)} · {d.annualRatePct}% / tahun</div>
                 </div>
                 <button onClick={() => setDebts((x) => x.filter((y) => y.id !== d.id))}
                   className="shrink-0 text-[11px] font-bold text-rose-500 hover:underline">Hapus</button>
@@ -505,7 +505,7 @@ function RiskTab() {
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Proyeksi menabung rutin</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Proyeksi menabung rutin</div>
         <div className="mt-2">
           <Field label="Setoran per bulan (Rp)">
             <input className={inputClass} inputMode="numeric" value={monthly} onChange={(e) => setMonthly(e.target.value)} />

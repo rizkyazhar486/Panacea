@@ -211,7 +211,7 @@ export function FluidCalculators() {
       {tab === 'resuscitation' && <FluidResuscitation />}
       {tab === 'electrolytes' && <Electrolytes />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Bedside estimates from standard published formulas (Holliday-Segar, Surviving Sepsis Campaign,
         PALS, Parkland, Katz, Adrogue-Madias) — always confirm against your institution's protocol and
         recheck labs serially during correction.

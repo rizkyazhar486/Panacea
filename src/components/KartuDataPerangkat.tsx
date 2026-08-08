@@ -49,22 +49,22 @@ export function KartuDataPerangkat() {
   return (
     <div className="rounded-2xl border border-neutral-100 bg-white p-4 dark:border-white/10 dark:bg-white/5">
       <div className="flex items-baseline justify-between gap-3">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">⌚ Your device data</div>
-        {umur && <div className="text-[10px] text-neutral-400">{umur}</div>}
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">⌚ Your device data</div>
+        {umur && <div className="text-[10px] text-neutral-500">{umur}</div>}
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {ada.map((b) => {
           const v = vitals[b.kunci] as number
           return (
             <span key={String(b.kunci)} className="rounded-lg bg-neutral-50 px-2 py-1 text-[11px] dark:bg-white/5">
-              <span className="text-neutral-400">{b.label} </span>
+              <span className="text-neutral-500">{b.label} </span>
               <b className="text-ink dark:text-white">{b.bulat ? Math.round(v) : v}</b>
-              {b.satuan && <span className="text-neutral-400"> {b.satuan}</span>}
+              {b.satuan && <span className="text-neutral-500"> {b.satuan}</span>}
             </span>
           )
         })}
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
         Sengaja tidak diisikan otomatis ke kolom di bawah: kalkulator ini dipakai untuk menghitung
         pasien, dan angka tubuh Anda bukan angka mereka. Salin manual bila memang untuk diri sendiri.
       </p>

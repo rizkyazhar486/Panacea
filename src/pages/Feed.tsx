@@ -181,7 +181,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
                   <img src={s.artwork} alt="" className="h-10 w-10 rounded-lg" />
                   <button onClick={() => choose(s)} className="min-w-0 flex-1 text-left">
                     <div className="truncate text-xs font-bold">{s.title}</div>
-                    <div className="truncate text-[10px] text-neutral-400">{s.artist}</div>
+                    <div className="truncate text-[10px] text-neutral-500">{s.artist}</div>
                   </button>
                   {s.preview && (
                     <button onClick={() => preview(s)} aria-label="30-second preview"
@@ -194,7 +194,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
             </div>
 
             {/* Quick moods + none */}
-            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Quick moods</div>
+            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-500">Quick moods</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {SONGS.map((s) => (
                 <button key={s} onClick={() => { setSong(s); setOpen(false) }}
@@ -203,7 +203,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">
+            <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">
               Search & 30-sec preview via the iTunes catalog (free). Full playback opens your Spotify / Apple Music app.
             </p>
           </div>
@@ -337,20 +337,20 @@ function HealthMetricsBar({ weight, height, age, gender, hrRest }: { weight: num
     <div className="grid grid-cols-3 gap-2">
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)}</div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">BMI</div>
+        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">BMI</div>
         <div className="text-[9px] font-semibold" style={{ color: bmiCat.c }}>{bmiCat.l}</div>
       </div>
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold text-indigo-500">{Math.round(bmr)}</div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">BMR</div>
-        <div className="text-[9px] text-neutral-400">kcal/day</div>
+        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">BMR</div>
+        <div className="text-[9px] text-neutral-500">kcal/day</div>
       </div>
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold" style={{ color: vo2 ? (vo2 >= 45 ? '#00BF63' : vo2 >= 35 ? '#f59e0b' : '#FF3131') : '#d4d4d4' }}>
           {vo2 ? vo2.toFixed(1) : '—'}
         </div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">VO₂Max</div>
-        <div className="text-[9px] text-neutral-400">{vo2 ? (vo2 >= 50 ? 'Elite' : vo2 >= 45 ? 'Excellent' : vo2 >= 35 ? 'Good' : 'Fair') : 'Need HR'}</div>
+        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">VO₂Max</div>
+        <div className="text-[9px] text-neutral-500">{vo2 ? (vo2 >= 50 ? 'Elite' : vo2 >= 45 ? 'Excellent' : vo2 >= 35 ? 'Good' : 'Fair') : 'Need HR'}</div>
       </div>
     </div>
   )
@@ -465,7 +465,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-xl">📍</span>
         <span className="flex-1 text-left text-sm font-bold text-ink">GPS Tracker</span>
         {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Recording" />}
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-400"><polyline points="6 9 12 15 18 9" /></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
     )
   }
@@ -476,7 +476,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
-          <p className="text-[10px] text-neutral-400 mt-0.5">Track route, speed, acceleration & calories</p>
+          <p className="text-[10px] text-neutral-500 mt-0.5">Track route, speed, acceleration & calories</p>
         </div>
         <div className="flex items-center gap-2">
           {mode === 'done' && (
@@ -489,7 +489,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               <IconDownload size={13} /> Image
             </button>
           )}
-          <button onClick={() => setOpen(false)} aria-label="Close GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100">
+          <button onClick={() => setOpen(false)} aria-label="Close GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
           </button>
         </div>
@@ -517,7 +517,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             📍 Tap the map to add a route point {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
-        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Loading map…</div>}>
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-500">Loading map…</div>}>
           <RouteMap
             points={pts}
             planned={plan}
@@ -565,7 +565,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                 <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(100, progressPct)}%`, background: 'linear-gradient(90deg, #00BF63, #0B7A4B)' }} />
                 </div>
-                <div className="flex justify-between text-[9px] text-neutral-400 mt-1">
+                <div className="flex justify-between text-[9px] text-neutral-500 mt-1">
                   <span>0 km</span>
                   <span>{sport.targetDist} km</span>
                 </div>
@@ -574,26 +574,26 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
             {/* %HRmax + Talk Test + MAF (Maffetone) — running intensity guide */}
             <div className="rounded-xl border border-neutral-100 p-3">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-400">Running Intensity Guide</div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500">Running Intensity Guide</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-sm font-extrabold tabular-nums" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
                     {hr > 0 ? Math.round((hr / hrMax) * 100) + '%' : '—'}
                   </div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">% HR Max</div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">% HR Max</div>
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-[11px] font-extrabold leading-tight" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
                     {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Can speak full sentences' : hr / hrMax < 0.9 ? 'Only 3-4 words' : 'Cannot speak'}
                   </div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">Talk Test</div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Talk Test</div>
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
-                  <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[9px] text-neutral-400"> bpm</span></div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-400">MAF Target</div>
+                  <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[9px] text-neutral-500"> bpm</span></div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">MAF Target</div>
                 </div>
               </div>
-              <p className="mt-2 text-[9px] leading-relaxed text-neutral-400">
+              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">
                 <b>Talk test:</b> the easiest zone check — Zone 2 if you can still speak in full sentences.
                 <b> MAF</b> (Maximum Aerobic Function, Maffetone's 180−age method): training at ≤{180 - age} bpm builds your aerobic engine & maximizes fat burning.
                 {hr > 0 && hr > 180 - age && <span className="font-bold text-amber-600"> Your HR of {hr} bpm is above MAF — slow down to stay in the aerobic base.</span>}
@@ -614,11 +614,11 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             <div className="flex items-center gap-3">
               <span className={'text-lg ' + (liveHr.isLive ? 'animate-pulse' : '')}>💗</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Heart Rate</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div>
                 <div className="truncate text-[9px] text-neutral-500">{liveHr.label}</div>
               </div>
               <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr || ''} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
-              <span className="text-[10px] text-neutral-400">bpm</span>
+              <span className="text-[10px] text-neutral-500">bpm</span>
             </div>
             {liveHr.source !== 'ble' && (
               liveHr.bleSupported ? (
@@ -631,7 +631,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               ) : (
                 // Not a bug the user can fix by tapping: iOS Safari ships no Web
                 // Bluetooth, so say what actually works instead of a dead button.
-                <p className="text-[9px] leading-relaxed text-neutral-400">
+                <p className="text-[9px] leading-relaxed text-neutral-500">
                   This browser cannot read Bluetooth heart-rate straps — iPhone browsers do not support it at all.
                   Sync your watch through <a href="#/health-data" className="font-bold text-brand-dark underline">Data Kesehatan</a> to
                   fill HR automatically, or type your bpm above.
@@ -991,7 +991,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
               <video src={videoUrl} className="max-h-56 w-full object-contain" controls />
               <button onClick={() => { setVideoUrl(null); setVideoSec(0) }} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-xs"><IconX size={12} /></button>
             </div>
-            <p className="mt-1 text-[10px] text-neutral-400">Duration: {videoSec}s / {MAX_VIDEO_SEC}s max.</p>
+            <p className="mt-1 text-[10px] text-neutral-500">Duration: {videoSec}s / {MAX_VIDEO_SEC}s max.</p>
           </div>
         )}
         {videoErr && <p className="px-5 pb-2 text-[11px] font-medium text-accent">{videoErr}</p>}
@@ -1009,7 +1009,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Input Area */}
         <div className="px-5 pb-5 space-y-4">
-          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-400 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Write a description or health insight here..." value={caption} onChange={e => setCaption(e.target.value)} />
+          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Write a description or health insight here..." value={caption} onChange={e => setCaption(e.target.value)} />
 
           {/* Tag teman */}
           <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag friends (e.g. Budi, Sinta) — separate with commas" value={tags} onChange={e => setTags(e.target.value)} />
@@ -1212,7 +1212,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
               <span className="truncate text-xs font-black">{post.authorName}</span>
               <span className="shrink-0 text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
             </div>
-            <div className="text-[10px] text-neutral-400 mt-0.5 truncate">
+            <div className="text-[10px] text-neutral-500 mt-0.5 truncate">
               {timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span>
               {mutual && <span className="ml-1 text-amber-600">· 🤝</span>}
             </div>
@@ -1239,7 +1239,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           </button>
           {/* Options menu (Instagram-style: Save / QR / Insights / Archive / Edit / Delete …) */}
           <button onClick={() => setShowMenu(true)} aria-label="More options" title="Options"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-400 transition active:scale-90 hover:bg-neutral-100">
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-500 transition active:scale-90 hover:bg-neutral-100">
             <span className="text-lg leading-none">⋯</span>
           </button>
         </div>
@@ -1344,7 +1344,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             <div key={c.id} className="flex items-start gap-2">
               <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-brand-dark">{initials(c.authorName)}</div>
               <div className="flex-1 rounded-2xl bg-neutral-50 px-3 py-2">
-                <div className="text-[11px] font-bold text-ink">{c.authorName} <span className="ml-1 font-normal text-neutral-400">{timeAgo(c.at)}</span></div>
+                <div className="text-[11px] font-bold text-ink">{c.authorName} <span className="ml-1 font-normal text-neutral-500">{timeAgo(c.at)}</span></div>
                 <div className="text-xs text-neutral-600">{c.text}</div>
               </div>
             </div>
@@ -1439,7 +1439,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
 
   return (
     <div className="space-y-4">
-      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Community Wellness</h4>
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-500">Community Wellness</h4>
 
       {/* 1. Health Buddy — akuntabilitas */}
       <Card className="space-y-3">
@@ -1465,7 +1465,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         {/* History check-in (log) */}
         {myCheckIns.length > 0 && (
           <div className="border-t border-neutral-100 pt-2">
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-400">Check-in History ({myCheckIns.length})</div>
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-neutral-500">Check-in History ({myCheckIns.length})</div>
             <div className="flex flex-wrap gap-1.5">
               {[...myCheckIns].reverse().slice(0, 14).map((d) => (
                 <span key={d} className="rounded-md bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-dark">
@@ -1493,12 +1493,12 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         <input value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} placeholder="Search communities (e.g. Running, Yoga)"
           className={inputClass + ' text-xs'} />
         <div className="space-y-1.5">
-          {filteredCommunities.length === 0 && <p className="text-xs text-neutral-400">No communities yet. Create the first one!</p>}
+          {filteredCommunities.length === 0 && <p className="text-xs text-neutral-500">No communities yet. Create the first one!</p>}
           {filteredCommunities.map((c) => (
             <div key={c.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
               <div>
                 <b className="text-ink">{c.name}</b> · <span className="text-brand-dark">{c.sportTag}</span>
-                <div className="text-neutral-400">{c.memberNames.length} members: {c.memberNames.join(', ')}</div>
+                <div className="text-neutral-500">{c.memberNames.length} members: {c.memberNames.join(', ')}</div>
               </div>
               {!c.memberNames.includes(viewerName) && (
                 <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Join</button>
@@ -1531,7 +1531,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <div className="space-y-1.5 border-t border-neutral-100 pt-2">
             {recentMoods.map((m) => (
               <div key={m.id} className="text-[11px] text-neutral-500">
-                {MOOD_OPTIONS.find((o) => o.id === m.mood)?.emoji} <b className="text-ink">{m.name}</b> feeling {m.mood}{m.note ? ` — "${m.note}"` : ''} <span className="text-neutral-400">· {timeAgo(m.at)}</span>
+                {MOOD_OPTIONS.find((o) => o.id === m.mood)?.emoji} <b className="text-ink">{m.name}</b> feeling {m.mood}{m.note ? ` — "${m.note}"` : ''} <span className="text-neutral-500">· {timeAgo(m.at)}</span>
               </div>
             ))}
           </div>
@@ -1564,7 +1564,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <button onClick={() => { startChallenge(newChallengeTitle, 'poin', 100, 7); setNewChallengeTitle('') }} disabled={!newChallengeTitle.trim()}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Start</button>
         </div>
-        {state.challenges.length === 0 && <p className="text-xs text-neutral-400">No active challenges yet. Start one and invite friends!</p>}
+        {state.challenges.length === 0 && <p className="text-xs text-neutral-500">No active challenges yet. Start one and invite friends!</p>}
         {state.challenges.map((c) => {
           const leaders = [...c.participants].sort((a, b) => b.progress - a.progress)
           const me = c.participants.find((p) => p.email === viewerEmail)
@@ -1583,7 +1583,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
                   </div>
                 ))}
               </div>
-              {!me && <p className="mt-1 text-[10px] text-neutral-400">Tap "+10" to join in.</p>}
+              {!me && <p className="mt-1 text-[10px] text-neutral-500">Tap "+10" to join in.</p>}
             </div>
           )
         })}
@@ -1653,7 +1653,7 @@ function bpCategory(sys: number, dia: number) {
 
 // #1: lightweight inline SVG sparkline for trend visualization (no chart lib).
 function Sparkline({ data, color = '#00BF63', height = 32 }: { data: number[]; color?: string; height?: number }) {
-  if (data.length === 0) return <div className="text-[10px] text-neutral-400">No data yet</div>
+  if (data.length === 0) return <div className="text-[10px] text-neutral-500">No data yet</div>
   const w = 100, h = height
   const min = Math.min(...data), max = Math.max(...data)
   const range = max - min || 1
@@ -1860,7 +1860,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
 
   return (
     <div className="space-y-4">
-      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-400">Real-Time Health Center</h4>
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-500">Real-Time Health Center</h4>
 
       {/* Proof-of-sync. Without this, prefilled numbers are indistinguishable
           from the old hardcoded defaults and the user cannot tell whether their
@@ -1892,7 +1892,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-neutral-400">Automated analysis based on the data you've logged. Not a substitute for professional medical consultation.</p>
+        <p className="text-[10px] text-neutral-500">Automated analysis based on the data you've logged. Not a substitute for professional medical consultation.</p>
       </Card>
 
       {/* 1. Kalkulator BMI & Kalori Harian + 3. Kebutuhan Cairan */}
@@ -1991,7 +1991,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <Sparkline data={sleepSeries} color="#6366F1" />
           </div>
         </div>
-        <p className="text-[10px] text-neutral-400">Log vitals & sleep regularly to see trends here.</p>
+        <p className="text-[10px] text-neutral-500">Log vitals & sleep regularly to see trends here.</p>
       </Card>
 
       {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
@@ -2001,12 +2001,12 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <Field label="Resting HR (bpm)"><input type="number" value={hrRest} onChange={(e) => setHrRest(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
           <Field label="Max HR (bpm)"><input type="number" value={hrMaxInput} onChange={(e) => setHrMaxInput(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
-        <p className="text-[10px] text-neutral-400">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
+        <p className="text-[10px] text-neutral-500">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
         <div className="flex items-center justify-between rounded-xl p-2 text-ink" style={{ background: vo2Cat.c }}>
           <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
           <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Record</button>
         </div>
-        <p className="text-[10px] text-neutral-400">Non-exercise estimate (Uth-Sørensen).</p>
+        <p className="text-[10px] text-neutral-500">Non-exercise estimate (Uth-Sørensen).</p>
 
         {/* #5: Tes Cooper — lari 12 menit, paling akurat */}
         <div className="space-y-2 border-t border-neutral-100 pt-2">
@@ -2019,7 +2019,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
               className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
           </div>
-          <p className="text-[10px] text-neutral-400">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</p>
+          <p className="text-[10px] text-neutral-500">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</p>
         </div>
 
         {lastVo2 && (
@@ -2068,7 +2068,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           const bookmarked = state.eduBookmarks.includes(a.id)
           return (
             <div key={a.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
-              <span className="flex-1 pr-2 text-neutral-700">{a.title} <span className="text-neutral-400">· {a.minutes} min read</span></span>
+              <span className="flex-1 pr-2 text-neutral-700">{a.title} <span className="text-neutral-500">· {a.minutes} min read</span></span>
               <button onClick={() => toggleEduBookmark(a.id)} className="shrink-0 text-base">{bookmarked ? '🔖' : '📑'}</button>
             </div>
           )
@@ -2105,7 +2105,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           }} disabled={goalTarget <= 0 || (goalMetric === 'custom' && !goalLabel.trim())}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
         </div>
-        {state.goals.length === 0 && <p className="text-xs text-neutral-400">No goals yet. Set one to start tracking progress.</p>}
+        {state.goals.length === 0 && <p className="text-xs text-neutral-500">No goals yet. Set one to start tracking progress.</p>}
         {state.goals.map((g) => {
           const cur = goalCurrent(g.metric)
           const pct = Math.min(100, Math.round((cur / g.target) * 100))
@@ -2114,7 +2114,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           return (
             <div key={g.id} className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-semibold text-neutral-600">{done ? '🏅 ' : ''}{g.label} <span className="text-neutral-400">· target {g.target} {g.unit}</span></span>
+                <span className="font-semibold text-neutral-600">{done ? '🏅 ' : ''}{g.label} <span className="text-neutral-500">· target {g.target} {g.unit}</span></span>
                 <button onClick={() => removeGoal(g.id)} className="text-neutral-300 hover:text-red-600">✕</button>
               </div>
               {trackable ? (
@@ -2122,10 +2122,10 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
                   <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
                     <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: done ? '#00BF63' : 'linear-gradient(90deg,#84CC16,#00BF63)' }} />
                   </div>
-                  <div className="text-[10px] text-neutral-400">{cur} / {g.target} {g.unit} ({pct}%){done ? ' — achieved! 🎉' : ''}</div>
+                  <div className="text-[10px] text-neutral-500">{cur} / {g.target} {g.unit} ({pct}%){done ? ' — achieved! 🎉' : ''}</div>
                 </>
               ) : (
-                <div className="text-[10px] text-neutral-400">Automatic tracking requires wearable integration (upcoming feature).</div>
+                <div className="text-[10px] text-neutral-500">Automatic tracking requires wearable integration (upcoming feature).</div>
               )}
             </div>
           )
@@ -2139,11 +2139,11 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
           <button onClick={exportReport} className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-bold text-neutral-600">⬇ Export Report</button>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Blood Pressure</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-400">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
         </div>
       </Card>
     </div>
@@ -2264,10 +2264,10 @@ export default function SportsSocialFeed() {
 
       {/* Feed tabs — For You / Mengikuti + search (gaya TikTok/Instagram) */}
       <div className="sticky top-0 z-20 -mx-4 flex items-center justify-center gap-6 border-b border-neutral-100 bg-white/85 px-4 py-2 backdrop-blur">
-        <button onClick={() => setFeedTab('following')} className={`text-sm font-bold transition ${feedTab === 'following' ? 'text-ink' : 'text-neutral-400'}`}>
+        <button onClick={() => setFeedTab('following')} className={`text-sm font-bold transition ${feedTab === 'following' ? 'text-ink' : 'text-neutral-500'}`}>
           Following{feedTab === 'following' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
         </button>
-        <button onClick={() => setFeedTab('foryou')} className={`text-sm font-bold transition ${feedTab === 'foryou' ? 'text-ink' : 'text-neutral-400'}`}>
+        <button onClick={() => setFeedTab('foryou')} className={`text-sm font-bold transition ${feedTab === 'foryou' ? 'text-ink' : 'text-neutral-500'}`}>
           For You{feedTab === 'foryou' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
         </button>
         <button onClick={() => { window.location.hash = '#/search' }} aria-label="Search" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
@@ -2284,7 +2284,7 @@ export default function SportsSocialFeed() {
             : visible
           if (feed.length === 0) {
             return (
-              <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
+              <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-500">
                 {feedTab === 'following'
                   ? <>No posts yet from people you follow. Go to <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">For You</button> or <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">find people</button>.</>
                   : <>No posts yet. Tap the <span className="font-bold text-brand-dark">＋</span> button below to create a post or story.</>}

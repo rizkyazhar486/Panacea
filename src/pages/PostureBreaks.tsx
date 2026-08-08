@@ -121,7 +121,7 @@ export function PostureBreaks() {
 
       <Card className="!p-6 text-center">
         <div className="text-5xl font-black tabular-nums text-brand-dark">{mm}:{ss}</div>
-        <div className="mt-1 text-[12px] font-bold uppercase tracking-wide text-neutral-400">Until next break</div>
+        <div className="mt-1 text-[12px] font-bold uppercase tracking-wide text-neutral-500">Until next break</div>
         <button
           onClick={() => setRunning((r) => !r)}
           className={`mt-4 w-full rounded-xl py-3 text-sm font-bold transition ${running ? 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300' : 'bg-brand text-white'}`}
@@ -135,7 +135,7 @@ export function PostureBreaks() {
 
       {tipIndex !== null && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your break</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your break</div>
           <div className="mt-2 flex items-start gap-3">
             <span className="text-3xl">{TIPS[tipIndex].emoji}</span>
             <div>
@@ -146,7 +146,7 @@ export function PostureBreaks() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         The timer only runs while this page/tab is open (or via browser notification if enabled) —
         it's a nudge, not a guaranteed background service. Break count resets daily.
       </div>

@@ -109,11 +109,11 @@ export function BodyDiagram({
               <p className="text-neutral-600">{sel.note || 'No notes recorded for this system yet.'}</p>
             </>
           ) : (
-            <p className="text-neutral-400">Select a system on the diagram to view findings.</p>
+            <p className="text-neutral-500">Select a system on the diagram to view findings.</p>
           )}
         </div>
 
-        <div className="mt-2 flex gap-3 text-[11px] text-neutral-400">
+        <div className="mt-2 flex gap-3 text-[11px] text-neutral-500">
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-brand" /> Normal</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accent" /> Abnormal</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-neutral-300" /> Not examined</span>

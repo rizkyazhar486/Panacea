@@ -185,19 +185,19 @@ export function BiologicalAge() {
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-neutral-100 p-4 text-center dark:border-white/10">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Biological Age</div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Biological Age</div>
             <div className="text-4xl font-black" style={{ color: bioColor }}>{bioAge ?? '—'}</div>
             {bioDelta != null && (
               <Badge tone={bioDelta <= -1 ? 'brand' : bioDelta <= 1 ? 'low' : 'critical'}>
                 {bioDelta <= 0 ? `${Math.abs(bioDelta)} yrs younger` : `${bioDelta} yrs older`}
               </Badge>
             )}
-            <div className="mt-1 text-[10px] text-neutral-400">vs chronological {d.age || '—'}</div>
+            <div className="mt-1 text-[10px] text-neutral-500">vs chronological {d.age || '—'}</div>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4 text-center dark:border-white/10">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Metabolic Age</div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Metabolic Age</div>
             <div className="text-4xl font-black text-brand-dark">{metAge ?? '—'}</div>
-            <div className="mt-1 text-[10px] text-neutral-400">from resting metabolic rate</div>
+            <div className="mt-1 text-[10px] text-neutral-500">from resting metabolic rate</div>
           </div>
         </div>
       </Card>
@@ -239,7 +239,7 @@ export function BiologicalAge() {
               <div key={m.label} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
                 <div className="min-w-0">
                   <div className="text-sm font-bold text-ink dark:text-ink">{m.label}</div>
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400">{m.note}</div>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-500">{m.note}</div>
                 </div>
                 <Badge tone={m.delta <= -0.3 ? 'brand' : m.delta <= 0.3 ? 'low' : 'critical'}>
                   {m.delta <= 0 ? '−' : '+'}{Math.abs(m.delta).toFixed(1)} yr
@@ -250,7 +250,7 @@ export function BiologicalAge() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimate from transparent, published-evidence-direction formulas (Mifflin-St Jeor, VO₂max mortality data, standard risk markers) — <b>not</b> a validated clinical biological-age clock or a diagnosis. Data stays on your device. For a true epigenetic age, use a laboratory DNA-methylation test.
       </div>
     </div>

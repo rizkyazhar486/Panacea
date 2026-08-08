@@ -62,16 +62,16 @@ export function HasBledScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 9</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">{result.bleed}. Score ≥3 warrants caution and correction of modifiable risk factors, with regular clinical review.</p>
+        <p className="mt-2 text-[12px] text-neutral-500">{result.bleed}. Score ≥3 warrants caution and correction of modifiable risk factors, with regular clinical review.</p>
         <CopyNote text={`HAS-BLED ${score}/9 — ${result.label.toLowerCase()}, ${result.bleed} [Pisters 2010]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Pisters, R., et al. (2010). A novel user-friendly score (HAS-BLED) to assess 1-year risk of
         major bleeding. <i>Chest</i>, 138(5), 1093-1100. Decision-support estimate — anticoagulation
         decisions should weigh this alongside stroke risk (CHA2DS2-VASc) and patient preference.

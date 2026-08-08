@@ -156,7 +156,7 @@ export function Billing() {
                   {active && <Badge tone="brand">Active</Badge>}
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">
-                  {pl.price} <span className="text-sm font-medium text-neutral-400">PNC / month</span>
+                  {pl.price} <span className="text-sm font-medium text-neutral-500">PNC / month</span>
                 </div>
                 <ul className="mt-3 space-y-1.5 text-sm">
                   {pl.features.map((fe) => (
@@ -204,7 +204,7 @@ export function Billing() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-neutral-400">
+              <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
                 <th className="pb-2 pr-4 font-semibold">Time</th>
                 <th className="pb-2 pr-4 font-semibold">Type</th>
                 <th className="pb-2 pr-4 font-semibold">Description</th>
@@ -412,17 +412,17 @@ function ManualBankTransfer() {
       </p>
       <div className="mt-3 rounded-xl bg-white p-3 text-sm">
         <div className="flex items-center justify-between py-1">
-          <span className="text-neutral-400">Bank</span><span className="font-bold">{MANUAL_BANK.bank}</span>
+          <span className="text-neutral-500">Bank</span><span className="font-bold">{MANUAL_BANK.bank}</span>
         </div>
         <div className="flex items-center justify-between py-1">
-          <span className="text-neutral-400">Account No.</span>
+          <span className="text-neutral-500">Account No.</span>
           <span className="flex items-center gap-2">
             <span className="font-mono text-base font-extrabold">{MANUAL_BANK.number}</span>
             <button onClick={copyNumber} className="rounded-lg bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-dark">{copied ? 'Copied ✓' : 'Copy'}</button>
           </span>
         </div>
         <div className="flex items-center justify-between py-1">
-          <span className="text-neutral-400">Account Holder</span><span className="font-bold">{MANUAL_BANK.holder}</span>
+          <span className="text-neutral-500">Account Holder</span><span className="font-bold">{MANUAL_BANK.holder}</span>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -453,7 +453,7 @@ function ManualBankTransfer() {
         </Button>
       </div>
       {reqMsg && <p className="mt-2 text-[12px] font-semibold text-brand-dark">{reqMsg}</p>}
-      <p className="mt-1 text-[11px] text-neutral-400">Admin: {MANUAL_BANK.waLabel} · balance is credited automatically once the proof is verified.</p>
+      <p className="mt-1 text-[11px] text-neutral-500">Admin: {MANUAL_BANK.waLabel} · balance is credited automatically once the proof is verified.</p>
     </div>
   )
 }
@@ -493,7 +493,7 @@ function ProofVerification() {
         right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {reqs.length === 0 ? (
-        <p className="text-sm text-neutral-400">No transfer proofs submitted yet.</p>
+        <p className="text-sm text-neutral-500">No transfer proofs submitted yet.</p>
       ) : (
         <div className="space-y-2">
           {reqs.map((r) => (
@@ -502,8 +502,8 @@ function ProofVerification() {
                 <img src={r.proof} alt="proof" className="h-12 w-12 rounded-lg object-cover ring-1 ring-neutral-200" />
               </button>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold">{r.amount} PNC <span className="font-normal text-neutral-400">· Rp{r.idr}</span></div>
-                <div className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('en-GB')}</div>
+                <div className="text-sm font-bold">{r.amount} PNC <span className="font-normal text-neutral-500">· Rp{r.idr}</span></div>
+                <div className="text-[11px] text-neutral-500">{new Date(r.at).toLocaleString('en-GB')}</div>
               </div>
               {r.status === 'pending' ? (
                 <div className="flex shrink-0 gap-2">
@@ -595,7 +595,7 @@ function BackendWallet() {
           <div className="w-28"><Field label="Amount (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
           <Button variant="outline" onClick={withdraw}>Withdraw Rp{(amount * TOKEN_TO_IDR).toLocaleString('en-GB')} to Bank</Button>
         </div>
-        <p className="mt-2 text-[11px] text-neutral-400">Funds are withdrawn to an account in your name. Make sure the details are correct — account errors are not the platform's responsibility.</p>
+        <p className="mt-2 text-[11px] text-neutral-500">Funds are withdrawn to an account in your name. Make sure the details are correct — account errors are not the platform's responsibility.</p>
       </div>
       {msg && <p className="mt-2 text-xs font-semibold text-brand-dark">{msg}</p>}
     </Card>

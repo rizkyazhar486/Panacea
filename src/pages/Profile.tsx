@@ -74,11 +74,11 @@ export function Profile() {
         </button>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-black text-ink">{account.name}</h1>
-          <div className="truncate text-xs text-neutral-400">{handle}</div>
+          <div className="truncate text-xs text-neutral-500">{handle}</div>
           <div className="mt-2 flex gap-5 text-center">
-            <div><div className="text-sm font-black text-ink">{state.follows.length}</div><div className="text-[10px] text-neutral-400">Following</div></div>
-            <div><div className="text-sm font-black text-ink">{collections.posts.length}</div><div className="text-[10px] text-neutral-400">Posts</div></div>
-            <div><div className="text-sm font-black text-ink">{totalLikes}</div><div className="text-[10px] text-neutral-400">Likes</div></div>
+            <div><div className="text-sm font-black text-ink">{state.follows.length}</div><div className="text-[10px] text-neutral-500">Following</div></div>
+            <div><div className="text-sm font-black text-ink">{collections.posts.length}</div><div className="text-[10px] text-neutral-500">Posts</div></div>
+            <div><div className="text-sm font-black text-ink">{totalLikes}</div><div className="text-[10px] text-neutral-500">Likes</div></div>
           </div>
         </div>
       </div>
@@ -113,7 +113,7 @@ export function Profile() {
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-base font-black text-ink">Edit Profile</h3>
-              <button onClick={() => setEditing(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+              <button onClick={() => setEditing(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
             {/* Photo */}
@@ -124,7 +124,7 @@ export function Profile() {
                   : <span className="grid h-24 w-24 place-items-center rounded-full text-2xl font-black text-ink" style={{ backgroundColor: '#00BF63' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
                 <span className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-brand text-xs text-white">📷</span>
               </button>
-              <span className="text-[11px] text-neutral-400">{busy ? 'Uploading…' : 'Tap to change photo'}</span>
+              <span className="text-[11px] text-neutral-500">{busy ? 'Uploading…' : 'Tap to change photo'}</span>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => pickAvatar(e.target.files?.[0])} />
             </div>
 
@@ -166,7 +166,7 @@ export function Profile() {
       <div className="mt-4 flex border-b border-neutral-100">
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setTab(t.id)} aria-label={t.label}
-            className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-lg transition-colors ${tab === t.id ? 'border-b-2 border-brand text-ink' : 'text-neutral-400'}`}>
+            className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-lg transition-colors ${tab === t.id ? 'border-b-2 border-brand text-ink' : 'text-neutral-500'}`}>
             <span>{t.icon}</span>
             <span className="text-[8px] font-bold">{t.label}</span>
           </button>
@@ -176,7 +176,7 @@ export function Profile() {
       {/* Collection */}
       <div className="mt-4 space-y-4">
         {list.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-400">
+          <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-500">
             {tab === 'posts' && 'No posts yet. Create one using the ＋ button.'}
             {tab === 'locked' && '🔒 No locked posts yet. Locked posts are only visible to you.'}
             {tab === 'reposts' && '🔁 No reposts yet.'}

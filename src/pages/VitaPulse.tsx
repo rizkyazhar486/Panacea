@@ -14,7 +14,7 @@ export function VitaPulse() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">💓</span>
         <div>
           <h1 className="text-lg font-black text-ink">VitaPulse</h1>
-          <p className="text-xs text-neutral-400">Monitor & calculate your health in real time</p>
+          <p className="text-xs text-neutral-500">Monitor & calculate your health in real time</p>
         </div>
       </div>
       <div className="mb-4">

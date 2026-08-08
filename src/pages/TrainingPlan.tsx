@@ -364,7 +364,7 @@ function RunnerCoach() {
             <button key={k} onClick={() => setCont(k)} className={'rounded-xl py-2 text-xs font-bold ' + (cont === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
           ))}
         </div>
-        <p className="mt-1 text-[10px] text-neutral-400">Answer honestly based on a comfortable easy run, not a sprint. This is what shapes your plan.</p>
+        <p className="mt-1 text-[10px] text-neutral-500">Answer honestly based on a comfortable easy run, not a sprint. This is what shapes your plan.</p>
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -427,13 +427,13 @@ function RunnerCoach() {
               ['Fast / Strides', zone(-12), '15-20 sec explosive'],
             ].map(([l, p, d]) => (
               <div key={l} className="rounded-xl border border-neutral-100 p-2.5">
-                <div className="text-[10px] font-bold text-neutral-400">{l}</div>
+                <div className="text-[10px] font-bold text-neutral-500">{l}</div>
                 <div className="text-base font-extrabold text-brand-dark">{p}</div>
-                <div className="text-[9px] text-neutral-400">{d}</div>
+                <div className="text-[9px] text-neutral-500">{d}</div>
               </div>
             ))}
           </div>
-          <p className="mt-1.5 text-[10px] text-neutral-400">Derived from your VO₂max (Jack Daniels method). Run easy runs in the Easy zone — going faster damages your aerobic base.</p>
+          <p className="mt-1.5 text-[10px] text-neutral-500">Derived from your VO₂max (Jack Daniels method). Run easy runs in the Easy zone — going faster damages your aerobic base.</p>
         </div>
       )}
 
@@ -604,7 +604,7 @@ export function TrainingPlan() {
             return (
               <Card key={d} className={'!p-4 ' + (p ? '' : 'opacity-60')}>
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{d}</div>
+                  <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{d}</div>
                   {p ? <Badge tone="brand">{p.emoji} {p.title}</Badge> : <Badge tone="neutral">Rest</Badge>}
                 </div>
                 {p && (
@@ -630,7 +630,7 @@ export function TrainingPlan() {
                                 {ex.rest && <span>⏸ Rest: {ex.rest}</span>}
                                 {ex.pace && <span>🎯 {ex.pace}</span>}
                               </div>
-                              <div className="mt-0.5 text-[10px] italic text-neutral-400">💡 {ex.cue}</div>
+                              <div className="mt-0.5 text-[10px] italic text-neutral-500">💡 {ex.cue}</div>
                             </div>
                           </div>
                         )
@@ -738,7 +738,7 @@ export function TrainingPlan() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[10px] text-neutral-400">
+        <p className="mt-3 text-[10px] text-neutral-500">
           References: Mandsager 2018 (JAMA — fitness & mortality), Helgerud 2007 (4×4), PURE study (grip),
           Rikli & Jones (functional tests), Northwestern Mutual Lifespan Calculator & Longevity Illustrator (lifespan projection).
         </p>

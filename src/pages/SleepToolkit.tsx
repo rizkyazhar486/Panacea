@@ -135,11 +135,11 @@ function DreamJournal() {
       <div className="mt-4 space-y-2">
         {entries.map((e) => (
           <div key={e.t} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-            <div className="text-[11px] font-bold text-neutral-400">{new Date(e.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+            <div className="text-[11px] font-bold text-neutral-500">{new Date(e.t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
             <p className="mt-0.5 whitespace-pre-wrap text-[13px] text-neutral-700 dark:text-neutral-300">{e.text}</p>
           </div>
         ))}
-        {entries.length === 0 && <p className="text-center text-[12px] text-neutral-400">No entries yet.</p>}
+        {entries.length === 0 && <p className="text-center text-[12px] text-neutral-500">No entries yet.</p>}
       </div>
     </Card>
   )
@@ -165,7 +165,7 @@ function BedtimeChecklist() {
           <label key={s.text} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
             <input type="checkbox" checked={!!done[s.text]} onChange={(e) => setDone((d) => ({ ...d, [s.text]: e.target.checked }))} className="h-4 w-4 accent-brand" />
             <span className="text-lg">{s.emoji}</span>
-            <span className={`text-[13px] font-semibold ${done[s.text] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{s.text}</span>
+            <span className={`text-[13px] font-semibold ${done[s.text] ? 'text-neutral-500 line-through' : 'text-ink dark:text-ink'}`}>{s.text}</span>
           </label>
         ))}
       </div>
@@ -361,7 +361,7 @@ export function SleepToolkit() {
       {tab === 'bedtime' && <BedtimeChecklist />}
       {tab === 'soundscape' && <SoundscapeGenerator />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimates based on general sleep-science heuristics (90-minute cycle length varies
         person to person) — not a substitute for a clinical sleep study if you have ongoing sleep problems.
       </div>

@@ -57,7 +57,7 @@ export function DrugInfo() {
       {loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /></Card>}
 
       {drug === null && !loading && (
-        <Card className="!p-6 text-center text-sm text-neutral-400">No FDA label found for that name. Try the generic name, or check the spelling.</Card>
+        <Card className="!p-6 text-center text-sm text-neutral-500">No FDA label found for that name. Try the generic name, or check the spelling.</Card>
       )}
 
       {drug && (
@@ -65,7 +65,7 @@ export function DrugInfo() {
           <Card className="!p-5">
             <div className="text-xl font-black text-ink dark:text-ink">{drug.brand}</div>
             {drug.generic && <div className="text-sm text-neutral-500">Generic: {drug.generic}</div>}
-            {drug.manufacturer && <div className="mt-0.5 text-[11px] text-neutral-400">{drug.manufacturer}</div>}
+            {drug.manufacturer && <div className="mt-0.5 text-[11px] text-neutral-500">{drug.manufacturer}</div>}
           </Card>
           <Section title="What it's for" body={drug.purpose || drug.usage} />
           <Section title="Dosage & administration" body={drug.dosage} />
@@ -73,7 +73,7 @@ export function DrugInfo() {
           <Section title="Possible side effects" body={drug.adverse} />
           {related.length > 0 && (
             <Card className="!p-5">
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Related brand/generic products</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Related brand/generic products</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {related.map((d) => (
                   <span key={d.name} className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
@@ -82,13 +82,13 @@ export function DrugInfo() {
                   </span>
                 ))}
               </div>
-              <p className="mt-2 text-[11px] text-neutral-400">Via RxNorm (NIH) — other formulations/brands of the same active ingredient, not a substitute check.</p>
+              <p className="mt-2 text-[11px] text-neutral-500">Via RxNorm (NIH) — other formulations/brands of the same active ingredient, not a substitute check.</p>
             </Card>
           )}
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconShield size={12} className="mr-1 inline" /> Official label text via the free openFDA API (US labels — availability & wording vary by country/brand). This is reference information, not personal medical advice. For interactions with your other medicines and conditions, ask your pharmacist or doctor.
       </div>
     </div>
@@ -99,7 +99,7 @@ function Section({ title, body, danger }: { title: string; body: string; danger?
   if (!body) return null
   return (
     <Card className="!p-5">
-      <div className={'text-xs font-black uppercase tracking-wide ' + (danger ? 'text-rose-600' : 'text-neutral-400')}>{title}</div>
+      <div className={'text-xs font-black uppercase tracking-wide ' + (danger ? 'text-rose-600' : 'text-neutral-500')}>{title}</div>
       <p className="mt-2 whitespace-pre-line text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{body}</p>
     </Card>
   )

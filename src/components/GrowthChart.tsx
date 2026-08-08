@@ -147,20 +147,20 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
 
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">{label.short}</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">{label.short}</div>
           <div className="text-xl font-extrabold">
-            {patientValue} <span className="text-xs font-medium text-neutral-400">{label.unit}</span>
+            {patientValue} <span className="text-xs font-medium text-neutral-500">{label.unit}</span>
           </div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Z-score (SD)</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Z-score (SD)</div>
           <div className={`text-xl font-extrabold ${Math.abs(z) > 2 ? 'text-accent' : 'text-brand-dark'}`}>
             {z >= 0 ? '+' : ''}
             {z.toFixed(2)}
           </div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Percentile</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Percentile</div>
           <div className="text-xl font-extrabold">P{pct}</div>
         </div>
       </div>
@@ -168,7 +168,7 @@ function PediatricChart({ patient, ageYears }: { patient: Patient; ageYears: num
         <span className="text-sm text-neutral-500">Assessment ({label.short})</span>
         <Badge tone={cls.tone}>{cls.kesan}</Badge>
       </div>
-      <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+      <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
         Z-scores are computed using the LMS method (Cole) — consistent with WHO/CDC standards. Reference
         curves are derived from tabulated percentile points.
       </p>
@@ -193,9 +193,9 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
     <div>
       <div className="mb-2 flex items-end justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Adult BMI</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Adult BMI</div>
           <div className="text-3xl font-extrabold">
-            {bmi} <span className="text-base font-medium text-neutral-400">kg/m²</span>
+            {bmi} <span className="text-base font-medium text-neutral-500">kg/m²</span>
           </div>
         </div>
         <Badge tone={tone}>{kesan}</Badge>
@@ -211,7 +211,7 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
           <div className="absolute -top-1 -translate-x-1/2 rounded-full border-2 border-ink bg-white px-1 text-[10px] font-bold">▲</div>
         </div>
       </div>
-      <div className="mt-1 flex justify-between text-[10px] text-neutral-400">
+      <div className="mt-1 flex justify-between text-[10px] text-neutral-500">
         <span>18.5</span>
         <span>23</span>
         <span>25</span>
@@ -224,7 +224,7 @@ function AdultBmiChart({ patient }: { patient: Patient }) {
           </span>
         ))}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-400">Asia-Pacific adult BMI classification (WHO).</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Asia-Pacific adult BMI classification (WHO).</p>
     </div>
   )
 }

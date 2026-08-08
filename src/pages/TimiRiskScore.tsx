@@ -59,16 +59,16 @@ export function TimiRiskScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 7</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">14-day risk of death, MI, or urgent revascularization: ~{RISK_BY_SCORE[score]}.</p>
+        <p className="mt-2 text-[12px] text-neutral-500">14-day risk of death, MI, or urgent revascularization: ~{RISK_BY_SCORE[score]}.</p>
         <CopyNote text={`TIMI (UA/NSTEMI) ${score}/7 — ${result.label.toLowerCase()}, ~${RISK_BY_SCORE[score]} 14-day death/MI/urgent revascularization [Antman 2000]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Antman, E.M., et al. (2000). The TIMI risk score for unstable angina/non-ST elevation MI.
         <i> JAMA</i>, 284(7), 835-842. Decision-support estimate — management decisions should follow
         current ACC/AHA guidelines and clinical judgment.

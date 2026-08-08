@@ -61,7 +61,7 @@ export function GratitudeJournal() {
 
       <Card className="!p-5">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Today · {today}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Today · {today}</div>
           <Badge tone={streak > 0 ? 'brand' : 'low'}>🔥 {streak} day{streak === 1 ? '' : 's'}</Badge>
         </div>
         <div className="mt-3 space-y-2">
@@ -84,11 +84,11 @@ export function GratitudeJournal() {
 
       {past.length > 0 && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Looking back</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Looking back</div>
           <div className="mt-3 space-y-3">
             {past.map((e) => (
               <div key={e.date} className="rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
-                <div className="text-[11px] font-bold text-neutral-400">{e.date}</div>
+                <div className="text-[11px] font-bold text-neutral-500">{e.date}</div>
                 <ul className="mt-1 list-inside list-disc text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                   {e.items.filter(Boolean).map((it, i) => <li key={i}>{it}</li>)}
                 </ul>
@@ -98,7 +98,7 @@ export function GratitudeJournal() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Seligman, M.E.P., et al. (2005). Positive psychology progress: empirical validation of
         interventions. <i>American Psychologist</i>, 60(5), 410-421. Entries are saved only on this
         device. A wellbeing practice — not a substitute for care if you're struggling.

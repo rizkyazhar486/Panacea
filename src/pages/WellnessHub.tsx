@@ -171,12 +171,12 @@ export function WellnessHub() {
       </Card>
 
       {filtered.length === 0 && (
-        <Card className="!p-5 text-center text-sm text-neutral-400">Nothing matches "{query}" — try "sleep", "stress", "aging", or "skin".</Card>
+        <Card className="!p-5 text-center text-sm text-neutral-500">Nothing matches "{query}" — try "sleep", "stress", "aging", or "skin".</Card>
       )}
 
       {filtered.map((g) => (
         <Card key={g.title} className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{g.emoji} {g.title}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.emoji} {g.title}</div>
           <div className="mt-3 space-y-1.5">
             {g.feats.map((f) => (
               <a key={f.to} href={`#${f.to}`} className="group flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 transition hover:bg-brand/10 dark:bg-white/5">
@@ -194,7 +194,7 @@ export function WellnessHub() {
         </Card>
       ))}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Every tool cites its evidence on-page. Wellbeing support — not a replacement for medical care.
       </div>
     </div>

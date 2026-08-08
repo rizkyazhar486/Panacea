@@ -132,7 +132,7 @@ export function SofaScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Per-system breakdown</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Per-system breakdown</div>
         <div className="mt-3 space-y-2">
           {rows.map((r) => (
             <div key={r.name} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
@@ -144,12 +144,12 @@ export function SofaScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Total SOFA Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total SOFA Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{total} / 24</span>
           <Badge tone={band.tone}>{band.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">Estimated mortality: {band.mortality} (population-level estimate).</p>
+        <p className="mt-2 text-[12px] text-neutral-500">Estimated mortality: {band.mortality} (population-level estimate).</p>
         <CopyNote text={`SOFA ${total}/24 (resp ${resp}, coag ${coag}, liver ${liver}, CV ${cv}, CNS ${cns}, renal ${renal}) — ${band.label.toLowerCase()}, est. mortality ${band.mortality} [Vincent 1996]`} />
       </Card>
 
@@ -161,7 +161,7 @@ export function SofaScore() {
         detail={`Resp ${resp}, Coag ${coag}, Liver ${liver}, CV ${cv}, CNS ${cns}, Renal ${renal}`}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Vincent, J.L., et al. (1996). The SOFA score. <i>Intensive Care Med</i>, 22(7), 707-710.
         Decision-support estimate — trend the score serially rather than relying on a single value.
       </div>

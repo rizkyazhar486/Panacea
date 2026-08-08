@@ -88,7 +88,7 @@ export function AssessmentPrompt() {
           style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           Complete Now →
         </a>
-        <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-400">Maybe later</button>
+        <button onClick={dismiss} className="mt-2 w-full rounded-2xl py-3 text-sm font-bold text-neutral-500">Maybe later</button>
       </div>
     </div>
   )

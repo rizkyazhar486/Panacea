@@ -44,7 +44,7 @@ export function ScoreTrend({ storageKey, scoreName, total, maxScore, detail }: {
     <Card className="!p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Trend — serial {scoreName}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Trend — serial {scoreName}</div>
           <p className="mt-1 text-[12px] text-neutral-500">
             {scoreName} is designed to be trended: the direction of change carries as much information
             as any single value.
@@ -56,7 +56,7 @@ export function ScoreTrend({ storageKey, scoreName, total, maxScore, detail }: {
       </div>
 
       {readings.length === 0 && (
-        <p className="mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-400 dark:bg-white/5">
+        <p className="mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-500 dark:bg-white/5">
           No saved readings yet — enter the current values above and tap "Save reading".
         </p>
       )}
@@ -76,7 +76,7 @@ export function ScoreTrend({ storageKey, scoreName, total, maxScore, detail }: {
       )}
 
       {delta != null && (
-        <p className={`mt-2 text-center text-[12px] font-bold ${delta > 0 ? 'text-red-600 dark:text-red-300' : delta < 0 ? 'text-brand-dark' : 'text-neutral-400'}`}>
+        <p className={`mt-2 text-center text-[12px] font-bold ${delta > 0 ? 'text-red-600 dark:text-red-300' : delta < 0 ? 'text-brand-dark' : 'text-neutral-500'}`}>
           {delta > 0 ? `▲ Worsening: +${delta} since previous reading` : delta < 0 ? `▼ Improving: ${delta} since previous reading` : '— Unchanged since previous reading'}
         </p>
       )}
@@ -89,7 +89,7 @@ export function ScoreTrend({ storageKey, scoreName, total, maxScore, detail }: {
               <span className="flex-1 truncate text-neutral-500">
                 {new Date(r.t).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })} · {r.note}
               </span>
-              <button onClick={() => remove(r.t)} aria-label="Delete reading" className="font-bold text-neutral-400 hover:text-red-500">✕</button>
+              <button onClick={() => remove(r.t)} aria-label="Delete reading" className="font-bold text-neutral-500 hover:text-red-500">✕</button>
             </div>
           ))}
         </div>

@@ -74,7 +74,7 @@ export function PsychiatricStatusExam() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Summary</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Summary</div>
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{summary}</p>
         <div className="mt-3"><CopyNote text={summary} /></div>
       </Card>
@@ -86,7 +86,7 @@ export function PsychiatricStatusExam() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A documentation aid for the standard MSE format — not a diagnostic tool, not a substitute for a
         full psychiatric evaluation, and not a validated suicide-risk instrument.
       </div>

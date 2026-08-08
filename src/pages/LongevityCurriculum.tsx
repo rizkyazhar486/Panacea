@@ -154,7 +154,7 @@ export function LongevityCurriculum() {
                   <div className="text-sm font-black text-ink">{m.title}</div>
                   <Badge tone={ev.tone}>{ev.l}</Badge>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={`shrink-0 text-neutral-400 transition-transform ${open ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={`shrink-0 text-neutral-500 transition-transform ${open ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9" /></svg>
               </button>
               {open && (
                 <div className="border-t border-black/5 p-4 pt-3">
@@ -169,7 +169,7 @@ export function LongevityCurriculum() {
                     </div>
                   )}
                   <div className="mt-3 rounded-xl bg-neutral-50 p-3">
-                    <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">References</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">References</div>
                     <ul className="mt-1 space-y-1 text-[10px] leading-relaxed text-neutral-500">
                       {m.references.map((r, i) => <li key={i}>• {r}</li>)}
                     </ul>
@@ -181,7 +181,7 @@ export function LongevityCurriculum() {
         })}
       </div>
 
-      <p className="text-center text-[10px] leading-relaxed text-neutral-400">
+      <p className="text-center text-[10px] leading-relaxed text-neutral-500">
         The citations on this page are landmark references underlying each topic — verify details (DOI, volume, latest edition)
         directly on PubMed/publisher sites for formal academic use. This material is compiled for clinician/educational
         institution orientation, not as a substitute for a systematic literature review or official specialty guidelines.

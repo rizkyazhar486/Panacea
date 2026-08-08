@@ -127,11 +127,11 @@ export function Marketplace() {
               </div>
               <h3 className="font-bold leading-tight">{m.title}</h3>
               <p className="mt-1 line-clamp-3 text-sm text-neutral-500">{m.description}</p>
-              <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-400">
+              <div className="mt-3 flex items-center gap-1.5 text-xs text-neutral-500">
                 <IconShield size={13} className="text-brand" />
                 AI-verified + {m.verifierReview?.verifierRole ?? 'Specialist'} · {m.specialty}
               </div>
-              <div className="mt-1 text-xs text-neutral-400">
+              <div className="mt-1 text-xs text-neutral-500">
                 by {m.authorName} · ★ {m.rating || '—'} · {m.downloads}× downloaded
                 {subbed && <span className="ml-1 font-semibold text-brand-dark">· subscription active</span>}
               </div>
@@ -140,9 +140,9 @@ export function Marketplace() {
                   <span className="flex items-center gap-1 text-lg font-extrabold">
                     <IconToken size={16} className="text-brand" />
                     {m.priceTokens}
-                    <span className="text-xs font-medium text-neutral-400">PNC</span>
+                    <span className="text-xs font-medium text-neutral-500">PNC</span>
                   </span>
-                  <span className="text-[10px] text-neutral-400">
+                  <span className="text-[10px] text-neutral-500">
                     Author receives {Math.max(0, m.priceTokens - 5)} · platform fee 5 PNC
                   </span>
                 </span>
@@ -166,7 +166,7 @@ export function Marketplace() {
           )
         })}
         {listed.length === 0 && (
-          <Card className="md:col-span-2 lg:col-span-3 text-center text-sm text-neutral-400">
+          <Card className="md:col-span-2 lg:col-span-3 text-center text-sm text-neutral-500">
             No materials match this filter.
           </Card>
         )}
@@ -306,7 +306,7 @@ function UploadPanel({
         <Button onClick={submit} disabled={busy || !f.title.trim() || !f.fileName}>
           <IconBook size={16} /> {busy ? 'Uploading & AI verification…' : 'Upload & Verify'}
         </Button>
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-neutral-500">
           Uploading as <b>{authorName}</b>. Royalty earnings are credited to your PNC balance once
           sold.
         </p>

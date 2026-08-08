@@ -64,12 +64,12 @@ function DailyHabits() {
   useEffect(() => { try { localStorage.setItem(HABIT_KEY, JSON.stringify({ day: today, items: done })) } catch { /* ignore */ } }, [done, today])
   return (
     <Card className="!p-5">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Today's habits</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Today's habits</div>
       <div className="mt-2 space-y-1.5">
         {DAILY_HABITS.map((h) => (
           <label key={h.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
             <input type="checkbox" checked={!!done[h.id]} onChange={(e) => setDone((d) => ({ ...d, [h.id]: e.target.checked }))} className="h-4 w-4 accent-brand" />
-            <span className={`text-[13px] font-semibold ${done[h.id] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{h.label}</span>
+            <span className={`text-[13px] font-semibold ${done[h.id] ? 'text-neutral-500 line-through' : 'text-ink dark:text-ink'}`}>{h.label}</span>
           </label>
         ))}
       </div>
@@ -95,53 +95,53 @@ export function ToxinChecklist() {
       <DailyHabits />
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">🧴 Non-toxic cleaning swaps</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">🧴 Non-toxic cleaning swaps</div>
         <div className="mt-2 space-y-2">
           {SWAPS.map((s) => (
             <div key={s.from} className="rounded-xl bg-neutral-50 p-3 text-[13px] dark:bg-white/5">
-              <span className="text-neutral-400 line-through">{s.from}</span> → <span className="font-bold text-brand-dark">{s.to}</span>
+              <span className="text-neutral-500 line-through">{s.from}</span> → <span className="font-bold text-brand-dark">{s.to}</span>
             </div>
           ))}
         </div>
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">🔍 Search: endocrine disruptors</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">🔍 Search: endocrine disruptors</div>
         <input className={`${inputClass} mt-2`} placeholder="Search a chemical name…" value={query} onChange={(e) => setQuery(e.target.value)} />
         <div className="mt-3 space-y-2">
           {filteredDisruptors.map((d) => (
             <div key={d.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="text-[13px] font-bold text-ink dark:text-ink">{d.name}</div>
-              <div className="text-[11px] text-neutral-400">Found in: {d.where}</div>
+              <div className="text-[11px] text-neutral-500">Found in: {d.where}</div>
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{d.note}</p>
             </div>
           ))}
-          {filteredDisruptors.length === 0 && <p className="text-center text-[12px] text-neutral-400">No match for "{query}".</p>}
+          {filteredDisruptors.length === 0 && <p className="text-center text-[12px] text-neutral-500">No match for "{query}".</p>}
         </div>
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">📶 Reducing EMF exposure at night</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">📶 Reducing EMF exposure at night</div>
         <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           {EMF_TIPS.map((t) => <li key={t}>{t}</li>)}
         </ul>
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">🍽️ Microwave safety</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">🍽️ Microwave safety</div>
         <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           {MICROWAVE_TIPS.map((t) => <li key={t}>{t}</li>)}
         </ul>
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">💨 Air purifier placement</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">💨 Air purifier placement</div>
         <ul className="mt-2 list-inside list-disc space-y-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           {AIR_TIPS.map((t) => <li key={t}>{t}</li>)}
         </ul>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         General household-exposure guidance, not a certified environmental health assessment. Water
         filtration needs vary by local water quality — check your municipal water report for
         what's actually in your specific supply.

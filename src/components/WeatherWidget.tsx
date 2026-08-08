@@ -121,7 +121,7 @@ export function WeatherWidget() {
           <div className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-t-3xl bg-white p-5 sm:rounded-3xl dark:bg-[#17191c]">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-black text-ink dark:text-white">Your Location Weather</h3>
-              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100 dark:hover:bg-white/10">
+              <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-white/10">
                 <IconX size={18} />
               </button>
             </div>
@@ -158,14 +158,14 @@ export function WeatherWidget() {
                 <div key={d.date} className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-neutral-50 dark:hover:bg-white/5">
                   <span className="w-28 shrink-0 text-xs font-bold text-ink dark:text-white">{dayLabel(d.date, i)}</span>
                   <span className="text-lg">{weatherEmoji(d.code)}</span>
-                  <span className="text-xs text-neutral-400">{weatherLabel(d.code)}</span>
+                  <span className="text-xs text-neutral-500">{weatherLabel(d.code)}</span>
                   <span className="text-xs font-bold text-neutral-600 dark:text-neutral-200">{d.tMax}° / {d.tMin}°</span>
                 </div>
               ))}
             </div>
 
             {tab === 'month' && (
-              <p className="mt-3 text-center text-[10px] text-neutral-400">
+              <p className="mt-3 text-center text-[10px] text-neutral-500">
                 Forecast available up to 16 days ahead (free weather service limit).
               </p>
             )}

@@ -197,7 +197,7 @@ export function ClubHub() {
           </Card>
 
           {myMeetsByDay.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">
+            <Card className="!p-5 text-center text-sm text-neutral-500">
               Nothing on your schedule yet — head to the Meets tab and join one.
             </Card>
           )}
@@ -211,7 +211,7 @@ export function ClubHub() {
                   return (
                     <button key={m.id} onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
                       <div className="w-14 shrink-0 text-center">
-                        <div className="text-lg font-black leading-tight text-neutral-400">{m.time}</div>
+                        <div className="text-lg font-black leading-tight text-neutral-500">{m.time}</div>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-[15px] font-black text-ink dark:text-ink">{m.title}</div>
@@ -219,7 +219,7 @@ export function ClubHub() {
                         <span className={`mt-1 inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${r === 'joined' ? 'border-brand text-brand-dark' : 'border-amber-400 text-amber-600 dark:text-amber-300'}`}>
                           {r === 'joined' ? 'Joining' : 'Maybe'}
                         </span>
-                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-400"><IconMapPin size={12} />{m.venue}</div>
+                        <div className="mt-1 flex items-center gap-1 text-[12px] text-neutral-500"><IconMapPin size={12} />{m.venue}</div>
                       </div>
                       {capBadge(m)}
                     </button>
@@ -263,10 +263,10 @@ export function ClubHub() {
             </button>
           </div>
 
-          {loadingMeets && <Card className="!p-5 text-center text-sm text-neutral-400">Loading meets…</Card>}
+          {loadingMeets && <Card className="!p-5 text-center text-sm text-neutral-500">Loading meets…</Card>}
 
           {!loadingMeets && meetsToday.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
+            <Card className="!p-5 text-center text-sm text-neutral-500">No meets on this day{q ? ' matching your search' : ''} — check another day, or host your own.</Card>
           )}
 
           {meetView === 'map' && meetsToday.length > 0 && (() => {
@@ -277,7 +277,7 @@ export function ClubHub() {
             return (
               <Card className="!p-2">
                 {mappable.length > 0 ? (
-                  <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-400">Loading map…</div>}>
+                  <Suspense fallback={<div className="flex h-[340px] items-center justify-center text-sm text-neutral-500">Loading map…</div>}>
                     <MeetMap
                       pins={mappable.map((m) => ({
                         id: m.id, lat: m.lat, lng: m.lng, emoji: m.emoji, title: m.title, time: m.time,
@@ -287,9 +287,9 @@ export function ClubHub() {
                     />
                   </Suspense>
                 ) : (
-                  <div className="flex h-[200px] items-center justify-center px-4 text-center text-sm text-neutral-400">None of today's meets have a mappable location yet — check the list view instead.</div>
+                  <div className="flex h-[200px] items-center justify-center px-4 text-center text-sm text-neutral-500">None of today's meets have a mappable location yet — check the list view instead.</div>
                 )}
-                <p className="px-2 py-1.5 text-center text-[11px] text-neutral-400">
+                <p className="px-2 py-1.5 text-center text-[11px] text-neutral-500">
                   Pin number = people actually joined · red = full · tap a pin for details
                   {mappable.length < meetsToday.length ? ` · ${meetsToday.length - mappable.length} meet(s) not shown (no location match)` : ''}
                 </p>
@@ -304,7 +304,7 @@ export function ClubHub() {
                 <button onClick={() => setDetail(m)} className="flex w-full items-start gap-3 text-left">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-xl">{m.emoji}</div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{m.club}</div>
+                    <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{m.club}</div>
                     <div className="truncate text-[15px] font-black text-ink dark:text-ink">{m.title}</div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-neutral-500">
                       <span className="rounded-full bg-neutral-100 px-2 py-0.5 font-semibold dark:bg-white/10">{m.tag}</span>
@@ -332,10 +332,10 @@ export function ClubHub() {
             ＋ Start a new club
           </button>
 
-          {loadingClubs && <Card className="!p-5 text-center text-sm text-neutral-400">Loading clubs…</Card>}
+          {loadingClubs && <Card className="!p-5 text-center text-sm text-neutral-500">Loading clubs…</Card>}
 
           {!loadingClubs && clubsFiltered.length === 0 && (
-            <Card className="!p-5 text-center text-sm text-neutral-400">No clubs match "{query}" — start one instead.</Card>
+            <Card className="!p-5 text-center text-sm text-neutral-500">No clubs match "{query}" — start one instead.</Card>
           )}
 
           {clubsFiltered.map((c) => {
@@ -401,9 +401,9 @@ export function ClubHub() {
                   <span key={pEmail} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-[12px] font-black text-ink" title={pEmail}>{initials(pEmail)}</span>
                 ))}
                 {count > 4 && (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-400 dark:border-white/20">+{count - 4}</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-neutral-300 text-[12px] font-bold text-neutral-500 dark:border-white/20">+{count - 4}</span>
                 )}
-                <span className="ml-1 text-[12px] text-neutral-400">{count} really going{m.maybes.length > 0 ? ` · ${m.maybes.length} maybe` : ''}</span>
+                <span className="ml-1 text-[12px] text-neutral-500">{count} really going{m.maybes.length > 0 ? ` · ${m.maybes.length} maybe` : ''}</span>
               </div>
 
               <div className="mt-4 space-y-3 text-sm">
@@ -439,7 +439,7 @@ export function ClubHub() {
 
               {m.notes.length > 0 && (
                 <div className="mt-4 rounded-2xl bg-neutral-50 p-3 dark:bg-white/5">
-                  <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Notes</div>
+                  <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Notes</div>
                   <ul className="mt-1 list-inside list-disc space-y-0.5 text-[13px] text-neutral-600 dark:text-neutral-300">
                     {m.notes.map((n) => <li key={n}>{n}</li>)}
                   </ul>
@@ -458,7 +458,7 @@ export function ClubHub() {
                 <button
                   onClick={() => !full && setRsvp(m.id, r === 'joined' ? 'none' : 'joined')}
                   disabled={full}
-                  className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition ${r === 'joined' ? 'bg-brand/10 text-brand-dark' : full ? 'cursor-not-allowed bg-neutral-100 text-neutral-400 dark:bg-white/5' : 'bg-brand text-white'}`}
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition ${r === 'joined' ? 'bg-brand/10 text-brand-dark' : full ? 'cursor-not-allowed bg-neutral-100 text-neutral-500 dark:bg-white/5' : 'bg-brand text-white'}`}
                 >
                   {r === 'joined' ? '✓ Joining — tap to leave' : full ? 'Full' : 'Join meet'}
                 </button>
@@ -481,7 +481,7 @@ export function ClubHub() {
       {showHost && <HostMeetSheet email={email} initialDay={day} onClose={() => setShowHost(false)} onCreated={() => { setShowHost(false); refreshMeets() }} />}
       {showNewClub && <NewClubSheet onClose={() => setShowNewClub(false)} onCreated={() => { setShowNewClub(false); refreshClubs() }} />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Clubs and meets are real and shared with every Panaceamed user — anyone can start a club or
         host a meet, and every "members" or "joined" count is the actual number of accounts that
         joined, never a preset number. Group exercise adherence evidence: social support is a

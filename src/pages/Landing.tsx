@@ -325,7 +325,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 text-brand-dark shadow-inner">
                     <f.icon size={22} />
                   </span>
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-neutral-400 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
+                  <span className="grid h-8 w-8 place-items-center rounded-full border border-black/10 text-neutral-500 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" /></svg>
                   </span>
                 </div>
@@ -427,7 +427,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                     <div className="flex flex-wrap items-baseline gap-2">
                       <h3 className="text-base font-extrabold text-ink">{e.title}</h3>
                       <span className="text-[11px] font-bold text-brand-dark">{e.era}</span>
-                      <span className="text-[10px] text-neutral-400">· {e.when}</span>
+                      <span className="text-[10px] text-neutral-500">· {e.when}</span>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.body}</p>
                     {e.video && (

@@ -53,7 +53,7 @@ export function GeneInfo() {
       {loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /></Card>}
 
       {gene === null && !loading && (
-        <Card className="!p-6 text-center text-sm text-neutral-400">No gene found for that name. Try the official HGNC symbol (e.g. APOE, not "apolipoprotein E").</Card>
+        <Card className="!p-6 text-center text-sm text-neutral-500">No gene found for that name. Try the official HGNC symbol (e.g. APOE, not "apolipoprotein E").</Card>
       )}
 
       {gene && (
@@ -65,14 +65,14 @@ export function GeneInfo() {
             </div>
             {gene.name && <div className="mt-0.5 text-sm text-neutral-500">{gene.name}</div>}
             {(gene.chromosome || gene.location) && (
-              <div className="mt-2 text-[11px] text-neutral-400">
+              <div className="mt-2 text-[11px] text-neutral-500">
                 {gene.chromosome}{gene.chromosome && gene.location ? ' · ' : ''}{gene.location && `bp ${gene.location}`}
               </div>
             )}
             {gene.aliases.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {gene.aliases.slice(0, 8).map((a) => (
-                  <span key={a} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-500 dark:bg-white/5 dark:text-neutral-400">{a}</span>
+                  <span key={a} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-500 dark:bg-white/5 dark:text-neutral-500">{a}</span>
                 ))}
               </div>
             )}
@@ -80,7 +80,7 @@ export function GeneInfo() {
           <Section title="What it does" body={gene.summary} />
           {(gene.entrezId || gene.ensemblId) && (
             <Card className="!p-5">
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-400">External references</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">External references</div>
               <div className="mt-2 flex flex-wrap gap-3 text-[13px]">
                 {gene.entrezId && (
                   <a className="font-semibold text-brand-dark underline" href={`https://www.ncbi.nlm.nih.gov/gene/${gene.entrezId}`} target="_blank" rel="noreferrer">NCBI Gene {gene.entrezId} →</a>
@@ -94,7 +94,7 @@ export function GeneInfo() {
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconShield size={12} className="mr-1 inline" /> Reference gene function via the free MyGene.info API (NCBI Entrez / Ensembl / UniProt data). This is educational information, not a genetic test result or medical interpretation — discuss any personal genetic testing with a clinician or genetic counselor.
       </div>
     </div>
@@ -105,7 +105,7 @@ function Section({ title, body }: { title: string; body: string }) {
   if (!body) return null
   return (
     <Card className="!p-5">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{title}</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{title}</div>
       <p className="mt-2 whitespace-pre-line text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-200">{body}</p>
     </Card>
   )

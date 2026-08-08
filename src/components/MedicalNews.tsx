@@ -102,7 +102,7 @@ function Kicker({ kind, cat }: { kind: NewsItem['kind']; cat: string }) {
       {showCat && (
         <>
           <span aria-hidden className="text-neutral-300">·</span>
-          <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{cat}</span>
+          <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{cat}</span>
         </>
       )}
     </div>
@@ -212,13 +212,13 @@ export function MedicalNews() {
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{n.source || 'Health'}</span>
+                        <span className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{n.source || 'Health'}</span>
                         <RegionTag region={n.region === 'domestic' ? 'Domestic' : 'Internasional'} />
                       </div>
                       <h4 className="mt-1 text-[15px] font-semibold leading-snug transition-colors group-hover:text-brand-dark">
                         {cleanTitle(n.title, n.source)}
                       </h4>
-                      {relTime(n.pubDate) && <p className="mt-0.5 text-[12px] text-neutral-400">{relTime(n.pubDate)}</p>}
+                      {relTime(n.pubDate) && <p className="mt-0.5 text-[12px] text-neutral-500">{relTime(n.pubDate)}</p>}
                     </div>
                   </a>
                 </li>

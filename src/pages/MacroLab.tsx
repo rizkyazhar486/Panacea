@@ -40,7 +40,7 @@ export function MacroLab() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌐</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Macro Lab</h1>
-          <p className="text-xs text-neutral-400">Ekonomi makro, suku bunga, dan perdagangan — dengan asumsi yang terbuka</p>
+          <p className="text-xs text-neutral-500">Ekonomi makro, suku bunga, dan perdagangan — dengan asumsi yang terbuka</p>
         </div>
       </div>
 
@@ -72,13 +72,13 @@ export function MacroLab() {
       {tab === 'dagang' && <TradeTab />}
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Sumber data</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Sumber data</div>
         <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
           {DATA_SOURCES.map((s) => <li key={s}>{s}</li>)}
         </ol>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Alat edukasi ekonomi makro. Bukan nasihat investasi maupun kebijakan, dan tidak
         memperkirakan pergerakan pasar. Angka dibulatkan untuk perbandingan, bukan untuk perhitungan
         yang presisi.
@@ -131,7 +131,7 @@ function CountryTab() {
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">{METRIC_LABEL[metric]}</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">{METRIC_LABEL[metric]}</div>
         <div className="mt-2 space-y-1.5">
           {rows.map(({ c, v }) => (
             <div key={c.code} className="flex items-center gap-2">
@@ -147,7 +147,7 @@ function CountryTab() {
       </Card>
 
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Detail</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Detail</div>
         <div className="mt-2 space-y-2">
           {rows.map(({ c }) => (
             <div key={c.code} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -163,7 +163,7 @@ function CountryTab() {
                 <span>Pengangguran: {c.unemploymentPct}%</span>
                 <span>Utang: {c.govDebtPctGdp}% PDB</span>
               </div>
-              <div className="mt-1 text-[10px] text-neutral-400">{c.centralBank}</div>
+              <div className="mt-1 text-[10px] text-neutral-500">{c.centralBank}</div>
             </div>
           ))}
         </div>
@@ -310,7 +310,7 @@ function SimTab() {
         </div>
 
         <div className="mt-3 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Persamaan yang dipakai</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Persamaan yang dipakai</div>
           <pre className="mt-1 overflow-x-auto text-[10px] leading-relaxed text-neutral-600 dark:text-neutral-300">
 {`suku bunga target = riil netral + inflasi
                   + 0,5 × (inflasi − target)

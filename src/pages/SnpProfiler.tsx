@@ -144,9 +144,9 @@ export function SnpProfiler() {
           onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f) }}
           className="block w-full text-[13px] text-neutral-500 file:mr-3 file:rounded-xl file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-bold file:text-white"
         />
-        {parsing && <p className="mt-2 text-[12px] text-neutral-400">Parsing…</p>}
+        {parsing && <p className="mt-2 text-[12px] text-neutral-500">Parsing…</p>}
         {error && <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-[12px] font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
-        {genotypes && !error && <p className="mt-2 text-[12px] text-neutral-400">Parsed {rowCount.toLocaleString()} rows from {fileName} — matched {found.length}/{SNP_DB.length} reference SNPs.</p>}
+        {genotypes && !error && <p className="mt-2 text-[12px] text-neutral-500">Parsed {rowCount.toLocaleString()} rows from {fileName} — matched {found.length}/{SNP_DB.length} reference SNPs.</p>}
       </Card>
 
       {found.map(({ snp, genotype, interp }) => (
@@ -155,22 +155,22 @@ export function SnpProfiler() {
             <div className="text-[15px] font-black text-ink dark:text-ink">{snp.gene}</div>
             <Badge tone="brand">{snp.rsid} · {genotype}</Badge>
           </div>
-          <div className="text-[12px] text-neutral-400">{snp.trait}</div>
+          <div className="text-[12px] text-neutral-500">{snp.trait}</div>
           <p className="mt-2 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{interp || 'Genotype found but not in our interpretation table for this position.'}</p>
-          <p className="mt-1 text-[11px] text-neutral-400">{snp.citation}</p>
+          <p className="mt-1 text-[11px] text-neutral-500">{snp.citation}</p>
         </Card>
       ))}
 
       {!genotypes && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What's checked</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What's checked</div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {SNP_DB.map((s) => <Badge key={s.rsid} tone="neutral">{s.gene} ({s.rsid})</Badge>)}
           </div>
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational research lookup only, sourced from published GWAS literature — not a diagnosis, not
         medical advice, and not a substitute for genetic counseling. Discuss anything concerning
         (especially APOE results) with a genetic counselor, who can interpret it in full clinical context.

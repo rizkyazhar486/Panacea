@@ -150,7 +150,7 @@ function CompliancePanel() {
           <span className={`mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full ${sehat?.configured ? 'bg-brand' : 'bg-amber-400'}`} />
           <div>
             <div>{sehat?.note ?? (backendEnabled ? 'Loading status…' : 'Server not active.')}</div>
-            <div className="mt-0.5 text-[11px] text-neutral-400">Environment: {sehat?.env ?? 'sandbox'} · set SATUSEHAT_CLIENT_ID/SECRET on the server to enable.</div>
+            <div className="mt-0.5 text-[11px] text-neutral-500">Environment: {sehat?.env ?? 'sandbox'} · set SATUSEHAT_CLIENT_ID/SECRET on the server to enable.</div>
           </div>
         </div>
       </Card>
@@ -163,18 +163,18 @@ function CompliancePanel() {
           right={audit ? <Badge tone="neutral">{audit.length} entries</Badge> : undefined}
         />
         {err && <p className="text-sm text-accent">{err}</p>}
-        {!backendEnabled && <p className="text-sm text-neutral-400">Audit log requires an active server.</p>}
+        {!backendEnabled && <p className="text-sm text-neutral-500">Audit log requires an active server.</p>}
         {backendEnabled && !audit && !err && <SkeletonRows rows={4} />}
-        {audit && audit.length === 0 && <p className="text-sm text-neutral-400">No access recorded yet.</p>}
+        {audit && audit.length === 0 && <p className="text-sm text-neutral-500">No access recorded yet.</p>}
         {audit && audit.length > 0 && (
           <div className="max-h-80 space-y-1.5 overflow-y-auto">
             {audit.map((e) => (
               <div key={e.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
                 <IconCheck size={15} className="shrink-0 text-brand" />
                 <span className="font-semibold">{actionLabel[e.action] ?? e.action}</span>
-                {e.target && <span className="text-[11px] text-neutral-400">#{e.target}</span>}
-                <span className="ml-auto truncate text-[11px] text-neutral-400">{e.userEmail}</span>
-                <span className="shrink-0 text-[11px] text-neutral-400">{new Date(e.at).toLocaleString('en-GB')}</span>
+                {e.target && <span className="text-[11px] text-neutral-500">#{e.target}</span>}
+                <span className="ml-auto truncate text-[11px] text-neutral-500">{e.userEmail}</span>
+                <span className="shrink-0 text-[11px] text-neutral-500">{new Date(e.at).toLocaleString('en-GB')}</span>
               </div>
             ))}
           </div>
@@ -218,7 +218,7 @@ function RealtimeStats() {
             {tiles.map((t) => (
               <div key={t.label} className="rounded-xl bg-neutral-50 p-3">
                 <div className="text-lg font-extrabold leading-tight">{t.value}</div>
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{t.label}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">{t.label}</div>
               </div>
             ))}
           </div>
@@ -318,7 +318,7 @@ function AIOperatorPanel() {
           )}
         </div>
       )}
-      <p className="mt-2 text-[11px] text-neutral-400">
+      <p className="mt-2 text-[11px] text-neutral-500">
         ⚕️ AI provides analysis & drafts. Financial decisions (top-up approvals, STR verification) still require
         your manual confirmation for safety.
       </p>
@@ -368,7 +368,7 @@ function UserDirectoryPanel() {
             </div>
           </div>
           <div className="mt-3 space-y-2">
-            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-400">No accounts match the filter.</p>}
+            {filtered.length === 0 && <p className="py-6 text-center text-sm text-neutral-500">No accounts match the filter.</p>}
             {filtered.map((r) => (
               <div key={r.id} className="rounded-xl border border-neutral-100 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -422,7 +422,7 @@ function FeedbackInboxPanel() {
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && rows.length === 0 && <p className="text-sm text-neutral-400">No messages yet.</p>}
+      {rows && rows.length === 0 && <p className="text-sm text-neutral-500">No messages yet.</p>}
       <div className="space-y-2">
         {(rows ?? []).slice(0, 30).map((r) => (
           <div key={r.id} className={`rounded-xl border p-3 ${r.read ? 'border-neutral-100' : 'border-amber-200 bg-amber-50'}`}>
@@ -430,9 +430,9 @@ function FeedbackInboxPanel() {
               <div className="flex items-center gap-2">
                 <Badge tone={r.read ? 'neutral' : 'high'}>{r.kind}</Badge>
                 <span className="text-xs font-bold text-ink">{r.userName}</span>
-                <span className="text-[11px] text-neutral-400">{r.userEmail}</span>
+                <span className="text-[11px] text-neutral-500">{r.userEmail}</span>
               </div>
-              <span className="text-[11px] text-neutral-400">{new Date(r.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="text-[11px] text-neutral-500">{new Date(r.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <p className="mt-1.5 text-sm text-neutral-700">{r.text}</p>
             {!r.read && (
@@ -469,7 +469,7 @@ function ApplicationsPanel() {
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">No applicants pending.</p>}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-500">No applicants pending.</p>}
       <div className="space-y-2">
         {pending.map((r) => (
           <div key={r.id} className="rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -492,7 +492,7 @@ function ApplicationsPanel() {
       </div>
       {decided.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">History</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">History</div>
           <div className="space-y-1">
             {decided.map((r) => (
               <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
@@ -543,7 +543,7 @@ function ManualTopupPanel() {
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
       {!rows && !err && <SkeletonRows rows={2} />}
-      {rows && pending.length === 0 && <p className="text-sm text-neutral-400">No pending requests.</p>}
+      {rows && pending.length === 0 && <p className="text-sm text-neutral-500">No pending requests.</p>}
       <div className="space-y-2">
         {pending.map((r) => (
           <div key={r.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -560,7 +560,7 @@ function ManualTopupPanel() {
       </div>
       {decided.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">History</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">History</div>
           <div className="space-y-1">
             {decided.map((r) => (
               <div key={r.id} className="flex items-center justify-between rounded-lg border border-neutral-100 px-3 py-1.5 text-xs">
@@ -588,7 +588,7 @@ function MiniChart({ title, data, labels, color, money }: { title: string; data:
         {data.map((v, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${labels[i]}: ${money ? 'Rp' + v.toLocaleString('en-GB') : v}`}>
             <div className="w-full rounded-t transition-all" style={{ height: `${(v / max) * 100}%`, minHeight: 2, background: color }} />
-            <span className="text-[8px] text-neutral-400">{labels[i]}</span>
+            <span className="text-[8px] text-neutral-500">{labels[i]}</span>
           </div>
         ))}
       </div>
@@ -673,9 +673,9 @@ function DoctorVerifyPanel() {
         right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge> : undefined}
       />
       {err && <p className="text-sm text-accent">{err}</p>}
-      {!backendEnabled && <p className="text-sm text-neutral-400">Requires an active server.</p>}
+      {!backendEnabled && <p className="text-sm text-neutral-500">Requires an active server.</p>}
       {backendEnabled && !docs && !err && <SkeletonRows rows={3} />}
-      {docs && docs.length === 0 && <p className="text-sm text-neutral-400">No doctors registered yet.</p>}
+      {docs && docs.length === 0 && <p className="text-sm text-neutral-500">No doctors registered yet.</p>}
 
       {pending.length > 0 && (
         <div className="space-y-2">
@@ -698,13 +698,13 @@ function DoctorVerifyPanel() {
 
       {verified.length > 0 && (
         <div className="mt-3 space-y-1.5">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Verified</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Verified</div>
           {verified.map((d) => (
             <div key={d.id} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-sm">
               <IconCheck size={15} className="shrink-0 text-brand" />
               <span className="truncate font-semibold">{d.name}</span>
-              <span className="truncate text-[11px] text-neutral-400">STR {d.str || '—'}</span>
-              <button onClick={() => setStatus(d.id, 'pending')} className="ml-auto shrink-0 text-[11px] font-semibold text-neutral-400 hover:text-accent">
+              <span className="truncate text-[11px] text-neutral-500">STR {d.str || '—'}</span>
+              <button onClick={() => setStatus(d.id, 'pending')} className="ml-auto shrink-0 text-[11px] font-semibold text-neutral-500 hover:text-accent">
                 Revoke
               </button>
             </div>
@@ -722,9 +722,9 @@ function IconWalletDot() {
 function Stat({ icon, label, value, sub }: { icon: ReactNode; label: string; value: string; sub: string }) {
   return (
     <Card>
-      <div className="flex items-center gap-2 text-neutral-400">{icon}<span className="text-[11px] font-semibold uppercase tracking-wide">{label}</span></div>
+      <div className="flex items-center gap-2 text-neutral-500">{icon}<span className="text-[11px] font-semibold uppercase tracking-wide">{label}</span></div>
       <div className="mt-1 text-2xl font-extrabold">{value}</div>
-      <div className="text-[11px] text-neutral-400">{sub}</div>
+      <div className="text-[11px] text-neutral-500">{sub}</div>
     </Card>
   )
 }

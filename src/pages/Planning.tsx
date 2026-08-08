@@ -91,14 +91,14 @@ export function Planning() {
               <div className="min-w-0 flex-1">
                 <div className="mb-1 flex items-center gap-2">
                   <Badge tone="neutral">{pi.category}</Badge>
-                  <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+                  <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
                     {pi.source === 'AI' ? <IconSparkle size={12} /> : <IconCheck size={12} />}
                     {pi.source}
                   </span>
                   {pi.status === 'usulan' && <Badge tone="high">Proposed</Badge>}
                   {pi.status === 'ditolak' && <Badge tone="neutral">Rejected</Badge>}
                 </div>
-                <p className={`text-sm ${pi.status === 'ditolak' ? 'text-neutral-400 line-through' : ''}`}>
+                <p className={`text-sm ${pi.status === 'ditolak' ? 'text-neutral-500 line-through' : ''}`}>
                   {pi.text}
                 </p>
               </div>
@@ -121,7 +121,7 @@ export function Planning() {
             </div>
           ))}
           {record.plan.length === 0 && (
-            <p className="text-sm text-neutral-400">No plan items yet.</p>
+            <p className="text-sm text-neutral-500">No plan items yet.</p>
           )}
         </div>
       </Card>
@@ -159,7 +159,7 @@ export function Planning() {
             <IconPlus size={16} /> Add
           </Button>
         </div>
-        <p className="mt-3 text-xs text-neutral-400">
+        <p className="mt-3 text-xs text-neutral-500">
           ⚕️ For high-alert medications (anticoagulants, insulin, opioids, vasopressors), AI only provides
           a range & reference — the final dose is calculated and verified by the physician.
         </p>
@@ -182,7 +182,7 @@ function DDICheck({ texts }: { texts: string[] }) {
         right={hits.length === 0 ? <Badge tone="brand">No interactions</Badge> : <Badge tone="critical">{hits.length} interactions</Badge>}
       />
       {hits.length === 0 ? (
-        <p className="text-sm text-neutral-400">No significant interactions detected in the current list.</p>
+        <p className="text-sm text-neutral-500">No significant interactions detected in the current list.</p>
       ) : (
         <div className="space-y-2">
           {hits.map((h, i) => (
@@ -267,7 +267,7 @@ function SurgeryCard() {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs text-neutral-400">Multi-stage informed consent (Chatbot-AI → Recommendation → Medication → Procedure) approved by the patient on the Education page.</p>
+      <p className="mt-2 text-xs text-neutral-500">Multi-stage informed consent (Chatbot-AI → Recommendation → Medication → Procedure) approved by the patient on the Education page.</p>
     </Card>
   )
 }
@@ -276,7 +276,7 @@ function SurgeryCard() {
 function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="w-8 text-[10px] font-bold text-neutral-400">{label}</span>
+      <span className="w-8 text-[10px] font-bold text-neutral-500">{label}</span>
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-100">
         <div className="h-full rounded-full" style={{ width: `${value * 100}%`, background: color }} />
       </div>
@@ -315,7 +315,7 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
       />
       {open && (
         <div className="space-y-2.5">
-          {scored.length === 0 && <p className="text-sm text-neutral-400">No items to score yet.</p>}
+          {scored.length === 0 && <p className="text-sm text-neutral-500">No items to score yet.</p>}
           {scored.map(({ item, s }) => {
             const isBlocked = s.blocked && !overrides[item.id]
             return (
@@ -339,7 +339,7 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
                     <ScoreBar label="L" value={s.L} color="#3b82f6" />
                     <ScoreBar label="S" value={s.S} color={s.blocked ? '#FF3131' : '#00BF63'} />
                     <div className="flex justify-between border-t border-neutral-100 pt-1 text-[11px] font-bold">
-                      <span className="text-neutral-400">Final</span>
+                      <span className="text-neutral-500">Final</span>
                       <span className={isBlocked ? 'text-accent' : 'text-brand-dark'}>
                         {isBlocked ? 'BLOCKED' : s.final.toFixed(2)}
                       </span>
@@ -402,7 +402,7 @@ function CdssPanel({ plan, patient }: { plan: PlanItem[]; patient: Patient }) {
               </div>
             )
           })}
-          <p className="text-[11px] leading-relaxed text-neutral-400">
+          <p className="text-[11px] leading-relaxed text-neutral-500">
             V = vertical (guideline/dosing concordance) · L = lateral (LLM suggestion/patient fit) · S =
             safety (DDI/allergy/contraindication). Items with S &lt; {S_THRESHOLD} are blocked and require
             a recorded clinician justification (doctor-in-the-loop).

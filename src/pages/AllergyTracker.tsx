@@ -134,7 +134,7 @@ export function AllergyTracker() {
               ))}
             </select>
           </Field>
-          <p className="-mt-1.5 text-[11px] text-neutral-400">{CATEGORY_HINT[draft.category]}</p>
+          <p className="-mt-1.5 text-[11px] text-neutral-500">{CATEGORY_HINT[draft.category]}</p>
 
           <Field label="What are you allergic to?">
             <input className={inputClass} value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="e.g. Shrimp, Amoxicillin, Nickel" />
@@ -168,7 +168,7 @@ export function AllergyTracker() {
       </Card>
 
       {log.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-[13px] text-neutral-400 dark:border-white/10">
+        <div className="rounded-2xl border border-dashed border-neutral-200 p-6 text-center text-[13px] text-neutral-500 dark:border-white/10">
           No allergies logged yet — add your first one above.
         </div>
       )}
@@ -178,14 +178,14 @@ export function AllergyTracker() {
         if (entries.length === 0) return null
         return (
           <div key={cat} className="space-y-2">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{CATEGORY_LABEL[cat]}</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{CATEGORY_LABEL[cat]}</div>
             {entries.map((e) => (
               <Card key={e.id} className="!p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-[15px] font-black text-ink dark:text-ink">{e.name}</div>
                     {e.reaction && <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">Reaction: {e.reaction}</p>}
-                    {e.notes && <p className="mt-1 text-[12px] leading-relaxed text-neutral-400">{e.notes}</p>}
+                    {e.notes && <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{e.notes}</p>}
                   </div>
                   <Badge tone={SEVERITY_TONE[e.severity]}>{SEVERITY_LABEL[e.severity]}</Badge>
                 </div>
@@ -199,7 +199,7 @@ export function AllergyTracker() {
         )
       })}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         This is a personal note stored only on this device — it is not a medical diagnosis and
         doesn't sync to your care team automatically. For anything severe, also carry a physical
         medical alert card or bracelet.

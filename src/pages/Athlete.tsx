@@ -30,11 +30,11 @@ function AthleteQuotePopup() {
     <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setOpen(false)}>
       <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => setOpen(false)} aria-label="Close" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+        <button onClick={() => setOpen(false)} aria-label="Close" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
         <div className="mb-3 text-4xl">🏅</div>
         <p className="text-lg font-bold leading-snug text-ink">“{q.quote}”</p>
         <div className="mt-4 text-sm font-black text-brand-dark">{q.author}</div>
-        <div className="text-xs text-neutral-400">{q.feat}</div>
+        <div className="text-xs text-neutral-500">{q.feat}</div>
         <button onClick={() => setOpen(false)} className="mt-5 w-full rounded-2xl py-3 text-sm font-bold text-ink transition active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
           Let's Train! 💪
         </button>
@@ -127,7 +127,7 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
     return (
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="BPM trace & time in each zone" />
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-neutral-500">
           No session with heart-rate data yet. Track a workout with the <b>GPS Tracker</b> on Home and enter your HR (bpm) while training — or sync a watch — and your BPM chart and time-in-zone breakdown will appear here automatically.
         </p>
       </Card>
@@ -169,11 +169,11 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
       <div className="mt-3 flex items-baseline justify-around text-center">
         <div>
           <div className="text-3xl font-extrabold text-ink">{avg}</div>
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Avg BPM</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Avg BPM</div>
         </div>
         <div>
           <div className="text-3xl font-extrabold text-ink">{max}</div>
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Max BPM</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Max BPM</div>
         </div>
       </div>
 
@@ -194,8 +194,8 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
           return (
             <div key={z.label}>
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold text-neutral-600">{z.label} <span className="font-medium text-neutral-400">· {z.range}</span></span>
-                <span className="font-bold tabular-nums text-neutral-600">{fmtZoneDur(zoneSec[i])} <span className="text-neutral-400">({pct}%)</span></span>
+                <span className="font-bold text-neutral-600">{z.label} <span className="font-medium text-neutral-500">· {z.range}</span></span>
+                <span className="font-bold tabular-nums text-neutral-600">{fmtZoneDur(zoneSec[i])} <span className="text-neutral-500">({pct}%)</span></span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-neutral-100">
                 <div className="h-full rounded-full" style={{ width: `${Math.max(pct, zoneSec[i] > 0 ? 3 : 0)}%`, background: ZONE_COLORS[i] }} />
@@ -303,9 +303,9 @@ export function Athlete() {
             <Badge tone="brand">{tier}</Badge>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Max HR</div>
-            <div className="text-3xl font-extrabold text-ink">{hrMax}<span className="ml-1 text-sm font-medium text-neutral-400">bpm</span></div>
-            <div className="mt-1 text-[11px] text-neutral-400">Basis for calculating the 5 training zones</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Max HR</div>
+            <div className="text-3xl font-extrabold text-ink">{hrMax}<span className="ml-1 text-sm font-medium text-neutral-500">bpm</span></div>
+            <div className="mt-1 text-[11px] text-neutral-500">Basis for calculating the 5 training zones</div>
           </div>
         </div>
       </Card>
@@ -319,7 +319,7 @@ export function Athlete() {
               <div key={z.z} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
                 <div>
                   <div className="text-sm font-bold">{z.z} — {z.label}</div>
-                  <div className="text-[11px] text-neutral-400">{z.desc}</div>
+                  <div className="text-[11px] text-neutral-500">{z.desc}</div>
                 </div>
                 <div className="text-right text-sm font-extrabold text-brand-dark">{lo}–{hi} bpm</div>
               </div>
@@ -386,12 +386,12 @@ export function Athlete() {
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Training Status</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Training Status</div>
             <div className="mt-1"><Badge tone={status.tone}>{status.label}</Badge></div>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{status.desc}</p>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-400">HRV Status / Readiness</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">HRV Status / Readiness</div>
             <div className="mt-1"><Badge tone={hrvZ.tone}>{hrvZ.label}</Badge></div>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
               {p.recoveryHrs > 0 ? `Recovery Time remaining ${p.recoveryHrs} hrs. ` : ''}
@@ -459,11 +459,11 @@ function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number
       <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="CTL/ATL/TSB model — calculated from the same Training Load above" />
       <div className="mt-3 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Fitness (CTL)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Fitness (CTL)</div>
           <div className="text-xl font-extrabold text-brand-dark">{has ? ctl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[9px] font-bold uppercase text-neutral-400">Fatigue (ATL)</div>
+          <div className="text-[9px] font-bold uppercase text-neutral-500">Fatigue (ATL)</div>
           <div className="text-xl font-extrabold text-amber-600">{has ? atl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-ink p-3 text-center text-white">

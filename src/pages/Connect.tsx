@@ -84,7 +84,7 @@ export function Connect() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🤝</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Connect</h1>
-          <p className="text-xs text-neutral-400">Cari teman olahraga atau pasangan — perempuan yang memulai</p>
+          <p className="text-xs text-neutral-500">Cari teman olahraga atau pasangan — perempuan yang memulai</p>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export function Connect() {
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+              <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
                 Jarak selalu berupa rentang, tidak pernah titik pasti — lokasi persis pada profil
                 kencan adalah cara penguntitan terjadi.
               </p>
@@ -185,12 +185,12 @@ export function Connect() {
           <Card className="!p-4"><p className="text-[12px] text-neutral-500">Belum ada kecocokan.</p></Card>
         ) : (
           <Card className="!p-4">
-            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Kecocokan Anda</div>
+            <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kecocokan Anda</div>
             <div className="mt-2 space-y-2">
               {matches.map((m) => (
                 <div key={m.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                   <div className="text-[13px] font-bold text-ink dark:text-ink">{m.displayName}, {m.age}</div>
-                  <div className="text-[11px] text-neutral-400">{m.city} · {m.distanceBand}</div>
+                  <div className="text-[11px] text-neutral-500">{m.city} · {m.distanceBand}</div>
                   {profile && (
                     <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                       {compatibility(profile, m).sharedActivities.join(', ') || 'Belum ada aktivitas yang sama'}
@@ -226,7 +226,7 @@ export function Connect() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Hanya untuk usia 18 tahun ke atas. Profil dan pilihan Anda disimpan di perangkat ini. Laporkan
         perilaku yang membuat Anda tidak nyaman — dan hentikan komunikasi lebih dulu, sebelum melapor.
       </div>
@@ -244,7 +244,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-[17px] font-black text-ink dark:text-ink">{them.displayName}, {them.age}</h2>
-          <div className="text-[11px] text-neutral-400">{them.city} · {them.distanceBand} · mencari {them.lookingFor}</div>
+          <div className="text-[11px] text-neutral-500">{them.city} · {them.distanceBand} · mencari {them.lookingFor}</div>
         </div>
         <Badge tone={c.label === 'Banyak kesamaan' ? 'normal' : c.label === 'Beberapa kesamaan' ? 'low' : 'neutral'}>{c.label}</Badge>
       </div>
@@ -275,7 +275,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
           <ul className="mt-1 list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
             {c.frictions.map((f, i) => <li key={i}>{f}</li>)}
           </ul>
-          <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
             Perbedaan sengaja ditampilkan, bukan disembunyikan. Aplikasi yang menyembunyikannya demi
             memperbanyak kecocokan merugikan penggunanya sendiri.
           </p>
@@ -292,7 +292,7 @@ function SwipeCard({ me, them, iInitiate, onSwipe, remaining }: {
           Suka →
         </button>
       </div>
-      <p className="mt-2 text-center text-[10px] text-neutral-400">
+      <p className="mt-2 text-center text-[10px] text-neutral-500">
         {remaining} profil tersisa · {iInitiate ? 'Anda yang memulai percakapan bila cocok' : 'Bila cocok, dia yang memulai percakapan'}
       </p>
     </Card>
@@ -332,7 +332,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
               </button>
             ))}
           </div>
-          <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
             Mengikuti model Bumble: perempuan yang memulai percakapan lebih dulu.
           </p>
         </div>
@@ -384,7 +384,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
         <Button className="w-full" onClick={() => { onSave(p); setSaved(true); setTimeout(() => setSaved(false), 1800) }}>
           {saved ? 'Tersimpan ✓' : 'Simpan profil'}
         </Button>
-        <p className="text-[10px] leading-relaxed text-neutral-400">
+        <p className="text-[10px] leading-relaxed text-neutral-500">
           Jangan cantumkan alamat rumah, nomor telepon, tempat kerja persis, atau NIK di bagian mana pun.
         </p>
       </div>

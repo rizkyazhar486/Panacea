@@ -49,7 +49,7 @@ export function SleepApneaScreen() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">STOP</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">STOP</div>
         <div className="mt-3 space-y-2">
           {ITEMS.map((it) => (
             <label key={it.key} className="flex items-start gap-3 rounded-xl border border-neutral-200 px-3.5 py-2.5 dark:border-white/10">
@@ -61,7 +61,7 @@ export function SleepApneaScreen() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">BANG</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">BANG</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="B — BMI (kg/m²)">
             <input className={inputClass} type="number" step="0.1" value={bmi || ''} onChange={(e) => setBmi(Number(e.target.value) || 0)} placeholder="e.g. 24.5" />
@@ -82,7 +82,7 @@ export function SleepApneaScreen() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Result</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{total}/8</span>
           <div>
@@ -90,13 +90,13 @@ export function SleepApneaScreen() {
             <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
           </div>
         </div>
-        <div className="mt-3 flex gap-4 text-[11px] text-neutral-400">
+        <div className="mt-3 flex gap-4 text-[11px] text-neutral-500">
           <span>STOP: {stopScore}/4</span>
           <span>BANG: {bangScore}/4</span>
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Chung, F., et al. (2008). STOP questionnaire: a tool to screen patients for obstructive sleep
         apnea. <i>Anesthesiology</i>, 108(5), 812-821. Screening tool only — a positive result warrants
         clinical evaluation and, if indicated, a sleep study; it does not diagnose OSA on its own.

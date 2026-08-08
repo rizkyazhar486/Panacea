@@ -62,7 +62,11 @@ const BUKAN_TEKS = /(text-|bg-|flex|rounded|grid|px-|py-|mt-|mb-|gap-|hover:|bor
 // mencapai 2,63:1 dan rose-400 2,86:1 di atas kartu terang — keduanya jauh di
 // bawah ambang WCAG AA 4,5:1. Pengukuran pertama menyatakan slate-400 lolos
 // karena regex-nya salah membaca oklch() sebagai RGB.
-const WARNA_GELAP = /\btext-(?:slate-[1-4]00|(?:rose|amber|emerald|sky|lime|teal|cyan|violet|orange|yellow|green|blue|indigo|red)-400)\b/
+// neutral-400 ditambahkan setelah diukur: hanya 2,58:1 di atas putih,
+// sementara neutral-500 mencapai 4,74:1 dan hampir tak terbedakan mata. Ia
+// dipakai 1.224 kali sebagai label kecil di seluruh aplikasi — jenis teks yang
+// paling mudah dianggap "hanya hiasan" padahal ia yang memberi nama pada angka.
+const WARNA_GELAP = /\btext-(?:slate-[1-4]00|neutral-400|(?:rose|amber|emerald|sky|lime|teal|cyan|violet|orange|yellow|green|blue|indigo|red)-400)\b/
 
 /**
  * Campuran bahasa: kata Inggris yang menempel pada kata Indonesia. Inilah

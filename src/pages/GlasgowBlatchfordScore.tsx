@@ -81,7 +81,7 @@ export function GlasgowBlatchfordScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Other findings</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Other findings</div>
         <div className="mt-3 space-y-2">
           <label className="flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
             <input type="checkbox" className="h-4 w-4 rounded" checked={!!flags.hr} onChange={() => toggle('hr')} />
@@ -107,14 +107,14 @@ export function GlasgowBlatchfordScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Glasgow-Blatchford Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Glasgow-Blatchford Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score}</span>
           <Badge tone={lowRisk ? 'brand' : score <= 5 ? 'low' : 'critical'}>
             {lowRisk ? 'Very low risk' : score <= 5 ? 'Low-moderate risk' : 'High risk'}
           </Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">
+        <p className="mt-2 text-[12px] text-neutral-500">
           {lowRisk
             ? 'Score of 0: some guidelines support safe outpatient management without hospital admission.'
             : 'A score ≥1 generally warrants admission and inpatient endoscopy per most guidelines; higher scores correlate with need for transfusion, endoscopic intervention, or surgery.'}
@@ -122,7 +122,7 @@ export function GlasgowBlatchfordScore() {
         <CopyNote text={`Glasgow-Blatchford ${score} (BUN ${bun}, Hgb ${hgb} ${sex}, SBP ${sbp}) — ${lowRisk ? 'very low risk: outpatient management may be appropriate' : 'admission and inpatient endoscopy warranted'} [Blatchford 2000]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Blatchford, O., et al. (2000). A risk score to predict need for treatment for upper-
         gastrointestinal haemorrhage. <i>Lancet</i>, 356(9238), 1318-1323. Decision-support estimate —
         clinical judgment and local protocols should guide final admission decisions.

@@ -141,7 +141,7 @@ function PeriodTracker() {
               {sorted.slice(-6).map((d) => (
                 <span key={d} className="flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600">
                   {fmtIdDate(d)}
-                  <button onClick={() => removeDate(d)} className="ml-1 text-neutral-400 hover:text-red-500">✕</button>
+                  <button onClick={() => removeDate(d)} className="ml-1 text-neutral-500 hover:text-red-500">✕</button>
                 </span>
               ))}
             </div>
@@ -165,7 +165,7 @@ function PeriodTracker() {
               )}
             </div>
           )}
-          <p className="mt-2 text-[10px] text-neutral-400">Average cycle: {cycleLen} days ({sorted.length >= 2 ? 'calculated from your history' : 'default value, log ≥2 cycles for a personalized calculation'}). The prediction assumes a standard 14-day luteal phase — real individual variation occurs, especially with irregular cycles (PCOS, etc.).</p>
+          <p className="mt-2 text-[10px] text-neutral-500">Average cycle: {cycleLen} days ({sorted.length >= 2 ? 'calculated from your history' : 'default value, log ≥2 cycles for a personalized calculation'}). The prediction assumes a standard 14-day luteal phase — real individual variation occurs, especially with irregular cycles (PCOS, etc.).</p>
         </>
       )}
 
@@ -184,7 +184,7 @@ function PeriodTracker() {
                 </div>
                 <div className="rounded-xl bg-neutral-50 p-3 text-center">
                   <div className="text-sm font-black text-ink">{fmtIdDate(edd)}</div>
-                  <div className="mt-0.5 text-[10px] font-bold uppercase text-neutral-400">Estimated Due Date (EDD)</div>
+                  <div className="mt-0.5 text-[10px] font-bold uppercase text-neutral-500">Estimated Due Date (EDD)</div>
                 </div>
               </div>
               {currentFetal && (
@@ -195,7 +195,7 @@ function PeriodTracker() {
               )}
             </>
           )}
-          <p className="mt-2 text-[10px] text-neutral-400">Naegele's Rule: EDD = LMP + 280 days. The fetal size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar estimates alone.</p>
+          <p className="mt-2 text-[10px] text-neutral-500">Naegele's Rule: EDD = LMP + 280 days. The fetal size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar estimates alone.</p>
         </div>
       )}
 
@@ -205,14 +205,14 @@ function PeriodTracker() {
           <div key={p.phase} className="rounded-xl border border-neutral-100 p-3">
             <div className="flex items-center justify-between">
               <div className="text-sm font-bold text-ink">{p.phase}</div>
-              <span className="text-[11px] font-semibold text-neutral-400">{p.hari}</span>
+              <span className="text-[11px] font-semibold text-neutral-500">{p.hari}</span>
             </div>
             <p className="mt-1 text-[12px] leading-relaxed text-brand-dark">{p.hormon}</p>
             <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-600">{p.tanda}</p>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">Cycle data is stored on this device. This is an education & planning tool — not a sole reliable contraceptive method (see "Calendar Method" above) nor a replacement for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Cycle data is stored on this device. This is an education & planning tool — not a sole reliable contraceptive method (see "Calendar Method" above) nor a replacement for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</p>
     </Card>
   )
 }
@@ -267,7 +267,7 @@ export function SexualHealth() {
                 <div className="text-sm font-bold text-ink">{m.name}</div>
                 <Badge tone="brand">{m.efektivitas}</Badge>
               </div>
-              <div className="mt-0.5 text-[11px] font-semibold text-neutral-400">Duration: {m.durasi}</div>
+              <div className="mt-0.5 text-[11px] font-semibold text-neutral-500">Duration: {m.durasi}</div>
               <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">{m.cara}</p>
               <p className="mt-1 text-xs leading-relaxed text-amber-700">⚠️ {m.catatan}</p>
             </div>
@@ -297,7 +297,7 @@ export function SexualHealth() {
               <div key={f.id} className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
                 <div>
                   <div className="text-sm font-bold">{f.name}</div>
-                  <div className="text-[11px] text-neutral-400">{f.type} · {f.city} · {f.dist.toFixed(1)} km</div>
+                  <div className="text-[11px] text-neutral-500">{f.type} · {f.city} · {f.dist.toFixed(1)} km</div>
                 </div>
                 <a href={`tel:${f.phone}`} className="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-dark">📞 {f.phone}</a>
               </div>
@@ -313,7 +313,7 @@ export function SexualHealth() {
             <div key={a.trimester} className="rounded-xl border border-neutral-100 p-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-bold text-ink">{a.trimester}</div>
-                <span className="text-[11px] font-semibold text-neutral-400">{a.minggu}</span>
+                <span className="text-[11px] font-semibold text-neutral-500">{a.minggu}</span>
               </div>
               <ul className="mt-1.5 space-y-1 text-sm text-neutral-600">
                 {a.fokus.map((f, i) => <li key={i}>• {f}</li>)}
@@ -321,7 +321,7 @@ export function SexualHealth() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-400">WHO/Indonesian Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek care immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</p>
+        <p className="mt-3 text-[11px] text-neutral-500">WHO/Indonesian Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek care immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</p>
       </Card>
     </div>
   )

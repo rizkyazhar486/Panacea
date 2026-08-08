@@ -107,7 +107,7 @@ export function BodyBattery() {
         ))}
       </div>
 
-      {memuat && <Card><p className="text-sm text-neutral-400">Loading…</p></Card>}
+      {memuat && <Card><p className="text-sm text-neutral-500">Loading…</p></Card>}
       {gagal && <Card><p className="text-sm text-red-600">Gagal memuat data. Coba muat ulang halaman.</p></Card>}
 
       {!memuat && !gagal && !hasil.cukupData && (
@@ -127,14 +127,14 @@ export function BodyBattery() {
           <Card>
             <div className="flex items-end justify-between gap-4">
               <div>
-                <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Sekarang</div>
+                <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Sekarang</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="text-5xl font-black tabular-nums" style={{ color: saran.warna }}>{hasil.sekarang}</span>
-                  <span className="text-lg font-bold text-neutral-400">/ 100</span>
+                  <span className="text-lg font-bold text-neutral-500">/ 100</span>
                 </div>
                 <div className="mt-1 text-sm font-bold" style={{ color: saran.warna }}>{saran.judul}</div>
               </div>
-              <div className="text-right text-xs text-neutral-400">
+              <div className="text-right text-xs text-neutral-500">
                 <div>Tertinggi <b className="tabular-nums text-ink dark:text-ink">{hasil.tertinggi}</b></div>
                 <div>Terendah <b className="tabular-nums text-ink dark:text-ink">{hasil.terendah}</b></div>
               </div>
@@ -146,7 +146,7 @@ export function BodyBattery() {
           </Card>
 
           <Card>
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Kurva energi</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Kurva energi</div>
             <div className="mt-3 h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={hasil.titik} margin={{ top: 4, right: 4, bottom: 0, left: -22 }}>
@@ -174,7 +174,7 @@ export function BodyBattery() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+            <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
               Tertutup sampel <b className="tabular-nums">{hasil.jamTertutup} dari {hasil.jamTotal} jam</b>
               {' '}({Math.round(hasil.cakupan * 100)}%). Celah lebih dari {JEDA_MAKS_MS / 60_000} menit sengaja
               tidak dihitung, jadi bagian yang datar bisa berarti tidak ada data — bukan tidak ada perubahan.
@@ -183,7 +183,7 @@ export function BodyBattery() {
 
           {stres && (
             <Card>
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Stres sepanjang hari</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Stres sepanjang hari</div>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-3xl font-black tabular-nums" style={{ color: stres.warna }}>{stres.skor}</span>
                 <span className="text-sm font-bold" style={{ color: stres.warna }}>{stres.label}</span>
@@ -192,7 +192,7 @@ export function BodyBattery() {
                 <div className="h-full rounded-full" style={{ width: `${stres.skor}%`, background: stres.warna }} />
               </div>
               <p className="mt-3 text-sm leading-relaxed text-neutral-500">{stres.arti}</p>
-              <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">
+              <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
                 Sampel dari sesi latihan dikeluarkan dari hitungan ini. Denyut tinggi saat berolahraga
                 bukan stres — bila ikut dihitung, hari dengan sesi terbaik justru akan terbaca paling buruk.
               </p>
@@ -201,7 +201,7 @@ export function BodyBattery() {
 
           {hasil.peristiwa.length > 0 && (
             <Card>
-              <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Yang paling memengaruhi</div>
+              <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Yang paling memengaruhi</div>
               <div className="mt-3 space-y-2">
                 {hasil.peristiwa.map((p, i) => (
                   <div key={i} className="flex items-start justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
@@ -219,14 +219,14 @@ export function BodyBattery() {
           )}
 
           <Card>
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Dasar hitungan</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Dasar hitungan</div>
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
-                <div className="text-[11px] text-neutral-400">Denyut istirahat</div>
+                <div className="text-[11px] text-neutral-500">Denyut istirahat</div>
                 <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.istirahat} bpm</div>
               </div>
               <div>
-                <div className="text-[11px] text-neutral-400">Denyut maksimum</div>
+                <div className="text-[11px] text-neutral-500">Denyut maksimum</div>
                 <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.hrMaks} bpm</div>
               </div>
             </div>

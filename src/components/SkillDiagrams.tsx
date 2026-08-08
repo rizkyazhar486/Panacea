@@ -46,10 +46,10 @@ export function InjectionAnglesDiagram() {
               <circle cx="120" cy="46" r="2.5" className="fill-brand" />
               {/* busur sudut */}
               <path d="M 150 46 A 30 30 0 0 0 150 46" fill="none" />
-              <line x1="120" y1="46" x2="195" y2="46" stroke={SKIN} strokeWidth="1" strokeDasharray="3 3" className="text-neutral-400" />
+              <line x1="120" y1="46" x2="195" y2="46" stroke={SKIN} strokeWidth="1" strokeDasharray="3 3" className="text-neutral-500" />
               <text x="198" y="49" className="fill-neutral-500 text-[8px] font-bold dark:fill-neutral-400">{r.angle}</text>
             </svg>
-            <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+            <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
               Target: <span className="font-bold">{r.depth}</span> · {r.note}
             </p>
           </div>
@@ -82,11 +82,11 @@ export function IvGaugesDiagram() {
               <span className="text-[12px] font-black text-ink dark:text-white">{x.g}</span>
               <span className="text-[11px] font-bold text-brand-dark">{x.flow} mL/mnt</span>
             </div>
-            <p className="truncate text-[11px] text-neutral-500 dark:text-neutral-400">{x.use}</p>
+            <p className="truncate text-[11px] text-neutral-500 dark:text-neutral-500">{x.use}</p>
           </div>
         </div>
       ))}
-      <p className="px-1 pt-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+      <p className="px-1 pt-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
         Angka gauge makin <span className="font-bold">kecil</span> berarti diameter makin{' '}
         <span className="font-bold">besar</span> dan aliran makin cepat. Untuk resusitasi pilih kanula{' '}
         <span className="font-bold">pendek dan besar</span> — aliran sebanding pangkat empat jari-jari
@@ -114,12 +114,12 @@ export function AbcdeDiagram() {
           </div>
           <div className="min-w-0 flex-1 rounded-lg bg-neutral-50 px-3 py-1.5 dark:bg-white/5">
             <div className="text-[12px] font-black text-ink dark:text-white">{s.t}</div>
-            <div className="text-[11px] text-neutral-500 dark:text-neutral-400">{s.d}</div>
+            <div className="text-[11px] text-neutral-500 dark:text-neutral-500">{s.d}</div>
           </div>
           {i < steps.length - 1 && <span className="shrink-0 text-neutral-300">↓</span>}
         </div>
       ))}
-      <p className="px-1 pt-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+      <p className="px-1 pt-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
         Kerjakan <span className="font-bold">berurutan</span>. Jangan lanjut ke huruf berikutnya sebelum
         masalah pada huruf sebelumnya teratasi, dan <span className="font-bold">ulangi dari A</span>{' '}
         setiap kali kondisi pasien berubah.
@@ -181,7 +181,7 @@ export function SuturePatternsDiagram() {
         </svg>
       </div>
 
-      <p className="px-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+      <p className="px-1 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
         Ambil <span className="font-bold">kedalaman yang sama</span> pada kedua tepi agar luka bertemu
         rata. Ikat secukupnya untuk mendekatkan tepi —{' '}
         <span className="font-bold">jangan terlalu kencang</span>, karena edema akan membuat tepi luka

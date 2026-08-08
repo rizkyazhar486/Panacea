@@ -55,25 +55,25 @@ export function AaGradient() {
             <input className={inputClass} type="number" min={400} max={800} value={patm || ''} onChange={(e) => setPatm(Number(e.target.value) || 0)} />
           </Field>
         </div>
-        <p className="mt-2 text-[11px] text-neutral-400">Atmospheric pressure defaults to sea level (760 mmHg) — lower it for altitude (e.g. ~630 at 1,600 m).</p>
+        <p className="mt-2 text-[11px] text-neutral-500">Atmospheric pressure defaults to sea level (760 mmHg) — lower it for altitude (e.g. ~630 at 1,600 m).</p>
       </Card>
 
       <Card className="!p-5">
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">PAO₂ (alveolar)</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">PAO₂ (alveolar)</div>
             <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{alveolar.toFixed(0)}</div>
-            <div className="text-[11px] text-neutral-400">mmHg</div>
+            <div className="text-[11px] text-neutral-500">mmHg</div>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">A-a gradient</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">A-a gradient</div>
             <div className="mt-1 text-2xl font-black text-brand-dark">{gradient.toFixed(0)}</div>
-            <div className="text-[11px] text-neutral-400">mmHg</div>
+            <div className="text-[11px] text-neutral-500">mmHg</div>
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Expected for age</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Expected for age</div>
             <div className="mt-1 text-2xl font-black text-ink dark:text-ink">≤{expectedForAge.toFixed(0)}</div>
-            <div className="text-[11px] text-neutral-400">mmHg (≈ age/4 + 4)</div>
+            <div className="text-[11px] text-neutral-500">mmHg (≈ age/4 + 4)</div>
           </div>
         </div>
         <div className="mt-3">
@@ -93,7 +93,7 @@ export function AaGradient() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Alveolar gas equation with PH₂O = 47 mmHg, RQ = 0.8 (standard physiology; see Sarkar et al.,
         <i> Lung India</i> 2017 for review). Decision-support estimate — interpret with the full ABG,
         clinical picture, and imaging.

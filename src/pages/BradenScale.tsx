@@ -106,16 +106,16 @@ export function BradenScale() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Total Braden Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total Braden Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{total} / 23</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">{result.rec}</p>
+        <p className="mt-2 text-[12px] text-neutral-500">{result.rec}</p>
         <CopyNote text={`Braden ${total}/23 — ${result.label.toLowerCase()}: ${result.rec} [Bergstrom & Braden 1987]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Bergstrom, N., Braden, B.J., et al. (1987). The Braden Scale for predicting pressure sore
         risk. <i>Nurs Res</i>, 36(4), 205-210. Decision-support estimate — reassess on admission,
         daily (or per shift in critical care), and with any change in condition.

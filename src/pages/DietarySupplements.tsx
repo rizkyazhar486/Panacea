@@ -394,7 +394,7 @@ function StatusPills({ s }: { s: Substance }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-0.5 sm:grid-cols-[160px_1fr] sm:gap-3">
-      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
       <div className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{children}</div>
     </div>
   )
@@ -410,10 +410,10 @@ function SubstanceCard({ s }: { s: Substance }) {
           <div className="flex items-center gap-2">
             <span className="font-bold text-ink dark:text-ink">{s.name}</span>
           </div>
-          {s.aka && <div className="truncate text-xs text-neutral-400">{s.aka}</div>}
+          {s.aka && <div className="truncate text-xs text-neutral-500">{s.aka}</div>}
           <div className="mt-1.5"><StatusPills s={s} /></div>
         </div>
-        <span className={'shrink-0 text-neutral-400 transition-transform ' + (open ? 'rotate-90' : '')}>›</span>
+        <span className={'shrink-0 text-neutral-500 transition-transform ' + (open ? 'rotate-90' : '')}>›</span>
       </button>
       {open && (
         <div className="space-y-3 border-t border-neutral-100 p-4 dark:border-white/10">
@@ -460,7 +460,7 @@ export function DietarySupplements() {
 
       {/* Category selector */}
       <Card className="!p-4">
-        <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Selected Ingredients — browse by category</div>
+        <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Selected Ingredients — browse by category</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
             <button
@@ -550,7 +550,7 @@ export function DietarySupplements() {
                 <span className="text-sm font-bold text-ink dark:text-ink">{p.group}</span>
                 <span className="shrink-0 text-sm font-black text-brand-dark">{p.range}</span>
               </div>
-              <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{p.note}</p>
+              <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-500">{p.note}</p>
             </div>
           ))}
         </div>
@@ -559,13 +559,13 @@ export function DietarySupplements() {
       {/* References */}
       <Card className="!p-5">
         <SectionTitle icon={<IconShield size={20} />} title="References & Further Reading" />
-        <ul className="mt-2 ml-4 list-disc space-y-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+        <ul className="mt-2 ml-4 list-disc space-y-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-500">
           {REFERENCES.map((r) => <li key={r}>{r}</li>)}
         </ul>
       </Card>
 
       {/* Disclaimer */}
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         This page is educational and does not constitute medical advice, diagnosis, or treatment, and is not an endorsement or
         instruction to use any substance. Prescription medicines require a licensed clinician. Many substances described are
         unapproved, illegal to sell, and/or prohibited in sport. Always consult a qualified healthcare professional and comply with

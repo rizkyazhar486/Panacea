@@ -133,12 +133,12 @@ export function EmergencyCard() {
             <Row label="Medications" value={d.medications} />
             <Row label="Emergency contact" value={[d.emergencyName, d.emergencyPhone].filter(Boolean).join(' · ')} />
             <Row label="Notes" value={d.notes} />
-            {!d.name && <p className="text-xs text-neutral-400">Tap <b>Edit</b> to fill in your details — they're saved on this device and shown here even offline.</p>}
+            {!d.name && <p className="text-xs text-neutral-500">Tap <b>Edit</b> to fill in your details — they're saved on this device and shown here even offline.</p>}
           </div>
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconHeart size={12} className="mr-1 inline" /> Saved only on this device and shown even without internet. Location is shared only when you tap the button. Tip: install Panaceamed to your home screen and add this page as a shortcut so it's reachable fast in an emergency. Local emergency numbers vary — set yours above (112 works in many countries).
       </div>
     </div>
@@ -149,7 +149,7 @@ function Row({ label, value, danger }: { label: string; value: string; danger?: 
   if (!value) return null
   return (
     <div className="grid grid-cols-[110px_1fr] gap-3 border-t border-neutral-100 pt-2 dark:border-white/10">
-      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
       <div className={'text-sm ' + (danger ? 'font-bold text-rose-600' : 'text-ink dark:text-white')}>{value}</div>
     </div>
   )

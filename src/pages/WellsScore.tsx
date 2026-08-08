@@ -82,7 +82,7 @@ export function WellsScore() {
             </div>
           </Card>
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">DVT Result</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">DVT Result</div>
             <div className="mt-2 flex items-center gap-3">
               <span className="text-3xl font-black text-brand-dark">{dvtScore}</span>
               <Badge tone={dvtLikely ? 'critical' : 'brand'}>{dvtLikely ? 'DVT likely' : 'DVT unlikely'}</Badge>
@@ -111,7 +111,7 @@ export function WellsScore() {
             </div>
           </Card>
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">PE Result</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">PE Result</div>
             <div className="mt-2 flex items-center gap-3">
               <span className="text-3xl font-black text-brand-dark">{peScore}</span>
               <Badge tone={peLikely ? 'critical' : 'brand'}>{peLikely ? 'PE likely' : 'PE unlikely'}</Badge>
@@ -126,7 +126,7 @@ export function WellsScore() {
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Wells, P.S., et al. DVT (2003), <i>NEJM</i>, 349, 1227-1235; PE (2000), <i>Thromb Haemost</i>,
         83(3), 416-420. Decision-support tool used alongside D-dimer and clinical judgment — not a
         substitute for imaging when clinically indicated.

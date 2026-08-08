@@ -75,7 +75,7 @@ export function QTcCalculator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Bazett QTc (most commonly used clinically)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Bazett QTc (most commonly used clinically)</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{primary.toFixed(0)} ms</span>
           <Badge tone={primaryBand.tone}>{primaryBand.label}</Badge>
@@ -97,25 +97,25 @@ export function QTcCalculator() {
       />
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Compare correction formulas</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Compare correction formulas</div>
         <div className="mt-3 space-y-2">
           {rows.map((r) => (
             <div key={r.name} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <div>
                 <div className="text-sm font-bold text-ink dark:text-ink">{r.name}</div>
-                <div className="text-[11px] text-neutral-400">{r.note}</div>
+                <div className="text-[11px] text-neutral-500">{r.note}</div>
               </div>
               <div className="text-lg font-black text-brand-dark">{r.value.toFixed(0)} ms</div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-400">
+        <p className="mt-3 text-[11px] text-neutral-500">
           Formulas diverge most at heart rates far from 60 bpm — Fridericia or Framingham are generally
           preferred over Bazett at tachycardia or bradycardia.
         </p>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Bazett (1920); Fridericia (1920); Sagie et al., Framingham Heart Study (1992); Hodges et al.
         (1983). Decision-support only — always correlate with the actual ECG tracing and clinical context.
       </div>

@@ -70,7 +70,7 @@ export function ClinicalTrials() {
 
       {!trials && !loading && (
         <Card className="!p-5">
-          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Try an example</div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Try an example</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex} onClick={() => search(ex)} className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-600 transition hover:bg-brand-50 hover:text-brand-dark dark:bg-white/5 dark:text-neutral-300">{ex}</button>
@@ -79,15 +79,15 @@ export function ClinicalTrials() {
         </Card>
       )}
 
-      {loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /><p className="mt-3 text-sm text-neutral-400">Searching ClinicalTrials.gov…</p></Card>}
+      {loading && <Card className="!p-8 text-center"><span className="mx-auto block h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" /><p className="mt-3 text-sm text-neutral-500">Searching ClinicalTrials.gov…</p></Card>}
 
       {trials && trials.length === 0 && !err && (
-        <Card className="!p-6 text-center text-sm text-neutral-400">No matching studies found. Try broader keywords or turn off "recruiting only".</Card>
+        <Card className="!p-6 text-center text-sm text-neutral-500">No matching studies found. Try broader keywords or turn off "recruiting only".</Card>
       )}
 
       {trials && trials.length > 0 && (
         <>
-          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">{trials.length} studies</div>
+          <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">{trials.length} studies</div>
           {trials.map((t) => (
             <Card key={t.nctId} className="!p-4">
               <a href={t.url} target="_blank" rel="noreferrer" className="block">
@@ -95,8 +95,8 @@ export function ClinicalTrials() {
                   <h3 className="text-sm font-bold leading-snug text-ink dark:text-ink">{t.title}</h3>
                   <Badge tone={statusTone(t.status)}>{t.status.replace(/_/g, ' ')}</Badge>
                 </div>
-                {t.conditions && <div className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-400">{t.conditions}</div>}
-                <div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-neutral-400">
+                {t.conditions && <div className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-500">{t.conditions}</div>}
+                <div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-neutral-500">
                   <span>Phase {t.phase}</span><span>📍 {t.locations}</span><span>{t.nctId}</span>
                 </div>
                 <div className="mt-1 text-[11px] font-bold text-brand-dark">View on ClinicalTrials.gov ↗</div>
@@ -106,7 +106,7 @@ export function ClinicalTrials() {
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <IconSearch size={12} className="mr-1 inline" /> Live results from the public ClinicalTrials.gov registry. Panaceamed doesn't run trials or recommend one — always discuss eligibility, risks, and legitimacy with your doctor before contacting any study, and be wary of clinics selling unproven "stem cell" or "anti-aging" therapies outside registered trials.
       </div>
     </div>

@@ -71,7 +71,7 @@ export function CaffeineCalculator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What did you drink?</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What did you drink?</div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {DRINKS.map((d) => (
             <Field key={d.label} label={`${d.icon} ${d.label}`}>
@@ -105,7 +105,7 @@ export function CaffeineCalculator() {
       {totalDose > 0 && (
         <>
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">At your bedtime</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">At your bedtime</div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-black text-brand-dark">{remainingAtBed.toFixed(0)}</span>
               <span className="text-sm font-semibold text-neutral-500">mg still active ({pctAtBed.toFixed(0)}% of {totalDose}mg consumed)</span>
@@ -120,18 +120,18 @@ export function CaffeineCalculator() {
           </Card>
 
           <Card className="!p-5">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Decay over the next 16 hours</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Decay over the next 16 hours</div>
             <div className="mt-3 flex h-24 items-end gap-1">
               {curve.map((v, h) => (
                 <div key={h} className="flex-1 rounded-t bg-amber-400/70" style={{ height: `${Math.max(2, (v / totalDose) * 100)}%` }} title={`+${h}h: ${v.toFixed(0)}mg`} />
               ))}
             </div>
-            <div className="mt-1 flex justify-between text-[10px] text-neutral-400"><span>0h</span><span>8h</span><span>16h</span></div>
+            <div className="mt-1 flex justify-between text-[10px] text-neutral-500"><span>0h</span><span>8h</span><span>16h</span></div>
           </Card>
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational estimate only — individual caffeine metabolism varies substantially. Not medical advice;
         talk to a clinician about caffeine if you're pregnant or have a heart or anxiety condition.
       </div>

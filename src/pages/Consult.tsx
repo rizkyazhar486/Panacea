@@ -125,7 +125,7 @@ export function Consult() {
               <IconCheck size={16} /> Pay & Start AI Triage
             </Button>
           </div>
-          <p className="mt-2 text-[11px] text-neutral-400">
+          <p className="mt-2 text-[11px] text-neutral-500">
             Need a full assessment first? Open the <Link to="/chatbot" className="font-semibold text-brand-dark">AI Chatbot</Link>.
           </p>
         </Card>
@@ -178,7 +178,7 @@ export function Consult() {
       )}
       {result && recommended.length > 0 && (
         <div className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm ring-1 ring-black/5">
-          <IconSearch size={18} className="text-neutral-400" />
+          <IconSearch size={18} className="text-neutral-500" />
           <input value={docQuery} onChange={(e) => setDocQuery(e.target.value)} placeholder="Search for a doctor or specialty…" className="w-full bg-transparent text-sm outline-none" />
         </div>
       )}
@@ -205,7 +205,7 @@ export function Consult() {
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('en-GB')}<span className="text-xs font-medium text-neutral-400">/session</span></span>
+                  <span className="text-lg font-extrabold">Rp{FEE.toLocaleString('en-GB')}<span className="text-xs font-medium text-neutral-500">/session</span></span>
                   <div className="flex gap-2">
                     {backendEnabled && (
                       <Button variant="outline" onClick={() => setChatRoom('consult-' + slug(d.name))} disabled={!d.online}>Chat</Button>
@@ -245,7 +245,7 @@ export function Consult() {
 
 function Sessions() {
   const { state } = useStore()
-  if (state.consults.length === 0) return <p className="text-sm text-neutral-400">No consultation sessions yet.</p>
+  if (state.consults.length === 0) return <p className="text-sm text-neutral-500">No consultation sessions yet.</p>
   return (
     <div className="space-y-2">
       {state.consults.map((c) => (

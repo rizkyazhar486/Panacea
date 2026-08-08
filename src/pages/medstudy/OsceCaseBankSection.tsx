@@ -53,7 +53,7 @@ export default function OsceCaseBankSection() {
 
       {grouped.map(([sys, cases]) => (
         <Card key={sys} className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{sys}</div>
           <div className="mt-2 space-y-2">
             {cases.map((c) => {
               const notes = OSCE_STATION_NOTES[c.name]
@@ -109,9 +109,9 @@ export default function OsceCaseBankSection() {
           </div>
         </Card>
       ))}
-      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
+      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil — coba kata kunci lain.</p>}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Direkap dari rekap kasus OSCE UKMPPD 2016-2026 (studyclubukmppd & kontributor lain). Bantuan
         belajar, bukan bocoran atau jaminan soal ujian — tetap pelajari materi secara menyeluruh.
       </div>

@@ -22,20 +22,20 @@ export function Admin() {
 
       <Card>
         <SectionTitle title="Complaint & Issue Tickets" subtitle="For fixing the system & improving service" />
-        <p className="text-sm text-neutral-400">No tickets received yet.</p>
+        <p className="text-sm text-neutral-500">No tickets received yet.</p>
       </Card>
 
       <Card>
         <SectionTitle title="Outgoing Email (System)" subtitle="Automated notifications to users" />
         {state.emails.length === 0 ? (
-          <p className="text-sm text-neutral-400">No emails sent yet.</p>
+          <p className="text-sm text-neutral-500">No emails sent yet.</p>
         ) : (
           <div className="space-y-2">
             {state.emails.slice(0, 8).map((e) => (
               <div key={e.id} className="rounded-xl border border-neutral-100 px-3 py-2 text-sm">
                 <div className="flex justify-between">
                   <span className="font-semibold">{e.subject}</span>
-                  <span className="text-xs text-neutral-400">{new Date(e.at).toLocaleString('en-US')}</span>
+                  <span className="text-xs text-neutral-500">{new Date(e.at).toLocaleString('en-US')}</span>
                 </div>
                 <div className="text-xs text-neutral-500">to {e.to}</div>
               </div>
@@ -50,7 +50,7 @@ export function Admin() {
 function Mini({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-xl bg-neutral-50 p-3">
-      <div className="flex items-center gap-2 text-neutral-400">{icon}<span className="text-[11px] font-semibold uppercase tracking-wide">{label}</span></div>
+      <div className="flex items-center gap-2 text-neutral-500">{icon}<span className="text-[11px] font-semibold uppercase tracking-wide">{label}</span></div>
       <div className="text-2xl font-extrabold">{value}</div>
     </div>
   )

@@ -183,7 +183,7 @@ export default function SkdiDiseaseDirectorySection() {
 
       {grouped.map(([sys, diseases]) => (
         <Card key={sys} className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys} · {diseases.length}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{sys} · {diseases.length}</div>
           <div className="mt-2 space-y-2">
             {diseases.map((e, i) => {
               // The toggle is drawn from the lightweight key index, so it is
@@ -206,7 +206,7 @@ export default function SkdiDiseaseDirectorySection() {
                         the badge row past the viewport on narrow screens. */}
                     <div className="min-w-0 flex-1">
                       <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
-                      {e.subsection && <span className="ml-2 text-[11px] text-neutral-400">{e.subsection}</span>}
+                      {e.subsection && <span className="ml-2 text-[11px] text-neutral-500">{e.subsection}</span>}
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-1.5">
                       {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
@@ -225,7 +225,7 @@ export default function SkdiDiseaseDirectorySection() {
                         <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.definisi}</p>
                       )}
                       {note.kind === 'osce' && (
-                        <p className="text-[11px] italic text-neutral-400">
+                        <p className="text-[11px] italic text-neutral-500">
                           Dari catatan station OSCE: {note.sourceStation}
                         </p>
                       )}
@@ -303,8 +303,8 @@ export default function SkdiDiseaseDirectorySection() {
                       )}
                       {note.referensi.length > 0 && (
                         <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Referensi</div>
-                          <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Referensi</div>
+                          <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
                             {note.referensi.map((key) => (
                               <li key={key}>{REFERENSI_SUMBER[key] ?? key}</li>
                             ))}
@@ -319,9 +319,9 @@ export default function SkdiDiseaseDirectorySection() {
           </div>
         </Card>
       ))}
-      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil — coba kata kunci lain.</p>}
+      {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil — coba kata kunci lain.</p>}
 
-      <div className="space-y-2 rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="space-y-2 rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         <p>
           Nama penyakit dan level kompetensi berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia).
           Level 4A/4B = harus tuntas mandiri saat lulus dokter, 3A/3B = bisa dengan supervisi,

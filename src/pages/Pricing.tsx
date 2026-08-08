@@ -84,7 +84,7 @@ export function Pricing() {
               </div>
               <div className="shrink-0 text-right">
                 <div className="text-xl font-black text-ink">{t.price}</div>
-                {t.note && <div className="text-[11px] text-neutral-400">{t.note}</div>}
+                {t.note && <div className="text-[11px] text-neutral-500">{t.note}</div>}
               </div>
             </div>
             <ul className="mt-3 space-y-1.5">
@@ -121,7 +121,7 @@ export function Pricing() {
       </Card>
 
       <Card className="!border-neutral-100">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-neutral-400">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">
           <IconHeart size={14} /> Chronic — lifetime account option
         </div>
         <div className="mt-3 flex items-center justify-between py-2 text-sm">
@@ -152,7 +152,7 @@ export function Pricing() {
         <Button className="mt-3 w-full" variant="outline" onClick={() => navigate('/billing')}>Top Up Balance in Billing</Button>
       </Card>
 
-      <p className="text-center text-[11px] leading-relaxed text-neutral-400">
+      <p className="text-center text-[11px] leading-relaxed text-neutral-500">
         Certified AI-EMR + CDSS for clinicians/institutions: contact us for subscription pricing.
         Medical Materials Hub: pricing set by authors, royalties paid automatically to contributors.
       </p>

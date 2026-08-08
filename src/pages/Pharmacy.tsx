@@ -71,7 +71,7 @@ export function Pharmacy() {
             </div>
           } />
         <div className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
-          <IconSearch size={16} className="text-neutral-400" />
+          <IconSearch size={16} className="text-neutral-500" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search medicine… (e.g. Paracetamol)" className="w-full bg-transparent text-sm outline-none" />
         </div>
         <div className="mt-3">
@@ -113,7 +113,7 @@ export function Pharmacy() {
           <div className="mt-3 max-h-48 space-y-1.5 overflow-y-auto">
             {PRODUCTS.map((p) => (
               <div key={p.id} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-1.5 text-sm">
-                <span>{p.emoji} {p.name} · <span className="text-neutral-400">{rupiah(p.priceIdr)}</span></span>
+                <span>{p.emoji} {p.name} · <span className="text-neutral-500">{rupiah(p.priceIdr)}</span></span>
                 <button onClick={() => removeProduct(p.id)} className="text-xs font-semibold text-accent hover:underline">Remove</button>
               </div>
             ))}
@@ -152,14 +152,14 @@ export function Pharmacy() {
                 </div>
               </Card>
             ))}
-            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-400">No medicine found.</Card>}
+            {products.length === 0 && <Card className="col-span-full text-center text-sm text-neutral-500">No medicine found.</Card>}
           </div>
         </div>
 
         <div>
           <Card className="sticky top-20">
             <SectionTitle title="Cart" subtitle={`${count} items`} />
-            {count === 0 ? <p className="text-sm text-neutral-400">Your cart is still empty.</p> : (
+            {count === 0 ? <p className="text-sm text-neutral-500">Your cart is still empty.</p> : (
               <div className="space-y-2">
                 {Object.entries(cart).map(([id, qty]) => {
                   const p = PRODUCTS.find((x) => x.id === id)!

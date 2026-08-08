@@ -391,7 +391,7 @@ export function Chatbot() {
               return (<Bubble key={m.id} msg={m} isLastAi={isLastAi} copiedId={copiedId} feedback={feedbackMap[m.id]} onCopy={copyText} onFeedback={toggleFeedback} onRegenerate={regenerate} />)
             })}
             {busy && (
-              <div className="flex items-center gap-2.5 text-sm text-neutral-400">
+              <div className="flex items-center gap-2.5 text-sm text-neutral-500">
                 <LogoMark size={22} />
                 <span className="animate-pulse">AI is analyzing…</span>
               </div>
@@ -428,7 +428,7 @@ export function Chatbot() {
               <button
                 onClick={() => setShowAttach(v => !v)}
                 title="Attachment"
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-lg font-bold text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-600"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-lg font-bold text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-600"
               >
                 +
               </button>
@@ -441,7 +441,7 @@ export function Chatbot() {
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-50 text-base">🖼️</span>
                     <div>
                       <div className="font-medium">Upload Image</div>
-                      <div className="text-[11px] text-neutral-400">JPG, PNG, etc.</div>
+                      <div className="text-[11px] text-neutral-500">JPG, PNG, etc.</div>
                     </div>
                   </button>
                   <button
@@ -451,7 +451,7 @@ export function Chatbot() {
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-purple-50 text-base">📎</span>
                     <div>
                       <div className="font-medium">Upload File</div>
-                      <div className="text-[11px] text-neutral-400">PDF, DOCX, etc.</div>
+                      <div className="text-[11px] text-neutral-500">PDF, DOCX, etc.</div>
                     </div>
                   </button>
                 </div>
@@ -466,13 +466,13 @@ export function Chatbot() {
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
               rows={1}
               placeholder="Type your medical complaint or question…"
-              className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-400"
+              className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-500"
             />
 
             <button
               onClick={toggleMic}
               title="Voice input"
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${listening ? 'animate-pulse text-accent' : 'text-neutral-500 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               🎤
             </button>
@@ -480,7 +480,7 @@ export function Chatbot() {
             <button
               onClick={() => { setVoiceOut(v => { if (v) window.speechSynthesis?.cancel(); return !v }) }}
               title={voiceOut ? 'Turn off voice' : 'Turn on voice'}
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${voiceOut ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-200 hover:text-neutral-600'}`}
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-base transition ${voiceOut ? 'text-brand' : 'text-neutral-500 hover:bg-neutral-200 hover:text-neutral-600'}`}
             >
               {voiceOut ? '🔊' : '🔈'}
             </button>
@@ -493,7 +493,7 @@ export function Chatbot() {
               <IconSend size={16} />
             </button>
           </div>
-          <p className="mt-2 text-center text-[10px] text-neutral-400">⚕️ AI supports, but does not replace, a licensed clinician.</p>
+          <p className="mt-2 text-center text-[10px] text-neutral-500">⚕️ AI supports, but does not replace, a licensed clinician.</p>
         </div>
       </Card>
 
@@ -503,25 +503,25 @@ export function Chatbot() {
           <div className="w-80 max-w-[85vw] flex flex-col border-r border-neutral-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
               <h3 className="font-bold text-sm">📜 Chat History</h3>
-              <button onClick={() => setShowHistory(false)} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">✕</button>
+              <button onClick={() => setShowHistory(false)} className="text-neutral-500 hover:text-neutral-700 text-lg leading-none">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-1">
               <button onClick={startNewChat} disabled={messages.length === 0} className="w-full rounded-xl border-2 border-dashed border-brand/30 px-4 py-3 text-left text-sm font-bold text-brand-dark transition hover:border-brand hover:bg-brand-50 disabled:opacity-40">➕ Save &amp; start new chat</button>
               {groupByDate(history).map(group => (
                 <div key={group.label} className="mt-3">
-                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400">{group.label}</div>
+                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-neutral-500">{group.label}</div>
                   {group.items.map(session => (
                     <div key={session.id} onClick={() => loadSession(session)} className="group/s flex items-center gap-2 rounded-xl px-3 py-2.5 cursor-pointer transition hover:bg-neutral-50">
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-medium text-ink">{session.title}</div>
-                        <div className="text-[11px] text-neutral-400">{new Date(session.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} message(s)</div>
+                        <div className="text-[11px] text-neutral-500">{new Date(session.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} · {session.messages.length} message(s)</div>
                       </div>
                       <button onClick={(e) => deleteSession(session.id, e)} className="shrink-0 text-neutral-300 opacity-0 transition group-hover/s:opacity-100 hover:text-red-500">🗑️</button>
                     </div>
                   ))}
                 </div>
               ))}
-              {history.length === 0 && <p className="py-10 text-center text-xs text-neutral-400">No history yet.</p>}
+              {history.length === 0 && <p className="py-10 text-center text-xs text-neutral-500">No history yet.</p>}
             </div>
           </div>
           <div className="flex-1 bg-black/25 backdrop-blur-[2px]" onClick={() => setShowHistory(false)} />
@@ -585,11 +585,11 @@ function Bubble({ msg, isLastAi, copiedId, feedback, onCopy, onFeedback, onRegen
           <RenderContent text={msg.content} />
         </div>
         <div className="mt-1 flex items-center gap-0.5 pl-1 opacity-0 transition-opacity group-hover/b:opacity-100">
-          <span className="mr-1 text-[10px] text-neutral-400">{time}</span>
-          <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-400 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>
-          <button onClick={() => onFeedback(msg.id, 'up')} className={`rounded-md p-1 text-xs transition ${feedback === 'up' ? 'text-brand' : 'text-neutral-400 hover:bg-neutral-100 hover:text-ink'}`}>👍</button>
-          <button onClick={() => onFeedback(msg.id, 'down')} className={`rounded-md p-1 text-xs transition ${feedback === 'down' ? 'text-accent' : 'text-neutral-400 hover:bg-neutral-100 hover:text-ink'}`}>👎</button>
-          {isLastAi && <button onClick={onRegenerate} className="rounded-md p-1 text-[10px] text-neutral-400 transition hover:bg-neutral-100 hover:text-ink">🔄</button>}
+          <span className="mr-1 text-[10px] text-neutral-500">{time}</span>
+          <button onClick={() => onCopy(msg.content, msg.id)} className="rounded-md p-1 text-[10px] text-neutral-500 transition hover:bg-neutral-100 hover:text-ink">{copiedId === msg.id ? '✅' : '📋'}</button>
+          <button onClick={() => onFeedback(msg.id, 'up')} className={`rounded-md p-1 text-xs transition ${feedback === 'up' ? 'text-brand' : 'text-neutral-500 hover:bg-neutral-100 hover:text-ink'}`}>👍</button>
+          <button onClick={() => onFeedback(msg.id, 'down')} className={`rounded-md p-1 text-xs transition ${feedback === 'down' ? 'text-accent' : 'text-neutral-500 hover:bg-neutral-100 hover:text-ink'}`}>👎</button>
+          {isLastAi && <button onClick={onRegenerate} className="rounded-md p-1 text-[10px] text-neutral-500 transition hover:bg-neutral-100 hover:text-ink">🔄</button>}
         </div>
       </div>
     </div>

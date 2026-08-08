@@ -90,17 +90,17 @@ export function CreatinineClearance() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Result</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Result</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{crcl.toFixed(0)}</span>
           <span className="text-sm font-semibold text-neutral-500">mL/min</span>
           <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>
+        <p className="mt-2 text-[12px] text-neutral-500">Ideal body weight (reference): {ibw.toFixed(1)} kg</p>
         <CopyNote text={`CrCl (Cockcroft-Gault) ${crcl.toFixed(0)} mL/min using ${weightBasis} body weight (age ${age}, ${sex === 'M' ? 'male' : 'female'}, ${useWeight.toFixed(0)} kg, SCr ${scr} mg/dL) — ${bandInfo.label.toLowerCase()} [Cockcroft & Gault 1976]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Cockcroft, D.W. &amp; Gault, M.H. (1976). Prediction of creatinine clearance from serum
         creatinine. <i>Nephron</i>, 16(1), 31-41. Decision-support estimate — verify against the
         specific drug's package insert and consult a pharmacist for renal dose adjustment.

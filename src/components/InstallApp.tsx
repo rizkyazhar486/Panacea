@@ -20,7 +20,7 @@ export function InstallBanner() {
       {state === 'ios' && (
         <a href="/settings" className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white">How</a>
       )}
-      <button onClick={() => { dismissBanner(); setHidden(true) }} className="shrink-0 px-1.5 text-lg leading-none text-neutral-400" aria-label="Close">×</button>
+      <button onClick={() => { dismissBanner(); setHidden(true) }} className="shrink-0 px-1.5 text-lg leading-none text-neutral-500" aria-label="Close">×</button>
     </div>
   )
 }
@@ -71,7 +71,7 @@ export function InstallApp() {
                 How to install on iPhone/iPad ▾
               </button>
             ) : (
-              <p className="text-[12px] text-neutral-400">
+              <p className="text-[12px] text-neutral-500">
                 Open in <b>Chrome (Android)</b> or <b>Safari (iOS)</b> to install. On desktop Chrome/Edge,
                 click the install icon (⊕) in the address bar.
               </p>

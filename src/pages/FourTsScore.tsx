@@ -80,12 +80,12 @@ export function FourTsScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score} / 8</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">
+        <p className="mt-2 text-[12px] text-neutral-500">
           {result.prob}. {score <= 3
             ? 'A low score has a high negative predictive value — further HIT-specific testing is usually unnecessary.'
             : 'Consider stopping all heparin products and sending confirmatory HIT antibody testing while awaiting results.'}
@@ -93,7 +93,7 @@ export function FourTsScore() {
         <CopyNote text={`4Ts ${score}/8 — ${result.label.toLowerCase()} of HIT (${result.prob}) [Lo 2006]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Lo, G.K., et al. (2006). Evaluation of pretest clinical score for HIT in two clinical settings.
         <i> J Thromb Haemost</i>, 4(4), 759-765. Decision-support estimate — clinical judgment and
         confirmatory testing remain essential for a definitive HIT diagnosis.

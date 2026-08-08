@@ -76,13 +76,13 @@ export function MeldScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">MELD-Na Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">MELD-Na Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{meldNa.toFixed(0)}</span>
           <Badge tone={bandInfo.tone}>{bandInfo.label}</Badge>
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">Estimated {bandInfo.mortality} (population-level estimate, not individual prognosis).</p>
-        <p className="mt-2 text-[12px] text-neutral-400">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
+        <p className="mt-2 text-[12px] text-neutral-500">Unadjusted MELD (pre-sodium): {meld.toFixed(0)}</p>
         <CopyNote text={`MELD-Na ${meldNa.toFixed(0)} (bilirubin ${bilirubin} mg/dL, INR ${inr}, creatinine ${dialysis ? '4.0 [on dialysis]' : creatinine + ' mg/dL'}, Na ${sodium} mEq/L) — ${bandInfo.label.toLowerCase()}, est. ${bandInfo.mortality} [Kamath 2001; Kim 2008; OPTN 2016]`} />
       </Card>
 
@@ -94,7 +94,7 @@ export function MeldScore() {
         detail={`Bili ${bilirubin}, INR ${inr}, Cr ${dialysis ? '4.0 (dialysis)' : creatinine}, Na ${sodium}`}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Kamath, P.S., et al. (2001). <i>Hepatology</i>, 33(2), 464-470. Kim, W.R., et al. (2008). <i>NEJM</i>,
         359(10), 1018-1026. OPTN/UNOS allocation policy (2016). Decision-support estimate — actual
         transplant allocation uses laboratory values verified per UNOS policy, not this tool.

@@ -63,22 +63,22 @@ export function LdlCalculator() {
       <Card className="!p-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Calculated LDL</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Calculated LDL</div>
             {tgTooHigh ? (
-              <p className="mt-1 text-[12px] font-semibold text-neutral-400">Not valid at TG ≥400</p>
+              <p className="mt-1 text-[12px] font-semibold text-neutral-500">Not valid at TG ≥400</p>
             ) : (
               <>
                 <div className="mt-1 text-2xl font-black text-brand-dark">{ldl.toFixed(0)}</div>
-                <div className="text-[11px] text-neutral-400">mg/dL</div>
+                <div className="text-[11px] text-neutral-500">mg/dL</div>
                 <Badge tone={band.tone}>{band.label}</Badge>
               </>
             )}
           </div>
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Non-HDL cholesterol</div>
+            <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Non-HDL cholesterol</div>
             <div className="mt-1 text-2xl font-black text-ink dark:text-ink">{nonHdl.toFixed(0)}</div>
-            <div className="text-[11px] text-neutral-400">mg/dL</div>
-            <p className="mt-1 text-[11px] text-neutral-400">Valid at any TG level; secondary target is usually LDL goal + 30.</p>
+            <div className="text-[11px] text-neutral-500">mg/dL</div>
+            <p className="mt-1 text-[11px] text-neutral-500">Valid at any TG level; secondary target is usually LDL goal + 30.</p>
           </div>
         </div>
         <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
@@ -89,7 +89,7 @@ export function LdlCalculator() {
         <CopyNote text={tgTooHigh ? `Non-HDL ${nonHdl.toFixed(0)} mg/dL (TC ${totalChol}, HDL ${hdl}; TG ${tg} >=400 so Friedewald LDL not valid — direct LDL advised)` : `LDL ${ldl.toFixed(0)} mg/dL by Friedewald (TC ${totalChol}, HDL ${hdl}, TG ${tg}) — ${band.label}; non-HDL ${nonHdl.toFixed(0)} mg/dL [Friedewald 1972]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Friedewald, W.T., et al. (1972). Estimation of the concentration of LDL cholesterol without
         use of the preparative ultracentrifuge. <i>Clin Chem</i>, 18(6), 499-502. Decision-support
         estimate — classification bands per NCEP ATP III; individual targets are risk-based.

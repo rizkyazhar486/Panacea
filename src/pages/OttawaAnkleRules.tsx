@@ -38,7 +38,7 @@ function Zone({ title, painPresent, setPain, items, checked, setChecked }: {
 
   return (
     <Card className="!p-5">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{title}</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{title}</div>
       <label className="mt-3 flex items-center gap-3 rounded-xl border border-neutral-200 px-3.5 py-2.5 dark:border-white/10">
         <input type="checkbox" className="h-4 w-4 accent-brand" checked={painPresent} onChange={(e) => setPain(e.target.checked)} />
         <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Pain in this zone</span>
@@ -58,7 +58,7 @@ function Zone({ title, painPresent, setPain, items, checked, setChecked }: {
           <Badge tone={xrayIndicated ? 'critical' : 'brand'}>{xrayIndicated ? 'X-ray indicated' : 'X-ray not indicated'}</Badge>
         </div>
       )}
-      {!painPresent && <p className="mt-2 text-[12px] text-neutral-400">No pain in this zone — the rule doesn't apply here.</p>}
+      {!painPresent && <p className="mt-2 text-[12px] text-neutral-500">No pain in this zone — the rule doesn't apply here.</p>}
     </Card>
   )
 }
@@ -83,7 +83,7 @@ export function OttawaAnkleRules() {
       <Zone title="Malleolar zone (ankle)" painPresent={anklePain} setPain={setAnklePain} items={ANKLE_ITEMS} checked={ankleChecked} setChecked={setAnkleChecked} />
       <Zone title="Midfoot zone" painPresent={footPain} setPain={setFootPain} items={FOOT_ITEMS} checked={footChecked} setChecked={setFootChecked} />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Stiell, I.G., et al. (1992). A study to develop clinical decision rules for the use of radiography
         in acute ankle injuries. <i>Ann Emerg Med</i>, 21(4), 384-390. Stiell et al. (1993), <i>JAMA</i>,
         269(9), 1127-1132. High sensitivity, not 100% — clinical judgment always applies (e.g. in

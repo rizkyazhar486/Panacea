@@ -118,7 +118,7 @@ export function ChildGrowthTracker() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Log a visit</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Log a visit</div>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <Field label="Age (months)">
             <input className={inputClass} type="number" min={0} max={60} value={ageMo || ''} onChange={(e) => setAgeMo(Number(e.target.value) || 0)} />
@@ -146,14 +146,14 @@ export function ChildGrowthTracker() {
 
       {latest && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Latest visit ({latest.ageMo} months)</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Latest visit ({latest.ageMo} months)</div>
           <div className="mt-2 flex flex-wrap gap-4">
             <div>
-              <div className="text-[11px] text-neutral-400">Weight-for-age</div>
+              <div className="text-[11px] text-neutral-500">Weight-for-age</div>
               <Badge tone={zClass(latestWaz!).tone}>{zClass(latestWaz!).label} (z={latestWaz!.toFixed(1)})</Badge>
             </div>
             <div>
-              <div className="text-[11px] text-neutral-400">Height-for-age</div>
+              <div className="text-[11px] text-neutral-500">Height-for-age</div>
               <Badge tone={zClass(latestHaz!).tone}>{zClass(latestHaz!).label} (z={latestHaz!.toFixed(1)})</Badge>
             </div>
           </div>
@@ -163,7 +163,7 @@ export function ChildGrowthTracker() {
       {state.visits.length > 0 && (
         <>
           <Card className="!p-4">
-            <div className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-400">Weight-for-age (kg)</div>
+            <div className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Weight-for-age (kg)</div>
             <div className="h-56 w-full">
               <ResponsiveContainer>
                 <LineChart data={weightData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
@@ -182,7 +182,7 @@ export function ChildGrowthTracker() {
           </Card>
 
           <Card className="!p-4">
-            <div className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-400">Height-for-age (cm)</div>
+            <div className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Height-for-age (cm)</div>
             <div className="h-56 w-full">
               <ResponsiveContainer>
                 <LineChart data={heightData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
@@ -202,7 +202,7 @@ export function ChildGrowthTracker() {
         </>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         WHO Child Growth Standards (2006), 0-60 months. Reference curves use a simplified
         checkpoint-based estimator (screening-grade, not the full monthly LMS table) — for definitive
         clinical use, cross-check against the official WHO growth chart. Not a diagnosis; discuss any

@@ -102,6 +102,7 @@ const Peregangan = lazy(() => import('./pages/Peregangan').then((m) => ({ defaul
 const Jelajah = lazy(() => import('./pages/Jelajah').then((m) => ({ default: m.Jelajah })))
 const TeknikLari = lazy(() => import('./pages/TeknikLari').then((m) => ({ default: m.TeknikLari })))
 const VerifikasiConnect = lazy(() => import('./pages/VerifikasiConnect').then((m) => ({ default: m.VerifikasiConnect })))
+const Perubahan = lazy(() => import('./pages/Perubahan').then((m) => ({ default: m.Perubahan })))
 const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn })))
 const DekConnect = lazy(() => import('./pages/DekConnect').then((m) => ({ default: m.DekConnect })))
 const TinjauConnect = lazy(() => import('./pages/TinjauConnect').then((m) => ({ default: m.TinjauConnect })))
@@ -334,6 +335,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/jelajah" element={<Jelajah />} />
               <Route path="/teknik-lari" element={<TeknikLari />} />
               <Route path="/learn" element={<Learn />} />
+              <Route path="/change" element={<Perubahan />} />
               <Route path="/dek-connect" element={<DekConnect />} />
               <Route path="/verifikasi-connect" element={<VerifikasiConnect />} />
               <Route path="/tinjau-connect" element={<TinjauConnect />} />

@@ -55,7 +55,7 @@ export function Legal() {
         </div>
       </Card>
 
-      <p className="px-1 text-center text-xs text-neutral-400">
+      <p className="px-1 text-center text-xs text-neutral-500">
         This document is informational and will be refined together with healthcare legal counsel. Last updated: {new Date().toLocaleDateString('en-US')}.
       </p>
     </div>

@@ -58,7 +58,7 @@ export function ThermalTherapy() {
       </Card>
 
       <Card className="!p-4">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">This week</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">This week</div>
         <div className="mt-2 grid grid-cols-2 gap-3 text-center">
           <div className="rounded-2xl bg-brand/10 p-3">
             <div className="text-2xl font-black text-brand-dark">🔥 {saunaCount}</div>
@@ -86,7 +86,7 @@ export function ThermalTherapy() {
       {sessions.length > 0 && (
         <Card className="!p-5">
           <div className="flex items-center justify-between">
-            <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Recent sessions</div>
+            <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Recent sessions</div>
             <Badge tone="brand">{sessions.length} total</Badge>
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -99,7 +99,7 @@ export function ThermalTherapy() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Laukkanen, T., et al. (2015). Association between sauna bathing and fatal cardiovascular and
         all-cause mortality events. <i>JAMA Internal Medicine</i>, 175(4), 542-548. Observational
         associations, not proof of causation — and never override the safety limits above.

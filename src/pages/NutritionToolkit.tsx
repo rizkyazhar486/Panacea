@@ -32,7 +32,7 @@ function MediterraneanChecklist() {
         {MED_FOODS.map((f) => (
           <label key={f} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-white/5">
             <input type="checkbox" checked={!!done[f]} onChange={(e) => setDone((d) => ({ ...d, [f]: e.target.checked }))} className="h-4 w-4 accent-brand" />
-            <span className={`text-[13px] font-semibold ${done[f] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{f}</span>
+            <span className={`text-[13px] font-semibold ${done[f] ? 'text-neutral-500 line-through' : 'text-ink dark:text-ink'}`}>{f}</span>
           </label>
         ))}
       </div>
@@ -80,8 +80,8 @@ function AntioxidantTracker() {
             <input type="checkbox" checked={!!done[c.name]} onChange={(e) => setDone((d) => ({ ...d, [c.name]: e.target.checked }))} className="h-4 w-4 accent-brand" />
             <span className="text-lg">{c.emoji}</span>
             <div>
-              <div className={`text-[13px] font-bold ${done[c.name] ? 'text-neutral-400 line-through' : 'text-ink dark:text-ink'}`}>{c.name}</div>
-              <div className="text-[11px] text-neutral-400">{c.ex}</div>
+              <div className={`text-[13px] font-bold ${done[c.name] ? 'text-neutral-500 line-through' : 'text-ink dark:text-ink'}`}>{c.name}</div>
+              <div className="text-[11px] text-neutral-500">{c.ex}</div>
             </div>
           </label>
         ))}
@@ -111,7 +111,7 @@ function PlantDiversity() {
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {plants.map((p) => <Badge key={p} tone="neutral">{p}</Badge>)}
-        {plants.length === 0 && <p className="text-[12px] text-neutral-400">Nothing logged this week yet.</p>}
+        {plants.length === 0 && <p className="text-[12px] text-neutral-500">Nothing logged this week yet.</p>}
       </div>
     </Card>
   )
@@ -190,7 +190,7 @@ export function NutritionToolkit() {
       {tab === 'coffee' && <CoffeeHydration />}
       {tab === 'electrolyte' && <ElectrolyteCalc />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Habit-tracking based on general nutrition-science patterns (Mediterranean diet, dietary
         diversity, polyphenol variety) — not personalized medical or dietetic advice.
       </div>

@@ -184,15 +184,15 @@ export function Workout() {
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{todayLog.length}</div>
-            <div className="text-[10px] text-neutral-400">Sets today</div>
+            <div className="text-[10px] text-neutral-500">Sets today</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{weekLog.length}</div>
-            <div className="text-[10px] text-neutral-400">Sessions this week</div>
+            <div className="text-[10px] text-neutral-500">Sessions this week</div>
           </div>
           <div className="rounded-xl bg-brand-50 p-3 text-center">
             <div className="text-lg font-extrabold text-brand-dark">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="text-[10px] text-neutral-400">Weekly volume</div>
+            <div className="text-[10px] text-neutral-500">Weekly volume</div>
           </div>
         </div>
       </Card>
@@ -218,7 +218,7 @@ export function Workout() {
             {open === e.id && (
               <div className="mt-3 space-y-3 border-t border-neutral-100 pt-3">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">How To Perform</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">How To Perform</div>
                   <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.description}</p>
                 </div>
                 <div className="rounded-xl bg-amber-50/60 p-3">
@@ -251,7 +251,7 @@ export function Workout() {
               return (
                 <div key={l.id} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2 text-sm">
                   <span className="font-semibold">{ex?.name}</span>
-                  <span className="text-xs text-neutral-400">{l.sets}×{l.reps} {l.weight > 0 ? `@ ${l.weight}kg` : ''}</span>
+                  <span className="text-xs text-neutral-500">{l.sets}×{l.reps} {l.weight > 0 ? `@ ${l.weight}kg` : ''}</span>
                   <IconCheck size={14} className="text-brand" />
                 </div>
               )

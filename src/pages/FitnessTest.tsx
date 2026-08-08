@@ -82,7 +82,7 @@ export function FitnessTest() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🎖️</span>
         <div>
           <h1 className="text-lg font-black text-ink">Physical Test & Form Analysis</h1>
-          <p className="text-xs text-neutral-400">SIPSS/civil service fitness · AI form · Hyrox/Marathon programs</p>
+          <p className="text-xs text-neutral-500">SIPSS/civil service fitness · AI form · Hyrox/Marathon programs</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export function FitnessTest() {
           </div>
           <Badge tone={lulus ? 'normal' : 'high'}>{lulus ? '✓ Meets Requirements' : 'Needs Improvement'}</Badge>
         </div>
-        <p className="mt-2 text-[10px] text-neutral-400">Equivalency estimate; official thresholds & tables may vary by agency/age. The 12-minute run can be measured automatically via GPS Tracker.</p>
+        <p className="mt-2 text-[10px] text-neutral-500">Equivalency estimate; official thresholds & tables may vary by agency/age. The 12-minute run can be measured automatically via GPS Tracker.</p>
       </Card>
 
       {/* 2. AI Form Analysis */}
@@ -166,7 +166,7 @@ export function FitnessTest() {
             {form.goodPoints?.length > 0 && <div className="rounded-xl bg-neutral-50 p-2 text-[11px]"><b className="text-brand-dark">✓ Already good:</b> <ul className="mt-1 space-y-0.5 text-neutral-600">{form.goodPoints.map((g, i) => <li key={i}>• {g}</li>)}</ul></div>}
             {form.corrections?.length > 0 && <div className="rounded-xl bg-amber-50 p-2 text-[11px]"><b className="text-amber-700">⚠ To fix:</b> <ul className="mt-1 space-y-0.5 text-amber-800">{form.corrections.map((g, i) => <li key={i}>• {g}</li>)}</ul></div>}
             {form.injuryRisk && <div className="rounded-xl bg-red-50 p-2 text-[11px] text-red-700"><b>Injury risk:</b> {form.injuryRisk}</div>}
-            <p className="text-[10px] text-neutral-400">Movement education, not a substitute for direct coach/physiotherapist assessment.</p>
+            <p className="text-[10px] text-neutral-500">Movement education, not a substitute for direct coach/physiotherapist assessment.</p>
           </div>
         )}
       </Card>

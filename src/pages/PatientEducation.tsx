@@ -47,7 +47,7 @@ export function PatientEducation() {
           }
         />
         {!sheet ? (
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-neutral-500">
             Press <b>Generate Education</b> to display an explanation of <b>{diagnosis}</b> and how to maintain your health.
           </p>
         ) : (
@@ -58,7 +58,7 @@ export function PatientEducation() {
               <p className="mt-2 text-sm text-ink/90">{sheet.ringkas}</p>
             </div>
             <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">How to Maintain Your Health</div>
+              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-500">How to Maintain Your Health</div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {sheet.caraMenjaga.map((c, i) => (
                   <div key={i} className="rounded-2xl border border-neutral-100 p-4">
@@ -120,7 +120,7 @@ function SurgeryEducation({ pid }: { pid: string }) {
       </div>
 
       <div className="mt-4">
-        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-400">Informed Consent — Multi-stage</div>
+        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-neutral-500">Informed Consent — Multi-stage</div>
         <div className="space-y-2">
           {s.consent.map((c) => (
             <div key={c.stage} className="flex items-center justify-between rounded-xl border border-neutral-100 px-3 py-2">

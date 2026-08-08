@@ -780,7 +780,7 @@ function Empty({ e, t }: { e: string; t: string }) {
   return (
     <div className="rounded-xl border-2 border-dashed border-neutral-200 py-8 text-center">
       <span className="text-3xl">{e}</span>
-      <p className="mt-2 text-sm text-neutral-400">{t}</p>
+      <p className="mt-2 text-sm text-neutral-500">{t}</p>
     </div>
   )
 }
@@ -859,30 +859,30 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold" style={{ color: info.c }}><ANum v={bi} d={1} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">{'BMI \u00B7 ' + info.l}</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">{'BMI \u00B7 ' + info.l}</div>
           <div className="mt-1.5 h-1 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, bi / 40 * 100) + '%', background: info.c }} /></div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold text-indigo-500"><ANum v={Math.round(bm)} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">BMR kcal</div>
-          <div className="mt-1 text-[10px] text-neutral-400">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">BMR kcal</div>
+          <div className="mt-1 text-[10px] text-neutral-500">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold" style={{ color: '#0B7A4B' }}><ANum v={Math.round(td)} /></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">TDEE kcal</div>
-          <div className="mt-1 text-[10px] text-neutral-400">{ACT_L[b.act]}</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">TDEE kcal</div>
+          <div className="mt-1 text-[10px] text-neutral-500">{ACT_L[b.act]}</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-lg font-extrabold" style={{ color: intakeKcal > rec * 1.1 ? C.org : intakeKcal < rec * 0.8 ? C.blue : C.ok }}>
             <ANum v={intakeKcal} />/<ANum v={rec} />
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mt-1">Kcal today</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">Kcal today</div>
           <div className="mt-1 text-[10px]" style={{ color: intakeKcal > rec ? C.org : C.ok }}>
             {intakeKcal > rec ? '+' + (intakeKcal - rec) + ' surplus' : (rec - intakeKcal) + ' remaining'}
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-400">
+      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-500">
         {b.w}kg {'\u00B7'} {b.h}cm {'\u00B7'} Target: {b.goal === 'lose' ? 'Lose' : b.goal === 'gain' ? 'Gain' : 'Maintain'}
       </div>
     </Card>
@@ -980,9 +980,9 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           <div key={l} className="flex flex-col items-center gap-1">
             <Ring value={v} max={mx} color={c}>
               <span className="text-xs font-extrabold tabular-nums" style={{ color: c }}>{v}</span>
-              <span className="text-[8px] text-neutral-400">g</span>
+              <span className="text-[8px] text-neutral-500">g</span>
             </Ring>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">{l}</span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">{l}</span>
           </div>
         ))}
       </div>
@@ -1011,7 +1011,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
             <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
-              {f.emoji} {f.name} <span className="text-neutral-400">{f.k}</span>
+              {f.emoji} {f.name} <span className="text-neutral-500">{f.k}</span>
               {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
               {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
             </button>
@@ -1039,8 +1039,8 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         {todays.length === 0 && <Empty e={'\u{1F37D}\uFE0F'} t="No food logged yet" />}
         {todays.map(f => { const s = FD.find(x => x.name === f.name); return (
           <div key={f.id} className="flex items-center justify-between rounded-lg px-3 py-2 transition hover:bg-neutral-50">
-            <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-400">{f.grams}g</span></div>
-            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: '#0B7A4B' }}>{f.kcal}</span><span className="text-neutral-400 ml-1">kcal</span></div>
+            <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-500">{f.grams}g</span></div>
+            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: '#0B7A4B' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
           </div>
         )})}
       </div>
@@ -1095,7 +1095,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
       </div>
       <div className="px-5 pb-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExType(f[0]) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-400">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       {/* Real map (OpenStreetMap) — live position, record routes & plan
           a path by tapping the map. */}
@@ -1105,7 +1105,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
             {'\u{1F4CD}'} Tap the map to add route points {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
-        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-400">Loading map…</div>}>
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-500">Loading map…</div>}>
           <RouteMap
             points={pts}
             planned={plan}
@@ -1128,9 +1128,9 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <div className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-2.5">
             <span className="text-lg">{'\u{1F493}'}</span>
-            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Heart Rate</div></div>
+            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div></div>
             <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
-            <span className="text-[10px] text-neutral-400">bpm</span>
+            <span className="text-[10px] text-neutral-500">bpm</span>
           </div>
         )}
         {mode === 'done' && (
@@ -1207,7 +1207,7 @@ function SleepWater({ body }: { body: Body }) {
         <div className="rounded-xl border border-neutral-100 p-3">
           <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }}>{weekMet.toFixed(1)}</span></div>
           <div className="mt-1 h-2 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (weekMet / 15) * 100) + '%', background: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }} /></div>
-          <div className="flex justify-between text-[9px] text-neutral-400 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
+          <div className="flex justify-between text-[9px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
         </div>
       </div>
     </Card>
@@ -1235,11 +1235,11 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[9px] text-neutral-400">+{active.specialFoods.length - 6}</span>}</div></div>
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[9px] text-neutral-400">+{active.avoidFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
           </div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-400">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
         </div>
       )}
       <button onClick={() => setOpen(!open)} className="mt-3 w-full rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-xs font-bold text-neutral-500 transition hover:bg-neutral-50 hover:border-neutral-300">
@@ -1251,7 +1251,7 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             <button key={p.id} onClick={() => { onSelect(p); setOpen(false) }} className={'rounded-xl border p-3 text-left transition active:scale-95 ' + (active?.id === p.id ? 'border-current shadow-sm' : 'border-neutral-100 hover:border-neutral-200')} style={active?.id === p.id ? { borderColor: p.color, background: p.color + '08' } : {}}>
               <span className="text-lg">{p.emoji}</span>
               <div className="mt-1 text-[11px] font-bold" style={{ color: active?.id === p.id ? p.color : '#404040' }}>{p.name}</div>
-              <div className="text-[9px] text-neutral-400">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
+              <div className="text-[9px] text-neutral-500">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
             </button>
           ))}
         </div>
@@ -1373,11 +1373,11 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-neutral-100">
-                <th className="py-2 pr-3 text-left font-bold text-neutral-400 sticky left-0 bg-white">Date</th>
+                <th className="py-2 pr-3 text-left font-bold text-neutral-500 sticky left-0 bg-white">Date</th>
                 {labKeys.map(k => (
-                  <th key={k} className="py-2 px-2 text-center font-bold text-neutral-400 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
+                  <th key={k} className="py-2 px-2 text-center font-bold text-neutral-500 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
                 ))}
-                <th className="py-2 pl-2 text-center font-bold text-neutral-400">Status</th>
+                <th className="py-2 pl-2 text-center font-bold text-neutral-500">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -1411,7 +1411,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
       {/* Trend Summary */}
       {labs.length >= 2 && (
         <div className="mt-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Weekly Trend (latest vs previous)</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Weekly Trend (latest vs previous)</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {labKeys.map(k => {
               const trend = labTrend(k)
@@ -1426,7 +1426,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                     <span className="text-[10px] font-semibold text-neutral-500">{labLabels[k]}</span>
                     <span className="text-[10px]" style={{ color: trend.color }}>{trend.dir === 'up' ? '\u2191' : trend.dir === 'down' ? '\u2193' : '\u2192'} {trend.diff != null ? (trend.diff > 0 ? '+' : '') + trend.diff.toFixed(1) : ''}</span>
                   </div>
-                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[9px] font-normal text-neutral-400">{labUnits[k]}</span></div>
+                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[9px] font-normal text-neutral-500">{labUnits[k]}</span></div>
                   <div className="text-[9px] font-semibold" style={{ color: st.color }}>{st.label}</div>
                 </div>
               )
@@ -1437,7 +1437,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
 
       {/* Lab Range Reference */}
       <div className="mt-4">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Normal Reference Range</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Normal Reference Range</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
           {labKeys.map(k => {
             const range = labRanges[k]
@@ -1445,7 +1445,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
             return (
               <div key={k} className="flex items-center justify-between rounded-lg bg-neutral-50 px-2.5 py-1.5">
                 <span className="text-[10px] text-neutral-600">{labLabels[k]}</span>
-                <span className="text-[10px] font-bold tabular-nums text-neutral-400">{range[0]}-{range[1]} {labUnits[k]}</span>
+                <span className="text-[10px] font-bold tabular-nums text-neutral-500">{range[0]}-{range[1]} {labUnits[k]}</span>
               </div>
             )
           })}
@@ -1646,13 +1646,13 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
       <SectionTitle icon={<IconFlame size={18} />} title="Manual Exercise Log" subtitle="Log exercise without GPS" />
       <div className="mt-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExName(f[0].name) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-400">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       <div className="mt-3 flex items-center gap-3">
         <Stepper label="Duration" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
         <div className="shrink-0 text-right">
           <div className="text-lg font-extrabold" style={{ color: '#0B7A4B' }}>{k}</div>
-          <div className="text-[9px] text-neutral-400">kcal</div>
+          <div className="text-[9px] text-neutral-500">kcal</div>
         </div>
         <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Log</Button>
       </div>
@@ -1693,9 +1693,9 @@ function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
               {d.isRestDay && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Recovery</span>}
             </div>
             <div className="mt-1.5 grid grid-cols-1 gap-1 text-xs text-neutral-600 sm:grid-cols-3">
-              <div><b className="text-neutral-400">Breakfast:</b> {d.breakfast}</div>
-              <div><b className="text-neutral-400">Lunch:</b> {d.lunch}</div>
-              <div><b className="text-neutral-400">Dinner:</b> {d.dinner}</div>
+              <div><b className="text-neutral-500">Breakfast:</b> {d.breakfast}</div>
+              <div><b className="text-neutral-500">Lunch:</b> {d.lunch}</div>
+              <div><b className="text-neutral-500">Dinner:</b> {d.dinner}</div>
             </div>
             <div className="mt-1.5 text-xs font-semibold text-brand-dark">🏃 {d.exerciseFocus}</div>
           </div>
@@ -1751,7 +1751,7 @@ export function Nutrition() {
 
       {/* 7-day BMI / BMR / VO₂Max trends (recharts) */}
       <div id="calc-vo2max">
-        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-400 shadow-sm">Loading health trends…</div>}>
+        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Loading health trends…</div>}>
           <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
         </Suspense>
       </div>

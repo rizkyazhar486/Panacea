@@ -98,7 +98,7 @@ export function Architecture() {
         return {score: combined, V, L, S, evidence: collate_evidence(plan)}
 # Overriding a rejected plan ⇒ requires clinician justification (recorded in the audit log).`}
         </pre>
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-neutral-500">
           → Implemented directly in the <b>Planning</b> module (CDSS Safety Engine).
         </p>
       </Card>
@@ -175,7 +175,7 @@ export function Architecture() {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-neutral-400">
+        <p className="mt-3 text-xs text-neutral-500">
           Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays
           local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused
           test set before rollout, with versioning & rollback paths.

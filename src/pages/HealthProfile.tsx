@@ -262,7 +262,7 @@ export function HealthProfile() {
     </Field>
   )
 
-  if (loading) return <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-400">Loading health data…</div>
+  if (loading) return <div className="mx-auto max-w-2xl py-16 text-center text-sm text-neutral-500">Loading health data…</div>
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
@@ -285,7 +285,7 @@ export function HealthProfile() {
             ))}
           </div>
         </div>
-        {account && <div className="mt-2 text-[10px] text-neutral-400">Account: {account.email}</div>}
+        {account && <div className="mt-2 text-[10px] text-neutral-500">Account: {account.email}</div>}
       </Card>
 
       {/* Import from / export to a file */}
@@ -457,7 +457,7 @@ function BenchmarkCard({ profile }: { profile: HealthProfile }) {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">{BENCHMARK_DISCLAIMER}</p>
+      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">{BENCHMARK_DISCLAIMER}</p>
     </Card>
   )
 }
@@ -575,14 +575,14 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
         <>
           {terlihat.map(([kategori, items]) => (
             <div key={kategori} className="mt-3">
-              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-400">{kategori}</div>
+              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">{kategori}</div>
               <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {items.map((d) => (
                   <div key={d.kunci} className="rounded-xl border border-neutral-100 bg-neutral-50 p-2.5 text-center dark:border-white/10 dark:bg-white/5">
                     <div className="text-sm font-extrabold text-ink dark:text-ink">
                       {fmt(blob[d.kunci] as number, d.satuan)}
                     </div>
-                    <div className="text-[10px] font-semibold leading-tight text-neutral-400">{d.label}</div>
+                    <div className="text-[10px] font-semibold leading-tight text-neutral-500">{d.label}</div>
                   </div>
                 ))}
               </div>
@@ -596,7 +596,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
           )}
         </>
       ) : (
-        <p className="mt-2 text-xs text-neutral-400">
+        <p className="mt-2 text-xs text-neutral-500">
           Perangkat tersambung, tetapi sinkronisasi ini tidak membawa metrik yang cocok — perluas
           Date Range di Health Auto Export dan angkanya akan terisi di sini.
         </p>
@@ -705,7 +705,7 @@ function AutoSyncCard() {
           <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
           <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
-        <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+        <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
           Rahasiakan tautan ini — siapa pun yang memilikinya bisa mengirim data ke akun Anda.
           Saat menempelkannya di Health Auto Export, <b>kosongkan dahulu kolom URL</b> lalu tempel
           sekali; menempel di atas isi lama menghasilkan alamat ganda yang tidak akan pernah dikenali server.
@@ -737,7 +737,7 @@ function AutoSyncCard() {
       >
         {busy ? 'Memproses…' : '🔑 Buat tautan baru (bila tautan lama bocor)'}
       </button>
-      <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
         Setelah ini tautan lama langsung tidak berlaku, dan Anda harus memperbarui URL di aplikasi
         sebelum data bisa masuk lagi.
       </p>
@@ -815,7 +815,7 @@ function SyncDiagnosticsCard() {
           </Button>
           {fileNote && <p className="mt-1 text-[11px] text-neutral-500">{fileNote}</p>}
 
-          <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
             Menempel isinya juga bisa, tapi file 7 hari bisa berukuran beberapa megabyte dan berat
             untuk browser di HP — memilih file jauh lebih aman.
           </p>
@@ -858,14 +858,14 @@ function SyncDiagnosticsCard() {
 
               {d.metrics.length > 0 && (
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
+                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
                     Rincian · {d.matchedCount} dikenali · {d.emptyCount} kosong · {d.metrics.length} total
                   </div>
                   <div className="mt-1.5 space-y-1">
                     {d.metrics.slice(0, MAX_ROWS).map((m, i) => (
                       <div key={i} className="flex items-center justify-between gap-2 rounded-lg bg-neutral-50 px-2.5 py-1.5 dark:bg-white/5">
                         <span className="min-w-0 flex-1 truncate font-mono text-[10px] text-neutral-600 dark:text-neutral-300">{m.name}</span>
-                        <span className="shrink-0 text-[10px] text-neutral-400">{m.sampleCount} sampel</span>
+                        <span className="shrink-0 text-[10px] text-neutral-500">{m.sampleCount} sampel</span>
                         <span className={`shrink-0 text-[10px] font-bold ${
                           m.sampleCount === 0 ? 'text-amber-600'
                           : m.recognised ? 'text-emerald-600' : 'text-rose-600'}`}>
@@ -874,7 +874,7 @@ function SyncDiagnosticsCard() {
                       </div>
                     ))}
                     {d.metrics.length > MAX_ROWS && (
-                      <p className="pt-1 text-[10px] text-neutral-400">
+                      <p className="pt-1 text-[10px] text-neutral-500">
                         …dan {d.metrics.length - MAX_ROWS} metrik lain (disembunyikan agar halaman tetap ringan).
                       </p>
                     )}

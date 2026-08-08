@@ -165,7 +165,7 @@ export function Markets() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📈</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Data Pasar</h1>
-          <p className="text-xs text-neutral-400">Harga, grafik, dan berita — diperbarui otomatis</p>
+          <p className="text-xs text-neutral-500">Harga, grafik, dan berita — diperbarui otomatis</p>
         </div>
       </div>
 
@@ -182,7 +182,7 @@ export function Markets() {
           </p>
         </div>
         {fetchedAt && (
-          <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-400">
+          <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-500">
             <span>Diperbarui {ago(fetchedAt)} · sumber Yahoo Finance</span>
             <button onClick={loadWatchlist} className="font-bold text-brand-dark hover:underline">Muat ulang</button>
           </div>
@@ -222,7 +222,7 @@ export function Markets() {
 
       {search.trim().length >= 2 && (
         <Card className="!p-4">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
             Hasil pencarian "{search.trim()}"
           </div>
           {searching && <p className="mt-2 text-[12px] text-neutral-500">Mencari…</p>}
@@ -234,14 +234,14 @@ export function Markets() {
           )}
           {!searching && !!hitsBaru.length && (
             <>
-              <p className="mt-1 text-[11px] text-neutral-400">Di luar daftar pantau — ketuk untuk membuka</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Di luar daftar pantau — ketuk untuk membuka</p>
               <div className="mt-2 space-y-1.5">
                 {hitsBaru.map((h) => (
                   <button key={h.symbol} onClick={() => { setSelected(h.symbol); setSearch('') }}
                     className="flex w-full items-center justify-between gap-3 rounded-xl bg-neutral-50 px-3 py-2 text-left transition hover:bg-brand/10 dark:bg-white/5">
                     <div className="min-w-0">
                       <div className="truncate text-[13px] font-bold text-ink dark:text-ink">{h.name}</div>
-                      <div className="text-[10px] text-neutral-400">
+                      <div className="text-[10px] text-neutral-500">
                         {h.symbol}{h.exchange ? ` · ${h.exchange}` : ''}
                       </div>
                     </div>
@@ -268,7 +268,7 @@ export function Markets() {
               onClick={() => setSelected(isOpen ? null : q.symbol)}>
               <div className="min-w-0">
                 <div className="text-[13px] font-black text-ink dark:text-ink">{q.name}</div>
-                <div className="text-[10px] text-neutral-400">{q.symbol}{q.exchange ? ` · ${q.exchange}` : ''}</div>
+                <div className="text-[10px] text-neutral-500">{q.symbol}{q.exchange ? ` · ${q.exchange}` : ''}</div>
               </div>
               <div className="shrink-0 text-right">
                 <div className="text-[14px] font-black text-ink dark:text-ink">{fmtPrice(q.price, q.currency)}</div>
@@ -334,7 +334,7 @@ export function Markets() {
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer"
                 className="block rounded-xl bg-neutral-50 p-3 transition hover:bg-neutral-100 dark:bg-white/5">
                 <div className="text-[12px] font-semibold leading-snug text-ink dark:text-ink">{n.title}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-[10px] text-neutral-400">
+                <div className="mt-0.5 flex items-center gap-2 text-[10px] text-neutral-500">
                   <Badge tone="low">{n.region === 'domestic' ? 'Domestik' : 'Internasional'}</Badge>
                   {n.source && <span>{n.source}</span>}
                   {n.pubDate && <span>· {ago(n.pubDate)}</span>}
@@ -345,7 +345,7 @@ export function Markets() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Data harga disediakan melalui Yahoo Finance dan bersifat tertunda serta indikatif.
         Panaceamed tidak memberikan nasihat investasi, tidak merekomendasikan pembelian maupun
         penjualan efek, dan bukan perusahaan efek berizin.

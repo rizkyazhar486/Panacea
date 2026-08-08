@@ -97,7 +97,7 @@ export function SunExposure() {
           </select>
         </div>
 
-        {status === 'loading' && <p className="mt-4 text-sm text-neutral-400">Getting your local UV index…</p>}
+        {status === 'loading' && <p className="mt-4 text-sm text-neutral-500">Getting your local UV index…</p>}
         {(status === 'denied' || status === 'error') && err && (
           <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:bg-red-500/10 dark:text-red-300">{err}</p>
         )}
@@ -107,7 +107,7 @@ export function SunExposure() {
             <div className="mt-4 flex items-center gap-5 rounded-2xl p-4" style={{ background: uvBand.color + '18' }}>
               <div className="text-center">
                 <div className="text-5xl font-black" style={{ color: uvBand.color }}>{uvIndex}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">UV Index</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">UV Index</div>
               </div>
               <div>
                 <Badge tone={uvIndex < 3 ? 'brand' : uvIndex < 8 ? 'low' : 'critical'}>{uvBand.label}</Badge>
@@ -119,18 +119,18 @@ export function SunExposure() {
 
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Time to sunburn risk</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Time to sunburn risk</div>
                 <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(burnMin!) ? `~${burnMin!.toFixed(0)} min` : '—'}</div>
-                <div className="text-[9px] text-neutral-400">Unprotected, {skin.label}</div>
+                <div className="text-[9px] text-neutral-500">Unprotected, {skin.label}</div>
               </div>
               <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Rough vitamin D window</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Rough vitamin D window</div>
                 <div className="text-lg font-black text-ink dark:text-ink">{uvIndex >= 3 && vitDMin != null && Number.isFinite(vitDMin) ? `~${vitDMin.toFixed(0)} min` : 'Minimal today'}</div>
-                <div className="text-[9px] text-neutral-400">Arms + legs exposed</div>
+                <div className="text-[9px] text-neutral-500">Arms + legs exposed</div>
               </div>
             </div>
 
-            <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+            <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
               Derived from the WMO UV Index definition and standard erythema-dose reference values for
               your skin type — not a personalized prescription. Actual time varies with cloud cover,
               altitude, reflective surfaces (snow/sand/water), sunscreen, medications that increase
@@ -142,7 +142,7 @@ export function SunExposure() {
         )}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Live UV index from the free Open-Meteo API, fetched using your device's actual GPS coordinates
         (location is used only to fetch the reading). Educational estimate, not medical advice.
       </div>

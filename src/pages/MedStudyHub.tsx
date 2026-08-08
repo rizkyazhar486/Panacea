@@ -32,7 +32,7 @@ const ClinicalSkillsSection = lazy(() => import('./medstudy/ClinicalSkillsSectio
 
 function SectionFallback() {
   return (
-    <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center text-[13px] text-neutral-400 dark:border-white/10 dark:bg-white/5">
+    <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center text-[13px] text-neutral-500 dark:border-white/10 dark:bg-white/5">
       Memuat materi…
     </div>
   )
@@ -186,7 +186,7 @@ function PracticeBank() {
         </>
       )}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-400">
+      <p className="mt-4 text-[10px] leading-relaxed text-neutral-500">
         These are original practice questions written to match each exam's format and blueprint — not real/leaked past papers, which are copyrighted by their boards. UKMPPD candidates: the USMLE and PLAB banks track the same clinical-reasoning skills and blueprint the UKMPPD draws from.
       </p>
     </Card>

@@ -90,10 +90,10 @@ export function EmpiricTherapyReference() {
             <div className="mt-1 text-[12px] text-neutral-500">{e.notes}</div>
           </Card>
         ))}
-        {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-400">No matches — try a different search term.</p>}
+        {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">No matches — try a different search term.</p>}
       </div>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         A study/reference aid summarizing commonly-published guideline first-line choices — not a
         substitute for current full guideline text, an antibiogram, or clinical/pharmacist judgment.
         Not a prescription and contains no dosing.

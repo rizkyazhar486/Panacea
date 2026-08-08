@@ -51,7 +51,7 @@ export function RealisticHealth() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🌱</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Sehat Tapi Sibuk</h1>
-          <p className="text-xs text-neutral-400">Satu tindakan yang muat di hari Anda — bukan skor yang membuat Anda merasa gagal</p>
+          <p className="text-xs text-neutral-500">Satu tindakan yang muat di hari Anda — bukan skor yang membuat Anda merasa gagal</p>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export function RealisticHealth() {
         )}
 
         <div className="mt-3">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Yang paling mengganggu sekarang</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Yang paling mengganggu sekarang</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             <button
               onClick={() => setWorst(null)}
@@ -144,7 +144,7 @@ export function RealisticHealth() {
 
       {alternatives.length > 0 && (
         <Card className="!p-4">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Kalau yang tadi tidak cocok</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Kalau yang tadi tidak cocok</div>
           <div className="mt-2 space-y-2">
             {alternatives.map((d) => (
               <div key={d.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -168,7 +168,7 @@ export function RealisticHealth() {
       {/* Step 3 — reframe a bad wearable reading, only if there IS one. */}
       {triage && (
         <Card className="!p-4">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
             Soal angka Anda {vitalsAge(vitals) ? `· ${vitalsAge(vitals)}` : ''}
           </div>
           <h3 className="mt-1 text-[14px] font-black text-ink dark:text-ink">{triage.headline}</h3>
@@ -188,7 +188,7 @@ export function RealisticHealth() {
 
       {/* The principles, stated plainly — users deserve to know the reasoning. */}
       <Card className="!p-4">
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Prinsip halaman ini</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Prinsip halaman ini</div>
         <ul className="mt-2 space-y-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li><b>Jangan pernah nol.</b> Dua menit mengalahkan nol, dan bukan versi gagal dari tiga puluh menit. Lompatan kesehatan terbesar terjadi saat naik dari tidak pernah sama sekali menjadi sedikit — bukan dari sedikit menjadi banyak.</li>
           <li><b>Ubah lingkungan, jangan andalkan kemauan.</b> Menaruh telepon di ruangan lain lebih andal daripada berniat tidak membukanya. Kemauan adalah hal pertama yang habis ketika Anda lelah.</li>
@@ -197,7 +197,7 @@ export function RealisticHealth() {
         </ul>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Saran umum untuk orang sehat. Bila Anda punya penyakit jantung, paru, sendi, sedang hamil,
         atau minum obat rutin, bicarakan dulu dengan dokter sebelum menambah aktivitas fisik.
       </div>

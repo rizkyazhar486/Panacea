@@ -24,7 +24,7 @@ export function GymEquipment() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🏋️</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Alat Fitness & Hyrox</h1>
-          <p className="text-xs text-neutral-400">Cara pakai, otot sasaran, dan perbandingan jujur dengan calisthenic</p>
+          <p className="text-xs text-neutral-500">Cara pakai, otot sasaran, dan perbandingan jujur dengan calisthenic</p>
         </div>
       </div>
 
@@ -60,7 +60,7 @@ export function GymEquipment() {
       </Card>
 
       {list.length === 0 && (
-        <p className="text-center text-[13px] text-neutral-400">Tidak ada yang cocok — coba kata kunci lain.</p>
+        <p className="text-center text-[13px] text-neutral-500">Tidak ada yang cocok — coba kata kunci lain.</p>
       )}
 
       {list.map((e) => {
@@ -75,7 +75,7 @@ export function GymEquipment() {
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Badge tone={e.group === 'hyrox' ? 'brand' : 'low'}>{GROUP_LABEL[e.group]}</Badge>
-                <span className="text-[11px] font-bold text-neutral-400">{open ? 'Tutup ▲' : 'Buka ▼'}</span>
+                <span className="text-[11px] font-bold text-neutral-500">{open ? 'Tutup ▲' : 'Buka ▼'}</span>
               </div>
             </button>
 
@@ -93,7 +93,7 @@ export function GymEquipment() {
                   <ol className="mt-1 space-y-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                     {e.howTo.map((h, i) => (
                       <li key={i} className="flex gap-2">
-                        <span className="shrink-0 font-bold text-neutral-400">{i + 1}.</span>
+                        <span className="shrink-0 font-bold text-neutral-500">{i + 1}.</span>
                         <span>{h}</span>
                       </li>
                     ))}
@@ -109,13 +109,13 @@ export function GymEquipment() {
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Otot Utama</div>
+                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Otot Utama</div>
                     <ul className="mt-1 space-y-0.5 text-[12px] text-neutral-700 dark:text-neutral-200">
                       {e.primaryMuscles.map((m) => <li key={m}>• {m}</li>)}
                     </ul>
                   </div>
                   <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Otot Pendukung</div>
+                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Otot Pendukung</div>
                     <ul className="mt-1 space-y-0.5 text-[12px] text-neutral-700 dark:text-neutral-200">
                       {e.secondaryMuscles.map((m) => <li key={m}>• {m}</li>)}
                     </ul>
@@ -123,7 +123,7 @@ export function GymEquipment() {
                 </div>
 
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Alat vs Calisthenic</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Alat vs Calisthenic</div>
                   <div className="mt-1.5 space-y-2">
                     <div className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-500/10">
                       <div className="text-[11px] font-black text-emerald-800 dark:text-emerald-300">Keunggulan alat ini</div>
@@ -134,7 +134,7 @@ export function GymEquipment() {
                       <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.calisthenicWins}</p>
                     </div>
                     <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                      <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Pengganti tanpa alat</div>
+                      <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pengganti tanpa alat</div>
                       <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.calisthenicAlternative}</p>
                     </div>
                   </div>
@@ -150,7 +150,7 @@ export function GymEquipment() {
         )
       })}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Panduan umum untuk orang sehat. Bila Anda punya cedera, penyakit jantung, masalah punggung,
         atau sedang hamil, konsultasikan dulu sebelum memakai alat berbeban. Minta bantuan instruktur
         saat pertama kali mencoba alat yang belum Anda kenal.

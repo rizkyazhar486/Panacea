@@ -64,7 +64,7 @@ export default function SkdiTherapySection() {
 
       {tab === 'therapy' && groupedTherapy.map(([sys, entries]) => (
         <Card key={sys} className="!p-4">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{sys}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{sys}</div>
           <div className="mt-2 space-y-2">
             {entries.map((e, i) => (
               <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -75,7 +75,7 @@ export default function SkdiTherapySection() {
           </div>
         </Card>
       ))}
-      {tab === 'therapy' && filteredTherapy.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil.</p>}
+      {tab === 'therapy' && filteredTherapy.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil.</p>}
 
       {tab === 'eponym' && (
         <Card className="!p-4">
@@ -86,12 +86,12 @@ export default function SkdiTherapySection() {
                 <p className="mt-1 text-[12px] text-neutral-500">{e.keyword}</p>
               </div>
             ))}
-            {filteredEponym.length === 0 && <p className="text-center text-[13px] text-neutral-400">Tidak ada hasil.</p>}
+            {filteredEponym.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil.</p>}
           </div>
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Direkap dari referensi tatalaksana SKDI/UKMPPD, digunakan dengan izin pemilik konten. Bantuan
         belajar untuk ujian — bukan pengganti panduan farmakologi resmi atau penilaian klinis.
       </div>

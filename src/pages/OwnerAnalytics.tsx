@@ -42,7 +42,7 @@ export function OwnerAnalytics() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
           <h1 className="text-lg font-black text-ink dark:text-ink">Owner Analytics</h1>
-          <p className="text-xs text-neutral-400">SEO, eksperimen, segmentasi, dan sentimen</p>
+          <p className="text-xs text-neutral-500">SEO, eksperimen, segmentasi, dan sentimen</p>
         </div>
       </div>
 
@@ -102,9 +102,9 @@ function SeoTab() {
       <Card className="!p-4">
         <div className="flex items-center justify-between">
           <span className="text-[12px] font-bold text-neutral-500">Skor pemeriksaan</span>
-          <span className="text-2xl font-black text-ink dark:text-ink">{r.score}<span className="text-sm text-neutral-400">/100</span></span>
+          <span className="text-2xl font-black text-ink dark:text-ink">{r.score}<span className="text-sm text-neutral-500">/100</span></span>
         </div>
-        <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+        <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
           Skor ini hanya mengukur item teknis di daftar ini. SEO sesungguhnya ditentukan oleh isi
           yang benar-benar menjawab kebutuhan pembaca — skor 100 pada halaman yang isinya dangkal
           tidak akan menang di hasil pencarian.
@@ -157,7 +157,7 @@ function AbTab() {
             <span className="text-[12px] font-bold text-neutral-500">Butuh per kelompok</span>
             <span className="text-xl font-black text-ink dark:text-ink">{need.toLocaleString('en-GB')}</span>
           </div>
-          <p className="mt-1 text-[10px] leading-relaxed text-neutral-400">
+          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
             Pada kekuatan 80% dan tingkat signifikansi 5%. Tetapkan angka ini dulu, lalu jalankan
             sampai tercapai.
           </p>
@@ -194,7 +194,7 @@ function AbTab() {
           </div>
         )}
 
-        <p className="mt-3 text-[10px] leading-relaxed text-neutral-400">
+        <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">
           Selang kepercayaan lebih berguna daripada nilai p: ia memberi tahu seberapa besar
           perbedaannya, bukan sekadar apakah ada perbedaan. Selang yang melewati nol berarti arahnya
           pun belum pasti.
@@ -246,7 +246,7 @@ function SegmentTab() {
 
       {segs.length > 0 && (
         <Card className="!p-4">
-          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-400">Hasil segmentasi</div>
+          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Hasil segmentasi</div>
           <div className="mt-2 space-y-2">
             {segs.map((s) => (
               <div key={s.customer.id} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -254,7 +254,7 @@ function SegmentTab() {
                   <span className="text-[13px] font-bold text-ink dark:text-ink">{s.customer.name}</span>
                   <Badge tone={s.segment === 'Juara' ? 'normal' : s.segment === 'Hilang' ? 'critical' : s.segment === 'Berisiko pergi' ? 'high' : 'low'}>{s.segment}</Badge>
                 </div>
-                <div className="mt-0.5 text-[10px] text-neutral-400">
+                <div className="mt-0.5 text-[10px] text-neutral-500">
                   {s.customer.daysSinceLastUse} hari lalu · {s.customer.usesLast90Days}× dalam 90 hari
                 </div>
                 <p className="mt-1 text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">{s.action}</p>

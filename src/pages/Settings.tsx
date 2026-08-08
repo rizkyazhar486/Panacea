@@ -205,7 +205,7 @@ export function Settings() {
               <span className={S ? 'text-2xl' : 'text-xl'}>{l.flag}</span>
               <span className="min-w-0 flex-1">
                 <span className={`block truncate font-bold ${S ? 'text-base' : 'text-sm'}`}>{l.native}</span>
-                <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{l.en}</span>
+                <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{l.en}</span>
               </span>
               {lang === l.id && <IconCheck size={S ? 20 : 16} className="text-brand" />}
             </button>
@@ -249,9 +249,9 @@ export function Settings() {
             <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-12 w-12' : 'h-10 w-10'}`}><IconKey size={S ? 20 : 18} /></span>
             <span className="min-w-0 flex-1">
               <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{t('password', lang)}</span>
-              <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('passwordSub', lang)}</span>
+              <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('passwordSub', lang)}</span>
             </span>
-            <IconChevronRight size={18} className={`text-neutral-400 ${showPwd ? 'rotate-90' : ''}`} />
+            <IconChevronRight size={18} className={`text-neutral-500 ${showPwd ? 'rotate-90' : ''}`} />
           </button>
           {showPwd && <PasswordForm lang={lang} onDone={() => setShowPwd(false)} simple={S} />}
           <ToggleRow title={t('twoFactor', lang)} sub={t('twoFactorSub', lang)} on={s.twoFactor ?? false} onToggle={(v) => updateSettings({ twoFactor: v })} simple={S} />
@@ -278,14 +278,14 @@ export function Settings() {
           <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-14 w-14' : 'h-11 w-11'}`}><IconDownload size={S ? 22 : 20} /></span>
           <span className="min-w-0 flex-1">
             <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{t('exportData', lang)}</span>
-            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('exportSub', lang)}</span>
+            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('exportSub', lang)}</span>
           </span>
-          <IconChevronRight size={18} className="text-neutral-400" />
+          <IconChevronRight size={18} className="text-neutral-500" />
         </button>
         <div className={`mt-3 flex items-center justify-between gap-3 rounded-xl border border-neutral-200 ${S ? 'p-4' : 'p-3'}`}>
           <span className="min-w-0">
             <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Local Data</span>
-            <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>Delete data stored on this device</span>
+            <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Delete data stored on this device</span>
           </span>
           <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
@@ -294,7 +294,7 @@ export function Settings() {
       {/* App info */}
       <div className="pb-2 pt-2 text-center">
         <p className={`font-bold text-neutral-500 ${S ? 'text-base' : 'text-sm'}`}>Panaceamed.id · v2.4.0</p>
-        <p className={`uppercase tracking-widest text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('appInfo', lang)}</p>
+        <p className={`uppercase tracking-widest text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{t('appInfo', lang)}</p>
       </div>
     </div>
   )
@@ -373,7 +373,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           {busy ? 'Sending…' : appSent ? '✓ Sent to Owner' : '📩 Send to Owner (App)'}
         </button>
       )}
-      <p className="mt-2 text-[11px] text-neutral-400">Or send through another channel:</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Or send through another channel:</p>
       <div className="mt-1 flex gap-2">
         <a
           href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
@@ -391,10 +391,10 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           ✉️ Email
         </a>
       </div>
-      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-400">Write at least 5 characters.</p>}
+      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-500">Write at least 5 characters.</p>}
       {sent.length > 0 && (
         <details className="mt-3">
-          <summary className={`cursor-pointer font-semibold text-neutral-400 ${S ? 'text-sm' : 'text-xs'}`}>Sent history ({sent.length})</summary>
+          <summary className={`cursor-pointer font-semibold text-neutral-500 ${S ? 'text-sm' : 'text-xs'}`}>Sent history ({sent.length})</summary>
           <div className="mt-2 space-y-1.5">
             {sent.map((f, i) => (
               <div key={i} className="rounded-lg bg-neutral-50 px-3 py-2">
@@ -533,7 +533,7 @@ function ToggleRow({ title, sub, on, onToggle, simple: S }: { title: string; sub
     <button onClick={() => onToggle(!on)} className={`flex w-full items-center justify-between gap-3 bg-neutral-50 text-left ${S ? 'rounded-2xl p-4' : 'rounded-xl p-3'}`}>
       <span className="min-w-0">
         <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{title}</span>
-        <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
+        <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
       </span>
       <span className={`relative shrink-0 rounded-full ${S ? 'h-8 w-14' : 'h-6 w-11'} ${on ? 'bg-brand' : 'bg-neutral-300'}`}>
         <span className={`absolute top-0.5 rounded-full bg-white shadow ${S ? 'h-7 w-7' : 'h-5 w-5'} ${on ? (S ? 'left-[26px]' : 'left-[22px]') : 'left-0.5'}`} />
@@ -548,9 +548,9 @@ function LinkRow({ icon, title, sub, onClick, simple: S }: { icon: React.ReactNo
       <span className={`grid shrink-0 place-items-center rounded-full bg-brand-50 text-brand-dark ${S ? 'h-12 w-12' : 'h-10 w-10'}`}>{icon}</span>
       <span className="min-w-0 flex-1">
         <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>{title}</span>
-        <span className={`block text-neutral-400 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
+        <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>{sub}</span>
       </span>
-      <IconChevronRight size={18} className="text-neutral-400" />
+      <IconChevronRight size={18} className="text-neutral-500" />
     </button>
   )
 }

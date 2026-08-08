@@ -125,7 +125,7 @@ export function Notifications() {
               className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
                 saring === k
                   ? 'border-brand bg-brand-50 text-brand-dark'
-                  : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-400'
+                  : 'border-neutral-200 text-neutral-500 dark:border-white/10 dark:text-neutral-500'
               }`}
             >
               {l}
@@ -150,7 +150,7 @@ export function Notifications() {
           <button onClick={load} className="mt-3 rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white">Coba lagi</button>
         </Card>
       ) : memuat ? (
-        <Card><p className="text-sm text-neutral-400">Loading…</p></Card>
+        <Card><p className="text-sm text-neutral-500">Loading…</p></Card>
       ) : tersaring.length === 0 ? (
         <Card>
           <p className="text-sm text-neutral-500">
@@ -159,7 +159,7 @@ export function Notifications() {
                 : 'Belum ada pemberitahuan.'}
           </p>
           {saring === 'semua' && (
-            <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-400">
+            <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-500">
               Pengingat obat, jadwal konsultasi, pembaruan pembayaran, dan pesan baru akan muncul di sini.
             </p>
           )}
@@ -167,7 +167,7 @@ export function Notifications() {
       ) : (
         grup.map((g) => (
           <Card key={g.hari}>
-            <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-neutral-400">{g.hari}</div>
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-wide text-neutral-500">{g.hari}</div>
             <div className="space-y-2">
               {g.list.map((n) => {
                 const kat = kategori(n)
@@ -184,7 +184,7 @@ export function Notifications() {
                           {!n.read && <Badge tone="brand">Baru</Badge>}
                         </div>
                         <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{n.body}</p>
-                        <p className="mt-1.5 text-[11px] text-neutral-400">{kat.label} · {fullTime(n.at)}</p>
+                        <p className="mt-1.5 text-[11px] text-neutral-500">{kat.label} · {fullTime(n.at)}</p>
                         {n.url && (
                           <button
                             onClick={() => {

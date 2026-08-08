@@ -97,7 +97,7 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-[28px] font-black leading-none tabular-nums" style={{ color }}>{animated}</span>
-        <span className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.18em] text-neutral-400">{band}</span>
+        <span className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.18em] text-neutral-500">{band}</span>
       </div>
     </div>
   )
@@ -162,7 +162,7 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
       </div>
       <div className="text-center">
         <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
-        <span className="ml-1 text-xs text-neutral-400">kg/m²</span>
+        <span className="ml-1 text-xs text-neutral-500">kg/m²</span>
       </div>
       <div className="text-center">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -193,11 +193,11 @@ function VitalCard({ label, value, unit, series, tone }: { label: string; value:
         <div>
           <div className="flex items-center gap-1.5">
             <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: accent, boxShadow: `0 0 6px ${accent}66` }} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-400">{label}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">{label}</span>
           </div>
           <div className="mt-2.5 flex items-baseline gap-1">
             <span className="text-[26px] font-black leading-none tabular-nums" style={{ color: tone === 'high' ? '#FF3131' : '#171717' }}>{value}</span>
-            <span className="text-[10px] font-medium text-neutral-400">{unit}</span>
+            <span className="text-[10px] font-medium text-neutral-500">{unit}</span>
           </div>
         </div>
         <div className="mt-1 opacity-70 transition-opacity group-hover:opacity-100">
@@ -232,7 +232,7 @@ function SupportiveCard({ r }: { r: SupportiveResult }) {
           <Badge tone={(r.flag ?? 'normal') as any}>{flagLabel}</Badge>
           <span className="rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-500">{r.category}</span>
         </div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-400">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-neutral-500">
           <span className="font-bold" style={{ color: s.dot }}>{r.value} {r.unit}</span>
           <span>Reference: {r.reference || '—'}</span>
         </div>
@@ -468,13 +468,13 @@ export function Dashboard() {
                     <span>{ageFromDob(p.dob)} years old</span>
                     {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Type {p.bloodType}</span></>)}
                     <span className="text-neutral-200">·</span>
-                    <span className="font-mono text-xs text-neutral-400">{p.mrn}</span>
+                    <span className="font-mono text-xs text-neutral-500">{p.mrn}</span>
                   </p>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-1 sm:pb-1">
                 <LongevityRing score={longevity.score} band={longevity.band} />
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-400">Longevity Score</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
               </div>
             </div>
 
@@ -499,7 +499,7 @@ export function Dashboard() {
               )}
             </div>
 
-            <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-400">
+            <p className="mt-4 flex items-center gap-1.5 text-[10px] text-neutral-500">
               <IconShield size={11} className="text-[#00BF63]" /> Health data is confidential — only shared with the patient's consent.
             </p>
           </div>
@@ -535,7 +535,7 @@ export function Dashboard() {
         </div>
         {latest && (
           <div className="border-t border-neutral-50 px-5 py-2.5">
-            <p className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+            <p className="flex items-center gap-1.5 text-[11px] text-neutral-500">
               <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#00BF63] animate-pulse" />
               Last updated {fmt(latest.takenAt)}
             </p>
@@ -552,11 +552,11 @@ export function Dashboard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
               <span className="text-sm text-neutral-500">Height</span>
-              <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-400">cm</span></span>
+              <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-500">cm</span></span>
             </div>
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
               <span className="text-sm text-neutral-500">Weight</span>
-              <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-400">kg</span></span>
+              <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-500">kg</span></span>
             </div>
             <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
               <p className="text-[11px] leading-relaxed text-neutral-500">
@@ -599,7 +599,7 @@ export function Dashboard() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.03)' }}>
                 <IconShield size={22} className="text-neutral-300" />
               </div>
-              <p className="text-sm text-neutral-400">No supportive results yet.</p>
+              <p className="text-sm text-neutral-500">No supportive results yet.</p>
             </div>
           ) : (
             supportive.map((r) => <SupportiveCard key={r.id} r={r} />)

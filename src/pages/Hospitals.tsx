@@ -80,7 +80,7 @@ export function Hospitals() {
         </div>
 
         <div className="mt-3 flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2">
-          <IconSearch size={16} className="text-neutral-400" />
+          <IconSearch size={16} className="text-neutral-500" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name / service / city…" className="w-full bg-transparent text-sm outline-none" />
         </div>
         {/* Desktop: Button Group. Mobile: a button that opens a bottom sheet. */}
@@ -119,7 +119,7 @@ export function Hospitals() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {!loading && list.map((h) => <FacilityCard key={h.id} h={h} hasCoords={!!coords} />)}
-        {!loading && list.length === 0 && <Card className="text-center text-sm text-neutral-400">No matching facilities.</Card>}
+        {!loading && list.length === 0 && <Card className="text-center text-sm text-neutral-500">No matching facilities.</Card>}
       </div>
     </div>
   )
@@ -153,7 +153,7 @@ function FacilityCard({ h, hasCoords }: { h: NearbyFacility; hasCoords: boolean 
       )}
       <div className="mt-3 border-t border-neutral-100 pt-3 text-xs text-neutral-500">
         {h.rating > 0 && <span>★ {h.rating} · </span>}
-        {h.phone ? <span>{h.phone}</span> : <span className="text-neutral-400">Phone number not yet available on the map</span>}
+        {h.phone ? <span>{h.phone}</span> : <span className="text-neutral-500">Phone number not yet available on the map</span>}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {h.phone ? (

@@ -68,7 +68,7 @@ function RangeBar({ label, value, unit, lo, hi, max, danger }: {
       <div className="flex items-baseline justify-between">
         <span className="text-xs font-bold text-neutral-500">{label}</span>
         <span className={'text-lg font-extrabold ' + (inRange ? 'text-ink' : danger ? 'text-rose-500' : 'text-amber-600')}>
-          {Number.isFinite(value) ? value.toFixed(1) : '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-400">{unit}</span>
+          {Number.isFinite(value) ? value.toFixed(1) : '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-500">{unit}</span>
         </span>
       </div>
       <div className="relative mt-2 h-2.5 overflow-hidden rounded-full bg-neutral-100">
@@ -77,7 +77,7 @@ function RangeBar({ label, value, unit, lo, hi, max, danger }: {
         <div className="absolute top-1/2 h-4 w-0.5 -translate-y-1/2 bg-neutral-300" style={{ left: `${loP}%` }} />
         <div className="absolute top-1/2 h-4 w-0.5 -translate-y-1/2 bg-neutral-300" style={{ left: `${hiP}%` }} />
       </div>
-      <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Under</span><span>Normal</span><span>Over</span></div>
+      <div className="mt-1 flex justify-between text-[9px] text-neutral-500"><span>Under</span><span>Normal</span><span>Over</span></div>
     </div>
   )
 }
@@ -95,18 +95,18 @@ function BodyTypeGrid({ bmi, pbf, g }: { bmi: number; pbf: number; g: 'M' | 'F' 
   const label = CELLS[row][col]
   return (
     <div>
-      <div className="text-xs font-bold text-neutral-400">Body Type</div>
+      <div className="text-xs font-bold text-neutral-500">Body Type</div>
       <div className="text-2xl font-extrabold text-ink">{label}</div>
       <div className="mt-2 grid grid-cols-3 gap-1">
         {CELLS.flatMap((r, ri) => r.map((c, ci) => (
           <div key={`${ri}${ci}`}
-            className={'relative rounded-lg p-2 text-[9px] font-bold leading-tight ' + (ri === row && ci === col ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-400' : 'bg-neutral-50 text-neutral-400')}>
+            className={'relative rounded-lg p-2 text-[9px] font-bold leading-tight ' + (ri === row && ci === col ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-400' : 'bg-neutral-50 text-neutral-500')}>
             {c}
             {ri === row && ci === col && <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full bg-amber-500" />}
           </div>
         )))}
       </div>
-      <div className="mt-1 flex justify-between text-[9px] text-neutral-400"><span>Low PBF</span><span>Normal</span><span>High</span></div>
+      <div className="mt-1 flex justify-between text-[9px] text-neutral-500"><span>Low PBF</span><span>Normal</span><span>High</span></div>
     </div>
   )
 }
@@ -273,8 +273,8 @@ export function BodyComposition() {
       {/* Score + bento header */}
       <div className="grid grid-cols-2 gap-3">
         <Card className="!p-4 liquid-glass">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Composition Score</div>
-          <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-400"> /100</span></div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Composition Score</div>
+          <div className="text-4xl font-extrabold text-brand-dark">{d.score}<span className="text-sm font-medium text-neutral-500"> /100</span></div>
           <Badge tone={d.score >= 80 ? 'brand' : d.score >= 65 ? 'low' : 'critical'}>{d.score >= 80 ? 'Athletic' : d.score >= 65 ? 'Average' : 'Needs improvement'}</Badge>
         </Card>
         <Card className="!p-4 liquid-glass"><BodyTypeGrid bmi={d.bmi} pbf={d.pbf} g={b.g} /></Card>
@@ -321,7 +321,7 @@ export function BodyComposition() {
             </p>
           </div>
         )}
-        {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-400">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
+        {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-500">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
       </Card>
 
       {/* Longevity indicator bento */}
@@ -350,9 +350,9 @@ export function BodyComposition() {
             { t: 'Noise Environment', v: `${b.noiseDb}`, u: 'dB', tone: b.noiseDb <= 55 ? 'text-brand-dark' : 'text-rose-500', note: b.noiseDb <= 55 ? 'Safe' : '>55 dB chronic = stress/CVD risk' },
           ].map((x) => (
             <div key={x.t} className="liquid-glass rounded-xl p-3">
-              <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-400">{x.t}</div>
-              <div className={'text-xl font-extrabold ' + x.tone}>{x.v}<span className="text-[10px] font-medium text-neutral-400"> {x.u}</span></div>
-              <div className="text-[9px] text-neutral-400">{x.note}</div>
+              <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-500">{x.t}</div>
+              <div className={'text-xl font-extrabold ' + x.tone}>{x.v}<span className="text-[10px] font-medium text-neutral-500"> {x.u}</span></div>
+              <div className="text-[9px] text-neutral-500">{x.note}</div>
             </div>
           ))}
         </div>
@@ -379,7 +379,7 @@ export function BodyComposition() {
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-3 text-center text-[10px] text-neutral-400">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-3 text-center text-[10px] text-neutral-500">
         <IconMoon size={12} className="mr-1 inline" /> Estimates based on validated formulas (US Navy, Mifflin-St Jeor, Cooper) —
         not a substitute for clinical measurement. Data is stored on your device (offline-ready).
       </div>
@@ -461,7 +461,7 @@ function ScaleMeasurements() {
                 {r.nilai}{r.satuan ? ` ${r.satuan}` : ''}
               </span>
             </div>
-            <div className="text-[11px] text-neutral-400">{r.rujukan}</div>
+            <div className="text-[11px] text-neutral-500">{r.rujukan}</div>
             <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{r.arti}</p>
           </div>
         ))}

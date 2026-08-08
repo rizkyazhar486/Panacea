@@ -158,7 +158,7 @@ export function ResilienceStories() {
         <input className={`${inputClass} mt-3`} placeholder="Search a name, field, or struggle…" value={query} onChange={(e) => setQuery(e.target.value)} />
       </Card>
 
-      {filtered.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-400">No stories match "{query}".</Card>}
+      {filtered.length === 0 && <Card className="!p-5 text-center text-sm text-neutral-500">No stories match "{query}".</Card>}
 
       {filtered.map((s) => (
         <Card key={s.name} className="!p-5">
@@ -171,7 +171,7 @@ export function ResilienceStories() {
         </Card>
       ))}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Facts summarized from widely available public biographical record. Faith figures are described
         as their own tradition presents them, not as a claim between beliefs. This collection will grow
         over time — always with verifiable stories, never invented ones.

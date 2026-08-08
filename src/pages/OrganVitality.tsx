@@ -93,18 +93,18 @@ function MarkerBar({ m, v }: { m: Marker; v: number }) {
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-xs font-bold">{m.label}</span>
         <span className="text-sm font-extrabold" style={{ color: BAND_COLOR[band] }}>
-          {v || '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-400">{m.unit}</span>
+          {v || '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-500">{m.unit}</span>
         </span>
       </div>
       <div className="relative mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
         <div className="absolute inset-y-0 rounded-full bg-emerald-200" style={{ left: `${pct(m.lo)}%`, width: `${pct(m.hi) - pct(m.lo)}%` }} />
         {v > 0 && <div className="absolute top-1/2 h-3.5 w-1 -translate-y-1/2 rounded-full" style={{ left: `${pct(v)}%`, background: BAND_COLOR[band] }} />}
       </div>
-      <div className="mt-1 flex justify-between text-[9px] text-neutral-400">
+      <div className="mt-1 flex justify-between text-[9px] text-neutral-500">
         <span>Normal {m.lo}-{m.hi} {m.unit}</span>
         <span className="font-bold" style={{ color: BAND_COLOR[band] }}>{BAND_LABEL[band]}</span>
       </div>
-      {m.note && <div className="mt-0.5 text-[9px] text-neutral-400">{m.note}</div>}
+      {m.note && <div className="mt-0.5 text-[9px] text-neutral-500">{m.note}</div>}
     </div>
   )
 }
@@ -167,9 +167,9 @@ export function OrganVitality() {
         </div>
         {tab === 'organ' && filled.length > 0 && (
           <div className="mt-3 flex items-center justify-around rounded-2xl bg-neutral-50 p-3 text-center">
-            <div><div className="text-xl font-extrabold text-brand-dark">{filled.length}</div><div className="text-[9px] uppercase text-neutral-400">filled</div></div>
-            <div><div className="text-xl font-extrabold text-amber-600">{warn}</div><div className="text-[9px] uppercase text-neutral-400">borderline</div></div>
-            <div><div className="text-xl font-extrabold text-rose-500">{bad}</div><div className="text-[9px] uppercase text-neutral-400">needs attention</div></div>
+            <div><div className="text-xl font-extrabold text-brand-dark">{filled.length}</div><div className="text-[9px] uppercase text-neutral-500">filled</div></div>
+            <div><div className="text-xl font-extrabold text-amber-600">{warn}</div><div className="text-[9px] uppercase text-neutral-500">borderline</div></div>
+            <div><div className="text-xl font-extrabold text-rose-500">{bad}</div><div className="text-[9px] uppercase text-neutral-500">needs attention</div></div>
           </div>
         )}
       </Card>

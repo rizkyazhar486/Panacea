@@ -67,7 +67,7 @@ export function Logs() {
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">📊</span>
         <div>
           <h1 className="text-lg font-black text-ink">Logs & Stats</h1>
-          <p className="text-xs text-neutral-400">Your training intensity, communities, relationships & challenges</p>
+          <p className="text-xs text-neutral-500">Your training intensity, communities, relationships & challenges</p>
         </div>
       </div>
 
@@ -91,7 +91,7 @@ export function Logs() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        {logged.length === 0 && <p className="text-center text-[11px] text-neutral-400">No entries yet. Log your intensity below.</p>}
+        {logged.length === 0 && <p className="text-center text-[11px] text-neutral-500">No entries yet. Log your intensity below.</p>}
         {/* RPE logger */}
         <div className="space-y-2 border-t border-neutral-100 pt-3">
           <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export function Logs() {
             <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-ink" style={{ background: RPE_COLOR(rpe) }}>RPE {rpe}</span>
           </div>
           <input type="range" min={1} max={10} value={rpe} onChange={(e) => setRpe(+e.target.value)} className="w-full accent-[#00BF63]" />
-          <div className="flex justify-between text-[9px] text-neutral-400"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
+          <div className="flex justify-between text-[9px] text-neutral-500"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notes (optional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
           <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Log Today's Intensity</button>
         </div>
@@ -108,7 +108,7 @@ export function Logs() {
       {/* Calendar */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">📅 Training Calendar — {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
-        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-neutral-400">
+        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-neutral-500">
           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={i}>{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -119,11 +119,11 @@ export function Logs() {
             const active = activeDays.has(key)
             const isToday = day === today.getDate()
             return (
-              <div key={day} className={`grid aspect-square place-items-center rounded-lg text-[11px] font-semibold ${active ? 'bg-brand text-white' : 'bg-neutral-50 text-neutral-400'} ${isToday ? 'ring-2 ring-brand-dark' : ''}`}>{day}</div>
+              <div key={day} className={`grid aspect-square place-items-center rounded-lg text-[11px] font-semibold ${active ? 'bg-brand text-white' : 'bg-neutral-50 text-neutral-500'} ${isToday ? 'ring-2 ring-brand-dark' : ''}`}>{day}</div>
             )
           })}
         </div>
-        <p className="text-[10px] text-neutral-400">Green = training / check-in / GPS activity that day.</p>
+        <p className="text-[10px] text-neutral-500">Green = training / check-in / GPS activity that day.</p>
       </Card>
 
       {/* Current program */}
@@ -138,12 +138,12 @@ export function Logs() {
       {/* Communities */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">🏃 Communities Joined ({myCommunities.length})</div>
-        {myCommunities.length === 0 ? <p className="text-[11px] text-neutral-400">No communities joined yet. Open Community to join one.</p> : (
+        {myCommunities.length === 0 ? <p className="text-[11px] text-neutral-500">No communities joined yet. Open Community to join one.</p> : (
           <div className="space-y-1.5">
             {myCommunities.map((c) => (
               <div key={c.id} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[11px]">
                 <span><b className="text-ink">{c.name}</b> · <span className="text-brand-dark">{c.sportTag}</span></span>
-                <span className="text-neutral-400">{c.memberNames.length} member(s)</span>
+                <span className="text-neutral-500">{c.memberNames.length} member(s)</span>
               </div>
             ))}
           </div>
@@ -159,13 +159,13 @@ export function Logs() {
             <div className="mt-1 text-[11px]">Affinity score <b>{affinity}/100</b> · {streak}-day streak · {sharedCommunities.length} shared communities</div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/60"><div className="h-full rounded-full bg-pink-500" style={{ width: `${affinity}%` }} /></div>
           </div>
-        ) : <p className="text-[11px] text-neutral-400">No Health Buddy yet. Set one in Community to track affinity.</p>}
+        ) : <p className="text-[11px] text-neutral-500">No Health Buddy yet. Set one in Community to track affinity.</p>}
       </Card>
 
       {/* Circles */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">🫂 Circle of Care ({state.circles.length})</div>
-        {state.circles.length === 0 ? <p className="text-[11px] text-neutral-400">No circles yet.</p> : state.circles.map((c) => (
+        {state.circles.length === 0 ? <p className="text-[11px] text-neutral-500">No circles yet.</p> : state.circles.map((c) => (
           <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600"><b className="text-ink">{c.name}</b> — {c.memberNames.join(', ') || 'no members yet'}</div>
         ))}
       </Card>
@@ -173,7 +173,7 @@ export function Logs() {
       {/* Challenges */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">🏆 My Challenges ({state.challenges.length})</div>
-        {state.challenges.length === 0 ? <p className="text-[11px] text-neutral-400">No active challenges yet.</p> : state.challenges.map((c) => {
+        {state.challenges.length === 0 ? <p className="text-[11px] text-neutral-500">No active challenges yet.</p> : state.challenges.map((c) => {
           const me2 = c.participants.find((p) => p.email === account.email)
           const top = [...c.participants].sort((a, b) => b.progress - a.progress)[0]
           return (
@@ -188,7 +188,7 @@ export function Logs() {
       {/* Wall of gratitude */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">🙏 Wall of Gratitude ({state.gratitudes.length})</div>
-        {state.gratitudes.length === 0 ? <p className="text-[11px] text-neutral-400">No messages yet.</p> : state.gratitudes.slice(0, 8).map((g) => (
+        {state.gratitudes.length === 0 ? <p className="text-[11px] text-neutral-500">No messages yet.</p> : state.gratitudes.slice(0, 8).map((g) => (
           <div key={g.id} className="rounded-xl bg-amber-50 px-3 py-2 text-[11px] text-neutral-700"><b>{g.fromName}</b> → <b>{g.toName}</b>: "{g.text}"</div>
         ))}
       </Card>

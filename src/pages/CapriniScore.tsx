@@ -104,7 +104,7 @@ export function CapriniScore() {
 
       {GROUPS.map((g) => (
         <Card key={g.title} className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">{g.title}</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{g.title}</div>
           <div className="mt-3 space-y-2">
             {g.items.map((c) => (
               <label key={c.key} className="flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
@@ -118,16 +118,16 @@ export function CapriniScore() {
       ))}
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Total Caprini Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total Caprini Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{score}</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">{result.rec}</p>
+        <p className="mt-2 text-[12px] text-neutral-500">{result.rec}</p>
         <CopyNote text={`Caprini ${score} — ${result.label.toLowerCase()}: ${result.rec} [Caprini 2005]`} />
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Caprini, J.A. (2005). Thrombosis risk assessment as a guide to quality patient care.
         <i> Dis Mon</i>, 51(2-3), 70-78; validation: Bahl, V., et al. (2010), <i>Ann Surg</i>, 251(2),
         344-350. Decision-support estimate — always weigh individual bleeding risk before

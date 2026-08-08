@@ -106,10 +106,10 @@ export function RiskCalculators() {
             <div className="text-4xl font-black" style={{ color: cvd < 7.5 ? '#00BF63' : cvd < 20 ? '#f59e0b' : '#ef4444' }}>{cvd}%</div>
             <div>
               <Badge tone={cvdBand(cvd).tone}>{cvdBand(cvd).label}</Badge>
-              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-400">Estimated risk of a cardiovascular event in the next 10 years. &lt;7.5% low · 7.5–20% intermediate · ≥20% high.</p>
+              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-500">Estimated risk of a cardiovascular event in the next 10 years. &lt;7.5% low · 7.5–20% intermediate · ≥20% high.</p>
             </div>
           </div>
-        ) : <p className="mt-3 text-[12px] text-neutral-400">Enter total cholesterol, HDL, and systolic BP to calculate.</p>}
+        ) : <p className="mt-3 text-[12px] text-neutral-500">Enter total cholesterol, HDL, and systolic BP to calculate.</p>}
       </Card>
 
       {/* FIB-4 */}
@@ -125,10 +125,10 @@ export function RiskCalculators() {
             <div className="text-4xl font-black" style={{ color: fib4Band(fib, age).tone === 'brand' ? '#00BF63' : fib4Band(fib, age).tone === 'low' ? '#f59e0b' : '#ef4444' }}>{fib}</div>
             <div>
               <Badge tone={fib4Band(fib, age).tone}>{fib4Band(fib, age).label}</Badge>
-              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-400">{fib4Band(fib, age).note}</p>
+              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-500">{fib4Band(fib, age).note}</p>
             </div>
           </div>
-        ) : <p className="mt-3 text-[12px] text-neutral-400">Enter AST, ALT, and platelet count to calculate.</p>}
+        ) : <p className="mt-3 text-[12px] text-neutral-500">Enter AST, ALT, and platelet count to calculate.</p>}
       </Card>
 
       {/* OST */}
@@ -139,13 +139,13 @@ export function RiskCalculators() {
             <div className="text-4xl font-black" style={{ color: ostBand(ost).tone === 'brand' ? '#00BF63' : ostBand(ost).tone === 'low' ? '#f59e0b' : '#ef4444' }}>{ost}</div>
             <div>
               <Badge tone={ostBand(ost).tone}>{ostBand(ost).label}</Badge>
-              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-400">A simple screen (originally validated in postmenopausal women) — higher risk suggests discussing a bone-density (DEXA) scan.</p>
+              <p className="mt-1 text-[12px] text-neutral-500 dark:text-neutral-500">A simple screen (originally validated in postmenopausal women) — higher risk suggests discussing a bone-density (DEXA) scan.</p>
             </div>
           </div>
-        ) : <p className="mt-3 text-[12px] text-neutral-400">Enter age and weight above to calculate.</p>}
+        ) : <p className="mt-3 text-[12px] text-neutral-500">Enter age and weight above to calculate.</p>}
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Decision-support estimates using each score's published formula. Every tool has its own validated population, units, and caveats (e.g. Framingham is a US-cohort general estimate; region-specific tools may differ). Not a diagnosis — review results with the clinician who knows your full history.
       </div>
     </div>

@@ -126,13 +126,13 @@ function AgingFlowchart() {
     <Card className="!p-6 text-center">
       {result ? (
         <>
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Your answer</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Your answer</div>
           <p className="mt-2 text-[15px] font-bold leading-relaxed text-ink dark:text-ink">{result}</p>
           <button onClick={restart} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start over</button>
         </>
       ) : (
         <>
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">What's aging you?</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">What's aging you?</div>
           <p className="mt-2 text-[15px] font-bold text-ink dark:text-ink">{node!.q}</p>
           <div className="mt-4 flex gap-2">
             <button onClick={() => answer(true)} className="flex-1 rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Yes</button>
@@ -199,7 +199,7 @@ export function SelfAssessmentToolkit() {
       {tab === 'aging-factor' && <AgingFlowchart />}
       {tab === 'waist-height' && <WaistHeightRatio />}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Educational self-assessments based on general research patterns — none of these are diagnostic
         lab tests. See a clinician for actual bloodwork, telomere testing, or inflammatory markers.
       </div>

@@ -174,7 +174,7 @@ export function HealthSyncTutorial() {
 
         {diag && (
           <>
-            <div className="mt-2 text-[11px] text-neutral-400">
+            <div className="mt-2 text-[11px] text-neutral-500">
               {diag.deliveries} kiriman tercatat
               {diag.lastAt ? ` · terakhir ${new Date(diag.lastAt).toLocaleString('en-GB')}` : ''}
             </div>
@@ -257,7 +257,7 @@ export function HealthSyncTutorial() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
+        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
           After changing them, press Export once manually, then open{' '}
           <Link to="/log-detak-jantung" className="font-bold text-brand-dark underline">Heart Rate Log</Link>.
           That page measures the real spacing between your samples and states it, so you can confirm the change
@@ -299,7 +299,7 @@ export function HealthSyncTutorial() {
               <summary className="cursor-pointer list-none text-sm font-bold text-ink marker:content-none">
                 <span className="flex items-center justify-between gap-2">
                   {f.q}
-                  <IconChevronRight size={16} className="shrink-0 text-neutral-400 transition group-open:rotate-90" />
+                  <IconChevronRight size={16} className="shrink-0 text-neutral-500 transition group-open:rotate-90" />
                 </span>
               </summary>
               <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">{f.a}</p>

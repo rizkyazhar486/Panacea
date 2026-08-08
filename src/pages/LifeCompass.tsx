@@ -67,7 +67,7 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 1 — Your core values (pick up to 5)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 1 — Your core values (pick up to 5)</div>
         <p className="mt-1 text-[12px] text-neutral-500">Not what you think you <i>should</i> value — what actually feels non-negotiable to you.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {VALUE_OPTIONS.map((v) => (
@@ -77,20 +77,20 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 2 — Your vision (10-20 years from now)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 2 — Your vision (10-20 years from now)</div>
         <p className="mt-1 text-[12px] text-neutral-500">If things went as well as they realistically could, what would your life look like?</p>
         <textarea className={`${inputClass} mt-2 min-h-[80px] resize-none`} placeholder="e.g. I want to be a doctor known for..." value={s.vision} onChange={(e) => setS((x) => ({ ...x, vision: e.target.value }))} />
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 3 — Your mission (what you do, and for whom)</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 3 — Your mission (what you do, and for whom)</div>
         <p className="mt-1 text-[12px] text-neutral-500">One or two sentences: what you do, who it's for, why it matters.</p>
         <textarea className={`${inputClass} mt-2 min-h-[70px] resize-none`} placeholder="e.g. I help my patients understand their health clearly enough to take charge of it." value={s.mission} onChange={(e) => setS((x) => ({ ...x, mission: e.target.value }))} />
       </Card>
 
       <Card className="!p-5">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Step 4 — One goal + one next step, per life domain</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 4 — One goal + one next step, per life domain</div>
           <Badge tone={filledGoals > 0 ? 'brand' : 'low'}>{filledGoals}/{DOMAINS.length} started</Badge>
         </div>
         <div className="mt-3 space-y-4">
@@ -105,7 +105,7 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">When you're worried about the future</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">When you're worried about the future</div>
         <p className="mt-1 text-[12px] text-neutral-500">
           Different traditions frame this differently — shown side by side, not to tell you which to
           believe, but so you can draw from whichever speaks to you.
@@ -120,7 +120,7 @@ export function LifeCompass() {
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Frameworks: Schwartz values theory; Gollwitzer's implementation-intention research
         (meta-analytic effect on goal follow-through, Gollwitzer &amp; Sheeran, 2006); Tedeschi &amp;
         Calhoun's post-traumatic growth model. Wisdom-tradition summaries are necessarily brief —

@@ -100,7 +100,7 @@ export function HealthAlertSettings() {
         icon={<IconBell />}
         title="Pengingat terhubung perangkat"
         subtitle="Turn on what you need — each has its own settings"
-        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-400">menyimpan…</span>
+        right={simpan === 'saving' ? <span className="text-[11px] text-neutral-500">menyimpan…</span>
           : simpan === 'saved' ? <span className="text-[11px] font-bold text-brand-dark">tersimpan ✓</span> : undefined}
       />
 
@@ -130,7 +130,7 @@ export function HealthAlertSettings() {
       {gagal && (
         <p className="mt-3 text-sm text-rose-600">Could not load settings. <button onClick={load} className="underline">Coba lagi</button></p>
       )}
-      {memuat && <p className="mt-3 text-sm text-neutral-400">Loading…</p>}
+      {memuat && <p className="mt-3 text-sm text-neutral-500">Loading…</p>}
 
       {!memuat && (
         <div className="mt-3 space-y-3">
@@ -145,7 +145,7 @@ export function HealthAlertSettings() {
             />
             {zoneOn && (
               <div className="mt-3">
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Alert from zone</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Alert from zone</div>
                 <div className="mt-1.5 space-y-1.5">
                   {ZONA.map((z) => {
                     const dipilih = (prefs.hrZoneThreshold ?? 4) === z.z

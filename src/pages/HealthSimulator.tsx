@@ -137,9 +137,9 @@ export function HealthSimulator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Try changing your future</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Try changing your future</div>
         <div className="mt-3 space-y-2">
-          {applicable.length === 0 && <p className="text-[12px] text-neutral-400">Your current profile has no modifiable levers in this model — great baseline.</p>}
+          {applicable.length === 0 && <p className="text-[12px] text-neutral-500">Your current profile has no modifiable levers in this model — great baseline.</p>}
           {applicable.map((l) => (
             <label key={l.id} className="flex items-start gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded" checked={!!active[l.id]} onChange={() => setActive((a) => ({ ...a, [l.id]: !a[l.id] }))} />
@@ -153,17 +153,17 @@ export function HealthSimulator() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">10-year cardiovascular risk</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">10-year cardiovascular risk</div>
         {valid ? (
           <>
             <div className="mt-2 grid grid-cols-2 gap-4">
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">Now</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Now</div>
                 <div className="mt-1 text-3xl font-black text-ink dark:text-ink">{baseRisk!.toFixed(1)}%</div>
                 <Badge tone={cvdBand(baseRisk!).tone}>{cvdBand(baseRisk!).label}</Badge>
               </div>
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-400">If you make these changes</div>
+                <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">If you make these changes</div>
                 <div className="mt-1 text-3xl font-black text-brand-dark">{simRisk!.toFixed(1)}%</div>
                 <Badge tone={cvdBand(simRisk!).tone}>{cvdBand(simRisk!).label}</Badge>
               </div>
@@ -173,18 +173,18 @@ export function HealthSimulator() {
                 ↓ {Math.abs(delta).toFixed(1)} percentage points lower — a {relReduction.toFixed(0)}% relative reduction in 10-year risk.
               </p>
             ) : (
-              <p className="mt-3 text-[12px] text-neutral-400">Toggle the levers above to see your risk change.</p>
+              <p className="mt-3 text-[12px] text-neutral-500">Toggle the levers above to see your risk change.</p>
             )}
             <CopyNote text={`Framingham 10-yr CVD risk ${baseRisk!.toFixed(1)}% → ${simRisk!.toFixed(1)}% with modifiable changes (${relReduction.toFixed(0)}% relative reduction) [D'Agostino 2008]`} />
           </>
         ) : (
-          <p className="mt-2 text-[12px] text-neutral-400">Enter valid cholesterol, HDL, and blood-pressure values to simulate.</p>
+          <p className="mt-2 text-[12px] text-neutral-500">Enter valid cholesterol, HDL, and blood-pressure values to simulate.</p>
         )}
       </Card>
 
       {timeline.length >= 2 && (
         <Card className="!p-5">
-          <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Life Timeline — 10-year risk at each future age</div>
+          <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Life Timeline — 10-year risk at each future age</div>
           <p className="mt-1 text-[12px] text-neutral-500">
             Your risk projected forward with today's numbers held constant. The gap between the two
             lines is the future you're buying with today's choices.
@@ -204,7 +204,7 @@ export function HealthSimulator() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-2 text-[11px] text-neutral-400">
+          <p className="mt-2 text-[11px] text-neutral-500">
             Projection uses the Framingham equation at each age with your current biomarkers held
             constant (the model is validated for ages 30-74). It isolates the interventions' effect —
             real labs and blood pressure also drift with age, so treat this as direction, not destiny.
@@ -212,7 +212,7 @@ export function HealthSimulator() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         D'Agostino, R.B., et al. (2008). General cardiovascular risk profile for use in primary care:
         the Framingham Heart Study. <i>Circulation</i>, 117(6), 743-753. This simulates the risk-model
         response to modifiable factors — it is decision support to motivate change, not a promise of

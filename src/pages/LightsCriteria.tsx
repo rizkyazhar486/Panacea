@@ -63,7 +63,7 @@ export function LightsCriteria() {
             <div key={c.label} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
               <div>
                 <div className="text-sm font-bold text-ink dark:text-ink">{c.label}</div>
-                <div className="text-[11px] text-neutral-400">Value: {c.value}</div>
+                <div className="text-[11px] text-neutral-500">Value: {c.value}</div>
               </div>
               <Badge tone={c.met ? 'critical' : 'brand'}>{c.met ? 'Met' : 'Not met'}</Badge>
             </div>
@@ -72,18 +72,18 @@ export function LightsCriteria() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Classification</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Classification</div>
         <div className="mt-2 flex items-center gap-3">
           <Badge tone={exudate ? 'critical' : 'brand'}>{exudate ? 'Exudate' : 'Transudate'}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">
+        <p className="mt-2 text-[12px] text-neutral-500">
           {exudate
             ? 'Exudative effusions warrant further workup for local causes (infection, malignancy, inflammation) — consider cytology, culture, pH, glucose, and adenosine deaminase as indicated.'
             : 'Transudative effusions are typically due to a systemic process (heart failure, cirrhosis, nephrotic syndrome) and rarely need further fluid analysis beyond addressing the underlying condition.'}
         </p>
       </Card>
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Light, R.W., et al. (1972). Pleural effusions: the diagnostic separation of transudates and
         exudates. <i>Ann Intern Med</i>, 77(4), 507-513. Decision-support estimate — correlate with
         clinical context, imaging, and further fluid analysis as indicated.

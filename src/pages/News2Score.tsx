@@ -133,7 +133,7 @@ export function News2Score() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Per-parameter breakdown</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Per-parameter breakdown</div>
         <div className="mt-3 space-y-2">
           {rows.map((r) => (
             <div key={r.name} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
@@ -145,12 +145,12 @@ export function News2Score() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Total NEWS2 Score</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Total NEWS2 Score</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{total}</span>
           <Badge tone={result.tone}>{result.label}</Badge>
         </div>
-        <p className="mt-2 text-[12px] text-neutral-400">{result.action}</p>
+        <p className="mt-2 text-[12px] text-neutral-500">{result.action}</p>
         <CopyNote text={`NEWS2 ${total} (RR ${rr}, SpO2 ${spo2}%${onOxygen ? ' on supplemental O2' : ' on air'}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'AVPU<A'}, T ${temp.toFixed(1)}°C) — ${result.label.toLowerCase()}: ${result.action} [RCP 2017]`} />
       </Card>
 
@@ -162,7 +162,7 @@ export function News2Score() {
         detail={`RR ${rr}, SpO₂ ${spo2}%${onOxygen ? ' on O₂' : ''}, SBP ${sbp}, HR ${hr}, ${alert ? 'alert' : 'not alert'}, T ${temp.toFixed(1)}°C`}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Royal College of Physicians (2017). National Early Warning Score (NEWS) 2. Decision-support
         estimate — uses SpO₂ Scale 1 (not the alternate Scale 2 for hypercapnic respiratory failure);
         always follow your institution's escalation protocol.

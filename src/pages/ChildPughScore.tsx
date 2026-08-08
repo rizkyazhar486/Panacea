@@ -94,7 +94,7 @@ export function ChildPughScore() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-400">Child-Pugh Class</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Child-Pugh Class</div>
         <div className="mt-2 flex items-center gap-3">
           <span className="text-3xl font-black text-brand-dark">{pts} pts</span>
           <Badge tone={cls.tone}>{cls.label}</Badge>
@@ -111,7 +111,7 @@ export function ChildPughScore() {
         detail={`Bili ${bilirubin}, Alb ${albumin}, INR ${inr}, ascites ${ascites}pt, enceph ${enceph}pt`}
       />
 
-      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-400 dark:border-white/10 dark:bg-white/5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Pugh, R.N.H., et al. (1973). Transection of the oesophagus for bleeding oesophageal varices.
         <i> Br J Surg</i>, 60(8), 643-649. Decision-support estimate — verify classification against
         the primary literature for surgical or transplant decisions.

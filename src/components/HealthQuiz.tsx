@@ -103,7 +103,7 @@ export function HealthQuiz() {
             const isPicked = selected === i
             const tone = selected === null ? 'bg-neutral-50 text-neutral-700 hover:bg-neutral-100'
               : isAnswer ? 'bg-brand/15 text-brand-dark font-bold'
-              : isPicked ? 'bg-rose-50 text-rose-600' : 'bg-neutral-50 text-neutral-400'
+              : isPicked ? 'bg-rose-50 text-rose-600' : 'bg-neutral-50 text-neutral-500'
             return (
               <button key={i} onClick={() => answer(i)} disabled={selected !== null}
                 className={`block w-full rounded-xl px-3 py-2 text-left text-xs transition disabled:cursor-default ${tone}`}>

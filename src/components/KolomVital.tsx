@@ -133,7 +133,7 @@ export function KolomVital({
         {tersimpan && <span className="shrink-0 text-[11px] font-bold text-emerald-600" role="status">tersimpan</span>}
       </div>
       {belumDisimpan && (
-        <span className="mt-1 block text-[10px] text-neutral-400">
+        <span className="mt-1 block text-[10px] text-neutral-500">
           Tekan Enter untuk memakai angka ini di semua halaman.
         </span>
       )}

@@ -192,7 +192,7 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
       <div className="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-3xl bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-black text-ink">Share Activity</h3>
-          <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-400 hover:bg-neutral-100"><IconX size={18} /></button>
+          <button onClick={onClose} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
         </div>
         <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ aspectRatio: '1080/1350' }} />
         {posted && <p className="mt-2 text-center text-xs font-bold text-brand-dark">{posted}</p>}
@@ -203,7 +203,7 @@ export function ActivityShareCard({ data, onClose }: { data: ActivityShareData; 
             <button onClick={() => publishInApp('post')} disabled={busy} className="flex-1 rounded-full bg-ink py-2.5 text-xs font-bold text-white disabled:opacity-50">📣 Post to Panaceamed</button>
           </div>
         )}
-        <button onClick={handleDownload} disabled={busy} className="mt-2 w-full rounded-full py-2 text-xs font-bold text-neutral-400 hover:text-neutral-600 disabled:opacity-50">Download image</button>
+        <button onClick={handleDownload} disabled={busy} className="mt-2 w-full rounded-full py-2 text-xs font-bold text-neutral-500 hover:text-neutral-600 disabled:opacity-50">Download image</button>
       </div>
     </div>
     </Portal>
