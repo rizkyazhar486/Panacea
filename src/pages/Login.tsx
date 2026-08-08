@@ -228,9 +228,6 @@ export function Login({ onBack }: { onBack?: () => void }) {
             <EmailOtpLogin role={role} consentOk={consentOk} name={f.name} str={f.str}
               email={f.email} setEmail={v => setF(p => ({ ...p, email: v }))} onLogin={finish} />
           )}
-          {health?.features.otp && (
-            <PhoneLogin role={role} consentOk={consentOk} name={f.name} str={f.str} onLogin={finish} />
-          )}
 
           {/* ── Consent ────────────────────────── */}
           <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
@@ -386,58 +383,6 @@ function EmailOtpLogin({ role, name, str, email, setEmail, consentOk, onLogin }:
           type="email" placeholder="email@you.com" disabled={sent} />
         {!sent
           ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send Code'}</Button>
-          : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
-      </div>
-      {sent && (
-        <div className="mt-2 flex gap-2">
-          <input className={inputClass} value={code} onChange={e => setCode(e.target.value)}
-            inputMode="numeric" placeholder="6-digit code" />
-          <Button onClick={verify} disabled={busy} className="shrink-0">{busy ? '…' : 'Verify'}</Button>
-        </div>
-      )}
-      {msg && <p className="mt-1.5 text-[11px] font-semibold text-brand-dark">{msg}</p>}
-    </div>
-  )
-}
-
-/* ── Phone OTP ───────────────────────────────────────────── */
-
-function PhoneLogin({ role, name, str, consentOk, onLogin }: {
-  role: Role; name: string; str: string; consentOk: () => boolean; onLogin: (a: Account) => void
-}) {
-  const [phone, setPhone] = useState('')
-  const [code, setCode] = useState('')
-  const [sent, setSent] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  async function start() {
-    if (!consentOk()) return
-    if (!phone.trim()) { setMsg('Enter your phone number.'); return }
-    setBusy(true); setMsg('')
-    try { await api.otpStart(phone.trim()); setSent(true); setMsg('OTP code sent via SMS.') }
-    catch { setMsg('Failed to send OTP.') } finally { setBusy(false) }
-  }
-
-  async function verify() {
-    if (!code.trim()) { setMsg('Enter the OTP code.'); return }
-    setBusy(true); setMsg('')
-    try {
-      const a = await api.otpVerify(phone.trim(), code.trim(), name.trim() || 'Panaceamed User', role)
-      onLogin({ ...a, isOwner: a.email.toLowerCase() === OWNER_EMAIL, isSubscriber: role === 'owner', sex: 'L',
-        str: STR_ROLES.includes(role) ? str.trim() : undefined,
-        strStatus: STR_ROLES.includes(role) ? 'pending' : 'none', consentAt: new Date().toISOString() })
-    } catch { setMsg('Incorrect or expired OTP code.') } finally { setBusy(false) }
-  }
-
-  return (
-    <div className="rounded-2xl border border-brand/20 bg-brand-50/50 p-3">
-      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-dark">📱 Quick sign-in with Phone No. (SMS OTP)</div>
-      <div className="flex gap-2">
-        <input className={inputClass} value={phone} onChange={e => setPhone(e.target.value)}
-          inputMode="tel" placeholder="08xxxxxxxxxx" disabled={sent} />
-        {!sent
-          ? <Button onClick={start} disabled={busy} className="shrink-0">{busy ? '…' : 'Send OTP'}</Button>
           : <button onClick={() => { setSent(false); setCode(''); setMsg('') }} className="shrink-0 px-2 text-xs font-semibold text-neutral-500">Change</button>}
       </div>
       {sent && (

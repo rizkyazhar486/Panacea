@@ -1,7 +1,7 @@
 // Minimal file-backed persistence (no native deps). For production swap for a
 // real database (Postgres/SQLite). Suitable for the demo backend.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
-import { isiConnect, muatConnect } from './connect.js'
+import { isiConnect, muatConnect, pasangPenyimpan } from './connect.js'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { randomBytes } from 'node:crypto'
@@ -317,6 +317,13 @@ function save() {
 
 // Call once at boot before serving requests.
 export async function initStore() {
+  // Connect menyunting keadaannya sendiri di memori dan tidak boleh mengimpor
+  // modul ini (store sudah mengimpor Connect, jadi arah sebaliknya melingkar).
+  // Fungsi simpan dititipkan ke sana supaya setiap perubahan di Connect —
+  // pengajuan verifikasi, radius, blokir, laporan, penghapusan terjadwal —
+  // benar-benar sampai ke penyimpanan, bukan hanya yang kebetulan juga
+  // menulis catatan audit.
+  pasangPenyimpan(save)
   const uri = process.env.MONGODB_URI
   if (!uri) {
     loadFile()

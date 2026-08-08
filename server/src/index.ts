@@ -104,7 +104,7 @@ import {
   diagnoseSync,
 } from './store.js'
 import { googleLogin, devLogin, currentUser, clearSession, requireAuth } from './auth.js'
-import { otpStart, otpVerify, otpLive, emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
+import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
 import { sendPush, notify } from './push.js'
@@ -192,7 +192,7 @@ app.use(['/api/auth', '/api/login', '/api/dev-login'], authLimiter)
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
-    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otp: otpLive, otpEmail: emailOtpLive },
+    features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     aiConsultPnc: config.aiConsultPnc,
@@ -232,8 +232,6 @@ app.post('/api/clinical-calculators/unlock-pnc', requireAuth, (req, res) => {
 // --- auth ---
 app.post('/api/auth/google', googleLogin)
 app.post('/api/auth/dev-login', devLogin)
-app.post('/api/auth/otp/start', otpStart)
-app.post('/api/auth/otp/verify', otpVerify)
 app.post('/api/auth/otp/email/start', emailOtpStart)
 app.post('/api/auth/otp/email/verify', emailOtpVerify)
 app.get('/api/auth/me', (req, res) => {
@@ -1539,5 +1537,4 @@ server.listen(config.port, () => {
   console.log(`  Google login: ${features.googleLive ? 'LIVE' : 'mock (dev-login)'}`)
   console.log(`  Payments:     ${features.paymentsLive ? 'LIVE (Midtrans)' : 'mock'}`)
   console.log(`  Payout (Iris):${irisLive ? ' LIVE' : ' off (set IRIS_API_KEY for auto-disbursement)'}`)
-  console.log(`  OTP SMS:      ${otpLive ? 'LIVE (Twilio Verify)' : 'off (set TWILIO_ACCOUNT_SID/AUTH_TOKEN/VERIFY_SERVICE_SID)'}`)
 })

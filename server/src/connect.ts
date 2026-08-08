@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 import type { Role } from './store.js'
 import { kotaDariTeks, jarakKm } from './kota.js'
-import { normalizePhone } from './otp.js'
+import { normalizePhone } from './telepon.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Connect — verifikasi, kredit kepercayaan, pelaporan dan pemblokiran.
@@ -142,6 +142,33 @@ export function muatConnect(data: Partial<DbConnect> | undefined) {
 }
 export function isiConnect(): DbConnect { return db }
 
+// ── Penyimpanan ─────────────────────────────────────────────────────────────
+//
+// Modul ini menyunting keadaannya di memori. Menuliskannya ke penyimpanan
+// permanen adalah urusan store utama, jadi store menitipkan fungsi simpannya
+// ke sini saat boot dan modul ini memanggilnya setiap kali ada yang berubah.
+//
+// TANPA INI ADA CACAT YANG TIDAK BERBUNYI, dan itulah sebabnya ia dibuat.
+// Sebelumnya hanya jalur yang kebetulan juga menulis catatan audit yang
+// tersimpan; pengajuan verifikasi, radius, pemblokiran, pelaporan, dan
+// penghapusan akun terjadwal tidak. Semuanya berhasil di layar, bertahan
+// selama server hidup, lalu lenyap saat server dinyalakan ulang — dan yang
+// paling berbahaya di antaranya adalah PEMBLOKIRAN, karena orang yang sudah
+// diblokir akan muncul kembali di dek tanpa siapa pun diberi tahu.
+//
+// Arah ketergantungan sengaja dibalik lewat titipan fungsi: store sudah
+// mengimpor modul ini, jadi modul ini tidak boleh mengimpor store.
+type Penyimpan = () => void
+let simpanKeluar: Penyimpan | null = null
+
+/** Dipanggil store utama sekali saat boot. */
+export function pasangPenyimpan(fn: Penyimpan): void { simpanKeluar = fn }
+
+/** Tandai keadaan berubah. Aman dipanggil sebelum store siap. */
+function ubah(): void {
+  try { simpanKeluar?.() } catch { /* penyimpanan gagal tidak boleh membatalkan aksi pengguna */ }
+}
+
 function uid(): string { return randomBytes(9).toString('hex') }
 
 /** Sidik nomor telepon. Tidak dapat dikembalikan; hanya mendeteksi akun ganda. */
@@ -245,6 +272,7 @@ export function tarikPersetujuan(email: string): HasilAjuan {
   delete a.teleponPada
   a.status = 'belum'
   a.alasanTolak = undefined
+  ubah()
   return { ok: true }
 }
 
@@ -324,6 +352,7 @@ export function ikatTelepon(email: string, telepon: string): HasilAjuan {
   a.teleponSidik = sidik
   a.teleponAkhir = bersih.slice(-4)
   a.teleponPada = new Date().toISOString()
+  ubah()
   return { ok: true }
 }
 
@@ -434,6 +463,7 @@ export function ajukanVerifikasi(
   catatPersetujuan(email, TUJUAN_WAJIB)
   a.status = 'menunggu'
   a.alasanTolak = undefined
+  ubah()
   return { ok: true }
 }
 
@@ -454,6 +484,7 @@ export function putuskanVerifikasi(email: string, setuju: boolean, alasan?: stri
   // lebih lama (UU PDP Pasal 43). Ini berlaku baik untuk yang disetujui maupun
   // yang ditolak — penolakan bukan alasan menyimpan wajah orang.
   if (a.data) a.data.selfieUrl = ''
+  ubah()
   return { ok: true }
 }
 
@@ -472,6 +503,7 @@ export function kurangiKredit(email: string, poin: number, alasan: string, olehE
   if (a.kredit < KREDIT_HAPUS && !a.hapusPada) {
     a.hapusPada = new Date(Date.now() + 7 * 86400_000).toISOString()
   }
+  ubah()
   return { kredit: a.kredit, bahaya: a.kredit <= KREDIT_BAHAYA, dijadwalkanHapus: !!a.hapusPada }
 }
 
@@ -480,6 +512,7 @@ export function pulihkanKredit(email: string, poin: number): HasilKredit {
   const a = akunConnect(email)
   a.kredit = Math.min(KREDIT_AWAL, a.kredit + Math.max(0, Math.round(poin)))
   if (a.kredit >= KREDIT_HAPUS) a.hapusPada = undefined
+  ubah()
   return { kredit: a.kredit, bahaya: a.kredit <= KREDIT_BAHAYA, dijadwalkanHapus: !!a.hapusPada }
 }
 
@@ -496,6 +529,7 @@ export function laporkan(pelaporEmail: string, terlaporEmail: string, alasan: st
     pelaporEmail, terlaporEmail, alasan: alasan.trim(), catatan: catatan?.trim() || undefined,
     status: 'menunggu',
   })
+  ubah()
   return { ok: true }
 }
 
@@ -511,6 +545,7 @@ export function putuskanLaporan(id: string, poin: number, olehEmail: string, cat
   l.status = p > 0 ? 'ditindak' : 'ditolak'
   l.putusan = { pada: new Date().toISOString(), poin: p, catatan: catatan?.trim() || undefined }
   if (p > 0) kurangiKredit(l.terlaporEmail, p, `Laporan: ${l.alasan}`, olehEmail)
+  ubah()
   return { ok: true }
 }
 
@@ -527,12 +562,14 @@ export function blokir(email: string, targetEmail: string): HasilAjuan {
   if (email === targetEmail) return { ok: false, galat: 'tidak_bisa_blokir_diri' }
   const a = akunConnect(email)
   if (!a.diblokir.includes(targetEmail)) a.diblokir.push(targetEmail)
+  ubah()
   return { ok: true }
 }
 
 export function bukaBlokir(email: string, targetEmail: string): HasilAjuan {
   const a = akunConnect(email)
   a.diblokir = a.diblokir.filter((x) => x !== targetEmail)
+  ubah()
   return { ok: true }
 }
 
@@ -548,6 +585,7 @@ export function terblokir(a: string, b: string): boolean {
 export function setelRadius(email: string, km: number): number {
   const a = akunConnect(email)
   a.radiusKm = Math.max(1, Math.min(500, Math.round(km)))
+  ubah()
   return a.radiusKm
 }
 
@@ -683,6 +721,7 @@ export function jatuhTempoHapus(sekarang = Date.now()): string[] {
 export function hapusAkunConnect(email: string) {
   delete db.akun[email]
   db.laporan = db.laporan.filter((l) => l.terlaporEmail !== email && l.pelaporEmail !== email)
+  ubah()
 }
 
 export function bolehDilihat(pelihatEmail: string, targetEmail: string): boolean {

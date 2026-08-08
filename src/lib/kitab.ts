@@ -94,20 +94,22 @@ export interface PenyediaQuran extends Sumber {
   syarat: string
 }
 
-export const SUMBER: Record<Tradisi, Sumber> = {
-  quran: {
-    id: 'alquran-cloud',
-    nama: 'Al-Qur’an',
-    penerbit: 'AlQuran Cloud API — teks Utsmani dari proyek Tanzil',
-    situs: 'https://alquran.cloud',
-    basis: 'https://api.alquran.cloud/v1',
-    catatan: 'Teks Arab, terjemahan, dan tafsir diambil langsung dari penyedia. Aplikasi ini tidak menulis ulang satu huruf pun.',
-    provenansi: {
-      acuan: 'Mushaf Madinah, riwayat Hafs dari ‘Ashim — cetakan Mujamma‘ al-Malik Fahd (King Fahd Glorious Qur’an Printing Complex).',
-      rantai: 'Penyedia menyajikan teks Utsmani yang berasal dari proyek Tanzil, yang teksnya disusun dan diperiksa terhadap mushaf cetakan Mujamma‘ al-Malik Fahd. Aplikasi ini tidak menambah lapisan penyuntingan apa pun di atasnya.',
-      caraPeriksa: 'Buka mushaf cetak di tangan Anda pada surah dan ayat yang sama, lalu bandingkan huruf per huruf. Bila ada satu perbedaan saja, hentikan pemakaian dan laporkan — jangan diperbaiki sendiri di aplikasi.',
-    },
-  },
+/**
+ * Sumber untuk kitab yang dilayani SATU penyedia tetap.
+ *
+ * AL-QUR'AN SENGAJA TIDAK ADA DI SINI. Ia dilayani rantai penyedia (lihat
+ * PENYEDIA di bawah), dan yang benar-benar menjawab bisa berbeda dari yang
+ * pertama dalam daftar. Menyimpan keterangan sumbernya di dua tempat berarti
+ * suatu hari layar akan menyebut penyedia A sementara teksnya datang dari
+ * penyedia B — salah atribusi pada teks kitab suci, dan tidak ada yang akan
+ * menyadarinya karena keduanya sama-sama terlihat masuk akal. Karena itu
+ * keterangan sumber Al-Qur'an hanya hidup di satu tempat: pada penyedia yang
+ * benar-benar melayaninya, dibaca lewat penyediaSekarang().
+ *
+ * Weda, kanon Pali, dan kitab Konfusius juga tidak ada di sini karena teksnya
+ * memang tidak dimuat — yang ada hanya pengantar, lihat PENGANTAR.
+ */
+export const SUMBER: Record<'bible' | 'tanakh', Sumber> = {
   bible: {
     id: 'bible-api',
     nama: 'Alkitab (Perjanjian Lama & Baru)',
@@ -123,18 +125,6 @@ export const SUMBER: Record<Tradisi, Sumber> = {
     situs: 'https://www.sefaria.org',
     basis: 'https://www.sefaria.org/api',
     catatan: 'Teks Ibrani beserta terjemahannya, dari perpustakaan digital Sefaria.',
-  },
-  veda: {
-    id: 'ringkas-veda', nama: 'Weda & Upanishad', penerbit: '—', situs: '', basis: '',
-    catatan: 'Hanya pengantar ringkas. Teks lengkapnya tidak dimuat karena belum ada sumber yang bisa kami rujuk dengan yakin.',
-  },
-  buddhist: {
-    id: 'ringkas-buddha', nama: 'Kanon Pali', penerbit: '—', situs: '', basis: '',
-    catatan: 'Hanya pengantar ringkas, dengan rujukan ke sumber utama untuk pembacaan lanjutan.',
-  },
-  confucian: {
-    id: 'ringkas-konghucu', nama: 'Kitab Konfusius', penerbit: '—', situs: '', basis: '',
-    catatan: 'Hanya pengantar ringkas, dengan rujukan ke sumber utama untuk pembacaan lanjutan.',
   },
 }
 
@@ -214,6 +204,31 @@ export function periksaSurah(surah: Surah, ayat: Ayat[]): HasilPeriksa {
   return { utuh: true }
 }
 
+/**
+ * Periksa bahwa tiap ayat memperoleh terjemahannya sendiri.
+ *
+ * Pemeriksaan ini terpisah dari periksaSurah karena yang dijaga berbeda
+ * jenisnya. periksaSurah menjaga TEKSNYA sampai utuh; ini menjaga MAKNANYA
+ * tidak tertukar. Teks Arab yang sempurna dengan terjemahan yang bergeser satu
+ * ayat adalah kerusakan yang lebih halus dan lebih berbahaya daripada halaman
+ * yang gagal dimuat — yang gagal dimuat terlihat gagal.
+ *
+ * `jumlahDiterima` adalah banyaknya ayat yang dikirim edisi terjemahan. Ia
+ * diperiksa terhadap jumlah resmi surah, sehingga terjemahan yang justru
+ * KELEBIHAN ayat pun tertangkap, bukan hanya yang kekurangan.
+ */
+export function periksaTerjemahan(surah: Surah, ayat: Ayat[], jumlahDiterima: number): HasilPeriksa {
+  if (jumlahDiterima !== surah.jumlahAyat) {
+    return { utuh: false, alasan: `The translation returned ${jumlahDiterima} verses for a surah of ${surah.jumlahAyat}. Pairing them could attach the wrong meaning to a verse, so nothing is shown.` }
+  }
+  for (const a of ayat) {
+    if (!a.terjemahan || !a.terjemahan.trim()) {
+      return { utuh: false, alasan: `Ayah ${a.nomor} arrived without its translation, which means the verses did not line up. Nothing is shown rather than risk pairing a verse with someone else's meaning.` }
+    }
+  }
+  return { utuh: true }
+}
+
 const KUNCI_CACHE = 'pmd-kitab-v1'
 
 interface Cache { [k: string]: { pada: number; data: unknown } }
@@ -234,20 +249,76 @@ function bacaCache<T>(k: string): T | null {
 function tulisCache(k: string, data: unknown): void {
   try {
     const c = JSON.parse(localStorage.getItem(KUNCI_CACHE) || '{}') as Cache
+    // Yang sudah lewat umur dibuang di sini. Tanpa ini isinya hanya bertambah:
+    // teks Arab seluruh Al-Qur'an ditambah tiap terjemahan yang pernah dibuka
+    // sanggup menghabiskan kuota localStorage, dan setiap penulisan berikutnya
+    // harus mengurai lalu merangkai ulang seluruh gumpalan itu.
+    const batas = Date.now() - UMUR_CACHE
+    for (const [nama, isi] of Object.entries(c)) if (!isi || isi.pada < batas) delete c[nama]
     c[k] = { pada: Date.now(), data }
-    localStorage.setItem(KUNCI_CACHE, JSON.stringify(c))
-  } catch { /* kuota penuh — pembacaan daring tetap jalan */ }
+    try {
+      localStorage.setItem(KUNCI_CACHE, JSON.stringify(c))
+    } catch {
+      // Kuota penuh. Buang separuh yang paling lama tidak dipakai dan coba
+      // sekali lagi, supaya surah yang baru dibaca tetap bisa dibaca luring
+      // alih-alih cache berhenti bekerja diam-diam sejak entri pertama penuh.
+      const urut = Object.entries(c).sort((a, b) => a[1].pada - b[1].pada)
+      for (const [nama] of urut.slice(0, Math.ceil(urut.length / 2))) delete c[nama]
+      c[k] = { pada: Date.now(), data }
+      localStorage.setItem(KUNCI_CACHE, JSON.stringify(c))
+    }
+  } catch { /* tetap penuh — pembacaan daring tidak terganggu */ }
 }
 
-async function ambil<T>(url: string, kunci: string): Promise<T> {
+function hapusCache(...kunci: string[]): void {
+  try {
+    const c = JSON.parse(localStorage.getItem(KUNCI_CACHE) || '{}') as Cache
+    for (const k of kunci) delete c[k]
+    localStorage.setItem(KUNCI_CACHE, JSON.stringify(c))
+  } catch { /* tidak ada yang bisa dilakukan, dan tidak perlu */ }
+}
+
+interface Diambil<T> { data: T; kunci: string; dariCache: boolean }
+
+/**
+ * Ambil satu alamat. TIDAK MENYIMPAN KE CACHE — itu urusan pemanggil, dan
+ * hanya setelah pemeriksaan keutuhan lolos.
+ *
+ * Urutan ini pernah terbalik, dan akibatnya adalah cacat yang paling buruk
+ * bentuknya: jawaban yang terpotong disimpan lebih dulu, baru kemudian gagal
+ * diperiksa. Cache berumur tujuh hari, jadi memuat ulang halaman tidak
+ * menolong — surah itu rusak selama sepekan penuh dan tidak ada cara bagi
+ * pembaca untuk memulihkannya. Satu gangguan jaringan sesaat berubah menjadi
+ * kerusakan yang menetap.
+ *
+ * Isi jawaban TIDAK dibuka bungkusnya di sini. Dulu ada tebakan `j.data ?? j`
+ * yang berlaku untuk semua penyedia sekaligus; itu kebetulan cocok untuk satu
+ * penyedia dan diam-diam salah untuk penyedia lain yang punya kolom bernama
+ * "data" dengan arti berbeda. Tiap pembaca membuka bungkusnya sendiri.
+ */
+async function ambil<T>(url: string, kunci: string): Promise<Diambil<T>> {
   const tersimpan = bacaCache<T>(kunci)
-  if (tersimpan) return tersimpan
+  if (tersimpan) return { data: tersimpan, kunci, dariCache: true }
   const r = await fetch(url)
   if (!r.ok) throw new Error(`gagal_memuat_${r.status}`)
-  const j = (await r.json()) as { data?: T }
-  const d = (j.data ?? j) as T
-  tulisCache(kunci, d)
-  return d
+  return { data: (await r.json()) as T, kunci, dariCache: false }
+}
+
+/** Simpan yang baru diambil, setelah keutuhannya terbukti. */
+function simpanLolos(...bagian: (Diambil<unknown> | null)[]): void {
+  for (const b of bagian) if (b && !b.dariCache) tulisCache(b.kunci, b.data)
+}
+
+/**
+ * Buang yang gagal periksa, termasuk yang datangnya dari cache.
+ *
+ * Bagian terakhir itu yang penting: cache yang sudah terlanjur berisi jawaban
+ * rusak — ditulis versi lama aplikasi, atau rusak saat disimpan — akan gagal
+ * periksa berulang kali tanpa pernah sembuh. Membuangnya membuat percobaan
+ * berikutnya benar-benar mengambil ulang dari penyedia.
+ */
+function buangYangGagal(...bagian: (Diambil<unknown> | null)[]): void {
+  hapusCache(...bagian.filter((b): b is Diambil<unknown> => !!b).map((b) => b.kunci))
 }
 
 /**
@@ -349,9 +420,10 @@ async function lewatPenyedia<T>(
 export async function daftarSurah(): Promise<Surah[]> {
   return lewatPenyedia(async (p) => {
     const j = await ambil<unknown>(`${p.basis}${p.jalurDaftar}`, `${p.id}-surah-list`)
-    const out = p.bacaDaftar(j)
+    const out = p.bacaDaftar(j.data)
     const c = periksaDaftarSurah(out)
-    if (!c.utuh) throw new Error(c.alasan)
+    if (!c.utuh) { buangYangGagal(j); throw new Error(c.alasan) }
+    simpanLolos(j)
     return out
   })
 }
@@ -378,21 +450,36 @@ export async function bacaSurah(
       edTaf ? ambil<unknown>(url(edTaf), `${p.id}-s${nomor}-${edTaf}`).catch(() => null) : Promise.resolve(null),
     ])
 
-    const A = p.bacaSurah(arab)
-    const T = p.bacaSurah(terj)
-    const F = taf ? p.bacaSurah(taf) : null
+    const A = p.bacaSurah(arab.data)
+    const T = p.bacaSurah(terj.data)
+    const F = taf ? p.bacaSurah(taf.data) : null
 
-    const ayat: Ayat[] = A.ayat.map((x, i) => ({
+    // DIPASANGKAN MENURUT NOMOR AYAT, BUKAN MENURUT URUTAN DALAM LARIK.
+    //
+    // Ini bukan kerapian; ini soal makna. Bila edisi terjemahan mengirim satu
+    // ayat lebih sedikit — entah karena penomoran basmalah yang berbeda, entah
+    // karena jawaban terpotong — pemasangan menurut urutan menggeser SELURUH
+    // terjemahan sesudahnya satu langkah. Setiap ayat lalu tampil dengan
+    // terjemahan ayat lain, rapi dan meyakinkan, dan pemeriksaan keutuhan tidak
+    // menangkapnya karena teks Arabnya sendiri utuh. Pembaca yang tidak
+    // menguasai bahasa Arab tidak punya cara apa pun untuk mengetahuinya.
+    const terjPerNomor = new Map(T.ayat.map((x) => [x.nomor, x.teks]))
+    const tafPerNomor = F ? new Map(F.ayat.map((x) => [x.nomor, x.teks])) : null
+
+    const ayat: Ayat[] = A.ayat.map((x) => ({
       nomor: x.nomor,
       arab: x.teks,
-      terjemahan: T.ayat[i]?.teks ?? '',
-      tafsir: F?.ayat[i]?.teks
-        ? { teks: F.ayat[i].teks, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? String(tafsirId) }
+      terjemahan: terjPerNomor.get(x.nomor) ?? '',
+      tafsir: tafPerNomor?.get(x.nomor)
+        ? { teks: tafPerNomor.get(x.nomor) as string, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? String(tafsirId) }
         : undefined,
     }))
 
     const c = periksaSurah(A.surah, ayat)
-    if (!c.utuh) throw new Error(c.alasan)
+    if (!c.utuh) { buangYangGagal(arab, terj, taf); throw new Error(c.alasan) }
+    const t = periksaTerjemahan(A.surah, ayat, T.ayat.length)
+    if (!t.utuh) { buangYangGagal(arab, terj, taf); throw new Error(t.alasan) }
+    simpanLolos(arab, terj, taf)
     return { surah: A.surah, ayat }
   })
 }
@@ -482,13 +569,15 @@ export function periksaBacaan(b: Bacaan, aksara?: 'ibrani'): HasilPeriksa {
 export async function bacaAlkitab(rujukan: string, terjemahan = 'web'): Promise<Bacaan> {
   const url = `${SUMBER.bible.basis}/${encodeURIComponent(rujukan)}?translation=${encodeURIComponent(terjemahan)}`
   const j = await ambil<Record<string, unknown>>(url, `bible-${rujukan}-${terjemahan}`)
+  const d = j.data
   const b: Bacaan = {
-    rujukan: String(j['reference'] ?? rujukan),
-    teks: String(j['text'] ?? '').trim(),
-    edisi: String(j['translation_name'] ?? terjemahan),
+    rujukan: String(d['reference'] ?? rujukan),
+    teks: String(d['text'] ?? '').trim(),
+    edisi: String(d['translation_name'] ?? terjemahan),
   }
   const c = periksaBacaan(b)
-  if (!c.utuh) throw new Error(c.alasan)
+  if (!c.utuh) { buangYangGagal(j); throw new Error(c.alasan) }
+  simpanLolos(j)
   return b
 }
 
@@ -496,16 +585,18 @@ export async function bacaAlkitab(rujukan: string, terjemahan = 'web'): Promise<
 export async function bacaTanakh(rujukan: string): Promise<{ ibrani: Bacaan; terjemahan: Bacaan }> {
   const url = `${SUMBER.tanakh.basis}/texts/${encodeURIComponent(rujukan)}?context=0`
   const j = await ambil<Record<string, unknown>>(url, `tanakh-${rujukan}`)
+  const d = j.data
   const gabung = (v: unknown): string =>
     Array.isArray(v) ? v.map(gabung).join(' ') : String(v ?? '').replace(/<[^>]+>/g, '').trim()
 
-  const ibrani: Bacaan = { rujukan, teks: gabung(j['he']), edisi: String(j['heVersionTitle'] ?? 'Hebrew') }
-  const terjemahan: Bacaan = { rujukan, teks: gabung(j['text']), edisi: String(j['versionTitle'] ?? 'English') }
+  const ibrani: Bacaan = { rujukan, teks: gabung(d['he']), edisi: String(d['heVersionTitle'] ?? 'Hebrew') }
+  const terjemahan: Bacaan = { rujukan, teks: gabung(d['text']), edisi: String(d['versionTitle'] ?? 'English') }
 
   const a = periksaBacaan(ibrani, 'ibrani')
-  if (!a.utuh) throw new Error(a.alasan)
+  if (!a.utuh) { buangYangGagal(j); throw new Error(a.alasan) }
   const b = periksaBacaan(terjemahan)
-  if (!b.utuh) throw new Error(b.alasan)
+  if (!b.utuh) { buangYangGagal(j); throw new Error(b.alasan) }
+  simpanLolos(j)
   return { ibrani, terjemahan }
 }
 
