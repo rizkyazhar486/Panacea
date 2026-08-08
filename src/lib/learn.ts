@@ -50,17 +50,17 @@ export const TIER_LABEL: Record<Tier, { label: string; blurb: string; color: str
   strong: {
     label: 'Strong evidence',
     blurb: 'Randomised trials with hard outcomes, or findings so consistent that reversal is implausible.',
-    color: '#22c55e',
+    color: '#15803d',
   },
   moderate: {
     label: 'Moderate evidence',
     blurb: 'Consistent observational data, or trials measuring blood markers rather than actual events.',
-    color: '#f59e0b',
+    color: '#b45309',
   },
   weak: {
     label: 'Weak evidence',
     blurb: 'Small, short, mechanistic, or animal studies. Worth knowing, not worth reorganising your life around.',
-    color: '#94a3b8',
+    color: '#57616f',
   },
 }
 

@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
+import { pasangKilau } from '../lib/kilau'
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
 import {
@@ -283,6 +284,9 @@ export function Shell({ children }: { children: ReactNode }) {
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [])
+
+  // Satu pendengar untuk seluruh halaman — lihat catatan di lib/kilau.ts.
+  useEffect(() => pasangKilau(), [])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({})
   const [navHidden, setNavHidden] = useState(false)
@@ -442,7 +446,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-5">
+        <header className="kaca sticky top-0 z-10 flex items-center justify-between gap-2 rounded-none border-x-0 border-t-0 px-4 py-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
             {/* Mobile: buka drawer */}
             <button
@@ -697,7 +701,7 @@ export function Shell({ children }: { children: ReactNode }) {
           className={`fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden ${navHidden ? 'translate-y-[calc(100%+env(safe-area-inset-bottom)+16px)]' : 'translate-y-0'}`}
           aria-label="Main navigation"
         >
-          <div className="liquid-glass relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16 shadow-[0_10px_30px_rgba(12,20,16,0.14)]">
+          <div className="kaca relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16">
             <div className="fade-edge-glass pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full" />
             <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
               {[

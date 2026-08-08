@@ -29,7 +29,7 @@ export function Learn() {
         subtitle="Health evidence, with its uncertainty attached" />
 
       <Card>
-        <p className="text-[13px] leading-relaxed text-slate-300">
+        <p className="text-[13px] leading-relaxed text-neutral-600">
           Every claim on these pages is labelled with how good the evidence behind it is, and every
           claim says what would make it wrong. That second part is the point: knowing why something
           might be mistaken is what lets you decide for yourself.
@@ -41,7 +41,7 @@ export function Learn() {
                 style={{ background: `${TIER_LABEL[t].color}22`, color: TIER_LABEL[t].color }}>
                 {TIER_LABEL[t].label}
               </span>
-              <span className="text-[11px] leading-relaxed text-slate-400">{TIER_LABEL[t].blurb}</span>
+              <span className="text-[11px] leading-relaxed text-neutral-500">{TIER_LABEL[t].blurb}</span>
             </div>
           ))}
         </div>
@@ -50,14 +50,14 @@ export function Learn() {
       <div className="space-y-2">
         {TOPICS.map((t) => (
           <button key={t.id} onClick={() => setBuka(t)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 text-left transition-colors hover:bg-white/10">
+            className="w-full rounded-2xl border border-black/5 bg-white/60 p-4 text-left transition-colors hover:bg-white/80">
             <div className="flex items-start gap-3">
               <span className="shrink-0 text-2xl" aria-hidden="true">{t.icon}</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-black text-white">{t.title}</div>
-                <p className="mt-0.5 text-[12px] leading-relaxed text-slate-400">{t.summary}</p>
+                <div className="text-[15px] font-black text-ink">{t.title}</div>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-neutral-500">{t.summary}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-slate-500">{t.minutes} min read</span>
+                  <span className="text-[10px] font-bold text-neutral-400">{t.minutes} min read</span>
                   {ringkasTier(t).map((r) => (
                     <span key={r.tier} className="rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase"
                       style={{ background: `${TIER_LABEL[r.tier].color}1f`, color: TIER_LABEL[r.tier].color }}>
@@ -72,7 +72,7 @@ export function Learn() {
       </div>
 
       <Card>
-        <p className="text-[11px] leading-relaxed text-slate-500">
+        <p className="text-[11px] leading-relaxed text-neutral-400">
           This is education, not medical advice, and it deliberately contains no doses or protocols.
           Nothing here is tailored to you — decisions about your own treatment belong with a
           clinician who can examine you and knows your history.
@@ -108,39 +108,39 @@ function TopicView({ topic, onClose }: { topic: Topic; onClose: () => void }) {
       <div>
         <div className="flex items-center gap-2">
           <span className="text-3xl" aria-hidden="true">{topic.icon}</span>
-          <h2 className="text-xl font-black text-white">{topic.title}</h2>
+          <h2 className="text-xl font-black text-ink">{topic.title}</h2>
         </div>
-        <p className="mt-1 text-[13px] leading-relaxed text-slate-400">{topic.summary}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-neutral-500">{topic.summary}</p>
       </div>
 
       {topic.sections.map((s, i) => (
         <Card key={i}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-[15px] font-black text-white">{s.heading}</h3>
+            <h3 className="text-[15px] font-black text-ink">{s.heading}</h3>
             <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase"
               style={{ background: `${TIER_LABEL[s.tier].color}22`, color: TIER_LABEL[s.tier].color }}>
               {TIER_LABEL[s.tier].label}
             </span>
           </div>
-          <p className="mt-2 text-[13px] leading-relaxed text-slate-300">{s.body}</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">{s.body}</p>
           {/* Caveat berada di dalam kartu yang sama, bukan di catatan kaki —
               lihat catatan di kepala berkas. */}
           <div className="mt-3 rounded-xl border-l-2 border-amber-500/50 bg-amber-500/5 p-3">
-            <div className="text-[10px] font-black uppercase tracking-wide text-amber-400">
+            <div className="text-[10px] font-black uppercase tracking-wide text-amber-700">
               What would change this
             </div>
-            <p className="mt-1 text-[12px] leading-relaxed text-slate-400">{s.caveat}</p>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{s.caveat}</p>
           </div>
         </Card>
       ))}
 
       <Card className="!border-brand/30 !bg-brand/5">
         <div className="text-[10px] font-black uppercase tracking-wide text-brand">Takeaway</div>
-        <p className="mt-1 text-[13px] leading-relaxed text-slate-200">{topic.takeaway}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-ink">{topic.takeaway}</p>
       </Card>
 
       <button onClick={onClose}
-        className="w-full rounded-xl bg-white/5 px-3 py-2.5 text-[13px] font-bold text-slate-300">
+        className="w-full rounded-xl bg-neutral-100 px-3 py-2.5 text-[13px] font-bold text-neutral-600">
         Back to all topics
       </button>
     </div>

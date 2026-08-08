@@ -135,7 +135,7 @@ function FacilityCard({ h, hasCoords }: { h: NearbyFacility; hasCoords: boolean 
   const gojek = `https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving`
 
   return (
-    <Card hover className="flex flex-col">
+    <Card className="flex flex-col">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
