@@ -18,11 +18,12 @@ import { normalizePhone } from './otp.js'
 //    Menyidik nomornya memperkecil kerugian bila bocor, tetapi tidak memberi
 //    hak untuk memintanya.
 //
-//    Nomor telepon yang sudah dibuktikan lewat OTP justru lebih baik untuk
-//    tujuan ini, bukan sekadar lebih aman secara hukum. NIK hanya membuktikan
-//    nomornya ADA — siapa pun yang mengetahui NIK orang lain bisa memakainya.
-//    OTP membuktikan pemohon MEMEGANG nomor itu sekarang, dan satu nomor
-//    hanya bisa dipegang satu orang pada satu waktu.
+//    NOMOR TIDAK DIBUKTIKAN LEWAT OTP — pemilik memutuskan demikian. Artinya
+//    nomor yang diketik hanya membuktikan pemohon TAHU nomor itu, sama
+//    lemahnya dengan NIK dulu. Pemeriksaan bentrok mencegah satu nomor dipakai
+//    dua akun, tetapi tidak mencegah seseorang memakai nomor orang lain.
+//    Penahan akun ganda yang sebenarnya kini adalah tinjauan manual pemilik
+//    atas selfie berpose dan akun media sosial.
 //
 //    Yang disimpan tetap hanya sidik ber-garam dan empat digit terakhir.
 //    Nomor utuhnya tidak disimpan di data verifikasi, jadi basis data yang
@@ -98,11 +99,11 @@ export interface AkunConnect {
   pelanggaran: Pelanggaran[]
   /** Bukti persetujuan per tujuan (UU PDP Pasal 20-22). */
   persetujuan: CatatanPersetujuan[]
-  /** Sidik nomor telepon yang sudah dibuktikan lewat OTP. */
+  /** Sidik nomor telepon yang didaftarkan. Tidak dibuktikan lewat OTP. */
   teleponSidik?: string
   /** Empat digit terakhirnya, untuk pemilik mengenali saat meninjau. */
   teleponAkhir?: string
-  /** Kapan nomor itu dibuktikan. */
+  /** Kapan nomor itu didaftarkan. */
   teleponPada?: string
   /** Radius pencarian dalam km, ditentukan pengguna sendiri. */
   radiusKm: number
@@ -285,17 +286,21 @@ export function platformDariUrl(url: string): PlatformSosial | null {
 }
 
 /**
- * Ikat nomor telepon yang SUDAH terbukti lewat OTP ke akun Connect.
+ * Ikat nomor telepon ke akun Connect.
  *
- * Fungsi ini tidak memeriksa kode apa pun — pemeriksaannya milik lapisan OTP,
- * dan pemanggil wajib melakukannya lebih dulu. Pemisahan ini disengaja supaya
- * jelas siapa yang bertanggung jawab atas apa, tetapi ia juga berarti fungsi
- * ini berbahaya bila dipanggil tanpa pembuktian. Hanya ada satu pemanggil, di
- * rute /api/connect/telepon/verifikasi, tepat setelah Twilio menjawab approved.
+ * PEMBUKTIAN LEWAT OTP DIHAPUS ATAS PERMINTAAN PEMILIK. Nomor kini cukup
+ * diketik. Akibatnya harus dipahami siapa pun yang membaca berkas ini:
  *
- * Di sinilah aturan satu orang satu akun ditegakkan, dan sengaja ditegakkan di
- * sini — bukan saat mengajukan verifikasi. Nomor yang sudah dipakai akun lain
- * ditolak SEBELUM pemohon mengisi seluruh formulir, bukan sesudahnya.
+ *   Nomor yang diketik hanya membuktikan pemohon TAHU nomor itu, bukan bahwa
+ *   ia MEMEGANGNYA. Karena itu pemeriksaan bentrok di bawah tidak lagi
+ *   menegakkan "satu orang satu akun" — ia hanya mencegah nomor yang sama
+ *   dipakai dua kali. Seseorang yang mengetik nomor orang lain tetap lolos,
+ *   dan lebih buruk, ia dapat "membakar" nomor orang lain sehingga pemilik
+ *   asli nomor itu tidak bisa lagi memakainya.
+ *
+ * Yang menahan akun ganda sekarang tinggal tinjauan pemilik atas selfie
+ * berpose dan akun media sosial. Halaman tinjauan menyatakan ini apa adanya
+ * supaya pemilik tidak mengira nomornya sudah terjamin.
  */
 export function ikatTelepon(email: string, telepon: string): HasilAjuan {
   // Dinormalkan DI SINI, bukan hanya di rutenya. "081234567890" dan
@@ -309,6 +314,8 @@ export function ikatTelepon(email: string, telepon: string): HasilAjuan {
   if (bersih.length < 9) return { ok: false, galat: 'telepon_tidak_sah' }
   const sidik = sidikTelepon(bersih)
 
+  // Mencegah nomor yang sama terpakai dua kali. Tanpa OTP ini BUKAN jaminan
+  // satu orang satu akun — lihat catatan di atas.
   const bentrok = Object.values(db.akun).find(
     (x) => x.email !== email && x.teleponSidik === sidik && x.status !== 'ditolak')
   if (bentrok) return { ok: false, galat: 'telepon_sudah_dipakai' }
@@ -323,6 +330,8 @@ export function ikatTelepon(email: string, telepon: string): HasilAjuan {
 export function ajukanVerifikasi(
   email: string,
   masuk: Omit<DataVerifikasi, 'teleponSidik' | 'teleponAkhir'> & {
+    /** Nomor telepon, diketik pemohon. Tidak dibuktikan lewat OTP. */
+    telepon?: string
     /** Tujuan yang disetujui pengguna secara tegas, satu per satu. */
     persetujuan?: TujuanPersetujuan[]
   },
@@ -334,10 +343,13 @@ export function ajukanVerifikasi(
   const setuju = new Set(masuk.persetujuan ?? [])
   if (!TUJUAN_WAJIB.every((t) => setuju.has(t))) return { ok: false, galat: 'persetujuan_belum_lengkap' }
   if (a.status === 'terverifikasi') return { ok: false, galat: 'sudah_terverifikasi' }
-  // Nomor telepon TIDAK diterima dari formulir ini. Ia harus sudah diikat lebih
-  // dulu lewat OTP — nomor yang sekadar diketik hanya membuktikan pemohon tahu
-  // nomornya, bukan bahwa ia memegangnya.
-  if (!a.teleponSidik || !a.teleponAkhir) return { ok: false, galat: 'telepon_belum_diverifikasi' }
+  // Nomor diikat di sini, sebelum data lain disimpan, supaya nomor yang sudah
+  // terpakai ditolak tanpa menyimpan apa pun.
+  if (masuk.telepon) {
+    const t = ikatTelepon(email, masuk.telepon)
+    if (!t.ok) return t
+  }
+  if (!a.teleponSidik || !a.teleponAkhir) return { ok: false, galat: 'telepon_wajib' }
   if (!masuk.selfieUrl) return { ok: false, galat: 'selfie_wajib' }
   const tautan = (masuk.sosialMedia ?? []).map((s) => s.trim()).filter(Boolean)
   if (!tautan.length) return { ok: false, galat: 'sosial_media_wajib' }
@@ -353,6 +365,9 @@ export function ajukanVerifikasi(
     teleponSidik: a.teleponSidik,
     teleponAkhir: a.teleponAkhir,
   } as DataVerifikasi
+  // Nomor mentah tidak boleh ikut tersimpan lewat sebaran objek di atas —
+  // yang disimpan hanya sidik dan empat digit terakhirnya.
+  delete (a.data as unknown as Record<string, unknown>).telepon
   // Daftar persetujuan: tempatnya di a.persetujuan sebagai catatan
   // bertanggal, bukan disalin mentah ke dalam data verifikasi.
   delete (a.data as unknown as Record<string, unknown>).persetujuan
@@ -490,7 +505,7 @@ export function ringkasanSaya(email: string) {
     radiusKm: a.radiusKm,
     persetujuan: a.persetujuan,
     teleponAkhir: a.teleponAkhir,
-    teleponTerverifikasi: !!a.teleponSidik,
+    teleponTerdaftar: !!a.teleponSidik,
     versiPemberitahuan: VERSI_PEMBERITAHUAN,
     diblokir: a.diblokir,
     pelanggaran: a.pelanggaran,

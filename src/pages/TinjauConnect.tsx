@@ -106,7 +106,7 @@ export function TinjauConnect() {
                 <span>Pendidikan: {a.data.pendidikanTerakhir}</span>
                 <span>Lahir: {a.data.tempatLahir}, {a.data.tanggalLahir}</span>
                 <span className="col-span-2">Tinggal: {a.data.tempatTinggal}</span>
-                <span className="col-span-2">Telepon: ••••••••{a.data.teleponAkhir} · terbukti lewat SMS</span>
+                <span className="col-span-2">Telepon: ••••••••{a.data.teleponAkhir} · tidak diverifikasi</span>
               </div>
 
               {/* Yang dipakai memutuskan: selfie berpose vs foto media sosial. */}
@@ -132,7 +132,13 @@ export function TinjauConnect() {
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
                   Cocokkan wajah di selfie dengan foto di akun media sosialnya. Perhatikan juga
                   riwayat unggahan dan tanggal bergabung — akun yang baru dibuat kemarin tidak
-                  membuktikan apa pun. Nomor teleponnya sudah dibuktikan lewat kode SMS, jadi Anda tidak perlu menilainya — dan nomornya memang tidak disimpan.
+                  membuktikan apa pun.
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-amber-400/80">
+                  Nomor telepon tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi
+                  nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama
+                  tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda
+                  di halaman ini.
                 </p>
               </div>
 

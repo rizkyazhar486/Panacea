@@ -12,9 +12,10 @@ import { api, backendEnabled } from '../lib/api'
 // menyembunyikannya di balik tautan kebijakan privasi yang tidak dibaca siapa
 // pun. Tiga hal yang paling penting disebut tepat di sebelah kolomnya:
 //
-//   * Identitas diikat ke NOMOR TELEPON yang dibuktikan lewat OTP, bukan NIK.
-//     Yang disimpan hanya sidiknya dan empat digit terakhir. NIK hanya
-//     membuktikan nomornya ada; OTP membuktikan pemohon memegangnya.
+//   * Identitas diikat ke NOMOR TELEPON, bukan NIK. Yang disimpan hanya
+//     sidiknya dan empat digit terakhir. Nomornya tidak dibuktikan lewat kode
+//     SMS, jadi ia mencegah satu nomor dipakai dua akun — bukan mencegah
+//     seseorang memakai nomor orang lain.
 //   * Orientasi seksual tidak pernah ditampilkan kepada pengguna lain. Ia data
 //     pribadi spesifik menurut UU PDP 27/2022, dan di Indonesia daftar semacam
 //     itu bisa membahayakan keselamatan orang.
@@ -68,10 +69,7 @@ const PREFERENSI = [
 const GALAT: Record<string, string> = {
   telepon_tidak_sah: 'Nomor telepon tidak sah. Contoh: 08123456789.',
   telepon_sudah_dipakai: 'Nomor ini sudah dipakai akun lain. Satu orang hanya boleh punya satu akun.',
-  telepon_belum_diverifikasi: 'Verifikasi nomor telepon Anda lebih dulu.',
-  kode_salah: 'Kode yang Anda masukkan salah atau sudah kedaluwarsa.',
-  too_soon: 'Kode baru saja dikirim. Tunggu 30 detik sebelum meminta lagi.',
-  otp_not_configured: 'Pengiriman SMS belum diaktifkan di server ini.',
+  telepon_wajib: 'Nomor telepon wajib diisi.',
   selfie_wajib: 'Selfie berpose wajib diunggah.',
   sosial_media_wajib: 'Isi minimal satu tautan LinkedIn, Facebook, atau Instagram.',
   sosial_media_tidak_dikenal: 'Tautan hanya boleh ke LinkedIn, Facebook, atau Instagram. Periksa alamat yang Anda tempel.',
@@ -85,14 +83,11 @@ export function VerifikasiConnect() {
   const [f, setF] = useState({
     nama: '', tempatLahir: '', tanggalLahir: '', pekerjaan: '', status: '',
     preferensi: 'straight', pendidikanTerakhir: '', tempatTinggal: '',
-    selfieUrl: '', linkedin: '', facebook: '', instagram: '',
+    telepon: '', selfieUrl: '', linkedin: '', facebook: '', instagram: '',
   })
   const [umur, setUmur] = useState<number | undefined>(undefined)
   const [setuju, setSetuju] = useState<Record<string, boolean>>({})
   const [tarik, setTarik] = useState(false)
-  const [telepon, setTelepon] = useState('')
-  const [kode, setKode] = useState('')
-  const [kodeTerkirim, setKodeTerkirim] = useState(false)
   const [kirim, setKirim] = useState(false)
   const [pesan, setPesan] = useState('')
   const [galat, setGalat] = useState('')
@@ -112,7 +107,7 @@ export function VerifikasiConnect() {
         nama: f.nama, tempatLahir: f.tempatLahir, tanggalLahir: f.tanggalLahir,
         umur: umur ?? 0, pekerjaan: f.pekerjaan, status: f.status,
         preferensi: f.preferensi, pendidikanTerakhir: f.pendidikanTerakhir,
-        tempatTinggal: f.tempatTinggal, selfieUrl: f.selfieUrl,
+        tempatTinggal: f.tempatTinggal, telepon: f.telepon, selfieUrl: f.selfieUrl,
         sosialMedia: PLATFORM.map((p) => f[p.id]).filter(Boolean),
         persetujuan: TUJUAN.filter((t) => setuju[t.id]).map((t) => t.id),
       })
@@ -122,24 +117,6 @@ export function VerifikasiConnect() {
       const k = (e as Error)?.message ?? ''
       setGalat(GALAT[k] ?? 'Gagal mengirim ajuan. Coba lagi.')
     } finally { setKirim(false) }
-  }
-
-  async function kirimKode() {
-    setGalat(''); setPesan('')
-    try {
-      await api.connectTeleponKirim(telepon)
-      setKodeTerkirim(true)
-      setPesan('Kode dikirim lewat SMS.')
-    } catch (e) { setGalat(GALAT[(e as Error)?.message ?? ''] ?? 'Gagal mengirim kode.') }
-  }
-
-  async function periksaKode() {
-    setGalat(''); setPesan('')
-    try {
-      await api.connectTeleponVerifikasi(telepon, kode)
-      setSaya(await api.connectSaya())
-      setPesan('Nomor telepon Anda terverifikasi.')
-    } catch (e) { setGalat(GALAT[(e as Error)?.message ?? ''] ?? 'Gagal memverifikasi nomor.') }
   }
 
   async function lakukanTarik() {
@@ -186,8 +163,7 @@ export function VerifikasiConnect() {
         <ul className="mt-2 space-y-1.5 text-[12px] leading-relaxed text-slate-300">
           <li>• <b>NIK tidak lagi diminta.</b> Pemakaian NIK oleh pihak swasta diatur UU Adminduk
             24/2013 dan menuntut kerja sama resmi dengan Dukcapil. Identitas kini diikat ke
-            <b> nomor telepon yang dibuktikan lewat SMS</b> — yang juga lebih kuat: NIK hanya
-            membuktikan nomornya ada, OTP membuktikan Anda memegangnya.</li>
+            <b> nomor telepon</b>, yang dipakai memastikan satu orang tidak membuat dua akun.</li>
           <li>• <b>Nomor telepon tidak disimpan.</b> Hanya sidiknya dan empat digit terakhir, jadi
             basis data yang bocor tidak memberi siapa pun daftar nomor untuk dihubungi.</li>
           <li>• <b>Orientasi seksual tidak pernah ditampilkan kepada pengguna lain.</b>
@@ -243,41 +219,15 @@ export function VerifikasiConnect() {
           <Card>
             <div className="text-[11px] font-black uppercase tracking-wide text-slate-400">Pembuktian identitas</div>
             <div className="mt-2">
-              {saya?.teleponTerverifikasi ? (
-                <div className="rounded-xl bg-emerald-500/10 p-2.5">
-                  <p className="text-[12px] font-bold text-emerald-400">
-                    ✓ Nomor telepon terverifikasi (••••{saya.teleponAkhir})
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl bg-white/5 p-2.5">
-                  <Field label="Nomor telepon">
-                    <input className={inputClass} inputMode="tel" placeholder="08123456789"
-                      value={telepon} onChange={(e) => setTelepon(e.target.value)} aria-label="Nomor telepon" />
-                  </Field>
-                  {kodeTerkirim ? (
-                    <>
-                      <Field label="Kode dari SMS">
-                        <input className={inputClass} inputMode="numeric" maxLength={8} value={kode}
-                          onChange={(e) => setKode(e.target.value.replace(/\D/g, ''))} aria-label="Kode dari SMS" />
-                      </Field>
-                      <div className="mt-2 flex gap-2">
-                        <Button onClick={() => void periksaKode()}>Verifikasi nomor</Button>
-                        <button onClick={() => void kirimKode()}
-                          className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-slate-300">
-                          Kirim ulang
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <Button onClick={() => void kirimKode()}>Kirim kode lewat SMS</Button>
-                  )}
-                  <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
-                    Kode SMS membuktikan Anda <b>memegang</b> nomor ini sekarang. Nomornya sendiri
-                    tidak disimpan — hanya sidiknya dan empat digit terakhir.
-                  </p>
-                </div>
-              )}
+              <Field label="Nomor telepon">
+                <input className={inputClass} inputMode="tel" placeholder="08123456789"
+                  value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Nomor telepon" />
+              </Field>
+              <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+                Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan —
+                hanya sidiknya dan empat digit terakhir, jadi ia tidak bisa dibaca kembali maupun
+                dipakai menghubungi Anda.
+              </p>
             </div>
             <div className="mt-2">
               <Field label="Tautan selfie berpose">
