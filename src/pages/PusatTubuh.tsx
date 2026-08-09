@@ -20,23 +20,23 @@ const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default:
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 
 const TABS: TabDef[] = [
-  { id: 'energi', label: 'Energi', emoji: '🔋', komponen: BodyBattery,
-    ringkas: 'Cadangan energi 0–100 dan tingkat stres sepanjang hari' },
-  { id: 'jantung', label: 'Jantung', emoji: '❤️', komponen: HeartRateLog,
-    ringkas: 'Setiap sampel denyut yang dikirim jam tangan, beserta kerapatannya' },
-  { id: 'tidur', label: 'Tidur', emoji: '😴', komponen: SleepPattern,
-    ringkas: 'Durasi, tahapan, dan keteraturan jam tidur' },
-  { id: 'gerak', label: 'Gerak', emoji: '🦶', komponen: GaitAnalysis,
-    ringkas: 'Asimetri langkah, kualitas berjalan, bentuk lari, pemulihan denyut' },
-  { id: 'klinis', label: 'Klinis', emoji: '🩺', komponen: ClinicalTrackers,
-    ringkas: 'SpO₂, catatan EKG, jet lag, kehamilan, fisiologi kursi roda' },
+  { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
+    ringkas: 'Energy reserve 0–100 and stress level through the day' },
+  { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
+    ringkas: 'Every heart-rate sample your watch sends, and how dense they are' },
+  { id: 'tidur', label: 'Sleep', emoji: '😴', komponen: SleepPattern,
+    ringkas: 'Duration, stages, and how regular your sleep timing is' },
+  { id: 'gerak', label: 'Movement', emoji: '🦶', komponen: GaitAnalysis,
+    ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
+  { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
+    ringkas: 'SpO₂, ECG log, jet lag, pregnancy, wheelchair physiology' },
 ]
 
 export function PusatTubuh() {
   return (
     <HalamanTab
-      judul="Sinyal Tubuh"
-      subjudul="Energi, jantung, tidur, gerak dan pelacak klinis dalam satu halaman"
+      judul="Body Signals"
+      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
       ikon={<IconActivity />}
       tabs={TABS}
     />

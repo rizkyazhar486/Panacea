@@ -21,22 +21,22 @@ const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) =>
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 
 const TABS: TabDef[] = [
-  { id: 'pelatih', label: 'Pelatih', emoji: '🏃', komponen: WorkoutHistory,
-    ringkas: 'Sesi berikutnya, rangkuman sesi terakhir, riwayat, target dan rekor' },
-  { id: 'analisis', label: 'Analisis', emoji: '📈', komponen: AnalisisPro,
-    ringkas: 'Kebugaran & kesegaran, upaya relatif, log latihan, zona pace' },
-  { id: 'fisiologi', label: 'Fisiologi', emoji: '🫀', komponen: TrainingPhysiology,
-    ringkas: 'Beban latihan, status, waktu pemulihan, ambang laktat, kesiapan' },
+  { id: 'pelatih', label: 'Coach', emoji: '🏃', komponen: WorkoutHistory,
+    ringkas: 'Next session, last session summary, history, targets and records' },
+  { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
+    ringkas: 'Fitness & freshness, relative effort, training log, pace zones' },
+  { id: 'fisiologi', label: 'Physiology', emoji: '🫀', komponen: TrainingPhysiology,
+    ringkas: 'Training load, status, recovery time, lactate threshold, readiness' },
   { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
-    ringkas: 'Bahan bakar, laju keringat, FTP, panduan daya, aklimatisasi' },
+    ringkas: 'Fuelling, sweat rate, FTP, power guidance, acclimatisation' },
 ]
 
 export function PusatLatihan() {
   return (
     <>
     <HalamanTab
-      judul="Latihan"
-      subjudul="Pelatih, analisis, fisiologi dan alat endurance dalam satu halaman"
+      judul="Training"
+      subjudul="Coach, analysis, physiology and endurance tools on one page"
       ikon={<IconRun />}
       tabs={TABS}
     />
@@ -44,7 +44,7 @@ export function PusatLatihan() {
     <div className="-mt-20 pb-24">
       <Link to="/fitness-hub"
         className="block rounded-2xl border border-dashed border-white/15 py-2.5 text-center text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
-        🔎 Semua alat latihan lainnya
+        🔎 Every other training tool
       </Link>
     </div>
     </>
