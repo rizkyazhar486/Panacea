@@ -3,10 +3,12 @@ import { Card, SectionTitle, Button } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
 import {
-  daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN,
+  daftarSurah, bacaSurah, renunganUntuk, penyediaSekarang, TAFSIR, TERJEMAHAN, QARI,
   TOTAL_SURAH, TOTAL_AYAT_HAFS, bacaAlkitab, bacaTanakh, PENGANTAR, SUMBER,
-  type Surah, type Ayat, type Bacaan,
+  bacaTradisi,
+  type Surah, type Bacaan, type HasilBaca, type Pengantar,
 } from '../lib/kitab'
+import { usePemutarAyat, TombolPutar } from '../components/PemutarAyat'
 import { Field, inputClass } from '../components/ui'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,14 +31,28 @@ export function Kitab() {
   const [tab, setTab] = useState<Tab>('quran')
   const [surah, setSurah] = useState<Surah[]>([])
   const [buka, setBuka] = useState<number | null>(null)
-  const [isi, setIsi] = useState<{ surah: Surah; ayat: Ayat[] } | null>(null)
+  const [isi, setIsi] = useState<HasilBaca | null>(null)
   const [terjemahan, setTerjemahan] = useState(TERJEMAHAN[0].id)
-  const [tafsirId, setTafsirId] = useState<string | undefined>(undefined)
+  const [tafsirId, setTafsirId] = useState<string | undefined>(TAFSIR[0].id)
+  // Alih aksara menyala secara bawaan. Sebagian besar pengguna aplikasi ini
+  // tidak membaca aksara Arab, dan tanpa alih aksara mereka hanya bisa MELIHAT
+  // ayat tanpa bisa melafalkannya — jadi bawaan yang benar adalah menyala.
+  const [latin, setLatin] = useState(true)
+  const [qari, setQari] = useState<string | undefined>(undefined)
   const [galat, setGalat] = useState('')
   const [muat, setMuat] = useState(false)
   // Dibaca ulang tiap render supaya selalu mencerminkan penyedia yang terakhir
   // benar-benar menjawab, bukan yang pertama dalam daftar.
   const p = penyediaSekarang()
+
+  // Daftar trek dibangun dari ayat yang benar-benar membawa alamat rekaman.
+  // Bila edisi qari gagal diambil, daftarnya kosong dan seluruh kendali putar
+  // hilang dengan sendirinya — tidak ada tombol yang menjanjikan sesuatu yang
+  // tidak ada di baliknya.
+  const audio = (isi?.ayat ?? [])
+    .filter((a): a is typeof a & { audio: string } => !!a.audio)
+    .map((a) => ({ nomor: a.nomor, audio: a.audio }))
+  const { main, putar, berhenti, galat: galatAudio } = usePemutarAyat(audio)
 
   useEffect(() => {
     setMuat(true)
@@ -51,13 +67,13 @@ export function Kitab() {
   useEffect(() => {
     if (buka === null) { setIsi(null); return }
     setMuat(true); setGalat('')
-    bacaSurah(buka, terjemahan, tafsirId)
+    bacaSurah(buka, terjemahan, tafsirId, { latin, qari })
       .then(setIsi)
       .catch((e: Error) => setGalat(e?.message?.startsWith('gagal_memuat')
         ? 'Could not load this surah.'
         : e.message))
       .finally(() => setMuat(false))
-  }, [buka, terjemahan, tafsirId])
+  }, [buka, terjemahan, tafsirId, latin, qari])
 
   return (
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
@@ -71,6 +87,21 @@ export function Kitab() {
               className={`rounded-lg px-2.5 py-1.5 text-[12px] font-bold ${
                 tab === id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>{l}</button>
           ))}
+      </div>
+
+      {/* Hadis dan waktu salat berdiri sebagai halaman sendiri, bukan tab.
+          Keduanya punya persoalannya masing-masing yang perlu dijelaskan di
+          bagian atas halamannya — derajat riwayat, dan metode hisab — dan
+          penjelasan itu tidak akan terbaca bila terkubur sebagai tab kelima. */}
+      <div className="flex flex-wrap gap-1.5">
+        <a href="#/hadith"
+          className="rounded-lg bg-neutral-100 px-2.5 py-1.5 text-[12px] font-bold text-neutral-600 hover:bg-neutral-200">
+          📜 Hadith →
+        </a>
+        <a href="#/prayer-times"
+          className="rounded-lg bg-neutral-100 px-2.5 py-1.5 text-[12px] font-bold text-neutral-600 hover:bg-neutral-200">
+          🕌 Prayer times →
+        </a>
       </div>
 
       {tab === 'bible' && <Petikan jenis="bible" />}
@@ -193,7 +224,42 @@ export function Kitab() {
                 </button>
               ))}
             </div>
-            <div className="mt-2.5 text-[10px] font-black uppercase tracking-wide text-neutral-500">Commentary</div>
+            <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">
+              How to read it aloud
+            </div>
+            <button onClick={() => setLatin((x) => !x)} aria-pressed={latin}
+              className={`mt-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-bold ${
+                latin ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+              🔤 Latin transliteration
+            </button>
+            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
+              A guide to pronunciation, not a translation and never a substitute for the Arabic.
+              It is fetched from the provider like everything else here.
+            </p>
+
+            <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">Recitation</div>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <button onClick={() => setQari(undefined)} aria-pressed={!qari}
+                className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
+                  !qari ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Off</button>
+              {QARI.map((q) => (
+                <button key={q.id} onClick={() => setQari(q.id)} aria-pressed={qari === q.id}
+                  className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
+                    qari === q.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+                  {q.nama}
+                </button>
+              ))}
+            </div>
+            {qari && (
+              <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
+                {QARI.find((q) => q.id === qari)?.catatan} Playing one ayah continues into the next
+                until you pause.
+              </p>
+            )}
+
+            <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">
+              Commentary (tafsir)
+            </div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               <button onClick={() => setTafsirId(undefined)} aria-pressed={!tafsirId}
                 className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
@@ -202,14 +268,66 @@ export function Kitab() {
                 <button key={t.id} onClick={() => setTafsirId(t.id)} aria-pressed={tafsirId === t.id}
                   className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
                     tafsirId === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
-                  {t.nama}
+                  {t.nama.split(' — ')[0]}
+                  <span className={`ml-1 text-[9px] font-black uppercase ${
+                    tafsirId === t.id ? 'text-white/80' : 'text-neutral-600'}`}>{t.bahasa}</span>
                 </button>
               ))}
             </div>
+            {tafsirId && (
+              <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
+                {TAFSIR.find((t) => t.id === tafsirId)?.tentang}
+              </p>
+            )}
+            <div className="mt-2">
+              <Ringkas ikon="💚" judul="Why commentary matters here"
+                anak={
+                  <div className="space-y-1.5">
+                    <Poin ikon="🧠">Reading a verse you do not understand can settle you for a
+                      moment. Understanding it gives you something you can actually hold on to when
+                      things are hard — which is the whole reason commentary sits in a health app.</Poin>
+                    <Poin ikon="🎓">And that is exactly why the meaning must come from scholars,
+                      never from us. Composing a soothing "meaning" for a verse would bend
+                      revelation into motivation, and not one sentence of that is done here.</Poin>
+                    <Poin ikon="🩺">If you are in real distress, a commentary is not a clinician.
+                      Both are worth having, and neither replaces the other.</Poin>
+                  </div>
+                } />
+            </div>
           </Card>
+
+          {isi && isi.gagalSebagian.length > 0 && (
+            <Card className="!border-amber-500/40 !bg-amber-500/5">
+              <p className="text-[12px] leading-relaxed text-amber-800">
+                <b>Requested but did not arrive:</b> {isi.gagalSebagian.join(', ')}. The verses and
+                translation below came through intact and were checked; only the missing parts are
+                absent. They are named here rather than left blank, so you are never looking at a
+                page that quietly dropped something you asked for.
+              </p>
+            </Card>
+          )}
 
           {isi && (
             <>
+              {audio.length > 0 && (
+                <Card className="!border-brand/30 !bg-brand-50/50">
+                  <div className="flex items-center gap-3">
+                    <TombolPutar aktif={main !== null}
+                      onKlik={() => (main !== null ? berhenti() : putar(audio[0].nomor))}
+                      label={main !== null ? 'Pause recitation' : 'Play the whole surah'} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[12px] font-black text-ink">
+                        {main !== null ? `Playing ayah ${main}` : 'Play the whole surah'}
+                      </div>
+                      <div className="truncate text-[10px] text-neutral-500">
+                        {QARI.find((q) => q.id === qari)?.nama}
+                      </div>
+                    </div>
+                  </div>
+                  {galatAudio && <p className="mt-1.5 text-[11px] text-rose-700">{galatAudio}</p>}
+                </Card>
+              )}
+
               <Card>
                 <div className="text-center">
                   <div className="text-[20px] font-black text-ink" dir="rtl">{isi.surah.namaArab}</div>
@@ -228,12 +346,32 @@ export function Kitab() {
                       className="min-w-0 flex-1 text-right text-[20px] leading-[2.1] text-ink">
                       {a.arab}
                     </p>
+                    {a.audio && (
+                      <TombolPutar aktif={main === a.nomor} onKlik={() => putar(a.nomor)}
+                        label={main === a.nomor ? `Pause ayah ${a.nomor}` : `Play ayah ${a.nomor}`} />
+                    )}
                   </div>
-                  <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">{a.terjemahan}</p>
+
+                  {/* Alih aksara diberi gaya yang JELAS BERBEDA dari ayatnya —
+                      miring, lebih kecil, warna lebih redup — supaya tidak
+                      pernah terbaca sebagai teks Al-Qur'an itu sendiri. */}
+                  {a.latin && (
+                    <p lang="ar-Latn"
+                      className="mt-2 border-l-2 border-brand/25 pl-2.5 text-[12px] italic leading-relaxed text-neutral-500">
+                      {a.latin}
+                    </p>
+                  )}
+
+                  <p className="mt-2 text-[13px] leading-relaxed text-neutral-700">{a.terjemahan}</p>
+
                   <div className="mt-2 space-y-1.5">
                     {a.tafsir && (
                       <Ringkas ikon="🧾" judul={`Commentary — ${a.tafsir.oleh}`}
-                        anak={<p dir="rtl" lang="ar" className="text-right leading-[2] text-[15px]">{a.tafsir.teks}</p>} />
+                        anak={
+                          a.tafsir.bahasa === 'Arabic'
+                            ? <p dir="rtl" lang="ar" className="text-right text-[15px] leading-[2]">{a.tafsir.teks}</p>
+                            : <p className="text-[13px] leading-relaxed">{a.tafsir.teks}</p>
+                        } />
                     )}
                     {/* Renungan, bukan tafsir. Bedanya dinyatakan pada judulnya. */}
                     <Ringkas ikon="🤲" judul="A question to sit with (not commentary)"
@@ -356,32 +494,13 @@ function Lain() {
     <>
       <Card className="!border-sky-500/30 !bg-sky-500/5">
         <p className="text-[12px] leading-relaxed text-neutral-600">
-          These are descriptions, not quotations. Naming a text is description; reproducing its
-          contents from memory is the thing this app refuses to do — and that refusal does not
-          weaken because the tradition changed.
+          Where a tradition has a source we can name and call, it reads here just like the Bible
+          and the Tanakh do — fetched, checked, and attributed. Where it does not, you get a
+          description and a pointer to a proper archive, and nothing is quoted from memory to fill
+          the gap. That refusal does not weaken because the tradition changed.
         </p>
       </Card>
-      {PENGANTAR.map((x) => (
-        <Card key={x.tradisi}>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl" aria-hidden="true">{x.ikon}</span>
-            <h3 className="text-[15px] font-black text-ink">{x.nama}</h3>
-          </div>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600">{x.ringkas}</p>
-          <div className="mt-2 space-y-1">
-            {x.susunan.map((y) => <Poin key={y} ikon="•">{y}</Poin>)}
-          </div>
-          <div className="mt-2 text-[10px] font-black uppercase tracking-wide text-neutral-500">
-            Where to read it properly
-          </div>
-          <div className="mt-1 space-y-0.5">
-            {x.sumberUtama.map((sx) => (
-              <a key={sx.situs} href={sx.situs} target="_blank" rel="noopener noreferrer"
-                className="block text-[11px] font-bold text-brand underline">{sx.nama} →</a>
-            ))}
-          </div>
-        </Card>
-      ))}
+      {PENGANTAR.map((x) => <TradisiLain key={x.tradisi} x={x} />)}
       <Card>
         <p className="text-[11px] leading-relaxed text-neutral-500">
           Including a tradition here is not a claim about which is true. This is a reader for
@@ -389,6 +508,101 @@ function Lain() {
         </p>
       </Card>
     </>
+  )
+}
+
+/**
+ * Satu tradisi lain: pengantar, dan pembaca bila ada penyedia yang bisa
+ * disebut namanya.
+ *
+ * Yang tidak punya penyedia TIDAK diberi kotak pencarian yang tidak akan
+ * pernah menghasilkan apa-apa. Sebuah kolom yang selalu gagal lebih buruk
+ * daripada tidak ada kolom sama sekali: ia menjanjikan sesuatu, lalu
+ * membiarkan pengguna menyalahkan dirinya sendiri karena mengetik salah.
+ */
+function TradisiLain({ x }: { x: Pengantar }) {
+  const [rujukan, setRujukan] = useState(x.baca?.contoh[0]?.rujukan ?? '')
+  const [hasil, setHasil] = useState<Bacaan[] | null>(null)
+  const [galat, setGalat] = useState('')
+  const [muat, setMuat] = useState(false)
+
+  async function cari(r = rujukan) {
+    if (!x.baca || !r.trim()) return
+    setMuat(true); setGalat(''); setHasil(null)
+    try {
+      setHasil(await bacaTradisi(x.tradisi, r.trim()))
+    } catch (e) {
+      const m = (e as Error)?.message ?? ''
+      setGalat(/nothing is shown|returned nothing/i.test(m)
+        ? m
+        : `Could not reach ${x.baca.penyedia}, or that reference was not found. Nothing is shown.`)
+    } finally { setMuat(false) }
+  }
+
+  return (
+    <Card>
+      <div className="flex items-center gap-2">
+        <span className="text-2xl" aria-hidden="true">{x.ikon}</span>
+        <h3 className="text-[15px] font-black text-ink">{x.nama}</h3>
+      </div>
+      <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600">{x.ringkas}</p>
+      <div className="mt-2 space-y-1">
+        {x.susunan.map((y) => <Poin key={y} ikon="•">{y}</Poin>)}
+      </div>
+
+      {x.baca ? (
+        <div className="mt-3 rounded-xl bg-white/50 p-2.5">
+          <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+            Read a passage · {x.baca.penyedia}
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {x.baca.contoh.map((c) => (
+              <button key={c.rujukan} onClick={() => { setRujukan(c.rujukan); void cari(c.rujukan) }}
+                className="rounded-lg bg-neutral-100 px-2.5 py-1 text-[11px] font-bold text-neutral-600 hover:bg-neutral-200">
+                {c.label}
+              </button>
+            ))}
+          </div>
+          <div className="mt-2">
+            <Field label="Reference">
+              <input className={inputClass} value={rujukan} aria-label={`Reference for ${x.nama}`}
+                onChange={(e) => setRujukan(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') void cari() }} />
+            </Field>
+          </div>
+          <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">{x.baca.petunjuk}</p>
+          <div className="mt-2"><Button onClick={() => void cari()} disabled={muat}>
+            {muat ? 'Loading…' : 'Read'}</Button></div>
+
+          {galat && <p className="mt-2 text-[11px] leading-relaxed text-rose-700">{galat}</p>}
+          {hasil?.map((b, i) => (
+            <div key={b.edisi + i} className="mt-2.5 border-t border-black/5 pt-2">
+              <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">
+                {b.rujukan} · {b.edisi}
+              </div>
+              <p className="mt-1 whitespace-pre-line text-[13px] leading-relaxed text-ink">{b.teks}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 rounded-xl bg-amber-500/10 p-2.5 text-[11px] leading-relaxed text-amber-800">
+          <b>No direct reader here, on purpose.</b> The archives below are good to read, but none of
+          them offers an interface we can call while still naming the edition and editor for each
+          passage. Showing this text without being able to say which edition it came from would be
+          showing text of unknown origin — the one thing this page will not do.
+        </p>
+      )}
+
+      <div className="mt-2 text-[10px] font-black uppercase tracking-wide text-neutral-500">
+        Where to read it properly
+      </div>
+      <div className="mt-1 space-y-0.5">
+        {x.sumberUtama.map((sx) => (
+          <a key={sx.situs} href={sx.situs} target="_blank" rel="noopener noreferrer"
+            className="block text-[11px] font-bold text-brand underline">{sx.nama} →</a>
+        ))}
+      </div>
+    </Card>
   )
 }
 

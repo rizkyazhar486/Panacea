@@ -32,6 +32,8 @@ const INDUK: Record<string, string> = {
   '/learn': '/',
   '/change': '/',
   '/scripture': '/',
+  '/hadith': '/scripture',
+  '/prayer-times': '/scripture',
   '/analisis-pro': '/latihan',
   '/riwayat-latihan': '/latihan',
   '/macro-lab': '/nutrition',

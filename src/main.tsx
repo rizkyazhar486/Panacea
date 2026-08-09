@@ -103,6 +103,8 @@ const Jelajah = lazy(() => import('./pages/Jelajah').then((m) => ({ default: m.J
 const TeknikLari = lazy(() => import('./pages/TeknikLari').then((m) => ({ default: m.TeknikLari })))
 const VerifikasiConnect = lazy(() => import('./pages/VerifikasiConnect').then((m) => ({ default: m.VerifikasiConnect })))
 const Kitab = lazy(() => import('./pages/Kitab').then((m) => ({ default: m.Kitab })))
+const Hadis = lazy(() => import('./pages/Hadis').then((m) => ({ default: m.Hadis })))
+const Adzan = lazy(() => import('./pages/Adzan').then((m) => ({ default: m.Adzan })))
 const Perubahan = lazy(() => import('./pages/Perubahan').then((m) => ({ default: m.Perubahan })))
 const Learn = lazy(() => import('./pages/Learn').then((m) => ({ default: m.Learn })))
 const DekConnect = lazy(() => import('./pages/DekConnect').then((m) => ({ default: m.DekConnect })))
@@ -338,6 +340,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/learn" element={<Learn />} />
               <Route path="/change" element={<Perubahan />} />
               <Route path="/scripture" element={<Kitab />} />
+              <Route path="/hadith" element={<Hadis />} />
+              <Route path="/prayer-times" element={<Adzan />} />
               <Route path="/dek-connect" element={<DekConnect />} />
               <Route path="/verifikasi-connect" element={<VerifikasiConnect />} />
               <Route path="/tinjau-connect" element={<TinjauConnect />} />

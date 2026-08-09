@@ -87,9 +87,15 @@ export interface PenyediaQuran extends Sumber {
   /** Pemetaan id terjemahan kami ke id penyedia. */
   edisiTerjemahan: Record<string, string>
   edisiTafsir: Record<string, string>
+  /** Edisi alih aksara Latin, bila penyedia menyediakannya. */
+  edisiLatin?: string
+  /** Pemetaan id qari kami ke id edisi audio penyedia. */
+  edisiQari: Record<string, string>
   /** Bentuk jawaban berbeda antarpenyedia, jadi tiap penyedia membaca sendiri. */
   bacaDaftar: (j: unknown) => Surah[]
   bacaSurah: (j: unknown) => { surah: Surah; ayat: { nomor: number; teks: string }[] }
+  /** Baca alamat rekaman per ayat dari jawaban edisi audio. */
+  bacaAudio?: (j: unknown) => { nomor: number; audio: string }[]
   /** Syarat pemakaian yang wajib dipatuhi, mis. keharusan mencantumkan sumber. */
   syarat: string
 }
@@ -141,8 +147,22 @@ export interface Ayat {
   nomor: number
   arab: string
   terjemahan: string
+  /**
+   * Alih aksara Latin — CARA MEMBACA, bukan makna dan bukan pengganti teks.
+   *
+   * Ditampilkan karena sebagian besar pengguna aplikasi ini tidak membaca
+   * aksara Arab, dan tanpa alih aksara mereka hanya bisa MELIHAT ayat, tidak
+   * bisa melafalkannya. Ia diambil dari penyedia seperti semua teks lain di
+   * sini; tidak satu huruf pun disusun oleh aplikasi ini.
+   *
+   * Ia sengaja ditampilkan di bawah teks Arab dan dengan gaya yang jelas
+   * berbeda, supaya tidak pernah tertukar dengan ayatnya sendiri.
+   */
+  latin?: string
+  /** Alamat rekaman bacaan ayat ini, bila edisi qari diminta. */
+  audio?: string
   /** Tafsir bila diminta; selalu bersama nama penyusunnya. */
-  tafsir?: { teks: string; oleh: string }
+  tafsir?: { teks: string; oleh: string; bahasa: string }
 }
 
 // ── Pemeriksaan keutuhan ─────────────────────────────────────────────────────
@@ -343,7 +363,12 @@ export const PENYEDIA: PenyediaQuran[] = [
     jalurSurah: '/surah/{n}/{ed}',
     edisiArab: 'quran-uthmani',
     edisiTerjemahan: { 'en.sahih': 'en.sahih', 'id.indonesian': 'id.indonesian', 'en.pickthall': 'en.pickthall' },
-    edisiTafsir: { 'ar.muyassar': 'ar.muyassar', 'ar.jalalayn': 'ar.jalalayn' },
+    edisiTafsir: {
+      'en.maududi': 'en.maududi', 'en.jalalayn': 'en.jalalayn',
+      'ar.muyassar': 'ar.muyassar', 'ar.jalalayn': 'ar.jalalayn',
+    },
+    edisiLatin: 'en.transliteration',
+    edisiQari: { alafasy: 'ar.alafasy', husary: 'ar.husary', minshawi: 'ar.minshawimujawwad' },
     bacaDaftar: (j) => {
       const d = (j as { data?: unknown[] }).data ?? j
       return (d as Record<string, never>[]).map((x) => ({
@@ -363,6 +388,18 @@ export const PENYEDIA: PenyediaQuran[] = [
         },
         ayat: a.map((x) => ({ nomor: Number(x['numberInSurah']), teks: String(x['text']) })),
       }
+    },
+    // Edisi audio memakai bentuk jawaban yang SAMA PERSIS dengan edisi teks,
+    // hanya dengan satu field tambahan berisi alamat berkas suara. Karena
+    // itulah audio ditambahkan lewat jalur ini dan bukan lewat API baru:
+    // bentuk jawabannya sudah terbukti oleh uji yang ada, jadi yang bertambah
+    // hanyalah nama edisinya.
+    bacaAudio: (j) => {
+      const d = ((j as { data?: unknown }).data ?? j) as Record<string, never>
+      const a = (d['ayahs'] ?? []) as Record<string, never>[]
+      return a
+        .map((x) => ({ nomor: Number(x['numberInSurah']), audio: String(x['audio'] ?? '') }))
+        .filter((x) => Number.isFinite(x.nomor) && /^https?:\/\//.test(x.audio))
     },
   },
   // ── CADANGAN BELUM DIPASANG, DAN ITU DISENGAJA ────────────────────────────
@@ -434,25 +471,63 @@ export async function daftarSurah(): Promise<Surah[]> {
  * Ketiganya diminta sekaligus karena membaca satu surah tanpa terjemahannya
  * bukan membaca, dan menunggu dua kali muat membuat orang menutup halaman.
  */
+export interface PilihanBaca {
+  terjemahan?: string
+  tafsirId?: string
+  /** Tampilkan alih aksara Latin. */
+  latin?: boolean
+  /** Id qari; kosong berarti tanpa audio. */
+  qari?: string
+}
+
+/**
+ * Hasil pembacaan, beserta APA YANG DIMINTA TETAPI TIDAK DATANG.
+ *
+ * Bagian kedua itu penting. Tafsir, alih aksara, dan audio semuanya bersifat
+ * tambahan, jadi kegagalannya tidak boleh membatalkan seluruh bacaan — tetapi
+ * ia juga TIDAK BOLEH DIAM. Sebelumnya tafsir yang gagal diambil hanya hilang
+ * dari layar, sehingga pengguna yang menyalakannya melihat halaman yang sama
+ * persis seperti saat ia mematikannya, tanpa satu pun petunjuk bahwa ada yang
+ * salah. Yang gagal disebutkan namanya di layar.
+ */
+export interface HasilBaca {
+  surah: Surah
+  ayat: Ayat[]
+  /** Nama bagian tambahan yang diminta tetapi gagal diambil. */
+  gagalSebagian: string[]
+}
+
 export async function bacaSurah(
   nomor: number,
   terjemahan = 'en.sahih',
   tafsirId?: string,
-): Promise<{ surah: Surah; ayat: Ayat[] }> {
+  pilihan: PilihanBaca = {},
+): Promise<HasilBaca> {
   return lewatPenyedia(async (p) => {
     const url = (ed: string) => `${p.basis}${p.jalurSurah.replace('{n}', String(nomor)).replace('{ed}', ed)}`
     const edTerj = p.edisiTerjemahan[terjemahan] ?? terjemahan
     const edTaf = tafsirId ? p.edisiTafsir[tafsirId] : undefined
+    const edLatin = pilihan.latin ? p.edisiLatin : undefined
+    const edQari = pilihan.qari ? p.edisiQari[pilihan.qari] : undefined
+    const gagalSebagian: string[] = []
 
-    const [arab, terj, taf] = await Promise.all([
+    const [arab, terj, taf, lat, aud] = await Promise.all([
       ambil<unknown>(url(p.edisiArab), `${p.id}-s${nomor}-ar`),
       ambil<unknown>(url(edTerj), `${p.id}-s${nomor}-${edTerj}`),
       edTaf ? ambil<unknown>(url(edTaf), `${p.id}-s${nomor}-${edTaf}`).catch(() => null) : Promise.resolve(null),
+      edLatin ? ambil<unknown>(url(edLatin), `${p.id}-s${nomor}-${edLatin}`).catch(() => null) : Promise.resolve(null),
+      edQari ? ambil<unknown>(url(edQari), `${p.id}-s${nomor}-${edQari}`).catch(() => null) : Promise.resolve(null),
     ])
+
+    if (edTaf && !taf) gagalSebagian.push(`commentary (${NAMA_TAFSIR(tafsirId)})`)
+    if (edLatin && !lat) gagalSebagian.push('transliteration')
+    if (edQari && !aud) gagalSebagian.push(`recitation (${NAMA_QARI(pilihan.qari)})`)
 
     const A = p.bacaSurah(arab.data)
     const T = p.bacaSurah(terj.data)
     const F = taf ? p.bacaSurah(taf.data) : null
+    const L = lat ? p.bacaSurah(lat.data) : null
+    const U = aud ? p.bacaAudio?.(aud.data) ?? null : null
 
     // DIPASANGKAN MENURUT NOMOR AYAT, BUKAN MENURUT URUTAN DALAM LARIK.
     //
@@ -465,35 +540,103 @@ export async function bacaSurah(
     // menguasai bahasa Arab tidak punya cara apa pun untuk mengetahuinya.
     const terjPerNomor = new Map(T.ayat.map((x) => [x.nomor, x.teks]))
     const tafPerNomor = F ? new Map(F.ayat.map((x) => [x.nomor, x.teks])) : null
+    const latPerNomor = L ? new Map(L.ayat.map((x) => [x.nomor, x.teks])) : null
+    const audPerNomor = U ? new Map(U.map((x) => [x.nomor, x.audio])) : null
 
+    // Alih aksara yang jumlah ayatnya tidak cocok DIBUANG SELURUHNYA, bukan
+    // dipasang sebagian. Cara membaca yang meleset satu ayat menuntun orang
+    // melafalkan ayat yang salah sambil mengira ia sedang membaca ayat di
+    // depan matanya — dan justru pembaca yang paling membutuhkan alih aksara
+    // adalah yang paling tidak mungkin menyadarinya.
+    const latinSah = !latPerNomor || A.ayat.every((x) => latPerNomor.has(x.nomor))
+    if (latPerNomor && !latinSah) gagalSebagian.push('transliteration (verses did not line up)')
+
+    const tafsirInfo = TAFSIR.find((t) => t.id === tafsirId)
     const ayat: Ayat[] = A.ayat.map((x) => ({
       nomor: x.nomor,
       arab: x.teks,
       terjemahan: terjPerNomor.get(x.nomor) ?? '',
+      latin: latinSah ? latPerNomor?.get(x.nomor) : undefined,
+      audio: audPerNomor?.get(x.nomor) || undefined,
       tafsir: tafPerNomor?.get(x.nomor)
-        ? { teks: tafPerNomor.get(x.nomor) as string, oleh: TAFSIR.find((t) => t.id === tafsirId)?.nama ?? String(tafsirId) }
+        ? {
+            teks: tafPerNomor.get(x.nomor) as string,
+            oleh: tafsirInfo?.nama ?? String(tafsirId),
+            bahasa: tafsirInfo?.bahasa ?? 'Unknown',
+          }
         : undefined,
     }))
 
     const c = periksaSurah(A.surah, ayat)
-    if (!c.utuh) { buangYangGagal(arab, terj, taf); throw new Error(c.alasan) }
+    if (!c.utuh) { buangYangGagal(arab, terj, taf, lat, aud); throw new Error(c.alasan) }
     const t = periksaTerjemahan(A.surah, ayat, T.ayat.length)
-    if (!t.utuh) { buangYangGagal(arab, terj, taf); throw new Error(t.alasan) }
-    simpanLolos(arab, terj, taf)
-    return { surah: A.surah, ayat }
+    if (!t.utuh) { buangYangGagal(arab, terj, taf, lat, aud); throw new Error(t.alasan) }
+    simpanLolos(arab, terj, taf, lat, aud)
+    return { surah: A.surah, ayat, gagalSebagian }
   })
 }
 
-/** Tafsir yang tersedia, selalu ditampilkan bersama nama penyusunnya. */
+/** Nama tafsir untuk pesan galat; id mentah tidak berarti apa pun bagi pembaca. */
+function NAMA_TAFSIR(id?: string): string {
+  return TAFSIR.find((t) => t.id === id)?.nama ?? String(id)
+}
+function NAMA_QARI(id?: string): string {
+  return QARI.find((q) => q.id === id)?.nama ?? String(id)
+}
+
+/**
+ * Tafsir yang tersedia, selalu ditampilkan bersama nama penyusun DAN bahasanya.
+ *
+ * Bahasa disebut karena ia menentukan apakah tafsirnya bisa dipakai sama
+ * sekali. Sebelumnya hanya dua tafsir berbahasa Arab yang tersedia, sehingga
+ * seorang pengguna yang tidak membaca bahasa Arab menyalakan "commentary",
+ * memperoleh satu blok teks yang tidak dapat ia baca, dan tidak memperoleh
+ * apa pun dari fitur yang seluruh tujuannya adalah memahami.
+ *
+ * KENAPA TAFSIR PENTING DI APLIKASI KESEHATAN. Membaca ayat tanpa memahaminya
+ * memberi ketenangan sesaat; memahaminya memberi sesuatu yang bisa dipakai
+ * saat keadaan sulit. Itulah alasan tafsir ada di sini — bukan sebagai hiasan
+ * keagamaan, melainkan karena makna yang dipahami adalah yang benar-benar
+ * menopang seseorang.
+ *
+ * Dan justru karena itu ia harus datang dari ULAMA, bukan dari aplikasi ini.
+ * Menyusun sendiri "makna" sebuah ayat untuk tujuan menenangkan pembaca adalah
+ * cara paling halus untuk membelokkan wahyu menjadi motivasi — dan itu tidak
+ * dilakukan di sini, tidak satu kalimat pun.
+ */
 export const TAFSIR = [
-  { id: 'ar.muyassar', nama: 'Tafsir Al-Muyassar', bahasa: 'Arab' },
-  { id: 'ar.jalalayn', nama: 'Tafsir Al-Jalalayn', bahasa: 'Arab' },
+  { id: 'en.maududi', nama: 'Tafhim al-Qur’an — Abul A‘la Maududi', bahasa: 'English',
+    tentang: 'A complete modern commentary, widely read and translated. Explains the context of each passage before its meaning.' },
+  { id: 'en.jalalayn', nama: 'Tafsir al-Jalalayn (English)', bahasa: 'English',
+    tentang: 'The classical concise commentary of al-Mahalli and al-Suyuti, in English translation. Short, close to the wording.' },
+  { id: 'ar.muyassar', nama: 'Tafsir Al-Muyassar', bahasa: 'Arabic',
+    tentang: 'Prepared by the King Fahd Complex. Plain modern Arabic, deliberately simple.' },
+  { id: 'ar.jalalayn', nama: 'Tafsir Al-Jalalayn', bahasa: 'Arabic',
+    tentang: 'The classical text in its original Arabic.' },
 ]
 
 export const TERJEMAHAN = [
-  { id: 'en.sahih', nama: 'Saheeh International', bahasa: 'Inggris' },
-  { id: 'id.indonesian', nama: 'Kemenag RI', bahasa: 'Indonesia' },
-  { id: 'en.pickthall', nama: 'Pickthall', bahasa: 'Inggris' },
+  { id: 'en.sahih', nama: 'Saheeh International', bahasa: 'English' },
+  { id: 'id.indonesian', nama: 'Kemenag RI', bahasa: 'Indonesian' },
+  { id: 'en.pickthall', nama: 'Pickthall', bahasa: 'English' },
+]
+
+/**
+ * Qari yang tersedia.
+ *
+ * MENDENGARKAN BUKAN TAMBAHAN KECIL. Al-Qur'an diturunkan sebagai bacaan yang
+ * dilisankan, dan bagi pengguna yang belum membaca aksara Arab, rekaman adalah
+ * satu-satunya jalan mendengar ayat sebagaimana ia dibunyikan. Berpasangan
+ * dengan alih aksara, keduanya menjadi cara belajar melafalkan: dengar, lalu
+ * ikuti.
+ *
+ * Rekamannya tidak disimpan aplikasi ini. Alamatnya datang dari penyedia yang
+ * sama dengan teksnya dan diputar langsung oleh peramban.
+ */
+export const QARI = [
+  { id: 'alafasy', nama: 'Mishary Rashid Alafasy', catatan: 'Clear and measured; the most widely used recording.' },
+  { id: 'husary', nama: 'Mahmoud Khalil Al-Husary', catatan: 'Slow and deliberate — the usual choice for learning pronunciation.' },
+  { id: 'minshawi', nama: 'Mohamed Siddiq El-Minshawi', catatan: 'Mujawwad style, slower and more melodic.' },
 ]
 
 /**
@@ -601,6 +744,63 @@ export async function bacaTanakh(rujukan: string): Promise<{ ibrani: Bacaan; ter
 }
 
 /**
+ * Pembacaan tradisi lain — kanon Pali dan kitab Konfusius.
+ *
+ * Bentuk jawaban kedua penyedia BERBEDA satu sama lain dan berbeda pula dari
+ * penyedia Al-Qur'an, jadi masing-masing dibaca oleh fungsinya sendiri. Tidak
+ * ada tebakan bersama yang berlaku untuk semua — tebakan semacam itu sudah
+ * pernah dibuang dari berkas ini sekali.
+ *
+ * Keduanya melewati periksaBacaan yang sama dengan Alkitab dan Tanakh, jadi
+ * jawaban kosong, jawaban rusak, dan halaman web yang menyamar sebagai teks
+ * sama-sama ditolak alih-alih ditampilkan.
+ */
+export async function bacaTradisi(tradisi: Tradisi, rujukan: string): Promise<Bacaan[]> {
+  const png = PENGANTAR.find((x) => x.tradisi === tradisi)
+  if (!png?.baca) throw new Error('No reader is configured for this tradition.')
+  const b = png.baca
+
+  if (tradisi === 'buddhist') {
+    const j = await ambil<Record<string, unknown>>(
+      `${b.basis}/suttas/${encodeURIComponent(rujukan)}`, `sc-${rujukan}`)
+    const d = j.data
+    const akar = (d['root_text'] ?? {}) as Record<string, unknown>
+    const terj = (d['translation'] ?? {}) as Record<string, unknown>
+    const rapikan = (v: unknown): string => {
+      if (v && typeof v === 'object') return Object.values(v as Record<string, unknown>).map(rapikan).join(' ')
+      return String(v ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+    }
+    const keluar: Bacaan[] = []
+    const tPali = rapikan(akar['text'] ?? akar)
+    const tIng = rapikan(terj['text'] ?? terj)
+    if (tPali) keluar.push({ rujukan, teks: tPali, edisi: String(akar['lang'] ?? 'Pali') })
+    if (tIng) keluar.push({ rujukan, teks: tIng, edisi: String(terj['author'] ?? terj['lang'] ?? 'English translation') })
+    for (const x of keluar) {
+      const c = periksaBacaan(x)
+      if (!c.utuh) { buangYangGagal(j); throw new Error(c.alasan) }
+    }
+    if (!keluar.length) {
+      buangYangGagal(j)
+      throw new Error(`${b.penyedia} returned nothing for "${rujukan}". Check the reference — nothing is shown rather than a guess.`)
+    }
+    simpanLolos(j)
+    return keluar
+  }
+
+  // Chinese Text Project: { fulltext: [ "…", "…" ] }
+  const j = await ambil<Record<string, unknown>>(
+    `${b.basis}/gettext?urn=ctp:${encodeURIComponent(rujukan)}`, `ctext-${rujukan}`)
+  const d = j.data
+  const baris = Array.isArray(d['fulltext']) ? (d['fulltext'] as unknown[]) : []
+  const teks = baris.map((x) => String(x ?? '').replace(/<[^>]+>/g, ' ').trim()).filter(Boolean).join('\n')
+  const bacaan: Bacaan = { rujukan, teks, edisi: String(d['title'] ?? b.penyedia) }
+  const c = periksaBacaan(bacaan)
+  if (!c.utuh) { buangYangGagal(j); throw new Error(c.alasan) }
+  simpanLolos(j)
+  return [bacaan]
+}
+
+/**
  * Pengantar ringkas untuk tradisi yang teksnya TIDAK dimuat.
  *
  * Ditulis sebagai keterangan, bukan kutipan. Tidak ada satu pun petikan kitab
@@ -616,6 +816,22 @@ export interface Pengantar {
   susunan: string[]
   /** Ke mana pembaca yang serius harus pergi. */
   sumberUtama: { nama: string; situs: string }[]
+  /**
+   * Pembacaan langsung, bila ada penyedia yang bisa disebut namanya.
+   *
+   * Tidak semua tradisi punya. Weda TIDAK punya, dan itu dinyatakan apa adanya
+   * di layar alih-alih ditambal dengan sumber yang tidak jelas asalnya —
+   * "tidak ada sumber yang bisa kami pertanggungjawabkan" adalah jawaban yang
+   * sah, dan jauh lebih baik daripada teks yang tidak diketahui dari mana.
+   */
+  baca?: {
+    penyedia: string
+    situs: string
+    basis: string
+    /** Contoh rujukan yang bisa langsung dicoba pengguna. */
+    contoh: { label: string; rujukan: string }[]
+    petunjuk: string
+  }
 }
 
 export const PENGANTAR: Pengantar[] = [
@@ -627,6 +843,12 @@ export const PENGANTAR: Pengantar[] = [
       { nama: 'GRETIL — Göttingen Register of Electronic Texts in Indian Languages', situs: 'http://gretil.sub.uni-goettingen.de' },
       { nama: 'Sacred-texts archive', situs: 'https://sacred-texts.com/hin' },
     ],
+    // Sengaja TANPA pembacaan langsung. Arsip yang ada memang bagus untuk
+    // dibaca manusia, tetapi tidak satu pun menyediakan antarmuka yang bisa
+    // kami panggil sambil tetap menyebutkan edisi dan penyuntingnya per
+    // petikan. Menampilkan teks Weda tanpa bisa menyebut edisinya sama saja
+    // dengan menampilkan teks yang tidak diketahui asalnya, dan itu dilarang
+    // di kepala berkas ini.
   },
   {
     tradisi: 'buddhist', nama: 'Pali Canon (Tipiṭaka)', ikon: '☸️',
@@ -636,6 +858,18 @@ export const PENGANTAR: Pengantar[] = [
       { nama: 'SuttaCentral — original texts with translations', situs: 'https://suttacentral.net' },
       { nama: 'Access to Insight', situs: 'https://accesstoinsight.org' },
     ],
+    baca: {
+      penyedia: 'SuttaCentral',
+      situs: 'https://suttacentral.net',
+      basis: 'https://suttacentral.net/api',
+      contoh: [
+        { label: 'Dhammapada 1', rujukan: 'dhp1-20' },
+        { label: 'The first discourse (SN 56.11)', rujukan: 'sn56.11' },
+        { label: 'Mindfulness of breathing (MN 118)', rujukan: 'mn118' },
+        { label: 'Loving-kindness (Snp 1.8)', rujukan: 'snp1.8' },
+      ],
+      petunjuk: 'Enter a SuttaCentral reference such as "mn118" or "sn56.11". The identifiers follow the standard citation system for the Pali Canon.',
+    },
   },
   {
     tradisi: 'confucian', nama: 'Confucian classics', ikon: '📜',
@@ -644,5 +878,17 @@ export const PENGANTAR: Pengantar[] = [
     sumberUtama: [
       { nama: 'Chinese Text Project — original texts with translations', situs: 'https://ctext.org' },
     ],
+    baca: {
+      penyedia: 'Chinese Text Project (ctext.org)',
+      situs: 'https://ctext.org',
+      basis: 'https://api.ctext.org',
+      contoh: [
+        { label: 'Analects — Book 1', rujukan: 'analects/xue-er' },
+        { label: 'Analects — Book 2', rujukan: 'analects/wei-zheng' },
+        { label: 'Great Learning', rujukan: 'liji/da-xue' },
+        { label: 'Doctrine of the Mean', rujukan: 'liji/zhong-yong' },
+      ],
+      petunjuk: 'Enter a Chinese Text Project reference such as "analects/xue-er". The original Chinese is shown; English is included where the project carries a parallel translation.',
+    },
   },
 ]

@@ -164,6 +164,8 @@ const nav: Nav[] = [
   // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
   { to: '/scripture', label: 'Scripture', icon: IconShield, roles: ALL, group: 'Account' },
+  { to: '/hadith', label: 'Hadith', icon: IconShield, roles: ALL, group: 'Account' },
+  { to: '/prayer-times', label: 'Prayer times', icon: IconShield, roles: ALL, group: 'Account' },
   { to: '/change', label: 'Change', icon: IconChartUp, roles: ALL, group: 'Account' },
   { to: '/learn', label: 'Learn', icon: IconChartUp, roles: ALL, group: 'Account' },
   { to: '/dek-connect', label: 'Connect', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Account' },
