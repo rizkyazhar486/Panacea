@@ -16,10 +16,10 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TAB: { id: Kapan | 'semua'; label: string; emoji: string }[] = [
-  { id: 'semua', label: 'Semua', emoji: '📋' },
-  { id: 'sebelum', label: 'Sebelum', emoji: '⚡' },
-  { id: 'sesudah', label: 'Sesudah', emoji: '🧘' },
-  { id: 'harian', label: 'Harian', emoji: '💺' },
+  { id: 'semua', label: 'All', emoji: '📋' },
+  { id: 'sebelum', label: 'Before', emoji: '⚡' },
+  { id: 'sesudah', label: 'After', emoji: '🧘' },
+  { id: 'harian', label: 'Daily', emoji: '💺' },
   { id: 'yoga', label: 'Yoga & Pilates', emoji: '🕉️' },
 ]
 
@@ -28,8 +28,8 @@ const WARNA: Record<Kapan, string> = {
   harian: 'text-sky-700', yoga: 'text-violet-700',
 }
 const LABEL_KAPAN: Record<Kapan, string> = {
-  sebelum: 'dinamis · sebelum latihan', sesudah: 'statis · sesudah latihan',
-  harian: 'harian · postur', yoga: 'yoga & pilates',
+  sebelum: 'dynamic · before training', sesudah: 'static · after training',
+  harian: 'daily · posture', yoga: 'yoga & pilates',
 }
 
 export function Peregangan() {
@@ -53,29 +53,29 @@ export function Peregangan() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle
         icon={<IconLeaf />}
-        title="Peregangan & Postur"
+        title="Stretching & Posture"
         subtitle="Organised by when, not by muscle"
       />
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Satu hal yang perlu diluruskan dulu</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">One thing to get straight first</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Peregangan <b>statis</b> sebelum latihan — menahan posisi 30 detik atau lebih — menurunkan
-          tenaga dan kekuatan untuk sementara, dan <b>tidak</b> menurunkan risiko cedera. Yang sebelum
-          latihan seharusnya <b>dinamis</b>: gerakan yang membawa sendi melewati rentang geraknya
-          berulang kali.
+          <b>Static</b> stretching before training — holding a position for 30 seconds or more —
+          temporarily lowers power and strength, and does <b>not</b> reduce injury risk. What belongs
+          before training is <b>dynamic</b> work: movement that takes the joints through their range,
+          repeatedly.
         </p>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Peregangan statis tetap punya tempat — setelah latihan, atau sebagai sesi tersendiri untuk
-          menambah rentang gerak. Hanya waktunya yang selama ini keliru.
+          Static stretching still has its place — after training, or as its own session to build
+          range of motion. It is only the timing that has been wrong all along.
         </p>
       </Card>
 
       {/* Protokol siap pakai */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rutinitas siap pakai</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Pilih situasinya, bukan ototnya.</p>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Ready-made routines</div>
+        <p className="mt-1 text-[12px] text-neutral-500">Pick the situation, not the muscle.</p>
         <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {PROTOKOL.map((p) => (
             <button
@@ -122,13 +122,13 @@ export function Peregangan() {
 
       {/* Daftar gerakan */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Gerakan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Movements</div>
         <input
           className={`${inputClass} mt-2`}
-          placeholder="Cari: hamstring, bahu, lari, duduk…"
+          placeholder="Search: hamstring, shoulder, running, desk…"
           value={cari}
           onChange={(e) => setCari(e.target.value)}
-          aria-label="Cari gerakan"
+          aria-label="Search movements"
         />
         <div className="mt-2 flex flex-wrap gap-1.5">
           {TAB.map((t) => (
@@ -159,8 +159,8 @@ export function Peregangan() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[13px] font-black text-ink">{g.nama}</span>
-                      {g.video ? <span className="text-[10px]" title="Ada klip">🎬</span>
-                        : g.gambar ? <span className="text-[10px]" title="Ada foto acuan">🖼️</span> : null}
+                      {g.video ? <span className="text-[10px]" title="Has a clip">🎬</span>
+                        : g.gambar ? <span className="text-[10px]" title="Has a reference photo">🖼️</span> : null}
                     </div>
                     <div className={`truncate text-[10px] font-bold ${WARNA[g.kapan]}`}>{LABEL_KAPAN[g.kapan]}</div>
                   </div>
@@ -178,7 +178,7 @@ export function Peregangan() {
                     ) : null}
                     <div className="flex flex-wrap gap-2 text-[11px] text-neutral-500">
                       <span><b className="text-neutral-600">Target:</b> {g.target}</span>
-                      <span><b className="text-neutral-600">Durasi:</b> {g.durasi}</span>
+                      <span><b className="text-neutral-600">Duration:</b> {g.durasi}</span>
                     </div>
                     <ol className="space-y-1">
                       {g.cara.map((c, i) => (
@@ -194,7 +194,7 @@ export function Peregangan() {
                     </div>
                     {g.hindari && (
                       <div className="rounded-lg bg-rose-500/10 p-2">
-                        <div className="text-[10px] font-black uppercase text-rose-600">Hindari</div>
+                        <div className="text-[10px] font-black uppercase text-rose-600">Avoid</div>
                         <p className="text-[12px] leading-snug text-neutral-600">{g.hindari}</p>
                       </div>
                     )}
@@ -208,7 +208,7 @@ export function Peregangan() {
 
       {/* Salah kaprah */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Empat salah kaprah</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Four misconceptions</div>
         <div className="mt-2 space-y-2">
           {SALAH_KAPRAH.map((s) => (
             <div key={s.klaim} className="rounded-xl bg-white/5 p-3">
@@ -220,16 +220,16 @@ export function Peregangan() {
       </Card>
 
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rujukan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">References</div>
         <ul className="mt-2 space-y-1">
           {RUJUKAN_PEREGANGAN.map((r) => (
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
         <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-          Klip demonstrasi dihasilkan AI sebagai ilustrasi gerakan, bukan rekaman instruktur.
-          Bila ada nyeri tajam, kesemutan atau baal saat melakukan salah satu gerakan, hentikan
-          dan konsultasikan — itu tanda saraf, bukan otot.
+          Demonstration clips are AI-generated illustrations of the movement, not footage of an
+          instructor. If any movement brings sharp pain, tingling or numbness, stop and get it
+          looked at — that points to a nerve, not a muscle.
         </p>
       </Card>
     </div>

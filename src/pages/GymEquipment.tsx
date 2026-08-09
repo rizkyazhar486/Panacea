@@ -23,25 +23,25 @@ export function GymEquipment() {
       <div className="flex items-center gap-3">
         <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-2xl">🏋️</span>
         <div>
-          <h1 className="text-lg font-black text-ink dark:text-ink">Alat Fitness & Hyrox</h1>
-          <p className="text-xs text-neutral-500">Cara pakai, otot sasaran, dan perbandingan jujur dengan calisthenic</p>
+          <h1 className="text-lg font-black text-ink dark:text-ink">Gym Equipment & Hyrox</h1>
+          <p className="text-xs text-neutral-500">How to use each one, which muscles work, and an honest comparison with calisthenics</p>
         </div>
       </div>
 
       <Card className="!p-4">
-        <SectionTitle icon={<IconRun size={18} />} title={`${EQUIPMENT.length} alat & stasiun`}
-          subtitle="Termasuk seluruh stasiun resmi Hyrox" />
+        <SectionTitle icon={<IconRun size={18} />} title={`${EQUIPMENT.length} machines & stations`}
+          subtitle="Including every official Hyrox station" />
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Setiap alat di sini dibandingkan dengan padanan tanpa alatnya secara dua arah: di mana
-          mesin benar-benar unggul, di mana gerakan bodyweight yang unggul, dan kapan perbedaannya
-          terlalu kecil untuk diperdebatkan. Anggapan bahwa mesin selalu inferior maupun bahwa mesin
-          selalu lebih aman sama-sama tidak akurat — yang berbeda dan bisa diukur adalah tuntutan
-          otot penstabil, kemudahan menambah beban, keterampilan yang dibutuhkan, dan seberapa baik
-          gerakan itu berpindah ke kehidupan nyata.
+          Every machine here is compared against its equipment-free equivalent in both directions:
+          where the machine genuinely wins, where the bodyweight movement wins, and when the
+          difference is too small to argue about. "Machines are always inferior" and "machines are
+          always safer" are equally inaccurate — what actually differs, and can be measured, is how
+          much stabiliser work the movement demands, how easily load can be added, how much skill it
+          takes, and how well it transfers to real life.
         </p>
         <input
           className={inputClass + ' mt-3'}
-          placeholder="Cari alat (mis. treadmill, sled, dayung, otot gluteus)…"
+          placeholder="Search equipment (e.g. treadmill, sled, rower, glutes)…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -60,7 +60,7 @@ export function GymEquipment() {
       </Card>
 
       {list.length === 0 && (
-        <p className="text-center text-[13px] text-neutral-500">Tidak ada yang cocok — coba kata kunci lain.</p>
+        <p className="text-center text-[13px] text-neutral-500">Nothing matched — try a different term.</p>
       )}
 
       {list.map((e) => {
@@ -83,13 +83,13 @@ export function GymEquipment() {
               <div className="mt-3 space-y-3 border-t border-neutral-200 pt-3 dark:border-white/10">
                 {e.hyroxNote && (
                   <div className="rounded-xl bg-brand-50 p-3 dark:bg-brand/10">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Catatan Hyrox</div>
+                    <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Hyrox note</div>
                     <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.hyroxNote}</p>
                   </div>
                 )}
 
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Cara Penggunaan</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">How to use it</div>
                   <ol className="mt-1 space-y-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                     {e.howTo.map((h, i) => (
                       <li key={i} className="flex gap-2">
@@ -101,7 +101,7 @@ export function GymEquipment() {
                 </div>
 
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-600 dark:text-rose-600">Kesalahan Umum</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-rose-600 dark:text-rose-600">Common mistakes</div>
                   <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                     {e.mistakes.map((m, i) => <li key={i}>{m}</li>)}
                   </ul>
@@ -109,13 +109,13 @@ export function GymEquipment() {
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Otot Utama</div>
+                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Primary muscles</div>
                     <ul className="mt-1 space-y-0.5 text-[12px] text-neutral-700 dark:text-neutral-200">
                       {e.primaryMuscles.map((m) => <li key={m}>• {m}</li>)}
                     </ul>
                   </div>
                   <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Otot Pendukung</div>
+                    <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Secondary muscles</div>
                     <ul className="mt-1 space-y-0.5 text-[12px] text-neutral-700 dark:text-neutral-200">
                       {e.secondaryMuscles.map((m) => <li key={m}>• {m}</li>)}
                     </ul>
@@ -123,25 +123,25 @@ export function GymEquipment() {
                 </div>
 
                 <div>
-                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Alat vs Calisthenic</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Machine vs calisthenics</div>
                   <div className="mt-1.5 space-y-2">
                     <div className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-500/10">
-                      <div className="text-[11px] font-black text-emerald-800 dark:text-emerald-300">Keunggulan alat ini</div>
+                      <div className="text-[11px] font-black text-emerald-800 dark:text-emerald-300">Where the machine wins</div>
                       <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.machineWins}</p>
                     </div>
                     <div className="rounded-xl bg-amber-50 p-3 dark:bg-amber-500/10">
-                      <div className="text-[11px] font-black text-amber-800 dark:text-amber-300">Keunggulan versi tanpa alat</div>
+                      <div className="text-[11px] font-black text-amber-800 dark:text-amber-300">Where bodyweight wins</div>
                       <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.calisthenicWins}</p>
                     </div>
                     <div className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
-                      <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pengganti tanpa alat</div>
+                      <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Bodyweight substitute</div>
                       <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.calisthenicAlternative}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-brand/30 bg-white p-3 dark:bg-white/5">
-                  <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Kesimpulan</div>
+                  <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Bottom line</div>
                   <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{e.verdict}</p>
                 </div>
               </div>
@@ -151,9 +151,9 @@ export function GymEquipment() {
       })}
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Panduan umum untuk orang sehat. Bila Anda punya cedera, penyakit jantung, masalah punggung,
-        atau sedang hamil, konsultasikan dulu sebelum memakai alat berbeban. Minta bantuan instruktur
-        saat pertama kali mencoba alat yang belum Anda kenal.
+        General guidance for healthy adults. If you have an injury, heart disease, a back problem,
+        or are pregnant, check with a clinician before using loaded equipment. Ask an instructor for
+        help the first time you try a machine you do not know.
       </div>
     </div>
   )
