@@ -13,6 +13,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type SkillCategory =
+  | 'Pemeriksaan Fisik per Sistem'
   | 'Kegawatdaruratan'
   | 'Obstetri & Ginekologi'
   | 'Akses Vaskular & Cairan'
@@ -61,6 +62,401 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
 ]
 
 export const CLINICAL_SKILLS: ClinicalSkill[] = [
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PEMERIKSAAN FISIK PER SISTEM ORGAN
+  //
+  // Sebelumnya seluruh keterampilan di berkas ini adalah TINDAKAN, dan tidak
+  // satu pun berupa PEMERIKSAAN. Padahal stasiun pemeriksaan fisik adalah yang
+  // paling banyak jumlahnya di OSCE, dan nilainya diberikan untuk perilaku yang
+  // TERLIHAT PENGUJI — urutan yang benar, sisi yang benar, dan menyebutkan apa
+  // yang sedang dicari. Mahasiswa yang tahu temuannya tetapi memeriksa dengan
+  // urutan acak tetap kehilangan angka.
+  //
+  // Urutan universalnya inspeksi, palpasi, perkusi, auskultasi — kecuali pada
+  // abdomen yang auskultasinya didahulukan, karena palpasi mengubah bising usus
+  // yang justru hendak dinilai.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'pf-head-to-toe',
+    category: 'Pemeriksaan Fisik per Sistem',
+    title: 'Pemeriksaan Fisik Umum — Head to Toe',
+    subtitle: 'Kerangka menyeluruh dari kepala sampai ujung kaki, dipakai sebagai tulang punggung semua stasiun',
+    indikasi: [
+      'Pemeriksaan awal setiap pasien baru, rawat inap, dan medical check-up',
+      'Kerangka dasar yang dipersempit menjadi pemeriksaan terarah pada stasiun bersistem tunggal',
+    ],
+    alat: [
+      'Stetoskop, tensimeter, termometer, dan oksimeter denyut',
+      'Senter kecil, spatula lidah, palu refleks, dan garpu tala',
+      'Meteran, timbangan, dan pengukur tinggi badan',
+      'Sarung tangan dan pengalas pemeriksaan',
+    ],
+    fases: [
+      {
+        fase: 'Pembukaan yang bernilai angka di setiap stasiun',
+        steps: [
+          'Cuci tangan atau pakai antiseptik SECARA TERLIHAT sebelum menyentuh pasien — nilai gratis yang paling sering terlewat.',
+          'Ucapkan salam, sebutkan nama dan peran Anda, lalu konfirmasi identitas pasien dengan dua penanda.',
+          'Jelaskan apa yang akan diperiksa dan mengapa, lalu MINTA IZIN secara tegas.',
+          'Tanyakan apakah ada bagian yang nyeri, dan periksa bagian itu PALING AKHIR.',
+          'Atur posisi dan buka pakaian seperlunya sambil menjaga privasi; tawarkan pendamping pada pemeriksaan yang sensitif.',
+          'Berdiri di SISI KANAN pasien sebagai kelaziman pemeriksaan.',
+        ],
+      },
+      {
+        fase: 'Kesan umum dan tanda vital',
+        steps: [
+          'Kesan umum: tampak sakit ringan, sedang, atau berat; posisi tubuh; dan apakah tampak sesak maupun kesakitan.',
+          'Kesadaran secara kualitatif (kompos mentis sampai koma) dan kuantitatif dengan Skala Koma Glasgow.',
+          'Tekanan darah pada kedua lengan bila pertama kali diperiksa; nadi menyangkut frekuensi, irama, isi, dan kesamaan kanan-kiri.',
+          'Laju napas dihitung satu menit penuh TANPA memberi tahu pasien, agar tidak dipengaruhi kesadaran diri.',
+          'Suhu, saturasi oksigen, serta skala nyeri.',
+          'Antropometri: berat badan, tinggi badan, indeks massa tubuh, dan lingkar perut.',
+        ],
+      },
+      {
+        fase: 'Kepala dan leher',
+        steps: [
+          'Kepala: bentuk, ukuran, luka, dan nyeri tekan; rambut dan kulit kepala.',
+          'Mata: konjungtiva anemis, sklera ikterik, pupil bulat isokor beserta refleks cahaya langsung dan tidak langsung, serta gerak bola mata enam arah.',
+          'Telinga: daun telinga, liang, membran timpani bila memakai otoskop, dan nyeri tekan tragus maupun mastoid.',
+          'Hidung: deviasi septum, mukosa, sekret, dan nyeri tekan sinus frontalis serta maksilaris.',
+          'Mulut dan tenggorok: bibir, mukosa, lidah, gigi, faring, dan tonsil beserta ukurannya.',
+          'Leher: kelenjar getah bening submandibula, servikal, dan supraklavikula; kelenjar tiroid saat menelan; tekanan vena jugularis; dan kaku kuduk.',
+        ],
+      },
+      {
+        fase: 'Toraks — jantung dan paru',
+        steps: [
+          'Inspeksi: bentuk dada, kesimetrisan gerak napas, retraksi, dan iktus kordis.',
+          'Palpasi: pengembangan dada kanan-kiri, fremitus taktil, dan iktus kordis menyangkut letak, kuat angkat, serta thrill.',
+          'Perkusi: batas paru-hati, batas jantung, dan bandingkan sonor kanan-kiri.',
+          'Auskultasi paru pada seluruh lapangan depan, samping, dan belakang secara BERSELANG KANAN-KIRI pada ketinggian yang sama.',
+          'Auskultasi jantung pada empat katup dengan diafragma dan bel.',
+        ],
+      },
+      {
+        fase: 'Abdomen',
+        steps: [
+          'INSPEKSI lalu AUSKULTASI lalu PERKUSI lalu PALPASI. Urutannya berbeda dari bagian tubuh lain karena palpasi mengubah bising usus.',
+          'Inspeksi: bentuk, jaringan parut, pelebaran vena, dan gerak dinding perut.',
+          'Auskultasi bising usus minimal satu menit, dan bruit pada aorta maupun arteri renalis.',
+          'Perkusi: timpani atau redup, pekak beralih pada asites, serta batas hati dan limpa.',
+          'Palpasi superfisial lalu dalam, DIMULAI DARI DAERAH YANG TIDAK NYERI; nilai hati, limpa, ginjal, nyeri tekan, nyeri lepas, dan defans.',
+        ],
+      },
+      {
+        fase: 'Ekstremitas, kulit, dan punggung',
+        steps: [
+          'Ekstremitas: akral hangat atau dingin, pengisian kapiler, edema beserta derajat dan sifat cekungnya, sianosis, jari tabuh, dan deformitas.',
+          'Nadi perifer radialis, brakialis, femoralis, poplitea, tibialis posterior, dan dorsalis pedis — bandingkan kanan dan kiri.',
+          'Kulit: warna, turgor, kelembapan, ruam, dan luka termasuk daerah tertekan.',
+          'Punggung: bentuk tulang belakang, nyeri ketok kostovertebra, dan nyeri tekan.',
+          'Neurologis singkat berupa kekuatan motorik, sensorik kasar, dan refleks fisiologis; diperdalam bila ada keluhan.',
+        ],
+      },
+      {
+        fase: 'Penutup',
+        steps: [
+          'Rapikan pakaian pasien dan kembalikan ke posisi nyaman.',
+          'Cuci tangan kembali secara terlihat.',
+          'Sampaikan ringkasan temuan kepada pasien dengan bahasa yang ia pahami, lalu rencana selanjutnya.',
+          'Ucapkan terima kasih dan tanyakan apakah ada yang ingin ditanyakan.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'IPPA',
+        kepanjangan: [
+          'I — Inspeksi',
+          'P — Palpasi',
+          'P — Perkusi',
+          'A — Auskultasi',
+        ],
+        catatan: 'Berlaku di semua bagian tubuh KECUALI abdomen, yang urutannya menjadi Inspeksi, Auskultasi, Perkusi, Palpasi.',
+      },
+    ],
+    tips: [
+      'Sebutkan dengan suara terdengar apa yang sedang Anda cari — penguji menilai apa yang ia dengar dan lihat, bukan apa yang ada di kepala Anda.',
+      'Selalu bandingkan kanan dan kiri pada ketinggian yang sama; membandingkan adalah inti pemeriksaan fisik.',
+      'Daerah yang nyeri diperiksa PALING AKHIR, supaya pasien tidak menegang sepanjang sisa pemeriksaan.',
+      'Hangatkan tangan dan stetoskop lebih dahulu; tangan dingin membuat pasien menegang dan hasil palpasi menjadi keliru.',
+    ],
+    referensi: ['SKDI2012', 'PPKFKTP2014'],
+  },
+  {
+    id: 'pf-jantung',
+    category: 'Pemeriksaan Fisik per Sistem',
+    title: 'Pemeriksaan Jantung',
+    subtitle: 'Empat katup, tekanan vena jugularis, dan tanda gagal jantung',
+    alat: [
+      'Stetoskop dengan diafragma dan bel',
+      'Tensimeter',
+      'Penggaris untuk mengukur tekanan vena jugularis',
+    ],
+    fases: [
+      {
+        fase: 'Posisi dan inspeksi',
+        steps: [
+          'Baringkan pasien dengan kepala terangkat 30-45 derajat, dada terbuka, dan pemeriksa berdiri di sisi kanan.',
+          'Inspeksi dari ujung ke pusat: jari tabuh, splinter haemorrhage, dan sianosis perifer pada tangan; xanthelasma, sianosis sentral, serta konjungtiva pucat pada wajah.',
+          'Inspeksi dada: bentuk, jaringan parut bekas operasi, dan iktus kordis yang terlihat.',
+          'Nilai tekanan vena jugularis pada sudut 45 derajat, diukur vertikal dari sudut sternum; lebih dari 4 cm menandakan peninggian.',
+        ],
+      },
+      {
+        fase: 'Palpasi',
+        steps: [
+          'Cari iktus kordis; normalnya di sela iga kelima garis midklavikula kiri seluas satu ujung jari.',
+          'Nilai apakah iktus BERGESER yang menandakan pembesaran ventrikel kiri, KUAT ANGKAT yang menandakan hipertrofi, maupun MELEBAR.',
+          'Raba thrill pada tiap katup — thrill selalu berarti bising derajat empat atau lebih.',
+          'Raba heaving parasternal kiri sebagai tanda hipertrofi ventrikel kanan.',
+          'Raba nadi karotis untuk menilai bentuk gelombangnya, lalu periksa nadi perifer beserta kesamaannya.',
+        ],
+      },
+      {
+        fase: 'Auskultasi empat katup',
+        steps: [
+          'AORTA di sela iga kedua garis parasternal KANAN.',
+          'PULMONAL di sela iga kedua garis parasternal KIRI.',
+          'TRIKUSPID di sela iga keempat sampai kelima garis parasternal kiri bawah.',
+          'MITRAL di sela iga kelima garis midklavikula kiri, yaitu pada iktus kordis.',
+          'Pakai DIAFRAGMA untuk bunyi bernada tinggi seperti bising sistolik, S1, dan S2; pakai BEL untuk bernada rendah seperti S3, S4, dan stenosis mitral.',
+          'Pada tiap titik: kenali S1 dan S2, cari bunyi tambahan, lalu tentukan waktu bising terhadap siklus dengan meraba nadi karotis bersamaan.',
+        ],
+      },
+      {
+        fase: 'Manuver penajam',
+        steps: [
+          'Miringkan pasien ke KIRI lalu dengarkan dengan bel di apeks — menajamkan bising stenosis mitral dan S3.',
+          'Dudukkan pasien lalu condongkan ke depan, minta membuang napas dan menahannya, dengarkan di tepi sternum kiri — menajamkan bising regurgitasi aorta.',
+          'Nilai penjalaran: bising stenosis aorta menjalar ke karotis, sedangkan regurgitasi mitral menjalar ke aksila.',
+        ],
+      },
+      {
+        fase: 'Tanda gagal jantung dan penutup',
+        steps: [
+          'Auskultasi basal paru untuk ronki halus.',
+          'Palpasi hati untuk hepatomegali dan refluks hepatojugular.',
+          'Periksa edema tungkai serta daerah sakrum pada pasien yang berbaring lama.',
+          'Rapikan pasien, cuci tangan, dan sampaikan temuan.',
+        ],
+      },
+    ],
+    tips: [
+      'Selalu raba nadi karotis SAAT auskultasi untuk menentukan bising itu sistolik atau diastolik — tanpa itu penentuan waktunya hanya tebakan.',
+      'Bising yang disertai thrill sudah pasti derajat empat atau lebih; menyebut derajat tanpa meraba thrill adalah kesalahan yang mudah terlihat penguji.',
+    ],
+    referensi: ['SKDI2012', 'BRAUNWALD2022'],
+  },
+  {
+    id: 'pf-paru',
+    category: 'Pemeriksaan Fisik per Sistem',
+    title: 'Pemeriksaan Paru',
+    subtitle: 'Depan, samping, dan belakang — selalu membandingkan kanan dan kiri',
+    alat: [
+      'Stetoskop',
+      'Pita ukur untuk lingkar dada bila diperlukan',
+    ],
+    fases: [
+      {
+        fase: 'Inspeksi',
+        steps: [
+          'Bentuk dada: normal, barrel chest, pektus ekskavatum, maupun kifoskoliosis.',
+          'Pola dan laju napas, pemakaian otot bantu napas, retraksi sela iga dan suprasternal, serta napas cuping hidung.',
+          'Kesimetrisan gerak napas kanan dan kiri; sisi yang tertinggal menandakan kelainan pada sisi itu.',
+          'Cari jaringan parut, pelebaran vena dada, dan jari tabuh.',
+        ],
+      },
+      {
+        fase: 'Palpasi',
+        steps: [
+          'Nilai pengembangan dada dengan kedua ibu jari bertemu di garis tengah punggung, lalu minta pasien menarik napas dalam — kedua ibu jari harus menjauh sama besar.',
+          'FREMITUS TAKTIL: minta pasien mengucapkan tujuh puluh tujuh berulang sambil telapak tangan dipindah berselang kanan-kiri pada ketinggian sama. MENINGKAT pada konsolidasi, MENURUN pada efusi, pneumotoraks, dan penebalan pleura.',
+          'Raba nyeri tekan, krepitasi subkutis, dan posisi trakea di suprasternal — trakea terdorong menjauh pada pneumotoraks tekanan dan efusi masif, tertarik mendekat pada atelektasis.',
+        ],
+      },
+      {
+        fase: 'Perkusi',
+        steps: [
+          'Perkusi BERSELANG KANAN-KIRI pada ketinggian yang sama, dari puncak ke basal, di depan lalu di belakang.',
+          'Sonor adalah normal; REDUP menandakan konsolidasi maupun efusi; HIPERSONOR menandakan pneumotoraks maupun emfisema.',
+          'Tentukan batas paru-hati di garis midklavikula kanan, lalu nilai peranjakan diafragma saat napas dalam.',
+        ],
+      },
+      {
+        fase: 'Auskultasi',
+        steps: [
+          'Minta pasien bernapas dalam lewat MULUT, lalu dengarkan berselang kanan-kiri pada ketinggian sama di seluruh lapangan.',
+          'Nilai suara napas dasar: vesikuler yang normal, bronkial, maupun melemah sampai menghilang.',
+          'Cari suara tambahan berupa ronki basah halus maupun kasar, ronki kering atau wheezing, dan pleural friction rub.',
+          'Bila dicurigai konsolidasi, nilai bronkofoni, egofoni, dan bisikan pektoriloquy.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Pola temuan yang khas',
+        kepanjangan: [
+          'KONSOLIDASI — fremitus meningkat, perkusi redup, suara napas bronkial',
+          'EFUSI PLEURA — fremitus menurun, perkusi redup, suara napas menghilang',
+          'PNEUMOTORAKS — fremitus menurun, perkusi hipersonor, suara napas menghilang',
+          'ATELEKTASIS — fremitus menurun, perkusi redup, trakea TERTARIK ke sisi sakit',
+        ],
+        catatan: 'Yang membedakan efusi dari pneumotoraks adalah PERKUSINYA; yang membedakan atelektasis dari efusi adalah ARAH DEVIASI TRAKEA.',
+      },
+    ],
+    tips: [
+      'Selalu bandingkan kanan-kiri pada ketinggian yang SAMA — memeriksa seluruh sisi kanan lalu seluruh sisi kiri membuat perbedaan halus terlewat.',
+      'Jangan lupa memeriksa punggung; sebagian besar lapangan paru justru berada di belakang.',
+    ],
+    referensi: ['SKDI2012', 'GOLD2024'],
+  },
+  {
+    id: 'pf-abdomen',
+    category: 'Pemeriksaan Fisik per Sistem',
+    title: 'Pemeriksaan Abdomen',
+    subtitle: 'Urutannya berbeda: inspeksi, auskultasi, perkusi, baru palpasi',
+    alat: [
+      'Stetoskop',
+      'Pita ukur untuk lingkar perut',
+    ],
+    fases: [
+      {
+        fase: 'Posisi dan inspeksi',
+        steps: [
+          'Baringkan pasien telentang dengan lutut sedikit ditekuk dan tangan di samping badan — posisi ini melemaskan dinding perut.',
+          'Buka dari batas bawah dada sampai simfisis pubis sambil menjaga privasi.',
+          'Inspeksi bentuk apakah datar, cembung, maupun cekung; jaringan parut, striae, pelebaran vena, benjolan, dan gerak dinding perut saat bernapas.',
+          'Perhatikan pulsasi di epigastrium serta tanda Cullen maupun Grey Turner pada perdarahan retroperitoneal.',
+        ],
+      },
+      {
+        fase: 'Auskultasi — SEBELUM palpasi',
+        steps: [
+          'Dengarkan bising usus minimal SATU MENIT sebelum menyimpulkan menurun, dan sampai tiga menit sebelum menyatakan menghilang.',
+          'Nilai sifatnya: normal, meningkat dan metalik pada obstruksi mekanik dini, maupun menghilang pada ileus paralitik dan peritonitis.',
+          'Cari bruit pada aorta, arteri renalis, dan arteri iliaka.',
+          'Alasan auskultasi didahulukan: palpasi merangsang usus dan mengubah bising yang hendak dinilai.',
+        ],
+      },
+      {
+        fase: 'Perkusi',
+        steps: [
+          'Perkusi seluruh kuadran; timpani adalah normal karena usus berisi gas.',
+          'Tentukan batas atas dan bawah hati di garis midklavikula kanan, lalu ukur rentang pekaknya.',
+          'Perkusi limpa di ruang Traube; pekak menandakan pembesaran.',
+          'Bila dicurigai asites, cari PEKAK BERALIH dengan memiringkan pasien, dan uji gelombang cairan pada asites masif.',
+        ],
+      },
+      {
+        fase: 'Palpasi',
+        steps: [
+          'MULAI DARI KUADRAN YANG PALING JAUH DARI NYERI. Memulai di titik nyeri membuat pasien menegang sehingga sisa pemeriksaan tidak dapat dinilai.',
+          'Palpasi superfisial seluruh kuadran untuk nyeri tekan, defans muskular, dan massa dangkal — perhatikan WAJAH PASIEN, bukan tangan Anda.',
+          'Palpasi dalam untuk massa dan organ.',
+          'HATI: mulai dari fosa iliaka kanan naik ke arah iga sambil pasien menarik napas dalam; nilai tepi, permukaan, dan nyeri tekan.',
+          'LIMPA: dari fosa iliaka kanan menuju iga kiri; bila tidak teraba, ulangi dengan pasien miring ke kanan.',
+          'GINJAL: dengan teknik ballotement dua tangan pada kedua sisi.',
+          'Nilai nyeri lepas, tanda Murphy pada kolesistitis, serta titik McBurney beserta tanda Rovsing, psoas, dan obturator pada apendisitis.',
+        ],
+      },
+      {
+        fase: 'Pelengkap',
+        steps: [
+          'Periksa seluruh lubang hernia inguinal, femoral, dan umbilikal, saat berbaring dan saat mengejan.',
+          'Nyeri ketok kostovertebra untuk kelainan ginjal.',
+          'Colok dubur bila ada indikasi, dengan penjelasan dan izin tersendiri.',
+          'Rapikan pasien, cuci tangan, dan sampaikan temuan.',
+        ],
+      },
+    ],
+    tips: [
+      'Urutan inspeksi, auskultasi, perkusi, palpasi pada abdomen adalah pertanyaan ujian yang paling sering keluar sekaligus paling sering dijawab keliru.',
+      'Perhatikan wajah pasien selama palpasi — nyeri lebih dulu terlihat di wajah daripada terdengar dari mulut.',
+    ],
+    referensi: ['SKDI2012', 'SLEISENGER2021', 'SCHWARTZ2019'],
+  },
+  {
+    id: 'pf-neurologis',
+    category: 'Pemeriksaan Fisik per Sistem',
+    title: 'Pemeriksaan Neurologis',
+    subtitle: 'Kesadaran, saraf kranial, motorik, sensorik, refleks, koordinasi, dan rangsang meningeal',
+    alat: [
+      'Palu refleks',
+      'Senter kecil',
+      'Garpu tala 128 Hz dan 512 Hz',
+      'Jarum tumpul, kapas, serta tabung air hangat dan dingin',
+    ],
+    fases: [
+      {
+        fase: 'Kesadaran dan fungsi luhur',
+        steps: [
+          'Kesadaran kualitatif dan Skala Koma Glasgow dengan mata 1 sampai 4, verbal 1 sampai 5, dan motorik 1 sampai 6.',
+          'Orientasi terhadap waktu, tempat, dan orang.',
+          'Bila ada gangguan bicara, bedakan AFASIA yang merupakan gangguan bahasa dari DISARTRIA yang merupakan gangguan artikulasi — uji kelancaran, pemahaman, pengulangan, dan penamaan.',
+        ],
+      },
+      {
+        fase: 'Dua belas saraf kranial',
+        steps: [
+          'I Olfaktorius: penciuman tiap lubang hidung dengan bahan yang tidak merangsang.',
+          'II Optikus: tajam penglihatan, lapang pandang konfrontasi, dan funduskopi.',
+          'III, IV, dan VI: gerak bola mata enam arah, ptosis, pupil, serta refleks cahaya langsung dan tidak langsung.',
+          'V Trigeminus: sensorik wajah tiga cabang, kekuatan otot kunyah, dan refleks kornea.',
+          'VII Fasialis: minta mengangkat alis, memejamkan mata kuat, dan menyeringai. DAHI IKUT TERKENA menandakan lesi PERIFER, sedangkan dahi terkecuali menandakan lesi SENTRAL — pembeda yang paling sering ditanyakan.',
+          'VIII Vestibulokoklearis: uji bisik, uji Rinne dan Weber, serta keseimbangan.',
+          'IX dan X: refleks muntah, elevasi palatum, dan uvula yang terdorong ke sisi sehat.',
+          'XI Aksesorius: kekuatan sternokleidomastoideus dan trapezius melawan tahanan.',
+          'XII Hipoglosus: julurkan lidah; deviasinya mengarah ke sisi LESI.',
+        ],
+      },
+      {
+        fase: 'Motorik',
+        steps: [
+          'Inspeksi atrofi, fasikulasi, dan gerakan involunter.',
+          'Tonus dinilai saat gerakan pasif: menurun pada lesi neuron motorik bawah, meningkat spastik pada lesi atas, dan rigiditas pada gangguan ekstrapiramidal.',
+          'Kekuatan dengan skala 0 sampai 5 pada tiap kelompok otot, dibandingkan kanan dan kiri.',
+          'Uji tahan lengan lurus dengan mata tertutup untuk mendeteksi kelemahan ringan.',
+        ],
+      },
+      {
+        fase: 'Sensorik, refleks, dan koordinasi',
+        steps: [
+          'Sensorik: raba halus, nyeri tumpul, suhu, getar dengan garpu tala 128 Hz, dan rasa posisi sendi. Bandingkan kanan-kiri serta ujung dan pangkal; tentukan batas setinggi dermatom bila ada.',
+          'Refleks fisiologis bisep, trisep, brakioradialis, patella, dan Achilles; nilai dengan skala 0 sampai 4 plus dan bandingkan kedua sisi.',
+          'Refleks patologis Babinski dan kelompoknya; positif menandakan lesi neuron motorik atas.',
+          'Koordinasi: telunjuk-hidung, tumit-lutut, gerak berganti cepat, dan uji Romberg.',
+          'Cara berjalan: pola langkah, ayunan lengan, dan jalan tandem.',
+        ],
+      },
+      {
+        fase: 'Rangsang meningeal',
+        steps: [
+          'Kaku kuduk dinilai dengan menekuk leher secara pasif; adanya tahanan menandakan positif.',
+          'Tanda Brudzinski I: fleksi leher menimbulkan fleksi kedua tungkai.',
+          'Tanda Brudzinski II: fleksi satu tungkai menimbulkan fleksi tungkai lainnya.',
+          'Tanda Kernig: tungkai difleksikan 90 derajat lalu diluruskan; tahanan sebelum 135 derajat menandakan positif.',
+          'Rangsang meningeal WAJIB diperiksa pada setiap demam yang disertai nyeri kepala maupun penurunan kesadaran.',
+        ],
+      },
+    ],
+    mnemonics: [
+      {
+        akronim: 'Lesi atas dan lesi bawah',
+        kepanjangan: [
+          'NEURON MOTORIK ATAS — tonus meningkat, refleks meningkat, Babinski positif, atrofi minimal',
+          'NEURON MOTORIK BAWAH — tonus menurun, refleks menurun, Babinski negatif, atrofi dan fasikulasi jelas',
+        ],
+      },
+    ],
+    tips: [
+      'Pemeriksaan neurologis lengkap itu panjang; pada stasiun berbatas waktu, sebutkan bahwa Anda akan memeriksa secara terarah beserta alasannya.',
+      'Selalu bandingkan kanan dan kiri — hampir seluruh temuan neurologis bermakna karena perbedaannya, bukan karena nilai mutlaknya.',
+    ],
+    referensi: ['SKDI2012', 'ADAMS2019', 'PERDOSSI2016'],
+  },
   // ══════════════════════════════════════════════════════════════════════════
   {
     id: 'apn-60',
