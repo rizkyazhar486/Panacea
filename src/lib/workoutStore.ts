@@ -18,11 +18,36 @@ const KEY_N = 'pmd_hr_notifications_v1'
 const MAX_WORKOUTS = 200
 const MAX_NOTIFS = 100
 
+/**
+ * Benar bila entri ini aman dipakai perhitungan.
+ *
+ * `hr` dan `pemulihan` WAJIB pada tipenya, dan yang membacanya langsung
+ * memanggil `.length` tanpa penjagaan. Isi localStorage tidak dijamin
+ * mengikuti tipe itu: ia bisa berasal dari versi aplikasi yang lebih lama,
+ * dari impor yang terputus di tengah jalan, atau dari suntingan tangan.
+ * Satu entri cacat cukup untuk melempar TypeError dan mengganti SELURUH
+ * halaman latihan dengan layar "Something went wrong" — termasuk ratusan sesi
+ * lain yang sebetulnya baik-baik saja.
+ */
+function bentuknyaBenar(w: unknown): w is ImportedWorkout {
+  if (!w || typeof w !== 'object') return false
+  const x = w as Record<string, unknown>
+  return (
+    typeof x.id === 'string' &&
+    typeof x.mulai === 'string' &&
+    !Number.isNaN(Date.parse(x.mulai)) &&
+    Array.isArray(x.hr) &&
+    Array.isArray(x.pemulihan)
+  )
+}
+
 export function getWorkouts(): ImportedWorkout[] {
   try {
     const raw = localStorage.getItem(KEY_W)
     const v = raw ? JSON.parse(raw) : []
-    return Array.isArray(v) ? (v as ImportedWorkout[]) : []
+    // Yang cacat dibuang, bukan diloloskan: kehilangan satu sesi jauh lebih
+    // ringan daripada kehilangan akses ke seluruh halaman.
+    return Array.isArray(v) ? v.filter(bentuknyaBenar) : []
   } catch {
     return []
   }
