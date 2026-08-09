@@ -1,7 +1,12 @@
-import { lazy } from 'react'
+import { lazy, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
+import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
 import { IconRun } from '../components/icons'
+import { getWorkouts } from '../lib/workoutStore'
+import { getVitals } from '../lib/healthVitals'
+import { statusSingkat } from '../lib/pelatih'
+import { hrMaxFromAge } from '../lib/workoutImport'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Latihan — empat halaman yang selama ini terpisah, padahal semuanya
@@ -21,30 +26,64 @@ const TrainingPhysiology = lazy(() => import('./TrainingPhysiology').then((m) =>
 const EnduranceTools = lazy(() => import('./EnduranceTools').then((m) => ({ default: m.EnduranceTools })))
 
 const TABS: TabDef[] = [
-  { id: 'pelatih', label: 'Coach', emoji: '🏃', komponen: WorkoutHistory,
-    ringkas: 'Next session, last session summary, history, targets and records' },
-  { id: 'analisis', label: 'Analysis', emoji: '📈', komponen: AnalisisPro,
-    ringkas: 'Fitness & freshness, relative effort, training log, pace zones' },
-  { id: 'fisiologi', label: 'Physiology', emoji: '🫀', komponen: TrainingPhysiology,
-    ringkas: 'Training load, status, recovery time, lactate threshold, readiness' },
-  { id: 'endurance', label: 'Endurance', emoji: '⛽', komponen: EnduranceTools,
-    ringkas: 'Fuelling, sweat rate, FTP, power guidance, acclimatisation' },
+  { id: 'pelatih', label: 'Pelatih', emoji: '🏃', komponen: WorkoutHistory,
+    ringkas: 'Sesi berikutnya, rangkuman sesi terakhir, riwayat, target, rekor' },
+  { id: 'analisis', label: 'Analisis', emoji: '📈', komponen: AnalisisPro,
+    ringkas: 'Kebugaran & kesegaran, upaya relatif, log latihan, zona pace' },
+  { id: 'fisiologi', label: 'Fisiologi', emoji: '🫀', komponen: TrainingPhysiology,
+    ringkas: 'Beban latihan, status, waktu pulih, ambang laktat, kesiapan' },
+  { id: 'endurance', label: 'Daya Tahan', emoji: '⛽', komponen: EnduranceTools,
+    ringkas: 'Bahan bakar, laju keringat, FTP, panduan daya, aklimatisasi' },
 ]
 
 export function PusatLatihan() {
+  /**
+   * Angka latihan terkini, di atas seluruh tab.
+   *
+   * Halaman ini setinggi 6,3 layar telepon, dan yang paling sering dicari --
+   * "boleh latihan keras hari ini atau tidak" -- terkubur di dalam tab
+   * pertama. Ditaruh di atas supaya jawabannya terbaca sebelum menggulir.
+   */
+  const angka = useMemo<Angka[]>(() => {
+    const w = getWorkouts()
+    if (!w.length) return []
+    const v = getVitals()
+    const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
+    const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
+    const k = {
+      hrMax: Math.max(teramati, hrMaxFromAge(30, sex)),
+      hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
+      sex,
+    }
+    const st = statusSingkat(w, k)
+    if (!st) return []
+    const deret = Array.from({ length: 14 }, (_, i) => {
+      const x = statusSingkat(w, k, Date.now() - (13 - i) * 86400_000)
+      return x ? x.kesegaran : 0
+    })
+    return [
+      { label: 'Segar', nilai: String(Math.round(st.kesegaran)),
+        nada: st.kesegaran >= -10 ? NADA.baik : NADA.perhatian, deret },
+      { label: 'Bugar', nilai: String(Math.round(st.kebugaran)), nada: NADA.biru },
+      { label: 'Lelah', nilai: String(Math.round(st.kelelahan)), nada: NADA.jantung },
+      { label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: NADA.netral },
+    ]
+  }, [])
+
   return (
     <>
     <HalamanTab
-      judul="Training"
-      subjudul="Coach, analysis, physiology and endurance tools on one page"
+      judul="Latihan"
+      subjudul="Pelatih, analisis, fisiologi, dan daya tahan dalam satu halaman"
       ikon={<IconRun />}
+      ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
     />
     {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
     <div className="-mt-20 pb-24">
       <Link to="/fitness-hub"
         className="block rounded-2xl border border-dashed border-white/15 py-2.5 text-center text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
-        🔎 Every other training tool
+        🔎 Seluruh alat latihan lainnya
       </Link>
     </div>
     </>

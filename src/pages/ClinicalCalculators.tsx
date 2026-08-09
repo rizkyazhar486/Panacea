@@ -7,7 +7,7 @@ import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope, IconShield, IconCheck, IconToken } from '../components/icons'
 import { useSearchParams } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
-import { ALAT_DI_HALAMAN, cocokAlat } from '../lib/katalogKalkulator'
+import { ALAT_DI_HALAMAN, cocokAlat, URUTAN_GRUP } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -2544,6 +2544,7 @@ export function ClinicalCalculators() {
   useEffect(() => {
     if (dariAlamat && TABS.some((t) => t.id === dariAlamat)) setTab(dariAlamat)
   }, [dariAlamat])
+  const [grupBuka, setGrupBuka] = useState<string | null>(null)
   const pilihTab = (id: string) => {
     setTab(id)
     // Ditulis ke alamat supaya alat yang sedang dibuka bisa dibagikan dan
@@ -2568,43 +2569,82 @@ export function ClinicalCalculators() {
 
   if (access && !access.unlocked) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 p-4">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
+      <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle={`${TABS.length} skor dan alat baku, dikelompokkan per sistem organ`} />
         <ClinicalCalcPaywall access={access} onUnlocked={() => setAccess({ ...access, unlocked: true })} />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-4 p-4">
+    <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
       {access?.free && (
         <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
           <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
         </div>
       )}
-      <SectionTitle icon={<IconStethoscope size={20} />} title="Clinical Calculators" subtitle="Internationally standard clinical decision-support scores & tools" />
+      <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle={`${TABS.length} skor dan alat baku, dikelompokkan per sistem organ`} />
       <KartuDataPerangkat />
       <input
         className={inputClass}
-        placeholder="Search 40 tools: sepsis, burn, stroke, newborn, dosing…"
+        placeholder={`Cari ${TABS.length} alat: sepsis, luka bakar, stroke, bayi, dosis…`}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
       {visibleTabs.length === 0 && (
         <p className="rounded-xl bg-neutral-50 px-3 py-2.5 text-center text-[12px] text-neutral-500">
-          No tool matches "{query}" — try an organ, symptom, or situation.
+          Tidak ada yang cocok dengan "{query}" — coba nama organ, gejala, atau situasi.
         </p>
       )}
-      <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
-        {visibleTabs.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => pilihTab(t.id)}
-            className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}
-          >
-            {t.label}
-          </button>
-        ))}
+      {/* PEMILIH ALAT — kisi berkelompok, bukan satu baris gulir mendatar.
+          Sebelumnya 42 alat berjajar dalam satu pita yang harus digulir ke
+          samping: hanya lima yang terlihat sekaligus, tidak ada yang
+          memberitahu masih ada berapa lagi, dan alat di ujung kanan praktis
+          tidak pernah ditemukan. Kisi berkelompok menampilkan semuanya
+          sekaligus dan memberi mata jangkar berupa sistem organ, jadi orang
+          bisa mencari lewat "ini soal ginjal" tanpa tahu nama alatnya.
+
+          Yang sedang dibuka tetap ditampilkan sebagai satu pita di atas
+          alatnya, supaya berpindah antar alat serumpun tidak perlu kembali
+          menggulir ke kisi. */}
+      <div className="space-y-[6px]">
+        {URUTAN_GRUP.filter((g) => visibleTabs.some((t) => t.grup === g)).map((g) => {
+          const isi = visibleTabs.filter((t) => t.grup === g)
+          // Kelompok terbuka bila alat yang sedang dipakai ada di dalamnya,
+          // atau bila pemakainya sedang mencari -- saat mencari, menyembunyikan
+          // hasil di balik lipatan adalah menyembunyikan jawabannya sendiri.
+          const buka = grupBuka === g || isi.some((t) => t.id === tab) || q.length > 0
+          return (
+            <section key={g} className="rounded-xl bg-neutral-50 dark:bg-white/5">
+              <button
+                onClick={() => setGrupBuka(buka && grupBuka === g ? null : g)}
+                aria-expanded={buka}
+                className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
+              >
+                <span className="text-[11px] font-black uppercase tracking-wide text-neutral-600 dark:text-neutral-300">{g}</span>
+                <span className="rounded-full bg-neutral-200 px-1.5 py-0.5 text-[9px] font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{isi.length}</span>
+                <span className="ml-auto text-[11px] font-black text-neutral-400">{buka ? '▲' : '▼'}</span>
+              </button>
+              {buka && (
+                <div className="grid grid-cols-3 gap-[6px] px-3 pb-3 sm:grid-cols-4">
+                  {isi.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => pilihTab(t.id)}
+                      aria-pressed={tab === t.id}
+                      className={`flex min-h-[52px] items-center justify-center rounded-xl px-2 py-2 text-center text-[11px] font-bold leading-tight transition active:scale-95 ${
+                        tab === t.id
+                          ? 'bg-brand text-white'
+                          : 'bg-white text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
+          )
+        })}
       </div>
       {tab === 'apgar' && <ApgarCalc />}
       {tab === 'gcs' && <GcsCalc />}

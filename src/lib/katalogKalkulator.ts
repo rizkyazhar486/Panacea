@@ -17,7 +17,21 @@ export interface AlatKalkulator {
   label: string
   /** Kata kunci pencarian: organ, gejala, situasi, dan sinonim Indonesianya. */
   kw: string
+  /** Sistem organ atau situasi klinis. Dipakai untuk mengelompokkan di layar. */
+  grup: string
 }
+
+/**
+ * Urutan kelompok di layar: yang paling menentukan keputusan cepat lebih dulu.
+ *
+ * Gawat darurat di atas karena di sanalah waktu paling menentukan; "Lainnya"
+ * di paling bawah karena isinya memang tidak berkelompok.
+ */
+export const URUTAN_GRUP = [
+  'Gawat Darurat', 'Saraf', 'Jantung & Paru', 'Ginjal & Cairan',
+  'Anak & Neonatus', 'Obstetri', 'Bedah & Abdomen', 'THT',
+  'Gizi & Antropometri', 'Lainnya',
+]
 
 /**
  * Alat yang hidup DI DALAM halaman Clinical Calculators sebagai tab.
@@ -26,48 +40,48 @@ export interface AlatKalkulator {
  * mendarat langsung pada alatnya, bukan di puncak halaman.
  */
 export const ALAT_DI_HALAMAN: AlatKalkulator[] = [
-  { id: 'apgar', label: 'APGAR', kw: 'newborn neonate birth delivery score' },
-  { id: 'gcs', label: 'GCS', kw: 'coma consciousness glasgow head injury neuro' },
-  { id: 'siriraj', label: 'Siriraj', kw: 'stroke haemorrhagic ischaemic bedside neuro cva perdarahan infark' },
-  { id: 'gadjahmada', label: 'Gadjah Mada', kw: 'stroke algoritma indonesia babinski neuro cva perdarahan infark ugm' },
-  { id: 'curb65', label: 'CURB-65', kw: 'pneumonia cap severity admission respiratory' },
-  { id: 'bishop', label: 'Bishop', kw: 'cervix induction labor obstetric delivery' },
-  { id: 'ckdepi', label: 'CKD-EPI', kw: 'egfr kidney renal creatinine gfr' },
-  { id: 'whogrowth', label: 'WHO Anthropometry', kw: 'child growth stunting weight height pediatric z-score' },
-  { id: 'whoneonate', label: 'WHO Neonate', kw: 'newborn neonate growth anthropometry' },
-  { id: 'cdcanthro', label: 'CDC Anthropometry', kw: 'child bmi percentile adolescent growth' },
-  { id: 'ballard', label: 'Ballard+SOAP', kw: 'gestational age newborn neonate maturity lubchenco' },
-  { id: 'qsofa', label: 'qSOFA', kw: 'sepsis infection screening organ dysfunction' },
-  { id: 'hollidaysegar', label: 'Maintenance Fluid', kw: 'fluid iv pediatric 4-2-1 hydration holliday-segar holliday segar maintenance fluid rumatan cairan' },
-  { id: 'parkland', label: 'Parkland', kw: 'burn fluid resuscitation tbsa' },
-  { id: 'naegele', label: 'Naegele', kw: 'due date pregnancy edd lmp obstetric naegele’s rule hpht taksiran persalinan' },
-  { id: 'map', label: 'MAP', kw: 'blood pressure perfusion arterial shock mean arterial pressure tekanan arteri rata-rata perfusion pressure perfusi organ average' },
-  { id: 'alvarado', label: 'Alvarado', kw: 'appendicitis abdominal pain rlq surgery' },
-  { id: 'centor', label: 'Centor/McIsaac', kw: 'strep pharyngitis sore throat antibiotic tonsil' },
-  { id: 'nacorr', label: 'Electrolyte Correction', kw: 'sodium potassium hyponatremia hypokalemia glucose katz' },
-  { id: 'broca', label: 'Broca IBW', kw: 'ideal body weight obesity broca’s formula berat badan' },
-  { id: 'brocalorentz', label: 'Broca-Lorentz Calorie', kw: 'calorie nutrition ideal weight diet requirement kebutuhan kalori' },
-  { id: 'ivdrip', label: 'IV Drip Rate', kw: 'infusion drops fluid rate tpm' },
-  { id: 'midparental', label: 'Mid-Parental', kw: 'height prediction child target parental tinggi potensi genetik' },
-  { id: 'fletcher', label: 'Fletcher Index', kw: 'hearing loss audiometry deaf ent' },
-  { id: 'nose', label: 'NOSE', kw: 'nasal obstruction breathing ent septum' },
-  { id: 'rsi', label: 'RSI', kw: 'reflux lpr laryngopharyngeal hoarseness ent' },
-  { id: 'aria', label: 'ARIA Criteria', kw: 'allergic rhinitis allergy asthma ent' },
-  { id: 'abcd2', label: 'ABCD²', kw: 'tia stroke risk transient ischemic' },
-  { id: 'four', label: 'FOUR Score', kw: 'coma consciousness icu intubated neuro' },
-  { id: 'mcdonald', label: 'McDonald', kw: 'fundal height pregnancy gestational age obstetric mcdonald’s rule tinggi fundus uteri tfu usia kehamilan' },
-  { id: 'paradise', label: 'Paradise', kw: 'tonsillectomy tonsillitis recurrent ent' },
-  { id: 'nihss', label: 'NIHSS', kw: 'stroke severity neuro deficit thrombolysis' },
-  { id: 'fluidbalance', label: 'Fluid Balance', kw: 'intake output urine monitoring' },
-  { id: 'pedsdose', label: 'Pediatric Dosing', kw: 'dose child weight syrup medication mg/kg' },
-  { id: 'vbac', label: 'VBAC Flamm-Geiger', kw: 'cesarean vaginal birth trial labor obstetric' },
-  { id: 'denver', label: 'Denver II (Simplified)', kw: 'development milestone child screening delay' },
-  { id: 'atls', label: 'XABCDE Trauma Survey', kw: 'trauma primary survey hemorrhage emergency' },
-  { id: 'acls', label: 'ACLS Guide', kw: 'cardiac arrest cpr resuscitation algorithm emergency' },
-  { id: 'abg', label: 'Blood Gas Analysis', kw: 'abg acidosis alkalosis anion gap ph co2' },
-  { id: 'burn', label: 'Burn Calculator', kw: 'burn tbsa parkland rule of nines advanced burn calculator luka bakar tbsa' },
-  { id: 'cranial', label: 'Cranial Nerve + Meningeal', kw: 'neuro exam nerves meningitis kernig brudzinski' },
-  { id: 'competencies', label: 'Competency Tracker', kw: 'kki aipki education doctor competency' },
+  { id: 'apgar', label: 'APGAR', kw: 'newborn neonate birth delivery score', grup: 'Anak & Neonatus' },
+  { id: 'gcs', label: 'GCS', kw: 'coma consciousness glasgow head injury neuro', grup: 'Saraf' },
+  { id: 'siriraj', label: 'Siriraj', kw: 'stroke haemorrhagic ischaemic bedside neuro cva perdarahan infark', grup: 'Saraf' },
+  { id: 'gadjahmada', label: 'Gadjah Mada', kw: 'stroke algoritma indonesia babinski neuro cva perdarahan infark ugm', grup: 'Saraf' },
+  { id: 'curb65', label: 'CURB-65', kw: 'pneumonia cap severity admission respiratory', grup: 'Jantung & Paru' },
+  { id: 'bishop', label: 'Bishop', kw: 'cervix induction labor obstetric delivery', grup: 'Obstetri' },
+  { id: 'ckdepi', label: 'CKD-EPI', kw: 'egfr kidney renal creatinine gfr', grup: 'Ginjal & Cairan' },
+  { id: 'whogrowth', label: 'WHO Anthropometry', kw: 'child growth stunting weight height pediatric z-score', grup: 'Anak & Neonatus' },
+  { id: 'whoneonate', label: 'WHO Neonate', kw: 'newborn neonate growth anthropometry', grup: 'Anak & Neonatus' },
+  { id: 'cdcanthro', label: 'CDC Anthropometry', kw: 'child bmi percentile adolescent growth', grup: 'Anak & Neonatus' },
+  { id: 'ballard', label: 'Ballard+SOAP', kw: 'gestational age newborn neonate maturity lubchenco', grup: 'Anak & Neonatus' },
+  { id: 'qsofa', label: 'qSOFA', kw: 'sepsis infection screening organ dysfunction', grup: 'Gawat Darurat' },
+  { id: 'hollidaysegar', label: 'Maintenance Fluid', kw: 'fluid iv pediatric 4-2-1 hydration holliday-segar holliday segar maintenance fluid rumatan cairan', grup: 'Anak & Neonatus' },
+  { id: 'parkland', label: 'Parkland', kw: 'burn fluid resuscitation tbsa', grup: 'Gawat Darurat' },
+  { id: 'naegele', label: 'Naegele', kw: 'due date pregnancy edd lmp obstetric naegele’s rule hpht taksiran persalinan', grup: 'Obstetri' },
+  { id: 'map', label: 'MAP', kw: 'blood pressure perfusion arterial shock mean arterial pressure tekanan arteri rata-rata perfusion pressure perfusi organ average', grup: 'Gawat Darurat' },
+  { id: 'alvarado', label: 'Alvarado', kw: 'appendicitis abdominal pain rlq surgery', grup: 'Bedah & Abdomen' },
+  { id: 'centor', label: 'Centor/McIsaac', kw: 'strep pharyngitis sore throat antibiotic tonsil', grup: 'THT' },
+  { id: 'nacorr', label: 'Electrolyte Correction', kw: 'sodium potassium hyponatremia hypokalemia glucose katz', grup: 'Ginjal & Cairan' },
+  { id: 'broca', label: 'Broca IBW', kw: 'ideal body weight obesity broca’s formula berat badan', grup: 'Gizi & Antropometri' },
+  { id: 'brocalorentz', label: 'Broca-Lorentz Calorie', kw: 'calorie nutrition ideal weight diet requirement kebutuhan kalori', grup: 'Gizi & Antropometri' },
+  { id: 'ivdrip', label: 'IV Drip Rate', kw: 'infusion drops fluid rate tpm', grup: 'Ginjal & Cairan' },
+  { id: 'midparental', label: 'Mid-Parental', kw: 'height prediction child target parental tinggi potensi genetik', grup: 'Anak & Neonatus' },
+  { id: 'fletcher', label: 'Fletcher Index', kw: 'hearing loss audiometry deaf ent', grup: 'THT' },
+  { id: 'nose', label: 'NOSE', kw: 'nasal obstruction breathing ent septum', grup: 'THT' },
+  { id: 'rsi', label: 'RSI', kw: 'reflux lpr laryngopharyngeal hoarseness ent', grup: 'THT' },
+  { id: 'aria', label: 'ARIA Criteria', kw: 'allergic rhinitis allergy asthma ent', grup: 'THT' },
+  { id: 'abcd2', label: 'ABCD²', kw: 'tia stroke risk transient ischemic', grup: 'Saraf' },
+  { id: 'four', label: 'FOUR Score', kw: 'coma consciousness icu intubated neuro', grup: 'Saraf' },
+  { id: 'mcdonald', label: 'McDonald', kw: 'fundal height pregnancy gestational age obstetric mcdonald’s rule tinggi fundus uteri tfu usia kehamilan', grup: 'Obstetri' },
+  { id: 'paradise', label: 'Paradise', kw: 'tonsillectomy tonsillitis recurrent ent', grup: 'THT' },
+  { id: 'nihss', label: 'NIHSS', kw: 'stroke severity neuro deficit thrombolysis', grup: 'Saraf' },
+  { id: 'fluidbalance', label: 'Fluid Balance', kw: 'intake output urine monitoring', grup: 'Ginjal & Cairan' },
+  { id: 'pedsdose', label: 'Pediatric Dosing', kw: 'dose child weight syrup medication mg/kg', grup: 'Anak & Neonatus' },
+  { id: 'vbac', label: 'VBAC Flamm-Geiger', kw: 'cesarean vaginal birth trial labor obstetric', grup: 'Obstetri' },
+  { id: 'denver', label: 'Denver II (Simplified)', kw: 'development milestone child screening delay', grup: 'Anak & Neonatus' },
+  { id: 'atls', label: 'XABCDE Trauma Survey', kw: 'trauma primary survey hemorrhage emergency', grup: 'Gawat Darurat' },
+  { id: 'acls', label: 'ACLS Guide', kw: 'cardiac arrest cpr resuscitation algorithm emergency', grup: 'Gawat Darurat' },
+  { id: 'abg', label: 'Blood Gas Analysis', kw: 'abg acidosis alkalosis anion gap ph co2', grup: 'Jantung & Paru' },
+  { id: 'burn', label: 'Burn Calculator', kw: 'burn tbsa parkland rule of nines advanced burn calculator luka bakar tbsa', grup: 'Gawat Darurat' },
+  { id: 'cranial', label: 'Cranial Nerve + Meningeal', kw: 'neuro exam nerves meningitis kernig brudzinski', grup: 'Saraf' },
+  { id: 'competencies', label: 'Competency Tracker', kw: 'kki aipki education doctor competency', grup: 'Lainnya' },
 ]
 
 /**

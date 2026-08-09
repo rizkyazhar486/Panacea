@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Button, Field, inputClass, Badge } from '../components/ui'
+import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
 import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFlame, IconDrop } from '../components/icons'
 import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
@@ -1735,50 +1736,126 @@ export function Nutrition() {
 
   const recs = useMemo(() => genRecs(body, totalKcal, totalProt, totalFiber, totalNa, totalOmega3, wt.metHours || 0, wt.sleepHr, wt.waterMl, wt.sunDone, vitals.avgHR, vitals.avgSys, vitals.avgSpo2, activeProtocol), [body, totalKcal, totalProt, totalFiber, totalNa, totalOmega3, wt.metHours, wt.sleepHr, wt.waterMl, wt.sunDone, vitals, activeProtocol])
 
+  /**
+   * Angka hari ini, di paling atas.
+   *
+   * Yang dicari orang saat membuka halaman gizi adalah "sudah berapa kalori
+   * hari ini" -- itu satu angka, dan sebelumnya terkubur di dalam kartu kelima
+   * pada halaman setinggi hampir tujuh layar. Targetnya dihitung dari BMR dan
+   * tingkat aktivitas, sama seperti yang dipakai kartu di bawah, bukan angka
+   * lain yang kebetulan mirip.
+   */
+  const angkaHariIni = useMemo<Angka[]>(() => {
+    const target = Math.round(getTdee(getBmr(body.w, body.h, body.age, body.g), body.act) * (1 + goalAdj(body.goal)))
+    const out: Angka[] = [
+      { label: 'Kalori', nilai: String(Math.round(totalKcal)), satuan: `/ ${target}`,
+        nada: totalKcal > target * 1.1 ? NADA.perhatian : NADA.netral },
+      { label: 'Protein', nilai: String(Math.round(totalProt)), satuan: 'g', nada: NADA.biru },
+    ]
+    if (body.w) out.push({ label: 'Berat', nilai: String(body.w), satuan: 'kg', nada: NADA.netral })
+    if (wt.waterMl) out.push({ label: 'Air', nilai: String(Math.round(wt.waterMl / 100) / 10), satuan: 'L', nada: NADA.biru })
+    return out
+  }, [body, totalKcal, totalProt, wt.waterMl])
+
+  /**
+   * Dua belas kartu besar dikelompokkan menjadi empat tab.
+   *
+   * Diukur di peramban sebelum ini: halaman setinggi 6,9 layar telepon dengan
+   * 246 sasaran ketuk, semuanya tercurah sekaligus. Panjang seperti itu tidak
+   * dibaca — orang menggulir sampai lelah lalu keluar, dan kartu di bawah tidak
+   * pernah terlihat siapa pun.
+   *
+   * Tidak ada kartu yang dihapus atau ditulis ulang; keduabelasnya tetap
+   * komponen yang sama, hanya dikelompokkan menurut pertanyaan yang dijawabnya:
+   * apa yang saya makan, bagaimana badan saya, apa yang saya lakukan, apa kata
+   * angka klinis.
+   */
+  const KELOMPOK = [
+    { id: 'makan', label: 'Makan', emoji: '\u{1F37D}\uFE0F' },
+    { id: 'tubuh', label: 'Tubuh', emoji: '\u2696\uFE0F' },
+    { id: 'gerak', label: 'Gerak', emoji: '\u{1F3C3}' },
+    { id: 'klinis', label: 'Klinis', emoji: '\u{1F9EC}' },
+  ] as const
+  type IdKel = (typeof KELOMPOK)[number]['id']
+  const [kel, setKel] = useState<IdKel>('makan')
+
+  /** Di tab mana tiap tautan lompat berada. */
+  const TAB_ANCHOR: Record<string, IdKel> = {
+    'calc-vo2max': 'tubuh', 'calc-bmi': 'tubuh', 'calc-lab': 'klinis', 'calc-protokol': 'klinis',
+  }
+  /**
+   * Pindah tab dulu, baru gulir.
+   *
+   * Tautan lompat yang langsung memanggil scrollIntoView diam-diam tidak
+   * melakukan apa pun begitu sasarannya berada di tab yang belum terbuka:
+   * elemennya belum terpasang, getElementById mengembalikan null, dan tombolnya
+   * tampak rusak tanpa pesan apa pun. Guliran ditunda satu putaran render
+   * supaya tab tujuannya sempat terpasang lebih dulu.
+   */
+  const lompat = (anchor: string) => {
+    const tujuan = TAB_ANCHOR[anchor]
+    if (tujuan && tujuan !== kel) setKel(tujuan)
+    setTimeout(() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+  }
+
   return (
-    <div className="mx-auto max-w-2xl space-y-5 pb-24">
-      <div className="flex justify-end">
-        <ShareToFeed activity="🥗 Nutrition & Calories" defaultCaption="My nutrition & healthy lifestyle progress today 🥗" />
+    <div className="mx-auto max-w-2xl space-y-6 px-4 pb-24 sm:px-[30px]">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-[19px] font-black leading-tight text-ink dark:text-white">Gizi</h1>
+        <ShareToFeed activity="\u{1F957} Nutrition & Calories" defaultCaption="My nutrition & healthy lifestyle progress today \u{1F957}" />
       </div>
-      {/* Longevity Score */}
+
+      {/* Angka hari ini — di atas segalanya, karena inilah yang dicari orang
+          saat membuka halaman gizi. */}
+      <PanelAngka angka={angkaHariIni} />
+
+      {/* Skor umur panjang tetap di luar tab: ia merangkum keempatnya. */}
       <LongevityCard body={body} wt={wt} todaysFoods={todaysFoods} vitals={vitals} activeProtocol={activeProtocol} />
 
-      {/* Chronic Protocol Selector */}
-      <div id="calc-protokol"><ChronicProtocolCard onSelect={setActiveProtocol} active={activeProtocol} /></div>
-
-      {/* Body Profile */}
-      <div id="calc-bmi"><BodyCard intakeKcal={totalKcal} /></div>
-
-      {/* 7-day BMI / BMR / VO₂Max trends (recharts) */}
-      <div id="calc-vo2max">
-        <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Loading health trends…</div>}>
-          <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
-        </Suspense>
+      <div className="no-scrollbar -mx-1 flex gap-[6px] overflow-x-auto px-1">
+        {KELOMPOK.map((k) => (
+          <button key={k.id} onClick={() => setKel(k.id)} aria-pressed={kel === k.id}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-bold transition active:scale-95 ${
+              kel === k.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>
+            <span>{k.emoji}</span>{k.label}
+          </button>
+        ))}
       </div>
 
-      {/* Food Tracker */}
-      <FoodTracker body={body} activeProtocol={activeProtocol} />
+      {kel === 'makan' && (
+        <>
+          <FoodTracker body={body} activeProtocol={activeProtocol} />
+          <SleepWater body={body} />
+        </>
+      )}
 
-      {/* GPS Tracker */}
-      <GPSTracker body={body} onComplete={onExComplete} />
+      {kel === 'tubuh' && (
+        <>
+          <div id="calc-bmi"><BodyCard intakeKcal={totalKcal} /></div>
+          <div id="calc-vo2max">
+            <Suspense fallback={<div className="rounded-2xl border border-black/5 bg-white p-5 text-center text-xs text-neutral-500 shadow-sm">Memuat tren kesehatan…</div>}>
+              <HealthTrends weight={body.w} height={body.h} age={body.age} gender={body.g as 'M' | 'F'} hrRest={vitals.avgHR} />
+            </Suspense>
+          </div>
+        </>
+      )}
 
-      {/* Exercise Log */}
-      <ExerciseLog body={body} onLog={onExComplete} />
+      {kel === 'gerak' && (
+        <>
+          <GPSTracker body={body} onComplete={onExComplete} />
+          <ExerciseLog body={body} onLog={onExComplete} />
+        </>
+      )}
 
-      {/* Sleep, Water, Sun */}
-      <SleepWater body={body} />
-
-      {/* Vital Importer */}
-      <VitalImporter onImported={avg => setVitals(avg)} />
-
-      {/* Lab Tracker */}
-      <div id="calc-lab"><LabTracker activeProtocol={activeProtocol} /></div>
-
-      {/* Obesity weekly nutrition + exercise scheduler */}
-      {activeProtocol?.id === 'obesity' && <ObesityWeeklyPlan protocol={activeProtocol} />}
-
-      {/* Recommendations */}
-      <RecommendationsCard recs={recs} />
+      {kel === 'klinis' && (
+        <>
+          <div id="calc-protokol"><ChronicProtocolCard onSelect={setActiveProtocol} active={activeProtocol} /></div>
+          <div id="calc-lab"><LabTracker activeProtocol={activeProtocol} /></div>
+          <VitalImporter onImported={avg => setVitals(avg)} />
+          {activeProtocol?.id === 'obesity' && <ObesityWeeklyPlan protocol={activeProtocol} />}
+          <RecommendationsCard recs={recs} />
+        </>
+      )}
 
       {/* Quick Links — longevity calculator capabilities */}
       <Card className="!p-5">
@@ -1793,7 +1870,7 @@ export function Nutrition() {
             <button
               key={item.label}
               type="button"
-              onClick={() => document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              onClick={() => lompat(item.anchor)}
               className="flex flex-col items-center rounded-2xl border border-brand/15 bg-brand-50/40 p-3 text-center transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-sm active:scale-95"
             >
               <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-2xl shadow-sm">{item.icon}</span>

@@ -1,6 +1,8 @@
-import { lazy } from 'react'
+import { lazy, useMemo } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
+import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
 import { IconActivity } from '../components/icons'
+import { getVitals } from '../lib/healthVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Sinyal Tubuh — lima halaman yang semuanya membaca deret dari jam tangan,
@@ -20,24 +22,45 @@ const GaitAnalysis = lazy(() => import('./GaitAnalysis').then((m) => ({ default:
 const ClinicalTrackers = lazy(() => import('./ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 
 const TABS: TabDef[] = [
-  { id: 'energi', label: 'Energy', emoji: '🔋', komponen: BodyBattery,
-    ringkas: 'Energy reserve 0–100 and stress level through the day' },
-  { id: 'jantung', label: 'Heart', emoji: '❤️', komponen: HeartRateLog,
-    ringkas: 'Every heart-rate sample your watch sends, and how dense they are' },
-  { id: 'tidur', label: 'Sleep', emoji: '😴', komponen: SleepPattern,
-    ringkas: 'Duration, stages, and how regular your sleep timing is' },
-  { id: 'gerak', label: 'Movement', emoji: '🦶', komponen: GaitAnalysis,
-    ringkas: 'Step asymmetry, walking quality, running form, heart-rate recovery' },
-  { id: 'klinis', label: 'Clinical', emoji: '🩺', komponen: ClinicalTrackers,
-    ringkas: 'SpO₂, ECG log, jet lag, pregnancy, wheelchair physiology' },
+  { id: 'energi', label: 'Energi', emoji: '🔋', komponen: BodyBattery,
+    ringkas: 'Cadangan energi 0–100 dan tingkat stres sepanjang hari' },
+  { id: 'jantung', label: 'Jantung', emoji: '❤️', komponen: HeartRateLog,
+    ringkas: 'Setiap sampel denyut yang dikirim jam tangan, dan serapatnya' },
+  { id: 'tidur', label: 'Tidur', emoji: '😴', komponen: SleepPattern,
+    ringkas: 'Durasi, tahapan, dan keteraturan jam tidur' },
+  { id: 'gerak', label: 'Gerak', emoji: '🦶', komponen: GaitAnalysis,
+    ringkas: 'Asimetri langkah, kualitas jalan, bentuk lari, pemulihan denyut' },
+  { id: 'klinis', label: 'Klinis', emoji: '🩺', komponen: ClinicalTrackers,
+    ringkas: 'SpO₂, rekam EKG, jet lag, kehamilan, fisiologi kursi roda' },
 ]
 
 export function PusatTubuh() {
+  /**
+   * Angka tubuh terkini, ditampilkan di atas seluruh tab.
+   *
+   * Diukur di peramban sebelum ini ada: halaman /tubuh hanya 42 kata dan
+   * nyaris kosong, karena tab pertamanya kebetulan yang paling jarang berisi
+   * data — padahal berat, nadi, dan tensi pemakainya tersimpan dan bisa
+   * langsung dibaca. Halaman yang terbuka kosong mengajarkan orang bahwa
+   * halaman itu memang kosong, dan ia tidak akan kembali.
+   */
+  const angka = useMemo<Angka[]>(() => {
+    const v = getVitals()
+    const out: Angka[] = []
+    if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: NADA.netral })
+    if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: NADA.jantung })
+    if (v.systolic && v.diastolic) out.push({ label: 'Tensi', nilai: `${v.systolic}/${v.diastolic}`, nada: NADA.netral })
+    if (v.spo2Pct) out.push({ label: 'SpO₂', nilai: String(v.spo2Pct), satuan: '%', nada: NADA.biru })
+    if (v.hrvMs) out.push({ label: 'HRV', nilai: String(v.hrvMs), satuan: 'ms', nada: NADA.biru })
+    return out
+  }, [])
+
   return (
     <HalamanTab
-      judul="Body Signals"
-      subjudul="Energy, heart, sleep, movement and clinical trackers on one page"
+      judul="Tanda Tubuh"
+      subjudul="Energi, jantung, tidur, gerak, dan pemantau klinis dalam satu halaman"
       ikon={<IconActivity />}
+      ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
     />
   )

@@ -32,12 +32,22 @@ export interface TabDef {
 }
 
 export function HalamanTab({
-  judul, subjudul, ikon, tabs,
+  judul, subjudul, ikon, tabs, ringkasan,
 }: {
   judul: string
   subjudul: string
   ikon: React.ReactNode
   tabs: TabDef[]
+  /**
+   * Panel angka yang berlaku untuk SELURUH tab, ditampilkan di atasnya.
+   *
+   * Tanpa ini halaman bertab bergantung sepenuhnya pada tab pertama. Diukur di
+   * peramban: /tubuh hanya 42 kata dan nyaris kosong, karena tab pertamanya
+   * kebetulan yang paling jarang berisi data — padahal berat, nadi, dan tensi
+   * pemakainya tersimpan dan bisa langsung ditampilkan. Halaman yang terbuka
+   * kosong mengajarkan orang bahwa halaman itu memang kosong.
+   */
+  ringkasan?: React.ReactNode
 }) {
   const lokasi = useLocation()
   const navigate = useNavigate()
@@ -62,8 +72,10 @@ export function HalamanTab({
   const Isi = tab.komponen
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-6 pb-24">
       <SectionTitle icon={ikon} title={judul} subtitle={tab.ringkas ?? subjudul} />
+
+      {ringkasan}
 
       <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
         {tabs.map((t) => (
