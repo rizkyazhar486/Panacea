@@ -59,7 +59,7 @@ export function analisisSpo2(bacaan: BacaanSpo2[]): AnalisisSpo2 {
 
   if (!nilai.length) {
     return { terakhir: null, rerata: null, terendah: null, jumlah: 0, band: 'takAda',
-      arti: 'Belum ada bacaan tercatat.', tandaBahaya: [], batasKetinggian: null }
+      arti: 'No readings recorded yet.', tandaBahaya: [], batasKetinggian: null }
   }
 
   const rerata = +(nilai.reduce((a, b) => a + b, 0) / nilai.length).toFixed(1)
@@ -70,37 +70,37 @@ export function analisisSpo2(bacaan: BacaanSpo2[]): AnalisisSpo2 {
   const band: AnalisisSpo2['band'] = v >= 95 ? 'normal' : v >= 91 ? 'perhatian' : 'rendah'
 
   const arti = band === 'normal'
-    ? 'Dalam rentang rujukan orang sehat di dataran rendah (95-100%).'
+    ? 'Within the reference range for healthy people at low altitude (95–100%).'
     : band === 'perhatian'
       ? diKetinggian
-        ? 'Di bawah 95%, namun Anda berada di ketinggian — penurunan ini wajar terjadi di sana.'
-        : 'Sedikit di bawah rentang rujukan. Bila Anda merasa sehat, ulangi pengukuran dengan tangan hangat dan diam; angka rendah sendirian tanpa gejala paling sering merupakan kesalahan pengukuran.'
-      : 'Jelas di bawah rentang rujukan. Ulangi pengukuran; bila tetap rendah DAN disertai gejala, ini perlu diperiksakan hari itu juga.'
+        ? 'Below 95%, but you are at altitude — a reading like this is normal up there.'
+        : 'Slightly below the reference range. If you feel well, take it again with warm, still hands; a single low number with no symptoms is most often a measurement error.'
+      : 'Clearly below the reference range. Repeat the measurement; if it stays low AND you have symptoms, this needs to be seen the same day.'
 
   const tandaBahaya = band === 'normal' ? [] : [
-    'Sesak napas yang baru maupun memberat',
-    'Nyeri dada',
-    'Bibir maupun ujung jari kebiruan',
-    'Bingung, sangat mengantuk, maupun sulit dibangunkan',
-    'Napas cepat saat istirahat',
+    'Breathlessness that is new or getting worse',
+    'Chest pain',
+    'Blue lips or fingertips',
+    'Confusion, extreme drowsiness, or difficulty waking',
+    'Rapid breathing at rest',
   ]
 
   return {
     terakhir, rerata, terendah, jumlah: nilai.length, band, arti, tandaBahaya,
     batasKetinggian: diKetinggian
-      ? `Bacaan diambil pada ${terakhir!.ketinggianM} m. Di ketinggian, saturasi memang lebih rendah — sekitar 90-94% di 2500 m sudah lazim pada orang sehat, dan rentang 95-100% tidak berlaku di sana.`
+      ? `Reading taken at ${terakhir!.ketinggianM} m. Saturation genuinely runs lower at altitude — around 90–94% at 2,500 m is ordinary in healthy people, and the 95–100% range does not apply there.`
       : null,
   }
 }
 
 /** Alasan tersering pembacaan rendah yang keliru — diperiksa sebelum panik. */
 export const SEBAB_SPO2_KELIRU: string[] = [
-  'Jari dingin maupun peredaran darah tangan yang menurun',
-  'Gerakan saat pengukuran, termasuk menggigil',
-  'Cat kuku, kuku palsu, maupun kuku yang sangat tebal',
-  'Jam tangan yang longgar maupun terlalu jauh dari pergelangan',
-  'Cahaya terang yang masuk di antara sensor dan kulit',
-  'Pengukuran pada kulit gelap cenderung sedikit lebih tinggi daripada keadaan sebenarnya, sehingga penurunan nyata bisa terlewat',
+  'Cold fingers or reduced circulation in the hand',
+  'Movement during the reading, including shivering',
+  'Nail polish, false nails, or very thick nails',
+  'A watch worn loose or too far up the wrist',
+  'Bright light getting between the sensor and the skin',
+  'Readings on darker skin tend to run slightly higher than the true value, so a real drop can be missed',
 ]
 
 // ═══ 2. CATATAN HASIL EKG ═══════════════════════════════════════════════════
@@ -131,46 +131,46 @@ export interface InfoEkg {
  */
 export const INFO_EKG: Record<KlasifikasiEkg, InfoEkg> = {
   sinus: {
-    label: 'Irama sinus',
-    arti: 'Alat menilai irama jantung teratur dan berasal dari pemacu alami jantung, pada laju 50-100 kali per menit selama perekaman itu.',
-    langkah: 'Tidak perlu tindakan bila Anda tidak bergejala. Perlu disadari, rekaman ini hanya menggambarkan 30 detik itu saja — gangguan irama yang hilang-timbul bisa saja terlewat sepenuhnya.',
+    label: 'Sinus rhythm',
+    arti: 'The device judged the rhythm to be regular and coming from the heart’s own pacemaker, at 50–100 beats per minute during that recording.',
+    langkah: 'No action needed if you have no symptoms. Bear in mind that this recording describes only those 30 seconds — a rhythm problem that comes and goes can be missed entirely.',
     warna: '#34d399',
   },
   afib: {
-    label: 'Fibrilasi atrium',
-    arti: 'Alat menemukan pola tidak teratur yang menyerupai fibrilasi atrium, yaitu irama tidak teratur yang berasal dari serambi jantung.',
-    langkah: 'PERLU DITINDAKLANJUTI dengan pemeriksaan langsung, meskipun Anda merasa sehat. Fibrilasi atrium meningkatkan risiko stroke dan sering tidak terasa. Simpan berkas PDF rekamannya dari aplikasi Health dan bawa saat berobat — dokter akan menilai rekamannya sendiri, bukan labelnya.',
+    label: 'Atrial fibrillation',
+    arti: 'The device found an irregular pattern resembling atrial fibrillation — an irregular rhythm arising in the atria.',
+    langkah: 'THIS NEEDS FOLLOW-UP in person, even if you feel well. Atrial fibrillation raises stroke risk and is often not felt at all. Save the PDF of the recording from the Health app and bring it to the appointment — a doctor will read the trace itself, not the label.',
     warna: '#f87171',
   },
   tidakMeyakinkan: {
-    label: 'Tidak meyakinkan',
-    arti: 'Alat tidak dapat menggolongkan rekaman ini. Penyebab tersering adalah gerakan, sentuhan yang tidak rapat, kulit kering, maupun denyut di luar rentang yang bisa dinilai alat.',
-    langkah: 'Ulangi rekaman dengan lengan disangga meja, tubuh diam, dan kulit sedikit dilembapkan. Bila berulang kali tidak meyakinkan DAN Anda bergejala, periksakan diri — jangan menunggu alat memberi label.',
+    label: 'Inconclusive',
+    arti: 'The device could not classify this recording. The usual causes are movement, poor contact, dry skin, or a heart rate outside the range it can assess.',
+    langkah: 'Record again with your arm resting on a table, body still, and skin slightly moistened. If it stays inconclusive AND you have symptoms, get checked — do not wait for the device to produce a label.',
     warna: '#fbbf24',
   },
   nadiTinggi: {
-    label: 'Denyut tinggi',
-    arti: 'Denyut di atas 100 saat perekaman, sehingga alat tidak menilai iramanya.',
-    langkah: 'Bila Anda baru bergerak, cemas, demam, maupun minum kopi, ini lazim. Ulangi setelah tenang beberapa menit. Bila denyut tetap tinggi saat benar-benar istirahat dan disertai gejala, periksakan diri.',
+    label: 'High heart rate',
+    arti: 'The rate was above 100 during the recording, so the device did not assess the rhythm.',
+    langkah: 'If you have just moved about, are anxious, feverish, or have had coffee, this is ordinary. Repeat it after a few calm minutes. If the rate stays high at genuine rest and you have symptoms, get checked.',
     warna: '#fbbf24',
   },
   nadiRendah: {
-    label: 'Denyut rendah',
-    arti: 'Denyut di bawah 50 saat perekaman, sehingga alat tidak menilai iramanya.',
-    langkah: 'Pada orang terlatih, denyut istirahat rendah lazim dan bukan masalah. Menjadi penting bila disertai rasa melayang, pingsan, maupun mudah lelah yang tidak biasa — dan pada pemakai obat pelambat denyut seperti penyekat beta.',
+    label: 'Low heart rate',
+    arti: 'The rate was below 50 during the recording, so the device did not assess the rhythm.',
+    langkah: 'In trained people a low resting rate is common and not a problem. It matters when it comes with light-headedness, fainting, or unusual fatigue — and in anyone taking rate-slowing medication such as a beta blocker.',
     warna: '#fbbf24',
   },
   lainnya: {
-    label: 'Hasil lain',
-    arti: 'Klasifikasi lain yang dikeluarkan alat.',
-    langkah: 'Simpan berkas PDF-nya dan tunjukkan saat berobat.',
+    label: 'Other result',
+    arti: 'Another classification produced by the device.',
+    langkah: 'Save the PDF and show it at your appointment.',
     warna: '#94a3b8',
   },
 }
 
 export const GEJALA_EKG: string[] = [
-  'Berdebar', 'Nyeri dada', 'Sesak napas', 'Pusing berputar', 'Hampir pingsan', 'Pingsan',
-  'Mudah lelah tidak biasa', 'Tidak ada gejala',
+  'Palpitations', 'Chest pain', 'Breathlessness', 'Vertigo', 'Nearly fainting', 'Fainting',
+  'Unusual fatigue', 'No symptoms',
 ]
 
 export interface RingkasEkg {
@@ -187,18 +187,18 @@ export function ringkasEkg(catatan: CatatanEkg[]): RingkasEkg {
   for (const c of catatan) hitung.set(c.klasifikasi, (hitung.get(c.klasifikasi) ?? 0) + 1)
 
   const afibList = catatan.filter((c) => c.klasifikasi === 'afib')
-  const bergejala = afibList.some((c) => c.gejala.some((g) => g !== 'Tidak ada gejala'))
+  const bergejala = afibList.some((c) => c.gejala.some((g) => g !== 'No symptoms'))
   // Gejala yang menuntut pertolongan segera, apa pun label alatnya.
-  const gejalaBerat = ['Nyeri dada', 'Pingsan', 'Hampir pingsan', 'Sesak napas']
+  const gejalaBerat = ['Chest pain', 'Fainting', 'Nearly fainting', 'Breathlessness']
   const darurat = catatan.some((c) => c.gejala.some((g) => gejalaBerat.includes(g)))
 
   const saran = darurat
-    ? 'Ada rekaman yang disertai nyeri dada, sesak, maupun pingsan. Gejala seperti itu perlu dinilai segera, TERLEPAS dari apa pun label yang diberikan alat — alat ini tidak dirancang untuk mengenali serangan jantung.'
+    ? 'One or more recordings came with chest pain, breathlessness, or fainting. Symptoms like those need assessing straight away, REGARDLESS of what label the device gave — this device is not designed to recognise a heart attack.'
     : afibList.length > 0
-      ? `Tercatat ${afibList.length} rekaman berlabel fibrilasi atrium. Bawa berkas PDF-nya saat berobat; yang paling berguna bagi dokter adalah pola waktunya, bukan angkanya.`
+      ? `${afibList.length} recording(s) labelled atrial fibrillation. Bring the PDFs to your appointment; what helps a doctor most is the pattern over time, not the numbers.`
       : catatan.length > 0
-        ? 'Belum ada rekaman berlabel fibrilasi atrium. Tetap simpan riwayat ini — pola dari waktu ke waktu jauh lebih berguna daripada satu rekaman.'
-        : 'Belum ada rekaman tersimpan.'
+        ? 'No recordings labelled atrial fibrillation so far. Keep the history anyway — a pattern over time is far more useful than a single recording.'
+        : 'No recordings saved yet.'
 
   return {
     total: catatan.length,
@@ -266,7 +266,7 @@ export function rencanaJetLag(opsi: {
 
   if (arah === 'tidakAda') {
     return { bedaJam: 0, arah, perkiraanHariPulih: 0,
-      ringkas: 'Tidak ada perbedaan zona waktu — tidak perlu penyesuaian.', langkah: [], catatan: [] }
+      ringkas: 'No time-zone difference — no adjustment needed.', langkah: [], catatan: [] }
   }
 
   const hariSiap = Math.min(opsi.hariPersiapan ?? 3, 4)
@@ -275,51 +275,51 @@ export function rencanaJetLag(opsi: {
   for (let d = hariSiap; d >= 1; d--) {
     const geser = (hariSiap - d + 1) * geserPerHari * (arah === 'maju' ? -1 : 1)
     langkah.push({
-      hari: `H−${d} (sebelum terbang)`,
+      hari: `D−${d} (before the flight)`,
       isi: [
-        `Tidur dan bangun ${Math.abs(geser) / 60} jam lebih ${arah === 'maju' ? 'awal' : 'lambat'} daripada biasa (bangun sekitar pukul ${fmt(bangunMin + geser)}).`,
+        `Sleep and wake ${Math.abs(geser) / 60} hour(s) ${arah === 'maju' ? 'earlier' : 'later'} than usual (waking around ${fmt(bangunMin + geser)}).`,
         arah === 'maju'
-          ? `Cari cahaya terang segera setelah bangun, dan REDUPKAN cahaya pada malam hari — cahaya malam akan menarik jam Anda ke arah yang salah.`
-          : `Cari cahaya terang pada sore dan malam hari, dan hindari cahaya terang pagi-pagi sekali.`,
+          ? `Seek bright light immediately on waking, and DIM the light in the evening — evening light pulls your clock the wrong way.`
+          : `Seek bright light in the late afternoon and evening, and avoid bright light very early in the morning.`,
       ],
     })
   }
 
   langkah.push({
-    hari: 'Hari penerbangan',
+    hari: 'Flight day',
     isi: [
-      'Segera setelah naik pesawat, ubah jam tangan ke waktu tujuan dan mulai berpikir dalam waktu itu.',
-      'Tidur di pesawat hanya bila saat itu malam di tempat tujuan. Bila di tujuan sedang siang, tetap terjaga meskipun mengantuk.',
-      'Minum air cukup. Hindari alkohol — ia memperburuk kualitas tidur dan memperlambat penyesuaian.',
-      'Kafein boleh dipakai untuk bertahan terjaga, tetapi hentikan setidaknya 8 jam sebelum waktu tidur di tujuan.',
+      'As soon as you board, set your watch to destination time and start thinking in it.',
+      'Sleep on the plane only if it is night at your destination. If it is daytime there, stay awake even if you feel sleepy.',
+      'Drink enough water. Avoid alcohol — it worsens sleep quality and slows adjustment.',
+      'Caffeine can be used to stay awake, but stop at least 8 hours before bedtime at your destination.',
     ],
   })
 
   for (let d = 1; d <= Math.min(perkiraanHariPulih, 5); d++) {
     langkah.push({
-      hari: `H+${d} (di tujuan)`,
+      hari: `D+${d} (at your destination)`,
       isi: [
         arah === 'maju'
-          ? 'Keluar ruangan untuk mendapat cahaya terang pada pagi hari waktu setempat, dan pakai kacamata hitam bila terpaksa keluar sebelum subuh.'
-          : 'Cari cahaya terang pada sore hari waktu setempat, dan hindari tidur sore yang panjang.',
-        'Makan mengikuti jam makan setempat — jadwal makan ikut mengatur jam biologis, meskipun lebih lemah daripada cahaya.',
-        'Bila sangat mengantuk, tidur singkat maksimal 20-30 menit dan tidak lewat pukul 15.00 waktu setempat.',
-        d === 1 ? 'Turunkan intensitas latihan pada hari pertama; koordinasi dan penilaian usaha ikut terganggu.' : 'Latihan boleh dinaikkan bertahap sesuai rasa.',
+          ? 'Get outside into bright light in the local morning, and wear sunglasses if you must go out before dawn.'
+          : 'Seek bright light in the local late afternoon, and avoid long afternoon naps.',
+        'Eat on local meal times — meal timing also sets the body clock, though more weakly than light does.',
+        'If you are very sleepy, nap for 20–30 minutes at most, and not after 3 pm local time.',
+        d === 1 ? 'Lower training intensity on the first day; coordination and your sense of effort are both affected.' : 'Training can be built back up gradually, guided by how you feel.',
       ],
     })
   }
 
   catatan.push(
     arah === 'maju'
-      ? 'Ke timur berarti jam tubuh harus MAJU, dan ini arah yang lebih sulit karena jam bawaan manusia sedikit lebih panjang daripada 24 jam.'
-      : 'Ke barat berarti jam tubuh MUNDUR, dan ini arah yang lebih mudah — biasanya pulih sekitar satu setengah kali lebih cepat.',
-    `Perkiraan titik suhu tubuh terendah Anda sekitar pukul ${fmt(titikTerendah)} waktu asal. Cahaya SESUDAH titik itu memajukan jam; cahaya SEBELUMNYA memundurkannya. Inilah sebabnya waktu berjemur lebih menentukan daripada lamanya.`,
-    'Melatonin dipakai sebagian orang untuk membantu penyesuaian, namun dosis dan waktunya berbeda menurut arah perjalanan dan tidak seragam antarorang — bicarakan dengan dokter maupun apoteker sebelum memakainya, terlebih bila Anda memakai obat lain.',
+      ? 'Travelling east means the body clock must ADVANCE, and that is the harder direction because the human internal clock runs slightly longer than 24 hours.'
+      : 'Travelling west means the body clock DELAYS, which is the easier direction — recovery is usually about one and a half times faster.',
+    `Your core temperature low is estimated at around ${fmt(titikTerendah)} in your home time zone. Light AFTER that point advances the clock; light BEFORE it delays the clock. This is why the timing of light exposure matters more than how long it lasts.`,
+    'Some people use melatonin to help them adjust, but the dose and timing differ with the direction of travel and are not the same for everyone — talk to a doctor or pharmacist before using it, especially if you take other medication.',
   )
 
   return {
     bedaJam, arah, perkiraanHariPulih,
-    ringkas: `Beda ${abs} jam ke ${arah === 'maju' ? 'timur' : 'barat'}. Perkiraan pulih sekitar ${perkiraanHariPulih} hari bila cahaya diatur; tanpa pengaturan cahaya bisa lebih lama.`,
+    ringkas: `${abs} hour(s) ${arah === 'maju' ? 'east' : 'west'}. Expect roughly ${perkiraanHariPulih} day(s) to adjust if you manage light exposure; without managing light it can take longer.`,
     langkah, catatan,
   }
 }
@@ -370,57 +370,57 @@ export interface PanduanOlahragaHamil {
  */
 export function panduanOlahragaHamil(trimester: 1 | 2 | 3): PanduanOlahragaHamil {
   const catatanTrimester = trimester === 1
-    ? 'Trimester pertama: mual dan lelah sering menjadi penghalang terbesar, bukan olahraganya. Aktivitas ringan justru sering mengurangi keluhan. Suhu tubuh yang terlalu tinggi dihindari pada masa ini.'
+    ? 'First trimester: nausea and fatigue are usually the bigger obstacle, not the exercise itself. Light activity often eases both. Avoid overheating during this period.'
     : trimester === 2
-      ? 'Trimester kedua: umumnya masa paling nyaman untuk beraktivitas. Mulai hindari berbaring telentang lama karena rahim dapat menekan pembuluh darah besar dan menimbulkan rasa melayang.'
-      : 'Trimester ketiga: pusat berat badan berpindah sehingga keseimbangan menurun. Utamakan aktivitas dengan tumpuan stabil seperti berjalan, berenang, dan sepeda statis.'
+      ? 'Second trimester: usually the most comfortable period for activity. Start avoiding long periods lying flat on your back, as the uterus can press on the major vessels and cause light-headedness.'
+      : 'Third trimester: your centre of gravity shifts and balance declines. Favour activities with stable support such as walking, swimming, and a stationary bike.'
 
   return {
     catatanTrimester,
     anjuran: [
-      'Sasaran umum sekitar 150 menit aktivitas intensitas sedang per pekan, dibagi ke beberapa hari.',
-      'Ukur intensitas dengan UJI BICARA, bukan dengan denyut jantung: intensitas sedang berarti masih bisa berbicara dalam kalimat penuh. Denyut jantung berubah dalam kehamilan sehingga zona denyut menjadi menyesatkan.',
-      'Strength training ringan sampai sedang bermanfaat dan aman pada kehamilan tanpa penyulit.',
-      'Latihan otot dasar panggul membantu pemulihan setelah melahirkan dan mengurangi keluhan kebocoran kencing.',
-      'Minum cukup dan hindari berolahraga pada suhu maupun kelembapan yang tinggi.',
-      'Berjalan, berenang, sepeda statis, dan senam hamil merupakan pilihan dengan risiko paling rendah.',
+      'The general target is around 150 minutes of moderate-intensity activity per week, spread over several days.',
+      'Judge intensity with the TALK TEST rather than heart rate: moderate means you can still speak in full sentences. Heart rate changes in pregnancy, which makes heart-rate zones misleading.',
+      'Light to moderate strength training is beneficial and safe in an uncomplicated pregnancy.',
+      'Pelvic floor training helps recovery after birth and reduces urinary leakage.',
+      'Drink enough, and avoid exercising in high heat or humidity.',
+      'Walking, swimming, a stationary bike, and antenatal classes are the lowest-risk options.',
     ],
     hindari: [
-      'Olahraga dengan risiko benturan maupun jatuh: bela diri kontak, sepak bola, bola basket, berkuda, ski, sepeda di jalan ramai maupun medan sulit',
+      'Sports carrying a risk of impact or falling: contact martial arts, football, basketball, horse riding, skiing, and cycling in traffic or on difficult terrain',
       'Menyelam (scuba)',
-      'Aktivitas di ketinggian lebih dari 2500 m bila belum terbiasa',
+      'Activity above 2,500 m if you are not acclimatised',
       'Berbaring telentang lama setelah trimester pertama',
-      'Sauna, bak air panas, dan hot yoga — suhu inti yang tinggi tidak dianjurkan',
-      'Menahan napas saat mengangkat beban',
+      'Saunas, hot tubs, and hot yoga — a raised core temperature is not advised',
+      'Holding your breath while lifting',
     ],
     tandaBerhenti: [
-      'Perdarahan dari jalan lahir',
-      'Nyeri perut maupun kontraksi teratur yang menetap',
-      'Keluar cairan dari jalan lahir',
+      'Vaginal bleeding',
+      'Abdominal pain or persistent regular contractions',
+      'Fluid leaking from the vagina',
       'Sesak napas sebelum beraktivitas',
-      'Nyeri dada',
-      'Pusing berputar maupun hampir pingsan yang menetap',
-      'Nyeri kepala hebat',
-      'Kelemahan otot yang mengganggu keseimbangan',
-      'Nyeri maupun bengkak pada betis',
-      'Gerakan janin berkurang',
+      'Chest pain',
+      'Vertigo or near-fainting that persists',
+      'Severe headache',
+      'Muscle weakness affecting your balance',
+      'Calf pain or swelling',
+      'Reduced fetal movement',
     ],
     kontraindikasiMutlak: [
-      'Penyakit jantung maupun paru yang bermakna',
-      'Serviks yang lemah maupun sudah dijahit',
-      'Kehamilan kembar dengan risiko kelahiran prematur',
-      'Perdarahan menetap pada trimester kedua maupun ketiga',
+      'Significant heart or lung disease',
+      'A weak or sutured cervix',
+      'A multiple pregnancy with risk of preterm birth',
+      'Persistent bleeding in the second or third trimester',
       'Plasenta previa setelah 26 minggu',
-      'Riwayat maupun ancaman persalinan prematur pada kehamilan ini',
+      'A history of, or threatened, preterm labour in this pregnancy',
       'Ketuban pecah dini',
-      'Preeklamsia maupun hipertensi dalam kehamilan yang tidak terkendali',
+      'Pre-eclampsia or uncontrolled hypertension in pregnancy',
       'Anemia berat',
     ],
   }
 }
 
 export const DISCLAIMER_HAMIL =
-  'Panduan ini bersifat umum untuk kehamilan TANPA penyulit. Kehamilan Anda perlu dinilai sendiri oleh bidan maupun dokter yang merawat sebelum memulai maupun melanjutkan program latihan, terutama bila ada keadaan pada daftar kontraindikasi. Bila muncul salah satu tanda berhenti, hentikan aktivitas dan hubungi tenaga kesehatan.'
+  'This guidance is general and applies to pregnancies WITHOUT complications. Your own pregnancy needs to be assessed by the midwife or doctor caring for you before you start or continue a training programme, particularly if any of the contraindications above apply. If any of the stop signs appear, stop the activity and contact a health professional.'
 
 // ═══ 5. FISIOLOGI KURSI RODA ════════════════════════════════════════════════
 
@@ -441,11 +441,11 @@ export interface ZonaDorong {
  * diamati SAAT MENDORONG, bukan terhadap HRmaks umum.
  */
 export const ZONA_DORONG: ZonaDorong[] = [
-  { z: 1, nama: 'Pemulihan', pctHrPuncak: [50, 60], tujuan: 'Mendorong santai, melancarkan peredaran darah.' },
-  { z: 2, nama: 'Ketahanan', pctHrPuncak: [60, 70], tujuan: 'Basis aerobik. Bagian terbesar volume mingguan ada di sini.' },
-  { z: 3, nama: 'Tempo', pctHrPuncak: [70, 80], tujuan: 'Menengah, terasa berat namun terkendali.' },
-  { z: 4, nama: 'Ambang', pctHrPuncak: [80, 90], tujuan: 'Interval 5-10 menit untuk menaikkan ambang.' },
-  { z: 5, nama: 'Maksimal', pctHrPuncak: [90, 100], tujuan: 'Sprint dan interval pendek.' },
+  { z: 1, nama: 'Pemulihan', pctHrPuncak: [50, 60], tujuan: 'Easy pushing that keeps the blood moving.' },
+  { z: 2, nama: 'Ketahanan', pctHrPuncak: [60, 70], tujuan: 'The aerobic base. Most of your weekly volume belongs here.' },
+  { z: 3, nama: 'Tempo', pctHrPuncak: [70, 80], tujuan: 'Moderate — hard but controlled.' },
+  { z: 4, nama: 'Ambang', pctHrPuncak: [80, 90], tujuan: '5–10 minute intervals to raise the threshold.' },
+  { z: 5, nama: 'Maksimal', pctHrPuncak: [90, 100], tujuan: 'Sprints and short intervals.' },
 ]
 
 export interface PanduanKursiRoda {
@@ -465,28 +465,28 @@ export function panduanKursiRoda(hrPuncakDorong: number): PanduanKursiRoda {
     zona,
     bahu: [
       {
-        judul: 'Bahu adalah sendi yang menanggung segalanya',
-        isi: 'Pada pengguna kursi roda, bahu dipakai untuk berpindah, mendorong, dan menahan berat badan — pekerjaan yang pada orang lain dibagi ke tungkai. Karena itu nyeri bahu sangat sering terjadi, dan menjaganya bukan tambahan melainkan bagian inti program.',
+        judul: 'The shoulder carries everything here',
+        isi: 'For wheelchair users the shoulder is used for transfers, propulsion, and bearing weight — work that is shared with the legs in everyone else. Shoulder pain is therefore very common, and protecting the shoulder is not an add-on but a core part of the programme.',
       },
       {
-        judul: 'Kuatkan otot penarik, bukan hanya pendorong',
-        isi: 'Mendorong melatih dada dan bagian depan bahu. Bila hanya itu yang dilatih, ketidakseimbangan bertambah dan bahu makin tertarik ke depan. Latihan menarik — row, face pull, retraksi belikat — adalah penyeimbang yang paling menentukan.',
+        judul: 'Train the pulling muscles, not only the pushing ones',
+        isi: 'Pushing trains the chest and front of the shoulder. If that is all you train, the imbalance grows and the shoulder is pulled further forward. Pulling work — rows, face pulls, scapular retraction — is the counterweight that matters most.',
       },
       {
         judul: 'Teknik mendorong menentukan beban sendi',
-        isi: 'Dorongan yang panjang dan berirama dengan tangan mengayun rendah kembali ke belakang membebani bahu lebih sedikit daripada dorongan pendek yang cepat dan berulang. Jumlah dorongan yang lebih sedikit dengan setiap dorongan lebih panjang adalah sasaran yang tepat.',
+        isi: 'Long, rhythmic strokes with the hand swinging low on the return load the shoulder less than short, fast, repeated pushes. Fewer strokes, each one longer, is the right target.',
       },
       {
-        judul: 'Rotator cuff dan dada',
-        isi: 'Kuatkan rotator eksternal dan regangkan dada secara teratur. Pola pemendekan dada dengan pelemahan otot belakang berkembang lebih cepat pada pengguna kursi roda dibanding orang lain.',
+        judul: 'Rotator cuff and chest',
+        isi: 'Strengthen the external rotators and stretch the chest regularly. The pattern of a shortened chest with weakened back muscles develops faster in wheelchair users than in others.',
       },
     ],
     catatan: [
-      'Denyut jantung puncak pada olahraga lengan lebih rendah daripada pada olahraga kaki. Memakai rumus 220−usia akan membuat zona terbaca terlalu ringan — pakailah denyut puncak yang benar-benar Anda amati saat mendorong keras.',
-      'Pada cedera saraf tulang belakang setinggi dada ke atas, denyut jantung dapat tidak naik sebagaimana mestinya karena persarafan jantung ikut terganggu. Bila demikian, denyut jantung TIDAK bisa dipakai untuk mengukur intensitas — pakai skala rasa usaha (6-20 maupun 1-10) dan uji bicara.',
-      'Pengaturan suhu tubuh juga dapat terganggu pada cedera saraf tulang belakang tinggi, sehingga risiko kepanasan meningkat. Berlatih di tempat sejuk, minum cukup, dan gunakan pendinginan.',
-      'Waspadai disrefleksia otonom pada cedera setinggi T6 ke atas: nyeri kepala hebat mendadak, wajah memerah, berkeringat di atas ketinggian cedera, dan tekanan darah melonjak. Ini keadaan gawat darurat — hentikan aktivitas, duduk tegak, dan cari pertolongan.',
-      'Periksa kulit di daerah tumpuan secara teratur, terutama setelah menambah volume latihan.',
+      'Peak heart rate in arm exercise is lower than in leg exercise. Using 220−age will make the zones read too easy — use the peak rate you actually observe when pushing hard.',
+      'With a spinal cord injury at chest level or above, heart rate may not rise as it should because the nerve supply to the heart is affected. Where that is the case, heart rate CANNOT be used to gauge intensity — use a rating of perceived exertion (6–20 or 1–10) and the talk test.',
+      'Temperature regulation can also be impaired in a high spinal cord injury, raising the risk of overheating. Train somewhere cool, drink enough, and use active cooling.',
+      'Watch for autonomic dysreflexia in injuries at T6 or above: sudden severe headache, facial flushing, sweating above the level of injury, and a surge in blood pressure. This is a medical emergency — stop the activity, sit upright, and get help.',
+      'Check the skin over weight-bearing areas regularly, especially after increasing training volume.',
     ],
   }
 }
