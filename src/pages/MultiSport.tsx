@@ -31,15 +31,15 @@ export function MultiSport() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Lari, Sepeda, Renang" subtitle="Intensity zones, speed work, and posture for three sports" />
+      <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Intensity zones, speed work, and posture for three sports" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Intensitas pada ketiga cabang ini diatur oleh prinsip yang sama — ambang laktat — tetapi
-          <strong className="text-ink"> satuannya berbeda</strong>: lari memakai pace, sepeda memakai watt,
-          renang memakai waktu per 100 meter. Menyamakan "zona 3" antar cabang tanpa mengukur ambang
-          masing-masing menghasilkan intensitas yang salah pada hampir setiap sesi. Halaman ini menghitung
-          ketiganya secara terpisah.
+          Intensity in all three sports is governed by the same principle — the lactate threshold — but
+          <strong className="text-ink"> the units differ</strong>: running uses pace, cycling uses watts,
+          swimming uses time per 100 metres. Treating "zone 3" as the same across sports without measuring
+          each threshold produces the wrong intensity in nearly every session. This page calculates all
+          three separately.
         </p>
       </Card>
 
@@ -72,7 +72,7 @@ export function MultiSport() {
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Aturan lintas cabang" />
+        <SectionTitle icon={<IconHeart />} title="Rules that cross all three" />
         <div className="space-y-3 mt-2">
           {CROSS_RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -100,22 +100,22 @@ function CompareTab() {
           </div>
 
           <div className="mt-3 grid gap-2 text-sm">
-            <div><span className="text-slate-500">Satuan intensitas:</span> <span className="text-neutral-600">{s.satuan}</span></div>
-            <div><span className="text-slate-500">Cara mengukur ambang:</span> <span className="text-neutral-600">{s.tesAmbang}</span></div>
+            <div><span className="text-slate-500">Intensity unit:</span> <span className="text-neutral-600">{s.satuan}</span></div>
+            <div><span className="text-slate-500">How threshold is measured:</span> <span className="text-neutral-600">{s.tesAmbang}</span></div>
           </div>
 
           <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
-            <div className="text-xs uppercase tracking-wide text-slate-500">Beban sendi</div>
+            <div className="text-xs uppercase tracking-wide text-slate-500">Joint load</div>
             <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{s.bebanSendi}</p>
           </div>
 
           <div className={`mt-2 rounded-lg border p-3 ${ARAH_STYLE[s.posturArah]}`}>
-            <div className="text-xs uppercase tracking-wide opacity-80">Pengaruh terhadap postur</div>
+            <div className="text-xs uppercase tracking-wide opacity-80">Effect on posture</div>
             <p className="text-sm mt-1 leading-relaxed opacity-95">{s.postur}</p>
           </div>
 
           <div className="mt-2 text-sm text-amber-300/90">
-            <span className="text-amber-500/80">Cedera khas:</span> {s.cederaKhas}
+            <span className="text-amber-500/80">Typical injuries:</span> {s.cederaKhas}
           </div>
         </Card>
       ))}
@@ -130,11 +130,11 @@ function RunTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Zona pace lari" subtitle="From your race pace" />
-      <Field label="Pace lomba (menit:detik per km)">
+      <SectionTitle icon={<IconTimer />} title="Running pace zones" subtitle="From your race pace" />
+      <Field label="Race pace (min:sec per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
-      {sec == null && <p className="text-sm text-amber-300 mt-2">Format menit:detik, misalnya 5:30.</p>}
+      {sec == null && <p className="text-sm text-amber-300 mt-2">Format min:sec, for example 5:30.</p>}
       {res && (
         <div className="grid gap-2 sm:grid-cols-2 mt-3">
           {RUN_ZONES.map((z) => {
@@ -152,8 +152,8 @@ function RunTab() {
         </div>
       )}
       <p className="text-sm text-neutral-500 mt-4 leading-relaxed">
-        Untuk penjelasan lengkap tiap jenis lari beserta kesalahan yang paling sering, lihat halaman
-        <strong className="text-ink"> Foundation Training &amp; Postur</strong>.
+        For a full explanation of each run type and the mistakes made most often, see the
+        <strong className="text-ink"> Foundation Training &amp; Posture</strong> page.
       </p>
     </Card>
   )
@@ -169,25 +169,25 @@ function BikeTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconChartUp />} title="Zona daya sepeda" subtitle="From an all-out 20-minute test" />
+        <SectionTitle icon={<IconChartUp />} title="Cycling power zones" subtitle="From an all-out 20-minute test" />
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Daya rata-rata 20 menit (watt)">
+          <Field label="Average 20-minute power (watts)">
             <input className={inputClass} value={watt} onChange={(e) => setWatt(e.target.value)} inputMode="decimal" />
           </Field>
-          <Field label="Berat badan (kg)">
+          <Field label="Body weight (kg)">
             <input className={inputClass} value={berat} onChange={(e) => setBerat(e.target.value)} inputMode="decimal" />
           </Field>
         </div>
 
         {ftp == null ? (
-          <p className="text-sm text-amber-300 mt-3">Masukkan daya rata-rata dalam watt.</p>
+          <p className="text-sm text-amber-300 mt-3">Enter your average power in watts.</p>
         ) : (
           <>
             <div className="mt-3 flex flex-wrap items-baseline gap-3">
               <div className="text-sm text-neutral-500">
                 FTP ≈ <span className="text-ink font-bold text-lg tabular-nums">{ftp}</span> watt
-                <span className="text-xs text-slate-500 ml-1">(95% dari daya 20 menit)</span>
+                <span className="text-xs text-slate-500 ml-1">(95% of the 20-minute power)</span>
               </div>
               {wkg != null && (
                 <div className="text-sm text-neutral-500">
@@ -201,10 +201,10 @@ function BikeTab() {
               <table className="w-full text-sm min-w-[460px]">
                 <thead>
                   <tr className="text-neutral-500 border-b border-white/10">
-                    <th className="text-left py-2 pr-3 font-medium">Zona</th>
+                    <th className="text-left py-2 pr-3 font-medium">Zone</th>
                     <th className="text-left py-2 pr-3 font-medium">Watt</th>
-                    <th className="text-left py-2 pr-3 font-medium">Tujuan</th>
-                    <th className="text-left py-2 font-medium">Durasi</th>
+                    <th className="text-left py-2 pr-3 font-medium">Purpose</th>
+                    <th className="text-left py-2 font-medium">Duration</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -227,13 +227,13 @@ function BikeTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Penyetelan sepeda" subtitle="The numbers behind knee, neck, and back pain" />
+        <SectionTitle icon={<IconActivity />} title="Bike fit" subtitle="The numbers behind knee, neck, and back pain" />
         <div className="space-y-2 mt-2">
           {BIKE_FIT.map((f) => (
             <div key={f.bagian} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
               <div className="font-semibold text-ink text-sm">{f.bagian}</div>
               <div className="text-sm text-neutral-500 mt-1">{f.patokan}</div>
-              <div className="text-sm text-amber-300/90 mt-1"><span className="text-amber-500/80">Bila salah:</span> {f.bilaSalah}</div>
+              <div className="text-sm text-amber-300/90 mt-1"><span className="text-amber-500/80">If it is wrong:</span> {f.bilaSalah}</div>
             </div>
           ))}
         </div>
@@ -241,10 +241,10 @@ function BikeTab() {
 
       <Card>
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
-          <div className="text-sm font-semibold text-rose-300">Sepeda memerlukan latihan penyeimbang — renang tidak</div>
+          <div className="text-sm font-semibold text-rose-300">Cycling needs a counterweight — swimming does not</div>
           <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-            Bersepeda menahan punggung membungkuk dengan leher mendongak selama berjam-jam, yaitu persis pola
-            postur yang ingin diperbaiki. Tanpa penyeimbang, semakin banyak bersepeda semakin kuat pola itu
+            Cycling holds the back rounded with the neck extended for hours — precisely the posture pattern you
+            are trying to correct. Without a counterweight, the more you ride the stronger that pattern
             tertanam.
           </p>
         </div>
@@ -281,10 +281,10 @@ function SwimTab() {
         <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="From all-out 400 m and 200 m tests" />
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Waktu 400 m (menit:detik)">
+          <Field label="400 m time (min:sec)">
             <input className={inputClass} value={t400} onChange={(e) => setT400(e.target.value)} inputMode="numeric" />
           </Field>
-          <Field label="Waktu 200 m (menit:detik)">
+          <Field label="200 m time (min:sec)">
             <input className={inputClass} value={t200} onChange={(e) => setT200(e.target.value)} inputMode="numeric" />
           </Field>
         </div>
@@ -324,7 +324,7 @@ function SwimTab() {
 
       <Card>
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
-          <div className="text-sm font-semibold text-emerald-300">Renang adalah satu-satunya dari ketiganya yang memperbaiki postur</div>
+          <div className="text-sm font-semibold text-emerald-300">Swimming is the only one of the three that improves posture</div>
           <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
             Gaya bebas dan gaya punggung menarik lengan ke belakang melawan tahanan air, sehingga menguatkan
             latissimus dorsi, rhomboid, dan trapezius bawah — otot yang justru melemah akibat duduk dan berdiri
@@ -333,10 +333,10 @@ function SwimTab() {
           </p>
         </div>
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mt-3">
-          <div className="text-sm font-semibold text-amber-300">Satu hal yang perlu dijaga</div>
+          <div className="text-sm font-semibold text-amber-300">One thing to watch</div>
           <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-            Nyeri bahu pada perenang hampir selalu berasal dari volume yang naik terlalu cepat dan dari tangan
-            yang menyeberang garis tengah tubuh saat masuk air. Bila bahu mulai nyeri, yang perlu diperbaiki
+            Shoulder pain in swimmers almost always comes from volume rising too fast and from the hand crossing
+            the body’s midline on entry. If the shoulder starts to hurt, what needs fixing
             lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.
           </p>
         </div>
@@ -353,9 +353,9 @@ function SpeedTab() {
     <div className="space-y-4">
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          Kerja kecepatan berbeda dari kerja daya tahan pada satu hal yang paling sering dilanggar:
-          <strong className="text-ink"> jeda harus panjang sampai benar-benar pulih</strong>. Begitu jeda
-          dipersingkat, sesi berubah menjadi latihan daya tahan anaerobik dan tujuan kecepatannya hilang.
+          Speed work differs from endurance work in the one respect that is most often broken:
+          <strong className="text-ink"> the rest must be long enough for full recovery</strong>. The moment the rest
+          is shortened, the session becomes anaerobic endurance work and its purpose as speed training is lost.
         </p>
       </Card>
 
@@ -401,7 +401,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Susunan seminggu" subtitle="Berbeda menurut tujuan" />
+      <SectionTitle icon={<IconTimer />} title="How a week is arranged" subtitle="It changes with your goal" />
 
       <div className="flex flex-wrap gap-2 mt-3">
         {([
@@ -422,9 +422,9 @@ function ScheduleTab() {
       {goal === 'postur' && (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 mt-3">
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Pada tujuan postur, porsi <strong className="text-ink">renang dan latihan tarik diperbesar</strong>
-            {' '}sementara <strong className="text-ink">sepeda dibatasi dan selalu disusul penyeimbang</strong> —
-            karena keduanya bekerja ke arah yang berlawanan terhadap postur.
+            With posture as the goal, <strong className="text-ink">swimming and pulling work are increased</strong>
+            {' '}sementara <strong className="text-ink">cycling is capped and always followed by its counterweight</strong> —
+            because the two work in opposite directions on posture.
           </p>
         </div>
       )}
