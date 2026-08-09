@@ -5776,6 +5776,40 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     tatalaksana: ['Bungkus organ terpapar dengan kasa lembab steril dan plastik untuk cegah kehilangan cairan dan panas, puasa, NGT, cairan IV, antibiotik, rujuk bedah anak segera untuk penutupan primer atau bertahap (silo)'],
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'PPKFKTP2014'],
   },
+  // ── Ileus ──────────────────────────────────────────────────────────────
+  //
+  // Ditulis sebagai SATU entri yang memuat KEDUA jenisnya, dan itu keputusan
+  // yang disengaja. Daftar SKDI hanya menuliskan "Ileus" tanpa memisahkan
+  // obstruktif dan paralitik, sementara tatalaksana keduanya BERLAWANAN: yang
+  // satu sering berakhir di meja operasi, yang lain justru dirugikan oleh
+  // laparotomi. Entri yang hanya memuat salah satunya akan menuntun pembaca
+  // ke arah yang salah pada separuh kasus, dan tidak ada di layar yang
+  // memberi tahu bahwa separuh lainnya ada.
+  'Ileus': {
+    definisi:
+      'Terhentinya pasase isi usus. Dibagi menjadi ILEUS OBSTRUKTIF (mekanik) — ada sumbatan fisik pada lumen usus — dan ILEUS PARALITIK (adinamik/fungsional) — tidak ada sumbatan, melainkan peristaltik yang berhenti. Membedakan keduanya adalah inti persoalan pada kasus ini, karena tatalaksananya berlawanan arah: ileus obstruktif sering memerlukan pembedahan, sedangkan ileus paralitik ditangani dengan memperbaiki penyebabnya dan JUSTRU DIRUGIKAN oleh laparotomi yang tidak perlu.',
+    diagnosis: [
+      'PEMBEDA UTAMA — NYERI: obstruktif bersifat kolik (hilang-timbul mengikuti gelombang peristaltik yang melawan sumbatan); paralitik bersifat tumpul menetap dan sering justru lebih ringan meski perut sangat distensi',
+      'PEMBEDA UTAMA — BISING USUS: obstruktif meningkat dan metalik pada fase dini lalu MENGHILANG pada fase lanjut atau strangulasi; paralitik menurun atau menghilang SEJAK AWAL. Bising usus yang hilang pada pasien yang baru beberapa jam sakit lebih mengarah ke paralitik daripada obstruktif',
+      'PEMBEDA UTAMA — FOTO POLOS ABDOMEN 3 POSISI: obstruktif menunjukkan dilatasi usus proksimal dengan air-fluid level bertingkat (step-ladder) dan TIDAK ADA UDARA DI DISTAL/REKTUM pada obstruksi total; paralitik menunjukkan udara TERSEBAR MERATA di usus halus DAN usus besar sampai ke rektum',
+      'Gejala bersama keduanya: distensi abdomen, mual dan muntah, tidak bisa flatus maupun buang air besar (obstipasi)',
+      'Cari penyebab obstruktif: riwayat operasi abdomen (adhesi — penyebab tersering pada dewasa), hernia inkarserata (WAJIB periksa seluruh lubang hernia), massa tumor, volvulus, invaginasi pada anak',
+      'Cari penyebab paralitik: pascaoperasi abdomen, HIPOKALEMIA (penyebab metabolik tersering dan paling mudah terlewat), hipomagnesemia, hiponatremia, obat (opioid, antikolinergik), sepsis dan peritonitis, pankreatitis, iskemia mesenterika, kolik ginjal maupun patologi retroperitoneal lain, ketoasidosis diabetik, cedera medula spinalis',
+      'TANDA STRANGULASI yang mengubah kasus menjadi kegawatdaruratan bedah: nyeri hebat menetap yang tidak lagi kolik, demam, takikardia, tanda peritonitis (defans, nyeri lepas), leukositosis, asidosis metabolik dengan laktat meningkat',
+      'Pemeriksaan penunjang penyerta: darah lengkap, elektrolit (terutama kalium), ureum dan kreatinin, analisis gas darah maupun laktat bila curiga strangulasi; CT abdomen bila tersedia untuk menentukan letak dan sebab sumbatan',
+    ],
+    tatalaksana: [
+      'AWAL, SAMA UNTUK KEDUANYA: puasakan pasien, pasang NGT untuk dekompresi lambung dan usus proksimal, resusitasi cairan intravena, koreksi elektrolit, pasang kateter urin untuk memantau produksi urin sebagai penanda kecukupan resusitasi',
+      'ILEUS OBSTRUKTIF — rujuk bedah untuk menilai kebutuhan laparotomi. Obstruksi parsial akibat adhesi dapat dicoba konservatif 48-72 jam dengan pemantauan ketat, tetapi percobaan konservatif itu DIHENTIKAN SEGERA bila muncul tanda strangulasi',
+      'ILEUS OBSTRUKTIF — operasi cito bila ada tanda strangulasi, hernia inkarserata maupun strangulata, obstruksi lengkap yang tidak membaik, maupun obstruksi lengkung tertutup (closed-loop). Menunda pada keadaan ini berisiko nekrosis usus',
+      'ILEUS PARALITIK — TATALAKSANANYA ADALAH MENGOBATI PENYEBABNYA, bukan membedah. Koreksi kalium, magnesium, dan natrium; hentikan atau kurangi opioid dan antikolinergik; atasi sepsis maupun infeksi intraabdomen yang mendasari',
+      'ILEUS PARALITIK — mobilisasi sedini mungkin, dan nutrisi enteral dimulai kembali secara bertahap begitu peristaltik pulih. Ileus paralitik pascaoperasi umumnya bersifat fisiologis dan pulih dalam 24-72 jam; usus halus pulih paling dahulu dan kolon paling akhir',
+      'ILEUS PARALITIK — LAPAROTOMI TIDAK DIINDIKASIKAN dan justru memperburuk keadaan, KECUALI bila ternyata ada sebab bedah di baliknya (perforasi, peritonitis, iskemia mesenterika) maupun bila obstruksi mekanik belum dapat disingkirkan',
+      'PSEUDO-OBSTRUKSI KOLON AKUT (sindrom Ogilvie) — bentuk paralitik pada kolon; diameter sekum melebihi 10-12 cm berisiko perforasi. Ditangani dengan koreksi metabolik dan dekompresi, neostigmin di bawah pemantauan jantung, maupun dekompresi kolonoskopik; rujuk',
+      'Antibiotik tidak diberikan rutin pada ileus tanpa penyulit; diberikan bila curiga strangulasi, perforasi, maupun sepsis sebagai sumber ileus paralitiknya',
+    ],
+    referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021', 'PPKFKTP2014'],
+  },
   'Apendisitis akut': {
     definisi: 'Inflamasi apendiks vermiformis, umumnya akibat obstruksi lumen — penyebab abdomen akut bedah tersering.',
     diagnosis: ['Nyeri berpindah dari periumbilikal ke kuadran kanan bawah, anoreksia, mual, demam ringan; nyeri tekan McBurney, Rovsing, psoas, dan obturator sign; skor Alvarado, USG/CT bila meragukan'],

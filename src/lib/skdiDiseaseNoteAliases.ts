@@ -88,7 +88,6 @@ export const SKDI_DISEASE_NOTE_ALIASES: Record<string, string> = {
   'Peritonitis': 'Peritonitis',
   'Gastritis': 'Gastritis / Dispepsia / GERD',
   'Demam tifoid': 'Demam Tifoid',
-  'Ileus': 'Ileus Obstruktif — pasang NGT',
   'Taeniasis': 'Ascariasis / Taeniasis / Amoebiasis (parasit)',
   'Hepatitis A': 'Hepatitis A / B',
   'Kolesistitis': 'Kolesistitis / Kolelitiasis',
