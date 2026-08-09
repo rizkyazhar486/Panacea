@@ -655,8 +655,13 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
         <PencarianGlobal buka={cariBuka} tutup={() => setCariBuka(false)} />
 
-        {/* Quick actions — one-tap shortcuts (mobile only) */}
-        <div className="relative border-b border-black/5 bg-white lg:hidden">
+        {/* Pintasan cepat, hanya di layar sempit -- DAN tidak di dasbor.
+            Di dasbor deretan ini mengulang persis kisi lambang yang ada tepat
+            di bawahnya, jadi ia hanya mendorong isi yang sesungguhnya turun
+            satu baris dan memberi dua jalan ke tujuan yang sama. Di halaman
+            lain ia tetap berguna, karena di sana kisinya tidak ada. */}
+        {!onHome && (
+        <div data-pintasan className="relative border-b border-black/5 bg-white lg:hidden">
           <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
             {quick.map((n) => (
               <NavLink
@@ -682,7 +687,7 @@ export function Shell({ children }: { children: ReactNode }) {
           {/* Fade hint that the strip scrolls further right */}
           <div className="fade-edge-surface pointer-events-none absolute inset-y-0 right-0 w-8" />
         </div>
-
+        )}
         {/* Umpan balik tarikan: tanpa ini gestur terasa seperti tidak terjadi
             apa-apa sampai tiba-tiba halaman berkedip. */}
         {(tarikan > 0 || sedangSegar) && (
