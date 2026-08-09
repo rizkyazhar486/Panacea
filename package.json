@@ -11,7 +11,8 @@
     "gen:note-index": "node scripts/gen-note-index.mjs",
     "periksa": "node scripts/periksaTeks.mjs",
     "periksa:semua": "node scripts/periksaTeks.mjs --semua",
-    "uji": "node scripts/uji/jalankan.mjs"
+    "uji": "node scripts/uji/jalankan.mjs",
+    "cakupan": "node scripts/cakupanSkdi.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
