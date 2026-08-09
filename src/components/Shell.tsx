@@ -38,6 +38,7 @@ import {
   IconLeaf,
   IconSearch,
   IconBell,
+  IconPhone,
 } from './icons'
 import { useStore } from '../lib/store'
 import { getTheme, toggleTheme, type Theme } from '../lib/theme'
@@ -83,23 +84,75 @@ const GROUP_ORDER = ['Home', 'Health', 'Longevity', 'Calculators & Labs', 'Fitne
  */
 export const NAV_UNTUK_PENGATURAN: { to: string; label: string; group: string; roles: Role[] }[] = []
 
+/**
+ * MENU HARIAN — hanya yang dibuka berulang kali.
+ *
+ * Sebelumnya menu ini memuat 69 tujuan dalam 9 grup. Menu sepanjang itu tidak
+ * dipindai, ia diabaikan: begitu daftarnya melewati satu layar, orang berhenti
+ * membaca dan kembali memakai dua-tiga jalan yang sudah dihafalnya, sehingga 60
+ * tujuan lain praktis tidak pernah ditemukan.
+ *
+ * Yang dikeluarkan dari sini TIDAK dihapus. Seluruh 69 tujuan tetap ada di
+ * KATALOG di bawah, yang menyuplai pencarian global dan layar Atur Fitur --
+ * jadi semuanya masih bisa dicari dan dijangkau, hanya tidak lagi berebut
+ * tempat di menu.
+ */
 const nav: Nav[] = [
-  // Beranda (rendered as plain links — the most-used, social-first destinations)
+  // Beranda
+  { to: '/', label: 'Beranda', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
+  { to: '/semua-fitur', label: 'Semua Fitur', icon: IconSearch, roles: ALL, group: 'Home' },
+  { to: '/tutorial', label: 'Panduan Pemakaian', icon: IconBook, roles: ALL, group: 'Home' },
+  { to: '/profile', label: 'Profil', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
+  // Badan Anda
+  { to: '/tubuh', label: 'Tanda Tubuh', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/nutrition', label: 'Gizi', icon: IconFood, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/latihan', label: 'Latihan', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/recovery', label: 'Tidur & Pemulihan', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
+  { to: '/health-data', label: 'Data Kesehatan', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  { to: '/emergency', label: 'Darurat & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
+  // Klinis
+  { to: '/med-study', label: 'Belajar Kedokteran', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/drug-info', label: 'Obat & Resep', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/emr', label: 'Rekam Medis', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/clinical-hub', label: 'Alat Klinis Lain', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  // Sosial
+  { to: '/feed', label: 'Kabar Teman', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/community', label: 'Komunitas', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/messages', label: 'Pesan', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Content' },
+  { to: '/scripture', label: 'Ibadah', icon: IconBook, roles: ALL, group: 'Content' },
+  // Pengelolaan (peran tertentu saja)
+  { to: '/admin', label: 'Admin', icon: IconShield, roles: ['admin'], group: 'Manage' },
+  { to: '/owner', label: 'Owner', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Manage' },
+  { to: '/verification', label: 'Verifikasi', icon: IconShield, roles: ['verifikator'], group: 'Manage' },
+  // Akun
+  { to: '/atur-fitur', label: 'Atur Fitur', icon: IconSettings, roles: ALL, group: 'Account' },
+  { to: '/settings', label: 'Pengaturan', icon: IconSettings, roles: ALL, group: 'Account' },
+]
+
+/**
+ * KATALOG LENGKAP — sumber tunggal untuk pencarian global dan Atur Fitur.
+ *
+ * Terpisah dari `nav` dengan sengaja. Kalau keduanya satu daftar, memangkas
+ * menu berarti ikut menghapus tujuan itu dari pencarian, dan fitur yang tidak
+ * bisa dicari sama saja dengan fitur yang dihapus -- tanpa ada yang menyadari.
+ *
+ * Pasar saham dan makro ekonomi TIDAK ada di sini maupun di menu: keduanya
+ * dikeluarkan dari produk atas keputusan pemilik, karena tidak berkaitan
+ * dengan kesehatan.
+ */
+const KATALOG: Nav[] = [
   { to: '/', label: 'Home', icon: IconHome, roles: ['pasien', 'dokter', 'owner'], end: true, group: 'Home' },
   { to: '/community', label: 'Community', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/clubs', label: 'Club Hub', icon: IconUsers, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/messages', label: 'Messages', icon: IconChat, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/logs', label: 'Log & Stats', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
   { to: '/profile', label: 'Profile', icon: IconUser, roles: ['pasien', 'dokter', 'owner'], group: 'Home' },
-  // Kesehatan — core health data & daily care. Trimmed to the items used daily;
-  // the long tail (screenings, first aid, sleep tools, etc.) lives in Wellness
-  // Hub, searchable, so nothing here is deleted — just not duplicated in two
-  // places at once.
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/keuangan', label: 'Finance', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/pasar', label: 'Market Data', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/makro-ekonomi', label: 'Macro Lab (Economics)', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
   { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
@@ -107,34 +160,23 @@ const nav: Nav[] = [
   { to: '/recovery', label: 'Recovery', icon: IconMoon, roles: ['pasien', 'dokter'], group: 'Health' },
   { to: '/latihan', label: 'Training', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/tubuh', label: 'Body Signals', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
-  // Longevity & aging — trimmed to the flagship entries; the rest (breathwork,
-  // gratitude, sleep debt, thermal therapy, ikigai, life compass, resilience
-  // stories, fasting, gene info, aesthetic) live in Wellness Hub, searchable.
   { to: '/wellness-hub', label: '✨ Wellness Hub (all)', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/health-simulator', label: 'What-If Health Simulator', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/longevity', label: 'Longevity Center', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/biological-age', label: 'Biological Age', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/family-health', label: 'Family Health History', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
   { to: '/life-compass', label: 'Life Compass (Vision & Purpose)', icon: IconSparkle, roles: ['pasien', 'dokter', 'owner'], group: 'Longevity' },
-  // Calculators & labs
-  // Calculators & labs — trimmed to gateway pages; all 36 individual scores
-  // (Wells, TIMI, SOFA, MELD-Na, etc.) are fully searchable in Calculator Hub,
-  // so nothing here is deleted, just not listed twice.
   { to: '/calculator-hub', label: '🔎 Calculator Hub (search all)', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/lab-decoder', label: 'Lab Result Decoder', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/risk', label: 'Risk Calculators', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/reality-check', label: 'Habit Reality Check', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/data-lab', label: 'Data Lab (upload CSV)', icon: IconChartUp, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
-  // Kebugaran — trimmed to daily-use entries; Fitness Test, Anti-Aging &
-  // Organs, Initial Assessment, Body Composition, Performance Lab, Science &
-  // KPIs, and Shape Forming live in Fitness Hub, searchable.
   { to: '/fitness-hub', label: '🏃 Fitness Hub (all)', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/athlete', label: 'Athlete', icon: IconRun, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/workout', label: 'Workout', icon: IconFlame, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/training-plan', label: 'AI Program', icon: IconTimer, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/readiness', label: 'Recovery & Strain', icon: IconHeart, roles: ['pasien', 'dokter'], group: 'Fitness' },
   { to: '/sports-scores', label: 'Live Scores', icon: IconRun, roles: ['pasien', 'dokter', 'owner'], group: 'Fitness' },
-  // Klinis & AI
   { to: '/evidence', label: 'Clinical Evidence', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/chatbot', label: 'AI Chatbot', icon: IconChat, roles: ['pasien', 'dokter'], group: 'Clinical & AI' },
   { to: '/second-opinion', label: 'Second Opinion', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
@@ -143,7 +185,6 @@ const nav: Nav[] = [
   { to: '/clinical-calculators', label: 'Clinical Calculators', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Calculators & Labs' },
   { to: '/planning', label: 'Planning', icon: IconPlan, roles: ['dokter'], group: 'Clinical & AI' },
   { to: '/clinical-hub', label: '🩺 More clinical & AI tools', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
-  // Layanan
   { to: '/consult', label: 'Consultation', icon: IconStethoscope, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/hospitals', label: 'Health Facilities', icon: IconHospital, roles: ['pasien', 'dokter'], group: 'Services' },
   { to: '/pharmacy', label: 'Pharmacy', icon: IconPill, roles: ['pasien', 'dokter'], group: 'Services' },
@@ -151,17 +192,14 @@ const nav: Nav[] = [
   { to: '/med-reminders', label: 'Medication Reminders', icon: IconBell, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
   { to: '/orders', label: 'Transactions', icon: IconWallet, roles: ['pasien'], group: 'Services' },
   { to: '/pricing', label: 'Pricing & Plans', icon: IconWallet, roles: ['pasien', 'dokter', 'owner'], group: 'Services' },
-  // Konten
   { to: '/med-study', label: 'Med Study Hub', icon: IconBook, roles: ['pasien', 'dokter', 'kontributor', 'owner'], group: 'Content' },
   { to: '/editor', label: 'Write Material', icon: IconBook, roles: ['kontributor'], group: 'Content' },
   { to: '/marketplace', label: 'Marketplace', icon: IconStore, roles: ['pasien', 'dokter', 'kontributor', 'verifikator', 'owner'], group: 'Content' },
   { to: '/my-materials', label: 'My Materials', icon: IconBook, roles: ['kontributor'], group: 'Content' },
   { to: '/verification', label: 'Verification', icon: IconShield, roles: ['verifikator'], group: 'Content' },
-  // Kelola
   { to: '/admin', label: 'Admin', icon: IconStethoscope, roles: ['admin'], group: 'Manage' },
   { to: '/owner', label: 'Owner', icon: IconChartUp, roles: ['owner'], group: 'Manage' },
   { to: '/architecture', label: 'Architecture', icon: IconArchitecture, roles: ['admin'], group: 'Manage' },
-  // Akun
   { to: '/billing', label: 'Billing', icon: IconWallet, roles: ALL, group: 'Account' },
   { to: '/scripture', label: 'Scripture', icon: IconShield, roles: ALL, group: 'Account' },
   { to: '/hadith', label: 'Hadith', icon: IconShield, roles: ALL, group: 'Account' },
@@ -176,10 +214,17 @@ const nav: Nav[] = [
   { to: '/legal', label: 'Legal', icon: IconShield, roles: ALL, group: 'Account' },
 ]
 
-// Isi daftar untuk layar pengaturan dari `nav` itu sendiri.
-NAV_UNTUK_PENGATURAN.push(
-  ...nav.map((n) => ({ to: n.to, label: n.label, group: n.group ?? 'Account', roles: n.roles })),
-)
+// Diisi dari KATALOG, bukan dari `nav`: menu hanya memuat tujuan harian,
+// sedangkan pencarian harus tetap menemukan semuanya. Digabung menurut `to`
+// supaya tujuan yang ada di keduanya tidak muncul dua kali.
+{
+  const perTo = new Map<string, Nav>()
+  for (const n of [...KATALOG, ...nav]) perTo.set(n.to, n)
+  NAV_UNTUK_PENGATURAN.push(
+    ...[...perTo.values()].map((n) => ({ to: n.to, label: n.label, group: n.group ?? 'Account', roles: n.roles })),
+  )
+}
+export const SEMUA_TUJUAN = NAV_UNTUK_PENGATURAN
 
 // Pages that show the active-patient context. Patients see only their own data
 // (no selector); doctors manage patients via the selector.
@@ -256,6 +301,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
+  const [bantuanBuka, setBantuanBuka] = useState(false)
 
   // Kembali mengikuti ALUR HALAMAN, bukan sekadar satu langkah mundur di
   // riwayat. Alasannya ada di lib/alurHalaman.ts: riwayat sering tidak seperti
@@ -533,6 +579,14 @@ export function Shell({ children }: { children: ReactNode }) {
                 <IconChat size={20} />
               </NavLink>
             )}
+            <button
+              onClick={() => setBantuanBuka(true)}
+              aria-label="Bantuan / Hubungi dukungan"
+              title="Bantuan / Hubungi dukungan"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-brand-dark"
+            >
+              <IconPhone size={20} />
+            </button>
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
@@ -784,7 +838,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
       {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}
 
-      <ContactService hidden={menuOpen} />
+      <ContactService buka={bantuanBuka} onTutup={() => setBantuanBuka(false)} />
     </div>
   )
 }

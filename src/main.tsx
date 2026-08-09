@@ -43,6 +43,8 @@ const Admin = lazy(() => import('./pages/Admin').then((m) => ({ default: m.Admin
 const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal })))
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
 const Feed = lazy(() => import('./pages/Feed'))
+const SemuaFitur = lazy(() => import('./pages/SemuaFitur'))
+const Tutorial = lazy(() => import('./pages/Tutorial'))
 const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const RealisticHealth = lazy(() => import('./pages/RealisticHealth').then((m) => ({ default: m.RealisticHealth })))
 const MoneyHub = lazy(() => import('./pages/MoneyHub').then((m) => ({ default: m.MoneyHub })))
@@ -59,10 +61,8 @@ const EnduranceTools = lazy(() => import('./pages/EnduranceTools').then((m) => (
 const ClinicalTrackers = lazy(() => import('./pages/ClinicalTrackers').then((m) => ({ default: m.ClinicalTrackers })))
 const SportsLab = lazy(() => import('./pages/SportsLab').then((m) => ({ default: m.SportsLab })))
 const Connect = lazy(() => import('./pages/Connect').then((m) => ({ default: m.Connect })))
-const MacroLab = lazy(() => import('./pages/MacroLab').then((m) => ({ default: m.MacroLab })))
 const MacroLabGizi = lazy(() => import('./pages/MacroLabGizi').then((m) => ({ default: m.MacroLabGizi })))
 const OwnerAnalytics = lazy(() => import('./pages/OwnerAnalytics').then((m) => ({ default: m.OwnerAnalytics })))
-const Markets = lazy(() => import('./pages/Markets').then((m) => ({ default: m.Markets })))
 const Messages = lazy(() => import('./pages/Messages').then((m) => ({ default: m.Messages })))
 const Profile = lazy(() => import('./pages/Profile').then((m) => ({ default: m.Profile })))
 const FitnessTest = lazy(() => import('./pages/FitnessTest').then((m) => ({ default: m.FitnessTest })))
@@ -247,6 +247,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/social" element={<Home />} />
               <Route path="/community" element={<Community />} />
               <Route path="/feed" element={<Feed />} />
+              <Route path="/semua-fitur" element={<SemuaFitur />} />
+              <Route path="/tutorial" element={<Tutorial />} />
               <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/sehat-sibuk" element={<RealisticHealth />} />
               <Route path="/keuangan" element={<MoneyHub />} />
@@ -257,9 +259,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sports-lab" element={<SportsLab />} />
               <Route path="/connect" element={<Connect />} />
               <Route path="/macro-lab" element={<MacroLabGizi />} />
-              <Route path="/makro-ekonomi" element={<MacroLab />} />
               <Route path="/owner-analytics" element={<OwnerAnalytics />} />
-              <Route path="/pasar" element={<Markets />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/fitness-test" element={<FitnessTest />} />

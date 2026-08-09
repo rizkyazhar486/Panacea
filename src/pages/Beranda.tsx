@@ -112,7 +112,8 @@ export default function Beranda() {
             { ke: '/community', label: '👥 Komunitas' },
             { ke: '/scripture', label: '📖 Ibadah' },
             { ke: '/emergency', label: '🚨 Darurat' },
-            { ke: '/jelajah', label: '🧭 Semua fitur' },
+            { ke: '/semua-fitur', label: '🧭 Semua Fitur' },
+            { ke: '/tutorial', label: '❓ Panduan' },
           ].map((x) => (
             <Link
               key={x.ke}

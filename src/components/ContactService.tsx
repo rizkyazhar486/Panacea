@@ -30,8 +30,28 @@ function clampBottom(v: number): number {
 // clearance between their default resting spots, so a user-dragged position
 // (this button is draggable and persists to localStorage) could land right
 // on top of the "+" and block it entirely.
-export function ContactService({ hidden }: { hidden?: boolean } = {}) {
-  const [open, setOpen] = useState(false)
+/**
+ * Pemicu dukungan sekarang berupa ikon di bilah atas, bukan tombol mengambang.
+ *
+ * Dulu ada DUA tombol mengambang sekaligus: yang ini di kiri bawah dan tombol
+ * "+" di bilah bawah. Keduanya menutupi isi halaman -- pada peta penyakit yang
+ * ini menimpa baris cabang, dan pemakai harus menyeretnya dulu untuk membaca
+ * apa yang tertutup. Satu ikon di bilah atas tidak menutupi apa pun dan tetap
+ * ada di setiap halaman.
+ *
+ * Panel percakapannya tidak berubah; hanya cara membukanya.
+ */
+export function ContactService({ hidden, buka, onTutup }: {
+  hidden?: boolean
+  buka?: boolean
+  onTutup?: () => void
+} = {}) {
+  const [openLokal, setOpenLokal] = useState(false)
+  const open = buka ?? openLokal
+  const setOpen = (v: boolean | ((x: boolean) => boolean)) => {
+    const next = typeof v === 'function' ? v(open) : v
+    if (buka !== undefined) { if (!next) onTutup?.() } else setOpenLokal(next)
+  }
   const [input, setInput] = useState('')
   const [msgs, setMsgs] = useState<Msg[]>([
     {
@@ -92,41 +112,14 @@ export function ContactService({ hidden }: { hidden?: boolean } = {}) {
     setInput('')
   }
 
-  if (hidden && !open) return null
-
-  if (minimized) {
-    return (
-      <button
-        onClick={() => toggleMinimized(false)}
-        style={{ bottom }}
-        className="fixed left-2 z-40 flex h-7 w-7 items-center justify-center rounded-full text-white opacity-70 shadow-md transition hover:opacity-100 active:scale-90"
-        title="Expand support button"
-        aria-label="Expand support button"
-      >
-        <span className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }} />
-        <IconPhone size={12} className="relative" />
-      </button>
-    )
-  }
+  // Dikendalikan dari bilah atas: tidak ada lagi tombol mengambang di sini,
+  // jadi ketika tertutup komponen ini tidak menggambar apa pun.
+  if (!open) return null
 
   return (
     <>
-      <button
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={() => { if (!onPointerUp()) setOpen((o) => !o) }}
-        onDoubleClick={() => toggleMinimized(true)}
-        style={{ bottom, background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 10px 26px -6px rgba(0,191,99,0.55)', touchAction: 'none' }}
-        className="group fixed left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:scale-95 lg:h-14 lg:w-14"
-        title="Support / Contact Service — drag to move, double-tap to minimize"
-        aria-label="Contact Service"
-      >
-        <span className="absolute inset-0 rounded-full bg-brand/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:animate-ping" />
-        <IconPhone size={24} className="relative" />
-      </button>
-
       {open && (
-        <div style={{ bottom: bottom + 64 }} className="fixed left-4 z-40 flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+        <div className="fixed bottom-24 left-1/2 z-[60] flex h-[26rem] w-[22rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
           <div className="flex items-center gap-2 bg-ink px-4 py-3 text-white">
             <IconPhone size={18} className="text-brand" />
             <div className="text-sm font-bold">Panaceamed Support</div>
