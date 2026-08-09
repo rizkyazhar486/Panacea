@@ -37,6 +37,11 @@ export function KolomPelatih({
   const status = useMemo(() => statusSingkat(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const jadwal = useMemo(() => jadwalPekan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
   const dk = useMemo(() => dukungan(workouts, konteks, sekarang), [workouts, konteks, sekarang])
+  const jedaHari = useMemo(() => {
+    if (!terakhir) return null
+    const t = Date.parse(terakhir.mulai)
+    return Number.isNaN(t) ? null : Math.max(0, (sekarang - t) / 86400_000)
+  }, [terakhir, sekarang])
 
   if (ringkas) {
     return (
@@ -84,6 +89,19 @@ export function KolomPelatih({
             <Angka label="Fatigue" nilai={Math.round(status.kelelahan)} warna="#f87171" />
             <Angka label="Freshness" nilai={Math.round(status.kesegaran)} warna={status.baca.warna} />
           </div>
+        )}
+        {/* Kelelahan meluruh dengan tetapan waktu 7 hari, jadi dua hari
+            istirahat menurunkannya sekitar seperempat. Kalau angkanya tidak
+            bergerak padahal sudah libur, yang salah hampir selalu TANGGAL sesi
+            -- sesi yang diimpor dengan tanggal impor, bukan tanggal latihan,
+            membuat setiap hari terhitung sebagai "latihan hari ini". Tanggal
+            sesi terakhir ditampilkan supaya sebabnya kelihatan, bukan
+            ditebak-tebak. */}
+        {jedaHari !== null && (
+          <p className="mt-2 text-[11px] text-slate-500">
+            Sesi terakhir tercatat {jedaHari < 1 ? 'hari ini' : `${Math.floor(jedaHari)} hari lalu`}
+            {jedaHari < 1 && ' — kalau Anda sebenarnya libur, tanggal sesi salah tercatat.'}
+          </p>
         )}
         {status && <p className="mt-2 text-[12px] leading-relaxed text-slate-400">
           <b style={{ color: status.baca.warna }}>{status.baca.judul}.</b> {status.baca.arti}
