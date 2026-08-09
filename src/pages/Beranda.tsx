@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { ambilTujuan, simpanTujuan, PILIHAN_TUJUAN, type Tujuan } from '../lib/tujuan'
+import { ambilTujuan, simpanTujuan, modeAwam, PILIHAN_TUJUAN, type Tujuan } from '../lib/tujuan'
 
 /**
  * Beranda: satu pertanyaan, "apa yang saya kerjakan sekarang?"
@@ -38,6 +38,20 @@ const KLINIS: Pintu[] = [
   { ke: '/med-study', ikon: '🩺', judul: 'Keterampilan & OSCE', isi: 'APN, ACLS, ATLS, bidai, sirkumsisi — langkah demi langkah' },
   { ke: '/clinical-calculators', ikon: '🧮', judul: 'Skor & Kalkulator', isi: 'SOFA, Wells, GRACE, Child-Pugh, dosis anak' },
   { ke: '/drug-info', ikon: '💊', judul: 'Obat & Resep', isi: 'Dosis, interaksi, cara menulis resep' },
+]
+
+/**
+ * Pintu yang sama, disebut dengan bahasa sehari-hari.
+ *
+ * Tujuannya BUKAN isi yang lebih dangkal — halaman yang dituju persis sama.
+ * Yang berbeda hanya namanya: "SKDI", "OSCE", dan "SOFA" adalah bahasa ujian,
+ * berarti bagi yang diuji dengannya dan singkatan kosong bagi yang tidak.
+ */
+const KLINIS_AWAM: Pintu[] = [
+  { ke: '/med-study', ikon: '🧠', judul: 'Cari Tahu Penyakit', isi: '623 penyakit — apa, sebabnya, tandanya, obatnya' },
+  { ke: '/med-study', ikon: '🩺', judul: 'Pertolongan & Tindakan', isi: 'Bantuan napas, henti jantung, membidai patah tulang' },
+  { ke: '/clinical-calculators', ikon: '🧮', judul: 'Hitung Risiko', isi: 'Risiko jantung, fungsi ginjal, berat badan ideal' },
+  { ke: '/drug-info', ikon: '💊', judul: 'Cari Obat', isi: 'Kegunaan, efek samping, obat yang tidak boleh dicampur' },
 ]
 
 /** Pintu untuk yang menjaga badannya sendiri. */
@@ -114,6 +128,8 @@ export default function Beranda() {
   // isi klinis dibuka saat sedang belajar. Yang lebih sering dituju diletakkan
   // lebih dekat. Kelompok klinis tetap ada tepat di bawahnya.
   const klinisDulu = tujuan ? tujuan === 'belajar' : account?.role === 'dokter'
+  const awam = modeAwam(tujuan)
+  const klinis = awam ? KLINIS_AWAM : KLINIS
 
   return (
     <div className="space-y-5 pb-4">
@@ -135,13 +151,13 @@ export default function Beranda() {
 
       {klinisDulu ? (
         <>
-          <Bagian judul="Klinis" pintu={KLINIS} />
+          <Bagian judul="Klinis" pintu={klinis} />
           <Bagian judul="Badan Anda" pintu={PRIBADI} />
         </>
       ) : (
         <>
           <Bagian judul="Badan Anda" pintu={PRIBADI} />
-          <Bagian judul="Klinis" pintu={KLINIS} />
+          <Bagian judul={awam ? 'Kesehatan & Penyakit' : 'Klinis'} pintu={klinis} />
         </>
       )}
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTujuan, modeAwam } from '../lib/tujuan'
 
 /**
  * Panduan pemakaian: peta, bukan buku manual.
@@ -24,6 +25,13 @@ const BELAJAR: Langkah[] = [
   { ke: '/med-study', ikon: '🧠', judul: 'Buka satu penyakit', isi: 'Muncul peta: Sebab → Tampak → Pastikan → Periksa → Obat → Bahaya. Ketuk cabang untuk isi penuh.', lama: '2 menit' },
   { ke: '/med-study', ikon: '🩺', judul: 'Buka satu tindakan', isi: 'Tiap fase jadi satu cabang. Urutan fase itulah yang dihafal, langkahnya dipanggil saat dibutuhkan.', lama: '2 menit' },
   { ke: '/clinical-calculators', ikon: '🧮', judul: 'Hitung satu skor', isi: 'SOFA, Wells, Child-Pugh. Isi kolomnya, hasil dan artinya keluar bersamaan.', lama: '1 menit' },
+]
+
+/** Langkah yang sama tanpa istilah ujian. Halaman tujuannya persis sama. */
+const BELAJAR_AWAM: Langkah[] = [
+  { ke: '/med-study', ikon: '🧠', judul: 'Cari satu penyakit', isi: 'Muncul peta: Sebab → Tampak → Pastikan → Periksa → Obat → Bahaya. Ketuk cabang untuk isi penuh.', lama: '2 menit' },
+  { ke: '/med-study', ikon: '🩺', judul: 'Lihat cara pertolongan', isi: 'Bantuan napas, henti jantung, membidai patah tulang — tiap tahap satu cabang.', lama: '2 menit' },
+  { ke: '/clinical-calculators', ikon: '🧮', judul: 'Hitung satu risiko', isi: 'Risiko jantung, fungsi ginjal. Isi kolomnya, hasil dan artinya keluar bersamaan.', lama: '1 menit' },
 ]
 
 /** Arti warna cabang di peta penyakit — sama di seluruh 623 catatan. */
@@ -66,6 +74,9 @@ function Bagian({ judul, langkah, dari }: { judul: string; langkah: Langkah[]; d
 }
 
 export default function Tutorial() {
+  // Panduan memakai bahasa pembacanya sendiri; kalau tidak, langkah pertama
+  // pemakai awam justru menjadi menebak arti singkatan di dalam panduannya.
+  const awam = modeAwam(useTujuan())
   return (
     <div className="space-y-5 pb-4">
       <header>
@@ -74,13 +85,15 @@ export default function Tutorial() {
       </header>
 
       <Bagian judul="① Siapkan dulu" langkah={MULAI} dari={1} />
-      <Bagian judul="② Mulai belajar" langkah={BELAJAR} dari={4} />
+      <Bagian judul={awam ? '② Mulai cari tahu' : '② Mulai belajar'} langkah={awam ? BELAJAR_AWAM : BELAJAR} dari={4} />
 
       <section>
         <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">Arti warna di peta penyakit</h2>
         <div className="rounded-2xl border border-neutral-200 bg-white p-3 dark:border-white/10 dark:bg-white/5">
           <p className="mb-2 text-[12px] leading-snug text-neutral-500">
-            Warna dan urutannya sama di seluruh 623 penyakit. Hafalkan sekali, berlaku untuk semuanya.
+            {awam
+              ? 'Warna dan urutannya sama di seluruh 623 penyakit. Kenali sekali, berlaku untuk semuanya.'
+              : 'Warna dan urutannya sama di seluruh 623 penyakit. Hafalkan sekali, berlaku untuk semuanya.'}
           </p>
           <ul className="space-y-1">
             {WARNA.map(([w, label, arti]) => (
@@ -104,8 +117,9 @@ export default function Tutorial() {
       </section>
 
       <p className="text-[11px] leading-relaxed text-neutral-400">
-        Isi klinis di aplikasi ini bahan belajar, bukan pengganti pemeriksaan dokter.
-        Selalu periksa ulang pedoman terkini sebelum dipakai pada pasien.
+        {awam
+          ? 'Isi kesehatan di aplikasi ini bahan bacaan, bukan diagnosis dan bukan resep. Kalau ada keluhan, periksakan ke dokter.'
+          : 'Isi klinis di aplikasi ini bahan belajar, bukan pengganti pemeriksaan dokter. Selalu periksa ulang pedoman terkini sebelum dipakai pada pasien.'}
       </p>
     </div>
   )

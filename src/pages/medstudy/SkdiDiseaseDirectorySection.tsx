@@ -8,6 +8,7 @@ import { SKDI_NOTE_KEYS } from '../../lib/skdiDiseaseNoteIndex'
 import type { SkdiDiseaseNote } from '../../lib/skdiDiseaseNotes'
 import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
 import { levelTone, levelLabel } from './shared'
+import { useTujuan, modeAwam } from '../../lib/tujuan'
 
 /**
  * The three note datasets total well over a megabyte — far too much to ship in
@@ -163,6 +164,11 @@ export default function SkdiDiseaseDirectorySection() {
   const [query, setQuery] = useState('')
   const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
   const [levelFilter, setLevelFilter] = useState<'all' | '4' | '3' | '2' | '1'>('all')
+  // Bahasanya mengikuti pembacanya. "SKDI" dan "level 4A" adalah bahasa yang
+  // DIUJIKAN kepada mahasiswa kedokteran — bagi mereka itu bukan jargon yang
+  // boleh diganti. Bagi orang yang sekadar ingin tahu penyakitnya, keduanya
+  // singkatan tanpa arti yang hanya menambah beban baca.
+  const awam = modeAwam(useTujuan())
   const [expanded, setExpanded] = useState<string | null>(null)
   // Fetching the note corpus starts on the first expand, not on mount.
   const [wantNotes, setWantNotes] = useState(false)
@@ -190,12 +196,25 @@ export default function SkdiDiseaseDirectorySection() {
   return (
     <div className="space-y-4">
       <Card className="!p-5">
-        <SectionTitle icon={<IconBook size={20} />} title="Daftar Penyakit SKDI" subtitle={`${SKDI_DISEASE_LIST.length} penyakit/kondisi resmi, per Standar Kompetensi Dokter Indonesia (Konsil Kedokteran Indonesia)`} />
+        <SectionTitle
+          icon={<IconBook size={20} />}
+          title={awam ? 'Ensiklopedia Penyakit' : 'Daftar Penyakit SKDI'}
+          subtitle={awam
+            ? `${SKDI_DISEASE_LIST.length} penyakit — apa penyakitnya, apa sebabnya, apa obatnya`
+            : `${SKDI_DISEASE_LIST.length} penyakit/kondisi resmi, per Standar Kompetensi Dokter Indonesia (Konsil Kedokteran Indonesia)`}
+        />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Referensi cepat: nama penyakit, sistem, dan level kompetensi. Penyakit yang sudah punya
-          catatan station lengkap (anamnesis/PF/tatalaksana) ditandai badge "Catatan OSCE" — buka di
-          tab OSCE Case Bank.
+          {awam
+            ? 'Ketuk satu penyakit untuk melihat petanya: sebab, tandanya, cara memastikan, obatnya, dan bahayanya.'
+            : 'Referensi cepat: nama penyakit, sistem, dan level kompetensi. Penyakit yang sudah punya catatan station lengkap (anamnesis/PF/tatalaksana) ditandai badge "Catatan OSCE" — buka di tab OSCE Case Bank.'}
         </p>
+        {awam && (
+          <p className="mt-2 rounded-xl bg-amber-500/10 p-2.5 text-[12px] leading-relaxed text-amber-900 dark:text-amber-200">
+            <b>Dosis obat di sini untuk dibaca, bukan untuk dipakai sendiri.</b> Obat yang sama bisa
+            berbahaya pada dosis yang sama bila ginjal, hati, kehamilan, atau obat lain yang sedang
+            diminum berbeda. Bawa ini ke dokter untuk ditanyakan, jangan dibeli sendiri.
+          </p>
+        )}
         {wantNotes && !noteData && (
           <p className="mt-2 text-[12px] font-semibold text-brand-dark">Memuat catatan penyakit…</p>
         )}
@@ -205,12 +224,16 @@ export default function SkdiDiseaseDirectorySection() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button onClick={() => setLevelFilter('all')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === 'all' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua level</button>
-          {(['4', '3', '2', '1'] as const).map((lv) => (
-            <button key={lv} onClick={() => setLevelFilter(lv)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === lv ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Level {lv}</button>
-          ))}
-        </div>
+        {/* Penyaring level kompetensi hanya berarti bagi yang diujikan
+            dengannya. Untuk pembaca awam ia deretan tombol tanpa makna. */}
+        {!awam && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button onClick={() => setLevelFilter('all')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === 'all' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua level</button>
+            {(['4', '3', '2', '1'] as const).map((lv) => (
+              <button key={lv} onClick={() => setLevelFilter(lv)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${levelFilter === lv ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Level {lv}</button>
+            ))}
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap gap-2">
           <button onClick={() => setSystem(null)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${!system ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Semua sistem</button>
           {SKDI_DISEASE_SYSTEMS.map((s) => (
@@ -257,8 +280,8 @@ export default function SkdiDiseaseDirectorySection() {
                       )}
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                      <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
-                      {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
+                      {!awam && <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>}
+                      {!awam && note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
                       {e.subsection && <span className="text-[11px] text-neutral-500">{e.subsection}</span>}
                     </div>
                   </button>
@@ -292,11 +315,19 @@ export default function SkdiDiseaseDirectorySection() {
       {filtered.length === 0 && <p className="text-center text-[13px] text-neutral-500">Tidak ada hasil — coba kata kunci lain.</p>}
 
       <div className="space-y-2 rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        <p>
-          Nama penyakit dan level kompetensi berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia).
-          Level 4A/4B = harus tuntas mandiri saat lulus dokter, 3A/3B = bisa dengan supervisi,
-          2 = pernah melihat, 1 = tahu teori.
-        </p>
+        {awam ? (
+          <p>
+            Halaman ini bahan bacaan, bukan diagnosis. Penyakit yang berbeda bisa memberi keluhan
+            yang sama persis, dan hanya pemeriksaan langsung yang bisa membedakannya. Kalau ada
+            keluhan, periksakan ke dokter.
+          </p>
+        ) : (
+          <p>
+            Nama penyakit dan level kompetensi berdasarkan SKDI 2012 (Konsil Kedokteran Indonesia).
+            Level 4A/4B = harus tuntas mandiri saat lulus dokter, 3A/3B = bisa dengan supervisi,
+            2 = pernah melihat, 1 = tahu teori.
+          </p>
+        )}
         <p>
           Isi klinis tiap catatan disusun dari ajaran klinis baku dan diselaraskan dengan pedoman
           terbit yang dicantumkan pada bagian Referensi di tiap entry — bukan kutipan verbatim dari
