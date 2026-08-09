@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconStethoscope, IconShield, IconCheck, IconToken } from '../components/icons'
+import { useSearchParams } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
+import { ALAT_DI_HALAMAN, cocokAlat } from '../lib/katalogKalkulator'
 import { MANUAL_BANK } from '../lib/payment'
 
 // Standard published clinical scoring tools — each formula/table matches the
@@ -1014,50 +1016,9 @@ function GadjahMadaCalc() {
 
 // `kw` = hidden search terms so tools are findable by clinical intent
 // (symptom, organ, situation) — not just by name.
-const TABS = [
-  { id: 'apgar', label: 'APGAR', kw: 'newborn neonate birth delivery score' },
-  { id: 'gcs', label: 'GCS', kw: 'coma consciousness glasgow head injury neuro' },
-  { id: 'siriraj', label: 'Siriraj', kw: 'stroke haemorrhagic ischaemic bedside neuro cva perdarahan infark' },
-  { id: 'gadjahmada', label: 'Gadjah Mada', kw: 'stroke algoritma indonesia babinski neuro cva perdarahan infark ugm' },
-  { id: 'curb65', label: 'CURB-65', kw: 'pneumonia cap severity admission respiratory' },
-  { id: 'bishop', label: 'Bishop', kw: 'cervix induction labor obstetric delivery' },
-  { id: 'ckdepi', label: 'CKD-EPI', kw: 'egfr kidney renal creatinine gfr' },
-  { id: 'whogrowth', label: 'WHO Anthropometry', kw: 'child growth stunting weight height pediatric z-score' },
-  { id: 'whoneonate', label: 'WHO Neonate', kw: 'newborn neonate growth anthropometry' },
-  { id: 'cdcanthro', label: 'CDC Anthropometry', kw: 'child bmi percentile adolescent growth' },
-  { id: 'ballard', label: 'Ballard+SOAP', kw: 'gestational age newborn neonate maturity lubchenco' },
-  { id: 'qsofa', label: 'qSOFA', kw: 'sepsis infection screening organ dysfunction' },
-  { id: 'hollidaysegar', label: 'Maintenance Fluid', kw: 'fluid iv pediatric 4-2-1 hydration' },
-  { id: 'parkland', label: 'Parkland', kw: 'burn fluid resuscitation tbsa' },
-  { id: 'naegele', label: 'Naegele', kw: 'due date pregnancy edd lmp obstetric' },
-  { id: 'map', label: 'MAP', kw: 'blood pressure perfusion arterial shock' },
-  { id: 'alvarado', label: 'Alvarado', kw: 'appendicitis abdominal pain rlq surgery' },
-  { id: 'centor', label: 'Centor/McIsaac', kw: 'strep pharyngitis sore throat antibiotic tonsil' },
-  { id: 'nacorr', label: 'Electrolyte Correction', kw: 'sodium potassium hyponatremia hypokalemia glucose katz' },
-  { id: 'broca', label: 'Broca IBW', kw: 'ideal body weight obesity' },
-  { id: 'brocalorentz', label: 'Broca-Lorentz Calorie', kw: 'calorie nutrition ideal weight diet requirement' },
-  { id: 'ivdrip', label: 'IV Drip Rate', kw: 'infusion drops fluid rate tpm' },
-  { id: 'midparental', label: 'Mid-Parental', kw: 'height prediction child target parental' },
-  { id: 'fletcher', label: 'Fletcher Index', kw: 'hearing loss audiometry deaf ent' },
-  { id: 'nose', label: 'NOSE', kw: 'nasal obstruction breathing ent septum' },
-  { id: 'rsi', label: 'RSI', kw: 'reflux lpr laryngopharyngeal hoarseness ent' },
-  { id: 'aria', label: 'ARIA Criteria', kw: 'allergic rhinitis allergy asthma ent' },
-  { id: 'abcd2', label: 'ABCD²', kw: 'tia stroke risk transient ischemic' },
-  { id: 'four', label: 'FOUR Score', kw: 'coma consciousness icu intubated neuro' },
-  { id: 'mcdonald', label: 'McDonald', kw: 'fundal height pregnancy gestational age obstetric' },
-  { id: 'paradise', label: 'Paradise', kw: 'tonsillectomy tonsillitis recurrent ent' },
-  { id: 'nihss', label: 'NIHSS', kw: 'stroke severity neuro deficit thrombolysis' },
-  { id: 'fluidbalance', label: 'Fluid Balance', kw: 'intake output urine monitoring' },
-  { id: 'pedsdose', label: 'Pediatric Dosing', kw: 'dose child weight syrup medication mg/kg' },
-  { id: 'vbac', label: 'VBAC Flamm-Geiger', kw: 'cesarean vaginal birth trial labor obstetric' },
-  { id: 'denver', label: 'Denver II (Simplified)', kw: 'development milestone child screening delay' },
-  { id: 'atls', label: 'XABCDE Trauma Survey', kw: 'trauma primary survey hemorrhage emergency' },
-  { id: 'acls', label: 'ACLS Guide', kw: 'cardiac arrest cpr resuscitation algorithm emergency' },
-  { id: 'abg', label: 'Blood Gas Analysis', kw: 'abg acidosis alkalosis anion gap ph co2' },
-  { id: 'burn', label: 'Burn Calculator', kw: 'burn tbsa parkland rule of nines' },
-  { id: 'cranial', label: 'Cranial Nerve + Meningeal', kw: 'neuro exam nerves meningitis kernig brudzinski' },
-  { id: 'competencies', label: 'Competency Tracker', kw: 'kki aipki education doctor competency' },
-] as const
+// Daftarnya kini datang dari katalog bersama, supaya Calculator Hub dan
+// pencarian melihat alat yang sama persis dengan yang ada di sini.
+const TABS = ALAT_DI_HALAMAN
 
 /* ══════════════════ CENTOR / McISAAC (STREP PHARYNGITIS) ══════════════════ */
 function CentorCalc() {
@@ -2575,11 +2536,32 @@ function AclsCalc() {
 }
 
 export function ClinicalCalculators() {
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('apgar')
+  // Alat yang dituju boleh datang dari alamat: /clinical-calculators?alat=qsofa
+  //
+  // Tanpa ini, satu-satunya cara mencapai qSOFA atau Bishop adalah menggulir
+  // deretan tab yang panjang -- jadi hasil pencarian di Calculator Hub hanya
+  // bisa mengantar sampai puncak halaman dan pemakainya harus mencari lagi
+  // dari awal, di halaman yang memuat 42 alat.
+  const [sp, setSp] = useSearchParams()
+  const dariAlamat = sp.get('alat')
+  const [tab, setTab] = useState<string>(
+    dariAlamat && TABS.some((t) => t.id === dariAlamat) ? dariAlamat : 'apgar',
+  )
+  // Alamat yang berubah saat halaman sudah terbuka (misalnya dari tombol
+  // kembali peramban) tetap diikuti.
+  useEffect(() => {
+    if (dariAlamat && TABS.some((t) => t.id === dariAlamat)) setTab(dariAlamat)
+  }, [dariAlamat])
+  const pilihTab = (id: string) => {
+    setTab(id)
+    // Ditulis ke alamat supaya alat yang sedang dibuka bisa dibagikan dan
+    // ditemukan lagi lewat riwayat peramban.
+    setSp({ alat: id }, { replace: true })
+  }
   const [access, setAccess] = useState<CalcAccess | null>(null)
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
-  const visibleTabs = q ? TABS.filter((t) => (t.label + ' ' + t.kw).toLowerCase().includes(q)) : TABS
+  const visibleTabs = q ? TABS.filter((t) => cocokAlat(t, q)) : TABS
   // Keep the open tool in sync with the filter: if the current tab no longer
   // matches, jump to the first match so search feels immediate.
   useEffect(() => {
@@ -2625,7 +2607,7 @@ export function ClinicalCalculators() {
         {visibleTabs.map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => pilihTab(t.id)}
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}
           >
             {t.label}

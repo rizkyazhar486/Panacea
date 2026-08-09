@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
+import { ALAT_DI_HALAMAN, tautanAlat, samakan } from '../lib/katalogKalkulator'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Calculator Hub — searchable index of every clinical calculator and score in
@@ -10,6 +11,24 @@ import { IconActivity } from '../components/icons'
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface Tool { to: string; name: string; what: string; keywords: string }
+
+/**
+ * Alat yang hidup di dalam halaman Clinical Calculators, diangkat ke katalog.
+ *
+ * Ini yang menutup lubang terbesar di halaman ini: dari 47 alat di sana, hanya
+ * 13 yang pernah disebut oleh daftar tangan di bawah. Bishop, CKD-EPI, qSOFA,
+ * Parkland, Alvarado, dan 29 lainnya tidak muncul di pencarian mana pun, jadi
+ * praktis tidak ada bagi siapa pun yang tidak tahu harus menggulir ke sana.
+ *
+ * Dibangkitkan dari katalog, bukan disalin, supaya alat yang ditambahkan nanti
+ * ikut muncul di sini tanpa ada yang perlu ingat memperbaruinya.
+ */
+const DARI_HALAMAN: Tool[] = ALAT_DI_HALAMAN.map((a) => ({
+  to: tautanAlat(a.id),
+  name: a.label,
+  what: 'Di dalam halaman Clinical Calculators — terbuka langsung pada alatnya',
+  keywords: a.kw,
+}))
 
 const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
   {
@@ -103,6 +122,11 @@ const GROUPS: { title: string; emoji: string; tools: Tool[] }[] = [
       { to: '/psychiatric-status-exam', name: 'Psychiatric Status Exam', what: 'Structured Mental Status Exam (MSE) documentation', keywords: 'status psikiatri mental status exam mse psychiatric' },
     ],
   },
+  {
+    title: 'Semua alat di halaman Clinical Calculators',
+    emoji: '🧰',
+    tools: DARI_HALAMAN,
+  },
 ]
 
 export function CalculatorHub() {
@@ -113,7 +137,9 @@ export function CalculatorHub() {
     if (!q) return GROUPS
     return GROUPS.map((g) => ({
       ...g,
-      tools: g.tools.filter((t) => (t.name + ' ' + t.what + ' ' + t.keywords).toLowerCase().includes(q)),
+      // Disamakan bentuknya lebih dulu -- lihat `samakan`: kata kunci memakai
+      // apostrof tipografis, papan ketik mengetik yang lurus.
+      tools: g.tools.filter((t) => samakan(t.name + ' ' + t.what + ' ' + t.keywords).includes(samakan(q))),
     })).filter((g) => g.tools.length > 0)
   }, [q])
 
@@ -130,10 +156,15 @@ export function CalculatorHub() {
           onChange={(e) => setQuery(e.target.value)}
           autoFocus
         />
+        {/* Catatan lama di sini menyuruh orang pergi ke halaman lain untuk
+            GCS, APGAR, Parkland, dan seterusnya. Itu sudah tidak benar: alat
+            di halaman itu kini ikut terdaftar dan ikut tercari dari sini, dan
+            menekannya mendarat langsung pada alatnya. */}
         <p className="mt-2 text-[12px] text-neutral-500">
-          Looking for GCS, APGAR, CURB-65, Parkland, ABG, or pediatric dosing? Those live in{' '}
-          <a href="#/clinical-calculators" className="font-bold text-brand-dark">Clinical Calculators</a>{' '}
-          (40 more tools).
+          Mencari semuanya sekaligus? Setiap alat di aplikasi ini terdaftar di sini —
+          termasuk yang tampil sebagai tab di{' '}
+          <a href="#/clinical-calculators" className="font-bold text-brand-dark">Clinical Calculators</a>.
+          Menekannya membuka langsung pada alat itu.
         </p>
       </Card>
 
