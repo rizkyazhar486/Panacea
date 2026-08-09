@@ -197,45 +197,45 @@ export function statusLatihan(b: BebanRingkas, vo2Tren: number | null): StatusLa
     abu: '#94a3b8', hijau: '#34d399', biru: '#60a5fa', kuning: '#fbbf24', merah: '#f87171',
   }
   if (b.total28 <= 0 || b.hariAktif7 === 0 && b.kronis === 0) {
-    return { key: 'tidakAdequateData', label: 'Data belum cukup', warna: W.abu,
-      penjelasan: 'Belum ada sesi dengan detak jantung dalam 28 hari terakhir.',
+    return { key: 'tidakAdequateData', label: 'Not enough data yet', warna: W.abu,
+      penjelasan: 'No sessions with heart-rate data in the past 28 days.',
       saran: 'Nyalakan Include Workouts di Health Auto Export, lalu catat beberapa sesi.' }
   }
   const r = b.acwrDapatDipercaya ? b.acwr : null
   if (!b.acwrDapatDipercaya && b.hariAktif7 > 0) {
     return { key: 'pemeliharaan', label: 'Sedang membangun dasar', warna: W.biru,
       penjelasan: `Your history baru mencakup ${b.rentangHariData} hari. Nisbah beban 7:28 hari belum bermakna sebelum ada sekitar empat pekan riwayat — pada awal berlatih, angkanya selalu tampak melonjak semata karena pembandingnya masih hampir kosong, bukan karena Anda berlebihan.`,
-      saran: 'Lanjutkan dengan menambah volume paling banyak 10% per minggu. Penilaian beban akan mulai bermakna setelah empat pekan.' }
+      saran: 'Carry on, adding at most 10% volume per week. Load assessment starts to mean something after four weeks.' }
   }
   if (b.hariAktif7 === 0) {
     return { key: 'istirahat', label: 'Istirahat', warna: W.abu,
-      penjelasan: 'Tidak ada sesi dalam tujuh hari terakhir. Kebugaran yang sudah terbangun bertahan beberapa minggu, jadi jeda pendek tidak menghapusnya.',
-      saran: 'Bila ini disengaja, tidak ada yang perlu diperbaiki. Bila tidak, mulai lagi dengan satu sesi mudah.' }
+      penjelasan: 'No sessions in the past seven days. Fitness you have already built lasts several weeks, so a short break does not erase it.',
+      saran: 'If this was deliberate, nothing needs fixing. If it was not, start again with one easy session.' }
   }
   if (r != null && r < 0.8) {
     return { key: 'menurun', label: 'Menurun', warna: W.biru,
       penjelasan: `Beban minggu ini (${b.akut.toFixed(0)}/hari) jauh di bawah kebiasaan Anda (${b.kronis.toFixed(0)}/hari). Kebugaran mulai luruh bila berlanjut berminggu-minggu.`,
-      saran: 'Bila ini pekan pemulihan yang disengaja, biarkan. Bila tidak, kembalikan volume secara bertahap.' }
+      saran: 'If this is a deliberate recovery week, leave it. If not, bring the volume back gradually.' }
   }
   if (r != null && r > 1.5) {
     return { key: 'berlebih', label: 'Beban melonjak', warna: W.merah,
       penjelasan: `Beban tujuh hari terakhir ${r.toFixed(2)}× kebiasaan Anda. Lonjakan sebesar ini berkaitan dengan naiknya risiko cedera pada berbagai penelitian, meskipun ambang pastinya masih diperdebatkan.`,
-      saran: 'Kurangi volume pekan depan, bukan menambah. Jaringan ikat beradaptasi jauh lebih lambat daripada jantung dan paru.' }
+      saran: 'Reduce volume next week rather than adding. Connective tissue adapts far more slowly than the heart and lungs.' }
   }
   if (vo2Tren != null && vo2Tren < -0.3 && r != null && r > 1.1) {
-    return { key: 'tidakProduktif', label: 'Tidak produktif', warna: W.kuning,
-      penjelasan: 'Beban naik tetapi VO2max justru turun. Pola ini menandakan beban belum terbayar — biasanya karena kurang tidur, kurang makan, maupun terlalu sedikit sesi mudah.',
-      saran: 'Periksa tidur dan asupan lebih dulu sebelum menambah latihan. Perbanyak porsi sesi mudah.' }
+    return { key: 'tidakProduktif', label: 'Not productive', warna: W.kuning,
+      penjelasan: 'Load is rising but VO2max is falling. That pattern means the load is not being paid for — usually too little sleep, too little food, or too few easy sessions.',
+      saran: 'Check sleep and intake before adding any training. Increase the share of easy sessions.' }
   }
   if (vo2Tren != null && vo2Tren > 0.3) {
     return { key: r != null && r > 1.3 ? 'puncak' : 'produktif', warna: W.hijau,
       label: r != null && r > 1.3 ? 'Puncak' : 'Produktif',
       penjelasan: `VO2max Anda naik ${vo2Tren.toFixed(1)} dalam periode ini dengan beban yang terkendali. Inilah keadaan yang dituju.`,
-      saran: 'Pertahankan. Perubahan besar tidak diperlukan saat sesuatu sedang bekerja.' }
+      saran: 'Keep it as it is. Big changes are not needed while something is working.' }
   }
   return { key: 'pemeliharaan', label: 'Pemeliharaan', warna: W.biru,
     penjelasan: `Beban Anda setara dengan kebiasaan (${(r ?? 1).toFixed(2)}×) dan kebugaran mendatar. Ini mempertahankan, bukan menambah.`,
-    saran: 'Untuk kemajuan, tambahkan volume maksimal 10% per minggu — atau satu sesi kualitas, bukan keduanya sekaligus.' }
+    saran: 'To progress, add at most 10% volume per week — or one quality session, but not both at once.' }
 }
 
 // ── 4. Training effect 0-5 ──────────────────────────────────────────────────
@@ -247,7 +247,7 @@ export interface TrainingEffect {
   labelAnaerobik: string
 }
 
-const TE_LABEL = ['Tidak ada', 'Ringan', 'Mempertahankan', 'Meningkatkan', 'Sangat meningkatkan', 'Berlebih']
+const TE_LABEL = ['None', 'Ringan', 'Mempertahankan', 'Meningkatkan', 'Sangat meningkatkan', 'Berlebih']
 
 export function labelTE(v: number): string {
   return TE_LABEL[Math.min(5, Math.max(0, Math.round(v)))]
@@ -316,8 +316,8 @@ export function waktuPemulihan(
   }
   if (opsi.hrvMs != null && opsi.hrvBaseline != null && opsi.hrvBaseline > 0) {
     const dev = (opsi.hrvMs - opsi.hrvBaseline) / opsi.hrvBaseline
-    if (dev < -0.15) { jam *= 1.25; dasar.push('Variabilitas denyut di bawah kebiasaan Anda') }
-    else if (dev > 0.15) { jam *= 0.9; dasar.push('Variabilitas denyut di atas kebiasaan Anda') }
+    if (dev < -0.15) { jam *= 1.25; dasar.push('Heart-rate variability below your own baseline') }
+    else if (dev > 0.15) { jam *= 0.9; dasar.push('Heart-rate variability above your own baseline') }
   }
   if (opsi.acwr != null && opsi.acwr > 1.4) { jam *= 1.2; dasar.push('Beban tujuh hari terakhir sedang melonjak') }
 
@@ -356,12 +356,12 @@ export function perkiraanLTHR(sesi: SesiTerhitung[], hrMax: number): Ambang {
   }
   if (terbaik <= 0) {
     return { lthr: null, pctHrMax: null,
-      metode: 'Belum ada sesi berkelanjutan 20 menit dengan deret detak jantung. Perkiraan kasar: sekitar 88-90% HRmaks.' }
+      metode: 'No continuous 20-minute session with a heart-rate series yet. A rough estimate: around 88–90% of HRmax.' }
   }
   return {
     lthr: Math.round(terbaik),
     pctHrMax: hrMax > 0 ? Math.round((terbaik / hrMax) * 100) : null,
-    metode: 'Rata-rata 20 menit tertinggi yang pernah dipertahankan pada sesi Anda. Ini perkiraan dari data harian, bukan hasil tes ambang khusus, dan cenderung sedikit lebih rendah daripada nilai tes sebenarnya.',
+    metode: 'The highest 20-minute average you have sustained in a session. This is an estimate from everyday data rather than a dedicated threshold test, and it tends to sit slightly below a true test value.',
   }
 }
 
@@ -397,18 +397,18 @@ export function kondisiPerforma(sesi: SesiTerhitung[], sekarang = Date.now()): K
   const baselineList = beri(urut.slice(1).filter((s) => Date.parse(s.mulai) >= sekarang - 28 * 86_400_000))
   if (efTerbaru == null || baselineList.length < 2) {
     return { nilai: null, ef: efTerbaru, efBaseline: null,
-      arti: 'Perlu setidaknya tiga sesi berjarak dalam 28 hari untuk membentuk pembanding.' }
+      arti: 'At least three spaced sessions within 28 days are needed to form a baseline.' }
   }
   const median = [...baselineList].sort((a, b) => a - b)[Math.floor(baselineList.length / 2)]
   const dev = (efTerbaru - median) / median
   // Skala −10..+10, sekitar 1 poin tiap 2% penyimpangan.
   const nilai = Math.max(-10, Math.min(10, Math.round(dev * 500) / 10))
 
-  const arti = nilai >= 3 ? 'Jauh di atas kebiasaan Anda — pada denyut yang sama Anda bergerak lebih cepat.'
-    : nilai >= 1 ? 'Sedikit di atas kebiasaan Anda.'
-      : nilai > -1 ? 'Setara dengan kebiasaan Anda.'
-        : nilai > -3 ? 'Sedikit di bawah kebiasaan — lazim terjadi saat lelah, panas, maupun kurang tidur.'
-          : 'Jauh di bawah kebiasaan Anda. Bila menetap beberapa sesi, pertimbangkan kelelahan menumpuk maupun sakit.'
+  const arti = nilai >= 3 ? 'Well above your baseline — at the same heart rate you are moving faster.'
+    : nilai >= 1 ? 'Slightly above your baseline.'
+      : nilai > -1 ? 'In line with your baseline.'
+        : nilai > -3 ? 'Slightly below baseline — common when tired, hot, or short of sleep.'
+          : 'Well below your baseline. If it persists over several sessions, consider accumulated fatigue or illness.'
 
   return { nilai, ef: +efTerbaru.toFixed(2), efBaseline: +median.toFixed(2), arti }
 }
@@ -446,7 +446,7 @@ export function kesiapan(opsi: {
   if (opsi.tidurJam != null) {
     const d = opsi.tidurJam >= 7.5 ? 12 : opsi.tidurJam >= 6.5 ? 4 : opsi.tidurJam >= 5.5 ? -8 : -18
     skor += d
-    faktor.push({ nama: 'Tidur semalam', nilai: `${opsi.tidurJam.toFixed(1)} jam`, bobot: d > 0 ? `+${d}` : `${d}`,
+    faktor.push({ nama: 'Last night’s sleep', nilai: `${opsi.tidurJam.toFixed(1)} jam`, bobot: d > 0 ? `+${d}` : `${d}`,
       arah: d > 4 ? 'baik' : d >= 0 ? 'netral' : 'kurang' })
   }
   if (opsi.hrvMs != null && opsi.hrvBaseline != null && opsi.hrvBaseline > 0) {
@@ -478,10 +478,10 @@ export function kesiapan(opsi: {
   skor = Math.max(1, Math.min(100, Math.round(skor)))
   const label = skor >= 80 ? 'Siap' : skor >= 65 ? 'Adequate siap' : skor >= 45 ? 'Sedang' : skor >= 25 ? 'Rendah' : 'Sangat rendah'
   const warna = skor >= 80 ? '#34d399' : skor >= 65 ? '#a3e635' : skor >= 45 ? '#fbbf24' : '#f87171'
-  const saran = skor >= 80 ? 'Hari yang baik untuk sesi kualitas bila memang terjadwal.'
+  const saran = skor >= 80 ? 'A good day for a quality session if one is scheduled.'
     : skor >= 65 ? 'The scheduled session can go ahead; reassess after the warm-up.'
-      : skor >= 45 ? 'Condongkan ke sesi mudah. Bila terasa baik setelah 10 menit pemanasan, boleh dinaikkan.'
-        : 'Pilih sesi mudah maupun istirahat. Memaksakan sesi keras pada keadaan ini menambah kelelahan tanpa menambah kebugaran.'
+      : skor >= 45 ? 'Lean toward an easy session. If it feels good after 10 minutes of warm-up, you can lift it.'
+        : 'Choose an easy session or rest. Forcing a hard session in this state adds fatigue without adding fitness.'
 
   return { skor, label, warna, faktor, saran }
 }
@@ -496,24 +496,24 @@ export interface SaranSesi {
 
 export function saranSesiHarian(k: Kesiapan, b: BebanRingkas, pemulihanSisaJam: number): SaranSesi {
   if (pemulihanSisaJam > 20 || k.skor < 35) {
-    return { judul: 'Istirahat atau jalan santai 20-30 menit',
-      rincian: 'Jaga denyut di bawah 60% HRmaks. Tidak perlu berlari.',
-      alasan: k.skor < 35 ? 'Kesiapan rendah — sesi keras hari ini menambah kelelahan tanpa menambah kebugaran.' : 'Pemulihan dari sesi terakhir belum selesai.' }
+    return { judul: 'Rest, or a gentle 20–30 minute walk',
+      rincian: 'Keep the heart rate below 60% of HRmax. There is no need to run.',
+      alasan: k.skor < 35 ? 'Readiness is low — a hard session today adds fatigue without adding fitness.' : 'Recovery from the last session is not complete.' }
   }
   if (k.skor >= 80 && (b.acwr == null || b.acwr < 1.3)) {
     if ((b.pctAerobikRendah ?? 0) < 60) {
-      return { judul: 'Easy run 40-50 menit di zona 2',
-        rincian: 'Pertahankan denyut 60-70% HRmaks. Bila harus melambat sampai terasa terlalu pelan, itu justru tandanya benar.',
+      return { judul: 'Easy run, 40–50 minutes in zone 2',
+        rincian: 'Hold the heart rate at 60–70% of HRmax. If you have to slow until it feels too slow, that is the sign you are doing it right.',
         alasan: `Kesiapan Anda baik, namun hanya ${b.pctAerobikRendah ?? 0}% waktu latihan Anda berada di zona mudah. Menambah sesi keras sekarang bukan yang paling menolong.` }
     }
     return { judul: 'Quality session: 20–25 minute tempo',
-      rincian: 'Setelah 15 menit pemanasan, jalankan pada denyut sekitar ambang, lalu pendinginan 10 menit.',
-      alasan: 'Kesiapan baik dan beban terkendali — hari yang tepat untuk sesi yang menuntut.' }
+      rincian: 'After a 15-minute warm-up, run at roughly threshold heart rate, then cool down for 10 minutes.',
+      alasan: 'Readiness is good and load is under control — the right day for a demanding session.' }
   }
   if (k.skor >= 55) {
-    return { judul: 'Easy run 30-40 menit',
-      rincian: 'Zona 2. Nilai ulang setelah 10 menit; bila terasa berat, perpendek.',
-      alasan: 'Kesiapan sedang — volume mudah tetap menambah basis aerobik tanpa menambah kelelahan berarti.' }
+    return { judul: 'Easy run, 30–40 minutes',
+      rincian: 'Zone 2. Reassess after 10 minutes; if it feels hard, cut it short.',
+      alasan: 'Readiness is moderate — easy volume still builds the aerobic base without adding meaningful fatigue.' }
   }
   return { judul: 'Easy session 20–30 minutes, or rest',
     rincian: 'Zona 1-2 saja.',
@@ -538,8 +538,8 @@ export interface Ketahanan {
 export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ketahanan {
   const s90 = sesi.filter((s) => Date.parse(s.mulai) >= sekarang - 90 * 86_400_000)
   if (s90.length < 3) {
-    return { skor: null, label: 'Belum cukup data', terpanjangKm: null, terpanjangMenit: null,
-      penjelasan: 'Perlu setidaknya tiga sesi dalam 90 hari.' }
+    return { skor: null, label: 'Not enough data yet', terpanjangKm: null, terpanjangMenit: null,
+      penjelasan: 'At least three sessions within 90 days are needed.' }
   }
   const terpanjangMenit = Math.max(...s90.map((s) => s.durasiDetik / 60))
   const terpanjangKm = Math.max(...s90.map((s) => s.jarakKm ?? 0))
@@ -569,68 +569,68 @@ export function skorKetahanan(sesi: SesiTerhitung[], sekarang = Date.now()): Ket
  * Ditulis di dalam kode DAN ditampilkan di layar.
  *
  * Daftar ini pernah keliru: sebelumnya ia menyatakan sembilan hal "tidak bisa
- * dibuat", padahal yang benar adalah "tidak bisa dihitung dari ekspor jam
+ * dibuat", when the correct value is "tidak bisa dihitung dari ekspor jam
  * tangan". Keduanya tidak sama — sebagian besar hanya memerlukan masukannya
  * sendiri, dan kini memang sudah dibuat. `adaDi` menunjuk ke tempatnya.
  */
 export const UNAVAILABLE: { fitur: string; kenapa: string; syarat: string; adaDi?: string }[] = [
   {
     fitur: 'Smart fueling / rencana minum & karbohidrat',
-    kenapa: 'Tidak bisa dihitung dari ekspor jam tangan, karena ia merencanakan sesuatu yang BELUM terjadi. Karena itu dibuat sebagai alat tersendiri dengan masukan Anda: durasi, intensitas, suhu, dan laju keringat Anda sendiri.',
-    syarat: 'Masukan manual — tidak perlu sinkronisasi.',
+    kenapa: 'This cannot be computed from a watch export, because it plans something that has NOT yet happened. It is therefore built as its own tool driven by your inputs: duration, intensity, temperature, and your own sweat rate.',
+    syarat: 'Manual input — no sync required.',
     adaDi: '/alat-endurance',
   },
   {
-    fitur: 'Power Guide untuk lomba',
-    kenapa: 'Ekspor Anda tidak memuat rute, jadi profil tanjakan tidak bisa dibaca otomatis. Segmen dimasukkan sendiri, lalu target watt per segmen dihitung dari persamaan tenaga bersepeda beserta perkiraan waktunya.',
-    syarat: 'Profil segmen dimasukkan sendiri, dan FTP.',
+    fitur: 'Race power guide',
+    kenapa: 'Your export carries no route, so the gradient profile cannot be read automatically. You enter the segments yourself, and target watts per segment are computed from the cycling power equation along with an estimated time.',
+    syarat: 'Segment profile entered by you, plus your FTP.',
     adaDi: '/alat-endurance',
   },
   {
-    fitur: 'FTP sepeda dalam watt dan watt/kg',
-    kenapa: 'Apple Health Anda tidak memuat daya bersepeda, sehingga FTP tidak dapat dibaca otomatis. Yang dibuat adalah penghitung dari protokol tes — 20 menit, 2×8 menit, maupun ramp — beserta tujuh zona daya.',
-    syarat: 'Hasil satu tes daya, dari power meter maupun trainer mana pun.',
+    fitur: 'Cycling FTP in watts and watts/kg',
+    kenapa: 'Your Apple Health data carries no cycling power, so FTP cannot be read automatically. What is provided is a calculator built on the test protocols — 20 minutes, 2 × 8 minutes, or a ramp — together with the seven power zones.',
+    syarat: 'The result of one power test, from any power meter or trainer.',
     adaDi: '/alat-endurance',
   },
   {
-    fitur: 'Aklimatisasi panas dan ketinggian',
-    kenapa: 'Rute dan cuaca tidak ikut disinkronkan, jadi paparan tidak terdeteksi sendiri. Paparan dicatat sendiri (suhu dan lama, maupun ketinggian dan lama tinggal), lalu status aklimatisasi dihitung beserta peluruhannya.',
+    fitur: 'Heat and altitude acclimatisation',
+    kenapa: 'Route and weather are not synced, so exposure is not detected on its own. You log the exposure yourself (temperature and duration, or altitude and time spent), and the acclimatisation status is computed along with how it decays.',
     syarat: 'Catat paparan sendiri.',
     adaDi: '/alat-endurance',
   },
   {
     fitur: 'Catatan saturasi oksigen',
-    kenapa: 'Pemantauan BERKELANJUTAN tidak mungkin — Apple Watch hanya mengukur sesekali. Yang dibuat adalah catatan dan kecenderungan bacaan, lengkap dengan penyesuaian untuk ketinggian dan daftar sebab bacaan rendah yang keliru.',
-    syarat: 'Bacaan dari alat mana pun, dicatat sendiri.',
+    kenapa: 'CONTINUOUS monitoring is not possible — an Apple Watch measures only occasionally. What is provided is a log and a trend of readings, together with an altitude adjustment and a list of causes of falsely low readings.',
+    syarat: 'Readings from any device, logged by you.',
     adaDi: '/pelacak-klinis',
   },
   {
     fitur: 'Catatan hasil EKG',
-    kenapa: 'Penafsiran gelombang EKG merupakan wilayah alat kesehatan berizin dan tenaga medis, dan tidak ditiru di sini. Yang dibuat adalah catatan LABEL yang sudah dikeluarkan alat berizin beserta gejala yang menyertainya, sehingga polanya dapat dibawa saat berobat.',
-    syarat: 'Rekam di aplikasi bawaan jam tangan, lalu salin hasilnya.',
+    kenapa: 'Interpreting an ECG trace belongs to licensed medical devices and to clinicians, and is not imitated here. What is provided is a log of the LABEL a licensed device already produced, together with the symptoms that accompanied it, so the pattern can be taken to an appointment.',
+    syarat: 'Record it in the watch’s own app, then copy the result across.',
     adaDi: '/pelacak-klinis',
   },
   {
     fitur: 'Penasihat jet lag',
-    kenapa: 'Data lokasi tidak ikut disinkronkan, jadi perjalanan tidak terdeteksi sendiri. Zona waktu dimasukkan sendiri, lalu disusun rencana cahaya dan tidur harian sebelum, saat, dan sesudah terbang.',
-    syarat: 'Zona waktu asal dan tujuan.',
+    kenapa: 'Location data is not synced, so travel is not detected on its own. You enter the time zones, and a daily light and sleep plan is drawn up for before, during, and after the flight.',
+    syarat: 'Your origin and destination time zones.',
     adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Kehamilan dan aktivitas',
-    kenapa: 'Tidak berkaitan dengan data jam tangan sama sekali. Usia kehamilan dihitung dari hari pertama haid terakhir, dan panduan aktivitasnya memakai uji bicara — bukan zona denyut jantung, yang menyesatkan dalam kehamilan.',
+    fitur: 'Pregnancy and activity',
+    kenapa: 'Not related to watch data at all. Gestational age is calculated from the first day of the last period, and the activity guidance uses the talk test — not heart-rate zones, which are misleading in pregnancy.',
     syarat: 'Hari pertama haid terakhir.',
     adaDi: '/pelacak-klinis',
   },
   {
     fitur: 'Fisiologi kursi roda',
-    kenapa: 'Memerlukan rujukan tersendiri, bukan perkiraan dari data lari. Zona dihitung dari denyut puncak saat mendorong, disertai panduan menjaga bahu dan peringatan disrefleksia otonom.',
-    syarat: 'Denyut puncak yang diamati saat mendorong.',
+    kenapa: 'This needs its own reference rather than an estimate from running data. Zones are computed from peak heart rate while pushing, alongside shoulder-care guidance and a warning about autonomic dysreflexia.',
+    syarat: 'The peak heart rate you observe while pushing.',
     adaDi: '/pelacak-klinis',
   },
   {
-    fitur: 'Body Battery dan pemantauan stres sepanjang hari',
-    kenapa: 'Garmin membangunnya dari variabilitas denyut yang diukur terus-menerus, dan Apple Watch tidak merekamnya seperti itu. Jalan keluarnya bukan mengarang kurva, melainkan memakai posisi denyut terhadap cadangan denyut — data yang memang ada — dan menolak menjembatani celah lebih dari 30 menit. Hasilnya kurva yang jujur terputus saat data memang tidak ada, lengkap dengan angka cakupannya.',
+    fitur: 'Body Battery and all-day stress monitoring',
+    kenapa: 'Garmin builds this from continuously measured heart-rate variability, and an Apple Watch does not record it that way. The answer is not to invent a curve, but to use heart rate relative to heart-rate reserve — data that genuinely exists — and to refuse to bridge gaps longer than 30 minutes. The result is an honest curve that breaks where the data is genuinely absent, with its coverage stated.',
     syarat: 'Deret denyut. Makin rapat sampelnya, makin utuh kurvanya.',
     adaDi: '/body-battery',
   },

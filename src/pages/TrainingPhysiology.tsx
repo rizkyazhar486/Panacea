@@ -127,9 +127,9 @@ export function TrainingPhysiology() {
             tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.
           </p>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-            Nyalakan <strong className="text-ink">Include Workouts</strong> di Health Auto Export, lalu
-            sinkronkan. Panduannya ada di{' '}
-            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">panduan sinkronisasi</Link>.
+            Turn on <strong className="text-ink">Include Workouts</strong> in Health Auto Export, then
+            sync. The instructions are in{' '}
+            <Link to="/health-data/tutorial" className="font-semibold text-ink underline">the sync guide</Link>.
           </p>
         </Card>
 
@@ -150,7 +150,7 @@ export function TrainingPhysiology() {
 
       {/* Kesiapan — satu-satunya yang menuntut keputusan hari ini */}
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Kesiapan hari ini" />
+        <SectionTitle icon={<IconHeart />} title="Readiness today" />
         <div className="mt-2 flex items-center gap-4">
           <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full"
             style={{ background: `conic-gradient(${siap.warna} ${siap.skor * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}>
@@ -192,7 +192,7 @@ export function TrainingPhysiology() {
         <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-3">
           <div className="text-sm font-semibold text-ink">{saran.judul}</div>
           <p className="mt-1 text-sm text-neutral-600 leading-relaxed">{saran.rincian}</p>
-          <p className="mt-2 text-sm text-neutral-500 leading-relaxed"><span className="text-slate-500">Alasan: </span>{saran.alasan}</p>
+          <p className="mt-2 text-sm text-neutral-500 leading-relaxed"><span className="text-slate-500">Why: </span>{saran.alasan}</p>
         </div>
       </Card>
 
@@ -201,7 +201,7 @@ export function TrainingPhysiology() {
         <Card>
           <SectionTitle icon={<IconTimer />} title="Recovery time" />
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-neutral-500">Sisa sampai siap untuk sesi berat</span>
+            <span className="text-sm text-neutral-500">Remaining until ready for a hard session</span>
             <span className={`text-2xl font-semibold tabular-nums ${sisaJam > 12 ? 'text-amber-300' : 'text-emerald-300'}`}>
               {sisaJam < 1 ? 'siap' : `${Math.round(sisaJam)} jam`}
             </span>
@@ -212,8 +212,8 @@ export function TrainingPhysiology() {
             ))}
           </div>
           <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-            Ini <b>bukan larangan bergerak</b>. Jalan kaki dan sesi mudah tetap boleh dan justru mempercepat
-            pemulihan — yang dimaksud adalah kesiapan untuk sesi keras.
+            This is <b>not an instruction to stop moving</b>. Walking and easy sessions are still fine and
+            actually speed recovery — what this refers to is readiness for hard work.
           </p>
         </Card>
       )}
@@ -228,15 +228,15 @@ export function TrainingPhysiology() {
         </div>
 
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Stat label="Beban akut (7h)" value={beban.akut.toFixed(0)} sub="per hari" />
-          <Stat label="Beban kronis (28h)" value={beban.kronis.toFixed(0)} sub="per hari" />
-          <Stat label="Nisbah 7:28" value={beban.acwr != null ? beban.acwr.toFixed(2) : '—'} sub={beban.acwrDapatDipercaya ? 'sasaran 0,8–1,3' : 'belum bermakna'} />
-          <Stat label="Hari aktif" value={`${beban.hariAktif7}/7`} />
+          <Stat label="Acute load (7d)" value={beban.akut.toFixed(0)} sub="per hari" />
+          <Stat label="Chronic load (28d)" value={beban.kronis.toFixed(0)} sub="per hari" />
+          <Stat label="7:28 ratio" value={beban.acwr != null ? beban.acwr.toFixed(2) : '—'} sub={beban.acwrDapatDipercaya ? 'target 0.8–1.3' : 'not yet meaningful'} />
+          <Stat label="Active days" value={`${beban.hariAktif7}/7`} />
         </div>
 
         {beban.pctAerobikRendah != null && (
           <div className="mt-4">
-            <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Sebaran intensitas 28 hari</div>
+            <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Intensity distribution over 28 days</div>
             <div className="mt-1.5 flex h-3 overflow-hidden rounded-full bg-white/5">
               <div style={{ width: `${beban.pctAerobikRendah}%`, background: '#34d399' }} />
               <div style={{ width: `${beban.pctAerobikTinggi}%`, background: '#fbbf24' }} />
@@ -264,29 +264,29 @@ export function TrainingPhysiology() {
           <SectionTitle icon={<IconRun />} title="Training effect — last session"
             subtitle={new Date(terbaru.mulai).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} />
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <TeBar label="Aerobik" value={teTerbaru.aerobik} teks={teTerbaru.labelAerobik} warna="#34d399" />
-            <TeBar label="Anaerobik" value={teTerbaru.anaerobik} teks={teTerbaru.labelAnaerobik} warna="#f87171" />
+            <TeBar label="Aerobic" value={teTerbaru.aerobik} teks={teTerbaru.labelAerobik} warna="#34d399" />
+            <TeBar label="Anaerobic" value={teTerbaru.anaerobik} teks={teTerbaru.labelAnaerobik} warna="#f87171" />
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
-            <Stat label="Beban sesi" value={terbaru.trimp.toFixed(0)} sub="TRIMP" />
-            <Stat label="Durasi" value={`${Math.round(terbaru.durasiDetik / 60)}`} sub="menit" />
-            <Stat label="Rata-rata" value={terbaru.avgHr ? `${terbaru.avgHr}` : '—'} sub="bpm" />
+            <Stat label="Session load" value={terbaru.trimp.toFixed(0)} sub="TRIMP" />
+            <Stat label="Duration" value={`${Math.round(terbaru.durasiDetik / 60)}`} sub="minutes" />
+            <Stat label="Average" value={terbaru.avgHr ? `${terbaru.avgHr}` : '—'} sub="bpm" />
           </div>
           <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-            Skala 0–5: 0 tidak ada · 1 ringan · 2 mempertahankan · 3 meningkatkan · 4 sangat meningkatkan · 5 berlebih.
-            Dinilai <b>relatif terhadap kebugaran Anda sendiri</b> — sesi yang sama berat bagi pemula dan ringan
-            bagi pelari terlatih, sehingga ambang tetap akan menyesatkan.
+            Scale 0–5: 0 none · 1 minor · 2 maintaining · 3 improving · 4 highly improving · 5 overreaching.
+            Judged <b>relative to your own fitness</b> — the same session is hard for a beginner and easy for
+            a trained runner, so a fixed threshold would mislead.
           </p>
         </Card>
       )}
 
       {/* Ambang & performa */}
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Ambang & kondisi performa" />
+        <SectionTitle icon={<IconHeart />} title="Threshold & performance condition" />
         <div className="mt-2 space-y-3">
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-ink">Denyut ambang laktat (LTHR)</span>
+              <span className="text-sm font-semibold text-ink">Lactate threshold heart rate (LTHR)</span>
               <span className="text-lg font-semibold tabular-nums text-ink">
                 {lthr.lthr != null ? `${lthr.lthr} bpm` : '—'}
                 {lthr.pctHrMax != null && <span className="ml-1 text-xs text-slate-500">{lthr.pctHrMax}% HRmaks</span>}
@@ -301,7 +301,7 @@ export function TrainingPhysiology() {
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-ink">Kondisi performa</span>
+              <span className="text-sm font-semibold text-ink">Performance condition</span>
               <span className={`text-lg font-semibold tabular-nums ${
                 performa.nilai == null ? 'text-slate-500' : performa.nilai > 0 ? 'text-emerald-300' : performa.nilai < 0 ? 'text-amber-300' : 'text-ink'}`}>
                 {performa.nilai == null ? '—' : performa.nilai > 0 ? `+${performa.nilai}` : performa.nilai}
@@ -318,7 +318,7 @@ export function TrainingPhysiology() {
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-ink">Skor ketahanan</span>
+              <span className="text-sm font-semibold text-ink">Endurance score</span>
               <span className="text-lg font-semibold tabular-nums text-ink">
                 {ketahanan.skor ?? '—'}{ketahanan.skor != null && <span className="ml-1 text-xs text-slate-500">{ketahanan.label}</span>}
               </span>
@@ -330,11 +330,11 @@ export function TrainingPhysiology() {
 
       {/* Dasar perhitungan */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Dasar perhitungannya" />
+        <SectionTitle icon={<IconActivity />} title="What the numbers are built on" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">
-          Garmin menghitung beban dari <b>EPOC</b> yang diperkirakan lewat model berpemilik Firstbeat, memakai
-          detak jantung detik per detik beserta variabilitas antarketukan. Apple Watch tidak mengeluarkan data
-          sedetail itu, jadi halaman ini <b>tidak mengaku menghitung EPOC</b>.
+          Garmin derives load from <b>EPOC</b> estimated through Firstbeat's proprietary model, using
+          second-by-second heart rate along with beat-to-beat variability. An Apple Watch does not expose data
+          at that resolution, so this page <b>does not claim to compute EPOC</b>.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Yang dipakai adalah <b>TRIMP (Banister)</b> — ukuran beban berbasis detak jantung yang sudah lama
@@ -366,9 +366,9 @@ function KartuBelumDariJam() {
       <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
         subtitle="That does not mean it is missing — each exists as its own tool" />
       <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-        Yang berikut ini <strong className="text-ink">tidak bisa dihitung dari ekspor Apple Watch</strong>,
-        dan itu tidak sama dengan tidak bisa dibuat. Masing-masing hanya memerlukan masukannya sendiri,
-        dan kini <strong className="text-ink">semuanya sudah tersedia</strong> — tautannya ada di tiap baris.
+        The following <strong className="text-ink">cannot be computed from an Apple Watch export</strong>,
+        which is not the same as being impossible to build. Each simply needs its own input, and
+        <strong className="text-ink"> all of them now exist</strong> — the link is on every row.
       </p>
       <div className="mt-3 space-y-2">
         {UNAVAILABLE.map((u) => (
@@ -376,11 +376,11 @@ function KartuBelumDariJam() {
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <span className="text-sm font-semibold text-ink">{u.fitur}</span>
               {u.adaDi
-                ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Sudah ada →</Link>
-                : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Belum dibuat</span>}
+                ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Available →</Link>
+                : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Not built yet</span>}
             </div>
             <p className="mt-1 text-sm leading-relaxed text-neutral-500">{u.kenapa}</p>
-            <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Perlu: </span>{u.syarat}</p>
+            <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Needs: </span>{u.syarat}</p>
           </div>
         ))}
       </div>
