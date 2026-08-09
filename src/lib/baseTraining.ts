@@ -43,48 +43,48 @@ export const RUN_ZONES: RunZone[] = [
     name: 'Easy Run',
     tujuan: 'Membangun aerobic base',
     kenapa:
-      'Intensitas rendah yang dijalankan lama merangsang pertumbuhan kapiler di otot, menambah jumlah dan ukuran mitokondria, serta memperbesar volume sekuncup jantung. Adaptasi ini hanya terjadi bila intensitasnya cukup rendah untuk dipertahankan berlama-lama — begitu terlalu cepat, sesi berubah menjadi beban kelelahan tanpa menambah basis aerobik.',
-    porsi: '70-80% dari total kilometer mingguan',
-    durasi: '30-60 menit',
-    rasa: 'Masih bisa berbicara dalam kalimat penuh tanpa terengah',
+      'Low intensity sustained for a long time stimulates capillary growth in muscle, increases the number and size of mitochondria, and enlarges the heart’s stroke volume. These adaptations only occur if the intensity is low enough to hold for a long time — go too fast and the session becomes a fatigue cost with no gain in aerobic base.',
+    porsi: '70–80% of weekly kilometres',
+    durasi: '30–60 minutes',
+    rasa: 'You can still speak in full sentences without gasping',
     salahnya:
-      'Easy run yang dijalankan terlalu cepat adalah kesalahan paling umum dan paling merugikan: terlalu berat untuk pemulihan, terlalu ringan untuk memicu adaptasi kecepatan — sesi yang mahal secara kelelahan namun murah secara manfaat.',
+      'Running the easy run too fast is the most common and most costly mistake: too hard to count as recovery, too easy to trigger speed adaptation — expensive in fatigue and cheap in benefit.',
   },
   {
     key: 'long',
     name: 'Long Run',
     tujuan: 'Membangun endurance',
     kenapa:
-      'Durasi panjang menguras cadangan glikogen sehingga tubuh belajar memakai lemak sebagai bahan bakar, memperkuat jaringan ikat, dan melatih daya tahan mental. Yang memberi adaptasi di sini adalah LAMA WAKTUNYA, bukan kecepatannya.',
-    porsi: '20-30% dari total kilometer mingguan, satu kali seminggu',
-    durasi: '60-120 menit',
-    rasa: 'Sedikit lebih santai daripada easy run, dan harus tetap terkendali sampai kilometer terakhir',
+      'Long duration depletes glycogen stores so the body learns to use fat as fuel, strengthens connective tissue, and trains mental endurance. What produces the adaptation here is TIME ON FEET, not speed.',
+    porsi: '20–30% of weekly kilometres, once a week',
+    durasi: '60–120 minutes',
+    rasa: 'Slightly easier than an easy run, and it must stay controlled to the final kilometre',
     salahnya:
-      'Memulai terlalu cepat sehingga separuh akhir berantakan. Long run yang benar terasa membosankan pada 30 menit pertama.',
+      'Starting too fast and falling apart in the second half. A long run done properly feels boring for the first 30 minutes.',
   },
   {
     key: 'tempo',
     name: 'Tempo Run',
     tujuan: 'Menaikkan lactate threshold',
     kenapa:
-      'Ambang laktat adalah kecepatan tertinggi yang masih bisa dipertahankan tanpa laktat menumpuk lebih cepat daripada dibersihkan. Berlari tepat di sekitar ambang ini melatih tubuh membersihkan laktat lebih efisien, sehingga pace yang dulu terasa berat menjadi terasa nyaman. Inilah penentu terbesar performa lari jarak menengah dan jauh.',
-    porsi: '10-15% dari total kilometer mingguan',
-    durasi: '20-40 menit berlari menerus, atau blok 2×15 menit',
-    rasa: 'Nyaman namun berat — hanya sanggup mengucapkan 3-5 kata sekaligus',
+      'The lactate threshold is the highest speed you can hold without lactate accumulating faster than it is cleared. Running right around that threshold trains the body to clear lactate more efficiently, so a pace that once felt hard starts to feel comfortable. It is the single largest determinant of middle- and long-distance performance.',
+    porsi: '10–15% of weekly kilometres',
+    durasi: '20–40 minutes continuous, or 2 × 15 minute blocks',
+    rasa: 'Comfortably hard — you can manage only 3–5 words at a time',
     salahnya:
-      'Dijalankan seperti balapan. Bila napas sudah tersengal, itu bukan lagi tempo melainkan interval, dan manfaat ambang laktatnya justru hilang.',
+      'Running it like a race. Once you are gasping it is no longer a tempo but an interval, and the threshold benefit is exactly what you lose.',
   },
   {
     key: 'interval',
     name: 'Interval',
-    tujuan: 'Melatih kecepatan dan VO₂max',
+    tujuan: 'Trains speed and VO₂max',
     kenapa:
-      'Blok pendek pada intensitas sangat tinggi memaksa jantung bekerja pada curah maksimal — rangsangan yang paling kuat untuk menaikkan VO₂max, penanda kebugaran yang paling erat berkaitan dengan angka harapan hidup. Karena sangat melelahkan, porsinya harus kecil.',
-    porsi: '5-10% dari total kilometer mingguan, maksimal 1-2 sesi seminggu',
-    durasi: 'Blok 400 m sampai 1200 m, jeda jogging di antaranya',
-    rasa: 'Berat, hanya sanggup satu-dua kata; napas belum pulih penuh saat blok berikutnya dimulai',
+      'Short blocks at very high intensity force the heart to work at maximal output — the strongest stimulus for raising VO₂max, the fitness marker most closely tied to life expectancy. Because it is so fatiguing, the dose must stay small.',
+    porsi: '5–10% of weekly kilometres, at most 1–2 sessions a week',
+    durasi: 'Blocks of 400 m to 1,200 m with jogging recovery between',
+    rasa: 'Hard — one or two words at most; breathing has not fully recovered when the next block starts',
     salahnya:
-      'Menambah sesi interval karena merasa itu yang "paling berguna". Interval tanpa basis aerobik yang cukup adalah jalan tercepat menuju cedera dan kelelahan menahun.',
+      'Adding interval sessions because they feel like the "most useful" ones. Intervals without an adequate aerobic base are the fastest route to injury and chronic fatigue.',
   },
 ]
 
@@ -206,48 +206,48 @@ export const LADDERS: Ladder[] = [
   {
     key: 'pushup',
     title: 'Push-Up',
-    otot: 'Dada, trisep, deltoid anterior, dan serratus anterior',
+    otot: 'Chest, triceps, anterior deltoid, and serratus anterior',
     postur:
-      'Serratus anterior adalah otot yang menahan tulang belikat menempel pada dinding dada. Bila lemah, belikat mencuat dan bahu jatuh ke depan. Push-up yang dikerjakan dengan dorongan penuh di akhir gerakan — bukan berhenti saat siku lurus — melatih otot ini secara langsung.',
-    frekuensi: '3-4 kali seminggu, jeda minimal satu hari antar sesi',
+      'Serratus anterior is the muscle that holds the shoulder blade against the rib cage. When it is weak the blade wings out and the shoulder drops forward. A push-up finished with a full protraction at the top — rather than stopping when the elbows lock — trains it directly.',
+    frekuensi: '3–4 times a week, with at least one day between sessions',
     steps: [
-      { level: 1, name: 'Push-up dinding', target: '3×15', naik: 'Bisa 3×15 dengan gerakan penuh dan terkendali', cue: 'Tubuh satu garis lurus dari telinga sampai tumit; jangan menekuk pinggul' },
-      { level: 2, name: 'Push-up meja / bangku', target: '3×12', naik: 'Bisa 3×12 tanpa pinggul turun', cue: 'Semakin rendah tumpuan, semakin berat; turunkan ketinggian secara bertahap' },
-      { level: 3, name: 'Push-up lutut', target: '3×12', naik: 'Bisa 3×12 dengan dada menyentuh dekat lantai', cue: 'Lutut, pinggul, dan bahu tetap satu garis — jangan menekuk di pinggul' },
-      { level: 4, name: 'Push-up penuh', target: '3×8', naik: 'Bisa 3×8 dengan dada hampir menyentuh lantai', cue: 'Siku sekitar 45° dari badan, bukan melebar 90° — siku melebar membebani sendi bahu' },
-      { level: 5, name: 'Push-up penuh volume', target: '3×20', naik: 'Bisa 3×20', cue: 'Tahan 1 detik di bawah; kualitas gerakan lebih menentukan daripada jumlah' },
-      { level: 6, name: 'Push-up kaki ditinggikan / archer', target: '3×10', naik: 'Lanjut ke varian satu tangan bila diinginkan', cue: 'Naikkan kaki untuk menambah beban pada bahu dan dada atas' },
+      { level: 1, name: 'Push-up dinding', target: '3×15', naik: '3 × 15 with full, controlled range', cue: 'Body in one straight line from ear to heel; do not pike at the hips' },
+      { level: 2, name: 'Push-up meja / bangku', target: '3×12', naik: '3 × 12 without the hips sagging', cue: 'Semakin rendah tumpuan, semakin berat; turunkan ketinggian secara bertahap' },
+      { level: 3, name: 'Knee push-up', target: '3×12', naik: '3 × 12 with the chest close to the floor', cue: 'Knees, hips and shoulders in one line — do not bend at the hip' },
+      { level: 4, name: 'Push-up penuh', target: '3×8', naik: '3 × 8 with the chest almost touching the floor', cue: 'Elbows about 45° from the body, not flared to 90° — flared elbows load the shoulder joint' },
+      { level: 5, name: 'Push-up penuh volume', target: '3×20', naik: '3 × 20', cue: 'Pause 1 second at the bottom; quality of movement matters more than the count' },
+      { level: 6, name: 'Feet-elevated / archer push-up', target: '3×10', naik: 'Progress to one-arm variants if you want to', cue: 'Raise the feet to load the shoulders and upper chest more' },
     ],
   },
   {
     key: 'pullup',
     title: 'Pull-Up',
-    otot: 'Latissimus dorsi, rhomboid, trapezius bawah, bisep, dan otot genggam',
+    otot: 'Latissimus dorsi, rhomboids, lower trapezius, biceps, and grip',
     postur:
-      'INI GERAKAN PALING PENTING UNTUK POSTUR. Rhomboid dan trapezius bawah adalah otot yang menarik belikat ke belakang dan ke bawah. Duduk membungkuk berjam-jam melemahkan keduanya sekaligus memendekkan otot dada, sehingga bahu tertarik ke depan dan kepala maju — pola yang dikenal sebagai upper cross syndrome. Semua latihan tarik memperbaikinya; tidak ada latihan dorong yang bisa menggantikannya.',
-    frekuensi: '2-3 kali seminggu, jeda minimal satu hari antar sesi',
+      'THIS IS THE MOST IMPORTANT MOVEMENT FOR POSTURE. The rhomboids and lower trapezius draw the shoulder blade back and down. Hours of slumped sitting weaken both while shortening the chest, so the shoulders pull forward and the head drifts ahead — the pattern known as upper cross syndrome. Every pulling exercise corrects it; no amount of pushing can substitute.',
+    frekuensi: '2–3 times a week, with at least one day between sessions',
     steps: [
-      { level: 1, name: 'Dead hang', target: '3×20 detik', naik: 'Bisa menggantung 30 detik', cue: 'Bahu aktif ditarik turun menjauhi telinga, bukan menggantung pasif' },
-      { level: 2, name: 'Scapular pull', target: '3×8', naik: 'Bisa 3×10 terkendali', cue: 'Hanya belikat yang bergerak turun; siku tetap lurus. Inilah gerakan yang paling langsung melatih trapezius bawah' },
-      { level: 3, name: 'Australian row / inverted row', target: '3×10', naik: 'Bisa 3×12 dengan badan makin mendatar', cue: 'Tarik sampai dada menyentuh batang; jaga badan lurus seperti papan' },
-      { level: 4, name: 'Negative pull-up', target: '3×5 turun 5 detik', naik: 'Bisa menahan turun 5 detik sebanyak 3×5', cue: 'Naik dengan bantuan lompatan, lalu turun selambat mungkin — fase turun inilah yang membangun kekuatan' },
-      { level: 5, name: 'Pull-up penuh', target: '3×3', naik: 'Bisa 3×5', cue: 'Dagu melewati batang, turun sampai siku hampir lurus; jangan mengayun' },
-      { level: 6, name: 'Pull-up volume / berbeban', target: '3×10 atau tambah beban', naik: '—', cue: 'Setelah 3×10 tercapai, tambah beban alih-alih menambah jumlah repetisi' },
+      { level: 1, name: 'Dead hang', target: '3 × 20 seconds', naik: 'Hang for 30 seconds', cue: 'Shoulders actively pulled down away from the ears, not hanging passively' },
+      { level: 2, name: 'Scapular pull', target: '3×8', naik: '3 × 10 under control', cue: 'Only the shoulder blades move downward; the elbows stay straight. This is the most direct way to train the lower trapezius' },
+      { level: 3, name: 'Australian row / inverted row', target: '3×10', naik: '3 × 12 with the body progressively more horizontal', cue: 'Pull until the chest meets the bar; hold the body straight as a plank' },
+      { level: 4, name: 'Negative pull-up', target: '3 × 5 with a 5-second lowering', naik: 'Control a 5-second lowering for 3 × 5', cue: 'Jump to the top, then lower as slowly as you can — the lowering phase is what builds the strength' },
+      { level: 5, name: 'Pull-up penuh', target: '3×3', naik: '3 × 5', cue: 'Chin over the bar, lower until the elbows are almost straight; no swinging' },
+      { level: 6, name: 'Pull-up volume / berbeban', target: '3 × 10, or add load', naik: '—', cue: 'Setelah 3×10 tercapai, tambah beban alih-alih menambah jumlah repetisi' },
     ],
   },
   {
     key: 'situp',
     title: 'Sit-Up & Core',
-    otot: 'Rektus abdominis, obliks, dan otot dalam perut (transversus abdominis)',
+    otot: 'Rectus abdominis, obliques, and the deep abdominal wall (transversus abdominis)',
     postur:
-      'Untuk postur, bagian core yang paling menentukan bukan otot perut bagian depan melainkan transversus abdominis dan otot dalam yang menstabilkan panggul. Sit-up berulang dalam jumlah sangat besar justru membebani cakram tulang belakang, sementara latihan menahan seperti plank dan dead bug melatih fungsi menstabilkan yang sesungguhnya dibutuhkan untuk berdiri tegak tanpa nyeri.',
-    frekuensi: '3-4 kali seminggu; boleh setiap hari untuk latihan menahan yang ringan',
+      'For posture, the part of the core that matters most is not the front of the abdomen but transversus abdominis and the deep muscles that stabilise the pelvis. Very high-volume sit-ups load the spinal discs, while holding exercises such as planks and dead bugs train the stabilising function you actually need to stand tall without pain.',
+    frekuensi: '3–4 times a week; daily is fine for the lighter holds',
     steps: [
-      { level: 1, name: 'Dead bug', target: '3×8 tiap sisi', naik: 'Punggung bawah tetap menempel lantai sepanjang gerakan', cue: 'Punggung bawah TIDAK boleh terangkat dari lantai — ini syarat, bukan saran' },
-      { level: 2, name: 'Plank', target: '3×30 detik', naik: 'Bisa 3×45 detik tanpa pinggul turun', cue: 'Pinggul sejajar bahu; kencangkan bokong agar panggul tidak menungging' },
-      { level: 3, name: 'Crunch terkendali', target: '3×15', naik: 'Bisa 3×20', cue: 'Angkat hanya sampai belikat terangkat; leher rileks dan jangan ditarik dengan tangan' },
-      { level: 4, name: 'Sit-up penuh', target: '3×15', naik: 'Bisa 3×20', cue: 'Gerakan lambat dan terkendali; berhenti bila punggung bawah terasa nyeri' },
-      { level: 5, name: 'Hanging knee raise', target: '3×10', naik: 'Bisa 3×12', cue: 'Angkat dengan panggul menggulung ke atas, bukan sekadar menekuk pinggul' },
+      { level: 1, name: 'Dead bug', target: '3 × 8 each side', naik: 'The lower back stays in contact with the floor throughout', cue: 'The lower back must NOT lift off the floor — that is a requirement, not a suggestion' },
+      { level: 2, name: 'Plank', target: '3 × 30 seconds', naik: '3 × 45 seconds without the hips dropping', cue: 'Hips level with the shoulders; squeeze the glutes so the pelvis does not tip' },
+      { level: 3, name: 'Crunch terkendali', target: '3×15', naik: '3 × 20', cue: 'Lift only until the shoulder blades clear the floor; keep the neck relaxed and do not pull on it' },
+      { level: 4, name: 'Sit-up penuh', target: '3×15', naik: '3 × 20', cue: 'Slow and controlled; stop if the lower back hurts' },
+      { level: 5, name: 'Hanging knee raise', target: '3×10', naik: '3 × 12', cue: 'Lift by curling the pelvis upward, not by simply flexing the hip' },
       { level: 6, name: 'Hanging leg raise / ab wheel', target: '3×8', naik: '—', cue: 'Jangan mengayun; kendalikan fase turun' },
     ],
   },
@@ -270,15 +270,15 @@ export interface PostureItem {
  * kuatkan yang melemah. Melakukan salah satunya saja jarang berhasil.
  */
 export const POSTURE_PROGRAM: PostureItem[] = [
-  { nama: 'Peregangan dada di kusen pintu', jenis: 'regangkan', dosis: '3×30 detik, 2 kali sehari', cue: 'Lengan atas sejajar bahu, melangkah maju sampai terasa tarikan di depan dada — bukan di sendi bahu' },
-  { nama: 'Peregangan otot leher depan (chin tuck)', jenis: 'kuatkan', dosis: '3×10 tahan 5 detik, beberapa kali sehari', cue: 'Tarik dagu lurus ke belakang seperti membuat dagu berlipat; kepala tidak menunduk' },
-  { nama: 'Peregangan otot pinggul depan (hip flexor)', jenis: 'regangkan', dosis: '3×30 detik tiap sisi', cue: 'Posisi berlutut satu kaki, kencangkan bokong sisi belakang lalu dorong panggul ke depan' },
-  { nama: 'Scapular pull / band pull-apart', jenis: 'kuatkan', dosis: '3×15, 3 kali seminggu', cue: 'Tarik belikat turun dan ke belakang; bahu jangan naik ke arah telinga' },
-  { nama: 'Face pull atau row dengan karet', jenis: 'kuatkan', dosis: '3×15, 3 kali seminggu', cue: 'Tarik ke arah dahi dengan siku tinggi — melatih trapezius bawah dan rotator eksternal' },
-  { nama: 'Prone Y-T-W', jenis: 'kuatkan', dosis: '3×8 tiap huruf', cue: 'Tengkurap, angkat lengan membentuk huruf Y, T, dan W dengan ibu jari mengarah ke atas' },
-  { nama: 'Glute bridge', jenis: 'kuatkan', dosis: '3×12', cue: 'Bokong yang lemah karena duduk lama membuat panggul menungging dan punggung bawah menahan beban berlebih' },
-  { nama: 'Jeda berdiri tiap 30-45 menit', jenis: 'sadari', dosis: 'Sepanjang jam kerja', cue: 'Postur rusak karena LAMA menetap dalam satu posisi, bukan karena satu posisi yang salah. Berpindah posisi lebih menentukan daripada mencari posisi sempurna' },
-  { nama: 'Atur tinggi layar dan meja', jenis: 'sadari', dosis: 'Sekali, permanen', cue: 'Bagian atas layar sedikit di bawah tinggi mata; siku sekitar 90°. Menahan postur baik di meja yang salah tidak akan bertahan' },
+  { nama: 'Doorway chest stretch', jenis: 'regangkan', dosis: '3 × 30 seconds, twice a day', cue: 'Upper arm at shoulder height, step forward until you feel the stretch across the front of the chest — not in the shoulder joint' },
+  { nama: 'Front-of-neck stretch (chin tuck)', jenis: 'kuatkan', dosis: '3 × 10 holding 5 seconds, several times a day', cue: 'Draw the chin straight back, making a double chin; the head does not nod down' },
+  { nama: 'Front-of-hip stretch (hip flexor)', jenis: 'regangkan', dosis: '3 × 30 seconds each side', cue: 'Half-kneeling; squeeze the glute on the back side, then push the hips forward' },
+  { nama: 'Scapular pull / band pull-apart', jenis: 'kuatkan', dosis: '3 × 15, three times a week', cue: 'Draw the shoulder blades down and back; do not let the shoulders rise toward the ears' },
+  { nama: 'Face pulls or band rows', jenis: 'kuatkan', dosis: '3 × 15, three times a week', cue: 'Pull toward the forehead with high elbows — this trains the lower trapezius and the external rotators' },
+  { nama: 'Prone Y-T-W', jenis: 'kuatkan', dosis: '3 × 8 of each letter', cue: 'Lie face down and lift the arms into a Y, T, and W with the thumbs pointing up' },
+  { nama: 'Glute bridge', jenis: 'kuatkan', dosis: '3×12', cue: 'Glutes weakened by long sitting tip the pelvis forward and leave the lower back carrying too much' },
+  { nama: 'Stand up every 30–45 minutes', jenis: 'sadari', dosis: 'Sepanjang jam kerja', cue: 'Posture suffers from HOW LONG you hold one position, not from one wrong position. Changing position matters more than finding a perfect one' },
+  { nama: 'Set your screen and desk height', jenis: 'sadari', dosis: 'Sekali, permanen', cue: 'The top of the screen slightly below eye level; elbows around 90°. Holding good posture at a badly set desk will not last' },
 ]
 
 export interface WeekPlan {
@@ -290,18 +290,18 @@ export interface WeekPlan {
 /** Contoh susunan seminggu yang menggabungkan lari dan kalistenik. */
 export function weeklyTemplate(hariLari: 3 | 4 | 5): WeekPlan[] {
   const base: WeekPlan[] = [
-    { hari: 'Senin', isi: 'Easy run 30-40 menit + program postur', jenis: 'lari' },
+    { hari: 'Senin', isi: 'Easy run 30–40 minutes + the posture programme', jenis: 'lari' },
     { hari: 'Selasa', isi: 'Push-up + pull-up + core (tangga progresi)', jenis: 'kekuatan' },
-    { hari: 'Rabu', isi: 'Tempo run 20-30 menit (setelah pemanasan)', jenis: 'lari' },
-    { hari: 'Kamis', isi: 'Jalan santai, peregangan, tidur cukup', jenis: 'pulih' },
+    { hari: 'Rabu', isi: 'Tempo run 20–30 minutes (after warming up)', jenis: 'lari' },
+    { hari: 'Kamis', isi: 'A gentle walk, stretching, enough sleep', jenis: 'pulih' },
     { hari: 'Jumat', isi: 'Push-up + pull-up + core (tangga progresi)', jenis: 'kekuatan' },
-    { hari: 'Sabtu', isi: 'Long run 60-90 menit pada pace long run', jenis: 'lari' },
-    { hari: 'Minggu', isi: 'Istirahat penuh atau jalan ringan', jenis: 'pulih' },
+    { hari: 'Sabtu', isi: 'Long run 60–90 minutes at long-run pace', jenis: 'lari' },
+    { hari: 'Minggu', isi: 'Complete rest or a light walk', jenis: 'pulih' },
   ]
-  if (hariLari === 4) base[3] = { hari: 'Kamis', isi: 'Easy run 30 menit', jenis: 'lari' }
+  if (hariLari === 4) base[3] = { hari: 'Kamis', isi: 'Easy run, 30 minutes', jenis: 'lari' }
   if (hariLari === 5) {
-    base[3] = { hari: 'Kamis', isi: 'Easy run 30 menit', jenis: 'lari' }
-    base[6] = { hari: 'Minggu', isi: 'Interval 6×400 m (hanya bila basis aerobik sudah kuat)', jenis: 'lari' }
+    base[3] = { hari: 'Kamis', isi: 'Easy run, 30 minutes', jenis: 'lari' }
+    base[6] = { hari: 'Minggu', isi: 'Intervals 6 × 400 m (only once the aerobic base is solid)', jenis: 'lari' }
   }
   return base
 }
@@ -310,22 +310,22 @@ export function weeklyTemplate(hariLari: 3 | 4 | 5): WeekPlan[] {
 export const RULES: { judul: string; isi: string }[] = [
   {
     judul: 'Naikkan jarak maksimal 10% per minggu',
-    isi: 'Cedera lari pada pemula hampir selalu berasal dari menambah jarak terlalu cepat, bukan dari teknik. Tulang, tendon, dan ligamen beradaptasi jauh lebih lambat daripada jantung dan paru — perasaan "masih kuat" datang lebih dulu daripada kesiapan jaringan.',
+    isi: 'Running injuries in beginners almost always come from adding distance too fast, not from technique. Bone, tendon and ligament adapt far more slowly than the heart and lungs — the feeling of "still having more" arrives before the tissue is ready.',
   },
   {
-    judul: 'Sebagian besar lari harus terasa mudah',
-    isi: 'Bila semua sesi terasa berat, program itu salah. Aturan 80/20 — sekitar 80% kilometer pada intensitas rendah — dipakai oleh hampir semua pelari jarak jauh, termasuk yang elite.',
+    judul: 'Most of your running should feel easy',
+    isi: 'If every session feels hard, the programme is wrong. The 80/20 rule — roughly 80% of kilometres at low intensity — is used by almost every distance runner, including the elite ones.',
   },
   {
-    judul: 'Hari istirahat adalah bagian dari program',
-    isi: 'Adaptasi terjadi saat pulih, bukan saat berlatih. Latihan tanpa pemulihan hanya menumpuk kelelahan, dan pada orang yang jam tidurnya sudah kacau karena jaga, ini merupakan risiko yang nyata.',
+    judul: 'Rest days are part of the programme',
+    isi: 'Adaptation happens during recovery, not during training. Training without recovery only accumulates fatigue, and for anyone whose sleep is already disrupted by shift work, that is a real risk.',
   },
   {
-    judul: 'Tidur adalah latihan yang tidak terlihat',
-    isi: 'Kurang tidur menurunkan sintesis protein otot, menaikkan hormon stres, dan memperlambat pemulihan. Menambah sesi latihan sambil memotong jam tidur hampir selalu memberi hasil yang lebih buruk daripada berlatih lebih sedikit dengan tidur cukup.',
+    judul: 'Sleep is the training you cannot see',
+    isi: 'Short sleep lowers muscle protein synthesis, raises stress hormones, and slows recovery. Adding training sessions while cutting sleep almost always produces a worse result than training less and sleeping enough.',
   },
   {
-    judul: 'Nyeri sendi bukan nyeri otot',
-    isi: 'Pegal otot yang muncul 1-2 hari setelah latihan itu wajar. Nyeri yang tajam, terlokalisasi pada sendi, memburuk saat berlatih, atau menetap lebih dari beberapa hari bukan hal yang perlu dilawan — kurangi beban dan periksakan bila menetap.',
+    judul: 'Joint pain is not muscle pain',
+    isi: 'Muscle soreness appearing 1–2 days after training is normal. Pain that is sharp, localised to a joint, worsens during training, or lasts more than a few days is not something to push through — reduce the load, and get it looked at if it persists.',
   },
 ]

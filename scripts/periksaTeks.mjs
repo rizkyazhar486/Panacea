@@ -89,7 +89,12 @@ const CAMPUR = /\b(Sessions|Training|Fitness|Summary|History|Result|Settings|Rec
  * ikut menandai saveEducation — nama yang sah — jadi dipersempit ke bentuk yang
  * mustahil muncul dari kode yang ditulis sengaja.
  */
-const IDENT_RUSAK = /\b[a-z][a-zA-Z]*[ \t]+(?:in|Lives|Born)[ \t]*:/
+// Bentuk kerusakan yang sebenarnya adalah nama camelCase yang terbelah oleh
+// kata pengganti: `tempatTinggal:` menjadi `tempat Lives in:`. Alternatif `in`
+// yang berdiri sendiri sempat ada di sini dan menandai kalimat Inggris yang
+// sah — "Should be felt in:" — jadi ia dibuang. Penjaga yang menandai tulisan
+// benar akan diabaikan orang, dan penjaga yang diabaikan sama saja tidak ada.
+const IDENT_RUSAK = /\b[a-z][a-zA-Z]*[ \t]+(?:Lives in|Born|Occupation|History)[ \t]*:/
 
 /**
  * Identifier HIBRIDA: potongan kata Indonesia dan kata Inggris hasil

@@ -39,8 +39,8 @@ export function BaseTraining() {
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
           Halaman ini menjawab dua pertanyaan yang paling sering salah dijawab orang yang berlatih tanpa pelatih:
-          <strong className="text-ink"> secepat apa seharusnya berlari</strong>, dan
-          <strong className="text-ink"> mulai dari mana kalau satu pull-up pun belum bisa</strong>.
+          <strong className="text-ink"> how fast you should actually be running</strong>, dan
+          <strong className="text-ink"> where to start if you cannot do a single pull-up</strong>.
           Semua hitungan berjalan di perangkat ini, tanpa mengirim data ke mana pun.
         </p>
       </Card>
@@ -119,22 +119,22 @@ function RunTab() {
         </div>
 
         {mode === 'pace' ? (
-          <Field label="Pace lomba (menit:detik per km)">
+          <Field label="Race pace (min:sec per km)">
             <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} placeholder="5:30" inputMode="numeric" />
           </Field>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Jarak (km)">
+            <Field label="Distance (km)">
               <input className={inputClass} value={dist} onChange={(e) => setDist(e.target.value)} inputMode="decimal" />
             </Field>
-            <Field label="Waktu (menit)">
+            <Field label="Time (minutes)">
               <input className={inputClass} value={mins} onChange={(e) => setMins(e.target.value)} inputMode="decimal" />
             </Field>
           </div>
         )}
 
         {derived == null && (
-          <p className="text-sm text-amber-300 mt-3">Masukkan pace dalam format menit:detik, misalnya 5:30.</p>
+          <p className="text-sm text-amber-300 mt-3">Enter pace as min:sec, for example 5:30.</p>
         )}
 
         {result && (
@@ -172,7 +172,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Empat jenis lari, empat tujuan berbeda" subtitle="Do not run every session as hard as you can" />
+        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Do not run every session as hard as you can" />
         <div className="space-y-3 mt-2">
           {RUN_ZONES.map((z) => (
             <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -183,9 +183,9 @@ function RunTab() {
               </div>
               <p className="text-sm text-neutral-500 mt-2 leading-relaxed">{z.kenapa}</p>
               <div className="mt-2 grid gap-1 text-xs">
-                <div className="text-neutral-500"><span className="text-slate-500">Rasanya:</span> {z.rasa}</div>
-                <div className="text-neutral-500"><span className="text-slate-500">Porsi:</span> {z.porsi}</div>
-                <div className="text-amber-300/90"><span className="text-amber-500/80">Kesalahan umum:</span> {z.salahnya}</div>
+                <div className="text-neutral-500"><span className="text-slate-500">How it feels:</span> {z.rasa}</div>
+                <div className="text-neutral-500"><span className="text-slate-500">Share of volume:</span> {z.porsi}</div>
+                <div className="text-amber-300/90"><span className="text-amber-500/80">Common mistake:</span> {z.salahnya}</div>
               </div>
             </div>
           ))}
@@ -193,12 +193,12 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle title="Tabel pace lengkap" subtitle="For race paces of 3:00–6:00 per km" />
+        <SectionTitle title="Full pace table" subtitle="For race paces of 3:00–6:00 per km" />
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
               <tr className="text-neutral-500 border-b border-white/10">
-                <th className="text-left py-2 pr-3 font-medium">Pace lomba</th>
+                <th className="text-left py-2 pr-3 font-medium">Race pace</th>
                 <th className="text-left py-2 pr-3 font-medium">Easy</th>
                 <th className="text-left py-2 pr-3 font-medium">Long</th>
                 <th className="text-left py-2 pr-3 font-medium">Tempo</th>
@@ -247,7 +247,7 @@ function LadderCard({ ladder }: { ladder: Ladder }) {
       <SectionTitle icon={<IconActivity />} title={ladder.title} subtitle={ladder.otot} />
 
       <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 p-3 mt-2">
-        <div className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">Kaitannya dengan postur</div>
+        <div className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">How this relates to posture</div>
         <p className="text-sm text-neutral-600 mt-1 leading-relaxed">{ladder.postur}</p>
       </div>
 
@@ -273,8 +273,8 @@ function LadderCard({ ladder }: { ladder: Ladder }) {
           <span className="font-semibold text-ink">{cur.name}</span>
           <span className="text-sm text-neutral-500">— {cur.target}</span>
         </div>
-        <div className="mt-2 text-sm text-neutral-500"><span className="text-slate-500">Teknik:</span> {cur.cue}</div>
-        <div className="mt-1 text-sm text-emerald-300/90"><span className="text-emerald-500/80">Naik tingkat bila:</span> {cur.naik}</div>
+        <div className="mt-2 text-sm text-neutral-500"><span className="text-slate-500">Technique:</span> {cur.cue}</div>
+        <div className="mt-1 text-sm text-emerald-300/90"><span className="text-emerald-500/80">Progress when:</span> {cur.naik}</div>
       </div>
     </Card>
   )
@@ -293,22 +293,22 @@ function PostureTab() {
         <SectionTitle icon={<IconActivity />} title="Why posture breaks down, and what actually needs fixing" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
           Berdiri membungkuk maupun duduk berjam-jam menghasilkan pola yang dapat diprediksi:
-          <strong className="text-ink"> otot depan memendek dan otot belakang melemah</strong> — dada dan otot leher
+          <strong className="text-ink"> the front shortens and the back weakens</strong> — dada dan otot leher
           depan menarik bahu ke depan, sementara rhomboid serta trapezius bawah yang seharusnya menahan belikat justru
           kehilangan kekuatan. Karena itu programnya berpasangan: regangkan yang memendek, kuatkan yang melemah.
           Mengerjakan salah satunya saja jarang mengubah apa pun.
         </p>
         <p className="text-sm text-neutral-500 mt-3 leading-relaxed">
           Yang perlu diluruskan: postur bukan soal menemukan satu posisi sempurna lalu mempertahankannya. Kerusakan
-          datang dari <strong className="text-ink">lamanya menetap dalam satu posisi</strong>, bukan dari posisi itu
+          datang dari <strong className="text-ink">how long you stay in one position</strong>, bukan dari posisi itu
           sendiri — sehingga sering berpindah posisi lebih menentukan daripada duduk "benar" selama enam jam.
         </p>
       </Card>
 
       {([
-        ['kuatkan', '💪 Kuatkan yang melemah', 'Ini bagian yang paling menentukan dan paling sering dilewati'],
-        ['regangkan', '🧘 Regangkan yang memendek', 'Tanpa ini, otot yang dikuatkan terus ditarik kembali ke depan'],
-        ['sadari', '🧠 Ubah yang bisa diubah', 'Perubahan lingkungan bertahan lebih lama daripada niat'],
+        ['kuatkan', '💪 Strengthen what has weakened', 'The part that matters most, and the one most often skipped'],
+        ['regangkan', '🧘 Stretch what has shortened', 'Without this, the muscles you strengthen keep getting pulled forward again'],
+        ['sadari', '🧠 Change what can be changed', 'A change to your surroundings outlasts a change of intention'],
       ] as ['kuatkan' | 'regangkan' | 'sadari', string, string][]).map(([k, title, sub]) => (
         <Card key={k}>
           <SectionTitle title={title} subtitle={sub} />
@@ -341,7 +341,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Susunan seminggu" subtitle="Combining running, calisthenics, and recovery" />
+      <SectionTitle icon={<IconTimer />} title="How a week is arranged" subtitle="Combining running, calisthenics, and recovery" />
 
       <div className="flex gap-2 mt-3">
         {([3, 4, 5] as const).map((n) => (
@@ -368,7 +368,7 @@ function ScheduleTab() {
 
       <p className="text-sm text-neutral-500 mt-4 leading-relaxed">
         Susunan ini menyisakan minimal dua hari pemulihan. Bila jam tidur sedang kacau karena jaga malam,
-        <strong className="text-ink"> kurangi jumlah sesi alih-alih memaksakan semuanya</strong> — berlatih dengan
+        <strong className="text-ink"> cut the number of sessions rather than forcing them all in</strong> — berlatih dengan
         kurang tidur memberi hasil yang lebih buruk daripada berlatih lebih sedikit dengan tidur cukup.
       </p>
     </Card>
@@ -381,8 +381,8 @@ function ScheduleTab() {
 // yang dituju, sehingga daftar gerakan tanpa aturannya justru menyesatkan.
 
 const WILAYAH_LABEL: Record<Wilayah, string> = {
-  atas: 'Tubuh atas',
-  inti: 'Panggul & batang tubuh',
+  atas: 'Upper body',
+  inti: 'Hips & trunk',
   bawah: 'Tungkai',
 }
 
@@ -400,13 +400,13 @@ function StretchTab() {
       <Card>
         <SectionTitle icon={<IconActivity />} title="Four things that decide whether stretching works or is wasted" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
-          Kesalahan tersering bukan pada memilih gerakan, melainkan pada
-          <strong className="text-ink"> kapan</strong>,
-          <strong className="text-ink"> seberapa lama</strong>, dan
-          <strong className="text-ink"> seberapa kuat</strong> — ditambah satu hal yang hampir tidak pernah
-          disampaikan: <strong className="text-ink">otot yang terasa kencang belum tentu otot yang memendek</strong>.
-          Otot yang lemah dan tertarik memanjang menimbulkan rasa kencang yang sama persis, dan meregangkannya lebih
-          jauh justru memperburuk keadaan.
+          The most common mistake is not the choice of movement but
+          <strong className="text-ink"> when</strong>,
+          <strong className="text-ink"> how long</strong>, and
+          <strong className="text-ink"> how hard</strong> — plus one thing that is almost never
+          said: <strong className="text-ink">a muscle that feels tight is not necessarily a short one</strong>.
+          A weak muscle held lengthened produces exactly the same sensation, and stretching it further
+          makes matters worse.
         </p>
         <div className="space-y-3 mt-3">
           {STRETCH_RULES.map((r) => (
@@ -421,7 +421,7 @@ function StretchTab() {
       <DoseCalculator />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Rutin siap pakai" subtitle="Four different moments call for different kinds of stretching" />
+        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Four different moments call for different kinds of stretching" />
         <div className="space-y-3 mt-2">
           {ROUTINES.map((r) => (
             <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -448,7 +448,7 @@ function StretchTab() {
         <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Position, where it should be felt, and the most common mistake" />
 
         <div className="flex flex-wrap gap-2 mt-3">
-          {([['semua', 'Semua'], ['atas', 'Tubuh atas'], ['inti', 'Panggul & batang tubuh'], ['bawah', 'Tungkai']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
+          {([['semua', 'All'], ['atas', 'Upper body'], ['inti', 'Hips & trunk'], ['bawah', 'Legs']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
             <button
               key={k}
               onClick={() => setWilayah(k)}
@@ -479,9 +479,9 @@ function StretchTab() {
                 {terbuka && (
                   <div className="px-3 pb-3 space-y-3">
                     <div className="rounded-lg bg-white/[0.03] border border-white/10 p-3">
-                      <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Kenapa memendek</div>
+                      <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">Why it shortens</div>
                       <p className="text-sm text-neutral-600 mt-1 leading-relaxed">{g.kenapaTegang}</p>
-                      <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-3">Akibatnya</div>
+                      <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-3">What it leads to</div>
                       <p className="text-sm text-neutral-500 mt-1 leading-relaxed">{g.akibat}</p>
                     </div>
 
@@ -503,18 +503,18 @@ function StretchTab() {
                         </ol>
 
                         <div className="mt-2 rounded-md bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1.5">
-                          <span className="text-xs text-emerald-700/80">Seharusnya terasa di: </span>
+                          <span className="text-xs text-emerald-700/80">Should be felt in: </span>
                           <span className="text-sm text-emerald-200">{st.terasaDi}</span>
                         </div>
 
                         <div className="mt-1.5 rounded-md bg-amber-500/10 border border-amber-500/25 px-2.5 py-1.5">
-                          <span className="text-xs text-amber-700/80">Kesalahan tersering: </span>
+                          <span className="text-xs text-amber-700/80">Most common mistake: </span>
                           <span className="text-sm text-amber-100/90">{st.salah}</span>
                         </div>
 
                         {st.hatiHati && (
                           <div className="mt-1.5 rounded-md bg-rose-500/10 border border-rose-500/25 px-2.5 py-1.5">
-                            <span className="text-xs text-rose-600/80">Hati-hati: </span>
+                            <span className="text-xs text-rose-600/80">Take care: </span>
                             <span className="text-sm text-rose-100/90">{st.hatiHati}</span>
                           </div>
                         )}
@@ -572,23 +572,23 @@ function DoseCalculator() {
       />
 
       <div className="grid grid-cols-3 gap-3 mt-3">
-        <Field label="Tahan (detik)">
+        <Field label="Hold (seconds)">
           <input className={inputClass} value={hold} onChange={(e) => setHold(e.target.value)} inputMode="numeric" />
         </Field>
-        <Field label="Ulangan">
+        <Field label="Reps">
           <input className={inputClass} value={reps} onChange={(e) => setReps(e.target.value)} inputMode="numeric" />
         </Field>
-        <Field label="Sessions/minggu">
+        <Field label="Sessions per week">
           <input className={inputClass} value={sesi} onChange={(e) => setSessions(e.target.value)} inputMode="numeric" />
         </Field>
       </div>
 
       {hasil == null ? (
-        <p className="text-sm text-slate-500 mt-3">Isi ketiga kolom dengan angka lebih dari nol.</p>
+        <p className="text-sm text-slate-500 mt-3">Fill all three fields with a number above zero.</p>
       ) : (
         <div className="mt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm text-neutral-500">Per otot per minggu</span>
+            <span className="text-sm text-neutral-500">Per muscle per week</span>
             <span className={`text-lg font-semibold ${hasil.cukup ? 'text-emerald-300' : 'text-amber-300'}`}>
               {fmtDur(hasil.perMingguDetik)}
             </span>
