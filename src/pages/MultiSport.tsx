@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconRun, IconActivity, IconHeart, IconTimer, IconChartUp } from '../components/icons'
 import {
@@ -242,11 +243,7 @@ function BikeTab() {
       <Card>
         <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
           <div className="text-sm font-semibold text-rose-300">Cycling needs a counterweight — swimming does not</div>
-          <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-            Cycling holds the back rounded with the neck extended for hours — precisely the posture pattern you
-            are trying to correct. Without a counterweight, the more you ride the stronger that pattern
-            tertanam.
-          </p>
+          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Cycling holds the back rounded with the neck extended for hours — precisely the posture pattern you are trying to correct. Without a counterweight, the more you ride the stronger that pattern tertanam.</Prosa>
         </div>
         <div className="space-y-2 mt-3">
           {CYCLING_COUNTER.map((c) => (
@@ -334,11 +331,7 @@ function SwimTab() {
         </div>
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mt-3">
           <div className="text-sm font-semibold text-amber-300">One thing to watch</div>
-          <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
-            Shoulder pain in swimmers almost always comes from volume rising too fast and from the hand crossing
-            the body’s midline on entry. If the shoulder starts to hurt, what needs fixing
-            lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.
-          </p>
+          <Prosa kelas="text-sm text-neutral-600 mt-1 leading-relaxed">Shoulder pain in swimmers almost always comes from volume rising too fast and from the hand crossing the body’s midline on entry. If the shoulder starts to hurt, what needs fixing lebih dahulu adalah teknik dan jarak tempuh — bukan menambah latihan bahu.</Prosa>
         </div>
       </Card>
     </div>

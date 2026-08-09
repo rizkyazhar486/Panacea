@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Button, inputClass } from '../components/ui'
 import { KolomAngka } from '../components/KolomAngka'
 import { IconShield } from '../components/icons'
@@ -129,17 +130,8 @@ export function TinjauConnect() {
                     </a>
                   )
                 })}
-                <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
-                  Match the face in the selfie against the photo on their social account. Look at
-                  the posting history and join date too — an account created yesterday proves
-                  nothing.
-                </p>
-                <p className="mt-1 text-[10px] leading-relaxed text-amber-700/80">
-                  Phone number tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi
-                  nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama
-                  tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda
-                  di halaman ini.
-                </p>
+                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-slate-500">Match the face in the selfie against the photo on their social account. Look at the posting history and join date too — an account created yesterday proves nothing.</Prosa>
+                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-amber-700/80">Phone number tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda di halaman ini.</Prosa>
               </div>
 
               <input className={`${inputClass} mt-2`} placeholder="Reason if rejected (shown to the user)"

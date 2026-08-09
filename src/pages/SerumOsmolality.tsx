@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 
@@ -91,11 +92,7 @@ export function SerumOsmolality() {
           </div>
         </div>
         {gap != null && gap > 10 && (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            Elevated osmolal gap — in the right clinical context (altered mental status, unexplained
-            metabolic acidosis), consider toxic alcohol ingestion and send specific levels; treatment
-            (fomepizole) should not wait for confirmation if suspicion is high.
-          </p>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Elevated osmolal gap — in the right clinical context (altered mental status, unexplained metabolic acidosis), consider toxic alcohol ingestion and send specific levels; treatment (fomepizole) should not wait for confirmation if suspicion is high.</Prosa>
         )}
       </Card>
 

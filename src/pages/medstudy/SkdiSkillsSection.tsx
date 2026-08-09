@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconActivity } from '../../components/icons'
 import { SKDI_SKILLS, SKILL_SYSTEMS, type SkillSystem } from '../../lib/skdiSkillsChecklist'
@@ -30,10 +31,7 @@ export default function SkdiSkillsSection() {
     <div className="space-y-4">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="SKDI Skills Checklist" subtitle="Official competency level (1-4) for every clinical skill, per Konsil Kedokteran Indonesia 2019" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          4A/4 = must be able to do it independently by graduation. 3A/3B = under supervision
-          (3B = emergency setting). 2 = only need to have observed it. 1 = theory only.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">4A/4 = must be able to do it independently by graduation. 3A/3B = under supervision (3B = emergency setting). 2 = only need to have observed it. 1 = theory only.</Prosa>
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           placeholder="Cari skill (mis. Leopold, kaku kuduk, Phalen)…"

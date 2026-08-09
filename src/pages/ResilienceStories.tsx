@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -143,13 +144,7 @@ export function ResilienceStories() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Resilience Stories" subtitle="Real people, real hardship, real comebacks" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          A curated collection of well-documented doctors, scientists, athletes, innovators, leaders,
-          Nobel laureates, and revered spiritual figures who faced serious adversity — illness, injury,
-          poverty, rejection, loss, persecution — and kept going. Curated for accuracy over quantity:
-          each story is a verifiable public fact pattern (or, for faith figures, each tradition's own
-          well-known account), not padding.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A curated collection of well-documented doctors, scientists, athletes, innovators, leaders, Nobel laureates, and revered spiritual figures who faced serious adversity — illness, injury, poverty, rejection, loss, persecution — and kept going. Curated for accuracy over quantity: each story is a verifiable public fact pattern (or, for faith figures, each tradition's own well-known account), not padding.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
             <button key={c} onClick={() => setCat(c)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${cat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{c}</button>

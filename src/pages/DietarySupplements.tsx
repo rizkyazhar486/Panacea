@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconShield, IconChartUp, IconHeart } from '../components/icons'
 
@@ -445,12 +446,7 @@ export function DietarySupplements() {
           title="Dietary Supplements for Exercise & Athletic Performance"
           subtitle="An evidence-review reference, structured like the NIH Office of Dietary Supplements fact sheet"
         />
-        <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Athletes and active people use a huge range of products to try to improve performance, recovery, and physique — from
-          well-studied nutrients to prescription hormones and unapproved research chemicals. This page reviews what these
-          substances actually are, what the evidence does and doesn't show, and their real safety and legal status. The goal is
-          informed, honest harm reduction.
-        </p>
+        <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Athletes and active people use a huge range of products to try to improve performance, recovery, and physique — from well-studied nutrients to prescription hormones and unapproved research chemicals. This page reviews what these substances actually are, what the evidence does and doesn't show, and their real safety and legal status. The goal is informed, honest harm reduction.</Prosa>
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
           <b>Important:</b> This is education, not a how-to guide. It intentionally provides <b>no doses, cycles, or protocols</b> for
           steroids, SARMs, research peptides, or banned agents. Prescription medicines belong under the care of a licensed clinician;

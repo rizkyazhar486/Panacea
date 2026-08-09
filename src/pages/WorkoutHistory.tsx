@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
@@ -225,10 +226,7 @@ export function WorkoutHistory() {
       </Card>
 
       <Card>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          Data tersimpan di perangkat ini saja. Mengimpor berkas baru menambah sesi, bukan menggantinya,
-          sehingga riwayat lama tetap utuh meskipun Anda hanya mengekspor tujuh hari terakhir.
-        </p>
+        <Prosa kelas="text-xs text-slate-500 leading-relaxed">Data tersimpan di perangkat ini saja. Mengimpor berkas baru menambah sesi, bukan menggantinya, sehingga riwayat lama tetap utuh meskipun Anda hanya mengekspor tujuh hari terakhir.</Prosa>
         <button
           onClick={() => { if (confirm('Hapus seluruh riwayat latihan yang tersimpan di perangkat ini?')) clearWorkouts() }}
           className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-neutral-500"

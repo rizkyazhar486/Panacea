@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -55,10 +56,7 @@ export function DukeCriteria() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Modified Duke Criteria" subtitle="Infective endocarditis diagnosis (Durack 1994, modified Li 2000)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Definite (clinical) = 2 major, 1 major + 3 minor, or 5 minor. Possible = 1 major + 1 minor,
-          or 3 minor. Pathologic confirmation is independently definitive.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Definite (clinical) = 2 major, 1 major + 3 minor, or 5 minor. Possible = 1 major + 1 minor, or 3 minor. Pathologic confirmation is independently definitive.</Prosa>
         <label className="mt-3 flex items-center gap-2.5 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-ink dark:bg-white/5 dark:text-white">
           <input type="checkbox" className="h-4 w-4 rounded" checked={pathologic} onChange={(e) => setPathologic(e.target.checked)} />
           Pathologic criterion met (histology or culture of vegetation/abscess positive)

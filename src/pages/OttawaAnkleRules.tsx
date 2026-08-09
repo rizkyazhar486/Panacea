@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 
@@ -73,11 +74,7 @@ export function OttawaAnkleRules() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Ottawa Ankle Rules" subtitle="Decision rule for whether an ankle/foot X-ray is needed" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          One of the most validated clinical decision rules in emergency medicine — high sensitivity for
-          clinically significant fractures, used to reduce unnecessary X-rays after an acute ankle/foot
-          injury. Applies to malleolar-zone and midfoot-zone pain, evaluated separately.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">One of the most validated clinical decision rules in emergency medicine — high sensitivity for clinically significant fractures, used to reduce unnecessary X-rays after an acute ankle/foot injury. Applies to malleolar-zone and midfoot-zone pain, evaluated separately.</Prosa>
       </Card>
 
       <Zone title="Malleolar zone (ankle)" painPresent={anklePain} setPain={setAnklePain} items={ANKLE_ITEMS} checked={ankleChecked} setChecked={setAnkleChecked} />

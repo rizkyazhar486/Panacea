@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -56,10 +57,7 @@ export function WellsScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Wells Score" subtitle="Venous thromboembolism risk — DVT and PE, combined with D-dimer" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Two related, widely used clinical decision rules used alongside D-dimer testing to decide
-          whether imaging (ultrasound for DVT, CT pulmonary angiogram for PE) is needed.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Two related, widely used clinical decision rules used alongside D-dimer testing to decide whether imaging (ultrasound for DVT, CT pulmonary angiogram for PE) is needed.</Prosa>
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('dvt')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'dvt' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>DVT (leg)</button>
           <button onClick={() => setTab('pe')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'pe' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>PE (lung)</button>

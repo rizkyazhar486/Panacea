@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 
@@ -181,11 +182,7 @@ export function LongevityCurriculum() {
         })}
       </div>
 
-      <p className="text-center text-[10px] leading-relaxed text-neutral-500">
-        The citations on this page are landmark references underlying each topic — verify details (DOI, volume, latest edition)
-        directly on PubMed/publisher sites for formal academic use. This material is compiled for clinician/educational
-        institution orientation, not as a substitute for a systematic literature review or official specialty guidelines.
-      </p>
+      <Prosa kelas="text-center text-[10px] leading-relaxed text-neutral-500">The citations on this page are landmark references underlying each topic — verify details (DOI, volume, latest edition) directly on PubMed/publisher sites for formal academic use. This material is compiled for clinician/educational institution orientation, not as a substitute for a systematic literature review or official specialty guidelines.</Prosa>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -96,11 +97,7 @@ export function VisitPrepChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Doctor-Visit Prep Checklist" subtitle="What to bring and what to ask, before you walk in" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Consultations go better when you walk in prepared — this turns your reason for visiting into
-          a concrete checklist and a set of questions worth asking, so you don't remember them in the
-          car on the way home.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Consultations go better when you walk in prepared — this turns your reason for visiting into a concrete checklist and a set of questions worth asking, so you don't remember them in the car on the way home.</Prosa>
         <Field label="What's this visit about?">
           <select className={`${inputClass} mt-1`} value={type} onChange={(e) => setType(e.target.value as VisitType)}>
             {VISIT_TYPES.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}

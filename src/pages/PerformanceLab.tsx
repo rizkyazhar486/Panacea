@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconGauge, IconHeart, IconRun, IconTimer, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
@@ -252,7 +253,7 @@ function MetabolicMapCard() {
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-ink/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</Prosa>
     </div>
   )
 }
@@ -643,7 +644,7 @@ function TssCard() {
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">Intensity Factor</div><div className="text-base font-extrabold text-brand-dark">{ifactor.toFixed(2)}</div></div>
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[9px] font-bold uppercase text-neutral-500">TSS</div><div className="text-base font-extrabold text-brand-dark">{tss.toFixed(0)}</div></div>
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">TSS = (duration × NP × IF)/(FTP × 3600) × 100. 100 TSS ≈ 1 hour all-out at FTP. &gt;150/session = heavy load, needs extra recovery.</p>
+      <Prosa kelas="mt-1.5 text-[10px] leading-relaxed text-neutral-500">TSS = (duration × NP × IF)/(FTP × 3600) × 100. 100 TSS ≈ 1 hour all-out at FTP. &gt;150/session = heavy load, needs extra recovery.</Prosa>
     </div>
   )
 }

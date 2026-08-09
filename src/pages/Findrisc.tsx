@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -51,11 +52,7 @@ export function Findrisc() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Diabetes Risk (FINDRISC)" subtitle="10-year type-2 diabetes risk — no blood test needed (Lindström & Tuomilehto 2003)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Eight quick questions estimate your risk of developing type 2 diabetes over the next 10
-          years. It needs no lab work, which makes it a powerful early-prevention screen — most of the
-          risk it flags is modifiable.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Eight quick questions estimate your risk of developing type 2 diabetes over the next 10 years. It needs no lab work, which makes it a powerful early-prevention screen — most of the risk it flags is modifiable.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
             <input className={inputClass} type="number" value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
@@ -104,11 +101,7 @@ export function Findrisc() {
         </div>
         <p className="mt-2 text-[12px] text-neutral-500">{result.risk}.</p>
         {score >= 12 && (
-          <p className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            A score ≥12 is worth acting on — ask your clinician about a fasting glucose or HbA1c, and
-            the biggest levers are weight loss, daily movement, and cutting refined carbs (the Finnish
-            &amp; DPP trials cut progression to diabetes by ~58% with lifestyle change).
-          </p>
+          <Prosa kelas="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">A score ≥12 is worth acting on — ask your clinician about a fasting glucose or HbA1c, and the biggest levers are weight loss, daily movement, and cutting refined carbs (the Finnish &amp; DPP trials cut progression to diabetes by ~58% with lifestyle change).</Prosa>
         )}
         <CopyNote text={`FINDRISC ${score}/26 — ${result.label.toLowerCase()} 10-year type-2 diabetes risk (${result.risk}) [Lindström & Tuomilehto 2003]`} />
       </Card>

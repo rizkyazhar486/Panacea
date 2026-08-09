@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { JamWod } from '../components/JamWod'
@@ -238,13 +239,7 @@ export function CrossFit() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-          "The Girls" dan "Hero WOD" adalah benchmark bernama milik CrossFit Inc. yang sudah lama
-          beredar umum; yang dimuat di sini hanya daftar gerakan dan repetisinya. Hero WOD dinamai
-          dari anggota militer dan petugas penyelamat yang gugur — asal namanya disebutkan karena
-          memang pantas diketahui. Halaman ini bersifat edukatif dan bukan pengganti penilaian
-          pelatih atau dokter.
-        </p>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">"The Girls" dan "Hero WOD" adalah benchmark bernama milik CrossFit Inc. yang sudah lama beredar umum; yang dimuat di sini hanya daftar gerakan dan repetisinya. Hero WOD dinamai dari anggota militer dan petugas penyelamat yang gugur — asal namanya disebutkan karena memang pantas diketahui. Halaman ini bersifat edukatif dan bukan pengganti penilaian pelatih atau dokter.</Prosa>
       </Card>
     </div>
   )

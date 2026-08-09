@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 import {
@@ -66,10 +67,7 @@ export function Peregangan() {
           before training is <b>dynamic</b> work: movement that takes the joints through their range,
           repeatedly.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Static stretching still has its place — after training, or as its own session to build
-          range of motion. It is only the timing that has been wrong all along.
-        </p>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Static stretching still has its place — after training, or as its own session to build range of motion. It is only the timing that has been wrong all along.</Prosa>
       </Card>
 
       {/* Protokol siap pakai */}
@@ -226,11 +224,7 @@ export function Peregangan() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-          Demonstration clips are AI-generated illustrations of the movement, not footage of an
-          instructor. If any movement brings sharp pain, tingling or numbness, stop and get it
-          looked at — that points to a nerve, not a muscle.
-        </p>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Demonstration clips are AI-generated illustrations of the movement, not footage of an instructor. If any movement brings sharp pain, tingling or numbness, stop and get it looked at — that points to a nerve, not a muscle.</Prosa>
       </Card>
     </div>
   )

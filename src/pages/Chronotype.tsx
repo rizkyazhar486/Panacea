@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconMoon } from '../components/icons'
 
@@ -82,11 +83,7 @@ export function Chronotype() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Chronotype Quiz" subtitle="Reduced Morningness-Eveningness Questionnaire (rMEQ)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          A validated 5-item short form (Adan &amp; Almirall, 1991) of the classic Horne &amp; Östberg
-          questionnaire, used in chronobiology research to classify a person's natural circadian
-          preference. Answer based on how you'd naturally feel — not your current schedule.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A validated 5-item short form (Adan &amp; Almirall, 1991) of the classic Horne &amp; Östberg questionnaire, used in chronobiology research to classify a person's natural circadian preference. Answer based on how you'd naturally feel — not your current schedule.</Prosa>
       </Card>
 
       {QUESTIONS.map((q, qi) => (
@@ -120,13 +117,7 @@ export function Chronotype() {
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
             </div>
           </div>
-          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-            Chronotype is a real, measurable trait linked to differences in core body temperature rhythm
-            and melatonin timing — it's not just a habit. It can inform when to schedule demanding tasks,
-            exercise, and — for a clinician — the timing of some medications (chronotherapy) and sleep
-            hygiene advice. It's a trait tendency, not a fixed diagnosis, and can shift somewhat with age
-            (adolescents skew later; older adults skew earlier).
-          </p>
+          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Chronotype is a real, measurable trait linked to differences in core body temperature rhythm and melatonin timing — it's not just a habit. It can inform when to schedule demanding tasks, exercise, and — for a clinician — the timing of some medications (chronotherapy) and sleep hygiene advice. It's a trait tendency, not a fixed diagnosis, and can shift somewhat with age (adolescents skew later; older adults skew earlier).</Prosa>
         </Card>
       )}
 

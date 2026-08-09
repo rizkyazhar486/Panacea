@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getHealthCache, hasHealth } from '../lib/profile'
@@ -123,10 +124,7 @@ export function HydrationCalculator() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-500">
-          Includes water from all beverages and food (roughly 20% of intake typically comes from food).
-          Spread intake across the day rather than drinking it all at once.
-        </p>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Includes water from all beverages and food (roughly 20% of intake typically comes from food). Spread intake across the day rather than drinking it all at once.</Prosa>
       </Card>
     </div>
   )

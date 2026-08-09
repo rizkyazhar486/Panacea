@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
@@ -318,11 +319,7 @@ export function HeartRateLog() {
       )}
 
       <Card>
-        <p className="text-xs leading-relaxed text-slate-500">
-          Sampel yang sama dikirim berulang kali oleh otomatisasi disaring berdasarkan waktunya, jadi
-          menjalankan sinkronisasi lebih sering tidak menggandakan data. Log dibatasi supaya tidak tumbuh
-          tanpa batas; yang tersimpan adalah bagian terbaru.
-        </p>
+        <Prosa kelas="text-xs leading-relaxed text-slate-500">Sampel yang sama dikirim berulang kali oleh otomatisasi disaring berdasarkan waktunya, jadi menjalankan sinkronisasi lebih sering tidak menggandakan data. Log dibatasi supaya tidak tumbuh tanpa batas; yang tersimpan adalah bagian terbaru.</Prosa>
       </Card>
     </div>
   )

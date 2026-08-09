@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -59,11 +60,7 @@ export function PediatricDkaCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Pediatric DKA Fluid & Insulin Calculator" subtitle="Resuscitation, rehydration, maintenance, potassium & insulin — standard pediatric DKA protocol" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Reproduces the standard bedside pediatric DKA fluid worksheet: bolus (if shock) → 48h deficit +
-          maintenance fluid → per-hour rate → potassium band → insulin infusion rate. A calculation aid
-          only — always confirm against your institution's protocol.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Reproduces the standard bedside pediatric DKA fluid worksheet: bolus (if shock) → 48h deficit + maintenance fluid → per-hour rate → potassium band → insulin infusion rate. A calculation aid only — always confirm against your institution's protocol.</Prosa>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <Field label="Weight (kg)">

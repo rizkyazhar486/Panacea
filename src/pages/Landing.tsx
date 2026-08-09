@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Prosa } from '../components/Prosa'
 import { api, backendEnabled, type Health } from '../lib/api'
 import { Wordmark } from '../components/Logo'
 import { Reveal, CountUp } from '../components/Reveal'
@@ -401,10 +402,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal className="text-center">
             <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">A Legacy Thousands of Years Old</span>
             <h2 className="mt-3 text-3xl font-extrabold sm:text-4xl">A History of <span className="font-serif-display italic text-brand-dark">Longevity</span> &amp; Health</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
-              From pharaohs, prophets, the Greco-Roman world, and Chinese dynasties, to the Mongol empire —
-              the pursuit of a long, healthy life is as old as civilization itself. Panaceamed.id carries it forward with science &amp; AI.
-            </p>
+            <Prosa kelas="mx-auto mt-3 max-w-2xl text-neutral-600">From pharaohs, prophets, the Greco-Roman world, and Chinese dynasties, to the Mongol empire — the pursuit of a long, healthy life is as old as civilization itself. Panaceamed.id carries it forward with science &amp; AI.</Prosa>
           </Reveal>
 
           {/* Self-hosted Remotion animated timeline (code-based, free) */}
@@ -507,9 +505,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <Reveal className="mt-12 text-center">
             <span className="rounded-full bg-brand-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-dark">Machine Precision</span>
             <h3 className="mt-3 text-2xl font-extrabold">Robotics in <span className="font-serif-display italic text-brand-dark">Medicine</span></h3>
-            <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
-              From precision surgical arms to nanorobots in the bloodstream — machines extend the reach of doctors, making care safer, less invasive, &amp; more affordable.
-            </p>
+            <Prosa kelas="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">From precision surgical arms to nanorobots in the bloodstream — machines extend the reach of doctors, making care safer, less invasive, &amp; more affordable.</Prosa>
           </Reveal>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {ROBOTICS.map((r, i) => (
@@ -544,12 +540,7 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           <div className="mx-auto grid max-w-5xl gap-6 rounded-[2rem] border border-black/5 bg-white p-8 shadow-sm lg:grid-cols-3">
             <div>
               <h2 className="text-2xl font-extrabold">About Us</h2>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-600">
-                Panaceamed.id is Indonesia's health & longevity super-app: AI handles the intake & education,
-                licensed doctors verify. Our mission is to make quality healthcare access, chronic disease
-                monitoring, and leading-edge longevity science affordable for everyone — backed by responsible
-                artificial intelligence and PDP Law compliance.
-              </p>
+              <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600">Panaceamed.id is Indonesia's health & longevity super-app: AI handles the intake & education, licensed doctors verify. Our mission is to make quality healthcare access, chronic disease monitoring, and leading-edge longevity science affordable for everyone — backed by responsible artificial intelligence and PDP Law compliance.</Prosa>
             </div>
             <div className="rounded-2xl bg-brand-50 p-5">
               <h3 className="font-bold">Contact Us</h3>

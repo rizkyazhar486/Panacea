@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
@@ -150,11 +151,7 @@ export function Adzan() {
               )
             })}
           </div>
-          <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-            Methods differ by a few minutes for the same city, and that difference is a scholarly
-            choice rather than an error. Your local mosque&rsquo;s timetable is the authority here —
-            this page is a reminder, not a replacement.
-          </p>
+          <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Methods differ by a few minutes for the same city, and that difference is a scholarly choice rather than an error. Your local mosque&rsquo;s timetable is the authority here — this page is a reminder, not a replacement.</Prosa>
         </Card>
       )}
 
@@ -215,12 +212,7 @@ export function Adzan() {
 
             <div>
               <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Sound</div>
-              <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
-                No adhan recording ships with this app. Nearly every adhan recording in circulation
-                is a particular muezzin&rsquo;s work with unclear rights, and quietly redistributing
-                that is not something to do with an act of worship. A soft generated chime is used
-                instead — and if you hold your own copy, point to it here.
-              </p>
+              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">No adhan recording ships with this app. Nearly every adhan recording in circulation is a particular muezzin&rsquo;s work with unclear rights, and quietly redistributing that is not something to do with an act of worship. A soft generated chime is used instead — and if you hold your own copy, point to it here.</Prosa>
               <div className="mt-2 flex gap-2">
                 <Button onClick={() => bunyikanNada()}>Preview chime</Button>
                 {setelan.suaraUrl && (
@@ -256,10 +248,7 @@ export function Adzan() {
             Use this city
           </Button>
         </div>
-        <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">
-          A city name is used rather than your GPS location. Precise coordinates are not needed to
-          compute prayer times to the minute, and not collecting them is the safer default.
-        </p>
+        <Prosa kelas="mt-1.5 text-[10px] leading-relaxed text-neutral-500">A city name is used rather than your GPS location. Precise coordinates are not needed to compute prayer times to the minute, and not collecting them is the safer default.</Prosa>
 
         <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">Calculation method</div>
         <div className="mt-1.5 space-y-1">

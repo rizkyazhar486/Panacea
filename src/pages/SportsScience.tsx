@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp } from '../components/icons'
 import { useStore } from '../lib/store'
@@ -313,7 +314,7 @@ export function SportsScience() {
           <ul className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-neutral-500">
             {REFERENCES.map((r) => <li key={r}>• {r}</li>)}
           </ul>
-          <p className="mt-2 text-[10px] text-neutral-500">Device indicator source: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (official Garmin manual). The citations above are landmark references underlying the concepts on this page — verify details (volume, edition year, DOI) directly on PubMed/publisher sites for formal academic purposes.</p>
+          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Device indicator source: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (official Garmin manual). The citations above are landmark references underlying the concepts on this page — verify details (volume, edition year, DOI) directly on PubMed/publisher sites for formal academic purposes.</Prosa>
         </div>
       </Card>
     </div>

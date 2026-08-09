@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -29,11 +30,7 @@ export function MaddreyScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Maddrey's Discriminant Function" subtitle="Severe alcoholic hepatitis — the corticosteroid decision (Maddrey et al. 1978)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          The classic bedside trigger for considering corticosteroid therapy in alcoholic hepatitis —
-          a distinct clinical fork from MELD-Na or Child-Pugh. Uses prothrombin time in seconds above
-          your lab's control value, exactly as originally validated.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The classic bedside trigger for considering corticosteroid therapy in alcoholic hepatitis — a distinct clinical fork from MELD-Na or Child-Pugh. Uses prothrombin time in seconds above your lab's control value, exactly as originally validated.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Total bilirubin (mg/dL)">
             <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin || ''} onChange={(e) => setBilirubin(Number(e.target.value) || 0)} />

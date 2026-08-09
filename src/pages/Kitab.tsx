@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Button } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
 import { IconShield } from '../components/icons'
@@ -171,11 +172,7 @@ export function Kitab() {
       {galat && (
         <Card className="!border-rose-500/30 !bg-rose-500/5">
           <p className="text-[12px] leading-relaxed text-rose-700">{galat}</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-neutral-600">
-            The text is deliberately not bundled with the app. Shipping our own copy would mean
-            shipping a version nobody verified — fetching it keeps the provider accountable for
-            the text and keeps us out of the business of reproducing it.
-          </p>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">The text is deliberately not bundled with the app. Shipping our own copy would mean shipping a version nobody verified — fetching it keeps the provider accountable for the text and keeps us out of the business of reproducing it.</Prosa>
         </Card>
       )}
 
@@ -232,10 +229,7 @@ export function Kitab() {
                 latin ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
               🔤 Latin transliteration
             </button>
-            <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-              A guide to pronunciation, not a translation and never a substitute for the Arabic.
-              It is fetched from the provider like everything else here.
-            </p>
+            <Prosa kelas="mt-1 text-[10px] leading-relaxed text-neutral-500">A guide to pronunciation, not a translation and never a substitute for the Arabic. It is fetched from the provider like everything else here.</Prosa>
 
             <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">Recitation</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -493,12 +487,7 @@ function Lain() {
   return (
     <>
       <Card className="!border-sky-500/30 !bg-sky-500/5">
-        <p className="text-[12px] leading-relaxed text-neutral-600">
-          Where a tradition has a source we can name and call, it reads here just like the Bible
-          and the Tanakh do — fetched, checked, and attributed. Where it does not, you get a
-          description and a pointer to a proper archive, and nothing is quoted from memory to fill
-          the gap. That refusal does not weaken because the tradition changed.
-        </p>
+        <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Where a tradition has a source we can name and call, it reads here just like the Bible and the Tanakh do — fetched, checked, and attributed. Where it does not, you get a description and a pointer to a proper archive, and nothing is quoted from memory to fill the gap. That refusal does not weaken because the tradition changed.</Prosa>
       </Card>
       {PENGANTAR.map((x) => <TradisiLain key={x.tradisi} x={x} />)}
       <Card>

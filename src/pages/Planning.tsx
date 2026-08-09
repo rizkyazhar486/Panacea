@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore, uid } from '../lib/store'
 import { Card, SectionTitle, Badge, Button, Field, inputClass } from '../components/ui'
@@ -159,10 +160,7 @@ export function Planning() {
             <IconPlus size={16} /> Add
           </Button>
         </div>
-        <p className="mt-3 text-xs text-neutral-500">
-          ⚕️ For high-alert medications (anticoagulants, insulin, opioids, vasopressors), AI only provides
-          a range & reference — the final dose is calculated and verified by the physician.
-        </p>
+        <Prosa kelas="mt-3 text-xs text-neutral-500">⚕️ For high-alert medications (anticoagulants, insulin, opioids, vasopressors), AI only provides a range & reference — the final dose is calculated and verified by the physician.</Prosa>
       </Card>
     </div>
   )

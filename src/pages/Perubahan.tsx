@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
 import { Ringkas, Poin } from '../components/Ringkas'
@@ -87,10 +88,7 @@ export function Perubahan() {
         ? <TinjauPekan pekan={jatuhTempo} onSimpan={(t) => setS((x) => ({ ...x, tinjauan: [...x.tinjauan, t] }))} />
         : (
           <Card>
-            <p className="text-[13px] leading-relaxed text-neutral-600">
-              No review due yet. Reviews open once a week has finished — reviewing a week while you
-              are still inside it measures your mood, not the week.
-            </p>
+            <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">No review due yet. Reviews open once a week has finished — reviewing a week while you are still inside it measures your mood, not the week.</Prosa>
           </Card>
         )}
 
@@ -197,12 +195,7 @@ function Susun({
 
       {langkah === 0 && (
         <Card>
-          <p className="text-[13px] leading-relaxed text-neutral-600">
-            Reading does not change anything by itself — it mostly produces the feeling of having
-            changed. What follows is the smallest structure the evidence actually supports: one
-            goal, a named time, a version small enough to survive a bad week, and a review that is
-            allowed to conclude this is not working.
-          </p>
+          <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Reading does not change anything by itself — it mostly produces the feeling of having changed. What follows is the smallest structure the evidence actually supports: one goal, a named time, a version small enough to survive a bad week, and a review that is allowed to conclude this is not working.</Prosa>
           <div className="mt-3">
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Area</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -293,10 +286,7 @@ function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import(
           arah, halangan: halangan.trim(), penyesuaian: penyesuaian.trim(),
         })}>Save review</Button>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Answer with what happened, not what you intended. A log you edited to look better is a log
-        that can no longer tell you anything.
-      </p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Answer with what happened, not what you intended. A log you edited to look better is a log that can no longer tell you anything.</Prosa>
     </Card>
   )
 }

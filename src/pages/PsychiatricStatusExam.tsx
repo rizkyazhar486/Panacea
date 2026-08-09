@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -47,12 +48,7 @@ export function PsychiatricStatusExam() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Psychiatric Status Exam" subtitle="Structured Mental Status Exam (MSE) documentation" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Tap through the standard MSE domains to build a clean, EMR-ready summary line. A
-          documentation aid only — not a diagnostic or risk-stratification instrument; always use
-          your clinical judgment and a validated risk-assessment tool (e.g. C-SSRS) when suicide/self-harm
-          risk is a concern.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tap through the standard MSE domains to build a clean, EMR-ready summary line. A documentation aid only — not a diagnostic or risk-stratification instrument; always use your clinical judgment and a validated risk-assessment tool (e.g. C-SSRS) when suicide/self-harm risk is a concern.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-4">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -42,10 +43,7 @@ export function StrokeRiskCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="CHA₂DS₂-VASc Score" subtitle="Stroke risk in atrial fibrillation (Lip et al., 2010)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          The standard clinical tool for estimating annual stroke risk in patients with atrial
-          fibrillation and guiding the anticoagulation decision. Check every factor that applies.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The standard clinical tool for estimating annual stroke risk in patients with atrial fibrillation and guiding the anticoagulation decision. Check every factor that applies.</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -68,11 +66,7 @@ export function StrokeRiskCalculator() {
           <span className="text-3xl font-black text-brand-dark">{score}/9</span>
           <Badge tone={rec.tone}>{rec.label}</Badge>
         </div>
-        <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-          Higher scores correspond to progressively higher estimated annual stroke risk. This is
-          decision support — the final anticoagulation decision should weigh bleeding risk (e.g. via
-          HAS-BLED), patient preference, and drug interactions, in discussion with the treating physician.
-        </p>
+        <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Higher scores correspond to progressively higher estimated annual stroke risk. This is decision support — the final anticoagulation decision should weigh bleeding risk (e.g. via HAS-BLED), patient preference, and drug interactions, in discussion with the treating physician.</Prosa>
         <CopyNote text={`CHA2DS2-VASc ${score}/9 — ${rec.label} [Lip 2010]`} />
       </Card>
 

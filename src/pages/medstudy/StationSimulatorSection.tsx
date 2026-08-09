@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconStethoscope } from '../../components/icons'
 import { OSCE_STATION_RUBRICS } from '../../lib/osceStationRubrics'
@@ -15,11 +16,7 @@ export default function StationSimulatorSection() {
     <div className="space-y-4">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Station Simulator" subtitle="Official UKMPPD OSCE station templates — scenario, task, and the full examiner scoring rubric" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Read the scenario, mentally (or out loud) run through the tasks like a real OSCE station,
-          then tap "Reveal examiner findings" to check your anamnesis, exam findings, diagnosis, and
-          treatment against the official rubric.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Read the scenario, mentally (or out loud) run through the tasks like a real OSCE station, then tap "Reveal examiner findings" to check your anamnesis, exam findings, diagnosis, and treatment against the official rubric.</Prosa>
       </Card>
 
       <Card className="!p-4">

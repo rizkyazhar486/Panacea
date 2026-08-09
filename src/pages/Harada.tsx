@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { simpanTeks } from '../lib/unduh'
 import { Card, SectionTitle, Button, inputClass } from '../components/ui'
 import { IconSparkle, IconChartUp } from '../components/icons'
@@ -172,10 +173,7 @@ export function Harada() {
           kisinya, melainkan <b>paksaan mengisi 64 kotak</b>: jawaban malas habis sekitar kotak
           ke-20, dan sisanya memaksa Anda menyebut hal yang selama ini dihindari.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-          Isi bertahap. Tidak harus selesai hari ini — kisi yang jujur dan setengah terisi jauh
-          lebih berguna daripada 64 kotak yang diisi asal penuh.
-        </p>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Isi bertahap. Tidak harus selesai hari ini — kisi yang jujur dan setengah terisi jauh lebih berguna daripada 64 kotak yang diisi asal penuh.</Prosa>
       </Card>
 
       {/* Sasaran utama */}
@@ -338,10 +336,7 @@ export function Harada() {
             Kosongkan kisi
           </button>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-          Tersimpan di perangkat ini saja — tidak dikirim ke server dan tidak terlihat oleh siapa pun.
-          Unduh salinannya bila Anda ingin menyimpannya di luar aplikasi.
-        </p>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Tersimpan di perangkat ini saja — tidak dikirim ke server dan tidak terlihat oleh siapa pun. Unduh salinannya bila Anda ingin menyimpannya di luar aplikasi.</Prosa>
       </Card>
 
       <Card>

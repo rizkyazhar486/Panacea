@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari } from '../lib/tanggal'
 import { Card, SectionTitle, Button, Badge, SkeletonRows } from '../components/ui'
 import { IconHeart, IconUsers, IconHospital, IconShield } from '../components/icons'
@@ -195,7 +196,7 @@ function PeriodTracker() {
               )}
             </>
           )}
-          <p className="mt-2 text-[10px] text-neutral-500">Naegele's Rule: EDD = LMP + 280 days. The fetal size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar estimates alone.</p>
+          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Naegele's Rule: EDD = LMP + 280 days. The fetal size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar estimates alone.</Prosa>
         </div>
       )}
 
@@ -212,7 +213,7 @@ function PeriodTracker() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Cycle data is stored on this device. This is an education & planning tool — not a sole reliable contraceptive method (see "Calendar Method" above) nor a replacement for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Cycle data is stored on this device. This is an education & planning tool — not a sole reliable contraceptive method (see "Calendar Method" above) nor a replacement for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</Prosa>
     </Card>
   )
 }
@@ -321,7 +322,7 @@ export function SexualHealth() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-neutral-500">WHO/Indonesian Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek care immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</p>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">WHO/Indonesian Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek care immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</Prosa>
       </Card>
     </div>
   )

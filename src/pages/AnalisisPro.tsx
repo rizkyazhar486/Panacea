@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useJam } from '../lib/useJam'
 import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
@@ -95,10 +96,7 @@ export function AnalisisPro() {
       <div className="space-y-4 pb-24">
         <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Fitness, freshness, relative effort, records and targets" />
         <Card>
-          <p className="text-sm leading-relaxed text-neutral-600">
-            Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di
-            halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.
-          </p>
+          <Prosa kelas="text-sm leading-relaxed text-neutral-600">Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.</Prosa>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
             Sesi masuk sendiri lewat sinkronisasi bila di Health Auto Export ada otomatisasi
             <strong className="text-neutral-600"> Data Type: Workouts</strong> dengan
@@ -235,11 +233,7 @@ export function AnalisisPro() {
             )
           })}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-          Berbasis TRIMP Banister: satu menit berat membebani jauh lebih besar daripada satu menit
-          ringan. Skalanya tidak akan sama persis dengan angka Strava — rumus mereka tidak
-          diterbitkan — tetapi perbandingan antar sesi Anda sendiri tetap sahih.
-        </p>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-slate-500">Berbasis TRIMP Banister: satu menit berat membebani jauh lebih besar daripada satu menit ringan. Skalanya tidak akan sama persis dengan angka Strava — rumus mereka tidak diterbitkan — tetapi perbandingan antar sesi Anda sendiri tetap sahih.</Prosa>
       </Card>
 
       {/* ── Usaha terbaik ── */}

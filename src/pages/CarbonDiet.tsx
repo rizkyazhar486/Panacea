@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
 
@@ -135,10 +136,7 @@ export function CarbonDiet() {
                 </div>
               ))}
             </div>
-            <p className="mt-3 text-[11px] text-neutral-500">
-              As a rule of thumb from this same research: swapping red meat for poultry, fish, or plant
-              proteins a few times a week tends to have the single largest effect on this number for most diets.
-            </p>
+            <Prosa kelas="mt-3 text-[11px] text-neutral-500">As a rule of thumb from this same research: swapping red meat for poultry, fish, or plant proteins a few times a week tends to have the single largest effect on this number for most diets.</Prosa>
           </Card>
         </>
       )}

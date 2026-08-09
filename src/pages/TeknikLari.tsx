@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
 import { IconRun } from '../components/icons'
@@ -43,11 +44,7 @@ export function TeknikLari() {
           reduce injury risk, and often just moves it from the knee to the Achilles tendon and the
           bones of the foot.
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Each section below therefore carries its own evidence rating, and the list is ordered from
-          the best-supported down. If your time is limited, work on the green ones first and leave
-          the rest alone.
-        </p>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Each section below therefore carries its own evidence rating, and the list is ordered from the best-supported down. If your time is limited, work on the green ones first and leave the rest alone.</Prosa>
       </Card>
 
       {/* Teknik */}
@@ -180,11 +177,7 @@ export function TeknikLari() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-          Klip dan gambar dihasilkan AI sebagai acuan bentuk, bukan rekaman pelatih. Bila ada nyeri
-          yang berulang di tempat yang sama, itu urusan tenaga kesehatan — bukan urusan memperbaiki
-          teknik sendiri dari halaman web.
-        </p>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Klip dan gambar dihasilkan AI sebagai acuan bentuk, bukan rekaman pelatih. Bila ada nyeri yang berulang di tempat yang sama, itu urusan tenaga kesehatan — bukan urusan memperbaiki teknik sendiri dari halaman web.</Prosa>
       </Card>
     </div>
   )

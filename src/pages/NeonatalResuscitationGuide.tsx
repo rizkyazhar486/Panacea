@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 
@@ -68,11 +69,7 @@ export function NeonatalResuscitationGuide() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Neonatal Resuscitation (NRP) Guide" subtitle="The initial-steps algorithm & Golden Minute, as a study/drill aid" />
-        <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
-          Educational reference only, aligned to the standard AAP/ILCOR NRP initial-steps algorithm —
-          not a substitute for NRP certification, your institution's protocol, or real-time clinical
-          judgment during an actual resuscitation.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Educational reference only, aligned to the standard AAP/ILCOR NRP initial-steps algorithm — not a substitute for NRP certification, your institution's protocol, or real-time clinical judgment during an actual resuscitation.</Prosa>
       </Card>
 
       <GoldenMinuteTimer />

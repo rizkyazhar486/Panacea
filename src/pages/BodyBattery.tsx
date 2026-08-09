@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { Card, SectionTitle } from '../components/ui'
@@ -192,10 +193,7 @@ export function BodyBattery() {
                 <div className="h-full rounded-full" style={{ width: `${stres.skor}%`, background: stres.warna }} />
               </div>
               <p className="mt-3 text-sm leading-relaxed text-neutral-500">{stres.arti}</p>
-              <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-                Sampel dari sesi latihan dikeluarkan dari hitungan ini. Denyut tinggi saat berolahraga
-                bukan stres — bila ikut dihitung, hari dengan sesi terbaik justru akan terbaca paling buruk.
-              </p>
+              <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Sampel dari sesi latihan dikeluarkan dari hitungan ini. Denyut tinggi saat berolahraga bukan stres — bila ikut dihitung, hari dengan sesi terbaik justru akan terbaca paling buruk.</Prosa>
             </Card>
           )}
 
@@ -230,12 +228,7 @@ export function BodyBattery() {
                 <div className="font-black tabular-nums text-ink dark:text-ink">{hasil.hrMaks} bpm</div>
               </div>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-500">
-              Garmin menghitung Body Battery dari variabilitas denyut yang direkam terus-menerus.
-              Apple Watch tidak merekamnya seperti itu, jadi halaman ini memakai posisi denyut terhadap
-              cadangan denyut: mendekati istirahat mengisi, jauh di atasnya menguras, dan tidur mengisi
-              paling cepat. Arahnya sama, tetapi angkanya tidak akan persis sama dengan Garmin.
-            </p>
+            <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-500">Garmin menghitung Body Battery dari variabilitas denyut yang direkam terus-menerus. Apple Watch tidak merekamnya seperti itu, jadi halaman ini memakai posisi denyut terhadap cadangan denyut: mendekati istirahat mengisi, jauh di atasnya menguras, dan tidur mengisi paling cepat. Arahnya sama, tetapi angkanya tidak akan persis sama dengan Garmin.</Prosa>
           </Card>
 
           {hasil.catatan.length > 0 && (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { KartuDataPerangkat } from '../components/KartuDataPerangkat'
 import { useNavigate } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
@@ -98,7 +99,7 @@ function GcsCalc() {
           <p className="mt-1 text-[10px] text-neutral-500">GCS-P = GCS total − pupil score (0/1/2)</p>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</Prosa>
     </Card>
   )
 }
@@ -346,9 +347,7 @@ function WhoGrowthCalc() {
       {masked && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Possible masked stunting (masked malnutrition)</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
-            Height/age shows stunting (HAZ ≤ -2 SD), yet weight/age looks normal — this is misleading if weight/age is viewed alone, because weight is judged relative to chronological age, not against the child's growth trajectory, which is already compromised. Consider further nutritional evaluation even when weight/age looks fine.
-          </p>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Height/age shows stunting (HAZ ≤ -2 SD), yet weight/age looks normal — this is misleading if weight/age is viewed alone, because weight is judged relative to chronological age, not against the child's growth trajectory, which is already compromised. Consider further nutritional evaluation even when weight/age looks fine.</Prosa>
         </div>
       )}
 
@@ -365,9 +364,7 @@ function WhoGrowthCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        The curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for definitive clinical decisions, compare against the official WHO/KMS growth chart or Buku KIA per the Child Anthropometry Standard (Permenkes RI No. 2/2020).
-      </p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">The curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for definitive clinical decisions, compare against the official WHO/KMS growth chart or Buku KIA per the Child Anthropometry Standard (Permenkes RI No. 2/2020).</Prosa>
     </Card>
   )
 }
@@ -445,7 +442,7 @@ function WhoNeonateCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Physiologic loss of up to ~7-10% of birth weight in the first 3-5 days is normal (extravascular fluid loss), with return to birth weight around day 10-14. Estimate simplified from standard reference points — compare against official neonatal charts (WHO/Fenton) for borderline cases.</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Physiologic loss of up to ~7-10% of birth weight in the first 3-5 days is normal (extravascular fluid loss), with return to birth weight around day 10-14. Estimate simplified from standard reference points — compare against official neonatal charts (WHO/Fenton) for borderline cases.</Prosa>
     </Card>
   )
 }
@@ -521,7 +518,7 @@ function CdcAnthropometryCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the entire pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the entire pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</Prosa>
     </Card>
   )
 }
@@ -668,9 +665,7 @@ P (Plan):
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Gestational age estimate & Lubchenco classification are simplified from standard reference points — verify against official tables/charts for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.
-      </p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Gestational age estimate & Lubchenco classification are simplified from standard reference points — verify against official tables/charts for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.</Prosa>
     </Card>
   )
 }
@@ -733,7 +728,7 @@ function HollidaySegarCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL / hour (maintenance rate)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10kg: 100 mL/kg · second 10kg: +50 mL/kg · each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10kg: 100 mL/kg · second 10kg: +50 mL/kg · each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</Prosa>
     </Card>
   )
 }
@@ -767,7 +762,7 @@ function ParklandCalc() {
           <div className="text-[9px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</Prosa>
     </Card>
   )
 }
@@ -807,7 +802,7 @@ function NaegeleCalc() {
           </div>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Naegele's Rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound if possible — it is more accurate than LMP alone, especially with irregular cycles.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Naegele's Rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound if possible — it is more accurate than LMP alone, especially with irregular cycles.</Prosa>
     </Card>
   )
 }
@@ -1116,7 +1111,7 @@ function NaCorrectionCalc() {
           <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
         </div>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ 200-400 mEq total-body deficit (nonlinear relationship, affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hr peripherally (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ 200-400 mEq total-body deficit (nonlinear relationship, affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hr peripherally (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</Prosa>
     </Card>
   )
 }
@@ -1138,7 +1133,7 @@ function BrocaCalc() {
         <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approximation — for higher clinical precision needs (e.g. drug dosing), consider the Devine/Robinson formulas.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approximation — for higher clinical precision needs (e.g. drug dosing), consider the Devine/Robinson formulas.</Prosa>
     </Card>
   )
 }
@@ -1163,7 +1158,7 @@ function MidParentalCalc() {
         <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Father's height + Mother's height + 13) / 2. Female: (Father's height + Mother's height − 13) / 2. The ±8.5cm range covers ~90% of the genetic target — a child deviating far outside this range warrants endocrine/nutritional evaluation.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Father's height + Mother's height + 13) / 2. Female: (Father's height + Mother's height − 13) / 2. The ±8.5cm range covers ~90% of the genetic target — a child deviating far outside this range warrants endocrine/nutritional evaluation.</Prosa>
     </Card>
   )
 }
@@ -1367,7 +1362,7 @@ function McDonaldCalc() {
         <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's Rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks in a singleton pregnancy with normal fetal growth. A deviation &gt;3cm from the true gestational age (from LMP/ultrasound) warrants further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple gestation).</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's Rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks in a singleton pregnancy with normal fetal growth. A deviation &gt;3cm from the true gestational age (from LMP/ultrasound) warrants further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple gestation).</Prosa>
     </Card>
   )
 }
@@ -1393,7 +1388,7 @@ function ParadiseCalc() {
       </label>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with every episode well documented. This is one indication; the tonsillectomy decision remains individualized together with an ENT physician.</p>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with every episode well documented. This is one indication; the tonsillectomy decision remains individualized together with an ENT physician.</Prosa>
       </div>
     </Card>
   )
@@ -1451,10 +1446,7 @@ function NihssCalc() {
         <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
         <li>The score is one input to a thrombolysis decision, never the decision itself — onset time, imaging and contraindications govern.</li>
       </ul>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical
-        examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.
-      </p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.</Prosa>
     </Card>
   )
 }
@@ -1492,7 +1484,7 @@ function FluidBalanceCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total Output</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-500">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</p>
+      <Prosa kelas="mt-3 text-[10px] text-neutral-500">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</Prosa>
     </Card>
   )
 }
@@ -1522,7 +1514,7 @@ function PedsDoseCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mg/dose</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</Prosa>
     </Card>
   )
 }
@@ -1572,7 +1564,7 @@ function VbacCalc() {
           <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={total >= 7 ? 'normal' : total >= 4 ? 'low' : 'critical'}>Estimated success {successPct}</Badge>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">A higher score → higher predicted VBAC success. This prediction model is one decision-support tool — the trial of labor after cesarean (TOLAC) decision remains individualized together with an obstetrician, taking into account emergency cesarean facilities available.</p>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">A higher score → higher predicted VBAC success. This prediction model is one decision-support tool — the trial of labor after cesarean (TOLAC) decision remains individualized together with an obstetrician, taking into account emergency cesarean facilities available.</Prosa>
       </div>
     </Card>
   )
@@ -1680,10 +1672,10 @@ function DenverCalc() {
       {anyDelay && (
         <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Consider further developmental evaluation</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">There are milestones typically achieved well below the child's current age (≥6 months earlier) that have not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II evaluation or another standardized screening instrument (e.g. KPSP, M-CHAT if relevant).</p>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">There are milestones typically achieved well below the child's current age (≥6 months earlier) that have not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II evaluation or another standardized screening instrument (e.g. KPSP, M-CHAT if relevant).</Prosa>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</Prosa>
     </Card>
   )
 }
@@ -1797,7 +1789,7 @@ function AtlsCalc() {
         <p className="mt-2 text-[10px] text-neutral-500">{assessedCount}/{totalCount} items assessed.</p>
       </div>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</Prosa>
     </Card>
   )
 }
@@ -1892,7 +1884,7 @@ function AbgCalc() {
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</Prosa>
     </Card>
   )
 }
@@ -1994,7 +1986,7 @@ function BurnCalc() {
           <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
-          <p className="mt-1.5 text-[10px] text-neutral-500">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</p>
+          <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</Prosa>
         </div>
       ) : (
         <>
@@ -2003,7 +1995,7 @@ function BurnCalc() {
               <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
-              <p className="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</p>
+              <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</Prosa>
             </div>
           )}
           <div className="mt-3 flex gap-2">
@@ -2071,7 +2063,7 @@ function BurnCalc() {
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</Prosa>
     </Card>
   )
 }
@@ -2160,7 +2152,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
-      <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</p>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</Prosa>
     </Card>
   )
 }
@@ -2275,7 +2267,7 @@ function CompetencyTracker() {
         )
       })}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-500">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</p>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</Prosa>
     </Card>
   )
 }
@@ -2382,7 +2374,7 @@ function BrocaLorentzCalorieCalc() {
           <div className="text-[9px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</Prosa>
     </Card>
   )
 }
@@ -2416,7 +2408,7 @@ function IvDripCalc() {
           <div className="text-[9px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</Prosa>
     </Card>
   )
 }
@@ -2473,7 +2465,7 @@ function AriaCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</Prosa>
     </Card>
   )
 }
@@ -2530,7 +2522,7 @@ function AclsCalc() {
           ))}
         </ol>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</Prosa>
     </Card>
   )
 }

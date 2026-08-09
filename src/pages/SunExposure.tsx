@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSun } from '../components/icons'
 
@@ -130,14 +131,7 @@ export function SunExposure() {
               </div>
             </div>
 
-            <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-              Derived from the WMO UV Index definition and standard erythema-dose reference values for
-              your skin type — not a personalized prescription. Actual time varies with cloud cover,
-              altitude, reflective surfaces (snow/sand/water), sunscreen, medications that increase
-              photosensitivity, and how much skin is exposed. People with a history of skin cancer,
-              photosensitive conditions, or on photosensitizing medication should follow their
-              dermatologist's guidance instead of this estimate.
-            </p>
+            <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Derived from the WMO UV Index definition and standard erythema-dose reference values for your skin type — not a personalized prescription. Actual time varies with cloud cover, altitude, reflective surfaces (snow/sand/water), sunscreen, medications that increase photosensitivity, and how much skin is exposed. People with a history of skin cancer, photosensitive conditions, or on photosensitizing medication should follow their dermatologist's guidance instead of this estimate.</Prosa>
           </>
         )}
       </Card>

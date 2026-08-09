@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconRun, IconHeart, IconChartUp, IconTimer } from '../components/icons'
 import { getDemo, setDemo, hasHealth, pushBiometrics } from '../lib/profile'
@@ -738,10 +739,7 @@ export function TrainingPlan() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[10px] text-neutral-500">
-          References: Mandsager 2018 (JAMA — fitness & mortality), Helgerud 2007 (4×4), PURE study (grip),
-          Rikli & Jones (functional tests), Northwestern Mutual Lifespan Calculator & Longevity Illustrator (lifespan projection).
-        </p>
+        <Prosa kelas="mt-3 text-[10px] text-neutral-500">References: Mandsager 2018 (JAMA — fitness & mortality), Helgerud 2007 (4×4), PURE study (grip), Rikli & Jones (functional tests), Northwestern Mutual Lifespan Calculator & Longevity Illustrator (lifespan projection).</Prosa>
       </Card>
 
       {/* Music */}

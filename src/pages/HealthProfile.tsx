@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { KolomAngka } from '../components/KolomAngka'
 import { simpanTeks } from '../lib/unduh'
 import { bacaTeksBia, PERINTAH_BACA } from '../lib/biaGambar'
@@ -269,11 +270,7 @@ export function HealthProfile() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
-        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Apple Watch auto-syncs live; Garmin and WHOOP import from a file you export and upload;
-          everything else can be entered by hand. Whatever you fill in here flows straight into every
-          fitness &amp; longevity calculator in the app.
-        </p>
+        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch auto-syncs live; Garmin and WHOOP import from a file you export and upload; everything else can be entered by hand. Whatever you fill in here flows straight into every fitness &amp; longevity calculator in the app.</Prosa>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -596,10 +593,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
           )}
         </>
       ) : (
-        <p className="mt-2 text-xs text-neutral-500">
-          Perangkat tersambung, tetapi sinkronisasi ini tidak membawa metrik yang cocok — perluas
-          Date Range di Health Auto Export dan angkanya akan terisi di sini.
-        </p>
+        <Prosa kelas="mt-2 text-xs text-neutral-500">Perangkat tersambung, tetapi sinkronisasi ini tidak membawa metrik yang cocok — perluas Date Range di Health Auto Export dan angkanya akan terisi di sini.</Prosa>
       )}
     </Card>
   )
@@ -691,11 +685,7 @@ function AutoSyncCard() {
           </p>
         )}
         {conn === 'up' && !lastSync && (
-          <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-            Server sehat, tetapi belum pernah menerima kiriman dari perangkat Anda. Artinya
-            masalahnya ada di sisi iPhone — URL, izin Health, atau otomatisasi yang belum berjalan —
-            bukan di server.
-          </p>
+          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Server sehat, tetapi belum pernah menerima kiriman dari perangkat Anda. Artinya masalahnya ada di sisi iPhone — URL, izin Health, atau otomatisasi yang belum berjalan — bukan di server.</Prosa>
         )}
       </div>
 
@@ -815,10 +805,7 @@ function SyncDiagnosticsCard() {
           </Button>
           {fileNote && <p className="mt-1 text-[11px] text-neutral-500">{fileNote}</p>}
 
-          <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-            Menempel isinya juga bisa, tapi file 7 hari bisa berukuran beberapa megabyte dan berat
-            untuk browser di HP — memilih file jauh lebih aman.
-          </p>
+          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Menempel isinya juga bisa, tapi file 7 hari bisa berukuran beberapa megabyte dan berat untuk browser di HP — memilih file jauh lebih aman.</Prosa>
           <textarea
             ref={taRef}
             className={inputClass + ' mt-1 h-28 font-mono !text-[10px]'}

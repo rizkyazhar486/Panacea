@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconMoon } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -41,11 +42,7 @@ export function SleepApneaScreen() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Sleep Apnea Screening (STOP-BANG)" subtitle="Validated obstructive sleep apnea risk screen (Chung et al., 2008)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          One of the most widely used OSA screening tools in pre-operative and primary-care settings.
-          Answer each item honestly — this is a screening tool to guide whether a sleep study makes
-          sense, not a diagnosis.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">One of the most widely used OSA screening tools in pre-operative and primary-care settings. Answer each item honestly — this is a screening tool to guide whether a sleep study makes sense, not a diagnosis.</Prosa>
       </Card>
 
       <Card className="!p-5">

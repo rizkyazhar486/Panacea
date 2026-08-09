@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, ReferenceLine } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
@@ -106,11 +107,7 @@ export function HealthSimulator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="What-If Health Simulator" subtitle="See how today's choices reshape your 10-year risk" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          A transparent "digital twin" first step: enter your current numbers, then toggle real,
-          evidence-based changes and watch your 10-year cardiovascular risk move. Every number comes
-          from the published Framingham equation — nothing is a black-box guess.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A transparent "digital twin" first step: enter your current numbers, then toggle real, evidence-based changes and watch your 10-year cardiovascular risk move. Every number comes from the published Framingham equation — nothing is a black-box guess.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {num('Age (years)', 'age')}
           <Field label="Sex">
@@ -204,11 +201,7 @@ export function HealthSimulator() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="mt-2 text-[11px] text-neutral-500">
-            Projection uses the Framingham equation at each age with your current biomarkers held
-            constant (the model is validated for ages 30-74). It isolates the interventions' effect —
-            real labs and blood pressure also drift with age, so treat this as direction, not destiny.
-          </p>
+          <Prosa kelas="mt-2 text-[11px] text-neutral-500">Projection uses the Framingham equation at each age with your current biomarkers held constant (the model is validated for ages 30-74). It isolates the interventions' effect — real labs and blood pressure also drift with age, so treat this as direction, not destiny.</Prosa>
         </Card>
       )}
 

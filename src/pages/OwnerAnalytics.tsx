@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
 import { IconShield } from '../components/icons'
 import { useStore } from '../lib/store'
@@ -104,11 +105,7 @@ function SeoTab() {
           <span className="text-[12px] font-bold text-neutral-500">Skor pemeriksaan</span>
           <span className="text-2xl font-black text-ink dark:text-ink">{r.score}<span className="text-sm text-neutral-500">/100</span></span>
         </div>
-        <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
-          Skor ini hanya mengukur item teknis di daftar ini. SEO sesungguhnya ditentukan oleh isi
-          yang benar-benar menjawab kebutuhan pembaca — skor 100 pada halaman yang isinya dangkal
-          tidak akan menang di hasil pencarian.
-        </p>
+        <Prosa kelas="mt-1 text-[10px] leading-relaxed text-neutral-500">Skor ini hanya mengukur item teknis di daftar ini. SEO sesungguhnya ditentukan oleh isi yang benar-benar menjawab kebutuhan pembaca — skor 100 pada halaman yang isinya dangkal tidak akan menang di hasil pencarian.</Prosa>
         <div className="mt-3 space-y-1.5">
           {r.findings.map((f) => (
             <div key={f.area} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -194,11 +191,7 @@ function AbTab() {
           </div>
         )}
 
-        <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">
-          Selang kepercayaan lebih berguna daripada nilai p: ia memberi tahu seberapa besar
-          perbedaannya, bukan sekadar apakah ada perbedaan. Selang yang melewati nol berarti arahnya
-          pun belum pasti.
-        </p>
+        <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Selang kepercayaan lebih berguna daripada nilai p: ia memberi tahu seberapa besar perbedaannya, bukan sekadar apakah ada perbedaan. Selang yang melewati nol berarti arahnya pun belum pasti.</Prosa>
       </Card>
     </>
   )

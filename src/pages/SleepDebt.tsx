@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
@@ -56,11 +57,7 @@ export function SleepDebt() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Sleep Debt Calculator" subtitle="The rolling gap between the sleep you need and what you get" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Log each night's sleep. Debt accumulates when you sleep less than you need — and unlike
-          money, you can't fully "repay" it in one long lie-in, so the trend matters more than any
-          single night. Adults generally need ≥7 hours (AASM).
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Log each night's sleep. Debt accumulates when you sleep less than you need — and unlike money, you can't fully "repay" it in one long lie-in, so the trend matters more than any single night. Adults generally need ≥7 hours (AASM).</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <label className="text-[12px] font-semibold text-neutral-500">
             My nightly sleep need (hours)

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -56,11 +57,7 @@ export function GlasgowBlatchfordScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Glasgow-Blatchford Score" subtitle="Pre-endoscopy upper GI bleed risk (Blatchford et al. 2000)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Calculated before endoscopy from clinical and lab data alone. A score of 0 identifies
-          patients low-risk enough that some guidelines support outpatient management without
-          admission or urgent endoscopy.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Calculated before endoscopy from clinical and lab data alone. A score of 0 identifies patients low-risk enough that some guidelines support outpatient management without admission or urgent endoscopy.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="BUN (mg/dL)">
             <input className={inputClass} type="number" min={0} value={bun || ''} onChange={(e) => setBun(Number(e.target.value) || 0)} />

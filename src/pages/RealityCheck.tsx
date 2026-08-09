@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity, IconChartUp, IconHeart } from '../components/icons'
 
@@ -145,9 +146,7 @@ function AlcoholCard() {
           <div className="text-xl font-black text-ink dark:text-ink">{(gramsYear / 1000).toFixed(1)} kg</div>
         </div>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">
-        A standard drink ≈ 10 g pure alcohol. Common low-risk guidance is ≤14 standard drinks/week with alcohol-free days — and current evidence finds no amount is truly "health-promoting." Less is better.
-      </p>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500 dark:text-neutral-500">A standard drink ≈ 10 g pure alcohol. Common low-risk guidance is ≤14 standard drinks/week with alcohol-free days — and current evidence finds no amount is truly "health-promoting." Less is better.</Prosa>
     </Card>
   )
 }
@@ -157,9 +156,7 @@ export function RealityCheck() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Habit Reality Check" subtitle="Turn everyday habits into concrete numbers — money, teaspoons, and time" />
-        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Small daily habits add up in ways that are easy to underestimate. These quick calculators make the real cost visible. Everything is computed on your device — nothing is stored or sent anywhere.
-        </p>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Small daily habits add up in ways that are easy to underestimate. These quick calculators make the real cost visible. Everything is computed on your device — nothing is stored or sent anywhere.</Prosa>
       </Card>
       <SmokingCard />
       <SugarCard />

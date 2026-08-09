@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { IconHeart, IconShield, IconActivity } from '../components/icons'
 import { uid } from '../lib/store'
@@ -105,9 +106,7 @@ export function FamilyHealth() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Family Health History" subtitle="Your family's conditions are an early-warning map for your own screening. Private & stored on your device." />
-        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Add each relative and the major conditions they've had. Panaceamed flags what you should screen for earlier — closer relatives and early-onset disease weigh the most.
-        </p>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Add each relative and the major conditions they've had. Panaceamed flags what you should screen for earlier — closer relatives and early-onset disease weigh the most.</Prosa>
       </Card>
 
       {/* Add relative */}

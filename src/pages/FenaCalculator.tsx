@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -35,11 +36,7 @@ export function FenaCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Fractional Excretion of Sodium (FeNa)" subtitle="Prerenal azotemia vs. acute tubular necrosis (Espinel, 1976)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          In acute kidney injury, a low FeNa suggests the kidneys are appropriately conserving sodium
-          (prerenal cause, e.g. hypovolemia); a high FeNa suggests intrinsic tubular damage. Needs a
-          simultaneous urine and plasma sample.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">In acute kidney injury, a low FeNa suggests the kidneys are appropriately conserving sodium (prerenal cause, e.g. hypovolemia); a high FeNa suggests intrinsic tubular damage. Needs a simultaneous urine and plasma sample.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Urine sodium (mEq/L)">
             <input className={inputClass} type="number" min={0} value={urineNa || ''} onChange={(e) => setUrineNa(Number(e.target.value) || 0)} />
@@ -59,10 +56,7 @@ export function FenaCalculator() {
           Patient has received diuretics recently
         </label>
         {onDiuretics && (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            FeNa is unreliable after diuretic use (diuretics force sodium wasting regardless of
-            cause). Fractional Excretion of Urea is the preferred alternative in this setting.
-          </p>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">FeNa is unreliable after diuretic use (diuretics force sodium wasting regardless of cause). Fractional Excretion of Urea is the preferred alternative in this setting.</Prosa>
         )}
       </Card>
 

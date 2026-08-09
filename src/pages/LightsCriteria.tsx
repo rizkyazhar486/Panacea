@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 
@@ -33,11 +34,7 @@ export function LightsCriteria() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Light's Criteria" subtitle="Exudate vs. transudate pleural effusion (Light et al. 1972)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          The fluid is classified as exudative if ANY ONE of the three criteria is met. Highly
-          sensitive for exudate, but diuretic-treated heart failure can occasionally cross the
-          threshold and appear falsely exudative.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The fluid is classified as exudative if ANY ONE of the three criteria is met. Highly sensitive for exudate, but diuretic-treated heart failure can occasionally cross the threshold and appear falsely exudative.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Pleural fluid protein (g/dL)">
             <input className={inputClass} type="number" step="0.1" min={0} value={pleuralProtein || ''} onChange={(e) => setPleuralProtein(Number(e.target.value) || 0)} />

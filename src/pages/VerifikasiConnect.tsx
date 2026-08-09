@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Button, Field, inputClass } from '../components/ui'
 import { KolomAngka } from '../components/KolomAngka'
 import { IconShield } from '../components/icons'
@@ -179,11 +180,7 @@ export function VerifikasiConnect() {
           <li>• <b>Persetujuan bisa Anda tarik kapan saja</b>, dan penarikannya menghapus data
             verifikasi Anda.</li>
         </ul>
-        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
-          Dasar: UU No. 27/2022 tentang Pelindungan Data Pribadi — Pasal 4 ayat (2) untuk data
-          pribadi spesifik, Pasal 16 untuk pembatasan tujuan, Pasal 20-22 untuk persetujuan,
-          Pasal 9 untuk penarikan persetujuan, dan Pasal 43 untuk penghapusan.
-        </p>
+        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-slate-500">Dasar: UU No. 27/2022 tentang Pelindungan Data Pribadi — Pasal 4 ayat (2) untuk data pribadi spesifik, Pasal 16 untuk pembatasan tujuan, Pasal 20-22 untuk persetujuan, Pasal 9 untuk penarikan persetujuan, dan Pasal 43 untuk penghapusan.</Prosa>
       </Card>
 
       {status !== 'terverifikasi' && status !== 'menunggu' && (
@@ -225,11 +222,7 @@ export function VerifikasiConnect() {
                 <input className={inputClass} inputMode="tel" placeholder="08123456789"
                   value={f.telepon} onChange={(e) => set('telepon', e.target.value)} aria-label="Phone number" />
               </Field>
-              <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-                Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan —
-                hanya sidiknya dan empat digit terakhir, jadi ia tidak bisa dibaca kembali maupun
-                dipakai menghubungi Anda.
-              </p>
+              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Dipakai memastikan satu orang tidak membuat dua akun. Nomornya tidak disimpan — hanya sidiknya dan empat digit terakhir, jadi ia tidak bisa dibaca kembali maupun dipakai menghubungi Anda.</Prosa>
             </div>
             <div className="mt-2">
               <Field label="Posed selfie link">
@@ -263,11 +256,7 @@ export function VerifikasiConnect() {
             <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">
               Processing consent
             </div>
-            <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-              Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah
-              satu tidak Anda setujui, verifikasi tidak bisa dijalankan. Yang dipisah di sini adalah
-              informasinya — Anda berhak tahu persis apa yang Anda setujui, satu per satu.
-            </p>
+            <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Ketiganya wajib untuk bisa diverifikasi, dan itu disampaikan terus terang: bila salah satu tidak Anda setujui, verifikasi tidak bisa dijalankan. Yang dipisah di sini adalah informasinya — Anda berhak tahu persis apa yang Anda setujui, satu per satu.</Prosa>
             <div className="mt-2 space-y-2">
               {TUJUAN.map((t) => (
                 <label key={t.id} className="flex cursor-pointer items-start gap-2 rounded-xl bg-white/5 p-2.5">
@@ -307,11 +296,7 @@ export function VerifikasiConnect() {
           </div>
           {tarik ? (
             <div className="mt-2 rounded-xl bg-rose-500/10 p-3">
-              <p className="text-[12px] leading-relaxed text-neutral-600">
-                Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status
-                belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya
-                lagi. Trust credit dan riwayat pelanggaran tetap tersimpan.
-              </p>
+              <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Menarik persetujuan menghapus data verifikasi Anda dan mengembalikan akun ke status belum terverifikasi, sehingga Connect tidak bisa dipakai sampai Anda mengajukannya lagi. Trust credit dan riwayat pelanggaran tetap tersimpan.</Prosa>
               <div className="mt-2 flex gap-2">
                 <button onClick={() => void lakukanTarik()}
                   className="rounded-xl bg-rose-500 px-3 py-2 text-[12px] font-bold text-ink">

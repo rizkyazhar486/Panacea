@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconRun, IconActivity, IconHeart, IconTimer } from '../components/icons'
 import {
@@ -163,10 +164,7 @@ function RunTab() {
               })}
             </div>
 
-            <p className="text-xs text-slate-500 mt-3">
-              Estimasi mengikuti kerangka VDOT (Jack Daniels' Running Formula), diinterpolasi di antara baris tabel.
-              Angka ini titik awal, bukan aturan mati — sesuaikan dengan rasa dan cuaca.
-            </p>
+            <Prosa kelas="text-xs text-slate-500 mt-3">Estimasi mengikuti kerangka VDOT (Jack Daniels' Running Formula), diinterpolasi di antara baris tabel. Angka ini titik awal, bukan aturan mati — sesuaikan dengan rasa dan cuaca.</Prosa>
           </>
         )}
       </Card>

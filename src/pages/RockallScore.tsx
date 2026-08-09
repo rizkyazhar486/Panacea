@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -73,11 +74,7 @@ export function RockallScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Rockall Score" subtitle="Mortality risk after upper GI bleeding (Rockall et al. 1996)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Complements the pre-endoscopy Glasgow-Blatchford Score: Blatchford answers "who needs
-          admission/intervention?", Rockall answers "how likely is rebleeding or death?" — fully
-          scored after endoscopy adds the diagnosis and stigmata criteria.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Complements the pre-endoscopy Glasgow-Blatchford Score: Blatchford answers "who needs admission/intervention?", Rockall answers "how likely is rebleeding or death?" — fully scored after endoscopy adds the diagnosis and stigmata criteria.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-3">

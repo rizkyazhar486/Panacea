@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { Card, SectionTitle, Field, inputClass, Button, Badge } from '../components/ui'
 import { IconChartUp } from '../components/icons'
@@ -101,12 +102,7 @@ export function ChildGrowthTracker() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Child Growth Tracker" subtitle="Plot a child's weight & height over time against WHO growth standards" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Unlike a single-visit percentile check, this records every visit and plots the child's actual
-          trajectory against the WHO Child Growth Standards (2006), 0-60 months — a view worth showing
-          parents directly. A flattening or downward-crossing trend across visits is more meaningful than
-          any single measurement.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Unlike a single-visit percentile check, this records every visit and plots the child's actual trajectory against the WHO Child Growth Standards (2006), 0-60 months — a view worth showing parents directly. A flattening or downward-crossing trend across visits is more meaningful than any single measurement.</Prosa>
         <div className="mt-3">
           <Field label="Sex">
             <select className={inputClass} value={state.sex} onChange={(e) => persist({ ...state, sex: e.target.value as 'M' | 'F' })}>

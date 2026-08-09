@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -53,11 +54,7 @@ export function QTcCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="QTc Calculator" subtitle="Corrected QT interval — drug-safety screening for Torsades de Pointes risk" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Many medications (antipsychotics, some antibiotics/antiemetics, methadone,
-          class Ia/III antiarrhythmics) prolong the QT interval and raise Torsades de Pointes risk.
-          Enter the measured QT interval and heart rate from an ECG.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Many medications (antipsychotics, some antibiotics/antiemetics, methadone, class Ia/III antiarrhythmics) prolong the QT interval and raise Torsades de Pointes risk. Enter the measured QT interval and heart rate from an ECG.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="QT interval (ms)">
             <input className={inputClass} type="number" min={200} max={700} value={qtMs} onChange={(e) => setQtMs(Number(e.target.value) || 0)} />

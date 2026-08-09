@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconAlertTriangle } from '../components/icons'
 
@@ -106,12 +107,7 @@ export function AllergyTracker() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconAlertTriangle size={20} />} title="Allergy Tracker" subtitle="Your personal record of food, drink, medication & contact allergies" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Keep a running list of things you're allergic to — food, drinks, medications, and
-          contact/object triggers (latex, nickel, cosmetics, and other causes of dermatitis
-          kontak alergi). This stays on your device as a personal note; show it to any clinician
-          before a new prescription, procedure, or meal you're unsure about.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Keep a running list of things you're allergic to — food, drinks, medications, and contact/object triggers (latex, nickel, cosmetics, and other causes of dermatitis kontak alergi). This stays on your device as a personal note; show it to any clinician before a new prescription, procedure, or meal you're unsure about.</Prosa>
       </Card>
 
       {severeCount > 0 && (

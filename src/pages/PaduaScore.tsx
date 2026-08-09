@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -37,11 +38,7 @@ export function PaduaScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Padua Prediction Score" subtitle="VTE risk in hospitalized medical patients (Barbar et al. 2010)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Identifies which hospitalized medical (non-surgical) patients warrant pharmacologic VTE
-          prophylaxis. Score ≥4 = high risk. Always pair with a bleeding-risk assessment before
-          prescribing anticoagulant prophylaxis.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Identifies which hospitalized medical (non-surgical) patients warrant pharmacologic VTE prophylaxis. Score ≥4 = high risk. Always pair with a bleeding-risk assessment before prescribing anticoagulant prophylaxis.</Prosa>
       </Card>
 
       <Card className="!p-5">

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity, IconHeart, IconTimer, IconRun } from '../components/icons'
@@ -204,11 +205,7 @@ function TabFtp() {
     <div className="space-y-4">
       <Card>
         <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Power you can hold for about an hour" />
-        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          FTP adalah batas yang memisahkan &quot;berat tapi bisa dijalani&quot; dari &quot;kelelahan menumpuk
-          cepat&quot;. Di atasnya, laktat menumpuk lebih cepat daripada yang bisa dibersihkan, dan performa
-          menurun tajam. Setara dengan LTHR pada denyut jantung — hanya diukur dalam watt.
-        </p>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-500">FTP adalah batas yang memisahkan &quot;berat tapi bisa dijalani&quot; dari &quot;kelelahan menumpuk cepat&quot;. Di atasnya, laktat menumpuk lebih cepat daripada yang bisa dibersihkan, dan performa menurun tajam. Setara dengan LTHR pada denyut jantung — hanya diukur dalam watt.</Prosa>
         <div className="mt-3 space-y-1.5">
           {PROTOKOL.map((p) => (
             <button key={p.k} onClick={() => setMetode(p.k)}
@@ -247,11 +244,7 @@ function TabFtp() {
               </div>
             ))}
           </div>
-          <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
-            Watt per kilogram menentukan kemampuan menanjak; watt mentah menentukan kecepatan di jalan datar.
-            Karena itu pesepeda ringan unggul di gunung dan pesepeda besar unggul di jalan rata — keduanya
-            bisa punya FTP yang sama.
-          </p>
+          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-slate-500">Watt per kilogram menentukan kemampuan menanjak; watt mentah menentukan kecepatan di jalan datar. Karena itu pesepeda ringan unggul di gunung dan pesepeda besar unggul di jalan rata — keduanya bisa punya FTP yang sama.</Prosa>
         </Card>
       )}
     </div>

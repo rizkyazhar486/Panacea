@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconStethoscope } from '../../components/icons'
 import { SkillDiagram } from '../../components/SkillDiagrams'
@@ -38,11 +39,7 @@ export default function ClinicalSkillsSection() {
           title="Keterampilan Klinis & Prosedur"
           subtitle={`${CLINICAL_SKILLS.length} tindakan — langkah demi langkah, alat, mnemonik, dan jebakan OSCE`}
         />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Panduan tindakan untuk station keterampilan: APN 60 langkah, ATLS, ACLS, akses vaskular,
-          injeksi dan imunisasi, dan lainnya. Seluruh diagram digambar sendiri — tidak menyalin
-          ilustrasi berhak cipta dari sumber lain.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Panduan tindakan untuk station keterampilan: APN 60 langkah, ATLS, ACLS, akses vaskular, injeksi dan imunisasi, dan lainnya. Seluruh diagram digambar sendiri — tidak menyalin ilustrasi berhak cipta dari sumber lain.</Prosa>
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           placeholder="Cari tindakan (mis. APN, ACLS, infus, vaksin)…"

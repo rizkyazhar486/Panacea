@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
@@ -52,11 +53,7 @@ export function GratitudeJournal() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Gratitude Journal" subtitle='"Three Good Things" — a proven mood-lifting daily habit' />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Each evening, write three things that went well today and — briefly — why. It sounds simple,
-          but it's one of the most replicated ways to raise happiness and lower depressive symptoms
-          over weeks to months.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Each evening, write three things that went well today and — briefly — why. It sounds simple, but it's one of the most replicated ways to raise happiness and lower depressive symptoms over weeks to months.</Prosa>
       </Card>
 
       <Card className="!p-5">

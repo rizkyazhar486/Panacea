@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
@@ -24,11 +25,7 @@ export function PainDiary() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Pain / Symptom Diary" subtitle="Track severity over time — useful for you and your clinician" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          A single reading is a snapshot; a trend is information. Rate your pain or symptom severity
-          now, add where it is and what might have triggered it, and save — the chart below tracks
-          every entry so you (or your doctor) can see the pattern, not just today.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A single reading is a snapshot; a trend is information. Rate your pain or symptom severity now, add where it is and what might have triggered it, and save — the chart below tracks every entry so you (or your doctor) can see the pattern, not just today.</Prosa>
       </Card>
 
       <Card className="!p-5">

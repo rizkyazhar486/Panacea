@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 
@@ -129,12 +130,7 @@ export function SnpProfiler() {
           option in your account settings). It's matched locally against {SNP_DB.length} well-documented
           research SNPs. <b>The file is processed entirely on your device and is never sent anywhere.</b>
         </p>
-        <p className="mt-2 text-[12px] leading-relaxed text-amber-700 dark:text-amber-300">
-          Individual SNPs from consumer arrays typically have small individual effect sizes, and
-          consumer genotyping (unlike clinical sequencing) can have real error rates on specific
-          positions. This is an educational literature lookup, not a clinical genetic test or a
-          polygenic risk score.
-        </p>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-amber-700 dark:text-amber-300">Individual SNPs from consumer arrays typically have small individual effect sizes, and consumer genotyping (unlike clinical sequencing) can have real error rates on specific positions. This is an educational literature lookup, not a clinical genetic test or a polygenic risk score.</Prosa>
       </Card>
 
       <Card className="!p-5">

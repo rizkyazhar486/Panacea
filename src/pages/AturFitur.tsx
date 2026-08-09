@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconSettings } from '../components/icons'
@@ -133,11 +134,7 @@ export function AturFitur() {
       })}
 
       <Card>
-        <p className="text-[12px] leading-relaxed text-neutral-500">
-          Beranda, Profil, Pengaturan dan Kartu Darurat sengaja tidak bisa disembunyikan.
-          Menyembunyikan jalan menuju pengaturan akan mengunci Anda dari pengaturan Anda sendiri,
-          dan tombol darurat bukan sesuatu yang pantas dihilangkan oleh aplikasi kesehatan.
-        </p>
+        <Prosa kelas="text-[12px] leading-relaxed text-neutral-500">Beranda, Profil, Pengaturan dan Kartu Darurat sengaja tidak bisa disembunyikan. Menyembunyikan jalan menuju pengaturan akan mengunci Anda dari pengaturan Anda sendiri, dan tombol darurat bukan sesuatu yang pantas dihilangkan oleh aplikasi kesehatan.</Prosa>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
           Ingin mengatur kartu di beranda? Itu terpisah dan ada di{' '}
           <Link to="/" className="font-semibold text-ink underline">Beranda</Link> lewat tombol

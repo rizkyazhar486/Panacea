@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -58,12 +59,7 @@ export function LifeCompass() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Life Compass" subtitle="Plan your vision, mission, and next step — so the future feels like a direction, not a worry" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Anxiety about the future often comes from having no plan to point it at. This page walks
-          through two things psychology consistently finds helpful: naming what actually matters to
-          you (values clarification), and turning big dreams into one concrete next step
-          (implementation intentions — shown to meaningfully improve follow-through vs. goals alone).
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Anxiety about the future often comes from having no plan to point it at. This page walks through two things psychology consistently finds helpful: naming what actually matters to you (values clarification), and turning big dreams into one concrete next step (implementation intentions — shown to meaningfully improve follow-through vs. goals alone).</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -106,10 +102,7 @@ export function LifeCompass() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">When you're worried about the future</div>
-        <p className="mt-1 text-[12px] text-neutral-500">
-          Different traditions frame this differently — shown side by side, not to tell you which to
-          believe, but so you can draw from whichever speaks to you.
-        </p>
+        <Prosa kelas="mt-1 text-[12px] text-neutral-500">Different traditions frame this differently — shown side by side, not to tell you which to believe, but so you can draw from whichever speaks to you.</Prosa>
         <div className="mt-3 space-y-3">
           {WISDOM.map((w) => (
             <div key={w.tradition} className="rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">

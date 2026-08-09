@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconActivity } from '../../components/icons'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../../lib/skdiTherapyReference'
@@ -122,10 +123,7 @@ function PanelResep() {
 
       <Card>
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Anatomi resep</div>
-        <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Enam bagian, ditulis dari atas ke bawah. Apotek membacanya dengan urutan ini, jadi bagian
-          yang tertukar tempatnya memperlambat pembacaan justru saat resep paling perlu cepat.
-        </p>
+        <Prosa kelas="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">Enam bagian, ditulis dari atas ke bawah. Apotek membacanya dengan urutan ini, jadi bagian yang tertukar tempatnya memperlambat pembacaan justru saat resep paling perlu cepat.</Prosa>
         <div className="mt-3 space-y-2">
           {BAGIAN_RESEP.map((b, i) => (
             <div key={b.nama} className="rounded-xl bg-white/60 p-3 dark:bg-white/5">

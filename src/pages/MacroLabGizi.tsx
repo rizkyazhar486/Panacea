@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, Field } from '../components/ui'
 import { KolomAngka } from '../components/KolomAngka'
@@ -243,12 +244,7 @@ export function MacroLabGizi() {
           <Link to="/nutrition" className="font-bold text-brand underline">Nutrisi</Link>.
           Halaman ini hanya menghitung targetnya.
         </p>
-        <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
-          Perhitungan memakai Mifflin-St Jeor untuk BMR, rentang protein ISSN/ACSM, serat 14 g per
-          1000 kkal (Institute of Medicine). Angka ini titik awal untuk orang sehat — bukan resep
-          gizi medis. Pada penyakit ginjal, hati, kehamilan atau gangguan makan, ikuti arahan
-          tenaga kesehatan.
-        </p>
+        <Prosa kelas="mt-2 text-[10px] leading-relaxed text-slate-500">Perhitungan memakai Mifflin-St Jeor untuk BMR, rentang protein ISSN/ACSM, serat 14 g per 1000 kkal (Institute of Medicine). Angka ini titik awal untuk orang sehat — bukan resep gizi medis. Pada penyakit ginjal, hati, kehamilan atau gangguan makan, ikuti arahan tenaga kesehatan.</Prosa>
       </Card>
     </div>
   )

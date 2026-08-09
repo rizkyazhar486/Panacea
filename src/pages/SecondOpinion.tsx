@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 import { api, type BackendSecondOpinion } from '../lib/api'
@@ -135,10 +136,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
     <>
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="AI drafts privately; your edited answer is what the patient receives" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Every request below includes an AI-drafted analysis as a starting point. Edit it freely — the
-          patient only ever sees what you submit, never the raw draft.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Every request below includes an AI-drafted analysis as a starting point. Edit it freely — the patient only ever sees what you submit, never the raw draft.</Prosa>
       </Card>
 
       {loading && <Card className="!p-5 text-center text-sm text-neutral-500">Loading…</Card>}

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconChartUp, IconActivity } from '../components/icons'
 import { analyzeCsv, type AnalysisResult, type ColumnStats } from '../lib/dataAnalyzer'
@@ -45,9 +46,7 @@ export function DataLab() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Data Lab" subtitle="Upload a wearable / CGM / scale / BP export — get it turned into plain conclusions" />
-        <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          Export a CSV from your device or health app (glucose monitor, watch, smart scale, blood-pressure cuff) and drop it here. Panaceamed recognizes the columns and processes them into what they actually mean for you — nothing leaves your device.
-        </p>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Export a CSV from your device or health app (glucose monitor, watch, smart scale, blood-pressure cuff) and drop it here. Panaceamed recognizes the columns and processes them into what they actually mean for you — nothing leaves your device.</Prosa>
         <button onClick={() => fileRef.current?.click()}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50 py-8 text-sm font-bold text-brand-dark dark:bg-white/5">
           📄 {fileName ? `Re-upload (last: ${fileName})` : 'Choose a CSV file'}

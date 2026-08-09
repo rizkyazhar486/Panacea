@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { ScoreTrend } from '../components/ScoreTrend'
@@ -95,10 +96,7 @@ export function News2Score() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="NEWS2 Score" subtitle="National Early Warning Score — ward deterioration risk (RCP 2017)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Aggregates 7 routine vital signs into a single escalation trigger. Widely used across UK and
-          international hospital wards to standardize the response to acute deterioration.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Aggregates 7 routine vital signs into a single escalation trigger. Widely used across UK and international hospital wards to standardize the response to acute deterioration.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Respiration rate (/min)">
             <input className={inputClass} type="number" min={0} value={rr || ''} onChange={(e) => setRr(Number(e.target.value) || 0)} />
@@ -117,10 +115,7 @@ export function News2Score() {
           </Field>
         </div>
         {hrFromDevice && (
-          <p className="mt-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-[11px] font-semibold text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200">
-            Pulse was prefilled from your synced resting heart rate — for scoring someone else (or an
-            acute assessment), replace it with the current measured pulse.
-          </p>
+          <Prosa kelas="mt-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-[11px] font-semibold text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200">Pulse was prefilled from your synced resting heart rate — for scoring someone else (or an acute assessment), replace it with the current measured pulse.</Prosa>
         )}
         <label className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-neutral-600 dark:text-neutral-300">
           <input type="checkbox" checked={onOxygen} onChange={(e) => setOnOxygen(e.target.checked)} className="h-4 w-4 rounded" />

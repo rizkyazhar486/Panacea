@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle, Button } from '../components/ui'
 import { IconShield } from '../components/icons'
@@ -118,11 +119,7 @@ export function DekConnect() {
               People you could meet ({kartu.length})
             </div>
             {kartu.length === 0 && (
-              <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-                Belum ada yang cocok. Yang muncul di sini hanya akun terverifikasi, dengan kredit
-                kepercayaan di atas ambang bahaya, preferensi yang saling cocok, dan berada di dalam
-                radius Anda maupun radius mereka. Melebarkan radius biasanya yang paling berpengaruh.
-              </p>
+              <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Belum ada yang cocok. Yang muncul di sini hanya akun terverifikasi, dengan kredit kepercayaan di atas ambang bahaya, preferensi yang saling cocok, dan berada di dalam radius Anda maupun radius mereka. Melebarkan radius biasanya yang paling berpengaruh.</Prosa>
             )}
             <div className="mt-2 space-y-2">
               {kartu.map((k) => (
@@ -152,12 +149,7 @@ export function DekConnect() {
           </Card>
 
           <Card>
-            <p className="text-[11px] leading-relaxed text-neutral-500">
-              Memblokir seseorang membuatnya hilang dari kedua sisi sekaligus — ia tidak lagi
-              melihat Anda dan tidak bisa menghubungi Anda dari perangkat mana pun yang tersambung
-              ke akunnya. Bila ada yang mengganggu, laporkan; laporan dinilai pemilik, dan
-              pengurangan kredit dicatat beserta alasannya.
-            </p>
+            <Prosa kelas="text-[11px] leading-relaxed text-neutral-500">Memblokir seseorang membuatnya hilang dari kedua sisi sekaligus — ia tidak lagi melihat Anda dan tidak bisa menghubungi Anda dari perangkat mana pun yang tersambung ke akunnya. Bila ada yang mengganggu, laporkan; laporan dinilai pemilik, dan pengurangan kredit dicatat beserta alasannya.</Prosa>
             <Link to="/verifikasi-connect" className="mt-2 inline-block text-[12px] font-bold text-brand underline">
               See my trust credit →
             </Link>

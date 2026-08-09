@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconSparkle } from '../components/icons'
 
@@ -108,7 +109,7 @@ function TelomereAttrition() {
         <rect x="20" y="20" width={Math.max(4, (pct / 100) * 160)} height="20" rx="10" fill="#00BF63" />
       </svg>
       <p className="mt-2 text-[12px] text-neutral-500">Illustrative telomere length: <b>{Math.round(pct)}%</b> of reference baseline</p>
-      <p className="mt-2 text-[11px] text-neutral-500">A stylized model from published average attrition rates — not a measurement of your actual telomere length, which requires a specialized lab (qPCR or flow-FISH) test.</p>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">A stylized model from published average attrition rates — not a measurement of your actual telomere length, which requires a specialized lab (qPCR or flow-FISH) test.</Prosa>
     </Card>
   )
 }

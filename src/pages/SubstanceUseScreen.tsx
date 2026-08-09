@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconShield } from '../components/icons'
 
@@ -81,11 +82,7 @@ export function SubstanceUseScreen() {
               <span className="text-sm font-semibold text-neutral-500">pack-years</span>
             </div>
             {screeningEligible ? (
-              <p className="mt-2 text-[13px] leading-relaxed text-rose-600 dark:text-rose-300">
-                Meets USPSTF 2021 criteria for annual low-dose CT lung cancer screening (age 50-80,
-                ≥20 pack-years, currently smoking or quit within 15 years) — worth discussing with a
-                clinician if not already screening.
-              </p>
+              <Prosa kelas="mt-2 text-[13px] leading-relaxed text-rose-600 dark:text-rose-300">Meets USPSTF 2021 criteria for annual low-dose CT lung cancer screening (age 50-80, ≥20 pack-years, currently smoking or quit within 15 years) — worth discussing with a clinician if not already screening.</Prosa>
             ) : (
               <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
                 {packYears >= 20 ? 'Meets the pack-year threshold, but age or quit-date criteria are not yet met for USPSTF screening eligibility.' : 'Below the ≥20 pack-year threshold used for lung cancer screening eligibility — quitting still meaningfully reduces risk at any pack-year total.'}

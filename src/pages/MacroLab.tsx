@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { Card, SectionTitle, Badge, Field, inputClass } from '../components/ui'
 import { IconToken } from '../components/icons'
@@ -319,13 +320,7 @@ suku bunga        = bergerak 50% menuju target tiap kuartal
 output gap        −= 0,3 × (suku bunga riil − riil netral)
 inflasi           = 0,7×inflasi + 0,3×target + 0,2×output gap`}
           </pre>
-          <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-            Persamaannya ditampilkan supaya Anda bisa menilai modelnya, bukan sekadar mempercayai
-            grafiknya. Model ini sangat disederhanakan dan mengabaikan banyak hal yang nyata —
-            guncangan harga pangan dan energi, nilai tukar, ekspektasi inflasi yang tidak jangkar,
-            dan kebijakan fiskal. Gunakan untuk memahami arah dan jeda, bukan untuk memperkirakan
-            angka bulan depan.
-          </p>
+          <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Persamaannya ditampilkan supaya Anda bisa menilai modelnya, bukan sekadar mempercayai grafiknya. Model ini sangat disederhanakan dan mengabaikan banyak hal yang nyata — guncangan harga pangan dan energi, nilai tukar, ekspektasi inflasi yang tidak jangkar, dan kebijakan fiskal. Gunakan untuk memahami arah dan jeda, bukan untuk memperkirakan angka bulan depan.</Prosa>
         </div>
       </Card>
     </>

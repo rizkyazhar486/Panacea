@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, inputClass } from '../components/ui'
 import { IconLeaf } from '../components/icons'
@@ -86,10 +87,7 @@ export function ToxinChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconLeaf size={20} />} title="Environment & Toxin Checklist" subtitle="Everyday exposure reduction, in one place" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          None of this is about fear — total avoidance of every trace exposure isn't realistic or
-          necessary. These are the highest-leverage, lowest-effort swaps worth knowing about.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">None of this is about fear — total avoidance of every trace exposure isn't realistic or necessary. These are the highest-leverage, lowest-effort swaps worth knowing about.</Prosa>
       </Card>
 
       <DailyHabits />

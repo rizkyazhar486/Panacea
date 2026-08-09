@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { KolomVitalTerikat } from '../components/KolomVital'
 import { WidgetBeranda } from '../components/WidgetBeranda'
@@ -2019,7 +2020,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
               className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
           </div>
-          <p className="text-[10px] text-neutral-500">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</p>
+          <Prosa kelas="text-[10px] text-neutral-500">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</Prosa>
         </div>
 
         {lastVo2 && (

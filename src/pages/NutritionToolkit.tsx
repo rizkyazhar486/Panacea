@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconFood } from '../components/icons'
@@ -152,11 +153,7 @@ function ElectrolyteCalc() {
         <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{potassium}mg</div><div className="text-[10px] text-neutral-500">Potassium</div></div>
         <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{magnesium}mg</div><div className="text-[10px] text-neutral-500">Magnesium</div></div>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-        Rough daily targets during longer fasts (beyond ~16h), when electrolyte loss without food intake
-        can cause headaches/fatigue. Not medical advice — if you have kidney, heart, or blood pressure
-        conditions, check with a clinician before fasting or supplementing electrolytes.
-      </p>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Rough daily targets during longer fasts (beyond ~16h), when electrolyte loss without food intake can cause headaches/fatigue. Not medical advice — if you have kidney, heart, or blood pressure conditions, check with a clinician before fasting or supplementing electrolytes.</Prosa>
     </Card>
   )
 }

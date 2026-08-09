@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge, Button } from '../components/ui'
 import { useVitals } from '../lib/useVitals'
@@ -315,10 +316,7 @@ export function BodyComposition() {
                 {b.bmd >= -1 ? 'Normal' : b.bmd >= -2.5 ? 'Osteopenia' : 'Osteoporosis'}
               </Badge>
             </div>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">
-              T-score ≥ −1: normal · −1 to −2.5: osteopenia (low bone mass) · ≤ −2.5: osteoporosis (WHO criteria).
-              Bone density naturally declines with age — resistance training and adequate calcium/vitamin D and protein intake help maintain BMD.
-            </p>
+            <Prosa kelas="mt-1.5 text-[11px] leading-relaxed text-neutral-500">T-score ≥ −1: normal · −1 to −2.5: osteopenia (low bone mass) · ≤ −2.5: osteoporosis (WHO criteria). Bone density naturally declines with age — resistance training and adequate calcium/vitamin D and protein intake help maintain BMD.</Prosa>
           </div>
         )}
         {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-500">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
@@ -466,12 +464,7 @@ function ScaleMeasurements() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-        Alat BIA mengukur hambatan listrik lalu MEMPERKIRAKAN komposisi dari situ, sehingga hasilnya
-        dipengaruhi status cairan, makan, olahraga, dan waktu pengukuran. Agar dapat dibandingkan,
-        ukur pada keadaan yang sama: pagi hari, setelah buang air kecil, sebelum makan dan minum,
-        dan sebelum berolahraga.
-      </p>
+      <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Alat BIA mengukur hambatan listrik lalu MEMPERKIRAKAN komposisi dari situ, sehingga hasilnya dipengaruhi status cairan, makan, olahraga, dan waktu pengukuran. Agar dapat dibandingkan, ukur pada keadaan yang sama: pagi hari, setelah buang air kecil, sebelum makan dan minum, dan sebelum berolahraga.</Prosa>
     </Card>
   )
 }

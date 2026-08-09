@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
@@ -408,7 +409,7 @@ function FingerTappingTest() {
 
   return (
     <Card className="!p-6 text-center">
-      <p className="text-[13px] text-neutral-500">Tap as fast and as evenly as you can for 10 seconds. Tapping speed and rhythm consistency are real, widely-used measures of fine motor speed.</p>
+      <Prosa kelas="text-[13px] text-neutral-500">Tap as fast and as evenly as you can for 10 seconds. Tapping speed and rhythm consistency are real, widely-used measures of fine motor speed.</Prosa>
       {phase === 'idle' && (
         <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start 10s test</button>
       )}

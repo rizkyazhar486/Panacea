@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 
@@ -76,11 +77,7 @@ export function LongevityScience() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Longevity Science Explainers" subtitle="What the buzzwords actually mean" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Plain-language mechanism explainers for terms that show up constantly in longevity content.
-          The drug-based entries (metformin, rapamycin, methylene blue) are explained for
-          understanding, not as a recommendation to use them — they require a prescribing physician.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Plain-language mechanism explainers for terms that show up constantly in longevity content. The drug-based entries (metformin, rapamycin, methylene blue) are explained for understanding, not as a recommendation to use them — they require a prescribing physician.</Prosa>
       </Card>
 
       {ENTRIES.map((e) => {

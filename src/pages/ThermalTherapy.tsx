@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariLalu, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconFlame } from '../components/icons'
@@ -50,11 +51,7 @@ export function ThermalTherapy() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconFlame size={20} />} title="Thermal Therapy" subtitle="Sauna & cold exposure — protocols, evidence, and a weekly log" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Deliberate heat and cold are two of the most talked-about longevity practices. Here's what
-          the evidence actually supports, how to dose each, and a simple log to build the habit —
-          with the safety limits that matter.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Deliberate heat and cold are two of the most talked-about longevity practices. Here's what the evidence actually supports, how to dose each, and a simple log to build the habit — with the safety limits that matter.</Prosa>
       </Card>
 
       <Card className="!p-4">

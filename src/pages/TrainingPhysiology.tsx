@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Link } from 'react-router-dom'
 import { Card, SectionTitle } from '../components/ui'
@@ -122,10 +123,7 @@ export function TrainingPhysiology() {
       <div className="space-y-4">
         <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery, and readiness" />
         <Card>
-          <p className="text-sm text-neutral-600 leading-relaxed">
-            Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung
-            tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.
-          </p>
+          <Prosa kelas="text-sm text-neutral-600 leading-relaxed">Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.</Prosa>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
             Turn on <strong className="text-ink">Include Workouts</strong> in Health Auto Export, then
             sync. The instructions are in{' '}
@@ -293,10 +291,7 @@ export function TrainingPhysiology() {
               </span>
             </div>
             <p className="mt-1 text-sm leading-relaxed text-neutral-500">{lthr.metode}</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
-              Di atas ambang ini kelelahan menumpuk jauh lebih cepat dan performa cepat menurun. Inilah
-              batas yang memisahkan &quot;berat tapi terkendali&quot; dari &quot;tidak bisa dipertahankan&quot;.
-            </p>
+            <Prosa kelas="mt-1.5 text-sm leading-relaxed text-neutral-500">Di atas ambang ini kelelahan menumpuk jauh lebih cepat dan performa cepat menurun. Inilah batas yang memisahkan &quot;berat tapi terkendali&quot; dari &quot;tidak bisa dipertahankan&quot;.</Prosa>
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -342,10 +337,7 @@ export function TrainingPhysiology() {
           tinggi dihitung jauh lebih berat daripada satu menit ringan. Angkanya <b>tidak sebanding dengan angka
           Garmin</b>; yang bermakna adalah kecenderungannya pada diri Anda sendiri.
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-          Nisbah beban 7:28 hari dipakai luas, namun bukti bahwa ia meramalkan cedera masih diperdebatkan.
-          Ia dipakai di sini sebagai penanda perubahan, bukan sebagai ramalan.
-        </p>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-500">Nisbah beban 7:28 hari dipakai luas, namun bukti bahwa ia meramalkan cedera masih diperdebatkan. Ia dipakai di sini sebagai penanda perubahan, bukan sebagai ramalan.</Prosa>
       </Card>
 
       <KartuBelumDariJam />

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconGauge } from '../components/icons'
 import { getDemo } from '../lib/profile'
@@ -41,11 +42,7 @@ function AutophagyTiming() {
           ? <div className="text-lg font-black text-brand-dark">Likely in early autophagy range</div>
           : <><div className="text-2xl font-black text-brand-dark">~{hoursRemaining.toFixed(1)}h</div><div className="text-[11px] text-neutral-500">until likely glycogen depletion / autophagy upregulation begins</div></>}
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-        Illustrative estimate based on typical liver glycogen depletion timing (roughly 12-16h fasted,
-        varies with body composition and activity) — not a direct measurement of your glycogen or
-        autophagy status, which can only be assessed in a research lab.
-      </p>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Illustrative estimate based on typical liver glycogen depletion timing (roughly 12-16h fasted, varies with body composition and activity) — not a direct measurement of your glycogen or autophagy status, which can only be assessed in a research lab.</Prosa>
     </Card>
   )
 }
@@ -79,11 +76,7 @@ function CortisolAwakening() {
         <polyline fill="none" stroke="#00BF63" strokeWidth="2" points={points.map((p) => `${p.min * 2.4},${100 - p.level}`).join(' ')} />
       </svg>
       <p className="mt-2 text-center text-[11px] text-neutral-500">Illustrative shape from {wakeTime} · 0-120 min after waking</p>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-        A stylized visualization of the well-documented cortisol awakening response pattern (a natural
-        rise peaking ~30-45 min after waking) — not your measured cortisol, which requires a saliva or
-        blood test at multiple timepoints.
-      </p>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">A stylized visualization of the well-documented cortisol awakening response pattern (a natural rise peaking ~30-45 min after waking) — not your measured cortisol, which requires a saliva or blood test at multiple timepoints.</Prosa>
     </Card>
   )
 }
@@ -106,12 +99,7 @@ function SaunaEquivalent() {
         <div className="text-2xl font-black text-brand-dark">≈ {equivalentWalkMin} min brisk walk</div>
         <div className="text-[11px] text-neutral-500">Estimated cardiovascular strain equivalence</div>
       </div>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-        Based on published heart-rate data from sauna studies (elevated HR similar to light-moderate
-        aerobic exercise) — a rough population-average comparison, not a personal calorie or fitness
-        measurement. Regular sauna use (4-7x/week) is separately associated with lower cardiovascular
-        mortality in observational cohorts.
-      </p>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Based on published heart-rate data from sauna studies (elevated HR similar to light-moderate aerobic exercise) — a rough population-average comparison, not a personal calorie or fitness measurement. Regular sauna use (4-7x/week) is separately associated with lower cardiovascular mortality in observational cohorts.</Prosa>
     </Card>
   )
 }
@@ -127,7 +115,7 @@ function NovaScorer() {
   const band = score >= 80 ? ['Mostly minimally-processed', 'brand'] : score >= 50 ? ['Moderately processed', 'low'] : ['Heavily processed', 'critical']
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">Paste an ingredient list or a list of foods you ate — this scans for common ultra-processing markers (a NOVA-inspired heuristic, not the official NOVA classification methodology).</p>
+      <Prosa kelas="text-[13px] text-neutral-500">Paste an ingredient list or a list of foods you ate — this scans for common ultra-processing markers (a NOVA-inspired heuristic, not the official NOVA classification methodology).</Prosa>
       <textarea className={`${inputClass} mt-2 min-h-24`} placeholder="e.g. sugar, high-fructose corn syrup, modified starch, natural flavor…" value={text} onChange={(e) => setText(e.target.value)} />
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
         <div className="text-2xl font-black text-brand-dark">{score}/100</div>
@@ -177,11 +165,7 @@ function GlycemicOptimizer() {
         <div className="text-2xl font-black text-brand-dark">{gl.toFixed(1)}</div>
         <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]} glycemic load</Badge>
       </div>
-      <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-        Glycemic load = (GI × carbs per serving) / 100 — adding fiber or fat/protein before/with a
-        high-GI food is well-documented to blunt the resulting glucose spike, modeled here as an
-        illustrative reduction, not a measurement of your actual blood sugar response.
-      </p>
+      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Glycemic load = (GI × carbs per serving) / 100 — adding fiber or fat/protein before/with a high-GI food is well-documented to blunt the resulting glucose spike, modeled here as an illustrative reduction, not a measurement of your actual blood sugar response.</Prosa>
     </Card>
   )
 }
@@ -196,7 +180,7 @@ function HealthspanDividend() {
 
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">Toggle the habits you maintain consistently — based on combined-lifestyle-factor effect sizes seen in large cohort studies (e.g. never smoking, regular exercise, healthy diet, healthy BMI, moderate alcohol).</p>
+      <Prosa kelas="text-[13px] text-neutral-500">Toggle the habits you maintain consistently — based on combined-lifestyle-factor effect sizes seen in large cohort studies (e.g. never smoking, regular exercise, healthy diet, healthy BMI, moderate alcohol).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {(Object.keys(habits) as (keyof typeof habits)[]).map((k) => (
           <button key={k} onClick={() => setHabits((h) => ({ ...h, [k]: !h[k] }))} className={`rounded-xl py-2 text-[12px] font-bold capitalize ${habits[k] ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>
@@ -231,10 +215,7 @@ export function PredictiveModelsToolkit() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Six real mathematical models in one place" />
-        <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
-          Every model here applies published, population-average patterns to your inputs — none of them
-          measure your actual biology directly. Think of these as educated illustrations, not lab results.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Every model here applies published, population-average patterns to your inputs — none of them measure your actual biology directly. Think of these as educated illustrations, not lab results.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>

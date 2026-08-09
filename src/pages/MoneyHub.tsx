@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Badge, Field, inputClass, Button } from '../components/ui'
 import { IconToken } from '../components/icons'
@@ -165,11 +166,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
       <Card className="!p-4">
         <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Terakhir dicatat</div>
         {recent.length === 0 ? (
-          <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-            Belum ada catatan. Mulai dari mencatat pengeluaran hari ini saja — jangan mencoba
-            merekonstruksi sebulan ke belakang, karena itulah yang membuat sebagian besar orang
-            berhenti di hari pertama.
-          </p>
+          <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Belum ada catatan. Mulai dari mencatat pengeluaran hari ini saja — jangan mencoba merekonstruksi sebulan ke belakang, karena itulah yang membuat sebagian besar orang berhenti di hari pertama.</Prosa>
         ) : (
           <div className="mt-2 space-y-1.5">
             {recent.map((t) => (
@@ -261,11 +258,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-500">
-          50/30/20 adalah patokan kasar, bukan aturan. Di kota dengan biaya sewa tinggi, porsi
-          kebutuhan hampir selalu melewati 50% dan itu bukan tanda Anda boros — yang lebih berguna
-          adalah melihat arahnya dari bulan ke bulan, bukan membandingkannya dengan angka ideal.
-        </p>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">50/30/20 adalah patokan kasar, bukan aturan. Di kota dengan biaya sewa tinggi, porsi kebutuhan hampir selalu melewati 50% dan itu bukan tanda Anda boros — yang lebih berguna adalah melihat arahnya dari bulan ke bulan, bukan membandingkannya dengan angka ideal.</Prosa>
       </Card>
 
       <Card className="!p-4">
@@ -517,12 +510,7 @@ function RiskTab() {
             <div className="mt-1 text-[15px] font-black text-ink dark:text-ink">
               {formatIdr(low[low.length - 1]?.value ?? 0)} — {formatIdr(high[high.length - 1]?.value ?? 0)}
             </div>
-            <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
-              Ditampilkan sebagai rentang (asumsi 4% dan 9% per tahun), bukan satu angka. Satu angka
-              memberi kesan pasti yang tidak ada — dan orang menyusun rencana hidup di atas kesan itu.
-              Hasil sesungguhnya bisa di luar rentang ini, termasuk lebih rendah dari total setoran
-              Anda bila pasar sedang buruk saat Anda membutuhkannya.
-            </p>
+            <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Ditampilkan sebagai rentang (asumsi 4% dan 9% per tahun), bukan satu angka. Satu angka memberi kesan pasti yang tidak ada — dan orang menyusun rencana hidup di atas kesan itu. Hasil sesungguhnya bisa di luar rentang ini, termasuk lebih rendah dari total setoran Anda bila pasar sedang buruk saat Anda membutuhkannya.</Prosa>
           </div>
         )}
       </Card>

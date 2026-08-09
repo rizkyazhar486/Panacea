@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconStethoscope } from '../../components/icons'
 import { OSCE_CASES, OSCE_SYSTEMS, type OsceSystem } from '../../lib/osceCaseBank'
@@ -33,10 +34,7 @@ export default function OsceCaseBankSection() {
     <div className="space-y-4">
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Case Bank" subtitle="Curated high-yield case topics by system, from a decade of real OSCE UKMPPD recaps" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Frequency tags are a rough "how often a variant of this case shows up" signal for prioritizing
-          review — not a guarantee of what's on any specific exam sitting.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Frequency tags are a rough "how often a variant of this case shows up" signal for prioritizing review — not a guarantee of what's on any specific exam sitting.</Prosa>
         <input
           className="mt-3 w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-[13px] outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           placeholder="Cari kasus (mis. BPPV, DM, appendisitis)…"

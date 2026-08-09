@@ -573,20 +573,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </button>
 
           <div className="no-scrollbar flex min-w-0 shrink items-center gap-2 overflow-x-auto sm:gap-3">
-            {['pasien', 'dokter', 'owner'].includes(account.role) && (
-              <NavLink to="/messages" aria-label="Messages" title="Messages"
-                className={({ isActive }) => `grid h-10 w-10 shrink-0 place-items-center rounded-full transition-colors hover:bg-neutral-100 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
-                <IconChat size={20} />
-              </NavLink>
-            )}
-            <button
-              onClick={() => setBantuanBuka(true)}
-              aria-label="Bantuan / Hubungi dukungan"
-              title="Bantuan / Hubungi dukungan"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-brand-dark"
-            >
-              <IconPhone size={20} />
-            </button>
+            {/* Pesan, dukungan, dan tema pindah ke laci menu -- lihat catatan
+                di atas soal delapan sasaran ketuk dalam satu bilah. Yang
+                tersisa di sini hanya yang benar-benar dipakai setiap hari. */}
             <NotificationBell />
             <button
               onClick={() => setTheme(toggleTheme())}
@@ -779,6 +768,26 @@ export function Shell({ children }: { children: ReactNode }) {
                   <IconHospital size={18} /> Emergency (SOS)
                 </NavLink>
               )}
+              <NavLink
+                to="/messages"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
+              >
+                <IconChat size={18} /> Pesan
+              </NavLink>
+              <button
+                onClick={() => { setMenuOpen(false); setBantuanBuka(true) }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
+              >
+                <IconPhone size={18} /> Bantuan / Dukungan
+              </button>
+              <button
+                onClick={() => setTheme(toggleTheme())}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
+              >
+                {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+                {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
+              </button>
               <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
                 <IconLogout size={18} /> Log Out
               </button>

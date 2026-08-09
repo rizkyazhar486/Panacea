@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Prosa } from './Prosa'
 
 export function Card({
   children,
@@ -38,7 +39,11 @@ export function SectionTitle({
         {icon && <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-dark">{icon}</span>}
         <div className="min-w-0">
           <h2 className="text-lg font-extrabold leading-tight tracking-tight text-ink">{title}</h2>
-          {subtitle && <p className="mt-0.5 text-[13px] leading-snug text-neutral-500">{subtitle}</p>}
+          {/* Subjudul dilipat otomatis bila panjang. Ini dipakai 188 berkas,
+              jadi satu perubahan di sini memendekkan seluruh aplikasi tanpa
+              menyentuh satu halaman pun -- dan tanpa membuang satu kata pun,
+              karena yang panjang hanya dilipat dan bisa dibuka. */}
+          {subtitle && <Prosa kelas="mt-0.5 text-[13px] leading-snug text-neutral-500">{subtitle}</Prosa>}
         </div>
       </div>
       {right}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
@@ -586,9 +587,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
           ))}
         </div>
       )}
-      <p className="mt-1.5 text-[10px] text-neutral-500">
-        ICD-10 standard (used by SATUSEHAT/BPJS) with ICD-11 equivalents for common diagnoses. The final primary diagnosis is still determined and signed off by the doctor.
-      </p>
+      <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">ICD-10 standard (used by SATUSEHAT/BPJS) with ICD-11 equivalents for common diagnoses. The final primary diagnosis is still determined and signed off by the doctor.</Prosa>
     </div>
   )
 }

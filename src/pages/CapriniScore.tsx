@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -95,11 +96,7 @@ export function CapriniScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Caprini Score" subtitle="Surgical VTE risk assessment (Caprini 2005; validated Bahl 2010)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          VTE risk stratification for surgical patients, mapped to prophylaxis intensity per
-          ACCP/CHEST guidance. For hospitalized medical (non-surgical) patients, use the Padua score
-          instead. Check only the age band that applies.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">VTE risk stratification for surgical patients, mapped to prophylaxis intensity per ACCP/CHEST guidance. For hospitalized medical (non-surgical) patients, use the Padua score instead. Check only the age band that applies.</Prosa>
       </Card>
 
       {GROUPS.map((g) => (

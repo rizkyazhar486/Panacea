@@ -1,4 +1,5 @@
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { Prosa } from '../components/Prosa'
 import { IconShield, IconSparkle, IconEMR, IconBook, IconCheck } from '../components/icons'
 import { WEIGHTS, S_THRESHOLD } from '../lib/cdss'
 
@@ -175,11 +176,7 @@ export function Architecture() {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-xs text-neutral-500">
-          Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays
-          local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused
-          test set before rollout, with versioning & rollback paths.
-        </p>
+        <Prosa kelas="mt-3 text-xs text-neutral-500">Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused test set before rollout, with versioning & rollback paths.</Prosa>
       </Card>
     </div>
   )

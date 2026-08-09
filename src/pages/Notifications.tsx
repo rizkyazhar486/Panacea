@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconBell } from '../components/icons'
@@ -97,10 +98,7 @@ export function Notifications() {
       <div className="space-y-4">
         <SectionTitle icon={<IconBell />} title="Pemberitahuan" />
         <Card>
-          <p className="text-sm text-neutral-500">
-            Pemberitahuan memerlukan sambungan ke server, dan saat ini aplikasi berjalan dalam mode
-            tanpa server. Data kesehatan Anda tetap tersimpan di perangkat ini seperti biasa.
-          </p>
+          <Prosa kelas="text-sm text-neutral-500">Pemberitahuan memerlukan sambungan ke server, dan saat ini aplikasi berjalan dalam mode tanpa server. Data kesehatan Anda tetap tersimpan di perangkat ini seperti biasa.</Prosa>
         </Card>
       </div>
     )

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconMoon, IconLeaf, IconActivity } from '../components/icons'
@@ -101,7 +102,7 @@ function SleepScoreCard() {
         <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Awakenings</div></div>
         <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Consistency</div></div>
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</Prosa>
     </Card>
   )
 }
@@ -238,7 +239,7 @@ function MeditationCard() {
         <span className="text-[10px] font-bold uppercase text-neutral-500">Volume</span>
         <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
       </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-neutral-500">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</p>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</Prosa>
     </Card>
   )
 }

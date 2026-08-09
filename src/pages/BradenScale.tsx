@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
 import { CopyNote } from '../components/CopyNote'
@@ -87,10 +88,7 @@ export function BradenScale() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Braden Scale" subtitle="Pressure injury risk assessment (Bergstrom & Braden 1987)" />
-        <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Six subscales, each scored 1-4 (friction/shear 1-3). A LOWER total means HIGHER risk —
-          range 6-23, with ≤18 conventionally treated as "at risk" in adult inpatients.
-        </p>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Six subscales, each scored 1-4 (friction/shear 1-3). A LOWER total means HIGHER risk — range 6-23, with ≤18 conventionally treated as "at risk" in adult inpatients.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-3">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconStethoscope } from '../components/icons'
 
@@ -33,7 +34,7 @@ function BloodTrendForecaster() {
 
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">Enter your last few years of a biomarker (e.g. fasting glucose, mg/dL) — a linear regression projects the trend forward 5 years if nothing changes.</p>
+      <Prosa kelas="text-[13px] text-neutral-500">Enter your last few years of a biomarker (e.g. fasting glucose, mg/dL) — a linear regression projects the trend forward 5 years if nothing changes.</Prosa>
       <div className="mt-3 grid grid-cols-5 gap-1.5">
         {values.map((v, i) => (
           <Field key={i} label={`Yr ${i + 1}`}>
@@ -101,7 +102,7 @@ function PhenoAgeCalc() {
 
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">The published PhenoAge formula (Levine et al. 2018) from 9 standard blood markers + chronological age. Enter values from a recent panel (defaults shown are roughly typical/healthy).</p>
+      <Prosa kelas="text-[13px] text-neutral-500">The published PhenoAge formula (Levine et al. 2018) from 9 standard blood markers + chronological age. Enter values from a recent panel (defaults shown are roughly typical/healthy).</Prosa>
       <div className="mt-3 grid grid-cols-3 gap-2">
         <Field label="Albumin (g/L)"><input className={inputClass} type="number" value={f.albumin} onChange={set('albumin')} /></Field>
         <Field label="Creatinine (µmol/L)"><input className={inputClass} type="number" value={f.creatinine} onChange={set('creatinine')} /></Field>
@@ -118,7 +119,7 @@ function PhenoAgeCalc() {
         <div className="text-3xl font-black text-brand-dark">{phenoAge}</div>
         <div className="text-[11px] text-neutral-500">PhenoAge (vs. chronological age {f.age})</div>
       </div>
-      <p className="mt-2 text-[11px] text-neutral-500">Levine ME et al., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Our best-effort implementation of the published coefficients; not a substitute for validated clinical labs, and worth cross-checking against another PhenoAge calculator.</p>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Levine ME et al., Aging (Albany NY) 2018 — "An epigenetic biomarker of aging for lifespan and healthspan." Our best-effort implementation of the published coefficients; not a substitute for validated clinical labs, and worth cross-checking against another PhenoAge calculator.</Prosa>
     </Card>
   )
 }
@@ -138,11 +139,7 @@ function OmegaRatio() {
         <div className="text-2xl font-black text-brand-dark">{ratio.toFixed(1)} : 1</div>
         <Badge tone={band[1] as 'brand' | 'low' | 'critical'}>{band[0]}</Badge>
       </div>
-      <p className="mt-2 text-[12px] leading-relaxed text-neutral-500">
-        Western diets often run 15:1-20:1 omega-6:3; ancestral/traditional diets are estimated closer to
-        1:1-4:1. Lower ratios are theorized to favor a less pro-inflammatory eicosanoid balance — an
-        active research area, not a settled clinical target.
-      </p>
+      <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-500">Western diets often run 15:1-20:1 omega-6:3; ancestral/traditional diets are estimated closer to 1:1-4:1. Lower ratios are theorized to favor a less pro-inflammatory eicosanoid balance — an active research area, not a settled clinical target.</Prosa>
     </Card>
   )
 }
@@ -165,13 +162,13 @@ function MicrobiomeDiversity() {
 
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">Pulls from your Plant Diversity list in the Nutrition Longevity Toolkit this week and calculates a real Shannon Diversity Index (a standard ecological evenness/richness metric, applied here to your diet).</p>
+      <Prosa kelas="text-[13px] text-neutral-500">Pulls from your Plant Diversity list in the Nutrition Longevity Toolkit this week and calculates a real Shannon Diversity Index (a standard ecological evenness/richness metric, applied here to your diet).</Prosa>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
         <div className="text-2xl font-black text-brand-dark">{shannon.toFixed(2)}</div>
         <div className="text-[11px] text-neutral-500">Shannon Index · {plants.length} unique plants logged this week</div>
       </div>
       {plants.length === 0 && <p className="mt-2 text-center text-[12px] text-neutral-500">Nothing logged yet — add plants in the Nutrition Longevity Toolkit's "Plant Diversity" tab first.</p>}
-      <p className="mt-2 text-[11px] text-neutral-500">Higher richness (more unique plants) drives a higher index — a proxy some microbiome researchers use for dietary fiber/polyphenol diversity, not a direct measurement of your actual gut microbiome (which requires stool sequencing).</p>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Higher richness (more unique plants) drives a higher index — a proxy some microbiome researchers use for dietary fiber/polyphenol diversity, not a direct measurement of your actual gut microbiome (which requires stool sequencing).</Prosa>
     </Card>
   )
 }
@@ -232,7 +229,7 @@ function SupplementCombiner() {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-[11px] text-neutral-500">A simplified single-compartment exponential-decay model — real pharmacokinetics involve absorption phases, metabolism (CYP450), and individual variation this doesn't capture. Not medical advice; check real interactions with a pharmacist.</p>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">A simplified single-compartment exponential-decay model — real pharmacokinetics involve absorption phases, metabolism (CYP450), and individual variation this doesn't capture. Not medical advice; check real interactions with a pharmacist.</Prosa>
     </Card>
   )
 }

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../components/icons'
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
@@ -186,9 +187,7 @@ function PracticeBank() {
         </>
       )}
 
-      <p className="mt-4 text-[10px] leading-relaxed text-neutral-500">
-        These are original practice questions written to match each exam's format and blueprint — not real/leaked past papers, which are copyrighted by their boards. UKMPPD candidates: the USMLE and PLAB banks track the same clinical-reasoning skills and blueprint the UKMPPD draws from.
-      </p>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">These are original practice questions written to match each exam's format and blueprint — not real/leaked past papers, which are copyrighted by their boards. UKMPPD candidates: the USMLE and PLAB banks track the same clinical-reasoning skills and blueprint the UKMPPD draws from.</Prosa>
     </Card>
   )
 }

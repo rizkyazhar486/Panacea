@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Prosa } from '../components/Prosa'
 import { kunciHari, hariIni } from '../lib/tanggal'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconSparkle } from '../components/icons'
@@ -124,11 +125,7 @@ function NeatTracker() {
   }, [minutes])
   return (
     <Card className="!p-5">
-      <p className="text-[13px] leading-relaxed text-neutral-500">
-        NEAT (Non-Exercise Activity Thermogenesis) — walking, standing, fidgeting, chores — often burns
-        more calories over a day than a single workout, and standing/walking hours correlate with
-        better metabolic health independent of formal exercise.
-      </p>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">NEAT (Non-Exercise Activity Thermogenesis) — walking, standing, fidgeting, chores — often burns more calories over a day than a single workout, and standing/walking hours correlate with better metabolic health independent of formal exercise.</Prosa>
       <Field label="Standing/walking minutes today">
         <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => setMinutes((m) => ({ ...m, [today]: Number(e.target.value) || 0 }))} placeholder="0" />
       </Field>
