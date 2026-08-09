@@ -30,29 +30,29 @@ export function TeknikLari() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle
         icon={<IconRun />}
-        title="Teknik Lari"
+        title="Running Technique"
         subtitle="From the start to breathing — ordered by how strong the evidence is"
       />
 
       {/* Yang paling sering salah dipahami, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">
-        <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Baca ini dulu</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Read this first</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          <b>Tidak ada satu bentuk lari yang benar untuk semua orang.</b> Bukti terbaik yang ada
-          menunjukkan bahwa mengubah gaya lari secara paksa — terutama memaksa mendarat pada ujung
-          kaki — tidak menurunkan risiko cedera, dan sering hanya memindahkannya dari lutut ke
-          tendon Achilles dan tulang telapak kaki.
+          <b>There is no single correct running form for everyone.</b> The best evidence available
+          shows that forcibly changing your gait — especially forcing a forefoot landing — does not
+          reduce injury risk, and often just moves it from the knee to the Achilles tendon and the
+          bones of the foot.
         </p>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          Karena itu tiap bagian di bawah membawa tingkat buktinya sendiri, dan daftarnya diurutkan
-          dari yang paling terbukti. Kalau waktu Anda terbatas, kerjakan yang hijau lebih dulu dan
-          biarkan sisanya apa adanya.
+          Each section below therefore carries its own evidence rating, and the list is ordered from
+          the best-supported down. If your time is limited, work on the green ones first and leave
+          the rest alone.
         </p>
       </Card>
 
       {/* Teknik */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Teknik, dari yang paling terbukti</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Technique, best-supported first</div>
         <div className="mt-3 space-y-1.5">
           {bagian.map((b) => {
             const t = buka === b.id
@@ -87,7 +87,7 @@ export function TeknikLari() {
                     <p className="text-[12px] leading-relaxed text-ink">{b.intinya}</p>
 
                     <div>
-                      <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">Cara mengerjakannya</div>
+                      <div className="text-[10px] font-black uppercase tracking-wide text-slate-500">How to do it</div>
                       <ol className="mt-1 space-y-1">
                         {b.langkah.map((l, i) => (
                           <li key={l} className="flex gap-2 text-[12px] leading-snug text-ink">
@@ -98,12 +98,12 @@ export function TeknikLari() {
                     </div>
 
                     <div className="rounded-lg bg-rose-500/10 p-2">
-                      <div className="text-[10px] font-black uppercase text-rose-600">Kesalahan yang paling umum</div>
+                      <div className="text-[10px] font-black uppercase text-rose-600">The most common mistake</div>
                       <p className="text-[12px] leading-snug text-neutral-600">{b.kesalahan}</p>
                     </div>
 
                     <div className="rounded-lg bg-emerald-500/10 p-2">
-                      <div className="text-[10px] font-black uppercase text-emerald-700">Latihan</div>
+                      <div className="text-[10px] font-black uppercase text-emerald-700">Drill</div>
                       <p className="text-[12px] leading-snug text-neutral-600">{b.latihan}</p>
                     </div>
 
@@ -118,7 +118,7 @@ export function TeknikLari() {
 
       {/* Fisiologi endurance */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Membangun daya tahan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Building endurance</div>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">
           Teknik menentukan seberapa murah tiap langkah. Empat hal ini menentukan berapa lama Anda
           bisa mempertahankannya.
@@ -158,23 +158,23 @@ export function TeknikLari() {
 
       {/* Pace tidak diduplikasi — sudah punya halamannya sendiri. */}
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Pace Anda sendiri</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Your own pace</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
           Angka pace easy, tempo dan interval bergantung pada kebugaran Anda sekarang, jadi ia tidak
-          diulang di sini. Halaman <b>Foundation Training &amp; Postur</b> menghitungnya dari hasil lomba
+          diulang di sini. Halaman <b>Foundation Training &amp; Posture</b> menghitungnya dari hasil lomba
           atau tes Anda memakai kerangka VDOT, dan <b>Analisis Pro</b> membaca zona pace langsung
           dari sesi yang sudah tersinkron.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link to="/latihan-dasar"
-            className="rounded-xl bg-brand px-3 py-2 text-[12px] font-bold text-ink">Hitung zona pace saya</Link>
+            className="rounded-xl bg-brand px-3 py-2 text-[12px] font-bold text-ink">Calculate my pace zones</Link>
           <Link to="/analisis-pro"
-            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-neutral-600">Zona dari data saya</Link>
+            className="rounded-xl bg-white/5 px-3 py-2 text-[12px] font-bold text-neutral-600">Zones from my own data</Link>
         </div>
       </Card>
 
       <Card>
-        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Rujukan</div>
+        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">References</div>
         <ul className="mt-2 space-y-1">
           {RUJUKAN_LARI.map((r) => (
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
