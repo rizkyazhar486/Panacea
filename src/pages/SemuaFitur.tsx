@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
+import { FITUR_DARI_HUB } from '../lib/katalogFitur'
 
 /**
  * Direktori seluruh fitur, dapat dicari.
@@ -45,13 +46,36 @@ export default function SemuaFitur() {
   const [q, setQ] = useState('')
   const peran = account?.role ?? 'pasien'
 
+  // Dua sumber digabung menurut `to`, dengan menu didahulukan karena labelnya
+  // yang dipakai di navigasi. Tanpa penggabungan ini halaman "Semua Fitur"
+  // hanya memuat 59 dari 187 tujuan -- namanya berjanji lebih daripada isinya.
+  const semua = useMemo(() => {
+    const peta = new Map<string, { to: string; label: string; group: string; kw: string; roles: string[] }>()
+    for (const f of FITUR_DARI_HUB) {
+      peta.set(f.to, { to: f.to, label: f.nama, group: f.grup, kw: `${f.apa} ${f.kw}`, roles: [] })
+    }
+    for (const n of NAV_UNTUK_PENGATURAN) {
+      const ada = peta.get(n.to)
+      peta.set(n.to, { to: n.to, label: n.label, group: n.group, kw: ada?.kw ?? '', roles: n.roles })
+    }
+    return [...peta.values()]
+  }, [])
+
   const grup = useMemo(() => {
     const kata = q.toLowerCase().trim()
-    const cocok = NAV_UNTUK_PENGATURAN.filter((n) => {
-      if (!n.roles.includes(peran)) return false
+    const cocok = semua.filter((n) => {
+      // Tujuan yang datang dari hub tidak membawa daftar peran; hub itu
+      // sendiri sudah membatasi siapa yang bisa membukanya, jadi daftar kosong
+      // di sini berarti "tidak dibatasi", bukan "tidak boleh siapa pun".
+      if (n.roles.length && !n.roles.includes(peran)) return false
       if (n.to === '/semua-fitur') return false
       if (!kata) return true
-      return `${n.label} ${n.group} ${n.to}`.toLowerCase().includes(kata)
+      // Dicocokkan PER KATA, bukan sebagai frasa utuh. Dengan `includes`,
+      // mengetik "pulmonary embolism" tidak menemukan Wells Score meskipun
+      // kedua katanya ada di sana -- hanya urutannya yang tidak persis sama.
+      // Semua kata harus ada, jadi menambah kata tetap mempersempit hasil.
+      const teks = `${n.label} ${n.group} ${n.to} ${n.kw}`.toLowerCase()
+      return kata.split(/\s+/).every((w) => teks.includes(w))
     })
     const peta = new Map<string, typeof cocok>()
     for (const n of cocok) {
@@ -63,7 +87,7 @@ export default function SemuaFitur() {
     // menaruhnya di atas membuat halaman ini terbaca sebagai etalase.
     return [...peta.entries()].sort((a, b) =>
       (a[0].startsWith('Toko') ? 1 : 0) - (b[0].startsWith('Toko') ? 1 : 0))
-  }, [q, peran])
+  }, [q, peran, semua])
 
   const total = grup.reduce((a, [, v]) => a + v.length, 0)
 

@@ -10,80 +10,109 @@ import { ambilTujuan, simpanTujuan, modeAwam, PILIHAN_TUJUAN, type Tujuan } from
  * pertama sebuah aplikasi kesehatan berbunyi "No posts yet" — 31 kata, tidak
  * satu pun tentang kesehatannya. Tidak ada alasan untuk kembali besok.
  *
- * Umpan sosial tidak dihapus, hanya tidak lagi menjadi pintu masuk: ia butuh
- * massa kritis yang belum ada, sedangkan isi klinis sudah lengkap sejak hari
- * pertama dan berguna walau pemakainya sendirian.
+ * Bentuknya KISI LAMBANG, bukan tumpukan kartu bertulisan. Kartu selebar layar
+ * hanya memuat empat pintu per layar; kisi empat kolom memuat delapan sekaligus,
+ * jadi seluruh isi aplikasi terlihat tanpa menggulir. Lambang juga dikenali
+ * lebih cepat daripada dibaca, dan posisinya yang tetap membuat orang hafal
+ * letaknya — itu pola yang sudah dipahami semua orang di sini dari Gojek dan
+ * aplikasi sejenis.
  *
  * Susunannya mengikuti TUJUAN PAKAI yang ditanyakan sekali, bukan peran akun.
- * Percobaan sebelumnya memakai peran, dan itu salah untuk separuh pemakai yang
- * dituju: peran "Doctor" mensyaratkan nomor STR, sedangkan mahasiswa kedokteran
- * belum punya STR dan karenanya mendaftar sebagai "pasien" — persis kelompok
- * yang paling membutuhkan isi klinis di atas, tetapi justru mendapat susunan
- * orang awam.
- *
- * Apa pun jawabannya, tidak ada bagian yang disembunyikan. Yang berubah hanya
- * urutan, karena aplikasi ini memang melayani keduanya dan seorang mahasiswa
- * kedokteran juga punya badan yang perlu dijaga.
+ * Peran "Doctor" mensyaratkan nomor STR, sedangkan mahasiswa kedokteran belum
+ * punya STR dan karenanya mendaftar sebagai "pasien" — persis kelompok yang
+ * paling membutuhkan isi klinis di atas, tetapi justru mendapat susunan orang
+ * awam. Apa pun jawabannya tidak ada yang disembunyikan; yang berubah hanya
+ * urutannya.
  */
 
-type Pintu = { ke: string; ikon: string; judul: string; isi: string }
+type Pintu = { ke: string; ikon: string; judul: string; warna: string }
 
-/**
- * Pintu untuk yang belajar/berpraktik kedokteran, DIURUTKAN MENURUT KEDALAMAN
- * ISI YANG SUDAH ADA — bukan menurut selera. Direktori SKDI memuat 623 catatan
- * penyakit; itu yang paling matang, jadi itu yang di atas.
- */
+/** Warna latar lambang — tetap per wilayah, supaya letaknya ikut terhafal. */
+const W = {
+  gerak: 'bg-emerald-100 dark:bg-emerald-500/20',
+  makan: 'bg-amber-100 dark:bg-amber-500/20',
+  tidur: 'bg-indigo-100 dark:bg-indigo-500/20',
+  tubuh: 'bg-rose-100 dark:bg-rose-500/20',
+  otak: 'bg-violet-100 dark:bg-violet-500/20',
+  alat: 'bg-sky-100 dark:bg-sky-500/20',
+  obat: 'bg-teal-100 dark:bg-teal-500/20',
+  darurat: 'bg-red-100 dark:bg-red-500/20',
+}
+
+const PRIBADI: Pintu[] = [
+  { ke: '/latihan', ikon: '🏃', judul: 'Latihan', warna: W.gerak },
+  { ke: '/nutrition', ikon: '🥗', judul: 'Gizi', warna: W.makan },
+  { ke: '/recovery', ikon: '🌙', judul: 'Tidur', warna: W.tidur },
+  { ke: '/tubuh', ikon: '❤️', judul: 'Tanda Tubuh', warna: W.tubuh },
+]
+
 const KLINIS: Pintu[] = [
-  { ke: '/med-study', ikon: '🧠', judul: 'Belajar Penyakit', isi: '623 penyakit SKDI — peta sebab, tanda, obat, bahaya' },
-  { ke: '/med-study', ikon: '🩺', judul: 'Keterampilan & OSCE', isi: 'APN, ACLS, ATLS, bidai, sirkumsisi — langkah demi langkah' },
-  { ke: '/clinical-calculators', ikon: '🧮', judul: 'Skor & Kalkulator', isi: 'SOFA, Wells, GRACE, Child-Pugh, dosis anak' },
-  { ke: '/drug-info', ikon: '💊', judul: 'Obat & Resep', isi: 'Dosis, interaksi, cara menulis resep' },
+  { ke: '/med-study', ikon: '🧠', judul: 'Penyakit', warna: W.otak },
+  { ke: '/med-study', ikon: '🩺', judul: 'Tindakan', warna: W.alat },
+  { ke: '/calculator-hub', ikon: '🧮', judul: 'Kalkulator', warna: W.alat },
+  { ke: '/drug-info', ikon: '💊', judul: 'Obat', warna: W.obat },
 ]
 
 /**
  * Pintu yang sama, disebut dengan bahasa sehari-hari.
  *
- * Tujuannya BUKAN isi yang lebih dangkal — halaman yang dituju persis sama.
- * Yang berbeda hanya namanya: "SKDI", "OSCE", dan "SOFA" adalah bahasa ujian,
- * berarti bagi yang diuji dengannya dan singkatan kosong bagi yang tidak.
+ * Halaman yang dituju persis sama dan tidak ada isi yang dikurangi. Yang
+ * berbeda hanya namanya: "OSCE" dan "SOFA" adalah bahasa ujian, berarti bagi
+ * yang diuji dengannya dan singkatan kosong bagi yang tidak.
  */
 const KLINIS_AWAM: Pintu[] = [
-  { ke: '/med-study', ikon: '🧠', judul: 'Cari Tahu Penyakit', isi: '623 penyakit — apa, sebabnya, tandanya, obatnya' },
-  { ke: '/med-study', ikon: '🩺', judul: 'Pertolongan & Tindakan', isi: 'Bantuan napas, henti jantung, membidai patah tulang' },
-  { ke: '/clinical-calculators', ikon: '🧮', judul: 'Hitung Risiko', isi: 'Risiko jantung, fungsi ginjal, berat badan ideal' },
-  { ke: '/drug-info', ikon: '💊', judul: 'Cari Obat', isi: 'Kegunaan, efek samping, obat yang tidak boleh dicampur' },
+  { ke: '/med-study', ikon: '🧠', judul: 'Penyakit', warna: W.otak },
+  { ke: '/med-study', ikon: '🩺', judul: 'Pertolongan', warna: W.alat },
+  { ke: '/calculator-hub', ikon: '🧮', judul: 'Hitung Risiko', warna: W.alat },
+  { ke: '/drug-info', ikon: '💊', judul: 'Obat', warna: W.obat },
 ]
 
-/** Pintu untuk yang menjaga badannya sendiri. */
-const PRIBADI: Pintu[] = [
-  { ke: '/latihan', ikon: '🏃', judul: 'Latihan', isi: 'Sesi berikutnya dari kelelahan yang masih ada' },
-  { ke: '/nutrition', ikon: '🥗', judul: 'Gizi', isi: 'Makan hari ini, target kalori dan protein' },
-  { ke: '/recovery', ikon: '🌙', judul: 'Tidur & Pemulihan', isi: 'Utang tidur, kesiapan besok' },
-  { ke: '/tubuh', ikon: '❤️', judul: 'Tanda Tubuh', isi: 'Tekanan darah, nadi, berat, gula' },
+const LAINNYA: Pintu[] = [
+  { ke: '/emergency', ikon: '🚨', judul: 'Darurat', warna: W.darurat },
+  { ke: '/scripture', ikon: '📖', judul: 'Ibadah', warna: W.tidur },
+  { ke: '/feed', ikon: '💬', judul: 'Kabar', warna: W.gerak },
+  { ke: '/semua-fitur', ikon: '🧭', judul: 'Semua Fitur', warna: W.alat },
 ]
 
-function Kartu({ p }: { p: Pintu }) {
+/**
+ * Satu lambang.
+ *
+ * Label dibiarkan membungkus sampai dua baris dan tingginya dikunci, supaya
+ * baris kisi tetap sejajar walau ada label sepanjang "Tanda Tubuh" berdampingan
+ * dengan "Gizi" — tanpa itu, kotak-kotaknya bergeser naik-turun dan kisinya
+ * berhenti terbaca sebagai kisi.
+ */
+function Lambang({ p }: { p: Pintu }) {
   return (
-    <Link
-      to={p.ke}
-      className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white p-3.5 transition active:scale-[0.99] dark:border-white/10 dark:bg-white/5"
-    >
-      <span className="text-2xl leading-none">{p.ikon}</span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[14px] font-bold text-ink dark:text-white">{p.judul}</span>
-        <span className="block text-[12px] leading-snug text-neutral-500">{p.isi}</span>
+    <Link to={p.ke} className="flex flex-col items-center gap-1.5 transition active:scale-95">
+      <span className={`grid h-[58px] w-[58px] place-items-center rounded-2xl text-[26px] ${p.warna}`}>
+        {p.ikon}
       </span>
-      <span className="text-neutral-300">›</span>
+      <span className="flex h-[26px] items-start text-center text-[11px] font-bold leading-[1.2] text-ink dark:text-neutral-200">
+        {p.judul}
+      </span>
     </Link>
   )
 }
 
-function Bagian({ judul, pintu }: { judul: string; pintu: Pintu[] }) {
+/**
+ * Satu baris keterangan di bawah judul kisi.
+ *
+ * Label lambang harus pendek supaya muat empat kolom, dan itu menghilangkan
+ * keterangan yang dulu ada di kartu. Yang paling terasa hilangnya adalah
+ * "SKDI": bagi mahasiswa kedokteran kata itu yang menandakan isinya memang
+ * bahan ujiannya, dan tanpa itu kisi klinis terbaca seperti ensiklopedia umum.
+ * Satu baris cukup untuk mengembalikannya tanpa menghidupkan lagi dinding
+ * teks yang baru saja dibongkar.
+ */
+function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu[] }) {
   return (
     <section>
-      <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      <div className="space-y-2">
-        {pintu.map((p) => <Kartu key={p.judul} p={p} />)}
+      <h2 className="text-[11px] font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      {isi && <p className="mb-2 text-[11px] leading-snug text-neutral-400">{isi}</p>}
+      {!isi && <div className="mb-2" />}
+      <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+        {pintu.map((p) => <Lambang key={p.judul} p={p} />)}
       </div>
     </section>
   )
@@ -120,16 +149,19 @@ export default function Beranda() {
   const nama = account?.name?.split(' ')[0] ?? ''
   const [tujuan, setTujuan] = useState<Tujuan | null>(() => ambilTujuan())
   const pilih = (t: Tujuan) => { simpanTujuan(t); setTujuan(t) }
-  // Sebelum dijawab, urutannya mengikuti peran akun sebagai perkiraan sementara
-  // — dan pertanyaannya tetap ditampilkan supaya perkiraan itu bisa dikoreksi.
+  // Sebelum dijawab, peran akun dipakai sebagai perkiraan sementara — dan
+  // pertanyaannya tetap tampil supaya perkiraan itu bisa dikoreksi.
   //
   // "Keduanya" menaruh badan lebih dulu, dan itu keputusan frekuensi, bukan
   // kepentingan: gizi, latihan, dan tanda tubuh dibuka setiap hari, sedangkan
-  // isi klinis dibuka saat sedang belajar. Yang lebih sering dituju diletakkan
-  // lebih dekat. Kelompok klinis tetap ada tepat di bawahnya.
+  // isi klinis dibuka saat sedang belajar.
   const klinisDulu = tujuan ? tujuan === 'belajar' : account?.role === 'dokter'
   const awam = modeAwam(tujuan)
   const klinis = awam ? KLINIS_AWAM : KLINIS
+  const judulKlinis = awam ? 'Kesehatan & Penyakit' : 'Klinis'
+  const isiKlinis = awam
+    ? '623 penyakit — apa, sebabnya, tandanya, obatnya'
+    : '623 penyakit SKDI · OSCE · SOFA, Wells, Child-Pugh · resep'
 
   return (
     <div className="space-y-5 pb-4">
@@ -151,15 +183,17 @@ export default function Beranda() {
 
       {klinisDulu ? (
         <>
-          <Bagian judul="Klinis" pintu={klinis} />
-          <Bagian judul="Badan Anda" pintu={PRIBADI} />
+          <Kisi judul={judulKlinis} isi={isiKlinis} pintu={klinis} />
+          <Kisi judul="Badan Anda" isi="Latihan, makan, tidur, dan angka tubuh Anda" pintu={PRIBADI} />
         </>
       ) : (
         <>
-          <Bagian judul="Badan Anda" pintu={PRIBADI} />
-          <Bagian judul={awam ? 'Kesehatan & Penyakit' : 'Klinis'} pintu={klinis} />
+          <Kisi judul="Badan Anda" isi="Latihan, makan, tidur, dan angka tubuh Anda" pintu={PRIBADI} />
+          <Kisi judul={judulKlinis} isi={isiKlinis} pintu={klinis} />
         </>
       )}
+
+      <Kisi judul="Lainnya" pintu={LAINNYA} />
 
       {tujuan && (
         <section>
@@ -180,27 +214,9 @@ export default function Beranda() {
         </section>
       )}
 
-      <section>
-        <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">Lainnya</h2>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { ke: '/feed', label: '💬 Kabar Teman' },
-            { ke: '/community', label: '👥 Komunitas' },
-            { ke: '/scripture', label: '📖 Ibadah' },
-            { ke: '/emergency', label: '🚨 Darurat' },
-            { ke: '/semua-fitur', label: '🧭 Semua Fitur' },
-            { ke: '/tutorial', label: '❓ Panduan' },
-          ].map((x) => (
-            <Link
-              key={x.ke}
-              to={x.ke}
-              className="rounded-full bg-neutral-100 px-3.5 py-2 text-[12px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300"
-            >
-              {x.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+      <Link to="/tutorial" className="block text-center text-[12px] font-bold text-brand">
+        ❓ Baru di sini? Buka panduan 6 langkah
+      </Link>
     </div>
   )
 }
