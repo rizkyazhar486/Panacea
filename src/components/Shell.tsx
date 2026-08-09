@@ -765,9 +765,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 </NavLink>
               ))}
             </div>
-            {/* Tombol tengah "+" — buat post/story, mengambang di luar area scroll */}
+            {/* Tombol "+" — buat post/story. Mengarah ke /community, bukan ke
+                "/": beranda tidak lagi memuat umpan, jadi kejadian compose yang
+                dikirim ke sana tidak akan ada yang menangkap dan tombolnya
+                diam-diam tidak melakukan apa pun. */}
             <button
-              onClick={() => { navigate('/'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
+              onClick={() => { navigate('/feed'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
               aria-label="Create a new post or story"
               className="group absolute right-1 top-1/2 flex -translate-y-1/2 flex-col items-center justify-center"
             >
