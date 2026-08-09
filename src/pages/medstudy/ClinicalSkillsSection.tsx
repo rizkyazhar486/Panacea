@@ -4,6 +4,8 @@ import { IconStethoscope } from '../../components/icons'
 import { SkillDiagram } from '../../components/SkillDiagrams'
 import { CLINICAL_SKILLS, SKILL_CATEGORIES, type SkillCategory } from '../../lib/clinicalSkills'
 import { REFERENSI_SUMBER } from '../../lib/referensiSumber'
+import { Mindmap, WARNA, type Cabang } from './Mindmap'
+import type { ClinicalSkill } from '../../lib/clinicalSkills'
 
 export default function ClinicalSkillsSection() {
   const [query, setQuery] = useState('')
@@ -86,65 +88,20 @@ export default function ClinicalSkillsSection() {
                   </button>
 
                   {isOpen && (
-                    <div className="mt-3 space-y-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                    <div data-tindakan className="mt-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      <Mindmap pusat={s.title} sub={s.subtitle ?? undefined} cabang={cabangTindakan(s)} />
                       {s.diagram && (
-                        <div>
-                          <div className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-brand-dark">Diagram</div>
-                          <SkillDiagram kind={s.diagram} />
-                        </div>
+                        <details className="mt-2">
+                          <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-wide text-neutral-400">Diagram</summary>
+                          <div className="mt-1"><SkillDiagram kind={s.diagram} /></div>
+                        </details>
                       )}
-
-                      {s.indikasi && (
-                        <Block title="Indikasi" items={s.indikasi} />
-                      )}
-                      {s.kontraindikasi && (
-                        <Block title="Kontraindikasi" items={s.kontraindikasi} tone="warn" />
-                      )}
-                      {s.alat && <Block title="Alat & Bahan" items={s.alat} />}
-
-                      {s.fases.map((f) => (
-                        <div key={f.fase}>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">{f.fase}</div>
-                          <ol className="mt-1 space-y-1 pl-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-                            {f.steps.map((st, i) => (
-                              <li key={i} className="flex gap-2">
-                                <span className="mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand/60" />
-                                <span>{st}</span>
-                              </li>
-                            ))}
-                          </ol>
-                        </div>
-                      ))}
-
-                      {s.mnemonics?.map((m) => (
-                        <div key={m.akronim} className="rounded-lg bg-brand-50 p-3 dark:bg-brand/10">
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">
-                            Mnemonik · {m.akronim}
-                          </div>
-                          <ul className="mt-1 space-y-0.5 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">
-                            {m.kepanjangan.map((k, i) => (
-                              <li key={i}>{k}</li>
-                            ))}
-                          </ul>
-                          {m.catatan && (
-                            <p className="mt-1.5 text-[11px] italic leading-relaxed text-neutral-600 dark:text-neutral-300">
-                              {m.catatan}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-
-                      {s.tips && <Block title="Tips & Jebakan OSCE" items={s.tips} tone="tip" />}
-                      {s.komplikasi && <Block title="Komplikasi" items={s.komplikasi} />}
-
-                      <div>
-                        <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Referensi</div>
-                        <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
-                          {s.referensi.map((k) => (
-                            <li key={k}>{REFERENSI_SUMBER[k] ?? k}</li>
-                          ))}
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-wide text-neutral-400">Referensi ({s.referensi.length})</summary>
+                        <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-[10px] leading-snug text-neutral-500">
+                          {s.referensi.map((k) => <li key={k}>{REFERENSI_SUMBER[k] ?? k}</li>)}
                         </ol>
-                      </div>
+                      </details>
                     </div>
                   )}
                 </div>
@@ -167,17 +124,28 @@ export default function ClinicalSkillsSection() {
   )
 }
 
-function Block({ title, items, tone }: { title: string; items: string[]; tone?: 'warn' | 'tip' }) {
-  const color =
-    tone === 'warn' ? 'text-rose-600 dark:text-rose-600' : tone === 'tip' ? 'text-amber-700 dark:text-amber-300' : 'text-brand-dark'
-  return (
-    <div>
-      <div className={`text-[11px] font-black uppercase tracking-wide ${color}`}>{title}</div>
-      <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-        {items.map((x, i) => (
-          <li key={i}>{x}</li>
-        ))}
-      </ul>
-    </div>
-  )
+/**
+ * Peta tindakan -> cabang mindmap.
+ *
+ * Untuk prosedur, tiap FASE jadi satu cabangnya sendiri. Yang harus melekat
+ * adalah urutan fase; nomor langkah resmi (APN 1-60) tetap ada di dalamnya.
+ */
+function cabangTindakan(s: ClinicalSkill): Cabang[] {
+  const fase: Cabang[] = s.fases.map((f, i) => ({
+    kunci: 'f' + i,
+    label: String(i + 1),
+    warna: WARNA.tx,
+    butir: [f.fase, ...f.steps],
+    pratinjau: 1,
+  }))
+  return [
+    { kunci: 'untuk', label: 'Untuk', warna: WARNA.klinis, butir: s.indikasi ?? [] },
+    { kunci: 'jangan', label: 'Jangan', warna: WARNA.awas, butir: s.kontraindikasi ?? [] },
+    { kunci: 'alat', label: 'Alat', warna: WARNA.px, butir: s.alat ?? [] },
+    ...fase,
+    { kunci: 'ingat', label: 'Ingat', warna: WARNA.dx,
+      butir: (s.mnemonics ?? []).flatMap((m) => [m.akronim + ' — ' + m.kepanjangan.join('; ')]) },
+    { kunci: 'jebakan', label: 'Jebakan', warna: WARNA.etio, butir: s.tips ?? [] },
+    { kunci: 'awas', label: 'Bahaya', warna: WARNA.awas, butir: s.komplikasi ?? [] },
+  ]
 }

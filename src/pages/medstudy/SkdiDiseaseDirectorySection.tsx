@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Mindmap, WARNA, type Cabang } from './Mindmap'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconBook } from '../../components/icons'
 import type { OsceStationNote } from '../../lib/osceStationNotes'
@@ -121,6 +122,43 @@ function resolveNote(disease: string, data: NoteData | null) {
   }
 }
 
+/**
+ * Peta data catatan -> cabang mindmap.
+ *
+ * Urutan cabang SAMA untuk setiap penyakit: sebab -> tampak -> cara pastikan ->
+ * obat -> bahaya. Itu alur berpikir klinis, dan karena urutannya tetap, orang
+ * hafal posisinya, bukan kalimatnya.
+ */
+function cabangDari(note: {
+  definisi?: string
+  deep?: SkdiDiseaseNote
+  blocks: { title: string; items: string[] }[]
+}): Cabang[] {
+  const blok = (j: string) => note.blocks.find((b) => b.title === j)?.items ?? []
+  const d = note.deep
+  const gejala = [
+    ...(d?.anamnesis?.keluhanUtama ? [d.anamnesis.keluhanUtama] : []),
+    ...blok('Pemeriksaan Fisik'),
+    ...blok('Anamnesis'),
+  ]
+  const sebab = [
+    ...(d?.etiologi ? [d.etiologi] : []),
+    ...(d?.patofisiologi ? [d.patofisiologi] : []),
+    ...blok('Faktor Risiko'),
+  ]
+  return [
+    { kunci: 'apa', label: 'Apa', warna: 'bg-neutral-700', butir: note.definisi ? [note.definisi] : [] },
+    { kunci: 'etio', label: 'Sebab', warna: WARNA.etio, butir: sebab },
+    { kunci: 'klinis', label: 'Tampak', warna: WARNA.klinis, butir: gejala },
+    { kunci: 'dx', label: 'Pastikan', warna: WARNA.dx,
+      butir: [...(d?.goldStandard ? [d.goldStandard] : []), ...blok('Diagnosis'), ...blok('Kriteria Diagnosis')] },
+    { kunci: 'px', label: 'Periksa', warna: WARNA.px, butir: blok('Pemeriksaan Penunjang & Interpretasi') },
+    { kunci: 'tx', label: 'Obat', warna: WARNA.tx, butir: [...blok('Tatalaksana'), ...blok('Terapi Suportif')] },
+    { kunci: 'dd', label: 'Beda Dgn', warna: WARNA.dd, butir: blok('Diagnosis Banding') },
+    { kunci: 'awas', label: 'Bahaya', warna: WARNA.awas, butir: blok('Komplikasi') },
+  ]
+}
+
 export default function SkdiDiseaseDirectorySection() {
   const [query, setQuery] = useState('')
   const [system, setSystem] = useState<SkdiDiseaseSystem | null>(null)
@@ -194,24 +232,34 @@ export default function SkdiDiseaseDirectorySection() {
               const isOpen = expanded === e.disease
               return (
                 <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
+                  {/* Nama penyakit mendapat satu barisnya sendiri; keterangan
+                      dan lencana turun ke baris berikutnya.
+                      Sebelumnya semuanya berdesakan dalam satu baris, dan pada
+                      layar 390 px lencana "4A — Mandiri, tuntas" menyisakan
+                      kolom judul selebar kira-kira 90 px — cukup untuk memecah
+                      "Endokrin dan Metabolik" menjadi "dan" dan "Metabolik"
+                      pada baris terpisah. Judulnya yang dicari mata saat
+                      menelusuri daftar, jadi judul yang didahulukan. */}
                   <button
-                    className="flex w-full items-start justify-between gap-2 text-left"
+                    className="w-full text-left"
                     onClick={() => {
                       if (!hasNote) return
                       setWantNotes(true)
                       setExpanded(isOpen ? null : e.disease)
                     }}
                   >
-                    {/* min-w-0 lets the long disease names wrap instead of forcing
-                        the badge row past the viewport on narrow screens. */}
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
-                      {e.subsection && <span className="ml-2 text-[11px] text-neutral-500">{e.subsection}</span>}
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="min-w-0 flex-1 text-[13px] font-semibold text-ink dark:text-white">{e.disease}</span>
+                      {hasNote && (
+                        <span className="shrink-0">
+                          <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>
+                        </span>
+                      )}
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-1.5">
-                      {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       <Badge tone={levelTone(e.level)}>{levelLabel(e.level)}</Badge>
-                      {hasNote && <Badge tone="low">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
+                      {note?.kind === 'osce' && <Badge tone="brand">Catatan OSCE</Badge>}
+                      {e.subsection && <span className="text-[11px] text-neutral-500">{e.subsection}</span>}
                     </div>
                   </button>
                   {isOpen && !note && (
@@ -220,96 +268,18 @@ export default function SkdiDiseaseDirectorySection() {
                     </p>
                   )}
                   {isOpen && note && (
-                    <div className="mt-3 space-y-2 border-t border-neutral-200 pt-3 dark:border-white/10">
-                      {note.definisi && (
-                        <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.definisi}</p>
-                      )}
+                    <div data-catatan className="mt-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      <Mindmap pusat={e.disease} sub={e.subsection ?? undefined} cabang={cabangDari(note)} />
                       {note.kind === 'osce' && (
-                        <p className="text-[11px] italic text-neutral-500">
-                          Dari catatan station OSCE: {note.sourceStation}
-                        </p>
-                      )}
-
-                      {note.deep?.anamnesis && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Anamnesis</div>
-                          <div className="mt-1 space-y-1.5">
-                            {ANAMNESIS_LABELS.map(([key, label]) => {
-                              const v = note.deep!.anamnesis![key]
-                              if (!v) return null
-                              return (
-                                <div key={key}>
-                                  <div className="text-[11px] font-bold text-neutral-500 dark:text-neutral-300">{label}</div>
-                                  <p className="text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{v}</p>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {note.deep?.antropometri && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Interpretasi Antropometri</div>
-                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.antropometri}</p>
-                        </div>
-                      )}
-
-                      {(note.deep?.etiologi || note.deep?.patofisiologi) && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Etiologi & Patofisiologi</div>
-                          {note.deep.etiologi && (
-                            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.etiologi}</p>
-                          )}
-                          {note.deep.patofisiologi && (
-                            <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.patofisiologi}</p>
-                          )}
-                        </div>
-                      )}
-
-                      {note.blocks.map((b) => (
-                        <div key={b.title}>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">{b.title}</div>
-                          <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
-                            {b.items.map((t, j) => <li key={j}>{t}</li>)}
-                          </ul>
-                        </div>
-                      ))}
-                      {note.deep?.goldStandard && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Baku Emas Diagnosis</div>
-                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.goldStandard}</p>
-                        </div>
-                      )}
-
-                      {note.deep?.pengkajian && (
-                        <div className="rounded-lg bg-neutral-100 p-3 dark:bg-white/10">
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pengkajian Masalah</div>
-                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-700 dark:text-neutral-200">{note.deep.pengkajian}</p>
-                        </div>
-                      )}
-
-                      {note.deep?.prognosis && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Prognosis</div>
-                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{note.deep.prognosis}</p>
-                        </div>
-                      )}
-
-                      {note.tips && (
-                        <div className="rounded-lg bg-brand-50 p-2.5 text-[12px] leading-relaxed text-brand-dark dark:bg-brand/10">
-                          <span className="font-black">Tips: </span>{note.tips}
-                        </div>
+                        <p className="mt-2 text-[10px] italic text-neutral-500">Dari station OSCE: {note.sourceStation}</p>
                       )}
                       {note.referensi.length > 0 && (
-                        <div>
-                          <div className="text-[11px] font-black uppercase tracking-wide text-neutral-500">Referensi</div>
-                          <ol className="mt-1 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
-                            {note.referensi.map((key) => (
-                              <li key={key}>{REFERENSI_SUMBER[key] ?? key}</li>
-                            ))}
+                        <details className="mt-2">
+                          <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-wide text-neutral-400">Referensi ({note.referensi.length})</summary>
+                          <ol className="mt-1 list-decimal space-y-0.5 pl-4 text-[10px] leading-snug text-neutral-500">
+                            {note.referensi.map((k) => <li key={k}>{REFERENSI_SUMBER[k] ?? k}</li>)}
                           </ol>
-                        </div>
+                        </details>
                       )}
                     </div>
                   )}
