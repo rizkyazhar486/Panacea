@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { NAV_UNTUK_PENGATURAN } from '../components/Shell'
 import { FITUR_DARI_HUB } from '../lib/katalogFitur'
+import { penjelasan } from '../lib/penjelasanFitur'
 
 /**
  * Direktori seluruh fitur, dapat dicari.
@@ -50,13 +51,17 @@ export default function SemuaFitur() {
   // yang dipakai di navigasi. Tanpa penggabungan ini halaman "Semua Fitur"
   // hanya memuat 59 dari 187 tujuan -- namanya berjanji lebih daripada isinya.
   const semua = useMemo(() => {
-    const peta = new Map<string, { to: string; label: string; group: string; kw: string; roles: string[] }>()
+    const peta = new Map<string, { to: string; label: string; group: string; kw: string; apa: string; roles: string[] }>()
     for (const f of FITUR_DARI_HUB) {
-      peta.set(f.to, { to: f.to, label: f.nama, group: f.grup, kw: `${f.apa} ${f.kw}`, roles: [] })
+      peta.set(f.to, { to: f.to, label: f.nama, group: f.grup, kw: `${f.apa} ${f.kw}`, apa: f.apa, roles: [] })
     }
     for (const n of NAV_UNTUK_PENGATURAN) {
       const ada = peta.get(n.to)
-      peta.set(n.to, { to: n.to, label: n.label, group: n.group, kw: ada?.kw ?? '', roles: n.roles })
+      // Label menu didahulukan, namun keterangan dari hub DIPERTAHANKAN.
+      // Sebelumnya keterangan itu ikut terhapus setiap kali sebuah tujuan juga
+      // ada di menu, sehingga tujuan yang paling sering dipakai justru yang
+      // paling sering kehilangan penjelasannya.
+      peta.set(n.to, { to: n.to, label: n.label, group: n.group, kw: ada?.kw ?? '', apa: ada?.apa ?? '', roles: n.roles })
     }
     return [...peta.values()]
   }, [])
@@ -74,7 +79,11 @@ export default function SemuaFitur() {
       // mengetik "pulmonary embolism" tidak menemukan Wells Score meskipun
       // kedua katanya ada di sana -- hanya urutannya yang tidak persis sama.
       // Semua kata harus ada, jadi menambah kata tetap mempersempit hasil.
-      const teks = `${n.label} ${n.group} ${n.to} ${n.kw}`.toLowerCase()
+      // Penjelasan bahasa Indonesia WAJIB ikut dicari. Tanpa ini, kalimat
+      // yang ditulis khusus agar orang awam mengerti justru tidak dapat
+      // dipakai untuk menemukan fiturnya: mengetik "darurat" tidak menemukan
+      // "Emergency Card & SOS" meskipun penjelasannya diawali kata itu.
+      const teks = `${n.label} ${n.group} ${n.to} ${n.kw} ${penjelasan(n.to, n.apa)}`.toLowerCase()
       return kata.split(/\s+/).every((w) => teks.includes(w))
     })
     const peta = new Map<string, typeof cocok>()
@@ -112,20 +121,44 @@ export default function SemuaFitur() {
           <h2 className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-neutral-500">
             {nama} <span className="text-neutral-400">· {isi.length}</span>
           </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {isi.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                /* h-10: 40 px adalah batas bawah sasaran sentuh. Dengan py-1.5
-                   tinggi setiap keping hanya 30 px, dan pada kisi serapat ini
-                   meleset satu keping berarti membuka halaman yang salah. */
-                className="inline-flex h-10 items-center rounded-full bg-neutral-100 px-3 text-[12px] font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200"
-              >
-                {n.label}
-              </Link>
-            ))}
-          </div>
+          {/* Tabel, bukan deretan keping.
+              Keping hanya memuat nama, dan nama seperti "VitaPulse" maupun
+              "Braden Scale" tidak memberi tahu siapa pun apa isinya — sehingga
+              halaman yang namanya berjanji memuat semua fitur justru tidak
+              membantu menemukan satu pun. Setiap baris kini membawa
+              penjelasannya sendiri.
+
+              Dibangun dengan <ul>, bukan <table>: pada lebar 390 px tabel
+              sungguhan memaksa dua kolom berdampingan, dan kolom penjelasan
+              tersisa ±150 px sehingga tiap kalimat pecah menjadi enam baris.
+              Susunan menurun membuat penjelasan memakai lebar penuh. */}
+          <ul className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-white/10">
+            {isi.map((n, i) => {
+              const apa = penjelasan(n.to, n.apa)
+              return (
+                <li key={n.to} className={i > 0 ? 'border-t border-neutral-200 dark:border-white/10' : ''}>
+                  <Link
+                    to={n.to}
+                    /* min-h-[56px]: dua baris teks pada 390 px, sekaligus jauh
+                       di atas batas bawah sasaran sentuh 40 px. */
+                    className="flex min-h-[56px] items-center gap-3 bg-white px-3 py-2.5 transition active:bg-neutral-50 dark:bg-white/5 dark:active:bg-white/10"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13px] font-bold leading-tight text-ink dark:text-white">
+                        {n.label}
+                      </span>
+                      {apa && (
+                        <span className="mt-0.5 block text-[11px] leading-snug text-neutral-500 dark:text-neutral-400">
+                          {apa}
+                        </span>
+                      )}
+                    </span>
+                    <span aria-hidden="true" className="shrink-0 text-[13px] font-black text-neutral-300 dark:text-neutral-600">›</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
         </section>
       ))}
 

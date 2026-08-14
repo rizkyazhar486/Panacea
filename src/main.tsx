@@ -7,6 +7,7 @@ import { applyLang, getLang } from './lib/i18n'
 import { initPwaInstall } from './lib/pwa'
 import { StoreProvider } from './lib/store'
 import { Shell } from './components/Shell'
+import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { AppStatus } from './components/AppStatus'
 import { OfflineBanner } from './components/OfflineBanner'
@@ -214,10 +215,18 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+/**
+ * Rangka halaman, bukan pemutar berputar.
+ *
+ * Pemutar berputar setinggi 20 px digantikan halaman setinggi ribuan piksel
+ * begitu berkasnya selesai diunduh; seluruh tata letak melompat, dan jari yang
+ * sedang bergerak menuju satu tombol mendarat pada tombol lain. Rangka
+ * menempati ruang yang kira-kira sama dengan halaman yang akan menggantikannya.
+ */
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center py-24 text-sm text-neutral-400">
-      <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-[30px]">
+      <RangkaHalaman />
     </div>
   )
 }

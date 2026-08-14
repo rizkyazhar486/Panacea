@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
+import { RangkaDaftar } from '../components/Rangka'
 import { IconBook, IconStethoscope, IconSparkle, IconActivity } from '../components/icons'
 import { STUDY_TECHNIQUES, OSCE_TECHNIQUE, MOTIVATION, EXAM_TIMELINE } from '../lib/studyContent'
 import { EXAM_INFO, EXAM_ORDER, questionsForExam, type ExamTrack } from '../lib/examBank'
@@ -34,11 +35,7 @@ const ClinicalSkillsSection = lazy(() => import('./medstudy/ClinicalSkillsSectio
 const MnemonikSection = lazy(() => import('./medstudy/MnemonikSection'))
 
 function SectionFallback() {
-  return (
-    <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center text-[13px] text-neutral-500 dark:border-white/10 dark:bg-white/5">
-      Memuat materi…
-    </div>
-  )
+  return <RangkaDaftar jumlah={4} />
 }
 
 

@@ -24,10 +24,39 @@
   --color-pnc-red-light: #fff0f0;
   --color-pnc-yellow-light: #fff9e6;
   --color-pnc-blue-light: #f0f7ff;
+
+  /* ── Warna identitas Panaceamed ──────────────────────────────────────────
+     Dua warna, dan pembagian tugasnya tegas:
+
+       --color-malam #171717  latar. Bukan hitam murni: hitam murni pada layar
+                              OLED membuat tepi kartu kaca lenyap sepenuhnya
+                              sehingga kedalaman glassmorphism ikut hilang.
+                              #171717 menyisakan cukup nilai untuk memantulkan
+                              tepi spekular.
+       --color-limau #C6FF34  aksen. Dipakai HANYA untuk satu hal terpenting
+                              pada setiap layar. Warna sekuat ini kehilangan
+                              seluruh dayanya begitu dipakai pada dua tempat
+                              sekaligus — dan yang tersisa hanyalah silau.
+
+     Hijau merek yang lama tetap dipertahankan untuk penanda bermakna klinis
+     (sehat, normal, aman), sebab mengganti maknanya akan mengubah arti warna
+     di ratusan tempat yang sudah tervalidasi. */
+  --color-malam: #171717;
+  --color-malam-naik: #1f1f1f;
+  --color-limau: #c6ff34;
+  --color-limau-redup: #a8dd21;
 }
 
+/* Tailwind v4 hanya memancarkan token @theme yang benar-benar terpakai di
+   kelas. --color-limau dipakai lewat var() di dalam CSS dan JSX, bukan lewat
+   kelas, sehingga ikut terbuang saat pemangkasan. Diukur di peramban: nilainya
+   kosong. Didaftarkan ulang di :root supaya selalu ada. */
 :root {
   color-scheme: light;
+  --color-malam: #171717;
+  --color-malam-naik: #1f1f1f;
+  --color-limau: #c6ff34;
+  --color-limau-redup: #a8dd21;
 }
 
 html,
@@ -77,7 +106,11 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
    (#24272C) and a bright mint/teal accent trio (#68FE9A, #17E7B7, #51E5A1)
    layered over the Panaceamed brand green for contrast & depth. */
 .dark body {
-  background: radial-gradient(circle at 50% 0%, rgba(104, 254, 154, 0.07) 0%, #060606 55%) fixed;
+  /* #171717, bukan #060606. Diukur di layar OLED: pada latar mendekati hitam
+     murni, tepi spekular kartu kaca tidak lagi punya nilai untuk dipantulkan
+     sehingga kartu terbaca sebagai persegi datar dan seluruh kedalaman
+     glassmorphism hilang. */
+  background: radial-gradient(circle at 50% 0%, rgba(198, 255, 52, 0.06) 0%, var(--color-malam) 55%) fixed;
   color: #eef2ef;
 }
 
@@ -662,3 +695,47 @@ html { -webkit-overflow-scrolling: touch; }
   .buka-halus { transition: none; }
   .geser-pulih { transition: none; }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Rangka muat (skeleton).
+
+   Ada bukan untuk memperindah menunggu, melainkan untuk MENJAGA TATA LETAK.
+   Tulisan "Loading…" setinggi satu baris digantikan isi setinggi ribuan piksel
+   begitu data datang; halaman melompat, dan jari yang sedang bergerak menuju
+   satu tombol mendarat pada tombol lain. Rangka menempati ruang yang kira-kira
+   sama dengan isinya, sehingga tidak ada yang berpindah saat isi muncul.
+
+   Kilaunya bergerak dari kiri ke kanan sekali setiap 1,4 detik — cukup untuk
+   menandakan "sedang berjalan", cukup lambat untuk tidak menarik perhatian
+   dari isi yang sudah tampil di sekitarnya.
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes rangka-kilau {
+  100% { background-position-x: -200%; }
+}
+
+.rangka {
+  background: linear-gradient(
+    90deg,
+    rgba(12, 20, 16, 0.055) 25%,
+    rgba(12, 20, 16, 0.11) 37%,
+    rgba(12, 20, 16, 0.055) 63%);
+  background-size: 200% 100%;
+  animation: rangka-kilau 1.4s linear infinite;
+  border-radius: 12px;
+}
+
+.dark .rangka {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 37%,
+    rgba(255, 255, 255, 0.05) 63%);
+  background-size: 200% 100%;
+}
+
+/* Bagi yang meminta gerak dikurangi, kilaunya dimatikan namun bentuk rangkanya
+   tetap ada — yang dibutuhkan adalah ruangnya, bukan animasinya. */
+@media (prefers-reduced-motion: reduce) {
+  .rangka { animation: none; }
+}
+.reduce-motion .rangka { animation: none; }

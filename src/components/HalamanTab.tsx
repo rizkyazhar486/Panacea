@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { SectionTitle } from './ui'
+import { RangkaDaftar } from './Rangka'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rangka halaman bertab.
@@ -101,7 +102,10 @@ export function HalamanTab({
 
       {/* key memaksa pemasangan ulang saat tab berganti, sehingga setiap halaman
           menjalankan efek pemuatan datanya sendiri seperti saat dibuka langsung. */}
-      <Suspense fallback={<div className="py-10 text-center text-sm text-slate-500">Loading…</div>}>
+      {/* Rangka, bukan tulisan satu baris: tab yang dimuat malas menggantikan
+          satu baris dengan isi setinggi ribuan piksel, dan lompatannya membuat
+          keping tab di atasnya bergeser tepat saat jari menuju ke sana. */}
+      <Suspense fallback={<RangkaDaftar jumlah={3} />}>
         <div key={tab.id}><Isi /></div>
       </Suspense>
 
