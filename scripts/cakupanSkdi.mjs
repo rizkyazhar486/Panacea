@@ -25,8 +25,11 @@ const FIELD = ['definisi','etiologi','patofisiologi','anamnesis','pemeriksaanFis
 const byLevel = {}
 const kurang = []
 for (const r of rows) {
-  const key = alias[r.disease] ?? r.disease
-  const b = blok[key] ?? blok['OSCE::'+key]
+  // Urutan yang sama dengan yang dipakai halaman direktori: catatan milik
+  // penyakit itu sendiri lebih dulu, alias ke stasiun OSCE hanya sebagai
+  // cadangan. Terbalik urutannya, entri lengkap yang baru ditulis akan
+  // tertutup oleh stasiun OSCE lamanya dan terhitung belum lengkap.
+  const b = blok[r.disease] ?? blok['OSCE::'+(alias[r.disease] ?? r.disease)]
   const punya = b ? FIELD.filter(f => new RegExp('^\\s{4}'+f+':','m').test(b)) : []
   const lvl = r.level
   byLevel[lvl] ??= { n:0, lengkap:0, jml:0 }

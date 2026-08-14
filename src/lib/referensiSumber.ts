@@ -130,4 +130,22 @@ export const REFERENSI_SUMBER: Record<string, string> = {
     'Kementerian Kesehatan Republik Indonesia. Pedoman Umum Pengendalian Obesitas. Jakarta: Direktorat Jenderal Pencegahan dan Pengendalian Penyakit, Kementerian Kesehatan RI; 2015.',
   ASCRSHEM2018:
     'Davis BR, Lee-Kong SA, Migaly J, Feingold DL, Steele SR. The American Society of Colon and Rectal Surgeons Clinical Practice Guidelines for the Management of Hemorrhoids. Dis Colon Rectum. 2018;61(3):284-92.',
+  GINA2024:
+    'Global Initiative for Asthma. Global Strategy for Asthma Management and Prevention. Fontana (WI): Global Initiative for Asthma; 2024.',
+  WHOMALARIA2023:
+    'World Health Organization. WHO Guidelines for Malaria, 16 October 2023. Geneva: World Health Organization; 2023.',
+  KEMENKESMALARIA2019:
+    'Kementerian Kesehatan Republik Indonesia. Buku Saku Tatalaksana Kasus Malaria. Jakarta: Direktorat Jenderal Pencegahan dan Pengendalian Penyakit, Kementerian Kesehatan RI; 2019.',
+  WHOTYPHOID2018:
+    'World Health Organization. Typhoid Vaccines: WHO Position Paper, March 2018. Wkly Epidemiol Rec. 2018;93(13):153-72.',
+  WHOLEPTO2003:
+    'World Health Organization. Human Leptospirosis: Guidance for Diagnosis, Surveillance and Control. Geneva: World Health Organization; 2003.',
+  WHOTETANUS2018:
+    'World Health Organization. Tetanus Vaccines: WHO Position Paper, February 2017. Wkly Epidemiol Rec. 2017;92(6):53-76.',
+  IDAIKEJANGDEMAM2016:
+    'Ikatan Dokter Anak Indonesia. Rekomendasi Penatalaksanaan Kejang Demam. Jakarta: Badan Penerbit IDAI; 2016.',
+  IDSACAP2019:
+    'Metlay JP, Waterer GW, Long AC, Anzueto A, Brozek J, Crothers K, et al. Diagnosis and Treatment of Adults with Community-acquired Pneumonia. Am J Respir Crit Care Med. 2019;200(7):e45-67.',
+  NELSON2020:
+    "Kliegman RM, St Geme JW, Blum NJ, Shah SS, Tasker RC, Wilson KM, editors. Nelson Textbook of Pediatrics. 21st ed. Philadelphia: Elsevier; 2020.",
 }
