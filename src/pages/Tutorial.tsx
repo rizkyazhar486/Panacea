@@ -98,7 +98,7 @@ export default function Tutorial() {
           <ul className="space-y-1">
             {WARNA.map(([w, label, arti]) => (
               <li key={label} className="flex items-center gap-2">
-                <span className={`w-[68px] shrink-0 rounded px-1.5 py-0.5 text-center text-[9px] font-black uppercase tracking-wide text-white ${w}`}>{label}</span>
+                <span className={`w-[68px] shrink-0 rounded px-1.5 py-0.5 text-center text-[10px] font-black uppercase tracking-wide text-white ${w}`}>{label}</span>
                 <span className="text-neutral-400">▶</span>
                 <span className="text-[12px] text-neutral-600 dark:text-neutral-300">{arti}</span>
               </li>

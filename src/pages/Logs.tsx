@@ -99,7 +99,7 @@ export function Logs() {
             <span className="rounded-lg px-2.5 py-1.5 text-sm font-black text-ink" style={{ background: RPE_COLOR(rpe) }}>RPE {rpe}</span>
           </div>
           <input type="range" min={1} max={10} value={rpe} onChange={(e) => setRpe(+e.target.value)} className="w-full accent-[#00BF63]" />
-          <div className="flex justify-between text-[9px] text-neutral-500"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
+          <div className="flex justify-between text-[10px] text-neutral-500"><span>1 Light</span><span>5 Moderate</span><span>10 Maximal</span></div>
           <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Notes (optional)" className="w-full rounded-xl border border-neutral-200 px-3 py-2 text-xs outline-none focus:border-brand" />
           <button onClick={() => { addTrainingLog(rpe, type, note); setNote('') }} className="w-full rounded-xl py-2.5 text-sm font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Log Today's Intensity</button>
         </div>
@@ -108,7 +108,7 @@ export function Logs() {
       {/* Calendar */}
       <Card className="space-y-2">
         <div className="text-xs font-black text-ink">📅 Training Calendar — {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
-        <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-bold text-neutral-500">
+        <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-neutral-500">
           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={i}>{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">

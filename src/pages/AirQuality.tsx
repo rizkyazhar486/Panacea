@@ -142,8 +142,8 @@ function Pollutant({ label, value, unit, note }: { label: string; value: number;
   return (
     <div className="rounded-xl bg-neutral-50 p-3 text-center dark:bg-white/5">
       <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
-      <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[9px] font-medium text-neutral-500">{unit}</span></div>
-      <div className="text-[9px] text-neutral-500">{note}</div>
+      <div className="text-lg font-black text-ink dark:text-ink">{Number.isFinite(value) ? value : '—'}<span className="ml-0.5 text-[10px] font-medium text-neutral-500">{unit}</span></div>
+      <div className="text-[10px] text-neutral-500">{note}</div>
     </div>
   )
 }

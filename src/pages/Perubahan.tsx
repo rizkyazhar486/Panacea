@@ -295,7 +295,7 @@ function Angka({ label, nilai }: { label: string; nilai: number }) {
   return (
     <div className="rounded-xl bg-white/60 p-2.5 text-center">
       <div className="text-lg font-black tabular-nums text-ink">{nilai}</div>
-      <div className="mt-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide text-neutral-500">{label}</div>
+      <div className="mt-0.5 text-[10px] font-bold uppercase leading-tight tracking-wide text-neutral-500">{label}</div>
     </div>
   )
 }

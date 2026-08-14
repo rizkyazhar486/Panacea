@@ -806,9 +806,9 @@ function Stepper({ label, value, min, max, step = 1, unit, onChange }: { label?:
   return (
     <div className="flex items-center gap-2">
       {label && <span className="text-sm text-neutral-600 shrink-0">{label}</span>}
-      <button onClick={() => onChange(Math.max(min, +(value - step).toFixed(2)))} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-neutral-100 text-sm font-bold text-neutral-500 transition hover:bg-neutral-200 active:scale-90">-</button>
+      <button onClick={() => onChange(Math.max(min, +(value - step).toFixed(2)))} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-neutral-100 text-sm font-bold text-neutral-500 transition hover:bg-neutral-200 active:scale-90">-</button>
       <div className="flex-1 text-center text-sm font-bold tabular-nums">{value}{unit ? ' ' + unit : ''}</div>
-      <button onClick={() => onChange(Math.min(max, +(value + step).toFixed(2)))} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand/10 text-sm font-bold text-brand-dark transition hover:bg-brand/20 active:scale-90">+</button>
+      <button onClick={() => onChange(Math.min(max, +(value + step).toFixed(2)))} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand/10 text-sm font-bold text-brand-dark transition hover:bg-brand/20 active:scale-90">+</button>
     </div>
   )
 }
@@ -981,9 +981,9 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
           <div key={l} className="flex flex-col items-center gap-1">
             <Ring value={v} max={mx} color={c}>
               <span className="text-xs font-extrabold tabular-nums" style={{ color: c }}>{v}</span>
-              <span className="text-[8px] text-neutral-500">g</span>
+              <span className="text-[10px] text-neutral-500">g</span>
             </Ring>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">{l}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">{l}</span>
           </div>
         ))}
       </div>
@@ -1006,12 +1006,12 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         <div className="flex-1"><input className={inputClass} placeholder="Search food..." value={q} onChange={e => setQ(e.target.value)} /></div>
         <select className={inputClass + ' w-28'} value={cat} onChange={e => setCat(e.target.value)}><option>All</option>{FCATS.map(c => <option key={c}>{c}</option>)}</select>
       </div>
-      <div className="mt-2 flex flex-wrap gap-1.5 max-h-32 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
+      <div className="mt-2 flex flex-wrap gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
         {filtered.map(f => {
           const rec = activeProtocol && activeProtocol.specialFoods.some(sf => f.name.includes(sf))
           const avo = activeProtocol && activeProtocol.avoidFoods.some(af => f.name.includes(af))
           return (
-            <button key={f.name} onClick={() => setName(f.name)} className={'rounded-lg border px-2 py-1 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
+            <button key={f.name} onClick={() => setName(f.name)} className={'inline-flex min-h-[40px] items-center rounded-lg border px-2 text-[11px] font-medium transition active:scale-95 ' + (name === f.name ? 'border-brand bg-brand/10 text-brand-dark' : avo ? 'border-red-200 text-red-600 bg-red-50/50' : rec ? 'border-green-200 text-green-600 bg-green-50/50' : 'border-transparent text-neutral-600 hover:bg-white')}>
               {f.emoji} {f.name} <span className="text-neutral-500">{f.k}</span>
               {rec && <span className="ml-0.5 text-green-500">{'\u2705'}</span>}
               {avo && <span className="ml-0.5 text-red-600">{'\u274C'}</span>}
@@ -1031,7 +1031,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
             <span className="text-blue-700">Na{pv.na}</span>
             {pv.omega3 > 0 && <span className="text-cyan-500">{'\u{1F41F}'}{pv.omega3}g</span>}
           </div>
-          {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[9px] text-neutral-500">{t}</span>)}</div>}
+          {fd.tags.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1">{fd.tags.slice(0, 4).map(t => <span key={t} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-500">{t}</span>)}</div>}
         </div>
         <div className="w-20"><Field label="Gram"><input className={inputClass} type="number" value={g} onChange={e => setG(+e.target.value)} /></Field></div>
         <Button onClick={() => addFood({ id: uid(), date: today(), name, grams: g, kcal: pv.k, carbs: pv.c, protein: pv.p, fat: pv.f })} className="h-[42px] shrink-0 rounded-xl"><IconPlus size={15} /></Button>
@@ -1096,7 +1096,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
       </div>
       <div className="px-5 pb-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExType(f[0]) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExType(e)} disabled={mode === 'tracking' || mode === 'paused'} className={'inline-flex min-h-[40px] shrink-0 items-center rounded-lg border px-2.5 text-[11px] font-medium transition active:scale-95 disabled:opacity-50 ' + (exType.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[10px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[10px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       {/* Real map (OpenStreetMap) — live position, record routes & plan
           a path by tapping the map. */}
@@ -1119,7 +1119,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
             {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(dur > 0 ? (dist / dur) * 3.6 : 0) + ' km/h', 'SPEED'], [fmtPace(dur, dist), 'PACE']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-2 py-2 text-center">
                 <div className="text-sm font-extrabold text-ink tabular-nums">{v}</div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
               </div>
             ))}
           </div>
@@ -1202,13 +1202,13 @@ function SleepWater({ body }: { body: Body }) {
           <Stepper value={wt.waterMl} min={0} max={5000} step={250} unit="mL" onChange={v => logWellness(today(), { waterMl: v })} />
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u2600\uFE0F'}</span><span className="text-xs font-bold text-neutral-700">Sunlight</span><span className="ml-auto"><button onClick={() => logWellness(today(), { sunDone: !wt.sunDone, sunHr: wt.sunDone ? 0 : 0.25 })} className={'rounded-lg px-3 py-1 text-[11px] font-bold transition active:scale-95 ' + (wt.sunDone ? 'bg-yellow-100 text-yellow-700' : 'bg-neutral-100 text-neutral-500')}>{wt.sunDone ? 'Done \u2705' : 'Not yet'}</button></span></div>
+          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u2600\uFE0F'}</span><span className="text-xs font-bold text-neutral-700">Sunlight</span><span className="ml-auto"><button onClick={() => logWellness(today(), { sunDone: !wt.sunDone, sunHr: wt.sunDone ? 0 : 0.25 })} className={'inline-flex min-h-[40px] items-center rounded-lg px-3 text-[11px] font-bold transition active:scale-95 ' + (wt.sunDone ? 'bg-yellow-100 text-yellow-700' : 'bg-neutral-100 text-neutral-500')}>{wt.sunDone ? 'Done \u2705' : 'Not yet'}</button></span></div>
           {wt.sunDone && <Stepper value={wt.sunHr} min={0.05} max={1} step={0.05} unit="hrs" onChange={v => logWellness(today(), { sunHr: v })} />}
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
           <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }}>{weekMet.toFixed(1)}</span></div>
           <div className="mt-1 h-2 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (weekMet / 15) * 100) + '%', background: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }} /></div>
-          <div className="flex justify-between text-[9px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
+          <div className="flex justify-between text-[10px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
         </div>
       </div>
     </Card>
@@ -1236,11 +1236,11 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
-            <div><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[9px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
           </div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
-          <div className="mt-2"><div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
         </div>
       )}
       <button onClick={() => setOpen(!open)} className="mt-3 w-full rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-xs font-bold text-neutral-500 transition hover:bg-neutral-50 hover:border-neutral-300">
@@ -1252,7 +1252,7 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             <button key={p.id} onClick={() => { onSelect(p); setOpen(false) }} className={'rounded-xl border p-3 text-left transition active:scale-95 ' + (active?.id === p.id ? 'border-current shadow-sm' : 'border-neutral-100 hover:border-neutral-200')} style={active?.id === p.id ? { borderColor: p.color, background: p.color + '08' } : {}}>
               <span className="text-lg">{p.emoji}</span>
               <div className="mt-1 text-[11px] font-bold" style={{ color: active?.id === p.id ? p.color : '#404040' }}>{p.name}</div>
-              <div className="text-[9px] text-neutral-500">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
+              <div className="text-[10px] text-neutral-500">NaMax {p.naMax}mg | Prot {p.protAdj}x</div>
             </button>
           ))}
         </div>
@@ -1427,8 +1427,8 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                     <span className="text-[10px] font-semibold text-neutral-500">{labLabels[k]}</span>
                     <span className="text-[10px]" style={{ color: trend.color }}>{trend.dir === 'up' ? '\u2191' : trend.dir === 'down' ? '\u2193' : '\u2192'} {trend.diff != null ? (trend.diff > 0 ? '+' : '') + trend.diff.toFixed(1) : ''}</span>
                   </div>
-                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[9px] font-normal text-neutral-500">{labUnits[k]}</span></div>
-                  <div className="text-[9px] font-semibold" style={{ color: st.color }}>{st.label}</div>
+                  <div className="text-sm font-extrabold tabular-nums" style={{ color: st.color }}>{latest} <span className="text-[10px] font-normal text-neutral-500">{labUnits[k]}</span></div>
+                  <div className="text-[10px] font-semibold" style={{ color: st.color }}>{st.label}</div>
                 </div>
               )
             })}
@@ -1552,9 +1552,9 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
-            <span className="text-[9px] text-ink/20">{'\u00B7'}</span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
+            <span className="text-[10px] text-ink/20">{'\u00B7'}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
           </div>
 
@@ -1587,10 +1587,10 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
           {/* Quick Vitals */}
           <div className="mt-4 grid grid-cols-4 gap-2">
-            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
-            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
-            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
-            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[8px] text-ink/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
+            {vitals.avgHR != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">HR</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgHR}</div></div>}
+            {vitals.avgSpo2 != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">SpO2</div><div className="text-sm font-extrabold tabular-nums">{vitals.avgSpo2}%</div></div>}
+            {(vitals.vo2Max || vo2Est) != null && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">VO2Max</div><div className="text-sm font-extrabold tabular-nums">{(vitals.vo2Max || vo2Est || 0).toFixed(1)}</div></div>}
+            {bmi > 0 && <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center"><div className="text-[10px] text-ink/40 uppercase">BMI</div><div className="text-sm font-extrabold tabular-nums">{bmi.toFixed(1)}</div></div>}
           </div>
         </div>
 
@@ -1647,13 +1647,13 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
       <SectionTitle icon={<IconFlame size={18} />} title="Manual Exercise Log" subtitle="Log exercise without GPS" />
       <div className="mt-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExName(f[0].name) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[9px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[8px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'inline-flex min-h-[40px] shrink-0 items-center rounded-lg border px-2.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[10px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[10px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       <div className="mt-3 flex items-center gap-3">
         <Stepper label="Duration" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
         <div className="shrink-0 text-right">
           <div className="text-lg font-extrabold" style={{ color: '#0B7A4B' }}>{k}</div>
-          <div className="text-[9px] text-neutral-500">kcal</div>
+          <div className="text-[10px] text-neutral-500">kcal</div>
         </div>
         <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Log</Button>
       </div>
@@ -1815,7 +1815,7 @@ export function Nutrition() {
       <div className="no-scrollbar -mx-1 flex gap-[6px] overflow-x-auto px-1">
         {KELOMPOK.map((k) => (
           <button key={k.id} onClick={() => setKel(k.id)} aria-pressed={kel === k.id}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-bold transition active:scale-95 ${
+            className={`flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition active:scale-95 ${
               kel === k.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>
             <span>{k.emoji}</span>{k.label}
           </button>

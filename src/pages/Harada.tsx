@@ -247,7 +247,7 @@ export function Harada() {
               return (
                 <div key={i} className="grid aspect-square place-items-center rounded-xl bg-brand p-1.5 text-center">
                   <div>
-                    <div className="text-[8px] font-black uppercase tracking-wide text-ink/70">Sasaran</div>
+                    <div className="text-[10px] font-black uppercase tracking-wide text-ink/70">Sasaran</div>
                     <div className="mt-0.5 line-clamp-3 text-[10px] font-bold leading-tight text-ink">
                       {d.sasaran || '—'}
                     </div>
@@ -270,7 +270,7 @@ export function Harada() {
                   <div className={`line-clamp-3 text-[10px] font-bold leading-tight ${p.judul.trim() ? 'text-white' : 'text-slate-500'}`}>
                     {p.judul || `Penopang ${sel.idx + 1}`}
                   </div>
-                  <div className="mt-0.5 text-[8px] font-bold text-neutral-500">{terisi}/8</div>
+                  <div className="mt-0.5 text-[10px] font-bold text-neutral-500">{terisi}/8</div>
                 </div>
               </button>
             )

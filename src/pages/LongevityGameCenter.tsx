@@ -60,7 +60,7 @@ function BingoBoard() {
           <button
             key={i}
             onClick={() => toggle(i)}
-            className={`flex h-16 items-center justify-center rounded-lg p-1 text-center text-[9px] font-bold leading-tight transition ${done[i] ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
+            className={`flex h-16 items-center justify-center rounded-lg p-1 text-center text-[10px] font-bold leading-tight transition ${done[i] ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
           >
             {h}
           </button>

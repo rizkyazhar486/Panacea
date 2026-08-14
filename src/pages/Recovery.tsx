@@ -97,10 +97,10 @@ function SleepScoreCard() {
         <Badge tone={grade.tone}>{grade.l}</Badge>
       </div>
       <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Duration</div></div>
-        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Latency</div></div>
-        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Awakenings</div></div>
-        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Consistency</div></div>
+        <div><div className="text-sm font-black text-ink">{s.duration}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Duration</div></div>
+        <div><div className="text-sm font-black text-ink">{s.latency}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Latency</div></div>
+        <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Awakenings</div></div>
+        <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Consistency</div></div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</Prosa>
     </Card>

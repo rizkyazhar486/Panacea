@@ -361,7 +361,7 @@ export function Athlete() {
             <div className="absolute inset-y-0 bg-emerald-400/30" style={{ left: `${(0.8 / 2) * 100}%`, width: `${((1.3 - 0.8) / 2) * 100}%` }} />
             {acwr > 0 && <div className="absolute top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white" style={{ left: `${Math.min(acwr / 2, 1) * 100}%` }} />}
           </div>
-          <div className="mt-1 flex justify-between text-[9px] text-ink/40"><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>1.5+</span></div>
+          <div className="mt-1 flex justify-between text-[10px] text-ink/40"><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>1.5+</span></div>
           <p className="mt-3 text-xs leading-relaxed text-ink/80">{acwrZ.advice}</p>
         </div>
         <details className="mt-2 text-[11px] text-neutral-500">
@@ -459,15 +459,15 @@ function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number
       <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="CTL/ATL/TSB model — calculated from the same Training Load above" />
       <div className="mt-3 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Fitness (CTL)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Fitness (CTL)</div>
           <div className="text-xl font-extrabold text-brand-dark">{has ? ctl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Fatigue (ATL)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Fatigue (ATL)</div>
           <div className="text-xl font-extrabold text-amber-600">{has ? atl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-ink p-3 text-center text-white">
-          <div className="text-[9px] font-bold uppercase text-ink/50">Form (TSB)</div>
+          <div className="text-[10px] font-bold uppercase text-ink/50">Form (TSB)</div>
           <div className={'text-xl font-extrabold ' + (tsb >= 0 ? 'text-brand' : 'text-amber-300')}>{has ? (tsb > 0 ? '+' : '') + tsb.toFixed(0) : '—'}</div>
         </div>
       </div>

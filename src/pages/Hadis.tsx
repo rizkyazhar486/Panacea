@@ -202,7 +202,7 @@ function Lencana({ derajat, kecil }: { derajat: Kitab['derajat']; kecil?: boolea
   const sahih = derajat === 'sahih-kitab'
   return (
     <span className={`shrink-0 rounded-full font-black uppercase tracking-wide ${
-      kecil ? 'px-1.5 py-0.5 text-[8px]' : 'px-2 py-1 text-[9px]'} ${
+      kecil ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-1 text-[10px]'} ${
       sahih ? 'bg-emerald-500/15 text-emerald-800' : 'bg-amber-500/20 text-amber-900'}`}>
       {sahih ? 'Sahih collection' : 'Mixed grade'}
     </span>

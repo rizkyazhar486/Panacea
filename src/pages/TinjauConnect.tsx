@@ -122,7 +122,7 @@ export function TinjauConnect() {
                       className="mt-1 flex items-baseline gap-1.5 text-[11px] text-sky-700 underline">
                       {/* Platform diberi label agar tautan yang host-nya tidak sesuai
                           langsung terlihat, tanpa perlu membaca URL panjangnya. */}
-                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-black uppercase no-underline ${
+                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black uppercase no-underline ${
                         p ? 'bg-sky-500/15 text-sky-300' : 'bg-rose-500/15 text-rose-300'}`}>
                         {p ?? 'unknown'}
                       </span>

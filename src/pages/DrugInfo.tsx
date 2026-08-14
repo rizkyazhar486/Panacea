@@ -77,7 +77,7 @@ export function DrugInfo() {
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {related.map((d) => (
                   <span key={d.name} className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-semibold text-neutral-600 dark:bg-white/5 dark:text-neutral-300">
-                    {TTY_LABEL[d.tty] && <span className="text-[9px] font-bold uppercase text-brand-dark">{TTY_LABEL[d.tty]}</span>}
+                    {TTY_LABEL[d.tty] && <span className="text-[10px] font-bold uppercase text-brand-dark">{TTY_LABEL[d.tty]}</span>}
                     {d.name}
                   </span>
                 ))}

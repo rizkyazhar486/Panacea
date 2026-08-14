@@ -430,7 +430,7 @@ function RunnerCoach() {
               <div key={l} className="rounded-xl border border-neutral-100 p-2.5">
                 <div className="text-[10px] font-bold text-neutral-500">{l}</div>
                 <div className="text-base font-extrabold text-brand-dark">{p}</div>
-                <div className="text-[9px] text-neutral-500">{d}</div>
+                <div className="text-[10px] text-neutral-500">{d}</div>
               </div>
             ))}
           </div>

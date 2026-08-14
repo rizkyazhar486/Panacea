@@ -121,7 +121,7 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="rounded-xl bg-neutral-50 p-2 dark:bg-white/5">
       <div className="text-sm font-black" style={color ? { color } : undefined}>{value}</div>
-      <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">{label}</div>
     </div>
   )
 }

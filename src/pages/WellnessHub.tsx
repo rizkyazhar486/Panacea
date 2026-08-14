@@ -183,7 +183,7 @@ export function WellnessHub() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-ink group-hover:text-brand-dark dark:text-white">{f.name}</span>
-                    <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${TAG_STYLE[f.tag] ?? TAG_STYLE.Wellness}`}>{f.tag}</span>
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TAG_STYLE[f.tag] ?? TAG_STYLE.Wellness}`}>{f.tag}</span>
                   </div>
                   <div className="text-[12px] leading-snug text-neutral-500">{f.what}</div>
                 </div>

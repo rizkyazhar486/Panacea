@@ -87,7 +87,7 @@ function shuffle<T>(arr: T[]): T[] {
 function RegionTag({ region }: { region?: NewsItem['region'] }) {
   const dom = region === 'Domestic'
   return (
-    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${dom ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-600'}`}>
+    <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${dom ? 'bg-red-50 text-red-600' : 'bg-sky-50 text-sky-600'}`}>
       {dom ? '🇮🇩 Domestic' : '🌍 International'}
     </span>
   )

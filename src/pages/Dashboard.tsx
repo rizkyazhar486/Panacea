@@ -97,7 +97,7 @@ function LongevityRing({ score, band }: { score: number; band: string }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span className="text-[28px] font-black leading-none tabular-nums" style={{ color }}>{animated}</span>
-        <span className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.18em] text-neutral-500">{band}</span>
+        <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">{band}</span>
       </div>
     </div>
   )
@@ -157,7 +157,7 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
           <div className="h-5 w-3 rounded-full border-2 border-white shadow-md" style={{ background: color }} />
         </div>
       </div>
-      <div className="flex justify-between text-[9px] font-semibold text-neutral-300">
+      <div className="flex justify-between text-[10px] font-semibold text-neutral-300">
         <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
       </div>
       <div className="text-center">
@@ -474,7 +474,7 @@ export function Dashboard() {
               </div>
               <div className="flex flex-col items-center gap-1 sm:pb-1">
                 <LongevityRing score={longevity.score} band={longevity.band} />
-                <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
               </div>
             </div>
 

@@ -148,7 +148,7 @@ function PanelResep() {
             <div key={c.id} className="rounded-xl bg-white/60 p-3 dark:bg-white/5">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-[13px] font-black text-ink dark:text-white">{c.kasus}</span>
-                <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[9px] font-black uppercase text-neutral-600 dark:bg-white/10">{c.sistem}</span>
+                <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-black uppercase text-neutral-600 dark:bg-white/10">{c.sistem}</span>
               </div>
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{c.alasan}</p>
               <pre className="mt-2 overflow-x-auto whitespace-pre rounded-lg bg-black/5 p-3 font-mono text-[11px] leading-relaxed text-ink dark:bg-black/30 dark:text-white">{c.baris.join('\n') + '\n\n' + c.pro}</pre>

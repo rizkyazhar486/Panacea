@@ -263,7 +263,7 @@ export function Kitab() {
                   className={`rounded-lg px-2.5 py-1 text-[12px] font-bold ${
                     tafsirId === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
                   {t.nama.split(' — ')[0]}
-                  <span className={`ml-1 text-[9px] font-black uppercase ${
+                  <span className={`ml-1 text-[10px] font-black uppercase ${
                     tafsirId === t.id ? 'text-white/80' : 'text-neutral-600'}`}>{t.bahasa}</span>
                 </button>
               ))}

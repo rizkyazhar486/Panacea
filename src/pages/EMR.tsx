@@ -581,7 +581,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
             >
               <span className="w-16 shrink-0 font-mono text-xs font-bold text-brand-dark">{c.code}</span>
               <span className="min-w-0 flex-1 truncate">{c.id}</span>
-              {icd11(c.code) && <span className="shrink-0 rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[9px] font-bold text-neutral-500">11: {icd11(c.code)}</span>}
+              {icd11(c.code) && <span className="shrink-0 rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-neutral-500">11: {icd11(c.code)}</span>}
               <span className="hidden shrink-0 text-[10px] text-neutral-500 sm:inline">{c.chapter}</span>
             </button>
           ))}

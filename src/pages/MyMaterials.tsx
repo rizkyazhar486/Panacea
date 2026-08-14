@@ -152,7 +152,7 @@ function Step({ ok, label, sub, icon }: { ok: boolean; label: string; sub?: stri
         {icon === 'ai' ? <IconSparkle size={13} /> : icon === 'verify' ? <IconShield size={13} /> : '✓'}
       </span>
       <span className={`mt-0.5 ${ok ? 'font-semibold text-neutral-700' : 'text-neutral-500'}`}>{label}</span>
-      {sub && <span className="text-[9px] text-neutral-500">{sub}</span>}
+      {sub && <span className="text-[10px] text-neutral-500">{sub}</span>}
     </div>
   )
 }

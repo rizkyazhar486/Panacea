@@ -60,14 +60,14 @@ function Kotak({ c, buka, onToggle }: { c: Cabang; buka: boolean; onToggle: () =
     <div className="relative pl-6">
       {/* panah dari tulang punggung ke kotak */}
       <span className="absolute left-0 top-[14px] h-px w-4 bg-neutral-300 dark:bg-white/20" />
-      <span className="absolute left-[13px] top-[11px] text-[9px] leading-none text-neutral-400">▶</span>
+      <span className="absolute left-[13px] top-[11px] text-[10px] leading-none text-neutral-400">▶</span>
       <button
         onClick={onToggle}
         aria-expanded={buka}
         className="w-full rounded-lg border border-neutral-200 bg-white p-2 text-left dark:border-white/10 dark:bg-white/5"
       >
         <div className="flex items-center gap-1.5">
-          <span className={`rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-white ${c.warna}`}>
+          <span className={`rounded px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-white ${c.warna}`}>
             {c.label}
           </span>
           <span className="ml-auto text-[10px] font-bold text-brand">

@@ -283,7 +283,7 @@ export function Longevity() {
               <div className="absolute inset-0 grid place-items-center">
                 <div>
                   <div className="text-4xl font-extrabold" style={{ color: scoreColor }}>{score ?? '—'}</div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Longevity Score</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Longevity Score</div>
                 </div>
               </div>
             </div>
@@ -296,7 +296,7 @@ export function Longevity() {
                 {delta <= 0 ? `${Math.abs(delta).toFixed(1)} yrs younger 🎉` : `${delta.toFixed(1)} yrs older`}
               </Badge>
             )}
-            <div className="mt-1 text-[9px] text-neutral-500">vs chronological age {d.age}</div>
+            <div className="mt-1 text-[10px] text-neutral-500">vs chronological age {d.age}</div>
           </div>
         </div>
         {score == null && <p className="mt-3 text-center text-[11px] text-neutral-500">Fill in at least 4 pillars below to activate your score & biological age.</p>}
@@ -353,7 +353,7 @@ export function Longevity() {
               <div className="relative mt-1.5 h-1.5 overflow-hidden rounded-full bg-neutral-100">
                 <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${p.score}%`, background: p.score >= 75 ? '#00BF63' : p.score >= 50 ? '#f59e0b' : '#ef4444' }} />
               </div>
-              <div className="mt-1 flex justify-between text-[9px] text-neutral-500">
+              <div className="mt-1 flex justify-between text-[10px] text-neutral-500">
                 <span>{p.why}</span>
                 <span className="shrink-0 font-bold">target {p.target}</span>
               </div>

@@ -588,7 +588,7 @@ function MiniChart({ title, data, labels, color, money }: { title: string; data:
         {data.map((v, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1" title={`${labels[i]}: ${money ? 'Rp' + v.toLocaleString('en-GB') : v}`}>
             <div className="w-full rounded-t transition-all" style={{ height: `${(v / max) * 100}%`, minHeight: 2, background: color }} />
-            <span className="text-[8px] text-neutral-500">{labels[i]}</span>
+            <span className="text-[10px] text-neutral-500">{labels[i]}</span>
           </div>
         ))}
       </div>

@@ -338,20 +338,20 @@ function HealthMetricsBar({ weight, height, age, gender, hrRest }: { weight: num
     <div className="grid grid-cols-3 gap-2">
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)}</div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">BMI</div>
-        <div className="text-[9px] font-semibold" style={{ color: bmiCat.c }}>{bmiCat.l}</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">BMI</div>
+        <div className="text-[10px] font-semibold" style={{ color: bmiCat.c }}>{bmiCat.l}</div>
       </div>
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold text-indigo-500">{Math.round(bmr)}</div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">BMR</div>
-        <div className="text-[9px] text-neutral-500">kcal/day</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">BMR</div>
+        <div className="text-[10px] text-neutral-500">kcal/day</div>
       </div>
       <div className="rounded-xl border border-neutral-100 p-2.5 text-center">
         <div className="text-lg font-extrabold" style={{ color: vo2 ? (vo2 >= 45 ? '#00BF63' : vo2 >= 35 ? '#f59e0b' : '#FF3131') : '#d4d4d4' }}>
           {vo2 ? vo2.toFixed(1) : '—'}
         </div>
-        <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">VO₂Max</div>
-        <div className="text-[9px] text-neutral-500">{vo2 ? (vo2 >= 50 ? 'Elite' : vo2 >= 45 ? 'Excellent' : vo2 >= 35 ? 'Good' : 'Fair') : 'Need HR'}</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">VO₂Max</div>
+        <div className="text-[10px] text-neutral-500">{vo2 ? (vo2 >= 50 ? 'Elite' : vo2 >= 45 ? 'Excellent' : vo2 >= 35 ? 'Good' : 'Fair') : 'Need HR'}</div>
       </div>
     </div>
   )
@@ -504,7 +504,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               className={'shrink-0 rounded-xl px-3 py-2 text-[11px] font-bold transition-all active:scale-95 disabled:opacity-50 border ' +
                 (sport.id === s.id ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300 bg-white')}>
               <span className="text-sm">{s.emoji}</span> {s.name}
-              {s.hiit && <span className="ml-1 text-[8px] font-black text-red-500">HIIT</span>}
+              {s.hiit && <span className="ml-1 text-[10px] font-black text-red-500">HIIT</span>}
             </button>
           ))}
         </div>
@@ -533,7 +533,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             {[[fmtD(dur), 'TIME'], [fmtDist(dist), 'DISTANCE'], [Math.round(speed), 'KM/H'], [fmtPace(dur, dist), 'PACE'], [acceleration.toFixed(2), 'm/s²'], [`${Math.round(elevGainM)}m · ${terrain}`, 'ELEVATION']].map(([v, l]) => (
               <div key={l} className="bg-neutral-900 px-1.5 py-2 text-center">
                 <div className="text-xs font-extrabold text-ink tabular-nums">{v}</div>
-                <div className="text-[7px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-ink/40">{l}</div>
               </div>
             ))}
           </div>
@@ -566,7 +566,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                 <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(100, progressPct)}%`, background: 'linear-gradient(90deg, #00BF63, #0B7A4B)' }} />
                 </div>
-                <div className="flex justify-between text-[9px] text-neutral-500 mt-1">
+                <div className="flex justify-between text-[10px] text-neutral-500 mt-1">
                   <span>0 km</span>
                   <span>{sport.targetDist} km</span>
                 </div>
@@ -581,20 +581,20 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                   <div className="text-sm font-extrabold tabular-nums" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
                     {hr > 0 ? Math.round((hr / hrMax) * 100) + '%' : '—'}
                   </div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">% HR Max</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">% HR Max</div>
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-[11px] font-extrabold leading-tight" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
                     {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Can speak full sentences' : hr / hrMax < 0.9 ? 'Only 3-4 words' : 'Cannot speak'}
                   </div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Talk Test</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Talk Test</div>
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
-                  <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[9px] text-neutral-500"> bpm</span></div>
-                  <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">MAF Target</div>
+                  <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[10px] text-neutral-500"> bpm</span></div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">MAF Target</div>
                 </div>
               </div>
-              <p className="mt-2 text-[9px] leading-relaxed text-neutral-500">
+              <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
                 <b>Talk test:</b> the easiest zone check — Zone 2 if you can still speak in full sentences.
                 <b> MAF</b> (Maximum Aerobic Function, Maffetone's 180−age method): training at ≤{180 - age} bpm builds your aerobic engine & maximizes fat burning.
                 {hr > 0 && hr > 180 - age && <span className="font-bold text-amber-600"> Your HR of {hr} bpm is above MAF — slow down to stay in the aerobic base.</span>}
@@ -616,7 +616,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               <span className={'text-lg ' + (liveHr.isLive ? 'animate-pulse' : '')}>💗</span>
               <div className="min-w-0 flex-1">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div>
-                <div className="truncate text-[9px] text-neutral-500">{liveHr.label}</div>
+                <div className="truncate text-[10px] text-neutral-500">{liveHr.label}</div>
               </div>
               <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr || ''} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
               <span className="text-[10px] text-neutral-500">bpm</span>
@@ -632,7 +632,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               ) : (
                 // Not a bug the user can fix by tapping: iOS Safari ships no Web
                 // Bluetooth, so say what actually works instead of a dead button.
-                <p className="text-[9px] leading-relaxed text-neutral-500">
+                <p className="text-[10px] leading-relaxed text-neutral-500">
                   This browser cannot read Bluetooth heart-rate straps — iPhone browsers do not support it at all.
                   Sync your watch through <a href="#/health-data" className="font-bold text-brand-dark underline">Data Kesehatan</a> to
                   fill HR automatically, or type your bpm above.
@@ -1211,7 +1211,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1">
               <span className="truncate text-xs font-black">{post.authorName}</span>
-              <span className="shrink-0 text-[9px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
+              <span className="shrink-0 text-[10px] font-medium bg-neutral-100 text-neutral-500 px-1.5 py-0.5 rounded-md">{roleLabel[post.role]}</span>
             </div>
             <div className="text-[10px] text-neutral-500 mt-0.5 truncate">
               {timeAgo(post.at)} · <span className="font-semibold text-brand-dark capitalize">{post.postType}</span>
@@ -2034,7 +2034,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="space-y-1.5 overflow-hidden">
         <div className="flex items-center gap-2 text-xs font-black text-ink">
           📰 Live Health News <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
-          {liveNews && <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-red-600">Real-time</span>}
+          {liveNews && <span className="rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-600">Real-time</span>}
         </div>
         {(() => {
           const item = ticker[newsIdx % ticker.length]

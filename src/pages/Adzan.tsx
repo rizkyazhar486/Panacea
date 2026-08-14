@@ -128,7 +128,7 @@ export function Adzan() {
               <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Today</div>
               <p className="text-[12px] font-bold text-ink">{jadwal.kota} · {jadwal.tanggal}</p>
             </div>
-            <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-[9px] font-black uppercase tracking-wide text-neutral-600">
+            <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-neutral-600">
               {jadwal.metode}
             </span>
           </div>

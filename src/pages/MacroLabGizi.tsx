@@ -203,7 +203,7 @@ export function MacroLabGizi() {
           ].map((x) => (
             <div key={x.l} className="rounded-xl bg-white/5 p-2">
               <div className="text-[13px] font-black text-ink">{x.v}</div>
-              <div className="text-[9px] font-bold uppercase text-neutral-500">{x.l}</div>
+              <div className="text-[10px] font-bold uppercase text-neutral-500">{x.l}</div>
             </div>
           ))}
         </div>

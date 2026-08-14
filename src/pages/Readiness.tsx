@@ -225,7 +225,7 @@ export function Readiness() {
       <Field label={
         <span className="flex items-center gap-1">
           <span>{label}</span>
-          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark" title="Filled automatically from your device">⌚</span>}
+          {dariPerangkat && <span className="rounded bg-brand-50 px-1 text-[10px] font-bold text-brand-dark" title="Filled automatically from your device">⌚</span>}
         </span>
       }>
         <div className="flex items-center gap-1"
@@ -254,7 +254,7 @@ export function Readiness() {
             <Ring value={rec ?? 0} max={100} color={tone.color}>
               <div>
                 <div className="text-3xl font-extrabold" style={{ color: tone.color }}>{rec ?? '—'}<span className="text-sm text-neutral-500">%</span></div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Recovery</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Recovery</div>
               </div>
             </Ring>
           </div>
@@ -262,7 +262,7 @@ export function Readiness() {
             <Ring value={strain} max={21} color="#3b82f6">
               <div>
                 <div className="text-3xl font-extrabold text-blue-500">{strain.toFixed(1)}</div>
-                <div className="text-[8px] font-bold uppercase tracking-widest text-neutral-500">Strain /21</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Strain /21</div>
               </div>
             </Ring>
           </div>
@@ -313,14 +313,14 @@ export function Readiness() {
         </div>
         <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-neutral-50 p-3 text-center">
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-500">Sleep Need Tonight</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Sleep Need Tonight</div>
             <div className="text-lg font-extrabold text-brand-dark">{sleepNeed.toFixed(1)} hours</div>
-            <div className="text-[9px] text-neutral-500">base {baseNeed}h + strain + sleep debt</div>
+            <div className="text-[10px] text-neutral-500">base {baseNeed}h + strain + sleep debt</div>
           </div>
           <div>
-            <div className="text-[9px] font-bold uppercase text-neutral-500">Sleep Debt (7 days)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Sleep Debt (7 days)</div>
             <div className={'text-lg font-extrabold ' + (debt > 2 ? 'text-rose-500' : debt > 0.5 ? 'text-amber-600' : 'text-brand-dark')}>{debt.toFixed(1)} hours</div>
-            <div className="text-[9px] text-neutral-500">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
+            <div className="text-[10px] text-neutral-500">{debt > 2 ? 'sleep earlier tonight' : 'under control'}</div>
           </div>
         </div>
       </Card>
@@ -363,7 +363,7 @@ export function Readiness() {
                   <div className="w-2.5 rounded-t" style={{ height: `${d.rec ?? 4}%`, background: c, minHeight: 4 }} title={`Recovery ${d.rec ?? '—'}%`} />
                   <div className="w-2.5 rounded-t bg-blue-400" style={{ height: `${(d.strain / 21) * 100}%`, minHeight: 2 }} title={`Strain ${d.strain.toFixed(1)}`} />
                 </div>
-                <div className="text-[8px] font-bold text-neutral-500">{new Date(d.k).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                <div className="text-[10px] font-bold text-neutral-500">{new Date(d.k).toLocaleDateString('en-US', { weekday: 'short' })}</div>
               </div>
             )
           })}

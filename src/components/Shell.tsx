@@ -432,7 +432,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <LogoMark size={28} />
         <div className="leading-tight">
           <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
         </div>
       </div>
       {/* Ambient animated backdrop — sits behind every page */}

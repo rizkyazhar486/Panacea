@@ -181,10 +181,10 @@ export function CrossFit() {
                     <div className="flex items-center gap-1.5">
                       <span className="text-[13px] font-black text-ink">{b.nama}</span>
                       {b.bodyweight && (
-                        <span className="rounded bg-emerald-500/20 px-1 text-[9px] font-bold text-emerald-700">no equipment</span>
+                        <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-700">no equipment</span>
                       )}
                       {b.kelompok === 'hero' && (
-                        <span className="rounded bg-white/10 px-1 text-[9px] font-bold text-neutral-600">hero</span>
+                        <span className="rounded bg-white/10 px-1 text-[10px] font-bold text-neutral-600">hero</span>
                       )}
                     </div>
                     <div className="truncate text-[11px] text-neutral-500">{b.format}</div>

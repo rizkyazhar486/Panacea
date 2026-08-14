@@ -35,7 +35,7 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   const initials = alt.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase()
   if (!src || broken) {
     return (
-      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-100 text-[9px] font-black text-neutral-500">
+      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-100 text-[10px] font-black text-neutral-500">
         {initials}
       </span>
     )

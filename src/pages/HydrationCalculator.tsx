@@ -79,7 +79,7 @@ export function HydrationCalculator() {
 
       <Card className="!p-5">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label={<>Body weight (kg) {weightFromDevice && <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-dark">From Health Profile</span>}</>}>
+          <Field label={<>Body weight (kg) {weightFromDevice && <span className="ml-1 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-dark">From Health Profile</span>}</>}>
             <input className={inputClass} type="number" min={30} max={200} value={weightKg} onChange={(e) => { setWeightKg(Number(e.target.value) || 0); setWeightFromDevice(false) }} />
           </Field>
           <Field label="Exercise today (minutes)">

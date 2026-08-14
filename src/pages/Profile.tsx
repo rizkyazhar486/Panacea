@@ -101,7 +101,7 @@ export function Profile() {
       <HealthSnapshot className="mt-3" />
 
       {/* Edit profile button */}
-      <button onClick={openEdit} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-700">
+      <button onClick={openEdit} className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded-xl bg-neutral-100 text-sm font-bold text-neutral-700">
         ✎ Edit Profile
       </button>
 
@@ -168,7 +168,7 @@ export function Profile() {
           <button key={t.id} onClick={() => setTab(t.id)} aria-label={t.label}
             className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-lg transition-colors ${tab === t.id ? 'border-b-2 border-brand text-ink' : 'text-neutral-500'}`}>
             <span>{t.icon}</span>
-            <span className="text-[8px] font-bold">{t.label}</span>
+            <span className="text-[10px] font-bold">{t.label}</span>
           </button>
         ))}
       </div>

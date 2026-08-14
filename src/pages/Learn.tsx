@@ -70,7 +70,7 @@ export function Learn() {
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <span className="text-[10px] font-bold text-neutral-500">{t.minutes} min read</span>
                   {ringkasTier(t).map((r) => (
-                    <span key={r.tier} className="rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase"
+                    <span key={r.tier} className="rounded-full px-1.5 py-0.5 text-[10px] font-black uppercase"
                       style={{ background: `${TIER_LABEL[r.tier].color}1f`, color: TIER_LABEL[r.tier].color }}>
                       {r.n} {r.tier}
                     </span>

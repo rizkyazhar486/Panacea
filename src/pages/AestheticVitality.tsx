@@ -215,7 +215,7 @@ export function AestheticVitality() {
             <div className="absolute inset-0 grid place-items-center text-center">
               <div>
                 <div className="text-3xl font-black" style={{ color: scoreColor }}>{score ?? '—'}</div>
-                <div className="text-[9px] font-bold uppercase tracking-wide text-neutral-500">Vitality Index</div>
+                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Vitality Index</div>
               </div>
             </div>
           </div>

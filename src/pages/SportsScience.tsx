@@ -197,7 +197,7 @@ export function SportsScience() {
                 {items && (
                   <div className="absolute inset-x-1 bottom-1 flex items-center gap-0.5">
                     {top > 0 && <span className={'h-1.5 w-1.5 rounded-full ' + rpeColor(top)} />}
-                    <span className="truncate text-[9px] leading-none">{items[0].emoji}{items.length > 1 ? `+${items.length - 1}` : ''}</span>
+                    <span className="truncate text-[10px] leading-none">{items[0].emoji}{items.length > 1 ? `+${items.length - 1}` : ''}</span>
                   </div>
                 )}
               </div>

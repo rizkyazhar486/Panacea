@@ -409,11 +409,11 @@ function WhoNeonateCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{lossFromBirth >= 0 ? lossFromBirth.toFixed(1) : '0'}%</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">{lossFromBirth >= 0 ? 'Down from birth weight' : 'Already above birth weight'}</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">{lossFromBirth >= 0 ? 'Down from birth weight' : 'Already above birth weight'}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{z >= 0 ? '+' : ''}{z.toFixed(2)} SD</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">vs. median trajectory (expected {expectedG.toFixed(0)}g)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">vs. median trajectory (expected {expectedG.toFixed(0)}g)</div>
         </div>
       </div>
 
@@ -657,7 +657,7 @@ P (Plan):
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
-          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-500">Lubchenco</div>
+          <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Lubchenco</div>
         </div>
       </div>
 
@@ -751,15 +751,15 @@ function ParklandCalc() {
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">mL Total 24 hours</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">mL Total 24 hours</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">mL/hour (first 8 hours)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (first 8 hours)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</Prosa>
@@ -1480,9 +1480,9 @@ function FluidBalanceCalc() {
         <Field label="Other"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total Intake</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total Output</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Intake</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
       <Prosa kelas="mt-3 text-[10px] text-neutral-500">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</Prosa>
     </Card>
@@ -1510,9 +1510,9 @@ function PedsDoseCalc() {
         <Field label="Syrup Concentration (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mg/dose</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[9px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</Prosa>
     </Card>
@@ -1659,7 +1659,7 @@ function DenverCalc() {
                 <div key={key} className="flex items-center justify-between gap-2 rounded-xl border border-neutral-100 p-2.5">
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] font-bold text-ink">{m.label}</div>
-                    <div className="text-[9px] font-bold uppercase text-neutral-500">Typically achieved ~{m.ageMo} months</div>
+                    <div className="text-[10px] font-bold uppercase text-neutral-500">Typically achieved ~{m.ageMo} months</div>
                   </div>
                   <SegButtons value={v} onChange={(nv) => setResults((s) => ({ ...s, [key]: nv }))} options={[{ v: 'pass', l: 'Can' }, { v: 'fail', l: 'Not yet' }, { v: 'na', l: '—' }]} />
                 </div>
@@ -1871,11 +1871,11 @@ function AbgCalc() {
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
-          <div className="mt-1 text-[9px] font-bold uppercase text-neutral-500">AG Classification</div>
+          <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">AG Classification</div>
         </div>
       </div>
       {deltaRatioNote && (
@@ -2045,15 +2045,15 @@ function BurnCalc() {
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-500">Total mL / 24h (Parkland)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Total mL / 24h (Parkland)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-500">mL/h (first 8 hours)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">mL/h (first 8 hours)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{next16hRate.toFixed(0)}</div>
-            <div className="text-[9px] font-bold uppercase text-neutral-500">mL/h (next 16 hours)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">mL/h (next 16 hours)</div>
           </div>
         </div>
       )}
@@ -2367,11 +2367,11 @@ function BrocaLorentzCalorieCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{ibw.toFixed(1)} kg</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight ({formula === 'broca' ? 'Broca' : 'Lorentz'})</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kcal/day</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</Prosa>
@@ -2401,11 +2401,11 @@ function IvDripCalc() {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/h</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Rate (infusion pump)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Rate (infusion pump)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} drops/min</div>
-          <div className="text-[9px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</Prosa>
@@ -2622,7 +2622,7 @@ export function ClinicalCalculators() {
                 className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
               >
                 <span className="text-[11px] font-black uppercase tracking-wide text-neutral-600 dark:text-neutral-300">{g}</span>
-                <span className="rounded-full bg-neutral-200 px-1.5 py-0.5 text-[9px] font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{isi.length}</span>
+                <span className="rounded-full bg-neutral-200 px-1.5 py-0.5 text-[10px] font-black text-neutral-600 dark:bg-white/10 dark:text-neutral-300">{isi.length}</span>
                 <span className="ml-auto text-[11px] font-black text-neutral-400">{buka ? '▲' : '▼'}</span>
               </button>
               {buka && (

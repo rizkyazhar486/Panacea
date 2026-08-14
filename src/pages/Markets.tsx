@@ -246,7 +246,7 @@ export function Markets() {
                       </div>
                     </div>
                     {h.type && (
-                      <span className="shrink-0 rounded-md bg-neutral-200 px-1.5 py-0.5 text-[9px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">
+                      <span className="shrink-0 rounded-md bg-neutral-200 px-1.5 py-0.5 text-[10px] font-bold text-neutral-600 dark:bg-white/10 dark:text-neutral-300">
                         {h.type}
                       </span>
                     )}
