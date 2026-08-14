@@ -601,7 +601,7 @@ export function Shell({ children }: { children: ReactNode }) {
             )}
             <NavLink
               to="/billing"
-              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 py-1.5 text-sm font-bold text-white"
+              className="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 text-sm font-bold text-white"
               title="PanaceaToken Balance"
             >
               <IconToken size={16} className="text-brand" />
@@ -669,7 +669,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 to={n.to}
                 end={n.end}
                 className={({ isActive }) =>
-                  `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  `flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-bold ${
                     isActive ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'
                   }`
                 }
@@ -679,7 +679,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </NavLink>
             ))}
             {(account.role === 'pasien' || account.role === 'dokter') && (
-              <NavLink to="/hospitals" className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent">
+              <NavLink to="/hospitals" className="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-3 text-xs font-bold text-accent">
                 <IconHospital size={15} /> SOS
               </NavLink>
             )}

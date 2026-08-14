@@ -1,6 +1,8 @@
 import { lazy, useMemo } from 'react'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
+import { KartuAngkaKlinis } from '../components/AngkaKlinis'
+import { auditTubuh } from '../lib/rujukanTubuh'
 import { IconActivity } from '../components/icons'
 import { getVitals } from '../lib/healthVitals'
 
@@ -55,6 +57,26 @@ export function PusatTubuh() {
     return out
   }, [])
 
+  /**
+   * Penjabaran tiap angka tubuh: rentang rujukan BESERTA POPULASINYA, ragam
+   * harian dalam diri sendiri, dan batasan alatnya.
+   *
+   * Label "baik / cukup / kurang" sengaja tidak dipakai. Label semacam itu
+   * menyembunyikan terhadap siapa angkanya dibandingkan, seberapa tidak pasti
+   * alatnya, dan seberapa besar ayunan hariannya — dan ketiganya menentukan
+   * apakah angka itu berarti sama sekali.
+   */
+  const klinis = useMemo(() => {
+    const v = getVitals()
+    return auditTubuh({
+      restingHr: typeof v.restingHr === 'number' ? v.restingHr : undefined,
+      hrvMs: typeof v.hrvMs === 'number' ? v.hrvMs : undefined,
+      spo2Pct: typeof v.spo2Pct === 'number' ? v.spo2Pct : undefined,
+      systolic: typeof v.systolic === 'number' ? v.systolic : undefined,
+      diastolic: typeof v.diastolic === 'number' ? v.diastolic : undefined,
+    })
+  }, [])
+
   return (
     <HalamanTab
       judul="Tanda Tubuh"
@@ -62,6 +84,20 @@ export function PusatTubuh() {
       ikon={<IconActivity />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
+      kaki={
+        klinis.length > 0 ? (
+          <section className="space-y-3">
+            <h2 className="text-[13px] font-black text-ink dark:text-white">Dari mana angka-angka ini</h2>
+            <p className="text-[12px] leading-relaxed text-neutral-500">
+              Setiap angka di bawah membawa rentang rujukannya beserta populasi asalnya, seberapa besar ayunan
+              hariannya, dan kapan ia tidak boleh dipercaya.
+            </p>
+            {klinis.map((a) => (
+              <KartuAngkaKlinis key={a.label} a={a} />
+            ))}
+          </section>
+        ) : undefined
+      }
     />
   )
 }
