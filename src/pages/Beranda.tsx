@@ -35,14 +35,21 @@ import {
  * mapan memakai 2,5x-3x (Material 8/24, Apple 8/20). Di sini: 6 px di dalam
  * widget, 24 px antar-grup — 4x, dan hierarkinya terbaca.
  *
- * WADAH. Permintaannya 30 px. Dipakai mulai lebar 640 px ke atas; di bawah itu
- * 16 px, karena 30 px di dua sisi memakan 60 px dari 390 px — 15% lebar layar
- * hilang menjadi ruang kosong, dan kisi empat kolom tidak lagi muat.
+ * FLUID. Angka-angka di atas adalah BATAS BAWAHNYA, bukan nilai matinya.
+ * Seluruh ukuran halaman ini — huruf, jarak, wadah, ubin lambang, jumlah kolom
+ * — mengalir mengikuti lebar wadahnya lewat clamp() dan satuan cqw; lihat
+ * "MODEL FLUID" di index.css. Yang berubah bukan sekadar nilainya melainkan
+ * modelnya: sebelumnya sebuah ukuran hanya benar tepat di lebar yang diuji dan
+ * meleset di antaranya, karena ditetapkan sebagai angka mati padahal yang
+ * menentukan keterbacaan adalah perbandingannya terhadap ruang yang ada.
+ *
+ * Tidak ada satu pun titik patah yang ditulis di berkas ini. Kisi empat kolom
+ * pada telepon terbentuk dengan sendirinya dari lebar ubin, dan menambah kolom
+ * sendiri pada layar yang lebih lega.
  */
 
-// ── Nilai jarak, disebut sekali supaya tidak menyebar sebagai angka lepas ──
-const DALAM = 'gap-[6px]'        // antar elemen di dalam satu widget
-const ANTAR_GRUP = 'space-y-6'   // 24px — 4x jarak dalam, supaya grup terbaca
+// ── Jarak di dalam satu widget. Batas bawah 6 px, tumbuh sampai 10 px. ──
+const DALAM = 'gap-fluid'
 
 type Pintu = { ke: string; Logo: (p: { size?: number }) => JSX.Element; judul: string; warna: string }
 
@@ -107,19 +114,36 @@ function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
     .map((v, i) => `${(i / (deret.length - 1)) * 68 + 1},${19 - ((v - min) / rentang) * 17}`)
     .join(' ')
   return (
-    <svg width="70" height="20" viewBox="0 0 70 20" fill="none" className={kelas} aria-hidden="true">
-      <polyline points={titik} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    // Melebar mengikuti kartunya, dengan tinggi tetap. preserveAspectRatio
+    // "none" membuat gambarnya diregangkan mendatar — yang justru diinginkan di
+    // sini, karena yang dibaca hanyalah arahnya. Agar peregangan itu tidak ikut
+    // menipiskan garisnya, tebalnya dikunci dengan vector-effect.
+    <svg
+      viewBox="0 0 70 20"
+      preserveAspectRatio="none"
+      fill="none"
+      className={`h-[clamp(18px,5cqw,26px)] w-full ${kelas}`}
+      aria-hidden="true"
+    >
+      <polyline
+        points={titik}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
     </svg>
   )
 }
 
 function KartuKpi({ k }: { k: Kpi }) {
   return (
-    <div className={`flex min-w-0 flex-1 flex-col ${DALAM} rounded-2xl bg-white/70 p-3 dark:bg-white/5`}>
-      <span className="truncate text-[10px] font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
+    <div className={`flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/70 p-3 dark:bg-white/5`}>
+      <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
       <span className="flex items-baseline gap-1">
-        <span className={`text-[22px] font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
-        {k.satuan && <span className="text-[10px] font-bold text-neutral-400">{k.satuan}</span>}
+        <span className={`t-angka font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
+        {k.satuan && <span className="t-mikro font-bold text-neutral-400">{k.satuan}</span>}
       </span>
       {k.deret && <Garis deret={k.deret} kelas={k.nada} />}
     </div>
@@ -133,12 +157,16 @@ function Lambang({ p }: { p: Pintu }) {
   return (
     <Link
       to={p.ke}
-      className={`flex flex-col items-center ${DALAM} rounded-2xl py-1 transition active:scale-95`}
+      className={`flex w-full max-w-[calc(var(--ubin)*1.5)] flex-col items-center ${DALAM} rounded-2xl py-1 transition active:scale-95`}
     >
-      <span className={`grid h-[56px] w-[56px] place-items-center rounded-2xl ${p.warna}`}>
+      {/* Ubin dan lambangnya tumbuh bersama: ukuran svg ditentukan dalam persen
+          oleh .ubin-fluid, jadi tidak ada angka kedua yang bisa berselisih
+          dengan ukuran ubinnya. Nilai size di bawah hanya bekal bila CSS-nya
+          belum termuat. */}
+      <span className={`ubin-fluid grid place-items-center rounded-2xl ${p.warna}`}>
         <Logo size={26} />
       </span>
-      <span className="flex h-[15px] items-start text-center text-[11px] font-bold leading-none text-ink dark:text-neutral-200">
+      <span className="t-kecil text-center font-bold leading-tight text-ink dark:text-neutral-200">
         {p.judul}
       </span>
     </Link>
@@ -159,9 +187,9 @@ function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu
   return (
     <section>
       {/* Rata kiri: pemindaian pola F bertumpu pada tepi kiri yang lurus. */}
-      <h2 className="text-[11px] font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      <p className="mb-2 text-[11px] leading-snug text-neutral-400">{isi ?? '\u00A0'}</p>
-      <div className="grid grid-cols-4 gap-x-[6px] gap-y-3">
+      <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      <p className="t-kecil mb-2 leading-snug text-neutral-400">{isi ?? '\u00A0'}</p>
+      <div className="kisi-fluid">
         {pintu.map((p) => <Lambang key={p.judul} p={p} />)}
       </div>
     </section>
@@ -172,14 +200,14 @@ function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu
 function Tanya({ pilih }: { pilih: (t: Tujuan) => void }) {
   return (
     <section className="rounded-2xl border border-brand/30 bg-brand-50/60 p-3 dark:border-brand/40 dark:bg-brand/10">
-      <h2 className="text-[13px] font-black text-ink dark:text-white">Anda memakai ini untuk apa?</h2>
-      <p className="mb-2 text-[11px] text-neutral-500">Menentukan urutan dasbor saja — tidak ada yang disembunyikan.</p>
-      <div className="flex flex-wrap gap-[6px]">
+      <h2 className="t-sedang font-black text-ink dark:text-white">Anda memakai ini untuk apa?</h2>
+      <p className="t-kecil mb-2 text-neutral-500">Menentukan urutan dasbor saja — tidak ada yang disembunyikan.</p>
+      <div className="flex flex-wrap gap-fluid">
         {PILIHAN_TUJUAN.map((o) => (
           <button
             key={o.id}
             onClick={() => pilih(o.id)}
-            className="flex h-10 items-center rounded-full bg-white px-3 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white"
+            className="t-sedang flex min-h-[44px] items-center rounded-full bg-white px-4 font-bold text-ink dark:bg-white/10 dark:text-white"
           >
             {o.ikon} {o.judul}
           </button>
@@ -255,29 +283,32 @@ export default function Beranda() {
   }, [account])
 
   return (
-    // Wadah 30px mulai 640px; 16px di bawah itu — lihat catatan JARAK di atas.
-    <div className={`mx-auto max-w-3xl px-4 sm:px-[30px] ${ANTAR_GRUP} pb-6`}>
+    // `fluid` menjadikan pembungkus ini WADAH UKUR: seluruh cqw di dalamnya
+    // mengukur lebar kotak ini, bukan lebar layar. Itulah sebabnya halaman ini
+    // tetap benar saat isinya duduk di samping bilah sisi selebar 280 px.
+    <div className="fluid mx-auto max-w-3xl">
+      <div className="j-grup px-fluid pb-6">
       {/* ── PANEL ATAS — dibaca menyilang (Z) ───────────────────────────────
           kiri-atas: siapa saya · kanan-atas: aksi utama
           kiri-bawah: angka       · kanan-bawah: ke mana lanjut          */}
-      <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-50 to-brand-100/50 p-4 dark:from-brand/15 dark:to-brand/5">
+      <section className="p-fluid overflow-hidden rounded-3xl bg-gradient-to-br from-brand-50 to-brand-100/50 dark:from-brand/15 dark:to-brand/5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="truncate text-[19px] font-black leading-tight text-ink dark:text-white">
+            <h1 className="t-judul truncate font-black leading-tight text-ink dark:text-white">
               Halo{nama && `, ${nama}`}
             </h1>
-            <p className="text-[12px] text-neutral-500">Mau kerjakan apa hari ini?</p>
+            <p className="t-sedang text-neutral-500">Mau kerjakan apa hari ini?</p>
           </div>
           <Link
             to="/search"
-            className="flex h-10 shrink-0 items-center rounded-full bg-brand px-4 text-[12px] font-bold text-white transition active:scale-95"
+            className="t-sedang flex h-11 shrink-0 items-center rounded-full bg-brand px-5 font-bold text-white transition active:scale-95"
           >
             Cari
           </Link>
         </div>
 
         {kpi.length > 0 && (
-          <div className={`mt-3 flex ${DALAM}`}>
+          <div className="angka-fluid mt-3">
             {kpi.map((k) => <KartuKpi key={k.label} k={k} />)}
           </div>
         )}
@@ -285,9 +316,9 @@ export default function Beranda() {
         {kpi.length === 0 && (
           <Link
             to="/tutorial"
-            className="mt-3 flex items-center justify-between rounded-2xl bg-white/70 px-3 py-2.5 dark:bg-white/5"
+            className="mt-3 flex min-h-[44px] items-center justify-between gap-3 rounded-2xl bg-white/70 px-3 py-2.5 dark:bg-white/5"
           >
-            <span className="text-[12px] font-semibold text-ink dark:text-white">
+            <span className="t-sedang font-semibold text-ink dark:text-white">
               Belum ada angka. Mulai dari 3 langkah singkat.
             </span>
             <span className="text-brand">›</span>
@@ -314,14 +345,14 @@ export default function Beranda() {
 
       {tujuan && (
         <section>
-          <h2 className="mb-2 text-[11px] font-black uppercase tracking-wide text-neutral-500">Urutan dasbor</h2>
-          <div className="flex flex-wrap gap-[6px]">
+          <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Urutan dasbor</h2>
+          <div className="flex flex-wrap gap-fluid">
             {PILIHAN_TUJUAN.map((o) => (
               <button
                 key={o.id}
                 onClick={() => pilih(o.id)}
                 aria-pressed={tujuan === o.id}
-                className={`flex h-10 items-center rounded-full px-3 text-[12px] font-bold transition ${
+                className={`t-sedang flex min-h-[44px] items-center rounded-full px-4 font-bold transition ${
                   tujuan === o.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
               >
                 {o.ikon} {o.judul}
@@ -333,10 +364,11 @@ export default function Beranda() {
 
       <Link
         to="/tutorial"
-        className="flex h-11 items-center justify-center gap-2 text-[12px] font-bold text-brand"
+        className="t-sedang flex min-h-[44px] items-center justify-center gap-2 font-bold text-brand"
       >
         <LogoPanduan size={16} /> Baru di sini? Buka panduan 6 langkah
       </Link>
+      </div>
     </div>
   )
 }

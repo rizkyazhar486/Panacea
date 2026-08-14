@@ -759,3 +759,89 @@ html { -webkit-overflow-scrolling: touch; }
   .rangka { animation: none; }
 }
 .reduce-motion .rangka { animation: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MODEL FLUID — ukuran yang mengalir mengikuti lebar WADAHNYA.
+
+   MENGAPA BUKAN TITIK PATAH. Tata letak yang bergantung pada titik patah hanya
+   benar tepat di lebar yang diuji, dan meleset di antaranya: pada 390 px semua
+   pas, pada 430 px huruf 11 px tetap 11 px sementara ruangnya bertambah 10%,
+   dan pada 768 px kartu meregang tanpa isinya ikut membesar. Yang salah bukan
+   nilainya melainkan modelnya — ukuran ditetapkan sebagai angka mati, padahal
+   yang menentukan keterbacaan adalah PERBANDINGANNYA terhadap ruang yang ada.
+
+   MENGAPA cqw, BUKAN vw. Satuan vw mengukur lebar layar, sedangkan yang
+   sesungguhnya membatasi sebuah kartu adalah lebar wadahnya. Di layar lebar,
+   isi halaman ini duduk di samping bilah sisi selebar 280 px; dengan vw huruf
+   akan membesar seolah-olah wadahnya selebar layar, padahal tidak. Dengan cqw
+   ia mengikuti ruang yang benar-benar tersedia — dan komponen yang sama tetap
+   benar di mana pun ia dipasang nanti.
+
+   BATAS BAWAH TIDAK PERNAH DILANGGAR. Tiap clamp() dimulai dari nilai yang
+   sudah dipegang aplikasi ini: huruf tidak pernah di bawah 10 px, dan ubin
+   lambang tidak pernah di bawah 56 px. Fluid berarti boleh MEMBESAR mengikuti
+   ruang, bukan boleh mengecil sampai tidak terbaca.
+
+   Interpolasinya lurus antara wadah 320 px dan 900 px.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .fluid {
+    container-type: inline-size;
+  }
+
+  /* ── Huruf ── */
+  .t-mikro  { font-size: clamp(10px,  8.90px + 0.345cqw, 12px); }
+  .t-kecil  { font-size: clamp(11px,  9.35px + 0.517cqw, 14px); }
+  .t-sedang { font-size: clamp(12px,  9.79px + 0.690cqw, 16px); }
+  .t-angka  { font-size: clamp(22px, 15.38px + 2.069cqw, 34px); }
+  .t-judul  { font-size: clamp(19px, 12.93px + 1.897cqw, 30px); }
+
+  /* ── Jarak ── */
+  .j-rapat > * + * { margin-top: clamp(6px, 3.79px + 0.690cqw, 10px); }
+  .j-grup  > * + * { margin-top: clamp(24px, 15.17px + 2.759cqw, 40px); }
+  .p-fluid { padding: clamp(16px, 8.28px + 2.414cqw, 30px); }
+  .px-fluid { padding-inline: clamp(16px, 8.28px + 2.414cqw, 30px); }
+  /* Jarak antar-elemen di dalam satu widget, dalam bentuk gap. */
+  .gap-fluid { gap: clamp(6px, 3.79px + 0.690cqw, 10px); }
+
+  /* ── Kisi lambang ──
+     auto-fit, bukan jumlah kolom tetap: pada telepon ia jatuh menjadi empat
+     kolom dengan sendirinya, dan pada layar lebih lega ia menambah kolom tanpa
+     satu pun titik patah ditulis. Lebar ubin dibatasi supaya kolom yang tersisa
+     tidak meregangkan lambang menjadi sebesar telapak tangan. */
+  .kisi-fluid {
+    --ubin: clamp(56px, 44.97px + 3.448cqw, 76px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--ubin), 1fr));
+    gap: clamp(6px, 3.79px + 0.690cqw, 12px) clamp(6px, 3.79px + 0.690cqw, 10px);
+    justify-items: center;
+    /* Empat lambang pada wadah 768 px akan terpencar sejauh 60 px satu sama
+       lain bila kisinya dibiarkan meregang penuh, dan kelompok yang renggang
+       berhenti terbaca sebagai satu kelompok. Lebarnya dibatasi terhadap ubin,
+       bukan terhadap piksel tetap, supaya batas itu ikut mengalir. */
+    max-width: calc(var(--ubin) * 7);
+  }
+
+  .ubin-fluid {
+    width: var(--ubin, 56px);
+    height: var(--ubin, 56px);
+  }
+
+  /* Lambangnya ikut tumbuh bersama ubinnya. Ukuran dalam persen, bukan piksel,
+     supaya tidak ada angka kedua yang harus ikut diubah setiap kali ubinnya
+     berubah — dan tidak ada peluang keduanya berselisih. */
+  .ubin-fluid > svg {
+    width: 46%;
+    height: 46%;
+  }
+
+  /* ── Deret angka ──
+     Empat kolom pada telepon, dan melipat dengan sendirinya bila wadahnya
+     terlalu sempit untuk memuat empatnya tanpa memotong angka. */
+  .angka-fluid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(76px, 22cqw, 150px), 1fr));
+    gap: clamp(6px, 3.79px + 0.690cqw, 10px);
+  }
+}
