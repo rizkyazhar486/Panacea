@@ -5,6 +5,7 @@ import { pasangKilau } from '../lib/kilau'
 import { indukRute } from '../lib/alurHalaman'
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { LogoMark } from './Logo'
+import { FabNavigasi } from './FabNavigasi'
 import {
   IconDashboard,
   IconChat,
@@ -33,7 +34,6 @@ import {
   IconSparkle,
   IconHome,
   IconActivity,
-  IconPlus,
   IconUser,
   IconLeaf,
   IconSearch,
@@ -719,7 +719,13 @@ export function Shell({ children }: { children: ReactNode }) {
             menggeser, gerakannya tertinggal di belakang jari dan justru terasa
             berat. */}
         <main
-          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-28 sm:px-6 lg:pb-6 ${
+          /* pb-16, bukan pb-28. Ruang 112 px di bawah dulu disediakan untuk
+             bilah navigasi selebar layar; bilah itu sudah diganti tombol
+             melayang yang tidak menempati aliran halaman, sehingga menyisakan
+             ruang sebesar itu berarti setiap halaman berakhir dengan 112 px
+             kosong tanpa sebab. Yang disisakan kini hanya cukup agar baris
+             terakhir tidak tertutup tombol saat tombolnya berada di bawah. */
+          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-16 sm:px-6 lg:pb-6 ${
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >
@@ -801,53 +807,32 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {/* Bottom tab bar (mobile) — floating liquid-glass pill, horizontally
-          scrollable so it grows with the app's feature set without ever
-          feeling cramped. Icon-first: label is a small caption underneath,
-          never the primary cue. The "+" compose button floats above the pill,
-          fixed in place (not part of the scroll strip). */}
-      {['pasien', 'dokter', 'owner'].includes(account.role) && (
-        <nav
-          className={`fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden ${navHidden ? 'translate-y-[calc(100%+env(safe-area-inset-bottom)+16px)]' : 'translate-y-0'}`}
-          aria-label="Main navigation"
-        >
-          <div className="kaca relative mx-auto flex max-w-sm items-center rounded-full py-1.5 pl-2 pr-16">
-            <div className="fade-edge-glass pointer-events-none absolute inset-y-1.5 right-16 z-10 w-6 rounded-r-full" />
-            <div className="no-scrollbar flex items-stretch gap-0.5 overflow-x-auto">
-              {[
-                { to: '/', label: 'Home', icon: IconHome, end: true },
-                { to: '/community', label: 'Community', icon: IconUsers },
-                { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity },
-                { to: '/health-data', label: 'Health', icon: IconHeart },
-                { to: '/latihan', label: 'Training', icon: IconRun },
-                { to: '/sports-scores', label: 'Scores', icon: IconFlame },
-                { to: '/profile', label: 'Profile', icon: IconUser },
-              ].map((t) => (
-                <NavLink key={t.to} to={t.to} end={t.end} aria-label={t.label}
-                  className={({ isActive }) => `group relative flex min-h-[52px] w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full py-2 transition-colors duration-200 ${isActive ? 'text-brand-dark' : 'text-neutral-500'}`}>
-                  {({ isActive }) => (<>
-                    <span className={`absolute top-0.5 h-0.5 w-6 rounded-full bg-brand transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`} />
-                    <t.icon size={23} className={`transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'scale-110' : 'group-active:scale-90'}`} />
-                    <span className="text-[9px] font-bold">{t.label}</span>
-                  </>)}
-                </NavLink>
-              ))}
-            </div>
-            {/* Tombol "+" — buat post/story. Mengarah ke /community, bukan ke
-                "/": beranda tidak lagi memuat umpan, jadi kejadian compose yang
-                dikirim ke sana tidak akan ada yang menangkap dan tombolnya
-                diam-diam tidak melakukan apa pun. */}
-            <button
-              onClick={() => { navigate('/feed'); setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60) }}
-              aria-label="Create a new post or story"
-              className="group absolute right-1 top-1/2 flex -translate-y-1/2 flex-col items-center justify-center"
-            >
-              <span className="grid place-items-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:-translate-y-0.5 group-active:scale-95" style={{ height: 52, width: 52, background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 22px rgba(0,191,99,0.45)' }}>
-                <IconPlus size={26} />
-              </span>
-            </button>
-          </div>
-        </nav>
+      {/* Navigasi: satu tombol melayang yang dapat dipindah, menggantikan bilah
+          selebar layar.
+
+          Bilah lama memakan 68 px tinggi layar SETIAP SAAT pada aplikasi yang
+          halaman-halamannya sudah setinggi enam layar. Satu tombol 56 px
+          mengembalikan ruang itu kepada isi — dan karena dapat dipindah, ia
+          tidak pernah menutupi bagian yang sedang dibaca.
+
+          Tujuh tujuan yang sama tetap ada, kini di dalam menu yang muncul saat
+          tombolnya diketuk; tidak ada satu pun yang dihapus. */}
+      {['pasien', 'dokter', 'owner'].includes(account.role) && !navHidden && (
+        <FabNavigasi
+          tujuan={[
+            { to: '/', label: 'Beranda', ikon: <IconHome size={19} />, end: true },
+            { to: '/community', label: 'Komunitas', ikon: <IconUsers size={19} /> },
+            { to: '/vitapulse', label: 'VitaPulse', ikon: <IconActivity size={19} /> },
+            { to: '/health-data', label: 'Perangkat', ikon: <IconHeart size={19} /> },
+            { to: '/latihan', label: 'Latihan', ikon: <IconRun size={19} /> },
+            { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
+            { to: '/profile', label: 'Profil', ikon: <IconUser size={19} /> },
+          ]}
+          onTambah={() => {
+            navigate('/feed')
+            setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)
+          }}
+        />
       )}
 
       {['pasien', 'dokter', 'owner'].includes(account.role) && <><OnboardingTour /><AssessmentPrompt /></>}

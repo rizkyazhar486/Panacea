@@ -519,7 +519,6 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .kaca {
   --kx: 50%;
   --ky: 0%;
-  position: relative;
   isolation: isolate;
   background:
     linear-gradient(160deg, rgba(255,255,255,0.78), rgba(255,255,255,0.46) 55%, rgba(255,255,255,0.62));
@@ -536,6 +535,27 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
   transition:
     transform 0.34s cubic-bezier(0.32,0.72,0,1),
     box-shadow 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+
+/* position DIPINDAHKAN KE @layer components.
+   Sebelumnya `position: relative` berada di dalam .kaca sendiri, dan ia
+   mengalahkan setiap utilitas posisi yang dipakai bersamanya. Akibatnya
+   terukur di peramban: menu navigasi yang ditulis `absolute right-0` justru
+   dirender relatif dan mengalir di dalam induknya, sehingga meluber 114 px
+   keluar layar 390 px. Cacat semacam ini tidak menimbulkan galat apa pun — ia
+   hanya membuat setiap permukaan kaca yang perlu melayang diam-diam berhenti
+   melayang.
+
+   Menurunkan kekhususan dengan :where() TIDAK menyelesaikannya, dan sebabnya
+   perlu dicatat: Tailwind v4 menaruh utilitasnya di dalam @layer utilities,
+   sedangkan aturan tanpa lapisan SELALU menang atas aturan berlapis berapa pun
+   kekhususannya. Satu-satunya jalan adalah ikut masuk ke lapisan yang lebih
+   awal. Diukur di peramban, bukan diduga: dengan :where() posisinya tetap
+   terbaca relative. */
+@layer components {
+  .kaca {
+    position: relative;
+  }
 }
 
 /* Pantulan. pointer-events: none wajib — lapisan ini menutupi seluruh kartu,
