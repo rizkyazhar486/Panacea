@@ -2,10 +2,13 @@ import { lazy, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
+import { KartuAngkaKlinis } from '../components/AngkaKlinis'
+import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type BahanAudit } from '../lib/auditKebugaran'
 import { IconRun } from '../components/icons'
 import { getWorkouts } from '../lib/workoutStore'
 import { getVitals } from '../lib/healthVitals'
 import { statusSingkat } from '../lib/pelatih'
+import { upayaRelatif } from '../lib/analisisPro'
 import { hrMaxFromAge } from '../lib/workoutImport'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,6 +73,52 @@ export function PusatLatihan() {
     ]
   }, [])
 
+  /**
+   * Bahan untuk menjabarkan ketiga angka itu.
+   *
+   * Dihitung dari sumber yang SAMA PERSIS dengan angka ringkas di atas, bukan
+   * dihitung ulang secara terpisah. Penjabaran yang berasal dari perhitungan
+   * kedua pasti akan menyimpang dari angka yang dijabarkannya begitu salah satu
+   * diubah, dan penjabaran yang tidak cocok dengan angkanya lebih buruk
+   * daripada tidak ada penjabaran sama sekali.
+   */
+  const bahan = useMemo<BahanAudit | null>(() => {
+    const w = getWorkouts()
+    if (!w.length) return null
+    const v = getVitals()
+    const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
+    const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
+    const hrMax = Math.max(teramati, hrMaxFromAge(30, sex))
+    const hrIstirahat = typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60
+    const st = statusSingkat(w, { hrMax, hrRest: hrIstirahat, sex })
+    if (!st) return null
+
+    const waktu = w.map((x) => Date.parse(x.mulai)).filter((t) => !Number.isNaN(t))
+    const rentangHari = waktu.length
+      ? Math.max(1, Math.round((Date.now() - Math.min(...waktu)) / 86400_000))
+      : 0
+
+    // Beban hari ini: jumlah TRIMP seluruh sesi yang mulai pada tanggal
+    // kalender yang sama. Dihitung dengan fungsi yang SAMA dengan yang dipakai
+    // model, bukan ditaksir ulang — penjabaran yang memakai perhitungan kedua
+    // akan menyimpang dari angka yang dijabarkannya.
+    const hariIni = new Date().toDateString()
+    const upayaHariIni = w
+      .filter((x) => new Date(Date.parse(x.mulai)).toDateString() === hariIni)
+      .reduce((a, x) => a + upayaRelatif(x, { hrMax, hrRest: hrIstirahat, sex }).skor, 0)
+
+    return {
+      kebugaran: st.kebugaran,
+      kelelahan: st.kelelahan,
+      kesegaran: st.kesegaran,
+      jumlahSesi: w.length,
+      rentangHari,
+      hrMax,
+      hrIstirahat,
+      upayaHariIni,
+    }
+  }, [])
+
   return (
     <HalamanTab
       judul="Latihan"
@@ -77,12 +126,34 @@ export function PusatLatihan() {
       ikon={<IconRun />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
-      /* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */
       kaki={
-        <Link to="/fitness-hub"
-          className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
-          🔎 Seluruh alat latihan lainnya
-        </Link>
+        <div className="space-y-3">
+          {/* Penjabaran ketiga angka.
+              Ada karena pertanyaan "angka ini dari mana" adalah pertanyaan yang
+              sah, dan karena tidak menjawabnya membuat orang menyimpulkan
+              tubuhnya bermasalah atas sesuatu yang sebenarnya sifat model. */}
+          {bahan && (
+            <section className="space-y-3">
+              <h2 className="text-[13px] font-black text-ink dark:text-white">
+                Dari mana angka-angka ini
+              </h2>
+              {bacaanJujur(bahan) && (
+                <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
+                  {bacaanJujur(bahan)}
+                </p>
+              )}
+              <KartuAngkaKlinis a={auditKesegaran(bahan)} />
+              <KartuAngkaKlinis a={auditKebugaran(bahan)} />
+              <KartuAngkaKlinis a={auditKelelahan(bahan)} />
+            </section>
+          )}
+
+          {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
+          <Link to="/fitness-hub"
+            className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
+            🔎 Seluruh alat latihan lainnya
+          </Link>
+        </div>
       }
     />
   )
