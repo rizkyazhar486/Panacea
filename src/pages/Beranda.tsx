@@ -179,7 +179,7 @@ function Tanya({ pilih }: { pilih: (t: Tujuan) => void }) {
           <button
             key={o.id}
             onClick={() => pilih(o.id)}
-            className="rounded-full bg-white px-3 py-2 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white"
+            className="flex h-10 items-center rounded-full bg-white px-3 text-[12px] font-bold text-ink dark:bg-white/10 dark:text-white"
           >
             {o.ikon} {o.judul}
           </button>
@@ -270,7 +270,7 @@ export default function Beranda() {
           </div>
           <Link
             to="/search"
-            className="shrink-0 rounded-full bg-brand px-4 py-2 text-[12px] font-bold text-white transition active:scale-95"
+            className="flex h-10 shrink-0 items-center rounded-full bg-brand px-4 text-[12px] font-bold text-white transition active:scale-95"
           >
             Cari
           </Link>
@@ -321,7 +321,7 @@ export default function Beranda() {
                 key={o.id}
                 onClick={() => pilih(o.id)}
                 aria-pressed={tujuan === o.id}
-                className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${
+                className={`flex h-10 items-center rounded-full px-3 text-[12px] font-bold transition ${
                   tujuan === o.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
               >
                 {o.ikon} {o.judul}
@@ -333,7 +333,7 @@ export default function Beranda() {
 
       <Link
         to="/tutorial"
-        className="flex items-center justify-center gap-2 text-[12px] font-bold text-brand"
+        className="flex h-11 items-center justify-center gap-2 text-[12px] font-bold text-brand"
       >
         <LogoPanduan size={16} /> Baru di sini? Buka panduan 6 langkah
       </Link>

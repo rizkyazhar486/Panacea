@@ -73,7 +73,7 @@ export function KolomPelatih({
               <div className="text-xl font-black tabular-nums" style={{ color: status.baca.warna }}>
                 {Math.round(status.kesegaran)}
               </div>
-              <div className="text-[9px] uppercase tracking-wide text-slate-500">Freshness</div>
+              <div className="text-[10px] uppercase tracking-wide text-slate-500">Freshness</div>
             </div>
           )}
         </div>
@@ -165,7 +165,7 @@ export function KolomPelatih({
               className={`flex items-start gap-3 rounded-xl px-3 py-2 ${h.sudah ? 'bg-emerald-500/10' : 'bg-white/5'}`}>
               <div className="w-12 shrink-0">
                 <div className="text-[11px] font-black text-slate-300">{h.hari.slice(0, 3)}</div>
-                <div className="text-[9px] text-slate-500">{h.tanggal.slice(8)}/{h.tanggal.slice(5, 7)}</div>
+                <div className="text-[10px] text-slate-500">{h.tanggal.slice(8)}/{h.tanggal.slice(5, 7)}</div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-bold" style={{ color: h.warna }}>
@@ -202,7 +202,7 @@ function Angka({ label, nilai, warna }: { label: string; nilai: number; warna: s
   return (
     <div className="rounded-xl bg-white/5 p-2.5 text-center">
       <div className="text-lg font-black tabular-nums" style={{ color: warna }}>{nilai}</div>
-      <div className="text-[9px] uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div>
     </div>
   )
 }

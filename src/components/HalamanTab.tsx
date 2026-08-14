@@ -32,7 +32,7 @@ export interface TabDef {
 }
 
 export function HalamanTab({
-  judul, subjudul, ikon, tabs, ringkasan,
+  judul, subjudul, ikon, tabs, ringkasan, kaki,
 }: {
   judul: string
   subjudul: string
@@ -48,6 +48,16 @@ export function HalamanTab({
    * kosong mengajarkan orang bahwa halaman itu memang kosong.
    */
   ringkasan?: React.ReactNode
+  /**
+   * Ditempel di bawah isi tab, di dalam alur yang sama.
+   *
+   * Ada supaya halaman pemanggil tidak perlu menempelkan blok sendiri di luar
+   * rangka ini. Diukur di peramban: /latihan menempelkan tautannya sebagai
+   * saudara sekandung lalu menariknya naik dengan `-mt-20` untuk memakan
+   * `pb-24` di sini — hasilnya blok 358×80 px yang menindih isi tab. Slot ini
+   * menghapus sebab masalahnya, bukan menambal jaraknya.
+   */
+  kaki?: React.ReactNode
 }) {
   const lokasi = useLocation()
   const navigate = useNavigate()
@@ -81,7 +91,7 @@ export function HalamanTab({
         {tabs.map((t) => (
           <button key={t.id} onClick={() => pilih(t.id)}
             aria-current={t.id === aktif ? 'page' : undefined}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-bold transition ${
+            className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-bold transition ${
               t.id === aktif ? 'bg-brand text-white' : 'bg-white/5 text-slate-400 hover:text-white'
             }`}>
             <span className="text-[13px]">{t.emoji}</span>{t.label}
@@ -94,6 +104,8 @@ export function HalamanTab({
       <Suspense fallback={<div className="py-10 text-center text-sm text-slate-500">Loading…</div>}>
         <div key={tab.id}><Isi /></div>
       </Suspense>
+
+      {kaki}
     </div>
   )
 }

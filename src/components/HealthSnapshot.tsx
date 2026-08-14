@@ -25,8 +25,8 @@ export function HealthSnapshot({ className = '' }: { className?: string }) {
         <div className="mt-2 grid grid-cols-4 gap-2">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-sm font-black text-ink">{s.value}<span className="text-[9px] font-semibold text-neutral-500">{s.unit}</span></div>
-              <div className="text-[9px] text-neutral-500">{s.label}</div>
+              <div className="text-sm font-black text-ink">{s.value}<span className="text-[10px] font-semibold text-neutral-500">{s.unit}</span></div>
+              <div className="text-[10px] text-neutral-500">{s.label}</div>
             </div>
           ))}
         </div>
@@ -41,7 +41,7 @@ export function HealthSnapshot({ className = '' }: { className?: string }) {
 export function PrefillBadge({ show }: { show: boolean }) {
   if (!show) return null
   return (
-    <span className="ml-1 inline-flex items-center rounded-full bg-brand-50 px-1.5 py-0.5 text-[9px] font-bold text-brand-dark align-middle" title="Auto-filled from Health Data">
+    <span className="ml-1 inline-flex items-center rounded-full bg-brand-50 px-1.5 py-0.5 text-[10px] font-bold text-brand-dark align-middle" title="Auto-filled from Health Data">
       ❤ auto
     </span>
   )

@@ -67,7 +67,7 @@ export function HealthTrends({ weight, height, age, gender, hrRest }: {
         {metrics.map((m) => (
           <div key={m.key} className="rounded-xl border border-neutral-100 p-2.5 text-center">
             <div className="text-lg font-extrabold" style={{ color: m.color }}>{m.val ?? '—'}</div>
-            <div className="text-[9px] font-bold uppercase tracking-widest text-neutral-500">{m.name}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">{m.name}</div>
           </div>
         ))}
       </div>

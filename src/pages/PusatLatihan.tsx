@@ -71,22 +71,20 @@ export function PusatLatihan() {
   }, [])
 
   return (
-    <>
     <HalamanTab
       judul="Latihan"
       subjudul="Pelatih, analisis, fisiologi, dan daya tahan dalam satu halaman"
       ikon={<IconRun />}
       ringkasan={<PanelAngka angka={angka} />}
       tabs={TABS}
+      /* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */
+      kaki={
+        <Link to="/fitness-hub"
+          className="flex h-11 items-center justify-center rounded-2xl border border-dashed border-white/15 text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
+          🔎 Seluruh alat latihan lainnya
+        </Link>
+      }
     />
-    {/* Pintu ke alat-alat yang tidak muat dalam empat tab di atas. */}
-    <div className="-mt-20 pb-24">
-      <Link to="/fitness-hub"
-        className="block rounded-2xl border border-dashed border-white/15 py-2.5 text-center text-[12px] font-bold text-neutral-500 transition hover:border-white/30 hover:text-ink">
-        🔎 Seluruh alat latihan lainnya
-      </Link>
-    </div>
-    </>
   )
 }
 

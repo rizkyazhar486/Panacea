@@ -45,7 +45,9 @@ export function Prosa({ children, kelas, baris = 2 }: {
       </span>
       <button
         onClick={() => setBuka((x) => !x)}
-        className="mt-0.5 block text-[11px] font-bold text-brand underline underline-offset-2"
+        /* h-10: sasaran sentuh terkecil yang masih bisa dikenai jempol. Sebagai
+           teks telanjang tingginya cuma 18 px. */
+        className="flex h-10 items-center text-[11px] font-bold text-brand underline underline-offset-2"
       >
         {buka ? 'ringkas' : 'selengkapnya'}
       </button>

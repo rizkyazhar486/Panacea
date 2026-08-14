@@ -107,7 +107,7 @@ export function Sorot({
         {nilai}
         {satuan && <span className="ml-0.5 text-[10px] font-bold text-neutral-500">{satuan}</span>}
       </div>
-      <div className="mt-1 text-[9px] font-bold uppercase leading-tight tracking-wide text-neutral-500">
+      <div className="mt-1 text-[10px] font-bold uppercase leading-tight tracking-wide text-neutral-500">
         {label}
       </div>
     </div>

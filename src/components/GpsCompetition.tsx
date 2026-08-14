@@ -11,12 +11,12 @@ function BarChart({ data, color, unit }: { data: { label: string; value: number 
     <div className="flex items-end gap-1.5" style={{ height: 90 }}>
       {data.map((d, i) => (
         <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1">
-          <span className="text-[9px] font-bold text-neutral-500">{d.value}</span>
+          <span className="text-[10px] font-bold text-neutral-500">{d.value}</span>
           <div className="w-full rounded-t-md transition-all" style={{ height: `${Math.max(6, (d.value / max) * 64)}px`, background: color }} />
-          <span className="truncate text-[8px] text-neutral-500">{d.label}</span>
+          <span className="truncate text-[10px] text-neutral-500">{d.label}</span>
         </div>
       ))}
-      <span className="ml-1 self-end text-[8px] font-semibold text-neutral-300">{unit}</span>
+      <span className="ml-1 self-end text-[10px] font-semibold text-neutral-300">{unit}</span>
     </div>
   )
 }

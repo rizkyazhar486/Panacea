@@ -109,7 +109,7 @@ export function WidgetBeranda() {
                 <div className="text-[12px] font-black text-white">
                   {Math.floor(p.detik / 60)}:{String(p.detik % 60).padStart(2, '0')}
                 </div>
-                <div className="text-[9px] text-slate-500">{p.label}</div>
+                <div className="text-[10px] text-slate-500">{p.label}</div>
               </div>
             ))}
           </div>
@@ -209,7 +209,7 @@ function Mini({ label, nilai, warna }: { label: string; nilai: number; warna: st
   return (
     <div>
       <div className="text-base font-black tabular-nums" style={{ color: warna }}>{nilai}</div>
-      <div className="text-[9px] uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div>
     </div>
   )
 }

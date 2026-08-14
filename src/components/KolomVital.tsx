@@ -51,7 +51,7 @@ export function KolomVitalTerikat({
       <span className="flex items-center gap-1">
         <span>{label}</span>
         {dariPerangkat && (
-          <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark"
+          <span className="rounded bg-brand-50 px-1 text-[10px] font-bold text-brand-dark"
             title="Filled automatically from your device">⌚</span>
         )}
       </span>
@@ -109,7 +109,7 @@ export function KolomVital({
       <span className="flex items-center gap-1.5">
         <span>{label}</span>
         {dariPerangkat && (
-          <span className="rounded bg-brand-50 px-1 text-[9px] font-bold text-brand-dark"
+          <span className="rounded bg-brand-50 px-1 text-[10px] font-bold text-brand-dark"
             title="Filled automatically from your device">⌚</span>
         )}
       </span>

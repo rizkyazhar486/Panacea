@@ -229,7 +229,7 @@ export function WorkoutHistory() {
         <Prosa kelas="text-xs text-slate-500 leading-relaxed">Data tersimpan di perangkat ini saja. Mengimpor berkas baru menambah sesi, bukan menggantinya, sehingga riwayat lama tetap utuh meskipun Anda hanya mengekspor tujuh hari terakhir.</Prosa>
         <button
           onClick={() => { if (confirm('Hapus seluruh riwayat latihan yang tersimpan di perangkat ini?')) clearWorkouts() }}
-          className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-neutral-500"
+          className="mt-3 flex h-10 items-center rounded-lg border border-white/10 px-3 text-xs font-semibold text-neutral-500"
         >
           Hapus riwayat tersimpan
         </button>

@@ -117,7 +117,10 @@ export default function SemuaFitur() {
               <Link
                 key={n.to}
                 to={n.to}
-                className="rounded-full bg-neutral-100 px-3 py-1.5 text-[12px] font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200"
+                /* h-10: 40 px adalah batas bawah sasaran sentuh. Dengan py-1.5
+                   tinggi setiap keping hanya 30 px, dan pada kisi serapat ini
+                   meleset satu keping berarti membuka halaman yang salah. */
+                className="inline-flex h-10 items-center rounded-full bg-neutral-100 px-3 text-[12px] font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200"
               >
                 {n.label}
               </Link>
