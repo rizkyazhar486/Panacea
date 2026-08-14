@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { HalamanTab, type TabDef } from '../components/HalamanTab'
 import { PanelAngka, NADA, type Angka } from '../components/PanelAngka'
 import { KartuAngkaKlinis } from '../components/AngkaKlinis'
+import { RaporRamalanKesegaran } from '../components/RaporRamalan'
 import { auditKebugaran, auditKelelahan, auditKesegaran, bacaanJujur, type BahanAudit } from '../lib/auditKebugaran'
 import { IconRun } from '../components/icons'
 import { getWorkouts } from '../lib/workoutStore'
@@ -82,7 +83,7 @@ export function PusatLatihan() {
    * diubah, dan penjabaran yang tidak cocok dengan angkanya lebih buruk
    * daripada tidak ada penjabaran sama sekali.
    */
-  const bahan = useMemo<BahanAudit | null>(() => {
+  const audit = useMemo(() => {
     const w = getWorkouts()
     if (!w.length) return null
     const v = getVitals()
@@ -108,14 +109,18 @@ export function PusatLatihan() {
       .reduce((a, x) => a + upayaRelatif(x, { hrMax, hrRest: hrIstirahat, sex }).skor, 0)
 
     return {
-      kebugaran: st.kebugaran,
-      kelelahan: st.kelelahan,
-      kesegaran: st.kesegaran,
-      jumlahSesi: w.length,
-      rentangHari,
-      hrMax,
-      hrIstirahat,
-      upayaHariIni,
+      bahan: {
+        kebugaran: st.kebugaran,
+        kelelahan: st.kelelahan,
+        kesegaran: st.kesegaran,
+        jumlahSesi: w.length,
+        rentangHari,
+        hrMax,
+        hrIstirahat,
+        upayaHariIni,
+      } satisfies BahanAudit,
+      riwayat: w,
+      k: { hrMax, hrRest: hrIstirahat, sex },
     }
   }, [])
 
@@ -132,19 +137,20 @@ export function PusatLatihan() {
               Ada karena pertanyaan "angka ini dari mana" adalah pertanyaan yang
               sah, dan karena tidak menjawabnya membuat orang menyimpulkan
               tubuhnya bermasalah atas sesuatu yang sebenarnya sifat model. */}
-          {bahan && (
+          {audit && (
             <section className="space-y-3">
               <h2 className="text-[13px] font-black text-ink dark:text-white">
                 Dari mana angka-angka ini
               </h2>
-              {bacaanJujur(bahan) && (
+              {bacaanJujur(audit.bahan) && (
                 <p className="rounded-2xl border-l-4 border-amber-400 bg-amber-50/70 p-3 text-[12px] leading-relaxed text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-                  {bacaanJujur(bahan)}
+                  {bacaanJujur(audit.bahan)}
                 </p>
               )}
-              <KartuAngkaKlinis a={auditKesegaran(bahan)} />
-              <KartuAngkaKlinis a={auditKebugaran(bahan)} />
-              <KartuAngkaKlinis a={auditKelelahan(bahan)} />
+              <KartuAngkaKlinis a={auditKesegaran(audit.bahan)} />
+              <KartuAngkaKlinis a={auditKebugaran(audit.bahan)} />
+              <KartuAngkaKlinis a={auditKelelahan(audit.bahan)} />
+              <RaporRamalanKesegaran riwayat={audit.riwayat} k={audit.k} />
             </section>
           )}
 

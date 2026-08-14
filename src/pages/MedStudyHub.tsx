@@ -66,9 +66,11 @@ export function MedStudyHub() {
             <span className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">{motive.context}</span>
             <button
               onClick={() => setMotiveIdx((i) => (i + 1) % MOTIVATION.length)}
-              className="rounded-full bg-white/70 px-3 py-1 text-[11px] font-bold text-brand-dark transition active:scale-95"
+              /* h-10: batas bawah sasaran sentuh. Dengan py-1 tingginya hanya
+                 26 px. */
+              className="flex h-10 shrink-0 items-center rounded-full bg-white/70 px-3 text-[11px] font-bold text-brand-dark transition active:scale-95"
             >
-              Another →
+              Kutipan lain →
             </button>
           </div>
         </div>
