@@ -800,8 +800,14 @@ html { -webkit-overflow-scrolling: touch; }
   /* ── Jarak ── */
   .j-rapat > * + * { margin-top: clamp(6px, 3.79px + 0.690cqw, 10px); }
   .j-grup  > * + * { margin-top: clamp(24px, 15.17px + 2.759cqw, 40px); }
-  .p-fluid { padding: clamp(16px, 8.28px + 2.414cqw, 30px); }
-  .px-fluid { padding-inline: clamp(16px, 8.28px + 2.414cqw, 30px); }
+  /* Bantalan halaman disebut sekali sebagai variabel supaya bagian lain dapat
+     MENGHITUNG terhadapnya — deret geser perlu keluar dari bantalan ini untuk
+     menempati zona tepinya sendiri, dan menyalin angkanya berarti keduanya akan
+     berselisih pada perubahan berikutnya. */
+  .p-fluid,
+  .px-fluid { --bantalan-halaman: clamp(16px, 8.28px + 2.414cqw, 30px); }
+  .p-fluid { padding: var(--bantalan-halaman); }
+  .px-fluid { padding-inline: var(--bantalan-halaman); }
   /* Jarak antar-elemen di dalam satu widget, dalam bentuk gap. */
   .gap-fluid { gap: clamp(6px, 3.79px + 0.690cqw, 10px); }
 
@@ -844,4 +850,232 @@ html { -webkit-overflow-scrolling: touch; }
     grid-template-columns: repeat(auto-fit, minmax(clamp(76px, 22cqw, 150px), 1fr));
     gap: clamp(6px, 3.79px + 0.690cqw, 10px);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DERET KARTU YANG DAPAT DIGESER — tanpa merebut sapuan kembali.
+
+   BENTURANNYA NYATA. Ponsel memakai sapuan dari tepi kiri (dan kanan, pada
+   sebagian sistem) untuk kembali ke halaman sebelumnya. Sebuah deret yang dapat
+   digeser mendatar dan MENYENTUH TEPI LAYAR akan menelan sapuan itu: jari yang
+   dimulai dari tepi mendarat di atas deret, peramban menganggapnya sedang
+   menggulir isi, dan gerakan kembali tidak pernah terjadi. Cacat ini praktis
+   tidak pernah dilaporkan — orang hanya diam-diam berhenti memakai gerakan
+   kembali dan mengira teleponnya yang berubah.
+
+   PENYELESAIANNYA JARAK, BUKAN PENANGANAN KEJADIAN. Daerah gesernya dijauhkan
+   dari kedua tepi layar sejauh zona gerakan sistem, sehingga sapuan yang
+   berawal dari tepi mendarat di halaman, bukan di deret. Menyelesaikannya lewat
+   pembatalan kejadian akan gagal: sapuan tepi ditangani sistem operasi di luar
+   halaman, dan preventDefault() tidak sampai ke sana.
+
+   YANG TIDAK IKUT HILANG. Kartu tetap terpotong di tepi kanan sebagai isyarat
+   bahwa deretnya berlanjut, karena bantalan ada DI DALAM daerah geser. Isyarat
+   itulah satu-satunya yang memberi tahu ada isi lain di sebelahnya.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .geser-aman {
+    /* Zona gerakan sistem pada Android dan iOS berkisar 16-24 px dari tiap
+       tepi. Diambil yang terbesar, karena kesalahan ke arah terlalu sempit
+       mematikan sebuah gerakan sedangkan kesalahan ke arah terlalu lebar hanya
+       memakan sedikit ruang. */
+    --zona-tepi: 24px;
+
+    display: flex;
+    gap: clamp(6px, 3.79px + 0.690cqw, 12px);
+    overflow-x: auto;
+    /* Keluar dari bantalan halaman lebih dahulu, lalu masuk kembali sejauh
+       zona tepi. Tanpa pengurangan ini, jaraknya menjadi jumlah keduanya —
+       terukur 57 px pada layar 390 px, yang memangkas lebar tampak deret
+       menjadi 276 px dan membuat kartu ketiga tidak lagi mengintip. */
+    margin-inline: calc(var(--zona-tepi) - var(--bantalan-halaman, 0px));
+    padding-inline: 0;
+    padding-block: 2px;
+    scroll-snap-type: x proximity;
+    /* Guliran yang sampai ujung tidak diteruskan ke halaman di belakangnya —
+       tanpa ini, deret yang sudah mentok menarik seluruh halaman ikut bergeser. */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .geser-aman::-webkit-scrollbar {
+    display: none;
+  }
+
+  .geser-aman > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    /* Lebar kartu ditetapkan terhadap wadahnya, bukan piksel tetap: pada telepon
+       tampak dua kartu beserta potongan kartu ketiga, dan pada layar lebih lega
+       jumlahnya bertambah dengan sendirinya. */
+    width: clamp(150px, 42cqw, 230px);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   KETERBACAAN MODE TERANG.
+
+   Diukur, bukan ditaksir: seluruh teks di beranda, tanda tubuh, latihan, gizi,
+   semua fitur, dan profil diperiksa satu per satu dengan menghitung rasio
+   kontras antara warna teks yang sungguh dirender dan latar efektifnya. Yang
+   di bawah ini adalah temuan yang lolos pemeriksaan itu — bukan daftar dugaan.
+
+   TIGA POLA YANG DITEMUKAN, dan semuanya sistemik, bukan satu-dua tempat:
+
+     1. TEKS PUTIH DI ATAS ISIAN WARNA TERANG. Putih di atas hijau merek
+        (#00BF63) hanya 2,43:1, dan di atas emerald/sky/amber/rose-500 berkisar
+        2,0-3,0:1. Ambang yang lazim dipakai untuk teks berukuran biasa adalah
+        4,5:1, jadi semuanya gagal — dan gagalnya paling terasa di luar ruangan,
+        persis saat orang paling butuh membaca cepat.
+
+     2. ABU-ABU MUDA UNTUK TEKS PENJELAS. text-neutral-400 di atas putih hanya
+        2,58:1. Teks penjelas memang sengaja lebih redup daripada teks utama,
+        tetapi "lebih redup" tidak boleh berarti "tidak terbaca".
+
+     3. TINTA SETENGAH TEMBUS. text-ink/20 sampai /40 menghasilkan 1,55-2,61:1.
+
+   DUA CARA MEMPERBAIKI, DAN PILIHANNYA BERBEDA PER KASUS:
+
+     * Pada hijau merek, WARNA LATARNYA DIPERTAHANKAN dan tulisannya yang
+       digelapkan. Hijau itu identitas produk ini, dan menggelapkannya demi
+       tulisan putih akan menukar hal yang paling dikenali demi hal yang bisa
+       diperbaiki dengan cara lain. Tinta gelap di atas hijau terang mencapai
+       7,6:1 — jauh lebih terbaca daripada putih.
+
+     * Pada isian 500 lainnya, YANG DIGELAPKAN LATARNYA, karena lencana kecil
+       seperti "Terukur" memang dirancang sebagai bidang berwarna dengan
+       tulisan putih, dan membalik tulisannya menjadi gelap akan membuatnya
+       terbaca sebagai bidang yang tidak aktif.
+
+   Seluruh aturan di bawah ini SENGAJA TIDAK BERLAPIS. Utilitas Tailwind v4
+   berada di dalam @layer utilities, dan aturan tanpa lapisan selalu menang atas
+   aturan berlapis — itulah satu-satunya cara menimpa `text-white` yang tertulis
+   langsung pada elemennya tanpa harus menyunting ratusan tempat pemakaian.
+
+   Dibatasi pada mode terang saja lewat :root:not(.dark); mode gelap sudah punya
+   lapisan pemetaannya sendiri di atas.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* 1a. Hijau merek: tulisannya yang digelapkan, latarnya tetap. */
+.bg-brand.text-white,
+.bg-brand .text-white,
+.dark .bg-brand.dark\:text-white,
+.bg-brand .dark\:text-white {
+  color: var(--color-ink);
+}
+
+/* 1b. Isian 500 lain yang membawa tulisan putih: latarnya yang digelapkan. */
+.bg-emerald-500.text-white { background-color: #047857; }
+.bg-sky-500.text-white { background-color: #0369a1; }
+.bg-amber-500.text-white { background-color: #92400e; }
+.bg-rose-500.text-white { background-color: #be123c; }
+.bg-violet-500.text-white { background-color: #6d28d9; }
+.bg-teal-500.text-white { background-color: #0f766e; }
+.bg-indigo-500.text-white { background-color: #4338ca; }
+
+/* 2. Abu-abu penjelas. Tetap lebih redup daripada teks utama — 4,7:1 berbanding
+      15:1 — sehingga susunannya tidak berubah, hanya menjadi terbaca. */
+:root:not(.dark) .text-neutral-400 { color: #737373; }
+:root:not(.dark) .text-neutral-300 { color: #8a8a8a; }
+
+/* 3. Tinta setengah tembus. Yang paling samar dinaikkan sampai ambang, dan
+      urutan kepekatannya di antara mereka tetap terjaga. */
+:root:not(.dark) .text-ink\/20 { color: rgba(12, 20, 16, 0.55); }
+:root:not(.dark) .text-ink\/25 { color: rgba(12, 20, 16, 0.58); }
+:root:not(.dark) .text-ink\/30 { color: rgba(12, 20, 16, 0.6); }
+:root:not(.dark) .text-ink\/40 { color: rgba(12, 20, 16, 0.65); }
+:root:not(.dark) .text-ink\/50 { color: rgba(12, 20, 16, 0.7); }
+
+/* 4. Warna terang yang dipakai sebagai WARNA TULISAN, bukan sebagai isian.
+      Hijau merek dan amber cukup terang untuk menjadi bidang, dan justru karena
+      itu terlalu terang untuk menjadi huruf di atas putih: 2,4:1 dan 2,1:1.
+      Yang dipakai di sini adalah saudara gelapnya — rona yang sama, terang yang
+      berbeda — sehingga warnanya tetap terbaca sebagai warna yang sama. */
+:root:not(.dark) .text-brand { color: #0b7a4b; }
+:root:not(.dark) .text-amber-500 { color: #92400e; }
+:root:not(.dark) .text-emerald-500 { color: #047857; }
+:root:not(.dark) .text-sky-500 { color: #0369a1; }
+:root:not(.dark) .text-rose-500 { color: #be123c; }
+
+/* ── Mode gelap: pecahan kelas yang terlewat oleh lapisan pemetaan di atas ──
+   Lapisan pemetaan mode gelap menimpa `text-ink` dan `bg-brand-50`, namun TIDAK
+   menimpa varian pecahannya seperti `text-ink/40` atau `bg-brand-50/60` —
+   masing-masing kelas tersendiri bagi CSS. Akibatnya terukur: tinta gelap pada
+   kepekatan 25% di atas kanvas #171717 menghasilkan 1,01:1, yaitu tidak
+   terlihat sama sekali, dan permukaan hijau muda 60% tetap terang sehingga
+   tulisan terang di atasnya tinggal 2,4:1. Keduanya tidak menimbulkan galat apa
+   pun; keduanya hanya membuat sebagian halaman lenyap bagi pembacanya. */
+.dark .text-ink\/20 { color: rgba(238, 242, 239, 0.55); }
+.dark .text-ink\/25 { color: rgba(238, 242, 239, 0.58); }
+.dark .text-ink\/30 { color: rgba(238, 242, 239, 0.6); }
+.dark .text-ink\/40 { color: rgba(238, 242, 239, 0.65); }
+.dark .text-ink\/50 { color: rgba(238, 242, 239, 0.7); }
+.dark .text-ink\/60 { color: rgba(238, 242, 239, 0.75); }
+.dark .text-ink\/70 { color: rgba(238, 242, 239, 0.82); }
+.dark .text-ink\/80 { color: rgba(238, 242, 239, 0.88); }
+.dark .text-ink\/85 { color: rgba(238, 242, 239, 0.92); }
+.dark .text-ink\/90 { color: rgba(238, 242, 239, 0.95); }
+
+.dark .bg-brand-50\/30 { background-color: rgba(104, 254, 154, 0.05) !important; }
+.dark .bg-brand-50\/40 { background-color: rgba(104, 254, 154, 0.06) !important; }
+.dark .bg-brand-50\/50 { background-color: rgba(104, 254, 154, 0.07) !important; }
+.dark .bg-brand-50\/60 { background-color: rgba(104, 254, 154, 0.08) !important; }
+.dark .bg-brand-50\/70 { background-color: rgba(104, 254, 154, 0.09) !important; }
+.dark .bg-brand-50\/80 { background-color: rgba(104, 254, 154, 0.1) !important; }
+
+/* ── Palet warna HURUF, satu nilai per tema ────────────────────────────────
+   Dipakai oleh gaya sebaris di React lewat var(), karena berkas React tidak
+   mengetahui tema yang sedang aktif dan karena itu tidak boleh memutuskan
+   warna yang bergantung padanya. Grafik tetap memakai warna terangnya sendiri;
+   yang di sini khusus untuk huruf. */
+:root {
+  --teks-ok: #0b7a4b;
+  --teks-warn: #92400e;
+  --teks-bad: #b91c1c;
+  --teks-blue: #1d4ed8;
+  --teks-pur: #6d28d9;
+  --teks-ind: #4338ca;
+  --teks-org: #c2410c;
+  --teks-cyan: #0e7490;
+  --teks-pink: #be185d;
+}
+
+.dark {
+  --teks-ok: #68fe9a;
+  --teks-warn: #fbbf24;
+  --teks-bad: #fca5a5;
+  --teks-blue: #93c5fd;
+  --teks-pur: #c4b5fd;
+  --teks-ind: #a5b4fc;
+  --teks-org: #fdba74;
+  --teks-cyan: #67e8f9;
+  --teks-pink: #f9a8d4;
+}
+
+/* Warna huruf pekat lain yang tidak terbaca di atas kanvas gelap. */
+.dark .text-blue-700 { color: #93c5fd !important; }
+.dark .text-blue-600 { color: #93c5fd !important; }
+.dark .text-green-700 { color: #86efac !important; }
+.dark .text-red-600 { color: #fca5a5 !important; }
+.dark .text-amber-900 { color: #fcd34d !important; }
+
+/* Pecahan permukaan netral yang juga terlewat. Sama sebabnya dengan pecahan
+   bg-brand-50 di atas: `bg-neutral-50/50` bukan `bg-neutral-50` bagi CSS, jadi
+   ia tetap hampir putih di atas kanvas gelap. */
+.dark .bg-neutral-50\/50 { background-color: rgba(255, 255, 255, 0.04) !important; }
+.dark .bg-neutral-50\/70 { background-color: rgba(255, 255, 255, 0.05) !important; }
+.dark .bg-neutral-100\/50 { background-color: rgba(255, 255, 255, 0.05) !important; }
+
+/* ── Angka panjang ────────────────────────────────────────────────────────
+   "118/76" adalah enam aksara, "72" hanya dua. Pada ukuran yang sama keduanya
+   dituntut muat di kolom yang sama lebarnya, dan yang panjang kalah: terukur di
+   peramban, kartu TENSI meluber keluar petaknya dan angkanya terpotong di tepi
+   layar 390 px.
+
+   Yang diperkecil hanya nilai yang memang panjang, bukan seluruh angka di
+   halaman — mengecilkan semuanya demi satu kasus akan menghukum kartu yang
+   sudah benar. Batas bawahnya tetap dijaga jauh di atas ambang keterbacaan. */
+@layer components {
+  .t-angka-panjang { font-size: clamp(16px, 11.59px + 1.379cqw, 24px); }
 }

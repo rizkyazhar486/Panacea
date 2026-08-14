@@ -1,0 +1,220 @@
+import { kunciTanggal } from './ramalan'
+import { getVitals } from './healthVitals'
+import { getWorkouts } from './workoutStore'
+import { statusSingkat } from './pelatih'
+import { hrMaxFromAge } from './workoutImport'
+import type { FoodEntry, SleepLog } from './types'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pratinjau fitur untuk beranda — isi fitur, bukan pintu ke fitur.
+//
+// MASALAH YANG DIPECAHKAN. Kisi lambang memberi tahu sebuah fitur ADA, tetapi
+// tidak memberi tahu apa pun tentang keadaan pemakainya. Akibatnya setiap
+// pertanyaan sesederhana "berapa tidur saya semalam" tetap menuntut satu
+// ketukan dan satu pemuatan halaman, dan pertanyaan yang harus dibayar dengan
+// dua langkah akhirnya tidak ditanyakan sama sekali.
+//
+// ATURAN YANG MEMBUAT KARTU INI TIDAK BERBOHONG. Ketiganya dijaga di dalam
+// kode, bukan diserahkan pada kehati-hatian pemanggil:
+//
+//   1. TIDAK ADA ANGKA YANG DIKARANG. Bila datanya tidak ada, kartunya berkata
+//      datanya tidak ada — bukan menampilkan 0, bukan "—", dan bukan contoh.
+//      Nol yang sebenarnya berarti "belum diisi" mengajarkan orang bahwa angka
+//      di aplikasi ini boleh diabaikan, dan sesudah itu angka yang benar pun
+//      ikut diabaikan.
+//
+//   2. TIAP ANGKA MEMBAWA UMURNYA. "58 bpm" tanpa keterangan kapan diukur
+//      terbaca sebagai keadaan sekarang, padahal bisa berasal dari enam hari
+//      lalu. Yang lama ditandai sebagai lama.
+//
+//   3. TIDAK ADA PENILAIAN BAIK/BURUK DI KARTU. Ruang sebesar ini tidak cukup
+//      untuk menyebut populasi pembanding maupun ragam hariannya, dan penilaian
+//      tanpa keduanya adalah persis yang dibongkar oleh halaman rentang rujukan.
+//      Kartu menyatakan nilainya; penilaiannya ada di halaman yang punya ruang
+//      untuk mempertanggungjawabkannya.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Pratinjau {
+  /** Kunci tetap, dipakai React dan pengujian. */
+  id: string
+  /** Nama wilayahnya, sependek mungkin. */
+  wilayah: string
+  ke: string
+  /** Nilai utama. Kosong berarti belum ada data — lihat aturan 1. */
+  nilai: string
+  satuan?: string
+  /** Satu kalimat: apa arti angka itu, atau apa yang perlu dilakukan. */
+  garis: string
+  /** Umur data, bila layak disebut. Lihat aturan 2. */
+  umur?: string
+  nada: string
+}
+
+const HARI = 86400_000
+
+function selisihHari(tanggal: string, sekarang: number): number | null {
+  const t = Date.parse(`${tanggal}T12:00:00`)
+  if (Number.isNaN(t)) return null
+  return Math.round((sekarang - t) / HARI)
+}
+
+/**
+ * Umur data dalam kata-kata, dan null bila memang hari ini.
+ *
+ * Menandai data hari ini dengan "hari ini" membuat setiap kartu memikul satu
+ * baris yang tidak menambah keterangan apa pun; yang perlu menonjol justru
+ * data yang SUDAH TUA.
+ */
+function umurKata(hari: number | null): string | undefined {
+  if (hari === null || hari <= 0) return undefined
+  if (hari === 1) return 'kemarin'
+  if (hari < 7) return `${hari} hari lalu`
+  if (hari < 30) return `${Math.floor(hari / 7)} pekan lalu`
+  return 'lebih dari sebulan lalu'
+}
+
+export interface BahanPratinjau {
+  foods: FoodEntry[]
+  sleepLogs: SleepLog[]
+  umur?: number
+  sekarang?: number
+}
+
+/** Latihan: kesegaran bila modelnya punya cukup bahan, kalau tidak jumlah sesi. */
+function pratinjauLatihan(umurTahun: number, sekarang: number): Pratinjau {
+  const w = getWorkouts()
+  if (!w.length) {
+    return {
+      id: 'latihan', wilayah: 'Latihan', ke: '/latihan', nilai: '', garis: 'Belum ada sesi tersimpan. Hubungkan atau catat satu sesi.',
+      nada: 'text-emerald-600 dark:text-emerald-400',
+    }
+  }
+  const v = getVitals()
+  const teramati = w.reduce((a, x) => Math.max(a, x.maxHr ?? 0), 0)
+  const sex = (v.sex === 'F' ? 'F' : 'M') as 'M' | 'F'
+  const k = {
+    hrMax: Math.max(teramati, hrMaxFromAge(umurTahun, sex)),
+    hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
+    sex,
+  }
+  const st = statusSingkat(w, k, sekarang)
+  const terakhir = w
+    .map((x) => Date.parse(x.mulai))
+    .filter((t) => !Number.isNaN(t))
+    .reduce((a, t) => Math.max(a, t), 0)
+  const hari = terakhir ? Math.floor((sekarang - terakhir) / HARI) : null
+  if (!st) {
+    return {
+      id: 'latihan', wilayah: 'Latihan', ke: '/latihan', nilai: String(w.length), satuan: 'sesi',
+      garis: 'Tersimpan, namun belum cukup untuk menghitung kesegaran.',
+      umur: umurKata(hari), nada: 'text-emerald-600 dark:text-emerald-400',
+    }
+  }
+  return {
+    id: 'latihan', wilayah: 'Latihan', ke: '/latihan',
+    nilai: String(Math.round(st.kesegaran)), satuan: 'segar',
+    // Tanpa "bagus"/"kurang": lihat aturan 3.
+    garis: 'Selisih kebugaran dan kelelahan menurut model beban latihan.',
+    umur: umurKata(hari),
+    nada: 'text-emerald-600 dark:text-emerald-400',
+  }
+}
+
+function pratinjauGizi(foods: FoodEntry[], sekarang: number): Pratinjau {
+  const hariIni = kunciTanggal(new Date(sekarang))
+  const kcal = foods.filter((f) => f.date === hariIni).reduce((a, f) => a + (f.kcal || 0), 0)
+  if (!foods.length) {
+    return {
+      id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: '',
+      garis: 'Belum ada makanan tercatat. Catat satu untuk memulai.',
+      nada: 'text-amber-600 dark:text-amber-400',
+    }
+  }
+  if (kcal === 0) {
+    // Nol yang JUJUR: ada riwayat, tetapi hari ini memang belum dicatat.
+    // Dibedakan dari nol yang berarti "tidak ada data" — lihat aturan 1.
+    return {
+      id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: '',
+      garis: 'Hari ini belum ada yang dicatat.',
+      nada: 'text-amber-600 dark:text-amber-400',
+    }
+  }
+  const porsi = foods.filter((f) => f.date === hariIni).length
+  return {
+    id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: String(Math.round(kcal)), satuan: 'kkal',
+    garis: `Dari ${porsi} catatan hari ini.`,
+    nada: 'text-amber-600 dark:text-amber-400',
+  }
+}
+
+function pratinjauTidur(logs: SleepLog[], sekarang: number): Pratinjau {
+  const urut = [...logs].filter((l) => typeof l.hours === 'number').sort((a, b) => (a.date < b.date ? 1 : -1))
+  const t = urut[0]
+  if (!t) {
+    return {
+      id: 'tidur', wilayah: 'Tidur', ke: '/recovery', nilai: '',
+      garis: 'Belum ada catatan tidur.',
+      nada: 'text-indigo-600 dark:text-indigo-400',
+    }
+  }
+  const hari = selisihHari(t.date, sekarang)
+  // Satu digit di belakang koma sudah melampaui ketelitian yang mungkin: waktu
+  // tidur yang dilaporkan sendiri meleset dalam hitungan puluhan menit.
+  const jam = Math.round(t.hours * 10) / 10
+  return {
+    id: 'tidur', wilayah: 'Tidur', ke: '/recovery', nilai: String(jam), satuan: 'jam',
+    garis: urut.length > 1 ? `Catatan terakhir dari ${urut.length} malam.` : 'Catatan pertama Anda.',
+    umur: umurKata(hari),
+    nada: 'text-indigo-600 dark:text-indigo-400',
+  }
+}
+
+function pratinjauTubuh(sekarang: number): Pratinjau {
+  const v = getVitals()
+  // Nama medannya measuredAt/syncedAt, bukan updatedAt — dibaca dari sumber
+  // yang sama dengan vitalsAge() supaya keduanya tidak pernah berselisih.
+  const iso = typeof v.measuredAt === 'string' ? v.measuredAt : typeof v.syncedAt === 'string' ? v.syncedAt : null
+  const t = iso ? Date.parse(iso) : NaN
+  const hari = Number.isNaN(t) ? null : Math.floor((sekarang - t) / HARI)
+  if (typeof v.restingHr === 'number' && v.restingHr > 0) {
+    return {
+      id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: String(v.restingHr), satuan: 'bpm istirahat',
+      garis: 'Denyut istirahat terakhir yang tercatat.',
+      umur: umurKata(hari),
+      nada: 'text-rose-600 dark:text-rose-400',
+    }
+  }
+  if (v.systolic && v.diastolic) {
+    return {
+      id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: `${v.systolic}/${v.diastolic}`, satuan: 'mmHg',
+      garis: 'Satu bacaan tekanan darah, bukan diagnosis.',
+      umur: umurKata(hari),
+      nada: 'text-rose-600 dark:text-rose-400',
+    }
+  }
+  return {
+    id: 'tubuh', wilayah: 'Tubuh', ke: '/tubuh', nilai: '',
+    garis: 'Belum ada tanda tubuh tersimpan.',
+    nada: 'text-rose-600 dark:text-rose-400',
+  }
+}
+
+/**
+ * Empat pratinjau, selalu dalam urutan yang sama.
+ *
+ * URUTANNYA SENGAJA TETAP, tidak diurutkan menurut "yang paling perlu
+ * diperhatikan". Kartu yang berpindah tempat menurut keadaan menghancurkan
+ * ingatan letak: orang menghafal posisi jauh lebih cepat daripada membaca
+ * label, dan tata letak yang berubah-ubah memaksa setiap kunjungan dimulai
+ * dengan membaca ulang seluruhnya.
+ */
+export function pratinjauBeranda(b: BahanPratinjau): Pratinjau[] {
+  const sekarang = b.sekarang ?? Date.now()
+  const umur = b.umur && b.umur > 0 ? b.umur : 30
+  return [
+    pratinjauLatihan(umur, sekarang),
+    pratinjauGizi(b.foods ?? [], sekarang),
+    pratinjauTidur(b.sleepLogs ?? [], sekarang),
+    pratinjauTubuh(sekarang),
+  ]
+}

@@ -22,6 +22,25 @@ const GOAL_SLEEP = 8
 const GOAL_WATER = 2000
 const C = { ok: '#00BF63', warn: '#f59e0b', bad: '#ef4444', blue: '#2563eb', pur: '#8b5cf6', ind: '#818cf8', org: '#f97316', cyan: '#06b6d4', pink: '#ec4899' }
 
+/**
+ * Palet KEDUA, khusus untuk warna HURUF di atas latar terang.
+ *
+ * C dipilih agar terang dan hidup sebagai GARIS dan BIDANG — cincin, batang,
+ * grafik. Warna yang tepat sebagai garis setebal 8 px tidak otomatis tepat
+ * sebagai huruf setinggi 10 px: hijau merek di atas putih hanya mencapai 2,4:1
+ * dan amber 2,1:1, sedangkan huruf berukuran biasa membutuhkan 4,5:1.
+ *
+ * Rona keduanya sama, hanya terangnya yang diturunkan, sehingga kode warnanya
+ * tetap dikenali sebagai kode warna yang sama antara grafik dan angkanya.
+ *
+ * NILAINYA BERUPA VARIABEL CSS, bukan kode heksadesimal. Percobaan pertama
+ * menuliskan warna gelapnya langsung di sini, dan itu benar pada mode terang
+ * lalu gagal pada mode gelap: hijau tua di atas kanvas #171717 hanya 2,8:1.
+ * Warna yang bergantung pada tema tidak boleh ditetapkan di dalam berkas React,
+ * karena di sini temanya tidak diketahui — hanya CSS yang mengetahuinya.
+ */
+const CT = { ok: 'var(--teks-ok)', warn: 'var(--teks-warn)', bad: 'var(--teks-bad)', blue: 'var(--teks-blue)', pur: 'var(--teks-pur)', ind: 'var(--teks-ind)', org: 'var(--teks-org)', cyan: 'var(--teks-cyan)', pink: 'var(--teks-pink)' }
+
 /* ═══════════════════════════════════════════════════════
    TYPES
    ═══════════════════════════════════════════════════════ */
@@ -869,16 +888,16 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
           <div className="mt-1 text-[10px] text-neutral-500">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
-          <div className="text-2xl font-extrabold" style={{ color: '#0B7A4B' }}><ANum v={Math.round(td)} /></div>
+          <div className="text-2xl font-extrabold" style={{ color: 'var(--teks-ok)' }}><ANum v={Math.round(td)} /></div>
           <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">TDEE kcal</div>
           <div className="mt-1 text-[10px] text-neutral-500">{ACT_L[b.act]}</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
-          <div className="text-lg font-extrabold" style={{ color: intakeKcal > rec * 1.1 ? C.org : intakeKcal < rec * 0.8 ? C.blue : C.ok }}>
+          <div className="text-lg font-extrabold" style={{ color: intakeKcal > rec * 1.1 ? CT.org : intakeKcal < rec * 0.8 ? CT.blue : CT.ok }}>
             <ANum v={intakeKcal} />/<ANum v={rec} />
           </div>
           <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">Kcal today</div>
-          <div className="mt-1 text-[10px]" style={{ color: intakeKcal > rec ? C.org : C.ok }}>
+          <div className="mt-1 text-[10px]" style={{ color: intakeKcal > rec ? CT.org : CT.ok }}>
             {intakeKcal > rec ? '+' + (intakeKcal - rec) + ' surplus' : (rec - intakeKcal) + ' remaining'}
           </div>
         </div>
@@ -980,7 +999,13 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         ] as const).map(([l, v, mx, c]) => (
           <div key={l} className="flex flex-col items-center gap-1">
             <Ring value={v} max={mx} color={c}>
-              <span className="text-xs font-extrabold tabular-nums" style={{ color: c }}>{v}</span>
+              {/* Angkanya memakai tinta biasa, bukan warna cincinnya. Warna
+                  cincin dipilih supaya terang di atas putih sebagai GARIS, dan
+                  warna yang terang sebagai garis menjadi 2,1:1 sebagai huruf.
+                  Kode warnanya tidak hilang — ia tetap dibawa oleh cincin yang
+                  melingkarinya, yang juga terbaca oleh orang yang kesulitan
+                  membedakan warna. */}
+              <span className="text-xs font-extrabold tabular-nums text-ink">{v}</span>
               <span className="text-[10px] text-neutral-500">g</span>
             </Ring>
             <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">{l}</span>
@@ -991,11 +1016,11 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
       {/* Sodium & Omega-3 bars */}
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div className="rounded-lg bg-neutral-50 px-3 py-2">
-          <div className="flex justify-between text-[10px] font-semibold"><span className="text-neutral-500">Sodium</span><span style={{ color: na > 2300 ? C.bad : na > 1500 ? C.warn : C.ok }}>{Math.round(na)}mg</span></div>
+          <div className="flex justify-between text-[10px] font-semibold"><span className="text-neutral-500">Sodium</span><span style={{ color: na > 2300 ? CT.bad : na > 1500 ? CT.warn : CT.ok }}>{Math.round(na)}mg</span></div>
           <div className="mt-1 h-1.5 rounded-full bg-neutral-200 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (na / 2300) * 100) + '%', background: na > 2300 ? C.bad : na > 1500 ? C.warn : C.ok }} /></div>
         </div>
         <div className="rounded-lg bg-neutral-50 px-3 py-2">
-          <div className="flex justify-between text-[10px] font-semibold"><span className="text-neutral-500">Omega-3</span><span style={{ color: omega3 >= 2 ? C.ok : omega3 >= 1 ? C.warn : C.blue }}>{omega3.toFixed(1)}g</span></div>
+          <div className="flex justify-between text-[10px] font-semibold"><span className="text-neutral-500">Omega-3</span><span style={{ color: omega3 >= 2 ? CT.ok : omega3 >= 1 ? CT.warn : CT.blue }}>{omega3.toFixed(1)}g</span></div>
           <div className="mt-1 h-1.5 rounded-full bg-neutral-200 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (omega3 / 3) * 100) + '%', background: omega3 >= 2 ? C.ok : omega3 >= 1 ? C.warn : C.blue }} /></div>
         </div>
       </div>
@@ -1023,7 +1048,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         <div className="flex-1 rounded-xl bg-neutral-50 px-4 py-3">
           <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="brand">Recommended</Badge>}{isAvoided && <Badge tone="high">Avoid</Badge>}</div>
           <div className="mt-1 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
-            <span style={{ color: '#0B7A4B' }}>{pv.k} kcal</span>
+            <span style={{ color: 'var(--teks-ok)' }}>{pv.k} kcal</span>
             <span className="text-amber-500">K{pv.c}</span>
             <span className="text-green-600">P{pv.p}</span>
             <span className="text-red-600">L{pv.f}</span>
@@ -1041,7 +1066,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         {todays.map(f => { const s = FD.find(x => x.name === f.name); return (
           <div key={f.id} className="flex items-center justify-between rounded-lg px-3 py-2 transition hover:bg-neutral-50">
             <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-500">{f.grams}g</span></div>
-            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: '#0B7A4B' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
+            <div className="shrink-0 tabular-nums text-xs"><span className="font-bold" style={{ color: 'var(--teks-ok)' }}>{f.kcal}</span><span className="text-neutral-500 ml-1">kcal</span></div>
           </div>
         )})}
       </div>
@@ -1206,7 +1231,7 @@ function SleepWater({ body }: { body: Body }) {
           {wt.sunDone && <Stepper value={wt.sunHr} min={0.05} max={1} step={0.05} unit="hrs" onChange={v => logWellness(today(), { sunHr: v })} />}
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }}>{weekMet.toFixed(1)}</span></div>
+          <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? CT.ok : weekMet >= 3.75 ? CT.warn : CT.bad }}>{weekMet.toFixed(1)}</span></div>
           <div className="mt-1 h-2 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (weekMet / 15) * 100) + '%', background: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }} /></div>
           <div className="flex justify-between text-[10px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
         </div>
@@ -1286,9 +1311,9 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   function labStatus(key: string, val: number) {
     const range = labRanges[key]
     if (!range) return { color: '#a3a3a3', label: '-' }
-    if (val >= range[0] && val <= range[1]) return { color: C.ok, label: 'Normal' }
-    if (val < range[0]) return { color: C.blue, label: 'Low' }
-    return { color: C.bad, label: 'High' }
+    if (val >= range[0] && val <= range[1]) return { color: CT.ok, label: 'Normal' }
+    if (val < range[0]) return { color: CT.blue, label: 'Low' }
+    return { color: CT.bad, label: 'High' }
   }
 
   function labTrend(key: string) {
@@ -1399,7 +1424,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
                       )
                     })}
                     <td className="py-2 pl-2 text-center">
-                      {abnormalCount === 0 ? <span className="text-[10px] font-bold" style={{ color: C.ok }}>{'\u2705'}</span> : <span className="text-[10px] font-bold" style={{ color: C.bad }}>{abnormalCount} {'\u26A0\uFE0F'}</span>}
+                      {abnormalCount === 0 ? <span className="text-[10px] font-bold" style={{ color: CT.ok }}>{'\u2705'}</span> : <span className="text-[10px] font-bold" style={{ color: CT.bad }}>{abnormalCount} {'\u26A0\uFE0F'}</span>}
                     </td>
                   </tr>
                 )
@@ -1598,7 +1623,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
         <div className="relative mt-5 flex items-center justify-between border-t border-white/10 pt-3">
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] font-black tracking-wider text-ink/25">PANACEA</span>
-            <span className="text-[11px] font-black tracking-wider" style={{ color: 'rgba(0,191,99,0.5)' }}>MED</span>
+            <span className="text-[11px] font-black tracking-wider" style={{ color: 'var(--teks-ok)', opacity: 0.75 }}>MED</span>
           </div>
           <span className="text-[10px] font-mono text-ink/20">.id</span>
         </div>
@@ -1652,7 +1677,7 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
       <div className="mt-3 flex items-center gap-3">
         <Stepper label="Duration" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
         <div className="shrink-0 text-right">
-          <div className="text-lg font-extrabold" style={{ color: '#0B7A4B' }}>{k}</div>
+          <div className="text-lg font-extrabold" style={{ color: 'var(--teks-ok)' }}>{k}</div>
           <div className="text-[10px] text-neutral-500">kcal</div>
         </div>
         <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Log</Button>

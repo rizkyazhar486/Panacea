@@ -69,7 +69,7 @@ export function Profile() {
         <button onClick={openEdit} className="relative h-20 w-20 shrink-0" aria-label="Change profile photo">
           {profile.avatar
             ? <img src={profile.avatar} alt="" className="h-20 w-20 rounded-full object-cover" />
-            : <span className="grid h-20 w-20 place-items-center rounded-full text-2xl font-black text-ink" style={{ backgroundColor: '#00BF63' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
+            : <span className="grid h-20 w-20 place-items-center rounded-full text-2xl font-black" style={{ backgroundColor: '#00BF63', color: '#0c1410' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
           <span className="absolute bottom-0 right-0 grid h-6 w-6 place-items-center rounded-full border-2 border-white bg-brand text-[11px] text-white">✎</span>
         </button>
         <div className="min-w-0 flex-1">
@@ -121,7 +121,7 @@ export function Profile() {
               <button onClick={() => fileRef.current?.click()} disabled={busy} className="relative h-24 w-24" aria-label="Upload photo">
                 {draft.avatar
                   ? <img src={draft.avatar} alt="" className="h-24 w-24 rounded-full object-cover" />
-                  : <span className="grid h-24 w-24 place-items-center rounded-full text-2xl font-black text-ink" style={{ backgroundColor: '#00BF63' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
+                  : <span className="grid h-24 w-24 place-items-center rounded-full text-2xl font-black" style={{ backgroundColor: '#00BF63', color: '#0c1410' }}>{account.name.slice(0, 2).toUpperCase()}</span>}
                 <span className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-brand text-xs text-white">📷</span>
               </button>
               <span className="text-[11px] text-neutral-500">{busy ? 'Uploading…' : 'Tap to change photo'}</span>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
+import { DeretPratinjau } from '../components/KartuPratinjau'
+import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { statusSingkat } from '../lib/pelatih'
@@ -142,7 +144,10 @@ function KartuKpi({ k }: { k: Kpi }) {
     <div className={`flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/70 p-3 dark:bg-white/5`}>
       <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
       <span className="flex items-baseline gap-1">
-        <span className={`t-angka font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
+        {/* Ukurannya mengikuti panjang nilainya. Lihat catatan "Angka panjang"
+            di index.css: pada ukuran yang sama, "118/76" tidak muat di petak
+            yang memuat "72" dengan lapang. */}
+        <span className={`${k.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} min-w-0 font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
         {k.satuan && <span className="t-mikro font-bold text-neutral-400">{k.satuan}</span>}
       </span>
       {k.deret && <Garis deret={k.deret} kelas={k.nada} />}
@@ -218,7 +223,7 @@ function Tanya({ pilih }: { pilih: (t: Tujuan) => void }) {
 }
 
 export default function Beranda() {
-  const { account } = useStore()
+  const { account, state } = useStore()
   const nama = account?.name?.split(' ')[0] ?? ''
   const [tujuan, setTujuan] = useState<Tujuan | null>(() => ambilTujuan())
   const pilih = (t: Tujuan) => { simpanTujuan(t); setTujuan(t) }
@@ -282,6 +287,22 @@ export default function Beranda() {
     return out.slice(0, 4)
   }, [account])
 
+  /**
+   * Pratinjau dihitung sekali per kunjungan.
+   *
+   * Bergantung pada state.foods dan state.sleepLogs supaya ikut menyegar begitu
+   * pemakainya mencatat sesuatu lalu kembali ke beranda — kartu yang tetap
+   * memajang angka lama sesudah pencatatan membuat orang mencatat dua kali.
+   */
+  const pratinjau = useMemo(
+    () => pratinjauBeranda({
+      foods: state.foods ?? [],
+      sleepLogs: state.sleepLogs ?? [],
+      umur: account?.dob ? ageFromDob(account.dob) : undefined,
+    }),
+    [state.foods, state.sleepLogs, account],
+  )
+
   return (
     // `fluid` menjadikan pembungkus ini WADAH UKUR: seluruh cqw di dalamnya
     // mengukur lebar kotak ini, bukan lebar layar. Itulah sebabnya halaman ini
@@ -325,6 +346,11 @@ export default function Beranda() {
           </Link>
         )}
       </section>
+
+      {/* Pratinjau isi fitur, tepat di bawah panel angka: pertanyaan "bagaimana
+          keadaan saya" terjawab tanpa satu pun ketukan, dan kisi lambang di
+          bawahnya tinggal mengurus "ke mana saya pergi". */}
+      <DeretPratinjau daftar={pratinjau} />
 
       {!tujuan && <Tanya pilih={pilih} />}
 
