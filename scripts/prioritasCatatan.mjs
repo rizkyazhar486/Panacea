@@ -75,7 +75,41 @@ function cariSatu(nama) {
  * yang memang baru 3/8. Daftar kerja yang melaporkan pekerjaan selesai sebagai
  * belum selesai akan membuat pekerjaan itu dikerjakan dua kali.
  */
+/**
+ * SINONIM YANG DIPERIKSA TANGAN, satu per satu, terhadap berkas catatannya.
+ *
+ * MENGAPA TABEL, BUKAN ATURAN LAIN LAGI. Sudah LIMA KALI berturut-turut alat
+ * ini melaporkan pekerjaan yang sudah selesai sebagai belum, dan setiap kali
+ * jawabannya adalah menambah satu aturan pencocokan baru: bentuk nama
+ * berlapis, awalan kata utuh, singkatan, lalu ejaan sindroma/sindrom. Kelima
+ * kalinya menunjukkan bahwa persoalannya bukan aturan yang kurang tepat,
+ * melainkan bahwa NAMA DI REKAP UJIAN DAN NAMA DI DAFTAR SKDI MEMANG BERBEDA
+ * KOSAKATANYA — "sistitis" berbanding "infeksi saluran kemih", "syok
+ * anafilaktik" berbanding "reaksi anafilaktik". Tidak ada aturan umum yang
+ * dapat menyeberangi jarak itu tanpa sekaligus menyatukan hal-hal yang memang
+ * berbeda.
+ *
+ * Tabel ini kecil, dapat dibaca, dan setiap barisnya sudah dibuka berkasnya.
+ * Bila keliru, kekeliruannya terlihat sebagai satu baris — bukan tersembunyi
+ * di dalam sebuah regex.
+ */
+const SINONIM = {
+  'sistitis': 'Infeksi saluran kemih',
+  'sistitis akut': 'Infeksi saluran kemih',
+  'syok anafilaktik': 'Reaksi anafilaktik',
+  'anafilaksis': 'Reaksi anafilaktik',
+  'kad': 'Ketoasidosis diabetikum nonketotik',
+  'ketoasidosis diabetik': 'Ketoasidosis diabetikum nonketotik',
+  'rheumatoid arthritis': 'Artritis reumatoid',
+  'systemic lupus erythematosus': 'Lupus eritematosus sistemik',
+  'graves disease': 'Tirotoksikosis',
+  'penyakit graves': 'Tirotoksikosis',
+}
+
 function cari(kunciBaku, label) {
+  const langsung = SINONIM[norm(kunciBaku)] ?? SINONIM[norm(label)]
+  if (langsung && blok[langsung]) return langsung
+
   const kata = norm(kunciBaku).split(' ')
   const calon = [
     label,
@@ -125,6 +159,11 @@ console.log('  ke  isi  kasus                                        sistem')
 for (const b of belum.slice(0, batas)) {
   console.log(
     '  ' + String(b.jumlah).padStart(2) + 'x  ' + String(b.n) + '/8  ' +
-    b.label.slice(0, 44).padEnd(46) + b.sistem.split(',')[0].slice(0, 24),
+    b.label.slice(0, 40).padEnd(42) +
+    // Kunci yang dipakai ikut dicetak. Tanpa ini, angka 3/8 tidak dapat
+    // dibedakan antara "catatannya memang belum ditulis" dan "pencocokannya
+    // yang meleset ke stasiun OSCE" — dan kelima kekeliruan sejauh ini
+    // seluruhnya jenis kedua.
+    (b.kunci ? String(b.kunci).slice(0, 46) : '(tidak ketemu)'),
   )
 }
