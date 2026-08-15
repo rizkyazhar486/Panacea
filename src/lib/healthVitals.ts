@@ -126,6 +126,16 @@ export function mergeVitals(patch: Vitals): Vitals {
 
   const next: Vitals = { ...getVitals(), ...clean, syncedAt: new Date().toISOString() }
   try { localStorage.setItem(KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  /*
+   * Riwayat dicatat DI SINI, bukan di pemanggilnya. mergeVitals adalah
+   * satu-satunya jalan masuk angka tubuh ke dalam aplikasi; menaruh pencatatan
+   * di tempat lain berarti ada jalur penyaluran data yang lolos tanpa tercatat,
+   * dan riwayat yang berlubang menghasilkan rentang pribadi yang keliru tanpa
+   * ada yang menyadarinya.
+   *
+   * Impor dinamis supaya berkas ini tidak saling mengimpor dengan riwayatVitals.
+   */
+  import('./riwayatVitals').then((m) => m.catatRiwayat(next)).catch(() => { /* abaikan */ })
   broadcastHealthUpdate()
   return next
 }

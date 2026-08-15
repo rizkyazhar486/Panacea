@@ -313,7 +313,22 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
               i > 0 ? 'border-t border-neutral-100 dark:border-white/10' : ''
             }`}
           >
-            <span className="t-kecil min-w-0 truncate font-semibold text-neutral-600 dark:text-neutral-300">{b.label}</span>
+            <span className="min-w-0 flex-1">
+              <span className="t-kecil block truncate font-semibold text-neutral-600 dark:text-neutral-300">{b.label}</span>
+              {/* Rentang KEBIASAAN ANDA SENDIRI, dan angkanya selalu ikut
+                  disebut. "Di luar kebiasaan" tanpa menyebut kebiasaannya
+                  berapa adalah penilaian yang tidak dapat diperiksa pembacanya.
+                  Ditandai dengan tebal-tipis huruf, bukan warna, karena ini
+                  BUKAN penilaian sehat atau sakit — hanya pernyataan bahwa
+                  angkanya berbeda dari biasanya. */}
+              {b.rentang && (
+                <span className={`t-mikro block truncate ${
+                  b.rentang.posisi === 'dalam kebiasaan' ? 'text-neutral-400' : 'font-bold text-neutral-500 dark:text-neutral-300'
+                }`}>
+                  {b.rentang.baca}
+                </span>
+              )}
+            </span>
             <span className="flex shrink-0 items-baseline gap-1">
               <span className="t-sedang font-black tabular-nums text-ink dark:text-white">{b.nilai}</span>
               <span className="t-mikro font-bold text-neutral-400">{b.satuan}</span>
@@ -331,7 +346,8 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
           bukan penilaian, dan halaman rentang rujukanlah yang punya ruang untuk
           menyebut populasi pembanding serta ragam hariannya. */}
       <p className="t-mikro mt-1 leading-snug text-neutral-400">
-        Angka apa adanya dari perangkat Anda. Satu bacaan bukan diagnosis — ketuk untuk melihat rentang rujukannya.
+        Angka apa adanya dari perangkat Anda, dibandingkan dengan KEBIASAAN ANDA SENDIRI — bukan dengan orang lain,
+        dan bukan penilaian sehat atau sakit. Ketuk untuk melihat rentang rujukan medisnya.
       </p>
     </section>
   )

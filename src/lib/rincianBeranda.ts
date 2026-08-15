@@ -1,4 +1,5 @@
 import { getVitals } from './healthVitals'
+import { rentangPribadi, bacaRentang } from './riwayatVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rincian angka tubuh sebagai BARIS, bukan ubin.
@@ -32,6 +33,11 @@ export interface BarisRincian {
   satuan: string
   /** Halaman yang menjelaskan angka ini beserta rentang rujukannya. */
   ke: string
+  /**
+   * Perbandingan terhadap KEBIASAAN ANDA SENDIRI, bukan terhadap populasi.
+   * Kosong bila riwayatnya belum cukup — lihat CUKUP_HARI di riwayatVitals.ts.
+   */
+  rentang?: { posisi: string; baca: string }
 }
 
 /**
@@ -77,12 +83,14 @@ export function rincianBeranda(): BarisRincian[] {
     const nilai = v[m.kunci]
     if (typeof nilai !== 'number' || !Number.isFinite(nilai) || nilai <= 0) continue
     const bulat = m.bulat ?? 0
+    const r = rentangPribadi(m.kunci, nilai)
     keluar.push({
       kunci: m.kunci,
       label: m.label,
       nilai: bulat ? nilai.toFixed(bulat) : String(Math.round(nilai)),
       satuan: m.satuan,
       ke: m.ke,
+      ...(r ? { rentang: { posisi: r.posisi, baca: bacaRentang(r, m.satuan, bulat) } } : {}),
     })
   }
   return keluar
