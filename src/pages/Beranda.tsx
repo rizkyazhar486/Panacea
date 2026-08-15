@@ -4,7 +4,6 @@ import { useStore } from '../lib/store'
 import { DeretPratinjau } from '../components/KartuPratinjau'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
-import { SiapUjian } from '../components/SiapUjian'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -382,12 +381,6 @@ export default function Beranda() {
           di atasnya. Dua borang serupa dengan tata letak berbeda memaksa orang
           belajar dua kali, dan yang kedua tidak pernah benar-benar dipelajari. */}
       <CatatanLatihan />
-
-      {/* Menjelang ujian, hitung mundur dan pencarian tatalaksana lebih sering
-          dipakai daripada seluruh kisi lambang di bawahnya — karena itu ia
-          diletakkan di atas kisi, bukan di dalam salah satu fiturnya.
-          Hanya untuk yang memakai aplikasi ini untuk belajar. */}
-      {klinisDulu && <SiapUjian />}
 
       {!tujuan && <Tanya pilih={pilih} />}
 
