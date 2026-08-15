@@ -85,9 +85,18 @@ export function ClinicalEvidence() {
     } catch (e) {
       // Refund the free-allowance credit is automatic (we only record on success);
       // a paid query that failed to synthesize is not re-charged again.
+      // Say what actually went wrong. The old text told the user to rephrase the
+      // question for every failure — including failures on our side, where no
+      // rephrasing could ever have helped.
       const msg = String(e instanceof Error ? e.message : e)
-      if (msg.includes('backend_unavailable')) setErr('The AI service is not configured on this deployment yet. You can still use the verification links below to search the primary literature.')
-      else if (msg.includes('parse_failed')) setErr('The evidence engine returned an unexpected format. Please rephrase the question and try again.')
+      if (msg.includes('backend_unavailable') || msg.includes('ai_not_configured'))
+        setErr('The AI service is not configured on this deployment yet. The verification links below still search the primary literature.')
+      else if (msg.includes('rate_limited'))
+        setErr('Too many questions in the last minute. Wait about a minute and ask again — nothing was charged.')
+      else if (msg.includes('empty_reply') || msg.includes('parse_failed'))
+        setErr('The evidence engine answered but the reply could not be read. This is a fault on our side, not with your question — please try again.')
+      else if (msg.includes('ai_failed'))
+        setErr('The evidence engine could not be reached. Please try again shortly.')
       else setErr('Could not complete the evidence lookup. Please try again shortly.')
     } finally {
       setLoading(false)

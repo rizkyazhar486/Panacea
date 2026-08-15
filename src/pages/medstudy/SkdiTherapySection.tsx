@@ -8,9 +8,9 @@ import {
 } from '../../lib/resepDokter'
 
 type TherapyTab = 'therapy' | 'eponym' | 'resep'
-export default function SkdiTherapySection() {
+export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: string }) {
   const [tab, setTab] = useState<TherapyTab>('therapy')
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(cariAwal)
   const [system, setSystem] = useState<SkdiSystem | null>(null)
 
   const filteredTherapy = useMemo(() => {

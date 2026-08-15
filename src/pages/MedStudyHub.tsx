@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { RangkaDaftar } from '../components/Rangka'
@@ -45,7 +46,14 @@ function loadScores(): Scores { try { return JSON.parse(localStorage.getItem(SCO
 function saveScores(s: Scores) { try { localStorage.setItem(SCORE_KEY, JSON.stringify(s)) } catch { /* ignore */ } }
 
 export function MedStudyHub() {
-  const [section, setSection] = useState<Section>('practice')
+  // Deep link: the home widget sends people straight to a section (and, for the
+  // therapy reference, straight to a search) so looking up one drug regimen is
+  // one tap instead of open-hub → pick-section → type.
+  const [params] = useSearchParams()
+  const diminta = params.get('bagian') as Section | null
+  const [section, setSection] = useState<Section>(
+    diminta && SECTIONS.some((s) => s.id === diminta) ? diminta : 'practice',
+  )
   const [motiveIdx, setMotiveIdx] = useState(() => Math.floor(Math.random() * MOTIVATION.length))
   const motive = MOTIVATION[motiveIdx]
 
@@ -102,7 +110,7 @@ export function MedStudyHub() {
         {section === 'station-sim' && <StationSimulatorSection />}
         {section === 'skills' && <SkdiSkillsSection />}
         {section === 'procedures' && <ClinicalSkillsSection />}
-        {section === 'therapy' && <SkdiTherapySection />}
+        {section === 'therapy' && <SkdiTherapySection cariAwal={params.get('cari') ?? ''} />}
         {section === 'diseases' && <SkdiDiseaseDirectorySection />}
         {section === 'mnemonik' && <MnemonikSection />}
       </Suspense>

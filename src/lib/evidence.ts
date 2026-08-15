@@ -65,13 +65,80 @@ function buildUserPrompt(q: string, f: EvidenceFilters): string {
   return `${ctx.join(' ')}\n\nClinical question: ${q}\n\nProduce the structured JSON answer now.`
 }
 
+/**
+ * Extract the answer object from a model reply.
+ *
+ * The first version took everything between the first '{' and the LAST '}' and
+ * handed it to JSON.parse. That works only when the reply is complete. When the
+ * generation is cut off at the token limit — which is exactly what happens to a
+ * long structured answer — the tail is a half-written object, the last '}' is
+ * some inner brace, and the slice is invalid JSON. The user then sees "unexpected
+ * format, please rephrase", advice that cannot help because the question was
+ * never the problem.
+ *
+ * So: scan with a brace counter that respects strings and escapes. If the object
+ * closes, parse it. If the reply ran out mid-object, CLOSE IT — drop the partial
+ * trailing value and shut every open bracket. A truncated answer that renders
+ * what did arrive is more useful than an error page, and the missing fields are
+ * simply absent rather than wrong.
+ */
 function safeParse(text: string): Partial<EvidenceAnswer> | null {
-  // Strip any accidental code fences / leading prose, then grab the JSON object.
   const cleaned = text.replace(/```json|```/g, '').trim()
   const start = cleaned.indexOf('{')
-  const end = cleaned.lastIndexOf('}')
-  if (start < 0 || end <= start) return null
-  try { return JSON.parse(cleaned.slice(start, end + 1)) } catch { return null }
+  if (start < 0) return null
+
+  // Forward scan. Records, for every position, how many brackets are open and
+  // whether we are inside a string — a plain lastIndexOf('}') cannot know
+  // either, which is why the old parser mistook an inner brace for the end.
+  const opens: string[][] = []
+  const inString: boolean[] = []
+  const stack: string[] = []
+  let inStr = false
+  let esc = false
+
+  for (let i = start; i < cleaned.length; i++) {
+    const c = cleaned[i]
+    opens.push(stack.slice())
+    inString.push(inStr)
+    if (esc) { esc = false; continue }
+    if (c === '\\') { esc = true; continue }
+    if (c === '"') { inStr = !inStr; continue }
+    if (inStr) continue
+    if (c === '{') stack.push('}')
+    else if (c === '[') stack.push(']')
+    else if (c === '}' || c === ']') {
+      stack.pop()
+      if (stack.length === 0) {
+        try { return JSON.parse(cleaned.slice(start, i + 1)) } catch { return null }
+      }
+    }
+  }
+
+  /*
+   * The reply ran out with brackets still open — the generation hit its token
+   * limit mid-object. Rather than guess one cut point, walk backwards through
+   * the positions where a value could plausibly have ended, close whatever is
+   * still open there, and let JSON.parse be the judge. The first candidate that
+   * parses wins. A partial answer that renders what did arrive beats an error
+   * page; the fields that never arrived are simply absent, never invented.
+   */
+  for (let i = cleaned.length - 1; i > start; i--) {
+    const rel = i - start
+    if (inString[rel]) continue
+    const c = cleaned[i]
+    if (c !== ',' && c !== '}' && c !== ']' && c !== '"') continue
+    let head = cleaned.slice(start, c === ',' ? i : i + 1)
+    // Drop a trailing separator and any key left without its value.
+    head = head.replace(/,\s*$/, '').replace(/,?\s*"[^"\\]*"\s*:\s*$/, '')
+    if (!head || head === '{') continue
+    const closers = opens[c === ',' ? rel : rel + 1] ?? opens[rel]
+    const repaired = head + closers.slice().reverse().join('')
+    try {
+      const v = JSON.parse(repaired) as Partial<EvidenceAnswer>
+      if (v && typeof v === 'object') return v
+    } catch { /* try an earlier boundary */ }
+  }
+  return null
 }
 
 const DISCLAIMER = 'AI-generated evidence synthesis for licensed health professionals. It may be incomplete or out of date and can contain errors — verify against the primary sources and current local guidelines linked below before any clinical decision. Not a substitute for clinical judgement.'
@@ -156,13 +223,20 @@ export async function askClinicalEvidence(question: string, filters: EvidenceFil
   if (!backendEnabled) throw new Error('backend_unavailable')
 
   const { text } = await api.aiMessages({
-    model: 'anthropic/claude-3.5-sonnet',
+    // 'opus' marks this as a reasoning-grade request, and `json` tells the
+    // server the reply will be machine-parsed — both are required for the
+    // answer to come back as a bare object rather than chatty prose. The old
+    // value here was an OpenRouter-style slug that matched no route at all.
+    model: 'claude-opus-4-8',
+    json: true,
     system: EVIDENCE_SYSTEM,
     messages: [{ role: 'user', content: buildUserPrompt(q, filters) }],
-    max_tokens: 2048,
+    // The schema has seven fields, several of them lists of full sentences.
+    // 2048 tokens truncated ordinary answers mid-object.
+    max_tokens: 4096,
   })
   const parsed = safeParse(text)
-  if (!parsed || !parsed.bottomLine) throw new Error('parse_failed')
+  if (!parsed || !parsed.bottomLine) throw new Error(text.trim() ? 'parse_failed' : 'empty_reply')
 
   return {
     question: q,

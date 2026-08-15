@@ -64,7 +64,7 @@ function toOpenAIContent(content: string | any[]): any {
   )
 }
 
-async function callOpenRouter(model: string, system: string, messages: Msg[], maxTokens: number): Promise<string> {
+async function callOpenRouter(model: string, system: string, messages: Msg[], maxTokens: number, json = false): Promise<string> {
   const oaMessages = [
     { role: 'system', content: system },
     ...messages.map((m) => ({ role: m.role, content: toOpenAIContent(m.content) })),
@@ -77,7 +77,16 @@ async function callOpenRouter(model: string, system: string, messages: Msg[], ma
       'HTTP-Referer': 'https://panaceamed.id',
       'X-Title': 'Panaceamed.id',
     },
-    body: JSON.stringify({ model, messages: oaMessages, max_tokens: Math.min(Math.max(maxTokens, 256), 4096) }),
+    body: JSON.stringify({
+      model,
+      messages: oaMessages,
+      max_tokens: Math.min(Math.max(maxTokens, 256), 8192),
+      // Callers that parse the reply as JSON say so explicitly. Without this the
+      // provider is free to wrap the object in prose or a code fence, and the
+      // caller's parse fails for a reason the user cannot possibly fix by
+      // rephrasing the question.
+      ...(json ? { response_format: { type: 'json_object' } } : {}),
+    }),
   })
   if (!r.ok) {
     const txt = await r.text()
@@ -89,10 +98,19 @@ async function callOpenRouter(model: string, system: string, messages: Msg[], ma
 
 // Shared AI call. Routes to OpenRouter when configured (heavier "opus" requests
 // → AI-EMR model/GLM, others → fast chat model/Gemini), else to Anthropic.
-async function callAnthropic(model: string, system: string, messages: Msg[], maxTokens: number): Promise<string> {
+async function callAnthropic(model: string, system: string, messages: Msg[], maxTokens: number, json = false): Promise<string> {
   if (OPENROUTER_KEY) {
-    const orModel = model.includes('opus') ? EMR_MODEL : CHAT_MODEL
-    return callOpenRouter(orModel, system, messages, maxTokens)
+    /*
+     * Model routing used to be a substring test on the requested model name
+     * ("does it contain 'opus'"), which quietly sent every other request to the
+     * fast chat model. Clinical Evidence asks for strict structured JSON and
+     * named a model that matched nothing, so it was answered by the chat model
+     * and its reply never parsed — the page reported "unexpected format" for
+     * every question ever asked. Routing now follows what the caller NEEDS: a
+     * reply that must be machine-parsed goes to the reasoning model.
+     */
+    const orModel = json || model.includes('opus') ? EMR_MODEL : CHAT_MODEL
+    return callOpenRouter(orModel, system, messages, maxTokens, json)
   }
   const key = process.env.ANTHROPIC_API_KEY as string
   const r = await fetch(API_URL, {
@@ -142,12 +160,12 @@ export async function aiMessages(req: Request, res: Response) {
   const user = (req as Request & { user: User }).user
   if (rateLimited(user.id)) return res.status(429).json({ error: 'rate_limited' })
 
-  const body = req.body as { model?: string; system?: string; messages?: Msg[]; max_tokens?: number }
+  const body = req.body as { model?: string; system?: string; messages?: Msg[]; max_tokens?: number; json?: boolean }
   if (!Array.isArray(body.messages) || body.messages.length === 0) {
     return res.status(400).json({ error: 'bad_messages' })
   }
   try {
-    const text = await callAnthropic(body.model || 'claude-sonnet-4-6', body.system || '', body.messages, Number(body.max_tokens) || 2048)
+    const text = await callAnthropic(body.model || 'claude-sonnet-4-6', body.system || '', body.messages, Number(body.max_tokens) || 2048, body.json === true)
     res.json({ text })
   } catch (e) {
     res.status(502).json({ error: 'ai_failed', detail: (e as Error).message })

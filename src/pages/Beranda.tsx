@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { DeretPratinjau } from '../components/KartuPratinjau'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
+import { SiapUjian } from '../components/SiapUjian'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -382,6 +383,12 @@ export default function Beranda() {
           belajar dua kali, dan yang kedua tidak pernah benar-benar dipelajari. */}
       <CatatanLatihan />
 
+      {/* Menjelang ujian, hitung mundur dan pencarian tatalaksana lebih sering
+          dipakai daripada seluruh kisi lambang di bawahnya — karena itu ia
+          diletakkan di atas kisi, bukan di dalam salah satu fiturnya.
+          Hanya untuk yang memakai aplikasi ini untuk belajar. */}
+      {klinisDulu && <SiapUjian />}
+
       {!tujuan && <Tanya pilih={pilih} />}
 
       {/* ── KISI FITUR — dibaca menurun (F) ─────────────────────────────── */}
@@ -398,25 +405,6 @@ export default function Beranda() {
       )}
 
       <Kisi judul="Lainnya" isi="Darurat, ibadah, kabar teman, dan seluruh fitur" pintu={LAINNYA} />
-
-      {tujuan && (
-        <section>
-          <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Urutan dasbor</h2>
-          <div className="flex flex-wrap gap-fluid">
-            {PILIHAN_TUJUAN.map((o) => (
-              <button
-                key={o.id}
-                onClick={() => pilih(o.id)}
-                aria-pressed={tujuan === o.id}
-                className={`t-sedang flex min-h-[44px] items-center rounded-full px-4 font-bold transition ${
-                  tujuan === o.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}
-              >
-                {o.ikon} {o.judul}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
 
       <Link
         to="/tutorial"

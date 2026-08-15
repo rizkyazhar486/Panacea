@@ -246,6 +246,8 @@ export const api = {
     system: string
     messages: { role: 'user' | 'assistant'; content: string }[]
     max_tokens?: number
+    /** Reply will be machine-parsed — ask the provider for a bare JSON object. */
+    json?: boolean
   }) => req<{ text: string }>('/api/ai/messages', { method: 'POST', body: JSON.stringify(payload) }),
   aiOperator: (mode: 'briefing' | 'content' | 'social' | 'seo' | 'ads' | 'ops') =>
     req<{ text: string; mode: string; pending?: { topups: number; topupIdr: number; doctors: number } }>(
