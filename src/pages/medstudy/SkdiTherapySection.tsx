@@ -3,6 +3,7 @@ import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconActivity } from '../../components/icons'
 import { SKDI_ENTRIES, SKDI_SYSTEMS, EPONYM_ENTRIES, type SkdiSystem } from '../../lib/skdiTherapyReference'
+import { RantaiObat } from '../../components/RantaiObat'
 import {
   BAGIAN_RESEP, SINGKATAN_RESEP, ATURAN_RESEP, CONTOH_RESEP, KESALAHAN_RESEP, PERINGATAN_RESEP,
 } from '../../lib/resepDokter'
@@ -79,6 +80,9 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
               <div key={i} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
                 <div className="text-[13px] font-bold text-ink dark:text-white">{e.diagnosis}{e.classification ? ` — ${e.classification}` : ''}</div>
                 <p className="mt-1 text-[12px] text-neutral-500">{e.therapy}</p>
+                {/* Mekanisme tiap obat yang disebut di atas — dilipat supaya
+                    tidak mengubur dosisnya, yang justru paling sering dicari. */}
+                <RantaiObat terapi={e.therapy} />
               </div>
             ))}
           </div>
