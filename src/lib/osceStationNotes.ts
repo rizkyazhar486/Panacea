@@ -10,10 +10,30 @@
 // Keyed by the exact `name` string used in `osceCaseBank.ts`'s OSCE_CASES.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Catatan satu stasiun OSCE.
+ *
+ * LIMA MEDAN TAMBAHAN, SEMUANYA OPSIONAL. Bentuk semula hanya memuat anamnesis,
+ * pemeriksaan fisik, kriteria diagnosis, dan tatalaksana. Alat pemeriksa
+ * kelengkapan menilai catatan terhadap delapan medan, sehingga SELURUH stasiun
+ * di berkas ini terbaca "3/8" — bukan karena isinya kurang, melainkan karena
+ * bentuknya memang tidak pernah punya medan itu. Angka 114 "belum lengkap" pada
+ * daftar kerja sebagian besar berasal dari sini.
+ *
+ * Yang lima itu — definisi, etiologi, patofisiologi, penunjang, dan diagnosis
+ * banding — memang yang ditanya penguji sesudah pemeriksaan, jadi menambahkannya
+ * bukan sekadar mengejar angka. Dibuat opsional supaya stasiun yang belum diisi
+ * tidak perlu diisi asal-asalan hanya agar hitungannya penuh.
+ */
 export interface OsceStationNote {
+  definisi?: string
+  etiologi?: string[]
+  patofisiologi?: string
   anamnesis: string[]
   pemeriksaanFisik: string[]
+  penunjang?: string[]
   kriteriaDiagnosis: string
+  diagnosisBanding?: string[]
   tatalaksana: string[]
   tips?: string
 }
@@ -80,6 +100,25 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
   'Cluster Headache': {
+    definisi: 'Nyeri kepala primer sesisi yang sangat hebat di sekitar mata, berlangsung 15-180 menit, disertai gejala otonom pada sisi yang sama, dan datang berkelompok dalam periode berminggu-minggu.',
+    etiologi: [
+      'Idiopatik; diduga berpusat pada hipotalamus posterior — menjelaskan sifatnya yang muncul pada jam yang sama tiap hari dan pada musim yang sama tiap tahun',
+      'Pencetus saat periode serangan: ALKOHOL (paling khas), nitrogliserin, tidur siang, bau menyengat',
+      'Jauh lebih sering pada laki-laki, umumnya mulai usia 20-40 tahun, dan sangat berkaitan dengan merokok',
+    ],
+    patofisiologi: 'Serangan bermula dari aktivasi hipotalamus posterior — inilah yang menjelaskan keteraturan waktunya, sesuatu yang tidak dimiliki nyeri kepala lain. Dari sana jalur trigemino-vaskular teraktivasi sehingga cabang oftalmik nervus trigeminus melepaskan CGRP dan menimbulkan nyeri hebat di daerah orbita. Refleks trigemino-otonom secara bersamaan meningkatkan keluaran parasimpatis lewat nervus fasialis, menghasilkan mata merah, berair, hidung tersumbat dan berair pada sisi yang sama. Pembengkakan di sekitar sinus kavernosus menekan serabut simpatis yang berjalan bersama arteri karotis interna, dan dari situlah muncul ptosis serta miosis — sindrom Horner parsial yang kadang menetap di antara serangan.',
+    penunjang: [
+      'Diagnosis KLINIS — tidak ada pemeriksaan yang memastikannya',
+      'MRI kepala dengan perhatian pada regio hipofisis dilakukan setidaknya sekali untuk menyingkirkan lesi struktural, terutama bila gejalanya tidak khas, defisit neurologis menetap, atau serangan pertama pada usia lanjut',
+      'Laju endap darah pada usia >50 tahun untuk menyingkirkan arteritis temporalis',
+    ],
+    diagnosisBanding: [
+      'Migrain — nyeri berdenyut, penderita ingin diam di ruang gelap; pada klaster penderita justru GELISAH dan mondar-mandir',
+      'Neuralgia trigeminal — nyeri seperti tersetrum berdurasi detik, dipicu sentuhan wajah, tanpa gejala otonom',
+      'Hemikrania paroksismal — serupa tetapi lebih pendek (2-30 menit), lebih sering per hari, dan MUTLAK berespons terhadap indometasin',
+      'Sinusitis akut — nyeri tumpul, demam, sekret purulen, nyeri ketok sinus',
+      'Glaukoma akut sudut tertutup — mata merah dengan penglihatan kabur, halo, kornea keruh, bola mata keras, pupil middilatasi',
+    ],
     anamnesis: [
       'Nyeri kepala unilateral periorbital/temporal sangat hebat, episodik, durasi 15-180 menit, dapat berulang beberapa kali sehari dalam periode "cluster" (minggu-bulan)',
       'Gejala otonom ipsilateral: mata merah berair, hidung tersumbat/berair, ptosis, miosis',
@@ -91,9 +130,12 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Nyeri kepala unilateral berat episodik dengan gejala otonom trigeminal ipsilateral (lakrimasi, kongesti nasal, ptosis/miosis) sesuai kriteria IHS untuk cluster headache.',
     tatalaksana: [
-      'Serangan akut: oksigen 100% aliran tinggi via masker non-rebreathing, atau triptan (sumatriptan subkutan/nasal)',
-      'Profilaksis periode cluster: verapamil lini pertama',
-      'Edukasi hindari pemicu (alkohol) selama periode aktif cluster',
+      'SERANGAN — Oksigen 100% 12-15 L/menit lewat sungkup non-rebreathing selama 15-20 menit dalam posisi duduk membungkuk (lini pertama, meredakan 70% serangan)',
+      'SERANGAN — Sumatriptan 6 mg subkutan (jalur suntik, bukan oral, karena serangan memuncak dalam hitungan menit) atau semprot hidung 20 mg; KONTRAINDIKASI pada penyakit jantung koroner, stroke, dan hipertensi tidak terkendali',
+      'PERALIHAN — Prednison 60 mg/hari 5 hari lalu diturunkan bertahap selama 2-3 minggu, untuk menahan serangan sementara obat pencegah mulai bekerja',
+      'PENCEGAH — Verapamil 240-480 mg/hari dibagi 3 (lini pertama), dinaikkan bertahap dengan EKG berkala karena risiko blok jantung',
+      'Analgesik biasa, opioid, dan parasetamol TIDAK BERGUNA — serangan sudah berakhir sebelum obatnya diserap',
+      'Hentikan merokok dan hindari alkohol sepanjang periode serangan',
     ],
   },
   'Migrain (dengan/tanpa aura)': {
@@ -249,6 +291,27 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
   'Tarsal Tunnel Syndrome': {
+    definisi: 'Jepitan nervus tibialis posterior di dalam terowongan tarsal, di bawah retinakulum fleksor pada sisi dalam pergelangan kaki.',
+    etiologi: [
+      'Kelainan bentuk kaki: kaki datar (pes planus) dengan valgus tumit yang meregangkan saraf',
+      'Massa dalam terowongan: ganglion, lipoma, varises, tenosinovitis',
+      'Pasca-trauma: fraktur atau dislokasi pergelangan kaki, jaringan parut',
+      'Penyakit sistemik: diabetes melitus, artritis reumatoid, hipotiroid, kehamilan',
+      'Idiopatik pada sebagian kasus',
+    ],
+    patofisiologi: 'Terowongan tarsal adalah ruang tertutup berdinding tulang dengan atap retinakulum fleksor yang tidak dapat meregang. Setiap penambahan isi atau penyempitan ruang menaikkan tekanan di dalamnya; ketika tekanan melampaui tekanan kapiler, aliran darah ke saraf terganggu sehingga timbul iskemia, edema di dalam saraf, dan penebalan selubung mielin. Serabut sensorik bermielin tipis paling dahulu terkena — itulah sebabnya keluhan bermula sebagai nyeri terbakar dan kesemutan di telapak kaki, jauh sebelum ada kelemahan. Berdiri dan berjalan lama menambah tekanan, dan berbaring menurunkannya, yang menjelaskan pola keluhan memberat sore hari dan mereda saat istirahat.',
+    penunjang: [
+      'Elektromiografi dan kecepatan hantar saraf — memastikan letak jepitan dan menyingkirkan radikulopati maupun polineuropati; dapat normal pada kasus ringan',
+      'USG atau MRI pergelangan kaki bila dicurigai massa (ganglion, lipoma, varises) yang dapat dioperasi',
+      'Gula darah dan HbA1c, TSH — mencari penyakit yang mendasari',
+    ],
+    diagnosisBanding: [
+      'Fasiitis plantaris — nyeri tajam di TUMIT pada langkah pertama pagi hari, tanpa kesemutan atau rasa terbakar',
+      'Polineuropati diabetik — kedua kaki simetris seperti kaus kaki, bukan sesisi',
+      'Radikulopati S1 — nyeri menjalar dari punggung bawah, refleks Achilles menurun',
+      'Neuroma Morton — nyeri terbakar di antara jari ke-3 dan ke-4, tanda Mulder positif',
+      'Insufisiensi vena atau penyakit arteri perifer — perubahan warna dan suhu kulit, klaudikasio',
+    ],
     anamnesis: [
       'Nyeri/kesemutan telapak kaki (distribusi N. tibialis posterior), memberat berdiri/berjalan lama',
       'Faktor risiko: deformitas kaki, trauma pergelangan kaki, edema',
@@ -262,10 +325,14 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Gejala klinis (nyeri sensoris plantar akibat kompresi N. tibialis posterior di area maleolus medial) + Tinel/dorsiflexion-eversion test positif, dikonfirmasi EMG bila tersedia.',
     tatalaksana: [
-      'Non-medikamentosa: rest, ice pack, istirahatkan kaki bila nyeri',
-      'Medikamentosa: gabapentin 100mg 1x1 prn nyeri, mecobalamin 100mcg 3x1',
-      'Bila tidak membaik dengan konservatif: rujuk Sp.S untuk injeksi kortikosteroid',
-      'Penunjang: EMG, GDS, HbA1c',
+      'Kurangi beban: hentikan sementara berdiri dan berjalan lama, turunkan berat badan',
+      'ORTOSIS penyangga lengkung kaki untuk mengoreksi kaki datar dan valgus tumit — mengatasi sebab mekaniknya, bukan hanya gejalanya',
+      'NSAID jangka pendek: Ibuprofen 3x400 mg atau Natrium diklofenak 2x50 mg sesudah makan',
+      'Nyeri neuropatik: Gabapentin 300 mg malam dinaikkan bertahap sampai 3x300-600 mg, atau Amitriptilin 10-25 mg malam',
+      'Fisioterapi: peregangan betis dan fasia plantaris, latihan luncur saraf (nerve gliding), penguatan otot intrinsik kaki',
+      'Injeksi kortikosteroid setempat bila terapi konservatif gagal — hati-hati, hindari menyuntik langsung ke dalam saraf',
+      'Obati penyakit dasarnya (diabetes, hipotiroid)',
+      'RUJUK BEDAH untuk pelepasan retinakulum bila ada massa yang jelas, defisit motorik, atau gagal konservatif 6 bulan',
     ],
   },
   'Neuralgia Trigeminal': {
@@ -305,6 +372,27 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
   'Parkinson Disease': {
+    definisi: 'Penyakit neurodegeneratif akibat hilangnya neuron dopaminergik substansia nigra, ditandai bradikinesia disertai tremor istirahat dan/atau rigiditas.',
+    etiologi: [
+      'Idiopatik pada sebagian besar kasus; usia adalah faktor risiko terkuat',
+      'Sebagian kecil bersifat genetik (LRRK2, PARK), terutama bila mulai pada usia muda',
+      'Paparan pestisida dan logam berat dikaitkan dengan peningkatan risiko',
+      'PARKINSONISME SEKUNDER yang harus dibedakan: obat penyekat dopamin (haloperidol, risperidon, METOKLOPRAMID — sering terlewat), pasca-ensefalitis, hidrosefalus tekanan normal, dan vaskular',
+    ],
+    patofisiologi: 'Neuron dopaminergik di substansia nigra pars kompakta mati secara bertahap, disertai penumpukan alfa-sinuklein sebagai badan Lewy. Gejala baru muncul setelah sekitar 60-80% neuron itu hilang — itulah sebabnya penyakitnya sudah berjalan bertahun-tahun sebelum pasien datang, dan mengapa keluhan non-motorik seperti hilangnya penciuman, sembelit, dan gangguan tidur REM sering mendahului tremor bertahun-tahun. Hilangnya dopamin di striatum menekan jalur langsung dan melepaskan hambatan pada jalur tidak langsung, sehingga keluaran ganglia basalis yang bersifat menghambat meningkat, talamus tertekan, dan korteks motorik kehilangan dorongan untuk memulai gerak — inilah bradikinesia. Rigiditas roda gigi timbul dari peningkatan tonus yang menetap sepanjang lingkup gerak, dan tremor istirahat 4-6 Hz berasal dari osilasi lingkar talamokortikal yang justru mereda ketika anggota gerak digunakan.',
+    penunjang: [
+      'Diagnosis KLINIS — tidak ada pemeriksaan darah maupun pencitraan yang memastikannya',
+      'MRI kepala untuk menyingkirkan hidrosefalus tekanan normal, lesi vaskular, dan massa',
+      'Uji coba levodopa: perbaikan yang jelas dan meyakinkan mendukung Parkinson; parkinsonisme atipikal umumnya kurang berespons',
+      'Periksa daftar obat pasien — parkinsonisme akibat obat adalah penyebab yang paling mudah disembuhkan dan paling sering terlewat',
+    ],
+    diagnosisBanding: [
+      'Tremor esensial — tremor saat BERGERAK dan memegang, kedua sisi, membaik dengan alkohol, ada riwayat keluarga; tidak ada bradikinesia',
+      'Parkinsonisme akibat obat — kedua sisi seimbang sejak awal, ada riwayat antipsikotik atau metoklopramid',
+      'Progressive supranuclear palsy — jatuh ke belakang sejak dini dan gangguan gerak bola mata vertikal',
+      'Multiple system atrophy — hipotensi ortostatik berat dan gangguan berkemih yang menonjol sejak awal',
+      'Hidrosefalus tekanan normal — trias langkah magnetik, inkontinensia urin, dan demensia',
+    ],
     anamnesis: [
       'Gejala motorik progresif: tremor istirahat (membaik dengan gerakan), bradikinesia (gerakan melambat, kesulitan memulai gerakan), kekakuan',
       'Gangguan gaya berjalan: langkah kecil-kecil (shuffling), postur membungkuk, berkurangnya ayunan lengan',
@@ -317,9 +405,13 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Bradikinesia + minimal salah satu dari tremor istirahat atau rigiditas, dengan respons baik terhadap levodopa mendukung diagnosis klinis.',
     tatalaksana: [
-      'Levodopa/karbidopa sebagai terapi lini pertama untuk gejala motorik pada kebanyakan kasus',
-      'Agonis dopamin sebagai alternatif pada pasien lebih muda (menunda komplikasi motorik jangka panjang levodopa)',
-      'Fisioterapi, edukasi keluarga tentang progresivitas penyakit',
+      'Levodopa-karbidopa 100/25 mg mulai 3x1/2 tablet, dinaikkan bertahap sesuai gejala — obat paling efektif; diminum 30-60 menit SEBELUM makan karena protein makanan menghambat penyerapannya',
+      'Usia muda dan gejala ringan: agonis dopamin (Pramipeksol 0,125 mg 3x/hari dinaikkan bertahap) untuk menunda komplikasi motorik levodopa; awas mengantuk mendadak dan gangguan kendali impuls',
+      'Triheksifenidil 2x2 mg dapat dipakai bila tremor mendominasi pada usia muda; HINDARI pada usia lanjut karena kebingungan dan gangguan daya ingat',
+      'FISIOTERAPI sejak dini adalah bagian terapi, bukan pelengkap: latihan langkah besar, isyarat visual dan irama untuk mengatasi freezing, latihan keseimbangan, dan terapi wicara',
+      'Tangani gejala non-motorik yang justru paling menurunkan kualitas hidup: sembelit, depresi, gangguan tidur, dan hipotensi ortostatik',
+      'Jangan hentikan levodopa mendadak — dapat mencetuskan sindrom mirip neuroleptik maligna',
+      'Cegah jatuh: singkirkan karpet lepas, pasang pegangan, terangi jalan ke kamar mandi',
     ],
   },
   'Meniere Disease': {
@@ -457,6 +549,27 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     tips: 'Status mental lengkap wajib didokumentasikan tertulis di rekam medis pada station ini — bukan hanya disampaikan lisan.',
   },
   'Gangguan Cemas Menyeluruh (GAD)': {
+    definisi: 'Kecemasan dan kekhawatiran berlebihan yang sulit dikendalikan terhadap banyak hal, berlangsung lebih dari 6 bulan, disertai gejala fisik dan mengganggu fungsi sehari-hari.',
+    etiologi: [
+      'Kerentanan genetik dan temperamen cemas sejak kecil',
+      'Ketidakseimbangan serotonin, noradrenalin, dan GABA',
+      'Stres psikososial menahun: pekerjaan, keuangan, hubungan, penyakit kronik',
+      'SINGKIRKAN sebab organik dan zat: hipertiroid, aritmia, feokromositoma, hipoglikemia, kafein berlebihan, obat simpatomimetik, dan putus alkohol atau benzodiazepin',
+    ],
+    patofisiologi: 'Amigdala — pusat penilaian ancaman — bekerja berlebihan sementara korteks prefrontal yang seharusnya meredamnya bekerja kurang, sehingga rangsangan biasa terus dinilai sebagai bahaya. Kekhawatiran yang tak berhenti adalah cara pikiran menghindari rasa tidak pasti, dan justru itulah yang melanggengkannya: karena hal yang dikhawatirkan hampir selalu tidak terjadi, otak menyimpulkan bahwa khawatir itu berguna. Sumbu hipotalamus-hipofisis-adrenal dan saraf simpatis ikut menyala terus-menerus, dan dari situlah datang keluhan yang dibawa pasien ke dokter umum: jantung berdebar, otot tegang dan pegal, sakit kepala, perut mulas, dan sulit tidur. Karena keluhannya badani, pasien sering menjalani banyak pemeriksaan sebelum kecemasan pernah ditanyakan.',
+    penunjang: [
+      'Skrining GAD-7 untuk menapis dan memantau berat gejala; PHQ-9 karena depresi menyertai lebih dari separuh kasus',
+      'TSH dan T4 bebas untuk menyingkirkan hipertiroid',
+      'EKG bila berdebar menonjol; darah lengkap dan gula darah sesuai keluhan',
+      'Tidak ada pemeriksaan yang MEMASTIKAN diagnosis — pemeriksaan hanya untuk menyingkirkan penyakit lain, dan pemeriksaan berulang tanpa indikasi justru memperkuat kecemasan',
+    ],
+    diagnosisBanding: [
+      'Gangguan panik — serangan mendadak memuncak dalam 10 menit dengan rasa akan mati, di antaranya bebas gejala',
+      'Depresi — murung dan hilang minat mendominasi; sangat sering bersamaan dengan GAD',
+      'Gangguan somatisasi — perhatian terpusat pada keluhan fisiknya sendiri, bukan pada kekhawatiran akan masa depan',
+      'Hipertiroid — turun berat badan dengan nafsu makan naik, tidak tahan panas, tremor halus, tiroid membesar',
+      'Gangguan penyesuaian — jelas terkait satu pencetus dan mereda setelahnya',
+    ],
     anamnesis: [
       'Cemas berlebihan tentang berbagai hal (pekerjaan, kesehatan, keuangan) hampir setiap hari, sulit dikendalikan, ≥6 bulan',
       'Gejala somatik penyerta: tegang otot, mudah lelah, sulit konsentrasi, iritabel, gangguan tidur, gelisah',
@@ -467,9 +580,12 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Kecemasan dan kekhawatiran berlebihan, sulit dikendalikan, tentang berbagai peristiwa/aktivitas, ≥6 bulan, disertai minimal 3 gejala somatik (gelisah, mudah lelah, sulit konsentrasi, iritabel, tegang otot, gangguan tidur).',
     tatalaksana: [
-      'Farmakoterapi: SSRI (sertraline, escitalopram) lini pertama untuk terapi jangka panjang; benzodiazepin jangka pendek hanya untuk kontrol gejala akut',
-      'Non-farmako: CBT, relaksasi, psikoedukasi',
-      'Edukasi: kurangi kafein, olahraga teratur, teknik relaksasi',
+      'Terapi kognitif perilaku adalah lini pertama dan hasilnya lebih bertahan daripada obat — bila tersedia, tawarkan lebih dahulu',
+      'Sertralin 25-50 mg/hari dinaikkan sampai 50-200 mg, atau Fluoksetin 10-20 mg/hari sampai 20-60 mg. Beritahu di awal bahwa kecemasan dapat SEMENTARA memburuk pada 1-2 minggu pertama dan efeknya baru terasa setelah 4-6 minggu — tanpa penjelasan ini pasien berhenti sendiri',
+      'Lanjutkan minimal 12 bulan setelah gejala membaik, lalu turunkan bertahap; berhenti mendadak menimbulkan gejala putus obat',
+      'Benzodiazepin (Lorazepam 0,5-1 mg) hanya untuk jangka SANGAT pendek, maksimal 2-4 minggu, karena toleransi dan ketergantungan; hindari pada riwayat penyalahgunaan zat',
+      'Latihan napas perut, relaksasi otot progresif, aktivitas fisik teratur, tidur cukup, dan batasi kafein serta alkohol',
+      'Jelaskan bahwa gejala fisiknya NYATA dan berasal dari sistem saraf otonom — pengakuan ini menghentikan siklus pemeriksaan berulang',
     ],
   },
   'Skizofrenia Paranoid': {
@@ -1184,6 +1300,30 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     tips: 'Teknik nebulisasi (dosis obat, durasi, evaluasi respons) sering jadi station tindakan tersendiri — hafal dosis salbutamol nebul dan target evaluasi ulang.',
   },
   'PPOK Eksaserbasi Akut': {
+    definisi: 'Perburukan akut gejala pernapasan pada penderita PPOK yang melampaui variasi harian biasanya dan menuntut perubahan pengobatan.',
+    etiologi: [
+      'Infeksi saluran napas — penyebab tersering (virus rinovirus/influenza, bakteri H. influenzae, S. pneumoniae, M. catarrhalis, dan Pseudomonas pada PPOK berat)',
+      'Polusi udara, asap rokok, asap dapur, dan perubahan cuaca',
+      'Kepatuhan obat yang terputus atau teknik inhaler yang salah',
+      'Sekitar sepertiga eksaserbasi tidak diketahui pencetusnya',
+      'PENYAMAR: emboli paru, gagal jantung, pneumotoraks, dan pneumonia dapat menyerupai eksaserbasi — singkirkan sebelum menyimpulkan',
+    ],
+    patofisiologi: 'Dasar PPOK adalah keterbatasan aliran udara yang tidak pulih sempurna: peradangan kronik menebalkan dinding bronkiolus, sekret bertambah, dan kerusakan alveolus menghilangkan tarikan elastis yang biasanya menahan saluran napas kecil tetap terbuka. Saat eksaserbasi, radang dan sekret bertambah sehingga tahanan meningkat dan waktu ekspirasi memanjang. Bila napas berikutnya dimulai sebelum paru sempat kosong, udara terperangkap — inilah HIPERINFLASI DINAMIK, dan itulah yang dirasakan pasien sebagai sesak, bukan kadar oksigen semata. Diafragma yang terdorong mendatar kehilangan lengkung optimalnya sehingga kerja napas melonjak justru ketika cadangan paling tipis. Hipoventilasi dan ketidakseimbangan ventilasi-perfusi menimbulkan hipoksemia lalu retensi CO2 dengan asidosis respiratorik. Oksigen berlebihan memperberat retensi CO2 melalui tiga mekanisme — hilangnya vasokonstriksi hipoksik sehingga darah mengalir ke daerah berventilasi buruk, efek Haldane, dan penurunan dorongan napas — dan itulah alasan sasaran saturasi ditahan di 88-92%, bukan dinaikkan setinggi mungkin.',
+    penunjang: [
+      'Analisis gas darah — menentukan gagal napas dan apakah ada asidosis respiratorik (pH <7,35 dengan PaCO2 >45 mmHg adalah indikasi NIV)',
+      'Foto toraks — mencari pneumonia, pneumotoraks, dan bendungan paru',
+      'EKG — aritmia, tanda kor pulmonale, iskemia',
+      'Darah lengkap (polisitemia, leukositosis), gula darah, elektrolit',
+      'Kultur sputum bila eksaserbasi berulang, berat, atau gagal terapi awal',
+      'Spirometri TIDAK dikerjakan saat eksaserbasi — hasilnya tidak dapat dipercaya; ia untuk menegakkan diagnosis PPOK di luar serangan',
+    ],
+    diagnosisBanding: [
+      'Pneumonia — demam tinggi dan infiltrat pada foto toraks',
+      'Gagal jantung kiri akut — ortopnea, ronki basah halus basal, JVP naik, kardiomegali',
+      'Emboli paru — sesak mendadak, nyeri pleuritik, hipoksemia tanpa mengi, faktor risiko imobilisasi',
+      'Pneumotoraks — sesak mendadak, hipersonor sepihak, suara napas menghilang',
+      'Asma eksaserbasi — usia lebih muda, riwayat atopi, gejala bervariasi dan reversibel penuh',
+    ],
     anamnesis: [
       'Sesak memberat dari baseline, peningkatan volume/purulensi sputum',
       'Riwayat merokok lama (pack-years), riwayat PPOK terdiagnosis sebelumnya',
@@ -1194,11 +1334,13 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Perburukan akut gejala respirasi (sesak, sputum) melebihi variasi harian pada pasien dengan riwayat PPOK terkonfirmasi spirometri (FEV1/FVC <0,7 pasca-bronkodilator).',
     tatalaksana: [
-      'Oksigen terkontrol (target SpO2 88-92% — hindari hiperoksia yang dapat memperburuk retensi CO2)',
-      'Bronkodilator kerja pendek (salbutamol + ipratropium) nebulisasi',
-      'Kortikosteroid sistemik oral/IV',
-      'Antibiotik bila memenuhi kriteria Anthonisen (peningkatan sesak, volume sputum, purulensi sputum — minimal 2 kriteria termasuk purulensi)',
-      'NIV (non-invasive ventilation) pada gagal napas dengan asidosis respiratorik',
+      'Oksigen TERKONTROL dengan target SpO2 88-92% (nasal kanul 1-2 L/menit atau venturi 24-28%) — hiperoksia memperberat retensi CO2',
+      'Salbutamol 2,5-5 mg + Ipratropium bromida 0,5 mg nebulisasi, dapat diulang tiap 20 menit pada jam pertama lalu tiap 4-6 jam',
+      'Metilprednisolon 32 mg/hari PO atau Prednison 40 mg/hari selama 5 HARI (tidak perlu tapering, tidak perlu lebih lama)',
+      'Antibiotik bila memenuhi 2 dari 3 kriteria Anthonisen dengan purulensi sputum sebagai salah satunya: Amoksisilin-klavulanat 3x500 mg atau Azitromisin 500 mg hari-1 lalu 250 mg selama 4 hari, 5-7 hari',
+      'NIV (BiPAP) bila pH <7,35 dengan PaCO2 >45 mmHg — menurunkan kebutuhan intubasi dan angka kematian',
+      'Cari dan atasi pencetus; hentikan rokok (satu-satunya tindakan yang mengubah perjalanan penyakit selain oksigen jangka panjang)',
+      'Sebelum pulang: periksa TEKNIK INHALER, rencana vaksinasi influenza dan pneumokokus, dan rujuk rehabilitasi paru',
     ],
   },
   'Pneumonia (lobaris/aspirasi/CAP)': {

@@ -110,12 +110,16 @@ function resolveNote(disease: string, data: NoteData | null) {
   return {
     kind: 'osce' as const,
     sourceStation: aliasKey,
-    definisi: undefined as string | undefined,
+    definisi: station.definisi as string | undefined,
     deep: undefined,
     blocks: [
+      ...(station.etiologi ? [{ title: 'Etiologi', items: station.etiologi }] : []),
+      ...(station.patofisiologi ? [{ title: 'Patofisiologi', items: [station.patofisiologi] }] : []),
       { title: 'Anamnesis', items: station.anamnesis },
       { title: 'Pemeriksaan Fisik', items: station.pemeriksaanFisik },
+      ...(station.penunjang ? [{ title: 'Pemeriksaan Penunjang', items: station.penunjang }] : []),
       { title: 'Kriteria Diagnosis', items: [station.kriteriaDiagnosis] },
+      ...(station.diagnosisBanding ? [{ title: 'Diagnosis Banding', items: station.diagnosisBanding }] : []),
       { title: 'Tatalaksana', items: station.tatalaksana },
     ],
     referensi: [] as string[],

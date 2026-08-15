@@ -72,6 +72,26 @@ export default function OsceCaseBankSection() {
 
                   {isOpen && notes && (
                     <div className="mt-3 space-y-3 border-t border-neutral-200 pt-3 dark:border-white/10">
+                      {notes.definisi && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Definisi</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.definisi}</p>
+                        </div>
+                      )}
+                      {notes.etiologi && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Etiologi</div>
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                            {notes.etiologi.map((e, i) => <li key={i}>{e}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                      {notes.patofisiologi && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Patofisiologi</div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.patofisiologi}</p>
+                        </div>
+                      )}
                       <div>
                         <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Anamnesis</div>
                         <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
@@ -84,10 +104,26 @@ export default function OsceCaseBankSection() {
                           {notes.pemeriksaanFisik.map((p, i) => <li key={i}>{p}</li>)}
                         </ul>
                       </div>
+                      {notes.penunjang && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Pemeriksaan Penunjang</div>
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                            {notes.penunjang.map((x, i) => <li key={i}>{x}</li>)}
+                          </ul>
+                        </div>
+                      )}
                       <div>
                         <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Kriteria Diagnosis</div>
                         <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.kriteriaDiagnosis}</p>
                       </div>
+                      {notes.diagnosisBanding && (
+                        <div>
+                          <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Diagnosis Banding</div>
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                            {notes.diagnosisBanding.map((x, i) => <li key={i}>{x}</li>)}
+                          </ul>
+                        </div>
+                      )}
                       <div>
                         <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Tatalaksana</div>
                         <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
