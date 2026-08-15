@@ -493,6 +493,26 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .menu-turun { animation: menu-turun 0.16s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .reduce-motion .menu-turun { animation: none; }
 
+/* Kartu bertumpuk: tiap kartu menempel di puncaknya sendiri sampai kartu
+   berikutnya naik menutupinya.
+
+   Puncaknya diberikan lewat gaya sebaris karena bertambah tiap kartu; yang di
+   sini hanya perilakunya. Latar kartunya WAJIB pekat — kartu tembus pandang
+   yang menempel di atas kartu lain menghasilkan dua paragraf yang saling
+   menembus dan tidak satu pun terbaca. */
+.tumpuk-kartu {
+  position: sticky;
+  display: block;
+}
+
+/* Yang meminta gerakan dikurangi mendapat daftar biasa. Kartu yang menempel
+   dan tertumpuk adalah gerakan terikat guliran — persis jenis yang memicu
+   pusing pada sebagian orang, dan halaman ini tidak kehilangan apa pun bila
+   keenam kartunya sekadar berjajar menurun. */
+.reduce-motion .tumpuk-kartu {
+  position: static;
+}
+
 /* Bottom sheet slide-up */
 @keyframes sheet-in {
   from { transform: translateY(100%); }

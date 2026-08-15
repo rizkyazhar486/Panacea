@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Prosa } from '../components/Prosa'
 import { api, backendEnabled, type Health } from '../lib/api'
 import { Wordmark } from '../components/Logo'
@@ -23,6 +23,48 @@ import { getTheme, toggleTheme, type Theme } from '../lib/theme'
 import { MedicalNews } from '../components/MedicalNews'
 import { ScrollCinematic, ScrollCinematicStyles } from '../components/ScrollCinematic'
 import { PricingSection } from '../components/PricingSection'
+
+/**
+ * Video yang hanya berputar SAAT TERLIHAT.
+ *
+ * Enam kartu era masing-masing memuat satu video ber-autoplay. Sebelumnya
+ * keenamnya mulai mengunduh dan berputar bersamaan begitu halaman dibuka —
+ * pada paket data seluler itu puluhan megabita yang tidak diminta siapa pun,
+ * dan pada telepon kelas menengah enam pemutar sekaligus membuat guliran
+ * tersendat. preload="none" saja tidak menolong, sebab autoPlay membatalkannya.
+ *
+ * Yang di bawah memutar video hanya ketika kartunya benar-benar berada di
+ * layar, dan menghentikannya begitu lewat. Perilaku ini juga yang membuat
+ * tumpukan kartu terbaca: yang bergerak selalu era yang sedang dibaca.
+ */
+function VideoSaatTerlihat({ src, judul }: { src: string; judul: string }) {
+  const acuan = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    const el = acuan.current
+    if (!el) return
+    const pengamat = new IntersectionObserver(
+      ([masuk]) => {
+        if (masuk.isIntersecting) void el.play().catch(() => {})
+        else el.pause()
+      },
+      { threshold: 0.35 },
+    )
+    pengamat.observe(el)
+    return () => pengamat.disconnect()
+  }, [])
+  return (
+    <video
+      ref={acuan}
+      src={src}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-label={`Suasana era ${judul}`}
+      className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover"
+    />
+  )
+}
 
 const FEATURES = [
   { icon: IconUsers, title: 'Healthy Living Dashboard', text: 'A Strava/TikTok-style social network: share activities, healthy habits & longevity articles. Photos, short videos, profiles, bookmarks.' },
@@ -433,8 +475,14 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
       <MedicalNews />
 
       {/* ── LONGEVITY & HEALTHCARE HISTORY ──────────────────── */}
-      <section className="relative overflow-hidden px-6 py-20 sm:px-10">
-        <div className="pointer-events-none absolute inset-0">
+      {/* overflow-hidden DIPINDAH dari section ke pembungkus orb di dalamnya.
+          Kartu era di bawah memakai position:sticky, dan sticky yang berada di
+          dalam leluhur ber-overflow-hidden menempel pada kotak guliran leluhur
+          itu, bukan pada layar — akibatnya ia tampak tidak menempel sama
+          sekali. Orbnya tetap terkurung karena pembungkusnya sendiri yang kini
+          memotong. */}
+      <section className="relative px-6 py-20 sm:px-10">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="orb absolute left-1/4 top-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl" />
           <div className="orb absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl" style={{ animationDelay: '-8s' }} />
         </div>
@@ -452,14 +500,36 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             </div>
           </Reveal>
 
-          {/* Ancient eras timeline */}
-          <div className="mt-10 space-y-4">
+          {/* Ancient eras — KARTU BERTUMPUK.
+              Enam era, masing-masing satu paragraf penuh beserta satu video,
+              berjajar menurun menjadi kolom yang sangat panjang; pembacanya
+              melewati keenamnya sekaligus dan tidak satu pun sempat menjadi
+              pusat perhatian. Bertumpuk, tiap kartu menempel di tempat yang
+              sama sampai kartu berikutnya naik menutupinya — satu era menguasai
+              layar pada satu waktu, dan urutan zamannya terasa sebagai gerakan
+              maju, bukan sebagai daftar.
+
+              Puncak menempelnya bertambah 12 px tiap kartu sehingga tepi kartu
+              di bawahnya tetap mengintip; tanpa itu tumpukan terlihat seperti
+              satu kartu yang isinya berganti-ganti sendiri. */}
+          <ol className="mt-10 list-none">
             {HISTORY_ERAS.map((e, i) => (
-              <Reveal key={e.era} delay={(i % 3) * 80}>
-                <div className="liquid-glass flex gap-4 rounded-2xl p-5">
+              <li
+                key={e.era}
+                className="tumpuk-kartu"
+                style={{ top: `calc(4.5rem + ${i * 12}px)`, zIndex: i + 1 }}
+              >
+                {/* TANPA liquid-glass, dan ini bukan pilihan selera. Kartu kaca yang
+                      menempel di atas kartu kaca lain membuat tiga paragraf saling
+                      menembus sekaligus — terlihat jelas pada tangkapan layar di
+                      390 px: judul era Yunani-Romawi, Mesir, dan Cina bertumpuk pada
+                      baris yang sama dan tidak satu pun terbaca. Menambahkan
+                      bg-white/95 di sebelah liquid-glass tidak menolong karena kelas
+                      itu memasang latarnya sendiri. Tumpukan menuntut latar pekat. */}
+                <div className="mb-4 flex gap-4 rounded-2xl border border-black/5 bg-white p-5 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-neutral-900">
                   <div className="flex shrink-0 flex-col items-center">
                     <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-2xl">{e.emoji}</span>
-                    {i < HISTORY_ERAS.length - 1 && <span className="mt-2 w-px flex-1 bg-brand/20" />}
+                    <span className="mt-2 text-[10px] font-black tabular-nums text-neutral-400">{i + 1}/{HISTORY_ERAS.length}</span>
                   </div>
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-baseline gap-2">
@@ -468,16 +538,12 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
                       <span className="text-[10px] text-neutral-500">· {e.when}</span>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.body}</p>
-                    {e.video && (
-                      <video src={e.video} autoPlay muted loop playsInline preload="none"
-                        aria-label={`Suasana era ${e.era}`}
-                        className="mt-3 aspect-video w-full rounded-xl bg-[#06120c] object-cover" />
-                    )}
+                    {e.video && <VideoSaatTerlihat src={e.video} judul={e.era} />}
                   </div>
                 </div>
-              </Reveal>
+              </li>
             ))}
-          </div>
+          </ol>
 
           {/* Modern per-decade */}
           <Reveal className="mt-12 text-center">
