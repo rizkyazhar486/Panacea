@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
+import { WIDGETS, ambilWidget } from '../lib/homeWidgets'
+import { PemilihWidget } from './PemilihWidget'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan widget beranda — bentuk ubin seperti di layar utama telepon.
@@ -53,15 +55,32 @@ function Ubin({
   )
 }
 
-/** Ubin kosong: dibedakan lewat BENTUK (garis putus-putus), bukan warna saja. */
-function UbinKosong({ ke, judul, garis }: { ke: string; judul: string; garis: string }) {
+/**
+ * Ubin kosong — DIPADATKAN, bukan disamakan besarnya dengan ubin berisi.
+ *
+ * Bentuk sebelumnya memakai tinggi dan kalimat ajakan yang sama panjangnya
+ * dengan ubin berangka. Akibatnya pemakai baru, yang semua ubinnya masih
+ * kosong, membuka beranda dan menemukan lima kotak besar berisi kalimat "belum
+ * ada" — hampir satu layar penuh yang tidak memberi satu pun angka. Ruang
+ * terbesar di halaman justru diberikan kepada bagian yang paling sedikit
+ * isinya, dan itulah yang membuat halaman ini terasa sesak.
+ *
+ * Sekarang ubin kosong hanya setinggi 64 px dengan satu ajakan pendek. Ia tetap
+ * ADA — menghapusnya akan menyembunyikan fitur yang belum pernah dipakai, dan
+ * orang tidak akan pernah tahu bahwa ia bisa mengisinya — tetapi tidak lagi
+ * menuntut ruang sebesar bagian yang benar-benar berisi.
+ *
+ * Pembedaannya tetap lewat BENTUK (garis putus-putus dan tinggi yang berbeda),
+ * bukan lewat warna saja.
+ */
+function UbinKosong({ ke, judul }: { ke: string; judul: string; garis?: string }) {
   return (
     <Link
       to={ke}
-      className="flex min-h-[112px] flex-col gap-1.5 rounded-3xl border border-dashed border-neutral-300 p-3 transition active:scale-[0.98] dark:border-white/20"
+      className="flex min-h-[64px] flex-col justify-center gap-0.5 rounded-3xl border border-dashed border-neutral-300 p-3 transition active:scale-[0.98] dark:border-white/20"
     >
       <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">{judul}</span>
-      <p className="t-kecil leading-snug text-neutral-500">{garis}</p>
+      <span className="t-kecil text-neutral-400">Belum ada — catat →</span>
     </Link>
   )
 }
@@ -170,8 +189,55 @@ export function UbinKlinis() {
  * memakai col-span-2, dan rentang kolom hanya bermakna bila jumlah kolomnya
  * pasti. Pada layar lebar, wadahnya sendiri yang dibatasi lebarnya.
  */
-export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinjau[]; tanggalCatatan: string[] }) {
+/**
+ * Ubin pintasan: satu fitur yang dipilih sendiri oleh pemakainya.
+ *
+ * Sengaja TANPA angka. Ubin berangka di atasnya menjawab "bagaimana keadaan
+ * saya"; ubin ini menjawab "ke mana saya mau pergi", dan mencampur keduanya
+ * dalam satu bentuk membuat mata harus memeriksa tiap ubin untuk tahu ia jenis
+ * yang mana. Bentuknya dibuat lebih rendah supaya perbedaan itu terbaca sekilas.
+ */
+function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
   return (
+    <Link
+      to={w.ke}
+      className="kaca flex min-h-[76px] flex-col justify-center gap-0.5 rounded-3xl p-3 transition active:scale-[0.98]"
+    >
+      <span aria-hidden className="text-[17px] leading-none">{w.emoji}</span>
+      <span className="t-kecil truncate font-black text-ink dark:text-white">{w.label}</span>
+      <span className="t-mikro truncate text-neutral-400">{w.ringkas}</span>
+    </Link>
+  )
+}
+
+/**
+ * Papan widget.
+ *
+ * DUA LAPIS, DAN PEMISAHANNYA DISENGAJA. Lapis pertama berisi angka keadaan
+ * Anda dan selalu tampil. Lapis kedua berisi pintasan yang DIPILIH SENDIRI dari
+ * lebih dari seratus fitur — sebab tidak ada susunan bawaan yang benar untuk
+ * semua orang, dan menebak berarti salah bagi sebagian besar.
+ *
+ * Bawaannya sedikit dengan sengaja: beranda yang penuh sejak hari pertama
+ * membuat orang berhenti membacanya, dan sesudah itu widget yang benar-benar
+ * penting pun ikut tidak terbaca.
+ */
+export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinjau[]; tanggalCatatan: string[] }) {
+  const [pilihan, setPilihan] = useState<string[]>(ambilWidget)
+  const [aturBuka, setAturBuka] = useState(false)
+
+  useEffect(() => {
+    const on = () => setPilihan(ambilWidget())
+    window.addEventListener('panacea:home-widgets', on)
+    return () => window.removeEventListener('panacea:home-widgets', on)
+  }, [])
+
+  // Urutan mengikuti urutan katalog, bukan urutan penambahan — supaya letak
+  // sebuah ubin tidak berpindah-pindah dan tetap dapat dihafal tangannya.
+  const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id))
+
+  return (
+    <>
     <section>
       <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
       <p className="t-kecil mb-2 leading-snug text-neutral-400">Isi tiap fitur, bukan hanya pintunya.</p>
@@ -181,6 +247,30 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         <UbinKlinis />
       </div>
     </section>
+
+    <section>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Pintasan</h2>
+        <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
+          Atur widget
+        </button>
+      </div>
+      {pintasan.length ? (
+        <div className="grid grid-cols-2 gap-fluid">
+          {pintasan.map((w) => <UbinPintasan key={w.id} w={w} />)}
+        </div>
+      ) : (
+        <button
+          onClick={() => setAturBuka(true)}
+          className="t-kecil flex min-h-[76px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
+        >
+          Belum ada pintasan. Pilih dari {WIDGETS.length} fitur yang ada.
+        </button>
+      )}
+    </section>
+
+    {aturBuka && <PemilihWidget tutup={() => setAturBuka(false)} />}
+    </>
   )
 }
 
