@@ -4,6 +4,7 @@ import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
 import { WIDGETS, ambilWidget } from '../lib/homeWidgets'
 import { PemilihWidget } from './PemilihWidget'
+import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rincianBeranda'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan widget beranda — bentuk ubin seperti di layar utama telepon.
@@ -281,6 +282,62 @@ function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
 }
 
 /**
+ * Rincian angka tubuh sebagai daftar baris.
+ *
+ * BENTUKNYA DIAMBIL DARI APLIKASI KEBUGARAN, ALASANNYA DARI JUMLAH DATA. Ubin
+ * setengah lebar layar tepat untuk empat sampai enam angka utama; katalog
+ * metrik perangkat memuat lebih dari seratus medan, dan dua puluh di antaranya
+ * sebagai ubin berarti sepuluh layar yang tidak mungkin dibaca. Baris memuat
+ * delapan sampai sepuluh angka dalam satu layar.
+ *
+ * DILIPAT SETELAH ENAM BARIS. Daftar yang seluruhnya terbuka mendorong bagian
+ * di bawahnya keluar layar, dan bagian di bawahnya adalah pintasan serta kisi
+ * fitur — dua hal yang justru paling sering dituju.
+ */
+function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
+  const [semua, setSemua] = useState(false)
+  if (!baris.length) return null
+  const tampil = semua ? baris : baris.slice(0, 6)
+  return (
+    <section>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Rincian tubuh</h2>
+        <span className="t-mikro text-neutral-400">{baris.length} angka tercatat</span>
+      </div>
+      <div className="kaca overflow-hidden rounded-3xl">
+        {tampil.map((b, i) => (
+          <Link
+            key={b.kunci}
+            to={b.ke}
+            className={`flex min-h-[48px] items-center justify-between gap-2 px-3 py-2 transition active:bg-neutral-100 dark:active:bg-white/10 ${
+              i > 0 ? 'border-t border-neutral-100 dark:border-white/10' : ''
+            }`}
+          >
+            <span className="t-kecil min-w-0 truncate font-semibold text-neutral-600 dark:text-neutral-300">{b.label}</span>
+            <span className="flex shrink-0 items-baseline gap-1">
+              <span className="t-sedang font-black tabular-nums text-ink dark:text-white">{b.nilai}</span>
+              <span className="t-mikro font-bold text-neutral-400">{b.satuan}</span>
+              <span aria-hidden className="t-kecil text-neutral-300 dark:text-neutral-600">›</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+      {baris.length > 6 && (
+        <button onClick={() => setSemua((v) => !v)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
+          {semua ? 'Ringkas ▲' : `Lihat ${baris.length - 6} angka lainnya ▼`}
+        </button>
+      )}
+      {/* Peringatan ini menemani angkanya di mana pun ia muncul: satu bacaan
+          bukan penilaian, dan halaman rentang rujukanlah yang punya ruang untuk
+          menyebut populasi pembanding serta ragam hariannya. */}
+      <p className="t-mikro mt-1 leading-snug text-neutral-400">
+        Angka apa adanya dari perangkat Anda. Satu bacaan bukan diagnosis — ketuk untuk melihat rentang rujukannya.
+      </p>
+    </section>
+  )
+}
+
+/**
  * Papan widget.
  *
  * DUA LAPIS, DAN PEMISAHANNYA DISENGAJA. Lapis pertama berisi angka keadaan
@@ -306,6 +363,11 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   // sebuah ubin tidak berpindah-pindah dan tetap dapat dihafal tangannya.
   const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id))
 
+  // Tekanan darah didahulukan karena ia satu-satunya baris berisi dua angka,
+  // dan menaruhnya di tengah daftar memutus keselarasan kolom angkanya.
+  const td = barisTekananDarah()
+  const rincian = td ? [td, ...rincianBeranda()] : rincianBeranda()
+
   return (
     <>
     <section>
@@ -317,6 +379,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         <UbinKlinis />
       </div>
     </section>
+
+    <DaftarRincian baris={rincian} />
 
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
