@@ -5,6 +5,9 @@ import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
 import { WIDGETS, ambilWidget } from '../lib/homeWidgets'
 import { PemilihWidget } from './PemilihWidget'
 import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rincianBeranda'
+import { bilahTersedia } from '../lib/bilahRujukan'
+import { BilahTubuh } from './BilahTubuh'
+import { getVitals } from '../lib/healthVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan widget beranda — bentuk ubin seperti di layar utama telepon.
@@ -383,6 +386,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   // dan menaruhnya di tengah daftar memutus keselarasan kolom angkanya.
   const td = barisTekananDarah()
   const rincian = td ? [td, ...rincianBeranda()] : rincianBeranda()
+  const bilah = bilahTersedia(getVitals() as Record<string, unknown>)
 
   return (
     <>
@@ -395,6 +399,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         <UbinKlinis />
       </div>
     </section>
+
+    <BilahTubuh daftar={bilah} />
 
     <DaftarRincian baris={rincian} />
 
