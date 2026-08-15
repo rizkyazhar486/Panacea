@@ -85,16 +85,86 @@ function UbinKosong({ ke, judul }: { ke: string; judul: string; garis?: string }
   )
 }
 
+/**
+ * Grafik garis kecil di dalam ubin.
+ *
+ * SUMBUNYA TIDAK PERNAH DIPOTONG PADA NOL YANG PALSU. Grafik kecil memakai
+ * seluruh tinggi yang ada untuk rentang datanya sendiri, dan itu memang
+ * membesar-besarkan perubahan kecil — karena itu ia TIDAK BOLEH berdiri
+ * sendirian sebagai bukti. Ia selalu ditemani angka sebenarnya di sebelahnya
+ * dan keterangan jangkanya, sehingga yang dibaca dari garis ini hanyalah
+ * BENTUK perjalanannya, bukan besarnya.
+ *
+ * Tanpa sumbu, tanpa kisi, tanpa label: pada lebar sekitar 70 px semuanya tidak
+ * terbaca dan hanya menambah coretan.
+ */
+function GarisKecil({ deret, kelas }: { deret: number[]; kelas: string }) {
+  if (deret.length < 2) return null
+  const min = Math.min(...deret)
+  const maks = Math.max(...deret)
+  const rentang = maks - min || 1
+  const titik = deret
+    .map((v, i) => `${(i / (deret.length - 1)) * 68 + 1},${18 - ((v - min) / rentang) * 16}`)
+    .join(' ')
+  return (
+    <svg viewBox="0 0 70 20" preserveAspectRatio="none" fill="none" className={`h-5 w-full ${kelas}`} aria-hidden="true">
+      <polyline
+        points={titik}
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  )
+}
+
+/**
+ * Penanda tren.
+ *
+ * TANPA WARNA HIJAU-MERAH, dan ini keputusan yang disengaja. Aplikasi yang
+ * menjadi rujukan bentuk ini mewarnai panah naik hijau dan panah turun merah,
+ * seolah arah perubahan sudah cukup untuk menilai. Pada berat badan, turun
+ * belum tentu baik; pada denyut istirahat, naik belum tentu buruk; pada jam
+ * tidur, keduanya bergantung pada dari berapa. Yang ditampilkan di sini
+ * hanyalah ARAH dan BESARNYA, beserta jangka waktunya — penilaiannya ada di
+ * halaman yang punya ruang untuk mempertanggungjawabkannya.
+ */
+function Tren({ persen, jangka }: { persen: number; jangka: string }) {
+  // Jangka waktunya WAJIB ikut, bukan pelengkap: "naik 5%" tanpa keterangan
+  // atas berapa lama tidak berarti apa-apa, dan pembaca akan mengiranya
+  // perubahan sejak kemarin.
+  return (
+    <span className="t-mikro whitespace-nowrap font-bold text-neutral-400" title={`Dibanding awal ${jangka} terakhir`}>
+      {persen === 0 ? 'tetap' : <><span aria-hidden>{persen > 0 ? '↑' : '↓'}</span>{Math.abs(persen)}%</>}
+      {' '}/{jangka.replace(' hari', 'h').replace(' malam', 'm')}
+    </span>
+  )
+}
+
 function UbinAngka({ p }: { p: Pratinjau }) {
   if (p.nilai === '') return <UbinKosong ke={p.ke} judul={p.wilayah} garis={p.garis} />
   return (
     <Ubin ke={p.ke} judul={p.wilayah} tanda={p.umur}>
-      <div className="flex items-baseline gap-1">
+      {/* Tren duduk SEBARIS dengan angkanya, bukan di bawah kalimat.
+          Percobaan pertama menaruhnya bersebelahan dengan kalimat penjelas, dan
+          pada ubin selebar 159 px keduanya tidak muat: kalimatnya terpotong di
+          tengah kata dan trennya membungkus menjadi dua baris. Angka, satuan,
+          dan trennya adalah satu kesatuan yang dibaca sekali sapu — merekatkan
+          ketiganya juga membuat jelas bahwa persennya menerangkan angka itu,
+          bukan menerangkan kalimat di bawahnya. */}
+      <div className="flex flex-wrap items-baseline gap-x-1">
         <span className={`${p.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} min-w-0 font-black leading-none tabular-nums ${p.nada}`}>
           {p.nilai}
         </span>
         {p.satuan && <span className="t-mikro min-w-0 truncate font-bold text-neutral-400">{p.satuan}</span>}
+        {p.tren && <Tren persen={p.tren.persen} jangka={p.tren.jangka} />}
       </div>
+      {/* Garis hanya muncul bila riwayatnya cukup — lihat CUKUP_TITIK di
+          pratinjauBeranda.ts. Dua pengukuran hanya dapat berbeda, tidak dapat
+          menunjukkan arah. */}
+      {p.deret && p.deret.length >= 2 && <GarisKecil deret={p.deret} kelas={p.nada} />}
       <p className="t-kecil leading-snug text-neutral-500 dark:text-neutral-400">{p.garis}</p>
     </Ubin>
   )

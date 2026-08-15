@@ -48,6 +48,55 @@ export interface Pratinjau {
   /** Umur data, bila layak disebut. Lihat aturan 2. */
   umur?: string
   nada: string
+  /**
+   * Deret nilai terakhir untuk grafik kecil — TERLAMA di depan, terbaru di
+   * belakang. Kosong bila riwayatnya kurang dari dua titik.
+   *
+   * ATURAN KEEMPAT, LAHIR DARI GRAFIK INI. Grafik kecil sangat mudah
+   * berbohong: dua titik sudah cukup menggambar garis yang terlihat seperti
+   * kecenderungan, padahal dua pengukuran hanya dapat berbeda, tidak dapat
+   * menunjukkan arah. Karena itu garisnya baru digambar pada MINIMAL EMPAT
+   * titik, dan sumbunya tidak pernah dipotong — grafik yang dasarnya bukan nol
+   * membesar-besarkan perubahan kecil, dan itu persis cara grafik dipakai untuk
+   * menakut-nakuti.
+   */
+  deret?: number[]
+  /**
+   * Selisih terhadap awal deret, dalam persen, beserta jangkanya. Hanya diisi
+   * bila deretnya cukup panjang. Naik atau turun DITAMPILKAN APA ADANYA tanpa
+   * warna hijau-merah: pada berat badan turun belum tentu baik, pada denyut
+   * istirahat naik belum tentu buruk, dan ubin sekecil ini tidak punya ruang
+   * untuk mempertanggungjawabkan penilaian semacam itu (aturan 3).
+   */
+  tren?: { persen: number; jangka: string }
+}
+
+const CUKUP_TITIK = 4
+
+/**
+ * Bangun deret dan trennya dari pasangan tanggal-nilai.
+ *
+ * Satu nilai per hari (yang terakhir pada hari itu), diurutkan menaik, dan
+ * dipotong pada `maks` hari terakhir. Mengembalikan undefined bila titiknya
+ * kurang dari empat — lihat alasannya pada medan `deret`.
+ */
+function bangunDeret(
+  titik: { tanggal: string; nilai: number }[],
+  jangka: string,
+  maks = 14,
+): { deret?: number[]; tren?: { persen: number; jangka: string } } {
+  const perHari = new Map<string, number>()
+  for (const t of titik) {
+    if (!t.tanggal || typeof t.nilai !== 'number' || !Number.isFinite(t.nilai)) continue
+    perHari.set(t.tanggal, t.nilai)
+  }
+  const urut = [...perHari.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).slice(-maks)
+  if (urut.length < CUKUP_TITIK) return {}
+  const deret = urut.map(([, v]) => v)
+  const awal = deret[0]
+  const akhir = deret[deret.length - 1]
+  if (!awal) return { deret }
+  return { deret, tren: { persen: Math.round(((akhir - awal) / awal) * 100), jangka } }
 }
 
 const HARI = 86400_000
@@ -140,10 +189,16 @@ function pratinjauGizi(foods: FoodEntry[], sekarang: number): Pratinjau {
     }
   }
   const porsi = foods.filter((f) => f.date === hariIni).length
+  // Kalori DIJUMLAHKAN per hari lebih dahulu; memakai tiap catatan sebagai satu
+  // titik akan menggambar garis yang naik-turun mengikuti jam makan, bukan
+  // mengikuti asupan hariannya.
+  const perHari = new Map<string, number>()
+  for (const f of foods) if (f.date) perHari.set(f.date, (perHari.get(f.date) ?? 0) + (f.kcal || 0))
   return {
     id: 'gizi', wilayah: 'Gizi', ke: '/nutrition', nilai: String(Math.round(kcal)), satuan: 'kkal',
     garis: `Dari ${porsi} catatan hari ini.`,
     nada: 'text-amber-600 dark:text-amber-400',
+    ...bangunDeret([...perHari.entries()].map(([tanggal, nilai]) => ({ tanggal, nilai })), '14 hari'),
   }
 }
 
@@ -166,6 +221,7 @@ function pratinjauTidur(logs: SleepLog[], sekarang: number): Pratinjau {
     garis: urut.length > 1 ? `Catatan terakhir dari ${urut.length} malam.` : 'Catatan pertama Anda.',
     umur: umurKata(hari),
     nada: 'text-indigo-600 dark:text-indigo-400',
+    ...bangunDeret(logs.map((l) => ({ tanggal: l.date, nilai: l.hours as number })), '14 malam'),
   }
 }
 
