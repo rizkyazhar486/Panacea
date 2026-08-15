@@ -18,7 +18,11 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
     return SKDI_ENTRIES.filter((e) => {
       if (system && e.system !== system) return false
       if (!q) return true
-      return `${e.diagnosis} ${e.classification ?? ''} ${e.therapy} ${e.system}`.toLowerCase().includes(q)
+      // Sinonim ikut dicari: yang diketik orang adalah singkatan yang dipakai
+      // di stasiun ("UAP", "GNAPS", "BV"), bukan nama panjang di daftar SKDI.
+      return `${e.diagnosis} ${e.classification ?? ''} ${e.therapy} ${e.system} ${(e.sinonim ?? []).join(' ')}`
+        .toLowerCase()
+        .includes(q)
     })
   }, [query, system])
 
