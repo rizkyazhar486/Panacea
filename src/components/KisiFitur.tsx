@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { WIDGETS } from '../lib/homeWidgets'
 
@@ -92,6 +92,26 @@ function Bagian({ kategori, daftar }: { kategori: string; daftar: typeof WIDGETS
  * tetapi hilang dari kisi, tanpa ada yang menyadarinya.
  */
 export function KisiFitur() {
+  const [pilih, setPilih] = useState<string | null>(null)
+  const [cari, setCari] = useState('')
+  const [cariBuka, setCariBuka] = useState(false)
+  const wadah = useRef<HTMLDivElement>(null)
+  const kotak = useRef<HTMLInputElement>(null)
+
+  // Pencarian mendahului penyaringan kelompok: begitu ada yang diketik,
+  // kepingnya tidak lagi menentukan apa pun, dan membiarkannya tampak aktif
+  // sementara hasilnya berasal dari seluruh katalog akan menyesatkan.
+  const kunci = cari.trim().toLowerCase()
+  const cocok = useMemo(
+    () =>
+      kunci
+        ? WIDGETS.filter((w) =>
+            `${w.label} ${w.ringkas} ${w.kategori}`.toLowerCase().includes(kunci),
+          )
+        : [],
+    [kunci],
+  )
+
   const kelompok = useMemo(() => {
     const peta = new Map<string, typeof WIDGETS>()
     for (const w of WIDGETS) {
@@ -101,40 +121,154 @@ export function KisiFitur() {
     return [...peta.entries()]
   }, [])
 
-  const [pilih, setPilih] = useState<string | null>(null)
-  const wadah = useRef<HTMLDivElement>(null)
-
   const terlihat = pilih ? kelompok.filter(([k]) => k === pilih) : kelompok
+
+  useEffect(() => { if (cariBuka) kotak.current?.focus() }, [cariBuka])
+
+  // Letak penanda diukur dari keping yang sedang terpilih, bukan dihitung dari
+  // lebar tetap: label kelompok panjangnya berbeda-beda dan angka jumlahnya pun
+  // ikut melebarkan, jadi lebar yang ditebak akan selalu meleset pada sebagian.
+  const keping = useRef<(HTMLButtonElement | null)[]>([])
+  const [penanda, setPenanda] = useState({ kiri: 0, lebar: 0, tinggi: 40 })
+
+  const nomorAktif = pilih === null ? 0 : kelompok.findIndex(([k]) => k === pilih) + 1
+
+  useLayoutEffect(() => {
+    if (kunci) return // keping tidak ditampilkan saat sedang mencari
+    const el = keping.current[nomorAktif]
+    if (!el) return
+    setPenanda({ kiri: el.offsetLeft, lebar: el.offsetWidth, tinggi: el.offsetHeight })
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+  }, [nomorAktif, kunci])
 
   return (
     <section className="j-grup">
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Semua fitur</h2>
-        <Link to="/semua-fitur" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Daftar lengkap →
-        </Link>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="t-kecil shrink-0 font-black uppercase tracking-wide text-neutral-500">Semua fitur</h2>
+
+        {/* Kotak cari yang MEMANJANG saat diketuk, bukan kotak yang selalu
+            terbentang. Dalam keadaan tertutup ia satu lambang 40 px, sehingga
+            "Daftar lengkap" tetap muat di sebelahnya pada layar 390 px; saat
+            dibuka ia mengambil seluruh baris, karena kotak ketik selebar 120 px
+            hanya memperlihatkan tiga huruf dan membuat orang mengetik tanpa
+            dapat memeriksa apa yang sudah diketiknya.
+
+            MENGAPA ADA PENCARIAN DI SINI padahal bilah judul sudah punya. Kisi
+            ini memuat 115 fitur dalam sepuluh kelompok; menemukan satu di
+            antaranya lewat keping penyaring menuntut menebak kelompoknya dulu,
+            dan tebakan itu sering meleset — "Gizi" ada di kelompok yang tidak
+            selalu terduga. Mengetik tiga huruf melewati seluruh tebakan itu. */}
+        <div className={`flex min-w-0 items-center gap-2 ${cariBuka ? 'flex-1' : ''}`}>
+          {cariBuka ? (
+            <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-brand/30 bg-white px-3 dark:bg-white/10">
+              <span aria-hidden className="text-neutral-400">⌕</span>
+              <input
+                ref={kotak}
+                value={cari}
+                onChange={(e) => setCari(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') { setCari(''); setCariBuka(false) } }}
+                placeholder={`Cari di ${WIDGETS.length} fitur`}
+                aria-label="Cari fitur"
+                className="t-kecil min-h-[40px] w-full min-w-0 bg-transparent font-semibold text-ink outline-none dark:text-white"
+              />
+              <button
+                onClick={() => { setCari(''); setCariBuka(false) }}
+                aria-label="Tutup pencarian"
+                className="grid h-10 w-8 shrink-0 place-items-center text-lg leading-none text-neutral-400"
+              >
+                ×
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => setCariBuka(true)}
+                aria-label="Cari fitur"
+                aria-expanded={false}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-100 text-neutral-600 transition-transform duration-200 hover:scale-105 dark:bg-white/10 dark:text-neutral-300"
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
+                </svg>
+              </button>
+              <Link to="/semua-fitur" className="t-kecil flex min-h-[40px] shrink-0 items-center font-bold text-brand">
+                Daftar lengkap →
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Keping penyaring. Memakai .geser-aman supaya gerakan menyamping tidak
-          bertabrakan dengan gerakan kembali milik sistem di tepi layar. */}
-      <div className="geser-aman" ref={wadah}>
+      {/* Hasil pencarian menggantikan keping dan kelompoknya sekaligus.
+          Menampilkan hasil DI ATAS kelompok yang tetap terpampang membuat dua
+          kisi berisi lambang serupa berdiri berdampingan, dan tidak ada cara
+          bagi pembacanya menebak mana yang menjawab ketikannya. */}
+      {kunci ? (
+        cocok.length ? (
+          <div className="rounded-3xl bg-white p-3 dark:bg-white/5">
+            <p className="t-mikro mb-2 font-bold text-neutral-500">
+              {cocok.length} fitur cocok dengan "{cari.trim()}"
+            </p>
+            <div className="grid grid-cols-4 gap-1">
+              {cocok.map((w) => <Lambang key={w.id} w={w} />)}
+            </div>
+          </div>
+        ) : (
+          <p className="t-kecil rounded-3xl bg-white px-3 py-4 text-center leading-snug text-neutral-500 dark:bg-white/5">
+            Tidak ada fitur yang cocok dengan "{cari.trim()}". Coba kata yang lebih pendek.
+          </p>
+        )
+      ) : (
+        <>
+
+      {/* Keping penyaring dengan PENANDA YANG BERPINDAH.
+
+          Sebelumnya tiap keping sekadar berganti warna sendiri-sendiri, dan
+          perpindahan yang tidak dapat diikuti mata membuat deret sepanjang
+          sebelas keping terasa berkedip: yang terlihat hanyalah "sesuatu di
+          tempat lain kini hijau". Satu penanda tunggal yang meluncur dari
+          keping lama ke keping baru menunjukkan hubungan keduanya, dan itulah
+          seluruh gunanya.
+
+          KEPING TERPILIH DIGULIRKAN KE DALAM PANDANGAN. Pada sebelas keping,
+          keping kesembilan berada di luar layar setelah halaman digulirkan;
+          tanpa ini, mengetuknya lalu menggulir turun membuat penyaring yang
+          sedang aktif tidak terlihat sama sekali.
+
+          Memakai .geser-aman supaya gerakan menyamping tidak bertabrakan
+          dengan gerakan kembali milik sistem di tepi layar. */}
+      <div className="geser-aman relative" ref={wadah}>
+        {/* Penanda: satu-satunya bagian yang berwarna merek. Berada DI BELAKANG
+            keping (z-0 terhadap keping z-10) supaya tulisannya tidak tertutup. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-[2px] z-0 rounded-full bg-brand transition-[transform,width] duration-300 ease-out"
+          style={{
+            width: penanda.lebar,
+            height: penanda.tinggi,
+            transform: `translateX(${penanda.kiri}px)`,
+            opacity: penanda.lebar ? 1 : 0,
+          }}
+        />
         <button
+          ref={(el) => { keping.current[0] = el }}
           onClick={() => setPilih(null)}
           aria-pressed={pilih === null}
-          className={`t-kecil flex min-h-[40px] items-center rounded-full px-4 font-bold transition ${
-            pilih === null ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+          className={`t-kecil relative z-10 flex min-h-[40px] items-center rounded-full px-4 font-bold transition-colors ${
+            pilih === null ? 'text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
           }`}
           style={{ width: 'auto' }}
         >
           Semua
         </button>
-        {kelompok.map(([k, d]) => (
+        {kelompok.map(([k, d], i) => (
           <button
             key={k}
+            ref={(el) => { keping.current[i + 1] = el }}
             onClick={() => setPilih(pilih === k ? null : k)}
             aria-pressed={pilih === k}
-            className={`t-kecil flex min-h-[40px] items-center whitespace-nowrap rounded-full px-4 font-bold transition ${
-              pilih === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
+            className={`t-kecil relative z-10 flex min-h-[40px] items-center whitespace-nowrap rounded-full px-4 font-bold transition-colors ${
+              pilih === k ? 'text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'
             }`}
             style={{ width: 'auto' }}
           >
@@ -146,6 +280,8 @@ export function KisiFitur() {
       <div className="j-grup">
         {terlihat.map(([k, d]) => <Bagian key={k} kategori={k} daftar={d} />)}
       </div>
+        </>
+      )}
     </section>
   )
 }
