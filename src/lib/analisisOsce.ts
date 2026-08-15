@@ -71,6 +71,14 @@ const EJAAN: [RegExp, string][] = [
   [/\boa\b/g, 'osteoarthritis'],
   [/\bsle\b/g, 'systemic lupus erythematosus'],
   [/\bhpp\b/g, 'perdarahan pascapersalinan'],
+  // Singkatan yang menjadi NAMA RESMI penyakitnya di daftar SKDI. Tanpa
+  // penerjemahan ini, alat pencari catatan melaporkan "PTSD 0/8" padahal
+  // entrinya ada dengan nama panjang — dan daftar kerja yang mengatakan sesuatu
+  // belum dikerjakan padahal sudah, membuatnya dikerjakan dua kali.
+  [/\bptsd\b/g, 'post traumatic stress disorder'],
+  [/\btth\b/g, 'tension type headache'],
+  [/\bcorpal\b/g, 'corpus alienum'],
+  [/\bkorpal\b/g, 'corpus alienum'],
   [/\bkdk?\b/g, 'kejang demam'],
   [/\brme\b/g, ''],
   [/\bga\b/g, ''],
