@@ -153,14 +153,6 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
       </header>
 
-      {/* ── SCROLL-CINEMATIC OVERTURE ───────────────────────────
-          Scroll-driven sequence (sunrise → vitalitas → sains → longevity)
-          — the live implementation of the earlier Remotion concept video.
-          Pinned via `sticky` over a 400vh track so each act gets its own
-          scroll "chapter" instead of racing past in a few frames. */}
-      <ScrollCinematicStyles />
-      <ScrollCinematic />
-
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden px-4 py-16 sm:px-8 sm:py-28">
         {/* Cinematic brand film (Higgsfield) behind the hero, softened by a
@@ -257,6 +249,26 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
         </div>
       </section>
 
+      {/* ── SCROLL-CINEMATIC OVERTURE, SESUDAH HERO ─────────────
+          Urutan ini DIBALIK, dan itu perbaikan yang paling menentukan pada
+          halaman ini.
+
+          Sebelumnya sinematik berdiri paling atas dan menempati jalur setinggi
+          400vh — empat layar penuh. Akibatnya pengunjung baru mendarat di
+          bidang hijau berisi satu judul melayang, tanpa satu pun kalimat yang
+          menjelaskan ini aplikasi apa dan tanpa tombol selain "Sign In" di
+          pojok. Seluruh isi yang meyakinkan — judul, kalimat penjelas, tombol
+          daftar, angka, dan lencana kepercayaan — berada sekitar 3.400 px di
+          bawahnya. Orang yang datang dari tautan lalu menggulir sekali dan
+          masih melihat hijau kosong akan menutup halamannya, dan ia tidak
+          keliru: tidak ada yang ditawarkan kepadanya di sana.
+
+          Sinematiknya TIDAK DIHAPUS. Ia tetap utuh, hanya tidak lagi menjadi
+          pintu tol: yang ingin melihatnya tinggal menggulir, yang datang untuk
+          mendaftar sudah menemukan tombolnya di layar pertama. */}
+      <ScrollCinematicStyles />
+      <ScrollCinematic />
+
            {/* Marquee strip */}
       <style>{`#panacea-track{animation:panaceaGo 45s linear infinite!important}@keyframes panaceaGo{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}`}</style>
       <div className="relative overflow-hidden border-y border-black/5 bg-white/40 py-5 backdrop-blur">
@@ -316,9 +328,34 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {/* DEK YANG DAPAT DIGESER DI TELEPON, kisi di layar lebar.
+            Keenam kartu ini masing-masing memuat satu paragraf penuh; ditumpuk
+            menurun pada layar 390 px keenamnya menjadi kolom setinggi lebih
+            dari empat layar, dan pembaca harus melewati seluruh isinya untuk
+            sampai ke bagian berikutnya. Sebagai dek, keenamnya menempati satu
+            layar dan yang tidak diminati cukup dilewati dengan satu geseran.
+
+            Kartu berikutnya sengaja MENGINTIP di tepi kanan: dek yang kartunya
+            pas selebar layar tidak memberi tanda apa pun bahwa masih ada yang
+            lain di sebelahnya, dan yang tidak tampak tidak pernah digeser.
+
+            INTIPAN SAJA TIDAK CUKUP DI SINI, dan itu baru ketahuan dari
+            tangkapan layarnya. Kartunya berlatar kaca putih di atas bagian yang
+            juga putih, sehingga tepi kartu kedua yang mengintip tidak
+            menghasilkan garis yang terlihat — petunjuknya ada secara geometri
+            tetapi tidak ada secara penglihatan. Karena itu jumlah sisanya
+            ditulis sebagai kalimat, hanya pada layar sempit tempat deknya
+            memang berlaku.
+
+            Lebarnya 74vw, bukan cqw. Percobaan pertama memakai 78cqw dan
+            hasilnya 300 px karena tidak ada leluhur ber-container-type di
+            cabang ini sehingga cqw jatuh ke batas max-w — kartu kedua mulai di
+            412 px, yakni di luar layar 390 px, dan intipan yang seluruh
+            gunanya menandakan "masih ada lagi" tidak pernah terjadi. Terukur
+            ulang: kartu kedua kini mulai sebelum tepi kanan. */}
+        <div className="geser-aman mt-12 sm:!m-0 sm:grid sm:gap-5 sm:overflow-visible lg:grid-cols-3 sm:grid-cols-2">
           {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={(i % 3) * 90}>
+            <Reveal key={f.title} delay={(i % 3) * 90} className="w-[74vw] max-w-[300px] sm:w-auto sm:max-w-none">
               <div role="button" tabIndex={0} onClick={onMasuk} onKeyDown={(e) => e.key === 'Enter' && onMasuk()}
                 className="liquid-glass group relative h-full cursor-pointer overflow-hidden rounded-2xl p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-[0_18px_40px_rgba(0,191,99,0.16)]">
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition group-hover:bg-brand/20" />
@@ -336,6 +373,9 @@ export function Landing({ onMasuk }: { onMasuk: () => void }) {
             </Reveal>
           ))}
         </div>
+        <p className="mt-3 text-center text-xs font-semibold text-neutral-500 sm:hidden">
+          Geser untuk {FEATURES.length - 1} fitur lainnya →
+        </p>
       </section>
 
       {/* ── ROLES ────────────────────────────────────────────── */}
