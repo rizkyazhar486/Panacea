@@ -1079,3 +1079,20 @@ html { -webkit-overflow-scrolling: touch; }
 @layer components {
   .t-angka-panjang { font-size: clamp(16px, 11.59px + 1.379cqw, 24px); }
 }
+
+/* Permukaan pastel PECAHAN yang dipakai bersama varian dark:.
+   Keduanya berada di lapisan utilitas dengan kekhususan yang sama, sehingga
+   yang menang ditentukan urutan penulisan — dan pada kotak peringatan amber,
+   yang menang justru versi terangnya. Terukur di mode gelap: tulisan kuning
+   di atas latar cokelat muda, 1,4:1. Aturan tanpa lapisan di bawah ini
+   menyelesaikannya tanpa perlu menyunting tiap tempat pemakaian. */
+.dark .bg-amber-50\/40,
+.dark .bg-amber-50\/60,
+.dark .bg-amber-50\/70 { background-color: rgba(245, 158, 11, 0.12) !important; }
+.dark .bg-emerald-50\/60 { background-color: rgba(16, 185, 129, 0.12) !important; }
+.dark .bg-green-50\/50 { background-color: rgba(34, 197, 94, 0.12) !important; }
+.dark .bg-red-50\/40,
+.dark .bg-red-50\/50,
+.dark .bg-red-50\/60 { background-color: rgba(239, 68, 68, 0.12) !important; }
+.dark .bg-rose-50\/60 { background-color: rgba(244, 63, 94, 0.12) !important; }
+.dark .bg-violet-50\/60 { background-color: rgba(139, 92, 246, 0.12) !important; }

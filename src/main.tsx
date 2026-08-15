@@ -11,6 +11,7 @@ import { RangkaHalaman } from './components/Rangka'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { AppStatus } from './components/AppStatus'
 import { OfflineBanner } from './components/OfflineBanner'
+const OsceUkmppd = lazy(() => import('./pages/OsceUkmppd').then((m) => ({ default: m.OsceUkmppd })))
 const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })))
 const NotFound = lazy(() => import('./pages/NotFound').then((m) => ({ default: m.NotFound })))
 const Chatbot = lazy(() => import('./pages/Chatbot').then((m) => ({ default: m.Chatbot })))
@@ -288,6 +289,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/clinical-calculators" element={<ClinicalCalculators />} />
               <Route path="/longevity-curriculum" element={<LongevityCurriculum />} />
               <Route path="/med-study" element={<MedStudyHub />} />
+              <Route path="/osce-ukmppd" element={<OsceUkmppd />} />
               <Route path="/supplements" element={<DietarySupplements />} />
               <Route path="/aesthetic" element={<AestheticVitality />} />
               <Route path="/evidence" element={<ClinicalEvidence />} />

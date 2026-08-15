@@ -112,6 +112,7 @@ const nav: Nav[] = [
   { to: '/emergency', label: 'Darurat & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   // Klinis
   { to: '/med-study', label: 'Belajar Kedokteran', icon: IconBook, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
+  { to: '/osce-ukmppd', label: 'Stasiun OSCE UKMPPD', icon: IconStethoscope, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/clinical-calculators', label: 'Kalkulator Klinis', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/drug-info', label: 'Obat & Resep', icon: IconPill, roles: ['pasien', 'dokter', 'owner'], group: 'Clinical & AI' },
   { to: '/emr', label: 'Rekam Medis', icon: IconEMR, roles: ['dokter', 'owner'], group: 'Clinical & AI' },

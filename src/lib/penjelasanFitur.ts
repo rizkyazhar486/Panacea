@@ -44,6 +44,7 @@ export const PENJELASAN_FITUR: Record<string, string> = {
 
   // ── Belajar & materi ──
   '/med-study': 'Bank soal, kasus OSCE, catatan penyakit, dan jembatan keledai untuk ujian',
+  '/osce-ukmppd': 'Lihat kasus apa saja yang pernah keluar di ujian OSCE sejak 2016.',
   '/education': 'Materi belajar kesehatan untuk umum, bukan untuk ujian kedokteran',
   '/drug-info': 'Cari obat: kegunaan, dosis, efek samping, dan pantangannya',
   '/my-materials': 'Materi yang Anda tulis maupun simpan sendiri',
