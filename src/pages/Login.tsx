@@ -63,6 +63,8 @@ function Collapse({ title, children }: { title: string; children: React.ReactNod
 export function Login({ onBack }: { onBack?: () => void }) {
   const { login, sendEmail, state } = useStore()
   const [role, setRole] = useState<Role>('pasien')
+  /** Pemilih peran hanya muncul bila diminta. Lihat catatan "Peran" di bawah. */
+  const [pilihPeran, setPilihPeran] = useState(false)
   const [f, setF] = useState({
     email: '', name: '', sex: 'L' as 'L' | 'P', dob: '',
     occupation: '', background: '',
@@ -197,24 +199,42 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
         <div className="w-full max-w-md space-y-5">
           <div className="lg:hidden"><Wordmark size={34} /></div>
-          {onBack && <button onClick={onBack} className="text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Back</button>}
+          {onBack && <button onClick={onBack} className="inline-flex min-h-[44px] items-center text-sm font-semibold text-neutral-500 hover:text-brand-dark">← Kembali</button>}
 
           <div>
-            <h2 className="text-2xl font-extrabold">Sign In</h2>
-            <p className="mt-1 text-sm text-neutral-500">Choose your role, then sign in.</p>
+            <h2 className="text-2xl font-extrabold">Masuk atau daftar</h2>
+            <p className="mt-1 text-sm text-neutral-500">Cukup email dan nama. Selebihnya bisa menyusul.</p>
           </div>
 
-          {/* ── Role pills ─────────────────────── */}
-          <div className="grid grid-cols-3 gap-2">
-            {ROLES.map(r => (
-              <button key={r.id} onClick={() => setRole(r.id)}
-                className={`rounded-xl border px-2 py-2.5 text-center text-[11px] font-bold leading-tight transition
-                  ${role === r.id ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'}`}>
-                {r.title.split(' (')[0]}
-              </button>
-            ))}
-          </div>
-          <p className="-mt-3 text-[11px] leading-relaxed text-neutral-500">{cur.desc}</p>
+          {/* ── Peran ──────────────────────────────────────────────────────
+              Pemilih peran DISEMBUNYIKAN sampai diminta, dan bawaannya pasien.
+
+              Sebelumnya enam peran dipajang lebih dahulu, sehingga layar
+              pertama aplikasi kesehatan menuntut orang memilih jati dirinya
+              di antara enam istilah -- "kontributor", "verifikator" -- yang
+              tidak berarti apa-apa bagi orang yang sekadar ingin mencatat
+              tekanan darahnya. Hampir semua pemakai adalah pasien; yang bukan
+              pasien tahu persis bahwa dirinya bukan, dan mereka justru yang
+              paling mudah menemukan satu tautan. */}
+          {pilihPeran ? (
+            <div className="space-y-2">
+              <div className="grid grid-cols-3 gap-2">
+                {ROLES.map(r => (
+                  <button key={r.id} onClick={() => setRole(r.id)}
+                    className={`min-h-[44px] rounded-xl border px-2 text-center text-[11px] font-bold leading-tight transition
+                      ${role === r.id ? 'border-brand bg-brand-50 text-brand-dark' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'}`}>
+                    {r.title.split(' (')[0]}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] leading-relaxed text-neutral-500">{cur.desc}</p>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setPilihPeran(true)}
+              className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-dashed border-neutral-300 px-3 text-[12px] font-bold text-neutral-500 transition hover:border-brand hover:text-brand-dark">
+              Saya dokter, penulis, atau verifikator →
+            </button>
+          )}
 
           {/* ── Quick login ────────────────────── */}
           {health?.googleClientId
@@ -233,10 +253,23 @@ export function Login({ onBack }: { onBack?: () => void }) {
           <label className="flex cursor-pointer items-start gap-2 rounded-xl bg-neutral-50 p-3 text-[12px] leading-snug text-neutral-600">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
               className="mt-0.5 h-4 w-4 shrink-0 accent-[#00BF63]" />
-            <span>I agree to the{' '}
+            <span>Saya setuju dengan{' '}
+              {/* Sengaja tetap sebesar barisnya: ini tautan DI DALAM kalimat,
+                  dan membesarkannya menjadi 44 px akan merusak paragraf yang
+                  memuatnya. */}
+              {/* Tombol TIDAK DAPAT dibuat display:inline. Baik lewat kelas
+                  maupun lewat gaya sebaris, peramban tetap melaporkannya
+                  inline-block: kendali formulir adalah kotak inline atomik dan
+                  dijadikan blok oleh peramban. Diukur, bukan diduga — dua
+                  percobaan menyetelnya gagal berturut-turut.
+
+                  Karena itu pemeriksa sasaran sentuh tidak boleh memakai
+                  "display === inline" sebagai tanda tautan dalam kalimat; yang
+                  dipakai adalah apakah ia duduk di dalam kalimat yang lebih
+                  panjang daripada dirinya sendiri. */}
               <button type="button" onClick={() => setShowLegal(true)}
-                className="font-bold text-brand-dark underline">Terms & Privacy Policy</button>.
-              AI is supportive in nature, not a replacement for a doctor.</span>
+                className="font-bold text-brand-dark underline">Syarat & Kebijakan Privasi</button>.
+              AI bersifat membantu, bukan pengganti dokter.</span>
           </label>
 
           {error && <p className="text-xs text-accent">{error}</p>}
@@ -247,7 +280,7 @@ export function Login({ onBack }: { onBack?: () => void }) {
           )}
 
           <div className="flex items-center gap-3 text-xs text-neutral-500">
-            <span className="h-px flex-1 bg-neutral-200" /> or fill in manually <span className="h-px flex-1 bg-neutral-200" />
+            <span className="h-px flex-1 bg-neutral-200" /> atau isi sendiri <span className="h-px flex-1 bg-neutral-200" />
           </div>
 
           {/* ── Adaptive form fields ───────────── */}
@@ -256,30 +289,43 @@ export function Login({ onBack }: { onBack?: () => void }) {
               <input className={inputClass} value={f.email}
                 onChange={e => setF(p => ({ ...p, email: e.target.value }))} type="email" />
             </Field>
-            <Field label="Full Name">
+            <Field label="Nama">
               <input className={inputClass} value={f.name}
-                onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Your full name" />
+                onChange={e => setF(p => ({ ...p, name: e.target.value }))} placeholder="Nama Anda" />
             </Field>
 
-            {/* Demographics — only for pasien & clinical */}
+            {/* Jenis kelamin dan tanggal lahir — DIMINTA, BUKAN DIWAJIBKAN.
+                Keduanya benar-benar dipakai, dan karena itu SEBABNYA ditulis
+                di sini alih-alih dibiarkan sebagai dua kotak tanpa keterangan.
+                Formulir yang meminta tanggal lahir tanpa menyebutkan untuk apa
+                terbaca sebagai pengumpulan data, dan orang menjawabnya asal
+                atau berhenti mendaftar -- keduanya lebih buruk daripada
+                membiarkannya kosong dengan jujur. */}
             {!simple && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Sex</label>
-                  <select className={inputClass} value={f.sex}
-                    onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
-                    <option value="L">Male</option>
-                    <option value="P">Female</option>
-                  </select>
+              <Collapse title="Agar angkanya lebih tepat (boleh dilewati)">
+                <p className="text-[11px] leading-relaxed text-neutral-500">
+                  Umur dan jenis kelamin dipakai untuk memperkirakan denyut jantung maksimum dan kebutuhan
+                  energi harian. Tanpa keduanya, angka itu memakai nilai umum dan akan menyimpang dari
+                  keadaan Anda. Tidak ada bagian lain aplikasi yang terkunci karenanya.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Jenis kelamin</label>
+                    <select className={inputClass} value={f.sex}
+                      onChange={e => setF(p => ({ ...p, sex: e.target.value as 'L' | 'P' }))}>
+                      <option value="L">Laki-laki</option>
+                      <option value="P">Perempuan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-neutral-500">Tanggal lahir</label>
+                    <input className={inputClass} value={f.dob}
+                      onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
+                      max={hariIni()} />
+                    {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Umur: {ageFromDob(f.dob)} tahun</p>}
+                  </div>
                 </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">Date of Birth</label>
-                  <input className={inputClass} value={f.dob}
-                    onChange={e => setF(p => ({ ...p, dob: e.target.value }))} type="date"
-                    max={hariIni()} />
-                  {f.dob && <p className="mt-0.5 text-[11px] text-brand-dark">Age: {ageFromDob(f.dob)} years</p>}
-                </div>
-              </div>
+              </Collapse>
             )}
 
             {/* STR — clinical roles */}
@@ -326,17 +372,17 @@ export function Login({ onBack }: { onBack?: () => void }) {
 
             {/* Optional pasien details — collapsed by default */}
             {role === 'pasien' && (
-              <Collapse title="Additional details (optional)">
+              <Collapse title="Keterangan tambahan (boleh dilewati)">
                 <div className="grid grid-cols-2 gap-2">
-                  <Mini label="Occupation" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Employee" />
+                  <Mini label="Pekerjaan" value={f.occupation} onChange={v => setF(p => ({ ...p, occupation: v }))} placeholder="Karyawan" />
                 </div>
-                <Mini label="Health background" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Family history of hypertension, etc." />
+                <Mini label="Riwayat kesehatan" value={f.background} onChange={v => setF(p => ({ ...p, background: v }))} placeholder="Ada darah tinggi di keluarga, dsb." />
               </Collapse>
             )}
           </div>
 
-          <Button onClick={doLogin} className="w-full">Sign in as {cur.title}</Button>
-          <p className="text-center text-[11px] text-neutral-500">⚕️ Data protected in accordance with Indonesia's PDP Law.</p>
+          <Button onClick={doLogin} className="w-full">{role === 'pasien' ? 'Masuk' : `Masuk sebagai ${cur.title}`}</Button>
+          <p className="text-center text-[11px] text-neutral-500">⚕️ Data dilindungi sesuai Undang-Undang Pelindungan Data Pribadi.</p>
         </div>
 
         {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}

@@ -724,8 +724,13 @@ export function Shell({ children }: { children: ReactNode }) {
              melayang yang tidak menempati aliran halaman, sehingga menyisakan
              ruang sebesar itu berarti setiap halaman berakhir dengan 112 px
              kosong tanpa sebab. Yang disisakan kini hanya cukup agar baris
-             terakhir tidak tertutup tombol saat tombolnya berada di bawah. */
-          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-16 sm:px-6 lg:pb-6 ${
+             terakhir tidak tertutup tombol saat tombolnya berada di bawah.
+
+             pb-20 (80 px), bukan pb-16 (64 px): letak istirahat tombol kini di
+             sudut kanan bawah, dan di sana ia menempati 12-68 px dari dasar
+             layar. Dengan 64 px, empat piksel terakhir isi halaman berada
+             tepat di bawahnya. */
+          className={`mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 sm:px-6 lg:pb-6 ${
             menggeser ? 'geser-ikut' : 'geser-pulih'}`}
           style={geser ? { transform: `translate3d(${geser}px,0,0)` } : undefined}
         >

@@ -73,8 +73,15 @@ export interface TujuanFab {
 
 export function FabNavigasi({ tujuan, onTambah }: { tujuan: TujuanFab[]; onTambah?: () => void }) {
   const lokasi = useLocation()
+  // Letak bawaan: sudut kanan bawah, bukan melayang 96 px di atasnya.
+  //
+  // Tombol yang beristirahat di tengah tinggi layar menutupi isi yang sedang
+  // dibaca — terlihat pada tangkapan layar 390x844: ia duduk tepat di atas
+  // salah satu ubin lambang, sehingga satu pintu fitur harus digeser dahulu
+  // sebelum dapat disentuh. Di sudut, yang tertutupi hanyalah ujung halaman,
+  // dan ujung halaman sudah diberi bantalan tersendiri di bawah.
   const [pos, setPos] = useState<Posisi>(() =>
-    jepit(bacaPosisi() ?? { x: window.innerWidth - UKURAN - 16, y: window.innerHeight - UKURAN - 96 }))
+    jepit(bacaPosisi() ?? { x: window.innerWidth - UKURAN - TEPI, y: window.innerHeight - UKURAN - TEPI - 8 }))
   const [buka, setBuka] = useState(false)
   const [menggeser, setMenggeser] = useState(false)
 
