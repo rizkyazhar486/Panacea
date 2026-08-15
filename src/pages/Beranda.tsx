@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { DeretPratinjau } from '../components/KartuPratinjau'
+import { CatatanHarian } from '../components/CatatanHarian'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -351,6 +352,12 @@ export default function Beranda() {
           keadaan saya" terjawab tanpa satu pun ketukan, dan kisi lambang di
           bawahnya tinggal mengurus "ke mana saya pergi". */}
       <DeretPratinjau daftar={pratinjau} />
+
+      {/* Catatan harian ditaruh SESUDAH pratinjau, bukan sebelumnya.
+          Kartu pratinjau menjawab "bagaimana keadaan saya"; catatan harian
+          meminta sesuatu. Layar yang meminta lebih dahulu sebelum memberi apa
+          pun terbaca sebagai pekerjaan, dan pekerjaan ditunda. */}
+      <CatatanHarian />
 
       {!tujuan && <Tanya pilih={pilih} />}
 

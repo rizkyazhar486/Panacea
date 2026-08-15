@@ -397,6 +397,18 @@ export interface WellnessDay {
   sunDone?: boolean // got sunlight exposure today
   sunHr?: number // hours of sun exposure
   metHours?: number // MET-hours of activity
+  /**
+   * Tenaga yang dirasakan, 1-5, dilaporkan sendiri oleh pemakainya.
+   *
+   * SENGAJA TIDAK PERNAH MENJADI MASUKAN MODEL. Nilai yang dilaporkan sendiri
+   * tidak dapat disamakan dengan nilai terukur, dan mencampurkan keduanya
+   * membuat angka model tampak lebih pasti daripada yang sebenarnya. Ia ada
+   * untuk dibaca manusia, dan untuk dibandingkan dengan angka terukur ketika
+   * keduanya berselisih -- justru perselisihannya yang memberi keterangan.
+   */
+  tenaga?: number
+  /** Catatan bebas, maksimal 280 aksara. */
+  catatan?: string
 }
 
 // -------- Doctor consultations --------------------------------------------

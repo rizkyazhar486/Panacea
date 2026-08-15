@@ -312,6 +312,16 @@ interface Store {
   // Pusat Kesehatan Realtime — edukasi, news, fungsionalitas, kalkulasi, monitoring
   addSelfVital: (v: Omit<SelfVital, 'id' | 'at'>) => void
   addSleepLog: (hours: number, bedtimeConsistent: boolean) => void
+  /**
+   * Catat tidur untuk TANGGAL TERTENTU, bukan hanya hari ini.
+   *
+   * addSleepLog selalu menulis ke hari ini, dan itu membuat satu hal mustahil:
+   * mengisi catatan kemarin. Orang lupa mencatat, lalu teringat besok paginya —
+   * dan bila satu-satunya cara mencatat adalah "hari ini", ia akan menuliskan
+   * tidur semalam ke tanggal yang keliru. Data yang salah tanggal lebih buruk
+   * daripada data yang hilang, karena ia ikut dihitung model.
+   */
+  setSleepLog: (date: string, hours: number, bedtimeConsistent: boolean) => void
   toggleEduBookmark: (articleId: string) => void
   answerQuiz: (correct: boolean) => void
   logVo2Max: (value: number, method: string) => void
@@ -863,6 +873,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const date = hariIni()
           const without = st.sleepLogs.filter((s) => s.date !== date)
           return { ...st, sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without].slice(0, 60) }
+        }),
+      setSleepLog: (date, hours, bedtimeConsistent) =>
+        setState((st) => {
+          if (!date || !Number.isFinite(hours) || hours <= 0 || hours > 24) return st
+          const without = st.sleepLogs.filter((s) => s.date !== date)
+          return {
+            ...st,
+            sleepLogs: [{ id: uid(), date, hours, bedtimeConsistent }, ...without]
+              .sort((a, b) => (a.date < b.date ? 1 : -1))
+              .slice(0, 60),
+          }
         }),
       toggleEduBookmark: (articleId) =>
         setState((st) => ({
