@@ -84,6 +84,13 @@ export const SKDI_DISEASE_NOTE_ALIASES: Record<string, string> = {
   // ─── Kardiovaskular ───
   'Angina pektoris': 'Angina Pektoris Stabil',
 
+  // ─── Psikiatri ───
+  // Catatannya bernama 'Gangguan somatoform', tetapi yang diketik orang saat
+  // mencari adalah kata yang dipakai di stasiun dan di percakapan sehari-hari.
+  'Gangguan somatisasi': 'Gangguan somatoform',
+  'Somatisasi': 'Gangguan somatoform',
+  'Hipokondriasis': 'Gangguan somatoform',
+
   // ─── Gastrointestinal & Hepatobilier ───
   'Peritonitis': 'Peritonitis',
   'Gastritis': 'Gastritis / Dispepsia / GERD',
