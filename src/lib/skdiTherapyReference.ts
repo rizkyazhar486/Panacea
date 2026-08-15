@@ -30,6 +30,9 @@ export type SkdiSystem =
   | 'Psikiatri'
   | 'Mata'
   | 'THT'
+  | 'Kulit & Kelamin'
+  | 'Muskuloskeletal'
+  | 'Obstetri & Ginekologi'
 
 export interface SkdiEntry {
   system: SkdiSystem
@@ -456,6 +459,121 @@ export const SKDI_ENTRIES: SkdiEntry[] = [
   { system: 'THT', diagnosis: 'Presbikusis', therapy: 'Alat bantu dengar (hearing aid); bersifat degeneratif dan tidak dapat disembuhkan' },
   { system: 'THT', diagnosis: 'Mastoiditis', therapy: 'Antibiotik IV dosis tinggi; mastoidektomi bila tidak respon atau ada komplikasi' },
   { system: 'THT', diagnosis: 'Rhinitis Atrofi (Ozaena)', therapy: 'Irigasi hidung NaCl + tetes glukosa-gliserin; hindari antibiotik/antihistamin sebagai lini pertama' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea korporis', classification: 'Lesi terbatas (4A)', therapy: 'Topikal: Ketokonazol krim 2% 1-2x/hari 2-4 minggu / Mikonazol krim 2% 2x/hari / Terbinafin krim 1% 1-2x/hari 1-2 minggu. Lanjutkan 1-2 minggu setelah lesi hilang' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea korporis', classification: 'Luas / gagal topikal', therapy: 'Griseofulvin 500 mg/hari (anak 10-25 mg/kgBB/hari) 2-4 minggu / Ketokonazol 200 mg/hari 2-4 minggu / Itrakonazol 100 mg/hari 2 minggu / Terbinafin 250 mg/hari 2 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea kruris', classification: '4A', therapy: 'Topikal azol/terbinafin 2-4 minggu; jaga area kering, hindari pakaian ketat. Luas: Griseofulvin 500 mg/hari 2-4 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea pedis', classification: '4A', therapy: 'Topikal terbinafin 1% / azol 2x/hari 2-4 minggu; keringkan sela jari. Tipe mokasin/hiperkeratotik: Terbinafin 250 mg/hari 2 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea manus', classification: '4A', therapy: 'Sama dengan tinea pedis; periksa dan obati tinea pedis yang menyertai (pola two feet one hand)' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea kapitis', classification: '4A', therapy: 'WAJIB SISTEMIK — topikal saja tidak cukup: Griseofulvin 20-25 mg/kgBB/hari 6-8 minggu (dengan makanan berlemak) / Terbinafin. Tambah sampo ketokonazol 2% 2x/minggu untuk mengurangi penularan' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Tinea unguium (onikomikosis)', classification: '4A', therapy: 'Terbinafin 250 mg/hari — kuku tangan 6 minggu, kuku kaki 12 minggu / Itrakonazol denyut 200 mg 2x/hari 1 minggu tiap bulan, 2-3 siklus (tangan) atau 3-4 siklus (kaki)' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Pitiriasis versikolor', classification: '4A', therapy: 'Ketokonazol sampo 2% dioleskan 5-10 menit lalu bilas, 1x/hari 3-5 hari / Selenium sulfida 1.8% / Topikal azol 2x/hari 2 minggu. Luas: Ketokonazol 200 mg/hari 10 hari. EDUKASI: hipopigmentasi menetap berbulan setelah jamur mati — bukan gagal terapi' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kandidiasis kutis / intertriginosa', classification: '4A', therapy: 'Nistatin krim 100.000 IU/g 2-3x/hari / Klotrimazol 1% / Mikonazol 2%; jaga area kering. Luas: Flukonazol 150 mg dosis tunggal' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kandidiasis oral', classification: '4A', therapy: 'Nistatin drop 100.000 IU 4x/hari (kumur lalu telan) 7-14 hari / Flukonazol 100-200 mg/hari 7-14 hari. Cari faktor predisposisi: HIV, DM, kortikosteroid inhalasi' },
+
+  // ── Kulit & Kelamin — Infeksi Bakteri ────────────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Impetigo krustosa', classification: '4A', therapy: 'Bersihkan krusta dengan NaCl 0.9%; Mupirosin salep 2% 3x/hari 7 hari / Asam fusidat 2% 3x/hari. Luas: Sefaleksin 25-50 mg/kgBB/hari dibagi 4 / Amoksisilin-klavulanat / Eritromisin 30-50 mg/kgBB/hari 7 hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Impetigo bulosa', classification: '4A', therapy: 'Selalu S. aureus: Mupirosin/asam fusidat topikal; luas atau sistemik: Sefaleksin / Kloksasilin 4x250-500 mg 7 hari. Waspadai SSSS pada neonatus' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Ektima', classification: '4A', therapy: 'Kompres NaCl untuk melunakkan krusta + antibiotik SISTEMIK (menembus dermis): Sefaleksin 4x500 mg / Kloksasilin 4x500 mg 7-10 hari. Selalu meninggalkan parut' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Folikulitis', classification: '4A', therapy: 'Kompres hangat + Mupirosin/asam fusidat topikal; rekuren: Sefaleksin 4x500 mg 7 hari + dekolonisasi hidung mupirosin 2x/hari 5 hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Furunkel / karbunkel', classification: '4A', therapy: 'Kompres hangat; INSISI DAN DRAINASE bila sudah fluktuasi — antibiotik saja tidak cukup. Antibiotik bila selulitis/demam/wajah: Sefaleksin 4x500 mg / Klindamisin 3x300 mg 7 hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Erisipelas', classification: '4A', therapy: 'Batas tegas, meninggi: Penisilin V 4x500 mg / Amoksisilin 3x500 mg 10-14 hari; berat: Penisilin G 1.2-2.4 juta IU/6 jam IV. Elevasi tungkai' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Selulitis', classification: '4A', therapy: 'Batas tidak tegas: Sefaleksin 4x500 mg / Kloksasilin 4x500 mg / Klindamisin 3x300 mg 7-14 hari. Berat/sistemik: Seftriakson 1-2 g/hari IV. Tandai batas eritema dengan spidol untuk menilai respons' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Hidradenitis supurativa', classification: '3A', therapy: 'Ringan: Klindamisin topikal 1% 2x/hari. Sedang: Doksisiklin 2x100 mg 12 minggu / Klindamisin 2x300 mg + Rifampisin 2x300 mg 10 minggu. Berat: rujuk untuk biologik/bedah' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kusta (Morbus Hansen)', classification: 'Pausibasiler — 4A', therapy: 'MDT-PB 6 bulan: Rifampisin 600 mg + Dapson 100 mg (hari 1, diawasi) lalu Dapson 100 mg/hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kusta (Morbus Hansen)', classification: 'Multibasiler — 4A', therapy: 'MDT-MB 12 bulan: Rifampisin 600 mg + Klofazimin 300 mg + Dapson 100 mg (hari 1, diawasi) lalu Klofazimin 50 mg + Dapson 100 mg/hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Reaksi kusta', classification: 'Tipe 1 (reversal)', therapy: 'Prednison 40 mg/hari diturunkan bertahap 5-10 mg tiap 2 minggu selama 12 minggu; MDT DILANJUTKAN' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Reaksi kusta', classification: 'Tipe 2 (ENL)', therapy: 'Prednison 40-60 mg/hari tapering / Talidomid 100-400 mg/hari (KONTRAINDIKASI MUTLAK pada kehamilan); MDT dilanjutkan' },
+
+  // ── Kulit & Kelamin — Infeksi Virus & Parasit ────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Herpes zoster', classification: '4A', therapy: 'Mulai <72 jam: Asiklovir 5x800 mg 7 hari / Valasiklovir 3x1000 mg 7 hari / Famsiklovir 3x500 mg 7 hari. Nyeri: parasetamol/NSAID, neuropatik: gabapentin/amitriptilin. Zoster oftalmikus: rujuk mata' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Herpes simpleks', classification: '4A', therapy: 'Episode pertama: Asiklovir 5x200 mg atau 3x400 mg 7-10 hari. Rekuren: 5x200 mg 5 hari. Supresi (>6x/tahun): Asiklovir 2x400 mg jangka panjang' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Varisela', classification: '4A', therapy: 'Anak sehat: simtomatik (parasetamol — HINDARI ASPIRIN, risiko sindrom Reye), antihistamin untuk gatal. Dewasa/imunokompromais: Asiklovir 5x800 mg 7 hari, mulai <24-72 jam' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Veruka vulgaris', classification: '4A', therapy: 'Asam salisilat 17-40% topikal setiap malam / krioterapi N2 cair tiap 2-3 minggu / bedah listrik. Sebagian sembuh sendiri' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Moluskum kontagiosum', classification: '4A', therapy: 'Ekstraksi badan moluskum dengan ekstraktor komedo/kuret + antiseptik; sembuh sendiri dalam 6-12 bulan. Dewasa dengan lesi luas: periksa HIV' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kondiloma akuminata', classification: '3A', therapy: 'Tinktura podofilin 25% dioleskan lalu dicuci 4-6 jam (KONTRAINDIKASI HAMIL) / Asam trikloroasetat 80-90% mingguan (AMAN untuk hamil) / Imikuimod 5% krim 3x/minggu / krioterapi / bedah. Periksa IMS lain dan pasangan' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Skabies', classification: '4A', therapy: 'Permetrin 5% krim dioleskan seluruh tubuh leher ke bawah, didiamkan 8-12 jam, diulang 7 hari kemudian (aman >2 bulan & hamil) / Salep 2-4 (sulfur presipitatum) 3 malam berturut untuk bayi. OBATI SELURUH ANGGOTA RUMAH SERENTAK; rendam pakaian dan sprei air panas. Gatal dapat bertahan 2-4 minggu setelah tungau mati' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Pedikulosis kapitis', classification: '4A', therapy: 'Permetrin 1% losio didiamkan 10 menit lalu bilas, ulang hari ke-7-9 / Malation 0.5%. Sisir serit basah + kondisioner; obati kontak serumah' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Pedikulosis pubis', classification: '4A', therapy: 'Permetrin 1% / 5%, ulang 7 hari; obati pasangan seksual, periksa IMS lain, cuci pakaian air panas' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Creeping eruption (cutaneous larva migrans)', classification: '4A', therapy: 'Albendazol 400 mg/hari 3-7 hari / Ivermektin 200 mcg/kgBB dosis tunggal. Topikal tiabendazol bila tersedia' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Insect bite / gigitan serangga', classification: '4A', therapy: 'Kompres dingin, kortikosteroid topikal potensi sedang (hidrokortison 1-2.5% / desoksimetason), antihistamin oral (setirizin 10 mg/hari). Bila infeksi sekunder: antibiotik topikal/sistemik' },
+
+  // ── Kulit & Kelamin — Dermatitis & Eksema ────────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Dermatitis atopik', classification: '4A', therapy: 'PELEMBAP adalah dasar terapi, 2-3x/hari segera setelah mandi. Flare: kortikosteroid topikal potensi rendah-sedang (hidrokortison 1-2.5% wajah/lipatan; desoksimetason 0.25% badan) 5-7 hari. Antihistamin sedatif malam. Hindari pemicu; antibiotik bila superinfeksi' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Dermatitis kontak iritan', classification: '4A', therapy: 'HINDARI IRITAN + pelembap + sarung tangan pelindung; kortikosteroid topikal potensi sedang 1-2 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Dermatitis kontak alergi', classification: '3A', therapy: 'Identifikasi dan hindari alergen (uji tempel bila perlu); kortikosteroid topikal potensi sedang-kuat 1-2 minggu; luas: Prednison 0.5 mg/kgBB/hari tapering 1-2 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Dermatitis seboroik', classification: '4A', therapy: 'Kulit kepala: sampo ketokonazol 2% / selenium sulfida / zinc pirition 2-3x/minggu. Wajah: krim ketokonazol 2% + hidrokortison 1% jangka pendek. Bayi (cradle cap): minyak mineral + sampo lembut' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Dermatitis numularis', classification: '4A', therapy: 'Pelembap tebal + kortikosteroid topikal potensi kuat (betametason valerat 0.1%) 2x/hari 2 minggu; antihistamin; antibiotik bila infeksi sekunder' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Napkin eczema (diaper rash)', classification: '4A', therapy: 'Sering ganti popok, biarkan terbuka, krim pelindung zinc oxide. Bila kandida (lesi satelit): nistatin/klotrimazol krim 2-3x/hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Liken simpleks kronikus (neurodermatitis)', classification: '3A', therapy: 'Putuskan siklus gatal-garuk: kortikosteroid topikal potensi kuat + oklusi, antihistamin sedatif malam, tutup lesi. Atasi stres' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Prurigo', classification: '4A', therapy: 'Kortikosteroid topikal potensi kuat, antihistamin oral, cari dan atasi penyebab (gigitan serangga, atopi, cacing, gangguan sistemik)' },
+
+  // ── Kulit & Kelamin — Reaksi Obat & Urtikaria ────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Urtikaria akut', classification: '4A', therapy: 'Antihistamin H1 non-sedatif: Setirizin 10 mg/hari / Loratadin 10 mg/hari — dapat dinaikkan sampai 4x dosis standar bila perlu. Hindari pencetus. Angioedema/anafilaksis: EPINEFRIN 0.3-0.5 mg IM paha' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Urtikaria kronik', classification: '3A', therapy: 'Antihistamin H1 non-sedatif dosis naik bertahap sampai 4x; gagal: rujuk untuk omalizumab/siklosporin. Kortikosteroid hanya jangka sangat pendek saat flare' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Exanthematous drug eruption (erupsi makulopapular)', classification: '4A', therapy: 'HENTIKAN OBAT PENYEBAB; antihistamin + kortikosteroid topikal; luas: Prednison 0.5 mg/kgBB/hari tapering. Catat obatnya di rekam medis dan beri kartu alergi' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Fixed drug eruption', classification: '4A', therapy: 'Hentikan obat penyebab (tersering: kotrimoksazol, NSAID, tetrasiklin, parasetamol); kortikosteroid topikal. Lesi berulang di tempat yang SAMA setiap paparan — hiperpigmentasi menetap' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Sindrom Stevens-Johnson / TEN', classification: '3B', therapy: 'KEGAWATAN — hentikan segera obat tersangka, RUJUK ke fasilitas dengan perawatan luka bakar. Resusitasi cairan, rawat luka, perawatan mata dan mukosa, cegah infeksi. Hitung SCORTEN. Kortikosteroid masih diperdebatkan; siklosporin/IVIG oleh spesialis' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Eritema multiforme', classification: '4A', therapy: 'Atasi pencetus (tersering HSV): Asiklovir; simtomatik antihistamin + kortikosteroid topikal; rekuren berkaitan HSV: Asiklovir supresif 2x400 mg' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Reaksi anafilaksis kulit', classification: '4A', therapy: 'EPINEFRIN 1:1000 0.3-0.5 mg IM paha lateral, ulang tiap 5-15 menit; O2, cairan; antihistamin dan kortikosteroid hanya TAMBAHAN, bukan pengganti epinefrin. Observasi 4-6 jam (risiko bifasik)' },
+
+  // ── Kulit & Kelamin — Papuloskuamosa & Lain ──────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Psoriasis vulgaris', classification: '3A', therapy: 'Ringan: kortikosteroid topikal potensi kuat + analog vitamin D (kalsipotriol) / tar. Sedang-berat: rujuk untuk fototerapi NB-UVB, metotreksat, atau biologik. HINDARI kortikosteroid sistemik — memicu psoriasis pustulosa saat dihentikan' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Pitiriasis rosea', classification: '4A', therapy: 'Sembuh sendiri 6-8 minggu; simtomatik: pelembap, antihistamin, kortikosteroid topikal ringan. EDUKASI: bukan menular, akan hilang sendiri' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Liken planus', classification: '3A', therapy: 'Kortikosteroid topikal potensi kuat; luas: Prednison 0.5 mg/kgBB/hari tapering 4-6 minggu; oral: kortikosteroid topikal dalam basis perekat' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Akne vulgaris', classification: 'Ringan (komedonal) — 4A', therapy: 'Topikal retinoid (tretinoin 0.025-0.05% malam) / asam salisilat / benzoil peroksida 2.5-5%' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Akne vulgaris', classification: 'Sedang (papulopustular) — 4A', therapy: 'Benzoil peroksida + antibiotik topikal (klindamisin 1%) + retinoid topikal; atau Doksisiklin 2x50-100 mg / Eritromisin 2x500 mg 6-12 minggu' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Akne vulgaris', classification: 'Berat (nodulokistik)', therapy: 'Rujuk untuk isotretinoin 0.5-1 mg/kgBB/hari (WAJIB kontrasepsi ketat — sangat teratogenik)' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Miliaria', classification: '4A', therapy: 'Dinginkan lingkungan, pakaian menyerap keringat, bedak salisil 2% / losio kalamin; hindari salep berminyak' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Hidradenitis / bisul berulang', classification: '4A', therapy: 'Higiene, kompres hangat, insisi drainase bila fluktuasi, antibiotik anti-stafilokokus; cari DM dan status karier' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Vitiligo', classification: '3A', therapy: 'Kortikosteroid topikal potensi sedang-kuat / takrolimus 0.1% untuk wajah; tabir surya SPF 30+; rujuk untuk fototerapi NB-UVB' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Melasma', classification: '3A', therapy: 'TABIR SURYA adalah dasar terapi; hidrokuinon 2-4% malam / kombinasi triple (hidrokuinon + tretinoin + kortikosteroid); hentikan kontrasepsi oral bila memungkinkan' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Alopesia areata', classification: '3A', therapy: 'Kortikosteroid topikal potensi kuat / injeksi triamsinolon intralesi 2.5-5 mg/mL tiap 4-6 minggu; sebagian tumbuh kembali sendiri' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Luka bakar', classification: 'Derajat 1-2 — 4A', therapy: 'Dinginkan air mengalir 20 menit (BUKAN es); analgesik; derajat 2: salep perak sulfadiazin 1% / balutan lembap; profilaksis tetanus. Rujuk bila >10% dewasa / >5% anak, wajah, tangan, genitalia, sirkumferensial' },
+
+  // ── Kulit & Kelamin — Infeksi Menular Seksual ────────────────────────────
+  { system: 'Kulit & Kelamin', diagnosis: 'Uretritis / servisitis gonore', classification: '4A', therapy: 'Seftriakson 250-500 mg IM dosis tunggal + Azitromisin 1 g PO dosis tunggal (untuk klamidia). Obati pasangan; periksa sifilis dan HIV' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Uretritis non-gonore (klamidia)', classification: '4A', therapy: 'Azitromisin 1 g PO dosis tunggal / Doksisiklin 2x100 mg 7 hari (KONTRAINDIKASI hamil — gunakan azitromisin/eritromisin). Obati pasangan' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Sifilis', classification: 'Primer/sekunder/laten dini — 3A', therapy: 'Benzatin penisilin G 2.4 juta IU IM dosis tunggal; alergi penisilin: Doksisiklin 2x100 mg 14 hari. Peringatkan reaksi Jarisch-Herxheimer' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Sifilis', classification: 'Laten lanjut / durasi tak diketahui', therapy: 'Benzatin penisilin G 2.4 juta IU IM tiap minggu x 3 dosis; ibu hamil WAJIB penisilin (desensitisasi bila alergi)' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Ulkus mole (chancroid)', classification: '3A', therapy: 'Azitromisin 1 g PO dosis tunggal / Seftriakson 250 mg IM dosis tunggal / Siprofloksasin 2x500 mg 3 hari' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Bakterial vaginosis', classification: '4A', therapy: 'Metronidazol 2x500 mg PO 7 hari / Metronidazol gel 0.75% intravaginal 5 hari / Klindamisin krim 2% 7 malam. Tidak perlu mengobati pasangan. Hindari alkohol selama metronidazol' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Trikomoniasis', classification: '4A', therapy: 'Metronidazol 2 g PO dosis tunggal / 2x500 mg 7 hari; OBATI PASANGAN (berbeda dari BV); hindari alkohol' },
+  { system: 'Kulit & Kelamin', diagnosis: 'Kandidiasis vulvovaginalis', classification: '4A', therapy: 'Flukonazol 150 mg PO dosis tunggal / Klotrimazol supositoria vagina 100 mg 7 malam / Nistatin vaginal. Hamil: HANYA topikal azol 7 hari' },
+
+  // ── Muskuloskeletal ──────────────────────────────────────────────────────
+  { system: 'Muskuloskeletal', diagnosis: 'Osteoartritis', classification: '3A', therapy: 'Turunkan berat badan + latihan penguatan kuadrisep (dasar terapi). Parasetamol 3-4x500-1000 mg (maks 4 g/hari) / NSAID topikal / NSAID oral dosis efektif terendah + gastroprotektor bila berisiko. Injeksi kortikosteroid intraartikular untuk flare' },
+  { system: 'Muskuloskeletal', diagnosis: 'Artritis gout', classification: 'Serangan akut — 4A', therapy: 'NSAID dosis penuh (naproksen 2x500 mg / indometasin 3x50 mg) / Kolkisin 1 mg lalu 0.5 mg 1 jam kemudian, maks 1.5 mg hari pertama / Prednison 30-35 mg/hari 5 hari. JANGAN memulai maupun menghentikan allopurinol saat serangan akut' },
+  { system: 'Muskuloskeletal', diagnosis: 'Artritis gout', classification: 'Interkritikal/kronik — 3A', therapy: 'Allopurinol mulai 100 mg/hari, naikkan bertahap sampai asam urat <6 mg/dL (maks 900 mg/hari); mulai 2-4 minggu setelah serangan reda dengan profilaksis kolkisin 0.5-1 mg/hari selama 3-6 bulan' },
+  { system: 'Muskuloskeletal', diagnosis: 'Artritis reumatoid', classification: '3A', therapy: 'RUJUK untuk DMARD dini: Metotreksat 7.5-25 mg/minggu + asam folat 1-5 mg/hari (bukan pada hari MTX). NSAID/kortikosteroid dosis rendah sebagai jembatan. MTX KONTRAINDIKASI pada kehamilan' },
+  { system: 'Muskuloskeletal', diagnosis: 'Artritis septik', classification: '3A', therapy: 'KEGAWATAN — aspirasi sendi untuk kultur SEBELUM antibiotik, lalu antibiotik empiris IV (Sefazolin/Kloksasilin; curiga MRSA: Vankomisin) + drainase sendi. RUJUK segera' },
+  { system: 'Muskuloskeletal', diagnosis: 'Osteomielitis', classification: '3B', therapy: 'Kultur (biopsi tulang bila mungkin) lalu antibiotik IV 4-6 minggu; debridemen bedah bila ada sekuestrum. RUJUK' },
+  { system: 'Muskuloskeletal', diagnosis: 'Osteoporosis', classification: '3A', therapy: 'Kalsium 1000-1200 mg/hari + Vitamin D 800-1000 IU/hari + latihan menahan beban + cegah jatuh. Bifosfonat: Alendronat 70 mg/minggu (diminum saat perut kosong, tegak 30 menit)' },
+  { system: 'Muskuloskeletal', diagnosis: 'Low back pain mekanik', classification: '4A', therapy: 'TETAP AKTIF (tirah baring justru memperlambat pemulihan); Parasetamol / NSAID jangka pendek; latihan penguatan inti. Waspadai red flag: usia >50, penurunan berat badan, demam, defisit neurologis, gangguan BAK/BAB' },
+  { system: 'Muskuloskeletal', diagnosis: 'Hernia nukleus pulposus', classification: '3A', therapy: 'Konservatif 6 minggu: NSAID + fisioterapi + tetap aktif; nyeri neuropatik: gabapentin/pregabalin. RUJUK SEGERA bila sindrom kauda ekuina (retensi urin, saddle anestesia, kelemahan progresif)' },
+  { system: 'Muskuloskeletal', diagnosis: 'Sprain / strain (ankle, lutut)', classification: '4A', therapy: 'PRICE: Protection, Rest, Ice 15-20 menit tiap 2-3 jam, Compression elastic bandage, Elevation. Analgesik parasetamol/NSAID; mobilisasi dini + latihan proprioseptif. Aturan Ottawa untuk menentukan perlu foto' },
+  { system: 'Muskuloskeletal', diagnosis: 'Tenosinovitis / de Quervain', classification: '3A', therapy: 'Istirahat + bidai ibu jari (thumb spica) + NSAID; gagal: injeksi kortikosteroid setempat' },
+  { system: 'Muskuloskeletal', diagnosis: 'Frozen shoulder (adhesive capsulitis)', classification: '3A', therapy: 'Analgesik + fisioterapi latihan lingkup gerak; injeksi kortikosteroid intraartikular pada fase nyeri. Perjalanan 1-3 tahun' },
+  { system: 'Muskuloskeletal', diagnosis: 'Fraktur tertutup', classification: '3B', therapy: 'Imobilisasi/bidai melewati dua sendi, analgesik, foto rontgen 2 posisi, RUJUK untuk reduksi dan fiksasi. Nilai neurovaskular distal SEBELUM dan SESUDAH pembidaian' },
+  { system: 'Muskuloskeletal', diagnosis: 'Fraktur terbuka', classification: '3B', therapy: 'KEGAWATAN: hentikan perdarahan, tutup luka dengan kasa steril lembap, bidai, Sefazolin 2 g IV (tambah gentamisin bila kotor), profilaksis tetanus, analgesik, RUJUK SEGERA untuk debridemen <6-8 jam' },
+  { system: 'Muskuloskeletal', diagnosis: 'Sindrom kompartemen', classification: '3B', therapy: 'KEGAWATAN BEDAH: buka semua balutan dan gips, posisikan setinggi jantung (JANGAN elevasi tinggi), O2, analgesik, RUJUK SEGERA untuk fasiotomi. 6P: pain out of proportion, pallor, paresthesia, paralysis, pulselessness, poikilothermia' },
+  { system: 'Muskuloskeletal', diagnosis: 'Dislokasi bahu', classification: '3B', therapy: 'Nilai neurovaskular (n. aksilaris) SEBELUM dan SESUDAH; reduksi tertutup dengan analgesia/sedasi, imobilisasi arm sling 2-3 minggu, foto pasca reduksi. RUJUK bila gagal maupun disertai fraktur' },
+
+  // ── Obstetri & Ginekologi ────────────────────────────────────────────────
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Preeklamsia berat', classification: '3B', therapy: 'MgSO4 loading 4 g (10 mL MgSO4 40% dilarutkan sampai 20 mL) IV pelan 15-20 menit, lanjut 1 g/jam maintenance / 4 g IM tiap 6 jam. Antihipertensi bila TD >=160/110: Nifedipin 10 mg PO ulang tiap 30 menit (maks 30 mg) / Metildopa 3x250-500 mg. Terminasi kehamilan adalah terapi definitif. Siapkan Ca glukonas 1 g IV sebagai antidot' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Eklamsia', classification: '3B', therapy: 'ABC, miringkan, O2; MgSO4 sama seperti PEB; kejang berulang: MgSO4 2 g IV tambahan. Pantau refleks patela, napas >=16x/menit, urin >=0.5 mL/kg/jam. RUJUK setelah stabil' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Perdarahan pascapersalinan (atonia uteri)', classification: '3B', therapy: 'Masase uterus + kompresi bimanual; Oksitosin 20-40 IU dalam 1 L RL 60 tetes/menit; Metilergometrin 0.2 mg IM (KONTRAINDIKASI hipertensi); Misoprostol 600-1000 mcg rektal; asam traneksamat 1 g IV. Kondom kateter tamponade; RUJUK' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Retensio plasenta', classification: '3B', therapy: 'Oksitosin 20-40 IU dalam infus; manual plasenta dengan analgesia bila perdarahan aktif; antibiotik profilaksis Ampisilin 2 g IV. RUJUK bila plasenta akreta dicurigai' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Abortus imminens', classification: '4A', therapy: 'Tirah baring tidak terbukti; observasi, hindari senggama, asam folat; USG untuk menilai viabilitas. Progesteron dipertimbangkan pada abortus berulang' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Abortus inkomplit', classification: '3B', therapy: 'Stabilkan hemodinamik; evakuasi sisa hasil konsepsi dengan AVM (aspirasi vakum manual) / kuretase; Oksitosin; antibiotik bila infeksi. Beri konseling kontrasepsi pascakeguguran' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Ketuban pecah dini', classification: '3A', therapy: '>=34 minggu: terminasi. <34 minggu: kortikosteroid (deksametason 6 mg IM tiap 12 jam x4 / betametason 12 mg IM tiap 24 jam x2) + antibiotik (Eritromisin 4x250 mg 10 hari) + rujuk. Hindari periksa dalam berulang' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Hiperemesis gravidarum', classification: '3B', therapy: 'Rehidrasi RL/NaCl; Piridoksin (B6) 10-25 mg 3-4x/hari +/- doksilamin; Metoklopramid 3x10 mg / Ondansetron 4-8 mg; TIAMIN 100 mg sebelum dekstrosa (cegah Wernicke); koreksi elektrolit' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Anemia dalam kehamilan', classification: '3A', therapy: 'Ferrous sulfat 60 mg besi elemental + asam folat 400 mcg/hari (2-3x/hari bila anemia); Hb <7 g/dL mendekati persalinan: pertimbangkan transfusi. Cari cacing tambang dan talasemia' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Mastitis laktasi', classification: '4A', therapy: 'TERUSKAN MENYUSUI/pompa (pengosongan payudara adalah terapi utama), kompres hangat, analgesik. Antibiotik: Sefaleksin 4x500 mg / Kloksasilin 4x500 mg 10-14 hari. Abses: insisi drainase' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Endometritis', classification: '3B', therapy: 'Ampisilin 2 g IV/6 jam + Gentamisin 5 mg/kgBB/hari IV + Metronidazol 500 mg IV/8 jam sampai bebas demam 48 jam; RUJUK bila sepsis' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Penyakit radang panggul (PID)', classification: '3A', therapy: 'Seftriakson 250-500 mg IM dosis tunggal + Doksisiklin 2x100 mg 14 hari + Metronidazol 2x500 mg 14 hari; obati pasangan; lepas AKDR bila tidak membaik 48-72 jam' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Kehamilan ektopik terganggu', classification: '3B', therapy: 'KEGAWATAN: dua jalur IV besar, resusitasi cairan, golongan darah dan crossmatch, RUJUK SEGERA untuk laparotomi. Jangan tunda untuk pemeriksaan tambahan' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Kontrasepsi darurat', classification: '4A', therapy: 'Levonorgestrel 1.5 mg dosis tunggal dalam 72 jam (makin cepat makin efektif) / AKDR tembaga dalam 5 hari (paling efektif). Bukan abortifasien' },
+  { system: 'Obstetri & Ginekologi', diagnosis: 'Dismenore primer', classification: '4A', therapy: 'NSAID mulai 1-2 hari sebelum haid: Asam mefenamat 3x500 mg / Ibuprofen 3x400 mg; kompres hangat; kontrasepsi hormonal bila perlu' },
 ]
 
 export const SKDI_SYSTEMS: SkdiSystem[] = [
@@ -478,6 +596,9 @@ export const SKDI_SYSTEMS: SkdiSystem[] = [
   'Psikiatri',
   'Mata',
   'THT',
+  'Kulit & Kelamin',
+  'Muskuloskeletal',
+  'Obstetri & Ginekologi',
 ]
 
 // Kata Kunci / Eponim — classic diagnostic "keyword" associations used in
@@ -570,4 +691,6 @@ export const EPONYM_ENTRIES: EponymEntry[] = [
   { diagnosis: "Racoon's Eye / Hematom Kacamata", keyword: 'Brill hematoma' },
   { diagnosis: "Bogorad Syndrome", keyword: "Crocodile tears syndrome (komplikasi Bell's palsy)" },
   { diagnosis: 'Radial Head Subluxation', keyword: 'Pulled elbow, nursemaid elbow' },
+
+  // ── Kulit & Kelamin — Infeksi Jamur ──────────────────────────────────────
 ]
