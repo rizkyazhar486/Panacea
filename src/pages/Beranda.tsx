@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { PapanWidget } from '../components/PapanWidget'
+import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
@@ -398,20 +399,14 @@ export default function Beranda() {
 
       {!tujuan && <Tanya pilih={pilih} />}
 
-      {/* ── KISI FITUR — dibaca menurun (F) ─────────────────────────────── */}
-      {klinisDulu ? (
-        <>
-          <Kisi judul={judulKlinis} isi={isiKlinis} pintu={klinis} />
-          <Kisi judul="Badan Anda" isi="Latihan, makan, tidur, dan angka tubuh Anda" pintu={PRIBADI} />
-        </>
-      ) : (
-        <>
-          <Kisi judul="Badan Anda" isi="Latihan, makan, tidur, dan angka tubuh Anda" pintu={PRIBADI} />
-          <Kisi judul={judulKlinis} isi={isiKlinis} pintu={klinis} />
-        </>
-      )}
-
-      <Kisi judul="Lainnya" isi="Darurat, ibadah, kabar teman, dan seluruh fitur" pintu={LAINNYA} />
+      {/* ── KISI FITUR ───────────────────────────────────────────────────
+          Tiga kisi tetap (Klinis, Badan Anda, Lainnya) diganti satu kisi yang
+          diturunkan dari KATALOG WIDGET. Alasannya bukan tampilan: ketiga kisi
+          lama ditulis tangan dan hanya memuat 16 dari 115 fitur, sehingga
+          sebagian besar isi aplikasi ini tidak pernah punya jalan masuk dari
+          beranda — dan setiap fitur baru harus didaftarkan di dua tempat, yang
+          satu di antaranya selalu ketinggalan. */}
+      <KisiFitur />
 
       <Link
         to="/tutorial"
