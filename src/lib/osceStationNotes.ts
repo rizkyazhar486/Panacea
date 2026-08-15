@@ -1935,6 +1935,30 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
   'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis': {
+    definisi: 'Batu pada saluran kemih — di ginjal (nefrolitiasis), ureter (ureterolitiasis), atau kandung kemih (vesikolitiasis).',
+    etiologi: [
+      'Batu KALSIUM oksalat tersering (80%): asupan cairan kurang, hiperkalsiuria, hiperoksaluria, sitrat urin rendah',
+      'Batu asam urat: urin yang asam menetap, gout, sindrom metabolik, asupan purin tinggi',
+      'Batu STRUVIT: infeksi kuman pemecah urea (Proteus, Klebsiella) — batu ini TIDAK dapat larut dan selalu terinfeksi',
+      'Batu sistin: kelainan bawaan, muncul sejak usia muda',
+      'Batu BULI hampir selalu SEKUNDER: obstruksi di bawahnya (BPH, striktur) atau benda asing seperti kateter menetap',
+    ],
+    patofisiologi: 'Batu terbentuk ketika urin menjadi jenuh berlebih terhadap suatu garam sehingga kristal mengendap dan menempel pada sel epitel yang rusak, lalu tumbuh berlapis. Yang menentukan bukan hanya banyaknya bahan pembentuk melainkan juga hilangnya PENGHAMBAT alami — terutama sitrat, yang mengikat kalsium sehingga tidak tersedia untuk membentuk kristal. Itulah sebabnya sitrat urin yang rendah menjadi faktor risiko tersendiri, dan mengapa air perasan jeruk nipis dianjurkan. Nyeri kolik tidak berasal dari batunya melainkan dari OBSTRUKSI: urin yang tertahan meregangkan ureter dan kapsul ginjal, prostaglandin dilepaskan, dan otot polos ureter berkontraksi kuat. Karena prostaglandin yang menjadi perantaranya, NSAID meredakan kolik lebih baik daripada opioid — sesuatu yang berlawanan dengan dugaan bahwa nyeri hebat selalu menuntut opioid. Prostaglandin juga meningkatkan aliran darah ginjal dan produksi urin, yang justru menambah tekanan di hulu sumbatan; hidrasi paksa karena itu TIDAK menolong dan dapat memperberat. Letak nyerinya mengikuti perjalanan batu: pinggang pada batu ginjal, menjalar ke selangkangan pada batu ureter tengah, dan menjadi keluhan berkemih pada batu di muara ureter maupun buli. Sekitar 90% batu berukuran di bawah 5 mm keluar sendiri; di atas 10 mm hampir tidak pernah.',
+    penunjang: [
+      'Urinalisis: hematuria mikroskopik pada sebagian besar kasus — ketiadaannya TIDAK menyingkirkan batu',
+      'CT stone protokol tanpa kontras adalah baku emas; USG menjadi pilihan pertama pada kehamilan dan anak',
+      'Foto polos abdomen melihat batu radioopak (kalsium, struvit) tetapi TIDAK melihat batu asam urat',
+      'Ureum, kreatinin, elektrolit; kalsium dan asam urat darah',
+      'Kultur urin bila dicurigai infeksi; analisis batu bila berhasil ditampung — jenisnya menentukan pencegahannya',
+      'DEMAM bersama batu obstruktif adalah KEGAWATAN (pionefrosis) dan menuntut drainase segera, bukan menunggu',
+    ],
+    diagnosisBanding: [
+      'Pielonefritis akut — demam tinggi, nyeri ketok pinggang, leukosituria bermakna',
+      'Kehamilan ektopik terganggu dan torsi ovarium pada perempuan — uji kehamilan wajib',
+      'Apendisitis, divertikulitis, dan kolesistitis',
+      'Aneurisma aorta abdominalis yang pecah pada usia lanjut — nyeri pinggang mendadak dengan syok',
+      'Herpes zoster sebelum ruam muncul',
+    ],
     anamnesis: [
       'Nyeri kolik hebat pinggang menjalar ke selangkangan/genitalia (sesuai lokasi batu — proksimal ureter: setinggi umbilikus; ureter tengah: ke inguinal/skrotum; ureter distal: ujung penis/labia), hematuria, mual muntah',
     ],
@@ -1944,9 +1968,13 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'BNO-IVP atau CT scan non-kontras (baku emas) menunjukkan batu dan lokasinya; USG untuk skrining awal/kehamilan.',
     tatalaksana: [
-      'Batu kecil (<5mm): terapi ekspulsif medis (tamsulosin/alpha-blocker) + hidrasi + analgesik (NSAID/opioid), observasi keluar spontan',
-      'Batu besar/tidak keluar spontan/obstruksi berat: ESWL, ureteroskopi, atau PCNL tergantung ukuran/lokasi',
-      'Analgesik NSAID lini pertama untuk kolik akut (efektif mengurangi spasme ureter)',
+      'NYERI: NSAID lebih dahulu, bukan opioid — Ketorolak 30 mg IV/IM atau Natrium diklofenak 75 mg IM; opioid hanya bila NSAID tidak dapat dipakai',
+      'Hidrasi CUKUP, bukan hidrasi paksa: cairan berlebihan menambah tekanan di hulu sumbatan dan tidak mempercepat keluarnya batu',
+      'TERAPI EKSPULSIF pada batu ureter distal <10 mm: Tamsulosin 0,4 mg malam selama 2-4 minggu, dengan analgesik sesuai kebutuhan dan saringan urin untuk menampung batunya',
+      'RUJUK SEGERA bila: DEMAM (batu terinfeksi — kegawatan), ginjal tunggal, gangguan fungsi ginjal, anuria, nyeri tak terkendali, atau batu >10 mm',
+      'Batu buli: cari dan atasi obstruksi di bawahnya (BPH, striktur); RUJUK untuk litotripsi atau vesikolitotomi — mengeluarkan batunya saja tanpa mengatasi sebabnya berarti batu akan terbentuk lagi',
+      'PENCEGAHAN, dan inilah yang paling menentukan: minum 2,5-3 L/hari sampai urin jernih. Batu kalsium — kurangi GARAM dan protein hewani, JANGAN mengurangi kalsium makanan (justru menaikkan oksalat yang terserap). Batu asam urat — alkalinisasi urin dengan kalium sitrat dan allopurinol',
+      'Analisis batu yang berhasil ditampung menentukan pencegahan berikutnya; tanpa itu pencegahannya hanya menebak',
     ],
   },
   'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter': {
@@ -2071,6 +2099,25 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
 
   // ─── Obgyn ─────────────────────────────────────────────────────────────
   'ANC Normal (Antenatal Care)': {
+    definisi: 'Pemeriksaan kehamilan berkala untuk memantau ibu dan janin, menapis penyulit sedini mungkin, dan menyiapkan persalinan yang aman.',
+    etiologi: [
+      'Bukan penyakit. Yang ditapis adalah penyulit yang lazim dan dapat dicegah: anemia, preeklamsia, diabetes gestasional, infeksi menular (HIV, sifilis, hepatitis B), malpresentasi, dan pertumbuhan janin terhambat',
+      'Faktor risiko yang menentukan tempat bersalin: usia <20 atau >35 tahun, jarak kehamilan <2 tahun, paritas tinggi, tinggi badan <145 cm, riwayat seksio, riwayat perdarahan atau preeklamsia sebelumnya',
+    ],
+    patofisiologi: 'Kehamilan mengubah hampir seluruh sistem tubuh, dan mengetahui arah perubahannya adalah dasar seluruh penapisan. Volume plasma naik 40-50% sedangkan massa sel darah merah hanya naik 20-30%, sehingga hemoglobin TURUN secara fisiologis — anemia kehamilan karena itu dinilai dengan ambang yang lebih rendah (<11 g/dL) daripada dewasa tidak hamil. Curah jantung naik, tahanan perifer turun, dan tekanan darah justru MENURUN pada trimester kedua lalu kembali naik menjelang aterm; tekanan yang naik pada trimester kedua karena itu bukan hal biasa dan menjadi penanda dini preeklamsia. Hormon plasenta terutama human placental lactogen bersifat melawan insulin, sehingga kebutuhan insulin meningkat sepanjang kehamilan dan ibu yang cadangan sel betanya terbatas jatuh ke diabetes gestasional pada trimester kedua — itulah sebabnya penapisannya dikerjakan pada 24-28 minggu, bukan di awal. Rahim yang membesar menekan vena kava inferior pada posisi telentang sehingga aliran balik dan curah jantung anjlok (sindrom hipotensi telentang), dan itulah alasan pemeriksaan maupun tindakan dikerjakan dengan ibu sedikit miring ke kiri. Kebutuhan besi meningkat sampai tiga kali lipat karena massa sel darah merah ibu, plasenta, dan janin semuanya menuntut besi, dan asupan makanan hampir tidak pernah mencukupinya — dari situlah tablet tambah darah menjadi keharusan, bukan pilihan.',
+    penunjang: [
+      'Tiap kunjungan: tekanan darah, berat badan, tinggi fundus uteri, denyut jantung janin, dan PROTEIN URIN',
+      'Awal kehamilan: hemoglobin, golongan darah dan rhesus, gula darah, HBsAg, HIV, sifilis (VDRL/TPHA), dan urinalisis',
+      'USG minimal 2 kali oleh dokter: trimester 1 untuk memastikan usia kehamilan dan letak, trimester 3 untuk taksiran berat, letak, dan plasenta',
+      'Penapisan diabetes gestasional pada 24-28 minggu; ulang hemoglobin pada trimester 3',
+      'Tinggi fundus dalam sentimeter kira-kira sama dengan usia kehamilan dalam minggu antara 20-36 minggu; selisih lebih dari 3 cm menuntut USG',
+    ],
+    diagnosisBanding: [
+      'Kehamilan ektopik pada nyeri perut dengan perdarahan trimester 1',
+      'Mola hidatidosa bila uterus lebih besar daripada usia kehamilan dengan hiperemesis berat dan tanpa denyut jantung janin',
+      'Hipertensi kronik (sebelum 20 minggu) versus hipertensi gestasional dan preeklamsia (setelah 20 minggu) — pembedaan ini menentukan seluruh penanganannya',
+      'Anemia defisiensi besi versus talasemia bila anemia tidak membaik dengan besi',
+    ],
     anamnesis: [
       'HPHT untuk hitung usia kehamilan, riwayat obstetri sebelumnya (paritas), keluhan kehamilan saat ini, riwayat penyakit penyerta',
     ],
@@ -2079,10 +2126,13 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'Bukan diagnosis penyakit — evaluasi kesehatan ibu & janin rutin sesuai jadwal ANC standar (minimal 6x kunjungan menurut standar WHO/Kemenkes terbaru).',
     tatalaksana: [
-      'Skrining rutin: Hb, golongan darah, HIV, sifilis, hepatitis B, urinalisis, gula darah',
-      'Suplementasi: asam folat, zat besi, kalsium',
-      'Imunisasi TT (tetanus toksoid) sesuai jadwal',
-      'Edukasi: tanda bahaya kehamilan (perdarahan, kejang, nyeri kepala hebat, gerak janin berkurang), nutrisi, aktivitas',
+      'MINIMAL 6 KALI KUNJUNGAN: 1x trimester 1, 2x trimester 2, 3x trimester 3, dengan 2 kali USG oleh dokter',
+      'TABLET TAMBAH DARAH: 60 mg besi elemental + 400 mcg asam folat 1x/hari, minimal 90 tablet. Diminum malam dengan vitamin C; hindari bersamaan dengan teh, kopi, susu, dan kalsium',
+      'Asam folat sebaiknya sudah dimulai SEBELUM hamil dan diteruskan sampai 12 minggu — pencegahan defek tabung saraf hanya berhasil bila dimulai sebelum tabung saraf menutup, yaitu sebelum banyak ibu tahu dirinya hamil',
+      'Imunisasi Td sesuai status; Kalsium 1000 mg/hari dan Aspirin 75-150 mg malam sejak 12-16 minggu pada risiko tinggi preeklamsia',
+      'Nilai risiko tiap kunjungan dan tentukan TEMPAT BERSALIN sejak trimester 3; siapkan pendamping, transportasi, dan calon pendonor darah',
+      'EDUKASI TANDA BAHAYA yang harus segera dibawa ke fasilitas: perdarahan, nyeri kepala hebat, pandangan kabur, bengkak wajah dan tangan, kejang, demam tinggi, ketuban keluar, dan GERAK JANIN BERKURANG',
+      'Anjuran gizi, istirahat, dan aktivitas; hentikan rokok dan asap rokok; jangan minum obat tanpa sepengetahuan tenaga kesehatan',
     ],
   },
   'Ketuban Pecah Dini (KPD)': {
@@ -2101,6 +2151,29 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
   },
   'Abortus Imminens / Inkomplit': {
+    definisi: 'Perdarahan pervaginam pada kehamilan di bawah 20 minggu. IMMINENS: ostium masih TERTUTUP dan kehamilan berpeluang berlanjut. INKOMPLIT: ostium TERBUKA dan sebagian hasil konsepsi sudah keluar sementara sisanya tertinggal.',
+    etiologi: [
+      'KELAINAN KROMOSOM janin adalah penyebab lebih dari separuh keguguran trimester pertama — dan ini yang paling penting disampaikan kepada ibu, sebab ia tidak dapat dicegah dan bukan akibat kesalahan siapa pun',
+      'Infeksi: rubela, toksoplasma, sitomegalovirus, sifilis, listeria',
+      'Kelainan rahim: mioma submukosa, septum, sinekia, inkompetensi serviks (khas pada trimester kedua)',
+      'Penyakit ibu: diabetes tak terkendali, hipotiroid, SINDROM ANTIFOSFOLIPID (penyebab keguguran berulang yang dapat diobati)',
+      'Trauma, merokok, alkohol, kokain, dan usia ibu di atas 35 tahun',
+    ],
+    patofisiologi: 'Perdarahan bermula dari lepasnya sebagian desidua basalis, tempat plasenta melekat. Bila lepasnya kecil dan hasil konsepsi masih hidup serta serviks tertutup, kehamilan masih dapat berlanjut — inilah abortus imminens. Bila lepasnya luas, suplai darah ke janin terputus, kematian janin terjadi, dan rahim memperlakukan sisa konsepsi sebagai benda asing: prostaglandin dilepaskan, kontraksi timbul, dan serviks membuka. Yang menentukan bahaya pada abortus inkomplit adalah SISA JARINGAN itu sendiri. Selama sebagian plasenta masih menempel, rahim tidak dapat berkontraksi menutup pembuluh darah bekas tempat melekatnya — pembuluh spiralis tetap menganga dan perdarahan berlanjut, kadang sampai syok. Karena itu terapinya bukan uterotonika saja melainkan EVAKUASI; rahim yang isinya belum bersih tidak akan berhenti berdarah berapa pun oksitosin diberikan. Sisa jaringan juga menjadi tempat berkembangnya kuman, dan dari situlah abortus infeksiosa serta sepsis. Pada ibu rhesus negatif, darah janin yang masuk ke sirkulasi ibu memicu pembentukan antibodi yang akan menyerang janin pada kehamilan berikutnya — pemberian anti-D mencegah hal yang tidak akan terlihat akibatnya sampai bertahun-tahun kemudian.',
+    penunjang: [
+      'USG adalah penentu: kantong gestasi, denyut jantung janin, dan ada tidaknya sisa jaringan',
+      'Beta-hCG kuantitatif berseri bila USG belum menentukan — kenaikan yang tidak wajar mengarah pada kehamilan ektopik',
+      'Hemoglobin, golongan darah dan RHESUS (menentukan perlu tidaknya anti-D), dan uji silang bila perdarahan banyak',
+      'Pemeriksaan dalam untuk menilai OSTIUM — terbuka atau tertutup — sebab inilah yang memisahkan imminens dari inkomplit',
+      'Pada keguguran BERULANG (>=2 kali): antibodi antifosfolipid, TSH, gula darah, USG rahim, dan analisis kromosom pasangan',
+    ],
+    diagnosisBanding: [
+      'KEHAMILAN EKTOPIK TERGANGGU — wajib disingkirkan lebih dahulu pada setiap perdarahan trimester 1: nyeri hebat sesisi, syok yang tidak sebanding dengan perdarahan luar, nyeri goyang serviks',
+      'Mola hidatidosa — uterus lebih besar daripada usia kehamilan, hiperemesis berat, hCG sangat tinggi, gambaran badai salju',
+      'Perdarahan implantasi — sedikit, singkat, tanpa nyeri',
+      'Polip serviks, servisitis, dan erosi — perdarahan berasal dari serviks, bukan dari kavum',
+      'Abortus komplit (ostium tertutup, uterus mengecil, perdarahan berkurang) dan missed abortion (janin mati tanpa keluar)',
+    ],
     anamnesis: [
       'Perdarahan pervaginam pada kehamilan muda (<20 minggu), nyeri perut bawah/kram',
       'Imminens: OUI tertutup, janin masih hidup; inkomplit: sebagian jaringan sudah keluar, OUI terbuka',
@@ -2110,9 +2183,14 @@ export const OSCE_STATION_NOTES: Record<string, OsceStationNote> = {
     ],
     kriteriaDiagnosis: 'USG: imminens — janin/kantung gestasi masih intak dengan DJJ (+); inkomplit — sisa jaringan hasil konsepsi di kavum uteri tanpa gestational sac utuh.',
     tatalaksana: [
-      'Imminens: tirah baring, hindari aktivitas berat, progesteron dapat dipertimbangkan pada kasus tertentu, observasi',
-      'Inkomplit: evakuasi sisa jaringan (kuretase atau manual vacuum aspiration), tatalaksana perdarahan (uterotonik bila perlu), antibiotik profilaksis',
-      'Edukasi & dukungan emosional pasien pasca-keguguran',
+      'IMMINENS: tirah baring TIDAK terbukti mencegah keguguran — sampaikan itu apa adanya, sebab ibu yang disuruh berbaring lalu tetap keguguran akan menyalahkan dirinya karena merasa kurang berbaring. Hindari hubungan seksual, obati penyebab yang dapat diobati, dan kontrol dengan USG',
+      'IMMINENS: progesteron dapat dipertimbangkan pada riwayat keguguran berulang; tidak ada bukti kuat untuk pemakaian rutin',
+      'INKOMPLIT dengan perdarahan banyak: dua jalur IV besar, resusitasi kristaloid, golongan darah dan uji silang, lalu EVAKUASI — kuretase hisap atau Misoprostol 600 mcg oral / 800 mcg pervaginam',
+      'Uterotonika SETELAH rahim kosong; sebelum itu perdarahan tidak akan berhenti karena rahim tidak dapat berkontraksi menutup pembuluh selama masih ada sisa',
+      'ANTI-D 300 mcg dalam 72 jam pada ibu RHESUS NEGATIF — mencegah akibat yang baru terlihat pada kehamilan berikutnya',
+      'Antibiotik bila ada tanda infeksi (demam, sekret berbau, nyeri tekan uterus): Ampisilin + Gentamisin + Metronidazol; abortus infeksiosa adalah kegawatan',
+      'DUKUNGAN PSIKOLOGIS bukan pelengkap: sampaikan bahwa lebih dari separuh keguguran trimester pertama disebabkan kelainan kromosom yang tidak dapat dicegah, dan bahwa ini bukan kesalahan ibu. Kalimat itu sering menjadi bagian terpenting dari seluruh kunjungan',
+      'Rencanakan kontrasepsi dan kehamilan berikutnya; tidak perlu menunda lama bila keadaan ibu baik',
     ],
   },
   'Mastitis / Cracked Nipple': {

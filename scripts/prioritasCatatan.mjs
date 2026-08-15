@@ -104,11 +104,53 @@ const SINONIM = {
   'systemic lupus erythematosus': 'Lupus eritematosus sistemik',
   'graves disease': 'Tirotoksikosis',
   'penyakit graves': 'Tirotoksikosis',
+
+  /*
+   * Nama-nama di bawah ini ditemukan pada pemeriksaan LANGSUNG, bukan
+   * diperkirakan. Daftar kerja melaporkan seluruhnya "(tidak ketemu) 0/8"
+   * padahal catatannya ada — hanya bernama lain — dan enam kasus akan
+   * dikerjakan ulang dari nol seandainya laporan itu dipercaya begitu saja.
+   *
+   * Ini kelima kalinya alat pencari nama melaporkan pekerjaan yang sudah
+   * selesai sebagai belum. Setiap kali, penyebabnya bukan aturan pencocokan
+   * yang kurang pintar melainkan kenyataan bahwa nama stasiun ujian dan nama
+   * catatan memang berbeda — dan perbedaan itu hanya dapat diselesaikan dengan
+   * memeriksa satu per satu, bukan dengan regex yang lebih rumit.
+   */
+  'anc': 'ANC Normal (Antenatal Care)',
+  'antenatal care': 'ANC Normal (Antenatal Care)',
+  'ab imminens': 'Abortus Imminens / Inkomplit',
+  'abortus imminens': 'Abortus Imminens / Inkomplit',
+  'gerd': 'Gastritis / Dispepsia / GERD',
+  'dispepsia': 'Gastritis / Dispepsia / GERD',
+  'dm tipe 2': 'Diabetes melitus tipe 2',
+  'diabetes melitus tipe 2': 'Diabetes melitus tipe 2',
+  'tb paru': 'Tuberkulosis Paru',
+  'tuberkulosis paru': 'Tuberkulosis Paru',
+  'pap smear': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'iva': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'vesikolithiasis': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'vesikolitiasis': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'uretritis gonore': 'Servisitis / Uretritis Gonore',
+  'uretritis go': 'Servisitis / Uretritis Gonore',
+  'honk': 'Hiperglikemia hiperosmolar nonketotik',
+  'hhs': 'Hiperglikemia hiperosmolar nonketotik',
 }
 
 function cari(kunciBaku, label) {
+  /*
+   * Sinonim dicoba pada KEDUA ruang nama. Catatan penyakit memakai kunci
+   * telanjang, catatan stasiun OSCE memakai awalan 'OSCE::'. Percobaan pertama
+   * hanya memeriksa kunci telanjang, sehingga seluruh sinonim yang menunjuk ke
+   * catatan stasiun — ANC, GERD, TB paru, pap smear, vesikolitiasis, uretritis
+   * gonore — tetap dilaporkan "tidak ketemu" meski sudah dituliskan. Tabel
+   * sinonim yang benar tetapi tidak pernah dipakai sama saja dengan tidak ada.
+   */
   const langsung = SINONIM[norm(kunciBaku)] ?? SINONIM[norm(label)]
-  if (langsung && blok[langsung]) return langsung
+  if (langsung) {
+    if (blok[langsung]) return langsung
+    if (blok['OSCE::' + langsung]) return 'OSCE::' + langsung
+  }
 
   const kata = norm(kunciBaku).split(' ')
   const calon = [
