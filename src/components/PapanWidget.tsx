@@ -8,6 +8,8 @@ import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rin
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
+import { UbinDompet } from './UbinDompet'
+import { useStore } from '../lib/store'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papan widget beranda — bentuk ubin seperti di layar utama telepon.
@@ -369,6 +371,7 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
  * penting pun ikut tidak terbaca.
  */
 export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinjau[]; tanggalCatatan: string[] }) {
+  const { state } = useStore()
   const [pilihan, setPilihan] = useState<string[]>(ambilWidget)
   const [aturBuka, setAturBuka] = useState(false)
 
@@ -399,6 +402,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         <UbinKlinis />
       </div>
     </section>
+
+    <UbinDompet saldo={state.wallet?.balance ?? 0} />
 
     <BilahTubuh daftar={bilah} />
 

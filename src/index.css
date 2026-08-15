@@ -484,6 +484,15 @@ button:active, a[href]:active, [role='button']:active { transform: scale(0.985);
 .drawer-in { animation: drawer-in 0.22s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .reduce-motion .drawer-in { animation: none; }
 
+/* Menu yang turun dari lambangnya: tumbuh dari sudut kanan atas supaya jelas
+   berasal dari tombol yang baru diketuk, bukan muncul entah dari mana. */
+@keyframes menu-turun {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.menu-turun { animation: menu-turun 0.16s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reduce-motion .menu-turun { animation: none; }
+
 /* Bottom sheet slide-up */
 @keyframes sheet-in {
   from { transform: translateY(100%); }

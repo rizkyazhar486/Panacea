@@ -1,4 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { MenuPeran } from './MenuPeran'
 import { PencarianGlobal } from './PencarianGlobal'
 import { useGestur } from '../lib/useGestur'
 import { pasangKilau } from '../lib/kilau'
@@ -586,29 +587,14 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
             </button>
+            {/* Peran: lambang orang, bukan kotak pilihan. Saldo PNC: pindah ke
+                beranda. Keduanya dulu berdiri di sini dan bersama-sama memakan
+                sekitar 170 px dari bilah selebar 390 px, sehingga judul halaman
+                terpotong menjadi "Ber…" — lihat catatan di MenuPeran.tsx dan
+                UbinDompet.tsx. */}
             {account.isOwner && (
-              <label className="flex shrink-0 items-center gap-1.5 rounded-xl border border-brand bg-brand-50 px-2 py-1" title="Owner — switch access mode">
-                <span className="hidden text-[10px] font-bold uppercase tracking-wide text-brand-dark sm:inline">Mode</span>
-                <select
-                  value={account.role}
-                  onChange={(e) => setMode(e.target.value as Role)}
-                  className="max-w-[92px] cursor-pointer bg-transparent text-sm font-bold text-brand-dark outline-none sm:max-w-none"
-                >
-                  {ALL.map((r) => (
-                    <option key={r} value={r}>{roleLabel[r]}</option>
-                  ))}
-                </select>
-              </label>
+              <MenuPeran peran={account.role} daftar={ALL} label={roleLabel} ganti={setMode} />
             )}
-            <NavLink
-              to="/billing"
-              className="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 text-sm font-bold text-white"
-              title="PanaceaToken Balance"
-            >
-              <IconToken size={16} className="text-brand" />
-              {state.wallet.balance}
-              <span className="hidden text-[10px] font-semibold text-white/60 sm:inline">PNC</span>
-            </NavLink>
             {/* Mobile-only exit/logout — the sidebar Log Out is hidden on phones */}
             <button
               onClick={() => {
