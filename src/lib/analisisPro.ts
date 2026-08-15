@@ -33,6 +33,8 @@ export function sesiDariWorkout(w: ImportedWorkout): Sesi {
     avgHr: w.avgHr,
     maxHr: w.maxHr,
     hr: w.hr,
+    // Diteruskan supaya sesi yang dicatat tangan tidak menyumbang beban nol.
+    rpe: w.rpe,
   }
 }
 

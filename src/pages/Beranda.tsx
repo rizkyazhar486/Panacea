@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { DeretPratinjau } from '../components/KartuPratinjau'
 import { CatatanHarian } from '../components/CatatanHarian'
+import { CatatanLatihan } from '../components/CatatanLatihan'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
@@ -295,13 +296,30 @@ export default function Beranda() {
    * pemakainya mencatat sesuatu lalu kembali ke beranda — kartu yang tetap
    * memajang angka lama sesudah pencatatan membuat orang mencatat dua kali.
    */
+  /**
+   * Penanda segar untuk data yang TIDAK berada di dalam state React.
+   *
+   * Sesi latihan dan tanda tubuh disimpan langsung di penyimpanan peramban,
+   * bukan di dalam store. Akibatnya terukur: sesi baru tersimpan dengan benar,
+   * namun kartu Latihan tetap berbunyi "belum ada sesi tersimpan" sampai
+   * halaman dimuat ulang — pemakainya menyimpulkan simpanannya gagal, lalu
+   * menyimpannya lagi. Peristiwa yang sama yang dipakai seluruh aplikasi untuk
+   * menandai perubahan data kesehatan dipakai di sini sebagai pemicu baca ulang.
+   */
+  const [segar, setSegar] = useState(0)
+  useEffect(() => {
+    const ubah = () => setSegar((v) => v + 1)
+    window.addEventListener('panacea:health-updated', ubah)
+    return () => window.removeEventListener('panacea:health-updated', ubah)
+  }, [])
+
   const pratinjau = useMemo(
     () => pratinjauBeranda({
       foods: state.foods ?? [],
       sleepLogs: state.sleepLogs ?? [],
       umur: account?.dob ? ageFromDob(account.dob) : undefined,
     }),
-    [state.foods, state.sleepLogs, account],
+    [state.foods, state.sleepLogs, account, segar],
   )
 
   return (
@@ -358,6 +376,11 @@ export default function Beranda() {
           meminta sesuatu. Layar yang meminta lebih dahulu sebelum memberi apa
           pun terbaca sebagai pekerjaan, dan pekerjaan ditunda. */}
       <CatatanHarian />
+
+      {/* Catatan latihan memakai bentuk yang sama persis dengan catatan harian
+          di atasnya. Dua borang serupa dengan tata letak berbeda memaksa orang
+          belajar dua kali, dan yang kedua tidak pernah benar-benar dipelajari. */}
+      <CatatanLatihan />
 
       {!tujuan && <Tanya pilih={pilih} />}
 

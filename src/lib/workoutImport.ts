@@ -65,6 +65,16 @@ export interface ImportedWorkout {
   pemulihan: HrPoint[]
   /** Penurunan bpm pada menit pertama setelah selesai, bila terekam. */
   hrr1?: number
+  /**
+   * Berat yang dirasakan (Borg CR10, 1-10), hanya pada sesi yang dicatat tangan.
+   *
+   * Ada karena sesi tangan tidak punya deret denyut jantung: tanpa satu pun
+   * keterangan beban, sesi itu hanya berupa lama waktu, dan lari santai 60 menit
+   * akan dihitung setara dengan interval 60 menit. RPE tidak menggantikan
+   * pengukuran — ia dinyatakan sebagai yang DIRASAKAN, dan tetap ditandai
+   * demikian di mana pun dipakai.
+   */
+  rpe?: number
 }
 
 export interface HrNotification {

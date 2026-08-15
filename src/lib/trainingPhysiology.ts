@@ -32,6 +32,11 @@ export interface Sesi {
   maxHr?: number
   /** Deret detak jantung; makin rapat makin baik. */
   hr: { t: number; bpm: number }[]
+  /**
+   * Berat yang dirasakan (Borg CR10), hanya pada sesi yang dicatat tangan.
+   * Dipakai sebagai jalan terakhir ketika tidak ada denyut sama sekali.
+   */
+  rpe?: number
 }
 
 export interface Konteks {
@@ -83,6 +88,35 @@ export function trimpSesi(sesi: Sesi, k: Konteks): number {
   if (sesi.avgHr && sesi.durasiDetik > 0) {
     return +((sesi.durasiDetik / 60) * bobot(sesi.avgHr)).toFixed(1)
   }
+
+  /**
+   * Jalan terakhir: berat yang DIRASAKAN, untuk sesi yang dicatat tangan.
+   *
+   * MENGAPA INI HARUS ADA. Tanpa cabang ini fungsi mengembalikan 0, dan sesi
+   * tanpa denyut menyumbang beban NOL ke model Banister. Akibatnya persis
+   * terlihat di peramban: satu sesi lari 45 menit tersimpan dengan benar,
+   * namun kartu kebugaran tetap menunjukkan 0 — pemakainya mencatat dengan
+   * rajin ke dalam angka yang tidak pernah bergerak. Fitur yang datanya
+   * diabaikan diam-diam oleh model lebih buruk daripada fitur yang tidak ada.
+   *
+   * MENGAPA MEMAKAI RUMUS YANG SAMA, BUKAN SKALA KEDUA. Cara yang lazim
+   * (sRPE Foster: RPE x menit) menghasilkan satuan yang berbeda dari TRIMP,
+   * dan mencampur dua satuan dalam satu deret membuat kurva kebugaran melompat
+   * setiap kali sumber datanya berganti. Di sini RPE diterjemahkan lebih dahulu
+   * menjadi perkiraan cadangan denyut — RPE 10 setara kerja maksimal — lalu
+   * dimasukkan ke bobot() yang sama. Hasilnya berada pada skala yang sama
+   * dengan sesi terukur secara konstruksi, bukan karena disetel.
+   *
+   * INI TETAP TAKSIRAN. upayaRelatif() menandainya lewat dariDeret=false, dan
+   * layar yang menampilkannya menyebutkan bahwa bebannya ditaksir dari lama dan
+   * berat yang dirasakan — bukan diukur.
+   */
+  if (sesi.rpe && sesi.durasiDetik > 0) {
+    const hrrTaksiran = Math.min(1, Math.max(0, sesi.rpe / 10))
+    const bpmTaksiran = k.hrRest + hrrTaksiran * span
+    return +((sesi.durasiDetik / 60) * bobot(bpmTaksiran)).toFixed(1)
+  }
+
   return 0
 }
 
