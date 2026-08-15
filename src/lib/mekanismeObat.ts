@@ -83,6 +83,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Klopidogrel',
     alias: ['clopidogrel'],
+    rantai: [
+      '⊣ reseptor ADP P2Y12 (irreversibel)',
+      'aktivasi GP IIb/IIIa ↓',
+      'agregasi trombosit ↓',
+      '',
+      'Jalur ADP — BEDA dari COX-1 aspirin',
+      '→ dua pintu ditutup sekaligus',
+    ],
     golongan: 'Antiplatelet penghambat P2Y12',
     mekanisme: 'Menghambat reseptor ADP P2Y12 pada trombosit secara irreversibel sehingga aktivasi glikoprotein IIb/IIIa dan agregasi terhambat. Bekerja pada jalur BERBEDA dari aspirin — itulah dasar terapi antiplatelet ganda.',
     mengatasi: 'Mencegah trombus pada sindrom koroner akut dan setelah pemasangan cincin; pengganti aspirin bila alergi.',
@@ -128,7 +136,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Penyekat beta',
-    alias: ['bisoprolol', 'metoprolol', 'propranolol', 'atenolol', 'carvedilol', 'karvedilol'],
+    alias: ['propranolol', 'bisoprolol', 'metoprolol', 'atenolol', 'carvedilol', 'labetalol', 'bisoprolol', 'metoprolol', 'propranolol', 'atenolol', 'carvedilol', 'karvedilol'],
     rantai: [
       '⊣ reseptor beta-1 jantung',
       'nadi ↓ + kontraktilitas ↓',
@@ -145,7 +153,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Penghambat kanal kalsium',
-    alias: ['amlodipin', 'nifedipin', 'diltiazem', 'verapamil'],
+    alias: ['amlodipine', 'nifedipine', 'diltiazem', 'verapamil', 'nimodipin', 'amlodipin', 'nifedipin', 'diltiazem', 'verapamil'],
     rantai: [
       '⊣ kanal Ca otot polos',
       'vasodilatasi',
@@ -160,7 +168,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'ACE-inhibitor',
-    alias: ['kaptopril', 'captopril', 'lisinopril', 'ramipril', 'enalapril'],
+    alias: ['ARB', 'losartan', 'valsartan', 'candesartan', 'kandesartan', 'telmisartan', 'irbesartan', 'kaptopril', 'captopril', 'lisinopril', 'ramipril', 'enalapril'],
     rantai: [
       '⊣ ACE',
       'Angiotensin II ↓',
@@ -179,7 +187,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Furosemid',
-    alias: ['furosemide', 'lasix'],
+    alias: ['furosemide', 'lasix', 'hidroklorotiazid', 'HCT', 'thiazide', 'tiazid', 'furosemide', 'lasix'],
     rantai: [
       '⊣ Na-K-2Cl di ansa Henle',
       'reabsorpsi Na ↓',
@@ -210,7 +218,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Parasetamol',
-    alias: ['paracetamol', 'asetaminofen', 'acetaminophen'],
+    alias: ['paracetamol', 'acetaminophen', 'panadol', 'paracetamol', 'asetaminofen', 'acetaminophen'],
     rantai: [
       '⊣ prostaglandin di HIPOTALAMUS',
       'titik setel suhu ↓',
@@ -225,7 +233,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'NSAID',
-    alias: ['ibuprofen', 'natrium diklofenak', 'diklofenak', 'meloksikam', 'asam mefenamat', 'ketorolak', 'naproksen', 'indometasin', 'piroksikam'],
+    alias: ['diclofenac', 'ibuprofen', 'mefenamat', 'ketorolac', 'naproxen', 'piroxicam', 'celecoxib', 'selekoksib', 'asam mefenamat', 'ibuprofen', 'natrium diklofenak', 'diklofenak', 'meloksikam', 'asam mefenamat', 'ketorolak', 'naproksen', 'indometasin', 'piroksikam'],
     rantai: [
       '⊣ COX-1 & COX-2',
       'prostaglandin ↓',
@@ -244,7 +252,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Kortikosteroid',
-    alias: ['prednison', 'prednisolon', 'metilprednisolon', 'deksametason', 'hidrokortison', 'betametason'],
+    alias: ['methylprednisolone', 'dexamethasone', 'prednisone', 'prednisolone', 'hydrocortisone', 'triamsinolon', 'prednison', 'prednisolon', 'metilprednisolon', 'deksametason', 'hidrokortison', 'betametason'],
     rantai: [
       'Masuk inti sel → ubah transkripsi',
       '⊣ fosfolipase A₂',
@@ -262,7 +270,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Salbutamol',
-    alias: ['salbutamol', 'albuterol', 'ventolin', 'terbutalin'],
+    alias: ['ventolin', 'albuterol', 'terbutaline', 'fenoterol', 'formoterol', 'salmeterol', 'salbutamol', 'albuterol', 'ventolin', 'terbutalin'],
     rantai: [
       'Rangsang beta-2 bronkus',
       'cAMP ↑',
@@ -314,7 +322,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Antihistamin',
-    alias: ['setirizin', 'cetirizine', 'loratadin', 'klorfeniramin', 'ctm', 'difenhidramin', 'dimenhidrinat'],
+    alias: ['cetirizine', 'loratadine', 'chlorpheniramine', 'CTM', 'mebhidrolin', 'interhistin', 'fexofenadine', 'feksofenadin', 'setirizin', 'cetirizine', 'loratadin', 'klorfeniramin', 'ctm', 'difenhidramin', 'dimenhidrinat'],
     rantai: [
       '⊣ reseptor H1',
       'gatal ↓ bentol ↓ permeabilitas kapiler ↓',
@@ -328,7 +336,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Amoksisilin',
-    alias: ['amoxicillin', 'amoksisilin', 'amoksisilin-klavulanat', 'co-amoxiclav'],
+    alias: ['amoxicillin', 'amoxycillin', 'co-amoxiclav', 'augmentin', 'amoxicillin', 'amoksisilin', 'amoksisilin-klavulanat', 'co-amoxiclav'],
     rantai: [
       '⊣ protein pengikat penisilin',
       'ikatan silang peptidoglikan gagal',
@@ -345,7 +353,15 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Seftriakson',
-    alias: ['ceftriaxone', 'seftriakson', 'sefiksim', 'cefixime', 'sefaleksin', 'cephalexin', 'sefadroksil'],
+    alias: ['ceftriaxon', 'cefadroxil', 'cefadroksil', 'ceftazidime', 'seftazidim', 'cefotaxime', 'sefotaksim', 'cefuroxime', 'ceftriaxon', 'ceftriaxone', 'seftriakson', 'sefiksim', 'cefixime', 'sefaleksin', 'cephalexin', 'sefadroksil'],
+    rantai: [
+      '⊣ protein pengikat penisilin',
+      'dinding sel gagal terbentuk',
+      'bakteri lisis',
+      '',
+      'Lebih tahan beta-laktamase',
+      '+ menembus cairan otak → MENINGITIS',
+    ],
     golongan: 'Antibiotik sefalosporin',
     mekanisme: 'Sama seperti penisilin, menghambat sintesis dinding sel bakteri, tetapi lebih tahan terhadap beta-laktamase. Generasi makin tinggi makin kuat terhadap kuman gram negatif; seftriakson menembus cairan serebrospinal dengan baik.',
     mengatasi: 'Infeksi berat: meningitis, pielonefritis, demam tifoid, gonore, dan pneumonia yang perlu dirawat.',
@@ -354,7 +370,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Metronidazol',
-    alias: ['metronidazole', 'metronidazol'],
+    alias: ['metronidazole', 'metro', 'metronidazole', 'metronidazol'],
     rantai: [
       'Masuk kuman ANAEROB',
       'gugus nitro direduksi',
@@ -370,7 +386,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Doksisiklin',
-    alias: ['doxycycline', 'doksisiklin', 'tetrasiklin'],
+    alias: ['doxycycline', 'doksi', 'tetra', 'tetracycline', 'doxycycline', 'doksisiklin', 'tetrasiklin'],
     rantai: [
       '⊣ ribosom 30S',
       'tRNA tak menempel',
@@ -386,7 +402,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Azitromisin',
-    alias: ['azithromycin', 'azitromisin', 'eritromisin', 'erythromycin', 'klaritromisin'],
+    alias: ['azithromycin', 'erythromycin', 'clarithromycin', 'klaritromisin', 'azithromycin', 'azitromisin', 'eritromisin', 'erythromycin', 'klaritromisin'],
     rantai: [
       '⊣ ribosom 50S',
       'translokasi peptida berhenti',
@@ -401,7 +417,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Siprofloksasin',
-    alias: ['ciprofloxacin', 'siprofloksasin', 'levofloksasin', 'levofloxacin', 'ofloksasin', 'fluorokuinolon'],
+    alias: ['ciprofloxacin', 'ciproflox', 'levofloxacin', 'moxifloxacin', 'moksifloksasin', 'ciprofloxacin', 'siprofloksasin', 'levofloksasin', 'levofloxacin', 'ofloksasin', 'fluorokuinolon'],
     rantai: [
       '⊣ DNA girase & topoisomerase IV',
       'DNA tak dapat dipilin',
@@ -434,7 +450,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Insulin',
-    alias: ['insulin', 'novorapid', 'levemir', 'lantus'],
+    alias: ['insulin reguler', 'insulin rapid', 'actrapid', 'humalog', 'insulin', 'novorapid', 'levemir', 'lantus'],
     rantai: [
       'Insulin → reseptor',
       'GLUT4 ke membran',
@@ -504,7 +520,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Omeprazol',
-    alias: ['omeprazol', 'omeprazole', 'lansoprazol', 'pantoprazol', 'esomeprazol'],
+    alias: ['omeprazole', 'lansoprazole', 'pantoprazole', 'esomeprazole', 'PPI', 'omeprazol', 'omeprazole', 'lansoprazol', 'pantoprazol', 'esomeprazol'],
     rantai: [
       '⊣ pompa H⁺/K⁺-ATPase (irreversibel)',
       'sekresi asam berhenti',
@@ -519,6 +535,12 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Ranitidin',
     alias: ['ranitidin', 'famotidin', 'simetidin'],
+    rantai: [
+      '⊣ reseptor H2 sel parietal',
+      'rangsang histamin ↓',
+      'asam ↓',
+      '(hanya 1 dari 3 rangsangan → lebih lemah dari PPI)',
+    ],
     golongan: 'Penghambat reseptor H2',
     mekanisme: 'Menghambat reseptor histamin H2 pada sel parietal sehingga rangsangan histamin terhadap sekresi asam berkurang. Hanya menutup satu dari tiga rangsangan, sehingga lebih lemah daripada penghambat pompa proton.',
     mengatasi: 'Nyeri ulu hati dan dispepsia ringan.',
@@ -527,7 +549,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Oralit',
-    alias: ['oralit', 'cairan rehidrasi', 'ORS', 'rehidrasi oral'],
+    alias: ['ORS', 'cairan rehidrasi oral', 'larutan gula garam', 'LGG', 'oralit', 'cairan rehidrasi', 'ORS', 'rehidrasi oral'],
     rantai: [
       'Glukosa + Na masuk lewat SGLT1',
       'Na ditarik masuk',
@@ -544,6 +566,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Zinc',
     alias: ['zinc', 'zink', 'seng'],
+    rantai: [
+      'Perbaiki epitel usus',
+      'enzim pembawa pulih',
+      '+ imunitas mukosa ↑',
+      'diare lebih singkat',
+      '+ kekambuhan 2-3 bulan ↓',
+    ],
     golongan: 'Mikronutrien',
     mekanisme: 'Memperbaiki epitel usus yang rusak, mengembalikan fungsi enzim pembawa, dan memperkuat kekebalan mukosa sehingga durasi dan beratnya diare berkurang.',
     mengatasi: 'Mempersingkat diare pada anak dan menurunkan kekambuhan dalam 2-3 bulan berikutnya.',
@@ -584,7 +613,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Ketokonazol',
-    alias: ['ketokonazol', 'mikonazol', 'flukonazol', 'itrakonazol', 'klotrimazol'],
+    alias: ['ketoconazole', 'miconazole', 'fluconazole', 'itraconazole', 'clotrimazole', 'nystatin oral', 'ketokonazol', 'mikonazol', 'flukonazol', 'itrakonazol', 'klotrimazol'],
     rantai: [
       '⊣ lanosterol 14-α-demetilase',
       'ERGOSTEROL tak terbentuk',
@@ -600,6 +629,12 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Terbinafin',
     alias: ['terbinafin', 'terbinafine'],
+    rantai: [
+      '⊣ skualen epoksidase',
+      'ergosterol ↓ DAN skualen menumpuk',
+      'membran rusak + racun bagi jamur',
+      'FUNGISID (membunuh, bukan menghambat)',
+    ],
     golongan: 'Antijamur alilamin',
     mekanisme: 'Menghambat skualen epoksidase pada langkah yang lebih awal daripada azol, sehingga ergosterol tidak terbentuk sekaligus skualen menumpuk dan meracuni jamur — bersifat fungisid, bukan sekadar menghambat.',
     mengatasi: 'Tinea, terutama tinea unguium dan tinea kapitis.',
@@ -608,7 +643,16 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Kloroquin',
-    alias: ['klorokuin', 'chloroquine', 'dihidroartemisinin', 'artesunat', 'piperakuin', 'primakuin', 'DHP'],
+    alias: ['ACT', 'artemisinin', 'kina', 'quinine', 'kuinin', 'artemether', 'lumefantrin', 'klorokuin', 'chloroquine', 'dihidroartemisinin', 'artesunat', 'piperakuin', 'primakuin', 'DHP'],
+    rantai: [
+      'Artemisinin + besi heme parasit',
+      'radikal bebas',
+      'protein parasit rusak',
+      'parasit mati (paling cepat)',
+      '',
+      'Primakuin → HIPNOZOIT di hati',
+      'kekambuhan dicegah',
+    ],
     golongan: 'Antimalaria',
     mekanisme: 'Artemisinin dan turunannya diaktifkan oleh besi heme di dalam parasit dan menghasilkan radikal bebas yang merusak protein parasit — kerjanya paling cepat di antara semua antimalaria. Primakuin membunuh bentuk HIPNOZOIT yang tidur di hati.',
     mengatasi: 'Malaria falsiparum dan vivaks; primakuin mencegah kekambuhan dari hati.',
@@ -650,6 +694,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Asam valproat',
     alias: ['asam valproat', 'valproat', 'depakote'],
+    rantai: [
+      'GABA ↑',
+      '+ ⊣ kanal Na⁺',
+      '+ ⊣ kanal Ca²⁺ tipe T',
+      'letupan neuron teredam',
+      'SPEKTRUM LUAS: umum, absans, mioklonik',
+    ],
     golongan: 'Antikonvulsan spektrum luas',
     mekanisme: 'Meningkatkan GABA, menghambat kanal natrium, dan menghambat kanal kalsium tipe T — kombinasi inilah yang membuatnya bekerja pada hampir semua jenis bangkitan.',
     mengatasi: 'Bangkitan umum, absans, mioklonik, dan pencegahan migren.',
@@ -659,6 +710,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Karbamazepin',
     alias: ['karbamazepin', 'carbamazepin', 'carbamazepine', 'okskarbazepin'],
+    rantai: [
+      '⊣ kanal Na⁺ bergerbang voltase',
+      'membran neuron stabil',
+      'letupan berulang ↓',
+      '',
+      'Neuralgia trigeminal → pilihan PERTAMA',
+      '(JANGAN pada absans → memperberat)',
+    ],
     golongan: 'Antikonvulsan penstabil kanal natrium',
     mekanisme: 'Menghambat kanal natrium bergerbang voltase dan menstabilkan membran neuron yang mudah melepas letupan berulang.',
     mengatasi: 'Bangkitan fokal dan NEURALGIA TRIGEMINAL, tempat ia menjadi obat pilihan pertama.',
@@ -748,7 +807,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Asam traneksamat',
-    alias: ['asam traneksamat', 'tranexamic', 'kalnex'],
+    alias: ['tranexamic acid', 'TXA', 'kalnex', 'asam traneksamat', 'tranexamic', 'kalnex'],
     rantai: [
       '⊣ tempat ikat lisin pada plasminogen',
       'plasmin tak menempel pada fibrin',
@@ -765,6 +824,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Vitamin K',
     alias: ['vitamin k', 'fitomenadion', 'phytomenadione'],
+    rantai: [
+      'Kofaktor karboksilasi di hati',
+      'faktor II, VII, IX, X dapat ikat Ca²⁺',
+      'faktor BERFUNGSI',
+      'pembekuan pulih',
+      '',
+      'Tanpa vitamin K: faktor tetap dibuat tapi MATI FUNGSI',
+    ],
     golongan: 'Kofaktor sintesis faktor pembekuan',
     mekanisme: 'Menjadi kofaktor karboksilasi faktor II, VII, IX, dan X di hati sehingga faktor-faktor itu dapat mengikat kalsium dan bekerja. Tanpa vitamin K, faktor tetap dibuat tetapi tidak berfungsi.',
     mengatasi: 'Perdarahan akibat defisiensi vitamin K, penyakit hati, dan kelebihan warfarin; profilaksis perdarahan pada bayi baru lahir.',
@@ -809,6 +876,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Atropin',
     alias: ['atropin', 'atropine'],
+    rantai: [
+      '⊣ reseptor muskarinik',
+      'pengaruh vagus pada nodus SA/AV ↓',
+      'nadi ↑',
+      '',
+      'Organofosfat: sasarannya PARU KERING',
+      'bukan angka nadi tertentu',
+    ],
     golongan: 'Antikolinergik (antagonis muskarinik)',
     mekanisme: 'Menghambat reseptor muskarinik sehingga pengaruh saraf vagus pada nodus SA dan AV berkurang dan laju denyut naik; juga mengeringkan sekret dan melebarkan pupil.',
     mengatasi: 'Bradikardia bergejala dan keracunan organofosfat.',
@@ -834,6 +909,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Misoprostol',
     alias: ['misoprostol'],
+    rantai: [
+      'Rangsang reseptor prostaglandin miometrium',
+      'rahim kontraksi + serviks melunak',
+      '',
+      'Di lambung: gantikan PG pelindung mukosa',
+      '',
+      'Tahan suhu ruangan → unggul tanpa kulkas',
+    ],
     golongan: 'Analog prostaglandin E1',
     mekanisme: 'Merangsang reseptor prostaglandin pada miometrium sehingga rahim berkontraksi dan serviks melunak; pada lambung ia menggantikan prostaglandin pelindung mukosa.',
     mengatasi: 'Perdarahan pascapersalinan bila oksitosin tidak tersedia, evakuasi sisa konsepsi, dan pencegahan tukak akibat NSAID.',
@@ -860,6 +943,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Asam folat',
     alias: ['asam folat', 'folat', 'folic acid'],
+    rantai: [
+      'Kofaktor pemindahan 1 atom karbon',
+      'sintesis purin & timidin',
+      'DNA terbentuk',
+      'sel cepat membelah selamat',
+      '',
+      '(sumsum tulang & tabung saraf janin)',
+    ],
     golongan: 'Vitamin B9',
     mekanisme: 'Menjadi kofaktor pemindahan satu atom karbon pada sintesis purin dan timidin — bahan dasar DNA. Tanpa folat, pembelahan sel terhenti pada sel yang paling cepat membelah: sumsum tulang dan tabung saraf janin.',
     mengatasi: 'Anemia megaloblastik, pencegahan defek tabung saraf pada kehamilan, dan mengurangi efek samping metotreksat.',
@@ -887,6 +978,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Hidroksiklorokuin',
     alias: ['hidroksiklorokuin', 'hydroxychloroquine', 'HCQ'],
+    rantai: [
+      'Naikkan pH lisosom sel penyaji antigen',
+      'pemrosesan antigen terganggu',
+      'pensinyalan TLR ↓',
+      'respons autoimun mereda',
+      '',
+      'Satu-satunya obat lupus yang turunkan KEMATIAN',
+    ],
     golongan: 'Antimalaria dengan efek imunomodulator',
     mekanisme: 'Menaikkan pH di dalam lisosom sel penyaji antigen sehingga pemrosesan antigen dan pensinyalan reseptor Toll-like terganggu, dan respons autoimun mereda.',
     mengatasi: 'Dasar terapi lupus untuk SEMUA pasien; juga dipakai pada artritis reumatoid.',
@@ -929,6 +1028,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Bifosfonat',
     alias: ['alendronat', 'bifosfonat', 'asam zoledronat'],
+    rantai: [
+      'Menempel hidroksiapatit tulang',
+      'ditelan OSTEOKLAS',
+      'jalur mevalonat terganggu',
+      'osteoklas apoptosis',
+      'RESORPSI TULANG BERHENTI',
+    ],
     golongan: 'Penghambat resorpsi tulang',
     mekanisme: 'Menempel pada hidroksiapatit tulang dan ditelan osteoklas, lalu mengganggu jalur mevalonat sehingga osteoklas kehilangan fungsi dan mengalami apoptosis — resorpsi tulang berhenti.',
     mengatasi: 'Osteoporosis dan pencegahan patah tulang, termasuk akibat kortikosteroid jangka panjang.',
@@ -937,7 +1043,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Kalsium dan vitamin D',
-    alias: ['kalsium', 'vitamin d', 'kolekalsiferol'],
+    alias: ['mecobalamin', 'mekobalamin', 'vitamin b12', 'kobalamin', 'cyanocobalamin', 'sianokobalamin', 'vitamin b kompleks', 'neurotropik', 'kalsium', 'vitamin d', 'kolekalsiferol'],
+    rantai: [
+      'Vitamin D → hati → ginjal',
+      'KALSITRIOL',
+      'penyerapan Ca & fosfat di usus ↑',
+      'mineralisasi tulang',
+    ],
     golongan: 'Mineral dan hormon pengatur kalsium',
     mekanisme: 'Vitamin D dihidroksilasi di hati lalu di ginjal menjadi kalsitriol, yang meningkatkan penyerapan kalsium dan fosfat di usus sehingga mineralisasi tulang berjalan.',
     mengatasi: 'Mencegah dan mengobati rakitis, osteomalasia, dan osteoporosis; menjadi dasar terapi bersama bifosfonat.',
@@ -979,6 +1091,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Betahistin',
     alias: ['betahistin', 'betahistine'],
+    rantai: [
+      'Agonis lemah H1 + antagonis H3',
+      'mikrosirkulasi telinga dalam ↑',
+      'tekanan endolimf ↓',
+      '+ kompensasi vestibular dipercepat',
+      'SERANGAN BERKURANG (pencegahan)',
+    ],
     golongan: 'Analog histamin',
     mekanisme: 'Bekerja sebagai agonis lemah H1 dan antagonis H3 sehingga aliran darah mikrosirkulasi telinga dalam meningkat dan tekanan endolimf diduga berkurang; ia juga mempercepat kompensasi vestibular di batang otak.',
     mengatasi: 'Mengurangi frekuensi serangan vertigo pada penyakit Meniere.',
@@ -988,6 +1107,11 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Ondansetron',
     alias: ['ondansetron'],
+    rantai: [
+      '⊣ reseptor 5-HT3',
+      'di zona pencetus kemoreseptor DAN ujung vagus usus',
+      'sinyal muntah tak sampai pusat muntah',
+    ],
     golongan: 'Antagonis reseptor 5-HT3',
     mekanisme: 'Menghambat reseptor serotonin 5-HT3 di zona pencetus kemoreseptor dan pada ujung saraf vagus di usus, sehingga sinyal muntah tidak sampai ke pusat muntah.',
     mengatasi: 'Mual dan muntah hebat, termasuk pascaoperasi dan akibat kemoterapi.',
@@ -997,6 +1121,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Domperidon',
     alias: ['domperidon', 'metoklopramid', 'metoclopramide'],
+    rantai: [
+      '⊣ reseptor D2 di CTZ & saluran cerna',
+      'pengosongan lambung dipercepat',
+      'mual ↓',
+      '',
+      'Metoklopramid MENEMBUS otak',
+      '→ PARKINSONISME akibat obat',
+    ],
     golongan: 'Antagonis dopamin (prokinetik)',
     mekanisme: 'Menghambat reseptor dopamin D2 di zona pencetus kemoreseptor dan di saluran cerna sehingga pengosongan lambung dipercepat dan rasa mual berkurang. Domperidon hampir tidak menembus sawar darah-otak, metoklopramid menembusnya.',
     mengatasi: 'Mual, muntah, dan rasa penuh akibat pengosongan lambung yang lambat.',
@@ -1024,6 +1156,12 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Salin hipertonik',
     alias: ['salin hipertonik', 'nacl 3%', 'manitol'],
+    rantai: [
+      'Osmolaritas plasma ↑',
+      'air ditarik keluar dari jaringan otak',
+      'tekanan intrakranial ↓',
+      '(hanya bila sawar darah-otak UTUH)',
+    ],
     golongan: 'Agen osmotik',
     mekanisme: 'Menaikkan osmolaritas plasma sehingga air ditarik keluar dari jaringan otak melewati sawar darah-otak yang utuh, dan tekanan intrakranial turun.',
     mengatasi: 'Menurunkan tekanan intrakranial pada edema serebri.',
@@ -1085,6 +1223,11 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Kloramfenikol',
     alias: ['kloramfenikol', 'chloramphenicol'],
+    rantai: [
+      '⊣ peptidil transferase ribosom 50S',
+      'rantai peptida tak tersambung',
+      'sintesis protein berhenti',
+    ],
     golongan: 'Antibiotik penghambat ribosom 50S',
     mekanisme: 'Menghambat enzim peptidil transferase pada subunit ribosom 50S sehingga rantai peptida bakteri tidak dapat disambung.',
     mengatasi: 'Demam tifoid, dan sediaan tetes atau salep untuk infeksi mata luar.',
@@ -1094,6 +1237,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Penisilin benzatin',
     alias: ['benzatin', 'penisilin prokain', 'penicillin', 'penisilin'],
+    rantai: [
+      'Garam lepas-lambat di otot',
+      'kadar bertahan BERMINGGU-MINGGU',
+      '⊣ dinding sel',
+      '',
+      '1 suntikan tiap 3-4 minggu',
+      'katup jantung terlindung',
+    ],
     golongan: 'Antibiotik beta-laktam kerja panjang',
     mekanisme: 'Sama seperti penisilin lain menghambat sintesis dinding sel, tetapi bentuk garamnya melepaskan obat perlahan dari tempat suntikan sehingga kadar terapeutik bertahan berminggu-minggu dari satu kali suntikan.',
     mengatasi: 'Faringitis streptokokus, sifilis, dan PROFILAKSIS SEKUNDER demam reumatik.',
@@ -1103,6 +1254,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Klindamisin',
     alias: ['klindamisin', 'clindamycin'],
+    rantai: [
+      '⊣ ribosom 50S',
+      'sintesis protein berhenti',
+      '',
+      '+ produksi TOKSIN ditekan',
+      '→ fasiitis nekrotikans & syok toksik',
+    ],
     golongan: 'Antibiotik linkosamid',
     mekanisme: 'Mengikat subunit ribosom 50S dan menghambat sintesis protein; menembus tulang dan abses dengan baik, serta menekan produksi toksin pada infeksi streptokokus dan stafilokokus berat.',
     mengatasi: 'Infeksi kulit dan jaringan lunak, abses gigi, osteomielitis, dan alternatif pada alergi penisilin.',
@@ -1112,6 +1270,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Gentamisin',
     alias: ['gentamisin', 'gentamicin', 'amikasin', 'aminoglikosida'],
+    rantai: [
+      '⊣ ribosom 30S (irreversibel)',
+      'kode genetik salah dibaca',
+      'protein cacat merusak membran',
+      'BAKTERISID',
+      '',
+      'Bergantung PUNCAK → sekali sehari dosis besar',
+    ],
     golongan: 'Antibiotik aminoglikosida',
     mekanisme: 'Mengikat subunit ribosom 30S secara irreversibel sehingga pembacaan kode genetik menjadi keliru dan protein yang cacat merusak membran bakteri — bersifat bakterisid dan bergantung pada kadar puncak.',
     mengatasi: 'Infeksi gram negatif berat, sepsis neonatorum, dan dikombinasikan pada endokarditis.',
@@ -1121,6 +1287,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Vankomisin',
     alias: ['vankomisin', 'vancomycin'],
+    rantai: [
+      'Ikat ujung D-ala-D-ala prekursor peptidoglikan',
+      'penyambungan dinding sel terhalang',
+      '',
+      'Jalur BEDA dari beta-laktam → tetap kerja pada MRSA',
+      '',
+      'Oral: TIDAK diserap → tinggal di lumen → C. difficile',
+    ],
     golongan: 'Antibiotik glikopeptida',
     mekanisme: 'Mengikat ujung D-alanil-D-alanin prekursor peptidoglikan sehingga penyambungan dinding sel terhalang — jalur berbeda dari beta-laktam, sehingga tetap bekerja pada kuman yang menghasilkan beta-laktamase maupun MRSA.',
     mengatasi: 'Infeksi MRSA, sepsis terkait kateter, dan kolitis Clostridioides difficile berat (per oral).',
@@ -1130,6 +1304,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Praziquantel',
     alias: ['praziquantel'],
+    rantai: [
+      'Permeabilitas Ca²⁺ membran cacing ↑',
+      'kontraksi hebat',
+      'kelumpuhan',
+      '+ tegumen rusak',
+      'imun pejamu menyerang',
+    ],
     golongan: 'Antihelmintik untuk cacing pipih',
     mekanisme: 'Meningkatkan permeabilitas membran cacing terhadap kalsium sehingga terjadi kontraksi otot yang hebat dan kelumpuhan, sekaligus merusak tegumen sehingga cacing terbuka terhadap serangan kekebalan pejamu.',
     mengatasi: 'Skistosomiasis, taeniasis, dan sistiserkosis.',
@@ -1139,6 +1320,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Dietilkarbamazin',
     alias: ['dietilkarbamazin', 'DEC', 'ivermektin', 'ivermectin'],
+    rantai: [
+      'DEC → ubah permukaan mikrofilaria',
+      'dihancurkan sistem imun',
+      '',
+      'Ivermektin → kanal Cl⁻ gerbang glutamat',
+      '(hanya pada invertebrata)',
+      'parasit lumpuh',
+    ],
     golongan: 'Antifilaria',
     mekanisme: 'DEC mengubah permukaan mikrofilaria sehingga mudah dihancurkan sistem imun pejamu. Ivermektin mengikat kanal klorida bergerbang glutamat yang hanya dimiliki invertebrata sehingga parasit lumpuh — itulah dasar keamanannya pada manusia.',
     mengatasi: 'Filariasis limfatik, skabies (ivermektin oral), dan strongiloidiasis.',
@@ -1147,7 +1336,15 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Antiretroviral',
-    alias: ['tenofovir', 'lamivudin', 'dolutegravir', 'efavirenz', 'zidovudin', 'ARV', 'antiretroviral'],
+    alias: ['TDF', '3TC', 'FTC', 'EFV', 'DTG', 'ART', 'HAART', 'tenofovir', 'lamivudin', 'dolutegravir', 'efavirenz', 'zidovudin', 'ARV', 'antiretroviral'],
+    rantai: [
+      'RT-inhibitor ⊣ RNA → DNA',
+      'Integrase-inhibitor ⊣ sisip ke kromosom',
+      'Protease-inhibitor ⊣ pematangan virion',
+      '',
+      'viral load tak terdeteksi',
+      'TIDAK MENULARKAN',
+    ],
     golongan: 'Terapi antiretroviral kombinasi',
     mekanisme: 'Menghambat tiga tahap daur hidup HIV sekaligus: penghambat reverse transcriptase menghentikan penyalinan RNA virus menjadi DNA, penghambat integrase mencegah penyisipan DNA virus ke kromosom pejamu, dan penghambat protease menggagalkan pematangan virion.',
     mengatasi: 'Menekan jumlah virus sampai tidak terdeteksi, memulihkan CD4, dan MEMUTUS PENULARAN.',
@@ -1157,6 +1354,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Dapson',
     alias: ['dapson', 'dapsone', 'klofazimin', 'rifampicin kusta', 'MDT'],
+    rantai: [
+      'Dapson ⊣ sintesis folat basil',
+      'Rifampisin ⊣ RNA polimerase → bunuh cepat',
+      'Klofazimin → DNA basil + radang ↓',
+      '',
+      'Tak menular setelah dosis PERTAMA rifampisin',
+    ],
     golongan: 'Antikusta (multidrug therapy)',
     mekanisme: 'Dapson menghambat sintesis folat basil kusta; rifampisin membunuhnya dengan cepat lewat penghambatan RNA polimerase; klofazimin bekerja pada DNA basil sekaligus meredam radang. Kombinasi tiga obat mencegah kekebalan.',
     mengatasi: 'Menyembuhkan kusta dan memutus penularan; pasien tidak menular lagi setelah dosis pertama rifampisin.',
@@ -1166,6 +1370,15 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Permetrin',
     alias: ['permetrin', 'permethrin', 'gameksan', 'lindan', 'sulfur presipitatum'],
+    rantai: [
+      'Ganggu kanal Na⁺ saraf tungau',
+      'depolarisasi berkepanjangan',
+      'kelumpuhan',
+      'tungau mati',
+      '',
+      'Gatal 2-4 minggu setelah mati = ALERGI sisa tungau',
+      'bukan gagal terapi',
+    ],
     golongan: 'Skabisida topikal',
     mekanisme: 'Mengganggu kanal natrium pada saraf tungau sehingga terjadi depolarisasi berkepanjangan, kelumpuhan, dan kematian parasit.',
     mengatasi: 'Skabies dan pedikulosis.',
@@ -1174,7 +1387,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Heparin',
-    alias: ['heparin', 'enoksaparin', 'enoxaparin', 'fondaparinuks', 'fondaparinux', 'LMWH'],
+    alias: ['UFH', 'heparin unfractionated', 'dalteparin', 'heparin', 'enoksaparin', 'enoxaparin', 'fondaparinuks', 'fondaparinux', 'LMWH'],
     rantai: [
       'Percepat antitrombin III ×1000',
       'faktor Xa & trombin dinonaktifkan',
@@ -1241,6 +1454,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Amiodaron',
     alias: ['amiodaron', 'amiodarone'],
+    rantai: [
+      '⊣ kanal K⁺ → masa refrakter memanjang',
+      '+ sifat kelas I, II, IV',
+      'aritmia atrium DAN ventrikel teratasi',
+      '',
+      'Satu obat empat kelas → efek samping banyak organ',
+    ],
     golongan: 'Antiaritmia kelas III',
     mekanisme: 'Memperpanjang masa refrakter dengan menghambat kanal kalium, sekaligus memiliki sifat kelas I, II, dan IV — itulah sebabnya ia bekerja pada aritmia atrium maupun ventrikel.',
     mengatasi: 'Fibrilasi atrium, takikardia ventrikel, dan henti jantung dengan irama yang dapat dikejut.',
@@ -1250,6 +1470,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Adenosin',
     alias: ['adenosin', 'adenosine'],
+    rantai: [
+      'Aktifkan reseptor A1 nodus AV',
+      'konduksi AV terhenti SESAAT',
+      'sirkuit masuk-ulang terputus',
+      'SVT berhenti',
+      '',
+      'Waktu paruh <10 detik → suntik CEPAT + bilas',
+    ],
     golongan: 'Antiaritmia kerja sangat singkat',
     mekanisme: 'Mengaktifkan reseptor A1 di nodus AV sehingga konduksi terhenti sesaat dan sirkuit masuk-ulang terputus. Waktu paruhnya kurang dari 10 detik karena langsung diambil sel darah merah dan endotel.',
     mengatasi: 'Menghentikan takikardia supraventrikel yang stabil, dan membantu mengungkap irama atrium yang tersembunyi.',
@@ -1259,6 +1487,15 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Norepinefrin',
     alias: ['norepinefrin', 'noradrenalin', 'dobutamin', 'dopamin', 'vasopresor'],
+    rantai: [
+      'Norepinefrin → alfa-1',
+      'vasokonstriksi',
+      'tekanan perfusi ↑',
+      '',
+      'Dobutamin → beta-1',
+      'kontraktilitas ↑',
+      'curah jantung ↑',
+    ],
     golongan: 'Vasopresor dan inotropik',
     mekanisme: 'Norepinefrin bekerja terutama pada reseptor alfa-1 sehingga pembuluh menyempit dan tekanan perfusi naik. Dobutamin bekerja pada beta-1 sehingga kontraktilitas meningkat tanpa banyak menaikkan tahanan pembuluh.',
     mengatasi: 'Mempertahankan tekanan perfusi organ pada syok septik (norepinefrin) dan memperbaiki curah jantung pada syok kardiogenik (dobutamin).',
@@ -1284,6 +1521,12 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Montelukast',
     alias: ['montelukast'],
+    rantai: [
+      '⊣ reseptor CysLT1',
+      'leukotrien tak bekerja',
+      'bronkokonstriksi ↓ + eosinofil ↓',
+      '(jalur ini TIDAK disentuh antihistamin)',
+    ],
     golongan: 'Antagonis reseptor leukotrien',
     mekanisme: 'Menghambat reseptor CysLT1 sehingga leukotrien — mediator yang jauh lebih kuat daripada histamin dalam menyempitkan bronkus dan menarik eosinofil — tidak dapat bekerja.',
     mengatasi: 'Asma, terutama yang dipicu latihan fisik, dan rinitis alergi penyerta.',
@@ -1293,6 +1536,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Oksimetazolin',
     alias: ['oksimetazolin', 'pseudoefedrin', 'efedrin', 'dekongestan', 'fenilefrin'],
+    rantai: [
+      'Rangsang alfa-1 pembuluh mukosa hidung',
+      'vasokonstriksi',
+      'mukosa mengempis',
+      'hidung terbuka',
+      '',
+      '>5 hari → rinitis MEDIKAMENTOSA',
+    ],
     golongan: 'Dekongestan agonis alfa-adrenergik',
     mekanisme: 'Merangsang reseptor alfa-1 pada pembuluh mukosa hidung sehingga terjadi vasokonstriksi, mukosa mengempis, dan jalan napas hidung terbuka.',
     mengatasi: 'Hidung tersumbat pada rinitis dan sinusitis, serta melapangkan lapangan pandang saat mengeluarkan benda asing.',
@@ -1302,6 +1553,11 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Timolol',
     alias: ['timolol', 'asetazolamid', 'acetazolamide', 'latanoprost', 'pilokarpin'],
+    rantai: [
+      'Timolol & asetazolamid → PRODUKSI humor akuos ↓',
+      'Latanoprost & pilokarpin → PENGELUARAN ↑',
+      'tekanan bola mata ↓',
+    ],
     golongan: 'Obat penurun tekanan intraokular',
     mekanisme: 'Penyekat beta topikal (timolol) dan asetazolamid menurunkan PRODUKSI humor akuos oleh badan siliar; analog prostaglandin (latanoprost) dan pilokarpin meningkatkan PENGELUARANNYA.',
     mengatasi: 'Menurunkan tekanan bola mata pada glaukoma, dan pada glaukoma akut menyelamatkan penglihatan yang dapat hilang dalam hitungan jam.',
@@ -1311,6 +1567,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Air mata buatan',
     alias: ['air mata buatan', 'artificial tear', 'lubrikan mata', 'hidroksipropil metilselulosa'],
+    rantai: [
+      'Ganti lapisan air mata',
+      'permukaan kornea tetap basah',
+      'epitel terlindung dari kering & gesekan',
+      '',
+      'Bell’s palsy: kebutaan kornea TIDAK dapat dikembalikan',
+    ],
     golongan: 'Lubrikan permukaan mata',
     mekanisme: 'Menggantikan lapisan air mata yang kurang sehingga permukaan kornea tetap basah dan epitelnya terlindung dari kekeringan serta gesekan kelopak.',
     mengatasi: 'Mata kering, dan PERLINDUNGAN KORNEA pada mata yang tidak dapat menutup sempurna (Bell\'s palsy, eksoftalmus).',
@@ -1320,6 +1583,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Karbo adsorben',
     alias: ['norit', 'karbo adsorben', 'arang aktif', 'activated charcoal'],
+    rantai: [
+      'Permukaan berpori sangat luas',
+      'ikat racun di LUMEN usus',
+      'racun tak terserap',
+      'dibuang bersama tinja',
+      '(paling berguna <1 jam)',
+    ],
     golongan: 'Adsorben saluran cerna',
     mekanisme: 'Permukaannya yang sangat luas dan berpori mengikat molekul racun di dalam lumen saluran cerna sehingga tidak terserap dan dibuang bersama tinja.',
     mengatasi: 'Keracunan obat dan zat kimia yang tertelan.',
@@ -1329,6 +1599,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Nalokson',
     alias: ['nalokson', 'naloxone'],
+    rantai: [
+      'Saingi opioid pada reseptor mu',
+      'opioid terusir',
+      'depresi napas pulih',
+      '',
+      'Waktu paruh LEBIH PENDEK dari opioid → pantau terus',
+    ],
     golongan: 'Antagonis reseptor opioid',
     mekanisme: 'Bersaing dengan opioid pada reseptor mu dan mengusirnya dari reseptor sehingga depresi napas segera pulih.',
     mengatasi: 'Keracunan opioid dengan depresi napas.',
@@ -1338,6 +1615,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Diazepam rektal',
     alias: ['stesolid', 'diazepam rektal'],
+    rantai: [
+      'Diserap pleksus vena hemoroidalis',
+      'sebagian lewati hati',
+      'kadar terapeutik 5-10 menit',
+      'kejang berhenti',
+      '',
+      '<10 kg = 5 mg, >10 kg = 10 mg',
+    ],
     golongan: 'Benzodiazepin sediaan rektal',
     mekanisme: 'Zat yang sama dengan diazepam suntik, tetapi diserap melalui pleksus vena hemoroidalis yang sebagian melewati hati, sehingga kadar terapeutik tercapai dalam 5-10 menit tanpa perlu jalur intravena.',
     mengatasi: 'Menghentikan kejang pada anak ketika jalur intravena belum terpasang atau di rumah.',
@@ -1347,6 +1632,12 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Asam salisilat',
     alias: ['asam salisilat', 'urea topikal', 'keratolitik'],
+    rantai: [
+      'Larutkan semen antar-sel stratum korneum',
+      'lapisan tanduk terlepas',
+      'obat aktif dapat menembus',
+      '(PEMBUKA JALAN, bukan obat utamanya)',
+    ],
     golongan: 'Keratolitik topikal',
     mekanisme: 'Melarutkan semen antar-sel pada stratum korneum sehingga lapisan tanduk yang menebal terlepas dan obat lain dapat menembus lebih dalam.',
     mengatasi: 'Menipiskan sisik pada psoriasis, kalus, dan veruka.',
@@ -1356,6 +1647,15 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Benzoil peroksida',
     alias: ['benzoil peroksida', 'tretinoin', 'adapalen', 'retinoid'],
+    rantai: [
+      'Retinoid → pematangan keratinosit normal',
+      'sumbatan folikel tak terbentuk',
+      '',
+      'Benzoil peroksida → radikal oksigen',
+      'C. acnes mati + komedo larut',
+      '',
+      'Akne mulai dari SUMBATAN, bukan kuman',
+    ],
     golongan: 'Antiakne topikal',
     mekanisme: 'Benzoil peroksida melepaskan radikal oksigen yang membunuh Cutibacterium acnes sekaligus melarutkan komedo. Retinoid menormalkan pematangan keratinosit sehingga sumbatan folikel — akar seluruh proses akne — tidak terbentuk.',
     mengatasi: 'Akne: retinoid mengurusi komedo, benzoil peroksida mengurusi bakteri dan radangnya.',
@@ -1365,6 +1665,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Antasida',
     alias: ['antasida', 'aluminium hidroksida', 'magnesium hidroksida', 'sukralfat'],
+    rantai: [
+      'Antasida → netralkan asam yang SUDAH ada (menit)',
+      '',
+      'Sukralfat + suasana asam → lapisan lekat',
+      'tutupi dasar tukak',
+      'terlindung dari asam & pepsin',
+    ],
     golongan: 'Penetral asam dan pelindung mukosa',
     mekanisme: 'Antasida menetralkan asam lambung yang sudah ada secara langsung. Sukralfat, dalam suasana asam, membentuk lapisan lekat yang menutupi dasar tukak sehingga terlindung dari asam dan pepsin.',
     mengatasi: 'Meredakan nyeri ulu hati dengan CEPAT, dan sukralfat melindungi tukak selama penyembuhan.',
@@ -1374,6 +1681,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Loperamid',
     alias: ['loperamid', 'loperamide'],
+    rantai: [
+      'Aktifkan reseptor mu pleksus mienterikus',
+      'peristaltik melambat',
+      'waktu serap air memanjang',
+      '',
+      'JANGAN pada disentri → kuman & toksin tertahan',
+    ],
     golongan: 'Antimotilitas opioid perifer',
     mekanisme: 'Mengaktifkan reseptor opioid mu pada pleksus mienterikus usus sehingga gerak peristaltik melambat dan waktu penyerapan air memanjang; hampir tidak menembus sawar darah-otak sehingga tidak menimbulkan efek pusat.',
     mengatasi: 'Diare tanpa infeksi invasif, misalnya diare wisatawan tanpa demam.',
@@ -1383,6 +1697,14 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Piridoksin',
     alias: ['piridoksin', 'vitamin b6'],
+    rantai: [
+      'Isoniazid mengikat piridoksin',
+      'defisiensi B6 fungsional',
+      'sintesis neurotransmiter saraf tepi ↓',
+      'NEUROPATI',
+      '',
+      'Piridoksin 10-25 mg/hari → dicegah',
+    ],
     golongan: 'Vitamin B6',
     mekanisme: 'Menjadi kofaktor pada sintesis neurotransmiter dan metabolisme asam amino; isoniazid mengikatnya sehingga terjadi defisiensi fungsional pada saraf tepi.',
     mengatasi: 'Mencegah dan mengobati neuropati akibat isoniazid; penawar kejang pada keracunan isoniazid.',
@@ -1392,6 +1714,13 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   {
     nama: 'Vitamin A',
     alias: ['vitamin a', 'retinol'],
+    rantai: [
+      'Bahan RODOPSIN sel batang retina',
+      '+ keutuhan epitel & imunitas mukosa',
+      '',
+      'Kurang → buta senja → xeroftalmia',
+      'Campak: keparahan & kematian ↓',
+    ],
     golongan: 'Vitamin larut lemak',
     mekanisme: 'Menjadi bahan rodopsin pada sel batang retina dan mempertahankan keutuhan epitel serta fungsi kekebalan mukosa.',
     mengatasi: 'Xeroftalmia dan buta senja; menurunkan keparahan campak dan angka kematiannya.',
@@ -1400,7 +1729,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
   },
   {
     nama: 'Cairan kristaloid',
-    alias: ['ringer laktat', 'nacl 0,9%', 'kristaloid', 'ringer asetat', 'dekstrosa'],
+    alias: ['RL', 'NaCl', 'normal saline', 'ringer', 'kristaloid', 'asering', 'ringer laktat', 'nacl 0,9%', 'kristaloid', 'ringer asetat', 'dekstrosa'],
     rantai: [
       'Isi ruang intravaskular',
       'preload ↑',
@@ -1413,6 +1742,306 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
     mengatasi: 'Mengembalikan perfusi jaringan pada syok hipovolemik, dehidrasi, dan sepsis.',
     ingat: 'Pada perdarahan, kristaloid hanya menunda — yang dibutuhkan adalah DARAH dan penghentian sumber perdarahannya.',
     awas: 'Berlebihan menimbulkan edema paru dan asidosis hiperkloremik (NaCl 0,9%); pada syok kardiogenik justru berbahaya.',
+  },
+  {
+    nama: 'Ampisilin',
+    alias: ['ampisilin', 'ampicillin', 'kloksasilin', 'cloxacillin', 'sefazolin', 'cefazolin', 'amfisilin'],
+    rantai: [
+      '⊣ protein pengikat penisilin',
+      'ikatan silang peptidoglikan gagal',
+      'dinding sel tak terbentuk',
+      'bakteri LISIS',
+      '',
+      'Kloksasilin tahan penisilinase → STAFILOKOKUS',
+    ],
+    golongan: 'Antibiotik beta-laktam',
+    mekanisme: 'Sama seperti penisilin lain menghambat sintesis dinding sel bakteri. Ampisilin berspektrum lebih luas ke gram negatif; kloksasilin dan sefazolin dirancang tahan terhadap penisilinase stafilokokus sehingga menjadi pilihan pada infeksi kulit dan tulang oleh S. aureus.',
+    mengatasi: 'Sepsis neonatorum, meningitis (bersama gentamisin), infeksi kulit dan jaringan lunak, serta profilaksis bedah.',
+    ingat: 'Kloksasilin = stafilokokus. Ampisilin = gram negatif dan Listeria pada neonatus.',
+    awas: 'Alergi penisilin; ruam bila diberikan pada mononukleosis.',
+  },
+  {
+    nama: 'Nistatin',
+    alias: ['nistatin', 'nystatin', 'griseofulvin'],
+    rantai: [
+      'Nistatin ikat ERGOSTEROL membran jamur',
+      'pori terbentuk',
+      'isi sel bocor keluar',
+      'jamur mati',
+      '',
+      'Griseofulvin → ikat mikrotubulus',
+      'masuk ke keratin baru',
+      'jamur tak dapat menyerang rambut & kuku',
+    ],
+    golongan: 'Antijamur (polien dan antimitotik)',
+    mekanisme: 'Nistatin mengikat ergosterol dan membentuk pori pada membran jamur sehingga isi selnya bocor; ia tidak diserap dari saluran cerna sehingga hanya bekerja di tempat yang disentuhnya. Griseofulvin mengikat mikrotubulus dan tertimbun pada keratin yang baru terbentuk, sehingga rambut dan kuku yang tumbuh menjadi tidak dapat ditembus jamur.',
+    mengatasi: 'Nistatin untuk kandidiasis mulut dan lipatan kulit; griseofulvin untuk tinea kapitis pada anak.',
+    ingat: 'Nistatin TIDAK diserap — itulah sebabnya ia dikumur dan ditelan, dan sia-sia untuk infeksi jamur sistemik.',
+    awas: 'Griseofulvin perlu terapi berbulan-bulan dan diserap lebih baik bersama makanan berlemak.',
+  },
+  {
+    nama: 'Kalamin',
+    alias: ['kalamin', 'calamine', 'losion kalamin'],
+    rantai: [
+      'Zink oksida + besi oksida',
+      'menguap di permukaan kulit',
+      'efek MENDINGINKAN',
+      'serabut C penghantar gatal teredam',
+      'GATAL BERKURANG',
+    ],
+    golongan: 'Antipruritus topikal',
+    mekanisme: 'Bekerja secara fisik, bukan farmakologis: penguapan airnya mendinginkan kulit sehingga serabut saraf penghantar gatal teredam, dan lapisan zink oksida yang tertinggal bersifat astringen serta melindungi lesi.',
+    mengatasi: 'Gatal pada varisela, gigitan serangga, dan biang keringat.',
+    ingat: 'Aman untuk anak dan ibu hamil karena hampir tidak diserap.',
+    awas: 'Mengeringkan kulit bila dipakai terus-menerus pada kulit yang sudah kering.',
+  },
+  {
+    nama: 'Tramadol',
+    alias: ['tramadol', 'kodein', 'codein', 'dekstrometorfan'],
+    rantai: [
+      'Aktifkan reseptor mu (lemah)',
+      '+ ⊣ ambilan serotonin & noradrenalin',
+      'jalur penghambat nyeri desendens ↑',
+      'nyeri sedang ↓',
+      '',
+      'Dekstrometorfan → tekan pusat batuk di medula',
+    ],
+    golongan: 'Opioid lemah',
+    mekanisme: 'Tramadol bekerja ganda: mengaktifkan reseptor mu secara lemah sekaligus menghambat ambilan kembali serotonin dan noradrenalin sehingga jalur penghambat nyeri desendens menguat. Kodein adalah pro-obat yang diubah menjadi morfin oleh enzim CYP2D6 — orang dengan enzim lambat hampir tidak memperoleh efek, sedangkan yang sangat cepat berisiko keracunan.',
+    mengatasi: 'Nyeri sedang yang tidak cukup dengan parasetamol dan NSAID; dekstrometorfan menekan batuk kering.',
+    ingat: 'Kodein tidak bekerja sama pada setiap orang — CYP2D6-nya berbeda-beda.',
+    awas: 'Tramadol menurunkan ambang kejang dan berisiko sindrom serotonin bersama SSRI. Kodein TIDAK BOLEH pada anak <12 tahun.',
+  },
+  {
+    nama: 'Antibiotik topikal',
+    alias: ['mupirosin', 'asam fusidat', 'neomisin', 'basitrasin', 'silver sulfadiazin'],
+    rantai: [
+      'Kadar sangat tinggi TEPAT di lesi',
+      'tanpa kadar sistemik bermakna',
+      'kuman di permukaan mati',
+      '',
+      'Lesi LUAS atau dalam → topikal tidak cukup',
+    ],
+    golongan: 'Antibiotik topikal',
+    mekanisme: 'Diberikan langsung pada lesi sehingga kadarnya di tempat infeksi jauh melampaui yang dapat dicapai obat oral, tanpa paparan seluruh tubuh. Mupirosin menghambat isoleusil-tRNA sintetase; silver sulfadiazin melepaskan ion perak yang merusak dinding sel dan DNA kuman.',
+    mengatasi: 'Impetigo terbatas, folikulitis, dan pencegahan infeksi pada luka bakar.',
+    ingat: 'Topikal hanya untuk lesi TERBATAS di permukaan; lesi luas, dalam, atau disertai demam memerlukan antibiotik oral.',
+    awas: 'Neomisin sering menimbulkan dermatitis kontak alergi — jangan dipakai berkepanjangan.',
+  },
+  {
+    nama: 'Kortikosteroid topikal',
+    alias: ['hidrokortison', 'betametason valerat', 'klobetasol', 'mometason', 'desoksimetason'],
+    rantai: [
+      '⊣ fosfolipase A2 di kulit',
+      'prostaglandin & leukotrien ↓',
+      '+ sitokin & sel radang ↓',
+      'radang, gatal, dan kemerahan ↓',
+      '',
+      'Potensi dipilih menurut TEBAL kulitnya',
+    ],
+    golongan: 'Glukokortikoid topikal',
+    mekanisme: 'Menekan radang setempat lewat jalur yang sama dengan steroid sistemik, tetapi kadarnya di kulit tinggi sementara paparan seluruh tubuh kecil. Potensi dipilih menurut lokasi: wajah dan lipatan memakai potensi rendah karena kulitnya tipis dan penyerapannya berlipat ganda, telapak tangan dan kaki memerlukan potensi tinggi.',
+    mengatasi: 'Dermatitis, eksim, psoriasis, dan gatal karena radang.',
+    ingat: 'Wajah dan lipatan = potensi RENDAH. Klobetasol di wajah menimbulkan atrofi menetap.',
+    awas: 'Atrofi kulit, striae, telangiektasia, dan dermatitis perioral pada pemakaian lama; jangan pada infeksi jamur yang belum diobati.',
+  },
+  {
+    nama: 'Antiseptik',
+    alias: ['povidon iodin', 'povidone', 'alkohol 70', 'klorheksidin', 'hidrogen peroksida'],
+    rantai: [
+      'Denaturasi protein & rusak membran mikroba',
+      'jumlah kuman di kulit ↓',
+      'risiko infeksi tindakan ↓',
+      '',
+      'Untuk KULIT UTUH, bukan untuk mengisi luka',
+    ],
+    golongan: 'Antiseptik',
+    mekanisme: 'Membunuh mikroba secara fisikokimia: alkohol dan iodin mendenaturasi protein serta merusak membran; klorheksidin mengikat dinding sel bermuatan negatif dan menetap di kulit sehingga efeknya bertahan lama.',
+    mengatasi: 'Antisepsis kulit sebelum tindakan dan perawatan luka.',
+    ingat: 'Alkohol harus MENGERING dahulu sebelum insisi — di situlah kerjanya, bukan saat masih basah.',
+    awas: 'Povidon iodin dan hidrogen peroksida meracuni sel penyembuh luka bila dipakai berulang pada luka bersih — irigasi NaCl 0,9% lebih baik.',
+  },
+  {
+    nama: 'Lidokain',
+    alias: ['lidokain', 'lignokain', 'bupivakain', 'prokain', 'anestesi lokal'],
+    rantai: [
+      '⊣ kanal Na⁺ serabut saraf',
+      'depolarisasi gagal',
+      'potensial aksi tak terbentuk',
+      'sinyal NYERI tak terkirim',
+      '',
+      'Serabut kecil (nyeri) lumpuh DULU',
+      'sentuh & motorik terakhir',
+    ],
+    golongan: 'Anestetik lokal',
+    mekanisme: 'Menghambat kanal natrium pada membran saraf sehingga potensial aksi tidak terbentuk dan sinyal nyeri tidak sampai ke pusat. Serabut tipis penghantar nyeri terkena lebih dahulu daripada serabut tebal penghantar rasa raba dan gerak — itulah sebabnya pasien masih merasakan tekanan meski nyerinya sudah hilang, dan itu perlu dijelaskan supaya tidak dikira biusnya gagal.',
+    mengatasi: 'Menghilangkan nyeri saat penjahitan, insisi abses, ekstraksi kuku, dan tindakan kecil lain.',
+    ingat: 'Maksimal 4,5 mg/kg, atau 7 mg/kg bila dengan adrenalin. Infiltrasi dari DALAM luka lebih tidak nyeri.',
+    awas: 'JANGAN memakai adrenalin pada jari, penis, dan daun telinga. Keracunan: kesemutan sekitar mulut, telinga berdenging, lalu kejang dan henti jantung.',
+  },
+  {
+    nama: 'Aminofilin',
+    alias: ['aminofilin', 'teofilin', 'theophylline'],
+    rantai: [
+      '⊣ fosfodiesterase',
+      'cAMP ↑',
+      'otot polos bronkus melemas',
+      '+ antagonis reseptor adenosin',
+      '+ kontraksi diafragma ↑',
+    ],
+    golongan: 'Metilxantin',
+    mekanisme: 'Menghambat fosfodiesterase sehingga cAMP tidak dipecah dan otot polos bronkus melemas; sekaligus menghambat reseptor adenosin yang bersifat bronkokonstriktor, dan meningkatkan kekuatan kontraksi diafragma.',
+    mengatasi: 'Bronkospasme pada asma dan PPOK bila terapi baku belum cukup.',
+    ingat: 'Jendela terapinya SEMPIT — kini menjadi obat cadangan, bukan lini pertama.',
+    awas: 'Mual, takikardia, aritmia, dan kejang pada kadar berlebih; banyak interaksi obat lewat enzim hati.',
+  },
+  {
+    nama: 'Ambroksol',
+    alias: ['ambroksol', 'ambroxol', 'asetilsistein', 'n-asetilsistein', 'gliseril guaiakolat', 'bromheksin'],
+    rantai: [
+      'Asetilsistein memutus ikatan disulfida mukus',
+      'kekentalan dahak ↓',
+      'dahak lebih mudah dikeluarkan',
+      '',
+      'Asetilsistein juga → prekursor GLUTATION',
+      'penawar keracunan parasetamol',
+    ],
+    golongan: 'Mukolitik dan ekspektoran',
+    mekanisme: 'Asetilsistein memutus jembatan disulfida antar-rantai glikoprotein mukus sehingga dahak mengencer; gugus sulfhidrilnya juga menjadi sumber glutation, dan dari situlah ia menjadi penawar keracunan parasetamol. Ambroksol meningkatkan sekresi surfaktan dan gerak silia.',
+    mengatasi: 'Dahak kental yang sulit dikeluarkan; asetilsistein juga menjadi penawar keracunan parasetamol.',
+    ingat: 'Satu obat dua pekerjaan yang tampak tak berhubungan — keduanya berasal dari gugus sulfhidril yang sama.',
+    awas: 'Manfaat mukolitik pada infeksi napas akut kecil; hidrasi yang cukup sering lebih berguna.',
+  },
+  {
+    nama: 'Pencahar',
+    alias: ['bisakodil', 'bisacodyl', 'polietilen glikol', 'PEG', 'gliserin'],
+    rantai: [
+      'PEG → tarik air ke lumen secara OSMOTIK',
+      'tinja melunak',
+      '',
+      'Bisakodil → rangsang pleksus saraf usus',
+      'peristaltik ↑',
+      'tinja terdorong',
+    ],
+    golongan: 'Laksatif',
+    mekanisme: 'Polietilen glikol menahan air di dalam lumen usus secara osmotik tanpa diserap sehingga tinja melunak; bisakodil merangsang pleksus mienterikus sehingga gerakan usus meningkat dan sekresi cairan bertambah.',
+    mengatasi: 'Konstipasi dan disimpaksi tinja keras.',
+    ingat: 'Pada konstipasi fungsional anak, rumatan diteruskan MINIMAL 2 BULAN — berhenti terlalu dini adalah sebab kekambuhan tersering.',
+    awas: 'Laksatif perangsang jangka panjang menimbulkan ketergantungan dan kram; jangan dipakai bila dicurigai obstruksi.',
+  },
+  {
+    nama: 'Dekstrosa',
+    alias: ['dekstrosa', 'd40', 'd10', 'd5', 'glukosa', 'larutan gula', 'dextrose'],
+    rantai: [
+      'Glukosa langsung ke darah',
+      'otak memperoleh bahan bakarnya',
+      '(otak TIDAK dapat memakai lemak)',
+      'kesadaran pulih dalam menit',
+      '',
+      'Sadar → 15-20 g glukosa ORAL',
+      'Tidak sadar → D40% IV',
+    ],
+    golongan: 'Larutan glukosa',
+    mekanisme: 'Menyediakan glukosa langsung ke sirkulasi. Otak hampir seluruhnya bergantung pada glukosa dan tidak dapat memakai asam lemak sebagai bahan bakar, sehingga kekurangan glukosa menimbulkan gangguan kesadaran dalam hitungan menit dan kerusakan menetap bila berkepanjangan.',
+    mengatasi: 'HIPOGLIKEMIA: berkeringat, gemetar, bingung, sampai kejang dan koma.',
+    ingat: 'Setiap penurunan kesadaran = PERIKSA GULA DARAH dahulu. Bila alat tidak ada, berikan dekstrosa — risikonya jauh lebih kecil daripada membiarkan hipoglikemia.',
+    awas: 'Pada gizi buruk dan peminum alkohol, berikan tiamin bersama atau sebelum glukosa untuk mencegah ensefalopati Wernicke.',
+  },
+  {
+    nama: 'Fibrat',
+    alias: ['gemfibrozil', 'fenofibrat', 'fibrat', 'asam nikotinat', 'niasin', 'niacin'],
+    rantai: [
+      'Fibrat → aktifkan PPAR-alfa',
+      'lipoprotein lipase ↑',
+      'pemecahan trigliserida ↑',
+      'TRIGLISERIDA ↓↓ + HDL ↑',
+      '',
+      'Statin → LDL. Fibrat → trigliserida.',
+    ],
+    golongan: 'Penurun trigliserida',
+    mekanisme: 'Fibrat mengaktifkan reseptor inti PPAR-alfa sehingga lipoprotein lipase meningkat dan trigliserida dipecah lebih cepat, sekaligus menaikkan HDL. Niasin menekan pelepasan asam lemak bebas dari jaringan lemak sehingga bahan baku VLDL berkurang.',
+    mengatasi: 'Trigliserida sangat tinggi, terutama untuk mencegah PANKREATITIS bila melebihi 500 mg/dL.',
+    ingat: 'Statin mengurus LDL, fibrat mengurus trigliserida — sasarannya berbeda, bukan saling menggantikan.',
+    awas: 'Fibrat bersama statin meningkatkan risiko miopati dan rabdomiolisis; niasin menimbulkan kemerahan wajah (kurangi dengan aspirin sebelumnya).',
+  },
+  {
+    nama: 'Hioscin',
+    alias: ['hyoscine', 'hioscin', 'buscopan', 'papaverin', 'butilbromida', 'antispasmodik', 'mebeverin'],
+    rantai: [
+      '⊣ reseptor muskarinik otot polos viseral',
+      'kontraksi berlebih usus & saluran empedu ↓',
+      'KOLIK REDA',
+      '(tidak menyentuh nyeri radang)',
+    ],
+    golongan: 'Antispasmodik',
+    mekanisme: 'Menghambat reseptor muskarinik pada otot polos organ berongga sehingga kontraksi berlebihan yang menimbulkan kolik mereda. Hioscin butilbromida hampir tidak menembus sawar darah-otak sehingga tidak menimbulkan efek pusat.',
+    mengatasi: 'Nyeri KOLIK: kram perut, kolik bilier, dan nyeri haid.',
+    ingat: 'Kolik = otot berkontraksi berlebihan → antispasmodik. Nyeri radang → NSAID. Salah pilih membuat keduanya tampak tidak berguna.',
+    awas: 'Mulut kering, retensi urin, dan penglihatan kabur; hindari pada glaukoma sudut sempit dan obstruksi usus.',
+  },
+  {
+    nama: 'Asam ursodeoksikolat',
+    alias: ['ursodeoxycholic', 'ursodiol', 'UDCA', 'urdafalk'],
+    rantai: [
+      'Gantikan asam empedu yang beracun bagi sel hati',
+      '+ kelarutan kolesterol empedu ↑',
+      'batu kolesterol kecil larut perlahan',
+      '+ aliran empedu ↑',
+    ],
+    golongan: 'Asam empedu hidrofilik',
+    mekanisme: 'Menggantikan sebagian asam empedu hidrofobik yang merusak membran sel hati dengan asam empedu hidrofilik yang lebih lembut, sekaligus meningkatkan kelarutan kolesterol di dalam empedu dan memperlancar aliran empedu.',
+    mengatasi: 'Batu empedu kolesterol kecil pada pasien yang tidak dapat dioperasi, kolestasis, dan sirosis bilier primer.',
+    ingat: 'Melarutkan hanya batu KOLESTEROL yang kecil dan pada kandung empedu yang masih berfungsi — butuh berbulan-bulan dan sering kambuh setelah dihentikan.',
+    awas: 'Bukan pengganti kolesistektomi pada batu bergejala.',
+  },
+  {
+    nama: 'Iodium radioaktif',
+    alias: ['iodine-131', 'i-131', 'radioaktif iodine', 'iodium radioaktif', 'RAI'],
+    rantai: [
+      'Sel tiroid menangkap iodium (satu-satunya jaringan yang begitu)',
+      'I-131 terkumpul DI DALAM tiroid',
+      'radiasi beta jarak pendek',
+      'sel tiroid rusak setempat',
+      'produksi hormon ↓ permanen',
+    ],
+    golongan: 'Terapi radionuklida',
+    mekanisme: 'Memanfaatkan sifat unik sel tiroid yang menangkap iodium: I-131 terkumpul di dalam kelenjar lalu memancarkan radiasi beta berjarak sangat pendek sehingga merusak sel tiroid tanpa banyak mengenai jaringan sekitarnya.',
+    mengatasi: 'Terapi definitif hipertiroid Graves dan nodul toksik yang kambuh atau tidak tahan obat.',
+    ingat: 'Selektivitasnya berasal dari biologi, bukan dari penargetan alat — hanya tiroid yang menangkap iodium.',
+    awas: 'KONTRAINDIKASI MUTLAK pada kehamilan dan menyusui; dapat memperberat oftalmopati Graves; sebagian besar berakhir hipotiroid dan memerlukan levotiroksin seumur hidup.',
+  },
+  {
+    nama: 'Orlistat',
+    alias: ['orlistat'],
+    rantai: [
+      '⊣ lipase pankreas & lambung',
+      'trigliserida makanan tak dipecah',
+      '~30% lemak TIDAK diserap',
+      'dibuang bersama tinja',
+      'defisit kalori',
+    ],
+    golongan: 'Penghambat lipase',
+    mekanisme: 'Menghambat lipase pankreas dan lambung sehingga trigliserida makanan tidak dipecah menjadi asam lemak bebas yang dapat diserap; sekitar sepertiga lemak yang dimakan keluar bersama tinja.',
+    mengatasi: 'Membantu penurunan berat badan sebagai tambahan diet dan latihan, bukan penggantinya.',
+    ingat: 'Efek sampingnya sekaligus menjadi umpan balik: makan berlemak langsung menghasilkan tinja berminyak.',
+    awas: 'Tinja berminyak, buang air besar mendadak, dan gangguan penyerapan vitamin larut lemak (A, D, E, K) — berikan suplemen pada waktu terpisah.',
+  },
+  {
+    nama: 'Tiamin',
+    alias: ['tiamin', 'thiamine', 'vitamin b1'],
+    rantai: [
+      'Kofaktor piruvat dehidrogenase',
+      'piruvat → asetil-KoA',
+      'siklus Krebs berjalan',
+      '',
+      'Kurang → metabolisme glukosa MACET di otak',
+      'Wernicke: bingung, ataksia, gangguan gerak mata',
+    ],
+    golongan: 'Vitamin B1',
+    mekanisme: 'Menjadi kofaktor piruvat dehidrogenase dan transketolase; tanpa tiamin, glukosa tidak dapat masuk siklus Krebs sehingga jaringan yang paling bergantung pada metabolisme aerob — otak dan miokardium — paling dahulu terganggu.',
+    mengatasi: 'Ensefalopati Wernicke, beri-beri, dan gagal jantung curah tinggi akibat defisiensi.',
+    ingat: 'Pada peminum alkohol dan gizi buruk, TIAMIN DIBERIKAN SEBELUM atau bersama glukosa — glukosa tanpa tiamin justru mencetuskan Wernicke.',
+    awas: 'Aman; keterlambatan pemberian jauh lebih berbahaya daripada memberikannya tanpa perlu.',
   },
 ]
 
