@@ -79,6 +79,7 @@ const EJAAN: [RegExp, string][] = [
   [/\btth\b/g, 'tension type headache'],
   [/\bcorpal\b/g, 'corpus alienum'],
   [/\bkorpal\b/g, 'corpus alienum'],
+  [/\bsindroma\b/g, 'sindrom'],
   [/\bbppv\b/g, 'benign paroxysmal positional vertigo'],
   [/\bnstemi\b/g, 'non st elevation myocardial infarction'],
   [/\bstemi\b/g, 'st elevation myocardial infarction'],
