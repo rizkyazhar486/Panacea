@@ -1,0 +1,60 @@
+[
+  { "kelompok": "Bedah Umum", "isi": [
+    "Airway & gangguannya", "Hemothorax", "Open Pneumothorax", "Tension Pneumothorax",
+    "Flail Chest", "Cardiac Tamponade", "Syok Hemoragik", "Trauma Kapitis", "Fraktur Basis Cranii"
+  ]},
+  { "kelompok": "Bedah Digestif", "isi": [
+    "Trauma Organ Viscera", "Trauma Hepar & Lien", "Trauma Organ Berongga", "Appendisitis Akut",
+    "Peritonitis", "Hernia Abdominalis", "Ileus", "Hemorrhoid"
+  ]},
+  { "kelompok": "Bedah Plastik", "isi": [
+    "Le Fort Fracture", "Luka Bakar", "Cleft Lip & Palate", "Diabetic Foot", "Snake Bite"
+  ]},
+  { "kelompok": "Bedah Anak", "isi": [
+    "Atresia Esofagus", "Stenosis Pilorik Hipertrofi", "Atresia Duodenum & Jejunum",
+    "Hirschsprung Disease", "Intususepsi", "Volvulus", "Omphalocele & Gastroschisis", "Malformasi Anorektal"
+  ]},
+  { "kelompok": "Bedah Urologi", "isi": [
+    "Fimosis", "Parafimosis", "Hipospadia", "Epispadia", "BPH", "Ca Prostat", "Prostatitis",
+    "Varikokel", "Hidrokel", "Spermatokel", "Kriptorkidismus", "Torsio Testis", "Orchitis",
+    "Priapismus", "Renal cell carcinoma", "Urolitiasis", "Trauma Ginjal", "Trauma Buli",
+    "Trauma Uretra", "Striktur Uretra", "Inkontinensia urin"
+  ]},
+  { "kelompok": "Bedah Onkologi", "isi": [
+    "Mastitis", "Abses Mammae", "Galaktokel", "Fibroadenoma Mammae", "Fibrokistik Mammae",
+    "Tumor Phyloides", "Ca Mammae", "Kista Ganglion", "Kista Baker", "Lipoma", "Kista Ateroma"
+  ]},
+  { "kelompok": "Endokrin", "isi": [
+    "Diabetes Mellitus", "Hipoglikemia", "Krisis Hiperglikemia", "Dislipidemia", "Sindrom Metabolik",
+    "Diabetes Insipidus", "Hipotiroidisme", "Koma miksedema", "Goiter endemik", "Hipertiroidisme",
+    "Krisis tiroid", "Tiroiditis", "Hiperparatiroidisme", "Hipoparatiroidisme", "Cushing syndrome",
+    "Insufisiensi adrenal", "Krisis adrenal", "Delayed puberty", "Pubertas prekoks",
+    "Prolaktinoma", "Porfiria", "Congenital adrenal hyperplasia"
+  ]},
+  { "kelompok": "Forensik", "isi": [
+    "Visum et Repertum", "Autopsi Forensik", "Surat Kematian", "Sudden Death", "Identifikasi Forensik",
+    "Disaster Victim Identification", "Tanatologi", "Toksikologi", "Asfiksia", "Drowning",
+    "Abortus dan Infanticide", "Kejahatan Seksual", "Traumatologi"
+  ]},
+  { "kelompok": "Medikolegal", "isi": [
+    "Kaidah Dasar Moral", "Etika Klinik", "Informed Consent", "Rekam Medis",
+    "Insiden Keselamatan Pasien", "Malpraktik", "Euthanasia", "Audit medis",
+    "Hak dan Kewajiban KODEKI", "Surat Keterangan Palsu"
+  ]},
+  { "kelompok": "Rongga Mulut", "isi": [
+    "Glositis atrofi", "Median rhomboid glositis", "Benign migratory glositis", "Oral candidiasis",
+    "Leukoplakia", "Eritroplakia", "Karies Gigi", "Infeksi Gusi", "Stomatitis Aftosa Rekuren"
+  ]},
+  { "kelompok": "Esofagus & Gaster", "isi": [
+    "Akalasia", "Barrett Esofagus", "GERD", "Dispepsia", "Ulkus Peptikum", "Gastritis Erosiva",
+    "Varises Esofagus", "Perdarahan Saluran Cerna"
+  ]},
+  { "kelompok": "Hepar & Bilier & Pankreas", "isi": [
+    "Ikterus", "NASH", "NAFLD", "Hepatitis", "Sirosis Hepatis", "Karsinoma hepatoseluler",
+    "Abses Hepar", "Kolangitis", "Kolelitiasis", "Kolesistitis", "Koledokolitiasis",
+    "Pankreatitis Akut", "Karsinoma Pankreas"
+  ]},
+  { "kelompok": "Kolon", "isi": [
+    "Irritable bowel syndrome", "Inflammatory bowel disease", "Divertikulosis", "Karsinoma Kolon"
+  ]}
+]
