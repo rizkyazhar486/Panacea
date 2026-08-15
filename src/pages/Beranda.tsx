@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { DeretPratinjau } from '../components/KartuPratinjau'
+import { PapanWidget } from '../components/PapanWidget'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
@@ -229,6 +229,20 @@ export default function Beranda() {
   const nama = account?.name?.split(' ')[0] ?? ''
   const [tujuan, setTujuan] = useState<Tujuan | null>(() => ambilTujuan())
   const pilih = (t: Tujuan) => { simpanTujuan(t); setTujuan(t) }
+
+  /*
+   * Tanggal yang dihitung sebagai "hari tercatat" — dipakai ubin rangkaian.
+   * Sumbernya dua, bukan satu: seseorang yang hanya mencatat tenaganya tanpa
+   * mencatat tidur tetap mencatat hari itu. Aturan yang sama dipakai
+   * CatatanHarian, dan bila keduanya berbeda maka angka yang sama akan tampil
+   * dua nilai di satu layar.
+   */
+  const tanggalCatatan = useMemo(() => {
+    const dari = new Set<string>()
+    for (const s of state.sleepLogs ?? []) if (s?.date) dari.add(s.date)
+    for (const k of Object.keys(state.wellness ?? {})) dari.add(k)
+    return [...dari]
+  }, [state.sleepLogs, state.wellness])
   const klinisDulu = tujuan ? tujuan === 'belajar' : account?.role === 'dokter'
   const awam = modeAwam(tujuan)
   const klinis = awam ? KLINIS_AWAM : KLINIS
@@ -369,7 +383,7 @@ export default function Beranda() {
       {/* Pratinjau isi fitur, tepat di bawah panel angka: pertanyaan "bagaimana
           keadaan saya" terjawab tanpa satu pun ketukan, dan kisi lambang di
           bawahnya tinggal mengurus "ke mana saya pergi". */}
-      <DeretPratinjau daftar={pratinjau} />
+      <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
 
       {/* Catatan harian ditaruh SESUDAH pratinjau, bukan sebelumnya.
           Kartu pratinjau menjawab "bagaimana keadaan saya"; catatan harian
