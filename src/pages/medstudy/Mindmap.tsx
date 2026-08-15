@@ -35,6 +35,9 @@ export const WARNA = {
   tx: 'bg-emerald-500',
   dd: 'bg-neutral-400',
   awas: 'bg-red-600',
+  ajar: 'bg-teal-600',
+  nalar: 'bg-indigo-500',
+  hasil: 'bg-cyan-700',
 } as const
 
 /**

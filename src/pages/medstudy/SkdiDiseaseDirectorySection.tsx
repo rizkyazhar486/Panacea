@@ -157,6 +157,25 @@ function cabangDari(note: {
     { kunci: 'tx', label: 'Obat', warna: WARNA.tx, butir: [...blok('Tatalaksana'), ...blok('Terapi Suportif')] },
     { kunci: 'dd', label: 'Beda Dgn', warna: WARNA.dd, butir: blok('Diagnosis Banding') },
     { kunci: 'awas', label: 'Bahaya', warna: WARNA.awas, butir: blok('Komplikasi') },
+    /*
+     * Tiga cabang berikut ditambahkan sesudah ditemukan bahwa isinya SUDAH
+     * DITULIS NAMUN TIDAK PERNAH SAMPAI KE LAYAR.
+     *
+     * `edukasi` terlanjur dimasukkan ke daftar blok namun tidak satu pun cabang
+     * mindmap memungutnya kembali; `pengkajian` dan `prognosis` bahkan tidak
+     * pernah disebut di berkas ini sama sekali. Terhitung 155 entri memiliki
+     * edukasi, 145 memiliki pengkajian, dan 155 memiliki prognosis — seluruhnya
+     * tidak terlihat oleh pembacanya. Cacat semacam ini tidak menimbulkan galat
+     * apa pun dan tidak akan pernah dilaporkan siapa pun: yang hilang bukan
+     * fungsi, melainkan isi yang tidak pernah diketahui keberadaannya.
+     *
+     * `pengkajian` sengaja diletakkan sesudah diagnosis banding, karena ia
+     * memang paragraf yang MEMBANDINGKAN — membacanya sebelum bandingnya
+     * disebut membuat alurnya kehilangan lawan bicaranya.
+     */
+    { kunci: 'nalar', label: 'Alur Pikir', warna: WARNA.nalar, butir: d?.pengkajian ? [d.pengkajian] : [] },
+    { kunci: 'ajar', label: 'Ajarkan', warna: WARNA.ajar, butir: blok('Edukasi') },
+    { kunci: 'hasil', label: 'Ke Depan', warna: WARNA.hasil, butir: d?.prognosis ? [d.prognosis] : [] },
   ]
 }
 
