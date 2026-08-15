@@ -403,7 +403,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
       </div>
     </section>
 
-    <UbinDompet saldo={state.wallet?.balance ?? 0} />
+    <UbinDompet saldoLokal={state.wallet?.balance ?? 0} />
 
     <BilahTubuh daftar={bilah} />
 
