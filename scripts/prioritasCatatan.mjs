@@ -35,6 +35,61 @@ for (const k of Object.keys(blok)) {
   const n = norm(k.replace(/^OSCE::/, ''))
   if (!petaNorm.has(n)) petaNorm.set(n, k)
 }
+/*
+ * SINGKATAN DI DALAM TANDA KURUNG IKUT DIDAFTARKAN.
+ *
+ * Ini bukan aturan pencocokan longgar yang keenam; ini pembacaan atas apa yang
+ * MEMANG SUDAH TERTULIS di kunci catatannya. Nama seperti
+ *
+ *   'Ventricular Ectopic (VES) - baca EKG'
+ *   'Hyperosmolar Hyperglycemic State (HHS/HONK) - resusitasi cairan'
+ *   'Ketoasidosis Diabetik (KAD) - resusitasi cairan'
+ *
+ * sudah memuat singkatan yang dipakai rekap ujian, tepat di dalam kurungnya —
+ * tetapi pencocokan kata melewatkannya karena "ves" bukan bagian dari
+ * "ventricular ectopic baca ekg" sebagai kata mandiri di awal. Akibatnya VES,
+ * HONK, dan KAD dilaporkan "(tidak ketemu) 0/8" padahal catatannya ada dan
+ * sebagian sudah lengkap. Itu kekeliruan yang MAHAL: nol dari delapan menuntun
+ * orang menulis ulang catatan yang sudah jadi.
+ *
+ * Dipisah juga pada garis miring, sebab satu kurung kerap memuat dua singkatan
+ * yang keduanya dipakai orang ('HHS/HONK').
+ *
+ * Aman karena mekanis: yang didaftarkan hanya rangkaian huruf yang penulis
+ * catatannya sendiri tuliskan sebagai singkatan bagi nama itu. Tidak ada
+ * penyamaan makna yang ditebak dari luar.
+ *
+ * DISIMPAN TERPISAH DARI petaNorm, dan itu bukan kerapian melainkan perbaikan
+ * atas kekeliruan yang terjadi pada percobaan pertama. Menyisipkannya ke dalam
+ * petaNorm menggeser URUTAN penelusuran, dan penelusuran longgar di cariSatu
+ * mengembalikan padanan PERTAMA yang ditemukannya — sehingga 'Tension type
+ * headache' yang tadinya menemukan catatan 8/8 berpindah ke stasiun 3/8, dan
+ * jumlah yang lengkap justru turun dari 109 menjadi 108. Peta terpisah ini
+ * hanya dibaca sebagai pencocokan PERSIS, sesudah petaNorm gagal, sehingga
+ * tidak dapat mengubah hasil satu pun nama yang sudah ketemu sebelumnya.
+ */
+const petaSingkatan = new Map()
+for (const k of Object.keys(blok)) {
+  for (const m of k.matchAll(/\(([^)]+)\)/g)) {
+    for (const potong of m[1].split('/')) {
+      /*
+       * HARUS BENAR-BENAR HURUF BESAR SEMUA. Saringan pertama hanya membatasi
+       * panjangnya (2-8 huruf, satu kata), dan itu meloloskan kata biasa yang
+       * kebetulan berada di dalam kurung: 'Pneumotoraks (Tension/Terbuka)'
+       * mendaftarkan "tension" sebagai singkatan, sehingga 'Tension type
+       * headache' — kasus yang PALING SERING keluar, sepuluh kali — berpindah
+       * dari catatan 8/8 ke stasiun pneumotoraks 3/8, dan jumlah yang lengkap
+       * turun dari 109 ke 108. Singkatan yang sesungguhnya ditulis kapital oleh
+       * penulisnya sendiri: VES, HHS, HONK, KAD, TTH, APN.
+       */
+      if (!/^[A-Z0-9][A-Z0-9.\-]{1,7}$/.test(potong.trim())) continue
+      const n = norm(potong)
+      if (!n || n.includes(' ')) continue
+      if (!petaNorm.has(n) && !petaSingkatan.has(n)) petaSingkatan.set(n, k)
+    }
+  }
+}
+
 for (const [k, v] of Object.entries(alias)) {
   const kunci = blok[v] ? v : blok['OSCE::' + v] ? 'OSCE::' + v : null
   if (kunci && !petaNorm.has(norm(k))) petaNorm.set(norm(k), kunci)
@@ -54,6 +109,7 @@ function cariSatu(nama) {
   const n = norm(nama)
   if (!n) return null
   if (petaNorm.has(n)) return petaNorm.get(n)
+  if (petaSingkatan.has(n)) return petaSingkatan.get(n)
   const kata = n.split(' ').filter((w) => w.length > 3)
   if (!kata.length) return null
   for (const [kn, kunci] of petaNorm) {
