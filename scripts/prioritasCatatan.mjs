@@ -189,6 +189,27 @@ const SINONIM = {
   'vesikolitiasis': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
   'uretritis gonore': 'Servisitis / Uretritis Gonore',
   'uretritis go': 'Servisitis / Uretritis Gonore',
+  /*
+   * Diperiksa langsung pada berkasnya, sama seperti baris-baris di atas. Lima
+   * dari enam yang dilaporkan "(tidak ketemu) 0/8" ternyata SUDAH ADA, hanya
+   * bernama lain: singkatan Inggris berbanding nama Indonesia (ACS, AF, FDE),
+   * dan ejaan candid- berbanding kandid-. Hanya CLM dan FDE yang benar-benar
+   * belum ada, dan keduanya lalu ditulis.
+   */
+  'acs': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'sindrom koroner akut': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'af': 'Atrial Fibrilasi — baca EKG',
+  'candidiasis oral': 'Kandidiasis mulut',
+  'candidiasis oral rme': 'Kandidiasis mulut',
+  'candidosis vulvovaginal': 'Kandidiasis Vulvovaginalis',
+  'candidiasis vulvovaginal': 'Kandidiasis Vulvovaginalis',
+  'classic migrain': 'Migrain (dengan/tanpa aura)',
+  'common migrain': 'Migrain (dengan/tanpa aura)',
+  'clm': 'Cutaneous Larva Migrans (Creeping Eruption)',
+  'creeping eruption': 'Cutaneous Larva Migrans (Creeping Eruption)',
+  'fde': 'Fixed Drug Eruption (FDE)',
+  'fixed drug eruption': 'Fixed Drug Eruption (FDE)',
+
   'honk': 'Hiperglikemia hiperosmolar nonketotik',
   'hhs': 'Hiperglikemia hiperosmolar nonketotik',
 }
