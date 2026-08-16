@@ -32,6 +32,13 @@ const BUKAN_OBAT = [
   'fototerapi', 'laser', 'krioterapi', 'radioterapi', 'kemoterapi',
   'transfusi', 'ventilasi', 'oksigen', 'resusitasi', 'defibrilasi',
   'reposisi', 'traksi', 'pungsi', 'biopsi', 'sirkumsisi', 'tampon',
+  // Ditambahkan setelah memeriksa sisa daftar satu per satu: seluruhnya
+  // tindakan, alat, atau ALUR PEMERIKSAAN — bukan obat, sehingga menuntut
+  // dosis padanya hanya membuat daftar kerja memuat pekerjaan yang tidak ada.
+  'pacemaker', 'stent', 'stocking', 'skleroterapi', 'hearing aid', 'alat bantu',
+  'epilasi', 'graft', 'vitrektomi', 'eviserasi', 'enukleasi', 'pengangkatan',
+  'lensa sferis', 'lensa silinder', 'helperr', 'uji kehamilan',
+  'infeksi meluas', 'infeksi/inflamasi',
 ]
 
 const entri = []
