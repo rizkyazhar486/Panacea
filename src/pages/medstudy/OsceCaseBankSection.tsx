@@ -63,8 +63,15 @@ export default function OsceCaseBankSection() {
                     className="flex w-full items-start justify-between gap-2 text-left"
                     onClick={() => notes && setExpanded(isOpen ? null : c.name)}
                   >
-                    <span className="text-[13px] font-bold text-ink dark:text-white">{c.name}</span>
-                    <div className="flex shrink-0 items-center gap-1.5">
+                    {/* min-w-0 pada nama dan boleh-membungkus pada lencana.
+                        Tanpa keduanya, nama kasus yang panjang mendorong lencana
+                        keluar layar: terukur di 390 px, baris 'Sangat Sering +
+                        Catatan' berakhir di 414 px sehingga seluruh halaman ikut
+                        dapat digeser mendatar. Wadah lencana ber-shrink-0
+                        menolak menyusut, dan nama tanpa min-w-0 menolak
+                        menyempit, sehingga tidak ada satu pun yang mengalah. */}
+                    <span className="min-w-0 flex-1 break-words text-[13px] font-bold text-ink dark:text-white">{c.name}</span>
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                       <Badge tone={freqTone(c.frequency)}>{c.frequency}</Badge>
                       {notes && <Badge tone="brand">{isOpen ? 'Tutup ▲' : 'Catatan ▼'}</Badge>}
                     </div>
