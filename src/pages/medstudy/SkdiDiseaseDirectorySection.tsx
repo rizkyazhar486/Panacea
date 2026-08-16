@@ -173,6 +173,7 @@ function cabangDari(note: {
   ]
   const sebab = [
     ...(d?.etiologi ? [d.etiologi] : []),
+    ...(d?.rantai ? rantaiKeTeks(d.rantai) : []),
     ...(d?.patofisiologi ? [d.patofisiologi] : []),
     ...blok('Faktor Risiko'),
   ]
