@@ -266,8 +266,8 @@ const SINONIM = {
   'common migrain': 'Migrain (dengan/tanpa aura)',
   'clm': 'Cutaneous Larva Migrans (Creeping Eruption)',
   'creeping eruption': 'Cutaneous Larva Migrans (Creeping Eruption)',
-  'fde': 'Fixed Drug Eruption (FDE)',
-  'fixed drug eruption': 'Fixed Drug Eruption (FDE)',
+  'fde': 'Insect Bite / Fixed Drug Eruption',
+  'fixed drug eruption': 'Insect Bite / Fixed Drug Eruption',
 
   'honk': 'Hiperglikemia hiperosmolar nonketotik',
   'hhs': 'Hiperglikemia hiperosmolar nonketotik',

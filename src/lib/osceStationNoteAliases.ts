@@ -25,6 +25,7 @@ import { OSCE_STATION_NOTES } from './osceStationNotes'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ALIAS: Record<string, string> = {
+  'Ankle Sprain / Knee Sprain': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
   Omphalitis: 'Omfalitis',
   'V- Fib (RJP)': 'Fibrilasi Ventrikel — RJP & defibrilasi',
   'V-Fib (RJP)': 'Fibrilasi Ventrikel — RJP & defibrilasi',

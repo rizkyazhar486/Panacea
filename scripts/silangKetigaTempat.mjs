@@ -21,6 +21,15 @@ const stasiun = readFileSync('src/lib/osceStationNotes.ts','utf8')
 const terapi  = readFileSync('src/lib/skdiTherapyReference.ts','utf8')
 const catatan = readFileSync('src/lib/skdiDiseaseNotes.ts','utf8')
 const alias   = readFileSync('src/lib/skdiDiseaseNoteAliases.ts','utf8')
+/*
+ * Tabel padanan nama stasiun ikut dibaca. Tanpa ini, skrip melaporkan
+ * 'Ankle Sprain / Knee Sprain' TIDAK ADA hanya karena kunci catatannya
+ * diperluas menjadi '... / Wrist Sprain', padahal aplikasinya sendiri sudah
+ * menemukannya lewat padanan. Alat ukur yang tidak mengikuti perubahan pada
+ * yang diukurnya akan melaporkan kerusakan yang tidak ada — dan laporan palsu
+ * itu memakan waktu yang sama dengan kerusakan sungguhan.
+ */
+const aliasStasiun = readFileSync('src/lib/osceStationNoteAliases.ts','utf8')
 
 const SELESAI = [
  ['PPOK Eksaserbasi Akut','PPOK'], ['Cluster Headache','cluster'],
@@ -36,7 +45,7 @@ const punya = (teks, kata) => teks.toLowerCase().includes(kata.toLowerCase())
 let kurang = 0
 console.log('kasus'.padEnd(46), 'stasiun terapi catatan')
 for (const [kunci, cari] of SELESAI) {
-  const a = stasiun.includes(`  '${kunci}': {`)
+  const a = stasiun.includes(`  '${kunci}': {`) || aliasStasiun.includes(`'${kunci}':`)
   const b = punya(terapi, cari)
   const c = punya(catatan, cari) || punya(alias, cari)
   if (!(a && b && c)) kurang++
