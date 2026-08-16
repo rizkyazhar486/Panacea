@@ -83,6 +83,60 @@ export const SINONIM_PENYAKIT: Record<string, string[]> = {
   skabies: ['skabies'],
   'creeping eruption': ['larva migrans'],
   clm: ['larva migrans'],
+
+  /*
+   * Nama SKDI yang berupa DAFTAR DALAM KURUNG. Beberapa entri resmi menyebut
+   * beberapa penyakit sekaligus — 'Hernia (inguinalis, femoralis, skrotalis)
+   * reponibilis, irreponibilis', 'Kelainan jantung kongenital (Ventricular
+   * Septal Defect, ...)'. Yang diketik orang adalah salah satu isi kurungnya,
+   * 'hernia inguinalis' atau 'VSD', dan itu BUKAN potongan huruf yang berurutan
+   * dari nama resminya, sehingga pencariannya gagal walaupun entrinya ada.
+   */
+  'hernia inguinalis': ['hernia (inguinalis'],
+  'hernia femoralis': ['hernia (inguinalis'],
+  'hernia skrotalis': ['hernia (inguinalis'],
+  'hernia inkarserata': ['strangulata, inkarserata'],
+  'hernia strangulata': ['strangulata, inkarserata'],
+  vsd: ['kelainan jantung kongenital'],
+  asd: ['kelainan jantung kongenital'],
+  pda: ['kelainan jantung kongenital'],
+  tof: ['kelainan jantung kongenital'],
+  'tetralogy of fallot': ['kelainan jantung kongenital'],
+  'tetralogi fallot': ['kelainan jantung kongenital'],
+  'penyakit jantung bawaan': ['kelainan jantung kongenital'],
+  pjb: ['kelainan jantung kongenital'],
+  endokarditis: ['radang pada dinding jantung'],
+  miokarditis: ['radang pada dinding jantung'],
+  perikarditis: ['radang pada dinding jantung'],
+  'mitral stenosis': ['penyakit katup jantung'],
+  'mitral regurgitasi': ['penyakit katup jantung'],
+  'aortic stenosis': ['penyakit katup jantung'],
+  'stenosis mitral': ['penyakit katup jantung'],
+  'penyakit katup': ['penyakit katup jantung'],
+  gonore: ['sindrom duh'],
+  'gonorrhea': ['sindrom duh'],
+  'duh tubuh': ['sindrom duh'],
+  keputihan: ['sindrom duh', 'vaginitis', 'vulvitis'],
+  uretritis: ['sindrom duh', 'uretritis'],
+  skoliosis: ['kelainan bentuk tulang belakang'],
+  kifosis: ['kelainan bentuk tulang belakang'],
+  lordosis: ['kelainan bentuk tulang belakang'],
+  'club foot': ['malformasi kongenital (genovarum'],
+  'pes planus': ['malformasi kongenital (genovarum'],
+  'flat foot': ['malformasi kongenital (genovarum'],
+  'kaki datar': ['malformasi kongenital (genovarum'],
+  genuvalgum: ['malformasi kongenital (genovarum'],
+  genuvarum: ['malformasi kongenital (genovarum'],
+  hemofilia: ['gangguan pembekuan darah'],
+  'von willebrand': ['gangguan pembekuan darah'],
+  mioma: ['adenomiosis, mioma'],
+  'mioma uteri': ['adenomiosis, mioma'],
+  adenomiosis: ['adenomiosis, mioma'],
+  dispareunia: ['sexual pain disorder'],
+  vaginismus: ['sexual pain disorder'],
+  'henti jantung': ['cardiorespiratory arrest'],
+  'cardiac arrest': ['cardiorespiratory arrest'],
+  rjp: ['cardiorespiratory arrest'],
 }
 
 /**

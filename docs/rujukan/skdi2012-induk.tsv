@@ -1,0 +1,722 @@
+No urut	Diagnosis/Daftar Penyakit SKDI 2012	Tingkat kompetensi
+1	Spina bifida	2
+2	Fenilketonuria	1
+3	Duchene muscular dystrophy	1
+4	Kejang demam	4A
+5	Infeksi sitomegalovirus	2
+6	Meningitis	3B
+7	Ensefalitis	3B
+8	Malaria serebral	3B
+9	Tetanus	4A
+10	Tetanus neonatorum	3B
+11	Toksoplasmosis serebral	2
+12	Abses otak	2
+13	HIV AIDS tanpa komplikasi	4A
+14	AIDS dengan komplikasi	3A
+15	Hidrosefalus	2
+16	Poliomielitis	3B
+17	Rabies	3B
+18	Spondilitis TB	3A
+19	Tumor primer	2
+20	Tumor sekunder	2
+21	Ensefalopati	3B
+22	Koma	3B
+23	Mati batang otak	2
+24	Tension headache	4A
+25	Migren	4A
+26	Arteritis kranial	1
+27	Neuralgia trigeminal	3A
+28	Cluster headache	3A
+29	TIA	3B
+30	Infark serebral	3B
+31	Hematom intraserebral	3B
+32	Perdarahan subarakhnoid	3B
+33	Ensefalopati hipertensi	3B
+34	Bells’ palsy	4A
+35	Lesi batang otak	2
+36	Meniere's disease	3A
+37	Vertigo (Benign paroxysmal positional vertigo)	4A
+38	Cerebral palsy	2
+39	Demensia	3A
+40	Penyakit Alzheimer	2
+41	Parkinson	3A
+42	Gangguan pergerakan lainnya Epilepsi dan Kejang Lainnya	1
+43	Kejang	3B
+44	Epilepsi	3A
+45	Status epileptikus	3B
+46	Sklerosis multipel	1
+47	Amyotrophic lateral sclerosis (ALS)	1
+48	Complete spinal transaction	3B
+49	Sindrom kauda equine	2
+50	Neurogenic bladder	3A
+51	Siringomielia	2
+52	Mielopati	2
+53	Dorsal root syndrome	2
+54	Acute medulla compression	3B
+55	Radicular syndrome	3A
+56	Hernia nucleus pulposus (HNP)	3A
+57	Hematom epidural	2
+58	Hematom subdural	2
+59	Trauma Medula Spinalis	2
+60	Reffered pain	3A
+61	Nyeri neuropatik	3A
+62	Sindrom Horner	2
+63	Carpal tunnel syndrome	3A
+64	Tarsal tunnel syndrome	3A
+65	Neuropati	3A
+66	Peroneal palsy	3A
+67	Guillain Barre syndrome	3B
+68	Miastenia gravis	3B
+69	Polimiositis	1
+70	Neurofibromatosis (Von Recklaing Hausen disease)	2
+71	Amnesia pascatrauma	3A
+72	Afasia	2
+73	psikoaktif lainnya	3A
+74	Intoksikasi akut zat psikoaktif	3B
+75	Adiksi/ketergantungan Narkoba Delirium yang diinduksi oleh alkohol atau zat psikoaktif	3A
+76	lainnya Psikosis (Skizofrenia, Gangguan Waham menetap, Psikosis Akut dan Skizoafektif)	3A
+77	Skizofrenia	3A
+78	Gangguan waham	3A
+79	Gangguan psikotik	3A
+80	Gangguan skizoafektif	3A
+81	Gangguan bipolar, episode manik	3A
+82	Gangguan bipolar, episode depresif	3A
+83	Gangguan siklotimia	2
+84	Depresi endogen, episode tunggal dan rekuran	2
+85	Gangguan distimia (depresi neurosis)	2
+86	Gangguan depresif yang tidak terklasifikasikan	2
+87	Baby blues (post-partum depression) Somatoform	3A
+88	Agorafobia dengan/tanpa panik	2
+89	Fobia sosial	2
+90	Fobia spesifik	2
+91	Gangguan panik	3A
+92	Gangguan cemas menyeluruh	3A
+93	Gangguan campuran cemas depresi	3A
+94	Gangguan obsesif-kompulsif	2
+95	Reaksi terhadap stres yg berat, & gangguan penyesuaian	2
+96	Post traumatic stress disorder	3A
+97	Gangguan disosiasi (konversi)	2
+98	Gangguan somatoform	4A
+99	Trikotilomania	3A
+100	Gangguan kepribadian	2
+101	Gangguan identitas gender	2
+102	Gangguan preferensi seksual Remaja	2
+103	Gangguan perkembangan pervasif	2
+104	Retardasi mental	3A
+105	(termasuk autisme) 34	2
+106	Anoreksia nervosa	2
+107	Bulimia	2
+108	Pica Tics	2
+109	Gilles de la tourette syndrome	2
+110	Chronic motor of vocal tics disorder	2
+111	Transient tics disorder	3A
+112	Functional encoperasis	2
+113	Functional enuresis	2
+114	Uncoordinated speech	2
+115	Parafilia	2
+116	Gangguan keinginan dan gairah seksual	3A
+117	(ejakulasi dini) Sexual pain disorder (termasuk vaginismus,	3A
+118	diparenia)	3A
+119	Insomnia	4A
+120	Hipersomnia	3A
+121	Sleep-wake cycle disturbance	2
+122	Nightmare	2
+123	Benda asing di konjungtiva	4A
+124	Konjungtivitis	4A
+125	Pterigium	3A
+126	Perdarahan subkonjungtiva	4A
+127	Mata kering	4A
+128	Blefaritis	4A
+129	Hordeolum	4A
+130	Chalazion	3A
+131	Laserasi kelopak mata	3B
+132	Entropion	2
+133	Trikiasis	4A
+134	Lagoftalmus	2
+135	Epikantus	2
+136	Ptosis	2
+137	Retraksi kelopak mata	2
+138	Xanthelasma	2
+139	Dakrioadenitis	3A
+140	Dakriosistitis	3A
+141	Dakriostenosis	2
+142	Laserasi duktus lakrimal	2
+143	Skleritis	3A
+144	Episkleritis	4A
+145	Erosi	2
+146	Benda asing di kornea	2
+147	Luka bakar kornea	2
+148	Keratitis	3A
+149	Kerato-konjungtivitis sicca	2
+150	Edema kornea	2
+151	Keratokonus	2
+152	Xerophtalmia	3A
+153	Endoftalmitis	2
+154	Mikroftalmos	2
+155	Hifema	3A
+156	Hipopion	3A
+157	Perdarahan Vitreous	1
+158	Iridosisklitis, iritis	3A
+159	Tumor iris	2
+160	Katarak	2
+161	Afakia kongenital	2
+162	Dislokasi lensa	2
+163	Hipermetropia ringan	4A
+164	Miopia ringan	4A
+165	Astigmatism ringan	4A
+166	Presbiopia	4A
+167	Anisometropia pada dewasa	3A
+168	Anisometropia pada anak	2
+169	Ambliopia	2
+170	Diplopia binokuler	2
+171	Buta senja	4A
+172	Skotoma	2
+173	Hemianopia, bitemporal, and homonymous	2
+174	Gangguan lapang pandang	2
+175	Ablasio retina	2
+176	Perdarahan retina, oklusi pembuluh darah retina	2
+177	Degenerasi makula karena usia	2
+178	Retinopati (diabetik, hipertensi, prematur)	2
+179	Korioretinitis	1
+180	Optic disc cupping	2
+181	Edema papil	2
+182	Atrofi optik	2
+183	Neuropati optik	2
+184	Neuritis optik	2
+185	Glaukoma akut	3B
+186	Glaukoma lainnya	3A
+187	Tuli (kongenital, perseptif, konduktif)	2
+188	Inflamasi pada aurikular	3A
+189	Herpes zoster pada telinga	3A
+190	Fistula pre-aurikular	3A
+191	Labirintitis	2
+192	Otitis eksterna	4A
+193	Otitis media akut	4A
+194	Otitis media serosa	3A
+195	Otitis media kronik	3A
+196	Mastoiditis	3A
+197	Miringitis bullosa	3A
+198	Benda asing	3A
+199	Perforasi membran timpani	3A
+200	Otosklerosis	3A
+201	Timpanosklerosis	2
+202	Kolesteatoma	1
+203	Presbiakusis	3A
+204	Serumen prop	4A
+205	Mabuk perjalanan	4A
+206	Trauma akustik akut	3A
+207	Trauma aurikular	3B
+208	Deviasi septum hidung	2
+209	Furunkel pada hidung	4A
+210	Rhinitis akut	4A
+211	Rhinitis vasomotor	4A
+212	Rhinitis alergika	4A
+213	Rhinitis kronik	3A
+214	Rhinitis medikamentosa	3A
+215	Sinusitis	3A
+216	Sinusitis frontal akut	2
+217	Sinusitis maksilaris akut	2
+218	Sinusitis kronik	3A
+219	Benda asing	4A
+220	Epistaksis	4A
+221	Etmoiditis akut	1
+222	Polip	2
+223	Fistula dan kista brankial lateral dan medial	2
+224	Higroma kistik	2
+225	Tortikolis	3A
+226	Influenza	4A
+227	Pertusis	4A
+228	Acute Respiratory distress syndrome (ARDS)	3B
+229	SARS	3B
+230	Flu burung Laring dan Faring	3B
+231	Faringitis	4A
+232	Tonsilitis	4A
+233	Laringitis	4A
+234	Hipertrofi adenoid	2
+235	Abses peritonsilar	3A
+236	Pseudo-croop acute epiglotitis	3A
+237	Difteria (THT)	3B
+238	Karsinoma laring	2
+239	Karsinoma nasofaring Trakea	2
+240	Trakeitis	2
+241	Aspirasi	3B
+242	Benda asing Paru	2
+243	Asma bronkial	4A
+244	Status asmatikus (asma akut berat)	3B
+245	Bronkitis akut	4A
+246	Bronkiolitis akut	3B
+247	Bronkiektasis	3A
+248	Displasia bronkopulmonar	1
+249	Karsinoma paru	2
+250	Pneumonia, bronkopneumonia	4A
+251	Pneumonia aspirasi	3B
+252	Tuberkulosis paru tanpa komplikasi	4A
+253	Tuberkulosis dengan HIV	3A
+254	Multi Drug Resistance (MDR) TB	2
+255	Pneumothorax ventil	3A
+256	Pneumothorax	3A
+257	Efusi pleura	2
+258	Efusi pleura masif	3B
+259	Emfisema paru	3A
+260	Atelektasis	2
+261	Penyakit Paru Obstruksi Kronik (PPOK) eksaserbasi akut	3B
+262	Edema paru	3B
+263	Infark paru	1
+264	Abses paru	3A
+265	Emboli paru	1
+266	Kistik fibrosis	1
+267	Haematothorax	3B
+268	Tumor mediastinum	2
+269	Pnemokoniasis	2
+270	Penyakit paru intersisial	1
+271	Defect, Atrial Septal Defect, Patent Ductus Arteriosus, Tetralogy of Fallot) Radang pada dinding jantung (Endokarditis,	2
+272	Miokarditis, Perikarditis)	2
+273	Syok (septik, hipovolemik, kardiogenik, neurogenik)	3B
+274	Angina pektoris	3B
+275	Infark miokard	3B
+276	Gagal jantung akut	3B
+277	Gagal jantung kronik 8      Cardiorespiratory arrest                                         3b	3A
+278	regurgitation, Aortic stenosis, Aortic regurgitation,dan	2
+279	Takikardi: supraventrikular, ventrikular	3B
+280	Fibrilasi atrial	3A
+281	Fibrilasi ventrikular	3B
+282	Atrial flutter	3B
+283	Ekstrasistol supraventrikular, ventrikular	3A
+284	Bundle Branch Block	2
+285	Aritmia lainnya	2
+286	Kardiomiopati	2
+287	Kor pulmonale akut	3B
+288	Kor pulmonale kronik	3A
+289	Hipertensi esensial	4A
+290	Hipertensi sekunder	3A
+291	Hipertensi pulmoner	1
+292	Penyakit Raynaud	2
+293	Trombosis arteri	2
+294	Koarktasio aorta	1
+295	Penyakit Buerger's (Thromboangiitis Obliterans)	2
+296	Emboli arteri	1
+297	Aterosklerosis	1
+298	Subclavian steal syndrome	1
+299	Aneurisma Aorta	1
+300	Aneurisma diseksi	1
+301	Klaudikasio	2
+302	Penyakit jantung reumatik Vena dan Pembuluh Limfe	2
+303	Tromboflebitis	3A
+304	Limfangitis	3A
+305	Varises (primer, sekunder)	2
+306	Obstructed venous return	2
+307	Trombosis vena dalam	2
+308	Emboli vena	2
+309	Limfedema (primer, sekunder)	3A
+310	Sumbing pada bibir dan palatum	2
+311	Micrognatia and macrognatia	2
+312	Kandidiasis mulut	4A
+313	Ulkus mulut (aptosa, herpes)	4A
+314	Glositis	3A
+315	Leukoplakia	2
+316	Angina Ludwig	3A
+317	Parotitis	4A
+318	Karies gigi Esofagus	3A
+319	Atresia esofagus	2
+320	Akalasia	2
+321	Esofagitis refluks	3A
+322	Lesi korosif pada esofagus	3B
+323	Varises esofagus	2
+324	Ruptur esofagus Dinding, Rongga Abdomen, dan Hernia Hernia (inguinalis, femoralis, skrotalis) reponibilis,	1
+325	irreponibilis Hernia (inguinalis, femoralis, skrotalis) strangulata,	2
+326	inkarserata	3B
+327	Hernia (diaframatika, hiatus)	2
+328	Hernia umbilikalis	3A
+329	Peritonitis	3B
+330	Perforasi usus	2
+331	Malrotasi traktus gastro-intestinal	2
+332	Infeksi pada umbilikus	4A
+333	Sindrom Reye Lambung, Duodenum, Jejunum, Ileum	1
+334	Gastritis	4A
+335	Gastroenteritis (termasuk kolera, giardiasis)	4A
+336	Refluks gastroesofagus	4A
+337	Ulkus (gaster, duodenum)	3A
+338	Stenosis pilorik	2
+339	Atresia intestinal	2
+340	Divertikulum Meckel	2
+341	Fistula umbilikal, omphalocoele-gastroschisis	2
+342	Apendisitis akut	3B
+343	Abses apendiks	3B
+344	Demam tifoid	4A
+345	Perdarahan gastrointestinal	3B
+346	Ileus	2
+347	Malabsorbsi	3A
+348	Intoleransi makanan	4A
+349	Alergi makanan	4A
+350	Keracunan makanan	4A
+351	Botulisme Infestasi Cacing dan Lainnya	3B
+352	Penyakit cacing tambang	4A
+353	Strongiloidiasis	4A
+354	Askariasis	4A
+355	Skistosomiasis	4A
+356	Taeniasis	4A
+357	Pes Hepar	1
+358	Hepatitis A	4A
+359	Hepatitis B	3A
+360	Hepatitis C	2
+361	Abses hepar amoeba	3A
+362	Perlemakan hepar	3A
+363	Sirosis hepatis	2
+364	Gagal hepar	2
+365	Neoplasma hepar Kandung Empedu, Saluran Empedu, dan Pankreas	2
+366	Kolesistitis	3B
+367	Kole(doko)litiasis	2
+368	Empiema dan hidrops kandung empedu	2
+369	Atresia biliaris	2
+370	Pankreatitis	2
+371	Karsinoma pankreas Kolon	2
+372	Divertikulosis/divertikulitis	3A
+373	Kolitis	3A
+374	Disentri basiler, disentri amuba	4A
+375	Penyakit Crohn	1
+376	Kolitis ulseratif	1
+377	Irritable Bowel Syndrome	3A
+378	Polip/adenoma	2
+379	Karsinoma kolon	2
+380	Penyakit Hirschsprung	2
+381	Enterokolitis nekrotik	1
+382	Intususepsi atau invaginasi	3B
+383	Atresia anus	2
+384	Proktitis	3A
+385	Abses (peri)anal	3A
+386	Hemoroid grade 1-2	4A
+387	Hemoroid grade 3-4	3A
+388	Fistula	2
+389	Fisura anus	2
+390	Prolaps rektum, anus Neoplasma Gastrointestinal	3A
+391	Limfoma	2
+392	Infeksi saluran kemih	4A
+393	Glomerulonefritis akut	3A
+394	Glomerulonefritis kronik	3A
+395	Gonore	4A
+396	Karsinoma sel renal	2
+397	Tumor Wilms	2
+398	Acute kidney injury	2
+399	Penyakit ginjal kronik	2
+400	Sindrom nefrotik	2
+401	Kolik renal Batu saluran kemih (vesika urinaria, ureter, uretra )	3A
+402	tanpa kolik	3A
+403	Ginjal polikistik simtomatik	2
+404	Ginjal tapal kuda	1
+405	Pielonefritis tanpa komplikasi	4A
+406	Nekrosis tubular akut Alat Kelamin Pria	2
+407	Hipospadia	2
+408	Epispadia	2
+409	Testis tidak turun/ kriptorkidismus	2
+410	Rectratile testis	2
+411	Varikokel	2
+412	Hidrokel	2
+413	Fimosis	4A
+414	Parafimosis	4A
+415	Spermatokel	2
+416	Epididimitis	2
+417	Prostatitis	3A
+418	Torsio testis	3B
+419	Ruptur uretra	3B
+420	Ruptur kandung kencing	3B
+421	Ruptur ginjal	3B
+422	Karsinoma uroterial	2
+423	Seminoma testis	1
+424	Teratoma testis	1
+425	Hiperplasia prostat jinak	2
+426	Karsinoma prostat	2
+427	Striktura uretra	2
+428	Priapismus	3B
+429	Sifilis	3A
+430	Toksoplasmosis Sindrom duh (discharge) genital (gonore dan	2
+431	nongonore)	4A
+432	Infeksi virus Herpes tipe 2	2
+433	Infeksi saluran kemih bagian bawah	4A
+434	Vulvitis	4A
+435	Kondiloma akuminatum	3A
+436	Vaginitis	4A
+437	Vaginosis bakterialis	4A
+438	Servisitis	3A
+439	Salpingitis	4A
+440	Abses tubo-ovarium	3B
+441	Penyakit radang panggul	3A
+442	Kehamilan normal	4A
+443	Infeksi intra-uterin: korioamnionitis	3A
+444	Infeksi pada kehamilan: TORCH, hepatitis B, malaria	3B
+445	Aborsi mengancam	3B
+446	Aborsi spontan inkomplit	3B
+447	Aborsi spontan komplit	4A
+448	Hiperemesis gravidarum	3B
+449	Inkompatibilitas darah	2
+450	Mola hidatidosa	2
+451	Hipertensi pada kehamilan	2
+452	Preeklampsia	3B
+453	Eklampsia	3B
+454	Diabetes gestasional	2
+455	Kehamilan posterm	2
+456	Insufisiensi plasenta	2
+457	Plasenta previa	2
+458	Vasa previa	2
+459	Abrupsio plasenta	2
+460	Inkompeten serviks	2
+461	Polihidramnion	2
+462	Kelainan letak janin setelah 36 minggu	2
+463	Kehamilan ganda	2
+464	Janin tumbuh lambat	3A
+465	Kelainan janin	2
+466	Diproporsi kepala panggul	2
+467	Anemia defisiensi besi pada kehamilan	4A
+468	Intra-Uterine Fetal Death (IUFD)	2
+469	Persalinan preterm	3A
+470	Ruptur uteri	2
+471	Bayi post matur	3A
+472	Ketuban pecah dini (KPD)	3A
+473	Distosia	3B
+474	Malpresentasi	2
+475	Partus lama	3B
+476	Prolaps tali pusat	3B
+477	Hipoksia janin	3B
+478	Ruptur serviks	3B
+479	Ruptur perineum tingkat 1-2	4A
+480	Ruptur perineum tingkat 3-4	3B
+481	Retensi plasenta	3B
+482	Inversio uterus	3B
+483	Perdarahan post partum	3B
+484	Tromboemboli	2
+485	Endometritis	3B
+486	Inkontinensia urine	2
+487	Inkontinensia feses	2
+488	Trombosis vena dalam	2
+489	Tromboflebitis	2
+490	Subinvolusio uterus	3B
+491	Kista dan abses kelenjar bartolini	3A
+492	Abses folikel rambut atau kelenjar sebasea	4A
+493	Malformasi kongenital	1
+494	Kistokel	1
+495	Rektokel	1
+496	Corpus alienum vaginae	3A
+497	Kista Gartner	3A
+498	Fistula (vesiko-vaginal, uretero-vagina, rektovagina)	2
+499	Kista Nabotian	3A
+500	Polip serviks	3A
+501	Malformasi kongenital uterus	1
+502	Prolaps uterus, sistokel, rektokel	3A
+503	Hematokolpos	2
+504	Endometriosis	2
+505	Hiperplasia endometrium	1
+506	Menopause, perimenopausal syndome	2
+507	Polikistik ovarium	1
+508	Kehamilan ektopik	2
+509	Karsinoma serviks	2
+510	Karsinoma endometrium	1
+511	Karsinoma ovarium	1
+512	Teratoma ovarium (kista dermoid)	2
+513	Kista ovarium	2
+514	Torsi dan ruptur kista	3B
+515	Koriokarsinoma Adenomiosis, mioma	1
+516	Malpresentasi	2
+517	Inflamasi, abses	2
+518	Mastitis	4A
+519	Cracked nipple	4A
+520	Inverted nipple	4A
+521	Fibrokista	2
+522	Fibroadenoma mammae (FAM)	2
+523	Tumor Filoides	1
+524	Karsinoma payudara	2
+525	Penyakit Paget	1
+526	Ginekomastia	2
+527	Infertilitas	3A
+528	Gangguan ereksi	2
+529	Diabetes melitus tipe 1	4A
+530	Diabetes melitus tipe 2	4A
+531	Diabetes melitus tipe lain (intoleransi glukosa akibat penyakit lain atau obat-obatan)	3A
+532	Ketoasidosis diabetikum nonketotik	3B
+533	Hiperglikemi hiperosmolar	3B
+534	Hipoglikemia ringan	4A
+535	Hipoglikemia berat	3B
+536	Diabetes insipidus	1
+537	Akromegali, gigantisme	1
+538	Defisiensi hormon pertumbuhan	1
+539	Hiperparatiroid	1
+540	Hipoparatiroid	3A
+541	Hipertiroid	3A
+542	Tirotoksikosis	3B
+543	Hipotiroid	2
+544	Goiter	3A
+545	Tiroiditis	2
+546	Cushing's disease	3B
+547	Krisis adrenal	3B
+548	Addison's disease	1
+549	Pubertas prekoks	2
+550	Hipogonadisme	2
+551	Prolaktinemia	1
+552	Adenoma tiroid	2
+553	Karsinoma tiroid	2
+554	Malnutrisi energi-protein	4A
+555	Defisiensi vitamin	4A
+556	Defisiensi mineral	4A
+557	Dislipidemia	4A
+558	Porfiria	1
+559	Hiperurisemia	4A
+560	Obesitas	4A
+561	Anemia aplastik	2
+562	Anemia defisiensi besi	4A
+563	Anemia hemolitik	3A
+564	Anemia makrositik	3A
+565	Anemia megaloblastik	2
+566	Hemoglobinopati	2
+567	Polisitemia	2
+568	hemofilia, Von Willebrand's disease)	2
+569	DIC	2
+570	Agranulositosis	2
+571	Inkompatibilitas golongan darah	2
+572	Timoma	1
+573	Limfoma non-Hodgkin's, Hodgkin's	1
+574	Leukemia akut, kronik	2
+575	Mieloma multipel	1
+576	Limfadenopati	3A
+577	Limfadenitis	4A
+578	Bakteremia	3B
+579	Demam dengue, DHF	4A
+580	Dengue shock syndrome	3B
+581	Malaria	4A
+582	Leishmaniasis dan tripanosomiasis	2
+583	Toksoplasmosis	3A
+584	Leptospirosis (tanpa komplikasi)	4A
+585	Sepsis	3B
+586	Lupus eritematosus sistemik	3A
+587	Poliarteritis nodosa	1
+588	Polimialgia reumatik	3A
+589	Reaksi anafilaktik	4A
+590	Demam reumatik	3A
+591	Artritis reumatoid	3A
+592	Juvenile chronic arthritis	2
+593	Henoch-schoenlein purpura	2
+594	Eritema multiformis	2
+595	Artritis, osteoarthritis	3A
+596	Fraktur terbuka, tertutup	3B
+597	Fraktur klavikula	3A
+598	Fraktur patologis,	2
+599	Fraktur dan dislokasi tulang belakang	2
+600	Dislokasi pada sendi ekstremitas	2
+601	Osteogenesis imperfekta	1
+602	Ricketsia, osteomalasia	1
+603	Osteoporosis	3A
+604	Akondroplasia	1
+605	Displasia fibrosa	1
+606	Tenosinovitis supuratif	3A
+607	Tumor tulang primer, sekunder	2
+608	Osteosarkoma	1
+609	Sarcoma Ewing	1
+610	Kista ganglion	2
+611	Trauma sendi	3A
+612	lordosis)	2
+613	Spondilitis, spondilodisitis	2
+614	Teratoma sakrokoksigeal	2
+615	Spondilolistesis	1
+616	Spondilolisis	1
+617	Lesi pada ligamentosa panggul	1
+618	Displasia panggul	2
+619	Nekrosis kaput femoris	1
+620	Tendinitis Achilles	1
+621	Ruptur tendon Achilles	3A
+622	Lesi meniskus, medial, dan lateral	3A
+623	Instabilitas sendi tumit Malformasi kongenital (genovarum, genovalgum, club	2
+624	foot, pes planus)	2
+625	Claw foot, drop foot	2
+626	Claw hand, drop hand	2
+627	Ulkus pada tungkai	4A
+628	Osteomielitis	3B
+629	Rhabdomiosarkoma	1
+630	Leiomioma, leiomiosarkoma, liposarkoma	1
+631	Lipoma	4A
+632	Veruka vulgaris	4A
+633	Kondiloma akuminatum	3A
+634	Moluskum kontagiosum	4A
+635	Herpes zoster tanpa komplikasi	4A
+636	Morbili tanpa komplikasi	4A
+637	Varisela tanpa komplikasi	4A
+638	Herpes simpleks tanpa komplikasi	4A
+639	Impetigo	4A
+640	Impetigo ulseratif (ektima)	4A
+641	Folikulitis superfisialis	4A
+642	Furunkel, karbunkel	4A
+643	Eritrasma	4A
+644	Erisipelas	4A
+645	Skrofuloderma	4A
+646	Lepra	4A
+647	Reaksi lepra	3A
+648	Sifilis stadium 1 dan 2	4A
+649	Tinea kapitis	4A
+650	Tinea barbe	4A
+651	Tinea fasialis	4A
+652	Tinea korporis	4A
+653	Tinea manus	4A
+654	Tinea unguium	4A
+655	Tinea kruris	4A
+656	Tinea pedis	4A
+657	Pitiriasis vesikolor	4A
+658	Kandidosis mukokutan ringan Gigitan Serangga dan Infestasi Parasit	4A
+659	Cutaneus larva migran	4A
+660	Filariasis	4A
+661	Pedikulosis kapitis	4A
+662	Pedikulosis pubis	4A
+663	Skabies	4A
+664	Reaksi gigitan serangga Dermatitis Eksim	4A
+665	Dermatitis kontak iritan	4A
+666	Dermatitis kontak alergika	3A
+667	Dermatitis atopik (kecuali recalcitrant)	4A
+668	Dermatitis numularis	4A
+669	Liken simpleks kronik/neurodermatitis	3A
+670	Napkin eczema	4A
+671	Psoriasis vulgaris	3A
+672	Dermatitis seboroik	4A
+673	Pitiriasis rosea	4A
+674	Akne vulgaris ringan	4A
+675	Akne vulgaris sedang-berat	3A
+676	Hidradenitis supuratif	4A
+677	Dermatitis perioral	4A
+678	Miliaria	4A
+679	Toxic epidermal necrolysis	3B
+680	Sindrom Stevens-Johnson	3B
+681	Urtikaria akut	4A
+682	Urtikaria kronis	3A
+683	Angioedema	3B
+684	Lupus eritematosis kulit	2
+685	Ichthyosis vulgaris Reaksi Obat	3A
+686	Exanthematous drug eruption, fixed drug eruption	4A
+687	Vitiligo	3A
+688	Melasma	3A
+689	Albino	2
+690	Hiperpigmentasi pascainflamasi	3A
+691	Hipopigmentasi pascainflamasi Neoplasma	3A
+692	Keratosis seboroik	2
+693	Kista epitel	3A
+694	Squamous cell carcinoma (Karsinoma sel skuamosa)	2
+695	Basal cell carcinoma (Karsinoma sel basal)	2
+696	Xanthoma	2
+697	Hemangioma	2
+698	Lentigo	2
+699	Nevus pigmentosus	2
+700	Melanoma maligna Rambut	1
+701	Alopesia areata	2
+702	Alopesia androgenik	2
+703	Telogen eflluvium	2
+704	Psoriasis vulgaris	2
+705	Vulnus laseratum, punctum	4A
+706	Vulnus perforatum, penetratum	3B
+707	Luka bakar derajat 1 dan 2	4A
+708	Luka bakar derajat 3 dan 4	3B
+709	Luka akibat bahan kimia	3B
+710	Kekerasan tumpul	4A
+711	Kekerasan tajam	4A
+712	Trauma kimia	3A
+713	Luka tembak	3A
+714	Luka listrik dan petir	2
+715	Barotrauma	2
+716	Trauma suhu	2
+717	Asfiksia	3A
+718	Tenggelam	3A
+719	Pembunuhan anak sendiri	3A
+720	Pengguguran kandungan	3A
+721	Kematian mendadak	3B
