@@ -35,6 +35,12 @@ export const apiBaseUrl = API
 export interface Health {
   ok: boolean
   features: { google: boolean; payments: boolean; ai?: boolean; push?: boolean; email?: boolean; payout?: boolean; otpEmail?: boolean }
+  /**
+   * Kemampuan server yang terpasang. TIDAK ADA pada server versi lama, dan
+   * ketiadaannya itulah keterangannya — dari situ aplikasi tahu membedakan
+   * server yang belum dipasang ulang dari kegagalan yang sesungguhnya.
+   */
+  kemampuan?: { evidenceJson?: boolean }
   aiConsultPnc?: number
   tokenToIdr: number
   midtransClientKey: string | null

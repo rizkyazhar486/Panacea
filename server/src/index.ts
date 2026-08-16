@@ -194,6 +194,22 @@ app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     features: { google: features.googleLive, payments: features.paymentsLive, ai: features.aiLive, push: features.pushLive, email: features.emailLive, payout: features.payoutLive, otpEmail: emailOtpLive },
+    /*
+     * KEMAMPUAN SERVER, supaya aplikasi dapat membedakan SERVER YANG BELUM
+     * DIPERBARUI dari kegagalan yang sesungguhnya.
+     *
+     * Perbaikan Clinical Evidence berada di server: permintaan ber-json harus
+     * diarahkan ke model penalaran dan dijawab sebagai objek, dan batas token
+     * dinaikkan supaya jawabannya tidak terpotong di tengah. Selama server yang
+     * terpasang masih versi lama, aplikasi hanya melihat teks yang tidak dapat
+     * diurai dan menampilkan 'format tidak terduga' — pesan yang tidak
+     * memberitahu apa pun kepada pemakainya, dan membuat orang menyangka
+     * fiturnya rusak padahal servernya saja yang belum dipasang ulang.
+     *
+     * Penanda di bawah dibaca aplikasi: bila tidak ada, penyebabnya disebutkan
+     * apa adanya beserta apa yang harus dikerjakan.
+     */
+    kemampuan: { evidenceJson: true },
     vapidPublicKey: features.pushLive ? config.vapid.publicKey : null,
     tokenToIdr: config.tokenToIdr,
     aiConsultPnc: config.aiConsultPnc,

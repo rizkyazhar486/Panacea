@@ -236,7 +236,30 @@ export async function askClinicalEvidence(question: string, filters: EvidenceFil
     max_tokens: 4096,
   })
   const parsed = safeParse(text)
-  if (!parsed || !parsed.bottomLine) throw new Error(text.trim() ? 'parse_failed' : 'empty_reply')
+  if (!parsed || !parsed.bottomLine) {
+    /*
+     * SEBUTKAN SEBABNYA, JANGAN HANYA MENYEBUT GAGALNYA.
+     *
+     * Perbaikan Clinical Evidence berada di SERVER, bukan di aplikasi ini.
+     * Selama server yang terpasang masih versi lama, jawabannya kembali
+     * sebagai prosa yang tidak dapat diurai — dan pesan 'format tidak terduga'
+     * membuat pemakainya menyangka fiturnya rusak, lalu mencoba berulang kali
+     * dengan pertanyaan yang berbeda-beda padahal tidak ada pertanyaan yang
+     * akan berhasil.
+     *
+     * Server yang sudah diperbarui menyebutkan kemampuannya pada /api/health.
+     * Bila penanda itu tidak ada, itulah sebabnya, dan itu yang disampaikan.
+     */
+    let serverLama = false
+    try {
+      const h = await api.health()
+      serverLama = !h.kemampuan?.evidenceJson
+    } catch {
+      // Tidak dapat memastikan; jangan menuduh servernya usang tanpa bukti.
+    }
+    if (serverLama) throw new Error('server_lama')
+    throw new Error(text.trim() ? 'parse_failed' : 'empty_reply')
+  }
 
   return {
     question: q,

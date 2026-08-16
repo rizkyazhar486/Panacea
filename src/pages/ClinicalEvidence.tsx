@@ -93,6 +93,12 @@ export function ClinicalEvidence() {
         setErr('The AI service is not configured on this deployment yet. The verification links below still search the primary literature.')
       else if (msg.includes('rate_limited'))
         setErr('Too many questions in the last minute. Wait about a minute and ask again — nothing was charged.')
+      else if (msg.includes('server_lama'))
+        // Sebab yang PASTI, bukan dugaan: server menyebutkan kemampuannya pada
+        // /api/health, dan penanda evidenceJson memang tidak ada. Menyuruh
+        // pengguna mengulang pertanyaan di sini akan menyesatkan — tidak ada
+        // pertanyaan yang akan berhasil sampai servernya dipasang ulang.
+        setErr('Server belum diperbarui. Perbaikan Clinical Evidence sudah ada di kode tetapi server yang sedang berjalan masih versi lama, sehingga jawabannya kembali dalam bentuk yang tidak dapat dibaca. Mengubah pertanyaan tidak akan menolong — server perlu dipasang ulang (deploy) lebih dahulu. Tautan penelusuran di bawah tetap berfungsi.')
       else if (msg.includes('empty_reply') || msg.includes('parse_failed'))
         setErr('The evidence engine answered but the reply could not be read. This is a fault on our side, not with your question — please try again.')
       else if (msg.includes('ai_failed'))
