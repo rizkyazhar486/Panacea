@@ -533,8 +533,8 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
     awas: 'Diminum 30-60 menit SEBELUM makan. Pemakaian lama: defisiensi B12 dan magnesium, risiko patah tulang, dan infeksi Clostridioides difficile.',
   },
   {
-    nama: 'Ranitidin',
-    alias: ['ranitidin', 'famotidin', 'simetidin'],
+    nama: 'Famotidin (penghambat H2)',
+    alias: ['famotidin', 'ranitidin', 'simetidin'],
     rantai: [
       '⊣ reseptor H2 sel parietal',
       'rangsang histamin ↓',
@@ -545,7 +545,7 @@ export const MEKANISME_OBAT: MekanismeObat[] = [
     mekanisme: 'Menghambat reseptor histamin H2 pada sel parietal sehingga rangsangan histamin terhadap sekresi asam berkurang. Hanya menutup satu dari tiga rangsangan, sehingga lebih lemah daripada penghambat pompa proton.',
     mengatasi: 'Nyeri ulu hati dan dispepsia ringan.',
     ingat: 'H2 menutup satu keran; pompa proton menutup keran terakhir.',
-    awas: 'Simetidin banyak berinteraksi lewat enzim hati.',
+    awas: 'RANITIDIN SUDAH DITARIK dari peredaran sejak 2020 di Indonesia dan banyak negara lain karena cemaran NDMA yang bersifat karsinogen — bila menemukannya pada resep atau catatan lama, gantilah dengan famotidin. Simetidin banyak berinteraksi lewat enzim hati.',
   },
   {
     nama: 'Oralit',
