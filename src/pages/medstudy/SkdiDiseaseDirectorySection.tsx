@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { sinonimUntuk } from '../../lib/sinonimPenyakit'
 import { Mindmap, WARNA, type Cabang } from './Mindmap'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconBook } from '../../components/icons'
@@ -229,7 +230,16 @@ export default function SkdiDiseaseDirectorySection() {
       if (system && e.system !== system) return false
       if (levelFilter !== 'all' && !e.level.startsWith(levelFilter)) return false
       if (!q) return true
-      return `${e.disease} ${e.subsection ?? ''} ${e.system}`.toLowerCase().includes(q)
+      /*
+       * Cocokkan juga lewat SINONIM. Tanpa ini, mengetik 'Stroke',
+       * 'Appendisitis', 'Kusta', atau 'Migrain' tidak memberi hasil apa pun,
+       * sebab daftar resmi memakai 'Infark serebral', 'Apendisitis', 'Lepra',
+       * dan 'Migren'. Bagi yang mencari, gagal menemukan karena beda ejaan
+       * terasa sama saja dengan penyakitnya tidak ada.
+       */
+      const baris = `${e.disease} ${e.subsection ?? ''} ${e.system}`.toLowerCase()
+      if (baris.includes(q)) return true
+      return sinonimUntuk(q).some((p) => baris.includes(p))
     })
   }, [query, system, levelFilter])
 

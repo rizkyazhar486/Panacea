@@ -612,6 +612,14 @@ export const SKDI_DISEASE_LIST: SkdiDiseaseEntry[] = [
   { system: 'Hematologi & Imunologi', disease: 'Eritema multiformis', level: '2', subsection: 'Penyakit Autoimun' },
   { system: 'Hematologi & Imunologi', disease: 'Imunodefisiensi', level: '2', subsection: 'Penyakit Autoimun' },
   { system: 'Muskuloskeletal', disease: 'Artritis, osteoarthritis', level: '3A', subsection: 'Tulang dan Sendi' },
+  /*
+   * ARTRITIS GOUT TIDAK PERNAH ADA di daftar ini, padahal ia kompetensi 4A —
+   * harus dapat ditangani tuntas sendiri — dan catatan stasiunnya sudah lengkap
+   * 8/8 beserta enam entri tatalaksana. Akibatnya siapa pun yang mengetik
+   * "Gout" pada Daftar Penyakit memperoleh "Tidak ada hasil", dan menyimpulkan
+   * penyakit itu tidak ada di aplikasi ini. Ditambahkan di sini.
+   */
+  { system: 'Muskuloskeletal', disease: 'Artritis, gout', level: '4A', subsection: 'Tulang dan Sendi' },
   { system: 'Muskuloskeletal', disease: 'Fraktur terbuka, tertutup', level: '3B', subsection: 'Tulang dan Sendi' },
   { system: 'Muskuloskeletal', disease: 'Fraktur klavikula', level: '3A', subsection: 'Tulang dan Sendi' },
   { system: 'Muskuloskeletal', disease: 'Fraktur patologis', level: '2', subsection: 'Tulang dan Sendi' },
