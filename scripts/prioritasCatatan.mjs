@@ -196,6 +196,13 @@ const SINONIM = {
    * dan ejaan candid- berbanding kandid-. Hanya CLM dan FDE yang benar-benar
    * belum ada, dan keduanya lalu ditulis.
    */
+  'lbp': 'HNP / Low Back Pain',
+  'lbp e c susp hnp': 'HNP / Low Back Pain',
+  'low back pain': 'HNP / Low Back Pain',
+  'mh tipe mb': 'Kusta (Morbus Hansen)',
+  'mh tipe pb': 'Kusta (Morbus Hansen)',
+  'morbus hansen': 'Kusta (Morbus Hansen)',
+  'lepra': 'Kusta (Morbus Hansen)',
   'acs': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
   'sindrom koroner akut': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
   'af': 'Atrial Fibrilasi — baca EKG',
