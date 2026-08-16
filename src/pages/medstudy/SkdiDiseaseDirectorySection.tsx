@@ -114,7 +114,22 @@ function resolveNote(disease: string, data: NoteData | null) {
     deep: undefined,
     blocks: [
       ...(station.etiologi ? [{ title: 'Etiologi', items: station.etiologi }] : []),
-      ...(station.patofisiologi ? [{ title: 'Patofisiologi', items: [station.patofisiologi] }] : []),
+      /* Rantai berpanah ikut ditampilkan di sini, bukan hanya di Case Bank.
+         Kalau hanya satu tempat yang merendernya, catatan yang mekanismenya
+         ditulis sebagai rantai akan tampil TANPA patofisiologi sama sekali di
+         tempat yang lain — dan pembacanya tidak punya cara tahu ada yang
+         hilang. Di sini bloknya berupa daftar teks, jadi rantainya dirangkai
+         dengan tanda panah menjadi satu baris; baris kosong pada data memisah
+         menjadi butir tersendiri. */
+      ...(station.rantai || station.patofisiologi
+        ? [{
+            title: 'Patofisiologi',
+            items: [
+              ...(station.rantai ? rantaiKeTeks(station.rantai) : []),
+              ...(station.patofisiologi ? [station.patofisiologi] : []),
+            ],
+          }]
+        : []),
       { title: 'Anamnesis', items: station.anamnesis },
       { title: 'Pemeriksaan Fisik', items: station.pemeriksaanFisik },
       ...(station.penunjang ? [{ title: 'Pemeriksaan Penunjang', items: station.penunjang }] : []),
@@ -125,6 +140,16 @@ function resolveNote(disease: string, data: NoteData | null) {
     referensi: [] as string[],
     tips: station.tips,
   }
+}
+
+/** Rantai langkah menjadi baris teks berpanah; '' memisahkan rantai. */
+function rantaiKeTeks(langkah: string[]): string[] {
+  const bagian: string[][] = [[]]
+  for (const l of langkah) {
+    if (l === '') bagian.push([])
+    else bagian[bagian.length - 1].push(l)
+  }
+  return bagian.filter((b) => b.length).map((b) => b.join(' → '))
 }
 
 /**

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { obatDalam, type MekanismeObat } from '../lib/mekanismeObat'
+import { Rantai } from './Rantai'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mekanisme obat sebagai RANTAI, bukan paragraf.
@@ -29,42 +30,6 @@ import { obatDalam, type MekanismeObat } from '../lib/mekanismeObat'
  * di dalam obat yang sama (misalnya jalur yang diinginkan dan jalur efek
  * samping pada NSAID), bukan langkah kosong.
  */
-function Ruas({ teks, akhir }: { teks: string; akhir: boolean }) {
-  const tebal = teks === teks.toUpperCase() && /[A-Z]/.test(teks)
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span
-        className={`rounded-lg px-1.5 py-0.5 text-[11px] leading-snug ${
-          tebal
-            ? 'bg-brand/15 font-black text-brand-dark dark:text-brand'
-            : 'bg-neutral-100 font-semibold text-neutral-700 dark:bg-white/10 dark:text-neutral-200'
-        }`}
-      >
-        {teks}
-      </span>
-      {!akhir && <span aria-hidden className="text-[11px] font-black text-neutral-400">→</span>}
-    </span>
-  )
-}
-
-function Rantai({ langkah }: { langkah: string[] }) {
-  // Dipecah pada baris kosong: satu obat dapat punya lebih dari satu rantai.
-  const bagian: string[][] = [[]]
-  for (const l of langkah) {
-    if (l === '') bagian.push([])
-    else bagian[bagian.length - 1].push(l)
-  }
-  return (
-    <div className="space-y-1.5">
-      {bagian.filter((b) => b.length).map((b, i) => (
-        <div key={i} className="flex flex-wrap items-center gap-x-1 gap-y-1">
-          {b.map((teks, j) => <Ruas key={j} teks={teks} akhir={j === b.length - 1} />)}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function KartuObat({ o }: { o: MekanismeObat }) {
   const [buka, setBuka] = useState(false)
   return (

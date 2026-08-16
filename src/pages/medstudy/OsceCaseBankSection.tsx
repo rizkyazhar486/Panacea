@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
+import { catatanStasiun } from '../../lib/osceStationNoteAliases'
+import { Rantai } from '../../components/Rantai'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconStethoscope } from '../../components/icons'
 import { OSCE_CASES, OSCE_SYSTEMS, type OsceSystem } from '../../lib/osceCaseBank'
-import { OSCE_STATION_NOTES } from '../../lib/osceStationNotes'
 
 export default function OsceCaseBankSection() {
   const [query, setQuery] = useState('')
@@ -54,7 +55,7 @@ export default function OsceCaseBankSection() {
           <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{sys}</div>
           <div className="mt-2 space-y-2">
             {cases.map((c) => {
-              const notes = OSCE_STATION_NOTES[c.name]
+              const notes = catatanStasiun(c.name)
               const isOpen = expanded === c.name
               return (
                 <div key={c.name} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -86,10 +87,17 @@ export default function OsceCaseBankSection() {
                           </ul>
                         </div>
                       )}
-                      {notes.patofisiologi && (
+                      {(notes.rantai || notes.patofisiologi) && (
                         <div>
                           <div className="text-[11px] font-black uppercase tracking-wide text-brand-dark">Patofisiologi</div>
-                          <p className="mt-1 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.patofisiologi}</p>
+                          {/* Rantai lebih dahulu, paragraf sesudahnya. Yang datang
+                              ke sini sedang menghafal untuk ujian lisan, dan urutan
+                              inilah yang menempatkan bentuk yang dapat diucapkan
+                              ulang di tempat pertama. */}
+                          {notes.rantai && <div className="mt-1.5"><Rantai langkah={notes.rantai} /></div>}
+                          {notes.patofisiologi && (
+                            <p className="mt-1.5 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">{notes.patofisiologi}</p>
+                          )}
                         </div>
                       )}
                       <div>

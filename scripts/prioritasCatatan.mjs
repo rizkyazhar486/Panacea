@@ -95,9 +95,24 @@ for (const [k, v] of Object.entries(alias)) {
   if (kunci && !petaNorm.has(norm(k))) petaNorm.set(norm(k), kunci)
 }
 
+/*
+ * 'rantai' DIHITUNG SETARA 'patofisiologi'.
+ *
+ * Keduanya menjawab pertanyaan yang sama — bagaimana penyakit ini terjadi —
+ * hanya dalam dua bentuk: paragraf untuk yang ingin mengerti, rantai berpanah
+ * untuk yang sedang menghafal untuk ujian lisan. Menghitung hanya paragrafnya
+ * akan melaporkan catatan yang mekanismenya sudah ditulis sebagai rantai
+ * sebagai '7/8', dan itu mengundang penulisan ulang atas pekerjaan yang sudah
+ * selesai — kekeliruan yang sama yang sudah lima kali terjadi di skrip ini.
+ */
+const SETARA = { patofisiologi: ['patofisiologi', 'rantai'] }
+
 const terisi = (kunci) => {
   const b = blok[kunci]
-  return b ? FIELD.filter((f) => new RegExp('^\\s{4}' + f + ':', 'm').test(b)).length : 0
+  if (!b) return 0
+  return FIELD.filter((f) =>
+    (SETARA[f] ?? [f]).some((nama) => new RegExp('^\\s{4}' + nama + ':', 'm').test(b)),
+  ).length
 }
 
 /**
@@ -196,6 +211,41 @@ const SINONIM = {
    * dan ejaan candid- berbanding kandid-. Hanya CLM dan FDE yang benar-benar
    * belum ada, dan keduanya lalu ditulis.
    */
+  /*
+   * PENCOCOKAN YANG KELIRU LEBIH BERBAHAYA DARIPADA YANG GAGAL. 'Transient
+   * Ischemic Attack' tercocokkan ke 'Transient tics disorder' — dua penyakit
+   * yang tidak berhubungan sama sekali — hanya karena berbagi kata "transient"
+   * dan "t...". Laporan "(tidak ketemu)" masih mengundang pemeriksaan; laporan
+   * yang menunjuk catatan yang SALAH membuat pembacanya mengira TIA sudah
+   * tertulis padahal yang ada catatan gangguan tik.
+   */
+  'omphalitis': 'Omfalitis',
+  'omfalitis': 'Omfalitis',
+  'paronikia ekstraksi kuku': 'Paronikia (ekstraksi kuku)',
+  'paronikia': 'Paronikia (ekstraksi kuku)',
+  'v fib rjp': 'Fibrilasi Ventrikel — RJP & defibrilasi',
+  'v fib': 'Fibrilasi Ventrikel — RJP & defibrilasi',
+  'vf': 'Fibrilasi Ventrikel — RJP & defibrilasi',
+  'sirkumsisi': 'Sirkumsisi',
+  'transient ischemic attack': 'Stroke Hemoragik / TIA',
+  'tia': 'Stroke Hemoragik / TIA',
+
+  'non alcoholic fatty liver disease': 'Perlemakan hepar',
+  'nafld': 'Perlemakan hepar',
+  'osteomyelitis': 'Osteomielitis',
+  'pyelonefritis': 'Pielonefritis Akut',
+  'pielonefritis': 'Pielonefritis Akut',
+  'stemi anteroseptal': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'stemi inferior': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'varicella zoster': 'Varisela tanpa komplikasi',
+  'varisela': 'Varisela tanpa komplikasi',
+  'weils disease lepto': 'Leptospirosis / Weil Disease',
+  'weil disease': 'Leptospirosis / Weil Disease',
+  'pvc': 'Ventricular Ectopic (VES) — baca EKG',
+  'ureteritis go': 'Servisitis / Uretritis Gonore',
+  'pasang implan': 'Konseling & Pemasangan/Pelepasan KB (implan/IUD/suntik)',
+  'pentabio opv kms': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+
   'lbp': 'HNP / Low Back Pain',
   'lbp e c susp hnp': 'HNP / Low Back Pain',
   'low back pain': 'HNP / Low Back Pain',
