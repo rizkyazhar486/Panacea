@@ -243,7 +243,9 @@ const SINONIM = {
   'weil disease': 'Leptospirosis / Weil Disease',
   'pvc': 'Ventricular Ectopic (VES) — baca EKG',
   'ureteritis go': 'Servisitis / Uretritis Gonore',
-  'pasang implan': 'Konseling & Pemasangan/Pelepasan KB (implan/IUD/suntik)',
+  'pasang implan': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'lepas implan': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'wrist sprain': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
   'pentabio opv kms': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
 
   'lbp': 'HNP / Low Back Pain',
