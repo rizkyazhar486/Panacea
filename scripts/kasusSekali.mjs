@@ -101,8 +101,18 @@ function cari(nama) {
   if (petaNorm.has(n)) return petaNorm.get(n)
   const kata = n.split(' ').filter((w) => w.length >= 2 && !KATA_SAMBUNG.has(w))
   if (!kata.length) return null
+  /*
+   * KATA PENDEK HARUS COCOK SEBAGAI KATA UTUH, bukan sebagai potongan huruf.
+   * 'RA OA' pernah tercocokkan ke 'DIC (Disseminated Intravascular
+   * Coagulation)' — 'ra' termuat di dalam "intravascular" dan 'oa' di dalam
+   * "coagulation". Dua penyakit yang tidak berhubungan sama sekali. Untuk
+   * kata panjang potongan huruf masih masuk akal (imbuhan, jamak); untuk
+   * singkatan dua sampai tiga huruf ia hampir selalu kebetulan.
+   */
+  const adaKata = (kn, w) =>
+    w.length >= 4 ? kn.includes(w) : new RegExp(`(^| )${w}( |$)`).test(kn)
   for (const [kn, kunci] of petaNorm) {
-    if (!kata.every((w) => kn.includes(w))) continue
+    if (!kata.every((w) => adaKata(kn, w))) continue
     if (kata.length === 1 && !(kn === kata[0] || kn.startsWith(kata[0] + ' '))) continue
     return kunci
   }
