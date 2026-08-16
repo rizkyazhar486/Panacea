@@ -9063,7 +9063,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'SLEISENGER2021', 'PPKFKTP2014'],
   },
   'Polip/adenoma': {
-    definisi: 'Pertumbuhan jaringan menonjol ke lumen kolon; adenoma bersifat prakanker melalui sekuens adenoma-karsinoma.',
+    definisi: 'POLIP/ADENOMA KOLON — pertumbuhan jaringan menonjol ke lumen kolon; adenoma bersifat prakanker melalui urutan adenoma-karsinoma. Berbeda dari polip nasi, yang terdaftar terpisah dan tidak prakanker.',
     diagnosis: ['Umumnya asimtomatik, ditemukan saat skrining atau kolonoskopi karena perdarahan samar; histopatologi menentukan jenis (adenomatosa vs hiperplastik) dan derajat displasia'],
     tatalaksana: ['Polipektomi endoskopik saat kolonoskopi, surveilans kolonoskopi berkala sesuai jumlah, ukuran, dan histologi polip; skrining kanker kolorektal populasi sesuai usia dan faktor risiko'],
     referensi: ['SKDI2012', 'SLEISENGER2021', 'SCHWARTZ2019'],
@@ -9248,7 +9248,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'PPKFKTP2014'],
   },
   'Fistula': {
-    definisi: 'Fistula perianal — saluran abnormal antara kanalis analis dan kulit perianal, umumnya akibat abses perianal sebelumnya.',
+    definisi: 'FISTULA PERIANAL — saluran abnormal antara kanalis analis dan kulit perianal, umumnya akibat abses perianal sebelumnya. Berbeda dari fistula obstetri (vesikovaginal dan rektovaginal), yang terdaftar terpisah.',
     diagnosis: ['Sekret purulen berulang dari lubang di kulit perianal, riwayat abses yang pecah/didrainase; identifikasi muara interna dan eksterna (aturan Goodsall), MRI pelvis pada fistula kompleks; cari penyakit Crohn bila multipel/rekuren'],
     tatalaksana: ['Rujuk bedah: fistulotomi pada fistula simpel superfisial, seton atau teknik sphincter-sparing pada fistula kompleks untuk melindungi kontinensia; tatalaksana penyakit dasar bila Crohn'],
     referensi: ['SKDI2012', 'SCHWARTZ2019', 'SLEISENGER2021'],
@@ -16129,7 +16129,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'CUMMINGS2021', 'PPKFKTP2014'],
   },
   'Polip': {
-    definisi: 'Polip nasi — massa jinak edematosa dari mukosa hidung dan sinus, terkait inflamasi kronik.',
+    definisi: 'POLIP NASI (hidung) — massa jinak edematosa dari mukosa hidung dan sinus, terkait radang menahun. Jangan tertukar dengan polip kolon, yang terdaftar terpisah sebagai Polip/adenoma dan bersifat prakanker.',
     diagnosis: ['Sumbatan hidung bilateral progresif, penurunan atau hilangnya penghidu, rinore; rinoskopi menunjukkan massa bertangkai putih keabuan seperti anggur, TIDAK NYERI dan tidak berdarah saat disentuh (berbeda dari tumor); polip UNILATERAL pada dewasa atau polip pada anak perlu evaluasi lanjut (keganasan, fibrosis kistik)'],
     tatalaksana: ['Kortikosteroid nasal jangka panjang sebagai terapi utama, kortikosteroid oral jangka pendek untuk polip besar, cuci hidung salin; polipektomi/FESS bila gagal terapi medis — REKURENSI tinggi sehingga steroid nasal harus dilanjutkan pasca operasi; evaluasi asma dan sensitivitas aspirin penyerta'],
     referensi: ['SKDI2012', 'CUMMINGS2021', 'PPKFKTP2014'],
@@ -17647,7 +17647,7 @@ export const SKDI_DISEASE_NOTES: Record<string, SkdiDiseaseNote> = {
     referensi: ['SKDI2012', 'POGI2016', 'WILLIAMSOB2022'],
   },
   'Fistula (vesiko-vaginal, uretero-vagina, rektovagina)': {
-    definisi: 'Hubungan abnormal antara traktus genital dengan saluran kemih atau rektum, tersering akibat persalinan macet berkepanjangan (fistula obstetri).',
+    definisi: 'FISTULA OBSTETRI — hubungan abnormal antara saluran genital dengan saluran kemih atau rektum, tersering akibat persalinan macet berkepanjangan. Berbeda dari fistula perianal, yang terdaftar terpisah.',
     diagnosis: ['Vesikovaginal: keluar urin terus-menerus dari vagina tanpa disadari; Rektovaginal: keluar feses atau flatus melalui vagina; riwayat partus lama, persalinan macet, bedah panggul, atau radioterapi; uji metilen biru dan sistoskopi untuk lokalisasi'],
     tatalaksana: ['Rujuk ke pusat rujukan untuk repair bedah oleh operator berpengalaman (waktu repair disesuaikan kondisi jaringan), kateter menetap dan perawatan kulit sementara; DAMPAK PSIKOSOSIAL BESAR (isolasi sosial) sehingga dukungan psikologis penting; PENCEGAHAN melalui akses persalinan aman dan penggunaan partograf'],
     referensi: ['SKDI2012', 'POGI2016', 'CAMPBELL2016'],

@@ -54,6 +54,22 @@ for (const k of kunci) {
   for (const potong of k.nama.split('/')) {
     const n = norm(potong)
     if (!n || n.split(' ').every((w) => UMUM.has(w))) continue
+    /*
+     * NAMA SATU KATA TIDAK DIHITUNG, dan itu memperbaiki dua laporan palsu.
+     *
+     * Skrip ini melaporkan 'Polip' berbanding 'Polip/adenoma', dan 'Fistula'
+     * berbanding 'Fistula (vesiko-vaginal...)' sebagai rangkap. Keduanya BUKAN
+     * rangkap: yang pertama polip HIDUNG berbanding polip KOLON, yang kedua
+     * fistula PERIANAL berbanding fistula OBSTETRI — empat penyakit berbeda
+     * yang kebetulan berbagi satu kata bentuk. Nama satu kata seperti polip,
+     * fistula, abses, kista, dan tumor menyebut BENTUK kelainan, bukan
+     * penyakitnya, sehingga tidak pernah cukup untuk menyimpulkan dua entri
+     * membicarakan hal yang sama.
+     *
+     * Nama berkata dua atau lebih tetap diperiksa, dan itu yang menangkap
+     * rangkap sungguhan seperti 'fixed drug eruption'.
+     */
+    if (!n.includes(' ')) continue
     if (!peta.has(n)) peta.set(n, [])
     peta.get(n).push(k)
   }
