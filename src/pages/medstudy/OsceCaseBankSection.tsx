@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ManuverPFBox } from '../../components/ManuverPF'
 import { catatanStasiun } from '../../lib/osceStationNoteAliases'
 import { Rantai } from '../../components/Rantai'
 import { Prosa } from '../../components/Prosa'
@@ -118,6 +119,11 @@ export default function OsceCaseBankSection() {
                         <ul className="mt-1 list-disc space-y-1 pl-4 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">
                           {notes.pemeriksaanFisik.map((p, i) => <li key={i}>{p}</li>)}
                         </ul>
+                        {/* Cara melakukan manuver yang disebut di atas, menempel
+                            sendiri. Nama tesnya dapat dihafal dalam semenit;
+                            yang dinilai penguji adalah tangannya, dan itulah
+                            yang selama ini tidak tertulis di mana pun. */}
+                        <ManuverPFBox teks={notes.pemeriksaanFisik.join(' | ')} />
                       </div>
                       {notes.penunjang && (
                         <div>
