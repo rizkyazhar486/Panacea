@@ -78,11 +78,28 @@ const terisi = (kunci) => {
   return FIELD.filter((f) => (SETARA[f] ?? [f]).some((nama) => new RegExp('^\\s{4}' + nama + ':', 'm').test(b))).length
 }
 
-/** Pencocokan KETAT: nama persis, atau seluruh kata bermakna termuat. */
+/*
+ * Pencocokan KETAT: nama persis, atau seluruh kata bermakna termuat.
+ *
+ * MENGAPA KATA PENDEK IKUT DIHITUNG. Sebelumnya hanya kata lebih dari tiga
+ * huruf yang dipakai, dan itu membuang justru kata yang membedakan:
+ *
+ *   'Neuropati DM'   -> tinggal 'neuropati' -> cocok ke 'Neuropati optik'
+ *   'OMA perforasi'  -> tinggal 'perforasi' -> cocok ke 'Perforasi usus'
+ *
+ * Keduanya penyakit yang sama sekali lain. Dilaporkan sebagai "catatannya
+ * sudah ada, tinggal dilengkapi", padahal catatan yang dimaksud bukan
+ * catatannya — dan yang membacanya belajar penyakit yang salah. Singkatan
+ * ujian hampir selalu pendek (DM, OMA, RA, TB, PID), jadi membuang kata
+ * pendek berarti membuang pembedanya.
+ *
+ * Kata sambung yang tidak membedakan apa pun tetap dibuang.
+ */
+const KATA_SAMBUNG = new Set(['dan', 'atau', 'pada', 'dgn', 'yg', 'the', 'of'])
 function cari(nama) {
   const n = norm(nama)
   if (petaNorm.has(n)) return petaNorm.get(n)
-  const kata = n.split(' ').filter((w) => w.length > 3)
+  const kata = n.split(' ').filter((w) => w.length >= 2 && !KATA_SAMBUNG.has(w))
   if (!kata.length) return null
   for (const [kn, kunci] of petaNorm) {
     if (!kata.every((w) => kn.includes(w))) continue
