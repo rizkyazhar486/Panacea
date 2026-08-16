@@ -353,29 +353,60 @@ export function TrainingPhysiology() {
  * alat lain tidak menunggu sinkronisasi apa pun.
  */
 function KartuBelumDariJam() {
+  const [buka, setBuka] = useState(false)
+  const tersedia = UNAVAILABLE.filter((u) => u.adaDi).length
+
+  /*
+   * DILIPAT, BUKAN DIPENDEKKAN.
+   *
+   * Sebelas baris ini masing-masing memuat dua paragraf, dan bersama-sama
+   * menempati sekitar 3.000 px — pada tab yang BELUM PUNYA DATA, hampir
+   * seluruh halaman berisi keterangan tentang apa yang TIDAK dapat dihitung.
+   * Terukur di 390x844: tab fisiologi setinggi 3.599 px dengan hanya dua judul
+   * di dalamnya. Akibatnya orang yang baru membuka tab ini bertemu daftar
+   * batasan lebih dahulu daripada fiturnya sendiri, dan kesan pertamanya
+   * adalah aplikasi yang menjelaskan ketidakmampuannya panjang lebar.
+   *
+   * Tidak satu kata pun dihapus — kejujuran daftar ini justru yang membuatnya
+   * berharga, dan memendekkannya berarti menyembunyikan batasan. Yang berubah
+   * hanya: ringkasannya terlihat lebih dahulu, isinya dibuka bila diminta.
+   * Jumlah yang SUDAH ADA alatnya disebut di muka, sebab itulah bagian yang
+   * berguna; daftar yang tampak seperti sebelas kekurangan sebenarnya memuat
+   * sebelas alat yang menunggu dipakai.
+   */
   return (
     <Card>
       <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
         subtitle="That does not mean it is missing — each exists as its own tool" />
       <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-        The following <strong className="text-ink">cannot be computed from an Apple Watch export</strong>,
-        which is not the same as being impossible to build. Each simply needs its own input, and
-        <strong className="text-ink"> all of them now exist</strong> — the link is on every row.
+        {UNAVAILABLE.length} things <strong className="text-ink">cannot be computed from an Apple Watch export</strong> —
+        which is not the same as being impossible. <strong className="text-ink">{tersedia} of them already exist</strong> as
+        their own tool, each with its own input.
       </p>
-      <div className="mt-3 space-y-2">
-        {UNAVAILABLE.map((u) => (
-          <div key={u.fitur} className={`rounded-lg border p-3 ${u.adaDi ? 'border-emerald-500/25 bg-emerald-500/[0.05]' : 'border-white/10 bg-white/[0.02]'}`}>
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="text-sm font-semibold text-ink">{u.fitur}</span>
-              {u.adaDi
-                ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Available →</Link>
-                : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Not built yet</span>}
+      <button
+        onClick={() => setBuka((v) => !v)}
+        aria-expanded={buka}
+        className="mt-2 flex min-h-[40px] items-center gap-1.5 text-sm font-bold text-brand"
+      >
+        {buka ? 'Hide the list' : `Show all ${UNAVAILABLE.length} and where each lives`}
+        <span aria-hidden>{buka ? '▲' : '▼'}</span>
+      </button>
+      {buka && (
+        <div className="mt-3 space-y-2">
+          {UNAVAILABLE.map((u) => (
+            <div key={u.fitur} className={`rounded-lg border p-3 ${u.adaDi ? 'border-emerald-500/25 bg-emerald-500/[0.05]' : 'border-white/10 bg-white/[0.02]'}`}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="text-sm font-semibold text-ink">{u.fitur}</span>
+                {u.adaDi
+                  ? <Link to={u.adaDi} className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">Available →</Link>
+                  : <span className="shrink-0 rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">Not built yet</span>}
+              </div>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-500">{u.kenapa}</p>
+              <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Needs: </span>{u.syarat}</p>
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-neutral-500">{u.kenapa}</p>
-            <p className="mt-1 text-[11px] text-slate-500"><span className="text-slate-600">Needs: </span>{u.syarat}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </Card>
   )
 }
