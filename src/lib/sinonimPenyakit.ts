@@ -137,6 +137,69 @@ export const SINONIM_PENYAKIT: Record<string, string[]> = {
   'henti jantung': ['cardiorespiratory arrest'],
   'cardiac arrest': ['cardiorespiratory arrest'],
   rjp: ['cardiorespiratory arrest'],
+
+  /*
+   * EJAAN YANG DIPAKAI KATALOG RESEP DAN KLINIK SEHARI-HARI.
+   *
+   * Diambil dari memeriksa satu katalog resep klinik berisi 259 kondisi
+   * terhadap isi aplikasi: 229 di antaranya SUDAH ADA, dan hampir seluruh
+   * sisanya ternyata ada juga — hanya ditulis dengan ejaan lain. Yang
+   * mengetik 'gonorhea', 'pyelonefritis', 'dry eyes', atau 'dementia' —
+   * dan itu cara orang klinik menuliskannya — memperoleh 'Tidak ada hasil'
+   * padahal entrinya ada. Ini cacat yang sama persis dengan yang dulu
+   * membuat pencarian 'Gout' gagal.
+   */
+  gonorhea: ['gonore'],
+  gonorrhoea: ['gonore'],
+  'kencing nanah': ['gonore', 'sindrom duh'],
+  pyelonefritis: ['pielonefritis'],
+  pyelonephritis: ['pielonefritis'],
+  prostattitis: ['prostatitis'],
+  urethritis: ['uretritis'],
+  urolithiasis: ['batu saluran kemih'],
+  urethrolithiasis: ['batu saluran kemih', 'ureterolitiasis'],
+  ureterolithiasis: ['ureterolitiasis'],
+  vesikulolitiasis: ['vesikolitiasis'],
+  vesicolithiasis: ['vesikolitiasis'],
+  nefrolitiasis: ['batu saluran kemih'],
+  hematothorax: ['haematothorax'],
+  hemothorax: ['haematothorax'],
+  /*
+   * SASARANNYA HARUS ADA DI skdiDiseaseList.ts, bukan sekadar ada di catatan.
+   * Halaman Daftar Penyakit dibangun dari daftar itu; menunjuk kata yang hanya
+   * muncul di dalam catatan membuat padanannya benar secara medis tetapi tetap
+   * mengembalikan 'Tidak ada hasil'. Dua baris di bawah ini semula keliru
+   * begitu, dan ketahuan hanya karena diperiksa di peramban.
+   */
+  rhinosinusitis: ['sinusitis'],
+  rinosinusitis: ['sinusitis'],
+  rhinitis: ['rinitis'],
+  dementia: ['demensia'],
+  alzheimier: ['alzheimer'],
+  'dry eyes': ['mata kering', 'kerato-konjungtivitis sicca'],
+  'dry eye': ['mata kering'],
+  'mata kering': ['kerato-konjungtivitis sicca'],
+  dakrioadenitis: ['dakrioadenitis'],
+  'meniskus tears': ['lesi meniskus'],
+  'meniscus tear': ['lesi meniskus'],
+  'trauma genu': ['trauma sendi', 'lesi meniskus'],
+  vulvoganitis: ['vulvovaginitis', 'vulvitis'],
+  vulvovaginitis: ['vulvitis', 'vaginitis'],
+  disentriform: ['disentri'],
+  /*
+   * Neuralgia pascaherpes TIDAK berdiri sendiri di daftar SKDI — ia penyulit
+   * herpes zoster, dan di situlah pembahasannya. SENGAJA TIDAK dipetakan ke
+   * 'neuralgia' begitu saja: satu-satunya neuralgia di daftar adalah neuralgia
+   * TRIGEMINAL, penyakit yang sama sekali lain. Pencocokan longgar semacam itu
+   * pernah menautkan 'Transient Ischemic Attack' ke 'Transient tics disorder'.
+   */
+  'neuralgia pascaherpetika': ['herpes zoster'],
+  'neuralgia pascaherpes': ['herpes zoster'],
+  'post herpetic neuralgia': ['herpes zoster'],
+  'vulnus laceratum': ['luka', 'vulnus'],
+  'ankle sprain': ['sprain', 'trauma sendi'],
+  'inverted nipple': ['kelainan puting'],
+  'cracked nipple': ['kelainan puting'],
 }
 
 /**
