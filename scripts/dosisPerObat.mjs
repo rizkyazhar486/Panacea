@@ -32,7 +32,16 @@ for (const m of mek.matchAll(/^\s*alias: \[([^\]]*)\]/gm)) {
   for (const a of m[1].matchAll(/'((?:[^'\\]|\\.)*)'/g)) nama.add(a[1].replace(/\\'/g, "'"))
 }
 // Nama yang terlalu umum atau terlalu pendek menimbulkan cocok palsu.
-const ABAIKAN = new Set(['oksigen', 'besi', 'zinc', 'zink', 'ics', 'oralit', 'tiamin', 'air mata buatan',
+/*
+ * BUKAN OBAT YANG PERLU DOSIS. 'Isolasi 7 hari', 'sampo bayi encer', 'penawar
+ * pilihan', 'Ca glukonas sebagai antidot' — semuanya tindakan atau kata
+ * penunjuk, bukan obat yang diresepkan dengan miligram. Menandainya berarti
+ * mengarang pekerjaan yang tidak ada.
+ */
+const ABAIKAN = new Set(['isolasi', 'sampo', 'penawar', 'antidot', 'dekongestan', 'nsaid', 'oains',
+  'benzodiazepin', 'fluorokuinolon', 'sulfonilurea', 'antihistamin', 'statin', 'nitrat',
+  'penyekat beta', 'ace-inhibitor', 'adrenalin', 'kriopresipitat', 'antasida',
+  'oksigen', 'besi', 'zinc', 'zink', 'ics', 'oralit', 'tiamin', 'air mata buatan',
   'antiseptik', 'pencahar', 'kortikosteroid', 'kortikosteroid topikal', 'kortikosteroid inhalasi',
   'antibiotik topikal', 'cairan kristaloid', 'karbo adsorben', 'vasopresor', 'antiretroviral',
   'penawar keracunan', 'obat diabetes oral lain', 'psikostimulan dan antidepresan lain',
@@ -60,7 +69,7 @@ while ((m = re.exec(terapi))) {
 // satuan bertanda seperti '%' JUSTRU RUSAK oleh \b, sebab sesudahnya biasanya
 // spasi. Memakai satu pola untuk keduanya menandai 'Natrium diklofenak gel 1%'
 // sebagai tanpa dosis — temuan palsu yang hampir saya laporkan.
-const SATUAN = 'mg|g|gr|gram|mcg|µg|ug|ml|cc|l|iu|ui|unit|u|mmol|meq|tetes|gtt|puff|semprot|sachet|kaps(ul)?|tab(let)?|amp(ul)?|vial|kali'
+const SATUAN = 'mg|g|gr|gram|mcg|µg|ug|ml|cc|l|iu|ui|unit|u|mmol|meq|tetes|gtt|puff|semprot|sachet|kaps(ul)?|tab(let)?|amp(ul)?|vial|kali|sendok( takar| makan| teh)?|cth|cp|kantong|bungkus|mci|joule|j'
 const RE_DOSIS = new RegExp(
   [
     // 500 mg | 1gr | 0,5 ml | 1.5 jt unit | 2 juta unit
