@@ -820,6 +820,7 @@ export function Shell({ children }: { children: ReactNode }) {
             { to: '/sports-scores', label: 'Skor Langsung', ikon: <IconFlame size={19} /> },
             { to: '/profile', label: 'Profil', ikon: <IconUser size={19} /> },
           ]}
+          onCari={() => setCariBuka(true)}
           onTambah={() => {
             navigate('/feed')
             setTimeout(() => window.dispatchEvent(new Event('panacea:compose')), 60)

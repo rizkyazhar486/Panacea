@@ -9,6 +9,7 @@ import { hrMaxFromAge } from '../lib/workoutImport'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
+import { ArtiKebugaran } from './ArtiKebugaran'
 import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, type Target } from '../lib/analisisPro'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,6 +93,14 @@ export function WidgetBeranda() {
             </div>
             <span className="shrink-0 text-[11px] font-bold" style={{ color: b.warna }}>{b.judul}</span>
           </div>
+          <ArtiKebugaran
+            workouts={workouts}
+            sekarang={sekarang}
+            kebugaran={kini.kebugaran}
+            kelelahan={kini.kelelahan}
+            kesegaran={kini.kesegaran}
+            arti={b.arti}
+          />
         </Card>,
       )
     }

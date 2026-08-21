@@ -71,7 +71,7 @@ export interface TujuanFab {
   end?: boolean
 }
 
-export function FabNavigasi({ tujuan, onTambah }: { tujuan: TujuanFab[]; onTambah?: () => void }) {
+export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
   const lokasi = useLocation()
   // Letak bawaan: sudut kanan bawah, bukan melayang 96 px di atasnya.
   //
@@ -179,6 +179,28 @@ export function FabNavigasi({ tujuan, onTambah }: { tujuan: TujuanFab[]; onTamba
               keAtas ? 'bottom-[64px]' : 'top-[64px]'
             } ${keKiri ? 'right-0' : 'left-0'}`}
           >
+            {/* CARI DITARUH PALING ATAS, dan sengaja di dalam menu ini.
+                Tombol cari sudah ada di bilah judul, tetapi bilah judul berada
+                di ATAS layar sementara ibu jari memegang ponsel di BAWAH — dan
+                di halaman yang panjang, bilah itu ikut tergulir hilang. Menu
+                inilah yang selalu terjangkau, jadi di sinilah cari perlu ada.
+                Ia bukan tautan halaman melainkan pembuka kotak pencarian,
+                karena itu berupa tombol, bukan NavLink. */}
+            {onCari && (
+              <button
+                role="menuitem"
+                onClick={() => { setBuka(false); onCari() }}
+                className="flex min-h-[44px] items-center gap-2.5 rounded-2xl px-3 text-[13px] font-bold text-ink transition hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
+              >
+                <span className="shrink-0">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
+                  </svg>
+                </span>
+                <span className="truncate">Cari</span>
+              </button>
+            )}
+
             {tujuan.map((t) => (
               <NavLink
                 key={t.to}
