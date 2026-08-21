@@ -146,9 +146,23 @@ function KartuGrafik({ judul, kanan, anak }: { judul: string; kanan?: React.Reac
   )
 }
 
+/*
+ * DUA UKURAN, SATU SUMBER.
+ *
+ * Beranda tidak boleh menerima keenam grafik: kartu setinggi enam layar di
+ * beranda membuat orang berhenti menggulir sebelum sampai ke kartu lain, dan
+ * kartu di bawahnya menjadi tidak pernah terlihat. Yang dibawa orang ke beranda
+ * hanyalah 'bagaimana pekan ini' — jaraknya, dan sebaran zonanya.
+ *
+ * Tetapi versi ringkasnya TIDAK ditulis ulang sebagai komponen terpisah.
+ * Salinan kedua pasti berselisih setelah beberapa kali disunting, dan
+ * pembacanya tidak punya cara tahu mana yang berlaku — itu sudah terjadi di
+ * aplikasi ini pada catatan penyakit yang kembar. Di sini ia hanya cabang
+ * lebih awal di dalam komponen yang sama, memakai perhitungan yang sama persis.
+ */
 export function GrafikOlahraga({
-  workouts, hrMax, sekarang = Date.now(),
-}: { workouts: ImportedWorkout[]; hrMax: number; sekarang?: number }) {
+  workouts, hrMax, sekarang = Date.now(), ringkas = false,
+}: { workouts: ImportedWorkout[]; hrMax: number; sekarang?: number; ringkas?: boolean }) {
   const [rentang, setRentang] = useState<30 | 90>(30)
 
   const harian = useMemo(() => deretHarian(workouts, rentang, sekarang), [workouts, rentang, sekarang])
@@ -167,6 +181,55 @@ export function GrafikOlahraga({
   const totalKm = harian.reduce((a, d) => a + (d.km ?? 0), 0)
   const totalLangkah = harian.reduce((a, d) => a + (d.langkah ?? 0), 0)
   const hariAktif = harian.filter((d) => d.sesi > 0).length
+
+  if (ringkas) {
+    const z12 = zona.zona[0].pct + zona.zona[1].pct
+    return (
+      <div className="space-y-2">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="text-[10px] font-black uppercase tracking-wide text-slate-500">
+            Olahraga 30 hari
+          </span>
+          <Delta pct={bandingkan(pekanIni?.km ?? null, pekanLalu?.km ?? null).deltaPct} />
+        </div>
+
+        <div className="flex items-baseline gap-4">
+          <span className="text-lg font-black text-white">
+            {totalKm > 0 ? totalKm.toFixed(1) : '—'}
+            <span className="ml-1 text-[11px] font-bold text-slate-400">km</span>
+          </span>
+          <span className="text-lg font-black text-white">
+            {totalLangkah > 0 ? (totalLangkah / 1000).toFixed(0) + 'k' : '—'}
+            <span className="ml-1 text-[11px] font-bold text-slate-400">langkah</span>
+          </span>
+          <span className="text-lg font-black text-white">
+            {hariAktif}
+            <span className="ml-1 text-[11px] font-bold text-slate-400">hari aktif</span>
+          </span>
+        </div>
+
+        {/* Satu grafik saja di beranda, dan yang dipilih adalah jarak per
+            pekan — satuan yang paling dekat dengan cara orang mengingat
+            latihannya sendiri. */}
+        <div className="text-slate-400">
+          {cakup.jarak.ada === 0
+            ? <Kosong pesan="Belum ada sesi yang merekam jarak." />
+            : <Batang nilai={pekanan.map((p) => p.km)} label={labelPekan} warna="#60a5fa" format={(n) => n.toFixed(0) + ' km'} />}
+        </div>
+
+        {zona.sesiDipakai > 0 && (
+          <div>
+            <div className="flex h-1.5 overflow-hidden rounded-full bg-white/5">
+              {zona.zona.map((z) => (
+                z.pct > 0 && <div key={z.z} style={{ width: `${z.pct}%`, background: z.warna }} />
+              ))}
+            </div>
+            <p className="mt-1 text-[10.5px] text-slate-500">{z12}% waktu di Z1-Z2 (aerobik ringan)</p>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <section className="space-y-3">

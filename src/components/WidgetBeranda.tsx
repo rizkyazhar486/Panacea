@@ -10,6 +10,7 @@ import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
 import { KolomPelatih } from './KolomPelatih'
 import { ArtiKebugaran } from './ArtiKebugaran'
+import { GrafikOlahraga } from './GrafikOlahraga'
 import { kemajuanTarget, usahaTerbaik, kebugaranKesegaran, bacaKesegaran, hariRiwayatLatihan, type Target } from '../lib/analisisPro'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -106,6 +107,14 @@ export function WidgetBeranda() {
     }
   }
 
+  if (punya('grafikOlahraga') && workouts.length > 0) {
+    kartu.push(
+      <Card key="grafikOlahraga">
+        <GrafikOlahraga workouts={workouts} hrMax={konteks.hrMax} sekarang={sekarang} ringkas />
+      </Card>,
+    )
+  }
+
   if (punya('usahaTerbaik')) {
     const pr = usahaTerbaik(workouts).slice(0, 3)
     if (pr.length) {
@@ -129,7 +138,7 @@ export function WidgetBeranda() {
 
   // Kartu yang isinya hidup di halamannya sendiri: tampilkan sebagai pintasan.
   const pintasan = WIDGETS.filter(
-    (w) => punya(w.id) && !['pelatih', 'targetLatihan', 'kebugaran', 'usahaTerbaik'].includes(w.id),
+    (w) => punya(w.id) && !['pelatih', 'targetLatihan', 'kebugaran', 'usahaTerbaik', 'grafikOlahraga'].includes(w.id),
   )
   if (pintasan.length) {
     kartu.push(

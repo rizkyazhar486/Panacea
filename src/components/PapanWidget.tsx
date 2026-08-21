@@ -3,6 +3,16 @@ import { Link } from 'react-router-dom'
 import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
 import { WIDGETS, ambilWidget } from '../lib/homeWidgets'
+import { lazy, Suspense } from 'react'
+import { getWorkouts } from '../lib/workoutStore'
+import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo } from '../lib/profile'
+
+// Dimuat malas: berkas grafik beserta analisisnya tidak perlu ikut ke bundel
+// awal bagi pemakai yang tidak menyalakan kartunya.
+const GrafikOlahraga = lazy(() =>
+  import('./GrafikOlahraga').then((m) => ({ default: m.GrafikOlahraga })),
+)
 import { PemilihWidget } from './PemilihWidget'
 import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rincianBeranda'
 import { bilahTersedia } from '../lib/bilahRujukan'
@@ -266,6 +276,27 @@ export function UbinKlinis() {
  * pasti. Pada layar lebar, wadahnya sendiri yang dibatasi lebarnya.
  */
 /**
+ * Kartu grafik olahraga di beranda.
+ *
+ * Tidak dirender sama sekali bila belum ada sesi: judul di atas ruang kosong
+ * memberi kesan ada yang gagal dimuat, dan itu lebih buruk daripada tidak ada.
+ */
+function KartuGrafikOlahraga() {
+  const workouts = getWorkouts()
+  if (!workouts.length) return null
+  const demo = getDemo()
+  const teramati = workouts.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0)
+  const hrMax = Math.max(teramati, hrMaxFromAge(demo.age || 30, demo.sex))
+  return (
+    <section className="rounded-3xl bg-neutral-900 p-4 dark:bg-white/5">
+      <Suspense fallback={<div className="h-24" />}>
+        <GrafikOlahraga workouts={workouts} hrMax={hrMax} ringkas />
+      </Suspense>
+    </section>
+  )
+}
+
+/**
  * Ubin pintasan: satu fitur yang dipilih sendiri oleh pemakainya.
  *
  * Sengaja TANPA angka. Ubin berangka di atasnya menjawab "bagaimana keadaan
@@ -383,7 +414,21 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   // Urutan mengikuti urutan katalog, bukan urutan penambahan — supaya letak
   // sebuah ubin tidak berpindah-pindah dan tetap dapat dihafal tangannya.
-  const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id))
+  /*
+   * KARTU YANG PUNYA ISI SENDIRI DIKELUARKAN DARI DAFTAR UBIN.
+   *
+   * Ubin pintasan hanyalah pintu: lambang, nama, dan satu baris ringkasan.
+   * Untuk sebagian besar fitur itu memang yang dibutuhkan. Tetapi grafik
+   * olahraga isinya justru angka pemakainya sendiri, dan angka itu tidak ada
+   * gunanya disembunyikan di balik pintu — yang membukanya sudah tahu apa yang
+   * dicarinya, sedangkan yang perlu diingatkan justru yang tidak membuka.
+   *
+   * Tanpa pengecualian ini ia dirender DUA KALI: sekali sebagai kartu, sekali
+   * sebagai ubin.
+   */
+  const BERKARTU = ['grafikOlahraga']
+  const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id))
+  const adaGrafik = pilihan.includes('grafikOlahraga')
 
   // Tekanan darah didahulukan karena ia satu-satunya baris berisi dua angka,
   // dan menaruhnya di tengah daftar memutus keselarasan kolom angkanya.
@@ -408,6 +453,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     <BilahTubuh daftar={bilah} />
 
     <DaftarRincian baris={rincian} />
+
+    {adaGrafik && <KartuGrafikOlahraga />}
 
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
