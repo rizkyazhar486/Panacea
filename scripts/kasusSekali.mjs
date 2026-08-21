@@ -30,6 +30,22 @@ function blokDari(teks, awalan = '') {
   return out
 }
 
+/*
+ * TABEL PADANAN IKUT DIBACA.
+ *
+ * osceStationNoteAliases.ts adalah yang dipakai LAYAR untuk menemukan catatan
+ * sebuah kasus. Bila skrip ini tidak ikut membacanya, ia melaporkan "belum ada
+ * catatannya" untuk kasus yang di layar SUDAH menampilkan catatannya — angka
+ * yang mengada-adakan pekerjaan, kebalikan dari cacat yang biasa terjadi di
+ * sini tetapi sama menyesatkannya.
+ */
+const aliasSrc = readFileSync('src/lib/osceStationNoteAliases.ts', 'utf8')
+const badanAlias = aliasSrc.slice(aliasSrc.indexOf('const ALIAS'), aliasSrc.indexOf('\n}', aliasSrc.indexOf('const ALIAS')))
+const ALIAS = new Map(
+  [...badanAlias.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|([A-Za-z][A-Za-z0-9_]*)):\s*'((?:[^'\\]|\\.)*)',/gm)]
+    .map((m) => [(m[1] ?? m[2]).replace(/\\'/g, "'"), m[3].replace(/\\'/g, "'")]),
+)
+
 const notes = readFileSync('src/lib/skdiDiseaseNotes.ts', 'utf8')
 const osce = readFileSync('src/lib/osceStationNotes.ts', 'utf8')
 const blok = { ...blokDari(notes), ...blokDari(osce, 'OSCE::') }
@@ -132,7 +148,10 @@ const belum = []
 let dibuang = 0
 for (const k of sekali) {
   if (bukanKasus(k.label)) { dibuang++; continue }
-  const kunci = cari(k.kunci) ?? cari(k.label)
+  // Padanan yang diperiksa tangan didahulukan: ia yang dipakai layar.
+  const lewatAlias = ALIAS.get(k.label) ?? ALIAS.get(k.kunci)
+  const kunci = (lewatAlias && blok['OSCE::' + lewatAlias] ? 'OSCE::' + lewatAlias : null)
+    ?? cari(k.kunci) ?? cari(k.label)
   if (!kunci) { tidakAda++; belum.push({ ...k, isi: 0, kunci: '(tidak ketemu)' }); continue }
   const isi = terisi(kunci)
   if (isi >= 8) adaLengkap++

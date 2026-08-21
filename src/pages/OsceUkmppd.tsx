@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { hitungKasus, ringkasPerSistem, ringkasSeluruh, periodeTerurut, type HitunganKasus } from '../lib/analisisOsce'
+import { catatanStasiun } from '../lib/osceStationNoteAliases'
+import { CatatanStasiunKartu } from '../components/CatatanStasiunKartu'
 import { RIWAYAT_OSCE } from '../lib/osceUkmppdRiwayat'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,6 +48,15 @@ function BarisKasus({ k, maks }: { k: HitunganKasus; maks: number }) {
         {k.sistem.split(',')[0]} · terakhir {k.periode[0]}
         {k.periode.length > 1 && ` · ${k.periode.length} periode`}
       </div>
+      {/* CATATAN STASIUN, dan inilah yang selama ini hilang.
+          Halaman ini memuat seluruh 1.416 kasus rekap — tempat orang benar-benar
+          mencari sebuah kasus — tetapi tidak pernah menautkannya ke catatan mana
+          pun. Akibatnya ratusan catatan yang sudah ditulis LENGKAP tidak dapat
+          dijangkau dari sini, dan skrip pemeriksa melaporkannya sebagai "belum
+          ada catatannya" padahal catatannya ada.
+          Nama rekap dilewatkan lewat catatanStasiun(), yang mencoba nama
+          aslinya lebih dahulu lalu tabel padanan yang diperiksa tangan. */}
+      <CatatanStasiunKartu nama={k.label} />
     </li>
   )
 }
