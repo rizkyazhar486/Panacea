@@ -276,6 +276,134 @@ const ALIAS: Record<string, string> = {
   'Trauma Medulla Spinalis VT 12 dengan Fraktur Kompresi': 'Trauma Medulla Spinalis dengan Fraktur Kompresi',
   'emfisema paru': 'PPOK Eksaserbasi Akut',
   'Gastroenteritis Akut': 'Disentri (Amoeba / Basiler)',
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * GELOMBANG BERIKUTNYA — 22 catatan stasiun yang baru dilengkapi 8/8.
+   *
+   * CACAT YANG MELAHIRKAN BAGIAN INI, dan ini kesekian kalinya. Dua puluh dua
+   * catatan ditulis lengkap, diperiksa oleh medanKurang.mjs, dan dilaporkan
+   * "0 tersisa". Lalu diperiksa di peramban: dicari 'Herpes zoster' pada
+   * halaman rekap, barisnya muncul, dan TOMBOL CATATANNYA TIDAK ADA. Nama di
+   * rekap 'Herpes zoster' tidak sama dengan kunci catatannya 'Herpes Simplex /
+   * Herpes Zoster', dan tanpa baris di tabel ini pencocokannya gagal.
+   *
+   * Angka mana pun akan mengatakan pekerjaan itu selesai. Hanya membuka
+   * peramban yang menunjukkan bahwa tidak seorang pun dapat membacanya.
+   *
+   * Calonnya dikumpulkan dengan scripts/cariKasusRekap.mjs, lalu DIPILIH SATU
+   * PER SATU. Yang sengaja TIDAK dipetakan dicatat pada tempatnya.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Saraf
+  BPPV: 'BPPV (Benign Paroxysmal Positional Vertigo)',
+  'Tension type headache': 'Tension Type Headache (TTH)',
+  'Neuralgia trigeminal': 'Neuralgia Trigeminal',
+  'Trigeminal neuralgia': 'Neuralgia Trigeminal',
+  'Kejang Demam Sederhana': 'Kejang Demam Sederhana (KDS)',
+  'Kejang demam sederhana ec faringitis akut': 'Kejang Demam Sederhana (KDS)',
+  // 'Vertigo ec menier disease' SENGAJA TIDAK dipetakan ke BPPV: penyakit
+  // Meniere berlangsung berjam-jam dengan gangguan pendengaran, dan BPPV tidak
+  // pernah mengganggu pendengaran. Memetakannya berarti mengajarkan penyakit
+  // yang salah pada stasiun yang salah.
+
+  // Jiwa
+  'Post Traumatic Stress Disorder': 'Post-Traumatic Stress Disorder (PTSD)',
+  'PTSD/Gangguan Penyesuaian': 'Post-Traumatic Stress Disorder (PTSD)',
+  'Nightmare dengan mid insomnia / PTSD': 'Post-Traumatic Stress Disorder (PTSD)',
+
+  // THT
+  'Sinusitis Maxilaris': 'Sinusitis Maksilaris',
+  'Sinusitis Maxilaris Akut': 'Sinusitis Maksilaris',
+  'Rhinosinusitis Maxillaris': 'Sinusitis Maksilaris',
+  'Rhinosinusitis maksilaris Kronis': 'Sinusitis Maksilaris',
+  'Sinusitis maxillaris kronis e.c rhinitis alergi persisten sedang berat': 'Sinusitis Maksilaris',
+  'Tonsilitis akut': 'Tonsilitis (akut/kronis eksaserbasi)',
+  'Tonsilitis kronis eksaserbasi akut': 'Tonsilitis (akut/kronis eksaserbasi)',
+  'Tonsilitis lakunaris': 'Tonsilitis (akut/kronis eksaserbasi)',
+  'Tonsilitis difteri': 'Tonsilitis (akut/kronis eksaserbasi)',
+  OMA: 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA perforasi': 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA Stadium Perforasi': 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA stadium perforasi AS': 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA stadium supuratif': 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA Supuratif': 'Otitis Media Akut (OMA) — semua stadium',
+  'OMA supuratif akut': 'Otitis Media Akut (OMA) — semua stadium',
+  'Otitis eksterna sirkumskripta': 'Otitis Eksterna',
+  'Serumen Prop': 'Serumen Prop / Mastoiditis',
+  'Serumen prop+mmmm': 'Serumen Prop / Mastoiditis',
+  'Serumen obturans telinga (ekstraksi)': 'Serumen Prop / Mastoiditis',
+  Mastoiditis: 'Serumen Prop / Mastoiditis',
+  'Mastoiditis ec OMSK': 'Serumen Prop / Mastoiditis',
+  'Epistaksis anterior': 'Epistaksis Anterior — tindakan tampon',
+  'Epistaksis anterior bilateral ec trauma': 'Epistaksis Anterior — tindakan tampon',
+  'Epistaksis anterior cavum nasi sinistra ec Trauma': 'Epistaksis Anterior — tindakan tampon',
+  'Epistaksis anterior ec trauma (tampon anterior)': 'Epistaksis Anterior — tindakan tampon',
+  'Epistaksis anteriornasal sinistra': 'Epistaksis Anterior — tindakan tampon',
+  // 'Otitis Media Efusi' SENGAJA TIDAK dipetakan ke catatan OMA. Justru
+  // perbedaan keduanya yang menentukan pengobatan — efusi TIDAK memerlukan
+  // antibiotik — sehingga menampilkan catatan OMA di situ mengajarkan yang
+  // sebaliknya.
+
+  // Jantung dan paru
+  'SVT (manuver vagal)': 'Supraventricular Tachycardia (SVT) — vagal maneuver',
+  'SVT (Baca EKG + INTERPRETASI)': 'Supraventricular Tachycardia (SVT) — vagal maneuver',
+  'SVT, stabil': 'Supraventricular Tachycardia (SVT) — vagal maneuver',
+  'SVT - HT grade I': 'Supraventricular Tachycardia (SVT) — vagal maneuver',
+  'SVT+HT grade 1': 'Supraventricular Tachycardia (SVT) — vagal maneuver',
+  'Spontaneous pneumothorax dextra (oksigen)': 'Pneumotoraks (Tension/Terbuka) — needle decompression',
+  'Pertusis (px anak)': 'Pertusis',
+  'Pertusis (anak)': 'Pertusis',
+
+  // Dalam
+  'Demam Tifoid (RME)': 'Demam Tifoid',
+  'demam typhoid': 'Demam Tifoid',
+  'KAD (pasang infus)': 'Ketoasidosis Diabetik (KAD) — resusitasi cairan',
+  'KAD / Tindakan resusitasi cairan (Tindakan Pasang IV line)': 'Ketoasidosis Diabetik (KAD) — resusitasi cairan',
+  'KAD: iv line terapi': 'Ketoasidosis Diabetik (KAD) — resusitasi cairan',
+  'Hepatitis A (RME)': 'Hepatitis A / B',
+  'Hepatitis A': 'Hepatitis A / B',
+  'Hepatitis B': 'Hepatitis A / B',
+  Kolelithiasis: 'Kolesistitis / Kolelitiasis',
+  'Kolelitiasis (RME)': 'Kolesistitis / Kolelitiasis',
+  'Kolesistitis akut': 'Kolesistitis / Kolelitiasis',
+  'Kolesistitis/kolangitis akut': 'Kolesistitis / Kolelitiasis',
+  'Sindroma metabolik': 'Sindrom Metabolik',
+  'Sindrom metabolik/obes': 'Sindrom Metabolik',
+  'Sindrom Metabolik + Hiperuricemia (Asam Urat 8)': 'Sindrom Metabolik',
+  'Sindrom Metabolik/Dislipidemia': 'Sindrom Metabolik',
+  'Xanthelasma ec Sindrom Metabolik': 'Sindrom Metabolik',
+  dislipidemi: 'Dislipidemia',
+  'Obesitas grade 2 dengan dislipidemia': 'Dislipidemia',
+  'Systemic Lupus Erythematosus': 'Systemic Lupus Erythematosus (SLE)',
+  // 'Ensefalopati Hepatikum ec. Hepatitis A' SENGAJA TIDAK dipetakan: yang
+  // diujikan di situ adalah gagal hati dan penanganan ensefalopatinya, bukan
+  // hepatitisnya.
+
+  // Kandungan dan payudara
+  'BV (Pemeriksaan Duh tubuh)': 'Bakterial Vaginosis (BV)',
+  'Mastitis Dextra': 'Mastitis / Cracked Nipple',
+  'mastitis sinistra': 'Mastitis / Cracked Nipple',
+  'Mastitis dd/ Breast Engorgement': 'Mastitis / Cracked Nipple',
+  'P2A0 Cracked Nipple dd/ Mastitis mamae sinistra': 'Mastitis / Cracked Nipple',
+
+  // Kulit
+  'Tinea korporis': 'Tinea Corporis',
+  'Dermatitis atopik': 'Dermatitis Atopik',
+  'Dermatitis seboroik': 'Dermatitis Seboroik',
+  'Herpes zoster': 'Herpes Simplex / Herpes Zoster',
+  'Herpes zooster AS': 'Herpes Simplex / Herpes Zoster',
+  'Herpes zoster thoracalis dextra': 'Herpes Simplex / Herpes Zoster',
+  'Herpes Zoster Thorakalis': 'Herpes Simplex / Herpes Zoster',
+  'Herpes simplex labialis': 'Herpes Simplex / Herpes Zoster',
+  'Herpes Simpleks Labialis (RME)': 'Herpes Simplex / Herpes Zoster',
+  'Herpes simplex labialis atau Sifilis primer (RME)': 'Herpes Simplex / Herpes Zoster',
+  // 'Tinea cruris', 'Tinea kruris', 'Tinea mannum', dan 'Tinea Pedis' SENGAJA
+  // TIDAK dipetakan ke Tinea Corporis. Letaknya berbeda, dan letak itulah yang
+  // menentukan pilihan obat minum berbanding krim serta lamanya pengobatan.
+  // 'Varicella zoster' juga tidak: cacar air adalah infeksi pertama yang
+  // tersebar di seluruh tubuh, bukan bangkitnya kembali pada satu dermatom.
 }
 
 /**
