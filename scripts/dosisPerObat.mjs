@@ -78,6 +78,14 @@ const RE_DOSIS = new RegExp(
     `\\d+([.,]\\d+)?\\s*%`,
     // 4x500 | 3 x 1 | 2×1
     `\\d\\s*[x×]\\s*\\d`,
+    /*
+     * 2-3x/hari | 4x/hari | 1x sehari — bentuk aturan pakai yang PALING LAZIM
+     * dalam bahasa Indonesia, dan semula tidak dikenali sama sekali: pola
+     * angka-garis miring menuntut angka tepat sebelum '/', sedangkan di sini
+     * ada 'x' di antaranya. Akibatnya 'salep Basitrasin dioleskan tipis
+     * 2-3x/hari' ditandai tanpa dosis padahal aturan pakainya justru lengkap.
+     */
+    `\\d\\s*[x×]\\s*\\/?\\s*(hari|minggu|bulan|jam|sehari|seminggu|malam|pagi)`,
     // 1 dd | 3 dd
     `\\b\\d\\s*dd\\b`,
     // 1gr/6 jam | 200 mg/minggu | 5 mg/kgBB/hari | 3x/hari
@@ -152,11 +160,50 @@ function tanpaDosis(teks) {
   return [...new Set(keluar)]
 }
 
+/*
+ * SUDAH DIPERIKSA MATA DAN MEMANG BENAR TANPA DOSIS.
+ *
+ * MENGAPA DAFTAR INI ADA, dan mengapa ia bukan cara menyembunyikan pekerjaan.
+ * Penjaga yang berhenti di angka dua belas selamanya akan diabaikan orang, dan
+ * begitu diabaikan ia tidak lagi menangkap kekurangan BARU — yang justru satu-
+ * satunya alasan ia dibuat. Penjaga hanya berguna bila nol berarti nol.
+ *
+ * Tiap baris di bawah ini dibuka teksnya, dibaca, dan disimpulkan bahwa
+ * menambahkan dosis di situ akan membuat kalimatnya KELIRU. Alasannya ditulis
+ * supaya dapat dibantah, bukan dipercaya begitu saja.
+ */
+const DIPERIKSA = new Map([
+  // Obat disebut sebagai KETERANGAN atau AKIBAT, bukan yang diresepkan.
+  ['Neuropati Diabetik|metformin', 'lazim pada PEMAKAI metformin jangka panjang'],
+  ['Obesitas|metformin', 'sama: pemakai metformin jangka panjang'],
+  ['Obesitas|vitamin b12', 'diperiksa kadarnya, dosisnya ada pada entri bariatrik'],
+  ['Hipertiroid (radioterapi pre-op)|levotiroksin', 'akibat yang diharapkan: memerlukan levotiroksin seumur hidup'],
+  ['Glaukoma (akut, awal)|asetazolamid', 'syarat KCl: bila memakai asetazolamid dosis besar'],
+  ['Hiperemesis gravidarum|dekstrosa', 'urutan: tiamin 100 mg SEBELUM dekstrosa'],
+  ['Gastritis (H. pylori)|bismut', 'penunjuk paduan; dosisnya ada pada entri paduan bismut'],
+
+  // Obat disebut untuk DITOLAK — menambahkan dosis justru menyesatkan.
+  ['Hepatitis (hepatoprotektor)|parasetamol', 'termasuk yang HARUS DIHENTIKAN karena membebani hati'],
+  ['Cluster Headache — abortif|ergotamin', 'disebut sudah jarang dipakai'],
+  ['Gangguan Tidur (middle/maintenance insomnia)|fenobarbital', 'disebut TIDAK dipakai untuk insomnia'],
+
+  // Urutan tindakan, bukan peresepan.
+  ['TB — Drug-Induced Hepatitis, ikterus|rifampisin', 'urutan rechallenge, bukan dosis'],
+  ['TB — Drug-Induced Hepatitis, ikterus|isoniazid', 'urutan rechallenge'],
+  ['TB — Drug-Induced Hepatitis, ikterus|pirazinamid', 'urutan rechallenge'],
+  ['Kejang Demam|diazepam', 'entri edukasi: mengajari keluarga memberi diazepam rektal di rumah'],
+  ['Kejang Demam|diazepam rektal', 'sama'],
+
+  // Dosisnya ada, hanya di luar jendela 60 huruf.
+  ['ACT (kombinasi)|dihidroartemisinin', 'tabel berat badan menyusul di kalimat yang sama'],
+  ['ACT (kombinasi)|piperakuin', 'sama'],
+])
+
 const kurang = []
 let totalObat = 0
 let totalTanpa = 0
 for (const e of entri) {
-  const t = tanpaDosis(e.terapi)
+  const t = tanpaDosis(e.terapi).filter((o) => !DIPERIKSA.has(`${e.diagnosis}|${o}`))
   const semua = daftarObat.filter((o) => new RegExp(`(^|[^a-z0-9])${o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z0-9]|$)`, 'i').test(e.terapi))
   totalObat += semua.length
   totalTanpa += t.length
@@ -167,6 +214,7 @@ console.log(`Entri tatalaksana                : ${entri.length}`)
 console.log(`Penyebutan obat yang dikenali    : ${totalObat}`)
 console.log(`  di antaranya TANPA dosis dekat : ${totalTanpa}`)
 console.log(`Entri yang memuat sedikitnya satu: ${kurang.length}`)
+console.log(`Sudah diperiksa & sengaja tanpa dosis: ${DIPERIKSA.size}`)
 console.log('')
 console.log('ANGKA DI ATAS ADALAH BATAS ATAS YANG MASIH HARUS DIPERIKSA TANGAN,')
 console.log('bukan daftar pekerjaan yang siap dikerjakan. Empat kelas temuan palsu')
