@@ -1,4 +1,5 @@
-import { OSCE_STATION_NOTES } from './osceStationNotes'
+import { OSCE_STATION_NOTES, type OsceStationNote } from './osceStationNotes'
+import { SKDI_DISEASE_NOTES, type SkdiDiseaseNote } from './skdiDiseaseNotes'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Nama kasus di REKAP UJIAN berbanding nama kunci CATATAN.
@@ -404,6 +405,187 @@ const ALIAS: Record<string, string> = {
   // menentukan pilihan obat minum berbanding krim serta lamanya pengobatan.
   // 'Varicella zoster' juga tidak: cacar air adalah infeksi pertama yang
   // tersebar di seluruh tubuh, bukan bangkitnya kembali pada satu dermatom.
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * KASUS YANG PALING SERING KELUAR, DIURUTKAN MENURUT SERINGNYA.
+   *
+   * CACAT YANG MELAHIRKAN BAGIAN INI ADA PADA ALAT UKURNYA. kasusSekali.mjs
+   * sengaja hanya menghitung kasus yang muncul SATU KALI, dan mencetak "30
+   * teratas" MENURUT ABJAD. Akibatnya daftar pekerjaan selalu dimulai dari
+   * 'Abses', 'Acne', 'Akne' — sementara 'PPOK Eksaserbasi Akut (Nebul)' yang
+   * keluar SEPULUH KALI dalam sepuluh tahun tidak pernah terlihat sama sekali,
+   * sebab ia tidak masuk saringan "sekali muncul".
+   *
+   * Setelah diukur ulang dengan scripts/kasusTanpaCatatan.mjs: bukan 384
+   * melainkan 587 kasus tanpa catatan, dan 120 di antaranya muncul dua kali
+   * atau lebih. Hampir seluruh yang tersering ternyata SUDAH punya catatan
+   * lengkap — hanya namanya di rekap ditulis lain. Sekali lagi pekerjaannya
+   * bukan menulis, melainkan menyambung.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Paru
+  'PPOK Eksaserbasi Akut (Nebul)': 'PPOK Eksaserbasi Akut',
+  PPOK: 'PPOK Eksaserbasi Akut',
+  Asma: 'Asma (berbagai derajat & eksaserbasi) — tindakan nebulisasi',
+  'asma bronkiale': 'Asma (berbagai derajat & eksaserbasi) — tindakan nebulisasi',
+  'Pneumonia lobaris': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia aspirasi (RME)': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Abses paru (RME)': 'Abses Paru',
+  'TB paru': 'Tuberkulosis Paru',
+
+  // Jantung
+  'Atrial Fibrilasi': 'Atrial Fibrilasi — baca EKG',
+  AF: 'Atrial Fibrilasi — baca EKG',
+  UAP: 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  ACS: 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'STEMI anteroseptal': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'STEMI Inferior': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'VES (baca EKG)': 'Ventricular Ectopic (VES) — baca EKG',
+  PVC: 'Ventricular Ectopic (VES) — baca EKG',
+  'Syok anafilaktik (IVFD)': 'Syok Anafilaktik — tindakan resusitasi',
+  'Syok Hipovolemik (Tindakan IV Line)': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+
+  // Saraf
+  "Bell's palsy": 'Bells’ palsy',
+  'Bells Palsy': 'Bells’ palsy',
+  'LBP e.c Susp. HNP': 'HNP / Low Back Pain',
+  'classic migrain': 'Migrain (dengan/tanpa aura)',
+  'migrain dengan aura': 'Migrain (dengan/tanpa aura)',
+  Meningitis: 'Meningitis / Meningoensefalitis',
+  'Meningitis bakterial': 'Meningitis / Meningoensefalitis',
+  ensefalitis: 'Meningitis / Meningoensefalitis',
+  'Neuropati perifer e.c DM tipe 2': 'Neuropati Perifer e.c. DM',
+
+  // Infeksi
+  'Malaria Falciparum - (RME)': 'Malaria (falciparum/vivax) — apus darah tebal/tipis',
+  Leptospirosis: 'Leptospirosis / Weil Disease',
+  'Weils Disease/Lepto': 'Leptospirosis / Weil Disease',
+  'DHF Grade 2 (tindakan Infus)': 'Dengue Hemorrhagic Fever (DHF) — semua grade',
+  'Disentri Basiler': 'Disentri (Amoeba / Basiler)',
+  'MH tipe MB': 'Kusta (Morbus Hansen)',
+  'Morbus hansen tipe MB': 'Kusta (Morbus Hansen)',
+  'Varicella zoster': 'Varisela tanpa komplikasi',
+  'Varicella Zoster': 'Varisela tanpa komplikasi',
+
+  // Ginjal dan saluran kemih
+  Sistitis: 'Sistitis Akut',
+  'Retensi Urin ec. Vesicolithiasis': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  'Retensio urin e.c vesicolithiasis': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  'Retensio Urin e.c BPH (kateter)': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  Vesikolithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Prostatitis - (RME)': 'Prostatitis',
+  Pyelonefritis: 'Pielonefritis Akut',
+  'Fimosis (Tindakan Sirkumsisi)': 'Fimosis / Parafimosis — tindakan sirkumsisi',
+  'Parafimosis (dorsumsisi + sirkumsisi)': 'Fimosis / Parafimosis — tindakan sirkumsisi',
+  'uretritis GO': 'Servisitis / Uretritis Gonore',
+  'Ureteritis GO': 'Servisitis / Uretritis Gonore',
+  'Sindrom Nefritik - (RME)': 'Sindrom Nefrotik / Sindrom Nefritik',
+  'GNAPS (dewasa)': 'Glomerulonefritis Akut Pasca-Streptokokus (GNAPS)',
+
+  // Endokrin
+  'Goiter Endemik': 'Goiter',
+  'graves disease': 'Hipertiroid',
+  "Grave's disease": 'Hipertiroid',
+  'DM Tipe 2': 'DM Tipe 2 (edukasi & tatalaksana)',
+  'HONK - infus': 'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan',
+  'HHS (pasang infus)': 'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan',
+  'Hipoglikemia Berat (Infus)': 'Hipoglikemia berat',
+  'Non Alcoholic Fatty Liver Disease': 'Perlemakan hepar',
+
+  // Pencernaan
+  GERD: 'Gastritis / Dispepsia / GERD',
+  dispepsia: 'Gastritis / Dispepsia / GERD',
+  'Hemoroid Interna Grade II': 'Hemoroid Interna (berbagai grade)',
+  'Ileus Obstruktif (tindakan pasang NGT)': 'Ileus Obstruktif — pasang NGT',
+
+  // Otot dan tulang
+  'Ankle sprain': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'knee sprain': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'Wrist sprain': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  Gout: 'Gout Artritis',
+  'Gout arthritis': 'Gout Artritis',
+  Osteoarthritis: 'Osteoarthritis (OA)',
+  Osteomyelitis: 'Osteomielitis',
+
+  // Indera
+  'Corpal Hidung (tindakan ekstraksi, px anak)': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  'corpal mata': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  dakrioadenitis: 'Dakrioadenitis / Dakriosistitis',
+  Dakriosistitis: 'Dakrioadenitis / Dakriosistitis',
+  'Konjungtivitis bakterial': 'Konjungtivitis (bakteri/vernal/viral)',
+  'Konjungtivitis bakterialis': 'Konjungtivitis (bakteri/vernal/viral)',
+  'Konjungtivitis vernal': 'Konjungtivitis (bakteri/vernal/viral)',
+  'Keratitis viral': 'Episkleritis / Keratitis',
+  'Blefaritis anterior': 'Hordeolum / Blefaritis',
+  'Hordeolum internum': 'Hordeolum / Blefaritis',
+  'Rhinitis alergi': 'Rhinitis Alergika',
+
+  // Kulit
+  'Insect bite': 'Insect Bite / Fixed Drug Eruption',
+  FDE: 'Insect Bite / Fixed Drug Eruption',
+  'Dermatitis venenata': 'Dermatitis Venenata / Kontak',
+  'Dermatitis atopi': 'Dermatitis Atopik',
+  'Kandidiasis oral': 'Kandidiasis mulut',
+  'Candidiasis oral (RME)': 'Kandidiasis mulut',
+  'Candidosis vulvovaginal': 'Kandidiasis Vulvovaginalis',
+  'Kondiloma Akuminata': 'Kondiloma akuminatum',
+  'Tinea pedis (preparat KOH)': 'Tinea pedis',
+  'Ulkus durum': 'Sifilis stadium 1 dan 2',
+  'Lipoma (tindakan Eksisi & Hecting)': 'Lipoma',
+  'Eksisi lipoma': 'Lipoma',
+  CLM: 'Cutaneous Larva Migrans (Creeping Eruption)',
+
+  // Jiwa
+  'Gangguan Cemas Menyeluruh': 'Gangguan Cemas Menyeluruh (GAD)',
+  'Gangguan cemas': 'Gangguan Cemas Menyeluruh (GAD)',
+  'Gangguan Campuran Cemas dan Depresi / Gangguan Cemas Menyeluruh (?)': 'Gangguan campuran cemas depresi',
+  'Gangguan somatisasi': 'Gangguan Somatisasi / Hipokondriasis',
+  'Ggn. Cemas Menyeluruh / Ggn. Somatisasi': 'Gangguan Somatisasi / Hipokondriasis',
+  'Ggn. Cemas Menyeluruh / Ggn. Somatisasi / Hipokondriasis': 'Gangguan Somatisasi / Hipokondriasis',
+  'Gangguan waham': 'Gangguan Waham Menetap',
+  'Gangguan afektif bipolar episode kini manik dengan gejala psikotik': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Early + Late Insomnia': 'Insomnia (primer/early/middle/late)',
+  'insomnia early / middle': 'Insomnia (primer/early/middle/late)',
+  'Intoksikasi alkohol': 'Intoksikasi Alkohol / Zat Psikoaktif',
+  'Trikotilomania (px pakai wig)': 'Trikotilomania',
+  'Transient Tic Disorder': 'Transient tics disorder',
+
+  // Kandungan, anak, dan tindakan
+  ANC: 'ANC Normal (Antenatal Care)',
+  KPD: 'Ketuban Pecah Dini (KPD)',
+  'HEG gr I': 'Hiperemesis Gravidarum (HEG)',
+  'Ab imminens': 'Abortus Imminens / Inkomplit',
+  'Asuhan Persalinan Normal': 'Asuhan Persalinan Normal (APN 60 langkah)',
+  'Asuhan Persalinan Normal (Kala 1-4)': 'Asuhan Persalinan Normal (APN 60 langkah)',
+  'Baby blues': 'Baby Blues / Depresi Postpartum',
+  'Endometritis - (RME)': 'Endometritis',
+  'Pap smear': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'Lepas implan': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Pasang Implan': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  imunisasi: 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi campak': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  Marasmus: 'Marasmus / Kwashiorkor (gizi buruk anak)',
+  'Vulnus scissum': 'Vulnus laseratum, punctum',
+
+  /*
+   * YANG SENGAJA TIDAK DIPETAKAN, dan alasannya:
+   *
+   *   'Transient Ischemic Attack' (2x) — belum ada catatannya sama sekali.
+   *   Sengaja TIDAK ditautkan ke 'Transient tics disorder', sebab pencocokan
+   *   longgar pernah melakukan tepat itu; keduanya hanya berbagi satu kata dan
+   *   tidak berhubungan sedikit pun. Ini pekerjaan menulis, bukan menyambung.
+   *
+   *   'ANC, KPD' dan 'Pentabio, OPV, KMS' — satu baris rekap berisi DUA
+   *   stasiun sekaligus. Menautkannya ke salah satu berarti menyembunyikan
+   *   yang lain.
+   *
+   *   'Vulnus scissum' DIPETAKAN ke 'Vulnus laseratum, punctum' walaupun
+   *   namanya berbeda: luka iris dan luka robek berbeda pada gambaran tepinya,
+   *   tetapi penanganannya — pembersihan, penjahitan, dan pencegahan tetanus —
+   *   dibahas pada catatan yang sama.
+   */
 }
 
 /**
@@ -412,8 +594,73 @@ const ALIAS: Record<string, string> = {
  * itu benar; kartu kasusnya lalu tampil tanpa tombol "Catatan", bukan tampil
  * dengan catatan penyakit lain.
  */
-export function catatanStasiun(nama: string) {
-  return OSCE_STATION_NOTES[nama] ?? OSCE_STATION_NOTES[ALIAS[nama] ?? '']
+
+/**
+ * Catatan penyakit SKDI dibentuk ulang menjadi catatan stasiun.
+ *
+ * CACAT YANG MELAHIRKAN FUNGSI INI. catatanStasiun() hanya melihat
+ * OSCE_STATION_NOTES. Padahal ratusan penyakit yang keluar di rekap ujian
+ * catatannya sudah lengkap di skdiDiseaseNotes.ts — Bells' palsy, Goiter,
+ * Hipertiroid, Osteomielitis, Lipoma, Kandidiasis mulut, Sifilis, Varisela.
+ * Semuanya ADA, dan tidak satu pun dapat dibuka dari halaman rekap.
+ *
+ * Ketahuannya bukan dari membaca kode, melainkan dari aliasSasaran.mjs yang
+ * menolak 19 padanan sekaligus: sasarannya memang ada sebagai catatan, hanya
+ * bukan di rak yang dilihat fungsi ini.
+ *
+ * MENGAPA DIBENTUK ULANG, BUKAN DISATUKAN. Kedua bentuk berbeda dengan sengaja:
+ * anamnesis SKDI berupa kerangka SOCRATES bermedan-medan, sedangkan stasiun
+ * OSCE berupa daftar butir yang diucapkan di depan penguji. Menyatukan tipenya
+ * akan memaksa salah satu kehilangan bentuk yang justru menjadi gunanya.
+ * Perubahan bentuk dikerjakan di sini, di satu tempat, dan dapat dibaca.
+ */
+function dariCatatanSkdi(n: SkdiDiseaseNote): OsceStationNote {
+  const a = n.anamnesis
+  const anamnesis = a
+    ? [
+        `Keluhan utama: ${a.keluhanUtama}`,
+        `Riwayat penyakit sekarang: ${a.riwayatPenyakitSekarang}`,
+        a.riwayatPenyakitDahulu && `Riwayat penyakit dahulu: ${a.riwayatPenyakitDahulu}`,
+        a.riwayatPenyakitKeluarga && `Riwayat penyakit keluarga: ${a.riwayatPenyakitKeluarga}`,
+        a.riwayatPengobatan && `Riwayat pengobatan: ${a.riwayatPengobatan}`,
+        a.riwayatAlergi && `Riwayat alergi: ${a.riwayatAlergi}`,
+        a.riwayatKehamilanPersalinan && `Riwayat kehamilan dan persalinan: ${a.riwayatKehamilanPersalinan}`,
+        a.riwayatTumbuhKembang && `Riwayat tumbuh kembang: ${a.riwayatTumbuhKembang}`,
+        a.riwayatNutrisi && `Riwayat nutrisi: ${a.riwayatNutrisi}`,
+        a.riwayatImunisasi && `Riwayat imunisasi: ${a.riwayatImunisasi}`,
+        a.riwayatSosialEkonomi && `Riwayat sosial ekonomi: ${a.riwayatSosialEkonomi}`,
+      ].filter((x): x is string => Boolean(x))
+    : []
+
+  // kriteriaDiagnosis WAJIB pada bentuk stasiun, dan tipe SkdiDiseaseNote sudah
+  // memaksa salah satu dari `diagnosis` atau `goldStandard` ada — jadi rangkaian
+  // ini tidak pernah benar-benar jatuh ke untai kosong. Untai kosong tetap
+  // ditulis agar tidak ada tanda seru yang memaksa TypeScript diam.
+  const kriteriaDiagnosis = n.goldStandard ?? (n.diagnosis ? n.diagnosis.join(' ') : '')
+
+  return {
+    definisi: n.definisi,
+    // etiologi SKDI berupa satu paragraf, stasiun berupa daftar.
+    etiologi: n.etiologi ? [n.etiologi] : undefined,
+    patofisiologi: n.patofisiologi,
+    rantai: n.rantai,
+    anamnesis,
+    pemeriksaanFisik: n.pemeriksaanFisik ?? [],
+    penunjang: n.penunjang,
+    kriteriaDiagnosis,
+    diagnosisBanding: n.diagnosisBanding,
+    tatalaksana: n.tatalaksana,
+  }
+}
+
+export function catatanStasiun(nama: string): OsceStationNote | undefined {
+  const sasaran = ALIAS[nama] ?? nama
+  // Urutannya disengaja: catatan stasiun lebih dahulu, sebab ia ditulis khusus
+  // untuk ujian dan memuat langkah tindakannya. Catatan SKDI adalah cadangan.
+  const stasiun = OSCE_STATION_NOTES[nama] ?? OSCE_STATION_NOTES[sasaran]
+  if (stasiun) return stasiun
+  const skdi = SKDI_DISEASE_NOTES[nama] ?? SKDI_DISEASE_NOTES[sasaran]
+  return skdi ? dariCatatanSkdi(skdi) : undefined
 }
 
 export default catatanStasiun
