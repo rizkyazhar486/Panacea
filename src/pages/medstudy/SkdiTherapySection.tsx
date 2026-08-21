@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ObatPerKeluhan } from '../../components/ObatPerKeluhan'
 import { Prosa } from '../../components/Prosa'
 import { Card, SectionTitle, Badge } from '../../components/ui'
 import { IconActivity } from '../../components/icons'
@@ -70,6 +71,15 @@ export default function SkdiTherapySection({ cariAwal = '' }: { cariAwal?: strin
             ))}
           </div>
         )}
+      </Card>
+
+      {/* Ditaruh TEPAT DI BAWAH JUDUL, sebelum tabel per diagnosis. Yang berdiri
+          di depan pasien tidak memulai dari nama diagnosis atau nama obat — ia
+          memulai dari KELUHAN. Menaruhnya di bawah tabel berarti hanya ditemukan
+          oleh yang sudah tahu apa yang dicarinya, persis kelompok yang paling
+          tidak membutuhkannya. */}
+      <Card>
+        <ObatPerKeluhan />
       </Card>
 
       {tab === 'therapy' && groupedTherapy.map(([sys, entries]) => (
