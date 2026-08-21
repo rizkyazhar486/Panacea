@@ -105,7 +105,7 @@ const RE_TABRAKAN = /\b(oksida|oxide|nitric)\s*$/i
  */
 const RE_DOSIS_LAIN = /\b(inr|titrasi|dititrasi|sasaran|target|sesuai (berat|kultur|respons|sasaran)|hingga|sampai)\b/i
 
-const RE_BUKAN_RESEP = /\b(hentikan|dihentikan|stop|hindari|dihindari|jangan|tidak boleh|dilarang|kontraindikasi|kontra-indikasi|waspada|hati-hati|akibat|dicetuskan|disebabkan|menyebabkan|memperberat|alergi|riwayat|bukan|tanpa|kurangi|turunkan|tapering|sapih|resistensi|gagal dengan|jika alergi|bila alergi)\b/i
+const RE_BUKAN_RESEP = /\b(hentikan|dihentikan|stop|hindari|dihindari|jangan|tidak boleh|dilarang|kontraindikasi|kontra-indikasi|waspada|hati-hati|akibat|dicetuskan|disebabkan|menyebabkan|memperberat|alergi|riwayat|bukan|tanpa|kurangi|turunkan|tapering|sapih|resistensi|gagal dengan|jika alergi|bila alergi|tidak lagi|sudah ditinggalkan|tidak dianjurkan|aman dan tidak|pernah memakai|bila pernah)\b/i
 
 function tanpaDosis(teks) {
   const rendah = teks.toLowerCase()
@@ -120,10 +120,19 @@ function tanpaDosis(teks) {
         const jendela = teks.slice(i, i + obat.length + 60)
         // Konteks SEBELUM nama obat menentukan apakah ia memang diresepkan.
         const sebelumnya = teks.slice(Math.max(0, i - 70), i)
+        /*
+         * Kalimat yang MENOLAK sebuah obat sering menaruh nama obatnya di
+         * DEPAN: 'LAMIVUDIN TIDAK LAGI menjadi pilihan pertama', 'INTERFERON
+         * DITINGGALKAN', 'statin AMAN dan tidak dilarang di sini'. Memeriksa
+         * konteks sebelumnya saja melewatkan seluruh bentuk itu, dan ketiganya
+         * ditandai sebagai kurang dosis padahal justru sedang ditolak.
+         */
+        const sesudahnya = teks.slice(i + obat.length, i + obat.length + 45)
         if (
           !RE_DOSIS.test(jendela) &&
           !RE_DOSIS_LAIN.test(jendela) &&
           !RE_BUKAN_RESEP.test(sebelumnya) &&
+          !RE_BUKAN_RESEP.test(sesudahnya) &&
           !RE_TABRAKAN.test(sebelumnya)
         ) keluar.push(obat)
         break
