@@ -14,6 +14,7 @@ import { KolomPelatih } from '../components/KolomPelatih'
 import { usahaTerbaik, kemajuanTarget, type Target, type JenisTarget, type PeriodeTarget } from '../lib/analisisPro'
 import { getDemo } from '../lib/profile'
 import { useVitals } from '../lib/useVitals'
+import { GrafikOlahraga } from '../components/GrafikOlahraga'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // History Latihan — sesi nyata beserta deret detak jantung per menit.
@@ -115,6 +116,16 @@ export function WorkoutHistory() {
       {/* Kolom pelatih ditaruh paling atas: pertanyaan yang dibawa orang saat
           membuka halaman ini adalah "berikutnya apa", bukan "berapa totalnya". */}
       <KolomPelatih workouts={workouts} konteks={konteks} />
+
+      {/* Angka sehari-hari ditaruh tepat setelah kolom pelatih dan SEBELUM
+          daftar sesi. Yang dibawa orang saat membuka halaman ini setelah
+          "berikutnya apa" adalah "bagaimana perkembangan saya" — dan itu
+          dijawab oleh bentuk grafiknya, bukan oleh daftar sesi satu per satu.
+          Daftar sesi menjawab pertanyaan yang berbeda: "sesi Selasa itu
+          bagaimana", dan itu datang belakangan. */}
+      <Card>
+        <GrafikOlahraga workouts={workouts} hrMax={hrMax} />
+      </Card>
 
       {/* Target — dibuat bisa diatur langsung di sini agar perencanaan tidak
           perlu berpindah halaman. */}
