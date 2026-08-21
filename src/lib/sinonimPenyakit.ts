@@ -198,6 +198,82 @@ export const SINONIM_PENYAKIT: Record<string, string[]> = {
   'post herpetic neuralgia': ['herpes zoster'],
   'vulnus laceratum': ['luka', 'vulnus'],
   'ankle sprain': ['sprain', 'trauma sendi'],
+
+  /*
+   * EJAAN YANG DIPAKAI REKAP UJIAN OSCE.
+   *
+   * Tabel ini kini dipakai DUA halaman: Daftar Penyakit dan Stasiun OSCE.
+   * Keduanya dahulu hanya mencocokkan huruf, dan keduanya gagal dengan cara
+   * yang sama — 'SLE' tidak menemukan 'Systemic Lupus Erythematosus',
+   * 'Pneumotoraks' tidak menemukan 'Spontaneous pneumothorax'. Rekap ditulis
+   * oleh peserta ujian yang berganti tiap periode selama sepuluh tahun, dengan
+   * ejaan campur Indonesia dan Inggris, sehingga di halaman itulah kegagalan
+   * ini paling sering terjadi.
+   *
+   * SASARANNYA SENGAJA DIPILIH YANG BERLAKU DI KEDUA TEMPAT bila mungkin.
+   * 'sle' menunjuk 'lupus eritematosus sistemik' (nama di daftar SKDI) DAN
+   * 'systemic lupus' (nama di rekap), supaya satu baris menolong keduanya.
+   */
+  sle: ['lupus eritematosus sistemik', 'systemic lupus'],
+  lupus: ['lupus eritematosus sistemik', 'systemic lupus'],
+  pneumotoraks: ['pneumothorax'],
+  hematotoraks: ['haematothorax', 'hemothorax'],
+  'ketoasidosis diabetik': ['kad'],
+  ketoasidosis: ['kad'],
+  bppv: ['bppv', 'vertigo posisi'],
+  'vertigo posisi': ['bppv'],
+  tth: ['tension type headache', 'nyeri kepala tegang'],
+  'nyeri kepala tegang': ['tension type headache'],
+  'sakit kepala tegang': ['tension type headache'],
+  ptsd: ['post traumatic stress', 'stres pascatrauma'],
+  'stres pascatrauma': ['post traumatic stress'],
+  kds: ['kejang demam'],
+  oma: ['otitis media akut'],
+  'otitis media akut': ['oma'],
+  omsk: ['otitis media supuratif kronik'],
+  ome: ['otitis media efusi'],
+  svt: ['supraventricular', 'supraventrikular takikardia'],
+  'takikardia supraventrikular': ['supraventricular', 'svt'],
+  'blok av': ['av block', 'atrioventricular block'],
+  'av block': ['blok av'],
+  bradikardia: ['bradiaritmia', 'av block'],
+  'batuk rejan': ['pertusis'],
+  'batuk seratus hari': ['pertusis'],
+  'kaki gajah': ['filariasis'],
+  elefantiasis: ['filariasis'],
+  'sindrom metabolik': ['sindroma metabolik'],
+  'sindroma metabolik': ['sindrom metabolik'],
+  dislipidemi: ['dislipidemia'],
+  'kolesterol tinggi': ['dislipidemia', 'hiperkolesterolemia'],
+  'batu empedu': ['kolelitiasis', 'kolelithiasis'],
+  cholelithiasis: ['kolelitiasis'],
+  cholecystitis: ['kolesistitis'],
+  bv: ['bakterial vaginosis', 'vaginosis'],
+  'vaginosis bakterialis': ['bakterial vaginosis', 'bv'],
+  'puting lecet': ['cracked nipple'],
+  'radang payudara': ['mastitis'],
+  'kurap': ['tinea'],
+  'kadas': ['tinea'],
+  'panu': ['pitiriasis versikolor', 'versicolor'],
+  'tinea korporis': ['tinea corporis'],
+  'tinea corporis': ['tinea korporis'],
+  'eksim': ['dermatitis'],
+  'ketombe': ['dermatitis seboroik'],
+  'cacar ular': ['herpes zoster'],
+  'dompo': ['herpes zoster'],
+  'sinusitis maksilaris': ['sinusitis maxilaris', 'rhinosinusitis'],
+  'sinusitis maxilaris': ['sinusitis maksilaris'],
+  'radang amandel': ['tonsilitis'],
+  amandel: ['tonsilitis'],
+  'mimisan': ['epistaksis'],
+  'kotoran telinga': ['serumen'],
+  'congek': ['otitis media'],
+  cts: ['carpal tunnel'],
+  'terowongan karpal': ['carpal tunnel'],
+  gnaps: ['glomerulonefritis'],
+  pid: ['pelvic inflammatory'],
+  'radang panggul': ['pelvic inflammatory', 'pid'],
+
   'inverted nipple': ['kelainan puting'],
   'cracked nipple': ['kelainan puting'],
 }
@@ -213,9 +289,37 @@ export function sinonimUntuk(ketikan: string): string[] {
   if (!q) return []
   const keluar = new Set<string>()
   for (const [kata, padanan] of Object.entries(SINONIM_PENYAKIT)) {
-    if (q === kata || q.includes(kata)) padanan.forEach((p) => keluar.add(p))
+    if (q === kata || mengandungKata(q, kata)) padanan.forEach((p) => keluar.add(p))
   }
   return [...keluar]
+}
+
+/**
+ * Apakah `q` mengandung `kata` SEBAGAI KATA UTUH, bukan sekadar potongan huruf.
+ *
+ * CACAT YANG MELAHIRKAN FUNGSI INI. Pencocokannya semula `q.includes(kata)` —
+ * potongan huruf di mana saja. Padanan berupa singkatan pendek membuatnya
+ * meledak: 'oma' terkandung di dalam glaukOMA, lipOMA, melanOMA, kondilOMA,
+ * trakOMA, dan sindrOMA nefrotik; 'ome' di dalam glOMErulonefritis; 'pid' di
+ * dalam ePIDidimitis; dan 'af' — yang sudah ada di tabel ini sejak awal — di
+ * dalam AFasia. Akibatnya yang mencari 'glaukoma akut' ikut memperoleh otitis
+ * media akut, dan yang mencari 'afasia' memperoleh fibrilasi atrial.
+ *
+ * Ini persis kesalahan yang sudah berkali-kali terjadi di sini: pencocokan
+ * longgar yang menautkan penyakit yang keliru. Batas kata menyelesaikannya
+ * tanpa mengorbankan satu pun padanan yang sah — 'AF', 'SVT', dan 'OMA' tetap
+ * ketemu bila memang itu yang diketik.
+ */
+function mengandungKata(q: string, kata: string): boolean {
+  let dari = 0
+  for (;;) {
+    const i = q.indexOf(kata, dari)
+    if (i < 0) return false
+    const sebelum = i === 0 ? '' : q[i - 1]
+    const sesudah = q[i + kata.length] ?? ''
+    if (!/[a-z0-9]/.test(sebelum) && !/[a-z0-9]/.test(sesudah)) return true
+    dari = i + 1
+  }
 }
 
 export default SINONIM_PENYAKIT

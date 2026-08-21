@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { sinonimUntuk } from '../lib/sinonimPenyakit'
 import { hitungKasus, ringkasPerSistem, ringkasSeluruh, periodeTerurut, type HitunganKasus } from '../lib/analisisOsce'
 import { catatanStasiun } from '../lib/osceStationNoteAliases'
 import { CatatanStasiunKartu } from '../components/CatatanStasiunKartu'
@@ -74,7 +75,25 @@ export function OsceUkmppd() {
     const q = cari.trim().toLowerCase()
     let d = semua
     if (sistem) d = d.filter((k) => k.sistem === sistem)
-    if (q) d = d.filter((k) => k.label.toLowerCase().includes(q) || k.kunci.includes(q))
+    // PENCARIAN IKUT MEMAKAI TABEL SINONIM.
+    //
+    // CACAT YANG MELAHIRKAN BARIS INI. Halaman ini hanya mencocokkan huruf.
+    // Yang mengetik 'SLE' tidak menemukan 'Systemic Lupus Erythematosus', dan
+    // yang mengetik 'Pneumotoraks' tidak menemukan 'Spontaneous pneumothorax'
+    // — padahal keduanya ADA di rekap dan catatannya sudah lengkap. Ini cacat
+    // yang sama persis dengan yang dahulu membuat pencarian 'Gout' gagal di
+    // Daftar Penyakit; hanya halamannya yang berbeda, dan tabelnya sudah ada.
+    //
+    // Rekap ditulis banyak orang selama sepuluh tahun dengan ejaan campur
+    // Indonesia dan Inggris, sehingga di sinilah tabel itu justru paling
+    // dibutuhkan.
+    if (q) {
+      const lain = sinonimUntuk(q)
+      d = d.filter((k) => {
+        const l = k.label.toLowerCase()
+        return l.includes(q) || k.kunci.includes(q) || lain.some((s) => l.includes(s))
+      })
+    }
     return d.slice(0, 120)
   }, [semua, sistem, cari])
 
