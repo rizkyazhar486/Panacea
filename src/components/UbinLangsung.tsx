@@ -171,7 +171,17 @@ function UbinLongevity() {
 // dan lama sesi, tidak dari darah maupun otot. Karena itu angkanya tidak punya
 // satuan yang berarti di luar dirinya sendiri, dan yang dibaca adalah ARAH dan
 // SELISIHNYA. Dasar keputusannya ikut ditulis supaya dapat dibantah.
-export function UbinPelatihLebar() {
+/**
+ * Hitungan ubin pelatih, DIPISAH DARI KOMPONENNYA.
+ *
+ * Papan widget perlu tahu lebih dahulu apakah ubin ini akan berisi, sebab
+ * halaman tumpukan yang dapat digeser ke sana lalu kosong adalah cacat yang
+ * paling membingungkan dari tumpukan. Memanggil komponennya untuk memeriksa
+ * itu bukan pilihan — komponen React yang dipanggil sebagai fungsi biasa
+ * menjalankan hook-nya di luar pohon render dan menjatuhkan seluruh halaman.
+ * Maka pemeriksaannya dilakukan di sini, tanpa hook sama sekali.
+ */
+export function hitungPelatih() {
   const sesi = getWorkouts()
   if (sesi.length < 3) return null
   const demo = getDemo()
@@ -186,6 +196,16 @@ export function UbinPelatihLebar() {
   const ff = kebugaranKesegaran(sesi, k, 90)
   const kini = ff.length ? ff[ff.length - 1] : null
   if (!kini) return null
+  // Bila modelnya tidak dapat dihitung, ubin ini TIDAK ADA — lebih baik
+  // daripada tiga angka "NaN" yang terbaca sebagai aplikasi yang rusak.
+  if (![kini.kebugaran, kini.kelelahan, kini.kesegaran].every(Number.isFinite)) return null
+  return { sesi, k, kini }
+}
+
+export function UbinPelatihLebar() {
+  const hasil = hitungPelatih()
+  if (!hasil) return null
+  const { sesi, k, kini } = hasil
   const saran = saranBerikutnya(sesi, k)
 
   return (

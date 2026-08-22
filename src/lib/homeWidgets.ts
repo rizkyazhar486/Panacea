@@ -102,6 +102,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'konsistensi', label: 'Konsistensi', ringkas: 'Hari tercatat 12 pekan', ke: '/harian', emoji: '🟩', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'longevity', label: 'Longevity', ringkas: 'Umur panjang berbasis bukti', ke: '/longevity', emoji: '🌱', kategori: 'Tubuh & Data' },
   { id: 'nutrisi', label: 'Gizi', ringkas: 'Asupan hari ini', ke: '/nutrition', emoji: '🥗', kategori: 'Gizi', bawaan: true },
   { id: 'macroLab', label: 'Macro Lab', ringkas: 'Susun makro sesuai sasaran', ke: '/macro-lab', emoji: '🍽️', kategori: 'Gizi' },
@@ -267,6 +268,7 @@ export const WIDGET_HIDUP = [
   'detakJantung',   // denyut istirahat + garis
   'longevity',      // kapasitas aerobik + selisih MET
   'salat',          // salat berikutnya + hitungan mundur
+  'konsistensi',    // peta 12 pekan: hari mana saja yang tercatat
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

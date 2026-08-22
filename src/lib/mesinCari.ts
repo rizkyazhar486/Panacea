@@ -49,6 +49,33 @@ let sedangMembangun: Promise<Butir[]> | null = null
 /** Kata kunci yang menandai sebuah halaman sebagai kalkulator/skor. */
 const PENANDA_HITUNG = /skor|score|kalkulator|calculator|kriteria|rule|index|indeks|gradient|clearance|osmolality|calcium/i
 
+// Rute yang mengandung kata "skor" tetapi BUKAN kalkulator klinis. Tanpa
+// daftar ini, "Skor Olahraga" — papan hasil pertandingan — digolongkan ke
+// "Kalkulator & skor" dan tenggelam di antara empat puluhan skor klinis, jadi
+// orang yang mencarinya menyimpulkan halaman itu tidak ada.
+const BUKAN_HITUNG = new Set(['/sports-scores'])
+
+/**
+ * Kata lain untuk sebuah halaman.
+ *
+ * Nama halaman ditulis dalam satu bahasa, sedangkan yang diketik orang bisa
+ * bahasa yang lain atau nama bendanya langsung: "score", "bola", "liga",
+ * "champions". Padanan ini ikut ke dalam kolom pencarian tetapi tidak
+ * ditampilkan, sehingga judulnya tetap satu bahasa.
+ */
+const PADANAN: Record<string, string> = {
+  '/sports-scores': 'score sports bola sepak bola basket liga klasemen pertandingan jadwal klub tim favorit ufc mma nba liga champions',
+  '/nutrition': 'nutrition makan kalori gizi kkal makro protein karbohidrat lemak',
+  '/latihan': 'workout exercise olahraga lari sesi kardio',
+  '/latihan-beban': 'gym angkat beban strength lifting repetisi set',
+  '/pola-tidur': 'sleep tidur jam tidur begadang',
+  '/tubuh': 'body composition komposisi tubuh berat badan imt bmi lemak otot',
+  '/cari': 'search pencarian temukan',
+  '/med-study': 'belajar study penyakit skdi materi',
+  '/osce-ukmppd': 'osce ukmppd ujian stasiun tryout',
+  '/clinical-calculators': 'kalkulator klinis calculator rumus skor',
+}
+
 async function bangun(): Promise<Butir[]> {
   const [fitur, penjelasan, penyakit, obat, osce] = await Promise.all([
     import('./homeWidgets'),
@@ -63,13 +90,14 @@ async function bangun(): Promise<Butir[]> {
 
   // 1. Fitur — dari katalog widget (lengkap dengan ringkasannya).
   for (const w of fitur.WIDGETS) {
-    const hitung = PENANDA_HITUNG.test(`${w.label} ${w.ke}`)
+    const rute = w.ke.split('?')[0]
+    const hitung = !BUKAN_HITUNG.has(rute) && PENANDA_HITUNG.test(`${w.label} ${w.ke}`)
     out.push({
       jenis: hitung ? 'kalkulator' : 'fitur',
       judul: w.label,
       ringkas: w.ringkas,
       ke: w.ke,
-      cari: `${w.label} ${w.ringkas} ${w.kategori}`.toLowerCase(),
+      cari: `${w.label} ${w.ringkas} ${w.kategori} ${PADANAN[rute] ?? ''}`.toLowerCase(),
     })
   }
 
@@ -79,11 +107,11 @@ async function bangun(): Promise<Butir[]> {
     if (sudah.has(rute)) continue
     const nama = rute.replace(/^\//, '').replace(/-/g, ' ')
     out.push({
-      jenis: PENANDA_HITUNG.test(rute) ? 'kalkulator' : 'fitur',
+      jenis: !BUKAN_HITUNG.has(rute) && PENANDA_HITUNG.test(rute) ? 'kalkulator' : 'fitur',
       judul: nama.charAt(0).toUpperCase() + nama.slice(1),
       ringkas: teks,
       ke: rute,
-      cari: `${nama} ${teks}`.toLowerCase(),
+      cari: `${nama} ${teks} ${PADANAN[rute] ?? ''}`.toLowerCase(),
     })
   }
 

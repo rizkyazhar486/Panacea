@@ -23,8 +23,10 @@ import { UBIN_LANGSUNG } from './UbinLangsung'
 import { UbinGrafik, wilayahBergrafik } from './UbinGrafik'
 import { UbinPantauan } from './UbinPantauan'
 import { Tumpukan } from './Tumpukan'
-import { UbinPelatihLebar } from './UbinLangsung'
+import { UbinPelatihLebar, hitungPelatih } from './UbinLangsung'
 import { UbinSalat } from './UbinSalat'
+import { PetaKonsistensi } from './PetaKonsistensi'
+import { ambilRiwayat } from '../lib/riwayatVitals'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -493,6 +495,16 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   )
   const bilah = bilahTersedia(getVitals() as Record<string, unknown>)
 
+  // Peta konsistensi hanya masuk ke tumpukan bila ADA hari yang tercatat.
+  // Komponennya sendiri mengembalikan null saat kosong, dan halaman tumpukan
+  // yang kosong adalah halaman yang tetap bisa digeser ke sana lalu tidak
+  // menampilkan apa pun — cacat yang paling membingungkan dari tumpukan.
+  const adaJejak =
+    getWorkouts().length > 0 ||
+    (state.sleepLogs ?? []).length > 0 ||
+    Object.keys(state.wellness ?? {}).length > 0 ||
+    ambilRiwayat().length > 0
+
   return (
     <>
     {/* TUMPUKAN: widget lebar berbagi satu petak dan digeser mendatar.
@@ -512,12 +524,18 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
          Ketersediaan datanya diperiksa lewat lib, bukan dengan menjalankan
          komponennya. */
       anak={[
-        ...(pilihan.includes('kebugaran') && getWorkouts().length >= 3
+        ...(pilihan.includes('kebugaran') && hitungPelatih()
           ? [{ kunci: 'kebugaran', isi: <UbinPelatihLebar /> }] : []),
         ...(pilihan.includes('salat') ? [{ kunci: 'salat', isi: <UbinSalat /> }] : []),
         ...(pilihan.includes('pantauan') ? [{ kunci: 'pantauan', isi: <UbinPantauan /> }] : []),
+        ...(pilihan.includes('konsistensi') && adaJejak
+          ? [{ kunci: 'konsistensi', isi: <PetaKonsistensi /> }] : []),
+        ...((state.wallet?.balance ?? 0) > 0
+          ? [{ kunci: 'dompet', isi: <UbinDompet saldoLokal={state.wallet?.balance ?? 0} /> }] : []),
       ]}
     />
+
+    <BilahTubuh daftar={bilah} />
 
     <UbinGrafik />
 
@@ -534,13 +552,6 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         </div>
       </section>
     )}
-
-    {/* Kartu dompet hanya muncul bila memang ada saldo. Bagi yang tidak
-        memakai token, ia sebelumnya menempati satu kartu penuh di beranda
-        untuk menyatakan angka nol setiap hari. Halaman Tagihan tetap ada. */}
-    {(state.wallet?.balance ?? 0) > 0 && <UbinDompet saldoLokal={state.wallet?.balance ?? 0} />}
-
-    <BilahTubuh daftar={bilah} />
 
     <DaftarRincian baris={rincian} />
 

@@ -111,7 +111,13 @@ export function kebugaranKesegaran(
   for (const w of workouts) {
     const t = Date.parse(w.mulai)
     if (Number.isNaN(t)) continue
-    perHari.set(kunciHari(new Date(t)), (perHari.get(kunciHari(new Date(t))) ?? 0) + upayaRelatif(w, k).skor)
+    const upaya = upayaRelatif(w, k).skor
+    // Sesi yang tidak dapat diskor (denyut tidak terekam, lama sesi hilang)
+    // DILEWATI, bukan dihitung nol. Menjumlahkan NaN meracuni seluruh deret:
+    // satu sesi cacat membuat kebugaran, kelelahan, dan kesegaran ikut NaN,
+    // dan di layar itu terbaca sebagai "NaN" di ketiga angka sekaligus.
+    if (!Number.isFinite(upaya)) continue
+    perHari.set(kunciHari(new Date(t)), (perHari.get(kunciHari(new Date(t))) ?? 0) + upaya)
   }
 
   const mulai = new Date(sekarang - hariKeBelakang * 86400_000)

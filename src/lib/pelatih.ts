@@ -24,8 +24,12 @@ import type { Konteks } from './trainingPhysiology'
 export type JenisSesi = 'pemulihan' | 'easy' | 'long' | 'tempo' | 'interval' | 'sprint' | 'kekuatan' | 'lainnya'
 export type Olahraga = 'lari' | 'sepeda' | 'renang' | 'kekuatan' | 'lainnya'
 
-export function olahragaDari(nama: string): Olahraga {
-  const n = nama.toLowerCase()
+export function olahragaDari(nama: string | undefined | null): Olahraga {
+  // Nama boleh kosong. Penjaga bentuk di workoutStore tidak menuntut nama,
+  // sehingga satu sesi lama tanpa nama pernah menjatuhkan SELURUH beranda ke
+  // layar galat — satu ruas yang hilang menghapus semua angka orang itu.
+  // Sesi tanpa nama tetap terhitung, hanya jenis olahraganya yang tak dikenali.
+  const n = (nama ?? '').toLowerCase()
   if (/run|lari|jog|treadmill|marathon/.test(n)) return 'lari'
   if (/cycl|bike|sepeda|ride|spin/.test(n)) return 'sepeda'
   if (/swim|renang|pool/.test(n)) return 'renang'
