@@ -9,7 +9,7 @@ import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
 import { parseWorkouts, hrMaxFromAge, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
 import { getDemo } from '../lib/profile'
-import { sebaranIntensitas, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
+import { sebaranIntensitas, sebaranPerMinggu, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
@@ -166,6 +166,27 @@ export function AnalisisPro() {
                   </span>
                 )}
               </div>
+              {/* Pita rasio. Batas 0,8 dan 1,3 digambar sebagai RAMBU, dengan
+                  keterangannya ikut tertulis — bukan sebagai zona aman. */}
+              {laju.rasio !== null && (
+                <div className="mt-2">
+                  <div className="relative h-2.5 overflow-hidden rounded-full bg-neutral-200 dark:bg-white/10">
+                    <span className="absolute inset-y-0 bg-emerald-500/30" style={{ left: `${(0.8 / 2) * 100}%`, right: `${100 - (1.3 / 2) * 100}%` }} />
+                    <span
+                      className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full border-2 border-white shadow"
+                      style={{ left: `calc(${Math.min(100, Math.max(0, (laju.rasio / 2) * 100))}% - 7px)`, background: laju.warna }}
+                    />
+                  </div>
+                  <div className="mt-1 flex justify-between text-[10px] tabular-nums text-neutral-400">
+                    <span>0</span><span>0,8</span><span>1,3</span><span>2,0</span>
+                  </div>
+                  <p className="mt-1 text-[11px] leading-snug text-neutral-500">
+                    Pita hijau 0,8–1,3 berasal dari Gabbett (2016), Br J Sports Med 50:273-80 pada atlet tim. Kerangka ini
+                    dikritik keras — Impellizzeri dkk. (2020), Br J Sports Med 54:1245-6 menunjukkan rasio semacam ini dapat
+                    memperlihatkan kaitan bahkan pada data acak. Bacalah sebagai rambu, <b>bukan</b> batas aman.
+                  </p>
+                </div>
+              )}
               <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{laju.arti}</p>
               {laju.kmPekanLalu > 0 && (
                 <p className="mt-1 text-[11px] text-slate-500">
@@ -377,12 +398,13 @@ export default AnalisisPro
 function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: number }) {
   const sebar = useMemo(() => sebaranIntensitas(workouts, hrMax), [workouts, hrMax])
   const hanyut = useMemo(() => hanyutanDenyut(workouts), [workouts])
+  const perMinggu = useMemo(() => sebaranPerMinggu(workouts, hrMax), [workouts, hrMax])
   const vol = useMemo(() => volumeMingguan(workouts), [workouts])
   const rekor = useMemo(() => usahaTerbaik(workouts), [workouts])
   const acuan = rekor.find((r) => !r.diskalakan) ?? rekor[0]
   const ramal = useMemo(() => (acuan ? perkiraanRiegel(acuan.jarakKm, acuan.detik) : null), [acuan])
 
-  if (!sebar && !vol && !ramal && !hanyut.length) return null
+  if (!sebar && !vol && !ramal && !hanyut.length && !perMinggu.length) return null
   const maxKm = vol ? Math.max(...vol.minggu.map((m) => m.km), 1) : 1
 
   return (
@@ -417,6 +439,32 @@ function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: nu
               ? 'Ini sejalan dengan pola yang diamati pada atlet ketahanan terlatih.'
               : 'Pola pada atlet ketahanan terlatih sekitar 80% mudah; bagian sedang yang besar adalah yang paling sering menahan kemajuan.'}{' '}
             <span className="opacity-75">Seiler &amp; Kjerland (2006), Scand J Med Sci Sports 16:49-56 — pola yang DIAMATI pada atlet terlatih, bukan resep bagi semua orang.</span>
+          </p>
+        </div>
+      )}
+
+      {perMinggu.length > 0 && (
+        <div className="mt-5">
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Sebaran per minggu</h3>
+          <div className="mt-2 space-y-1.5">
+            {perMinggu.map((m) => (
+              <div key={m.mulai} className="flex items-center gap-2">
+                <span className="w-16 shrink-0 text-[10px] tabular-nums text-neutral-500">{m.mulai.slice(5)}</span>
+                <span className="flex h-3.5 flex-1 overflow-hidden rounded-full">
+                  {[
+                    { p: m.persen[0], c: '#34d399' },
+                    { p: m.persen[1], c: '#fbbf24' },
+                    { p: m.persen[2], c: '#f87171' },
+                  ].map((x, i) => <span key={i} style={{ width: `${x.p}%`, background: x.c }} />)}
+                </span>
+                <span className="w-10 shrink-0 text-right text-[10.5px] font-bold tabular-nums text-neutral-500">
+                  {Math.round(m.persen[0])}%
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
+            Angka di kanan adalah bagian yang mudah. Minggu tanpa denyut terekam tidak muncul — bukan digambar kosong.
           </p>
         </div>
       )}

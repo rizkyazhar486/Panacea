@@ -170,3 +170,38 @@ export function perkiraanRiegel(dariKm: number, dariDetik: number): Perkiraan | 
     })),
   }
 }
+
+// ACWR TIDAK DIHITUNG DI BERKAS INI. Ia sudah ada sebagai lajuBeban() di
+// analisisPro.ts, lengkap dengan penanganan riwayat pendek dan keterangan
+// bahwa rentang 0,8-1,3 masih diperdebatkan. Menulis ulang perhitungan yang
+// sama di dua tempat adalah cara paling pasti membuat dua angka berbeda muncul
+// untuk data yang sama - itu sudah pernah terjadi di proyek ini.
+
+// ── 6. Sebaran intensitas per minggu ───────────────────────────────────────
+
+export interface MingguSebaran {
+  mulai: string
+  persen: [number, number, number]
+  menit: number
+}
+
+export function sebaranPerMinggu(
+  sesi: ImportedWorkout[],
+  hrMax: number,
+  jumlahMinggu = 6,
+  sekarang = Date.now(),
+): MingguSebaran[] {
+  if (!(hrMax > 0)) return []
+  const keluar: MingguSebaran[] = []
+  for (let i = jumlahMinggu - 1; i >= 0; i--) {
+    const akhir = sekarang - i * 7 * HARI
+    const dalam = sesi.filter((w) => {
+      const t = Date.parse(w.mulai)
+      return t >= akhir - 7 * HARI && t < akhir
+    })
+    const s = sebaranIntensitas(dalam, hrMax)
+    if (!s) continue
+    keluar.push({ mulai: new Date(akhir - 7 * HARI).toISOString().slice(0, 10), persen: s.persen, menit: s.totalMenit })
+  }
+  return keluar
+}
