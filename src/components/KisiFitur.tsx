@@ -121,7 +121,12 @@ export function KisiFitur() {
     return [...peta.entries()]
   }, [])
 
-  const terlihat = pilih ? kelompok.filter(([k]) => k === pilih) : kelompok
+  // Tanpa kelompok terpilih, kisi ini dulu membentangkan SELURUH kelompok
+  // sekaligus — beranda menjadi 5.700 px, dan bagian yang paling berguna
+  // (angka tubuh dan pintasan pilihan sendiri) terdorong jauh ke atas layar
+  // oleh daftar yang tidak dicari siapa pun. Sekarang keping kelompoknya saja
+  // yang tampak; kisinya terbuka setelah ada yang dipilih atau diketik.
+  const terlihat = pilih ? kelompok.filter(([k]) => k === pilih) : []
 
   useEffect(() => { if (cariBuka) kotak.current?.focus() }, [cariBuka])
 
@@ -277,9 +282,15 @@ export function KisiFitur() {
         ))}
       </div>
 
-      <div className="j-grup">
-        {terlihat.map(([k, d]) => <Bagian key={k} kategori={k} daftar={d} />)}
-      </div>
+      {terlihat.length ? (
+        <div className="j-grup">
+          {terlihat.map(([k, d]) => <Bagian key={k} kategori={k} daftar={d} />)}
+        </div>
+      ) : (
+        <p className="t-kecil px-1 leading-snug text-neutral-500">
+          Pilih kelompok di atas, atau ketik untuk mencari di {WIDGETS.length} fitur.
+        </p>
+      )}
         </>
       )}
     </section>

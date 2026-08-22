@@ -337,6 +337,13 @@ export default function Beranda() {
     [state.foods, state.sleepLogs, account, segar],
   )
 
+  // Kartu "Tubuh" dibuang bila angkanya sama dengan yang sudah berdiri besar di
+  // panel atas. Denyut 58 yang muncul dua kali dalam satu layar tidak menambah
+  // keterangan apa pun; ia hanya membuat layar terasa lebih penuh daripada
+  // isinya. Bila angka tubuhnya lain (mis. hanya tekanan darah), kartunya tetap.
+  const angkaAtas = kpi.map((k) => k.nilai)
+  const pratinjauTampil = pratinjau.filter((p) => p.id !== 'tubuh' || !angkaAtas.includes(p.nilai))
+
   return (
     // `fluid` menjadikan pembungkus ini WADAH UKUR: seluruh cqw di dalamnya
     // mengukur lebar kotak ini, bukan lebar layar. Itulah sebabnya halaman ini
@@ -384,7 +391,7 @@ export default function Beranda() {
       {/* Pratinjau isi fitur, tepat di bawah panel angka: pertanyaan "bagaimana
           keadaan saya" terjawab tanpa satu pun ketukan, dan kisi lambang di
           bawahnya tinggal mengurus "ke mana saya pergi". */}
-      <PapanWidget pratinjau={pratinjau} tanggalCatatan={tanggalCatatan} />
+      <PapanWidget pratinjau={pratinjauTampil} tanggalCatatan={tanggalCatatan} />
 
       {/* Catatan harian ditaruh SESUDAH pratinjau, bukan sebelumnya.
           Kartu pratinjau menjawab "bagaimana keadaan saya"; catatan harian

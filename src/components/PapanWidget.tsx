@@ -382,8 +382,7 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
           bukan penilaian, dan halaman rentang rujukanlah yang punya ruang untuk
           menyebut populasi pembanding serta ragam hariannya. */}
       <p className="t-mikro mt-1 leading-snug text-neutral-400">
-        Angka apa adanya dari perangkat Anda, dibandingkan dengan KEBIASAAN ANDA SENDIRI — bukan dengan orang lain,
-        dan bukan penilaian sehat atau sakit. Ketuk untuk melihat rentang rujukan medisnya.
+        Dibandingkan dengan kebiasaan Anda sendiri, bukan penilaian sehat atau sakit. Ketuk untuk rentang rujukannya.
       </p>
     </section>
   )
@@ -432,8 +431,20 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   // Tekanan darah didahulukan karena ia satu-satunya baris berisi dua angka,
   // dan menaruhnya di tengah daftar memutus keselarasan kolom angkanya.
+  /*
+   * BERAT, NADI DAN TENSI TIDAK DIULANG DI SINI.
+   *
+   * Ketiganya sudah berdiri sebagai angka besar di panel atas beranda. Sebelum
+   * ini denyut 58 muncul tiga kali pada satu layar dan berat dua kali, dan
+   * pengulangan itu membuat daftar rincian terbaca seperti salinan, bukan
+   * seperti keterangan tambahan. Yang tersisa di sini justru yang TIDAK ada di
+   * atas: VO2max, lama tidur, langkah, dan seterusnya.
+   */
+  const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td']
   const td = barisTekananDarah()
-  const rincian = td ? [td, ...rincianBeranda()] : rincianBeranda()
+  const rincian = (td ? [td, ...rincianBeranda()] : rincianBeranda()).filter(
+    (b) => !DI_PANEL_ATAS.includes(b.kunci),
+  )
   const bilah = bilahTersedia(getVitals() as Record<string, unknown>)
 
   return (
@@ -447,7 +458,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
       </div>
     </section>
 
-    <UbinDompet saldoLokal={state.wallet?.balance ?? 0} />
+    {/* Kartu dompet hanya muncul bila memang ada saldo. Bagi yang tidak
+        memakai token, ia sebelumnya menempati satu kartu penuh di beranda
+        untuk menyatakan angka nol setiap hari. Halaman Tagihan tetap ada. */}
+    {(state.wallet?.balance ?? 0) > 0 && <UbinDompet saldoLokal={state.wallet?.balance ?? 0} />}
 
     <BilahTubuh daftar={bilah} />
 
