@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from './Logo'
-import { KATALOG_AKSI, ambilAksi } from '../lib/aksiFab'
+import { KATALOG_AKSI, ambilAksi, SLOT_PER_HALAMAN } from '../lib/aksiFab'
 import { PemilihAksiFab } from './PemilihAksiFab'
 import { toggleTheme } from '../lib/theme'
 
@@ -100,6 +100,26 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   const [menggeser, setMenggeser] = useState(false)
   const [aturBuka, setAturBuka] = useState(false)
   const [pilihan, setPilihan] = useState<string[]>(ambilAksi)
+  /* SAMAR SAAT DIAM, JELAS SAAT DISENTUH — persis seperti tombol bantu ponsel.
+     Tombol yang selalu pekat menutupi isi bacaan di sudut layar sepanjang
+     waktu. Ia tidak pernah dibuat HILANG: tombol yang benar-benar tidak
+     terlihat adalah tombol yang tidak dapat ditemukan lagi oleh orang yang
+     baru memasangnya. Yang dipilih adalah samar — cukup untuk tidak
+     mengganggu, cukup untuk masih terlihat. */
+  const [redup, setRedup] = useState(false)
+  const jamRedup = useRef<number | null>(null)
+  const bangunkan = useCallback(() => {
+    setRedup(false)
+    if (jamRedup.current) window.clearTimeout(jamRedup.current)
+    jamRedup.current = window.setTimeout(() => setRedup(true), 2600)
+  }, [])
+  useEffect(() => {
+    bangunkan()
+    return () => { if (jamRedup.current) window.clearTimeout(jamRedup.current) }
+  }, [bangunkan])
+  /* Halaman ke berapa dari menu yang sedang tampak. */
+  const [halaman, setHalaman] = useState(0)
+  const geser = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const on = () => setPilihan(ambilAksi())
     window.addEventListener('panacea:aksi-fab', on)
@@ -112,6 +132,10 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   // Menu ditutup setiap kali berpindah halaman. Tanpa ini menu tetap terbuka
   // menutupi halaman baru, dan orang mengira halamannya yang tidak berganti.
   useEffect(() => { setBuka(false) }, [lokasi.pathname])
+
+  // Menu yang terbuka tidak boleh meredup, dan menu yang ditutup memulai
+  // hitungan meredup dari awal.
+  useEffect(() => { if (buka) { setRedup(false); setHalaman(0) } else bangunkan() }, [buka, bangunkan])
 
   // Layar bisa berputar maupun berubah ukuran; posisi yang tersimpan untuk
   // layar tegak akan berada di luar layar saat mendatar.
@@ -135,9 +159,10 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   }, [buka])
 
   const turun = useCallback((e: React.PointerEvent) => {
+    bangunkan()
     awal.current = { px: e.clientX, py: e.clientY, x: pos.x, y: pos.y, geser: false }
     ref.current?.setPointerCapture(e.pointerId)
-  }, [pos])
+  }, [pos, bangunkan])
 
   const gerak = useCallback((e: React.PointerEvent) => {
     const a = awal.current
@@ -181,23 +206,25 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   // Rata kanan bila tombol di paruh kanan, supaya daftar tidak melewati tepi.
   const keKiri = pos.x > window.innerWidth / 2
 
-  /* Letak tiap tindakan di dalam kisi 3x3: atas, kiri, kanan, bawah, lalu dua
-     sudut bawah. Tengahnya sengaja DIBIARKAN KOSONG — di situlah ibu jari
+  /* Letak tiap tindakan di dalam kisi 3x3: atas, kiri, kanan, bawah, lalu
+     keempat sudut. Tengahnya sengaja DIBIARKAN KOSONG — di situlah ibu jari
      mendarat sesudah mengetuk tombolnya, dan menaruh tindakan di sana membuat
-     orang menekan sesuatu yang tidak dimaksudnya. */
+     orang menekan sesuatu yang tidak dimaksudnya.
+
+     Delapan tempat per halaman, bukan enam: dua tempat yang dahulu dikosongkan
+     tidak menghemat apa pun — kisinya toh sudah selebar itu — sementara dua
+     tindakan lagi harus dibuang karenanya. */
   const TATA = [
     'col-start-2 row-start-1',
     'col-start-1 row-start-2',
     'col-start-3 row-start-2',
     'col-start-2 row-start-3',
     'col-start-1 row-start-3',
+    'col-start-3 row-start-3',
+    'col-start-1 row-start-1',
     'col-start-3 row-start-1',
   ]
 
-  /* Tindakan diambil dari pilihan pemakainya sendiri.
-     Slot terakhir SELALU "Ubah" — sebuah pengaturan yang hanya dapat
-     ditemukan lewat menu pengaturan yang lain tidak akan pernah ditemukan
-     oleh orang yang justru paling membutuhkannya. */
   const jalankan = (id: string) => {
     const a = KATALOG_AKSI.find((x) => x.id === id)
     if (!a) return
@@ -210,7 +237,6 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   const terpilih = pilihan
     .map((id) => KATALOG_AKSI.find((a) => a.id === id))
     .filter((a): a is (typeof KATALOG_AKSI)[number] => !!a)
-    .slice(0, TATA.length - 1)
 
   const aksi: { label: string; ikon: React.ReactNode; jalan: () => void; utama?: boolean }[] = [
     ...terpilih.map((a, i) => ({
@@ -225,6 +251,15 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
       jalan: () => setAturBuka(true),
     },
   ]
+
+  /* DIPOTONG MENJADI HALAMAN, BUKAN DIPADATKAN.
+     Enam belas tindakan pada satu kisi menuntut ikon sebesar 34 px, dan sasaran
+     sentuh sekecil itu meleset di tangan yang sedang berjalan. Halaman kedua
+     digeser mendatar seperti layar utama ponsel: ukuran tiap tombol tetap. */
+  const halamanAksi: typeof aksi[] = []
+  for (let i = 0; i < aksi.length; i += SLOT_PER_HALAMAN) {
+    halamanAksi.push(aksi.slice(i, i + SLOT_PER_HALAMAN))
+  }
 
   return (
     <>
@@ -262,30 +297,66 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
           <div
             role="menu"
             aria-label="Tindakan cepat"
-            /* Latar dipadatkan, bukan hanya kaca. Di atas halaman yang penuh angka,
-               menu tembus pandang membuat nama tindakan bertumpuk dengan tulisan
-               di belakangnya dan keduanya sama-sama sulit dibaca. */
-            className="kaca absolute grid grid-cols-3 grid-rows-3 place-items-center rounded-[28px] bg-white/90 p-2 backdrop-blur-xl dark:bg-neutral-900/92"
+            /* TEMBUS PANDANG DENGAN BURAM TEBAL, bukan panel pekat.
+               Panel pekat memotong halaman menjadi dua benda yang tidak
+               berhubungan. Keterbacaannya dijaga oleh buram dan penjenuhan
+               warna — cara yang sama dipakai tombol bantu ponsel — bukan
+               dengan menutup halaman di belakangnya. */
+            className="kaca absolute rounded-[28px] bg-white/62 p-2 shadow-xl backdrop-blur-2xl backdrop-saturate-150 dark:bg-neutral-900/58"
             style={{
               width: 208,
-              height: 208,
               [keAtas ? 'bottom' : 'top']: 64,
               [keKiri ? 'right' : 'left']: 0,
             } as React.CSSProperties}
           >
-            {aksi.map((t, i) => (
-              <button
-                key={t.label}
-                role="menuitem"
-                onClick={() => { setBuka(false); t.jalan() }}
-                className={`flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 ${TATA[i]} ${
-                  t.utama ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'
-                }`}
-              >
-                <span className="shrink-0">{t.ikon}</span>
-                <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{t.label}</span>
-              </button>
-            ))}
+            <div
+              ref={geser}
+              className="geser-aman flex snap-x snap-mandatory overflow-x-auto"
+              style={{ scrollbarWidth: 'none' }}
+              onScroll={(e) => {
+                const el = e.currentTarget
+                setHalaman(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
+              }}
+            >
+              {halamanAksi.map((hal, h) => (
+                <div
+                  key={h}
+                  className="grid w-full shrink-0 snap-center grid-cols-3 grid-rows-3 place-items-center"
+                  style={{ height: 192 }}
+                >
+                  {hal.map((t, i) => (
+                    <button
+                      key={t.label}
+                      role="menuitem"
+                      onClick={() => { setBuka(false); t.jalan() }}
+                      className={`flex h-[58px] w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 ${TATA[i]} ${
+                        t.utama ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="shrink-0">{t.ikon}</span>
+                      <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Titik halaman hanya ditarik bila memang ada halaman kedua.
+                Satu titik tunggal tidak memberi tahu apa pun dan hanya
+                menyisakan garis di bawah menu. */}
+            {halamanAksi.length > 1 && (
+              <div className="mt-1 flex items-center justify-center gap-1.5">
+                {halamanAksi.map((_, h) => (
+                  <button
+                    key={h}
+                    aria-label={`Halaman ${h + 1} dari ${halamanAksi.length}`}
+                    aria-current={h === halaman}
+                    onClick={() => geser.current?.scrollTo({ left: h * (geser.current?.clientWidth ?? 0), behavior: 'smooth' })}
+                    className={`h-1.5 rounded-full transition-all ${h === halaman ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-400/60'}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -305,8 +376,13 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
             height: UKURAN,
             touchAction: 'none',
             cursor: menggeser ? 'grabbing' : 'grab',
-            transition: menggeser ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1)',
+            transition: menggeser ? 'none' : 'transform 0.2s cubic-bezier(0.32,0.72,0,1), opacity 0.45s ease',
             transform: buka ? 'rotate(45deg)' : 'none',
+            // Samar hanya saat benar-benar diam. Nilainya tidak diturunkan di
+            // bawah 0,4: di bawah itu tombolnya tidak lagi lolos ambang beda
+            // terang WCAG terhadap latar terang, dan orang yang penglihatannya
+            // kurang kehilangan satu-satunya alat navigasi di halaman ini.
+            opacity: redup && !buka && !menggeser ? 0.42 : 1,
           }}
         >
           <span style={{ transform: buka ? 'rotate(-45deg)' : 'none' }}>

@@ -56,8 +56,9 @@ export function PemilihAksiFab({ tutup }: { tutup: () => void }) {
             })}
           </div>
           <p className="mt-3 text-[11px] leading-snug text-neutral-500">
-            Lima slot; tempat keenam selalu dipakai tombol Ubah ini. Bila sudah penuh dan Anda menyalakan yang baru, yang
-            paling lama dipilih otomatis dilepas — supaya tidak perlu mematikan sesuatu lebih dahulu.
+            Lima belas slot di atas dua halaman menu yang digeser mendatar; tempat terakhir selalu dipakai tombol Ubah
+            ini. Bila sudah penuh dan Anda menyalakan yang baru, yang paling lama dipilih otomatis dilepas — supaya tidak
+            perlu mematikan sesuatu lebih dahulu.
           </p>
         </div>
 

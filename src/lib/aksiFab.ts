@@ -6,14 +6,20 @@
 // yang mengurus orang tuanya ingin obat dan darurat. Menebak berarti salah
 // bagi sebagian besar dari mereka.
 //
-// LIMA SLOT, BUKAN ENAM. Menu lingkar punya enam tempat, dan satu di antaranya
-// SELALU dipakai "Ubah" — pengaturan yang hanya dapat ditemukan lewat halaman
-// pengaturan lain tidak akan pernah ditemukan orang yang paling membutuhkannya.
-// Sisanya lima.
+// LIMA BELAS SLOT DI ATAS DUA HALAMAN. Menunya bukan lagi satu kisi tunggal:
+// satu halaman memuat delapan tempat (kisi 3x3 dengan tengah dibiarkan kosong),
+// dan halaman kedua digeser mendatar seperti pada layar utama ponsel. Slot
+// terakhir SELALU "Ubah", jadi 15 + 1 = 16 = dua halaman penuh.
+//
+// MENGAPA BUKAN LIMA. Bentuk pertama hanya menyediakan lima tempat, dan lima
+// terlalu sedikit untuk orang yang memakai aplikasi ini dengan dua kepala
+// sekaligus — koas menjelang ujian DAN pelari. Tombol bantu pada ponsel pun
+// tidak berhenti di lima.
 //
 // Angka ini pernah salah: batasnya ditulis enam sementara menunya hanya
 // menggambar lima, sehingga tindakan keenam yang dipilih orang tersimpan tetapi
-// tidak pernah muncul. Ketahuan dari uji peramban, bukan dari kode.
+// tidak pernah muncul. Ketahuan dari uji peramban, bukan dari kode. Karena itu
+// SLOT_PER_HALAMAN ada di berkas ini, bukan ditulis ulang di komponennya.
 
 export type JenisAksi = 'rute' | 'kembali' | 'atas' | 'tema'
 
@@ -32,7 +38,7 @@ export const KATALOG_AKSI: AksiFab[] = [
   { id: 'beranda', label: 'Beranda', ikon: '⌂', jenis: 'rute', ke: '/' },
   { id: 'atas', label: 'Ke atas', ikon: '↑', jenis: 'atas' },
   { id: 'catat', label: 'Catat', ikon: '✎', jenis: 'rute', ke: '/harian' },
-  { id: 'sos', label: 'SOS', ikon: '✚', jenis: 'rute', ke: '/darurat' },
+  { id: 'sos', label: 'SOS', ikon: '✚', jenis: 'rute', ke: '/emergency' },
   { id: 'tema', label: 'Terang/gelap', ikon: '◐', jenis: 'tema' },
   { id: 'osce', label: 'OSCE', ikon: '🩺', jenis: 'rute', ke: '/osce-ukmppd' },
   { id: 'obat', label: 'Tatalaksana', ikon: '💊', jenis: 'rute', ke: '/med-study?bagian=therapy' },
@@ -43,9 +49,19 @@ export const KATALOG_AKSI: AksiFab[] = [
   { id: 'salat', label: 'Salat', ikon: '🕌', jenis: 'rute', ke: '/prayer-times' },
   { id: 'apotek', label: 'Apotek', ikon: '🏪', jenis: 'rute', ke: '/pharmacy' },
   { id: 'rs', label: 'Rumah sakit', ikon: '🏥', jenis: 'rute', ke: '/hospitals' },
+  { id: 'gizi', label: 'Gizi', ikon: '🥗', jenis: 'rute', ke: '/nutrition' },
+  { id: 'tidur', label: 'Tidur', ikon: '🌙', jenis: 'rute', ke: '/pola-tidur' },
+  { id: 'tubuh', label: 'Tubuh', ikon: '🫁', jenis: 'rute', ke: '/tubuh' },
+  { id: 'beban', label: 'Angkat beban', ikon: '🏋️', jenis: 'rute', ke: '/latihan-beban' },
+  { id: 'analisis', label: 'Analisis', ikon: '📊', jenis: 'rute', ke: '/analisis-pro' },
+  { id: 'semuaFitur', label: 'Semua fitur', ikon: '⊞', jenis: 'rute', ke: '/semua-fitur' },
+  { id: 'pengaturan', label: 'Pengaturan', ikon: '⚙', jenis: 'rute', ke: '/settings' },
 ]
 
-export const MAKS_AKSI = 5
+/** Tempat per halaman menu: kisi 3x3 dikurangi tengahnya yang dibiarkan kosong. */
+export const SLOT_PER_HALAMAN = 8
+
+export const MAKS_AKSI = 15
 const KUNCI = 'pmd-aksi-fab-v1'
 
 /** Bawaannya sengaja tindakan umum, bukan fitur khusus profesi mana pun. */
@@ -72,7 +88,7 @@ function simpan(daftar: string[]): string[] {
 /**
  * Menyalakan/mematikan satu tindakan.
  *
- * Bila sudah enam dan yang baru dinyalakan, yang PALING LAMA dipilih yang
+ * Bila sudah penuh dan yang baru dinyalakan, yang PALING LAMA dipilih yang
  * dibuang — bukan permintaannya yang ditolak. Menolak dengan pesan "sudah
  * penuh" memaksa orang mematikan sesuatu dahulu, dan itu dua langkah untuk
  * pekerjaan yang jelas maksudnya.
