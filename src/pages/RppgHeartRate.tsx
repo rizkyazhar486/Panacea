@@ -125,9 +125,9 @@ export function RppgHeartRate() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="rPPG Heart Rate (experimental)" subtitle="Estimate your pulse from your webcam — no wearable needed" />
+        <SectionTitle icon={<IconActivity size={20} />} title="rPPG Heart Rate (experimental)" subtitle="Perkirakan nadi Anda dari kamera — tanpa perlu perangkat pakai" />
         <p className="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">
-          <b>Experimental, not a medical device.</b> This estimates heart rate from subtle color changes
+          <b>Percobaan, bukan alat kesehatan.</b> This estimates heart rate from subtle color changes
           in your face caused by blood flow (remote photoplethysmography) — accuracy depends heavily on
           lighting, stillness, and skin tone contrast, and it is measurably less accurate than a real
           pulse oximeter or ECG. Don't use it for any medical decision.

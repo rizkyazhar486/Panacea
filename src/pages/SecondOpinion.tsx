@@ -50,7 +50,7 @@ function PatientView({ email }: { email: string }) {
   return (
     <>
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="AI drafts privately, a real doctor reviews before you see anything" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Request a Second Opinion" subtitle="AI menyusun draf secara tertutup, dokter sungguhan memeriksanya sebelum Anda melihat apa pun" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Describe your current diagnosis, treatment, symptoms, and relevant history. An AI assistant
           drafts a structured analysis, but <b>you will never see that draft</b> — a licensed doctor
@@ -135,7 +135,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
   return (
     <>
       <Card className="!p-5">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="AI drafts privately; your edited answer is what the patient receives" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="AI menyusun draf secara tertutup; jawaban Anda yang sudah disuntinglah yang diterima pasien" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tiap permintaan di bawah disertai analisis draf dari AI sebagai titik mulai. Suntinglah sebebasnya — pasien hanya melihat apa yang Anda kirim, tidak pernah drafnya.</Prosa>
       </Card>
 

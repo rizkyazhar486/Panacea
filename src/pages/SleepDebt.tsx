@@ -56,8 +56,8 @@ export function SleepDebt() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Debt Calculator" subtitle="The rolling gap between the sleep you need and what you get" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Log each night's sleep. Debt accumulates when you sleep less than you need — and unlike money, you can't fully "repay" it in one long lie-in, so the trend matters more than any single night. Adults generally need ≥7 hours (AASM).</Prosa>
+        <SectionTitle icon={<IconMoon size={20} />} title="Sleep Debt Calculator" subtitle="Selisih berjalan antara tidur yang Anda butuhkan dan yang benar-benar Anda dapatkan" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Catat tidur tiap malam. Utang menumpuk ketika Anda tidur kurang dari kebutuhan — dan tidak seperti uang, ia tidak dapat "dilunasi" penuh dengan sekali tidur panjang, sehingga trennya lebih penting daripada malam mana pun. Orang dewasa umumnya membutuhkan ≥7 jam (AASM).</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <label className="text-[12px] font-semibold text-neutral-500">
             My nightly sleep need (hours)

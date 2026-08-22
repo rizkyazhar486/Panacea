@@ -162,7 +162,7 @@ export function OrganVitality() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Anti-Aging & Organ Function" subtitle="The numbers, safe ranges & quality control behind healthy aging — not just wellness" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Anti-Aging & Organ Function" subtitle="Angka, rentang aman & kendali mutu di balik penuaan yang sehat — bukan sekadar kebugaran umum" />
         <div className="mt-3 flex gap-1.5">
           {([['organ', '🫀 Organ Panel'], ['kulit', '✨ Skin'], ['estetika', '💪 Safe Aesthetics']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setTab(k)} className={'flex-1 rounded-xl py-2 text-xs font-bold transition ' + (tab === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
@@ -239,7 +239,7 @@ export function OrganVitality() {
       {/* AESTHETIC + SAFETY */}
       {tab === 'estetika' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Body Composition Aesthetics — with a Safety Floor" subtitle="Optimal shape without sacrificing hormones, immunity & organs" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Estetika Komposisi Tubuh — dengan Batas Bawah Keselamatan" subtitle="Optimal shape without sacrificing hormones, immunity & organs" />
           <div className="mt-2 grid grid-cols-2 gap-3">
             <Field label="Sex">
               <select className={inputClass} value={g} disabled><option>{g === 'M' ? 'Male' : 'Female'}</option></select>

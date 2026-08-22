@@ -91,7 +91,7 @@ export function BodyBattery() {
       <SectionTitle
         icon={<IconActivity />}
         title="Body Battery"
-        subtitle="Energy reserve 0–100, computed from heart rate across the day"
+        subtitle="Cadangan tenaga 0–100, dihitung dari denyut jantung sepanjang hari"
       />
 
       <div className="flex gap-2">

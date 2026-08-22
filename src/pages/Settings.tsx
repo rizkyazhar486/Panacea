@@ -345,7 +345,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
       <SectionTitle
         icon={<span className={S ? 'text-2xl' : 'text-xl'}>💬</span>}
         title="Feedback & Suggestions"
-        subtitle="Send feedback straight to the developer — all of it gets read"
+        subtitle="Kirim masukan langsung ke pengembang — semuanya dibaca"
       />
       <div className={`flex flex-wrap ${S ? 'gap-2.5' : 'gap-1.5'}`}>
         {(['Suggestion', 'Problem/Bug', 'Question', 'Compliment', 'Feature Request'] as const).map((k) => (
@@ -360,7 +360,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
       <textarea
         className={`mt-3 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 ${S ? 'text-base' : 'text-sm'}`}
         rows={4}
-        placeholder="Write your message, suggestion, or issue…"
+        placeholder="Tulis pesan, saran, atau kendala Anda…"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />

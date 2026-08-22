@@ -60,7 +60,7 @@ export function CaffeineCalculator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Caffeine & Sleep Calculator" subtitle="How much caffeine is still in your system at bedtime" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Caffeine & Sleep Calculator" subtitle="Berapa banyak kafein yang masih tersisa di tubuh saat waktu tidur" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Caffeine clears the body by first-order kinetics (a fixed <i>fraction</i> per hour, not a fixed
           amount) with a plasma half-life that averages ~5 hours but genuinely varies — roughly

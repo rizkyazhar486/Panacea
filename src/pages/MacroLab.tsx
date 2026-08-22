@@ -183,7 +183,7 @@ function RateTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="The mechanical consequences of your assumptions" />
+        <SectionTitle icon={<IconToken size={18} />} title="Dampak perubahan suku bunga" subtitle="Akibat yang timbul dari asumsi Anda sendiri" />
         <div className="mt-3 space-y-3">
           <div>
             <div className="text-[12px] font-bold text-ink dark:text-ink">Perubahan suku bunga acuan</div>
@@ -339,7 +339,7 @@ function TradeTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Analisis perdagangan" subtitle="Balance sheet, disclosure, and how to read it" />
+        <SectionTitle icon={<IconToken size={18} />} title="Analisis perdagangan" subtitle="Neraca, keterbukaan, dan cara membacanya" />
         <div className="mt-3 grid gap-2">
           <Field label="Ekspor (miliar USD)"><input className={inputClass} inputMode="decimal" value={ex} onChange={(e) => setEx(e.target.value)} /></Field>
           <Field label="Impor (miliar USD)"><input className={inputClass} inputMode="decimal" value={im} onChange={(e) => setIm(e.target.value)} /></Field>

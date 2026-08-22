@@ -40,7 +40,7 @@ export function Verification() {
         <SectionTitle
           icon={<IconShield size={20} />}
           title="Verification Center"
-          subtitle="Two layers: Claude AI (accuracy & safety) then a Specialist/Subspecialist verifier"
+          subtitle="Dua lapis: AI (ketepatan & keselamatan) lalu verifikator Spesialis/Subspesialis"
           right={
             <label className="flex items-center gap-2 text-sm">
               <span className="text-neutral-500">Acting as:</span>
@@ -163,7 +163,7 @@ export function Verification() {
 
       {/* Contributor roster */}
       <Card>
-        <SectionTitle title="Contributors & Verifiers" subtitle="Authors must be verified before their materials appear" />
+        <SectionTitle title="Contributors & Verifiers" subtitle="Penulis harus terverifikasi sebelum materinya tampil" />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

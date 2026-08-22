@@ -76,7 +76,7 @@ export function AirQuality() {
         <SectionTitle
           icon={<IconActivity size={20} />}
           title="Air Quality & Respiratory Risk"
-          subtitle="Live local air quality with advice tailored to your lungs"
+          subtitle="Mutu udara setempat seketika, dengan saran yang disesuaikan untuk paru Anda"
           right={<button onClick={locate} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">📍 Refresh</button>}
         />
 

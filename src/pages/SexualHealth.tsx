@@ -248,7 +248,7 @@ export function SexualHealth() {
       <PeriodTracker />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Sexual & Reproductive Health Education" subtitle="Fertility, contraception, ANC, and sexual health — based on obstetric & gynecological science" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Sexual & Reproductive Health Education" subtitle="Kesuburan, kontrasepsi, ANC, dan kesehatan seksual — berdasarkan ilmu kebidanan & kandungan" />
         <div className="mt-3 space-y-2.5">
           {SEX_ED_TOPICS.map((t) => (
             <div key={t.title} className="rounded-xl border border-neutral-100 p-3">
@@ -260,7 +260,7 @@ export function SexualHealth() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconUsers size={20} />} title="Fertility Control & Contraceptive Options" subtitle="Compare contraceptive methods to suit your needs" />
+        <SectionTitle icon={<IconUsers size={20} />} title="Fertility Control & Contraceptive Options" subtitle="Bandingkan metode kontrasepsi sesuai kebutuhan Anda" />
         <div className="mt-3 space-y-2.5">
           {KB_METHODS.map((m) => (
             <div key={m.name} className="rounded-xl border border-neutral-100 p-3">

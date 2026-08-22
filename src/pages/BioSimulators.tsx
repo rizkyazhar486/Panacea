@@ -109,7 +109,7 @@ function TelomereAttrition() {
         <rect x="20" y="20" width={Math.max(4, (pct / 100) * 160)} height="20" rx="10" fill="#00BF63" />
       </svg>
       <p className="mt-2 text-[12px] text-neutral-500">Illustrative telomere length: <b>{Math.round(pct)}%</b> of reference baseline</p>
-      <Prosa kelas="mt-2 text-[11px] text-neutral-500">A stylized model from published average attrition rates — not a measurement of your actual telomere length, which requires a specialized lab (qPCR or flow-FISH) test.</Prosa>
+      <Prosa kelas="mt-2 text-[11px] text-neutral-500">Model yang disederhanakan dari laju pemendekan rata-rata yang sudah terbit — bukan pengukuran panjang telomer Anda yang sebenarnya, yang memerlukan pemeriksaan laboratorium khusus (qPCR atau flow-FISH).</Prosa>
     </Card>
   )
 }

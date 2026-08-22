@@ -52,7 +52,7 @@ export function AlcoholCalculator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconDrop size={20} />} title="Alcohol Unit & BAC Estimator" subtitle="Standard drinks and an educational blood-alcohol estimate" />
+        <SectionTitle icon={<IconDrop size={20} />} title="Alcohol Unit & BAC Estimator" subtitle="Takaran baku dan perkiraan kadar alkohol darah untuk belajar" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This uses the classic Widmark formula, the standard teaching model in forensic toxicology — but
           it is an <b>estimate from population averages</b>, not a breathalyzer reading. Food intake,

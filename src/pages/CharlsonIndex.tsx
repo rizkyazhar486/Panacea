@@ -67,7 +67,7 @@ export function CharlsonIndex() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Charlson Comorbidity Index" subtitle="Comorbidity burden & estimated 10-year survival (Charlson et al. 1987)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The most widely used comorbidity index — 19 weighted conditions plus an age adjustment. Where a mild and severe form of the same condition are both checked, only the severe form is scored (as in the original index).</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Indeks komorbiditas yang paling luas dipakai — 19 penyakit berbobot ditambah penyesuaian umur. Bila bentuk ringan dan berat dari penyakit yang sama sama-sama dicentang, hanya bentuk beratnya yang dihitung (sesuai indeks aslinya).</Prosa>
         <div className="mt-3 max-w-[200px]">
           <Field label="Age (years)">
             <input className={inputClass} type="number" min={18} max={110} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />

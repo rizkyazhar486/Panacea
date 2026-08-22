@@ -125,7 +125,7 @@ function NeatTracker() {
   }, [minutes])
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">NEAT (Non-Exercise Activity Thermogenesis) — walking, standing, fidgeting, chores — often burns more calories over a day than a single workout, and standing/walking hours correlate with better metabolic health independent of formal exercise.</Prosa>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">NEAT (Non-Exercise Activity Thermogenesis) — berjalan, berdiri, bergerak-gerak kecil, pekerjaan rumah — sering membakar lebih banyak kalori sehari daripada satu sesi latihan, dan jumlah jam berdiri/berjalan berkaitan dengan kesehatan metabolik yang lebih baik, terlepas dari olahraga terjadwal.</Prosa>
       <Field label="Standing/walking minutes today">
         <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => setMinutes((m) => ({ ...m, [today]: Number(e.target.value) || 0 }))} placeholder="0" />
       </Field>

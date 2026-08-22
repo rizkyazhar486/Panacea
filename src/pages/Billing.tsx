@@ -142,7 +142,7 @@ export function Billing() {
 
       {/* Plans */}
       <Card>
-        <SectionTitle title="Choose a Subscription Plan" subtitle="For individual clinicians as well as hospital institutions" />
+        <SectionTitle title="Choose a Subscription Plan" subtitle="Untuk tenaga medis perorangan maupun institusi rumah sakit" />
         <div className="grid gap-4 md:grid-cols-2">
           {PLANS.map((pl) => {
             const active = subscription.plan === pl.id

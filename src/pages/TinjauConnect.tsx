@@ -84,7 +84,7 @@ export function TinjauConnect() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle icon={<IconShield />} title="Connect Review"
-        subtitle="Account verification and decisions on reports — owner only" />
+        subtitle="Verifikasi akun dan keputusan atas laporan — khusus pemilik" />
 
       {galat && <Card className="!border-rose-500/30 !bg-rose-500/5"><p className="text-[12px] text-rose-600">{galat}</p></Card>}
       {muat && <Card><p className="text-[13px] text-neutral-500">Loading…</p></Card>}
@@ -130,7 +130,7 @@ export function TinjauConnect() {
                     </a>
                   )
                 })}
-                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-slate-500">Match the face in the selfie against the photo on their social account. Look at the posting history and join date too — an account created yesterday proves nothing.</Prosa>
+                <Prosa kelas="mt-1 text-[10px] leading-relaxed text-slate-500">Cocokkan wajah pada swafoto dengan foto di akun media sosialnya. Perhatikan juga riwayat unggahan dan tanggal bergabungnya — akun yang dibuat kemarin tidak membuktikan apa pun.</Prosa>
                 <Prosa kelas="mt-1 text-[10px] leading-relaxed text-amber-700/80">Phone number tidak dibuktikan lewat kode SMS — ia hanya diketik pemohon. Jadi nomor itu bukan bukti identitas, dan sistem hanya memastikan nomor yang sama tidak dipakai dua akun. Penahan akun ganda yang sebenarnya adalah penilaian Anda di halaman ini.</Prosa>
               </div>
 

@@ -136,7 +136,7 @@ export function SleepPattern() {
       <SectionTitle
         icon={<IconTimer />}
         title="Sleep Pattern"
-        subtitle="By stage and by night, from Apple Watch via automatic sync"
+        subtitle="Menurut tahap dan menurut malam, dari Apple Watch lewat sinkronisasi otomatis"
       />
 
       <Card>
@@ -205,7 +205,7 @@ export function SleepPattern() {
           </Card>
 
           <Card>
-            <SectionTitle title="Per malam" subtitle="Bar length is proportional to time asleep" />
+            <SectionTitle title="Per malam" subtitle="Panjang bilah sebanding dengan lama tidur" />
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
               {([['deep', 'Dalam'], ['rem', 'REM'], ['core', 'Inti'], ['awake', 'Terbangun']] as const).map(([k, l]) => (
                 <span key={k} className="flex items-center gap-1.5 text-neutral-500">
