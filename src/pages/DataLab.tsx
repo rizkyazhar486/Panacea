@@ -45,8 +45,8 @@ export function DataLab() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Data Lab" subtitle="Upload a wearable / CGM / scale / BP export — get it turned into plain conclusions" />
-        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Export a CSV from your device or health app (glucose monitor, watch, smart scale, blood-pressure cuff) and drop it here. Panaceamed recognizes the columns and processes them into what they actually mean for you — nothing leaves your device.</Prosa>
+        <SectionTitle icon={<IconChartUp size={20} />} title="Data Lab" subtitle="Unggah ekspor dari jam tangan / CGM / timbangan / tensimeter — diubah menjadi kesimpulan yang gamblang" />
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Ekspor berkas CSV dari perangkat atau aplikasi kesehatan Anda (pemantau glukosa, jam tangan, timbangan pintar, tensimeter), lalu jatuhkan di sini. Panaceamed mengenali kolomnya dan mengolahnya menjadi apa artinya bagi Anda — tidak ada yang keluar dari perangkat Anda.</Prosa>
         <button onClick={() => fileRef.current?.click()}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand/40 bg-brand-50 py-8 text-sm font-bold text-brand-dark dark:bg-white/5">
           📄 {fileName ? `Re-upload (last: ${fileName})` : 'Choose a CSV file'}
@@ -99,7 +99,7 @@ export function DataLab() {
 
       {!result && !err && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="What you'll get" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Apa yang Anda dapatkan" />
           <ul className="mt-2 ml-4 list-disc space-y-1 text-sm text-neutral-600 dark:text-neutral-300">
             <li><b>Glucose (CGM):</b> time-in-range, estimated HbA1c, variability, high/low flags.</li>
             <li><b>Heart rate / HRV:</b> resting estimate, averages, recovery trend.</li>

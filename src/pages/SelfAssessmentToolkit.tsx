@@ -31,7 +31,7 @@ function TelomereQuiz() {
   const band = score <= maxScore * 0.3 ? 'Lifestyle pattern favorable for telomere health' : score <= maxScore * 0.6 ? 'Some room to improve a few habits' : 'Several habits worth addressing'
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Telomeres (protective caps on your chromosomes) shorten with age, and observational studies link chronic stress, poor diet, inactivity, poor sleep, and smoking to faster shortening. This is an educational lifestyle-pattern quiz, not a telomere length test — only a lab (telomere length blood test) can measure that directly.</Prosa>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Telomer (tudung pelindung pada ujung kromosom) memendek seiring umur, dan penelitian pengamatan mengaitkan stres menahun, pola makan buruk, kurang gerak, tidur buruk, dan merokok dengan pemendekan yang lebih cepat. Ini kuis pola gaya hidup untuk belajar, bukan pemeriksaan panjang telomer — hanya laboratorium (pemeriksaan panjang telomer dari darah) yang dapat mengukurnya langsung.</Prosa>
       <div className="mt-3 space-y-3">
         {TELOMERE_QS.map((item, qi) => (
           <div key={item.q}>
@@ -68,7 +68,7 @@ function InflammationScore() {
   const band = count === 0 ? 'No self-reported signals right now' : count <= 2 ? 'A couple of signals worth watching' : 'Several signals — worth discussing with a clinician'
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Check anything you've noticed regularly over the past 2 weeks. This is a self-reported symptom pattern, not a CRP/inflammatory-marker blood test — actual inflammation is only confirmed with lab work.</Prosa>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Centang apa saja yang Anda rasakan berulang selama 2 pekan terakhir. Ini pola gejala yang dilaporkan sendiri, bukan pemeriksaan CRP/penanda radang dari darah — radang yang sesungguhnya hanya dapat dipastikan lewat pemeriksaan laboratorium.</Prosa>
       <div className="mt-3 space-y-1.5">
         {INFLAMMATION_QS.map((q) => (
           <label key={q} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">
@@ -146,7 +146,7 @@ function WaistHeightRatio() {
     ratio < 0.5 ? { label: 'Lower risk', tone: 'brand' } : ratio < 0.6 ? { label: 'Increased risk', tone: 'low' } : { label: 'High risk', tone: 'critical' }
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Waist-to-height ratio — several studies find "keep your waist to less than half your height" a simpler and better predictor of cardiometabolic risk than BMI alone, since it captures central (visceral) fat directly.</Prosa>
+      <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Rasio lingkar pinggang terhadap tinggi badan — beberapa penelitian menemukan pedoman "jaga lingkar pinggang kurang dari separuh tinggi badan" lebih sederhana dan lebih baik dalam memperkirakan risiko kardiometabolik daripada IMT saja, karena ia langsung menangkap lemak pusat (viseral).</Prosa>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Waist circumference (cm)">
           <input className={inputClass} type="number" min={40} max={200} value={waist} onChange={(e) => setWaist(Number(e.target.value) || 0)} />

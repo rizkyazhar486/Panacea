@@ -19,7 +19,7 @@ const SECTIONS: { id: Section; label: string; emoji: string }[] = [
   { id: 'therapy', label: 'SKDI Therapy Reference', emoji: '💊' },
   { id: 'diseases', label: 'Daftar Penyakit SKDI', emoji: '📖' },
   { id: 'mnemonik', label: 'Jembatan Keledai', emoji: '🔤' },
-  { id: 'techniques', label: 'How to Study', emoji: '🧠' },
+  { id: 'techniques', label: 'Cara Belajar', emoji: '🧠' },
   { id: 'timeline', label: 'Exam Plan', emoji: '📅' },
 ]
 
@@ -64,7 +64,7 @@ export function MedStudyHub() {
         <SectionTitle
           icon={<IconBook size={20} />}
           title="Med Study Hub"
-          subtitle="For OSCE · UKMPPD · koas · PPDS — practice, technique & staying sane"
+          subtitle="Untuk OSCE · UKMPPD · koas · PPDS — latihan, teknik & menjaga kewarasan"
         />
         {/* Motivation — honest encouragement for the grind */}
         <div className="mt-3 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100/40 p-4">
@@ -200,7 +200,7 @@ function PracticeBank() {
         </>
       )}
 
-      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">These are original practice questions written to match each exam's format and blueprint — not real/leaked past papers, which are copyrighted by their boards. UKMPPD candidates: the USMLE and PLAB banks track the same clinical-reasoning skills and blueprint the UKMPPD draws from.</Prosa>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">Ini soal latihan asli yang ditulis mengikuti format dan cetak biru tiap ujian — bukan soal ujian sungguhan atau bocoran, yang hak ciptanya dipegang penyelenggara masing-masing. Bagi peserta UKMPPD: bank soal USMLE dan PLAB mengikuti kemampuan penalaran klinis dan cetak biru yang sama dengan yang menjadi acuan UKMPPD.</Prosa>
     </Card>
   )
 }
@@ -235,7 +235,7 @@ function TechniquesSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconSparkle size={20} />} title="How to Study" subtitle="Evidence-based methods, ordered by effect size in the learning-science literature" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Cara Belajar" subtitle="Evidence-based methods, ordered by effect size in the learning-science literature" />
       </Card>
       {STUDY_TECHNIQUES.map((t) => (
         <Card key={t.title} className="!p-4">

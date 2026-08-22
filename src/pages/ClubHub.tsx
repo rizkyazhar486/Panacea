@@ -148,8 +148,8 @@ export function ClubHub() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Find your people — clubs and group meets, all real" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Regular group activity is one of the strongest predictors of sticking with exercise. Join a club, show up to a meet, and your workouts stop depending on willpower alone. Anyone can start a club or host a meet — there's no gatekeeper.</Prosa>
+        <SectionTitle icon={<IconUsers size={20} />} title="Club Hub" subtitle="Temukan orang-orang Anda — klub dan pertemuan kelompok, semuanya nyata" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Kegiatan kelompok yang teratur adalah salah satu penanda terkuat orang bertahan berolahraga. Bergabunglah dengan klub, datanglah ke pertemuan, dan latihan Anda tidak lagi bergantung pada tekad semata. Siapa pun boleh memulai klub atau menjadi tuan rumah pertemuan — tidak ada penjaga gerbang.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {([['meets', 'Meets'], ['myhub', 'My Hub'], ['clubs', 'Clubs']] as [Tab, string][]).map(([t, label]) => (
             <button
@@ -600,7 +600,7 @@ function NewClubSheet({ onClose, onCreated }: { onClose: () => void; onCreated: 
           <h2 className="text-lg font-black text-ink dark:text-ink">Start a real club</h2>
           <button onClick={onClose} aria-label="Close" className="rounded-full bg-neutral-100 px-3 py-1.5 text-sm font-bold text-neutral-500 dark:bg-white/10">✕</button>
         </div>
-        <Prosa kelas="mt-1 text-[12px] leading-relaxed text-neutral-500">This creates a real, shared club visible to every Panaceamed user — you'll be the first member. Once it exists, host meets under it from the Meets tab.</Prosa>
+        <Prosa kelas="mt-1 text-[12px] leading-relaxed text-neutral-500">Ini membuat klub nyata dan terbuka yang terlihat oleh semua pengguna Panaceamed — Anda menjadi anggota pertamanya. Setelah ada, adakan pertemuan di bawahnya lewat tab Pertemuan.</Prosa>
         <div className="mt-4 space-y-3">
           <input className={inputClass} placeholder="Club name (e.g. East Jakarta Trail Runners)" value={name} onChange={(e) => setName(e.target.value)} />
           <select className={inputClass} value={sport} onChange={(e) => setSport(e.target.value as (typeof SPORTS)[number])}>

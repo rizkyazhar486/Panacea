@@ -94,7 +94,7 @@ export function MentalHealthScreen() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — validated brief screens" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Over the last 2 weeks, how often have you been bothered by each problem? These are the most widely used screening instruments in primary care worldwide — not a diagnosis, but a well-validated way to gauge severity and track change over time.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Selama 2 pekan terakhir, seberapa sering tiap masalah ini mengganggu Anda? Ini instrumen penapisan yang paling luas dipakai di layanan primer di seluruh dunia — bukan diagnosis, melainkan cara yang tervalidasi baik untuk menakar derajat berat dan mengikuti perubahannya dari waktu ke waktu.</Prosa>
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('phq9')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'phq9' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>PHQ-9 (Depression)</button>
           <button onClick={() => setTab('gad7')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'gad7' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>GAD-7 (Anxiety)</button>
@@ -107,11 +107,11 @@ export function MentalHealthScreen() {
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-500 text-white"><IconPhone size={18} /></span>
             <div>
               <div className="text-sm font-black text-rose-700 dark:text-rose-300">You don't have to go through this alone</div>
-              <Prosa kelas="mt-1 text-[13px] leading-relaxed text-rose-700/90 dark:text-rose-200/90">You indicated having thoughts of self-harm or that you'd be better off dead. Please reach out now — to a trusted person, a mental health professional, or one of these lines:</Prosa>
+              <Prosa kelas="mt-1 text-[13px] leading-relaxed text-rose-700/90 dark:text-rose-200/90">Anda menyatakan adanya pikiran untuk menyakiti diri sendiri atau merasa lebih baik tidak ada. Mohon hubungi seseorang sekarang — orang yang Anda percaya, tenaga kesehatan jiwa, atau salah satu saluran berikut:</Prosa>
               <ul className="mt-2 space-y-1 text-[13px] font-semibold text-rose-800 dark:text-rose-200">
                 <li>🇮🇩 Indonesia — Kemenkes SEJIWA: <b>119 ext. 8</b></li>
                 <li>🌍 International — <a href="https://findahelpline.com" target="_blank" rel="noreferrer" className="underline">findahelpline.com</a> (crisis lines by country)</li>
-                <li>Or go to the nearest emergency room.</li>
+                <li>Atau datangi unit gawat darurat terdekat.</li>
               </ul>
             </div>
           </div>

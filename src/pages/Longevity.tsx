@@ -258,7 +258,7 @@ export function Longevity() {
             onNilai={(n) => u({ [key]: n } as Partial<LongevityData>)} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Save this value across the app (or press Enter)"
+              title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -285,7 +285,7 @@ export function Longevity() {
         <SectionTitle
           icon={<IconHeart size={20} />}
           title="Longevity Center"
-          subtitle="Your watch scores your day — this page scores your decade. VO₂max, resting HR, sleep & WHR auto-update from your Health Profile (Apple Health / WHOOP) and Body Composition."
+          subtitle="Jam tangan Anda menilai hari Anda — halaman ini menilai dasawarsa Anda. VO₂max, denyut istirahat, tidur & rasio pinggang-panggul diperbarui sendiri dari Profil Kesehatan (Apple Health / WHOOP) dan Komposisi Tubuh."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -415,7 +415,7 @@ export function Longevity() {
 
       {/* Decade projection */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Decade Projection — Train the You at 80" subtitle="Untrained: VO₂max −10%/decade, muscle −8%/decade after 30. Trained: half that." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Proyeksi Dasawarsa — Latih Diri Anda yang Berumur 80" subtitle="Untrained: VO₂max −10%/decade, muscle −8%/decade after 30. Trained: half that." />
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">

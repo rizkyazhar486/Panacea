@@ -57,13 +57,13 @@ export function AlcoholCalculator() {
           This uses the classic Widmark formula, the standard teaching model in forensic toxicology — but
           it is an <b>estimate from population averages</b>, not a breathalyzer reading. Food intake,
           individual metabolism, medications, and genetics all shift the real number, often significantly.
-          <b> The only safe BAC for driving is zero</b> — never use this tool to decide whether it's okay to drive.
+          <b> Satu-satunya kadar alkohol darah yang aman untuk menyetir adalah nol</b> — never use this tool to decide whether it's okay to drive.
         </p>
       </Card>
 
       <Card className="!p-5">
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Biological sex (for the r constant)">
+          <Field label="Jenis kelamin biologis (untuk tetapan r)">
             <select className={inputClass} value={sex} onChange={(e) => setSex(e.target.value as 'M' | 'F')}>
               <option value="M">Male (r ≈ 0.68)</option>
               <option value="F">Female (r ≈ 0.55)</option>
@@ -90,7 +90,7 @@ export function AlcoholCalculator() {
             </Field>
           ))}
         </div>
-        <Field label="Hours since you started drinking">
+        <Field label="Berapa jam sejak mulai minum">
           <input className="mt-1 w-full accent-brand" type="range" min={0} max={12} step={0.5} value={hoursElapsed} onChange={(e) => setHoursElapsed(Number(e.target.value))} />
           <div className="mt-1 text-right text-[12px] font-semibold text-neutral-500">{hoursElapsed}h</div>
         </Field>

@@ -69,7 +69,7 @@ export function DermatologyLesionMapper() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Structured exam documentation + a classic morphology/site differential — not photo-based diagnosis" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">This tool does not analyze photos or diagnose from images — a consumer-grade model cannot reliably rule out malignancy or give a precise diagnosis from a picture, and pretending otherwise would be unsafe. Instead it documents your exam findings in a structured way and surfaces the classic differential dermatology teaching associates with that morphology + site, the same way a textbook table works. Always correlate clinically and biopsy/refer if uncertain.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Alat ini tidak menganalisis foto dan tidak mendiagnosis dari gambar — model tingkat konsumen tidak dapat menyingkirkan keganasan secara andal maupun memberi diagnosis yang tepat dari sebuah gambar, dan berpura-pura sebaliknya tidak aman. Sebagai gantinya ia mencatat temuan pemeriksaan Anda secara tersusun lalu memunculkan diagnosis banding klasik yang diajarkan dermatologi untuk morfologi + lokasi itu, persis seperti cara kerja tabel di buku ajar. Selalu padukan dengan keadaan klinis, dan lakukan biopsi/rujukan bila ragu.</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -110,7 +110,7 @@ export function DermatologyLesionMapper() {
               ))}
             </div>
           ) : (
-            <Prosa kelas="mt-2 text-[13px] text-neutral-500">No curated teaching association for this exact combination — select just morphology or just site for broader matches, or use your standard differential-diagnosis approach.</Prosa>
+            <Prosa kelas="mt-2 text-[13px] text-neutral-500">Belum ada kaitan ajar yang disusun untuk gabungan persis ini — pilih morfologinya saja atau lokasinya saja untuk kecocokan yang lebih luas, atau pakai pendekatan diagnosis banding baku Anda.</Prosa>
           )}
           <div className="mt-3"><CopyNote text={summary} /></div>
         </Card>
@@ -123,7 +123,7 @@ export function DermatologyLesionMapper() {
             <div key={r.k} className="flex justify-between text-[13px]"><span className="font-bold text-ink dark:text-ink">{r.k}</span><span className="text-neutral-500 text-right">{r.v}</span></div>
           ))}
         </div>
-        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Any pigmented lesion meeting ABCDE criteria, or the "ugly duckling" sign (looks different from the patient's other moles), warrants dermatology referral/biopsy — not something this tool, or any photo, should be used to rule out.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Setiap lesi berpigmen yang memenuhi kriteria ABCDE, atau tanda "ugly duckling" (tampak berbeda dari tahi lalat pasien yang lain), perlu dirujuk ke dermatologi/dibiopsi — bukan sesuatu yang boleh disingkirkan dengan alat ini maupun dengan foto apa pun.</Prosa>
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">

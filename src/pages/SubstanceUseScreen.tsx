@@ -62,7 +62,7 @@ export function SubstanceUseScreen() {
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Pack-Year Calculator (tobacco)</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="Cigarettes per day (when smoking)">
+          <Field label="Batang rokok per hari (saat masih merokok)">
             <input className={inputClass} type="number" min={0} value={cigsPerDay || ''} onChange={(e) => setCigsPerDay(Number(e.target.value) || 0)} />
           </Field>
           <Field label="Years smoked">
@@ -71,7 +71,7 @@ export function SubstanceUseScreen() {
           <Field label="Current age">
             <input className={inputClass} type="number" min={0} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />
           </Field>
-          <Field label="Years since quitting (0 if still smoking)">
+          <Field label="Sudah berapa tahun berhenti (0 bila masih merokok)">
             <input className={inputClass} type="number" min={0} value={quitYearsAgo || ''} onChange={(e) => setQuitYearsAgo(Number(e.target.value) || 0)} />
           </Field>
         </div>
@@ -82,7 +82,7 @@ export function SubstanceUseScreen() {
               <span className="text-sm font-semibold text-neutral-500">pack-years</span>
             </div>
             {screeningEligible ? (
-              <Prosa kelas="mt-2 text-[13px] leading-relaxed text-rose-600 dark:text-rose-300">Meets USPSTF 2021 criteria for annual low-dose CT lung cancer screening (age 50-80, ≥20 pack-years, currently smoking or quit within 15 years) — worth discussing with a clinician if not already screening.</Prosa>
+              <Prosa kelas="mt-2 text-[13px] leading-relaxed text-rose-600 dark:text-rose-300">Memenuhi kriteria USPSTF 2021 untuk penapisan kanker paru dengan CT dosis rendah setiap tahun (umur 50-80 tahun, ≥20 bungkus-tahun, masih merokok atau berhenti dalam 15 tahun terakhir) — layak dibicarakan dengan tenaga medis bila belum menjalani penapisan.</Prosa>
             ) : (
               <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
                 {packYears >= 20 ? 'Meets the pack-year threshold, but age or quit-date criteria are not yet met for USPSTF screening eligibility.' : 'Below the ≥20 pack-year threshold used for lung cancer screening eligibility — quitting still meaningfully reduces risk at any pack-year total.'}

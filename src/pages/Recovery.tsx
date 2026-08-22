@@ -109,7 +109,7 @@ function SleepScoreCard() {
         <div><div className="text-sm font-black text-ink">{s.awakening}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Awakenings</div></div>
         <div><div className="text-sm font-black text-ink">{s.consistency}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Consistency</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Weighting: Duration 40% (optimal 7-9 hours) · Latency 20% (ideally ≤15 minutes to fall asleep) · Awakenings 20% (ideally 0) · Bedtime consistency 20% (ideally variance ≤30 minutes from usual) — this pattern reflects the core components of the Pittsburgh Sleep Quality Index (PSQI), simplified for daily self-monitoring.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Pembobotan: Lama tidur 40% (optimal 7-9 jam) · Waktu terlelap 20% (idealnya ≤15 menit) · Terbangun 20% (idealnya 0 kali) · Keajekan jam tidur 20% (idealnya menyimpang ≤30 menit dari biasanya) — pola ini mengikuti bagian inti Pittsburgh Sleep Quality Index (PSQI), disederhanakan untuk pemantauan harian sendiri. Bobot persennya pilihan penulis, bukan bobot PSQI yang tervalidasi.</Prosa>
     </Card>
   )
 }
@@ -246,7 +246,7 @@ function MeditationCard() {
         <span className="text-[10px] font-bold uppercase text-neutral-500">Volume</span>
         <input type="range" min={0} max={0.5} step={0.01} value={volume} onChange={(e) => changeVolume(+e.target.value)} className="flex-1 accent-brand" />
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ambient sound is generated directly on your device (Web Audio API) — it works fully offline, without relying on a third-party music service that may not always be reachable.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Suara latar dibangkitkan langsung di perangkat Anda (Web Audio API) — bekerja sepenuhnya luring, tanpa bergantung pada layanan musik pihak ketiga yang belum tentu selalu dapat dijangkau.</Prosa>
     </Card>
   )
 }
@@ -297,7 +297,7 @@ export function Recovery() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconLeaf size={20} />} title="Guidance for This Phase" subtitle="Recommendations based on days since you started" />
+        <SectionTitle icon={<IconLeaf size={20} />} title="Panduan untuk Tahap Ini" subtitle="Recommendations based on days since you started" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           {current.guidance.map((g, i) => <li key={i}>• {g}</li>)}
         </ul>

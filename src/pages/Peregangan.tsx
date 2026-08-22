@@ -55,7 +55,7 @@ export function Peregangan() {
       <SectionTitle
         icon={<IconLeaf />}
         title="Stretching & Posture"
-        subtitle="Organised by when, not by muscle"
+        subtitle="Disusun menurut kapan, bukan menurut otot"
       />
 
       {/* Hal yang paling sering salah, ditaruh paling atas. */}
@@ -67,7 +67,7 @@ export function Peregangan() {
           before training is <b>dynamic</b> work: movement that takes the joints through their range,
           repeatedly.
         </p>
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Static stretching still has its place — after training, or as its own session to build range of motion. It is only the timing that has been wrong all along.</Prosa>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Peregangan statis tetap ada tempatnya — sesudah latihan, atau sebagai sesi tersendiri untuk menambah luas gerak sendi. Yang selama ini keliru hanyalah waktunya.</Prosa>
       </Card>
 
       {/* Protokol siap pakai */}
@@ -224,7 +224,7 @@ export function Peregangan() {
             <li key={r} className="text-[10px] leading-relaxed text-slate-500">{r}</li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Demonstration clips are AI-generated illustrations of the movement, not footage of an instructor. If any movement brings sharp pain, tingling or numbness, stop and get it looked at — that points to a nerve, not a muscle.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Klip peragaan adalah gambaran gerakan yang dibuat AI, bukan rekaman seorang instruktur. Bila suatu gerakan menimbulkan nyeri tajam, kesemutan, atau baal, hentikan dan periksakan — itu menunjuk ke saraf, bukan ke otot.</Prosa>
       </Card>
     </div>
   )
