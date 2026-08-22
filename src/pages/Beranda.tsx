@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { PapanWidget } from '../components/PapanWidget'
 import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
+import { PetaKonsistensi } from '../components/PetaKonsistensi'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
 import { deretMetrik } from '../lib/riwayatVitals'
@@ -393,6 +394,8 @@ export default function Beranda() {
           Kartu pratinjau menjawab "bagaimana keadaan saya"; catatan harian
           meminta sesuatu. Layar yang meminta lebih dahulu sebelum memberi apa
           pun terbaca sebagai pekerjaan, dan pekerjaan ditunda. */}
+      <PetaKonsistensi />
+
       <CatatanHarian />
 
       {/* Catatan latihan memakai bentuk yang sama persis dengan catatan harian

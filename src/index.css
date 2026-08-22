@@ -1261,3 +1261,69 @@ h1, h2, h3,
   font-family: var(--font-judul);
   letter-spacing: 0.06em;
 }
+
+/* ── Peta konsistensi: empat tingkat kepekatan ───────────────────────────── */
+:root {
+  --petak-kosong: rgba(12, 20, 16, 0.07);
+  --petak-1: rgba(0, 191, 99, 0.35);
+  --petak-2: rgba(0, 191, 99, 0.62);
+  --petak-3: #00bf63;
+}
+.dark {
+  --petak-kosong: rgba(255, 255, 255, 0.055);
+  --petak-1: rgba(0, 255, 136, 0.28);
+  --petak-2: rgba(0, 255, 136, 0.58);
+  --petak-3: #00ff88;
+}
+/* Petak terpekat ikut memancar di mode gelap — hanya yang terpekat, supaya
+   yang paling padat benar-benar terlihat paling menyala. */
+.dark .peta-konsistensi span[style*="--petak-3"],
+.dark .peta-konsistensi span[style*="rgb(0, 255, 136)"] {
+  box-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TANDA BACA VISUAL — garis aksen pada nama bagian.
+   
+   Satu batang 2 px di kiri judul bagian. Gunanya bukan hiasan: pada halaman
+   yang seluruhnya gelap, judul bagian berhuruf kecil dan berwarna redup mudah
+   tenggelam, dan mata kehilangan tempat memulai. Batang itu memberi titik
+   mulai yang sama di setiap bagian.
+   ───────────────────────────────────────────────────────────────────────────── */
+.dark section > h2.uppercase,
+.dark section > .mb-2 > h2.uppercase {
+  position: relative;
+  padding-left: 10px;
+}
+.dark section > h2.uppercase::before,
+.dark section > .mb-2 > h2.uppercase::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  bottom: 0.15em;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--neon-hijau);
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   KISI LATAR — sangat samar, hanya di mode gelap.
+   
+   Bidang hitam yang benar-benar rata membuat kartu tampak mengambang tanpa
+   ruang. Kisi 32 px memberi kedalaman itu tanpa menambah satu pun benda yang
+   harus dibaca. Opasitasnya sengaja di bawah ambang sadar: bila kisinya
+   terlihat sebagai kisi, ia sudah terlalu terang.
+   ───────────────────────────────────────────────────────────────────────────── */
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(0, 255, 136, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.022) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
