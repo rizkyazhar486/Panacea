@@ -476,18 +476,19 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     <>
     <UbinGrafik />
 
-    <section>
-      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
-      <div className="grid grid-cols-2 gap-fluid">
-        {pratinjau.filter((p) => !bergrafik.includes(p.id)).map((p) => <UbinAngka key={p.id} p={p} />)}
-        {/* Ubin rangkaian dibuang dari beranda: peta konsistensi di bawah
-            menggambarkan hal yang sama dalam bentuk yang jauh lebih banyak
-            keterangannya — 84 hari sekaligus, bukan tiga angka. Menampilkan
-            keduanya berarti menyuruh orang membaca dua kali hal yang sama.
-            Angka rangkaiannya sendiri tetap ada di halaman Log. */}
-        <UbinKlinis />
-      </div>
-    </section>
+    {/* JUDUL "KEADAAN ANDA" DIHAPUS, BUKAN DIKOSONGKAN.
+        Sesudah wilayah yang bergrafik dikeluarkan, bagian ini kerap hanya
+        berisi satu ubin — dan judul bagian di atas satu ubin adalah judul yang
+        tidak membagi apa pun. Ubin yang tersisa naik ke atas tanpa judul; isi
+        klinis pindah ke bawah rincian tubuh, tempat angka-angka katalog memang
+        lebih masuk akal dibaca. */}
+    {pratinjau.some((p) => !bergrafik.includes(p.id)) && (
+      <section>
+        <div className="grid grid-cols-2 gap-fluid">
+          {pratinjau.filter((p) => !bergrafik.includes(p.id)).map((p) => <UbinAngka key={p.id} p={p} />)}
+        </div>
+      </section>
+    )}
 
     {/* Kartu dompet hanya muncul bila memang ada saldo. Bagi yang tidak
         memakai token, ia sebelumnya menempati satu kartu penuh di beranda
@@ -497,6 +498,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     <BilahTubuh daftar={bilah} />
 
     <DaftarRincian baris={rincian} />
+
+    <section className="grid grid-cols-2 gap-fluid">
+      <UbinKlinis />
+    </section>
 
     {adaGrafik && <KartuGrafikOlahraga />}
 
