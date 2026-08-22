@@ -164,7 +164,7 @@ function BishopCalc() {
     : { l: 'Unfavorable', tone: 'critical' as const, note: 'Consider cervical ripening agents (e.g. prostaglandins) before induction.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Cervical readiness for labor induction (Bishop, 1964)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
       <div className="space-y-3">
         <Field label="Cervical dilation"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
         <Field label="Effacement"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
@@ -313,7 +313,7 @@ function WhoGrowthCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Anthropometry (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 months — per Indonesian MoH Child Anthropometry Standard (Permenkes 2/2020)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri WHO (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — sesuai Standar Antropometri Anak Kemenkes RI (Permenkes 2/2020)" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
         <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
@@ -399,7 +399,7 @@ function WhoNeonateCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="WHO Neonate (0–30 Days)" subtitle="Early neonatal weight trajectory — physiologic weight loss & regain to birth weight" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Neonatus WHO (0–30 Hari)" subtitle="Lintasan berat neonatus dini — penurunan fisiologis & kembalinya ke berat lahir" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
         <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
@@ -488,7 +488,7 @@ function CdcAnthropometryCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CDC Anthropometry (2–20 Years)" subtitle="CDC 2000 Growth Reference — BMI-for-age percentiles for children & adolescents" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri CDC (2–20 Tahun)" subtitle="Rujukan Pertumbuhan CDC 2000 — persentil IMT menurut umur untuk anak & remaja" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
         <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
@@ -614,7 +614,7 @@ P (Plan):
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) for gestational age, Lubchenco classification, auto-summarized into a SOAP note" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
@@ -743,7 +743,7 @@ function ParklandCalc() {
   const next16hRate = (total24h - first8h) / 16
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Fluid resuscitation for burns ≥20% TBSA (Baxter, 1968)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
         <Field label="% TBSA (burn surface area)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
@@ -785,7 +785,7 @@ function NaegeleCalc() {
   }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Estimated due date (EDD) & gestational age from LMP" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Perkiraan hari lahir (HPL) & usia gestasi dari HPHT" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="LMP (last menstrual period)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
         <Field label="Menstrual Cycle Length (days)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
@@ -857,7 +857,7 @@ function AlvaradoCalc() {
     : { l: 'High probability', tone: 'critical' as const, note: 'Consider surgical consultation for appendectomy.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Clinical scoring for suspected acute appendicitis (Alvarado, 1986)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
       <div className="space-y-2">
         {criteria.map((c) => (
           <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -1124,7 +1124,7 @@ function BrocaCalc() {
   const ibw = sex === 'M' ? base - base * 0.1 : base - base * 0.15
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Broca Index, modified for sex" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Indeks Broca, dimodifikasi menurut jenis kelamin" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
         <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
@@ -1148,7 +1148,7 @@ function MidParentalCalc() {
   const rangeHi = mph + 8.5
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Predicted adult height target for a child from parental heights" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Perkiraan sasaran tinggi dewasa seorang anak dari tinggi kedua orang tuanya" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Father's Height (cm)"><input className={inputClass} type="number" value={fatherCm} onChange={(e) => setFatherCm(+e.target.value)} /></Field>
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>

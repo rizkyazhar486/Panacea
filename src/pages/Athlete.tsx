@@ -128,7 +128,7 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
   if (!act || !act.hrSamples) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="BPM trace & time in each zone" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="Jejak bpm & waktu di tiap zona" />
         <p className="mt-2 text-xs text-neutral-500">
           No session with heart-rate data yet. Track a workout with the <b>GPS Tracker</b> on Home and enter your HR (bpm) while training — or sync a watch — and your BPM chart and time-in-zone breakdown will appear here automatically.
         </p>
@@ -347,7 +347,7 @@ export function Athlete() {
 
       {/* ── Training Load & Injury Risk (ACWR) ─────────────────── */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Training Load & Injury Risk" subtitle="Acute:Chronic Workload Ratio — filled in from Training Load on your watch (Garmin/Polar/Coros/Apple)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Training Load & Injury Risk" subtitle="Rasio Beban Akut:Kronis — diisi dari Training Load pada jam tangan Anda (Garmin/Polar/Coros/Apple)" />
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Acute Load — 7 days (Load)"><input className={inputClass} type="number" value={p.acuteLoad || ''} placeholder="e.g. 420" onChange={(e) => upd({ acuteLoad: +e.target.value })} /></Field>
           <Field label="Chronic Load — 28-day weekly average"><input className={inputClass} type="number" value={p.chronicLoad || ''} placeholder="e.g. 380" onChange={(e) => upd({ chronicLoad: +e.target.value })} /></Field>
@@ -376,7 +376,7 @@ export function Athlete() {
 
       {/* ── Training Status + Recovery (Garmin-style) ────────────── */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Training Status & Readiness" subtitle="Training Status, HRV & Recovery Time from your device" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Training Status & Readiness" subtitle="Training Status, HRV & Recovery Time dari perangkat Anda" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Field label="VO₂max Trend (4 wks)">
             <select className={inputClass} value={p.vo2Trend} onChange={(e) => upd({ vo2Trend: e.target.value as AthleteProfile['vo2Trend'] })}>
@@ -460,7 +460,7 @@ function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number
     : { l: 'Very Tired — danger', tone: 'critical' as const, d: 'TSB is very negative. Reduce load now to avoid overtraining/injury.' }
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="CTL/ATL/TSB model — calculated from the same Training Load above" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="Model CTL/ATL/TSB — dihitung dari Training Load yang sama di atas" />
       <div className="mt-3 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-[10px] font-bold uppercase text-neutral-500">Fitness (CTL)</div>

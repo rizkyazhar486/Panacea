@@ -35,7 +35,7 @@ export function BaseTraining() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Running, push-ups, pull-ups, sit-ups, and posture correction" />
+      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Lari, push-up, pull-up, sit-up, dan perbaikan postur" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
@@ -105,7 +105,7 @@ function RunTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Training pace calculator" subtitle="From your race pace, work out the pace for each kind of run" />
+        <SectionTitle icon={<IconTimer />} title="Training pace calculator" subtitle="Dari pace lomba Anda, tentukan pace untuk tiap jenis lari" />
 
         <div className="flex gap-2 mt-3 mb-3">
           {([['pace', 'Saya tahu pace lomba'], ['waktu', 'Saya tahu waktu lari terakhir']] as ['pace' | 'waktu', string][]).map(([k, l]) => (
@@ -170,7 +170,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Do not run every session as hard as you can" />
+        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Jangan berlari sekuat tenaga pada tiap sesi" />
         <div className="space-y-3 mt-2">
           {RUN_ZONES.map((z) => (
             <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -191,7 +191,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle title="Full pace table" subtitle="For race paces of 3:00–6:00 per km" />
+        <SectionTitle title="Full pace table" subtitle="Untuk pace lomba 3:00–6:00 per km" />
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
@@ -339,7 +339,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Combining running, calisthenics, and recovery" />
+      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Memadukan lari, kalistenik, dan pemulihan" />
 
       <div className="flex gap-2 mt-3">
         {([3, 4, 5] as const).map((n) => (
@@ -419,7 +419,7 @@ function StretchTab() {
       <DoseCalculator />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Four different moments call for different kinds of stretching" />
+        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Empat saat yang berbeda menuntut jenis peregangan yang berbeda" />
         <div className="space-y-3 mt-2">
           {ROUTINES.map((r) => (
             <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -443,7 +443,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Position, where it should be felt, and the most common mistake" />
+        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Posisi, di mana seharusnya terasa, dan kekeliruan yang paling sering" />
 
         <div className="flex flex-wrap gap-2 mt-3">
           {([['semua', 'All'], ['atas', 'Upper body'], ['inti', 'Hips & trunk'], ['bawah', 'Legs']] as [Wilayah | 'semua', string][]).map(([k, l]) => (

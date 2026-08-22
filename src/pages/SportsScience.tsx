@@ -158,7 +158,7 @@ export function SportsScience() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Sports Science & KPIs" subtitle="Performance indicators, analysis & mentality — based on journals and world-champion team methods" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Sports Science & KPIs" subtitle="Penanda penampilan, analisis & mental — berdasarkan jurnal dan cara kerja tim juara dunia" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">
           Physical preparation, workload, and precise timing ensure you reach peak fitness during
           critical phases. Data-based training — VO₂max, oxygen & CO₂ levels, lactate threshold, HRV — determines
@@ -215,7 +215,7 @@ export function SportsScience() {
 
       {/* KPI library */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Key Indicators by Sport" subtitle="What is measured · tool/indicator · why it matters" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Key Indicators by Sport" subtitle="Apa yang diukur · alat/penanda · mengapa penting" />
         <div className="mt-3 space-y-4">
           {KPI_LIBRARY.map((grp) => (
             <div key={grp.group}>
@@ -238,7 +238,7 @@ export function SportsScience() {
 
       {/* Seven branches of exercise science */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Seven Branches of Sports Science" subtitle="The scientific foundation that shapes your training plan" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Seven Branches of Sports Science" subtitle="Dasar ilmiah yang membentuk rencana latihan Anda" />
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
           Science-based training planning applies scientific methods from seven branches to understand &
           improve performance, sport, and physical activity.
@@ -256,7 +256,7 @@ export function SportsScience() {
 
       {/* Training principles */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Training Principles (7 Principles)" subtitle="Core guidelines for designing an effective program" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Training Principles (7 Principles)" subtitle="Pedoman inti menyusun program yang berhasil" />
         <div className="mt-3 space-y-2">
           {TRAINING_PRINCIPLES.map((pr, i) => (
             <div key={pr.name} className="flex gap-3 rounded-xl border border-neutral-100 p-3">
@@ -273,7 +273,7 @@ export function SportsScience() {
 
       {/* Periodization & peaking */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Periodization & Peaking" subtitle="Structuring load so peak fitness lands at the critical moment" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Periodization & Peaking" subtitle="Menyusun beban agar puncak kebugaran jatuh pada saat yang menentukan" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           <li>• <b>Macrocycle:</b> a seasonal plan toward a target (main competition).</li>
           <li>• <b>Mesocycle (3–4 weeks):</b> a progressive load block followed by 1 deload week (~–40% volume).</li>
@@ -285,7 +285,7 @@ export function SportsScience() {
 
       {/* Injury management */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Load Management & Injury Recovery" subtitle="What to push, what to protect" />
+        <SectionTitle icon={<IconRun size={20} />} title="Load Management & Injury Recovery" subtitle="Apa yang didorong, apa yang dilindungi" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           <li>• <b>Protect</b> when ACWR &gt;1.5, HRV drops &gt;15% from baseline, or CMJ drops &gt;10% — reduce load.</li>
           <li>• <b>Push</b> when status is "Productive/Maintaining", HRV is balanced, sleep &ge;75 — add measured stimulus.</li>
@@ -296,7 +296,7 @@ export function SportsScience() {
 
       {/* References */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="World Champion Team Methods" subtitle="Real principles you can adopt" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="World Champion Team Methods" subtitle="Prinsip nyata yang dapat Anda pakai" />
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {WINNING_TEAMS.map((t) => (
             <div key={t.team} className="rounded-xl border border-neutral-100 p-3">
@@ -314,7 +314,7 @@ export function SportsScience() {
           <ul className="mt-1.5 space-y-1 text-[11px] leading-relaxed text-neutral-500">
             {REFERENCES.map((r) => <li key={r}>• {r}</li>)}
           </ul>
-          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Device indicator source: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (official Garmin manual). The citations above are landmark references underlying the concepts on this page — verify details (volume, edition year, DOI) directly on PubMed/publisher sites for formal academic purposes.</Prosa>
+          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Sumber penanda perangkat: Garmin fēnix 7 — Performance Measurements, Training Status & Recovery (manual resmi Garmin). Sitasi di atas adalah rujukan penting yang mendasari gagasan di halaman ini — periksa rinciannya (volume, tahun terbit, DOI) langsung di PubMed/situs penerbit untuk keperluan akademik resmi.</Prosa>
         </div>
       </Card>
     </div>

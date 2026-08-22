@@ -96,7 +96,7 @@ export function InitialAssessment() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Initial Assessment" subtitle="Movement pattern, injury risk, pain, strength & asymmetry — before starting a demanding program" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Initial Assessment" subtitle="Pola gerak, risiko cedera, nyeri, kekuatan & ketidaksimetrisan — sebelum memulai program yang berat" />
         <div className="mt-3 flex flex-wrap gap-1.5">
           {STEPS.map((s, i) => (
             <button key={s} onClick={() => setStep(i)} className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition ' + (step === i ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{i + 1}. {s}</button>
@@ -106,7 +106,7 @@ export function InitialAssessment() {
 
       {step === 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Movement Pattern Screen" subtitle="Self-assess (use a mirror/record video) — 0 unable, 1 with compensation, 2 perfect" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Movement Pattern Screen" subtitle="Nilai sendiri (pakai cermin/rekam video) — 0 tidak mampu, 1 dengan kompensasi, 2 sempurna" />
           <div className="mt-3 space-y-3">
             {MOVEMENTS.map((m) => (
               <div key={m.id} className="rounded-xl border border-neutral-100 p-3">
@@ -126,7 +126,7 @@ export function InitialAssessment() {
 
       {step === 1 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Pain & Injury History" subtitle="Mark areas that feel painful/have been injured" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Pain & Injury History" subtitle="Tandai bagian yang terasa nyeri/pernah cedera" />
           <div className="mt-3 flex flex-wrap gap-1.5">
             {PAIN_REGIONS.map((r) => (
               <button key={r} onClick={() => setA((x) => ({ ...x, painRegions: x.painRegions.includes(r) ? x.painRegions.filter((p) => p !== r) : [...x.painRegions, r] }))}
@@ -144,7 +144,7 @@ export function InitialAssessment() {
 
       {step === 2 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Baseline Strength" subtitle="Simple tests — a reference point for tracking your progress" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Baseline Strength" subtitle="Uji sederhana — titik acuan untuk mengikuti kemajuan Anda" />
           <div className="mt-3 grid grid-cols-3 gap-3">
             <Field label="Max push-ups"><input className={inputClass} type="number" value={a.strength.pushups || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, pushups: +e.target.value } }))} /></Field>
             <Field label="Squats/60 sec"><input className={inputClass} type="number" value={a.strength.squats60 || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, squats60: +e.target.value } }))} /></Field>
@@ -172,7 +172,7 @@ export function InitialAssessment() {
 
       {step === 4 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Quality of Life Screening" subtitle="Choose a reference instrument (brief adaptation, not the official licensed version)" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Quality of Life Screening" subtitle="Pilih instrumen acuan (adaptasi singkat, bukan versi resmi berlisensi)" />
           <Field label="Instrument">
             <select className={inputClass} value={a.qolInstrument} onChange={(e) => setA((x) => ({ ...x, qolInstrument: e.target.value, qolAnswers: [] }))}>
               {Object.keys(QOL_INSTRUMENTS).map((k) => <option key={k}>{k}</option>)}
@@ -202,7 +202,7 @@ export function InitialAssessment() {
 
       {step === 5 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconCheck size={20} />} title="Summary & Save" subtitle="Review before saving the assessment" />
+          <SectionTitle icon={<IconCheck size={20} />} title="Summary & Save" subtitle="Periksa kembali sebelum menyimpan penilaian" />
           <div className="mt-3 space-y-2">
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
               <span className="text-xs font-bold">Movement Pattern</span>

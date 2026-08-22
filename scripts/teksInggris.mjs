@@ -24,8 +24,22 @@ const LEWATI = [
 function kalimatTerlihat(baris) {
   if (LEWATI.some((r) => r.test(baris))) return null
   // Teks di antara > dan <, atau di dalam atribut title/subtitle/placeholder/label.
-  const petik = baris.match(/(?:title|subtitle|placeholder|label|ringkas)="([^"]{12,})"/)
-  if (petik && KATA.test(petik[1])) return petik[1]
+  // Ambang panjang untuk ATRIBUT diturunkan ke 6 aksara. Dengan ambang 12,
+  // judul halaman seperti "Allergy Tracker" lolos — justru teks yang paling
+  // besar dan paling terlihat di layar. Ambang yang membuat skrip ini tenang
+  // ternyata menyembunyikan yang paling penting.
+  // SEMUA atribut diperiksa, bukan yang pertama saja, dan pemeriksaan JSX
+  // TIDAK dilewati ketika sebuah atribut cocok tetapi ternyata sudah
+  // berbahasa Indonesia.
+  //
+  // Versi sebelumnya berhenti pada atribut pertama; begitu ambangnya
+  // diturunkan ke 6 aksara, atribut pendek berbahasa Indonesia mulai
+  // "menutupi" kalimat Inggris di baris yang sama, dan jumlahnya justru TURUN
+  // sesudah penapisnya diperluas. Angka yang bergerak ke arah yang mustahil
+  // itulah yang menunjukkan alatnya rusak, bukan datanya membaik.
+  for (const m of baris.matchAll(/(?:title|subtitle|placeholder|label|ringkas)="([^"]{6,})"/g)) {
+    if (KATA.test(m[1])) return m[1]
+  }
   const jsx = baris.match(/>\s*([A-Z][^<>{}]{14,})</)
   if (jsx && KATA.test(jsx[1])) return jsx[1].trim()
   return null
