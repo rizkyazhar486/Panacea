@@ -65,7 +65,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'risiko', label: 'Kalkulator Risiko', ringkas: 'Risiko kardiovaskular dan lainnya', ke: '/risk', emoji: '⚖️', kategori: 'Kalkulator & Skor' },
   { id: 'pelatih', label: 'Pelatih Latihan', ringkas: 'Sesi berikutnya dan status kesegaran', ke: '/riwayat-latihan', emoji: '🏃', kategori: 'Latihan', bawaan: true },
   { id: 'targetLatihan', label: 'Target Latihan', ringkas: 'Kemajuan target pekan atau bulan', ke: '/analisis-pro', emoji: '🎯', kategori: 'Latihan' },
-  { id: 'kebugaran', label: 'Kebugaran & Kesegaran', ringkas: 'Beban kronis melawan kelelahan akut', ke: '/analisis-pro', emoji: '📊', kategori: 'Latihan' },
+  { id: 'kebugaran', label: 'Latihan Hari Ini', ringkas: 'Bugar, lelah, segar, dan keputusan hari ini', ke: '/analisis-pro', emoji: '📊', kategori: 'Latihan', bawaan: true },
   { id: 'usahaTerbaik', label: 'Usaha Terbaik', ringkas: 'Rekor waktu per jarak', ke: '/analisis-pro', emoji: '🏅', kategori: 'Latihan' },
   { id: 'grafikOlahraga', label: 'Grafik Olahraga', ringkas: 'Jarak, langkah, pace, denyut, zona, kadens', ke: '/riwayat-latihan', emoji: '📈', kategori: 'Latihan' },
   { id: 'latihanTerpandu', label: 'Latihan Terpandu', ringkas: 'Sesi berpandu dengan video gerakan', ke: '/workout', emoji: '🏋️', kategori: 'Latihan' },

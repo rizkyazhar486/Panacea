@@ -19,6 +19,10 @@ import { getWorkouts } from '../lib/workoutStore'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { GrafikMini } from './GrafikMini'
 import { titikTengahVo2, ML_PER_MET } from '../lib/bugarIlmiah'
+import { kebugaranKesegaran } from '../lib/analisisPro'
+import { saranBerikutnya } from '../lib/pelatih'
+import { hrMaxFromAge } from '../lib/workoutImport'
+import { getDemo } from '../lib/profile'
 
 const HARI = 864e5
 
@@ -157,6 +161,65 @@ function UbinLongevity() {
   )
 }
 
+// ── Pelatih: latihan hari ini ──────────────────────────────────────────────
+//
+// Tiga angka model beban latihan (Banister 1975; bentuk CTL/ATL/TSB yang
+// dipakai perangkat lunak balap sepeda) beserta satu keputusan untuk hari ini.
+//
+// Ketiganya adalah MODEL, bukan hasil ukur: ia menduga kelelahan dari denyut
+// dan lama sesi, tidak dari darah maupun otot. Karena itu angkanya tidak punya
+// satuan yang berarti di luar dirinya sendiri, dan yang dibaca adalah ARAH dan
+// SELISIHNYA. Dasar keputusannya ikut ditulis supaya dapat dibantah.
+function UbinPelatih() {
+  const sesi = getWorkouts()
+  if (sesi.length < 3) return null
+  const demo = getDemo()
+  const usia = demo.age > 0 ? demo.age : 30
+  const jk: 'M' | 'F' = demo.sex === 'F' ? 'F' : 'M'
+  const v = getVitals()
+  const k = {
+    hrMax: sesi.reduce((a, w) => Math.max(a, w.maxHr ?? 0), 0) || hrMaxFromAge(usia, jk),
+    hrRest: typeof v.restingHr === 'number' && v.restingHr > 0 ? v.restingHr : 60,
+    sex: jk,
+  }
+  const ff = kebugaranKesegaran(sesi, k, 90)
+  const kini = ff.length ? ff[ff.length - 1] : null
+  if (!kini) return null
+  const saran = saranBerikutnya(sesi, k)
+
+  return (
+    <Link to="/analisis-pro" className="kaca col-span-2 flex flex-col gap-2 rounded-3xl p-3 transition active:scale-[0.98]">
+      <div className="flex items-center justify-between gap-2">
+        <span className="t-mikro font-black uppercase tracking-wide text-neutral-500">Latihan hari ini</span>
+        <span className="t-mikro rounded-full px-2 py-0.5 font-black text-white" style={{ background: saran.warna }}>
+          {saran.kapan}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { l: 'Bugar', v: kini.kebugaran, n: 'text-sky-600 dark:text-sky-400', s: 'beban 42 hari' },
+          { l: 'Lelah', v: kini.kelelahan, n: 'text-rose-600 dark:text-rose-400', s: 'beban 7 hari' },
+          { l: 'Segar', v: kini.kesegaran, n: 'text-ink dark:text-white', s: 'bugar − lelah' },
+        ].map((x) => (
+          <span key={x.l} className="min-w-0">
+            <span className="t-mikro block truncate font-bold uppercase tracking-wide text-neutral-500">{x.l}</span>
+            <span className={`block text-[20px] font-black leading-none tabular-nums ${x.n}`}>
+              {x.v > 0 && x.l === 'Segar' ? '+' : ''}{Math.round(x.v)}
+            </span>
+            <span className="t-mikro block truncate text-neutral-400">{x.s}</span>
+          </span>
+        ))}
+      </div>
+
+      <div>
+        <span className="t-kecil block font-black text-ink dark:text-white">{saran.judul}</span>
+        <span className="t-mikro block leading-snug text-neutral-500">{saran.dasar}</span>
+      </div>
+    </Link>
+  )
+}
+
 /**
  * Ubin hidup menurut id widget. Yang tidak terdaftar di sini tetap memakai
  * pintu biasa — dan itu keadaan yang benar bagi kebanyakan fitur.
@@ -167,4 +230,5 @@ export const UBIN_LANGSUNG: Record<string, () => JSX.Element | null> = {
   tidur: UbinTidur,
   detakJantung: UbinDenyut,
   longevity: UbinLongevity,
+  kebugaran: UbinPelatih,
 }
