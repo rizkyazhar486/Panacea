@@ -333,28 +333,13 @@ function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
   // Bila fitur ini punya ubin hidup DAN datanya sudah ada, angkanya yang
   // ditampilkan. Ubin hidup mengembalikan null ketika datanya belum ada,
   // sehingga pintu biasa di bawah ini tetap menjadi jalan keluarnya.
+  // Widget tanpa ubin hidup tidak digambar sama sekali, dan widget yang
+  // ubinnya belum punya data pun tidak: kartu berisi lambang dan nama fitur
+  // adalah PINTU, bukan widget, dan papan yang penuh pintu membuat aplikasi
+  // ini terbaca sebagai menu belaka — terutama bagi pemakai baru, yang justru
+  // paling mudah menyimpulkan begitu.
   const Langsung = UBIN_LANGSUNG[w.id]
-  if (Langsung) {
-    const isi = Langsung()
-    if (isi) return isi
-    // DATANYA BELUM ADA → TIDAK DIGAMBAR SAMA SEKALI.
-    //
-    // Sebelumnya ia jatuh kembali menjadi kartu berisi lambang dan nama fitur.
-    // Itu membuat papan widget penuh oleh pintu justru pada pemakai baru —
-    // keadaan yang paling tidak boleh terjadi, karena merekalah yang paling
-    // mudah menyimpulkan bahwa aplikasi ini isinya menu belaka.
-    return null
-  }
-  return (
-    <Link
-      to={w.ke}
-      className="kaca flex min-h-[76px] flex-col justify-center gap-0.5 rounded-3xl p-3 transition active:scale-[0.98]"
-    >
-      <span aria-hidden className="text-[17px] leading-none">{w.emoji}</span>
-      <span className="t-kecil truncate font-black text-ink dark:text-white">{w.label}</span>
-      <span className="t-mikro truncate text-neutral-400">{w.ringkas}</span>
-    </Link>
-  )
+  return Langsung ? Langsung() : null
 }
 
 /**
@@ -469,9 +454,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   const BERKARTU = [
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
-    'pantauan', 'kebugaran', 'salat',
+    'pantauan', 'kebugaran', 'salat', 'konsistensi',
   ]
-  const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id))
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
   // Tekanan darah didahulukan karena ia satu-satunya baris berisi dua angka,
@@ -487,6 +471,23 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
    */
   // Wilayah yang sudah punya grafik tujuh hari tidak diulang sebagai ubin teks.
   const bergrafik = wilayahBergrafik(state)
+
+  /* HANYA WIDGET YANG PUNYA UBIN HIDUP.
+     Sebelum ini, widget tanpa ubin hidup tetap digambar sebagai kartu berisi
+     lambang, nama, dan satu baris keterangan — sebuah PINTU. Di layar itu
+     terbaca persis seperti yang dikeluhkan: widget yang isinya hanya tulisan.
+     Pintu ke fitur mana pun tetap ada di kisi fitur, di pencarian, dan di menu
+     tombol melayang; ia tidak perlu menempati petak widget juga. */
+  const pintasan = WIDGETS.filter(
+    (w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id) && UBIN_LANGSUNG[w.id]
+      // Widget yang wilayahnya SUDAH digambar sebagai grafik tujuh hari tidak
+      // digambar dua kali. Sebelum ini "Latihan" muncul sebagai tujuh batang di
+      // bagian Tujuh hari DAN sebagai ubin "Latihan 7 hari" beberapa petak di
+      // bawahnya — angka yang sama, dua kali, pada satu layar.
+      && !(w.id === 'pelatih' && bergrafik.includes('latihan'))
+      && !(w.id === 'tidur' && bergrafik.includes('tidur'))
+      && !(w.id === 'detakJantung' && bergrafik.includes('tubuh'))
+  )
 
   const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td']
   const td = barisTekananDarah()
@@ -563,7 +564,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Pintasan</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Widget</h2>
         <button onClick={() => setAturBuka(true)} className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
           Atur widget
         </button>
@@ -577,7 +578,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
           onClick={() => setAturBuka(true)}
           className="t-kecil flex min-h-[76px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
         >
-          Belum ada pintasan. Pilih dari {WIDGETS.length} fitur yang ada.
+          Pilih widget →
         </button>
       )}
     </section>

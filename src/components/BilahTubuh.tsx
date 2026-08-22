@@ -80,12 +80,19 @@ function Bilah({ b }: { b: BilahRujukan }) {
         />
       </div>
 
-      <p className="t-mikro mt-1 leading-snug text-neutral-500 dark:text-neutral-400">
+      {/* SATU BARIS, DIPOTONG — bukan tiga baris penuh.
+          Keterangan populasi dan sumber batas sepanjang dua sampai tiga baris
+          untuk SETIAP bilah mengubah bagian ini menjadi paragraf, dan bilahnya
+          sendiri — satu-satunya bagian yang menjawab pertanyaan sekali lihat —
+          tenggelam di antaranya. Keduanya TIDAK dihapus: teks lengkapnya ikut
+          sebagai title (muncul saat ditahan/ditunjuk) dan tertulis utuh di
+          halaman Tubuh, satu ketukan dari sini. Sumber yang dihapus akan
+          membuat angka ini tidak dapat diperiksa lagi, dan itu tidak boleh. */}
+      <p className="t-mikro mt-1 truncate text-neutral-500 dark:text-neutral-400" title={`${b.populasi} · Batas: ${b.sumber}`}>
         <span className="font-bold">{b.zonaKini}</span>
         {' · '}
         {b.populasi}
       </p>
-      <p className="t-mikro leading-snug text-neutral-400">Batas: {b.sumber}</p>
     </div>
   )
 }
@@ -114,10 +121,6 @@ export function BilahTubuh({ daftar }: { daftar: BilahRujukan[] }) {
           </div>
         ))}
       </div>
-      <p className="t-mikro mt-1 leading-snug text-neutral-400">
-        Hanya angka yang punya batas terbit yang digambar begini. Saturasi, HRV, dan denyut istirahat tidak punya
-        batas tunggal yang berlaku bagi semua orang — keduanya dibandingkan dengan kebiasaan Anda sendiri di atas.
-      </p>
     </section>
   )
 }

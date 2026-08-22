@@ -220,10 +220,10 @@ export function saranBerikutnya(
 
   if (!terakhir) {
     return {
-      judul: 'Start with an easy session', jenis: 'easy', warna: '#34d399',
-      isi: 'No sessions logged yet. Start with 20–30 minutes at a pace where you can still speak a full sentence.',
+      judul: 'Mulai dari sesi ringan', jenis: 'easy', warna: '#34d399',
+      isi: 'Belum ada sesi tercatat. Mulailah 20–30 menit pada laju yang masih memungkinkan Anda mengucapkan satu kalimat penuh.',
       kapan: 'Kapan saja',
-      dasar: 'No history to build on yet.',
+      dasar: 'Belum ada riwayat sebagai dasar.',
     }
   }
 
@@ -245,9 +245,9 @@ export function saranBerikutnya(
   // Sesi berat baru saja: pulihkan dulu.
   if ((kl.jenis === 'interval' || kl.jenis === 'sprint') && jamSejak < 36) {
     return {
-      judul: 'Recovery day', jenis: 'pemulihan', warna: '#94a3b8',
-      isi: 'Your last session was intense. Today is better spent walking, jogging very easily for 20–30 minutes, or resting completely. Adaptation happens while you recover, not while you pile on.',
-      kapan: 'Today',
+      judul: 'Hari pemulihan', jenis: 'pemulihan', warna: '#94a3b8',
+      isi: 'Sesi terakhir Anda berat. Hari ini lebih baik dipakai berjalan, jogging sangat ringan 20–30 menit, atau istirahat penuh. Adaptasi terjadi saat pulih, bukan saat menumpuk beban.',
+      kapan: 'Hari ini',
       dasar: `Sesi terakhir ${kl.label.toLowerCase()} sekitar ${Math.round(jamSejak)} jam lalu.`,
     }
   }
@@ -255,16 +255,16 @@ export function saranBerikutnya(
   if (segar <= -30) {
     return {
       judul: 'Kurangi dulu', jenis: 'pemulihan', warna: '#ef4444',
-      isi: 'Fatigue is far above fitness. Take 2–3 easy days or rest. Pushing from here adds injury risk, not progress.',
-      kapan: 'Over the next few days',
+      isi: 'Kelelahan jauh di atas kebugaran. Ambil 2–3 hari ringan atau istirahat. Memaksa dari sini menambah risiko cedera, bukan kemajuan.',
+      kapan: 'Beberapa hari ke depan',
       dasar: `Kesegaran ${Math.round(segar)} — menandakan beban menumpuk lebih cepat daripada pemulihan.`,
     }
   }
 
   if (kerasPekanIni >= 2) {
     return {
-      judul: 'Easy run', jenis: 'easy', warna: '#34d399',
-      isi: 'You already have two quality sessions this week — that is enough. Another hard session in the same week rarely adds progress and often adds fatigue. Run easy for 40–60 minutes.',
+      judul: 'Lari ringan', jenis: 'easy', warna: '#34d399',
+      isi: 'Sudah ada dua sesi bermutu pekan ini — itu cukup. Sesi berat lagi pada pekan yang sama jarang menambah kemajuan dan sering menambah kelelahan. Lari ringan 40–60 menit.',
       kapan: `Besok (${namaBesok})`,
       dasar: `${kerasPekanIni} sesi tempo/interval dalam tujuh hari terakhir.`,
     }
@@ -272,26 +272,26 @@ export function saranBerikutnya(
 
   if (segar >= 5 && jamSejak >= 24) {
     return {
-      judul: 'Time for a quality session', jenis: 'tempo', warna: '#fbbf24',
-      isi: 'You are fresh and ready for a stimulus. Options: a 20-minute tempo at a comfortably-hard pace, or 5×3 minutes in zone 4 with 2-minute recoveries.',
-      kapan: jamSejak >= 40 ? 'Today' : `Besok (${namaBesok})`,
+      judul: 'Saatnya sesi bermutu', jenis: 'tempo', warna: '#fbbf24',
+      isi: 'Anda segar dan siap menerima rangsangan. Pilihan: tempo 20 menit pada laju berat-nyaman, atau 5×3 menit di zona 4 dengan pemulihan 2 menit.',
+      kapan: jamSejak >= 40 ? 'Hari ini' : `Besok (${namaBesok})`,
       dasar: `Kesegaran ${Math.round(segar)} dan ${Math.round(jamSejak)} jam sejak sesi terakhir.`,
     }
   }
 
   if (kl.jenis === 'long') {
     return {
-      judul: 'Easy run pendek', jenis: 'easy', warna: '#34d399',
-      isi: 'After a long session, a short easy run helps the legs recover faster than complete rest. 30–40 minutes is enough.',
+      judul: 'Lari ringan pendek', jenis: 'easy', warna: '#34d399',
+      isi: 'Sesudah sesi panjang, lari ringan yang pendek memulihkan kaki lebih cepat daripada istirahat penuh. 30–40 menit sudah cukup.',
       kapan: `Besok (${namaBesok})`,
       dasar: 'Sesi terakhir adalah long run.',
     }
   }
 
   return {
-    judul: 'Easy run', jenis: 'easy', warna: '#34d399',
-    isi: 'Hold your aerobic base: 40–60 minutes at a conversational pace. Sessions like this should fill most of your week.',
-    kapan: jamSejak >= 24 ? 'Today' : `Besok (${namaBesok})`,
+    judul: 'Lari ringan', jenis: 'easy', warna: '#34d399',
+    isi: 'Jaga dasar aerobik: 40–60 menit pada laju yang masih bisa dipakai mengobrol. Sesi seperti ini semestinya mengisi sebagian besar pekan Anda.',
+    kapan: jamSejak >= 24 ? 'Hari ini' : `Besok (${namaBesok})`,
     dasar: `Sesi terakhir ${kl.label.toLowerCase()}, kesegaran ${Math.round(segar)}.`,
   }
 }
@@ -384,17 +384,17 @@ export function dukungan(riwayat: ImportedWorkout[], k: Konteks, sekarang = Date
   const kmLalu = +pekanLalu.reduce((a, w) => a + (w.jarakKm ?? 0), 0).toFixed(1)
 
   if (!riwayat.length) {
-    return { judul: 'Nothing to compare yet', nada: 'netral',
+    return { judul: 'Belum ada pembanding', nada: 'netral',
       isi: 'Once a few sessions are in, this section will compare this week with the last using your own numbers.' }
   }
 
   if (!pekanIni.length && pekanLalu.length) {
-    return { judul: 'This week is still empty', nada: 'netral',
+    return { judul: 'Pekan ini masih kosong', nada: 'netral',
       isi: `Pekan lalu ${pekanLalu.length} sesi (${kmLalu} km). Istirahat satu pekan tidak menghapus kebugaran — kebugaran meluruh jauh lebih lambat daripada kelelahan. Satu sesi mudah sudah cukup untuk memulai lagi.` }
   }
 
   if (!pekanIni.length) {
-    return { judul: 'Start again whenever you like', nada: 'netral',
+    return { judul: 'Mulai lagi kapan pun Anda mau', nada: 'netral',
       isi: 'No sessions in the last seven days. There is nothing to catch up on — start with one easy session.' }
   }
 
@@ -405,11 +405,11 @@ export function dukungan(riwayat: ImportedWorkout[], k: Konteks, sekarang = Date
   }
 
   if (kmLalu > 0 && kmIni >= kmLalu) {
-    return { judul: 'Consistent and controlled', nada: 'baik',
+    return { judul: 'Konsisten dan terkendali', nada: 'baik',
       isi: `${pekanIni.length} sesi, ${kmIni} km pekan ini — setara atau di atas pekan lalu (${kmLalu} km), dan masih dalam kenaikan yang wajar. Justru pola membosankan seperti inilah yang membangun kebugaran.` }
   }
 
-  return { judul: 'A lighter week', nada: 'netral',
+  return { judul: 'Pekan yang lebih ringan', nada: 'netral',
     isi: `${pekanIni.length} sesi, ${kmIni} km. Lebih ringan daripada pekan lalu (${kmLalu} km). Pekan ringan yang disengaja adalah bagian dari program; yang perlu diperhatikan hanya bila ia tidak disengaja dan berulang.` }
 }
 

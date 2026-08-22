@@ -22,6 +22,23 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: string; isi: ReactNode }[] }) {
   const wadah = useRef<HTMLDivElement>(null)
   const [aktif, setAktif] = useState(0)
+  /* TINGGI MENGIKUTI HALAMAN YANG SEDANG TAMPAK.
+     Wadah geser mengambil tinggi halaman TERTINGGI, sehingga halaman pendek
+     menyisakan ruang kosong sebesar selisihnya — pada layar 390 px selisih itu
+     mencapai 200 px, dan di layar ia terbaca sebagai bagian yang gagal dimuat.
+     Tingginya diukur dari halaman yang tampak, dan diukur ulang saat isinya
+     berubah (angka baru, jadwal salat yang datang belakangan). */
+  const halaman = useRef<(HTMLDivElement | null)[]>([])
+  const [tinggi, setTinggi] = useState<number | undefined>(undefined)
+  useEffect(() => {
+    const el = halaman.current[aktif]
+    if (!el) return
+    const ukur = () => setTinggi(el.scrollHeight || undefined)
+    ukur()
+    const po = new ResizeObserver(ukur)
+    po.observe(el)
+    return () => po.disconnect()
+  }, [aktif, anak.length])
 
   useEffect(() => {
     const el = wadah.current
@@ -75,11 +92,15 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
           kembali milik sistem di tepi layar. */}
       <div
         ref={wadah}
-        className="geser-aman flex snap-x snap-mandatory overflow-x-auto"
-        style={{ scrollbarWidth: 'none' }}
+        className="geser-aman flex snap-x snap-mandatory items-start overflow-x-auto"
+        style={{ scrollbarWidth: 'none', height: tinggi, transition: 'height 0.22s ease' }}
       >
-        {anak.map((a) => (
-          <div key={a.kunci} className="w-full shrink-0 snap-center pr-[1px]">
+        {anak.map((a, i) => (
+          <div
+            key={a.kunci}
+            ref={(el) => { halaman.current[i] = el }}
+            className="w-full shrink-0 snap-center pr-[1px]"
+          >
             {a.isi}
           </div>
         ))}

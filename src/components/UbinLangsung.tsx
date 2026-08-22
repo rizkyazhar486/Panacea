@@ -72,6 +72,46 @@ function Cincin({ rasio, isi }: { rasio: number; isi: string }) {
   )
 }
 
+/**
+ * Batang tujuh hari di dalam ubin.
+ *
+ * Sumbu dasarnya NOL, bukan nilai terkecil: batang mengaku mewakili banyaknya
+ * sesuatu, dan batang yang dipotong di tengah membesar-besarkan selisih kecil
+ * menjadi selisih yang tampak berlipat. Hari kosong tetap digambar sebagai
+ * garis tipis — hari tanpa latihan adalah keterangan, bukan ketiadaan data.
+ */
+function Batang({ deret, nada = 'bg-brand' }: { deret: number[]; nada?: string }) {
+  const maks = Math.max(...deret, 1)
+  return (
+    <span className="flex h-7 items-end gap-[3px]" aria-hidden>
+      {deret.map((v, i) => (
+        <span
+          key={i}
+          className={`flex-1 rounded-sm ${v > 0 ? nada : 'bg-neutral-300 dark:bg-white/15'}`}
+          style={{ height: v > 0 ? `${Math.max(12, (v / maks) * 100)}%` : '3px' }}
+        />
+      ))}
+    </span>
+  )
+}
+
+/** Menit latihan per hari untuk tujuh hari terakhir, hari ini paling kanan. */
+function menitTujuhHari(): number[] {
+  const per = new Map<string, number>()
+  for (const w of getWorkouts()) {
+    const d = new Date(Date.parse(w.mulai))
+    if (Number.isNaN(d.getTime())) continue
+    const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+    per.set(k, (per.get(k) ?? 0) + Math.round((w.durasi ?? 0) / 60))
+  }
+  const out: number[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * HARI)
+    out.push(per.get(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`) ?? 0)
+  }
+  return out
+}
+
 // ── Langkah ────────────────────────────────────────────────────────────────
 function UbinLangkah() {
   const v = getVitals()
@@ -103,9 +143,13 @@ function UbinLatihan() {
   return (
     <Bingkai ke="/riwayat-latihan" judul="Latihan 7 hari">
       <Angka nilai={String(sesi.length)} satuan={`sesi · ${menit} mnt`} />
-      <span className="t-mikro truncate text-neutral-400">
-        {km > 0 ? `${km.toFixed(1)} km${pace ? ` · ${pace}/km` : ''}` : 'jarak tidak terekam'}
-      </span>
+      {/* Keterangan jarak dan pace DIGANTI GRAFIK, bukan ditambah di bawahnya.
+          Dua baris kalimat di dalam ubin sekecil ini membuat ubinnya terbaca
+          sebagai paragraf; sebaran latihan sepekan justru tidak terbaca sama
+          sekali dari angka totalnya. Jarak dan pace tetap ada, satu ketukan
+          jauhnya, di halaman yang memang untuk itu. */}
+      <Batang deret={menitTujuhHari()} />
+      {km > 0 && <span className="t-mikro truncate text-neutral-400">{km.toFixed(1)} km{pace ? ` · ${pace}/km` : ''}</span>}
     </Bingkai>
   )
 }
@@ -153,11 +197,29 @@ function UbinLongevity() {
   return (
     <Bingkai ke="/longevity" judul="Kapasitas aerobik">
       <Angka nilai={vo2.toFixed(1)} satuan="mL/kg/mnt" />
-      <span className="t-mikro truncate text-neutral-400">
-        {selisihMet == null
-          ? `${(vo2 / ML_PER_MET).toFixed(1)} MET`
-          : `${selisihMet >= 0 ? '+' : ''}${selisihMet.toFixed(1)} MET dari titik tengah usia`}
-      </span>
+      {titik == null ? (
+        <span className="t-mikro truncate text-neutral-400">{(vo2 / ML_PER_MET).toFixed(1)} MET</span>
+      ) : (
+        <>
+          {/* Letak terhadap TITIK TENGAH USIA, digambar pada sumbu ±2 MET.
+              Angka "+1,3 MET" tidak memberi tahu apakah itu jauh atau dekat;
+              jaraknya terhadap penanda titik tengah memberitahukannya sekali
+              lihat. Sumbunya dipotong pada ±2 MET dan penandanya tetap di
+              tengah, jadi yang di luar rentang menempel di ujung — melebarkan
+              sumbu mengikuti data akan membuat jarak yang sama tampak berbeda
+              pada hari yang berbeda. */}
+          <span className="relative block h-2 w-full rounded-full bg-neutral-200 dark:bg-white/12" aria-hidden>
+            <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-neutral-400 dark:bg-white/40" />
+            <span
+              className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand cahaya-hijau"
+              style={{ left: `${Math.min(96, Math.max(4, 50 + (Math.max(-2, Math.min(2, selisihMet ?? 0)) / 2) * 46))}%` }}
+            />
+          </span>
+          <span className="t-mikro truncate text-neutral-400">
+            {`${(selisihMet ?? 0) >= 0 ? '+' : ''}${(selisihMet ?? 0).toFixed(1)} MET · titik tengah usia`}
+          </span>
+        </>
+      )}
     </Bingkai>
   )
 }
@@ -181,6 +243,22 @@ function UbinLongevity() {
  * menjalankan hook-nya di luar pohon render dan menjatuhkan seluruh halaman.
  * Maka pemeriksaannya dilakukan di sini, tanpa hook sama sekali.
  */
+/** Garis kesegaran dengan nol sebagai sumbu tetap. */
+function GarisKesegaran({ deret }: { deret: number[] }) {
+  if (deret.length < 3) return null
+  const batas = Math.max(5, ...deret.map((v) => Math.abs(v)))
+  const T = 34
+  const y = (v: number) => T / 2 - (v / batas) * (T / 2 - 2)
+  const x = (i: number) => (i / (deret.length - 1)) * 100
+  const titik = deret.map((v, i) => `${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(' ')
+  return (
+    <svg viewBox={`0 0 100 ${T}`} preserveAspectRatio="none" className="h-[34px] w-full" role="img" aria-label={`Kesegaran ${deret.length} hari terakhir`}>
+      <line x1="0" y1={T / 2} x2="100" y2={T / 2} stroke="currentColor" strokeWidth="0.5" className="text-neutral-300 dark:text-white/25" />
+      <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.6" vectorEffect="non-scaling-stroke" strokeLinejoin="round" className="text-brand" />
+    </svg>
+  )
+}
+
 export function hitungPelatih() {
   const sesi = getWorkouts()
   if (sesi.length < 3) return null
@@ -199,13 +277,13 @@ export function hitungPelatih() {
   // Bila modelnya tidak dapat dihitung, ubin ini TIDAK ADA — lebih baik
   // daripada tiga angka "NaN" yang terbaca sebagai aplikasi yang rusak.
   if (![kini.kebugaran, kini.kelelahan, kini.kesegaran].every(Number.isFinite)) return null
-  return { sesi, k, kini }
+  return { sesi, k, kini, ff }
 }
 
 export function UbinPelatihLebar() {
   const hasil = hitungPelatih()
   if (!hasil) return null
-  const { sesi, k, kini } = hasil
+  const { sesi, k, kini, ff } = hasil
   const saran = saranBerikutnya(sesi, k)
 
   return (
@@ -233,10 +311,15 @@ export function UbinPelatihLebar() {
         ))}
       </div>
 
-      <div>
-        <span className="t-kecil block font-black text-ink dark:text-white">{saran.judul}</span>
-        <span className="t-mikro block leading-snug text-neutral-500">{saran.dasar}</span>
-      </div>
+      {/* KESEGARAN 30 HARI, bukan kalimat penjelas.
+          Tiga angka di atas menyatakan keadaan hari ini saja, dan keadaan hari
+          ini tidak dapat dibedakan antara "sedang menumpuk beban" dan "baru
+          selesai memulihkan diri" tanpa melihat dari mana ia datang. Garis nol
+          digambar tegas karena tanda garis inilah artinya: di atas nol terbawa
+          beban yang sudah mengendap, di bawahnya sedang menumpuk kelelahan.
+          Alasan lengkap keputusannya ada di halaman yang ditunjuk ubin ini. */}
+      <GarisKesegaran deret={ff.slice(-30).map((t) => t.kesegaran)} />
+      <span className="t-kecil block truncate font-black text-ink dark:text-white">{saran.judul}</span>
     </Link>
   )
 }
