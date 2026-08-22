@@ -7,6 +7,7 @@ import { pushBiometrics, mergeHealthCache } from '../lib/profile'
 import { mergeVitals } from '../lib/healthVitals'
 import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
+import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -311,8 +312,33 @@ export function Longevity() {
       </Card>
 
       {/* Pillars */}
+      {/* ── Lapisan bukti ────────────────────────────────────────────────
+          Ditaruh SEBELUM kartu skor komposit, dan itu disengaja. Skor
+          komposit di bawah memakai bobot yang dikarang (0,22 untuk VO2max,
+          0,13 untuk grip) dan rumus usia biologis yang tidak berasal dari
+          penelitian mana pun. Kartu ini menampilkan besaran yang benar-benar
+          dilaporkan penelitian beserta sumbernya, sehingga pembacanya dapat
+          membedakan keduanya — dan itu tidak mungkin bila yang berdasar bukti
+          diletakkan di bawah yang berdasar tebakan. */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Validated long-term predictors — weighted by strength of evidence" />
+        <SectionTitle
+          icon={<span className="text-lg">🔬</span>}
+          title="Angka yang dapat dilacak ke sumbernya"
+          subtitle="Hanya besaran yang benar-benar dilaporkan penelitian, masing-masing dengan kutipan, ukuran kohort, dan batas ketidakpastiannya"
+        />
+        <div className="mt-3">
+          <PanelKebugaranIlmiah
+            usia={d.age}
+            jk={d.g === 'M' ? 'L' : 'P'}
+            vo2={d.vo2 || undefined}
+            denyutIstirahat={d.rhr || undefined}
+            genggamKg={d.grip || undefined}
+          />
+        </div>
+      </Card>
+
+      <Card className="!p-5">
+        <SectionTitle icon={<IconActivity size={20} />} title="8 Longevity Pillars" subtitle="Predictor jangka panjang yang memang terbukti — TETAPI bobot penggabungannya adalah pilihan penulis, bukan hasil penelitian" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           {num('VO₂max (ml/kg/min)', 'vo2', 0.1)}
           {num('Best grip (kg)', 'grip', 0.5)}
