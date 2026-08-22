@@ -935,10 +935,6 @@ const ALIAS: Record<string, string> = {
   /*
    * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini:
    *
-   *   'Pitiriasis Versicolor' (2x) — dicoba dipetakan dan ditolak penjaga:
-   *   catatannya memang tidak ada, padahal panu adalah penyakit kulit yang
-   *   paling sering di Indonesia. Ini yang pertama ditulis berikutnya.
-   *
    *   'Uveitis Anterior', 'Retinitis pigmentosa', 'Ramsay Hunt Syndrome',
    *   'Ulkus Mole', 'Kalazion', 'Cushing syndrome', 'Ankilostomiasis',
    *   'Epiglottitis', 'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
@@ -952,6 +948,10 @@ const ALIAS: Record<string, string> = {
    *   KPD'. Menautkannya ke salah satu menyembunyikan yang lain, dan justru
    *   MEMBEDAKAN keduanya yang sedang diuji.
    */
+
+  // Catatan baru yang ditulis pada gelombang ini.
+  'Pitiriasis Versicolor': 'Pitiriasis Versikolor (Panu)',
+  Panu: 'Pitiriasis Versikolor (Panu)',
 }
 
 /**
