@@ -935,9 +935,8 @@ const ALIAS: Record<string, string> = {
   /*
    * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini:
    *
-   *   'Retinitis pigmentosa', 'Cushing syndrome', 'Ankilostomiasis',
-   *   'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
-   *   belum ada catatannya sama sekali. Ini pekerjaan menulis.
+   *   'Retinitis pigmentosa', 'Kista Nabothian', dan 'IUGR' — memang belum
+   *   ada catatannya sama sekali. Ini pekerjaan menulis.
    *
    *   'Sistitis komplikata' DIPETAKAN ke 'Sistitis Akut' walaupun komplikata
    *   dan non-komplikata berbeda lama pengobatannya; catatan itu membahas
@@ -949,6 +948,30 @@ const ALIAS: Record<string, string> = {
    */
 
   // Catatan baru yang ditulis pada gelombang ini.
+  Ankilostomiasis: 'Ankilostomiasis (Cacing Tambang)',
+  'Ankilostomiasis (RME)': 'Ankilostomiasis (Cacing Tambang)',
+  'Penyakit cacing tambang': 'Ankilostomiasis (Cacing Tambang)',
+  /*
+   * 'Anemia Megaloblastik ec cacing tambang (RME)' SUDAH dipetakan di atas ke
+   * 'Anemia megaloblastik', dan itu dipertahankan: yang disebut sebagai
+   * DIAGNOSIS pada baris rekap itu adalah anemia megaloblastiknya, cacing
+   * tambang disebut sebagai sebabnya. Perlu dicatat bahwa cacing tambang
+   * sesungguhnya menimbulkan anemia MIKROSITIK karena kehilangan besi, bukan
+   * megaloblastik; keduanya baru terjadi bersamaan bila gizinya sangat buruk.
+   * Kejanggalan itu dibiarkan apa adanya di sini karena berasal dari rekapnya,
+   * dan catatan cacing tambang membahas perbedaan itu pada diagnosis banding.
+   */
+  'Cushing syndrome': 'Sindrom Cushing',
+  'Cushing disease dd/ Cushing syndrome': 'Sindrom Cushing',
+  'DM Tipe Lain ec Kortikosteroid': 'Sindrom Cushing',
+  /*
+   * 'Hidronefrosis renal kanan grade 2 e.c ureterolithiasis' dan 'Hidroureter'
+   * dipetakan ke catatan batu saluran kemih: keduanya adalah AKIBAT sumbatan
+   * batu, dan yang diujikan pada stasiun itu adalah menemukan sumbatannya
+   * serta menanganinya, bukan bendungannya sendiri.
+   */
+  'Hidronefrosis renal kanan grade 2 e.c ureterolithiasis': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  Hidroureter: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
   'Ramsay Hunt Syndrome': 'Sindrom Ramsay Hunt',
   'Epiglottitis - (RME)': 'Epiglotitis Akut',
   Epiglotitis: 'Epiglotitis Akut',
