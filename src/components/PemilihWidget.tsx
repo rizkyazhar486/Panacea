@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -46,7 +47,20 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
     return [...peta.entries()]
   }, [cari])
 
-  return (
+  // ── DIPASANG DI BODY, BUKAN DI TEMPATNYA DIPANGGIL ────────────────────────
+  //
+  // Beranda dibungkus .fluid, dan .fluid memakai container-type: inline-size
+  // supaya seluruh ukuran cqw di dalamnya mengukur lebar kolom, bukan lebar
+  // layar. Efek sampingnya jarang disebut tetapi menentukan: elemen dengan
+  // container-type menjadi CONTAINING BLOCK bagi keturunan position: fixed.
+  // Akibatnya lembar ini tidak menutupi layar melainkan kotak beranda, dan
+  // pada telepon ia berakhir terpotong atau di luar pandangan — terlihat
+  // seperti tombol "Atur widget" yang tidak melakukan apa-apa.
+  //
+  // Uji otomatis sebelumnya lolos justru karena itu: ia mencari lembarnya di
+  // pohon DOM dan menemukannya. Yang tidak diperiksa adalah apakah lembar itu
+  // benar-benar menutupi layar. Kini itu yang diuji.
+  return createPortal(
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/60 sm:items-center sm:p-4" role="dialog" aria-label="Pilih widget beranda">
       <div className="flex max-h-[88vh] w-full max-w-lg flex-col rounded-t-3xl bg-white shadow-2xl dark:bg-neutral-900 sm:rounded-3xl">
         <div className="flex items-center justify-between gap-2 border-b border-neutral-200 p-4 dark:border-white/10">
@@ -126,7 +140,8 @@ export function PemilihWidget({ tutup }: { tutup: () => void }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
