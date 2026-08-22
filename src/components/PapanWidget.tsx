@@ -212,6 +212,14 @@ function Angka({ label, nilai }: { label: string; nilai: string }) {
  * padahal totalnya tidak pernah berkurang — dan itulah yang menahan orang
  * berhenti mencatat sesudah jedanya yang pertama.
  */
+/**
+ * Ubin rangkaian — TIDAK LAGI DIPAKAI DI BERANDA.
+ *
+ * Dibiarkan ada karena halaman Log memakainya bila ingin, dan karena
+ * menghapusnya berarti kehilangan penanganan keadaan kosong yang sudah
+ * dipikirkan. Yang berubah hanyalah tempatnya: peta konsistensi
+ * menggambarkan hal yang sama dengan jauh lebih banyak keterangan.
+ */
 export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
   const r = hitungRangkaian(tanggal)
   if (r.total === 0) {
@@ -262,10 +270,13 @@ export function UbinKlinis() {
   return (
     <Ubin ke="/med-study" judul="Klinis" lebar>
       {n ? (
-        <div className="flex items-end gap-4">
+        /* Tiga angka pada satu baris. Ini isi katalog, bukan angka tubuh
+           siapa pun, jadi tidak ada tren yang dapat digambar — yang jujur
+           hanyalah jumlahnya. */
+        <div className="flex items-end justify-between gap-2">
           <Angka label="penyakit" nilai={String(n.penyakit)} />
-          <Angka label="tatalaksana" nilai={String(n.obat)} />
-          <Angka label="stasiun OSCE" nilai={String(n.stasiun)} />
+          <Angka label="obat" nilai={String(n.obat)} />
+          <Angka label="stasiun" nilai={String(n.stasiun)} />
         </div>
       ) : (
         <p className="t-kecil text-neutral-400">Menghitung isi…</p>
@@ -469,7 +480,11 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
       <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
       <div className="grid grid-cols-2 gap-fluid">
         {pratinjau.filter((p) => !bergrafik.includes(p.id)).map((p) => <UbinAngka key={p.id} p={p} />)}
-        <UbinRangkaian tanggal={tanggalCatatan} />
+        {/* Ubin rangkaian dibuang dari beranda: peta konsistensi di bawah
+            menggambarkan hal yang sama dalam bentuk yang jauh lebih banyak
+            keterangannya — 84 hari sekaligus, bukan tiga angka. Menampilkan
+            keduanya berarti menyuruh orang membaca dua kali hal yang sama.
+            Angka rangkaiannya sendiri tetap ada di halaman Log. */}
         <UbinKlinis />
       </div>
     </section>
