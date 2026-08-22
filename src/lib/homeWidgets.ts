@@ -80,6 +80,15 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'gerak', label: 'Analisis Gerak', ringkas: 'Telaah pola gerakan', ke: '/analisis-gerak', emoji: '🎥', kategori: 'Latihan' },
   { id: 'sportsLab', label: 'Sports Lab', ringkas: 'Fisiologi latihan mendalam', ke: '/sports-lab', emoji: '🔬', kategori: 'Latihan' },
   { id: 'latihanBeban', label: 'Latihan Beban', ringkas: 'Set, ulangan, volume, dan rekor per gerakan', ke: '/latihan-beban', emoji: '🏋️', kategori: 'Latihan' },
+  // Grafik tujuh hari di beranda. Terdaftar sebagai widget tersendiri supaya
+  // dapat dimatikan: sebelumnya kelimanya tampil apa pun pilihan pemakainya,
+  // sehingga "Atur widget" terasa tidak berfungsi — orang mematikan Pola Tidur
+  // dan grafik tidurnya tetap ada di layar.
+  { id: 'grafikLatihan', label: 'Grafik Latihan 7 Hari', ringkas: 'Menit latihan per hari', ke: '/latihan', emoji: '📊', kategori: 'Latihan', bawaan: true },
+  { id: 'grafikTidur', label: 'Grafik Tidur 7 Hari', ringkas: 'Jam tidur per malam', ke: '/pola-tidur', emoji: '🌙', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'grafikLangkah', label: 'Grafik Langkah 7 Hari', ringkas: 'Langkah per hari', ke: '/tubuh', emoji: '👣', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'grafikGizi', label: 'Grafik Gizi 7 Hari', ringkas: 'Kalori tercatat per hari', ke: '/nutrition', emoji: '🍽️', kategori: 'Gizi', bawaan: true },
+  { id: 'grafikDenyut', label: 'Grafik Denyut 14 Hari', ringkas: 'Denyut istirahat dari waktu ke waktu', ke: '/tubuh', emoji: '❤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'harian', label: 'Harian', ringkas: 'Telusuri hari mana pun: terukur dan yang dirasakan', ke: '/harian', emoji: '📅', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'ikhtisar', label: 'Ikhtisar', ringkas: 'Semua angka tubuh dan grafiknya pada satu layar', ke: '/ikhtisar', emoji: '📈', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'tubuh', label: 'Pusat Tubuh', ringkas: 'Angka tubuh dan rentang rujukannya', ke: '/tubuh', emoji: '🫁', kategori: 'Tubuh & Data', bawaan: true },

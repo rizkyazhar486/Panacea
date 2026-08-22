@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getWorkouts } from '../lib/workoutStore'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { useStore } from '../lib/store'
+import { ambilWidget } from '../lib/homeWidgets'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ubin berbentuk GRAFIK, bukan kalimat.
@@ -100,16 +101,30 @@ function Ubin({
  * panjang halaman.
  */
 export function wilayahBergrafik(state: { foods?: unknown[]; sleepLogs?: unknown[] }): string[] {
+  // Sebuah wilayah hanya dianggap "sudah bergrafik" bila grafiknya BENAR-BENAR
+  // tampil: datanya ada DAN widgetnya dinyalakan. Tanpa syarat kedua, mematikan
+  // grafik tidur akan menghilangkan tidur dari beranda sama sekali — ubin
+  // teksnya sudah telanjur dibuang karena mengira grafiknya ada.
+  const nyala = ambilWidget()
   const ada: string[] = []
-  if (getWorkouts().length) ada.push('latihan')
-  if (deretMetrik('sleepH').length || (state.sleepLogs ?? []).length) ada.push('tidur')
-  if ((state.foods ?? []).length) ada.push('gizi')
-  if (deretMetrik('restingHr').length >= 3) ada.push('tubuh')
+  if (nyala.includes('grafikLatihan') && getWorkouts().length) ada.push('latihan')
+  if (nyala.includes('grafikTidur') && (deretMetrik('sleepH').length || (state.sleepLogs ?? []).length)) ada.push('tidur')
+  if (nyala.includes('grafikGizi') && (state.foods ?? []).length) ada.push('gizi')
+  if (nyala.includes('grafikDenyut') && deretMetrik('restingHr').length >= 3) ada.push('tubuh')
   return ada
 }
 
 export function UbinGrafik() {
   const { state } = useStore()
+
+  // Pilihan pemakai dihormati di sini juga. Tanpa ini, mematikan sebuah widget
+  // tidak mengubah apa pun di layar, dan pemilihnya berhenti dipercaya.
+  const [pilihan, setPilihan] = useState<string[]>(ambilWidget)
+  useEffect(() => {
+    const on = () => setPilihan(ambilWidget())
+    window.addEventListener('panacea:home-widgets', on)
+    return () => window.removeEventListener('panacea:home-widgets', on)
+  }, [])
 
   const latihan = useMemo(() => {
     const m = new Map<string, number>()
@@ -144,37 +159,38 @@ export function UbinGrafik() {
   const denyut = useMemo(() => deretMetrik('restingHr').slice(-14).map((t) => t.nilai), [])
 
   const ubin: {
-    ke: string; judul: string; nilai: string; satuan: string; deret: number[]
+    id: string; ke: string; judul: string; nilai: string; satuan: string; deret: number[]
     nada: string; bentuk?: 'batang' | 'garis'
   }[] = []
 
   const menitPekan = latihan.reduce((a, b) => a + b, 0)
-  if (menitPekan > 0) ubin.push({ ke: '/latihan', judul: 'Latihan', nilai: String(menitPekan), satuan: 'mnt / 7 hari', deret: latihan, nada: 'bg-brand' })
+  if (menitPekan > 0) ubin.push({ id: 'grafikLatihan', ke: '/latihan', judul: 'Latihan', nilai: String(menitPekan), satuan: 'mnt / 7 hari', deret: latihan, nada: 'bg-brand' })
 
   const malam = tidur.filter((x) => x > 0)
-  if (malam.length) ubin.push({ ke: '/pola-tidur', judul: 'Tidur', nilai: (malam.reduce((a, b) => a + b, 0) / malam.length).toFixed(1), satuan: 'jam rata-rata', deret: tidur, nada: 'bg-indigo-400' })
+  if (malam.length) ubin.push({ id: 'grafikTidur', ke: '/pola-tidur', judul: 'Tidur', nilai: (malam.reduce((a, b) => a + b, 0) / malam.length).toFixed(1), satuan: 'jam rata-rata', deret: tidur, nada: 'bg-indigo-400' })
 
   const hariLangkah = langkah.filter((x) => x > 0)
-  if (hariLangkah.length) ubin.push({ ke: '/tubuh', judul: 'Langkah', nilai: Math.round(hariLangkah.reduce((a, b) => a + b, 0) / hariLangkah.length).toLocaleString('id-ID'), satuan: 'per hari', deret: langkah, nada: 'bg-cyan-400' })
+  if (hariLangkah.length) ubin.push({ id: 'grafikLangkah', ke: '/tubuh', judul: 'Langkah', nilai: Math.round(hariLangkah.reduce((a, b) => a + b, 0) / hariLangkah.length).toLocaleString('id-ID'), satuan: 'per hari', deret: langkah, nada: 'bg-cyan-400' })
 
   const hariGizi = gizi.filter((x) => x > 0)
-  if (hariGizi.length) ubin.push({ ke: '/nutrition', judul: 'Gizi', nilai: Math.round(hariGizi.reduce((a, b) => a + b, 0) / hariGizi.length).toLocaleString('id-ID'), satuan: 'kkal / hari', deret: gizi, nada: 'bg-amber-400' })
+  if (hariGizi.length) ubin.push({ id: 'grafikGizi', ke: '/nutrition', judul: 'Gizi', nilai: Math.round(hariGizi.reduce((a, b) => a + b, 0) / hariGizi.length).toLocaleString('id-ID'), satuan: 'kkal / hari', deret: gizi, nada: 'bg-amber-400' })
 
   if (denyut.length >= 3) {
     const akhir = denyut[denyut.length - 1]
     ubin.push({
-      ke: '/tubuh', judul: 'Denyut istirahat', nilai: String(Math.round(akhir)),
+      id: 'grafikDenyut', ke: '/tubuh', judul: 'Denyut istirahat', nilai: String(Math.round(akhir)),
       satuan: 'bpm', deret: denyut, nada: 'bg-rose-400', bentuk: 'garis',
     })
   }
 
-  if (!ubin.length) return null
+  const tampil = ubin.filter((u) => pilihan.includes(u.id))
+  if (!tampil.length) return null
 
   return (
     <section>
       <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Tujuh hari</h2>
       <div className="grid grid-cols-2 gap-fluid">
-        {ubin.map((u, i) => <Ubin key={u.judul} {...u} cahaya={i === 0} />)}
+        {tampil.map((u, i) => <Ubin key={u.id} {...u} cahaya={i === 0} />)}
       </div>
     </section>
   )
