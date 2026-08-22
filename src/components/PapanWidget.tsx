@@ -27,6 +27,8 @@ import { UbinPelatihLebar, hitungPelatih } from './UbinLangsung'
 import { UbinSalat } from './UbinSalat'
 import { UbinObat, UbinKalkulator, UbinStasiun } from './UbinKerja'
 import { UbinMotivasi } from './UbinMotivasi'
+import { UbinSkor } from './UbinSkor'
+import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { bilahTersedia } from '../lib/bilahRujukan'
@@ -458,6 +460,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
     'pantauan', 'kebugaran', 'salat', 'konsistensi',
     'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
+    'skorTim', 'tidurLebar', 'giziLebar',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -532,6 +535,9 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
           ? [{ kunci: 'kebugaran', isi: <UbinPelatihLebar /> }] : []),
         ...(pilihan.includes('salat') ? [{ kunci: 'salat', isi: <UbinSalat /> }] : []),
         ...(pilihan.includes('pantauan') ? [{ kunci: 'pantauan', isi: <UbinPantauan /> }] : []),
+        ...(pilihan.includes('skorTim') ? [{ kunci: 'skorTim', isi: <UbinSkor /> }] : []),
+        ...(pilihan.includes('tidurLebar') ? [{ kunci: 'tidurLebar', isi: <UbinTidurLebar /> }] : []),
+        ...(pilihan.includes('giziLebar') ? [{ kunci: 'giziLebar', isi: <UbinGiziLebar /> }] : []),
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
         ...(pilihan.includes('obatCepat') ? [{ kunci: 'obatCepat', isi: <UbinObat /> }] : []),
         ...(pilihan.includes('kalkulatorCepat') ? [{ kunci: 'kalkulatorCepat', isi: <UbinKalkulator /> }] : []),

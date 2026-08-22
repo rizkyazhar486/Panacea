@@ -30,15 +30,50 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
      berubah (angka baru, jadwal salat yang datang belakangan). */
   const halaman = useRef<(HTMLDivElement | null)[]>([])
   const [tinggi, setTinggi] = useState<number | undefined>(undefined)
+
+  /* HALAMAN KOSONG DISEMBUNYIKAN, TERMASUK TITIKNYA.
+     Widget berhak mengembalikan null bila datanya belum ada — itu aturan yang
+     dipegang seluruh berkas ubin. Tetapi di dalam tumpukan, widget yang tidak
+     menggambar apa pun tetap menyisakan satu halaman yang dapat digeser ke
+     sana lalu kosong, lengkap dengan titik penanda yang menjanjikan ada
+     isinya. Karena isi widget baru diketahui SESUDAH digambar (skor menunggu
+     jawaban server), yang kosong dikenali dengan mengukur tingginya, bukan
+     dengan menebak dari luar. */
+  const [kosong, setKosong] = useState<Record<number, boolean>>({})
   useEffect(() => {
-    const el = halaman.current[aktif]
+    const periksa = () => {
+      setKosong((lama) => {
+        const baru: Record<number, boolean> = {}
+        let berubah = false
+        anak.forEach((_, i) => {
+          // Kosong dikenali dari ADA-TIDAKNYA SIMPUL ANAK, bukan dari tinggi.
+          // Tinggi halaman yang sudah disembunyikan selalu nol, sehingga
+          // mengukur tinggi akan mengunci halaman itu tersembunyi selamanya —
+          // termasuk sesudah jawaban server datang dan isinya muncul.
+          const nihil = !halaman.current[i]?.firstElementChild
+          baru[i] = nihil
+          if (lama[i] !== nihil) berubah = true
+        })
+        return berubah ? baru : lama
+      })
+    }
+    periksa()
+    const mo = new MutationObserver(periksa)
+    for (const el of halaman.current) if (el) mo.observe(el, { childList: true })
+    return () => mo.disconnect()
+  }, [anak])
+
+  const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
+
+  useEffect(() => {
+    const el = halaman.current[tampil[aktif]?.i ?? 0]
     if (!el) return
     const ukur = () => setTinggi(el.scrollHeight || undefined)
     ukur()
     const po = new ResizeObserver(ukur)
     po.observe(el)
     return () => po.disconnect()
-  }, [aktif, anak.length])
+  }, [aktif, tampil])
 
   useEffect(() => {
     const el = wadah.current
@@ -49,7 +84,7 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
       jalan = true
       requestAnimationFrame(() => {
         const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth))
-        setAktif(Math.min(anak.length - 1, Math.max(0, i)))
+        setAktif(Math.max(0, i))
         jalan = false
       })
     }
@@ -58,7 +93,6 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
   }, [anak.length])
 
   if (!anak.length) return null
-  if (anak.length === 1) return <section>{anak[0].isi}</section>
 
   const ke = (i: number) => {
     const el = wadah.current
@@ -67,7 +101,7 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
 
   return (
     <section>
-      {judul && (
+      {judul && tampil.length > 1 && (
         <div className="mb-2 flex items-center justify-between gap-2">
           <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
           {/* Titik halaman: penanda letak DAN tombol. Pada iOS titik ini hanya
@@ -75,11 +109,11 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
               yang lebar, menggeser empat kali lebih lelah daripada menekan
               titik keempat. */}
           <div className="flex items-center gap-1.5">
-            {anak.map((a, i) => (
+            {tampil.map((a, i) => (
               <button
                 key={a.kunci}
                 onClick={() => ke(i)}
-                aria-label={`Widget ${i + 1} dari ${anak.length}`}
+                aria-label={`Widget ${i + 1} dari ${tampil.length}`}
                 aria-current={i === aktif}
                 className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
               />
@@ -99,7 +133,7 @@ export function Tumpukan({ judul, anak }: { judul?: string; anak: { kunci: strin
           <div
             key={a.kunci}
             ref={(el) => { halaman.current[i] = el }}
-            className="w-full shrink-0 snap-center pr-[1px]"
+            className={kosong[i] ? 'hidden' : 'w-full shrink-0 snap-center pr-[1px]'}
           >
             {a.isi}
           </div>

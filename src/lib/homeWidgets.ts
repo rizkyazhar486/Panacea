@@ -102,6 +102,9 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'skorTim', label: 'Skor Tim Anda', ringkas: 'Pertandingan tim favorit', ke: '/sports-scores', emoji: '⚽', kategori: 'Ibadah & Hidup', bawaan: true },
+  { id: 'tidurLebar', label: 'Tidur 14 Malam', ringkas: 'Malam ini terhadap kebiasaan', ke: '/pola-tidur', emoji: '🌙', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'giziLebar', label: 'Asupan Hari Ini', ringkas: 'Kalori dan susunan makro', ke: '/nutrition', emoji: '🥗', kategori: 'Gizi', bawaan: true },
   { id: 'motivasi', label: 'Pekan Ini', ringkas: 'Rangkaian hari dan menit latihan', ke: '/harian', emoji: '🔥', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'obatCepat', label: 'Obat & Dosis', ringkas: 'Cari dosis langsung di beranda', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'kalkulatorCepat', label: 'Hitung Cepat', ringkas: 'IMT, MAP, LPB, dosis per kg', ke: '/clinical-calculators', emoji: '🧮', kategori: 'Klinis & Belajar', bawaan: true },
@@ -277,6 +280,9 @@ export const WIDGET_HIDUP = [
   'obatCepat',      // cari dosis SKDI di dalam ubinnya
   'kalkulatorCepat',// IMT/MAP/LPB/dosis per kg, dihitung di tempat
   'stasiunSering',  // kasus OSCE tersering per sistem, dari arsip
+  'skorTim',        // pertandingan tim favorit, dari server skor
+  'tidurLebar',     // 14 malam + kebiasaan sendiri
+  'giziLebar',      // kalori hari ini + susunan makro
 ] as const
 
 /** Katalog yang boleh menempati beranda. */
