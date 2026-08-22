@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from './Logo'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -71,8 +71,19 @@ export interface TujuanFab {
   end?: boolean
 }
 
+/*
+ * `tujuan` dan `onTambah` TIDAK LAGI DIPAKAI oleh menu ini, dan itu disengaja.
+ *
+ * Menu lingkar berisi TINDAKAN, bukan daftar halaman: menaruh enam pintu di
+ * sini akan mengulang kisi fitur dan pencarian yang sudah ada, dan tepat itulah
+ * yang membuat menu lama terasa seperti menu belaka. Kedua prop dibiarkan ada
+ * supaya pemanggilnya tidak perlu diubah sekaligus, dan supaya menu daftar
+ * dapat dihidupkan kembali bila ternyata dibutuhkan.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[]; onTambah?: () => void; onCari?: () => void }) {
   const lokasi = useLocation()
+  const navigasi = useNavigate()
   // Letak bawaan: sudut kanan bawah, bukan melayang 96 px di atasnya.
   //
   // Tombol yang beristirahat di tengah tinggi layar menutupi isi yang sedang
@@ -135,7 +146,16 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
     if (a.geser) {
       setMenggeser(false)
       setPos((p) => {
-        const akhir = jepit(p)
+        // MENEMPEL KE TEPI TERDEKAT, seperti tombol bantu pada ponsel.
+        //
+        // Tombol yang berhenti di tengah layar menutupi isi bacaan dan tidak
+        // pernah berada di tempat yang sama dua kali, sehingga tangan tidak
+        // pernah hafal letaknya. Menempel ke tepi membuat letaknya hanya empat
+        // kemungkinan, dan tangan menghafalnya dalam beberapa kali pakai.
+        const l = jepit(p)
+        const kanan = window.innerWidth - UKURAN - TEPI
+        const x = l.x + UKURAN / 2 < window.innerWidth / 2 ? TEPI : kanan
+        const akhir = jepit({ x, y: l.y })
         try { localStorage.setItem(KUNCI, JSON.stringify(akhir)) } catch {}
         return akhir
       })
@@ -150,6 +170,64 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
   const keAtas = pos.y > window.innerHeight / 2
   // Rata kanan bila tombol di paruh kanan, supaya daftar tidak melewati tepi.
   const keKiri = pos.x > window.innerWidth / 2
+
+  /* Letak tiap tindakan di dalam kisi 3x3: atas, kiri, kanan, bawah, lalu dua
+     sudut bawah. Tengahnya sengaja DIBIARKAN KOSONG — di situlah ibu jari
+     mendarat sesudah mengetuk tombolnya, dan menaruh tindakan di sana membuat
+     orang menekan sesuatu yang tidak dimaksudnya. */
+  const TATA = [
+    'col-start-2 row-start-1',
+    'col-start-1 row-start-2',
+    'col-start-3 row-start-2',
+    'col-start-2 row-start-3',
+    'col-start-1 row-start-3',
+    'col-start-3 row-start-1',
+  ]
+
+  /* Enam tindakan yang benar-benar dipakai berulang, bukan enam pintu.
+     Dipilih dari yang paling sering dibutuhkan di tengah halaman mana pun:
+     mencari sesuatu, kembali, naik ke atas halaman panjang, pulang ke beranda,
+     mencatat hari ini, dan pertolongan darurat. */
+  const aksi: { label: string; ikon: React.ReactNode; jalan: () => void; utama?: boolean }[] = [
+    {
+      label: 'Cari',
+      ikon: (
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
+        </svg>
+      ),
+      // Selalu ke mesin pencari, bukan ke kotak cari milik bilah judul.
+      // Kotak itu hanya mencari nama fitur; yang dicari orang di tengah
+      // halaman biasanya penyakit, obat, atau skor — dan itu ada di /cari.
+      jalan: () => navigasi('/cari'),
+      utama: true,
+    },
+    {
+      label: 'Kembali',
+      ikon: <span className="text-[18px] leading-none">‹</span>,
+      jalan: () => navigasi(-1),
+    },
+    {
+      label: 'Beranda',
+      ikon: <span className="text-[15px] leading-none">⌂</span>,
+      jalan: () => navigasi('/'),
+    },
+    {
+      label: 'Ke atas',
+      ikon: <span className="text-[15px] leading-none">↑</span>,
+      jalan: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+    },
+    {
+      label: 'Catat',
+      ikon: <span className="text-[14px] leading-none">✎</span>,
+      jalan: () => navigasi('/harian'),
+    },
+    {
+      label: 'SOS',
+      ikon: <span className="text-[13px] font-black leading-none">SOS</span>,
+      jalan: () => navigasi('/darurat'),
+    },
+  ]
 
   return (
     <>
@@ -172,64 +250,43 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
         // aplikasi yang lambat, bukan sebagai gerak yang halus.
       >
         {buka && (
+          /* MENU LINGKAR, BUKAN DAFTAR TEGAK.
+             Daftar tegak sepanjang enam butir menutupi separuh layar dan
+             menuntut mata membaca dari atas ke bawah untuk menemukan satu
+             tindakan. Susunan melingkar meletakkan tiap tindakan pada ARAH
+             yang tetap — atas, kanan, bawah, kiri — sehingga sesudah beberapa
+             kali pakai tangan bergerak tanpa membaca. Itulah alasan tombol
+             bantu di ponsel memakai bentuk ini.
+
+             Ukuran 208 px dipilih supaya seluruh menu tetap muat pada layar
+             320 px sekalipun tombolnya berada rapat di tepi. */
           <div
             role="menu"
-            aria-label="Navigasi utama"
-            className={`absolute flex w-[186px] flex-col gap-1 rounded-3xl p-2 kaca ${
-              keAtas ? 'bottom-[64px]' : 'top-[64px]'
-            } ${keKiri ? 'right-0' : 'left-0'}`}
+            aria-label="Tindakan cepat"
+            /* Latar dipadatkan, bukan hanya kaca. Di atas halaman yang penuh angka,
+               menu tembus pandang membuat nama tindakan bertumpuk dengan tulisan
+               di belakangnya dan keduanya sama-sama sulit dibaca. */
+            className="kaca absolute grid grid-cols-3 grid-rows-3 place-items-center rounded-[28px] bg-white/90 p-2 backdrop-blur-xl dark:bg-neutral-900/92"
+            style={{
+              width: 208,
+              height: 208,
+              [keAtas ? 'bottom' : 'top']: 64,
+              [keKiri ? 'right' : 'left']: 0,
+            } as React.CSSProperties}
           >
-            {/* CARI DITARUH PALING ATAS, dan sengaja di dalam menu ini.
-                Tombol cari sudah ada di bilah judul, tetapi bilah judul berada
-                di ATAS layar sementara ibu jari memegang ponsel di BAWAH — dan
-                di halaman yang panjang, bilah itu ikut tergulir hilang. Menu
-                inilah yang selalu terjangkau, jadi di sinilah cari perlu ada.
-                Ia bukan tautan halaman melainkan pembuka kotak pencarian,
-                karena itu berupa tombol, bukan NavLink. */}
-            {onCari && (
+            {aksi.map((t, i) => (
               <button
+                key={t.label}
                 role="menuitem"
-                onClick={() => { setBuka(false); onCari() }}
-                className="flex min-h-[44px] items-center gap-2.5 rounded-2xl px-3 text-[13px] font-bold text-ink transition hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
-              >
-                <span className="shrink-0">
-                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                    <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
-                  </svg>
-                </span>
-                <span className="truncate">Cari</span>
-              </button>
-            )}
-
-            {tujuan.map((t) => (
-              <NavLink
-                key={t.to}
-                to={t.to}
-                end={t.end}
-                role="menuitem"
-                onClick={() => setBuka(false)}
-                className={({ isActive }) =>
-                  `flex min-h-[44px] items-center gap-2.5 rounded-2xl px-3 text-[13px] font-bold transition ${
-                    isActive
-                      ? 'bg-brand text-white'
-                      : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'
-                  }`
-                }
+                onClick={() => { setBuka(false); t.jalan() }}
+                className={`flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-2xl px-1 transition active:scale-95 ${TATA[i]} ${
+                  t.utama ? 'bg-brand text-white' : 'text-ink hover:bg-black/5 dark:text-white dark:hover:bg-white/10'
+                }`}
               >
                 <span className="shrink-0">{t.ikon}</span>
-                <span className="truncate">{t.label}</span>
-              </NavLink>
-            ))}
-
-            {onTambah && (
-              <button
-                role="menuitem"
-                onClick={() => { setBuka(false); onTambah() }}
-                className="mt-1 flex min-h-[44px] items-center justify-center gap-2 rounded-2xl bg-brand text-[13px] font-black text-white"
-              >
-                <span className="text-[17px] leading-none">＋</span> Buat Kiriman
+                <span className="w-full truncate text-center text-[9.5px] font-bold leading-none">{t.label}</span>
               </button>
-            )}
+            ))}
           </div>
         )}
 
