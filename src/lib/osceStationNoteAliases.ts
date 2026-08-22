@@ -1136,6 +1136,96 @@ const ALIAS: Record<string, string> = {
    *   Patah tulang HUMERUS dan FEMUR tetap tidak ditautkan ke catatan bidai
    *   klavikula/tibia/radius; alasannya sudah ditulis di bagian sebelumnya.
    */
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * SISA TERAKHIR. Setelah ini yang belum terjangkau hanyalah baris yang
+   * BUKAN kasus, baris berisi dua stasiun, dan segelintir penyakit yang
+   * catatannya memang perlu ditulis — semuanya didaftar di akhir.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Tiroid
+  'Struma difus toksik/Graves disease': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'Struma Difusa Toksik : Grave Disease': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'Struma difusa toksik / graves disease': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'Struma Difussa Toksik ec Graves Disease': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'Toxic Thyroid Nodule': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'SNNT/SNT': 'Goiter',
+
+  // Imunologi dan infeksi
+  'SLE (ANA test, anti CCP) - (RME)': 'Systemic Lupus Erythematosus (SLE)',
+  'Suspek SLE + Anemia + Candidiasis oral': 'Systemic Lupus Erythematosus (SLE)',
+  'Toxo cerebri + HIV + candida': 'Toksoplasmosis serebral',
+  Gonorrhea: 'Gonore',
+  'Morbus Hansen tipe Multibasiler dengan reaksi kusta tipe II (ENL)': 'Kusta (Morbus Hansen)',
+  'Anemia + Diare ec Scistosomiasis': 'Skistosomiasis',
+  'Diare akut Taeniasis': 'Taeniasis',
+  'Diare Berlemak e.c. Giardia Lamblia (Giardiasis)': 'Gastroenteritis (termasuk kolera, giardiasis)',
+  'Diare akut ec E coli': 'Gastroenteritis (termasuk kolera, giardiasis)',
+  'Ensefalopati Hepatikum ec. Hepatitis A': 'Hepatitis A / B',
+  'intoksikasi organofosfat pasang NGT': 'Intoksikasi Alkohol / Zat Psikoaktif',
+  PSCBA: 'Varises esofagus',
+
+  // Anak dan saraf
+  'Marasmus? Kwarshiorkor?': 'Marasmus / Kwashiorkor (gizi buruk anak)',
+  'KDK / KDS + tatalaksana kejang + KIE gizi (tindakan infus)': 'Kejang Demam Sederhana (KDS)',
+  'Hemiparese sinistra dan parese n. 7': 'Stroke Iskemik',
+  'Anemia megaloblastik (tp bingung def B 12 atau asam folat, krn tdk ada data)': 'Anemia megaloblastik',
+
+  // Indera
+  'oe difusa aurikula dextra': 'Otitis Eksterna',
+  'OD Corpal Konjungtiva OS Emetrop': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  'Korpus Alienum OD + Emetropia OS': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  'Obstruksi Saluran Nafas e.c Aspirasi Corpus Alienum Manik- manik (Backblow)': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  'Konjungtivitis fliktenularis? Pinguekulitis? Episkleritis?': 'Episkleritis / Keratitis',
+
+  // Kandungan dan kemih
+  'Syok Hipovolemik ec HPP + Inversio Uteri (tindakan Infus + Reposisi manual)': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'Akut abdomen ec Ruptur Buli (tindakan Kateter)': 'Ruptur uretra',
+  'Ruptur Vesica Urinaria': 'Ruptur uretra',
+  'Gangguan sex hipoaktif': 'Gangguan keinginan dan gairah seksual',
+  'Hiposeksual disorder (Vaginismus)': 'Gangguan keinginan dan gairah seksual',
+
+  // Tulang — patah femur dan humerus kini punya sasaran yang benar
+  /*
+   * Patah FEMUR dan HUMERUS sebelumnya sengaja dibiarkan kosong karena catatan
+   * bidai yang ada khusus untuk klavikula, tibia-fibula, dan radius-ulna.
+   * Sekarang catatan 'Fraktur terbuka, tertutup' sudah lengkap 8/8 dan
+   * membahas prinsip umum — termasuk perdarahan 1-1,5 liter pada patah femur
+   * dan sindrom kompartemen — sehingga menautkannya ke situ benar, dan bukan
+   * lagi ke catatan bidai anggota gerak atas.
+   */
+  'fr femur': 'Fraktur terbuka, tertutup',
+  'Fraktur femur 1/3 medial': 'Fraktur terbuka, tertutup',
+  'Fraktur femur terutup 1/3 proksimal komplit': 'Fraktur terbuka, tertutup',
+  'frtertutup os femur 1/3 medial sinistra': 'Fraktur terbuka, tertutup',
+  'Fraktur humerus (pembidaian)': 'Fraktur terbuka, tertutup',
+  'close fracture komplit 1/3 distal humerus dextra': 'Fraktur terbuka, tertutup',
+  'Fraktur tertutup 1/3 distal os humerus dekstra oblik': 'Fraktur terbuka, tertutup',
+  'Fraktur tertutup Os humerus 1/3 lateral, displacement garis fraktur oblique': 'Fraktur terbuka, tertutup',
+  'Fr. Tibia 1/3 distal dekstra': 'Fraktur terbuka, tertutup',
+  'Meniscus tear medial + dislokasi patella': 'Lesi meniskus, medial, dan lateral',
+
+  /*
+   * YANG TETAP TIDAK DIPETAKAN, dan seluruh alasannya:
+   *
+   *   'ANC, KPD', 'Pentabio, OPV, KMS', 'RA OA', 'Ra/Gout', 'Mastitis
+   *   uretritis GO', 'fr humerus gout', dan 'ANC (G2P1A0H1 ... dd/ IUGR??)' —
+   *   satu baris berisi DUA stasiun atau dua penyakit; menautkannya ke salah
+   *   satu justru menyembunyikan yang lain.
+   *
+   *   'DADR-S ec intoleransi laktosa', 'DATD ec intoleransi laktosa', 'Diare
+   *   akut ec Intoleransi laktosa', dan 'Diare ec intoksikasi susu sapi' —
+   *   catatan intoleransi laktosa memang belum ada, dan menautkannya ke
+   *   catatan diare umum menghapus justru yang sedang diuji.
+   *
+   *   'Retinitis pigmentosa', 'Kista Nabothian', 'IUGR', dan 'Sindrom
+   *   Geriatri' — catatannya memang belum ada.
+   *
+   *   'Ga ada data' dan 'gaada?' bukan kasus sama sekali; keduanya lolos dari
+   *   saringan bukanKasus() karena panjangnya melebihi ambang.
+   */
 }
 
 /**
