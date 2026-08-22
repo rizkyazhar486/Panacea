@@ -46,7 +46,7 @@ function ApgarCalc() {
   const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Needs assistance', tone: 'low' as const } : { l: 'Severe depression', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Scored at 1 and 5 minutes after birth (Apgar, 1953)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
       <div className="space-y-3">
         {criteria.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -125,7 +125,7 @@ function Curb65Calc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Severity stratification for community-acquired pneumonia (Lim et al. 2003, British Thoracic Society)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Penentuan derajat berat pneumonia komunitas (Lim dkk. 2003, British Thoracic Society)" />
       <div className="space-y-2">
         <Row label="Confusion" sub="Acute confusion/new disorientation" checked={confusion} onChange={setConfusion} />
         <Row label="Urea" sub="BUN >19 mg/dL (urea >7 mmol/L)" checked={urea} onChange={setUrea} />
@@ -347,7 +347,7 @@ function WhoGrowthCalc() {
       {masked && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Possible masked stunting (masked malnutrition)</p>
-          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Height/age shows stunting (HAZ ≤ -2 SD), yet weight/age looks normal — this is misleading if weight/age is viewed alone, because weight is judged relative to chronological age, not against the child's growth trajectory, which is already compromised. Consider further nutritional evaluation even when weight/age looks fine.</Prosa>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Tinggi/umur menunjukkan perawakan pendek (HAZ ≤ −2 SD), tetapi berat/umur tampak normal — ini menyesatkan bila berat/umur dibaca sendirian, karena berat dinilai terhadap umur kronologis, bukan terhadap lintasan pertumbuhan anak yang memang sudah terganggu. Pertimbangkan penilaian gizi lanjutan meskipun berat/umur tampak baik.</Prosa>
         </div>
       )}
 
@@ -364,7 +364,7 @@ function WhoGrowthCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">The curve shows the WHO reference median (not this child's data). A simplified estimate from standard reference points — for definitive clinical decisions, compare against the official WHO/KMS growth chart or Buku KIA per the Child Anthropometry Standard (Permenkes RI No. 2/2020).</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Kurva ini menampilkan median rujukan WHO (bukan data anak ini). Perkiraan yang disederhanakan dari titik rujukan baku — untuk keputusan klinis, bandingkan dengan grafik pertumbuhan WHO/KMS resmi atau Buku KIA sesuai Standar Antropometri Anak (Permenkes RI No. 2/2020).</Prosa>
     </Card>
   )
 }
@@ -442,7 +442,7 @@ function WhoNeonateCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Physiologic loss of up to ~7-10% of birth weight in the first 3-5 days is normal (extravascular fluid loss), with return to birth weight around day 10-14. Estimate simplified from standard reference points — compare against official neonatal charts (WHO/Fenton) for borderline cases.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Penurunan fisiologis sampai sekitar 7-10% berat lahir pada hari ke-3 sampai ke-5 adalah normal (kehilangan cairan ekstravaskular), dan berat lahir biasanya tercapai kembali sekitar hari ke-10 sampai ke-14. Perkiraan ini disederhanakan dari titik rujukan baku — bandingkan dengan grafik neonatus resmi (WHO/Fenton) pada kasus yang berada di batas.</Prosa>
     </Card>
   )
 }
@@ -518,7 +518,7 @@ function CdcAnthropometryCalc() {
         </ResponsiveContainer>
       </div>
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">CDC 2000 Growth Reference (2-20 years), used internationally for BMI-for-age. Indonesia (Permenkes 2/2020) uses the WHO standard across the entire pediatric age range — use the WHO Anthropometry tab for the national reference. The percentiles above are estimated from standard reference points, not the full LMS table.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rujukan Pertumbuhan CDC 2000 (2-20 tahun), dipakai secara internasional untuk IMT menurut umur. Indonesia (Permenkes 2/2020) memakai standar WHO untuk seluruh rentang umur anak — pakailah tab Antropometri WHO untuk rujukan nasional. Persentil di atas diperkirakan dari titik rujukan baku, bukan dari tabel LMS lengkap.</Prosa>
     </Card>
   )
 }
@@ -665,7 +665,7 @@ P (Plan):
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Gestational age estimate & Lubchenco classification are simplified from standard reference points — verify against official tables/charts for borderline cases. The SOAP draft must be reviewed and completed by a physician before entering the official medical record.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Perkiraan usia gestasi & klasifikasi Lubchenco disederhanakan dari titik rujukan baku — periksa terhadap tabel/grafik resmi pada kasus di batas. Draf SOAP wajib ditinjau dan dilengkapi dokter sebelum masuk ke rekam medis resmi.</Prosa>
     </Card>
   )
 }
@@ -687,7 +687,7 @@ function QsofaCalc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — rapid screening for infection-related organ dysfunction (Sepsis-3, 2016)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — penapisan cepat disfungsi organ akibat infeksi (Sepsis-3, 2016)" />
       <div className="space-y-2">
         <Row label="Respiratory rate ≥22/min" sub="Tachypnea" checked={rr22} onChange={setRr22} />
         <Row label="Altered mental status" sub="GCS <15 / acute confusion" checked={alteredMental} onChange={setAlteredMental} />
@@ -728,7 +728,7 @@ function HollidaySegarCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL / hour (maintenance rate)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">First 10kg: 100 mL/kg · second 10kg: +50 mL/kg · each kg above 20: +20 mL/kg. Adjust for hydration status, fever, and clinical condition.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">10 kg pertama: 100 mL/kg · 10 kg kedua: +50 mL/kg · tiap kg di atas 20: +20 mL/kg. Sesuaikan dengan status hidrasi, demam, dan keadaan klinis.</Prosa>
     </Card>
   )
 }
@@ -762,7 +762,7 @@ function ParklandCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">mL/hour (following 16 hours)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × weight(kg) × %TBSA, crystalloid fluid (LR). Half given in the first 8 hours FROM THE TIME OF INJURY (not from hospital arrival), the remaining half over the next 16 hours. Titrate against urine output (target ~0.5 mL/kg/hr in adults).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total = 4 mL × berat(kg) × %LPB, cairan kristaloid (RL). Separuh diberikan dalam 8 jam pertama SEJAK SAAT TRAUMA (bukan sejak tiba di rumah sakit), separuh sisanya dalam 16 jam berikutnya. Titrasi terhadap keluaran urin (sasaran ~0,5 mL/kg/jam pada dewasa).</Prosa>
     </Card>
   )
 }
@@ -802,7 +802,7 @@ function NaegeleCalc() {
           </div>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Naegele's Rule: EDD = LMP + 280 days (adjusted if the menstrual cycle is not 28 days). Confirm with a first-trimester ultrasound if possible — it is more accurate than LMP alone, especially with irregular cycles.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rumus Naegele: HPL = HPHT + 280 hari (disesuaikan bila siklus haid bukan 28 hari). Pastikan dengan USG trimester pertama bila memungkinkan — lebih tepat daripada HPHT saja, terutama pada siklus yang tidak teratur.</Prosa>
     </Card>
   )
 }
@@ -941,8 +941,8 @@ function SirirajCalc() {
       </div>
 
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
-        <li><b>This does not replace a CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
-        <li>Scores between −1 and +1 are explicitly indeterminate — that band is common, and it means "image the patient", not "pick the likelier one".</li>
+        <li><b>Ini tidak menggantikan CT scan.</b> It was built for settings where imaging is unavailable or delayed, and it is wrong often enough that giving antiplatelets or thrombolysis on the strength of it alone can kill a patient with a bleed.</li>
+        <li>Nilai antara −1 dan +1 secara tegas tidak menentukan — rentang itu sering terjadi, dan artinya "lakukan pencitraan", bukan "pilih yang lebih mungkin".</li>
         <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
       </ul>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
@@ -1111,7 +1111,7 @@ function NaCorrectionCalc() {
           <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
         </div>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Rough estimate: each 1 mEq/L drop in serum K⁺ below 4.0 ≈ 200-400 mEq total-body deficit (nonlinear relationship, affected by acid-base status). IV potassium correction is generally limited to ≤10-20 mEq/hr peripherally (higher via central access with continuous ECG monitoring) — do not correct the entire deficit at once.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Perkiraan kasar: tiap penurunan 1 mEq/L K⁺ serum di bawah 4,0 ≈ defisit total tubuh 200-400 mEq (hubungannya tidak linear dan dipengaruhi status asam-basa). Koreksi kalium intravena umumnya dibatasi ≤10-20 mEq/jam lewat vena perifer (lebih tinggi lewat akses sentral dengan pemantauan EKG terus-menerus) — jangan mengoreksi seluruh defisit sekaligus.</Prosa>
     </Card>
   )
 }
@@ -1133,7 +1133,7 @@ function BrocaCalc() {
         <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Height − 100) − 10%. Female: (Height − 100) − 15%. A simple approximation — for higher clinical precision needs (e.g. drug dosing), consider the Devine/Robinson formulas.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Laki-laki: (Tinggi − 100) − 10%. Perempuan: (Tinggi − 100) − 15%. Pendekatan sederhana — bila dibutuhkan ketelitian klinis lebih tinggi (mis. penghitungan dosis obat), pertimbangkan rumus Devine/Robinson.</Prosa>
     </Card>
   )
 }
@@ -1158,7 +1158,7 @@ function MidParentalCalc() {
         <div className="text-2xl font-black text-ink">{mph.toFixed(1)} cm</div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Target Height (±8.5cm range: {rangeLo.toFixed(0)}–{rangeHi.toFixed(0)} cm)</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Male: (Father's height + Mother's height + 13) / 2. Female: (Father's height + Mother's height − 13) / 2. The ±8.5cm range covers ~90% of the genetic target — a child deviating far outside this range warrants endocrine/nutritional evaluation.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Laki-laki: (tinggi ayah + tinggi ibu + 13) / 2. Perempuan: (tinggi ayah + tinggi ibu − 13) / 2. Rentang ±8,5 cm mencakup sekitar 90% sasaran genetik — anak yang jauh menyimpang dari rentang ini perlu penilaian endokrin/gizi.</Prosa>
     </Card>
   )
 }
@@ -1335,7 +1335,7 @@ function FourScoreCalc() {
   const total = e + m + b + r
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks et al., 2005) — a GCS alternative that assesses the brainstem & respiratory pattern" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
       <div className="space-y-3">
         <Field label="Eye Response (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
         <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
@@ -1362,7 +1362,7 @@ function McDonaldCalc() {
         <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
         <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">McDonald's Rule: fundal height (cm) ≈ gestational age (weeks) between 20-36 weeks in a singleton pregnancy with normal fetal growth. A deviation &gt;3cm from the true gestational age (from LMP/ultrasound) warrants further evaluation (oligo/polyhydramnios, IUGR, macrosomia, multiple gestation).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rumus McDonald: tinggi fundus (cm) ≈ usia gestasi (minggu) pada 20-36 minggu, kehamilan tunggal dengan pertumbuhan janin normal. Simpangan &gt;3 cm dari usia gestasi sebenarnya (dari HPHT/USG) perlu penilaian lanjut (oligo/polihidramnion, IUGR, makrosomia, kehamilan ganda).</Prosa>
     </Card>
   )
 }
@@ -1388,7 +1388,7 @@ function ParadiseCalc() {
       </label>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <Badge tone={meets ? 'critical' : 'normal'}>{meets ? 'Meets Paradise criteria' : 'Does not yet meet criteria'}</Badge>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Criteria: ≥7 episodes in 1 year, OR ≥5/year for 2 consecutive years, OR ≥3/year for 3 consecutive years — with every episode well documented. This is one indication; the tonsillectomy decision remains individualized together with an ENT physician.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Kriteria: ≥7 episode dalam 1 tahun, ATAU ≥5/tahun selama 2 tahun berturut-turut, ATAU ≥3/tahun selama 3 tahun berturut-turut — dengan tiap episode terdokumentasi baik. Ini satu indikasi; keputusan tonsilektomi tetap bersifat perorangan bersama dokter THT.</Prosa>
       </div>
     </Card>
   )
@@ -1442,9 +1442,9 @@ function NihssCalc() {
       </div>
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
         <li>Score the <b>first</b> response, not the best — do not coach the patient, and do not go back to change an item once scored.</li>
-        <li>Motor items: arm at 90° sitting (45° supine) held 10 s; leg at 30° supine held 5 s. An untestable limb (amputation, joint fusion) is excluded by NIH convention — score it 0 and note why.</li>
+        <li>Butir motorik: lengan pada 90° saat duduk (45° saat berbaring) ditahan 10 detik; tungkai pada 30° saat berbaring ditahan 5 detik. Anggota gerak yang tidak dapat diuji (amputasi, sendi terfiksasi) dikecualikan menurut ketentuan NIH — beri nilai 0 dan tuliskan alasannya.</li>
         <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
-        <li>The score is one input to a thrombolysis decision, never the decision itself — onset time, imaging and contraindications govern.</li>
+        <li>Skor ini satu masukan bagi keputusan trombolisis, bukan keputusannya — waktu awitan, pencitraan, dan kontraindikasi yang menentukan.</li>
       </ul>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.</Prosa>
     </Card>
@@ -1484,7 +1484,7 @@ function FluidBalanceCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] text-neutral-500">Estimated adult insensible loss ~500-800 mL/day (increases with fever/tachypnea). A large, prolonged positive balance → risk of overload; a negative balance → risk of dehydration/hypoperfusion.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] text-neutral-500">Perkiraan kehilangan cairan tak kasatmata pada dewasa ~500-800 mL/hari (bertambah pada demam/takipnea). Keseimbangan positif yang besar dan berkepanjangan → risiko kelebihan cairan; keseimbangan negatif → risiko dehidrasi/hipoperfusi.</Prosa>
     </Card>
   )
 }
@@ -1514,7 +1514,7 @@ function PedsDoseCalc() {
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/day = weight × dose(mg/kg/day). mg/dose = total ÷ frequency. mL/dose = mg/dose ÷ syrup concentration. For powdered preparations: divide the mg/dose across the number of sachets per the prescribed frequency. ALWAYS verify against maximum adult dosing & the formulary — this calculator does not replace clinical judgment or official drug references.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Total mg/hari = berat × dosis(mg/kg/hari). mg/kali = total ÷ frekuensi. mL/kali = mg/kali ÷ kadar sirop. Untuk sediaan puyer: bagi mg/kali sesuai jumlah bungkus menurut frekuensi yang diresepkan. SELALU periksa terhadap dosis maksimum dewasa & formularium — kalkulator ini tidak menggantikan pertimbangan klinis maupun rujukan obat resmi.</Prosa>
     </Card>
   )
 }
@@ -1564,7 +1564,7 @@ function VbacCalc() {
           <div className="text-2xl font-black text-ink">{total}<span className="text-sm font-semibold text-neutral-500">/10</span></div>
           <Badge tone={total >= 7 ? 'normal' : total >= 4 ? 'low' : 'critical'}>Estimated success {successPct}</Badge>
         </div>
-        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">A higher score → higher predicted VBAC success. This prediction model is one decision-support tool — the trial of labor after cesarean (TOLAC) decision remains individualized together with an obstetrician, taking into account emergency cesarean facilities available.</Prosa>
+        <Prosa kelas="mt-2 text-[11px] leading-relaxed text-neutral-500">Skor lebih tinggi → perkiraan keberhasilan VBAC lebih besar. Model perkiraan ini satu alat bantu keputusan — keputusan percobaan persalinan pascaseksio (TOLAC) tetap bersifat perorangan bersama dokter kandungan, dengan memperhitungkan ketersediaan fasilitas seksio darurat.</Prosa>
       </div>
     </Card>
   )
@@ -1672,10 +1672,10 @@ function DenverCalc() {
       {anyDelay && (
         <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Consider further developmental evaluation</p>
-          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">There are milestones typically achieved well below the child's current age (≥6 months earlier) that have not yet been achieved. This is a simplified screening pattern — refer to a pediatrician/developmental specialist for a full Denver II evaluation or another standardized screening instrument (e.g. KPSP, M-CHAT if relevant).</Prosa>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-amber-700">Ada tonggak perkembangan yang lazimnya tercapai jauh di bawah umur anak sekarang (≥6 bulan lebih awal) tetapi belum tercapai. Ini pola penapisan yang disederhanakan — rujuk ke dokter anak/spesialis tumbuh kembang untuk penilaian Denver II lengkap atau instrumen penapisan baku lain (mis. KPSP, M-CHAT bila sesuai).</Prosa>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">This is NOT the official Denver II instrument (which uses ~125 items with age-percentile bars & standardized test materials) — this tool is a simplified early screening based on representative milestones for awareness, not a diagnosis of developmental delay.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ini BUKAN instrumen Denver II resmi (yang memakai sekitar 125 butir dengan bilah persentil umur & bahan uji baku) — alat ini penapisan awal yang disederhanakan berdasarkan tonggak perkembangan yang mewakili, untuk kewaspadaan, bukan diagnosis keterlambatan perkembangan.</Prosa>
     </Card>
   )
 }
@@ -1789,7 +1789,7 @@ function AtlsCalc() {
         <p className="mt-2 text-[10px] text-neutral-500">{assessedCount}/{totalCount} items assessed.</p>
       </div>
 
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Modern trauma principles (&lt;C&gt;ABCDE / MARCH): massive external hemorrhage control PRECEDES Airway if immediately life-threatening, then address each problem AS FOUND in the order X→A→B→C→D→E before moving to the next step. This tool is a checklist aid, not a substitute for certified ATLS/TCCC training & direct clinical judgment in the field.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Prinsip trauma modern (&lt;C&gt;ABCDE / MARCH): pengendalian perdarahan luar masif MENDAHULUI Airway bila mengancam nyawa seketika, lalu tangani tiap masalah SAAT DITEMUKAN dengan urutan X→A→B→C→D→E sebelum beranjak ke langkah berikutnya. Alat ini bantuan daftar periksa, bukan pengganti pelatihan ATLS/TCCC bersertifikat & pertimbangan klinis langsung di lapangan.</Prosa>
     </Card>
   )
 }
@@ -1884,7 +1884,7 @@ function AbgCalc() {
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">High AG (MUDPILES: methanol, uremia, DKA, propylene glycol/paraldehyde, isoniazid/iron, lactate, ethylene glycol, salicylates). Normal/hyperchloremic AG: diarrhea, RTA, acetazolamide, saline dilution. Corrected anion gap = AG + 2.5×(4 − albumin g/dL). An interpretation aid — always integrate with the full clinical context.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Anion gap tinggi (MUDPILES: metanol, uremia, KAD, propilen glikol/paraldehid, isoniazid/besi, laktat, etilen glikol, salisilat). Anion gap normal/hiperkloremik: diare, RTA, asetazolamid, pengenceran salin. Anion gap terkoreksi = AG + 2,5×(4 − albumin g/dL). Alat bantu penafsiran — selalu padukan dengan keseluruhan keadaan klinis.</Prosa>
     </Card>
   )
 }
@@ -1986,7 +1986,7 @@ function BurnCalc() {
           <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
-          <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">For cases where a %TBSA estimate is already available (e.g. referral from another hospital) — enter it directly without needing to mark the body diagram.</Prosa>
+          <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Untuk kasus yang perkiraan %LPB-nya sudah ada (mis. rujukan dari rumah sakit lain) — masukkan langsung tanpa perlu menandai bagan tubuh.</Prosa>
         </div>
       ) : (
         <>
@@ -1995,7 +1995,7 @@ function BurnCalc() {
               <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
-              <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) corrects for a child's body proportions — proportionally larger head, smaller legs compared to adults. Age bands: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 years.</Prosa>
+              <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) mengoreksi perbandingan tubuh anak — kepala relatif lebih besar dan tungkai lebih kecil dibanding dewasa. Kelompok umur: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 tahun.</Prosa>
             </div>
           )}
           <div className="mt-3 flex gap-2">
@@ -2063,7 +2063,7 @@ function BurnCalc() {
 
       <button onClick={() => window.print()} className="liquid-glass-btn liquid-glass-btn--outline mt-4 w-full rounded-full py-2.5 text-xs font-bold text-brand-dark">🖨️ Print / Save as PDF</button>
 
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) is the standard adult estimate. Lund-Browder corrects for child body proportions by age group. Parkland: Total = 4 mL × weight(kg) × %TBSA (LR crystalloid), half in the first 8 hours FROM THE TIME OF INJURY, the rest over the next 16 hours, titrated to urine output.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rule of Nines (Wallace) adalah perkiraan baku untuk dewasa. Lund-Browder mengoreksi perbandingan tubuh anak menurut kelompok umur. Parkland: Total = 4 mL × berat(kg) × %LPB (kristaloid RL), separuh dalam 8 jam pertama SEJAK SAAT TRAUMA, sisanya dalam 16 jam berikutnya, dititrasi terhadap keluaran urin.</Prosa>
     </Card>
   )
 }
@@ -2152,7 +2152,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
         <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">This auto-generated note draft must be reviewed & completed by a physician before entering the official medical record. Central vs. peripheral facial paresis is distinguished by forehead involvement (forehead spared = central, since forehead innervation is bilateral from the cortex; forehead also paralyzed = peripheral/Bell's palsy).</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Draf catatan yang dibuat otomatis ini wajib ditinjau & dilengkapi dokter sebelum masuk ke rekam medis resmi. Parese fasialis sentral dan perifer dibedakan dari keterlibatan dahi (dahi tidak terkena = sentral, karena persarafan dahi bilateral dari korteks; dahi ikut lumpuh = perifer/Bell's palsy).</Prosa>
     </Card>
   )
 }
@@ -2267,7 +2267,7 @@ function CompetencyTracker() {
         )
       })}
 
-      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">The 7-Area Competency framework follows SKDI (Standar Kompetensi Dokter Indonesia, set by KKI based on AIPKI) — a national standard implemented across all medical education institutions, not a list unique per campus. The sub-competencies above are a representative summary; refer to the official SKDI document & your institution's logbook for the complete, verified list. Progress is saved on this device.</Prosa>
+      <Prosa kelas="mt-4 text-[10px] leading-relaxed text-neutral-500">Kerangka 7 Area Kompetensi mengikuti SKDI (Standar Kompetensi Dokter Indonesia, ditetapkan KKI berdasarkan masukan AIPKI) — standar nasional yang berlaku di seluruh institusi pendidikan kedokteran, bukan daftar yang berbeda tiap kampus. Subkompetensi di atas ringkasan yang mewakili; lihat dokumen SKDI resmi & logbook institusi Anda untuk daftar lengkap yang sah. Kemajuan disimpan di perangkat ini.</Prosa>
     </Card>
   )
 }
@@ -2374,7 +2374,7 @@ function BrocaLorentzCalorieCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Height−100)±10-15%. Lorentz: (Height−100) − (Height−150)/4 (male) or /2.5 (female) — corrects for extreme heights, generally considered more accurate than plain Broca. Calories = IBW × activity factor (25 kcal/kg basal + activity adjustment). Adjust further for metabolic stress, wounds, or catabolic conditions.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Tinggi−100)±10-15%. Lorentz: (Tinggi−100) − (Tinggi−150)/4 (laki-laki) atau /2,5 (perempuan) — mengoreksi tinggi badan ekstrem dan umumnya dianggap lebih tepat daripada Broca polos. Kalori = BB ideal × faktor aktivitas (25 kkal/kg basal + penyesuaian aktivitas). Sesuaikan lagi pada stres metabolik, luka, atau keadaan katabolik.</Prosa>
     </Card>
   )
 }
@@ -2408,7 +2408,7 @@ function IvDripCalc() {
           <div className="text-[10px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Drops/min = (Volume mL × Drop Factor) / (Duration hours × 60). A standard macro set is usually 15 or 20 drops/mL (adult/general use), a micro set 60 drops/mL (pediatric/neonatal, precision titration). Always confirm the drop factor printed on the giving-set packaging you're using.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Tetes/menit = (Volume mL × faktor tetes) / (lama jam × 60). Set makro baku umumnya 15 atau 20 tetes/mL (dewasa/umum), set mikro 60 tetes/mL (anak/neonatus, titrasi tepat). Selalu pastikan faktor tetes yang tercetak pada kemasan set infus yang Anda pakai.</Prosa>
     </Card>
   )
 }
@@ -2465,7 +2465,7 @@ function AriaCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-600">{treatmentNote[classification]}</p>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">ARIA classification: duration (intermittent vs persistent) × severity (mild if 0/4 QoL impact items affected; moderate-severe if ≥1/4). Replaces the older "seasonal/perennial" terminology since it doesn't always match real-world symptom patterns.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Klasifikasi ARIA: lama (intermiten vs persisten) × derajat berat (ringan bila 0 dari 4 butir dampak kualitas hidup terkena; sedang-berat bila ≥1 dari 4). Menggantikan istilah lama "musiman/sepanjang tahun" karena tidak selalu cocok dengan pola gejala di lapangan.</Prosa>
     </Card>
   )
 }
@@ -2522,7 +2522,7 @@ function AclsCalc() {
           ))}
         </ol>
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Summary of the AHA ACLS 2020 algorithms — complements the XABCDE trauma primary survey for cardiac-arrest/peri-arrest scenarios. Not a substitute for certified ACLS training & does not cover every pediatric nuance/dose (see PALS separately).</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Ringkasan algoritma AHA ACLS 2020 — melengkapi survei primer trauma XABCDE untuk keadaan henti jantung/perihenti. Bukan pengganti pelatihan ACLS bersertifikat & tidak mencakup seluruh kekhususan/dosis anak (lihat PALS terpisah).</Prosa>
     </Card>
   )
 }
@@ -2580,7 +2580,7 @@ export function ClinicalCalculators() {
     <div className="mx-auto max-w-xl space-y-6 px-4 py-4 sm:px-[30px]">
       {access?.free && (
         <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">
-          <IconCheck size={14} /> You're among the first {access.limit} registrants — free access forever.
+          <IconCheck size={14} /> Anda termasuk {access.limit} pendaftar pertama — akses gratis selamanya.
         </div>
       )}
       <SectionTitle icon={<IconStethoscope size={20} />} title="Kalkulator Klinis" subtitle={`${TABS.length} skor dan alat baku, dikelompokkan per sistem organ`} />

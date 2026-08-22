@@ -29,7 +29,7 @@ const TIERS: Tier[] = [
     features: [
       'AI Chatbot — history-taking & health education',
       'Community, Facility GPS & Emergency SOS',
-      'Clinical Calculators — free for the first 50 sign-ups',
+      'Kalkulator Klinis — gratis untuk 50 pendaftar pertama',
     ],
     cta: 'Get Started on Home',
     to: '/',

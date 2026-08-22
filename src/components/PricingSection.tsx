@@ -86,7 +86,7 @@ const TIERS: Tier[] = [
     features: [
       <>AI Chatbot — history-taking &amp; health education</>,
       <>Community, Facility GPS &amp; Emergency SOS</>,
-      <>Clinical Calculators — free for the first 50 sign-ups</>,
+      <>Kalkulator Klinis — gratis untuk 50 pendaftar pertama</>,
     ],
   },
   {
@@ -143,7 +143,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
         {promo && promo.slotsLeft > 0 && (
           <Reveal delay={60}>
             <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-center text-sm font-semibold text-emerald-200">
-              🎉 {promo.discountPct}% off ALL plans for the next {promo.slotsLeft} sign-ups — limited early-bird offer.
+              🎉 Potongan {promo.discountPct}% untuk SEMUA paket bagi {promo.slotsLeft} pendaftar berikutnya — penawaran awal terbatas.
             </div>
           </Reveal>
         )}

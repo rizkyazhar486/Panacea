@@ -79,7 +79,7 @@ export function Perubahan() {
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Angka label="Weeks reviewed" nilai={rk.ditinjau} />
             <Angka label="Avg days at minimum" nilai={rk.rerataHariMinimum} />
-            <Angka label="Weeks that moved" nilai={rk.pekanMaju} />
+            <Angka label="Pekan yang bergerak" nilai={rk.pekanMaju} />
           </div>
         </Card>
       )}
@@ -88,7 +88,7 @@ export function Perubahan() {
         ? <TinjauPekan pekan={jatuhTempo} onSimpan={(t) => setS((x) => ({ ...x, tinjauan: [...x.tinjauan, t] }))} />
         : (
           <Card>
-            <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">No review due yet. Reviews open once a week has finished — reviewing a week while you are still inside it measures your mood, not the week.</Prosa>
+            <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Belum ada tinjauan yang jatuh tempo. Tinjauan terbuka setelah satu pekan selesai — meninjau pekan yang masih berjalan mengukur suasana hati Anda, bukan pekannya.</Prosa>
           </Card>
         )}
 
@@ -115,9 +115,9 @@ export function Perubahan() {
       <Ringkas ikon="🚫" judul="Why there is no streak, badge, or celebration here"
         anak={
           <div className="space-y-1.5">
-            <Poin ikon="🔗">A broken streak turns one missed day into a verdict about who you are — and that is what makes people quit entirely instead of continuing.</Poin>
-            <Poin ikon="🎁">Badges and rewards move motivation from inside to outside, and outside motivation collapses when the rewards stop.</Poin>
-            <Poin ikon="📉">What is offered instead is the one thing most apps will not give you: the possibility of being told this is not working.</Poin>
+            <Poin ikon="🔗">Rangkaian yang putus mengubah satu hari terlewat menjadi vonis tentang diri Anda — dan justru itu yang membuat orang berhenti sama sekali alih-alih melanjutkan.</Poin>
+            <Poin ikon="🎁">Lencana dan hadiah memindahkan dorongan dari dalam ke luar diri, dan dorongan dari luar runtuh begitu hadiahnya berhenti.</Poin>
+            <Poin ikon="📉">Sebagai gantinya, yang ditawarkan di sini adalah satu hal yang tidak diberikan kebanyakan aplikasi: kemungkinan diberi tahu bahwa ini tidak berhasil.</Poin>
           </div>
         } />
 
@@ -191,11 +191,11 @@ function Susun({
   return (
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Change"
-        subtitle="Twelve weeks, one commitment, and a measure that can say no" />
+        subtitle="Dua belas pekan, satu komitmen, dan ukuran yang boleh berkata tidak" />
 
       {langkah === 0 && (
         <Card>
-          <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Reading does not change anything by itself — it mostly produces the feeling of having changed. What follows is the smallest structure the evidence actually supports: one goal, a named time, a version small enough to survive a bad week, and a review that is allowed to conclude this is not working.</Prosa>
+          <Prosa kelas="text-[13px] leading-relaxed text-neutral-600">Membaca saja tidak mengubah apa pun — ia lebih sering hanya memunculkan perasaan telah berubah. Yang menyusul di bawah ini adalah susunan paling kecil yang memang didukung bukti: satu sasaran, waktu yang disebutkan, versi yang cukup kecil untuk bertahan pada pekan yang buruk, dan tinjauan yang boleh menyimpulkan bahwa ini tidak berhasil.</Prosa>
           <div className="mt-3">
             <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Area</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -232,15 +232,15 @@ function Susun({
           )}
           {langkah < LANGKAH.length - 1
             ? <Button onClick={() => setLangkah(langkah + 1)} disabled={!bolehLanjut}>Next</Button>
-            : <Button onClick={onSelesai} disabled={!bolehLanjut}>Start the twelve weeks</Button>}
+            : <Button onClick={onSelesai} disabled={!bolehLanjut}>Mulai dua belas pekan</Button>}
         </div>
       </Card>
 
       <Ringkas ikon="📚" judul="Where this structure comes from"
         anak={
           <div className="space-y-1.5">
-            <Poin ikon="🕒"><b>Naming when and where</b> — one of the better-supported findings in behaviour change, though its effect is modest and shrinks in the most rigorous studies.</Poin>
-            <Poin ikon="🔻"><b>The minimum version</b> — reasoning from maintenance research: far less work preserves what you built than was needed to build it.</Poin>
+            <Poin ikon="🕒"><b>Menyebutkan kapan dan di mana</b> — one of the better-supported findings in behaviour change, though its effect is modest and shrinks in the most rigorous studies.</Poin>
+            <Poin ikon="🔻"><b>Versi paling kecil</b> — reasoning from maintenance research: far less work preserves what you built than was needed to build it.</Poin>
             <Poin ikon="🔎"><b>The falsifier</b> — borrowed from trial pre-registration. Sound reasoning, but no study shows individuals who do this develop faster.</Poin>
             <Poin ikon="⚠️"><b>Twelve weeks</b> — a convention, not a finding. It is long enough to see change in most physical measures and short enough to stay real.</Poin>
           </div>
@@ -273,12 +273,12 @@ function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import(
             ))}
           </div>
         </div>
-        <Field label="What got in the way most?">
+        <Field label="Apa yang paling menghalangi?">
           <input className={inputClass} value={halangan} aria-label="What got in the way"
             placeholder="Late meetings on Tuesdays" onChange={(e) => setHalangan(e.target.value)} />
         </Field>
-        <Field label="One change for next week">
-          <input className={inputClass} value={penyesuaian} aria-label="One change for next week"
+        <Field label="Satu perubahan untuk pekan depan">
+          <input className={inputClass} value={penyesuaian} aria-label="Satu perubahan untuk pekan depan"
             placeholder="Move Tuesday session to morning" onChange={(e) => setPenyesuaian(e.target.value)} />
         </Field>
         <Button onClick={() => onSimpan({
@@ -286,7 +286,7 @@ function TinjauPekan({ pekan, onSimpan }: { pekan: number; onSimpan: (t: import(
           arah, halangan: halangan.trim(), penyesuaian: penyesuaian.trim(),
         })}>Save review</Button>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Answer with what happened, not what you intended. A log you edited to look better is a log that can no longer tell you anything.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Jawablah dengan apa yang terjadi, bukan apa yang Anda niatkan. Catatan yang disunting agar tampak lebih baik adalah catatan yang tidak lagi dapat memberi tahu apa pun.</Prosa>
     </Card>
   )
 }

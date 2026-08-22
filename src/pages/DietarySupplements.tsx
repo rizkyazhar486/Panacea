@@ -4,7 +4,7 @@ import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity, IconShield, IconChartUp, IconHeart } from '../components/icons'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Dietary Supplements for Exercise & Athletic Performance
+// Suplemen untuk Latihan & Penampilan Olahraga
 // ─────────────────────────────────────────────────────────────────────────────
 // Structured after the NIH Office of Dietary Supplements (ODS) health-
 // professional fact sheet. This is EVIDENCE-REVIEW / HARM-REDUCTION education,
@@ -443,12 +443,12 @@ export function DietarySupplements() {
       <Card className="!p-5">
         <SectionTitle
           icon={<IconActivity size={20} />}
-          title="Dietary Supplements for Exercise & Athletic Performance"
-          subtitle="An evidence-review reference, structured like the NIH Office of Dietary Supplements fact sheet"
+          title="Suplemen untuk Latihan & Penampilan Olahraga"
+          subtitle="Rujukan tinjauan bukti, disusun mengikuti lembar fakta NIH Office of Dietary Supplements"
         />
-        <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Athletes and active people use a huge range of products to try to improve performance, recovery, and physique — from well-studied nutrients to prescription hormones and unapproved research chemicals. This page reviews what these substances actually are, what the evidence does and doesn't show, and their real safety and legal status. The goal is informed, honest harm reduction.</Prosa>
+        <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Atlet dan orang yang aktif memakai bermacam produk untuk memperbaiki penampilan, pemulihan, dan bentuk tubuh — dari zat gizi yang sudah banyak diteliti sampai hormon resep dan bahan kimia penelitian yang tidak disetujui. Halaman ini meninjau apa sebenarnya zat-zat itu, apa yang ditunjukkan dan TIDAK ditunjukkan buktinya, serta keadaan keamanan dan hukumnya. Tujuannya pengurangan bahaya secara jujur dan berdasar.</Prosa>
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-          <b>Important:</b> This is education, not a how-to guide. It intentionally provides <b>no doses, cycles, or protocols</b> for
+          <b>Important:</b> Ini bahan belajar, bukan panduan cara memakai. Halaman ini dengan sengaja tidak memuat <b>no doses, cycles, or protocols</b> for
           steroids, SARMs, research peptides, or banned agents. Prescription medicines belong under the care of a licensed clinician;
           many substances below are illegal to sell, unapproved, and/or prohibited in sport. Nothing here is medical advice.
         </div>
@@ -491,7 +491,7 @@ export function DietarySupplements() {
 
       {/* Ingredients banned from dietary supplements */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Ingredients Banned From Dietary Supplements" subtitle="Sold as 'supplements' but not lawful supplement ingredients" />
+        <SectionTitle icon={<IconShield size={20} />} title="Bahan yang Dilarang dalam Suplemen" subtitle="Sold as 'supplements' but not lawful supplement ingredients" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           Several substances above are frequently sold in products labeled as dietary supplements even though they are not lawful
           supplement ingredients — they are unapproved drugs. This includes <b>SARMs</b> (ostarine, ligandrol, RAD-140 and others),
@@ -503,12 +503,12 @@ export function DietarySupplements() {
 
       {/* Regulation */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Regulation" subtitle="How supplements are (and aren't) controlled" />
+        <SectionTitle icon={<IconShield size={20} />} title="Regulation" subtitle="Bagaimana suplemen diatur — dan tidak diatur" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          <li>Dietary supplements are <b>not</b> reviewed for safety and efficacy before sale the way medicines are; manufacturers are responsible for safety, and regulators act mainly after problems appear.</li>
+          <li>Suplemen makanan bersifat <b>not</b> reviewed for safety and efficacy before sale the way medicines are; manufacturers are responsible for safety, and regulators act mainly after problems appear.</li>
           <li>Supplements can be <b>contaminated or adulterated</b> with unlabeled drugs (including steroids and stimulants) — a real cause of failed drug tests and health harm.</li>
-          <li>Athletes under anti-doping rules are held to <b>strict liability</b>: they are responsible for everything in their body regardless of intent. Third-party certification (NSF Certified for Sport, Informed Sport) reduces but does not eliminate risk.</li>
-          <li>Prescription medicines, unapproved drugs, and research chemicals are <b>not</b> dietary supplements and are governed by separate (stricter) laws.</li>
+          <li>Atlet yang tunduk pada aturan antidoping terikat pada <b>strict liability</b>: they are responsible for everything in their body regardless of intent. Third-party certification (NSF Certified for Sport, Informed Sport) reduces but does not eliminate risk.</li>
+          <li>Obat resep, obat yang tidak disetujui, dan bahan kimia penelitian bersifat <b>not</b> dietary supplements and are governed by separate (stricter) laws.</li>
         </ul>
       </Card>
 
@@ -517,10 +517,10 @@ export function DietarySupplements() {
         <SectionTitle icon={<IconHeart size={20} />} title="Safety Considerations" subtitle="Before using anything" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li>"Natural" and "supplement" do not mean safe, effective, or legal.</li>
-          <li>More is not better — several effective aids (caffeine, bicarbonate, creatine) have clear diminishing returns and dose-related side effects.</li>
-          <li>Unapproved drugs and research chemicals have <b>uncharacterized long-term safety</b> and frequent quality problems.</li>
-          <li>Hormonal manipulation (steroids, SERMs, GH agents) can cause lasting endocrine, cardiovascular, and psychological effects.</li>
-          <li>Discuss any supplement or substance with a qualified clinician, especially with existing conditions, pregnancy, or other medications.</li>
+          <li>Lebih banyak bukan berarti lebih baik — beberapa zat yang benar-benar bekerja (kafein, bikarbonat, kreatin) jelas menunjukkan hasil yang makin kecil pada dosis besar, disertai efek samping yang bergantung dosis.</li>
+          <li>Obat yang tidak disetujui dan bahan kimia penelitian memiliki <b>uncharacterized long-term safety</b> and frequent quality problems.</li>
+          <li>Manipulasi hormon (steroid, SERM, zat hormon pertumbuhan) dapat menimbulkan gangguan endokrin, jantung-pembuluh darah, dan kejiwaan yang menetap.</li>
+          <li>Bicarakan setiap suplemen atau zat dengan tenaga medis yang berwenang, terutama bila ada penyakit penyerta, kehamilan, atau obat lain yang sedang dipakai.</li>
         </ul>
       </Card>
 
@@ -528,10 +528,10 @@ export function DietarySupplements() {
       <Card className="!p-5">
         <SectionTitle icon={<IconChartUp size={20} />} title="Choosing a Sensible Approach" subtitle="Foundations first" />
         <ol className="mt-2 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          <li><b>Get the basics right first:</b> training, total energy and protein, sleep, and recovery drive the vast majority of results.</li>
-          <li><b>Use only well-evidenced, permitted aids</b> where they fit your sport (e.g. creatine, caffeine, β-alanine, nitrate).</li>
+          <li><b>Benahi dasarnya lebih dahulu:</b> training, total energy and protein, sleep, and recovery drive the vast majority of results.</li>
+          <li><b>Pakai hanya zat yang buktinya kuat dan diizinkan</b> where they fit your sport (e.g. creatine, caffeine, β-alanine, nitrate).</li>
           <li><b>Prefer third-party-tested products</b> to reduce contamination and doping risk.</li>
-          <li><b>Avoid unapproved drugs and research chemicals</b> — the risk/benefit and legal exposure are unfavorable.</li>
+          <li><b>Hindari obat yang tidak disetujui dan bahan kimia penelitian</b> — the risk/benefit and legal exposure are unfavorable.</li>
           <li><b>Involve a clinician or accredited sports dietitian</b> for individualized, safe decisions.</li>
         </ol>
       </Card>
