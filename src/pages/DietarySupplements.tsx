@@ -491,7 +491,7 @@ export function DietarySupplements() {
 
       {/* Ingredients banned from dietary supplements */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Bahan yang Dilarang dalam Suplemen" subtitle="Sold as 'supplements' but not lawful supplement ingredients" />
+        <SectionTitle icon={<IconShield size={20} />} title="Bahan yang Dilarang dalam Suplemen" subtitle="Dijual sebagai 'suplemen' padahal bukan bahan suplemen yang sah" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           Several substances above are frequently sold in products labeled as dietary supplements even though they are not lawful
           supplement ingredients — they are unapproved drugs. This includes <b>SARMs</b> (ostarine, ligandrol, RAD-140 and others),
@@ -514,7 +514,7 @@ export function DietarySupplements() {
 
       {/* Safety considerations */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Safety Considerations" subtitle="Before using anything" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Safety Considerations" subtitle="Sebelum memakai apa pun" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li>"Natural" and "supplement" do not mean safe, effective, or legal.</li>
           <li>Lebih banyak bukan berarti lebih baik — beberapa zat yang benar-benar bekerja (kafein, bikarbonat, kreatin) jelas menunjukkan hasil yang makin kecil pada dosis besar, disertai efek samping yang bergantung dosis.</li>
@@ -538,7 +538,7 @@ export function DietarySupplements() {
 
       {/* Usage prevalence */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Reported Usage Prevalence" subtitle="Approximate ranges from surveys & reviews — figures vary widely by population" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Reported Usage Prevalence" subtitle="Rentang perkiraan dari survei & tinjauan — angkanya sangat berbeda antarpopulasi" />
         <div className="mt-3 space-y-2">
           {PREVALENCE.map((p) => (
             <div key={p.group} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

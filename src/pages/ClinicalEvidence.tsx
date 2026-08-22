@@ -255,7 +255,7 @@ export function ClinicalEvidence() {
 
           {answer.patientFriendly && (
             <Card className="!p-5">
-              <SectionTitle icon={<IconStethoscope size={20} />} title="Plain-language version" subtitle="For explaining to a patient" />
+              <SectionTitle icon={<IconStethoscope size={20} />} title="Plain-language version" subtitle="Untuk dijelaskan kepada pasien" />
               <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{answer.patientFriendly}</p>
             </Card>
           )}
@@ -265,7 +265,7 @@ export function ClinicalEvidence() {
       {/* Live journal retrieval — real PubMed articles for this question */}
       {(articlesLoading || articles.length > 0) && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Live from PubMed (NCBI) for this question — real, currently-indexed papers" />
+          <SectionTitle icon={<IconSearch size={20} />} title="Related published articles" subtitle="Langsung dari PubMed (NCBI) untuk pertanyaan ini — makalah nyata yang saat ini terindeks" />
           {articlesLoading && articles.length === 0 ? (
             <p className="mt-3 text-sm text-neutral-500">Fetching articles from PubMed…</p>
           ) : (
@@ -285,7 +285,7 @@ export function ClinicalEvidence() {
       {/* Verification links — always available once a question is typed */}
       {links.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconSearch size={20} />} title="Periksa pada pustaka primer" subtitle="Open the same question in the major evidence sources — no login, works worldwide" />
+          <SectionTitle icon={<IconSearch size={20} />} title="Periksa pada pustaka primer" subtitle="Buka pertanyaan yang sama di sumber bukti utama — tanpa masuk akun, berlaku di seluruh dunia" />
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {links.map((l) => (
               <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-3 py-2.5 transition hover:border-brand dark:border-white/10 dark:bg-white/5">

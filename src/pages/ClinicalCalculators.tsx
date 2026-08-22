@@ -1356,7 +1356,7 @@ function McDonaldCalc() {
   const gaWeeksEst = fundalCm // McDonald's rule: fundal height (cm) ≈ GA (weeks), valid ~20-36 weeks
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Estimate gestational age from symphysis-fundal height (20-36 weeks)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Perkirakan usia gestasi dari tinggi fundus uteri (20-36 minggu)" />
       <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
@@ -1376,7 +1376,7 @@ function ParadiseCalc() {
   const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Tonsillectomy indication for recurrent pharyngitis/tonsillitis (Paradise et al., 1984)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
       <div className="grid grid-cols-3 gap-2">
         <Field label="Episodes This Year"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
         <Field label="Episodes Last Year"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
@@ -1538,7 +1538,7 @@ function VbacCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Predicted success of vaginal birth after cesarean (Flamm & Geiger, 1997)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={ageU40} onChange={(e) => setAgeU40(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1644,7 +1644,7 @@ function DenverCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Simplified developmental screening — representative milestones per domain, not the full Denver II instrument" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Penapisan perkembangan yang disederhanakan — tonggak yang mewakili tiap ranah, bukan instrumen Denver II lengkap" />
       <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
 
       {domainFlags.map(({ domain, applicable }) => (
@@ -1747,7 +1747,7 @@ function AtlsCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = massive/exsanguinating hemorrhage control precedes Airway — priority order drives action, not just a checklist" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
@@ -2113,7 +2113,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="12 cranial nerve exam & meningeal signs, auto-formatted into a note" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, otomatis disusun menjadi catatan" />
 
       <div className="space-y-2.5">
         {CRANIAL_NERVES.map((n) => (

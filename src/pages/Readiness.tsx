@@ -238,7 +238,7 @@ export function Readiness() {
             onNilai={(n) => upd({ [key]: n } as Partial<DayLog>)} />
           {perluSimpan && baruDisimpan !== key && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Save this value across the app (or press Enter)"
+              title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === key && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -251,7 +251,7 @@ export function Readiness() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       {/* Hero: today's scores */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Recovery & Strain" subtitle="One decision every morning: how hard should today be?" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Recovery & Strain" subtitle="Satu keputusan tiap pagi: seberapa berat hari ini seharusnya?" />
         <div className="mt-2 flex items-center justify-around">
           <div className="flex flex-col items-center gap-1">
             <Ring value={rec ?? 0} max={100} color={tone.color}>
@@ -285,7 +285,7 @@ export function Readiness() {
 
       {/* Morning check-in */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconMoon size={20} />} title="Morning Check-in" subtitle="Fill in from your watch/ring or subjective feel — 30 seconds" />
+        <SectionTitle icon={<IconMoon size={20} />} title="Morning Check-in" subtitle="Isi dari jam tangan/cincin atau dari yang Anda rasakan — 30 detik" />
         <div className="mt-2 grid grid-cols-3 gap-3">
           {num('Overnight HRV (ms)', 'hrv', 1, hrvBase ? `baseline ${hrvBase.toFixed(0)}` : 'e.g. 65')}
           {num('Resting HR (bpm)', 'rhr', 1, rhrBase ? `baseline ${rhrBase.toFixed(0)}` : 'e.g. 58')}
@@ -330,7 +330,7 @@ export function Readiness() {
 
       {/* Log workout -> strain */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Log Today's Workout" subtitle="Duration × RPE → strain (0-21 scale, harder to climb the higher it gets)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Log Today's Workout" subtitle="Lama × RPE → beban (skala 0-21, makin tinggi makin sulit dinaikkan)" />
         <div className="mt-2 flex items-end gap-2">
           <div className="w-24"><Field label="Minutes"><input className={inputClass} type="number" value={wMin} onChange={(e) => setWMin(+e.target.value)} /></Field></div>
           <div className="flex-1">

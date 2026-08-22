@@ -152,9 +152,9 @@ export function FirstAidGuide() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="First Aid Quick Guide" subtitle="Plain-language emergency steps for bystanders" />
+        <SectionTitle icon={<IconShield size={20} />} title="First Aid Quick Guide" subtitle="Langkah gawat darurat dengan bahasa sederhana untuk orang di sekitar" />
         <p className="mt-2 text-[13px] leading-relaxed text-red-600 dark:text-red-300">
-          <b>This does not replace calling emergency services.</b> In a real emergency, call for help first
+          <b>Ini tidak menggantikan panggilan ke layanan gawat darurat.</b> In a real emergency, call for help first
           (or have someone else call) — these steps are what to do while help is on the way, based on
           standard Red Cross / AHA bystander first-aid guidance.
         </p>
@@ -183,7 +183,7 @@ export function FirstAidGuide() {
             {isOpen && (
               <div className="border-t border-neutral-100 p-4 dark:border-white/10">
                 <div className="rounded-xl bg-red-50 p-3 text-[12px] leading-relaxed text-red-700 dark:bg-red-500/10 dark:text-red-300">
-                  <b>Call emergency services when:</b> {g.whenToCall911}
+                  <b>Hubungi layanan gawat darurat bila:</b> {g.whenToCall911}
                 </div>
                 <div className="mt-3 text-xs font-black uppercase tracking-wide text-neutral-500">Steps</div>
                 <ol className="mt-1.5 list-inside list-decimal space-y-1.5 text-[13px] leading-relaxed text-neutral-700 dark:text-neutral-300">

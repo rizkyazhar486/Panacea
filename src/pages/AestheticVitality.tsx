@@ -230,7 +230,7 @@ export function AestheticVitality() {
       {/* Live indicators */}
       {indicators.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="Penanda Anda Saat Ini" subtitle="Each is a health signal research links to perceived attractiveness" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="Penanda Anda Saat Ini" subtitle="Masing-masing adalah tanda kesehatan yang dikaitkan penelitian dengan daya tarik yang dipersepsikan" />
           <div className="mt-3 space-y-2">
             {indicators.map((i) => (
               <div key={i.id} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
@@ -253,7 +253,7 @@ export function AestheticVitality() {
 
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Measurements" subtitle="Proportion & vitality inputs — most auto-fill from other pages; facial ones are optional & self-measured" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Measurements" subtitle="Masukan perbandingan tubuh & daya hidup — sebagian besar terisi sendiri dari halaman lain; bagian wajah boleh dikosongkan & diukur sendiri" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Field label="Sex">
             <select className={inputClass} value={d.g} onChange={(e) => u({ g: e.target.value as 'M' | 'F' })}>
@@ -284,7 +284,7 @@ export function AestheticVitality() {
 
       {/* Concept pillars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Apa yang Membuat Sesuatu Terlihat Indah?" subtitle="The evolutionary, cultural, psychological, philosophical & design dimensions" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Apa yang Membuat Sesuatu Terlihat Indah?" subtitle="Sisi evolusi, budaya, psikologi, filsafat & rancangan" />
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

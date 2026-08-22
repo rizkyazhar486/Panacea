@@ -32,7 +32,7 @@ export function MultiSport() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Intensity zones, speed work, and posture for three sports" />
+      <SectionTitle icon={<IconRun />} title="Running, Cycling, Swimming" subtitle="Zona intensitas, latihan kecepatan, dan postur untuk tiga cabang" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
@@ -131,7 +131,7 @@ function RunTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Running pace zones" subtitle="From your race pace" />
+      <SectionTitle icon={<IconTimer />} title="Running pace zones" subtitle="Dari pace lomba Anda" />
       <Field label="Race pace (min:sec per km)">
         <input className={inputClass} value={racePace} onChange={(e) => setRacePace(e.target.value)} inputMode="numeric" />
       </Field>
@@ -170,7 +170,7 @@ function BikeTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconChartUp />} title="Cycling power zones" subtitle="From an all-out 20-minute test" />
+        <SectionTitle icon={<IconChartUp />} title="Cycling power zones" subtitle="Dari tes 20 menit sekuat tenaga" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="Average 20-minute power (watts)">
@@ -275,7 +275,7 @@ function SwimTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="From all-out 400 m and 200 m tests" />
+        <SectionTitle icon={<IconTimer />} title="Critical Swim Speed" subtitle="Dari tes 400 m dan 200 m sekuat tenaga" />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="400 m time (min:sec)">
@@ -394,7 +394,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="It changes with your goal" />
+      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Berubah mengikuti sasaran Anda" />
 
       <div className="flex flex-wrap gap-2 mt-3">
         {([

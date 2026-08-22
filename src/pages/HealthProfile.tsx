@@ -319,7 +319,7 @@ export function HealthProfile() {
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Demographics" subtitle="The basis for all calculations" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Demographics" subtitle="Dasar bagi seluruh perhitungan" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {num('Age', 'age', 1, 'e.g. 26')}
           <Field label="Sex">
@@ -333,7 +333,7 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="From a watch/ring or a test" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="Dari jam tangan/cincin atau dari sebuah tes" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('VO₂max (ml/kg/min)', 'vo2max', 0.1, 'e.g. 42')}
           {num('Resting HR (bpm)', 'restingHr', 1, 'e.g. 58')}
@@ -356,7 +356,7 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="From a smart scale / InBody" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="Dari timbangan pintar / InBody" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('Body fat (%)', 'bodyFatPct', 0.1, 'e.g. 18')}
           {num('Muscle mass (kg)', 'muscleMassKg', 0.1)}
@@ -401,7 +401,7 @@ function InsightCard({ history }: { history: Snapshot[] }) {
   }
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Automatic Insights" subtitle="From your own data trends — free, no AI" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Automatic Insights" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
       <div className="mt-3 space-y-2">
         {insights.map((ins) => (
           <div key={ins.id} className={`rounded-xl border p-3 ${toneClass[ins.tone]}`}>
@@ -655,7 +655,7 @@ function AutoSyncCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Via the third-party “Health Auto Export” app" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Lewat aplikasi pihak ketiga “Health Auto Export”" />
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
         A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>

@@ -58,8 +58,8 @@ export function LifeCompass() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Life Compass" subtitle="Plan your vision, mission, and next step — so the future feels like a direction, not a worry" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Anxiety about the future often comes from having no plan to point it at. This page walks through two things psychology consistently finds helpful: naming what actually matters to you (values clarification), and turning big dreams into one concrete next step (implementation intentions — shown to meaningfully improve follow-through vs. goals alone).</Prosa>
+        <SectionTitle icon={<IconSparkle size={20} />} title="Life Compass" subtitle="Susun visi, misi, dan langkah berikutnya — agar masa depan terasa sebagai arah, bukan kecemasan" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Kecemasan tentang masa depan kerap muncul karena tidak ada rencana untuk mengarahkannya. Halaman ini menuntun dua hal yang secara konsisten ditemukan bermanfaat dalam psikologi: menyebutkan apa yang benar-benar penting bagi Anda (penjernihan nilai), dan mengubah impian besar menjadi satu langkah nyata berikutnya (implementation intentions — terbukti meningkatkan pelaksanaan secara berarti dibanding sekadar menetapkan sasaran).</Prosa>
       </Card>
 
       <Card className="!p-5">
@@ -102,7 +102,7 @@ export function LifeCompass() {
 
       <Card className="!p-5">
         <div className="text-xs font-black uppercase tracking-wide text-neutral-500">When you're worried about the future</div>
-        <Prosa kelas="mt-1 text-[12px] text-neutral-500">Different traditions frame this differently — shown side by side, not to tell you which to believe, but so you can draw from whichever speaks to you.</Prosa>
+        <Prosa kelas="mt-1 text-[12px] text-neutral-500">Tiap tradisi merumuskannya dengan cara berbeda — ditampilkan berdampingan, bukan untuk memberi tahu mana yang harus Anda yakini, melainkan agar Anda dapat mengambil dari yang mana pun yang berbicara kepada Anda.</Prosa>
         <div className="mt-3 space-y-3">
           {WISDOM.map((w) => (
             <div key={w.tradition} className="rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-white/5">

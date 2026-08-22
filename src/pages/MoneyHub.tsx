@@ -117,7 +117,7 @@ function RecordTab({ txs, setTxs }: { txs: Tx[]; setTxs: (f: (t: Tx[]) => Tx[]) 
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Catat transaksi" subtitle="Ten seconds is enough — regularity matters more than completeness" />
+        <SectionTitle icon={<IconToken size={18} />} title="Catat transaksi" subtitle="Sepuluh detik sudah cukup — keteraturan lebih penting daripada kelengkapan" />
         <div className="mt-3 flex gap-2">
           {(['expense', 'income'] as const).map((k) => (
             <button
@@ -216,7 +216,7 @@ function CashflowTab({ summary, hasData }: { summary: ReturnType<typeof summaris
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Arus kas" subtitle="From the transactions you record" />
+        <SectionTitle icon={<IconToken size={18} />} title="Arus kas" subtitle="Dari transaksi yang Anda catat" />
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-xl bg-emerald-50 p-2.5 dark:bg-emerald-500/10">
             <div className="text-[10px] font-bold uppercase text-neutral-500">Masuk</div>
@@ -347,7 +347,7 @@ function DebtTab({ debts, setDebts }: { debts: Debt[]; setDebts: (f: (d: Debt[])
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconToken size={18} />} title="Daftar utang" subtitle="The payoff order decides how much interest you pay in total" />
+        <SectionTitle icon={<IconToken size={18} />} title="Daftar utang" subtitle="Urutan pelunasan menentukan berapa total bunga yang Anda bayar" />
         <div className="mt-3 grid gap-2">
           <Field label="Nama utang"><input className={inputClass} placeholder="Kartu kredit A" value={name} onChange={(e) => setName(e.target.value)} /></Field>
           <div className="grid grid-cols-2 gap-2">
