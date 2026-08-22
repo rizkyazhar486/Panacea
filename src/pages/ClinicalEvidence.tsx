@@ -118,7 +118,7 @@ export function ClinicalEvidence() {
         <SectionTitle
           icon={<IconStethoscope size={20} />}
           title="Clinical Evidence"
-          subtitle="Ask a clinical question — get a structured, graded, source-aware answer. Works in any country; every answer links to the primary literature to verify."
+          subtitle="Ajukan pertanyaan klinis — jawabannya tersusun, bertingkat bukti, dan menyebut sumbernya. Berlaku di negara mana pun; tiap jawaban menautkan ke pustaka primer untuk diperiksa sendiri."
         />
         {!evidenceAvailable() && (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
@@ -150,7 +150,7 @@ export function ClinicalEvidence() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ask() }}
-            placeholder="e.g. First-line antihypertensive in an adult with type 2 diabetes and albuminuria?"
+            placeholder="mis. Antihipertensi lini pertama pada dewasa dengan diabetes melitus tipe 2 dan albuminuria?"
             className="min-h-[80px] w-full rounded-xl border border-neutral-200 p-3 text-sm outline-none focus:border-brand dark:border-white/10 dark:bg-white/5"
           />
         </div>
@@ -285,7 +285,7 @@ export function ClinicalEvidence() {
       {/* Verification links — always available once a question is typed */}
       {links.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconSearch size={20} />} title="Verify in the primary literature" subtitle="Open the same question in the major evidence sources — no login, works worldwide" />
+          <SectionTitle icon={<IconSearch size={20} />} title="Periksa pada pustaka primer" subtitle="Open the same question in the major evidence sources — no login, works worldwide" />
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {links.map((l) => (
               <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-3 py-2.5 transition hover:border-brand dark:border-white/10 dark:bg-white/5">

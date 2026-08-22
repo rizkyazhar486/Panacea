@@ -8,7 +8,7 @@ import { framinghamCVD, cvdBand } from '../lib/riskModels'
 import { CopyNote } from '../components/CopyNote'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// What-If Health Simulator — the honest, transparent foundation of a "digital
+// Simulator Bagaimana-Jika — the honest, transparent foundation of a "digital
 // twin": it composes VALIDATED, published risk equations the app already
 // trusts (Framingham General CVD 10-year risk, D'Agostino 2008) and lets the
 // user toggle modifiable choices — quit smoking, treat blood pressure, lower
@@ -106,8 +106,8 @@ export function HealthSimulator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="What-If Health Simulator" subtitle="See how today's choices reshape your 10-year risk" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A transparent "digital twin" first step: enter your current numbers, then toggle real, evidence-based changes and watch your 10-year cardiovascular risk move. Every number comes from the published Framingham equation — nothing is a black-box guess.</Prosa>
+        <SectionTitle icon={<IconSparkle size={20} />} title="Simulator Bagaimana-Jika" subtitle="See how today's choices reshape your 10-year risk" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Langkah pertama sebuah "kembaran digital" yang terbuka: masukkan angka Anda sekarang, lalu nyalakan perubahan nyata yang berdasar bukti dan lihat risiko jantung-pembuluh darah 10 tahun Anda bergerak. Setiap angka berasal dari persamaan Framingham yang sudah terbit — tidak ada tebakan dari kotak hitam.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {num('Age (years)', 'age')}
           <Field label="Sex">
@@ -201,7 +201,7 @@ export function HealthSimulator() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <Prosa kelas="mt-2 text-[11px] text-neutral-500">Projection uses the Framingham equation at each age with your current biomarkers held constant (the model is validated for ages 30-74). It isolates the interventions' effect — real labs and blood pressure also drift with age, so treat this as direction, not destiny.</Prosa>
+          <Prosa kelas="mt-2 text-[11px] text-neutral-500">Proyeksi memakai persamaan Framingham pada tiap umur dengan penanda hayati Anda sekarang ditahan tetap (model ini tervalidasi untuk umur 30-74 tahun). Ia memisahkan pengaruh tindakannya saja — hasil laboratorium dan tekanan darah sesungguhnya juga bergeser seiring umur, jadi bacalah ini sebagai arah, bukan kepastian.</Prosa>
         </Card>
       )}
 

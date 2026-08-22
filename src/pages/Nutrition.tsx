@@ -1903,7 +1903,7 @@ export function Nutrition() {
 
       {/* Quick Links — longevity calculator capabilities */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={18} />} title="The Best Longevity Calculator" subtitle="Built to help humanity live longer and healthier" />
+        <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Umur Panjang Terbaik" subtitle="Built to help humanity live longer and healthier" />
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { icon: '🫀', label: 'VO₂max Est.', desc: 'Aerobic capacity', anchor: 'calc-vo2max' },
@@ -1932,9 +1932,9 @@ export function Nutrition() {
             judul="Built to clinical standards — calculated live from your data"
             anak={
               <div className="space-y-1.5">
-                <Poin ikon="🏅">Tuned on the demands of elite endurance and team sport athletes.</Poin>
-                <Poin ikon="🫀">Covers 15+ chronic conditions, including heart failure, COPD, diabetes, kidney failure, and cancer.</Poin>
-                <Poin ikon="⚡">Every target recalculates as your own numbers change — nothing is a fixed table.</Poin>
+                <Poin ikon="🏅">Disetel menurut tuntutan atlet ketahanan elite dan atlet olahraga beregu.</Poin>
+                <Poin ikon="🫀">Mencakup lebih dari 15 penyakit menahun, termasuk gagal jantung, PPOK, diabetes, gagal ginjal, dan kanker.</Poin>
+                <Poin ikon="⚡">Tiap sasaran dihitung ulang begitu angka Anda berubah — tidak ada tabel yang dipatok tetap.</Poin>
               </div>
             }
           />
@@ -1959,7 +1959,7 @@ export function Nutrition() {
             anak={
               <div className="space-y-1.5">
                 <Poin ikon="🍗">"Grilled chicken" stands for common recipes — your recipe, portion, and brand shift the real numbers.</Poin>
-                <Poin ikon="🩺">If precision matters medically — kidney disease, severe allergies — read the product label and ask a clinical dietitian.</Poin>
+                <Poin ikon="🩺">Bila ketelitian penting secara medis — penyakit ginjal, alergi berat — bacalah label produk dan tanyakan kepada ahli gizi klinis.</Poin>
               </div>
             }
           />

@@ -238,7 +238,7 @@ export function BodyComposition() {
             ariaLabel={label} />
           {perluSimpan && baruDisimpan !== String(key) && (
             <button type="button" onClick={kirim} aria-label={`Simpan ${label}`}
-              title="Save this value across the app (or press Enter)"
+              title="Simpan nilai ini untuk seluruh aplikasi (atau tekan Enter)"
               className="shrink-0 rounded-lg bg-brand px-2 py-1.5 text-[12px] font-black text-ink">↵</button>
           )}
           {baruDisimpan === String(key) && <span className="shrink-0 text-[10px] font-bold text-emerald-600" role="status">✓</span>}
@@ -254,7 +254,7 @@ export function BodyComposition() {
         <SectionTitle
           icon={<IconActivity size={20} />}
           title="Body Composition & Longevity"
-          subtitle="Auto-fills from your Health Profile (Apple Health / WHOOP / etc.) — override manually from a smart scale or InBody printout anytime"
+          subtitle="Terisi sendiri dari Profil Kesehatan Anda (Apple Health / WHOOP / dsb.) — boleh ditimpa dengan tangan dari timbangan pintar atau cetakan InBody kapan saja"
           right={<Button variant="outline" onClick={() => syncNow(false)}>🔄 Sync from Health Profile</Button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -323,7 +323,7 @@ export function BodyComposition() {
                 {b.bmd >= -1 ? 'Normal' : b.bmd >= -2.5 ? 'Osteopenia' : 'Osteoporosis'}
               </Badge>
             </div>
-            <Prosa kelas="mt-1.5 text-[11px] leading-relaxed text-neutral-500">T-score ≥ −1: normal · −1 to −2.5: osteopenia (low bone mass) · ≤ −2.5: osteoporosis (WHO criteria). Bone density naturally declines with age — resistance training and adequate calcium/vitamin D and protein intake help maintain BMD.</Prosa>
+            <Prosa kelas="mt-1.5 text-[11px] leading-relaxed text-neutral-500">Skor-T ≥ −1: normal · −1 sampai −2,5: osteopenia (massa tulang rendah) · ≤ −2,5: osteoporosis (kriteria WHO). Kepadatan tulang menurun secara alami seiring umur — latihan beban serta kecukupan kalsium/vitamin D dan protein membantu mempertahankannya.</Prosa>
           </div>
         )}
         {b.bmd === 0 && <p className="mt-2 text-[11px] text-neutral-500">No data yet. BMD is measured via a DEXA scan at a health facility/radiology lab.</p>}
@@ -459,8 +459,8 @@ function ScaleMeasurements() {
     <Card className="!p-5">
       <SectionTitle
         icon={<IconActivity size={20} />}
-        title="From a body-composition device"
-        subtitle="Values only an InBody or BIA scale can give — not formula estimates"
+        title="Dari alat komposisi tubuh"
+        subtitle="Nilai yang hanya dapat diberikan InBody atau timbangan BIA — bukan perkiraan dari rumus"
       />
       <div className="mt-3 space-y-2">
         {ada.map((r) => (

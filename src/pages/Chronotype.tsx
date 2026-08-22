@@ -83,7 +83,7 @@ export function Chronotype() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Chronotype Quiz" subtitle="Reduced Morningness-Eveningness Questionnaire (rMEQ)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A validated 5-item short form (Adan &amp; Almirall, 1991) of the classic Horne &amp; Östberg questionnaire, used in chronobiology research to classify a person's natural circadian preference. Answer based on how you'd naturally feel — not your current schedule.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Bentuk pendek 5 butir yang tervalidasi (Adan &amp; Almirall, 1991) dari kuesioner klasik Horne &amp; Östberg, dipakai dalam penelitian kronobiologi untuk menggolongkan kecenderungan sirkadian alami seseorang. Jawablah menurut yang Anda rasakan secara alami — bukan menurut jadwal Anda sekarang.</Prosa>
       </Card>
 
       {QUESTIONS.map((q, qi) => (
@@ -117,7 +117,7 @@ export function Chronotype() {
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{band.desc}</p>
             </div>
           </div>
-          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Chronotype is a real, measurable trait linked to differences in core body temperature rhythm and melatonin timing — it's not just a habit. It can inform when to schedule demanding tasks, exercise, and — for a clinician — the timing of some medications (chronotherapy) and sleep hygiene advice. It's a trait tendency, not a fixed diagnosis, and can shift somewhat with age (adolescents skew later; older adults skew earlier).</Prosa>
+          <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Kronotipe adalah sifat nyata yang dapat diukur, terkait perbedaan irama suhu inti tubuh dan waktu keluarnya melatonin — bukan sekadar kebiasaan. Ia dapat menjadi pertimbangan kapan menjadwalkan pekerjaan berat, olahraga, dan — bagi tenaga medis — waktu pemberian sebagian obat (kronoterapi) serta nasihat kebersihan tidur. Ini kecenderungan sifat, bukan diagnosis yang pasti, dan dapat bergeser seiring umur (remaja cenderung lebih malam; orang lanjut usia cenderung lebih pagi).</Prosa>
         </Card>
       )}
 

@@ -106,7 +106,7 @@ export function FamilyHealth() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Family Health History" subtitle="Your family's conditions are an early-warning map for your own screening. Private & stored on your device." />
-        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Add each relative and the major conditions they've had. Panaceamed flags what you should screen for earlier — closer relatives and early-onset disease weigh the most.</Prosa>
+        <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Tambahkan tiap anggota keluarga beserta penyakit besar yang pernah dideritanya. Panaceamed menandai apa yang sebaiknya Anda tapis lebih awal — kekerabatan yang lebih dekat dan penyakit yang muncul pada usia muda paling besar bobotnya.</Prosa>
       </Card>
 
       {/* Add relative */}
@@ -139,7 +139,7 @@ export function FamilyHealth() {
       {/* Family list */}
       {members.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Your family tree" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Silsilah keluarga Anda" />
           <div className="mt-3 space-y-2">
             {members.map((m) => (
               <div key={m.id} className="flex items-start justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">
@@ -157,7 +157,7 @@ export function FamilyHealth() {
       {/* Risk flags */}
       {flags.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconShield size={20} />} title="Your screening flags" subtitle="Based on your family history — discuss timing with your doctor" />
+          <SectionTitle icon={<IconShield size={20} />} title="Penanda penapisan untuk Anda" subtitle="Based on your family history — discuss timing with your doctor" />
           <div className="mt-3 space-y-2">
             {flags.map((f, i) => (
               <div key={i} className={'rounded-xl border p-3 ' + (f.level === 'high' ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>

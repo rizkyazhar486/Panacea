@@ -121,7 +121,7 @@ export function AnalisisPro() {
       {kini && baca && (
         <Card>
           <SectionTitle icon={<IconChartUp />} title="Kebugaran & Kesegaran"
-            subtitle="Load that has settled in (42 days) against fatigue still with you (7 days)" />
+            subtitle="Beban yang sudah mengendap (42 hari) melawan kelelahan yang masih tertinggal (7 hari)" />
           <div className="mt-3 grid grid-cols-3 gap-2">
             <Stat label="Kebugaran" value={String(Math.round(kini.kebugaran))} warna="#60a5fa" />
             <Stat label="Kelelahan" value={String(Math.round(kini.kelelahan))} warna="#f87171" />
@@ -204,7 +204,7 @@ export function AnalisisPro() {
 
       {/* ── Target ── */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Set your own, computed from sessions actually recorded" />
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Tetapkan sendiri, dihitung dari sesi yang benar-benar tercatat" />
         <div className="mt-3 flex flex-wrap gap-2">
           <Pilih value={target.jenis} onChange={(v) => setTarget({ ...target, jenis: v as JenisTarget })}
             opsi={[['jarak', 'Jarak'], ['waktu', 'Waktu'], ['sesi', 'Jumlah sesi']]} />
@@ -235,7 +235,7 @@ export function AnalisisPro() {
       {/* ── Upaya relatif ── */}
       <Card>
         <SectionTitle icon={<IconActivity />} title="Upaya Relatif"
-          subtitle="How hard each session was, from heart rate — not duration alone" />
+          subtitle="Seberapa berat tiap sesi, dari denyut jantung — bukan dari lamanya saja" />
         <div className="mt-3 space-y-1.5">
           {terbaru.map((w) => {
             const u = upayaRelatif(w, konteks)
@@ -357,7 +357,7 @@ export function AnalisisPro() {
 function KartuTidakDibangun() {
   return (
     <Card>
-      <SectionTitle icon={<IconActivity />} title="What is not built here"
+      <SectionTitle icon={<IconActivity />} title="Yang tidak dibangun di sini"
         subtitle="With the reason â not merely ‘not available yet’" />
       <div className="mt-3 space-y-2">
         {TIDAK_DIBANGUN.map((t) => (

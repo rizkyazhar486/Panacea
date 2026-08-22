@@ -54,3 +54,31 @@ if (arg) {
   for (const h of hasil.slice(0, 25)) console.log(String(h.temuan.length).padStart(4), h.berkas)
   console.log(`\n${hasil.reduce((a, h) => a + h.temuan.length, 0)} kalimat Inggris di ${hasil.length} berkas.`)
 }
+
+// ── Kalimat SETENGAH TERJEMAH ──────────────────────────────────────────────
+//
+// Lebih buruk daripada kalimat yang masih utuh berbahasa Inggris: kalimat yang
+// separuhnya sudah Indonesia dan separuhnya belum terbaca seperti kekeliruan
+// ketik, dan pembacanya berhenti di tengah. Ini muncul ketika penggantian
+// dilakukan sepotong-sepotong.
+import { readdirSync as bacaDir, readFileSync as bacaBerkas } from 'node:fs'
+
+const ING = /\b(the|your|with|from|this|that|and|for|when|which|not)\b/i
+const IND = /\b(yang|dengan|tidak|adalah|dari|pada|untuk|karena|bukan|lebih)\b/i
+
+const campur = []
+for (const dir of ['src/pages', 'src/components']) {
+  for (const f of bacaDir(dir).filter((x) => x.endsWith('.tsx'))) {
+    bacaBerkas(`${dir}/${f}`, 'utf8').split('\n').forEach((b, i) => {
+      if (/^\s*(\/\/|\*|import|export)/.test(b)) return
+      if (!/[><"']/.test(b)) return
+      const teks = (b.match(/>\s*([^<>{}]{25,})</) || b.match(/"([^"]{25,})"/) || [])[1]
+      if (!teks) return
+      if (ING.test(teks) && IND.test(teks)) campur.push(`${dir}/${f}:${i + 1}  ${teks.slice(0, 90)}`)
+    })
+  }
+}
+if (!process.argv[2]) {
+  console.log(`\n${campur.length} kalimat setengah terjemah (Inggris + Indonesia dalam satu kalimat):`)
+  for (const c of campur.slice(0, 15)) console.log('  ', c)
+}

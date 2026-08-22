@@ -35,7 +35,7 @@ export function ClinicalTrackers() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconHeart />} title="Pelacak Klinis"
-        subtitle="Saturation, ECG, jet lag, pregnancy, and wheelchair physiology" />
+        subtitle="Saturasi, EKG, jet lag, kehamilan, dan fisiologi pengguna kursi roda" />
 
       <Card>
         <p className="text-sm leading-relaxed text-neutral-600">
@@ -144,7 +144,7 @@ function TabSpo2() {
       )}
 
       <Card>
-        <SectionTitle title="Before you panic: reasons a low reading can be wrong" />
+        <SectionTitle title="Sebelum panik: sebab-sebab bacaan rendah bisa keliru" />
         <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
           Alat di jam tangan dan oksimeter jari <strong className="text-ink">bukan alat diagnostik</strong>.
           Angka rendah yang berdiri sendiri tanpa gejala paling sering merupakan kesalahan pengukuran.
@@ -331,7 +331,7 @@ function TabHamil() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Stop and contact a clinician if these appear" />
+        <SectionTitle icon={<IconHeart />} title="Hentikan dan hubungi tenaga medis bila tanda ini muncul" />
         <ul className="mt-2 space-y-1">
           {panduan.tandaBerhenti.map((t) => (
             <li key={t} className="flex gap-2 text-sm text-rose-100/90"><span className="text-rose-500">•</span><span>{t}</span></li>
@@ -340,7 +340,7 @@ function TabHamil() {
       </Card>
 
       <Card>
-        <SectionTitle title="Conditions where exercise is not advised" />
+        <SectionTitle title="Keadaan yang membuat olahraga tidak dianjurkan" />
         <ul className="mt-2 space-y-1">
           {panduan.kontraindikasiMutlak.map((t) => (
             <li key={t} className="flex gap-2 text-sm text-neutral-600"><span className="text-slate-600">•</span><span>{t}</span></li>
@@ -389,7 +389,7 @@ function TabKursiRoda() {
       </Card>
 
       <Card>
-        <SectionTitle title="What to be aware of" />
+        <SectionTitle title="Hal yang perlu diwaspadai" />
         <div className="mt-2 space-y-2">
           {panduan.catatan.map((c, i) => (
             <p key={i} className={`rounded-lg border p-2.5 text-sm leading-relaxed ${/disrefleksia/i.test(c) ? 'border-rose-500/30 bg-rose-500/[0.08] text-rose-100/90' : 'border-white/10 text-neutral-500'}`}>{c}</p>
