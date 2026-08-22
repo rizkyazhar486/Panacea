@@ -97,7 +97,7 @@ function TabSpo2() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Catat bacaan" subtitle="From a watch, a fingertip oximeter, or any device" />
+        <SectionTitle icon={<IconActivity />} title="Catat bacaan" subtitle="Dari jam tangan, oksimeter jari, atau perangkat apa pun" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="SpO₂ (%)"><input className={inputClass} inputMode="numeric" value={nilai} onChange={(e) => setNilai(e.target.value)} /></Field>
           <Field label="Nadi (opsional)"><input className={inputClass} inputMode="numeric" value={nadi} onChange={(e) => setNadi(e.target.value)} /></Field>
@@ -361,7 +361,7 @@ function TabKursiRoda() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Zona mendorong" subtitle="Computed from peak heart rate while PUSHING, not from a formula" />
+        <SectionTitle icon={<IconHeart />} title="Zona mendorong" subtitle="Dihitung dari denyut puncak saat BENAR-BENAR DIDORONG, bukan dari rumus" />
         <div className="mt-2"><Field label="Denyut puncak saat mendorong keras (bpm)"><input className={inputClass} inputMode="numeric" value={puncak} onChange={(e) => setPuncak(e.target.value)} /></Field></div>
         <div className="mt-3 space-y-1.5">
           {panduan.zona.map((z) => (

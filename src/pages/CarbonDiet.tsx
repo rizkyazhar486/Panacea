@@ -69,7 +69,7 @@ export function CarbonDiet() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconLeaf size={20} />} title="Carbon-Footprint Diet Calculator" subtitle="Estimate your diet's greenhouse-gas footprint from weekly servings" />
+        <SectionTitle icon={<IconLeaf size={20} />} title="Carbon-Footprint Diet Calculator" subtitle="Perkirakan jejak gas rumah kaca pola makan Anda dari jumlah sajian per pekan" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Enter how many servings of each food you eat in a typical <b>week</b>. This uses global-average
           emission factors (kg CO₂-equivalent per kg of food, farm-to-consumer) from Poore &amp; Nemecek,
@@ -136,7 +136,7 @@ export function CarbonDiet() {
                 </div>
               ))}
             </div>
-            <Prosa kelas="mt-3 text-[11px] text-neutral-500">As a rule of thumb from this same research: swapping red meat for poultry, fish, or plant proteins a few times a week tends to have the single largest effect on this number for most diets.</Prosa>
+            <Prosa kelas="mt-3 text-[11px] text-neutral-500">Sebagai aturan praktis dari penelitian yang sama: mengganti daging merah dengan unggas, ikan, atau protein nabati beberapa kali sepekan cenderung memberi pengaruh terbesar pada angka ini bagi kebanyakan pola makan.</Prosa>
           </Card>
         </>
       )}

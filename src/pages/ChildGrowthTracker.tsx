@@ -101,8 +101,8 @@ export function ChildGrowthTracker() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Child Growth Tracker" subtitle="Plot a child's weight & height over time against WHO growth standards" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Unlike a single-visit percentile check, this records every visit and plots the child's actual trajectory against the WHO Child Growth Standards (2006), 0-60 months — a view worth showing parents directly. A flattening or downward-crossing trend across visits is more meaningful than any single measurement.</Prosa>
+        <SectionTitle icon={<IconChartUp size={20} />} title="Child Growth Tracker" subtitle="Gambarkan berat & tinggi anak dari waktu ke waktu terhadap standar pertumbuhan WHO" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Berbeda dari pemeriksaan persentil sekali kunjung, halaman ini mencatat tiap kunjungan dan menggambar lintasan pertumbuhan anak yang sebenarnya terhadap WHO Child Growth Standards (2006), 0-60 bulan — tampilan yang layak diperlihatkan langsung kepada orang tua. Tren yang mendatar atau memotong garis ke bawah antarkunjungan lebih bermakna daripada satu pengukuran mana pun.</Prosa>
         <div className="mt-3">
           <Field label="Sex">
             <select className={inputClass} value={state.sex} onChange={(e) => persist({ ...state, sex: e.target.value as 'M' | 'F' })}>

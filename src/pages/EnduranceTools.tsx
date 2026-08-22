@@ -100,7 +100,7 @@ function TabBahanBakar() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Once only, then every fluid plan uses your own numbers" />
+        <SectionTitle icon={<IconTimer />} title="Uji laju keringat" subtitle="Cukup sekali, lalu tiap rencana cairan memakai angka Anda sendiri" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Timbang tanpa baju sebelum dan sesudah sesi, catat berapa yang diminum. Laju keringat berbeda
           sampai <strong className="text-ink">tiga kali lipat</strong> antarorang pada suhu yang sama —
@@ -279,7 +279,7 @@ function TabPanduan() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Target watts per segment, from the climb profile" />
+        <SectionTitle icon={<IconTimer />} title="Panduan daya rute" subtitle="Sasaran watt tiap penggal, dari profil tanjakan" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">
           Aturan intinya berlawanan dengan naluri kebanyakan orang: <strong className="text-ink">naik
           tanjakan pakai daya lebih tinggi, turun dan datar pakai lebih rendah</strong>. Saat menanjak

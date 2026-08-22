@@ -292,7 +292,7 @@ export function BodyComposition() {
 
       {/* Muscle-Fat analysis bars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="InBody style: Under · Normal · Over" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Muscle-Fat Analysis" subtitle="Gaya InBody: Kurang · Normal · Lebih" />
         <div className="mt-3 space-y-2.5">
           <RangeBar label="Body Weight" value={b.w} unit="kg" lo={18.5 * Math.pow(b.h / 100, 2)} hi={24.9 * Math.pow(b.h / 100, 2)} max={35 * Math.pow(b.h / 100, 2)} />
           <RangeBar label="Skeletal Muscle Mass" value={d.smm} unit="kg" lo={b.w * 0.37} hi={b.w * 0.5} max={b.w * 0.6} />
@@ -311,7 +311,7 @@ export function BodyComposition() {
 
       {/* Lab & Pemeriksaan Lanjutan */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Bone Mass Density (DEXA) — enter if you have test results" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Lab & Advanced Screening" subtitle="Kepadatan massa tulang (DEXA) — isi bila Anda punya hasil pemeriksaan" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('T-score BMD (DEXA)', 'bmd', 0.1)}
         </div>

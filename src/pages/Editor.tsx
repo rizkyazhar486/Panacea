@@ -62,7 +62,7 @@ export function Editor() {
         <SectionTitle
           icon={<IconBook size={20} />}
           title="Write Medical Material / Notes"
-          subtitle="Write, edit, trim, then upload — passed on to a verifier"
+          subtitle="Tulis, sunting, rapikan, lalu unggah — diteruskan ke verifikator"
           right={
             <Link to="/my-materials"><Button variant="outline">My Materials →</Button></Link>
           }
@@ -96,7 +96,7 @@ export function Editor() {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={12}
-          placeholder="Write your notes/journal here… select text then 'Cut selection' to trim."
+          placeholder="Tulis catatan/jurnal Anda di sini… pilih teksnya lalu 'Potong pilihan' untuk merapikan."
           className="w-full resize-y rounded-xl border border-neutral-200 p-3 font-mono text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
         <div className="mt-3 flex flex-wrap items-end gap-3">

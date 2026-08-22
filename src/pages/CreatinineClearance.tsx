@@ -51,8 +51,8 @@ export function CreatinineClearance() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Creatinine Clearance (Cockcroft-Gault)" subtitle="Renal function for drug dosing — distinct from CKD-EPI eGFR" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Many drug package inserts and dosing nomograms specify renal dose adjustment by this formula specifically, not by eGFR — both have a real role and aren't interchangeable.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Creatinine Clearance (Cockcroft-Gault)" subtitle="Fungsi ginjal untuk penghitungan dosis obat — berbeda dari eGFR CKD-EPI" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Banyak brosur obat dan nomogram dosis menetapkan penyesuaian dosis ginjal justru dengan rumus ini, bukan dengan eGFR — keduanya punya perannya masing-masing dan tidak dapat saling menggantikan.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
             <input className={inputClass} type="number" min={18} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />

@@ -11,7 +11,7 @@ export function Admin() {
         <SectionTitle
           icon={<IconStethoscope size={20} />}
           title="Service & Admin"
-          subtitle="Human admin + automated AI chatbot (phone icon on every page)"
+          subtitle="Admin manusia + chatbot AI otomatis (lambang telepon di tiap halaman)"
         />
         <div className="grid gap-3 sm:grid-cols-3">
           <Mini icon={<IconPhone size={18} />} label="Active tickets" value="0" />
@@ -21,7 +21,7 @@ export function Admin() {
       </Card>
 
       <Card>
-        <SectionTitle title="Complaint & Issue Tickets" subtitle="For fixing the system & improving service" />
+        <SectionTitle title="Complaint & Issue Tickets" subtitle="Untuk memperbaiki sistem & meningkatkan layanan" />
         <p className="text-sm text-neutral-500">No tickets received yet.</p>
       </Card>
 

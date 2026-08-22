@@ -35,8 +35,8 @@ export function CorrectedCalcium() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Corrected Calcium" subtitle="Adjusts total calcium for low albumin (Payne et al., 1973)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">About half of serum calcium is protein-bound (mostly to albumin) — low albumin makes total calcium read falsely low even when the physiologically active (ionized) fraction is normal. A very common bedside pitfall in hospitalized, malnourished, or cirrhotic patients.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Corrected Calcium" subtitle="Menyesuaikan kalsium total terhadap albumin rendah (Payne dkk., 1973)" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Sekitar separuh kalsium serum terikat protein (terutama albumin) — albumin yang rendah membuat kalsium total terbaca rendah palsu meskipun bagian yang aktif secara fisiologis (terionisasi) sebenarnya normal. Jebakan yang sangat lazim di sisi tempat tidur pada pasien rawat inap, kurang gizi, atau sirosis.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Measured total calcium (mg/dL)">
             <input className={inputClass} type="number" step="0.1" min={0} value={totalCa || ''} onChange={(e) => setTotalCa(Number(e.target.value) || 0)} />

@@ -105,7 +105,7 @@ export function FamilyHealth() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Family Health History" subtitle="Your family's conditions are an early-warning map for your own screening. Private & stored on your device." />
+        <SectionTitle icon={<IconHeart size={20} />} title="Family Health History" subtitle="Penyakit keluarga Anda adalah peta peringatan dini bagi penapisan Anda sendiri. Pribadi & tersimpan di perangkat Anda." />
         <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Tambahkan tiap anggota keluarga beserta penyakit besar yang pernah dideritanya. Panaceamed menandai apa yang sebaiknya Anda tapis lebih awal — kekerabatan yang lebih dekat dan penyakit yang muncul pada usia muda paling besar bobotnya.</Prosa>
       </Card>
 
@@ -157,7 +157,7 @@ export function FamilyHealth() {
       {/* Risk flags */}
       {flags.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconShield size={20} />} title="Penanda penapisan untuk Anda" subtitle="Based on your family history — discuss timing with your doctor" />
+          <SectionTitle icon={<IconShield size={20} />} title="Penanda penapisan untuk Anda" subtitle="Berdasarkan riwayat keluarga Anda — bicarakan waktunya dengan dokter Anda" />
           <div className="mt-3 space-y-2">
             {flags.map((f, i) => (
               <div key={i} className={'rounded-xl border p-3 ' + (f.level === 'high' ? 'border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10' : 'border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10')}>

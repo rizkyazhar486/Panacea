@@ -2390,7 +2390,7 @@ function IvDripCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Convert infusion volume & duration into drops/minute per the giving set's drop factor" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Ubah volume & lama infus menjadi tetes/menit menurut faktor tetes set infus" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Total Volume (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
@@ -2437,7 +2437,7 @@ function AriaCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet et al., WHO 2008)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
       <Field label="Symptom Duration">
         <SegButtons value={duration} onChange={setDuration} options={[
           { v: 'intermiten', l: 'Intermittent (<4 days/week or <4 weeks)' },

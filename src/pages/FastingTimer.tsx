@@ -65,7 +65,7 @@ export function FastingTimer() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Fasting & Autophagy Timer" subtitle="Track a fast and see which metabolic phase your body is likely in" />
+        <SectionTitle icon={<IconTimer size={20} />} title="Fasting & Autophagy Timer" subtitle="Ikuti jalannya puasa dan lihat tahap metabolik mana yang kemungkinan sedang berlangsung" />
 
         {/* Plan picker */}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export function FastingTimer() {
       {/* Current phase detail + next */}
       {start && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="What's happening now" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Apa yang sedang terjadi" />
           <p className="mt-2 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{phase.emoji} <b>{phase.name}.</b> {phase.note}</p>
           {nextPhase && (
             <p className="mt-2 rounded-xl bg-neutral-50 p-3 text-[12px] text-neutral-500 dark:bg-white/5 dark:text-neutral-500">

@@ -66,7 +66,7 @@ export function FourTsScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="4Ts Score" subtitle="Heparin-induced thrombocytopenia pretest probability (Lo et al. 2006)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Estimates pretest probability of HIT before confirmatory lab testing (HIT antibody ELISA or serotonin release assay). A low score has a high negative predictive value — HIT is effectively excluded without needing further testing.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Memperkirakan kemungkinan pratest HIT sebelum pemeriksaan laboratorium pemastian (ELISA antibodi HIT atau serotonin release assay). Skor rendah punya nilai prediksi negatif yang tinggi — HIT praktis tersingkir tanpa perlu pemeriksaan lanjutan.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-3">
