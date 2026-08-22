@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { WIDGETS, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
+import { widgetPapan, ambilWidget, alihkanWidget, simpanWidget, widgetBawaan } from '../lib/homeWidgets'
+
+// Hanya widget yang benar-benar menampilkan sesuatu. Pintu ke fitur dicari
+// lewat kolom pencarian, bukan dinyalakan sebagai kartu.
+const WIDGETS = widgetPapan()
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pemilih widget beranda.

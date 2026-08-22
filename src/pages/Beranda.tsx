@@ -358,7 +358,7 @@ export default function Beranda() {
             </h1>
           </div>
           <Link
-            to="/search"
+            to="/cari"
             className="t-sedang flex h-11 shrink-0 items-center rounded-full bg-brand px-5 font-bold text-white transition active:scale-95"
           >
             Cari

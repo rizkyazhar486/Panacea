@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Pratinjau } from '../lib/pratinjauBeranda'
 import { hitungRangkaian, PERINGATAN_RANGKAIAN } from '../lib/rangkaian'
-import { WIDGETS, ambilWidget } from '../lib/homeWidgets'
+import { widgetPapan, ambilWidget } from '../lib/homeWidgets'
+
+const WIDGETS = widgetPapan()
 import { lazy, Suspense } from 'react'
 import { getWorkouts } from '../lib/workoutStore'
 import { hrMaxFromAge } from '../lib/workoutImport'

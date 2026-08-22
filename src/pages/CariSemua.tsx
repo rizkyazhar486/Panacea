@@ -1,0 +1,98 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { IconSearch } from '../components/icons'
+import { cari, siapkanIndeks, NAMA_JENIS, type Hasil, type JenisHasil } from '../lib/mesinCari'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Satu kotak untuk seluruh isi aplikasi: fitur, penyakit, obat, stasiun OSCE,
+// dan kalkulator.
+//
+// TANPA TOMBOL "CARI". Hasil muncul saat mengetik. Tombol cari menambah satu
+// ketukan pada pekerjaan yang paling sering dilakukan orang di halaman ini,
+// dan tidak memberi apa pun sebagai gantinya.
+//
+// HASIL DIKELOMPOKKAN MENURUT JENISNYA. Satu daftar bercampur memaksa pembaca
+// memeriksa tiap baris untuk tahu ia sedang melihat penyakit atau nama obat;
+// kelompok menjawabnya sebelum dibaca.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const URUTAN: JenisHasil[] = ['fitur', 'kalkulator', 'penyakit', 'obat', 'stasiun']
+
+const WARNA: Record<JenisHasil, string> = {
+  fitur: 'text-brand',
+  kalkulator: 'text-sky-500',
+  penyakit: 'text-rose-500',
+  obat: 'text-amber-500',
+  stasiun: 'text-violet-500',
+}
+
+export function CariSemua() {
+  const [q, setQ] = useState('')
+  const [siap, setSiap] = useState(0)
+
+  useEffect(() => { siapkanIndeks().then(setSiap).catch(() => setSiap(-1)) }, [])
+
+  const hasil = useMemo<Hasil[]>(() => (siap > 0 ? cari(q) : []), [q, siap])
+
+  const kelompok = useMemo(() => {
+    const peta = new Map<JenisHasil, Hasil[]>()
+    for (const h of hasil) {
+      if (!peta.has(h.jenis)) peta.set(h.jenis, [])
+      peta.get(h.jenis)!.push(h)
+    }
+    return URUTAN.filter((j) => peta.has(j)).map((j) => [j, peta.get(j)!] as const)
+  }, [hasil])
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-3 px-fluid pb-24">
+      <div className="sticky top-0 z-10 -mx-fluid bg-white/85 px-fluid py-3 backdrop-blur dark:bg-neutral-950/85">
+        <div className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-3 dark:border-white/15 dark:bg-white/10">
+          <IconSearch size={18} className="shrink-0 text-neutral-400" />
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Cari fitur, penyakit, obat, skor…"
+            aria-label="Cari di seluruh aplikasi"
+            className="h-12 w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-neutral-400 dark:text-white"
+          />
+          {q && (
+            <button onClick={() => setQ('')} aria-label="Kosongkan" className="shrink-0 px-1 text-lg leading-none text-neutral-400">×</button>
+          )}
+        </div>
+        <p className="t-mikro mt-1.5 text-neutral-500">
+          {siap === -1 ? 'Indeks gagal dimuat.' : siap === 0 ? 'Menyiapkan indeks…' : `${siap.toLocaleString('id-ID')} butir terindeks`}
+          {q.trim().length >= 2 && siap > 0 && ` · ${hasil.length} hasil`}
+        </p>
+      </div>
+
+      {q.trim().length < 2 ? (
+        <p className="t-kecil px-1 text-neutral-500">Ketik sedikitnya dua huruf.</p>
+      ) : hasil.length === 0 ? (
+        <p className="t-kecil px-1 text-neutral-500">Tidak ada yang cocok dengan “{q.trim()}”.</p>
+      ) : (
+        kelompok.map(([jenis, daftar]) => (
+          <section key={jenis}>
+            <h2 className="t-kecil mb-1.5 font-black uppercase tracking-wide text-neutral-500">
+              {NAMA_JENIS[jenis]} <span className="tabular-nums opacity-60">{daftar.length}</span>
+            </h2>
+            <div className="kaca divide-y divide-neutral-100 overflow-hidden rounded-2xl dark:divide-white/10">
+              {daftar.map((h) => (
+                <Link key={h.jenis + h.judul + h.ke} to={h.ke} className="flex min-h-[52px] items-center gap-3 px-3 py-2 transition active:bg-neutral-100 dark:active:bg-white/10">
+                  <span className={`t-mikro w-1 shrink-0 self-stretch rounded-full ${WARNA[h.jenis]}`} style={{ background: 'currentColor' }} />
+                  <span className="min-w-0 flex-1">
+                    <span className="t-kecil block truncate font-bold text-ink dark:text-white">{h.judul}</span>
+                    <span className="t-mikro block truncate text-neutral-500">{h.ringkas}</span>
+                  </span>
+                  <span aria-hidden className="t-kecil shrink-0 text-neutral-300 dark:text-neutral-600">›</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))
+      )}
+    </div>
+  )
+}
+
+export default CariSemua

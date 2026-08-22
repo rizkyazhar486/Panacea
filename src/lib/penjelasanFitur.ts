@@ -33,6 +33,7 @@ export const PENJELASAN_FITUR: Record<string, string> = {
 
   // ── Tubuh & kesehatan harian ──
   '/latihan-beban': 'Catat set, ulangan, dan beban; lihat volume mingguan serta rekor per gerakan',
+  '/cari': 'Satu kotak untuk mencari fitur, penyakit, obat, stasiun OSCE, dan kalkulator sekaligus',
   '/harian': 'Telusuri hari mana pun: angka yang terukur perangkat dan yang Anda rasakan sendiri',
   '/ikhtisar': 'Seluruh angka tubuh beserta grafik dan rata-ratanya, dengan jangka yang dipilih sendiri',
   '/tubuh': 'Energi, jantung, tidur, dan gerak dalam satu halaman',

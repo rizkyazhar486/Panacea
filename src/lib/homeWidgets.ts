@@ -239,10 +239,43 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'materiSaya', label: 'Materi Saya', ringkas: 'Materi yang Anda tulis maupun simpan', ke: '/my-materials', emoji: '📚', kategori: 'Layanan & Darurat' },
 ]
 
+/**
+ * WIDGET YANG BENAR-BENAR HIDUP.
+ *
+ * Hanya id di sini yang boleh muncul di papan beranda dan di pemilih widget.
+ * Alasannya sederhana dan diminta langsung oleh pemakainya: sebuah widget yang
+ * hanya berisi lambang dan nama fitur bukan widget — ia pintu. Pintu sudah ada
+ * tempatnya sendiri (kisi fitur dan pencarian), dan menaruhnya di papan widget
+ * membuat papan itu penuh oleh benda yang tidak menjawab apa pun.
+ *
+ * Sisa katalog WIDGETS tetap ada dan tetap dipakai — oleh kisi fitur, oleh
+ * halaman Semua Fitur, dan oleh mesin pencari. Yang berubah hanyalah siapa
+ * yang berhak menempati beranda.
+ */
+export const WIDGET_HIDUP = [
+  'kebugaran',      // bugar/lelah/segar + keputusan hari ini
+  'grafikLatihan',
+  'grafikTidur',
+  'grafikLangkah',
+  'grafikGizi',
+  'grafikDenyut',
+  'tubuh',          // langkah hari ini + cincin kebiasaan
+  'pelatih',        // latihan 7 hari
+  'tidur',          // tidur semalam + 14 malam
+  'detakJantung',   // denyut istirahat + garis
+  'longevity',      // kapasitas aerobik + selisih MET
+  'salat',          // salat berikutnya + hitungan mundur
+] as const
+
+/** Katalog yang boleh menempati beranda. */
+export function widgetPapan(): WidgetDef[] {
+  return WIDGETS.filter((w) => (WIDGET_HIDUP as readonly string[]).includes(w.id))
+}
+
 const KUNCI = 'pmd-home-widgets'
 
 export function widgetBawaan(): string[] {
-  return WIDGETS.filter((w) => w.bawaan).map((w) => w.id)
+  return widgetPapan().filter((w) => w.bawaan).map((w) => w.id)
 }
 
 export function ambilWidget(): string[] {
@@ -253,7 +286,7 @@ export function ambilWidget(): string[] {
     if (!Array.isArray(arr)) return widgetBawaan()
     // Saring id yang sudah tidak ada lagi, agar kartu yang dihapus dari aplikasi
     // tidak meninggalkan slot kosong di beranda seseorang.
-    return arr.filter((id) => typeof id === 'string' && WIDGETS.some((w) => w.id === id))
+    return arr.filter((id) => typeof id === 'string' && (WIDGET_HIDUP as readonly string[]).includes(id))
   } catch {
     return widgetBawaan()
   }
