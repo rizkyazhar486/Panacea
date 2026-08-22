@@ -4,6 +4,7 @@ import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp } from '../components/icons'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
+import { KartuKlinisTubuh } from '../components/KartuKlinisTubuh'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ikhtisar — seluruh angka tubuh pada satu layar, dengan jangka yang dipilih.
@@ -88,6 +89,7 @@ export function Ikhtisar() {
     return (
       <div className="mx-auto max-w-3xl space-y-4 px-fluid pb-24">
         <SectionTitle icon={<IconChartUp size={20} />} title="Ikhtisar" subtitle="Seluruh angka tubuh pada satu layar" />
+        <KartuKlinisTubuh />
         <Card>
           <p className="text-[13px] leading-relaxed text-neutral-500">
             Belum ada riwayat angka tubuh yang tersimpan. Riwayat terkumpul sendiri begitu data masuk — dari impor
@@ -126,7 +128,9 @@ export function Ikhtisar() {
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {deret.map((d) => (
+        <KartuKlinisTubuh />
+
+      {deret.map((d) => (
           <div key={d.medan.kunci} className="kaca rounded-2xl p-3">
             <span className="block truncate text-[10px] font-bold uppercase tracking-wide text-neutral-500">
               {d.medan.label}
