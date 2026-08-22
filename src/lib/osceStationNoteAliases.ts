@@ -902,6 +902,15 @@ const ALIAS: Record<string, string> = {
   'TB Paru + candidiasis oral + Susp HIV': 'Tuberkulosis dengan HIV',
   'TB paru + HIV + Candidiasis Oral': 'Tuberkulosis dengan HIV',
   'Limfadenopati regio coli': 'Limfadenopati',
+  /*
+   * 'Limfadenopati TB' dan 'Limfadenopati TB anak' dipetakan ke 'Limfadenitis',
+   * bukan ke catatan tuberkulosis paru: yang diujikan adalah benjolan lehernya
+   * — sifat rabaan, untaian kelenjar yang menyatu, abses dingin, dan biopsi —
+   * dan catatan limfadenitis membahas tuberkulosis kelenjar beserta
+   * skrofuloderma pada tempatnya.
+   */
+  'Limfadenopati TB': 'Limfadenitis',
+  'Limfadenopati TB anak': 'Limfadenitis',
   'Limfadenitis dd limfadenopati regio coli': 'Limfadenitis',
   'Malaria tropikana': 'Malaria (falciparum/vivax) — apus darah tebal/tipis',
   'Malaria (Pungsi vena)': 'Malaria (falciparum/vivax) — apus darah tebal/tipis',
