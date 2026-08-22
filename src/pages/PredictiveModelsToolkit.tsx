@@ -214,7 +214,11 @@ export function PredictiveModelsToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Six real mathematical models in one place" />
+        <SectionTitle icon={<IconGauge size={20} />} title="Predictive Models Toolkit" subtitle="Enam model matematis — bentuk kurvanya, bukan angka Anda" />
+        <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
+          Tetapan pada model-model ini <b>dipilih penulis</b> agar bentuk kurvanya masuk akal; keluarannya bukan hasil
+          pengukuran dan tidak dapat dipakai untuk menentukan tindakan.
+        </p>
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Every model here applies published, population-average patterns to your inputs — none of them measure your actual biology directly. Think of these as educated illustrations, not lab results.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (

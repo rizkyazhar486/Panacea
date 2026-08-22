@@ -26,6 +26,8 @@ function TelomereQuiz() {
   const answered = answers.every((a) => a >= 0)
   const score = answers.reduce((a, b) => a + Math.max(b, 0), 0)
   const maxScore = TELOMERE_QS.length * 2
+  // Ambang 30% dan 60% adalah pembagian sembarang untuk memberi kalimat, bukan
+  // titik potong yang pernah diuji terhadap panjang telomer.
   const band = score <= maxScore * 0.3 ? 'Lifestyle pattern favorable for telomere health' : score <= maxScore * 0.6 ? 'Some room to improve a few habits' : 'Several habits worth addressing'
   return (
     <Card className="!p-5">

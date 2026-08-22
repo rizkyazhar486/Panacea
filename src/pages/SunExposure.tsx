@@ -73,6 +73,10 @@ export function SunExposure() {
 
   const skin = SKIN_TYPES.find((s) => s.id === skinId)!
   const burnMin = uvIndex != null ? minutesToBurn(uvIndex, skin.med) : null
+  // Holick (2007), N Engl J Med 357:266-81 — paparan sekitar seperempat sampai
+  // sepertiga dosis eritema minimal sudah cukup untuk sintesis vitamin D. Yang
+  // dipakai di sini sepertiga; angkanya kasar dan sangat bergantung warna kulit,
+  // lintang, musim, dan jam.
   const vitDMin = burnMin != null && Number.isFinite(burnMin) ? burnMin * 0.3 : null
   const uvBand = uvIndex == null ? null
     : uvIndex < 3 ? { label: 'Low', color: '#00BF63' }

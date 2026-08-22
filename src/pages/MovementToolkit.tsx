@@ -60,8 +60,12 @@ function BalanceTest() {
 
 function Zone2Checker() {
   const [age, setAge] = useState(() => getDemo().age || 30)
-  const lower = Math.round((220 - age) * 0.6)
-  const upper = Math.round((220 - age) * 0.7)
+  // HRmaks memakai Tanaka, Monahan & Seals (2001), J Am Coll Cardiol 37(1):153-6
+  // (208 - 0,7 x usia) — 220 - usia meleset makin jauh pada usia lanjut.
+  // Batas zona 2 = 60-70% HRmaks mengikuti ACSM (Garber et al., 2011).
+  const hrMaks = 208 - 0.7 * age
+  const lower = Math.round(hrMaks * 0.6)
+  const upper = Math.round(hrMaks * 0.7)
   return (
     <Card className="!p-5">
       <Field label="Age">

@@ -320,6 +320,8 @@ function WorkoutRow({ w, hrMax, terbuka, onToggle }: { w: ImportedWorkout; hrMax
                 <ResponsiveContainer>
                   <LineChart data={chart} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
                     {/* Pita zona sebagai latar: membaca kurva tanpa acuan zona hampir tidak berarti. */}
+                  {/* Pita 60/70/80/90% HRmaks mengikuti ACSM Guidelines
+                      (Garber dkk., 2011, Med Sci Sports Exerc 43(7):1334-59). */}
                     <ReferenceArea y1={hrMax * 0.6} y2={hrMax * 0.7} fill="#34d399" fillOpacity={0.08} />
                     <ReferenceArea y1={hrMax * 0.8} y2={hrMax * 0.9} fill="#fbbf24" fillOpacity={0.08} />
                     <ReferenceArea y1={hrMax * 0.9} y2={hrMax} fill="#f87171" fillOpacity={0.1} />

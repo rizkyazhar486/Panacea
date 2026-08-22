@@ -81,6 +81,8 @@ export function InitialAssessment() {
   const qolPct = qolMax > 0 ? (qolScore / qolMax) * 100 : 0
 
   const painFlag = a.painRegions.length > 0 && a.painSeverity >= 4
+  // Ambang 50% ini penyaring perhatian buatan sendiri, bukan titik potong klinis:
+  // gunanya menandai apa yang perlu dilihat, bukan menyatakan ada gangguan.
   const movementFlag = movementScore < movementMax * 0.5
   const asymFlag = asymBalance > 15 || asymHop > 15
 

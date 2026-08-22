@@ -68,6 +68,7 @@ export function MacroLabGizi() {
     const t = tinggi > 0 ? tinggi : 170
     const u = umur && umur > 0 ? umur : 30
     // Mifflin-St Jeor. Dipakai pria/wanita lewat demo.sex bila ada.
+    // Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7.
     const bmr = 10 * b + 6.25 * t - 5 * u + (demo.sex === 'F' ? -161 : 5)
     const tdee = bmr * (AKTIVITAS.find((a) => a.id === aktivitas)?.f ?? 1.55)
     const target = tdee * (TUJUAN.find((x) => x.id === tujuan)?.faktor ?? 1)
@@ -95,6 +96,7 @@ export function MacroLabGizi() {
         lemak: Math.round(lemakG / perMakan),
       },
       seratG: Math.round((target / 1000) * 14),   // 14 g per 1000 kkal
+      // 33 mL/kg adalah aturan praktis yang lazim, bukan angka hasil penelitian.
       airL: Math.round(b * 0.033 * 10) / 10,
     }
   }, [berat, tinggi, umur, tujuan, aktivitas, makanPerHari, demo.sex])

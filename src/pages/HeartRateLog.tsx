@@ -278,6 +278,8 @@ export function HeartRateLog() {
                       <stop offset="100%" stopColor="#f43f5e" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
+                  {/* Pita 60/70/80/90% HRmaks mengikuti ACSM Guidelines
+                      (Garber dkk., 2011, Med Sci Sports Exerc 43(7):1334-59). */}
                   <ReferenceArea y1={hrMax * 0.6} y2={hrMax * 0.7} fill="#34d399" fillOpacity={0.07} />
                   <ReferenceArea y1={hrMax * 0.8} y2={hrMax * 0.9} fill="#fbbf24" fillOpacity={0.07} />
                   <ReferenceArea y1={hrMax * 0.9} y2={hrMax} fill="#f87171" fillOpacity={0.09} />

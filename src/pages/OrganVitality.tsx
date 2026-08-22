@@ -152,7 +152,10 @@ export function OrganVitality() {
   const warn = flags.filter((f) => f === 'warn').length
 
   const sScore = skinScore(skin)
-  const skinBioAge = Math.round((100 - sScore) * 0.25) // extra "skin years" heuristic
+  // "Umur kulit tambahan" ini karangan penulis, bukan ukuran terbitan. Ia hanya
+  // mengubah skor menjadi satuan tahun supaya lebih mudah dirasakan — dan justru
+  // karena itu mudah disalahartikan sebagai hasil ukur.
+  const skinBioAge = Math.round((100 - sScore) * 0.25)
   const bf = aestheticBodyFat(g)
   const pbfBand: Band = pbf < bf.floor ? 'bad' : pbf <= bf.fit[1] ? 'ok' : pbf <= bf.healthy[1] ? 'warn' : 'bad'
 

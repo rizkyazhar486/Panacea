@@ -120,19 +120,23 @@ function PlantDiversity() {
 
 function CoffeeHydration() {
   const [cups, setCups] = useState(2)
-  const extraMl = Math.round(cups * 150 * 1.5)
+  // Angka "tambah air 1,5x volume kopi" dihapus: tidak ada terbitan yang
+  // mendukungnya. Killer, Blannin & Jeukendrup (2014), PLoS ONE 9(1):e84154 —
+  // pada peminum kopi biasa, 4 cangkir/hari TIDAK menyebabkan kekurangan
+  // cairan; kopi ikut dihitung sebagai asupan cairan.
+  const ml = cups * 150
   return (
     <Card className="!p-5">
       <Field label="Cups of coffee today">
         <input className={inputClass} type="number" min={0} max={15} value={cups} onChange={(e) => setCups(Number(e.target.value) || 0)} />
       </Field>
       <div className="mt-3 rounded-xl bg-brand/10 p-4 text-center">
-        <div className="text-2xl font-black text-brand-dark">+{extraMl} mL</div>
-        <div className="text-[11px] text-neutral-500">Extra water suggested to offset caffeine's mild diuretic effect</div>
+        <div className="text-2xl font-black text-brand-dark">{ml} mL</div>
+        <div className="text-[11px] text-neutral-500">terhitung sebagai asupan cairan, bukan pengurangnya</div>
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">
-        Coffee still contributes to daily fluid intake overall — this is a small top-up, not a
-        1-for-1 replacement rule.
+        Pada peminum kopi biasa, sampai 4 cangkir sehari tidak membuat tubuh kekurangan cairan — kopi ikut dihitung sebagai
+        cairan harian. <span className="opacity-75">Killer, Blannin &amp; Jeukendrup (2014), PLoS ONE 9(1):e84154.</span>
       </p>
     </Card>
   )

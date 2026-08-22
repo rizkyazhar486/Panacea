@@ -66,6 +66,9 @@ function sleepScore(hours: number, latencyMin: number, awakenings: number, bedti
   const latency = clamp100(latencyMin <= 15 ? 100 : 100 - (latencyMin - 15) * 2)
   const awakening = clamp100(100 - awakenings * 15)
   const consistency = clamp100(bedtimeVarianceMin <= 30 ? 100 : 100 - (bedtimeVarianceMin - 30) * 1.5)
+  // Bobot 0,4/0,2/0,2/0,2 adalah pilihan penulis. Tidak ada skor kualitas tidur
+  // terbitan yang menggabungkan keempatnya dengan bobot tervalidasi; yang paling
+  // dekat, PSQI (Buysse et al., 1989), memakai pertanyaan dan penilaian lain.
   const total = clamp100(duration * 0.4 + latency * 0.2 + awakening * 0.2 + consistency * 0.2)
   return { total, duration, latency, awakening, consistency }
 }
@@ -85,7 +88,11 @@ function SleepScoreCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconMoon size={20} />} title="Sleep Quality Score" subtitle="Physiological scoring based on duration, latency, awakenings & bedtime consistency" />
+      <SectionTitle icon={<IconMoon size={20} />} title="Skor Tidur" subtitle="Lama, waktu terlelap, terbangun, dan keajekan jam tidur" />
+      <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
+        Bobot keempat bagian ini <b>pilihan penulis</b>, bukan skor tidur tervalidasi. Pakai perubahannya dari malam ke
+        malam pada diri sendiri. Untuk penilaian baku, PSQI (Buysse dkk., 1989) adalah yang lazim dipakai.
+      </p>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label={sleepFromDevice ? 'Total Sleep (hours) — from your device' : 'Total Sleep (hours)'}><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
         <Field label="Time to Fall Asleep (minutes)"><input className={inputClass} type="number" value={latency} onChange={(e) => setLatency(+e.target.value)} /></Field>

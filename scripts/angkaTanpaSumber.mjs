@@ -16,7 +16,20 @@
 import { readdirSync, readFileSync } from 'node:fs'
 
 const DIR = 'src/pages'
-const SUMBER = /et al\.|doi|PMID|\(19\d\d\)|\(20\d\d\)|pilihan penulis|dipilih penulis|bukan hasil penelitian/i
+// Dua macam penanda dianggap cukup: KUTIPAN (nama penulis/tahun/lembaga
+// pedoman) atau PENGAKUAN bahwa angkanya bukan hasil penelitian. Keduanya
+// sama-sama membuat pembaca tahu sedang membaca apa; yang tidak boleh adalah
+// diam.
+const SUMBER = new RegExp(
+  [
+    'et al\\.|dkk\\.|doi|PMID|\\(19\\d\\d\\)|\\(20\\d\\d\\)',
+    'KDIGO|ACSM|WHO|PSQI|Mifflin|Tanaka|Uth|Navy',
+    'pilihan penulis|dipilih penulis|karangan penulis|buatan sendiri|sembarang',
+    'bukan hasil penelitian|bukan ukuran terbitan|bukan pengukuran|aturan praktis',
+    'not a medical|experimental|heuristic',
+  ].join('|'),
+  'i',
+)
 const HITUNGAN = /(skor|score|risiko|risk|usia|age|indeks|index|proyeksi)/i
 const KOEFISIEN = /[^\w.]\d\.\d+\s*[*+]|[*]\s*\d\.\d+/
 
@@ -34,3 +47,8 @@ for (const f of readdirSync(DIR).filter((x) => x.endsWith('.tsx'))) {
 hasil.sort((a, b) => b.koefisien - a.koefisien)
 for (const h of hasil) console.log(String(h.koefisien).padStart(4), h.f)
 console.log(`\n${hasil.length} halaman menghitung sesuatu tanpa menyebut sumber.`)
+console.log(
+  'Sisa yang tetap muncul adalah batas skrip ini, bukan temuan: tetapan tapis',
+  'suara (SleepToolkit) dan angka tata letak CSS (Beranda, TrainingPhysiology)',
+  'bukan angka kesehatan.',
+)

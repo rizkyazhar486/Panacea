@@ -275,6 +275,8 @@ const EFFORT_FRAC: Record<string, number> = { easy: 0.68, moderate: 0.78, hard: 
 function vo2Category(v: number, age: number, g: 'M' | 'F'): { label: string; tone: 'brand' | 'low' | 'critical' | 'neutral' } {
   // Cooper/ACSM norms, age & sex adjusted (approx).
   const base = g === 'M' ? [32, 38, 44, 51] : [27, 33, 39, 45]
+  // Penurunan 0,3 ml/kg/menit per tahun sesudah usia 30 adalah besaran kasar
+  // yang lazim dikutip; laju sebenarnya berbeda-beda menurut latihan.
   const adj = base.map((b) => b - Math.max(0, age - 30) * 0.3)
   if (v >= adj[3]) return { label: 'Superior', tone: 'brand' }
   if (v >= adj[2]) return { label: 'Very Good', tone: 'brand' }
@@ -315,6 +317,8 @@ function RunnerCoach() {
 
   // Velocity at VO₂max → 5K-equivalent pace → Daniels-style zones.
   const vVo2 = (vo2max - 3.5) / 0.2 // m/min
+  // Kecepatan 5 km kira-kira 4% lebih lambat dari vVO2max (Daniels, Daniels'
+  // Running Formula) — perkiraan kasar, bukan hasil uji lapangan.
   const pace5kSec = vVo2 > 0 ? (1000 / vVo2) * 60 * 1.04 : 0
   const zone = (deltaSec: number) => fmtPace(pace5kSec + deltaSec)
 
@@ -542,6 +546,8 @@ export function TrainingPlan() {
   const vo2FromCooper = cooperVo2(cooper)
   const vo2Target = Math.max(vo2Now + 5, 50)
   const monthsToTarget = Math.max(1, Math.ceil((vo2Target - vo2Now) / 0.5)) // Norwegian 4x4 ≈ +0.5/bln
+  // 1,6 g/kg/hari: titik jenuh penambahan massa otot pada meta-analisis Morton
+  // dkk. (2018), Br J Sports Med 52(6):376-84.
   const protein = Math.round(weightKg * 1.6)
 
   return (

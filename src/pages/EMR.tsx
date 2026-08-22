@@ -94,7 +94,8 @@ function supportiveDefaults(weightKg: number) {
     resusitasi: 'Assess ABC; crystalloids (RL/NaCl 0.9%) per status; target MAP ≥65 mmHg.',
     balansCairan: `Maintenance ±${Math.round(maint)} mL/24 h (${Math.round(maint / 24)} mL/h, Holliday-Segar); adjust for deficit/loss.`,
     kebutuhanKalori: `${Math.round(w * 25)}–${Math.round(w * 30)} kcal/day (25–30 kcal/kg).`,
-    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/h (0.5 mL/kg/h).`,
+    // Ambang 0,5 mL/kg/jam mengikuti kriteria KDIGO 2012 untuk cedera ginjal akut.
+    urineOutput: `> ${(0.5 * w).toFixed(1)} mL/h (0.5 mL/kg/h, KDIGO 2012).`,
   }
 }
 

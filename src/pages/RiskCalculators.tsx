@@ -33,6 +33,9 @@ function fib4Band(v: number, age: number): { label: string; tone: 'brand' | 'low
 }
 
 // ── OST index = 0.2 × (weight_kg − age), truncated ───────────────────────────
+// Koh L.K.H. et al. (2001), Osteoporos Int 12(9):699-705 — penapisan, bukan
+// diagnosis: hasilnya menentukan siapa yang perlu DXA, bukan ada-tidaknya
+// osteoporosis.
 function ostIndex(weight: number, age: number): number | null {
   if (!(weight > 0 && age > 0)) return null
   return Math.trunc(0.2 * (weight - age))
