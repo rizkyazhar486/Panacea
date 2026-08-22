@@ -89,6 +89,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'grafikLangkah', label: 'Grafik Langkah 7 Hari', ringkas: 'Langkah per hari', ke: '/tubuh', emoji: '👣', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'grafikGizi', label: 'Grafik Gizi 7 Hari', ringkas: 'Kalori tercatat per hari', ke: '/nutrition', emoji: '🍽️', kategori: 'Gizi', bawaan: true },
   { id: 'grafikDenyut', label: 'Grafik Denyut 14 Hari', ringkas: 'Denyut istirahat dari waktu ke waktu', ke: '/tubuh', emoji: '❤️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'pantauan', label: 'Pantauan', ringkas: 'Penyakit, obat, dan skor pilihan Anda sendiri', ke: '/cari', emoji: '★', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'harian', label: 'Harian', ringkas: 'Telusuri hari mana pun: terukur dan yang dirasakan', ke: '/harian', emoji: '📅', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'ikhtisar', label: 'Ikhtisar', ringkas: 'Semua angka tubuh dan grafiknya pada satu layar', ke: '/ikhtisar', emoji: '📈', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'tubuh', label: 'Pusat Tubuh', ringkas: 'Angka tubuh dan rentang rujukannya', ke: '/tubuh', emoji: '🫁', kategori: 'Tubuh & Data', bawaan: true },
@@ -253,6 +254,7 @@ export const WIDGETS: WidgetDef[] = [
  * yang berhak menempati beranda.
  */
 export const WIDGET_HIDUP = [
+  'pantauan',       // daftar pilihan sendiri: penyakit, obat, skor, stasiun
   'kebugaran',      // bugar/lelah/segar + keputusan hari ini
   'grafikLatihan',
   'grafikTidur',

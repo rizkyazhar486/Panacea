@@ -21,6 +21,7 @@ import { deretMetrik } from '../lib/riwayatVitals'
 import { GrafikMini } from './GrafikMini'
 import { UBIN_LANGSUNG } from './UbinLangsung'
 import { UbinGrafik, wilayahBergrafik } from './UbinGrafik'
+import { UbinPantauan } from './UbinPantauan'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -331,6 +332,13 @@ function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
   if (Langsung) {
     const isi = Langsung()
     if (isi) return isi
+    // DATANYA BELUM ADA → TIDAK DIGAMBAR SAMA SEKALI.
+    //
+    // Sebelumnya ia jatuh kembali menjadi kartu berisi lambang dan nama fitur.
+    // Itu membuat papan widget penuh oleh pintu justru pada pemakai baru —
+    // keadaan yang paling tidak boleh terjadi, karena merekalah yang paling
+    // mudah menyimpulkan bahwa aplikasi ini isinya menu belaka.
+    return null
   }
   return (
     <Link
@@ -449,7 +457,15 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
    * Tanpa pengecualian ini ia dirender DUA KALI: sekali sebagai kartu, sekali
    * sebagai ubin.
    */
-  const BERKARTU = ['grafikOlahraga']
+  // Widget yang PUNYA TEMPATNYA SENDIRI di halaman ini tidak boleh muncul lagi
+  // sebagai ubin pintasan. Tanpa daftar ini, "Grafik Tidur 7 Hari" tampil dua
+  // kali: sekali sebagai grafik sungguhan, sekali sebagai kartu berisi lambang
+  // dan namanya — persis bentuk yang baru saja dibuang dari aplikasi ini.
+  const BERKARTU = [
+    'grafikOlahraga',
+    'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
+    'pantauan',
+  ]
   const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id))
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -476,6 +492,8 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   return (
     <>
+    {pilihan.includes('pantauan') && <UbinPantauan />}
+
     <UbinGrafik />
 
     {/* JUDUL "KEADAAN ANDA" DIHAPUS, BUKAN DIKOSONGKAN.

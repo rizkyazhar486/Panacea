@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconSearch } from '../components/icons'
 import { cari, siapkanIndeks, NAMA_JENIS, type Hasil, type JenisHasil } from '../lib/mesinCari'
+import { alihkanPantauan, ambilPantauan } from '../lib/pantauan'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Satu kotak untuk seluruh isi aplikasi: fitur, penyakit, obat, stasiun OSCE,
@@ -29,6 +30,10 @@ const WARNA: Record<JenisHasil, string> = {
 export function CariSemua() {
   const [q, setQ] = useState('')
   const [siap, setSiap] = useState(0)
+  // Bintang menandai butir yang dipantau. Disimpan sebagai daftar alamat,
+  // bukan indeks baris, supaya tandanya tetap benar ketika hasil pencarian
+  // berubah urutan.
+  const [pantau, setPantau] = useState<string[]>(() => ambilPantauan().map((p) => p.ke))
 
   useEffect(() => { siapkanIndeks().then(setSiap).catch(() => setSiap(-1)) }, [])
 
@@ -78,14 +83,27 @@ export function CariSemua() {
             </h2>
             <div className="kaca divide-y divide-neutral-100 overflow-hidden rounded-2xl dark:divide-white/10">
               {daftar.map((h) => (
-                <Link key={h.jenis + h.judul + h.ke} to={h.ke} className="flex min-h-[52px] items-center gap-3 px-3 py-2 transition active:bg-neutral-100 dark:active:bg-white/10">
+                <div key={h.jenis + h.judul + h.ke} className="flex min-h-[52px] items-center gap-2 px-2 py-2">
                   <span className={`t-mikro w-1 shrink-0 self-stretch rounded-full ${WARNA[h.jenis]}`} style={{ background: 'currentColor' }} />
-                  <span className="min-w-0 flex-1">
+                  <Link to={h.ke} className="min-w-0 flex-1 py-1">
                     <span className="t-kecil block truncate font-bold text-ink dark:text-white">{h.judul}</span>
                     <span className="t-mikro block truncate text-neutral-500">{h.ringkas}</span>
-                  </span>
-                  <span aria-hidden className="t-kecil shrink-0 text-neutral-300 dark:text-neutral-600">›</span>
-                </Link>
+                  </Link>
+                  {/* Bintang berdiri SENDIRI, di luar tautan. Menaruhnya di
+                      dalam tautan membuat tiap penekanan bintang ikut membuka
+                      halamannya — dan tepat itulah yang tidak diinginkan orang
+                      yang sedang menyusun daftar pantauannya. */}
+                  <button
+                    onClick={() => { setPantau(alihkanPantauan({ jenis: h.jenis, judul: h.judul, ke: h.ke }).map((p) => p.ke)) }}
+                    aria-pressed={pantau.includes(h.ke)}
+                    aria-label={pantau.includes(h.ke) ? `Berhenti memantau ${h.judul}` : `Pantau ${h.judul}`}
+                    className={`grid h-10 w-10 shrink-0 place-items-center rounded-full text-[16px] leading-none transition ${
+                      pantau.includes(h.ke) ? 'text-amber-400' : 'text-neutral-300 dark:text-neutral-600'
+                    }`}
+                  >
+                    {pantau.includes(h.ke) ? '★' : '☆'}
+                  </button>
+                </div>
               ))}
             </div>
           </section>
