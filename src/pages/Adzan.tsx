@@ -94,7 +94,7 @@ export function Adzan() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconShield />} title="Prayer times"
-        subtitle="Times from a named service, with the method you choose" />
+        subtitle="Waktu dari layanan yang disebutkan namanya, dengan metode pilihan Anda" />
 
       {galat && (
         <Card className="!border-rose-500/30 !bg-rose-500/5">
@@ -151,7 +151,7 @@ export function Adzan() {
               )
             })}
           </div>
-          <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Methods differ by a few minutes for the same city, and that difference is a scholarly choice rather than an error. Your local mosque&rsquo;s timetable is the authority here — this page is a reminder, not a replacement.</Prosa>
+          <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Antarmetode berbeda beberapa menit untuk kota yang sama, dan perbedaan itu adalah pilihan ijtihad, bukan kekeliruan. Jadwal masjid setempat Anda yang menjadi rujukan — halaman ini pengingat, bukan penggantinya.</Prosa>
         </Card>
       )}
 
@@ -212,7 +212,7 @@ export function Adzan() {
 
             <div>
               <div className="text-[10px] font-black uppercase tracking-wide text-neutral-500">Sound</div>
-              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">No adhan recording ships with this app. Nearly every adhan recording in circulation is a particular muezzin&rsquo;s work with unclear rights, and quietly redistributing that is not something to do with an act of worship. A soft generated chime is used instead — and if you hold your own copy, point to it here.</Prosa>
+              <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">Tidak ada rekaman azan yang disertakan dalam aplikasi ini. Hampir semua rekaman azan yang beredar adalah karya seorang muazin tertentu dengan status hak yang tidak jelas, dan menyebarkannya diam-diam bukan hal yang pantas dilakukan pada ibadah. Sebagai gantinya dipakai nada lembut yang dibangkitkan sendiri — dan bila Anda punya salinan sendiri, tunjukkan alamatnya di sini.</Prosa>
               <div className="mt-2 flex gap-2">
                 <Button onClick={() => bunyikanNada()}>Preview chime</Button>
                 {setelan.suaraUrl && (
@@ -222,7 +222,7 @@ export function Adzan() {
                 )}
               </div>
               <div className="mt-2">
-                <Field label="Your own adhan audio URL (optional)">
+                <Field label="Alamat berkas audio azan milik Anda sendiri (boleh dikosongkan)">
                   <input className={inputClass} value={setelan.suaraUrl} inputMode="url"
                     aria-label="Adhan audio URL" placeholder="https://…"
                     onChange={(e) => ubah({ suaraUrl: e.target.value.trim() })} />
@@ -248,7 +248,7 @@ export function Adzan() {
             Use this city
           </Button>
         </div>
-        <Prosa kelas="mt-1.5 text-[10px] leading-relaxed text-neutral-500">A city name is used rather than your GPS location. Precise coordinates are not needed to compute prayer times to the minute, and not collecting them is the safer default.</Prosa>
+        <Prosa kelas="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Yang dipakai adalah nama kota, bukan lokasi GPS Anda. Koordinat yang tepat tidak diperlukan untuk menghitung waktu salat sampai satuan menit, dan tidak mengumpulkannya adalah pilihan bawaan yang lebih aman.</Prosa>
 
         <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">Calculation method</div>
         <div className="mt-1.5 space-y-1">
@@ -277,7 +277,7 @@ export function Adzan() {
           <Ringkas ikon="🛡️" judul="What is checked before times are shown"
             anak={
               <div className="space-y-1.5">
-                <Poin ikon="1️⃣">All five prayers must be present — a partial schedule is not shown at all.</Poin>
+                <Poin ikon="1️⃣">Kelima waktu salat harus lengkap — jadwal yang tidak utuh sama sekali tidak ditampilkan.</Poin>
                 <Poin ikon="2️⃣">Each time must fall later in the day than the one before it. A schedule
                   that jumps backwards cannot be right, and showing it would lead someone to pray
                   outside the time.</Poin>

@@ -270,7 +270,7 @@ export function HealthProfile() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
           subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
-        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch auto-syncs live; Garmin and WHOOP import from a file you export and upload; everything else can be entered by hand. Whatever you fill in here flows straight into every fitness &amp; longevity calculator in the app.</Prosa>
+        <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch tersinkron langsung; Garmin dan WHOOP diimpor dari berkas yang Anda ekspor lalu unggah; selebihnya dapat diisi dengan tangan. Apa pun yang Anda isi di sini langsung mengalir ke seluruh kalkulator kebugaran &amp; umur panjang di aplikasi ini.</Prosa>
         <div className="mt-3">
           <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -289,7 +289,7 @@ export function HealthProfile() {
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · tangkapan layar timbangan .jpg/.png" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          <b>Apple Watch</b> can auto-sync below. <b>Garmin and WHOOP don't offer a live sync link</b>,
+          <b>Apple Watch</b> can auto-sync below. <b>Garmin dan WHOOP tidak menyediakan sambungan sinkron langsung</b>,
           so export your data from the Garmin Connect or WHOOP app and upload the file here — the
           fields fill in automatically, and you'll see exactly what was found before saving.
         </p>
@@ -438,7 +438,7 @@ function BenchmarkCard({ profile }: { profile: HealthProfile }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Compare with the General Population" subtitle="Estimate based on age & sex norms" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimate based on age & sex norms" />
       <div className="mt-3 space-y-4">
         {items.map((it) => (
           <div key={it.key}>
@@ -464,7 +464,7 @@ function TrendChart({ history }: { history: Snapshot[] }) {
   if (history.length < 2) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="Chart appears after ≥2 saves" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Trends" subtitle="Grafik muncul setelah tersimpan ≥2 kali" />
         <p className="mt-1 text-[11px] text-neutral-500">Save your data regularly (e.g. every morning) to track your VO₂max, HRV, and resting HR over time.</p>
       </Card>
     )
@@ -561,7 +561,7 @@ function DeviceSyncSummary({ profile }: { profile: HealthProfile }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between gap-3">
-        <SectionTitle icon={<IconActivity size={20} />} title="Synced from Your Device"
+        <SectionTitle icon={<IconActivity size={20} />} title="Tersinkron dari Perangkat Anda"
           subtitle={`${profile.deviceSyncSource ?? 'Device'} · ${daftar.length} metrik terisi otomatis`} />
         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-[10px] font-bold text-brand-dark">
           <span className="h-2 w-2 rounded-full bg-brand vital-dot" /> {ago}
@@ -655,7 +655,7 @@ function AutoSyncCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Auto-Sync from Apple Watch" subtitle="Via the third-party “Health Auto Export” app" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Sinkron Otomatis dari Apple Watch" subtitle="Via the third-party “Health Auto Export” app" />
       <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
         A website can't read Apple Health directly — that's an Apple restriction, native apps only. The closest thing to "automatic": install the <b>Health Auto Export</b> app (App Store, one-time purchase) on your iPhone, then point it at your private link below.
       </p>
@@ -784,7 +784,7 @@ function SyncDiagnosticsCard() {
   return (
     <Card className="!p-5">
       <SectionTitle icon={<IconActivity size={20} />} title="Diagnostik Sinkronisasi"
-        subtitle="Find out why data from your iPhone is not arriving" />
+        subtitle="Cari tahu mengapa data dari iPhone Anda tidak sampai" />
       {!open ? (
         <button onClick={() => setOpen(true)}
           className="mt-3 w-full rounded-xl bg-neutral-100 px-4 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-200 dark:bg-white/10 dark:text-neutral-200">

@@ -79,7 +79,7 @@ export function Kitab() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 pb-24">
       <SectionTitle icon={<IconShield />} title="Scripture"
-        subtitle="Read from the source, with the source named" />
+        subtitle="Dibaca dari sumbernya, dan sumbernya disebutkan" />
 
       <div className="flex flex-wrap gap-1.5">
         {([['quran', 'Qur’an'], ['bible', 'Bible'], ['tanakh', 'Torah / Tanakh'], ['lain', 'Other traditions']] as const)
@@ -117,14 +117,14 @@ export function Kitab() {
           How this page treats the text
         </div>
         <div className="mt-2 space-y-1.5">
-          <Poin ikon="📖"><b>Nothing here is written by us.</b> Every letter is fetched from the
+          <Poin ikon="📖"><b>Tidak ada satu pun di sini yang kami tulis sendiri.</b> Every letter is fetched from the
             provider named below and shown unaltered. This app never generates scripture.</Poin>
-          <Poin ikon="🧾"><b>Commentary is attributed.</b> Where tafsir is shown, the scholar or
+          <Poin ikon="🧾"><b>Tafsir disebutkan penulisnya.</b> Where tafsir is shown, the scholar or
             work is named, so you know whose reading you are reading.</Poin>
           <Poin ikon="🚫"><b>No "scientific miracle" claims.</b> Matching verses to current science
             is rejected by many scholars and scientists alike — it makes revelation depend on
             findings that change every decade.</Poin>
-          <Poin ikon="🕌"><b>This is a reader, not a teacher.</b> Questions of ruling and meaning
+          <Poin ikon="🕌"><b>Ini pembaca teks, bukan guru.</b> Questions of ruling and meaning
             belong with a qualified teacher in your own tradition.</Poin>
         </div>
       </Card>
@@ -160,9 +160,9 @@ export function Kitab() {
                 <div className="space-y-1.5">
                   <Poin ikon="1️⃣">There must be exactly {TOTAL_SURAH} surahs.</Poin>
                   <Poin ikon="2️⃣">The ayah counts must total {TOTAL_AYAT_HAFS} — the count of the Hafs reading.</Poin>
-                  <Poin ikon="3️⃣">Each surah must arrive with the exact number of ayat it declares, which catches truncation.</Poin>
-                  <Poin ikon="4️⃣">Every ayah must contain Arabic script, with no Latin letters and no replacement characters.</Poin>
-                  <Poin ikon="⚠️">If any check fails, nothing is displayed at all. These checks prove the text arrived intact — only a printed mushaf can prove it is correct.</Poin>
+                  <Poin ikon="3️⃣">Tiap surah harus datang dengan jumlah ayat persis seperti yang dinyatakannya — inilah yang menangkap teks yang terpotong.</Poin>
+                  <Poin ikon="4️⃣">Tiap ayat harus memuat aksara Arab, tanpa huruf Latin dan tanpa aksara pengganti.</Poin>
+                  <Poin ikon="⚠️">Bila satu pemeriksaan saja gagal, tidak ada yang ditampilkan sama sekali. Pemeriksaan ini membuktikan teksnya sampai utuh — hanya mushaf cetak yang dapat membuktikan teksnya benar.</Poin>
                 </div>
               } />
           </div>
@@ -172,7 +172,7 @@ export function Kitab() {
       {galat && (
         <Card className="!border-rose-500/30 !bg-rose-500/5">
           <p className="text-[12px] leading-relaxed text-rose-700">{galat}</p>
-          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">The text is deliberately not bundled with the app. Shipping our own copy would mean shipping a version nobody verified — fetching it keeps the provider accountable for the text and keeps us out of the business of reproducing it.</Prosa>
+          <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-600">Teksnya sengaja tidak disertakan di dalam aplikasi. Menyertakan salinan sendiri berarti menyebarkan versi yang tidak diperiksa siapa pun — mengambilnya dari penyedia membuat penyedia itulah yang bertanggung jawab atas teksnya, dan menjauhkan kami dari perkara memperbanyaknya.</Prosa>
         </Card>
       )}
 
@@ -229,7 +229,7 @@ export function Kitab() {
                 latin ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
               🔤 Latin transliteration
             </button>
-            <Prosa kelas="mt-1 text-[10px] leading-relaxed text-neutral-500">A guide to pronunciation, not a translation and never a substitute for the Arabic. It is fetched from the provider like everything else here.</Prosa>
+            <Prosa kelas="mt-1 text-[10px] leading-relaxed text-neutral-500">Panduan pelafalan, bukan terjemahan, dan sama sekali bukan pengganti teks Arabnya. Diambil dari penyedia seperti seluruh isi halaman ini.</Prosa>
 
             <div className="mt-3 text-[10px] font-black uppercase tracking-wide text-neutral-500">Recitation</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -293,7 +293,7 @@ export function Kitab() {
           {isi && isi.gagalSebagian.length > 0 && (
             <Card className="!border-amber-500/40 !bg-amber-500/5">
               <p className="text-[12px] leading-relaxed text-amber-800">
-                <b>Requested but did not arrive:</b> {isi.gagalSebagian.join(', ')}. The verses and
+                <b>Diminta tetapi tidak sampai:</b> {isi.gagalSebagian.join(', ')}. The verses and
                 translation below came through intact and were checked; only the missing parts are
                 absent. They are named here rather than left blank, so you are never looking at a
                 page that quietly dropped something you asked for.
@@ -487,7 +487,7 @@ function Lain() {
   return (
     <>
       <Card className="!border-sky-500/30 !bg-sky-500/5">
-        <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Where a tradition has a source we can name and call, it reads here just like the Bible and the Tanakh do — fetched, checked, and attributed. Where it does not, you get a description and a pointer to a proper archive, and nothing is quoted from memory to fill the gap. That refusal does not weaken because the tradition changed.</Prosa>
+        <Prosa kelas="text-[12px] leading-relaxed text-neutral-600">Bila sebuah tradisi punya sumber yang dapat kami sebut namanya dan kami panggil, ia tampil di sini persis seperti Alkitab dan Tanakh — diambil, diperiksa, dan disebutkan asalnya. Bila tidak, yang Anda dapat adalah keterangan beserta penunjuk ke arsip yang sepatutnya, dan tidak ada satu pun kutipan dari ingatan untuk menambal kekosongan itu. Penolakan itu tidak melemah hanya karena tradisinya berganti.</Prosa>
       </Card>
       {PENGANTAR.map((x) => <TradisiLain key={x.tradisi} x={x} />)}
       <Card>
@@ -575,7 +575,7 @@ function TradisiLain({ x }: { x: Pengantar }) {
         </div>
       ) : (
         <p className="mt-3 rounded-xl bg-amber-500/10 p-2.5 text-[11px] leading-relaxed text-amber-800">
-          <b>No direct reader here, on purpose.</b> The archives below are good to read, but none of
+          <b>Sengaja tidak ada pembaca langsung di sini.</b> The archives below are good to read, but none of
           them offers an interface we can call while still naming the edition and editor for each
           passage. Showing this text without being able to say which edition it came from would be
           showing text of unknown origin — the one thing this page will not do.

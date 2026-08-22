@@ -73,7 +73,7 @@ export function BaseTraining() {
       {tab === 'jadwal' && <ScheduleTab />}
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="The rule broken most often" />
+        <SectionTitle icon={<IconHeart />} title="Aturan yang paling sering dilanggar" />
         <div className="space-y-3 mt-2">
           {RULES.map((r) => (
             <div key={r.judul} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -288,7 +288,7 @@ function PostureTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Why posture breaks down, and what actually needs fixing" />
+        <SectionTitle icon={<IconActivity />} title="Mengapa postur rusak, dan apa yang sebenarnya perlu dibenahi" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
           Berdiri membungkuk maupun duduk berjam-jam menghasilkan pola yang dapat diprediksi:
           <strong className="text-ink"> the front shortens and the back weakens</strong> — dada dan otot leher
@@ -339,7 +339,7 @@ function ScheduleTab() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="How a week is arranged" subtitle="Combining running, calisthenics, and recovery" />
+      <SectionTitle icon={<IconTimer />} title="Bagaimana satu pekan disusun" subtitle="Combining running, calisthenics, and recovery" />
 
       <div className="flex gap-2 mt-3">
         {([3, 4, 5] as const).map((n) => (
@@ -396,7 +396,7 @@ function StretchTab() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Four things that decide whether stretching works or is wasted" />
+        <SectionTitle icon={<IconActivity />} title="Empat hal yang menentukan peregangan berhasil atau sia-sia" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
           The most common mistake is not the choice of movement but
           <strong className="text-ink"> when</strong>,
@@ -527,7 +527,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconHeart />} title="Stop stretching and get checked if you have these" />
+        <SectionTitle icon={<IconHeart />} title="Hentikan peregangan dan periksakan diri bila ada tanda ini" />
         <p className="text-sm text-neutral-500 mt-2 leading-relaxed">
           Tanda-tanda berikut bukan masalah kelenturan. Meregangkannya lebih jauh tidak menolong dan dapat
           memperburuk keadaan.
@@ -565,8 +565,8 @@ function DoseCalculator() {
     <Card>
       <SectionTitle
         icon={<IconTimer />}
-        title="Is your stretching dose enough"
-        subtitle="What decides the result is total time per muscle per week, not how deep you pull"
+        title="Sudah cukupkah takaran peregangan Anda"
+        subtitle="Yang menentukan hasilnya adalah total waktu per otot per pekan, bukan seberapa dalam Anda menarik"
       />
 
       <div className="grid grid-cols-3 gap-3 mt-3">
