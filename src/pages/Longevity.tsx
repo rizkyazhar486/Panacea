@@ -8,6 +8,7 @@ import { mergeVitals } from '../lib/healthVitals'
 import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
+import { bahanOtomatis } from '../lib/bugarOtomatis'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pusat Longevity — the layer wearables DON'T have. Apple Watch & WHOOP score
@@ -173,6 +174,8 @@ export function Longevity() {
   // push-back effect below can never overwrite fresher cache values with a
   // stale localStorage copy — same race fixed on the Body Composition page.
   const [d, setD] = useState<LongevityData>(() => syncFromDevices(load()).next)
+  // Diambil dari data tersimpan, bukan diisi ulang dengan tangan.
+  const otomatis = useMemo(() => bahanOtomatis(), [])
   const vitals = useVitals()
   const [baruDisimpan, setBaruDisimpan] = useState<string | null>(null)
   const [syncNote, setSyncNote] = useState('')
@@ -330,10 +333,18 @@ export function Longevity() {
           <PanelKebugaranIlmiah
             usia={d.age}
             jk={d.g === 'M' ? 'L' : 'P'}
-            vo2={d.vo2 || undefined}
-            denyutIstirahat={d.rhr || undefined}
+            vo2={d.vo2 || otomatis.vo2}
+            denyutIstirahat={d.rhr || otomatis.denyutIstirahat}
+            denyutMaksTerukur={otomatis.denyutMaksTerukur}
             genggamKg={d.grip || undefined}
+            langkahHarian={otomatis.langkahHarian}
+            menitZona={otomatis.menitZona}
           />
+          {otomatis.asal.length > 0 && (
+            <ul className="mt-2 space-y-0.5 text-[10.5px] leading-snug text-neutral-500">
+              {otomatis.asal.map((a) => <li key={a}>• {a}</li>)}
+            </ul>
+          )}
         </div>
       </Card>
 

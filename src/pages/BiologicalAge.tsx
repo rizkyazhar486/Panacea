@@ -178,7 +178,7 @@ export function BiologicalAge() {
         <SectionTitle
           icon={<IconHeart size={20} />}
           title="Biological & Metabolic Age"
-          subtitle="How old your body acts vs your birthday — estimated transparently from your device & lab data."
+          subtitle="Angka arah, bukan usia biologis tervalidasi."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -200,6 +200,14 @@ export function BiologicalAge() {
             <div className="mt-1 text-[10px] text-neutral-500">from resting metabolic rate</div>
           </div>
         </div>
+
+        {/* Koefisien di berkas ini adalah pilihan penulis, bukan hasil
+            penelitian. Menampilkan angka bertahun-tahun tanpa mengatakan itu
+            membuatnya tidak dapat dibedakan dari jam epigenetik. */}
+        <p className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
+          Bobot tiap penanda di sini <b>dipilih penulis</b>, bukan diambil dari penelitian. Pakai arah dan perubahannya dari
+          waktu ke waktu — bukan angkanya sebagai usia sesungguhnya. Jam biologis tervalidasi (mis. epigenetik) mengukur hal lain.
+        </p>
       </Card>
 
       {/* Inputs */}

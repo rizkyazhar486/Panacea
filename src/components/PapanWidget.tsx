@@ -439,8 +439,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   return (
     <>
     <section>
-      <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
-      <p className="t-kecil mb-2 leading-snug text-neutral-400">Isi tiap fitur, bukan hanya pintunya.</p>
+      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
       <div className="grid grid-cols-2 gap-fluid">
         {pratinjau.map((p) => <UbinAngka key={p.id} p={p} />)}
         <UbinRangkaian tanggal={tanggalCatatan} />

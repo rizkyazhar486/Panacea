@@ -195,8 +195,8 @@ function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu
   return (
     <section>
       {/* Rata kiri: pemindaian pola F bertumpu pada tepi kiri yang lurus. */}
-      <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
-      <p className="t-kecil mb-2 leading-snug text-neutral-400">{isi ?? '\u00A0'}</p>
+      <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">{judul}</h2>
+      {isi && <p className="t-kecil mb-2 leading-snug text-neutral-400">{isi}</p>}
       <div className="kisi-fluid">
         {pintu.map((p) => <Lambang key={p.judul} p={p} />)}
       </div>
@@ -408,12 +408,14 @@ export default function Beranda() {
           satu di antaranya selalu ketinggalan. */}
       <KisiFitur />
 
-      <Link
-        to="/tutorial"
-        className="t-sedang flex min-h-[44px] items-center justify-center gap-2 font-bold text-brand"
-      >
-        <LogoPanduan size={16} /> Baru di sini? Buka panduan 6 langkah
-      </Link>
+      {kpi.length === 0 && (
+        <Link
+          to="/tutorial"
+          className="t-sedang flex min-h-[44px] items-center justify-center gap-2 font-bold text-brand"
+        >
+          <LogoPanduan size={16} /> Baru di sini? Buka panduan 6 langkah
+        </Link>
+      )}
       </div>
     </div>
   )
