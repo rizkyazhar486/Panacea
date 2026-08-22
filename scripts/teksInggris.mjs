@@ -40,8 +40,17 @@ function kalimatTerlihat(baris) {
   for (const m of baris.matchAll(/(?:title|subtitle|placeholder|label|ringkas)="([^"]{6,})"/g)) {
     if (KATA.test(m[1])) return m[1]
   }
+  // Teks JSX hanya tertangkap bila pembuka dan penutupnya berada pada BARIS
+  // YANG SAMA. Paragraf yang dipenggal ke beberapa baris — bentuk yang justru
+  // lazim untuk kalimat panjang — luput seluruhnya. Itu ditemukan lewat uji
+  // peramban pada halaman Osmolalitas Serum, bukan lewat skrip ini.
+  //
+  // Karena itu ditambahkan penapis kedua: baris yang seluruhnya teks (tanpa
+  // tanda kurung siku maupun kurung kurawal) dan memuat kata Inggris.
   const jsx = baris.match(/>\s*([A-Z][^<>{}]{14,})</)
   if (jsx && KATA.test(jsx[1])) return jsx[1].trim()
+  const polos = baris.trim()
+  if (polos.length >= 20 && !/[<>{}=]/.test(polos) && KATA.test(polos)) return polos
   return null
 }
 
