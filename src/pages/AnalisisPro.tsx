@@ -6,9 +6,10 @@ import { AreaChart, Area, Line, ComposedChart, XAxis, YAxis, Tooltip, Responsive
 import { Card, SectionTitle } from '../components/ui'
 import { IconChartUp, IconRun, IconTimer, IconActivity } from '../components/icons'
 import { getWorkouts, mergeWorkouts } from '../lib/workoutStore'
-import { parseWorkouts, hrMaxFromAge, fmtDurasi, fmtPace } from '../lib/workoutImport'
+import { parseWorkouts, hrMaxFromAge, fmtDurasi, fmtPace, type ImportedWorkout } from '../lib/workoutImport'
 import { api, backendEnabled } from '../lib/api'
 import { getDemo } from '../lib/profile'
+import { sebaranIntensitas, hanyutanDenyut, volumeMingguan, perkiraanRiegel } from '../lib/analisisLari'
 import { useVitals } from '../lib/useVitals'
 import {
   upayaRelatif, kebugaranKesegaran, bacaKesegaran, usahaTerbaik, logLatihan,
@@ -113,6 +114,8 @@ export function AnalisisPro() {
     <div className="space-y-4 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Analisis Pro"
         subtitle={`${workouts.length} sessions · HRmax ${konteks.hrMax} · Resting HR ${konteks.hrRest} bpm`} />
+
+      <SeksiLari workouts={workouts} hrMax={konteks.hrMax} />
 
       {/* ── Kebugaran & Kesegaran ── */}
       {kini && baca && (
@@ -366,3 +369,134 @@ function Pilih({ value, onChange, opsi }: { value: string; onChange: (v: string)
 }
 
 export default AnalisisPro
+
+// ── Analisis lari: sebaran intensitas, hanyutan denyut, volume, perkiraan ──
+//
+// Semuanya dihitung dari sesi yang tersimpan; tiap bagian menghilang bila
+// bahannya kurang, bukan menampilkan nol.
+function SeksiLari({ workouts, hrMax }: { workouts: ImportedWorkout[]; hrMax: number }) {
+  const sebar = useMemo(() => sebaranIntensitas(workouts, hrMax), [workouts, hrMax])
+  const hanyut = useMemo(() => hanyutanDenyut(workouts), [workouts])
+  const vol = useMemo(() => volumeMingguan(workouts), [workouts])
+  const rekor = useMemo(() => usahaTerbaik(workouts), [workouts])
+  const acuan = rekor.find((r) => !r.diskalakan) ?? rekor[0]
+  const ramal = useMemo(() => (acuan ? perkiraanRiegel(acuan.jarakKm, acuan.detik) : null), [acuan])
+
+  if (!sebar && !vol && !ramal && !hanyut.length) return null
+  const maxKm = vol ? Math.max(...vol.minggu.map((m) => m.km), 1) : 1
+
+  return (
+    <Card>
+      <SectionTitle icon={<IconRun />} title="Analisis Lari"
+        subtitle="Dihitung dari sesi yang tersimpan — tiap bagian hilang bila bahannya kurang" />
+
+      {sebar && (
+        <div className="mt-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <h3 className="text-[13px] font-black text-ink dark:text-white">Sebaran intensitas</h3>
+            <span className="text-[11px] text-neutral-500">{sebar.totalMenit} menit · {sebar.sesi} sesi</span>
+          </div>
+          <div className="mt-2 flex h-6 overflow-hidden rounded-full">
+            {[
+              { p: sebar.persen[0], c: '#34d399', l: 'mudah' },
+              { p: sebar.persen[1], c: '#fbbf24', l: 'sedang' },
+              { p: sebar.persen[2], c: '#f87171', l: 'keras' },
+            ].map((x) => (
+              <span key={x.l} style={{ width: `${x.p}%`, background: x.c }}
+                className="grid place-items-center text-[10px] font-black text-white">
+                {x.p >= 12 ? `${Math.round(x.p)}%` : ''}
+              </span>
+            ))}
+          </div>
+          <div className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-neutral-500">
+            <span>&lt;80% HRmaks mudah</span><span>80–87% sedang</span><span>≥87% keras</span>
+          </div>
+          <p className="mt-2 text-[11.5px] leading-snug text-neutral-500">
+            {Math.round(sebar.persen[0])}% waktunya mudah.{' '}
+            {sebar.persen[0] >= 75
+              ? 'Ini sejalan dengan pola yang diamati pada atlet ketahanan terlatih.'
+              : 'Pola pada atlet ketahanan terlatih sekitar 80% mudah; bagian sedang yang besar adalah yang paling sering menahan kemajuan.'}{' '}
+            <span className="opacity-75">Seiler &amp; Kjerland (2006), Scand J Med Sci Sports 16:49-56 — pola yang DIAMATI pada atlet terlatih, bukan resep bagi semua orang.</span>
+          </p>
+        </div>
+      )}
+
+      {vol && (
+        <div className="mt-5">
+          <div className="flex items-baseline justify-between gap-2">
+            <h3 className="text-[13px] font-black text-ink dark:text-white">Volume 8 minggu</h3>
+            <span className="text-[11px] text-neutral-500">
+              rata-rata {vol.rataKm.toFixed(1)} km/mgg · tren {vol.trenKmPerMinggu >= 0 ? '+' : ''}{vol.trenKmPerMinggu.toFixed(1)} km/mgg
+            </span>
+          </div>
+          <div className="mt-2 flex h-24 items-end gap-1">
+            {vol.minggu.map((m) => (
+              <span key={m.mulai} className="flex flex-1 flex-col items-center gap-1">
+                <span className="w-full rounded-t bg-brand/70" style={{ height: `${Math.max(2, (m.km / maxKm) * 76)}px` }} />
+                <span className="text-[9px] tabular-nums text-neutral-400">{m.km ? m.km.toFixed(0) : '–'}</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
+            Kemiringan regresi kuadrat terkecil atas delapan minggu terakhir. Satu minggu yang terlewat menggeser garis ini
+            lebih jauh daripada yang diduga.
+          </p>
+        </div>
+      )}
+
+      {hanyut.length > 0 && (
+        <div className="mt-5">
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Hanyutan denyut pada sesi panjang</h3>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[320px] text-[11.5px]">
+              <thead>
+                <tr className="text-left text-[10px] uppercase tracking-wide text-neutral-500">
+                  <th className="py-1">Tanggal</th><th>Km</th><th>Awal</th><th>Akhir</th><th className="text-right">Selisih</th>
+                </tr>
+              </thead>
+              <tbody className="tabular-nums">
+                {hanyut.map((h) => (
+                  <tr key={h.tanggal + h.nama} className="border-t border-neutral-100 dark:border-white/10">
+                    <td className="py-1.5">{h.tanggal}</td>
+                    <td>{h.km ? h.km.toFixed(1) : '–'}</td>
+                    <td>{h.awalBpm}</td>
+                    <td>{h.akhirBpm}</td>
+                    <td className={`text-right font-bold ${h.persen > 5 ? 'text-amber-600' : 'text-neutral-500'}`}>
+                      {h.persen >= 0 ? '+' : ''}{h.persen.toFixed(1)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
+            Kenaikan denyut rata-rata dari paruh pertama ke paruh kedua. Ini <b>bukan</b> decoupling (Pa:HR): pace per titik
+            tidak tersimpan, jadi lajunya tidak dapat diperiksa. Angka ini hanya berarti bila laju Anda memang dijaga tetap.
+          </p>
+        </div>
+      )}
+
+      {ramal && acuan && (
+        <div className="mt-5">
+          <h3 className="text-[13px] font-black text-ink dark:text-white">Perkiraan waktu lomba</h3>
+          <p className="text-[11px] text-neutral-500">
+            Dari {acuan.label} {fmtDurasi(acuan.detik)} ({acuan.tanggal})
+          </p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {ramal.target.map((t) => (
+              <span key={t.label} className="rounded-xl bg-black/[0.03] p-2 text-center dark:bg-white/5">
+                <span className="block text-[10px] font-bold uppercase tracking-wide text-neutral-500">{t.label}</span>
+                <span className="block text-[15px] font-black tabular-nums text-ink dark:text-white">{fmtDurasi(Math.round(t.detik))}</span>
+                {t.jauh && <span className="block text-[9.5px] leading-tight text-amber-600">di luar jangkauan data</span>}
+              </span>
+            ))}
+          </div>
+          <p className="mt-1 text-[11.5px] leading-snug text-neutral-500">
+            Riegel (1981): T₂ = T₁ × (D₂/D₁)^1,06. Eksponennya dicocokkan pada rekor dunia dan cenderung <b>terlalu optimis</b>
+            untuk jarak yang jauh lebih panjang daripada yang pernah Anda tempuh — ditandai di atas.
+          </p>
+        </div>
+      )}
+    </Card>
+  )
+}
