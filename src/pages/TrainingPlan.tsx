@@ -340,7 +340,7 @@ function RunnerCoach() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Enter your last run — get a true VO₂max, personal pace zones & a realistic plan" />
+      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang sebenarnya, zona pace pribadi & rencana yang masuk akal" />
 
       {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
       <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">
@@ -589,7 +589,7 @@ export function TrainingPlan() {
 
       {/* Movement technique videos (Higgsfield) */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Examples of how to perform movements with correct form" />
+        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Contoh cara melakukan gerakan dengan bentuk yang benar" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TECHNIQUE_VIDEOS.map((v) => (
             <div key={v.label} className="overflow-hidden rounded-2xl border border-neutral-100">
@@ -677,7 +677,7 @@ export function TrainingPlan() {
       {/* Year macrocycle */}
       {view === 'tahun' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="12-Month Macrocycle" subtitle="Annual periodization toward a peak — the champion team's pattern" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="12-Month Macrocycle" subtitle="Periodisasi setahun menuju satu puncak — pola tim juara" />
           <div className="mt-3 space-y-2">
             {[
               { p: 'Month 1-3 · Base', desc: 'Aerobic foundation (Zone 2 dominant) + basic technique & strength. ACWR stable at 0.9-1.1.' },

@@ -211,7 +211,7 @@ function MeditationCard() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconLeaf size={20} />} title="Guided Meditation" subtitle="Guided scripts + ambient sound to calm the mind before sleep" />
+      <SectionTitle icon={<IconLeaf size={20} />} title="Guided Meditation" subtitle="Naskah tuntunan + suara latar untuk menenangkan pikiran sebelum tidur" />
 
       <div className="flex gap-2 overflow-x-auto pb-1">
         {MEDITATION_SCRIPTS.map((s) => (
@@ -297,14 +297,14 @@ export function Recovery() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconLeaf size={20} />} title="Panduan untuk Tahap Ini" subtitle="Recommendations based on days since you started" />
+        <SectionTitle icon={<IconLeaf size={20} />} title="Panduan untuk Tahap Ini" subtitle="Anjuran menurut berapa hari sejak Anda memulai" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           {current.guidance.map((g, i) => <li key={i}>• {g}</li>)}
         </ul>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Recovery Timeline" subtitle="All phases for this type" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Recovery Timeline" subtitle="Semua tahap untuk jenis ini" />
         <div className="mt-3 space-y-2">
           {phases.map((ph, i) => (
             <div key={ph.label} className={'flex items-center justify-between rounded-xl border p-3 ' + (i === (idx === -1 ? phases.length - 1 : idx) ? 'border-brand/40 bg-brand-50/40' : 'border-neutral-100')}>

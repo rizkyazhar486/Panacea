@@ -95,7 +95,7 @@ export function AnalisisPro() {
   if (!workouts.length) {
     return (
       <div className="space-y-4 pb-24">
-        <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Fitness, freshness, relative effort, records and targets" />
+        <SectionTitle icon={<IconChartUp />} title="Analisis Pro" subtitle="Kebugaran, kesegaran, upaya relatif, rekor, dan target" />
         <Card>
           <Prosa kelas="text-sm leading-relaxed text-neutral-600">Belum ada sesi latihan tersimpan, jadi belum ada yang bisa dianalisis. Semua angka di halaman ini dihitung dari sesi nyata — tidak ada contoh atau data bawaan.</Prosa>
           <p className="mt-2 text-sm leading-relaxed text-slate-500">
@@ -358,7 +358,7 @@ function KartuTidakDibangun() {
   return (
     <Card>
       <SectionTitle icon={<IconActivity />} title="Yang tidak dibangun di sini"
-        subtitle="With the reason â not merely ‘not available yet’" />
+        subtitle="Beserta alasannya — bukan sekadar ‘belum tersedia’" />
       <div className="mt-3 space-y-2">
         {TIDAK_DIBANGUN.map((t) => (
           <div key={t.fitur} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">

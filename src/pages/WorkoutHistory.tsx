@@ -85,7 +85,7 @@ export function WorkoutHistory() {
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconRun />} title="History Latihan" subtitle="Real sessions with per-minute heart rate" />
+        <SectionTitle icon={<IconRun />} title="History Latihan" subtitle="Sesi sungguhan dengan denyut jantung per menit" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Belum ada sesi tersimpan. Unggah berkas ekspor Health Auto Export di{' '}
@@ -130,7 +130,7 @@ export function WorkoutHistory() {
       {/* Target — dibuat bisa diatur langsung di sini agar perencanaan tidak
           perlu berpindah halaman. */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Target" subtitle="For planning future training" />
+        <SectionTitle icon={<IconTimer />} title="Target" subtitle="Untuk merencanakan latihan berikutnya" />
         <div className="mt-3 flex flex-wrap gap-2">
           <select value={target.jenis} onChange={(e) => setTarget({ ...target, jenis: e.target.value as JenisTarget })}
             className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white">
@@ -228,7 +228,7 @@ export function WorkoutHistory() {
       {notifs.length > 0 && <NotifCard />}
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Sessions" subtitle="Tap a session to see its heart-rate curve and zone spread" />
+        <SectionTitle icon={<IconActivity />} title="Sessions" subtitle="Ketuk sebuah sesi untuk melihat kurva denyut dan sebaran zonanya" />
         <div className="space-y-2 mt-2">
           {workouts.map((w) => (
             <WorkoutRow key={w.id} w={w} hrMax={hrMax} terbuka={buka === w.id} onToggle={() => setBuka(buka === w.id ? null : w.id)} />

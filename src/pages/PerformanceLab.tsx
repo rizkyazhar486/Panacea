@@ -78,7 +78,7 @@ export function PerformanceLab() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="Full battery of strength, endurance & speed tests and calculators — manual/lab-based" />
+        <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="Rangkaian lengkap uji dan kalkulator kekuatan, ketahanan & kecepatan — manual/berbasis laboratorium" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           Fill in values from a watch, lab equipment (lactate, NIRS, power meter) or field tests. Everything is stored offline on your device.
           Before starting a heavy program, first complete the <a href="#/assessment" className="font-bold text-brand-dark underline">Initial Assessment</a> (movement patterns, pain, injury risk, asymmetry).
@@ -253,7 +253,7 @@ function MetabolicMapCard() {
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">The "Fat Max" peak typically sits at Z2 (±60% HRmax) — key for base training that uses fat as fuel. Above Z4, fat burning nearly stops ("No Fat Burning") and the body switches entirely to carbohydrate while lactate builds up quickly.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">Puncak "Fat Max" umumnya berada di Z2 (sekitar 60% HRmaks) — kunci latihan dasar yang memakai lemak sebagai bahan bakar. Di atas Z4, pembakaran lemak nyaris berhenti dan tubuh beralih sepenuhnya ke karbohidrat sementara laktat menumpuk dengan cepat.</Prosa>
     </div>
   )
 }
@@ -532,7 +532,7 @@ function HydrationCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">💧 Sweat Rate & Hydration</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <KolomVitalTerikat ikat={ikatPre} label="Weight before (kg)" satuan="kg" step={0.1} />
+        <KolomVitalTerikat ikat={ikatPre} label="Berat sebelum (kg)" satuan="kg" step={0.1} />
         <Field label="Weight after (kg)"><input className={inputClass} type="number" step="0.1" value={post} onChange={(e) => setPost(+e.target.value)} /></Field>
         <Field label="Fluid consumed (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
         <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>

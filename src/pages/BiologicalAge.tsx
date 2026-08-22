@@ -216,7 +216,7 @@ export function BiologicalAge() {
 
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Angka Anda" subtitle="Most auto-fill from Health Profile & Body Composition — add labs if you have them" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Angka Anda" subtitle="Sebagian besar terisi sendiri dari Profil Kesehatan & Komposisi Tubuh — tambahkan hasil laboratorium bila ada" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {field('Age', 'age')}
           <Field label="Sex">
@@ -245,7 +245,7 @@ export function BiologicalAge() {
       {/* Contributing markers */}
       {markers.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="Apa yang menggerakkan umur Anda" subtitle="Each marker shifts your biological age up or down (years)" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="Apa yang menggerakkan umur Anda" subtitle="Tiap penanda menggeser usia biologis Anda naik atau turun (dalam tahun)" />
           <div className="mt-3 space-y-2">
             {markers.map((m) => (
               <div key={m.label} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">

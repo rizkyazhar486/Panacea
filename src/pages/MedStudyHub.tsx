@@ -209,7 +209,7 @@ function OsceSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Station Technique" subtitle="Marks are for observable behaviours — technique is as scoreable as knowledge" />
+        <SectionTitle icon={<IconStethoscope size={20} />} title="OSCE Station Technique" subtitle="Nilai diberikan untuk perilaku yang dapat diamati — teknik sama dapat dinilainya dengan pengetahuan" />
       </Card>
       {OSCE_TECHNIQUE.map((tip) => (
         <Card key={tip.station} className="!p-4">
@@ -235,7 +235,7 @@ function TechniquesSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Cara Belajar" subtitle="Evidence-based methods, ordered by effect size in the learning-science literature" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Cara Belajar" subtitle="Cara belajar yang berdasar bukti, diurutkan menurut besar pengaruhnya dalam pustaka ilmu belajar" />
       </Card>
       {STUDY_TECHNIQUES.map((t) => (
         <Card key={t.title} className="!p-4">
@@ -255,7 +255,7 @@ function TimelineSection() {
   return (
     <div className="space-y-3">
       <Card className="!p-4">
-        <SectionTitle icon={<IconActivity size={20} />} title="Countdown Plan" subtitle="An operational plan for the weeks before OSCE / UKMPPD" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Countdown Plan" subtitle="Rencana kerja untuk pekan-pekan menjelang OSCE / UKMPPD" />
       </Card>
       {EXAM_TIMELINE.map((item, i) => (
         <Card key={item.title} className="!p-4">

@@ -53,7 +53,7 @@ export function OrganDonorCard() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Organ Donor Pledge" subtitle="Clarify your wishes, then talk to your family" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Organ Donor Pledge" subtitle="Perjelas keinginan Anda, lalu bicarakan dengan keluarga" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           A single organ donor can save up to 8 lives, and tissue donation can help dozens more — but
           donation decisions are only actually honored if your family or next-of-kin know your wishes
@@ -82,10 +82,10 @@ export function OrganDonorCard() {
           </>
         )}
 
-        <Field label="Your name (for the card below)">
+        <Field label="Nama Anda (untuk kartu di bawah)">
           <input className={`${inputClass} mt-1`} value={name} onChange={(e) => { setName(e.target.value); save({ name: e.target.value }) }} />
         </Field>
-        <Field label="Note for your family (optional)">
+        <Field label="Pesan untuk keluarga Anda (boleh dikosongkan)">
           <textarea className={`${inputClass} mt-1 min-h-16`} placeholder="Anything you want them to know about your decision" value={note} onChange={(e) => { setNote(e.target.value); save({ note: e.target.value }) }} />
         </Field>
         <label className="mt-3 flex items-center gap-2 text-[13px] text-neutral-600 dark:text-neutral-300">

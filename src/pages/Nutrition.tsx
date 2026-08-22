@@ -1358,7 +1358,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Monitor lab result changes each week" />
+        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Pantau perubahan hasil laboratorium tiap pekan" />
         <div className="flex gap-2">
           <label className="cursor-pointer rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">
             {'\u{1F4C1}'} Import
@@ -1729,7 +1729,7 @@ function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconFlame size={18} />} title="Weekly Schedule — Obesity" subtitle="7-day meal & exercise schedule based on the obesity protocol" />
+      <SectionTitle icon={<IconFlame size={18} />} title="Weekly Schedule — Obesity" subtitle="Jadwal makan & olahraga 7 hari berdasarkan protokol obesitas" />
       <div className="mt-3 space-y-2">
         {plan.map((d) => (
           <div key={d.day} className="rounded-2xl border border-neutral-100 p-3">
@@ -1903,7 +1903,7 @@ export function Nutrition() {
 
       {/* Quick Links — longevity calculator capabilities */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Umur Panjang Terbaik" subtitle="Built to help humanity live longer and healthier" />
+        <SectionTitle icon={<IconHeart size={18} />} title="Kalkulator Umur Panjang Terbaik" subtitle="Dibuat untuk membantu manusia hidup lebih panjang dan lebih sehat" />
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { icon: '🫀', label: 'VO₂max Est.', desc: 'Aerobic capacity', anchor: 'calc-vo2max' },
