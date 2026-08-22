@@ -145,6 +145,86 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'skorOlahraga', label: 'Skor Olahraga', ringkas: 'Pertandingan tim Anda', ke: '/sports-scores', emoji: '⚽', kategori: 'Ibadah & Hidup' },
   { id: 'kisah', label: 'Kisah Ketangguhan', ringkas: 'Cerita orang yang bertahan', ke: '/resilience-stories', emoji: '📻', kategori: 'Ibadah & Hidup' },
   { id: 'jelajah', label: 'Jelajah', ringkas: 'Tempat dan rute di sekitar', ke: '/jelajah', emoji: '🗺️', kategori: 'Ibadah & Hidup' },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // GELOMBANG SUSULAN: halaman yang sudah ada tetapi hanya terjangkau lewat
+  // beberapa lapis menu. Selama tidak terdaftar di sini, satu-satunya jalan ke
+  // sana adalah menebak namanya di /semua-fitur — dan fitur yang harus ditebak
+  // sama saja dengan fitur yang tidak ada. Semua tetap MATI secara bawaan;
+  // yang berubah hanyalah dapat-tidaknya dinyalakan dari Beranda.
+  //
+  // Halaman pengurus (admin, owner, verifikator, editor), halaman akun
+  // (billing, settings, legal, pricing) dan halaman sistem sengaja TIDAK
+  // dimasukkan: tempatnya di menu samping, bukan di pintasan beranda.
+  // ───────────────────────────────────────────────────────────────────────────
+  { id: 'semuaFitur', label: 'Semua Fitur', ringkas: 'Daftar seluruh halaman beserta kegunaannya', ke: '/semua-fitur', emoji: '🧭', kategori: 'Klinis & Belajar' },
+  { id: 'cariGlobal', label: 'Pencarian', ringkas: 'Cari apa pun di dalam aplikasi dari satu kotak', ke: '/search', emoji: '🔎', kategori: 'Klinis & Belajar' },
+  { id: 'clinicalHub', label: 'Alat Klinis Lain', ringkas: 'Pintu ke seluruh alat klinis dan bantuan AI', ke: '/clinical-hub', emoji: '🩺', kategori: 'Klinis & Belajar' },
+  { id: 'chatbot', label: 'Tanya Kesehatan', ringkas: 'Jawaban bahasa sederhana beserta sumbernya', ke: '/chatbot', emoji: '💬', kategori: 'Klinis & Belajar' },
+  { id: 'panduanPakai', label: 'Panduan Pemakaian', ringkas: 'Enam langkah untuk yang baru pertama kali', ke: '/tutorial', emoji: '🗺️', kategori: 'Klinis & Belajar' },
+  { id: 'catatanLog', label: 'Log & Statistik', ringkas: 'Catatan harian dan angka yang terkumpul', ke: '/logs', emoji: '🗒️', kategori: 'Tubuh & Data' },
+  { id: 'profilSaya', label: 'Profil Saya', ringkas: 'Tinggi, berat, dan riwayat kesehatan Anda', ke: '/profile', emoji: '🙋', kategori: 'Tubuh & Data' },
+
+  // Skor klinis yang selama ini hanya ada di dalam Kalkulator Hub.
+  { id: 'perc', label: 'PERC Rule', ringkas: 'Singkirkan emboli paru pada risiko rendah', ke: '/perc-rule', emoji: '🫁', kategori: 'Kalkulator & Skor' },
+  { id: 'padua', label: 'Skor Padua', ringkas: 'Perlu tidaknya profilaksis VTE pasien penyakit dalam', ke: '/padua-score', emoji: '🩸', kategori: 'Kalkulator & Skor' },
+  { id: 'caprini', label: 'Skor Caprini', ringkas: 'Perlu tidaknya profilaksis VTE pasien bedah', ke: '/caprini-score', emoji: '🩹', kategori: 'Kalkulator & Skor' },
+  { id: 'duke', label: 'Kriteria Duke', ringkas: 'Penegakan diagnosis endokarditis infektif', ke: '/duke-criteria', emoji: '❤️‍🩹', kategori: 'Kalkulator & Skor' },
+  { id: 'lights', label: "Kriteria Light", ringkas: 'Eksudat atau transudat pada efusi pleura', ke: '/lights-criteria', emoji: '💧', kategori: 'Kalkulator & Skor' },
+  { id: 'ranson', label: 'Kriteria Ranson', ringkas: 'Beratnya pankreatitis saat masuk dan 48 jam', ke: '/ranson-criteria', emoji: '🧪', kategori: 'Kalkulator & Skor' },
+  { id: 'bisap', label: 'Skor BISAP', ringkas: 'Beratnya pankreatitis dalam 24 jam pertama', ke: '/bisap-score', emoji: '⏱️', kategori: 'Kalkulator & Skor' },
+  { id: 'blatchford', label: 'Glasgow-Blatchford', ringkas: 'Siapa perlu dirawat pada perdarahan SCBA', ke: '/glasgow-blatchford-score', emoji: '🩸', kategori: 'Kalkulator & Skor' },
+  { id: 'rockall', label: 'Skor Rockall', ringkas: 'Risiko perdarahan ulang sesudah endoskopi', ke: '/rockall-score', emoji: '🔬', kategori: 'Kalkulator & Skor' },
+  { id: 'maddrey', label: 'Maddrey DF', ringkas: 'Perlu tidaknya steroid pada hepatitis alkoholik', ke: '/maddrey-score', emoji: '🫀', kategori: 'Kalkulator & Skor' },
+  { id: 'charlson', label: 'Indeks Charlson', ringkas: 'Beban komorbiditas dan harapan hidup 10 tahun', ke: '/charlson-index', emoji: '📊', kategori: 'Kalkulator & Skor' },
+  { id: 'fourTs', label: 'Skor 4Ts', ringkas: 'Kemungkinan trombositopenia akibat heparin', ke: '/4ts-score', emoji: '🧫', kategori: 'Kalkulator & Skor' },
+  { id: 'aaGradient', label: 'Gradien A-a', ringkas: 'Letak sebab hipoksemia: paru atau hipoventilasi', ke: '/aa-gradient', emoji: '🌬️', kategori: 'Kalkulator & Skor' },
+  { id: 'fena', label: 'FeNa', ringkas: 'AKI prarenal atau nekrosis tubular akut', ke: '/fena-calculator', emoji: '🚰', kategori: 'Kalkulator & Skor' },
+  { id: 'kalsiumKoreksi', label: 'Kalsium Terkoreksi', ringkas: 'Sesuaikan kalsium bila albumin rendah', ke: '/corrected-calcium', emoji: '🦴', kategori: 'Kalkulator & Skor' },
+  { id: 'osmolalitas', label: 'Osmolalitas Serum', ringkas: 'Selisih osmolal untuk menapis keracunan alkohol', ke: '/serum-osmolality', emoji: '⚗️', kategori: 'Kalkulator & Skor' },
+  { id: 'kadAnak', label: 'KAD Anak', ringkas: 'Bolus, defisit, rumatan, kalium, dan insulin', ke: '/pediatric-dka-calculator', emoji: '🧒', kategori: 'Kalkulator & Skor' },
+
+  // Latihan dan sains olahraga.
+  { id: 'fitnessHub', label: 'Fitness Hub', ringkas: 'Pintu ke seluruh alat kebugaran dan latihan', ke: '/fitness-hub', emoji: '🏃', kategori: 'Latihan' },
+  { id: 'athlete', label: 'Papan Atlet', ringkas: 'Zona denyut, beban, dan lari ber-GPS', ke: '/athlete', emoji: '🏅', kategori: 'Latihan' },
+  { id: 'fisiologiLatihan', label: 'Fisiologi Latihan', ringkas: 'Beban, status, waktu pulih, dan kesiapan', ke: '/fisiologi-latihan', emoji: '📈', kategori: 'Latihan' },
+  { id: 'sportsScience', label: 'Sports Science', ringkas: 'Bukti ilmiah di balik angka-angka Anda', ke: '/sports-science', emoji: '🔬', kategori: 'Latihan' },
+  { id: 'labLatihan', label: 'Lab Latihan', ringkas: 'Beban latihan, VO2max, dan ukuran penampilan', ke: '/lab', emoji: '🧬', kategori: 'Latihan' },
+  { id: 'latihanDasar', label: 'Latihan Dasar', ringkas: 'Zona pace, push-up, pull-up, sit-up, postur', ke: '/latihan-dasar', emoji: '💪', kategori: 'Latihan' },
+  { id: 'alatEndurance', label: 'Alat Endurance', ringkas: 'Bahan bakar, laju keringat, FTP, penyesuaian panas', ke: '/alat-endurance', emoji: '🚴', kategori: 'Latihan' },
+  { id: 'assessmentAwal', label: 'Asesmen Awal', ringkas: 'Titik mulai: kebugaran dan pola gerak', ke: '/assessment', emoji: '📋', kategori: 'Latihan' },
+  { id: 'shapeForming', label: 'Shape Forming', ringkas: 'Program tersusun membentuk komposisi tubuh', ke: '/shape-forming', emoji: '🧗', kategori: 'Latihan' },
+  { id: 'movementToolkit', label: 'Movement Toolkit', ringkas: 'Genggaman, keseimbangan, zona 2, latihan singkat', ke: '/movement-toolkit', emoji: '🤸', kategori: 'Latihan' },
+
+  // Longevity dan data tubuh.
+  { id: 'longevitySains', label: 'Ilmu Penuaan', ringkas: 'Hallmark of aging, NAD+, sirtuin, rapamisin', ke: '/longevity-science', emoji: '🧪', kategori: 'Tubuh & Data' },
+  { id: 'longevityKurikulum', label: 'Kurikulum Longevity', ringkas: 'Materi ajar tersusun kedokteran umur panjang', ke: '/longevity-curriculum', emoji: '🎓', kategori: 'Tubuh & Data' },
+  { id: 'simulatorSehat', label: 'What-If Simulator', ringkas: 'Pilihan hari ini vs risiko sepuluh tahun ke depan', ke: '/health-simulator', emoji: '🔮', kategori: 'Tubuh & Data' },
+  { id: 'dataLab', label: 'Data Lab', ringkas: 'Unggah data kesehatan Anda, ubah jadi grafik', ke: '/data-lab', emoji: '📂', kategori: 'Tubuh & Data' },
+  { id: 'dataLabLanjut', label: 'Data Lab Lanjutan', ringkas: 'Tren darah, PhenoAge, brankas terenkripsi', ke: '/data-lab-advanced', emoji: '🔐', kategori: 'Tubuh & Data' },
+  { id: 'snp', label: 'SNP Profiler', ringkas: 'Data DNA mentah diolah di peramban Anda sendiri', ke: '/snp-profiler', emoji: '🧬', kategori: 'Tubuh & Data' },
+  { id: 'bioSimulator', label: 'Bio Simulator', ringkas: 'mTOR/AMPK, ritme harian, dan telomer', ke: '/bio-simulators', emoji: '⚙️', kategori: 'Tubuh & Data' },
+  { id: 'modelPrediktif', label: 'Model Prediktif', ringkas: 'Waktu autofagi, kurva kortisol, beban glikemik', ke: '/predictive-models-toolkit', emoji: '📐', kategori: 'Tubuh & Data' },
+  { id: 'vitapulse', label: 'VitaPulse', ringkas: 'Pantau denyut, tekanan darah, dan tanda tubuh', ke: '/vitapulse', emoji: '💓', kategori: 'Tubuh & Data' },
+  { id: 'pelacakKlinis', label: 'Pelacak Klinis', ringkas: 'SpO2, EKG, jet lag, kehamilan, kursi roda', ke: '/pelacak-klinis', emoji: '📟', kategori: 'Tubuh & Data' },
+  { id: 'penilaianDiri', label: 'Penilaian Diri', ringkas: 'Kuis telomer, skor radang, pinggang/tinggi', ke: '/self-assessment-toolkit', emoji: '📝', kategori: 'Tubuh & Data' },
+
+  // Pencegahan, gizi, tidur, jiwa.
+  { id: 'toksin', label: 'Daftar Periksa Toksin', ringkas: 'Kurangi paparan plastik, pembersih, udara kotor', ke: '/toxin-checklist', emoji: '☣️', kategori: 'Pencegahan & Skrining' },
+  { id: 'realityCheck', label: 'Reality Check', ringkas: 'Penapisan CAGE dan hitungan bungkus-tahun', ke: '/reality-check', emoji: '🪞', kategori: 'Pencegahan & Skrining' },
+  { id: 'aesthetic', label: 'Perawatan Kulit', ringkas: 'Panduan merawat kulit dan wajah', ke: '/aesthetic', emoji: '🧴', kategori: 'Pencegahan & Skrining' },
+  { id: 'bodyToolkit', label: 'Body Toolkit', ringkas: 'Rutinitas kulit, peta gejala, catatan gerak', ke: '/body-toolkit', emoji: '🧰', kategori: 'Pencegahan & Skrining' },
+  { id: 'gizisToolkit', label: 'Nutrition Toolkit', ringkas: 'Mediterania, catatan gula, keragaman tanaman', ke: '/nutrition-toolkit', emoji: '🥗', kategori: 'Gizi' },
+  { id: 'sleepToolkit', label: 'Sleep Toolkit', ringkas: 'Alarm siklus, tidur siang, jurnal mimpi, suara', ke: '/sleep-toolkit', emoji: '🌙', kategori: 'Tidur & Pemulihan' },
+  { id: 'mindToolkit', label: 'Mind Toolkit', ringkas: 'Latihan otak, ingatan, waktu reaksi, stres', ke: '/mind-toolkit', emoji: '🧠', kategori: 'Jiwa & Kebiasaan' },
+  { id: 'sehatSibuk', label: 'Sehat Saat Sibuk', ringkas: 'Kebiasaan sehat yang muat di jadwal padat', ke: '/sehat-sibuk', emoji: '⏳', kategori: 'Jiwa & Kebiasaan' },
+  { id: 'gameLongevity', label: 'Game Center', ringkas: 'Bingo kebiasaan, rapor, dan kutipan harian', ke: '/longevity-game-center', emoji: '🎲', kategori: 'Jiwa & Kebiasaan' },
+
+  // Sosial dan layanan.
+  { id: 'kabarTeman', label: 'Kabar Teman', ringkas: 'Kegiatan dari teman-teman Anda', ke: '/feed', emoji: '📰', kategori: 'Layanan & Darurat' },
+  { id: 'pesanPribadi', label: 'Pesan', ringkas: 'Percakapan pribadi dengan pemakai lain', ke: '/messages', emoji: '✉️', kategori: 'Layanan & Darurat' },
+  { id: 'pasarMateri', label: 'Marketplace', ringkas: 'Jual beli materi dan catatan antar pemakai', ke: '/marketplace', emoji: '🛍️', kategori: 'Layanan & Darurat' },
+  { id: 'materiSaya', label: 'Materi Saya', ringkas: 'Materi yang Anda tulis maupun simpan', ke: '/my-materials', emoji: '📚', kategori: 'Layanan & Darurat' },
 ]
 
 const KUNCI = 'pmd-home-widgets'
