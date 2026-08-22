@@ -11,7 +11,7 @@ import { getWorkouts } from '../lib/workoutStore'
 import { statusSingkat } from '../lib/pelatih'
 import { hrMaxFromAge } from '../lib/workoutImport'
 import { ageFromDob } from '../lib/anthro'
-import { ambilTujuan, simpanTujuan, modeAwam, PILIHAN_TUJUAN, type Tujuan } from '../lib/tujuan'
+import { ambilTujuan, modeAwam } from '../lib/tujuan'
 import {
   LogoLatihan, LogoGizi, LogoTidur, LogoTubuh, LogoPenyakit, LogoTindakan,
   LogoKalkulator, LogoObat, LogoDarurat, LogoIbadah, LogoKabar, LogoSemua, LogoPanduan,
@@ -204,32 +204,13 @@ function Kisi({ judul, isi, pintu }: { judul: string; isi?: string; pintu: Pintu
   )
 }
 
-/** Pertanyaan sekali pakai. Tidak menghalangi: dasbor tetap terbaca di bawahnya. */
-function Tanya({ pilih }: { pilih: (t: Tujuan) => void }) {
-  return (
-    <section className="rounded-2xl border border-brand/30 bg-brand-50/60 p-3 dark:border-brand/40 dark:bg-brand/10">
-      <h2 className="t-sedang font-black text-ink dark:text-white">Anda memakai ini untuk apa?</h2>
-      <p className="t-kecil mb-2 text-neutral-500">Menentukan urutan dasbor saja — tidak ada yang disembunyikan.</p>
-      <div className="flex flex-wrap gap-fluid">
-        {PILIHAN_TUJUAN.map((o) => (
-          <button
-            key={o.id}
-            onClick={() => pilih(o.id)}
-            className="t-sedang flex min-h-[44px] items-center rounded-full bg-white px-4 font-bold text-ink dark:bg-white/10 dark:text-white"
-          >
-            {o.ikon} {o.judul}
-          </button>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 export default function Beranda() {
   const { account, state } = useStore()
   const nama = account?.name?.split(' ')[0] ?? ''
-  const [tujuan, setTujuan] = useState<Tujuan | null>(() => ambilTujuan())
-  const pilih = (t: Tujuan) => { simpanTujuan(t); setTujuan(t) }
+  // Tidak ada lagi pertanyaan "Anda memakai ini untuk apa?" di beranda:
+  // beranda bukan tempat mewawancarai orang. Urutan dasbor mengikuti peran
+  // akun, dan tujuan yang pernah tersimpan tetap dihormati bila ada.
+  const tujuan = ambilTujuan()
 
   /*
    * Tanggal yang dihitung sebagai "hari tercatat" — dipakai ubin rangkaian.
@@ -404,7 +385,6 @@ export default function Beranda() {
           belajar dua kali, dan yang kedua tidak pernah benar-benar dipelajari. */}
       <CatatanLatihan />
 
-      {!tujuan && <Tanya pilih={pilih} />}
 
       {/* ── KISI FITUR ───────────────────────────────────────────────────
           Tiga kisi tetap (Klinis, Badan Anda, Lainnya) diganti satu kisi yang
