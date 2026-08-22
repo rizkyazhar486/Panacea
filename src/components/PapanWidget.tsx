@@ -18,6 +18,7 @@ import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rin
 import { deretMetrik } from '../lib/riwayatVitals'
 import { GrafikMini } from './GrafikMini'
 import { UBIN_LANGSUNG } from './UbinLangsung'
+import { UbinGrafik, wilayahBergrafik } from './UbinGrafik'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -450,6 +451,9 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
    * seperti keterangan tambahan. Yang tersisa di sini justru yang TIDAK ada di
    * atas: VO2max, lama tidur, langkah, dan seterusnya.
    */
+  // Wilayah yang sudah punya grafik tujuh hari tidak diulang sebagai ubin teks.
+  const bergrafik = wilayahBergrafik(state)
+
   const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td']
   const td = barisTekananDarah()
   const rincian = (td ? [td, ...rincianBeranda()] : rincianBeranda()).filter(
@@ -459,10 +463,12 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   return (
     <>
+    <UbinGrafik />
+
     <section>
       <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Keadaan Anda</h2>
       <div className="grid grid-cols-2 gap-fluid">
-        {pratinjau.map((p) => <UbinAngka key={p.id} p={p} />)}
+        {pratinjau.filter((p) => !bergrafik.includes(p.id)).map((p) => <UbinAngka key={p.id} p={p} />)}
         <UbinRangkaian tanggal={tanggalCatatan} />
         <UbinKlinis />
       </div>
