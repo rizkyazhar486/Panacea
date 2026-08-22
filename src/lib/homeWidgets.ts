@@ -102,6 +102,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'motivasi', label: 'Pekan Ini', ringkas: 'Rangkaian hari dan menit latihan', ke: '/harian', emoji: '🔥', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'obatCepat', label: 'Obat & Dosis', ringkas: 'Cari dosis langsung di beranda', ke: '/med-study?bagian=therapy', emoji: '💊', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'kalkulatorCepat', label: 'Hitung Cepat', ringkas: 'IMT, MAP, LPB, dosis per kg', ke: '/clinical-calculators', emoji: '🧮', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'stasiunSering', label: 'Stasiun Tersering', ringkas: 'Kasus OSCE per sistem', ke: '/osce-ukmppd', emoji: '🩺', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'konsistensi', label: 'Konsistensi', ringkas: 'Hari tercatat 12 pekan', ke: '/harian', emoji: '🟩', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'longevity', label: 'Longevity', ringkas: 'Umur panjang berbasis bukti', ke: '/longevity', emoji: '🌱', kategori: 'Tubuh & Data' },
   { id: 'nutrisi', label: 'Gizi', ringkas: 'Asupan hari ini', ke: '/nutrition', emoji: '🥗', kategori: 'Gizi', bawaan: true },
@@ -269,6 +273,10 @@ export const WIDGET_HIDUP = [
   'longevity',      // kapasitas aerobik + selisih MET
   'salat',          // salat berikutnya + hitungan mundur
   'konsistensi',    // peta 12 pekan: hari mana saja yang tercatat
+  'motivasi',       // rangkaian hari + pekan ini vs pekan lalu
+  'obatCepat',      // cari dosis SKDI di dalam ubinnya
+  'kalkulatorCepat',// IMT/MAP/LPB/dosis per kg, dihitung di tempat
+  'stasiunSering',  // kasus OSCE tersering per sistem, dari arsip
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

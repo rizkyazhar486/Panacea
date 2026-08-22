@@ -25,6 +25,8 @@ import { UbinPantauan } from './UbinPantauan'
 import { Tumpukan } from './Tumpukan'
 import { UbinPelatihLebar, hitungPelatih } from './UbinLangsung'
 import { UbinSalat } from './UbinSalat'
+import { UbinObat, UbinKalkulator, UbinStasiun } from './UbinKerja'
+import { UbinMotivasi } from './UbinMotivasi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
 import { bilahTersedia } from '../lib/bilahRujukan'
@@ -455,6 +457,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
     'pantauan', 'kebugaran', 'salat', 'konsistensi',
+    'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -529,6 +532,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
           ? [{ kunci: 'kebugaran', isi: <UbinPelatihLebar /> }] : []),
         ...(pilihan.includes('salat') ? [{ kunci: 'salat', isi: <UbinSalat /> }] : []),
         ...(pilihan.includes('pantauan') ? [{ kunci: 'pantauan', isi: <UbinPantauan /> }] : []),
+        ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
+        ...(pilihan.includes('obatCepat') ? [{ kunci: 'obatCepat', isi: <UbinObat /> }] : []),
+        ...(pilihan.includes('kalkulatorCepat') ? [{ kunci: 'kalkulatorCepat', isi: <UbinKalkulator /> }] : []),
+        ...(pilihan.includes('stasiunSering') ? [{ kunci: 'stasiunSering', isi: <UbinStasiun /> }] : []),
         ...(pilihan.includes('konsistensi') && adaJejak
           ? [{ kunci: 'konsistensi', isi: <PetaKonsistensi /> }] : []),
         ...((state.wallet?.balance ?? 0) > 0
