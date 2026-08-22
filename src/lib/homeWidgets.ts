@@ -102,6 +102,9 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'inspirasi', label: 'Inspirasi', ringkas: 'Kisah dan kutipan, berganti tiap hari', ke: '/resilience-stories', emoji: '✨', kategori: 'Ibadah & Hidup', bawaan: true },
+  { id: 'kartuBelajar', label: 'Kartu Belajar', ringkas: 'Diagnosis → tatalaksana, ditutup dulu', ke: '/med-study?bagian=therapy', emoji: '🗂️', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'soalHarian', label: 'Soal Hari Ini', ringkas: 'Satu soal dengan pembahasan', ke: '/med-study', emoji: '❓', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'skorTim', label: 'Skor Tim Anda', ringkas: 'Pertandingan tim favorit', ke: '/sports-scores', emoji: '⚽', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'tidurLebar', label: 'Tidur 14 Malam', ringkas: 'Malam ini terhadap kebiasaan', ke: '/pola-tidur', emoji: '🌙', kategori: 'Tidur & Pemulihan', bawaan: true },
   { id: 'giziLebar', label: 'Asupan Hari Ini', ringkas: 'Kalori dan susunan makro', ke: '/nutrition', emoji: '🥗', kategori: 'Gizi', bawaan: true },
@@ -283,6 +286,9 @@ export const WIDGET_HIDUP = [
   'skorTim',        // pertandingan tim favorit, dari server skor
   'tidurLebar',     // 14 malam + kebiasaan sendiri
   'giziLebar',      // kalori hari ini + susunan makro
+  'inspirasi',      // 97 kartu: kisah ketahanan, kutipan atlet, semangat koas
+  'kartuBelajar',   // kartu tatalaksana yang jawabannya ditutup
+  'soalHarian',     // satu soal dari bank soal, dengan pembahasan
 ] as const
 
 /** Katalog yang boleh menempati beranda. */
