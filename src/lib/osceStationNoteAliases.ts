@@ -935,9 +935,8 @@ const ALIAS: Record<string, string> = {
   /*
    * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini:
    *
-   *   'Retinitis pigmentosa', 'Ramsay Hunt Syndrome', 'Cushing syndrome',
-   *   'Ankilostomiasis',
-   *   'Epiglottitis', 'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
+   *   'Retinitis pigmentosa', 'Cushing syndrome', 'Ankilostomiasis',
+   *   'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
    *   belum ada catatannya sama sekali. Ini pekerjaan menulis.
    *
    *   'Sistitis komplikata' DIPETAKAN ke 'Sistitis Akut' walaupun komplikata
@@ -950,6 +949,10 @@ const ALIAS: Record<string, string> = {
    */
 
   // Catatan baru yang ditulis pada gelombang ini.
+  'Ramsay Hunt Syndrome': 'Sindrom Ramsay Hunt',
+  'Epiglottitis - (RME)': 'Epiglotitis Akut',
+  Epiglotitis: 'Epiglotitis Akut',
+  Epiglottitis: 'Epiglotitis Akut',
   'Ulkus Mole': 'Ulkus Mole (Chancroid)',
   'Ulkus Molle': 'Ulkus Mole (Chancroid)',
   'Ulkus molle (H.Ducreyi)': 'Ulkus Mole (Chancroid)',
