@@ -33,8 +33,8 @@ export function AaGradient() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="A-a Oxygen Gradient" subtitle="Alveolar gas equation — localizes the cause of hypoxemia" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A normal gradient with hypoxemia points to hypoventilation or low inspired oxygen (the lungs themselves are fine); an elevated gradient points to a lung problem — V/Q mismatch, shunt, or diffusion limitation. Needs an arterial blood gas.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Gradien Oksigen A-a" subtitle="Persamaan gas alveolar — menentukan letak sebab hipoksemia" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Gradien normal disertai hipoksemia menunjuk ke hipoventilasi atau kadar oksigen inspirasi yang rendah (parunya sendiri baik); gradien yang melebar menunjuk ke masalah paru — ketidakserasian V/Q, pirau, atau gangguan difusi. Memerlukan analisis gas darah arteri.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="FiO₂ (%)">
             <input className={inputClass} type="number" min={21} max={100} value={fio2 || ''} onChange={(e) => setFio2(Number(e.target.value) || 0)} />
@@ -82,7 +82,7 @@ export function AaGradient() {
             : 'Within the age-expected range — if the patient is hypoxemic, think hypoventilation (sedatives, neuromuscular weakness, CO₂ retention) or low inspired oxygen (altitude) rather than an intrinsic lung problem.'}
         </p>
         {fio2 > 30 && (
-          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">The age/4 + 4 expected-gradient rule was derived on room air — on supplemental oxygen the normal gradient widens substantially, so interpret cautiously (some references allow roughly 5-7 mmHg per 10% FiO₂ increase).</Prosa>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Aturan gradien harapan umur/4 + 4 diturunkan pada udara ruangan — dengan oksigen tambahan, gradien normalnya melebar jauh, jadi tafsirkan dengan hati-hati (sebagian rujukan memberi kelonggaran sekitar 5-7 mmHg tiap kenaikan FiO₂ 10%).</Prosa>
         )}
       </Card>
 

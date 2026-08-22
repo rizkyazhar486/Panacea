@@ -181,27 +181,27 @@ export function BiologicalAge() {
       <Card className="!p-5">
         <SectionTitle
           icon={<IconHeart size={20} />}
-          title="Biological & Metabolic Age"
+          title="Usia Biologis & Metabolik"
           subtitle="Angka arah, bukan usia biologis tervalidasi."
-          right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
+          right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sinkron perangkat</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-neutral-100 p-4 text-center dark:border-white/10">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Biological Age</div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Usia Biologis</div>
             <div className="text-4xl font-black" style={{ color: bioColor }}>{bioAge ?? '—'}</div>
             {bioDelta != null && (
               <Badge tone={bioDelta <= -1 ? 'brand' : bioDelta <= 1 ? 'low' : 'critical'}>
-                {bioDelta <= 0 ? `${Math.abs(bioDelta)} yrs younger` : `${bioDelta} yrs older`}
+                {bioDelta <= 0 ? `${Math.abs(bioDelta)} tahun lebih muda` : `${bioDelta} tahun lebih tua`}
               </Badge>
             )}
-            <div className="mt-1 text-[10px] text-neutral-500">vs chronological {d.age || '—'}</div>
+            <div className="mt-1 text-[10px] text-neutral-500">vs usia kronologis {d.age || '—'}</div>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4 text-center dark:border-white/10">
-            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Metabolic Age</div>
+            <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Usia Metabolik</div>
             <div className="text-4xl font-black text-brand-dark">{metAge ?? '—'}</div>
-            <div className="mt-1 text-[10px] text-neutral-500">from resting metabolic rate</div>
+            <div className="mt-1 text-[10px] text-neutral-500">dari laju metabolisme istirahat</div>
           </div>
         </div>
 
@@ -216,7 +216,7 @@ export function BiologicalAge() {
 
       {/* Inputs */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Your Numbers" subtitle="Most auto-fill from Health Profile & Body Composition — add labs if you have them" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Angka Anda" subtitle="Most auto-fill from Health Profile & Body Composition — add labs if you have them" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {field('Age', 'age')}
           <Field label="Sex">
@@ -245,7 +245,7 @@ export function BiologicalAge() {
       {/* Contributing markers */}
       {markers.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="What's moving your age" subtitle="Each marker shifts your biological age up or down (years)" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="Apa yang menggerakkan umur Anda" subtitle="Each marker shifts your biological age up or down (years)" />
           <div className="mt-3 space-y-2">
             {markers.map((m) => (
               <div key={m.label} className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 p-3 dark:border-white/10">

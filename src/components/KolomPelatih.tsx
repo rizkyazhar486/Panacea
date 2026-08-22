@@ -89,7 +89,7 @@ export function KolomPelatih({
       {/* 1. Apa berikutnya */}
       <Card>
         <SectionTitle icon={<IconRun />} title="Next session"
-          subtitle="Built from your last session, how long ago it was, and the fatigue still with you" />
+          subtitle="Disusun dari sesi terakhir Anda, berapa lama sejak itu, dan kelelahan yang masih tertinggal" />
         <div className="mt-3 rounded-2xl p-4" style={{ background: `${saran.warna}14`, border: `1px solid ${saran.warna}33` }}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-lg font-black" style={{ color: saran.warna }}>{saran.judul}</span>
@@ -157,8 +157,8 @@ export function KolomPelatih({
 
       {/* 3. Jadwal pekan */}
       <Card>
-        <SectionTitle icon={<IconTimer />} title="This week’s plan"
-          subtitle="Two quality sessions, one long, the rest easy — deliberately simple" />
+        <SectionTitle icon={<IconTimer />} title="Rencana pekan ini"
+          subtitle="Dua sesi bermutu, satu sesi panjang, sisanya ringan — sengaja dibuat sederhana" />
         <div className="mt-3 space-y-1.5">
           {jadwal.map((h) => (
             <div key={h.tanggal}

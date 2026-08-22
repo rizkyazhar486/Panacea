@@ -325,7 +325,7 @@ export function TrainingPhysiology() {
 
       {/* Dasar perhitungan */}
       <Card>
-        <SectionTitle icon={<IconActivity />} title="What the numbers are built on" />
+        <SectionTitle icon={<IconActivity />} title="Angka-angka ini dibangun di atas apa" />
         <p className="mt-2 text-sm leading-relaxed text-neutral-600">
           Garmin derives load from <b>EPOC</b> estimated through Firstbeat's proprietary model, using
           second-by-second heart rate along with beat-to-beat variability. An Apple Watch does not expose data
@@ -376,8 +376,8 @@ function KartuBelumDariJam() {
    */
   return (
     <Card>
-      <SectionTitle icon={<IconTimer />} title="What does not come from the watch"
-        subtitle="That does not mean it is missing — each exists as its own tool" />
+      <SectionTitle icon={<IconTimer />} title="Yang tidak berasal dari jam tangan"
+        subtitle="Itu bukan berarti tidak ada — masing-masing berdiri sebagai alatnya sendiri" />
       <p className="mt-2 text-sm leading-relaxed text-neutral-500">
         {UNAVAILABLE.length} things <strong className="text-ink">cannot be computed from an Apple Watch export</strong> —
         which is not the same as being impossible. <strong className="text-ink">{tersedia} of them already exist</strong> as

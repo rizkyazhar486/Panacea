@@ -41,7 +41,7 @@ export function DrugInfo() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconPill size={20} />} title="Drug Info" subtitle="Look up a medicine — purpose, warnings & side effects from official FDA labels" />
+        <SectionTitle icon={<IconPill size={20} />} title="Drug Info" subtitle="Cari sebuah obat — kegunaan, peringatan & efek samping dari label resmi FDA" />
         <div className="mt-3 flex gap-2">
           <input className={inputClass} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') search() }} placeholder="Brand or generic name — e.g. ibuprofen" />
           <Button onClick={() => search()} disabled={loading || !q.trim()}>{loading ? '…' : 'Search'}</Button>
@@ -67,7 +67,7 @@ export function DrugInfo() {
             {drug.generic && <div className="text-sm text-neutral-500">Generic: {drug.generic}</div>}
             {drug.manufacturer && <div className="mt-0.5 text-[11px] text-neutral-500">{drug.manufacturer}</div>}
           </Card>
-          <Section title="What it's for" body={drug.purpose || drug.usage} />
+          <Section title="Untuk apa obat ini" body={drug.purpose || drug.usage} />
           <Section title="Dosage & administration" body={drug.dosage} />
           <Section title="⚠️ Warnings" body={drug.warnings} danger />
           <Section title="Possible side effects" body={drug.adverse} />

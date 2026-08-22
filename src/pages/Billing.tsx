@@ -316,7 +316,7 @@ function EmrPurchaseModal({
             <Field label="Number of doctor seats">
               <input className={inputClass} type="number" min={1} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
             </Field>
-            <UploadBox label="STR for each doctor (multiple JPGs)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
+            <UploadBox label="STR tiap dokter (boleh beberapa berkas JPG)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
           </div>
         )}
 
@@ -489,7 +489,7 @@ function ProofVerification() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Verify Transfer Proof (Owner)"
-        subtitle="Approve proof → PNC is added automatically"
+        subtitle="Setujui buktinya → PNC ditambahkan otomatis"
         right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {reqs.length === 0 ? (
@@ -573,7 +573,7 @@ function BackendWallet() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Real Wallet (Backend)"
-        subtitle="Balance & fund withdrawals processed by the server"
+        subtitle="Saldo & penarikan dana diproses oleh server"
         right={<Badge tone={live ? 'brand' : 'high'}>{live ? 'Backend Active' : 'Local Mode'}</Badge>}
       />
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-brand p-5 text-white">

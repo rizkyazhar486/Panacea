@@ -32,19 +32,19 @@ export function TeknikLari() {
       <SectionTitle
         icon={<IconRun />}
         title="Running Technique"
-        subtitle="From the start to breathing — ordered by how strong the evidence is"
+        subtitle="Dari langkah pertama sampai pernapasan — diurutkan menurut kekuatan buktinya"
       />
 
       {/* Yang paling sering salah dipahami, ditaruh paling atas. */}
       <Card className="!border-amber-500/30 !bg-amber-500/5">
         <div className="text-[11px] font-black uppercase tracking-wide text-amber-700">Read this first</div>
         <p className="mt-2 text-[12px] leading-relaxed text-neutral-600">
-          <b>There is no single correct running form for everyone.</b> The best evidence available
+          <b>Tidak ada satu bentuk lari yang benar untuk semua orang.</b> The best evidence available
           shows that forcibly changing your gait — especially forcing a forefoot landing — does not
           reduce injury risk, and often just moves it from the knee to the Achilles tendon and the
           bones of the foot.
         </p>
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Each section below therefore carries its own evidence rating, and the list is ordered from the best-supported down. If your time is limited, work on the green ones first and leave the rest alone.</Prosa>
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600">Karena itu tiap bagian di bawah membawa peringkat buktinya sendiri, dan daftarnya diurutkan dari yang paling kuat dukungannya. Bila waktu Anda terbatas, kerjakan yang hijau lebih dahulu dan biarkan sisanya.</Prosa>
       </Card>
 
       {/* Teknik */}

@@ -56,14 +56,14 @@ export function Architecture() {
         <SectionTitle
           icon={<IconShield size={20} />}
           title="Hybrid CDSS Architecture — Lateral + Vertical"
-          subtitle="Panaceamed.id's foundation: safe prescribing support (doctor-in-the-loop) + personalized patient education"
+          subtitle="Fondasi Panaceamed.id: dukungan peresepan yang aman (dokter tetap di dalam alurnya) + edukasi pasien yang dipersonalisasi"
         />
         <div className="flex flex-wrap gap-2">
-          <Badge tone="brand">Doctor-in-the-loop</Badge>
+          <Badge tone="brand">Dokter tetap di dalam alurnya</Badge>
           <Badge tone="brand">SMART on FHIR</Badge>
           <Badge tone="brand">RAG + Knowledge Graph</Badge>
           <Badge tone="brand">Federated Learning + DP</Badge>
-          <Badge tone="high">AI = decision support, not autonomous prescribing</Badge>
+          <Badge tone="high">AI = pendukung keputusan, bukan peresepan mandiri</Badge>
         </div>
       </Card>
 
@@ -176,7 +176,7 @@ export function Architecture() {
             </li>
           ))}
         </ul>
-        <Prosa kelas="mt-3 text-xs text-neutral-500">Privacy & training: federated learning for LLM adapter & DDI predictor updates; data stays local, combined with Differential Privacy & secure aggregation. Evaluated on a safety-focused test set before rollout, with versioning & rollback paths.</Prosa>
+        <Prosa kelas="mt-3 text-xs text-neutral-500">Privasi & pelatihan model: federated learning untuk pembaruan adapter LLM & pemerkira interaksi obat; datanya tetap di perangkat, dipadukan dengan Differential Privacy & agregasi aman. Diuji pada himpunan uji yang menitikberatkan keselamatan sebelum digulirkan, dengan penomoran versi & jalan untuk mundur.</Prosa>
       </Card>
     </div>
   )

@@ -74,7 +74,7 @@ export function Owner() {
           <SectionTitle
             icon={<IconShield size={20} />}
             title="Manage Admin Access"
-            subtitle="Only emails you allow here can sign in as Admin."
+            subtitle="Hanya surel yang Anda izinkan di sini yang dapat masuk sebagai Admin."
           />
           <div className="flex gap-2">
             <input
@@ -292,7 +292,7 @@ function AIOperatorPanel() {
       <SectionTitle
         icon={<IconSparkle size={20} />}
         title="AI Marketing Team — CMO, Social, SEO, Content, Ads, Operations"
-        subtitle="5 AI departments under one CMO — real-time analysis & drafting, AI-powered (free via server)"
+        subtitle="5 departemen AI di bawah satu CMO — analisis & penyusunan draf seketika, ditenagai AI (gratis lewat server)"
         right={pending && (pending.topups + pending.doctors > 0)
           ? <Badge tone="high">{pending.topups + pending.doctors} need action</Badge>
           : <Badge tone="brand">AI ready</Badge>}
@@ -350,7 +350,7 @@ function UserDirectoryPanel() {
       <SectionTitle
         icon={<IconUsers size={20} />}
         title="User Directory"
-        subtitle="All accounts that signed up, transacted, & subscribed"
+        subtitle="Semua akun yang mendaftar, bertransaksi, & berlangganan"
         right={<Badge tone="brand">{rows?.length ?? 0} accounts</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
@@ -417,7 +417,7 @@ function FeedbackInboxPanel() {
       <SectionTitle
         icon={<span className="text-xl">💬</span>}
         title="User Messages & Suggestions"
-        subtitle="Feedback sent directly from the app"
+        subtitle="Masukan yang dikirim langsung dari aplikasi"
         right={<Badge tone={unread.length ? 'high' : 'brand'}>{unread.length} unread</Badge>}
       />
       {err && <p className="mb-2 text-xs text-accent">{err}</p>}
@@ -669,7 +669,7 @@ function DoctorVerifyPanel() {
       <SectionTitle
         icon={<IconShield size={20} />}
         title="Doctor STR Verification"
-        subtitle="Review STR/SIP before granting AI-EMR access (Health Law)"
+        subtitle="Periksa STR/SIP sebelum memberi akses AI-EMR (UU Kesehatan)"
         right={docs ? <Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge> : undefined}
       />
       {err && <p className="text-sm text-accent">{err}</p>}
