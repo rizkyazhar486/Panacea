@@ -63,7 +63,7 @@ export function UbinPantauan() {
 
       {/* geser-aman: gerakan menyamping tidak bertabrakan dengan gerakan
           kembali milik sistem di tepi layar. */}
-      <div className="geser-aman -mx-fluid flex gap-2 overflow-x-auto px-fluid pb-1">
+      <div className="geser-aman geser-kartu -mx-fluid flex gap-2 overflow-x-auto px-fluid pb-1">
         {daftar.map((p) => (
           <div key={p.ke} className="kaca relative w-[148px] shrink-0 rounded-2xl p-2.5">
             <span className={`mb-1.5 block h-1 w-6 rounded-full ${WARNA[p.jenis] ?? 'bg-neutral-400'}`} />

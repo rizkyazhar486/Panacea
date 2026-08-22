@@ -952,6 +952,20 @@ html { -webkit-overflow-scrolling: touch; }
     display: none;
   }
 
+  /* ── Deret KARTU: lekatan WAJIB, bukan sekadar berdekatan ────────────────
+     Pada deret keping penyaring, lekatan "proximity" benar: keping berukuran
+     berbeda-beda dan memaksa tiap keping ke tepi kiri justru membuat geseran
+     pendek terasa dilawan.
+
+     Pada deret KARTU berukuran sama, sebaliknya. Dengan proximity, geseran
+     pendek mengembalikan kartu ke tempat semula — terukur: geseran 70 px
+     berakhir di posisi 0, sehingga tangan terasa "ditolak". Dengan mandatory,
+     tiap geseran berakhir tepat pada tepi sebuah kartu, dan tidak ada kartu
+     yang berhenti setengah terpotong. */
+  .geser-kartu {
+    scroll-snap-type: x mandatory;
+  }
+
   .geser-aman > * {
     flex: 0 0 auto;
     scroll-snap-align: start;
