@@ -17,6 +17,7 @@ import { PemilihWidget } from './PemilihWidget'
 import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rincianBeranda'
 import { deretMetrik } from '../lib/riwayatVitals'
 import { GrafikMini } from './GrafikMini'
+import { UBIN_LANGSUNG } from './UbinLangsung'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -307,6 +308,14 @@ function KartuGrafikOlahraga() {
  * yang mana. Bentuknya dibuat lebih rendah supaya perbedaan itu terbaca sekilas.
  */
 function UbinPintasan({ w }: { w: (typeof WIDGETS)[number] }) {
+  // Bila fitur ini punya ubin hidup DAN datanya sudah ada, angkanya yang
+  // ditampilkan. Ubin hidup mengembalikan null ketika datanya belum ada,
+  // sehingga pintu biasa di bawah ini tetap menjadi jalan keluarnya.
+  const Langsung = UBIN_LANGSUNG[w.id]
+  if (Langsung) {
+    const isi = Langsung()
+    if (isi) return isi
+  }
   return (
     <Link
       to={w.ke}
