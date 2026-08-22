@@ -33,12 +33,14 @@
 export type Salat = 'Fajr' | 'Dhuhr' | 'Asr' | 'Maghrib' | 'Isha'
 
 /** Salat wajib yang lima. Sunrise sengaja tidak termasuk — ia bukan waktu salat. */
+// Nama yang dipakai orang Indonesia sehari-hari, bukan transliterasi Inggris
+// milik penyedia. `id` tetap mengikuti penyedia karena itulah kunci datanya.
 export const SALAT: { id: Salat; nama: string; ikon: string }[] = [
-  { id: 'Fajr', nama: 'Fajr', ikon: '🌄' },
-  { id: 'Dhuhr', nama: 'Dhuhr', ikon: '🌞' },
-  { id: 'Asr', nama: 'Asr', ikon: '🌤️' },
-  { id: 'Maghrib', nama: 'Maghrib', ikon: '🌇' },
-  { id: 'Isha', nama: 'Isha', ikon: '🌙' },
+  { id: 'Fajr', nama: 'Subuh', ikon: '🌄' },
+  { id: 'Dhuhr', nama: 'Zuhur', ikon: '🌞' },
+  { id: 'Asr', nama: 'Asar', ikon: '🌤️' },
+  { id: 'Maghrib', nama: 'Magrib', ikon: '🌇' },
+  { id: 'Isha', nama: 'Isya', ikon: '🌙' },
 ]
 
 /**

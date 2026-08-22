@@ -23,6 +23,7 @@ import { kebugaranKesegaran } from '../lib/analisisPro'
 import { saranBerikutnya } from '../lib/pelatih'
 import { hrMaxFromAge } from '../lib/workoutImport'
 import { getDemo } from '../lib/profile'
+import { UbinSalat } from './UbinSalat'
 
 const HARI = 864e5
 
@@ -231,4 +232,5 @@ export const UBIN_LANGSUNG: Record<string, () => JSX.Element | null> = {
   detakJantung: UbinDenyut,
   longevity: UbinLongevity,
   kebugaran: UbinPelatih,
+  salat: UbinSalat,
 }
