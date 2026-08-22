@@ -5,6 +5,7 @@ import { NAV_UNTUK_PENGATURAN } from './Shell'
 import { ambilTersembunyi } from '../lib/fiturTersembunyi'
 import { api, backendEnabled } from '../lib/api'
 import type { Role } from '../lib/types'
+import { siapkanIndeks, cari as cariIsi, NAMA_JENIS, type Hasil } from '../lib/mesinCari'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pencarian global — satu kotak untuk fitur, orang dan tagar.
@@ -29,6 +30,7 @@ import type { Role } from '../lib/types'
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface HasilFeatures { to: string; label: string; grup: string; kw?: string }
+
 interface HasilOrang { id: string; name: string; role: Role; picture?: string }
 
 /** Skor kecocokan: awalan kata lebih tinggi daripada sekadar mengandung. */
@@ -48,7 +50,29 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
   const [orang, setOrang] = useState<HasilOrang[]>([])
   const [tagar, setHashtags] = useState<{ tag: string; jumlah: number }[]>([])
   const [sorot, setSorot] = useState(0)
+  /* Hasil dari indeks ISI aplikasi: penyakit, obat, kalkulator, stasiun OSCE.
+     Sebelum ini isi itu hanya dapat dicari dengan BERPINDAH ke halaman
+     pencarian tersendiri — dan berpindah halaman untuk mencari berarti
+     kehilangan tempat yang sedang dibaca. Satu kotak, tanpa pindah halaman. */
+  const [isi, setIsi] = useState<Hasil[]>([])
+  const [jumlahIndeks, setJumlahIndeks] = useState(0)
   const kotak = useRef<HTMLInputElement>(null)
+
+  // Indeks isi dibangun saat kotak DIBUKA, bukan saat aplikasi dimuat: berkas
+  // penyakit, tatalaksana, dan arsip OSCE besar, dan menariknya ke bundel awal
+  // memperlambat pembukaan pertama bagi semua orang demi satu kotak.
+  useEffect(() => {
+    if (!buka) return
+    let batal = false
+    void siapkanIndeks().then((n) => { if (!batal) setJumlahIndeks(n) })
+    return () => { batal = true }
+  }, [buka])
+
+  useEffect(() => {
+    const t = q.trim()
+    if (!buka || t.length < 2) { setIsi([]); return }
+    setIsi(cariIsi(t, 12))
+  }, [q, buka, jumlahIndeks])
 
   // Katalog dimuat sekali, saat pertama dibuka.
   useEffect(() => {
@@ -132,7 +156,8 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
     ...fitur.map((f) => ({ jenis: 'fitur' as const, kunci: f.to, ke: f.to, f })),
     ...orang.map((o) => ({ jenis: 'orang' as const, kunci: 'u' + o.id, ke: `/jelajah?orang=${encodeURIComponent(o.name)}`, o })),
     ...tagar.map((h) => ({ jenis: 'tagar' as const, kunci: 't' + h.tag, ke: `/jelajah?tag=${h.tag}`, h })),
-  ], [fitur, orang, tagar])
+    ...isi.map((x, i) => ({ jenis: 'isi' as const, kunci: `i${i}-${x.ke}`, ke: x.ke, x })),
+  ], [fitur, orang, tagar, isi])
 
   const pergi = useCallback((ke: string) => { tutup(); setQ(''); nav(ke) }, [nav, tutup])
 
@@ -156,32 +181,33 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
             <input
               ref={kotak}
               className="min-w-0 flex-1 bg-transparent text-[15px] text-white outline-none placeholder:text-slate-500"
-              placeholder="Search features, people, or #hashtags…"
+              placeholder="Fitur, penyakit, obat, skor, orang, #tagar…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={padaTombol}
-              aria-label="Search features, people, or hashtags"
+              aria-label="Cari fitur, penyakit, obat, orang, atau tagar"
             />
-            <button onClick={tutup} aria-label="Close search"
-              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Close</button>
+            <button onClick={tutup} aria-label="Tutup pencarian"
+              className="shrink-0 rounded-lg bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300">Tutup</button>
           </div>
 
           <div className="max-h-[calc(100vh-64px)] overflow-y-auto p-2 sm:max-h-[calc(70vh-64px)]">
             {!q.trim() && (
               <p className="px-3 py-6 text-center text-[12px] leading-relaxed text-slate-500">
-                Type a feature name — "stretching", "calculator", "sleep" — or a person, or a #hashtag.
+                Ketik apa saja: nama fitur, penyakit, obat, kalkulator, stasiun OSCE, orang, atau #tagar.
+                {jumlahIndeks > 0 && <><br />{jumlahIndeks.toLocaleString('id-ID')} hal terindeks.</>}
               </p>
             )}
 
             {q.trim() && semua.length === 0 && (
               <p className="px-3 py-6 text-center text-[12px] text-slate-500">
-                No matches for "{q}".
+                Tidak ada yang cocok dengan "{q}".
               </p>
             )}
 
             {fitur.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Features</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Fitur</div>
                 {fitur.map((f, i) => (
                   <button key={f.to} onClick={() => pergi(f.to)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
@@ -195,7 +221,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
             {orang.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">People</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Orang</div>
                 {orang.map((o) => (
                   <button key={o.id} onClick={() => pergi(`/jelajah?orang=${encodeURIComponent(o.name)}`)}
                     className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left ${
@@ -214,7 +240,7 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
 
             {tagar.length > 0 && (
               <div className="mb-1">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Hashtags</div>
+                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Tagar</div>
                 {tagar.map((h) => (
                   <button key={h.tag} onClick={() => pergi(`/jelajah?tag=${h.tag}`)}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left ${
@@ -225,6 +251,37 @@ export function PencarianGlobal({ buka, tutup }: { buka: boolean; tutup: () => v
                 ))}
               </div>
             )}
+
+            {/* ISI APLIKASI — dikelompokkan menurut jenisnya, dan tiap hasil
+                membawa satu baris keterangannya sendiri. Tanpa keterangan itu
+                sepuluh nama penyakit yang mirip tidak dapat dibedakan sebelum
+                dibuka satu per satu. */}
+            {isi.length > 0 && (() => {
+              const perJenis = new Map<string, Hasil[]>()
+              for (const h of isi) {
+                const a = perJenis.get(h.jenis)
+                if (a) a.push(h)
+                else perJenis.set(h.jenis, [h])
+              }
+              return [...perJenis.entries()].map(([jenis, daftar]) => (
+                <div key={jenis} className="mb-1">
+                  <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">
+                    {NAMA_JENIS[jenis as keyof typeof NAMA_JENIS]}
+                  </div>
+                  {daftar.map((h) => {
+                    const kunci = `i${isi.indexOf(h)}-${h.ke}`
+                    return (
+                      <button key={kunci} onClick={() => pergi(h.ke)}
+                        className={`flex w-full flex-col items-start gap-0.5 rounded-xl px-3 py-2 text-left ${
+                          semua[sorot]?.kunci === kunci ? 'bg-brand/25' : 'hover:bg-white/5'}`}>
+                        <span className="w-full truncate text-[13px] font-bold text-white">{h.judul}</span>
+                        <span className="w-full truncate text-[11px] text-slate-400">{h.ringkas}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              ))
+            })()}
           </div>
         </div>
       </div>

@@ -40,12 +40,12 @@ export function UbinPantauan() {
     return (
       <section>
         <h2 className="t-kecil mb-2 font-black uppercase tracking-wide text-neutral-500">Pantauan</h2>
-        <Link
-          to="/cari"
-          className="t-kecil flex min-h-[64px] items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
+        <button
+          onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
+          className="t-kecil flex min-h-[64px] w-full items-center justify-center rounded-3xl border border-dashed border-neutral-300 px-3 text-center leading-snug text-neutral-500 dark:border-white/20"
         >
           Belum ada. Cari penyakit, obat, atau skor lalu tekan ★ untuk memantaunya di sini.
-        </Link>
+        </button>
       </section>
     )
   }
@@ -82,12 +82,12 @@ export function UbinPantauan() {
             )}
           </div>
         ))}
-        <Link
-          to="/cari"
+        <button
+          onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
           className="t-mikro flex w-[92px] shrink-0 items-center justify-center rounded-2xl border border-dashed border-neutral-300 text-center font-bold text-neutral-500 dark:border-white/20"
         >
           + tambah
-        </Link>
+        </button>
       </div>
     </section>
   )

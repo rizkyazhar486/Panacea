@@ -356,12 +356,16 @@ export default function Beranda() {
               Halo{nama && `, ${nama}`}
             </h1>
           </div>
-          <Link
-            to="/cari"
+          {/* Membuka kotak pencarian di atas halaman ini, BUKAN pindah ke
+              halaman pencarian. Berpindah halaman untuk mencari berarti
+              kehilangan tempat yang sedang dibaca, dan sesudah selesai harus
+              kembali lagi. */}
+          <button
+            onClick={() => window.dispatchEvent(new Event('panacea:cari'))}
             className="t-sedang flex h-11 shrink-0 items-center rounded-full bg-brand px-5 font-bold text-white transition active:scale-95"
           >
             Cari
-          </Link>
+          </button>
         </div>
 
         {kpi.length > 0 && (

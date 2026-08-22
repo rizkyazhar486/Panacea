@@ -21,7 +21,7 @@
 // tidak pernah muncul. Ketahuan dari uji peramban, bukan dari kode. Karena itu
 // SLOT_PER_HALAMAN ada di berkas ini, bukan ditulis ulang di komponennya.
 
-export type JenisAksi = 'rute' | 'kembali' | 'atas' | 'tema'
+export type JenisAksi = 'rute' | 'kembali' | 'atas' | 'tema' | 'cari'
 
 export interface AksiFab {
   id: string
@@ -33,7 +33,7 @@ export interface AksiFab {
 }
 
 export const KATALOG_AKSI: AksiFab[] = [
-  { id: 'cari', label: 'Cari', ikon: '⌕', jenis: 'rute', ke: '/cari' },
+  { id: 'cari', label: 'Cari', ikon: '⌕', jenis: 'cari' },
   { id: 'kembali', label: 'Kembali', ikon: '‹', jenis: 'kembali' },
   { id: 'beranda', label: 'Beranda', ikon: '⌂', jenis: 'rute', ke: '/' },
   { id: 'atas', label: 'Ke atas', ikon: '↑', jenis: 'atas' },

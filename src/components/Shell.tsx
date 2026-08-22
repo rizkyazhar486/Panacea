@@ -303,6 +303,17 @@ export function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getTheme)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cariBuka, setCariBuka] = useState(false)
+  /* SATU KOTAK, DIPANGGIL DARI MANA SAJA.
+     Kotak pencarian ini menumpang di atas halaman yang sedang dibuka, jadi
+     mencari tidak lagi berarti berpindah halaman dan kehilangan tempat yang
+     sedang dibaca. Pemanggilnya — tombol Cari di beranda, tombol melayang,
+     lambang kaca pembesar — cukup melempar satu peristiwa, tanpa perlu
+     dihubungkan satu per satu ke keadaan milik Shell. */
+  useEffect(() => {
+    const on = () => setCariBuka(true)
+    window.addEventListener('panacea:cari', on)
+    return () => window.removeEventListener('panacea:cari', on)
+  }, [])
   const [bantuanBuka, setBantuanBuka] = useState(false)
 
   // Kembali mengikuti ALUR HALAMAN, bukan sekadar satu langkah mundur di

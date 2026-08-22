@@ -232,6 +232,8 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
     else if (a.jenis === 'kembali') navigasi(-1)
     else if (a.jenis === 'atas') window.scrollTo({ top: 0, behavior: 'smooth' })
     else if (a.jenis === 'tema') toggleTheme()
+    // Kotak pencarian menumpang di atas halaman yang sedang terbuka.
+    else if (a.jenis === 'cari') window.dispatchEvent(new Event('panacea:cari'))
   }
 
   const terpilih = pilihan
