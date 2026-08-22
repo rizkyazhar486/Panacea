@@ -991,6 +991,151 @@ const ALIAS: Record<string, string> = {
   Chancroid: 'Ulkus Mole (Chancroid)',
   'Pitiriasis Versicolor': 'Pitiriasis Versikolor (Panu)',
   Panu: 'Pitiriasis Versikolor (Panu)',
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * GELOMBANG TERAKHIR — sisa kasus sekali muncul yang hanya beda cara menulis.
+   * Dipilih satu per satu dari daftar calon; yang tidak dipetakan diberi
+   * alasannya di akhir bagian ini.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Jantung dan kegawatan
+  STEMI: 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'UAP / NSTEMI': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'UAP/ NSTEMI : EKG': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'UAP/STEMI': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'ST elevasi V1-V4? St depresi II III aVf? LVH': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'syok anafilaktik STEMI': 'Syok Anafilaktik — tindakan resusitasi',
+  'HHS / Tindakan resusitasi cairan (Tindakan Pasang IV line)': 'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan',
+  'Syok Septik': 'Syok (septik, hipovolemik, kardiogenik, neurogenik)',
+  'Syok septik - iv line': 'Syok (septik, hipovolemik, kardiogenik, neurogenik)',
+  'Syok hipovolemik ec PPH ec Atonia uteri (KBE KBI)': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'V-Fib + Sinus Bradikardia (RJP)': 'Fibrilasi Ventrikel — RJP & defibrilasi',
+  'RJP neonatus': 'Fibrilasi Ventrikel — RJP & defibrilasi',
+  Hipertensi: 'Hipertensi esensial',
+  'Hipertensi grade I': 'Hipertensi esensial',
+  'Hipertensi stage 2': 'Hipertensi esensial',
+  'HT Stage 1': 'Hipertensi esensial',
+  'HT Grade 1 + Hiperkolesterolnemia': 'Hipertensi esensial',
+
+  // Saraf dan jiwa
+  Migrain: 'Migrain (dengan/tanpa aura)',
+  'Stroke/TIA': 'Stroke Hemoragik / TIA',
+  'Neuropati DM': 'Neuropati Perifer e.c. DM',
+  'Late insomnia': 'Insomnia (primer/early/middle/late)',
+  'insomnia dd/depresi': 'Insomnia (primer/early/middle/late)',
+  'Narkolepsi/hipersomnia': 'Hipersomnia',
+  'Psikotik akut': 'Gangguan Psikotik Akut',
+  'skizofrenia/ waham menetap( gajelas)': 'Gangguan Waham Menetap',
+  'Gangguan cemas + depresi': 'Gangguan campuran cemas depresi',
+  'gg cemas dan depresi ringan': 'Gangguan campuran cemas depresi',
+  'gg cemas dan depresi sedang': 'Gangguan campuran cemas depresi',
+  'impotensi e.c gangguan cemas': 'Gangguan Cemas Menyeluruh (GAD)',
+  'Psikotik Post Partum': 'Baby Blues / Depresi Postpartum',
+  'GMO karena demam (riwayat meminum alkohol': 'Intoksikasi Alkohol / Zat Psikoaktif',
+  'Gangguan mental dan perilaku e.c zat psikoaktif ganja': 'Intoksikasi Alkohol / Zat Psikoaktif',
+  'intoksikasi oplosan-pasang NGT': 'Intoksikasi Alkohol / Zat Psikoaktif',
+
+  // Dalam dan infeksi
+  Pneumonia: 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia Berat / Bronkiolitis akut (px anak)': 'Bronkiolitis (anak)',
+  Pielonefritis: 'Pielonefritis Akut',
+  Hipoglikemia: 'Hipoglikemia berat',
+  'Anemia G6PD - (RME)': 'Anemia hemolitik',
+  'IBS tipe diare': 'Irritable Bowel Syndrome',
+  'Ruptur ginjal ec trauma': 'Ruptur ginjal',
+  'Trauma ginjal sinistra': 'Ruptur ginjal',
+  'Ruptur Varises Esofagus (NGT)': 'Varises esofagus',
+  'Sirhep - hematemesis melena (NGT)': 'Varises esofagus',
+  'Peritonitis e.c Perforasi App (NGT)': 'Perforasi usus',
+  'Peritonitis e.c Perforasi Gaster': 'Perforasi usus',
+  'Ulkus DM': 'Ulkus pada tungkai',
+  'Obesitas, hiperlipid': 'Obesitas (berbagai grade)',
+  'Obestias anak + hipertrofi tonsil': 'Obesitas (berbagai grade)',
+  'Underweight (BMI 15.6)': 'Obesitas (berbagai grade)',
+  'omphalitis anak': 'Omfalitis',
+  'Infeksi neonatorum dd omfalitis': 'Omfalitis',
+  'Periappendicular Infiltrate': 'Appendisitis Akut',
+  'diare anak': 'Gastroenteritis (termasuk kolera, giardiasis)',
+  DADRS: 'Gastroenteritis (termasuk kolera, giardiasis)',
+  'Diare cair akut ec intoksikasi makanan': 'Gastroenteritis (termasuk kolera, giardiasis)',
+
+  // Indera dan kulit
+  Miopia: 'Miopia ringan',
+  'Astigmatisme / miopia': 'Astigmatism ringan',
+  'Dry eye Syndrome': 'Mata kering',
+  'Dry eyes ODS': 'Mata kering',
+  'dry eye': 'Mata kering',
+  rhinitis: 'Rhinitis akut',
+  'Rinitis akut/Common cold': 'Rhinitis akut',
+  Morbili: 'Morbili tanpa komplikasi',
+  'Morbili / Ichtyosis vulgaris': 'Morbili tanpa komplikasi',
+  'Miliaria Rubra / Measles': 'Miliaria',
+  'Scabies / miliaria': 'Skabies',
+  'Pityriasis rosea/urtikaria akut': 'Urtikaria akut',
+  'Dermatitis numularis / LSK / Tinea pedis': 'Dermatitis numularis',
+  'FDE di penis': 'Insect Bite / Fixed Drug Eruption',
+  'Erupsi obat morbiliformis / makulopapular (exanthema drug eruption)': 'Insect Bite / Fixed Drug Eruption',
+  'Acne vulgaris/folikulitis': 'Akne vulgaris sedang-berat',
+  'Abses (insisi drainase)': 'Abses folikel rambut atau kelenjar sebasea',
+
+  // Otot, tulang, dan tindakan
+  'Sprain Ankle': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'Sprain ankle dextra': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'Sprain Genu /Meniscus Tear': 'Lesi meniskus, medial, dan lateral',
+  'trauma genu': 'Lesi meniskus, medial, dan lateral',
+  'Open fracture os tibia fibula': 'Fraktur terbuka, tertutup',
+  'Open fracture os tibia-fibula sinistra 1/3 distal displaced': 'Fraktur terbuka, tertutup',
+  'Fraktur Terbuka os Tibia Sinistra Medial Oblique grade 3A (RME) / Tx Pemasangan Bidai': 'Fraktur terbuka, tertutup',
+  'Fraktur terbuka os radius et ulna 1/3 distal, komplit, dgn dislokasi os ulnar pd regio antebrachii (Irigasi / debridement + Bidai)': 'Fraktur terbuka, tertutup',
+  'Soft tissue injury metacarpal sin': 'Trauma sendi',
+  Hecting: 'Vulnus laseratum, punctum',
+  'Retensio Urin (tindakan Kateter)': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+
+  // Kandungan
+  Partus: 'Partus lama',
+  'Pelepasan Implan (konseling & tindakan)': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Pemasangan AKDR (Tindakan)': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Servisitis gonore': 'Servisitis / Uretritis Gonore',
+  'uretritis non GO': 'Servisitis / Uretritis Gonore',
+  'Susp. ca serviks (IVA)': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'suspek ca serviks IVA': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'servisitis suspek ca serviks tes iva': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'keputihan + papsmear': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'Candidiasis / Ca Cervix Lesi Prakanker (tindakan pap smear)': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'Ca Serviks': 'Karsinoma serviks',
+  'Primigravida dengan anemia defisiensi besi (ANC)': 'Anemia defisiensi besi pada kehamilan',
+  'Hamil 37 mgg tanpa penyulit (ANC)': 'ANC Normal (Antenatal Care)',
+  'PEB (ANC)': 'Preeklampsia',
+  'G1P0A0, Hamil 32 Minggu, JTH Preskep dengan PEB': 'Preeklampsia',
+  'G4P2A0 hamil 32 minggu, janin tunggal hidup, letak kepala, dg PEB tanpa HELLP syndrome': 'Preeklampsia',
+  'G1P0A0 + UK 38-39 minggu + JT + PK + AH + KPD': 'Ketuban Pecah Dini (KPD)',
+
+  /*
+   * YANG SENGAJA DIBIARKAN KOSONG, dan alasannya:
+   *
+   *   'Ra/Gout', 'RA OA', 'ANC, KPD', 'Pentabio, OPV, KMS', 'Mastitis
+   *   uretritis GO' — satu baris berisi DUA penyakit atau dua stasiun, dan
+   *   justru MEMBEDAKAN keduanya yang sedang diuji.
+   *
+   *   'Diare akut ec E coli', 'ec Intoleransi laktosa', 'Taeniasis',
+   *   'Giardiasis', 'ec intoksikasi susu sapi', 'DADR-S ec intoleransi
+   *   laktosa', 'DATD ec intoleransi laktosa' — yang diujikan adalah
+   *   MEMBEDAKAN penyebabnya, sehingga menautkan semuanya ke satu catatan
+   *   diare justru menghapus yang sedang diuji.
+   *
+   *   'Kista Nabothian', 'IUGR', 'Retinitis pigmentosa', 'Sindrom Geriatri',
+   *   'Ruptur Vesica Urinaria' dan 'Akut abdomen ec Ruptur Buli',
+   *   'Gangguan sex hipoaktif', 'Hiposeksual disorder (Vaginismus)',
+   *   'Anemia + Diare ec Scistosomiasis', 'Toxic Thyroid Nodule', 'SNNT/SNT',
+   *   'Konjungtivitis fliktenularis', 'Obstruksi Saluran Nafas e.c Aspirasi
+   *   Corpus Alienum', 'Tenosinovitis supurativ ec tertusuk duri ikan' —
+   *   memang belum ada catatannya. Ini pekerjaan menulis, bukan menyambung.
+   *
+   *   Patah tulang HUMERUS dan FEMUR tetap tidak ditautkan ke catatan bidai
+   *   klavikula/tibia/radius; alasannya sudah ditulis di bagian sebelumnya.
+   */
 }
 
 /**
