@@ -37,7 +37,7 @@ export function EnduranceTools() {
   return (
     <div className="space-y-4">
       <SectionTitle icon={<IconActivity />} title="Alat Endurance"
-        subtitle="Fuelling, FTP, power guidance, and acclimatisation — all from your own input" />
+        subtitle="Bahan bakar, FTP, panduan daya, dan penyesuaian iklim — semuanya dari masukan Anda sendiri" />
 
       <Card>
         <p className="text-sm leading-relaxed text-neutral-600">
@@ -125,7 +125,7 @@ function TabBahanBakar() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Plan for a single session" />
+        <SectionTitle icon={<IconRun />} title="Rencana untuk satu sesi" />
         <div className="mt-2 grid grid-cols-2 gap-3">
           <Field label="Durasi (menit)"><input className={inputClass} inputMode="numeric" value={durasi} onChange={(e) => setDurasi(e.target.value)} /></Field>
           <Field label="Suhu (°C)"><input className={inputClass} inputMode="numeric" value={suhu} onChange={(e) => setSuhu(e.target.value)} /></Field>
@@ -204,7 +204,7 @@ function TabFtp() {
   return (
     <div className="space-y-4">
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Power you can hold for about an hour" />
+        <SectionTitle icon={<IconActivity />} title="Hitung FTP" subtitle="Daya yang dapat Anda tahan sekitar satu jam" />
         <Prosa kelas="mt-2 text-sm leading-relaxed text-neutral-500">FTP adalah batas yang memisahkan &quot;berat tapi bisa dijalani&quot; dari &quot;kelelahan menumpuk cepat&quot;. Di atasnya, laktat menumpuk lebih cepat daripada yang bisa dibersihkan, dan performa menurun tajam. Setara dengan LTHR pada denyut jantung — hanya diukur dalam watt.</Prosa>
         <div className="mt-3 space-y-1.5">
           {PROTOKOL.map((p) => (
@@ -306,7 +306,7 @@ function TabPanduan() {
       </Card>
 
       <Card>
-        <SectionTitle title="Segmen rute" subtitle="Split the route into flat, climbing, and descending parts" />
+        <SectionTitle title="Segmen rute" subtitle="Bagi rutenya menjadi bagian datar, tanjakan, dan turunan" />
         <div className="mt-2 space-y-2">
           {segmen.map((s, i) => (
             <div key={i} className="rounded-lg border border-white/10 p-2.5">

@@ -200,7 +200,7 @@ export function AestheticVitality() {
         <SectionTitle
           icon={<IconSparkle size={20} />}
           title="Aesthetic Vitality"
-          subtitle="The science of a healthy, radiant appearance — read as vitality, not a verdict. Proportion, skin & recovery indicators auto-sync from your Health Profile and Body Composition."
+          subtitle="Ilmu penampilan yang sehat dan bercahaya — dibaca sebagai daya hidup, bukan sebagai penilaian. Penanda perbandingan tubuh, kulit, dan pemulihan tersinkron sendiri dari Profil Kesehatan dan Komposisi Tubuh Anda."
           right={<button onClick={() => syncNow(false)} className="shrink-0 rounded-full border border-brand/30 bg-brand-50 px-3 py-1.5 text-[11px] font-bold text-brand-dark active:scale-95">🔄 Sync devices</button>}
         />
         {syncNote && <p className="mt-2 rounded-xl bg-brand-50 px-3 py-2 text-[11px] font-semibold text-brand-dark">{syncNote}</p>}
@@ -222,7 +222,7 @@ export function AestheticVitality() {
           <div className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             {score == null
               ? 'Enter or sync at least three indicators below to see your Aesthetic Vitality Index — a blend of proportion, body composition, skin-repair, and vitality signals that research links to a healthy, attractive appearance.'
-              : <>Your index blends <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition moves it, and each also adds years of healthspan.</>}
+              : <>Indeks Anda menggabungkan <b>{indicators.length}</b> health-linked signals. It reflects the modifiable, health-driven part of appearance — improving sleep, recovery, and body composition moves it, and each also adds years of healthspan.</>}
           </div>
         </div>
       </Card>
@@ -230,7 +230,7 @@ export function AestheticVitality() {
       {/* Live indicators */}
       {indicators.length > 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconChartUp size={20} />} title="Your Live Indicators" subtitle="Each is a health signal research links to perceived attractiveness" />
+          <SectionTitle icon={<IconChartUp size={20} />} title="Penanda Anda Saat Ini" subtitle="Each is a health signal research links to perceived attractiveness" />
           <div className="mt-3 space-y-2">
             {indicators.map((i) => (
               <div key={i.id} className="rounded-xl border border-neutral-100 p-3 dark:border-white/10">
@@ -284,7 +284,7 @@ export function AestheticVitality() {
 
       {/* Concept pillars */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="What Makes Something Beautiful?" subtitle="The evolutionary, cultural, psychological, philosophical & design dimensions" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Apa yang Membuat Sesuatu Terlihat Indah?" subtitle="The evolutionary, cultural, psychological, philosophical & design dimensions" />
         <div className="mt-3 space-y-3">
           {PILLARS.map((p) => (
             <div key={p.title} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">

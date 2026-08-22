@@ -101,14 +101,14 @@ export function Consult() {
           <SectionTitle
             icon={<IconChat size={20} />}
             title="Step 1 — AI Consultation (required)"
-            subtitle="Every consultation with a human doctor starts with our AI Chatbot. The AI will recommend the right specialist."
+            subtitle="Setiap konsultasi dengan dokter dimulai dari Chatbot AI kami. AI akan menyarankan dokter spesialis yang sesuai."
           />
-          <Field label="Describe your symptoms">
+          <Field label="Ceritakan gejala Anda">
             <textarea
               className={`${inputClass} min-h-[90px]`}
               value={complaint}
               onChange={(e) => setComplaint(e.target.value)}
-              placeholder="e.g. Stomach pain & nausea for 3 days, especially after eating…"
+              placeholder="mis. Nyeri ulu hati & mual sejak 3 hari, terutama sesudah makan…"
             />
           </Field>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
@@ -226,7 +226,7 @@ export function Consult() {
           <SectionTitle
             icon={<IconStethoscope size={20} />}
             title="Real-time Consultation"
-            subtitle="Doctors and patients who open the same room will be connected instantly"
+            subtitle="Dokter dan pasien yang membuka ruang yang sama akan tersambung seketika"
           />
           <ConsultChat room={chatRoom} name={account?.name ?? 'Patient'} />
         </Card>

@@ -60,13 +60,13 @@ function PatientView({ email }: { email: string }) {
       </Card>
 
       <Card className="!p-5">
-        <Field label="Your current diagnosis (if any)">
+        <Field label="Diagnosis Anda saat ini (bila ada)">
           <textarea className={`${inputClass} min-h-16`} placeholder="e.g. Diagnosed with type 2 diabetes 6 months ago" value={currentDiagnosis} onChange={(e) => setCurrentDiagnosis(e.target.value)} />
         </Field>
-        <Field label="Your current treatment/medication (if any)">
+        <Field label="Pengobatan/obat Anda saat ini (bila ada)">
           <textarea className={`${inputClass} mt-3 min-h-16`} placeholder="e.g. Metformin 500mg twice daily" value={currentTreatment} onChange={(e) => setCurrentTreatment(e.target.value)} />
         </Field>
-        <Field label="Symptoms you're experiencing">
+        <Field label="Gejala yang Anda rasakan">
           <textarea className={`${inputClass} mt-3 min-h-16`} placeholder="e.g. Persistent fatigue and tingling in both feet for the last month" value={symptoms} onChange={(e) => setSymptoms(e.target.value)} />
         </Field>
         <Field label="Relevant history (other conditions, family history, allergies)">
@@ -136,7 +136,7 @@ function DoctorView({ name, email }: { name: string; email: string }) {
     <>
       <Card className="!p-5">
         <SectionTitle icon={<IconStethoscope size={20} />} title="Second Opinion — Review Queue" subtitle="AI drafts privately; your edited answer is what the patient receives" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Every request below includes an AI-drafted analysis as a starting point. Edit it freely — the patient only ever sees what you submit, never the raw draft.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tiap permintaan di bawah disertai analisis draf dari AI sebagai titik mulai. Suntinglah sebebasnya — pasien hanya melihat apa yang Anda kirim, tidak pernah drafnya.</Prosa>
       </Card>
 
       {loading && <Card className="!p-5 text-center text-sm text-neutral-500">Loading…</Card>}

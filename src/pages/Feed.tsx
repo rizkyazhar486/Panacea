@@ -1446,7 +1446,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🤝 Health Buddy</div>
         <div className="flex items-center gap-2">
-          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Your accountability partner's name"
+          <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Nama teman penjaga komitmen Anda"
             className={inputClass + ' flex-1 text-xs'} />
           <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Save</button>
         </div>
@@ -1526,7 +1526,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
             </button>
           ))}
         </div>
-        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Short note (optional), then pick a mood above"
+        <input value={moodNote} onChange={(e) => setMoodNote(e.target.value)} placeholder="Catatan singkat (boleh dikosongkan), lalu pilih suasana hati di atas"
           className={inputClass + ' text-xs'} />
         {recentMoods.length > 0 && (
           <div className="space-y-1.5 border-t border-neutral-100 pt-2">
@@ -1820,7 +1820,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <h1>🩺 Health Report — Panaceamed.id</h1>
       <div class="sub">Generated: ${esc(new Date().toLocaleString('en-US'))}</div>
       <table>${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>
-      <div class="foot">This data is self-reported and does not replace a diagnosis from a healthcare professional.</div>
+      <div class="foot">Data ini dilaporkan sendiri dan tidak menggantikan diagnosis dari tenaga kesehatan.</div>
       </body></html>`)
     win.document.close()
     setTimeout(() => win.print(), 400)
@@ -2020,7 +2020,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
               className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
           </div>
-          <Prosa kelas="text-[10px] text-neutral-500">Run as far as possible in 12 minutes (use GPS Tracker to measure distance), then enter the distance. The Cooper formula is the most accurate.</Prosa>
+          <Prosa kelas="text-[10px] text-neutral-500">Berlarilah sejauh mungkin dalam 12 menit (pakai Pelacak GPS untuk mengukur jaraknya), lalu masukkan jaraknya. Rumus Cooper yang paling tepat di antara pilihan ini.</Prosa>
         </div>
 
         {lastVo2 && (

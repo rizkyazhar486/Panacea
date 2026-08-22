@@ -27,7 +27,7 @@ export function Learn() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <SectionTitle icon={<IconChartUp />} title="Learn"
-        subtitle="Health evidence, with its uncertainty attached" />
+        subtitle="Bukti kesehatan, beserta ketidakpastiannya" />
 
       {/* Semula tiga kalimat pengantar plus tiga penjelasan tingkat bukti —
           sembilan baris sebelum topik pertama terlihat. Sekarang satu baris,
@@ -85,9 +85,9 @@ export function Learn() {
       <Ringkas ikon="ℹ️" judul="Education, not medical advice"
         anak={
           <div className="space-y-1.5">
-            <Poin ikon="🚫">No doses and no protocols, on purpose.</Poin>
-            <Poin ikon="👤">Nothing here is tailored to you.</Poin>
-            <Poin ikon="🩺">Treatment decisions belong with a clinician who can examine you.</Poin>
+            <Poin ikon="🚫">Sengaja tidak ada dosis dan tidak ada protokol.</Poin>
+            <Poin ikon="👤">Tidak ada satu pun di sini yang disesuaikan untuk Anda.</Poin>
+            <Poin ikon="🩺">Keputusan pengobatan adalah milik tenaga medis yang dapat memeriksa Anda langsung.</Poin>
           </div>
         } />
     </div>

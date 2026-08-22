@@ -196,7 +196,7 @@ function PeriodTracker() {
               )}
             </>
           )}
-          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Naegele's Rule: EDD = LMP + 280 days. The fetal size comparison is educational/illustrative — actual growth is monitored via ultrasound & routine ANC checkups, not calendar estimates alone.</Prosa>
+          <Prosa kelas="mt-2 text-[10px] text-neutral-500">Rumus Naegele: HPL = HPHT + 280 hari. Pembandingan ukuran janin bersifat edukatif/gambaran — pertumbuhan sesungguhnya dipantau lewat USG & pemeriksaan ANC rutin, bukan dari hitungan kalender saja.</Prosa>
         </div>
       )}
 
@@ -213,7 +213,7 @@ function PeriodTracker() {
           </div>
         ))}
       </div>
-      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Cycle data is stored on this device. This is an education & planning tool — not a sole reliable contraceptive method (see "Calendar Method" above) nor a replacement for medical evaluation of irregular cycles, severe pain, or suspected PCOS/endometriosis.</Prosa>
+      <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Data siklus disimpan di perangkat ini. Ini alat edukasi & perencanaan — bukan metode kontrasepsi tunggal yang dapat diandalkan (lihat "Metode Kalender" di atas), dan bukan pengganti penilaian medis pada siklus tidak teratur, nyeri hebat, atau dugaan PCOS/endometriosis.</Prosa>
     </Card>
   )
 }
@@ -280,7 +280,7 @@ export function SexualHealth() {
         <SectionTitle
           icon={<IconHospital size={20} />}
           title="Nearby Family Planning / OB-GYN Facilities (GPS)"
-          subtitle="Clinics and hospitals offering family planning, ANC, and obstetric services"
+          subtitle="Klinik dan rumah sakit yang melayani keluarga berencana, ANC, dan pelayanan kebidanan"
           right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Searching…' : 'Use My Location'}</Button>}
         />
         <div className={`mt-2 rounded-xl px-3 py-2 text-xs ${geoState === 'granted' ? 'bg-brand-50 text-brand-dark' : geoState === 'denied' ? 'bg-red-50 text-accent' : 'bg-neutral-50 text-neutral-500'}`}>
@@ -322,7 +322,7 @@ export function SexualHealth() {
             </div>
           ))}
         </div>
-        <Prosa kelas="mt-3 text-[11px] text-neutral-500">WHO/Indonesian Ministry of Health guidance recommends at least 6 ANC contacts during pregnancy. Seek care immediately if there is bleeding, severe headache, blurred vision, or reduced fetal movement.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Panduan WHO/Kementerian Kesehatan RI menganjurkan sedikitnya 6 kali kontak ANC selama kehamilan. Segera cari pertolongan bila ada perdarahan, nyeri kepala hebat, pandangan kabur, atau gerak janin berkurang.</Prosa>
       </Card>
     </div>
   )

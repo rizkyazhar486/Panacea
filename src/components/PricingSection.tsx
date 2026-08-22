@@ -96,10 +96,10 @@ const TIERS: Tier[] = [
     note: '/month',
     highlight: true,
     features: [
-      <>Everything in the Free plan</>,
+      <>Semua isi paket Gratis</>,
       <>AI Longevity Calculator — diet, exercise, sleep &amp; sun exposure</>,
       <>2× In-depth AI Consultations per month (worth Rp98,000)</>,
-      <>Full access to Clinical Calculators (beyond the free quota)</>,
+      <>Akses penuh Kalkulator Klinis (melampaui jatah gratis)</>,
     ],
   },
   {
@@ -108,7 +108,7 @@ const TIERS: Tier[] = [
     price: 'Rp199,000',
     note: '/month',
     features: [
-      <>Everything in the Plus plan</>,
+      <>Semua isi paket Plus</>,
       <>Chronic Monitoring — biomarker trends &amp; ongoing recommendations</>,
       <>Unlimited in-depth AI Consultations</>,
       <>Priority support</>,
@@ -187,7 +187,7 @@ export function PricingSection({ onMasuk, promo }: { onMasuk: () => void; promo?
                 34 internationally standard clinical scores &amp; decision-support tools (APGAR, GCS, CURB-65, NIHSS, Parkland, Blood Gas, and more) — for those who'd rather not subscribe monthly.
               </p>
               <div className="mt-4">
-                <PriceLine label="Pay from your PanaceaToken balance" price="500 PNC" />
+                <PriceLine label="Bayar dari saldo PanaceaToken Anda" price="500 PNC" />
                 <PriceLine label="Equivalent bank transfer" price="Rp500,000" note="one-time payment, lifetime access" />
               </div>
             </TiltCard>

@@ -125,7 +125,7 @@ export function HeartRateLog() {
   if (!backendEnabled) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconHeart />} title="Heart Rate Log" />
+        <SectionTitle icon={<IconHeart />} title="Log Detak Jantung" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Log ini diisi oleh server melalui sinkronisasi otomatis, dan saat ini aplikasi berjalan
@@ -141,12 +141,12 @@ export function HeartRateLog() {
     <div className="space-y-4">
       <SectionTitle
         icon={<IconHeart />}
-        title="Heart Rate Log"
-        subtitle="Every sample your watch sends, not just the latest value"
+        title="Log Detak Jantung"
+        subtitle="Tiap sampel yang dikirim jam tangan Anda, bukan hanya nilai terakhirnya"
       />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="How close this is to real time" />
+        <SectionTitle icon={<IconTimer />} title="Seberapa dekat ini dengan waktu sesungguhnya" />
         <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
           Jujur di depan supaya harapannya tepat: <strong className="text-ink">detak jantung per detik
           tidak tersedia</strong>, dan itu bukan batasan Panaceamed melainkan batasan datanya sendiri.
@@ -173,8 +173,8 @@ export function HeartRateLog() {
       <Card>
         <SectionTitle
           icon={<IconActivity />}
-          title="Three settings that decide data density"
-          subtitle="This is what actually changes the result — not how often you open this page"
+          title="Tiga pengaturan yang menentukan kerapatan data"
+          subtitle="Inilah yang benar-benar mengubah hasilnya — bukan seberapa sering Anda membuka halaman ini"
         />
         <div className="mt-2 space-y-2">
           {SETELAN.map((x) => (

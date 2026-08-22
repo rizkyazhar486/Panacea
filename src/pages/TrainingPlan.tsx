@@ -355,7 +355,7 @@ function RunnerCoach() {
         </div>
         {flags.length > 0 && (
           <div className="mt-2 rounded-xl bg-white p-3 text-[11px] leading-relaxed text-rose-700">
-            <b>Stop for now — see a doctor before high-intensity training or the Cooper Test.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
+            <b>Hentikan dulu — periksakan diri ke dokter sebelum latihan intensitas tinggi atau Tes Cooper.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
             <div className="mt-2"><a href="#/consult" className="font-bold underline">Consult a doctor</a> · <a href="#/hospitals" className="font-bold underline">Nearest facility</a></div>
           </div>
         )}
@@ -375,9 +375,9 @@ function RunnerCoach() {
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Field label="Distance (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="e.g. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
         <Field label="Time (minutes)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
-        <Field label="How hard was it?">
+        <Field label="Seberapa berat rasanya?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
-            <option value="easy">Easy (could chat)</option>
+            <option value="easy">Ringan (masih bisa mengobrol)</option>
             <option value="moderate">Moderate (fairly hard)</option>
             <option value="hard">All-out (maximal)</option>
           </select>
@@ -697,7 +697,7 @@ export function TrainingPlan() {
 
       {/* Longevity panel — user's own numbers */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Your Longevity Panel" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Panel Umur Panjang Anda" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label={<>VO₂max (from watch/test)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="e.g. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
           <Field label="Cooper 12-min ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="e.g. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>

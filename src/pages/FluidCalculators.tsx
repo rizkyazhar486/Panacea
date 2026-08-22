@@ -29,7 +29,7 @@ function MaintenanceFluid() {
   const summary = `Maintenance fluid (Holliday-Segar), BB ${weightKg}kg: ${dailyMl.toFixed(0)} mL/day (${hourlyMl.toFixed(1)} mL/hr). Na ~${naMeq.toFixed(0)} mEq/day, K ~${kMeq.toFixed(0)} mEq/day.`
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Holliday-Segar "4-2-1" rule — daily maintenance fluid need by weight, plus an approximate daily electrolyte allowance (2-3 mEq/kg Na, 1-2 mEq/kg K, roughly capped per the standard bands below).</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Rumus Holliday-Segar "4-2-1" — kebutuhan cairan rumatan harian menurut berat badan, beserta perkiraan jatah elektrolit harian (2-3 mEq/kg Na, 1-2 mEq/kg K, dibatasi kasar menurut kelompok baku di bawah).</Prosa>
       <Field label="Weight (kg)">
         <input className={inputClass} type="number" min={1} step={0.1} value={weightKg || ''} onChange={(e) => setWeightKg(Number(e.target.value) || 0)} />
       </Field>
@@ -78,7 +78,7 @@ function FluidResuscitation() {
 
   return (
     <Card className="!p-5">
-      <Prosa kelas="text-[13px] text-neutral-500">Weight-based crystalloid resuscitation volumes for common shock/burn scenarios. Always reassess perfusion (MAP, lactate, urine output, capillary refill) between boluses — these are starting-point estimates, not fixed prescriptions.</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Volume resusitasi kristaloid menurut berat badan untuk keadaan syok/luka bakar yang lazim. Selalu nilai ulang perfusi (MAP, laktat, keluaran urin, waktu pengisian kapiler) di antara pemberian bolus — ini perkiraan titik mulai, bukan resep yang dipatok.</Prosa>
       <div className="mt-3 flex flex-wrap gap-2">
         <button onClick={() => setScenario('adult-sepsis')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${scenario === 'adult-sepsis' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Adult Sepsis/Shock</button>
         <button onClick={() => setScenario('peds-shock')} className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${scenario === 'peds-shock' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Pediatric Shock (PALS)</button>
@@ -150,7 +150,7 @@ function Electrolytes() {
 
       {eTab === 'na-correction-rate' && (
         <div className="mt-4">
-          <Prosa kelas="text-[13px] text-neutral-500">Simplified Adrogue-Madias estimate — how much serum Na rises per liter of 0.9% saline (Na 154 mEq/L) infused. Correct chronic hyponatremia no faster than 8-10 mEq/L per 24h to avoid osmotic demyelination.</Prosa>
+          <Prosa kelas="text-[13px] text-neutral-500">Perkiraan Adrogue-Madias yang disederhanakan — berapa kenaikan Na serum untuk tiap liter salin 0,9% (Na 154 mEq/L) yang diberikan. Koreksi hiponatremia menahun tidak boleh lebih cepat dari 8-10 mEq/L per 24 jam untuk menghindari mielinolisis osmotik.</Prosa>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Field label="Current Na (mEq/L)"><input className={inputClass} type="number" value={currentNa || ''} onChange={(e) => setCurrentNa(Number(e.target.value) || 0)} /></Field>
             <Field label="Target Na (mEq/L)"><input className={inputClass} type="number" value={targetNa || ''} onChange={(e) => setTargetNa(Number(e.target.value) || 0)} /></Field>
@@ -173,7 +173,7 @@ function Electrolytes() {
 
       {eTab === 'k-deficit' && (
         <div className="mt-4">
-          <Prosa kelas="text-[13px] text-neutral-500">Illustrative total-body potassium deficit range for hypokalemia below 4.0 mEq/L (deficits are notoriously nonlinear with serum K — this is a rough starting estimate for repletion planning, not a precise measurement).</Prosa>
+          <Prosa kelas="text-[13px] text-neutral-500">Rentang perkiraan defisit kalium total tubuh pada hipokalemia di bawah 4,0 mEq/L sebagai gambaran (hubungan defisit dengan K serum terkenal tidak linear — ini perkiraan kasar sebagai titik mulai perencanaan koreksi, bukan pengukuran yang tepat).</Prosa>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Field label="Current K (mEq/L)"><input className={inputClass} type="number" step={0.1} value={currentK || ''} onChange={(e) => setCurrentK(Number(e.target.value) || 0)} /></Field>
             <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKgK || ''} onChange={(e) => setWeightKgK(Number(e.target.value) || 0)} /></Field>
