@@ -143,16 +143,28 @@ function Garis({ deret, kelas }: { deret: number[]; kelas: string }) {
   )
 }
 
-function KartuKpi({ k }: { k: Kpi }) {
+/*
+ * CAHAYA HANYA UNTUK ANGKA PERTAMA.
+ *
+ * Percobaan pertama menyalakan seluruh kartu KPI sekaligus, dan hasilnya
+ * terlihat di tangkapan layar: empat angka bersinar sama terang, sehingga tidak
+ * ada satu pun yang menonjol — persis kebalikan dari maksudnya. Cahaya bekerja
+ * sebagai PEMBEDA, dan pembeda yang diberikan kepada semua orang berhenti
+ * membedakan.
+ */
+function KartuKpi({ k, utama }: { k: Kpi; utama?: boolean }) {
   return (
     <div className={`flex min-w-0 flex-col ${DALAM} rounded-2xl bg-white/70 p-3 dark:bg-white/5`}>
       <span className="t-mikro truncate font-bold uppercase tracking-wide text-neutral-500">{k.label}</span>
-      <span className="flex items-baseline gap-1">
+      {/* flex-wrap, bukan satu baris kaku: pada kartu sempit "12" dan satuannya
+          "tercatat" saling menimpa — terlihat di tangkapan layar, tidak pernah
+          terlihat dari kode. */}
+      <span className="flex flex-wrap items-baseline gap-x-1">
         {/* Ukurannya mengikuti panjang nilainya. Lihat catatan "Angka panjang"
             di index.css: pada ukuran yang sama, "118/76" tidak muat di petak
             yang memuat "72" dengan lapang. */}
-        <span className={`${k.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} min-w-0 font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
-        {k.satuan && <span className="t-mikro font-bold text-neutral-400">{k.satuan}</span>}
+        <span className={`${k.nilai.length >= 5 ? 't-angka-panjang' : 't-angka'} ${utama ? 'nyala' : ''} min-w-0 font-black leading-none tabular-nums ${k.nada}`}>{k.nilai}</span>
+        {k.satuan && <span className="t-mikro min-w-0 truncate font-bold text-neutral-400">{k.satuan}</span>}
       </span>
       {k.deret && <Garis deret={k.deret} kelas={k.nada} />}
     </div>
@@ -355,7 +367,7 @@ export default function Beranda() {
 
         {kpi.length > 0 && (
           <div className="angka-fluid mt-3">
-            {kpi.map((k) => <KartuKpi key={k.label} k={k} />)}
+            {kpi.map((k, i) => <KartuKpi key={k.label} k={k} utama={i === 0} />)}
           </div>
         )}
 

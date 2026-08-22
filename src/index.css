@@ -1125,3 +1125,83 @@ html { -webkit-overflow-scrolling: touch; }
 .dark .bg-red-50\/60 { background-color: rgba(239, 68, 68, 0.12) !important; }
 .dark .bg-rose-50\/60 { background-color: rgba(244, 63, 94, 0.12) !important; }
 .dark .bg-violet-50\/60 { background-color: rgba(139, 92, 246, 0.12) !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAPISAN NEON — hanya untuk mode gelap.
+   
+   MENGAPA HANYA GELAP. Cahaya neon adalah cahaya yang dipancarkan; ia hanya
+   terbaca sebagai cahaya bila ada gelap di sekelilingnya. Sinar hijau yang sama
+   di atas latar putih tidak menyala — ia hanya menurunkan ketajaman huruf dan
+   membuat teks lebih sulit dibaca. Karena itu seluruh aturan di bawah ini
+   berada di dalam .dark, dan mode terang tidak berubah sama sekali.
+   
+   MENGAPA HIJAU DAN MERAH SAJA. Dua warna sudah cukup untuk membedakan "ini
+   berjalan" dari "ini perlu perhatian". Warna ketiga menuntut pembaca menghafal
+   arti yang lebih banyak daripada yang ia butuhkan, dan pada layar sekecil ini
+   hafalan itu tidak pernah terbentuk.
+   
+   MERAH TIDAK DIPAKAI SEBAGAI HIASAN. Ia hanya untuk hal yang benar-benar
+   mendesak — darurat, dan angka yang keluar dari kebiasaan. Neon merah yang
+   dipakai untuk mempercantik membuat merah yang sesungguhnya kehilangan arti.
+   
+   CAHAYANYA ADA DI TEPI DAN DI BALIK BENDA, BUKAN DI ATAS HURUF. Bayangan teks
+   yang menyala menebalkan tepi huruf dan menurunkan keterbacaan pada ukuran
+   kecil; karena itu yang bersinar hanya ANGKA BESAR, tepi kartu, dan tombol —
+   sedangkan kalimat tetap tercetak bersih.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.dark {
+  --neon-hijau: #00ff88;
+  --neon-hijau-redup: #00c46a;
+  --neon-merah: #ff2d55;
+  /* Latar sedikit lebih gelap dan lebih dingin supaya hijau terbaca sebagai
+     cahaya, bukan sebagai cat. */
+  --neon-latar: #0a0c0b;
+}
+
+/* Angka besar yang menyala. Dipakai TERBATAS: satu sampai tiga angka utama per
+   layar. Bila semua angka menyala, tidak ada satu pun yang menonjol. */
+.dark .nyala {
+  color: var(--neon-hijau);
+  text-shadow:
+    0 0 12px rgba(0, 255, 136, 0.45),
+    0 0 34px rgba(0, 255, 136, 0.18);
+}
+.dark .nyala-merah {
+  color: var(--neon-merah);
+  text-shadow:
+    0 0 12px rgba(255, 45, 85, 0.45),
+    0 0 34px rgba(255, 45, 85, 0.18);
+}
+
+/* Tepi kartu: satu garis rambut hijau, sangat tipis. Yang membuat sebuah
+   antarmuka terasa "futuristik" bukan banyaknya cahaya, melainkan ketipisan
+   garisnya. */
+.dark .kaca {
+  border-color: rgba(0, 255, 136, 0.14);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 12px 32px -8px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(0, 255, 136, 0.07);
+}
+
+/* Tombol utama benar-benar memancar; ia satu-satunya benda di layar yang
+   berhak melakukannya, karena ia satu-satunya yang meminta ditekan. */
+.dark .bg-brand,
+.dark .bg-brand-dark {
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 136, 0.35),
+    0 6px 24px -6px rgba(0, 255, 136, 0.45);
+}
+
+/* Bilah kemajuan dan cincin mewarisi cahaya yang sama. */
+.dark .cahaya-hijau { filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.55)); }
+.dark .cahaya-merah { filter: drop-shadow(0 0 6px rgba(255, 45, 85, 0.5)); }
+
+/* Gerakan dimatikan bagi yang memintanya; cahaya tetap, hanya denyutnya
+   berhenti. Ini bukan hiasan yang boleh diabaikan: gerak berulang dapat
+   memicu keluhan pada sebagian orang. */
+@media (prefers-reduced-motion: reduce) {
+  .dark .nyala,
+  .dark .nyala-merah { animation: none !important; }
+}

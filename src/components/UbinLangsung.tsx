@@ -45,7 +45,7 @@ function Bingkai({ ke, judul, children }: { ke: string; judul: string; children:
 function Angka({ nilai, satuan, nada = 'text-ink dark:text-white' }: { nilai: string; satuan?: string; nada?: string }) {
   return (
     <span className="flex items-baseline gap-1">
-      <span className={`text-[22px] font-black leading-none tabular-nums ${nada}`}>{nilai}</span>
+      <span className={`text-[22px] font-black leading-none tabular-nums nyala ${nada}`}>{nilai}</span>
       {satuan && <span className="t-mikro font-bold text-neutral-400">{satuan}</span>}
     </span>
   )
@@ -62,7 +62,7 @@ function Cincin({ rasio, isi }: { rasio: number; isi: string }) {
         <circle cx="20" cy="20" r={r} fill="none" stroke="currentColor" strokeWidth="4" className="text-neutral-200 dark:text-white/10" />
         <circle
           cx="20" cy="20" r={r} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round"
-          className="text-brand" strokeDasharray={`${(terpakai * keliling).toFixed(1)} ${keliling}`}
+          className="text-brand cahaya-hijau" strokeDasharray={`${(terpakai * keliling).toFixed(1)} ${keliling}`}
           transform="rotate(-90 20 20)"
         />
       </svg>
