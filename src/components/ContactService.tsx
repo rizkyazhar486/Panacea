@@ -147,7 +147,7 @@ export function ContactService({ hidden, buka, onTutup }: {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="Write your complaint / question…"
+              placeholder="Tulis keluhan / pertanyaan Anda…"
               className="flex-1 rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand"
             />
             <button onClick={send} className="rounded-xl bg-brand px-3 text-sm font-semibold text-white">

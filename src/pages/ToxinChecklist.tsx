@@ -87,7 +87,7 @@ export function ToxinChecklist() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconLeaf size={20} />} title="Environment & Toxin Checklist" subtitle="Everyday exposure reduction, in one place" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">None of this is about fear — total avoidance of every trace exposure isn't realistic or necessary. These are the highest-leverage, lowest-effort swaps worth knowing about.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Semua ini bukan soal ketakutan — menghindari tiap jejak paparan sepenuhnya tidak realistis dan tidak perlu. Ini adalah penggantian yang pengaruhnya paling besar dengan usaha paling kecil, yang layak diketahui.</Prosa>
       </Card>
 
       <DailyHabits />

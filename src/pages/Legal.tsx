@@ -7,7 +7,7 @@ export function Legal() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <Card>
-        <SectionTitle icon={<IconShield size={20} />} title="Privacy & Data Protection Policy" subtitle="In accordance with Law No. 27/2022 on Personal Data Protection (UU PDP)" />
+        <SectionTitle icon={<IconShield size={20} />} title="Privacy & Data Protection Policy" subtitle="Sesuai Undang-Undang No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP)" />
         <div className="space-y-3 text-sm leading-relaxed text-neutral-600">
           <p>Panaceamed.id menghormati privasi Anda. Data kesehatan tergolong <b>specific personal data</b> and receives enhanced protection.</p>
           <ul className="ml-4 list-disc space-y-1.5">

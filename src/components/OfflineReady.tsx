@@ -42,7 +42,7 @@ export function OfflineReady() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconDownload size={20} />} title="Offline Mode" subtitle="Save the Fitness features to your phone — they keep working without internet" />
+      <SectionTitle icon={<IconDownload size={20} />} title="Offline Mode" subtitle="Simpan fitur Kebugaran ke telepon Anda — tetap bekerja tanpa internet" />
 
       {busy ? (
         <div className="mt-1">

@@ -93,7 +93,7 @@ export function MentalHealthScreen() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depression) and GAD-7 (anxiety) — validated brief screens" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Mental Health Screening" subtitle="PHQ-9 (depresi) dan GAD-7 (kecemasan) — penapis singkat yang tervalidasi" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Selama 2 pekan terakhir, seberapa sering tiap masalah ini mengganggu Anda? Ini instrumen penapisan yang paling luas dipakai di layanan primer di seluruh dunia — bukan diagnosis, melainkan cara yang tervalidasi baik untuk menakar derajat berat dan mengikuti perubahannya dari waktu ke waktu.</Prosa>
         <div className="mt-3 flex gap-2">
           <button onClick={() => setTab('phq9')} className={`flex-1 rounded-xl px-3 py-2 text-sm font-bold ${tab === 'phq9' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>PHQ-9 (Depression)</button>

@@ -465,7 +465,7 @@ export function Chatbot() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
               rows={1}
-              placeholder="Type your medical complaint or question…"
+              placeholder="Tuliskan keluhan atau pertanyaan medis Anda…"
               className="max-h-32 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-neutral-500"
             />
 

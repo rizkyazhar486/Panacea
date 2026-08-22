@@ -53,7 +53,7 @@ export function GratitudeJournal() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconSparkle size={20} />} title="Gratitude Journal" subtitle='"Three Good Things" — a proven mood-lifting daily habit' />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Each evening, write three things that went well today and — briefly — why. It sounds simple, but it's one of the most replicated ways to raise happiness and lower depressive symptoms over weeks to months.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tiap malam, tuliskan tiga hal yang berjalan baik hari ini dan — singkat saja — mengapa. Terdengar sederhana, tetapi inilah salah satu cara yang paling sering terulang hasilnya untuk menaikkan kebahagiaan dan menurunkan gejala depresi dalam hitungan pekan sampai bulan.</Prosa>
       </Card>
 
       <Card className="!p-5">

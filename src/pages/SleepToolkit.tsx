@@ -287,7 +287,7 @@ function SoundscapeGenerator() {
 
   return (
     <Card className="!p-6">
-      <Prosa kelas="text-[13px] text-neutral-500">Real generated audio (Web Audio API) — binaural tones or colored noise for winding down. A relaxation aid, not a proven treatment for any sleep disorder. Headphones recommended for binaural beats to work (each ear needs a different tone).</Prosa>
+      <Prosa kelas="text-[13px] text-neutral-500">Audio yang benar-benar dibangkitkan sendiri (Web Audio API) — nada binaural atau derau berwarna untuk menenangkan diri. Alat bantu relaksasi, bukan pengobatan yang terbukti untuk gangguan tidur apa pun. Dianjurkan memakai earphone agar nada binaural bekerja (tiap telinga perlu nada yang berbeda).</Prosa>
 
       <div className="mt-4 flex gap-2">
         <button onClick={() => setMode('binaural')} className={`flex-1 rounded-xl py-2 text-[12px] font-bold ${mode === 'binaural' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10'}`}>Binaural Beats</button>

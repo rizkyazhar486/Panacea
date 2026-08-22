@@ -328,7 +328,7 @@ export function Markets() {
 
       {news.length > 0 && (
         <Card className="!p-4">
-          <SectionTitle icon={<IconToken size={18} />} title="Berita ekonomi & bisnis" subtitle="Google News — domestic and international" />
+          <SectionTitle icon={<IconToken size={18} />} title="Berita ekonomi & bisnis" subtitle="Google News — dalam dan luar negeri" />
           <div className="mt-2 space-y-2">
             {news.slice(0, 14).map((n, i) => (
               <a key={i} href={n.link} target="_blank" rel="noopener noreferrer"

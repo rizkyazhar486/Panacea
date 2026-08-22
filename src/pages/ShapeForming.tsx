@@ -124,7 +124,7 @@ export function ShapeForming() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Pembentukan Tubuh & Umur Panjang dari Foto" subtitle="Upload a photo for personalized workout, nutrition & skin quality recommendations" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Pembentukan Tubuh & Umur Panjang dari Foto" subtitle="Unggah foto untuk anjuran latihan, gizi & mutu kulit yang disesuaikan" />
         <div className="mt-3 flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-brand/30 bg-brand-50/30 p-6 text-center">
           {preview ? (
             <img src={preview} alt="Preview" className="h-40 w-40 rounded-2xl object-cover shadow-sm" />

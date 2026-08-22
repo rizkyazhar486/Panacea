@@ -121,7 +121,7 @@ export function TrainingPhysiology() {
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Load, status, recovery, and readiness" />
+        <SectionTitle icon={<IconActivity />} title="Training Physiology" subtitle="Beban, status, pemulihan, dan kesiapan" />
         <Card>
           <Prosa kelas="text-sm text-neutral-600 leading-relaxed">Belum ada sesi latihan tersimpan. Seluruh halaman ini dihitung dari deret detak jantung tiap sesi, jadi tidak ada yang bisa ditampilkan sebelum ada sesi yang masuk.</Prosa>
           <p className="mt-2 text-sm text-neutral-500 leading-relaxed">

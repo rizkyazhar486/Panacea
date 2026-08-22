@@ -157,7 +157,7 @@ export function WellnessHub() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Live longer, feel better, age well — your whole journey in one place" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Wellness Hub" subtitle="Hidup lebih panjang, terasa lebih baik, menua dengan baik — seluruh perjalanan Anda dalam satu tempat" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Longevity, mental wellness, sleep, metabolism, and aesthetics — {total} tools, each grounded
           in evidence and yours to build a daily practice around.

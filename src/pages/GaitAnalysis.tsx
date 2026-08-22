@@ -65,7 +65,7 @@ export function GaitAnalysis() {
 
       {sorot.length > 0 && (
         <Card>
-          <SectionTitle icon={<IconHeart />} title="Yang paling layak Anda perhatikan" subtitle="Ordered by how far each sits outside its reference range" />
+          <SectionTitle icon={<IconHeart />} title="Yang paling layak Anda perhatikan" subtitle="Diurutkan menurut seberapa jauh masing-masing keluar dari rentang rujukannya" />
           <div className="space-y-2 mt-2">
             {sorot.map((r) => (
               <div key={r.key} className="rounded-lg border border-rose-500/25 bg-rose-500/[0.07] p-3">

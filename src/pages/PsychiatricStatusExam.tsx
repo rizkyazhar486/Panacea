@@ -48,7 +48,7 @@ export function PsychiatricStatusExam() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Psychiatric Status Exam" subtitle="Structured Mental Status Exam (MSE) documentation" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Tap through the standard MSE domains to build a clean, EMR-ready summary line. A documentation aid only — not a diagnostic or risk-stratification instrument; always use your clinical judgment and a validated risk-assessment tool (e.g. C-SSRS) when suicide/self-harm risk is a concern.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Ketuk tiap ranah baku pemeriksaan status mental untuk menyusun satu baris ringkasan yang rapi dan siap masuk rekam medis. Alat bantu pencatatan semata — bukan instrumen diagnosis maupun penentuan derajat risiko; selalu pakai pertimbangan klinis Anda dan alat penilaian risiko tervalidasi (mis. C-SSRS) bila ada kekhawatiran risiko bunuh diri/melukai diri.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-4">

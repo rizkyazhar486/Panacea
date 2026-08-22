@@ -219,7 +219,7 @@ function Susun({
         <h3 className="mt-1 text-[16px] font-black leading-snug text-ink">{L.judul}</h3>
         <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">{L.bantu}</p>
         <div className="mt-3">
-          <Field label="Your answer">
+          <Field label="Jawaban Anda">
             <input className={inputClass} value={nilai} placeholder={L.tempat}
               aria-label={L.judul}
               onChange={(e) => setDraf({ ...draf, [L.kunci]: e.target.value } as Komitmen)} />

@@ -21,7 +21,7 @@ export function VitaPulse() {
         <VideoGallery
           icon={<span className="text-lg">🩺</span>}
           title="Educational Videos"
-          subtitle="How to measure vital signs correctly"
+          subtitle="Cara mengukur tanda vital dengan benar"
           videos={[
             { label: 'Measuring Blood Pressure', cue: 'Sit calmly for 5 min · arm resting on table at heart height · feet flat on floor · don\'t talk', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073025_ac2d37c3-a20e-45c4-ae71-ce92a0be4bc8.mp4' },
           ]}

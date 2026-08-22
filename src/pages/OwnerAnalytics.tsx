@@ -79,7 +79,7 @@ function SeoTab() {
   return (
     <>
       <Card className="!p-4">
-        <SectionTitle icon={<IconShield size={18} />} title="Audit SEO" subtitle="Enter the conditions you want assessed" />
+        <SectionTitle icon={<IconShield size={18} />} title="Audit SEO" subtitle="Masukkan keadaan yang ingin Anda nilai" />
         <div className="mt-3 grid gap-2">
           <Field label="Title tag"><input className={inputClass} value={i.title} onChange={(e) => set({ title: e.target.value })} /></Field>
           <Field label="Meta description"><input className={inputClass} value={i.metaDescription} onChange={(e) => set({ metaDescription: e.target.value })} /></Field>

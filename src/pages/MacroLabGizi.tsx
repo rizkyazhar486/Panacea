@@ -112,7 +112,7 @@ export function MacroLabGizi() {
       <SectionTitle
         icon={<IconLeaf />}
         title="Macro Lab"
-        subtitle="Macronutrient targets and meal composition, from your own body mass"
+        subtitle="Sasaran makronutrien dan susunan makan, dari massa tubuh Anda sendiri"
       />
 
       <Card>

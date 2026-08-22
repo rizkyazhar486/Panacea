@@ -66,7 +66,7 @@ export function Hospitals() {
         <SectionTitle
           icon={<IconHospital size={20} />}
           title="Nearest Health Facilities"
-          subtitle="Nearby hospitals, clinics & pharmacies — important for emergencies"
+          subtitle="Rumah sakit, klinik & apotek terdekat — penting saat gawat darurat"
           right={<Button variant="outline" onClick={useMyLocation} disabled={geoState === 'asking' || loading}>📍 {geoState === 'asking' || loading ? 'Searching…' : 'Use My Location (GPS)'}</Button>}
         />
         <div className={`rounded-xl px-3 py-2 text-xs ${geoState === 'granted' ? 'bg-brand-50 text-brand-dark' : geoState === 'denied' ? 'bg-red-50 text-accent' : 'bg-neutral-50 text-neutral-500'}`}>

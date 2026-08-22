@@ -45,6 +45,21 @@ function kalimatTerlihat(baris) {
   return null
 }
 
+// SISA YANG MEMANG BENAR BERBAHASA INGGRIS, dan alasannya masing-masing.
+// Semuanya sudah diperiksa satu per satu; menerjemahkannya justru menjadikan
+// halaman itu salah.
+//
+//  - "Personality and Individual Differences" — nama jurnal pada sitasi
+//    Adan & Almirall (1991). Nama terbitan tidak dialihbahasakan.
+//  - "Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" —
+//    nama resmi pedoman ARIA; menerjemahkannya membuat pedomannya tidak dapat
+//    dicari.
+//  - Judul makalah Levine dkk. (2018) di dalam kalimat Indonesia — judul
+//    makalah dikutip apa adanya.
+//  - "Skor HAS-BLED" — tertangkap hanya karena kata "has" ada di dalam
+//    akronimnya. Ini kekeliruan penapis, bukan teks Inggris.
+//
+// Karena itu ambang jujur skrip ini adalah 4, bukan 0.
 const hasil = []
 for (const dir of ['src/pages', 'src/components']) {
   for (const f of readdirSync(dir).filter((x) => x.endsWith('.tsx'))) {

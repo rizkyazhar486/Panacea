@@ -123,8 +123,8 @@ export function Chronotype() {
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
         Adan, A., &amp; Almirall, H. (1991). Horne &amp; Östberg morningness-eveningness questionnaire: A
-        reduced scale. <i>Personality and Individual Differences</i>, 12(3), 241-253. Educational
-        self-assessment, not a clinical sleep disorder diagnosis.
+        reduced scale. <i>Personality and Individual Differences</i>, 12(3), 241-253. Penilaian
+        diri untuk belajar, bukan diagnosis gangguan tidur klinis.
       </div>
     </div>
   )

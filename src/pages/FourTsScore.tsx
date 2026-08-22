@@ -73,7 +73,7 @@ export function FourTsScore() {
         <Picker label="Thrombocytopenia" options={THROMBOCYTOPENIA} value={thrombo} onChange={setThrombo} />
         <Picker label="Timing of platelet fall" options={TIMING} value={timing} onChange={setTiming} />
         <Picker label="Thrombosis or other sequelae" options={THROMBOSIS} value={thrombosis} onChange={setThrombosis} />
-        <Picker label="oTher causes for thrombocytopenia" options={OTHER_CAUSES} value={otherCause} onChange={setOtherCause} />
+        <Picker label="sebab lain trombositopenia (oTher)" options={OTHER_CAUSES} value={otherCause} onChange={setOtherCause} />
       </Card>
 
       <Card className="!p-5">

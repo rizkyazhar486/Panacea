@@ -63,7 +63,7 @@ export function Pharmacy() {
   return (
     <div className="space-y-5">
       <Card>
-        <SectionTitle icon={<IconPill size={20} />} title="Panaceamed Pharmacy" subtitle="Buy over-the-counter (OTC) medicine or fill a prescription from a doctor consultation"
+        <SectionTitle icon={<IconPill size={20} />} title="Panaceamed Pharmacy" subtitle="Beli obat bebas atau tebus resep dari hasil konsultasi dokter"
           right={
             <div className="flex gap-2">
               {canManage && <Button variant="outline" onClick={() => setManage((m) => !m)}><IconPlus size={16} /> Manage Medicines</Button>}

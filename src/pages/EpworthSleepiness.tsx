@@ -40,7 +40,7 @@ export function EpworthSleepiness() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconMoon size={20} />} title="Epworth Sleepiness Scale" subtitle="Validated measure of excessive daytime sleepiness (Johns, 1991)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">How likely are you to doze off or fall asleep in each situation below — not just feeling tired, but actually dozing? Rate based on your usual way of life in recent times, even if you haven't done some of these things recently.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Seberapa besar kemungkinan Anda terkantuk atau tertidur pada tiap keadaan di bawah — bukan sekadar merasa lelah, melainkan benar-benar terlelap? Nilailah menurut kebiasaan hidup Anda belakangan ini, meskipun sebagian keadaan itu belum Anda alami akhir-akhir ini.</Prosa>
       </Card>
 
       {SITUATIONS.map((text, qi) => (

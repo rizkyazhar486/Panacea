@@ -135,7 +135,7 @@ export function SunExposure() {
               </div>
             </div>
 
-            <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Derived from the WMO UV Index definition and standard erythema-dose reference values for your skin type — not a personalized prescription. Actual time varies with cloud cover, altitude, reflective surfaces (snow/sand/water), sunscreen, medications that increase photosensitivity, and how much skin is exposed. People with a history of skin cancer, photosensitive conditions, or on photosensitizing medication should follow their dermatologist's guidance instead of this estimate.</Prosa>
+            <Prosa kelas="mt-3 text-[11px] leading-relaxed text-neutral-500">Diturunkan dari definisi Indeks UV WMO dan nilai rujukan dosis eritema baku untuk jenis kulit Anda — bukan resep perorangan. Waktu sebenarnya berbeda menurut tutupan awan, ketinggian, permukaan pemantul (salju/pasir/air), tabir surya, obat yang menaikkan kepekaan terhadap cahaya, dan seberapa luas kulit yang terpapar. Orang dengan riwayat kanker kulit, penyakit yang peka cahaya, atau sedang memakai obat fotosensitif sebaiknya mengikuti arahan dokter kulitnya, bukan perkiraan ini.</Prosa>
           </>
         )}
       </Card>

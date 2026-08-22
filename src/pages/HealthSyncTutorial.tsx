@@ -268,7 +268,7 @@ export function HealthSyncTutorial() {
       {/* Live link preview, if logged in with backend enabled */}
       {backendEnabled && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconKey size={20} />} title="Tautan Sinkron Pribadi Anda" subtitle="For step 2 — copy it into the app" />
+          <SectionTitle icon={<IconKey size={20} />} title="Tautan Sinkron Pribadi Anda" subtitle="Untuk langkah 2 — salin ke dalam aplikasinya" />
           <div className="mt-2 rounded-xl bg-neutral-50 p-3 font-mono text-[11px] text-neutral-600 break-all">
             {url ?? 'Loading…'}
           </div>

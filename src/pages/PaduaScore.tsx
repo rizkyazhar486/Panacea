@@ -38,7 +38,7 @@ export function PaduaScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Padua Prediction Score" subtitle="VTE risk in hospitalized medical patients (Barbar et al. 2010)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Identifies which hospitalized medical (non-surgical) patients warrant pharmacologic VTE prophylaxis. Score ≥4 = high risk. Always pair with a bleeding-risk assessment before prescribing anticoagulant prophylaxis.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Menentukan pasien penyakit dalam (nonbedah) yang dirawat mana yang perlu profilaksis tromboemboli vena dengan obat. Skor ≥4 = risiko tinggi. Selalu sandingkan dengan penilaian risiko perdarahan sebelum meresepkan profilaksis antikoagulan.</Prosa>
       </Card>
 
       <Card className="!p-5">

@@ -47,7 +47,7 @@ export function CrossFit() {
       <SectionTitle
         icon={<IconActivity />}
         title="CrossFit & AMRAP"
-        subtitle="Workout formats, named benchmarks, and how to scale them safely"
+        subtitle="Bentuk latihan, tolok ukur bernama, dan cara menurunkan takarannya dengan aman"
       />
 
       {/* Peringatan didahulukan, bukan disembunyikan di bawah. */}

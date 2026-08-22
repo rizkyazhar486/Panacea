@@ -81,7 +81,7 @@ export function InstallApp() {
           {showIos && state === 'ios' && (
             <ol className="mt-3 list-decimal space-y-1 rounded-xl bg-white p-3 pl-7 text-[12px] text-neutral-600">
               <li>Tap the <b>Share</b> button (a box with an upward arrow) in Safari.</li>
-              <li>Scroll down and select <b>“Add to Home Screen”</b>.</li>
+              <li>Gulir ke bawah lalu pilih <b>“Add to Home Screen”</b>.</li>
               <li>Tap <b>Add</b> — the Panaceamed icon appears on your home screen.</li>
             </ol>
           )}

@@ -69,7 +69,7 @@ export function Pricing() {
   const navigate = useNavigate()
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
-      <SectionTitle icon={<IconWallet size={20} />} title="Services & Pricing" subtitle="Three simple plans — choose what fits your needs, upgrade or downgrade anytime" />
+      <SectionTitle icon={<IconWallet size={20} />} title="Services & Pricing" subtitle="Tiga paket sederhana — pilih yang sesuai kebutuhan, naik atau turun paket kapan saja" />
 
       <div className="grid gap-4">
         {TIERS.map((t) => (

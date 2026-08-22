@@ -234,7 +234,7 @@ export function EMR() {
 
       {/* S — Subjective */}
       <Card>
-        <SectionTitle title="S · Subjective — History" subtitle="Drafted by AI, editable by the doctor" />
+        <SectionTitle title="S · Subjective — History" subtitle="Draf disusun AI, dapat disunting dokter" />
         <div className="grid gap-4 md:grid-cols-2">
           {ANAMNESIS_FIELDS.map((f) => (
             <div key={f.key} className={f.key === 'rps' ? 'md:col-span-2' : ''}>

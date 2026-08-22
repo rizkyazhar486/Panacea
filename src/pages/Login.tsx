@@ -454,7 +454,7 @@ function LegalModal({ onClose }: { onClose: () => void }) {
         <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600">
           <p><b>Informed Consent.</b> AI interactions are educational & supportive in nature — not a final diagnosis. Diagnosis & treatment still require verification by a licensed doctor.</p>
           <p><b>Privacy (Indonesia's PDP Law No. 27/2022).</b> Your health data is specific personal data, stored encrypted in Indonesia, with an access audit log. You have the right to access, correct, and delete your data at any time.</p>
-          <p><b>Terms.</b> AI-EMR is only for clinicians with a verified STR/SIP. Pharmacy services are subject to licensed pharmacists & BPOM regulation. In an emergency, use the SOS Emergency feature and contact the nearest healthcare facility.</p>
+          <p><b>Terms.</b> AI-EMR hanya untuk tenaga medis dengan STR/SIP terverifikasi. Layanan apotek tunduk pada apoteker berizin & ketentuan BPOM. Dalam keadaan gawat darurat, pakailah fitur SOS Darurat dan hubungi fasilitas kesehatan terdekat.</p>
           <p className="text-xs text-neutral-500">The full version is available in the "Privacy & Legal" menu after signing in.</p>
         </div>
         <button onClick={onClose}

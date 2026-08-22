@@ -622,7 +622,7 @@ function BroadcastPanel() {
   if (!backendEnabled) return null
   return (
     <Card>
-      <SectionTitle icon={<IconBell size={20} />} title="Send Announcement (Push)" subtitle="Notification to all users who are subscribed & allow broadcasts" />
+      <SectionTitle icon={<IconBell size={20} />} title="Send Announcement (Push)" subtitle="Pemberitahuan kepada semua pengguna yang berlangganan & mengizinkan siaran" />
       <div className="space-y-2">
         <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g. Service Update)" maxLength={60} />
         <textarea className={`${inputClass} min-h-[72px]`} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Announcement content…" maxLength={180} />

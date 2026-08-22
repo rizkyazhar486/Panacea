@@ -80,7 +80,7 @@ export function GraceScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="GRACE Score" subtitle="ACS in-hospital mortality (Granger et al. 2003)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Covers the full ACS spectrum (STEMI, NSTEMI, unstable angina) and is preferred in ESC guidance for timing the invasive strategy — complements the UA/NSTEMI-specific TIMI score.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Mencakup seluruh rentang sindrom koroner akut (STEMI, NSTEMI, angina tidak stabil) dan lebih dianjurkan dalam panduan ESC untuk menentukan waktu strategi invasif — melengkapi skor TIMI yang khusus untuk UA/NSTEMI.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Age (years)">
             <input className={inputClass} type="number" min={18} value={age || ''} onChange={(e) => setAge(Number(e.target.value) || 0)} />

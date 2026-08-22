@@ -316,7 +316,7 @@ function ProfileEditor({ initial, defaultName, onSave }: {
 
   return (
     <Card className="!p-4">
-      <SectionTitle icon={<IconUsers size={18} />} title="Your profile" subtitle="What other people see" />
+      <SectionTitle icon={<IconUsers size={18} />} title="Profil Anda" subtitle="Yang dilihat orang lain" />
       <div className="mt-3 space-y-2">
         <div className="grid grid-cols-2 gap-2">
           <Field label="Nama tampilan"><input className={inputClass} value={p.displayName} onChange={(e) => setP({ ...p, displayName: e.target.value })} /></Field>

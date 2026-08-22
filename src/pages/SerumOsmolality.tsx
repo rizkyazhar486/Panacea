@@ -92,7 +92,7 @@ export function SerumOsmolality() {
           </div>
         </div>
         {gap != null && gap > 10 && (
-          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Elevated osmolal gap — in the right clinical context (altered mental status, unexplained metabolic acidosis), consider toxic alcohol ingestion and send specific levels; treatment (fomepizole) should not wait for confirmation if suspicion is high.</Prosa>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Selisih osmolal melebar — dalam keadaan klinis yang sesuai (penurunan kesadaran, asidosis metabolik tanpa sebab jelas), pikirkan keracunan alkohol beracun dan kirimkan pemeriksaan kadarnya; pengobatan (fomepizol) tidak boleh menunggu pemastian bila kecurigaannya kuat.</Prosa>
         )}
       </Card>
 

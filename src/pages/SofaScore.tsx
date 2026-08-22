@@ -96,7 +96,7 @@ export function SofaScore() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="SOFA Score" subtitle="Sequential Organ Failure Assessment (Vincent et al. 1996)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Full 6-organ-system ICU severity score — distinct from the bedside qSOFA screening tool. Used for prognosis and to trend organ dysfunction over time, not as an initial screen.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Skor derajat berat di ICU untuk 6 sistem organ lengkap — berbeda dari alat penapisan qSOFA di sisi tempat tidur. Dipakai untuk prognosis dan mengikuti perkembangan disfungsi organ, bukan sebagai penapisan awal.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="PaO₂/FiO₂ ratio">
             <input className={inputClass} type="number" min={0} value={pf || ''} onChange={(e) => setPf(Number(e.target.value) || 0)} />
