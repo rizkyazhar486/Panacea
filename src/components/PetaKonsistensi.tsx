@@ -131,10 +131,6 @@ export function PetaKonsistensi() {
         ))}
       </div>
 
-      <p className="t-mikro mt-2 leading-snug text-neutral-500">
-        Satu petak satu hari; makin pekat makin banyak yang tercatat. Hari kosong tidak diberi warna merah — hari yang
-        terlewat bukan vonis.
-      </p>
     </section>
   )
 }

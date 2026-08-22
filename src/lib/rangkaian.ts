@@ -106,7 +106,8 @@ export function hitungRangkaian(tanggal: string[], sekarang = Date.now()): Rangk
  */
 export function bacaRangkaian(r: Rangkaian): string {
   if (r.total === 0) {
-    return 'Belum ada hari yang tercatat. Satu catatan hari ini sudah cukup untuk memulai.'
+    // Satu baris pendek: ajakan panjang di dasbor terbaca sebagai basa-basi.
+    return 'Belum ada catatan — mulai hari ini.'
   }
   if (r.berjalan === 0) {
     return `Ada jeda sejak catatan terakhir. Seluruhnya sudah ${r.total} hari tercatat, dan angka itu tidak berkurang.`

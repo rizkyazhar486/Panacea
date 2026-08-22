@@ -184,7 +184,11 @@ function UbinAngka({ p }: { p: Pratinjau }) {
           pratinjauBeranda.ts. Dua pengukuran hanya dapat berbeda, tidak dapat
           menunjukkan arah. */}
       {p.deret && p.deret.length >= 2 && <GarisKecil deret={p.deret} kelas={p.nada} />}
-      <p className="t-kecil leading-snug text-neutral-500 dark:text-neutral-400">{p.garis}</p>
+      {/* SATU BARIS, DIPOTONG. Kalimat penjelas di dalam ubin membuat dasbor
+          menjadi bacaan; yang dicari orang di sini adalah angkanya. Kalimat
+          penuhnya tetap ada — pada halaman yang dituju ubin ini, dan pada
+          atribut title untuk pembaca layar. */}
+      <p className="t-kecil truncate text-neutral-500 dark:text-neutral-400" title={p.garis}>{p.garis}</p>
     </Ubin>
   )
 }
@@ -219,7 +223,6 @@ export function UbinRangkaian({ tanggal }: { tanggal: string[] }) {
         <Angka label="terpanjang" nilai={String(r.terpanjang)} />
         <Angka label="seluruhnya" nilai={String(r.total)} />
       </div>
-      <p className="t-mikro leading-snug text-neutral-400">{PERINGATAN_RANGKAIAN}</p>
     </Ubin>
   )
 }
@@ -266,7 +269,6 @@ export function UbinKlinis() {
       ) : (
         <p className="t-kecil text-neutral-400">Menghitung isi…</p>
       )}
-      <p className="t-mikro leading-snug text-neutral-400">Catatan penyakit, tatalaksana berdosis, dan rekap stasiun.</p>
     </Ubin>
   )
 }
@@ -392,12 +394,6 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
           {semua ? 'Ringkas ▲' : `Lihat ${baris.length - 6} angka lainnya ▼`}
         </button>
       )}
-      {/* Peringatan ini menemani angkanya di mana pun ia muncul: satu bacaan
-          bukan penilaian, dan halaman rentang rujukanlah yang punya ruang untuk
-          menyebut populasi pembanding serta ragam hariannya. */}
-      <p className="t-mikro mt-1 leading-snug text-neutral-400">
-        Dibandingkan dengan kebiasaan Anda sendiri, bukan penilaian sehat atau sakit. Ketuk untuk rentang rujukannya.
-      </p>
     </section>
   )
 }

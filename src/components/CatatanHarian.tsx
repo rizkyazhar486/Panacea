@@ -97,11 +97,12 @@ export function CatatanHarian() {
         </button>
       </div>
 
-      {/* Rangkaian, beserta peringatan yang tidak boleh dipisahkan darinya. */}
-      <p className="t-kecil mt-1 leading-snug text-neutral-600 dark:text-neutral-300">
+      {/* Satu baris. Peringatannya tidak dihapus dari aplikasi — ia pindah ke
+          title, terbaca saat disentuh lama atau oleh pembaca layar, tanpa
+          memakan satu baris penuh di dasbor. */}
+      <p className="t-kecil mt-1 truncate text-neutral-600 dark:text-neutral-300" title={PERINGATAN_RANGKAIAN}>
         {bacaRangkaian(rangkaian)}
       </p>
-      <p className="t-mikro mt-0.5 leading-snug text-neutral-500">{PERINGATAN_RANGKAIAN}</p>
 
       {rangkaian.total > 0 && (
         <div className="angka-fluid mt-3">

@@ -84,11 +84,6 @@ export function CatatanLatihan() {
           ? 'Belum ada sesi tersimpan. Satu sesi sudah cukup untuk mulai menghitung kebugaran.'
           : `${ringkas.total} sesi tersimpan${ringkas.tangan ? `, ${ringkas.tangan} di antaranya dicatat tangan` : ''}.`}
       </p>
-      {/* Keterangan yang tidak boleh hilang: sesi tangan tidak punya denyut. */}
-      <p className="t-mikro mt-0.5 leading-snug text-neutral-500">
-        Sesi yang dicatat tangan tidak memiliki rekaman denyut jantung, sehingga bebannya ditaksir dari lama dan
-        berat yang Anda rasakan — bukan diukur.
-      </p>
 
       <div className="mt-3 space-y-3">
         <div>

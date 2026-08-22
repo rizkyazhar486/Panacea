@@ -356,7 +356,6 @@ export default function Beranda() {
             <h1 className="t-judul truncate font-black leading-tight text-ink dark:text-white">
               Halo{nama && `, ${nama}`}
             </h1>
-            <p className="t-sedang text-neutral-500">Mau kerjakan apa hari ini?</p>
           </div>
           <Link
             to="/search"
