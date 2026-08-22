@@ -79,6 +79,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'ujiKebugaran', label: 'Uji Kebugaran', ringkas: 'Ukur kapasitas Anda', ke: '/fitness-test', emoji: '⏱️', kategori: 'Latihan' },
   { id: 'gerak', label: 'Analisis Gerak', ringkas: 'Telaah pola gerakan', ke: '/analisis-gerak', emoji: '🎥', kategori: 'Latihan' },
   { id: 'sportsLab', label: 'Sports Lab', ringkas: 'Fisiologi latihan mendalam', ke: '/sports-lab', emoji: '🔬', kategori: 'Latihan' },
+  { id: 'ikhtisar', label: 'Ikhtisar', ringkas: 'Semua angka tubuh dan grafiknya pada satu layar', ke: '/ikhtisar', emoji: '📈', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'tubuh', label: 'Pusat Tubuh', ringkas: 'Angka tubuh dan rentang rujukannya', ke: '/tubuh', emoji: '🫁', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'bodyBattery', label: 'Body Battery', ringkas: 'Cadangan energi hari ini', ke: '/body-battery', emoji: '🔋', kategori: 'Tubuh & Data' },
   { id: 'detakJantung', label: 'Detak Jantung', ringkas: 'Sampel terbaru dari jam tangan', ke: '/log-detak-jantung', emoji: '❤️', kategori: 'Tubuh & Data' },

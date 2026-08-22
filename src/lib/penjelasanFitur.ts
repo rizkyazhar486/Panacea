@@ -32,6 +32,7 @@ export const PENJELASAN_FITUR: Record<string, string> = {
   '/search': 'Cari apa pun di dalam aplikasi dari satu kotak',
 
   // ── Tubuh & kesehatan harian ──
+  '/ikhtisar': 'Seluruh angka tubuh beserta grafik dan rata-ratanya, dengan jangka yang dipilih sendiri',
   '/tubuh': 'Energi, jantung, tidur, dan gerak dalam satu halaman',
   '/latihan': 'Pelatih, analisis, fisiologi, dan daya tahan latihan Anda',
   '/recovery': 'Seberapa pulih tubuh Anda hari ini, dan boleh tidaknya latihan keras',
