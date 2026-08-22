@@ -179,7 +179,12 @@ export async function generateEducation(
   const msgs = [
     {
       role: 'user' as const,
-      content: `${contextBlock(ctx)}\n\nBuat EDUKASI PASIEN (bahasa awam, empatik, bilingual ID+EN) untuk diagnosis: "${diagnosis}". Singkat namun mendalam, agar pasien memahami penyakitnya dan cara menjaga kesehatan.\n\nKeluarkan HANYA JSON minified: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
+      // SATU BAHASA, BUKAN DUA. Permintaan "bilingual ID+EN" membuat model
+      // menuliskan tiap kalimat dua kali dipisahkan tanda |, sehingga pasien
+      // membaca hal yang sama berturut-turut dan panjang halaman berlipat.
+      // Aplikasinya berbahasa Indonesia; terjemahan Inggris tidak dibaca
+      // siapa pun di sini.
+      content: `${contextBlock(ctx)}\n\nBuat EDUKASI PASIEN dalam BAHASA INDONESIA saja (bahasa awam, empatik) untuk diagnosis: "${diagnosis}". Singkat namun mendalam, agar pasien memahami penyakitnya dan cara menjaga kesehatan. Jangan menuliskan terjemahan Inggris dan jangan memakai tanda | sebagai pemisah bahasa.\n\nKeluarkan HANYA JSON minified: {"diagnosis":string,"ringkas":string,"mendalam":string,"caraMenjaga":string[],"tandaBahaya":string[]}`,
     },
   ]
   try {
