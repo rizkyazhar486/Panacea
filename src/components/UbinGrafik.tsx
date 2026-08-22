@@ -48,10 +48,36 @@ function Batang({ deret, nada }: { deret: number[]; nada: string }) {
   )
 }
 
+/**
+ * Denyut istirahat digambar sebagai GARIS, bukan batang.
+ *
+ * Batang menyatakan jumlah yang menumpuk dalam satu hari — menit latihan,
+ * langkah, kalori. Denyut istirahat bukan jumlah: ia satu bacaan yang
+ * berjalan naik-turun, dan menggambarnya sebagai batang dari dasar nol
+ * memberi kesan seolah "0 bpm" adalah titik yang bermakna.
+ */
+function Garis({ deret }: { deret: number[] }) {
+  const isi = deret.filter((v) => v > 0)
+  if (isi.length < 3) return null
+  const min = Math.min(...isi)
+  const maks = Math.max(...isi)
+  const rentang = maks - min || 1
+  const titik = deret
+    .map((v, i) => (v > 0 ? `${(i / (deret.length - 1)) * 100},${28 - ((v - min) / rentang) * 24}` : null))
+    .filter(Boolean)
+    .join(' ')
+  return (
+    <svg viewBox="0 0 100 32" preserveAspectRatio="none" className="mt-2 h-9 w-full text-rose-500 dark:text-rose-400" aria-hidden>
+      <polyline points={titik} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+    </svg>
+  )
+}
+
 function Ubin({
-  ke, judul, nilai, satuan, deret, nada, cahaya,
+  ke, judul, nilai, satuan, deret, nada, cahaya, bentuk = 'batang',
 }: {
-  ke: string; judul: string; nilai: string; satuan: string; deret: number[]; nada: string; cahaya?: boolean
+  ke: string; judul: string; nilai: string; satuan: string; deret: number[]
+  nada: string; cahaya?: boolean; bentuk?: 'batang' | 'garis'
 }) {
   return (
     <Link to={ke} className="kaca flex flex-col rounded-3xl p-3 transition active:scale-[0.98]">
@@ -60,7 +86,7 @@ function Ubin({
         <span className={`t-angka font-black leading-none tabular-nums ${cahaya ? 'nyala' : 'text-ink dark:text-white'}`}>{nilai}</span>
         <span className="t-mikro font-bold text-neutral-400">{satuan}</span>
       </span>
-      <Batang deret={deret} nada={nada} />
+      {bentuk === 'garis' ? <Garis deret={deret} /> : <Batang deret={deret} nada={nada} />}
     </Link>
   )
 }
@@ -78,6 +104,7 @@ export function wilayahBergrafik(state: { foods?: unknown[]; sleepLogs?: unknown
   if (getWorkouts().length) ada.push('latihan')
   if (deretMetrik('sleepH').length || (state.sleepLogs ?? []).length) ada.push('tidur')
   if ((state.foods ?? []).length) ada.push('gizi')
+  if (deretMetrik('restingHr').length >= 3) ada.push('tubuh')
   return ada
 }
 
@@ -112,7 +139,14 @@ export function UbinGrafik() {
     return tujuhHari(m)
   }, [state.foods])
 
-  const ubin: { ke: string; judul: string; nilai: string; satuan: string; deret: number[]; nada: string }[] = []
+  // Denyut memakai 14 hari, bukan 7: ia bergerak pelan, dan tujuh titik terlalu
+  // sedikit untuk membedakan perubahan sungguhan dari ragam harian biasa.
+  const denyut = useMemo(() => deretMetrik('restingHr').slice(-14).map((t) => t.nilai), [])
+
+  const ubin: {
+    ke: string; judul: string; nilai: string; satuan: string; deret: number[]
+    nada: string; bentuk?: 'batang' | 'garis'
+  }[] = []
 
   const menitPekan = latihan.reduce((a, b) => a + b, 0)
   if (menitPekan > 0) ubin.push({ ke: '/latihan', judul: 'Latihan', nilai: String(menitPekan), satuan: 'mnt / 7 hari', deret: latihan, nada: 'bg-brand' })
@@ -125,6 +159,14 @@ export function UbinGrafik() {
 
   const hariGizi = gizi.filter((x) => x > 0)
   if (hariGizi.length) ubin.push({ ke: '/nutrition', judul: 'Gizi', nilai: Math.round(hariGizi.reduce((a, b) => a + b, 0) / hariGizi.length).toLocaleString('id-ID'), satuan: 'kkal / hari', deret: gizi, nada: 'bg-amber-400' })
+
+  if (denyut.length >= 3) {
+    const akhir = denyut[denyut.length - 1]
+    ubin.push({
+      ke: '/tubuh', judul: 'Denyut istirahat', nilai: String(Math.round(akhir)),
+      satuan: 'bpm', deret: denyut, nada: 'bg-rose-400', bentuk: 'garis',
+    })
+  }
 
   if (!ubin.length) return null
 
