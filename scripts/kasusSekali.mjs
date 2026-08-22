@@ -15,7 +15,7 @@
 //
 // Dijalankan: node scripts/kasusSekali.mjs [jumlah]
 
-import { FIELD, petaNorm, terisi, bukanKasus, norm, kunciCatatan, semuaKasus } from './lib/catatanRekap.mjs'
+import { FIELD, ALIAS_GANDA, petaNorm, terisi, bukanKasus, norm, kunciCatatan, semuaKasus } from './lib/catatanRekap.mjs'
 
 const kasus = semuaKasus()
 
@@ -28,7 +28,14 @@ for (const k of sekali) {
   // Urutannya sama persis dengan yang dipakai layar; lihat kunciCatatan().
   const kunci = kunciCatatan(k.label, k.kunci)
   if (!kunci) { tidakAda++; belum.push({ ...k, isi: 0, kunci: '(tidak ketemu)' }); continue }
-  const isi = terisi(kunci)
+  /*
+   * Baris yang memuat DUA stasiun dinilai dari catatan yang PALING TIDAK
+   * lengkap di antara keduanya — sebab yang dibaca pemakai adalah keduanya,
+   * dan satu yang kurang tetap berarti pekerjaannya belum selesai.
+   */
+  const isi = kunci.startsWith('GANDA::')
+    ? Math.min(...ALIAS_GANDA.get(kunci.slice(7)).map((k) => terisi('OSCE::' + k) || terisi(k)))
+    : terisi(kunci)
   if (isi >= 8) adaLengkap++
   else { adaSebagian++; belum.push({ ...k, isi, kunci }) }
 }

@@ -1312,4 +1312,51 @@ export function catatanStasiun(nama: string): OsceStationNote | undefined {
   return skdi ? dariCatatanSkdi(skdi) : undefined
 }
 
+/**
+ * Baris rekap yang berisi DUA STASIUN sekaligus.
+ *
+ * CACAT YANG MELAHIRKAN TABEL INI. Tujuh baris terakhir yang tidak pernah
+ * punya catatan bukan karena penyakitnya belum ditulis, melainkan karena satu
+ * baris memuat dua hal: 'ANC, KPD', 'RA OA', 'Ra/Gout', 'Pentabio, OPV, KMS'.
+ * Selama padanan hanya boleh menunjuk SATU catatan, ketujuhnya terpaksa
+ * dibiarkan kosong — dan alasannya benar: menautkan 'RA OA' ke rheumatoid
+ * arthritis saja menyembunyikan osteoartritisnya, padahal justru MEMBEDAKAN
+ * keduanya yang sedang diuji.
+ *
+ * Yang keliru bukan keputusannya melainkan BENTUK TABELNYA, yang memaksa
+ * memilih salah satu. Tabel ini membolehkan satu baris menunjuk beberapa
+ * catatan sekaligus, dan layar menampilkan semuanya dengan judul masing-masing
+ * — sehingga pembacanya melihat persis apa yang perlu ia bandingkan.
+ */
+const ALIAS_GANDA: Record<string, string[]> = {
+  'ANC, KPD': ['ANC Normal (Antenatal Care)', 'Ketuban Pecah Dini (KPD)'],
+  'ANC (G2P1A0H1 gravid 33-34 minggu JTHIU + letling + emesis gravidarum) dd/ IUGR??': [
+    'ANC Normal (Antenatal Care)',
+    'Hiperemesis Gravidarum (HEG)',
+    'Pertumbuhan Janin Terhambat (IUGR)',
+  ],
+  'Pentabio, OPV, KMS': ['Imunisasi & Interpretasi KMS/Tumbang (anak)'],
+  'RA OA': ['Rheumatoid Arthritis (RA)', 'Osteoarthritis (OA)'],
+  'Ra/Gout': ['Rheumatoid Arthritis (RA)', 'Gout Artritis'],
+  'Mastitis uretritis GO': ['Mastitis / Cracked Nipple', 'Servisitis / Uretritis Gonore'],
+  'fr humerus gout': ['Fraktur terbuka, tertutup', 'Gout Artritis'],
+}
+
+/**
+ * Seluruh catatan untuk sebuah nama kasus, beserta judulnya.
+ *
+ * Mengembalikan larik KOSONG bila memang belum ada. Untuk baris biasa isinya
+ * satu; untuk baris yang memuat dua stasiun isinya dua atau lebih.
+ */
+export function catatanStasiunSemua(nama: string): { judul: string; catatan: OsceStationNote }[] {
+  const ganda = ALIAS_GANDA[nama]
+  if (ganda) {
+    return ganda
+      .map((k) => ({ judul: k, catatan: catatanStasiun(k) }))
+      .filter((x): x is { judul: string; catatan: OsceStationNote } => Boolean(x.catatan))
+  }
+  const satu = catatanStasiun(nama)
+  return satu ? [{ judul: nama, catatan: satu }] : []
+}
+
 export default catatanStasiun

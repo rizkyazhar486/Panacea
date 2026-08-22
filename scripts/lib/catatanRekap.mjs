@@ -67,6 +67,23 @@ const ALIAS = new Map(
     .map((m) => [(m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"), (m[4] ?? m[5]).replace(/\\'/g, "'")]),
 )
 
+
+/*
+ * TABEL PADANAN GANDA ikut dibaca.
+ *
+ * Satu baris rekap dapat memuat DUA stasiun ('RA OA', 'ANC, KPD'), dan sejak
+ * layar mampu menampilkan keduanya, baris itu TIDAK lagi tanpa catatan.
+ * Skrip yang hanya membaca tabel tunggal akan tetap melaporkannya sebagai
+ * pekerjaan yang belum selesai — angka yang mengada-adakan pekerjaan.
+ */
+const badanGanda = aliasSrc.slice(aliasSrc.indexOf('const ALIAS_GANDA'), aliasSrc.indexOf('\n}', aliasSrc.indexOf('const ALIAS_GANDA')))
+const ALIAS_GANDA = new Map(
+  [...badanGanda.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z][A-Za-z0-9_]*)):\s*\[([^\]]*)\]/gm)].map((m) => [
+    (m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"),
+    [...m[4].matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g)].map((x) => (x[1] ?? x[2]).replace(/\\'/g, "'")),
+  ]),
+)
+
 const notes = readFileSync('src/lib/skdiDiseaseNotes.ts', 'utf8')
 const osce = readFileSync('src/lib/osceStationNotes.ts', 'utf8')
 const blok = { ...blokDari(notes), ...blokDari(osce, 'OSCE::') }
@@ -174,6 +191,7 @@ function cari(nama) {
  * melewatkan satu langkah yang dilakukan aplikasi.
  */
 export function kunciCatatan(label, kunciKasus) {
+  if (ALIAS_GANDA.has(label)) return 'GANDA::' + label
   const sasaran = ALIAS.get(label) ?? (kunciKasus ? ALIAS.get(kunciKasus) : undefined)
   if (sasaran) {
     if (blok['OSCE::' + sasaran]) return 'OSCE::' + sasaran
@@ -192,4 +210,4 @@ export function semuaKasus() {
   )
 }
 
-export { FIELD, SETARA, ALIAS, blok, petaNorm, cari, terisi, bukanKasus, norm }
+export { FIELD, SETARA, ALIAS, ALIAS_GANDA, blok, petaNorm, cari, terisi, bukanKasus, norm }
