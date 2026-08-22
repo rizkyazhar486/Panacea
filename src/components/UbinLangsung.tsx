@@ -171,7 +171,7 @@ function UbinLongevity() {
 // dan lama sesi, tidak dari darah maupun otot. Karena itu angkanya tidak punya
 // satuan yang berarti di luar dirinya sendiri, dan yang dibaca adalah ARAH dan
 // SELISIHNYA. Dasar keputusannya ikut ditulis supaya dapat dibantah.
-function UbinPelatih() {
+export function UbinPelatihLebar() {
   const sesi = getWorkouts()
   if (sesi.length < 3) return null
   const demo = getDemo()
@@ -231,6 +231,6 @@ export const UBIN_LANGSUNG: Record<string, () => JSX.Element | null> = {
   tidur: UbinTidur,
   detakJantung: UbinDenyut,
   longevity: UbinLongevity,
-  kebugaran: UbinPelatih,
+  kebugaran: UbinPelatihLebar,
   salat: UbinSalat,
 }

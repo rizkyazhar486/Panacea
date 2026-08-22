@@ -22,6 +22,9 @@ import { GrafikMini } from './GrafikMini'
 import { UBIN_LANGSUNG } from './UbinLangsung'
 import { UbinGrafik, wilayahBergrafik } from './UbinGrafik'
 import { UbinPantauan } from './UbinPantauan'
+import { Tumpukan } from './Tumpukan'
+import { UbinPelatihLebar } from './UbinLangsung'
+import { UbinSalat } from './UbinSalat'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -464,7 +467,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   const BERKARTU = [
     'grafikOlahraga',
     'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
-    'pantauan',
+    'pantauan', 'kebugaran', 'salat',
   ]
   const pintasan = WIDGETS.filter((w) => pilihan.includes(w.id) && !BERKARTU.includes(w.id))
   const adaGrafik = pilihan.includes('grafikOlahraga')
@@ -492,7 +495,29 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
 
   return (
     <>
-    {pilihan.includes('pantauan') && <UbinPantauan />}
+    {/* TUMPUKAN: widget lebar berbagi satu petak dan digeser mendatar.
+        Empat widget lebar berdiri sendiri-sendiri memakai empat kali tinggi
+        yang sama; ditumpuk, ketiganya memakai tinggi satu widget. Yang masuk
+        ke sini hanya widget yang memang selebar layar — widget separuh lebar
+        tetap berdampingan seperti biasa, karena menumpuk dua benda yang muat
+        berdampingan justru menambah pekerjaan tangan tanpa menghemat apa pun. */}
+    <Tumpukan
+      judul="Ringkas"
+      /* DITULIS SEBAGAI ELEMEN <Komponen />, BUKAN DIPANGGIL SEBAGAI FUNGSI.
+         Percobaan pertama memanggil UBIN_LEBAR.salat?.() untuk memeriksa
+         apakah ada isinya sebelum dimasukkan ke tumpukan. Itu memanggil
+         komponen React sebagai fungsi biasa, sedangkan komponen itu memakai
+         useState dan useEffect — dan hook yang dijalankan di luar pohon render
+         menjatuhkan seluruh halaman ke layar "Something went wrong".
+         Ketersediaan datanya diperiksa lewat lib, bukan dengan menjalankan
+         komponennya. */
+      anak={[
+        ...(pilihan.includes('kebugaran') && getWorkouts().length >= 3
+          ? [{ kunci: 'kebugaran', isi: <UbinPelatihLebar /> }] : []),
+        ...(pilihan.includes('salat') ? [{ kunci: 'salat', isi: <UbinSalat /> }] : []),
+        ...(pilihan.includes('pantauan') ? [{ kunci: 'pantauan', isi: <UbinPantauan /> }] : []),
+      ]}
+    />
 
     <UbinGrafik />
 
