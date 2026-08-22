@@ -3,6 +3,7 @@ import { KolomAngka } from '../components/KolomAngka'
 import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp } from '../components/icons'
 import { getHealthCache, getDemo, pushBiometrics } from '../lib/profile'
+import { getVitals } from '../lib/healthVitals'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Biological & Metabolic Age — estimates how old your body "acts" versus your
@@ -59,6 +60,9 @@ function syncFromDevices(cur: BioData): { next: BioData; changed: string[] } {
     if (bc.waist > 0 && !cur.waist) { patch.waist = bc.waist; changed.push('Waist') }
     if (bc.hip > 0 && !cur.hip) { patch.hip = bc.hip; changed.push('Hip') }
   } catch { /* ignore */ }
+  const v = getVitals()
+  const sbp = typeof v.systolic === 'number' ? v.systolic : 0
+  if (sbp > 0 && sbp !== cur.sbp) { patch.sbp = sbp; changed.push('Systolic') }
   return { next: { ...cur, ...patch }, changed }
 }
 

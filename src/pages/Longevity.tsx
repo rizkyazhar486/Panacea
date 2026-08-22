@@ -4,7 +4,7 @@ import { Card, SectionTitle, Field, inputClass, Badge } from '../components/ui'
 import { IconHeart, IconActivity, IconChartUp, IconTimer } from '../components/icons'
 import { PrefillBadge } from '../components/HealthSnapshot'
 import { pushBiometrics, mergeHealthCache } from '../lib/profile'
-import { mergeVitals } from '../lib/healthVitals'
+import { mergeVitals, getVitals } from '../lib/healthVitals'
 import { useVitals } from '../lib/useVitals'
 import { ShareStatCard } from '../components/ShareStatCard'
 import { PanelKebugaranIlmiah } from '../components/PanelKebugaranIlmiah'
@@ -166,6 +166,20 @@ function syncFromDevices(cur: LongevityData): { next: LongevityData; changed: st
       if (whr !== cur.whr) { patch.whr = whr; changed.push('Waist-Hip Ratio') }
     }
   } catch { /* ignore */ }
+  // Data alat yang diimpor tersimpan di vitals — sumber ini sebelumnya
+  // terlewat, sehingga angka yang sudah ada tetap harus diketik ulang.
+  const v = getVitals()
+  const pakai = (nilai: unknown, kini: number, ke: keyof LongevityData, nama: string) => {
+    if (typeof nilai === 'number' && nilai > 0 && nilai !== kini) {
+      ;(patch as Record<string, number>)[ke as string] = nilai
+      changed.push(nama)
+    }
+  }
+  pakai(v.vo2max, patch.vo2 ?? cur.vo2, 'vo2', 'VO₂max')
+  pakai(v.restingHr, patch.rhr ?? cur.rhr, 'rhr', 'Denyut istirahat')
+  pakai(v.sleepH, patch.sleepH ?? cur.sleepH, 'sleepH', 'Tidur')
+  pakai(v.systolic, cur.sbp, 'sbp', 'Tekanan sistolik')
+  pakai(v.waistHipRatio, patch.whr ?? cur.whr, 'whr', 'Rasio pinggang-panggul')
   return { next: { ...cur, ...patch }, changed }
 }
 
