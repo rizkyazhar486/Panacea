@@ -186,6 +186,7 @@ const PusatLatihan = lazy(() => import('./pages/PusatLatihan').then((m) => ({ de
 const PusatTubuh = lazy(() => import('./pages/PusatTubuh').then((m) => ({ default: m.PusatTubuh })))
 const Ikhtisar = lazy(() => import('./pages/Ikhtisar').then((m) => ({ default: m.Ikhtisar })))
 const Harian = lazy(() => import('./pages/Harian').then((m) => ({ default: m.Harian })))
+const LatihanBeban = lazy(() => import('./pages/LatihanBeban').then((m) => ({ default: m.LatihanBeban })))
 const AturFitur = lazy(() => import('./pages/AturFitur').then((m) => ({ default: m.AturFitur })))
 const AnalisisPro = lazy(() => import('./pages/AnalisisPro').then((m) => ({ default: m.AnalisisPro })))
 const BodyBattery = lazy(() => import('./pages/BodyBattery').then((m) => ({ default: m.BodyBattery })))
@@ -315,6 +316,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/tubuh" element={<PusatTubuh />} />
               <Route path="/ikhtisar" element={<Ikhtisar />} />
               <Route path="/harian" element={<Harian />} />
+              <Route path="/latihan-beban" element={<LatihanBeban />} />
               <Route path="/atur-fitur" element={<AturFitur />} />
               {/* Rute lama tetap hidup dan mengalihkan ke tab yang tepat, agar
                   penanda halaman dan tautan lama tidak ada yang putus. */}
