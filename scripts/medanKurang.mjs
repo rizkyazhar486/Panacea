@@ -14,9 +14,9 @@ const SETARA = { patofisiologi: ['patofisiologi', 'rantai'] }
 function blokDari(teks, awalan = '') {
   const out = {}
   const idx = []
-  const re = /^  '((?:[^'\\]|\\.)*)':\s*\{$/gm
+  const re = /^  (?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"):\s*\{$/gm
   let m
-  while ((m = re.exec(teks))) idx.push({ key: m[1].replace(/\\'/g, "'"), start: m.index })
+  while ((m = re.exec(teks))) idx.push({ key: (m[1] ?? m[2]).replace(/\\'/g, "'"), start: m.index })
   idx.forEach((x, i) => { out[awalan + x.key] = teks.slice(x.start, i + 1 < idx.length ? idx[i + 1].start : teks.length) })
   return out
 }

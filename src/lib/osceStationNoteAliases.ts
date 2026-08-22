@@ -485,9 +485,9 @@ const ALIAS: Record<string, string> = {
   'GNAPS (dewasa)': 'Glomerulonefritis Akut Pasca-Streptokokus (GNAPS)',
 
   // Endokrin
-  'Goiter Endemik': 'Goiter',
-  'graves disease': 'Hipertiroid',
-  "Grave's disease": 'Hipertiroid',
+  'Goiter Endemik': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'graves disease': "Goiter Endemik / Grave's Disease / Hipertiroid",
+  "Grave's disease": "Goiter Endemik / Grave's Disease / Hipertiroid",
   'DM Tipe 2': 'DM Tipe 2 (edukasi & tatalaksana)',
   'HONK - infus': 'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan',
   'HHS (pasang infus)': 'Hyperosmolar Hyperglycemic State (HHS/HONK) — resusitasi cairan',
@@ -696,8 +696,8 @@ const ALIAS: Record<string, string> = {
   'DM tipe 1': 'Diabetes melitus tipe 1',
   'DM Tipe 1 Anak': 'Diabetes melitus tipe 1',
   'Edukasi DM': 'DM Tipe 2 (edukasi & tatalaksana)',
-  "Grave's Disease": 'Hipertiroid',
-  'Hipertiroid / struma difusa': 'Hipertiroid',
+  "Grave's Disease": "Goiter Endemik / Grave's Disease / Hipertiroid",
+  'Hipertiroid / struma difusa': "Goiter Endemik / Grave's Disease / Hipertiroid",
   'hipersomnia ec clobazam': 'Hipersomnia',
 
   // Kulit
@@ -762,6 +762,195 @@ const ALIAS: Record<string, string> = {
    *   'Cushing syndrome', 'Ankilostomiasis', 'Kalazion', 'Epiglottitis',
    *   'Gonorrhea', 'Hidronefrosis', 'IUGR', 'Kista Nabothian' — memang belum
    *   ada catatannya. Ini pekerjaan menulis, bukan menyambung.
+   */
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * KELOMPOK EJAAN YANG BERULANG-ULANG.
+   *
+   * Sisa daftar didominasi satu penyakit yang ditulis lima sampai tujuh cara.
+   * Pielonefritis muncul sebagai 'Pyelonefritis D', 'Pyelonefritis Dextra',
+   * 'Pyelonefritis sinistra', 'Pielonegritis', 'Pyelonephritis e.c.
+   * Ureterolithiasis'. Batu saluran kemih sebagai 'vesicolithiasis',
+   * 'vesikolithiasis', 'vesikolthiasis', 'Uretelithiasis', 'Uretherolithiasis'.
+   * Semuanya penyakit yang catatannya sudah lengkap.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Ginjal dan saluran kemih
+  'Pyelonefritis D': 'Pielonefritis Akut',
+  'Pyelonefritis Dextra': 'Pielonefritis Akut',
+  'Pyelonefritis sinistra': 'Pielonefritis Akut',
+  'Pyelonefritis Dextra (ISK Komplikata)': 'Pielonefritis Akut',
+  'Pyelonefritis akut non komplikata': 'Pielonefritis Akut',
+  'Pyelonephritis e.c. Ureterolithiasis': 'Pielonefritis Akut',
+  Pielonegritis: 'Pielonefritis Akut',
+  'Sistitis komplikata': 'Sistitis Akut',
+  'Sistitis dd/ Pielonefritis, Vesikolithiasis': 'Sistitis Akut',
+  vesicolithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  vesikolithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  vesikolthiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Vesikolithiasis , HTN': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'vesikolithiasis pasang DC': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  'Retensio urine ec Vesicolithiasis': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  'Pemasangan Kateter': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  'Pemasangan kateter wanita': 'Retensio Urin e.c. BPH / Vesikolitiasis — pasang kateter',
+  Ureterolithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Ureterolithiasis dextra': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Ureterolithiasis Dextra pars Distal': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  Uretherolithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  Uretelithiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  Nefrolitiasis: 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Nefrolithiasis Dextra': 'Vesikolitiasis / Ureterolitiasis / Nefrolitiasis',
+  'Uretritis GO': 'Servisitis / Uretritis Gonore',
+  'Servisitis GO': 'Servisitis / Uretritis Gonore',
+  'Servisitis gonore dd PID': 'Servisitis / Uretritis Gonore',
+  'Prostatitis kronis': 'Prostatitis',
+  'Parafimosis (Dorsal Slit lanjut Sirkumsisi)': 'Fimosis / Parafimosis — tindakan sirkumsisi',
+
+  // Otot dan tulang
+  'OA genu': 'Osteoarthritis (OA)',
+  'OA genu sinistra': 'Osteoarthritis (OA)',
+  'OA genu dextra + sin': 'Osteoarthritis (OA)',
+  'OA Genu dextra grade 2': 'Osteoarthritis (OA)',
+  'OA grade IV (RME)': 'Osteoarthritis (OA)',
+  'OA Bahu': 'Osteoarthritis (OA)',
+  Osteoartritis: 'Osteoarthritis (OA)',
+  'Osteoartritis Genu': 'Osteoarthritis (OA)',
+  'Rheumatoid Artritis': 'Rheumatoid Arthritis (RA)',
+  'Polimyalgia Reumatik': 'Polimialgia reumatik',
+  'Meniscus Tear': 'Lesi meniskus, medial, dan lateral',
+  'Meniscus tear': 'Lesi meniskus, medial, dan lateral',
+  'Meniscus tear dextra': 'Lesi meniskus, medial, dan lateral',
+  'Meniscus tear lateral dextra': 'Lesi meniskus, medial, dan lateral',
+  'Ruptur Meniscus - (RME)': 'Lesi meniskus, medial, dan lateral',
+  'Sprain Ankle dekstra': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'Sprain Genu': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'Sprain genu Dx': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  'sprain genu dextra': 'Ankle Sprain / Knee Sprain / Wrist Sprain',
+  Tenosynovitis: 'Tenosinovitis supuratif',
+  tenosivitis: 'Tenosinovitis supuratif',
+  'Tenosynovitis Supuratif Akut (RME)': 'Tenosinovitis supuratif',
+  'Tenosinovitis supurativ ec tertusuk duri ikan': 'Tenosinovitis supuratif',
+  'Osteomyelitis kronik post-fraktur': 'Osteomielitis',
+  'Spondylolisthesis/HNP': 'HNP / Low Back Pain',
+
+  // Jiwa
+  'Skizoafektif Depresif': 'Skizoafektif',
+  'Skizoafektif Tipe Depresi': 'Skizoafektif',
+  'Skizoafektif fase manik': 'Skizoafektif',
+  'Skizoafektif tipe manik': 'Skizoafektif',
+  skizoparanoid: 'Skizofrenia Paranoid',
+  Paranoid: 'Skizofrenia Paranoid',
+  'Skizofrenia dengan gangguan waham': 'Skizofrenia',
+  'Serangan Panik': 'Gangguan Panik',
+  'Panic attack/Gang. Cemas Menyeluruh': 'Gangguan Panik',
+  Trikotiloamania: 'Trikotilomania',
+  'Insomnia e.c. Depresi': 'Insomnia (primer/early/middle/late)',
+  'Gangguan cemas + insomnia middle': 'Insomnia (primer/early/middle/late)',
+
+  // Kulit
+  'Pityriasis rosea': 'Pitiriasis rosea',
+  'Ptiriasis rosea': 'Pitiriasis rosea',
+  'LSK/Neurodermatitis': 'Liken simpleks kronik/neurodermatitis',
+  'Dermatitis numularis/like simpleks kronis': 'Liken simpleks kronik/neurodermatitis',
+  'Moluskum contagiosum': 'Moluskum kontagiosum',
+  'Melasma / SC': 'Melasma',
+  Rubeola: 'Morbili tanpa komplikasi',
+  'Skrofuloderma TB': 'Skrofuloderma',
+  'Sifilis Primer': 'Sifilis stadium 1 dan 2',
+  'Lepra tipe MB': 'Kusta (Morbus Hansen)',
+  'Morbus Hansen tipe MB': 'Kusta (Morbus Hansen)',
+  'Morbus Hansen tipe Multibasiler dengan reaksi kusta tipe 1': 'Kusta (Morbus Hansen)',
+  Varicella: 'Varisela tanpa komplikasi',
+  'SJS/TEN (tindakan Infus)': 'Sindrom Stevens-Johnson',
+  'Tinea cruris': 'Tinea kruris',
+  'Tinea mannum': 'Tinea manus',
+  'Vulnus apertum': 'Vulnus laseratum, punctum',
+  'Vulnus laceratum antebrachii dextra': 'Vulnus laseratum, punctum',
+  'Vulnus laceratum humerus sinistra': 'Vulnus laseratum, punctum',
+  'Vulnus laceratum dd vulnus scissum': 'Vulnus laseratum, punctum',
+  'Vulnus Scissum Regio Antebrachii Sinistra': 'Vulnus laseratum, punctum',
+  'Vulnus scissum regio antebrachii sinistra': 'Vulnus laseratum, punctum',
+  'Vulnus scissum regio femur': 'Vulnus laseratum, punctum',
+  'Vulnus scissum: hecting': 'Vulnus laseratum, punctum',
+  'Vulnus schissum': 'Vulnus laseratum, punctum',
+
+  // Indera
+  'Miopia (Koreksi Visus)': 'Miopia ringan',
+  'Miopia ringan (resep kacamata)': 'Miopia ringan',
+  'Presbiopia (resep kacamata)': 'Presbiopia',
+  'Rinitis alergi': 'Rhinitis Alergika',
+  'Rhinitis Alergika Persisten Sedang-Berat': 'Rhinitis Alergika',
+  'Rhinitis alergi persisten derajat ringan': 'Rhinitis Alergika',
+  'Rhinits Alergi Derajat Ringan': 'Rhinitis Alergika',
+  'Laserasi palpebra': 'Laserasi kelopak mata',
+  'Otitis Media Efusi': 'Otitis media serosa',
+
+  // Paru dan infeksi
+  'Penumonia (CAP)': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia lobaris komunitas': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia Klebsiella (ada hasil kultur, cxr)': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia dgn comorbid DM tipe 2': 'Pneumonia (lobaris/aspirasi/CAP)',
+  'Pneumonia Aspirasi (Anak)': 'Pneumonia (lobaris/aspirasi/CAP)',
+  Pertussis: 'Pertusis',
+  'PPOK (Spirometri)': 'PPOK Eksaserbasi Akut',
+  'TB dewasa': 'Tuberkulosis Paru',
+  'TB paru gagal pengobatan': 'Tuberkulosis Paru',
+  'Tuberkulosis Paru Kasus Baru': 'Tuberkulosis Paru',
+  'TB anak + gizi kurang': 'Tuberkulosis Paru',
+  'TB Paru + candidiasis oral + Susp HIV': 'Tuberkulosis dengan HIV',
+  'TB paru + HIV + Candidiasis Oral': 'Tuberkulosis dengan HIV',
+  'Limfadenopati regio coli': 'Limfadenopati',
+  'Limfadenitis dd limfadenopati regio coli': 'Limfadenitis',
+  'Malaria tropikana': 'Malaria (falciparum/vivax) — apus darah tebal/tipis',
+  'Malaria (Pungsi vena)': 'Malaria (falciparum/vivax) — apus darah tebal/tipis',
+  'Weils disease - (RME)': 'Leptospirosis / Weil Disease',
+  'Leptospirosis/Weils': 'Leptospirosis / Weil Disease',
+  'Toxoplasmosis + AIDS': 'Toksoplasmosis serebral',
+  Meningoensefalitis: 'Meningitis / Meningoensefalitis',
+  Menierre: 'Meniere Disease',
+  'Vertigo ec menier disease': 'Meniere Disease',
+  'Stroke hemoragik (SAH)': 'Stroke Hemoragik / TIA',
+
+  // Jantung dan kegawatan
+  'STEMI anteroseptal + HT grade 1': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'STEMI anteroseptal + HT grd 1 + Hiperlipidemia': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'UAP / NSTEMI / APS (tindakan pasang EKG dan interpretasi)': 'STEMI / NSTEMI / UAP — baca & interpretasi EKG',
+  'VES Unifokal Trigemini (Baca EKG + interpretasi)': 'Ventricular Ectopic (VES) — baca EKG',
+  'VES + hipokalemia (3,1) + HT gr 1': 'Ventricular Ectopic (VES) — baca EKG',
+  'Syok Anafilaksis (IV)': 'Syok Anafilaktik — tindakan resusitasi',
+  'Syok Hipovolemik ec. Dehidrasi berat ec Diare': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'Syok hipovolemik e.c diare dengan dehidrasi berat': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'Syok dengan Riwayat Diare (tindakan Infus)': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'Syok hipovolemik ec OF Femur Dextra': 'Syok Hipovolemik / Hemoragik — pasang IV line',
+  'Superficial Vein Thrombosis / Thromboflebitis': 'Tromboflebitis',
+  'Partus normal (tindakan APN 60 langkah)': 'Asuhan Persalinan Normal (APN 60 langkah)',
+  'Pasang AKDR': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Pasang IUD': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Vaksin campak': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi dan status gizi anak': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Ulkus Peptikum ec Gastropati NSAID - (RME)': 'Ulkus (gaster, duodenum)',
+
+  /*
+   * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini:
+   *
+   *   'Pitiriasis Versicolor' (2x) — dicoba dipetakan dan ditolak penjaga:
+   *   catatannya memang tidak ada, padahal panu adalah penyakit kulit yang
+   *   paling sering di Indonesia. Ini yang pertama ditulis berikutnya.
+   *
+   *   'Uveitis Anterior', 'Retinitis pigmentosa', 'Ramsay Hunt Syndrome',
+   *   'Ulkus Mole', 'Kalazion', 'Cushing syndrome', 'Ankilostomiasis',
+   *   'Epiglottitis', 'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
+   *   belum ada catatannya sama sekali. Ini pekerjaan menulis.
+   *
+   *   'Sistitis komplikata' DIPETAKAN ke 'Sistitis Akut' walaupun komplikata
+   *   dan non-komplikata berbeda lama pengobatannya; catatan itu membahas
+   *   pembedaannya, sehingga yang membacanya justru menemukan yang dicari.
+   *
+   *   'RA OA' dan 'Ra/Gout' — dua penyakit dalam satu baris, seperti 'ANC,
+   *   KPD'. Menautkannya ke salah satu menyembunyikan yang lain, dan justru
+   *   MEMBEDAKAN keduanya yang sedang diuji.
    */
 }
 

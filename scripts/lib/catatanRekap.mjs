@@ -18,9 +18,12 @@ const SETARA = { patofisiologi: ['patofisiologi', 'rantai'] }
 function blokDari(teks, awalan = '') {
   const out = {}
   const idx = []
-  const re = /^  '((?:[^'\\]|\\.)*)':\s*\{$/gm
+  // Kunci catatan pun ada yang berkutip GANDA, karena isinya mengandung
+  // apostrof — "Goiter Endemik / Grave's Disease / Hipertiroid". Pola yang
+  // hanya mengenali kutip tunggal membuat catatan itu seolah tidak ada.
+  const re = /^  (?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"):\s*\{$/gm
   let m
-  while ((m = re.exec(teks))) idx.push({ key: m[1], start: m.index })
+  while ((m = re.exec(teks))) idx.push({ key: (m[1] ?? m[2]).replace(/\\'/g, "'"), start: m.index })
   idx.forEach((x, i) => { out[awalan + x.key] = teks.slice(x.start, i + 1 < idx.length ? idx[i + 1].start : teks.length) })
   return out
 }
@@ -49,10 +52,19 @@ const badanAlias = aliasSrc.slice(aliasSrc.indexOf('const ALIAS'), aliasSrc.inde
  *
  * Ini kesalahan alat ukur, bukan kesalahan aplikasi — bentuk yang paling
  * mahal, sebab ia mengarahkan pekerjaan ke tempat yang keliru.
+ *
+ * KEMUDIAN HAL YANG SAMA TERJADI PADA SISI NILAINYA. Setelah kunci berkutip
+ * ganda dibaca, tiga padanan Graves dan Goiter tetap dilaporkan hilang —
+ * kali ini karena SASARANNYA yang berkutip ganda, sebab nama catatannya
+ * "Goiter Endemik / Grave's Disease / Hipertiroid" juga mengandung apostrof.
+ * Ketahuannya dari angka yang mustahil: kasus ">=2x tanpa catatan" NAIK dari
+ * 2 menjadi 5 setelah padanan DITAMBAHKAN. Penambahan padanan tidak pernah
+ * bisa menaikkan angka itu, dan justru kemustahilan itulah yang menunjuk ke
+ * alat ukurnya, bukan ke datanya.
  */
 const ALIAS = new Map(
-  [...badanAlias.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z][A-Za-z0-9_]*)):\s*'((?:[^'\\]|\\.)*)',/gm)]
-    .map((m) => [(m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"), m[4].replace(/\\'/g, "'")]),
+  [...badanAlias.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z][A-Za-z0-9_]*)):\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"),/gm)]
+    .map((m) => [(m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"), (m[4] ?? m[5]).replace(/\\'/g, "'")]),
 )
 
 const notes = readFileSync('src/lib/skdiDiseaseNotes.ts', 'utf8')

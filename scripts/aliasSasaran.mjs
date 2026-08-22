@@ -32,7 +32,8 @@ const alias = readFileSync('src/lib/osceStationNoteAliases.ts', 'utf8')
  * kerusakan sama berbahayanya dengan yang menyembunyikannya.
  */
 const ambilKunci = (berkas) =>
-  [...readFileSync(berkas, 'utf8').matchAll(/^  '((?:[^'\\]|\\.)*)':\s*\{$/gm)].map((m) => m[1].replace(/\\'/g, "'"))
+  [...readFileSync(berkas, 'utf8').matchAll(/^  (?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"):\s*\{$/gm)]
+    .map((m) => (m[1] ?? m[2]).replace(/\\'/g, "'"))
 
 const kunciOsce = ambilKunci('src/lib/osceStationNotes.ts')
 const kunciSkdi = ambilKunci('src/lib/skdiDiseaseNotes.ts')
@@ -53,10 +54,19 @@ const badan = alias.slice(alias.indexOf('const ALIAS'), alias.indexOf('\n}', ali
  *
  * Ini kesalahan alat ukur, bukan kesalahan aplikasi — bentuk yang paling
  * mahal, sebab ia mengarahkan pekerjaan ke tempat yang keliru.
+ *
+ * KEMUDIAN HAL YANG SAMA TERJADI PADA SISI NILAINYA. Setelah kunci berkutip
+ * ganda dibaca, tiga padanan Graves dan Goiter tetap dilaporkan hilang —
+ * kali ini karena SASARANNYA yang berkutip ganda, sebab nama catatannya
+ * "Goiter Endemik / Grave's Disease / Hipertiroid" juga mengandung apostrof.
+ * Ketahuannya dari angka yang mustahil: kasus ">=2x tanpa catatan" NAIK dari
+ * 2 menjadi 5 setelah padanan DITAMBAHKAN. Penambahan padanan tidak pernah
+ * bisa menaikkan angka itu, dan justru kemustahilan itulah yang menunjuk ke
+ * alat ukurnya, bukan ke datanya.
  */
 const baris = [
-  ...badan.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z][A-Za-z0-9_]*)):\s*'((?:[^'\\]|\\.)*)',/gm),
-].map((m) => ({ dari: (m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"), ke: m[4].replace(/\\'/g, "'") }))
+  ...badan.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z][A-Za-z0-9_]*)):\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"),/gm),
+].map((m) => ({ dari: (m[1] ?? m[2] ?? m[3]).replace(/\\'/g, "'"), ke: (m[4] ?? m[5]).replace(/\\'/g, "'") }))
 
 const rusak = baris.filter((b) => !kunci.has(b.ke))
 // Padanan yang menunjuk dirinya sendiri tidak salah, tetapi tidak berguna.
