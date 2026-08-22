@@ -570,12 +570,24 @@ const ALIAS: Record<string, string> = {
   'Vulnus scissum': 'Vulnus laseratum, punctum',
 
   /*
+   * 'Transient Ischemic Attack' — SAYA SEMULA MENYIMPULKAN CATATANNYA BELUM
+   * ADA, dan itu keliru. Yang saya cari adalah KUNCI bernama TIA; yang ada
+   * adalah TIA sebagai separuh isi kunci 'Stroke Hemoragik / TIA', lengkap
+   * sampai skor ABCD2 dan alasan mengapa TIA ditangani hari itu juga. Mencari
+   * berdasarkan nama kunci saja melewatkan catatan yang isinya memang ada —
+   * bentuk kesalahan yang sama dengan yang dikejar seluruh berkas ini, hanya
+   * kali ini saya sendiri yang melakukannya.
+   *
+   * Tetap TIDAK ditautkan ke 'Transient tics disorder': pencocokan longgar
+   * pernah melakukan tepat itu, dan keduanya tidak berhubungan sedikit pun.
+   */
+  'Transient Ischemic Attack': 'Stroke Hemoragik / TIA',
+  TIA: 'Stroke Hemoragik / TIA',
+
+  /*
    * YANG SENGAJA TIDAK DIPETAKAN, dan alasannya:
    *
-   *   'Transient Ischemic Attack' (2x) — belum ada catatannya sama sekali.
-   *   Sengaja TIDAK ditautkan ke 'Transient tics disorder', sebab pencocokan
-   *   longgar pernah melakukan tepat itu; keduanya hanya berbagi satu kata dan
-   *   tidak berhubungan sedikit pun. Ini pekerjaan menulis, bukan menyambung.
+   *   'ANC, KPD' dan 'Pentabio, OPV, KMS' — satu baris rekap berisi DUA
    *
    *   'ANC, KPD' dan 'Pentabio, OPV, KMS' — satu baris rekap berisi DUA
    *   stasiun sekaligus. Menautkannya ke salah satu berarti menyembunyikan
@@ -585,6 +597,171 @@ const ALIAS: Record<string, string> = {
    *   namanya berbeda: luka iris dan luka robek berbeda pada gambaran tepinya,
    *   tetapi penanganannya — pembersihan, penjahitan, dan pencegahan tetanus —
    *   dibahas pada catatan yang sama.
+   */
+
+  /*
+   * ═══════════════════════════════════════════════════════════════════════
+   * KASUS YANG MUNCUL SEKALI — bagian yang hanya beda cara menulis.
+   *
+   * 380 kasus rekap tersisa tanpa catatan. Diperiksa satu per satu dengan
+   * bantuan daftar calon, dan sebagian besar ternyata penyakit yang sama
+   * dengan yang sudah lengkap: rekap ditulis peserta yang berganti tiap
+   * periode, sehingga satu penyakit muncul sebagai 'Hiperemesis gravidarum +
+   * dehidrasi', 'Hiperemis gravidarum', dan 'Hyperemesis Gravidarum (HEG)'.
+   *
+   * Yang TIDAK dipetakan tetap dibiarkan kosong. Kartu tanpa tombol catatan
+   * jujur mengatakan belum ada; kartu dengan catatan penyakit lain tidak.
+   * ═══════════════════════════════════════════════════════════════════════
+   */
+
+  // Kandungan
+  'Abortus Imminens': 'Abortus Imminens / Inkomplit',
+  'Abortus Inkomplit': 'Abortus Imminens / Inkomplit',
+  'Hiperemesis gravidarum + dehidrasi': 'Hiperemesis Gravidarum (HEG)',
+  'Hiperemis gravidarum': 'Hiperemesis Gravidarum (HEG)',
+  'Hyperemesis Gravidarum (HEG)': 'Hiperemesis Gravidarum (HEG)',
+  'Ca Serviks (IVA Test)': 'Suspek Ca Serviks — IVA test / Pap smear',
+  'KB Implan (Konseling & Tindakan Pemasangan)': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Konseling KB': 'Konseling & Pemasangan/Pelepasan KB (implan/AKDR)',
+  'Depresi Postpartum/Baby Blues': 'Baby Blues / Depresi Postpartum',
+  'Kandidiasis vulvovaginitis': 'Kandidiasis Vulvovaginalis',
+  'KPD aterm belum inpartu': 'Ketuban Pecah Dini (KPD)',
+  'G1P0A0 Aterm Belum Inpartu + KPD': 'Ketuban Pecah Dini (KPD)',
+
+  // Anak
+  'Gizi Buruk (Kwashiorkor)': 'Marasmus / Kwashiorkor (gizi buruk anak)',
+  'Gizi Buruk (Marasmus)': 'Marasmus / Kwashiorkor (gizi buruk anak)',
+  'KEP tipe Marasmus': 'Marasmus / Kwashiorkor (gizi buruk anak)',
+  'Imunisasi anak / MR': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi pada anak': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi BCG (Konseling Tumbang + Imunisasi dan Tindakan)': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi BCG + Interpretasi KMS + Tumbang + WHO Chart': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi BCG + KMS': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi MR + KMS': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi pentabio + KMS': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi Pentabio dan OPV': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi Pentabio dan Polio oral usia 2 bulan, Interpretasi buku dan hasil KMS': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi Pentabio, IPV, OPV, Rotavirus usia 4 bulan': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi bayi 1 bulan': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi pd bayi 2 bulan': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'Imunisasi pd bayi 9 bulan': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+  'KMS dan vaksin campak': 'Imunisasi & Interpretasi KMS/Tumbang (anak)',
+
+  // Jiwa
+  'Gangguan Afektif Bipolar episode kini Depresi': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Ggn Afektif Bipolar Episode Kini Depresi': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Ggn afektif bipolar episode kini manik': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Gangguan bipolar episode manik dengan gejala psikotik': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Gangguan bipolar episode depresi dengan gejala psikotik': 'Gangguan Afektif Bipolar (manik/depresi)',
+  'Gangguan hipokondriasis': 'Gangguan Somatisasi / Hipokondriasis',
+  'Depresi ringan': 'Depresi (ringan/sedang/berat)',
+  'insomnia late onset': 'Insomnia (primer/early/middle/late)',
+  'Insomnia primer': 'Insomnia (primer/early/middle/late)',
+  'Insomnia non organik dd GCM': 'Insomnia (primer/early/middle/late)',
+  GAD: 'Gangguan Cemas Menyeluruh (GAD)',
+  'Gangguan cemas menyeluruh / GAD dengan depresi': 'Gangguan Cemas Menyeluruh (GAD)',
+  'intoksikasi organofosfat: NGT': 'Intoksikasi Alkohol / Zat Psikoaktif',
+
+  // Saraf dan jantung
+  'Hemiparese sinistra ec stroke iskemik': 'Stroke Iskemik',
+  Cluster: 'Cluster Headache',
+  HNP: 'HNP / Low Back Pain',
+  'HNP Lumbal': 'HNP / Low Back Pain',
+  CTS: 'Carpal Tunnel Syndrome (CTS)',
+  'Angina Stabil': 'Angina Pektoris Stabil',
+  'Cor Pulmonale': 'CHF / ADHF / Cor Pulmonale',
+  'EKG - Atrial Fibrilasi': 'Atrial Fibrilasi — baca EKG',
+  'Atrial Flutter Stable': 'Atrial flutter',
+  'Ensefalopati Hipertensi dengan Hipertensi emergensi': 'Ensefalopati Hipertensi',
+
+  // Dalam dan infeksi
+  Appendisitis: 'Appendisitis Akut',
+  'Abses Hepar': 'Abses hepar amoeba',
+  'Abses Hepar ec Amobeasis - (RME)': 'Abses hepar amoeba',
+  'Anemia Defisiensi Besi - (RME)': 'Anemia Defisiensi Besi',
+  'Anemia Defisiensi Vit. B12': 'Anemia megaloblastik',
+  'Anemia Megaloblastik ec cacing tambang (RME)': 'Anemia megaloblastik',
+  'GEA Amoeba': 'Disentri (Amoeba / Basiler)',
+  Kolera: 'Gastroenteritis (termasuk kolera, giardiasis)',
+  Divertikulitis: 'Divertikulosis/divertikulitis',
+  'Hematemesis e.c Ulkus Gaster e.c NSAID': 'Ulkus (gaster, duodenum)',
+  'Ileus paralitik (NGT)': 'Ileus',
+  'Intususepsi (NGT)': 'Intususepsi atau invaginasi',
+  'Dengue Shock Syndrome (IV line)': 'Dengue shock syndrome',
+  'Efusi Pleura Massive Sin (oksigen)': 'Efusi Pleura Massive',
+  'Hernia inguinalis irreponible strangulata': 'Hernia Inguinalis',
+  'ISK ec Pielonefritis': 'Pielonefritis Akut',
+  'Hipoglikemi Berat (pasang infus)': 'Hipoglikemia berat',
+  'Hipoglikemia berat / Tindakan resusitasi cairan (Pasang IV line)': 'Hipoglikemia berat',
+  'DM tipe 1': 'Diabetes melitus tipe 1',
+  'DM Tipe 1 Anak': 'Diabetes melitus tipe 1',
+  'Edukasi DM': 'DM Tipe 2 (edukasi & tatalaksana)',
+  "Grave's Disease": 'Hipertiroid',
+  'Hipertiroid / struma difusa': 'Hipertiroid',
+  'hipersomnia ec clobazam': 'Hipersomnia',
+
+  // Kulit
+  'Artritis Gout': 'Gout Artritis',
+  'Gout Artritis + Obesitas grade I': 'Gout Artritis',
+  'Akne vulgaris derajat berat': 'Akne vulgaris sedang-berat',
+  Folikulitis: 'Folikulitis superfisialis',
+  'Folikulitis dd karbunkel': 'Folikulitis superfisialis',
+  'Folikulitis/hidradenitis supuratif': 'Hidradenitis supuratif',
+  Karbunkel: 'Furunkel, karbunkel',
+  'Furunkel nasi': 'Furunkel pada hidung',
+  'Erisipelas/selulitis': 'Erisipelas',
+  'Impetigo krustosa': 'Impetigo',
+
+  // Indera
+  'Glaukoma sudut terbuka kronis (2 tahun onset) dd glaukoma akut': 'Glaukoma Akut Sudut Tertutup',
+  'Gukoma akut sudut tertutup / fokomorfik': 'Glaukoma Akut Sudut Tertutup',
+  'hordeolum eksterna': 'Hordeolum / Blefaritis',
+  'hordeolum interna inferior sinistra': 'Hordeolum / Blefaritis',
+  'Hifema grade II': 'Hifema',
+  Keratokonjungtivitis: 'Kerato-konjungtivitis sicca',
+  'Keratokonjungtivitis sicca': 'Kerato-konjungtivitis sicca',
+  'Keratitis/keratokonjugtivitis': 'Episkleritis / Keratitis',
+  'Keratitis Bakteri': 'Episkleritis / Keratitis',
+  'keratokonjungtivitis viral': 'Konjungtivitis (bakteri/vernal/viral)',
+  'Corpal telinga': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+  'Korpus alenum nasal sinistra': 'Corpus Alienum (mata/hidung/telinga) — tindakan ekstraksi',
+
+  // Tulang — patah tulang ditulis sangat panjang dan berbeda-beda di rekap
+  'Fraktur Tertutup 1/3 Distal/Medial os Radius Sinistra (bidai)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tertutup 1/3 medial os. radius ulna': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur Tertutup 1/3 proksinal Tibia et Fibula Dextra (Bidai)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tertutup Os. Tibia Dextra 1/3 Distal (RME) (Tindakan)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tertutup regio antebrachii': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tibia 1/3 proksimal (Bidai)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tertutup 1/3 medial clavicula sinistra': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur Tertutup Clavicula 1/3 Medial (Figure of 8)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur tertutup Os. Clavicula dextra 1/3 medial (RME) (Tindakan)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur oblik 1/3 distal os tibia dekstra (pembidaian)': 'Fraktur Tertutup (klavikula/tibia-fibula/radius-ulna) — bidai',
+  'Fraktur Clavicula': 'Fraktur klavikula',
+  'Fraktur 1/3 medial os clavicula': 'Fraktur klavikula',
+  'fr clavisula kiri': 'Fraktur klavikula',
+  'Fraktur kompresi ec osteoporosis dd spondilolisis': 'Trauma Medulla Spinalis dengan Fraktur Kompresi',
+  'Fraktur Kompresi VL1 + Osteoporosis (RME)': 'Trauma Medulla Spinalis dengan Fraktur Kompresi',
+  'Artritis, lesi meniskus genu medial dextra': 'Lesi meniskus, medial, dan lateral',
+
+  /*
+   * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini, dan alasannya:
+   *
+   *   Patah tulang HUMERUS dan FEMUR ('fr femur', 'Fraktur humerus
+   *   (pembidaian)', 'close fracture komplit 1/3 distal humerus dextra') —
+   *   catatan pembidaian yang ada khusus untuk klavikula, tibia-fibula, dan
+   *   radius-ulna. Pembidaian femur memerlukan bidai panjang melewati panggul
+   *   dan menimbang syok karena perdarahan satu sampai satu setengah liter;
+   *   menampilkan catatan bidai lengan bawah di situ mengajarkan yang keliru.
+   *
+   *   'Diare akut ec ...' dengan berbagai penyebab (E. coli, intoleransi
+   *   laktosa, taeniasis, giardiasis, intoksikasi makanan) — yang diujikan
+   *   justru MEMBEDAKAN penyebabnya, sehingga menautkan semuanya ke satu
+   *   catatan diare menghapus yang sedang diuji.
+   *
+   *   'Cushing syndrome', 'Ankilostomiasis', 'Kalazion', 'Epiglottitis',
+   *   'Gonorrhea', 'Hidronefrosis', 'IUGR', 'Kista Nabothian' — memang belum
+   *   ada catatannya. Ini pekerjaan menulis, bukan menyambung.
    */
 }
 
