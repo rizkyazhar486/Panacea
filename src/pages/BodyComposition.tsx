@@ -51,10 +51,13 @@ const load = (): Body => {
 // US Navy body-fat % (needs waist/neck/hip in cm, height in cm).
 function navyBf(b: Body): number {
   const log10 = Math.log10
+  // Persamaan lingkar U.S. Navy (Hodgdon & Beckett, 1984, Naval Health
+  // Research Center) — sekitar +-3-4% terhadap densitometri.
   if (b.g === 'M') return 495 / (1.0324 - 0.19077 * log10(Math.max(1, b.waist - b.neck)) + 0.15456 * log10(b.h)) - 450
   return 495 / (1.29579 - 0.35004 * log10(Math.max(1, b.waist + b.hip - b.neck)) + 0.221 * log10(b.h)) - 450
 }
 // Mifflin-St Jeor BMR.
+// Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7.
 function bmr(b: Body) { return Math.round(10 * b.w + 6.25 * b.h - 5 * b.age + (b.g === 'M' ? 5 : -161)) }
 
 // InBody-style horizontal bar: value plotted on an Under|Normal|Over strip.
@@ -179,6 +182,10 @@ export function BodyComposition() {
     // Cardio fitness ≈ VO2max tier + life-expectancy delta heuristic (Mandsager 2018 direction).
     const vo2Tier = b.vo2 >= 52 ? 'Elite' : b.vo2 >= 45 ? 'Excellent' : b.vo2 >= 38 ? 'Fair' : 'Low'
     const lifeBase = b.g === 'M' ? 72 : 76 // Indonesia approx
+    // PERINGATAN: koefisien pada lifeAdj, readiness dan aging di bawah ini
+    // adalah pilihan penulis, bukan hasil penelitian. Angkanya berguna untuk
+    // melihat ARAH perubahan pada diri sendiri, bukan untuk dibandingkan
+    // dengan orang lain atau dibaca sebagai tahun hidup.
     const lifeAdj = (b.vo2 - 38) * 0.25 + (smm / b.w > 0.4 ? 2 : 0) - (whr > (b.g === 'M' ? 0.9 : 0.85) ? 2 : 0) - b.stress * 0.2 + (b.sleepH >= 7 ? 1 : -1)
     const lifeExp = Math.round(lifeBase + lifeAdj)
     // Restorative sleep = (REM + deep) / total.
@@ -324,7 +331,12 @@ export function BodyComposition() {
 
       {/* Longevity indicator bento */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Daily Longevity Indicators" subtitle="Readiness, body battery, aging & mental — enter from today's hours/feelings" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Penanda Harian" subtitle="Arah perubahan pada diri sendiri, bukan angka mutlak" />
+        <p className="mt-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:text-amber-300">
+          Kesiapan, laju penuaan, dan harapan hidup di bawah ini dihitung dengan bobot <b>pilihan penulis</b>, bukan hasil
+          penelitian. Bacalah perubahannya dari waktu ke waktu — jangan dibandingkan dengan orang lain atau dibaca sebagai
+          tahun hidup. Persen lemak dan BMR di halaman ini memakai persamaan terbitan (Navy tape; Mifflin-St Jeor).
+        </p>
         <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {num('Total sleep (hrs)', 'sleepH', 0.1)}
           {num('REM (hrs)', 'remH', 0.1)}

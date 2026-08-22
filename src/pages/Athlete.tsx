@@ -86,6 +86,8 @@ function save(p: AthleteProfile) { try { localStorage.setItem(KEY, JSON.stringif
 // Uses the user's measured max HR when provided, falling back to the
 // 220−usia (226−usia for women) estimate only when no measurement exists.
 function vo2max(hrMax: number, hrRest: number) {
+  // Uth, Sorensen, Overgaard & Pedersen (2004), Eur J Appl Physiol 91:111-5.
+  // Simpangannya sekitar +-10-15%; ini perkiraan, bukan hasil uji langsung.
   return (15.3 * hrMax) / hrRest
 }
 
@@ -152,6 +154,8 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
   }
   const totalSec = zoneSec.reduce((a, b) => a + b, 0) || 1
   const zoneMeta = [
+    // Batas zona 60/70/80/90% HRmaks mengikuti ACSM Guidelines (Garber et al.,
+    // 2011, Med Sci Sports Exerc 43(7):1334-59).
     { label: 'Zone 1 · Warm-up', range: `≤ ${Math.round(hrMax * 0.6)} bpm` },
     { label: 'Zone 2 · Easy', range: `${Math.round(hrMax * 0.6)}–${Math.round(hrMax * 0.7)} bpm` },
     { label: 'Zone 3 · Aerobic', range: `${Math.round(hrMax * 0.7)}–${Math.round(hrMax * 0.8)} bpm` },

@@ -68,6 +68,9 @@ function recoveryScore(d: DayLog, hrvBase: number | null, rhrBase: number | null
   let hrvPart = 50
   if (hrvBase) {
     const r = d.hrv / hrvBase // >1 good
+    // Bobot di bawah ini pilihan penulis, bukan hasil penelitian: tidak ada
+    // rumus kesiapan yang diterbitkan dan tervalidasi untuk digabung begini.
+    // Yang bermakna adalah arah perubahannya pada satu orang dari hari ke hari.
     hrvPart = Math.max(0, Math.min(50, 50 * (0.5 + (r - 0.85) / 0.3 * 0.5)))
   }
   let rhrPart = 25

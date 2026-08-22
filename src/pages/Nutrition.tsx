@@ -9,6 +9,8 @@ import { IconPlus, IconSparkle, IconHeart, IconStethoscope, IconHospital, IconFl
 import { ShareToFeed } from '../components/ShareToFeed'
 import { api, backendEnabled } from '../lib/api'
 import { getDemo, setDemo } from '../lib/profile'
+import { getVitals } from '../lib/healthVitals'
+import { denyutMaksPerkiraan, vo2DariDenyut } from '../lib/bugarIlmiah'
 
 // Real map (Leaflet + OpenStreetMap) — same live map as the Beranda tracker.
 const RouteMap = lazy(() => import('../components/RouteMap'))
@@ -599,6 +601,8 @@ const CHRONIC_PROTOCOLS: ChronicProtocol[] = [
 const ACT_L = ['Sedentary', 'Light', 'Moderate', 'Active', 'Very active']
 const ACT_M = [1.2, 1.375, 1.55, 1.725, 1.9]
 const getBmi = (w: number, h: number) => w / ((h / 100) ** 2)
+// Mifflin-St Jeor (1990), Am J Clin Nutr 51(2):241-7 — persamaan laju
+// metabolisme basal yang paling kecil simpangannya pada orang sehat.
 const getBmr = (w: number, h: number, a: number, g: string) => g === 'M' ? 10 * w + 6.25 * h - 5 * a + 5 : 10 * w + 6.25 * h - 5 * a - 161
 const getTdee = (b: number, l: number) => b * (ACT_M[l] ?? 1.2)
 const getMetBurn = (met: number, kg: number, min: number) => Math.round(met * kg * (min / 60))
@@ -1527,7 +1531,22 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
   const bmi = getBmi(body.w, body.h)
   const bmr = getBmr(body.w, body.h, body.age, body.g)
   const tdee = getTdee(bmr, body.act)
-  const vo2Est = vitals.avgHR ? (body.g === 'M' ? 15.3 * (220 - body.age) / vitals.avgHR : 15.3 * (226 - body.age) / vitals.avgHR) : undefined
+  // Perkiraan VO2max memakai rumus Uth-Sorensen (2004): 15,3 x HRmaks/HRistirahat,
+  // dengan HRmaks dari Tanaka (2001) 208 - 0,7 x usia.
+  //
+  // Sebelumnya di sini dipakai HR RATA-RATA harian sebagai pengganti HR
+  // istirahat, dan 220 - usia sebagai HRmaks. Keduanya keliru: rata-rata harian
+  // bukan denyut istirahat, sehingga angka yang keluar bukan perkiraan yang
+  // meleset melainkan besaran yang tidak mengukur apa pun. Bila denyut istirahat
+  // tidak ada, sekarang tidak ada angka yang ditampilkan.
+  const vo2Est = useMemo(() => {
+    const v = getVitals()
+    if (typeof v.vo2max === 'number' && v.vo2max > 0) return v.vo2max
+    const ist = typeof v.restingHr === 'number' ? v.restingHr : 0
+    const maks = denyutMaksPerkiraan(body.age)
+    if (!(ist > 0) || !maks) return undefined
+    return vo2DariDenyut(maks.nilai, ist)?.nilai
+  }, [body.age])
 
   const lng = calcLong({
     sleepHr: wt.sleepHr,
