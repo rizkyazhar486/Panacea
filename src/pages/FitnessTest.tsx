@@ -88,7 +88,7 @@ export function FitnessTest() {
 
       {/* 1. Fitness Test Score */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Fitness Test Score" subtitle="Estimated score for the SIPSS / TNI-Polri / civil service exam" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Fitness Test Score" subtitle="Perkiraan nilai untuk ujian SIPSS / TNI-Polri / CPNS" />
         <div className="mt-3 mb-3 flex gap-2">
           {(['L', 'P'] as Sex[]).map((s) => (
             <button key={s} onClick={() => setSex(s)} className={`flex-1 rounded-xl py-2 text-sm font-bold ${sex === s ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>
@@ -126,7 +126,7 @@ export function FitnessTest() {
 
       {/* 2. AI Form Analysis */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconFlame size={18} />} title="Form & Posture Analysis (AI)" subtitle="Upload a photo of your movement — AI assesses form & injury risk" />
+        <SectionTitle icon={<IconFlame size={18} />} title="Form & Posture Analysis (AI)" subtitle="Unggah foto gerakan Anda — AI menilai bentuk & risiko cedera" />
         <div className="mt-3 flex flex-wrap gap-2">
           {EXERCISES.map((e) => (
             <button key={e.id} onClick={() => { setExercise(e); setForm(null); setPreview(null) }}

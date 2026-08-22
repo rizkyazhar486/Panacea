@@ -415,7 +415,7 @@ export function Longevity() {
 
       {/* Decade projection */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Proyeksi Dasawarsa — Latih Diri Anda yang Berumur 80" subtitle="Untrained: VO₂max −10%/decade, muscle −8%/decade after 30. Trained: half that." />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Proyeksi Dasawarsa — Latih Diri Anda yang Berumur 80" subtitle="Tanpa latihan: VO₂max −10% per dasawarsa, otot −8% per dasawarsa sesudah umur 30. Dengan latihan: separuhnya." />
         {vo2Proj60 && vo2Proj80 ? (
           <div className="mt-2 space-y-3">
             <div className="rounded-2xl bg-ink p-4 text-white">
@@ -462,7 +462,7 @@ export function Longevity() {
 
       {/* Testing protocol */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="What gets measured gets improved — mark each one as done" />
+        <SectionTitle icon={<IconTimer size={20} />} title="Periodic Testing Protocol" subtitle="Yang diukur akan membaik — tandai tiap butir yang sudah dikerjakan" />
         <div className="mt-2 space-y-2">
           {PROTOCOL.map((p) => {
             const last = d.tests[p.id]

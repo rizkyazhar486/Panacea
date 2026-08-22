@@ -67,7 +67,7 @@ export function Ikigai() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Legacy Letter" subtitle="A structured reflection on purpose — a validated longevity factor, not just a mood" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Legacy Letter" subtitle="Perenungan tersusun tentang tujuan hidup — faktor umur panjang yang tervalidasi, bukan sekadar suasana hati" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           Having a clear sense of purpose is linked to lower all-cause mortality in long-term studies,
           independent of other health factors. This page turns that into something concrete: the
@@ -98,7 +98,7 @@ export function Ikigai() {
         )}
         {filled === 4 && (
           <div className="mt-4 rounded-2xl bg-brand-50 p-4 text-[13px] leading-relaxed text-brand-dark">
-            <b>Your Ikigai, in one sentence:</b> I find purpose in <i>{d.love.trim().toLowerCase()}</i>,
+            <b>Ikigai Anda, dalam satu kalimat:</b> I find purpose in <i>{d.love.trim().toLowerCase()}</i>,
             using my strength in <i>{d.goodAt.trim().toLowerCase()}</i> to address <i>{d.worldNeeds.trim().toLowerCase()}</i>,
             in a way that can sustain me through <i>{d.paidFor.trim().toLowerCase()}</i>.
           </div>

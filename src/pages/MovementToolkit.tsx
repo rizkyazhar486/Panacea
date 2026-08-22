@@ -21,7 +21,7 @@ function GripStrength() {
   return (
     <>
       <Card className="!p-5">
-        <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Grip strength is one of the most-replicated simple predictors of healthy aging — measure with a hand dynamometer if you have one, or note your gym's grip-strength machine reading.</Prosa>
+        <Prosa kelas="text-[13px] leading-relaxed text-neutral-500">Kekuatan genggam adalah salah satu penanda sederhana penuaan sehat yang paling sering terulang hasilnya — ukur dengan dinamometer tangan bila ada, atau catat bacaan mesin kekuatan genggam di tempat gim Anda.</Prosa>
         <Field label="Grip strength (kg)">
           <input className={`${inputClass} mt-1`} type="number" min={0} max={100} value={kg} onChange={(e) => setKg(Number(e.target.value) || 0)} />
         </Field>
@@ -75,7 +75,7 @@ function Zone2Checker() {
         <div className="text-2xl font-black text-brand-dark">{lower}-{upper} bpm</div>
         <div className="text-[11px] text-neutral-500">Estimated Zone 2 range (60-70% of 220−age)</div>
       </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Zone 2 is easy, conversational-pace cardio — a practical field check is that you can breathe comfortably through your nose. It's the base of most endurance and metabolic-health training, not the "no pain no gain" zone.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Zona 2 adalah kardio ringan pada laju yang masih memungkinkan mengobrol — pemeriksaan praktis di lapangan: Anda masih dapat bernapas nyaman lewat hidung. Inilah dasar sebagian besar latihan ketahanan dan kesehatan metabolik, bukan zona "tanpa sakit tak ada hasil".</Prosa>
     </Card>
   )
 }

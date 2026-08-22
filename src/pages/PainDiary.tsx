@@ -24,8 +24,8 @@ export function PainDiary() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Pain / Symptom Diary" subtitle="Track severity over time — useful for you and your clinician" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">A single reading is a snapshot; a trend is information. Rate your pain or symptom severity now, add where it is and what might have triggered it, and save — the chart below tracks every entry so you (or your doctor) can see the pattern, not just today.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Pain / Symptom Diary" subtitle="Ikuti derajat beratnya dari waktu ke waktu — berguna bagi Anda dan tenaga medis Anda" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Satu bacaan hanyalah potret sesaat; sebuah tren adalah keterangan. Nilai derajat nyeri atau gejala Anda sekarang, tambahkan letaknya dan apa yang mungkin memicunya, lalu simpan — grafik di bawah mengikuti tiap catatan supaya Anda (atau dokter Anda) melihat polanya, bukan hanya hari ini.</Prosa>
       </Card>
 
       <Card className="!p-5">

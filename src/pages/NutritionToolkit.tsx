@@ -149,7 +149,7 @@ function ElectrolyteCalc() {
   const magnesium = Math.min(350, Math.round(hours * 8))
   return (
     <Card className="!p-5">
-      <Field label="Hours into your fast">
+      <Field label="Sudah berapa jam berpuasa">
         <input className={inputClass} type="number" min={0} max={72} value={hours} onChange={(e) => setHours(Number(e.target.value) || 0)} />
       </Field>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
@@ -157,7 +157,7 @@ function ElectrolyteCalc() {
         <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{potassium}mg</div><div className="text-[10px] text-neutral-500">Potassium</div></div>
         <div className="rounded-xl bg-brand/10 p-2"><div className="text-lg font-black text-brand-dark">{magnesium}mg</div><div className="text-[10px] text-neutral-500">Magnesium</div></div>
       </div>
-      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Rough daily targets during longer fasts (beyond ~16h), when electrolyte loss without food intake can cause headaches/fatigue. Not medical advice — if you have kidney, heart, or blood pressure conditions, check with a clinician before fasting or supplementing electrolytes.</Prosa>
+      <Prosa kelas="mt-3 text-[12px] leading-relaxed text-neutral-500">Sasaran harian kasar selama puasa yang lebih panjang (di atas sekitar 16 jam), ketika kehilangan elektrolit tanpa asupan makanan dapat menimbulkan nyeri kepala/lemas. Bukan nasihat medis — bila Anda punya penyakit ginjal, jantung, atau tekanan darah, periksakan kepada tenaga medis sebelum berpuasa atau menambah elektrolit.</Prosa>
     </Card>
   )
 }

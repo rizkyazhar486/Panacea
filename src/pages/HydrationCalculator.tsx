@@ -68,7 +68,7 @@ export function HydrationCalculator() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Daily Hydration Calculator" subtitle="Estimate your daily fluid target from weight, activity & climate" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Daily Hydration Calculator" subtitle="Perkirakan sasaran cairan harian Anda dari berat badan, aktivitas & iklim" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
           This is a population-average estimate, not a personal prescription. Thirst and pale-yellow urine
           are the best everyday guides for most healthy people. If you have a kidney, heart, or liver
@@ -124,7 +124,7 @@ export function HydrationCalculator() {
             </div>
           ))}
         </div>
-        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Includes water from all beverages and food (roughly 20% of intake typically comes from food). Spread intake across the day rather than drinking it all at once.</Prosa>
+        <Prosa kelas="mt-3 text-[11px] text-neutral-500">Sudah termasuk air dari semua minuman dan makanan (sekitar 20% asupan biasanya berasal dari makanan). Sebarkan asupannya sepanjang hari, bukan diminum sekaligus.</Prosa>
       </Card>
     </div>
   )

@@ -100,8 +100,8 @@ export function PostureBreaks() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconTimer size={20} />} title="Posture & Desk-Break Reminder" subtitle="A gentle nudge to stand, stretch, or rest your eyes" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Sustained sitting and screen focus are two of the easiest-to-fix daily habits. Pick an interval, keep this tab open (or allow notifications), and get a reminder with a specific micro-break to do.</Prosa>
+        <SectionTitle icon={<IconTimer size={20} />} title="Posture & Desk-Break Reminder" subtitle="Dorongan lembut untuk berdiri, meregang, atau mengistirahatkan mata" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Duduk terus-menerus dan menatap layar tanpa jeda adalah dua kebiasaan harian yang paling mudah dibenahi. Pilih selangnya, biarkan tab ini terbuka (atau izinkan pemberitahuan), lalu terima pengingat beserta jeda singkat yang jelas untuk dikerjakan.</Prosa>
         <div className="mt-3 flex flex-wrap gap-2">
           {INTERVALS.map((m) => (
             <button key={m} onClick={() => setInterval_(m)} disabled={running} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition disabled:opacity-50 ${saved.intervalMin === m ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>

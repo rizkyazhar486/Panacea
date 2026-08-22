@@ -29,8 +29,8 @@ export function MaddreyScore() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Maddrey's Discriminant Function" subtitle="Severe alcoholic hepatitis — the corticosteroid decision (Maddrey et al. 1978)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">The classic bedside trigger for considering corticosteroid therapy in alcoholic hepatitis — a distinct clinical fork from MELD-Na or Child-Pugh. Uses prothrombin time in seconds above your lab's control value, exactly as originally validated.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Maddrey's Discriminant Function" subtitle="Hepatitis alkoholik berat — keputusan pemberian kortikosteroid (Maddrey dkk. 1978)" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Pemicu klasik di sisi tempat tidur untuk mempertimbangkan terapi kortikosteroid pada hepatitis alkoholik — persimpangan klinis yang berbeda dari MELD-Na maupun Child-Pugh. Memakai waktu protrombin dalam detik di atas nilai kontrol laboratorium Anda, persis seperti saat divalidasi semula.</Prosa>
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Field label="Total bilirubin (mg/dL)">
             <input className={inputClass} type="number" step="0.1" min={0} value={bilirubin || ''} onChange={(e) => setBilirubin(Number(e.target.value) || 0)} />

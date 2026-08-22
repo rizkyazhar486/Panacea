@@ -67,9 +67,9 @@ export function Hadis() {
           <Poin ikon="✅"><b>Two collections stand apart.</b> Sahih al-Bukhari and Sahih Muslim are
             accepted as authentic at the level of the whole collection, so their text can be shown
             without a per-report label.</Poin>
-          <Poin ikon="⚠️"><b>The four Sunan are mixed.</b> This provider does not carry their
+          <Poin ikon="⚠️"><b>Keempat kitab Sunan bercampur derajatnya.</b> This provider does not carry their
             gradings, so they are marked differently and carry a warning wherever they appear.</Poin>
-          <Poin ikon="🚫"><b>Nothing here is written by us,</b> and no grading is ever guessed.</Poin>
+          <Poin ikon="🚫"><b>Tidak ada satu pun di sini yang kami tulis sendiri,</b> and no grading is ever guessed.</Poin>
         </div>
       </Card>
 

@@ -73,8 +73,8 @@ export function OttawaAnkleRules() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Ottawa Ankle Rules" subtitle="Decision rule for whether an ankle/foot X-ray is needed" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">One of the most validated clinical decision rules in emergency medicine — high sensitivity for clinically significant fractures, used to reduce unnecessary X-rays after an acute ankle/foot injury. Applies to malleolar-zone and midfoot-zone pain, evaluated separately.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Ottawa Ankle Rules" subtitle="Aturan keputusan perlu tidaknya rontgen pergelangan kaki/kaki" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Salah satu aturan keputusan klinis yang paling banyak divalidasi dalam kedokteran gawat darurat — kepekaannya tinggi untuk patah tulang yang bermakna klinis, dipakai untuk mengurangi rontgen yang tidak perlu sesudah cedera akut pergelangan kaki/kaki. Berlaku untuk nyeri di zona maleolus dan zona pertengahan kaki, dinilai terpisah.</Prosa>
       </Card>
 
       <Zone title="Malleolar zone (ankle)" painPresent={anklePain} setPain={setAnklePain} items={ANKLE_ITEMS} checked={ankleChecked} setChecked={setAnkleChecked} />

@@ -73,8 +73,8 @@ export function RockallScore() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Rockall Score" subtitle="Mortality risk after upper GI bleeding (Rockall et al. 1996)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Complements the pre-endoscopy Glasgow-Blatchford Score: Blatchford answers "who needs admission/intervention?", Rockall answers "how likely is rebleeding or death?" — fully scored after endoscopy adds the diagnosis and stigmata criteria.</Prosa>
+        <SectionTitle icon={<IconActivity size={20} />} title="Rockall Score" subtitle="Risiko kematian sesudah perdarahan saluran cerna atas (Rockall dkk. 1996)" />
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Melengkapi Glasgow-Blatchford Score praendoskopi: Blatchford menjawab "siapa yang perlu dirawat/ditindak?", Rockall menjawab "seberapa besar kemungkinan perdarahan ulang atau kematian?" — skornya lengkap sesudah endoskopi menambahkan kriteria diagnosis dan stigmata.</Prosa>
       </Card>
 
       <Card className="!p-5 space-y-3">

@@ -37,7 +37,7 @@ export function LdlCalculator() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="LDL Cholesterol (Friedewald)" subtitle="Calculated LDL + non-HDL cholesterol (Friedewald et al. 1972)" />
-        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Most labs report LDL calculated with this formula rather than measuring it directly: LDL = Total − HDL − Triglycerides/5. The TG/5 term estimates VLDL and breaks down at high triglycerides.</Prosa>
+        <Prosa kelas="mt-2 text-[13px] leading-relaxed text-neutral-500">Kebanyakan laboratorium melaporkan LDL yang dihitung dengan rumus ini, bukan diukur langsung: LDL = Total − HDL − Trigliserida/5. Suku TG/5 memperkirakan VLDL dan tidak berlaku lagi pada trigliserida tinggi.</Prosa>
         <div className="mt-3 grid grid-cols-3 gap-3">
           <Field label="Total cholesterol (mg/dL)">
             <input className={inputClass} type="number" min={0} value={totalChol || ''} onChange={(e) => setTotalChol(Number(e.target.value) || 0)} />
@@ -50,7 +50,7 @@ export function LdlCalculator() {
           </Field>
         </div>
         {tgTooHigh && (
-          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Triglycerides ≥400 mg/dL — the Friedewald formula is not valid here. Request a direct LDL measurement (or Martin-Hopkins calculation); the non-HDL value below remains valid.</Prosa>
+          <Prosa kelas="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">Trigliserida ≥400 mg/dL — rumus Friedewald tidak berlaku di sini. Mintalah pengukuran LDL langsung (atau perhitungan Martin-Hopkins); nilai non-HDL di bawah tetap sahih.</Prosa>
         )}
       </Card>
 

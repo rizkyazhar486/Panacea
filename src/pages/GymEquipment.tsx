@@ -31,8 +31,8 @@ export function GymEquipment() {
 
       <Card className="!p-4">
         <SectionTitle icon={<IconRun size={18} />} title={`${EQUIPMENT.length} machines & stations`}
-          subtitle="Including every official Hyrox station" />
-        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">Every machine here is compared against its equipment-free equivalent in both directions: where the machine genuinely wins, where the bodyweight movement wins, and when the difference is too small to argue about. "Machines are always inferior" and "machines are always safer" are equally inaccurate — what actually differs, and can be measured, is how much stabiliser work the movement demands, how easily load can be added, how much skill it takes, and how well it transfers to real life.</Prosa>
+          subtitle="Termasuk seluruh stasiun resmi Hyrox" />
+        <Prosa kelas="mt-2 text-[12px] leading-relaxed text-neutral-600 dark:text-neutral-300">Tiap mesin di sini dibandingkan dengan padanan tanpa alatnya ke dua arah: di mana mesinnya benar-benar unggul, di mana gerakan berat badan yang unggul, dan kapan selisihnya terlalu kecil untuk diperdebatkan. "Mesin selalu lebih rendah" dan "mesin selalu lebih aman" sama-sama tidak tepat — yang benar-benar berbeda, dan dapat diukur, adalah seberapa banyak kerja otot penstabil yang dituntut gerakan itu, semudah apa bebannya ditambah, seberapa besar keterampilan yang diperlukan, dan sebaik apa ia terbawa ke kehidupan nyata.</Prosa>
         <input
           className={inputClass + ' mt-3'}
           placeholder="Search equipment (e.g. treadmill, sled, rower, glutes)…"
