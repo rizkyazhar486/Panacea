@@ -6,6 +6,7 @@ import { KisiFitur } from '../components/KisiFitur'
 import { CatatanHarian } from '../components/CatatanHarian'
 import { CatatanLatihan } from '../components/CatatanLatihan'
 import { pratinjauBeranda } from '../lib/pratinjauBeranda'
+import { deretMetrik } from '../lib/riwayatVitals'
 import { getVitals } from '../lib/healthVitals'
 import { getWorkouts } from '../lib/workoutStore'
 import { statusSingkat } from '../lib/pelatih'
@@ -277,8 +278,10 @@ export default function Beranda() {
       }
       out.push({ label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: 'text-ink dark:text-white' })
     }
-    if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white' })
-    if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400' })
+    // Garisnya diambil dari riwayat yang benar-benar tercatat; Garis sendiri
+    // yang menolak menggambar bila titiknya kurang dari dua.
+    if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white', deret: deretMetrik('weightKg').map((t) => t.nilai) })
+    if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400', deret: deretMetrik('restingHr').map((t) => t.nilai) })
     if (v.systolic && v.diastolic) {
       out.push({ label: 'Tensi', nilai: `${v.systolic}/${v.diastolic}`, nada: 'text-ink dark:text-white' })
     }

@@ -15,6 +15,8 @@ const GrafikOlahraga = lazy(() =>
 )
 import { PemilihWidget } from './PemilihWidget'
 import { rincianBeranda, barisTekananDarah, type BarisRincian } from '../lib/rincianBeranda'
+import { deretMetrik } from '../lib/riwayatVitals'
+import { GrafikMini } from './GrafikMini'
 import { bilahTersedia } from '../lib/bilahRujukan'
 import { BilahTubuh } from './BilahTubuh'
 import { getVitals } from '../lib/healthVitals'
@@ -365,7 +367,10 @@ function DaftarRincian({ baris }: { baris: BarisRincian[] }) {
                 </span>
               )}
             </span>
-            <span className="flex shrink-0 items-baseline gap-1">
+            <span className="flex shrink-0 items-center gap-1.5">
+              {/* Bentuk perubahannya, dari bacaan yang benar-benar tercatat.
+                  Tidak muncul selama titiknya belum sampai tiga. */}
+              <GrafikMini deret={deretMetrik(b.kunci).map((t) => t.nilai)} />
               <span className="t-sedang font-black tabular-nums text-ink dark:text-white">{b.nilai}</span>
               <span className="t-mikro font-bold text-neutral-400">{b.satuan}</span>
               <span aria-hidden className="t-kecil text-neutral-300 dark:text-neutral-600">›</span>
