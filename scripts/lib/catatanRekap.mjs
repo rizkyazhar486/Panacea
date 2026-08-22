@@ -102,6 +102,9 @@ const norm = (s) => {
 const bukanKasus = (label) =>
   /^[\d.,\s]+$/.test(label) ||
   /ga ada osce|tidak ada osce|covid-19\)$/i.test(label) ||
+  // 'Ga ada data' dan 'gaada?' juga bukan kasus; keduanya lolos dari ambang
+  // panjang di bawah dan harus disebut sendiri.
+  /^ga+ ?ada( data)?\??$/i.test(label.trim()) ||
   label.trim().length < 4
 const petaNorm = new Map()
 for (const k of Object.keys(blok)) {

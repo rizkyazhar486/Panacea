@@ -1226,6 +1226,15 @@ const ALIAS: Record<string, string> = {
    *   'Ga ada data' dan 'gaada?' bukan kasus sama sekali; keduanya lolos dari
    *   saringan bukanKasus() karena panjangnya melebihi ambang.
    */
+
+  // Catatan yang ditulis pada gelombang penutup.
+  'Retinitis pigmentosa': 'Retinitis Pigmentosa',
+  IUGR: 'Pertumbuhan Janin Terhambat (IUGR)',
+  'Sindrom Geriatri - (RME)': 'Sindrom Geriatri',
+  'DADR-S ec intoleransi laktosa': 'Intoleransi Laktosa',
+  'DATD ec intoleransi laktosa': 'Intoleransi Laktosa',
+  'Diare akut ec Intoleransi laktosa': 'Intoleransi Laktosa',
+  'Diare ec intoksikasi susu sapi': 'Intoleransi Laktosa',
 }
 
 /**
