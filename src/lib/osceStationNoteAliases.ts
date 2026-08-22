@@ -935,8 +935,8 @@ const ALIAS: Record<string, string> = {
   /*
    * YANG SENGAJA DIBIARKAN KOSONG dari kelompok ini:
    *
-   *   'Uveitis Anterior', 'Retinitis pigmentosa', 'Ramsay Hunt Syndrome',
-   *   'Ulkus Mole', 'Kalazion', 'Cushing syndrome', 'Ankilostomiasis',
+   *   'Retinitis pigmentosa', 'Ramsay Hunt Syndrome', 'Cushing syndrome',
+   *   'Ankilostomiasis',
    *   'Epiglottitis', 'Hidronefrosis', 'Kista Nabothian', 'IUGR' — memang
    *   belum ada catatannya sama sekali. Ini pekerjaan menulis.
    *
@@ -950,6 +950,10 @@ const ALIAS: Record<string, string> = {
    */
 
   // Catatan baru yang ditulis pada gelombang ini.
+  'Ulkus Mole': 'Ulkus Mole (Chancroid)',
+  'Ulkus Molle': 'Ulkus Mole (Chancroid)',
+  'Ulkus molle (H.Ducreyi)': 'Ulkus Mole (Chancroid)',
+  Chancroid: 'Ulkus Mole (Chancroid)',
   'Pitiriasis Versicolor': 'Pitiriasis Versikolor (Panu)',
   Panu: 'Pitiriasis Versikolor (Panu)',
 }
