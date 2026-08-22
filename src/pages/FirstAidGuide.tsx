@@ -17,7 +17,7 @@ const GUIDES: Guide[] = [
     id: 'choking',
     title: 'Tersedak (dewasa/anak, sadar)',
     emoji: '🫁',
-    category: 'Airway',
+    category: 'Jalan Napas',
     whenToCall911: 'Bila orangnya sama sekali tidak dapat batuk, berbicara, atau bernapas, atau menjadi tidak sadar.',
     steps: [
       'Tanyakan "Anda tersedak?" — bila ia masih dapat batuk kuat atau berbicara, doronglah ia terus batuk dan jangan campur tangan dulu.',
@@ -33,7 +33,7 @@ const GUIDES: Guide[] = [
     id: 'cpr',
     title: 'RJP dewasa (oleh orang awam)',
     emoji: '❤️',
-    category: 'Cardiac',
+    category: 'Jantung',
     whenToCall911: 'Segera — bila Anda sendirian, teleponlah dulu sebelum memulai penekanan dada, baru mulai RJP.',
     steps: [
       'Periksa kesadarannya: tepuk bahunya dengan mantap dan panggil dengan keras. Periksa napas normal (tidak lebih dari 10 detik).',
@@ -79,7 +79,7 @@ const GUIDES: Guide[] = [
     id: 'seizure',
     title: 'Kejang',
     emoji: '🧠',
-    category: 'Neurological',
+    category: 'Saraf',
     whenToCall911: 'Kejang pertama kali seumur hidup, berlangsung lebih dari 5 menit, kejang berikutnya datang sebelum pulih, ada cedera saat kejang, sesak napas sesudahnya, atau orangnya sedang hamil/diabetes/diketahui bukan penyandang epilepsi.',
     steps: [
       'Tetap tenang dan hitung lama kejangnya.',
@@ -94,7 +94,7 @@ const GUIDES: Guide[] = [
     id: 'fainting',
     title: 'Pingsan',
     emoji: '💫',
-    category: 'General',
+    category: 'Umum',
     whenToCall911: 'Tidak sadar kembali dalam satu menit, cedera akibat jatuh, nyeri dada, denyut jantung tidak teratur, atau orangnya sedang hamil/lanjut usia.',
     steps: [
       'Baringkan orangnya mendatar dan angkat tungkainya sekitar 30 cm agar aliran darah ke otak membaik.',
@@ -108,7 +108,7 @@ const GUIDES: Guide[] = [
     id: 'stroke',
     title: 'Dugaan stroke (FAST)',
     emoji: '🧠',
-    category: 'Neurological',
+    category: 'Saraf',
     whenToCall911: 'Salah satu tanda FAST, meskipun kemudian menghilang — segera telepon, catat jam gejalanya mulai.',
     steps: [
       'F — Face (wajah): minta ia tersenyum. Apakah satu sisi turun?',
@@ -123,7 +123,7 @@ const GUIDES: Guide[] = [
     id: 'allergic',
     title: 'Severe allergic reaction (anaphylaxis)',
     emoji: '⚠️',
-    category: 'Allergic',
+    category: 'Alergi',
     whenToCall911: 'Tanda sesak napas apa pun, pembengkakan wajah/tenggorokan, biduran luas disertai pusing, atau paparan alergen yang diketahui berat.',
     steps: [
       'Call emergency services immediately.',
@@ -136,16 +136,16 @@ const GUIDES: Guide[] = [
   },
 ]
 
-const CATEGORIES = ['All', ...Array.from(new Set(GUIDES.map((g) => g.category)))]
+const CATEGORIES = ['Semua', ...Array.from(new Set(GUIDES.map((g) => g.category)))]
 
 export function FirstAidGuide() {
   const [query, setQuery] = useState('')
-  const [cat, setCat] = useState('All')
+  const [cat, setCat] = useState('Semua')
   const [open, setOpen] = useState<string | null>(null)
   const q = query.trim().toLowerCase()
 
   const filtered = useMemo(
-    () => GUIDES.filter((g) => (cat === 'All' || g.category === cat) && (!q || (g.title + g.category).toLowerCase().includes(q))),
+    () => GUIDES.filter((g) => (cat === 'Semua' || g.category === cat) && (!q || (g.title + g.category).toLowerCase().includes(q))),
     [q, cat],
   )
 

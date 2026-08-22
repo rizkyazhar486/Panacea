@@ -7,7 +7,27 @@
   --color-brand-100: #cdf3e0;
   --color-accent: #ff3131;
   --color-ink: #0c1410;
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  /* ── HURUF ────────────────────────────────────────────────────────────────
+     Tiga muka huruf, masing-masing untuk satu pekerjaan, bukan untuk variasi.
+
+     TUBUH TULISAN — Inter. Dipilih justru karena ia tidak berusaha menarik
+     perhatian: tinggi x-nya besar dan bentuk hurufnya terbuka, sehingga
+     kalimat panjang tentang dosis obat tetap terbaca pada 11 px di layar
+     telepon. Kalimat yang menjelaskan sesuatu yang penting tidak boleh
+     bersaing dengan bentuk hurufnya sendiri.
+
+     JUDUL — Space Grotesk. Geometris dan sedikit teknis; inilah yang memberi
+     kesan modern pada halaman tanpa perlu menambah satu pun hiasan. Dipakai
+     HANYA untuk judul dan nama bagian — pada paragraf panjang, ciri khasnya
+     yang sama justru melelahkan mata.
+
+     ANGKA BESAR — JetBrains Mono. Lebarnya tetap, sehingga angka yang berubah
+     tiap detik (denyut, langkah, pewaktu) tidak menggeser tata letak di
+     sekitarnya. Inilah alasan sebenarnya memakai huruf monospasi pada data,
+     bukan seleranya. */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-judul: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-angka: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
   /* Panaceamed "pnc" design tokens — calmer, green-tinted neutral system.
      Light surfaces stay airy; dark mode uses warm green-tinted greys (not
@@ -1204,4 +1224,40 @@ html { -webkit-overflow-scrolling: touch; }
 @media (prefers-reduced-motion: reduce) {
   .dark .nyala,
   .dark .nyala-merah { animation: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PENERAPAN KETIGA MUKA HURUF.
+
+   Aturannya satu: muka huruf mengikuti PEKERJAAN teksnya, bukan tempatnya.
+   Judul memakai Space Grotesk di mana pun ia berada; angka besar memakai
+   JetBrains Mono di mana pun ia berada; sisanya Inter. Tanpa aturan itu,
+   halaman berikutnya akan memakai kombinasi yang sedikit berbeda, dan
+   perbedaan-perbedaan kecil itulah yang membuat sebuah aplikasi terasa
+   dirakit dari potongan.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+h1, h2, h3,
+.font-judul {
+  font-family: var(--font-judul);
+  letter-spacing: -0.015em;
+}
+
+/* Angka besar. Dipakai pada bacaan tunggal yang berubah — bukan pada angka di
+   dalam kalimat, karena huruf monospasi di tengah paragraf memutus iramanya. */
+.t-angka,
+.t-angka-panjang,
+.font-angka {
+  font-family: var(--font-angka);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Nama bagian yang ditulis huruf besar semua. Space Grotesk pada ukuran kecil
+   dan huruf besar semua menjadi terlalu rapat; jarak antarhurufnya dilebarkan
+   supaya tetap terbaca sekilas. */
+.t-kecil.uppercase,
+.t-mikro.uppercase {
+  font-family: var(--font-judul);
+  letter-spacing: 0.06em;
 }
