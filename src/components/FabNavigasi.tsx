@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogoMark } from './Logo'
+import { KATALOG_AKSI, ambilAksi } from '../lib/aksiFab'
+import { PemilihAksiFab } from './PemilihAksiFab'
+import { toggleTheme } from '../lib/theme'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigasi berbentuk satu tombol melayang yang dapat dipindah.
@@ -95,6 +98,13 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
     jepit(bacaPosisi() ?? { x: window.innerWidth - UKURAN - TEPI, y: window.innerHeight - UKURAN - TEPI - 8 }))
   const [buka, setBuka] = useState(false)
   const [menggeser, setMenggeser] = useState(false)
+  const [aturBuka, setAturBuka] = useState(false)
+  const [pilihan, setPilihan] = useState<string[]>(ambilAksi)
+  useEffect(() => {
+    const on = () => setPilihan(ambilAksi())
+    window.addEventListener('panacea:aksi-fab', on)
+    return () => window.removeEventListener('panacea:aksi-fab', on)
+  }, [])
 
   const ref = useRef<HTMLButtonElement>(null)
   const awal = useRef<{ px: number; py: number; x: number; y: number; geser: boolean } | null>(null)
@@ -184,53 +194,42 @@ export function FabNavigasi({ tujuan, onTambah, onCari }: { tujuan: TujuanFab[];
     'col-start-3 row-start-1',
   ]
 
-  /* Enam tindakan yang benar-benar dipakai berulang, bukan enam pintu.
-     Dipilih dari yang paling sering dibutuhkan di tengah halaman mana pun:
-     mencari sesuatu, kembali, naik ke atas halaman panjang, pulang ke beranda,
-     mencatat hari ini, dan pertolongan darurat. */
+  /* Tindakan diambil dari pilihan pemakainya sendiri.
+     Slot terakhir SELALU "Ubah" — sebuah pengaturan yang hanya dapat
+     ditemukan lewat menu pengaturan yang lain tidak akan pernah ditemukan
+     oleh orang yang justru paling membutuhkannya. */
+  const jalankan = (id: string) => {
+    const a = KATALOG_AKSI.find((x) => x.id === id)
+    if (!a) return
+    if (a.jenis === 'rute' && a.ke) navigasi(a.ke)
+    else if (a.jenis === 'kembali') navigasi(-1)
+    else if (a.jenis === 'atas') window.scrollTo({ top: 0, behavior: 'smooth' })
+    else if (a.jenis === 'tema') toggleTheme()
+  }
+
+  const terpilih = pilihan
+    .map((id) => KATALOG_AKSI.find((a) => a.id === id))
+    .filter((a): a is (typeof KATALOG_AKSI)[number] => !!a)
+    .slice(0, TATA.length - 1)
+
   const aksi: { label: string; ikon: React.ReactNode; jalan: () => void; utama?: boolean }[] = [
+    ...terpilih.map((a, i) => ({
+      label: a.label,
+      ikon: <span className="text-[16px] leading-none">{a.ikon}</span>,
+      jalan: () => jalankan(a.id),
+      utama: i === 0,
+    })),
     {
-      label: 'Cari',
-      ikon: (
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-          <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
-        </svg>
-      ),
-      // Selalu ke mesin pencari, bukan ke kotak cari milik bilah judul.
-      // Kotak itu hanya mencari nama fitur; yang dicari orang di tengah
-      // halaman biasanya penyakit, obat, atau skor — dan itu ada di /cari.
-      jalan: () => navigasi('/cari'),
-      utama: true,
-    },
-    {
-      label: 'Kembali',
-      ikon: <span className="text-[18px] leading-none">‹</span>,
-      jalan: () => navigasi(-1),
-    },
-    {
-      label: 'Beranda',
-      ikon: <span className="text-[15px] leading-none">⌂</span>,
-      jalan: () => navigasi('/'),
-    },
-    {
-      label: 'Ke atas',
-      ikon: <span className="text-[15px] leading-none">↑</span>,
-      jalan: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
-    },
-    {
-      label: 'Catat',
-      ikon: <span className="text-[14px] leading-none">✎</span>,
-      jalan: () => navigasi('/harian'),
-    },
-    {
-      label: 'SOS',
-      ikon: <span className="text-[13px] font-black leading-none">SOS</span>,
-      jalan: () => navigasi('/darurat'),
+      label: 'Ubah',
+      ikon: <span className="text-[15px] leading-none">⚙</span>,
+      jalan: () => setAturBuka(true),
     },
   ]
 
   return (
     <>
+      {aturBuka && <PemilihAksiFab tutup={() => setAturBuka(false)} />}
+
       {/* Tirai: menutup menu bila disentuh di luar. Diberi warna sangat samar
           alih-alih sepenuhnya bening supaya jelas bahwa layar sedang "terkunci"
           oleh menu. */}
