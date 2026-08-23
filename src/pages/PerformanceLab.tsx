@@ -68,20 +68,20 @@ function MetricCard({ id, name, emoji, inputs, compute, unit, note, interpret }:
 }
 
 const TABS = [
-  'Ambang & Metabolik', 'Kekuatan & Daya', 'Kecepatan & Kelincahan', 'Uji Lapangan',
-  'Pernapasan & Lingkungan', 'Beban & Pengelolaan', 'Ekonomi & Ketahanan',
+  'Threshold & Metabolic', 'Strength & Power', 'Speed & Agility', 'Field Tests',
+  'Respiratory & Environment', 'Load & Management', 'Economy & Durability',
 ] as const
 type Tab = typeof TABS[number]
 
 export function PerformanceLab() {
-  const [tab, setTab] = useState<Tab>('Ambang & Metabolik')
+  const [tab, setTab] = useState<Tab>('Threshold & Metabolic')
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconGauge size={20} />} title="Lab Penampilan" subtitle="Rangkaian lengkap uji dan kalkulator kekuatan, ketahanan & kecepatan — manual/berbasis laboratorium" />
+        <SectionTitle icon={<IconGauge size={20} />} title="Performance Lab" subtitle="Rangkaian lengkap uji dan kalkulator kekuatan, ketahanan & kecepatan — manual/berbasis laboratorium" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Isikan angka dari jam tangan, alat laboratorium (laktat, NIRS, power meter), atau uji lapangan. Semuanya tersimpan luring di perangkat Anda.
-          Sebelum memulai program berat, selesaikan dahulu <a href="#/assessment" className="font-bold text-brand-dark underline">Penilaian Awal</a> (pola gerak, nyeri, risiko cedera, asimetri).
+          Fill in values from a watch, lab equipment (lactate, NIRS, power meter) or field tests. Everything is stored offline on your device.
+          Before starting a heavy program, first complete the <a href="#/assessment" className="font-bold text-brand-dark underline">Initial Assessment</a> (movement patterns, pain, injury risk, asymmetry).
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {TABS.map((t) => (
@@ -90,13 +90,13 @@ export function PerformanceLab() {
         </div>
       </Card>
 
-      {tab === 'Ambang & Metabolik' && <ThresholdTab />}
-      {tab === 'Kekuatan & Daya' && <PowerTab />}
-      {tab === 'Kecepatan & Kelincahan' && <SpeedTab />}
-      {tab === 'Uji Lapangan' && <FieldTestTab />}
-      {tab === 'Pernapasan & Lingkungan' && <RespiratoryTab />}
-      {tab === 'Beban & Pengelolaan' && <LoadTab />}
-      {tab === 'Ekonomi & Ketahanan' && <EconomyTab />}
+      {tab === 'Threshold & Metabolic' && <ThresholdTab />}
+      {tab === 'Strength & Power' && <PowerTab />}
+      {tab === 'Speed & Agility' && <SpeedTab />}
+      {tab === 'Field Tests' && <FieldTestTab />}
+      {tab === 'Respiratory & Environment' && <RespiratoryTab />}
+      {tab === 'Load & Management' && <LoadTab />}
+      {tab === 'Economy & Durability' && <EconomyTab />}
     </div>
   )
 }
@@ -105,7 +105,7 @@ export function PerformanceLab() {
 function ThresholdTab() {
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Ambang & Metabolik" subtitle="RPE, AT, MLSS, LT/VT, OBLA, RCP, Critical Power, HHb, VLaMax" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Threshold & Metabolic" subtitle="RPE, AT, MLSS, LT/VT, OBLA, RCP, Critical Power, HHb, VLaMax" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <RpeCard />
         <MetricCard id="at" name="Anaerobic Threshold (AT)" emoji="⚡" unit="bpm"
@@ -171,13 +171,13 @@ function RpeCard() {
       </div>
       <div className="mt-1 text-[11px] text-neutral-500">{BORG[rpe]}</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Lama (menit)"><input className={inputClass} type="number" value={dur} onChange={(e) => setDur(+e.target.value)} /></Field>
+        <Field label="Duration (minutes)"><input className={inputClass} type="number" value={dur} onChange={(e) => setDur(+e.target.value)} /></Field>
         <div className="rounded-xl bg-neutral-50 p-2.5">
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Beban Latihan (sRPE)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Training Load (sRPE)</div>
           <div className="text-lg font-extrabold text-brand-dark">{load}</div>
         </div>
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Metode Foster: Beban = RPE × lama. Dasar bagi Rasio Beban Akut:Kronis di halaman Atlet.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Foster method: Load = RPE × duration. Basis for the Acute:Chronic Workload Ratio on the Athlete page.</p>
     </div>
   )
 }
@@ -208,15 +208,15 @@ function LactateRecoveryCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">📉 Lactate Accumulation & Recovery</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Laktat Puncak (mmol)"><input className={inputClass} type="number" value={peak} onChange={(e) => setPeak(+e.target.value)} /></Field>
-        <Field label="Menit sesudah puncak"><input className={inputClass} type="number" value={min} onChange={(e) => setMin(+e.target.value)} /></Field>
+        <Field label="Peak Lactate (mmol)"><input className={inputClass} type="number" value={peak} onChange={(e) => setPeak(+e.target.value)} /></Field>
+        <Field label="Minutes after peak"><input className={inputClass} type="number" value={min} onChange={(e) => setMin(+e.target.value)} /></Field>
       </div>
       <div className="mt-2 flex gap-1.5">
-        <button onClick={() => setActive(true)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Pemulihan Aktif</button>
-        <button onClick={() => setActive(false)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (!active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Pemulihan Pasif</button>
+        <button onClick={() => setActive(true)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Active Recovery</button>
+        <button onClick={() => setActive(false)} className={'flex-1 rounded-xl py-1.5 text-[11px] font-bold ' + (!active ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>Passive Recovery</button>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Taksiran Laktat Tersisa</div><div className="text-lg font-extrabold text-brand-dark">{remaining.toFixed(1)} mmol</div></div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Waktu paruh laktat ≈15 menit (pemulihan aktif/jogging ringan) vs ≈25 menit (pasif/istirahat). Model peluruhan eksponensial.</p>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Remaining Lactate</div><div className="text-lg font-extrabold text-brand-dark">{remaining.toFixed(1)} mmol</div></div>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Lactate half-life ≈15 minutes (active recovery/light jogging) vs ≈25 minutes (passive/rest). Exponential decay model.</p>
     </div>
   )
 }
@@ -249,9 +249,9 @@ function MetabolicMapCard() {
         {pts.map((p, i) => <text key={p.z} x={x(i)} y={H - 6} fontSize="8" fill="rgba(255,255,255,0.5)" textAnchor="middle">Z{p.z}</text>)}
       </svg>
       <div className="mt-1 flex flex-wrap gap-3 text-[10px]">
-        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />Oksidasi Lemak %</span>
-        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Oksidasi Karbohidrat %</span>
-        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Laktat (mmol)</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />Fat Oxidation %</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />Carb Oxidation %</span>
+        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400" />Lactate (mmol)</span>
       </div>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-ink/70">Puncak "Fat Max" umumnya berada di Z2 (sekitar 60% HRmaks) — kunci latihan dasar yang memakai lemak sebagai bahan bakar. Di atas Z4, pembakaran lemak nyaris berhenti dan tubuh beralih sepenuhnya ke karbohidrat sementara laktat menumpuk dengan cepat.</Prosa>
     </div>
@@ -269,18 +269,18 @@ function PowerTab() {
   const pctUsed = oneRm > 0 ? (w / oneRm) * 100 : 0
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Kekuatan & Daya" subtitle="1RM, PPO, power-to-weight ratio, total mechanical work, FTP, MMP" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Strength & Power" subtitle="1RM, PPO, power-to-weight ratio, total mechanical work, FTP, MMP" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-neutral-100 p-4 sm:col-span-2">
           <div className="text-sm font-extrabold">🏋️ 1 Rep Max (1RM) & Submaximal Rep Test</div>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Field label="Gerakan">
+            <Field label="Movement">
               <select className={inputClass} value={ex} onChange={(e) => setEx(e.target.value)}>
                 {['Back Squat', 'Bench Press', 'Deadlift', 'Overhead Press'].map((o) => <option key={o}>{o}</option>)}
               </select>
             </Field>
-            <Field label="Beban (kg)"><input className={inputClass} type="number" value={w} onChange={(e) => setW(+e.target.value)} /></Field>
-            <Field label="Ulangan"><input className={inputClass} type="number" value={reps} onChange={(e) => setReps(+e.target.value)} /></Field>
+            <Field label="Load (kg)"><input className={inputClass} type="number" value={w} onChange={(e) => setW(+e.target.value)} /></Field>
+            <Field label="Reps"><input className={inputClass} type="number" value={reps} onChange={(e) => setReps(+e.target.value)} /></Field>
             <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">1RM ({ex})</div><div className="text-lg font-extrabold text-brand-dark">{oneRm.toFixed(0)} kg</div></div>
           </div>
           <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Average of Epley (w×(1+reps/30)) & Brzycki (w/(1.0278−0.0278×reps)). This load is ≈{pctUsed.toFixed(0)}% of your 1RM — a safe submaximal test without lifting to full failure.</p>
@@ -321,7 +321,7 @@ function PowerTab() {
 function SpeedTab() {
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Kecepatan & Kelincahan" subtitle="MSS, ASR, percepatan, laju langkah, reaksi & Kelincahan Illinois" />
+      <SectionTitle icon={<IconRun size={20} />} title="Speed & Agility" subtitle="MSS, ASR, acceleration, stride rate, reaction & Illinois Agility" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <MetricCard id="mss" name="Maximal Sprinting Speed (MSS)" emoji="🚀" unit="km/h"
           inputs={[{ key: 'val', label: 'Measured top speed (GPS/gate)', unit: 'km/h', default: 28 }]}
@@ -334,7 +334,7 @@ function SpeedTab() {
           note="ASR = MSS − speed at VO₂max. Pure anaerobic-speed capacity, important for repeated sprints & team sports."
         />
         <MetricCard id="accel" name="Acceleration (short sprint)" emoji="⚡" unit="m/s²"
-          inputs={[{ key: 'dist', label: 'Jarak', unit: 'm', default: 20 }, { key: 'time', label: 'Time', unit: 'sec', default: 3.2 }]}
+          inputs={[{ key: 'dist', label: 'Distance', unit: 'm', default: 20 }, { key: 'time', label: 'Time', unit: 'sec', default: 3.2 }]}
           compute={(v) => (2 * v.dist) / (v.time * v.time)}
           note="From standstill (s=½at²): a = 2×distance ÷ time². Tested via 10-30m sprint from a standing start."
         />
@@ -379,7 +379,7 @@ function ReactionTimeCard() {
         <div className="text-[10px] font-bold uppercase text-neutral-500">Average ({trials.length} trials)</div>
         <div className="text-lg font-extrabold text-brand-dark">{avg > 0 ? avg.toFixed(0) : '—'} ms</div>
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Orang dewasa umumnya ≈200-250 ms; atlet elite dapat &lt;180 ms. Ulangi 5× agar hasilnya mantap.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Average adult ≈200-250ms; elite athletes can be &lt;180ms. Repeat 5× for a stable result.</p>
     </div>
   )
 }
@@ -388,20 +388,20 @@ function IllinoisCard() {
   const [t, setT] = useState(17)
   const [g, setG] = useState<'M' | 'F'>('M')
   const bands = g === 'M'
-    ? [[15.2, 'Excellent'], [16.1, 'Good'], [18.1, 'Rata-rata'], [19.3, 'Fair'], [999, 'Poor']] as const
-    : [[17.0, 'Excellent'], [17.9, 'Good'], [21.7, 'Rata-rata'], [23.0, 'Fair'], [999, 'Poor']] as const
+    ? [[15.2, 'Excellent'], [16.1, 'Good'], [18.1, 'Average'], [19.3, 'Fair'], [999, 'Poor']] as const
+    : [[17.0, 'Excellent'], [17.9, 'Good'], [21.7, 'Average'], [23.0, 'Fair'], [999, 'Poor']] as const
   const label = bands.find(([max]) => t <= max)?.[1] ?? 'Poor'
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🔀 Illinois Agility Test</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Waktu (detik)"><input className={inputClass} type="number" step="0.1" value={t} onChange={(e) => setT(+e.target.value)} /></Field>
-        <Field label="Jenis kelamin">
-          <select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select>
+        <Field label="Time (seconds)"><input className={inputClass} type="number" step="0.1" value={t} onChange={(e) => setT(+e.target.value)} /></Field>
+        <Field label="Gender">
+          <select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">Male</option><option value="F">Female</option></select>
         </Field>
       </div>
-      <div className="mt-2"><Badge tone={label === 'Excellent' || label === 'Good' ? 'brand' : label === 'Rata-rata' ? 'low' : 'critical'}>{label}</Badge></div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Lintasan kerucut baku 10 m mengukur kelincahan berbagai arah — penting untuk olahraga beregu/bela diri.</p>
+      <div className="mt-2"><Badge tone={label === 'Excellent' || label === 'Good' ? 'brand' : label === 'Average' ? 'low' : 'critical'}>{label}</Badge></div>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Standard 10m cone track measures multi-directional agility — important for team sports/martial arts.</p>
     </div>
   )
 }
@@ -410,18 +410,18 @@ function IllinoisCard() {
 function FieldTestTab() {
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconTimer size={20} />} title="Uji Lapangan" subtitle="Lompat tegak, lompat jauh tanpa awalan, kekuatan genggam, uji bleep bertingkat" />
+      <SectionTitle icon={<IconTimer size={20} />} title="Field Tests" subtitle="Vertical jump, broad jump, handgrip, multi-stage fitness test (bleep)" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <MetricCard id="vjump" name="Vertical Jump" emoji="⬆️" unit="cm"
           inputs={[{ key: 'cm', label: 'Jump Height', unit: 'cm', default: 40 }]}
           compute={(v) => v.cm}
-          interpret={(r) => { const n = r as number; return { label: n >= 65 ? 'Elite' : n >= 55 ? 'Very Good' : n >= 45 ? 'Good' : n >= 35 ? 'Rata-rata' : 'Below Average', tone: n >= 55 ? 'brand' : n >= 40 ? 'low' : 'neutral' } }}
+          interpret={(r) => { const n = r as number; return { label: n >= 65 ? 'Elite' : n >= 55 ? 'Very Good' : n >= 45 ? 'Good' : n >= 35 ? 'Average' : 'Below Average', tone: n >= 55 ? 'brand' : n >= 40 ? 'low' : 'neutral' } }}
           note="Countermovement jump — proxy for explosive leg power. Elite jump/sprint athletes are typically &gt;60cm."
         />
         <MetricCard id="bjump" name="Standing Broad Jump" emoji="🦘" unit="cm"
           inputs={[{ key: 'cm', label: 'Jump Distance', unit: 'cm', default: 200 }]}
           compute={(v) => v.cm}
-          interpret={(r) => { const n = r as number; return { label: n >= 250 ? 'Elite' : n >= 220 ? 'Good' : n >= 180 ? 'Rata-rata' : 'Below Average', tone: n >= 220 ? 'brand' : n >= 180 ? 'low' : 'neutral' } }}
+          interpret={(r) => { const n = r as number; return { label: n >= 250 ? 'Elite' : n >= 220 ? 'Good' : n >= 180 ? 'Average' : 'Below Average', tone: n >= 220 ? 'brand' : n >= 180 ? 'low' : 'neutral' } }}
           note="Horizontal leg power — correlates with sprint performance & change of direction."
         />
         <GripCard />
@@ -443,13 +443,13 @@ function GripCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">✊ Handgrip Dynamometer</div>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        <Field label="Kanan (kg)"><input className={inputClass} type="number" value={r} onChange={(e) => setR(+e.target.value)} /></Field>
-        <Field label="Kiri (kg)"><input className={inputClass} type="number" value={l} onChange={(e) => setL(+e.target.value)} /></Field>
-        <KolomVitalTerikat ikat={ikatBw} label="Berat (kg)" satuan="kg" step={0.1} />
+        <Field label="Right (kg)"><input className={inputClass} type="number" value={r} onChange={(e) => setR(+e.target.value)} /></Field>
+        <Field label="Left (kg)"><input className={inputClass} type="number" value={l} onChange={(e) => setL(+e.target.value)} /></Field>
+        <KolomVitalTerikat ikat={ikatBw} label="Weight (kg)" satuan="kg" step={0.1} />
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Rata-rata</div><div className="text-lg font-extrabold text-brand-dark">{avg.toFixed(1)} kg</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Rasio / Berat</div><div className="text-lg font-extrabold text-brand-dark">{ratio.toFixed(2)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Average</div><div className="text-lg font-extrabold text-brand-dark">{avg.toFixed(1)} kg</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Ratio / Weight</div><div className="text-lg font-extrabold text-brand-dark">{ratio.toFixed(2)}</div></div>
       </div>
       {asym > 10 && <div className="mt-2"><Badge tone="critical">⚠️ Asymmetry {asym.toFixed(0)}% — more than 10%</Badge></div>}
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Grip strength is one of the strongest predictors of mortality (PURE study). A left-right asymmetry &gt;10% indicates a potential imbalance that needs correcting.</p>
@@ -464,12 +464,12 @@ function BleepTestCard() {
   return (
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🔔 Multi-Stage Fitness Test (Bleep)</div>
-      <Field label="Tingkat tercapai (1-21)"><input className={inputClass} type="number" min={1} max={21} value={level} onChange={(e) => setLevel(+e.target.value)} /></Field>
+      <Field label="Level reached (1-21)"><input className={inputClass} type="number" min={1} max={21} value={level} onChange={(e) => setLevel(+e.target.value)} /></Field>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Kecepatan Akhir</div><div className="text-lg font-extrabold text-brand-dark">{speed.toFixed(1)} km/h</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Taksiran VO₂maks</div><div className="text-lg font-extrabold text-brand-dark">{vo2.toFixed(1)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Final Speed</div><div className="text-lg font-extrabold text-brand-dark">{speed.toFixed(1)} km/h</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Estimated VO₂max</div><div className="text-lg font-extrabold text-brand-dark">{vo2.toFixed(1)}</div></div>
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Rumus Léger & Gadoury (1989): VO₂maks = 5,857×kecepatan(km/jam) − 19,458. Taksiran lapangan, bukan pengganti uji laboratorium.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Léger & Gadoury (1989) formula: VO₂max = 5.857×speed(km/h) − 19.458. Field estimate, not a substitute for a lab test.</p>
     </div>
   )
 }
@@ -478,7 +478,7 @@ function BleepTestCard() {
 function RespiratoryTab() {
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconChartUp size={20} />} title="Pernapasan & Lingkungan" subtitle="Ventilasi, panas, hidrasi, aklimasi vs aklimatisasi ketinggian" />
+      <SectionTitle icon={<IconChartUp size={20} />} title="Respiratory & Environment" subtitle="Ventilation, heat, hydration, acclimation vs altitude acclimatization" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <VentilationCard />
         <MetricCard id="tidal" name="Breathing Rate & Tidal Volume" emoji="🫁" unit="mL"
@@ -533,13 +533,13 @@ function HydrationCard() {
       <div className="text-sm font-extrabold">💧 Sweat Rate & Hydration</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <KolomVitalTerikat ikat={ikatPre} label="Berat sebelum (kg)" satuan="kg" step={0.1} />
-        <Field label="Berat sesudah (kg)"><input className={inputClass} type="number" step="0.1" value={post} onChange={(e) => setPost(+e.target.value)} /></Field>
-        <Field label="Cairan diminum (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
-        <Field label="Lama (jam)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>
+        <Field label="Weight after (kg)"><input className={inputClass} type="number" step="0.1" value={post} onChange={(e) => setPost(+e.target.value)} /></Field>
+        <Field label="Fluid consumed (L)"><input className={inputClass} type="number" step="0.1" value={fluid} onChange={(e) => setFluid(+e.target.value)} /></Field>
+        <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.1" value={hrs} onChange={(e) => setHrs(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Laju Keringat</div><div className="text-lg font-extrabold text-brand-dark">{rate.toFixed(2)} L/hour</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Sweat Rate</div><div className="text-lg font-extrabold text-brand-dark">{rate.toFixed(2)} L/hour</div></div>
       {lossPct > 2 && <div className="mt-2"><Badge tone="critical">⚠️ Weight loss {lossPct.toFixed(1)}% — significant dehydration</Badge></div>}
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Kehilangan &gt;2% berat badan menurunkan penampilan & menaikkan risiko penyakit akibat panas. 1 L cairan ≈ 1 kg.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">A loss &gt;2% of body weight reduces performance & increases heat illness risk. 1L fluid ≈ 1kg.</p>
     </div>
   )
 }
@@ -553,8 +553,8 @@ function HeatStrainCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🌡️ Heat Strain</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Suhu (°C)"><input className={inputClass} type="number" value={temp} onChange={(e) => setTemp(+e.target.value)} /></Field>
-        <Field label="Kelembapan (%)"><input className={inputClass} type="number" value={hum} onChange={(e) => setHum(+e.target.value)} /></Field>
+        <Field label="Temperature (°C)"><input className={inputClass} type="number" value={temp} onChange={(e) => setTemp(+e.target.value)} /></Field>
+        <Field label="Humidity (%)"><input className={inputClass} type="number" value={hum} onChange={(e) => setHum(+e.target.value)} /></Field>
       </div>
       <div className="mt-2"><Badge tone={risk.tone}>{risk.l}</Badge></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">A simple WBGT-style estimate. Temp &gt;32°C or (&gt;28°C + humidity &gt;70%) — lower intensity, increase hydration & acclimatization.</p>
@@ -571,13 +571,13 @@ function AltitudeCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">⛰️ Adaptation vs Altitude Acclimatization</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Ketinggian (m)"><input className={inputClass} type="number" value={alt} onChange={(e) => setAlt(+e.target.value)} /></Field>
-        <Field label="Hari di ketinggian"><input className={inputClass} type="number" value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
+        <Field label="Altitude (m)"><input className={inputClass} type="number" value={alt} onChange={(e) => setAlt(+e.target.value)} /></Field>
+        <Field label="Days at altitude"><input className={inputClass} type="number" value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
       </div>
       <div className="relative mt-2 h-2.5 overflow-hidden rounded-full bg-neutral-100"><div className="absolute inset-y-0 left-0 rounded-full bg-brand" style={{ width: `${pct}%` }} /></div>
       <div className="mt-1 text-[11px] font-bold text-brand-dark">{pct.toFixed(0)}% acclimatized (estimated ~{neededDays.toFixed(0)} days for full adaptation)</div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">
-        <b>Aklimatisasi</b> = short-term individual physiological adjustment (days-weeks): increased red blood cell production, ventilation. <b>Adaptasi</b> = long-term genetic/population-level change (generations) in high-altitude populations.
+        <b>Acclimatization</b> = short-term individual physiological adjustment (days-weeks): increased red blood cell production, ventilation. <b>Adaptation</b> = long-term genetic/population-level change (generations) in high-altitude populations.
       </p>
     </div>
   )
@@ -593,12 +593,12 @@ function IfCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">⏳ Intermittent Fasting & Training Timing</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Awal jendela makan"><input className={inputClass} type="time" value={start} onChange={(e) => setStart(e.target.value)} /></Field>
-        <Field label="Akhir jendela makan"><input className={inputClass} type="time" value={end} onChange={(e) => setEnd(e.target.value)} /></Field>
+        <Field label="Eating window start"><input className={inputClass} type="time" value={start} onChange={(e) => setStart(e.target.value)} /></Field>
+        <Field label="Eating window end"><input className={inputClass} type="time" value={end} onChange={(e) => setEnd(e.target.value)} /></Field>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Jendela Makan</div><div className="text-base font-extrabold text-brand-dark">{window.toFixed(1)} hours</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Puasa</div><div className="text-base font-extrabold text-brand-dark">{fasting.toFixed(1)} hours</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Eating Window</div><div className="text-base font-extrabold text-brand-dark">{window.toFixed(1)} hours</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Fasting</div><div className="text-base font-extrabold text-brand-dark">{fasting.toFixed(1)} hours</div></div>
       </div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Zone 2/light sessions are safe while fasted (fat-adapted). High-intensity/strength sessions should ideally be scheduled within the eating window so glycogen is sufficient.</p>
     </div>
@@ -609,7 +609,7 @@ function IfCard() {
 function LoadTab() {
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconGauge size={20} />} title="Beban & Pengelolaan" subtitle="TSS, MAP, zona denyut Karvonen, rep-max, kerja & kelelahan" />
+      <SectionTitle icon={<IconGauge size={20} />} title="Load & Management" subtitle="TSS, MAP, Karvonen HR zones, rep-max, work & fatigue" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <TssCard />
         <MetricCard id="map" name="Mean Arterial Pressure (MAP)" emoji="🩺" unit="mmHg"
@@ -636,12 +636,12 @@ function TssCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">📐 Training Stress Score (TSS)</div>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        <Field label="Lama (menit)"><input className={inputClass} type="number" value={dur} onChange={(e) => setDur(+e.target.value)} /></Field>
+        <Field label="Duration (min)"><input className={inputClass} type="number" value={dur} onChange={(e) => setDur(+e.target.value)} /></Field>
         <Field label="NP (W)"><input className={inputClass} type="number" value={np} onChange={(e) => setNp(+e.target.value)} /></Field>
         <Field label="FTP (W)"><input className={inputClass} type="number" value={ftp} onChange={(e) => setFtp(+e.target.value)} /></Field>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Faktor Intensitas</div><div className="text-base font-extrabold text-brand-dark">{ifactor.toFixed(2)}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Intensity Factor</div><div className="text-base font-extrabold text-brand-dark">{ifactor.toFixed(2)}</div></div>
         <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">TSS</div><div className="text-base font-extrabold text-brand-dark">{tss.toFixed(0)}</div></div>
       </div>
       <Prosa kelas="mt-1.5 text-[10px] leading-relaxed text-neutral-500">TSS = (duration × NP × IF)/(FTP × 3600) × 100. 100 TSS ≈ 1 hour all-out at FTP. &gt;150/session = heavy load, needs extra recovery.</Prosa>
@@ -661,11 +661,11 @@ function KarvonenCard() {
       <div className="text-sm font-extrabold">🎯 Training HR Zones (Karvonen)</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <Field label="HRmax"><input className={inputClass} type="number" value={hrmax} onChange={(e) => setHrmax(+e.target.value)} /></Field>
-        <KolomVitalTerikat ikat={ikatHrrest} label="Nadi Istirahat" satuan="bpm" />
-        <Field label="Intensitas rendah (%)"><input className={inputClass} type="number" value={lo} onChange={(e) => setLo(+e.target.value)} /></Field>
-        <Field label="Intensitas tinggi (%)"><input className={inputClass} type="number" value={hi} onChange={(e) => setHi(+e.target.value)} /></Field>
+        <KolomVitalTerikat ikat={ikatHrrest} label="Resting HR" satuan="bpm" />
+        <Field label="Low intensity (%)"><input className={inputClass} type="number" value={lo} onChange={(e) => setLo(+e.target.value)} /></Field>
+        <Field label="High intensity (%)"><input className={inputClass} type="number" value={hi} onChange={(e) => setHi(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Rentang Denyut Sasaran</div><div className="text-lg font-extrabold text-brand-dark">{target(lo)}–{target(hi)} bpm</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Target HR Range</div><div className="text-lg font-extrabold text-brand-dark">{target(lo)}–{target(hi)} bpm</div></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Karvonen: Target = (HRmax−HRrest)×%intensity + HRrest. More personalized than %HRmax alone since it accounts for Heart Rate Reserve.</p>
     </div>
   )
@@ -681,15 +681,15 @@ function HrMaxCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">❤️ HRmax Estimate</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Usia"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
-        <Field label="Jenis kelamin"><select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></Field>
+        <Field label="Age"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Field label="Gender"><select className={inputClass} value={g} onChange={(e) => setG(e.target.value as 'M' | 'F')}><option value="M">Male</option><option value="F">Female</option></select></Field>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">220-age</div><div className="text-base font-extrabold text-brand-dark">{classic}</div></div>
         <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Tanaka</div><div className="text-base font-extrabold text-brand-dark">{tanaka.toFixed(0)}</div></div>
         {g === 'F' && <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Gulati (F)</div><div className="text-base font-extrabold text-brand-dark">{gulati.toFixed(0)}</div></div>}
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Tanaka (208−0,7×usia) umumnya lebih tepat daripada 220−usia. Gulati (206−0,88×usia) divalidasi khusus untuk perempuan.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Tanaka (208−0.7×age) is generally more accurate than 220-age. Gulati (206−0.88×age) is specifically validated for women.</p>
     </div>
   )
 }
@@ -707,11 +707,11 @@ function TrainingLoadRecapCard() {
       <div className="text-sm font-extrabold">📋 Load Summary (from the Athlete page)</div>
       <div className="mt-2 grid grid-cols-4 gap-2 text-center">
         <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">ACWR</div><div className="text-base font-extrabold text-brand-dark">{acwr > 0 ? acwr.toFixed(2) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">CTL (Kebugaran)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? ctl.toFixed(0) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">ATL (Kelelahan)</div><div className="text-base font-extrabold text-brand-dark">{acute > 0 ? atl.toFixed(0) : '—'}</div></div>
-        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">TSB (Kesegaran)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? tsb.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">CTL (Fitness)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? ctl.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">ATL (Fatigue)</div><div className="text-base font-extrabold text-brand-dark">{acute > 0 ? atl.toFixed(0) : '—'}</div></div>
+        <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">TSB (Form)</div><div className="text-base font-extrabold text-brand-dark">{chronic > 0 ? tsb.toFixed(0) : '—'}</div></div>
       </div>
-      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">This data is edited from the <a href="#/athlete" className="font-bold text-brand-dark underline">halaman Atlet</a> — shown here so all load metrics are visible in one Lab.</p>
+      <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">This data is edited from the <a href="#/athlete" className="font-bold text-brand-dark underline">Athlete page</a> — shown here so all load metrics are visible in one Lab.</p>
     </div>
   )
 }
@@ -722,7 +722,7 @@ function EconomyTab() {
   const last = state.gpsActivities?.[state.gpsActivities.length - 1]
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Ekonomi & Ketahanan" subtitle="Ekonomi lari/sepeda, ketahanan, ringkasan GPS" />
+      <SectionTitle icon={<IconRun size={20} />} title="Economy & Durability" subtitle="Running/cycling economy, durability, GPS summary" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <MetricCard id="re" name="Running Economy" emoji="🏃" unit="mL/kg/km"
           inputs={[{ key: 'vo2', label: 'Submaximal VO₂', unit: 'ml/kg/min', default: 40 }, { key: 'speed', label: 'Speed', unit: 'km/h', default: 12 }]}
@@ -740,11 +740,11 @@ function EconomyTab() {
           <div className="text-sm font-extrabold">📍 Last GPS Activity Summary</div>
           {last ? (
             <div className="mt-2 grid grid-cols-2 gap-2 text-center">
-              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Jarak</div><div className="text-base font-extrabold text-brand-dark">{last.distKm.toFixed(2)} km</div></div>
-              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Kecepatan Rata-rata</div><div className="text-base font-extrabold text-brand-dark">{last.avgSpeedKmh.toFixed(1)} km/h</div></div>
+              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Distance</div><div className="text-base font-extrabold text-brand-dark">{last.distKm.toFixed(2)} km</div></div>
+              <div className="rounded-xl bg-neutral-50 p-2"><div className="text-[10px] font-bold text-neutral-500">Avg Speed</div><div className="text-base font-extrabold text-brand-dark">{last.avgSpeedKmh.toFixed(1)} km/h</div></div>
             </div>
-          ) : <p className="mt-2 text-[11px] text-neutral-500">Belum ada aktivitas GPS yang terekam.</p>}
-          <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Ketinggian & bentuk medan (datar/bergelombang/berbukit) tampil langsung saat merekam di Pelacak GPS (Beranda).</p>
+          ) : <p className="mt-2 text-[11px] text-neutral-500">No GPS activity recorded yet.</p>}
+          <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Elevation & terrain (flat/rolling/hilly) appear directly while recording in the GPS Tracker (Home).</p>
         </div>
       </div>
     </Card>
@@ -759,10 +759,10 @@ function DurabilityCard() {
     <div className="rounded-2xl border border-neutral-100 p-4">
       <div className="text-sm font-extrabold">🛡️ Durability (Performance Decline)</div>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Daya/kecepatan, bagian awal"><input className={inputClass} type="number" value={first} onChange={(e) => setFirst(+e.target.value)} /></Field>
-        <Field label="Daya/kecepatan, bagian akhir"><input className={inputClass} type="number" value={last} onChange={(e) => setLast(+e.target.value)} /></Field>
+        <Field label="Power/speed, early segment"><input className={inputClass} type="number" value={first} onChange={(e) => setFirst(+e.target.value)} /></Field>
+        <Field label="Power/speed, late segment"><input className={inputClass} type="number" value={last} onChange={(e) => setLast(+e.target.value)} /></Field>
       </div>
-      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Penurunan</div><div className="text-lg font-extrabold text-brand-dark">{decay.toFixed(1)}%</div></div>
+      <div className="mt-2 rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Decline</div><div className="text-lg font-extrabold text-brand-dark">{decay.toFixed(1)}%</div></div>
       <p className="mt-1.5 text-[10px] leading-relaxed text-neutral-500">Use a unit where a higher number = better (power/speed, not pace). Low durability (&lt;5% decline) indicates very good endurance in long sessions.</p>
     </div>
   )

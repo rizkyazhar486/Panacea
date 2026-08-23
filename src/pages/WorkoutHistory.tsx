@@ -85,7 +85,7 @@ export function WorkoutHistory() {
   if (!workouts.length) {
     return (
       <div className="space-y-4">
-        <SectionTitle icon={<IconRun />} title="Riwayat Latihan" subtitle="Sesi sungguhan dengan denyut jantung per menit" />
+        <SectionTitle icon={<IconRun />} title="History Latihan" subtitle="Sesi sungguhan dengan denyut jantung per menit" />
         <Card>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Belum ada sesi tersimpan. Unggah berkas ekspor Health Auto Export di{' '}
@@ -96,7 +96,7 @@ export function WorkoutHistory() {
           <p className="text-sm text-slate-500 mt-2 leading-relaxed">
             Tidak harus diunggah manual: sesi juga masuk sendiri lewat sinkronisasi otomatis, asalkan
             di Health Auto Export ada otomatisasi dengan <strong className="text-neutral-600">Data Type: Workouts</strong>
-            {' '}(atau <strong className="text-neutral-600">Sertakan Sesi Latihan</strong> dinyalakan) dan
+            {' '}(atau <strong className="text-neutral-600">Include Workouts</strong> dinyalakan) dan
             {' '}<strong className="text-neutral-600">Date Range: Today</strong>. Bila salah satunya meleset,
             larik latihan tidak ikut terkirim meskipun metriknya terkirim lengkap.
           </p>
@@ -111,7 +111,7 @@ export function WorkoutHistory() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Riwayat Latihan" subtitle={`${workouts.length} sessions stored · HRmax used ${hrMax} bpm`} />
+      <SectionTitle icon={<IconRun />} title="History Latihan" subtitle={`${workouts.length} sessions stored · HRmax used ${hrMax} bpm`} />
 
       {/* Kolom pelatih ditaruh paling atas: pertanyaan yang dibawa orang saat
           membuka halaman ini adalah "berikutnya apa", bukan "berapa totalnya". */}
@@ -188,9 +188,9 @@ export function WorkoutHistory() {
       )}
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Ringkasan" />
+        <SectionTitle icon={<IconTimer />} title="Summary" />
         <div className="grid grid-cols-2 gap-2 mt-2 sm:grid-cols-4">
-          <Stat label="Sesi" value={String(ringkas.sesi)} />
+          <Stat label="Sessions" value={String(ringkas.sesi)} />
           <Stat label="Total waktu" value={fmtDurasi(ringkas.totalMenit * 60)} />
           <Stat label="Total jarak" value={`${ringkas.totalKm} km`} />
           <Stat label="Total kalori" value={`${ringkas.totalKcal}`} />
@@ -219,7 +219,7 @@ export function WorkoutHistory() {
                 ? 'Sebaran ini sehat: sebagian besar waktu dijalankan pada intensitas yang membangun basis aerobik, sehingga sesi keras yang sedikit itu benar-benar bisa dijalankan keras.'
                 : 'Sebagian besar waktu lari Anda dijalankan di atas zona mudah. Pola ini terasa produktif namun justru yang paling sering membuat kemajuan mandek: terlalu berat untuk pemulihan, terlalu ringan untuk memicu adaptasi kecepatan. Cara memperbaikinya bukan menambah latihan, melainkan MEMPERLAMBAT sebagian besar sesi.'}
               {' '}Kerangka lengkapnya ada di{' '}
-              <Link to="/latihan-dasar" className="font-semibold text-ink underline">Latihan Dasar</Link>.
+              <Link to="/latihan-dasar" className="font-semibold text-ink underline">Foundation Training</Link>.
             </p>
           </div>
         )}
@@ -228,7 +228,7 @@ export function WorkoutHistory() {
       {notifs.length > 0 && <NotifCard />}
 
       <Card>
-        <SectionTitle icon={<IconActivity />} title="Sesi" subtitle="Ketuk sebuah sesi untuk melihat kurva denyut dan sebaran zonanya" />
+        <SectionTitle icon={<IconActivity />} title="Sessions" subtitle="Ketuk sebuah sesi untuk melihat kurva denyut dan sebaran zonanya" />
         <div className="space-y-2 mt-2">
           {workouts.map((w) => (
             <WorkoutRow key={w.id} w={w} hrMax={hrMax} terbuka={buka === w.id} onToggle={() => setBuka(buka === w.id ? null : w.id)} />
@@ -254,7 +254,7 @@ function NotifCard() {
   const notifs = useMemo(() => getHrNotifications(), [vitals])
   return (
     <Card>
-      <SectionTitle icon={<IconHeart />} title="Peringatan denyut jantung" subtitle={`${notifs.length} kejadian tercatat jam tangan`} />
+      <SectionTitle icon={<IconHeart />} title="Heart rate alerts" subtitle={`${notifs.length} kejadian tercatat jam tangan`} />
       <div className="space-y-2 mt-2">
         {notifs.map((n, i) => {
           const info = NOTIF_INFO[n.jenis]

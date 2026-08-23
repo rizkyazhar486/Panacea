@@ -68,44 +68,6 @@ const GOALS = [
 ] as const
 type Goal = typeof GOALS[number]
 
-/* NAMA TUJUAN DITERJEMAHKAN HANYA UNTUK DIBACA, BUKAN UNTUK DISIMPAN.
-   Nilai di dalam GOALS dipakai sebagai kunci percabangan di seluruh berkas ini
-   (goal === 'Hybrid Training', dan seterusnya) dan tersimpan pada rencana yang
-   sudah dibuat orang. Menerjemahkan nilainya akan mematikan percabangan itu
-   tanpa satu pun galat yang terlihat — dan rencana lama ikut kehilangan
-   tujuannya. Jadi yang diterjemahkan hanya tampilannya. */
-const LABEL_TUJUAN: Record<string, string> = {
-  'Longevity (VO₂max + Strength)': 'Umur Panjang (VO₂maks + Kekuatan)',
-  'Hybrid Training': 'Latihan Hibrida',
-  'Cardio': 'Kardio',
-  'Muscle Gain': 'Menambah Massa Otot',
-  'Full Body Workout': 'Latihan Seluruh Tubuh',
-  'Fat Loss / Burn Fat': 'Menurunkan Lemak',
-  'Strength Boost': 'Menambah Kekuatan',
-  'Glutes': 'Otot Bokong',
-  'Back': 'Punggung',
-  'Bicep': 'Bisep',
-  'Tricep': 'Trisep',
-  'Upper Body': 'Tubuh Bagian Atas',
-  'Lower Body': 'Tubuh Bagian Bawah',
-  'Waist & Hip Reducer': 'Mengecilkan Pinggang & Pinggul',
-  'Weight Loss': 'Menurunkan Berat Badan',
-  '3-Day Split': 'Pembagian Tiga Hari',
-  'Stamina Maintenance': 'Menjaga Stamina',
-  'Endurance': 'Daya Tahan',
-  'Runner — Easy Run': 'Pelari — Lari Santai',
-  'Runner — Tempo Run': 'Pelari — Lari Tempo',
-  'Runner — Intervals': 'Pelari — Interval',
-  'Runner — Long Run': 'Pelari — Lari Jauh',
-  'Runner — Norwegian 4x4': 'Pelari — Norwegia 4×4',
-  'Runner — 8×300m': 'Pelari — 8×300 m',
-  'Runner — VO₂max Ladder': 'Pelari — Tangga VO₂maks',
-  'Cycling (GPS)': 'Bersepeda (GPS)',
-  'Swimming (GPS)': 'Berenang (GPS)',
-  'Mental Strength': 'Kekuatan Mental',
-}
-const namaTujuan = (g: string) => LABEL_TUJUAN[g] ?? g
-
 // Scale sets/reps by level.
 function vol(level: Level, base: string, mid: string, adv: string) {
   return level === 'pemula' ? base : level === 'menengah' ? mid : adv
@@ -378,7 +340,7 @@ function RunnerCoach() {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Pelatih Lari Pribadi" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang sebenarnya, zona pace pribadi & rencana yang masuk akal" />
+      <SectionTitle icon={<IconRun size={20} />} title="Personal Running Coach" subtitle="Masukkan lari terakhir Anda — dapatkan VO₂max yang sebenarnya, zona pace pribadi & rencana yang masuk akal" />
 
       {/* Safety red-flag screen — a duty-of-care gate before intense running. */}
       <div className="mt-2 rounded-2xl border border-rose-200 bg-rose-50 p-3">
@@ -394,33 +356,33 @@ function RunnerCoach() {
         {flags.length > 0 && (
           <div className="mt-2 rounded-xl bg-white p-3 text-[11px] leading-relaxed text-rose-700">
             <b>Hentikan dulu — periksakan diri ke dokter sebelum latihan intensitas tinggi atau Tes Cooper.</b> The symptoms you flagged (especially dizziness/near-fainting or chest pain during exercise) should be evaluated (ECG + cardiac exam) to confirm it's safe. In the meantime, limit yourself to brisk walking and never train to the point of near-fainting.
-            <div className="mt-2"><a href="#/consult" className="font-bold underline">Konsultasikan ke dokter</a> · <a href="#/hospitals" className="font-bold underline">Fasilitas terdekat</a></div>
+            <div className="mt-2"><a href="#/consult" className="font-bold underline">Consult a doctor</a> · <a href="#/hospitals" className="font-bold underline">Nearest facility</a></div>
           </div>
         )}
       </div>
 
       {/* Honest current ability */}
       <div className="mt-3">
-        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Berapa lama Anda dapat berlari TERUS-MENERUS tanpa berhenti?</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">How long can you run CONTINUOUSLY without stopping?</div>
         <div className="mt-1.5 grid grid-cols-2 gap-1.5 sm:grid-cols-5">
           {([['u1', '<1 min'], ['m1_5', '1-5 min'], ['m5_15', '5-15 min'], ['m15_30', '15-30 min'], ['m30p', '30+ min']] as const).map(([k, l]) => (
             <button key={k} onClick={() => setCont(k)} className={'rounded-xl py-2 text-xs font-bold ' + (cont === k ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{l}</button>
           ))}
         </div>
-        <p className="mt-1 text-[10px] text-neutral-500">Jawab jujur berdasarkan lari santai yang nyaman, bukan sprint. Inilah yang membentuk program Anda.</p>
+        <p className="mt-1 text-[10px] text-neutral-500">Answer honestly based on a comfortable easy run, not a sprint. This is what shapes your plan.</p>
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Field label="Jarak (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="e.g. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
-        <Field label="Waktu (menit)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
+        <Field label="Distance (km)"><input className={inputClass} type="number" step={0.1} value={km || ''} placeholder="e.g. 3" onChange={(e) => setKm(+e.target.value)} /></Field>
+        <Field label="Time (minutes)"><input className={inputClass} type="number" value={min || ''} placeholder="e.g. 25" onChange={(e) => setMin(+e.target.value)} /></Field>
         <Field label="Seberapa berat rasanya?">
           <select className={inputClass} value={effort} onChange={(e) => setEffort(e.target.value as typeof effort)}>
             <option value="easy">Ringan (masih bisa mengobrol)</option>
-            <option value="moderate">Sedang (agak berat)</option>
-            <option value="hard">Habis-habisan (maksimal)</option>
+            <option value="moderate">Moderate (fairly hard)</option>
+            <option value="hard">All-out (maximal)</option>
           </select>
         </Field>
-        <Field label="Usia / Jenis kelamin">
+        <Field label="Age / Sex">
           <div className="flex gap-1">
             <input className={inputClass + ' w-14'} type="number" value={age} onChange={(e) => updAge(+e.target.value)} />
             <select className={inputClass} value={g} onChange={(e) => updSex(e.target.value as 'M' | 'F')}><option value="M">M</option><option value="F">F</option></select>
@@ -432,7 +394,7 @@ function RunnerCoach() {
       <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Taksiran VO₂maks Anda</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Your Estimated VO₂max</div>
             <div className="text-3xl font-extrabold text-brand">{vo2max > 0 ? vo2max.toFixed(0) : '—'}<span className="ml-1 text-sm text-ink/50">ml/kg/min</span></div>
             <div className="text-[10px] text-ink/50">this run's pace: {fmtPace(runPaceSec)}/km · O₂ at that pace {vo2atRun.toFixed(0)}</div>
           </div>
@@ -450,7 +412,7 @@ function RunnerCoach() {
       {/* Encouraging reframe */}
       {vo2max > 0 && (
         <div className="mt-3 rounded-xl bg-brand-50 p-3 text-[12px] leading-relaxed text-brand-dark">
-          💚 <b>Sudut pandang yang jujur:</b> {km >= 1 ? `being able to run ${km} km continuously already puts you ahead of the majority of people who can't run 1 km. ` : ''}
+          💚 <b>An honest perspective:</b> {km >= 1 ? `being able to run ${km} km continuously already puts you ahead of the majority of people who can't run 1 km. ` : ''}
           VO₂max is the <b>most trainable</b> capacity — beginners commonly gain <b>15-30% in 8-12 weeks</b> of structured training.
           Don't compare your <i>easy</i> run to someone else's <i>race</i> pace; that's apples to oranges.
         </div>
@@ -459,7 +421,7 @@ function RunnerCoach() {
       {/* Personal pace zones */}
       {pace5kSec > 0 && (
         <div className="mt-3">
-          <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Zona Pace Pribadi Anda (menit/km)</div>
+          <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Your Personal Pace Zones (min/km)</div>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {[
               ['Recovery', zone(105), 'very easy'],
@@ -476,7 +438,7 @@ function RunnerCoach() {
               </div>
             ))}
           </div>
-          <p className="mt-1.5 text-[10px] text-neutral-500">Diturunkan dari VO₂maks Anda (metode Jack Daniels). Jalankan lari santai di zona Santai — mempercepatnya justru merusak dasar aerobik Anda.</p>
+          <p className="mt-1.5 text-[10px] text-neutral-500">Derived from your VO₂max (Jack Daniels method). Run easy runs in the Easy zone — going faster damages your aerobic base.</p>
         </div>
       )}
 
@@ -520,7 +482,7 @@ function RunnerCoach() {
 
       {/* Symptom troubleshooting — the exact things that go wrong for beginners */}
       <div className="mt-4">
-        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Mengatasi Keluhan yang Lazim Saat Berlari</div>
+        <div className="text-xs font-bold uppercase tracking-wide text-neutral-500">Fixing Common Complaints While Running</div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {[
             { s: '🦵 Calves sore/tight from the start', d: 'You\'re landing on your toes / running too fast. Fix: 5-min walking warm-up + ankle circles; land MIDFOOT right under the hips; slow down. Strengthen calves: calf raise 3×15, 3×/week. Increase distance by at most +10%/week.' },
@@ -540,8 +502,8 @@ function RunnerCoach() {
       <div className="mt-4 rounded-2xl border border-brand/20 bg-brand-50 p-4">
         <div className="text-xs font-extrabold text-brand-dark">🎯 Your Cooper Test Target</div>
         <div className="mt-2 grid grid-cols-2 gap-3">
-          <Field label="Jarak sasaran (m)"><input className={inputClass} type="number" value={targetM} onChange={(e) => setTargetM(+e.target.value)} /></Field>
-          <Field label="Waktu tersedia (bulan)"><input className={inputClass} type="number" value={months} onChange={(e) => setMonths(+e.target.value)} /></Field>
+          <Field label="Target distance (m)"><input className={inputClass} type="number" value={targetM} onChange={(e) => setTargetM(+e.target.value)} /></Field>
+          <Field label="Time available (months)"><input className={inputClass} type="number" value={months} onChange={(e) => setMonths(+e.target.value)} /></Field>
         </div>
         <div className="mt-2 flex items-center gap-2">
           <Badge tone={verdict.tone}>{verdict.l}</Badge>
@@ -592,21 +554,21 @@ export function TrainingPlan() {
     <div className="mx-auto max-w-3xl space-y-5 pb-24">
       {/* Generator */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Penyusun Latihan AI" subtitle="Program yang tersusun rapi: jadwal, ulangan, lama, istirahat, pace & teknik" />
+        <SectionTitle icon={<IconActivity size={20} />} title="AI Training Planner" subtitle="A neatly structured program: schedule, reps, duration, rest, pace & technique" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="col-span-2 sm:col-span-1">
-            <Field label="Tujuan">
+            <Field label="Goal">
               <select className={inputClass} value={goal} onChange={(e) => setGoal(e.target.value as Goal)}>
-                {GOALS.map((g) => <option key={g} value={g}>{namaTujuan(g)}</option>)}
+                {GOALS.map((g) => <option key={g} value={g}>{g}</option>)}
               </select>
             </Field>
           </div>
-          <Field label="Tingkat">
+          <Field label="Level">
             <select className={inputClass} value={level} onChange={(e) => setLevel(e.target.value as Level)}>
-              <option value="pemula">Pemula</option><option value="menengah">Menengah</option><option value="lanjut">Mahir</option>
+              <option value="pemula">Beginner</option><option value="menengah">Intermediate</option><option value="lanjut">Advanced</option>
             </select>
           </Field>
-          <Field label="Hari latihan/pekan">
+          <Field label="Training days/week">
             <select className={inputClass} value={days} onChange={(e) => setDays(+e.target.value)}>
               {[2, 3, 4, 5, 6].map((d) => <option key={d} value={d}>{d} days</option>)}
             </select>
@@ -627,7 +589,7 @@ export function TrainingPlan() {
 
       {/* Movement technique videos (Higgsfield) */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Video Teknik Gerakan" subtitle="Contoh cara melakukan gerakan dengan bentuk yang benar" />
+        <SectionTitle icon={<IconRun size={20} />} title="Movement Technique Videos" subtitle="Contoh cara melakukan gerakan dengan bentuk yang benar" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {TECHNIQUE_VIDEOS.map((v) => (
             <div key={v.label} className="overflow-hidden rounded-2xl border border-neutral-100">
@@ -650,7 +612,7 @@ export function TrainingPlan() {
               <Card key={d} className={'!p-4 ' + (p ? '' : 'opacity-60')}>
                 <div className="flex items-center justify-between">
                   <div className="text-xs font-black uppercase tracking-wide text-neutral-500">{d}</div>
-                  {p ? <Badge tone="brand">{p.emoji} {p.title}</Badge> : <Badge tone="neutral">Istirahat</Badge>}
+                  {p ? <Badge tone="brand">{p.emoji} {p.title}</Badge> : <Badge tone="neutral">Rest</Badge>}
                 </div>
                 {p && (
                   <>
@@ -692,7 +654,7 @@ export function TrainingPlan() {
       {/* Month mesocycle */}
       {view === 'bulan' && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconTimer size={20} />} title="4-Week Mesocycle" subtitle="Beban bertambah bertahap + pekan ringan — keajekan mengalahkan intensitas" />
+          <SectionTitle icon={<IconTimer size={20} />} title="4-Week Mesocycle" subtitle="Progressive overload + deload — consistency beats intensity" />
           <div className="mt-3 space-y-2">
             {[
               { w: 'Week 1', pct: '100%', desc: 'Base volume per the weekly schedule. Log all loads/pace (baseline).', tone: 'brand' as const },
@@ -737,23 +699,23 @@ export function TrainingPlan() {
       <Card className="!p-5">
         <SectionTitle icon={<IconHeart size={20} />} title="Panel Umur Panjang Anda" subtitle="VO₂max, strength, muscle mass, glucose — Panaceamed's core competency" />
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <Field label={<>VO₂maks (dari jam tangan/uji)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="e.g. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
-          <Field label="Cooper 12 menit HABIS-HABISAN (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="e.g. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
-          <Field label="Berat (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="e.g. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
+          <Field label={<>VO₂max (from watch/test)<PrefillBadge show={hasHealth('vo2max')} /></>}><input className={inputClass} type="number" min={0} value={vo2Now || ''} placeholder="e.g. 40" onChange={(e) => setVo2Now(+e.target.value)} onBlur={() => pushBiometrics({ vo2max: vo2Now })} /></Field>
+          <Field label="Cooper 12-min ALL-OUT (m)"><input className={inputClass} type="number" value={cooper || ''} placeholder="e.g. 2200" onChange={(e) => setCooper(+e.target.value)} /></Field>
+          <Field label="Weight (kg)"><input className={inputClass} type="number" value={weightKg || ''} placeholder="e.g. 70" onChange={(e) => { setWeightKg(+e.target.value); setDemo({ weightKg: +e.target.value }) }} /></Field>
         </div>
         <div className="mt-2 rounded-xl bg-amber-50 p-2.5 text-[10px] leading-relaxed text-amber-800">
-          ⚠️ Cooper Test = run <b>as hard as possible for 12 minutes</b> (not an easy-run pace). Don't fill the Cooper field with an easy-run pace — the result will be falsely low. For analysis from a regular run, use the <b>Pelatih Lari Pribadi</b> above.
+          ⚠️ Cooper Test = run <b>as hard as possible for 12 minutes</b> (not an easy-run pace). Don't fill the Cooper field with an easy-run pace — the result will be falsely low. For analysis from a regular run, use the <b>Personal Running Coach</b> above.
         </div>
 
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">VO₂maks Cooper (habis-habisan)</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">VO₂max Cooper (all-out)</div>
               <div className="text-2xl font-extrabold text-brand">{cooper > 600 ? vo2FromCooper.toFixed(1) : '—'}</div>
               <div className="text-[10px] text-ink/50">{cooper > 600 && cooper < 1600 && vo2Now - vo2FromCooper > 8 ? '↯ far below your watch VO₂max — the test was likely not all-out' : '(distance − 504.9) ÷ 44.73'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Target yang realistis</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink/50">Realistic target</div>
               <div className="text-2xl font-extrabold text-amber-300">{vo2Now > 0 ? vo2Target : '—'}</div>
               <div className="text-[10px] text-ink/50">{vo2Now > 0 ? `±${monthsToTarget} months with regular 4×4 (≈+0.5/month)` : 'fill in your VO₂max'}</div>
             </div>
@@ -799,7 +761,7 @@ export function TrainingPlan() {
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
         🖼️ Movement technique illustrations now show automatically for Squat, Push-up/Bench Press, Deadlift, Pull-up, Hip Thrust, Overhead Press & running sessions — more movements will keep being added.
-        Quick gym load logging is in <a href="#/fitness-test" className="font-bold underline">Uji Fisik</a>, RPE journal in <a href="#/logs" className="font-bold underline">Catatan & Angka</a>.
+        Quick gym load logging is in <a href="#/fitness-test" className="font-bold underline">Physical Test</a>, RPE journal in <a href="#/logs" className="font-bold underline">Logs & Stats</a>.
       </div>
     </div>
   )

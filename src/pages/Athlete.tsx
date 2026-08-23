@@ -17,7 +17,7 @@ function AthleteQuotePopup() {
     <Portal>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setOpen(false)}>
       <div className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => setOpen(false)} aria-label="Tutup" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
+        <button onClick={() => setOpen(false)} aria-label="Close" className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
         <div className="mb-3 text-4xl">🏅</div>
         <p className="text-lg font-bold leading-snug text-ink">“{q.quote}”</p>
         <div className="mt-4 text-sm font-black text-brand-dark">{q.author}</div>
@@ -79,11 +79,11 @@ function vo2max(hrMax: number, hrRest: number) {
 }
 
 const ZONES = [
-  { z: 'Z1', label: 'Pemulihan', pct: [0.5, 0.6], desc: 'Pemulihan aktif, laju yang masih nyaman untuk mengobrol' },
-  { z: 'Z2', label: 'Dasar Aerobik', pct: [0.6, 0.7], desc: 'Membangun fondasi daya tahan' },
-  { z: 'Z3', label: 'Tempo', pct: [0.7, 0.8], desc: 'Ambang aerobik, masih dapat berbicara sepotong-sepotong' },
-  { z: 'Z4', label: 'Ambang Laktat', pct: [0.8, 0.9], desc: 'Berat, interval 4-8 menit' },
-  { z: 'Z5', label: 'VO₂maks / Anaerobik', pct: [0.9, 1.0], desc: 'Upaya maksimal, interval pendek 30 detik-3 menit' },
+  { z: 'Z1', label: 'Recovery', pct: [0.5, 0.6], desc: 'Active recovery, comfortable conversation pace' },
+  { z: 'Z2', label: 'Aerobic Base', pct: [0.6, 0.7], desc: 'Builds the endurance foundation' },
+  { z: 'Z3', label: 'Tempo', pct: [0.7, 0.8], desc: 'Aerobic threshold, still able to speak in short bursts' },
+  { z: 'Z4', label: 'Lactate Threshold', pct: [0.8, 0.9], desc: 'Hard, 4-8 minute intervals' },
+  { z: 'Z5', label: 'VO₂max / Anaerobic', pct: [0.9, 1.0], desc: 'Maximal effort, short 30s-3 minute intervals' },
 ] as const
 
 // Zone color scale used by the session HR chart & time-in-zone bars —
@@ -115,7 +115,7 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
   if (!act || !act.hrSamples) {
     return (
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Denyut Jantung Sesi" subtitle="Jejak bpm & waktu di tiap zona" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Session Heart Rate" subtitle="Jejak bpm & waktu di tiap zona" />
         <p className="mt-2 text-xs text-neutral-500">
           No session with heart-rate data yet. Track a workout with the <b>GPS Tracker</b> on Home and enter your HR (bpm) while training — or sync a watch — and your BPM chart and time-in-zone breakdown will appear here automatically.
         </p>
@@ -154,21 +154,21 @@ function HrZoneAnalysis({ hrMax }: { hrMax: number }) {
     <Card className="!p-5">
       <SectionTitle
         icon={<IconHeart size={20} />}
-        title="Denyut Jantung Sesi"
+        title="Session Heart Rate"
         subtitle={`${act.emoji} ${act.sport} · ${new Date(act.at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} · ${fmtZoneDur(act.durSec)}`}
       />
       <div className="mt-3 flex items-baseline justify-around text-center">
         <div>
           <div className="text-3xl font-extrabold text-ink">{avg}</div>
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Rerata BPM</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Avg BPM</div>
         </div>
         <div>
           <div className="text-3xl font-extrabold text-ink">{max}</div>
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">BPM Maksimum</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Max BPM</div>
         </div>
       </div>
 
-      <svg viewBox="0 0 320 120" className="mt-3 w-full" role="img" aria-label="Denyut jantung sepanjang sesi, diwarnai menurut zona latihan">
+      <svg viewBox="0 0 320 120" className="mt-3 w-full" role="img" aria-label="Heart rate over the session, colored by training zone">
         <line x1="0" x2="320" y1={Y(avg)} y2={Y(avg)} stroke="#ef4444" strokeWidth="1" strokeDasharray="4 4" opacity="0.55" />
         {samples.slice(0, -1).map((pt, i) => {
           const nxt = samples[i + 1]
@@ -207,10 +207,10 @@ function vo2Tier(v: number, g: 'M' | 'F') {
 }
 
 // Acute:Chronic Workload Ratio (Gabbett 2016) — primary injury-risk indicator.
-// "Titik ideal" 0.8–1.3; >1.5 sharply raises soft-tissue injury risk; <0.8 =
+// "Sweet spot" 0.8–1.3; >1.5 sharply raises soft-tissue injury risk; <0.8 =
 // undertraining/detraining (also raises risk when load later spikes).
 function acwrZone(ratio: number): { label: string; tone: 'brand' | 'low' | 'critical' | 'neutral'; advice: string } {
-  if (!isFinite(ratio) || ratio <= 0) return { label: 'Data belum cukup', tone: 'neutral', advice: 'Isikan beban akut (7 hari) & beban kronis (rerata mingguan 28 hari) dari jam tangan Anda.' }
+  if (!isFinite(ratio) || ratio <= 0) return { label: 'Not enough data', tone: 'neutral', advice: 'Enter your acute load (7 days) & chronic load (28-day weekly average) from your watch.' }
   if (ratio < 0.8) return { label: 'Undertraining / Detraining', tone: 'low', advice: 'Load is too low compared to your usual habits. Increase gradually (max +10%/week) so fitness doesn’t decline.' }
   if (ratio <= 1.3) return { label: 'Sweet Spot (Optimal)', tone: 'brand', advice: 'Safe & adaptive zone. Maintain gradual progression; this is the best phase for building fitness.' }
   if (ratio <= 1.5) return { label: 'Caution (Load Rising Fast)', tone: 'low', advice: 'Load spike detected. Hold back intensity for 1–2 days, favor Z1–Z2 & recovery before adding more load.' }
@@ -262,7 +262,7 @@ export function Athlete() {
       <div className="flex justify-end">
         <ShareStatCard
           activity="🏃 Athlete Performance"
-          metricLabel="Taksiran VO₂maks"
+          metricLabel="Estimated VO₂max"
           metricValue={v.toFixed(1)}
           metricUnit="ml/kg/min"
           badge={tier}
@@ -270,16 +270,16 @@ export function Athlete() {
         />
       </div>
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Penampilan Atlet" subtitle="VO₂maks, zona latihan & target beban mingguan" />
+        <SectionTitle icon={<IconRun size={20} />} title="Athlete Performance" subtitle="VO₂max, training zones & weekly load target" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Field label="Usia"><input className={inputClass} type="number" value={p.age} onChange={(e) => upd({ age: +e.target.value })} /></Field>
-          <Field label="Jenis kelamin">
+          <Field label="Age"><input className={inputClass} type="number" value={p.age} onChange={(e) => upd({ age: +e.target.value })} /></Field>
+          <Field label="Sex">
             <select className={inputClass} value={p.g} onChange={(e) => upd({ g: e.target.value as 'M' | 'F' })}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
-          <Field label="Berat (kg)"><input className={inputClass} type="number" value={p.weight} onChange={(e) => upd({ weight: +e.target.value })} /></Field>
-          <Field label={<>Nadi Istirahat<PrefillBadge show={hasHealth('restingHr')} /></>}><input className={inputClass} type="number" value={p.hrRest} onChange={(e) => upd({ hrRest: +e.target.value })} /></Field>
+          <Field label="Weight (kg)"><input className={inputClass} type="number" value={p.weight} onChange={(e) => upd({ weight: +e.target.value })} /></Field>
+          <Field label={<>Resting HR<PrefillBadge show={hasHealth('restingHr')} /></>}><input className={inputClass} type="number" value={p.hrRest} onChange={(e) => upd({ hrRest: +e.target.value })} /></Field>
         </div>
         <div className="mt-2">
           <Field label={`Measured Max HR (optional, leave blank to estimate ${p.g === 'M' ? '220' : '226'}-age)`}>
@@ -289,20 +289,20 @@ export function Athlete() {
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-ink p-4 text-white">
-            <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Taksiran VO₂maks</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Estimated VO₂max</div>
             <div className="text-3xl font-extrabold text-brand">{v.toFixed(1)}<span className="ml-1 text-sm font-medium text-ink/50">ml/kg/min</span></div>
             <Badge tone="brand">{tier}</Badge>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Denyut Maksimum</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Max HR</div>
             <div className="text-3xl font-extrabold text-ink">{hrMax}<span className="ml-1 text-sm font-medium text-neutral-500">bpm</span></div>
-            <div className="mt-1 text-[11px] text-neutral-500">Dasar penghitungan lima zona latihan</div>
+            <div className="mt-1 text-[11px] text-neutral-500">Basis for calculating the 5 training zones</div>
           </div>
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Zona Latihan" subtitle="Persentase denyut jantung maksimum" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Training Zones" subtitle="Percentage of maximum heart rate" />
         <div className="mt-3 space-y-2">
           {ZONES.map((z) => {
             const lo = Math.round(hrMax * z.pct[0]); const hi = Math.round(hrMax * z.pct[1])
@@ -322,7 +322,7 @@ export function Athlete() {
       <HrZoneAnalysis hrMax={hrMax} />
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Target Beban Mingguan" subtitle="Anjuran umum menurut tingkatan VO₂maks" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Weekly Load Target" subtitle="General recommendations based on VO₂max tier" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
           <li>• Total volume: {tier === 'Elite' || tier === 'Excellent' ? '8-12 hours' : tier === 'Good' ? '5-8 hours' : '3-5 hours'} / week</li>
           <li>• Z1-Z2 (aerobic base): 70-80% of total volume</li>
@@ -334,15 +334,15 @@ export function Athlete() {
 
       {/* ── Training Load & Injury Risk (ACWR) ─────────────────── */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Beban Latihan & Risiko Cedera" subtitle="Rasio Beban Akut:Kronis — diisi dari Training Load pada jam tangan Anda (Garmin/Polar/Coros/Apple)" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Training Load & Injury Risk" subtitle="Rasio Beban Akut:Kronis — diisi dari Training Load pada jam tangan Anda (Garmin/Polar/Coros/Apple)" />
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <Field label="Beban Akut — 7 hari (Beban)"><input className={inputClass} type="number" value={p.acuteLoad || ''} placeholder="e.g. 420" onChange={(e) => upd({ acuteLoad: +e.target.value })} /></Field>
-          <Field label="Beban Kronis — rerata mingguan 28 hari"><input className={inputClass} type="number" value={p.chronicLoad || ''} placeholder="e.g. 380" onChange={(e) => upd({ chronicLoad: +e.target.value })} /></Field>
+          <Field label="Acute Load — 7 days (Load)"><input className={inputClass} type="number" value={p.acuteLoad || ''} placeholder="e.g. 420" onChange={(e) => upd({ acuteLoad: +e.target.value })} /></Field>
+          <Field label="Chronic Load — 28-day weekly average"><input className={inputClass} type="number" value={p.chronicLoad || ''} placeholder="e.g. 380" onChange={(e) => upd({ chronicLoad: +e.target.value })} /></Field>
         </div>
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Rasio ACWR</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">ACWR Ratio</div>
               <div className="text-3xl font-extrabold text-brand">{acwr > 0 ? acwr.toFixed(2) : '—'}</div>
             </div>
             <Badge tone={acwrZ.tone}>{acwrZ.label}</Badge>
@@ -352,37 +352,37 @@ export function Athlete() {
             <div className="absolute inset-y-0 bg-emerald-400/30" style={{ left: `${(0.8 / 2) * 100}%`, width: `${((1.3 - 0.8) / 2) * 100}%` }} />
             {acwr > 0 && <div className="absolute top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-white" style={{ left: `${Math.min(acwr / 2, 1) * 100}%` }} />}
           </div>
-          <div className="mt-1 flex justify-between text-[10px] text-ink/40"><span>0.8</span><span>Titik ideal</span><span>1.3</span><span>1.5+</span></div>
+          <div className="mt-1 flex justify-between text-[10px] text-ink/40"><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>1.5+</span></div>
           <p className="mt-3 text-xs leading-relaxed text-ink/80">{acwrZ.advice}</p>
         </div>
         <details className="mt-2 text-[11px] text-neutral-500">
-          <summary className="cursor-pointer font-semibold text-brand-dark">Belum punya angka Beban? Hitung sRPE secara manual</summary>
-          <p className="mt-1.5 leading-relaxed">Metode Foster (sRPE): <b>Beban sesi = lama (menit) × RPE (1–10)</b>. Sum all sessions over 7 days → Acute Load. Average weekly load over 4 weeks → Chronic Load. Example: a 60-minute run at RPE 7 = 420 load units.</p>
+          <summary className="cursor-pointer font-semibold text-brand-dark">Don't have Load numbers? Calculate sRPE manually</summary>
+          <p className="mt-1.5 leading-relaxed">Foster method (sRPE): <b>Session load = duration (minutes) × RPE (1–10)</b>. Sum all sessions over 7 days → Acute Load. Average weekly load over 4 weeks → Chronic Load. Example: a 60-minute run at RPE 7 = 420 load units.</p>
         </details>
       </Card>
 
       {/* ── Training Status + Recovery (Garmin-style) ────────────── */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Keadaan Latihan & Kesiapan" subtitle="Training Status, HRV & Recovery Time dari perangkat Anda" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Training Status & Readiness" subtitle="Training Status, HRV & Recovery Time dari perangkat Anda" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Field label="Tren VO₂maks (4 pekan)">
+          <Field label="VO₂max Trend (4 wks)">
             <select className={inputClass} value={p.vo2Trend} onChange={(e) => upd({ vo2Trend: e.target.value as AthleteProfile['vo2Trend'] })}>
               <option value="up">Up ↑</option><option value="flat">Stable →</option><option value="down">Down ↓</option>
             </select>
           </Field>
-          <Field label={<>HRV Semalam (ms)<PrefillBadge show={hasHealth('hrvMs')} /></>}><input className={inputClass} type="number" value={p.hrv || ''} placeholder="e.g. 65" onChange={(e) => upd({ hrv: +e.target.value })} /></Field>
-          <Field label="HRV Dasar (ms)"><input className={inputClass} type="number" value={p.hrvBaseline || ''} placeholder="e.g. 68" onChange={(e) => upd({ hrvBaseline: +e.target.value })} /></Field>
-          <Field label="Waktu Pemulihan (jam)"><input className={inputClass} type="number" value={p.recoveryHrs || ''} placeholder="e.g. 18" onChange={(e) => upd({ recoveryHrs: +e.target.value })} /></Field>
-          <Field label="Skor Tidur (0–100)"><input className={inputClass} type="number" value={p.sleepScore || ''} placeholder="e.g. 82" onChange={(e) => upd({ sleepScore: +e.target.value })} /></Field>
+          <Field label={<>Overnight HRV (ms)<PrefillBadge show={hasHealth('hrvMs')} /></>}><input className={inputClass} type="number" value={p.hrv || ''} placeholder="e.g. 65" onChange={(e) => upd({ hrv: +e.target.value })} /></Field>
+          <Field label="Baseline HRV (ms)"><input className={inputClass} type="number" value={p.hrvBaseline || ''} placeholder="e.g. 68" onChange={(e) => upd({ hrvBaseline: +e.target.value })} /></Field>
+          <Field label="Recovery Time (hrs)"><input className={inputClass} type="number" value={p.recoveryHrs || ''} placeholder="e.g. 18" onChange={(e) => upd({ recoveryHrs: +e.target.value })} /></Field>
+          <Field label="Sleep Score (0–100)"><input className={inputClass} type="number" value={p.sleepScore || ''} placeholder="e.g. 82" onChange={(e) => upd({ sleepScore: +e.target.value })} /></Field>
         </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Keadaan Latihan</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Training Status</div>
             <div className="mt-1"><Badge tone={status.tone}>{status.label}</Badge></div>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{status.desc}</p>
           </div>
           <div className="rounded-2xl border border-neutral-100 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Keadaan HRV / Kesiapan</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">HRV Status / Readiness</div>
             <div className="mt-1"><Badge tone={hrvZ.tone}>{hrvZ.label}</Badge></div>
             <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">
               {p.recoveryHrs > 0 ? `Recovery Time remaining ${p.recoveryHrs} hrs. ` : ''}
@@ -394,16 +394,16 @@ export function Athlete() {
 
       {/* ── Lactate Threshold & Training Effect ──────────────────────── */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={20} />} title="Ambang Laktat & Efek Latihan" subtitle="Penanda intensitas — diukur lewat uji lapangan / jam tangan" />
+        <SectionTitle icon={<IconRun size={20} />} title="Lactate Threshold & Training Effect" subtitle="Intensity markers — measured via field test / watch" />
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Field label="Denyut Ambang Laktat (bpm)"><input className={inputClass} type="number" value={p.ltHr || ''} placeholder="e.g. 168" onChange={(e) => upd({ ltHr: +e.target.value })} /></Field>
-          <Field label="Pace Ambang Laktat (mm:dd /km)"><input className={inputClass} value={p.ltPace} placeholder="e.g. 4:35" onChange={(e) => upd({ ltPace: e.target.value })} /></Field>
-          <Field label="TE Aerobik (0–5)"><input className={inputClass} type="number" step="0.1" value={p.teAerobic || ''} placeholder="e.g. 3.4" onChange={(e) => upd({ teAerobic: +e.target.value })} /></Field>
-          <Field label="TE Anaerobik (0–5)"><input className={inputClass} type="number" step="0.1" value={p.teAnaerobic || ''} placeholder="e.g. 1.8" onChange={(e) => upd({ teAnaerobic: +e.target.value })} /></Field>
+          <Field label="LT Heart Rate (bpm)"><input className={inputClass} type="number" value={p.ltHr || ''} placeholder="e.g. 168" onChange={(e) => upd({ ltHr: +e.target.value })} /></Field>
+          <Field label="LT Pace (mm:ss /km)"><input className={inputClass} value={p.ltPace} placeholder="e.g. 4:35" onChange={(e) => upd({ ltPace: e.target.value })} /></Field>
+          <Field label="Aerobic TE (0–5)"><input className={inputClass} type="number" step="0.1" value={p.teAerobic || ''} placeholder="e.g. 3.4" onChange={(e) => upd({ teAerobic: +e.target.value })} /></Field>
+          <Field label="Anaerobic TE (0–5)"><input className={inputClass} type="number" step="0.1" value={p.teAnaerobic || ''} placeholder="e.g. 1.8" onChange={(e) => upd({ teAnaerobic: +e.target.value })} /></Field>
         </div>
         <ul className="mt-3 space-y-1 text-[11px] leading-relaxed text-neutral-500">
-          <li>• <b>Denyut Ambang Laktat</b> ≈ the upper limit of Zone 4. Tempo training right around this value raises your lactate threshold — key to endurance performance.</li>
-          <li>• <b>Efek Latihan</b>: 1.0–1.9 recovery · 2.0–2.9 maintaining · 3.0–3.9 improving · 4.0–4.9 highly improving · 5.0 overreaching (needs extra recovery).</li>
+          <li>• <b>LT HR</b> ≈ the upper limit of Zone 4. Tempo training right around this value raises your lactate threshold — key to endurance performance.</li>
+          <li>• <b>Training Effect</b>: 1.0–1.9 recovery · 2.0–2.9 maintaining · 3.0–3.9 improving · 4.0–4.9 highly improving · 5.0 overreaching (needs extra recovery).</li>
           {p.ltHr > 0 && <li>• Your tempo zone: <b>{Math.round(p.ltHr * 0.95)}–{p.ltHr} bpm</b> (4–8 minute threshold intervals).</li>}
         </ul>
       </Card>
@@ -423,9 +423,9 @@ export function Athlete() {
       </Card>
 
       <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4 text-center text-xs text-brand-dark">
-        📚 Learn more about these indicators in <a href="#/sports-science" className="font-bold underline">Ilmu Keolahragaan & Angka Kunci</a> ·
-        scheduled programs in <a href="#/training-plan" className="font-bold underline">Penyusun Latihan AI</a> ·
-        body composition in <a href="#/body" className="font-bold underline">Komposisi Tubuh</a>.
+        📚 Learn more about these indicators in <a href="#/sports-science" className="font-bold underline">Sports Science & KPIs</a> ·
+        scheduled programs in <a href="#/training-plan" className="font-bold underline">AI Training Planner</a> ·
+        body composition in <a href="#/body" className="font-bold underline">Body Composition</a>.
         This page is stored locally & can be accessed offline after your first visit.
       </div>
     </div>
@@ -447,18 +447,18 @@ function FitnessFatigueCard({ acute, chronic }: { acute: number; chronic: number
     : { l: 'Very Tired — danger', tone: 'critical' as const, d: 'TSB is very negative. Reduce load now to avoid overtraining/injury.' }
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Kebugaran & Kelelahan (Kesegaran)" subtitle="Model CTL/ATL/TSB — dihitung dari Training Load yang sama di atas" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Fitness & Fatigue (Form)" subtitle="Model CTL/ATL/TSB — dihitung dari Training Load yang sama di atas" />
       <div className="mt-3 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Kebugaran (CTL)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Fitness (CTL)</div>
           <div className="text-xl font-extrabold text-brand-dark">{has ? ctl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Kelelahan (ATL)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Fatigue (ATL)</div>
           <div className="text-xl font-extrabold text-amber-600">{has ? atl.toFixed(0) : '—'}</div>
         </div>
         <div className="rounded-xl bg-ink p-3 text-center text-white">
-          <div className="text-[10px] font-bold uppercase text-ink/50">Kesegaran (TSB)</div>
+          <div className="text-[10px] font-bold uppercase text-ink/50">Form (TSB)</div>
           <div className={'text-xl font-extrabold ' + (tsb >= 0 ? 'text-brand' : 'text-amber-300')}>{has ? (tsb > 0 ? '+' : '') + tsb.toFixed(0) : '—'}</div>
         </div>
       </div>
@@ -485,12 +485,12 @@ function RacePlannerCard() {
     'BASE/BUILD: build Zone 2 volume + 1-2 quality sessions. Increase max +10%/week.'
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconRun size={20} />} title="Perencanaan Lomba" subtitle="Target lomba → fase latihan otomatis + perkiraan waktu (Riegel)" />
+      <SectionTitle icon={<IconRun size={20} />} title="Race Planning" subtitle="Race target → automatic training phase + time prediction (Riegel)" />
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Field label="Tanggal lomba"><input className={inputClass} type="date" value={race.date} onChange={(e) => upd({ date: e.target.value })} /></Field>
-        <Field label="Jarak lomba (km)"><input className={inputClass} type="number" value={race.dist} onChange={(e) => upd({ dist: +e.target.value })} /></Field>
-        <Field label="Hasil terakhir: jarak (km)"><input className={inputClass} type="number" value={race.recentDist} onChange={(e) => upd({ recentDist: +e.target.value })} /></Field>
-        <Field label="Hasil terakhir: waktu (menit)"><input className={inputClass} type="number" value={race.recentMin} onChange={(e) => upd({ recentMin: +e.target.value })} /></Field>
+        <Field label="Race date"><input className={inputClass} type="date" value={race.date} onChange={(e) => upd({ date: e.target.value })} /></Field>
+        <Field label="Race distance (km)"><input className={inputClass} type="number" value={race.dist} onChange={(e) => upd({ dist: +e.target.value })} /></Field>
+        <Field label="Recent result: distance (km)"><input className={inputClass} type="number" value={race.recentDist} onChange={(e) => upd({ recentDist: +e.target.value })} /></Field>
+        <Field label="Recent result: time (min)"><input className={inputClass} type="number" value={race.recentMin} onChange={(e) => upd({ recentMin: +e.target.value })} /></Field>
       </div>
       {race.date && daysOut > 0 && (
         <div className="mt-3 rounded-2xl bg-ink p-4 text-white">
@@ -498,7 +498,7 @@ function RacePlannerCard() {
             <div><span className="text-3xl font-extrabold text-brand">{daysOut}</span><span className="ml-1 text-xs text-ink/60">days to go</span></div>
             {pred > 0 && (
               <div className="text-right">
-                <div className="text-[10px] uppercase text-ink/50">Perkiraan waktu finis</div>
+                <div className="text-[10px] uppercase text-ink/50">Predicted finish</div>
                 <div className="text-xl font-extrabold">{Math.floor(pred / 60) > 0 ? `${Math.floor(pred / 60)}h ` : ''}{Math.round(pred % 60)}m</div>
                 <div className="text-[10px] text-ink/60">pace {Math.floor(predPace)}:{String(Math.round((predPace % 1) * 60)).padStart(2, '0')} /km</div>
               </div>

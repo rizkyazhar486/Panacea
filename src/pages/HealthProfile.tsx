@@ -268,11 +268,11 @@ export function HealthProfile() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Data Kesehatan Saya"
-          subtitle={backendEnabled ? 'Tersimpan di server per akun — ikut ke semua perangkat Anda' : 'Tersimpan di perangkat ini (server tidak aktif)'} />
+        <SectionTitle icon={<IconHeart size={20} />} title="My Health Data"
+          subtitle={backendEnabled ? 'Saved on the server per account — follows you across all devices' : 'Saved on this device (server not active)'} />
         <Prosa kelas="mt-1 text-[11px] leading-relaxed text-neutral-500">Apple Watch tersinkron langsung; Garmin dan WHOOP diimpor dari berkas yang Anda ekspor lalu unggah; selebihnya dapat diisi dengan tangan. Apa pun yang Anda isi di sini langsung mengalir ke seluruh kalkulator kebugaran &amp; umur panjang di aplikasi ini.</Prosa>
         <div className="mt-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Sumber Data</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Data Source</div>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {SOURCES.map((s) => (
               <button key={s} onClick={() => u({ source: s })}
@@ -287,7 +287,7 @@ export function HealthProfile() {
 
       {/* Import from / export to a file */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Impor & Ekspor" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · tangkapan layar timbangan .jpg/.png" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Import & Export" subtitle="Apple Health .xml · Health Auto Export .json · InBody .csv · WHOOP/Garmin .csv/.json · tangkapan layar timbangan .jpg/.png" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
           <b>Apple Watch</b> can auto-sync below. <b>Garmin dan WHOOP tidak menyediakan sambungan sinkron langsung</b>,
           so export your data from the Garmin Connect or WHOOP app and upload the file here — the
@@ -306,9 +306,9 @@ export function HealthProfile() {
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <input ref={fileRef} type="file" accept=".xml,.csv,.json,.jpg,.jpeg,.png,.webp,text/xml,text/csv,application/json,image/*" className="hidden" onChange={(e) => onImport(e.target.files?.[0])} />
-          <Button onClick={() => fileRef.current?.click()} className="!px-4">Pilih berkas ekspor…</Button>
-          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh JSON</button>
-          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Unduh riwayat CSV</button>
+          <Button onClick={() => fileRef.current?.click()} className="!px-4">Choose export file…</Button>
+          <button onClick={exportJson} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download JSON</button>
+          <button onClick={exportCsv} className="rounded-xl bg-neutral-100 px-4 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200">Download history CSV</button>
           {note && <span className="w-full text-[11px] font-semibold text-brand-dark">{note}</span>}
         </div>
       </Card>
@@ -319,12 +319,12 @@ export function HealthProfile() {
       {p.lastDeviceSyncAt && <DeviceSyncSummary profile={p} />}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Data Diri" subtitle="Dasar bagi seluruh perhitungan" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Demographics" subtitle="Dasar bagi seluruh perhitungan" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {num('Age', 'age', 1, 'e.g. 26')}
           <Field label="Sex">
             <select className={inputClass} value={p.sex} onChange={(e) => u({ sex: e.target.value as 'M' | 'F' })}>
-              <option value="M">Laki-laki</option><option value="F">Perempuan</option>
+              <option value="M">Male</option><option value="F">Female</option>
             </select>
           </Field>
           {num('Height (cm)', 'heightCm', 1, 'e.g. 170')}
@@ -333,19 +333,19 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Kardio, Pemulihan & HRV" subtitle="Dari jam tangan/cincin atau dari sebuah tes" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Cardio, Recovery & HRV" subtitle="Dari jam tangan/cincin atau dari sebuah tes" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('VO₂max (ml/kg/min)', 'vo2max', 0.1, 'e.g. 42')}
           {num('Resting HR (bpm)', 'restingHr', 1, 'e.g. 58')}
           {num('HRV (ms)', 'hrvMs', 1, 'e.g. 65')}
           {num('Recovery (%) — WHOOP', 'recoveryPct', 1, '0-100')}
           {num('Strain (0-21) — WHOOP', 'strain', 0.1, '0-21')}
-          <Field label="Tekanan Darah"><input className={inputClass} placeholder="120/80" value={p.bloodPressure} onChange={(e) => u({ bloodPressure: e.target.value })} /></Field>
+          <Field label="Blood Pressure"><input className={inputClass} placeholder="120/80" value={p.bloodPressure} onChange={(e) => u({ bloodPressure: e.target.value })} /></Field>
         </div>
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Sleep & Activity" subtitle="Potret harian" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Sleep & Activity" subtitle="Daily snapshot" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('Total sleep (hours)', 'sleepH', 0.1, 'e.g. 7.5')}
           {num('REM (hours)', 'remH', 0.1)}
@@ -356,7 +356,7 @@ export function HealthProfile() {
       </Card>
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Komposisi Tubuh" subtitle="Dari timbangan pintar / InBody" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Body Composition" subtitle="Dari timbangan pintar / InBody" />
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {num('Body fat (%)', 'bodyFatPct', 0.1, 'e.g. 18')}
           {num('Muscle mass (kg)', 'muscleMassKg', 0.1)}
@@ -401,7 +401,7 @@ function InsightCard({ history }: { history: Snapshot[] }) {
   }
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconActivity size={20} />} title="Telaah Otomatis" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
+      <SectionTitle icon={<IconActivity size={20} />} title="Automatic Insights" subtitle="Dari tren data Anda sendiri — gratis, tanpa AI" />
       <div className="mt-3 space-y-2">
         {insights.map((ins) => (
           <div key={ins.id} className={`rounded-xl border p-3 ${toneClass[ins.tone]}`}>
@@ -438,7 +438,7 @@ function BenchmarkCard({ profile }: { profile: HealthProfile }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Taksiran menurut norma usia & jenis kelamin" />
+      <SectionTitle icon={<IconHeart size={20} />} title="Bandingkan dengan Populasi Umum" subtitle="Estimate based on age & sex norms" />
       <div className="mt-3 space-y-4">
         {items.map((it) => (
           <div key={it.key}>
@@ -693,7 +693,7 @@ function AutoSyncCard() {
         <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Private Sync Link</div>
         <div className="mt-1.5 flex items-center gap-2">
           <input readOnly value={url || 'Loading…'} className={inputClass + ' flex-1 !text-[11px]'} onFocus={(e) => e.target.select()} />
-          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Salin'}</button>
+          <button onClick={copy} disabled={!url} className="shrink-0 rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 transition hover:bg-neutral-200 disabled:opacity-50">{copied ? 'Copied ✓' : 'Copy'}</button>
         </div>
         <p className="mt-1 text-[10px] leading-relaxed text-neutral-500">
           Rahasiakan tautan ini — siapa pun yang memilikinya bisa mengirim data ke akun Anda.
@@ -706,9 +706,9 @@ function AutoSyncCard() {
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-500/30 dark:bg-amber-500/10">
           <div className="text-[12px] font-black text-amber-800 dark:text-amber-300">Tautan baru dibuat — sinkronisasi Anda sekarang MATI</div>
           <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-amber-900 dark:text-amber-100/90">
-            <li>Tekan <b>Salin</b> pada tautan baru di atas.</li>
+            <li>Tekan <b>Copy</b> pada tautan baru di atas.</li>
             <li>Buka Health Auto Export → otomatisasi Anda → <b>kosongkan kolom URL</b>, tempel sekali.</li>
-            <li>Tekan <b>Update</b> di kanan atas, lalu <b>Ekspor Manual</b> sekali.</li>
+            <li>Tekan <b>Update</b> di kanan atas, lalu <b>Manual Export</b> sekali.</li>
             <li>Ulangi untuk setiap otomatisasi yang memakai tautan ini.</li>
           </ol>
         </div>

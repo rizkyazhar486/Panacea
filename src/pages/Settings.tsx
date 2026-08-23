@@ -172,7 +172,7 @@ export function Settings() {
             }`}
           >
             <span className="min-w-0">
-              <span className={`flex items-center gap-2 font-extrabold ${S ? 'text-lg' : 'text-base'}`}>👵 Mode Sederhana</span>
+              <span className={`flex items-center gap-2 font-extrabold ${S ? 'text-lg' : 'text-base'}`}>👵 Simple Mode</span>
               <span className={`mt-0.5 block text-neutral-500 ${S ? 'text-sm' : 'text-[13px]'}`}>
                 Bigger text &amp; buttons, a calmer look — ideal for seniors or anyone new to the app.
               </span>
@@ -287,7 +287,7 @@ export function Settings() {
             <span className={`block font-bold ${S ? 'text-base' : 'text-sm'}`}>Reset Local Data</span>
             <span className={`block text-neutral-500 ${S ? 'text-xs' : 'text-[11px]'}`}>Delete data stored on this device</span>
           </span>
-          <Button variant="ghost" onClick={resetDemo} className="shrink-0">Atur ulang</Button>
+          <Button variant="ghost" onClick={resetDemo} className="shrink-0">Reset</Button>
         </div>
       </Card>
 
@@ -344,7 +344,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
     <Card>
       <SectionTitle
         icon={<span className={S ? 'text-2xl' : 'text-xl'}>💬</span>}
-        title="Masukan & Saran"
+        title="Feedback & Suggestions"
         subtitle="Kirim masukan langsung ke pengembang — semuanya dibaca"
       />
       <div className={`flex flex-wrap ${S ? 'gap-2.5' : 'gap-1.5'}`}>
@@ -373,7 +373,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           {busy ? 'Sending…' : appSent ? '✓ Sent to Owner' : '📩 Send to Owner (App)'}
         </button>
       )}
-      <p className="mt-2 text-[11px] text-neutral-500">Atau kirim lewat saluran lain:</p>
+      <p className="mt-2 text-[11px] text-neutral-500">Or send through another channel:</p>
       <div className="mt-1 flex gap-2">
         <a
           href={canSend ? `https://wa.me/${FEEDBACK_WA}?text=${encodeURIComponent(body)}` : undefined}
@@ -391,7 +391,7 @@ function FeedbackCard({ simple: S }: { simple: boolean }) {
           ✉️ Email
         </a>
       </div>
-      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-500">Tulis sedikitnya 5 huruf.</p>}
+      {!canSend && text.length > 0 && <p className="mt-1.5 text-[11px] text-neutral-500">Write at least 5 characters.</p>}
       {sent.length > 0 && (
         <details className="mt-3">
           <summary className={`cursor-pointer font-semibold text-neutral-500 ${S ? 'text-sm' : 'text-xs'}`}>Sent history ({sent.length})</summary>
@@ -507,7 +507,7 @@ function PushControl({ simple: S }: { simple: boolean }) {
             {busy ? '…' : status === 'enabled' ? 'Turn off' : 'Turn on'}
           </Button>
           {status === 'enabled' && (
-            <button onClick={test} className={`font-semibold text-brand-dark hover:underline ${S ? 'text-xs' : 'text-[11px]'}`}>Kirim percobaan</button>
+            <button onClick={test} className={`font-semibold text-brand-dark hover:underline ${S ? 'text-xs' : 'text-[11px]'}`}>Send test</button>
           )}
         </div>
       )}

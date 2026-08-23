@@ -62,12 +62,12 @@ export function Billing() {
         <Card className="lg:col-span-2">
           <SectionTitle
             icon={<IconWallet size={20} />}
-            title="Dompet PanaceaToken"
+            title="PanaceaToken Wallet"
             subtitle={`1 PNC = Rp${TOKEN_TO_IDR.toLocaleString('en-GB')}`}
           />
           <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-ink p-5 text-white">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Saldo</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink/50">Balance</div>
               <div className="flex items-center gap-2 text-4xl font-extrabold">
                 <IconToken size={28} className="text-brand" />
                 {wallet.balance}
@@ -89,7 +89,7 @@ export function Billing() {
               <div className="mb-2 text-sm font-bold">Withdraw Remaining Deposit to Bank</div>
               <div className="flex flex-wrap items-end gap-3">
                 <div className="w-32">
-                  <Field label="Jumlah (PNC)">
+                  <Field label="Amount (PNC)">
                     <input className={inputClass} type="number" min={1} value={withdraw} onChange={(e) => setWithdraw(Number(e.target.value))} />
                   </Field>
                 </div>
@@ -119,7 +119,7 @@ export function Billing() {
         <Card>
           <SectionTitle title="Subscription Status" />
           <div className="mb-3 rounded-xl bg-brand-50 p-3 text-center">
-            <div className="text-xs uppercase tracking-wide text-brand-dark">Paket aktif</div>
+            <div className="text-xs uppercase tracking-wide text-brand-dark">Active plan</div>
             <div className="text-xl font-extrabold text-brand-dark">
               {subscription.plan === 'none'
                 ? 'Not subscribed'
@@ -142,7 +142,7 @@ export function Billing() {
 
       {/* Plans */}
       <Card>
-        <SectionTitle title="Pilih Paket Langganan" subtitle="Untuk tenaga medis perorangan maupun institusi rumah sakit" />
+        <SectionTitle title="Choose a Subscription Plan" subtitle="Untuk tenaga medis perorangan maupun institusi rumah sakit" />
         <div className="grid gap-4 md:grid-cols-2">
           {PLANS.map((pl) => {
             const active = subscription.plan === pl.id
@@ -153,10 +153,10 @@ export function Billing() {
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold">{pl.name}</h3>
-                  {active && <Badge tone="brand">Aktif</Badge>}
+                  {active && <Badge tone="brand">Active</Badge>}
                 </div>
                 <div className="mt-1 text-2xl font-extrabold">
-                  {pl.price} <span className="text-sm font-medium text-neutral-500">PNC / bulan</span>
+                  {pl.price} <span className="text-sm font-medium text-neutral-500">PNC / month</span>
                 </div>
                 <ul className="mt-3 space-y-1.5 text-sm">
                   {pl.features.map((fe) => (
@@ -200,15 +200,15 @@ export function Billing() {
 
       {/* Transactions */}
       <Card>
-        <SectionTitle title="Riwayat Transaksi" subtitle="Setoran · pembelian · royalti penulis · langganan" />
+        <SectionTitle title="Transaction History" subtitle="Deposit · purchase · author royalty · subscription" />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
                 <th className="pb-2 pr-4 font-semibold">Time</th>
                 <th className="pb-2 pr-4 font-semibold">Type</th>
-                <th className="pb-2 pr-4 font-semibold">Keterangan</th>
-                <th className="pb-2 text-right font-semibold">Jumlah</th>
+                <th className="pb-2 pr-4 font-semibold">Description</th>
+                <th className="pb-2 text-right font-semibold">Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -274,7 +274,7 @@ function EmrPurchaseModal({
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 text-brand-dark">
           <IconShield size={20} />
-          <h3 className="text-lg font-bold">Pembelian AI-EMR — Pemeriksaan Kredensial</h3>
+          <h3 className="text-lg font-bold">AI-EMR Purchase — Credential Verification</h3>
         </div>
         <p className="mt-1 text-sm text-neutral-500">
           AI-EMR is sold only to certified buyers. <b>{isCompany ? 'Hospital' : 'Individual'}</b> plan · {price} PNC/month.
@@ -294,14 +294,14 @@ function EmrPurchaseModal({
 
         {buyer === 'individu' ? (
           <div className="mt-4 space-y-3">
-            <Field label="Nomor STR / Surat Izin Praktik">
-              <input className={inputClass} value={str} onChange={(e) => setStr(e.target.value)} placeholder="Wajib — STR yang masih berlaku" />
+            <Field label="STR Number / Practice Certificate">
+              <input className={inputClass} value={str} onChange={(e) => setStr(e.target.value)} placeholder="Required — active STR" />
             </Field>
             <UploadBox label="Upload STR scan (JPG/PDF) — optional" onFiles={(f) => setStrFiles(f)} files={strFiles} />
           </div>
         ) : (
           <div className="mt-4 space-y-3">
-            <Field label="Jenis Pembeli">
+            <Field label="Buyer Type">
               <select className={inputClass} value={orgType} onChange={(e) => setOrgType(e.target.value as 'Rumah Sakit' | 'Instansi')}>
                 <option>Rumah Sakit</option>
                 <option>Instansi</option>
@@ -310,10 +310,10 @@ function EmrPurchaseModal({
             <Field label={`${orgType === 'Rumah Sakit' ? 'Hospital' : 'Institution'} Name`}>
               <input className={inputClass} value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder={`e.g. ${orgType === 'Rumah Sakit' ? 'Sehat Sentosa Hospital' : 'City Health Department'}`} />
             </Field>
-            <Field label="NPWP Perusahaan">
+            <Field label="Company NPWP (Tax ID)">
               <input className={inputClass} value={npwp} onChange={(e) => setNpwp(e.target.value)} placeholder="00.000.000.0-000.000" />
             </Field>
-            <Field label="Jumlah kursi dokter">
+            <Field label="Number of doctor seats">
               <input className={inputClass} type="number" min={1} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
             </Field>
             <UploadBox label="STR tiap dokter (boleh beberapa berkas JPG)" multiple onFiles={(f) => setStrFiles(f)} files={strFiles} />
@@ -322,7 +322,7 @@ function EmrPurchaseModal({
 
         {err && <p className="mt-3 text-xs font-semibold text-accent">{err}</p>}
         <div className="mt-5 flex gap-2">
-          <Button variant="ghost" className="flex-1" onClick={onClose}>Batal</Button>
+          <Button variant="ghost" className="flex-1" onClick={onClose}>Cancel</Button>
           <Button className="flex-1" onClick={submit}>Pay {price} PNC & Submit</Button>
         </div>
       </div>
@@ -405,28 +405,28 @@ function ManualBankTransfer() {
     <div className="rounded-2xl border-2 border-brand/20 bg-brand-50/40 p-4">
       <div className="flex items-center gap-2 text-sm font-bold text-brand-dark">
         🏦 Top-up via Bank Transfer
-        <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-neutral-500">satu-satunya cara pembayaran</span>
+        <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-neutral-500">the only payment method</span>
       </div>
       <p className="mt-1 text-[12px] text-neutral-500">
-        Transfer ke rekening berikut sejumlah persis nominalnya, lalu konfirmasi lewat WhatsApp. Saldo PNC ditambahkan setelah pembayaran diperiksa.
+        Transfer to the following account for the exact amount, then confirm via WhatsApp. PNC balance is added once payment is verified.
       </p>
       <div className="mt-3 rounded-xl bg-white p-3 text-sm">
         <div className="flex items-center justify-between py-1">
           <span className="text-neutral-500">Bank</span><span className="font-bold">{MANUAL_BANK.bank}</span>
         </div>
         <div className="flex items-center justify-between py-1">
-          <span className="text-neutral-500">No. Rekening</span>
+          <span className="text-neutral-500">Account No.</span>
           <span className="flex items-center gap-2">
             <span className="font-mono text-base font-extrabold">{MANUAL_BANK.number}</span>
             <button onClick={copyNumber} className="rounded-lg bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-dark">{copied ? 'Copied ✓' : 'Copy'}</button>
           </span>
         </div>
         <div className="flex items-center justify-between py-1">
-          <span className="text-neutral-500">Pemilik Rekening</span><span className="font-bold">{MANUAL_BANK.holder}</span>
+          <span className="text-neutral-500">Account Holder</span><span className="font-bold">{MANUAL_BANK.holder}</span>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap items-end gap-3">
-        <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" min={1} value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+        <div className="w-28"><Field label="Amount (PNC)"><input className={inputClass} type="number" min={1} value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
         <div className="rounded-xl bg-white px-3 py-2 text-sm">
           Total transfer: <b>Rp{(amount * TOKEN_TO_IDR).toLocaleString('en-GB')}</b>
         </div>
@@ -435,7 +435,7 @@ function ManualBankTransfer() {
       <div className="mt-3 rounded-xl border border-dashed border-brand/40 bg-white p-3">
         <div className="flex items-center justify-between">
           <div className="text-[12px] font-bold text-brand-dark">📸 Transfer Proof (required)</div>
-          {proof && <button onClick={() => setProof('')} className="text-[11px] font-semibold text-red-500 hover:underline">Hapus</button>}
+          {proof && <button onClick={() => setProof('')} className="text-[11px] font-semibold text-red-500 hover:underline">Remove</button>}
         </div>
         <input ref={proofRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => pickProof(e.target.files?.[0] ?? null)} />
         {proof ? (
@@ -488,12 +488,12 @@ function ProofVerification() {
     <Card className="border-2 border-amber-300">
       <SectionTitle
         icon={<IconShield size={20} />}
-        title="Periksa Bukti Transfer (Pemilik)"
+        title="Verify Transfer Proof (Owner)"
         subtitle="Setujui buktinya → PNC ditambahkan otomatis"
         right={<Badge tone={pending.length ? 'high' : 'brand'}>{pending.length} pending</Badge>}
       />
       {reqs.length === 0 ? (
-        <p className="text-sm text-neutral-500">Belum ada bukti transfer yang dikirim.</p>
+        <p className="text-sm text-neutral-500">No transfer proofs submitted yet.</p>
       ) : (
         <div className="space-y-2">
           {reqs.map((r) => (
@@ -508,7 +508,7 @@ function ProofVerification() {
               {r.status === 'pending' ? (
                 <div className="flex shrink-0 gap-2">
                   <button onClick={() => verify(r)} className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark">Verify</button>
-                  <button onClick={() => reject(r)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-50">Tolak</button>
+                  <button onClick={() => reject(r)} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-500 hover:bg-red-50">Reject</button>
                 </div>
               ) : (
                 <Badge tone={r.status === 'verified' ? 'brand' : 'high'}>{r.status === 'verified' ? 'Verified ✓' : 'Rejected'}</Badge>
@@ -572,27 +572,27 @@ function BackendWallet() {
     <Card className="border-2 border-brand">
       <SectionTitle
         icon={<IconShield size={20} />}
-        title="Dompet Sungguhan (Server)"
+        title="Real Wallet (Backend)"
         subtitle="Saldo & penarikan dana diproses oleh server"
         right={<Badge tone={live ? 'brand' : 'high'}>{live ? 'Backend Active' : 'Local Mode'}</Badge>}
       />
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl bg-brand p-5 text-white">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-ink/70">Saldo server</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-ink/70">Server balance</div>
           <div className="text-3xl font-extrabold">{balance} <span className="text-base font-medium text-ink/70">PNC</span></div>
         </div>
-        <Button variant="ghost" className="bg-white/15 text-white hover:bg-white/25" onClick={refresh}>Muat ulang</Button>
+        <Button variant="ghost" className="bg-white/15 text-white hover:bg-white/25" onClick={refresh}>Refresh</Button>
       </div>
 
       <div className="mt-5 rounded-2xl border border-neutral-200 p-4">
         <div className="mb-2 text-sm font-semibold text-neutral-600">Withdraw funds to a bank account</div>
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Bank"><select className={inputClass} value={bank} onChange={(e) => setBank(e.target.value)}>{['Mandiri', 'BCA', 'BNI', 'BRI', 'BSI', 'CIMB Niaga', 'Permata'].map((b) => <option key={b}>{b}</option>)}</select></Field>
-          <Field label="Nomor Rekening"><input className={inputClass} inputMode="numeric" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="e.g. 1260007276065" /></Field>
-          <Field label="Nama Pemilik Rekening"><input className={inputClass} value={accountHolder} onChange={(e) => setAccountHolder(e.target.value.toUpperCase())} placeholder="e.g. RIZKY MUHAMMAD AZRIS" /></Field>
+          <Field label="Account Number"><input className={inputClass} inputMode="numeric" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="e.g. 1260007276065" /></Field>
+          <Field label="Account Holder Name"><input className={inputClass} value={accountHolder} onChange={(e) => setAccountHolder(e.target.value.toUpperCase())} placeholder="e.g. RIZKY MUHAMMAD AZRIS" /></Field>
         </div>
         <div className="mt-3 flex flex-wrap items-end gap-3">
-          <div className="w-28"><Field label="Jumlah (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
+          <div className="w-28"><Field label="Amount (PNC)"><input className={inputClass} type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} /></Field></div>
           <Button variant="outline" onClick={withdraw}>Withdraw Rp{(amount * TOKEN_TO_IDR).toLocaleString('en-GB')} to Bank</Button>
         </div>
         <p className="mt-2 text-[11px] text-neutral-500">Funds are withdrawn to an account in your name. Make sure the details are correct — account errors are not the platform's responsibility.</p>

@@ -67,26 +67,25 @@ export function Ikigai() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Surat Warisan" subtitle="Perenungan tersusun tentang tujuan hidup — faktor umur panjang yang tervalidasi, bukan sekadar suasana hati" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Ikigai & Legacy Letter" subtitle="Perenungan tersusun tentang tujuan hidup — faktor umur panjang yang tervalidasi, bukan sekadar suasana hati" />
         <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">
-          Rasa memiliki tujuan hidup yang jelas berkaitan dengan angka kematian keseluruhan yang lebih
-          rendah pada kajian jangka panjang, terlepas dari faktor kesehatan lainnya. Halaman ini
-          mewujudkannya menjadi sesuatu yang nyata: peta <b>Ikigai</b> empat lingkaran yang klasik, dan
-          <b>surat warisan</b> yang Anda tulis untuk diri sendiri. Semuanya tinggal di perangkat ini —
-          tidak dikirim ke mana pun dan tidak diperlihatkan kepada siapa pun kecuali Anda sendiri yang
-          mengunduhnya.
+          Having a clear sense of purpose is linked to lower all-cause mortality in long-term studies,
+          independent of other health factors. This page turns that into something concrete: the
+          classic four-circle <b>Ikigai</b> map, and a <b>legacy letter</b> you write to yourself.
+          Everything here stays on this device — nothing is sent anywhere or shown to anyone unless
+          you choose to download it.
         </p>
-        {saved && <p className="mt-2 text-[11px] font-semibold text-brand-dark">Tersimpan di perangkat ini ✓</p>}
+        {saved && <p className="mt-2 text-[11px] font-semibold text-brand-dark">Saved on this device ✓</p>}
       </Card>
 
       <Card className="!p-5">
-        <div className="text-sm font-black uppercase tracking-wide text-neutral-500">Peta Ikigai</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Isi sebanyak yang Anda bisa — satu kalimat jujur untuk masing-masing sudah cukup.</p>
+        <div className="text-sm font-black uppercase tracking-wide text-neutral-500">The Ikigai map</div>
+        <p className="mt-1 text-[12px] text-neutral-500">Fill in as many as you can — one honest sentence each is enough.</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="What I love"><textarea className={taClass} rows={2} value={d.love} onChange={(e) => set('love', e.target.value)} placeholder="Kegiatan yang membuat Anda lupa waktu" /></Field>
-          <Field label="What I'm good at"><textarea className={taClass} rows={2} value={d.goodAt} onChange={(e) => set('goodAt', e.target.value)} placeholder="Keterampilan yang diakui orang lain pada Anda" /></Field>
-          <Field label="Yang dibutuhkan dunia"><textarea className={taClass} rows={2} value={d.worldNeeds} onChange={(e) => set('worldNeeds', e.target.value)} placeholder="Masalah yang ingin Anda pecahkan" /></Field>
-          <Field label="Yang dapat dibayar orang kepada saya"><textarea className={taClass} rows={2} value={d.paidFor} onChange={(e) => set('paidFor', e.target.value)} placeholder="Keterampilan yang benar-benar berguna bagi orang lain" /></Field>
+          <Field label="What I love"><textarea className={taClass} rows={2} value={d.love} onChange={(e) => set('love', e.target.value)} placeholder="Activities that make you lose track of time" /></Field>
+          <Field label="What I'm good at"><textarea className={taClass} rows={2} value={d.goodAt} onChange={(e) => set('goodAt', e.target.value)} placeholder="Skills others recognize in you" /></Field>
+          <Field label="What the world needs"><textarea className={taClass} rows={2} value={d.worldNeeds} onChange={(e) => set('worldNeeds', e.target.value)} placeholder="A problem you care about solving" /></Field>
+          <Field label="What I can be paid for"><textarea className={taClass} rows={2} value={d.paidFor} onChange={(e) => set('paidFor', e.target.value)} placeholder="Skills that create real value for others" /></Field>
         </div>
 
         {filled >= 2 && (
@@ -108,12 +107,12 @@ export function Ikigai() {
 
       <Card className="!p-5">
         <div className="text-sm font-black uppercase tracking-wide text-neutral-500">Legacy letter</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Surat pendek untuk diri Anda di masa depan — bacalah dan perbarui kapan saja.</p>
+        <p className="mt-1 text-[12px] text-neutral-500">A short letter to your future self — revisit and update it any time.</p>
         <div className="mt-3 space-y-3">
-          <Field label="Yang paling berarti bagi saya"><textarea className={taClass} rows={2} value={d.mattersMost} onChange={(e) => set('mattersMost', e.target.value)} /></Field>
-          <Field label="Yang ingin dikenang dari saya"><textarea className={taClass} rows={2} value={d.rememberedFor} onChange={(e) => set('rememberedFor', e.target.value)} /></Field>
-          <Field label="Pesan untuk diri saya kelak"><textarea className={taClass} rows={2} value={d.adviceToFuture} onChange={(e) => set('adviceToFuture', e.target.value)} /></Field>
-          <Field label="Satu kebiasaan yang ingin saya jaga puluhan tahun"><textarea className={taClass} rows={2} value={d.habitToKeep} onChange={(e) => set('habitToKeep', e.target.value)} /></Field>
+          <Field label="What matters most to me"><textarea className={taClass} rows={2} value={d.mattersMost} onChange={(e) => set('mattersMost', e.target.value)} /></Field>
+          <Field label="What I want to be remembered for"><textarea className={taClass} rows={2} value={d.rememberedFor} onChange={(e) => set('rememberedFor', e.target.value)} /></Field>
+          <Field label="Advice to my future self"><textarea className={taClass} rows={2} value={d.adviceToFuture} onChange={(e) => set('adviceToFuture', e.target.value)} /></Field>
+          <Field label="One habit I want to keep for decades"><textarea className={taClass} rows={2} value={d.habitToKeep} onChange={(e) => set('habitToKeep', e.target.value)} /></Field>
         </div>
         <Button className="mt-4" onClick={downloadLetter} disabled={!hasLetterContent && filled < 4}>
           <IconHeart size={16} /> Download my letter (.txt)

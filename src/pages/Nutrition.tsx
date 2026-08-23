@@ -877,7 +877,7 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
   if (!edit) return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<span className="text-lg">{'\u2696\uFE0F'}</span>} title="Profil Tubuh" />
+        <SectionTitle icon={<span className="text-lg">{'\u2696\uFE0F'}</span>} title="Body Profile" />
         <button onClick={() => setEdit(true)} className="rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">{'\u270F\uFE0F'} Edit</button>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -889,7 +889,7 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold text-indigo-500"><ANum v={Math.round(bm)} /></div>
           <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">BMR kcal</div>
-          <div className="mt-1 text-[10px] text-neutral-500">{b.g === 'M' ? 'Laki-laki' : 'Perempuan'}, {b.age} thn</div>
+          <div className="mt-1 text-[10px] text-neutral-500">{b.g === 'M' ? 'Male' : 'Female'}, {b.age} yrs</div>
         </div>
         <div className="rounded-xl border border-neutral-100 p-3 text-center">
           <div className="text-2xl font-extrabold" style={{ color: 'var(--teks-ok)' }}><ANum v={Math.round(td)} /></div>
@@ -900,32 +900,32 @@ function BodyCard({ intakeKcal }: { intakeKcal: number }) {
           <div className="text-lg font-extrabold" style={{ color: intakeKcal > rec * 1.1 ? CT.org : intakeKcal < rec * 0.8 ? CT.blue : CT.ok }}>
             <ANum v={intakeKcal} />/<ANum v={rec} />
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">Kkal hari ini</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mt-1">Kcal today</div>
           <div className="mt-1 text-[10px]" style={{ color: intakeKcal > rec ? CT.org : CT.ok }}>
             {intakeKcal > rec ? '+' + (intakeKcal - rec) + ' surplus' : (rec - intakeKcal) + ' remaining'}
           </div>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-neutral-500">
-        {b.w}kg {'\u00B7'} {b.h}cm {'\u00B7'} Target: {b.goal === 'lose' ? 'Turun' : b.goal === 'gain' ? 'Naik' : 'Mempertahankan'}
+        {b.w}kg {'\u00B7'} {b.h}cm {'\u00B7'} Target: {b.goal === 'lose' ? 'Lose' : b.goal === 'gain' ? 'Gain' : 'Maintain'}
       </div>
     </Card>
   )
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<span className="text-lg">{'\u270F\uFE0F'}</span>} title="Ubah Profil Tubuh" />
+      <SectionTitle icon={<span className="text-lg">{'\u270F\uFE0F'}</span>} title="Edit Body Profile" />
       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <Field label="Berat (kg)"><input className={inputClass} type="number" value={b.w} onChange={e => setB({ ...b, w: +e.target.value })} /></Field>
-        <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={b.h} onChange={e => setB({ ...b, h: +e.target.value })} /></Field>
-        <Field label="Usia"><input className={inputClass} type="number" value={b.age} onChange={e => setB({ ...b, age: +e.target.value })} /></Field>
-        <Field label="Jenis kelamin"><select className={inputClass} value={b.g} onChange={e => setB({ ...b, g: e.target.value as 'M' | 'F' })}><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></Field>
-        <Field label="Aktivitas Harian"><select className={inputClass} value={b.act} onChange={e => setB({ ...b, act: +e.target.value })}>{ACT_L.map((l, i) => <option key={l} value={i}>{l}</option>)}</select></Field>
-        <Field label="Tujuan"><select className={inputClass} value={b.goal} onChange={e => setB({ ...b, goal: e.target.value as Body['goal'] })}><option value="lose">Menurunkan berat</option><option value="maintain">Mempertahankan</option><option value="gain">Menaikkan berat</option></select></Field>
+        <Field label="Weight (kg)"><input className={inputClass} type="number" value={b.w} onChange={e => setB({ ...b, w: +e.target.value })} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" value={b.h} onChange={e => setB({ ...b, h: +e.target.value })} /></Field>
+        <Field label="Age"><input className={inputClass} type="number" value={b.age} onChange={e => setB({ ...b, age: +e.target.value })} /></Field>
+        <Field label="Sex"><select className={inputClass} value={b.g} onChange={e => setB({ ...b, g: e.target.value as 'M' | 'F' })}><option value="M">Male</option><option value="F">Female</option></select></Field>
+        <Field label="Daily Activity"><select className={inputClass} value={b.act} onChange={e => setB({ ...b, act: +e.target.value })}>{ACT_L.map((l, i) => <option key={l} value={i}>{l}</option>)}</select></Field>
+        <Field label="Goal"><select className={inputClass} value={b.goal} onChange={e => setB({ ...b, goal: e.target.value as Body['goal'] })}><option value="lose">Lose weight</option><option value="maintain">Maintain</option><option value="gain">Gain weight</option></select></Field>
       </div>
       <div className="mt-3 flex gap-2 justify-end">
-        <Button variant="outline" onClick={() => setEdit(false)} className="h-9 text-xs rounded-xl">Batal</Button>
-        <Button onClick={save} className="h-9 text-xs rounded-xl">Simpan</Button>
+        <Button variant="outline" onClick={() => setEdit(false)} className="h-9 text-xs rounded-xl">Cancel</Button>
+        <Button onClick={save} className="h-9 text-xs rounded-xl">Save</Button>
       </div>
     </Card>
   )
@@ -993,7 +993,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<span className="text-lg">{'\u{1F37D}\uFE0F'}</span>} title="Gizi" subtitle={total.k + '/' + rec + ' kcal today'} />
+      <SectionTitle icon={<span className="text-lg">{'\u{1F37D}\uFE0F'}</span>} title="Nutrition" subtitle={total.k + '/' + rec + ' kcal today'} />
       <div className="mt-3 flex items-center justify-around">
         {([
           ['Carbs', total.c, Math.round(rec * 0.5 / 4), '#f59e0b'],
@@ -1032,7 +1032,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
       <FoodPhotoAI onDetect={(items) => items.forEach((it) => addFood({ id: uid(), date: today(), name: it.name, grams: it.grams, kcal: it.kcal, carbs: it.carbs, protein: it.protein, fat: it.fat }))} />
 
       <div className="mt-4 flex gap-2">
-        <div className="flex-1"><input className={inputClass} placeholder="Cari makanan…" value={q} onChange={e => setQ(e.target.value)} /></div>
+        <div className="flex-1"><input className={inputClass} placeholder="Search food..." value={q} onChange={e => setQ(e.target.value)} /></div>
         <select className={inputClass + ' w-28'} value={cat} onChange={e => setCat(e.target.value)}><option>All</option>{FCATS.map(c => <option key={c}>{c}</option>)}</select>
       </div>
       <div className="mt-2 flex flex-wrap gap-1.5 max-h-44 overflow-y-auto rounded-xl border border-neutral-100 bg-neutral-50/50 p-2" style={{ scrollbarWidth: 'thin' }}>
@@ -1050,7 +1050,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
       </div>
       <div className="mt-3 flex items-end gap-3">
         <div className="flex-1 rounded-xl bg-neutral-50 px-4 py-3">
-          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="brand">Dianjurkan</Badge>}{isAvoided && <Badge tone="high">Hindari</Badge>}</div>
+          <div className="flex items-baseline gap-2"><span className="text-sm font-bold text-neutral-800">{fd.emoji} {name}</span><Badge tone="neutral">{fd.cat}</Badge>{fd.gi > 0 && <Badge tone={fd.gi > 70 ? 'high' : fd.gi > 55 ? 'neutral' : 'normal'}>GI {fd.gi}</Badge>}{isRecommended && <Badge tone="brand">Recommended</Badge>}{isAvoided && <Badge tone="high">Avoid</Badge>}</div>
           <div className="mt-1 flex flex-wrap gap-2 text-xs tabular-nums font-semibold">
             <span style={{ color: 'var(--teks-ok)' }}>{pv.k} kcal</span>
             <span className="text-amber-500">K{pv.c}</span>
@@ -1066,7 +1066,7 @@ function FoodTracker({ body, activeProtocol }: { body: Body; activeProtocol?: Ch
         <Button onClick={() => addFood({ id: uid(), date: today(), name, grams: g, kcal: pv.k, carbs: pv.c, protein: pv.p, fat: pv.f })} className="h-[42px] shrink-0 rounded-xl"><IconPlus size={15} /></Button>
       </div>
       <div className="mt-3 space-y-1 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-        {todays.length === 0 && <Empty e={'\u{1F37D}\uFE0F'} t="Belum ada makanan tercatat" />}
+        {todays.length === 0 && <Empty e={'\u{1F37D}\uFE0F'} t="No food logged yet" />}
         {todays.map(f => { const s = FD.find(x => x.name === f.name); return (
           <div key={f.id} className="flex items-center justify-between rounded-lg px-3 py-2 transition hover:bg-neutral-50">
             <div className="min-w-0 flex-1"><span className="text-sm font-medium">{s ? s.emoji : ''} {f.name}</span><span className="ml-2 text-[10px] text-neutral-500">{f.grams}g</span></div>
@@ -1121,7 +1121,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
   return (
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <SectionTitle icon={<span className="text-lg">{'\u{1F5FA}\uFE0F'}</span>} title="Pelacak GPS" subtitle="Rekam rute, kecepatan, dan kalori" />
+        <SectionTitle icon={<span className="text-lg">{'\u{1F5FA}\uFE0F'}</span>} title="GPS Tracker" subtitle="Track route, speed, and calories" />
       </div>
       <div className="px-5 pb-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExType(f[0]) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
@@ -1135,7 +1135,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
             {'\u{1F4CD}'} Tap the map to add route points {plan.length > 0 && `· ${plan.length} points · ${fmtDist(planDist)}`}
           </div>
         )}
-        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-500">Memuat peta…</div>}>
+        <Suspense fallback={<div className="grid h-[240px] place-items-center bg-neutral-50 text-xs text-neutral-500">Loading map…</div>}>
           <RouteMap
             points={pts}
             planned={plan}
@@ -1158,7 +1158,7 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {(mode === 'tracking' || mode === 'paused' || mode === 'done') && (
           <div className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-2.5">
             <span className="text-lg">{'\u{1F493}'}</span>
-            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Denyut Jantung</div></div>
+            <div className="flex-1"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div></div>
             <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
             <span className="text-[10px] text-neutral-500">bpm</span>
           </div>
@@ -1166,13 +1166,13 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {mode === 'done' && (
           <div className="rounded-xl bg-gradient-to-r from-brand to-emerald-600 p-4 text-white">
             <div className="flex items-center justify-between">
-              <div><div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Ringkasan</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
+              <div><div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Summary</div><div className="text-2xl font-extrabold">{exType.emoji} {exType.name}</div></div>
               <div className="text-right"><div className="text-3xl font-extrabold">{kcal}<span className="text-sm font-medium text-ink/60"> kcal</span></div><div className="text-xs text-ink/70">MET {exType.met} {'\u00B7'} {metH.toFixed(2)} MET-hours</div></div>
             </div>
             <div className="mt-2 grid grid-cols-4 gap-3 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Jarak</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Lama</div></div>
-              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-ink/50">Kecepatan</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Distance</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Duration</div></div>
+              <div><div className="font-bold">{Math.round(dur > 0 ? (dist / dur) * 3.6 : 0)} km/h</div><div className="text-ink/50">Speed</div></div>
               <div><div className="font-bold">{hr || '-'}</div><div className="text-ink/50">HR</div></div>
             </div>
           </div>
@@ -1180,10 +1180,10 @@ function GPSTracker({ body, onComplete }: { body: Body; onComplete: (kcal: numbe
         {gpsErr && <div className="rounded-lg bg-red-50 px-3 py-2 text-[11px] font-medium text-red-600">{gpsErr}</div>}
         <div className="flex gap-2">
           {mode === 'idle' && <><Button onClick={startTrack} disabled={!exType.gps} className="flex-1 h-11 rounded-xl text-sm font-bold">{'\u25B6'} Start GPS{!exType.gps ? ' (N/A)' : ''}</Button><Button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100">{'\u{1F4CD}'} Plan Route</Button></>}
-          {mode === 'planning' && <><Button onClick={() => setPlan([])} variant="outline" className="h-10 rounded-xl text-xs">Kosongkan</Button><Button onClick={reset} variant="outline" className="flex-1 h-10 rounded-xl text-xs">Batal</Button><Button onClick={startTrack} disabled={!exType.gps} className="flex-1 h-10 rounded-xl text-xs font-bold">{'\u25B6'} Start</Button></>}
+          {mode === 'planning' && <><Button onClick={() => setPlan([])} variant="outline" className="h-10 rounded-xl text-xs">Clear</Button><Button onClick={reset} variant="outline" className="flex-1 h-10 rounded-xl text-xs">Cancel</Button><Button onClick={startTrack} disabled={!exType.gps} className="flex-1 h-10 rounded-xl text-xs font-bold">{'\u25B6'} Start</Button></>}
           {mode === 'tracking' && <><Button onClick={pause} className="flex-1 h-11 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-600">{'\u23F8'} Pause</Button><Button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600">{'\u23F9'} Finish</Button></>}
           {mode === 'paused' && <><Button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold">{'\u25B6'} Resume</Button><Button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600">{'\u23F9'} Finish</Button></>}
-          {mode === 'done' && <Button onClick={reset} className="w-full h-10 rounded-xl text-sm">Selesai & Atur Ulang</Button>}
+          {mode === 'done' && <Button onClick={reset} className="w-full h-10 rounded-xl text-sm">Finish & Reset</Button>}
         </div>
         {!exType.gps && mode === 'idle' && <ManualEx body={body} ex={exType} onComplete={onComplete} />}
       </div>
@@ -1205,7 +1205,7 @@ function ManualEx({ body, ex, onComplete }: { body: Body; ex: Exer; onComplete: 
       </div>
       <div className="flex items-center gap-3">
         <Stepper value={min} min={5} max={180} step={5} unit="min" onChange={setMin} />
-        <Button onClick={() => onComplete(k, min, mH)} className="h-9 text-xs rounded-xl shrink-0"><IconPlus size={14} /> Catat</Button>
+        <Button onClick={() => onComplete(k, min, mH)} className="h-9 text-xs rounded-xl shrink-0"><IconPlus size={14} /> Log</Button>
       </div>
     </div>
   )
@@ -1220,22 +1220,22 @@ function SleepWater({ body }: { body: Body }) {
   const weekMet = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return getW(state, kunciHari(d)).metHours }).reduce((a, b) => a + b, 0)
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<span className="text-lg">{'\u{1F4A4}'}</span>} title="Tidur, Air, Cahaya Matahari & Mingguan" />
+      <SectionTitle icon={<span className="text-lg">{'\u{1F4A4}'}</span>} title="Sleep, Water, Sunlight & Weekly" />
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u{1F319}'}</span><span className="text-xs font-bold text-neutral-700">Tidur</span><span className="ml-auto text-sm font-extrabold text-indigo-500 tabular-nums"><ANum v={wt.sleepHr} d={1} /> jam</span></div>
-          <Stepper value={wt.sleepHr} min={0} max={12} step={0.5} unit="jam" onChange={v => logWellness(today(), { sleepHr: v })} />
+          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u{1F319}'}</span><span className="text-xs font-bold text-neutral-700">Sleep</span><span className="ml-auto text-sm font-extrabold text-indigo-500 tabular-nums"><ANum v={wt.sleepHr} d={1} /> hrs</span></div>
+          <Stepper value={wt.sleepHr} min={0} max={12} step={0.5} unit="hrs" onChange={v => logWellness(today(), { sleepHr: v })} />
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u{1F4A7}'}</span><span className="text-xs font-bold text-neutral-700">Air</span><span className="ml-auto text-sm font-extrabold text-blue-500 tabular-nums"><ANum v={wt.waterMl} /> mL</span></div>
+          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u{1F4A7}'}</span><span className="text-xs font-bold text-neutral-700">Water</span><span className="ml-auto text-sm font-extrabold text-blue-500 tabular-nums"><ANum v={wt.waterMl} /> mL</span></div>
           <Stepper value={wt.waterMl} min={0} max={5000} step={250} unit="mL" onChange={v => logWellness(today(), { waterMl: v })} />
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u2600\uFE0F'}</span><span className="text-xs font-bold text-neutral-700">Cahaya matahari</span><span className="ml-auto"><button onClick={() => logWellness(today(), { sunDone: !wt.sunDone, sunHr: wt.sunDone ? 0 : 0.25 })} className={'inline-flex min-h-[40px] items-center rounded-lg px-3 text-[11px] font-bold transition active:scale-95 ' + (wt.sunDone ? 'bg-yellow-100 text-yellow-700' : 'bg-neutral-100 text-neutral-500')}>{wt.sunDone ? 'Done \u2705' : 'Not yet'}</button></span></div>
-          {wt.sunDone && <Stepper value={wt.sunHr} min={0.05} max={1} step={0.05} unit="jam" onChange={v => logWellness(today(), { sunHr: v })} />}
+          <div className="flex items-center gap-2 mb-2"><span className="text-lg">{'\u2600\uFE0F'}</span><span className="text-xs font-bold text-neutral-700">Sunlight</span><span className="ml-auto"><button onClick={() => logWellness(today(), { sunDone: !wt.sunDone, sunHr: wt.sunDone ? 0 : 0.25 })} className={'inline-flex min-h-[40px] items-center rounded-lg px-3 text-[11px] font-bold transition active:scale-95 ' + (wt.sunDone ? 'bg-yellow-100 text-yellow-700' : 'bg-neutral-100 text-neutral-500')}>{wt.sunDone ? 'Done \u2705' : 'Not yet'}</button></span></div>
+          {wt.sunDone && <Stepper value={wt.sunHr} min={0.05} max={1} step={0.05} unit="hrs" onChange={v => logWellness(today(), { sunHr: v })} />}
         </div>
         <div className="rounded-xl border border-neutral-100 p-3">
-          <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">MET Mingguan</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? CT.ok : weekMet >= 3.75 ? CT.warn : CT.bad }}>{weekMet.toFixed(1)}</span></div>
+          <div className="flex items-center gap-2 mb-1"><span className="text-lg">{'\u{1F4CA}'}</span><span className="text-xs font-bold text-neutral-700">Weekly MET</span><span className="ml-auto text-sm font-extrabold tabular-nums" style={{ color: weekMet >= 7.5 ? CT.ok : weekMet >= 3.75 ? CT.warn : CT.bad }}>{weekMet.toFixed(1)}</span></div>
           <div className="mt-1 h-2 rounded-full bg-neutral-100 overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: Math.min(100, (weekMet / 15) * 100) + '%', background: weekMet >= 7.5 ? C.ok : weekMet >= 3.75 ? C.warn : C.bad }} /></div>
           <div className="flex justify-between text-[10px] text-neutral-500 mt-1"><span>0</span><span>7.5 (WHO)</span><span>15</span></div>
         </div>
@@ -1252,8 +1252,8 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconHospital size={18} />} title="Protokol Penyakit Kronis" subtitle="Ketuk untuk memilih kondisi klinis" />
-        {active && <button onClick={() => onSelect(undefined)} className="rounded-lg bg-red-50 px-3 py-1.5 text-[11px] font-bold text-red-500 transition hover:bg-red-100 active:scale-95">Atur ulang</button>}
+        <SectionTitle icon={<IconHospital size={18} />} title="Chronic Disease Protocol" subtitle="Click to select a clinical condition" />
+        {active && <button onClick={() => onSelect(undefined)} className="rounded-lg bg-red-50 px-3 py-1.5 text-[11px] font-bold text-red-500 transition hover:bg-red-100 active:scale-95">Reset</button>}
       </div>
       {active && (
         <div className="mt-3 rounded-xl p-4" style={{ background: active.color + '10', border: '1px solid ' + active.color + '30' }}>
@@ -1265,11 +1265,11 @@ function ChronicProtocolCard({ onSelect, active }: { onSelect: (p: ChronicProtoc
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
-            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Makanan yang Dianjurkan</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
-            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Makanan yang Dihindari</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Recommended Foods</div><div className="mt-1 flex flex-wrap gap-1">{active.specialFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">{f}</span>)}{active.specialFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.specialFoods.length - 6}</span>}</div></div>
+            <div><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Foods to Avoid</div><div className="mt-1 flex flex-wrap gap-1">{active.avoidFoods.slice(0, 6).map(f => <span key={f} className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-600">{f}</span>)}{active.avoidFoods.length > 6 && <span className="text-[10px] text-neutral-500">+{active.avoidFoods.length - 6}</span>}</div></div>
           </div>
-          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Catatan Klinis</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
-          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Pembatasan Latihan</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Clinical Notes</div><ul className="mt-1 space-y-0.5">{active.notes.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span style={{ color: active.color }}>{'\u2022'}</span>{n}</li>)}</ul></div>
+          <div className="mt-2"><div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Exercise Restrictions</div><ul className="mt-1 space-y-0.5">{active.exerRestrictions.map((n, i) => <li key={i} className="text-[10px] text-neutral-600 flex gap-1"><span className="text-amber-500">{'\u26A0\uFE0F'}</span>{n}</li>)}</ul></div>
         </div>
       )}
       <button onClick={() => setOpen(!open)} className="mt-3 w-full rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-xs font-bold text-neutral-500 transition hover:bg-neutral-50 hover:border-neutral-300">
@@ -1358,23 +1358,23 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconStethoscope size={18} />} title="Pemantau Lab Mingguan" subtitle="Pantau perubahan hasil laboratorium tiap pekan" />
+        <SectionTitle icon={<IconStethoscope size={18} />} title="Weekly Lab Tracker" subtitle="Pantau perubahan hasil laboratorium tiap pekan" />
         <div className="flex gap-2">
           <label className="cursor-pointer rounded-lg bg-neutral-100 px-3 py-1.5 text-[11px] font-bold text-neutral-600 transition hover:bg-neutral-200 active:scale-95">
             {'\u{1F4C1}'} Import
             <input type="file" accept=".csv,.json" className="hidden" onChange={handleCSVImport} />
           </label>
-          <button onClick={() => { setEditDate(today()); setEditVals({}); setShowForm(true) }} className="rounded-lg bg-brand/10 px-3 py-1.5 text-[11px] font-bold text-brand-dark transition hover:bg-brand/20 active:scale-95"><IconPlus size={12} /> Tambah</button>
+          <button onClick={() => { setEditDate(today()); setEditVals({}); setShowForm(true) }} className="rounded-lg bg-brand/10 px-3 py-1.5 text-[11px] font-bold text-brand-dark transition hover:bg-brand/20 active:scale-95"><IconPlus size={12} /> Add</button>
         </div>
       </div>
 
       {showForm && (
         <div className="mt-3 rounded-xl border border-neutral-200 p-4 space-y-3" style={{ background: '#fafafa' }}>
           <div className="flex items-center gap-3">
-            <Field label="Tanggal"><input className={inputClass + ' w-40'} type="date" value={editDate} onChange={e => setEditDate(e.target.value)} /></Field>
+            <Field label="Date"><input className={inputClass + ' w-40'} type="date" value={editDate} onChange={e => setEditDate(e.target.value)} /></Field>
             <div className="flex-1" />
-            <Button onClick={saveLab} className="h-9 text-xs rounded-xl">Simpan</Button>
-            <Button variant="outline" onClick={() => setShowForm(false)} className="h-9 text-xs rounded-xl">Batal</Button>
+            <Button onClick={saveLab} className="h-9 text-xs rounded-xl">Save</Button>
+            <Button variant="outline" onClick={() => setShowForm(false)} className="h-9 text-xs rounded-xl">Cancel</Button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
   {labKeys.map(k => (
@@ -1403,11 +1403,11 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-neutral-100">
-                <th className="py-2 pr-3 text-left font-bold text-neutral-500 sticky left-0 bg-white">Tanggal</th>
+                <th className="py-2 pr-3 text-left font-bold text-neutral-500 sticky left-0 bg-white">Date</th>
                 {labKeys.map(k => (
                   <th key={k} className="py-2 px-2 text-center font-bold text-neutral-500 whitespace-nowrap" title={labLabels[k]}>{labLabels[k]}</th>
                 ))}
-                <th className="py-2 pl-2 text-center font-bold text-neutral-500">Keadaan</th>
+                <th className="py-2 pl-2 text-center font-bold text-neutral-500">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -1441,7 +1441,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
       {/* Trend Summary */}
       {labs.length >= 2 && (
         <div className="mt-4">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Tren Mingguan (terbaru vs sebelumnya)</div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Weekly Trend (latest vs previous)</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {labKeys.map(k => {
               const trend = labTrend(k)
@@ -1467,7 +1467,7 @@ function LabTracker({ activeProtocol }: { activeProtocol?: ChronicProtocol }) {
 
       {/* Lab Range Reference */}
       <div className="mt-4">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Rentang Rujukan Normal</div>
+        <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Normal Reference Range</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
           {labKeys.map(k => {
             const range = labRanges[k]
@@ -1507,7 +1507,7 @@ function VitalImporter({ onImported }: { onImported: (avg: ReturnType<typeof avg
   return (
     <Card className="!p-5">
       <div className="flex items-center justify-between">
-        <SectionTitle icon={<IconHeart size={18} />} title="Impor Data Vital" subtitle="CSV atau JSON (heartRate, steps, spo2, hrv, vo2Max, systolic, dan seterusnya)" />
+        <SectionTitle icon={<IconHeart size={18} />} title="Import Vital Data" subtitle="CSV or JSON (heartRate, steps, spo2, hrv, vo2Max, systolic, etc.)" />
         <label className="cursor-pointer rounded-lg bg-brand/10 px-3 py-1.5 text-[11px] font-bold text-brand-dark transition hover:bg-brand/20 active:scale-95">
           {'\u{1F4C1}'} Import File
           <input type="file" accept=".csv,.json" className="hidden" onChange={handleFile} />
@@ -1573,12 +1573,12 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
   const pillars = [
     { label: 'Body', v: lng.body, show: lng.hasB },
-    { label: 'Gizi', v: lng.nut, show: true },
+    { label: 'Nutrition', v: lng.nut, show: true },
     { label: 'Exercise', v: lng.exer, show: true },
-    { label: 'Tidur', v: lng.sleep, show: true },
+    { label: 'Sleep', v: lng.sleep, show: true },
     { label: 'Calories', v: lng.cal, show: true },
     { label: 'Hydration', v: lng.hydr, show: true },
-    { label: 'Cahaya matahari', v: lng.sun, show: true },
+    { label: 'Sunlight', v: lng.sun, show: true },
     { label: 'Vitals', v: lng.vit, show: lng.hasV },
   ].filter(p => p.show)
 
@@ -1596,7 +1596,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
 
         <div className="relative">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">Skor Umur Panjang</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">Longevity Score</span>
             <span className="text-[10px] text-ink/20">{'\u00B7'}</span>
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-ink/40">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
             {activeProtocol && <span className="ml-2"><Badge tone="high">{activeProtocol.emoji} {activeProtocol.name}</Badge></span>}
@@ -1617,7 +1617,7 @@ function LongevityCard({ body, wt, todaysFoods, vitals, activeProtocol }: {
               <div className="text-2xl font-black leading-tight">{scoreLabel}</div>
               <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: 'rgba(255,255,255,0.1)' }}>
                 <span className="inline-block h-[5px] w-[5px] rounded-full" style={{ background: scoreColor, boxShadow: '0 0 6px ' + scoreColor }} />
-                <span className="text-[11px] font-semibold text-ink/80">Fokus perbaikan: <b>{topPillar.label} ({topPillar.v})</b></span>
+                <span className="text-[11px] font-semibold text-ink/80">Focus on improving: <b>{topPillar.label} ({topPillar.v})</b></span>
               </div>
             </div>
           </div>
@@ -1658,7 +1658,7 @@ function RecommendationsCard({ recs }: { recs: Rec[] }) {
   if (!recs.length) return null
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconSparkle size={18} />} title="Anjuran Saat Ini" subtitle={`${recs.length} suggestion(s) based on your data`} />
+      <SectionTitle icon={<IconSparkle size={18} />} title="Real-time Recommendations" subtitle={`${recs.length} suggestion(s) based on your data`} />
       <div className="mt-3 space-y-2 max-h-80 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
         {recs.map((r, i) => (
           <div key={i} className="flex gap-3 rounded-xl px-3 py-2.5 transition hover:bg-neutral-50" style={{ borderLeft: '3px solid ' + r.c }}>
@@ -1688,18 +1688,18 @@ function ExerciseLog({ body, onLog }: { body: Body; onLog: (kcal: number, min: n
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconFlame size={18} />} title="Catatan Latihan Manual" subtitle="Catat latihan tanpa GPS" />
+      <SectionTitle icon={<IconFlame size={18} />} title="Manual Exercise Log" subtitle="Log exercise without GPS" />
       <div className="mt-3">
         <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{EXCATS.map(c => <button key={c} onClick={() => { setExCat(c); const f = EX.filter(e => e.cat === c); if (f.length) setExName(f[0].name) }} className={'shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition active:scale-95 ' + (exCat === c ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200')}>{c}</button>)}</div>
         <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>{filtered.map(e => <button key={e.name} onClick={() => setExName(e.name)} className={'inline-flex min-h-[40px] shrink-0 items-center rounded-lg border px-2.5 text-[11px] font-medium transition active:scale-95 ' + (ex.name === e.name ? 'border-brand bg-brand/10 text-brand-dark' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300')}>{e.emoji} {e.name} <span className="text-[10px] text-neutral-500">MET {e.met}</span>{e.hiit && <span className="text-[10px] font-black text-red-500 ml-1">HIIT</span>}</button>)}</div>
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <Stepper label="Lama" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
+        <Stepper label="Duration" value={min} min={5} max={300} step={5} unit="min" onChange={setMin} />
         <div className="shrink-0 text-right">
           <div className="text-lg font-extrabold" style={{ color: 'var(--teks-ok)' }}>{k}</div>
           <div className="text-[10px] text-neutral-500">kcal</div>
         </div>
-        <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Catat</Button>
+        <Button onClick={() => onLog(k, min, mH)} className="h-10 shrink-0 rounded-xl text-sm font-bold"><IconPlus size={14} /> Log</Button>
       </div>
     </Card>
   )
@@ -1729,25 +1729,25 @@ function ObesityWeeklyPlan({ protocol }: { protocol: ChronicProtocol }) {
 
   return (
     <Card className="!p-5">
-      <SectionTitle icon={<IconFlame size={18} />} title="Jadwal Mingguan — Obesitas" subtitle="Jadwal makan & olahraga 7 hari berdasarkan protokol obesitas" />
+      <SectionTitle icon={<IconFlame size={18} />} title="Weekly Schedule — Obesity" subtitle="Jadwal makan & olahraga 7 hari berdasarkan protokol obesitas" />
       <div className="mt-3 space-y-2">
         {plan.map((d) => (
           <div key={d.day} className="rounded-2xl border border-neutral-100 p-3">
             <div className="flex items-center justify-between">
               <div className="text-sm font-extrabold text-ink">{d.day}</div>
-              {d.isRestDay && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Pemulihan</span>}
+              {d.isRestDay && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Recovery</span>}
             </div>
             <div className="mt-1.5 grid grid-cols-1 gap-1 text-xs text-neutral-600 sm:grid-cols-3">
-              <div><b className="text-neutral-500">Sarapan:</b> {d.breakfast}</div>
-              <div><b className="text-neutral-500">Makan siang:</b> {d.lunch}</div>
-              <div><b className="text-neutral-500">Makan malam:</b> {d.dinner}</div>
+              <div><b className="text-neutral-500">Breakfast:</b> {d.breakfast}</div>
+              <div><b className="text-neutral-500">Lunch:</b> {d.lunch}</div>
+              <div><b className="text-neutral-500">Dinner:</b> {d.dinner}</div>
             </div>
             <div className="mt-1.5 text-xs font-semibold text-brand-dark">🏃 {d.exerciseFocus}</div>
           </div>
         ))}
       </div>
       <div className="mt-3 rounded-xl bg-amber-50/60 p-3">
-        <div className="mb-1 text-xs font-bold text-amber-800">Catatan Pembatasan Latihan</div>
+        <div className="mb-1 text-xs font-bold text-amber-800">Exercise Restriction Notes</div>
         <ul className="space-y-1 text-xs text-amber-800">
           {restrictions.map((r, i) => <li key={i}>• {r}</li>)}
         </ul>
@@ -1943,11 +1943,11 @@ export function Nutrition() {
 
       {/* Nutrition Data Sources */}
       <Card className="!p-5">
-        <SectionTitle icon={<span className="text-lg">📚</span>} title="Sumber Data Gizi" subtitle="Rujukan komposisi pangan yang mendasari basis data gizi Panaceamed" />
+        <SectionTitle icon={<span className="text-lg">📚</span>} title="Nutrition Data Sources" subtitle="Food composition references underlying the Panaceamed nutrition database" />
         <div className="mt-2 space-y-1.5">
-          <Poin ikon="🇮🇩"><b>TKPI</b> — komposisi pangan Indonesia, Kementerian Kesehatan. Sumber utama.</Poin>
-          <Poin ikon="🌐"><b>USDA FoodData Central</b> — pangan mancanegara dan rincian mikronutrien.</Poin>
-          <Poin ikon="🎯"><b>AKG 2019</b> — target harian dan angka pada halaman ini.</Poin>
+          <Poin ikon="🇮🇩"><b>TKPI</b> — Indonesian food composition, Ministry of Health. Main source.</Poin>
+          <Poin ikon="🌐"><b>USDA FoodData Central</b> — international items and detailed micronutrients.</Poin>
+          <Poin ikon="🎯"><b>AKG 2019</b> — the daily targets and scores on this page.</Poin>
         </div>
         {/* Peringatan ketelitian tetap ada dan tetap bisa ditemukan, tetapi
             tidak lagi menjadi dinding teks abu-abu yang dilewati semua orang. */}
@@ -1955,10 +1955,10 @@ export function Nutrition() {
           <Ringkas
             ikon="⚠️"
             nada="hati-hati"
-            judul="Ini perkiraan menurut golongan pangan, bukan hasil laboratorium untuk makanan Anda sendiri"
+            judul="These are category estimates, not lab results for your exact food"
             anak={
               <div className="space-y-1.5">
-                <Poin ikon="🍗">"Ayam bakar" mewakili resep yang lazim — resep, porsi, dan merek Anda sendiri menggeser angka sebenarnya.</Poin>
+                <Poin ikon="🍗">"Grilled chicken" stands for common recipes — your recipe, portion, and brand shift the real numbers.</Poin>
                 <Poin ikon="🩺">Bila ketelitian penting secara medis — penyakit ginjal, alergi berat — bacalah label produk dan tanyakan kepada ahli gizi klinis.</Poin>
               </div>
             }

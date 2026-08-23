@@ -26,19 +26,19 @@ function load(): State {
 }
 
 const VALUE_OPTIONS = [
-  'Keluarga', 'Kesehatan', 'Kebebasan', 'Penguasaan diri', 'Kejujuran', 'Iman', 'Rasa ingin tahu', 'Berguna bagi orang lain',
-  'Keamanan finansial', 'Daya cipta', 'Keberanian', 'Kedisiplinan', 'Welas asih', 'Petualangan', 'Warisan', 'Ketenangan batin',
+  'Family', 'Health', 'Freedom', 'Mastery', 'Honesty', 'Faith', 'Curiosity', 'Service to others',
+  'Financial security', 'Creativity', 'Courage', 'Discipline', 'Compassion', 'Adventure', 'Legacy', 'Peace of mind',
 ]
 
 interface Wisdom { tradition: string; teaching: string }
 const WISDOM: Wisdom[] = [
-  { tradition: 'Stoisisme (Epiktetos, Marcus Aurelius)', teaching: 'Pisahkan yang berada dalam kendali Anda — usaha, sikap, pilihan — dari yang tidak: hasil, orang lain, dan masa lalu. Kecemasan akan masa depan sering lahir dari usaha mengendalikan yang tidak dapat dikendalikan; alihkan tenaga itu ke tindakan benar Anda yang berikutnya.' },
-  { tradition: 'Islam', teaching: 'Tawakal — kerjakan segala yang ada dalam kemampuan Anda, lalu serahkan hasilnya kepada Allah. Usaha adalah tanggung jawab Anda; hasilnya tidak sepenuhnya beban Anda sendiri, dan justru itulah yang meringankan kecemasan.' },
-  { tradition: 'Kristen', teaching: '"Janganlah kamu khawatir akan hari esok, karena hari esok mempunyai kesusahannya sendiri" (Matius 6:34) — ajakan yang berulang untuk tetap berada pada hari ini, disertai gagasan bahwa kesukaran dapat menumbuhkan ketekunan dan tahan uji (Roma 5:3-4).' },
-  { tradition: 'Buddhisme', teaching: 'Penderitaan kerap lahir dari melekat pada satu gambaran tetap tentang bagaimana segalanya harus berakhir. Ketidakkekalan berlaku dua arah: kesukaran berlalu, dan begitu pula setiap kegagalan — tidak melekat pada hasil mengurangi penderitaan tanpa mengurangi usaha.' },
-  { tradition: 'Hinduisme (Bhagawadgita)', teaching: '"Engkau berhak atas perbuatanmu, tetapi tidak pernah atas buah perbuatanmu" — bertindaklah sepenuh hati, tetapi lepaskan cengkeraman pada hasil tertentu; di situlah akar ketenangan pikiran.' },
-  { tradition: 'Ikigai / ganbaru (Jepang)', teaching: 'Makna hidup berada pada irisan antara yang Anda cintai, yang Anda kuasai, yang dibutuhkan dunia, dan yang dapat menghidupi Anda — dan ketekunan yang ajek serta tidak gemerlap (ganbaru) dalam kesulitan itu sendiri dihargai, bukan hanya hasilnya.' },
-  { tradition: 'Psikologi positif (pertumbuhan pascatrauma)', teaching: 'Penelitian Tedeschi & Calhoun menemukan bahwa banyak orang yang melewati kesukaran berat melaporkan pertumbuhan kejiwaan yang nyata sesudahnya — bukan meskipun bergulat dengannya, melainkan sebagian justru karena mengolahnya lewat pemaknaan dan dukungan orang sekitar.' },
+  { tradition: 'Stoicism (Epictetus, Marcus Aurelius)', teaching: 'Separate what is in your control (your effort, attitude, choices) from what isn\'t (outcomes, other people, the past). Anxiety about the future often comes from trying to control the uncontrollable — redirect that energy to your next right action instead.' },
+  { tradition: 'Islam', teaching: 'Tawakkul — do everything within your ability, then trust the outcome to God. Effort is your responsibility; the result is not entirely yours to carry alone, which is meant to ease the weight of worry.' },
+  { tradition: 'Christianity', teaching: '"Do not worry about tomorrow, for tomorrow will worry about itself" (Matthew 6:34) — a repeated call to stay present, paired with the idea that hardship can produce endurance and character over time (Romans 5:3-4).' },
+  { tradition: 'Buddhism', teaching: 'Suffering often comes from clinging to a fixed idea of how things must turn out. Impermanence cuts both ways: hardship passes, and so does any single failure — non-attachment to outcome reduces suffering without reducing effort.' },
+  { tradition: 'Hinduism (Bhagavad Gita)', teaching: '"You have a right to your actions, but never to the fruits of your actions" — act with full commitment, but release your grip on the specific result, which is the root of a calmer mind.' },
+  { tradition: 'Japanese Ikigai / ganbaru', teaching: 'Purpose sits at the overlap of what you love, what you\'re good at, what the world needs, and what can sustain you — and steady, unglamorous persistence (ganbaru) through difficulty is itself respected, not just the outcome.' },
+  { tradition: 'Positive psychology (post-traumatic growth)', teaching: 'Tedeschi & Calhoun\'s research found that many people who go through serious adversity report genuine psychological growth afterward — not despite the struggle, but partly through processing it with meaning-making and social support.' },
 ]
 
 export function LifeCompass() {
@@ -63,8 +63,8 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Langkah 1 — Nilai inti Anda (pilih paling banyak 5)</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Bukan yang Anda pikir <i>seharusnya</i> Anda hargai — melainkan yang benar-benar terasa tidak dapat ditawar bagi Anda.</p>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 1 — Your core values (pick up to 5)</div>
+        <p className="mt-1 text-[12px] text-neutral-500">Not what you think you <i>should</i> value — what actually feels non-negotiable to you.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {VALUE_OPTIONS.map((v) => (
             <button key={v} onClick={() => toggleValue(v)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${s.values.includes(v) ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{v}</button>
@@ -73,15 +73,15 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Langkah 2 — Visi Anda (10-20 tahun dari sekarang)</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Bila segalanya berjalan sebaik yang masuk akal, seperti apa hidup Anda nanti?</p>
-        <textarea className={`${inputClass} mt-2 min-h-[80px] resize-none`} placeholder="misalnya: Saya ingin menjadi dokter yang dikenal karena…" value={s.vision} onChange={(e) => setS((x) => ({ ...x, vision: e.target.value }))} />
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 2 — Your vision (10-20 years from now)</div>
+        <p className="mt-1 text-[12px] text-neutral-500">If things went as well as they realistically could, what would your life look like?</p>
+        <textarea className={`${inputClass} mt-2 min-h-[80px] resize-none`} placeholder="e.g. I want to be a doctor known for..." value={s.vision} onChange={(e) => setS((x) => ({ ...x, vision: e.target.value }))} />
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Langkah 3 — Misi Anda (apa yang Anda kerjakan, dan untuk siapa)</div>
-        <p className="mt-1 text-[12px] text-neutral-500">Satu atau dua kalimat: apa yang Anda kerjakan, untuk siapa, dan mengapa itu berarti.</p>
-        <textarea className={`${inputClass} mt-2 min-h-[70px] resize-none`} placeholder="misalnya: Saya membantu pasien memahami kesehatannya cukup jelas untuk mengambil kendali atasnya." value={s.mission} onChange={(e) => setS((x) => ({ ...x, mission: e.target.value }))} />
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Step 3 — Your mission (what you do, and for whom)</div>
+        <p className="mt-1 text-[12px] text-neutral-500">One or two sentences: what you do, who it's for, why it matters.</p>
+        <textarea className={`${inputClass} mt-2 min-h-[70px] resize-none`} placeholder="e.g. I help my patients understand their health clearly enough to take charge of it." value={s.mission} onChange={(e) => setS((x) => ({ ...x, mission: e.target.value }))} />
       </Card>
 
       <Card className="!p-5">
@@ -93,7 +93,7 @@ export function LifeCompass() {
           {s.goals.map((g) => (
             <div key={g.domain} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
               <div className="text-[12px] font-black text-brand-dark">{g.domain}</div>
-              <input className={`${inputClass} mt-1.5`} placeholder="Satu tujuan di bidang ini…" value={g.goal} onChange={(e) => setGoal(g.domain, 'goal', e.target.value)} />
+              <input className={`${inputClass} mt-1.5`} placeholder="A goal in this area…" value={g.goal} onChange={(e) => setGoal(g.domain, 'goal', e.target.value)} />
               <input className={`${inputClass} mt-1.5`} placeholder="This week's concrete next step…" value={g.nextStep} onChange={(e) => setGoal(g.domain, 'nextStep', e.target.value)} />
             </div>
           ))}
@@ -101,7 +101,7 @@ export function LifeCompass() {
       </Card>
 
       <Card className="!p-5">
-        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Saat Anda cemas akan masa depan</div>
+        <div className="text-xs font-black uppercase tracking-wide text-neutral-500">When you're worried about the future</div>
         <Prosa kelas="mt-1 text-[12px] text-neutral-500">Tiap tradisi merumuskannya dengan cara berbeda — ditampilkan berdampingan, bukan untuk memberi tahu mana yang harus Anda yakini, melainkan agar Anda dapat mengambil dari yang mana pun yang berbicara kepada Anda.</Prosa>
         <div className="mt-3 space-y-3">
           {WISDOM.map((w) => (
@@ -114,12 +114,12 @@ export function LifeCompass() {
       </Card>
 
       <div className="rounded-2xl border border-neutral-100 bg-white p-4 text-center text-[11px] leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5">
-        Kerangka: teori nilai Schwartz; penelitian implementation intention Gollwitzer (efek
-        meta-analitik pada keterlaksanaan tujuan, Gollwitzer &amp; Sheeran, 2006); model pertumbuhan
-        pascatrauma Tedeschi &amp; Calhoun. Ringkasan tiap tradisi kebijaksanaan di sini mau tidak mau
-        singkat — telusuri sumber aslinya dan komunitas Anda sendiri untuk pemahaman yang utuh. Alat ini
-        untuk perenungan, bukan terapi — bila kecemasan akan masa depan terasa memberatkan, hubungi juga
-        tenaga kesehatan jiwa (lihat Periksa Kesehatan Jiwa di aplikasi ini).
+        Frameworks: Schwartz values theory; Gollwitzer's implementation-intention research
+        (meta-analytic effect on goal follow-through, Gollwitzer &amp; Sheeran, 2006); Tedeschi &amp;
+        Calhoun's post-traumatic growth model. Wisdom-tradition summaries are necessarily brief —
+        explore the primary sources and your own community for depth. This tool is for reflection, not
+        therapy — if anxiety about the future feels overwhelming, please also reach out to a mental
+        health professional (see Mental Health Check in this app).
       </div>
     </div>
   )

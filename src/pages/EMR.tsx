@@ -65,7 +65,7 @@ function LabPanel({ results }: { results: import('../lib/types').SupportiveResul
   const col: Record<string, string> = { low: '#f59e0b', normal: '#00BF63', high: '#FF3131', critical: '#FF3131' }
   return (
     <div className="mb-4">
-      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Panel Lab — nilai vs rentang rujukan</div>
+      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">Lab Panel — value vs reference range</div>
       <div className="grid gap-2.5 sm:grid-cols-2">
         {labs.map((r) => {
           const f = r.flag ?? 'normal'
@@ -205,7 +205,7 @@ export function EMR() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionTitle
             icon={<IconEMR size={20} />}
-            title="AI-EMR · Rekam Medis Elektronik"
+            title="AI-EMR · Electronic Medical Record"
             subtitle={`Patient: ${activePatient.name} · updated ${new Date(draft.updatedAt).toLocaleString('en-US')}`}
           />
           <div className="flex items-center gap-2 print:hidden">
@@ -214,7 +214,7 @@ export function EMR() {
                 <IconCheck size={13} /> Signed by {draft.signedBy}
               </Badge>
             ) : (
-              <Badge tone="high">Menunggu pemeriksaan dokter</Badge>
+              <Badge tone="high">Awaiting doctor verification</Badge>
             )}
             <Button variant="outline" onClick={save} disabled={!dirty}>
               {dirty ? 'Save Changes' : 'Saved'}
@@ -227,7 +227,7 @@ export function EMR() {
         </div>
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2 text-xs text-brand-dark">
           <IconSparkle size={14} />
-          Sections marked <b>USULAN AI</b> must be verified & completed by a doctor before
+          Sections marked <b>AI SUGGESTION</b> must be verified & completed by a doctor before
           signing.
         </div>
       </Card>
@@ -256,7 +256,7 @@ export function EMR() {
       {/* O — Objective */}
       <Card>
         <SectionTitle
-          title="O · Objective — Pemeriksaan Fisik"
+          title="O · Objective — Physical Examination"
           subtitle="Dilengkapi & diperiksa ulang oleh dokter pemeriksa"
           right={
             <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
@@ -290,7 +290,7 @@ export function EMR() {
 
         <div className="grid gap-4">
           <ExamField
-            label="Keadaan Umum & Tingkat Kesadaran"
+            label="General Condition & Level of Consciousness"
             value={draft.physicalExam.general}
             onChange={(v) => setExam('general', v)}
             rows={2}
@@ -314,7 +314,7 @@ export function EMR() {
       <Card>
         <SectionTitle
           title="Workup & Supportive Therapy"
-          subtitle="Pembacaan lab/EKG · resusitasi, neraca cairan, kebutuhan kalori, keluaran urine"
+          subtitle="Lab/ECG interpretation · resuscitation, fluid balance, caloric needs, urine output"
         />
         <LabPanel results={state.supportive[activePatient.id] ?? []} />
         <div className="mb-4">
@@ -365,8 +365,8 @@ export function EMR() {
       {/* A — Assessment */}
       <Card>
         <SectionTitle
-          title="A · Assessment — Daftar Masalah & Penilaian"
-          subtitle="Penalaran AI: dasar temuan + uraian “Dipertimbangkan …”"
+          title="A · Assessment — Problem List & Evaluation"
+          subtitle="AI reasoning: basis of findings + “Considered …” narrative"
         />
         <DiagnosisPicker
           value={draft.primaryDiagnosis}
@@ -374,7 +374,7 @@ export function EMR() {
           onChange={(d) => patch((r) => ({ ...r, primaryDiagnosis: d, updatedAt: new Date().toISOString() }))}
         />
         <div className="space-y-4">
-          {draft.problems.length === 0 && <p className="text-sm text-neutral-500">Belum ada masalah tercatat.</p>}
+          {draft.problems.length === 0 && <p className="text-sm text-neutral-500">No problems yet.</p>}
           {draft.problems.map((pr, i) => (
             <div key={pr.id} className="rounded-xl border border-neutral-100 p-4">
               <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -384,7 +384,7 @@ export function EMR() {
                 <h4 className="font-bold">{pr.title}</h4>
                 {typeof pr.probability === 'number' && (
                   <span className="ml-auto flex items-center gap-1.5">
-                    <span className="text-[11px] font-semibold text-neutral-500">Kemungkinan</span>
+                    <span className="text-[11px] font-semibold text-neutral-500">Probability</span>
                     <span className="h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100">
                       <span
                         className="block h-full rounded-full bg-brand"
@@ -396,7 +396,7 @@ export function EMR() {
                 )}
               </div>
               <p className="mb-2 text-sm">
-                <span className="font-semibold text-neutral-500">Dasar: </span>
+                <span className="font-semibold text-neutral-500">Basis: </span>
                 {pr.basis}
               </p>
               <p className="rounded-lg bg-neutral-50 p-3 text-sm leading-relaxed text-neutral-700">
@@ -434,11 +434,11 @@ export function EMR() {
       {/* P — Plan summary */}
       <Card>
         <SectionTitle
-          title="P · Plan — Ringkasan"
+          title="P · Plan — Summary"
           subtitle="Rincian pemeriksaan ulang rencana ada di modul Perencanaan"
           right={
             <Link to="/planning">
-              <Button variant="outline">Buka Perencanaan →</Button>
+              <Button variant="outline">Open Planning →</Button>
             </Link>
           }
         />
@@ -473,7 +473,7 @@ export function EMR() {
       <Card className="border-2 border-brand/20">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-bold">Tanda Tangan Dokter Pemeriksa</h3>
+            <h3 className="font-bold">Examining Doctor's Signature</h3>
             <p className="text-sm text-neutral-500">
               By signing, the doctor verifies the entire contents of this medical record.
             </p>
@@ -513,7 +513,7 @@ function ExamField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        placeholder="Tuliskan temuan pemeriksaan fisik…"
+        placeholder="Enter physical examination findings…"
         className="w-full resize-y rounded-xl border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
       />
     </div>
@@ -559,7 +559,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
             {value.chapter && <span className="ml-2 text-[11px] text-neutral-500">· {value.chapter}</span>}
             <span className="ml-2 text-[10px] font-semibold text-neutral-500">({value.source === 'AI' ? 'AI suggestion' : 'doctor selection'})</span>
           </div>
-          <button onClick={() => { onChange(undefined); setOpen(true) }} className="shrink-0 text-xs font-semibold text-accent hover:underline">Ubah</button>
+          <button onClick={() => { onChange(undefined); setOpen(true) }} className="shrink-0 text-xs font-semibold text-accent hover:underline">Change</button>
         </div>
       ) : (
         <input
@@ -573,7 +573,7 @@ function DiagnosisPicker({ value, aiText, onChange }: {
 
       {open && !value && (
         <div className="mt-2 max-h-60 overflow-y-auto rounded-lg border border-neutral-200 bg-white">
-          {results.length === 0 && <p className="p-3 text-sm text-neutral-500">Tidak ada kode yang cocok.</p>}
+          {results.length === 0 && <p className="p-3 text-sm text-neutral-500">No matching codes found.</p>}
           {results.map((c) => (
             <button
               key={c.code}
@@ -603,7 +603,7 @@ function ChronicSummary({ vitals, conditions }: { vitals: VitalSign[]; condition
     <Card>
       <SectionTitle
         icon={<IconShield size={18} />}
-        title="Pemantauan Penyakit Menahun (Tindak Lanjut Tanda Vital)"
+        title="Chronic Condition Monitoring (Vitals Follow-Up)"
         subtitle="Patient's daily self-logged vitals — evaluated against chronic condition targets"
         right={<Badge tone={status === 'alert' ? 'critical' : status === 'warn' ? 'high' : 'brand'}>{STATUS_LABEL[status]}</Badge>}
       />
@@ -647,7 +647,7 @@ function EducationCard({ diagnosis }: { diagnosis: string }) {
     <Card>
       <SectionTitle
         icon={<IconBook size={18} />}
-        title="Edukasi Pasien — Ringkas & Mendalam"
+        title="Patient Education — Brief & In-Depth"
         subtitle="Agar pasien memahami keadaannya dan cara menjaga kesehatannya"
         right={
           <Button onClick={gen} disabled={busy}>
@@ -678,7 +678,7 @@ function EducationDeck({ sheet }: { sheet: import('../lib/types').EducationSheet
     <div className="space-y-4">
       {/* Hero slide */}
       <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#00BF63] to-[#0b7a4b] p-6 text-white">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/70">Edukasi Pasien</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink/70">Patient Education</div>
         <h3 className="mt-1 text-2xl font-extrabold leading-tight">{sheet.diagnosis}</h3>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/90">{sheet.ringkas}</p>
       </div>
@@ -734,13 +734,13 @@ function EmptyEMR() {
   return (
     <Card className="mx-auto max-w-md text-center">
       <IconEMR size={40} className="mx-auto text-brand" />
-      <h3 className="mt-3 text-lg font-bold">Belum ada rekam medis</h3>
+      <h3 className="mt-3 text-lg font-bold">No medical record yet</h3>
       <p className="mt-1 text-sm text-neutral-500">
         Start an intake in <b>AI Chatbot</b>, then press <b>"Draft AI-EMR"</b> to create a
         medical record the doctor can verify.
       </p>
       <Link to="/chatbot" className="mt-4 inline-block">
-        <Button>Buka Obrolan AI</Button>
+        <Button>Open AI Chatbot</Button>
       </Link>
     </Card>
   )

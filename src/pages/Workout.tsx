@@ -154,7 +154,7 @@ export function Workout() {
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <VideoGallery
         icon={<IconFlame size={20} />}
-        title="Video Peragaan Gerakan"
+        title="Movement Demo Videos"
         subtitle="Correct-form demonstrations — warm-up, HIIT & legs"
         videos={[
           { label: 'Dynamic Warm-Up', cue: 'Leg swings · arm circles · high knees — mandatory before a session', url: 'https://d8j0ntlcm91z4.cloudfront.net/user_3FaS56ACS5VALa5WTIecT6KKkQf/hf_20260702_073037_fc3668ff-bc44-4938-8e63-69f2ba59c7f9.mp4' },
@@ -167,32 +167,32 @@ export function Workout() {
         <SectionTitle icon={<IconActivity size={20} />} title="AI Program — Workout Tracker" subtitle="Statis dan dinamis, dengan alat atau kalistenik, menurut kelompok otot — berpijak pada ilmu olahraga dan ortopedi" />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <select className={inputClass} value={muscle} onChange={(e) => setMuscle(e.target.value as Muscle | 'All')}>
-            <option value="All">Semua Otot</option>
+            <option value="All">All Muscles</option>
             {MUSCLES.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
           <select className={inputClass} value={modality} onChange={(e) => setModality(e.target.value as Modality | 'All')}>
-            <option value="All">Semua Tujuan</option>
+            <option value="All">All Goals</option>
             {MODALITIES.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
           <select className={inputClass} value={type} onChange={(e) => setType(e.target.value as typeof type)}>
-            <option value="All">Kalistenik & Beralat</option>
-            <option value="Calisthenic">Kalistenik</option>
-            <option value="Equipment">Beralat</option>
+            <option value="All">Calisthenics & Equipment</option>
+            <option value="Calisthenic">Calisthenics</option>
+            <option value="Equipment">With Equipment</option>
           </select>
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{todayLog.length}</div>
-            <div className="text-[10px] text-neutral-500">Set hari ini</div>
+            <div className="text-[10px] text-neutral-500">Sets today</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-extrabold text-ink">{weekLog.length}</div>
-            <div className="text-[10px] text-neutral-500">Sesi pekan ini</div>
+            <div className="text-[10px] text-neutral-500">Sessions this week</div>
           </div>
           <div className="rounded-xl bg-brand-50 p-3 text-center">
             <div className="text-lg font-extrabold text-brand-dark">{weeklyVolume.toLocaleString('en-US')}</div>
-            <div className="text-[10px] text-neutral-500">Volume mingguan</div>
+            <div className="text-[10px] text-neutral-500">Weekly volume</div>
           </div>
         </div>
       </Card>
@@ -218,23 +218,23 @@ export function Workout() {
             {open === e.id && (
               <div className="mt-3 space-y-3 border-t border-neutral-100 pt-3">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Cara Melakukannya</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">How To Perform</div>
                   <p className="mt-1 text-sm leading-relaxed text-neutral-600">{e.description}</p>
                 </div>
                 <div className="rounded-xl bg-amber-50/60 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-amber-700">Catatan Klinis & Ortopedi</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-amber-700">Clinical & Orthopedic Notes</div>
                   <p className="mt-1 text-sm leading-relaxed text-amber-800">{e.cue}</p>
                 </div>
                 <div className="rounded-xl bg-brand-50/60 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Penyesuaian Gizi</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-brand-dark">Nutrition Adjustments</div>
                   <p className="mt-1 text-sm leading-relaxed text-neutral-700">{e.nutrition}</p>
                 </div>
 
                 <div className="flex flex-wrap items-end gap-2 rounded-xl border border-neutral-100 p-3">
-                  <label className="text-xs">Set<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
-                  <label className="text-xs">Ulangan<input className={inputClass + ' mt-1 w-16'} type="number" value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
+                  <label className="text-xs">Sets<input className={inputClass + ' mt-1 w-16'} type="number" value={sets} onChange={(ev) => setSets(+ev.target.value)} /></label>
+                  <label className="text-xs">Reps<input className={inputClass + ' mt-1 w-16'} type="number" value={reps} onChange={(ev) => setReps(+ev.target.value)} /></label>
                   <label className="text-xs">Load (kg)<input className={inputClass + ' mt-1 w-20'} type="number" value={weight} onChange={(ev) => setWeight(+ev.target.value)} /></label>
-                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Catat</Button>
+                  <Button onClick={() => logExercise(e.id)} className="h-9"><IconPlus size={14} /> Log</Button>
                 </div>
               </div>
             )}
@@ -261,11 +261,11 @@ export function Workout() {
       )}
 
       <Card className="!p-5">
-        <SectionTitle icon={<IconRun size={18} />} title="Asas Penyusunan Program" subtitle="Dasar ilmu olahraga untuk menyusun peningkatan beban" />
+        <SectionTitle icon={<IconRun size={18} />} title="Programming Principles" subtitle="Dasar ilmu olahraga untuk menyusun peningkatan beban" />
         <ul className="mt-2 space-y-1.5 text-sm text-neutral-600">
-          <li>• <b>Beban bertambah bertahap</b>: increase load/reps/volume 2.5-10%/week while RPE &lt;8-9.</li>
-          <li>• <b>Periodisasi</b>: alternate high-volume/low-intensity phases with high-intensity/low-volume phases; deload every 4-6 weeks.</li>
-          <li>• <b>Kekhususan</b>: static movements (planks, isometric holds) build joint stability and motor control; dynamic movements build strength and explosive power.</li>
+          <li>• <b>Progressive overload</b>: increase load/reps/volume 2.5-10%/week while RPE &lt;8-9.</li>
+          <li>• <b>Periodization</b>: alternate high-volume/low-intensity phases with high-intensity/low-volume phases; deload every 4-6 weeks.</li>
+          <li>• <b>Specificity</b>: static movements (planks, isometric holds) build joint stability and motor control; dynamic movements build strength and explosive power.</li>
           <li>• <b>Joint/connective-tissue recovery</b>: allow 48-72 hours between sessions for the same muscle group for tendon collagen resynthesis and muscle remodeling.</li>
           <li>• <b>HIIT/Battling Ropes/Muay Thai</b> are highly effective for EPOC and fat loss but tax the nervous system — limit to 2-3×/week and combine with mobility/recovery days.</li>
           <li>• <b>Post-natal</b>: start with diaphragmatic breathing and pelvic floor activation, then progress to isometrics (light planks), then to light dynamic work after a diastasis recti screening by a healthcare professional.</li>

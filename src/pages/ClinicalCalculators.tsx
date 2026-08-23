@@ -35,21 +35,18 @@ function SegButtons<T extends string | number>({ value, onChange, options }: { v
 /* ══════════════════ APGAR ══════════════════ */
 function ApgarCalc() {
   const criteria: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
-    /* Nama medan tetap menyebut kata Inggrisnya di dalam kurung: A-P-G-A-R
-       adalah singkatan dari kelima kata itu, dan menghapusnya membuat nama
-       skornya tidak lagi dapat dihafal dari medannya. */
-    { key: 'appearance', label: 'Appearance — warna kulit', opts: [{ v: 0, l: 'Biru/pucat seluruhnya' }, { v: 1, l: 'Badan merah muda, ujung-ujung biru' }, { v: 2, l: 'Merah muda seluruhnya' }] },
-    { key: 'pulse', label: 'Pulse — denyut jantung', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
-    { key: 'grimace', label: 'Grimace — respons rangsang', opts: [{ v: 0, l: 'Tidak ada respons' }, { v: 1, l: 'Meringis' }, { v: 2, l: 'Menangis/batuk/bersin kuat' }] },
-    { key: 'activity', label: 'Activity — tonus otot', opts: [{ v: 0, l: 'Lemas' }, { v: 1, l: 'Sedikit fleksi anggota gerak' }, { v: 2, l: 'Gerak aktif' }] },
-    { key: 'respiration', label: 'Respiration — pernapasan', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: 'Lambat/tidak teratur' }, { v: 2, l: 'Menangis kuat' }] },
+    { key: 'appearance', label: 'Appearance (skin color)', opts: [{ v: 0, l: 'Blue/pale all over' }, { v: 1, l: 'Body pink, extremities blue' }, { v: 2, l: 'Pink all over' }] },
+    { key: 'pulse', label: 'Pulse (heart rate)', opts: [{ v: 0, l: 'Absent' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
+    { key: 'grimace', label: 'Grimace (reflex irritability)', opts: [{ v: 0, l: 'No response' }, { v: 1, l: 'Grimace' }, { v: 2, l: 'Strong cry/cough/sneeze' }] },
+    { key: 'activity', label: 'Activity (muscle tone)', opts: [{ v: 0, l: 'Limp' }, { v: 1, l: 'Some flexion of extremities' }, { v: 2, l: 'Active movement' }] },
+    { key: 'respiration', label: 'Respiration (breathing)', opts: [{ v: 0, l: 'Absent' }, { v: 1, l: 'Slow/irregular' }, { v: 2, l: 'Strong cry' }] },
   ]
   const [v, setV] = useState<Record<string, number>>({ appearance: 2, pulse: 2, grimace: 2, activity: 2, respiration: 2 })
   const total = Object.values(v).reduce((a, b) => a + b, 0)
-  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Perlu bantuan', tone: 'low' as const } : { l: 'Depresi berat', tone: 'critical' as const }
+  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Needs assistance', tone: 'low' as const } : { l: 'Severe depression', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor APGAR" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
       <div className="space-y-3">
         {criteria.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -85,12 +82,12 @@ function GcsCalc() {
   const interp = total >= 13 ? { l: 'Mild injury', tone: 'normal' as const } : total >= 9 ? { l: 'Moderate injury', tone: 'low' as const } : { l: 'Severe injury — airway protection indicated', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (GCS yang disempurnakan)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan dkk., Lancet Neurol 2018" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (Improved GCS)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan et al., Lancet Neurol 2018" />
       <div className="space-y-3">
-        <Field label="Membuka Mata (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
-        <Field label="Respons Verbal (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
-        <Field label="Respons Motorik (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
-        <Field label="Reaktivitas Pupil"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
+        <Field label="Eye Opening (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
+        <Field label="Verbal Response (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
+        <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
+        <Field label="Pupil Reactivity"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3">
@@ -99,7 +96,7 @@ function GcsCalc() {
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
           <div className="text-xl font-black text-ink">{gcsP}<span className="text-sm font-semibold text-neutral-500">/15 (GCS-P)</span></div>
-          <p className="mt-1 text-[10px] text-neutral-500">GCS-P = total GCS − skor pupil (0/1/2)</p>
+          <p className="mt-1 text-[10px] text-neutral-500">GCS-P = GCS total − pupil score (0/1/2)</p>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">13-15 mild · 9-12 moderate · ≤8 severe (indicates intubation for airway protection). GCS-Pupil (GCS-P) incorporates pupil reactivity for sharper mortality/prognosis stratification in traumatic brain injury than GCS alone, especially at lower scores.</Prosa>
@@ -130,11 +127,11 @@ function Curb65Calc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="CURB-65" subtitle="Penentuan derajat berat pneumonia komunitas (Lim dkk. 2003, British Thoracic Society)" />
       <div className="space-y-2">
-        <Row label="Bingung" sub="Acute confusion/new disorientation" checked={confusion} onChange={setConfusion} />
+        <Row label="Confusion" sub="Acute confusion/new disorientation" checked={confusion} onChange={setConfusion} />
         <Row label="Urea" sub="BUN >19 mg/dL (urea >7 mmol/L)" checked={urea} onChange={setUrea} />
-        <Row label="Laju napas" sub="Respiratory rate ≥30 breaths/min" checked={rr} onChange={setRr} />
-        <Row label="Tekanan darah" sub="Systolic <90 or diastolic ≤60 mmHg" checked={bp} onChange={setBp} />
-        <Row label="Usia ≥65" sub="Age 65 years or older" checked={age65} onChange={setAge65} />
+        <Row label="Respiratory rate" sub="Respiratory rate ≥30 breaths/min" checked={rr} onChange={setRr} />
+        <Row label="Blood pressure" sub="Systolic <90 or diastolic ≤60 mmHg" checked={bp} onChange={setBp} />
+        <Row label="Age ≥65" sub="Age 65 years or older" checked={age65} onChange={setAge65} />
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -167,13 +164,13 @@ function BishopCalc() {
     : { l: 'Unfavorable', tone: 'critical' as const, note: 'Consider cervical ripening agents (e.g. prostaglandins) before induction.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Bishop" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
       <div className="space-y-3">
-        <Field label="Pembukaan serviks"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
-        <Field label="Pendataran"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
-        <Field label="Stasiun (penurunan janin)"><SegButtons value={station} onChange={setStation} options={stationOpts} /></Field>
-        <Field label="Konsistensi serviks"><SegButtons value={consistency} onChange={setConsistency} options={consistencyOpts} /></Field>
-        <Field label="Posisi serviks"><SegButtons value={position} onChange={setPosition} options={positionOpts} /></Field>
+        <Field label="Cervical dilation"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
+        <Field label="Effacement"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
+        <Field label="Station (fetal descent)"><SegButtons value={station} onChange={setStation} options={stationOpts} /></Field>
+        <Field label="Cervical consistency"><SegButtons value={consistency} onChange={setConsistency} options={consistencyOpts} /></Field>
+        <Field label="Cervical position"><SegButtons value={position} onChange={setPosition} options={positionOpts} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -204,18 +201,18 @@ function CkdEpiCalc() {
   const tone = result >= 60 ? 'normal' as const : result >= 30 ? 'low' as const : 'critical' as const
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="CKD-EPI 2021 (eGFR)" subtitle="Persamaan terbaru tanpa faktor ras (Inker dkk., NEJM 2021)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="CKD-EPI 2021 (eGFR)" subtitle="Latest race-free equation (Inker et al., NEJM 2021)" />
       <div className="grid grid-cols-3 gap-2">
-        <Field label="Kreatinin (mg/dL)"><input className={inputClass} type="number" step="0.01" value={scr} onChange={(e) => setScr(+e.target.value)} /></Field>
-        <Field label="Usia (tahun)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Creatinine (mg/dL)"><input className={inputClass} type="number" step="0.01" value={scr} onChange={(e) => setScr(+e.target.value)} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
       <div className="mt-4 flex items-center justify-between rounded-xl bg-neutral-50 p-3">
         <div>
           <div className="text-2xl font-black text-ink">{result.toFixed(0)}<span className="text-sm font-semibold text-neutral-500"> mL/min/1.73m²</span></div>
           <Badge tone={tone}>{stage}</Badge>
         </div>
-        <p className="max-w-[40%] text-right text-[10px] text-neutral-500">Persamaan 2021 menghapus koefisien ras yang dipakai versi sebelumnya (CKD-EPI 2009/2012).</p>
+        <p className="max-w-[40%] text-right text-[10px] text-neutral-500">The 2021 equation removes the race coefficient used in earlier versions (CKD-EPI 2009/2012).</p>
       </div>
     </Card>
   )
@@ -318,25 +315,25 @@ function WhoGrowthCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri WHO (Permenkes 2/2020)" subtitle="WHO Child Growth Standards 2006, 0–60 bulan — sesuai Standar Antropometri Anak Kemenkes RI (Permenkes 2/2020)" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Usia (bulan)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (months)"><input className={inputClass} type="number" min={0} max={60} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
         <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Panjang/Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Length/Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Berat/Usia (WAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Age (WAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
           <Badge tone={wazC.tone}>{wazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Tinggi/Usia (HAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Height/Age (HAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{haz >= 0 ? '+' : ''}{haz.toFixed(2)} SD</div>
           <Badge tone={hazC.tone}>{hazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Berat/Tinggi (WHZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Height (WHZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{whz >= 0 ? '+' : ''}{whz.toFixed(2)} SD</div>
           <Badge tone={whzC.tone}>{whzC.l}</Badge>
         </div>
@@ -358,7 +355,7 @@ function WhoGrowthCalc() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="mo" tick={{ fontSize: 10 }} label={{ value: 'Usia (bulan)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <XAxis dataKey="mo" tick={{ fontSize: 10 }} label={{ value: 'Age (months)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
             <Line type="monotone" dataKey="weightMedian" name="Median Weight (kg)" stroke="#00BF63" strokeWidth={2} dot={false} />
@@ -404,9 +401,9 @@ function WhoNeonateCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Neonatus WHO (0–30 Hari)" subtitle="Lintasan berat neonatus dini — penurunan fisiologis & kembalinya ke berat lahir" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Berat Lahir (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
-        <Field label="Usia (hari)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
-        <Field label="Berat Saat Ini (g)"><input className={inputClass} type="number" value={currentWeightG} onChange={(e) => setCurrentWeightG(+e.target.value)} /></Field>
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="Age (days)"><input className={inputClass} type="number" min={0} max={30} value={days} onChange={(e) => setDays(+e.target.value)} /></Field>
+        <Field label="Current Weight (g)"><input className={inputClass} type="number" value={currentWeightG} onChange={(e) => setCurrentWeightG(+e.target.value)} /></Field>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -429,7 +426,7 @@ function WhoNeonateCalc() {
       {notRegained && !excessLoss && (
         <div className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-xs font-black text-amber-800">⚠️ Has not returned to birth weight by age ≥14 days</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">Berat lahir umumnya tercapai kembali sekitar hari ke-10 sampai ke-14 — telusuri asupannya bila belum.</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-700">Birth weight is normally regained by around day 10-14 — evaluate intake if this has not been reached.</p>
         </div>
       )}
 
@@ -437,7 +434,7 @@ function WhoNeonateCalc() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="d" tick={{ fontSize: 10 }} label={{ value: 'Usia (hari)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <XAxis dataKey="d" tick={{ fontSize: 10 }} label={{ value: 'Age (days)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} domain={[85, 125]} />
             <Tooltip />
             <Line type="monotone" dataKey="pctMedian" name="% Birth Weight (median)" stroke="#00BF63" strokeWidth={2} dot={false} />
@@ -493,10 +490,10 @@ function CdcAnthropometryCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Antropometri CDC (2–20 Tahun)" subtitle="Rujukan Pertumbuhan CDC 2000 — persentil IMT menurut umur untuk anak & remaja" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Usia (tahun)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Age (years)"><input className={inputClass} type="number" min={2} max={20} value={ageYr} onChange={(e) => setAgeYr(+e.target.value)} /></Field>
         <Field label="Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Tinggi (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" step="0.1" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
       </div>
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
@@ -511,7 +508,7 @@ function CdcAnthropometryCalc() {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="age" tick={{ fontSize: 10 }} label={{ value: 'Usia (tahun)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
+            <XAxis dataKey="age" tick={{ fontSize: 10 }} label={{ value: 'Age (years)', position: 'insideBottom', offset: -2, fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip />
             <Line type="monotone" dataKey="p5" name="P5" stroke="#9ca3af" strokeWidth={1.5} dot={false} strokeDasharray="3 3" />
@@ -617,12 +614,12 @@ P (Plan):
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Ballard + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Berat Lahir (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Birth Weight (g)"><input className={inputClass} type="number" value={birthWeightG} onChange={(e) => setBirthWeightG(+e.target.value)} /></Field>
         <Field label="APGAR 1' / 5'">
           <div className="flex gap-1.5">
             <input className={inputClass} type="number" min={0} max={10} value={apgar1} onChange={(e) => setApgar1(+e.target.value)} />
@@ -631,7 +628,7 @@ P (Plan):
         </Field>
       </div>
 
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Kematangan Neuromuskular</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Neuromuscular Maturity</h4>
       <div className="mt-2 space-y-2.5">
         {NEURO_CRITERIA.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -640,7 +637,7 @@ P (Plan):
         ))}
       </div>
 
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Kematangan Fisik</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Physical Maturity</h4>
       <div className="mt-2 space-y-2.5">
         {PHYSICAL_CRITERIA.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -652,11 +649,11 @@ P (Plan):
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{total}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Skor Ballard</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Ballard Score</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{gaWeeks.toFixed(1)} wks</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Usia Kehamilan</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Gestational Age</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={lub.tone}>{lub.l.split(' ')[0]}</Badge>
@@ -665,7 +662,7 @@ P (Plan):
       </div>
 
       <div className="mt-4">
-        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Catatan SOAP Terdraf Otomatis</h4>
+        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Drafted SOAP Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{soapNote}</pre>
       </div>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Perkiraan usia gestasi & klasifikasi Lubchenco disederhanakan dari titik rujukan baku — periksa terhadap tabel/grafik resmi pada kasus di batas. Draf SOAP wajib ditinjau dan dilengkapi dokter sebelum masuk ke rekam medis resmi.</Prosa>
@@ -692,9 +689,9 @@ function QsofaCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="qSOFA" subtitle="Quick SOFA — penapisan cepat disfungsi organ akibat infeksi (Sepsis-3, 2016)" />
       <div className="space-y-2">
-        <Row label="Laju napas ≥22/menit" sub="Tachypnea" checked={rr22} onChange={setRr22} />
-        <Row label="Penurunan kesadaran" sub="GCS <15 / acute confusion" checked={alteredMental} onChange={setAlteredMental} />
-        <Row label="Tekanan darah sistolik ≤100 mmHg" sub="Hypotension" checked={sbp100} onChange={setSbp100} />
+        <Row label="Respiratory rate ≥22/min" sub="Tachypnea" checked={rr22} onChange={setRr22} />
+        <Row label="Altered mental status" sub="GCS <15 / acute confusion" checked={alteredMental} onChange={setAlteredMental} />
+        <Row label="Systolic blood pressure ≤100 mmHg" sub="Hypotension" checked={sbp100} onChange={setSbp100} />
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -719,8 +716,8 @@ function HollidaySegarCalc() {
   const hourly = daily / 24
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Holliday-Segar (Cairan Rumatan)" subtitle="Rumus 4-2-1 klasik (Holliday & Segar, 1957)" />
-      <Field label="Berat Badan (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Holliday-Segar (Maintenance Fluid)" subtitle="Classic 4-2-1 formula (Holliday & Segar, 1957)" />
+      <Field label="Body Weight (kg)"><input className={inputClass} type="number" step="0.1" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{daily.toFixed(0)}</div>
@@ -746,9 +743,9 @@ function ParklandCalc() {
   const next16hRate = (total24h - first8h) / 16
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Rumus Parkland" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
         <Field label="% TBSA (burn surface area)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -790,18 +787,18 @@ function NaegeleCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Perkiraan hari lahir (HPL) & usia gestasi dari HPHT" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="HPHT (hari pertama haid terakhir)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
-        <Field label="Panjang Siklus Haid (hari)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
+        <Field label="LMP (last menstrual period)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
+        <Field label="Menstrual Cycle Length (days)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
       </div>
       {edd && (
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-base font-black text-ink">{edd.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Taksiran Persalinan</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Due Date (EDD)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-base font-black text-ink">{gaWeeks}wk {gaDays}d</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Usia Kehamilan Saat Ini</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Current Gestational Age</div>
           </div>
         </div>
       )}
@@ -822,10 +819,10 @@ function MapCalc() {
     : { l: 'High', tone: 'low' as const, note: 'Evaluate for hypertension / hypertensive crisis if very high.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Tekanan Arteri Rata-rata (MAP)" subtitle="Tekanan perfusi organ rata-rata" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mean Arterial Pressure (MAP)" subtitle="Average organ perfusion pressure" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Sistolik (mmHg)"><input className={inputClass} type="number" value={sys} onChange={(e) => setSys(+e.target.value)} /></Field>
-        <Field label="Diastolik (mmHg)"><input className={inputClass} type="number" value={dia} onChange={(e) => setDia(+e.target.value)} /></Field>
+        <Field label="Systolic (mmHg)"><input className={inputClass} type="number" value={sys} onChange={(e) => setSys(+e.target.value)} /></Field>
+        <Field label="Diastolic (mmHg)"><input className={inputClass} type="number" value={dia} onChange={(e) => setDia(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -834,7 +831,7 @@ function MapCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-500">MAP = (Sistolik + 2×Diastolik) / 3.</p>
+      <p className="mt-3 text-[10px] text-neutral-500">MAP = (Systolic + 2×Diastolic) / 3.</p>
     </Card>
   )
 }
@@ -860,7 +857,7 @@ function AlvaradoCalc() {
     : { l: 'High probability', tone: 'critical' as const, note: 'Consider surgical consultation for appendectomy.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Alvarado" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
       <div className="space-y-2">
         {criteria.map((c) => (
           <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -902,31 +899,31 @@ function SirirajCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Stroke Siriraj"
-        subtitle="Pembedaan stroke perdarahan vs iskemik di sisi tempat tidur" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Siriraj Stroke Score"
+        subtitle="Bedside discrimination of haemorrhagic vs ischaemic stroke" />
       <div className="mt-3 space-y-3">
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Kesadaran</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Consciousness</div>
           <div className="mt-1"><SegButtons value={conscious} onChange={setConscious}
             options={[{ v: 0, l: 'Alert' }, { v: 1, l: 'Drowsy/stupor' }, { v: 2, l: 'Semicoma/coma' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Muntah (dalam 2 jam sejak awitan)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Vomiting (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={vomiting} onChange={setVomiting}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Nyeri kepala (dalam 2 jam sejak awitan)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Headache (within 2 h of onset)</div>
           <div className="mt-1"><SegButtons value={headache} onChange={setHeadache}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
-        <Field label="Tekanan darah diastolik (mmHg)">
+        <Field label="Diastolic blood pressure (mmHg)">
           <input className={inputClass} type="number" value={dbp}
             onChange={(e) => setDbp(Number(e.target.value) || 0)} />
         </Field>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Penanda ateroma</div>
-          <div className="text-[10px] italic text-neutral-500">Diabetes, angina, atau klaudikasio intermiten — salah satu saja sudah dihitung</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Atheroma markers</div>
+          <div className="text-[10px] italic text-neutral-500">Diabetes, angina, or intermittent claudication — any one counts</div>
           <div className="mt-1"><SegButtons value={atheroma} onChange={setAtheroma}
             options={[{ v: 0, l: 'None' }, { v: 1, l: 'One or more' }]} /></div>
         </div>
@@ -934,7 +931,7 @@ function SirirajCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-bold text-neutral-500">skor Siriraj</span>
+          <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
           <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
         </div>
         <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
@@ -949,7 +946,7 @@ function SirirajCalc() {
         <li>Accuracy falls in the elderly, in posterior-circulation stroke, and where hypertension is untreated and diastolic pressure is high for reasons unrelated to the stroke.</li>
       </ul>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Sumber: Poungvarin N, Viriyavejakul A, Komontri C. Siriraj stroke score and validation study to
+        Source: Poungvarin N, Viriyavejakul A, Komontri C. Siriraj stroke score and validation study to
         distinguish supratentorial intracerebral haemorrhage from infarction. BMJ. 1991;302(6792):1565-7.
       </p>
     </Card>
@@ -979,7 +976,7 @@ function GadjahMadaCalc() {
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Algoritma Stroke Gadjah Mada"
-        subtitle="Algoritma di sisi tempat tidur — tiga tanda, luas diajarkan di Indonesia" />
+        subtitle="Bedside algorithm — three signs, taught widely in Indonesia" />
       <div className="mt-3 space-y-3">
         {[
           { l: 'Penurunan kesadaran (decreased consciousness)', v: loc, set: setLoc },
@@ -1005,7 +1002,7 @@ function GadjahMadaCalc() {
         <li>Bila hasil algoritma dan Siriraj berbeda, itu justru sinyal kuat bahwa pasien perlu segera dirujuk untuk pencitraan, bukan alasan memilih salah satunya.</li>
       </ul>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
-        Sumber: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
+        Source: Lamsudin R. Algoritma Stroke Gadjah Mada. Fakultas Kedokteran, Universitas Gadjah Mada,
         Yogyakarta. Widely reproduced in Indonesian neurology teaching materials and PERDOSSI guidance.
       </p>
     </Card>
@@ -1044,13 +1041,13 @@ function CentorCalc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Centor / McIsaac" subtitle="Kemungkinan faringitis streptokokus (Centor 1981, modifikasi McIsaac 1998)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Centor / McIsaac Score" subtitle="Likelihood of streptococcal pharyngitis (Centor 1981, modified McIsaac 1998)" />
       <div className="space-y-2">
-        <Row label="Demam >38°C" checked={fever} onChange={setFever} />
-        <Row label="Tidak ada batuk" checked={noCough} onChange={setNoCough} />
-        <Row label="Pembesaran kelenjar getah bening leher depan yang nyeri" checked={tenderNodes} onChange={setTenderNodes} />
-        <Row label="Eksudat/pembesaran tonsil" checked={exudate} onChange={setExudate} />
-        <Field label="Usia (tahun)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
+        <Row label="Fever >38°C" checked={fever} onChange={setFever} />
+        <Row label="Absence of cough" checked={noCough} onChange={setNoCough} />
+        <Row label="Tender anterior cervical lymphadenopathy" checked={tenderNodes} onChange={setTenderNodes} />
+        <Row label="Tonsillar exudate/swelling" checked={exudate} onChange={setExudate} />
+        <Field label="Age (years)"><input className={inputClass} type="number" value={age} onChange={(e) => setAge(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
@@ -1059,7 +1056,7 @@ function CentorCalc() {
         </div>
         <p className="mt-2 text-[11px] leading-relaxed text-neutral-500">{interp.note}</p>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-500">Modifikasi McIsaac: usia &lt;15 th (+1), 15-44 th (+0), ≥45 th (-1).</p>
+      <p className="mt-3 text-[10px] text-neutral-500">McIsaac modification: age &lt;15yr (+1), 15-44yr (+0), ≥45yr (-1).</p>
     </Card>
   )
 }
@@ -1088,28 +1085,28 @@ function NaCorrectionCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Koreksi Elektrolit (Na & K)" subtitle="Sodium: Katz Formula (1973) · Potassium: deficit estimate (Sterns' rule-of-thumb)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Electrolyte Correction (Na & K)" subtitle="Sodium: Katz Formula (1973) · Potassium: deficit estimate (Sterns' rule-of-thumb)" />
 
-      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Natrium (Hiperglikemia)</h4>
+      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Sodium (Hyperglycemia)</h4>
       <div className="mt-2 grid grid-cols-2 gap-2">
-        <Field label="Natrium Terukur (mEq/L)"><input className={inputClass} type="number" value={measuredNa} onChange={(e) => setMeasuredNa(+e.target.value)} /></Field>
-        <Field label="Gula Darah (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
+        <Field label="Measured Sodium (mEq/L)"><input className={inputClass} type="number" value={measuredNa} onChange={(e) => setMeasuredNa(+e.target.value)} /></Field>
+        <Field label="Blood Glucose (mg/dL)"><input className={inputClass} type="number" value={glucose} onChange={(e) => setGlucose(+e.target.value)} /></Field>
       </div>
       <div className="mt-3 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{correctedNa.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">mEq/L</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Natrium Terkoreksi</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Corrected Sodium</div>
       </div>
       <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">Corrected Na = Measured Na + 1.6 × [(Glucose − 100) / 100]. Hyperglycemia draws water out of cells, factitiously diluting serum sodium.</p>
 
-      <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Kalium</h4>
+      <h4 className="mt-5 text-xs font-black uppercase tracking-wide text-neutral-500">Potassium</h4>
       <div className="mt-2">
-        <Field label="Kalium Terukur (mEq/L)"><input className={inputClass} type="number" step="0.1" value={measuredK} onChange={(e) => setMeasuredK(+e.target.value)} /></Field>
+        <Field label="Measured Potassium (mEq/L)"><input className={inputClass} type="number" step="0.1" value={measuredK} onChange={(e) => setMeasuredK(+e.target.value)} /></Field>
       </div>
       <div className="mt-3 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-lg font-black text-ink">{measuredK < 4.0 ? `${kDeficitLow.toFixed(0)}–${kDeficitHigh.toFixed(0)} mEq` : '—'}</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Taksiran Defisit K⁺ Tubuh Total</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Estimated Total-Body K⁺ Deficit</div>
           </div>
           <Badge tone={kSeverity.tone}>{kSeverity.l}</Badge>
         </div>
@@ -1129,12 +1126,12 @@ function BrocaCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Broca's Formula (Ideal Body Weight)" subtitle="Indeks Broca, dimodifikasi menurut jenis kelamin" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">{ibw.toFixed(1)} <span className="text-sm font-semibold text-neutral-500">kg</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Berat Badan Ideal (Broca)</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Ideal Body Weight (Broca)</div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Laki-laki: (Tinggi − 100) − 10%. Perempuan: (Tinggi − 100) − 15%. Pendekatan sederhana — bila dibutuhkan ketelitian klinis lebih tinggi (mis. penghitungan dosis obat), pertimbangkan rumus Devine/Robinson.</Prosa>
     </Card>
@@ -1151,7 +1148,7 @@ function MidParentalCalc() {
   const rangeHi = mph + 8.5
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Tinggi Potensi Genetik" subtitle="Perkiraan sasaran tinggi dewasa seorang anak dari tinggi kedua orang tuanya" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Mid-Parental Height" subtitle="Perkiraan sasaran tinggi dewasa seorang anak dari tinggi kedua orang tuanya" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Father's Height (cm)"><input className={inputClass} type="number" value={fatherCm} onChange={(e) => setFatherCm(+e.target.value)} /></Field>
         <Field label="Mother's Height (cm)"><input className={inputClass} type="number" value={motherCm} onChange={(e) => setMotherCm(+e.target.value)} /></Field>
@@ -1190,7 +1187,7 @@ function FletcherCalc() {
     : { l: 'Profound (total) hearing loss', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Indeks Fletcher" subtitle="Ambang rerata nada murni — penggolongan derajat gangguan dengar" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Pure-tone average threshold — hearing loss grade classification" />
       <SegButtons value={mode} onChange={setMode} options={[{ v: 'basic', l: 'Basic (3-frequency)' }, { v: 'complete', l: 'Complete (4-frequency, AAO-HNS)' }]} />
       <div className={`mt-3 grid gap-2 ${mode === 'basic' ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
         <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
@@ -1226,7 +1223,7 @@ function NoseCalc() {
   const cls = total <= 25 ? { l: 'Mild', tone: 'normal' as const } : total <= 50 ? { l: 'Moderate', tone: 'low' as const } : total <= 75 ? { l: 'Severe', tone: 'critical' as const } : { l: 'Very severe', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor NOSE" subtitle="Nasal Obstruction Symptom Evaluation — dampak sumbatan hidung pada kualitas hidup" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="NOSE Score" subtitle="Nasal Obstruction Symptom Evaluation — quality-of-life impact of nasal obstruction" />
       <div className="space-y-3">
         {items.map((label, i) => (
           <Field key={label} label={label}>
@@ -1240,7 +1237,7 @@ function NoseCalc() {
           <Badge tone={cls.tone}>{cls.l}</Badge>
         </div>
       </div>
-      <p className="mt-3 text-[10px] text-neutral-500">Total = jumlah 5 butir (masing-masing 0-4) × 5, skala 0-100.</p>
+      <p className="mt-3 text-[10px] text-neutral-500">Total = sum of 5 items (0-4 each) × 5, scale 0-100.</p>
     </Card>
   )
 }
@@ -1264,7 +1261,7 @@ function RsiCalc() {
   const opts = [0, 1, 2, 3, 4, 5].map((v) => ({ v, l: String(v) }))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Indeks Gejala Refluks (RSI)" subtitle="Belafsky dkk., 2002 — penapisan refluks laringofaring" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Reflux Symptom Index (RSI)" subtitle="Belafsky et al., 2002 — laryngopharyngeal reflux screening" />
       <div className="space-y-3">
         {items.map((label, i) => (
           <Field key={label} label={label}>
@@ -1300,18 +1297,18 @@ function Abcd2Calc() {
     : { l: 'High risk', tone: 'critical' as const, note: '2-day stroke risk ~8.1%. Admission & urgent evaluation recommended.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor ABCD²" subtitle="Perkiraan risiko stroke pascaTIA (Johnston dkk., 2007)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ABCD² Score" subtitle="Post-TIA stroke risk prediction (Johnston et al., 2007)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={age60} onChange={(e) => setAge60(e.target.checked)} className="h-5 w-5 accent-brand" />
-          <div className="text-sm font-bold text-ink">Usia ≥60 tahun (+1)</div>
+          <div className="text-sm font-bold text-ink">Age ≥60 years (+1)</div>
         </label>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={bp140} onChange={(e) => setBp140(e.target.checked)} className="h-5 w-5 accent-brand" />
-          <div className="text-sm font-bold text-ink">TD ≥140/90 mmHg saat penilaian (+1)</div>
+          <div className="text-sm font-bold text-ink">BP ≥140/90 mmHg at assessment (+1)</div>
         </label>
-        <Field label="Gambaran Klinis"><SegButtons value={clinical} onChange={setClinical} options={[{ v: 'none', l: 'Other (0)' }, { v: 'speech', l: 'Speech disturbance without weakness (+1)' }, { v: 'weakness', l: 'Unilateral weakness (+2)' }]} /></Field>
-        <Field label="Lama Gejala"><SegButtons value={duration} onChange={setDuration} options={[{ v: 'lt10', l: '<10 minutes (0)' }, { v: '10to59', l: '10-59 minutes (+1)' }, { v: 'ge60', l: '≥60 minutes (+2)' }]} /></Field>
+        <Field label="Clinical Features"><SegButtons value={clinical} onChange={setClinical} options={[{ v: 'none', l: 'Other (0)' }, { v: 'speech', l: 'Speech disturbance without weakness (+1)' }, { v: 'weakness', l: 'Unilateral weakness (+2)' }]} /></Field>
+        <Field label="Duration of Symptoms"><SegButtons value={duration} onChange={setDuration} options={[{ v: 'lt10', l: '<10 minutes (0)' }, { v: '10to59', l: '10-59 minutes (+1)' }, { v: 'ge60', l: '≥60 minutes (+2)' }]} /></Field>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={diabetes} onChange={(e) => setDiabetes(e.target.checked)} className="h-5 w-5 accent-brand" />
           <div className="text-sm font-bold text-ink">Diabetes (+1)</div>
@@ -1338,12 +1335,12 @@ function FourScoreCalc() {
   const total = e + m + b + r
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor FOUR" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
       <div className="space-y-3">
-        <Field label="Respons Mata (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
-        <Field label="Respons Motorik (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
-        <Field label="Refleks Batang Otak (B)"><SegButtons value={b} onChange={setB} options={brainstem} /></Field>
-        <Field label="Pernapasan (R)"><SegButtons value={r} onChange={setR} options={respiration} /></Field>
+        <Field label="Eye Response (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
+        <Field label="Motor Response (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
+        <Field label="Brainstem Reflexes (B)"><SegButtons value={b} onChange={setB} options={brainstem} /></Field>
+        <Field label="Respiration (R)"><SegButtons value={r} onChange={setR} options={respiration} /></Field>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">E{e}M{m}B{b}R{r} = {total}<span className="text-sm font-semibold text-neutral-500">/16</span></div>
@@ -1360,10 +1357,10 @@ function McDonaldCalc() {
   return (
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="McDonald's Rule" subtitle="Perkirakan usia gestasi dari tinggi fundus uteri (20-36 minggu)" />
-      <Field label="Tinggi Fundus (cm, simfisis-fundus)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
+      <Field label="Fundal Height (cm, symphysis-fundal)"><input className={inputClass} type="number" value={fundalCm} onChange={(e) => setFundalCm(+e.target.value)} /></Field>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-center">
         <div className="text-2xl font-black text-ink">≈ {gaWeeksEst} <span className="text-sm font-semibold text-neutral-500">weeks</span></div>
-        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Taksiran Usia Kehamilan</div>
+        <div className="mt-1 text-[10px] font-bold uppercase text-neutral-500">Estimated Gestational Age</div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Rumus McDonald: tinggi fundus (cm) ≈ usia gestasi (minggu) pada 20-36 minggu, kehamilan tunggal dengan pertumbuhan janin normal. Simpangan &gt;3 cm dari usia gestasi sebenarnya (dari HPHT/USG) perlu penilaian lanjut (oligo/polihidramnion, IUGR, makrosomia, kehamilan ganda).</Prosa>
     </Card>
@@ -1379,11 +1376,11 @@ function ParadiseCalc() {
   const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kriteria Paradise" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
       <div className="grid grid-cols-3 gap-2">
-        <Field label="Episode Tahun Ini"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
-        <Field label="Episode Tahun Lalu"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
-        <Field label="Episode 2 Tahun Lalu"><input className={inputClass} type="number" value={y3} onChange={(e) => setY3(+e.target.value)} /></Field>
+        <Field label="Episodes This Year"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
+        <Field label="Episodes Last Year"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
+        <Field label="Episodes 2 Years Ago"><input className={inputClass} type="number" value={y3} onChange={(e) => setY3(+e.target.value)} /></Field>
       </div>
       <label className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
         <input type="checkbox" checked={documented} onChange={(e) => setDocumented(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1429,7 +1426,7 @@ function NihssCalc() {
     : { l: 'Severe stroke', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Skala Stroke NIH (NIHSS)" subtitle="Penilaian derajat berat stroke iskemik akut, 15 butir, 0-42" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="NIH Stroke Scale (NIHSS)" subtitle="Acute ischemic stroke severity assessment, 15 items, 0-42" />
       <div className="space-y-3">
         {items.map((it) => (
           <Field key={it.key} label={it.label}>
@@ -1444,12 +1441,12 @@ function NihssCalc() {
         </div>
       </div>
       <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-neutral-500">
-        <li>Nilai respons <b>pertama</b>, bukan yang terbaik — jangan menuntun pasien, dan jangan kembali mengubah butir yang sudah dinilai.</li>
+        <li>Score the <b>first</b> response, not the best — do not coach the patient, and do not go back to change an item once scored.</li>
         <li>Butir motorik: lengan pada 90° saat duduk (45° saat berbaring) ditahan 10 detik; tungkai pada 30° saat berbaring ditahan 5 detik. Anggota gerak yang tidak dapat diuji (amputasi, sendi terfiksasi) dikecualikan menurut ketentuan NIH — beri nilai 0 dan tuliskan alasannya.</li>
-        <li>NIHSS <b>menilai terlalu rendah stroke sirkulasi posterior</b>: sumbatan basilaris atau serebelum dapat sangat berat namun berskor rendah. Skor rendah tidak pernah menyingkirkan sumbatan pembuluh besar.</li>
+        <li>NIHSS <b>under-weights posterior-circulation stroke</b>: a basilar or cerebellar occlusion can be devastating yet score low. A low score never rules out large-vessel occlusion.</li>
         <li>Skor ini satu masukan bagi keputusan trombolisis, bukan keputusannya — waktu awitan, pencitraan, dan kontraindikasi yang menentukan.</li>
       </ul>
-      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Sumber: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-70. Instrumen sebagaimana diterbitkan NIH/NINDS.</Prosa>
+      <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Source: Brott T, Adams HP, Olinger CP, et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864-70. Instrument as published by NIH/NINDS.</Prosa>
     </Card>
   )
 }
@@ -1468,24 +1465,24 @@ function FluidBalanceCalc() {
   const balance = totalIn - totalOut
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Neraca Cairan (24 jam)" subtitle="Total asupan vs keluaran — pemantauan status cairan" />
-      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Asupan (mL)</h4>
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Fluid Balance (24 hours)" subtitle="Total intake vs output — fluid status monitoring" />
+      <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">Intake (mL)</h4>
       <div className="mt-2 grid grid-cols-3 gap-2">
         <Field label="Oral/Enteral"><input className={inputClass} type="number" value={oralIn} onChange={(e) => setOralIn(+e.target.value)} /></Field>
-        <Field label="IV/Infus"><input className={inputClass} type="number" value={ivIn} onChange={(e) => setIvIn(+e.target.value)} /></Field>
-        <Field label="Lainnya"><input className={inputClass} type="number" value={otherIn} onChange={(e) => setOtherIn(+e.target.value)} /></Field>
+        <Field label="IV/Infusion"><input className={inputClass} type="number" value={ivIn} onChange={(e) => setIvIn(+e.target.value)} /></Field>
+        <Field label="Other"><input className={inputClass} type="number" value={otherIn} onChange={(e) => setOtherIn(+e.target.value)} /></Field>
       </div>
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Keluaran (mL)</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Output (mL)</h4>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Urine"><input className={inputClass} type="number" value={urineOut} onChange={(e) => setUrineOut(+e.target.value)} /></Field>
         <Field label="Drain/NGT"><input className={inputClass} type="number" value={drainOut} onChange={(e) => setDrainOut(+e.target.value)} /></Field>
-        <Field label="Kehilangan Tak Kasat Mata"><input className={inputClass} type="number" value={insensible} onChange={(e) => setInsensible(+e.target.value)} /></Field>
-        <Field label="Lainnya"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
+        <Field label="Insensible Loss"><input className={inputClass} type="number" value={insensible} onChange={(e) => setInsensible(+e.target.value)} /></Field>
+        <Field label="Other"><input className={inputClass} type="number" value={otherOut} onChange={(e) => setOtherOut(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Asupan</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Keluaran</div></div>
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Selisih (mL)</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalIn}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Intake</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalOut}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total Output</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className={`text-lg font-black ${balance >= 0 ? 'text-brand-dark' : 'text-red-600'}`}>{balance >= 0 ? '+' : ''}{balance}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Balance (mL)</div></div>
       </div>
       <Prosa kelas="mt-3 text-[10px] text-neutral-500">Perkiraan kehilangan cairan tak kasatmata pada dewasa ~500-800 mL/hari (bertambah pada demam/takipnea). Keseimbangan positif yang besar dan berkepanjangan → risiko kelebihan cairan; keseimbangan negatif → risiko dehidrasi/hipoperfusi.</Prosa>
     </Card>
@@ -1505,15 +1502,15 @@ function PedsDoseCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Dosis Obat Anak" subtitle="Dosis sirup & puyer berdasarkan berat badan" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Pediatric Medication Dosing Calculator" subtitle="Liquid (syrup) & powdered dosing based on body weight" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
-        <Field label="Dosis (mg/kg/hari)"><input className={inputClass} type="number" value={doseMgKg} onChange={(e) => setDoseMgKg(+e.target.value)} /></Field>
-        <Field label="Frekuensi (kali/hari)"><input className={inputClass} type="number" value={freqPerDay} onChange={(e) => setFreqPerDay(+e.target.value)} /></Field>
-        <Field label="Kepekatan Sirup (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
+        <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Dose (mg/kg/day)"><input className={inputClass} type="number" value={doseMgKg} onChange={(e) => setDoseMgKg(+e.target.value)} /></Field>
+        <Field label="Frequency (times/day)"><input className={inputClass} type="number" value={freqPerDay} onChange={(e) => setFreqPerDay(+e.target.value)} /></Field>
+        <Field label="Syrup Concentration (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/hari</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
@@ -1541,25 +1538,25 @@ function VbacCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Skor Flamm-Geiger" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={ageU40} onChange={(e) => setAgeU40(e.target.checked)} className="h-5 w-5 accent-brand" />
-          <div className="text-sm font-bold text-ink">Usia &lt;40 tahun (+2)</div>
+          <div className="text-sm font-bold text-ink">Age &lt;40 years (+2)</div>
         </label>
-        <Field label="Riwayat Persalinan Pervaginam">
+        <Field label="Vaginal Delivery History">
           <SegButtons value={vagHx} onChange={setVagHx} options={[{ v: 'none', l: 'None (0)' }, { v: 'before', l: 'Before cesarean only (+2)' }, { v: 'vbac', l: 'Prior post-cesarean/VBAC (+4)' }]} />
         </Field>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={nonDystociaIndication} onChange={(e) => setNonDystociaIndication(e.target.checked)} className="h-5 w-5 accent-brand" />
-          <div className="text-sm font-bold text-ink">Indikasi seksio sebelumnya BUKAN distosia/kegagalan kemajuan persalinan (+1)</div>
+          <div className="text-sm font-bold text-ink">Prior cesarean indication was NOT dystocia/failure to progress (+1)</div>
         </label>
-        <Field label="Pendataran Serviks saat Masuk">
+        <Field label="Cervical Effacement on Admission">
           <SegButtons value={effacement} onChange={setEffacement} options={[{ v: 'lt25', l: '<25% (0)' }, { v: '25to75', l: '25-75% (+1)' }, { v: 'ge75', l: '≥75% (+2)' }]} />
         </Field>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={dilation4} onChange={(e) => setDilation4(e.target.checked)} className="h-5 w-5 accent-brand" />
-          <div className="text-sm font-bold text-ink">Pembukaan serviks ≥4 cm saat masuk (+1)</div>
+          <div className="text-sm font-bold text-ink">Cervical dilation ≥4cm on admission (+1)</div>
         </label>
       </div>
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
@@ -1647,14 +1644,14 @@ function DenverCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Disederhanakan)" subtitle="Penapisan perkembangan yang disederhanakan — tonggak yang mewakili tiap ranah, bukan instrumen Denver II lengkap" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Denver II (Simplified)" subtitle="Penapisan perkembangan yang disederhanakan — tonggak yang mewakili tiap ranah, bukan instrumen Denver II lengkap" />
       <Field label="Child's Age (months)"><input className={inputClass} type="number" min={0} max={72} value={ageMo} onChange={(e) => setAgeMo(+e.target.value)} /></Field>
 
       {domainFlags.map(({ domain, applicable }) => (
         <div key={domain.key} className="mt-4">
           <h4 className="text-xs font-black uppercase tracking-wide text-neutral-500">{domain.label}</h4>
           <div className="mt-2 space-y-1.5">
-            {applicable.length === 0 && <p className="text-[11px] text-neutral-500">Belum ada tonggak perkembangan rujukan untuk usia ini.</p>}
+            {applicable.length === 0 && <p className="text-[11px] text-neutral-500">No reference milestones for this age yet.</p>}
             {applicable.map((m) => {
               const key = `${domain.key}-${m.ageMo}`
               const v = results[key] ?? 'na'
@@ -1750,7 +1747,7 @@ function AtlsCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Survei Primer Trauma (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
@@ -1785,7 +1782,7 @@ function AtlsCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
         <div className="flex items-center justify-between">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Catatan Survei Primer — siap ditempel ke rekam medis</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Primary Survey Note — ready to paste into the medical record</div>
           <button onClick={copyNote} className="rounded-full bg-brand px-3 py-1 text-[10px] font-bold text-ink">{copied ? '✓ Copied' : 'Copy Note'}</button>
         </div>
         <pre className="mt-2 whitespace-pre-wrap font-sans text-[11px] leading-relaxed text-neutral-600">{formattedNote}</pre>
@@ -1847,7 +1844,7 @@ function AbgCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Analisis Gas Darah" subtitle="Pendekatan bertahap: gangguan primer → kompensasi → anion gap → rasio delta" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Blood Gas Analysis (ABG)" subtitle="Systematic approach: primary disorder → compensation → anion gap → delta ratio" />
       <div className="grid grid-cols-3 gap-2">
         <Field label="pH"><input className={inputClass} type="number" step="0.01" value={ph} onChange={(e) => setPh(+e.target.value)} /></Field>
         <Field label="PaCO2 (mmHg)"><input className={inputClass} type="number" value={paco2} onChange={(e) => setPaco2(+e.target.value)} /></Field>
@@ -1858,23 +1855,23 @@ function AbgCalc() {
       </div>
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-500">Langkah 1 — Keadaan pH</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-500">Step 1 — pH Status</div>
         <Badge tone={phNormal ? 'normal' : 'critical'}>{acidemia ? 'Acidemia' : alkalemia ? 'Alkalemia' : 'Normal pH'}</Badge>
       </div>
       <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-        <div className="text-[10px] font-bold uppercase text-neutral-500">Langkah 2 — Gangguan Primer</div>
+        <div className="text-[10px] font-bold uppercase text-neutral-500">Step 2 — Primary Disorder</div>
         <div className="mt-1 text-sm font-black text-ink">{primary}</div>
       </div>
       {compensationNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Langkah 3 — Kecukupan Kompensasi (Rumus Winter)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Step 3 — Compensation Adequacy (Winter's Formula)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{compensationNote}</p>
         </div>
       )}
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (terkoreksi albumin)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
@@ -1883,7 +1880,7 @@ function AbgCalc() {
       </div>
       {deltaRatioNote && (
         <div className="mt-2 rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Langkah 4 — Rasio Delta (mendeteksi gangguan campuran)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Step 4 — Delta Ratio (detects mixed disorders)</div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{deltaRatioNote}</p>
         </div>
       )}
@@ -1976,7 +1973,7 @@ function BurnCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Luka Bakar Lanjutan" subtitle="Tiga cara mengisi %TBSA + Rumus Parkland, dapat dicetak/diekspor ke PDF" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Advanced Burn Calculator" subtitle="Three %TBSA input methods + Parkland Formula, printable/exportable to PDF" />
 
       <SegButtons
         value={method}
@@ -1986,7 +1983,7 @@ function BurnCalc() {
 
       {method === 'manual' ? (
         <div className="mt-3">
-          <Field label="Total %TBSA (perkiraan klinis)">
+          <Field label="Total %TBSA (clinical estimate)">
             <input className={inputClass} type="number" min={0} max={100} value={manualTbsa} onChange={(e) => setManualTbsa(+e.target.value)} />
           </Field>
           <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Untuk kasus yang perkiraan %LPB-nya sudah ada (mis. rujukan dari rumah sakit lain) — masukkan langsung tanpa perlu menandai bagan tubuh.</Prosa>
@@ -1995,15 +1992,15 @@ function BurnCalc() {
         <>
           {method === 'pediatric' && (
             <div className="mt-3">
-              <Field label="Usia (tahun)">
+              <Field label="Age (years)">
                 <input className={inputClass} type="number" min={0} max={17} step={0.5} value={ageYears} onChange={(e) => setAgeYears(+e.target.value)} />
               </Field>
               <Prosa kelas="mt-1.5 text-[10px] text-neutral-500">Lund &amp; Browder (1944) mengoreksi perbandingan tubuh anak — kepala relatif lebih besar dan tungkai lebih kecil dibanding dewasa. Kelompok umur: &lt;1, 1-4, 5-9, 10-14, 15-17, ≥18 tahun.</Prosa>
             </div>
           )}
           <div className="mt-3 flex gap-2">
-            <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Depan</button>
-            <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Tampak Belakang</button>
+            <button onClick={() => setView('front')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'front' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Front View</button>
+            <button onClick={() => setView('back')} className={`flex-1 rounded-full py-2 text-xs font-bold ${view === 'back' ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600'}`}>Back View</button>
           </div>
 
           <div className="mt-3 flex justify-center">
@@ -2020,7 +2017,7 @@ function BurnCalc() {
               ))}
             </svg>
           </div>
-          <p className="text-center text-[10px] text-neutral-500">Ketuk bagian tubuh untuk menandai luka bakar (merah = terpilih)</p>
+          <p className="text-center text-[10px] text-neutral-500">Tap a body area to mark a burn (red = selected)</p>
 
           <div className="mt-3 space-y-1">
             {regions.map((r) => (
@@ -2041,14 +2038,14 @@ function BurnCalc() {
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
+        <Field label="Body Weight (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
       </div>
 
       {tbsa >= 20 && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{total24h.toFixed(0)}</div>
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Total mL / 24 jam (Parkland)</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Total mL / 24h (Parkland)</div>
           </div>
           <div className="rounded-xl bg-neutral-50 p-3 text-center">
             <div className="text-lg font-black text-ink">{first8hRate.toFixed(0)}</div>
@@ -2116,7 +2113,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Saraf Kranial + Tanda Rangsang Meningeal" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, otomatis disusun menjadi catatan" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Cranial Nerves + Meningeal Signs" subtitle="Pemeriksaan 12 saraf kranial & tanda rangsang meningeal, otomatis disusun menjadi catatan" />
 
       <div className="space-y-2.5">
         {CRANIAL_NERVES.map((n) => (
@@ -2131,7 +2128,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
         ))}
       </div>
 
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Tanda Rangsang Meningeal</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Meningeal Signs</h4>
       <div className="mt-2 space-y-2">
         {MENINGEAL_SIGNS.map((m) => (
           <label key={m.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -2152,7 +2149,7 @@ ${meningealPositive.length > 0 ? '⚠️ Meningeal signs POSITIVE — consider m
       )}
 
       <div className="mt-4">
-        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Catatan Tersusun Otomatis</h4>
+        <h4 className="mb-2 text-xs font-black uppercase tracking-wide text-neutral-500">Auto-Generated Note</h4>
         <pre className="whitespace-pre-wrap rounded-xl bg-neutral-900 p-3 text-[11px] leading-relaxed text-neutral-100">{formattedNote}</pre>
       </div>
       <Prosa kelas="mt-2 text-[10px] leading-relaxed text-neutral-500">Draf catatan yang dibuat otomatis ini wajib ditinjau & dilengkapi dokter sebelum masuk ke rekam medis resmi. Parese fasialis sentral dan perifer dibedakan dari keterlibatan dahi (dahi tidak terkena = sentral, karena persarafan dahi bilateral dari korteks; dahi ikut lumpuh = perifer/Bell's palsy).</Prosa>
@@ -2223,14 +2220,14 @@ function CompetencyTracker() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Pemantau Kompetensi (SKDI)" subtitle="7 Indonesian Doctor Competency Areas (KKI/AIPKI) — a national standard applied across all medical education institutions" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Competency Tracker (SKDI)" subtitle="7 Indonesian Doctor Competency Areas (KKI/AIPKI) — a national standard applied across all medical education institutions" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="Institusi">
+        <Field label="Institution">
           <select className={inputClass} value={university} onChange={(e) => setUniversity(e.target.value as (typeof UNIVERSITIES)[number])}>
             {UNIVERSITIES.map((u) => <option key={u} value={u}>{u}</option>)}
           </select>
         </Field>
-        <Field label="Program/Spesialisasi">
+        <Field label="Program/Specialty">
           <select className={inputClass} value={specialty} onChange={(e) => setSpecialty(e.target.value as (typeof SPECIALTIES)[number])}>
             {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -2301,7 +2298,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
 
   return (
     <Card>
-      <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 internationally standard clinical decision-support scores & tools" />
+      <SectionTitle icon={<IconShield size={20} />} title="Unlock Clinical Calculators" subtitle="34 internationally standard clinical decision-support scores & tools" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
         🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('en-GB')}).
       </div>
@@ -2311,7 +2308,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
           disabled={busy}
           className="flex flex-col items-start gap-1 rounded-2xl border border-brand/30 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50"
         >
-          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Bayar dari saldo</span>
+          <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-dark"><IconToken size={14} /> Pay from balance</span>
           <span className="text-xl font-black text-ink">{access.pricePnc} PNC</span>
           <span className="text-[11px] text-neutral-500">{busy ? 'Processing…' : 'Deducted directly from your PanaceaToken balance'}</span>
         </button>
@@ -2319,10 +2316,10 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
           onClick={() => navigate('/billing')}
           className="flex flex-col items-start gap-1 rounded-2xl border border-black/10 bg-white p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
         >
-          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">Saldo kurang?</span>
+          <span className="text-xs font-bold uppercase tracking-wide text-neutral-500">Balance not enough?</span>
           <span className="text-base font-black text-ink">Transfer to {MANUAL_BANK.bank}</span>
           <span className="text-[11px] text-neutral-500">{MANUAL_BANK.number} in the name of {MANUAL_BANK.holder}</span>
-          <span className="text-[11px] font-semibold text-brand-dark">Isi ulang di Tagihan →</span>
+          <span className="text-[11px] font-semibold text-brand-dark">Top up in Billing →</span>
         </button>
       </div>
       {err && <p className="mt-3 text-xs font-semibold text-rose-600">{err}</p>}
@@ -2358,13 +2355,13 @@ function BrocaLorentzCalorieCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Kalori Broca–Lorentz" subtitle="Berat badan ideal (Broca/Lorentz) → taksiran kebutuhan kalori harian" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca–Lorentz Calorie Calculator" subtitle="Ideal body weight (Broca/Lorentz) → estimated daily calorie requirement" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
-        <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
-        <Field label="Rumus Berat Badan Ideal"><SegButtons value={formula} onChange={setFormula} options={[{ v: 'broca', l: 'Broca' }, { v: 'lorentz', l: 'Lorentz' }]} /></Field>
+        <Field label="Height (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
+        <Field label="Sex"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
+        <Field label="IBW Formula"><SegButtons value={formula} onChange={setFormula} options={[{ v: 'broca', l: 'Broca' }, { v: 'lorentz', l: 'Lorentz' }]} /></Field>
       </div>
-      <Field label="Tingkat Aktivitas">
+      <Field label="Activity Level">
         <SegButtons value={activity} onChange={setActivity} options={[{ v: 'ringan', l: 'Light (30 kcal/kg)' }, { v: 'sedang', l: 'Moderate (35 kcal/kg)' }, { v: 'berat', l: 'Heavy (40 kcal/kg)' }]} />
       </Field>
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -2374,7 +2371,7 @@ function BrocaLorentzCalorieCalc() {
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{totalKcal.toFixed(0)} kcal/day</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Kebutuhan Kalori Total</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Total Calorie Requirement</div>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Broca: (Tinggi−100)±10-15%. Lorentz: (Tinggi−100) − (Tinggi−150)/4 (laki-laki) atau /2,5 (perempuan) — mengoreksi tinggi badan ekstrem dan umumnya dianggap lebih tepat daripada Broca polos. Kalori = BB ideal × faktor aktivitas (25 kkal/kg basal + penyesuaian aktivitas). Sesuaikan lagi pada stres metabolik, luka, atau keadaan katabolik.</Prosa>
@@ -2393,22 +2390,22 @@ function IvDripCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Laju Tetes Infus" subtitle="Ubah volume & lama infus menjadi tetes/menit menurut faktor tetes set infus" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="IV Fluid Drip Rate" subtitle="Ubah volume & lama infus menjadi tetes/menit menurut faktor tetes set infus" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <Field label="Volume Total (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
-        <Field label="Lama (jam)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
-        <Field label="Faktor Tetes (set infus)">
+        <Field label="Total Volume (mL)"><input className={inputClass} type="number" value={volumeMl} onChange={(e) => setVolumeMl(+e.target.value)} /></Field>
+        <Field label="Duration (hours)"><input className={inputClass} type="number" step="0.5" value={hours} onChange={(e) => setHours(+e.target.value)} /></Field>
+        <Field label="Drop Factor (giving set)">
           <SegButtons value={dropFactor} onChange={setDropFactor} options={[{ v: 15, l: '15 (macro)' }, { v: 20, l: '20 (macro)' }, { v: 60, l: '60 (micro)' }]} />
         </Field>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{mlPerHour.toFixed(1)} mL/h</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Laju (pompa infus)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Rate (infusion pump)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-xl font-black text-ink">{dropsPerMin.toFixed(0)} drops/min</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Tetes/menit (tanpa pompa)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Drops/min (no pump)</div>
         </div>
       </div>
       <Prosa kelas="mt-3 text-[10px] leading-relaxed text-neutral-500">Tetes/menit = (Volume mL × faktor tetes) / (lama jam × 60). Set makro baku umumnya 15 atau 20 tetes/mL (dewasa/umum), set mikro 60 tetes/mL (anak/neonatus, titrasi tepat). Selalu pastikan faktor tetes yang tercetak pada kemasan set infus yang Anda pakai.</Prosa>
@@ -2440,14 +2437,14 @@ function AriaCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Kriteria ARIA" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
-      <Field label="Lama Gejala">
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
+      <Field label="Symptom Duration">
         <SegButtons value={duration} onChange={setDuration} options={[
           { v: 'intermiten', l: 'Intermittent (<4 days/week or <4 weeks)' },
           { v: 'persisten', l: 'Persistent (≥4 days/week and ≥4 weeks)' },
         ]} />
       </Field>
-      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Dampak pada Kualitas Hidup (skor keparahan)</h4>
+      <h4 className="mt-4 text-xs font-black uppercase tracking-wide text-neutral-500">Quality of Life Impact (severity score)</h4>
       <div className="mt-2 space-y-2">
         {[
           { label: 'Sleep disturbance', checked: sleepImpaired, set: setSleepImpaired },
@@ -2512,7 +2509,7 @@ function AclsCalc() {
   const active = ACLS_ALGOS.find((a) => a.id === algo)!
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Panduan ACLS" subtitle="Advanced Cardiovascular Life Support — algoritma rujukan cepat (Panduan AHA 2020)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="ACLS Guide" subtitle="Advanced Cardiovascular Life Support — quick reference algorithms (AHA Guidelines 2020)" />
       <SegButtons value={algo} onChange={setAlgo} options={ACLS_ALGOS.map((a) => ({ v: a.id, l: a.label }))} />
       <div className="mt-4 rounded-xl bg-neutral-50 p-4">
         <h4 className="text-sm font-black text-ink">{active.title}</h4>

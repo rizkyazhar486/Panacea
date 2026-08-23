@@ -38,13 +38,13 @@ function load(): Assessment { try { return { ...DEF, ...JSON.parse(localStorage.
 export function isAssessmentDone(): boolean { try { return JSON.parse(localStorage.getItem(KEY) || '{}').done === true } catch { return false } }
 
 const MOVEMENTS = [
-  { id: 'squat', label: 'Squat Tangan di Atas Kepala', desc: 'Squat penuh, lengan lurus di atas kepala, tumit tetap menempel di lantai.' },
-  { id: 'balance', label: 'Keseimbangan Satu Kaki', desc: 'Berdiri satu kaki selama 30 detik tanpa goyang berlebihan.' },
-  { id: 'toetouch', label: 'Menyentuh Jari Kaki', desc: 'Membungkuk menyentuh jari kaki, lutut lurus, tanpa nyeri.' },
-  { id: 'shoulder', label: 'Jangkauan Bahu (Uji Garuk Punggung)', desc: 'Satu tangan dari atas, satu dari bawah punggung, usahakan bertemu.' },
-  { id: 'hop', label: 'Lompat Satu Kaki', desc: 'Melompat dan mendarat mantap dengan satu kaki tanpa goyah.' },
+  { id: 'squat', label: 'Overhead Squat', desc: 'Full squat, arms straight overhead, heels stay flat on the floor.' },
+  { id: 'balance', label: 'Single-Leg Balance', desc: 'Stand on one leg for 30 seconds without excessive wobbling.' },
+  { id: 'toetouch', label: 'Toe Touch', desc: 'Bend forward to touch your toes, knees straight, no pain.' },
+  { id: 'shoulder', label: 'Shoulder Reach (Scratch Test)', desc: 'One hand from above, one from below the back, try to meet.' },
+  { id: 'hop', label: 'Single-Leg Hop', desc: 'Jump and land stably on one leg without wobbling.' },
 ]
-const PAIN_REGIONS = ['Leher', 'Bahu', 'Punggung Atas', 'Punggung Bawah', 'Panggul', 'Lutut', 'Pergelangan Kaki', 'Lainnya']
+const PAIN_REGIONS = ['Neck', 'Shoulder', 'Upper Back', 'Lower Back', 'Hip', 'Knee', 'Ankle', 'Other']
 
 const QOL_INSTRUMENTS: Record<string, { note: string; items: string[] }> = {
   'Nottingham Health Profile (adapted)': {
@@ -91,12 +91,12 @@ export function InitialAssessment() {
     nav('/training-plan')
   }
 
-  const STEPS = ['Pola Gerak', 'Pain & Injury', 'Kekuatan Awal', 'Asimetri', 'Kualitas Hidup', 'Summary']
+  const STEPS = ['Movement Pattern', 'Pain & Injury', 'Baseline Strength', 'Asymmetry', 'Quality of Life', 'Summary']
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconActivity size={20} />} title="Penilaian Awal" subtitle="Pola gerak, risiko cedera, nyeri, kekuatan & ketidaksimetrisan — sebelum memulai program yang berat" />
+        <SectionTitle icon={<IconActivity size={20} />} title="Initial Assessment" subtitle="Pola gerak, risiko cedera, nyeri, kekuatan & ketidaksimetrisan — sebelum memulai program yang berat" />
         <div className="mt-3 flex flex-wrap gap-1.5">
           {STEPS.map((s, i) => (
             <button key={s} onClick={() => setStep(i)} className={'rounded-full px-3 py-1.5 text-[11px] font-bold transition ' + (step === i ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{i + 1}. {s}</button>
@@ -106,7 +106,7 @@ export function InitialAssessment() {
 
       {step === 0 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Penapisan Pola Gerak" subtitle="Nilai sendiri (pakai cermin/rekam video) — 0 tidak mampu, 1 dengan kompensasi, 2 sempurna" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Movement Pattern Screen" subtitle="Nilai sendiri (pakai cermin/rekam video) — 0 tidak mampu, 1 dengan kompensasi, 2 sempurna" />
           <div className="mt-3 space-y-3">
             {MOVEMENTS.map((m) => (
               <div key={m.id} className="rounded-xl border border-neutral-100 p-3">
@@ -126,7 +126,7 @@ export function InitialAssessment() {
 
       {step === 1 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Riwayat Nyeri & Cedera" subtitle="Tandai bagian yang terasa nyeri/pernah cedera" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Pain & Injury History" subtitle="Tandai bagian yang terasa nyeri/pernah cedera" />
           <div className="mt-3 flex flex-wrap gap-1.5">
             {PAIN_REGIONS.map((r) => (
               <button key={r} onClick={() => setA((x) => ({ ...x, painRegions: x.painRegions.includes(r) ? x.painRegions.filter((p) => p !== r) : [...x.painRegions, r] }))}
@@ -144,27 +144,27 @@ export function InitialAssessment() {
 
       {step === 2 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Kekuatan Awal" subtitle="Uji sederhana — titik acuan untuk mengikuti kemajuan Anda" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Baseline Strength" subtitle="Uji sederhana — titik acuan untuk mengikuti kemajuan Anda" />
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <Field label="Push-up maksimal"><input className={inputClass} type="number" value={a.strength.pushups || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, pushups: +e.target.value } }))} /></Field>
-            <Field label="Squat/60 detik"><input className={inputClass} type="number" value={a.strength.squats60 || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, squats60: +e.target.value } }))} /></Field>
-            <Field label="Plank (detik)"><input className={inputClass} type="number" value={a.strength.plankSec || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, plankSec: +e.target.value } }))} /></Field>
+            <Field label="Max push-ups"><input className={inputClass} type="number" value={a.strength.pushups || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, pushups: +e.target.value } }))} /></Field>
+            <Field label="Squats/60 sec"><input className={inputClass} type="number" value={a.strength.squats60 || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, squats60: +e.target.value } }))} /></Field>
+            <Field label="Plank (sec)"><input className={inputClass} type="number" value={a.strength.plankSec || ''} onChange={(e) => setA((x) => ({ ...x, strength: { ...x.strength, plankSec: +e.target.value } }))} /></Field>
           </div>
         </Card>
       )}
 
       {step === 3 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconActivity size={20} />} title="Asimetri & Ketidakseimbangan" subtitle="Bandingkan sisi kanan dan kiri" />
+          <SectionTitle icon={<IconActivity size={20} />} title="Asymmetry & Imbalance" subtitle="Compare right vs left side" />
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Keseimbangan Kanan (detik)"><input className={inputClass} type="number" value={a.asym.balanceR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceR: +e.target.value } }))} /></Field>
-            <Field label="Keseimbangan Kiri (detik)"><input className={inputClass} type="number" value={a.asym.balanceL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceL: +e.target.value } }))} /></Field>
-            <Field label="Lompat Kanan (cm)"><input className={inputClass} type="number" value={a.asym.hopR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopR: +e.target.value } }))} /></Field>
-            <Field label="Lompat Kiri (cm)"><input className={inputClass} type="number" value={a.asym.hopL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopL: +e.target.value } }))} /></Field>
+            <Field label="Right Balance (sec)"><input className={inputClass} type="number" value={a.asym.balanceR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceR: +e.target.value } }))} /></Field>
+            <Field label="Left Balance (sec)"><input className={inputClass} type="number" value={a.asym.balanceL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, balanceL: +e.target.value } }))} /></Field>
+            <Field label="Right Hop (cm)"><input className={inputClass} type="number" value={a.asym.hopR || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopR: +e.target.value } }))} /></Field>
+            <Field label="Left Hop (cm)"><input className={inputClass} type="number" value={a.asym.hopL || ''} onChange={(e) => setA((x) => ({ ...x, asym: { ...x.asym, hopL: +e.target.value } }))} /></Field>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Asimetri Keseimbangan</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
-            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Asimetri Lompat</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Balance Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymBalance.toFixed(0)}%</div></div>
+            <div className="rounded-xl bg-neutral-50 p-2.5"><div className="text-[10px] font-bold uppercase text-neutral-500">Hop Asymmetry</div><div className="text-base font-extrabold text-brand-dark">{asymHop.toFixed(0)}%</div></div>
           </div>
           {asymFlag && <div className="mt-3 rounded-xl bg-amber-50 p-3 text-[11px] text-amber-700">⚠️ Asymmetry &gt;15% detected — consider additional unilateral training for the weaker side.</div>}
         </Card>
@@ -172,8 +172,8 @@ export function InitialAssessment() {
 
       {step === 4 && (
         <Card className="!p-5">
-          <SectionTitle icon={<IconHeart size={20} />} title="Penapisan Kualitas Hidup" subtitle="Pilih instrumen acuan (adaptasi singkat, bukan versi resmi berlisensi)" />
-          <Field label="Instrumen">
+          <SectionTitle icon={<IconHeart size={20} />} title="Quality of Life Screening" subtitle="Pilih instrumen acuan (adaptasi singkat, bukan versi resmi berlisensi)" />
+          <Field label="Instrument">
             <select className={inputClass} value={a.qolInstrument} onChange={(e) => setA((x) => ({ ...x, qolInstrument: e.target.value, qolAnswers: [] }))}>
               {Object.keys(QOL_INSTRUMENTS).map((k) => <option key={k}>{k}</option>)}
             </select>
@@ -189,12 +189,12 @@ export function InitialAssessment() {
                       className={'flex-1 rounded-lg py-1.5 text-[11px] font-bold ' + ((a.qolAnswers[i] ?? -1) === v ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-500')}>{v}</button>
                   ))}
                 </div>
-                <div className="mt-1 flex justify-between text-[10px] text-neutral-500"><span>Tidak setuju</span><span>Sangat setuju</span></div>
+                <div className="mt-1 flex justify-between text-[10px] text-neutral-500"><span>Disagree</span><span>Strongly agree</span></div>
               </div>
             ))}
           </div>
           <div className="mt-3 rounded-xl bg-neutral-50 p-3">
-            <div className="text-[10px] font-bold uppercase text-neutral-500">Skor</div>
+            <div className="text-[10px] font-bold uppercase text-neutral-500">Score</div>
             <div className="text-lg font-extrabold text-brand-dark">{qolPct.toFixed(0)}%</div>
           </div>
         </Card>
@@ -205,19 +205,19 @@ export function InitialAssessment() {
           <SectionTitle icon={<IconCheck size={20} />} title="Summary & Save" subtitle="Periksa kembali sebelum menyimpan penilaian" />
           <div className="mt-3 space-y-2">
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Pola Gerak</span>
+              <span className="text-xs font-bold">Movement Pattern</span>
               <Badge tone={movementFlag ? 'critical' : 'brand'}>{movementScore}/{movementMax} {movementFlag ? '— Needs attention' : '— Good'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Nyeri</span>
+              <span className="text-xs font-bold">Pain</span>
               <Badge tone={painFlag ? 'critical' : 'brand'}>{a.painRegions.length > 0 ? a.painRegions.join(', ') : 'None'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Asimetri</span>
+              <span className="text-xs font-bold">Asymmetry</span>
               <Badge tone={asymFlag ? 'low' : 'brand'}>{asymFlag ? 'Detected >15%' : 'Balanced'}</Badge>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-neutral-100 p-3">
-              <span className="text-xs font-bold">Kualitas Hidup</span>
+              <span className="text-xs font-bold">Quality of Life</span>
               <Badge tone={qolPct >= 70 ? 'brand' : qolPct >= 40 ? 'low' : 'critical'}>{qolPct.toFixed(0)}%</Badge>
             </div>
           </div>
@@ -226,7 +226,7 @@ export function InitialAssessment() {
               Signs of injury risk detected. Your program will still be created, but start at a light intensity and consider consulting a professional first.
             </div>
           )}
-          <Button onClick={finish} className="mt-4 w-full">Simpan & Mulai Program →</Button>
+          <Button onClick={finish} className="mt-4 w-full">Save & Start Program →</Button>
         </Card>
       )}
     </div>
