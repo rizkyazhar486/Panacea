@@ -57,12 +57,12 @@ interface Setelan {
    menentukan syaratnya adalah data yang benar-benar masuk. Karena itu
    keterangannya menyebut contoh syarat, bukan menjanjikan notifikasi harian. */
 const KATEGORI: { kunci: keyof Setelan; judul: string; contoh: string }[] = [
-  { kunci: 'notifPemulihan', judul: 'Pemulihan & tidur', contoh: 'HRV atau denyut istirahat menyimpang, utang tidur menumpuk' },
-  { kunci: 'notifLatihanPintar', judul: 'Latihan', contoh: 'tiga hari tanpa sesi, menit pekan ini kurang, langkah tertinggal' },
-  { kunci: 'notifVital', judul: 'Vital & pencegahan', contoh: 'tekanan darah tinggi, saturasi rendah dua malam, data berhenti masuk' },
-  { kunci: 'notifLingkungan', judul: 'Udara & sinar UV', contoh: 'AQI di atas 80 atau indeks UV puncak ≥ 8 di kota Anda' },
-  { kunci: 'notifGizi', judul: 'Gizi & kafein', contoh: 'protein tertinggal sore hari, kopi sore, jendela puasa panjang' },
-  { kunci: 'notifKebiasaan', judul: 'Kebiasaan mencatat', contoh: 'beberapa hari tanpa catatan harian atau catatan makan' },
+  { kunci: 'notifPemulihan', judul: 'Recovery & sleep', contoh: 'HRV or resting heart rate drifting, sleep debt piling up' },
+  { kunci: 'notifLatihanPintar', judul: 'Training', contoh: 'three days without a session, weekly minutes short, steps behind' },
+  { kunci: 'notifVital', judul: 'Vitals & prevention', contoh: 'high blood pressure, two nights of low saturation, data stopped arriving' },
+  { kunci: 'notifLingkungan', judul: 'Air & UV', contoh: 'AQI above 80, or a peak UV index of 8 or more in your city' },
+  { kunci: 'notifGizi', judul: 'Nutrition & caffeine', contoh: 'protein behind by late afternoon, late coffee, a long fasting window' },
+  { kunci: 'notifKebiasaan', judul: 'Logging habits', contoh: 'several days with no daily note or food log' },
 ]
 
 function jamDariMenit(m: number): string {
@@ -132,7 +132,7 @@ export function UbinNotifikasi() {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Pengingat</h2>
+        <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Reminders</h2>
       </div>
 
       <div className="kaca rounded-3xl px-3 py-1">
@@ -151,19 +151,19 @@ export function UbinNotifikasi() {
 
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
-            judul="Latihan harian"
-            catatan={pushNyala ? 'Dikirim server, sampai walau aplikasi ditutup' : 'Nyalakan notifikasi dahulu'}
+            judul="Daily training"
+            catatan={pushNyala ? 'Sent by the server — it arrives even with the app closed' : 'Turn notifications on first'}
             kanan={
               <span className="flex shrink-0 items-center gap-2">
                 <input
                   type="time"
                   value={setelan.latihanHHMM ?? '17:00'}
                   onChange={(e) => void simpanServer({ latihanHHMM: e.target.value })}
-                  aria-label="Jam pengingat latihan"
+                  aria-label="Training reminder time"
                   className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
                 />
                 <Saklar
-                  label="Pengingat latihan harian"
+                  label="Daily training reminder"
                   nyala={!!setelan.notifLatihan && pushNyala}
                   onUbah={(v) => void simpanServer({ notifLatihan: v, latihanHHMM: setelan.latihanHHMM ?? '17:00' })}
                 />
@@ -174,11 +174,11 @@ export function UbinNotifikasi() {
 
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
-            judul="Gol tim yang dibintangi"
-            catatan={pushNyala ? 'Gol dan peluit akhir, diperiksa server tiap 90 detik' : 'Nyalakan notifikasi dahulu'}
+            judul="Goals from the teams you starred"
+            catatan={pushNyala ? 'Gol dan peluit akhir, diperiksa server tiap 90 detik' : 'Turn notifications on first'}
             kanan={
               <Saklar
-                label="Notifikasi gol tim"
+                label="Team goal alerts"
                 nyala={setelan.sportsNotif !== false && pushNyala}
                 onUbah={(v) => void simpanServer({ sportsNotif: v })}
               />
@@ -193,14 +193,14 @@ export function UbinNotifikasi() {
             tetapi hanya selama aplikasi terbuka. */}
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
-            judul="Menjelang waktu salat"
-            catatan={pushNyala ? `${setelan.salatLeadMin ?? 5} menit sebelumnya · ${setelan.salatKota ?? adzan.kota}` : 'Nyalakan notifikasi dahulu'}
+            judul="Shortly before the prayer time"
+            catatan={pushNyala ? `${setelan.salatLeadMin ?? 5} menit sebelumnya · ${setelan.salatKota ?? adzan.kota}` : 'Turn notifications on first'}
             kanan={
               <span className="flex shrink-0 items-center gap-2">
                 <select
                   value={String(setelan.salatLeadMin ?? 5)}
                   onChange={(e) => void simpanServer({ salatLeadMin: Number(e.target.value), salatKota: adzan.kota, salatNegara: adzan.negara, salatMetode: adzan.metode } as Setelan)}
-                  aria-label="Berapa menit sebelum waktu salat"
+                  aria-label="How many minutes before the prayer time"
                   className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
                 >
                   {[0, 2, 5, 10, 15].map((m) => (
@@ -208,7 +208,7 @@ export function UbinNotifikasi() {
                   ))}
                 </select>
                 <Saklar
-                  label="Pengingat menjelang salat"
+                  label="Pre-prayer reminder"
                   nyala={!!setelan.notifSalat && pushNyala}
                   onUbah={(v) => void simpanServer({
                     notifSalat: v,
@@ -225,14 +225,14 @@ export function UbinNotifikasi() {
 
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
-            judul="Adzan"
+            judul="Adhan"
             catatan={adzan.aktif ? `Bunyi${adzan.getar ? ' + getar' : ''} · hanya saat aplikasi terbuka` : 'Bunyi di dalam aplikasi · mati'}
             kanan={
               <span className="flex shrink-0 items-center gap-2">
                 {adzan.aktif && (
                   <button
                     onClick={() => { const b = { ...adzan, getar: !adzan.getar }; setAdzan(b); simpanSetelan(b) }}
-                    aria-label="Getar saat adzan"
+                    aria-label="Vibrate at the adhan"
                     aria-pressed={adzan.getar}
                     className={`t-mikro min-h-[40px] rounded-lg px-2 font-black ${
                       adzan.getar ? 'bg-brand/15 text-brand-dark dark:text-brand' : 'text-neutral-400'
@@ -242,7 +242,7 @@ export function UbinNotifikasi() {
                   </button>
                 )}
                 <Saklar
-                  label="Pengingat adzan"
+                  label="Adhan reminder"
                   nyala={adzan.aktif}
                   onUbah={(v) => { const b = { ...adzan, aktif: v }; setAdzan(b); simpanSetelan(b) }}
                 />
@@ -257,12 +257,12 @@ export function UbinNotifikasi() {
             disebut karena harapan yang salah adalah cara tercepat membuat
             orang mematikan seluruh notifikasi. */}
         <div className="border-t border-neutral-100 pt-2 dark:border-white/10">
-          <p className="t-mikro pb-1 font-black uppercase tracking-wide text-neutral-500">Berdasarkan keadaan</p>
+          <p className="t-mikro pb-1 font-black uppercase tracking-wide text-neutral-500">Condition-based</p>
           {KATEGORI.map((c) => (
             <div key={String(c.kunci)} className="border-t border-neutral-100 first:border-t-0 dark:border-white/10">
               <Baris
                 judul={c.judul}
-                catatan={pushNyala ? c.contoh : 'Nyalakan notifikasi dahulu'}
+                catatan={pushNyala ? c.contoh : 'Turn notifications on first'}
                 kanan={
                   <Saklar
                     label={c.judul}
@@ -279,13 +279,13 @@ export function UbinNotifikasi() {
               boleh menyela hidup orang besok. */}
           <div className="flex items-center gap-2 border-t border-neutral-100 py-2 dark:border-white/10">
             <span className="min-w-0 flex-1">
-              <span className="t-kecil block truncate font-bold text-ink dark:text-white">Paling banyak per hari</span>
-              <span className="t-mikro block truncate text-neutral-400">Sesudah kuota habis, sisanya menunggu besok</span>
+              <span className="t-kecil block truncate font-bold text-ink dark:text-white">At most per day</span>
+              <span className="t-mikro block truncate text-neutral-400">Once the quota is used up, the rest wait until tomorrow</span>
             </span>
             <select
               value={String(setelan.notifKuota ?? 6)}
               onChange={(e) => void simpanServer({ notifKuota: Number(e.target.value) })}
-              aria-label="Kuota notifikasi harian"
+              aria-label="Daily notification quota"
               className="t-kecil shrink-0 rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
             >
               {[2, 4, 6, 8, 12].map((n) => <option key={n} value={n}>{n}</option>)}
@@ -294,15 +294,15 @@ export function UbinNotifikasi() {
 
           <div className="flex items-center gap-2 border-t border-neutral-100 py-2 dark:border-white/10">
             <span className="min-w-0 flex-1">
-              <span className="t-kecil block truncate font-bold text-ink dark:text-white">Jam senyap</span>
-              <span className="t-mikro block truncate text-neutral-400">Tidak ada yang dikirim pada jam ini</span>
+              <span className="t-kecil block truncate font-bold text-ink dark:text-white">Quiet hours</span>
+              <span className="t-mikro block truncate text-neutral-400">Nothing is sent during these hours</span>
             </span>
             <span className="flex shrink-0 items-center gap-1">
               <input
                 type="time"
                 value={jamDariMenit(setelan.notifSenyapMulai ?? 22 * 60)}
                 onChange={(e) => void simpanServer({ notifSenyapMulai: menitDariJam(e.target.value) })}
-                aria-label="Jam senyap mulai"
+                aria-label="Quiet hours start"
                 className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
               />
               <span className="t-mikro text-neutral-400">–</span>
@@ -310,7 +310,7 @@ export function UbinNotifikasi() {
                 type="time"
                 value={jamDariMenit(setelan.notifSenyapSelesai ?? 6 * 60)}
                 onChange={(e) => void simpanServer({ notifSenyapSelesai: menitDariJam(e.target.value) })}
-                aria-label="Jam senyap selesai"
+                aria-label="Quiet hours end"
                 className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
               />
             </span>

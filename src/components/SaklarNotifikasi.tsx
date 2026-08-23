@@ -6,7 +6,7 @@ import { enablePush, pushStatus, pushSupported, type PushStatus } from '../lib/p
 // SATU TOMBOL untuk menghidupkan notifikasi, dari mana pun.
 //
 // MENGAPA DIBUAT. Menghidupkan notifikasi sebelumnya menuntut TIGA langkah yang
-// tidak pernah disebutkan berurutan: menyalakan widget "Pengingat" di beranda,
+// tidak pernah disebutkan berurutan: menyalakan widget "Reminders" di beranda,
 // menekan Nyalakan di sana, LALU menyalakan sedikitnya satu jenis pengingat.
 // Yang melewatkan langkah ketiga mendapat izin peramban, lencana hijau, dan
 // kesunyian — karena mesin aturan tidak punya satu pun jenis yang boleh
@@ -55,19 +55,19 @@ export function SaklarNotifikasi({ ringkas = false, onSelesai }: { ringkas?: boo
           tzOffsetMin: -new Date().getTimezoneOffset(),
         })
         setKabar(adaYangNyala
-          ? 'Notifikasi aktif. Jenis pengingat yang sudah Anda pilih tetap seperti semula.'
-          : 'Notifikasi aktif, dan empat jenis pengingat dinyalakan: pemulihan & tidur, latihan, vital, dan kebiasaan mencatat. Semuanya dapat diubah kapan saja.')
+          ? 'Notifications are on. The reminder types you already chose are left exactly as they were.'
+          : 'Notifications are on, and four reminder types were switched on: recovery & sleep, training, vitals, and logging habits. All of them can be changed at any time.')
       } catch {
-        setKabar('Notifikasi aktif di perangkat ini, tetapi jenis pengingatnya belum tersimpan di server. Coba lagi sebentar.')
+        setKabar('Notifications are on for this device, but the reminder types were not saved on the server. Try again in a moment.')
       }
     } else if (hasil === 'denied') {
-      setKabar('Izin ditolak. Tombol ini tidak dapat membatalkannya — bukalah pengaturan situs di peramban Anda, izinkan notifikasi, lalu kembali ke sini.')
+      setKabar('Permission denied. This button cannot undo that — open your browser\'s site settings, allow notifications, then come back here.')
     } else if (hasil === 'unsupported') {
-      setKabar('Peramban ini belum mendukungnya. Di iPhone, pasang dahulu aplikasi ini ke Layar Utama lewat menu Bagikan, lalu buka dari ikonnya.')
+      setKabar('This browser does not support them yet. On iPhone, add this app to the Home Screen from the Share menu first, then open it from that icon.')
     } else if (hasil === 'unavailable') {
-      setKabar('Server belum siap mengirim notifikasi. Buka “Notifikasi tidak berbunyi?” di widget Pengingat untuk melihat bagian mana yang belum siap.')
+      setKabar('The server is not ready to send notifications. Open “Notifications not arriving?” in the Reminders widget to see which part is missing.')
     } else {
-      setKabar('Belum aktif — izin belum diberikan.')
+      setKabar('Still off — permission has not been granted.')
     }
 
     setSibuk(false)
@@ -79,7 +79,7 @@ export function SaklarNotifikasi({ ringkas = false, onSelesai }: { ringkas?: boo
     if (ringkas) return null
     return (
       <p className="t-mikro flex items-center gap-1.5 text-neutral-500">
-        <span aria-hidden>✓</span> Notifikasi aktif di perangkat ini.
+        <span aria-hidden>✓</span> Notifications are on for this device.
       </p>
     )
   }
@@ -88,16 +88,16 @@ export function SaklarNotifikasi({ ringkas = false, onSelesai }: { ringkas?: boo
 
   return (
     <div className="rounded-2xl bg-brand/10 p-3 dark:bg-brand/15">
-      <p className="t-kecil font-bold text-ink dark:text-white">Notifikasi belum aktif</p>
+      <p className="t-kecil font-bold text-ink dark:text-white">Notifications are off</p>
       <p className="t-mikro mt-0.5 leading-snug text-neutral-600 dark:text-neutral-300">
-        Satu ketukan menyalakan izin, mendaftarkan perangkat ini, sekaligus memilih jenis pengingat bawaan.
+        One tap grants permission, registers this device, and picks the default reminder types.
       </p>
       <button
         onClick={nyalakan}
         disabled={sibuk || !bisaDitekan}
         className="t-sedang mt-2 flex h-12 w-full items-center justify-center rounded-xl bg-brand px-4 font-bold text-white transition active:scale-[0.98] disabled:opacity-50"
       >
-        {sibuk ? 'Menyiapkan…' : 'Nyalakan notifikasi'}
+        {sibuk ? 'Setting up…' : 'Turn on notifications'}
       </button>
       {/* Hasilnya diumumkan, bukan hanya ditampilkan: yang memakai pembaca
           layar tidak melihat perubahan warna atau munculnya baris baru. */}

@@ -42,18 +42,18 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
 
     const didukung = pushSupported()
     out.push({
-      nama: 'Peramban mendukung notifikasi',
+      nama: 'This browser supports notifications',
       keadaan: didukung ? 'ok' : 'gagal',
-      sebab: didukung ? undefined : 'Safari di iOS hanya mendukungnya bila aplikasi ini dipasang ke layar utama lebih dahulu.',
+      sebab: didukung ? undefined : 'On iOS, Safari only supports them once this app has been added to the Home Screen.',
     })
 
     const izin = didukung ? Notification.permission : 'default'
     out.push({
-      nama: 'Izin diberikan',
+      nama: 'Permission granted',
       keadaan: izin === 'granted' ? 'ok' : izin === 'denied' ? 'gagal' : 'tanya',
       sebab: izin === 'denied'
-        ? 'Ditolak. Tombol di aplikasi tidak dapat membatalkannya — buka pengaturan situs di peramban Anda, lalu izinkan notifikasi.'
-        : izin === 'granted' ? undefined : 'Belum ditanyakan — tekan “Nyalakan”.',
+        ? 'Denied. No button in the app can undo that — open your browser\'s site settings and allow notifications.'
+        : izin === 'granted' ? undefined : 'Not asked yet — press “Turn on notifications”.',
     })
 
     let langgananAda = false
@@ -64,9 +64,9 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
       } catch { /* peramban menolak — dianggap belum ada */ }
     }
     out.push({
-      nama: 'Langganan terbentuk di peramban',
+      nama: 'Subscription created in the browser',
       keadaan: langgananAda ? 'ok' : 'gagal',
-      sebab: langgananAda ? undefined : 'Belum ada. Ini terbentuk sendiri saat izin diberikan.',
+      sebab: langgananAda ? undefined : 'None yet. It is created automatically once permission is granted.',
     })
 
     /* KEADAAN SERVER DITANYAKAN KE SERVER, bukan disimpulkan dari satu bendera.
@@ -82,26 +82,26 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
       try { ks = await api.pushStatusServer() } catch { ks = null }
     }
     out.push({
-      nama: 'Server punya kunci VAPID',
+      nama: 'The server has VAPID keys',
       keadaan: ks === null ? 'periksa' : ks.vapidDiisi ? (ks.vapidGalat ? 'gagal' : 'ok') : 'gagal',
       sebab: ks === null
-        ? 'Server tidak dapat dihubungi saat memeriksa.'
+        ? 'The server could not be reached during this check.'
         : !ks.vapidDiisi
-          ? 'Belum diisi. Tanpa VAPID_PUBLIC_KEY dan VAPID_PRIVATE_KEY di server, TIDAK ADA satu pun notifikasi yang dapat dikirim — berapa pun saklar yang dinyalakan di sini. Kuncinya dibuat sekali dengan “npx web-push generate-vapid-keys”, lalu diisikan ke Environment di Render dan server dijalankan ulang.'
+          ? 'Not set. Without VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY on the server, NO notification can be sent at all — however many switches are turned on here. Generate the keys once with “npx web-push generate-vapid-keys”, put them into the Render environment, and restart the server.'
           : ks.vapidGalat
-            ? `Kuncinya ada tetapi DITOLAK server: ${ks.vapidGalat}. Paling sering karena spasi atau baris baru ikut tersalin saat menempel, atau kunci publik dan privatnya tertukar.`
+            ? `The keys are set but the server REJECTED them: ${ks.vapidGalat}. Usually a stray space or newline came along when pasting, or the public and private keys were swapped.`
             : undefined,
     })
 
     out.push({
-      nama: 'Server menyimpan langganan perangkat ini',
+      nama: 'The server holds a subscription for this device',
       keadaan: ks === null ? 'periksa' : ks.langganan > 0 ? 'ok' : 'gagal',
       sebab: ks === null ? undefined
         : ks.langganan > 0
-          ? `${ks.langganan} perangkat terdaftar.`
+          ? `${ks.langganan} device(s) registered.`
           : ks.penyimpanan === 'berkas'
-            ? 'Tidak ada. Server ini juga berjalan tanpa basis data tetap, sehingga daftar langganan TERHAPUS pada setiap deploy ulang — tekan “Nyalakan” lagi, dan isi MONGODB_URI agar tidak terulang.'
-            : 'Tidak ada. Tekan “Nyalakan” sekali lagi di perangkat ini.',
+            ? 'None. This server also runs without a permanent database, so the subscription list is WIPED on every redeploy — press “Turn on notifications” again, and set MONGODB_URI so it stops happening.'
+            : 'None. Press “Turn on notifications” once more on this device.',
     })
 
     /* APAKAH PENJADWALNYA MEMANG BERJALAN.
@@ -115,20 +115,20 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
       const menit = Math.round(ks.hidupDetik / 60)
       const baruBangun = ks.hidupDetik < 20 * 60
       out.push({
-        nama: 'Penjadwal server sedang berjalan',
+        nama: 'The server scheduler is running',
         keadaan: baruBangun ? 'tanya' : 'ok',
         sebab: baruBangun
-          ? `Server baru hidup ${menit} menit — kemungkinan besar baru dibangunkan oleh kunjungan ini. Selama tertidur ia tidak memeriksa jadwal siapa pun. Lihat catatan di bawah untuk cara membangunkannya sendiri tanpa biaya.`
-          : `Sudah hidup ${menit >= 120 ? `${Math.round(menit / 60)} jam` : `${menit} menit`} tanpa terputus.`,
+          ? `The server has only been up for ${menit} min — most likely this very visit woke it. While it sleeps it checks nobody's schedule. See the note below for how to keep it awake at no cost.`
+          : `Up for ${menit >= 120 ? `${Math.round(menit / 60)} h` : `${menit} min`} without interruption.`,
       })
     }
 
     const jenisNyala = ['notifPemulihan', 'notifLatihanPintar', 'notifVital', 'notifLingkungan', 'notifGizi', 'notifKebiasaan']
       .filter((k) => setelan[k] === true).length
     out.push({
-      nama: 'Sedikitnya satu jenis pengingat menyala',
+      nama: 'At least one reminder type is on',
       keadaan: jenisNyala > 0 ? 'ok' : 'gagal',
-      sebab: jenisNyala > 0 ? `${jenisNyala} jenis menyala.` : 'Semua saklar mati, jadi mesin aturan tidak punya satu pun jenis yang boleh dikirim.',
+      sebab: jenisNyala > 0 ? `${jenisNyala} type(s) switched on.` : 'Every switch is off, so the rule engine has no category it is allowed to send.',
     })
 
     setMata(out)
@@ -146,12 +146,12 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
       // setiap deploy ulang.
       await resyncPush()
       const r = await api.pushTest()
-      if (r.sent > 0) setUji(`Terkirim ke ${r.sent} perangkat. Bila tidak muncul juga, periksa mode fokus atau senyap di ponsel Anda.`)
-      else if (r.reason === 'vapid_not_configured') setUji('Server belum diberi kunci VAPID — itulah sebabnya. Lihat baris keempat di atas.')
-      else if (r.reason === 'no_subscriptions_on_file') setUji('Server tidak punya langganan perangkat ini. Tekan “Nyalakan” sekali lagi, lalu ulangi percobaan ini.')
-      else setUji('Server mencoba mengirim tetapi gagal. Sebab persisnya hanya tercatat di log server.')
+      if (r.sent > 0) setUji(`Sent to ${r.sent} device(s). If nothing shows up, check Focus or silent mode on your phone.`)
+      else if (r.reason === 'vapid_not_configured') setUji('The server has no VAPID keys — that is the reason. See the fourth line above.')
+      else if (r.reason === 'no_subscriptions_on_file') setUji('The server holds no subscription for this device. Press “Turn on notifications” again, then retry this test.')
+      else setUji('The server tried to send and failed. The exact reason is only recorded in the server log.')
     } catch {
-      setUji('Tidak dapat menghubungi server. Instans gratis tidur setelah 15 menit — coba lagi sekitar satu menit lagi.')
+      setUji('Could not reach the server. A free instance sleeps after 15 minutes — try again in about a minute.')
     }
     setSibuk(false)
     void periksa()
@@ -162,7 +162,7 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
   return (
     <div className="border-t border-neutral-100 py-2 dark:border-white/10">
       <button onClick={() => setBuka((b) => !b)} className="t-kecil flex min-h-[40px] w-full items-center justify-between gap-2 font-bold text-brand">
-        <span>Notifikasi tidak berbunyi? Periksa di sini</span>
+        <span>Notifications not arriving? Check here</span>
         <span aria-hidden>{buka ? '▴' : '▾'}</span>
       </button>
 
@@ -185,7 +185,7 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
             disabled={sibuk}
             className="t-kecil mt-3 min-h-[40px] w-full rounded-xl bg-brand px-3 font-bold text-white disabled:opacity-50"
           >
-            {sibuk ? 'Mengirim…' : 'Kirim notifikasi percobaan'}
+            {sibuk ? 'Sending…' : 'Send a test notification'}
           </button>
           {uji && <p className="t-mikro mt-2 leading-snug text-neutral-600 dark:text-neutral-300">{uji}</p>}
 
@@ -193,12 +193,12 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
               karena itu harus dikatakan: penjadwalnya hidup di server, dan
               server gratis dimatikan saat tidak ada yang membukanya. */}
           <p className="t-mikro mt-2 leading-snug text-neutral-400">
-            Pengingat berjadwal dikirim server, bukan oleh ponsel Anda. Pada paket gratis Render, server dimatikan
-            setelah 15 menit tanpa kunjungan — selama tertidur ia tidak memeriksa jadwal siapa pun, sehingga pengingat
-            pukul lima sore dapat terlewat pada hari aplikasi ini tidak dibuka sama sekali. Itu batas paketnya, bukan
-            kesalahan setelan Anda. Repositori ini sudah memuat alur kerja GitHub Actions yang menyentuh server tiap
-            sepuluh menit pada pukul 04.00-23.00 WIB supaya ia tetap bangun tanpa biaya tambahan; yang perlu diisi
-            hanya variabel repositori <code>SERVER_URL</code>.
+            Scheduled reminders are sent by the server, not by your phone. On Render's free plan the server is shut
+            down after 15 minutes without a visit — while it sleeps it checks nobody's schedule, so a 5 pm reminder can
+            be missed entirely on a day this app is never opened. That is the plan's limit, not a mistake in your
+            settings. This repository already ships a GitHub Actions workflow that touches the server every ten minutes
+            between 04:00 and 23:00 WIB to keep it awake at no extra cost; the address is taken from the
+            <code>VITE_API_URL</code> repository variable you already have.
           </p>
         </div>
       )}
