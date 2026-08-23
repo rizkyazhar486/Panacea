@@ -213,7 +213,7 @@ export function ShareStatCard(props: StatCardProps) {
         className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition active:scale-95"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}
       >
-        <IconShare2 size={16} /> Share Results
+        <IconShare2 size={16} /> Bagikan Hasil
       </button>
 
       {open && (
@@ -221,7 +221,7 @@ export function ShareStatCard(props: StatCardProps) {
         <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/50 sm:items-center" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
           <div className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-black text-ink">Share Results</h3>
+              <h3 className="text-base font-black text-ink">Bagikan Hasil</h3>
               <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100"><IconX size={18} /></button>
             </div>
 
