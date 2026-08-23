@@ -6,6 +6,17 @@ import { listPushSubs, removePushSub, addNotification, getSettings } from './sto
 // keys are configured.
 let configured = false
 let webpush: any = null
+/* SEBAB KEGAGALAN TERAKHIR DISIMPAN, bukan hanya dicetak ke log.
+   Kunci VAPID yang salah tempel — spasi ikut tersalin, panjangnya kurang —
+   gagal persis di sini, dan satu-satunya jejaknya selama ini adalah satu baris
+   di log Render yang tidak pernah dilihat pemakainya. Disimpan supaya
+   /api/push/status dapat menyebutkannya, dan panel diagnosa di aplikasi dapat
+   membedakan "kunci belum diisi" dari "kunci diisi tetapi ditolak". */
+let galatSiapan = ''
+
+export function keadaanPush(): { vapidTerpasang: boolean; galat: string } {
+  return { vapidTerpasang: configured, galat: galatSiapan }
+}
 
 async function ensure(): Promise<boolean> {
   if (!features.pushLive) return false
@@ -25,6 +36,7 @@ async function ensure(): Promise<boolean> {
     }
     webpush.setVapidDetails(config.vapid.subject, config.vapid.publicKey, config.vapid.privateKey)
     configured = true
+    galatSiapan = ''
     return true
   } catch (e) {
     // Surface the real reason in logs — a malformed VAPID key (stray
@@ -32,6 +44,7 @@ async function ensure(): Promise<boolean> {
     // fails silently here otherwise, and every push send would return 0 with
     // no clue why. Check Render's Logs tab for this line if push still
     // doesn't work after VAPID keys are set correctly.
+    galatSiapan = (e as Error).message
     console.error('[push] VAPID setup failed — check VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY for typos/whitespace, or that the web-push package installed correctly:', (e as Error).message)
     return false
   }

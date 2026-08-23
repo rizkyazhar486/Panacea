@@ -69,16 +69,36 @@ export function DiagnosaNotifikasi({ setelan }: { setelan: Record<string, unknow
       sebab: langgananAda ? undefined : 'Belum ada. Ini terbentuk sendiri saat izin diberikan.',
     })
 
-    let vapid: boolean | null = null
+    /* KEADAAN SERVER DITANYAKAN KE SERVER, bukan disimpulkan dari satu bendera.
+       Tiga keadaan yang selama ini terlihat sama dibedakan di sini: kunci belum
+       diisi, kunci diisi dan berhasil dipasang, dan kunci diisi tetapi DITOLAK
+       — yang terakhir itulah yang terjadi pada kunci yang tersalin bersama
+       spasi, dan sebelumnya hanya tercatat di log server. */
+    let ks: { vapidDiisi: boolean; vapidDicoba: boolean; vapidGalat?: string; langganan: number; penyimpanan: string } | null = null
     if (backendEnabled) {
-      try { vapid = Boolean((await api.health()).features?.push) } catch { vapid = null }
+      try { ks = await api.pushStatusServer() } catch { ks = null }
     }
     out.push({
       nama: 'Server punya kunci VAPID',
-      keadaan: vapid === true ? 'ok' : vapid === false ? 'gagal' : 'periksa',
-      sebab: vapid === false
-        ? 'Belum diisi. Tanpa VAPID_PUBLIC_KEY dan VAPID_PRIVATE_KEY di server, TIDAK ADA satu pun notifikasi yang dapat dikirim — berapa pun saklar yang dinyalakan di sini. Kuncinya dibuat sekali dengan “npx web-push generate-vapid-keys”, lalu diisikan ke Environment di Render dan server dijalankan ulang.'
-        : vapid === null ? 'Server tidak dapat dihubungi saat memeriksa.' : undefined,
+      keadaan: ks === null ? 'periksa' : ks.vapidDiisi ? (ks.vapidGalat ? 'gagal' : 'ok') : 'gagal',
+      sebab: ks === null
+        ? 'Server tidak dapat dihubungi saat memeriksa.'
+        : !ks.vapidDiisi
+          ? 'Belum diisi. Tanpa VAPID_PUBLIC_KEY dan VAPID_PRIVATE_KEY di server, TIDAK ADA satu pun notifikasi yang dapat dikirim — berapa pun saklar yang dinyalakan di sini. Kuncinya dibuat sekali dengan “npx web-push generate-vapid-keys”, lalu diisikan ke Environment di Render dan server dijalankan ulang.'
+          : ks.vapidGalat
+            ? `Kuncinya ada tetapi DITOLAK server: ${ks.vapidGalat}. Paling sering karena spasi atau baris baru ikut tersalin saat menempel, atau kunci publik dan privatnya tertukar.`
+            : undefined,
+    })
+
+    out.push({
+      nama: 'Server menyimpan langganan perangkat ini',
+      keadaan: ks === null ? 'periksa' : ks.langganan > 0 ? 'ok' : 'gagal',
+      sebab: ks === null ? undefined
+        : ks.langganan > 0
+          ? `${ks.langganan} perangkat terdaftar.`
+          : ks.penyimpanan === 'berkas'
+            ? 'Tidak ada. Server ini juga berjalan tanpa basis data tetap, sehingga daftar langganan TERHAPUS pada setiap deploy ulang — tekan “Nyalakan” lagi, dan isi MONGODB_URI agar tidak terulang.'
+            : 'Tidak ada. Tekan “Nyalakan” sekali lagi di perangkat ini.',
     })
 
     const jenisNyala = ['notifPemulihan', 'notifLatihanPintar', 'notifVital', 'notifLingkungan', 'notifGizi', 'notifKebiasaan']

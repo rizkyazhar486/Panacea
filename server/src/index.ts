@@ -110,7 +110,7 @@ import { emailOtpStart, emailOtpVerify, emailOtpLive } from './otp.js'
 import { putusanPengingat } from './jadwal.js'
 import { aiMessages, aiConsult, aiVision, aiOperator, reviewApplicationText, draftSecondOpinion, generateOperatorBriefing, aiConfigured, aiStatus } from './ai.js'
 import { sendEmail } from './email.js'
-import { sendPush, notify } from './push.js'
+import { sendPush, notify, keadaanPush } from './push.js'
 import { submitEmr } from './satusehat.js'
 import { createPayment, confirmPayment, paymentWebhook, orderStatus } from './payments.js'
 import { disburse, irisLive } from './iris.js'
@@ -1185,6 +1185,29 @@ app.get('/api/markets/news', async (_req, res) => {
 
 // --- Web Push notifications ---
 app.get('/api/push/key', (_req, res) => res.json({ key: features.pushLive ? config.vapid.publicKey : null }))
+/*
+ * KEADAAN PUSH UNTUK ORANG YANG SEDANG MASUK.
+ *
+ * Tanpa ini, satu-satunya cara mengetahui apakah server benar-benar memegang
+ * langganan perangkat seseorang adalah dengan MENGIRIM notifikasi percobaan —
+ * dan itu berarti setiap pemeriksaan mengirim satu pemberitahuan sungguhan ke
+ * ponsel orang. Di sini jawabannya diberikan tanpa mengirim apa pun.
+ *
+ * `vapidDicoba` membedakan tiga keadaan yang selama ini terlihat sama: kunci
+ * belum diisi, kunci sudah diisi dan berhasil dipasang, dan kunci sudah diisi
+ * tetapi DITOLAK (salah tempel, ada spasi, panjangnya kurang).
+ */
+app.get('/api/push/status', requireAuth, (req, res) => {
+  const u = (req as express.Request & { user: User }).user
+  const k = keadaanPush()
+  res.json({
+    vapidDiisi: features.pushLive,
+    vapidDicoba: k.vapidTerpasang,
+    vapidGalat: k.galat || undefined,
+    langganan: listPushSubs(u.id).length,
+    penyimpanan: modePenyimpanan(),
+  })
+})
 app.post('/api/push/subscribe', requireAuth, (req, res) => {
   const u = (req as express.Request & { user: User }).user
   const sub = (req.body as { subscription?: unknown }).subscription
