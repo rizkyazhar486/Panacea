@@ -418,15 +418,15 @@ function SubstanceCard({ s }: { s: Substance }) {
       </button>
       {open && (
         <div className="space-y-3 border-t border-neutral-100 p-4 dark:border-white/10">
-          <Row label="Clinical Reality">{s.clinicalReality}</Row>
-          <Row label="Marketing Hype">{s.marketingHype}</Row>
-          <Row label="Mechanism">{s.mechanism}</Row>
-          <Row label="Evidence of Efficacy">{s.efficacy}</Row>
-          <Row label="Evidence of Safety">{s.safety}</Row>
-          <Row label="Reported Adverse Effects">
+          <Row label="Kenyataan Klinis">{s.clinicalReality}</Row>
+          <Row label="Klaim Pemasaran">{s.marketingHype}</Row>
+          <Row label="Mekanisme">{s.mechanism}</Row>
+          <Row label="Bukti Kemanjuran">{s.efficacy}</Row>
+          <Row label="Bukti Keamanan">{s.safety}</Row>
+          <Row label="Efek Merugikan yang Dilaporkan">
             <ul className="ml-4 list-disc space-y-0.5">{s.adverse.map((a) => <li key={a}>{a}</li>)}</ul>
           </Row>
-          <Row label="Regulatory / Legal Status">{s.legal}</Row>
+          <Row label="Status Regulasi / Hukum">{s.legal}</Row>
         </div>
       )}
     </div>
@@ -448,7 +448,7 @@ export function DietarySupplements() {
         />
         <Prosa kelas="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Atlet dan orang yang aktif memakai bermacam produk untuk memperbaiki penampilan, pemulihan, dan bentuk tubuh — dari zat gizi yang sudah banyak diteliti sampai hormon resep dan bahan kimia penelitian yang tidak disetujui. Halaman ini meninjau apa sebenarnya zat-zat itu, apa yang ditunjukkan dan TIDAK ditunjukkan buktinya, serta keadaan keamanan dan hukumnya. Tujuannya pengurangan bahaya secara jujur dan berdasar.</Prosa>
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-          <b>Important:</b> Ini bahan belajar, bukan panduan cara memakai. Halaman ini dengan sengaja tidak memuat <b>no doses, cycles, or protocols</b> for
+          <b>Penting:</b> Ini bahan belajar, bukan panduan cara memakai. Halaman ini dengan sengaja tidak memuat <b>no doses, cycles, or protocols</b> for
           steroids, SARMs, research peptides, or banned agents. Prescription medicines belong under the care of a licensed clinician;
           many substances below are illegal to sell, unapproved, and/or prohibited in sport. Nothing here is medical advice.
         </div>
@@ -456,7 +456,7 @@ export function DietarySupplements() {
 
       {/* Category selector */}
       <Card className="!p-4">
-        <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Selected Ingredients — browse by category</div>
+        <div className="text-[11px] font-bold uppercase tracking-wide text-neutral-500">Bahan Terpilih — telusuri menurut golongan</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
             <button
@@ -503,7 +503,7 @@ export function DietarySupplements() {
 
       {/* Regulation */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="Regulation" subtitle="Bagaimana suplemen diatur — dan tidak diatur" />
+        <SectionTitle icon={<IconShield size={20} />} title="Regulasi" subtitle="Bagaimana suplemen diatur — dan tidak diatur" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li>Suplemen makanan bersifat <b>not</b> reviewed for safety and efficacy before sale the way medicines are; manufacturers are responsible for safety, and regulators act mainly after problems appear.</li>
           <li>Supplements can be <b>contaminated or adulterated</b> with unlabeled drugs (including steroids and stimulants) — a real cause of failed drug tests and health harm.</li>
@@ -514,7 +514,7 @@ export function DietarySupplements() {
 
       {/* Safety considerations */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconHeart size={20} />} title="Safety Considerations" subtitle="Sebelum memakai apa pun" />
+        <SectionTitle icon={<IconHeart size={20} />} title="Pertimbangan Keamanan" subtitle="Sebelum memakai apa pun" />
         <ul className="mt-2 ml-4 list-disc space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li>"Natural" and "supplement" do not mean safe, effective, or legal.</li>
           <li>Lebih banyak bukan berarti lebih baik — beberapa zat yang benar-benar bekerja (kafein, bikarbonat, kreatin) jelas menunjukkan hasil yang makin kecil pada dosis besar, disertai efek samping yang bergantung dosis.</li>
@@ -526,19 +526,19 @@ export function DietarySupplements() {
 
       {/* Choosing a sensible approach */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Choosing a Sensible Approach" subtitle="Foundations first" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Memilih Sikap yang Masuk Akal" subtitle="Dasarnya dahulu" />
         <ol className="mt-2 ml-4 list-decimal space-y-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           <li><b>Benahi dasarnya lebih dahulu:</b> training, total energy and protein, sleep, and recovery drive the vast majority of results.</li>
           <li><b>Pakai hanya zat yang buktinya kuat dan diizinkan</b> where they fit your sport (e.g. creatine, caffeine, β-alanine, nitrate).</li>
-          <li><b>Prefer third-party-tested products</b> to reduce contamination and doping risk.</li>
+          <li><b>Utamakan produk yang diuji pihak ketiga</b> to reduce contamination and doping risk.</li>
           <li><b>Hindari obat yang tidak disetujui dan bahan kimia penelitian</b> — the risk/benefit and legal exposure are unfavorable.</li>
-          <li><b>Involve a clinician or accredited sports dietitian</b> for individualized, safe decisions.</li>
+          <li><b>Libatkan dokter atau ahli gizi olahraga bersertifikat</b> for individualized, safe decisions.</li>
         </ol>
       </Card>
 
       {/* Usage prevalence */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconChartUp size={20} />} title="Reported Usage Prevalence" subtitle="Rentang perkiraan dari survei & tinjauan — angkanya sangat berbeda antarpopulasi" />
+        <SectionTitle icon={<IconChartUp size={20} />} title="Prevalensi Pemakaian yang Dilaporkan" subtitle="Rentang perkiraan dari survei & tinjauan — angkanya sangat berbeda antarpopulasi" />
         <div className="mt-3 space-y-2">
           {PREVALENCE.map((p) => (
             <div key={p.group} className="rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
@@ -554,7 +554,7 @@ export function DietarySupplements() {
 
       {/* References */}
       <Card className="!p-5">
-        <SectionTitle icon={<IconShield size={20} />} title="References & Further Reading" />
+        <SectionTitle icon={<IconShield size={20} />} title="Rujukan & Bacaan Lanjutan" />
         <ul className="mt-2 ml-4 list-disc space-y-1 text-xs leading-relaxed text-neutral-500 dark:text-neutral-500">
           {REFERENCES.map((r) => <li key={r}>{r}</li>)}
         </ul>
