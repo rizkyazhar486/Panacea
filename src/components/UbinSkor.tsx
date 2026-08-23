@@ -36,6 +36,13 @@ const KEADAAN: Record<Laga['state'], { label: string; kelas: string }> = {
   pre: { label: 'Akan main', kelas: 'bg-brand/15 text-brand-dark dark:text-brand' },
 }
 
+/* Liga sepak bola yang timnya juga dapat bermain di Liga Champions. Dipakai
+   untuk mencari sekali lagi tim yang liga domestiknya sedang kosong pekan itu. */
+const SEPAKBOLA = new Set([
+  'epl', 'laliga', 'seriea', 'bundesliga', 'ligue1', 'eredivisie', 'primeira',
+  'belpro', 'superlig', 'scottish', 'championship',
+])
+
 function Lambang({ src, nama }: { src?: string; nama: string }) {
   const [rusak, setRusak] = useState(false)
   const inisial = nama.split(/\s+/).map((w) => w[0]).join('').slice(0, 3).toUpperCase()
@@ -53,6 +60,7 @@ export function UbinSkor() {
   const [laga, setLaga] = useState<Laga[] | null>(null)
   const [galat, setGalat] = useState('')
   const [adaFavorit, setAdaFavorit] = useState<boolean | null>(null)
+  const [kosongTim, setKosongTim] = useState<{ nama: string; sebab: 'gagal' | 'kosong' }[]>([])
   const geser = useRef<HTMLDivElement>(null)
   const [aktif, setAktif] = useState(0)
 
@@ -82,104 +90,130 @@ export function UbinSkor() {
         const favorit = await api.getSportsFavorites()
         if (!hidup) return
         setAdaFavorit(favorit.length > 0)
-        if (!favorit.length) { setLaga([]); return }
+        if (!favorit.length) { setLaga([]); setKosongTim([]); return }
 
-        // Dikelompokkan per liga supaya satu liga cukup satu permintaan,
-        // dan dibatasi tiga liga: widget seukuran ini hanya memuat dua laga,
-        // jadi menarik sepuluh liga hanya membuang kuota orang.
-        const perLiga = new Map<string, Set<string>>()
+        // "liga:nama tim" — persis seperti yang tertulis di papan skor saat
+        // bintangnya ditekan.
+        const tim: { liga: string; nama: string }[] = []
         for (const f of favorit) {
           const [liga, ...sisa] = f.split(':')
           const nama = sisa.join(':')
-          if (!liga || !nama) continue
-          const a = perLiga.get(liga)
-          if (a) a.add(nama)
-          else perLiga.set(liga, new Set([nama]))
+          if (liga && nama) tim.push({ liga, nama })
         }
+        if (!tim.length) { setLaga([]); setKosongTim([]); return }
 
         /* PENCOCOKAN NAMA DILONGGARKAN.
-           Favorit disimpan sebagai "liga:nama tim" persis seperti yang
-           tertulis di papan skor saat ditekan bintang. Nama itu bisa berubah
-           ejaannya di sumbernya ("Tottenham Hotspur" vs "Tottenham"), dan
-           pembandingan huruf-per-huruf membuat tim yang jelas-jelas dibintangi
-           tidak pernah cocok — persis keluhan yang membuat bagian ini ditulis
-           ulang. Sekarang cocok bila salah satu nama memuat yang lain, atau
-           singkatannya sama. */
-        const cocok = (t: Set<string>, r?: Regu) => {
+           Nama bisa berubah ejaannya di sumbernya ("Tottenham Hotspur" vs
+           "Tottenham"), dan pembandingan huruf-per-huruf membuat tim yang
+           jelas-jelas dibintangi tidak pernah cocok. */
+        const cocokSatu = (nama: string, r?: Regu) => {
           if (!r) return false
-          const nama = (r.name ?? '').toLowerCase()
+          const n = (r.name ?? '').toLowerCase()
           const singkat = (r.abbrev ?? '').toLowerCase()
-          for (const f of t) {
-            const p = f.toLowerCase()
-            if (!p) continue
-            if (nama === p || singkat === p) return true
-            if (nama.includes(p) || p.includes(nama)) return true
-          }
-          return false
+          const p = nama.toLowerCase()
+          if (!p) return false
+          return n === p || singkat === p || n.includes(p) || p.includes(n)
         }
+        const adaDi = (nama: string, e: Laga) => cocokSatu(nama, e.home) || cocokSatu(nama, e.away)
 
-        const ambil = async (liga: string, tim: Set<string>, dates?: string) => {
-          const keluar: Laga[] = []
-          try {
-            const r = await api.getSportsScores(liga, dates)
-            for (const e of (r.events ?? []) as Laga[]) {
-              if (cocok(tim, e.home) || cocok(tim, e.away)) keluar.push(e)
-            }
-          } catch { /* satu liga gagal tidak boleh menjatuhkan yang lain */ }
-          return keluar
-        }
-
-        /* SEMUA LIGA YANG DIBINTANGI, DALAM SATU RENTANG TANGGAL.
-           Dua batas sebelumnya membuat widget ini hanya sanggup menampilkan
-           satu tim: hanya tiga liga yang ditanyakan, dan papan skor tanpa
-           rentang tanggal hanya berisi pertandingan HARI INI — sehingga tim
-           yang hari itu libur tidak pernah muncul, betapa pun ia dibintangi.
-           Rentangnya kini kemarin sampai empat belas hari ke depan sejak
-           permintaan pertama, jadi yang sedang berjalan, yang baru selesai,
-           dan jadwal berikutnya datang bersamaan. */
         const cap = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
-        const rentang = `${cap(new Date(Date.now() - 864e5))}-${cap(new Date(Date.now() + 14 * 864e5))}`
-        const ligaSemua = [...perLiga.entries()].slice(0, 6)
-        const kumpul: Laga[] = []
-        for (const [liga, tim] of ligaSemua) kumpul.push(...await ambil(liga, tim, rentang))
-        if (!hidup) return
+        const rentang = (hariKeDepan: number) =>
+          `${cap(new Date(Date.now() - 864e5))}-${cap(new Date(Date.now() + hariKeDepan * 864e5))}`
 
-        // Satu laga dapat cocok untuk dua tim yang sama-sama dibintangi.
-        const unik = new Map<string, Laga>()
-        for (const e of kumpul) if (e?.id && !unik.has(e.id)) unik.set(e.id, e)
+        const gagal = new Set<string>()
+        const singgah = new Map<string, Laga[]>()
+        const ambil = async (liga: string, hariKeDepan: number): Promise<Laga[]> => {
+          const kunci = `${liga}@${hariKeDepan}`
+          const ada = singgah.get(kunci)
+          if (ada) return ada
+          try {
+            const r = await api.getSportsScores(liga, rentang(hariKeDepan))
+            const ev = ((r.events ?? []) as Laga[]).filter((e) => e && e.id)
+            singgah.set(kunci, ev)
+            return ev
+          } catch {
+            // Kegagalan satu liga TIDAK BOLEH DIAM. Sebelum ini ia ditelan
+            // diam-diam, dan yang terlihat oleh pemakainya adalah tim yang
+            // dibintanginya "hilang" tanpa satu pun keterangan — persis
+            // keluhan yang membuat bagian ini ditulis ulang lagi.
+            gagal.add(liga)
+            singgah.set(kunci, [])
+            return []
+          }
+        }
+
+        // Satu permintaan per liga yang dibintangi, empat belas hari ke depan.
+        const ligaTim = [...new Set(tim.map((t) => t.liga))].slice(0, 6)
+        for (const liga of ligaTim) await ambil(liga, 14)
+
+        const punya = new Map<string, Laga[]>()
+        const catat = (kunciTim: string, ev: Laga[]) => {
+          if (ev.length) punya.set(kunciTim, [...(punya.get(kunciTim) ?? []), ...ev])
+        }
+        for (const t of tim) {
+          const ev = (singgah.get(`${t.liga}@14`) ?? []).filter((e) => adaDi(t.nama, e))
+          catat(`${t.liga}:${t.nama}`, ev)
+        }
+
+        /* TIM SEPAK BOLA JUGA MAIN DI PIALA.
+           PSG dibintangi pada tab Ligue 1, tetapi pada pekan Liga Champions
+           jadwal Ligue 1-nya kosong — dan widget ini lalu tidak menampilkan
+           apa pun untuk tim yang jelas sedang bermain. Yang belum kebagian
+           laga dicari sekali lagi di Liga Champions, lalu di jendela tiga
+           puluh hari liganya sendiri. */
+        const belum = tim.filter((t) => !punya.get(`${t.liga}:${t.nama}`)?.length)
+        if (belum.some((t) => SEPAKBOLA.has(t.liga))) {
+          const ucl = await ambil('ucl', 14)
+          for (const t of belum) {
+            if (!SEPAKBOLA.has(t.liga)) continue
+            catat(`${t.liga}:${t.nama}`, ucl.filter((e) => adaDi(t.nama, e)))
+          }
+        }
+        for (const t of tim.filter((x) => !punya.get(`${x.liga}:${x.nama}`)?.length)) {
+          const jauh = await ambil(t.liga, 30)
+          catat(`${t.liga}:${t.nama}`, jauh.filter((e) => adaDi(t.nama, e)))
+        }
+        if (!hidup) return
 
         // Yang sedang berjalan paling atas, lalu yang akan main, lalu yang
         // sudah selesai — urutan itu mengikuti seberapa mendesak orang ingin
         // melihatnya, bukan urutan abjad.
         const urutan = { in: 0, pre: 1, post: 2 }
-        const hasil = [...unik.values()].sort(
-          (a, b) => urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime),
-        )
+        const urut = (a: Laga, b: Laga) =>
+          urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime)
 
-        /* SETIAP TIM YANG DIBINTANGI KEBAGIAN SATU HALAMAN LEBIH DAHULU.
-           Bila daftar dipotong begitu saja, satu tim yang jadwalnya padat
-           memakan seluruh tempat dan tim lain tidak pernah tampak sama sekali
-           — persis keluhan yang membuat bagian ini ditulis ulang. Giliran
-           pertama diberikan satu laga untuk tiap tim, sisanya baru mengisi. */
-        const semuaTim = favorit.map((f) => f.split(':').slice(1).join(':')).filter(Boolean)
+        // Giliran pertama satu laga untuk TIAP tim, supaya satu tim yang
+        // jadwalnya padat tidak memakan seluruh tempat.
         const terpilih: Laga[] = []
         const sudah = new Set<string>()
-        for (const nama of semuaTim) {
-          const satu = new Set([nama])
-          const e = hasil.find((x) => !sudah.has(x.id) && (cocok(satu, x.home) || cocok(satu, x.away)))
+        for (const t of tim) {
+          const daftar = (punya.get(`${t.liga}:${t.nama}`) ?? []).sort(urut)
+          const e = daftar.find((x) => !sudah.has(x.id))
           if (e) { terpilih.push(e); sudah.add(e.id) }
         }
-        for (const e of hasil) {
-          if (terpilih.length >= 10) break
-          if (!sudah.has(e.id)) { terpilih.push(e); sudah.add(e.id) }
+        for (const daftar of punya.values()) {
+          for (const e of daftar.sort(urut)) {
+            if (terpilih.length >= 10) break
+            if (!sudah.has(e.id)) { terpilih.push(e); sudah.add(e.id) }
+          }
         }
-        terpilih.sort((a, b) => urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime))
-        setLaga(terpilih)
-        setGalat('')
+        terpilih.sort(urut)
 
-        if (hasil.some((e) => e.state === 'in')) jam = window.setTimeout(muat, 60_000)
+        // Tim yang benar-benar tidak punya jadwal TETAP DISEBUT, dengan
+        // alasannya. Bintang yang ditekan lalu tidak menghasilkan apa pun di
+        // layar terbaca sebagai kerusakan, padahal yang terjadi hanya "tidak
+        // ada jadwal" — dan kedua hal itu harus dapat dibedakan.
+        setKosongTim(
+          tim
+            .filter((t) => !punya.get(`${t.liga}:${t.nama}`)?.length)
+            .map((t) => ({ nama: t.nama, sebab: gagal.has(t.liga) ? 'gagal' : 'kosong' as 'gagal' | 'kosong' })),
+        )
+        setLaga(terpilih)
+        setGalat(gagal.size && !terpilih.length ? 'Sumber skor sedang tidak dapat dihubungi.' : '')
+
+        if (terpilih.some((e) => e.state === 'in')) jam = window.setTimeout(muat, 60_000)
       } catch {
-        if (hidup) { setGalat('Tidak dapat menghubungi server skor.'); setLaga([]) }
+        if (hidup) { setGalat('Tidak dapat menghubungi server skor.'); setLaga([]); setKosongTim([]) }
       }
     }
 
@@ -224,9 +258,16 @@ export function UbinSkor() {
             Belum ada tim favorit. Pilih tim di halaman Skor Olahraga →
           </Link>
         ) : laga.length === 0 ? (
-          <p className="t-kecil text-neutral-500">
-            Tidak ada pertandingan tim Anda hari ini maupun dalam 14 hari ke depan menurut sumber skor.
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <p className="t-kecil text-neutral-500">
+              Tidak ada pertandingan tim Anda dalam 30 hari ke depan menurut sumber skor.
+            </p>
+            {kosongTim.map((t) => (
+              <p key={t.nama} className="t-mikro text-neutral-400">
+                {t.nama} — {t.sebab === 'gagal' ? 'liganya tidak dapat diambil dari sumber skor saat ini' : 'tidak ada jadwal'}
+              </p>
+            ))}
+          </div>
         ) : (
           <div
             ref={geser}
@@ -269,6 +310,16 @@ export function UbinSkor() {
               )
             })}
           </div>
+        )}
+
+        {/* Tim yang dibintangi tetapi tanpa jadwal TETAP DISEBUT namanya.
+            Bintang yang ditekan lalu tidak menghasilkan apa pun di layar
+            terbaca sebagai kerusakan, padahal yang terjadi hanya "tidak ada
+            jadwal" — dan kedua hal itu harus dapat dibedakan tanpa menebak. */}
+        {laga.length > 0 && kosongTim.length > 0 && (
+          <p className="t-mikro mt-2 border-t border-neutral-200 pt-2 leading-snug text-neutral-400 dark:border-white/10">
+            {kosongTim.map((t) => `${t.nama} (${t.sebab === 'gagal' ? 'sumber gagal' : 'tanpa jadwal'})`).join(' · ')}
+          </p>
         )}
       </div>
     </section>
