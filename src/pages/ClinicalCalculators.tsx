@@ -35,18 +35,21 @@ function SegButtons<T extends string | number>({ value, onChange, options }: { v
 /* ══════════════════ APGAR ══════════════════ */
 function ApgarCalc() {
   const criteria: { key: string; label: string; opts: { v: number; l: string }[] }[] = [
-    { key: 'appearance', label: 'Appearance (skin color)', opts: [{ v: 0, l: 'Biru/pucat seluruhnya' }, { v: 1, l: 'Badan merah muda, ujung-ujung biru' }, { v: 2, l: 'Merah muda seluruhnya' }] },
-    { key: 'pulse', label: 'Pulse (heart rate)', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
-    { key: 'grimace', label: 'Grimace (reflex irritability)', opts: [{ v: 0, l: 'No response' }, { v: 1, l: 'Grimace' }, { v: 2, l: 'Strong cry/cough/sneeze' }] },
-    { key: 'activity', label: 'Activity (muscle tone)', opts: [{ v: 0, l: 'Limp' }, { v: 1, l: 'Some flexion of extremities' }, { v: 2, l: 'Active movement' }] },
-    { key: 'respiration', label: 'Respiration (breathing)', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: 'Slow/irregular' }, { v: 2, l: 'Strong cry' }] },
+    /* Nama medan tetap menyebut kata Inggrisnya di dalam kurung: A-P-G-A-R
+       adalah singkatan dari kelima kata itu, dan menghapusnya membuat nama
+       skornya tidak lagi dapat dihafal dari medannya. */
+    { key: 'appearance', label: 'Appearance — warna kulit', opts: [{ v: 0, l: 'Biru/pucat seluruhnya' }, { v: 1, l: 'Badan merah muda, ujung-ujung biru' }, { v: 2, l: 'Merah muda seluruhnya' }] },
+    { key: 'pulse', label: 'Pulse — denyut jantung', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
+    { key: 'grimace', label: 'Grimace — respons rangsang', opts: [{ v: 0, l: 'Tidak ada respons' }, { v: 1, l: 'Meringis' }, { v: 2, l: 'Menangis/batuk/bersin kuat' }] },
+    { key: 'activity', label: 'Activity — tonus otot', opts: [{ v: 0, l: 'Lemas' }, { v: 1, l: 'Sedikit fleksi anggota gerak' }, { v: 2, l: 'Gerak aktif' }] },
+    { key: 'respiration', label: 'Respiration — pernapasan', opts: [{ v: 0, l: 'Tidak ada' }, { v: 1, l: 'Lambat/tidak teratur' }, { v: 2, l: 'Menangis kuat' }] },
   ]
   const [v, setV] = useState<Record<string, number>>({ appearance: 2, pulse: 2, grimace: 2, activity: 2, respiration: 2 })
   const total = Object.values(v).reduce((a, b) => a + b, 0)
-  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Needs assistance', tone: 'low' as const } : { l: 'Severe depression', tone: 'critical' as const }
+  const interp = total >= 7 ? { l: 'Normal', tone: 'normal' as const } : total >= 4 ? { l: 'Perlu bantuan', tone: 'low' as const } : { l: 'Depresi berat', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="APGAR Score" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor APGAR" subtitle="Dinilai pada menit ke-1 dan ke-5 sesudah lahir (Apgar, 1953)" />
       <div className="space-y-3">
         {criteria.map((c) => (
           <Field key={c.key} label={c.label}>
@@ -82,10 +85,10 @@ function GcsCalc() {
   const interp = total >= 13 ? { l: 'Mild injury', tone: 'normal' as const } : total >= 9 ? { l: 'Moderate injury', tone: 'low' as const } : { l: 'Severe injury — airway protection indicated', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (Improved GCS)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan dkk., Lancet Neurol 2018" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="GCS + GCS-Pupil (GCS yang disempurnakan)" subtitle="Teasdale & Jennett, 1974 · GCS-P: Brennan dkk., Lancet Neurol 2018" />
       <div className="space-y-3">
         <Field label="Membuka Mata (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
-        <Field label="Verbal Response (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
+        <Field label="Respons Verbal (V)"><SegButtons value={v} onChange={setV} options={verbal} /></Field>
         <Field label="Respons Motorik (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
         <Field label="Reaktivitas Pupil"><SegButtons value={pupil} onChange={setPupil} options={pupilOpts} /></Field>
       </div>
@@ -164,7 +167,7 @@ function BishopCalc() {
     : { l: 'Unfavorable', tone: 'critical' as const, note: 'Consider cervical ripening agents (e.g. prostaglandins) before induction.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Bishop Score" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Bishop" subtitle="Kesiapan serviks untuk induksi persalinan (Bishop, 1964)" />
       <div className="space-y-3">
         <Field label="Pembukaan serviks"><SegButtons value={dilation} onChange={setDilation} options={dilationOpts} /></Field>
         <Field label="Pendataran"><SegButtons value={effacement} onChange={setEffacement} options={effacementOpts} /></Field>
@@ -323,7 +326,7 @@ function WhoGrowthCalc() {
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Age (WAZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Berat/Usia (WAZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{waz >= 0 ? '+' : ''}{waz.toFixed(2)} SD</div>
           <Badge tone={wazC.tone}>{wazC.l}</Badge>
         </div>
@@ -333,7 +336,7 @@ function WhoGrowthCalc() {
           <Badge tone={hazC.tone}>{hazC.l}</Badge>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3">
-          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Weight/Height (WHZ)</div>
+          <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">Berat/Tinggi (WHZ)</div>
           <div className="mt-1 text-xl font-black text-ink">{whz >= 0 ? '+' : ''}{whz.toFixed(2)} SD</div>
           <Badge tone={whzC.tone}>{whzC.l}</Badge>
         </div>
@@ -614,7 +617,7 @@ P (Plan):
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Ballard Score + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Ballard + Lubchenco → SOAP" subtitle="New Ballard Score (1991) untuk usia gestasi, klasifikasi Lubchenco, diringkas otomatis menjadi catatan SOAP" />
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Baby's Name (optional)"><input className={inputClass} value={babyName} onChange={(e) => setBabyName(e.target.value)} placeholder="—" /></Field>
@@ -649,7 +652,7 @@ P (Plan):
       <div className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{total}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Ballard Score</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Skor Ballard</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{gaWeeks.toFixed(1)} wks</div>
@@ -743,7 +746,7 @@ function ParklandCalc() {
   const next16hRate = (total24h - first8h) / 16
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Parkland Formula" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Rumus Parkland" subtitle="Resusitasi cairan pada luka bakar ≥20% LPB (Baxter, 1968)" />
       <div className="grid grid-cols-2 gap-2">
         <Field label="Berat Badan (kg)"><input className={inputClass} type="number" value={weight} onChange={(e) => setWeight(+e.target.value)} /></Field>
         <Field label="% TBSA (burn surface area)"><input className={inputClass} type="number" min={0} max={100} value={tbsa} onChange={(e) => setTbsa(+e.target.value)} /></Field>
@@ -787,7 +790,7 @@ function NaegeleCalc() {
     <Card>
       <SectionTitle icon={<IconStethoscope size={18} />} title="Naegele's Rule" subtitle="Perkiraan hari lahir (HPL) & usia gestasi dari HPHT" />
       <div className="grid grid-cols-2 gap-2">
-        <Field label="LMP (last menstrual period)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
+        <Field label="HPHT (hari pertama haid terakhir)"><input className={inputClass} type="date" value={lmp} onChange={(e) => setLmp(e.target.value)} /></Field>
         <Field label="Panjang Siklus Haid (hari)"><input className={inputClass} type="number" value={cycleLen} onChange={(e) => setCycleLen(+e.target.value)} /></Field>
       </div>
       {edd && (
@@ -857,7 +860,7 @@ function AlvaradoCalc() {
     : { l: 'High probability', tone: 'critical' as const, note: 'Consider surgical consultation for appendectomy.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Alvarado Score" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Alvarado" subtitle="Skor klinis untuk dugaan apendisitis akut (Alvarado, 1986)" />
       <div className="space-y-2">
         {criteria.map((c) => (
           <label key={c.key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -899,7 +902,7 @@ function SirirajCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Siriraj Stroke Score"
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Stroke Siriraj"
         subtitle="Pembedaan stroke perdarahan vs iskemik di sisi tempat tidur" />
       <div className="mt-3 space-y-3">
         <div>
@@ -908,7 +911,7 @@ function SirirajCalc() {
             options={[{ v: 0, l: 'Alert' }, { v: 1, l: 'Drowsy/stupor' }, { v: 2, l: 'Semicoma/coma' }]} /></div>
         </div>
         <div>
-          <div className="text-[12px] font-bold text-ink dark:text-ink">Vomiting (within 2 h of onset)</div>
+          <div className="text-[12px] font-bold text-ink dark:text-ink">Muntah (dalam 2 jam sejak awitan)</div>
           <div className="mt-1"><SegButtons value={vomiting} onChange={setVomiting}
             options={[{ v: 0, l: 'No' }, { v: 1, l: 'Yes' }]} /></div>
         </div>
@@ -931,7 +934,7 @@ function SirirajCalc() {
 
       <div className="mt-4 rounded-xl bg-neutral-50 p-3 dark:bg-white/5">
         <div className="flex items-center justify-between">
-          <span className="text-[12px] font-bold text-neutral-500">Siriraj score</span>
+          <span className="text-[12px] font-bold text-neutral-500">skor Siriraj</span>
           <span className="text-2xl font-black text-ink dark:text-ink">{rounded > 0 ? '+' : ''}{rounded}</span>
         </div>
         <div className="mt-1"><Badge tone={verdict.tone}>{verdict.l}</Badge></div>
@@ -1041,7 +1044,7 @@ function CentorCalc() {
   )
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Centor / McIsaac Score" subtitle="Kemungkinan faringitis streptokokus (Centor 1981, modifikasi McIsaac 1998)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor Centor / McIsaac" subtitle="Kemungkinan faringitis streptokokus (Centor 1981, modifikasi McIsaac 1998)" />
       <div className="space-y-2">
         <Row label="Demam >38°C" checked={fever} onChange={setFever} />
         <Row label="Tidak ada batuk" checked={noCough} onChange={setNoCough} />
@@ -1187,7 +1190,7 @@ function FletcherCalc() {
     : { l: 'Profound (total) hearing loss', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Fletcher Index" subtitle="Ambang rerata nada murni — penggolongan derajat gangguan dengar" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Indeks Fletcher" subtitle="Ambang rerata nada murni — penggolongan derajat gangguan dengar" />
       <SegButtons value={mode} onChange={setMode} options={[{ v: 'basic', l: 'Basic (3-frequency)' }, { v: 'complete', l: 'Complete (4-frequency, AAO-HNS)' }]} />
       <div className={`mt-3 grid gap-2 ${mode === 'basic' ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
         <Field label="500 Hz (dB)"><input className={inputClass} type="number" value={t500} onChange={(e) => setT500(+e.target.value)} /></Field>
@@ -1223,7 +1226,7 @@ function NoseCalc() {
   const cls = total <= 25 ? { l: 'Mild', tone: 'normal' as const } : total <= 50 ? { l: 'Moderate', tone: 'low' as const } : total <= 75 ? { l: 'Severe', tone: 'critical' as const } : { l: 'Very severe', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="NOSE Score" subtitle="Nasal Obstruction Symptom Evaluation — dampak sumbatan hidung pada kualitas hidup" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor NOSE" subtitle="Nasal Obstruction Symptom Evaluation — dampak sumbatan hidung pada kualitas hidup" />
       <div className="space-y-3">
         {items.map((label, i) => (
           <Field key={label} label={label}>
@@ -1261,7 +1264,7 @@ function RsiCalc() {
   const opts = [0, 1, 2, 3, 4, 5].map((v) => ({ v, l: String(v) }))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Reflux Symptom Index (RSI)" subtitle="Belafsky dkk., 2002 — penapisan refluks laringofaring" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Indeks Gejala Refluks (RSI)" subtitle="Belafsky dkk., 2002 — penapisan refluks laringofaring" />
       <div className="space-y-3">
         {items.map((label, i) => (
           <Field key={label} label={label}>
@@ -1297,7 +1300,7 @@ function Abcd2Calc() {
     : { l: 'High risk', tone: 'critical' as const, note: '2-day stroke risk ~8.1%. Admission & urgent evaluation recommended.' }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ABCD² Score" subtitle="Perkiraan risiko stroke pascaTIA (Johnston dkk., 2007)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor ABCD²" subtitle="Perkiraan risiko stroke pascaTIA (Johnston dkk., 2007)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={age60} onChange={(e) => setAge60(e.target.checked)} className="h-5 w-5 accent-brand" />
@@ -1335,7 +1338,7 @@ function FourScoreCalc() {
   const total = e + m + b + r
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="FOUR Score" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skor FOUR" subtitle="Full Outline of UnResponsiveness (Wijdicks dkk., 2005) — alternatif GCS yang menilai batang otak & pola napas" />
       <div className="space-y-3">
         <Field label="Respons Mata (E)"><SegButtons value={e} onChange={setE} options={eye} /></Field>
         <Field label="Respons Motorik (M)"><SegButtons value={m} onChange={setM} options={motor} /></Field>
@@ -1376,7 +1379,7 @@ function ParadiseCalc() {
   const meets = documented && (y1 >= 7 || (y1 >= 5 && y2 >= 5) || (y1 >= 3 && y2 >= 3 && y3 >= 3))
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Paradise Criteria" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kriteria Paradise" subtitle="Indikasi tonsilektomi pada faringitis/tonsilitis berulang (Paradise dkk., 1984)" />
       <div className="grid grid-cols-3 gap-2">
         <Field label="Episode Tahun Ini"><input className={inputClass} type="number" value={y1} onChange={(e) => setY1(+e.target.value)} /></Field>
         <Field label="Episode Tahun Lalu"><input className={inputClass} type="number" value={y2} onChange={(e) => setY2(+e.target.value)} /></Field>
@@ -1426,7 +1429,7 @@ function NihssCalc() {
     : { l: 'Severe stroke', tone: 'critical' as const }
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="NIH Stroke Scale (NIHSS)" subtitle="Penilaian derajat berat stroke iskemik akut, 15 butir, 0-42" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Skala Stroke NIH (NIHSS)" subtitle="Penilaian derajat berat stroke iskemik akut, 15 butir, 0-42" />
       <div className="space-y-3">
         {items.map((it) => (
           <Field key={it.key} label={it.label}>
@@ -1510,7 +1513,7 @@ function PedsDoseCalc() {
         <Field label="Kepekatan Sirup (mg/mL)"><input className={inputClass} type="number" step="0.1" value={concMgMl} onChange={(e) => setConcMgMl(+e.target.value)} /></Field>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/day</div></div>
+        <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{totalDailyMg.toFixed(0)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">Total mg/hari</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMg.toFixed(1)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mg/dose</div></div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center"><div className="text-lg font-black text-ink">{perDoseMl.toFixed(2)}</div><div className="text-[10px] font-bold uppercase text-neutral-500">mL/dose (syrup)</div></div>
       </div>
@@ -1538,13 +1541,13 @@ function VbacCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Flamm-Geiger Score" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="VBAC — Skor Flamm-Geiger" subtitle="Perkiraan keberhasilan persalinan pervaginam pascaseksio (Flamm & Geiger, 1997)" />
       <div className="space-y-3">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
           <input type="checkbox" checked={ageU40} onChange={(e) => setAgeU40(e.target.checked)} className="h-5 w-5 accent-brand" />
           <div className="text-sm font-bold text-ink">Usia &lt;40 tahun (+2)</div>
         </label>
-        <Field label="Vaginal Delivery History">
+        <Field label="Riwayat Persalinan Pervaginam">
           <SegButtons value={vagHx} onChange={setVagHx} options={[{ v: 'none', l: 'None (0)' }, { v: 'before', l: 'Before cesarean only (+2)' }, { v: 'vbac', l: 'Prior post-cesarean/VBAC (+4)' }]} />
         </Field>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50">
@@ -1747,7 +1750,7 @@ function AtlsCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Trauma Primary Survey (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Survei Primer Trauma (XABCDE)" subtitle="X = pengendalian perdarahan masif mendahului Airway — urutan prioritas yang menggerakkan tindakan, bukan sekadar daftar periksa" />
 
       {criticalFindings.length > 0 && (
         <div className="mb-4 rounded-xl border border-red-300 bg-red-50 p-3">
@@ -1871,7 +1874,7 @@ function AbgCalc() {
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <div className="text-lg font-black text-ink">{correctedAG.toFixed(1)}</div>
-          <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (albumin-corrected)</div>
+          <div className="text-[10px] font-bold uppercase text-neutral-500">Anion Gap (terkoreksi albumin)</div>
         </div>
         <div className="rounded-xl bg-neutral-50 p-3 text-center">
           <Badge tone={agHigh ? 'critical' : 'normal'}>{agHigh ? 'High Gap' : 'Normal Gap'}</Badge>
@@ -2298,7 +2301,7 @@ function ClinicalCalcPaywall({ access, onUnlocked }: { access: CalcAccess; onUnl
 
   return (
     <Card>
-      <SectionTitle icon={<IconShield size={20} />} title="Unlock Clinical Calculators" subtitle="34 internationally standard clinical decision-support scores & tools" />
+      <SectionTitle icon={<IconShield size={20} />} title="Buka Kalkulator Klinis" subtitle="34 internationally standard clinical decision-support scores & tools" />
       <div className="mt-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-600">
         🎉 Clinical Calculators are <b>free</b> for the first {access.limit} Panaceamed.id registered accounts — that quota is already full. Unlock lifetime account access with a one-time payment: <b>{access.pricePnc} PNC</b> (equivalent to Rp{access.priceIdr.toLocaleString('en-GB')}).
       </div>
@@ -2355,7 +2358,7 @@ function BrocaLorentzCalorieCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="Broca–Lorentz Calorie Calculator" subtitle="Berat badan ideal (Broca/Lorentz) → taksiran kebutuhan kalori harian" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kalkulator Kalori Broca–Lorentz" subtitle="Berat badan ideal (Broca/Lorentz) → taksiran kebutuhan kalori harian" />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={height} onChange={(e) => setHeight(+e.target.value)} /></Field>
         <Field label="Jenis kelamin"><SegButtons value={sex} onChange={setSex} options={[{ v: 'M', l: 'Male' }, { v: 'F', l: 'Female' }]} /></Field>
@@ -2437,7 +2440,7 @@ function AriaCalc() {
 
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ARIA Criteria" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Kriteria ARIA" subtitle="Allergic Rhinitis and its Impact on Asthma (Bousquet dkk., WHO 2008)" />
       <Field label="Lama Gejala">
         <SegButtons value={duration} onChange={setDuration} options={[
           { v: 'intermiten', l: 'Intermittent (<4 days/week or <4 weeks)' },
@@ -2509,7 +2512,7 @@ function AclsCalc() {
   const active = ACLS_ALGOS.find((a) => a.id === algo)!
   return (
     <Card>
-      <SectionTitle icon={<IconStethoscope size={18} />} title="ACLS Guide" subtitle="Advanced Cardiovascular Life Support — algoritma rujukan cepat (Panduan AHA 2020)" />
+      <SectionTitle icon={<IconStethoscope size={18} />} title="Panduan ACLS" subtitle="Advanced Cardiovascular Life Support — algoritma rujukan cepat (Panduan AHA 2020)" />
       <SegButtons value={algo} onChange={setAlgo} options={ACLS_ALGOS.map((a) => ({ v: a.id, l: a.label }))} />
       <div className="mt-4 rounded-xl bg-neutral-50 p-4">
         <h4 className="text-sm font-black text-ink">{active.title}</h4>
