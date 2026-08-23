@@ -254,6 +254,13 @@ export default function Beranda() {
    * bagian itu boleh diabaikan, dan sesudah itu ia tidak akan dilihat lagi
    * walau kemudian terisi.
    */
+  const [segar, setSegar] = useState(0)
+  useEffect(() => {
+    const ubah = () => setSegar((v) => v + 1)
+    window.addEventListener('panacea:health-updated', ubah)
+    return () => window.removeEventListener('panacea:health-updated', ubah)
+  }, [])
+
   const kpi = useMemo<Kpi[]>(() => {
     const out: Kpi[] = []
     const w = getWorkouts()
@@ -288,17 +295,61 @@ export default function Beranda() {
         })
         out.push({ label: 'Bugar', nilai: String(Math.round(st.kebugaran)), nada: 'text-sky-600 dark:text-sky-400' })
       }
-      out.push({ label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: 'text-ink dark:text-white' })
     }
     // Garisnya diambil dari riwayat yang benar-benar tercatat; Garis sendiri
     // yang menolak menggambar bila titiknya kurang dari dua.
+    /* ANGKA HARI INI DIDAHULUKAN.
+       Panel ini sebelumnya hanya berisi angka yang jarang berubah — berat,
+       nadi, jumlah sesi — sehingga membukanya dua kali sehari menampilkan
+       layar yang sama persis, sedangkan yang benar-benar berubah hari itu
+       harus dicari jauh ke bawah. Urutannya kini: keadaan latihan, lalu apa
+       yang terjadi HARI INI, baru angka tubuh yang berubah mingguan.
+       Tidak ada satu pun angka gabungan; tiap kartu satu besaran yang dapat
+       ditunjuk asalnya. */
+    const hariIni = new Date().toISOString().slice(0, 10)
+
+    const tidur = (state.sleepLogs ?? [])
+      .filter((l) => typeof l?.hours === 'number' && l.hours > 0)
+      .sort((a, b) => (a.date < b.date ? 1 : -1))
+    if (tidur[0]) {
+      const jam = Math.round(tidur[0].hours * 10) / 10
+      out.push({
+        label: 'Tidur', nilai: String(jam), satuan: tidur[0].date === hariIni ? 'jam' : 'jam (terakhir)',
+        nada: jam >= 7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400',
+        deret: tidur.slice(0, 14).map((l) => l.hours).reverse(),
+      })
+    }
+
+    const w0 = state.wellness?.[hariIni] as { steps?: number; waterMl?: number } | undefined
+    const langkah = Number(w0?.steps) || Number(v.steps) || 0
+    if (langkah > 0) {
+      out.push({ label: 'Langkah', nilai: langkah >= 10000 ? `${(langkah / 1000).toFixed(1)}k` : String(langkah), satuan: 'hari ini', nada: 'text-ink dark:text-white' })
+    }
+
+    let protein = 0
+    for (const f of state.foods ?? []) if (f?.date === hariIni) protein += Number(f.protein) || 0
+    if (protein > 0) out.push({ label: 'Protein', nilai: String(Math.round(protein)), satuan: 'g hari ini', nada: 'text-ink dark:text-white' })
+
+    const air = Number(w0?.waterMl) || 0
+    if (air > 0) out.push({ label: 'Air', nilai: (air / 1000).toFixed(1), satuan: 'L hari ini', nada: 'text-sky-600 dark:text-sky-400' })
+
     if (v.weightKg) out.push({ label: 'Berat', nilai: String(v.weightKg), satuan: 'kg', nada: 'text-ink dark:text-white', deret: deretMetrik('weightKg').map((t) => t.nilai) })
     if (v.restingHr) out.push({ label: 'Nadi', nilai: String(v.restingHr), satuan: 'bpm', nada: 'text-rose-600 dark:text-rose-400', deret: deretMetrik('restingHr').map((t) => t.nilai) })
     if (v.systolic && v.diastolic) {
       out.push({ label: 'Tensi', nilai: `${v.systolic}/${v.diastolic}`, nada: 'text-ink dark:text-white' })
     }
-    return out.slice(0, 4)
-  }, [account])
+
+    if (typeof v.vo2max === 'number' && v.vo2max > 0) {
+      out.push({ label: 'VO₂maks', nilai: String(Math.round(v.vo2max * 10) / 10), satuan: 'mL/kg/mnt', nada: 'text-ink dark:text-white', deret: deretMetrik('vo2max').map((t) => t.nilai) })
+    }
+
+    if (w.length) out.push({ label: 'Sesi', nilai: String(w.length), satuan: 'tercatat', nada: 'text-ink dark:text-white' })
+
+    // Delapan adalah batas yang dapat dilihat sekali sapu pada layar 390 px:
+    // dua lajur, empat baris. Lebih dari itu panelnya berhenti menjadi
+    // ringkasan dan menjadi daftar.
+    return out.slice(0, 8)
+  }, [account, segar, state.sleepLogs, state.wellness, state.foods])
 
   /**
    * Pratinjau dihitung sekali per kunjungan.
@@ -317,13 +368,6 @@ export default function Beranda() {
    * menyimpannya lagi. Peristiwa yang sama yang dipakai seluruh aplikasi untuk
    * menandai perubahan data kesehatan dipakai di sini sebagai pemicu baca ulang.
    */
-  const [segar, setSegar] = useState(0)
-  useEffect(() => {
-    const ubah = () => setSegar((v) => v + 1)
-    window.addEventListener('panacea:health-updated', ubah)
-    return () => window.removeEventListener('panacea:health-updated', ubah)
-  }, [])
-
   const pratinjau = useMemo(
     () => pratinjauBeranda({
       foods: state.foods ?? [],

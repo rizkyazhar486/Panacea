@@ -485,7 +485,11 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
   const bergrafik = wilayahBergrafik(state)
 
 
-  const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td']
+  /* Yang sudah berdiri besar di panel atas beranda tidak diulang sebagai
+     baris rincian. Daftarnya bertambah bersama panelnya: sesudah panel ikut
+     memuat langkah dan VO2max, dua baris itu muncul dua kali dalam satu
+     layar. */
+  const DI_PANEL_ATAS = ['weightKg', 'restingHr', 'td', 'steps', 'vo2max', 'sleepH']
   const td = barisTekananDarah()
   const rincian = (td ? [td, ...rincianBeranda()] : rincianBeranda()).filter(
     (b) => !DI_PANEL_ATAS.includes(b.kunci),
