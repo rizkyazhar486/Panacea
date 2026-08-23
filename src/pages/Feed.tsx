@@ -158,20 +158,20 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
         <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/50" onClick={() => setOpen(false)}>
           <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-6" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-neutral-200" />
-            <div className="text-sm font-black">Choose Music</div>
+            <div className="text-sm font-black">Pilih Musik</div>
 
             {/* Real song search */}
             <div className="mt-3 flex gap-2">
               <input className={inputClass} placeholder="Search for a song / artist…" value={q}
                 onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} />
               <button onClick={search} disabled={busy} className="shrink-0 rounded-xl bg-brand px-4 text-xs font-bold text-white disabled:opacity-50">
-                {busy ? '…' : 'Search'}
+                {busy ? '…' : 'Cari'}
               </button>
             </div>
             {q.trim() && (
               <div className="mt-2 flex gap-2">
                 <a href={`https://open.spotify.com/search/${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
-                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-ink">Open in Spotify</a>
+                  className="rounded-full bg-[#1DB954] px-3 py-1.5 text-[10px] font-bold text-ink">Buka di Spotify</a>
                 <a href={`https://music.apple.com/search?term=${encodeURIComponent(q.trim())}`} target="_blank" rel="noreferrer"
                   className="rounded-full bg-neutral-900 px-3 py-1.5 text-[10px] font-bold text-ink"> Apple Music</a>
               </div>
@@ -195,7 +195,7 @@ function MusicPicker({ song, setSong }: { song: string; setSong: (s: string) => 
             </div>
 
             {/* Quick moods + none */}
-            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-500">Quick moods</div>
+            <div className="mt-3 text-[10px] font-bold uppercase tracking-wide text-neutral-500">Suasana hati cepat</div>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {SONGS.map((s) => (
                 <button key={s} onClick={() => { setSong(s); setOpen(false) }}
@@ -460,12 +460,12 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
     return (
       <button
         onClick={() => setOpen(true)}
-        aria-label="Open GPS Tracker to track your workout"
+        aria-label="Buka Pelacak GPS untuk merekam latihan Anda"
         className="flex w-full items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-3 shadow-sm transition active:scale-[0.99]"
       >
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-xl">📍</span>
-        <span className="flex-1 text-left text-sm font-bold text-ink">GPS Tracker</span>
-        {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Recording" />}
+        <span className="flex-1 text-left text-sm font-bold text-ink">Pelacak GPS</span>
+        {mode === 'tracking' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-label="Merekam" />}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
     )
@@ -477,7 +477,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div>
           <h3 className="text-sm font-black flex items-center gap-2">📍 GPS Tracker</h3>
-          <p className="text-[10px] text-neutral-500 mt-0.5">Track route, speed, acceleration & calories</p>
+          <p className="text-[10px] text-neutral-500 mt-0.5">Rekam rute, kecepatan, percepatan & kalori</p>
         </div>
         <div className="flex items-center gap-2">
           {mode === 'done' && (
@@ -486,11 +486,11 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             </button>
           )}
           {mode === 'done' && (
-            <button onClick={() => setShareImageOpen(true)} aria-label="Share as an image to social media" className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all active:scale-95 hover:bg-neutral-50">
+            <button onClick={() => setShareImageOpen(true)} aria-label="Bagikan sebagai gambar ke media sosial" className="flex items-center gap-1.5 rounded-xl border border-neutral-200 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all active:scale-95 hover:bg-neutral-50">
               <IconDownload size={13} /> Image
             </button>
           )}
-          <button onClick={() => setOpen(false)} aria-label="Close GPS Tracker" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
+          <button onClick={() => setOpen(false)} aria-label="Tutup Pelacak GPS" className="grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
           </button>
         </div>
@@ -575,7 +575,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
 
             {/* %HRmax + Talk Test + MAF (Maffetone) — running intensity guide */}
             <div className="rounded-xl border border-neutral-100 p-3">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500">Running Intensity Guide</div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500">Panduan Intensitas Lari</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-sm font-extrabold tabular-nums" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
@@ -587,11 +587,11 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
                   <div className="text-[11px] font-extrabold leading-tight" style={{ color: hr > 0 ? (hr / hrMax >= 0.9 ? '#ef4444' : hr / hrMax >= 0.77 ? '#f59e0b' : '#00BF63') : '#a3a3a3' }}>
                     {hr <= 0 ? '—' : hr / hrMax < 0.77 ? 'Can speak full sentences' : hr / hrMax < 0.9 ? 'Only 3-4 words' : 'Cannot speak'}
                   </div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Talk Test</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Uji Bicara</div>
                 </div>
                 <div className="rounded-lg bg-neutral-50 p-2">
                   <div className="text-sm font-extrabold tabular-nums text-brand-dark">{180 - age}<span className="text-[10px] text-neutral-500"> bpm</span></div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">MAF Target</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Target MAF</div>
                 </div>
               </div>
               <p className="mt-2 text-[10px] leading-relaxed text-neutral-500">
@@ -615,7 +615,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             <div className="flex items-center gap-3">
               <span className={'text-lg ' + (liveHr.isLive ? 'animate-pulse' : '')}>💗</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Heart Rate</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Denyut Jantung</div>
                 <div className="truncate text-[10px] text-neutral-500">{liveHr.label}</div>
               </div>
               <input className="w-20 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-center text-sm font-bold tabular-nums" type="number" value={hr || ''} onChange={e => setHr(+e.target.value)} placeholder="bpm" />
@@ -651,7 +651,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
           <div className="rounded-xl p-4 text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #064e36)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Summary</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-ink/60">Ringkasan</div>
                 <div className="text-xl font-extrabold">{sport.emoji} {sport.name}</div>
               </div>
               <div className="text-right">
@@ -660,8 +660,8 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
               </div>
             </div>
             <div className="mt-2 grid grid-cols-5 gap-2 text-center text-xs">
-              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Distance</div></div>
-              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Duration</div></div>
+              <div><div className="font-bold">{fmtDist(dist)}</div><div className="text-ink/50">Jarak</div></div>
+              <div><div className="font-bold">{fmtD(dur)}</div><div className="text-ink/50">Lama</div></div>
               <div><div className="font-bold">{Math.round(speed)}</div><div className="text-ink/50">km/h</div></div>
               <div><div className="font-bold">{hr || '—'}</div><div className="text-ink/50">HR</div></div>
               <div><div className="font-bold">{acceleration.toFixed(1)}</div><div className="text-ink/50">m/s²</div></div>
@@ -677,8 +677,8 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             <button onClick={() => { setMode('planning'); setPlan([]) }} className="h-11 rounded-xl text-sm font-bold border-2 border-purple-300 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all active:scale-95">📍 Plan Route</button>
           </>}
           {mode === 'planning' && <>
-            <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Clear</button>
-            <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Cancel</button>
+            <button onClick={() => setPlan([])} className="h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600 px-4">Kosongkan</button>
+            <button onClick={reset} className="flex-1 h-10 rounded-xl text-xs font-bold border border-neutral-200 text-neutral-600">Batal</button>
             <button onClick={startTrack} className="flex-1 h-10 rounded-xl text-xs font-bold text-ink" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Start</button>
           </>}
           {mode === 'tracking' && <>
@@ -689,7 +689,7 @@ function GpsTrackerCard({ onShareToFeed, authorName }: { onShareToFeed: (data: S
             <button onClick={resume} className="flex-1 h-11 rounded-xl text-sm font-bold text-ink transition-all active:scale-95" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>▶ Resume</button>
             <button onClick={stop} className="flex-1 h-11 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-all active:scale-95">⏹ Finish</button>
           </>}
-          {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Done & Reset</button>}
+          {mode === 'done' && <button onClick={reset} className="w-full h-10 rounded-xl text-sm font-bold border border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all">Selesai & Atur Ulang</button>}
         </div>
       </div>
     </Card>
@@ -769,8 +769,8 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
         </div>
 
         {/* Tap zones to navigate */}
-        <button aria-label="Previous" className="absolute left-0 top-0 z-[5] h-full w-1/3" onClick={() => setIdx((i) => Math.max(0, i - 1))} />
-        <button aria-label="Next" className="absolute right-0 top-0 z-[5] h-full w-1/3" onClick={() => (idx < group.stories.length - 1 ? setIdx((i) => i + 1) : onClose())} />
+        <button aria-label="Sebelumnya" className="absolute left-0 top-0 z-[5] h-full w-1/3" onClick={() => setIdx((i) => Math.max(0, i - 1))} />
+        <button aria-label="Berikutnya" className="absolute right-0 top-0 z-[5] h-full w-1/3" onClick={() => (idx < group.stories.length - 1 ? setIdx((i) => i + 1) : onClose())} />
 
         {/* Media */}
         <div className="flex flex-1 items-center justify-center overflow-hidden" style={{ background: story.image || story.video ? '#000' : group.mediaColor }}>
@@ -811,7 +811,7 @@ function StoryViewer({ group, onClose, onComment, onReact }: {
             </button>
           ))}
           <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send() }}
-            placeholder="Reply directly..." className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
+            placeholder="Balas langsung…" className="flex-1 rounded-full border border-white/30 bg-black/30 px-4 py-2.5 text-xs text-white placeholder:text-white/50 focus:outline-none" />
           <button onClick={send} disabled={!draft.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={16} />
           </button>
@@ -870,7 +870,7 @@ function StoriesBar({ stories, viewerEmail, viewerName, onAddStory }: {
         <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-dashed border-brand/40 bg-brand-50 text-brand-dark">
           <IconPlus size={20} />
         </span>
-        <span className="text-[10px] font-semibold text-neutral-500">{busy ? 'Uploading…' : 'Your Story'}</span>
+        <span className="text-[10px] font-semibold text-neutral-500">{busy ? 'Mengunggah…' : 'Cerita Anda'}</span>
       </button>
       <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => pickStory(e.target.files?.[0])} />
       {groups.map((g) => (
@@ -962,7 +962,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-neutral-100">
-          <h3 className="text-base font-black">Create Post</h3>
+          <h3 className="text-base font-black">Buat Kiriman</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-neutral-200 transition"><IconX size={16} /></button>
         </div>
 
@@ -1010,7 +1010,7 @@ function ComposeModal({ onClose, onPost, onShareGps, authorEmail, authorName, ro
 
         {/* Input Area */}
         <div className="px-5 pb-5 space-y-4">
-          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Write a description or health insight here..." value={caption} onChange={e => setCaption(e.target.value)} />
+          <textarea className="w-full h-28 resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition-colors duration-200 placeholder:text-neutral-500 focus:border-brand focus:ring-2 focus:ring-brand/20" placeholder="Tulis keterangan atau catatan kesehatan di sini…" value={caption} onChange={e => setCaption(e.target.value)} />
 
           {/* Tag teman */}
           <input className={inputClass + ' text-sm'} type="text" placeholder="🏷️ Tag friends (e.g. Budi, Sinta) — separate with commas" value={tags} onChange={e => setTags(e.target.value)} />
@@ -1068,8 +1068,8 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
   type Row = { icon: string; label: string; onClick: () => void; danger?: boolean; active?: boolean }
   const close = (fn: () => void) => () => { fn(); onClose() }
   const general: Row[] = [
-    { icon: '🔖', label: post.bookmarkedByMe ? 'Remove from saved' : 'Save', onClick: close(onToggleBookmark), active: post.bookmarkedByMe },
-    { icon: '📋', label: 'Copy URL', onClick: close(onCopyUrl) },
+    { icon: '🔖', label: post.bookmarkedByMe ? 'Remove from saved' : 'Simpan', onClick: close(onToggleBookmark), active: post.bookmarkedByMe },
+    { icon: '📋', label: 'Salin tautan', onClick: close(onCopyUrl) },
   ]
   const owner: Row[] = isOwnPost ? [
     { icon: post.exclusive ? '🔓' : '🔒', label: post.exclusive ? 'Make public' : 'Make premium', onClick: close(() => onUpdate({ exclusive: !post.exclusive })), active: post.exclusive },
@@ -1101,7 +1101,7 @@ function PostOptionsSheet({ post, isOwnPost, onClose, onCopyUrl, onToggleBookmar
         <Group rows={general} />
         {owner.length > 0 && <Group rows={owner} />}
         {danger.length > 0 && <Group rows={danger} />}
-        <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Cancel</button>
+        <button onClick={onClose} className="w-full rounded-2xl bg-neutral-100 py-3 text-sm font-bold text-neutral-500 active:scale-[0.99]">Batal</button>
       </div>
     </div>
     </Portal>
@@ -1191,7 +1191,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
         )}
       </div>
       <div className="flex justify-end">
-        <button onClick={copyUrl} aria-label="Copy URL" title="Copy post link"
+        <button onClick={copyUrl} aria-label="Salin tautan" title="Salin tautan kiriman"
           className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold text-ink shadow backdrop-blur-sm transition active:scale-95">
           {copied ? '✓ Copied' : '📋 Copy URL'}
         </button>
@@ -1206,7 +1206,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <div className="relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-ink font-bold text-xs" style={{ backgroundColor: post.mediaColor || '#00BF63' }}>
             {initials(post.authorName)}
-            {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Currently active" />}
+            {online && <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" title="Sedang aktif" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1">
@@ -1227,19 +1227,19 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             </button>
           )}
           {!isOwnPost && subPrice > 0 && (
-            <button onClick={subscribeNow} disabled={subscribed} aria-label="Subscribe"
+            <button onClick={subscribeNow} disabled={subscribed} aria-label="Berlangganan"
               className={'grid h-9 w-9 place-items-center rounded-full text-[13px] font-bold transition active:scale-95 ' + (subscribed ? 'bg-amber-50 text-amber-600' : 'bg-ink text-white')}>
               {subscribed ? '✓' : '★'}
             </button>
           )}
           {/* Share button rendered as a logo only (no text) */}
-          <button onClick={share} aria-label="Share to social media" title="Share"
+          <button onClick={share} aria-label="Bagikan ke media sosial" title="Bagikan"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90"
             style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 4px 12px rgba(0,191,99,0.32)' }}>
             <IconShare2 size={15} />
           </button>
           {/* Options menu (Instagram-style: Save / QR / Insights / Archive / Edit / Delete …) */}
-          <button onClick={() => setShowMenu(true)} aria-label="More options" title="Options"
+          <button onClick={() => setShowMenu(true)} aria-label="Pilihan lain" title="Pilihan"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-500 transition active:scale-90 hover:bg-neutral-100">
             <span className="text-lg leading-none">⋯</span>
           </button>
@@ -1274,7 +1274,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           {mediaOverlay}
           {gated && (
             <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-ink">
-              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
             </button>
           )}
         </div>
@@ -1290,7 +1290,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           {mediaOverlay}
           {gated && (
             <button onClick={subscribeNow} className="absolute inset-0 z-20 grid place-items-center text-center text-ink">
-              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Subscribe to unlock</span></span>
+              <span className="rounded-2xl bg-black/50 px-4 py-3 text-xs font-bold backdrop-blur-sm">🔒 Premium content<br /><span className="text-[11px] font-medium text-amber-300">Berlangganan untuk membuka</span></span>
             </button>
           )}
         </div>
@@ -1313,11 +1313,11 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
 
       {/* Action bar: like · react · comment · share (icon-first, evenly spread) */}
       <div className="relative flex items-center justify-around gap-1 border-t border-neutral-100 pt-1.5 -mb-1">
-        <button onClick={() => toggleLike(post.id)} aria-label="Like" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-90 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
+        <button onClick={() => toggleLike(post.id)} aria-label="Suka" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-90 ' + (post.likedByMe ? 'text-rose-500 bg-rose-50' : 'text-neutral-500 hover:bg-neutral-50')}>
           <ColoredIcon color={post.likedByMe ? '#f43f5e' : '#a3a3a3'}><span className={post.likedByMe ? 'inline-block animate-[likepop_0.35s_ease]' : 'inline-block'}><IconHeart size={18} /></span></ColoredIcon>
           {post.likes > 0 && !post.hideLikes && <span>{post.likes}</span>}
         </button>
-        <button onClick={() => setShowReactions((v) => !v)} aria-label="React" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-lg transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
+        <button onClick={() => setShowReactions((v) => !v)} aria-label="Tanggapi" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-lg transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           😊
         </button>
         {showReactions && (
@@ -1330,10 +1330,10 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
             ))}
           </div>
         )}
-        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Comments" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 active:scale-90 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
+        <button onClick={() => !post.commentsOff && setShowComments(v => !v)} disabled={post.commentsOff} aria-label="Komentar" className={'flex min-h-[40px] items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 active:scale-90 ' + (post.commentsOff ? 'text-neutral-300 cursor-not-allowed' : showComments ? 'text-brand-dark bg-brand/10' : 'text-neutral-500 hover:bg-neutral-50')}>
           <IconComment size={18} /> {!post.commentsOff && comments.length > 0 && <span>{comments.length}</span>}
         </button>
-        <button onClick={share} aria-label="Share" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-neutral-500 transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
+        <button onClick={share} aria-label="Bagikan" className="flex min-h-[40px] items-center rounded-xl px-3 py-2 text-neutral-500 transition-transform duration-200 active:scale-90 hover:bg-neutral-50">
           <IconShare2 size={17} />
         </button>
       </div>
@@ -1352,7 +1352,7 @@ export function PostCard({ post, viewerEmail, viewerName }: { post: SocialPost; 
           ))}
           <div className="flex items-center gap-2">
             <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addComment() }}
-              placeholder="Write a comment..." className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
+              placeholder="Tulis komentar…" className="flex-1 rounded-full border border-neutral-200 bg-white px-4 py-2 text-xs focus:outline-none focus:border-brand" />
             <button onClick={addComment} disabled={!draft.trim()} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition active:scale-90 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
               <IconSend size={15} />
             </button>
@@ -1440,7 +1440,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
 
   return (
     <div className="space-y-4">
-      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-500">Community Wellness</h4>
+      <h4 className="px-1 text-xs font-black uppercase tracking-wider text-neutral-500">Kesehatan Komunitas</h4>
 
       {/* 1. Health Buddy — akuntabilitas */}
       <Card className="space-y-3">
@@ -1448,7 +1448,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         <div className="flex items-center gap-2">
           <input value={buddyDraft} onChange={(e) => setBuddyDraft(e.target.value)} placeholder="Nama teman penjaga komitmen Anda"
             className={inputClass + ' flex-1 text-xs'} />
-          <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Save</button>
+          <button onClick={() => setBuddy(buddyDraft)} className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600">Simpan</button>
         </div>
         {state.buddyName && (
           <p className="text-xs text-neutral-500">Your buddy: <b className="text-ink">{state.buddyName}</b> — remind each other to check in daily!</p>
@@ -1502,16 +1502,16 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
                 <div className="text-neutral-500">{c.memberNames.length} members: {c.memberNames.join(', ')}</div>
               </div>
               {!c.memberNames.includes(viewerName) && (
-                <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Join</button>
+                <button onClick={() => joinCommunity(c.id, joinNameDraft || viewerName)} className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand-dark">Gabung</button>
               )}
             </div>
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
-          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Community name" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
-          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Sport" className={inputClass + ' w-24 shrink-0 text-xs'} />
+          <input value={communityName} onChange={(e) => setCommunityName(e.target.value)} placeholder="Nama komunitas" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={sportTag} onChange={(e) => setSportTag(e.target.value)} placeholder="Olahraga" className={inputClass + ' w-24 shrink-0 text-xs'} />
           <button onClick={() => { createCommunity(communityName, sportTag); setCommunityName(''); setSportTag('') }} disabled={!communityName.trim() || !sportTag.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Create</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
         </div>
       </Card>
 
@@ -1539,7 +1539,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         )}
         <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
           <input value={supportTo} onChange={(e) => setSupportTo(e.target.value)} placeholder="For whom?" className={inputClass + ' w-28 shrink-0 text-xs'} />
-          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Send a quick word of encouragement..." className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={supportText} onChange={(e) => setSupportText(e.target.value)} placeholder="Kirim sepatah kata penyemangat…" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { sendSupport(supportTo, supportText); setSupportTo(''); setSupportText('') }} disabled={!supportText.trim()}
             className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink transition disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>
             <IconSend size={15} />
@@ -1563,7 +1563,7 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
           <input value={newChallengeTitle} onChange={(e) => setNewChallengeTitle(e.target.value)} placeholder="E.g. 10,000 steps/week"
             className={inputClass + ' flex-1 text-xs'} />
           <button onClick={() => { startChallenge(newChallengeTitle, 'poin', 100, 7); setNewChallengeTitle('') }} disabled={!newChallengeTitle.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Start</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Mulai</button>
         </div>
         {state.challenges.length === 0 && <p className="text-xs text-neutral-500">No active challenges yet. Start one and invite friends!</p>}
         {state.challenges.map((c) => {
@@ -1595,9 +1595,9 @@ export function KomunitasSehat({ viewerEmail, viewerName }: { viewerEmail: strin
         <div className="text-xs font-black text-ink">🫂 Circle of Care</div>
         <div className="flex flex-wrap items-center gap-2">
           <input value={circleName} onChange={(e) => setCircleName(e.target.value)} placeholder="Circle name (e.g. Family)" className={inputClass + ' w-32 shrink-0 text-xs'} />
-          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Member names, comma separated" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
+          <input value={circleMembers} onChange={(e) => setCircleMembers(e.target.value)} placeholder="Nama anggota, dipisahkan koma" className={inputClass + ' min-w-[160px] flex-1 text-xs'} />
           <button onClick={() => { createCircle(circleName, circleMembers.split(',')); setCircleName(''); setCircleMembers('') }} disabled={!circleName.trim()}
-            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Create</button>
+            className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">Buat</button>
         </div>
         {state.circles.map((c) => (
           <div key={c.id} className="rounded-xl bg-neutral-50 px-3 py-2 text-[11px] text-neutral-600">
@@ -1808,11 +1808,11 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       ['Blood pressure', `${sys}/${dia} mmHg (${bpCat.label})`],
       ['VO2Max', lastVo2 ? `${lastVo2.value} mL/kg/min (${lastVo2.method})` : `${vo2max} mL/kg/min (HR estimate)`],
       ['Sleep score today', todaySleep ? `${sleepScore}/100` : 'Not recorded'],
-      ['Latest vitals', lastVital ? `${lastVital.systolic}/${lastVital.diastolic} mmHg, HR ${lastVital.heartRate}, SpO2 ${lastVital.spo2}%, ${lastVital.tempC}°C` : 'None yet'],
+      ['Tanda vital terbaru', lastVital ? `${lastVital.systolic}/${lastVital.diastolic} mmHg, HR ${lastVital.heartRate}, SpO2 ${lastVital.spo2}%, ${lastVital.tempC}°C` : 'None yet'],
     ]
     const win = window.open('', '_blank')
     if (!win) { alert('Allow pop-ups to export the report.'); return }
-    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Health Report</title>
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Laporan Kesehatan</title>
       <style>body{font-family:system-ui,sans-serif;padding:32px;color:#111}h1{color:#0B7A4B;font-size:20px}
       .sub{color:#888;font-size:12px;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:14px}
       td{padding:10px 8px;border-bottom:1px solid #eee}td:first-child{color:#666;width:45%}td:last-child{font-weight:600}
@@ -1902,13 +1902,13 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         <div className="grid grid-cols-3 gap-2 text-xs">
           <KolomVitalTerikat ikat={ikatWeight} label="Weight (kg)" satuan="kg" step={0.1} kelas="text-xs" />
           <KolomVitalTerikat ikat={ikatHeight} label="Height (cm)" satuan="cm" kelas="text-xs" />
-          <Field label="Age"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Usia"><input type="number" value={age} onChange={(e) => setAge(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
         </div>
         <select value={activity} onChange={(e) => setActivity(+e.target.value)} className={inputClass + ' text-xs'}>
-          <option value={1.2}>Rarely exercise</option>
-          <option value={1.4}>Light exercise</option>
-          <option value={1.6}>Moderate exercise</option>
-          <option value={1.9}>Heavy exercise</option>
+          <option value={1.2}>Jarang berolahraga</option>
+          <option value={1.4}>Olahraga ringan</option>
+          <option value={1.6}>Olahraga sedang</option>
+          <option value={1.9}>Olahraga berat</option>
         </select>
         <div className="grid grid-cols-3 gap-2">
           <div className="rounded-xl p-2 text-center text-ink" style={{ background: bmiCat.c }}>
@@ -1933,8 +1933,8 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">🩺 Blood Pressure & Vital Monitor</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <KolomVitalTerikat ikat={ikatSys} label="Systolic" satuan="mmHg" kelas="text-xs" />
-          <KolomVitalTerikat ikat={ikatDia} label="Diastolic" satuan="mmHg" kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatSys} label="Sistolik" satuan="mmHg" kelas="text-xs" />
+          <KolomVitalTerikat ikat={ikatDia} label="Diastolik" satuan="mmHg" kelas="text-xs" />
         </div>
         <div className="rounded-xl p-2 text-center text-ink" style={{ background: bpCat.color }}>
           <span className="text-sm font-black">{sys}/{dia} mmHg</span> — <span className="text-xs font-bold">{bpCat.label}</span>
@@ -1964,7 +1964,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="space-y-3">
         <div className="text-xs font-black text-ink">😴 Sleep Quality Score</div>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <Field label="Sleep hours"><input type="number" value={sleepHours} onChange={(e) => setSleepHours(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
+          <Field label="Jam tidur"><input type="number" value={sleepHours} onChange={(e) => setSleepHours(+e.target.value || 0)} className={inputClass + ' text-xs'} /></Field>
           <label className="flex items-center gap-2 pt-5 text-xs text-neutral-600">
             <input type="checkbox" checked={bedtimeConsistent} onChange={(e) => setBedtimeConsistent(e.target.checked)} /> Consistent bedtime
           </label>
@@ -1988,11 +1988,11 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
             <Sparkline data={hrSeries} color="#00BF63" />
           </div>
           <div>
-            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Sleep Hours</span><b className="text-ink">{sleepSeries.length ? sleepSeries[sleepSeries.length - 1] : '—'}</b></div>
+            <div className="flex items-center justify-between text-[11px]"><span className="text-neutral-500">Jam Tidur</span><b className="text-ink">{sleepSeries.length ? sleepSeries[sleepSeries.length - 1] : '—'}</b></div>
             <Sparkline data={sleepSeries} color="#6366F1" />
           </div>
         </div>
-        <p className="text-[10px] text-neutral-500">Log vitals & sleep regularly to see trends here.</p>
+        <p className="text-[10px] text-neutral-500">Catat tanda vital & tidur secara teratur agar trennya terlihat di sini.</p>
       </Card>
 
       {/* VO2Max Calculator — estimasi kebugaran kardio (Uth-Sørensen) */}
@@ -2005,7 +2005,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         <p className="text-[10px] text-neutral-500">Default Max HR = 220 − age. Change it if you know your actual tested value.</p>
         <div className="flex items-center justify-between rounded-xl p-2 text-ink" style={{ background: vo2Cat.c }}>
           <span><span className="text-sm font-black">{vo2max}</span> <span className="text-xs font-bold">mL/kg/min · {vo2Cat.l}</span></span>
-          <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Record</button>
+          <button onClick={() => logVo2Max(vo2max, 'HR Estimate')} className="rounded-full bg-white/25 px-2.5 py-1 text-[10px] font-bold">Rekam</button>
         </div>
         <p className="text-[10px] text-neutral-500">Non-exercise estimate (Uth-Sørensen).</p>
 
@@ -2018,7 +2018,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
               <span className="text-sm font-black">{cooperVo2 > 0 ? cooperVo2 : '—'}</span> <span className="text-[10px] font-bold">mL/kg/min</span>
             </div>
             <button onClick={() => logVo2Max(cooperVo2, 'Cooper Test')} disabled={cooperVo2 <= 0}
-              className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Record</button>
+              className="rounded-xl px-3 py-2 text-xs font-bold text-ink disabled:opacity-40" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)' }}>Rekam</button>
           </div>
           <Prosa kelas="text-[10px] text-neutral-500">Berlarilah sejauh mungkin dalam 12 menit (pakai Pelacak GPS untuk mengukur jaraknya), lalu masukkan jaraknya. Rumus Cooper yang paling tepat di antara pilihan ini.</Prosa>
         </div>
@@ -2057,7 +2057,7 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
       <Card className="flex items-center justify-between gap-3">
         <div>
           <div className="text-xs font-black text-ink">💊 Medicine & Vitamin Reminder</div>
-          <p className="mt-0.5 text-[11px] text-neutral-500">Get a push notification daily, even when the app is closed.</p>
+          <p className="mt-0.5 text-[11px] text-neutral-500">Terima pemberitahuan tiap hari, bahkan saat aplikasi tertutup.</p>
         </div>
         <a href="#/med-reminders" className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white">Manage →</a>
       </Card>
@@ -2091,22 +2091,22 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         <div className="text-xs font-black text-ink">🎯 Health Goals</div>
         <div className="flex flex-wrap items-center gap-2">
           <select value={goalMetric} onChange={(e) => setGoalMetric(e.target.value as HealthGoal['metric'])} className={inputClass + ' w-28 shrink-0 text-xs'}>
-            <option value="sleep">Sleep</option>
+            <option value="sleep">Tidur</option>
             <option value="checkin">Check-in streak</option>
-            <option value="water">Water intake</option>
-            <option value="steps">Steps</option>
-            <option value="custom">Other</option>
+            <option value="water">Asupan air</option>
+            <option value="steps">Langkah</option>
+            <option value="custom">Lainnya</option>
           </select>
-          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Goal name" className={inputClass + ' min-w-[140px] flex-1 text-xs'} />}
+          {goalMetric === 'custom' && <input value={goalLabel} onChange={(e) => setGoalLabel(e.target.value)} placeholder="Nama tujuan" className={inputClass + ' min-w-[140px] flex-1 text-xs'} />}
           <input type="number" value={goalTarget} onChange={(e) => setGoalTarget(+e.target.value || 0)} className={inputClass + ' w-16 shrink-0 text-xs'} />
           <button onClick={() => {
-            const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Sleep', checkin: 'Check-in streak', water: 'Water intake', steps: 'Daily steps', custom: '' }[goalMetric]
+            const label = goalMetric === 'custom' ? goalLabel : { sleep: 'Tidur', checkin: 'Rangkaian check-in', water: 'Asupan air', steps: 'Langkah harian', custom: '' }[goalMetric]
             addGoal({ metric: goalMetric, label, target: goalTarget, unit: metricUnit[goalMetric] })
             setGoalLabel('')
           }} disabled={goalTarget <= 0 || (goalMetric === 'custom' && !goalLabel.trim())}
             className="rounded-xl bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-600 disabled:opacity-40">+</button>
         </div>
-        {state.goals.length === 0 && <p className="text-xs text-neutral-500">No goals yet. Set one to start tracking progress.</p>}
+        {state.goals.length === 0 && <p className="text-xs text-neutral-500">Belum ada tujuan. Tetapkan satu untuk mulai memantau kemajuannya.</p>}
         {state.goals.map((g) => {
           const cur = goalCurrent(g.metric)
           const pct = Math.min(100, Math.round((cur / g.target) * 100))
@@ -2141,9 +2141,9 @@ export function PusatKesehatanRealtime({ viewerEmail }: { viewerEmail: string })
         </div>
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">BMI</div><div className="font-bold" style={{ color: bmiCat.c }}>{bmi.toFixed(1)} · {bmiCat.l}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Blood Pressure</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Sleep today</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
-          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Latest vitals</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Tekanan Darah</div><div className="font-bold" style={{ color: bpCat.color }}>{sys}/{dia} · {bpCat.label}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Tidur hari ini</div><div className="font-bold text-indigo-600">{todaySleep ? `${sleepScore}/100` : 'Not recorded'}</div></div>
+          <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">Tanda vital terbaru</div><div className="font-bold text-neutral-700">{lastVital ? timeAgo(lastVital.at) : 'None yet'}</div></div>
           <div className="rounded-xl bg-neutral-50 p-2"><div className="text-neutral-500">VO2Max</div><div className="font-bold" style={{ color: vo2Cat.c }}>{lastVo2 ? `${lastVo2.value} · ${lastVo2.method}` : `${vo2max} · ${vo2Cat.l}`}</div></div>
         </div>
       </Card>
@@ -2271,7 +2271,7 @@ export default function SportsSocialFeed() {
         <button onClick={() => setFeedTab('foryou')} className={`text-sm font-bold transition ${feedTab === 'foryou' ? 'text-ink' : 'text-neutral-500'}`}>
           For You{feedTab === 'foryou' && <span className="mx-auto mt-0.5 block h-0.5 w-6 rounded-full bg-brand" />}
         </button>
-        <button onClick={() => { window.location.hash = '#/search' }} aria-label="Search" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
+        <button onClick={() => { window.location.hash = '#/search' }} aria-label="Cari" className="absolute right-4 grid h-8 w-8 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100">
           <IconSearch size={18} />
         </button>
       </div>
@@ -2287,8 +2287,8 @@ export default function SportsSocialFeed() {
             return (
               <div className="rounded-2xl border border-dashed border-neutral-200 p-8 text-center text-xs text-neutral-500">
                 {feedTab === 'following'
-                  ? <>No posts yet from people you follow. Go to <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">For You</button> or <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">find people</button>.</>
-                  : <>No posts yet. Tap the <span className="font-bold text-brand-dark">＋</span> button below to create a post or story.</>}
+                  ? <>Belum ada kiriman dari orang yang Anda ikuti. Buka <button onClick={() => setFeedTab('foryou')} className="font-bold text-brand-dark">Untuk Anda</button> atau <button onClick={() => { window.location.hash = '#/search' }} className="font-bold text-brand-dark">cari orang</button>.</>
+                  : <>Belum ada kiriman. Ketuk tombol <span className="font-bold text-brand-dark">＋</span> di bawah untuk membuat kiriman atau cerita.</>}
               </div>
             )
           }
@@ -2299,7 +2299,7 @@ export default function SportsSocialFeed() {
       {/* Tombol mengambang "+" — buat post/story (ikon, universal, target besar) */}
       <button
         onClick={() => setIsComposeOpen(true)}
-        aria-label="Create a new post or story"
+        aria-label="Buat kiriman atau cerita baru"
         data-tour="compose"
         className="fixed bottom-8 right-5 z-30 hidden h-14 w-14 place-items-center rounded-full text-ink shadow-lg transition active:scale-95 lg:grid"
         style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 8px 24px rgba(0,191,99,0.4)' }}
