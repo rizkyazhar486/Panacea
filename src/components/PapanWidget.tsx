@@ -34,6 +34,9 @@ import { UbinNotifikasi } from './UbinNotifikasi'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
 import { UbinPuasa } from './UbinPuasa'
 import { UbinZona2, UbinPemulihanDenyut, UbinUtangTidur, UbinProtein, UbinTekanan, UbinNapas, UbinDuduk } from './UbinLanjutan'
+import { UbinHrv, UbinTahapTidur, UbinEfisiensiTidur, UbinLajuNapas, UbinSaturasi, UbinSuhu } from './UbinPerangkat'
+import { UbinLingkungan } from './UbinLingkungan'
+import { UbinLab } from './UbinLab'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
@@ -470,6 +473,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'inspirasi', 'kartuBelajar', 'soalHarian', 'pewaktu', 'pengingat',
     'mata', 'fokus', 'kopi', 'puasa',
     'zona2', 'hrr', 'utangTidur', 'protein', 'tekanan', 'napas', 'duduk',
+    'hrv', 'tahapTidur', 'efisiensiTidur', 'lajuNapas', 'saturasi', 'suhu', 'lingkungan', 'lab',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -548,6 +552,14 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('tidurLebar') ? [{ kunci: 'tidurLebar', isi: <UbinTidurLebar /> }] : []),
         ...(pilihan.includes('giziLebar') ? [{ kunci: 'giziLebar', isi: <UbinGiziLebar /> }] : []),
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
+        ...(pilihan.includes('lingkungan') ? [{ kunci: 'lingkungan', isi: <UbinLingkungan /> }] : []),
+        ...(pilihan.includes('lab') ? [{ kunci: 'lab', isi: <UbinLab /> }] : []),
+        ...(pilihan.includes('hrv') ? [{ kunci: 'hrv', isi: <UbinHrv /> }] : []),
+        ...(pilihan.includes('tahapTidur') ? [{ kunci: 'tahapTidur', isi: <UbinTahapTidur /> }] : []),
+        ...(pilihan.includes('efisiensiTidur') ? [{ kunci: 'efisiensiTidur', isi: <UbinEfisiensiTidur /> }] : []),
+        ...(pilihan.includes('lajuNapas') ? [{ kunci: 'lajuNapas', isi: <UbinLajuNapas /> }] : []),
+        ...(pilihan.includes('saturasi') ? [{ kunci: 'saturasi', isi: <UbinSaturasi /> }] : []),
+        ...(pilihan.includes('suhu') ? [{ kunci: 'suhu', isi: <UbinSuhu /> }] : []),
         ...(pilihan.includes('zona2') ? [{ kunci: 'zona2', isi: <UbinZona2 /> }] : []),
         ...(pilihan.includes('hrr') ? [{ kunci: 'hrr', isi: <UbinPemulihanDenyut /> }] : []),
         ...(pilihan.includes('utangTidur') ? [{ kunci: 'utangTidur', isi: <UbinUtangTidur /> }] : []),

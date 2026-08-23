@@ -318,6 +318,10 @@ export const api = {
   getHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token').then((r) => r.token),
   rotateHealthWebhookToken: () => req<{ token: string }>('/api/health-profile/webhook-token/rotate', { method: 'POST' }).then((r) => r.token),
   // Live sports scores (free sources — see server/src/sports.ts for coverage & gaps)
+  lingkungan: (kota: string) =>
+    req<{ kota: string; aqi?: number; pm25?: number; pm10?: number; uv?: number; uvMaks?: number; sumber: string; error?: string }>(
+      `/api/lingkungan?kota=${encodeURIComponent(kota)}`,
+    ),
   getSportsLeagues: () => req<{ leagues: { id: string; label: string }[]; unavailable: { leagueId: string; label: string; unavailable: true; reason: string }[] }>('/api/sports/leagues'),
   getClinicalCalcAccess: () =>
     req<{ unlocked: boolean; free: boolean; limit: number; slotsLeft: number; pricePnc: number; priceIdr: number }>('/api/clinical-calculators/access'),

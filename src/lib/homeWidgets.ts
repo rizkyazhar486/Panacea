@@ -102,6 +102,14 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'tahapTidur', label: 'Tahap Tidur', ringkas: 'Dalam, REM, dan inti', ke: '/pola-tidur', emoji: '🛌', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'efisiensiTidur', label: 'Efisiensi Tidur', ringkas: 'Tidur ÷ waktu di ranjang', ke: '/pola-tidur', emoji: '📊', kategori: 'Tidur & Pemulihan', bawaan: true },
+  { id: 'lajuNapas', label: 'Laju Napas', ringkas: 'Napas per menit semalam', ke: '/tubuh', emoji: '🌬️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'saturasi', label: 'Saturasi Oksigen', ringkas: 'SpO₂ semalam', ke: '/tubuh', emoji: '🩸', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'suhu', label: 'Suhu Tubuh', ringkas: 'Simpangan dari kebiasaan', ke: '/tubuh', emoji: '🌡️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'zona2', label: 'Zona 2 Sepekan', ringkas: 'Menit di 60–70% HRmaks', ke: '/latihan?t=analisis', emoji: '🫀', kategori: 'Latihan', bawaan: true },
   { id: 'hrr', label: 'Pemulihan Denyut', ringkas: 'Turun berapa bpm dalam 1 menit', ke: '/latihan?t=analisis', emoji: '📉', kategori: 'Latihan', bawaan: true },
   { id: 'utangTidur', label: 'Utang Tidur', ringkas: '7 malam terhadap kebiasaan', ke: '/pola-tidur', emoji: '😴', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -315,6 +323,14 @@ export const WIDGET_HIDUP = [
   'tekanan',        // sistolik/diastolik + 14 bacaan
   'napas',          // panduan napas dua menit
   'duduk',          // pengingat berdiri
+  'hrv',            // HRV semalam + kebiasaan 14 hari
+  'tahapTidur',     // dalam/REM/inti dari perangkat
+  'efisiensiTidur', // tidur ÷ waktu di ranjang
+  'lajuNapas',      // napas per menit semalam
+  'saturasi',       // SpO2 semalam
+  'suhu',           // simpangan suhu dari kebiasaan
+  'lingkungan',     // AQI + UV dari Open-Meteo lewat server
+  'lab',            // hasil lab yang dimasukkan sendiri + rentang rujukan
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

@@ -117,6 +117,7 @@ import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
 import { checkPrayerReminder } from './salat.js'
+import { lingkunganKota } from './lingkungan.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
@@ -842,6 +843,11 @@ app.get('/api/sports/scores', async (req, res) => {
   // dates opsional (YYYYMMDD-YYYYMMDD) supaya widget dapat menanyakan jadwal
   // beberapa hari ke depan, bukan hanya pertandingan hari ini.
   res.json(await fetchLeagueScoreboard(league, req.query.dates ? String(req.query.dates) : undefined))
+})
+// Udara dan UV di kota pengguna — publik seperti papan skor, karena bukan
+// data pribadi siapa pun: yang dikirim hanya nama kota.
+app.get('/api/lingkungan', async (req, res) => {
+  res.json(await lingkunganKota(String(req.query.kota ?? 'Jakarta')))
 })
 app.get('/api/sports/f1', async (_req, res) => {
   res.json(await fetchF1Info())
