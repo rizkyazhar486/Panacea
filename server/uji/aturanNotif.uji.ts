@@ -137,6 +137,26 @@ periksa('bebanSepi diam sesudah 3 hari',
 periksa('bebanSepi diam sesudah 90 hari (sudah berhenti sama sekali, bukan lupa)',
   !cari('bebanSepi').nilai(konteks({}, 17 * 60, { hariSejakBeban: 90 })))
 
+// 7e. Gelombang penutup: Amsler, waktu layar, jet lag.
+periksa('amslerLama menyala sesudah 30 hari',
+  !!cari('amslerLama').nilai(konteks({}, 10 * 60, { amslerHariLalu: 30 })))
+periksa('amslerLama diam sesudah 7 hari',
+  !cari('amslerLama').nilai(konteks({}, 10 * 60, { amslerHariLalu: 7 })))
+
+periksa('layarPanjang menyala pada 200 menit sesi fokus',
+  !!cari('layarPanjang').nilai(konteks({}, 15 * 60, { fokusMenitHariIni: 200 })))
+periksa('layarPanjang diam pada 50 menit',
+  !cari('layarPanjang').nilai(konteks({}, 15 * 60, { fokusMenitHariIni: 50 })))
+
+periksa('jetlagSiap menyala 3 hari sebelum berangkat dengan selisih 6 jam',
+  !!cari('jetlagSiap').nilai(konteks({}, 20 * 60, { jetlagJam: 6, jetlagHariLagi: 3 })))
+periksa('jetlagSiap diam bila masih 20 hari lagi (belum waktunya menggeser)',
+  !cari('jetlagSiap').nilai(konteks({}, 20 * 60, { jetlagJam: 6, jetlagHariLagi: 20 })))
+periksa('jetlagSiap diam bila tanpa selisih jam',
+  !cari('jetlagSiap').nilai(konteks({}, 20 * 60, { jetlagJam: 0, jetlagHariLagi: 2 })))
+periksa('jetlagSiap ke barat berbunyi "lebih malam"',
+  /lebih malam/.test(cari('jetlagSiap').nilai(konteks({}, 20 * 60, { jetlagJam: -5, jetlagHariLagi: 2 }))!.judul))
+
 // 7b. Jendela waktu tiap aturan masuk akal (tidak ada yang tengah malam).
 for (const a of ATURAN) {
   if (!a.jendela) continue

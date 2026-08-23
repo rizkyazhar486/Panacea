@@ -48,6 +48,10 @@ interface Ringkasan {
   skriningLewat?: number
   umurGenggam?: number
   hariSejakBeban?: number
+  amslerHariLalu?: number
+  fokusMenitHariIni?: number
+  jetlagJam?: number
+  jetlagHariLagi?: number
 }
 
 function tanggalLokal(d = new Date()): string {
@@ -116,6 +120,34 @@ export function susunRingkasan(): Ringkasan {
     if (beban.length) {
       const t = Date.parse(beban[beban.length - 1].tanggal)
       if (Number.isFinite(t)) r.hariSejakBeban = Math.floor((Date.now() - t) / 864e5)
+    }
+  } catch { /* abaikan */ }
+
+  // Widget penutup: umur pemeriksaan Amsler, menit sesi fokus hari ini, dan
+  // rencana penyesuaian jet lag. Tetap angka saja — tidak ada catatan, tidak
+  // ada tujuan perjalanan, tidak ada nama kota.
+  try {
+    const amsler = JSON.parse(localStorage.getItem('pmd_amsler_v1') || '[]') as { tanggal?: string }[]
+    const akhir = amsler[amsler.length - 1]?.tanggal
+    if (akhir) {
+      const hari = Math.floor((Date.now() - Date.parse(`${akhir}T00:00:00`)) / 864e5)
+      if (Number.isFinite(hari) && hari >= 0) r.amslerHariLalu = hari
+    }
+  } catch { /* abaikan */ }
+
+  try {
+    const sesi = JSON.parse(localStorage.getItem('pmd_sesi_fokus_log_v1') || '[]') as { tanggal?: string; menit?: number }[]
+    let menit = 0
+    for (const s of sesi) if (s?.tanggal === hariIni) menit += Number(s.menit) || 0
+    if (menit > 0) r.fokusMenitHariIni = Math.round(menit)
+  } catch { /* abaikan */ }
+
+  try {
+    const j = JSON.parse(localStorage.getItem('pmd_jetlag_v1') || 'null') as { selisih?: string; tanggal?: string } | null
+    const jam = Number(j?.selisih)
+    if (j?.tanggal && Number.isFinite(jam) && jam !== 0) {
+      const lagi = Math.ceil((Date.parse(`${j.tanggal}T00:00:00`) - Date.now()) / 864e5)
+      if (Number.isFinite(lagi) && lagi >= 0 && lagi <= 30) { r.jetlagJam = jam; r.jetlagHariLagi = lagi }
     }
   } catch { /* abaikan */ }
 

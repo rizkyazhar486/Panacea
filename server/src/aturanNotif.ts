@@ -560,6 +560,71 @@ export const ATURAN: Aturan[] = [
     },
   },
   {
+    /* AMSLER LAMA TIDAK DIPERIKSA.
+       Perubahan pada penglihatan tengah datang perlahan dan mata yang satu
+       menutupi kekurangan mata yang lain, sehingga yang menyadarinya justru
+       bukan yang mengalaminya. Kisi ini alat pemantauan mandiri, bukan
+       pemeriksaan mata — dan kalimatnya harus mengatakan itu, supaya hasil
+       "normal" tidak dipakai sebagai alasan menunda periksa. */
+    id: 'amslerLama',
+    kategori: 'vital',
+    jendela: [J(9), J(20)],
+    jeda: 21,
+    nilai: (k) => {
+      const h = Number(k.ringkas?.amslerHariLalu)
+      if (!Number.isFinite(h) || h < 21) return null
+      return {
+        judul: `Kisi Amsler terakhir ${h} hari lalu`,
+        badan: 'Satu menit, satu mata bergantian. Ini pemantauan mandiri, bukan pemeriksaan mata — jadwal periksa ke dokter tetap berjalan sendiri.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    /* SESI FOKUS PANJANG TANPA JEDA.
+       Yang dihitung hanya sesi fokus yang dijalankan di dalam aplikasi ini —
+       bukan seluruh pemakaian layar, yang memang tidak dapat dilihat aplikasi
+       web. Batasnya 180 menit sehari, dan yang ditawarkan jeda, bukan
+       penilaian: bukti untuk aturan 20-20-20 memang tentang keluhan mata yang
+       lelah, bukan tentang kerusakan mata. */
+    id: 'layarPanjang',
+    kategori: 'kebiasaan',
+    jendela: [J(13), J(21)],
+    jeda: 1,
+    nilai: (k) => {
+      const m = Number(k.ringkas?.fokusMenitHariIni)
+      if (!Number.isFinite(m) || m < 180) return null
+      return {
+        judul: `${m} menit sesi fokus hari ini`,
+        badan: 'Waktunya jeda: pandang sesuatu sejauh enam meter selama dua puluh detik, dan berdiri sebentar. Ini mengurangi keluhan mata lelah — bukan mencegah kerusakan mata.',
+        url: './#/harian',
+      }
+    },
+  },
+  {
+    /* JET LAG: GESER SEBELUM BERANGKAT, BUKAN SESUDAH SAMPAI.
+       Jam tubuh bergeser kira-kira satu jam sehari, sehingga penyesuaian yang
+       dimulai setelah mendarat selalu terlambat sebanyak selisih jamnya.
+       Pengingat ini datang saat masih ada hari tersisa untuk menggeser, dan
+       berhenti sesudah keberangkatan. */
+    id: 'jetlagSiap',
+    kategori: 'pemulihan',
+    jendela: [J(19), J(22)],
+    jeda: 1,
+    nilai: (k) => {
+      const jam = Number(k.ringkas?.jetlagJam)
+      const lagi = Number(k.ringkas?.jetlagHariLagi)
+      if (!Number.isFinite(jam) || jam === 0) return null
+      if (!Number.isFinite(lagi) || lagi < 1 || lagi > Math.abs(jam)) return null
+      const timur = jam > 0
+      return {
+        judul: `${lagi} hari lagi berangkat — geser tidur ${timur ? 'lebih awal' : 'lebih malam'}`,
+        badan: `Selisihnya ${Math.abs(jam)} jam dan jam tubuh bergeser sekitar satu jam sehari. Malam ini tidur dan bangun sekitar satu jam lebih ${timur ? 'awal' : 'lambat'}, lalu tambah lagi besok. Cahaya pagi ${timur ? 'membantu' : 'menahan'} pergeserannya.`,
+        url: './#/harian',
+      }
+    },
+  },
+  {
     id: 'genggamLama',
     kategori: 'vital',
     jendela: [J(9), J(17)],
