@@ -40,6 +40,33 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
      jawaban server), yang kosong dikenali dengan mengukur tingginya, bukan
      dengan menebak dari luar. */
   const [kosong, setKosong] = useState<Record<number, boolean>>({})
+
+  /* HALAMAN DIPASANG BERTAHAP.
+     Satu tumpukan dapat berisi dua puluh lebih widget, dan setiap widget
+     membaca simpanan, memasang pewaktu, kadang menanyakan sesuatu ke server.
+     Memasang semuanya pada gambar pertama membuat beranda tersendat beberapa
+     ratus milidetik — terasa sebagai "widget ngelag" saat digeser. Yang
+     dipasang lebih dulu hanya halaman pertama beserta tetangganya; sisanya
+     menyusul saat peramban sedang senggang, beberapa halaman tiap giliran.
+     Halaman yang belum dipasang TIDAK dianggap kosong, supaya titiknya tidak
+     berkedip hilang-muncul. */
+  const [siap, setSiap] = useState(() => Math.min(anak.length, 3))
+  useEffect(() => { setSiap((s) => Math.max(s, Math.min(anak.length, 3))) }, [anak.length])
+  useEffect(() => {
+    if (siap >= anak.length) return
+    const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }
+    const lanjut = () => setSiap((s) => Math.min(anak.length, s + 3))
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(lanjut, { timeout: 400 })
+      return () => (window as unknown as { cancelIdleCallback?: (i: number) => void }).cancelIdleCallback?.(id)
+    }
+    const id = window.setTimeout(lanjut, 120)
+    return () => window.clearTimeout(id)
+  }, [siap, anak.length])
+  // Digeser lebih cepat daripada pemasangan bertahap: halaman yang dituju
+  // dipasang segera, jangan sampai orang menemukan halaman kosong.
+  useEffect(() => { setSiap((s) => Math.max(s, Math.min(anak.length, aktif + 3))) }, [aktif, anak.length])
+
   useEffect(() => {
     const periksa = () => {
       setKosong((lama) => {
@@ -50,7 +77,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
           // Tinggi halaman yang sudah disembunyikan selalu nol, sehingga
           // mengukur tinggi akan mengunci halaman itu tersembunyi selamanya —
           // termasuk sesudah jawaban server datang dan isinya muncul.
-          const nihil = !halaman.current[i]?.firstElementChild
+          const nihil = i < siap && !halaman.current[i]?.firstElementChild
           baru[i] = nihil
           if (lama[i] !== nihil) berubah = true
         })
@@ -61,7 +88,7 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
     const mo = new MutationObserver(periksa)
     for (const el of halaman.current) if (el) mo.observe(el, { childList: true })
     return () => mo.disconnect()
-  }, [anak])
+  }, [anak, siap])
 
   const tampil = anak.map((a, i) => ({ ...a, i })).filter((a) => !kosong[a.i])
 
@@ -145,16 +172,23 @@ export function Tumpukan({ judul, anak, aksi }: { judul?: string; anak: { kunci:
           kembali milik sistem di tepi layar. */}
       <div
         ref={wadah}
-        className="geser-aman flex snap-x snap-mandatory items-start overflow-x-auto"
-        style={{ scrollbarWidth: 'none', height: tinggi, transition: 'height 0.22s ease' }}
+        className="geser-halaman items-start"
+        /* FIRM, TETAPI TETAP MENGALIR.
+           Tingginya mengikuti halaman yang tampak — itu yang membuat tiap
+           halaman terasa pas. Yang membuatnya tadinya terasa "loss" adalah dua
+           hal lain: petak yang dapat menyusut sampai setinggi satu baris
+           sehingga bingkainya seakan hilang, dan geseran yang dapat meluncur
+           melewati dua-tiga halaman sekaligus. Sekarang ada tinggi minimum,
+           dan tiap geseran berhenti tepat satu halaman. */
+        style={{ scrollbarWidth: 'none', height: tinggi, minHeight: 120, transition: 'height 0.22s ease' }}
       >
         {anak.map((a, i) => (
           <div
             key={a.kunci}
             ref={(el) => { halaman.current[i] = el }}
-            className={kosong[i] ? 'hidden' : 'w-full shrink-0 snap-center pr-[1px]'}
+            className={kosong[i] ? 'hidden' : ''}
           >
-            {a.isi}
+            {i < siap ? a.isi : null}
           </div>
         ))}
       </div>

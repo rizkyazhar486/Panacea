@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { catatSesiFokus } from './UbinPenutup'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tiga pewaktu untuk hari kerja: istirahat mata 20-20-20, sesi fokus, dan kopi.
@@ -189,9 +190,15 @@ export function UbinFokus() {
     berbunyi.current = true
     getar([400, 200, 400])
     bunyi(760, 3)
+    // Sesi yang SELESAI dicatat, bukan sesi yang dimulai: menghitung sesi yang
+    // dibatalkan di menit kedua akan membuat angka fokus harian menjadi angka
+    // niat, bukan angka kerja.
+    if (lamaMenit.current > 0) catatSesiFokus(lamaMenit.current)
   }, [habis])
 
+  const lamaMenit = useRef(0)
   const mulai = useCallback((menit: number) => {
+    lamaMenit.current = menit
     const t = Date.now() + menit * 60_000
     berbunyi.current = false
     simpanAngka(KUNCI_FOKUS, t)

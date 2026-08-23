@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, backendEnabled } from '../lib/api'
 
@@ -53,6 +53,24 @@ export function UbinSkor() {
   const [laga, setLaga] = useState<Laga[] | null>(null)
   const [galat, setGalat] = useState('')
   const [adaFavorit, setAdaFavorit] = useState<boolean | null>(null)
+  const geser = useRef<HTMLDivElement>(null)
+  const [aktif, setAktif] = useState(0)
+
+  useEffect(() => {
+    const el = geser.current
+    if (!el) return
+    let jalan = false
+    const pada = () => {
+      if (jalan) return
+      jalan = true
+      requestAnimationFrame(() => {
+        setAktif(Math.max(0, Math.round(el.scrollLeft / Math.max(1, el.clientWidth))))
+        jalan = false
+      })
+    }
+    el.addEventListener('scroll', pada, { passive: true })
+    return () => el.removeEventListener('scroll', pada)
+  }, [laga])
 
   useEffect(() => {
     if (!backendEnabled) return
@@ -111,31 +129,52 @@ export function UbinSkor() {
           return keluar
         }
 
-        const liga3 = [...perLiga.entries()].slice(0, 3)
-        let hasil: Laga[] = []
-        for (const [liga, tim] of liga3) hasil.push(...await ambil(liga, tim))
-
-        /* TIDAK ADA LAGA HARI INI BUKAN BERARTI TIDAK ADA APA-APA.
-           Papan skor tanpa rentang tanggal hanya berisi pertandingan hari ini,
-           sehingga widget ini kosong pada hari tim itu libur — dan yang
-           terbaca oleh pemakainya adalah "fitur ini rusak", bukan "tim saya
-           tidak main hari ini". Bila kosong, ditanyakan sekali lagi untuk
-           empat belas hari ke depan dan yang ditampilkan jadwal berikutnya. */
-        if (!hasil.length) {
-          const hariIni = new Date()
-          const cap = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
-          const rentang = `${cap(hariIni)}-${cap(new Date(Date.now() + 14 * 864e5))}`
-          for (const [liga, tim] of liga3) hasil.push(...await ambil(liga, tim, rentang))
-          hasil = hasil.filter((e) => e.state !== 'post')
-        }
+        /* SEMUA LIGA YANG DIBINTANGI, DALAM SATU RENTANG TANGGAL.
+           Dua batas sebelumnya membuat widget ini hanya sanggup menampilkan
+           satu tim: hanya tiga liga yang ditanyakan, dan papan skor tanpa
+           rentang tanggal hanya berisi pertandingan HARI INI — sehingga tim
+           yang hari itu libur tidak pernah muncul, betapa pun ia dibintangi.
+           Rentangnya kini kemarin sampai empat belas hari ke depan sejak
+           permintaan pertama, jadi yang sedang berjalan, yang baru selesai,
+           dan jadwal berikutnya datang bersamaan. */
+        const cap = (d: Date) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+        const rentang = `${cap(new Date(Date.now() - 864e5))}-${cap(new Date(Date.now() + 14 * 864e5))}`
+        const ligaSemua = [...perLiga.entries()].slice(0, 6)
+        const kumpul: Laga[] = []
+        for (const [liga, tim] of ligaSemua) kumpul.push(...await ambil(liga, tim, rentang))
         if (!hidup) return
+
+        // Satu laga dapat cocok untuk dua tim yang sama-sama dibintangi.
+        const unik = new Map<string, Laga>()
+        for (const e of kumpul) if (e?.id && !unik.has(e.id)) unik.set(e.id, e)
 
         // Yang sedang berjalan paling atas, lalu yang akan main, lalu yang
         // sudah selesai — urutan itu mengikuti seberapa mendesak orang ingin
         // melihatnya, bukan urutan abjad.
         const urutan = { in: 0, pre: 1, post: 2 }
-        hasil.sort((a, b) => urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime))
-        setLaga(hasil.slice(0, 2))
+        const hasil = [...unik.values()].sort(
+          (a, b) => urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime),
+        )
+
+        /* SETIAP TIM YANG DIBINTANGI KEBAGIAN SATU HALAMAN LEBIH DAHULU.
+           Bila daftar dipotong begitu saja, satu tim yang jadwalnya padat
+           memakan seluruh tempat dan tim lain tidak pernah tampak sama sekali
+           — persis keluhan yang membuat bagian ini ditulis ulang. Giliran
+           pertama diberikan satu laga untuk tiap tim, sisanya baru mengisi. */
+        const semuaTim = favorit.map((f) => f.split(':').slice(1).join(':')).filter(Boolean)
+        const terpilih: Laga[] = []
+        const sudah = new Set<string>()
+        for (const nama of semuaTim) {
+          const satu = new Set([nama])
+          const e = hasil.find((x) => !sudah.has(x.id) && (cocok(satu, x.home) || cocok(satu, x.away)))
+          if (e) { terpilih.push(e); sudah.add(e.id) }
+        }
+        for (const e of hasil) {
+          if (terpilih.length >= 10) break
+          if (!sudah.has(e.id)) { terpilih.push(e); sudah.add(e.id) }
+        }
+        terpilih.sort((a, b) => urutan[a.state] - urutan[b.state] || Date.parse(a.startTime) - Date.parse(b.startTime))
+        setLaga(terpilih)
         setGalat('')
 
         if (hasil.some((e) => e.state === 'in')) jam = window.setTimeout(muat, 60_000)
@@ -157,9 +196,24 @@ export function UbinSkor() {
     <section>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <h2 className="t-kecil font-black uppercase tracking-wide text-neutral-500">Skor tim Anda</h2>
-        <Link to="/sports-scores" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
-          Semua →
-        </Link>
+        <div className="ml-auto flex items-center gap-2">
+          {/* Penanda halaman: berapa laga yang ada dan di mana kita sekarang.
+              Tanpa ini, satu-satunya cara mengetahui masih ada tim lain di
+              sebelah adalah dengan menggesernya lebih dulu. */}
+          {laga && laga.length > 1 && (
+            <span className="flex items-center gap-1" aria-hidden>
+              {laga.slice(0, 10).map((e, i) => (
+                <span
+                  key={e.id}
+                  className={`h-1.5 rounded-full transition-all ${i === aktif ? 'w-4 bg-brand' : 'w-1.5 bg-neutral-300 dark:bg-white/25'}`}
+                />
+              ))}
+            </span>
+          )}
+          <Link to="/sports-scores" className="t-kecil flex min-h-[40px] items-center font-bold text-brand">
+            Semua →
+          </Link>
+        </div>
       </div>
 
       <div className="kaca rounded-3xl p-3">
@@ -174,11 +228,24 @@ export function UbinSkor() {
             Tidak ada pertandingan tim Anda hari ini maupun dalam 14 hari ke depan menurut sumber skor.
           </p>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div
+            ref={geser}
+            className="geser-halaman"
+            style={{ scrollbarWidth: 'none' }}
+          >
             {laga.map((e) => {
               const k = KEADAAN[e.state] ?? KEADAAN.pre
               return (
-                <Link key={e.id} to="/sports-scores" className="block">
+                <Link
+                  key={e.id}
+                  to="/sports-scores"
+                  /* Lebar halaman DIPAKU pada lebar petak: flex-basis 100% dengan
+                     min-width 0, supaya isi terpanjang (nama tim) tidak
+                     melebarkan halamannya sendiri dan membuat geseran berhenti
+                     sedikit meleset dari tepi — bergeser beberapa piksel tiap
+                     halaman, dan pada halaman kelima meleset satu kartu. */
+                  className="block overflow-hidden"
+                >
                   <div className="flex items-center justify-between gap-2">
                     <span className={`t-mikro rounded-full px-2 py-0.5 font-black ${k.kelas}`}>{k.label}</span>
                     <span className="t-mikro truncate tabular-nums text-neutral-400">
@@ -187,7 +254,7 @@ export function UbinSkor() {
                         : e.statusDetail}
                     </span>
                   </div>
-                  <div className="mt-1.5 flex items-center gap-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <Lambang src={e.home.logo} nama={e.home.name} />
                     <span className="t-kecil min-w-0 flex-1 truncate font-bold text-ink dark:text-white">{e.home.abbrev || e.home.name}</span>
                     <span className="shrink-0 text-[20px] font-black leading-none tabular-nums text-ink dark:text-white">

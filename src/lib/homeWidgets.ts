@@ -115,6 +115,12 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'beban', label: 'Volume Angkat Beban', ringkas: 'Delapan pekan dan rekor gerakan', ke: '/latihan-beban', emoji: '🏋️', kategori: 'Latihan', bawaan: true },
   { id: 'ukurBerkala', label: 'Ukur Berkala', ringkas: 'Kekuatan genggam dan keseimbangan', ke: '/tubuh', emoji: '✊', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'skrining', label: 'Skrining & Vaksin', ringkas: 'Jatuh tempo pemeriksaan Anda sendiri', ke: '/tubuh', emoji: '🗓️', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'amsler', label: 'Kisi Amsler', ringkas: 'Pemantauan penglihatan tengah', ke: '/tubuh', emoji: '👁️', kategori: 'Klinis & Belajar', bawaan: true },
+  { id: 'layar', label: 'Sesi Fokus Tercatat', ringkas: 'Menit fokus hari ini dan sepekan', ke: '/harian', emoji: '🖥️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'peregangan', label: 'Peregangan 3 Menit', ringkas: 'Lima gerakan terpandu', ke: '/latihan', emoji: '🤸', kategori: 'Latihan', bawaan: true },
+  { id: 'tekananSebar', label: 'Sebaran Tekanan Darah', ringkas: 'Rerata dan rentang antar-bacaan', ke: '/tubuh', emoji: '📉', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'rangkaian', label: 'Rangkaian Kebiasaan', ringkas: 'Hari berturut-turut, tanpa hukuman', ke: '/harian', emoji: '🔗', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'jetlag', label: 'Jet Lag', ringkas: 'Geser jam tidur sebelum berangkat', ke: '/harian', emoji: '✈️', kategori: 'Tidur & Pemulihan', bawaan: true },
   { id: 'lab', label: 'Hasil Lab', ringkas: 'HbA1c, ApoB, eGFR, dan perjalanannya', ke: '/tubuh', emoji: '🧪', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'lingkungan', label: 'Udara & UV', ringkas: 'AQI dan indeks UV kota Anda', ke: '/tubuh', emoji: '🌤️', kategori: 'Tubuh & Data', bawaan: true },
   { id: 'hrv', label: 'HRV Semalam', ringkas: 'Terhadap kebiasaan 14 hari', ke: '/tubuh?t=jantung', emoji: '💓', kategori: 'Tidur & Pemulihan', bawaan: true },
@@ -310,6 +316,7 @@ export const WIDGET_HIDUP = [
   // ── Tubuh & vital ───────────────────────────────────────────────────────
   'komposisi', 'tekanan', 'lajuNapas', 'saturasi', 'suhu', 'lab', 'tenaga',
   'obatPengingat', 'beban', 'ukurBerkala', 'skrining',
+  'amsler', 'layar', 'peregangan', 'tekananSebar', 'rangkaian', 'jetlag',
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────

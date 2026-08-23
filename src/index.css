@@ -952,6 +952,35 @@ html { -webkit-overflow-scrolling: touch; }
     display: none;
   }
 
+  /* ── Deret HALAMAN PENUH: satu isi selebar petak, digeser satu-satu ──────
+     Berbeda dari .geser-aman yang dibuat untuk DERET KARTU kecil beruntun.
+     Kartu kecil membutuhkan jarak antar-kartu dan lebar tetap; halaman penuh
+     tidak, dan justru RUSAK olehnya: jarak antar-halaman membuat letak
+     halaman ke-n bergeser sejauh n kali jarak itu, sehingga penomoran
+     halaman — yang dihitung dari letak guliran dibagi lebar petak — meleset
+     makin jauh tiap halaman. Pada dua puluh lima halaman selisihnya mencapai
+     setengah halaman, dan yang terasa oleh tangan adalah geseran yang
+     "longgar": berhenti tidak pada tepi mana pun. */
+  .geser-halaman {
+    display: flex;
+    overflow-x: auto;
+    gap: 0;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .geser-halaman::-webkit-scrollbar {
+    display: none;
+  }
+
+  .geser-halaman > * {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
   /* ── Deret KARTU: lekatan WAJIB, bukan sekadar berdekatan ────────────────
      Pada deret keping penyaring, lekatan "proximity" benar: keping berukuran
      berbeda-beda dan memaksa tiap keping ke tepi kiri justru membuat geseran
