@@ -463,7 +463,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <LogoMark size={28} />
         <div className="leading-tight">
           <div className="text-sm font-extrabold tracking-tight">Panaceamed<span className="text-brand">.id</span></div>
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Longevity Medical-AI · Official Document</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Medis-AI Umur Panjang · Dokumen Resmi</div>
         </div>
       </div>
       {/* Ambient animated backdrop — sits behind every page */}
@@ -486,13 +486,13 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Hide menu" aria-label="Hide menu">
+          <button onClick={() => setSidebarOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30" title="Sembunyikan menu" aria-label="Sembunyikan menu">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
           </button>
         </div>
 
         <div className="mb-4 rounded-xl bg-brand-50 px-3 py-2">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">Logged in as</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wide text-brand-dark">Masuk sebagai</div>
           <div className="truncate text-sm font-bold">{account.name}</div>
           <div className="text-[11px] text-neutral-500">{roleLabel[account.role]}</div>
         </div>
@@ -546,7 +546,7 @@ export function Shell({ children }: { children: ReactNode }) {
           }}
           className="mt-2 flex min-h-[40px] items-center gap-2 rounded-full px-4 text-sm font-semibold text-neutral-500 hover:bg-neutral-50"
         >
-          <IconLogout size={18} /> Log Out
+          <IconLogout size={18} /> Keluar
         </button>
       </aside>
 
@@ -557,7 +557,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               onClick={() => setMenuOpen(true)}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:hidden"
-              aria-label="Open menu"
+              aria-label="Buka menu"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
@@ -568,7 +568,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="hidden h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100 lg:grid"
-                aria-label="Open sidebar menu"
+                aria-label="Buka menu samping"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                   <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
@@ -581,8 +581,8 @@ export function Shell({ children }: { children: ReactNode }) {
               <button
                 onClick={kembali}
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
-                aria-label="Go back"
-                title="Back"
+                aria-label="Kembali"
+                title="Kembali"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
@@ -596,7 +596,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <button
             onClick={() => setCariBuka(true)}
             className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink hover:bg-neutral-100"
-            aria-label="Search features, people, or hashtags"
+            aria-label="Cari fitur, orang, atau tagar"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="21" y2="21" />
@@ -612,7 +612,7 @@ export function Shell({ children }: { children: ReactNode }) {
               onClick={() => setTheme(toggleTheme())}
               className="hidden h-10 w-10 place-items-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 sm:grid"
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              aria-label="Toggle theme"
+              aria-label="Ganti tema terang/gelap"
             >
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
             </button>
@@ -631,15 +631,15 @@ export function Shell({ children }: { children: ReactNode }) {
                 logout()
               }}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-accent/20 bg-accent/10 text-accent transition hover:bg-accent/20 lg:hidden"
-              title="Log Out"
-              aria-label="Log Out"
+              title="Keluar"
+              aria-label="Keluar"
             >
               <IconLogout size={18} />
             </button>
             {showPatient && (
               <div
                 className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-2 py-1"
-                title="Active patient"
+                title="Pasien aktif"
               >
                 <span
                   className="grid h-8 w-8 place-items-center rounded-lg text-xs font-bold text-white"
@@ -792,7 +792,7 @@ export function Shell({ children }: { children: ReactNode }) {
                   <div className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{roleLabel[account.role]}</div>
                 </div>
               </div>
-              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-500 hover:bg-neutral-100" aria-label="Close menu">×</button>
+              <button onClick={() => setMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-full text-2xl leading-none text-neutral-500 hover:bg-neutral-100" aria-label="Tutup menu">×</button>
             </div>
             <DrawerNav items={items} />
             <div className="border-t border-black/5 p-3">
@@ -822,7 +822,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 {theme === 'dark' ? 'Mode terang' : 'Mode gelap'}
               </button>
               <button onClick={doLogout} className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-100 px-3 py-3 text-sm font-bold text-neutral-600">
-                <IconLogout size={18} /> Log Out
+                <IconLogout size={18} /> Keluar
               </button>
             </div>
           </aside>

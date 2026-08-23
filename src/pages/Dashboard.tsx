@@ -158,7 +158,7 @@ function BmiGauge({ bmi, kesan, tone }: { bmi: number; kesan: string; tone: stri
         </div>
       </div>
       <div className="flex justify-between text-[10px] font-semibold text-neutral-300">
-        <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
+        <span>Kurang</span><span>Normal</span><span>Lebih</span><span>Obesitas</span>
       </div>
       <div className="text-center">
         <span className="text-3xl font-black tabular-nums" style={{ color }}>{bmi}</span>
@@ -275,20 +275,20 @@ function AddPatientForm({ onAdd }: { onAdd: (p: Patient) => void }) {
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <Field label="Name"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Patient name" autoFocus /></Field>
-      <Field label="Sex">
+      <Field label="Nama"><input className={inputClass} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Nama pasien" autoFocus /></Field>
+      <Field label="Jenis kelamin">
         <select className={inputClass} value={f.sex} onChange={(e) => setF({ ...f, sex: e.target.value })}>
-          <option value="L">Male</option><option value="P">Female</option>
+          <option value="L">Laki-laki</option><option value="P">Perempuan</option>
         </select>
       </Field>
-      <Field label="Age"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
-      <Field label="Blood Type"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
-      <Field label="Height (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
-      <Field label="Weight (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
-      <Field label="Chronic Conditions"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="comma separated" /></Field>
-      <Field label="Allergies"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="comma separated" /></Field>
+      <Field label="Usia"><input className={inputClass} type="number" value={f.age} onChange={(e) => setF({ ...f, age: e.target.value })} /></Field>
+      <Field label="Golongan Darah"><input className={inputClass} value={f.bloodType} onChange={(e) => setF({ ...f, bloodType: e.target.value })} placeholder="O+" /></Field>
+      <Field label="Tinggi (cm)"><input className={inputClass} type="number" value={f.heightCm} onChange={(e) => setF({ ...f, heightCm: e.target.value })} /></Field>
+      <Field label="Berat (kg)"><input className={inputClass} type="number" value={f.weightKg} onChange={(e) => setF({ ...f, weightKg: e.target.value })} /></Field>
+      <Field label="Penyakit Menahun"><input className={inputClass} value={f.conditions} onChange={(e) => setF({ ...f, conditions: e.target.value })} placeholder="dipisahkan koma" /></Field>
+      <Field label="Alergi"><input className={inputClass} value={f.allergies} onChange={(e) => setF({ ...f, allergies: e.target.value })} placeholder="dipisahkan koma" /></Field>
       <div className="flex items-end sm:col-span-2 lg:col-span-4">
-        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Save Patient</Button>
+        <Button onClick={submit} disabled={!f.name.trim()}><IconPlus size={16} /> Simpan Pasien</Button>
       </div>
     </div>
   )
@@ -303,8 +303,8 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
     sys: '120', dia: '80', hr: '78', rr: '16', temp: '36.6', spo2: '98', glu: '',
   })
   const fields: [string, string][] = [
-    ['sys', 'Systolic'], ['dia', 'Diastolic'], ['hr', 'Pulse'],
-    ['rr', 'RR'], ['temp', 'Temp'], ['spo2', 'SpO₂'], ['glu', 'Blood Glucose'],
+    ['sys', 'Systolic'], ['dia', 'Diastolic'], ['hr', 'Nadi'],
+    ['rr', 'RR'], ['temp', 'Temp'], ['spo2', 'SpO₂'], ['glu', 'Gula Darah'],
   ]
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
@@ -320,7 +320,7 @@ function AddVital({ onAdd }: { onAdd: (v: VitalSign) => void }) {
           heartRate: Number(f.hr), respRate: Number(f.rr),
           tempC: Number(f.temp), spo2: Number(f.spo2),
           glucose: f.glu ? Number(f.glu) : undefined,
-        })}>Save</Button>
+        })}>Simpan</Button>
       </div>
     </div>
   )
@@ -361,8 +361,8 @@ function AiClinicalInsight({ patient, vitals, supportive }: { patient: Patient; 
       <div className="flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15"><IconSparkle size={16} /></span>
         <div>
-          <div className="text-sm font-black">AI Clinical Insight</div>
-          <div className="text-[10px] font-semibold text-ink/60">Powered by Panaceamed AI · Beta</div>
+          <div className="text-sm font-black">Telaah Klinis AI</div>
+          <div className="text-[10px] font-semibold text-ink/60">Ditenagai Panaceamed AI · Beta</div>
         </div>
       </div>
 
@@ -414,13 +414,13 @@ export function Dashboard() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[22px]" style={{ background: 'linear-gradient(135deg, #00BF63, #0B7A4B)', boxShadow: '0 12px 40px rgba(0,191,99,0.3)' }}>
             <IconHeart size={34} className="text-ink" />
           </div>
-          <h2 className="mt-7 text-2xl font-black tracking-tight">Start Your Longevity Journey</h2>
+          <h2 className="mt-7 text-2xl font-black tracking-tight">Mulai Perjalanan Umur Panjang Anda</h2>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-neutral-500">
-            Add your first patient to monitor vital signs, anthropometry, and clinical data — all integrated to support quality longevity.
+            Tambahkan pasien pertama Anda untuk memantau tanda vital, antropometri, dan data klinis — semuanya menyatu untuk menunjang umur panjang yang berkualitas.
           </p>
         </div>
         <Card className="overflow-hidden">
-          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="New Patient" /></div>
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Pasien Baru" /></div>
           <div className="p-5"><AddPatientForm onAdd={(np) => addPatient(np)} /></div>
         </Card>
       </div>
@@ -445,7 +445,7 @@ export function Dashboard() {
       {/* Add Patient Drawer */}
       {showAddPatient && (
         <Card className="overflow-hidden">
-          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Add Patient" /></div>
+          <div className="border-b border-neutral-100 px-5 py-3"><SectionTitle icon={<IconPlus size={18} />} title="Tambah Pasien" /></div>
           <div className="p-5"><AddPatientForm onAdd={(np) => { addPatient(np); setShowAddPatient(false) }} /></div>
         </Card>
       )}
@@ -463,7 +463,7 @@ export function Dashboard() {
                 <div className="pb-1">
                   <h2 className="text-[22px] font-black leading-tight tracking-tight">{p.name}</h2>
                   <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-neutral-500">
-                    <span>{p.sex === 'L' ? 'Male' : 'Female'}</span>
+                    <span>{p.sex === 'L' ? 'Laki-laki' : 'Perempuan'}</span>
                     <span className="text-neutral-200">·</span>
                     <span>{ageFromDob(p.dob)} years old</span>
                     {p.bloodType && (<><span className="text-neutral-200">·</span><span className="font-semibold text-neutral-600">Type {p.bloodType}</span></>)}
@@ -474,7 +474,7 @@ export function Dashboard() {
               </div>
               <div className="flex flex-col items-center gap-1 sm:pb-1">
                 <LongevityRing score={longevity.score} band={longevity.band} />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Longevity Score</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Skor Umur Panjang</span>
               </div>
             </div>
 
@@ -523,15 +523,15 @@ export function Dashboard() {
       {/* Vitals Feed Grid */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconHeart size={20} />} title="Vital Signs" subtitle="Continuous monitoring — longevity support" />
+          <SectionTitle icon={<IconHeart size={20} />} title="Tanda Vital" subtitle="Pemantauan berkelanjutan — penunjang umur panjang" />
         </div>
         <div className="grid grid-cols-2 gap-3 p-5 lg:grid-cols-3">
-          <VitalCard label="Blood Pressure" value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'} unit="mmHg" series={vitals.map((v) => v.systolic)} tone={latest && latest.systolic >= 140 ? 'high' : 'normal'} />
-          <VitalCard label="Pulse" value={latest ? `${latest.heartRate}` : '—'} unit="x/min" series={vitals.map((v) => v.heartRate)} tone={latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'} />
-          <VitalCard label="Resp. Rate" value={latest ? `${latest.respRate}` : '—'} unit="x/min" series={vitals.map((v) => v.respRate)} tone={latest && latest.respRate > 20 ? 'high' : 'normal'} />
-          <VitalCard label="Temperature" value={latest ? `${latest.tempC}` : '—'} unit="°C" series={vitals.map((v) => v.tempC)} tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'} />
+          <VitalCard label="Tekanan Darah" value={latest ? `${latest.systolic}/${latest.diastolic}` : '—'} unit="mmHg" series={vitals.map((v) => v.systolic)} tone={latest && latest.systolic >= 140 ? 'high' : 'normal'} />
+          <VitalCard label="Nadi" value={latest ? `${latest.heartRate}` : '—'} unit="x/min" series={vitals.map((v) => v.heartRate)} tone={latest && (latest.heartRate > 100 || latest.heartRate < 60) ? 'high' : 'normal'} />
+          <VitalCard label="Laju Napas" value={latest ? `${latest.respRate}` : '—'} unit="x/min" series={vitals.map((v) => v.respRate)} tone={latest && latest.respRate > 20 ? 'high' : 'normal'} />
+          <VitalCard label="Suhu" value={latest ? `${latest.tempC}` : '—'} unit="°C" series={vitals.map((v) => v.tempC)} tone={latest && latest.tempC >= 37.5 ? 'high' : 'normal'} />
           <VitalCard label="SpO₂" value={latest ? `${latest.spo2}` : '—'} unit="%" series={vitals.map((v) => v.spo2)} tone={latest && latest.spo2 < 95 ? 'high' : 'normal'} />
-          <VitalCard label="Blood Glucose" value={latest?.glucose ? `${latest.glucose}` : '—'} unit="mg/dL" series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)} tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'} />
+          <VitalCard label="Gula Darah" value={latest?.glucose ? `${latest.glucose}` : '—'} unit="mg/dL" series={vitals.map((v) => v.glucose ?? 0).filter(Boolean)} tone={latest?.glucose && latest.glucose >= 200 ? 'high' : 'normal'} />
         </div>
         {latest && (
           <div className="border-t border-neutral-50 px-5 py-2.5">
@@ -546,16 +546,16 @@ export function Dashboard() {
       {/* Anthropometry + BMI Gauge */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconSparkle size={18} />} title="Anthropometry" subtitle="Asia-Pacific cut-off" />
+          <SectionTitle icon={<IconSparkle size={18} />} title="Antropometri" subtitle="Batas Asia-Pasifik" />
         </div>
         <div className="grid gap-8 p-5 lg:grid-cols-2">
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
-              <span className="text-sm text-neutral-500">Height</span>
+              <span className="text-sm text-neutral-500">Tinggi</span>
               <span className="text-lg font-bold tabular-nums">{p.heightCm} <span className="text-xs font-normal text-neutral-500">cm</span></span>
             </div>
             <div className="flex items-center justify-between rounded-xl px-4 py-3.5" style={{ background: 'rgba(0,0,0,0.02)' }}>
-              <span className="text-sm text-neutral-500">Weight</span>
+              <span className="text-sm text-neutral-500">Berat</span>
               <span className="text-lg font-bold tabular-nums">{p.weightKg} <span className="text-xs font-normal text-neutral-500">kg</span></span>
             </div>
             <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(0,191,99,0.03)', border: '1px solid rgba(0,191,99,0.08)' }}>
@@ -578,7 +578,7 @@ export function Dashboard() {
         <div className="border-b border-neutral-100 px-5 py-4">
           <SectionTitle
             icon={<IconSparkle size={18} />}
-            title="Growth & BMI Chart"
+            title="Grafik Pertumbuhan & IMT"
             subtitle={ageFromDob(p.dob) <= 19 ? 'Child/adolescent growth curve (WHO/CDC) — weight-for-age · height-for-age · BMI-for-age' : 'Adult BMI classification (Asia-Pacific)'}
           />
         </div>
@@ -591,7 +591,7 @@ export function Dashboard() {
       {/* Supportive Results — Card Stream */}
       <Card className="overflow-hidden">
         <div className="border-b border-neutral-100 px-5 py-4">
-          <SectionTitle icon={<IconShield size={20} />} title="Supportive Results" subtitle="Lab · ECG · Radiology — longevity support" />
+          <SectionTitle icon={<IconShield size={20} />} title="Hasil Penunjang" subtitle="Lab · EKG · Radiologi — penunjang umur panjang" />
         </div>
         <div className="space-y-2 p-5">
           {supportive.length === 0 ? (
@@ -599,7 +599,7 @@ export function Dashboard() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: 'rgba(0,0,0,0.03)' }}>
                 <IconShield size={22} className="text-neutral-300" />
               </div>
-              <p className="text-sm text-neutral-500">No supportive results yet.</p>
+              <p className="text-sm text-neutral-500">Belum ada hasil penunjang.</p>
             </div>
           ) : (
             supportive.map((r) => <SupportiveCard key={r.id} r={r} />)

@@ -99,7 +99,7 @@ function SymptomBodyMap() {
       <Field label="Note (optional)">
         <input className={`${inputClass} mt-1`} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Sharp, dull, since when…" />
       </Field>
-      <button onClick={save} className="mt-2 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Log entry</button>
+      <button onClick={save} className="mt-2 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Catat masukan</button>
       <div className="mt-4 space-y-2">
         {logs.slice(0, 8).map((l) => (
           <div key={l.t} className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 text-[12px] dark:bg-white/5">
@@ -130,7 +130,7 @@ function NeatTracker() {
         <input className={`${inputClass} mt-1`} type="number" min={0} max={1440} value={todayMin || ''} onChange={(e) => setMinutes((m) => ({ ...m, [today]: Number(e.target.value) || 0 }))} placeholder="0" />
       </Field>
       <div className="mt-3 grid grid-cols-2 gap-3 text-center">
-        <div className="rounded-xl bg-brand/10 p-3"><div className="text-xl font-black text-brand-dark">{Math.round(todayMin / 60 * 10) / 10}h</div><div className="text-[11px] text-neutral-500">Today</div></div>
+        <div className="rounded-xl bg-brand/10 p-3"><div className="text-xl font-black text-brand-dark">{Math.round(todayMin / 60 * 10) / 10}h</div><div className="text-[11px] text-neutral-500">Hari ini</div></div>
         <div className="rounded-xl bg-brand/10 p-3"><div className="text-xl font-black text-brand-dark">{Math.round(weekTotal / 60 * 10) / 10}h</div><div className="text-[11px] text-neutral-500">Last 7 days</div></div>
       </div>
       {todayMin >= 180 && <Badge tone="brand">✓ Great NEAT day</Badge>}
@@ -149,7 +149,7 @@ export function BodyToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Body & Skin Toolkit" subtitle="Three small real body-tracking tools in one place" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Perkakas Tubuh & Kulit" subtitle="Tiga alat kecil pemantau tubuh yang sungguh mengukur, dalam satu tempat" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>
