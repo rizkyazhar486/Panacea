@@ -46,6 +46,7 @@ const Legal = lazy(() => import('./pages/Legal').then((m) => ({ default: m.Legal
 const Community = lazy(() => import('./pages/Community').then((m) => ({ default: m.Community })))
 const Feed = lazy(() => import('./pages/Feed'))
 const SemuaFitur = lazy(() => import('./pages/SemuaFitur'))
+const RingkasanKarya = lazy(() => import('./pages/RingkasanKarya'))
 const Tutorial = lazy(() => import('./pages/Tutorial'))
 const VitaPulse = lazy(() => import('./pages/VitaPulse').then((m) => ({ default: m.VitaPulse })))
 const RealisticHealth = lazy(() => import('./pages/RealisticHealth').then((m) => ({ default: m.RealisticHealth })))
@@ -262,6 +263,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/community" element={<Community />} />
               <Route path="/feed" element={<Feed />} />
               <Route path="/semua-fitur" element={<SemuaFitur />} />
+              <Route path="/ringkasan-karya" element={<RingkasanKarya />} />
               <Route path="/tutorial" element={<Tutorial />} />
               <Route path="/vitapulse" element={<VitaPulse />} />
               <Route path="/sehat-sibuk" element={<RealisticHealth />} />

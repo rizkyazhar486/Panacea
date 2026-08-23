@@ -71,6 +71,7 @@ export const PENJELASAN_FITUR: Record<string, string> = {
   '/calculator-hub': 'Pintu ke seluruh kalkulator klinis, dapat dicari',
   '/fitness-hub': 'Pintu ke seluruh alat kebugaran dan latihan',
   '/clinical-hub': 'Pintu ke seluruh alat klinis dan bantuan kecerdasan buatan',
+  '/ringkasan-karya': 'Ringkasan satu paragraf 131 buku dan film pengembangan diri',
   '/semua-fitur': 'Daftar seluruh halaman beserta kegunaannya',
 
   // ── Layanan & transaksi ──

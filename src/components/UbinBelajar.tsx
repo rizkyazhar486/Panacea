@@ -6,6 +6,7 @@ import { MOTIVATION } from '../lib/studyContent'
 import { SKDI_ENTRIES } from '../lib/skdiTherapyReference'
 import { QUIZ_BANK, type QuizQuestion } from '../lib/quizBank'
 import { PemutarBaca } from './PemutarBaca'
+import { KARYA } from '../lib/ringkasanKarya'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tiga widget yang mengambil dari isi yang SUDAH ADA di aplikasi ini.
@@ -240,6 +241,35 @@ export function UbinSoal() {
             </div>
           </>
         )}
+      </div>
+    </section>
+  )
+}
+
+// ── Ringkasan karya (buku & film) ──────────────────────────────────────────
+//
+// Satu karya per hari dari daftar ringkasan. Bentuknya sama dengan widget
+// inspirasi — berganti menurut tanggal, dapat diganti dengan satu ketukan —
+// karena keduanya menjawab kebutuhan yang sama: sesuatu yang layak dibaca
+// sebentar, bukan tugas yang menuntut waktu.
+export function UbinRingkasanKarya() {
+  const [geser, setGeser] = useState(0)
+  const k = KARYA[(nomorHari() * 5 + geser) % KARYA.length]
+
+  return (
+    <section>
+      <Kepala judul="Ringkasan karya" ke="/ringkasan-karya" aksi={<TombolLain onClick={() => setGeser((g) => g + 1)} />} />
+      <div className="kaca rounded-3xl p-3">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="t-kecil min-w-0 truncate font-black text-ink dark:text-white">{k.judul}</span>
+          <span className="t-mikro shrink-0 uppercase text-neutral-400">{k.jenis}</span>
+        </div>
+        <span className="t-mikro block truncate text-neutral-400">{k.oleh}{k.tahun ? ` · ${k.tahun}` : ''}</span>
+        <p className="t-kecil mt-2 line-clamp-5 leading-snug text-neutral-600 dark:text-neutral-300">{k.ringkas}</p>
+        <div className="mt-2">
+          <PemutarBaca teks={`${k.judul}, oleh ${k.oleh}. ${k.ringkas}`} label="Dengarkan" />
+        </div>
+        <p className="t-mikro mt-2 text-neutral-400">{KARYA.length} karya · berganti tiap hari</p>
       </div>
     </section>
   )

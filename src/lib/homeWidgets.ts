@@ -131,6 +131,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'puasa', label: 'Puasa', ringkas: 'Menuju Magrib dan jendela makan', ke: '/prayer-times', emoji: '🌙', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'pewaktu', label: 'Pewaktu', ringkas: 'Tidur singkat dan AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Latihan', bawaan: true },
   { id: 'pengingat', label: 'Pengingat', ringkas: 'Latihan, gol tim, dan adzan', ke: '/settings', emoji: '🔔', kategori: 'Layanan & Darurat', bawaan: true },
+  { id: 'ringkasanKarya', label: 'Ringkasan Karya', ringkas: 'Satu paragraf per buku dan film', ke: '/ringkasan-karya', emoji: '📚', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'inspirasi', label: 'Inspirasi', ringkas: 'Kisah dan kutipan, berganti tiap hari', ke: '/resilience-stories', emoji: '✨', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'kartuBelajar', label: 'Kartu Belajar', ringkas: 'Diagnosis → tatalaksana, ditutup dulu', ke: '/med-study?bagian=therapy', emoji: '🗂️', kategori: 'Klinis & Belajar', bawaan: true },
   { id: 'soalHarian', label: 'Soal Hari Ini', ringkas: 'Satu soal dengan pembahasan', ke: '/med-study', emoji: '❓', kategori: 'Klinis & Belajar', bawaan: true },
@@ -307,7 +308,7 @@ export const WIDGET_HIDUP = [
   // ── Grafik tujuh hari (kisi dua kolom, bukan tumpukan) ──────────────────
   'grafikLatihan', 'grafikTidur', 'grafikLangkah', 'grafikGizi', 'grafikDenyut',
   // ── Belajar & klinis ────────────────────────────────────────────────────
-  'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi',
+  'obatCepat', 'kalkulatorCepat', 'stasiunSering', 'kartuBelajar', 'soalHarian', 'inspirasi', 'ringkasanKarya',
   // ── Hidup & lingkungan ──────────────────────────────────────────────────
   'skorTim', 'lingkungan', 'cahaya', 'mata', 'fokus', 'duduk', 'napas', 'pengingat',
 ] as const

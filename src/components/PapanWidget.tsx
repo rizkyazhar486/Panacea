@@ -28,7 +28,7 @@ import { UbinSalat } from './UbinSalat'
 import { UbinObat, UbinKalkulator, UbinStasiun } from './UbinKerja'
 import { UbinMotivasi } from './UbinMotivasi'
 import { UbinSkor } from './UbinSkor'
-import { UbinInspirasi, UbinKartuBelajar, UbinSoal } from './UbinBelajar'
+import { UbinInspirasi, UbinKartuBelajar, UbinSoal, UbinRingkasanKarya } from './UbinBelajar'
 import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
 import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
@@ -566,6 +566,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('pewaktu') ? [{ kunci: 'pewaktu', isi: <UbinPewaktu /> }] : []),
         ...(pilihan.includes('pengingat') ? [{ kunci: 'pengingat', isi: <UbinNotifikasi /> }] : []),
         ...(pilihan.includes('inspirasi') ? [{ kunci: 'inspirasi', isi: <UbinInspirasi /> }] : []),
+        ...(pilihan.includes('ringkasanKarya') ? [{ kunci: 'ringkasanKarya', isi: <UbinRingkasanKarya /> }] : []),
         ...(pilihan.includes('soalHarian') ? [{ kunci: 'soalHarian', isi: <UbinSoal /> }] : []),
         ...(pilihan.includes('kartuBelajar') ? [{ kunci: 'kartuBelajar', isi: <UbinKartuBelajar /> }] : []),
         ...(pilihan.includes('obatCepat') ? [{ kunci: 'obatCepat', isi: <UbinObat /> }] : []),
