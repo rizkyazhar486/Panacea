@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { MorfologiLesi } from '../components/MorfologiLesi'
 import { Prosa } from '../components/Prosa'
 import { Card, SectionTitle, Badge } from '../components/ui'
 import { IconActivity } from '../components/icons'
@@ -67,6 +68,10 @@ export function DermatologyLesionMapper() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
+      <div className="mt-4">
+        <MorfologiLesi />
+      </div>
+
       <Card className="!p-5">
         <SectionTitle icon={<IconActivity size={20} />} title="Dermatologic Status & Lesion Predilection Mapper" subtitle="Pencatatan pemeriksaan yang tersusun + diagnosis banding klasik menurut morfologi/lokasi — bukan diagnosis dari foto" />
         <Prosa kelas="mt-2 text-[13px] leading-relaxed text-amber-700 dark:text-amber-300">Alat ini tidak menganalisis foto dan tidak mendiagnosis dari gambar — model tingkat konsumen tidak dapat menyingkirkan keganasan secara andal maupun memberi diagnosis yang tepat dari sebuah gambar, dan berpura-pura sebaliknya tidak aman. Sebagai gantinya ia mencatat temuan pemeriksaan Anda secara tersusun lalu memunculkan diagnosis banding klasik yang diajarkan dermatologi untuk morfologi + lokasi itu, persis seperti cara kerja tabel di buku ajar. Selalu padukan dengan keadaan klinis, dan lakukan biopsi/rujukan bila ragu.</Prosa>
