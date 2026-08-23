@@ -80,8 +80,8 @@ export function PerformanceLab() {
       <Card className="!p-5">
         <SectionTitle icon={<IconGauge size={20} />} title="Lab Penampilan" subtitle="Rangkaian lengkap uji dan kalkulator kekuatan, ketahanan & kecepatan — manual/berbasis laboratorium" />
         <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
-          Fill in values from a watch, lab equipment (lactate, NIRS, power meter) or field tests. Everything is stored offline on your device.
-          Before starting a heavy program, first complete the <a href="#/assessment" className="font-bold text-brand-dark underline">Penilaian Awal</a> (movement patterns, pain, injury risk, asymmetry).
+          Isikan angka dari jam tangan, alat laboratorium (laktat, NIRS, power meter), atau uji lapangan. Semuanya tersimpan luring di perangkat Anda.
+          Sebelum memulai program berat, selesaikan dahulu <a href="#/assessment" className="font-bold text-brand-dark underline">Penilaian Awal</a> (pola gerak, nyeri, risiko cedera, asimetri).
         </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {TABS.map((t) => (
