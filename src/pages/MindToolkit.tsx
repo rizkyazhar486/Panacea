@@ -35,9 +35,9 @@ function BrainPuzzle() {
           <div className="text-[12px] text-neutral-500">{p.hint}</div>
         </div>
       ) : (
-        <button onClick={() => setRevealed(true)} className="mt-4 rounded-xl bg-neutral-100 px-4 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Reveal answer</button>
+        <button onClick={() => setRevealed(true)} className="mt-4 rounded-xl bg-neutral-100 px-4 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Tampilkan jawaban</button>
       )}
-      <button onClick={() => { setI((x) => x + 1); setRevealed(false) }} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Next puzzle</button>
+      <button onClick={() => { setI((x) => x + 1); setRevealed(false) }} className="mt-3 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Teka-teki berikutnya</button>
     </Card>
   )
 }
@@ -89,7 +89,7 @@ function MemoryMatch() {
           )
         })}
       </div>
-      <button onClick={reset} className="mt-4 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">New game</button>
+      <button onClick={reset} className="mt-4 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Permainan baru</button>
     </Card>
   )
 }
@@ -142,7 +142,7 @@ function WordOfDay() {
   const w = WORDS[dayIndex]
   return (
     <Card className="!p-6 text-center">
-      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Today's word</div>
+      <div className="text-xs font-black uppercase tracking-wide text-neutral-500">Kata hari ini</div>
       <div className="mt-2 text-2xl font-black text-brand-dark">{w.word}</div>
       <p className="mt-2 text-[13px] leading-relaxed text-neutral-600 dark:text-neutral-300">{w.def}</p>
     </Card>
@@ -164,9 +164,9 @@ function StressInventory() {
   const remove = (i: number) => setItems((s) => s.filter((_, x) => x !== i))
   return (
     <Card className="!p-5">
-      <p className="text-[13px] text-neutral-500">List what's stressing you, order it by what's actually worth your energy today, then discard what isn't.</p>
+      <p className="text-[13px] text-neutral-500">Tuliskan apa yang membebani Anda, urutkan menurut yang benar-benar pantas menghabiskan tenaga hari ini, lalu buang sisanya.</p>
       <div className="mt-3 flex gap-2">
-        <input className={inputClassLocal} placeholder="Add a stressor…" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
+        <input className={inputClassLocal} placeholder="Tambahkan sumber tekanan…" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
         <button onClick={add} className="rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white">Add</button>
       </div>
       <div className="mt-3 space-y-1.5">
@@ -178,7 +178,7 @@ function StressInventory() {
             <button onClick={() => remove(i)} className="text-red-500">✕</button>
           </div>
         ))}
-        {items.length === 0 && <p className="text-center text-[12px] text-neutral-500">Nothing listed — good, or add what's on your mind.</p>}
+        {items.length === 0 && <p className="text-center text-[12px] text-neutral-500">Belum ada yang dituliskan — bagus, atau tambahkan yang sedang Anda pikirkan.</p>}
       </div>
     </Card>
   )
@@ -239,7 +239,7 @@ function StroopTest() {
   return (
     <Card className="!p-6 text-center">
       <p className="text-[13px] text-neutral-500">Tap the button matching the <b>ink color</b>, not the word — measures executive function / processing speed.</p>
-      {!started && round === 0 && <button onClick={begin} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start (15 rounds)</button>}
+      {!started && round === 0 && <button onClick={begin} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Mulai (15 putaran)</button>}
       {started && (
         <>
           <div className="mt-4 text-4xl font-black" style={{ color: ink.hex }}>{word.name}</div>
@@ -304,8 +304,8 @@ function DualNBack() {
 
   return (
     <Card className="!p-6 text-center">
-      <p className="text-[13px] text-neutral-500">The gold-standard working-memory trainer. Tap "Position match" or "Letter match" when the current square/letter matches the one from {n} steps back.</p>
-      {!running && seq.length === 0 && <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Start 2-back (20 rounds)</button>}
+      <p className="text-[13px] text-neutral-500">The gold-standard working-memory trainer. Tap "Cocok posisi" or "Cocok huruf" when the current square/letter matches the one from {n} steps back.</p>
+      {!running && seq.length === 0 && <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-2.5 text-sm font-bold text-white">Mulai 2-back (20 putaran)</button>}
       {running && current && (
         <>
           <div className="mx-auto mt-4 grid w-40 grid-cols-3 gap-1">
@@ -314,15 +314,15 @@ function DualNBack() {
             ))}
           </div>
           <div className="mt-4 flex gap-2">
-            <button onClick={markPos} disabled={answered.pos} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Position match</button>
-            <button onClick={markLetter} disabled={answered.letter} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Letter match</button>
+            <button onClick={markPos} disabled={answered.pos} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Cocok posisi</button>
+            <button onClick={markLetter} disabled={answered.letter} className="flex-1 rounded-xl bg-neutral-100 py-2.5 text-sm font-bold text-neutral-600 disabled:opacity-40 dark:bg-white/10 dark:text-neutral-300">Cocok huruf</button>
           </div>
         </>
       )}
       {!running && seq.length > 0 && (
         <div className="mt-4 rounded-xl bg-brand/10 p-4 text-left text-[13px]">
-          <div><b>Position:</b> {matches.posHits} correct, {matches.posMiss} incorrect</div>
-          <div><b>Letter:</b> {matches.letterHits} correct, {matches.letterMiss} incorrect</div>
+          <div><b>Posisi:</b> {matches.posHits} correct, {matches.posMiss} incorrect</div>
+          <div><b>Huruf:</b> {matches.letterHits} correct, {matches.letterMiss} incorrect</div>
           <button onClick={start} className="mt-3 w-full rounded-xl bg-brand py-2 text-sm font-bold text-white">Try again</button>
         </div>
       )}
@@ -359,7 +359,7 @@ function PatternMatrix() {
 
   return (
     <Card className="!p-6 text-center">
-      <p className="text-[13px] text-neutral-500">Memorize the highlighted squares, then tap them back in any order.</p>
+      <p className="text-[13px] text-neutral-500">Hafalkan kotak yang menyala, lalu ketuk kembali dalam urutan bebas.</p>
       {status === 'idle' && (
         <div className="mt-4 flex justify-center gap-2">
           {[3, 4, 5].map((n) => <button key={n} onClick={() => start(n)} className="rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white">{n}×{n}</button>)}
@@ -376,8 +376,8 @@ function PatternMatrix() {
         </div>
       )}
       {status === 'win' && <p className="mt-3 text-sm font-bold text-brand-dark">✓ Solved!</p>}
-      {status === 'lose' && <p className="mt-3 text-sm font-bold text-red-500">Missed one — try again</p>}
-      {(status === 'win' || status === 'lose') && <button onClick={() => setStatus('idle')} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">New pattern</button>}
+      {status === 'lose' && <p className="mt-3 text-sm font-bold text-red-500">Ada yang terlewat — coba lagi</p>}
+      {(status === 'win' || status === 'lose') && <button onClick={() => setStatus('idle')} className="mt-3 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Pola baru</button>}
     </Card>
   )
 }
@@ -411,7 +411,7 @@ function FingerTappingTest() {
     <Card className="!p-6 text-center">
       <Prosa kelas="text-[13px] text-neutral-500">Ketuk secepat dan seteratur mungkin selama 10 detik. Kecepatan mengetuk dan keajekan iramanya adalah ukuran kecepatan motorik halus yang sungguhan dan luas dipakai.</Prosa>
       {phase === 'idle' && (
-        <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Start 10s test</button>
+        <button onClick={start} className="mt-4 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white">Mulai uji 10 detik</button>
       )}
       {phase === 'running' && (
         <button onClick={tap} className="mt-4 h-40 w-full rounded-2xl bg-brand text-2xl font-black text-white active:scale-95">TAP<div className="mt-1 text-sm font-bold opacity-80">{taps.length}</div></button>
@@ -419,9 +419,9 @@ function FingerTappingTest() {
       {phase === 'done' && (
         <div className="mt-4 space-y-2 text-left">
           <div className="flex justify-between text-sm"><span className="text-neutral-500">Total taps</span><b>{taps.length}</b></div>
-          <div className="flex justify-between text-sm"><span className="text-neutral-500">Taps / second</span><b>{tapsPerSecond.toFixed(1)}</b></div>
-          <div className="flex justify-between text-sm"><span className="text-neutral-500">Rhythm variability (CV)</span><b>{cv.toFixed(1)}%</b></div>
-          <p className="text-[11px] text-neutral-500">Lower variability = steadier rhythm. Not a diagnostic motor exam — just a fun, repeatable self-tracker.</p>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Ketukan / detik</span><b>{tapsPerSecond.toFixed(1)}</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Keragaman irama (CV)</span><b>{cv.toFixed(1)}%</b></div>
+          <p className="text-[11px] text-neutral-500">Makin kecil keragamannya, makin ajek iramanya. Ini bukan pemeriksaan motorik untuk diagnosis — hanya alat pantau mandiri yang dapat diulang.</p>
           <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
         </div>
       )}
@@ -504,9 +504,9 @@ function GoNoGoTest() {
       )}
       {phase === 'done' && (
         <div className="mt-4 space-y-2 text-left">
-          <div className="flex justify-between text-sm"><span className="text-neutral-500">Go accuracy (hit rate)</span><b>{goAccuracy.toFixed(0)}%</b></div>
-          <div className="flex justify-between text-sm"><span className="text-neutral-500">No-Go accuracy (inhibition)</span><b>{nogoAccuracy.toFixed(0)}%</b></div>
-          <div className="flex justify-between text-sm"><span className="text-neutral-500">Avg. reaction time (Go)</span><b>{avgRt ? `${Math.round(avgRt)} ms` : '—'}</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Ketepatan Go (kena sasaran)</span><b>{goAccuracy.toFixed(0)}%</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Ketepatan No-Go (menahan diri)</span><b>{nogoAccuracy.toFixed(0)}%</b></div>
+          <div className="flex justify-between text-sm"><span className="text-neutral-500">Rerata waktu reaksi (Go)</span><b>{avgRt ? `${Math.round(avgRt)} ms` : '—'}</b></div>
           <p className="text-[11px] text-neutral-500">Lower No-Go accuracy means more impulsive "false alarm" taps. A casual self-tracker, not a clinical inhibition assessment.</p>
           <button onClick={() => setPhase('idle')} className="mt-2 w-full rounded-xl bg-neutral-100 py-2 text-sm font-bold text-neutral-600 dark:bg-white/10">Try again</button>
         </div>
@@ -544,18 +544,21 @@ function MeditationStreak() {
   )
 }
 
+/* Nama uji baku dipertahankan pada yang memang dikenal dengan nama itu —
+   Stroop, Dual N-Back, Go/No-Go — karena itulah nama yang dipakai orang untuk
+   mencari keterangannya. Sisanya diterjemahkan. */
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'puzzle', label: 'Brain Puzzle' },
-  { id: 'memory', label: 'Memory Match' },
-  { id: 'reaction', label: 'Reaction Time' },
-  { id: 'word', label: 'Word of the Day' },
-  { id: 'stress', label: 'Stress Inventory' },
-  { id: 'detox', label: 'Digital Detox' },
-  { id: 'meditation', label: 'Meditation Streak' },
-  { id: 'stroop', label: 'Stroop Test' },
+  { id: 'puzzle', label: 'Teka-teki Otak' },
+  { id: 'memory', label: 'Cocok Ingatan' },
+  { id: 'reaction', label: 'Waktu Reaksi' },
+  { id: 'word', label: 'Kata Hari Ini' },
+  { id: 'stress', label: 'Daftar Beban Pikiran' },
+  { id: 'detox', label: 'Puasa Layar' },
+  { id: 'meditation', label: 'Rangkaian Meditasi' },
+  { id: 'stroop', label: 'Uji Stroop' },
   { id: 'nback', label: 'Dual N-Back' },
-  { id: 'pattern', label: 'Pattern Matrix' },
-  { id: 'tapping', label: 'Finger Tapping' },
+  { id: 'pattern', label: 'Matriks Pola' },
+  { id: 'tapping', label: 'Ketuk Jari' },
   { id: 'gonogo', label: 'Go/No-Go' },
 ]
 
@@ -564,7 +567,7 @@ export function MindToolkit() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 pb-24">
       <Card className="!p-5">
-        <SectionTitle icon={<IconSparkle size={20} />} title="Cognitive Longevity Toolkit" subtitle="Twelve small brain & stress tools in one place" />
+        <SectionTitle icon={<IconSparkle size={20} />} title="Perkakas Ketajaman Pikiran" subtitle="Dua belas alat kecil untuk otak dan tekanan pikiran, dalam satu tempat" />
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-3 py-1.5 text-[12px] font-bold transition ${tab === t.id ? 'bg-brand text-white' : 'bg-neutral-100 text-neutral-600 dark:bg-white/10 dark:text-neutral-300'}`}>{t.label}</button>

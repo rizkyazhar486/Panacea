@@ -35,7 +35,7 @@ export function BaseTraining() {
 
   return (
     <div className="space-y-4">
-      <SectionTitle icon={<IconRun />} title="Foundation Training" subtitle="Lari, push-up, pull-up, sit-up, dan perbaikan postur" />
+      <SectionTitle icon={<IconRun />} title="Latihan Dasar" subtitle="Lari, push-up, pull-up, sit-up, dan perbaikan postur" />
 
       <Card>
         <p className="text-sm text-neutral-600 leading-relaxed">
@@ -125,7 +125,7 @@ function RunTab() {
           </Field>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Distance (km)">
+            <Field label="Jarak (km)">
               <input className={inputClass} value={dist} onChange={(e) => setDist(e.target.value)} inputMode="decimal" />
             </Field>
             <Field label="Time (minutes)">
@@ -135,7 +135,7 @@ function RunTab() {
         )}
 
         {derived == null && (
-          <p className="text-sm text-amber-300 mt-3">Enter pace as min:sec, for example 5:30.</p>
+          <p className="text-sm text-amber-300 mt-3">Tulis pace sebagai menit:detik, misalnya 5:30.</p>
         )}
 
         {result && (
@@ -170,7 +170,7 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="Four kinds of run, four different purposes" subtitle="Jangan berlari sekuat tenaga pada tiap sesi" />
+        <SectionTitle icon={<IconRun />} title="Empat jenis lari, empat maksud yang berbeda" subtitle="Jangan berlari sekuat tenaga pada tiap sesi" />
         <div className="space-y-3 mt-2">
           {RUN_ZONES.map((z) => (
             <div key={z.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -181,9 +181,9 @@ function RunTab() {
               </div>
               <p className="text-sm text-neutral-500 mt-2 leading-relaxed">{z.kenapa}</p>
               <div className="mt-2 grid gap-1 text-xs">
-                <div className="text-neutral-500"><span className="text-slate-500">How it feels:</span> {z.rasa}</div>
+                <div className="text-neutral-500"><span className="text-slate-500">Rasanya:</span> {z.rasa}</div>
                 <div className="text-neutral-500"><span className="text-slate-500">Share of volume:</span> {z.porsi}</div>
-                <div className="text-amber-300/90"><span className="text-amber-500/80">Common mistake:</span> {z.salahnya}</div>
+                <div className="text-amber-300/90"><span className="text-amber-500/80">Kesalahan yang lazim:</span> {z.salahnya}</div>
               </div>
             </div>
           ))}
@@ -191,14 +191,14 @@ function RunTab() {
       </Card>
 
       <Card>
-        <SectionTitle title="Full pace table" subtitle="Untuk pace lomba 3:00–6:00 per km" />
+        <SectionTitle title="Tabel pace lengkap" subtitle="Untuk pace lomba 3:00–6:00 per km" />
         <div className="overflow-x-auto mt-2">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
               <tr className="text-neutral-500 border-b border-white/10">
-                <th className="text-left py-2 pr-3 font-medium">Race pace</th>
-                <th className="text-left py-2 pr-3 font-medium">Easy</th>
-                <th className="text-left py-2 pr-3 font-medium">Long</th>
+                <th className="text-left py-2 pr-3 font-medium">Pace lomba</th>
+                <th className="text-left py-2 pr-3 font-medium">Santai</th>
+                <th className="text-left py-2 pr-3 font-medium">Jauh</th>
                 <th className="text-left py-2 pr-3 font-medium">Tempo</th>
                 <th className="text-left py-2 font-medium">Interval</th>
               </tr>
@@ -245,7 +245,7 @@ function LadderCard({ ladder }: { ladder: Ladder }) {
       <SectionTitle icon={<IconActivity />} title={ladder.title} subtitle={ladder.otot} />
 
       <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 p-3 mt-2">
-        <div className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">How this relates to posture</div>
+        <div className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">Kaitannya dengan postur</div>
         <p className="text-sm text-neutral-600 mt-1 leading-relaxed">{ladder.postur}</p>
       </div>
 
@@ -272,7 +272,7 @@ function LadderCard({ ladder }: { ladder: Ladder }) {
           <span className="text-sm text-neutral-500">— {cur.target}</span>
         </div>
         <div className="mt-2 text-sm text-neutral-500"><span className="text-slate-500">Technique:</span> {cur.cue}</div>
-        <div className="mt-1 text-sm text-emerald-300/90"><span className="text-emerald-500/80">Progress when:</span> {cur.naik}</div>
+        <div className="mt-1 text-sm text-emerald-300/90"><span className="text-emerald-500/80">Naikkan bila:</span> {cur.naik}</div>
       </div>
     </Card>
   )
@@ -419,7 +419,7 @@ function StretchTab() {
       <DoseCalculator />
 
       <Card>
-        <SectionTitle icon={<IconTimer />} title="Ready-made routines" subtitle="Empat saat yang berbeda menuntut jenis peregangan yang berbeda" />
+        <SectionTitle icon={<IconTimer />} title="Rangkaian siap pakai" subtitle="Empat saat yang berbeda menuntut jenis peregangan yang berbeda" />
         <div className="space-y-3 mt-2">
           {ROUTINES.map((r) => (
             <div key={r.key} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
@@ -443,7 +443,7 @@ function StretchTab() {
       </Card>
 
       <Card>
-        <SectionTitle icon={<IconRun />} title="By muscle group" subtitle="Posisi, di mana seharusnya terasa, dan kekeliruan yang paling sering" />
+        <SectionTitle icon={<IconRun />} title="Menurut kelompok otot" subtitle="Posisi, di mana seharusnya terasa, dan kekeliruan yang paling sering" />
 
         <div className="flex flex-wrap gap-2 mt-3">
           {([['semua', 'All'], ['atas', 'Upper body'], ['inti', 'Hips & trunk'], ['bawah', 'Legs']] as [Wilayah | 'semua', string][]).map(([k, l]) => (
@@ -506,7 +506,7 @@ function StretchTab() {
                         </div>
 
                         <div className="mt-1.5 rounded-md bg-amber-500/10 border border-amber-500/25 px-2.5 py-1.5">
-                          <span className="text-xs text-amber-700/80">Most common mistake: </span>
+                          <span className="text-xs text-amber-700/80">Kesalahan yang paling sering: </span>
                           <span className="text-sm text-amber-100/90">{st.salah}</span>
                         </div>
 
@@ -570,10 +570,10 @@ function DoseCalculator() {
       />
 
       <div className="grid grid-cols-3 gap-3 mt-3">
-        <Field label="Hold (seconds)">
+        <Field label="Tahan (detik)">
           <input className={inputClass} value={hold} onChange={(e) => setHold(e.target.value)} inputMode="numeric" />
         </Field>
-        <Field label="Reps">
+        <Field label="Ulangan">
           <input className={inputClass} value={reps} onChange={(e) => setReps(e.target.value)} inputMode="numeric" />
         </Field>
         <Field label="Sessions per week">
@@ -582,7 +582,7 @@ function DoseCalculator() {
       </div>
 
       {hasil == null ? (
-        <p className="text-sm text-slate-500 mt-3">Fill all three fields with a number above zero.</p>
+        <p className="text-sm text-slate-500 mt-3">Isi ketiga kolom dengan angka di atas nol.</p>
       ) : (
         <div className="mt-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">

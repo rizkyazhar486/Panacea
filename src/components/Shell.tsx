@@ -128,7 +128,7 @@ const nav: Nav[] = [
   // Pengelolaan (peran tertentu saja)
   { to: '/admin', label: 'Admin', icon: IconShield, roles: ['admin'], group: 'Manage' },
   { to: '/owner', label: 'Owner', icon: IconShield, roles: ['owner'], group: 'Manage' },
-  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/owner-analytics', label: 'Analitik Pemilik', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/editor', label: 'Tulis Materi', icon: IconBook, roles: ['kontributor'], group: 'Manage' },
   { to: '/verification', label: 'Verifikasi', icon: IconShield, roles: ['verifikator'], group: 'Manage' },
   // Akun
@@ -157,7 +157,7 @@ const KATALOG: Nav[] = [
   { to: '/health-data', label: 'Health Data', icon: IconHeart, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/vitapulse', label: 'VitaPulse', icon: IconActivity, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/keuangan', label: 'Finance', icon: IconToken, roles: ['pasien', 'dokter', 'owner'], group: 'Money' },
-  { to: '/owner-analytics', label: 'Owner Analytics', icon: IconShield, roles: ['owner'], group: 'Manage' },
+  { to: '/owner-analytics', label: 'Analitik Pemilik', icon: IconShield, roles: ['owner'], group: 'Manage' },
   { to: '/nutrition', label: 'Nutrition', icon: IconFood, roles: ['pasien'], group: 'Health' },
   { to: '/emergency', label: 'Emergency Card & SOS', icon: IconShield, roles: ['pasien', 'dokter', 'owner'], group: 'Health' },
   { to: '/education', label: 'Education', icon: IconBook, roles: ['pasien'], group: 'Content' },
