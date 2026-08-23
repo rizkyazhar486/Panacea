@@ -31,6 +31,8 @@ import { UbinSkor } from './UbinSkor'
 import { UbinInspirasi, UbinKartuBelajar, UbinSoal } from './UbinBelajar'
 import { UbinPewaktu } from './UbinPewaktu'
 import { UbinNotifikasi } from './UbinNotifikasi'
+import { UbinMata, UbinFokus, UbinKopi } from './UbinWaktuHidup'
+import { UbinPuasa } from './UbinPuasa'
 import { UbinTidurLebar, UbinGiziLebar } from './UbinTidurGizi'
 import { PetaKonsistensi } from './PetaKonsistensi'
 import { ambilRiwayat } from '../lib/riwayatVitals'
@@ -465,6 +467,7 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
     'motivasi', 'obatCepat', 'kalkulatorCepat', 'stasiunSering',
     'skorTim', 'tidurLebar', 'giziLebar',
     'inspirasi', 'kartuBelajar', 'soalHarian', 'pewaktu', 'pengingat',
+    'mata', 'fokus', 'kopi', 'puasa',
   ]
   const adaGrafik = pilihan.includes('grafikOlahraga')
 
@@ -543,6 +546,10 @@ export function PapanWidget({ pratinjau, tanggalCatatan }: { pratinjau: Pratinja
         ...(pilihan.includes('tidurLebar') ? [{ kunci: 'tidurLebar', isi: <UbinTidurLebar /> }] : []),
         ...(pilihan.includes('giziLebar') ? [{ kunci: 'giziLebar', isi: <UbinGiziLebar /> }] : []),
         ...(pilihan.includes('motivasi') ? [{ kunci: 'motivasi', isi: <UbinMotivasi /> }] : []),
+        ...(pilihan.includes('fokus') ? [{ kunci: 'fokus', isi: <UbinFokus /> }] : []),
+        ...(pilihan.includes('mata') ? [{ kunci: 'mata', isi: <UbinMata /> }] : []),
+        ...(pilihan.includes('puasa') ? [{ kunci: 'puasa', isi: <UbinPuasa /> }] : []),
+        ...(pilihan.includes('kopi') ? [{ kunci: 'kopi', isi: <UbinKopi /> }] : []),
         ...(pilihan.includes('pewaktu') ? [{ kunci: 'pewaktu', isi: <UbinPewaktu /> }] : []),
         ...(pilihan.includes('pengingat') ? [{ kunci: 'pengingat', isi: <UbinNotifikasi /> }] : []),
         ...(pilihan.includes('inspirasi') ? [{ kunci: 'inspirasi', isi: <UbinInspirasi /> }] : []),

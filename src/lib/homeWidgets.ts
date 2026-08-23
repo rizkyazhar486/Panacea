@@ -102,6 +102,10 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'labDecoder', label: 'Baca Hasil Lab', ringkas: 'Terjemahkan angka laboratorium', ke: '/lab-decoder', emoji: '🧾', kategori: 'Tubuh & Data' },
   { id: 'rppg', label: 'Detak dari Kamera', ringkas: 'Ukur nadi lewat wajah', ke: '/rppg-heart-rate', emoji: '📷', kategori: 'Tubuh & Data' },
   { id: 'vokal', label: 'Biomarker Suara', ringkas: 'Petunjuk kesehatan dari suara', ke: '/vocal-biomarkers', emoji: '🎙️', kategori: 'Tubuh & Data' },
+  { id: 'mata', label: 'Mata 20-20-20', ringkas: 'Jeda mata tiap 20 menit', ke: '/tubuh', emoji: '👁️', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'fokus', label: 'Sesi Fokus', ringkas: 'Hitungan mundur kerja atau layar', ke: '/harian', emoji: '🎯', kategori: 'Tubuh & Data', bawaan: true },
+  { id: 'kopi', label: 'Kopi', ringkas: 'Kopi terakhir dan sisa kafein', ke: '/pola-tidur', emoji: '☕', kategori: 'Gizi', bawaan: true },
+  { id: 'puasa', label: 'Puasa', ringkas: 'Menuju Magrib dan jendela makan', ke: '/prayer-times', emoji: '🌙', kategori: 'Ibadah & Hidup', bawaan: true },
   { id: 'pewaktu', label: 'Pewaktu', ringkas: 'Tidur singkat dan AMRAP', ke: '/latihan', emoji: '⏱️', kategori: 'Latihan', bawaan: true },
   { id: 'pengingat', label: 'Pengingat', ringkas: 'Latihan, gol tim, dan adzan', ke: '/settings', emoji: '🔔', kategori: 'Layanan & Darurat', bawaan: true },
   { id: 'inspirasi', label: 'Inspirasi', ringkas: 'Kisah dan kutipan, berganti tiap hari', ke: '/resilience-stories', emoji: '✨', kategori: 'Ibadah & Hidup', bawaan: true },
@@ -292,7 +296,11 @@ export const WIDGET_HIDUP = [
   'kartuBelajar',   // kartu tatalaksana yang jawabannya ditutup
   'soalHarian',     // satu soal dari bank soal, dengan pembahasan
   'pewaktu',        // hitungan mundur nap dan AMRAP
-  'pengingat',      // saklar notifikasi latihan, gol tim, adzan
+  'pengingat',      // saklar notifikasi latihan, gol tim, adzan, salat
+  'mata',           // 20-20-20
+  'fokus',          // sesi kerja/menatap layar
+  'kopi',           // kopi terakhir + perkiraan sisa kafein
+  'puasa',          // menuju Magrib + jendela makan
 ] as const
 
 /** Katalog yang boleh menempati beranda. */

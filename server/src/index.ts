@@ -116,6 +116,7 @@ import { KATALOG, KATEGORI } from './healthMetrics.js'
 import { parseHealthWebhookPayload, extractHeartRateSeries, extractSleepSessions, newestSampleDate } from './healthWebhook.js'
 import { checkHrZoneAlert, checkBedtimeReminder, checkWorkoutReminder, suggestedBedtime, ZONES } from './healthAlerts.js'
 import { fetchLeagueScoreboard, fetchF1Info, fetchMotoGpInfo, LEAGUES, UNAVAILABLE } from './sports.js'
+import { checkPrayerReminder } from './salat.js'
 import { searchPubmed } from './pubmed.js'
 import { fetchQuote, fetchQuotes, searchSymbols, INSTRUMENTS, UNGGULAN, WATCHLIST_MAX, RANGES, isValidSymbol, type Range } from './markets.js'
 import { searchTrials } from './trials.js'
@@ -1553,6 +1554,9 @@ setInterval(() => {
     // Pengingat latihan harian, penjadwal yang sama persis: jam milik
     // pengguna sendiri, sekali sehari, jendela toleransi dua menit.
     checkWorkoutReminder(u.id).catch(() => {})
+    // Pengingat SEBELUM waktu salat (bawaan lima menit). Bukan adzan — Web
+    // Push tidak dapat memutar lantunan, jadi yang dijanjikan hanya kabarnya.
+    checkPrayerReminder(u.id).catch(() => {})
   }
 }, 60_000)
 

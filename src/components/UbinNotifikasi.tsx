@@ -33,6 +33,9 @@ interface Setelan {
   notifLatihan?: boolean
   latihanHHMM?: string
   sportsNotif?: boolean
+  notifSalat?: boolean
+  salatLeadMin?: number
+  salatKota?: string
 }
 
 function Saklar({ nyala, onUbah, label }: { nyala: boolean; onUbah: (v: boolean) => void; label: string }) {
@@ -164,10 +167,47 @@ export function UbinNotifikasi() {
           />
         </div>
 
+        {/* Pengingat SEBELUM waktu salat, dikirim server — beda benda dengan
+            baris Adzan di bawahnya, dan bedanya disebut supaya tidak dikira
+            saklar yang sama. Yang ini sampai walau aplikasi ditutup, tetapi
+            berupa notifikasi biasa; yang di bawah berbunyi dan bergetar,
+            tetapi hanya selama aplikasi terbuka. */}
+        <div className="border-t border-neutral-100 dark:border-white/10">
+          <Baris
+            judul="Menjelang waktu salat"
+            catatan={pushNyala ? `${setelan.salatLeadMin ?? 5} menit sebelumnya · ${setelan.salatKota ?? adzan.kota}` : 'Nyalakan notifikasi dahulu'}
+            kanan={
+              <span className="flex shrink-0 items-center gap-2">
+                <select
+                  value={String(setelan.salatLeadMin ?? 5)}
+                  onChange={(e) => void simpanServer({ salatLeadMin: Number(e.target.value), salatKota: adzan.kota, salatNegara: adzan.negara, salatMetode: adzan.metode } as Setelan)}
+                  aria-label="Berapa menit sebelum waktu salat"
+                  className="t-kecil rounded-lg border border-neutral-200 bg-transparent px-1.5 py-1 tabular-nums text-ink dark:border-white/12 dark:text-white"
+                >
+                  {[0, 2, 5, 10, 15].map((m) => (
+                    <option key={m} value={m}>{m === 0 ? 'tepat' : `${m} mnt`}</option>
+                  ))}
+                </select>
+                <Saklar
+                  label="Pengingat menjelang salat"
+                  nyala={!!setelan.notifSalat && pushNyala}
+                  onUbah={(v) => void simpanServer({
+                    notifSalat: v,
+                    salatLeadMin: setelan.salatLeadMin ?? 5,
+                    salatKota: adzan.kota,
+                    salatNegara: adzan.negara,
+                    salatMetode: adzan.metode,
+                  } as Setelan)}
+                />
+              </span>
+            }
+          />
+        </div>
+
         <div className="border-t border-neutral-100 dark:border-white/10">
           <Baris
             judul="Adzan"
-            catatan={adzan.aktif ? `Bunyi${adzan.getar ? ' + getar' : ''} · hanya saat aplikasi terbuka` : 'Mati'}
+            catatan={adzan.aktif ? `Bunyi${adzan.getar ? ' + getar' : ''} · hanya saat aplikasi terbuka` : 'Bunyi di dalam aplikasi · mati'}
             kanan={
               <span className="flex shrink-0 items-center gap-2">
                 {adzan.aktif && (
