@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { SaklarNotifikasi } from './SaklarNotifikasi'
 import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { IconBell } from './icons'
 import { api, backendEnabled, type Notif } from '../lib/api'
 
@@ -72,6 +73,15 @@ export function NotificationBell() {
   const btnRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const nav = useNavigate()
+  const loc = useLocation()
+
+  /* PANEL DITUTUP SETIAP KALI HALAMAN BERGANTI.
+     Panel ini hidup di kerangka aplikasi, bukan di halamannya, sehingga ia
+     bertahan menyeberangi perpindahan halaman — termasuk perpindahan yang
+     BUKAN karena menekan isinya, misalnya tombol kembali peramban. Yang
+     tertinggal adalah tirai sepenuh layar di atas halaman baru: setiap ketukan
+     tertelan olehnya, dan halamannya tampak membeku tanpa sebab. */
+  useEffect(() => { setOpen(false) }, [loc.pathname])
   const unread = items.filter((n) => !n.read).length
 
   const load = useCallback(() => {
@@ -182,18 +192,27 @@ export function NotificationBell() {
           </span>
         </div>
 
+        {/* MENGHIDUPKAN NOTIFIKASI DITARUH DI SINI, bukan hanya di widget
+            beranda. Lonceng ini ada di bilah atas SETIAP halaman, sehingga
+            inilah satu-satunya tempat yang selalu berjarak satu ketukan dari
+            mana pun orang berada — dan orang yang membuka lonceng lalu
+            menemukannya kosong justru orang yang paling ingin menyalakannya. */}
+        <div className="shrink-0 px-3 pt-3 empty:hidden">
+          <SaklarNotifikasi ringkas onSelesai={load} />
+        </div>
+
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {gagal ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-neutral-500">Could not load notifications.</p>
-              <p className="mt-1 text-[11px] text-neutral-500">Check your internet connection.</p>
+              <p className="text-sm text-neutral-500">Pemberitahuan tidak dapat dimuat.</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Periksa sambungan internet Anda.</p>
               <button onClick={load} className="mt-3 rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-700 dark:bg-white/10 dark:text-neutral-200">
                 Coba lagi
               </button>
             </div>
           ) : items.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-sm text-neutral-500">No notifications yet.</p>
+              <p className="text-sm text-neutral-500">Belum ada pemberitahuan.</p>
               <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">
                 Pengingat obat, jadwal konsultasi, dan pembaruan akun akan muncul di sini.
               </p>

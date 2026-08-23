@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api, backendEnabled } from '../lib/api'
-import { enablePush, pushStatus, type PushStatus } from '../lib/push'
+import { pushStatus, type PushStatus } from '../lib/push'
 import { DiagnosaNotifikasi } from './DiagnosaNotifikasi'
+import { SaklarNotifikasi } from './SaklarNotifikasi'
 import { muatSetelan, simpanSetelan } from '../lib/adzan'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,7 +106,6 @@ export function UbinNotifikasi() {
   const [push, setPush] = useState<PushStatus>('disabled')
   const [setelan, setSetelan] = useState<Setelan>({})
   const [adzan, setAdzan] = useState(() => muatSetelan())
-  const [sibuk, setSibuk] = useState(false)
 
   useEffect(() => {
     void pushStatus().then(setPush)
@@ -127,12 +127,6 @@ export function UbinNotifikasi() {
     } catch { /* gagal simpan — saklar tetap sesuai yang dilihat, dicoba lagi nanti */ }
   }
 
-  const nyalakanPush = async () => {
-    setSibuk(true)
-    setPush(await enablePush())
-    setSibuk(false)
-  }
-
   const pushNyala = push === 'enabled'
 
   return (
@@ -145,27 +139,14 @@ export function UbinNotifikasi() {
         {/* Keadaan push disebut lebih dahulu, karena dua saklar di bawahnya
             bergantung padanya. Menaruhnya di bawah membuat orang menyalakan
             saklar yang tidak akan pernah berbunyi. */}
+        {/* Satu tombol yang mengerjakan KETIGA langkahnya sekaligus — izin,
+            langganan, dan jenis pengingat bawaan. Sebelum ini langkah ketiga
+            tidak pernah disebutkan, dan yang melewatkannya mendapat lencana
+            hijau beserta kesunyian. */}
         {!pushNyala && (
-          <Baris
-            judul="Notifikasi belum aktif"
-            catatan={
-              push === 'denied' ? 'Izin ditolak — hidupkan lewat pengaturan peramban'
-                : push === 'unsupported' ? 'Peramban ini tidak mendukung notifikasi'
-                  : push === 'unavailable' ? 'Butuh sambungan ke server'
-                    : 'Latihan dan gol tim butuh ini'
-            }
-            kanan={
-              push === 'disabled' ? (
-                <button
-                  onClick={nyalakanPush}
-                  disabled={sibuk}
-                  className="t-kecil min-h-[40px] shrink-0 rounded-xl bg-brand px-3 font-bold text-white disabled:opacity-50"
-                >
-                  {sibuk ? '…' : 'Nyalakan'}
-                </button>
-              ) : null
-            }
-          />
+          <div className="py-2">
+            <SaklarNotifikasi onSelesai={() => { void pushStatus().then(setPush); if (backendEnabled) void api.getSettings().then((s) => setSetelan((s ?? {}) as Setelan)).catch(() => {}) }} />
+          </div>
         )}
 
         <div className="border-t border-neutral-100 dark:border-white/10">
